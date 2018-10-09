@@ -29,5 +29,7 @@ module OffenderManagementAllocationClient
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+    
+    config.api_host = ENV.fetch('OFFENDER_MANAGEMENT_ALLOCATION_API', 'http://localhost:8000/status')
   end
 end
