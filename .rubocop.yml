@@ -1,0 +1,313 @@
+require: rubocop-rspec
+
+AllCops:
+  # Exclude anything that isn't really part of our code.
+  # rails_helper is excluded because it's full of solecisms, but it's mostly
+  # generated code and copy-and-pasted snipets from READMEs.
+  Exclude:
+    - 'vendor/**/*'
+    - 'db/**/*'
+    - 'bin/**/*'
+    - '**/*.gemspec'
+    - '**/Rakefile'
+    - '**/Vagrantfile'
+    - 'app/views/api/**/*.json.jbuilder'
+    - 'config/initializers/simple_form.rb'
+    - 'config/unicorn.rb'
+    - 'spec/rails_helper.rb'
+    - 'lib/tasks/brakeman.rake'
+    - 'lib/tasks/elasticsearch.rake'
+    - 'spec/dummy/db/**/*'
+
+  DisplayCopNames: true
+
+Rails:
+  Enabled: true
+
+# private/protected/public
+Layout/AccessModifierIndentation:
+  EnforcedStyle: outdent
+
+# Just indent parameters by two spaces. It's less volatile if methods change,
+# and there's less busy work lining things up.
+Layout/AlignParameters:
+  EnforcedStyle: with_fixed_indentation
+
+Style/AsciiComments:
+  Enabled: false
+
+# Use Weirich style
+Style/BlockDelimiters:
+  EnforcedStyle: semantic
+  FunctionalMethods:
+    - before
+    - let
+    - let!
+    - subject
+    - watch
+    - expect
+
+# Allow ===. It's useful.
+Style/CaseEquality:
+  Enabled: false
+
+Style/CollectionMethods:
+  PreferredMethods:
+    inject: 'inject'
+    reduce: 'inject'
+
+# Chain methods with trailing dots.
+Layout/DotPosition:
+  EnforcedStyle: trailing
+
+# The holidays file has extra spaces for ease of reading and comparison
+Layout/ExtraSpacing:
+  Exclude:
+    - 'config/initializers/holidays.rb'
+
+# Percent-formatting and hash interpolation both have their place. Don't
+# enforce any particular one.
+Style/FormatString:
+  Enabled: false
+
+# It's not really clearer to replace every if with a return if.
+Style/GuardClause:
+  Enabled: false
+
+Style/SymbolArray:
+  Enabled: false
+
+Style/SymbolProc:
+  Exclude:
+    - 'spec/factories/**/*'
+
+# You can't use attr_reader to define a foo? method from @foo.
+Style/TrivialAccessors:
+  AllowPredicates: true
+
+Naming/FileName:
+  Enabled: false
+
+# Default is 100
+Metrics/ClassLength:
+  Max: 200
+
+Metrics/LineLength:
+  Max: 90
+  Exclude:
+    - 'spec/**/*'
+
+# Don't worry about long methods in specs.
+Metrics/MethodLength:
+  Max: 10
+  Exclude:
+    - 'spec/**/*'
+    - 'app/helpers/form_elements_helper.rb'
+    - 'app/metrics/**/*' # Some very long SQL based methods there.
+
+# Don't worry about the complexity of spec methods
+Metrics/AbcSize:
+  Exclude:
+    - 'spec/**/*'
+
+# Enforce single quotes everywhere except in specs (because there's a lot of
+# human text with apostrophes in spec names, and using double quotes for all
+# of those is more consistent. There shouldn't be much human-readable text in
+# the application code: that is better moved to the locale files.
+Style/StringLiterals:
+  EnforcedStyle: single_quotes
+  Exclude:
+    - 'spec/**/*'
+
+# Prefer sensible naming to comments everywhere.
+Documentation:
+  Description: Document classes and non-namespace modules.
+  Enabled: false
+
+Style/DoubleNegation:
+  Enabled: false
+
+# Would enforce do_y if x over if x / do y / end. As with GuardClause above,
+# this enforces code organisation that doesn't necesarily make things clearer.
+IfUnlessModifier:
+  Enabled: false
+
+# Don't allow safe assignment in conditions.
+Lint/AssignmentInCondition:
+  AllowSafeAssignment: false
+
+# Just a preference to use %w[] over %w()
+Style/PercentLiteralDelimiters:
+  PreferredDelimiters:
+    '%i': '[]'
+    '%w': '[]'
+    '%W': '[]'
+    '%': '{}'
+
+ClassAndModuleChildren:
+  Enabled: false
+
+# This encourages bad style IMHO
+Rails/Delegate:
+  Enabled: false
+
+RSpec/AnyInstance:
+  Enabled: false
+
+Bundler/OrderedGems:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
+Performance/CompareWithBlock:
+  Enabled: false
+
+Performance/RangeInclude:
+  Enabled: false
+
+Performance/TimesMap:
+  Enabled: false
+
+RSpec/EmptyExampleGroup:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/HookArgument:
+  Enabled: false
+
+RSpec/ExpectInHook:
+  Enabled: false
+
+RSpec/ImplicitExpect:
+  Enabled: false
+
+RSpec/LeadingSubject:
+  Enabled: false
+
+RSpec/LetSetup:
+  Enabled: false
+
+RSpec/MessageSpies:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/NamedSubject:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Enabled: false
+
+RSpec/RepeatedExample:
+  Enabled: false
+
+RSpec/ScatteredSetup:
+  Enabled: false
+
+RSpec/SubjectStub:
+  Enabled: false
+
+RSpec/VerifiedDoubles:
+  Enabled: false
+
+Rails/FilePath:
+  Enabled: false
+
+Rails/HttpPositionalArguments:
+  Enabled: false
+
+Rails/OutputSafety:
+  Enabled: false
+
+Rails/SkipsModelValidations:
+  Enabled: false
+
+Rails/ApplicationRecord:
+  Enabled: false
+Rails/ApplicationJob:
+  Enabled: false
+
+Security/YAMLLoad:
+  Enabled: false
+
+Style/Alias:
+  Enabled: false
+
+Layout/ClosingParenthesisIndentation:
+  Enabled: false
+
+Style/ConditionalAssignment:
+  Enabled: false
+
+Style/EmptyCaseCondition:
+  Enabled: false
+
+Layout/ExtraSpacing:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Layout/IndentArray:
+  Enabled: false
+
+Layout/MultilineArrayBraceLayout:
+  Enabled: false
+
+Layout/MultilineHashBraceLayout:
+  Enabled: false
+
+Layout/MultilineMethodCallBraceLayout:
+  Enabled: false
+
+Layout/MultilineMethodCallIndentation:
+  Enabled: false
+
+Layout/MultilineOperationIndentation:
+  Enabled: false
+
+Style/MutableConstant:
+  Enabled: false
+
+Style/NestedParenthesizedCalls:
+  Enabled: false
+
+Style/NumericLiteralPrefix:
+  Enabled: false
+
+Style/NumericPredicate:
+  Enabled: false
+
+Style/SignalException:
+  Enabled: false
+
+Layout/SpaceAroundKeyword:
+  Enabled: false
+
+Layout/SpaceBeforeBlockBraces:
+  Enabled: false
+
+Layout/SpaceInsidePercentLiteralDelimiters:
+  Enabled: false
+
+Style/TernaryParentheses:
+  Enabled: false
+
+Lint/UselessAccessModifier:
+  Enabled: false
+
+Lint/IneffectiveAccessModifier:
+  Enabled: false
+
+Lint/AmbiguousBlockAssociation:
+  Enabled: false
+
+Capybara/FeatureMethods:
+  Enabled: false

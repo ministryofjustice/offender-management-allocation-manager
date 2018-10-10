@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class StatusController < ApplicationController
   def index
-    @status = Allocation::Api.instance.get_status
+    @status = Allocation::Api.instance.fetch_status
   end
 end
