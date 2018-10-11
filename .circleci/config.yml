@@ -1,34 +1,55 @@
+defaults: &defaults
+  working_directory: ~/repo
+  docker:
+    - image: circleci/ruby:2.5.1-node-browsers
+      environment:
+        RAILS_ENV: test
+        RACK_ENV: test
+
 version: 2
 jobs:
   build:
-    parallelism: 1
-    working_directory: ~/allocation-manager
-    docker:
-      - image: circleci/ruby:2.5.1-node-browsers
-        environment:
-          RAILS_ENV: test
-          RACK_ENV: test
+    <<: *defaults
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/repo
       - run:
           name: Which bundler?
           command: bundle -v
+      - restore_cache:
+          keys:
+            - allocation-manager-allocation-manager-v1-{{ checksum "Gemfile.lock" }}
+            - allocation-manager-allocation-manager-v1-
       - run:
           name: Update npm
           command: 'sudo npm install -g npm@latest'
       - run:
           name: Install GOV.UK frontend modules
           command: npm install
-      - restore_cache:
-          keys:
-            - allocation-manager-v1-{{ checksum "Gemfile.lock" }}
-            - allocation-manager-v1-
-      - run: gem install did_you_mean -v 1.2.1
       - run: bundle check --path vendor/bundle || bundle install --path vendor/bundle
       - save_cache:
           key: allocation-manager-v1-{{ checksum "Gemfile.lock" }}
           paths:
+            - ~/repo/vendor/bundle
+      - persist_to_workspace:
+          root: .
+          paths: 
             - vendor/bundle
+            - node_modules/
+
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/repo
+      - run: bundle --path vendor/bundle
+      - run:
+          name: Download Code Climate
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
       - run:
           name: install firefox
           command: |
@@ -50,11 +71,6 @@ jobs:
             fi
             [[ -L /usr/local/bin/geckodriver ]] || sudo ln -sf /opt/geckodriver /usr/local/bin/geckodriver
       - run:
-          name: Setup Code Climate test-reporter
-          command: |
-            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-            chmod +x ./cc-test-reporter
-      - run:
           name: Run tests
           command: |
             ./cc-test-reporter before-build
@@ -64,3 +80,12 @@ jobs:
           path: coverage
       - store_artifacts:
           path: coverage
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
