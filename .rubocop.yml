@@ -13,6 +13,7 @@ AllCops:
     - '**/Vagrantfile'
     - 'app/views/api/**/*.json.jbuilder'
     - 'config/initializers/simple_form.rb'
+    - 'config/initializers/assets.rb'
     - 'config/unicorn.rb'
     - 'spec/rails_helper.rb'
     - 'lib/tasks/brakeman.rake'
