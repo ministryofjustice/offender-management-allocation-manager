@@ -34,7 +34,7 @@ jobs:
             - ~/repo/vendor/bundle
       - persist_to_workspace:
           root: .
-          paths: 
+          paths:
             - vendor/bundle
             - node_modules/
 
@@ -61,11 +61,25 @@ jobs:
       - store_artifacts:
           path: coverage
 
+  security-static-analysis:
+    <<: *defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/repo
+      - run: bundle --path vendor/bundle
+      - run: bundle exec brakeman -o brakeman.html
+      - store_artifacts:
+          path: brakeman.html
+
 workflows:
   version: 2
   build_and_test:
     jobs:
       - build
       - test:
+          requires:
+            - build
+      - security-static-analysis:
           requires:
             - build
