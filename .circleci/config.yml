@@ -72,6 +72,15 @@ jobs:
       - store_artifacts:
           path: brakeman.html
 
+  rubocop:
+    <<: *defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/repo
+      - run: bundle --path vendor/bundle
+      - run: bundle exec rubocop
+
 workflows:
   version: 2
   build_and_test:
@@ -81,5 +90,8 @@ workflows:
           requires:
             - build
       - security-static-analysis:
+          requires:
+            - build
+      - rubocop:
           requires:
             - build
