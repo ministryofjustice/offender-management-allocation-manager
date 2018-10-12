@@ -50,26 +50,26 @@ jobs:
           command: |
             curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
             chmod +x ./cc-test-reporter
-      - run:
-          name: install firefox
-          command: |
-            if [[ $(command -v firefox) ]] && [[ $(firefox --version) == "Mozilla Firefox $FIREFOX_VERSION" ]]; then
-              echo "Skiping, Firefox $FIREFOX_VERSION already install."
-            else
-                wget -L "https://ftp.mozilla.org/pub/firefox/releases/$FIREFOX_VERSION/linux-x86_64/en-US/firefox-$FIREFOX_VERSION.tar.bz2" -O "firefox-$FIREFOX_VERSION.tar.bz2"
-              sudo tar xjf "firefox-$FIREFOX_VERSION.tar.bz2" -C /opt
-            fi
-            [[ -L /usr/local/bin/firefox ]] || sudo ln -sf /opt/firefox/firefox /usr/bin/firefox
-      - run:
-          name: install geckodriver
-          command: |
-            if [[ $(command -v geckodriver) ]] && [[ $(geckodriver --version) =~ $GECKODRIVER_VERSION  ]]; then
-              echo "Skiping, geckodriver $GECKODRIVER_VERSION already install."
-            else
-              wget https://github.com/mozilla/geckodriver/releases/download/v0.19.0/geckodriver-v0.19.0-linux64.tar.gz
-              sudo tar -zxvf geckodriver-v0.19.0-linux64.tar.gz -C /opt
-            fi
-            [[ -L /usr/local/bin/geckodriver ]] || sudo ln -sf /opt/geckodriver /usr/local/bin/geckodriver
+      # - run:
+      #     name: install firefox
+      #     command: |
+      #       if [[ $(command -v firefox) ]] && [[ $(firefox --version) == "Mozilla Firefox $FIREFOX_VERSION" ]]; then
+      #         echo "Skiping, Firefox $FIREFOX_VERSION already install."
+      #       else
+      #           wget -L "https://ftp.mozilla.org/pub/firefox/releases/$FIREFOX_VERSION/linux-x86_64/en-US/firefox-$FIREFOX_VERSION.tar.bz2" -O "firefox-$FIREFOX_VERSION.tar.bz2"
+      #         sudo tar xjf "firefox-$FIREFOX_VERSION.tar.bz2" -C /opt
+      #       fi
+      #       [[ -L /usr/local/bin/firefox ]] || sudo ln -sf /opt/firefox/firefox /usr/bin/firefox
+      # - run:
+      #     name: install geckodriver
+      #     command: |
+      #       if [[ $(command -v geckodriver) ]] && [[ $(geckodriver --version) =~ $GECKODRIVER_VERSION  ]]; then
+      #         echo "Skiping, geckodriver $GECKODRIVER_VERSION already install."
+      #       else
+      #         wget https://github.com/mozilla/geckodriver/releases/download/v0.19.0/geckodriver-v0.19.0-linux64.tar.gz
+      #         sudo tar -zxvf geckodriver-v0.19.0-linux64.tar.gz -C /opt
+      #       fi
+      #       [[ -L /usr/local/bin/geckodriver ]] || sudo ln -sf /opt/geckodriver /usr/local/bin/geckodriver
       - run:
           name: Run tests
           command: |
