@@ -68,7 +68,9 @@ jobs:
       - attach_workspace:
           at: ~/repo
       - run: bundle --path vendor/bundle
-      - run: bundle exec brakeman
+      - run: bundle exec brakeman -o brakeman.html
+      - store_artifacts:
+          path: brakeman.html
 
 workflows:
   version: 2
