@@ -1,0 +1,60 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: allocation-manager
+  labels:
+    app: allocation-manager
+spec:
+  replicas: 3
+  revisionHistoryLimit: 2
+  minReadySeconds: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 2
+  selector:
+    matchLabels:
+      app: allocation-manager
+  template:
+    metadata:
+      labels:
+        app: allocation-manager
+    spec:
+      containers:
+        - name: allocation-manager
+          image:
+            valueFrom:
+              secretKeyRef:
+                name: offender-management-allocation-manager
+                key: repo_url
+          imagePullPolicy: Always
+          command: ['sh', '-c', "bundle exec rails s -p 3000 -b '0.0.0.0' -P /tmp/server.pid"]
+          ports:
+            - containerPort: 3000
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 60
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+              initialDelaySeconds: 10
+              periodSeconds: 60
+          env:
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: secret_key_base
+            - name: RAILS_ENV
+              value: "production"
+            - name: RAILS_SERVE_STATIC_ASSETS
+              value: "true"
+            - name: OFFENDER_MANAGER_ALLOCATION_API
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: offender_manager_allocation_api
