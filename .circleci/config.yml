@@ -1,15 +1,18 @@
+ruby_image: &ruby_image
+  image: circleci/ruby:2.5.1-node-browsers
+  environment:
+    RAILS_ENV: test
+    RACK_ENV: test
+
 defaults: &defaults
   working_directory: ~/repo
-  docker:
-    - image: circleci/ruby:2.5.1-node-browsers
-      environment:
-        RAILS_ENV: test
-        RACK_ENV: test
 
 version: 2
 jobs:
   build:
     <<: *defaults
+    docker:
+      - <<: *ruby_image
     steps:
       - checkout
       - attach_workspace:
@@ -40,6 +43,8 @@ jobs:
 
   test:
     <<: *defaults
+    docker:
+      - <<: *ruby_image
     steps:
       - checkout
       - attach_workspace:
@@ -63,6 +68,8 @@ jobs:
 
   security-static-analysis:
     <<: *defaults
+    docker:
+      - <<: *ruby_image
     steps:
       - checkout
       - attach_workspace:
@@ -74,6 +81,8 @@ jobs:
 
   rubocop:
     <<: *defaults
+    docker:
+      - <<: *ruby_image
     steps:
       - checkout
       - attach_workspace:
