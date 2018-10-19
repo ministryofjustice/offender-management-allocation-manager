@@ -188,6 +188,7 @@ jobs:
           command: |
             kubectl apply -f ./deploy/ingress.yaml
             kubectl apply -f ./deploy/service.yaml
+            kubectl apply -f ./deploy/allocation-manager-secrets.yaml
             kubectl apply -f ./deploy/deployment.yaml
 
 workflows:
@@ -212,6 +213,6 @@ workflows:
       - deploy_staging:
           requires:
             - build_push_docker
-          # filters:
-          #   branches:
-          #     only: master
+          filters:
+            branches:
+              only: master
