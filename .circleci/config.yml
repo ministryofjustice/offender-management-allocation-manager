@@ -1,15 +1,77 @@
-ruby_image: &ruby_image
-  image: circleci/ruby:2.5.1-node-browsers
-  environment:
-    RAILS_ENV: test
-    RACK_ENV: test
+references:
+  defaults: &defaults
+    working_directory: ~/repo
 
-defaults: &defaults
-  working_directory: ~/repo
+  ruby_image: &ruby_image
+    image: circleci/ruby:2.5.1-node-browsers
+    environment:
+      RAILS_ENV: test
+      RACK_ENV: test
+
+  deploy_container_config: &deploy_container_config
+    docker:
+      - image: ${ECR_ENDPOINT}/cloud-platform/tools:circleci
+        environment:
+          GITHUB_TEAM_NAME_SLUG: offender-management
+
+
+  install_gpg: &install_gpg
+    run:
+      name: Install GPG
+      command: |
+        apk add \
+          --no-cache \
+          --no-progress \
+          gnupg
+
+  configure_gpg: &configure_gpg
+    run:
+      name: Configure GPG
+      command: |
+        echo "${GIT_CRYPT_KEY}" | base64 -d | gpg --batch --allow-secret-key-import --import
+
+  decrypt_secrets: &decrypt_secrets
+    run:
+      name: Decrypt secrets file
+      command: git-crypt unlock
+
+  install_aws_cli: &install_aws_cli
+    run:
+      name: Set up aws
+      command: |
+        sudo apt-get --assume-yes install python3-pip
+        sudo pip3 install awscli
+        $(aws ecr get-login --region eu-west-1 --no-include-email)
+
+  build_docker_image: &build_docker_image
+    run:
+      name: Build allocation-manager docker image
+      command: |
+        export BUILD_DATE=$(date -Is) >> $BASH_ENV
+        source $BASH_ENV
+        docker build \
+          --build-arg VERSION_NUMBER=${CIRCLE_BUILD_NUM} \
+          --build-arg COMMIT_ID=${CIRCLE_SHA1} \
+          --build-arg BUILD_DATE=${BUILD_DATE} \
+          --build-arg BUILD_TAG=${CIRCLE_BRANCH} \
+          -t app .
+
+  push_docker_image: &push_docker_image
+    run:
+      name: Push allocation-manager docker image
+      command: |
+        login="$(aws ecr get-login --region eu-west-1 --no-include-email)"
+        ${login}
+        docker tag app "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:${CIRCLE_SHA1}"
+        docker push "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:${CIRCLE_SHA1}"
+        if [ "${CIRCLE_BRANCH}" == "master" ]; then
+          docker tag app "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:latest"
+          docker push "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:latest"
+        fi
 
 version: 2
 jobs:
-  build:
+  install_dependencies:
     <<: *defaults
     docker:
       - <<: *ruby_image
@@ -90,17 +152,67 @@ jobs:
       - run: bundle --path vendor/bundle
       - run: bundle exec rubocop
 
+  build_push_docker:
+    <<: *defaults
+    docker:
+      - <<: *ruby_image
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/repo
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - *install_aws_cli
+      - *build_docker_image
+      - *push_docker_image
+
+  deploy_staging:
+    <<: *deploy_container_config
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: Kubectl deployment staging setup
+          command: |
+            $(aws ecr get-login --region eu-west-1 --no-include-email)
+            setup-kube-auth
+            kubectl config use-context staging
+      - *install_gpg
+      - *configure_gpg
+      - *decrypt_secrets
+      - deploy:
+          name: Deploy to staging
+          command: |
+            kubectl apply -f ./deploy/ingress.yaml
+            kubectl apply -f ./deploy/service.yaml
+            kubectl apply -f ./deploy/allocation-manager-secrets.yaml
+            kubectl apply -f ./deploy/deployment.yaml
+
 workflows:
   version: 2
   build_and_test:
     jobs:
-      - build
+      - install_dependencies
       - test:
           requires:
-            - build
+            - install_dependencies
       - security-static-analysis:
           requires:
-            - build
+            - install_dependencies
       - rubocop:
           requires:
-            - build
+            - install_dependencies
+      - build_push_docker:
+          requires:
+            - test
+            - security-static-analysis
+            - rubocop
+      - deploy_staging:
+          requires:
+            - build_push_docker
+          filters:
+            branches:
+              only: master
