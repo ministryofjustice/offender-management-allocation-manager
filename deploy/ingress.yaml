@@ -13,4 +13,4 @@ spec:
       - path: /
         backend:
           serviceName: allocation-manager
-          servicePort: 3000
+          servicePort: http
