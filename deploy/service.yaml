@@ -5,7 +5,8 @@ metadata:
   namespace: offender-management-staging
 spec:
   ports:
-  - port: 3000
-    name: http
+  - protocol: TCP
+    port: 3000
+    targetPort: 3000
   selector:
     app: allocation-manager

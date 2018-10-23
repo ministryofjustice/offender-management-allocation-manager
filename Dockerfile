@@ -52,7 +52,9 @@ RUN \
   && apt-get install \
     -y \
     --no-install-recommends \
-    yarn=1.10.1-1
+    yarn=1.10.1-1 \
+  && yarn add govuk-frontend
+
 
 COPY Gemfile Gemfile.lock package.json ./
 
