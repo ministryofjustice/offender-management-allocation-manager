@@ -1,1 +1,5 @@
 <h1 class="govuk-heading-l govuk-!-margin-top-9">Offender Management Allocation API Status</h1>
+<div>
+  <p class="status govuk-body"><strong>API health:</strong> <%= @status['status'] %></p>
+  <p class="postgres_version govuk-body"><strong>Postgres version:</strong> <%= @status['postgresVersion'] %></p>
+</div>
