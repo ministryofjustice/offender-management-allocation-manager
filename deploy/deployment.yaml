@@ -47,10 +47,10 @@ spec:
                   key: secret_key_base
             - name: RAILS_ENV
               value: "production"
-            - name: RAILS_SERVE_STATIC_ASSETS
+            - name: RAILS_SERVE_STATIC_FILES
               value: "true"
-            - name: OFFENDER_MANAGER_ALLOCATION_API
+            - name: OFFENDER_MANAGEMENT_ALLOCATION_API
               valueFrom:
                 secretKeyRef:
                   name: allocation-manager-secrets
-                  key: offender_manager_allocation_api
+                  key: offender_management_allocation_api

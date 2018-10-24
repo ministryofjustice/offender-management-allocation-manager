@@ -5,7 +5,8 @@ module Allocation
     include Singleton
 
     def fetch_status
-      response = Faraday.get(Rails.configuration.api_host)
+      endpoint = Rails.configuration.api_host.strip + '/status'
+      response = Faraday.get(endpoint)
 
       JSON.parse(response.body)
     end
