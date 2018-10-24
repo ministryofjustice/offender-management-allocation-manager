@@ -1,3 +1,5 @@
 class StatusController < ApplicationController
-  def index; end
+  def index
+    @status = Allocation::Api.instance.fetch_status
+  end
 end
