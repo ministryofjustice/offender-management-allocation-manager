@@ -27,6 +27,18 @@ spec:
           command: ['sh', '-c', "bundle exec rails s -p 3000 -b '0.0.0.0' -P /tmp/server.pid"]
           ports:
             - containerPort: 3000
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 60
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 60
           env:
             - name: SECRET_KEY_BASE
               valueFrom:
@@ -35,7 +47,7 @@ spec:
                   key: secret_key_base
             - name: RAILS_ENV
               value: "production"
-            - name: RAILS_SERVE_STATIC_ASSETS
+            - name: RAILS_SERVE_STATIC_FILES
               value: "true"
             - name: OFFENDER_MANAGEMENT_ALLOCATION_API
               valueFrom:
