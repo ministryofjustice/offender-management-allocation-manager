@@ -54,3 +54,8 @@ spec:
                 secretKeyRef:
                   name: allocation-manager-secrets
                   key: offender_management_allocation_api
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: sentry_dsn
