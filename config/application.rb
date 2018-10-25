@@ -32,5 +32,6 @@ module OffenderManagementAllocationClient
 
     config.api_host = ENV.fetch(
       'OFFENDER_MANAGEMENT_ALLOCATION_API', 'http://localhost:8000')
+    config.sentry_dsn = ENV['SENTRY_DSN']
   end
 end
