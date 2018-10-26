@@ -3,7 +3,7 @@ references:
     working_directory: ~/repo
 
   ruby_image: &ruby_image
-    image: circleci/ruby:2.5.1-node-browsers
+    image: circleci/ruby:2.5.3-node-browsers
     environment:
       RAILS_ENV: test
       RACK_ENV: test
