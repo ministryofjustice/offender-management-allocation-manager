@@ -6,7 +6,7 @@ ruby '2.5.3'
 gem 'bootsnap', '>= 1.1.0', require: false
 gem 'coffee-rails', '~> 4.2'
 gem 'faraday'
-gem 'jbuilder', '~> 2.5'
+gem 'jbuilder', '~> 2.8'
 gem 'lograge'
 gem 'logstash-event'
 gem 'puma', '~> 3.11'
