@@ -1,0 +1,30 @@
+.hmpps-header {
+  padding-top: 13px;
+  padding-bottom: 7px;
+}
+
+.hmpps__logotype-crest {
+  display: inline-block;
+  content: "";
+  background: url('Crest@2x.png') no-repeat;
+  background-size: contain;
+  width: 36px;
+  height: 30px;
+  margin-bottom: -2px;
+  margin-right: 10px;
+}
+
+.hmpps-header__inner {
+  border-bottom: 10px solid govuk-colour("blue");
+}
+
+.hmpps-header__navigation {
+  margin-top: 10px;
+  float: right;
+  display: inline-block !important;
+}
+
+.hmpss-header__prison-identifier {
+  color: govuk-colour("white");
+  font-weight: bold;
+}
