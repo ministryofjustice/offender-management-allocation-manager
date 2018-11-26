@@ -1,3 +1,4 @@
+require "byebug"
 require "json"
 require "faraday"
 
@@ -6,8 +7,13 @@ module Allocation
     include Singleton
 
     def fetch_status
+      byebug
       endpoint = Rails.configuration.api_host.strip + "/status"
-      response = Faraday.get(endpoint)
+      token = fetch_auth_token
+      response = Faraday.get do |req|
+        req.url endpoint
+        req.headers["Authorization"] = "Bearer #{token}"
+      end 
 
       JSON.parse(response.body)
     end
