@@ -21,5 +21,6 @@ module OffenderManagementAllocationClient
     config.sentry_dsn = ENV.fetch('SENTRY_DSN', nil)
     config.nomis_oauth_url = ENV.fetch('NOMIS_OAUTH_URL', nil)
     config.nomis_oauth_authorisation = ENV.fetch('NOMIS_OAUTH_AUTHORISATION', nil)
+    config.nomis_oauth_public_key = ENV.fetch('NOMIS_OAUTH_PUBLIC_KEY', nil)
   end
 end
