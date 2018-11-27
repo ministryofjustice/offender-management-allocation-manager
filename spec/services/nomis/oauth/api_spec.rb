@@ -8,6 +8,6 @@ describe Nomis::Oauth::Api do
     expect(token).to be_kind_of(Nomis::Oauth::Token)
     expect(token.type).to eq('bearer')
     expect(token.expiry).to be(1199)
-    expect(token.access_token).to be_kind_of(String)
+    expect(token.encrypted_token).to be_kind_of(String)
   end
 end

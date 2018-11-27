@@ -3,7 +3,7 @@ module Nomis
     class Api
       include Singleton
 
-      def fetch_auth_token
+      def fetch_new_auth_token
         response = Faraday.post do |req|
           req.url "#{Rails.configuration.nomis_oauth_url}/auth/oauth/token?grant_type=client_credentials"
           req.headers["Authorization"] = "Basic #{Rails.configuration.nomis_oauth_authorisation}"

@@ -1,12 +1,22 @@
 module Nomis
   module Oauth
     class Token
-      attr_reader :type, :expiry, :access_token, :expires_at
+      attr_reader :encrypted_token
 
-      def initialize(payload)
-        @type = payload['token_type']
-        @expiry = payload['expires_in']
-        @access_token = payload['access_token']
+      def initialize(encrypted_token)
+        @encrypted_token = encrypted_token
+      end
+
+      def expired?
+        JWT.decode(
+          encrypted_token,
+          Rails.configuration.nomis_oauth_public_key,
+          true,
+          algorithm: 'RS256'
+        )
+        false
+      rescue JWT::ExpiredSignature
+        true
       end
     end
   end
