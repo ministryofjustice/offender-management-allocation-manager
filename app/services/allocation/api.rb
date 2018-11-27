@@ -1,20 +1,20 @@
-require "json"
-require "faraday"
+require 'json'
+require 'faraday'
 
 module Allocation
   class Api
     include Singleton
 
     def token
-      @token ||= Nomis::Oauth::Api.instance.fetch_new_auth_token
+      Nomis::Oauth::TokenService.instance.valid_token
     end
 
     def fetch_status
-      endpoint = Rails.configuration.api_host.strip + "/status"
-      response = Faraday.get do |req|
+      endpoint = Rails.configuration.api_host.strip + '/status'
+      response = Faraday.get { |req|
         req.url endpoint
-        req.headers["Authorization"] = "Bearer #{token.encrypted_token}"
-      end
+        req.headers['Authorization'] = "Bearer #{token.access_token}"
+      }
 
       JSON.parse(response.body)
     end

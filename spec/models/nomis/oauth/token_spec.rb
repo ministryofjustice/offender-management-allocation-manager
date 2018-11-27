@@ -2,21 +2,14 @@ require 'jwt'
 require 'rails_helper'
 
 describe Nomis::Oauth::Token, model: true do
-  payload = {
-        'internal_user': false,
-        'scope': %w[read write],
-        'exp': Time.new.to_i + 4 * 3600,
-        'client_id': 'offender-management-allocation-manager'
-      }
+  it 'can confirm if it is not expired' do
+    payload = {
+      'internal_user': false,
+      'scope': %w[read write],
+      'exp': four_hours_from_now,
+      'client_id': 'offender-management-allocation-manager'
+    }
 
-  expired_payload = {
-    'internal_user': false,
-    'scope': %w[read write],
-    'exp': Time.new.to_i - 3600,
-    'client_id': 'offender-management-allocation-manager'
-  }
-
-  it '' do
     rsa_private = OpenSSL::PKey::RSA.generate 2048
     rsa_public = rsa_private.public_key
 
@@ -28,7 +21,14 @@ describe Nomis::Oauth::Token, model: true do
     expect(token).not_to be_expired
   end
 
-  it '' do
+  it 'can confirm if it is expired' do
+    expired_payload = {
+      'internal_user': false,
+      'scope': %w[read write],
+      'exp': four_hours_ago,
+      'client_id': 'offender-management-allocation-manager'
+    }
+
     rsa_private = OpenSSL::PKey::RSA.generate 2048
     rsa_public = rsa_private.public_key
 
@@ -39,5 +39,4 @@ describe Nomis::Oauth::Token, model: true do
 
     expect(token).to be_expired
   end
-
 end
