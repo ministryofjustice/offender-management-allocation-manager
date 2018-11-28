@@ -12,7 +12,7 @@ describe Nomis::Oauth::Client do
       expect(WebMock).to have_requested(:get, /\w/).
         with(
           headers: {
-            'Authorization': "Basic #{ Rails.configuration.nomis_oauth_authorisation }"
+            'Authorization': "Basic #{Rails.configuration.nomis_oauth_authorisation}"
           }
       )
     end
@@ -20,15 +20,12 @@ describe Nomis::Oauth::Client do
 
   describe 'when there is an http status header' do
     xit 'raises an APIError' do
-
     end
 
     xit 'sends the error to Sentry' do
-
     end
   end
 
   describe 'when there is a timeout' do
-
   end
 end

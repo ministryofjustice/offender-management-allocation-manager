@@ -25,15 +25,12 @@ describe Allocation::Client do
 
   describe 'when there is an http status header' do
     xit 'raises an APIError' do
-
     end
 
     xit 'sends the error to Sentry' do
-
     end
   end
 
   describe 'when there is a timeout' do
-
   end
 end

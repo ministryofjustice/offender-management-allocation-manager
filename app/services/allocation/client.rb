@@ -11,13 +11,13 @@ module Allocation
       request(:get, route)
     end
 
-    private
+  private
 
     def request(method, route)
-      response = @connection.send(method) do |req|
+      response = @connection.send(method) { |req|
         req.url(@host + route)
         req.headers['Authorization'] = "Bearer #{token.access_token}"
-      end
+      }
 
       JSON.parse(response.body)
     end

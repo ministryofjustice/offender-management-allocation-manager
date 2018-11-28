@@ -10,10 +10,8 @@ describe Allocation::Api do
 
   it 'fetches the api status' do
     allow_any_instance_of(Allocation::Client).to receive(:get).and_return(
-      {
-        status: 'ok',
-        postgresVersion: 'PostgreSQL 10.3'
-      }
+      status: 'ok',
+      postgresVersion: 'PostgreSQL 10.3'
     )
 
     response = described_class.get_status
