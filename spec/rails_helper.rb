@@ -5,6 +5,7 @@ require File.expand_path('../config/environment', __dir__)
 abort('The Rails environment is running in production mode!') if Rails.env.production?
 require 'rspec/rails'
 require 'spec_helper'
+require 'support/helpers/jwt_helper'
 require 'capybara/rspec'
 require 'webmock/rspec'
 
@@ -17,6 +18,9 @@ RSpec.configure do |config|
     Rails.configuration.sentry_dsn = 'https://test.com'
     allow(Raven).to receive(:capture_exception)
   end
+
+  config.include JWTHelper
+
    config.after(:each, :epect_exception) do
     Rails.configuration.sentry_dsn = nil
   end
