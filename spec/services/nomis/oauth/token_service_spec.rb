@@ -22,7 +22,7 @@ describe Nomis::Oauth::TokenService do
 
   it 'fetches a new auth token if it is expired' do
     unexpired_token = Nomis::Oauth::Token.new(generate_jwt_token)
-    expired_encoded_token = generate_jwt_token(exp: Time.new.to_i - 3600)
+    expired_encoded_token = generate_jwt_token(exp: 4.hours.ago.to_i)
     expired_token = Nomis::Oauth::Token.new(expired_encoded_token)
 
     allow_any_instance_of(Nomis::Oauth::Api).

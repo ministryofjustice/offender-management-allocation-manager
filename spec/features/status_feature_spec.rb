@@ -20,7 +20,7 @@ RSpec.feature 'fetch status' do
       status: 200,
       body: {
         'access_token' => generate_jwt_token,
-        'expires_in' => four_hours_from_now }.to_json
+        'expires_in' => 4.hours.from_now.to_i }.to_json
     )
 
     visit '/'

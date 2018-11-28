@@ -6,7 +6,7 @@ describe Nomis::Oauth::Token, model: true do
     payload = {
       'internal_user': false,
       'scope': %w[read write],
-      'exp': four_hours_from_now,
+      'exp': 4.hours.from_now.to_i,
       'client_id': 'offender-management-allocation-manager'
     }
 
@@ -25,7 +25,7 @@ describe Nomis::Oauth::Token, model: true do
     expired_payload = {
       'internal_user': false,
       'scope': %w[read write],
-      'exp': four_hours_ago,
+      'exp': 4.hours.ago.to_i,
       'client_id': 'offender-management-allocation-manager'
     }
 
