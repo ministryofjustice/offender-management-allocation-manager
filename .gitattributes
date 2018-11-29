@@ -1,2 +1,1 @@
 deploy/*secrets.yaml filter=git-crypt diff=gitcrypt
-spec/fixtures/vcr_cassettes/*.yml filter=git-crypt diff=gitcrypt
