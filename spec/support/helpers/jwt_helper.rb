@@ -3,7 +3,7 @@ module JWTHelper
     payload = {
       'internal_user': false,
       'scope': %w[read write],
-      'exp': four_hours_from_now,
+      'exp': 4.hours.from_now.to_i,
       'client_id': 'offender-management-allocation-manager'
     }.merge(options)
 
@@ -12,13 +12,5 @@ module JWTHelper
     Rails.configuration.nomis_oauth_public_key = rsa_public
 
     JWT.encode payload, rsa_private, 'RS256'
-  end
-
-  def four_hours_from_now
-    Time.new.to_i + 3600
-  end
-
-  def four_hours_ago
-    Time.new.to_i - 3600
   end
 end

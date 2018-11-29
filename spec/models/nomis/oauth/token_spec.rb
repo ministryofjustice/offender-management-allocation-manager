@@ -9,7 +9,7 @@ describe Nomis::Oauth::Token, model: true do
   end
 
   it 'can confirm if it is expired' do
-    access_token = generate_jwt_token('exp' => four_hours_ago)
+    access_token = generate_jwt_token('exp' => 4.hours.ago.to_i)
     token = Nomis::Oauth::Token.new(access_token)
 
     expect(token).to be_expired
