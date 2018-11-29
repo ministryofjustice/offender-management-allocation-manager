@@ -8,7 +8,8 @@ module Nomis
       end
 
       def initialize
-        @oauth_client = Nomis::Oauth::Client.new Rails.configuration.nomis_oauth_host
+        host = Rails.configuration.nomis_oauth_host
+        @oauth_client = Nomis::Oauth::Client.new(host)
       end
 
       def fetch_new_auth_token

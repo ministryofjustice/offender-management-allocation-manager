@@ -19,7 +19,8 @@ module Nomis
       def request(method, route)
         response = @connection.send(method) { |req|
           req.url(@host + route)
-          req.headers['Authorization'] = "Basic #{Rails.configuration.nomis_oauth_authorisation}"
+          req.headers['Authorization'] =
+            "Basic #{Rails.configuration.nomis_oauth_authorisation}"
         }
 
         JSON.parse(response.body)

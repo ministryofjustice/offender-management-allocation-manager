@@ -14,7 +14,7 @@ describe Allocation::Api do
       postgresVersion: 'PostgreSQL 10.3'
     )
 
-    response = described_class.get_status
+    response = described_class.status
 
     expect(response[:status]).to eq "ok"
     expect(response[:postgresVersion]).to include("PostgreSQL 10.3")

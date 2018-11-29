@@ -1,4 +1,3 @@
-require 'byebug'
 module Nomis
   module Oauth
     class TokenService
@@ -9,7 +8,6 @@ module Nomis
       end
 
       def valid_token
-        # byebug
         set_new_token if token.expired?
         token
       end

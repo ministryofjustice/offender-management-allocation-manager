@@ -3,14 +3,15 @@ module Allocation
     include Singleton
 
     class << self
-      delegate :get_status, to: :instance
+      delegate :status, to: :instance
     end
 
     def initialize
-      @allocation_api_client = Allocation::Client.new Rails.configuration.allocation_api_host
+      host = Rails.configuration.allocation_api_host
+      @allocation_api_client = Allocation::Client.new(host)
     end
 
-    def get_status
+    def status
       route = '/status'
       @allocation_api_client.get(route)
     end
