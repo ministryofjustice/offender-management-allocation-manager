@@ -59,3 +59,18 @@ spec:
                 secretKeyRef:
                   name: allocation-manager-secrets
                   key: sentry_dsn
+            - name: NOMIS_OAUTH_URL
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: nomis_oauth_url
+            - name: NOMIS_OAUTH_AUTHORISATION
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: nomis_oauth_authorisation
+            - name: NOMIS_OAUTH_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: nomis_oauth_public_key
