@@ -1,0 +1,49 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://gateway.t3.nomis-api.hmpps.dsd.io/auth/oauth/token?grant_type=client_credentials
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.3
+      Authorization:
+      - authorisation_header
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 405
+      message: ''
+    headers:
+      Cache-Control:
+      - no-store
+      Pragma:
+      - no-cache
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - application/json;charset=UTF-8
+      Server:
+      - nginx/1.15.3
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Frame-Options:
+      - DENY
+      Date:
+      - Thu, 29 Nov 2018 09:03:55 GMT
+    body:
+      encoding: UTF-8
+      string: '{"error":"method_not_allowed","error_description":"Request method &#39;GET&#39;
+        not supported"}'
+    http_version: 
+  recorded_at: Thu, 29 Nov 2018 09:03:54 GMT
+recorded_with: VCR 4.0.0

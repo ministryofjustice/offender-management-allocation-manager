@@ -1,14 +1,19 @@
-require 'json'
-
 module Allocation
   class Api
     include Singleton
 
-    def fetch_status
-      endpoint = Rails.configuration.api_host.strip + '/status'
-      response = Faraday.get(endpoint)
+    class << self
+      delegate :status, to: :instance
+    end
 
-      JSON.parse(response.body)
+    def initialize
+      host = Rails.configuration.allocation_api_host
+      @allocation_api_client = Allocation::Client.new(host)
+    end
+
+    def status
+      route = '/status'
+      @allocation_api_client.get(route)
     end
   end
 end

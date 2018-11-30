@@ -7,6 +7,7 @@ gem 'bootsnap', '>= 1.1.0', require: false
 gem 'coffee-rails', '~> 4.2'
 gem 'faraday'
 gem 'jbuilder', '~> 2.8'
+gem 'jwt'
 gem 'lograge'
 gem 'logstash-event'
 gem 'puma', '~> 3.11'
@@ -19,12 +20,16 @@ gem 'uglifier', '>= 1.3.0'
 group :development, :test do
   gem 'brakeman'
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
-  gem 'capybara'
-  gem 'rspec-rails'
   gem 'rubocop'
   gem 'rubocop-rspec'
+end
+
+group :test do
+  gem 'capybara'
+  gem 'rspec-rails'
   gem 'selenium-webdriver'
   gem 'simplecov'
+  gem 'vcr'
   gem 'webmock'
 end
 
