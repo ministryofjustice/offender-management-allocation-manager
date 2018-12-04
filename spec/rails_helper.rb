@@ -12,6 +12,7 @@ require 'webmock/rspec'
 OmniAuth.config.test_mode = true
 
 RSpec.configure do |config|
+  config.include ActiveSupport::Testing::TimeHelpers
   config.infer_spec_type_from_file_location!
 
   config.filter_rails_from_backtrace!
