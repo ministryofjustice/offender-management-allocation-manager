@@ -7,25 +7,14 @@ describe Nomis::Oauth::Client do
       route = '/auth/oauth/token?grant_type=client_credentials'
       client = described_class.new(api_host)
 
-      client.get(route)
+      client.post(route)
 
-      expect(WebMock).to have_requested(:get, /\w/).
+      expect(WebMock).to have_requested(:post, /\w/).
         with(
           headers: {
             'Authorization': "Basic #{Rails.configuration.nomis_oauth_authorisation}"
           }
       )
     end
-  end
-
-  describe 'when there is an http status header' do
-    xit 'raises an APIError' do
-    end
-
-    xit 'sends the error to Sentry' do
-    end
-  end
-
-  describe 'when there is a timeout' do
   end
 end
