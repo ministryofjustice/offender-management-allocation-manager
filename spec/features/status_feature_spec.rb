@@ -1,7 +1,13 @@
 require 'rails_helper'
 
 feature 'get status' do
-  it 'returns a status message', vcr: { cassette_name: :get_status_feature, record: :new_episodes, re_record_interval: 1.hour } do
+  around do |example|
+    travel_to Date.new(2018, 11, 3, 16) do
+      example.run
+    end
+  end
+
+  it 'returns a status message', vcr: { cassette_name: :get_status_feature } do
     hmpps_sso_response = {
       'info' => {
         'username' => 'Fred'

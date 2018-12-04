@@ -41,13 +41,13 @@ http_interactions:
       X-Frame-Options:
       - DENY
       Date:
-      - Tue, 04 Dec 2018 14:51:17 GMT
+      - Tue, 04 Dec 2018 16:05:07 GMT
     body:
       encoding: UTF-8
-      string: '{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbnRlcm5hbFVzZXIiOmZhbHNlLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNTQzOTM2Mjc3LCJhdXRob3JpdGllcyI6WyJST0xFX1NZU1RFTV9SRUFEX09OTFkiXSwianRpIjoiNTM1MWFkNTgtOWJkZS00MmNiLTg4NGEtNzIwNDk0NGE0Zjg4IiwiY2xpZW50X2lkIjoib2ZmZW5kZXItbWFuYWdlbWVudC1hbGxvY2F0aW9uLW1hbmFnZXIifQ.h80ZPJM9azIOuopTEx7jpowX0i3trAF5_o_dPDX1dDB4mrJ1di4nNjHxehrJyUlkQ5FS7A3imcUKW7z__vowV_8tY2sJK6q2FBqtaRXJFjYGbileSGlR9LoTYYIaFuyBP4sculViNplMY4mYhF9RKmPBE-WcejjV8FMWc2a0OsQb9VY0DLKmXLofQpE5gmDRUrIzzH-Fdb07VEN7sn7iJgaZv_nKHtFX2uH04lQpzZUyDYeluDg_BLAcrbmfMBnOX6fJUVt4pz9UeWSUQjfIS-DsAyUGxkJNziIbBMjhqM0UiNP29ofF21-BDwKEZhgb8_mNJsC_Alo8rbQHY0-MVg","token_type":"bearer","expires_in":1199,"scope":"read
-        write","internalUser":false,"jti":"5351ad58-9bde-42cb-884a-7204944a4f88"}'
+      string: '{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbnRlcm5hbFVzZXIiOmZhbHNlLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNTQzOTQwNzA4LCJhdXRob3JpdGllcyI6WyJST0xFX1NZU1RFTV9SRUFEX09OTFkiXSwianRpIjoiZTJiZDllNGQtOTJmYi00YTZmLTg2ZjEtYjQzMTUwNjY5OWRkIiwiY2xpZW50X2lkIjoib2ZmZW5kZXItbWFuYWdlbWVudC1hbGxvY2F0aW9uLW1hbmFnZXIifQ.NyULl_hho4t75MO-R-2JviCjySc4bknjUJCWB-XBYqbfFYmRyDSKzAzXLZKZEMGVu59aUpimDzajr7K1sjl5W8TTKHykrplSIGbqXhoXdE9eh9PmE3aweDV3xZecVk5b36dQV3WHQ2oKsKIOVmhh9MvzszTsvzdvWoOYPpVBqPBVfsYf8q5dGCZOBQ-0Tba1dMfS-lzRG48EjxQpmnx8JxlMgYQZpn020GnbG4vngluFP-CoQ_e77nygXfwUrDo4NGenSU-yKy3vFAa5awg153Z4hxHzhDDm0FA4KM4MJGMnttFPBujte7iLDmtXTjd3J8bmoFnBNXHnkA-uP0gc2g","token_type":"bearer","expires_in":1199,"scope":"read
+        write","internalUser":false,"jti":"e2bd9e4d-92fb-4a6f-86f1-b431506699dd"}'
     http_version: 
-  recorded_at: Tue, 04 Dec 2018 14:51:18 GMT
+  recorded_at: Sat, 03 Nov 2018 00:00:00 GMT
 - request:
     method: get
     uri: https://allocation-api-staging.apps.cloud-platform-live-0.k8s.integration.dsd.io/status
@@ -73,7 +73,7 @@ http_interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Tue, 04 Dec 2018 14:51:17 GMT
+      - Tue, 04 Dec 2018 16:05:08 GMT
       Etag:
       - W/"2ff9b07886f0349054ad226e3c665476"
       Server:
@@ -81,9 +81,9 @@ http_interactions:
       Vary:
       - Accept-Encoding
       X-Request-Id:
-      - 64a297b0ab209eb1768f9900b4b29f3c
+      - f42df2a0a3e2bd787c7f59a30887d82e
       X-Runtime:
-      - '0.055308'
+      - '0.034835'
       Content-Length:
       - '153'
       Connection:
@@ -93,5 +93,5 @@ http_interactions:
       string: '{"status":"ok","postgresVersion":"PostgreSQL 10.5 on x86_64-pc-linux-gnu,
         compiled by gcc (GCC) 4.8.3 20140911 (Red Hat 4.8.3-9), 64-bit"}'
     http_version: 
-  recorded_at: Tue, 04 Dec 2018 14:51:18 GMT
+  recorded_at: Sat, 03 Nov 2018 00:00:00 GMT
 recorded_with: VCR 4.0.0
