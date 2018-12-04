@@ -15,7 +15,7 @@ RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
 
   config.filter_rails_from_backtrace!
-  
+
   config.before(:each, :expect_exception) do
     Rails.configuration.sentry_dsn = 'https://test.com'
     allow(Raven).to receive(:capture_exception)
@@ -23,7 +23,7 @@ RSpec.configure do |config|
 
   config.include JWTHelper
 
-   config.after(:each, :epect_exception) do
+  config.after(:each, :epect_exception) do
     Rails.configuration.sentry_dsn = nil
   end
 end

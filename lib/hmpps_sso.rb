@@ -14,9 +14,7 @@ module OmniAuth
       end
 
       def build_access_token
-        options.token_params.merge!(
-          :headers => {'Authorization' => basic_auth_header }
-        )
+        options.token_params[:headers] = { 'Authorization' => basic_auth_header }
         super
       end
 
@@ -41,7 +39,7 @@ module OmniAuth
         full_host + script_name + callback_path
       end
 
-      private
+    private
 
       def basic_auth_header
         'Basic ' + Rails.configuration.nomis_oauth_authorisation
