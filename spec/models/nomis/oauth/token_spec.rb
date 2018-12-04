@@ -12,6 +12,7 @@ describe Nomis::Oauth::Token, model: true do
     access_token = generate_jwt_token('exp' => 4.hours.ago.to_i)
     token = Nomis::Oauth::Token.new(access_token)
 
-    expect(token).to be_expired
+    expect(Raven).to receive(:capture_exception)
+    expect(token.expired?).to be(true)
   end
 end
