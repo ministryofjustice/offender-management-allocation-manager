@@ -9,6 +9,8 @@ require 'support/helpers/jwt_helper'
 require 'capybara/rspec'
 require 'webmock/rspec'
 
+OmniAuth.config.test_mode = true
+
 RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
 
