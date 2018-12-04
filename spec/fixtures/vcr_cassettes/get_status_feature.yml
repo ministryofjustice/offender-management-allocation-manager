@@ -1,0 +1,97 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://gateway.t3.nomis-api.hmpps.dsd.io/auth/oauth/token?grant_type=client_credentials
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Authorization:
+      - authorisation_header
+      Content-Length:
+      - '0'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-store
+      Pragma:
+      - no-cache
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - application/json;charset=UTF-8
+      Server:
+      - nginx/1.15.3
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Frame-Options:
+      - DENY
+      Date:
+      - Tue, 04 Dec 2018 13:00:07 GMT
+    body:
+      encoding: UTF-8
+      string: '{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbnRlcm5hbFVzZXIiOmZhbHNlLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNTQzOTI5NjA4LCJhdXRob3JpdGllcyI6WyJST0xFX1NZU1RFTV9SRUFEX09OTFkiXSwianRpIjoiZmVjNDQ1ODMtNDgzOC00NmRlLThiNjktYzgyZjg5YTEyZjhlIiwiY2xpZW50X2lkIjoib2ZmZW5kZXItbWFuYWdlbWVudC1hbGxvY2F0aW9uLW1hbmFnZXIifQ.maul2FYIXHu8FJjdCinfdzEyjOYiagxIMnTA93h42bc_2nKO3K9Q5muPj7X-41XwjkRkhqZ8sSWxOQGx3dmxM9YVnVWKh1SV2G_H6T-Lr4bSrZLyLy-RvvFyHsoRbZZA7HCUkXHtUvXZ8osgcShMUtExk5VFCjKVdaHqL1CD1OYn5NEU4iAFFvj-U-vl2JATHGmlvi9dqA0HqTMHtDDeMd9cEiqTejWvEALZyYPMzhia-JZ41ECwF63SI2YcvhzSTDKcFRtgfPJNzujOvX-3BMJpikdzqz5pSj0pWpihzfhiSuVLAt5yDmMWNqzOZ53Chr3M4IpsqC8CXvx4y8mBbw","token_type":"bearer","expires_in":1199,"scope":"read
+        write","internalUser":false,"jti":"fec44583-4838-46de-8b69-c82f89a12f8e"}'
+    http_version: 
+  recorded_at: Tue, 04 Dec 2018 13:00:08 GMT
+- request:
+    method: get
+    uri: https://allocation-api-staging.apps.cloud-platform-live-0.k8s.integration.dsd.io/status
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Authorization:
+      - authorisation_header
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 04 Dec 2018 13:00:08 GMT
+      Etag:
+      - W/"2ff9b07886f0349054ad226e3c665476"
+      Server:
+      - nginx/1.15.5
+      Vary:
+      - Accept-Encoding
+      X-Request-Id:
+      - 68abef03dc5730616124650d947df507
+      X-Runtime:
+      - '0.002851'
+      Content-Length:
+      - '153'
+      Connection:
+      - keep-alive
+    body:
+      encoding: ASCII-8BIT
+      string: '{"status":"ok","postgresVersion":"PostgreSQL 10.5 on x86_64-pc-linux-gnu,
+        compiled by gcc (GCC) 4.8.3 20140911 (Red Hat 4.8.3-9), 64-bit"}'
+    http_version: 
+  recorded_at: Tue, 04 Dec 2018 13:00:08 GMT
+recorded_with: VCR 4.0.0

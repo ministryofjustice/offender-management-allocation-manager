@@ -1,24 +1,26 @@
 ---
 http_interactions:
 - request:
-    method: get
+    method: post
     uri: https://gateway.t3.nomis-api.hmpps.dsd.io/auth/oauth/token?grant_type=client_credentials
     body:
-      encoding: US-ASCII
+      encoding: UTF-8
       string: ''
     headers:
       User-Agent:
-      - Faraday v0.15.3
+      - Faraday v0.15.4
       Authorization:
       - authorisation_header
+      Content-Length:
+      - '0'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
       - "*/*"
   response:
     status:
-      code: 405
-      message: ''
+      code: 200
+      message: OK
     headers:
       Cache-Control:
       - no-store
@@ -39,11 +41,11 @@ http_interactions:
       X-Frame-Options:
       - DENY
       Date:
-      - Thu, 29 Nov 2018 09:03:55 GMT
+      - Mon, 03 Dec 2018 16:53:51 GMT
     body:
       encoding: UTF-8
-      string: '{"error":"method_not_allowed","error_description":"Request method &#39;GET&#39;
-        not supported"}'
+      string: '{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbnRlcm5hbFVzZXIiOmZhbHNlLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNTQzODU3MjMxLCJhdXRob3JpdGllcyI6WyJST0xFX1NZU1RFTV9SRUFEX09OTFkiXSwianRpIjoiYTlkZTQ0YWQtZjljOC00ODgyLTgxZmItNDA0YzIyMmMxYmMxIiwiY2xpZW50X2lkIjoib2ZmZW5kZXItbWFuYWdlbWVudC1hbGxvY2F0aW9uLW1hbmFnZXIifQ.rqg0mQgUyfg5uYT4Q6YgRA7IlYQvcL8LENi-mu8uxCvbXh5CUY5UrNLgoy8nuXJp19CbbQrPopiO8_TyBuQSL_5IoJraLATUIcbwgahwgl99QWD7DjhpFex4M4eL72PiYGPCRNwvvlGKNH3R3v_mNlXOOoIdup1JG4UCNsz9u_6ytq86PivgqjuEN2J73pJTEeOsHeGOkRk39hkzAiXi2YoaeOuKS6XgkgU2o3eqAAPwUbQS1RYcCElV6VTd1T8uvd9FJqKxsdo0j6lC9Cns_gVUiL4MFc0tNQYzj90Y2i6Bzv1IOrxsrc6PB4VQ-4A3tHGAY7prjKe0sEgDx5ioFw","token_type":"bearer","expires_in":1199,"scope":"read
+        write","internalUser":false,"jti":"a9de44ad-f9c8-4882-81fb-404c222c1bc1"}'
     http_version: 
-  recorded_at: Thu, 29 Nov 2018 09:03:54 GMT
+  recorded_at: Mon, 03 Dec 2018 16:53:52 GMT
 recorded_with: VCR 4.0.0
