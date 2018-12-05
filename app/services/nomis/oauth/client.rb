@@ -6,10 +6,6 @@ module Nomis
         @connection = Faraday.new
       end
 
-      def get(route)
-        request(:get, route)
-      end
-
       def post(route)
         request(:post, route)
       end
