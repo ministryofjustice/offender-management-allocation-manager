@@ -24,7 +24,6 @@ module OffenderManagementAllocationClient
     config.nomis_oauth_host = ENV['NOMIS_OAUTH_HOST']
     config.nomis_oauth_client_id = ENV['NOMIS_OAUTH_CLIENT_ID']
     config.nomis_oauth_client_secret = ENV['NOMIS_OAUTH_CLIENT_SECRET']
-    config.nomis_oauth_authorisation = ENV['NOMIS_OAUTH_AUTHORISATION']
     config.nomis_oauth_public_key = ENV['NOMIS_OAUTH_PUBLIC_KEY']
   end
 end
