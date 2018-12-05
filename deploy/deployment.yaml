@@ -69,3 +69,18 @@ spec:
                 secretKeyRef:
                   name: allocation-manager-secrets
                   key: nomis_oauth_client_secret
+            - name: NOMIS_OAUTH_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: nomis_oauth_host
+            - name: NOMIS_OAUTH_AUTHORISATION
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: nomis_oauth_authorisation
+            - name: NOMIS_OAUTH_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: nomis_oauth_public_key
