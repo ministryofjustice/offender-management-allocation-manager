@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'base64'
 
 describe Nomis::Oauth::Client do
   describe 'with a valid request' do
@@ -12,7 +13,9 @@ describe Nomis::Oauth::Client do
       expect(WebMock).to have_requested(:post, /\w/).
         with(
           headers: {
-            'Authorization': "Basic #{Rails.configuration.nomis_oauth_authorisation}"
+            'Authorization': 'Basic ' + Base64.urlsafe_encode64(
+              "#{Rails.configuration.nomis_oauth_client_id}:#{Rails.configuration.nomis_oauth_client_secret}"
+            )
           }
       )
     end

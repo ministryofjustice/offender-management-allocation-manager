@@ -1,4 +1,5 @@
 require 'omniauth-oauth2'
+require 'base64'
 
 module OmniAuth
   module Strategies
@@ -41,9 +42,13 @@ module OmniAuth
 
     private
 
+      # rubocop:disable Metrics/LineLength
       def basic_auth_header
-        'Basic ' + Rails.configuration.nomis_oauth_authorisation
+        'Basic ' + Base64.urlsafe_encode64(
+          "#{Rails.configuration.nomis_oauth_client_id}:#{Rails.configuration.nomis_oauth_client_secret}"
+        )
       end
+      # rubocop:enable Metrics/LineLength
       # :nocov:
     end
   end

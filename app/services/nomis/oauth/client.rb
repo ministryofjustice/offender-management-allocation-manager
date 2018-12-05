@@ -1,3 +1,5 @@
+require 'base64'
+
 module Nomis
   module Oauth
     class Client
@@ -16,11 +18,19 @@ module Nomis
         response = @connection.send(method) { |req|
           req.url(@host + route)
           req.headers['Authorization'] =
-            "Basic #{Rails.configuration.nomis_oauth_authorisation}"
+            'Basic ' + authorisation
         }
 
         JSON.parse(response.body)
       end
+
+      # rubocop:disable Metrics/LineLength
+      def authorisation
+        Base64.urlsafe_encode64(
+          "#{Rails.configuration.nomis_oauth_client_id}:#{Rails.configuration.nomis_oauth_client_secret}"
+        )
+      end
+      # rubocop:enable Metrics/LineLength
     end
   end
 end
