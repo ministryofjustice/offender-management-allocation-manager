@@ -8,13 +8,7 @@ feature 'get status' do
   end
 
   it 'returns a status message', vcr: { cassette_name: :get_status_feature } do
-    hmpps_sso_response = {
-      'info' => {
-        'username' => 'Fred'
-      }
-    }
-
-    OmniAuth.config.add_mock(:hmpps_sso, hmpps_sso_response)
+    signin_user
 
     visit '/'
 
