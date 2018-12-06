@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 feature 'allcations summary feature' do
-
   describe 'awaiting tiering' do
     it 'displays offenders awaiting tiering' do
       signin_user
@@ -12,5 +11,3 @@ feature 'allcations summary feature' do
     end
   end
 end
-
-

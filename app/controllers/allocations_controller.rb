@@ -1,6 +1,7 @@
 class AllocationsController < ApplicationController
   before_action :authenticate_user
 
+  # rubocop:disable Metrics/MethodLength
   def index
     @prisoners = [
       {
@@ -19,4 +20,5 @@ class AllocationsController < ApplicationController
       }
     ]
   end
+  # rubocop:enable Metrics/MethodLength
 end
