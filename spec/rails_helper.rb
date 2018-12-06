@@ -6,15 +6,14 @@ abort('The Rails environment is running in production mode!') if Rails.env.produ
 require 'rspec/rails'
 require 'spec_helper'
 require 'support/helpers/jwt_helper'
+require 'support/helpers/features_helper'
 require 'capybara/rspec'
 require 'webmock/rspec'
 
 OmniAuth.config.test_mode = true
 
 RSpec.configure do |config|
-  config.include ActiveSupport::Testing::TimeHelpers
   config.infer_spec_type_from_file_location!
-
   config.filter_rails_from_backtrace!
 
   config.before(:each, :expect_exception) do
@@ -22,7 +21,9 @@ RSpec.configure do |config|
     allow(Raven).to receive(:capture_exception)
   end
 
+  config.include ActiveSupport::Testing::TimeHelpers
   config.include JWTHelper
+  config.include FeaturesHelper
 
   config.after(:each, :epect_exception) do
     Rails.configuration.sentry_dsn = nil
