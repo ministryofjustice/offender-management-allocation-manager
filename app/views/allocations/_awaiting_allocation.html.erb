@@ -1,0 +1,28 @@
+<section class="govuk-tabs__panel" id="awaiting-allocation">
+  <table class="govuk-table responsive tablesorter">
+    <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th class="govuk-table__header" scope="col"><a
+        class='table-sorter__link' href='#'>Prisoner name</th>
+      <th class="govuk-table__header sorter-false" scope="col">Prisoner number</th>
+      <th class="govuk-table__header sorter-false" scope="col">Arrival date</th>
+      <th class="govuk-table__header sorter-false" scope="col">Release date</th>
+      <th class="govuk-table__header header-width__8" scope="col"><a href='#'
+                                                                     class='table-sorter__link'>Tier</th>
+      <th class="govuk-table__header" scope="col">Action</th>
+    </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+    <% @prisoners.each do |prisoner| %>
+      <tr class="govuk-table__row">
+        <td aria-label="Action" class="govuk-table__cell "><%= prisoner[:name] %></td>
+        <td aria-label="Prisoner number" class="govuk-table__cell "><%= prisoner[:number] %></td>
+        <td aria-label="Arrival date" class="govuk-table__cell "><%= prisoner[:arrival_date] %></td>
+        <td aria-label="Release date" class="govuk-table__cell "><%= prisoner[:release_date] %></td>
+        <td aria-label="Tier" class="govuk-table__cell ">NA</td>
+        <td aria-label="Action" class="govuk-table__cell "><a href="#">Allocate</a></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</section>
