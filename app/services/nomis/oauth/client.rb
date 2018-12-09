@@ -1,8 +1,8 @@
-require 'base64'
-
 module Nomis
   module Oauth
     class Client
+      include ClientHelper
+
       def initialize(host)
         @host = host
         @connection = Faraday.new
@@ -17,20 +17,11 @@ module Nomis
       def request(method, route)
         response = @connection.send(method) { |req|
           req.url(@host + route)
-          req.headers['Authorization'] =
-            'Basic ' + authorisation
+          req.headers['Authorization'] = authorisation
         }
 
         JSON.parse(response.body)
       end
-
-      # rubocop:disable Metrics/LineLength
-      def authorisation
-        Base64.urlsafe_encode64(
-          "#{Rails.configuration.nomis_oauth_client_id}:#{Rails.configuration.nomis_oauth_client_secret}"
-        )
-      end
-      # rubocop:enable Metrics/LineLength
     end
   end
 end
