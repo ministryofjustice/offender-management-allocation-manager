@@ -1,27 +1,27 @@
 require 'omniauth-oauth2'
 require 'base64'
+require 'byebug'
 
 module OmniAuth
   module Strategies
     class HmppsSso < OmniAuth::Strategies::OAuth2
+      include Nomis::Oauth::ClientHelper
+
       option :name, 'hmpps_sso'
 
-      # :nocov:
-      # Nocov temporary until we get user details from custody API
       info do
         {
-          username: token_info.fetch('user_name')
+          username: staff_details.fetch('activeNomisCaseload'),
+          caseload: staff_details.fetch('username')
         }
       end
 
+      #:nocov:
       def build_access_token
-        options.token_params[:headers] = { 'Authorization' => basic_auth_header }
+        options.token_params[:headers] = { 'Authorization' => authorisation }
         super
       end
-
-      def token_info
-        access_token.params
-      end
+      #:nocov:
 
       # Without this login with sso breaks.
       # This issued was first identified in the Prison Visits Booking service. See
@@ -42,14 +42,14 @@ module OmniAuth
 
     private
 
-      # rubocop:disable Metrics/LineLength
-      def basic_auth_header
-        'Basic ' + Base64.urlsafe_encode64(
-          "#{Rails.configuration.nomis_oauth_client_id}:#{Rails.configuration.nomis_oauth_client_secret}"
-        )
+      def staff_details
+        @staff_details ||= Nomis::Custody::Api.fetch_nomis_staff_details(username)
       end
-      # rubocop:enable Metrics/LineLength
-      # :nocov:
+
+      #:nocov:
+      def username
+        access_token.params.fetch('user_name')
+      end
     end
   end
 end

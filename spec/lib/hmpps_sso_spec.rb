@@ -13,22 +13,20 @@ describe OmniAuth::Strategies::HmppsSso do
   end
 
   context 'when methods' do
-    let(:user_name) { double('user_name') }
+    context 'when #info' do
+      it 'returns a hash with the user name and caseload' do
+        leeds_prison = 'LEI'
+        username = 'Fred'
+        staff_details = {
+          'activeNomisCaseload' => leeds_prison,
+          'username' => username
+        }
 
-    let(:token_info) do
-      {
-        'user_name' => user_name
-      }
-    end
+        allow(Nomis::Custody::Api).to receive(:fetch_nomis_staff_details).and_return(staff_details)
+        allow(strategy).to receive(:username).and_return(username)
 
-    context 'when #token_info' do
-      before do
-        allow(strategy).to receive(:token_info).and_return(token_info)
-      end
-
-      it 'returns a hash with the user name' do
-        expect(strategy.info).to eq(
-          username: user_name)
+        expect(strategy.info[:username]).to eq(leeds_prison)
+        expect(strategy.info[:caseload]).to eq(username)
       end
     end
   end
