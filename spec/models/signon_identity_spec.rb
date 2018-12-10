@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe SignonIdentity, model: true do
-  let(:user_auth_data) { double('user_auth_data', username: 'Fred') }
+  let(:user_auth_data) { double('user_auth_data', username: 'Fred', caseload: 'LEI') }
   let(:omniauth_data) { double('omniauth_data') }
   let(:signon_identity) { SignonIdentity.from_omniauth(omniauth_data) }
 
@@ -14,7 +14,8 @@ describe SignonIdentity, model: true do
     allow(omniauth_data).to receive(:fetch).and_return(user_auth_data)
 
     session = {
-      username: 'Fred'
+      username: 'Fred',
+      caseload: 'LEI'
     }
 
     expect(signon_identity.to_session).to eq(session)

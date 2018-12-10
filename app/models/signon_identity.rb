@@ -8,11 +8,13 @@ class SignonIdentity
 
   def initialize(user_auth_data)
     @username = user_auth_data.username
+    @caseload = user_auth_data.caseload
   end
 
   def to_session
     {
-      username: @username
+      username: @username,
+      caseload: @caseload
     }
   end
 end
