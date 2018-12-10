@@ -9,7 +9,7 @@ describe Nomis::Custody::Api do
   end
 
   around do |ex|
-    travel_to Date.new(2018, 11, 10, 13) do 
+    travel_to Date.new(2018, 11, 10, 13) do
       ex.run
     end
   end
