@@ -1,5 +1,4 @@
 require 'omniauth-oauth2'
-require 'base64'
 
 module OmniAuth
   module Strategies
