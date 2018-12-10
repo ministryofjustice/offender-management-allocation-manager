@@ -1,0 +1,108 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://gateway.t3.nomis-api.hmpps.dsd.io/auth/oauth/token?grant_type=client_credentials
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Authorization:
+      - authorisation_header
+      Content-Length:
+      - '0'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-store
+      Pragma:
+      - no-cache
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - application/json;charset=UTF-8
+      Server:
+      - nginx/1.15.3
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Frame-Options:
+      - DENY
+      Date:
+      - Mon, 10 Dec 2018 13:14:06 GMT
+    body:
+      encoding: UTF-8
+      string: '{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbnRlcm5hbFVzZXIiOmZhbHNlLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNTQ0NDQ4ODQ2LCJhdXRob3JpdGllcyI6WyJST0xFX1NZU1RFTV9SRUFEX09OTFkiXSwianRpIjoiNmE3MmU1Y2MtYzZlOC00YmI4LTgzOGYtNDViZjdlNjdmODdkIiwiY2xpZW50X2lkIjoib2ZmZW5kZXItbWFuYWdlbWVudC1hbGxvY2F0aW9uLW1hbmFnZXIifQ.Tjhuk2mVO_LoX2LNnfri1taQGX-f1HnNDBMj4feKJ0s5RSOkZu2D7eOdHqnDj98FVIqROf9_gMO7bR9YQk2evfGZ2Z_m12dbfmFK8-vP5isiBwovVK_Ez9YjQFUBs0LsBMyI-xMEyd7VUzRXR02gHUcBNzJoNn_1qMaflhKaEfHX6WSAS7qbUB3wihKRUFP2EJMAUTNaYLiP72YJC5ay4sWe0BYbxkqh7JgVxaXwtYsqS-FHgROgwFAnE-EwlaRd8pw9ZWeAMk9fAJM07-k06ni4XxnIbQX-_yh_8O33mQWPvGtBovBd5CBtXiDWXdfnByUk7FOcW7i2JJNW7KX_Cg","token_type":"bearer","expires_in":1199,"scope":"read
+        write","internalUser":false,"jti":"6a72e5cc-c6e8-4bb8-838f-45bf7e67f87d"}'
+    http_version: 
+  recorded_at: Mon, 10 Dec 2018 13:14:01 GMT
+- request:
+    method: get
+    uri: https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/nomis-staff-users/PK000223
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Authorization:
+      - authorisation_header
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Pragma:
+      - no-cache
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - application/json;charset=UTF-8
+      Expires:
+      - '0'
+      Server:
+      - nginx/1.15.3
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Application-Context:
+      - application:logstash,oracle
+      Date:
+      - Mon, 10 Dec 2018 13:14:05 GMT
+    body:
+      encoding: UTF-8
+      string: '{"username":"PK000223","staffId":485637,"firstName":"KATH","lastName":"POBEE-NORRIS","status":"ACTIVE","activeNomisCaseload":"LEI","nomisCaseloads":{"LEI":{"id":"LEI","name":"LEEDS
+        (HMP)","type":"INST","currentActive":true,"agencies":[{"agencyLocationId":"LEI","description":"LEEDS
+        (HMP)","longDescription":"HMP LEEDS","agencyLocationType":"INST","districtCode":"YORK","bailOffice":false,"housingLev1Code":"WING","housingLev2Code":"LAND","housingLev3Code":"CELL","housingLev4Code":"NULL","serviceRequired":false,"active":true,"areaCode":"YORK","nomsRegionCode":"YOHUM","geographicRegionCode":"YORK","cjitCode":"E00LE00"},{"agencyLocationId":"OUT","description":"OUTSIDE","longDescription":"OUTSIDE
+        JURISDICTION","agencyLocationType":"INST","districtCode":"FD","deactivationDate":"2008-05-29","jurisdictionCode":"CC","bailOffice":true,"listSeq":2,"housingLev1Code":"BED","propertyLev1Code":"BOX","serviceRequired":false,"active":false,"disabilityAccessCode":"WHEEL","cjitCode":"TEST"},{"agencyLocationId":"TRN","description":"TRANSFER","agencyLocationType":"INST","districtCode":"FD","bailOffice":true,"housingLev1Code":"CB","serviceRequired":false,"active":true}]},"NWEB":{"id":"NWEB","name":"Nomis-Web
+        Application","type":"APP","currentActive":false,"agencies":[]},"PVI":{"id":"PVI","name":"PENTONVILLE
+        (HMP)","type":"INST","currentActive":false,"agencies":[{"agencyLocationId":"OUT","description":"OUTSIDE","longDescription":"OUTSIDE
+        JURISDICTION","agencyLocationType":"INST","districtCode":"FD","deactivationDate":"2008-05-29","jurisdictionCode":"CC","bailOffice":true,"listSeq":2,"housingLev1Code":"BED","propertyLev1Code":"BOX","serviceRequired":false,"active":false,"disabilityAccessCode":"WHEEL","cjitCode":"TEST"},{"agencyLocationId":"PVI","description":"PENTONVILLE
+        (HMP)","longDescription":"HMP PENTONVILLE","agencyLocationType":"INST","districtCode":"LONDON","bailOffice":false,"housingLev1Code":"WING","housingLev2Code":"LAND","housingLev3Code":"CELL","housingLev4Code":"NULL","serviceRequired":false,"active":true,"areaCode":"LONDON","nomsRegionCode":"LON","geographicRegionCode":"LONDON","cjitCode":"E00PV00"},{"agencyLocationId":"TRN","description":"TRANSFER","agencyLocationType":"INST","districtCode":"FD","bailOffice":true,"housingLev1Code":"CB","serviceRequired":false,"active":true}]},"WEI":{"id":"WEI","name":"WEALSTUN
+        (HMP)","type":"INST","currentActive":false,"agencies":[{"agencyLocationId":"OUT","description":"OUTSIDE","longDescription":"OUTSIDE
+        JURISDICTION","agencyLocationType":"INST","districtCode":"FD","deactivationDate":"2008-05-29","jurisdictionCode":"CC","bailOffice":true,"listSeq":2,"housingLev1Code":"BED","propertyLev1Code":"BOX","serviceRequired":false,"active":false,"disabilityAccessCode":"WHEEL","cjitCode":"TEST"},{"agencyLocationId":"TRN","description":"TRANSFER","agencyLocationType":"INST","districtCode":"FD","bailOffice":true,"housingLev1Code":"CB","serviceRequired":false,"active":true},{"agencyLocationId":"WEI","description":"WEALSTUN
+        (HMP)","longDescription":"HMP WEALSTUN","agencyLocationType":"INST","districtCode":"YORK","bailOffice":false,"housingLev1Code":"WING","housingLev2Code":"LAND","housingLev3Code":"CELL","housingLev4Code":"NULL","serviceRequired":false,"active":true,"areaCode":"YORK","nomsRegionCode":"YOHUM","geographicRegionCode":"YORK","cjitCode":"E00WE00"}]}}}'
+    http_version: 
+  recorded_at: Mon, 10 Dec 2018 13:14:01 GMT
+recorded_with: VCR 4.0.0
