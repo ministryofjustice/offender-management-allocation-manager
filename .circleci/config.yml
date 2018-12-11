@@ -186,10 +186,13 @@ jobs:
       - deploy:
           name: Deploy to staging
           command: |
-            kubectl apply -f ./deploy/ingress.yaml
-            kubectl apply -f ./deploy/service.yaml
-            kubectl apply -f ./deploy/allocation-manager-secrets.yaml
-            kubectl apply -f ./deploy/deployment.yaml
+            kubectl set image -f deploy/deployment.yaml app=${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_SHA1} --local -o yaml \
+            | kubectl apply -f -
+            kubectl apply \
+              -f ./deploy/ingress.yaml \
+              -f ./deploy/service.yaml \
+              -f ./deploy/allocation-manager-secrets.yaml \
+              -f ./deploy/deployment.yaml
 
 workflows:
   version: 2
