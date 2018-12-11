@@ -1,15 +1,15 @@
-module Nomis
-  module Oauth
-    class Client
-      include ClientHelper
+require 'faraday'
 
+module Nomis
+  module Custody
+    class Client
       def initialize(host)
         @host = host
         @connection = Faraday.new
       end
 
-      def post(route)
-        request(:post, route)
+      def get(route)
+        request(:get, route)
       end
 
     private
@@ -17,10 +17,14 @@ module Nomis
       def request(method, route)
         response = @connection.send(method) { |req|
           req.url(@host + route)
-          req.headers['Authorization'] = authorisation
+          req.headers['Authorization'] = "Bearer #{token.access_token}"
         }
 
         JSON.parse(response.body)
+      end
+
+      def token
+        Nomis::Oauth::TokenService.valid_token
       end
     end
   end
