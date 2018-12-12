@@ -32,5 +32,6 @@ describe Nomis::Custody::Api do
     response = described_class.get_offenders(prison)
 
     expect(response.count).to eq(10)
+    expect(response.first).to be_kind_of(Nomis::OffenderDetails)
   end
 end

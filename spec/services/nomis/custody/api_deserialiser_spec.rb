@@ -9,7 +9,7 @@ RSpec.describe Nomis::Custody::ApiDeserialiser do
   end
 
   let(:payload) do
-    { foo: :bar, unknown_attribute: :boom }
+    { 'foo' => 'bar', 'unknown_attribute' => 'boom' }
   end
 
   subject { model.new(payload) }

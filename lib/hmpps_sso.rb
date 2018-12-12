@@ -9,8 +9,8 @@ module OmniAuth
 
       info do
         {
-          username: staff_details.fetch('username'),
-          caseload: staff_details.fetch('activeNomisCaseload')
+          username: staff_details.username,
+          caseload: staff_details.active_nomis_caseload
         }
       end
 

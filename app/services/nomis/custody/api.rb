@@ -22,10 +22,12 @@ module Nomis
       def get_offenders(prison)
         route = "/custodyapi/api/offenders/prison/#{prison}?page=1&size=10"
         response = @custodyapi_client.get(route)
-        response['_embedded']['offenders']
+        response['_embedded']['offenders'].map do |offender|
+          api_deserialiser.deserialise(Nomis::OffenderDetails, offender)
+        end
       end
 
-      private
+    private
 
       def api_deserialiser
         @api_deserialiser ||= ApiDeserialiser.new
