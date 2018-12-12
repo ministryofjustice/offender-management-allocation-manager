@@ -1,0 +1,105 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://gateway.t3.nomis-api.hmpps.dsd.io/auth/oauth/token?grant_type=client_credentials
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Authorization:
+      - authorisation_header
+      Content-Length:
+      - '0'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-store
+      Pragma:
+      - no-cache
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - application/json;charset=UTF-8
+      Server:
+      - nginx/1.15.3
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Frame-Options:
+      - DENY
+      Date:
+      - Wed, 12 Dec 2018 16:51:19 GMT
+    body:
+      encoding: UTF-8
+      string: '{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbnRlcm5hbFVzZXIiOmZhbHNlLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNTQ0NjM0NjgwLCJhdXRob3JpdGllcyI6WyJST0xFX1NZU1RFTV9SRUFEX09OTFkiXSwianRpIjoiOTNiZjA5YWMtMTUyMC00NzU2LWE2NjUtNTU1NGYwYWZjOTcxIiwiY2xpZW50X2lkIjoib2ZmZW5kZXItbWFuYWdlbWVudC1hbGxvY2F0aW9uLW1hbmFnZXIifQ.HyyexBB8MTz_TA7tAG7ROoi4VlOxUhoM7MG7sqytwYPF7MHhM5dFZRrj14C7s9bnCnVC4XTPhShYPUdkPnVsW4SKclYpnwL48wV7_oQ0Ap3IeYEbwyGC9WWkepO9gHO5HrauHFFTP4W-oRb0eozRivMiAjvwyRsFbqMxtrWl-hqbYPranj8ojIsaNQtEne9f4mVFs0G_wEw8WBMSEn05LOtngaRx4NfN-cFuZNbXau9awsV-n_wMil_pHwdTgNu3Lt7MBzPqFxkQ6TI9Lz9fNVlfeCCJmu1lX4aGPs2JSYOt3jImuwRmG1oT90BgP3dShyXXM8HnUN3F9P5g0Mrp4Q","token_type":"bearer","expires_in":1199,"scope":"read
+        write","internalUser":false,"jti":"93bf09ac-1520-4756-a665-5554f0afc971"}'
+    http_version: 
+  recorded_at: Mon, 12 Nov 2018 00:00:00 GMT
+- request:
+    method: get
+    uri: https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/offenderId/1317074/releaseDetails
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Authorization:
+      - authorisation_header
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Pragma:
+      - no-cache
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - application/json;charset=UTF-8
+      Expires:
+      - '0'
+      Server:
+      - nginx/1.15.3
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Application-Context:
+      - application:logstash,oracle
+      Date:
+      - Wed, 12 Dec 2018 16:51:20 GMT
+    body:
+      encoding: UTF-8
+      string: '[{"bookingId":136394,"releaseDate":"2010-05-12","movementReasonType":"REL","movementReasonCode":"CR","movementReasonDescription":"CONDITIONAL
+        RELEASE","eventId":18281667,"eventStatus":"EXP","autoReleaseDate":"2010-06-21","verified":true},{"bookingId":199095,"releaseDate":"2010-11-29","movementReasonType":"REL","movementReasonCode":"HR","movementReasonDescription":"HDC
+        Conditional Release","eventId":37003528,"eventStatus":"EXP","approvedReleaseDate":"2010-12-19","autoReleaseDate":"2011-01-08","verified":true},{"bookingId":583167,"releaseDate":"2012-05-16","movementReasonType":"REL","movementReasonCode":"AR","movementReasonDescription":"AUTO
+        RELEASE UNDER 12 MTH SHORT TERMERS","eventId":105390386,"eventStatus":"EXP","autoReleaseDate":"2012-06-03","verified":true},{"bookingId":747338,"releaseDate":"2013-05-17","movementReasonType":"REL","movementReasonCode":"AR","movementReasonDescription":"AUTO
+        RELEASE UNDER 12 MTH SHORT TERMERS","eventId":164210245,"eventStatus":"SCH","autoReleaseDate":"2013-07-08","verified":false},{"bookingId":770519,"releaseDate":"2013-11-22","movementReasonType":"REL","movementReasonCode":"AR","movementReasonDescription":"AUTO
+        RELEASE UNDER 12 MTH SHORT TERMERS","eventId":173532667,"eventStatus":"EXP","autoReleaseDate":"2014-01-06","verified":true},{"bookingId":847856,"releaseDate":"2014-04-07","movementReasonType":"REL","movementReasonCode":"AR","movementReasonDescription":"AUTO
+        RELEASE UNDER 12 MTH SHORT TERMERS","eventId":202575247,"eventStatus":"EXP","autoReleaseDate":"2014-05-05","verified":true},{"bookingId":965725,"releaseDate":"2017-04-09","movementReasonType":"REL","movementReasonCode":"CR","movementReasonDescription":"CONDITIONAL
+        RELEASE","eventId":335710788,"eventStatus":"SCH","autoReleaseDate":"2017-04-30","verified":false}]'
+    http_version: 
+  recorded_at: Mon, 12 Nov 2018 00:00:00 GMT
+recorded_with: VCR 4.0.0

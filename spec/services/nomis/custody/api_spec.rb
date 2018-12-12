@@ -9,23 +9,22 @@ describe Nomis::Custody::Api do
   end
 
   around do |ex|
-    travel_to Date.new(2018, 11, 10, 13) do
+    travel_to Date.new(2018, 11, 12, 16) do
       ex.run
     end
   end
 
-  it "fetches the staff's details",
-    vcr: { cassette_name: :fetch_nomis_staff_details } do
+  it "gets staff details",
+    vcr: { cassette_name: :get_nomis_staff_details } do
     username = 'PK000223'
 
     response = described_class.fetch_nomis_staff_details(username)
 
-    # expect(response['activeNomisCaseload']).to eq "LEI"
     expect(response).to be_kind_of(Nomis::StaffDetails)
     expect(response.active_nomis_caseload).to eq('LEI')
   end
 
-  it 'fetches prisoner information for a particular prison',
+  it 'gets prisoner information for a particular prison',
     vcr: { cassette_name: :get_prisoners } do
     prison = 'LEI'
 
@@ -34,4 +33,14 @@ describe Nomis::Custody::Api do
     expect(response.count).to eq(10)
     expect(response.first).to be_kind_of(Nomis::OffenderDetails)
   end
+
+  # TODO: this end point returns an array. Find out how to handle.
+  xit 'gets release details for a prisoner',
+    vcr: { cassette_name: :get_release_details } do
+      prisoner_id = '1317074'
+
+      response = described_class.get_release_details(prisoner_id)
+
+      expect(response).to be_kind_of(Nomis::ReleaseDetails)
+    end
 end

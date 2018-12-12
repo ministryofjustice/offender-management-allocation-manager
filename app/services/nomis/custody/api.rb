@@ -6,6 +6,7 @@ module Nomis
       class << self
         delegate :fetch_nomis_staff_details, to: :instance
         delegate :get_offenders, to: :instance
+        delegate :get_release_details, to: :instance
       end
 
       def initialize
@@ -25,6 +26,13 @@ module Nomis
         response['_embedded']['offenders'].map do |offender|
           api_deserialiser.deserialise(Nomis::OffenderDetails, offender)
         end
+      end
+
+      def get_release_details(prisoner_id)
+        route = "/custodyapi/api/offenders/offenderId/#{prisoner_id}/releaseDetails"
+        response = @custodyapi_client.get(route)
+
+        api_deserialiser.deserialise(Nomis::ReleaseDetails, response)
       end
 
     private
