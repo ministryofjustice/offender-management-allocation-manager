@@ -20,7 +20,9 @@ describe Nomis::Custody::Api do
 
     response = described_class.fetch_nomis_staff_details(username)
 
-    expect(response['activeNomisCaseload']).to eq "LEI"
+    # expect(response['activeNomisCaseload']).to eq "LEI"
+    expect(response).to be_kind_of(Nomis::StaffDetails)
+    expect(response.active_nomis_caseload).to eq('LEI')
   end
 
   it 'fetches prisoner information for a particular prison',

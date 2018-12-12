@@ -1,14 +1,14 @@
 module Nomis
   module Custody
     class ApiDeserialiser
-      def serialise(memory_model_class, payload)
+      def deserialise(memory_model_class, payload)
         memory_model = memory_model_class.new
         payload.each do |key, value|
-          setter = "#{key}="
+          setter = "#{key.underscore}="
           if memory_model.respond_to?(setter)
             memory_model.public_send(setter, value)
           else
-            raise_error_for(memory_model_class, key)
+            raise_error_for(memory_model_class, key.underscore)
           end
         end
         memory_model
