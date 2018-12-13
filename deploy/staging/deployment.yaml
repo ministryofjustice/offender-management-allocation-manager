@@ -1,0 +1,78 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: allocation-manager
+  labels:
+    app: allocation-manager
+spec:
+  replicas: 3
+  revisionHistoryLimit: 2
+  minReadySeconds: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 2
+  selector:
+    matchLabels:
+      app: allocation-manager
+  template:
+    metadata:
+      labels:
+        app: allocation-manager
+    spec:
+      containers:
+        - name: allocation-manager
+          image: 926803513772.dkr.ecr.eu-west-1.amazonaws.com/offender-management/offender-management-allocation-manager:latest
+          imagePullPolicy: Always
+          command: ['sh', '-c', "bundle exec puma -p 3000 -C ./config/puma_prod.rb --pidfile /tmp/server.pid"]
+          ports:
+            - containerPort: 3000
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 60
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 60
+          env:
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: secret_key_base
+            - name: RAILS_ENV
+              value: "production"
+            - name: RAILS_SERVE_STATIC_FILES
+              value: "true"
+            - name: NOMIS_OAUTH_PUBLIC_KEY
+              value: "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF6Y3g3WWJ3MkJBV3Y3U3NFSVVHUAppeUpTSURndHFCeDE5VHdtN3VJM1RYNXpSY3JabFV4Y0VtUEpHVWd5K0QySkloVmxxbWVxd0dWMkNOT3FaQmdHCmo4ZUpHQTU5aUlUemU4ZG1SSk5JYzdsNmxESmc5RE5KVk9pTHFVbFpGRENJcXplSTYzb3E2dWhjY2c1RFBpVE4KcU9HWmM4dXBOK3c1ZFpyTnYrMkdMZ3hLMnBldE1VL0JoWWVXZjNLdllJTzE2djF1dm5GT0dPMTNIb1d1NUJ0ZApTdC9UZ2NsRmhWTEVkR3c3WGJpWUhuTlpJZGh3YU5RaVlnbVhtalpWZE15Q1BETW8xMExrVjFwM1V5MTVwTU14ClVwc2xKYU8wNlZIYXJtY3ZWYzNleHg5NlpHTjE2T2U4ZWZoeG5Rdmhzd0ZrbXlYT25sSForNDI1MnJHcHlKTG8KbHdJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t"
+            - name: OFFENDER_MANAGEMENT_ALLOCATION_API
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: offender_management_allocation_api
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: sentry_dsn
+            - name: NOMIS_OAUTH_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: nomis_oauth_client_id
+            - name: NOMIS_OAUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: nomis_oauth_client_secret
+            - name: NOMIS_OAUTH_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: nomis_oauth_host
