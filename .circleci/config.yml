@@ -186,13 +186,41 @@ jobs:
       - deploy:
           name: Deploy to staging
           command: |
-            kubectl set image -f deploy/deployment.yaml allocation-manager=${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_SHA1} --local -o yaml \
+            kubectl set image -f deploy/staging/deployment.yaml allocation-manager=${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_SHA1} --local -o yaml \
             | kubectl apply -f -
             kubectl apply \
-              -f ./deploy/ingress.yaml \
-              -f ./deploy/service.yaml \
-              -f ./deploy/allocation-manager-secrets.yaml \
-              -f ./deploy/deployment.yaml
+              -f ./deploy/staging/ingress.yaml \
+              -f ./deploy/staging/service.yaml \
+              -f ./deploy/staging/allocation-manager-secrets.yaml \
+              -f ./deploy/staging/deployment.yaml
+
+    deploy_production:
+        <<: *deploy_container_config
+        steps:
+          - checkout
+          - setup_remote_docker:
+              docker_layer_caching: true
+          - attach_workspace:
+              at: ~/repo
+          - run:
+              name: Kubectl deployment production setup
+              command: |
+                $(aws ecr get-login --region eu-west-1 --no-include-email)
+                setup-kube-auth
+                kubectl config use-context production
+          - *install_gpg
+          - *configure_gpg
+          - *decrypt_secrets
+          - deploy:
+              name: Deploy to production
+              command: |
+                kubectl set image -f deploy/production/deployment.yaml allocation-manager=${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_SHA1} --local -o yaml \
+                | kubectl apply -f -
+                kubectl apply \
+                  -f ./deploy/production/ingress.yaml \
+                  -f ./deploy/production/service.yaml \
+                  -f ./deploy/production/allocation-manager-secrets.yaml \
+                  -f ./deploy/production/deployment.yaml
 
 workflows:
   version: 2
@@ -216,6 +244,21 @@ workflows:
       - deploy_staging:
           requires:
             - build_push_docker
+          filters:
+            branches:
+              only: master
+      - deploy_production_approval:
+          type: approval
+          requires:
+            - build_push_docker
+            - deploy_staging
+          filters:
+            branches:
+              only: master
+      - deploy_production:
+          requires:
+            - deploy_production_approval
+            - deploy_staging
           filters:
             branches:
               only: master
