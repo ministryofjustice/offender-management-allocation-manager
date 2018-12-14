@@ -28,11 +28,15 @@ module Nomis
         end
       end
 
-      def get_release_details(prisoner_id)
-        route = "/custodyapi/api/offenders/offenderId/#{prisoner_id}/releaseDetails"
+      def get_release_details(offender_id, booking_id)
+        route = "/custodyapi/api/offenders/offenderId/#{offender_id}/releaseDetails?bookingId=#{booking_id}"
         response = @custodyapi_client.get(route)
 
-        api_deserialiser.deserialise(Nomis::ReleaseDetails, response)
+        if response.is_a?(Array)
+          api_deserialiser.deserialise(Nomis::ReleaseDetails, response.first)
+        else
+          response
+        end
       end
 
     private

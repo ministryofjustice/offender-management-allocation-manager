@@ -20,7 +20,7 @@ module OffenderManagementAllocationClient
       'OFFENDER_MANAGEMENT_ALLOCATION_API',
       'http://localhost:8000'
     )
-    config.sentry_dsn = ENV.fetch('SENTRY_DSN', nil)
+    config.sentry_dsn = ENV.fetch('SENTRY_DSN', 'nil')
     config.nomis_oauth_host = ENV['NOMIS_OAUTH_HOST']
     config.nomis_oauth_client_id = ENV['NOMIS_OAUTH_CLIENT_ID']
     config.nomis_oauth_client_secret = ENV['NOMIS_OAUTH_CLIENT_SECRET']

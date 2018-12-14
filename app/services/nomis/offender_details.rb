@@ -9,5 +9,19 @@ module Nomis
     attribute :date_of_birth, :date
     attribute :active_booking, :string
     attribute :middle_names, :string
+
+    def release_date
+      release_details.release_date.present? ? release_details.release_date.to_date.strftime('%m/%d/%Y') : nil
+    end
+
+  private
+
+    def release_details
+      active_booking_record = JSON.parse active_booking.gsub('=>', ':')
+      booking_id = active_booking_record['bookingId']
+
+      @release_details ||= Nomis::Custody::Api.
+                   get_release_details(offender_id, booking_id)
+    end
   end
 end
