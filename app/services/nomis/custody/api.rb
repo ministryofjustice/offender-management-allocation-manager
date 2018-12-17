@@ -29,14 +29,14 @@ module Nomis
       end
 
       def get_release_details(offender_id, booking_id)
+        # rubocop:disable Metrics/LineLength
         route = "/custodyapi/api/offenders/offenderId/#{offender_id}/releaseDetails?bookingId=#{booking_id}"
+        # rubocop:enable Metrics/LineLength
         response = @custodyapi_client.get(route)
-
-        if response.is_a?(Array)
-          api_deserialiser.deserialise(Nomis::ReleaseDetails, response.first)
-        else
-          response
-        end
+        api_deserialiser.deserialise(Nomis::ReleaseDetails, response.first)
+      rescue Nomis::Custody::Client::APIError => e
+        AllocationManager::ExceptionHandler.capture_exception(e)
+        NullReleaseDetails.new
       end
 
     private

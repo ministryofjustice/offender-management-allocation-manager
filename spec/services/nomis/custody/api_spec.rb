@@ -34,13 +34,24 @@ describe Nomis::Custody::Api do
     expect(response.first).to be_kind_of(Nomis::OffenderDetails)
   end
 
-  # TODO: this end point returns an array. Find out how to handle.
-  xit 'gets release details for a prisoner',
+  it 'gets release details for a prisoner',
     vcr: { cassette_name: :get_release_details } do
-      prisoner_id = '1317074'
+      offender_id = '1317074'
+      booking_id = '965725'
 
-      response = described_class.get_release_details(prisoner_id)
+      response = described_class.get_release_details(offender_id, booking_id)
 
-      expect(response).to be_kind_of(Nomis::ReleaseDetails)
+      expect(response).to be_instance_of(Nomis::ReleaseDetails)
+      expect(response.release_date).to eq('2017-04-09')
+    end
+
+  it 'returns a NullReleaseDetails if there are no release details for a prisoner', :expect_exception,
+    vcr: { cassette_name: :handle_null_release_details } do
+      offender_id = '1027417'
+      booking_id = '1142296'
+
+      response = described_class.get_release_details(offender_id, booking_id)
+
+      expect(response).to be_instance_of(Nomis::NullReleaseDetails)
     end
 end

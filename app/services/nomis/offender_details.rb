@@ -11,7 +11,8 @@ module Nomis
     attribute :middle_names, :string
 
     def release_date
-      release_details.release_date.present? ? release_details.release_date.to_date.strftime('%m/%d/%Y') : nil
+      release_date = release_details.release_date
+      release_date&.to_date&.strftime('%m/%d/%Y')
     end
 
   private

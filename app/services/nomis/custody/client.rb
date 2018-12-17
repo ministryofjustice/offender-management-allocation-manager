@@ -1,9 +1,10 @@
 require 'faraday'
 
 module Nomis
-  APIError = Class.new(StandardError)
   module Custody
     class Client
+      APIError = Class.new(StandardError)
+
       def initialize(host)
         @host = host
         @connection = Faraday.new do |faraday|
@@ -25,9 +26,9 @@ module Nomis
         }
 
         JSON.parse(response.body)
-      rescue Faraday::Error::ClientError => e
-        AllocationManager::ExceptionHandler.capture_exception(Nomis::Error::NotFound.new(e))
-        NullReleaseDetails.new
+      rescue Faraday::ResourceNotFound => e
+        AllocationManager::ExceptionHandler.capture_exception(e)
+        raise APIError, "Unexpected status #{e.response[:status]}"
       end
 
       def token
