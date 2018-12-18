@@ -14,10 +14,15 @@ module Nomis
 
       def fetch_new_auth_token
         route = '/auth/oauth/token?grant_type=client_credentials'
-        auth_token_attributes = @oauth_client.post(route)
-        access_token = auth_token_attributes['access_token']
+        response = @oauth_client.post(route)
 
-        Nomis::Oauth::Token.new(access_token)
+        api_deserialiser.deserialise(Nomis::Oauth::Token, response)
+      end
+
+    private
+
+      def api_deserialiser
+        @api_deserialiser ||= ApiDeserialiser.new
       end
     end
   end

@@ -13,4 +13,8 @@ class ApplicationController < ActionController::Base
   def current_user
     sso_identity['username']
   end
+
+  def caseload
+    sso_identity['caseload']
+  end
 end

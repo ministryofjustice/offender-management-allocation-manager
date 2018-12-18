@@ -1,0 +1,95 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://gateway.t3.nomis-api.hmpps.dsd.io/auth/oauth/token?grant_type=client_credentials
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Authorization:
+      - authorisation_header
+      Content-Length:
+      - '0'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-store
+      Pragma:
+      - no-cache
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - application/json;charset=UTF-8
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Frame-Options:
+      - DENY
+      Date:
+      - Mon, 17 Dec 2018 09:45:02 GMT
+    body:
+      encoding: UTF-8
+      string: '{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbnRlcm5hbFVzZXIiOmZhbHNlLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNTQ1MDQxMTAzLCJhdXRob3JpdGllcyI6WyJST0xFX1NZU1RFTV9SRUFEX09OTFkiXSwianRpIjoiNDVkMmE3ZDMtMjE4MS00ODEwLTg1NjAtMDE4Y2MxOGEzOWYzIiwiY2xpZW50X2lkIjoib2ZmZW5kZXItbWFuYWdlbWVudC1hbGxvY2F0aW9uLW1hbmFnZXIifQ.ihJPzXM3NHpyfNKho_prWzoPboiKxg-A0jk9RhuXQlhZJmZVc46g3j6wof1hSDvV9wSXwsgiZ3bJYlM8rbtWnvgImfdpraB-YYaaSq-2TJzniumaS3fy61OTp8jryQ_Z4K2_In4kchot9nwsuq_2aofxzad2UYYXJJjEZSHMj7GFRQ8sGe7h-oly4k1eeMWQwys8hB86ijQwSFTMfSpixgTMIvSo0CUUrsAOApsMbW_xpiht62BeEra4UIRzyqtQczXUxj5V0BP5s4atitRBCvpLdNBJuq01wpwTDJcWMKgsLH1o5Fw8CR1s9BOYlVIe_XoCw4oVsve-KpHIivWmVg","token_type":"bearer","expires_in":1199,"scope":"read
+        write","internalUser":false,"jti":"45d2a7d3-2181-4810-8560-018cc18a39f3"}'
+    http_version: 
+  recorded_at: Mon, 12 Nov 2018 00:00:00 GMT
+- request:
+    method: get
+    uri: https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/offenderId/1317074/releaseDetails?bookingId=965725
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Authorization:
+      - authorisation_header
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Pragma:
+      - no-cache
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - application/json;charset=UTF-8
+      Expires:
+      - '0'
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Application-Context:
+      - application:logstash,oracle
+      Date:
+      - Mon, 17 Dec 2018 09:45:03 GMT
+    body:
+      encoding: UTF-8
+      string: '[{"bookingId":965725,"releaseDate":"2017-04-09","movementReasonType":"REL","movementReasonCode":"CR","movementReasonDescription":"CONDITIONAL
+        RELEASE","eventId":335710788,"eventStatus":"SCH","autoReleaseDate":"2017-04-30","verified":false}]'
+    http_version: 
+  recorded_at: Mon, 12 Nov 2018 00:00:00 GMT
+recorded_with: VCR 4.0.0

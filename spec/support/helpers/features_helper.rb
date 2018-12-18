@@ -2,7 +2,8 @@ module FeaturesHelper
   def signin_user(name = 'Fred')
     hmpps_sso_response = {
       'info' => {
-        'username' => name
+        'username' => name,
+        'caseload' => 'LEI'
       }
     }
 

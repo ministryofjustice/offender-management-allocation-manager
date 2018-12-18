@@ -25,7 +25,7 @@ RSpec.configure do |config|
   config.include JWTHelper
   config.include FeaturesHelper
 
-  config.after(:each, :epect_exception) do
+  config.after(:each, :expect_exception) do
     Rails.configuration.sentry_dsn = nil
   end
 end

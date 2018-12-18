@@ -1,0 +1,560 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://gateway.t3.nomis-api.hmpps.dsd.io/auth/oauth/token?grant_type=client_credentials
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Authorization:
+      - authorisation_header
+      Content-Length:
+      - '0'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-store
+      Pragma:
+      - no-cache
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - application/json;charset=UTF-8
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Frame-Options:
+      - DENY
+      Date:
+      - Mon, 17 Dec 2018 11:53:24 GMT
+    body:
+      encoding: UTF-8
+      string: '{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbnRlcm5hbFVzZXIiOmZhbHNlLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNTQ1MDQ4ODA0LCJhdXRob3JpdGllcyI6WyJST0xFX1NZU1RFTV9SRUFEX09OTFkiXSwianRpIjoiMDc1N2FiNTAtZDJkNC00N2VjLWEyZDYtZjQxOGRlYTIzNTVmIiwiY2xpZW50X2lkIjoib2ZmZW5kZXItbWFuYWdlbWVudC1hbGxvY2F0aW9uLW1hbmFnZXIifQ.QujZ2DDBpX7OMQQmhriwL6ExgbB2hZ_4dLQcNYCpBl4Cmk7_kDsuw301l1gj1x5SEm0Lx7a5PZGfae_YTFITBTvKeif5OKCCAi-Wlab16Ukdf5AGjY1_ycqjYst4yLaLiV_DfGIpqT4zNRbDpZ0UF40yyhUXBpkoXlOOFKw9FcdSuqkTS5gR94hy-HTs1cIr2Zv5hAD421QFPF698yhGRQT5LgpZPy2rxWh4ru8nWVAzaqZy9u-xZB2e35BpnL6gIJQhDz9vEAkHveBwaGAdcgkgsoahsOErBghJfn1nC6Vl3kfbaoBL9inmI8_Lwen7rDrYpfK52er5M8jjXoS0NA","token_type":"bearer","expires_in":1199,"scope":"read
+        write","internalUser":false,"jti":"0757ab50-d2d4-47ec-a2d6-f418dea2355f"}'
+    http_version: 
+  recorded_at: Mon, 17 Dec 2018 11:53:24 GMT
+- request:
+    method: get
+    uri: https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/prison/LEI?page=1&size=10
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Authorization:
+      - authorisation_header
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Pragma:
+      - no-cache
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - application/hal+json;charset=UTF-8
+      Expires:
+      - '0'
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Application-Context:
+      - application:logstash,oracle
+      Date:
+      - Mon, 17 Dec 2018 11:53:24 GMT
+    body:
+      encoding: UTF-8
+      string: '{"_embedded":{"offenders":[{"nomsId":"G7998GJ","offenderId":1317074,"firstName":"OKADONAH","surname":"AHMONIS","dateOfBirth":"1968-07-07","activeBooking":{"bookingId":965725,"bookingNo":"P91399","offenderId":1317074,"rootOffenderId":1317074,"agencyLocation":{"agencyLocationId":"LEI","description":"LEEDS
+        (HMP)","longDescription":"HMP LEEDS","agencyLocationType":"INST","districtCode":"YORK","bailOffice":false,"housingLev1Code":"WING","housingLev2Code":"LAND","housingLev3Code":"CELL","housingLev4Code":"NULL","serviceRequired":false,"active":true,"areaCode":"YORK","nomsRegionCode":"YOHUM","geographicRegionCode":"YORK","cjitCode":"E00LE00"},"livingUnit":{"internalLocationId":13032,"internalLocationCode":"039","agencyLocationId":"LEI","internalLocationType":"CELL","description":"LEI-D-3-039","capacity":2,"parentInternalLocationId":13000,"active":true,"listSequence":39,"cnaNumber":1,"certified":true,"unitType":"NA","operationCapacity":2,"numberOfOccupants":2,"trackingFlag":"N"},"activeFlag":true,"bookingStatus":"O","inOutStatus":"IN","statusReason":"ADM-I","startDate":"2015-03-12","bookingSequence":1}},{"nomsId":"G2390UN","offenderId":2538586,"firstName":"EF''LIAICO","surname":"AIDIO","dateOfBirth":"1971-08-21","activeBooking":{"bookingId":1161260,"bookingNo":"12085A","offenderId":2538586,"rootOffenderId":2538586,"agencyLocation":{"agencyLocationId":"LEI","description":"LEEDS
+        (HMP)","longDescription":"HMP LEEDS","agencyLocationType":"INST","districtCode":"YORK","bailOffice":false,"housingLev1Code":"WING","housingLev2Code":"LAND","housingLev3Code":"CELL","housingLev4Code":"NULL","serviceRequired":false,"active":true,"areaCode":"YORK","nomsRegionCode":"YOHUM","geographicRegionCode":"YORK","cjitCode":"E00LE00"},"livingUnit":{"internalLocationId":13280,"internalLocationCode":"027","agencyLocationId":"LEI","internalLocationType":"CELL","description":"LEI-F-5-027","capacity":2,"parentInternalLocationId":13255,"active":true,"listSequence":27,"cnaNumber":1,"certified":true,"unitType":"NA","operationCapacity":2,"numberOfOccupants":2,"trackingFlag":"N"},"activeFlag":true,"bookingStatus":"O","inOutStatus":"IN","statusReason":"CRT-DC","startDate":"2016-12-23","bookingSequence":1}},{"nomsId":"G2407UH","offenderId":2467558,"firstName":"EUNELU","surname":"AILICK","dateOfBirth":"1969-01-23","activeBooking":{"bookingId":1097499,"bookingNo":"W16356","offenderId":2467558,"rootOffenderId":2467558,"agencyLocation":{"agencyLocationId":"LEI","description":"LEEDS
+        (HMP)","longDescription":"HMP LEEDS","agencyLocationType":"INST","districtCode":"YORK","bailOffice":false,"housingLev1Code":"WING","housingLev2Code":"LAND","housingLev3Code":"CELL","housingLev4Code":"NULL","serviceRequired":false,"active":true,"areaCode":"YORK","nomsRegionCode":"YOHUM","geographicRegionCode":"YORK","cjitCode":"E00LE00"},"livingUnit":{"internalLocationId":13194,"internalLocationCode":"025","agencyLocationId":"LEI","internalLocationType":"CELL","description":"LEI-F-3-025","capacity":2,"parentInternalLocationId":13173,"active":true,"listSequence":25,"cnaNumber":1,"certified":true,"unitType":"NA","operationCapacity":2,"numberOfOccupants":2,"trackingFlag":"N"},"activeFlag":true,"bookingStatus":"O","inOutStatus":"IN","statusReason":"TAP-C5","startDate":"2016-05-12","bookingSequence":1}},{"nomsId":"G3020GG","offenderId":1185287,"firstName":"YF''LISOPER","surname":"AILICK","dateOfBirth":"1986-01-20","activeBooking":{"bookingId":1178649,"bookingNo":"29464A","offenderId":1185287,"rootOffenderId":1185287,"agencyLocation":{"agencyLocationId":"LEI","description":"LEEDS
+        (HMP)","longDescription":"HMP LEEDS","agencyLocationType":"INST","districtCode":"YORK","bailOffice":false,"housingLev1Code":"WING","housingLev2Code":"LAND","housingLev3Code":"CELL","housingLev4Code":"NULL","serviceRequired":false,"active":true,"areaCode":"YORK","nomsRegionCode":"YOHUM","geographicRegionCode":"YORK","cjitCode":"E00LE00"},"livingUnit":{"internalLocationId":12845,"internalLocationCode":"036","agencyLocationId":"LEI","internalLocationType":"CELL","description":"LEI-B-4-036","capacity":2,"parentInternalLocationId":12809,"active":true,"listSequence":36,"cnaNumber":1,"certified":true,"unitType":"NA","operationCapacity":2,"numberOfOccupants":2,"trackingFlag":"N"},"activeFlag":true,"bookingStatus":"O","inOutStatus":"IN","statusReason":"ADM-N","startDate":"2017-02-27","bookingSequence":1}},{"nomsId":"G4879UP","offenderId":2558302,"firstName":"ORDSANIEN","middleNames":"GAVID","surname":"AIMERT","dateOfBirth":"1968-08-21","activeBooking":{"bookingId":1179726,"bookingNo":"30541A","offenderId":2558302,"rootOffenderId":2558302,"agencyLocation":{"agencyLocationId":"LEI","description":"LEEDS
+        (HMP)","longDescription":"HMP LEEDS","agencyLocationType":"INST","districtCode":"YORK","bailOffice":false,"housingLev1Code":"WING","housingLev2Code":"LAND","housingLev3Code":"CELL","housingLev4Code":"NULL","serviceRequired":false,"active":true,"areaCode":"YORK","nomsRegionCode":"YOHUM","geographicRegionCode":"YORK","cjitCode":"E00LE00"},"livingUnit":{"internalLocationId":12663,"internalLocationCode":"014","agencyLocationId":"LEI","internalLocationType":"CELL","description":"LEI-A-3-014","capacity":2,"parentInternalLocationId":12651,"active":true,"listSequence":14,"cnaNumber":1,"certified":true,"unitType":"NA","operationCapacity":2,"numberOfOccupants":2,"trackingFlag":"N"},"activeFlag":true,"bookingStatus":"O","inOutStatus":"IN","statusReason":"ADM-I","startDate":"2017-03-02","bookingSequence":1}},{"nomsId":"G8060UF","offenderId":2330038,"firstName":"OGONANTHOMASIN","surname":"AISHO","dateOfBirth":"1984-12-24","activeBooking":{"bookingId":971856,"bookingNo":"P95783","offenderId":2330038,"rootOffenderId":2330038,"agencyLocation":{"agencyLocationId":"LEI","description":"LEEDS
+        (HMP)","longDescription":"HMP LEEDS","agencyLocationType":"INST","districtCode":"YORK","bailOffice":false,"housingLev1Code":"WING","housingLev2Code":"LAND","housingLev3Code":"CELL","housingLev4Code":"NULL","serviceRequired":false,"active":true,"areaCode":"YORK","nomsRegionCode":"YOHUM","geographicRegionCode":"YORK","cjitCode":"E00LE00"},"livingUnit":{"internalLocationId":13129,"internalLocationCode":"027","agencyLocationId":"LEI","internalLocationType":"CELL","description":"LEI-E-4-027","capacity":2,"parentInternalLocationId":13104,"active":true,"listSequence":27,"cnaNumber":1,"certified":true,"unitType":"NA","operationCapacity":2,"numberOfOccupants":2,"trackingFlag":"N"},"activeFlag":true,"bookingStatus":"O","inOutStatus":"IN","statusReason":"TAP-C6","startDate":"2015-03-26","bookingSequence":1}},{"nomsId":"G6980GG","offenderId":1027417,"firstName":"ONSHINTHOMASIN","surname":"AISHO","dateOfBirth":"1984-03-17","activeBooking":{"bookingId":1142296,"bookingNo":"W82131","offenderId":1027417,"rootOffenderId":1027417,"agencyLocation":{"agencyLocationId":"LEI","description":"LEEDS
+        (HMP)","longDescription":"HMP LEEDS","agencyLocationType":"INST","districtCode":"YORK","bailOffice":false,"housingLev1Code":"WING","housingLev2Code":"LAND","housingLev3Code":"CELL","housingLev4Code":"NULL","serviceRequired":false,"active":true,"areaCode":"YORK","nomsRegionCode":"YOHUM","geographicRegionCode":"YORK","cjitCode":"E00LE00"},"livingUnit":{"internalLocationId":13057,"internalLocationCode":"024","agencyLocationId":"LEI","internalLocationType":"CELL","description":"LEI-D-4-024","capacity":3,"parentInternalLocationId":13037,"active":true,"listSequence":24,"cnaNumber":2,"certified":true,"unitType":"NA","operationCapacity":2,"numberOfOccupants":1,"trackingFlag":"N"},"activeFlag":true,"bookingStatus":"O","inOutStatus":"IN","statusReason":"TAP-C5","startDate":"2016-10-17","bookingSequence":1}},{"nomsId":"G4281GV","offenderId":1032620,"firstName":"UAHINEY","middleNames":"MARCYN","surname":"ALAYNER","dateOfBirth":"1964-11-11","activeBooking":{"bookingId":1092489,"bookingNo":"W11354","offenderId":1032620,"rootOffenderId":1032620,"agencyLocation":{"agencyLocationId":"LEI","description":"LEEDS
+        (HMP)","longDescription":"HMP LEEDS","agencyLocationType":"INST","districtCode":"YORK","bailOffice":false,"housingLev1Code":"WING","housingLev2Code":"LAND","housingLev3Code":"CELL","housingLev4Code":"NULL","serviceRequired":false,"active":true,"areaCode":"YORK","nomsRegionCode":"YOHUM","geographicRegionCode":"YORK","cjitCode":"E00LE00"},"livingUnit":{"internalLocationId":12826,"internalLocationCode":"017","agencyLocationId":"LEI","internalLocationType":"CELL","description":"LEI-B-4-017","capacity":2,"parentInternalLocationId":12809,"active":true,"listSequence":17,"cnaNumber":1,"certified":true,"unitType":"NA","operationCapacity":2,"numberOfOccupants":2,"trackingFlag":"N"},"activeFlag":true,"bookingStatus":"O","inOutStatus":"IN","statusReason":"ADM-I","startDate":"2016-04-25","bookingSequence":1}},{"nomsId":"G1247VX","offenderId":1844327,"firstName":"AIANILAN","surname":"ALBINA","dateOfBirth":"1990-05-08","activeBooking":{"bookingId":595100,"bookingNo":"KC7485","offenderId":1844327,"rootOffenderId":1844327,"agencyLocation":{"agencyLocationId":"LEI","description":"LEEDS
+        (HMP)","longDescription":"HMP LEEDS","agencyLocationType":"INST","districtCode":"YORK","bailOffice":false,"housingLev1Code":"WING","housingLev2Code":"LAND","housingLev3Code":"CELL","housingLev4Code":"NULL","serviceRequired":false,"active":true,"areaCode":"YORK","nomsRegionCode":"YOHUM","geographicRegionCode":"YORK","cjitCode":"E00LE00"},"livingUnit":{"internalLocationId":13002,"internalLocationCode":"004","agencyLocationId":"LEI","internalLocationType":"CELL","description":"LEI-D-3-004","capacity":2,"parentInternalLocationId":13000,"active":true,"listSequence":4,"cnaNumber":1,"certified":true,"unitType":"NA","operationCapacity":1,"numberOfOccupants":1,"trackingFlag":"N"},"activeFlag":true,"bookingStatus":"O","inOutStatus":"IN","statusReason":"TAP-C5","startDate":"2011-12-17","bookingSequence":1}},{"nomsId":"G9403UP","offenderId":2565419,"firstName":"OBININS","surname":"ALBINA","dateOfBirth":"1981-11-14","activeBooking":{"bookingId":1186240,"bookingNo":"37049A","offenderId":2565419,"rootOffenderId":2565419,"agencyLocation":{"agencyLocationId":"LEI","description":"LEEDS
+        (HMP)","longDescription":"HMP LEEDS","agencyLocationType":"INST","districtCode":"YORK","bailOffice":false,"housingLev1Code":"WING","housingLev2Code":"LAND","housingLev3Code":"CELL","housingLev4Code":"NULL","serviceRequired":false,"active":true,"areaCode":"YORK","nomsRegionCode":"YOHUM","geographicRegionCode":"YORK","cjitCode":"E00LE00"},"livingUnit":{"internalLocationId":13041,"internalLocationCode":"004","agencyLocationId":"LEI","internalLocationType":"CELL","description":"LEI-D-4-004","capacity":2,"parentInternalLocationId":13037,"active":true,"listSequence":4,"cnaNumber":1,"certified":true,"unitType":"NA","operationCapacity":2,"numberOfOccupants":2,"trackingFlag":"N"},"activeFlag":true,"bookingStatus":"O","inOutStatus":"IN","statusReason":"ADM-I","startDate":"2017-03-24","bookingSequence":1}}]},"_links":{"first":{"href":"https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/prison/LEI?page=0&size=10&sort=offender.lastName,offender.firstName,asc"},"prev":{"href":"https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/prison/LEI?page=0&size=10&sort=offender.lastName,offender.firstName,asc"},"self":{"href":"https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/prison/LEI?page=1&size=10&sort=offender.lastName,offender.firstName,asc"},"next":{"href":"https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/prison/LEI?page=2&size=10&sort=offender.lastName,offender.firstName,asc"},"last":{"href":"https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/prison/LEI?page=116&size=10&sort=offender.lastName,offender.firstName,asc"}},"page":{"size":10,"totalElements":1167,"totalPages":117,"number":1}}'
+    http_version: 
+  recorded_at: Mon, 17 Dec 2018 11:53:24 GMT
+- request:
+    method: get
+    uri: https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/offenderId/1317074/releaseDetails?bookingId=965725
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Authorization:
+      - authorisation_header
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Pragma:
+      - no-cache
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - application/json;charset=UTF-8
+      Expires:
+      - '0'
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Application-Context:
+      - application:logstash,oracle
+      Date:
+      - Mon, 17 Dec 2018 11:53:24 GMT
+    body:
+      encoding: UTF-8
+      string: '[{"bookingId":965725,"releaseDate":"2017-04-09","movementReasonType":"REL","movementReasonCode":"CR","movementReasonDescription":"CONDITIONAL
+        RELEASE","eventId":335710788,"eventStatus":"SCH","autoReleaseDate":"2017-04-30","verified":false}]'
+    http_version: 
+  recorded_at: Mon, 17 Dec 2018 11:53:24 GMT
+- request:
+    method: get
+    uri: https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/offenderId/2538586/releaseDetails?bookingId=1161260
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Authorization:
+      - authorisation_header
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Pragma:
+      - no-cache
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - application/json;charset=UTF-8
+      Expires:
+      - '0'
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Application-Context:
+      - application:logstash,oracle
+      Date:
+      - Mon, 17 Dec 2018 11:53:24 GMT
+    body:
+      encoding: UTF-8
+      string: '[{"bookingId":1161260,"releaseDate":"2019-04-24","movementReasonType":"REL","movementReasonCode":"CR","movementReasonDescription":"CONDITIONAL
+        RELEASE","eventId":335363248,"eventStatus":"SCH","autoReleaseDate":"2019-06-16","verified":false}]'
+    http_version: 
+  recorded_at: Mon, 17 Dec 2018 11:53:24 GMT
+- request:
+    method: get
+    uri: https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/offenderId/2467558/releaseDetails?bookingId=1097499
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Authorization:
+      - authorisation_header
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Pragma:
+      - no-cache
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - application/json;charset=UTF-8
+      Expires:
+      - '0'
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Application-Context:
+      - application:logstash,oracle
+      Date:
+      - Mon, 17 Dec 2018 11:53:24 GMT
+    body:
+      encoding: UTF-8
+      string: '[{"bookingId":1097499,"releaseDate":"2024-05-11","movementReasonType":"REL","movementReasonCode":"CR","movementReasonDescription":"CONDITIONAL
+        RELEASE","eventId":320340445,"eventStatus":"SCH","autoReleaseDate":"2024-06-17","verified":false}]'
+    http_version: 
+  recorded_at: Mon, 17 Dec 2018 11:53:24 GMT
+- request:
+    method: get
+    uri: https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/offenderId/1185287/releaseDetails?bookingId=1178649
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Authorization:
+      - authorisation_header
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Pragma:
+      - no-cache
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - application/json;charset=UTF-8
+      Expires:
+      - '0'
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Application-Context:
+      - application:logstash,oracle
+      Date:
+      - Mon, 17 Dec 2018 11:53:24 GMT
+    body:
+      encoding: UTF-8
+      string: '[{"bookingId":1178649,"comments":"AHNMrimgVAHNMrimgV","eventId":335464120,"eventStatus":"SCH","verified":false}]'
+    http_version: 
+  recorded_at: Mon, 17 Dec 2018 11:53:25 GMT
+- request:
+    method: get
+    uri: https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/offenderId/2558302/releaseDetails?bookingId=1179726
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Authorization:
+      - authorisation_header
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Pragma:
+      - no-cache
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - application/json;charset=UTF-8
+      Expires:
+      - '0'
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Application-Context:
+      - application:logstash,oracle
+      Date:
+      - Mon, 17 Dec 2018 11:53:24 GMT
+    body:
+      encoding: UTF-8
+      string: '[{"bookingId":1179726,"releaseDate":"2017-05-10","movementReasonType":"REL","movementReasonCode":"CR","movementReasonDescription":"CONDITIONAL
+        RELEASE","eventId":334618748,"eventStatus":"SCH","autoReleaseDate":"2017-06-02","verified":false}]'
+    http_version: 
+  recorded_at: Mon, 17 Dec 2018 11:53:25 GMT
+- request:
+    method: get
+    uri: https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/offenderId/2330038/releaseDetails?bookingId=971856
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Authorization:
+      - authorisation_header
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Pragma:
+      - no-cache
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - application/json;charset=UTF-8
+      Expires:
+      - '0'
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Application-Context:
+      - application:logstash,oracle
+      Date:
+      - Mon, 17 Dec 2018 11:53:24 GMT
+    body:
+      encoding: UTF-8
+      string: '[{"bookingId":971856,"releaseDate":"2022-09-24","movementReasonType":"REL","movementReasonCode":"CR","movementReasonDescription":"CONDITIONAL
+        RELEASE","eventId":280030367,"eventStatus":"SCH","autoReleaseDate":"2022-10-27","verified":false}]'
+    http_version: 
+  recorded_at: Mon, 17 Dec 2018 11:53:25 GMT
+- request:
+    method: get
+    uri: https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/offenderId/1027417/releaseDetails?bookingId=1142296
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Authorization:
+      - authorisation_header
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 404
+      message: ''
+    headers:
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Pragma:
+      - no-cache
+      Expires:
+      - '0'
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Application-Context:
+      - application:logstash,oracle
+      Date:
+      - Mon, 17 Dec 2018 11:53:24 GMT
+      Content-Length:
+      - '0'
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Mon, 17 Dec 2018 11:53:25 GMT
+- request:
+    method: get
+    uri: https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/offenderId/1032620/releaseDetails?bookingId=1092489
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Authorization:
+      - authorisation_header
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Pragma:
+      - no-cache
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - application/json;charset=UTF-8
+      Expires:
+      - '0'
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Application-Context:
+      - application:logstash,oracle
+      Date:
+      - Mon, 17 Dec 2018 11:53:24 GMT
+    body:
+      encoding: UTF-8
+      string: '[{"bookingId":1092489,"releaseDate":"2017-06-18","movementReasonType":"REL","movementReasonCode":"CR","movementReasonDescription":"CONDITIONAL
+        RELEASE","eventId":335710516,"eventStatus":"SCH","autoReleaseDate":"2017-07-13","verified":false}]'
+    http_version: 
+  recorded_at: Mon, 17 Dec 2018 11:53:25 GMT
+- request:
+    method: get
+    uri: https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/offenderId/1844327/releaseDetails?bookingId=595100
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Authorization:
+      - authorisation_header
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Pragma:
+      - no-cache
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - application/json;charset=UTF-8
+      Expires:
+      - '0'
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Application-Context:
+      - application:logstash,oracle
+      Date:
+      - Mon, 17 Dec 2018 11:53:24 GMT
+    body:
+      encoding: UTF-8
+      string: '[{"bookingId":595100,"releaseDate":"2017-07-28","movementReasonType":"REL","movementReasonCode":"CR","movementReasonDescription":"CONDITIONAL
+        RELEASE","eventId":262479942,"eventStatus":"SCH","approvedReleaseDate":"2017-08-29","verified":false}]'
+    http_version: 
+  recorded_at: Mon, 17 Dec 2018 11:53:25 GMT
+- request:
+    method: get
+    uri: https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/offenderId/2565419/releaseDetails?bookingId=1186240
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Authorization:
+      - authorisation_header
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Pragma:
+      - no-cache
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - application/json;charset=UTF-8
+      Expires:
+      - '0'
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Application-Context:
+      - application:logstash,oracle
+      Date:
+      - Mon, 17 Dec 2018 11:53:25 GMT
+    body:
+      encoding: UTF-8
+      string: '[{"bookingId":1186240,"releaseDate":"2018-01-22","movementReasonType":"REL","movementReasonCode":"CR","movementReasonDescription":"CONDITIONAL
+        RELEASE","eventId":337377430,"eventStatus":"SCH","autoReleaseDate":"2018-02-21","verified":false}]'
+    http_version: 
+  recorded_at: Mon, 17 Dec 2018 11:53:25 GMT
+recorded_with: VCR 4.0.0

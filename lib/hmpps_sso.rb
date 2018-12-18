@@ -1,5 +1,4 @@
 require 'omniauth-oauth2'
-require 'base64'
 
 module OmniAuth
   module Strategies
@@ -10,8 +9,8 @@ module OmniAuth
 
       info do
         {
-          username: staff_details.fetch('activeNomisCaseload'),
-          caseload: staff_details.fetch('username')
+          username: staff_details.username,
+          caseload: staff_details.active_nomis_caseload
         }
       end
 
