@@ -9,6 +9,7 @@ RSpec.describe SessionsController, type: :controller do
 
   describe '#create' do
     let(:auth_hash) { { 'info' => 'anything' } }
+
     subject(:create) { get :create, params: { provider: 'hmpps_sso' } }
 
     before do
@@ -24,7 +25,6 @@ RSpec.describe SessionsController, type: :controller do
     end
 
     context 'when the user can be signed in' do
-
       before do
         allow(SignonIdentity).to receive(:from_omniauth).and_return(signon_identity)
       end
@@ -72,7 +72,7 @@ RSpec.describe SessionsController, type: :controller do
       allow(Rails.configuration).to receive(:nomis_oauth_client_id).and_return(client_id)
       allow(Rails.configuration).to receive(:offender_manager_host).and_return(offender_manager_host)
 
-      expect(delete :destroy).to  redirect_to(nomis_oauth_sign_out_path)
+      expect(delete :destroy).to redirect_to(nomis_oauth_sign_out_path)
       expect(session[:sso_data]).to be_nil
     end
   end

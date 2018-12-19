@@ -15,7 +15,7 @@ class SessionsController < ApplicationController
     redirect_to signout_url
   end
 
-  private
+private
 
   def signout_url
     url = URI.parse(Rails.configuration.nomis_oauth_host)
