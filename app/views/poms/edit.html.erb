@@ -1,0 +1,94 @@
+<a href="<%= poms_show_path(id: 1) %>" class="govuk-back-link">Back</a>
+
+<h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Edit profile</h1>
+<h2 class="govuk-heading-l">Surname, Forename</h2>
+
+<form method="POST">
+  <fieldset class="govuk-fieldset">
+    <div class="govuk-form-group">
+      <label class="govuk-label" for="working-pattern">
+        Working pattern
+      </label>
+
+      <div class="govuk-radios">
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="working-pattern-1" name="working-pattern" type="radio" value="1.0">
+          <label class="govuk-label govuk-radios__label" for="working-pattern-1">
+            Full-time
+          </label>
+        </div>
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="working-pattern-2" name="working-pattern" type="radio" value="0.8">
+          <label class="govuk-label govuk-radios__label" for="working-pattern-2">
+            Part time - 0.8
+          </label>
+        </div>
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="working-pattern-3" name="working-pattern" type="radio" value="0.6">
+          <label class="govuk-label govuk-radios__label" for="working-pattern-3">
+            Part time - 0.6
+          </label>
+        </div>
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="working-pattern-4" name="working-pattern" type="radio" value="0.4">
+          <label class="govuk-label govuk-radios__label" for="working-pattern-4">
+            Part time - 0.4
+          </label>
+        </div>
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="working-pattern-5" name="working-pattern" type="radio" value="0.2">
+          <label class="govuk-label govuk-radios__label" for="working-pattern-5">
+            Part time - 0.2
+          </label>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="govuk-form-group">
+      <label class="govuk-label" for="working-status">
+        Working status
+      </label>
+
+      <div class="govuk-radios">
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="working-status-1" name="working-status" type="radio" value="active">
+          <label class="govuk-label govuk-radios__label" for="working-pattern-1">
+            Active
+          </label>
+        </div>
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="working-status-2" name="working-status" type="radio" value="capacity">
+          <label class="govuk-label govuk-radios__label" for="working-status-2">
+            Active - At capacity (no new cases)
+          </label>
+        </div>
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="working-status-3" name="working-status" type="radio" value="inactive">
+          <label class="govuk-label govuk-radios__label" for="working-status-3">
+            Inactive (remove and and reallocate all cases)
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="govuk-warning-text">
+      <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+      <strong class="govuk-warning-text__text">
+        <span class="govuk-warning-text__assistive">Warning</span>
+        This will remove the POM from their current cases.<br/>
+        Their cases will need to be reallocated.
+      </strong>
+    </div>
+
+    <div class="govuk-form-group">
+        <button type="submit" class="govuk-button">
+          Save
+        </button>
+        <br/>
+        <a href="#" class="govuk-link">Cancel</a>
+    </div>
+
+
+  </fieldset>
+</form>
