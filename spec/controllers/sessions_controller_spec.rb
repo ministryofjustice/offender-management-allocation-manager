@@ -62,17 +62,17 @@ RSpec.describe SessionsController, type: :controller do
     end
 
     it 'deletes the session and redirects to Nomis Single Sign On' do
-      signout_url = 'http://nomis_sso/auth/logout'
+      nomis_oauth_host = 'http://nomis_sso'
       client_id = 'Bob'
       offender_manager_host = 'http://test:3000'
-      nomis_oauth_sign_out_path =
-        "#{signout_url}?client_id=#{client_id}&redirect_uri=#{CGI.escape(offender_manager_host)}"
+      nomis_oauth_sign_out_url =
+        "#{nomis_oauth_host}/auth/logout?client_id=#{client_id}&redirect_uri=#{CGI.escape(offender_manager_host)}"
 
-      allow(Rails.configuration).to receive(:nomis_oauth_host).and_return(signout_url)
+      allow(Rails.configuration).to receive(:nomis_oauth_host).and_return(nomis_oauth_host)
       allow(Rails.configuration).to receive(:nomis_oauth_client_id).and_return(client_id)
       allow(Rails.configuration).to receive(:offender_manager_host).and_return(offender_manager_host)
 
-      expect(delete :destroy).to redirect_to(nomis_oauth_sign_out_path)
+      expect(delete :destroy).to redirect_to(nomis_oauth_sign_out_url)
       expect(session[:sso_data]).to be_nil
     end
   end
