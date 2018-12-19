@@ -1,0 +1,74 @@
+<h1 class="govuk-heading-xl">Dashboard</h1>
+
+<h2 class="govuk-heading-m no-bottom-margin">Allocations</h2>
+<hr class="govuk-section-break govuk-section-break--visible">
+<div class="govuk-grid-row dashboard-row">
+  <div class="govuk-grid-column-one-third">
+    <div class="wrapper">
+      <h1 class="govuk-heading-s">
+        <%= link_to "Allocated prisoners", allocations_path(), class:"govuk-link" %>
+      </h1>
+      <p class="govuk-body">All prisoners who have been allocated a Prison Offender Manager.</p>
+    </div>
+  </div>
+  <div class="govuk-grid-column-one-third">
+    <div class="wrapper">
+      <h1 class="govuk-heading-s">
+        <%= link_to "Awaiting allocation", allocations_path(anchor: "awaiting-allocation"), class:"govuk-link" %>
+      </h1>
+      <p class="govuk-body">Prisoners who need to be allocated a Prison Offender Manager.</p>
+    </div>
+  </div>
+  <div class="govuk-grid-column-one-third">
+    <div class="wrapper">
+      <h1 class="govuk-heading-s">
+        <%= link_to "Missing information", allocations_path(anchor: "awaiting-tiering"), class:"govuk-link" %>
+      </h1>
+      <p class="govuk-body">Prisoners who have not yet had their risk tiering completed</p>
+    </div>
+  </div>
+</div>
+
+<h2 class="govuk-heading-m no-bottom-margin">Caseload</h2>
+<hr class="govuk-section-break govuk-section-break--visible">
+<div class="govuk-grid-row dashboard-row">
+  <div class="govuk-grid-column-one-third">
+    <div class="wrapper">
+      <h1 class="govuk-heading-s">
+        <%= link_to "My caseload", "/", class:"govuk-link" %>
+      </h1>
+      <p class="govuk-body">All cases allocated to you.</p>
+    </div>
+  </div>
+  <div class="govuk-grid-column-one-third">
+    <div class="wrapper">
+      <h1 class="govuk-heading-s">
+        <%= link_to "New allocations", "/", class:"govuk-link" %>
+      </h1>
+      <p class="govuk-body">Cases allocated to you in the last 7 days.</p>
+    </div>
+  </div>
+  <div class="govuk-grid-column-one-third">
+    <div class="wrapper">
+      <h1 class="govuk-heading-s">
+        <%= link_to "Approaching handover", "/" %>
+      </h1>
+      <p class="govuk-body">Cases that are 10 months or less from the release date.</p>
+    </div>
+  </div>
+</div>
+
+<h2 class="govuk-heading-m no-bottom-margin">Staff</h2>
+<hr class="govuk-section-break govuk-section-break--visible">
+<div class="govuk-grid-row dashboard-row">
+  <div class="govuk-grid-column-one-third">
+    <div class="wrapper">
+      <h1 class="govuk-heading-s">
+        <%= link_to "Active POMs", "/", class:"govuk-link" %>
+      </h1>
+      <p class="govuk-body">Active and inactive Prison Offender Managers at this prison.</p>
+    </div>
+  </div>
+  <div class="govuk-grid-column-one-third"></div>
+  <div class="govuk-grid-column-one-third"></div>
+</div>
