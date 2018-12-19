@@ -14,6 +14,7 @@
  *= require_self
  */
 
+@import "tables";
 
  .no-bottom-margin {
      margin-bottom: 0;
@@ -21,7 +22,7 @@
 
  .dashboard-row {
      margin-top: 20px;
-     
+
      .wrapper {
         min-height: 130px;
         background-color: #f9f9f9;
@@ -35,6 +36,3 @@
         padding: 8px;
     }
  }
-
-
-
