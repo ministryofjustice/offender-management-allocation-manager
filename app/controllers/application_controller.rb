@@ -19,6 +19,6 @@ class ApplicationController < ActionController::Base
   end
 
   def session_expired?
-    Time.now > Time.at(sso_identity['expiry'])
+    Time.current > Time.zone.at(sso_identity['expiry'])
   end
 end
