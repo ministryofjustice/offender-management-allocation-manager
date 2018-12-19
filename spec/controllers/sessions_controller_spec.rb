@@ -1,15 +1,15 @@
 require 'rails_helper'
 
 RSpec.describe SessionsController, type: :controller do
-  describe '#create' do
-    subject(:create) { get :create, params: { provider: 'hmpps_sso' } }
+  let(:sso_data) do
+    { 'username' => 'Staff_one' }
+  end
 
-    let(:auth_hash) { { 'info' => anything } }
-    let(:sso_data) do
-      {
-        'username': 'Staff_one'
-      }
-    end
+  let(:signon_identity) { double(SignonIdentity, to_session: sso_data) }
+
+  describe '#create' do
+    let(:auth_hash) { { 'info' => 'anything' } }
+    subject(:create) { get :create, params: { provider: 'hmpps_sso' } }
 
     before do
       request.env['omniauth.auth'] = auth_hash
@@ -24,7 +24,6 @@ RSpec.describe SessionsController, type: :controller do
     end
 
     context 'when the user can be signed in' do
-      let(:signon_identity) { double(SignonIdentity, to_session: sso_data) }
 
       before do
         allow(SignonIdentity).to receive(:from_omniauth).and_return(signon_identity)
@@ -53,6 +52,28 @@ RSpec.describe SessionsController, type: :controller do
           expect(create).to redirect_to(root_url)
         end
       end
+    end
+  end
+
+  describe '#destroy' do
+    before do
+      allow(SignonIdentity).to receive(:from_omniauth).and_return(signon_identity)
+      session[:sso_data] = sso_data
+    end
+
+    it 'deletes the session and redirects to Nomis Single Sign On' do
+      signout_url = 'http://nomis_sso/auth/logout'
+      client_id = 'Bob'
+      offender_manager_host = 'http://test:3000'
+      nomis_oauth_sign_out_path =
+        "#{signout_url}?client_id=#{client_id}&redirect_uri=#{CGI.escape(offender_manager_host)}"
+
+      allow(Rails.configuration).to receive(:nomis_oauth_host).and_return(signout_url)
+      allow(Rails.configuration).to receive(:nomis_oauth_client_id).and_return(client_id)
+      allow(Rails.configuration).to receive(:offender_manager_host).and_return(offender_manager_host)
+
+      expect(delete :destroy).to  redirect_to(nomis_oauth_sign_out_path)
+      expect(session[:sso_data]).to be_nil
     end
   end
 end

@@ -12,6 +12,9 @@
         <span class='govuk-body hmpss-header__prison-identifier govuk-!-font-size-16'>HMP Cardiff  |</span>
         <a href='#' class='govuk-header__link govuk-!-font-size-16'><%= current_user %></a>
       </li>
+      <li class="govuk-header__navigation-item govuk-header__navigation-item--active">
+        <%= link_to 'Sign out', signout_path  %>
+      </li>
     </ul>
   </div>
 </header>
