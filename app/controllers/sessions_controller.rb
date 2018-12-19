@@ -12,12 +12,12 @@ class SessionsController < ApplicationController
 
   def destroy
     session.delete(:sso_data)
-    redirect_to signout_url
+    redirect_to sso_signout_url
   end
 
 private
 
-  def signout_url
+  def sso_signout_url
     url = URI.parse("#{Rails.configuration.nomis_oauth_host}/auth/logout")
     url.query = {
       redirect_uri: Rails.configuration.offender_manager_host,
