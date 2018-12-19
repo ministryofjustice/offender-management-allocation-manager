@@ -13,3 +13,28 @@
  *= require_tree .
  *= require_self
  */
+
+
+ .no-bottom-margin {
+     margin-bottom: 0;
+ }
+
+ .dashboard-row {
+     margin-top: 20px;
+     
+     .wrapper {
+        min-height: 130px;
+        background-color: #f9f9f9;
+    }
+    .govuk-heading-s {
+        background-color: #eaeaea;
+        padding: 8px;
+        margin-bottom: 0;
+    }
+    .govuk-body {
+        padding: 8px;
+    }
+ }
+
+
+
