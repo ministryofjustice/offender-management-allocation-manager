@@ -8,4 +8,8 @@ Rails.application.routes.draw do
   get('health' => 'health#index')
 
   get('/allocations' => 'allocations#index')
+
+  get('/poms' => 'poms#index')
+  get('/poms/:id' => 'poms#show', as: 'poms_show')
+  get('/poms/:id/edit' => 'poms#edit', as: 'poms_edit')
 end
