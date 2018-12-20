@@ -1,0 +1,14 @@
+<% if breadcrumb_trail.count > 0 %>
+    <div class="govuk-breadcrumbs govuk-!-margin-top-0 govuk-!-margin-bottom-6">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+        <a class="govuk-breadcrumbs__link" href="/">Home</a>
+        </li>
+        <% breadcrumb_trail do |crumb| %>
+        <li class="govuk-breadcrumbs__list-item" <%= crumb.current? ? 'aria-current="page"' : '' %> >
+            <a class="govuk-breadcrumbs__link" href="<%= crumb.url %>"><%= crumb.name %></a>
+        </li>
+        <% end %>
+    </ol>
+    </div>
+<% end %>

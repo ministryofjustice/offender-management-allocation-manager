@@ -17,6 +17,7 @@ gem 'sass-rails', '~> 5.0'
 gem 'sentry-raven'
 gem 'turbolinks', '~> 5'
 gem 'uglifier', '>= 1.3.0'
+gem 'loaf'
 
 group :development, :test do
   gem 'brakeman'

@@ -16,5 +16,6 @@ feature 'get dashboard' do
     expect(page).to have_link('Allocated prisoners', href: allocations_path)
     expect(page).to have_link('Awaiting allocation', href: allocations_path(anchor: "awaiting-allocation"))
     expect(page).to have_link('Missing information', href: allocations_path(anchor: "awaiting-tiering"))
+    expect(page).not_to have_css('.govuk-breadcrumbs')
   end
 end

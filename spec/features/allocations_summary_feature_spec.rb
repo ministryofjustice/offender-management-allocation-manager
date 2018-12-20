@@ -14,6 +14,8 @@ feature 'allcations summary feature' do
       visit 'allocations/#awaiting_tiering'
 
       expect(page).to have_css('.govuk-tabs__tab', text: 'Awaiting tiering')
+      expect(page).to have_css('.govuk-breadcrumbs')
+      expect(page).to have_css('.govuk-breadcrumbs__link', count: 2)
     end
   end
 end

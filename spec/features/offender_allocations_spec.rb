@@ -7,5 +7,6 @@ feature 'allocate a POM' do
     visit '/allocate_prison_offender_managers'
 
     expect(page).to have_css('h1', text: 'Allocate a Prison Offender Manager')
+    expect(page).not_to have_css('.govuk-breadcrumbs')
   end
 end

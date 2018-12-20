@@ -1,4 +1,6 @@
-<a href="<%= poms_show_path(id: 1) %>" class="govuk-back-link">Back</a>
+
+
+<%= render :partial => "/shared/backlink", :locals => { :page => poms_show_path(id: 1) } %>
 
 <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Edit profile</h1>
 <h2 class="govuk-heading-l">Surname, Forename</h2>
