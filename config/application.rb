@@ -17,11 +17,11 @@ module OffenderManagementAllocationClient
     config.generators.system_tests = nil
 
     config.allocation_api_host = ENV.fetch(
-      'OFFENDER_MANAGEMENT_ALLOCATION_API',
+      'ALLOCATION_API_HOST',
       'http://localhost:8000'
     )
-    config.offender_manager_host = ENV.fetch(
-      'OFFENDER_MANAGER_HOST',
+    config.allocation_manager_host = ENV.fetch(
+      'ALLOCATION_MANAGER_HOST',
       'http://localhost:3000'
     )
     config.sentry_dsn = ENV['SENTRY_DSN']
