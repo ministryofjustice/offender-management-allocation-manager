@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
   include SSOIdentity
 
   def authenticate_user
-    unless sso_identity && !session_expired?
+    if sso_identity.nil? || session_expired?
       session[:redirect_path] = request.original_fullpath
       redirect_to '/auth/hmpps_sso'
     end
@@ -17,6 +17,8 @@ class ApplicationController < ActionController::Base
   def caseload
     sso_identity['caseload']
   end
+
+private
 
   def session_expired?
     Time.current > Time.zone.at(sso_identity['expiry'])
