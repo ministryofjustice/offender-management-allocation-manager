@@ -10,6 +10,9 @@ feature "get poms list" do
     expect(page).to have_content("Prison Offender Managers")
     expect(page).to have_content("Prison POM")
     expect(page).to have_content("Probation POM")
+
+    expect(page).to have_css('.govuk-breadcrumbs')
+    expect(page).to have_css('.govuk-breadcrumbs__link', count: 2)
   end
 
   it "allows viewing a POM", vcr: { cassette_name: :get_token } do
@@ -20,6 +23,8 @@ feature "get poms list" do
     expect(page).to have_css(".govuk-button", count: 1)
     expect(page).to have_content("Surname, Forename")
     expect(page).to have_content("Caseload")
+    expect(page).to have_css('.govuk-breadcrumbs')
+    expect(page).to have_css('.govuk-breadcrumbs__link', count: 3)
   end
 
   it "allows editing a POM", vcr: { cassette_name: :get_token } do
@@ -32,5 +37,6 @@ feature "get poms list" do
     expect(page).to have_content("Edit profile")
     expect(page).to have_content("Working pattern")
     expect(page).to have_content("Working status")
+    expect(page).not_to have_css('.govuk-breadcrumbs')
   end
 end
