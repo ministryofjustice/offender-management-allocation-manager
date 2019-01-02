@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature 'allcations summary feature' do
+feature 'allocations summary feature' do
   around do |example|
     travel_to Date.new(2018, 12, 17, 11) do
       example.run
@@ -20,7 +20,7 @@ feature 'allcations summary feature' do
     it 'displays offenders awaiting tiering', :expect_exception, vcr: { cassette_name: :awaiting_tiering_feature } do
       signin_user
 
-      visit 'allocations/waiting'
+      visit 'allocations/missing-information'
 
       expect(page).to have_css('.govuk-tabs__tab', text: 'Awaiting tiering')
       expect(page).to have_css('.govuk-breadcrumbs')
@@ -40,7 +40,7 @@ feature 'allcations summary feature' do
     it 'displays offenders pending allocation', :expect_exception, vcr: { cassette_name: :awaiting_tiering_feature } do
       signin_user
 
-      visit 'allocations/pending'
+      visit 'allocations/awaiting'
 
       expect(page).to have_css('.govuk-tabs__tab', text: 'Awaiting allocation')
       expect(page).to have_css('.govuk-breadcrumbs')

@@ -7,10 +7,10 @@ Rails.application.routes.draw do
 
   get('health' => 'health#index')
 
-  get('/allocations'           => 'allocations#index')
+  get('/allocations' => 'allocations#index')
   get('/allocations/allocated' => 'allocations#allocated')
-  get('/allocations/pending'   => 'allocations#pending_allocation')
-  get('/allocations/waiting'   => 'allocations#pending_tier')
+  get('/allocations/awaiting' => 'allocations#awaiting')
+  get('/allocations/missing-information' => 'allocations#missing_information')
 
   get('/poms' => 'poms#index')
   get('/poms/:id' => 'poms#show', as: 'poms_show')

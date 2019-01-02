@@ -11,13 +11,13 @@ class AllocationsController < ApplicationController
     @prisoners = Nomis::Custody::Api.get_offenders(caseload)
   end
 
-  def pending_allocation
-    breadcrumb 'Awaiting allocation', :allocations_pending_path
+  def awaiting
+    breadcrumb 'Awaiting allocation', :allocations_awaiting_path
     @prisoners = Nomis::Custody::Api.get_offenders(caseload)
   end
 
-  def pending_tier
-    breadcrumb 'Awaiting tiering', :allocations_waiting_path
+  def missing_information
+    breadcrumb 'Awaiting tiering', :allocations_missing_information_path
     @prisoners = Nomis::Custody::Api.get_offenders(caseload)
   end
 end
