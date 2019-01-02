@@ -8,7 +8,6 @@ class AllocationsController < ApplicationController
 
   def allocated
     breadcrumb 'Allocated', :allocations_allocated_path
-
     @prisoners = Nomis::Custody::Api.get_offenders(caseload)
   end
 
