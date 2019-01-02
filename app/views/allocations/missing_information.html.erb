@@ -1,3 +1,6 @@
+<%= render 'title' %>
+<%= render 'tabs', active: :tier %>
+
 <section class="govuk-tabs__panel" id="awaiting-tiering">
   <table class="govuk-table responsive tablesorter">
     <thead class="govuk-table__head">
@@ -15,7 +18,7 @@
     <tbody class="govuk-table__body">
     <% @prisoners.each do |prisoner| %>
       <tr class="govuk-table__row">
-        <td aria-label="Action" class="govuk-table__cell "><%= prisoner.surname %></td>
+        <td aria-label="Action" class="govuk-table__cell "><%= prisoner.surname %>, <%= prisoner.first_name %></td>
         <td aria-label="Prisoner number" class="govuk-table__cell "><%= prisoner.noms_id %></td>
         <td aria-label="Arrival date" class="govuk-table__cell ">NA</td>
         <td aria-label="Release date" class="govuk-table__cell "><%= prisoner.release_date %></td>
