@@ -1,0 +1,22 @@
+
+<div class="govuk-tabs" data-module="tabs">
+<h2 class="govuk-tabs__title">
+    Allocations
+</h2>
+<ul class="govuk-tabs__list" role='tablist'>
+    <li class="govuk-tabs__list-item">
+    <a class="govuk-tabs__tab <% if active == :allocated %>govuk-tabs__tab--selected<% end %>" href="<%= allocations_path() %>">
+        Allocated (2)
+    </a>
+    </li>
+    <li class="govuk-tabs__list-item">
+    <a class="govuk-tabs__tab <% if active == :pending %>govuk-tabs__tab--selected<% end %>" href="<%= allocations_pending_path() %>">
+        Awaiting allocation (2)
+    </a>
+    </li>
+    <li class="govuk-tabs__list-item">
+    <a class="govuk-tabs__tab <% if active == :tier %>govuk-tabs__tab--selected<% end %>" href="<%= allocations_waiting_path() %>">
+        Awaiting tiering (2)
+    </a>
+    </li>
+</ul>
