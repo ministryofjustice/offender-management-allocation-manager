@@ -25,7 +25,7 @@ http_interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 10 Dec 2018 15:04:45 GMT
+      - Thu, 03 Jan 2019 09:16:14 GMT
       Etag:
       - W/"2ff9b07886f0349054ad226e3c665476"
       Server:
@@ -33,9 +33,9 @@ http_interactions:
       Vary:
       - Accept-Encoding
       X-Request-Id:
-      - d53d4460f424df0c652b47f9e0e55fe5
+      - 3ef27899e518ee36426d300a22bea036
       X-Runtime:
-      - '0.098381'
+      - '0.209097'
       Content-Length:
       - '153'
       Connection:
@@ -45,5 +45,5 @@ http_interactions:
       string: '{"status":"ok","postgresVersion":"PostgreSQL 10.5 on x86_64-pc-linux-gnu,
         compiled by gcc (GCC) 4.8.3 20140911 (Red Hat 4.8.3-9), 64-bit"}'
     http_version: 
-  recorded_at: Mon, 10 Dec 2018 15:04:46 GMT
+  recorded_at: Thu, 03 Jan 2019 09:16:15 GMT
 recorded_with: VCR 4.0.0

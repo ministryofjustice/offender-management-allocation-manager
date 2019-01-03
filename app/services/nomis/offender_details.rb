@@ -20,7 +20,6 @@ module Nomis
     def release_details
       active_booking_record = JSON.parse active_booking.gsub('=>', ':')
       booking_id = active_booking_record['bookingId']
-
       @release_details ||= Nomis::Custody::Api.
                    get_release_details(offender_id, booking_id)
     end
