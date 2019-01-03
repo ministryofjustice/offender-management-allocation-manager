@@ -14,7 +14,7 @@ RSpec.describe Nomis::Custody::ApiDeserialiser do
 
   subject { model.new(payload) }
 
-  it 'will serialise a payload with unknown attributes', :expect_exception do
+  it 'will serialise a payload with unknown attributes', :raven_intercept_exception do
     expect(described_class.new.deserialise(memory_model_class, payload)).to have_attributes foo: 'bar'
   end
 

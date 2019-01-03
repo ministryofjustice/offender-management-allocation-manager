@@ -8,7 +8,7 @@ feature 'allocations summary feature' do
   end
 
   describe 'awaiting allocations table' do
-    it 'displays offenders awaiting tiering', :expect_exception, vcr: { cassette_name: :awaiting_tiering_feature } do
+    it 'displays offenders awaiting tiering', :raven_intercept_exception, vcr: { cassette_name: :awaiting_tiering_feature } do
       signin_user
 
       visit 'allocations/missing-information'
@@ -18,7 +18,7 @@ feature 'allocations summary feature' do
       expect(page).to have_css('.govuk-breadcrumbs__link', count: 2)
     end
 
-    it 'renders allocation offenders at index', :expect_exception, vcr: { cassette_name: :allocated_offenders } do
+    it 'renders allocation offenders at index', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders } do
       signin_user
       visit 'allocations'
 
@@ -27,7 +27,7 @@ feature 'allocations summary feature' do
       expect(page).to have_css('.govuk-breadcrumbs__link', count: 2)
     end
 
-    it 'displays offenders already allocated', :expect_exception, vcr: { cassette_name: :allocated_offenders } do
+    it 'displays offenders already allocated', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders } do
       signin_user
 
       visit 'allocations/allocated'
@@ -37,7 +37,7 @@ feature 'allocations summary feature' do
       expect(page).to have_css('.govuk-breadcrumbs__link', count: 2)
     end
 
-    it 'displays offenders pending allocation', :expect_exception, vcr: { cassette_name: :awaiting_allocation_offenders } do
+    it 'displays offenders pending allocation', :raven_intercept_exception, vcr: { cassette_name: :awaiting_allocation_offenders } do
       signin_user
 
       visit 'allocations/awaiting'
