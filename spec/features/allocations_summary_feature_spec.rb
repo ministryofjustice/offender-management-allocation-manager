@@ -2,13 +2,13 @@ require 'rails_helper'
 
 feature 'allocations summary feature' do
   around do |example|
-    travel_to Time.zone.local(2019, 1, 2, 16, 0) do
+    travel_to Time.zone.local(2019, 1, 3, 9, 30) do
       example.run
     end
   end
 
   describe 'awaiting allocations table' do
-    it 'displays offenders awaiting tiering', vcr: { cassette_name: :awaiting_tiering_feature } do
+    it 'displays offenders awaiting tiering', :expect_exception, vcr: { cassette_name: :awaiting_tiering_feature } do
       signin_user
 
       visit 'allocations/missing-information'
@@ -18,7 +18,7 @@ feature 'allocations summary feature' do
       expect(page).to have_css('.govuk-breadcrumbs__link', count: 2)
     end
 
-    it 'renders allocation offenders at index', vcr: { cassette_name: :allocated_offenders } do
+    it 'renders allocation offenders at index', :expect_exception, vcr: { cassette_name: :allocated_offenders } do
       signin_user
       visit 'allocations'
 
@@ -27,7 +27,7 @@ feature 'allocations summary feature' do
       expect(page).to have_css('.govuk-breadcrumbs__link', count: 2)
     end
 
-    it 'displays offenders already allocated', vcr: { cassette_name: :allocated_offenders } do
+    it 'displays offenders already allocated', :expect_exception, vcr: { cassette_name: :allocated_offenders } do
       signin_user
 
       visit 'allocations/allocated'
@@ -37,7 +37,7 @@ feature 'allocations summary feature' do
       expect(page).to have_css('.govuk-breadcrumbs__link', count: 2)
     end
 
-    it 'displays offenders pending allocation', vcr: { cassette_name: :awaiting_allocation_offenders } do
+    it 'displays offenders pending allocation', :expect_exception, vcr: { cassette_name: :awaiting_allocation_offenders } do
       signin_user
 
       visit 'allocations/awaiting'
