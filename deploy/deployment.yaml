@@ -6,7 +6,7 @@ metadata:
     app: allocation-manager
 spec:
   replicas: 3
-  revisionHistoryLimit: 2
+  revisionHistoryLimit: 1
   minReadySeconds: 10
   strategy:
     rollingUpdate:
