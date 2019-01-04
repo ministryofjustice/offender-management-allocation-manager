@@ -17,7 +17,7 @@ describe OmniAuth::Strategies::HmppsSso do
       it 'returns a hash with the user name and caseload' do
         leeds_prison = 'LEI'
         username = 'Fred'
-        response = Nomis::Custody::ApiObjectResponse.new(
+        response = Nomis::Custody::ApiResponse.new(
           double('staff_details',
             active_nomis_caseload: leeds_prison,
             username: username
