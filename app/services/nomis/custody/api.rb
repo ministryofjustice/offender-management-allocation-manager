@@ -1,7 +1,7 @@
 module Nomis
   module Custody
-    ApiObjectResponse = Struct.new(:data)
-    ApiListResponse = Struct.new(:meta, :data)
+    ApiResponse = Struct.new(:data)
+    ApiPaginatedResponse = Struct.new(:meta, :data)
 
     class Api
       include Singleton
@@ -21,7 +21,7 @@ module Nomis
         route = "/custodyapi/api/nomis-staff-users/#{username}"
         response = @custodyapi_client.get(route)
 
-        ApiObjectResponse.new(api_deserialiser.deserialise(Nomis::StaffDetails, response))
+        ApiResponse.new(api_deserialiser.deserialise(Nomis::StaffDetails, response))
       end
 
       # rubocop:disable Metrics/MethodLength
@@ -40,10 +40,10 @@ module Nomis
           api_deserialiser.deserialise(Nomis::OffenderDetails, offender)
         }
 
-        ApiListResponse.new(page_meta, offenders)
+        ApiPaginatedResponse.new(page_meta, offenders)
       rescue Nomis::Custody::Client::APIError => e
         AllocationManager::ExceptionHandler.capture_exception(e)
-        ApiListResponse.new(page_meta, [])
+        ApiPaginatedResponse.new(page_meta, [])
       end
       # rubocop:enable Metrics/MethodLength
 
@@ -52,12 +52,12 @@ module Nomis
         route = "/custodyapi/api/offenders/offenderId/#{offender_id}/releaseDetails?bookingId=#{booking_id}"
         # rubocop:enable Metrics/LineLength
         response = @custodyapi_client.get(route)
-        ApiObjectResponse.new(
+        ApiResponse.new(
           api_deserialiser.deserialise(Nomis::ReleaseDetails, response.first)
         )
       rescue Nomis::Custody::Client::APIError => e
         AllocationManager::ExceptionHandler.capture_exception(e)
-        ApiObjectResponse.new(NullReleaseDetails.new)
+        ApiResponse.new(NullReleaseDetails.new)
       end
 
     private
