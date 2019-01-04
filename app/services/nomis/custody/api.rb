@@ -1,5 +1,8 @@
 module Nomis
   module Custody
+    ApiObjectResponse = Struct.new(:data)
+    ApiListResponse = Struct.new(:meta, :data)
+
     class Api
       include Singleton
 
@@ -17,26 +20,44 @@ module Nomis
       def fetch_nomis_staff_details(username)
         route = "/custodyapi/api/nomis-staff-users/#{username}"
         response = @custodyapi_client.get(route)
-        api_deserialiser.deserialise(Nomis::StaffDetails, response)
+
+        ApiObjectResponse.new(api_deserialiser.deserialise(Nomis::StaffDetails, response))
       end
 
-      def get_offenders(prison)
-        route = "/custodyapi/api/offenders/prison/#{prison}?page=0&size=10"
-        response = @custodyapi_client.get(route)
-        response['_embedded']['offenders'].map do |offender|
+      # rubocop:disable Metrics/MethodLength
+      def get_offenders(prison, page = 0)
+        route = "/custodyapi/api/offenders/prison/#{prison}?page=#{page}&size=10"
+        page_meta = nil
+
+        response = @custodyapi_client.get(route) { |data|
+          page_meta = api_deserialiser.deserialise(Nomis::PageMeta, data['page'])
+
+          raise Nomis::Custody::Client::APIError, 'No data was returned' \
+            unless data.key?('_embedded')
+        }
+
+        offenders = response['_embedded']['offenders'].map { |offender|
           api_deserialiser.deserialise(Nomis::OffenderDetails, offender)
-        end
+        }
+
+        ApiListResponse.new(page_meta, offenders)
+      rescue Nomis::Custody::Client::APIError => e
+        AllocationManager::ExceptionHandler.capture_exception(e)
+        ApiListResponse.new(page_meta, [])
       end
+      # rubocop:enable Metrics/MethodLength
 
       def get_release_details(offender_id, booking_id)
         # rubocop:disable Metrics/LineLength
         route = "/custodyapi/api/offenders/offenderId/#{offender_id}/releaseDetails?bookingId=#{booking_id}"
         # rubocop:enable Metrics/LineLength
         response = @custodyapi_client.get(route)
-        api_deserialiser.deserialise(Nomis::ReleaseDetails, response.first)
+        ApiObjectResponse.new(
+          api_deserialiser.deserialise(Nomis::ReleaseDetails, response.first)
+        )
       rescue Nomis::Custody::Client::APIError => e
         AllocationManager::ExceptionHandler.capture_exception(e)
-        NullReleaseDetails.new
+        ApiObjectResponse.new(NullReleaseDetails.new)
       end
 
     private

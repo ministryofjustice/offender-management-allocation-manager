@@ -9,7 +9,7 @@ describe Nomis::Custody::Api do
   end
 
   around do |ex|
-    travel_to Date.new(2018, 11, 12, 16) do
+    travel_to Date.new(2019, 1, 4, 13) do
       ex.run
     end
   end
@@ -20,8 +20,8 @@ describe Nomis::Custody::Api do
 
     response = described_class.fetch_nomis_staff_details(username)
 
-    expect(response).to be_kind_of(Nomis::StaffDetails)
-    expect(response.active_nomis_caseload).to eq('LEI')
+    expect(response.data).to be_kind_of(Nomis::StaffDetails)
+    expect(response.data.active_nomis_caseload).to eq('LEI')
   end
 
   it 'gets prisoner information for a particular prison',
@@ -30,8 +30,20 @@ describe Nomis::Custody::Api do
 
     response = described_class.get_offenders(prison)
 
-    expect(response.count).to eq(10)
-    expect(response.first).to be_kind_of(Nomis::OffenderDetails)
+    expect(response.data.count).to eq(10)
+    expect(response.data.first).to be_kind_of(Nomis::OffenderDetails)
+    expect(response.meta).to be_kind_of(Nomis::PageMeta)
+  end
+
+  it 'does not explode with a bad page number',
+    :raven_intercept_exception,
+    vcr: { cassette_name: :get_prisoners_bad_page } do
+    prison = 'LEI'
+
+    response = described_class.get_offenders(prison, 10_000)
+
+    expect(response.data.count).to eq(0)
+    expect(response.meta).to be_kind_of(Nomis::PageMeta)
   end
 
   it 'gets release details for a prisoner',
@@ -41,8 +53,8 @@ describe Nomis::Custody::Api do
 
       response = described_class.get_release_details(offender_id, booking_id)
 
-      expect(response).to be_instance_of(Nomis::ReleaseDetails)
-      expect(response.release_date).to eq('2017-04-09')
+      expect(response.data).to be_instance_of(Nomis::ReleaseDetails)
+      expect(response.data.release_date).to eq('2017-04-09')
     end
 
   it 'returns a NullReleaseDetails if there are no release details for a prisoner', :raven_intercept_exception,
@@ -52,6 +64,6 @@ describe Nomis::Custody::Api do
 
       response = described_class.get_release_details(offender_id, booking_id)
 
-      expect(response).to be_instance_of(Nomis::NullReleaseDetails)
+      expect(response.data).to be_instance_of(Nomis::NullReleaseDetails)
     end
 end
