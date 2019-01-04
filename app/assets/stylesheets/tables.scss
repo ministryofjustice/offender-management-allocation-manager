@@ -2,7 +2,7 @@
   table.responsive thead {
     display: none;
   }
-  
+
   table.responsive tr {
     border-bottom: 2px solid govuk-colour("grey-2");
     display: block;
@@ -28,5 +28,9 @@
 }
 
 .hmpps-table-cell__key {
-  width: 50%;
+  width: 55%;
+}
+
+.poms-table-cell__key {
+  width: 25%;
 }
