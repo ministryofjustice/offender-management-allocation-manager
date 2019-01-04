@@ -44,7 +44,7 @@ describe Nomis::Custody::Client do
       WebMock.stub_request(:get, /\w/).to_raise(error)
     end
 
-    it 'raises an APIError', :expect_exception do
+    it 'raises an APIError', :raven_intercept_exception do
       expect { client.get(path) }.
         to raise_error(Nomis::Custody::Client::APIError, 'Unexpected status 401')
     end

@@ -45,7 +45,7 @@ describe Nomis::Custody::Api do
       expect(response.release_date).to eq('2017-04-09')
     end
 
-  it 'returns a NullReleaseDetails if there are no release details for a prisoner', :expect_exception,
+  it 'returns a NullReleaseDetails if there are no release details for a prisoner', :raven_intercept_exception,
     vcr: { cassette_name: :handle_null_release_details } do
       offender_id = '1027417'
       booking_id = '1142296'
