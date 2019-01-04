@@ -14,7 +14,12 @@ module Nomis
       end
 
       def get(route)
-        request(:get, route)
+        data = request(:get, route)
+        if block_given?
+          yield data
+        end
+
+        data
       end
 
     private
