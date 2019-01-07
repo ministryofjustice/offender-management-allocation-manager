@@ -16,6 +16,7 @@ feature 'allocations summary feature' do
       expect(page).to have_css('.govuk-tabs__tab', text: 'Awaiting tiering')
       expect(page).to have_css('.govuk-breadcrumbs')
       expect(page).to have_css('.govuk-breadcrumbs__link', count: 2)
+      expect(page).to have_css('.pagination ul.links li', count: 7)
     end
 
     it 'renders allocation offenders at index', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders } do
@@ -25,6 +26,8 @@ feature 'allocations summary feature' do
       expect(page).to have_css('.govuk-tabs__tab', text: 'Allocated')
       expect(page).to have_css('.govuk-breadcrumbs')
       expect(page).to have_css('.govuk-breadcrumbs__link', count: 2)
+      expect(page).to have_css('.pagination')
+      expect(page).to have_css('.pagination ul.links li', count: 7)
     end
 
     it 'displays offenders already allocated', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders } do
@@ -35,6 +38,7 @@ feature 'allocations summary feature' do
       expect(page).to have_css('.govuk-tabs__tab', text: 'Allocated')
       expect(page).to have_css('.govuk-breadcrumbs')
       expect(page).to have_css('.govuk-breadcrumbs__link', count: 2)
+      expect(page).to have_css('.pagination ul.links li', count: 7)
     end
 
     it 'displays offenders pending allocation', :raven_intercept_exception, vcr: { cassette_name: :awaiting_allocation_offenders } do
@@ -45,6 +49,7 @@ feature 'allocations summary feature' do
       expect(page).to have_css('.govuk-tabs__tab', text: 'Awaiting allocation')
       expect(page).to have_css('.govuk-breadcrumbs')
       expect(page).to have_css('.govuk-breadcrumbs__link', count: 2)
+      expect(page).to have_css('.pagination ul.links li', count: 7)
     end
   end
 end

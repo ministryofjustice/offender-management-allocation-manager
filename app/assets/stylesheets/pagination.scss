@@ -1,0 +1,16 @@
+
+.pagination {
+    .result-count {
+        text-align: right;
+    }
+
+    ul.links {
+        padding-left: 0;
+        margin: 0;
+    }
+
+    ul.links li {
+        display: inline;
+        padding: 4px;
+    }
+}

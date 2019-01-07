@@ -6,17 +6,17 @@
 <ul class="govuk-tabs__list" role='tablist'>
     <li class="govuk-tabs__list-item">
     <a class="govuk-tabs__tab <% if active == :allocated %>govuk-tabs__tab--selected<% end %>" href="<%= allocations_path() %>">
-        Allocated (2)
+        Allocated (N)
     </a>
     </li>
     <li class="govuk-tabs__list-item">
     <a class="govuk-tabs__tab <% if active == :pending %>govuk-tabs__tab--selected<% end %>" href="<%= allocations_awaiting_path() %>">
-        Awaiting allocation (2)
+        Awaiting allocation (N)
     </a>
     </li>
     <li class="govuk-tabs__list-item">
     <a class="govuk-tabs__tab <% if active == :tier %>govuk-tabs__tab--selected<% end %>" href="<%= allocations_missing_information_path() %>">
-        Awaiting tiering (2)
+        Awaiting tiering (N)
     </a>
     </li>
 </ul>

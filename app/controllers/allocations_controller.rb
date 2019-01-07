@@ -11,6 +11,7 @@ class AllocationsController < ApplicationController
 
     response = Nomis::Custody::Api.get_offenders(caseload, page_number)
     @prisoners = response.data
+    @page_data = response.meta
   end
 
   def awaiting
@@ -18,6 +19,7 @@ class AllocationsController < ApplicationController
 
     response = Nomis::Custody::Api.get_offenders(caseload, page_number)
     @prisoners = response.data
+    @page_data = response.meta
   end
 
   def missing_information
@@ -25,5 +27,6 @@ class AllocationsController < ApplicationController
 
     response = Nomis::Custody::Api.get_offenders(caseload, page_number)
     @prisoners = response.data
+    @page_data = response.meta
   end
 end

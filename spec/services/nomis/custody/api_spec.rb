@@ -32,7 +32,7 @@ describe Nomis::Custody::Api do
 
     expect(response.data.count).to eq(10)
     expect(response.data.first).to be_kind_of(Nomis::OffenderDetails)
-    expect(response.meta).to be_kind_of(Nomis::PageMeta)
+    expect(response.meta).to be_kind_of(PageMeta)
   end
 
   it 'does not explode with a bad page number',
@@ -43,7 +43,7 @@ describe Nomis::Custody::Api do
     response = described_class.get_offenders(prison, 10_000)
 
     expect(response.data.count).to eq(0)
-    expect(response.meta).to be_kind_of(Nomis::PageMeta)
+    expect(response.meta).to be_nil
   end
 
   it 'gets release details for a prisoner',
