@@ -1,0 +1,48 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/prison/LEI?page=0&size=10
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Authorization:
+      - authorisation_header
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 401
+      message: ''
+    headers:
+      Cache-Control:
+      - no-store
+      Pragma:
+      - no-cache
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - application/json;charset=UTF-8
+      Www-Authenticate:
+      - 'Bearer realm="oauth2-resource", error="invalid_token", error_description="Access
+        token expired: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbnRlcm5hbFVzZXIiOmZhbHNlLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNTQ2NTA4MTYyLCJhdXRob3JpdGllcyI6WyJST0xFX1NZU1RFTV9SRUFEX09OTFkiXSwianRpIjoiNGE1M2Y3NDMtNWQ2MC00ODRhLWE3ZDEtODE4ZWYxZWY0MTA2IiwiY2xpZW50X2lkIjoib2ZmZW5kZXItbWFuYWdlbWVudC1hbGxvY2F0aW9uLW1hbmFnZXIifQ.YizCE2vK_c45VIusVVbwz7n6HPeEaq7_XLQtIy0cxswJtpu0WByS1SWdiy8IAfOBXEWbeCRL40hD47OO8MXXQpCcREwPTU58vtWju0UrUGDlSDaHPQoSKpLmENqbTX65bDm8nPi-pI7DP4pF6ufzDjS1tAEoudav6YYpGzKYFjS8oZUU3KUsnJ7vLAuaJ-U_1ZZOU0HFy7-jhRenWLH4PxHpSoxWVPT4wc9_aHi6yCpCOVtMs6AWR1V_UmTbxpWrG1aGH886kMUplTOSNNm8iJe8YPd1-P0oNbdH6Nvf0BX8dmJ3lwlELFBo1WQijZ6EEVTIZ4sC29Lwh_65m4bytg"'
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      Date:
+      - Mon, 07 Jan 2019 09:42:35 GMT
+    body:
+      encoding: UTF-8
+      string: '{"error":"invalid_token","error_description":"Access token expired:
+        eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbnRlcm5hbFVzZXIiOmZhbHNlLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNTQ2NTA4MTYyLCJhdXRob3JpdGllcyI6WyJST0xFX1NZU1RFTV9SRUFEX09OTFkiXSwianRpIjoiNGE1M2Y3NDMtNWQ2MC00ODRhLWE3ZDEtODE4ZWYxZWY0MTA2IiwiY2xpZW50X2lkIjoib2ZmZW5kZXItbWFuYWdlbWVudC1hbGxvY2F0aW9uLW1hbmFnZXIifQ.YizCE2vK_c45VIusVVbwz7n6HPeEaq7_XLQtIy0cxswJtpu0WByS1SWdiy8IAfOBXEWbeCRL40hD47OO8MXXQpCcREwPTU58vtWju0UrUGDlSDaHPQoSKpLmENqbTX65bDm8nPi-pI7DP4pF6ufzDjS1tAEoudav6YYpGzKYFjS8oZUU3KUsnJ7vLAuaJ-U_1ZZOU0HFy7-jhRenWLH4PxHpSoxWVPT4wc9_aHi6yCpCOVtMs6AWR1V_UmTbxpWrG1aGH886kMUplTOSNNm8iJe8YPd1-P0oNbdH6Nvf0BX8dmJ3lwlELFBo1WQijZ6EEVTIZ4sC29Lwh_65m4bytg"}'
+    http_version: 
+  recorded_at: Thu, 03 Jan 2019 09:30:00 GMT
+recorded_with: VCR 4.0.0
