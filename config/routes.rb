@@ -16,5 +16,7 @@ Rails.application.routes.draw do
   get('/poms/:id' => 'poms#show', as: 'poms_show')
   get('/poms/:id/edit' => 'poms#edit', as: 'poms_edit')
 
+  get('/prisoners/:id' => 'prisoners#show', as: 'prisoners_show')
+
   resource :allocate_prison_offender_managers, only: %i[show edit]
 end
