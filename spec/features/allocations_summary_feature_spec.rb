@@ -2,7 +2,7 @@ require 'rails_helper'
 
 feature 'allocations summary feature' do
   around do |example|
-    travel_to Time.zone.local(2019, 1, 3, 9, 30) do
+    travel_to Time.zone.local(2019, 1, 9, 12, 00) do
       example.run
     end
   end
@@ -50,6 +50,37 @@ feature 'allocations summary feature' do
       expect(page).to have_css('.govuk-breadcrumbs')
       expect(page).to have_css('.govuk-breadcrumbs__link', count: 2)
       expect(page).to have_css('.pagination ul.links li', count: 7)
+    end
+  end
+
+  describe 'paging' do
+    it 'shows pages for allocation', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders_paged, match_requests_on: [:query] } do
+      signin_user
+      visit allocations_allocated_path()
+      expect(page).to have_link('Next »')
+      expect(page).to_not have_link('« Previous')
+      expect(page).to_not have_link(/^1$/)
+
+      visit allocations_allocated_path(page: 2)
+      expect(page).to have_link('Next »')
+      expect(page).to have_link('« Previous')
+      expect(page).to_not have_link(/^2$/)
+
+      visit allocations_allocated_path(page: 3)
+      expect(page).to have_link('Next »')
+      expect(page).to have_link('« Previous')
+      expect(page).to_not have_link(/^3$/)
+
+      visit allocations_allocated_path(page: 4)
+      expect(page).to have_link('Next »')
+      expect(page).to have_link('« Previous')
+      expect(page).to_not have_link(/^4$/)
+
+      visit allocations_allocated_path(page: 117)
+      expect(page).to_not have_link('Next »')
+      expect(page).to have_link('« Previous')
+      expect(page).to_not have_link(/^117$/)
+      expect(page).to_not have_link(/^118$/)
     end
   end
 end

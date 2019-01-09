@@ -30,11 +30,11 @@ module Nomis
         page_meta = nil
 
         response = @custodyapi_client.get(route) { |data|
+          page_meta = api_deserialiser.deserialise(PageMeta, data['page'])
+          page_meta.items_on_page = data.fetch('_embedded', {}).fetch('offenders', []).length
+
           raise Nomis::Custody::Client::APIError, 'No data was returned' \
             unless data.key?('_embedded')
-
-          page_meta = api_deserialiser.deserialise(PageMeta, data['page'])
-          page_meta.items_on_page = data['_embedded']['offenders'].length
         }
 
         offenders = response['_embedded']['offenders'].map { |offender|
