@@ -16,5 +16,5 @@ end
 
 after_fork do
   require 'prometheus_exporter/instrumentation'
-  PrometheusExporter::Instrumentation::process.start(type: 'web')
+  PrometheusExporter::Instrumentation.process.start(type: 'web')
 end
