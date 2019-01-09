@@ -32,7 +32,7 @@ describe Nomis::Custody::Client do
     end
   end
 
-  describe 'when there is an http status error' do
+  describe 'when there is an 404 (missing resource) error' do
     let(:error) do
       Faraday::ResourceNotFound.new('error', status: 401)
     end
@@ -47,6 +47,29 @@ describe Nomis::Custody::Client do
     it 'raises an APIError', :raven_intercept_exception do
       expect { client.get(path) }.
         to raise_error(Nomis::Custody::Client::APIError, 'Unexpected status 401')
+    end
+
+    it 'sends the error to sentry' do
+      expect(AllocationManager::ExceptionHandler).to receive(:capture_exception).with(error)
+      expect { client.get(path) }.to raise_error(Nomis::Custody::Client::APIError)
+    end
+  end
+
+  describe 'when there is an 500 (server broken) error' do
+    let(:error) do
+      Faraday::ClientError.new('error', status: 500)
+    end
+    let(:offender_id) { '12344556' }
+    let(:booking_id)  { '987653' }
+    let(:path)        { "/custodyapi/api/offenders/offenderId/#{offender_id}/releaseDetails?bookingId=#{booking_id}" }
+
+    before do
+      WebMock.stub_request(:get, /\w/).to_raise(error)
+    end
+
+    it 'raises an APIError', :raven_intercept_exception do
+      expect { client.get(path) }.
+        to raise_error(Nomis::Custody::Client::APIError, 'Unexpected status 500')
     end
 
     it 'sends the error to sentry' do
