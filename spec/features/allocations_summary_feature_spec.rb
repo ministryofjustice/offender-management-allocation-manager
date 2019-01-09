@@ -56,31 +56,32 @@ feature 'allocations summary feature' do
   describe 'paging' do
     it 'shows pages for allocation', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders_paged, match_requests_on: [:query] } do
       signin_user
-      visit allocations_allocated_path()
+
+      visit allocations_allocated_path
       expect(page).to have_link('Next »')
-      expect(page).to_not have_link('« Previous')
-      expect(page).to_not have_link(/^1$/)
+      expect(page).not_to have_link('« Previous')
+      expect(page).not_to have_link(/^1$/)
 
       visit allocations_allocated_path(page: 2)
       expect(page).to have_link('Next »')
       expect(page).to have_link('« Previous')
-      expect(page).to_not have_link(/^2$/)
+      expect(page).not_to have_link(/^2$/)
 
       visit allocations_allocated_path(page: 3)
       expect(page).to have_link('Next »')
       expect(page).to have_link('« Previous')
-      expect(page).to_not have_link(/^3$/)
+      expect(page).not_to have_link(/^3$/)
 
       visit allocations_allocated_path(page: 4)
       expect(page).to have_link('Next »')
       expect(page).to have_link('« Previous')
-      expect(page).to_not have_link(/^4$/)
+      expect(page).not_to have_link(/^4$/)
 
       visit allocations_allocated_path(page: 117)
-      expect(page).to_not have_link('Next »')
+      expect(page).not_to have_link('Next »')
       expect(page).to have_link('« Previous')
-      expect(page).to_not have_link(/^117$/)
-      expect(page).to_not have_link(/^118$/)
+      expect(page).not_to have_link(/^117$/)
+      expect(page).not_to have_link(/^118$/)
     end
   end
 end
