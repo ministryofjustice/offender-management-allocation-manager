@@ -31,7 +31,7 @@ module Nomis
         }
 
         JSON.parse(response.body)
-      rescue Faraday::ResourceNotFound => e
+      rescue Faraday::ResourceNotFound, Faraday::ClientError => e
         AllocationManager::ExceptionHandler.capture_exception(e)
         raise APIError, "Unexpected status #{e.response[:status]}"
       end
