@@ -1,6 +1,52 @@
 ---
 http_interactions:
 - request:
+    method: post
+    uri: https://gateway.t3.nomis-api.hmpps.dsd.io/auth/oauth/token?grant_type=client_credentials
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Authorization:
+      - authorisation_header
+      Content-Length:
+      - '0'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-store
+      Pragma:
+      - no-cache
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - application/json;charset=UTF-8
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Frame-Options:
+      - DENY
+      Date:
+      - Thu, 10 Jan 2019 13:08:43 GMT
+    body:
+      encoding: UTF-8
+      string: '{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbnRlcm5hbFVzZXIiOmZhbHNlLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNTQ3MTI2OTIzLCJhdXRob3JpdGllcyI6WyJST0xFX1NZU1RFTV9SRUFEX09OTFkiXSwianRpIjoiOWNlN2VjNDQtOTNkZS00ZjdhLWEyMjktNDAwNzFjNzcxYThkIiwiY2xpZW50X2lkIjoib2ZmZW5kZXItbWFuYWdlbWVudC1hbGxvY2F0aW9uLW1hbmFnZXIifQ.kdlDhrM_YhIbjaBvKpu9KGs5DbBjQFBpQ-mBhnj630l92CvM9jtQCzqtvl-LOkvbL8B_Yh3TBhw209P2gQh6yoT9EwhPV1GUx70yGX_J5g8nAdRUW1SWnAYNbIL5ilf2BdVmLFy7V4vyCyl9ZWTpONxFNZEAG8pOtzEsze3BIht4wt65p9wAaWHoi2Lqfwh2apgzu08DKmR_9d-7Dk_ROifZTibfcvu3nsWLlD-N3vJlYnVNZyHU2yu1RwHk7X1OQglkYDa8nHC1PKyK5uSLRnj_1Q7c-NMgtXncySoSMt2UB58EyggX8xdqkyN9-Mlqge63X3sbVZclSd9FZWXJiw","token_type":"bearer","expires_in":1199,"scope":"read
+        write","internalUser":false,"jti":"9ce7ec44-93de-4f7a-a229-40071c771a8d"}'
+    http_version: 
+  recorded_at: Thu, 10 Jan 2019 13:00:00 GMT
+- request:
     method: get
     uri: https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/prison/LEI?page=0&size=10
     body:
@@ -37,7 +83,7 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000 ; includeSubDomains
       Date:
-      - Fri, 04 Jan 2019 13:27:30 GMT
+      - Thu, 10 Jan 2019 13:08:43 GMT
     body:
       encoding: UTF-8
       string: '{"_embedded":{"offenders":[{"nomsId":"G4273GI","offenderId":1284739,"firstName":"OZULLIRN","middleNames":"TESSE","surname":"ABBELLA","dateOfBirth":"1980-08-15","activeBooking":{"bookingId":1153753,"bookingNo":"04581A","offenderId":1284739,"rootOffenderId":1284739,"agencyLocation":{"agencyLocationId":"LEI","description":"LEEDS
@@ -52,5 +98,5 @@ http_interactions:
         (HMP)","longDescription":"HMP LEEDS","agencyLocationType":"INST","districtCode":"YORK","bailOffice":false,"housingLev1Code":"WING","housingLev2Code":"LAND","housingLev3Code":"CELL","housingLev4Code":"NULL","serviceRequired":false,"active":true,"areaCode":"YORK","nomsRegionCode":"YOHUM","geographicRegionCode":"YORK","cjitCode":"E00LE00"},"livingUnit":{"internalLocationId":12950,"internalLocationCode":"021","agencyLocationId":"LEI","internalLocationType":"CELL","description":"LEI-C-4-021","capacity":2,"parentInternalLocationId":12932,"active":true,"listSequence":21,"cnaNumber":1,"certified":true,"unitType":"NA","operationCapacity":2,"numberOfOccupants":2,"trackingFlag":"N"},"activeFlag":true,"bookingStatus":"O","inOutStatus":"IN","statusReason":"ADM-I","startDate":"2015-01-08","bookingSequence":1}},{"nomsId":"G2911GD","offenderId":1425331,"firstName":"IMANJAH","surname":"AHMONIS","dateOfBirth":"1974-06-05","activeBooking":{"bookingId":1175317,"bookingNo":"26133A","offenderId":1425331,"rootOffenderId":1425331,"agencyLocation":{"agencyLocationId":"LEI","description":"LEEDS
         (HMP)","longDescription":"HMP LEEDS","agencyLocationType":"INST","districtCode":"YORK","bailOffice":false,"housingLev1Code":"WING","housingLev2Code":"LAND","housingLev3Code":"CELL","housingLev4Code":"NULL","serviceRequired":false,"active":true,"areaCode":"YORK","nomsRegionCode":"YOHUM","geographicRegionCode":"YORK","cjitCode":"E00LE00"},"livingUnit":{"internalLocationId":12806,"internalLocationCode":"041","agencyLocationId":"LEI","internalLocationType":"CELL","description":"LEI-B-3-041","capacity":2,"parentInternalLocationId":12766,"active":true,"listSequence":41,"cnaNumber":1,"certified":true,"unitType":"NA","operationCapacity":2,"numberOfOccupants":2,"trackingFlag":"N"},"activeFlag":true,"bookingStatus":"O","inOutStatus":"IN","statusReason":"CRT-CRT","startDate":"2017-02-14","bookingSequence":1}}]},"_links":{"first":{"href":"https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/prison/LEI?page=0&size=10&sort=offender.lastName,offender.firstName,asc"},"self":{"href":"https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/prison/LEI?page=0&size=10&sort=offender.lastName,offender.firstName,asc"},"next":{"href":"https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/prison/LEI?page=1&size=10&sort=offender.lastName,offender.firstName,asc"},"last":{"href":"https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/offenders/prison/LEI?page=116&size=10&sort=offender.lastName,offender.firstName,asc"}},"page":{"size":10,"totalElements":1167,"totalPages":117,"number":0}}'
     http_version: 
-  recorded_at: Fri, 04 Jan 2019 00:00:00 GMT
+  recorded_at: Thu, 10 Jan 2019 13:00:00 GMT
 recorded_with: VCR 4.0.0
