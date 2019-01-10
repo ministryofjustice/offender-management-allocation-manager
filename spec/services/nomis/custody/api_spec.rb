@@ -43,7 +43,7 @@ describe Nomis::Custody::Api do
     response = described_class.get_offenders(prison, 10_000)
 
     expect(response.data.count).to eq(0)
-    expect(response.meta).to be_nil
+    expect(response.meta).to be_kind_of(PageMeta)
   end
 
   it 'gets release details for a prisoner',
