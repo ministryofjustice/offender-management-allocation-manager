@@ -1,12 +1,6 @@
 require 'rails_helper'
 
 feature 'allocations summary feature' do
-  around do |example|
-    travel_to Time.zone.local(2019, 1, 9, 12, 00) do
-      example.run
-    end
-  end
-
   describe 'awaiting allocations table' do
     it 'displays offenders awaiting tiering', :raven_intercept_exception, vcr: { cassette_name: :awaiting_tiering_feature } do
       signin_user

@@ -8,12 +8,6 @@ describe Nomis::Custody::Api do
     Singleton.__init__(described_class)
   end
 
-  around do |ex|
-    travel_to Date.new(2019, 1, 4, 13) do
-      ex.run
-    end
-  end
-
   it "gets staff details",
     vcr: { cassette_name: :get_nomis_staff_details } do
     username = 'PK000223'

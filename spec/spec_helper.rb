@@ -1,4 +1,5 @@
 require 'simplecov'
+
 SimpleCov.minimum_coverage 100
 
 SimpleCov.start 'rails' do
@@ -23,12 +24,21 @@ RSpec.configure do |config|
 end
 
 require 'vcr'
+require 'active_support/testing/time_helpers'
+
+include ActiveSupport::Testing::TimeHelpers
 
 VCR.configure do |config|
   config.cassette_library_dir = "spec/fixtures/vcr_cassettes"
   config.hook_into :webmock
   config.configure_rspec_metadata!
   config.default_cassette_options = { match_requests_on: [:query] }
+
+  config.before_playback { |interaction, cassette|
+    if !['allocation_client_auth_header', 'nomis_oauth_client_auth_header'].include? cassette.name
+      travel_to interaction.recorded_at
+    end
+  }
 
   config.filter_sensitive_data('authorisation_header') do |interaction|
     interaction.request.headers['Authorization']&.first
