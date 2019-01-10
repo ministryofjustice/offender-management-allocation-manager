@@ -1,18 +1,8 @@
 <%= render :partial => "/shared/backlink", :locals => { :page => allocations_path() } %>
 
-<h1 class="govuk-heading-l govuk-!-margin-bottom-5">Reallocate a Prison Offender Manager</h1>
-
-<div class="govuk-warning-text">
-  <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-  <strong class="govuk-warning-text__text">
-    <span class="govuk-warning-text__assistive">Warning</span>
-    You are about to reallocate this prisoner, is this necessary?
-  </strong>
-</div>
+<h1 class="govuk-heading-l govuk-!-margin-bottom-5">Allocate a Prison Offender Manager</h1>
 
 <%= render 'shared/basic_prisoner_info' %>
-
-<%= render 'shared/current_pom_info' %>
 
 <%= render 'shared/offence_info' %>
 

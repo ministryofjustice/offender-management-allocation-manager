@@ -25,7 +25,7 @@ describe Nomis::Custody::Api do
     response = described_class.get_offenders(prison)
 
     expect(response.data.count).to eq(10)
-    expect(response.data.first).to be_kind_of(Nomis::OffenderDetails)
+    expect(response.data.first).to be_kind_of(Nomis::OffenderActiveBooking)
     expect(response.meta).to be_kind_of(PageMeta)
   end
 
@@ -59,5 +59,24 @@ describe Nomis::Custody::Api do
       response = described_class.get_release_details(offender_id, booking_id)
 
       expect(response.data).to be_instance_of(Nomis::NullReleaseDetails)
+    end
+
+  it 'gets the offender details for a prisoner',
+    vcr: { cassette_name: :get_offender_details } do
+      noms_id = 'G2911GD'
+
+      response = described_class.get_offender(noms_id)
+
+      expect(response.data).to be_instance_of(Nomis::OffenderDetails)
+      expect(response.data.nationality).to eq('White: Gypsy or Irish Traveller')
+    end
+
+  it 'gets the nationality details for a prisoner', :raven_intercept_exception,
+    vcr: { cassette_name: :fail_get_offender_details } do
+      noms_id = 'AAA22D'
+
+      response = described_class.get_offender(noms_id)
+
+      expect(response.data).to be_instance_of(Nomis::NullOffenderDetails)
     end
 end

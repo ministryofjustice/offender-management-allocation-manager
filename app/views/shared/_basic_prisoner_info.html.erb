@@ -8,15 +8,15 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell hmpps-table-cell__key">Name</td>
       <td class="govuk-table__cell table_cell__left_align hmpps-table-cell__key"><a
-          href="<%= prisoners_show_path(1) %>">Michael Scarn</a></td>
+          href="#"><%= @prisoner.surname %>, <%= @prisoner.first_name %></a></td>
     </tr>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell hmpps-table-cell__key">Number</td>
-      <td class="govuk-table__cell table_cell__left_align hmpps-table-cell__key">AB1234C</td>
+      <td class="govuk-table__cell table_cell__left_align hmpps-table-cell__key"><%= @prisoner.noms_id %></td>
     </tr>
     <tr class="govuk-table__row">
         <td class="govuk-table__cell hmpps-table-cell__key">Nationality</td>
-        <td class="govuk-table__cell table_cell__left_align hmpps-table-cell__key">British</td>
+        <td class="govuk-table__cell table_cell__left_align hmpps-table-cell__key"><%= @prisoner.nationality %></td>
       </tr>
     </tbody>
   </table>
