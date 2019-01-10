@@ -8,12 +8,6 @@ describe Nomis::Oauth::Api do
     Singleton.__init__(described_class)
   end
 
-  around do |ex|
-    travel_to Date.new(2018, 11, 12, 17) do
-      ex.run
-    end
-  end
-
   it 'fetches an auth token', vcr: { cassette_name: :get_token } do
     token = described_class.fetch_new_auth_token
 

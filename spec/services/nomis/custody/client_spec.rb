@@ -12,12 +12,6 @@ describe Nomis::Custody::Client do
   end
 
   describe 'with a valid request' do
-    around do |example|
-      travel_to Date.new(2018, 12, 9, 17) do
-        example.run
-      end
-    end
-
     it 'sets the Authorization header', vcr: { cassette_name: 'custodyapi_client_auth_header' } do
       username = 'PK000223'
       route = "/custodyapi/api/nomis-staff-users/#{username}"
