@@ -35,7 +35,7 @@ VCR.configure do |config|
   config.default_cassette_options = { match_requests_on: [:query] }
 
   config.before_playback do |interaction, cassette|
-    unless %w[allocation_client_auth_header nomis_oauth_client_auth_header].include? cassette.name
+    unless %w[allocation_client_auth_header nomis_oauth_client_auth_header custodyapi_client_auth_header].include? cassette.name
       travel_to interaction.recorded_at
     end
   end

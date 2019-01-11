@@ -30,8 +30,6 @@ http_interactions:
       - chunked
       Content-Type:
       - application/json;charset=UTF-8
-      Server:
-      - nginx/1.15.3
       X-Content-Type-Options:
       - nosniff
       X-Xss-Protection:
@@ -41,11 +39,11 @@ http_interactions:
       X-Frame-Options:
       - DENY
       Date:
-      - Wed, 12 Dec 2018 17:25:16 GMT
+      - Fri, 11 Jan 2019 15:45:07 GMT
     body:
       encoding: UTF-8
-      string: '{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbnRlcm5hbFVzZXIiOmZhbHNlLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNTQ0NjM2NzE3LCJhdXRob3JpdGllcyI6WyJST0xFX1NZU1RFTV9SRUFEX09OTFkiXSwianRpIjoiZDlmMTExMGQtN2RhZC00Mjg3LWIyZjItMWExNGI3MDNmZDY2IiwiY2xpZW50X2lkIjoib2ZmZW5kZXItbWFuYWdlbWVudC1hbGxvY2F0aW9uLW1hbmFnZXIifQ.ZxnMKeKS5wG0AYNR9wrFDfB4hK9OCHYRXA1hWGvWQs39izCPK5mcDx_6avYt4FolT-Piwz-TMat9upUc7bfiJ3S9SI_difqfKKmB3FgiOKzxZT5M_BPD93nJ6NnXoJEy9C_4-09xWwiUYfYRUPdIQW0_3blyvq178ZkiIT1ko1do8AovM2ime0YvpB4PFOll7sulKBbbMZuElpIci_q-f0Nz67iX0bt7FtvHTAYuPJDCgE2J2XvZHPlapEMhigq4B_WUbScXMpqgoRGV7pZWOX5kuLE2RS6twT7o0bB9JYpClyh_a5PQddOZE4ch1ZF4GjZQTLPXfvumjn8n-yOjOA","token_type":"bearer","expires_in":1199,"scope":"read
-        write","internalUser":false,"jti":"d9f1110d-7dad-4287-b2f2-1a14b703fd66"}'
+      string: '{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbnRlcm5hbFVzZXIiOmZhbHNlLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNTQ3MjIyNzA3LCJhdXRob3JpdGllcyI6WyJST0xFX1NZU1RFTV9SRUFEX09OTFkiXSwianRpIjoiMWEzMjU2YTUtZWI1OC00MjNhLTg0MDEtMmVkMjM2MTQ5NzUwIiwiY2xpZW50X2lkIjoib2ZmZW5kZXItbWFuYWdlbWVudC1hbGxvY2F0aW9uLW1hbmFnZXIifQ.uSUrdOTg5dC3YPUeDJaMx3fFHGNzQjp2VmfH4B3x0NRdhvezk-b5Nm0fpeLTl5nFF2OsyFFvSSPBY6XQZMRoEbpxZ0Ui3t8JLzZoRhzX4gmHVg4iF3dWcZGcMH_C1fhYKTShbnTir68KJWa5U7fFvzAKgm1BVcxrbW-N568gfeydelrwkmbW33IiTxMyuzgwR48Q43RhPs3sLMmP3G6L7RVSZSyag1GohyEf_xVAVkHxdkSG_DqTCMpSAuxbJiFv6CGoT-VxuKTVokWeshXT006yb7jf6JYBOST63cB7tyek-VCaaYxnBAgxGSx3qZ_UvL3am_k6_l9TXm8FFAKQZQ","token_type":"bearer","expires_in":1199,"scope":"read
+        write","internalUser":false,"jti":"1a3256a5-eb58-423a-8401-2ed236149750"}'
     http_version: 
-  recorded_at: Wed, 12 Dec 2018 17:25:17 GMT
+  recorded_at: Fri, 11 Jan 2019 15:45:02 GMT
 recorded_with: VCR 4.0.0
