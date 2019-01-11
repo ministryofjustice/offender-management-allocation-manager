@@ -1,6 +1,52 @@
 ---
 http_interactions:
 - request:
+    method: post
+    uri: https://gateway.t3.nomis-api.hmpps.dsd.io/auth/oauth/token?grant_type=client_credentials
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Authorization:
+      - authorisation_header
+      Content-Length:
+      - '0'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-store
+      Pragma:
+      - no-cache
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - application/json;charset=UTF-8
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Frame-Options:
+      - DENY
+      Date:
+      - Fri, 04 Jan 2019 13:27:28 GMT
+    body:
+      encoding: UTF-8
+      string: '{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbnRlcm5hbFVzZXIiOmZhbHNlLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNTQ2NjA5NjQ5LCJhdXRob3JpdGllcyI6WyJST0xFX1NZU1RFTV9SRUFEX09OTFkiXSwianRpIjoiN2E3MGMzNmQtMGJlZi00NzY3LThkOGQtOTVjMmVmYTYxMDkyIiwiY2xpZW50X2lkIjoib2ZmZW5kZXItbWFuYWdlbWVudC1hbGxvY2F0aW9uLW1hbmFnZXIifQ.WLSgRkMYUmABGJ9FgbvQQf9hzs05YWZkPTgjNlapp0-6SpeQbUO9NREgcR2Uok-X-r38tBlV8pVMzB-UW-6taysKfBnXfUokL-eIviKo48eldNgJxHcGixiqh1z6VWmEnJtxZUUluQ8D9GtZYMSvr6CPQdbQbbo67NH1Syis55bvKw1CJtHVeaH9RWbrPLeMXgFg5nTug-8xa7ohXx1SEW7gTHOcMg4x0vEzHT36RtW_0Wt6wUgXPYpg2lqrqFnIVHkaUPmlNwZuE_II4V2CsKf5QYIfbH5V925_kPBOKRAkWH7INK5rGKT1lLzkIPjXBgbvpGVjHw7lYeTYxtfiKQ","token_type":"bearer","expires_in":1199,"scope":"read
+        write","internalUser":false,"jti":"7a70c36d-0bef-4767-8d8d-95c2efa61092"}'
+    http_version: 
+  recorded_at: Fri, 04 Jan 2019 00:00:00 GMT
+- request:
     method: get
     uri: https://gateway.t3.nomis-api.hmpps.dsd.io/custodyapi/api/nomis-staff-users/PK000223
     body:
@@ -37,7 +83,7 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000 ; includeSubDomains
       Date:
-      - Fri, 11 Jan 2019 13:30:41 GMT
+      - Fri, 04 Jan 2019 13:27:30 GMT
     body:
       encoding: UTF-8
       string: '{"username":"PK000223","staffId":485637,"firstName":"KATH","lastName":"POBEE-NORRIS","status":"ACTIVE","activeNomisCaseload":"LEI","nomisCaseloads":{"LEI":{"id":"LEI","name":"LEEDS
@@ -52,5 +98,5 @@ http_interactions:
         JURISDICTION","agencyLocationType":"INST","districtCode":"FD","deactivationDate":"2008-05-29","jurisdictionCode":"CC","bailOffice":true,"listSeq":2,"housingLev1Code":"BED","propertyLev1Code":"BOX","serviceRequired":false,"active":false,"disabilityAccessCode":"WHEEL","cjitCode":"TEST"},{"agencyLocationId":"TRN","description":"TRANSFER","agencyLocationType":"INST","districtCode":"FD","bailOffice":true,"housingLev1Code":"CB","serviceRequired":false,"active":true},{"agencyLocationId":"WEI","description":"WEALSTUN
         (HMP)","longDescription":"HMP WEALSTUN","agencyLocationType":"INST","districtCode":"YORK","bailOffice":false,"housingLev1Code":"WING","housingLev2Code":"LAND","housingLev3Code":"CELL","housingLev4Code":"NULL","serviceRequired":false,"active":true,"areaCode":"YORK","nomsRegionCode":"YOHUM","geographicRegionCode":"YORK","cjitCode":"E00WE00"}]}}}'
     http_version: 
-  recorded_at: Fri, 11 Jan 2019 13:30:40 GMT
+  recorded_at: Fri, 04 Jan 2019 00:00:00 GMT
 recorded_with: VCR 4.0.0
