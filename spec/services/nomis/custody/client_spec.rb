@@ -12,11 +12,12 @@ describe Nomis::Custody::Client do
   end
 
   describe 'with a valid request' do
-    it 'sets the Authorization header', vcr: { cassette_name: 'custodyapi_client_auth_header' } do
+    it 'sets the Authorization header' do
+      WebMock.stub_request(:get, /\w/).to_return(body: "{}")
+
       username = 'PK000223'
       route = "/custodyapi/api/nomis-staff-users/#{username}"
       client.get(route)
-
       expect(WebMock).to have_requested(:get, /\w/).
         with(
           headers: {
