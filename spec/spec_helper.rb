@@ -24,11 +24,8 @@ RSpec.configure do |config|
 end
 
 require 'vcr'
-require 'active_support/testing/time_helpers'
 
 VCR.configure do |config|
-  include ActiveSupport::Testing::TimeHelpers
-
   config.cassette_library_dir = "spec/fixtures/vcr_cassettes"
   config.hook_into :webmock
   config.configure_rspec_metadata!
