@@ -28,7 +28,7 @@ references:
     run:
       name: Configure GPG
       command: |
-        echo "${GIT_CRYPT_KEY}" | base64 -d | gpg --batch --allow-secret-key-import --import
+        echo "${CIRCLECI_GPG_USER_PRIVATE_KEY}" | base64 -d | gpg --batch --allow-secret-key-import --import
 
   decrypt_secrets: &decrypt_secrets
     run:
