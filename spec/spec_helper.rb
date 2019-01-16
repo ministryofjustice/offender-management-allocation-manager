@@ -37,7 +37,7 @@ VCR.configure do |config|
   record_mode = ENV["VCR"] ? ENV["VCR"].to_sym : :new_episodes
   config.default_cassette_options = { record: record_mode }
 
-  # config.filter_sensitive_data('authorisation_header') do |interaction|
-  #   interaction.request.headers['Authorization']&.first
-  # end
+  config.filter_sensitive_data('authorisation_header') do |interaction|
+    interaction.request.headers['Authorization']&.first
+  end
 end
