@@ -7,6 +7,7 @@ module Nomis
 
       attribute :access_token, :string
       attribute :token_type, :string
+      attribute :timestamp, :string
       attribute :expires_in, :string
       attribute :scope, :string
       attribute :internal_user, :string
