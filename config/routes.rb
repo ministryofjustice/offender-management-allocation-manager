@@ -20,6 +20,6 @@ Rails.application.routes.draw do
 
   get('/allocate_prison_offender_managers/:noms_id' => 'allocate_prison_offender_managers#show',
       as: 'allocate_prison_offender_managers_show')
-  get('/allocate_prison_offender_managers/:noms_id/edit' => 'allocate_prison_offender_managers#edit',
-      as: 'allocate_prison_offender_managers_edit')
+  get('/allocate_prison_offender_managers/:noms_id/new' => 'allocate_prison_offender_managers#new',
+      as: 'allocate_prison_offender_managers_new')
 end

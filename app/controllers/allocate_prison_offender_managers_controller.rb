@@ -3,7 +3,7 @@ class AllocatePrisonOffenderManagersController < ApplicationController
 
   def show; end
 
-  def edit
+  def new
     response = Nomis::Custody::Api.get_offender(noms_id)
     @prisoner = response.data
   end
