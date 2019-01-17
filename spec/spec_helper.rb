@@ -34,11 +34,8 @@ VCR.configure do |config|
   config.configure_rspec_metadata!
   config.default_cassette_options = { match_requests_on: [:query] }
 
-  config.before_playback do |interaction, cassette|
-    unless %w[allocation_client_auth_header nomis_oauth_client_auth_header].include? cassette.name
-      travel_to interaction.recorded_at
-    end
-  end
+  record_mode = ENV["VCR"] ? ENV["VCR"].to_sym : :new_episodes
+  config.default_cassette_options = { record: record_mode }
 
   config.filter_sensitive_data('authorisation_header') do |interaction|
     interaction.request.headers['Authorization']&.first
