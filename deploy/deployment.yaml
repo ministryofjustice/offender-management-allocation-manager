@@ -81,3 +81,21 @@ spec:
                 secretKeyRef:
                   name: allocation-manager-secrets
                   key: nomis_oauth_host
+        - name: allocation-api-metrics
+          image: 926803513772.dkr.ecr.eu-west-1.amazonaws.com/offender-management/offender-management-allocation-manager:latest
+          imagePullPolicy: Always
+          command: ['sh', '-c', "bundle exec prometheus_exporter"]
+          ports:
+            - containerPort: 9394
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 9394
+            initialDelaySeconds: 10
+            periodSeconds: 60
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 9394
+            initialDelaySeconds: 10
+            periodSeconds: 60
