@@ -8,3 +8,9 @@ preload_app!
 rackup      DefaultRackup
 port        ENV['PORT']     || 3000
 environment ENV['RACK_ENV'] || 'production'
+
+after_worker_boot do
+  require 'prometheus_exporter/instrumentation'
+  PrometheusExporter::Instrumentation::Puma.start
+  PrometheusExporter::Instrumentation::Process.start(type: 'web')
+end
