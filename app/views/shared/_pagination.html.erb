@@ -1,3 +1,4 @@
+<% if @page_data %>
 <div class="govuk-grid-row pagination">
   <div class="govuk-grid-column-one-half">
     <ul class="links">
@@ -30,4 +31,4 @@
     Showing <%= @page_data.record_range %> of <%= @page_data.total_elements %> results
   </div>
 </div>
-</section>
+<% end %>
