@@ -8,6 +8,10 @@ module Nomis
       def initialize(host)
         @host = host
         @connection = Faraday.new do |faraday|
+          faraday.request :retry, max: 3, interval: 0.05,
+                                  interval_randomness: 0.5, backoff_factor: 2,
+                                  exceptions: [Faraday::ClientError, 'Timeout::Error']
+
           faraday.use Faraday::Response::RaiseError
           faraday.adapter Faraday.default_adapter
         end

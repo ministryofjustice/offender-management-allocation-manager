@@ -10,6 +10,7 @@ module Nomis
         delegate :fetch_nomis_staff_details, to: :instance
         delegate :get_offenders, to: :instance
         delegate :get_release_details, to: :instance
+        delegate :get_offender, to: :instance
       end
 
       def initialize
@@ -39,7 +40,7 @@ module Nomis
         }
 
         offenders = response['_embedded']['offenders'].map { |offender|
-          api_deserialiser.deserialise(Nomis::OffenderDetails, offender)
+          api_deserialiser.deserialise(Nomis::OffenderActiveBooking, offender)
         }
 
         ApiPaginatedResponse.new(page_meta, offenders)
@@ -60,6 +61,18 @@ module Nomis
       rescue Nomis::Custody::Client::APIError => e
         AllocationManager::ExceptionHandler.capture_exception(e)
         ApiResponse.new(NullReleaseDetails.new)
+      end
+
+      def get_offender(noms_id)
+        route = "/custodyapi/api/offenders/nomsId/#{noms_id}"
+        response = @custodyapi_client.get(route)
+
+        ApiResponse.new(
+          api_deserialiser.deserialise(Nomis::OffenderDetails, response)
+        )
+      rescue Nomis::Custody::Client::APIError => e
+        AllocationManager::ExceptionHandler.capture_exception(e)
+        ApiResponse.new(NullOffenderDetails.new)
       end
 
     private
