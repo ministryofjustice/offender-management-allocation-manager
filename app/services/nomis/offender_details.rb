@@ -29,6 +29,10 @@ module Nomis
       @active_booking ||= bookings_list.select{ |b| b['activeFlag'] == true }.first
     end
 
+    def full_name
+      "#{surname}, #{first_name}".titleize
+    end
+
   private
 
     def release_details

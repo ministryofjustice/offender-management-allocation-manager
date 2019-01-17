@@ -15,6 +15,10 @@ module Nomis
       release_date&.to_date&.strftime('%m/%d/%Y')
     end
 
+    def full_name
+      "#{surname}, #{first_name}".titleize
+    end
+
   private
 
     def release_details
