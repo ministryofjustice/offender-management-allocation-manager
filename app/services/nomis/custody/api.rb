@@ -15,7 +15,7 @@ module Nomis
 
       def initialize
         host = Rails.configuration.nomis_oauth_host
-        @custodyapi_client = Nomis::Custody::Client.new(host)
+        @custodyapi_client = Nomis::Client.new(host)
       end
 
       def fetch_nomis_staff_details(username)
@@ -35,7 +35,7 @@ module Nomis
           offender_len = data.fetch('_embedded', {}).fetch('offenders', []).length
           page_meta.items_on_page = offender_len
 
-          raise Nomis::Custody::Client::APIError, 'No data was returned' \
+          raise Nomis::Client::APIError, 'No data was returned' \
             unless data.key?('_embedded')
         }
 
@@ -44,7 +44,7 @@ module Nomis
         }
 
         ApiPaginatedResponse.new(page_meta, offenders)
-      rescue Nomis::Custody::Client::APIError => e
+      rescue Nomis::Client::APIError => e
         AllocationManager::ExceptionHandler.capture_exception(e)
         ApiPaginatedResponse.new(page_meta, [])
       end
@@ -58,7 +58,7 @@ module Nomis
         ApiResponse.new(
           api_deserialiser.deserialise(Nomis::ReleaseDetails, response.first)
         )
-      rescue Nomis::Custody::Client::APIError => e
+      rescue Nomis::Client::APIError => e
         AllocationManager::ExceptionHandler.capture_exception(e)
         ApiResponse.new(NullReleaseDetails.new)
       end
@@ -70,7 +70,7 @@ module Nomis
         ApiResponse.new(
           api_deserialiser.deserialise(Nomis::OffenderDetails, response)
         )
-      rescue Nomis::Custody::Client::APIError => e
+      rescue Nomis::Client::APIError => e
         AllocationManager::ExceptionHandler.capture_exception(e)
         ApiResponse.new(NullOffenderDetails.new)
       end
