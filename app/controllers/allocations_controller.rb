@@ -9,7 +9,7 @@ class AllocationsController < ApplicationController
   def allocated
     breadcrumb 'Allocated', :allocations_allocated_path
 
-    response = Nomis::Custody::Api.get_offenders(caseload, page_number)
+    response = Nomis::Elite2::Api.get_offender_list(caseload, page_number)
     @prisoners = response.data
     @page_data = response.meta
   end
@@ -17,7 +17,7 @@ class AllocationsController < ApplicationController
   def awaiting
     breadcrumb 'Awaiting allocation', :allocations_awaiting_path
 
-    response = Nomis::Custody::Api.get_offenders(caseload, page_number)
+    response = Nomis::Elite2::Api.get_offender_list(caseload, page_number)
     @prisoners = response.data
     @page_data = response.meta
   end
@@ -25,7 +25,7 @@ class AllocationsController < ApplicationController
   def missing_information
     breadcrumb 'Awaiting tiering', :allocations_missing_information_path
 
-    response = Nomis::Custody::Api.get_offenders(caseload, page_number)
+    response = Nomis::Elite2::Api.get_offender_list(caseload, page_number)
     @prisoners = response.data
     @page_data = response.meta
   end

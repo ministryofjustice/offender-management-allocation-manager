@@ -30,7 +30,7 @@ module Nomis
         route = "/custodyapi/api/offenders/prison/#{prison}?page=#{page}&size=10"
         page_meta = nil
 
-        response = @custodyapi_client.get(route) { |data|
+        response = @custodyapi_client.get(route) { |data, _response|
           page_meta = api_deserialiser.deserialise(PageMeta, data['page'])
           offender_len = data.fetch('_embedded', {}).fetch('offenders', []).length
           page_meta.items_on_page = offender_len

@@ -8,8 +8,8 @@ describe Nomis::Elite2::Api do
     Singleton.__init__(described_class)
   end
 
-  it "can create an Api" do
-    response = described_class.test_stub
+  it "can get a list of offenders", vcr: { cassette_name: :get_elite2_offender_list }  do
+    response = described_class.get_offender_list('LEI')
     expect(response).not_to be_nil
   end
 end
