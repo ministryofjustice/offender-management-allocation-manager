@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Nomis::Custody::ApiDeserialiser do
+RSpec.describe Nomis::ApiDeserialiser do
   let!(:memory_model_class) do
     Class.new do
       include MemoryModel
