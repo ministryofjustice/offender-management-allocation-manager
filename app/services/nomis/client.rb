@@ -11,15 +11,20 @@ module Nomis
                                 interval_randomness: 0.5, backoff_factor: 2,
                                 exceptions: [Faraday::ClientError, 'Timeout::Error']
 
+        faraday.options.params_encoder = Faraday::FlatParamsEncoder
         faraday.use Faraday::Response::RaiseError
         faraday.adapter Faraday.default_adapter
       end
     end
 
-    def get(route)
-      data = request(:get, route)
+    def get(route, queryparams: {}, extra_headers: {})
+      response = request(
+        :get, route, queryparams: queryparams, extra_headers: extra_headers
+      )
+      data = JSON.parse(response.body)
+
       if block_given?
-        yield data
+        yield data, response
       end
 
       data
@@ -27,13 +32,13 @@ module Nomis
 
   private
 
-    def request(method, route)
-      response = @connection.send(method) { |req|
+    def request(method, route, queryparams: {}, extra_headers: {})
+      @connection.send(method) do |req|
         req.url(@host + route)
         req.headers['Authorization'] = "Bearer #{token.access_token}"
-      }
-
-      JSON.parse(response.body)
+        req.headers.merge!(extra_headers)
+        req.params.update(queryparams)
+      end
     rescue Faraday::ResourceNotFound, Faraday::ClientError => e
       AllocationManager::ExceptionHandler.capture_exception(e)
       raise APIError, "Unexpected status #{e.response[:status]}"
