@@ -10,7 +10,7 @@ module Ndelius
 
     # rubocop:disable Metrics/CyclomaticComplexity
     # rubocop:disable Metrics/MethodLength
-    def self.generate(nomis_id)
+    def self.generate(nomis_id, raise_on_error: true)
       last_letter = nomis_id.split('').last
 
       case last_letter
@@ -23,11 +23,11 @@ module Ndelius
       when 'M', 'N', 'O', 'P'
         new(TIER_D, CRC_CASE_ALLOCATION, nomis_id)
       when 'Q', 'R', 'S', 'T'
-        raise NoTierException
+        new(nil, CRC_CASE_ALLOCATION, nomis_id)
       when 'U', 'V', 'W', 'X'
-        raise MultipleRecordException
+        raise MultipleRecordException if raise_on_error
       when 'Y', 'Z'
-        raise NoRecordException
+        raise NoRecordException if raise_on_error
       end
     end
     # rubocop:enable Metrics/CyclomaticComplexity
