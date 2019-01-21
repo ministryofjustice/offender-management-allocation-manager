@@ -53,7 +53,7 @@ describe Ndelius::FakeRecord do
     end
 
     context 'when the Nomis id ends with Q, R, S, T' do
-      it 'raises a NoTier exception' do
+      it 'returns a record without a tier' do
         %w[A1234BQ A1234BR A1234BS A1234BT].each do |nomis_id|
           record = subject.generate(nomis_id)
 
