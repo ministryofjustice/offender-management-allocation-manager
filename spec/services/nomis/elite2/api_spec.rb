@@ -11,5 +11,7 @@ describe Nomis::Elite2::Api do
   it "can get a list of offenders", vcr: { cassette_name: :get_elite2_offender_list }  do
     response = described_class.get_offender_list('LEI')
     expect(response).not_to be_nil
+    expect(response.data).to be_instance_of(Array)
+    expect(response.data.first).to be_instance_of(Nomis::OffenderShort)
   end
 end

@@ -17,7 +17,7 @@ module Nomis
       end
     end
 
-    def get(route, queryparams: nil, extra_headers: nil)
+    def get(route, queryparams: {}, extra_headers: {})
       response = request(
         :get, route, queryparams: queryparams, extra_headers: extra_headers
       )
@@ -32,12 +32,12 @@ module Nomis
 
   private
 
-    def request(method, route, queryparams: nil, extra_headers: nil)
+    def request(method, route, queryparams: {}, extra_headers: {})
       @connection.send(method) do |req|
         req.url(@host + route)
         req.headers['Authorization'] = "Bearer #{token.access_token}"
-        req.headers.merge!(extra_headers || {})
-        req.params.update(queryparams || {})
+        req.headers.merge!(extra_headers)
+        req.params.update(queryparams)
       end
     rescue Faraday::ResourceNotFound, Faraday::ClientError => e
       AllocationManager::ExceptionHandler.capture_exception(e)

@@ -10,7 +10,7 @@ module ApplicationHelper
   end
 
   def string_to_date(str)
-    return '' if str == ''
+    return str if str == ''
 
     Date.parse(str).strftime('%d/%m/%Y')
   end
