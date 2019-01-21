@@ -1,5 +1,5 @@
 module Nomis
-  class OffenderDetails
+  class Offender
     include MemoryModel
 
     attribute :noms_id, :string

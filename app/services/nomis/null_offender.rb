@@ -1,5 +1,5 @@
 module Nomis
-  class NullOffenderDetails < Nomis::OffenderDetails
+  class NullOffender < Nomis::Offender
     def release_date; end
 
     def nationality; end

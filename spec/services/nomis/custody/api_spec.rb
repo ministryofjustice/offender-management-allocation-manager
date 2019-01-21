@@ -67,7 +67,7 @@ describe Nomis::Custody::Api do
 
       response = described_class.get_offender(noms_id)
 
-      expect(response.data).to be_instance_of(Nomis::OffenderDetails)
+      expect(response.data).to be_instance_of(Nomis::Offender)
       expect(response.data.nationality).to eq('White: Gypsy or Irish Traveller')
     end
 
@@ -77,6 +77,6 @@ describe Nomis::Custody::Api do
 
       response = described_class.get_offender(noms_id)
 
-      expect(response.data).to be_instance_of(Nomis::NullOffenderDetails)
+      expect(response.data).to be_instance_of(Nomis::NullOffender)
     end
 end

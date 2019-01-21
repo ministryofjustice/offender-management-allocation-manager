@@ -19,6 +19,6 @@ describe OffenderService, vcr: { cassette_name: :get_offenders_for_specific_pris
 
   it "gets a single offender", vcr: { cassette_name: :get_single_offender } do
     offender = OffenderService.new.get_offender('G4273GI')
-    expect(offender.data).to be_kind_of(Nomis::OffenderDetails)
+    expect(offender.data).to be_kind_of(Nomis::Offender)
   end
 end
