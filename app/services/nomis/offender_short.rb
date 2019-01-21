@@ -23,6 +23,7 @@ module Nomis
     attribute :rnum, :integer
 
     attr_accessor :release_date
+    attr_accessor :tier
 
     def full_name
       "#{last_name}, #{first_name}".titleize

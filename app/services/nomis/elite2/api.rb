@@ -53,16 +53,13 @@ module Nomis
 
     private
 
-      def get_bulk_release_dates(prisoner_ids)
+      def get_bulk_release_dates(offender_ids)
         route = '/elite2api/api/offender-sentences'
-        parameters = { 'offenderNo' => prisoner_ids }
-        data = @e2_client.get(route, queryparams: parameters)
+        parameters = { 'offenderNo' => offender_ids }
 
-        data.each_with_object({}) { |record, hsh|
-          offender_no = record['offenderNo']
-          release_date = record['sentenceDetail'].fetch('releaseDate', '')
-          hsh[offender_no] = release_date
-        }
+        data = @e2_client.get(route, queryparams: parameters)
+        dates = data.map { |record| record['sentenceDetail'].fetch('releaseDate', '') }
+        offender_ids.zip(dates).to_h
       end
 
       def paging_headers(page_size, page_offset)

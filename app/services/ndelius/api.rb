@@ -13,7 +13,7 @@ module Ndelius
 
     def get_records(nomis_ids)
       nomis_ids.each_with_object({}) do |id, hash|
-        hash[id] = FakeRecord.generate(id)
+        hash[id] = FakeRecord.generate(id, raise_on_error: false)
       end
     end
   end
