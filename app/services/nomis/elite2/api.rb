@@ -8,6 +8,7 @@ module Nomis
 
       class << self
         delegate :get_offender_list, to: :instance
+        delegate :get_bulk_release_dates, to: :instance
       end
 
       def initialize
@@ -37,30 +38,29 @@ module Nomis
           api_deserialiser.deserialise(Nomis::OffenderShort, offender)
         }
 
-        # We have to add the empty item to the list because otherwise we only get the
-        # last item. This appears to be a bug in faraday because the Elite2 API works
-        # fine with the same URL when called via Postman.
-        ids = offenders.map(&:offender_no) + ['']
-        release_dates = get_bulk_release_dates(ids)
-
-        offenders.each do |offender|
-          offender.release_date = release_dates[offender.offender_no]
-        end
-
         ApiPaginatedResponse.new(page_meta, offenders)
       end
-    # rubocop:enable Metrics/MethodLength
-
-    private
+      # rubocop:enable Metrics/MethodLength
 
       def get_bulk_release_dates(offender_ids)
         route = '/elite2api/api/offender-sentences'
-        parameters = { 'offenderNo' => offender_ids }
+
+        # We have to add the empty item to the list because otherwise we only get the
+        # last item. This appears to be a bug in faraday because the Elite2 API works
+        # fine with the same URL when called via Postman.
+        parameters = { 'offenderNo' => offender_ids + [''] }
 
         data = @e2_client.get(route, queryparams: parameters)
-        dates = data.map { |record| record['sentenceDetail'].fetch('releaseDate', '') }
-        offender_ids.zip(dates).to_h
+
+        results = data.each_with_object({}) { |record, hash|
+          oid = record['offenderNo']
+          hash[oid] = record['sentenceDetail'].fetch('releaseDate', '')
+        }
+
+        ApiResponse.new(results)
       end
+
+    private
 
       def paging_headers(page_size, page_offset)
         {
