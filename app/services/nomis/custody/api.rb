@@ -68,11 +68,11 @@ module Nomis
         response = @custodyapi_client.get(route)
 
         ApiResponse.new(
-          api_deserialiser.deserialise(Nomis::Offender, response)
+          api_deserialiser.deserialise(Nomis::OffenderDetails, response)
         )
       rescue Nomis::Client::APIError => e
         AllocationManager::ExceptionHandler.capture_exception(e)
-        ApiResponse.new(NullOffender.new)
+        ApiResponse.new(Nomis::NullOffenderDetails.new)
       end
 
     private
