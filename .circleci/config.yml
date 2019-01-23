@@ -165,7 +165,7 @@ jobs:
       - run: bundle --path vendor/bundle
       - run: bundle exec rubocop
 
-  build_push_docker:
+  build_and_push_docker_image:
     <<: *defaults
     docker:
       - <<: *ruby_image
@@ -222,7 +222,7 @@ workflows:
       - rubocop:
           requires:
             - install_dependencies
-      - build_push_docker:
+      - build_and_push_docker_image:
           requires:
             - test
             - security-static-analysis
@@ -232,7 +232,7 @@ workflows:
               only: master
       - deploy_staging:
           requires:
-            - build_push_docker
+            - build_and_push_docker_image
           filters:
             branches:
               only: master
