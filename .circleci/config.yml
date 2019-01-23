@@ -47,7 +47,6 @@ references:
       command: |
         sudo apt-get --assume-yes install python3-pip
         sudo pip3 install awscli
-        $(aws ecr get-login --region eu-west-1 --no-include-email)
 
   build_docker_image: &build_docker_image
     run:
@@ -189,7 +188,6 @@ jobs:
       - run:
           name: Kubectl deployment staging setup
           command: |
-            $(aws ecr get-login --region eu-west-1 --no-include-email)
             setup-kube-auth
             kubectl config use-context staging
       - *install_gpg
