@@ -151,9 +151,9 @@ jobs:
       - attach_workspace:
           at: ~/repo
       - run: bundle --path vendor/bundle
-      - run: bundle exec brakeman -o brakeman.html
+      - run: bundle exec brakeman -o ~/test-results/brakeman/brakeman.json -o ~/test-results/brakeman/brakeman.html
       - store_artifacts:
-          path: brakeman.html
+          path: ~/test-results
 
   rubocop:
     <<: *defaults
