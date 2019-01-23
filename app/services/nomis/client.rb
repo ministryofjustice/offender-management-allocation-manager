@@ -1,4 +1,5 @@
 require 'faraday'
+require 'typhoeus/adapters/faraday'
 
 module Nomis
   class Client
@@ -13,7 +14,7 @@ module Nomis
 
         faraday.options.params_encoder = Faraday::FlatParamsEncoder
         faraday.use Faraday::Response::RaiseError
-        faraday.adapter Faraday.default_adapter
+        faraday.adapter :typhoeus
       end
     end
 
