@@ -62,7 +62,7 @@ describe Nomis::Custody::Api do
     end
 
   it 'gets the offender details for a prisoner',
-    vcr: { cassette_name: :get_offender_details } do
+    vcr: { cassette_name: :get_offender_details_custody_api } do
       noms_id = 'G2911GD'
 
       response = described_class.get_offender(noms_id)
@@ -71,7 +71,7 @@ describe Nomis::Custody::Api do
       expect(response.data.nationality).to eq('White: Gypsy or Irish Traveller')
     end
 
-  it 'gets the nationality details for a prisoner', :raven_intercept_exception,
+  it 'returns NullOffenderDetails if unable to find the prisoner', :raven_intercept_exception,
     vcr: { cassette_name: :fail_get_offender_details } do
       noms_id = 'AAA22D'
 
