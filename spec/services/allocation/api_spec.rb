@@ -19,4 +19,19 @@ describe Allocation::Api do
     expect(response[:status]).to eq "ok"
     expect(response[:postgresVersion]).to include("PostgreSQL 10.3")
   end
+
+  it 'gets a list allocation records for a POMs' do
+    first_staff_id = '1234567'
+    second_staff_id = '1234568'
+    third_staff_id = '1234569'
+
+    records = described_class.get_allocation_data([
+      first_staff_id,
+      second_staff_id,
+      third_staff_id
+    ])
+
+    expect(records.length).to be(3)
+    expect(records.values).to all(be_an Allocation::FakeAllocationRecord)
+  end
 end
