@@ -76,6 +76,8 @@ references:
           docker tag app "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:latest"
           docker push "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:latest"
         fi
+      environment:
+        GITHUB_TEAM_NAME_SLUG: offender-management
 
 version: 2
 jobs:
