@@ -11,6 +11,7 @@ class StaffService
       pom.tier_c = allocations[pom.staff_id].tier_c
       pom.tier_d = allocations[pom.staff_id].tier_d
       pom.status = allocations[pom.staff_id].status
+      pom.working_pattern = allocations[pom.staff_id].working_pattern
       pom.total_cases = allocations[pom.staff_id].total_cases
     end
 

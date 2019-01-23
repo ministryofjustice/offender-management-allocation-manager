@@ -12,6 +12,8 @@ describe Allocation::FakeAllocationRecord do
       expect(record.tier_b).to eq(1)
       expect(record.tier_c).to eq(0)
       expect(record.tier_d).to eq(1)
+      expect(record.working_pattern).to eq('Part time')
+      expect(record.status).to eq('Active')
       expect(record.total_cases).to eq(2)
     end
   end
