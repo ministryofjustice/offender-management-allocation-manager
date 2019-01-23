@@ -11,11 +11,21 @@ module Nomis
         delegate :get_offender_list, to: :instance
         delegate :get_bulk_release_dates, to: :instance
         delegate :get_offence, to: :instance
+        delegate :get_offender, to: :instance
+        delegate :fetch_nomis_user_details, to: :instance
       end
 
       def initialize
         host = Rails.configuration.nomis_oauth_host
         @e2_client = Nomis::Client.new(host)
+      end
+
+      def fetch_nomis_user_details(username)
+        route = "/elite2api/api/users/#{username}"
+        response = @e2_client.get(route)
+
+        ApiResponse.new(api_deserialiser.
+          deserialise(Nomis::Elite2::UserDetails, response))
       end
 
       # rubocop:disable Metrics/MethodLength
