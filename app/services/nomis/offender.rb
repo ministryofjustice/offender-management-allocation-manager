@@ -28,6 +28,7 @@ module Nomis
     attribute :marital_status, :string
     attribute :release_date, :date
     attribute :tier, :string
+    attribute :case_allocation, :string
 
     def full_name
       "#{last_name}, #{first_name}".titleize
