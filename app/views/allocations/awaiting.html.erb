@@ -21,7 +21,7 @@
         <td aria-label="Action" class="govuk-table__cell "><%= prisoner.full_name %></td>
         <td aria-label="Prisoner number" class="govuk-table__cell "><%= prisoner.offender_no %></td>
         <td aria-label="Arrival date" class="govuk-table__cell ">N/A</td>
-        <td aria-label="Release date" class="govuk-table__cell "><%= string_to_date(prisoner.release_date) %></td>
+        <td aria-label="Release date" class="govuk-table__cell "><%= format_date(prisoner.release_date) %></td>
         <td aria-label="Tier" class="govuk-table__cell "><%= prisoner.tier %></td>
         <td aria-label="Action" class="govuk-table__cell "><a href="<%= allocate_prison_offender_managers_new_path(prisoner.offender_no) %>">Allocate</a></td>
       </tr>
