@@ -5,7 +5,7 @@ describe Allocation::FakeAllocationRecord do
     it 'returns a record with tiering information' do
       staff_id = '1234569'
 
-      record = Allocation::FakeAllocationRecord.generate(staff_id)
+      record = described_class.generate(staff_id)
 
       expect(record.staff_id).to eq(staff_id)
       expect(record.tier_a).to eq(0)

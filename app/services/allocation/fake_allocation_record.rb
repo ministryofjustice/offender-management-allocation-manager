@@ -1,6 +1,5 @@
 module Allocation
   class FakeAllocationRecord
-
     def self.generate(staff_id)
       tier_counts = generate_tier_counts_from(staff_id)
       new(staff_id, tier_counts)

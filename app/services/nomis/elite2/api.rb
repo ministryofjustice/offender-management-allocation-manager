@@ -13,7 +13,7 @@ module Nomis
         delegate :get_offence, to: :instance
         delegate :get_offender, to: :instance
         delegate :fetch_nomis_user_details, to: :instance
-        delegate :get_prisoner_offender_manager_list, to: :instance
+        delegate :prisoner_offender_manager_list, to: :instance
       end
 
       def initialize
@@ -29,17 +29,17 @@ module Nomis
           deserialise(Nomis::Elite2::UserDetails, response))
       end
 
-      def get_prisoner_offender_manager_list
+      def prisoner_offender_manager_list(prison)
         # Temporarily using keyworker endpoint for now
-        route = "/elite2api/api/key-worker/LEI/available"
+        route = "/elite2api/api/key-worker/#{prison}/available"
 
-        data =  @e2_client.get(route) do |data|
+        data =  @e2_client.get(route) { |data|
           raise Nomis::Client::APIError, 'No data was returned' if data.empty?
-        end
+        }
 
-        poms = data.map do |pom|
+        poms = data.map { |pom|
           api_deserialiser.deserialise(Nomis::Elite2::PrisonerOffenderManager, pom)
-        end
+        }
 
         ApiResponse.new(poms)
       end

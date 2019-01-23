@@ -1,7 +1,6 @@
 class StaffService
-
   def get_prisoner_offender_managers(prison)
-    poms = Nomis::Elite2::Api.get_prisoner_offender_manager_list(prison)
+    poms = Nomis::Elite2::Api.prisoner_offender_manager_list(prison)
     staff_ids = poms.data.map(&:staff_id)
 
     allocations = Allocation::Api.get_allocation_data(staff_ids)
