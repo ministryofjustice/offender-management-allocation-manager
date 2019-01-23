@@ -26,9 +26,8 @@ module Nomis
     attribute :imprisonment_status, :string
     attribute :reception_date, :date
     attribute :marital_status, :string
-
-    attr_accessor :release_date
-    attr_accessor :tier
+    attribute :release_date, :date
+    attribute :tier, :string
 
     def full_name
       "#{last_name}, #{first_name}".titleize

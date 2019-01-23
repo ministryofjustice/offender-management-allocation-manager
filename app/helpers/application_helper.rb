@@ -9,9 +9,9 @@ module ApplicationHelper
     uri.to_s
   end
 
-  def string_to_date(str)
-    return str if str.blank?
+  def format_date(date_obj)
+    return '' if date_obj.nil?
 
-    Date.parse(str).strftime('%d/%m/%Y')
+    date_obj.strftime('%d/%m/%Y')
   end
 end

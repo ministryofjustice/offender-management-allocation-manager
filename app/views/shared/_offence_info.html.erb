@@ -10,7 +10,7 @@
   </tr>
   <tr class="govuk-table__row">
       <td class="govuk-table__cell hmpps-table-cell__key">Release date / parole eligibility</td>
-      <td class="govuk-table__cell table_cell__left_align hmpps-table-cell__key"><%= string_to_date(@prisoner.release_date) %></td>
+      <td class="govuk-table__cell table_cell__left_align hmpps-table-cell__key"><%= format_date(@prisoner.release_date) %></td>
     </tr>
   </tbody>
 </table>
