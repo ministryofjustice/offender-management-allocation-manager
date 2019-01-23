@@ -1,6 +1,6 @@
 class OffenderService
-  def get_offender(noms_id)
-    Nomis::Custody::Api.get_offender(noms_id)
+  def get_offender(offender_no)
+    Nomis::Elite2::Api.get_offender(offender_no)
   end
 
   def get_offenders_for_prison(prison, page_number: 0)
