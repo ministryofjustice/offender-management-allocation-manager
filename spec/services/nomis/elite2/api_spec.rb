@@ -21,6 +21,13 @@ describe Nomis::Elite2::Api do
     expect(response.data).to be_instance_of(Nomis::Offender)
   end
 
+  it "can get an offence description for a booking id", vcr: { cassette_name: :get_offence_ok }  do
+    booking_id = '1153753'
+    response = described_class.get_offence(booking_id)
+    expect(response.data).to be_instance_of(String)
+    expect(response.data).to eq 'Section 18 - wounding with intent to resist / prevent arrest'
+  end
+
   it 'returns null if unable to find prisoner', :raven_intercept_exception,
     vcr: { cassette_name: :elite2_api_fail_get_offender_details } do
       noms_id = 'AAA22D'

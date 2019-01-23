@@ -5,6 +5,8 @@ class OffenderService
 
       release = Nomis::Elite2::Api.get_bulk_release_dates([offender_no])
       o.data.release_date = release.data[offender_no]
+
+      o.data.main_offence = Nomis::Elite2::Api.get_offence(o.data.latest_booking_id).data
     }
   end
 
