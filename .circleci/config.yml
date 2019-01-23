@@ -131,6 +131,9 @@ jobs:
             ./cc-test-reporter before-build
             bundle exec rake
             ./cc-test-reporter after-build --coverage-input-type simplecov --exit-code $?
+          environment:
+            ALLOCATION_API_HOST: https://allocation-api-staging.apps.cloud-platform-live-0.k8s.integration.dsd.io
+            ALLOCATION_MANAGER_HOST: https://allocation-manager-staging.apps.cloud-platform-live-0.k8s.integration.dsd.io
       - store_test_results:
           path: coverage
       - store_artifacts:
