@@ -78,6 +78,7 @@ references:
         fi
       environment:
         GITHUB_TEAM_NAME_SLUG: offender-management
+        REPONAME: offender-management-allocation-manager
 
 version: 2
 jobs:
