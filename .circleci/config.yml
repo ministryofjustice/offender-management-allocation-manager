@@ -88,13 +88,13 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/repo
+      - run:
+          name: Which bundler?
+          command: bundle -v
       - restore_cache:
           keys:
             - allocation-manager-v1-{{ checksum "Gemfile.lock" }}
             - allocation-manager-v1-
-      - run:
-          name: Which bundler?
-          command: bundle -v
       - run:
           name: Update npm
           command: 'sudo npm install -g npm@latest'
