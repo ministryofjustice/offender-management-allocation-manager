@@ -36,4 +36,14 @@ describe Nomis::Elite2::Api do
 
       expect(response.data).to be_instance_of(Nomis::NullOffender)
     end
+
+  it "gets staff details",
+    vcr: { cassette_name: :elite2_api_get_nomis_user_details } do
+    username = 'PK000223'
+
+    response = described_class.fetch_nomis_user_details(username)
+
+    expect(response.data).to be_kind_of(Nomis::Elite2::UserDetails)
+    expect(response.data.active_case_load_id).to eq('LEI')
+  end
 end
