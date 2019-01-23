@@ -26,7 +26,7 @@ module Nomis
     attribute :imprisonment_status, :string
     attribute :reception_date, :date
     attribute :marital_status, :string
-    attribute :main_offence, :date
+    attribute :main_offence, :string
     attribute :release_date, :date
     attribute :tier, :string
     attribute :case_allocation, :string
