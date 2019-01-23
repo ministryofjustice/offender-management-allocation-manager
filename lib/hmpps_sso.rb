@@ -10,7 +10,7 @@ module OmniAuth
       info do
         {
           username: staff_details.username,
-          caseload: staff_details.active_nomis_caseload
+          caseload: staff_details.active_case_load_id
         }
       end
 
@@ -41,7 +41,7 @@ module OmniAuth
     private
 
       def staff_details
-        @staff_details ||= Nomis::Custody::Api.fetch_nomis_staff_details(username).data
+        @staff_details ||= Nomis::Elite2::Api.fetch_nomis_user_details(username).data
       end
 
       #:nocov:
