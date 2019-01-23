@@ -31,6 +31,10 @@ module Nomis
     attribute :tier, :string
     attribute :case_allocation, :string
 
+    def current_responsibility
+      @current_responsibility = ResponsibilityService.calculate_responsibility(self)
+    end
+
     def full_name
       "#{last_name}, #{first_name}".titleize
     end
