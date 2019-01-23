@@ -1,7 +1,9 @@
 class OffenderService
   def get_offender(offender_no)
     Nomis::Elite2::Api.get_offender(offender_no).tap { |o|
-      o.data.tier = Ndelius::Api.get_record(offender_no).tier
+      record = Ndelius::Api.get_record(offender_no)
+      o.data.tier = record.tier
+      o.data.case_allocation = record.case_allocation
 
       release = Nomis::Elite2::Api.get_bulk_release_dates([offender_no])
       o.data.release_date = release.data[offender_no]

@@ -29,6 +29,7 @@ module Nomis
 
     attr_accessor :release_date
     attr_accessor :tier
+    attr_accessor :case_allocation
 
     def full_name
       "#{last_name}, #{first_name}".titleize
