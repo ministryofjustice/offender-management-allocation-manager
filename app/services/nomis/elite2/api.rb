@@ -70,7 +70,8 @@ module Nomis
 
         results = data.each_with_object({}) { |record, hash|
           oid = record['offenderNo']
-          hash[oid] = record['sentenceDetail'].fetch('releaseDate', '')
+          datestring = record['sentenceDetail'].fetch('releaseDate', '')
+          hash[oid] = datestring.present? ? Date.parse(datestring) : nil
         }
 
         ApiResponse.new(results)

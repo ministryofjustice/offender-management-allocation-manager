@@ -21,7 +21,7 @@ describe OffenderService, vcr: { cassette_name: :get_offenders_for_specific_pris
     noms_id = 'G4273GI'
     offender = OffenderService.new.get_offender(noms_id)
     expect(offender.data).to be_kind_of(Nomis::Offender)
-    expect(offender.data.release_date).to eq '2020-02-07'
+    expect(offender.data.release_date).to eq Date.new(2020, 2, 7)
     expect(offender.data.tier).to eq 'C'
   end
 end
