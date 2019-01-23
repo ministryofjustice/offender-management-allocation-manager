@@ -9,6 +9,7 @@ module Nomis
       class << self
         delegate :get_offender_list, to: :instance
         delegate :get_bulk_release_dates, to: :instance
+        delegate :get_offender, to: :instance
       end
 
       def initialize
@@ -39,6 +40,21 @@ module Nomis
         }
 
         ApiPaginatedResponse.new(page_meta, offenders)
+      end
+
+      def get_offender(offender_no)
+        route = "/elite2api/api/prisoners/#{offender_no}"
+        response = @e2_client.get(route) { |data|
+          raise Nomis::Client::APIError, 'No data was returned' \
+            if data.empty?
+        }
+
+        ApiResponse.new(
+          api_deserialiser.deserialise(Nomis::Offender, response.first)
+        )
+      rescue Nomis::Client::APIError => e
+        AllocationManager::ExceptionHandler.capture_exception(e)
+        ApiResponse.new(NullOffender.new)
       end
       # rubocop:enable Metrics/MethodLength
 

@@ -15,21 +15,18 @@ describe Nomis::Elite2::Api do
     expect(response.data.first).to be_instance_of(Nomis::OffenderShort)
   end
 
-  it "can get a list of release dates", vcr: { cassette_name: :get_elite2_release_dates }  do
-    response = described_class.get_bulk_release_dates(%w[G4273GI G7806VO G2911GD])
-
-    expect(response.data).to be_instance_of(Hash)
-    expect(response.data.values.length).to eq(3)
-    expect(response.data['G4273GI']).to eq('2020-02-07')
-    expect(response.data['G7806VO']).to eq('2017-11-16')
-    expect(response.data['G3716UD']).to be_nil
+  it "can a single offender's details", vcr: { cassette_name: :full_single_offender }  do
+    noms_id = 'G2911GD'
+    response = described_class.get_offender(noms_id)
+    expect(response.data).to be_instance_of(Nomis::Offender)
   end
 
-  it "can get a single release date", vcr: { cassette_name: :get_elite2_release_date }  do
-    response = described_class.get_bulk_release_dates(['G4273GI'])
+  it 'returns null if unable to find prisoner', :raven_intercept_exception,
+    vcr: { cassette_name: :elite2_api_fail_get_offender_details } do
+      noms_id = 'AAA22D'
 
-    expect(response.data).to be_instance_of(Hash)
-    expect(response.data.values.length).to eq(1)
-    expect(response.data['G4273GI']).to eq('2020-02-07')
-  end
+      response = described_class.get_offender(noms_id)
+
+      expect(response.data).to be_instance_of(Nomis::NullOffender)
+    end
 end

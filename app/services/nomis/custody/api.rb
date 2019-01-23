@@ -72,7 +72,7 @@ module Nomis
         )
       rescue Nomis::Client::APIError => e
         AllocationManager::ExceptionHandler.capture_exception(e)
-        ApiResponse.new(NullOffenderDetails.new)
+        ApiResponse.new(Nomis::NullOffenderDetails.new)
       end
 
     private
