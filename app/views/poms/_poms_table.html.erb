@@ -23,8 +23,9 @@
     </tr>
   </thead>
   <tbody class="govuk-table__body">
+    <% @poms.each do |pom| %>
     <tr class="govuk-table__row">
-      <td aria-label="POM name" class="govuk-table__cell ">N/A</td>
+      <td aria-label="POM name" class="govuk-table__cell "><%= pom.full_name %></td>
       <td aria-label="Tier A cases" class="govuk-table__cell ">N/A</td>
       <td aria-label="Tier B cases" class="govuk-table__cell ">N/A</td>
       <td aria-label="Tier C cases" class="govuk-table__cell ">N/A</td>
@@ -35,5 +36,6 @@
       <td aria-label="Action" class="govuk-table__cell "><a
           href="<%= poms_show_path(id: 1) %>">View</a></td>
     </tr>
+  <% end %>
   </tbody>
 </table>
