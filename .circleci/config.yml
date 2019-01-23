@@ -4,9 +4,6 @@ references:
 
   ruby_image: &ruby_image
     image: circleci/ruby:2.5.3-node-browsers
-    environment:
-      RAILS_ENV: test
-      RACK_ENV: test
 
   deploy_container_config: &deploy_container_config
     docker:
@@ -137,6 +134,8 @@ jobs:
           environment:
             ALLOCATION_API_HOST: https://allocation-api-staging.apps.cloud-platform-live-0.k8s.integration.dsd.io
             ALLOCATION_MANAGER_HOST: https://allocation-manager-staging.apps.cloud-platform-live-0.k8s.integration.dsd.io
+            RAILS_ENV: test
+            RACK_ENV: test
       - store_test_results:
           path: coverage
       - store_artifacts:
