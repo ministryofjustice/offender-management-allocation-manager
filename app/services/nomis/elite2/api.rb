@@ -33,11 +33,11 @@ module Nomis
         # Temporarily using keyworker endpoint for now
         route = "/elite2api/api/key-worker/#{prison}/available"
 
-        data =  @e2_client.get(route) { |data|
+        response = @e2_client.get(route) { |data|
           raise Nomis::Client::APIError, 'No data was returned' if data.empty?
         }
 
-        poms = data.map { |pom|
+        poms = response.map { |pom|
           api_deserialiser.deserialise(Nomis::Elite2::PrisonerOffenderManager, pom)
         }
 

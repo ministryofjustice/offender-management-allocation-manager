@@ -1,4 +1,5 @@
 class StaffService
+  # rubocop:disable Metrics/MethodLength
   def get_prisoner_offender_managers(prison)
     poms = Nomis::Elite2::Api.prisoner_offender_manager_list(prison)
     staff_ids = poms.data.map(&:staff_id)
@@ -17,4 +18,5 @@ class StaffService
 
     poms
   end
+  # rubocop:enable Metrics/MethodLength
 end
