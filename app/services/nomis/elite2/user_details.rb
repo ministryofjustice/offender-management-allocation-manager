@@ -10,6 +10,7 @@ module Nomis
       attribute :active_case_load_id, :string
       attribute :locked_flag, :string
       attribute :expired_flag, :string
+      attribute :thumbnail_id, :string
     end
   end
 end

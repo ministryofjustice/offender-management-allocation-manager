@@ -6,11 +6,12 @@ class StaffService
     allocations = Allocation::Api.get_allocation_data(staff_ids)
 
     poms.data.each do |pom|
-      pom.tier_a = allocations[pom.tier_a]
-      pom.tier_b = allocations[pom.tier_b]
-      pom.tier_c = allocations[pom.tier_c]
-      pom.tier_d = allocations[pom.tier_d]
-      pom.total_cases = allocations[pom.total_cases]
+      pom.tier_a = allocations[pom.staff_id].tier_a
+      pom.tier_b = allocations[pom.staff_id].tier_b
+      pom.tier_c = allocations[pom.staff_id].tier_c
+      pom.tier_d = allocations[pom.staff_id].tier_d
+      pom.status = allocations[pom.staff_id].status
+      pom.total_cases = allocations[pom.staff_id].total_cases
     end
 
     poms
