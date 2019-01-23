@@ -7,9 +7,10 @@ module Nomis
       include Singleton
 
       class << self
+        delegate :get_offender, to: :instance
         delegate :get_offender_list, to: :instance
         delegate :get_bulk_release_dates, to: :instance
-        delegate :get_offender, to: :instance
+        delegate :get_offence, to: :instance
       end
 
       def initialize
@@ -57,6 +58,12 @@ module Nomis
         ApiResponse.new(NullOffender.new)
       end
       # rubocop:enable Metrics/MethodLength
+
+      def get_offence(booking_id)
+        route = "/elite2api/api/bookings/#{booking_id}/mainOffence"
+        data = @e2_client.get(route)
+        ApiResponse.new(data.first['offenceDescription'])
+      end
 
       def get_bulk_release_dates(offender_ids)
         route = '/elite2api/api/offender-sentences'

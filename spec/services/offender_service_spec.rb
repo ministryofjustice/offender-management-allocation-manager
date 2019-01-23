@@ -23,6 +23,7 @@ describe OffenderService, vcr: { cassette_name: :get_offenders_for_specific_pris
     expect(offender.data).to be_kind_of(Nomis::Offender)
     expect(offender.data.release_date).to eq Date.new(2020, 2, 7)
     expect(offender.data.tier).to eq 'C'
+    expect(offender.data.main_offence).to eq 'Section 18 - wounding with intent to resist / prevent arrest'
     expect(offender.data.case_allocation).to eq 'CRC'
   end
 end
