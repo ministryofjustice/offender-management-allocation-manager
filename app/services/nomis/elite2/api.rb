@@ -38,7 +38,7 @@ module Nomis
         }
 
         poms = response.map { |pom|
-          api_deserialiser.deserialise(Nomis::Elite2::PrisonerOffenderManager, pom)
+          api_deserialiser.deserialise(Nomis::Elite2::PrisonOffenderManager, pom)
         }
 
         ApiResponse.new(poms)

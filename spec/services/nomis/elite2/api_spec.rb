@@ -53,7 +53,7 @@ describe Nomis::Elite2::Api do
       response = described_class.prisoner_offender_manager_list('LEI')
 
       expect(response.data).to be_instance_of(Array)
-      expect(response.data).to all(be_an Nomis::Elite2::PrisonerOffenderManager)
+      expect(response.data).to all(be_an Nomis::Elite2::PrisonOffenderManager)
     end
 
     it "gets staff details",

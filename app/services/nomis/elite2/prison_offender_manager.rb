@@ -1,7 +1,7 @@
-# Note this is currently deserializing keyworker
+# Note this is currently deserializing a Nomis Keyworker
 module Nomis
   module Elite2
-    class PrisonerOffenderManager
+    class PrisonOffenderManager
       include MemoryModel
 
       attribute :staff_id, :string
