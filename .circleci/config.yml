@@ -197,6 +197,7 @@ jobs:
           name: Deploy to staging
           command: |
             kubectl set image -f deploy/deployment.yaml allocation-manager=${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_SHA1} --local -o yaml \
+            | kubectl annotate -f - kubernetes.io/change-cause="$CIRCLE_BUILD_URL" --local --o yaml \
             | kubectl apply -f -
             kubectl apply \
               -f ./deploy/ingress.yaml \

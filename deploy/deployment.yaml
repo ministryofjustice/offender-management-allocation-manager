@@ -4,6 +4,8 @@ metadata:
   name: allocation-manager
   labels:
     app: allocation-manager
+  annotations:
+    kubernetes.io/change-cause: "<to be filled in deploy job command>"
 spec:
   replicas: 3
   revisionHistoryLimit: 1
