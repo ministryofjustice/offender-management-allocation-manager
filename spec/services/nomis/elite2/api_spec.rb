@@ -28,7 +28,8 @@ describe Nomis::Elite2::Api do
   end
 
   describe 'Single offender' do
-    it "can get a single offender's details", vcr: { cassette_name: :full_single_offender } do
+    it "can get a single offender's details",
+       vcr: { cassette_name: :elite2_api_single_offender_spec } do
       noms_id = 'G2911GD'
 
       response = described_class.get_offender(noms_id)
@@ -37,7 +38,7 @@ describe Nomis::Elite2::Api do
     end
 
     it 'returns null if unable to find prisoner', :raven_intercept_exception,
-      vcr: { cassette_name: :elite2_api_fail_get_offender_details } do
+      vcr: { cassette_name: :elite2_api_null_offender_spec  } do
       noms_id = 'AAA22D'
 
       response = described_class.get_offender(noms_id)
@@ -49,7 +50,7 @@ describe Nomis::Elite2::Api do
   describe 'Staff' do
     # Note we are temporarily getting POMs from keyworker
     it 'can get a of Prison Offender Managers (POMs)',
-      vcr: { cassette_name: :get_elite2_keyworkers } do
+      vcr: { cassette_name: :elite2_api_keyworkers_spec  } do
       response = described_class.prisoner_offender_manager_list('LEI')
 
       expect(response.data).to be_instance_of(Array)
@@ -57,7 +58,7 @@ describe Nomis::Elite2::Api do
     end
 
     it "gets staff details",
-      vcr: { cassette_name: :elite2_api_get_nomis_user_details } do
+      vcr: { cassette_name: :elite2_api_staff_details_spec  } do
       username = 'PK000223'
 
       response = described_class.fetch_nomis_user_details(username)

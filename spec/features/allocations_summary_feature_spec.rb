@@ -13,7 +13,7 @@ feature 'allocations summary feature' do
       expect(page).to have_css('.pagination ul.links li', count: 7)
     end
 
-    it 'renders allocation offenders at index', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders } do
+    it 'renders allocation offenders at index', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders_feature } do
       signin_user
       visit 'allocations'
 
@@ -24,7 +24,7 @@ feature 'allocations summary feature' do
       expect(page).to have_css('.pagination ul.links li', count: 7)
     end
 
-    it 'displays offenders already allocated', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders } do
+    it 'displays offenders already allocated', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders_feature } do
       signin_user
 
       visit 'allocations/allocated'
@@ -35,7 +35,7 @@ feature 'allocations summary feature' do
       expect(page).to have_css('.pagination ul.links li', count: 7)
     end
 
-    it 'displays offenders pending allocation', :raven_intercept_exception, vcr: { cassette_name: :awaiting_allocation_offenders } do
+    it 'displays offenders pending allocation', :raven_intercept_exception, vcr: { cassette_name: :awaiting_allocation_feature } do
       signin_user
 
       visit 'allocations/awaiting'
@@ -48,7 +48,7 @@ feature 'allocations summary feature' do
   end
 
   describe 'paging' do
-    it 'shows pages for allocation', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders_paged, match_requests_on: [:query] } do
+    it 'shows pages for allocation', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders_paged_feature, match_requests_on: [:query] } do
       signin_user
 
       visit allocations_allocated_path

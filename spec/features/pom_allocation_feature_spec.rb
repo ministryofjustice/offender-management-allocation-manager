@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 feature 'allocate a POM' do
-  it 'shows the allocate a POM page', vcr: { cassette_name: :get_offender_details, match_requests_on: [:query] } do
+  it 'shows the allocate a POM page', vcr: { cassette_name: :pom_allocation_feature, match_requests_on: [:query] } do
     signin_user
     noms_id = 'G4273GI'
 
