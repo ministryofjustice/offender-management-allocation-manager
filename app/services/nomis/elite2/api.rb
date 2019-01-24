@@ -13,6 +13,7 @@ module Nomis
         delegate :get_offence, to: :instance
         delegate :get_offender, to: :instance
         delegate :fetch_nomis_user_details, to: :instance
+        delegate :prisoner_offender_manager_list, to: :instance
       end
 
       def initialize
@@ -26,6 +27,21 @@ module Nomis
 
         ApiResponse.new(api_deserialiser.
           deserialise(Nomis::Elite2::UserDetails, response))
+      end
+
+      def prisoner_offender_manager_list(prison)
+        # Temporarily using keyworker endpoint for now
+        route = "/elite2api/api/key-worker/#{prison}/available"
+
+        response = @e2_client.get(route) { |data|
+          raise Nomis::Client::APIError, 'No data was returned' if data.empty?
+        }
+
+        poms = response.map { |pom|
+          api_deserialiser.deserialise(Nomis::Elite2::PrisonOffenderManager, pom)
+        }
+
+        ApiResponse.new(poms)
       end
 
       # rubocop:disable Metrics/MethodLength
@@ -47,7 +63,7 @@ module Nomis
         }
 
         offenders = data.map { |offender|
-          api_deserialiser.deserialise(Nomis::OffenderShort, offender)
+          api_deserialiser.deserialise(Nomis::Elite2::OffenderShort, offender)
         }
 
         ApiPaginatedResponse.new(page_meta, offenders)
@@ -56,12 +72,11 @@ module Nomis
       def get_offender(offender_no)
         route = "/elite2api/api/prisoners/#{offender_no}"
         response = @e2_client.get(route) { |data|
-          raise Nomis::Client::APIError, 'No data was returned' \
-            if data.empty?
+          raise Nomis::Client::APIError, 'No data was returned' if data.empty?
         }
 
         ApiResponse.new(
-          api_deserialiser.deserialise(Nomis::Offender, response.first)
+          api_deserialiser.deserialise(Nomis::Elite2::Offender, response.first)
         )
       rescue Nomis::Client::APIError => e
         AllocationManager::ExceptionHandler.capture_exception(e)

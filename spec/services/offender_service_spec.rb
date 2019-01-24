@@ -6,7 +6,7 @@ describe OffenderService, vcr: { cassette_name: :get_offenders_for_specific_pris
     expect(offenders.meta).to be_kind_of(PageMeta)
     expect(offenders.data).to be_kind_of(Array)
     expect(offenders.data.length).to eq(10)
-    expect(offenders.data.first).to be_kind_of(Nomis::OffenderShort)
+    expect(offenders.data.first).to be_kind_of(Nomis::Elite2::OffenderShort)
   end
 
   it "get last page of offenders for a specific prison", vcr: { cassette_name: :get_offenders_for_specific_prison_last_page } do
@@ -14,13 +14,13 @@ describe OffenderService, vcr: { cassette_name: :get_offenders_for_specific_pris
     expect(offenders.meta).to be_kind_of(PageMeta)
     expect(offenders.data).to be_kind_of(Array)
     expect(offenders.data.length).to eq(7)
-    expect(offenders.data.first).to be_kind_of(Nomis::OffenderShort)
+    expect(offenders.data.first).to be_kind_of(Nomis::Elite2::OffenderShort)
   end
 
   it "gets a single offender", vcr: { cassette_name: :get_single_offender } do
     noms_id = 'G4273GI'
     offender = OffenderService.new.get_offender(noms_id)
-    expect(offender.data).to be_kind_of(Nomis::Offender)
+    expect(offender.data).to be_kind_of(Nomis::Elite2::Offender)
     expect(offender.data.release_date).to eq Date.new(2020, 2, 7)
     expect(offender.data.tier).to eq 'C'
     expect(offender.data.main_offence).to eq 'Section 18 - wounding with intent to resist / prevent arrest'
