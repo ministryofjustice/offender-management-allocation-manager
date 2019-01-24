@@ -16,3 +16,16 @@ if [[ $? -ne 0 ]]; then
   git-crypt status -e
   exit 1
 fi
+
+
+################################################################################
+# Check for any filenames containing "secret" in the list of files which are not
+# encrypted with git-crypt:
+#
+git-crypt status -u | grep secret
+# grep returns 0 if it finds some matches and 1 if there are no matches:
+if [[ $? -eq 0 ]]; then
+  echo "Found a secrets file which is not encrypted with git-crypt"
+  echo "Did you mean to add this file to the git-crypt config in .gitattributes?"
+  exit 1
+fi
