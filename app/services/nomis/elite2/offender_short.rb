@@ -22,9 +22,8 @@ module Nomis
       attribute :iep_level, :string
       attribute :category_code, :string
       attribute :rnum, :integer
-
-      attr_accessor :release_date
-      attr_accessor :tier
+      attribute :release_date, :date
+      attribute :tier, :string
 
       def full_name
         "#{last_name}, #{first_name}".titleize
