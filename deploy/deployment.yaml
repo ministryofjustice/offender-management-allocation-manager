@@ -52,7 +52,7 @@ spec:
             - name: RAILS_SERVE_STATIC_FILES
               value: "true"
             - name: WEB_CONCURRENCY
-              valueFrom: 
+              valueFrom:
                 secretKeyRef:
                   name: allocation-manager-secrets
                   key: rails_web_concurrency
