@@ -4,15 +4,13 @@ references:
 
   ruby_image: &ruby_image
     image: circleci/ruby:2.5.3-node-browsers
-    environment:
-      RAILS_ENV: test
-      RACK_ENV: test
+
+  github_team_name_slug: &github_team_name_slug
+    GITHUB_TEAM_NAME_SLUG: offender-management
 
   deploy_container_config: &deploy_container_config
     docker:
       - image: ${ECR_ENDPOINT}/cloud-platform/tools:circleci
-        environment:
-          GITHUB_TEAM_NAME_SLUG: offender-management
 
 
   install_gpg: &install_gpg
@@ -49,7 +47,6 @@ references:
       command: |
         sudo apt-get --assume-yes install python3-pip
         sudo pip3 install awscli
-        $(aws ecr get-login --region eu-west-1 --no-include-email)
 
   build_docker_image: &build_docker_image
     run:
@@ -77,7 +74,7 @@ references:
           docker push "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:latest"
         fi
       environment:
-        GITHUB_TEAM_NAME_SLUG: offender-management
+        <<: *github_team_name_slug
         REPONAME: offender-management-allocation-manager
 
 version: 2
@@ -90,13 +87,13 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/repo
+      - run:
+          name: Which bundler?
+          command: bundle -v
       - restore_cache:
           keys:
             - allocation-manager-v1-{{ checksum "Gemfile.lock" }}
             - allocation-manager-v1-
-      - run:
-          name: Which bundler?
-          command: bundle -v
       - run:
           name: Update npm
           command: 'sudo npm install -g npm@latest'
@@ -137,6 +134,8 @@ jobs:
           environment:
             ALLOCATION_API_HOST: https://allocation-api-staging.apps.cloud-platform-live-0.k8s.integration.dsd.io
             ALLOCATION_MANAGER_HOST: https://allocation-manager-staging.apps.cloud-platform-live-0.k8s.integration.dsd.io
+            RAILS_ENV: test
+            RACK_ENV: test
       - store_test_results:
           path: coverage
       - store_artifacts:
@@ -151,9 +150,9 @@ jobs:
       - attach_workspace:
           at: ~/repo
       - run: bundle --path vendor/bundle
-      - run: bundle exec brakeman -o brakeman.html
+      - run: bundle exec brakeman -o ~/test-results/brakeman/brakeman.json -o ~/test-results/brakeman/brakeman.html
       - store_artifacts:
-          path: brakeman.html
+          path: ~/test-results
 
   rubocop:
     <<: *defaults
@@ -166,7 +165,7 @@ jobs:
       - run: bundle --path vendor/bundle
       - run: bundle exec rubocop
 
-  build_push_docker:
+  build_and_push_docker_image:
     <<: *defaults
     docker:
       - <<: *ruby_image
@@ -184,14 +183,11 @@ jobs:
     <<: *deploy_container_config
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
       - attach_workspace:
           at: ~/repo
       - run:
           name: Kubectl deployment staging setup
           command: |
-            $(aws ecr get-login --region eu-west-1 --no-include-email)
             setup-kube-auth
             kubectl config use-context staging
       - *install_gpg
@@ -209,6 +205,8 @@ jobs:
               -f ./deploy/network-policy.yaml \
               -f ./deploy/allocation-manager-secrets.yaml \
               -f ./deploy/deployment.yaml
+          environment:
+            <<: *github_team_name_slug
 
 workflows:
   version: 2
@@ -224,7 +222,7 @@ workflows:
       - rubocop:
           requires:
             - install_dependencies
-      - build_push_docker:
+      - build_and_push_docker_image:
           requires:
             - test
             - security-static-analysis
@@ -234,7 +232,7 @@ workflows:
               only: master
       - deploy_staging:
           requires:
-            - build_push_docker
+            - build_and_push_docker_image
           filters:
             branches:
               only: master
