@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe Allocation::Client do
   describe 'with a valid request' do
-    it 'sets the Authorization header', vcr: { cassette_name: 'allocation_client_auth_header' } do
+    it 'sets the Authorization header', vcr: { cassette_name: :allocation_client_spec } do
       api_host = Rails.configuration.allocation_api_host
       route = '/status'
       client = described_class.new(api_host)
