@@ -29,7 +29,7 @@ describe Nomis::Elite2::Api do
 
   describe 'Single offender' do
     it "can get a single offender's details",
-       vcr: { cassette_name: :elite2_api_single_offender_spec } do
+      vcr: { cassette_name: :elite2_api_single_offender_spec } do
       noms_id = 'G2911GD'
 
       response = described_class.get_offender(noms_id)
