@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 feature 'get status' do
-  it 'returns a status message', vcr: { cassette_name: :get_status_feature } do
+  it 'returns a status message', vcr: { cassette_name: :status_feature } do
     signin_user
 
     visit '/status'

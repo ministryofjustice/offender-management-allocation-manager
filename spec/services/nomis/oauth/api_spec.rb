@@ -8,7 +8,7 @@ describe Nomis::Oauth::Api do
     Singleton.__init__(described_class)
   end
 
-  it 'fetches an auth token', vcr: { cassette_name: :get_token } do
+  it 'fetches an auth token', vcr: { cassette_name: :nomis_oauth_api_auth_token_spec } do
     token = described_class.fetch_new_auth_token
 
     expect(token).to be_kind_of(Nomis::Oauth::Token)

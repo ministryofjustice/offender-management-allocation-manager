@@ -4,6 +4,8 @@ metadata:
   name: allocation-manager
   labels:
     app: allocation-manager
+  annotations:
+    kubernetes.io/change-cause: "<to be filled in deploy job command>"
 spec:
   replicas: 3
   revisionHistoryLimit: 1
@@ -50,7 +52,7 @@ spec:
             - name: RAILS_SERVE_STATIC_FILES
               value: "true"
             - name: WEB_CONCURRENCY
-              valueFrom: 
+              valueFrom:
                 secretKeyRef:
                   name: allocation-manager-secrets
                   key: rails_web_concurrency
