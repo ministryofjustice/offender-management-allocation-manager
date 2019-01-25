@@ -196,15 +196,15 @@ jobs:
       - deploy:
           name: Deploy to staging
           command: |
-            kubectl set image -f deploy/deployment.yaml allocation-manager=${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_SHA1} --local -o yaml \
+            kubectl set image -f deploy/staging/deployment.yaml allocation-manager=${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_SHA1} --local -o yaml \
             | kubectl annotate -f - kubernetes.io/change-cause="$CIRCLE_BUILD_URL" --local -o yaml \
             | kubectl apply --record=false \
               -f - \
-              -f ./deploy/ingress.yaml \
-              -f ./deploy/service.yaml \
-              -f ./deploy/service-monitor.yaml \
-              -f ./deploy/network-policy.yaml \
-              -f ./deploy/allocation-manager-secrets.yaml \
+              -f ./deploy/staging/ingress.yaml \
+              -f ./deploy/staging/service.yaml \
+              -f ./deploy/staging/service-monitor.yaml \
+              -f ./deploy/staging/network-policy.yaml \
+              -f ./deploy/staging/allocation-manager-secrets.yaml \
           environment:
             <<: *github_team_name_slug
 
