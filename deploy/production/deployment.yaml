@@ -1,0 +1,108 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: allocation-manager
+  labels:
+    app: allocation-manager
+  annotations:
+    kubernetes.io/change-cause: "<to be filled in deploy job command>"
+spec:
+  replicas: 3
+  revisionHistoryLimit: 1
+  minReadySeconds: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 2
+  selector:
+    matchLabels:
+      app: allocation-manager
+  template:
+    metadata:
+      labels:
+        app: allocation-manager
+    spec:
+      containers:
+        - name: allocation-manager
+          image: 926803513772.dkr.ecr.eu-west-1.amazonaws.com/offender-management/offender-management-allocation-manager:latest
+          imagePullPolicy: Always
+          command: ['sh', '-c', "bundle exec puma -p 3000 -C ./config/puma_prod.rb --pidfile /tmp/server.pid"]
+          ports:
+            - containerPort: 3000
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 60
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 60
+          env:
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: secret_key_base
+            - name: RAILS_ENV
+              value: "production"
+            - name: RAILS_SERVE_STATIC_FILES
+              value: "true"
+            - name: WEB_CONCURRENCY
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: rails_web_concurrency
+            - name: NOMIS_OAUTH_PUBLIC_KEY
+              value: "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUFwSkdtYWp6SW9POVdSY2owM2VTbQpFeWJTYnNJaEdkNkRWVDRxUWFSRTZwN3RIN1ppSklvRWtzczRkOFphMGhuYWJwa0JqWTYwS3NnMW5teXpoZVlSCithWXVtc0gxbm1JcmJ4ZCtqV043T3A2V1pteWRBU3JMek1XWVdBYlNHOHBXMXkxY1RwdkRaMTlBSGJTYTRRL2UKSnRlcDFscCsyMnVHMW5kTVRwclRkNjRLTkcyZnRwcmV3aFExeE5xdmtUWjZoQnVRRVJKMzFhUXBkRThNQTFxSwpDWnI3VDJxTk1BTWNkTlpia0FqRjVLOXE0alZ0QkY3WXFPeXJ0T1JmTldqYUJoWHA5TlN0YWJCTXBURTdQNm8vClhJaU9rcmltNjlzaG1OdDhVRlU3WUlJN0ZvejgzM29HZnk2dmtDRjRxcGpIZ0RNc21STjc1UXRrRmRtaU8xaDgKcHdJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg=="
+            - name: ALLOCATION_MANAGER_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: allocation_manager_host
+            - name: ALLOCATION_API_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: allocation_api_host
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: sentry_dsn
+            - name: NOMIS_OAUTH_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: nomis_oauth_client_id
+            - name: NOMIS_OAUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: nomis_oauth_client_secret
+            - name: NOMIS_OAUTH_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: nomis_oauth_host
+        - name: allocation-manager-metrics
+          image: 926803513772.dkr.ecr.eu-west-1.amazonaws.com/offender-management/offender-management-allocation-manager:latest
+          imagePullPolicy: Always
+          command: ['sh', '-c', "bundle exec prometheus_exporter"]
+          ports:
+            - containerPort: 9394
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 9394
+            initialDelaySeconds: 10
+            periodSeconds: 60
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 9394
+            initialDelaySeconds: 10
+            periodSeconds: 60

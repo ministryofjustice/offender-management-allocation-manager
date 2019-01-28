@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: allocation-manager
+  namespace: offender-management-production
+spec:
+  selector:
+    matchLabels:
+      app: allocation-manager
+  namespaceSelector:
+    matchNames:
+    - offender-management-production
+  endpoints:
+  - port: metrics
+    interval: 15s
