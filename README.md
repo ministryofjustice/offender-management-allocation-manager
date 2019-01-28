@@ -4,12 +4,17 @@
 
 ## Setup
 
-Install the git pre-commit hook before you start working on this repository.
-From the root of the repo:
+Install the git pre-commit hook before you start working on this repository so
+that we're all using some checks to help us avoid committing unencrypted
+secrets. From the root of the repo:
 
 ```
 ln -s ../../config/git-hooks/pre-commit.sh .git/hooks/pre-commit
 ```
+
+To test that the pre-commit hook is set up correctly, try removing the `diff`
+attribute from a line in a `.gitattributes` file and then committing something -
+the hook should prevent you from committing.
 
 ### Start the application
 
