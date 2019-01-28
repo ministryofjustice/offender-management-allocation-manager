@@ -1,1 +1,1 @@
-deploy/*secrets.yaml filter=git-crypt diff=gitcrypt
+deploy/*secrets.yaml filter=git-crypt diff=git-crypt
