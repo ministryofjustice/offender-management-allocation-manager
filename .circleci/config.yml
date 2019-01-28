@@ -265,10 +265,17 @@ workflows:
           filters:
             branches:
               only: master
-      - deploy_production:
+      - deploy_production_approval:
+          type: approval
           requires:
             - build_and_push_docker_image
             - deploy_staging
+          filters:
+            branches:
+              only: master
+      - deploy_production:
+          requires:
+            - deploy_production_approval
           filters:
             branches:
               only: master
