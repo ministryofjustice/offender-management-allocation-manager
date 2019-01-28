@@ -9,13 +9,13 @@ module Nomis
       attribute :last_name, :string
       attribute :number_allocated, :string
 
-      attr_accessor :tier_a,
-        :tier_b,
-        :tier_c,
-        :tier_d,
-        :status,
-        :total_cases,
-        :working_pattern
+      attribute :tier_a, :integer
+      attribute :tier_b, :integer
+      attribute :tier_c, :integer
+      attribute :tier_d, :integer
+      attribute :total_cases, :integer
+      attribute :status, :string
+      attribute :working_pattern, :string
 
       def full_name
         "#{last_name}, #{first_name}".titleize
