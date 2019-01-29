@@ -39,20 +39,20 @@ describe Allocation::Api do
     end
 
     it 'allocates a POM to an Offender' do
-      #TODO - use real api call when ready
+      # TODO: - use real api call when ready
       allow_any_instance_of(Allocation::Client).to receive(:post).and_return(
         status: {
           code: 200
         }
       )
 
-      params =   {
+      params = {
         'staff_no' => '1234567',
         'offender_no' => 'A1234AB',
         'offender_id' => '65677888',
         'prison' => 'Leeds',
         'reason' => 'Why not?',
-        'notes' =>'Blah',
+        'notes' => 'Blah',
         'email' => 'pom@pompom.com'
       }
 

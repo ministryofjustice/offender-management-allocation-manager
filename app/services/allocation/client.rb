@@ -9,8 +9,8 @@ module Allocation
       @host = host
       @connection = Faraday.new do |faraday|
         faraday.request :retry, max: 3, interval: 0.05,
-                        interval_randomness: 0.5, backoff_factor: 2,
-                        exceptions: [Faraday::ClientError, 'Timeout::Error']
+                                interval_randomness: 0.5, backoff_factor: 2,
+                                exceptions: [Faraday::ClientError, 'Timeout::Error']
 
         faraday.options.params_encoder = Faraday::FlatParamsEncoder
         faraday.use Faraday::Response::RaiseError
@@ -26,14 +26,14 @@ module Allocation
       request(:post, route, params)
     end
 
-    private
+  private
 
     def request(method, route, params: {})
-      response = @connection.send(method) do |req|
+      response = @connection.send(method) { |req|
         req.url(@host + route)
         req.headers['Authorization'] = "Bearer #{token.access_token}"
         req.params.update(params)
-      end
+      }
 
       JSON.parse(response.body)
     rescue Faraday::ClientError => e

@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 describe Allocation::Client do
-
   let(:api_host) { Rails.configuration.nomis_oauth_host }
   let(:client) { described_class.new(api_host) }
   let(:token_service) { Nomis::Oauth::TokenService }
@@ -43,7 +42,7 @@ describe Allocation::Client do
         'offender_id' => '65677888',
         'prison' => 'Leeds',
         'reason' => 'Why not?',
-        'notes' =>'Blah',
+        'notes' => 'Blah',
         'email' => 'pom@pompom.com'
       }
     }
