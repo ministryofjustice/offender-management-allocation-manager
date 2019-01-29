@@ -22,17 +22,18 @@ module Allocation
       request(:get, route)
     end
 
-    def post(route, params)
-      request(:post, route, params)
+    def post(route, body)
+      request(:post, route, body)
     end
 
   private
 
-    def request(method, route, params: {})
+    def request(method, route, body: {})
       response = @connection.send(method) { |req|
         req.url(@host + route)
         req.headers['Authorization'] = "Bearer #{token.access_token}"
-        req.params.update(params)
+        req.headers['Content-Type'] = 'application/json'
+        req.body = body
       }
 
       JSON.parse(response.body)
