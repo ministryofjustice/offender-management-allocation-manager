@@ -34,20 +34,20 @@ describe Nomis::Client do
     end
     let(:offender_id) { '12344556' }
     let(:offender_no) { 'A1234AB' }
-    let(:path)        {  "/elite2api/api/prisoners/#{offender_no}" }
+    let(:route)        {  "/elite2api/api/prisoners/#{offender_no}" }
 
     before do
       WebMock.stub_request(:get, /\w/).to_raise(error)
     end
 
     it 'raises an APIError', :raven_intercept_exception do
-      expect { client.get(path) }.
+      expect { client.get(route) }.
         to raise_error(Nomis::Client::APIError, 'Unexpected status 401')
     end
 
     it 'sends the error to sentry' do
       expect(AllocationManager::ExceptionHandler).to receive(:capture_exception).with(error)
-      expect { client.get(path) }.to raise_error(Nomis::Client::APIError)
+      expect { client.get(route) }.to raise_error(Nomis::Client::APIError)
     end
   end
 
@@ -56,20 +56,20 @@ describe Nomis::Client do
       Faraday::ClientError.new('error', status: 500)
     end
     let(:offender_no) { 'A1234AB' }
-    let(:path)        { "/elite2api/api/prisoners/#{offender_no}" }
+    let(:route)        { "/elite2api/api/prisoners/#{offender_no}" }
 
     before do
       WebMock.stub_request(:get, /\w/).to_raise(error)
     end
 
     it 'raises an APIError', :raven_intercept_exception do
-      expect { client.get(path) }.
+      expect { client.get(route) }.
         to raise_error(Nomis::Client::APIError, 'Unexpected status 500')
     end
 
     it 'sends the error to sentry' do
       expect(AllocationManager::ExceptionHandler).to receive(:capture_exception).with(error)
-      expect { client.get(path) }.to raise_error(Nomis::Client::APIError)
+      expect { client.get(route) }.to raise_error(Nomis::Client::APIError)
     end
   end
 end
