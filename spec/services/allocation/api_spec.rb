@@ -46,7 +46,7 @@ describe Allocation::Api do
         }
       )
 
-      params = {
+      body = {
         'staff_no' => '1234567',
         'offender_no' => 'A1234AB',
         'offender_id' => '65677888',
@@ -56,7 +56,7 @@ describe Allocation::Api do
         'email' => 'pom@pompom.com'
       }
 
-      response = described_class.allocate(params)
+      response = described_class.allocate(body)
 
       expect(response[:status][:code]).to eq(200)
     end

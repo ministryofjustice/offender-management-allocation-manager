@@ -24,9 +24,9 @@ module Allocation
       end
     end
 
-    def allocate(allocation_params)
+    def allocate(body)
       route = '/allocate'
-      @allocation_api_client.post(route, params: allocation_params)
+      @allocation_api_client.post(route, body: body)
     end
   end
 end

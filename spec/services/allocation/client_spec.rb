@@ -35,7 +35,7 @@ describe Allocation::Client do
       Faraday::ClientError.new('error', status: 500)
     end
     let(:route)   { "/allocate" }
-    let(:params) {
+    let(:body) {
       {
         'staff_no' => '1234567',
         'offender_no' => 'A1234AB',
@@ -52,13 +52,13 @@ describe Allocation::Client do
     end
 
     it 'raises an APIError', :raven_intercept_exception do
-      expect { client.post(route, params: params) }.
+      expect { client.post(route, body: body) }.
         to raise_error(Allocation::Client::APIError, 'Unexpected status 500')
     end
 
     it 'sends the error to sentry' do
       expect(AllocationManager::ExceptionHandler).to receive(:capture_exception).with(error)
-      expect { client.post(route, params: params) }.to raise_error(Allocation::Client::APIError)
+      expect { client.post(route, body: body) }.to raise_error(Allocation::Client::APIError)
     end
   end
 end
