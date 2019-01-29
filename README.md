@@ -6,7 +6,7 @@
 
 Install the git pre-commit hook before you start working on this repository so
 that we're all using some checks to help us avoid committing unencrypted
-secrets. From the root of the repo:
+secrets or unlinted code. From the root of the repo:
 
 ```
 ln -s ../../config/git-hooks/pre-commit.sh .git/hooks/pre-commit
