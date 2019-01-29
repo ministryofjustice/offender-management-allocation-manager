@@ -34,7 +34,7 @@ describe Allocation::Client do
     let(:error) do
       Faraday::ClientError.new('error', status: 500)
     end
-    let(:route)   { "/allocate" }
+    let(:route)   { "/allocation" }
     let(:body) {
       {
         'staff_no' => '1234567',
