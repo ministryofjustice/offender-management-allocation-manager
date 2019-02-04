@@ -53,9 +53,9 @@ module Nomis
         page_meta = nil
 
         hdrs = paging_headers(page_size, page_offset)
+
         data = @e2_client.get(route, extra_headers: hdrs) { |json, response|
           total_records = response.headers['Total-Records'].to_i
-
           records_shown = json.length
           page_meta = make_page_meta(
             page, page_size, total_records, records_shown
@@ -97,7 +97,6 @@ module Nomis
         # last item. This appears to be a bug in faraday because the Elite2 API works
         # fine with the same URL when called via Postman.
         parameters = { 'offenderNo' => offender_ids + [''] }
-
         data = @e2_client.get(route, queryparams: parameters)
 
         results = data.each_with_object({}) { |record, hash|
@@ -113,7 +112,7 @@ module Nomis
 
       def paging_headers(page_size, page_offset)
         {
-          'Page-Size' => page_size.to_s,
+          'Page-Limit' => page_size.to_s,
           'Page-Offset' => page_offset.to_s
         }
       end

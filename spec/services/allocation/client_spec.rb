@@ -41,7 +41,7 @@ describe Allocation::Client do
         'offender_no' => 'A1234AB',
         'offender_id' => '65677888',
         'prison' => 'Leeds',
-        'reason' => 'Why not?',
+        'override_reason' => 'Why not?',
         'notes' => 'Blah',
         'email' => 'pom@pompom.com'
       }
