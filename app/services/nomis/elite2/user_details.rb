@@ -11,6 +11,8 @@ module Nomis
       attribute :locked_flag, :string
       attribute :expired_flag, :string
       attribute :thumbnail_id, :string
+      attribute :account_status, :string
+      attribute :active, :boolean
     end
   end
 end
