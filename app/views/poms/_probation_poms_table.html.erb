@@ -1,0 +1,40 @@
+<table class="govuk-table responsive tablesorter">
+  <thead class="govuk-table__head">
+  <tr class="govuk-table__row">
+    <th class="govuk-table__header" scope="col"><a
+      class='table-sorter__link' href='#'>POM name</a></th>
+    <th class="govuk-table__header" scope="col">
+      <a class="table-sorter__link" href="#">Tier A cases</a></th>
+    <th class="govuk-table__header" scope="col">
+      <a class="table-sorter__link" href="#">Tier B cases</a></th>
+    <th class="govuk-table__header" scope="col">
+      <a class="table-sorter__link" href="#">Tier C cases</a></th>
+    <th class="govuk-table__header" scope="col">
+      <a class="table-sorter__link" href="#">Tier D cases</a></th>
+    <th class="govuk-table__header" scope="col">
+      <a class="table-sorter__link" href="#">Total</a></th>
+    <th class="govuk-table__header header-width__8" scope="col">
+      <a
+        class='table-sorter__link' href='#'>Working pattern</a></th>
+    <th class="govuk-table__header" scope="col"><a
+      class='table-sorter__link' href='#'>Status</a></th>
+    <th class="govuk-table__header sorter-false" scope="col">Action</th>
+  </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+  <% @poms.select{ |pom| pom.position_description.include?('Probation Officer')}.each do |pom| %>
+    <tr class="govuk-table__row">
+      <td aria-label="POM name" class="govuk-table__cell "><%= pom.full_name %></td>
+      <td aria-label="Tier A cases" class="govuk-table__cell "><%= pom.tier_a %></td>
+      <td aria-label="Tier B cases" class="govuk-table__cell "><%= pom.tier_b %></td>
+      <td aria-label="Tier C cases" class="govuk-table__cell "><%= pom.tier_c %></td>
+      <td aria-label="Tier D cases" class="govuk-table__cell "><%= pom.tier_d %></td>
+      <td aria-label="Total" class="govuk-table__cell "><%= pom.total_cases %></td>
+      <td aria-label="Working pattern" class="govuk-table__cell"><%= pom.working_pattern %></td>
+      <td aria-label="Status" class="govuk-table__cell "><%= pom.status %></td>
+      <td aria-label="Action" class="govuk-table__cell "><a
+        href="<%= poms_show_path(id: 1) %>">View</a></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
