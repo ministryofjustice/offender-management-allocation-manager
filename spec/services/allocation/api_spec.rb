@@ -51,7 +51,7 @@ describe Allocation::Api do
         'offender_no' => 'A1234AB',
         'offender_id' => '65677888',
         'prison' => 'Leeds',
-        'reason' => 'Why not?',
+        'override_reason' => 'Why not?',
         'notes' => 'Blah',
         'email' => 'pom@pompom.com'
       }
@@ -59,6 +59,15 @@ describe Allocation::Api do
       response = described_class.allocate(body)
 
       expect(response[:status][:code]).to eq(200)
+    end
+
+    it 'fetches active allocations for offenders', vcr: { cassette_name: :allocation_api_spec } do
+      # TODO: - Test output of API when we have seed data
+      body = ['A1A']
+      response = described_class.get_active_allocations(body)
+
+      expect(response['status']).to eq('ok')
+      expect(response['data']).to eq({})
     end
   end
 end

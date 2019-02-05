@@ -5,6 +5,7 @@ module Allocation
     class << self
       delegate :status, to: :instance
       delegate :get_allocation_data, to: :instance
+      delegate :get_active_allocations, to: :instance
       delegate :allocate, to: :instance
     end
 
@@ -22,6 +23,11 @@ module Allocation
       staff_ids.each_with_object({}) do |id, hash|
         hash[id] = FakeAllocationRecord.generate(id)
       end
+    end
+
+    def get_active_allocations(offender_ids)
+      route = '/allocation/active'
+      @allocation_api_client.post(route, offender_ids)
     end
 
     def allocate(body)
