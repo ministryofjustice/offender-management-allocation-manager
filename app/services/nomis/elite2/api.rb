@@ -30,8 +30,7 @@ module Nomis
       end
 
       def prisoner_offender_manager_list(prison)
-        # Temporarily using keyworker endpoint for now
-        route = "/elite2api/api/key-worker/#{prison}/available"
+        route = "/elite2api/api/staff/roles/#{prison}/role/POM"
 
         response = @e2_client.get(route) { |data|
           raise Nomis::Client::APIError, 'No data was returned' if data.empty?

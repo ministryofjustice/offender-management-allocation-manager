@@ -22,7 +22,7 @@
   </tr>
   </thead>
   <tbody class="govuk-table__body">
-  <% @poms.each do |pom| %>
+  <% @poms.select{ |pom| pom.position_description.include?('Prison Officer')}.each do |pom| %>
     <tr class="govuk-table__row">
       <td aria-label="POM name" class="govuk-table__cell "><%= pom.full_name %></td>
       <td aria-label="Tier A cases" class="govuk-table__cell "><%= pom.tier_a %></td>
