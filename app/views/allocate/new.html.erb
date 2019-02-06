@@ -1,0 +1,9 @@
+<div>
+    <%= form_for :allocation, url:"#{allocate_create_path(@prisoner.offender_no, @pom.staff_id)}" do |form| %>
+      <h1 class="govuk-heading-xl govuk-!-margin-top-4">Confirm allocation</h1>
+      <p class="govuk-body">You are allocating <%= @prisoner.full_name %> to <%= @pom.full_name %></p>
+      <p class="govuk-body">We'll be using the email address below to let them know about their new allocation</p>
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24 govuk-!-margin-top-6"> POM EMAIL ADDRESS </p>
+      <%= form.submit "Complete allocation", role: "button", draggable: "false", class: "govuk-button" %>
+    <% end %>
+</div>
