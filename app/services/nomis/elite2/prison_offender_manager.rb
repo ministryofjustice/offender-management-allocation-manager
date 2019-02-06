@@ -25,6 +25,7 @@ module Nomis
       attribute :total_cases, :integer
       attribute :status, :string
       attribute :working_pattern, :string
+      attribute :number_allocated, :string
 
       def full_name
         "#{last_name}, #{first_name}".titleize

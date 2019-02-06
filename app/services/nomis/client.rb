@@ -31,19 +31,36 @@ module Nomis
       data
     end
 
+    def post(route, body)
+      response = request(
+        :post, route, body: body
+      )
+      data = JSON.parse(response.body)
+
+      if block_given?
+        yield data, response
+      end
+
+      data
+    end
+
   private
 
-    def request(method, route, queryparams: {}, extra_headers: {})
+    # rubocop:disable Metrics/MethodLength
+    def request(method, route, body: nil, queryparams: {}, extra_headers: {})
       @connection.send(method) do |req|
         req.url(@host + route)
+        req.headers['Content-Type'] = 'application/json' if method == :post
         req.headers['Authorization'] = "Bearer #{token.access_token}"
         req.headers.merge!(extra_headers)
         req.params.update(queryparams)
+        req.body = body.to_json if body.present? && method == :post
       end
     rescue Faraday::ResourceNotFound, Faraday::ClientError => e
       AllocationManager::ExceptionHandler.capture_exception(e)
       raise APIError, "Unexpected status #{e.response[:status]}"
     end
+    # rubocop:enable Metrics/MethodLength
 
     def token
       Nomis::Oauth::TokenService.valid_token
