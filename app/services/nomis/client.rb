@@ -33,18 +33,18 @@ module Nomis
 
     def post(route, body)
       response = request(
-        :post, route, body: body
+        :post, route, body: body, extra_headers: {
+          'Content-Type' => 'application/json'
+        }
       )
       JSON.parse(response.body)
     end
 
   private
 
-    # rubocop:disable Metrics/MethodLength
     def request(method, route, body: nil, queryparams: {}, extra_headers: {})
       @connection.send(method) do |req|
         req.url(@host + route)
-        req.headers['Content-Type'] = 'application/json' if method == :post
         req.headers['Authorization'] = "Bearer #{token.access_token}"
         req.headers.merge!(extra_headers)
         req.params.update(queryparams)
@@ -54,7 +54,6 @@ module Nomis
       AllocationManager::ExceptionHandler.capture_exception(e)
       raise APIError, "Unexpected status #{e.response[:status]}"
     end
-    # rubocop:enable Metrics/MethodLength
 
     def token
       Nomis::Oauth::TokenService.valid_token
