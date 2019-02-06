@@ -1,12 +1,12 @@
 <h4 class="govuk-heading-m">
-Recommendation:
+Recommendation: <%= @recommended_pom %> POMs
 </h4>
 
 <p>Based on the prisoner's tiering calculation.</p>
 
 <table class="govuk-table responsive">
   <thead class="govuk-table__head">
-    <h2 class="govuk-heading-s">Probation POMs</h2>
+    <h2 class="govuk-heading-s"><%= @recommended_pom %> POMs</h2>
     <tr class="govuk-table__row">
       <th class="govuk-table__header" scope="col">Name</th>
       <th class="govuk-table__header" scope="col">Previous allocation</th>
@@ -20,7 +20,7 @@ Recommendation:
     </tr>
   </thead>
   <tbody class="govuk-table__body">
-  <% @poms.select{ |pom| pom.position_description.include?('Probation Officer')}.each do |pom| %>
+  <% @recommended_poms.each do |pom| %>
     <tr class="govuk-table__row">
       <td aria-label="POM name" class="govuk-table__cell "><%= pom.full_name %></td>
       <td aria-label="Previous allocation" class="govuk-table__cell">-</td>
@@ -50,7 +50,11 @@ Recommendation:
 <details class="govuk-details">
   <summary class="govuk-details__summary">
     <span class="govuk-details__summary-text">
-      Prison POMs
+      <% if @prisoner.current_responsibility == 'Probation' %>
+        Prison POMs
+      <% else %>
+        Probation POMs
+      <% end %>
     </span>
   </summary>
   <div class="govuk-details__text">
@@ -71,7 +75,7 @@ Recommendation:
         </tr>
       </thead>
       <tbody class="govuk-table__body">
-        <% @poms.select{ |pom| pom.position_description.include?('Prison Officer')}.each do |pom| %>
+        <% @not_recommended_poms.each do |pom| %>
           <tr class="govuk-table__row">
             <td aria-label="POM name" class="govuk-table__cell "><%= pom.full_name %></td>
             <td aria-label="Previous allocation" class="govuk-table__cell">-</td>
