@@ -27,6 +27,16 @@ describe Nomis::Elite2::Api do
     end
   end
 
+  describe 'Bulk release dates' do
+    it "can get a single release date",
+      vcr: { cassette_name: :elite2_api_release_date_spec } do
+      noms_id = ['G2911GD']
+
+      response = described_class.get_bulk_release_dates(noms_id)
+      expect(response.data).not_to be_nil
+    end
+  end
+
   describe 'Single offender' do
     it "can get a single offender's details",
       vcr: { cassette_name: :elite2_api_single_offender_spec } do

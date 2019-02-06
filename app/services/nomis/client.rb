@@ -35,13 +35,7 @@ module Nomis
       response = request(
         :post, route, body: body
       )
-      data = JSON.parse(response.body)
-
-      if block_given?
-        yield data, response
-      end
-
-      data
+      JSON.parse(response.body)
     end
 
   private
