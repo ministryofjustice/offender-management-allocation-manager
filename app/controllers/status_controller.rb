@@ -1,6 +1,16 @@
 class StatusController < ApplicationController
-  before_action :authenticate_user
   def index
-    @status = Allocation::Api.status
+    render(
+      json: {
+        'status' => 'ok',
+        'postgresVersion' => postgres_version
+      }
+    )
+  end
+
+private
+
+  def postgres_version
+    @postgres_version ||= ActiveRecord::Base.connection.select_value('SELECT version()')
   end
 end
