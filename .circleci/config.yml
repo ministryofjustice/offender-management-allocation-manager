@@ -2,9 +2,6 @@ references:
   defaults: &defaults
     working_directory: ~/repo
 
-  ruby_image: &ruby_image
-    image: circleci/ruby:2.5.3-node-browsers
-
   github_team_name_slug: &github_team_name_slug
     GITHUB_TEAM_NAME_SLUG: offender-management
 
@@ -12,6 +9,19 @@ references:
     docker:
       - image: ${ECR_ENDPOINT}/cloud-platform/tools:circleci
 
+  test_container_config: &test_container_config
+    docker:
+      - image: circleci/ruby:2.5.3
+        environment:
+          RAILS_ENV: test
+          PGHOST: 127.0.0.1
+          PGUSER: ubuntu
+          RACK_ENV: test
+      - image: circleci/postgres:10.5-alpine
+        environment:
+          POSTGRES_USER: ubuntu
+          POSTGRES_PASSWORD: ""
+          POSTGRES_DB: offender-management-allocation-manager_test
 
   install_gpg: &install_gpg
     run:
@@ -81,8 +91,7 @@ version: 2
 jobs:
   install_dependencies:
     <<: *defaults
-    docker:
-      - <<: *ruby_image
+    <<: *test_container_config
     steps:
       - checkout
       - attach_workspace:
@@ -113,13 +122,16 @@ jobs:
 
   test:
     <<: *defaults
-    docker:
-      - <<: *ruby_image
+    <<: *test_container_config
     steps:
       - checkout
       - attach_workspace:
           at: ~/repo
       - run: bundle --path vendor/bundle
+      - run:
+          name: Migrate database
+          command: |
+            bundle exec rake db:create db:schema:load --trace db:migrate
       - run:
           name: Download Code Climate
           command: |
@@ -143,8 +155,7 @@ jobs:
 
   security-static-analysis:
     <<: *defaults
-    docker:
-      - <<: *ruby_image
+    <<: *test_container_config
     steps:
       - checkout
       - attach_workspace:
@@ -156,8 +167,7 @@ jobs:
 
   rubocop:
     <<: *defaults
-    docker:
-      - <<: *ruby_image
+    <<: *test_container_config
     steps:
       - checkout
       - attach_workspace:
@@ -167,8 +177,7 @@ jobs:
 
   build_and_push_docker_image:
     <<: *defaults
-    docker:
-      - <<: *ruby_image
+    <<: *test_container_config
     steps:
       - checkout
       - attach_workspace:
