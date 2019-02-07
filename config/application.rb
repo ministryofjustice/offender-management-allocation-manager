@@ -16,11 +16,6 @@ module OffenderManagementAllocationClient
   class Application < Rails::Application
     config.load_defaults 5.2
     config.generators.system_tests = nil
-
-    config.allocation_api_host = ENV.fetch(
-      'ALLOCATION_API_HOST',
-      'http://localhost:8000'
-    )
     config.allocation_manager_host = ENV.fetch(
       'ALLOCATION_MANAGER_HOST',
       'http://localhost:3000'

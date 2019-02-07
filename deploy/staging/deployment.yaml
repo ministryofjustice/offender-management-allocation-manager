@@ -83,11 +83,6 @@ spec:
                 secretKeyRef:
                   name: allocation-manager-secrets
                   key: allocation_manager_host
-            - name: ALLOCATION_API_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: allocation-manager-secrets
-                  key: allocation_api_host
             - name: SENTRY_DSN
               valueFrom:
                 secretKeyRef:
