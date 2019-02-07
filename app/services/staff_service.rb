@@ -4,7 +4,7 @@ class StaffService
     poms = Nomis::Elite2::Api.prisoner_offender_manager_list(prison)
     staff_ids = poms.data.map(&:staff_id)
 
-    allocations = Allocation::Api.get_allocation_data(staff_ids)
+    allocations = AllocationService::Api.get_allocation_data(staff_ids)
 
     poms.data.each do |pom|
       pom.tier_a = allocations[pom.staff_id].tier_a

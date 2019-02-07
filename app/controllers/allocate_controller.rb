@@ -21,7 +21,7 @@ class AllocateController < ApplicationController
   end
 
   def create
-    Allocation::Api.allocate(
+    AllocationService::Api.allocate(
       nomis_staff_id: nomis_staff_id.to_i,
       nomis_offender_id: nomis_offender_id,
       created_by: current_user,
