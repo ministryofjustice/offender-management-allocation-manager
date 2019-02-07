@@ -32,27 +32,15 @@ module Nomis
 
       def add_detail(pom_detail)
         allocations = pom_detail.allocations.where(active: true)
-        allocation_counts = get_allocation_counts(allocations)
-        self.tier_a = allocation_counts['A']
-        self.tier_b = allocation_counts['B']
-        self.tier_c = allocation_counts['C']
-        self.tier_d = allocation_counts['D']
+        allocation_counts = allocations.group_by(&:allocated_at_tier)
+
+        self.tier_a = allocation_counts.fetch('A', []).count
+        self.tier_b = allocation_counts.fetch('B', []).count
+        self.tier_c = allocation_counts.fetch('C', []).count
+        self.tier_d = allocation_counts.fetch('D', []).count
         self.total_cases = [tier_a, tier_b, tier_c, tier_d].sum
         self.status = pom_detail.status
         self.working_pattern = pom_detail.working_pattern
-      end
-
-    private
-
-      def get_allocation_counts(allocations)
-        allocation_counts = {}
-        allocation_counts.default = 0
-
-        allocations.each do |a|
-          allocation_counts[a.allocated_at_tier] += 1
-        end
-
-        allocation_counts
       end
     end
   end
