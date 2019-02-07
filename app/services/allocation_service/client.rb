@@ -1,7 +1,7 @@
 require 'faraday'
 require 'typhoeus/adapters/faraday'
 
-module Allocation
+module AllocationService
   class Client
     APIError = Class.new(StandardError)
 

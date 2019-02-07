@@ -32,7 +32,7 @@ module AllocationService
 
     def allocate(params)
       route = '/allocation'
-      @allocation_api_client.post(route, allocation: params)
+      @allocation_api_client.post(route, allocation_service: params)
     end
   end
 end

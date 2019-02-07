@@ -1,4 +1,4 @@
-module Allocation
+module AllocationService
   class FakeAllocationRecord
     def self.generate(staff_id)
       last_digit = staff_id.split('').last.to_i
