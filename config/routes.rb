@@ -18,8 +18,10 @@ Rails.application.routes.draw do
 
   get('/prisoners/:id' => 'prisoners#show', as: 'prisoners_show')
 
-  get('/allocate_prison_offender_managers/:noms_id' => 'allocate_prison_offender_managers#show',
-      as: 'allocate_prison_offender_managers_show')
-  get('/allocate_prison_offender_managers/:noms_id/new' => 'allocate_prison_offender_managers#new',
-      as: 'allocate_prison_offender_managers_new')
+  get('/allocate/:nomis_offender_id' => 'allocate#show',
+      as: 'allocate_show')
+  get('/allocate/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocate#new',
+      as: 'allocate_new')
+  post('/allocate/create/:nomis_offender_id/:nomis_staff_id' => 'allocate#create',
+      as: 'allocate_create')
 end
