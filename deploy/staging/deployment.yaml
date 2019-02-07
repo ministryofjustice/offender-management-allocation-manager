@@ -62,6 +62,8 @@ spec:
                 secretKeyRef:
                   name: allocation-rds-instance-output
                   key: postgres_user
+            - name: PROMETHEUS_METRICS
+              value: "on"
             - name: SECRET_KEY_BASE
               valueFrom:
                 secretKeyRef:
