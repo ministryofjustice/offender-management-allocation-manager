@@ -1,0 +1,19 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *default
+  database: offender-management-allocation-manager_development
+
+test:
+  <<: *default
+  database: offender-management-allocation-manager_test
+
+production:
+  <<: *default
+  database: <%= ENV['POSTGRES_NAME'] %>
+  username: <%= ENV['POSTGRES_USER'] %>
+  password: <%= ENV['POSTGRES_PASSWORD'] %>
+  host:     <%= ENV['POSTGRES_HOST'] %>
