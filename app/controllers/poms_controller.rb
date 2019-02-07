@@ -5,9 +5,7 @@ class PomsController < ApplicationController
   breadcrumb -> { 'Surname, Forename' }, -> {  poms_show_path(1) }, only: [:show]
 
   def index
-    response = StaffService.new.get_prisoner_offender_managers(caseload)
-
-    @poms = response.data
+    @poms = StaffService.get_prisoner_offender_managers(caseload)
   end
 
   def show; end
