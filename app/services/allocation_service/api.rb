@@ -1,4 +1,4 @@
-module Allocation
+module AllocationService
   class Api
     include Singleton
 
@@ -11,7 +11,7 @@ module Allocation
 
     def initialize
       host = Rails.configuration.allocation_api_host
-      @allocation_api_client = Allocation::Client.new(host)
+      @allocation_api_client = AllocationService::Client.new(host)
     end
 
     def status
