@@ -30,9 +30,9 @@ module Allocation
       @allocation_api_client.post(route, offender_ids)
     end
 
-    def allocate(body)
+    def allocate(params)
       route = '/allocation'
-      @allocation_api_client.post(route, body: body)
+      @allocation_api_client.post(route, allocation: params)
     end
   end
 end

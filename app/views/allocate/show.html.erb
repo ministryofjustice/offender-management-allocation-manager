@@ -1,4 +1,4 @@
-<%= render :partial => "/shared/backlink", :locals => { :page => allocations_path(anchor: "awaiting-allocation") } %>
+<%= render :partial => "/shared/backlink", :locals => { :page => allocations_path() } %>
 
 <h1 class="govuk-heading-l govuk-!-margin-bottom-5">Allocate a Prison Offender Manager</h1>
 
@@ -6,8 +6,8 @@
 
 <%= render 'shared/offence_info' %>
 
-<%= render 'allocate_prison_offender_managers/case_information' %>
+<%= render 'allocate/case_information' %>
 
 <hr class="govuk-section-break govuk-section-break--l govuk-section-break--invisible"></hr>
 
-<%= render 'allocate_prison_offender_managers/pom_tables' %>
+<%= render 'allocate/pom_tables' %>
