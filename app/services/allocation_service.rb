@@ -4,8 +4,8 @@ class AllocationService
       Allocation.where(nomis_offender_id: params[:nomis_offender_id]).
         update_all(active: false)
 
-      params[:prison_offender_manager] = PrisonOffenderManagerService.
-        get_prison_offender_manager(params[:nomis_staff_id])
+      params[:pom_detail_id] = PrisonOffenderManagerService.
+        get_pom_detail(params[:nomis_staff_id]).id
 
       Allocation.create!(params) { |alloc|
         alloc.active = true

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_05_104220) do
+ActiveRecord::Schema.define(version: 2019_02_07_143221) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,7 +23,7 @@ ActiveRecord::Schema.define(version: 2019_02_05_104220) do
     t.string "note"
     t.string "created_by"
     t.boolean "active"
-    t.bigint "prison_offender_manager_id"
+    t.bigint "pom_detail_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "nomis_staff_id"
@@ -32,14 +32,14 @@ ActiveRecord::Schema.define(version: 2019_02_05_104220) do
     t.index ["nomis_staff_id"], name: "index_allocations_on_nomis_staff_id"
   end
 
-  create_table "prison_offender_managers", force: :cascade do |t|
+  create_table "pom_details", force: :cascade do |t|
     t.integer "nomis_staff_id"
     t.float "working_pattern"
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["nomis_staff_id"], name: "index_prison_offender_managers_on_nomis_staff_id"
+    t.index ["nomis_staff_id"], name: "index_pom_details_on_nomis_staff_id"
   end
 
-  add_foreign_key "allocations", "prison_offender_managers"
+  add_foreign_key "allocations", "pom_details"
 end

@@ -5,7 +5,7 @@ class AllocateController < ApplicationController
     @prisoner = prisoner
     @recommended_pom = @prisoner.current_responsibility
 
-    pom_response = StaffService.get_prisoner_offender_managers(caseload)
+    pom_response = PrisonOffenderManagerService.get_poms(caseload)
     @recommended_poms, @not_recommended_poms = pom_response.partition { |pom|
       pom.position_description.include?(@recommended_pom)
     }
@@ -14,10 +14,8 @@ class AllocateController < ApplicationController
   def new
     @prisoner = prisoner
 
-    # TODO: This should not happen here, we should use an amalgamation
-    # of the StaffService and PrisonOffenderManagerService
-    poms_list = Nomis::Elite2::Api.prisoner_offender_manager_list(caseload)
-    @pom = poms_list.data.select { |p| p.staff_id == nomis_staff_id }.first
+    poms_list = PrisonOffenderManagerService.get_poms(caseload)
+    @pom = poms_list.select { |p| p.staff_id == nomis_staff_id }.first
   end
 
   def create
