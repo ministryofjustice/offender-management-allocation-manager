@@ -28,7 +28,7 @@ module Allocation
 
   private
 
-    def request(method, route, body: nil)
+    def request(method, route, body: {})
       response = @connection.send(method) { |req|
         req.url(@host + route)
         req.headers['Authorization'] = "Bearer #{token.access_token}"
