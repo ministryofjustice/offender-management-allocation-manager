@@ -6,16 +6,6 @@
 #
 
 ################################################################################
-# Check that any changes to be committed do not upset rubocop
-#
-FILES="$(git diff --cached --name-only --diff-filter=AMC | grep "\.rb$" | tr '\n' ' ')"
-bundle exec rubocop ${FILES}
-if [ $? -ne 0 ]; then
-  echo "Rubocop failed! You must appease the linter!"
-  exit 1
-fi
-
-################################################################################
 # https://github.com/AGWA/git-crypt/issues/45#issuecomment-151985431
 # Pre-commit hook to avoid accidentally adding unencrypted files which are
 # configured to be encrypted with [git-crypt](https://www.agwa.name/projects/git-crypt/)

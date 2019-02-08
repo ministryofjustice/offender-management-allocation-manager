@@ -29,6 +29,19 @@ module Nomis
       def full_name
         "#{last_name}, #{first_name}".titleize
       end
+
+      def add_detail(pom_detail)
+        allocations = pom_detail.allocations.where(active: true)
+        allocation_counts = allocations.group_by(&:allocated_at_tier)
+
+        self.tier_a = allocation_counts.fetch('A', []).count
+        self.tier_b = allocation_counts.fetch('B', []).count
+        self.tier_c = allocation_counts.fetch('C', []).count
+        self.tier_d = allocation_counts.fetch('D', []).count
+        self.total_cases = [tier_a, tier_b, tier_c, tier_d].sum
+        self.status = pom_detail.status
+        self.working_pattern = pom_detail.working_pattern
+      end
     end
   end
 end

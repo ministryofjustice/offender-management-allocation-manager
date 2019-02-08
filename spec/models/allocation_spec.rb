@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Allocation, type: :model do
-  it { is_expected.to belong_to(:prison_offender_manager) }
+  it { is_expected.to belong_to(:pom_detail) }
   it { is_expected.to validate_presence_of(:nomis_offender_id) }
   it { is_expected.to validate_presence_of(:nomis_booking_id) }
   it { is_expected.to validate_presence_of(:prison) }

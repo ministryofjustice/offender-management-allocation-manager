@@ -1,4 +1,4 @@
-class PrisonOffenderManager < ApplicationRecord
+class PomDetail < ApplicationRecord
   # rubocop:disable HasManyOrHasOneDependent
   has_many :allocations
   # rubocop:enable HasManyOrHasOneDependent
