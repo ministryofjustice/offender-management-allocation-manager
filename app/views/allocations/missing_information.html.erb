@@ -16,8 +16,8 @@
     </tr>
     </thead>
     <tbody class="govuk-table__body">
-    <% @prisoners.each do |prisoner| %>
-      <tr class="govuk-table__row">
+    <% @prisoners.each_with_index  do |prisoner, i| %>
+      <tr class="govuk-table__row offender_row_<%= i %>">
         <td aria-label="Action" class="govuk-table__cell "><%= prisoner.full_name %></td>
         <td aria-label="Prisoner number" class="govuk-table__cell "><%= prisoner.offender_no %></td>
         <td aria-label="Arrival date" class="govuk-table__cell ">NA</td>
