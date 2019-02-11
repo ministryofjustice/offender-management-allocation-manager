@@ -7,9 +7,11 @@ class AllocationsController < ApplicationController
       page_number: page_number
     )
 
-    @offenders_allocated = response.data
-    @offenders_awaiting_allocation = response.data
-    @offenders_awaiting_tiering = response.data
+    offenders = response.data
+
+    @offenders_allocated = offenders
+    @offenders_awaiting_allocation = offenders
+    @offenders_awaiting_tiering = offenders
 
     @page_data = response.meta
   end
