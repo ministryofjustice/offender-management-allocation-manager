@@ -1,8 +1,9 @@
-class AllocateController < ApplicationController
+class AllocatesController < ApplicationController
   before_action :authenticate_user
 
   def show
-    @prisoner = prisoner
+    @prisoner = OffenderService.new.get_offender(params.require(:nomis_offender_id)).data
+
     @recommended_pom = @prisoner.current_responsibility
 
     pom_response = PrisonOffenderManagerService.get_poms(caseload)
@@ -12,7 +13,8 @@ class AllocateController < ApplicationController
   end
 
   def new
-    @prisoner = prisoner
+    @prisoner = OffenderService.new.get_offender(params.require(:nomis_offender_id)).data
+
 
     poms_list = PrisonOffenderManagerService.get_poms(caseload)
     @pom = poms_list.select { |p| p.staff_id == params.require(:nomis_staff_id) }.first
@@ -20,9 +22,10 @@ class AllocateController < ApplicationController
 
   # rubocop:disable Metrics/MethodLength
   def create
+    prisoner  = OffenderService.new.get_offender(allocation_params[:nomis_offender_id]).data
     @override = Override.where(
-      nomis_offender_id: nomis_offender_id).
-      where(nomis_staff_id: nomis_staff_id)
+      nomis_offender_id: allocation_params[:nomis_offender_id]).
+      where(nomis_staff_id: allocation_params[:nomis_staff_id])
 
     AllocationService.create_allocation(
       nomis_staff_id: allocation_params[:nomis_staff_id].to_i,
@@ -43,12 +46,8 @@ class AllocateController < ApplicationController
 
 private
 
-  def prisoner
-    OffenderService.new.get_offender(params.require(:nomis_offender_id)).data
-  end
-
   def allocation_params
-    params.require(:allocation).permit(:nomis_staff_id, :nomis_offender_id)
+    params.require(:allocate).permit(:nomis_staff_id, :nomis_offender_id)
   end
 
   def override_reason

@@ -6,7 +6,7 @@ feature 'Allocation' do
   scenario 'creating an allocation', vcr: { cassette_name: :create_allocation_feature } do
     signin_user
 
-    visit allocate_new_path(prisoner.offender_no, pom.staff_id)
+    visit new_allocates_path(prisoner.offender_no, pom.staff_id)
 
     expect(page).to have_css('h1', text: 'Confirm allocation')
     expect(page).to have_css('p', text: 'You are allocating Abbella, Ozullirn to Jones, Ross')
@@ -19,7 +19,7 @@ feature 'Allocation' do
   scenario 'overriding an allocation', vcr: { cassette_name: :override_allocation_feature } do
     signin_user
 
-    visit allocate_show_path(prisoner.offender_no)
+    visit allocates_show_path(prisoner.offender_no)
 
     within('.not_recommended_pom_row_0') do
       click_link 'Allocate'
