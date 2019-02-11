@@ -43,7 +43,7 @@ feature 'allocations summary feature' do
     it 'shows pages for allocation', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders_paged_feature, match_requests_on: [:query] } do
       signin_user
 
-      visit allocations_path()
+      visit allocations_path
       expect(page).to have_link('Next »')
       expect(page).not_to have_link('« Previous')
       expect(page).not_to have_link(/^1$/)
