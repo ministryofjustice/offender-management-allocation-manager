@@ -15,4 +15,22 @@ feature 'Allocation' do
 
     expect(page).to have_current_path allocations_path
   end
+
+  scenario 'overriding an allocation', vcr: { cassette_name: :override_allocation_feature } do
+    signin_user
+
+    visit allocate_show_path(prisoner.offender_no)
+
+    within('.not_recommended_pom_row_0') do
+      click_link 'Allocate'
+    end
+
+    expect(page).to have_css('h1', text: 'Choose reason for changing recommended grade')
+    check('override-1')
+
+    click_button('Continue')
+
+    expect(page).to have_css('h1', text: 'Confirm allocation')
+    expect(page).to have_css('p', text: 'You are allocating Abbella, Ozullirn to Duckett, Jenny')
+  end
 end
