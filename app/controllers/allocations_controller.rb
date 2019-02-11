@@ -2,17 +2,17 @@ class AllocationsController < ApplicationController
   before_action :authenticate_user
 
   def index
-    response = OffenderService.new.get_offenders_for_prison(
-      caseload,
-      page_number: page_number
+    allocated_page = params.fetch('allocated_page', 1).to_i
+    unallocated_page = params.fetch('unallocated_page', 1).to_i
+    missing_info_page = params.fetch('missing_info_page', 1).to_i
+
+    @summary = AllocationSummaryService.summary(
+      allocated_page,
+      unallocated_page,
+      missing_info_page,
+      caseload
     )
 
-    offenders = response.data
-
-    @offenders_allocated = offenders
-    @offenders_awaiting_allocation = offenders
-    @offenders_awaiting_tiering = offenders
-
-    @page_data = response.meta
+    @page_data = PageMeta.new
   end
 end

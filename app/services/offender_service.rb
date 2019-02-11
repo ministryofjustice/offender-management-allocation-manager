@@ -22,7 +22,11 @@ class OffenderService
     offender_ids = offenders.data.map(&:offender_no)
 
     tier_map = Ndelius::Api.get_records(offender_ids)
-    release_dates = Nomis::Elite2::Api.get_bulk_release_dates(offender_ids)
+    release_dates = if offender_ids.count > 0
+                      Nomis::Elite2::Api.get_bulk_release_dates(offender_ids)
+                    else
+                      {}
+                    end
 
     offenders.data = offenders.data.select { |offender|
       record = tier_map[offender.offender_no]

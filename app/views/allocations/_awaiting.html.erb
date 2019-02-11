@@ -14,7 +14,7 @@
     </tr>
     </thead>
     <tbody class="govuk-table__body">
-    <% @offenders_awaiting_allocation.each_with_index do |offender, i| %>
+    <% @summary.unallocated_offenders.each_with_index do |offender, i| %>
       <tr class="govuk-table__row offender_row_<%= i %>">
         <td aria-label="Action" class="govuk-table__cell "><%= offender.full_name %></td>
         <td aria-label="Prisoner number" class="govuk-table__cell "><%= offender.offender_no %></td>
@@ -26,6 +26,4 @@
     <% end %>
     </tbody>
   </table>
-
-  <%= render '/shared/pagination' %>
 </section>
