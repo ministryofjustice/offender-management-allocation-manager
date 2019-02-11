@@ -31,8 +31,8 @@
               </div>
               <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="override-4">
                 <div class="govuk-form-group">
-                  <label class="govuk-label" for="provide-detail">Please provide detail here</label>
-                  <textarea class="govuk-textarea" id="more_detail" name="more_detail" rows="3" aria-describedby="more_detail_hint"></textarea>
+                  <%= label_tag "override[more_detail]", 'Please provide detail here' %>
+                  <%= text_field_tag "override[more_detail]", {id: "more_detail", name: "more_detail", rows: "3", aria_describedby: "more_detail_hint"}, class: "govuk-textarea" %>
                 </div>
               </div>
             </div>
