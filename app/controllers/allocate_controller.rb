@@ -18,18 +18,28 @@ class AllocateController < ApplicationController
     @pom = poms_list.select { |p| p.staff_id == nomis_staff_id }.first
   end
 
+  # rubocop:disable Metrics/MethodLength
   def create
+    @override = Override.where(
+      nomis_offender_id: nomis_offender_id).
+      where(nomis_staff_id: nomis_staff_id)
+
     AllocationService.create_allocation(
       nomis_staff_id: nomis_staff_id.to_i,
       nomis_offender_id: nomis_offender_id,
       created_by: current_user,
       nomis_booking_id: prisoner.latest_booking_id,
       allocated_at_tier: prisoner.tier,
-      prison: caseload
+      prison: caseload,
+      override_reason: override_reason,
+      override_detail: override_detail
     )
+
+    delete_override
 
     redirect_to allocations_path
   end
+# rubocop:enable Metrics/MethodLength
 
 private
 
@@ -43,5 +53,20 @@ private
 
   def nomis_staff_id
     params.require(:nomis_staff_id)
+  end
+
+  def override_reason
+    byebug
+    @override.present? ? @override.first[:override_reason] : nil
+  end
+
+  def override_detail
+    @override.present? ? @override.first[:override_detail] : nil
+  end
+
+  def delete_override
+    if @override.present?
+      @override.first.destroy
+    end
   end
 end
