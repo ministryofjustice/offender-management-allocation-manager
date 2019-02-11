@@ -20,7 +20,9 @@ class AllocatesController < ApplicationController
 
   # rubocop:disable Metrics/MethodLength
   def create
-    prisoner  = OffenderService.new.get_offender(allocation_params[:nomis_offender_id]).data
+    prisoner  = OffenderService.new.
+      get_offender(allocation_params[:nomis_offender_id]).
+      data
     @override = Override.where(
       nomis_offender_id: allocation_params[:nomis_offender_id]).
       where(nomis_staff_id: allocation_params[:nomis_staff_id])
@@ -61,7 +63,7 @@ private
   end
 
   def override_detail
-     @override.first[:override_detail] if @override.present?
+    @override.first[:override_detail] if @override.present?
   end
 
   def delete_override
