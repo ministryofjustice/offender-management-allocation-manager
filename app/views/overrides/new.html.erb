@@ -1,0 +1,45 @@
+  <div>
+    <%= form_for @override, url:"#{overrides_create_path(@prisoner.offender_no, @pom.staff_id)}" do |f| %>
+      <h1 class="govuk-heading-xl govuk-!-margin-top-4">Choose reason for changing recommended grade</h1>
+
+      <div class='govuk-!-margin-top-6'>
+        <div class="govuk-form-group">
+          <fieldset class="govuk-fieldset" aria-describedby="override-conditional-hint">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+              <h1 class="govuk-fieldset__heading">Choose reason for changing
+                recommended grade</h1>
+            </legend>
+            <div class="govuk-checkboxes" data-module="checkboxes">
+              <%= f.hidden_field(:nomis_offender_id, value: @prisoner.offender_no) %>
+              <%= f.hidden_field(:nomis_staff_id, value: @pom.staff_id) %>
+              <div class="govuk-checkboxes__item">
+                <%= check_box_tag(:overrides_reason, value = "complex", checked = false, options = { class: "govuk-checkboxes__input", data_aria_controls: "override-1", id: "override-1"}) %>
+                <label class="govuk-label govuk-checkboxes__label" for="override-1">
+                  <p> Prisoner assessed as too complex for <%= @recommended_pom %> officer POM </p>
+              </div>
+              <div class="govuk-checkboxes__item">
+                <%= check_box_tag(:overrides_reason, value = "no-staff", checked = false, options = { class: "govuk-checkboxes__input", data_aria_controls: "override-2", id: "override-2"}) %>
+                <label class="govuk-label govuk-checkboxes__label" for="override-2">No avaliable staff at recommended
+                  grade</label>
+              </div>
+              <div class="govuk-checkboxes__item">
+                <%= check_box_tag(:overrides_reason, value = "continuity", checked = false, options = { class: "govuk-checkboxes__input", data_aria_controls: "override-3", id: "override-3"}) %>
+                <label class="govuk-label govuk-checkboxes__label" for="override-3">Maintain continuity of previous POM</label>
+              </div>
+              <div class="govuk-checkboxes__item">
+                <%= check_box_tag(:overrides_reason, value = "other", checked = false, options = { class: "govuk-checkboxes__input", data_aria_controls: "override-4", id: "override-4"}) %>
+                <label class="govuk-label govuk-checkboxes__label" for="override-conditional-4">Other</label>
+              </div>
+              <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="override-4">
+                <div class="govuk-form-group">
+                  <label class="govuk-label" for="provide-detail">Please provide detail here</label>
+                  <textarea class="govuk-textarea" id="more_detail" name="more_detail" rows="3" aria-describedby="more_detail_hint"></textarea>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+        <%= f.submit "Continue", role: "button", draggable: "false", class: "govuk-button" %>
+      </div>
+    <% end %>
+  </div>
