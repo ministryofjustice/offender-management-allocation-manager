@@ -1,5 +1,3 @@
-<%= render 'title' %>
-<%= render 'tabs', active: :pending %>
 
 <section class="govuk-tabs__panel" id="awaiting-allocation">
   <table class="govuk-table responsive tablesorter">
@@ -16,14 +14,14 @@
     </tr>
     </thead>
     <tbody class="govuk-table__body">
-    <% @prisoners.each_with_index  do |prisoner, i| %>
+    <% @offenders_awaiting_allocation.each_with_index do |offender, i| %>
       <tr class="govuk-table__row offender_row_<%= i %>">
-        <td aria-label="Action" class="govuk-table__cell "><%= prisoner.full_name %></td>
-        <td aria-label="Prisoner number" class="govuk-table__cell "><%= prisoner.offender_no %></td>
+        <td aria-label="Action" class="govuk-table__cell "><%= offender.full_name %></td>
+        <td aria-label="Prisoner number" class="govuk-table__cell "><%= offender.offender_no %></td>
         <td aria-label="Arrival date" class="govuk-table__cell ">N/A</td>
-        <td aria-label="Release date" class="govuk-table__cell "><%= format_date(prisoner.release_date) %></td>
-        <td aria-label="Tier" class="govuk-table__cell "><%= prisoner.tier %></td>
-        <td aria-label="Action" class="govuk-table__cell "><a href="<%= allocate_show_path(prisoner.offender_no) %>">Allocate</a></td>
+        <td aria-label="Release date" class="govuk-table__cell "><%= format_date(offender.release_date) %></td>
+        <td aria-label="Tier" class="govuk-table__cell "><%= offender.tier %></td>
+        <td aria-label="Action" class="govuk-table__cell "><a href="<%= allocate_show_path(offender.offender_no) %>">Allocate</a></td>
       </tr>
     <% end %>
     </tbody>

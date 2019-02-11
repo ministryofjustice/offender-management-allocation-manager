@@ -1,0 +1,29 @@
+<h1 class="govuk-heading-xl">Allocations</h1>
+
+<div class="govuk-tabs" data-module="tabs">
+  <h2 class="govuk-tabs__title">
+      Allocations
+  </h2>
+  <ul class="govuk-tabs__list" role='tablist'>
+      <li class="govuk-tabs__list-item">
+      <a class="govuk-tabs__tab" href="#allocated">
+          Allocated (N)
+      </a>
+      </li>
+      <li class="govuk-tabs__list-item">
+      <a class="govuk-tabs__tab" href="#awaiting-allocation">
+          Awaiting allocation (N)
+      </a>
+      </li>
+      <li class="govuk-tabs__list-item">
+      <a class="govuk-tabs__tab" href="#awaiting-tiering">
+          Awaiting tiering (N)
+      </a>
+      </li>
+  </ul>
+
+  <%= render 'allocated' %>
+  <%= render 'awaiting' %>
+  <%= render 'missing_information' %>
+
+</div>
