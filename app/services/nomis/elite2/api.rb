@@ -44,10 +44,9 @@ module Nomis
       end
 
       # rubocop:disable Metrics/MethodLength
-      def get_offender_list(prison, page = 0)
+      def get_offender_list(prison, page = 0, page_size: 10)
         route = "/elite2api/api/locations/description/#{prison}/inmates"
 
-        page_size = 10
         page_offset = page * page_size
         page_meta = nil
 

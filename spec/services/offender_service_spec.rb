@@ -5,7 +5,7 @@ describe OffenderService, vcr: { cassette_name: :offender_service_offenders_by_p
     offenders = OffenderService.new.get_offenders_for_prison('LEI')
     expect(offenders.meta).to be_kind_of(PageMeta)
     expect(offenders.data).to be_kind_of(Array)
-    expect(offenders.data.length).to eq(10)
+    expect(offenders.data.length).to eq(5)
     expect(offenders.data.first).to be_kind_of(Nomis::Elite2::OffenderShort)
   end
 
@@ -13,7 +13,7 @@ describe OffenderService, vcr: { cassette_name: :offender_service_offenders_by_p
     offenders = OffenderService.new.get_offenders_for_prison('LEI', page_number: 116)
     expect(offenders.meta).to be_kind_of(PageMeta)
     expect(offenders.data).to be_kind_of(Array)
-    expect(offenders.data.length).to eq(7)
+    expect(offenders.data.length).to eq(5)
     expect(offenders.data.first).to be_kind_of(Nomis::Elite2::OffenderShort)
   end
 
