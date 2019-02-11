@@ -2,8 +2,7 @@ class AllocatesController < ApplicationController
   before_action :authenticate_user
 
   def show
-    @prisoner = OffenderService.new.get_offender(params.require(:nomis_offender_id)).data
-
+    @prisoner = OffenderService.new.get_offender(nomis_offender_id_from_url).data
     @recommended_pom = @prisoner.current_responsibility
 
     pom_response = PrisonOffenderManagerService.get_poms(caseload)
@@ -13,11 +12,10 @@ class AllocatesController < ApplicationController
   end
 
   def new
-    @prisoner = OffenderService.new.get_offender(params.require(:nomis_offender_id)).data
-
+    @prisoner = OffenderService.new.get_offender(nomis_offender_id_from_url).data
 
     poms_list = PrisonOffenderManagerService.get_poms(caseload)
-    @pom = poms_list.select { |p| p.staff_id == params.require(:nomis_staff_id) }.first
+    @pom = poms_list.select { |p| p.staff_id == nomis_staff_id_from_url }.first
   end
 
   # rubocop:disable Metrics/MethodLength
@@ -46,16 +44,24 @@ class AllocatesController < ApplicationController
 
 private
 
+  def nomis_offender_id_from_url
+    params.require(:nomis_offender_id)
+  end
+
+  def nomis_staff_id_from_url
+    params.require(:nomis_staff_id)
+  end
+
   def allocation_params
     params.require(:allocate).permit(:nomis_staff_id, :nomis_offender_id)
   end
 
   def override_reason
-    @override.present? ? @override.first[:override_reason] : nil
+    @override.first[:override_reason] if @override.present?
   end
 
   def override_detail
-    @override.present? ? @override.first[:override_detail] : nil
+     @override.first[:override_detail] if @override.present?
   end
 
   def delete_override

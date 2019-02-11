@@ -10,7 +10,7 @@ class OverridesController < ApplicationController
       nomis_staff_id: override_params[:nomis_staff_id],
       nomis_offender_id: override_params[:nomis_offender_id],
       override_reason: override_params[:override_reason],
-      more_detail: override_reason_params[:more_detail]
+      more_detail: override_params[:more_detail]
       )
 
     redirect_to new_allocates_path(
@@ -30,9 +30,5 @@ private
     params.require(:override).permit(
       :nomis_offender_id, :nomis_staff_id, :override_reason, :more_detail
     )
-  end
-
-  def override_reason_params
-    params.permit(:overrides_reason, :more_detail)
   end
 end
