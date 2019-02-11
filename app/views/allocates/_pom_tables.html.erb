@@ -32,7 +32,7 @@ Recommendation: <%= @recommended_pom %> POMs
       <td aria-label="Working pattern" class="govuk-table__cell"><%= pom.working_pattern %></td>
       <% if current_page?(action: 'show') %>
         <td aria-label="Action" class="govuk-table__cell table_cell__left_align"><a
-          <%= link_to "Allocate", allocate_new_path(@prisoner.offender_no, pom.staff_id), class:"govuk-link"%></a></td>
+          <%= link_to "Allocate", new_allocates_path(@prisoner.offender_no, pom.staff_id), class:"govuk-link"%></a></td>
       <% else %>
         <td aria-label="Action" class="govuk-table__cell table_cell__right_align"><a
           href="#">Reallocate</a></td>
