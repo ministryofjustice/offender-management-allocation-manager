@@ -143,7 +143,7 @@ GEM
       ast (~> 2.4.0)
     pg (1.1.4)
     powerpack (0.1.2)
-    prometheus_exporter (0.4.2)
+    prometheus_exporter (0.4.3)
     public_suffix (3.0.3)
     puma (3.12.0)
     rack (2.0.6)
