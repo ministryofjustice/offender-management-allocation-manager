@@ -11,6 +11,7 @@ module Nomis
       attribute :scope, :string
       attribute :internal_user, :string
       attribute :jti, :string
+      attribute :auth_source
 
       def expired?
         JWT.decode(
