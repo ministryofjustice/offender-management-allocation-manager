@@ -22,9 +22,9 @@ Rails.application.routes.draw do
   post('/allocate/create/:nomis_offender_id/:nomis_staff_id' => 'allocate#create',
       as: 'allocate_create')
 
-  get('/overrides/confirm/:nomis_offender_id/:nomis_staff_id' => 'overrides#new',
-      as: 'overrides_new')
-  post('/overrides/create/:nomis_offender_id/:nomis_staff_id' => 'overrides#create',
-      as: 'overrides_create')
+  get('/overrides/new/:nomis_offender_id/:nomis_staff_id' => 'overrides#new',
+      as: 'new_overrides')
+
+  resource :overrides,  only: %i[create]
 
 end

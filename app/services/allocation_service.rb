@@ -26,4 +26,8 @@ class AllocationService
   def self.create_override(params)
     Override.create!(params)
   end
+
+  def self.override_instance
+    Override.new
+  end
 end

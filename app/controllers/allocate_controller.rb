@@ -56,7 +56,6 @@ private
   end
 
   def override_reason
-    byebug
     @override.present? ? @override.first[:override_reason] : nil
   end
 
