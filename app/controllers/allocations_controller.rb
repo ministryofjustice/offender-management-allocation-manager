@@ -6,7 +6,7 @@ class AllocationsController < ApplicationController
     unallocated_page = params.fetch('unallocated-page', 1).to_i
     missing_info_page = params.fetch('missing-info-page', 1).to_i
 
-    @summary = AllocationSummaryService.summary(
+    @summary = AllocationSummaryService.new.summary(
       allocated_page, unallocated_page,
       missing_info_page, caseload
     )
