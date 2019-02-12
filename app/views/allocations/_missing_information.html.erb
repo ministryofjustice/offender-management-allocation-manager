@@ -26,4 +26,13 @@
     <% end %>
     </tbody>
   </table>
+
+  <%= render(
+        :partial => 'shared/pagination',
+        :locals => {
+          :page_data => @missing_info_page_meta,
+          :param_name => 'missing-info-page',
+          :fragment => 'awaiting-tiering'
+        }) %>
+
 </section>

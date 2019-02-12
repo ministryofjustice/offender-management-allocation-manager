@@ -1,6 +1,6 @@
 class AllocationSummaryService
   PAGE_SIZE = 10 # The number of items to show in the view
-  FETCH_SIZE = 1000 # How many records to fetch from nomis at a time
+  FETCH_SIZE = 500 # How many records to fetch from nomis at a time
 
   # rubocop:disable Metrics/MethodLength
   def self.summary(allocated_page, unallocated_page, missing_info_page, prison)
@@ -11,11 +11,14 @@ class AllocationSummaryService
     unallocated_bucket = Bucket.new(unallocated_page * PAGE_SIZE)
     missing_info_bucket = Bucket.new(missing_info_page * PAGE_SIZE)
 
+    # We want to store the total number of each item so we can show totals for
+    # each type of record.
     allocated_count = 0
     unallocated_count = 0
     missing_count = 0
 
-    # Fetch the first 1 prisoners just for metadata
+    # Fetch the first 1 prisoners just for the total number of pages so that we
+    # can send batched queries.
     info_request = OffenderService.new.get_offenders_for_prison(
       prison,
       page_number: 0,
@@ -66,15 +69,43 @@ class AllocationSummaryService
       }
     end
 
+    allocated_page_count = (allocated_count / PAGE_SIZE.to_f).ceil
+    unallocated_page_count = (unallocated_count / PAGE_SIZE.to_f).ceil
+    missing_page_count = (missing_count / PAGE_SIZE.to_f).ceil
+
+    # If we are on the last page, we don't always want 10 items from the bucket
+    # we just want the last digit, so if there are 138 items, the last page should
+    # show 8.
+    allocated_wanted = PAGE_SIZE
+    unallocated_wanted = PAGE_SIZE
+    missing_wanted = PAGE_SIZE
+
+    if allocated_page_count == allocated_page && allocated_count.digits[0] != 0
+      allocated_wanted = allocated_count.digits[0]
+    end
+
+    if unallocated_page_count == unallocated_page && unallocated_count.digits[0] != 0
+      unallocated_wanted = unallocated_count.digits[0]
+    end
+
+    if missing_page_count == missing_info_page && missing_count.digits[0] != 0
+      missing_wanted = missing_count.digits[0]
+    end
+
     # Return the last (N) records from each bucket, in case
     # the capacity was higher than 10 (we need more than one page worth).
     AllocationSummary.new.tap { |summary|
-      summary.allocated_offenders = allocated_bucket.last(PAGE_SIZE)
-      summary.unallocated_offenders = unallocated_bucket.last(PAGE_SIZE)
-      summary.missing_info_offenders = missing_info_bucket.last(PAGE_SIZE)
+      summary.allocated_offenders = allocated_bucket.last(allocated_wanted)
+      summary.unallocated_offenders = unallocated_bucket.last(unallocated_wanted)
+      summary.missing_info_offenders = missing_info_bucket.last(missing_wanted)
+
       summary.allocated_total = allocated_count
       summary.unallocated_total = unallocated_count
       summary.missing_info_total = missing_count
+
+      summary.allocated_page_count = allocated_page_count
+      summary.unallocated_page_count = unallocated_page_count
+      summary.missing_page_count = missing_page_count
     }
   end
   # rubocop:enable Metrics/MethodLength

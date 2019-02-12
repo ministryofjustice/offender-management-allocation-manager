@@ -33,4 +33,13 @@
     <% end %>
     </tbody>
   </table>
+
+  <%= render(
+        :partial => 'shared/pagination',
+        :locals => {
+          :page_data => @allocated_page_meta,
+          :param_name => 'allocated-page',
+          :fragment => 'allocated'
+        })%>
+
 </section>
