@@ -1,4 +1,6 @@
-  <div>
+<%= render :partial => "/shared/backlink", :locals => { :page => allocates_show_path() } %>
+
+<div>
     <%= form_tag(overrides_path, method: :post)  do %>
       <h1 class="govuk-heading-xl govuk-!-margin-top-4">Choose reason for changing recommended grade</h1>
 
@@ -25,14 +27,17 @@
                 <%= label_tag "override[override_reason]", "Maintain continuity of previous POM", class: 'govuk-label govuk-checkboxes__label' %>
               </div>
               <div class="govuk-checkboxes__item">
-                <%= check_box_tag("override[override_reason]", "other", false, id: "override-4", class: "govuk-checkboxes__input") %>
-                <%= label_tag "override[override_reason]", "Other", class: 'govuk-label govuk-checkboxes__label' %>
+                <input class="govuk-checkboxes__input" id="override-conditional-4" name="override[override_reason]" type="checkbox" value="other" data-aria-controls="override-4">
+                <label class="govuk-label govuk-checkboxes__label"
+                       for="override-conditional-4">Other</label>
               </div>
-              <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden">
+              <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="override-4">
                 <div class="govuk-form-group">
-                  <%= text_area_tag "override[more_detail]", nil, rows: 3, class: "govuk-input govuk-!-width-one-third" %>
-                  <%= label_tag "override[more_detail]", 'Please provide detail here', class: 'govuk-label govuk-checkboxes__label' %>
+                  <label class="govuk-label" for="provide-detail">Please provide detail
+                    here</label>
+                  <textarea class="govuk-textarea" id="more-detail" name="override[more_detail]" rows="3" aria-describedby="more-detail-hint"></textarea>
                 </div>
+              </div>
               </div>
             </div>
           </fieldset>
