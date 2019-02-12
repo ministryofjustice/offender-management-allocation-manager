@@ -7,10 +7,10 @@ class AllocationService
       params[:pom_detail_id] = PrisonOffenderManagerService.
         get_pom_detail(params[:nomis_staff_id]).id
 
-      Allocation.create!(params) { |alloc|
+      Allocation.create!(params) do |alloc|
         alloc.active = true
         alloc.save!
-      }
+      end
     end
   end
 
@@ -21,5 +21,13 @@ class AllocationService
         a
       ]
     }.to_h
+  end
+
+  def self.create_override(params)
+    Override.create!(params)
+  end
+
+  def self.override_instance
+    Override.new
   end
 end
