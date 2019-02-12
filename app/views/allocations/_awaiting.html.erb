@@ -21,7 +21,7 @@
         <td aria-label="Arrival date" class="govuk-table__cell ">N/A</td>
         <td aria-label="Release date" class="govuk-table__cell "><%= format_date(offender.release_date) %></td>
         <td aria-label="Tier" class="govuk-table__cell "><%= offender.tier %></td>
-        <td aria-label="Action" class="govuk-table__cell "><a href="<%= allocate_show_path(offender.offender_no) %>">Allocate</a></td>
+        <td aria-label="Action" class="govuk-table__cell "><a href="<%= allocates_show_path(offender.offender_no) %>">Allocate</a></td>
       </tr>
     <% end %>
     </tbody>
