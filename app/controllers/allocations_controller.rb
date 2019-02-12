@@ -7,10 +7,8 @@ class AllocationsController < ApplicationController
     missing_info_page = params.fetch('missing-info-page', 1).to_i
 
     @summary = AllocationSummaryService.summary(
-      allocated_page,
-      unallocated_page,
-      missing_info_page,
-      caseload
+      allocated_page, unallocated_page,
+      missing_info_page, caseload
     )
 
     @allocated_page_meta = @summary.allocated_page_meta(allocated_page)
