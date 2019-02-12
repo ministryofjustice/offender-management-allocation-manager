@@ -25,7 +25,7 @@ class AllocatesController < ApplicationController
       data
     @override = Override.where(
       nomis_offender_id: allocation_params[:nomis_offender_id]).
-      where(nomis_staff_id: allocation_params[:nomis_staff_id])
+      where(nomis_staff_id: allocation_params[:nomis_staff_id]).last
 
     AllocationService.create_allocation(
       nomis_staff_id: allocation_params[:nomis_staff_id].to_i,
@@ -37,8 +37,6 @@ class AllocatesController < ApplicationController
       override_reason: override_reason,
       override_detail: override_detail
     )
-
-    delete_override
 
     redirect_to allocations_path
   end
@@ -59,16 +57,10 @@ private
   end
 
   def override_reason
-    @override.first[:override_reason] if @override.present?
+    @override[:override_reason] if @override.present?
   end
 
   def override_detail
-    @override.first[:override_detail] if @override.present?
-  end
-
-  def delete_override
-    if @override.present?
-      @override.first.destroy
-    end
+    @override[:more_detail] if @override.present?
   end
 end

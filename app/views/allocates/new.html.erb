@@ -1,3 +1,5 @@
+<%= render :partial => "/shared/backlink", :locals => { :page => allocates_show_path() } %>
+
 <div>
     <%= form_tag(allocates_path, method: :post) do %>
       <h1 class="govuk-heading-xl govuk-!-margin-top-4">Confirm allocation</h1>
