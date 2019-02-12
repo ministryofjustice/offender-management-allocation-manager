@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 feature 'Allocation' do
-  let(:nomis_staff_id) { 485752 }
+  let(:nomis_staff_id) { 485_752 }
   let(:nomis_offender_id) { 'G4273GI' }
 
   scenario 'creating an allocation', vcr: { cassette_name: :create_allocation_feature } do
@@ -18,7 +18,7 @@ feature 'Allocation' do
   end
 
   scenario 'overriding an allocation', vcr: { cassette_name: :override_allocation_feature } do
-    override_nomis_staff_id = 485636
+    override_nomis_staff_id = 485_636
 
     signin_user
 
