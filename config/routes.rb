@@ -15,10 +15,15 @@ Rails.application.routes.draw do
 
   get('/prisoners/:id' => 'prisoners#show', as: 'prisoners_show')
 
-  get('/allocate/:nomis_offender_id' => 'allocate#show',
-      as: 'allocate_show')
-  get('/allocate/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocate#new',
-      as: 'allocate_new')
-  post('/allocate/create/:nomis_offender_id/:nomis_staff_id' => 'allocate#create',
-      as: 'allocate_create')
+  get('/allocate/:nomis_offender_id' => 'allocates#show',
+      as: 'allocates_show')
+  get('/allocate/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocates#new',
+      as: 'new_allocates')
+  resource :allocates, only: %i[ create ]
+
+  get('/overrides/new/:nomis_offender_id/:nomis_staff_id' => 'overrides#new',
+      as: 'new_overrides')
+
+  resource :overrides,  only: %i[create]
+
 end

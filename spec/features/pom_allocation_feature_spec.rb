@@ -5,7 +5,7 @@ feature 'allocate a POM' do
     signin_user
     nomis_offender_id = 'G4273GI'
 
-    visit allocate_show_path(nomis_offender_id)
+    visit allocates_show_path(nomis_offender_id)
 
     expect(page).to have_css('h1', text: 'Allocate a Prison Offender Manager')
     expect(page).not_to have_css('.govuk-breadcrumbs')
