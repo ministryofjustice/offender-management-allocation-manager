@@ -9,7 +9,7 @@ class OverridesController < ApplicationController
     AllocationService.create_override(
       nomis_staff_id: override_params[:nomis_staff_id],
       nomis_offender_id: override_params[:nomis_offender_id],
-      override_reason: override_params[:override_reason],
+      override_reasons: override_params[:override_reasons],
       more_detail: override_params[:more_detail]
       )
 
@@ -28,7 +28,7 @@ private
 
   def override_params
     params.require(:override).permit(
-      :nomis_offender_id, :nomis_staff_id, :override_reason, :more_detail
+      :nomis_offender_id, :nomis_staff_id, :more_detail, override_reasons: []
     )
   end
 end

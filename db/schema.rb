@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_10_132134) do
+ActiveRecord::Schema.define(version: 2019_02_12_160351) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -19,7 +19,7 @@ ActiveRecord::Schema.define(version: 2019_02_10_132134) do
     t.string "nomis_offender_id"
     t.string "prison"
     t.string "allocated_at_tier"
-    t.string "override_reason"
+    t.string "override_reasons"
     t.string "override_detail"
     t.string "created_by"
     t.boolean "active"
@@ -35,7 +35,7 @@ ActiveRecord::Schema.define(version: 2019_02_10_132134) do
   create_table "overrides", force: :cascade do |t|
     t.integer "nomis_staff_id"
     t.string "nomis_offender_id"
-    t.string "override_reason"
+    t.string "override_reasons"
     t.string "more_detail"
   end
 
