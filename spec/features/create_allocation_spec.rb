@@ -31,6 +31,7 @@ feature 'Allocation' do
     expect(page).to have_css('h1', text: 'Choose reason for changing recommended grade')
 
     check('override-1')
+    check('override-2')
     click_button('Continue')
 
     expect(Override.count).to eq(1)
