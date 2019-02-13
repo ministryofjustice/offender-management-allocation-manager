@@ -1,26 +1,26 @@
-<% if @page_data %>
+<% if page_data %>
 <div class="govuk-grid-row pagination">
   <div class="govuk-grid-column-one-half">
     <ul class="links">
       <li>
-        <% if @page_data.previous? %>
-          <a href="<%= replace_param('page', @page_data.current_page - 1) %>">&laquo; Previous</a>
+        <% if page_data.previous? %>
+          <a href="<%= replace_param(param_name, page_data.current_page - 1) %>#<%= fragment %>">&laquo; Previous</a>
         <% else %>
           &laquo; Previous
         <% end %>
       </li>
-      <% for page_num in @page_data.page_numbers %>
+      <% for page_num in page_data.page_numbers %>
         <li>
-          <% if page_num == @page_data.current_page %>
+          <% if page_num == page_data.current_page %>
             <%= page_num %>
           <% else %>
-            <a href="<%= replace_param('page', page_num) %>"><%= page_num %></a>
+            <a href="<%= replace_param(param_name, page_num) %>#<%= fragment %>"><%= page_num %></a>
           <% end %>
         </li>
       <% end %>
       <li>
-        <% if @page_data.next? %>
-          <a href="<%= replace_param('page', @page_data.current_page + 1) %>">Next &raquo;</a>
+        <% if page_data.next? %>
+          <a href="<%= replace_param(param_name, page_data.current_page + 1) %>#<%= fragment %>">Next &raquo;</a>
         <% else %>
           Next &raquo;
         <% end %>
@@ -28,7 +28,7 @@
     </ul>
   </div>
   <div class="govuk-grid-column-one-half result-count">
-    Showing <%= @page_data.record_range %> of <%= @page_data.total_elements %> results
+    Showing <%= page_data.record_range %> of <%= page_data.total_elements %> results
   </div>
 </div>
 <% end %>
