@@ -34,7 +34,7 @@ class AllocatesController < ApplicationController
       nomis_booking_id: prisoner.latest_booking_id,
       allocated_at_tier: prisoner.tier,
       prison: caseload,
-      override_reason: override_reason,
+      override_reasons: override_reasons,
       override_detail: override_detail
     )
 
@@ -56,8 +56,8 @@ private
     params.require(:allocate).permit(:nomis_staff_id, :nomis_offender_id)
   end
 
-  def override_reason
-    @override[:override_reason] if @override.present?
+  def override_reasons
+    @override[:override_reasons] if @override.present?
   end
 
   def override_detail

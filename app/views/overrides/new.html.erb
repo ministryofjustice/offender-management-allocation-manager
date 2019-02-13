@@ -15,19 +15,19 @@
               <%= hidden_field_tag("override[nomis_offender_id]", @prisoner.offender_no) %>
               <%= hidden_field_tag("override[nomis_staff_id]", @pom.staff_id) %>
               <div class="govuk-checkboxes__item">
-                <%= check_box_tag("override[override_reason]", "complex",  false, id: "override-1", class: "govuk-checkboxes__input") %>
-                <%= label_tag "override[override_reason]", "Prisoner assessed as too complex for #{@recommended_pom} officer POM", class: 'govuk-label govuk-checkboxes__label' %>
+                <%= check_box_tag("override[override_reasons][]", "complex",  false, id: "override-1", class: "govuk-checkboxes__input") %>
+                <%= label_tag "override[override_reasons][]", "Prisoner assessed as too complex for #{@recommended_pom} officer POM", class: 'govuk-label govuk-checkboxes__label' %>
               </div>
               <div class="govuk-checkboxes__item">
-                <%= check_box_tag("override[override_reason]", "no-staff", false, id: "override-2", class: "govuk-checkboxes__input") %>
-                <%= label_tag "override[override_reason]", "No avaliable staff at recommended grade", class: 'govuk-label govuk-checkboxes__label' %>
+                <%= check_box_tag("override[override_reasons][]", "no-staff", false, id: "override-2", class: "govuk-checkboxes__input") %>
+                <%= label_tag "override[override_reasons][]", "No avaliable staff at recommended grade", class: 'govuk-label govuk-checkboxes__label' %>
               </div>
               <div class="govuk-checkboxes__item">
-                <%= check_box_tag("override[override_reason]", "continuity", false, id: "override-3", class: "govuk-checkboxes__input") %>
-                <%= label_tag "override[override_reason]", "Maintain continuity of previous POM", class: 'govuk-label govuk-checkboxes__label' %>
+                <%= check_box_tag("override[override_reasons][]", "continuity", false, id: "override-3", class: "govuk-checkboxes__input") %>
+                <%= label_tag "override[override_reasons][]", "Maintain continuity of previous POM", class: 'govuk-label govuk-checkboxes__label' %>
               </div>
               <div class="govuk-checkboxes__item">
-                <input class="govuk-checkboxes__input" id="override-conditional-4" name="override[override_reason]" type="checkbox" value="other" data-aria-controls="override-4">
+                <input class="govuk-checkboxes__input" id="override-conditional-4" name="override[override_reasons][]" type="checkbox" value="other" data-aria-controls="override-4">
                 <label class="govuk-label govuk-checkboxes__label"
                        for="override-conditional-4">Other</label>
               </div>

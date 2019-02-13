@@ -31,7 +31,7 @@ class AllocationService
       nomis_staff_id: params[:nomis_staff_id],
       nomis_offender_id: params[:nomis_offender_id]
     )
-    o.override_reason = params[:override_reason]
+    o.override_reasons = params[:override_reasons]
     o.more_detail = params[:more_detail]
     o.save!
     o

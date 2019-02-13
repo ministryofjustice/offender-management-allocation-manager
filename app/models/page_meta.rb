@@ -10,12 +10,12 @@ class PageMeta
   def record_range
     return '0 - 0' if total_elements == 0
 
-    start = size * number + 1
-    "#{start} - #{start + items_on_page - 1}"
+    start = (size * (number - 1)) + 1
+    "#{start} - #{start + (items_on_page - 1)}"
   end
 
   def current_page
-    number + 1
+    number
   end
 
   def page_numbers

@@ -11,7 +11,7 @@ describe PageMeta, model: true do
     }
 
     expect(meta.record_range).to eq('0 - 0')
-    expect(meta.current_page).to eq(1)
+    expect(meta.current_page).to eq(0)
     expect(meta.page_numbers).to eq([])
     expect(meta.previous?).to be false
     expect(meta.next?).to be false
@@ -22,7 +22,7 @@ describe PageMeta, model: true do
       p.size = 10
       p.total_elements = 10
       p.total_pages = 1
-      p.number = 0
+      p.number = 1
       p.items_on_page = 10
     }
 
@@ -42,11 +42,11 @@ describe PageMeta, model: true do
       p.items_on_page = 10
     }
 
-    expect(meta.record_range).to eq('21 - 30')
-    expect(meta.current_page).to eq(3)
+    expect(meta.record_range).to eq('11 - 20')
+    expect(meta.current_page).to eq(2)
     expect(meta.page_numbers).to eq(1..3)
     expect(meta.previous?).to be true
-    expect(meta.next?).to be false
+    expect(meta.next?).to be true
   end
 
   it 'handles lots of pages' do
@@ -54,7 +54,7 @@ describe PageMeta, model: true do
       p.size = 10
       p.total_elements = 1000
       p.total_pages = 100
-      p.number = 99
+      p.number = 100
       p.items_on_page = 10
     }
 
@@ -70,7 +70,7 @@ describe PageMeta, model: true do
       p.size = 10
       p.total_elements = 15
       p.total_pages = 2
-      p.number = 1
+      p.number = 2
       p.items_on_page = 5
     }
 
@@ -90,9 +90,9 @@ describe PageMeta, model: true do
       p.items_on_page = 10
     }
 
-    expect(meta.record_range).to eq('91 - 100')
-    expect(meta.current_page).to eq(10)
-    expect(meta.page_numbers).to eq(8..12)
+    expect(meta.record_range).to eq('81 - 90')
+    expect(meta.current_page).to eq(9)
+    expect(meta.page_numbers).to eq(7..11)
     expect(meta.previous?).to be true
     expect(meta.next?).to be true
   end
