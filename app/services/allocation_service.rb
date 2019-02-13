@@ -1,7 +1,7 @@
 class AllocationService
   # rubocop:disable Metrics/MethodLength
   def self.create_allocation(params)
-    Allocation.transaction do
+    allocation = Allocation.transaction {
       Allocation.where(nomis_offender_id: params[:nomis_offender_id]).
         update_all(active: false)
 
@@ -12,8 +12,11 @@ class AllocationService
         alloc.active = true
         alloc.save!
       end
-    end
+    }
+
     delete_overrides(params)
+
+    allocation
   end
   # rubocop:enable Metrics/MethodLength
 

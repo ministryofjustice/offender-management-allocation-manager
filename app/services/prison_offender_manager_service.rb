@@ -1,6 +1,6 @@
 class PrisonOffenderManagerService
   def self.get_pom_detail(nomis_staff_id)
-    PomDetail.find_or_create_by!(nomis_staff_id: nomis_staff_id) { |s|
+    PomDetail.find_or_create_by!(nomis_staff_id: nomis_staff_id.to_i) { |s|
       s.working_pattern = s.working_pattern || 0.0
       s.status = s.status || 'inactive'
     }
@@ -13,5 +13,23 @@ class PrisonOffenderManagerService
       pom.add_detail(detail)
       pom
     }
+  end
+
+  def self.get_allocations_for_pom(nomis_staff_id)
+    detail = PrisonOffenderManagerService.get_pom_detail(nomis_staff_id)
+    detail.allocations.where(active: true)
+  end
+
+  def self.get_allocated_offenders(nomis_staff_id)
+    allocation_list = PrisonOffenderManagerService.get_allocations_for_pom(nomis_staff_id)
+
+    offender_ids = allocation_list.map(&:nomis_offender_id)
+    offender_map = OffenderService.get_sentence_details(offender_ids)
+
+    allocations_and_offender = []
+    allocation_list.each do |alloc|
+      allocations_and_offender << [alloc, offender_map[alloc.nomis_offender_id]]
+    end
+    allocations_and_offender
   end
 end

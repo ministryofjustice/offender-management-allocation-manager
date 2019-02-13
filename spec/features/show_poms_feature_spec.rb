@@ -18,10 +18,10 @@ feature "get poms list" do
   it "allows viewing a POM", vcr: { cassette_name: :show_poms_feature } do
     signin_user
 
-    visit "/poms/1"
+    visit "/poms/485752"
 
     expect(page).to have_css(".govuk-button", count: 1)
-    expect(page).to have_content("Surname, Forename")
+    expect(page).to have_content("Jones, Ross")
     expect(page).to have_content("Caseload")
     expect(page).to have_css('.govuk-breadcrumbs')
     expect(page).to have_css('.govuk-breadcrumbs__link', count: 3)

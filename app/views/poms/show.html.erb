@@ -1,5 +1,5 @@
 
-<h1 class="govuk-heading-xl">Surname, Forename</h1>
+<h1 class="govuk-heading-xl"><%= @pom.full_name %></h1>
 <h2 class="govuk-heading-m">email@example.com</h2>
 
 <div class="govuk-grid-row">
@@ -9,37 +9,25 @@
   </div>
   <div class="govuk-grid-column-one-quarter">
     <div class="govuk-body">POM level</div>
-    <div class="govuk-body govuk-!-font-weight-bold">LEVEL</div>
+    <div class="govuk-body govuk-!-font-weight-bold"><%= @pom.position %></div>
   </div>
   <div class="govuk-grid-column-one-quarter">
     <div class="govuk-body">Working pattern</div>
-    <div class="govuk-body govuk-!-font-weight-bold">PATTERN</div>
+    <div class="govuk-body govuk-!-font-weight-bold"><%= @pom.working_pattern %></div>
   </div>
   <div class="govuk-grid-column-one-quarter">
     <div class="govuk-body">Status</div>
-    <div class="govuk-body govuk-!-font-weight-bold">STATUS</div>
+    <div class="govuk-body govuk-!-font-weight-bold"><%= @pom.status.capitalize %></div>
   </div>
 </div>
 
-<%= link_to("Edit profile", poms_edit_path(id: 1), class: "govuk-button") %>
+<%= link_to("Edit profile", poms_edit_path(id: @pom.staff_id), class: "govuk-button") %>
 
-<div class="govuk-tabs" data-module="tabs">
-  <ul class="govuk-tabs__list" role='tablist'>
-    <li class="govuk-tabs__list-item">
-      <a class="govuk-tabs__tab" href="#caseload">
-        Caseload
-      </a>
-    </li>
-    <li class="govuk-tabs__list-item">
-      <a class="govuk-tabs__tab" href="#notes">
-        Notes
-      </a>
-    </li>
-  </ul>
-  <section class="govuk-tabs__panel" id="caseload">
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-one-quarter">
+    <h2 class="govuk-heading-l">Caseload</h2>
+  </div>
+  <div class="govuk-grid-column-full">
     <%= render 'caseload' %>
-  </section>
-  <section class="govuk-tabs__panel" id="notes">
-    <%= render 'notes' %>
-  </section>
+  </div>
 </div>
