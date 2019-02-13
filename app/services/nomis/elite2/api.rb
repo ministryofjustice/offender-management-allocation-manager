@@ -91,11 +91,7 @@ module Nomis
       def get_bulk_release_dates(offender_ids)
         route = '/elite2api/api/offender-sentences'
 
-        # We have to add the empty item to the list because otherwise we only get the
-        # last item. This appears to be a bug in faraday because the Elite2 API works
-        # fine with the same URL when called via Postman.
-        parameters = { 'offenderNo' => offender_ids + [''] }
-        data = @e2_client.get(route, queryparams: parameters)
+        data = @e2_client.post(route, body: offender_ids)
 
         results = data.each_with_object({}) { |record, hash|
           oid = record['offenderNo']

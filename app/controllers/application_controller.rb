@@ -18,11 +18,6 @@ class ApplicationController < ActionController::Base
     sso_identity['caseload']
   end
 
-  def page_number
-    page_num = params.fetch('page', '1').to_i
-    [page_num - 1, 0].max
-  end
-
 private
 
   def session_expired?
