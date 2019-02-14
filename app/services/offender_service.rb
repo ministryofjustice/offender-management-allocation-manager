@@ -1,9 +1,12 @@
 class OffenderService
   def get_offender(offender_no)
     Nomis::Elite2::Api.get_offender(offender_no).tap { |o|
-      record = Ndelius::Api.get_record(offender_no)
-      o.data.tier = record.tier
-      o.data.case_allocation = record.case_allocation
+      record = CaseInformation.where(nomis_offender_id: offender_no)
+
+      if !record.empty?
+        o.data.tier = record.first.tier
+        o.data.case_allocation = record.first.case_allocation
+      end
 
       release = Nomis::Elite2::Api.get_bulk_release_dates([offender_no])
       o.data.release_date = release.data[offender_no]
@@ -19,9 +22,13 @@ class OffenderService
       page_number,
       page_size: page_size
     )
+
     offender_ids = offenders.data.map(&:offender_no)
 
-    tier_map = Ndelius::Api.get_records(offender_ids)
+    tier_map = offender_ids.each_with_object({}) do |id, hash|
+      hash[id] = CaseInformation.where(nomis_offender_id: id).first
+    end
+
     release_dates = if offender_ids.count > 0
                       Nomis::Elite2::Api.get_bulk_release_dates(offender_ids)
                     else
@@ -31,6 +38,7 @@ class OffenderService
     offenders.data = offenders.data.select { |offender|
       record = tier_map[offender.offender_no]
       offender.tier = record.tier if record
+      offender.case_allocation = record.case_allocation if record
       offender.release_date = release_dates.data[offender.offender_no]
       offender.release_date.present?
     }

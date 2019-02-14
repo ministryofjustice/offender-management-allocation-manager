@@ -8,25 +8,9 @@ feature 'allocations summary feature' do
       visit 'allocations#awaiting-information'
 
       expect(page).to have_css('.govuk-tabs__tab', text: 'Awaiting information')
-      expect(page).to have_css('.pagination ul.links li', count: 21)
-    end
-
-    it 'renders allocated offenders at index', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders_feature } do
-      signin_user
-      visit 'allocations#allocated'
-
-      expect(page).to have_css('.govuk-tabs__tab', text: 'Allocated')
-      expect(page).to have_css('.pagination')
-      expect(page).to have_css('.pagination ul.links li', count: 16)
-    end
-
-    it 'displays offenders already allocated', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders_feature } do
-      signin_user
-
-      visit 'allocations#allocated'
-
-      expect(page).to have_css('.govuk-tabs__tab', text: 'Allocated')
-      expect(page).to have_css('.pagination ul.links li', count: 16)
+      within('#awaiting-information') do
+        expect(page).to have_css('.pagination ul.links li', count: 7)
+      end
     end
 
     it 'displays offenders pending allocation', :raven_intercept_exception, vcr: { cassette_name: :awaiting_allocation_feature } do
@@ -35,8 +19,23 @@ feature 'allocations summary feature' do
       visit 'allocations#awaiting-allocation'
 
       expect(page).to have_css('.govuk-tabs__tab', text: 'Awaiting allocation')
-      expect(page).to have_css('.pagination ul.links li', count: 16)
+      within('#awaiting-allocation') do
+        expect(page).to have_css('.pagination ul.links li', count: 2)
+      end
     end
+
+    it 'displays offenders already allocated', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders_feature } do
+      signin_user
+
+      visit 'allocations#allocated'
+
+      expect(page).to have_css('.govuk-tabs__tab', text: 'Allocated')
+      within('#allocated') do
+        expect(page).to have_css('.pagination ul.links li', count: 2)
+      end
+    end
+
+
   end
 
   describe 'paging' do

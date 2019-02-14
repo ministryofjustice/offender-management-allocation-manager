@@ -19,11 +19,11 @@ Rails.application.routes.draw do
       as: 'allocates_show')
   get('/allocate/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocates#new',
       as: 'new_allocates')
-  resource :allocates, only: %i[ create ]
 
   get('/overrides/new/:nomis_offender_id/:nomis_staff_id' => 'overrides#new',
       as: 'new_overrides')
 
+  resource :allocates, only: %i[ create ]
   resource :overrides,  only: %i[create]
-
+  resource :case_information, only: %i[new create], controller: 'case_information', path_names: { new: 'new/:nomis_offender_id' }
 end

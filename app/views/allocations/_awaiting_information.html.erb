@@ -15,9 +15,23 @@
       <tr class="govuk-table__row offender_row_<%= i %>">
         <td aria-label="Prisoner full name" class="govuk-table__cell "><%= offender.full_name %></td>
         <td aria-label="Prisoner number" class="govuk-table__cell "><%= offender.offender_no %></td>
-        <td aria-label="Case allocation" class="govuk-table__cell ">Case allocation</td>
-        <td aria-label="Tier" class="govuk-table__cell ">Tier</td>
-        <td aria-label="Awaiting for" class="govuk-table__cell">Awaiting for</td>
+
+        <!-- Todo: REFACTOR THIS SECTION TO USE PRESENTERS -->
+        <td aria-label="Case allocation" class="govuk-table__cell ">
+          <% if offender.case_allocation %>
+            <%= offender.case_allocation %>
+          <% else %>
+            Not provided
+          <% end %>
+        </td>
+        <td aria-label="Tier" class="govuk-table__cell ">
+          <% if offender.tier %>
+            <%= offender.tier %>
+          <% else %>
+            Not provided
+          <% end %>
+        </td>
+        <td aria-label="Awaiting for" class="govuk-table__cell"></td>
         <td aria-label="Action" class="govuk-table__cell "><%= link_to "Edit", new_case_information_path(offender.offender_no) %></td>
       </tr>
     <% end %>
