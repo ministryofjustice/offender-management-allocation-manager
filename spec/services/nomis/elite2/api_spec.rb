@@ -27,6 +27,35 @@ describe Nomis::Elite2::Api do
     end
   end
 
+  describe 'Bulk operations' do
+    it 'can get bulk sentence details',
+      vcr: { cassette_name: :elite2_api_bulk_sentence_details } do
+      noms_ids = ['G2911GD']
+
+      response = described_class.get_bulk_sentence_details(noms_ids)
+
+      expect(response.data).to be_instance_of(Hash)
+
+      records = response.data.values
+      expect(records.first).to be_instance_of(Nomis::Elite2::SentenceDetail)
+      expect(records.first.release_date).to eq('2019-05-17')
+      expect(records.first.full_name).to eq('Ahmonis, Imanjah')
+    end
+
+    it 'can get bulk release dates',
+      vcr: { cassette_name: :elite2_api_bulk_sentence_details } do
+      noms_ids = ['G2911GD']
+
+      response = described_class.get_bulk_release_dates(noms_ids)
+
+      expect(response.data).to be_instance_of(Hash)
+
+      records = response.data.values
+      expect(records.first).to be_instance_of(Date)
+      expect(records.first.to_s).to eq('2019-05-17')
+    end
+  end
+
   describe 'Single offender' do
     it "can get a single offender's details",
       vcr: { cassette_name: :elite2_api_single_offender_spec } do

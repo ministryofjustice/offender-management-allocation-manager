@@ -37,4 +37,8 @@ class OffenderService
     offenders
   end
   # rubocop:enable Metrics/MethodLength
+
+  def self.get_sentence_details(offender_id_list)
+    Nomis::Elite2::Api.get_bulk_sentence_details(offender_id_list).data
+  end
 end
