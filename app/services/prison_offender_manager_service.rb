@@ -15,6 +15,13 @@ class PrisonOffenderManagerService
     }
   end
 
+  def self.get_pom_names(prison)
+    poms_list = PrisonOffenderManagerService.get_poms(prison)
+    poms_list.each_with_object({}) { |p, hsh|
+      hsh[p.staff_id] = p.full_name
+    }
+  end
+
   def self.get_allocations_for_pom(nomis_staff_id)
     detail = PrisonOffenderManagerService.get_pom_detail(nomis_staff_id)
     detail.allocations.where(active: true)

@@ -31,4 +31,11 @@ describe PrisonOffenderManagerService do
     expect(poms).to be_kind_of(Array)
     expect(poms.count).to eq(5)
   end
+
+  it "can get the names for POMs when given IDs",
+    vcr: { cassette_name: :pom_service_get_poms } do
+    names = described_class.get_pom_names('LEI')
+    expect(names).to be_kind_of(Hash)
+    expect(names.count).to eq(5)
+  end
 end

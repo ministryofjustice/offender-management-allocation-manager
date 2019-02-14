@@ -6,9 +6,7 @@
         class='table-sorter__link' href='#'>Prisoner name</a></th>
       <th class="govuk-table__header sorter-false" scope="col">Prisoner number</th>
       <th class="govuk-table__header sorter-false" scope="col">Arrival date</th>
-      <th class="govuk-table__header sorter-false" scope="col">Release date</th>
-      <th class="govuk-table__header header-width__8" scope="col"><a
-        class='table-sorter__link' href='#'>Tier</a></th>
+      <th class="govuk-table__header sorter-false" scope="col">Release date/Parole eligibility</th>
       <th class="govuk-table__header" scope="col"><a
         class='table-sorter__link' href='#'>POM</a></th>
       <th class="govuk-table__header" scope="col"><a
@@ -24,8 +22,7 @@
         <td aria-label="Arrival date" class="govuk-table__cell
               ">N/A</td>
         <td aria-label="Release date" class="govuk-table__cell"><%= format_date(offender.release_date) %></td>
-        <td aria-label="Tier" class="govuk-table__cell"><%= offender.tier %></td>
-        <td aria-label="POM" class="govuk-table__cell">NA</td>
+        <td aria-label="POM" class="govuk-table__cell"><%= offender.allocated_pom_name %></td>
         <td aria-label="Allocation date" class="govuk-table__cell">NA</td>
         <td aria-label="Action" class="govuk-table__cell "><a
           href="">Reallocate</a></td>

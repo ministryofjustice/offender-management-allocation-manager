@@ -41,4 +41,27 @@ class OffenderService
   def self.get_sentence_details(offender_id_list)
     Nomis::Elite2::Api.get_bulk_sentence_details(offender_id_list).data
   end
+
+  def self.allocations_for_offenders(offender_id_list)
+    Allocation.where(
+      nomis_offender_id: offender_id_list, active: true
+    ).preload(:pom_detail)
+  end
+
+  # Takes a list of OffenderShort objects, and returns them with their
+  # allocated POM name set in :allocated_pom_name
+  def self.set_allocated_pom_name(offenders, caseload)
+    pom_names = PrisonOffenderManagerService.get_pom_names(caseload)
+
+    offender_ids = offenders.map(&:offender_no)
+    offender_to_staff_hash = allocations_for_offenders(offender_ids).map { |a|
+      [a.nomis_offender_id, pom_names[a.pom_detail.nomis_staff_id]]
+    }.to_h
+
+    offenders.each do |offender|
+      offender.allocated_pom_name = offender_to_staff_hash[offender.offender_no]
+    end
+
+    offenders
+  end
 end

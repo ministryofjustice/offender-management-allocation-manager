@@ -15,7 +15,7 @@ class AllocatesController < ApplicationController
     @prisoner = OffenderService.new.get_offender(nomis_offender_id_from_url).data
 
     poms_list = PrisonOffenderManagerService.get_poms(caseload)
-    @pom = poms_list.select { |p| p.staff_id == nomis_staff_id_from_url }.first
+    @pom = poms_list.select { |p| p.staff_id == nomis_staff_id_from_url.to_i }.first
   end
 
   # rubocop:disable Metrics/MethodLength
