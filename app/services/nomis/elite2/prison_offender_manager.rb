@@ -3,7 +3,7 @@ module Nomis
     class PrisonOffenderManager
       include MemoryModel
 
-      attribute :staff_id, :string
+      attribute :staff_id, :integer
       attribute :first_name, :string
       attribute :last_name, :string
       attribute :agency_id, :string

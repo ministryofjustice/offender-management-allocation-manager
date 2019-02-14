@@ -24,6 +24,7 @@ module Nomis
       attribute :rnum, :integer
       attribute :release_date, :date
       attribute :tier, :string
+      attribute :allocated_pom_name, :string
 
       def full_name
         "#{last_name}, #{first_name}".titleize

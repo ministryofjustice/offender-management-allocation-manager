@@ -23,7 +23,7 @@ private
 
   def pom
     @poms_list ||= PrisonOffenderManagerService.get_poms(caseload)
-    @poms_list.select { |p| p.staff_id == params.require(:nomis_staff_id) }.first
+    @poms_list.select { |p| p.staff_id == params.require(:nomis_staff_id).to_i }.first
   end
 
   def override_params

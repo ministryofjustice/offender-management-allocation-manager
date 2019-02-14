@@ -11,7 +11,7 @@ feature 'allocations summary feature' do
       expect(page).to have_css('.pagination ul.links li', count: 16)
     end
 
-    it 'renders allocation offenders at index', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders_feature } do
+    it 'renders allocated offenders at index', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders_feature } do
       signin_user
       visit 'allocations#allocated'
 

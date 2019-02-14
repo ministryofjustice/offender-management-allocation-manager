@@ -56,10 +56,17 @@ class AllocationSummaryService
       @counts[:missing_count].digits[0]
     )
 
+    # For the allocated offenders, we need to provide the allocated POM's
+    # name
+    allocated_offenders = OffenderService.set_allocated_pom_name(
+      @allocated_bucket.last(allocated_wanted),
+      prison
+    )
+
     # Return the last (N) records from each bucket, in case
     # the capacity was higher than 10 (we need more than one page worth).
     AllocationSummary.new.tap { |summary|
-      summary.allocated_offenders = @allocated_bucket.last(allocated_wanted)
+      summary.allocated_offenders = allocated_offenders
       summary.unallocated_offenders = @unallocated_bucket.last(unallocated_wanted)
       summary.missing_info_offenders = @missing_info_bucket.last(missing_wanted)
 
