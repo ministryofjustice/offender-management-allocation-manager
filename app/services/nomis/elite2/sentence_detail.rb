@@ -14,6 +14,10 @@ module Nomis
       attribute :facial_image_id
       attribute :internal_location_desc
 
+      def sentence_date
+        sentence_detail['sentenceStartDate']
+      end
+
       def release_date
         sentence_detail['releaseDate']
       end

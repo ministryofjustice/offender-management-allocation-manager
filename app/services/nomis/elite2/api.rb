@@ -9,7 +9,6 @@ module Nomis
       class << self
         delegate :get_offender, to: :instance
         delegate :get_offender_list, to: :instance
-        delegate :get_bulk_release_dates, to: :instance
         delegate :get_bulk_sentence_details, to: :instance
         delegate :get_offence, to: :instance
         delegate :get_offender, to: :instance
@@ -89,28 +88,12 @@ module Nomis
         ApiResponse.new(data.first['offenceDescription'])
       end
 
-      def get_bulk_release_dates(offender_ids)
-        route = '/elite2api/api/offender-sentences'
-
-        data = @e2_client.post(route, body: offender_ids)
-
-        results = data.each_with_object({}) { |record, hash|
-          oid = record['offenderNo']
-          datestring = record['sentenceDetail'].fetch('releaseDate', '')
-          hash[oid] = datestring.present? ? Date.parse(datestring) : nil
-        }
-
-        ApiResponse.new(results)
-      end
-
       def get_bulk_sentence_details(offender_ids)
+        return ApiResponse.new({}) if offender_ids.empty?
+
         route = '/elite2api/api/offender-sentences'
 
-        # We have to add the empty item to the list because otherwise we only get the
-        # last item. This appears to be a bug in faraday because the Elite2 API works
-        # fine with the same URL when called via Postman.
-        parameters = { 'offenderNo' => offender_ids + [''] }
-        data = @e2_client.get(route, queryparams: parameters)
+        data = @e2_client.post(route, offender_ids)
 
         results = data.each_with_object({}) { |record, hash|
           oid = record['offenderNo']

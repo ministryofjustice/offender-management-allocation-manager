@@ -1,4 +1,5 @@
 class OffenderService
+  # rubocop:disable Metrics/MethodLength
   def get_offender(offender_no)
     Nomis::Elite2::Api.get_offender(offender_no).tap { |o|
       record = CaseInformation.where(nomis_offender_id: offender_no)
@@ -8,12 +9,14 @@ class OffenderService
         o.data.case_allocation = record.first.case_allocation
       end
 
-      release = Nomis::Elite2::Api.get_bulk_release_dates([offender_no])
-      o.data.release_date = release.data[offender_no]
+      sentence_detail = Nomis::Elite2::Api.get_bulk_sentence_details([offender_no]).data
+      o.data.release_date = sentence_detail[offender_no].release_date
+      o.data.sentence_date = sentence_detail[offender_no].sentence_date
 
       o.data.main_offence = Nomis::Elite2::Api.get_offence(o.data.latest_booking_id).data
     }
   end
+  # rubocop:enable Metrics/MethodLength
 
   # rubocop:disable Metrics/MethodLength
   def get_offenders_for_prison(prison, page_number: 0, page_size: 10)
@@ -29,17 +32,20 @@ class OffenderService
       hash[id] = CaseInformation.where(nomis_offender_id: id).first
     end
 
-    release_dates = if offender_ids.count > 0
-                      Nomis::Elite2::Api.get_bulk_release_dates(offender_ids)
-                    else
-                      {}
-                    end
+    sentence_details = if offender_ids.count > 0
+                         sentence_details = Nomis::Elite2::Api.get_bulk_sentence_details(
+                           offender_ids
+                         ).data
+                       else
+                         {}
+                       end
 
     offenders.data = offenders.data.select { |offender|
       record = tier_map[offender.offender_no]
       offender.tier = record.tier if record
       offender.case_allocation = record.case_allocation if record
-      offender.release_date = release_dates.data[offender.offender_no]
+      offender.sentence_date = sentence_details[offender.offender_no].sentence_date
+      offender.release_date = sentence_details[offender.offender_no].release_date
       offender.release_date.present?
     }
     offenders

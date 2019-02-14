@@ -48,7 +48,7 @@ module Nomis
         req.headers['Content-Type'] = 'application/json' if method == :post
         req.headers.merge!(extra_headers)
         req.params.update(queryparams)
-        req.body = body[:body].to_json if body.present? && method == :post
+        req.body = body.to_json if body.present? && method == :post
       end
     rescue Faraday::ResourceNotFound, Faraday::ClientError => e
       AllocationManager::ExceptionHandler.capture_exception(e)

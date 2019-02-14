@@ -31,7 +31,7 @@
             Not provided
           <% end %>
         </td>
-        <td aria-label="Awaiting for" class="govuk-table__cell"></td>
+        <td aria-label="Awaiting for" class="govuk-table__cell"><%= offender.awaiting_allocation_for %> days</td>
         <td aria-label="Action" class="govuk-table__cell "><%= link_to "Edit", new_case_information_path(offender.offender_no) %></td>
       </tr>
     <% end %>
