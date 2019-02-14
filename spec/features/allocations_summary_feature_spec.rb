@@ -34,8 +34,6 @@ feature 'allocations summary feature' do
         expect(page).to have_css('.pagination ul.links li', count: 2)
       end
     end
-
-
   end
 
   describe 'paging' do

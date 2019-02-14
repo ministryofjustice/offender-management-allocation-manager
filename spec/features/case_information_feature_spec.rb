@@ -25,5 +25,3 @@ feature 'case information feature' do
     expect(page).to have_current_path allocations_path
   end
 end
-
-

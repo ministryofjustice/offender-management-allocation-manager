@@ -15,7 +15,7 @@ class CaseInformationController < ApplicationController
     redirect_to allocations_path
   end
 
-  private
+private
 
   def nomis_offender_id_from_url
     params.require(:nomis_offender_id)

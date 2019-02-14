@@ -3,7 +3,7 @@ class OffenderService
     Nomis::Elite2::Api.get_offender(offender_no).tap { |o|
       record = CaseInformation.where(nomis_offender_id: offender_no)
 
-      if !record.empty?
+      unless record.empty?
         o.data.tier = record.first.tier
         o.data.case_allocation = record.first.case_allocation
       end
