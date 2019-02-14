@@ -16,14 +16,13 @@
       </a>
       </li>
       <li class="govuk-tabs__list-item">
-      <a class="govuk-tabs__tab" href="#awaiting-tiering">
-          Awaiting tiering (<%= @summary.missing_info_total %>)
+      <a class="govuk-tabs__tab" href="#awaiting-information">
+          Awaiting information (<%= @summary.missing_info_total %>)
       </a>
       </li>
   </ul>
 
   <%= render 'allocated' %>
   <%= render 'awaiting' %>
-  <%= render 'missing_information' %>
-
+  <%= render 'awaiting_information' %>
 </div>

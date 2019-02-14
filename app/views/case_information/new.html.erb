@@ -1,0 +1,55 @@
+<%= render :partial => "/shared/backlink", :locals => { :page => allocations_path } %>
+
+<%= form_tag(case_information_path, method: :post) do %>
+  <h1 class="govuk-heading-l govuk-!-margin-top-4">Case information</h1>
+  <h2 class="govuk-heading-m">Prisoner name and number</h2>
+  <p>Please provide information on:</p>
+
+  <div class="govuk-form-group">
+    <%= hidden_field_tag("case_information[nomis_offender_id]", @prisoner.offender_no) %>
+    <fieldset class="govuk-fieldset">
+      <legend class="govuk-fieldset__legend">
+        <p class="govuk-fieldset__heading">
+        Case allocation decision
+        </p>
+      </legend>
+      <div class="govuk-radios">
+        <div class="govuk-radios__item">
+          <%= radio_button_tag("case_information[case_allocation]", "NPS", false, class: "govuk-radios__input") %>
+          <%= label_tag "case_information[case_allocation]", "National Probation Service (NPS)", class: "govuk-label govuk-radios__label" %>
+        </div>
+        <div class="govuk-radios__item">
+          <%= radio_button_tag("case_information[allocation]", "CRC", false, class: "govuk-radios__input") %>
+          <%= label_tag "case_information[allocation]", "Community Rehabilitation Company (CRC)", class: "govuk-label govuk-radios__label" %>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="govuk-fieldset govuk-!-margin-top-6">
+      <legend class="govuk-fieldset__legend">
+        <p class="govuk-fieldset__heading">
+        Prisoner's tiering decision
+        </p>
+      </legend>
+      <div class="govuk-radios">
+        <div class="govuk-radios__item">
+          <%= radio_button_tag("case_information[tier]", "A", false, class: "govuk-radios__input") %>
+          <%= label_tag "case_information[tier]", "Tier A", class: "govuk-label govuk-radios__label" %>
+        </div>
+        <div class="govuk-radios__item">
+          <%= radio_button_tag("case_information[tier]", "B", false, class: "govuk-radios__input") %>
+          <%= label_tag "case_information[tier]", "Tier B", class: "govuk-label govuk-radios__label" %>
+        </div>
+        <div class="govuk-radios__item">
+          <%= radio_button_tag("case_information[tier]", "C", false, class: "govuk-radios__input") %>
+          <%= label_tag "case_information[tier]", "Tier C", class: "govuk-label govuk-radios__label" %>
+        </div>
+        <div class="govuk-radios__item">
+          <%= radio_button_tag("case_information[tier]", "D", false, class: "govuk-radios__input") %>
+          <%= label_tag "case_information[tier]", "Tier D", class: "govuk-label govuk-radios__label" %>
+        </div>
+      </div>
+    </fieldset>
+    <%= submit_tag "Save", role: "button", draggable: "false", class: "govuk-button govuk govuk-!-margin-top-4" %>
+  </div>
+<% end %>

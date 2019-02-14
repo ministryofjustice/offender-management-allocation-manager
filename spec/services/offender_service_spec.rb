@@ -18,8 +18,11 @@ describe OffenderService, vcr: { cassette_name: :offender_service_offenders_by_p
   end
 
   it "gets a single offender", vcr: { cassette_name: :offender_service_single_offender_spec } do
-    noms_id = 'G4273GI'
-    offender = OffenderService.new.get_offender(noms_id)
+    nomis_offender_id = 'G4273GI'
+
+    CaseInformation.create(nomis_offender_id: nomis_offender_id, tier: 'C', case_allocation: 'CRC')
+    offender = OffenderService.new.get_offender(nomis_offender_id)
+
     expect(offender.data).to be_kind_of(Nomis::Elite2::Offender)
     expect(offender.data.release_date).to eq Date.new(2020, 2, 7)
     expect(offender.data.tier).to eq 'C'
