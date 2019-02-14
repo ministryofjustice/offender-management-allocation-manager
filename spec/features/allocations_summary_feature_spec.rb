@@ -2,13 +2,13 @@ require 'rails_helper'
 
 feature 'allocations summary feature' do
   describe 'awaiting allocations table' do
-    it 'displays offenders awaiting tiering', :raven_intercept_exception, vcr: { cassette_name: :awaiting_tiering_feature } do
+    it 'displays offenders awaiting information', :raven_intercept_exception, vcr: { cassette_name: :awaiting_information_feature } do
       signin_user
 
-      visit 'allocations#awaiting-tiering'
+      visit 'allocations#awaiting-information'
 
-      expect(page).to have_css('.govuk-tabs__tab', text: 'Awaiting tiering')
-      expect(page).to have_css('.pagination ul.links li', count: 16)
+      expect(page).to have_css('.govuk-tabs__tab', text: 'Awaiting information')
+      expect(page).to have_css('.pagination ul.links li', count: 21)
     end
 
     it 'renders allocated offenders at index', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders_feature } do

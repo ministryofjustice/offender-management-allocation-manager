@@ -1,0 +1,28 @@
+<section class="govuk-tabs__panel" id="awaiting-information">
+  <table class="govuk-table responsive tablesorter">
+    <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th class="govuk-table__header" scope="col"><a href='#' class='table-sorter__link'>Prisoner name</a></th>
+      <th class="govuk-table__header sorter-false" scope="col">Prisoner number</th>
+      <th class="govuk-table__header" scope="col"><a href="#">Case allocation</a></th>
+      <th class="govuk-table__header" scope="col"><a href="#">Tier</a></th>
+      <th class="govuk-table__header" scope="col"><a href="#">Awaiting for</a></th>
+      <th class="govuk-table__header sorter-false" scope="col">Action</th>
+    </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+    <% @offenders_awaiting_tiering.each_with_index do |offender, i| %>
+      <tr class="govuk-table__row offender_row_<%= i %>">
+        <td aria-label="Prisoner full name" class="govuk-table__cell "><%= offender.full_name %></td>
+        <td aria-label="Prisoner number" class="govuk-table__cell "><%= offender.offender_no %></td>
+        <td aria-label="Case allocation" class="govuk-table__cell ">Case allocation</td>
+        <td aria-label="Tier" class="govuk-table__cell ">Tier</td>
+        <td aria-label="Awaiting for" class="govuk-table__cell">Awaiting for</td>
+        <td aria-label="Action" class="govuk-table__cell "><%= link_to "Edit", new_case_information_path(offender.offender_no) %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+
+  <%= render '/shared/pagination' %>
+</section>
