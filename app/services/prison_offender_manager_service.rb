@@ -39,4 +39,10 @@ class PrisonOffenderManagerService
     end
     allocations_and_offender
   end
+
+  def self.get_new_cases(nomis_staff_id)
+    today = DateTime.now
+    week_ago = 7.days.ago
+    Allocation.where(nomis_staff_id: nomis_staff_id).where(created_at: week_ago..today)
+    end
 end

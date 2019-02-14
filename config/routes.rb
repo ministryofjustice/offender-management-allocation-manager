@@ -12,6 +12,8 @@ Rails.application.routes.draw do
   get('/poms' => 'poms#index')
   get('/poms/:id' => 'poms#show', as: 'poms_show')
   get('/poms/:id/edit' => 'poms#edit', as: 'poms_edit')
+  get('/poms/:id/my_caseload' => 'poms#my_caseload', as: 'my_caseload')
+  get('/poms/:id/new_cases' => 'poms#new_cases', as: 'new_cases')
 
   get('/prisoners/:id' => 'prisoners#show', as: 'prisoners_show')
 
