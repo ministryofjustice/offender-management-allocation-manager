@@ -1,4 +1,4 @@
-class AllocationSummaryService
+class SummaryService
   PAGE_SIZE = 10 # The number of items to show in the view
   FETCH_SIZE = 500 # How many records to fetch from nomis at a time
 
