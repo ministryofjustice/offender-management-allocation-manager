@@ -23,9 +23,16 @@ module Nomis
       attribute :category_code, :string
       attribute :rnum, :integer
       attribute :release_date, :date
+      attribute :sentence_date, :date
       attribute :tier, :string
       attribute :allocated_pom_name, :string
       attribute :case_allocation, :string
+
+      def awaiting_allocation_for
+        return 0 if sentence_date.blank?
+
+        (Time.zone.today - sentence_date).to_i
+      end
 
       def full_name
         "#{last_name}, #{first_name}".titleize
