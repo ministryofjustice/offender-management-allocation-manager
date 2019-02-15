@@ -7,7 +7,7 @@ Rails.application.routes.draw do
 
   get('health' => 'health#index')
 
-  get('/allocations' => 'allocations#index')
+  get('/summary' => 'summary#index')
 
   get('/poms' => 'poms#index')
   get('/poms/:id' => 'poms#show', as: 'poms_show')

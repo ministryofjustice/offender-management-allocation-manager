@@ -18,7 +18,7 @@ feature 'Allocation' do
 
     click_button 'Complete allocation'
 
-    expect(page).to have_current_path allocations_path
+    expect(page).to have_current_path summary_path
   end
 
   scenario 'overriding an allocation', vcr: { cassette_name: :override_allocation_feature } do
@@ -43,7 +43,7 @@ feature 'Allocation' do
 
     click_button 'Complete allocation'
 
-    expect(page).to have_current_path allocations_path
+    expect(page).to have_current_path summary_path
     expect(Override.count).to eq(0)
   end
 end

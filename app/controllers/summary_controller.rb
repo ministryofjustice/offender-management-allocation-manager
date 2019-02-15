@@ -1,4 +1,4 @@
-class AllocationsController < ApplicationController
+class SummaryController < ApplicationController
   before_action :authenticate_user
 
   def index

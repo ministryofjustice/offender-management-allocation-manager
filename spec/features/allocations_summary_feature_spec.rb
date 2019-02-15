@@ -1,11 +1,11 @@
 require 'rails_helper'
 
-feature 'allocations summary feature' do
-  describe 'awaiting allocations table' do
+feature 'summary summary feature' do
+  describe 'awaiting summary table' do
     it 'displays offenders awaiting information', :raven_intercept_exception, vcr: { cassette_name: :awaiting_information_feature } do
       signin_user
 
-      visit 'allocations#awaiting-information'
+      visit 'summary#awaiting-information'
 
       expect(page).to have_css('.govuk-tabs__tab', text: 'Awaiting information')
       within('#awaiting-information') do
@@ -16,7 +16,7 @@ feature 'allocations summary feature' do
     it 'displays offenders pending allocation', :raven_intercept_exception, vcr: { cassette_name: :awaiting_allocation_feature } do
       signin_user
 
-      visit 'allocations#awaiting-allocation'
+      visit 'summary#awaiting-allocation'
 
       expect(page).to have_css('.govuk-tabs__tab', text: 'Awaiting allocation')
       within('#awaiting-allocation') do
@@ -27,7 +27,7 @@ feature 'allocations summary feature' do
     it 'displays offenders already allocated', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders_feature } do
       signin_user
 
-      visit 'allocations#allocated'
+      visit 'summary#allocated'
 
       expect(page).to have_css('.govuk-tabs__tab', text: 'Allocated')
       within('#allocated') do
@@ -40,27 +40,27 @@ feature 'allocations summary feature' do
     it 'shows pages for allocation', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders_paged_feature, match_requests_on: [:query] } do
       signin_user
 
-      visit allocations_path
+      visit summary_path
       expect(page).to have_link('Next »')
       expect(page).not_to have_link('« Previous')
       expect(page).not_to have_link(/^1$/)
 
-      visit allocations_path(page: 2)
+      visit summary_path(page: 2)
       expect(page).to have_link('Next »')
       expect(page).not_to have_link('« Previous')
       expect(page).not_to have_link(/^2$/)
 
-      visit allocations_path(page: 3)
+      visit summary_path(page: 3)
       expect(page).to have_link('Next »')
       expect(page).not_to have_link('« Previous')
       expect(page).not_to have_link(/^3$/)
 
-      visit allocations_path(page: 4)
+      visit summary_path(page: 4)
       expect(page).to have_link('Next »')
       expect(page).not_to have_link('« Previous')
       expect(page).not_to have_link(/^4$/)
 
-      visit allocations_path(page: 117)
+      visit summary_path(page: 117)
       expect(page).to have_link('Next »')
       expect(page).not_to have_link('« Previous')
       expect(page).not_to have_link(/^117$/)

@@ -5,7 +5,7 @@ feature 'case information feature' do
     nomis_offender_id = 'G4273GI'
 
     signin_user
-    visit allocations_path
+    visit summary_path
 
     within('#awaiting-information') do
       within('.offender_row_0') do
@@ -23,7 +23,7 @@ feature 'case information feature' do
     expect(CaseInformation.first.nomis_offender_id).to eq(nomis_offender_id)
     expect(CaseInformation.first.tier).to eq('A')
     expect(CaseInformation.first.case_allocation).to eq('NPS')
-    expect(page).to have_current_path allocations_path
+    expect(page).to have_current_path summary_path
 
     within('#awaiting-allocation') do
       expect(page).to have_css('.offender_row_0', count: 1)
