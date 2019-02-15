@@ -1,6 +1,6 @@
 class AllocationSummaryService
   PAGE_SIZE = 10 # The number of items to show in the view
-  FETCH_SIZE = 500 # How many records to fetch from nomis at a time
+  FETCH_SIZE = 250 # How many records to fetch from nomis at a time
 
   # rubocop:disable Metrics/MethodLength
   def summary(allocated_page, unallocated_page, missing_info_page, prison)
