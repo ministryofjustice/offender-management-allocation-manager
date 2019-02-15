@@ -1,0 +1,31 @@
+<h2 class="govuk-heading-l">New allocations</h2>
+
+<table class="govuk-table responsive tablesorter">
+  <thead class="govuk-table__head">
+  <tr class="govuk-table__row">
+    <th class="govuk-table__header" scope="col"><a
+      class='table-sorter__link' href='#'>Prisoner name</a></th>
+    <th class="govuk-table__header" scope="col">Prisoner number</th>
+    <th class="govuk-table__header" scope="col">
+      <a class="table-sorter__link" href="#">Arrival date</a></th>
+    <th class="govuk-table__header" scope="col">
+      <a class="table-sorter__link" href="#">Release date/parole eligibility</a></th>
+    <th class="govuk-table__header" scope="col">
+      <a class="table-sorter__link" href="#">Allocation date</a></th>
+    <th class="govuk-table__header" scope="col">
+      <a class="table-sorter__link" href="#">Role</a></th>
+  </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+  <% @new_allocations.each do |allocation, sentence| %>
+    <tr class="govuk-table__row">
+      <td aria-label="Prisoner name" class="govuk-table__cell "><%= sentence.full_name %></td>
+      <td aria-label="Prisoner number" class="govuk-table__cell "><%= allocation.nomis_offender_id %></td>
+      <td aria-label="Arrival date" class="govuk-table__cell ">ARRIVAL DATE</td>
+      <td aria-label="Release date" class="govuk-table__cell "><%= format_date(sentence.release_date.to_date) %></td>
+      <td aria-label="Allocation date" class="govuk-table__cell "><%= format_date(allocation.created_at) %></td>
+      <td aria-label="Role" class="govuk-table__cell ">ROLE</td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

@@ -39,4 +39,15 @@ class PrisonOffenderManagerService
     end
     allocations_and_offender
   end
+
+  def self.get_new_allocations(nomis_staff_id)
+    allocations = PrisonOffenderManagerService.get_allocated_offenders(nomis_staff_id)
+    allocations.select { |allocation, _offender| allocation.created_at >= 7.days.ago }
+  end
+
+  def self.get_signed_in_pom_details(current_user)
+    user = Nomis::Elite2::Api.fetch_nomis_user_details(current_user).data
+    poms_list = PrisonOffenderManagerService.get_poms(user.active_case_load_id)
+    @pom = poms_list.select { |p| p.staff_id.to_i == user.staff_id.to_i }.first
+  end
 end

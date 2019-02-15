@@ -1,11 +1,12 @@
 require 'rails_helper'
 require_relative '../../app/services/nomis/elite2/sentence_detail'
+require_relative '../../app/services/nomis/elite2/offender'
 
 describe PrisonOffenderManagerService do
   let(:pom_detail) {
     described_class.get_pom_detail(485_595)
   }
-  let(:allocation) {
+  let(:allocation_one) {
     AllocationService.create_allocation(
       nomis_staff_id: pom_detail.nomis_staff_id,
       nomis_offender_id: 'G2911GD',
@@ -16,13 +17,34 @@ describe PrisonOffenderManagerService do
     )
   }
 
+  let(:allocation_two) {
+    AllocationService.create_allocation(
+      nomis_staff_id: pom_detail.nomis_staff_id,
+      nomis_offender_id: 'G8060UF',
+      created_by: 'Test User',
+      nomis_booking_id: 1,
+      allocated_at_tier: 'A',
+      prison: 'LEI'
+    )
+  }
+
   it "can get allocated offenders for a POM",
     vcr: { cassette_name: :pom_service_allocated_offenders } do
-    allocated_offenders = described_class.get_allocated_offenders(allocation.nomis_staff_id)
+    allocated_offenders = described_class.get_allocated_offenders(allocation_one.nomis_staff_id)
 
     alloc, sentence_detail = allocated_offenders.first
     expect(alloc).to be_kind_of(Allocation)
     expect(sentence_detail).to be_kind_of(Nomis::Elite2::SentenceDetail)
+  end
+
+  it "will get allocations for a POM made within the last 7 days", vcr: { cassette_name: :get_new_allocations } do
+    allocation_one.created_at = 10.days.ago
+    allocation_one.save!
+    allocation_two.created_at = 3.days.ago
+    allocation_two.save!
+
+    allocated_offenders = described_class.get_new_allocations(allocation_one.nomis_staff_id)
+    expect(allocated_offenders.count).to eq 1
   end
 
   it "can get a list of POMs",
