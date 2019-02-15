@@ -65,7 +65,7 @@ class SummaryService
 
     # Return the last (N) records from each bucket, in case
     # the capacity was higher than 10 (we need more than one page worth).
-    AllocationSummary.new.tap { |summary|
+    Summary.new.tap { |summary|
       summary.allocated_offenders = allocated_offenders
       summary.unallocated_offenders = @unallocated_bucket.last(unallocated_wanted)
       summary.missing_info_offenders = @missing_info_bucket.last(missing_wanted)
