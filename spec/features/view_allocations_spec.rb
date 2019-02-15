@@ -4,6 +4,10 @@ feature "view POM's caseload" do
   let(:nomis_staff_id) { 485_637 }
   let(:nomis_offender_id) { 'G4273GI' }
 
+  before do
+    CaseInformation.create(nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPC')
+  end
+
   it 'displays all cases for a specific POM',  vcr: { cassette_name: :show_poms_caseload } do
     signin_user('PK000223')
 
