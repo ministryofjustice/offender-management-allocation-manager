@@ -28,8 +28,9 @@ class OffenderService
 
     offender_ids = offenders.map(&:offender_no)
 
-    tier_map = offender_ids.each_with_object({}) do |id, hash|
-      hash[id] = CaseInformation.where(nomis_offender_id: id).first
+    cases = CaseInformation.where(nomis_offender_id: offender_ids)
+    tier_map = cases.each_with_object({}) do |c, hash|
+      hash[c.nomis_offender_id] = c
     end
 
     sentence_details = if offender_ids.count > 0
@@ -41,12 +42,16 @@ class OffenderService
                        end
 
     offenders.select { |offender|
-      record = tier_map[offender.offender_no]
-      offender.tier = record.tier if record
-      offender.case_allocation = record.case_allocation if record
-      offender.sentence_date = sentence_details[offender.offender_no].sentence_date
       offender.release_date = sentence_details[offender.offender_no].release_date
-      offender.release_date.present?
+      if offender.release_date.present?
+        record = tier_map[offender.offender_no]
+        offender.tier = record.tier if record
+        offender.case_allocation = record.case_allocation if record
+        offender.sentence_date = sentence_details[offender.offender_no].sentence_date
+        true
+      else
+        false
+      end
     }
   end
   # rubocop:enable Metrics/MethodLength
