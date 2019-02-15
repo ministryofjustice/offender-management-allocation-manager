@@ -16,7 +16,6 @@ class PomsController < ApplicationController
 
   def show
     @pom = pom
-
     @allocations = PrisonOffenderManagerService.get_allocated_offenders(@pom.staff_id)
   end
 
@@ -36,7 +35,6 @@ class PomsController < ApplicationController
 private
 
   def pom
-    poms_list = PrisonOffenderManagerService.get_poms(caseload)
-    @pom = poms_list.select { |p| p.staff_id.to_i == params['id'].to_i }.first
+    PrisonOffenderManagerService.get_pom(caseload, params[:id])
   end
 end
