@@ -1,6 +1,7 @@
 <% if page_data %>
 <div class="govuk-grid-row pagination">
   <div class="govuk-grid-column-one-half">
+    <% if page_data.page_count > 1 %>
     <ul class="links">
       <li>
         <% if page_data.previous? %>
@@ -26,6 +27,9 @@
         <% end %>
       </li>
     </ul>
+    <% else %>
+      &nbsp;
+    <% end %>
   </div>
   <div class="govuk-grid-column-one-half result-count">
     Showing <%= page_data.record_range %> of <%= page_data.total_elements %> results

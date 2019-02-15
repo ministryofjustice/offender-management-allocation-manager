@@ -20,7 +20,7 @@ feature 'allocations summary feature' do
 
       expect(page).to have_css('.govuk-tabs__tab', text: 'Awaiting allocation')
       within('#awaiting-allocation') do
-        expect(page).to have_css('.pagination ul.links li', count: 2)
+        expect(page).to have_css('.pagination ul.links li', count: 0)
       end
     end
 
@@ -31,7 +31,7 @@ feature 'allocations summary feature' do
 
       expect(page).to have_css('.govuk-tabs__tab', text: 'Allocated')
       within('#allocated') do
-        expect(page).to have_css('.pagination ul.links li', count: 2)
+        expect(page).to have_css('.pagination ul.links li', count: 0)
       end
     end
   end
