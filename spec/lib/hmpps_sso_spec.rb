@@ -17,12 +17,10 @@ describe OmniAuth::Strategies::HmppsSso do
       it 'returns a hash with the user name and caseload' do
         leeds_prison = 'LEI'
         username = 'Fred'
-        response = Nomis::Elite2::ApiResponse.new(
-          double('staff_details',
-            active_case_load_id: leeds_prison,
-            username: username
-          )
-        )
+        response = double('staff_details',
+          active_case_load_id: leeds_prison,
+          username: username
+                   )
 
         allow(Nomis::Elite2::Api).to receive(:fetch_nomis_user_details).and_return(response)
         allow(strategy).to receive(:username).and_return(username)

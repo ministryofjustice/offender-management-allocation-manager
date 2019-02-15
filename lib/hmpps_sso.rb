@@ -41,7 +41,7 @@ module OmniAuth
     private
 
       def staff_details
-        @staff_details ||= Nomis::Elite2::Api.fetch_nomis_user_details(username).data
+        @staff_details ||= Nomis::Elite2::Api.fetch_nomis_user_details(username)
       end
 
       #:nocov:

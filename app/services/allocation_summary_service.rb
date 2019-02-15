@@ -95,11 +95,7 @@ private
   def max_requests_count(prison)
     # Fetch the first 1 prisoners just for the total number of pages so that we
     # can send batched queries.
-    info_request = OffenderService.new.get_offenders_for_prison(
-      prison,
-      page_number: 0,
-      page_size: 1
-    )
+    info_request = Nomis::Elite2::Api.get_offender_list(prison, 1, page_size: 1)
 
     # The maximum number of pages we need to fetch before we have all of
     # the offenders
@@ -107,12 +103,11 @@ private
   end
 
   def get_page_of_offenders(prison, page_number)
-    response = OffenderService.new.get_offenders_for_prison(
+    OffenderService.new.get_offenders_for_prison(
       prison,
       page_number: page_number,
       page_size: FETCH_SIZE
     )
-    response.data
   end
 
   def get_tiered_offenders(offender_list)

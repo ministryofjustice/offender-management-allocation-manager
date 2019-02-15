@@ -8,7 +8,7 @@ class PrisonOffenderManagerService
 
   def self.get_poms(prison)
     poms = Nomis::Elite2::Api.prisoner_offender_manager_list(prison)
-    poms.data.map { |pom|
+    poms.map { |pom|
       detail = get_pom_detail(pom.staff_id)
       pom.add_detail(detail)
       pom
@@ -46,7 +46,7 @@ class PrisonOffenderManagerService
   end
 
   def self.get_signed_in_pom_details(current_user)
-    user = Nomis::Elite2::Api.fetch_nomis_user_details(current_user).data
+    user = Nomis::Elite2::Api.fetch_nomis_user_details(current_user)
     poms_list = PrisonOffenderManagerService.get_poms(user.active_case_load_id)
     @pom = poms_list.select { |p| p.staff_id.to_i == user.staff_id.to_i }.first
   end

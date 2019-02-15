@@ -1,6 +1,6 @@
 class OverridesController < ApplicationController
   def new
-    @prisoner = OffenderService.new.get_offender(params.require(:nomis_offender_id)).data
+    @prisoner = OffenderService.new.get_offender(params.require(:nomis_offender_id))
     @recommended_pom = @prisoner.current_responsibility
     @pom = pom
   end
