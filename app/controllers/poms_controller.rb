@@ -23,13 +23,13 @@ class PomsController < ApplicationController
   def edit; end
 
   def my_caseload
-    signed_in_pom_details
+    @pom = PrisonOffenderManagerService.get_signed_in_pom_details(current_user)
     @allocations = PrisonOffenderManagerService.get_allocated_offenders(@pom.staff_id)
     @new_allocations = PrisonOffenderManagerService.get_new_allocations(@pom.staff_id)
   end
 
   def new_allocations
-    signed_in_pom_details
+    @pom = PrisonOffenderManagerService.get_signed_in_pom_details(current_user)
     @new_allocations = PrisonOffenderManagerService.get_new_allocations(@pom.staff_id)
   end
 
@@ -38,11 +38,5 @@ private
   def pom
     poms_list = PrisonOffenderManagerService.get_poms(caseload)
     @pom = poms_list.select { |p| p.staff_id.to_i == params['id'].to_i }.first
-  end
-
-  def signed_in_pom_details
-    user = Nomis::Elite2::Api.fetch_nomis_user_details(current_user).data
-    poms_list = PrisonOffenderManagerService.get_poms(caseload)
-    @pom = poms_list.select { |p| p.staff_id.to_i == user.staff_id.to_i }.first
   end
 end
