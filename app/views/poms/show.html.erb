@@ -4,12 +4,8 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-one-quarter">
-    <div class="govuk-body">Gender</div>
-    <div class="govuk-body govuk-!-font-weight-bold">GENDER</div>
-  </div>
-  <div class="govuk-grid-column-one-quarter">
     <div class="govuk-body">POM level</div>
-    <div class="govuk-body govuk-!-font-weight-bold"><%= @pom.position %></div>
+    <div class="govuk-body govuk-!-font-weight-bold"><%= pom_level(@pom.position) %></div>
   </div>
   <div class="govuk-grid-column-one-quarter">
     <div class="govuk-body">Working pattern</div>

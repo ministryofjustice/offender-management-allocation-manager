@@ -14,4 +14,11 @@ module ApplicationHelper
 
     date_obj.strftime('%d/%m/%Y')
   end
+
+  def pom_level(level)
+    {
+      'PO' => 'Prison POM',
+      'PRO'=> 'Probation POM'
+    }[level]
+  end
 end
