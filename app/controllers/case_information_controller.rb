@@ -2,7 +2,7 @@ class CaseInformationController < ApplicationController
   before_action :authenticate_user
 
   def new
-    @prisoner = OffenderService.new.get_offender(nomis_offender_id_from_url).data
+    @prisoner = OffenderService.new.get_offender(nomis_offender_id_from_url)
   end
 
   def create

@@ -13,7 +13,7 @@ describe Nomis::Elite2::Api do
       vcr: { cassette_name: :get_elite2_offender_list } do
       response = described_class.get_offender_list('LEI')
 
-      expect(response).not_to be_nil
+      expect(response.data).not_to be_nil
       expect(response.data).to be_instance_of(Array)
       expect(response.data).to all(be_an Nomis::Elite2::OffenderShort)
     end
@@ -22,8 +22,8 @@ describe Nomis::Elite2::Api do
       vcr: { cassette_name: :get_offence_ok } do
       booking_id = '1153753'
       response = described_class.get_offence(booking_id)
-      expect(response.data).to be_instance_of(String)
-      expect(response.data).to eq 'Section 18 - wounding with intent to resist / prevent arrest'
+      expect(response).to be_instance_of(String)
+      expect(response).to eq 'Section 18 - wounding with intent to resist / prevent arrest'
     end
   end
 
@@ -34,9 +34,9 @@ describe Nomis::Elite2::Api do
 
       response = described_class.get_bulk_sentence_details(noms_ids)
 
-      expect(response.data).to be_instance_of(Hash)
+      expect(response).to be_instance_of(Hash)
 
-      records = response.data.values
+      records = response.values
       expect(records.first).to be_instance_of(Nomis::Elite2::SentenceDetail)
       expect(records.first.release_date).to eq('2019-05-17')
       expect(records.first.full_name).to eq('Ahmonis, Imanjah')
@@ -50,7 +50,7 @@ describe Nomis::Elite2::Api do
 
       response = described_class.get_offender(noms_id)
 
-      expect(response.data).to be_instance_of(Nomis::Elite2::Offender)
+      expect(response).to be_instance_of(Nomis::Elite2::Offender)
     end
 
     it 'returns null if unable to find prisoner', :raven_intercept_exception,
@@ -59,7 +59,7 @@ describe Nomis::Elite2::Api do
 
       response = described_class.get_offender(noms_id)
 
-      expect(response.data).to be_instance_of(Nomis::Elite2::NullOffender)
+      expect(response).to be_instance_of(Nomis::Elite2::NullOffender)
     end
   end
 
@@ -69,8 +69,8 @@ describe Nomis::Elite2::Api do
       vcr: { cassette_name: :elite2_api_keyworkers_spec  } do
       response = described_class.prisoner_offender_manager_list('LEI')
 
-      expect(response.data).to be_instance_of(Array)
-      expect(response.data).to all(be_an Nomis::Elite2::PrisonOffenderManager)
+      expect(response).to be_instance_of(Array)
+      expect(response).to all(be_an Nomis::Elite2::PrisonOffenderManager)
     end
 
     it "gets staff details",
@@ -79,8 +79,8 @@ describe Nomis::Elite2::Api do
 
       response = described_class.fetch_nomis_user_details(username)
 
-      expect(response.data).to be_kind_of(Nomis::Elite2::UserDetails)
-      expect(response.data.active_case_load_id).to eq('LEI')
+      expect(response).to be_kind_of(Nomis::Elite2::UserDetails)
+      expect(response.active_case_load_id).to eq('LEI')
     end
   end
 end

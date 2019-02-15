@@ -5,15 +5,15 @@ class OffenderService
       record = CaseInformation.where(nomis_offender_id: offender_no)
 
       unless record.empty?
-        o.data.tier = record.first.tier
-        o.data.case_allocation = record.first.case_allocation
+        o.tier = record.first.tier
+        o.case_allocation = record.first.case_allocation
       end
 
-      sentence_detail = Nomis::Elite2::Api.get_bulk_sentence_details([offender_no]).data
-      o.data.release_date = sentence_detail[offender_no].release_date
-      o.data.sentence_date = sentence_detail[offender_no].sentence_date
+      sentence_detail = Nomis::Elite2::Api.get_bulk_sentence_details([offender_no])
+      o.release_date = sentence_detail[offender_no].release_date
+      o.sentence_date = sentence_detail[offender_no].sentence_date
 
-      o.data.main_offence = Nomis::Elite2::Api.get_offence(o.data.latest_booking_id).data
+      o.main_offence = Nomis::Elite2::Api.get_offence(o.latest_booking_id)
     }
   end
   # rubocop:enable Metrics/MethodLength
@@ -24,9 +24,9 @@ class OffenderService
       prison,
       page_number,
       page_size: page_size
-    )
+    ).data
 
-    offender_ids = offenders.data.map(&:offender_no)
+    offender_ids = offenders.map(&:offender_no)
 
     tier_map = offender_ids.each_with_object({}) do |id, hash|
       hash[id] = CaseInformation.where(nomis_offender_id: id).first
@@ -35,12 +35,12 @@ class OffenderService
     sentence_details = if offender_ids.count > 0
                          sentence_details = Nomis::Elite2::Api.get_bulk_sentence_details(
                            offender_ids
-                         ).data
+                         )
                        else
                          {}
                        end
 
-    offenders.data = offenders.data.select { |offender|
+    offenders.select { |offender|
       record = tier_map[offender.offender_no]
       offender.tier = record.tier if record
       offender.case_allocation = record.case_allocation if record
@@ -48,12 +48,11 @@ class OffenderService
       offender.release_date = sentence_details[offender.offender_no].release_date
       offender.release_date.present?
     }
-    offenders
   end
   # rubocop:enable Metrics/MethodLength
 
   def self.get_sentence_details(offender_id_list)
-    Nomis::Elite2::Api.get_bulk_sentence_details(offender_id_list).data
+    Nomis::Elite2::Api.get_bulk_sentence_details(offender_id_list)
   end
 
   def self.allocations_for_offenders(offender_id_list)
