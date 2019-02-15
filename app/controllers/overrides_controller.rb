@@ -2,7 +2,7 @@ class OverridesController < ApplicationController
   def new
     @prisoner = OffenderService.new.get_offender(params.require(:nomis_offender_id))
     @recommended_pom = @prisoner.current_responsibility
-    @pom = pom
+    @pom = PrisonOffenderManagerService.get_pom(caseload, params[:nomis_staff_id])
   end
 
   def create
@@ -20,11 +20,6 @@ class OverridesController < ApplicationController
   end
 
 private
-
-  def pom
-    @poms_list ||= PrisonOffenderManagerService.get_poms(caseload)
-    @poms_list.select { |p| p.staff_id == params.require(:nomis_staff_id).to_i }.first
-  end
 
   def override_params
     params.require(:override).permit(

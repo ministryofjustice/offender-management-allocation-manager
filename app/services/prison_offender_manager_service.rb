@@ -15,6 +15,11 @@ class PrisonOffenderManagerService
     }
   end
 
+  def self.get_pom(caseload, nomis_staff_id)
+    poms_list = PrisonOffenderManagerService.get_poms(caseload)
+    @pom = poms_list.select { |p| p.staff_id == nomis_staff_id.to_i }.first
+  end
+
   def self.get_pom_names(prison)
     poms_list = PrisonOffenderManagerService.get_poms(prison)
     poms_list.each_with_object({}) { |p, hsh|
