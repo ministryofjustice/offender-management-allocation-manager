@@ -35,7 +35,7 @@ class AllocatesController < ApplicationController
       override_detail: override_detail
     )
 
-    redirect_to allocations_path(anchor: 'awaiting-allocation')
+    redirect_to summary_path(anchor: 'awaiting-allocation')
   end
 # rubocop:enable Metrics/MethodLength
 

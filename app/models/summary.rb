@@ -1,4 +1,4 @@
-class AllocationSummary
+class Summary
   attr_accessor :allocated_offenders, :unallocated_offenders, :missing_info_offenders
   attr_accessor :allocated_total, :unallocated_total, :missing_info_total
   attr_accessor :allocated_page_count, :unallocated_page_count, :missing_page_count

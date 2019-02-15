@@ -12,7 +12,7 @@ class CaseInformationController < ApplicationController
       case_allocation: case_information_params[:case_allocation]
     )
 
-    redirect_to allocations_path(anchor: 'awaiting-information')
+    redirect_to summary_path(anchor: 'awaiting-information')
   end
 
 private

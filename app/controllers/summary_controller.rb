@@ -1,4 +1,4 @@
-class AllocationsController < ApplicationController
+class SummaryController < ApplicationController
   before_action :authenticate_user
 
   def index
@@ -6,7 +6,7 @@ class AllocationsController < ApplicationController
     unallocated_page = params.fetch('unallocated-page', 1).to_i
     missing_info_page = params.fetch('missing-info-page', 1).to_i
 
-    @summary = AllocationSummaryService.new.summary(
+    @summary = SummaryService.new.summary(
       allocated_page, unallocated_page,
       missing_info_page, caseload
     )

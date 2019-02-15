@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe AllocationSummaryService do
+describe SummaryService do
   # TODO: - Populate test db with Case Information
   it "will generate a summary", vcr: { cassette_name: :allocation_summary_service_summary } do
     summary = described_class.new.summary(1, 48, 15, 'LEI')

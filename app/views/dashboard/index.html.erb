@@ -6,7 +6,7 @@
   <div class="govuk-grid-column-one-third">
     <div class="wrapper">
       <h1 class="govuk-heading-s">
-        <%= link_to "Allocated prisoners", allocations_path(anchor: 'allocated'), class:"govuk-link" %>
+        <%= link_to "Allocated prisoners", summary_path(anchor: 'allocated'), class:"govuk-link" %>
       </h1>
       <p class="govuk-body">All prisoners who have been allocated a Prison Offender Manager.</p>
     </div>
@@ -14,7 +14,7 @@
   <div class="govuk-grid-column-one-third">
     <div class="wrapper">
       <h1 class="govuk-heading-s">
-        <%= link_to "Awaiting allocation", allocations_path(anchor: 'awaiting-allocation'), class:"govuk-link" %>
+        <%= link_to "Awaiting allocation", summary_path(anchor: 'awaiting-allocation'), class:"govuk-link" %>
       </h1>
       <p class="govuk-body">Prisoners who need to be allocated a Prison Offender Manager.</p>
     </div>
@@ -22,7 +22,7 @@
   <div class="govuk-grid-column-one-third">
     <div class="wrapper">
       <h1 class="govuk-heading-s">
-        <%= link_to "Awaiting information", allocations_path(anchor: 'awaiting-information'), class:"govuk-link" %>
+        <%= link_to "Awaiting information", summary_path(anchor: 'awaiting-information'), class:"govuk-link" %>
       </h1>
       <p class="govuk-body">Prisoners for whom we require case information adding before being allocated already</p>
     </div>
