@@ -1,6 +1,5 @@
 module Nomis
   module Elite2
-    ApiResponse = Struct.new(:data)
     ApiPaginatedResponse = Struct.new(:meta, :data)
 
     class Api
@@ -25,8 +24,7 @@ module Nomis
         route = "/elite2api/api/users/#{username}"
         response = @e2_client.get(route)
 
-        ApiResponse.new(api_deserialiser.
-          deserialise(Nomis::Elite2::UserDetails, response))
+        api_deserialiser.deserialise(Nomis::Elite2::UserDetails, response)
       end
 
       def prisoner_offender_manager_list(prison)
@@ -36,20 +34,17 @@ module Nomis
           raise Nomis::Client::APIError, 'No data was returned' if data.empty?
         }
 
-        poms = response.map { |pom|
+        response.map { |pom|
           api_deserialiser.deserialise(Nomis::Elite2::PrisonOffenderManager, pom)
         }
-
-        ApiResponse.new(poms)
       end
 
       # rubocop:disable Metrics/MethodLength
       def get_offender_list(prison, page = 0, page_size: 10)
         route = "/elite2api/api/locations/description/#{prison}/inmates"
 
-        page_offset = page * page_size
         page_meta = nil
-
+        page_offset = page * page_size
         hdrs = paging_headers(page_size, page_offset)
 
         data = @e2_client.get(route, extra_headers: hdrs) { |json, response|
@@ -73,34 +68,30 @@ module Nomis
           raise Nomis::Client::APIError, 'No data was returned' if data.empty?
         }
 
-        ApiResponse.new(
-          api_deserialiser.deserialise(Nomis::Elite2::Offender, response.first)
-        )
+        api_deserialiser.deserialise(Nomis::Elite2::Offender, response.first)
       rescue Nomis::Client::APIError => e
         AllocationManager::ExceptionHandler.capture_exception(e)
-        ApiResponse.new(NullOffender.new)
+        NullOffender.new
       end
       # rubocop:enable Metrics/MethodLength
 
       def get_offence(booking_id)
         route = "/elite2api/api/bookings/#{booking_id}/mainOffence"
         data = @e2_client.get(route)
-        ApiResponse.new(data.first['offenceDescription'])
+        data.first['offenceDescription']
       end
 
       def get_bulk_sentence_details(offender_ids)
-        return ApiResponse.new({}) if offender_ids.empty?
+        return {} if offender_ids.empty?
 
         route = '/elite2api/api/offender-sentences'
 
         data = @e2_client.post(route, offender_ids)
 
-        results = data.each_with_object({}) { |record, hash|
+        data.each_with_object({}) { |record, hash|
           oid = record['offenderNo']
           hash[oid] = api_deserialiser.deserialise(Nomis::Elite2::SentenceDetail, record)
         }
-
-        ApiResponse.new(results)
       end
 
     private
