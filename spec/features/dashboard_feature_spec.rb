@@ -2,7 +2,7 @@ require 'rails_helper'
 
 feature 'get dashboard' do
   it 'shows the status page', vcr: { cassette_name: :dashboard_feature } do
-    signin_user
+    signin_user('PK000223')
 
     visit '/'
 
