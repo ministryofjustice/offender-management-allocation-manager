@@ -27,5 +27,8 @@ Rails.application.routes.draw do
 
   resource :allocations, only: %i[ create ]
   resource :overrides,  only: %i[create]
-  resource :case_information, only: %i[new create], controller: 'case_information', path_names: { new: 'new/:nomis_offender_id' }
+  resource :case_information, only: %i[new create edit update], controller: 'case_information', path_names: {
+      new: 'new/:nomis_offender_id',
+      edit: 'edit/:nomis_offender_id'
+  }
 end

@@ -9,6 +9,14 @@ class CaseInformationController < ApplicationController
     @prisoner = prisoner(nomis_offender_id_from_url)
   end
 
+  def edit
+    @case_info = CaseInformation.find_by(
+      nomis_offender_id: nomis_offender_id_from_url
+    )
+
+    @prisoner = prisoner(nomis_offender_id_from_url)
+  end
+
   def create
     @case_info = CaseInformation.create(
       nomis_offender_id: case_information_params[:nomis_offender_id],
@@ -20,6 +28,17 @@ class CaseInformationController < ApplicationController
 
     @prisoner = prisoner(case_information_params[:nomis_offender_id])
     render :new
+  end
+
+  def update
+    case_info = CaseInformation.find_by(
+      nomis_offender_id: case_information_params[:nomis_offender_id],
+    )
+    case_info.tier = case_information_params[:tier]
+    case_info.case_allocation = case_information_params[:case_allocation]
+    case_info.save()
+
+    redirect_to allocations_show_path(case_info.nomis_offender_id)
   end
 
 private
