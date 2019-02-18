@@ -1,55 +1,78 @@
-<%= render :partial => "/shared/backlink", :locals => { :page => summary_path } %>
+<%= render :partial => "/shared/backlink", :locals => { :page => summary_path(anchor: 'awaiting-information') } %>
+
+
+<% if @case_info.errors.count > 0 %>
+  <%= render :partial => "/shared/validation_errors", :locals => { :errors => @case_info.errors } %>
+<% end %>
 
 <%= form_tag(case_information_path, method: :post) do %>
   <h1 class="govuk-heading-l govuk-!-margin-top-4">Case information</h1>
   <h2 class="govuk-heading-m">Prisoner name and number</h2>
   <p>Please provide information on:</p>
 
-  <div class="govuk-form-group">
+  <div class="govuk-form-group <% if @case_info.errors[:case_allocation].present? %>govuk-form-group--error<% end %>">
     <%= hidden_field_tag("case_information[nomis_offender_id]", @prisoner.offender_no) %>
     <fieldset class="govuk-fieldset">
       <legend class="govuk-fieldset__legend">
+        <% if @case_info.errors[:case_allocation].present? %>
+          <span class="govuk-error-message">
+            Case allocation <%= @case_info.errors[:case_allocation].first %>
+          </span>
+        <% end %>
+
         <p class="govuk-fieldset__heading">
         Case allocation decision
         </p>
       </legend>
+
       <div class="govuk-radios">
         <div class="govuk-radios__item">
-          <%= radio_button_tag("case_information[case_allocation]", "NPS", false, class: "govuk-radios__input") %>
+          <%= radio_button_tag("case_information[case_allocation]", "NPS", @case_info.case_allocation == 'NPS', class: "govuk-radios__input") %>
           <%= label_tag "case_information[case_allocation]", "National Probation Service (NPS)", class: "govuk-label govuk-radios__label" %>
         </div>
         <div class="govuk-radios__item">
-          <%= radio_button_tag("case_information[case_allocation]", "CRC", false, class: "govuk-radios__input") %>
+          <%= radio_button_tag("case_information[case_allocation]", "CRC", @case_info.case_allocation == 'CRC', class: "govuk-radios__input") %>
           <%= label_tag "case_information[case_allocation]", "Community Rehabilitation Company (CRC)", class: "govuk-label govuk-radios__label" %>
         </div>
       </div>
     </fieldset>
+  </div>
 
+  <div class="govuk-form-group <% if @case_info.errors[:tier].present? %>govuk-form-group--error<% end %>">
     <fieldset class="govuk-fieldset govuk-!-margin-top-6">
       <legend class="govuk-fieldset__legend">
+        <% if @case_info.errors[:tier].present? %>
+          <span class="govuk-error-message">
+            Tier <%= @case_info.errors[:tier].first %>
+          </span>
+        <% end %>
+
         <p class="govuk-fieldset__heading">
         Prisoner's tiering decision
         </p>
       </legend>
+
       <div class="govuk-radios">
         <div class="govuk-radios__item">
-          <%= radio_button_tag("case_information[tier]", "A", false, class: "govuk-radios__input") %>
+          <%= radio_button_tag("case_information[tier]", "A", @case_info[:tier] == 'A', class: "govuk-radios__input") %>
           <%= label_tag "case_information[tier]", "Tier A", class: "govuk-label govuk-radios__label" %>
         </div>
         <div class="govuk-radios__item">
-          <%= radio_button_tag("case_information[tier]", "B", false, class: "govuk-radios__input") %>
+          <%= radio_button_tag("case_information[tier]", "B", @case_info[:tier] == 'B', class: "govuk-radios__input") %>
           <%= label_tag "case_information[tier]", "Tier B", class: "govuk-label govuk-radios__label" %>
         </div>
         <div class="govuk-radios__item">
-          <%= radio_button_tag("case_information[tier]", "C", false, class: "govuk-radios__input") %>
+          <%= radio_button_tag("case_information[tier]", "C", @case_info[:tier] == 'C', class: "govuk-radios__input") %>
           <%= label_tag "case_information[tier]", "Tier C", class: "govuk-label govuk-radios__label" %>
         </div>
         <div class="govuk-radios__item">
-          <%= radio_button_tag("case_information[tier]", "D", false, class: "govuk-radios__input") %>
+          <%= radio_button_tag("case_information[tier]", "D", @case_info[:tier] == 'D', class: "govuk-radios__input") %>
           <%= label_tag "case_information[tier]", "Tier D", class: "govuk-label govuk-radios__label" %>
         </div>
       </div>
     </fieldset>
-    <%= submit_tag "Save", role: "button", draggable: "false", class: "govuk-button govuk govuk-!-margin-top-4" %>
   </div>
+
+  <%= submit_tag "Save", role: "button", draggable: "false", class: "govuk-button govuk govuk-!-margin-top-4" %>
+
 <% end %>
