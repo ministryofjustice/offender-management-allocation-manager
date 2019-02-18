@@ -5,7 +5,9 @@ class AllocationsController < ApplicationController
     @prisoner = OffenderService.new.get_offender(nomis_offender_id_from_url)
     @recommended_pom = @prisoner.current_responsibility
 
-    pom_response = PrisonOffenderManagerService.get_poms(caseload)
+    pom_response = PrisonOffenderManagerService.get_poms(caseload) { |pom|
+      pom.status == 'active'
+    }
     @recommended_poms, @not_recommended_poms = pom_response.partition { |pom|
       pom.position_description.include?(@recommended_pom)
     }

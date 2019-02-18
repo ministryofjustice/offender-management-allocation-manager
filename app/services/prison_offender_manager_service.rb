@@ -2,17 +2,24 @@ class PrisonOffenderManagerService
   def self.get_pom_detail(nomis_staff_id)
     PomDetail.find_or_create_by!(nomis_staff_id: nomis_staff_id.to_i) { |s|
       s.working_pattern = s.working_pattern || 0.0
-      s.status = s.status || 'inactive'
+      s.status = s.status || 'active'
     }
   end
 
-  def self.get_poms(prison)
+  def self.get_poms(prison, &filter)
     poms = Nomis::Elite2::Api.prisoner_offender_manager_list(prison)
-    poms.map { |pom|
+
+    poms = poms.map { |pom|
       detail = get_pom_detail(pom.staff_id)
       pom.add_detail(detail)
       pom
-    }
+    }.compact
+
+    if filter
+      poms = poms.select { |pom| yield pom }
+    end
+
+    poms
   end
 
   def self.get_pom(caseload, nomis_staff_id)
