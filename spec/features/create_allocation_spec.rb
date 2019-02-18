@@ -11,7 +11,7 @@ feature 'Allocation' do
   scenario 'creating an allocation', vcr: { cassette_name: :create_allocation_feature } do
     signin_user
 
-    visit new_allocates_path(nomis_offender_id, nomis_staff_id)
+    visit new_allocations_path(nomis_offender_id, nomis_staff_id)
 
     expect(page).to have_css('h1', text: 'Confirm allocation')
     expect(page).to have_css('p', text: 'You are allocating Abbella, Ozullirn to Jones, Ross')
@@ -26,7 +26,7 @@ feature 'Allocation' do
 
     signin_user
 
-    visit allocates_show_path(nomis_offender_id)
+    visit allocations_show_path(nomis_offender_id)
 
     within('.not_recommended_pom_row_0') do
       click_link 'Allocate'
@@ -39,7 +39,7 @@ feature 'Allocation' do
     click_button('Continue')
 
     expect(Override.count).to eq(1)
-    expect(page).to have_current_path new_allocates_path(nomis_offender_id, override_nomis_staff_id)
+    expect(page).to have_current_path new_allocations_path(nomis_offender_id, override_nomis_staff_id)
 
     click_button 'Complete allocation'
 

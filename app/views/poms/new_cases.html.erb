@@ -17,7 +17,7 @@
   </tr>
   </thead>
   <tbody class="govuk-table__body">
-  <% @new_allocations.each do |allocation, sentence| %>
+  <% @new_cases.each do |allocation, sentence| %>
     <tr class="govuk-table__row">
       <td aria-label="Prisoner name" class="govuk-table__cell "><%= sentence.full_name %></td>
       <td aria-label="Prisoner number" class="govuk-table__cell "><%= allocation.nomis_offender_id %></td>

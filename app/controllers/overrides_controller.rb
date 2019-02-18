@@ -13,7 +13,7 @@ class OverridesController < ApplicationController
       more_detail: override_params[:more_detail]
       )
 
-    redirect_to new_allocates_path(
+    redirect_to new_allocations_path(
       override_params[:nomis_offender_id],
       override_params[:nomis_staff_id]
     )

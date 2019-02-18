@@ -1,7 +1,7 @@
-<%= render :partial => "/shared/backlink", :locals => { :page => allocates_show_path() } %>
+<%= render :partial => "/shared/backlink", :locals => { :page => allocations_show_path() } %>
 
 <div>
-    <%= form_tag(allocates_path, method: :post) do %>
+    <%= form_tag(allocations_path, method: :post) do %>
       <h1 class="govuk-heading-xl govuk-!-margin-top-4">Confirm allocation</h1>
       <p class="govuk-body">You are allocating <%= @prisoner.full_name %> to <%= @pom.full_name %></p>
       <p class="govuk-body">We'll be using the email address below to let them know about their new allocation</p>

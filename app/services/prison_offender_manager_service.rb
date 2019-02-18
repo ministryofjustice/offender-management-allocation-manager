@@ -45,7 +45,7 @@ class PrisonOffenderManagerService
     allocations_and_offender
   end
 
-  def self.get_new_allocations(nomis_staff_id)
+  def self.get_new_cases(nomis_staff_id)
     allocations = PrisonOffenderManagerService.get_allocated_offenders(nomis_staff_id)
     allocations.select { |allocation, _offender| allocation.created_at >= 7.days.ago }
   end
