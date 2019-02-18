@@ -6,7 +6,7 @@ class PrisonOffenderManagerService
     }
   end
 
-  def self.get_poms(prison, &filter)
+  def self.get_poms(prison)
     poms = Nomis::Elite2::Api.prisoner_offender_manager_list(prison)
 
     poms = poms.map { |pom|
@@ -15,9 +15,7 @@ class PrisonOffenderManagerService
       pom
     }.compact
 
-    if filter
-      poms = poms.select { |pom| yield pom }
-    end
+    poms = poms.select { |pom| yield pom } if block_given?
 
     poms
   end
