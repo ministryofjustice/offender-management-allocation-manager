@@ -3,13 +3,15 @@ require 'rails_helper'
 feature 'Allocation' do
   let!(:probation_officer_nomis_staff_id) { 485_636 }
   let!(:prison_officer_nomis_staff_id) { 485_752 }
-  let!(:nomis_offender_id) {'G4273GI'}
+  let!(:nomis_offender_id) { 'G4273GI' }
 
-  let!(:probation_officer_pom_detail) { PomDetail.create!(
-    nomis_staff_id: probation_officer_nomis_staff_id,
-    working_pattern: 1.0,
-    status: 'Active'
-  )}
+  let!(:probation_officer_pom_detail) {
+    PomDetail.create!(
+      nomis_staff_id: probation_officer_nomis_staff_id,
+      working_pattern: 1.0,
+      status: 'Active'
+  )
+  }
 
   let!(:case_information) {
     CaseInformation.create!(nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPS')
@@ -59,7 +61,7 @@ feature 'Allocation' do
     expect(Override.count).to eq(0)
   end
 
-  scenario 're-allocating', vcr: {cassette_name: :re_allocate_feature} do
+  scenario 're-allocating', vcr: { cassette_name: :re_allocate_feature } do
     probation_officer_pom_detail.allocations.create!(
       nomis_offender_id: nomis_offender_id,
       nomis_booking_id: 1_153_753,
