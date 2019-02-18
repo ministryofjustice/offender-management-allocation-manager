@@ -13,19 +13,19 @@ Rails.application.routes.draw do
   get('/poms/:id' => 'poms#show', as: 'poms_show')
   get('/poms/:id/edit' => 'poms#edit', as: 'poms_edit')
   get('/poms/:staff_id/my_caseload' => 'poms#my_caseload', as: 'my_caseload')
-  get('/poms/:staff_id/new_allocations' => 'poms#new_allocations', as: 'new_allocations')
+  get('/poms/:staff_id/new_cases' => 'poms#new_cases', as: 'new_cases')
 
   get('/prisoners/:id' => 'prisoners#show', as: 'prisoners_show')
 
-  get('/allocate/:nomis_offender_id' => 'allocates#show',
-      as: 'allocates_show')
-  get('/allocate/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocates#new',
-      as: 'new_allocates')
+  get('/allocations/:nomis_offender_id' => 'allocations#show',
+      as: 'allocations_show')
+  get('/allocations/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocations#new',
+      as: 'new_allocations')
 
   get('/overrides/new/:nomis_offender_id/:nomis_staff_id' => 'overrides#new',
       as: 'new_overrides')
 
-  resource :allocates, only: %i[ create ]
+  resource :allocations, only: %i[ create ]
   resource :overrides,  only: %i[create]
   resource :case_information, only: %i[new create], controller: 'case_information', path_names: { new: 'new/:nomis_offender_id' }
 end

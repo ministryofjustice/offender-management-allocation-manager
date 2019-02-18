@@ -37,13 +37,13 @@ describe PrisonOffenderManagerService do
     expect(sentence_detail).to be_kind_of(Nomis::Elite2::SentenceDetail)
   end
 
-  it "will get allocations for a POM made within the last 7 days", vcr: { cassette_name: :get_new_allocations } do
+  it "will get allocations for a POM made within the last 7 days", vcr: { cassette_name: :get_new_cases } do
     allocation_one.created_at = 10.days.ago
     allocation_one.save!
     allocation_two.created_at = 3.days.ago
     allocation_two.save!
 
-    allocated_offenders = described_class.get_new_allocations(allocation_one.nomis_staff_id)
+    allocated_offenders = described_class.get_new_cases(allocation_one.nomis_staff_id)
     expect(allocated_offenders.count).to eq 1
   end
 
