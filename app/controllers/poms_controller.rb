@@ -2,7 +2,7 @@ class PomsController < ApplicationController
   before_action :authenticate_user
 
   breadcrumb 'Prison Offender Managers', :poms_path, only: [:index, :show]
-  breadcrumb -> { pom.full_name }, -> {  poms_show_path(params[:id]) }, only: [:show]
+  breadcrumb -> { pom.full_name }, -> {  poms_path(params[:nomis_staff_id]) }, only: [:show]
   breadcrumb 'My caseload', :my_caseload_path, only: [:new_cases]
   breadcrumb -> { 'My caseload' }, -> { my_caseload_path(1) }, only: [:my_caseload]
   breadcrumb -> { 'New cases' }, -> { new_cases_path(1) }, only: [:new_cases]
@@ -35,6 +35,6 @@ class PomsController < ApplicationController
 private
 
   def pom
-    PrisonOffenderManagerService.get_pom(caseload, params[:id])
+    PrisonOffenderManagerService.get_pom(caseload, params[:nomis_staff_id])
   end
 end

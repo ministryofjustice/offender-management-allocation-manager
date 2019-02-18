@@ -32,8 +32,7 @@
       <td aria-label="Total" class="govuk-table__cell "><%= pom.total_cases %></td>
       <td aria-label="Working pattern" class="govuk-table__cell"><%= pom.working_pattern %></td>
       <td aria-label="Status" class="govuk-table__cell "><%= pom.status.capitalize %></td>
-      <td aria-label="Action" class="govuk-table__cell "><a
-        href="<%= poms_show_path(id: pom.staff_id) %>">View</a></td>
+      <td aria-label="Action" class="govuk-table__cell "><%= link_to 'View', pom_path(nomis_staff_id: pom.staff_id) %></td>
     </tr>
   <% end %>
   </tbody>

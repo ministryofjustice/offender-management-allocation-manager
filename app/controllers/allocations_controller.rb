@@ -1,7 +1,7 @@
 class AllocationsController < ApplicationController
   before_action :authenticate_user
 
-  def show
+  def new
     @prisoner = OffenderService.new.get_offender(nomis_offender_id_from_url)
     @recommended_pom = @prisoner.current_responsibility
 
@@ -13,7 +13,7 @@ class AllocationsController < ApplicationController
     }
   end
 
-  def new
+  def confirm
     @prisoner = OffenderService.new.get_offender(nomis_offender_id_from_url)
     @pom = PrisonOffenderManagerService.get_pom(caseload, nomis_staff_id_from_url)
   end
