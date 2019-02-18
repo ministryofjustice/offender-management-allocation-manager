@@ -46,4 +46,31 @@ feature 'Allocation' do
     expect(page).to have_current_path summary_path
     expect(Override.count).to eq(0)
   end
+
+  scenario 're-allocating', vcr: { cassette_name: :re_allocate_feature } do
+    pom_detail = PomDetail.create!(
+      nomis_staff_id: nomis_staff_id,
+      working_pattern: 1.0,
+      status: 'Active'
+    )
+
+    pom_detail.allocations.create!(
+      nomis_offender_id: nomis_offender_id,
+      nomis_booking_id: 1_153_753,
+      prison: 'LEI',
+      allocated_at_tier: 'A',
+      created_by: 'spo@leeds.hmpps.gov.uk',
+      active: true
+    )
+
+    signin_user
+
+    visit '/summary#allocated'
+
+    within('.allocated_offender_row_0') do
+      click_link 'Reallocate'
+    end
+
+    expect(page).to have_current_path allocations_show_path(nomis_offender_id)
+  end
 end
