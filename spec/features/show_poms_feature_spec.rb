@@ -4,7 +4,7 @@ feature "get poms list" do
   it "shows the page", vcr: { cassette_name: :show_poms_feature } do
     signin_user
 
-    visit "/poms"
+    visit poms_path
 
     expect(page).to have_css(".govuk-table", count: 4)
     expect(page).to have_content("Prison Offender Managers")

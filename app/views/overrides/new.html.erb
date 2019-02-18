@@ -1,4 +1,4 @@
-<%= render :partial => "/shared/backlink", :locals => { :page => allocations_show_path() } %>
+<%= render :partial => "/shared/backlink", :locals => { :page => new_allocations_path } %>
 
 <div>
     <%= form_tag(overrides_path, method: :post)  do %>
@@ -37,7 +37,6 @@
                     here</label>
                   <textarea class="govuk-textarea" id="more-detail" name="override[more_detail]" rows="3" aria-describedby="more-detail-hint"></textarea>
                 </div>
-              </div>
               </div>
             </div>
           </fieldset>
