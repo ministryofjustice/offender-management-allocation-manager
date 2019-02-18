@@ -38,7 +38,7 @@ class CaseInformationController < ApplicationController
     case_info.case_allocation = case_information_params[:case_allocation]
     case_info.save
 
-    redirect_to allocations_show_path(case_info.nomis_offender_id)
+    redirect_to new_allocations_path(case_info.nomis_offender_id)
   end
 
 private
