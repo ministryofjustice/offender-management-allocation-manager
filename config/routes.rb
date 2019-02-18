@@ -20,5 +20,8 @@ Rails.application.routes.draw do
   resources :poms, only: %i[ index show edit ], param: :nomis_staff_id
   resource :summary, only: %i[ index ], controller: 'summary'
   resource :overrides,  only: %i[ new create ], path_names: { new: 'new/:nomis_offender_id/:nomis_staff_id'}
-  resource :case_information, only: %i[new create], controller: 'case_information', path_names: { new: 'new/:nomis_offender_id' }
+  resource :case_information, only: %i[new create edit update], controller: 'case_information', path_names: {
+    new: 'new/:nomis_offender_id',
+    edit: 'edit/:nomis_offender_id'
+  }
 end

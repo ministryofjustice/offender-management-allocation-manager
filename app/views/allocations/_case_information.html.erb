@@ -11,12 +11,15 @@
 
   <tr class="govuk-table__row">
     <td class="govuk-table__cell hmpps-table-cell__key">Case allocation</td>
-    <td class="govuk-table__cell table_cell__left_align hmpps-table-cell__key"><%= @prisoner.case_allocation %>
+    <td class="govuk-table__cell table_cell__left_align hmpps-table-cell__key">
+      <a href="<%= edit_case_information_path(@prisoner.offender_no) %>"><%= @prisoner.case_allocation %></a>
     </td>
   </tr>
   <tr class="govuk-table__row">
     <td class="govuk-table__cell hmpps-table-cell__key">Tiering calculation</td>
-    <td class="govuk-table__cell table_cell__left_align hmpps-table-cell__key"><%= @prisoner.tier %></td>
+    <td class="govuk-table__cell table_cell__left_align hmpps-table-cell__key">
+      <a href="<%= edit_case_information_path(@prisoner.offender_no) %>"><%= @prisoner.tier %></a>
+    </td>
   </tr>
   </tbody>
 </table>

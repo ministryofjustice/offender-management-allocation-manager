@@ -1,14 +1,13 @@
-<%= render :partial => "/shared/backlink", :locals => { :page => summary_path(anchor: 'awaiting-information') } %>
-
+<%= render :partial => "/shared/backlink", :locals => { :page => new_allocations_path(@prisoner.offender_no) } %>
 
 <% if @case_info.errors.count > 0 %>
   <%= render :partial => "/shared/validation_errors", :locals => { :errors => @case_info.errors } %>
 <% end %>
 
-<h1 class="govuk-heading-l govuk-!-margin-top-4">Case information</h1>
+<h1 class="govuk-heading-l govuk-!-margin-top-4">Edit case information</h1>
 <h2 class="govuk-heading-m"><%= @prisoner.full_name %> - <%= @prisoner.offender_no %></h2>
 
 <%= render :partial => "form", :locals => {
       :action => case_information_path(),
-      :method => :post,
-      :save_text => "Save" } %>
+      :method => :put,
+      :save_text => "Update" } %>

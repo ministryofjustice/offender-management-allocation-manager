@@ -92,4 +92,30 @@ feature 'case information feature' do
     expect(CaseInformation.count).to eq(0)
     expect(page).to have_content("Tier must be provided")
   end
+
+  it 'allows editing case information for a prisoner', :raven_intercept_exception, vcr: { cassette_name: :case_information_editing_feature } do
+    nomis_offender_id = 'G4273GI'
+
+    signin_user
+    visit new_case_information_path(nomis_offender_id)
+    choose('case_information_case_allocation_NPS')
+    choose('case_information_tier_A')
+    click_button 'Save'
+
+    visit edit_case_information_path(nomis_offender_id)
+
+    expect(page).to have_content('Edit case information')
+    expect(page).to have_content('G4273GI')
+
+    choose('case_information_case_allocation_CRC')
+    click_button 'Update'
+
+    expect(CaseInformation.count).to eq(1)
+    expect(CaseInformation.first.nomis_offender_id).to eq(nomis_offender_id)
+    expect(CaseInformation.first.tier).to eq('A')
+    expect(CaseInformation.first.case_allocation).to eq('CRC')
+
+    expect(page).to have_current_path new_allocations_path(nomis_offender_id)
+    expect(page).to have_content('CRC')
+  end
 end
