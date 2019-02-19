@@ -61,7 +61,7 @@ class PrisonOffenderManagerService
     @pom = poms_list.select { |p| p.staff_id.to_i == user.staff_id.to_i }.first
   end
 
-  def self.edit_a_pom(params)
+  def self.update_pom(params)
     pom = PomDetail.where(nomis_staff_id: params[:nomis_staff_id]).first
     pom.working_pattern = params[:working_pattern] || pom.working_pattern
     pom.status = params[:status] || pom.status

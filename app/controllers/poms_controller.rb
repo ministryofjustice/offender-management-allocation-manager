@@ -28,7 +28,7 @@ class PomsController < ApplicationController
 
   def update
     @pom = PrisonOffenderManagerService.get_pom_detail(params[:nomis_staff_id])
-    PrisonOffenderManagerService.edit_a_pom(
+    PrisonOffenderManagerService.update_pom(
       nomis_staff_id: params[:nomis_staff_id].to_i,
       working_pattern: edit_pom_params[:working_pattern],
       status: edit_pom_params[:status]
