@@ -44,7 +44,7 @@ class CaseInformationController < ApplicationController
 private
 
   def prisoner(nomis_id)
-    @prisoner ||= OffenderService.new.get_offender(nomis_id)
+    @prisoner ||= OffenderService.get_offender(nomis_id)
   end
 
   def nomis_offender_id_from_url

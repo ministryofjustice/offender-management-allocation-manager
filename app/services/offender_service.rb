@@ -1,6 +1,6 @@
 class OffenderService
   # rubocop:disable Metrics/MethodLength
-  def get_offender(offender_no)
+  def self.get_offender(offender_no)
     Nomis::Elite2::Api.get_offender(offender_no).tap { |o|
       record = CaseInformation.where(nomis_offender_id: offender_no)
 
@@ -19,7 +19,7 @@ class OffenderService
   # rubocop:enable Metrics/MethodLength
 
   # rubocop:disable Metrics/MethodLength
-  def get_offenders_for_prison(prison, page_number: 0, page_size: 10)
+  def self.get_offenders_for_prison(prison, page_number: 0, page_size: 10)
     offenders = Nomis::Elite2::Api.get_offender_list(
       prison,
       page_number,
