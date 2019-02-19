@@ -21,4 +21,8 @@ module ApplicationHelper
       'PRO' => 'Probation POM'
     }[level]
   end
+
+  def override_reason_contains(override, val)
+    override.override_reasons.present? && override.override_reasons.include?(val)
+  end
 end

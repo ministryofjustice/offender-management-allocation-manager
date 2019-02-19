@@ -30,14 +30,14 @@ class AllocationService
   end
 
   def self.create_override(params)
-    o = Override.find_or_create_by(
+    Override.find_or_create_by(
       nomis_staff_id: params[:nomis_staff_id],
       nomis_offender_id: params[:nomis_offender_id]
-    )
-    o.override_reasons = params[:override_reasons]
-    o.more_detail = params[:more_detail]
-    o.save!
-    o
+    ).tap { |o|
+      o.override_reasons = params[:override_reasons]
+      o.more_detail = params[:more_detail]
+      o.save
+    }
   end
 
 private
