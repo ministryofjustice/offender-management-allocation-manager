@@ -61,6 +61,39 @@ feature 'Allocation' do
     expect(Override.count).to eq(0)
   end
 
+  scenario 'overriding an allocation can validate missing reasons', vcr: { cassette_name: :override_allocation_feature } do
+    signin_user
+
+    visit new_allocations_path(nomis_offender_id)
+
+    within('.not_recommended_pom_row_0') do
+      click_link 'Allocate'
+    end
+
+    expect(page).to have_css('h1', text: 'Choose reason for changing recommended grade')
+
+    click_button('Continue')
+    expect(page).to have_content('Override reasons must be provided')
+    expect(Override.count).to eq(0)
+  end
+
+  scenario 'overriding an allocation can validate missing Other detail', vcr: { cassette_name: :override_allocation_feature } do
+    signin_user
+
+    visit new_allocations_path(nomis_offender_id)
+
+    within('.not_recommended_pom_row_0') do
+      click_link 'Allocate'
+    end
+
+    expect(page).to have_css('h1', text: 'Choose reason for changing recommended grade')
+
+    check('override-conditional-4')
+    click_button('Continue')
+    expect(page).to have_content('More detail must be provided when Other is selected')
+    expect(Override.count).to eq(0)
+  end
+
   scenario 're-allocating', vcr: { cassette_name: :re_allocate_feature } do
     probation_officer_pom_detail.allocations.create!(
       nomis_offender_id: nomis_offender_id,
