@@ -4,20 +4,20 @@ class AllocationsController < ApplicationController
   alias_action :new, :edit
 
   def new
-    @prisoner = get_prisoner(nomis_offender_id_from_url)
+    @prisoner = prisoner(nomis_offender_id_from_url)
     @recommended_pom = @prisoner.current_responsibility
-    @recommended_poms, @not_recommended_poms = get_recommended_and_nonrecommended_poms
+    @recommended_poms, @not_recommended_poms = recommended_and_nonrecommended_poms
   end
 
   def confirm
-    @prisoner = get_prisoner(nomis_offender_id_from_url)
+    @prisoner = prisoner(nomis_offender_id_from_url)
     @pom = PrisonOffenderManagerService.get_pom(caseload, nomis_staff_id_from_url)
   end
 
   # rubocop:disable Metrics/MethodLength
   def create
-    prisoner  = get_prisoner(allocation_params[:nomis_offender_id])
-    @override = get_override
+    prisoner  = prisoner(allocation_params[:nomis_offender_id])
+    @override = override
 
     AllocationService.create_allocation(
       nomis_staff_id: allocation_params[:nomis_staff_id].to_i,
@@ -36,17 +36,17 @@ class AllocationsController < ApplicationController
 
 private
 
-  def get_prisoner(nomis_offender_id)
+  def prisoner(nomis_offender_id)
     OffenderService.new.get_offender(nomis_offender_id)
   end
 
-  def get_override
+  def override
     Override.where(
       nomis_offender_id: allocation_params[:nomis_offender_id]).
       where(nomis_staff_id: allocation_params[:nomis_staff_id]).last
   end
 
-  def get_recommended_and_nonrecommended_poms
+  def recommended_and_nonrecommended_poms
     pom_response = PrisonOffenderManagerService.get_poms(caseload) { |pom|
       pom.status == 'active'
     }

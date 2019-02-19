@@ -21,11 +21,11 @@ class ApplicationController < ActionController::Base
   def self.alias_action(existing, aliased)
     define_method(aliased) do
       send(existing)
-      render :action => existing
+      render action: existing
     end
   end
 
-  private
+private
 
   def session_expired?
     Time.current > Time.zone.at(sso_identity['expiry'])
