@@ -16,4 +16,18 @@ RSpec.describe AllocationService do
     alloc = described_class.active_allocations([allocation.nomis_offender_id])
     expect(alloc).to be_instance_of(Hash)
   end
+
+  it "can deallocate for a POM" do
+    staff_id = allocation.nomis_staff_id
+    described_class.deallocate_pom(staff_id)
+    alloc = PrisonOffenderManagerService.get_allocations_for_pom(staff_id)
+    expect(alloc).to eq([])
+  end
+
+  it "can deallocate for an offender" do
+    offender_id = allocation.nomis_offender_id
+    described_class.deallocate_offender(offender_id)
+    alloc = described_class.active_allocations([offender_id])
+    expect(alloc).to eq({})
+  end
 end
