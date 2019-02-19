@@ -31,7 +31,7 @@ module Nomis
       end
 
       def grade
-        "#{ position_description.split(" ").first } POM"
+        "#{position_description.split(' ').first} POM"
       end
 
       def add_detail(pom_detail)

@@ -116,7 +116,5 @@ feature 'Allocation' do
     expect(page).to have_current_path edit_allocations_path(nomis_offender_id)
     expect(page).to have_css('.current_pom_full_name', text: 'Duckett, Jenny')
     expect(page).to have_css('.current_pom_grade', text: 'Prison POM')
-
-
   end
 end

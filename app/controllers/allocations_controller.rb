@@ -3,12 +3,14 @@ class AllocationsController < ApplicationController
 
   def new
     @prisoner = prisoner(nomis_offender_id_from_url)
-    @recommended_poms, @not_recommended_poms = recommended_and_nonrecommended_poms_for(@prisoner)
+    @recommended_poms, @not_recommended_poms =
+      recommended_and_nonrecommended_poms_for(@prisoner)
   end
 
   def edit
     @prisoner = prisoner(nomis_offender_id_from_url)
-    @recommended_poms, @not_recommended_poms = recommended_and_nonrecommended_poms_for(@prisoner)
+    @recommended_poms, @not_recommended_poms =
+      recommended_and_nonrecommended_poms_for(@prisoner)
     @current_pom = current_pom_for(nomis_offender_id_from_url)
   end
 
