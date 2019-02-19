@@ -11,8 +11,8 @@ Rails.application.routes.draw do
   
   resources :health, only: %i[ index ], controller: 'health'
   resources :status, only: %i[ index ], controller: 'status'
-  resources :poms, only: %i[ index show edit ], param: :nomis_staff_id
   resource :overrides,  only: %i[ new create ], path_names: { new: 'new/:nomis_offender_id/:nomis_staff_id'}
+  resources :poms, only: %i[ index show edit update ], param: :nomis_staff_id
   resource :allocations, only: %i[ new create edit ], path_names: {
     new: 'new/:nomis_offender_id',
     edit: 'edit/:nomis_offender_id',
