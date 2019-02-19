@@ -22,7 +22,19 @@ class PomsController < ApplicationController
     @allocations = PrisonOffenderManagerService.get_allocated_offenders(@pom.staff_id)
   end
 
-  def edit; end
+  def edit
+    @pom = PrisonOffenderManagerService.get_pom(caseload, params[:id])
+  end
+
+  def update
+    @pom = PrisonOffenderManagerService.get_pom_detail(params[:nomis_staff_id])
+    PrisonOffenderManagerService.edit_a_pom(
+      nomis_staff_id: params[:nomis_staff_id].to_i,
+      working_pattern: edit_pom_params[:working_pattern],
+      status: edit_pom_params[:status]
+    )
+    redirect_to poms_show_path(id: @pom.nomis_staff_id)
+  end
 
   def my_caseload
     @pom = PrisonOffenderManagerService.get_signed_in_pom_details(current_user)
@@ -39,5 +51,9 @@ private
 
   def pom
     PrisonOffenderManagerService.get_pom(caseload, params[:nomis_staff_id])
+  end
+
+  def edit_pom_params
+    params.require(:edit_pom).permit(:working_pattern, :status)
   end
 end
