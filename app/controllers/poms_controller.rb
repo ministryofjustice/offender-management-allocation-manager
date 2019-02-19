@@ -23,7 +23,7 @@ class PomsController < ApplicationController
   end
 
   def edit
-    @pom = PrisonOffenderManagerService.get_pom(caseload, params[:id])
+    @pom = PrisonOffenderManagerService.get_pom(caseload, params[:nomis_staff_id])
   end
 
   def update
@@ -33,7 +33,7 @@ class PomsController < ApplicationController
       working_pattern: edit_pom_params[:working_pattern],
       status: edit_pom_params[:status]
     )
-    redirect_to poms_show_path(id: @pom.nomis_staff_id)
+    redirect_to poms_path(id: @pom.nomis_staff_id)
   end
 
   def my_caseload

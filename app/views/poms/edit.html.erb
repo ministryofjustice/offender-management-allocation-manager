@@ -1,4 +1,4 @@
-<%= render :partial => "/shared/backlink", :locals => {:page => poms_show_path(id: @pom.staff_id)} %>
+<%= render :partial => "/shared/backlink", :locals => {:page => poms_path(id: @pom.staff_id)} %>
 
 <div>
   <%= form_tag poms_update_path(@pom.staff_id), method: :put do %>
@@ -79,7 +79,7 @@
 
     <div class="govuk-form-group">
       <button type="submit" class="govuk-button">Save</button>
-      <a href="<%= poms_show_path(id: @pom.staff_id) %> class=" govuk-link">Cancel</a>
+      <a href="<%= poms_path(id: @pom.staff_id) %> class=" govuk-link">Cancel</a>
     </div>
 
     </form>

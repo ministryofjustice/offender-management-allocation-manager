@@ -29,7 +29,7 @@ feature "edit a POM's details" do
 
   it "de-allocates all a POM's cases when made inactive", vcr: { cassette_name: :edit_poms_deactivate_pom_feature } do
     signin_user('PK000223')
-    visit new_allocations_path(nomis_offender_id, nomis_staff_id)
+    visit "allocations/confirm/G4273GI/485637"
     click_button 'Complete allocation'
 
     visit "/poms/485637"
