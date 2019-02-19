@@ -33,7 +33,8 @@
       <td aria-label="Action" class="govuk-table__cell table_cell__left_align">
         <% if current_page?(action: :new) %>
           <%= link_to "Allocate", confirm_allocations_path(@prisoner.offender_no, pom.staff_id), class: "govuk-link" %>
-        <% else %>
+        <% end %>
+        <% if current_page?(action: :edit) %>
           <%= link_to "Reallocate", confirm_allocations_path(@prisoner.offender_no, pom.staff_id), class: "govuk-link" %>
         <% end %>
       </td>

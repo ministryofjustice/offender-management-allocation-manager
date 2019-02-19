@@ -1,30 +1,23 @@
 class AllocationsController < ApplicationController
   before_action :authenticate_user
 
-  def new
-    @prisoner = OffenderService.new.get_offender(nomis_offender_id_from_url)
-    @recommended_pom = @prisoner.current_responsibility
+  alias_action :new, :edit
 
-    pom_response = PrisonOffenderManagerService.get_poms(caseload) { |pom|
-      pom.status == 'active'
-    }
-    @recommended_poms, @not_recommended_poms = pom_response.partition { |pom|
-      pom.position_description.include?(@recommended_pom)
-    }
+  def new
+    @prisoner = get_prisoner(nomis_offender_id_from_url)
+    @recommended_pom = @prisoner.current_responsibility
+    @recommended_poms, @not_recommended_poms = get_recommended_and_nonrecommended_poms
   end
 
   def confirm
-    @prisoner = OffenderService.new.get_offender(nomis_offender_id_from_url)
+    @prisoner = get_prisoner(nomis_offender_id_from_url)
     @pom = PrisonOffenderManagerService.get_pom(caseload, nomis_staff_id_from_url)
   end
 
   # rubocop:disable Metrics/MethodLength
   def create
-    prisoner  = OffenderService.new.
-      get_offender(allocation_params[:nomis_offender_id])
-    @override = Override.where(
-      nomis_offender_id: allocation_params[:nomis_offender_id]).
-      where(nomis_staff_id: allocation_params[:nomis_staff_id]).last
+    prisoner  = get_prisoner(allocation_params[:nomis_offender_id])
+    @override = get_override
 
     AllocationService.create_allocation(
       nomis_staff_id: allocation_params[:nomis_staff_id].to_i,
@@ -42,6 +35,26 @@ class AllocationsController < ApplicationController
 # rubocop:enable Metrics/MethodLength
 
 private
+
+  def get_prisoner(nomis_offender_id)
+    OffenderService.new.get_offender(nomis_offender_id)
+  end
+
+  def get_override
+    Override.where(
+      nomis_offender_id: allocation_params[:nomis_offender_id]).
+      where(nomis_staff_id: allocation_params[:nomis_staff_id]).last
+  end
+
+  def get_recommended_and_nonrecommended_poms
+    pom_response = PrisonOffenderManagerService.get_poms(caseload) { |pom|
+      pom.status == 'active'
+    }
+
+    pom_response.partition { |pom|
+      pom.position_description.include?(@recommended_pom)
+    }
+  end
 
   def nomis_offender_id_from_url
     params.require(:nomis_offender_id)

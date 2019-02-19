@@ -112,6 +112,6 @@ feature 'Allocation' do
       click_link 'Reallocate'
     end
 
-    expect(page).to have_current_path new_allocations_path(nomis_offender_id)
+    expect(page).to have_current_path edit_allocations_path(nomis_offender_id)
   end
 end
