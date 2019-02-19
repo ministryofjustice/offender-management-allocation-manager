@@ -30,6 +30,10 @@ module Nomis
         "#{last_name}, #{first_name}".titleize
       end
 
+      def grade
+        "#{ position_description.split(" ").first } POM"
+      end
+
       def add_detail(pom_detail)
         allocations = pom_detail.allocations.where(active: true)
         allocation_counts = allocations.group_by(&:allocated_at_tier)

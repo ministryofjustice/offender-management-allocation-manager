@@ -1,12 +1,15 @@
 class AllocationsController < ApplicationController
   before_action :authenticate_user
 
-  alias_action :new, :edit
-
   def new
     @prisoner = prisoner(nomis_offender_id_from_url)
-    @recommended_pom = @prisoner.current_responsibility
-    @recommended_poms, @not_recommended_poms = recommended_and_nonrecommended_poms
+    @recommended_poms, @not_recommended_poms = recommended_and_nonrecommended_poms_for(@prisoner)
+  end
+
+  def edit
+    @prisoner = prisoner(nomis_offender_id_from_url)
+    @recommended_poms, @not_recommended_poms = recommended_and_nonrecommended_poms_for(@prisoner)
+    @current_pom = current_pom_for(nomis_offender_id_from_url)
   end
 
   def confirm
@@ -46,13 +49,20 @@ private
       where(nomis_staff_id: allocation_params[:nomis_staff_id]).last
   end
 
-  def recommended_and_nonrecommended_poms
+  def current_pom_for(nomis_offender_id)
+    current_allocation = AllocationService.active_allocations(nomis_offender_id)
+    nomis_staff_id = current_allocation[nomis_offender_id]['nomis_staff_id']
+
+    PrisonOffenderManagerService.get_pom(caseload, nomis_staff_id)
+  end
+
+  def recommended_and_nonrecommended_poms_for(prisoner)
     pom_response = PrisonOffenderManagerService.get_poms(caseload) { |pom|
       pom.status == 'active'
     }
 
     pom_response.partition { |pom|
-      pom.position_description.include?(@recommended_pom)
+      pom.position_description.include?(prisoner.current_responsibility)
     }
   end
 

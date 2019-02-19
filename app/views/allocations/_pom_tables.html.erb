@@ -1,12 +1,12 @@
 <h4 class="govuk-heading-m">
-  Recommendation: <%= @recommended_pom %> POMs
+  Recommendation: <%= @prisoner.current_responsibility %> POMs
 </h4>
 
 <p>Based on the prisoner's tiering calculation.</p>
 
 <table class="govuk-table responsive">
   <thead class="govuk-table__head">
-  <h2 class="govuk-heading-s"><%= @recommended_pom %> POMs</h2>
+  <h2 class="govuk-heading-s"><%= @prisoner.current_responsibility %> POMs</h2>
   <tr class="govuk-table__row">
     <th class="govuk-table__header" scope="col">Name</th>
     <th class="govuk-table__header" scope="col">Previous allocation</th>
