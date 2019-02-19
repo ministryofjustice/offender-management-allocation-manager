@@ -18,13 +18,6 @@ class ApplicationController < ActionController::Base
     sso_identity['caseload']
   end
 
-  def self.alias_action(existing, aliased)
-    define_method(aliased) do
-      send(existing)
-      render action: existing
-    end
-  end
-
 private
 
   def session_expired?
