@@ -9,7 +9,7 @@ class OffenderService
         o.case_allocation = record.first.case_allocation
       end
 
-      sentence_detail = Nomis::Elite2::Api.get_bulk_sentence_details([offender_no])
+      sentence_detail = get_sentence_details([offender_no])
       o.release_date = sentence_detail[offender_no].release_date
       o.sentence_date = sentence_detail[offender_no].sentence_date
 
