@@ -40,6 +40,14 @@ class AllocationService
     }
   end
 
+  def self.deallocate_pom(nomis_staff_id)
+    Allocation.where(nomis_staff_id: nomis_staff_id).update_all(active: false)
+  end
+
+  def self.deallocate_offender(nomis_offender_id)
+    Allocation.where(nomis_offender_id: nomis_offender_id).update_all(active: false)
+  end
+
 private
 
   def self.delete_overrides(params)

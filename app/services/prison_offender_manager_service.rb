@@ -66,13 +66,7 @@ class PrisonOffenderManagerService
     pom.working_pattern = params[:working_pattern] || pom.working_pattern
     pom.status = params[:status] || pom.status
     pom.save!
-    deallocate(params[:nomis_staff_id]) if pom.status == 'inactive'
+    AllocationService.deallocate_pom(params[:nomis_staff_id]) if pom.status == 'inactive'
     pom
-  end
-
-private
-
-  def self.deallocate(nomis_staff_id)
-    Allocation.where(nomis_staff_id: nomis_staff_id).update_all(active: false)
   end
 end
