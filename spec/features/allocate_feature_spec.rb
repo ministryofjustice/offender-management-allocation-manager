@@ -97,6 +97,7 @@ feature 'Allocation' do
   scenario 're-allocating', vcr: { cassette_name: :re_allocate_feature } do
     probation_officer_pom_detail.allocations.create!(
       nomis_offender_id: nomis_offender_id,
+      nomis_staff_id: probation_officer_nomis_staff_id,
       nomis_booking_id: 1_153_753,
       prison: 'LEI',
       allocated_at_tier: 'A',
@@ -112,6 +113,8 @@ feature 'Allocation' do
       click_link 'Reallocate'
     end
 
-    expect(page).to have_current_path new_allocations_path(nomis_offender_id)
+    expect(page).to have_current_path edit_allocations_path(nomis_offender_id)
+    expect(page).to have_css('.current_pom_full_name', text: 'Duckett, Jenny')
+    expect(page).to have_css('.current_pom_grade', text: 'Prison POM')
   end
 end
