@@ -1,96 +1,87 @@
+<%= render :partial => "/shared/backlink", :locals => {:page => poms_path(id: @pom.staff_id)} %>
 
+<div>
+  <%= form_tag poms_update_path(@pom.staff_id), method: :put do %>
+    <h1 class="govuk-heading-xl govuk-!-margin-top-4">Edit profile</h1>
+    <h2 class="govuk-heading-l"><%= @pom.full_name %></h2>
 
-<%= render :partial => "/shared/backlink", :locals => { :page => edit_pom_path(nomis_staff_id: 1) } %>
-
-<h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Edit profile</h1>
-<h2 class="govuk-heading-l">Surname, Forename</h2>
-
-<form method="POST">
-  <fieldset class="govuk-fieldset">
-    <div class="govuk-form-group">
-      <label class="govuk-label" for="working-pattern">
-        Working pattern
-      </label>
-
-      <div class="govuk-radios">
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input" id="working-pattern-1" name="working-pattern" type="radio" value="1.0">
-          <label class="govuk-label govuk-radios__label" for="working-pattern-1">
-            Full-time
-          </label>
-        </div>
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input" id="working-pattern-2" name="working-pattern" type="radio" value="0.8">
-          <label class="govuk-label govuk-radios__label" for="working-pattern-2">
-            Part time - 0.8
-          </label>
-        </div>
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input" id="working-pattern-3" name="working-pattern" type="radio" value="0.6">
-          <label class="govuk-label govuk-radios__label" for="working-pattern-3">
-            Part time - 0.6
-          </label>
-        </div>
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input" id="working-pattern-4" name="working-pattern" type="radio" value="0.4">
-          <label class="govuk-label govuk-radios__label" for="working-pattern-4">
-            Part time - 0.4
-          </label>
-        </div>
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input" id="working-pattern-5" name="working-pattern" type="radio" value="0.2">
-          <label class="govuk-label govuk-radios__label" for="working-pattern-5">
-            Part time - 0.2
-          </label>
-        </div>
+    <div class='govuk-!-margin-top-6'>
+      <div class="govuk-form-group">
+        <fieldset class="govuk-fieldset" aria-describedby="-edit_pom-conditional-hint">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+            <h1 class="govuk-fieldset__heading">Working pattern</h1>
+          </legend>
+          <div class="govuk-radios" data-module="radios">
+            <div class="govuk-radios__item">
+              <%= radio_button_tag("edit_pom[working_pattern]", "1.0", @pom.working_pattern == '1.0', id: "working_pattern-1", class: "govuk-radios__input") %>
+              <%= label_tag "edit_pom[working_pattern]", "Full time", class: "govuk-label govuk-radios__label" %>
+            </div>
+            <div class="govuk-radios__item">
+              <%= radio_button_tag("edit_pom[working_pattern]", "0.8", @pom.working_pattern == '0.8', id: "working_pattern-2", class: "govuk-radios__input") %>
+              <%= label_tag "edit_pom[working_pattern]", "Part time - 0.8", class: "govuk-label govuk-radios__label" %>
+            </div>
+            <div class="govuk-radios__item">
+              <%= radio_button_tag("edit_pom[working_pattern]", "0.6", @pom.working_pattern == '0.6', id: "working_pattern-3", class: "govuk-radios__input") %>
+              <%= label_tag "edit_pom[working_pattern]", "Part time - 0.6", class: "govuk-label govuk-radios__label" %>
+            </div>
+            <div class="govuk-radios__item">
+              <%= radio_button_tag("edit_pom[working_pattern]", "0.4", @pom.working_pattern == '0.4', id: "working_pattern-4", class: "govuk-radios__input") %>
+              <%= label_tag "edit_pom[working_pattern]", "Part time - 0.4", class: "govuk-label govuk-radios__label" %>
+            </div>
+            <div class="govuk-radios__item">
+              <%= radio_button_tag("edit_pom[working_pattern]", "0.2", @pom.working_pattern == '0.2', id: "working_pattern-5", class: "govuk-radios__input") %>
+              <%= label_tag "edit_pom[working_pattern]", "Part time - 0.2", class: "govuk-label govuk-radios__label" %>
+            </div>
+          </div>
+        </fieldset>
       </div>
     </div>
 
-
-    <div class="govuk-form-group">
-      <label class="govuk-label" for="working-status">
-        Working status
-      </label>
-
-      <div class="govuk-radios">
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input" id="working-status-1" name="working-status" type="radio" value="active">
-          <label class="govuk-label govuk-radios__label" for="working-pattern-1">
-            Active
-          </label>
-        </div>
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input" id="working-status-2" name="working-status" type="radio" value="capacity">
-          <label class="govuk-label govuk-radios__label" for="working-status-2">
-            Active - At capacity (no new cases)
-          </label>
-        </div>
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input" id="working-status-3" name="working-status" type="radio" value="inactive">
-          <label class="govuk-label govuk-radios__label" for="working-status-3">
-            Inactive (remove and and reallocate all cases)
-          </label>
-        </div>
+    <div class='govuk-!-margin-top-6'>
+      <div class="govuk-form-group">
+        <fieldset class="govuk-fieldset" aria-describedby="-edit_pom-conditional-hint">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+            <h3 class="govuk-fieldset__heading">Status</h3>
+          </legend>
+          <div class="govuk-radios" data-module="radios">
+            <div class="govuk-radios__item">
+              <%= radio_button_tag("edit_pom[status]", "active", @pom.status == 'active', id: "status-1", class: "govuk-radios__input") %>
+              <%= label_tag "edit_pom[status]", "Active", class: "govuk-label govuk-radios__label" %>
+            </div>
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="status-conditional-2" name="edit_pom[status]" type="radio" value="active-at-capacity" data-aria-controls="status-2" <%= 'checked' if @pom.status == 'active-at-capacity'%>>
+              <label class="govuk-label govuk-radios__label"
+                     for="status-conditional-2">Active - at capacity (no new cases)</label>
+            </div>
+            <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="status-2">
+              <h4 class="govuk-heading-s">You will not be able to allocate new cases to this POM. To allocate new cases
+                again, set their status to active</h4>
+            </div>
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="status-conditional-3" name="edit_pom[status]" type="radio" value="inactive" data-aria-controls="status-3"  <%= 'checked' if @pom.status == 'inactive'%>>
+              <label class="govuk-label govuk-radios__label"
+                     for="status-conditional-3">Inactive</label>
+            </div>
+            <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="status-3">
+              <div class="govuk-warning-text">
+                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                <strong class="govuk-warning-text__text">
+                  <span class="govuk-warning-text__assistive">Warning</span>
+                  This will remove the pom from their current cases.<br/>
+                  Their cases will need to be reallocated.
+                </strong>
+              </div>
+            </div>
+          </div>
+        </fieldset>
       </div>
     </div>
 
-    <div class="govuk-warning-text">
-      <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-      <strong class="govuk-warning-text__text">
-        <span class="govuk-warning-text__assistive">Warning</span>
-        This will remove the POM from their current cases.<br/>
-        Their cases will need to be reallocated.
-      </strong>
-    </div>
-
     <div class="govuk-form-group">
-        <button type="submit" class="govuk-button">
-          Save
-        </button>
-        <br/>
-        <a href="#" class="govuk-link">Cancel</a>
+      <button type="submit" class="govuk-button">Save</button>
+      <a href="<%= poms_path(id: @pom.staff_id) %> class=" govuk-link">Cancel</a>
     </div>
 
-
-  </fieldset>
-</form>
+    </form>
+  <% end %>
+</div>
