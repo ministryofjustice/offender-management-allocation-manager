@@ -69,5 +69,4 @@ class PrisonOffenderManagerService
     AllocationService.deallocate_pom(params[:nomis_staff_id]) if pom.status == 'inactive'
     pom
   end
-
 end
