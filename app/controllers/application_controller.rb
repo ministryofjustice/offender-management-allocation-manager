@@ -18,7 +18,14 @@ class ApplicationController < ActionController::Base
     sso_identity['caseload']
   end
 
-private
+  def self.alias_action(existing, aliased)
+    define_method(aliased) do
+      send(existing)
+      render :action => existing
+    end
+  end
+
+  private
 
   def session_expired?
     Time.current > Time.zone.at(sso_identity['expiry'])
