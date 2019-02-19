@@ -30,13 +30,13 @@ feature "get poms list" do
   it "allows editing a POM", vcr: { cassette_name: :show_poms_feature } do
     signin_user
 
-    visit "/poms/1/edit"
+    visit "/poms/485752/edit"
 
     expect(page).to have_css(".govuk-button", count: 1)
     expect(page).to have_css(".govuk-radios__item", count: 8)
     expect(page).to have_content("Edit profile")
     expect(page).to have_content("Working pattern")
-    expect(page).to have_content("Working status")
+    expect(page).to have_content("Status")
     expect(page).not_to have_css('.govuk-breadcrumbs')
   end
 end
