@@ -8,6 +8,7 @@
       </span>
     </a>
     <ul id="navigation" class="hmpps-header__navigation" aria-label="Top Level Navigation">
+      <% if current_user.present? %>
       <li class="govuk-header__navigation-item govuk-header__navigation-item--active">
         <span class='govuk-body hmpss-header__prison-identifier govuk-!-font-size-16'>HMP Cardiff <span class="govuk-!-padding-left-1">|</span></span>
         <a href='#' class='govuk-header__link govuk-!-font-size-16 govuk-!-padding-left-1'><%= current_user %></a>
@@ -15,6 +16,7 @@
       <li class="govuk-header__navigation-item govuk-header__navigation-item--active">
         <%= link_to 'Sign out', signout_path  %>
       </li>
+      <% end %>
     </ul>
   </div>
 </header>

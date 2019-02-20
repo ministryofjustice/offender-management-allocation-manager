@@ -15,6 +15,7 @@ Bundler.require(*Rails.groups)
 module OffenderManagementAllocationClient
   class Application < Rails::Application
     config.load_defaults 5.2
+    config.exceptions_app = routes
     config.generators.system_tests = nil
     config.allocation_manager_host = ENV.fetch(
       'ALLOCATION_MANAGER_HOST',
