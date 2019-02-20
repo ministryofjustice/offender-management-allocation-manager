@@ -103,7 +103,7 @@ private
   end
 
   def get_page_of_offenders(prison, page_number)
-    OffenderService.new.get_offenders_for_prison(
+    OffenderService.get_offenders_for_prison(
       prison,
       page_number: page_number,
       page_size: FETCH_SIZE

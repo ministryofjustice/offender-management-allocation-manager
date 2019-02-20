@@ -2,14 +2,14 @@ require 'rails_helper'
 
 describe OffenderService, vcr: { cassette_name: :offender_service_offenders_by_prison_spec } do
   it "get first page of offenders for a specific prison" do
-    offenders = OffenderService.new.get_offenders_for_prison('LEI')
+    offenders = OffenderService.get_offenders_for_prison('LEI')
     expect(offenders).to be_kind_of(Array)
     expect(offenders.length).to eq(5)
     expect(offenders.first).to be_kind_of(Nomis::Elite2::OffenderShort)
   end
 
   it "get last page of offenders for a specific prison", vcr: { cassette_name: :offender_service_offenders_by_prison_last_page_spec } do
-    offenders = OffenderService.new.get_offenders_for_prison('LEI', page_number: 116)
+    offenders = OffenderService.get_offenders_for_prison('LEI', page_number: 116)
     expect(offenders).to be_kind_of(Array)
     expect(offenders.length).to eq(5)
     expect(offenders.first).to be_kind_of(Nomis::Elite2::OffenderShort)
@@ -19,7 +19,7 @@ describe OffenderService, vcr: { cassette_name: :offender_service_offenders_by_p
     nomis_offender_id = 'G4273GI'
 
     CaseInformation.create(nomis_offender_id: nomis_offender_id, tier: 'C', case_allocation: 'CRC')
-    offender = OffenderService.new.get_offender(nomis_offender_id)
+    offender = OffenderService.get_offender(nomis_offender_id)
 
     expect(offender).to be_kind_of(Nomis::Elite2::Offender)
     expect(offender.release_date).to eq Date.new(2020, 2, 7)
@@ -31,7 +31,7 @@ describe OffenderService, vcr: { cassette_name: :offender_service_offenders_by_p
   it "gets the POM names for allocated offenders",
     vcr: { cassette_name: :offender_service_pom_names_spec } do
 
-    offenders = OffenderService.new.get_offenders_for_prison('LEI', page_size: 3)
+    offenders = OffenderService.get_offenders_for_prison('LEI', page_size: 3)
 
     PomDetail.create!(nomis_staff_id: 485_752, working_pattern: 1.0, status: 'active')
 

@@ -42,7 +42,7 @@ class AllocationsController < ApplicationController
 private
 
   def prisoner(nomis_offender_id)
-    OffenderService.new.get_offender(nomis_offender_id)
+    OffenderService.get_offender(nomis_offender_id)
   end
 
   def override
