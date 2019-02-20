@@ -27,5 +27,6 @@ module OffenderManagementAllocationClient
     config.nomis_oauth_client_secret = ENV['NOMIS_OAUTH_CLIENT_SECRET']
     config.nomis_oauth_public_key = ENV['NOMIS_OAUTH_PUBLIC_KEY']
     config.prometheus_metrics = ENV['PROMETHEUS_METRICS']
+    config.notify_api_key = ENV['GOVUK_NOTIFY_API_KEY']
   end
 end
