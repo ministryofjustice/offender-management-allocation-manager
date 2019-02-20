@@ -14,6 +14,7 @@ class AllocationService
       end
     }
 
+    EmailService.send_allocation_email(params)
     delete_overrides(params)
 
     allocation

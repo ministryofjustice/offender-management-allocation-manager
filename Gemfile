@@ -6,6 +6,7 @@ ruby '2.5.3'
 gem 'bootsnap', '>= 1.1.0', require: false
 gem 'coffee-rails', '~> 4.2'
 gem 'faraday'
+gem 'govuk_notify_rails'
 gem 'jbuilder', '~> 2.8'
 gem 'jwt'
 gem 'lograge'
