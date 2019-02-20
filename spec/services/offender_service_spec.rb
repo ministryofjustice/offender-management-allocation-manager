@@ -49,5 +49,6 @@ describe OffenderService, vcr: { cassette_name: :offender_service_offenders_by_p
     expect(updated_offenders.first).to be_kind_of(Nomis::Elite2::OffenderShort)
     expect(updated_offenders.count).to eq(offenders.count)
     expect(updated_offenders.first.allocated_pom_name).to eq('Jones, Ross')
+    expect(updated_offenders.first.allocation_date).to be_kind_of(Date)
   end
 end
