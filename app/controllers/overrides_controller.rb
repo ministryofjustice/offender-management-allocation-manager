@@ -18,6 +18,7 @@ class OverridesController < ApplicationController
     return redirect_on_success if @override.valid?
 
     @prisoner = OffenderService.get_offender(override_params[:nomis_offender_id])
+    @recommended_pom = ResponsibilityService.calculate_responsibility(@prisoner)
     @pom = PrisonOffenderManagerService.get_pom(
       caseload, override_params[:nomis_staff_id])
 
