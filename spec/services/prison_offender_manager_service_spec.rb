@@ -54,7 +54,7 @@ describe PrisonOffenderManagerService do
     vcr: { cassette_name: :pom_service_get_poms } do
     poms = described_class.get_poms('LEI')
     expect(poms).to be_kind_of(Array)
-    expect(poms.count).to eq(8)
+    expect(poms.count).to eq(9)
   end
 
   it "can get a filtered list of POMs",
@@ -63,13 +63,13 @@ describe PrisonOffenderManagerService do
       pom.status == 'active'
     }
     expect(poms).to be_kind_of(Array)
-    expect(poms.count).to eq(7)
+    expect(poms.count).to eq(8)
   end
 
   it "can get the names for POMs when given IDs",
     vcr: { cassette_name: :pom_service_get_poms } do
     names = described_class.get_pom_names('LEI')
     expect(names).to be_kind_of(Hash)
-    expect(names.count).to eq(7)
+    expect(names.count).to eq(8)
   end
 end
