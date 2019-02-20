@@ -3,6 +3,7 @@ class OverridesController < ApplicationController
     @prisoner = OffenderService.get_offender(params.require(:nomis_offender_id))
     @pom = PrisonOffenderManagerService.get_pom(caseload, params[:nomis_staff_id])
     @override = Override.new
+    @recommended_pom = ResponsibilityService.calculate_responsibility(@prisoner)
   end
 
   # rubocop:disable Metrics/MethodLength

@@ -13,7 +13,6 @@ class ResponsibilityService
   def self.nps_calculation(offender)
     return 'No release date' if offender.release_date.nil?
 
-    more_than_10_months = offender.release_date > DateTime.now.utc.to_date + 10.months
-    more_than_10_months ? 'Prison' : 'Probation'
+    offender.tier == 'A' || offender.tier == 'B' ? 'Probation' : 'Prison'
   end
 end

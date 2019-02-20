@@ -33,16 +33,6 @@ describe ResponsibilityService do
     expect(resp).to eq 'No release date'
   end
 
-  it "NPS allocations with release date <= 10m" do
-    resp = described_class.calculate_responsibility(offender_nps_lt_10)
-    expect(resp).to eq 'Probation'
-  end
-
-  it "NPS allocations with release date > 10m" do
-    resp = described_class.calculate_responsibility(offender_nps_gt_10)
-    expect(resp).to eq 'Prison'
-  end
-
   it "No allocation" do
     resp = described_class.calculate_responsibility(offender_none)
     expect(resp).to eq 'Unknown'
