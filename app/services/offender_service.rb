@@ -1,7 +1,7 @@
 class OffenderService
   # rubocop:disable Metrics/MethodLength
   def self.get_offender(offender_no)
-    Nomis::Elite2::Api.get_offender(offender_no).tap { |o|
+    Nomis::Elite2::Api.get_offender(offender_no).tap {|o|
       record = CaseInformation.where(nomis_offender_id: offender_no)
 
       unless record.empty?
@@ -16,6 +16,7 @@ class OffenderService
       o.main_offence = Nomis::Elite2::Api.get_offence(o.latest_booking_id)
     }
   end
+
   # rubocop:enable Metrics/MethodLength
 
   # rubocop:disable Metrics/MethodLength
@@ -41,7 +42,7 @@ class OffenderService
                          {}
                        end
 
-    offenders.select { |offender|
+    offenders.select {|offender|
       offender.release_date = sentence_details[offender.offender_no].release_date
       if offender.release_date.present?
         record = tier_map[offender.offender_no]
@@ -54,6 +55,7 @@ class OffenderService
       end
     }
   end
+
   # rubocop:enable Metrics/MethodLength
 
   def self.get_sentence_details(offender_id_list)
@@ -72,12 +74,15 @@ class OffenderService
     pom_names = PrisonOffenderManagerService.get_pom_names(caseload)
 
     offender_ids = offenders.map(&:offender_no)
-    offender_to_staff_hash = allocations_for_offenders(offender_ids).map { |a|
-      [a.nomis_offender_id, pom_names[a.pom_detail.nomis_staff_id]]
+    offender_to_staff_hash = allocations_for_offenders(offender_ids).map {|a|
+      [a.nomis_offender_id, {:pom_name => pom_names[a.pom_detail.nomis_staff_id], :allocation_date => a.created_at}]
     }.to_h
 
     offenders.each do |offender|
-      offender.allocated_pom_name = offender_to_staff_hash[offender.offender_no]
+      if offender_to_staff_hash.has_key?(offender.offender_no)
+        offender.allocated_pom_name = offender_to_staff_hash[offender.offender_no][:pom_name]
+        offender.allocation_date = offender_to_staff_hash[offender.offender_no][:allocation_date]
+      end
     end
 
     offenders

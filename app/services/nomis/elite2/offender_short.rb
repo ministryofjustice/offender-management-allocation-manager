@@ -26,6 +26,7 @@ module Nomis
       attribute :sentence_date, :date
       attribute :tier, :string
       attribute :allocated_pom_name, :string
+      attribute :allocation_date, :date
       attribute :case_allocation, :string
 
       def awaiting_allocation_for
