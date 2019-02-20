@@ -62,11 +62,6 @@ Style/CollectionMethods:
 Layout/DotPosition:
   EnforcedStyle: trailing
 
-# The holidays file has extra spaces for ease of reading and comparison
-Layout/ExtraSpacing:
-  Exclude:
-    - 'config/initializers/holidays.rb'
-
 # Percent-formatting and hash interpolation both have their place. Don't
 # enforce any particular one.
 Style/FormatString:
@@ -109,8 +104,7 @@ Metrics/MethodLength:
 
 # Don't worry about the complexity of spec methods
 Metrics/AbcSize:
-  Exclude:
-    - 'spec/**/*'
+  Enabled: false
 
 # Enforce single quotes everywhere except in specs (because there's a lot of
 # human text with apostrophes in spec names, and using double quotes for all
@@ -157,9 +151,6 @@ RSpec/AnyInstance:
   Enabled: false
 
 Bundler/OrderedGems:
-  Enabled: false
-
-Metrics/AbcSize:
   Enabled: false
 
 Metrics/BlockLength:
