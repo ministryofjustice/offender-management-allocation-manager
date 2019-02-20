@@ -11,11 +11,11 @@ class ApplicationController < ActionController::Base
   end
 
   def current_user
-    sso_identity['username']
+    sso_identity['username'] if sso_identity.present?
   end
 
   def caseload
-    sso_identity['caseload']
+    sso_identity['caseload'] if sso_identity.present?
   end
 
 private
