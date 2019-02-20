@@ -4,7 +4,7 @@ class ResponsibilityService
     when 'NPS'
       nps_calculation(offender)
     when 'CRC'
-      'Probation'
+      'Prison'
     else
       'Unknown'
     end
