@@ -20,7 +20,7 @@
             <%= hidden_field_tag("override[nomis_staff_id]", @pom.staff_id) %>
             <div class="govuk-checkboxes__item">
               <%= check_box_tag("override[override_reasons][]", "complex",  override_reason_contains(@override, 'complex'), id: "override-1", class: "govuk-checkboxes__input") %>
-              <%= label_tag "override[override_reasons][]", "Prisoner assessed as too complex for #{@recommended_pom} officer POM", class: 'govuk-label govuk-checkboxes__label' %>
+              <%= label_tag "override[override_reasons][]", "Prisoner assessed as too complex for #{@recommended_pom} Officer POM", class: 'govuk-label govuk-checkboxes__label' %>
             </div>
             <div class="govuk-checkboxes__item">
               <%= check_box_tag("override[override_reasons][]", "no-staff", override_reason_contains(@override, 'no-staff'), id: "override-2", class: "govuk-checkboxes__input") %>

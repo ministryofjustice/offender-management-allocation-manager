@@ -27,7 +27,7 @@ feature 'Allocation' do
     end
 
     expect(page).to have_css('h1', text: 'Confirm allocation')
-    expect(page).to have_css('p', text: 'You are allocating Abbella, Ozullirn to Retallick, Toby')
+    expect(page).to have_css('p', text: 'You are allocating Abbella, Ozullirn to Jones, Ross')
 
     click_button 'Complete allocation'
 
@@ -35,7 +35,7 @@ feature 'Allocation' do
   end
 
   scenario 'overriding an allocation', vcr: { cassette_name: :override_allocation_feature } do
-    override_nomis_staff_id = 485_752
+    override_nomis_staff_id = 485_595
 
     signin_user
 
