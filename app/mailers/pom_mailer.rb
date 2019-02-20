@@ -1,3 +1,4 @@
+# :nocov:
 class PomMailer < GovukNotifyRails::Mailer
   # TODO: Add POM email addresses
   def new_allocation_email(pom, offender)
@@ -37,3 +38,4 @@ private
     Rails.configuration.notify_api_key.present?
   end
 end
+# :nocov:
