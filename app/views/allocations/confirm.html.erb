@@ -1,7 +1,7 @@
 <%= render :partial => "/shared/backlink", :locals => { :page => new_allocations_path() } %>
 
 <div>
-    <%= form_tag(allocations_path, method: :post) do %>
+    <%= form_tag(allocations_path, method: :post, id: "confirm_allocation_form") do %>
       <h1 class="govuk-heading-xl govuk-!-margin-top-4">Confirm allocation</h1>
       <p class="govuk-body">You are allocating <%= @prisoner.full_name %> to <%= @pom.full_name %></p>
       <p class="govuk-body">We'll be using the email address below to let them know about their new allocation</p>
@@ -11,3 +11,11 @@
       <%= submit_tag "Complete allocation", role: "button", draggable: "false", class: "govuk-button" %>
     <% end %>
 </div>
+
+  <%= render :partial => "/shared/analytics_form_event",
+             :locals => {
+                :form_id => 'confirm_allocation_form',
+                :event_name => 'Allocate confirmation Form',
+                :event_action => 'submit'
+              }
+  %>
