@@ -3,11 +3,11 @@
     var form = document.getElementById("<%= form_id %>");
     form.addEventListener('submit', function(event) {
       event.preventDefault();
-      gtag("send", "event", "<%= event_name %>", "<%= event_action %>", {
+      window.dataLayer.push(["send", "event", "<%= event_name %>", "<%= event_action %>", {
         hitCallback: createFunctionWithTimeout(function() {
           form.submit();
         })
-      });
+      }]);
     });
 </script>
 <% end %>
