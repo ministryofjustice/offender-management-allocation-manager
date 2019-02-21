@@ -13,6 +13,7 @@ module Nomis
         delegate :get_offender, to: :instance
         delegate :fetch_nomis_user_details, to: :instance
         delegate :prisoner_offender_manager_list, to: :instance
+        delegate :movements_on_date, to: :instance
       end
 
       def initialize
@@ -91,6 +92,19 @@ module Nomis
         data.each_with_object({}) { |record, hash|
           oid = record['offenderNo']
           hash[oid] = api_deserialiser.deserialise(Nomis::Elite2::SentenceDetail, record)
+        }
+      end
+
+      def movements_on_date(date)
+        route = '/elite2api/api/movements'
+
+        data = @e2_client.get(route, queryparams: {
+                                movementDate: date.strftime('%F'),
+                                fromDateTime: (date - 1.day).strftime('%FT%R')
+                              })
+
+        data.map { |movement|
+          api_deserialiser.deserialise(Nomis::Elite2::Movement, movement)
         }
       end
 
