@@ -1,5 +1,5 @@
 
-<%= form_tag(action, method: method) do %>
+<%= form_tag(action, method: method, id: "case_info_form") do %>
   <p>Please provide information on:</p>
 
   <div class="govuk-form-group <% if @case_info.errors[:case_allocation].present? %>govuk-form-group--error<% end %>">
@@ -68,3 +68,11 @@
   <%= submit_tag save_text, role: "button", draggable: "false", class: "govuk-button govuk govuk-!-margin-top-4" %>
 
 <% end %>
+
+  <%= render :partial => "/shared/analytics_form_event",
+             :locals => {
+                :form_id => 'case_info_form',
+                :event_name => 'Edit offender case info',
+                :event_action => 'submit'
+              }
+  %>

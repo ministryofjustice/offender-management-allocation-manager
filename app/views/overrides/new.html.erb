@@ -6,7 +6,7 @@
 <% end %>
 
 <div>
-  <%= form_tag(overrides_path, method: :post)  do %>
+  <%= form_tag(overrides_path, method: :post, id: "override_form")  do %>
     <h1 class="govuk-heading-xl govuk-!-margin-top-4">Choose reason for changing recommended grade</h1>
     <div class='govuk-!-margin-top-6'>
       <div class="govuk-form-group <% if @override.errors[:override_reasons].present? %>govuk-form-group--error<% end %>">
@@ -51,3 +51,11 @@
     </div>
   <% end %>
   </div>
+
+  <%= render :partial => "/shared/analytics_form_event",
+             :locals => {
+                :form_id => 'override_form',
+                :event_name => 'Override POM recommendation',
+                :event_action => 'submit'
+              }
+  %>

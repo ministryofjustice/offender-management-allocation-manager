@@ -1,0 +1,5 @@
+<% if ga_enabled? %>
+<script>
+  analytics_form_event("<%= form_id %>", "<%= event_name %>", "<%= event_action %>");
+</script>
+<% end %>

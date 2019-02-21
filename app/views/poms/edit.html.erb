@@ -1,7 +1,7 @@
 <%= render :partial => "/shared/backlink", :locals => {:page => poms_path(id: @pom.staff_id)} %>
 
 <div>
-  <%= form_tag pom_path(nomis_staff_id: @pom.staff_id), method: :put do %>
+  <%= form_tag pom_path(nomis_staff_id: @pom.staff_id), method: :put, id: "edit_pom_form" do %>
     <h1 class="govuk-heading-xl govuk-!-margin-top-4">Edit profile</h1>
     <h2 class="govuk-heading-l"><%= @pom.full_name %></h2>
 
@@ -85,3 +85,11 @@
     </form>
   <% end %>
 </div>
+
+  <%= render :partial => "/shared/analytics_form_event",
+             :locals => {
+                :form_id => 'edit_pom_form',
+                :event_name => 'Edit POM',
+                :event_action => 'submit'
+              }
+  %>
