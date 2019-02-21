@@ -32,7 +32,8 @@ class AllocationsController < ApplicationController
       allocated_at_tier: prisoner.tier,
       prison: caseload,
       override_reasons: override_reasons,
-      override_detail: override_detail
+      override_detail: override_detail,
+      message: allocation_params[:message]
     )
 
     redirect_to summary_path(anchor: 'awaiting-allocation')
@@ -77,7 +78,7 @@ private
   end
 
   def allocation_params
-    params.require(:allocate).permit(:nomis_staff_id, :nomis_offender_id)
+    params.require(:allocations).permit(:nomis_staff_id, :nomis_offender_id, :message)
   end
 
   def override_reasons

@@ -6,8 +6,14 @@
       <p class="govuk-body">You are allocating <%= @prisoner.full_name %> to <%= @pom.full_name %></p>
       <p class="govuk-body">We'll be using the email address below to let them know about their new allocation</p>
       <p class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24 govuk-!-margin-top-6"> POM EMAIL ADDRESS </p>
-      <%= hidden_field_tag("allocate[nomis_offender_id]", @prisoner.offender_no) %>
-      <%= hidden_field_tag("allocate[nomis_staff_id]", @pom.staff_id) %>
+
+    <div class="govuk-form-group">
+        <label class="govuk-label" for="message">Add a note to the POM (optional):</label>
+        <span id="message_hint" class="govuk-hint">This will be included in the email</span>
+        <textarea class="govuk-textarea" id="message" name="allocations[message]]" rows="3" aria-describedby="message"></textarea>
+      </div>
+      <%= hidden_field_tag("allocations[nomis_offender_id]", @prisoner.offender_no) %>
+      <%= hidden_field_tag("allocations[nomis_staff_id]", @pom.staff_id) %>
       <%= submit_tag "Complete allocation", role: "button", draggable: "false", class: "govuk-button" %>
     <% end %>
 </div>
