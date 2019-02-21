@@ -6,7 +6,7 @@ class PomMailer < GovukNotifyRails::Mailer
     return unless active?
 
     message = "Additional information: #{message}" if message.present?
-
+    user = ''
     set_template('9679ea4c-1495-4fa6-a00b-630de715e315')
     set_personalisation(
       email_subject: 'New OMIC allocation',
@@ -16,7 +16,7 @@ class PomMailer < GovukNotifyRails::Mailer
       message: message
     )
 
-    mail(to: 'kath.pobee-norris@digital.justice.gov.uk')
+    mail(to: user)
   end
   # rubocop:enable Metrics/MethodLength
 
