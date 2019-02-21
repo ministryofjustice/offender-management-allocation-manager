@@ -4,6 +4,6 @@ module GaHelper
   end
 
   def ga_tracking_id
-    Rails.configuration.ga_tracking_id
+    Rails.configuration.ga_tracking_id.strip
   end
 end
