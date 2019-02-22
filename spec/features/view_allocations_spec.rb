@@ -33,4 +33,10 @@ feature "view POM's caseload" do
     expect(page).to have_content("New allocations")
     expect(page).to have_content("Abbella, Ozullirn")
   end
+
+  it 'allows staff without the POM role to view the my casload page', vcr: { cassette_name: :non_pom_my_caseload }  do
+    signin_user('NON_POM_GEN')
+    visit "/poms/485767/my_caseload"
+    expect(page).to have_text("No allocated cases")
+  end
 end
