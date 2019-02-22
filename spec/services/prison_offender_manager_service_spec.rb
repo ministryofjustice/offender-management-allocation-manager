@@ -1,6 +1,6 @@
 require 'rails_helper'
-require_relative '../../app/services/nomis/elite2/sentence_detail'
-require_relative '../../app/services/nomis/elite2/offender'
+require_relative '../../app/services/nomis/models/sentence_detail'
+require_relative '../../app/services/nomis/models/offender'
 
 describe PrisonOffenderManagerService do
   let(:staff_id) { 485_737 }
@@ -37,7 +37,7 @@ describe PrisonOffenderManagerService do
 
     alloc, sentence_detail = allocated_offenders.first
     expect(alloc).to be_kind_of(Allocation)
-    expect(sentence_detail).to be_kind_of(Nomis::Elite2::SentenceDetail)
+    expect(sentence_detail).to be_kind_of(Nomis::Models::SentenceDetail)
   end
 
   it "will get allocations for a POM made within the last 7 days", vcr: { cassette_name: :get_new_cases } do
