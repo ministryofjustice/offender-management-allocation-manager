@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   root to: 'dashboard#index'
 
   match "/401", :to => "errors#unauthorized", :via => :all
-  match "/404", :to => "errors#not_found", :via => :all
+  match "/404", :to => "errors#not_found", :via => :all, constraints: lambda { |req| req.format == :html }
   match "/500", :to => "errors#internal_server_error", :via => :all
   match "/503", :to => "errors#internal_server_error", :via => :all
 
