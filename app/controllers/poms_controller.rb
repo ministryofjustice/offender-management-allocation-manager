@@ -46,7 +46,9 @@ class PomsController < ApplicationController
 
   def new_cases
     @pom = PrisonOffenderManagerService.get_signed_in_pom_details(current_user)
-    @new_cases = PrisonOffenderManagerService.get_new_cases(@pom.staff_id) if @pom.present?
+    if @pom.present?
+      @new_cases = PrisonOffenderManagerService.get_new_cases(@pom.staff_id)
+    end
   end
 
 private
