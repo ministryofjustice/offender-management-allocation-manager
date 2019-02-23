@@ -35,7 +35,7 @@
   <div class="govuk-grid-column-one-third">
     <div class="wrapper">
       <h1 class="govuk-heading-s">
-        <%= link_to "My caseload", my_caseload_path(@user.staff_id), class:"govuk-link" %>
+        <%= link_to "My caseload", my_caseload_path, class:"govuk-link" %>
       </h1>
       <p class="govuk-body">All cases allocated to you.</p>
     </div>
@@ -43,7 +43,7 @@
   <div class="govuk-grid-column-one-third">
     <div class="wrapper">
       <h1 class="govuk-heading-s">
-        <%= link_to "New allocations", new_cases_path(@user.staff_id), class:"govuk-link" %>
+        <%= link_to "New allocations", new_cases_path, class:"govuk-link" %>
       </h1>
       <p class="govuk-body">Cases allocated to you in the last 7 days.</p>
     </div>
