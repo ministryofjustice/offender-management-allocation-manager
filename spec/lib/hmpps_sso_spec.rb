@@ -22,7 +22,7 @@ describe OmniAuth::Strategies::HmppsSso do
           username: username
                    )
 
-        allow(Nomis::Api::UserApi).to receive(:user_details).and_return(response)
+        allow(Nomis::Elite2::UserApi).to receive(:user_details).and_return(response)
         allow(strategy).to receive(:username).and_return(username)
 
         expect(strategy.info[:username]).to eq(username)

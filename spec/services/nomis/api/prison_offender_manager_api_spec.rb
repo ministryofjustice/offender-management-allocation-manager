@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Nomis::Api::PrisonOffenderManagerApi do
+describe Nomis::Elite2::PrisonOffenderManagerApi do
   it 'can get a of Prison Offender Managers (POMs)',
     vcr: { cassette_name: :pom_api_list_spec  } do
     response = described_class.list('LEI')

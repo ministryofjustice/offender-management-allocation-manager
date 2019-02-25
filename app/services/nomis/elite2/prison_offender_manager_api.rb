@@ -1,5 +1,5 @@
 module Nomis
-  module Api
+  module Elite2
     class PrisonOffenderManagerApi
       extend Elite2Api
 
@@ -7,7 +7,7 @@ module Nomis
         route = "/elite2api/api/staff/roles/#{prison}/role/POM"
 
         response = e2_client.get(route) { |data|
-          raise Nomis::Client::APIError, 'No data was returned' if data.empty?
+          raise Nomis::Elite2::Client::APIError, 'No data was returned' if data.empty?
         }
 
         response.map { |pom|

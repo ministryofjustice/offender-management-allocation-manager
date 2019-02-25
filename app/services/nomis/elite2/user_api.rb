@@ -1,5 +1,5 @@
 module Nomis
-  module Api
+  module Elite2
     class UserApi
       extend Elite2Api
 

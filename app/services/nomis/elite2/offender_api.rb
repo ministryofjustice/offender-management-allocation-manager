@@ -1,5 +1,5 @@
 module Nomis
-  module Api
+  module Elite2
     class OffenderApi
       extend Elite2Api
 
@@ -26,14 +26,14 @@ module Nomis
         ApiPaginatedResponse.new(page_meta, offenders)
       end
 
-      def self.get(offender_no)
+      def self.get_offender(offender_no)
         route = "/elite2api/api/prisoners/#{offender_no}"
         response = e2_client.get(route) { |data|
-          raise Nomis::Client::APIError, 'No data was returned' if data.empty?
+          raise Nomis::Elite2::Client::APIError, 'No data was returned' if data.empty?
         }
 
         api_deserialiser.deserialise(Nomis::Models::Offender, response.first)
-      rescue Nomis::Client::APIError => e
+      rescue Nomis::Elite2::Client::APIError => e
         AllocationManager::ExceptionHandler.capture_exception(e)
         Nomis::Models::NullOffender.new
       end

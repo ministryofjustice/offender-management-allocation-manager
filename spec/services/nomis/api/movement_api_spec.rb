@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Nomis::Api::MovementApi do
+describe Nomis::Elite2::MovementApi do
   describe 'Movements for date' do
     it 'can get movements on a specific date',
       vcr: { cassette_name: :movement_api_on_date } do

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Nomis::Api::UserApi do
+describe Nomis::Elite2::UserApi do
   it "gets staff details",
     vcr: { cassette_name: :user_api_staff_details_spec  } do
     username = 'PK000223'

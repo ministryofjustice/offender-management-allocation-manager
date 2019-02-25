@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Nomis::Api::OffenderApi do
+describe Nomis::Elite2::OffenderApi do
   describe 'List of offenders' do
     it "can get a list of offenders",
       vcr: { cassette_name: :offender_api_offender_list } do
@@ -41,7 +41,7 @@ describe Nomis::Api::OffenderApi do
       vcr: { cassette_name: :offender_api_single_offender_spec } do
       noms_id = 'G2911GD'
 
-      response = described_class.get(noms_id)
+      response = described_class.get_offender(noms_id)
 
       expect(response).to be_instance_of(Nomis::Models::Offender)
     end
@@ -50,7 +50,7 @@ describe Nomis::Api::OffenderApi do
       vcr: { cassette_name: :offender_api_null_offender_spec  } do
       noms_id = 'AAA22D'
 
-      response = described_class.get(noms_id)
+      response = described_class.get_offender(noms_id)
 
       expect(response).to be_instance_of(Nomis::Models::NullOffender)
     end
