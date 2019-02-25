@@ -1,3 +1,6 @@
+<% if @pom.blank? %>
+  <h2 class="govuk-heading-l">No allocated cases </h2>
+<% else %>
 <h2 class="govuk-heading-l">My caseload (<%= @allocations.count  %>)</h2>
 
 <div class="govuk-grid-row">
@@ -41,3 +44,4 @@
   <% end %>
   </tbody>
 </table>
+<% end %>
