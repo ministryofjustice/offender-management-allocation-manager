@@ -11,8 +11,8 @@ Rails.application.routes.draw do
   get('/summary' => 'summary#index')
   get('/prisoners/:id' => 'prisoners#show', as: 'prisoners_show')
   get('/allocations/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocations#confirm', as: 'confirm_allocations')
-  get('/poms/:nomis_staff_id/my_caseload' => 'poms#my_caseload', as: 'my_caseload')
-  get('/poms/:nomis_staff_id/new_cases' => 'poms#new_cases', as: 'new_cases')
+  get('/poms/my_caseload' => 'poms#my_caseload', as: 'my_caseload')
+  get('/poms/new_cases' => 'poms#new_cases', as: 'new_cases')
 
   resources :health, only: %i[ index ], controller: 'health'
   resources :status, only: %i[ index ], controller: 'status'
