@@ -6,9 +6,9 @@ class PomsController < ApplicationController
     -> {  poms_path(params[:nomis_staff_id]) }, only: [:show]
   breadcrumb 'My caseload', :my_caseload_path, only: [:new_cases]
   breadcrumb -> { 'My caseload' },
-    -> { my_caseload_path(1) }, only: [:my_caseload]
+    -> { my_caseload_path }, only: [:my_caseload]
   breadcrumb -> { 'New cases' },
-    -> { new_cases_path(1) }, only: [:new_cases]
+    -> { new_cases_path }, only: [:new_cases]
 
   def index
     poms = PrisonOffenderManagerService.get_poms(caseload)
@@ -38,13 +38,17 @@ class PomsController < ApplicationController
 
   def my_caseload
     @pom = PrisonOffenderManagerService.get_signed_in_pom_details(current_user)
-    @allocations = PrisonOffenderManagerService.get_allocated_offenders(@pom.staff_id)
-    @new_cases = PrisonOffenderManagerService.get_new_cases(@pom.staff_id)
+    if @pom.present?
+      @allocations = PrisonOffenderManagerService.get_allocated_offenders(@pom.staff_id)
+      @new_cases = PrisonOffenderManagerService.get_new_cases(@pom.staff_id)
+    end
   end
 
   def new_cases
     @pom = PrisonOffenderManagerService.get_signed_in_pom_details(current_user)
-    @new_cases = PrisonOffenderManagerService.get_new_cases(@pom.staff_id)
+    if @pom.present?
+      @new_cases = PrisonOffenderManagerService.get_new_cases(@pom.staff_id)
+    end
   end
 
 private
