@@ -15,6 +15,7 @@ feature 'case information feature' do
 
     expect(page).to have_current_path new_case_information_path(nomis_offender_id)
 
+    choose('case_information_welsh_address_Yes')
     choose('case_information_case_allocation_NPS')
     choose('case_information_tier_A')
     click_button 'Save'
@@ -49,6 +50,7 @@ feature 'case information feature' do
 
     expect(CaseInformation.count).to eq(0)
     expect(page).to have_content("Case allocation must be provided")
+    expect(page).to have_content("Welsh address must be selected")
   end
 
   it 'complains if all data is missing', :raven_intercept_exception, vcr: { cassette_name: :case_information_missing_all_feature } do
@@ -70,6 +72,7 @@ feature 'case information feature' do
     expect(CaseInformation.count).to eq(0)
     expect(page).to have_content("Case allocation must be provided")
     expect(page).to have_content("Tier must be provided")
+    expect(page).to have_content("Welsh address must be selected")
   end
 
   it 'complains if tier data is missing', :raven_intercept_exception, vcr: { cassette_name: :case_information_missing_tier_feature } do
@@ -98,6 +101,7 @@ feature 'case information feature' do
 
     signin_user
     visit new_case_information_path(nomis_offender_id)
+    choose('case_information_welsh_address_No')
     choose('case_information_case_allocation_NPS')
     choose('case_information_tier_A')
     click_button 'Save'
@@ -106,7 +110,7 @@ feature 'case information feature' do
 
     expect(page).to have_content('Edit case information')
     expect(page).to have_content('G4273GI')
-
+    choose('case_information_welsh_address_No')
     choose('case_information_case_allocation_CRC')
     click_button 'Update'
 
