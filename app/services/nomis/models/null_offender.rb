@@ -1,5 +1,5 @@
 module Nomis
-  module Elite2
+  module Models
     class NullOffender < Offender; end
   end
 end
