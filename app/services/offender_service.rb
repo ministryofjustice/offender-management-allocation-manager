@@ -1,7 +1,7 @@
 class OffenderService
   # rubocop:disable Metrics/MethodLength
   def self.get_offender(offender_no)
-    Nomis::Elite2::Api.get_offender(offender_no).tap { |o|
+    Nomis::Elite2::OffenderApi.get_offender(offender_no).tap { |o|
       record = CaseInformation.where(nomis_offender_id: offender_no)
 
       unless record.empty?
@@ -13,15 +13,16 @@ class OffenderService
       o.release_date = sentence_detail[offender_no].release_date
       o.sentence_date = sentence_detail[offender_no].sentence_date
 
-      o.main_offence = Nomis::Elite2::Api.get_offence(o.latest_booking_id)
+      o.main_offence = Nomis::Elite2::OffenderApi.get_offence(o.latest_booking_id)
     }
   end
 
   # rubocop:enable Metrics/MethodLength
 
   # rubocop:disable Metrics/MethodLength
+  # rubocop:disable Metrics/LineLength
   def self.get_offenders_for_prison(prison, page_number: 0, page_size: 10)
-    offenders = Nomis::Elite2::Api.get_offender_list(
+    offenders = Nomis::Elite2::OffenderApi.list(
       prison,
       page_number,
       page_size: page_size
@@ -35,7 +36,7 @@ class OffenderService
     end
 
     sentence_details = if offender_ids.count > 0
-                         sentence_details = Nomis::Elite2::Api.get_bulk_sentence_details(
+                         sentence_details = Nomis::Elite2::OffenderApi.get_bulk_sentence_details(
                            offender_ids
                          )
                        else
@@ -56,9 +57,10 @@ class OffenderService
     }
   end
   # rubocop:enable Metrics/MethodLength
+  # rubocop:enable Metrics/LineLength
 
   def self.get_sentence_details(offender_id_list)
-    Nomis::Elite2::Api.get_bulk_sentence_details(offender_id_list)
+    Nomis::Elite2::OffenderApi.get_bulk_sentence_details(offender_id_list)
   end
 
   def self.allocations_for_offenders(offender_id_list)

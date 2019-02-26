@@ -2,25 +2,25 @@ require 'rails_helper'
 
 describe ResponsibilityService do
   let(:offender_none){
-    Nomis::Elite2::Offender.new
+    Nomis::Models::Offender.new
   }
   let(:offender_crc){
-    Nomis::Elite2::Offender.new.tap { |o| o.case_allocation = 'CRC' }
+    Nomis::Models::Offender.new.tap { |o| o.case_allocation = 'CRC' }
   }
   let(:offender_nps_gt_10){
-    Nomis::Elite2::Offender.new.tap { |o|
+    Nomis::Models::Offender.new.tap { |o|
       o.case_allocation = 'NPS'
       o.release_date = DateTime.now.utc.to_date + 12.months
     }
   }
   let(:offender_nps_lt_10){
-    Nomis::Elite2::Offender.new.tap { |o|
+    Nomis::Models::Offender.new.tap { |o|
       o.case_allocation = 'NPS'
       o.release_date = DateTime.now.utc.to_date + 6.months
     }
   }
   let(:offender_nps_no_release_date){
-    Nomis::Elite2::Offender.new.tap { |o| o.case_allocation = 'NPS' }
+    Nomis::Models::Offender.new.tap { |o| o.case_allocation = 'NPS' }
   }
 
   it "CRC allocations means Prison" do

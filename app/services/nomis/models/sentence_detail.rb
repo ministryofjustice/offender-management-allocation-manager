@@ -1,5 +1,5 @@
 module Nomis
-  module Elite2
+  module Models
     class SentenceDetail
       include MemoryModel
 
