@@ -3,11 +3,18 @@
     var form = document.getElementById("<%= form_id %>");
     form.addEventListener('submit', function(event) {
       event.preventDefault();
-      window.dataLayer.push(["send", "event", "<%= event_name %>", "<%= event_action %>", {
-        hitCallback: createFunctionWithTimeout(function() {
-          form.submit();
-        })
-      }]);
+
+      createFunctionWithTimeout(function() {
+        form.submit();
+      })();
+
+      window.dataLayer.push({
+        "event": "send",
+        "event_category": "event",
+        "event_label": "<%= event_name %>",
+        "value": "<%= event_action %>"
+      });
+
     });
 </script>
 <% end %>
