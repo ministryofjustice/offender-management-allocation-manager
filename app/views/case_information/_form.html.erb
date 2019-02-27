@@ -1,48 +1,72 @@
 
 <%= form_tag(action, method: method, id: "case_info_form") do %>
-  <p>Please provide information on:</p>
-
-  <div class="govuk-form-group <% if @case_info.errors[:case_allocation].present? %>govuk-form-group--error<% end %>">
     <%= hidden_field_tag("case_information[nomis_offender_id]", @prisoner.offender_no) %>
-    <fieldset class="govuk-fieldset">
-      <legend class="govuk-fieldset__legend">
+
+    <p>You can find this information in nDelius</p>
+
+    <div class="govuk-form-group <% if @case_info.errors[:welsh_address].present? %>govuk-form-group--error<% end %>">
+      <fieldset class="govuk-fieldset">
+        <legend class="govuk-fieldset__legend--m">
+          Was this prisoner's last known address in Wales?
+        </legend>
+        <p>
+        Only prisoners with a Welsh address can be allocated a prison or probation POM
+        </p>
+
+        <% if @case_info.errors[:welsh_address].present? %>
+          <span class="govuk-error-message">
+            Last known address <%= @case_info.errors[:welsh_address].first %>
+          </span>
+        <% end %>
+
+        <div class="govuk-radios">
+          <div class="govuk-radios__item">
+            <%= radio_button_tag("case_information[welsh_address]", 'Yes', @case_info.welsh_address == 'Yes', class: "govuk-radios__input") %>
+            <%= label_tag "case_information[welsh_address]", 'Yes', class: "govuk-label govuk-radios__label" %>
+          </div>
+          <div class="govuk-radios__item">
+            <%= radio_button_tag("case_information[welsh_address]", 'No', @case_info.welsh_address == 'No', class: "govuk-radios__input") %>
+            <%= label_tag "case_information[welsh_address]", "No", class: "govuk-label govuk-radios__label" %>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="govuk-form-group <% if @case_info.errors[:case_allocation].present? %>govuk-form-group--error<% end %>">
+      <fieldset class="govuk-fieldset">
+        <legend class="govuk-fieldset__legend--m">
+            Who is the service provider for this case?
+        </legend>
         <% if @case_info.errors[:case_allocation].present? %>
           <span class="govuk-error-message">
             Case allocation <%= @case_info.errors[:case_allocation].first %>
           </span>
         <% end %>
 
-        <p class="govuk-fieldset__heading">
-        Case allocation decision
-        </p>
-      </legend>
-
-      <div class="govuk-radios">
-        <div class="govuk-radios__item">
-          <%= radio_button_tag("case_information[case_allocation]", "NPS", @case_info.case_allocation == 'NPS', class: "govuk-radios__input") %>
-          <%= label_tag "case_information[case_allocation]", "National Probation Service (NPS)", class: "govuk-label govuk-radios__label" %>
+        <div class="govuk-radios">
+          <div class="govuk-radios__item">
+            <%= radio_button_tag("case_information[case_allocation]", "NPS", @case_info.case_allocation == 'NPS', class: "govuk-radios__input") %>
+            <%= label_tag "case_information[case_allocation]", "National Probation Service (NPS)", class: "govuk-label govuk-radios__label" %>
+          </div>
+          <div class="govuk-radios__item">
+            <%= radio_button_tag("case_information[case_allocation]", "CRC", @case_info.case_allocation == 'CRC', class: "govuk-radios__input") %>
+            <%= label_tag "case_information[case_allocation]", "Community Rehabilitation Company (CRC)", class: "govuk-label govuk-radios__label" %>
+          </div>
         </div>
-        <div class="govuk-radios__item">
-          <%= radio_button_tag("case_information[case_allocation]", "CRC", @case_info.case_allocation == 'CRC', class: "govuk-radios__input") %>
-          <%= label_tag "case_information[case_allocation]", "Community Rehabilitation Company (CRC)", class: "govuk-label govuk-radios__label" %>
-        </div>
-      </div>
-    </fieldset>
-  </div>
+      </fieldset>
+    </div>
 
   <div class="govuk-form-group <% if @case_info.errors[:tier].present? %>govuk-form-group--error<% end %>">
     <fieldset class="govuk-fieldset govuk-!-margin-top-6">
-      <legend class="govuk-fieldset__legend">
-        <% if @case_info.errors[:tier].present? %>
-          <span class="govuk-error-message">
-            Tier <%= @case_info.errors[:tier].first %>
-          </span>
-        <% end %>
-
-        <p class="govuk-fieldset__heading">
-        Prisoner's tiering decision
-        </p>
+      <legend class="govuk-fieldset__legend--m">
+        What tier has the prisoner been assigned to?
       </legend>
+
+      <% if @case_info.errors[:tier].present? %>
+        <span class="govuk-error-message">
+          Tier <%= @case_info.errors[:tier].first %>
+        </span>
+      <% end %>
 
       <div class="govuk-radios">
         <div class="govuk-radios__item">
