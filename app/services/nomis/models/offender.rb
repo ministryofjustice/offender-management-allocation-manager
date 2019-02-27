@@ -32,6 +32,7 @@ module Nomis
       attribute :sentence_date, :date
       attribute :tier, :string
       attribute :case_allocation, :string
+      attribute :welsh_address, :boolean
 
       def current_responsibility
         @current_responsibility = ResponsibilityService.calculate_responsibility(self)
