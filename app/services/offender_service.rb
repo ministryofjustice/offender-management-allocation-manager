@@ -47,8 +47,11 @@ class OffenderService
       offender.release_date = sentence_details[offender.offender_no].release_date
       if offender.release_date.present?
         record = tier_map[offender.offender_no]
-        offender.tier = record.tier if record
-        offender.case_allocation = record.case_allocation if record
+        if record
+          offender.tier = record.tier
+          offender.case_allocation = record.case_allocation
+          offender.welsh_address = record.welsh_address
+        end
         offender.sentence_date = sentence_details[offender.offender_no].sentence_date
         true
       else
