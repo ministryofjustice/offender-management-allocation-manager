@@ -24,7 +24,9 @@ time left to serve into account.</p>
   <% @recommended_poms.each_with_index do |pom, i| %>
     <tr class="govuk-table__row recommended_pom_row_<%= i %>">
       <td aria-label="POM name" class="govuk-table__cell "><%= pom.full_name %></td>
-      <td aria-label="Previous allocation" class="govuk-table__cell">-</td>
+      <td aria-label="Previous allocation" class="govuk-table__cell">
+        <%= 'Yes' if @previously_allocated_pom_ids.include?(pom.staff_id) %>
+      </td>
       <td aria-label="Tier A cases" class="govuk-table__cell "><%= pom.tier_a %></td>
       <td aria-label="Tier B cases" class="govuk-table__cell "><%= pom.tier_b %></td>
       <td aria-label="Tier C cases" class="govuk-table__cell "><%= pom.tier_c %></td>
@@ -80,7 +82,9 @@ time left to serve into account.</p>
       <% @not_recommended_poms.each_with_index do |pom, i| %>
         <tr class="govuk-table__row not_recommended_pom_row_<%= i %>">
           <td aria-label="POM name" class="govuk-table__cell "><%= pom.full_name %></td>
-          <td aria-label="Previous allocation" class="govuk-table__cell">-</td>
+          <td aria-label="Previous allocation" class="govuk-table__cell">
+            <%= 'Yes' if @previously_allocated_pom_ids.include?(pom.staff_id) %>
+          </td>
           <td aria-label="Tier A cases" class="govuk-table__cell "><%= pom.tier_a %></td>
           <td aria-label="Tier B cases" class="govuk-table__cell "><%= pom.tier_b %></td>
           <td aria-label="Tier C cases" class="govuk-table__cell "><%= pom.tier_c %></td>
