@@ -10,7 +10,7 @@ feature 'Allocation' do
       nomis_staff_id: probation_officer_nomis_staff_id,
       working_pattern: 1.0,
       status: 'Active'
-  )
+    )
   }
 
   let!(:case_information) {
