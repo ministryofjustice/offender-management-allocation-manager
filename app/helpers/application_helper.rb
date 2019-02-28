@@ -25,4 +25,17 @@ module ApplicationHelper
   def override_reason_contains(override, val)
     override.override_reasons.present? && override.override_reasons.include?(val)
   end
+
+  def service_provider_label(provider)
+    {
+      'CRC' => 'Community Rehabilitation Company (CRC)',
+      'NPS' => 'National Probation Service (NPS)'
+    }[provider]
+  end
+
+  def working_pattern_name(pattern)
+    return 'Full time' if pattern.to_f == 1.0
+
+    'Part time'
+  end
 end

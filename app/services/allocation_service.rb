@@ -9,7 +9,7 @@ class AllocationService
         get_pom_detail(params[:nomis_staff_id]).id
 
       Allocation.create!(params) do |alloc|
-        alloc.active = true
+        alloc.active = params.fetch(:active, true)
         alloc.save!
       end
     }
@@ -28,6 +28,12 @@ class AllocationService
         a
       ]
     }.to_h
+  end
+
+  def self.previously_allocated_poms(nomis_offender_id)
+    Allocation.where(
+      nomis_offender_id: nomis_offender_id, active: false
+    ).map(&:nomis_staff_id)
   end
 
   def self.create_override(params)
