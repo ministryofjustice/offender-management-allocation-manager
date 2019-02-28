@@ -1,16 +1,16 @@
 <table class="govuk-table">
   <tbody class="govuk-table__body">
   <tr class="govuk-table__row">
-    <td class="govuk-table__header" scope="row">Offence</td>
-    <td class="govuk-table__cell"></td>
+    <td class="govuk-table__header govuk-!-width-one-half" scope="row">Offence</td>
+    <td class="govuk-table__cell govuk-!-width-one-half"></td>
   </tr>
   <tr class="govuk-table__row">
-    <td class="govuk-table__cell hmpps-table-cell__key">Main Offence</td>
-    <td class="govuk-table__cell table_cell__left_align hmpps-table-cell__key"><%= @prisoner.main_offence %></td>
+    <td class="govuk-table__cell govuk-!-width-one-half">Main Offence</td>
+    <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= @prisoner.main_offence %></td>
   </tr>
   <tr class="govuk-table__row">
-      <td class="govuk-table__cell hmpps-table-cell__key">Release date / parole eligibility</td>
-      <td class="govuk-table__cell table_cell__left_align hmpps-table-cell__key"><%= format_date(@prisoner.release_date) %></td>
+      <td class="govuk-table__cell">Release date / parole eligibility</td>
+      <td class="govuk-table__cell table_cell__left_align"><%= format_date(@prisoner.release_date) %></td>
     </tr>
   </tbody>
 </table>

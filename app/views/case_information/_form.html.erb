@@ -2,15 +2,13 @@
 <%= form_tag(action, method: method, id: "case_info_form") do %>
     <%= hidden_field_tag("case_information[nomis_offender_id]", @prisoner.offender_no) %>
 
-    <p>You can find this information in nDelius</p>
-
     <div class="govuk-form-group <% if @case_info.errors[:welsh_address].present? %>govuk-form-group--error<% end %>">
       <fieldset class="govuk-fieldset">
-        <legend class="govuk-fieldset__legend--m">
+        <legend class="govuk-fieldset__legend--s govuk-!-margin-bottom-2">
           Was this prisoner's last known address in Wales?
         </legend>
         <p>
-        Only prisoners with a Welsh address can be allocated a prison or probation POM
+          Only prisoners with a Welsh address can be allocated a prison or probation POM
         </p>
 
         <% if @case_info.errors[:welsh_address].present? %>
@@ -32,9 +30,9 @@
       </fieldset>
     </div>
 
-    <div class="govuk-form-group <% if @case_info.errors[:case_allocation].present? %>govuk-form-group--error<% end %>">
+    <div class="govuk-!-margin-top-8 govuk-form-group <% if @case_info.errors[:case_allocation].present? %>govuk-form-group--error<% end %>">
       <fieldset class="govuk-fieldset">
-        <legend class="govuk-fieldset__legend--m">
+        <legend class="govuk-fieldset__legend--s govuk-!-margin-bottom-4">
             Who is the service provider for this case?
         </legend>
         <% if @case_info.errors[:case_allocation].present? %>
@@ -56,9 +54,9 @@
       </fieldset>
     </div>
 
-  <div class="govuk-form-group <% if @case_info.errors[:tier].present? %>govuk-form-group--error<% end %>">
-    <fieldset class="govuk-fieldset govuk-!-margin-top-6">
-      <legend class="govuk-fieldset__legend--m">
+  <div class="govuk-!-margin-top-8 govuk-form-group <% if @case_info.errors[:tier].present? %>govuk-form-group--error<% end %>">
+    <fieldset class="govuk-fieldset">
+      <legend class="govuk-fieldset__legend--s  govuk-!-margin-bottom-4">
         What tier has the prisoner been assigned to?
       </legend>
 
@@ -71,19 +69,19 @@
       <div class="govuk-radios">
         <div class="govuk-radios__item">
           <%= radio_button_tag("case_information[tier]", "A", @case_info[:tier] == 'A', class: "govuk-radios__input") %>
-          <%= label_tag "case_information[tier]", "Tier A", class: "govuk-label govuk-radios__label" %>
+          <%= label_tag "case_information[tier]", "A", class: "govuk-label govuk-radios__label" %>
         </div>
         <div class="govuk-radios__item">
           <%= radio_button_tag("case_information[tier]", "B", @case_info[:tier] == 'B', class: "govuk-radios__input") %>
-          <%= label_tag "case_information[tier]", "Tier B", class: "govuk-label govuk-radios__label" %>
+          <%= label_tag "case_information[tier]", "B", class: "govuk-label govuk-radios__label" %>
         </div>
         <div class="govuk-radios__item">
           <%= radio_button_tag("case_information[tier]", "C", @case_info[:tier] == 'C', class: "govuk-radios__input") %>
-          <%= label_tag "case_information[tier]", "Tier C", class: "govuk-label govuk-radios__label" %>
+          <%= label_tag "case_information[tier]", "C", class: "govuk-label govuk-radios__label" %>
         </div>
         <div class="govuk-radios__item">
           <%= radio_button_tag("case_information[tier]", "D", @case_info[:tier] == 'D', class: "govuk-radios__input") %>
-          <%= label_tag "case_information[tier]", "Tier D", class: "govuk-label govuk-radios__label" %>
+          <%= label_tag "case_information[tier]", "D", class: "govuk-label govuk-radios__label" %>
         </div>
       </div>
     </fieldset>

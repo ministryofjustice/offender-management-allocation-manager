@@ -5,8 +5,10 @@
   <%= render :partial => "/shared/validation_errors", :locals => { :errors => @case_info.errors } %>
 <% end %>
 
-<h1 class="govuk-heading-xl govuk-!-margin-top-4">Case information</h1>
-<h2 class="govuk-heading-l"><%= @prisoner.full_name %> - <%= @prisoner.offender_no %></h2>
+<h1 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-4">Case information</h1>
+<h2 class="govuk-heading-m"><%= @prisoner.full_name %> - <%= @prisoner.offender_no %></h2>
+<p class="govuk-!-margin-bottom-8">You can find this information in nDelius</p>
+
 
 <%= render :partial => "form", :locals => {
       :action => case_information_path(),
