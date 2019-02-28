@@ -8,11 +8,16 @@ Rails.application.routes.draw do
 
   get '/auth/:provider/callback', to: 'sessions#create'
   get '/signout', to: 'sessions#destroy'
-  get('/summary' => 'summary#index')
   get('/prisoners/:id' => 'prisoners#show', as: 'prisoners_show')
   get('/allocations/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocations#confirm', as: 'confirm_allocations')
   get('/poms/my_caseload' => 'poms#my_caseload', as: 'my_caseload')
   get('/poms/new_cases' => 'poms#new_cases', as: 'new_cases')
+
+  get('/summary' => 'summary#index')
+  get('/summary/allocated' => 'summary#allocated')
+  get('/summary/unallocated' => 'summary#unallocated')
+  get('/summary/pending' => 'summary#pending')
+
 
   resources :health, only: %i[ index ], controller: 'health'
   resources :status, only: %i[ index ], controller: 'status'

@@ -2,31 +2,32 @@
 # number of things. The initial capacity of the bucket is set on
 # creation and once full, any attempts to put more items in the
 # bucket will be ignored.
+#
+# This would just be an array apart from the handling of the last
+# N items, and it's recommended not to subclass core classes
 class Bucket
   attr_accessor :items
 
-  def initialize(capacity)
-    raise BucketCapacityException if capacity < 1
-
+  def initialize
     @items = []
-    @capacity = capacity
   end
 
   def <<(item)
-    return if full?
-
     @items << item
   end
 
-  def last(count)
-    start_index = @items.count - count
-    start_index = 0 if start_index < 0
-    @items[start_index..-1]
+  def sort(field, direction = :asc)
+    return unless valid_sort_fields.include?(field)
+
+    @items = @items.sort_by(&field)
+    @items = @items.reverse if direction == :desc
   end
 
-  def full?
-    @items.count == @capacity
+  def valid_sort_fields
+    [:last_name, :sentence_date, :release_date]
+  end
+
+  def take(count, from)
+    @items[from..(from + count - 1)]
   end
 end
-
-class BucketCapacityException < RuntimeError; end

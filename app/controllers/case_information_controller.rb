@@ -25,7 +25,7 @@ class CaseInformationController < ApplicationController
       case_allocation: case_information_params[:case_allocation]
     )
 
-    return redirect_to summary_path(anchor: 'awaiting-information') if @case_info.valid?
+    return redirect_to summary_pending_path if @case_info.valid?
 
     @prisoner = prisoner(case_information_params[:nomis_offender_id])
     render :new

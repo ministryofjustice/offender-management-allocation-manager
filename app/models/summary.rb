@@ -1,30 +1,21 @@
 class Summary
-  attr_accessor :allocated_offenders, :unallocated_offenders, :missing_info_offenders
-  attr_accessor :allocated_total, :unallocated_total, :missing_info_total
-  attr_accessor :allocated_page_count, :unallocated_page_count, :missing_page_count
+  attr_accessor :offenders
+  attr_accessor :allocated_total, :unallocated_total, :pending_total
+  attr_accessor :page_count
 
-  def allocated_page_meta(current_page)
+  def page_meta(current_page, summary_type)
     new_page_meta(current_page).tap{ |p|
-      p.total_elements = allocated_total
-      p.total_pages = allocated_page_count
-      p.items_on_page = allocated_offenders.count
+      p.total_pages = page_count
+      p.items_on_page = offenders.count
+      p.total_elements = get_total_for_summary_type(summary_type)
     }
   end
 
-  def unallocated_page_meta(current_page)
-    new_page_meta(current_page).tap{ |p|
-      p.total_elements = unallocated_total
-      p.total_pages = unallocated_page_count
-      p.items_on_page = unallocated_offenders.count
-    }
-  end
+  def get_total_for_summary_type(summary_type)
+    return allocated_total if summary_type == :allocated
+    return unallocated_total if summary_type == :unallocated
 
-  def missing_info_page_meta(current_page)
-    new_page_meta(current_page).tap{ |p|
-      p.total_elements = missing_info_total
-      p.total_pages = missing_page_count
-      p.items_on_page = missing_info_offenders.count
-    }
+    pending_total if summary_type == :pending
   end
 
 private
