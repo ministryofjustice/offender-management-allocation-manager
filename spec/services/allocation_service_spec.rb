@@ -12,9 +12,32 @@ RSpec.describe AllocationService do
     )
   }
 
+  let(:inactive_allocation) {
+    described_class.create_allocation(
+      nomis_staff_id: 485_595,
+      nomis_offender_id: 'G2911GD',
+      created_by: 'Test User',
+      nomis_booking_id: 0,
+      allocated_at_tier: 'A',
+      prison: 'LEI',
+      active: false
+    )
+  }
+
   it "Can get the active allocations", vcr: { cassette_name: 'allocation_service_get_allocations' } do
     alloc = described_class.active_allocations([allocation.nomis_offender_id])
     expect(alloc).to be_instance_of(Hash)
+  end
+
+  it "Can get previous allocations for an offender where there are none", vcr: { cassette_name: 'allocation_service_previous_allocations_none' } do
+    staff_ids = described_class.previously_allocated_poms(allocation.nomis_offender_id)
+    expect(staff_ids).to eq([])
+  end
+
+  it "Can get previous allocations for an offender where there are some", vcr: { cassette_name: 'allocation_service_previous_allocations' } do
+    staff_ids = described_class.previously_allocated_poms(inactive_allocation.nomis_offender_id)
+    expect(staff_ids.count).to eq(1)
+    expect(staff_ids.first).to eq(485_595)
   end
 
   it "can deallocate for a POM", vcr: { cassette_name: 'allocation_service_deallocate_a_pom' } do
