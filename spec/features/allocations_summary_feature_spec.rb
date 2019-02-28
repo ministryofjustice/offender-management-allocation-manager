@@ -7,7 +7,8 @@ feature 'summary summary feature' do
 
       visit 'summary#awaiting-information'
 
-      expect(page).to have_css('.govuk-tabs__tab', text: 'Awaiting information')
+      expect(page).to have_css('.govuk-tabs__tab')
+      expect(page).to have_content('Update information')
       within('#awaiting-information') do
         expect(page).to have_css('.pagination ul.links li', count: 7)
       end
@@ -18,7 +19,8 @@ feature 'summary summary feature' do
 
       visit 'summary#awaiting-allocation'
 
-      expect(page).to have_css('.govuk-tabs__tab', text: 'Awaiting allocation')
+      expect(page).to have_css('.govuk-tabs__tab')
+      expect(page).to have_content('Update information')
       within('#awaiting-allocation') do
         expect(page).to have_css('.pagination ul.links li', count: 0)
       end
@@ -29,7 +31,8 @@ feature 'summary summary feature' do
 
       visit 'summary#allocated'
 
-      expect(page).to have_css('.govuk-tabs__tab', text: 'Allocated')
+      expect(page).to have_css('.govuk-tabs__tab')
+      expect(page).to have_content('See allocations')
       within('#allocated') do
         expect(page).to have_css('.pagination ul.links li', count: 0)
       end
