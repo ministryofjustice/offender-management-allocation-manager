@@ -65,18 +65,18 @@ feature 'summary summary feature' do
       visit summary_pending_path
       expect(page).to have_link('Next »')
       expect(page).not_to have_link('« Previous')
-      expect(page).not_to have_link(/^1$/)
+      expect(page).not_to have_link('1', :exact => true)
 
       visit summary_pending_path(page: 2)
       expect(page).to have_link('Next »')
       expect(page).to have_link('« Previous')
-      expect(page).not_to have_link(/^2$/)
+      expect(page).not_to have_link('2', :exact => true)
 
       visit summary_pending_path(page: 117)
       expect(page).not_to have_link('Next »')
       expect(page).to have_link('« Previous')
-      expect(page).not_to have_link(/^117$/)
-      expect(page).not_to have_link(/^118$/)
+      expect(page).not_to have_link('117', :exact => true)
+      expect(page).not_to have_link('118', :exact => true)
     end
   end
 end
