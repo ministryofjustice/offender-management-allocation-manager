@@ -54,6 +54,7 @@ CaseInformation.find_or_create_by!(
   nomis_offender_id: 'G7806VO',
   tier: 'A',
   case_allocation: 'NPS',
+  welsh_address: 'Yes',
   prison: 'LEI'
 )
 
@@ -61,6 +62,7 @@ CaseInformation.find_or_create_by!(
   nomis_offender_id: 'G3462VT',
   tier: 'B',
   case_allocation: 'NPS',
+  welsh_address: 'Yes',
   prison: 'LEI'
 )
 
@@ -68,6 +70,7 @@ CaseInformation.find_or_create_by!(
   nomis_offender_id: 'G3536UF',
   tier: 'C',
   case_allocation: 'CRC',
+  welsh_address: 'No',
   prison: 'LEI'
 )
 
@@ -75,5 +78,6 @@ CaseInformation.find_or_create_by!(
   nomis_offender_id: 'G2911GD',
   tier: 'D',
   case_allocation: 'CRC',
+  welsh_address: 'No',
   prison: 'LEI'
 )
