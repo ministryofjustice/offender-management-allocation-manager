@@ -1,3 +1,7 @@
+<h1 class="govuk-heading-xl">Allocations</h1>
+
+<%= render(:partial => 'tabs_start', :locals => {:active => :pending}) %>
+
 <section class="govuk-tabs__panel" id="awaiting-information">
   <table class="govuk-table responsive tablesorter">
     <thead class="govuk-table__head">
@@ -11,7 +15,7 @@
     </tr>
     </thead>
     <tbody class="govuk-table__body">
-    <% @summary.missing_info_offenders.each_with_index do |offender, i| %>
+    <% @summary.offenders.each_with_index do |offender, i| %>
       <tr class="govuk-table__row offender_row_<%= i %>">
         <td aria-label="Prisoner full name" class="govuk-table__cell "><%= offender.full_name %></td>
         <td aria-label="Prisoner number" class="govuk-table__cell "><%= offender.offender_no %></td>
@@ -41,8 +45,9 @@
   <%= render(
           :partial => 'shared/pagination',
           :locals => {
-              :page_data => @missing_info_page_meta,
-              :param_name => 'missing-info-page',
-              :fragment => 'awaiting-information'
+              :page_data => @page_meta,
+              :param_name => 'page',
           }) %>
+</section>
+
 </section>

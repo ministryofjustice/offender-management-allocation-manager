@@ -1,4 +1,3 @@
-<h1 class="govuk-heading-xl">Allocations</h1>
 
 <div class="govuk-tabs" data-module="tabs">
   <h2 class="govuk-tabs__title">
@@ -6,23 +5,18 @@
   </h2>
   <ul class="govuk-tabs__list" role='tablist'>
       <li class="govuk-tabs__list-item">
-      <a class="govuk-tabs__tab" href="#allocated">
+      <a class="govuk-tabs__tab <%= 'govuk-tabs__tab--selected' if active == :allocated %>" href="<%= summary_allocated_path %>">
           See allocations (<%= @summary.allocated_total %>)
       </a>
       </li>
       <li class="govuk-tabs__list-item">
-      <a class="govuk-tabs__tab" href="#awaiting-allocation">
+      <a class="govuk-tabs__tab <%= 'govuk-tabs__tab--selected' if active == :unallocated %>" href="<%= summary_unallocated_path %>">
           Make allocations (<%= @summary.unallocated_total %>)
       </a>
       </li>
       <li class="govuk-tabs__list-item">
-      <a class="govuk-tabs__tab" href="#awaiting-information">
-          Update information (<%= @summary.missing_info_total %>)
+      <a class="govuk-tabs__tab <%= 'govuk-tabs__tab--selected' if active == :pending %>" href="<%= summary_pending_path %>">
+          Update information (<%= @summary.pending_total %>)
       </a>
       </li>
   </ul>
-
-  <%= render 'allocated' %>
-  <%= render 'awaiting' %>
-  <%= render 'awaiting_information' %>
-</div>

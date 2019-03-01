@@ -40,7 +40,7 @@ class AllocationsController < ApplicationController
       message: allocation_params[:message]
     )
 
-    redirect_to summary_path(anchor: 'awaiting-allocation')
+    redirect_to summary_unallocated_path
   end
 # rubocop:enable Metrics/MethodLength
 

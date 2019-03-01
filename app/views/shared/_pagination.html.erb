@@ -5,7 +5,7 @@
     <ul class="links">
       <li>
         <% if page_data.previous? %>
-          <a href="<%= replace_param(param_name, page_data.current_page - 1) %>#<%= fragment %>">&laquo; Previous</a>
+          <a href="<%= replace_param(param_name, page_data.current_page - 1) %>">&laquo; Previous</a>
         <% else %>
           &laquo; Previous
         <% end %>
@@ -15,13 +15,13 @@
           <% if page_num == page_data.current_page %>
             <%= page_num %>
           <% else %>
-            <a href="<%= replace_param(param_name, page_num) %>#<%= fragment %>"><%= page_num %></a>
+            <a href="<%= replace_param(param_name, page_num) %>"><%= page_num %></a>
           <% end %>
         </li>
       <% end %>
       <li>
         <% if page_data.next? %>
-          <a href="<%= replace_param(param_name, page_data.current_page + 1) %>#<%= fragment %>">Next &raquo;</a>
+          <a href="<%= replace_param(param_name, page_data.current_page + 1) %>">Next &raquo;</a>
         <% else %>
           Next &raquo;
         <% end %>

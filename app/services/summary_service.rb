@@ -3,12 +3,16 @@ class SummaryService
   FETCH_SIZE = 250 # How many records to fetch from nomis at a time
 
   # rubocop:disable Metrics/MethodLength
-  def summary(allocated_page, unallocated_page, missing_info_page, prison)
-    create_buckets(allocated_page, unallocated_page, missing_info_page)
+  # rubocop:disable Metrics/PerceivedComplexity
+  # rubocop:disable Metrics/CyclomaticComplexity
+  def summary(summary_type, prison, page, sort_field: nil, sort_direction: :asc)
+    # We expect to be passed summary_type, which is one of :allocated, :unallocated,
+    # or :pending.  The other types will return totals, and do not contain any data.
+    bucket = Bucket.new
 
     # We want to store the total number of each item so we can show totals for
     # each type of record.
-    @counts = { allocated_count: 0, unallocated_count: 0, missing_count: 0 }
+    @counts = { allocated: 0, unallocated: 0, pending: 0 }
 
     number_of_requests = max_requests_count(prison)
     (0..number_of_requests).each do |request_no|
@@ -17,7 +21,7 @@ class SummaryService
 
       # Group the offenders without a tier, and the remaining ones
       # are either allocated or unallocated
-      tiered_offenders = get_tiered_offenders(offenders)
+      tiered_offenders = get_tiered_offenders(offenders, bucket, summary_type == :pending)
 
       # Check the allocations for the remaining offenders who have tiers.
       offender_nos = tiered_offenders.map(&:offender_no)
@@ -27,59 +31,56 @@ class SummaryService
       # find an active allocation for them.
       tiered_offenders.each { |offender|
         if active_allocations_hash.key?(offender.offender_no)
-          @allocated_bucket << offender
-          @counts[:allocated_count] += 1
+          bucket << offender if summary_type == :allocated
+          @counts[:allocated] += 1
         else
-          @unallocated_bucket << offender
-          @counts[:unallocated_count] += 1
+          bucket << offender if summary_type == :unallocated
+          @counts[:unallocated] += 1
         end
       }
     end
 
-    allocated_page_count = (@counts[:allocated_count] / PAGE_SIZE.to_f).ceil
-    unallocated_page_count = (@counts[:unallocated_count] / PAGE_SIZE.to_f).ceil
-    missing_page_count = (@counts[:missing_count] / PAGE_SIZE.to_f).ceil
+    page_count = (@counts[summary_type] / PAGE_SIZE.to_f).ceil
 
     # If we are on the last page, we don't always want 10 items from the bucket
     # we just want the last digit, so if there are 138 items, the last page should
     # show 8.
-    allocated_wanted = number_items_wanted(
-      allocated_page_count == allocated_page,
-      @counts[:allocated_count].digits[0]
+    wanted_items = number_items_wanted(
+      page_count == page,
+      @counts[summary_type].digits[0]
     )
-    unallocated_wanted = number_items_wanted(
-      allocated_page_count == allocated_page,
-      @counts[:unallocated_count].digits[0]
-    )
-    missing_wanted = number_items_wanted(
-      missing_page_count == missing_info_page,
-      @counts[:missing_count].digits[0]
-    )
+    if sort_field.present?
+      bucket.sort(sort_field, sort_direction)
+    end
 
     # For the allocated offenders, we need to provide the allocated POM's
     # name
-    allocated_offenders = OffenderService.set_allocated_pom_name(
-      @allocated_bucket.last(allocated_wanted),
-      prison
-    )
+    from = [(PAGE_SIZE * (page - 1)), 0].max
+
+    if summary_type == :allocated
+      offender_items = OffenderService.set_allocated_pom_name(
+        bucket.take(wanted_items, from) || [],
+        prison
+      )
+    else
+      offender_items = bucket.take(wanted_items, from) || []
+    end
 
     # Return the last (N) records from each bucket, in case
     # the capacity was higher than 10 (we need more than one page worth).
     Summary.new.tap { |summary|
-      summary.allocated_offenders = allocated_offenders
-      summary.unallocated_offenders = @unallocated_bucket.last(unallocated_wanted)
-      summary.missing_info_offenders = @missing_info_bucket.last(missing_wanted)
+      summary.offenders = offender_items
 
-      summary.allocated_total = @counts[:allocated_count]
-      summary.unallocated_total = @counts[:unallocated_count]
-      summary.missing_info_total = @counts[:missing_count]
+      summary.allocated_total = @counts[:allocated]
+      summary.unallocated_total = @counts[:unallocated]
+      summary.pending_total = @counts[:pending]
 
-      summary.allocated_page_count = allocated_page_count
-      summary.unallocated_page_count = unallocated_page_count
-      summary.missing_page_count = missing_page_count
+      summary.page_count = page_count
     }
   end
+# rubocop:enable Metrics/CyclomaticComplexity
 # rubocop:enable Metrics/MethodLength
+# rubocop:enable Metrics/PerceivedComplexity
 
 private
 
@@ -110,13 +111,13 @@ private
     )
   end
 
-  def get_tiered_offenders(offender_list)
+  def get_tiered_offenders(offender_list, bucket, store)
     # Filter out any offenders who have no tiering information
     # at the same time we add them to the correct bucket.
     offender_list.select { |offender|
       if offender.tier.blank?
-        @missing_info_bucket << offender
-        @counts[:missing_count] += 1
+        bucket << offender if store
+        @counts[:pending] += 1
         false
       else
         true
