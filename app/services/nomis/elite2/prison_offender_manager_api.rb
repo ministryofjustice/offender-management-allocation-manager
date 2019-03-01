@@ -1,3 +1,5 @@
+require 'api_cache'
+
 module Nomis
   module Elite2
     class PrisonOffenderManagerApi
@@ -6,8 +8,11 @@ module Nomis
       def self.list(prison)
         route = "/elite2api/api/staff/roles/#{prison}/role/POM"
 
-        response = e2_client.get(route) { |data|
-          raise Nomis::Elite2::Client::APIError, 'No data was returned' if data.empty?
+        key = "pom_list_#{prison}"
+        response = APICache.get(key, cache: 600) {
+          e2_client.get(route) { |data|
+            raise Nomis::Elite2::Client::APIError, 'No data was returned' if data.empty?
+          }
         }
 
         response.map { |pom|

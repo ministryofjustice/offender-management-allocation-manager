@@ -1,3 +1,5 @@
+require 'api_cache'
+
 module Nomis
   module Elite2
     class OffenderApi
@@ -7,16 +9,20 @@ module Nomis
       def self.list(prison, page = 0, page_size: 10)
         route = "/elite2api/api/locations/description/#{prison}/inmates"
 
-        page_meta = nil
         page_offset = page * page_size
         hdrs = paging_headers(page_size, page_offset)
 
-        data = e2_client.get(route, extra_headers: hdrs) { |json, response|
-          total_records = response.headers['Total-Records'].to_i
-          records_shown = json.length
-          page_meta = make_page_meta(
-            page, page_size, total_records, records_shown
-          )
+        key = "offender_list_#{prison}_#{page}_#{page_size}"
+        data, page_meta = APICache.get(key, cache: 300) {
+          page_meta = nil
+          data = e2_client.get(route, extra_headers: hdrs) { |json, response|
+            total_records = response.headers['Total-Records'].to_i
+            records_shown = json.length
+            page_meta = make_page_meta(
+              page, page_size, total_records, records_shown
+            )
+          }
+          [data, page_meta]
         }
 
         offenders = data.map { |offender|
