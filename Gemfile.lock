@@ -44,6 +44,7 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.6.0)
       public_suffix (>= 2.0.2, < 4.0)
+    api_cache (0.3.0)
     arel (9.0.0)
     ast (2.4.0)
     bindex (0.5.0)
@@ -289,6 +290,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  api_cache
   bootsnap (>= 1.1.0)
   brakeman
   byebug

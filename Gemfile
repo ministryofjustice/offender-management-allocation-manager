@@ -22,6 +22,7 @@ gem 'turbolinks', '~> 5'
 gem 'uglifier', '>= 1.3.0'
 gem 'loaf'
 gem 'typhoeus'
+gem 'api_cache'
 
 group :development, :test do
   gem 'brakeman'
