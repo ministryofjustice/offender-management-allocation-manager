@@ -16,12 +16,11 @@ class OffenderService
       o.main_offence = Nomis::Elite2::OffenderApi.get_offence(o.latest_booking_id)
     }
   end
-
   # rubocop:enable Metrics/MethodLength
 
   # rubocop:disable Metrics/MethodLength
   # rubocop:disable Metrics/LineLength
-  def self.get_offenders_for_prison(prison, page_number: 0, page_size: 10)
+  def self.get_offenders_for_prison(prison, page_number: 0, page_size: 10, tier_map: nil)
     offenders = Nomis::Elite2::OffenderApi.list(
       prison,
       page_number,
@@ -30,10 +29,7 @@ class OffenderService
 
     offender_ids = offenders.map(&:offender_no)
 
-    cases = CaseInformation.where(nomis_offender_id: offender_ids)
-    tier_map = cases.each_with_object({}) do |c, hash|
-      hash[c.nomis_offender_id] = c
-    end
+    mapped_tiers = tier_map || CaseInformationService.get_case_information(prison)
 
     sentence_details = if offender_ids.count > 0
                          sentence_details = Nomis::Elite2::OffenderApi.get_bulk_sentence_details(
@@ -46,7 +42,7 @@ class OffenderService
     offenders.select { |offender|
       offender.release_date = sentence_details[offender.offender_no].release_date
       if offender.release_date.present?
-        record = tier_map[offender.offender_no]
+        record = mapped_tiers[offender.offender_no]
         if record
           offender.tier = record.tier
           offender.case_allocation = record.case_allocation

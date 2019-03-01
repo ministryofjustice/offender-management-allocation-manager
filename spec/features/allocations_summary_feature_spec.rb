@@ -2,6 +2,13 @@ require 'rails_helper'
 
 feature 'summary summary feature' do
   describe 'awaiting summary table' do
+    it 'redirects correctly', :raven_intercept_exception, vcr: { cassette_name: :redirect_summary_index_feature } do
+      signin_user
+
+      visit summary_path
+      expect(page).to have_current_path summary_allocated_path
+    end
+
     it 'displays offenders awaiting information', :raven_intercept_exception, vcr: { cassette_name: :awaiting_information_feature } do
       signin_user
 
@@ -10,6 +17,24 @@ feature 'summary summary feature' do
       expect(page).to have_css('.govuk-tabs__tab')
       expect(page).to have_content('Update information')
       expect(page).to have_css('.pagination ul.links li', count: 7)
+    end
+
+    it 'handles sorting params', :raven_intercept_exception, vcr: { cassette_name: :summary_sorting_feature } do
+      signin_user
+
+      get_ids = lambda {
+        all('tbody tr td').map(&:text).select { |c|
+          /[A-Z][0-9.][0-9.][0-9.][0-9.][A-Z][A-Z]/.match(c)
+        }
+      }
+
+      visit summary_pending_path(sort: 'last_name')  # Default direction is asc.
+      asc_cells = get_ids.call
+
+      visit summary_pending_path(sort: 'last_name desc')
+      desc_cells = get_ids.call
+
+      expect(asc_cells).not_to match_array(desc_cells)
     end
 
     it 'displays offenders pending allocation', :raven_intercept_exception, vcr: { cassette_name: :awaiting_allocation_feature } do
