@@ -56,7 +56,12 @@ module Nomis
 
         route = '/elite2api/api/offender-sentences'
 
-        data = e2_client.post(route, offender_ids)
+        h = Digest::SHA256.hexdigest( offender_ids.to_s )
+        key = "bulk_sentence_#{h}"
+
+        data = APICache.get(key, cache: 300) {
+          e2_client.post(route, offender_ids)
+        }
 
         data.each_with_object({}) { |record, hash|
           oid = record['offenderNo']
