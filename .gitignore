@@ -30,3 +30,7 @@
 
 # Ignore VCR cassettes
 /spec/fixtures
+
+# Ignore VIM swap files
+*.swp
+*.swo
