@@ -51,12 +51,13 @@ module Nomis
         data.first['offenceDescription']
       end
 
+      # rubocop:disable Metrics/MethodLength
       def self.get_bulk_sentence_details(offender_ids)
         return {} if offender_ids.empty?
 
         route = '/elite2api/api/offender-sentences'
 
-        h = Digest::SHA256.hexdigest( offender_ids.to_s )
+        h = Digest::SHA256.hexdigest(offender_ids.to_s)
         key = "bulk_sentence_#{h}"
 
         data = APICache.get(key, cache: 300) {
@@ -68,6 +69,7 @@ module Nomis
           hash[oid] = api_deserialiser.deserialise(Nomis::Models::SentenceDetail, record)
         }
       end
+    # rubocop:enable Metrics/MethodLength
 
     private
 
