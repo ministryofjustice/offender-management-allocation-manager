@@ -20,7 +20,5 @@ Rails.application.configure do
 
   config.lograge.enabled = true
   config.lograge.formatter = Lograge::Formatters::Logstash.new
-
-  config.lograge.logger = ActiveSupport::Logger.new \
-    "#{Rails.root}/log/logstash_#{Rails.env}.json"
+  config.lograge.logger = ActiveSupport::Logger.new(STDOUT)
 end
