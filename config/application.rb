@@ -29,5 +29,6 @@ module OffenderManagementAllocationClient
     config.prometheus_metrics = ENV['PROMETHEUS_METRICS']
     config.notify_api_key = ENV['GOVUK_NOTIFY_API_KEY']
     config.ga_tracking_id = ENV['GA_TRACKING_ID']
+    config.support_email = ENV['SUPPORT_EMAIL']
   end
 end
