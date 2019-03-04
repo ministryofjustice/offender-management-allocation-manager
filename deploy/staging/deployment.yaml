@@ -110,6 +110,11 @@ spec:
                 secretKeyRef:
                   name: allocation-manager-secrets
                   key: ga_tracking_id
+            - name: SUPPORT_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-manager-secrets
+                  key: support_email
         - name: allocation-manager-metrics
           image: 926803513772.dkr.ecr.eu-west-1.amazonaws.com/offender-management/offender-management-allocation-manager:latest
           imagePullPolicy: Always
