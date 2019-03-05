@@ -10,29 +10,29 @@ class SummaryController < ApplicationController
   end
 
   def allocated
-    @summary = create_summary(:allocated, search)
+    @summary = create_summary(:allocated)
     @page_meta = @summary.page_meta(page, :allocated)
   end
 
   def unallocated
-    @summary = create_summary(:unallocated, search)
+    @summary = create_summary(:unallocated)
     @page_meta = @summary.page_meta(page, :unallocated)
   end
 
   def pending
-    @summary = create_summary(:pending, search)
+    @summary = create_summary(:pending)
     @page_meta = @summary.page_meta(page, :pending)
   end
 
 private
 
-  def create_summary(summary_type, search)
+  def create_summary(summary_type)
     field, direction = sort_params(summary_type)
 
     params = SummaryService::SummaryParams.new(
       sort_field: field,
       sort_direction: direction,
-      search: search
+      search: search_term
     )
 
     SummaryService.new.summary(
@@ -44,7 +44,7 @@ private
     params.fetch('page', 1).to_i
   end
 
-  def search
+  def search_term
     params['q']
   end
 
