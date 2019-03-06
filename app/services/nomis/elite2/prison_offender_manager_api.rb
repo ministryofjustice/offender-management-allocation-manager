@@ -10,13 +10,13 @@ module Nomis
 
         key = "pom_list_#{prison}"
         response = APICache.get(key, cache: 600) {
-          e2_client.get(route) { |data|
+          response = e2_client.get(route) { |data|
             raise Nomis::Elite2::Client::APIError, 'No data was returned' if data.empty?
           }
-        }
 
-        response.map { |pom|
-          api_deserialiser.deserialise(Nomis::Models::PrisonOffenderManager, pom)
+          response.map { |pom|
+            api_deserialiser.deserialise(Nomis::Models::PrisonOffenderManager, pom)
+          }
         }
       end
     end
