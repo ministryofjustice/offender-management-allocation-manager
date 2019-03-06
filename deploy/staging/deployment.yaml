@@ -117,12 +117,14 @@ spec:
                   key: support_email
             - name: REDIS_URL
               valueFrom:
-                secretKeyRef: elasticache-offender-management-allocation-manager-token-cache-staging
-                key: primary_endpoint_address
+                secretKeyRef:
+                  name: elasticache-offender-management-allocation-manager-token-cache-staging
+                  key: primary_endpoint_address
             - name: REDIS_AUTH
               valueFrom:
-                secretKeyRef: elasticache-offender-management-allocation-manager-token-cache-staging
-                key: auth_token
+                secretKeyRef:
+                  name: elasticache-offender-management-allocation-manager-token-cache-staging
+                  key: auth_token
         - name: allocation-manager-metrics
           image: 926803513772.dkr.ecr.eu-west-1.amazonaws.com/offender-management/offender-management-allocation-manager:latest
           imagePullPolicy: Always
