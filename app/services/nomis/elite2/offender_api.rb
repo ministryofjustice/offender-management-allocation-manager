@@ -22,14 +22,15 @@ module Nomis
               page, page_size, total_records, records_shown
             )
           }
-          [data, page_meta]
+
+          offenders = data.map { |offender|
+            api_deserialiser.deserialise(Nomis::Models::OffenderShort, offender)
+          }
+
+          [offenders, page_meta]
         }
 
-        offenders = data.map { |offender|
-          api_deserialiser.deserialise(Nomis::Models::OffenderShort, offender)
-        }
-
-        ApiPaginatedResponse.new(page_meta, offenders)
+        ApiPaginatedResponse.new(page_meta, data)
       end
 
       def self.get_offender(offender_no)
@@ -51,18 +52,27 @@ module Nomis
         data.first['offenceDescription']
       end
 
+      # rubocop:disable Metrics/MethodLength
       def self.get_bulk_sentence_details(offender_ids)
         return {} if offender_ids.empty?
 
         route = '/elite2api/api/offender-sentences'
 
-        data = e2_client.post(route, offender_ids)
+        h = Digest::SHA256.hexdigest(offender_ids.to_s)
+        key = "bulk_sentence_#{h}"
 
-        data.each_with_object({}) { |record, hash|
-          oid = record['offenderNo']
-          hash[oid] = api_deserialiser.deserialise(Nomis::Models::SentenceDetail, record)
+        APICache.get(key, cache: 300) {
+          data = e2_client.post(route, offender_ids)
+
+          data.each_with_object({}) { |record, hash|
+            oid = record['offenderNo']
+            hash[oid] = api_deserialiser.deserialise(
+              Nomis::Models::SentenceDetail, record
+            )
+          }
         }
       end
+    # rubocop:enable Metrics/MethodLength
 
     private
 
