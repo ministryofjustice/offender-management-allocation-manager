@@ -66,7 +66,9 @@ module Nomis
 
           data.each_with_object({}) { |record, hash|
             oid = record['offenderNo']
-            hash[oid] = api_deserialiser.deserialise(Nomis::Models::SentenceDetail, record)
+            hash[oid] = api_deserialiser.deserialise(
+              Nomis::Models::SentenceDetail, record
+            )
           }
         }
       end
