@@ -30,5 +30,7 @@ module OffenderManagementAllocationClient
     config.notify_api_key = ENV['GOVUK_NOTIFY_API_KEY']
     config.ga_tracking_id = ENV['GA_TRACKING_ID']
     config.support_email = ENV['SUPPORT_EMAIL']
+    config.redis_url = ENV['REDIS_URL']
+    config.redis_auth = ENV['REDIS_AUTH']
   end
 end
