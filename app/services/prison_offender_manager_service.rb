@@ -56,9 +56,9 @@ class PrisonOffenderManagerService
   end
 
   def self.get_signed_in_pom_details(current_user)
-    user = Nomis::Elite2::UserApi.user_details(current_user)
+    user = Nomis::Custody::UserApi.user_details(current_user)
 
-    poms_list = PrisonOffenderManagerService.get_poms(user.active_case_load_id)
+    poms_list = PrisonOffenderManagerService.get_poms(user.active_nomis_caseload)
     @pom = poms_list.select { |p| p.staff_id.to_i == user.staff_id.to_i }.first
   end
 

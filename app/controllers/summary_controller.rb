@@ -36,7 +36,7 @@ private
     )
 
     SummaryService.new.summary(
-      summary_type, caseload, page, params
+      summary_type, active_caseload, page, params
     )
   end
 
