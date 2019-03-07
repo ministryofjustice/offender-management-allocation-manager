@@ -38,4 +38,11 @@ module ApplicationHelper
 
     'Part time'
   end
+
+  def responsibility_label(offender_responsibility)
+    {
+      'Probation' => 'Community',
+      'Prison' => 'Prison'
+    }[offender_responsibility]
+  end
 end
