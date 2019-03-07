@@ -1,6 +1,78 @@
 require 'rails_helper'
 
 describe PageMeta, model: true do
+  it 'handles pages at the start' do
+    meta = PageMeta.new.tap { |p|
+      p.size = 10
+      p.total_elements = 612
+      p.total_pages = 62
+      p.number = 1
+      p.items_on_page = 10
+    }
+
+    expect(meta.pages).to match_array([1, 2, nil, 62])
+  end
+
+  it 'handles pages at the end' do
+    meta = PageMeta.new.tap { |p|
+      p.size = 10
+      p.total_elements = 612
+      p.total_pages = 62
+      p.number = 62
+      p.items_on_page = 10
+    }
+
+    expect(meta.pages).to match_array([1, nil, 61, 62])
+  end
+
+  it 'handles pages in the middle' do
+    meta = PageMeta.new.tap { |p|
+      p.size = 10
+      p.total_elements = 612
+      p.total_pages = 62
+      p.number = 21
+      p.items_on_page = 10
+    }
+
+    expect(meta.pages).to match_array([1, nil, 20, 21, 22, nil, 62])
+  end
+
+  it 'handles the page 3 in' do
+    meta = PageMeta.new.tap { |p|
+      p.size = 10
+      p.total_elements = 612
+      p.total_pages = 62
+      p.number = 3
+      p.items_on_page = 10
+    }
+
+    expect(meta.pages).to match_array([1, 2, 3, 4, nil, 62])
+  end
+
+  it 'handles the page 3 from the end' do
+    meta = PageMeta.new.tap { |p|
+      p.size = 10
+      p.total_elements = 150
+      p.total_pages = 15
+      p.number = 13
+      p.items_on_page = 10
+    }
+
+    expect(meta.pages).to match_array([1, nil, 12, 13, 14, 15])
+  end
+
+  it 'handles a single page' do
+    meta = PageMeta.new.tap { |p|
+      p.size = 10
+      p.total_elements = 9
+      p.total_pages = 1
+      p.number = 1
+      p.items_on_page = 9
+    }
+
+    expect(meta.pages).to match_array([1])
+  end
+
   it 'handles missing data' do
     meta = PageMeta.new.tap { |p|
       p.size = 10
@@ -12,88 +84,8 @@ describe PageMeta, model: true do
 
     expect(meta.record_range).to eq('0 - 0')
     expect(meta.current_page).to eq(0)
-    expect(meta.page_numbers).to eq([])
+    expect(meta.pages).to eq([])
     expect(meta.previous?).to be false
     expect(meta.next?).to be false
-  end
-
-  it 'handles a single pages' do
-    meta = PageMeta.new.tap { |p|
-      p.size = 10
-      p.total_elements = 10
-      p.total_pages = 1
-      p.number = 1
-      p.items_on_page = 10
-    }
-
-    expect(meta.record_range).to eq('1 - 10')
-    expect(meta.current_page).to eq(1)
-    expect(meta.page_numbers).to eq(1..1)
-    expect(meta.previous?).to be false
-    expect(meta.next?).to be false
-  end
-
-  it 'handles less than 5 pages' do
-    meta = PageMeta.new.tap { |p|
-      p.size = 10
-      p.total_elements = 30
-      p.total_pages = 3
-      p.number = 2
-      p.items_on_page = 10
-    }
-
-    expect(meta.record_range).to eq('11 - 20')
-    expect(meta.current_page).to eq(2)
-    expect(meta.page_numbers).to eq(1..3)
-    expect(meta.previous?).to be true
-    expect(meta.next?).to be true
-  end
-
-  it 'handles lots of pages' do
-    meta = PageMeta.new.tap { |p|
-      p.size = 10
-      p.total_elements = 1000
-      p.total_pages = 100
-      p.number = 100
-      p.items_on_page = 10
-    }
-
-    expect(meta.record_range).to eq('991 - 1000')
-    expect(meta.current_page).to eq(100)
-    expect(meta.page_numbers).to eq(95..100)
-    expect(meta.previous?).to be true
-    expect(meta.next?).to be false
-  end
-
-  it 'handles showing a short last page' do
-    meta = PageMeta.new.tap { |p|
-      p.size = 10
-      p.total_elements = 15
-      p.total_pages = 2
-      p.number = 2
-      p.items_on_page = 5
-    }
-
-    expect(meta.record_range).to eq('11 - 15')
-    expect(meta.current_page).to eq(2)
-    expect(meta.page_numbers).to eq(1..2)
-    expect(meta.previous?).to be true
-    expect(meta.next?).to be false
-  end
-
-  it 'shows sliding window' do
-    meta = PageMeta.new.tap { |p|
-      p.size = 10
-      p.total_elements = 200
-      p.total_pages = 20
-      p.number = 9
-      p.items_on_page = 10
-    }
-
-    expect(meta.record_range).to eq('81 - 90')
-    expect(meta.current_page).to eq(9)
-    expect(meta.page_numbers).to eq(7..11)
-    expect(meta.previous?).to be true
-    expect(meta.next?).to be true
   end
 end
