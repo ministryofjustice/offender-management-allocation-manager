@@ -13,7 +13,6 @@ module Nomis
       attribute :thumbnail_id, :string
       attribute :account_status, :string
       attribute :active, :boolean
-      attribute :caseloads
     end
   end
 end
