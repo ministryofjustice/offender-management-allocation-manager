@@ -4,7 +4,7 @@ require 'rails_helper'
 describe OmniAuth::Strategies::HmppsSso do
   let(:app) {
     Rack::Builder.new do |b|
-      b.run ->(_env) {[200, {}, ['Hello']]}
+      b.run ->(_env) { [200, {}, ['Hello']] }
     end.to_app
   }
 
