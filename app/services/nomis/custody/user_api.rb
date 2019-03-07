@@ -1,6 +1,6 @@
 module Nomis
   module Custody
-    class StaffApi
+    class UserApi
       extend CustodyApi
 
       def self.list_caseloads(username)

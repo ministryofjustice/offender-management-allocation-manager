@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe SignonIdentity, model: true do
   let(:time_stamp) { 123_456 }
-  let(:user_auth_data) { double('user_auth_data', username: 'Fred', caseload: 'LEI') }
+  let(:user_auth_data) { double('user_auth_data', username: 'Fred', active_caseload: 'LEI', caseloads: %w[LEI RNI]) }
   let(:credentials) { double('credentials', expires_at: time_stamp) }
   let(:omniauth_data) do
     { 'info' => user_auth_data, 'credentials' => credentials }
@@ -16,7 +16,8 @@ describe SignonIdentity, model: true do
   it 'creates session data' do
     session = {
       username: 'Fred',
-      caseload: 'LEI',
+      active_caseload: 'LEI',
+      caseloads: %w[LEI RNI],
       expiry: time_stamp
     }
 

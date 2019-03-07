@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   helper_method :current_user
-  helper_method :caseload
+  helper_method :active_caseload
+  helper_method :caseloads
 
   include SSOIdentity
 
@@ -15,8 +16,12 @@ class ApplicationController < ActionController::Base
     sso_identity['username'] if sso_identity.present?
   end
 
-  def caseload
-    sso_identity['caseload'] if sso_identity.present?
+  def active_caseload
+    sso_identity['active_caseload'] if sso_identity.present?
+  end
+
+  def caseloads
+    sso_identity['caseloads'] if sso_identity.present?
   end
 
 private

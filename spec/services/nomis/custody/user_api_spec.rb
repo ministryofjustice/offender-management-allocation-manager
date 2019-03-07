@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Nomis::Custody::StaffApi do
+describe Nomis::Custody::UserApi do
   describe 'List caseloads for staff' do
     it "can get a list of caseloads where they exist",
       vcr: { cassette_name: :custody_staff_api } do

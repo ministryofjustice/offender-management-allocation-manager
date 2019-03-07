@@ -11,7 +11,7 @@ class PomsController < ApplicationController
     -> { new_cases_path }, only: [:new_cases]
 
   def index
-    poms = PrisonOffenderManagerService.get_poms(caseload)
+    poms = PrisonOffenderManagerService.get_poms(active_caseload)
     @active_poms, @inactive_poms = poms.partition { |pom|
       pom.status == 'active'
     }
@@ -23,7 +23,7 @@ class PomsController < ApplicationController
   end
 
   def edit
-    @pom = PrisonOffenderManagerService.get_pom(caseload, params[:nomis_staff_id])
+    @pom = PrisonOffenderManagerService.get_pom(active_caseload, params[:nomis_staff_id])
   end
 
   def update
@@ -54,7 +54,7 @@ class PomsController < ApplicationController
 private
 
   def pom
-    PrisonOffenderManagerService.get_pom(caseload, params[:nomis_staff_id])
+    PrisonOffenderManagerService.get_pom(active_caseload, params[:nomis_staff_id])
   end
 
   def edit_pom_params
