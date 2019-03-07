@@ -61,7 +61,6 @@ describe PageMeta, model: true do
     expect(meta.pages).to match_array([1, nil, 12, 13, 14, 15])
   end
 
-
   it 'handles a single page' do
     meta = PageMeta.new.tap { |p|
       p.size = 10
@@ -73,7 +72,6 @@ describe PageMeta, model: true do
 
     expect(meta.pages).to match_array([1])
   end
-
 
   it 'handles missing data' do
     meta = PageMeta.new.tap { |p|

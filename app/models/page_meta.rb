@@ -22,24 +22,22 @@ class PageMeta
     total_pages
   end
 
+  def previous?
+    current_page > 1
+  end
+
+  def next?
+    current_page < total_pages
+  end
+
   def pages
     return [] if total_elements == 0
 
     page_numbers = [1]
 
-    left, right = [number - 1, number + 1]
-    if left > 1
-      page_numbers << nil if left - 1 > 1
-      page_numbers << left
-    end
-
-    # Push the current page onto the stack
+    page_numbers += left_pages
     page_numbers << number unless number == 1
-
-    if right <= total_pages
-      page_numbers << right
-      page_numbers << nil if right + 1 < total_pages
-    end
+    page_numbers += right_pages
 
     # Push the last page (unless we have already)
     page_numbers << total_pages unless page_numbers.include?(total_pages)
@@ -47,11 +45,29 @@ class PageMeta
     page_numbers
   end
 
-  def previous?
-    current_page > 1
+private
+
+  def left_pages
+    pnums = []
+    left = number - 1
+
+    if left > 1
+      pnums << nil if left - 1 > 1
+      pnums << left
+    end
+
+    pnums
   end
 
-  def next?
-    current_page < total_pages
+  def right_pages
+    pnums = []
+    right = number + 1
+
+    if right <= total_pages
+      pnums << right
+      pnums << nil if right + 1 < total_pages
+    end
+
+    pnums
   end
 end
