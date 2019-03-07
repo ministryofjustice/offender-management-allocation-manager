@@ -2,13 +2,23 @@ class SummaryService
   PAGE_SIZE = 10 # The number of items to show in the view
   FETCH_SIZE = 200 # How many records to fetch from nomis at a time
 
+  class SummaryParams
+    attr_reader :sort_field, :sort_direction, :search
+
+    def initialize(sort_field: nil, sort_direction: :asc, search: nil)
+      @sort_field = sort_field
+      @sort_direction = sort_direction
+      @search = search
+    end
+  end
+
   # rubocop:disable Metrics/MethodLength
   # rubocop:disable Metrics/PerceivedComplexity
   # rubocop:disable Metrics/CyclomaticComplexity
-  def summary(summary_type, prison, page, sort_field: nil, sort_direction: :asc)
+  def summary(summary_type, prison, page, params)
     # We expect to be passed summary_type, which is one of :allocated, :unallocated,
     # or :pending.  The other types will return totals, and do not contain any data.
-    bucket = Bucket.new
+    @bucket = Bucket.new
 
     # We want to store the total number of each item so we can show totals for
     # each type of record.
@@ -21,9 +31,18 @@ class SummaryService
       offenders = get_page_of_offenders(prison, request_no, tier_map)
       break if offenders.blank?
 
+      if params.search.present?
+        search_term = params.search.upcase
+        offenders = offenders.select { |offender|
+          offender.last_name.start_with?(search_term) ||
+          offender.first_name.start_with?(search_term) ||
+          offender.offender_no.include?(search_term)
+        }
+      end
+
       # Group the offenders without a tier, and the remaining ones
       # are either allocated or unallocated
-      tiered_offenders = get_tiered_offenders(offenders, bucket, summary_type == :pending)
+      tiered_offenders = get_tiered_offenders(offenders, summary_type == :pending)
 
       # Check the allocations for the remaining offenders who have tiers.
       offender_nos = tiered_offenders.map(&:offender_no)
@@ -33,10 +52,10 @@ class SummaryService
       # find an active allocation for them.
       tiered_offenders.each { |offender|
         if active_allocations_hash.key?(offender.offender_no)
-          bucket << offender if summary_type == :allocated
+          @bucket << offender if summary_type == :allocated
           @counts[:allocated] += 1
         else
-          bucket << offender if summary_type == :unallocated
+          @bucket << offender if summary_type == :unallocated
           @counts[:unallocated] += 1
         end
       }
@@ -51,8 +70,8 @@ class SummaryService
       page_count == page,
       @counts[summary_type].digits[0]
     )
-    if sort_field.present?
-      bucket.sort(sort_field, sort_direction)
+    if params.sort_field.present?
+      @bucket.sort(params.sort_field, params.sort_direction)
     end
 
     # For the allocated offenders, we need to provide the allocated POM's
@@ -61,11 +80,11 @@ class SummaryService
 
     if summary_type == :allocated
       offender_items = OffenderService.set_allocated_pom_name(
-        bucket.take(wanted_items, from) || [],
+        @bucket.take(wanted_items, from) || [],
         prison
       )
     else
-      offender_items = bucket.take(wanted_items, from) || []
+      offender_items = @bucket.take(wanted_items, from) || []
     end
 
     # Return the last (N) records from each bucket, in case
@@ -105,12 +124,12 @@ private
     )
   end
 
-  def get_tiered_offenders(offender_list, bucket, store)
+  def get_tiered_offenders(offender_list, should_store)
     # Filter out any offenders who have no tiering information
     # at the same time we add them to the correct bucket.
     offender_list.select { |offender|
       if offender.tier.blank?
-        bucket << offender if store
+        @bucket << offender if should_store
         @counts[:pending] += 1
         false
       else
