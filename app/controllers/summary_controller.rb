@@ -28,15 +28,24 @@ private
 
   def create_summary(summary_type)
     field, direction = sort_params(summary_type)
-    SummaryService.new.summary(
-      summary_type, caseload, page,
+
+    params = SummaryService::SummaryParams.new(
       sort_field: field,
-      sort_direction: direction
+      sort_direction: direction,
+      search: search_term
+    )
+
+    SummaryService.new.summary(
+      summary_type, caseload, page, params
     )
   end
 
   def page
     params.fetch('page', 1).to_i
+  end
+
+  def search_term
+    params['q']
   end
 
   def sort_params(summary_type)
