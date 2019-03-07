@@ -1,9 +1,7 @@
 module Nomis
-  module Elite2
-    ApiPaginatedResponse = Struct.new(:meta, :data)
-
-    module Elite2Api
-      def e2_client
+  module Custody
+    module CustodyApi
+      def custody_client
         host = Rails.configuration.nomis_oauth_host
         Nomis::Client.new(host)
       end

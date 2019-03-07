@@ -11,7 +11,7 @@ module Nomis
         key = "pom_list_#{prison}"
         APICache.get(key, cache: 600) {
           response = e2_client.get(route) { |data|
-            raise Nomis::Elite2::Client::APIError, 'No data was returned' if data.empty?
+            raise Nomis::Client::APIError, 'No data was returned' if data.empty?
           }
 
           response.map { |pom|

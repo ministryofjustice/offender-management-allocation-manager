@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Nomis::Elite2::Client do
+describe Nomis::Client do
   let(:api_host) { Rails.configuration.nomis_oauth_host }
   let(:client) { described_class.new(api_host) }
   let(:token_service) { Nomis::Oauth::TokenService }
@@ -42,12 +42,12 @@ describe Nomis::Elite2::Client do
 
     it 'raises an APIError', :raven_intercept_exception do
       expect { client.get(route) }.
-        to raise_error(Nomis::Elite2::Client::APIError, 'Unexpected status 401')
+        to raise_error(Nomis::Client::APIError, 'Unexpected status 401')
     end
 
     it 'sends the error to sentry' do
       expect(AllocationManager::ExceptionHandler).to receive(:capture_exception).with(error)
-      expect { client.get(route) }.to raise_error(Nomis::Elite2::Client::APIError)
+      expect { client.get(route) }.to raise_error(Nomis::Client::APIError)
     end
   end
 
@@ -64,12 +64,12 @@ describe Nomis::Elite2::Client do
 
     it 'raises an APIError', :raven_intercept_exception do
       expect { client.get(route) }.
-        to raise_error(Nomis::Elite2::Client::APIError, 'Unexpected status 500')
+        to raise_error(Nomis::Client::APIError, 'Unexpected status 500')
     end
 
     it 'sends the error to sentry' do
       expect(AllocationManager::ExceptionHandler).to receive(:capture_exception).with(error)
-      expect { client.get(route) }.to raise_error(Nomis::Elite2::Client::APIError)
+      expect { client.get(route) }.to raise_error(Nomis::Client::APIError)
     end
   end
 end
