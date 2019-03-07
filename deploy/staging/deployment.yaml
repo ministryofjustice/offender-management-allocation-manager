@@ -41,6 +41,11 @@ spec:
               port: 3000
             initialDelaySeconds: 10
             periodSeconds: 60
+          envFrom:
+            - configMapRef:
+                name: shared-environment
+            - secretRef:
+                name: allocation-manager-secrets
           env:
             - name: POSTGRES_HOST
               valueFrom:
@@ -62,69 +67,36 @@ spec:
                 secretKeyRef:
                   name: allocation-rds-instance-output
                   key: postgres_user
-            - name: PROMETHEUS_METRICS
-              value: "on"
-            - name: SECRET_KEY_BASE
+        - name: allocation-manager-sidekiq
+          image: 926803513772.dkr.ecr.eu-west-1.amazonaws.com/offender-management/offender-management-allocation-manager:latest
+          imagePullPolicy: Always
+          command: ['sh', '-c', "bundle exec sidekiq -C config/sidekiq.yml"]
+          envFrom:
+            - configMapRef:
+                name: shared-environment
+            - secretRef:
+                name: allocation-manager-secrets
+          env:
+            - name: POSTGRES_HOST
               valueFrom:
                 secretKeyRef:
-                  name: allocation-manager-secrets
-                  key: secret_key_base
-            - name: RAILS_ENV
-              value: "production"
-            - name: RAILS_SERVE_STATIC_FILES
-              value: "true"
-            - name: WEB_CONCURRENCY
+                  name: allocation-rds-instance-output
+                  key: rds_instance_address
+            - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: allocation-manager-secrets
-                  key: rails_web_concurrency
-            - name: NOMIS_OAUTH_PUBLIC_KEY
-              value: "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF6Y3g3WWJ3MkJBV3Y3U3NFSVVHUAppeUpTSURndHFCeDE5VHdtN3VJM1RYNXpSY3JabFV4Y0VtUEpHVWd5K0QySkloVmxxbWVxd0dWMkNOT3FaQmdHCmo4ZUpHQTU5aUlUemU4ZG1SSk5JYzdsNmxESmc5RE5KVk9pTHFVbFpGRENJcXplSTYzb3E2dWhjY2c1RFBpVE4KcU9HWmM4dXBOK3c1ZFpyTnYrMkdMZ3hLMnBldE1VL0JoWWVXZjNLdllJTzE2djF1dm5GT0dPMTNIb1d1NUJ0ZApTdC9UZ2NsRmhWTEVkR3c3WGJpWUhuTlpJZGh3YU5RaVlnbVhtalpWZE15Q1BETW8xMExrVjFwM1V5MTVwTU14ClVwc2xKYU8wNlZIYXJtY3ZWYzNleHg5NlpHTjE2T2U4ZWZoeG5Rdmhzd0ZrbXlYT25sSForNDI1MnJHcHlKTG8KbHdJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t"
-            - name: ALLOCATION_MANAGER_HOST
+                  name: allocation-rds-instance-output
+                  key: postgres_password
+            - name: POSTGRES_NAME
               valueFrom:
                 secretKeyRef:
-                  name: allocation-manager-secrets
-                  key: allocation_manager_host
-            - name: SENTRY_DSN
+                  name: allocation-rds-instance-output
+                  key: postgres_name
+            - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: allocation-manager-secrets
-                  key: sentry_dsn
-            - name: NOMIS_OAUTH_CLIENT_ID
-              valueFrom:
-                secretKeyRef:
-                  name: allocation-manager-secrets
-                  key: nomis_oauth_client_id
-            - name: NOMIS_OAUTH_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: allocation-manager-secrets
-                  key: nomis_oauth_client_secret
-            - name: NOMIS_OAUTH_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: allocation-manager-secrets
-                  key: nomis_oauth_host
-            - name: GA_TRACKING_ID
-              valueFrom:
-                secretKeyRef:
-                  name: allocation-manager-secrets
-                  key: ga_tracking_id
-            - name: SUPPORT_EMAIL
-              valueFrom:
-                secretKeyRef:
-                  name: allocation-manager-secrets
-                  key: support_email
-            - name: REDIS_URL
-              valueFrom:
-                secretKeyRef:
-                  name: elasticache-offender-management-allocation-manager-token-cache-staging
-                  key: primary_endpoint_address
-            - name: REDIS_AUTH
-              valueFrom:
-                secretKeyRef:
-                  name: elasticache-offender-management-allocation-manager-token-cache-staging
-                  key: auth_token
+                  name: allocation-rds-instance-output
+                  key: postgres_user
         - name: allocation-manager-metrics
           image: 926803513772.dkr.ecr.eu-west-1.amazonaws.com/offender-management/offender-management-allocation-manager:latest
           imagePullPolicy: Always
