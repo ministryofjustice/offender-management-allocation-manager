@@ -22,16 +22,29 @@ class PageMeta
     total_pages
   end
 
-  def page_numbers
-    page = current_page
+  def pages
+    return [] if total_elements == 0
 
-    return [] if total_pages == 0
+    page_numbers = [1]
 
-    return 1..[total_pages, 5].min if page <= 3
+    left, right = [number - 1, number + 1]
+    if left > 1
+      page_numbers << nil if left - 1 > 1
+      page_numbers << left
+    end
 
-    return total_pages - 5..total_pages if page >= total_pages - 5
+    # Push the current page onto the stack
+    page_numbers << number unless number == 1
 
-    page - 2..page + 2
+    if right <= total_pages
+      page_numbers << right
+      page_numbers << nil if right + 1 < total_pages
+    end
+
+    # Push the last page (unless we have already)
+    page_numbers << total_pages unless page_numbers.include?(total_pages)
+
+    page_numbers
   end
 
   def previous?
