@@ -16,7 +16,7 @@ feature 'summary summary feature' do
 
       expect(page).to have_css('.govuk-tabs__tab')
       expect(page).to have_content('Update information')
-      expect(page).to have_css('.pagination ul.links li', count: 7)
+      expect(page).to have_css('.pagination ul.links li', count: 5)
     end
 
     it 'handles sorting params', :raven_intercept_exception, vcr: { cassette_name: :summary_sorting_feature } do
@@ -44,7 +44,7 @@ feature 'summary summary feature' do
 
       expect(page).to have_css('.govuk-tabs__tab')
       expect(page).to have_content('Update information')
-      expect(page).to have_css('.pagination ul.links li', count: 0)
+      expect(page).to have_css('.pagination ul.links li', count: 2)
     end
 
     it 'displays offenders already allocated', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders_feature } do
@@ -54,7 +54,7 @@ feature 'summary summary feature' do
 
       expect(page).to have_css('.govuk-tabs__tab')
       expect(page).to have_content('See allocations')
-      expect(page).to have_css('.pagination ul.links li', count: 0)
+      expect(page).to have_css('.pagination ul.links li', count: 2)
     end
   end
 
