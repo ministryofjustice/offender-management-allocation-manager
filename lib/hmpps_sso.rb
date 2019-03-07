@@ -9,8 +9,9 @@ module OmniAuth
 
       info do
         {
-          username: staff_details.username,
-          caseload: staff_details.active_case_load_id
+          username: user_details.username,
+          active_caseload: user_details.active_nomis_caseload,
+          caseloads: user_details.nomis_caseloads.keys
         }
       end
 
@@ -40,8 +41,8 @@ module OmniAuth
 
     private
 
-      def staff_details
-        @staff_details ||= Nomis::Elite2::UserApi.user_details(username)
+      def user_details
+        @user_details ||= Nomis::Custody::UserApi.user_details(username)
       end
 
       #:nocov:

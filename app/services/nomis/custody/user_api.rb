@@ -1,11 +1,11 @@
 module Nomis
-  module Elite2
+  module Custody
     class UserApi
-      extend Elite2Api
+      extend CustodyApi
 
       def self.user_details(username)
-        route = "/elite2api/api/users/#{username}"
-        response = e2_client.get(route)
+        route = "/custodyapi/api/nomis-staff-users/#{username}"
+        response = custody_client.get(route)
 
         api_deserialiser.deserialise(Nomis::Models::UserDetails, response)
       end

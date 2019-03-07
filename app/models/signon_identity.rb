@@ -7,14 +7,16 @@ class SignonIdentity
 
   def initialize(omniauth_data)
     @username = omniauth_data.fetch('info').username
-    @caseload = omniauth_data.fetch('info').caseload
+    @active_caseload = omniauth_data.fetch('info').active_caseload
+    @caseloads = omniauth_data.fetch('info').caseloads
     @expiry = omniauth_data.fetch('credentials').expires_at
   end
 
   def to_session
     {
       username: @username,
-      caseload: @caseload,
+      active_caseload: @active_caseload,
+      caseloads: @caseloads,
       expiry: @expiry
     }
   end

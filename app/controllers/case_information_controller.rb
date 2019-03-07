@@ -4,7 +4,7 @@ class CaseInformationController < ApplicationController
   def new
     @case_info = CaseInformation.new(
       nomis_offender_id: nomis_offender_id_from_url,
-      prison: caseload
+      prison: active_caseload
     )
 
     @prisoner = prisoner(nomis_offender_id_from_url)
@@ -13,7 +13,7 @@ class CaseInformationController < ApplicationController
   def edit
     @case_info = CaseInformation.find_by(
       nomis_offender_id: nomis_offender_id_from_url,
-      prison: caseload
+      prison: active_caseload
     )
 
     @prisoner = prisoner(nomis_offender_id_from_url)
@@ -25,7 +25,7 @@ class CaseInformationController < ApplicationController
       tier: case_information_params[:tier],
       welsh_address: case_information_params[:welsh_address],
       case_allocation: case_information_params[:case_allocation],
-      prison: caseload
+      prison: active_caseload
     )
 
     return redirect_to summary_pending_path if @case_info.valid?
@@ -38,7 +38,7 @@ class CaseInformationController < ApplicationController
     case_info = CaseInformation.find_by(
       nomis_offender_id: case_information_params[:nomis_offender_id]
     )
-    case_info.prison = caseload
+    case_info.prison = active_caseload
     case_info.tier = case_information_params[:tier]
     case_info.case_allocation = case_information_params[:case_allocation]
     case_info.welsh_address = case_information_params[:welsh_address]

@@ -20,7 +20,7 @@ class AllocationsController < ApplicationController
 
   def confirm
     @prisoner = prisoner(nomis_offender_id_from_url)
-    @pom = PrisonOffenderManagerService.get_pom(caseload, nomis_staff_id_from_url)
+    @pom = PrisonOffenderManagerService.get_pom(active_caseload, nomis_staff_id_from_url)
   end
 
   # rubocop:disable Metrics/MethodLength
@@ -34,7 +34,7 @@ class AllocationsController < ApplicationController
       created_by: current_user,
       nomis_booking_id: prisoner.latest_booking_id,
       allocated_at_tier: prisoner.tier,
-      prison: caseload,
+      prison: active_caseload,
       override_reasons: override_reasons,
       override_detail: override_detail,
       message: allocation_params[:message]
@@ -60,11 +60,11 @@ private
     current_allocation = AllocationService.active_allocations(nomis_offender_id)
     nomis_staff_id = current_allocation[nomis_offender_id]['nomis_staff_id']
 
-    PrisonOffenderManagerService.get_pom(caseload, nomis_staff_id)
+    PrisonOffenderManagerService.get_pom(active_caseload, nomis_staff_id)
   end
 
   def recommended_and_nonrecommended_poms_for(prisoner)
-    pom_response = PrisonOffenderManagerService.get_poms(caseload) { |pom|
+    pom_response = PrisonOffenderManagerService.get_poms(active_caseload) { |pom|
       pom.status == 'active'
     }
 
