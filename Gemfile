@@ -25,6 +25,7 @@ gem 'typhoeus'
 gem 'api_cache'
 gem 'redis'
 gem 'moneta', '>= 1.0'
+gem 'act-fluent-logger-rails'
 
 group :development, :test do
   gem 'brakeman'
