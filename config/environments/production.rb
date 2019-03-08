@@ -24,11 +24,6 @@ Rails.application.configure do
   config.lograge.logger = ActFluentLoggerRails::Logger.new
 
   config.after_initialize do
-    # POST a test Fluentd formatted message
-    require 'fluent-logger'
-    flog = Fluent::Logger::ConsoleLogger.open(STDOUT)
-    flog.post('allocation-manager', 'startup': 1)
-
     if ENV['RAILS_URL'].present?
       require 'moneta'
       url = "rediss://#{ENV['RAILS_URL']}:6379/"
