@@ -1,5 +1,0 @@
-production:
-  fluent_host: ''
-  fluent_port: ''
-  tag:           'offender-management-staging'
-  severity_key:  'level'     # default severit
