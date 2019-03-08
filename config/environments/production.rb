@@ -18,11 +18,17 @@ Rails.application.configure do
     config.logger    = ActiveSupport::TaggedLogging.new(logger)
   end
 
+  #config.logger = ActFluentLoggerRails::Logger.new
   config.lograge.enabled = true
-  config.lograge.formatter = Lograge::Formatters::Logstash.new
-  config.lograge.logger = ActiveSupport::Logger.new(STDOUT)
+  config.lograge.formatter = Lograge::Formatters::Json.new
+  config.lograge.logger = ActFluentLoggerRails::Logger.new
 
   config.after_initialize do
+    # POST a test Fluentd formatted message
+    require 'fluent-logger'
+    flog = Fluent::Logger::ConsoleLogger.open(STDOUT)
+    flog.post('allocation-manager', {'startup': 1})
+
     if ENV['RAILS_URL'].present?
       require 'moneta'
       url = "rediss://#{ENV['RAILS_URL']}:6379/"
