@@ -6,6 +6,6 @@ RSpec.describe UserService, vcr: { cassette_name: :user_service_get_user_details
     user = described_class.get_user_details(username)
 
     expect(user.staff_id).to eq(485_637)
-    expect(user.emails).to eq("[\"kath.pobee-norris@digital.justice.gov.uk\"]")
+    expect(user.emails).to eq(["kath.pobee-norris@digital.justice.gov.uk"])
   end
 end
