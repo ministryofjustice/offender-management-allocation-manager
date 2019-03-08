@@ -13,7 +13,7 @@ module Nomis
       attribute :status, :string
       attribute :thumbnail_id, :string
       attribute :username, :string
-      attribute :emails, :string
+      attribute :emails
     end
   end
 end
