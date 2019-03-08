@@ -1,6 +1,7 @@
-<h1 class="govuk-heading-xl">Allocations</h1>
+<h1 class="govuk-heading-xl govuk-!-margin-bottom-3 ">Allocations</h1>
 
-<%= render(:partial => 'tabs_start', :locals => {:active => :unallocated}) %>
+<%= render '/shared/search' %>
+<%= render(:partial => 'tabs_start', :locals => {:active => :unallocated, :search_term => @q}) %>
 
 <section class="govuk-tabs__panel" id="awaiting-allocation">
   <table class="govuk-table responsive tablesorter">

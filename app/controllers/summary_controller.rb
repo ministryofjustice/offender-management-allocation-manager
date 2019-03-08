@@ -10,16 +10,19 @@ class SummaryController < ApplicationController
   end
 
   def allocated
+    @q = search_term
     @summary = create_summary(:allocated)
     @page_meta = @summary.page_meta(page, :allocated)
   end
 
   def unallocated
+    @q = search_term
     @summary = create_summary(:unallocated)
     @page_meta = @summary.page_meta(page, :unallocated)
   end
 
   def pending
+    @q = search_term
     @summary = create_summary(:pending)
     @page_meta = @summary.page_meta(page, :pending)
   end

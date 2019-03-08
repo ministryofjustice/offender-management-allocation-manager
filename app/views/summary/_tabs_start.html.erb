@@ -3,6 +3,11 @@
   <h2 class="govuk-tabs__title">
       Allocations
   </h2>
+
+<% if active.blank? %>
+    GRRRRRRR
+<% end %>
+
   <ul class="govuk-tabs__list" role='tablist'>
       <li class="govuk-tabs__list-item">
       <a class="govuk-tabs__tab <%= 'govuk-tabs__tab--selected' if active == :allocated %>" href="<%= summary_allocated_path %>">
@@ -10,12 +15,12 @@
       </a>
       </li>
       <li class="govuk-tabs__list-item">
-      <a class="govuk-tabs__tab <%= 'govuk-tabs__tab--selected' if active == :unallocated %>" href="<%= summary_unallocated_path %>">
+      <a class="govuk-tabs__tab <%= 'govuk-tabs__tab--selected' if active == :unallocated %>" href="<%= summary_unallocated_path(q: search_term) %>">
           Make allocations (<%= @summary.unallocated_total %>)
       </a>
       </li>
       <li class="govuk-tabs__list-item">
-      <a class="govuk-tabs__tab <%= 'govuk-tabs__tab--selected' if active == :pending %>" href="<%= summary_pending_path %>">
+      <a class="govuk-tabs__tab <%= 'govuk-tabs__tab--selected' if active == :pending %>" href="<%= summary_pending_path(q: search_term) %>">
           Update information (<%= @summary.pending_total %>)
       </a>
       </li>

@@ -1,6 +1,11 @@
-<h1 class="govuk-heading-xl">Allocations</h1>
+<% content_for(:body_attributes) do %>
+  data-turbolinks="false"
+<% end %>
 
-<%= render(:partial => 'tabs_start', :locals => {:active => :allocated}) %>
+<h1 class="govuk-heading-xl govuk-!-margin-bottom-3 ">Allocations</h1>
+
+<%= render '/shared/search' %>
+<%= render(:partial => 'tabs_start', :locals => {:active => :allocated, :search_term => @q }) %>
 
 <section class="govuk-tabs__panel" id="allocated">
   <table class="govuk-table responsive tablesorter">
