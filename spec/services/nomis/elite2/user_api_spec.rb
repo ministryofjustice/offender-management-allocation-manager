@@ -11,7 +11,7 @@ describe Nomis::Elite2::UserApi do
     end
 
     it "can get multiple email addresses for a user",
-      vcr: {cassette_name: :elite2_staff_api_get_emails } do
+      vcr: { cassette_name: :elite2_staff_api_get_emails } do
 
       response = described_class.fetch_email_addresses(485_595)
 
