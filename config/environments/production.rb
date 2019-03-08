@@ -18,10 +18,9 @@ Rails.application.configure do
     config.logger    = ActiveSupport::TaggedLogging.new(logger)
   end
 
-  # config.logger = ActFluentLoggerRails::Logger.new
   config.lograge.enabled = true
-  config.lograge.formatter = Lograge::Formatters::Json.new
-  config.lograge.logger = ActFluentLoggerRails::Logger.new
+  config.lograge.formatter = Lograge::Formatters::Logstash.new
+  config.lograge.logger = ActiveSupport::Logger.new(STDOUT)
 
   config.after_initialize do
     if ENV['RAILS_URL'].present?
