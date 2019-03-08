@@ -18,7 +18,7 @@ Rails.application.configure do
     config.logger    = ActiveSupport::TaggedLogging.new(logger)
   end
 
-  #config.logger = ActFluentLoggerRails::Logger.new
+  # config.logger = ActFluentLoggerRails::Logger.new
   config.lograge.enabled = true
   config.lograge.formatter = Lograge::Formatters::Json.new
   config.lograge.logger = ActFluentLoggerRails::Logger.new
@@ -27,7 +27,7 @@ Rails.application.configure do
     # POST a test Fluentd formatted message
     require 'fluent-logger'
     flog = Fluent::Logger::ConsoleLogger.open(STDOUT)
-    flog.post('allocation-manager', {'startup': 1})
+    flog.post('allocation-manager', 'startup': 1)
 
     if ENV['RAILS_URL'].present?
       require 'moneta'
