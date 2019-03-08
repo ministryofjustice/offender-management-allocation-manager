@@ -11,7 +11,8 @@ module OmniAuth
         {
           username: user_details.username,
           active_caseload: user_details.active_nomis_caseload,
-          caseloads: user_details.nomis_caseloads.keys
+          caseloads: user_details.nomis_caseloads.keys,
+          emails: user_details.emails
         }
       end
 
@@ -42,7 +43,7 @@ module OmniAuth
     private
 
       def user_details
-        @user_details ||= Nomis::Custody::UserApi.user_details(username)
+        @user_details ||= UserService. get_user_details(username)
       end
 
       #:nocov:
