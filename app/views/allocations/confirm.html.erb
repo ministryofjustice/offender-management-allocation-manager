@@ -1,21 +1,25 @@
-<%= render :partial => "/shared/backlink", :locals => { :page => new_allocations_path() } %>
+<%= render :partial => "/shared/backlink", :locals => { :page => new_allocations_path(@prisoner.offender_no) } %>
 
-<div>
+<div class="govuk-grid-row">
+
+  <div class="govuk-grid-column-two-thirds">
     <%= form_tag(allocations_path, method: :post, id: "confirm_allocation_form") do %>
       <h1 class="govuk-heading-xl govuk-!-margin-top-4">Confirm allocation</h1>
-      <p class="govuk-body">You are allocating <%= @prisoner.full_name %> to <%= @pom.full_name %></p>
-      <p class="govuk-body">We'll be using the email address below to let them know about their new allocation</p>
-      <p class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24 govuk-!-margin-top-6"> POM EMAIL ADDRESS </p>
+      <p class="govuk-body">You are allocating <%= "#{@prisoner.first_name} #{@prisoner.last_name}".titleize %> to <%= "#{@pom.first_name} #{@pom.last_name}".titleize %>.</p>
+      <p class="govuk-body">We will send a confirmation email to POM-EMAIL-ADDRESS.</p>
 
     <div class="govuk-form-group">
-        <label class="govuk-label" for="message">Add a note to the POM (optional):</label>
-        <span id="message_hint" class="govuk-hint">This will be included in the email</span>
+        <label class="govuk-label govuk-!-font-weight-bold" for="message">Add a note to the email:</label>
+        <span id="message_hint" class="govuk-hint">For example, you can tell the prison offender manager about any special requirements.</span>
         <textarea class="govuk-textarea" id="message" name="allocations[message]]" rows="3" aria-describedby="message"></textarea>
       </div>
       <%= hidden_field_tag("allocations[nomis_offender_id]", @prisoner.offender_no) %>
       <%= hidden_field_tag("allocations[nomis_staff_id]", @pom.staff_id) %>
       <%= submit_tag "Complete allocation", role: "button", draggable: "false", class: "govuk-button" %>
+      <a class="govuk-link cancel-button" href="<%= new_allocations_path(@prisoner.offender_no) %>">Cancel</a>
     <% end %>
+  </div>
+
 </div>
 
   <%= render :partial => "/shared/analytics_form_event",
