@@ -1,7 +1,7 @@
 <% if @pom.blank? %>
   <h2 class="govuk-heading-l">No allocated cases </h2>
 <% else %>
-<h2 class="govuk-heading-l">My caseload (<%= @allocations.count  %>)</h2>
+<h2 class="govuk-heading-l">Your caseload (<%= @allocations.count  %>)</h2>
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-one-quarter">
@@ -10,11 +10,11 @@
   </div>
   <div class="govuk-grid-column-one-quarter">
     <div class="govuk-body">Working pattern</div>
-    <div class="govuk-body govuk-!-font-weight-bold"><%= @pom.working_pattern %></div>
+    <div class="govuk-body govuk-!-font-weight-bold"><%= working_pattern_name(@pom.working_pattern) %></div>
   </div>
   <div class="govuk-grid-column-one-quarter">
     <div class="govuk-body">Status</div>
-    <div class="govuk-body govuk-!-font-weight-bold"><%= @pom.status.capitalize  %></div>
+    <div class="govuk-body govuk-!-font-weight-bold"><%= @pom.status.capitalize %></div>
   </div>
 </div>
 
@@ -27,7 +27,7 @@
     <th class="govuk-table__header" scope="col">
       <a class="table-sorter__link" href="#">Release/parole<br/>eligibility</a></th>
     <th class="govuk-table__header" scope="col">
-      <a class="table-sorter__link" href="#">Allocation date</a></th>
+      <a class="table-sorter__link" href="#">Allocation<br/>date</a></th>
     <th class="govuk-table__header" scope="col">
       <a class="table-sorter__link" href="#">Role</a></th>
   </tr>

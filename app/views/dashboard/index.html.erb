@@ -1,6 +1,6 @@
 <h1 class="govuk-heading-xl">Dashboard</h1>
 
-<h2 class="govuk-heading-m no-bottom-margin">Allocations</h2>
+<h2 class="govuk-heading-m no-bottom-margin">Allocate a prisoner to an offender manager</h2>
 <hr class="govuk-section-break govuk-section-break--visible">
 <div class="govuk-grid-row dashboard-row">
   <div class="govuk-grid-column-one-third">
@@ -8,7 +8,7 @@
       <h1 class="govuk-heading-s">
         <%= link_to "See all allocated prisoners", summary_allocated_path, class:"govuk-link" %>
       </h1>
-      <p class="govuk-body">All prisoners who have been allocated a Prison Offender Manager.</p>
+      <p class="govuk-body">All prisoners who have been allocated to a Prison Offender Manager.</p>
     </div>
   </div>
   <div class="govuk-grid-column-one-third">
@@ -16,7 +16,7 @@
       <h1 class="govuk-heading-s">
         <%= link_to "Make new allocations", summary_unallocated_path, class:"govuk-link" %>
       </h1>
-      <p class="govuk-body">Prisoners who need to be allocated a Prison Offender Manager.</p>
+      <p class="govuk-body">Prisoners who need to be allocated to a Prison Offender Manager.</p>
     </div>
   </div>
   <div class="govuk-grid-column-one-third">
@@ -24,41 +24,41 @@
       <h1 class="govuk-heading-s">
         <%= link_to "Update case information", summary_pending_path, class:"govuk-link" %>
       </h1>
-      <p class="govuk-body">Prisoners with missing case information. This needs to be updated before they can be allocated</p>
+      <p class="govuk-body">Prisoners with missing case information. This needs to be updated before they can be allocated.</p>
     </div>
   </div>
 </div>
 
-<h2 class="govuk-heading-m no-bottom-margin">Caseload</h2>
+<h2 class="govuk-heading-m no-bottom-margin">See all prisoners allocated to you</h2>
 <hr class="govuk-section-break govuk-section-break--visible">
 <div class="govuk-grid-row dashboard-row">
   <div class="govuk-grid-column-one-third">
     <div class="wrapper">
       <h1 class="govuk-heading-s">
-        <%= link_to "Your caseload", my_caseload_path, class:"govuk-link" %>
+        <%= link_to "See your caseload", my_caseload_path, class:"govuk-link" %>
       </h1>
-      <p class="govuk-body">All cases allocated to you.</p>
+      <p class="govuk-body">All prisoners allocated to you.</p>
     </div>
   </div>
   <div class="govuk-grid-column-one-third">
     <div class="wrapper">
       <h1 class="govuk-heading-s">
-        <%= link_to "New allocations", new_cases_path, class:"govuk-link" %>
+        <%= link_to "See new allocations", new_cases_path, class:"govuk-link" %>
       </h1>
-      <p class="govuk-body">Cases allocated to you in the last 7 days.</p>
+      <p class="govuk-body">Prisoners allocated to you in the last seven days.</p>
     </div>
   </div>
 </div>
 
-<h2 class="govuk-heading-m no-bottom-margin">Staff</h2>
+<h2 class="govuk-heading-m no-bottom-margin">Manage staff</h2>
 <hr class="govuk-section-break govuk-section-break--visible">
 <div class="govuk-grid-row dashboard-row">
   <div class="govuk-grid-column-one-third">
     <div class="wrapper">
       <h1 class="govuk-heading-s">
-        <%= link_to "Active POMs", poms_path(), class:"govuk-link" %>
+        <%= link_to "View all offender managers", poms_path(), class:"govuk-link" %>
       </h1>
-      <p class="govuk-body">Active and inactive Prison Offender Managers at this prison.</p>
+      <p class="govuk-body">Check and edit availability of offender managers.</p>
     </div>
   </div>
   <div class="govuk-grid-column-one-third"></div>

@@ -27,7 +27,7 @@ feature 'Allocation' do
     end
 
     expect(page).to have_css('h1', text: 'Confirm allocation')
-    expect(page).to have_css('p', text: 'You are allocating Abbella, Ozullirn to Jones, Ross')
+    expect(page).to have_css('p', text: 'You are allocating Ozullirn Abbella to Ross Jones')
 
     click_button 'Complete allocation'
 
@@ -45,7 +45,7 @@ feature 'Allocation' do
       click_link 'Allocate'
     end
 
-    expect(page).to have_css('h1', text: 'Choose reason for changing recommended grade')
+    expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
 
     check('override-2')
     check('override-3')
@@ -70,7 +70,7 @@ feature 'Allocation' do
       click_link 'Allocate'
     end
 
-    expect(page).to have_css('h1', text: 'Choose reason for changing recommended grade')
+    expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
 
     click_button('Continue')
     expect(page).to have_content('Override reasons must be provided')
@@ -86,7 +86,7 @@ feature 'Allocation' do
       click_link 'Allocate'
     end
 
-    expect(page).to have_css('h1', text: 'Choose reason for changing recommended grade')
+    expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
 
     check('override-conditional-4')
     click_button('Continue')

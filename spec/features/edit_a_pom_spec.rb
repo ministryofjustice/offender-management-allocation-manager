@@ -35,7 +35,7 @@ feature "edit a POM's details" do
     visit "/poms/485637"
     click_link "Edit profile"
 
-    expect(page).to have_content("Pobee Norris, Kath")
+    expect(page).to have_content("Kath Pobee Norris")
     expect(Allocation.count).to eq 1
 
     choose('working_pattern-2')
