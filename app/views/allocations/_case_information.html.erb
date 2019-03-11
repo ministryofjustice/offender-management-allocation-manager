@@ -5,16 +5,16 @@
     <td class="govuk-table__cell"></td>
   </tr>
   <tr class="govuk-table__row">
-    <td class="govuk-table__cell govuk-!-width-one-half">Current responsibility</td>
+    <td class="govuk-table__cell govuk-!-width-one-half">Current case owner</td>
     <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-      <%= @prisoner.current_responsibility %>
+      <%= responsibility_label(@prisoner.current_responsibility) %>
         <a class="govuk-link pull-right" href="<%= edit_case_information_path(@prisoner.offender_no) %>">Change</a>
     </td>
   </tr>
   <tr class="govuk-table__row">
-    <td class="govuk-table__cell">Case allocation</td>
+    <td class="govuk-table__cell">Service provider</td>
     <td class="govuk-table__cell table_cell__left_align">
-      <%= service_provider_label(@prisoner.case_allocation) %>
+      <%= @prisoner.case_allocation %>
       <a class="govuk-link pull-right" href="<%= edit_case_information_path(@prisoner.offender_no) %>">Change</a>
     </td>
   </tr>
