@@ -13,6 +13,22 @@ describe SignonIdentity, model: true do
     expect(signon_identity).to be_a_kind_of(SignonIdentity)
   end
 
+  it 'does not crash if from_omniauth fails' do
+    ident = SignonIdentity.from_omniauth(nil)
+    expect(ident).to be_nil
+  end
+
+  it 'creates session data' do
+    session = {
+      username: 'Fred',
+      active_caseload: 'LEI',
+      caseloads: %w[LEI RNI],
+      expiry: time_stamp
+    }
+
+    expect(signon_identity.to_session).to eq(session)
+  end
+
   it 'creates session data' do
     session = {
       username: 'Fred',
