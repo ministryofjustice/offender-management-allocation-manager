@@ -77,7 +77,7 @@ feature 'case information feature' do
 
     visit edit_case_information_path(nomis_offender_id)
 
-    expect(page).to have_content('Edit case information')
+    expect(page).to have_content('Case information')
     expect(page).to have_content('G1821VA')
     choose('case_information_welsh_address_No')
     choose('case_information_case_allocation_CRC')

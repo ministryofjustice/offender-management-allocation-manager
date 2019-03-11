@@ -4,8 +4,8 @@ class PomsController < ApplicationController
   breadcrumb 'Prison Offender Managers', :poms_path, only: [:index, :show]
   breadcrumb -> { pom.full_name },
     -> {  poms_path(params[:nomis_staff_id]) }, only: [:show]
-  breadcrumb 'My caseload', :my_caseload_path, only: [:new_cases]
-  breadcrumb -> { 'My caseload' },
+  breadcrumb 'Your caseload', :my_caseload_path, only: [:new_cases]
+  breadcrumb -> { 'Your caseload' },
     -> { my_caseload_path }, only: [:my_caseload]
   breadcrumb -> { 'New cases' },
     -> { new_cases_path }, only: [:new_cases]
