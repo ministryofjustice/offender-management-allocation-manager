@@ -42,7 +42,7 @@ module ApplicationHelper
   def responsibility_label(offender_responsibility)
     {
       'Probation' => 'Community',
-      'Prison' => 'Prison'
+      'Prison' => 'Custody'
     }[offender_responsibility]
   end
 end

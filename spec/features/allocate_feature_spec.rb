@@ -27,7 +27,7 @@ feature 'Allocation' do
     end
 
     expect(page).to have_css('h1', text: 'Confirm allocation')
-    expect(page).to have_css('p', text: 'You are allocating Abbella, Ozullirn to Jones, Ross')
+    expect(page).to have_css('p', text: 'You are allocating Ozullirn Abbella to Ross Jones')
 
     click_button 'Complete allocation'
 
