@@ -3,7 +3,7 @@ if Rails.env.production?
     config.redis = {
       url: "rediss://#{Rails.configuration.redis_url}:6379",
       network_timeout: 5,
-      password: Rails.configuration.redis_password,
+      password: Rails.configuration.redis_auth,
       read_timeout: 1.0,
       write_timeout: 1.0
     }
@@ -13,7 +13,7 @@ if Rails.env.production?
     config.redis = {
       url: "rediss://#{Rails.configuration.redis_url}:6379",
       network_timeout: 5,
-      password: Rails.configuration.redis_password,
+      password: Rails.configuration.redis_auth,
       read_timeout: 1.0,
       write_timeout: 1.0
     }
