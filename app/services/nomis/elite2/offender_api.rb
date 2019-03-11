@@ -13,7 +13,7 @@ module Nomis
         hdrs = paging_headers(page_size, page_offset)
 
         key = "offender_list_#{prison}_#{page}_#{page_size}"
-        data, page_meta = APICache.get(key, cache: 300) {
+        data, page_meta = APICache.get(key, cache: 300, timeout: 30) {
           page_meta = nil
           data = e2_client.get(route, extra_headers: hdrs) { |json, response|
             total_records = response.headers['Total-Records'].to_i
@@ -61,7 +61,7 @@ module Nomis
         h = Digest::SHA256.hexdigest(offender_ids.to_s)
         key = "bulk_sentence_#{h}"
 
-        APICache.get(key, cache: 300) {
+        APICache.get(key, cache: 300, timeout: 30) {
           data = e2_client.post(route, offender_ids)
 
           data.each_with_object({}) { |record, hash|
