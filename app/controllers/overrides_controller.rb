@@ -32,7 +32,9 @@ class OverridesController < ApplicationController
 private
 
   def complex_reason_label
-    return 'Prisoner assessed as not suitable for a prison officer POM' if @recommended_pom == 'Prison'
+    if @recommended_pom == 'Prison'
+      return 'Prisoner assessed as not suitable for a prison officer POM'
+    end
 
     'Prisoner assessed as suitable for a prison officer POM despite tiering calculation'
   end

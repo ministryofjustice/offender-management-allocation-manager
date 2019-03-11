@@ -13,7 +13,7 @@ class PomsController < ApplicationController
   def index
     poms = PrisonOffenderManagerService.get_poms(active_caseload)
     @active_poms, @inactive_poms = poms.partition { |pom|
-      pom.status == 'active'
+      %w[active unavailable].include? pom.status
     }
   end
 

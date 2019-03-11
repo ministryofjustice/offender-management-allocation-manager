@@ -3,7 +3,7 @@
 <div>
   <%= form_tag pom_path(nomis_staff_id: @pom.staff_id), method: :put, id: "edit_pom_form" do %>
     <h1 class="govuk-heading-xl govuk-!-margin-top-4">Edit profile</h1>
-    <h2 class="govuk-heading-l"><%= @pom.full_name %></h2>
+    <h2 class="govuk-heading-l"><%= @pom.first_name.titleize %> <%= @pom.last_name.titleize %></h2>
 
     <div class='govuk-!-margin-top-6'>
       <div class="govuk-form-group">
