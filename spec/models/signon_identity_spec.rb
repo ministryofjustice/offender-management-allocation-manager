@@ -28,15 +28,4 @@ describe SignonIdentity, model: true do
 
     expect(signon_identity.to_session).to eq(session)
   end
-
-  it 'creates session data' do
-    session = {
-      username: 'Fred',
-      active_caseload: 'LEI',
-      caseloads: %w[LEI RNI],
-      expiry: time_stamp
-    }
-
-    expect(signon_identity.to_session).to eq(session)
-  end
 end
