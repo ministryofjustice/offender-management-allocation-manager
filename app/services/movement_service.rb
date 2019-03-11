@@ -19,24 +19,18 @@ class MovementService
   end
   # rubocop:enable Metrics/MethodLength
 
-  # rubocop:disable Metrics/MethodLength
   def self.process_movement(movement)
-    processed = false
-
     if movement.movement_type == Nomis::Models::MovementType::RELEASE
-      process_release(movement)
-      processed = true
+      return process_release(movement)
     end
 
     if movement.movement_type == Nomis::Models::MovementType::TRANSFER &&
         movement.direction_code == Nomis::Models::MovementDirection::IN
-      process_transfer(movement)
-      processed = true
+      return process_transfer(movement)
     end
 
-    processed
+    false
   end
-# rubocop:enable Metrics/MethodLength
 
 private
 
@@ -49,6 +43,8 @@ private
       transfer.from_agency,
       transfer.to_agency
     )
+
+    true
   end
 
   # When an offender is released, we can no longer rely on their
@@ -58,5 +54,7 @@ private
     Rails.logger.info("Processing release for #{release.offender_no}")
     CaseInformationService.delete_information(release.offender_no)
     AllocationService.deallocate_offender(release.offender_no)
+
+    true
   end
 end
