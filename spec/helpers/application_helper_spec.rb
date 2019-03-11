@@ -22,5 +22,3 @@ RSpec.describe ApplicationHelper do
     end
   end
 end
-
-

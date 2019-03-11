@@ -19,22 +19,24 @@ class MovementService
   end
   # rubocop:enable Metrics/MethodLength
 
+  # rubocop:disable Metrics/MethodLength
   def self.process_movement(movement)
-    processed = 0
+    processed = false
 
     if movement.movement_type == Nomis::Models::MovementType::RELEASE
       process_release(movement)
-      processed += 1
+      processed = true
     end
 
     if movement.movement_type == Nomis::Models::MovementType::TRANSFER &&
         movement.direction_code == Nomis::Models::MovementDirection::IN
       process_transfer(movement)
-      processed += 1
+      processed = true
     end
 
     processed
   end
+# rubocop:enable Metrics/MethodLength
 
 private
 

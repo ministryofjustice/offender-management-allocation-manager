@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe CaseInformationService, vcr: { cassette_name: :caseinfo_service_spec } do
-  let (:caseinfo) {
+  let(:caseinfo) {
     CaseInformation.find_or_create_by!(
       nomis_offender_id: 'X1000XX',
       tier: 'A',
