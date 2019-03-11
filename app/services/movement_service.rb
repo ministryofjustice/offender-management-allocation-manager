@@ -18,4 +18,43 @@ class MovementService
     movements
   end
   # rubocop:enable Metrics/MethodLength
+
+  def self.process_movement(movement)
+    processed = 0
+
+    if movement.movement_type == Nomis::Models::MovementType::RELEASE
+      process_release(movement)
+      processed += 1
+    end
+
+    if movement.movement_type == Nomis::Models::MovementType::TRANSFER &&
+        movement.direction_code == Nomis::Models::MovementDirection::IN
+      process_transfer(movement)
+      processed += 1
+    end
+
+    processed
+  end
+
+private
+
+  def self.process_transfer(transfer)
+    Rails.logger.info("Processing transfer for #{transfer.offender_no}")
+
+    AllocationService.deallocate_offender(transfer.offender_no)
+    CaseInformationService.change_prison(
+      transfer.offender_no,
+      transfer.from_agency,
+      transfer.to_agency
+    )
+  end
+
+  # When an offender is released, we can no longer rely on their
+  # case information (in case they come back one day), and we
+  # should de-activate any current allocations.
+  def self.process_release(release)
+    Rails.logger.info("Processing release for #{release.offender_no}")
+    CaseInformationService.delete_information(release.offender_no)
+    AllocationService.deallocate_offender(release.offender_no)
+  end
 end

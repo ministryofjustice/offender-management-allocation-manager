@@ -15,5 +15,12 @@ RSpec.describe ApplicationHelper do
     it "for service provider NPS" do
       expect(service_provider_label('NPS')).to eq('National Probation Service (NPS)')
     end
+
+    it "can choose the correct responsibility label" do
+      expect(responsibility_label('Probation')).to eq('Community')
+      expect(responsibility_label('Prison')).to eq('Custody')
+    end
   end
 end
+
+

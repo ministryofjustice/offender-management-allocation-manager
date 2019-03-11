@@ -23,6 +23,7 @@ describe PageMeta, model: true do
     }
 
     expect(meta.pages).to match_array([1, nil, 61, 62])
+    expect(meta.page_count).to eq(62)
   end
 
   it 'handles pages in the middle' do

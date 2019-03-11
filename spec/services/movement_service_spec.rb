@@ -2,6 +2,33 @@ require 'rails_helper'
 require_relative '../../app/services/nomis/models/movement'
 
 describe MovementService, vcr: { cassette_name: :movement_service_spec } do
+  let (:transfer) {
+    Nomis::Models::Movement.new.tap { |m|
+      m.offender_no = 'G4273GI'
+      m.from_agency = 'LEI'
+      m.to_agency = 'SWI'
+      m.direction_code = 'IN'
+      m.movement_type = 'TRN'
+    }
+  }
+  let (:transfer_out) {
+    Nomis::Models::Movement.new.tap { |m|
+      m.offender_no = 'G4273GI'
+      m.from_agency = 'LEI'
+      m.to_agency = 'SWI'
+      m.direction_code = 'OUT'
+      m.movement_type = 'TRN'
+    }
+  }
+  let (:release) {
+    Nomis::Models::Movement.new.tap { |m|
+      m.offender_no = 'G4273GI'
+      m.from_agency = 'LEI'
+      m.direction_code = 'OUT'
+      m.movement_type = 'REL'
+    }
+  }
+
   it "can get recent movements" do
     movements = MovementService.movements_on(Date.iso8601('2019-02-20'))
     expect(movements).to be_kind_of(Array)
@@ -60,5 +87,20 @@ describe MovementService, vcr: { cassette_name: :movement_service_spec } do
     expect(movements.length).to eq(2)
     expect(movements.first).to be_kind_of(Nomis::Models::Movement)
     expect(movements.first.direction_code).to eq(Nomis::Models::MovementDirection::OUT)
+  end
+
+  it "can process transfer movements IN" do
+    processed = MovementService.process_movement(transfer)
+    expect(processed).to eq(1)
+  end
+
+  it "can process release movements" do
+    processed = MovementService.process_movement(release)
+    expect(processed).to eq(1)
+  end
+
+  it "can ignore movements OUT" do
+    processed = MovementService.process_movement(transfer_out)
+    expect(processed).to eq(0)
   end
 end
