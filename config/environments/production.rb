@@ -23,13 +23,13 @@ Rails.application.configure do
   config.lograge.logger = ActiveSupport::Logger.new(STDOUT)
 
   config.after_initialize do
-    if ENV['RAILS_URL'].present?
+    if Rails.configuration.redis_url.present?
       require 'moneta'
-      url = "rediss://#{ENV['RAILS_URL']}:6379/"
+      url = "rediss://#{Rails.configuration.redis_url}:6379/"
       APICache.store = Moneta.new(
         :Redis,
         url: url,
-        password: ENV['RAILS_AUTH'],
+        password: Rails.configuration.redis_auth,
         network_timeout: 5,
         read_timeout: 1.0,
         write_timeout: 1.0
