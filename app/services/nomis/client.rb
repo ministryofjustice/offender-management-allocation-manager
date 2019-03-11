@@ -18,11 +18,20 @@ module Nomis
       end
     end
 
+    # rubocop:disable Metrics/MethodLength
     def get(route, queryparams: {}, extra_headers: {})
       response = request(
         :get, route, queryparams: queryparams, extra_headers: extra_headers
       )
-      data = JSON.parse(response.body)
+
+      # Elite2 can return a 204 to mean empty results, and we don't know if
+      # it is meant to be a {} or a []. For now, we are going to use nil and
+      # let the caller handle it.
+      if response.status == 204
+        data = nil
+      else
+        data = JSON.parse(response.body)
+      end
 
       if block_given?
         yield data, response
@@ -37,6 +46,7 @@ module Nomis
       )
       JSON.parse(response.body)
     end
+  # rubocop:enable Metrics/MethodLength
 
   private
 
