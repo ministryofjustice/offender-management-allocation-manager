@@ -54,7 +54,7 @@
                      for="status-conditional-2">Active but unavailable for new cases</label>
             </div>
             <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="status-2">
-              <h4 class="govuk-heading-s">To allocate to this POM you will need to change their status to active</h4>
+              <h4 class="govuk-heading-s">To allocate to this POM you will need to change their status to active.</h4>
             </div>
             <div class="govuk-radios__item">
               <input class="govuk-radios__input" id="status-conditional-3" name="edit_pom[status]" type="radio" value="inactive" data-aria-controls="status-3"  <%= 'checked' if @pom.status == 'inactive'%>>
@@ -62,7 +62,7 @@
                      for="status-conditional-3">Inactive</label>
             </div>
             <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="status-3">
-              <h4 class="govuk-heading-s">If this POMs status becomes inactive their cases will need to be reallocated</h4>
+              <h4 class="govuk-heading-s">If this POMs status becomes inactive their cases will need to be reallocated.</h4>
             </div>
           </div>
         </fieldset>
