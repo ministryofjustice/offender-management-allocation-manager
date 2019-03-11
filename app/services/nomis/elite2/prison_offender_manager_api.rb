@@ -9,7 +9,7 @@ module Nomis
         route = "/elite2api/api/staff/roles/#{prison}/role/POM"
 
         key = "pom_list_#{prison}"
-        APICache.get(key, cache: 600) {
+        APICache.get(key, cache: 600, timeout: 30) {
           response = e2_client.get(route) { |data|
             raise Nomis::Client::APIError, 'No data was returned' if data.empty?
           }
