@@ -4,6 +4,8 @@ class OverridesController < ApplicationController
     @pom = PrisonOffenderManagerService.get_pom(active_caseload, params[:nomis_staff_id])
     @override = Override.new
     @recommended_pom = ResponsibilityService.calculate_responsibility(@prisoner)
+
+    @complex_label = complex_reason_label
   end
 
   # rubocop:disable Metrics/MethodLength
@@ -21,12 +23,19 @@ class OverridesController < ApplicationController
     @recommended_pom = ResponsibilityService.calculate_responsibility(@prisoner)
     @pom = PrisonOffenderManagerService.get_pom(
       active_caseload, override_params[:nomis_staff_id])
+    @complex_label = complex_reason_label
 
     render :new
   end
 # rubocop:enable Metrics/MethodLength
 
 private
+
+  def complex_reason_label
+    return 'Prisoner assessed as not suitable for a prison officer POM' if @recommended_pom == 'Prison'
+
+    'Prisoner assessed as suitable for a prison officer POM despite tiering calculation'
+  end
 
   def redirect_on_success
     redirect_to confirm_allocations_path(
