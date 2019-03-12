@@ -216,6 +216,51 @@ jobs:
           environment:
             <<: *github_team_name_slug
 
+  test_staging:
+    <<: *test_container_config
+    working_directory: ~/staging
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - integration-tests-v1-{{ checksum "Gemfile.lock" }}
+            - integration-tests-v1-
+      - run:
+          name: Clone and install gems
+          command: |
+            git clone git@github.com:ministryofjustice/offender-management-integration-tests.git
+            cd offender-management-integration-tests
+            bundle check --path vendor/bundle || bundle install --path vendor/bundle
+      - save_cache:
+          key: integration-tests-v1-{{ checksum "Gemfile.lock" }}
+          paths:
+            - ~/staging/vendor/bundle
+      - run:
+          name: install firefox
+          command: |
+            wget -L "https://ftp.mozilla.org/pub/firefox/releases/65.0/linux-x86_64/en-US/firefox-65.0.tar.bz2" -O "firefox-65.0.tar.bz2"
+            tar xjf "firefox-65.0.tar.bz2"
+            sudo rm -rf /opt/firefox
+            sudo mv firefox /opt/
+            sudo ln -sf /opt/firefox/firefox /usr/bin/firefox
+      - run:
+          name: install geckodriver
+          command: |
+            wget https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-linux64.tar.gz
+            tar -zxvf geckodriver-v0.23.0-linux64.tar.gz
+            sudo mv geckodriver /usr/local/bin/
+      - run:
+          name: run integration tests
+          command: |
+            cd offender-management-integration-tests
+            bundle exec rspec spec --no-color --format documentation --format RspecJunitFormatter -o screenshots/rspec.xml
+          environment:
+            START_PAGE: https://allocation-manager-staging.apps.cloud-platform-live-0.k8s.integration.dsd.io
+      - store_test_results:
+          path: ./offender-management-integration-tests/screenshots
+      - store_artifacts:
+          path: ./offender-management-integration-tests/screenshots
+
   deploy_production:
     <<: *deploy_container_config
     steps:
@@ -273,11 +318,17 @@ workflows:
           filters:
             branches:
               only: master
-      - deploy_production_approval:
-          type: approval
+      - test_staging:
           requires:
             - build_and_push_docker_image
             - deploy_staging
+          filters:
+            branches:
+              only: master
+      - deploy_production_approval:
+          type: approval
+          requires:
+            - test_staging
           filters:
             branches:
               only: master
