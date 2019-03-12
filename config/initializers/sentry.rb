@@ -4,5 +4,5 @@ if sentry_dsn
     config.dsn = sentry_dsn
   end
 else
-  STDOUT.puts '[WARN] Sentry is not configured (SENTRY_DSN)'
+  Rails.logger.warn '[WARN] Sentry is not configured (SENTRY_DSN)'
 end
