@@ -14,6 +14,7 @@ module Nomis
 
         faraday.options.params_encoder = Faraday::FlatParamsEncoder
         faraday.use Faraday::Response::RaiseError
+        faraday.use Faraday::Request::Instrumentation
         faraday.adapter :typhoeus
       end
     end
