@@ -1,6 +1,8 @@
 class SignonIdentity
   class << self
     def from_omniauth(omniauth_data)
+      return nil if omniauth_data.blank?
+
       new(omniauth_data)
     end
   end
