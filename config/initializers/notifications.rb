@@ -4,7 +4,7 @@ ActiveSupport::Notifications.subscribe('request.faraday') do |_name, start_time,
   url = env[:url]
   http_method = env[:method].to_s.upcase
   duration = end_time - start_time
-  STDOUT.puts '[%s] %s %s (%.3f s)' % [url.host, http_method, url.request_uri, duration]
+  Rails.logger.info '[%s] %s %s (%.3f s)' % [url.host, http_method, url.request_uri, duration]
 end
 # rubocop:enable Metrics/LineLength
 # rubocop:enable Style/FormatStringToken
