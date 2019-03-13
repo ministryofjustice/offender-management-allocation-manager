@@ -23,9 +23,6 @@ class PrisonOffenderManagerService
   def self.get_pom(caseload, nomis_staff_id)
     poms_list = PrisonOffenderManagerService.get_poms(caseload)
     @pom = poms_list.select { |p| p.staff_id == nomis_staff_id.to_i }.first
-    @pom.emails = Nomis::Elite2::PrisonOffenderManagerApi.
-        fetch_email_addresses(@pom.staff_id)
-    @pom
   end
 
   def self.get_pom_names(prison)
