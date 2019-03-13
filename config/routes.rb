@@ -32,4 +32,7 @@ Rails.application.routes.draw do
       new: 'new/:nomis_offender_id',
       edit: 'edit/:nomis_offender_id'
   }
+
+  require 'sidekiq/web'
+  mount Sidekiq::Web => '/sidekiq'
 end
