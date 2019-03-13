@@ -31,8 +31,7 @@ private
 
     params = SummaryService::SummaryParams.new(
       sort_field: field,
-      sort_direction: direction,
-      search: search_term
+      sort_direction: direction
     )
 
     SummaryService.new.summary(
@@ -42,10 +41,6 @@ private
 
   def page
     params.fetch('page', 1).to_i
-  end
-
-  def search_term
-    params['q']
   end
 
   def sort_params(summary_type)

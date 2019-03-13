@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   get('/summary/unallocated' => 'summary#unallocated')
   get('/summary/pending' => 'summary#pending')
 
+  get('/search' => 'search#search')
 
   resources :health, only: %i[ index ], controller: 'health'
   resources :status, only: %i[ index ], controller: 'status'
