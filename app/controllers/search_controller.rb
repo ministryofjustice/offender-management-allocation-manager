@@ -27,8 +27,6 @@ private
     # to get the allocated POM name for offenders, we will just get them
     # for the much smaller slice.
     OffenderService.set_allocated_pom_name(slice, active_caseload)
-
-    slice
   end
 
   def create_page_meta(total_records, current_view)

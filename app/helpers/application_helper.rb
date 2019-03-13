@@ -16,7 +16,7 @@ module ApplicationHelper
   end
 
   def format_date_string(date_string)
-    return '' if date_string.nil?
+    return '' if date_string.empty?
 
     Date.parse(date_string).strftime('%d/%m/%Y')
   end
