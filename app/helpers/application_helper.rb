@@ -15,6 +15,12 @@ module ApplicationHelper
     date_obj.strftime('%d/%m/%Y')
   end
 
+  def format_date_string(date_string)
+    return '' if date_string.nil?
+
+    Date.parse(date_string).strftime('%d/%m/%Y')
+  end
+
   def pom_level(level)
     {
       'PO' => 'Prison POM',

@@ -45,6 +45,7 @@ module Nomis
       response = request(
         :post, route, body: body
       )
+
       JSON.parse(response.body)
     end
   # rubocop:enable Metrics/MethodLength
