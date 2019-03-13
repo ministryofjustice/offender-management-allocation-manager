@@ -15,24 +15,24 @@ class EmailService
           get_pom(last_allocation[:prison], last_allocation[:nomis_staff_id])
 
       PomMailer.deallocation_email(
-        previous_pom.first_name.capitalize,
-        previous_pom.emails.first,
-        pom.full_name,
-        offender.full_name,
-        offender.offender_no,
-        PrisonService.name_for(pom.agency_id),
-        url
-      ).deliver_later
+        previous_pom_name: previous_pom.first_name.capitalize,
+        previous_pom_email: previous_pom.emails.first,
+        new_pom_name: pom.full_name,
+        offender_name: offender.full_name,
+        offender_no: offender.offender_no,
+        prison: PrisonService.name_for(pom.agency_id),
+        url: url
+                                   ).deliver_later
     end
 
     PomMailer.new_allocation_email(
-      pom.first_name.capitalize,
-      pom.emails.first,
-      offender.full_name,
-      offender.offender_no,
-      message,
-      url
-    ).deliver_later
+      pom_name: pom.first_name.capitalize,
+      pom_email: pom.emails.first,
+      offender_name: offender.full_name,
+      offender_no: offender.offender_no,
+      message: message,
+      url: url
+                                   ).deliver_later
   end
   # rubocop:enable Metrics/MethodLength
 end

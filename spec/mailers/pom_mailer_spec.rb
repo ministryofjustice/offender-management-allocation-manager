@@ -2,13 +2,18 @@ require 'rails_helper'
 
 RSpec.describe PomMailer, type: :mailer do
   describe 'new_allocation_email' do
-    let(:pom_name) { "Jones, Ross" }
-    let(:pom_email)       { "something@example.com" }
-    let(:offender_name) { "Franks, Jason" }
-    let(:offender_no) { "AB1234S" }
-    let(:message) { "This is just a test" }
-    let(:url) { "http:://example.com" }
-    let(:mail) { described_class.new_allocation_email(pom_name, pom_email, offender_name, offender_no, message, url) }
+    let(:params) do
+      {
+        pom_name: "Jones, Ross",
+        pom_email: "something@example.com",
+        offender_name: "Franks, Jason",
+        offender_no: "AB1234S",
+        message: "This is just a test",
+        url: "http:://example.com"
+      }
+    end
+
+    let(:mail) { described_class.new_allocation_email(params) }
 
     it 'sets the template' do
       expect(mail.govuk_notify_template).
@@ -23,40 +28,44 @@ RSpec.describe PomMailer, type: :mailer do
       expect(mail.govuk_notify_personalisation).
           to eq(
             email_subject: 'New OMIC allocation',
-            pom_name: pom_name,
-            offender_name: offender_name,
-            nomis_offender_id: offender_no,
-            message: "Additional information: " + message,
-            url: url
+            pom_name: params[:pom_name],
+            offender_name: params[:offender_name],
+            nomis_offender_id: params[:offender_no],
+            message: "Additional information: " + params[:message],
+            url: params[:url]
                  )
     end
 
     context 'when no optional message has been added to the email' do
-      let(:message) { "" }
-
       it 'personalises the email' do
+        params[:message] = ""
         expect(mail.govuk_notify_personalisation).
             to eq(
               email_subject: 'New OMIC allocation',
-              pom_name: pom_name,
-              offender_name: offender_name,
-              nomis_offender_id: offender_no,
-              message: message,
-              url: url
+              pom_name: params[:pom_name],
+              offender_name: params[:offender_name],
+              nomis_offender_id: params[:offender_no],
+              message: params[:message],
+              url: params[:url]
                    )
       end
     end
   end
 
   describe 'deallocation_email' do
-    let(:previous_pom_name) { "Pobee-Norris, Kath" }
-    let(:previous_pom_email) { "another@example.com" }
-    let(:new_pom_name) { "Jones, Ross" }
-    let(:offender_name) { "Marks, Simon" }
-    let(:offender_no) { "GE4595D" }
-    let(:url) { "http:://example.com" }
-    let(:prison) { "HMP Leeds" }
-    let(:mail) { described_class.deallocation_email(previous_pom_name, previous_pom_email, new_pom_name, offender_name, offender_no, prison, url) }
+    let(:params) do
+      {
+        previous_pom_name: "Pobee-Norris, Kath",
+        previous_pom_email: "another@example.com",
+        new_pom_name: "Jones, Ross",
+        offender_name: "Marks, Simon",
+        offender_no: "GE4595D",
+        url: "http:://example.com",
+        prison: "HMP Leeds"
+      }
+    end
+
+    let(:mail) { described_class.deallocation_email(params) }
 
     it 'sets the template' do
       expect(mail.govuk_notify_template).
@@ -71,12 +80,12 @@ RSpec.describe PomMailer, type: :mailer do
       expect(mail.govuk_notify_personalisation).
           to eq(
             email_subject: 'OMIC case reallocation',
-            previous_pom_name: previous_pom_name,
-            new_pom_name: new_pom_name,
-            offender_name: offender_name,
-            nomis_offender_id: offender_no,
-            prison: prison,
-            url: url
+            previous_pom_name: params[:previous_pom_name],
+            new_pom_name: params[:new_pom_name],
+            offender_name: params[:offender_name],
+            nomis_offender_id: params[:offender_no],
+            prison: params[:prison],
+            url: params[:url]
              )
     end
   end
