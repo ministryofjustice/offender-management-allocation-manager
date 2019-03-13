@@ -22,6 +22,7 @@ references:
           POSTGRES_USER: ubuntu
           POSTGRES_PASSWORD: ""
           POSTGRES_DB: offender-management-allocation-manager_test
+      - image: redis
 
   install_gpg: &install_gpg
     run:
