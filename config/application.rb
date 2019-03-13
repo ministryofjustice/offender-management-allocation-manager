@@ -17,7 +17,6 @@ module OffenderManagementAllocationClient
     config.load_defaults 5.2
     config.exceptions_app = routes
     config.generators.system_tests = nil
-    config.active_job.queue_adapter = :sidekiq
     config.allocation_manager_host = ENV.fetch(
       'ALLOCATION_MANAGER_HOST',
       'http://localhost:3000'
@@ -28,6 +27,7 @@ module OffenderManagementAllocationClient
     config.nomis_oauth_client_secret = ENV['NOMIS_OAUTH_CLIENT_SECRET']
     config.nomis_oauth_public_key = ENV['NOMIS_OAUTH_PUBLIC_KEY']
     config.prometheus_metrics = ENV['PROMETHEUS_METRICS']
+    config.notify_api_key = ENV['GOVUK_NOTIFY_API_KEY']
     config.ga_tracking_id = ENV['GA_TRACKING_ID']
     config.support_email = ENV['SUPPORT_EMAIL']
     config.redis_url = ENV['REDIS_URL']

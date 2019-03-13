@@ -6,7 +6,7 @@
     <%= form_tag(allocations_path, method: :post, id: "confirm_allocation_form") do %>
       <h1 class="govuk-heading-xl govuk-!-margin-top-4">Confirm allocation</h1>
       <p class="govuk-body">You are allocating <%= "#{@prisoner.first_name} #{@prisoner.last_name}".titleize %> to <%= "#{@pom.first_name} #{@pom.last_name}".titleize %>.</p>
-      <p class="govuk-body">We will send a confirmation email to <%= @pom.emails.first %>.</p>
+      <p class="govuk-body">We will send a confirmation email to POM-EMAIL-ADDRESS.</p>
 
     <div class="govuk-form-group">
         <label class="govuk-label govuk-!-font-weight-bold" for="message">Add a note to the email:</label>

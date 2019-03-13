@@ -18,18 +18,21 @@ describe OmniAuth::Strategies::HmppsSso do
         leeds_prison = 'LEI'
         username = 'Fred'
         caseloads = { 'LEI' => '', 'RNI' => '' }
+        emails = ["email@example.com"]
         response = double(
           'staff_details',
           active_nomis_caseload: leeds_prison,
           nomis_caseloads: caseloads,
-          username: username
+          username: username,
+          emails: emails
         )
 
-        allow(Nomis::Custody::UserApi).to receive(:user_details).and_return(response)
+        allow(UserService).to receive(:get_user_details).and_return(response)
         allow(strategy).to receive(:username).and_return(username)
 
         expect(strategy.info[:username]).to eq(username)
         expect(strategy.info[:active_caseload]).to eq(leeds_prison)
+        expect(strategy.info[:emails]).to eq(emails)
       end
     end
   end

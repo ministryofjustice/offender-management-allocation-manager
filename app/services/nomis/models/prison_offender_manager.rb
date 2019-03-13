@@ -17,7 +17,6 @@ module Nomis
       attribute :schedule_type_description, :string
       attribute :hours_per_week, :integer
       attribute :thumbnail_id, :string
-      attribute :emails
 
       attribute :tier_a, :integer
       attribute :tier_b, :integer
