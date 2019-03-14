@@ -6,5 +6,6 @@ class Allocation < ApplicationRecord
     :nomis_booking_id,
     :prison,
     :allocated_at_tier,
+    :responsibility,
     :created_by, presence: true
 end
