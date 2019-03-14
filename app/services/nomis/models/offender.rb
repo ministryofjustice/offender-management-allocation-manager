@@ -36,7 +36,7 @@ module Nomis
       attribute :allocated_pom_name, :string
 
       def case_owner
-        @current_responsibility ||= ResponsibilityService.calculate_case_owner(self)
+        @case_owner ||= ResponsibilityService.calculate_case_owner(self)
       end
 
       def full_name
