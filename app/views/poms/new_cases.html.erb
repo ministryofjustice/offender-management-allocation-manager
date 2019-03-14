@@ -27,7 +27,7 @@
         <td aria-label="Arrival date" class="govuk-table__cell ">ARRIVAL DATE</td>
         <td aria-label="Release date" class="govuk-table__cell "><%= format_date(sentence.release_date.to_date) %></td>
         <td aria-label="Allocation date" class="govuk-table__cell "><%= format_date(allocation.created_at) %></td>
-        <td aria-label="Role" class="govuk-table__cell ">ROLE</td>
+        <td aria-label="Role" class="govuk-table__cell "><%= allocation.responsibility %></td>
       </tr>
     <% end %>
     </tbody>

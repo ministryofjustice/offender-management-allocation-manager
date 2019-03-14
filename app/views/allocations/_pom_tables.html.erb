@@ -1,5 +1,5 @@
 <h4 class="govuk-heading-m">
-  Recommendation: <%= @prisoner.current_responsibility %> POM
+  Recommendation: <%= @prisoner.case_owner %> POM
 </h4>
 
 <p>This recommendation takes the prisoner's tier and
@@ -7,7 +7,7 @@ time left to serve into account.</p>
 
 <table class="govuk-table responsive">
   <thead class="govuk-table__head">
-  <h2 class="govuk-heading-s">Active <%= @prisoner.current_responsibility.downcase %> POMs</h2>
+  <h2 class="govuk-heading-s">Active <%= @prisoner.case_owner.downcase %> POMs</h2>
   <tr class="govuk-table__row">
     <th class="govuk-table__header" scope="col">Name</th>
     <th class="govuk-table__header" scope="col">Previous<br/>allocation</th>
@@ -54,7 +54,7 @@ time left to serve into account.</p>
 <details class="govuk-details">
   <summary class="govuk-details__summary">
     <span class="govuk-details__summary-text">
-      <% if @prisoner.current_responsibility == 'Probation' %>
+      <% if @prisoner.case_owner == 'Probation' %>
         Show active prison officer POMs
       <% else %>
         Show active probation officer POMs
