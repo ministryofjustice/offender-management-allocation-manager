@@ -37,16 +37,17 @@ class PrisonOffenderManagerService
     detail.allocations.where(active: true)
   end
 
+  # rubocop:disable Metrics/MethodLength
   def self.get_allocated_offenders(nomis_staff_id)
     allocation_list = get_allocations_for_pom(nomis_staff_id)
 
     offender_ids = allocation_list.map(&:nomis_offender_id)
 
-    allocation_list_with_responsibility = allocation_list.map do |alloc|
+    allocation_list_with_responsibility = allocation_list.map { |alloc|
       offender = OffenderService.get_offender(alloc.nomis_offender_id)
       alloc.responsibility = ResponsibilityService.calculate_pom_responsibility(offender)
       alloc
-    end
+    }
 
     offender_map = OffenderService.get_sentence_details(offender_ids)
 
@@ -57,6 +58,7 @@ class PrisonOffenderManagerService
 
     allocations_and_offender
   end
+  # rubocop:enable Metrics/MethodLength
 
   def self.get_new_cases(nomis_staff_id)
     allocations = get_allocated_offenders(nomis_staff_id)
