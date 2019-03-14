@@ -7,7 +7,6 @@ RSpec.describe AllocationService do
       nomis_offender_id: 'G2911GD',
       created_by: 'Test User',
       nomis_booking_id: 0,
-      responsibility: 'Supporting',
       allocated_at_tier: 'A',
       prison: 'LEI'
     )
@@ -19,7 +18,6 @@ RSpec.describe AllocationService do
       nomis_offender_id: 'G2911GD',
       created_by: 'Test User',
       nomis_booking_id: 0,
-      responsibility: 'Supporting',
       allocated_at_tier: 'A',
       prison: 'LEI',
       active: false

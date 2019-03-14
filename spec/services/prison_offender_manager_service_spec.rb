@@ -9,7 +9,6 @@ describe PrisonOffenderManagerService do
       nomis_offender_id: 'G2911GD',
       created_by: 'Test User',
       nomis_booking_id: 0,
-      responsibility: 'Supporting',
       allocated_at_tier: 'A',
       prison: 'LEI'
     )
@@ -21,7 +20,6 @@ describe PrisonOffenderManagerService do
       nomis_offender_id: 'G8060UF',
       created_by: 'Test User',
       nomis_booking_id: 1,
-      responsibility: 'Supporting',
       allocated_at_tier: 'A',
       prison: 'LEI'
     )
