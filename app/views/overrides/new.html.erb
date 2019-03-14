@@ -8,8 +8,8 @@
     <%= form_tag(overrides_path, method: :post, id: "override_form")  do %>
 
       <h1 class="govuk-heading-xl govuk-!-margin-top-4">
-        <%= "Why are you allocating a probation officer POM?" if @recommended_pom == 'Prison' %>
-        <%= "Why are you allocating a prison officer POM?" if @recommended_pom == 'Probation' %>
+        <%= "Why are you allocating a probation officer POM?" if @recommended_case_owner == 'Prison' %>
+        <%= "Why are you allocating a prison officer POM?" if @recommended_case_owner == 'Probation' %>
       </h1>
       <div class='govuk-!-margin-top-4'>
         <div class="govuk-form-group <% if @override.errors[:override_reasons].present? %>govuk-form-group--error<% end %>">
@@ -26,7 +26,7 @@
               </div>
               <div class="govuk-checkboxes__item">
                 <%= check_box_tag("override[override_reasons][]", "no-staff", override_reason_contains(@override, 'no-staff'), id: "override-2", class: "govuk-checkboxes__input") %>
-                <%= label_tag "override[override_reasons][]", "No available #{@recommended_pom.downcase} officer POMs", class: 'govuk-label govuk-checkboxes__label' %>
+                <%= label_tag "override[override_reasons][]", "No available #{@recommended_case_owner.downcase} officer POMs", class: 'govuk-label govuk-checkboxes__label' %>
               </div>
               <div class="govuk-checkboxes__item">
                 <%= check_box_tag("override[override_reasons][]", "continuity", override_reason_contains(@override, 'continuity'), id: "override-3", class: "govuk-checkboxes__input") %>
