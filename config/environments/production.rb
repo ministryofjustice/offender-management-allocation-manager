@@ -22,18 +22,13 @@ Rails.application.configure do
   config.lograge.formatter = Lograge::Formatters::Logstash.new
   config.lograge.logger = ActiveSupport::Logger.new(STDOUT)
 
-  config.after_initialize do
-    if Rails.configuration.redis_url.present?
-      require 'moneta'
-      url = "rediss://#{Rails.configuration.redis_url}:6379/"
-      APICache.store = Moneta.new(
-        :Redis,
-        url: url,
-        password: Rails.configuration.redis_auth,
-        network_timeout: 5,
-        read_timeout: 1.0,
-        write_timeout: 1.0
-      )
-    end
+  if Rails.configuration.redis_url.present?
+    config.cache_store = :redis_cache_store, {
+      url: "rediss://#{config.redis_url}:6379/0",
+      password: config.redis_auth,
+      network_timeout: 5,
+      read_timeout: 1.0,
+      write_timeout: 1.0
+    }
   end
 end
