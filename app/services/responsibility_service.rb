@@ -12,7 +12,8 @@ class ResponsibilityService
 
   def self.calculate_pom_responsibility(offender)
     return 'Unknown' if offender.release_date.nil?
-    return 'Responsible' if offender.welsh_address == true && release_date_gt_10_months(offender)
+    return 'Responsible' if assign_responsible?(offender)
+
     'Supporting'
   end
 
@@ -22,7 +23,8 @@ class ResponsibilityService
     offender.tier == 'A' || offender.tier == 'B' ? 'Probation' : 'Prison'
   end
 
-  def self.release_date_gt_10_months(offender)
-    offender.release_date > DateTime.now.utc.to_date + 10.months
+  def self.assign_responsible?(offender)
+    offender.welsh_address == true &&
+      offender.release_date > DateTime.now.utc.to_date + 10.months
   end
 end

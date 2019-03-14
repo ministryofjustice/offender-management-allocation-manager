@@ -58,7 +58,7 @@ describe ResponsibilityService do
       expect(resp).to eq 'Responsible'
     end
 
-    it "is 'Responsible' if offender is Welsh and release date is greater than 10 months" do
+    it "is 'Responsible' if offender is Welsh and release date is less than 10 months" do
       resp = described_class.calculate_pom_responsibility(offender_welsh_lt_10)
       expect(resp).to eq 'Supporting'
     end
