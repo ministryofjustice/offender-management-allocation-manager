@@ -13,9 +13,9 @@ describe Nomis::Elite2::UserApi do
     it "can get multiple email addresses for a user",
       vcr: { cassette_name: :elite2_staff_api_get_emails } do
 
-      response = described_class.fetch_email_addresses(485_595)
+      response = described_class.fetch_email_addresses(485_758)
 
-      expect(response).to eq(["tobby.retrallick@digitals.justice.gov.uk", "toby.retallick@digital.justice.gov.uk"])
+      expect(response).to eq(["ommiicc@digital.justice.gov.uk", "omic@digital.justice.gov.uk"])
     end
   end
 end

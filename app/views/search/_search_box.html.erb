@@ -1,0 +1,13 @@
+
+<div class="search-box govuk-grid-row">
+  <%= form_tag(search_path, method: :get, id: "search_form") do %>
+    <div class="govuk-form-group" style="display: inline;" >
+      <label class="govuk-label" for="q">
+        Enter a prisoner name or number
+      </label>
+      <input class="govuk-input" id="q" name="q" type="text" value="<%= @q %>" autofocus="true">
+
+      <input id="search-button" type="submit" class="govuk-button" value="    Search    "/>
+    </div>
+  <% end %>
+</div>

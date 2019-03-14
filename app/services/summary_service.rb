@@ -5,10 +5,9 @@ class SummaryService
   class SummaryParams
     attr_reader :sort_field, :sort_direction, :search
 
-    def initialize(sort_field: nil, sort_direction: :asc, search: nil)
+    def initialize(sort_field: nil, sort_direction: :asc)
       @sort_field = sort_field
       @sort_direction = sort_direction
-      @search = search
     end
   end
 
@@ -22,7 +21,7 @@ class SummaryService
 
     # We want to store the total number of each item so we can show totals for
     # each type of record.
-    @counts = { allocated: 0, unallocated: 0, pending: 0 }
+    @counts = { allocated: 0, unallocated: 0, pending: 0, all: 0 }
 
     tier_map = CaseInformationService.get_case_information(prison)
 
@@ -30,15 +29,6 @@ class SummaryService
     (0..number_of_requests).each do |request_no|
       offenders = get_page_of_offenders(prison, request_no, tier_map)
       break if offenders.blank?
-
-      if params.search.present?
-        search_term = params.search.upcase
-        offenders = offenders.select { |offender|
-          offender.last_name.start_with?(search_term) ||
-          offender.first_name.start_with?(search_term) ||
-          offender.offender_no.include?(search_term)
-        }
-      end
 
       # Group the offenders without a tier, and the remaining ones
       # are either allocated or unallocated

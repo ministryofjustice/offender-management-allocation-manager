@@ -33,6 +33,7 @@ module Nomis
       attribute :tier, :string
       attribute :case_allocation, :string
       attribute :welsh_address, :boolean
+      attribute :allocated_pom_name, :string
 
       def current_responsibility
         @current_responsibility = ResponsibilityService.calculate_responsibility(self)

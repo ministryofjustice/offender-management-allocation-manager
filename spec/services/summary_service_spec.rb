@@ -9,13 +9,6 @@ describe SummaryService do
     expect(summary.page_count).to eq(63)
   end
 
-  it "can search the summary", vcr: { cassette_name: :allocation_summary_service_summary_search } do
-    params = SummaryService::SummaryParams.new(search: 'AB')
-    summary = described_class.new.summary(:pending, 'LEI', 0, params)
-
-    expect(summary.page_count).to eq(1)
-  end
-
   it "will sort a summary", vcr: { cassette_name: :allocation_summary_service_summary_sort } do
     asc_summary = described_class.new.summary(
       :pending,
