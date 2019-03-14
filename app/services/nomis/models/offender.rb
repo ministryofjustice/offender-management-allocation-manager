@@ -35,8 +35,8 @@ module Nomis
       attribute :welsh_address, :boolean
       attribute :allocated_pom_name, :string
 
-      def current_responsibility
-        @current_responsibility = ResponsibilityService.calculate_responsibility(self)
+      def case_owner
+        @current_responsibility ||= ResponsibilityService.calculate_case_owner(self)
       end
 
       def full_name

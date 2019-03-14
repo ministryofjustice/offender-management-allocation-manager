@@ -39,6 +39,7 @@ describe OffenderService, vcr: { cassette_name: :offender_service_offenders_by_p
       nomis_offender_id: offenders.first.offender_no,
       nomis_booking_id: 1_153_753,
       prison: 'LEI',
+      responsibility: 'Supporting',
       allocated_at_tier: 'C',
       created_by: 'user@username.com',
       nomis_staff_id: 485_752
