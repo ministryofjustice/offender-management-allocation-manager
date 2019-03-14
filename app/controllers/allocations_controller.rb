@@ -37,6 +37,7 @@ class AllocationsController < ApplicationController
       prison: active_caseload,
       override_reasons: override_reasons,
       override_detail: override_detail,
+      responsibility: ResponsibilityService.calculate_pom_responsibility(prisoner),
       message: allocation_params[:message]
     )
 
@@ -69,7 +70,7 @@ private
     }
 
     pom_response.partition { |pom|
-      pom.position_description.include?(prisoner.current_responsibility)
+      pom.position_description.include?(prisoner.case_owner)
     }
   end
 
