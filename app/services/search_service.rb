@@ -1,4 +1,6 @@
 class SearchService
+  FETCH_SIZE = 200
+
   # Fetch all of the offenders (for a given prison) filtering
   # out offenders based on the provided text.
   # rubocop:disable Metrics/MethodLength
@@ -13,7 +15,7 @@ class SearchService
       offenders = OffenderService.get_offenders_for_prison(
         prison,
         page_number: request_no,
-        page_size: 250,
+        page_size: FETCH_SIZE,
         tier_map: tier_map
       )
       break if offenders.blank?
@@ -41,6 +43,6 @@ private
 
     # The maximum number of pages we need to fetch before we have all of
     # the offenders
-    (info_request.meta.total_pages / 250) + 1
+    (info_request.meta.total_pages / FETCH_SIZE) + 1
   end
 end
