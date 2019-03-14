@@ -9,13 +9,12 @@ namespace :movements do
       Rails.logger = Logger.new(STDOUT)
     end
 
-    # yesterday = Time.zone.today - 1.day
-    yesterday = Date.iso8601('2019-02-20')
+    yesterday = Time.zone.today - 1.day
 
     movements = MovementService.movements_on(
       yesterday,
       type_filters: [
-        Nomis::Models::MovementType::TRANSFER,
+        Nomis::Models::MovementType::ADMISSION,
         Nomis::Models::MovementType::RELEASE
       ]
     )

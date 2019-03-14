@@ -2,13 +2,21 @@ require 'rails_helper'
 require_relative '../../app/services/nomis/models/movement'
 
 describe MovementService, vcr: { cassette_name: :movement_service_spec } do
-  let(:transfer) {
+  let(:new_offender) {
+    Nomis::Models::Movement.new.tap { |m|
+      m.offender_no = 'G4273GI'
+      m.to_agency = 'SWI'
+      m.direction_code = 'IN'
+      m.movement_type = 'ADM'
+    }
+  }
+  let(:transfer_adm) {
     Nomis::Models::Movement.new.tap { |m|
       m.offender_no = 'G4273GI'
       m.from_agency = 'LEI'
       m.to_agency = 'SWI'
       m.direction_code = 'IN'
-      m.movement_type = 'TRN'
+      m.movement_type = 'ADM'
     }
   }
   let(:transfer_out) {
@@ -90,7 +98,7 @@ describe MovementService, vcr: { cassette_name: :movement_service_spec } do
   end
 
   it "can process transfer movements IN" do
-    processed = MovementService.process_movement(transfer)
+    processed = MovementService.process_movement(transfer_adm)
     expect(processed).to be true
   end
 
@@ -101,6 +109,11 @@ describe MovementService, vcr: { cassette_name: :movement_service_spec } do
 
   it "can ignore movements OUT" do
     processed = MovementService.process_movement(transfer_out)
+    expect(processed).to be false
+  end
+
+  it "can ignore new offenders arriving at prison" do
+    processed = MovementService.process_movement(new_offender)
     expect(processed).to be false
   end
 end

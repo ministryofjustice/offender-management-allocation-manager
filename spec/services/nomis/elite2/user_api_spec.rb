@@ -15,7 +15,7 @@ describe Nomis::Elite2::UserApi do
 
       response = described_class.fetch_email_addresses(485_595)
 
-      expect(response).to eq(["tobby.retrallick@digitals.justice.gov.uk", "toby.retallick@digital.justice.gov.uk"])
+      expect(response).to eq(["toby.retallick@digital.justice.gov.uk"])
     end
   end
 end
