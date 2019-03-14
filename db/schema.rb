@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_01_092256) do
+ActiveRecord::Schema.define(version: 2019_03_14_112354) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -29,6 +29,7 @@ ActiveRecord::Schema.define(version: 2019_03_01_092256) do
     t.integer "nomis_staff_id"
     t.integer "nomis_booking_id"
     t.text "message"
+    t.text "responsibility"
     t.index ["nomis_offender_id"], name: "index_allocations_on_nomis_offender_id"
     t.index ["nomis_staff_id"], name: "index_allocations_on_nomis_staff_id"
   end
