@@ -63,13 +63,13 @@ private
     PrisonOffenderManagerService.get_pom(active_caseload, nomis_staff_id)
   end
 
-  def recommended_and_nonrecommended_poms_for(prisoner)
+  def recommended_and_nonrecommended_poms_for(offender)
     pom_response = PrisonOffenderManagerService.get_poms(active_caseload) { |pom|
       pom.status == 'active'
     }
 
     pom_response.partition { |pom|
-      pom.position_description.include?(prisoner.current_responsibility)
+      pom.position_description.include?(offender.case_owner)
     }
   end
 

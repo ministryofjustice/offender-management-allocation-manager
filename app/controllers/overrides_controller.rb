@@ -3,7 +3,6 @@ class OverridesController < ApplicationController
     @prisoner = OffenderService.get_offender(params.require(:nomis_offender_id))
     @pom = PrisonOffenderManagerService.get_pom(active_caseload, params[:nomis_staff_id])
     @override = Override.new
-    @recommended_pom = ResponsibilityService.calculate_responsibility(@prisoner)
 
     @complex_label = complex_reason_label
   end
@@ -20,7 +19,6 @@ class OverridesController < ApplicationController
     return redirect_on_success if @override.valid?
 
     @prisoner = OffenderService.get_offender(override_params[:nomis_offender_id])
-    @recommended_pom = ResponsibilityService.calculate_responsibility(@prisoner)
     @pom = PrisonOffenderManagerService.get_pom(
       active_caseload, override_params[:nomis_staff_id])
     @complex_label = complex_reason_label
@@ -32,7 +30,7 @@ class OverridesController < ApplicationController
 private
 
   def complex_reason_label
-    if @recommended_pom == 'Prison'
+    if @prisoner.case_owner == 'Prison'
       return 'Prisoner assessed as not suitable for a prison officer POM'
     end
 

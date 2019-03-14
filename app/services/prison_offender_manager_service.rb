@@ -21,44 +21,54 @@ class PrisonOffenderManagerService
   end
 
   def self.get_pom(caseload, nomis_staff_id)
-    poms_list = PrisonOffenderManagerService.get_poms(caseload)
+    poms_list = get_poms(caseload)
     @pom = poms_list.select { |p| p.staff_id == nomis_staff_id.to_i }.first
   end
 
   def self.get_pom_names(prison)
-    poms_list = PrisonOffenderManagerService.get_poms(prison)
+    poms_list = get_poms(prison)
     poms_list.each_with_object({}) { |p, hsh|
       hsh[p.staff_id] = p.full_name
     }
   end
 
   def self.get_allocations_for_pom(nomis_staff_id)
-    detail = PrisonOffenderManagerService.get_pom_detail(nomis_staff_id)
+    detail = get_pom_detail(nomis_staff_id)
     detail.allocations.where(active: true)
   end
 
+  # rubocop:disable Metrics/MethodLength
   def self.get_allocated_offenders(nomis_staff_id)
-    allocation_list = PrisonOffenderManagerService.get_allocations_for_pom(nomis_staff_id)
+    allocation_list = get_allocations_for_pom(nomis_staff_id)
 
     offender_ids = allocation_list.map(&:nomis_offender_id)
+
+    allocation_list_with_responsibility = allocation_list.map { |alloc|
+      offender = OffenderService.get_offender(alloc.nomis_offender_id)
+      alloc.responsibility = ResponsibilityService.calculate_pom_responsibility(offender)
+      alloc
+    }
+
     offender_map = OffenderService.get_sentence_details(offender_ids)
 
     allocations_and_offender = []
-    allocation_list.each do |alloc|
+    allocation_list_with_responsibility.each do |alloc|
       allocations_and_offender << [alloc, offender_map[alloc.nomis_offender_id]]
     end
+
     allocations_and_offender
   end
+  # rubocop:enable Metrics/MethodLength
 
   def self.get_new_cases(nomis_staff_id)
-    allocations = PrisonOffenderManagerService.get_allocated_offenders(nomis_staff_id)
+    allocations = get_allocated_offenders(nomis_staff_id)
     allocations.select { |allocation, _offender| allocation.created_at >= 7.days.ago }
   end
 
   def self.get_signed_in_pom_details(current_user)
     user = Nomis::Custody::UserApi.user_details(current_user)
 
-    poms_list = PrisonOffenderManagerService.get_poms(user.active_nomis_caseload)
+    poms_list = get_poms(user.active_nomis_caseload)
     @pom = poms_list.select { |p| p.staff_id.to_i == user.staff_id.to_i }.first
   end
 

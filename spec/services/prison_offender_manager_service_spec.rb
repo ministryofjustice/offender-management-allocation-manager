@@ -1,6 +1,4 @@
 require 'rails_helper'
-require_relative '../../app/services/nomis/models/sentence_detail'
-require_relative '../../app/services/nomis/models/offender'
 
 describe PrisonOffenderManagerService do
   let(:staff_id) { 485_737 }
