@@ -10,8 +10,10 @@ class OffenderService
       end
 
       sentence_detail = get_sentence_details([offender_no])
-      o.release_date = sentence_detail[offender_no].release_date
-      o.sentence_date = sentence_detail[offender_no].sentence_date
+      if sentence_detail[offender_no].present?
+        o.release_date = sentence_detail[offender_no].release_date
+        o.sentence_date = sentence_detail[offender_no].sentence_date
+      end
 
       o.main_offence = Nomis::Elite2::OffenderApi.get_offence(o.latest_booking_id)
     }

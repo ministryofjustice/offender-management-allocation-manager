@@ -18,6 +18,10 @@ class PageMeta
     number
   end
 
+  def page_count
+    total_pages
+  end
+
   def previous?
     current_page > 1
   end
