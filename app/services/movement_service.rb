@@ -24,8 +24,11 @@ class MovementService
       return process_release(movement)
     end
 
-    if movement.movement_type == Nomis::Models::MovementType::TRANSFER &&
-        movement.direction_code == Nomis::Models::MovementDirection::IN
+    # We think that an ADM without a fromAgency is from court so there
+    # will be nothing to delete/change.
+    if movement.movement_type == Nomis::Models::MovementType::ADMISSION &&
+        movement.direction_code == Nomis::Models::MovementDirection::IN &&
+        movement.from_agency.present?
       return process_transfer(movement)
     end
 
