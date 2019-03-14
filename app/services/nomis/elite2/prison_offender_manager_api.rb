@@ -1,5 +1,3 @@
-require 'api_cache'
-
 module Nomis
   module Elite2
     class PrisonOffenderManagerApi
@@ -9,14 +7,15 @@ module Nomis
         route = "/elite2api/api/staff/roles/#{prison}/role/POM"
 
         key = "pom_list_#{prison}"
-        APICache.get(key, cache: 600, timeout: 30) {
-          response = e2_client.get(route) { |data|
-            raise Nomis::Client::APIError, 'No data was returned' if data.empty?
-          }
 
-          response.map { |pom|
-            api_deserialiser.deserialise(Nomis::Models::PrisonOffenderManager, pom)
+        data = Rails.cache.fetch(key, expires_in: 10.minutes) {
+          e2_client.get(route) { |result|
+            raise Nomis::Client::APIError, 'No data was returned' if result.empty?
           }
+        }
+
+        data.map { |pom|
+          api_deserialiser.deserialise(Nomis::Models::PrisonOffenderManager, pom)
         }
       end
     end

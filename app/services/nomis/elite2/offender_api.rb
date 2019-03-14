@@ -1,5 +1,3 @@
-require 'api_cache'
-
 module Nomis
   module Elite2
     class OffenderApi
@@ -13,7 +11,8 @@ module Nomis
         hdrs = paging_headers(page_size, page_offset)
 
         key = "offender_list_#{prison}_#{page}_#{page_size}"
-        data, page_meta = APICache.get(key, cache: 300, timeout: 30) {
+
+        data, page_meta = Rails.cache.fetch(key, expires_in: 10.minutes) {
           page_meta = nil
           data = e2_client.get(route, extra_headers: hdrs) { |json, response|
             total_records = response.headers['Total-Records'].to_i
@@ -23,14 +22,14 @@ module Nomis
             )
           }
 
-          offenders = data.map { |offender|
-            api_deserialiser.deserialise(Nomis::Models::OffenderShort, offender)
-          }
-
-          [offenders, page_meta]
+          [data, page_meta]
         }
 
-        ApiPaginatedResponse.new(page_meta, data)
+        offenders = data.map { |offender|
+          api_deserialiser.deserialise(Nomis::Models::OffenderShort, offender)
+        }
+
+        ApiPaginatedResponse.new(page_meta, offenders)
       end
 
       def self.get_offender(offender_no)
@@ -61,15 +60,17 @@ module Nomis
         h = Digest::SHA256.hexdigest(offender_ids.to_s)
         key = "bulk_sentence_#{h}"
 
-        APICache.get(key, cache: 300, timeout: 30) {
-          data = e2_client.post(route, offender_ids)
+        data = Rails.cache.fetch(key, expires_in: 10.minutes) {
+          e2_client.post(route, offender_ids)
+        }
 
-          data.each_with_object({}) { |record, hash|
-            oid = record['offenderNo']
-            hash[oid] = api_deserialiser.deserialise(
-              Nomis::Models::SentenceDetail, record
-            )
-          }
+        data.each_with_object({}) { |record, hash|
+          next unless record.key?('offenderNo')
+
+          oid = record['offenderNo']
+          hash[oid] = api_deserialiser.deserialise(
+            Nomis::Models::SentenceDetail, record
+          )
         }
       end
     # rubocop:enable Metrics/MethodLength
