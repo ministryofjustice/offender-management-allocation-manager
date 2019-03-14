@@ -100,6 +100,7 @@ feature 'Allocation' do
       nomis_staff_id: probation_officer_nomis_staff_id,
       nomis_booking_id: 1_153_753,
       prison: 'LEI',
+      responsibility: 'Supporting',
       allocated_at_tier: 'A',
       created_by: 'spo@leeds.hmpps.gov.uk',
       active: true

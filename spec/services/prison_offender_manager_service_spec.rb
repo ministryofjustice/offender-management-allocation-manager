@@ -1,6 +1,4 @@
 require 'rails_helper'
-require_relative '../../app/services/nomis/models/sentence_detail'
-require_relative '../../app/services/nomis/models/offender'
 
 describe PrisonOffenderManagerService do
   let(:staff_id) { 485_737 }
@@ -11,6 +9,7 @@ describe PrisonOffenderManagerService do
       nomis_offender_id: 'G2911GD',
       created_by: 'Test User',
       nomis_booking_id: 0,
+      responsibility: 'Supporting',
       allocated_at_tier: 'A',
       prison: 'LEI'
     )
@@ -22,6 +21,7 @@ describe PrisonOffenderManagerService do
       nomis_offender_id: 'G8060UF',
       created_by: 'Test User',
       nomis_booking_id: 1,
+      responsibility: 'Supporting',
       allocated_at_tier: 'A',
       prison: 'LEI'
     )
