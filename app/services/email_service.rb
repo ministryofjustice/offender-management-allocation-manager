@@ -15,6 +15,7 @@ class EmailService
           get_pom(last_allocation[:prison], last_allocation[:nomis_staff_id])
 
       return if previous_pom.emails.empty?
+
       PomMailer.deallocation_email(
         previous_pom_name: previous_pom.first_name.capitalize,
         previous_pom_email: previous_pom.emails.first,
@@ -27,6 +28,7 @@ class EmailService
     end
 
     return if pom.emails.empty?
+
     PomMailer.new_allocation_email(
       pom_name: pom.first_name.capitalize,
       pom_email: pom.emails.first,
