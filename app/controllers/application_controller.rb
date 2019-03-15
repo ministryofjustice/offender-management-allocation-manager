@@ -8,8 +8,10 @@ class ApplicationController < ActionController::Base
   def authenticate_user
     if sso_identity.nil? || session_expired?
       session[:redirect_path] = request.original_fullpath
-      redirect_to '/auth/hmpps_sso'
+      redirect_to '/auth/hmpps_sso' && return
     end
+
+    redirect_to '/401' unless roles.present? && roles.include?('ROLE_ALLOC_MGR')
   end
 
   def current_user
@@ -22,6 +24,10 @@ class ApplicationController < ActionController::Base
 
   def caseloads
     sso_identity['caseloads'] if sso_identity.present?
+  end
+
+  def roles
+    sso_identity['roles'] if sso_identity.present?
   end
 
 private
