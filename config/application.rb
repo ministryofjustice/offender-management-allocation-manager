@@ -12,6 +12,7 @@ require 'sprockets/railtie'
 
 Bundler.require(*Rails.groups)
 
+
 module OffenderManagementAllocationClient
   class Application < Rails::Application
     config.load_defaults 5.2
@@ -21,6 +22,10 @@ module OffenderManagementAllocationClient
     config.allocation_manager_host = ENV.fetch(
       'ALLOCATION_MANAGER_HOST',
       'http://localhost:3000'
+    )
+    Rails.application.routes.default_url_options[:host] = ENV.fetch(
+        'ALLOCATION_MANAGER_HOST',
+        'http://localhost:3000'
     )
     config.sentry_dsn = ENV['SENTRY_DSN']
     config.nomis_oauth_host = ENV['NOMIS_OAUTH_HOST']
