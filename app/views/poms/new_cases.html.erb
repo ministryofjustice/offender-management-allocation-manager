@@ -1,3 +1,7 @@
+<% content_for :switcher do %>
+  <%= render '/layouts/prison_switcher' %>
+<% end %>
+
 <% if @pom.blank? %>
   <h2 class="govuk-heading-l">No new cases </h2>
 <% else %>

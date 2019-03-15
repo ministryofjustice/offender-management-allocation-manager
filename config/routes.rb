@@ -20,6 +20,9 @@ Rails.application.routes.draw do
 
   get('/search' => 'search#search')
 
+  get('/prisons' => 'prisons#index')
+  get('/prisons/update' => 'prisons#set_active')
+
   resources :health, only: %i[ index ], controller: 'health'
   resources :status, only: %i[ index ], controller: 'status'
   resource :overrides,  only: %i[ new create ], path_names: { new: 'new/:nomis_offender_id/:nomis_staff_id'}

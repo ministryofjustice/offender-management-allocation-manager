@@ -32,14 +32,14 @@ class PrisonOffenderManagerService
     }
   end
 
-  def self.get_allocations_for_pom(nomis_staff_id)
+  def self.get_allocations_for_pom(nomis_staff_id, prison)
     detail = get_pom_detail(nomis_staff_id)
-    detail.allocations.where(active: true)
+    detail.allocations.where(active: true, prison: prison)
   end
 
   # rubocop:disable Metrics/MethodLength
-  def self.get_allocated_offenders(nomis_staff_id)
-    allocation_list = get_allocations_for_pom(nomis_staff_id)
+  def self.get_allocated_offenders(nomis_staff_id, prison)
+    allocation_list = get_allocations_for_pom(nomis_staff_id, prison)
 
     offender_ids = allocation_list.map(&:nomis_offender_id)
 
@@ -60,8 +60,8 @@ class PrisonOffenderManagerService
   end
   # rubocop:enable Metrics/MethodLength
 
-  def self.get_new_cases(nomis_staff_id)
-    allocations = get_allocated_offenders(nomis_staff_id)
+  def self.get_new_cases(nomis_staff_id, prison)
+    allocations = get_allocated_offenders(nomis_staff_id, prison)
     allocations.select { |allocation, _offender| allocation.created_at >= 7.days.ago }
   end
 

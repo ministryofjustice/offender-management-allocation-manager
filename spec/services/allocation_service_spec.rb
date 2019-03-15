@@ -43,7 +43,7 @@ RSpec.describe AllocationService do
   it "can deallocate for a POM", vcr: { cassette_name: 'allocation_service_deallocate_a_pom' } do
     staff_id = allocation.nomis_staff_id
     described_class.deallocate_pom(staff_id)
-    alloc = PrisonOffenderManagerService.get_allocations_for_pom(staff_id)
+    alloc = PrisonOffenderManagerService.get_allocations_for_pom(staff_id, 'LEI')
     expect(alloc).to eq([])
   end
 

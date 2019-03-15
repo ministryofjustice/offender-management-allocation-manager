@@ -1,0 +1,12 @@
+
+<%= render :partial => "/shared/backlink", :locals => { :page => @referer || root_path } %>
+
+<h1 class="govuk-heading-xl govuk-!-margin-top-0 govuk-!-margin-bottom-4">Choose prison</h1>
+
+<ul class="govuk-list">
+  <% caseloads.each do |prison| %>
+    <li>
+      <a href="<%= prisons_update_path(code: prison, next: @next) %>"><%= prison_title(prison) %></a>
+    </li>
+  <% end %>
+</ul>

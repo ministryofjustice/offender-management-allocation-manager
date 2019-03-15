@@ -20,8 +20,15 @@ class ApplicationController < ActionController::Base
     sso_identity['active_caseload'] if sso_identity.present?
   end
 
+  def update_active_caseload(code)
+    session[:sso_data]['active_caseload'] = code
+  end
+
   def caseloads
-    sso_identity['caseloads'] if sso_identity.present?
+    return nil if sso_identity.blank?
+
+    caseloads = sso_identity['caseloads']
+    caseloads.reject { |c| c == 'NWEB' }
   end
 
 private
