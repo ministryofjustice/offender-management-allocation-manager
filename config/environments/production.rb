@@ -12,8 +12,7 @@ Rails.application.configure do
   config.i18n.fallbacks = true
   config.active_support.deprecation = :notify
 
-  # TODO: Add live notify API key once our account goes live
-  config.notify_api_key = ENV['DEV_NOTIFY_API_KEY']
+  config.notify_api_key = ENV['LIVE_NOTIFY_API_KEY']
 
   if ENV['RAILS_LOG_TO_STDOUT'].present?
     logger           = ActiveSupport::Logger.new(STDOUT)
