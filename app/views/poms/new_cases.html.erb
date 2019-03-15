@@ -24,7 +24,7 @@
       <tr class="govuk-table__row">
         <td aria-label="Prisoner name" class="govuk-table__cell "><%= sentence.full_name %></td>
         <td aria-label="Prisoner number" class="govuk-table__cell "><%= allocation.nomis_offender_id %></td>
-        <td aria-label="Arrival date" class="govuk-table__cell ">ARRIVAL DATE</td>
+        <td aria-label="Arrival date" class="govuk-table__cell "><%= format_date_string(sentence.sentence_date) %></td>
         <td aria-label="Release date" class="govuk-table__cell "><%= format_date(sentence.release_date.to_date) %></td>
         <td aria-label="Allocation date" class="govuk-table__cell "><%= format_date(allocation.created_at) %></td>
         <td aria-label="Role" class="govuk-table__cell "><%= allocation.responsibility %></td>
