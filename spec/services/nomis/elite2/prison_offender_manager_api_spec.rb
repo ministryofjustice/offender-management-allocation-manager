@@ -16,8 +16,8 @@ describe Nomis::Elite2::PrisonOffenderManagerApi do
     expect(response).to be_instance_of(Array)
     expect(response.count).to eq(0)
     expect(response).to all(be_an Nomis::Models::PrisonOffenderManager)
-  end 
-  
+  end
+
   describe '#fetch_email_addresses' do
     it "can get a user's single email address",
       vcr: { cassette_name: :elite2_staff_api_get_email } do
