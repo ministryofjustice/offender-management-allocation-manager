@@ -1,3 +1,15 @@
+<% if notice.present? %>
+  <p class="notification govuk-!-margin-bottom-9" role="group" aria-labelledby="notice-heading">
+    <%= notice %>
+  </p>
+<% end %>
+
+<% if alert.present? %>
+  <p class="alert govuk-!-margin-bottom-9" role="group" aria-labelledby="error-summary-heading">
+    <%= alert %>
+  </p>
+<% end %>
+
 <h1 class="govuk-heading-xl">Allocations</h1>
 
 <%= render(:partial => 'tabs_start', :locals => {:active => :unallocated}) %>

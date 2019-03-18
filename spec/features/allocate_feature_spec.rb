@@ -32,6 +32,7 @@ feature 'Allocation' do
     click_button 'Complete allocation'
 
     expect(page).to have_current_path summary_unallocated_path
+    expect(page).to have_css('.notification', text: 'Ozullirn Abbella has been allocated to Ross Jones (Probation POM)')
   end
 
   scenario 'overriding an allocation', vcr: { cassette_name: :override_allocation_feature } do
@@ -58,6 +59,7 @@ feature 'Allocation' do
     click_button 'Complete allocation'
 
     expect(page).to have_current_path summary_unallocated_path
+    expect(page).to have_css('.notification', text: 'Ozullirn Abbella has been allocated to Toby Retallick (Prison POM)')
     expect(Override.count).to eq(0)
   end
 
@@ -116,5 +118,21 @@ feature 'Allocation' do
     expect(page).to have_current_path edit_allocations_path(nomis_offender_id)
     expect(page).to have_css('.current_pom_full_name', text: 'Duckett, Jenny')
     expect(page).to have_css('.current_pom_grade', text: 'Prison POM')
+  end
+
+  scenario 'allocation fails', vcr: { cassette_name: :allocation_fails_feature } do
+    allow(AllocationService).to receive(:create_allocation).and_return(false)
+    signin_user
+
+    visit new_allocations_path(nomis_offender_id)
+
+    within('.recommended_pom_row_0') do
+      click_link 'Allocate'
+    end
+
+    click_button 'Complete allocation'
+
+    expect(page).to have_current_path summary_unallocated_path
+    expect(page).to have_css('.alert', text: 'Something went wrong - please try again')
   end
 end
