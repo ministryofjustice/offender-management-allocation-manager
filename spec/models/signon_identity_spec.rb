@@ -23,7 +23,8 @@ describe SignonIdentity, model: true do
       username: 'Fred',
       active_caseload: 'LEI',
       caseloads: %w[LEI RNI],
-      expiry: time_stamp
+      expiry: time_stamp,
+      roles: ['ROLE_ALLOC_MGR']
     }
 
     expect(signon_identity.to_session).to eq(session)
