@@ -9,9 +9,7 @@ module Nomis
         key = "pom_list_#{prison}"
 
         data = Rails.cache.fetch(key, expires_in: 10.minutes) {
-          e2_client.get(route) { |result|
-            raise Nomis::Client::APIError, 'No data was returned' if result.empty?
-          }
+          e2_client.get(route) || []
         }
 
         data.map { |pom|

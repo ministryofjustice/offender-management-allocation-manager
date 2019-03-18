@@ -42,6 +42,10 @@ module Nomis
       def full_name
         "#{last_name}, #{first_name}".titleize
       end
+
+      def full_name_ordered
+        "#{first_name} #{last_name}".titleize
+      end
     end
   end
 end
