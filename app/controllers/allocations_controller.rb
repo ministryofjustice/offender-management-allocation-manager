@@ -20,13 +20,20 @@ class AllocationsController < ApplicationController
 
   def confirm
     @prisoner = offender(nomis_offender_id_from_url)
-    @pom = PrisonOffenderManagerService.get_pom(active_caseload, nomis_staff_id_from_url)
+    @pom = PrisonOffenderManagerService.get_pom(
+      active_caseload,
+      nomis_staff_id_from_url
+    )
   end
 
   # rubocop:disable Metrics/MethodLength
+  # rubocop:disable Metrics/LineLength
   def create
-    offender  = offender(allocation_params[:nomis_offender_id])
-    pom = PrisonOffenderManagerService.get_pom(active_caseload, allocation_params[:nomis_staff_id])
+    offender = offender(allocation_params[:nomis_offender_id])
+    pom = PrisonOffenderManagerService.get_pom(
+      active_caseload,
+      allocation_params[:nomis_staff_id]
+    )
 
     @override = override
     allocation = {
@@ -44,12 +51,13 @@ class AllocationsController < ApplicationController
     if AllocationService.create_allocation allocation
       flash[:notice] = "#{offender.full_name_ordered} has been allocated to #{pom.full_name_ordered} (#{pom.grade})"
     else
-      flash[:alert]   = "Something went wrong - please try again"
+      flash[:alert] = 'Something went wrong - please try again'
     end
 
     redirect_to summary_unallocated_path
   end
 # rubocop:enable Metrics/MethodLength
+# rubocop:enable Metrics/LineLength
 
 private
 
