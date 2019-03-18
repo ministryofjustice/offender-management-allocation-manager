@@ -31,6 +31,10 @@ module Nomis
         "#{last_name}, #{first_name}".titleize
       end
 
+      def full_name_ordered
+        "#{first_name} #{last_name}".titleize
+      end
+
       def grade
         "#{position_description.split(' ').first} POM"
       end
