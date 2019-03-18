@@ -2,7 +2,7 @@ class AllocationsController < ApplicationController
   before_action :authenticate_user
 
   def new
-    @prisoner = prisoner(nomis_offender_id_from_url)
+    @prisoner = offender(nomis_offender_id_from_url)
     @previously_allocated_pom_ids =
       AllocationService.previously_allocated_poms(nomis_offender_id_from_url)
     @recommended_poms, @not_recommended_poms =
@@ -10,7 +10,7 @@ class AllocationsController < ApplicationController
   end
 
   def edit
-    @prisoner = prisoner(nomis_offender_id_from_url)
+    @prisoner = offender(nomis_offender_id_from_url)
     @previously_allocated_pom_ids =
       AllocationService.previously_allocated_poms(nomis_offender_id_from_url)
     @recommended_poms, @not_recommended_poms =
@@ -19,34 +19,49 @@ class AllocationsController < ApplicationController
   end
 
   def confirm
-    @prisoner = prisoner(nomis_offender_id_from_url)
-    @pom = PrisonOffenderManagerService.get_pom(active_caseload, nomis_staff_id_from_url)
+    @prisoner = offender(nomis_offender_id_from_url)
+    @pom = PrisonOffenderManagerService.get_pom(
+      active_caseload,
+      nomis_staff_id_from_url
+    )
   end
 
   # rubocop:disable Metrics/MethodLength
+  # rubocop:disable Metrics/LineLength
   def create
-    prisoner  = prisoner(allocation_params[:nomis_offender_id])
-    @override = override
+    offender = offender(allocation_params[:nomis_offender_id])
+    pom = PrisonOffenderManagerService.get_pom(
+      active_caseload,
+      allocation_params[:nomis_staff_id]
+    )
 
-    AllocationService.create_allocation(
+    @override = override
+    allocation = {
       nomis_staff_id: allocation_params[:nomis_staff_id].to_i,
       nomis_offender_id: allocation_params[:nomis_offender_id],
       created_by: current_user,
-      nomis_booking_id: prisoner.latest_booking_id,
-      allocated_at_tier: prisoner.tier,
+      nomis_booking_id: offender.latest_booking_id,
+      allocated_at_tier: offender.tier,
       prison: active_caseload,
       override_reasons: override_reasons,
       override_detail: override_detail,
       message: allocation_params[:message]
-    )
+    }
+
+    if AllocationService.create_allocation allocation
+      flash[:notice] = "#{offender.full_name_ordered} has been allocated to #{pom.full_name_ordered} (#{pom.grade})"
+    else
+      flash[:alert] = "#{offender.full_name_ordered} has not been allocated  - please try again"
+    end
 
     redirect_to summary_unallocated_path
   end
 # rubocop:enable Metrics/MethodLength
+# rubocop:enable Metrics/LineLength
 
 private
 
-  def prisoner(nomis_offender_id)
+  def offender(nomis_offender_id)
     OffenderService.get_offender(nomis_offender_id)
   end
 
