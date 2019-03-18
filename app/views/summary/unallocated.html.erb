@@ -1,3 +1,7 @@
+<% content_for :switcher do %>
+  <%= render '/layouts/prison_switcher' %>
+<% end %>
+
 <% if notice.present? %>
   <p class="notification govuk-!-margin-bottom-9" role="group" aria-labelledby="notice-heading">
     <%= notice %>

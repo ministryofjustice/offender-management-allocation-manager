@@ -19,7 +19,9 @@ class PomsController < ApplicationController
 
   def show
     @pom = pom
-    @allocations = PrisonOffenderManagerService.get_allocated_offenders(@pom.staff_id)
+    @allocations = PrisonOffenderManagerService.get_allocated_offenders(
+      @pom.staff_id, active_caseload
+    )
   end
 
   def edit
@@ -39,15 +41,21 @@ class PomsController < ApplicationController
   def my_caseload
     @pom = PrisonOffenderManagerService.get_signed_in_pom_details(current_user)
     if @pom.present?
-      @allocations = PrisonOffenderManagerService.get_allocated_offenders(@pom.staff_id)
-      @new_cases = PrisonOffenderManagerService.get_new_cases(@pom.staff_id)
+      @allocations = PrisonOffenderManagerService.get_allocated_offenders(
+        @pom.staff_id, active_caseload
+      )
+      @new_cases = PrisonOffenderManagerService.get_new_cases(
+        @pom.staff_id, active_caseload
+      )
     end
   end
 
   def new_cases
     @pom = PrisonOffenderManagerService.get_signed_in_pom_details(current_user)
     if @pom.present?
-      @new_cases = PrisonOffenderManagerService.get_new_cases(@pom.staff_id)
+      @new_cases = PrisonOffenderManagerService.get_new_cases(
+        @pom.staff_id, active_caseload
+      )
     end
   end
 

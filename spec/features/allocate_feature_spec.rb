@@ -17,7 +17,7 @@ feature 'Allocation' do
     CaseInformation.create!(nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPS', welsh_address: 'No', prison: 'LEI')
   }
 
-  scenario 'accepting a recommended allocation', vcr: { cassette_name: :create_allocation_feature } do
+  scenario 'accepting a recommended allocation', vcr: { cassette_name: :create_new_allocation_feature } do
     signin_user
 
     visit new_allocations_path(nomis_offender_id)
