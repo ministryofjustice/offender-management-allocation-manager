@@ -1,3 +1,7 @@
+<% content_for :switcher do %>
+  <%= render '/layouts/prison_switcher' %>
+<% end %>
+
 <h1 class="govuk-heading-xl">Allocations</h1>
 
 <%= render(:partial => 'tabs_start', :locals => {:active => :pending}) %>
