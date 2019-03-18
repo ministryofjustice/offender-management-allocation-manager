@@ -133,6 +133,9 @@ feature 'Allocation' do
     click_button 'Complete allocation'
 
     expect(page).to have_current_path summary_unallocated_path
-    expect(page).to have_css('.alert', text: 'Something went wrong - please try again')
+    expect(page).to have_css(
+      '.alert',
+      text: 'Ozullirn Abbella has not been allocated - please try again'
+                    )
   end
 end

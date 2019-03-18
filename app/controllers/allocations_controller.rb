@@ -51,7 +51,7 @@ class AllocationsController < ApplicationController
     if AllocationService.create_allocation allocation
       flash[:notice] = "#{offender.full_name_ordered} has been allocated to #{pom.full_name_ordered} (#{pom.grade})"
     else
-      flash[:alert] = 'Something went wrong - please try again'
+      flash[:alert] = "#{offender.full_name_ordered} has not been allocated  - please try again"
     end
 
     redirect_to summary_unallocated_path
