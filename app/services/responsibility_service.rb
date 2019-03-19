@@ -1,4 +1,5 @@
 # rubocop:disable Metrics/MethodLength
+# rubocop:disable Metrics/LineLength
 # rubocop:disable Metrics/PerceivedComplexity
 # rubocop:disable Metrics/CyclomaticComplexity
 class ResponsibilityService
@@ -53,7 +54,7 @@ class ResponsibilityService
   end
 
   def self.nps_case?(offender)
-    @nps ||= offender.case_allocation == NPS
+    @nps_case ||= offender.case_allocation == NPS
   end
 
   def self.release_date_gt_10_mths?(offender)
@@ -65,7 +66,7 @@ class ResponsibilityService
   end
 
   def self.release_date_gt_12_weeks?(offender)
-    @release_date_gt_12_weeks ||= offender.release_date >  DateTime.now.utc.to_date + 12.weeks
+    @release_date_gt_12_weeks ||= offender.release_date > DateTime.now.utc.to_date + 12.weeks
   end
 
   def self.new_case?(offender)
@@ -86,3 +87,4 @@ end
 # rubocop:enable Metrics/MethodLength
 # rubocop:enable Metrics/PerceivedComplexity
 # rubocop:enable Metrics/CyclomaticComplexity
+# rubocop:enable Metrics/LineLength
