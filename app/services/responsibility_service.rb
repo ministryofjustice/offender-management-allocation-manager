@@ -11,7 +11,7 @@ class ResponsibilityService
   RESPONSIBLE = 'Responsible'
   SUPPORTING = 'Supporting'
 
-  def self.calculate_case_owner(offender)
+  def calculate_case_owner(offender)
     case offender.case_allocation
     when NPS
       nps_calculation(offender)
@@ -22,7 +22,7 @@ class ResponsibilityService
     end
   end
 
-  def self.calculate_pom_responsibility(offender)
+  def calculate_pom_responsibility(offender)
     return UNKNOWN if offender.release_date.nil?
     return SUPPORTING unless welsh?(offender)
 
@@ -49,37 +49,39 @@ class ResponsibilityService
       !release_date_gt_15_mths?(offender)
   end
 
-  def self.welsh?(offender)
+private
+
+  def welsh?(offender)
     offender.welsh_address == true
   end
 
-  def self.nps_case?(offender)
+  def nps_case?(offender)
     @nps_case ||= offender.case_allocation == NPS
   end
 
-  def self.release_date_gt_10_mths?(offender)
+  def release_date_gt_10_mths?(offender)
     @release_date_gt_10_mths = offender.release_date > DateTime.now.utc.to_date + 10.months
   end
 
-  def self.release_date_gt_15_mths?(offender)
+  def release_date_gt_15_mths?(offender)
     @release_date_gt_15_mths ||= offender.release_date > DateTime.new(2019, 2, 4).utc.to_date + 15.months
   end
 
-  def self.release_date_gt_12_weeks?(offender)
+  def release_date_gt_12_weeks?(offender)
     @release_date_gt_12_weeks ||= offender.release_date > DateTime.now.utc.to_date + 12.weeks
   end
 
-  def self.new_case?(offender)
+  def new_case?(offender)
     @new_case ||= offender.sentence_date > DateTime.new(2019, 2, 4).utc
   end
 
-  def self.nps_calculation(offender)
+  def nps_calculation(offender)
     return 'No release date' if offender.release_date.nil?
 
     offender.tier == 'A' || offender.tier == 'B' ? PROBATION : PRISON
   end
 
-  def self.assign_responsible?(offender)
+  def assign_responsible?(offender)
     # TODO: When we do this check, we should also check what the responsibility
     # was yesterday, so that we can determine if it has changed.  This will allow
     # us to persist the responsibility at the time of allocation, and when the
