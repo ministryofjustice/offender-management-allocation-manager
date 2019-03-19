@@ -49,7 +49,7 @@ class ResponsibilityService
       !release_date_gt_15_mths?(offender)
   end
 
-  private
+private
 
   def welsh?(offender)
     offender.welsh_address == true

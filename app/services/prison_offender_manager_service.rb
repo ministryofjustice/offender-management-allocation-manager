@@ -48,7 +48,8 @@ class PrisonOffenderManagerService
 
     allocation_list_with_responsibility = allocation_list.map { |alloc|
       offender = OffenderService.get_offender(alloc.nomis_offender_id)
-      alloc.responsibility = ResponsibilityService.new.calculate_pom_responsibility(offender)
+      alloc.responsibility =
+        ResponsibilityService.new.calculate_pom_responsibility(offender)
       alloc
     }
 
