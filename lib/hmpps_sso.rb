@@ -11,7 +11,8 @@ module OmniAuth
         {
           username: user_details.username,
           active_caseload: user_details.active_nomis_caseload,
-          caseloads: user_details.nomis_caseloads.keys
+          caseloads: user_details.nomis_caseloads.keys,
+          roles: decode_roles
         }
       end
 
@@ -40,6 +41,21 @@ module OmniAuth
       end
 
     private
+
+      def decode_roles
+        public_key = Base64.urlsafe_decode64(
+          Rails.configuration.nomis_oauth_public_key
+        )
+
+        decoded_token = JWT.decode(
+          access_token.token,
+          OpenSSL::PKey::RSA.new(public_key),
+          true,
+          algorithm: 'RS256'
+        )
+
+        decoded_token.first.fetch('authorities', [])
+      end
 
       def user_details
         @user_details ||= Nomis::Custody::UserApi.user_details(username)

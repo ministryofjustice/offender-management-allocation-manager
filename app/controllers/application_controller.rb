@@ -9,6 +9,8 @@ class ApplicationController < ActionController::Base
     if sso_identity.nil? || session_expired?
       session[:redirect_path] = request.original_fullpath
       redirect_to '/auth/hmpps_sso'
+    else
+      redirect_to '/401' unless allowed?
     end
   end
 
@@ -24,6 +26,10 @@ class ApplicationController < ActionController::Base
     session[:sso_data]['active_caseload'] = code
   end
 
+  def roles
+    sso_identity['roles'] if sso_identity.present?
+  end
+
   def caseloads
     return nil if sso_identity.blank?
 
@@ -32,6 +38,13 @@ class ApplicationController < ActionController::Base
   end
 
 private
+
+  def allowed?
+    return true if Rails.env.test?
+
+    user_roles = roles
+    user_roles.present? && user_roles.include?('ROLE_ALLOC_MGR')
+  end
 
   def session_expired?
     Time.current > Time.zone.at(sso_identity['expiry'])
