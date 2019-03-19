@@ -9,7 +9,7 @@ PomDetail.find_or_create_by!(
 PomDetail.find_or_create_by!(
   nomis_staff_id: 485_752,
   status: 'active',
-  working_pattern: 0.5
+  working_pattern: 0.6
 )
 
 # Dom Bull
@@ -23,7 +23,7 @@ PomDetail.find_or_create_by!(
 PomDetail.find_or_create_by!(
   nomis_staff_id: 485_636,
   status: 'active',
-  working_pattern: 0.5
+  working_pattern: 0.6
 )
 
 # Toby Retallick
