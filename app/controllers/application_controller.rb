@@ -6,15 +6,11 @@ class ApplicationController < ActionController::Base
   include SSOIdentity
 
   def authenticate_user
-    user_roles = roles
-    unless user_roles.present? && user_roles.include?('ROLE_ALLOC_MGR')
-      redirect_to '/401'
-      return
-    end
-
     if sso_identity.nil? || session_expired?
       session[:redirect_path] = request.original_fullpath
       redirect_to '/auth/hmpps_sso'
+    else
+      redirect_to '/401' unless allowed?
     end
   end
 
@@ -42,6 +38,13 @@ class ApplicationController < ActionController::Base
   end
 
 private
+
+  def allowed?
+    return true if Rails.env.test?
+
+    user_roles = roles
+    user_roles.present? && user_roles.include?('ROLE_ALLOC_MGR')
+  end
 
   def session_expired?
     Time.current > Time.zone.at(sso_identity['expiry'])

@@ -12,28 +12,10 @@ class SignonIdentity
     @active_caseload = omniauth_data.fetch('info').active_caseload
     @caseloads = omniauth_data.fetch('info').caseloads
     @expiry = omniauth_data.fetch('credentials').expires_at
-    @roles = get_roles(omniauth_data.fetch('credentials'))
-  end
-
-  def get_roles(credentials)
-    return ['ROLE_ALLOC_MGR'] if Rails.env.test?
-    byebug
-    public_key = Base64.urlsafe_decode64(
-        Rails.configuration.nomis_oauth_public_key
-    )
-
-    decoded_token = JWT.decode(
-        credentials.token,
-        OpenSSL::PKey::RSA.new(public_key),
-        true,
-        algorithm: 'RS256'
-    )
-
-    decoded_token.first.fetch('authorities', [])
+    @roles = omniauth_data.fetch('info').roles
   end
 
   def to_session
-    p @roles
     {
       username: @username,
       active_caseload: @active_caseload,

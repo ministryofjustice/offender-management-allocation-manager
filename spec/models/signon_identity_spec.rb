@@ -2,7 +2,14 @@ require 'rails_helper'
 
 describe SignonIdentity, model: true do
   let(:time_stamp) { 123_456 }
-  let(:user_auth_data) { double('user_auth_data', username: 'Fred', active_caseload: 'LEI', caseloads: %w[LEI RNI]) }
+  let(:user_auth_data) {
+    double('user_auth_data',
+      username: 'Fred',
+      active_caseload: 'LEI',
+      caseloads: %w[LEI RNI],
+      roles: ['ROLE_ALLOC_MGR']
+    )
+  }
   let(:credentials) { double('credentials', expires_at: time_stamp) }
   let(:omniauth_data) do
     { 'info' => user_auth_data, 'credentials' => credentials }
