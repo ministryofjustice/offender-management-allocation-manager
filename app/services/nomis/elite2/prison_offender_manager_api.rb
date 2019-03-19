@@ -9,7 +9,9 @@ module Nomis
         key = "pom_list_#{prison}"
 
         data = Rails.cache.fetch(key, expires_in: 10.minutes) {
-          e2_client.get(route) || []
+          e2_client.get(route,  extra_headers: paging_options { |result|
+            raise Nomis::Client::APIError, 'No data was returned' if result.empty?
+          })
         }
 
         data.map { |pom|
@@ -23,6 +25,15 @@ module Nomis
         return [] if data.nil?
 
         data
+      end
+
+    private
+
+      def self.paging_options
+        {
+          'Page-Limit' => '100',
+          'Page-Offset' => '0'
+        }
       end
     end
   end
