@@ -8,13 +8,19 @@
     <td class="govuk-table__cell govuk-!-width-one-half">Current case owner</td>
     <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
       <%= responsibility_label(@prisoner.case_owner) %>
-        <a class="govuk-link pull-right" href="<%= edit_case_information_path(@prisoner.offender_no) %>">Change</a>
     </td>
   </tr>
   <tr class="govuk-table__row">
+    <td class="govuk-table__cell">POM role</td>
+    <td class="govuk-table__cell table_cell__left_align">
+      <%= pom_responsibility_label(@prisoner) %>
+    </td>
+  </tr>
+
+  <tr class="govuk-table__row">
     <td class="govuk-table__cell">Service provider</td>
     <td class="govuk-table__cell table_cell__left_align">
-      <%= @prisoner.case_allocation %>
+      <%= service_provider_label(@prisoner.case_allocation) %>
       <a class="govuk-link pull-right" href="<%= edit_case_information_path(@prisoner.offender_no) %>">Change</a>
     </td>
   </tr>

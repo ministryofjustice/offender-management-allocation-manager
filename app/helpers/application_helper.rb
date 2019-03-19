@@ -45,6 +45,10 @@ module ApplicationHelper
     'Part time'
   end
 
+  def pom_responsibility_label(offender)
+    ResponsibilityService.calculate_pom_responsibility(offender)
+  end
+
   def responsibility_label(offender_responsibility)
     {
       'Probation' => 'Community',

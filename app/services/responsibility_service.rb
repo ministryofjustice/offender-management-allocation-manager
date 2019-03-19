@@ -24,6 +24,12 @@ class ResponsibilityService
   end
 
   def self.assign_responsible?(offender)
+    # TODO: When we do this check, we should also check what the responsibility
+    # was yesterday, so that we can determine if it has changed.  This will allow
+    # us to persist the responsibility at the time of allocation, and when the
+    # responsibility changes do:
+    #   * Notifications
+    #   * Deactive and recreate allocation (with new responsibility)
     offender.welsh_address == true &&
       offender.release_date > DateTime.now.utc.to_date + 10.months
   end
