@@ -29,8 +29,6 @@ describe OmniAuth::Strategies::HmppsSso do
         allow(strategy).to receive(:username).and_return(username)
         allow(strategy).to receive(:decode_roles).and_return(['ROLE_ALLOC_MGR'])
 
-        # allow(strategy).to receive(:access_token).and_return(access_token)
-
         expect(strategy.info[:username]).to eq(username)
         expect(strategy.info[:active_caseload]).to eq(leeds_prison)
       end
