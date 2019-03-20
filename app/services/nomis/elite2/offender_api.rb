@@ -25,10 +25,7 @@ module Nomis
           [data, page_meta]
         }
 
-        offenders = data.map { |offender|
-          api_deserialiser.deserialise(Nomis::Models::OffenderShort, offender)
-        }
-
+        offenders = api_deserialiser.deserialise_many(Nomis::Models::OffenderShort, data)
         ApiPaginatedResponse.new(page_meta, offenders)
       end
 
