@@ -7,7 +7,7 @@ class OffenderService
       if record.present?
         o.tier = record.tier
         o.case_allocation = record.case_allocation
-        o.welsh_address = record.welsh_address
+        o.omicable = record.omicable
       end
 
       sentence_detail = get_sentence_details([offender_no])
@@ -46,7 +46,7 @@ class OffenderService
         if record
           offender.tier = record.tier
           offender.case_allocation = record.case_allocation
-          offender.welsh_address = record.welsh_address
+          offender.omicable = record.omicable
         end
         offender.sentence_date = sentence_details[offender.offender_no].sentence_date
         true

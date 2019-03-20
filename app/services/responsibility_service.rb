@@ -24,7 +24,7 @@ class ResponsibilityService
 
   def calculate_pom_responsibility(offender)
     return UNKNOWN if offender.release_date.nil?
-    return SUPPORTING unless welsh?(offender)
+    return SUPPORTING unless omicable?(offender)
 
     return RESPONSIBLE if nps_case?(offender) &&
       new_case?(offender) &&
@@ -51,8 +51,8 @@ class ResponsibilityService
 
 private
 
-  def welsh?(offender)
-    offender.welsh_address == true
+  def omicable?(offender)
+    offender.omicable == true
   end
 
   def nps_case?(offender)
@@ -88,7 +88,7 @@ private
     # responsibility changes do:
     #   * Notifications
     #   * Deactive and recreate allocation (with new responsibility)
-    offender.welsh_address == true &&
+    offender.omicable == true &&
       offender.release_date > DateTime.now.utc.to_date + 10.months
   end
 end

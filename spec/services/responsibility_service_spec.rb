@@ -32,14 +32,14 @@ describe ResponsibilityService do
 
   let(:offender_not_welsh) {
     Nomis::Models::Offender.new.tap { |o|
-      o.welsh_address = false
+      o.omicable = false
       o.release_date = DateTime.now.utc.to_date + 6.months
     }
   }
 
   let(:offender_welsh_crc_lt_12_wk) {
     Nomis::Models::Offender.new.tap { |o|
-      o.welsh_address = true
+      o.omicable = true
       o.case_allocation = 'CRC'
       o.release_date = DateTime.now.utc.to_date + 2.weeks
     }
@@ -47,7 +47,7 @@ describe ResponsibilityService do
 
   let(:offender_welsh_crc_gt_12_wk) {
     Nomis::Models::Offender.new.tap { |o|
-      o.welsh_address = true
+      o.omicable = true
       o.case_allocation = 'CRC'
       o.release_date = DateTime.now.utc.to_date + 13.weeks
     }
@@ -55,7 +55,7 @@ describe ResponsibilityService do
 
   let(:offender_welsh_nps_gt_10_mths) {
     Nomis::Models::Offender.new.tap { |o|
-      o.welsh_address = true
+      o.omicable = true
       o.case_allocation = 'NPS'
       o.release_date = DateTime.now.utc.to_date + 11.months
     }
@@ -63,7 +63,7 @@ describe ResponsibilityService do
 
   let(:offender_welsh_nps_lt_10_mths) {
     Nomis::Models::Offender.new.tap { |o|
-      o.welsh_address = true
+      o.omicable = true
       o.case_allocation = 'NPS'
       o.release_date = DateTime.now.utc.to_date + 9.months
     }
@@ -71,7 +71,7 @@ describe ResponsibilityService do
 
   let(:offender_welsh_nps_old_case_gt_15_mths) {
     Nomis::Models::Offender.new.tap { |o|
-      o.welsh_address = true
+      o.omicable = true
       o.case_allocation = 'NPS'
       o.sentence_date = DateTime.new(2019, 1, 19).utc
       o.release_date = DateTime.now.utc.to_date + 16.months
@@ -80,7 +80,7 @@ describe ResponsibilityService do
 
   let(:offender_welsh_nps_old_case_lt_15_mths) {
     Nomis::Models::Offender.new.tap { |o|
-      o.welsh_address = true
+      o.omicable = true
       o.case_allocation = 'NPS'
       o.sentence_date = DateTime.new(2019, 2, 20).utc
       o.release_date = DateTime.now.utc.to_date + 9.months
@@ -89,7 +89,7 @@ describe ResponsibilityService do
 
   let(:offender_welsh_nps_new_case_gt_10_mths) {
     Nomis::Models::Offender.new.tap { |o|
-      o.welsh_address = true
+      o.omicable = true
       o.case_allocation = 'NPS'
       o.sentence_date = DateTime.new(2019, 1, 19).utc
       o.release_date = DateTime.now.utc.to_date + 16.months
@@ -98,7 +98,7 @@ describe ResponsibilityService do
 
   let(:offender_welsh_nps_new_case_lt_10_mths) {
     Nomis::Models::Offender.new.tap { |o|
-      o.welsh_address = true
+      o.omicable = true
       o.case_allocation = 'NPS'
       o.sentence_date = DateTime.new(2019, 2, 20).utc
       o.release_date = DateTime.now.utc.to_date + 9.months
