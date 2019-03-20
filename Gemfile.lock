@@ -153,7 +153,7 @@ GEM
     prometheus_exporter (0.4.5)
     psych (3.1.0)
     public_suffix (3.0.3)
-    puma (3.12.0)
+    puma (3.12.1)
     rack (2.0.6)
     rack-protection (2.0.5)
       rack
@@ -314,7 +314,7 @@ DEPENDENCIES
   omniauth-oauth2
   pg
   prometheus_exporter
-  puma (~> 3.11)
+  puma (~> 3.12)
   rails (~> 5.2.2)
   redis
   rspec-rails
