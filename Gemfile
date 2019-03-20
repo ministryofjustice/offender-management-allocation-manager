@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) do |repo| "https://github.com/#{repo}.git" end
 
-ruby '2.5.3'
+ruby '2.6.2'
 
 gem 'bootsnap', '>= 1.1.0', require: false
 gem 'coffee-rails', '~> 4.2'
@@ -24,6 +24,8 @@ gem 'uglifier', '>= 1.3.0'
 gem 'loaf'
 gem 'typhoeus'
 gem 'redis'
+gem 'plissken'
+gem 'fast_underscore', require: false
 
 group :development, :test do
   gem 'brakeman'

@@ -1,35 +1,33 @@
 class ApiDeserialiser
+  def deserialise_many(memory_model_class, payload_list)
+    safe_list = payload_list.to_snake_keys
+    safe_list.map { |item|
+      deserialise_hash(memory_model_class, item)
+    }
+  end
+
   def deserialise(memory_model_class, payload)
-    memory_model = memory_model_class.new
-    payload.each do |key, value|
-      setter = "#{key.underscore}="
-      if memory_model.respond_to?(setter)
-        memory_model.public_send(setter, value)
-      else
-        raise_error_for(memory_model_class, key.underscore)
-      end
-    end
-    memory_model
+    deserialise_hash(memory_model_class, payload.to_snake_keys)
   end
 
 private
 
-  def raise_error_for(klass, key)
-    AllocationManager::ExceptionHandler.capture_exception(
-      Nomis::Error::UnhandledApiField.new(build_error_message(klass, key))
-    )
+  def deserialise_hash(memory_model_class, payload)
+    memory_model = memory_model_class.new
+
+    payload.each do |key, value|
+      setter = "#{key}="
+      if memory_model.respond_to?(setter)
+        memory_model.public_send(setter, value)
+      else
+        raise_warning_for(memory_model_class, key)
+      end
+    end
+
+    memory_model
   end
 
-  def build_error_message(klass, key)
-    <<-END_OF_ERROR_MESSAGE
-        Unhandled attribute :#{key}
-
-        Consider adding the following to the class #{klass}
-
-           class #{klass}
-             # ...
-             attribute :#{key}
-           end
-    END_OF_ERROR_MESSAGE
+  def raise_warning_for(klass, key)
+    Rails.logger.info("#{klass} is missing field #{key}")
   end
 end
