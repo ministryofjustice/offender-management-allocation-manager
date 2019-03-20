@@ -14,7 +14,7 @@ feature 'Allocation' do
   }
 
   let!(:case_information) {
-    CaseInformation.create!(nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPS', welsh_address: 'No', prison: 'LEI')
+    CaseInformation.create!(nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPS', omicable: 'No', prison: 'LEI')
   }
 
   scenario 'accepting a recommended allocation', vcr: { cassette_name: :create_new_allocation_feature } do
@@ -75,7 +75,7 @@ feature 'Allocation' do
     expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
 
     click_button('Continue')
-    expect(page).to have_content('Override reasons must be provided')
+    expect(page).to have_content('Select one or more reasons for not accepting the recommendation')
     expect(Override.count).to eq(0)
   end
 
@@ -92,7 +92,7 @@ feature 'Allocation' do
 
     check('override-conditional-4')
     click_button('Continue')
-    expect(page).to have_content('More detail must be provided when Other is selected')
+    expect(page).to have_content('Please provide extra detail when Other is selected')
     expect(Override.count).to eq(0)
   end
 

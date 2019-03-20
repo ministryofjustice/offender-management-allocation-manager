@@ -23,7 +23,7 @@ class CaseInformationController < ApplicationController
     @case_info = CaseInformation.create(
       nomis_offender_id: case_information_params[:nomis_offender_id],
       tier: case_information_params[:tier],
-      welsh_address: case_information_params[:welsh_address],
+      omicable: case_information_params[:omicable],
       case_allocation: case_information_params[:case_allocation],
       prison: active_caseload
     )
@@ -41,7 +41,7 @@ class CaseInformationController < ApplicationController
     case_info.prison = active_caseload
     case_info.tier = case_information_params[:tier]
     case_info.case_allocation = case_information_params[:case_allocation]
-    case_info.welsh_address = case_information_params[:welsh_address]
+    case_info.omicable = case_information_params[:omicable]
     case_info.save
 
     redirect_to new_allocations_path(case_info.nomis_offender_id)
@@ -59,6 +59,6 @@ private
 
   def case_information_params
     params.require(:case_information).
-      permit(:nomis_offender_id, :tier, :case_allocation, :welsh_address)
+      permit(:nomis_offender_id, :tier, :case_allocation, :omicable)
   end
 end

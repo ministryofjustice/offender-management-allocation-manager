@@ -7,7 +7,7 @@ feature 'case information feature' do
     signin_user
     visit new_case_information_path(nomis_offender_id)
 
-    choose('case_information_welsh_address_Yes')
+    choose('case_information_omicable_Yes')
     choose('case_information_case_allocation_NPS')
     choose('case_information_tier_A')
     click_button 'Save'
@@ -32,8 +32,8 @@ feature 'case information feature' do
     click_button 'Save'
 
     expect(CaseInformation.count).to eq(0)
-    expect(page).to have_content("Case allocation must be provided")
-    expect(page).to have_content("Welsh address must be selected")
+    expect(page).to have_content("Select the service provider for this case")
+    expect(page).to have_content("Select yes if the prisoner’s last known address was in Wales")
   end
 
   it 'complains if all data is missing', :raven_intercept_exception, vcr: { cassette_name: :case_information_missing_all_feature } do
@@ -46,9 +46,9 @@ feature 'case information feature' do
     click_button 'Save'
 
     expect(CaseInformation.count).to eq(0)
-    expect(page).to have_content("Case allocation must be provided")
-    expect(page).to have_content("Tier must be provided")
-    expect(page).to have_content("Welsh address must be selected")
+    expect(page).to have_content("Select the service provider for this case")
+    expect(page).to have_content("Select the prisoner’s tier")
+    expect(page).to have_content("Select yes if the prisoner’s last known address was in Wales")
   end
 
   it 'complains if tier data is missing', :raven_intercept_exception, vcr: { cassette_name: :case_information_missing_tier_feature } do
@@ -62,7 +62,7 @@ feature 'case information feature' do
     click_button 'Save'
 
     expect(CaseInformation.count).to eq(0)
-    expect(page).to have_content("Tier must be provided")
+    expect(page).to have_content("Select the prisoner’s tier")
   end
 
   it 'allows editing case information for a prisoner', :raven_intercept_exception, vcr: { cassette_name: :case_information_editing_feature } do
@@ -70,7 +70,7 @@ feature 'case information feature' do
 
     signin_user
     visit new_case_information_path(nomis_offender_id)
-    choose('case_information_welsh_address_No')
+    choose('case_information_omicable_No')
     choose('case_information_case_allocation_NPS')
     choose('case_information_tier_A')
     click_button 'Save'
@@ -79,7 +79,7 @@ feature 'case information feature' do
 
     expect(page).to have_content('Case information')
     expect(page).to have_content('G1821VA')
-    choose('case_information_welsh_address_No')
+    choose('case_information_omicable_No')
     choose('case_information_case_allocation_CRC')
     click_button 'Update'
 

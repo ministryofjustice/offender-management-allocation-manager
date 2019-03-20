@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_01_092256) do
+ActiveRecord::Schema.define(version: 2019_03_20_130118) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -37,7 +37,7 @@ ActiveRecord::Schema.define(version: 2019_03_01_092256) do
     t.string "tier"
     t.string "case_allocation"
     t.string "nomis_offender_id"
-    t.text "welsh_address"
+    t.text "omicable"
     t.text "prison"
     t.index ["nomis_offender_id"], name: "index_case_information_on_nomis_offender_id"
   end
