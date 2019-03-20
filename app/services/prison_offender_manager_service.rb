@@ -69,10 +69,10 @@ class PrisonOffenderManagerService
     allocations.select { |allocation, _offender| allocation.created_at >= 7.days.ago }
   end
 
-  def self.get_signed_in_pom_details(current_user)
+  def self.get_signed_in_pom_details(current_user, prison)
     user = Nomis::Custody::UserApi.user_details(current_user)
 
-    poms_list = get_poms(user.active_nomis_caseload)
+    poms_list = get_poms(prison)
     @pom = poms_list.select { |p| p.staff_id.to_i == user.staff_id.to_i }.first
   end
 
