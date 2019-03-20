@@ -24,6 +24,8 @@ gem 'uglifier', '>= 1.3.0'
 gem 'loaf'
 gem 'typhoeus'
 gem 'redis'
+gem 'plissken'
+gem 'fast_underscore', require: false
 
 group :development, :test do
   gem 'brakeman'

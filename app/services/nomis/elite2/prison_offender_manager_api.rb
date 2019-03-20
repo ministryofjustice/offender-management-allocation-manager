@@ -14,9 +14,7 @@ module Nomis
           })
         }
 
-        data.map { |pom|
-          api_deserialiser.deserialise(Nomis::Models::PrisonOffenderManager, pom)
-        }
+        api_deserialiser.deserialise_many(Nomis::Models::PrisonOffenderManager, data)
       end
 
       def self.fetch_email_addresses(nomis_staff_id)

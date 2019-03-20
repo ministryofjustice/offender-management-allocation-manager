@@ -15,11 +15,11 @@ module Nomis
       attribute :internal_location_desc
 
       def sentence_date
-        sentence_detail['sentenceStartDate']
+        sentence_detail['sentence_start_date']
       end
 
       def release_date
-        sentence_detail['releaseDate']
+        sentence_detail['release_date']
       end
 
       def full_name
