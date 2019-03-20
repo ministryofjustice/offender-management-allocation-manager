@@ -38,10 +38,10 @@ describe OmniAuth::Strategies::HmppsSso do
         username = 'Frank'
         caseloads = { 'LEI' => '', 'RNI' => '' }
         response = double(
-            'staff_details',
-            active_nomis_caseload: nil,
-            nomis_caseloads: caseloads,
-            username: username
+          'staff_details',
+          active_nomis_caseload: nil,
+          nomis_caseloads: caseloads,
+          username: username
         )
 
         allow(Nomis::Custody::UserApi).to receive(:user_details).and_return(response)
