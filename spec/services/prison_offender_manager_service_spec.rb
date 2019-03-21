@@ -47,6 +47,10 @@ describe PrisonOffenderManagerService do
     )
   }
 
+  let(:all_allocations) {
+    [allocation_one, allocation_two, allocation_three, allocation_four]
+  }
+
   before(:each) {
     PomDetail.create(nomis_staff_id: 485_637, working_pattern: 1.0, status: 'inactive')
   }
@@ -62,10 +66,11 @@ describe PrisonOffenderManagerService do
 
   it "can get a subset of allocated offenders for a POM",
     vcr: { cassette_name: :pom_service_allocated_offenders_subset } do
-    [allocation_two, allocation_three, allocation_four]
+
+    expected_total = all_allocations.size
 
     allocated_offenders = described_class.get_allocated_offenders(allocation_one.nomis_staff_id, 'LEI')
-    expect(allocated_offenders.count).to eq(4)
+    expect(allocated_offenders.count).to eq(expected_total)
 
     allocated_offenders = described_class.get_allocated_offenders(
       allocation_one.nomis_staff_id, 'LEI',
