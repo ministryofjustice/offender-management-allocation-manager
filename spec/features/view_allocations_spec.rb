@@ -17,6 +17,7 @@ feature "view POM's caseload" do
 
     visit caseload_index_path
 
+    expect(page).to have_css("Showing 1 - 1 of 1 results")
     expect(page).to have_content("Your caseload")
     expect(page).to have_content("Abbella, Ozullirn")
   end

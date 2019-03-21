@@ -25,6 +25,28 @@ describe PrisonOffenderManagerService do
     )
   }
 
+  let(:allocation_three) {
+    AllocationService.create_allocation(
+      nomis_staff_id: staff_id,
+      nomis_offender_id: 'G8624GK',
+      created_by: 'Test User',
+      nomis_booking_id: 2,
+      allocated_at_tier: 'B',
+      prison: 'LEI'
+    )
+  }
+
+  let(:allocation_four) {
+    AllocationService.create_allocation(
+      nomis_staff_id: staff_id,
+      nomis_offender_id: 'G1714GU',
+      created_by: 'Test User',
+      nomis_booking_id: 3,
+      allocated_at_tier: 'C',
+      prison: 'LEI'
+    )
+  }
+
   before(:each) {
     PomDetail.create(nomis_staff_id: 485_637, working_pattern: 1.0, status: 'inactive')
   }
@@ -36,6 +58,19 @@ describe PrisonOffenderManagerService do
     alloc, sentence_detail = allocated_offenders.first
     expect(alloc).to be_kind_of(Allocation)
     expect(sentence_detail).to be_kind_of(Nomis::Models::SentenceDetail)
+  end
+
+  it "can get a subset of allocated offenders for a POM",
+    vcr: { cassette_name: :pom_service_allocated_offenders_subset } do
+    [allocation_two, allocation_three, allocation_four]
+
+    allocated_offenders = described_class.get_allocated_offenders(allocation_one.nomis_staff_id, 'LEI')
+    expect(allocated_offenders.count).to eq(4)
+
+    allocated_offenders = described_class.get_allocated_offenders(
+      allocation_one.nomis_staff_id, 'LEI',
+      offset: 2, limit: 2)
+    expect(allocated_offenders.count).to eq(2)
   end
 
   it "will get allocations for a POM made within the last 7 days", vcr: { cassette_name: :get_new_cases } do

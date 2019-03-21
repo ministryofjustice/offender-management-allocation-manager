@@ -5,53 +5,50 @@
 <% if @pom.blank? %>
   <h2 class="govuk-heading-l">No allocated cases </h2>
 <% else %>
-<h2 class="govuk-heading-l">Your caseload (<%= @allocations.count  %>)</h2>
+  <h2 class="govuk-heading-l">Your caseload (<%= @total_allocations  %>)</h2>
 
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-one-quarter">
-    <div class="govuk-body">New cases</div>
-    <div class="govuk-body govuk-!-font-weight-bold"><%= link_to "#{@new_cases.count}", new_caseload_path, class:"govuk-link"%></a></div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-quarter">
+      <div class="govuk-body">New cases</div>
+      <div class="govuk-body govuk-!-font-weight-bold"><%= link_to "#{@new_cases_count}", new_caseload_path, class:"govuk-link"%></a></div>
+    </div>
+    <div class="govuk-grid-column-one-quarter">
+      <div class="govuk-body">Working pattern</div>
+      <div class="govuk-body govuk-!-font-weight-bold"><%= working_pattern_name(@pom.working_pattern) %></div>
+    </div>
+    <div class="govuk-grid-column-one-quarter">
+      <div class="govuk-body">Status</div>
+      <div class="govuk-body govuk-!-font-weight-bold"><%= @pom.status.capitalize %></div>
+    </div>
   </div>
-  <div class="govuk-grid-column-one-quarter">
-    <div class="govuk-body">Working pattern</div>
-    <div class="govuk-body govuk-!-font-weight-bold"><%= working_pattern_name(@pom.working_pattern) %></div>
-  </div>
-  <div class="govuk-grid-column-one-quarter">
-    <div class="govuk-body">Status</div>
-    <div class="govuk-body govuk-!-font-weight-bold"><%= @pom.status.capitalize %></div>
-  </div>
-</div>
 
-<table class="govuk-table responsive tablesorter">
-  <thead class="govuk-table__head">
-  <tr class="govuk-table__row">
-    <th class="govuk-table__header" scope="col">Prisoner name</th>
-    <th class="govuk-table__header" scope="col">Prisoner number</th>
-    <th class="govuk-table__header" scope="col">Release/parole<br/>eligibility</th>
-    <th class="govuk-table__header" scope="col">Allocation<br/>date</th>
-    <th class="govuk-table__header" scope="col">Role</th>
-  </tr>
-  </thead>
-  <tbody class="govuk-table__body">
-  <% @allocations.each do |allocation, sentence| %>
+  <table class="govuk-table responsive tablesorter">
+    <thead class="govuk-table__head">
     <tr class="govuk-table__row">
-      <td aria-label="Prisoner name" class="govuk-table__cell "><%= sentence.full_name %></td>
-      <td aria-label="Prisoner number" class="govuk-table__cell "><%= allocation.nomis_offender_id %></td>
-      <td aria-label="Release date" class="govuk-table__cell "><%= format_date(sentence.release_date.to_date) %></td>
-      <td aria-label="Allocation date" class="govuk-table__cell "><%= format_date(allocation.created_at) %></td>
-      <td aria-label="Role" class="govuk-table__cell "><%= allocation.responsibility %></td>
+      <th class="govuk-table__header" scope="col">Prisoner name</th>
+      <th class="govuk-table__header" scope="col">Prisoner number</th>
+      <th class="govuk-table__header" scope="col">Release/parole<br/>eligibility</th>
+      <th class="govuk-table__header" scope="col">Allocation<br/>date</th>
+      <th class="govuk-table__header" scope="col">Role</th>
     </tr>
-  <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody class="govuk-table__body">
+    <% @allocations.each do |allocation, sentence| %>
+      <tr class="govuk-table__row">
+        <td aria-label="Prisoner name" class="govuk-table__cell "><%= sentence.full_name %></td>
+        <td aria-label="Prisoner number" class="govuk-table__cell "><%= allocation.nomis_offender_id %></td>
+        <td aria-label="Release date" class="govuk-table__cell "><%= format_date(sentence.release_date.to_date) %></td>
+        <td aria-label="Allocation date" class="govuk-table__cell "><%= format_date(allocation.created_at) %></td>
+        <td aria-label="Role" class="govuk-table__cell "><%= allocation.responsibility %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
 
-<%= render(
-          :partial => 'shared/pagination',
-          :locals => {
-              :page_data => @page_meta,
-              :param_name => 'page',
-          }) %>
-
-</div>
-
+  <%= render(
+            :partial => 'shared/pagination',
+            :locals => {
+                :page_data => @page_meta,
+                :param_name => 'page',
+            }) %>
 <% end %>
