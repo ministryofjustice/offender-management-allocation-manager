@@ -10,8 +10,8 @@ module OmniAuth
       info do
         {
           username: user_details.username,
-          active_caseload: active_caseload,
-          caseloads: user_details.nomis_caseloads.keys,
+          active_caseload: active_caseload.upcase,
+          caseloads: user_details.nomis_caseloads.keys.map(&:upcase),
           roles: decode_roles
         }
       end
