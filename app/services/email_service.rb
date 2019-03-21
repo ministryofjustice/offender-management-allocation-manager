@@ -8,7 +8,7 @@ class EmailService
       active: false
     ).last
     message = params[:message]
-    url = Rails.application.routes.url_helpers.my_caseload_url
+    url = Rails.application.routes.url_helpers.caseload_index_url
 
     if last_allocation.present?
       previous_pom = PrisonOffenderManagerService.

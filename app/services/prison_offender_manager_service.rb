@@ -41,8 +41,12 @@ class PrisonOffenderManagerService
   end
 
   # rubocop:disable Metrics/MethodLength
-  def self.get_allocated_offenders(nomis_staff_id, prison)
+  def self.get_allocated_offenders(nomis_staff_id, prison, offset: nil, limit: nil)
     allocation_list = get_allocations_for_pom(nomis_staff_id, prison)
+
+    if offset.present? && limit.present?
+      allocation_list = allocation_list.offset(offset).limit(limit)
+    end
 
     offender_ids = allocation_list.map(&:nomis_offender_id)
 
@@ -67,6 +71,13 @@ class PrisonOffenderManagerService
   def self.get_new_cases(nomis_staff_id, prison)
     allocations = get_allocated_offenders(nomis_staff_id, prison)
     allocations.select { |allocation, _offender| allocation.created_at >= 7.days.ago }
+  end
+
+  def self.get_new_cases_count(nomis_staff_id, prison)
+    allocations = get_allocated_offenders(nomis_staff_id, prison)
+    allocations.select { |allocation, _offender|
+      allocation.created_at >= 7.days.ago
+    }.count
   end
 
   def self.get_signed_in_pom_details(current_user, prison)
