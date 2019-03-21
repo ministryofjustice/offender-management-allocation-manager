@@ -29,6 +29,7 @@ module Nomis
       attribute :allocation_date, :date
       attribute :case_allocation, :string
       attribute :omicable, :boolean
+      attribute :convicted_status, :string
 
       def awaiting_allocation_for
         return 0 if sentence_date.blank?
