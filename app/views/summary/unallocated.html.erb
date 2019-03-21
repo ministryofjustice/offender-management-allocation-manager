@@ -25,7 +25,7 @@
       <th class="govuk-table__header" scope="col">Prisoner name</th>
       <th class="govuk-table__header sorter-false" scope="col">Prisoner number</th>
       <th class="govuk-table__header sorter-false" xscope="col">Release/parole<br/>eligibility</th>
-      <th class="govuk-table__header sorter-false" scope="col">Responsibility</th>
+      <th class="govuk-table__header sorter-false" scope="col">Case owner</th>
       <th class="govuk-table__header sorter-false" scope="col">Waiting</th>
       </th>
       <th class="govuk-table__header sorter-false" scope="col">Action</th>
@@ -37,7 +37,7 @@
         <td aria-label="Prisoner name" class="govuk-table__cell "><%= offender.full_name %></td>
         <td aria-label="Prisoner number" class="govuk-table__cell"><%= offender.offender_no %></td>
         <td aria-label="Release/parole eligibility" class="govuk-table__cell"><%= format_date(offender.release_date) %></td>
-        <td aria-label="Responsibility" class="govuk-table__cell">
+        <td aria-label="Case owner" class="govuk-table__cell">
           <%= responsibility_label(ResponsibilityService.new.calculate_case_owner(offender)) %>
         </td>
         <td aria-label="Awaiting allocation for" class="govuk-table__cell">
