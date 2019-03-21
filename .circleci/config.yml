@@ -214,6 +214,7 @@ jobs:
               -f ./deploy/staging/service-monitor.yaml \
               -f ./deploy/staging/network-policy.yaml \
               -f ./deploy/staging/allocation-manager-secrets.yaml \
+              -f ./deploy/staging/shared-environment.yaml \
           environment:
             <<: *github_team_name_slug
 
@@ -288,6 +289,7 @@ jobs:
               -f ./deploy/production/service-monitor.yaml \
               -f ./deploy/production/network-policy.yaml \
               -f ./deploy/production/allocation-manager-secrets.yaml \
+              -f ./deploy/production/shared-environment.yaml \
           environment:
             <<: *github_team_name_slug
 
