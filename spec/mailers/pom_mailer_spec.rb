@@ -6,6 +6,7 @@ RSpec.describe PomMailer, type: :mailer do
       {
         pom_name: "Jones, Ross",
         pom_email: "something@example.com",
+        responsibility: "supporting",
         offender_name: "Franks, Jason",
         offender_no: "AB1234S",
         message: "This is just a test",
@@ -29,6 +30,7 @@ RSpec.describe PomMailer, type: :mailer do
           to eq(
             email_subject: 'New OMIC allocation',
             pom_name: params[:pom_name],
+            responsibility: params[:responsibility],
             offender_name: params[:offender_name],
             nomis_offender_id: params[:offender_no],
             message: "Additional information: " + params[:message],
@@ -43,6 +45,7 @@ RSpec.describe PomMailer, type: :mailer do
             to eq(
               email_subject: 'New OMIC allocation',
               pom_name: params[:pom_name],
+              responsibility: params[:responsibility],
               offender_name: params[:offender_name],
               nomis_offender_id: params[:offender_no],
               message: params[:message],
@@ -56,6 +59,7 @@ RSpec.describe PomMailer, type: :mailer do
     let(:params) do
       {
         previous_pom_name: "Pobee-Norris, Kath",
+        responsibility: "Supporting",
         previous_pom_email: "another@example.com",
         new_pom_name: "Jones, Ross",
         offender_name: "Marks, Simon",
@@ -81,6 +85,7 @@ RSpec.describe PomMailer, type: :mailer do
           to eq(
             email_subject: 'OMIC case reallocation',
             previous_pom_name: params[:previous_pom_name],
+            responsibility: params[:responsibility],
             new_pom_name: params[:new_pom_name],
             offender_name: params[:offender_name],
             nomis_offender_id: params[:offender_no],
