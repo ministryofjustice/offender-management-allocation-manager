@@ -15,4 +15,12 @@ class Override < ApplicationRecord
     if: proc { |o|
           o.override_reasons.present? && o.override_reasons.include?('other')
         }
+
+  validates :suitability_detail,
+    presence: { message:
+                    'Please provide extra detail when suitability is selected'
+    },
+    if: proc { |o|
+      o.override_reasons.present? && o.override_reasons.include?('suitability')
+    }
 end
