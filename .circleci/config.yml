@@ -51,7 +51,6 @@ references:
         /usr/libexec/gpg-preset-passphrase --preset --passphrase $GPG_PASSPHRASE $GPG_KEY_KEYGRIP_ID
         git-crypt unlock
 
-
   install_aws_cli: &install_aws_cli
     run:
       name: Set up aws
@@ -87,6 +86,41 @@ references:
       environment:
         <<: *github_team_name_slug
         REPONAME: offender-management-allocation-manager
+
+  install_firefox_and_geckodriver: &install_firefox_and_geckodriver
+    run:
+      name: install firefox and geckodriver
+      command: |
+        wget -L "https://ftp.mozilla.org/pub/firefox/releases/65.0/linux-x86_64/en-US/firefox-65.0.tar.bz2" -O "firefox-65.0.tar.bz2"
+        tar xjf "firefox-65.0.tar.bz2"
+        sudo rm -rf /opt/firefox
+        sudo mv firefox /opt/
+        sudo ln -sf /opt/firefox/firefox /usr/bin/firefox
+        wget https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-linux64.tar.gz
+        tar -zxvf geckodriver-v0.23.0-linux64.tar.gz
+        sudo mv geckodriver /usr/local/bin/
+
+  restore_and_save_gem_cache: &restore_and_save_gem_cache
+    restore_cache:
+        keys:
+        - integration-tests-v1-{{ checksum "Gemfile.lock" }}
+        - integration-tests-v1-
+    run:
+        name: Clone and install gems
+        command: |
+          git clone git@github.com:ministryofjustice/offender-management-integration-tests.git
+          cd offender-management-integration-tests
+          bundle check --path vendor/bundle || bundle install --path vendor/bundle
+    save_cache:
+        key: integration-tests-v1-{{ checksum "Gemfile.lock" }}
+        paths:
+        - ~/staging/vendor/bundle
+
+  store_test_artifacts: &store_test_artifacts
+    store_test_results:
+        path: ./offender-management-integration-tests/screenshots
+    store_artifacts:
+        path: ./offender-management-integration-tests/screenshots
 
 version: 2
 jobs:
@@ -223,45 +257,16 @@ jobs:
     working_directory: ~/staging
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - integration-tests-v1-{{ checksum "Gemfile.lock" }}
-            - integration-tests-v1-
-      - run:
-          name: Clone and install gems
-          command: |
-            git clone git@github.com:ministryofjustice/offender-management-integration-tests.git
-            cd offender-management-integration-tests
-            bundle check --path vendor/bundle || bundle install --path vendor/bundle
-      - save_cache:
-          key: integration-tests-v1-{{ checksum "Gemfile.lock" }}
-          paths:
-            - ~/staging/vendor/bundle
-      - run:
-          name: install firefox
-          command: |
-            wget -L "https://ftp.mozilla.org/pub/firefox/releases/65.0/linux-x86_64/en-US/firefox-65.0.tar.bz2" -O "firefox-65.0.tar.bz2"
-            tar xjf "firefox-65.0.tar.bz2"
-            sudo rm -rf /opt/firefox
-            sudo mv firefox /opt/
-            sudo ln -sf /opt/firefox/firefox /usr/bin/firefox
-      - run:
-          name: install geckodriver
-          command: |
-            wget https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-linux64.tar.gz
-            tar -zxvf geckodriver-v0.23.0-linux64.tar.gz
-            sudo mv geckodriver /usr/local/bin/
+      - *restore_and_save_gem_cache
+      - *install_firefox_and_geckodriver
       - run:
           name: run integration tests
           command: |
             cd offender-management-integration-tests
-            bundle exec rspec spec --no-color --format documentation --format RspecJunitFormatter -o screenshots/rspec.xml
+            bundle exec rspec spec/integration --no-color --format documentation --format RspecJunitFormatter -o screenshots/rspec.xml
           environment:
             START_PAGE: https://allocation-manager-staging.apps.cloud-platform-live-0.k8s.integration.dsd.io
-      - store_test_results:
-          path: ./offender-management-integration-tests/screenshots
-      - store_artifacts:
-          path: ./offender-management-integration-tests/screenshots
+      - *store_test_artifacts
 
   deploy_production:
     <<: *deploy_container_config
@@ -292,6 +297,22 @@ jobs:
               -f ./deploy/production/shared-environment.yaml \
           environment:
             <<: *github_team_name_slug
+
+  test_production:
+    <<: *test_container_config
+    working_directory: ~/production
+    steps:
+      - checkout
+      - *restore_and_save_gem_cache
+      - *install_firefox_and_geckodriver
+      - run:
+          name: run smoke tests
+          command: |
+            cd offender-management-integration-tests
+            bundle exec rspec spec/smoke --no-color --format documentation --format RspecJunitFormatter -o screenshots/rspec.xml
+          environment:
+            START_PAGE: https://allocation-manager-production.apps.cloud-platform-live-0.k8s.integration.dsd.io
+      - *store_test_artifacts
 
 workflows:
   version: 2
@@ -338,6 +359,12 @@ workflows:
       - deploy_production:
           requires:
             - deploy_production_approval
+          filters:
+            branches:
+              only: master
+      - test_production:
+          requires:
+            - deploy_production
           filters:
             branches:
               only: master
