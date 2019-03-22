@@ -34,7 +34,7 @@ class ApplicationController < ActionController::Base
     return nil if sso_identity.blank?
 
     caseloads = sso_identity['caseloads']
-    caseloads.reject { |c| c == 'NWEB' }
+    caseloads.reject { |c| c.casecmp('NWEB') == 0 }
   end
 
 private

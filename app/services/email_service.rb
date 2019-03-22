@@ -8,7 +8,7 @@ class EmailService
       active: false
     ).last
     message = params[:message]
-    url = Rails.application.routes.url_helpers.my_caseload_url
+    url = Rails.application.routes.url_helpers.caseload_index_url
 
     if last_allocation.present?
       previous_pom = PrisonOffenderManagerService.
@@ -18,6 +18,7 @@ class EmailService
 
       PomMailer.deallocation_email(
         previous_pom_name: previous_pom.first_name.capitalize,
+        responsibility: current_responsibility(offender).downcase,
         previous_pom_email: previous_pom.emails.first,
         new_pom_name: pom.full_name,
         offender_name: offender.full_name,
@@ -31,6 +32,7 @@ class EmailService
 
     PomMailer.new_allocation_email(
       pom_name: pom.first_name.capitalize,
+      responsibility: current_responsibility(offender).downcase,
       pom_email: pom.emails.first,
       offender_name: offender.full_name,
       offender_no: offender.offender_no,
@@ -38,5 +40,11 @@ class EmailService
       url: url
                                    ).deliver_later
   end
-  # rubocop:enable Metrics/MethodLength
+# rubocop:enable Metrics/MethodLength
+
+private
+
+  def self.current_responsibility(offender)
+    ResponsibilityService.new.calculate_pom_responsibility(offender)
+  end
 end
