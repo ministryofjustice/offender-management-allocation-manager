@@ -6,7 +6,7 @@ RSpec.describe PomMailer, type: :mailer do
       {
         pom_name: "Jones, Ross",
         pom_email: "something@example.com",
-        responsibility: "Supporting",
+        responsibility: "supporting",
         offender_name: "Franks, Jason",
         offender_no: "AB1234S",
         message: "This is just a test",

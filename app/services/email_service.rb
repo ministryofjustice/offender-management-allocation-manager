@@ -18,7 +18,7 @@ class EmailService
 
       PomMailer.deallocation_email(
         previous_pom_name: previous_pom.first_name.capitalize,
-        responsibility: current_responsibility(offender),
+        responsibility: current_responsibility(offender).downcase,
         previous_pom_email: previous_pom.emails.first,
         new_pom_name: pom.full_name,
         offender_name: offender.full_name,
@@ -32,7 +32,7 @@ class EmailService
 
     PomMailer.new_allocation_email(
       pom_name: pom.first_name.capitalize,
-      responsibility: current_responsibility(offender),
+      responsibility: current_responsibility(offender).downcase,
       pom_email: pom.emails.first,
       offender_name: offender.full_name,
       offender_no: offender.offender_no,
