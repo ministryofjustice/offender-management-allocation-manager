@@ -6,7 +6,7 @@ describe CaseInformationService, vcr: { cassette_name: :caseinfo_service_spec } 
       nomis_offender_id: 'X1000XX',
       tier: 'A',
       case_allocation: 'NPS',
-      welsh_address: 'Yes',
+      omicable: 'Yes',
       prison: 'LEI'
     )
   }

@@ -10,8 +10,6 @@ Rails.application.routes.draw do
   get '/signout', to: 'sessions#destroy'
   get('/prisoners/:id' => 'prisoners#show', as: 'prisoners_show')
   get('/allocations/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocations#confirm', as: 'confirm_allocations')
-  get('/poms/my_caseload' => 'poms#my_caseload', as: 'my_caseload')
-  get('/poms/new_cases' => 'poms#new_cases', as: 'new_cases')
 
   get('/summary' => 'summary#index')
   get('/summary/allocated' => 'summary#allocated')
@@ -23,6 +21,7 @@ Rails.application.routes.draw do
   get('/prisons' => 'prisons#index')
   get('/prisons/update' => 'prisons#set_active')
 
+  resources :caseload, only: %i[ index new ], controller: 'caseload'
   resources :health, only: %i[ index ], controller: 'health'
   resources :status, only: %i[ index ], controller: 'status'
   resource :overrides,  only: %i[ new create ], path_names: { new: 'new/:nomis_offender_id/:nomis_staff_id'}

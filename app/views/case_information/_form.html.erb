@@ -2,7 +2,7 @@
 <%= form_tag(action, method: method, id: "case_info_form") do %>
     <%= hidden_field_tag("case_information[nomis_offender_id]", @prisoner.offender_no) %>
 
-    <div class="govuk-form-group <% if @case_info.errors[:welsh_address].present? %>govuk-form-group--error<% end %>">
+    <div class="govuk-form-group <% if @case_info.errors[:omicable].present? %>govuk-form-group--error<% end %>">
       <fieldset class="govuk-fieldset">
         <legend class="govuk-fieldset__legend--s govuk-!-margin-bottom-2">
           Was this prisoner's last known address in Wales?
@@ -11,20 +11,20 @@
           Only prisoners with a Welsh address will be allocated a responsible<br/> prison or probation POM.
         </p>
 
-        <% if @case_info.errors[:welsh_address].present? %>
+        <% if @case_info.errors[:omicable].present? %>
           <span class="govuk-error-message">
-            Last known address <%= @case_info.errors[:welsh_address].first %>
+            <%= @case_info.errors[:omicable].first %>
           </span>
         <% end %>
 
         <div class="govuk-radios">
           <div class="govuk-radios__item">
-            <%= radio_button_tag("case_information[welsh_address]", 'Yes', @case_info.welsh_address == 'Yes', class: "govuk-radios__input") %>
-            <%= label_tag "case_information[welsh_address]", 'Yes', class: "govuk-label govuk-radios__label" %>
+            <%= radio_button_tag("case_information[omicable]", 'Yes', @case_info.omicable == 'Yes', class: "govuk-radios__input") %>
+            <%= label_tag "case_information[omicable]", 'Yes', class: "govuk-label govuk-radios__label" %>
           </div>
           <div class="govuk-radios__item">
-            <%= radio_button_tag("case_information[welsh_address]", 'No', @case_info.welsh_address == 'No', class: "govuk-radios__input") %>
-            <%= label_tag "case_information[welsh_address]", "No", class: "govuk-label govuk-radios__label" %>
+            <%= radio_button_tag("case_information[omicable]", 'No', @case_info.omicable == 'No', class: "govuk-radios__input") %>
+            <%= label_tag "case_information[omicable]", "No", class: "govuk-label govuk-radios__label" %>
           </div>
         </div>
       </fieldset>
@@ -37,7 +37,7 @@
         </legend>
         <% if @case_info.errors[:case_allocation].present? %>
           <span class="govuk-error-message">
-            Case allocation <%= @case_info.errors[:case_allocation].first %>
+            <%= @case_info.errors[:case_allocation].first %>
           </span>
         <% end %>
 
@@ -62,7 +62,7 @@
 
       <% if @case_info.errors[:tier].present? %>
         <span class="govuk-error-message">
-          Tier <%= @case_info.errors[:tier].first %>
+          <%= @case_info.errors[:tier].first %>
         </span>
       <% end %>
 

@@ -5,7 +5,7 @@ feature "view POM's caseload" do
   let(:nomis_offender_id) { 'G4273GI' }
 
   before do
-    CaseInformation.create(nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPS', welsh_address: 'Yes', prison: 'LEI')
+    CaseInformation.create(nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPS', omicable: 'Yes', prison: 'LEI')
   end
 
   it 'displays all cases for a specific POM',  vcr: { cassette_name: :show_poms_caseload } do
@@ -15,8 +15,9 @@ feature "view POM's caseload" do
 
     click_button 'Complete allocation'
 
-    visit "/poms/my_caseload"
+    visit caseload_index_path
 
+    expect(page).to have_content("Showing 1 - 1 of 1 results")
     expect(page).to have_content("Your caseload")
     expect(page).to have_content("Abbella, Ozullirn")
   end
@@ -27,16 +28,16 @@ feature "view POM's caseload" do
     visit confirm_allocations_path(nomis_offender_id, nomis_staff_id)
     click_button 'Complete allocation'
 
-    visit "/poms/my_caseload"
+    visit caseload_index_path
     click_link('1')
 
     expect(page).to have_content("New cases")
     expect(page).to have_content("Abbella, Ozullirn")
   end
 
-  it 'allows staff without the POM role to view the my casload page', vcr: { cassette_name: :non_pom_my_caseload }  do
+  it 'allows staff without the POM role to view the my caseload page', vcr: { cassette_name: :non_pom_caseload }  do
     signin_user('NON_POM_GEN')
-    visit "/poms/my_caseload"
+    visit caseload_index_path
     expect(page).to have_text("No allocated cases")
   end
 end

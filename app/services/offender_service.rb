@@ -7,7 +7,7 @@ class OffenderService
       if record.present?
         o.tier = record.tier
         o.case_allocation = record.case_allocation
-        o.welsh_address = record.welsh_address
+        o.omicable = record.omicable
       end
 
       sentence_detail = get_sentence_details([offender_no])
@@ -40,19 +40,22 @@ class OffenderService
                        end
 
     offenders.select { |offender|
+      # If the offender is explicitly on remand, then exclude them.  Until this Elite2
+      # change is in production, we can't constrain this to just processing "Convicted"
+      # records.
+      next false if offender.convicted_status == 'Remand'
+
       offender.release_date = sentence_details[offender.offender_no].release_date
-      if offender.release_date.present?
-        record = mapped_tiers[offender.offender_no]
-        if record
-          offender.tier = record.tier
-          offender.case_allocation = record.case_allocation
-          offender.welsh_address = record.welsh_address
-        end
-        offender.sentence_date = sentence_details[offender.offender_no].sentence_date
-        true
-      else
-        false
+      next false if offender.release_date.blank?
+
+      record = mapped_tiers[offender.offender_no]
+      if record
+        offender.tier = record.tier
+        offender.case_allocation = record.case_allocation
+        offender.omicable = record.omicable
       end
+      offender.sentence_date = sentence_details[offender.offender_no].sentence_date
+      true
     }
   end
   # rubocop:enable Metrics/MethodLength

@@ -32,7 +32,7 @@ module Nomis
       attribute :sentence_date, :date
       attribute :tier, :string
       attribute :case_allocation, :string
-      attribute :welsh_address, :boolean
+      attribute :omicable, :boolean
       attribute :allocated_pom_name, :string
 
       def case_owner

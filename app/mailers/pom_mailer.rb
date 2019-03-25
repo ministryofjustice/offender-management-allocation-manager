@@ -6,6 +6,7 @@ class PomMailer < GovukNotifyRails::Mailer
     set_personalisation(
       email_subject: 'New OMIC allocation',
       pom_name: params[:pom_name],
+      responsibility: params[:responsibility],
       offender_name: params[:offender_name],
       nomis_offender_id: params[:offender_no],
       message: message || '',
@@ -21,6 +22,7 @@ class PomMailer < GovukNotifyRails::Mailer
     set_personalisation(
       email_subject: 'OMIC case reallocation',
       previous_pom_name: params[:previous_pom_name],
+      responsibility: params[:responsibility],
       new_pom_name: params[:new_pom_name],
       offender_name: params[:offender_name],
       nomis_offender_id: params[:offender_no],

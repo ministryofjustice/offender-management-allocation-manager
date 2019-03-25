@@ -10,8 +10,8 @@ module OmniAuth
       info do
         {
           username: user_details.username,
-          active_caseload: user_details.active_nomis_caseload,
-          caseloads: user_details.nomis_caseloads.keys,
+          active_caseload: active_caseload.upcase,
+          caseloads: user_details.nomis_caseloads.keys.map(&:upcase),
           roles: decode_roles
         }
       end
@@ -55,6 +55,13 @@ module OmniAuth
         )
 
         decoded_token.first.fetch('authorities', [])
+      end
+
+      def active_caseload
+        caseload = user_details.active_nomis_caseload
+        return caseload if caseload.present?
+
+        user_details.nomis_caseloads.keys.first
       end
 
       def user_details

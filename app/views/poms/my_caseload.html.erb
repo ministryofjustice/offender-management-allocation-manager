@@ -10,7 +10,7 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-one-quarter">
     <div class="govuk-body">New cases</div>
-    <div class="govuk-body govuk-!-font-weight-bold"><%= link_to "#{@new_cases.count}", new_cases_path(@pom.staff_id), class:"govuk-link"%></a></div>
+    <div class="govuk-body govuk-!-font-weight-bold"><%= link_to "#{@new_cases.count}", new_caseload_path, class:"govuk-link"%></a></div>
   </div>
   <div class="govuk-grid-column-one-quarter">
     <div class="govuk-body">Working pattern</div>
@@ -25,15 +25,11 @@
 <table class="govuk-table responsive tablesorter">
   <thead class="govuk-table__head">
   <tr class="govuk-table__row">
-    <th class="govuk-table__header" scope="col"><a
-      class='table-sorter__link' href='#'>Prisoner name</a></th>
+    <th class="govuk-table__header" scope="col">Prisoner name</th>
     <th class="govuk-table__header" scope="col">Prisoner number</th>
-    <th class="govuk-table__header" scope="col">
-      <a class="table-sorter__link" href="#">Release/parole<br/>eligibility</a></th>
-    <th class="govuk-table__header" scope="col">
-      <a class="table-sorter__link" href="#">Allocation<br/>date</a></th>
-    <th class="govuk-table__header" scope="col">
-      <a class="table-sorter__link" href="#">Role</a></th>
+    <th class="govuk-table__header" scope="col">Release/parole<br/>eligibility</th>
+    <th class="govuk-table__header" scope="col">Allocation<br/>date</th>
+    <th class="govuk-table__header" scope="col">Role</th>
   </tr>
   </thead>
   <tbody class="govuk-table__body">
@@ -48,4 +44,14 @@
   <% end %>
   </tbody>
 </table>
+
+<%= render(
+          :partial => 'shared/pagination',
+          :locals => {
+              :page_data => @page_meta,
+              :param_name => 'page',
+          }) %>
+
+</div>
+
 <% end %>
