@@ -18,7 +18,7 @@ class Override < ApplicationRecord
 
   validates :suitability_detail,
     presence: { message:
-                    'Please provide extra detail when suitability is selected'
+                    'Enter reason for allocating this POM'
     },
     if: proc { |o|
       o.override_reasons.present? && o.override_reasons.include?('suitability')
