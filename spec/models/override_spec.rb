@@ -30,7 +30,7 @@ RSpec.describe Override, type: :model do
     o = described_class.create(nomis_offender_id: 'A', nomis_staff_id: 1, override_reasons: ['suitability'])
     expect(o.valid?).to be false
     expect(o.errors[:suitability_detail].count).to eq(1)
-    expect(o.errors[:suitability_detail].first).to eq('Please provide extra detail when suitability is selected')
+    expect(o.errors[:suitability_detail].first).to eq('Enter reason for allocating this POM')
   }
 
   it {

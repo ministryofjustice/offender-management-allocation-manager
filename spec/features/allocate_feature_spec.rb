@@ -109,7 +109,7 @@ feature 'Allocation' do
 
     check('override-conditional-1')
     click_button('Continue')
-    expect(page).to have_content('Please provide extra detail when suitability is selected')
+    expect(page).to have_content('Enter reason for allocating this POM')
     expect(Override.count).to eq(0)
   end
 
