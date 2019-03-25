@@ -23,8 +23,8 @@ module ApplicationHelper
 
   def pom_level(level)
     {
-      'PO' => 'Prison POM',
-      'PRO' => 'Probation POM'
+      'PO' => 'Probation POM',
+      'PRO' => 'Prison POM'
     }[level]
   end
 
