@@ -13,6 +13,11 @@ class OffenderService
       sentence_detail = get_sentence_details([offender_no])
       o.release_date = sentence_detail[offender_no].release_date
       o.sentence_date = sentence_detail[offender_no].sentence_date
+      o.parole_eligibility_date =
+        sentence_detail[offender_no].parole_eligibility_date
+      o.has_indeterminate_release_date =
+        sentence_detail[offender_no].indeterminate_release_date?
+
       o.main_offence = Nomis::Elite2::OffenderApi.get_offence(o.latest_booking_id)
     }
   end
@@ -45,16 +50,20 @@ class OffenderService
       # records.
       next false if offender.convicted_status == 'Remand'
 
-      offender.release_date = sentence_details[offender.offender_no].release_date
-      next false if offender.release_date.blank?
-
       record = mapped_tiers[offender.offender_no]
       if record
         offender.tier = record.tier
         offender.case_allocation = record.case_allocation
         offender.omicable = record.omicable
       end
+
+      offender.release_date = sentence_details[offender.offender_no].release_date
       offender.sentence_date = sentence_details[offender.offender_no].sentence_date
+      offender.parole_eligibility_date =
+        sentence_details[offender.offender_no].parole_eligibility_date
+      offender.has_indeterminate_release_date =
+        sentence_details[offender.offender_no].indeterminate_release_date?
+
       true
     }
   end
