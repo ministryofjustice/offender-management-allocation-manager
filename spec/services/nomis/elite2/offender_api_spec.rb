@@ -23,16 +23,16 @@ describe Nomis::Elite2::OffenderApi do
   describe 'Bulk operations' do
     it 'can get bulk sentence details',
       vcr: { cassette_name: :offender_api_bulk_sentence_details } do
-      noms_ids = ['G2911GD']
+      booking_ids = [1_153_753]
 
-      response = described_class.get_bulk_sentence_details(noms_ids)
+      response = described_class.get_bulk_sentence_details(booking_ids)
 
       expect(response).to be_instance_of(Hash)
 
       records = response.values
       expect(records.first).to be_instance_of(Nomis::Models::SentenceDetail)
-      expect(records.first.release_date).to eq('2019-05-17')
-      expect(records.first.full_name).to eq('Ahmonis, Imanjah')
+      expect(records.first.release_date).to eq('2020-02-07')
+      expect(records.first.full_name).to eq('Abbella, Ozullirn')
     end
   end
 

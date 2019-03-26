@@ -10,7 +10,7 @@ class OffenderService
         o.omicable = record.omicable
       end
 
-      sentence_detail = get_sentence_details([offender_no])
+      sentence_detail = get_sentence_details([o.latest_booking_id])
       o.release_date = sentence_detail[offender_no].release_date
       o.sentence_date = sentence_detail[offender_no].sentence_date
       o.parole_eligibility_date =
@@ -32,13 +32,13 @@ class OffenderService
       page_size: page_size
     ).data
 
-    offender_ids = offenders.map(&:offender_no)
+    booking_ids = offenders.map(&:booking_id)
 
     mapped_tiers = tier_map || CaseInformationService.get_case_information(prison)
 
-    sentence_details = if offender_ids.count > 0
+    sentence_details = if booking_ids.count > 0
                          sentence_details = Nomis::Elite2::OffenderApi.get_bulk_sentence_details(
-                           offender_ids
+                           booking_ids
                          )
                        else
                          {}
@@ -70,8 +70,8 @@ class OffenderService
   # rubocop:enable Metrics/MethodLength
   # rubocop:enable Metrics/LineLength
 
-  def self.get_sentence_details(offender_id_list)
-    Nomis::Elite2::OffenderApi.get_bulk_sentence_details(offender_id_list)
+  def self.get_sentence_details(booking_ids)
+    Nomis::Elite2::OffenderApi.get_bulk_sentence_details(booking_ids)
   end
 
   def self.allocations_for_offenders(offender_id_list)
