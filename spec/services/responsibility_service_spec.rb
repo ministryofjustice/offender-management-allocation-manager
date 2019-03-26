@@ -127,7 +127,7 @@ describe ResponsibilityService do
       scenario 'is supporting' do
         resp = subject.calculate_pom_responsibility(offender_no_release_date)
 
-        expect(resp).to eq 'Unknown'
+        expect(resp).to eq 'Responsible'
       end
     end
 
