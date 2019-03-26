@@ -21,11 +21,24 @@
               <%= hidden_field_tag("override[nomis_offender_id]", @prisoner.offender_no) %>
               <%= hidden_field_tag("override[nomis_staff_id]", @pom.staff_id) %>
               <div class="govuk-checkboxes__item">
-                <%= check_box_tag("override[override_reasons][]", "complex",  override_reason_contains(@override, 'complex'), id: "override-1", class: "govuk-checkboxes__input") %>
-                <%= label_tag "override[override_reasons][]", complex_reason_label(@prisoner), class: 'govuk-label govuk-checkboxes__label' %>
+                <input class="govuk-checkboxes__input" id="override-conditional-1" name="override[override_reasons][]" type="checkbox" value="suitability" data-aria-controls="override-1"
+                       <%= 'checked=checked' if override_reason_contains(@override, 'suitability') %> >
+                <label class="govuk-label govuk-checkboxes__label"
+                       for="override-conditional-1"><%= complex_reason_label(@prisoner) %></label>
+              </div>
+              <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="override-1">
+                <% if @override.errors[:suitability_detail].present? %>
+                  <span class="govuk-error-message">
+                    <%= @override.errors[:suitability_detail].first %>
+                  </span>
+                <% end %>
+                <div class="govuk-form-group <% if @override.errors[:suitability_detail].present? %>govuk-form-group--error<% end %>">
+                  <label class="govuk-label" for="provide-detail">Enter your reason for this decision</label>
+                  <textarea class="govuk-textarea" id="suitability-detail" name="override[suitability_detail]" rows="3" aria-describedby="suitability-detail-hint suitability-detail-error"></textarea>
+                </div>
               </div>
               <div class="govuk-checkboxes__item">
-                <%= check_box_tag("override[override_reasons][]", "no-staff", override_reason_contains(@override, 'no-staff'), id: "override-2", class: "govuk-checkboxes__input") %>
+                <%= check_box_tag("override[override_reasons][]", "no_staff", override_reason_contains(@override, 'no_staff'), id: "override-2", class: "govuk-checkboxes__input") %>
                 <%= label_tag "override[override_reasons][]", "No available #{@prisoner.case_owner.downcase} officer POMs", class: 'govuk-label govuk-checkboxes__label' %>
               </div>
               <div class="govuk-checkboxes__item">
@@ -40,10 +53,14 @@
               </div>
 
               <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="override-4">
-                <div class="govuk-form-group <% if @override.errors[:more_detail].present? %>govuk-form-group--error<% end %>">
+                <% if @override.errors[:more_detail].present? %>
+                  <span class="govuk-error-message">
+                    <%= @override.errors[:more_detail].first %>
+                  </span>
+                <% end %>
                   <label class="govuk-label" for="provide-detail">Please provide detail
                     here</label>
-                  <textarea class="govuk-textarea" id="more-detail" name="override[more_detail]" rows="3" aria-describedby="more-detail-hint"></textarea>
+                  <textarea class="govuk-textarea" id="more-detail" name="override[more_detail]" rows="3" aria-describedby="more-detail-hint more-detail-error"></textarea>
                 </div>
               </div>
             </div>

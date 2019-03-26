@@ -24,7 +24,7 @@ class Bucket
   end
 
   def valid_sort_fields
-    [:last_name, :sentence_date, :release_date]
+    [:last_name]
   end
 
   def take(count, from)

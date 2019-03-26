@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_20_130118) do
+ActiveRecord::Schema.define(version: 2019_03_22_094954) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -29,6 +29,7 @@ ActiveRecord::Schema.define(version: 2019_03_20_130118) do
     t.integer "nomis_staff_id"
     t.integer "nomis_booking_id"
     t.text "message"
+    t.string "suitability_detail"
     t.index ["nomis_offender_id"], name: "index_allocations_on_nomis_offender_id"
     t.index ["nomis_staff_id"], name: "index_allocations_on_nomis_staff_id"
   end
@@ -47,6 +48,7 @@ ActiveRecord::Schema.define(version: 2019_03_20_130118) do
     t.string "nomis_offender_id"
     t.string "override_reasons"
     t.string "more_detail"
+    t.string "suitability_detail"
   end
 
   create_table "pom_details", force: :cascade do |t|

@@ -10,9 +10,14 @@ class OffenderService
         o.omicable = record.omicable
       end
 
-      sentence_detail = get_sentence_details([offender_no])
+      sentence_detail = get_sentence_details([o.latest_booking_id])
       o.release_date = sentence_detail[offender_no].release_date
       o.sentence_date = sentence_detail[offender_no].sentence_date
+      o.parole_eligibility_date =
+        sentence_detail[offender_no].parole_eligibility_date
+      o.has_indeterminate_release_date =
+        sentence_detail[offender_no].indeterminate_release_date?
+
       o.main_offence = Nomis::Elite2::OffenderApi.get_offence(o.latest_booking_id)
     }
   end
@@ -27,13 +32,13 @@ class OffenderService
       page_size: page_size
     ).data
 
-    offender_ids = offenders.map(&:offender_no)
+    booking_ids = offenders.map(&:booking_id)
 
     mapped_tiers = tier_map || CaseInformationService.get_case_information(prison)
 
-    sentence_details = if offender_ids.count > 0
+    sentence_details = if booking_ids.count > 0
                          sentence_details = Nomis::Elite2::OffenderApi.get_bulk_sentence_details(
-                           offender_ids
+                           booking_ids
                          )
                        else
                          {}
@@ -45,24 +50,28 @@ class OffenderService
       # records.
       next false if offender.convicted_status == 'Remand'
 
-      offender.release_date = sentence_details[offender.offender_no].release_date
-      next false if offender.release_date.blank?
-
       record = mapped_tiers[offender.offender_no]
       if record
         offender.tier = record.tier
         offender.case_allocation = record.case_allocation
         offender.omicable = record.omicable
       end
+
+      offender.release_date = sentence_details[offender.offender_no].release_date
       offender.sentence_date = sentence_details[offender.offender_no].sentence_date
+      offender.parole_eligibility_date =
+        sentence_details[offender.offender_no].parole_eligibility_date
+      offender.has_indeterminate_release_date =
+        sentence_details[offender.offender_no].indeterminate_release_date?
+
       true
     }
   end
   # rubocop:enable Metrics/MethodLength
   # rubocop:enable Metrics/LineLength
 
-  def self.get_sentence_details(offender_id_list)
-    Nomis::Elite2::OffenderApi.get_bulk_sentence_details(offender_id_list)
+  def self.get_sentence_details(booking_ids)
+    Nomis::Elite2::OffenderApi.get_bulk_sentence_details(booking_ids)
   end
 
   def self.allocations_for_offenders(offender_id_list)

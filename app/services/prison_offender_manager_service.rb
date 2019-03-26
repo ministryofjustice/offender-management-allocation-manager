@@ -48,7 +48,7 @@ class PrisonOffenderManagerService
       allocation_list = allocation_list.offset(offset).limit(limit)
     end
 
-    offender_ids = allocation_list.map(&:nomis_offender_id)
+    booking_ids = allocation_list.map(&:nomis_booking_id)
 
     allocation_list_with_responsibility = allocation_list.map { |alloc|
       offender = OffenderService.get_offender(alloc.nomis_offender_id)
@@ -57,7 +57,7 @@ class PrisonOffenderManagerService
       alloc
     }
 
-    offender_map = OffenderService.get_sentence_details(offender_ids)
+    offender_map = OffenderService.get_sentence_details(booking_ids)
 
     allocations_and_offender = []
     allocation_list_with_responsibility.each do |alloc|

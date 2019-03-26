@@ -96,6 +96,23 @@ feature 'Allocation' do
     expect(Override.count).to eq(0)
   end
 
+  scenario 'overriding an allocation can validate missing suitabilitydetail', vcr: { cassette_name: :override_suitability_allocation_feature } do
+    signin_user
+
+    visit new_allocations_path(nomis_offender_id)
+
+    within('.not_recommended_pom_row_0') do
+      click_link 'Allocate'
+    end
+
+    expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
+
+    check('override-conditional-1')
+    click_button('Continue')
+    expect(page).to have_content('Enter reason for allocating this POM')
+    expect(Override.count).to eq(0)
+  end
+
   scenario 're-allocating', vcr: { cassette_name: :re_allocate_feature } do
     probation_officer_pom_detail.allocations.create!(
       nomis_offender_id: nomis_offender_id,
