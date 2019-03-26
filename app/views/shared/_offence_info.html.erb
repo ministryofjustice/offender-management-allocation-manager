@@ -10,7 +10,9 @@
   </tr>
   <tr class="govuk-table__row">
       <td class="govuk-table__cell">Release parole/eligibility</td>
-      <td class="govuk-table__cell table_cell__left_align"><%= format_date(@prisoner.release_date) %></td>
+      <td class="govuk-table__cell table_cell__left_align">
+        <%= parole_or_release_date(@prisoner) %>
+      </td>
     </tr>
   </tbody>
 </table>

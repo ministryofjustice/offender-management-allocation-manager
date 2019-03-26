@@ -34,6 +34,8 @@ module Nomis
       attribute :case_allocation, :string
       attribute :omicable, :boolean
       attribute :allocated_pom_name, :string
+      attribute :parole_eligibility_date, :date
+      attribute :has_indeterminate_release_date
 
       def case_owner
         @case_owner ||= ResponsibilityService.new.calculate_case_owner(self)
