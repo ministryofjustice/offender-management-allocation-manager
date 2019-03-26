@@ -49,16 +49,16 @@ module Nomis
       end
 
       # rubocop:disable Metrics/MethodLength
-      def self.get_bulk_sentence_details(offender_ids)
-        return {} if offender_ids.empty?
+      def self.get_bulk_sentence_details(booking_ids)
+        return {} if booking_ids.empty?
 
-        route = '/elite2api/api/offender-sentences'
+        route = '/elite2api/api/offender-sentences/bookings'
 
-        h = Digest::SHA256.hexdigest(offender_ids.to_s)
+        h = Digest::SHA256.hexdigest(booking_ids.to_s)
         key = "bulk_sentence_#{h}"
 
         data = Rails.cache.fetch(key, expires_in: 10.minutes) {
-          e2_client.post(route, offender_ids)
+          e2_client.post(route, booking_ids)
         }
 
         data.each_with_object({}) { |record, hash|

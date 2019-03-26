@@ -22,6 +22,18 @@ module Nomis
         sentence_detail['release_date']
       end
 
+      def tariff_date
+        sentence_detail['tariff_date']
+      end
+
+      def parole_eligibility_date
+        sentence_detail['parole_eligibility_date']
+      end
+
+      def indeterminate_release_date?
+        release_date.nil? && tariff_date.present?
+      end
+
       def full_name
         "#{last_name}, #{first_name}".titleize
       end

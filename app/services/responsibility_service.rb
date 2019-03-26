@@ -23,7 +23,7 @@ class ResponsibilityService
   end
 
   def calculate_pom_responsibility(offender)
-    return UNKNOWN if offender.release_date.nil?
+    return RESPONSIBLE if offender.release_date.nil?
     return SUPPORTING unless omicable?(offender)
 
     return RESPONSIBLE if nps_case?(offender) &&

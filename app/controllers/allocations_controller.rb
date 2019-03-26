@@ -44,6 +44,7 @@ class AllocationsController < ApplicationController
       allocated_at_tier: offender.tier,
       prison: active_caseload,
       override_reasons: override_reasons,
+      suitability_detail: suitability_detail,
       override_detail: override_detail,
       message: allocation_params[:message]
     }
@@ -106,5 +107,9 @@ private
 
   def override_detail
     @override[:more_detail] if @override.present?
+  end
+
+  def suitability_detail
+    @override[:suitability_detail] if @override.present?
   end
 end

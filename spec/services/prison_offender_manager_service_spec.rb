@@ -6,9 +6,9 @@ describe PrisonOffenderManagerService do
   let(:allocation_one) {
     AllocationService.create_allocation(
       nomis_staff_id: staff_id,
-      nomis_offender_id: 'G2911GD',
+      nomis_offender_id: 'G4273GI',
       created_by: 'Test User',
-      nomis_booking_id: 0,
+      nomis_booking_id: 1_153_753,
       allocated_at_tier: 'A',
       prison: 'LEI'
     )

@@ -30,11 +30,17 @@ module Nomis
       attribute :case_allocation, :string
       attribute :omicable, :boolean
       attribute :convicted_status, :string
+      attribute :parole_eligibility_date, :date
+      attribute :has_indeterminate_release_date
 
       def awaiting_allocation_for
-        return 0 if sentence_date.blank?
+        omic_start_date = Date.new(2019, 2, 4)
 
-        (Time.zone.today - sentence_date).to_i
+        if sentence_date.nil? || sentence_date < omic_start_date
+          (Time.zone.today - omic_start_date).to_i
+        else
+          (Time.zone.today - sentence_date).to_i
+        end
       end
 
       def full_name
