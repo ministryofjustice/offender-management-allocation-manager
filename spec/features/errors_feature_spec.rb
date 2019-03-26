@@ -10,7 +10,7 @@ feature 'Errors' do
   it "handles unauthorized access", vcr: { cassette_name: :errors_feature } do
     visit "/401"
     expect(page).to have_http_status(:unauthorized)
-    expect(page).to have_content('You do not have permission to access this page')
+    expect(page).to have_content('This service is currently available in only a few prisons')
   end
 
   it "handles errors", vcr: { cassette_name: :errors_feature } do
