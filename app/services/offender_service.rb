@@ -48,7 +48,7 @@ class OffenderService
       # If the offender is explicitly on remand, then exclude them.  Until this Elite2
       # change is in production, we can't constrain this to just processing "Convicted"
       # records.
-      next false if offender.convicted_status == 'Remand'
+      next false unless offender.convicted_status == 'Convicted'
 
       record = mapped_tiers[offender.offender_no]
       if record
