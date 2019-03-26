@@ -42,6 +42,7 @@ class AllocationService
       nomis_offender_id: params[:nomis_offender_id]
     ).tap { |o|
       o.override_reasons = params[:override_reasons]
+      o.suitability_detail = params[:suitability_detail]
       o.more_detail = params[:more_detail]
       o.save
     }
