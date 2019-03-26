@@ -2,8 +2,8 @@ class SummaryController < ApplicationController
   before_action :authenticate_user
 
   breadcrumb 'See allocations', :summary_allocated_path, only: [:index, :allocated]
-  breadcrumb 'Make allocations', :summary_allocated_path, only: [:unallocated]
-  breadcrumb 'Update information', :summary_allocated_path, only: [:pending]
+  breadcrumb 'Make allocations', :summary_unallocated_path, only: [:unallocated]
+  breadcrumb 'Update information', :summary_pending_path, only: [:pending]
 
   def index
     redirect_to summary_allocated_path
