@@ -55,19 +55,4 @@ module ApplicationHelper
       'Prison' => 'Custody'
     }[offender_responsibility]
   end
-
-  def parole_or_release_date(offender)
-    # FIXME: This should say Indeterminate for indeterminate
-    # release dates, but we depend on imprisonmentStatus
-    # which we need adding to the multi-offender endpoint.
-    if offender.has_indeterminate_release_date
-      return ''
-    end
-
-    if offender.parole_eligibility_date.present?
-      return format_date(offender.parole_eligibility_date)
-    end
-
-    format_date(offender.release_date)
-  end
 end
