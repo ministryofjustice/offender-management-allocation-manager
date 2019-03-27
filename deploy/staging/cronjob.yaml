@@ -17,6 +17,29 @@ spec:
             image: 926803513772.dkr.ecr.eu-west-1.amazonaws.com/offender-management/offender-management-allocation-manager:latest
             imagePullPolicy: Always
             command: ['sh', '-c', "bundle exec rake integration_tests:clean_up"]
+            env:
+              - name: RAILS_ENV
+                value: 'production'
+              - name: POSTGRES_HOST
+                valueFrom:
+                  secretKeyRef:
+                    name: allocation-rds-instance-output
+                    key: rds_instance_address
+              - name: POSTGRES_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: allocation-rds-instance-output
+                    key: postgres_password
+              - name: POSTGRES_NAME
+                valueFrom:
+                  secretKeyRef:
+                    name: allocation-rds-instance-output
+                    key: postgres_name
+              - name: POSTGRES_USER
+                valueFrom:
+                  secretKeyRef:
+                    name: allocation-rds-instance-output
+                    key: postgres_user
           restartPolicy: OnFailure
 ---
 apiVersion: batch/v1beta1
@@ -38,4 +61,32 @@ spec:
             image: 926803513772.dkr.ecr.eu-west-1.amazonaws.com/offender-management/offender-management-allocation-manager:latest
             imagePullPolicy: Always
             command: ['sh', '-c', "bundle exec rake movements:process"]
+            envFrom:
+              - configMapRef:
+                  name: shared-environment
+              - secretRef:
+                  name: allocation-manager-secrets
+            env:
+              - name: PROMETHEUS_METRICS
+                value: "off"
+              - name: POSTGRES_HOST
+                valueFrom:
+                  secretKeyRef:
+                    name: allocation-rds-instance-output
+                    key: rds_instance_address
+              - name: POSTGRES_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: allocation-rds-instance-output
+                    key: postgres_password
+              - name: POSTGRES_NAME
+                valueFrom:
+                  secretKeyRef:
+                    name: allocation-rds-instance-output
+                    key: postgres_name
+              - name: POSTGRES_USER
+                valueFrom:
+                  secretKeyRef:
+                    name: allocation-rds-instance-output
+                    key: postgres_user
           restartPolicy: OnFailure
