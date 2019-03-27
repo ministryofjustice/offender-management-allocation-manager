@@ -9,8 +9,8 @@ module ApplicationHelper
     uri.to_s
   end
 
-  def format_date(date_obj)
-    return '' if date_obj.nil?
+  def format_date(date_obj, replacement: '')
+    return replacement if date_obj.nil?
 
     date_obj.strftime('%d/%m/%Y')
   end
