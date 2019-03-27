@@ -73,7 +73,7 @@ describe ResponsibilityService do
     Nomis::Models::Offender.new.tap { |o|
       o.omicable = true
       o.case_allocation = 'NPS'
-      o.sentence_date = DateTime.new(2019, 1, 19).utc
+      o.sentence_start_date = DateTime.new(2019, 1, 19).utc
       o.release_date = DateTime.now.utc.to_date + 16.months
     }
   }
@@ -82,7 +82,7 @@ describe ResponsibilityService do
     Nomis::Models::Offender.new.tap { |o|
       o.omicable = true
       o.case_allocation = 'NPS'
-      o.sentence_date = DateTime.new(2019, 2, 20).utc
+      o.sentence_start_date = DateTime.new(2019, 2, 20).utc
       o.release_date = DateTime.now.utc.to_date + 9.months
     }
   }
@@ -91,7 +91,7 @@ describe ResponsibilityService do
     Nomis::Models::Offender.new.tap { |o|
       o.omicable = true
       o.case_allocation = 'NPS'
-      o.sentence_date = DateTime.new(2019, 1, 19).utc
+      o.sentence_start_date = DateTime.new(2019, 1, 19).utc
       o.release_date = DateTime.now.utc.to_date + 16.months
     }
   }
@@ -100,7 +100,7 @@ describe ResponsibilityService do
     Nomis::Models::Offender.new.tap { |o|
       o.omicable = true
       o.case_allocation = 'NPS'
-      o.sentence_date = DateTime.new(2019, 2, 20).utc
+      o.sentence_start_date = DateTime.new(2019, 2, 20).utc
       o.release_date = DateTime.now.utc.to_date + 9.months
     }
   }

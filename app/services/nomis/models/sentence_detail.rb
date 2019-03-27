@@ -14,7 +14,7 @@ module Nomis
       attribute :facial_image_id
       attribute :internal_location_desc
 
-      def sentence_date
+      def sentence_start_date
         sentence_detail['sentence_start_date']
       end
 

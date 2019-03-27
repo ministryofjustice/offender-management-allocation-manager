@@ -33,14 +33,14 @@ module Nomis
       attribute :omicable, :boolean
       attribute :allocated_pom_name, :string
       attribute :release_date, :date
-      attribute :sentence_date, :date
+      attribute :sentence_start_date, :date
       attribute :parole_eligibility_date, :date
       attribute :home_detention_curfew_eligibility_date, :date
       attribute :tariff_date, :date
 
       def sentence_detail=(sentence_detail)
         self.release_date = sentence_detail.release_date
-        self.sentence_date = sentence_detail.sentence_date
+        self.sentence_start_date = sentence_detail.sentence_start_date
         self.parole_eligibility_date = sentence_detail.parole_eligibility_date
         self.tariff_date = sentence_detail.tariff_date
         self.home_detention_curfew_eligibility_date =

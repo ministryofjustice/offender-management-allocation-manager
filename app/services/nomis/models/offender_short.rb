@@ -28,7 +28,7 @@ module Nomis
       attribute :case_allocation, :string
       attribute :omicable, :boolean
       attribute :convicted_status, :string
-      attribute :sentence_date, :date
+      attribute :sentence_start_date, :date
       attribute :release_date, :date
       attribute :parole_eligibility_date, :date
       attribute :home_detention_curfew_eligibility_date, :date
@@ -51,7 +51,7 @@ module Nomis
 
       def sentence_detail=(sentence_detail)
         self.release_date = sentence_detail.release_date
-        self.sentence_date = sentence_detail.sentence_date
+        self.sentence_start_date = sentence_detail.sentence_start_date
         self.parole_eligibility_date = sentence_detail.parole_eligibility_date
         self.tariff_date = sentence_detail.tariff_date
         self.home_detention_curfew_eligibility_date =
@@ -73,10 +73,10 @@ module Nomis
       def awaiting_allocation_for
         omic_start_date = Date.new(2019, 2, 4)
 
-        if sentence_date.nil? || sentence_date < omic_start_date
+        if sentence_start_date.nil? || sentence_start_date < omic_start_date
           (Time.zone.today - omic_start_date).to_i
         else
-          (Time.zone.today - sentence_date).to_i
+          (Time.zone.today - sentence_start_date).to_i
         end
       end
 

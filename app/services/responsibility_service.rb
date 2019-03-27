@@ -72,7 +72,7 @@ private
   end
 
   def new_case?(offender)
-    @new_case ||= offender.sentence_date > DateTime.new(2019, 2, 4).utc
+    @new_case ||= offender.sentence_start_date > DateTime.new(2019, 2, 4).utc
   end
 
   def nps_calculation(offender)
