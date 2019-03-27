@@ -324,6 +324,7 @@ jobs:
               -f ./deploy/production/service.yaml \
               -f ./deploy/production/service-monitor.yaml \
               -f ./deploy/production/network-policy.yaml \
+              -f ./deploy/production/certificate.yaml \
               -f ./deploy/production/allocation-manager-secrets.yaml \
               -f ./deploy/production/shared-environment.yaml \
               -f ./deploy/production/dashboard.yaml \
