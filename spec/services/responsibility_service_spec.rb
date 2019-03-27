@@ -113,7 +113,7 @@ describe ResponsibilityService do
 
     it "NPS allocations with no release date" do
       resp = subject.calculate_case_owner(offender_nps_no_release_date)
-      expect(resp).to eq 'No release date'
+      expect(resp).to eq 'Custody'
     end
 
     it "No allocation" do

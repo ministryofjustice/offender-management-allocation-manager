@@ -51,7 +51,6 @@ module ApplicationHelper
 
   def responsibility_label(offender_responsibility)
     {
-      'No release date' => 'Custody',
       'Probation' => 'Community',
       'Prison' => 'Custody'
     }[offender_responsibility]
