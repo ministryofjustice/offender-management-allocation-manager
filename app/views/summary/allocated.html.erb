@@ -24,7 +24,7 @@
         <td aria-label="Prisoner name" class="govuk-table__cell"><%= offender.full_name %></td>
         <td aria-label="Prisoner number" class="govuk-table__cell"><%= offender.offender_no %></td>
         <td aria-label="Release date" class="govuk-table__cell">
-          <%= format_date(offender.earliest_sentence_date) %>
+          <%= format_date(offender.earliest_release_date) %>
         </td>
         <td aria-label="POM" class="govuk-table__cell"><%= offender.allocated_pom_name %></td>
         <td aria-label="Allocation date" class="govuk-table__cell"><%= format_date(offender.allocation_date) %></td>

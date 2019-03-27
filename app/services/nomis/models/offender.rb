@@ -47,7 +47,7 @@ module Nomis
           sentence_detail.home_detention_curfew_eligibility_date
       end
 
-      def earliest_sentence_date
+      def earliest_release_date
         dates = [
           release_date,
           parole_eligibility_date,
