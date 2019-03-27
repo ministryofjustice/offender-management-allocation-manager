@@ -30,8 +30,8 @@ module Nomis
         sentence_detail['parole_eligibility_date']
       end
 
-      def indeterminate_release_date?
-        release_date.nil? && tariff_date.present?
+      def home_detention_curfew_eligibility_date
+        sentence_detail['home_detention_curfew_eligibility_date']
       end
 
       def full_name

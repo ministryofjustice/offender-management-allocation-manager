@@ -28,14 +28,36 @@ module Nomis
       attribute :reception_date, :date
       attribute :marital_status, :string
       attribute :main_offence, :string
-      attribute :release_date, :date
-      attribute :sentence_date, :date
       attribute :tier, :string
       attribute :case_allocation, :string
       attribute :omicable, :boolean
       attribute :allocated_pom_name, :string
+      attribute :release_date, :date
+      attribute :sentence_date, :date
       attribute :parole_eligibility_date, :date
-      attribute :has_indeterminate_release_date
+      attribute :home_detention_curfew_eligibility_date, :date
+      attribute :tariff_date, :date
+
+      def sentence_detail=(sentence_detail)
+        self.release_date = sentence_detail.release_date
+        self.sentence_date = sentence_detail.sentence_date
+        self.parole_eligibility_date = sentence_detail.parole_eligibility_date
+        self.tariff_date = sentence_detail.tariff_date
+        self.home_detention_curfew_eligibility_date =
+          sentence_detail.home_detention_curfew_eligibility_date
+      end
+
+      def earliest_sentence_date
+        dates = [
+          release_date,
+          parole_eligibility_date,
+          home_detention_curfew_eligibility_date,
+          tariff_date
+        ].compact
+        return nil if dates.empty?
+
+        dates.min
+      end
 
       def case_owner
         @case_owner ||= ResponsibilityService.new.calculate_case_owner(self)

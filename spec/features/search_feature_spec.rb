@@ -10,6 +10,6 @@ feature 'Search for offenders' do
     click_on('search-button')
 
     expect(page).to have_current_path(search_path, ignore_query: true)
-    expect(page).to have_css('tbody tr', count: 6)
+    expect(page).to have_css('tbody tr', count: 4)
   end
 end
