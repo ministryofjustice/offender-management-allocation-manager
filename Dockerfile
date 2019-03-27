@@ -59,4 +59,12 @@ COPY Gemfile Gemfile.lock package.json ./
 
 RUN bundle install --without development test --jobs 2 --retry 3
 COPY . /app
+
+RUN mkdir -p /home/appuser && \
+  useradd appuser --user-group --home /home/appuser && \
+  chown -R appuser:appuser /app && \
+  chown -R appuser:appuser /home/appuser
+
+USER appuser
+
 RUN RAILS_ENV=production rails assets:precompile
