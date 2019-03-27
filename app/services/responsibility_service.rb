@@ -76,7 +76,7 @@ private
   end
 
   def nps_calculation(offender)
-    return 'Custody' if offender.release_date.nil?
+    return PRISON if offender.earliest_release_date.nil?
 
     offender.tier == 'A' || offender.tier == 'B' ? PROBATION : PRISON
   end
