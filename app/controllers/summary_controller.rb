@@ -45,7 +45,7 @@ private
 
   def sort_params(summary_type)
     if params['sort'].blank?
-      return [:sentence_date, :asc] unless summary_type == :allocated
+      return [:sentence_start_date, :asc] unless summary_type == :allocated
 
       return [nil, nil]
     end
