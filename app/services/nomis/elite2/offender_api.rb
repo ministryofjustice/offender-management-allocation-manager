@@ -45,6 +45,8 @@ module Nomis
       def self.get_offence(booking_id)
         route = "/elite2api/api/bookings/#{booking_id}/mainOffence"
         data = e2_client.get(route)
+        return '' if data.empty?
+
         data.first['offenceDescription']
       end
 

@@ -11,18 +11,17 @@ class OffenderService
       end
 
       sentence_detail = get_sentence_details([o.latest_booking_id])
-      o.release_date = sentence_detail[offender_no].release_date
-      o.sentence_date = sentence_detail[offender_no].sentence_date
-      o.parole_eligibility_date =
-        sentence_detail[offender_no].parole_eligibility_date
-      o.has_indeterminate_release_date =
-        sentence_detail[offender_no].indeterminate_release_date?
+      if sentence_detail.present? && sentence_detail.key?(offender_no)
+        o.sentence_detail = sentence_detail[offender_no]
+      end
 
       o.main_offence = Nomis::Elite2::OffenderApi.get_offence(o.latest_booking_id)
     }
   end
   # rubocop:enable Metrics/MethodLength
 
+  # rubocop:disable Metrics/PerceivedComplexity
+  # rubocop:disable Metrics/CyclomaticComplexity
   # rubocop:disable Metrics/MethodLength
   # rubocop:disable Metrics/LineLength
   def self.get_offenders_for_prison(prison, page_number: 0, page_size: 10, tier_map: nil)
@@ -45,10 +44,11 @@ class OffenderService
                        end
 
     offenders.select { |offender|
-      # If the offender is explicitly on remand, then exclude them.  Until this Elite2
-      # change is in production, we can't constrain this to just processing "Convicted"
-      # records.
-      next false if offender.convicted_status == 'Remand'
+      next false unless offender.convicted_status == 'Convicted'
+
+      sentencing = sentence_details[offender.offender_no]
+      offender.sentence_detail = sentencing if sentencing.present?
+      next false unless offender.sentenced?
 
       record = mapped_tiers[offender.offender_no]
       if record
@@ -57,18 +57,13 @@ class OffenderService
         offender.omicable = record.omicable
       end
 
-      offender.release_date = sentence_details[offender.offender_no].release_date
-      offender.sentence_date = sentence_details[offender.offender_no].sentence_date
-      offender.parole_eligibility_date =
-        sentence_details[offender.offender_no].parole_eligibility_date
-      offender.has_indeterminate_release_date =
-        sentence_details[offender.offender_no].indeterminate_release_date?
-
       true
     }
   end
   # rubocop:enable Metrics/MethodLength
   # rubocop:enable Metrics/LineLength
+  # rubocop:enable Metrics/PerceivedComplexity
+  # rubocop:enable Metrics/CyclomaticComplexity
 
   def self.get_sentence_details(booking_ids)
     Nomis::Elite2::OffenderApi.get_bulk_sentence_details(booking_ids)

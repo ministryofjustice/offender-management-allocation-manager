@@ -2,8 +2,8 @@ class SummaryController < ApplicationController
   before_action :authenticate_user
 
   breadcrumb 'See allocations', :summary_allocated_path, only: [:index, :allocated]
-  breadcrumb 'Make allocations', :summary_allocated_path, only: [:unallocated]
-  breadcrumb 'Update information', :summary_allocated_path, only: [:pending]
+  breadcrumb 'Make allocations', :summary_unallocated_path, only: [:unallocated]
+  breadcrumb 'Update information', :summary_pending_path, only: [:pending]
 
   def index
     redirect_to summary_allocated_path
@@ -45,7 +45,7 @@ private
 
   def sort_params(summary_type)
     if params['sort'].blank?
-      return [:sentence_date, :asc] unless summary_type == :allocated
+      return [:sentence_start_date, :asc] unless summary_type == :allocated
 
       return [nil, nil]
     end

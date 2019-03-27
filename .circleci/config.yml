@@ -326,7 +326,7 @@ jobs:
               -f ./deploy/production/network-policy.yaml \
               -f ./deploy/production/allocation-manager-secrets.yaml \
               -f ./deploy/production/shared-environment.yaml \
-              -f .deploy/production/dashboard.yaml \
+              -f ./deploy/production/dashboard.yaml \
           environment:
             <<: *github_team_name_slug
 
