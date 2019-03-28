@@ -251,7 +251,6 @@ jobs:
               -f - \
               -f ./deploy/staging/ingress.yaml \
               -f ./deploy/staging/cronjob.yaml \
-              -f ./deploy/staging/rails-migration.yaml \
               -f ./deploy/staging/service.yaml \
               -f ./deploy/staging/service-monitor.yaml \
               -f ./deploy/staging/network-policy.yaml \
@@ -320,7 +319,6 @@ jobs:
               -f - \
               -f ./deploy/production/ingress.yaml \
               -f ./deploy/production/cronjob.yaml \
-              -f ./deploy/production/rails-migration.yaml \
               -f ./deploy/production/service.yaml \
               -f ./deploy/production/service-monitor.yaml \
               -f ./deploy/production/network-policy.yaml \
