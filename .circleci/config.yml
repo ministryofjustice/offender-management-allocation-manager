@@ -319,8 +319,8 @@ jobs:
             | kubectl apply --record=false \
               -f - \
               -f ./deploy/production/ingress.yaml \
-              -f ./deploy/staging/cronjob.yaml \
-              -f ./deploy/staging/rails-migration.yaml \
+              -f ./deploy/production/cronjob.yaml \
+              -f ./deploy/production/rails-migration.yaml \
               -f ./deploy/production/service.yaml \
               -f ./deploy/production/service-monitor.yaml \
               -f ./deploy/production/network-policy.yaml \
