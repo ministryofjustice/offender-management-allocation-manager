@@ -9,7 +9,7 @@ spec:
       containers:
       - name: allocation-manager
         image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
-        command: [ 'sh', '-c', 'bundle exec rails db:migrate && bundle exec rails db:seed']
+        command: [ 'sh', '-c', 'bundle exec rails db:migrate']
         envFrom:
           - configMapRef:
               name: shared-environment
