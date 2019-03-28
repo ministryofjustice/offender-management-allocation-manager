@@ -293,7 +293,7 @@ jobs:
             cd offender-management-integration-tests
             bundle exec rspec spec/smoke --no-color --format documentation --format RspecJunitFormatter -o screenshots/rspec.xml
           environment:
-            PRODUCTION_START_PAGE: https://allocation-manager-production.apps.cloud-platform-live-0.k8s.integration.dsd.io
+            PRODUCTION_START_PAGE: https://moic.service.justice.gov.uk
       - *store_test_results
       - *store_artifacts
 
