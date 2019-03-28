@@ -8,7 +8,7 @@ spec:
     spec:
       containers:
       - name: allocation-manager
-        image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
+        image: 926803513772.dkr.ecr.eu-west-1.amazonaws.com/offender-management/offender-management-allocation-manager:latest
         command: [ 'sh', '-c', 'bundle exec rails db:migrate']
         envFrom:
           - configMapRef:
