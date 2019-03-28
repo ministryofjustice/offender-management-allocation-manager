@@ -8,9 +8,9 @@ metadata:
 spec:
   tls:
   - hosts:
-    - allocation-manager-staging.apps.cloud-platform-live-0.k8s.integration.dsd.io
+    - allocation-manager-staging.apps.live-1.cloud-platform.service.justice.gov.uk
   rules:
-  - host: allocation-manager-staging.apps.cloud-platform-live-0.k8s.integration.dsd.io
+  - host: allocation-manager-staging.apps.live-1.cloud-platform.service.justice.gov.uk
     http:
       paths:
       - path: /

@@ -8,9 +8,19 @@ metadata:
 spec:
   tls:
   - hosts:
-    - allocation-manager-production.apps.cloud-platform-live-0.k8s.integration.dsd.io
+    - allocation-manager-production.apps.live-1.cloud-platform.service.justice.gov.uk
+  - hosts:
+    - moic.service.justice.gov.uk
+    secretName: allocation-manager-hostname
   rules:
-  - host: allocation-manager-production.apps.cloud-platform-live-0.k8s.integration.dsd.io
+  - host: allocation-manager-production.apps.live-1.cloud-platform.service.justice.gov.uk
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: allocation-manager
+          servicePort: 3000
+  - host: moic.service.justice.gov.uk
     http:
       paths:
       - path: /
