@@ -126,11 +126,4 @@ class PrisonService
   def self.name_for(code)
     PRISONS[code]
   end
-
-  def self.prisons_from_list(codelist)
-    prisons = codelist.each_with_object({}) { |code, hash|
-      hash[code] = PRISONS[code]
-    }
-    prisons.compact
-  end
 end
