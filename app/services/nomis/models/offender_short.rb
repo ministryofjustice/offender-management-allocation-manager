@@ -21,6 +21,7 @@ module Nomis
       attribute :aliases, :string
       attribute :iep_level, :string
       attribute :category_code, :string
+      attribute :bandCode
       attribute :rnum, :integer
       attribute :tier, :string
       attribute :allocated_pom_name, :string
@@ -28,6 +29,7 @@ module Nomis
       attribute :case_allocation, :string
       attribute :omicable, :boolean
       attribute :convicted_status, :string
+      attribute :imprisonment_status, :string
       attribute :sentence_start_date, :date
       attribute :release_date, :date
       attribute :parole_eligibility_date, :date
