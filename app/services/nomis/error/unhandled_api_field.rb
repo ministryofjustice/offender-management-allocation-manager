@@ -1,7 +1,5 @@
 # :nocov:
-module Nomis
-  module Error
-    class UnhandledApiField < StandardError; end
-  end
+module Nomis::Error
+  class UnhandledApiField < StandardError; end
 end
 # :nocov:

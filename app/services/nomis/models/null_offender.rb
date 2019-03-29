@@ -1,5 +1,3 @@
-module Nomis
-  module Models
-    class NullOffender < Offender; end
-  end
+module Nomis::Models
+  class NullOffender < Offender; end
 end

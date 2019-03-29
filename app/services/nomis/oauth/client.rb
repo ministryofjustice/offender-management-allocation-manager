@@ -1,27 +1,25 @@
-module Nomis
-  module Oauth
-    class Client
-      include ClientHelper
+module Nomis::Oauth
+  class Client
+    include ClientHelper
 
-      def initialize(host)
-        @host = host
-        @connection = Faraday.new
-      end
+    def initialize(host)
+      @host = host
+      @connection = Faraday.new
+    end
 
-      def post(route)
-        request(:post, route)
-      end
+    def post(route)
+      request(:post, route)
+    end
 
-    private
+  private
 
-      def request(method, route)
-        response = @connection.send(method) { |req|
-          req.url(@host + route)
-          req.headers['Authorization'] = authorisation
-        }
+    def request(method, route)
+      response = @connection.send(method) { |req|
+        req.url(@host + route)
+        req.headers['Authorization'] = authorisation
+      }
 
-        JSON.parse(response.body)
-      end
+      JSON.parse(response.body)
     end
   end
 end

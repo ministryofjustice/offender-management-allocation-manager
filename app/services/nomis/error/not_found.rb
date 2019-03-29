@@ -1,7 +1,5 @@
 # :nocov:
-module Nomis
-  module Error
-    class NotFound < StandardError; end
-  end
+module Nomis::Error
+  class NotFound < StandardError; end
 end
 # :nocov:
