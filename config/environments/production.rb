@@ -30,7 +30,16 @@ Rails.application.configure do
       password: config.redis_auth,
       network_timeout: 5,
       read_timeout: 1.0,
-      write_timeout: 1.0
+      write_timeout: 1.0,
+
+      error_handler: lambda { |method:, returning:, exception:|
+                       # Report errors to Sentry as warnings
+                       Raven.capture_exception exception, level: 'warning',
+                                                          tags: {
+                                                            method: method,
+                                                            returning: returning
+                                                          }
+                     }
     }
   end
 end
