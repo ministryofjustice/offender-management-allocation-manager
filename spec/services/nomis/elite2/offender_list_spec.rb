@@ -52,10 +52,10 @@ describe Nomis::Elite2::OffenderList do
 
   it "can perform filter+update", vcr: { cassette_name: 'offender_list_filterupdate_spec' } do
     filter_map_func = lambda { |offenders|
-      offender_ids = offenders.map(&:offender_no)
+      booking_ids = offenders.map(&:booking_id)
       sentence_details = if offenders.count > 0
                            Nomis::Elite2::OffenderApi.get_bulk_sentence_details(
-                             offender_ids
+                             booking_ids
                            )
                          else
                            {}
@@ -71,16 +71,16 @@ describe Nomis::Elite2::OffenderList do
     offender_list.add_batch_filter(filter_map_func)
     offender_results = offender_list.fetch
 
-    expect(offender_results.count).to eq(623)
+    expect(offender_results.count).to eq(794)
   end
 
   it "can run several filters", vcr: { cassette_name: 'offender_list_several_filters_spec' } do
     # Filter our results that have no release date
     filter_map_func = lambda { |offenders|
-      offender_ids = offenders.map(&:offender_no)
+      booking_ids = offenders.map(&:booking_id)
       sentence_details = if offenders.count > 0
                            Nomis::Elite2::OffenderApi.get_bulk_sentence_details(
-                             offender_ids
+                             booking_ids
                            )
                          else
                            {}
@@ -108,6 +108,6 @@ describe Nomis::Elite2::OffenderList do
     offender_list.add_batch_filter(add_tiers)
     offender_results = offender_list.fetch
 
-    expect(offender_results.count).to eq(623)
+    expect(offender_results.count).to eq(794)
   end
 end
