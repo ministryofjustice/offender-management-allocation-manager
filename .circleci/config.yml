@@ -185,7 +185,7 @@ jobs:
             bundle exec rake
             ./cc-test-reporter after-build --coverage-input-type simplecov --exit-code $?
           environment:
-            ALLOCATION_MANAGER_HOST: https://allocation-manager-staging.apps.cloud-platform-live-0.k8s.integration.dsd.io
+            ALLOCATION_MANAGER_HOST: https://allocation-manager-staging.apps.live-1.cloud-platform.service.justice.gov.uk
             RAILS_ENV: test
             RACK_ENV: test
       - store_test_results:
@@ -274,7 +274,7 @@ jobs:
             cd offender-management-integration-tests
             bundle exec rspec spec/integration --no-color --format documentation --format RspecJunitFormatter -o screenshots/rspec.xml
           environment:
-            STAGING_START_PAGE: https://allocation-manager-staging.apps.cloud-platform-live-0.k8s.integration.dsd.io
+            STAGING_START_PAGE: https://allocation-manager-staging.apps.live-1.cloud-platform.service.justice.gov.uk
       - *store_test_results
       - *store_artifacts
 
