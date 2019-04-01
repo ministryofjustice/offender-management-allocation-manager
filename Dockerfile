@@ -62,7 +62,7 @@ RUN bundle install --without development test --jobs 2 --retry 3
 COPY . /app
 
 RUN mkdir -p /home/appuser && \
-  useradd appuser --user-group --home /home/appuser && \
+  useradd appuser -u 1001 --user-group --home /home/appuser && \
   chown -R appuser:appuser /app && \
   chown -R appuser:appuser /home/appuser
 
