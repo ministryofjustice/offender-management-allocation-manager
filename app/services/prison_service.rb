@@ -131,6 +131,6 @@ class PrisonService
     prisons = codelist.each_with_object({}) { |code, hash|
       hash[code] = PRISONS[code]
     }
-    prisons.compact
+    prisons.compact.sort_by { |_code, prison| prison }.to_h
   end
 end
