@@ -21,7 +21,7 @@ module Nomis
       attribute :aliases, :string
       attribute :iep_level, :string
       attribute :category_code, :string
-      attribute :bandCode
+      attribute :band_code
       attribute :rnum, :integer
       attribute :tier, :string
       attribute :allocated_pom_name, :string
