@@ -14,6 +14,18 @@ module Nomis
       attribute :facial_image_id
       attribute :internal_location_desc
 
+      def earliest_release_date
+        dates = [
+            release_date,
+            parole_eligibility_date,
+            home_detention_curfew_eligibility_date,
+            tariff_date
+        ].compact
+        return nil if dates.empty?
+
+        dates.min.to_date
+      end
+
       def sentence_start_date
         sentence_detail['sentence_start_date']
       end
