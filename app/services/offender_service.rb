@@ -20,8 +20,6 @@ class OffenderService
   end
   # rubocop:enable Metrics/MethodLength
 
-  # rubocop:disable Metrics/PerceivedComplexity
-  # rubocop:disable Metrics/CyclomaticComplexity
   # rubocop:disable Metrics/MethodLength
   # rubocop:disable Metrics/LineLength
   def self.get_offenders_for_prison(prison, page_number: 0, page_size: 10, tier_map: nil)
@@ -44,8 +42,6 @@ class OffenderService
                        end
 
     offenders.select { |offender|
-      next false unless offender.convicted_status == 'Convicted'
-
       sentencing = sentence_details[offender.offender_no]
       offender.sentence_detail = sentencing if sentencing.present?
       next false unless offender.sentenced?
@@ -62,8 +58,6 @@ class OffenderService
   end
   # rubocop:enable Metrics/MethodLength
   # rubocop:enable Metrics/LineLength
-  # rubocop:enable Metrics/PerceivedComplexity
-  # rubocop:enable Metrics/CyclomaticComplexity
 
   def self.get_sentence_details(booking_ids)
     Nomis::Elite2::OffenderApi.get_bulk_sentence_details(booking_ids)

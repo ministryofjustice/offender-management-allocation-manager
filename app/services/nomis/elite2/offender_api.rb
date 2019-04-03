@@ -7,6 +7,8 @@ module Nomis
       def self.list(prison, page = 0, page_size: 10)
         route = "/elite2api/api/locations/description/#{prison}/inmates"
 
+        queryparams = { 'convictedStatus' => 'Convicted' }
+
         page_offset = page * page_size
         hdrs = paging_headers(page_size, page_offset)
 
@@ -14,7 +16,10 @@ module Nomis
 
         data, page_meta = Rails.cache.fetch(key, expires_in: 10.minutes) {
           page_meta = nil
-          data = e2_client.get(route, extra_headers: hdrs) { |json, response|
+
+          data = e2_client.get(
+            route, queryparams: queryparams, extra_headers: hdrs
+          ) { |json, response|
             total_records = response.headers['Total-Records'].to_i
             records_shown = json.length
             page_meta = make_page_meta(
@@ -28,6 +33,7 @@ module Nomis
         offenders = api_deserialiser.deserialise_many(Nomis::Models::OffenderShort, data)
         ApiPaginatedResponse.new(page_meta, offenders)
       end
+      # rubocop:enable Metrics/MethodLength
 
       def self.get_offender(offender_no)
         route = "/elite2api/api/prisoners/#{offender_no}"
@@ -40,7 +46,6 @@ module Nomis
         AllocationManager::ExceptionHandler.capture_exception(e)
         Nomis::Models::NullOffender.new
       end
-      # rubocop:enable Metrics/MethodLength
 
       def self.get_offence(booking_id)
         route = "/elite2api/api/bookings/#{booking_id}/mainOffence"
