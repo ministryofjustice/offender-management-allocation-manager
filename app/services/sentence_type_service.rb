@@ -1,9 +1,10 @@
 class SentenceTypeService
-  def self.determinate_sentence?(offender)
-    SentenceType.for_offender(offender).duration_type == SentenceType::DETERMINATE
+  def self.indeterminate_sentence?(sentence_type)
+    SentenceType.create(sentence_type).duration_type ==
+      SentenceType::INDETERMINATE
   end
 
-  def self.describe_sentence(offender)
-    SentenceType.for_offender(offender).description
+  def self.describe_sentence(sentence_type)
+    SentenceType.create(sentence_type).description
   end
 end

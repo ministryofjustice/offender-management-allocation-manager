@@ -4,8 +4,8 @@ class SentenceType
 
   attr_accessor :code, :description, :duration_type
 
-  def self.for_offender(offender)
-    code = offender.imprisonment_status
+  def self.create(imprisonment_status)
+    code = imprisonment_status
     code = 'UNK_SENT' if code.nil?
 
     desc, duration_type = SENTENCE_TYPES.fetch(code)
