@@ -4,14 +4,14 @@ describe OffenderService, vcr: { cassette_name: :offender_service_offenders_by_p
   it "get first page of offenders for a specific prison" do
     offenders = OffenderService.get_offenders_for_prison('LEI')
     expect(offenders).to be_kind_of(Array)
-    expect(offenders.length).to eq(8)
+    expect(offenders.length).to eq(9)
     expect(offenders.first).to be_kind_of(Nomis::Models::OffenderShort)
   end
 
   it "get last page of offenders for a specific prison", vcr: { cassette_name: :offender_service_offenders_by_prison_last_page_spec } do
-    offenders = OffenderService.get_offenders_for_prison('LEI', page_number: 116)
+    offenders = OffenderService.get_offenders_for_prison('LEI', page_number: 93)
     expect(offenders).to be_kind_of(Array)
-    expect(offenders.length).to eq(6)
+    expect(offenders.length).to eq(2)
     expect(offenders.first).to be_kind_of(Nomis::Models::OffenderShort)
   end
 
