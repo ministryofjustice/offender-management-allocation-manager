@@ -48,7 +48,8 @@ module Nomis
         release_date.present? ||
         parole_eligibility_date.present? ||
         home_detention_curfew_eligibility_date.present? ||
-        tariff_date.present?
+        tariff_date.present? ||
+        SentenceTypeService.indeterminate_sentence?(imprisonment_status)
       end
 
       def sentence_detail=(sentence_detail)

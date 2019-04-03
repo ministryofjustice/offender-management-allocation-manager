@@ -22,6 +22,8 @@ feature 'Allocation' do
 
     visit new_allocations_path(nomis_offender_id)
 
+    expect(page).to have_content('Determinate')
+
     within('.recommended_pom_row_0') do
       click_link 'Allocate'
     end
