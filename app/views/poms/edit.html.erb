@@ -49,7 +49,7 @@
               <%= label_tag "edit_pom[status]", "Active", class: "govuk-label govuk-radios__label" %>
             </div>
             <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="status-conditional-2" name="edit_pom[status]" type="radio" value="unavailable" data-aria-controls="status-2" <%= 'checked' if @pom.status == 'active-unavailable'%>>
+              <input class="govuk-radios__input" id="status-conditional-2" name="edit_pom[status]" type="radio" value="unavailable" data-aria-controls="status-2" <%= 'checked' if @pom.status == 'unavailable'%>>
               <label class="govuk-label govuk-radios__label"
                      for="status-conditional-2">Active but unavailable for new cases</label>
             </div>
