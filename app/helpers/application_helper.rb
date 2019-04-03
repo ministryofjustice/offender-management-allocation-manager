@@ -55,4 +55,11 @@ module ApplicationHelper
       'Prison' => 'Custody'
     }[offender_responsibility]
   end
+
+  def sentence_type_label(offender)
+    sentence = offender.imprisonment_status
+    return 'Indeterminate' if SentenceTypeService.indeterminate_sentence?(sentence)
+
+    'Determinate'
+  end
 end
