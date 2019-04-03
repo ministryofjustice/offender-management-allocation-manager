@@ -8,6 +8,22 @@ feature "edit a POM's details" do
     CaseInformation.create(nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPC', omicable: 'Yes', prison: 'LEI')
   end
 
+  it "setting unavailable shows selected on re-edit", vcr: { cassette_name: :edit_poms_unavailable_check } do
+    signin_user
+
+    visit edit_pom_path(485_637)
+    expect(page).to have_css('h1', text: 'Edit profile')
+
+    choose('working_pattern-2')
+    choose('Active but unavailable for new cases')
+    click_on('Save')
+
+    visit edit_pom_path(485_637)
+    expect(page).to have_css('h1', text: 'Edit profile')
+
+    expect(page).to have_field('status-conditional-2', checked: true)
+  end
+
   it "makes an inactive POM active", vcr: { cassette_name: :edit_poms_activate_pom_feature } do
     signin_user
 
