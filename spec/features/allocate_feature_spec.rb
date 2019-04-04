@@ -4,6 +4,7 @@ feature 'Allocation' do
   let!(:probation_officer_nomis_staff_id) { 485_636 }
   let!(:prison_officer_nomis_staff_id) { 485_752 }
   let!(:nomis_offender_id) { 'G4273GI' }
+  let!(:never_allocated_offender) { 'G1670VU' }
 
   let!(:probation_officer_pom_detail) {
     PomDetail.create!(
@@ -156,5 +157,12 @@ feature 'Allocation' do
       '.alert',
       text: 'Ozullirn Abbella has not been allocated - please try again'
                     )
+  end
+
+  scenario 'cannot reallocate a non-allocated offender', vcr: { cassette_name: :allocation_attempt_bad_reallocate } do
+    signin_user
+
+    visit edit_allocations_path(never_allocated_offender)
+    expect(page).to have_current_path new_allocations_path(never_allocated_offender)
   end
 end

@@ -21,6 +21,10 @@ class AllocationService
   end
   # rubocop:enable Metrics/MethodLength
 
+  def self.active_allocation?(nomis_offender_id)
+    Allocation.where(nomis_offender_id: nomis_offender_id, active: true).count > 0
+  end
+
   def self.active_allocations(nomis_offender_ids)
     Allocation.where(nomis_offender_id: nomis_offender_ids, active: true).map { |a|
       [

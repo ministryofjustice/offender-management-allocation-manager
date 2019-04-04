@@ -10,6 +10,11 @@ class AllocationsController < ApplicationController
   end
 
   def edit
+    unless AllocationService.active_allocation?(nomis_offender_id_from_url)
+      redirect_to new_allocations_path(nomis_offender_id_from_url)
+      return
+    end
+
     @prisoner = offender(nomis_offender_id_from_url)
     @previously_allocated_pom_ids =
       AllocationService.previously_allocated_poms(nomis_offender_id_from_url)

@@ -29,6 +29,16 @@ RSpec.describe AllocationService do
     expect(alloc).to be_instance_of(Hash)
   end
 
+  it "Can tell if an allocated offender has an active allocation", vcr: { cassette_name: 'allocation_service_has_active_allocation' } do
+    alloc = described_class.active_allocation?(allocation.nomis_offender_id)
+    expect(alloc).to eq(true)
+  end
+
+  it "Can tell if an allocated offender has no active allocation", vcr: { cassette_name: 'allocation_service_has_no_active_allocation' } do
+    alloc = described_class.active_allocation?('G1670VU')
+    expect(alloc).to eq(false)
+  end
+
   it "Can get previous allocations for an offender where there are none", vcr: { cassette_name: 'allocation_service_previous_allocations_none' } do
     staff_ids = described_class.previously_allocated_poms(allocation.nomis_offender_id)
     expect(staff_ids).to eq([])
