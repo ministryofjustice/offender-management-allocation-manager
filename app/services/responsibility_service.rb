@@ -23,7 +23,7 @@ class ResponsibilityService
   end
 
   def calculate_pom_responsibility(offender)
-    return RESPONSIBLE if offender.release_date.nil?
+    return RESPONSIBLE if offender.earliest_release_date.nil?
     return SUPPORTING unless omicable?(offender)
 
     return RESPONSIBLE if nps_case?(offender) &&
@@ -60,15 +60,15 @@ private
   end
 
   def release_date_gt_10_mths?(offender)
-    @release_date_gt_10_mths = offender.release_date > DateTime.now.utc.to_date + 10.months
+    @release_date_gt_10_mths = offender.earliest_release_date > DateTime.now.utc.to_date + 10.months
   end
 
   def release_date_gt_15_mths?(offender)
-    @release_date_gt_15_mths ||= offender.release_date > DateTime.new(2019, 2, 4).utc.to_date + 15.months
+    @release_date_gt_15_mths ||= offender.earliest_release_date > DateTime.new(2019, 2, 4).utc.to_date + 15.months
   end
 
   def release_date_gt_12_weeks?(offender)
-    @release_date_gt_12_weeks ||= offender.release_date > DateTime.now.utc.to_date + 12.weeks
+    @release_date_gt_12_weeks ||= offender.earliest_release_date > DateTime.now.utc.to_date + 12.weeks
   end
 
   def new_case?(offender)
@@ -76,9 +76,12 @@ private
   end
 
   def nps_calculation(offender)
-    return PRISON if offender.earliest_release_date.nil?
+    if offender.omicable
+      return PRISON if SentenceTypeService.indeterminate_sentence?(offender.imprisonment_status)
+      return PRISON if release_date_gt_10_mths?(offender)
+    end
 
-    offender.tier == 'A' || offender.tier == 'B' ? PROBATION : PRISON
+    PROBATION
   end
 
   def assign_responsible?(offender)
@@ -89,7 +92,7 @@ private
     #   * Notifications
     #   * Deactive and recreate allocation (with new responsibility)
     offender.omicable == true &&
-      offender.release_date > DateTime.now.utc.to_date + 10.months
+      offender.earliest_release_date > DateTime.now.utc.to_date + 10.months
   end
 end
 # rubocop:enable Metrics/MethodLength

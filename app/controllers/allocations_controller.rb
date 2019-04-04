@@ -89,8 +89,13 @@ private
       pom.status == 'active'
     }
 
+    recommended_type = 'Prison'
+    if %w[A B].include?(offender.tier)
+      recommended_type = 'Probation'
+    end
+
     pom_response.partition { |pom|
-      pom.position_description.include?(offender.case_owner)
+      pom.position_description.exclude?(recommended_type)
     }
   end
 
