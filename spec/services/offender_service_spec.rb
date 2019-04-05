@@ -5,14 +5,14 @@ describe OffenderService, vcr: { cassette_name: :offender_service_offenders_by_p
     offenders = OffenderService.get_offenders_for_prison('LEI')
     expect(offenders).to be_kind_of(Array)
     expect(offenders.length).to eq(9)
-    expect(offenders.first).to be_kind_of(Nomis::Models::OffenderShort)
+    expect(offenders.first).to be_kind_of(Nomis::Models::Offender)
   end
 
   it "get last page of offenders for a specific prison", vcr: { cassette_name: :offender_service_offenders_by_prison_last_page_spec } do
     offenders = OffenderService.get_offenders_for_prison('LEI', page_number: 93)
     expect(offenders).to be_kind_of(Array)
     expect(offenders.length).to eq(2)
-    expect(offenders.first).to be_kind_of(Nomis::Models::OffenderShort)
+    expect(offenders.first).to be_kind_of(Nomis::Models::Offender)
   end
 
   it "gets a single offender", vcr: { cassette_name: :offender_service_single_offender_spec } do
@@ -46,7 +46,7 @@ describe OffenderService, vcr: { cassette_name: :offender_service_offenders_by_p
 
     updated_offenders = OffenderService.set_allocated_pom_name(offenders, 'LEI')
     expect(updated_offenders).to be_kind_of(Array)
-    expect(updated_offenders.first).to be_kind_of(Nomis::Models::OffenderShort)
+    expect(updated_offenders.first).to be_kind_of(Nomis::Models::Offender)
     expect(updated_offenders.count).to eq(offenders.count)
     expect(updated_offenders.first.allocated_pom_name).to eq('Jones, Ross')
     expect(updated_offenders.first.allocation_date).to be_kind_of(Date)
