@@ -34,7 +34,11 @@ class SummaryService
 
       # Group the offenders without a tier, and the remaining ones
       # are either allocated or unallocated
-      tiered_offenders = get_tiered_offenders(offenders, summary_type == :pending)
+      tiered_offenders, no_tier_offenders = offenders.partition { |offender|
+        offender.tier.present?
+      }
+      @counts[:pending] += no_tier_offenders.count
+      @bucket.items += no_tier_offenders if summary_type == :pending
 
       # Check the allocations for the remaining offenders who have tiers.
       offender_nos = tiered_offenders.map(&:offender_no)
@@ -42,15 +46,14 @@ class SummaryService
 
       # Put the offenders in the correct group based on whether we were able to
       # find an active allocation for them.
-      tiered_offenders.each { |offender|
-        if active_allocations_hash.key?(offender.offender_no)
-          @bucket << offender if summary_type == :allocated
-          @counts[:allocated] += 1
-        else
-          @bucket << offender if summary_type == :unallocated
-          @counts[:unallocated] += 1
-        end
+      allocated_offenders, unallocated_offenders = tiered_offenders.partition { |offender|
+        active_allocations_hash.key?(offender.offender_no)
       }
+      @bucket.items += allocated_offenders if summary_type == :allocated
+      @bucket.items += unallocated_offenders if summary_type == :unallocated
+
+      @counts[:allocated] += allocated_offenders.count
+      @counts[:unallocated] += unallocated_offenders.count
     end
 
     page_count = (@counts[summary_type] / PAGE_SIZE.to_f).ceil
@@ -66,10 +69,10 @@ class SummaryService
       @bucket.sort(params.sort_field, params.sort_direction)
     end
 
-    # For the allocated offenders, we need to provide the allocated POM's
-    # name
     from = [(PAGE_SIZE * (page - 1)), 0].max
 
+    # For the allocated offenders, we need to provide the allocated POM's
+    # name
     if summary_type == :allocated
       offender_items = OffenderService.set_allocated_pom_name(
         @bucket.take(wanted_items, from) || [],
@@ -79,8 +82,6 @@ class SummaryService
       offender_items = @bucket.take(wanted_items, from) || []
     end
 
-    # Return the last (N) records from each bucket, in case
-    # the capacity was higher than 10 (we need more than one page worth).
     Summary.new.tap { |summary|
       summary.offenders = offender_items
 
@@ -114,20 +115,6 @@ private
       page_size: FETCH_SIZE,
       tier_map: tiers
     )
-  end
-
-  def get_tiered_offenders(offender_list, should_store)
-    # Filter out any offenders who have no tiering information
-    # at the same time we add them to the correct bucket.
-    offender_list.select { |offender|
-      if offender.tier.blank?
-        @bucket << offender if should_store
-        @counts[:pending] += 1
-        false
-      else
-        true
-      end
-    }
   end
 
   def number_items_wanted(is_last_page, last_digit_of_count)
