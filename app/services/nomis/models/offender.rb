@@ -89,8 +89,6 @@ module Nomis
           (Time.zone.today - sentence_start_date).to_i
         end
       end
-      ###################################################
-      # end of import
 
       def sentence_detail=(sentence_detail)
         self.release_date = sentence_detail.release_date
