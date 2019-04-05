@@ -65,20 +65,16 @@ class OffenderService
     Nomis::Elite2::OffenderApi.get_bulk_sentence_details(booking_ids)
   end
 
-  def self.allocations_for_offenders(offender_id_list)
-    Allocation.where(
-      nomis_offender_id: offender_id_list, active: true
-    ).preload(:pom_detail)
-  end
-
   # Takes a list of OffenderShort or Offender objects, and returns them with their
   # allocated POM name set in :allocated_pom_name
   # rubocop:disable Metrics/MethodLength
   # rubocop:disable Metrics/LineLength
   def self.set_allocated_pom_name(offenders, caseload)
     pom_names = PrisonOffenderManagerService.get_pom_names(caseload)
-    offender_ids = offenders.map(&:offender_no)
-    offender_to_staff_hash = allocations_for_offenders(offender_ids).map { |a|
+    nomis_offender_ids = offenders.map(&:offender_no)
+    offender_to_staff_hash = AllocationService.
+      active_allocations_with_pom_detail(nomis_offender_ids).
+      map { |a|
       [
         a.nomis_offender_id,
         {
