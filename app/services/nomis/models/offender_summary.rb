@@ -2,7 +2,7 @@
 
 module Nomis
   module Models
-    class Offender
+    class OffenderSummary
       include MemoryModel
 
       attribute :offender_no, :string

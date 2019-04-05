@@ -21,7 +21,7 @@ describe OffenderService, vcr: { cassette_name: :offender_service_offenders_by_p
     CaseInformation.create(nomis_offender_id: nomis_offender_id, tier: 'C', case_allocation: 'CRC', omicable: 'Yes', prison: 'LEI')
     offender = OffenderService.get_offender(nomis_offender_id)
 
-    expect(offender).to be_kind_of(Nomis::Models::Offender)
+    expect(offender).to be_kind_of(Nomis::Models::OffenderSummary)
     expect(offender.release_date).to eq Date.new(2020, 2, 7)
     expect(offender.tier).to eq 'C'
     expect(offender.main_offence).to eq 'Section 18 - wounding with intent to resist / prevent arrest'

@@ -43,7 +43,7 @@ describe Nomis::Elite2::OffenderApi do
 
       response = described_class.get_offender(noms_id)
 
-      expect(response).to be_instance_of(Nomis::Models::Offender)
+      expect(response).to be_instance_of(Nomis::Models::OffenderSummary)
     end
 
     it 'returns null if unable to find prisoner', :raven_intercept_exception,

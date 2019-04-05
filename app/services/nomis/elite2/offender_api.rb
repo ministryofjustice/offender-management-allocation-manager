@@ -43,7 +43,7 @@ module Nomis
           raise Nomis::Client::APIError, 'No data was returned' if data.empty?
         }
 
-        api_deserialiser.deserialise(Nomis::Models::Offender, response.first)
+        api_deserialiser.deserialise(Nomis::Models::OffenderSummary, response.first)
       rescue Nomis::Client::APIError => e
         AllocationManager::ExceptionHandler.capture_exception(e)
         Nomis::Models::NullOffender.new

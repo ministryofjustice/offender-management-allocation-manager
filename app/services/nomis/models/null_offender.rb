@@ -2,6 +2,6 @@
 
 module Nomis
   module Models
-    class NullOffender < Offender; end
+    class NullOffender < OffenderSummary; end
   end
 end

@@ -2,26 +2,26 @@ require 'rails_helper'
 
 describe ResponsibilityService do
   let(:offender_none) {
-    Nomis::Models::Offender.new
+    Nomis::Models::OffenderSummary.new
   }
   let(:offender_crc) {
-    Nomis::Models::Offender.new.tap { |o| o.case_allocation = 'CRC' }
+    Nomis::Models::OffenderSummary.new.tap { |o| o.case_allocation = 'CRC' }
   }
   let(:offender_nps_gt_10) {
-    Nomis::Models::Offender.new.tap { |o|
+    Nomis::Models::OffenderSummary.new.tap { |o|
       o.case_allocation = 'NPS'
       o.release_date = DateTime.now.utc.to_date + 12.months
     }
   }
   let(:offender_nps_lt_10) {
-    Nomis::Models::Offender.new.tap { |o|
+    Nomis::Models::OffenderSummary.new.tap { |o|
       o.case_allocation = 'NPS'
       o.release_date = DateTime.now.utc.to_date + 6.months
     }
   }
 
   let(:offender_omicable_nps_12months) {
-    Nomis::Models::Offender.new.tap { |o|
+    Nomis::Models::OffenderSummary.new.tap { |o|
       o.omicable = true
       o.case_allocation = 'NPS'
       o.release_date = DateTime.now.utc.to_date + 12.months
@@ -29,7 +29,7 @@ describe ResponsibilityService do
   }
 
   let(:offender_omicable_nps_3months) {
-    Nomis::Models::Offender.new.tap { |o|
+    Nomis::Models::OffenderSummary.new.tap { |o|
       o.omicable = true
       o.case_allocation = 'NPS'
       o.release_date = DateTime.now.utc.to_date + 3.months
@@ -37,27 +37,27 @@ describe ResponsibilityService do
   }
 
   let(:offender_not_omicable) {
-    Nomis::Models::Offender.new.tap { |o|
+    Nomis::Models::OffenderSummary.new.tap { |o|
       o.omicable = false
       o.case_allocation = 'NPS'
     }
   }
 
   let(:offender_no_release_date) {
-    Nomis::Models::Offender.new.tap { |o|
+    Nomis::Models::OffenderSummary.new.tap { |o|
       o.release_date = nil
     }
   }
 
   let(:offender_not_welsh) {
-    Nomis::Models::Offender.new.tap { |o|
+    Nomis::Models::OffenderSummary.new.tap { |o|
       o.omicable = false
       o.release_date = DateTime.now.utc.to_date + 6.months
     }
   }
 
   let(:offender_welsh_crc_lt_12_wk) {
-    Nomis::Models::Offender.new.tap { |o|
+    Nomis::Models::OffenderSummary.new.tap { |o|
       o.omicable = true
       o.case_allocation = 'CRC'
       o.release_date = DateTime.now.utc.to_date + 2.weeks
@@ -65,7 +65,7 @@ describe ResponsibilityService do
   }
 
   let(:offender_welsh_crc_gt_12_wk) {
-    Nomis::Models::Offender.new.tap { |o|
+    Nomis::Models::OffenderSummary.new.tap { |o|
       o.omicable = true
       o.case_allocation = 'CRC'
       o.release_date = DateTime.now.utc.to_date + 13.weeks
@@ -73,7 +73,7 @@ describe ResponsibilityService do
   }
 
   let(:offender_welsh_nps_gt_10_mths) {
-    Nomis::Models::Offender.new.tap { |o|
+    Nomis::Models::OffenderSummary.new.tap { |o|
       o.omicable = true
       o.case_allocation = 'NPS'
       o.release_date = DateTime.now.utc.to_date + 11.months
@@ -81,7 +81,7 @@ describe ResponsibilityService do
   }
 
   let(:offender_welsh_nps_lt_10_mths) {
-    Nomis::Models::Offender.new.tap { |o|
+    Nomis::Models::OffenderSummary.new.tap { |o|
       o.omicable = true
       o.case_allocation = 'NPS'
       o.release_date = DateTime.now.utc.to_date + 9.months
@@ -89,7 +89,7 @@ describe ResponsibilityService do
   }
 
   let(:offender_welsh_nps_old_case_gt_15_mths) {
-    Nomis::Models::Offender.new.tap { |o|
+    Nomis::Models::OffenderSummary.new.tap { |o|
       o.omicable = true
       o.case_allocation = 'NPS'
       o.sentence_start_date = DateTime.new(2019, 1, 19).utc
@@ -98,7 +98,7 @@ describe ResponsibilityService do
   }
 
   let(:offender_welsh_nps_old_case_lt_15_mths) {
-    Nomis::Models::Offender.new.tap { |o|
+    Nomis::Models::OffenderSummary.new.tap { |o|
       o.omicable = true
       o.case_allocation = 'NPS'
       o.sentence_start_date = DateTime.new(2019, 2, 20).utc
@@ -107,7 +107,7 @@ describe ResponsibilityService do
   }
 
   let(:offender_welsh_nps_new_case_gt_10_mths) {
-    Nomis::Models::Offender.new.tap { |o|
+    Nomis::Models::OffenderSummary.new.tap { |o|
       o.omicable = true
       o.case_allocation = 'NPS'
       o.sentence_start_date = DateTime.new(2019, 1, 19).utc
@@ -116,7 +116,7 @@ describe ResponsibilityService do
   }
 
   let(:offender_welsh_nps_new_case_lt_10_mths) {
-    Nomis::Models::Offender.new.tap { |o|
+    Nomis::Models::OffenderSummary.new.tap { |o|
       o.omicable = true
       o.case_allocation = 'NPS'
       o.sentence_start_date = DateTime.new(2019, 2, 20).utc
