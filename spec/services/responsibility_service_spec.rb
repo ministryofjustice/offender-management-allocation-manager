@@ -20,8 +20,27 @@ describe ResponsibilityService do
     }
   }
 
-  let(:offender_nps_no_release_date) {
-    Nomis::Models::Offender.new.tap { |o| o.case_allocation = 'NPS' }
+  let(:offender_omicable_nps_12months) {
+    Nomis::Models::Offender.new.tap { |o|
+      o.omicable = true
+      o.case_allocation = 'NPS'
+      o.release_date = DateTime.now.utc.to_date + 12.months
+    }
+  }
+
+  let(:offender_omicable_nps_3months) {
+    Nomis::Models::Offender.new.tap { |o|
+      o.omicable = true
+      o.case_allocation = 'NPS'
+      o.release_date = DateTime.now.utc.to_date + 3.months
+    }
+  }
+
+  let(:offender_not_omicable) {
+    Nomis::Models::Offender.new.tap { |o|
+      o.omicable = false
+      o.case_allocation = 'NPS'
+    }
   }
 
   let(:offender_no_release_date) {
@@ -111,9 +130,19 @@ describe ResponsibilityService do
       expect(resp).to eq 'Prison'
     end
 
-    it "NPS allocations with no release date" do
-      resp = subject.calculate_case_owner(offender_nps_no_release_date)
+    it "NPS allocations with omic and > 12m" do
+      resp = subject.calculate_case_owner(offender_omicable_nps_12months)
       expect(resp).to eq 'Prison'
+    end
+
+    it "NPS allocations with omic and 3 months" do
+      resp = subject.calculate_case_owner(offender_omicable_nps_3months)
+      expect(resp).to eq 'Probation'
+    end
+
+    it "NPS allocations with no omic" do
+      resp = subject.calculate_case_owner(offender_not_omicable)
+      expect(resp).to eq 'Probation'
     end
 
     it "No allocation" do

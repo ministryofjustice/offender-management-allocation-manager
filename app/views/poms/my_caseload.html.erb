@@ -27,7 +27,7 @@
   <tr class="govuk-table__row">
     <th class="govuk-table__header" scope="col">Prisoner name</th>
     <th class="govuk-table__header" scope="col">Prisoner number</th>
-    <th class="govuk-table__header" scope="col">Release/parole<br/>eligibility</th>
+    <th class="govuk-table__header" scope="col">Earliest release date</th>
     <th class="govuk-table__header" scope="col">Allocation<br/>date</th>
     <th class="govuk-table__header" scope="col">Role</th>
   </tr>
@@ -37,7 +37,7 @@
     <tr class="govuk-table__row">
       <td aria-label="Prisoner name" class="govuk-table__cell "><%= sentence.full_name %></td>
       <td aria-label="Prisoner number" class="govuk-table__cell "><%= allocation.nomis_offender_id %></td>
-      <td aria-label="Release date" class="govuk-table__cell "><%= format_date(sentence.release_date.to_date) %></td>
+      <td aria-label="Release date" class="govuk-table__cell "><%= format_date(sentence.earliest_release_date) %></td>
       <td aria-label="Allocation date" class="govuk-table__cell "><%= format_date(allocation.created_at) %></td>
       <td aria-label="Role" class="govuk-table__cell "><%= allocation.responsibility %></td>
     </tr>

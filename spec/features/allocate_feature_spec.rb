@@ -30,16 +30,16 @@ feature 'Allocation' do
     end
 
     expect(page).to have_css('h1', text: 'Confirm allocation')
-    expect(page).to have_css('p', text: 'You are allocating Ozullirn Abbella to Ross Jones')
+    expect(page).to have_css('p', text: 'You are allocating Ozullirn Abbella to Toby Retallick')
 
     click_button 'Complete allocation'
 
     expect(page).to have_current_path summary_unallocated_path
-    expect(page).to have_css('.notification', text: 'Ozullirn Abbella has been allocated to Ross Jones (Probation POM)')
+    expect(page).to have_css('.notification', text: 'Ozullirn Abbella has been allocated to Toby Retallick (Prison POM)')
   end
 
   scenario 'overriding an allocation', vcr: { cassette_name: :override_allocation_feature } do
-    override_nomis_staff_id = 485_595
+    override_nomis_staff_id = 485_752
 
     signin_user
 
@@ -49,7 +49,7 @@ feature 'Allocation' do
       click_link 'Allocate'
     end
 
-    expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
+    expect(page).to have_css('h1', text: 'Why are you allocating a probation officer POM?')
 
     check('override-2')
     check('override-3')
@@ -62,7 +62,7 @@ feature 'Allocation' do
     click_button 'Complete allocation'
 
     expect(page).to have_current_path summary_unallocated_path
-    expect(page).to have_css('.notification', text: 'Ozullirn Abbella has been allocated to Toby Retallick (Prison POM)')
+    expect(page).to have_css('.notification', text: 'Ozullirn Abbella has been allocated to Ross Jones (Probation POM)')
     expect(Override.count).to eq(0)
   end
 
@@ -75,7 +75,7 @@ feature 'Allocation' do
       click_link 'Allocate'
     end
 
-    expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
+    expect(page).to have_css('h1', text: 'Why are you allocating a probation officer POM?')
 
     click_button('Continue')
     expect(page).to have_content('Select one or more reasons for not accepting the recommendation')
@@ -91,7 +91,7 @@ feature 'Allocation' do
       click_link 'Allocate'
     end
 
-    expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
+    expect(page).to have_css('h1', text: 'Why are you allocating a probation officer POM?')
 
     check('override-conditional-4')
     click_button('Continue')
@@ -108,7 +108,7 @@ feature 'Allocation' do
       click_link 'Allocate'
     end
 
-    expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
+    expect(page).to have_css('h1', text: 'Why are you allocating a probation officer POM?')
 
     check('override-conditional-1')
     click_button('Continue')
