@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module OverrideHelper
   def complex_reason_label(offender)
     if offender.case_owner == 'Prison'

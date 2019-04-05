@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GaHelper
   def ga_enabled?
     Rails.configuration.ga_tracking_id.present?

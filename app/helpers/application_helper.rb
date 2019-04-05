@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ApplicationHelper
   def replace_param(name, value)
     uri = URI.parse(request.original_url)
