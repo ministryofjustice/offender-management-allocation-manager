@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SentenceTypeService
   def self.indeterminate_sentence?(sentence_type)
     SentenceType.create(sentence_type).duration_type ==

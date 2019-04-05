@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SummaryService
   PAGE_SIZE = 10 # The number of items to show in the view
   FETCH_SIZE = 200 # How many records to fetch from nomis at a time

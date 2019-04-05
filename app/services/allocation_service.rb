@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AllocationService
   # rubocop:disable Metrics/MethodLength
   def self.create_allocation(params)

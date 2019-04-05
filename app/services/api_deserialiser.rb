@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ApiDeserialiser
   def deserialise_many(memory_model_class, payload_list)
     safe_list = payload_list.to_snake_keys

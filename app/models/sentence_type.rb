@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SentenceType
   DETERMINATE = :determinate
   INDETERMINATE = :indeterminate

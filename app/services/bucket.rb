@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # The Bucket class is a simple data structure that can contain a fixed
 # number of things. The initial capacity of the bucket is set on
 # creation and once full, any attempts to put more items in the

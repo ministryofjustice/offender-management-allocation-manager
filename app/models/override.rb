@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Override < ApplicationRecord
   validates :nomis_staff_id, presence: {
     message: 'NOMIS Staff ID is required'

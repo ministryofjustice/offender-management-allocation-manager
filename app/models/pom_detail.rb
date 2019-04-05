@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PomDetail < ApplicationRecord
   # rubocop:disable HasManyOrHasOneDependent
   has_many :allocations
