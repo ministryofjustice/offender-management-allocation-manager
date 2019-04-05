@@ -17,22 +17,27 @@ RSpec.describe EmailService do
     }
   }
 
+  let(:subject) {
+    described_class.instance(params)
+  }
+
   before(:each) {
     ActiveJob::Base.queue_adapter = :test
     PomDetail.create(nomis_staff_id: 485_637, working_pattern: 1.0, status: 'inactive')
   }
 
   context "when creating an initial POM allocation" do
-    it "Can send an allocation email", vcr: { cassette_name: 'email_service_send_allocation_email' } do
-      described_class.send_allocation_email(params)
+    it "Can send an allocation email", vcr: {cassette_name: 'email_service_send_allocation_email'} do
+      subject.send_allocation_email
       expect(enqueued_jobs.size).to eq(1)
       enqueued_jobs.clear
     end
   end
 
   context "when allocating a prisoner to another POM" do
-    it "Can send an allocation email", vcr: { cassette_name: 'email_service_send_deallocation_email' } do
-      allow(Allocation).to receive(:where).and_return([
+    before do
+      allow(Allocation).to receive(:where).and_return(
+        [
           Allocation.new.tap do |a|
             a.nomis_staff_id = 485_737
             a.nomis_offender_id = 'G2911GD'
@@ -41,8 +46,12 @@ RSpec.describe EmailService do
             a.allocated_at_tier = 'A'
             a.prison = 'LEI'
           end
-                                                      ])
-      described_class.send_allocation_email(params)
+        ]
+      )
+    end
+
+    it "Can send an allocation email", vcr: {cassette_name: 'email_service_send_deallocation_email'} do
+      subject.send_allocation_email
       expect(enqueued_jobs.size).to eq(2)
       enqueued_jobs.clear
     end
