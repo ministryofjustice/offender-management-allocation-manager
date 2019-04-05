@@ -62,6 +62,19 @@ class AllocationService
     Allocation.where(nomis_offender_id: nomis_offender_id).update_all(active: false)
   end
 
+  def self.last_allocation(nomis_offender_id)
+    Allocation.where(
+      nomis_offender_id: nomis_offender_id,
+      active: false
+    ).last
+  end
+
+  def self.active_allocations_with_pom_detail(nomis_offender_ids)
+    Allocation.where(
+      nomis_offender_id: nomis_offender_ids, active: true
+    ).preload(:pom_detail)
+  end
+
 private
 
   def self.delete_overrides(params)
