@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SearchService
   FETCH_SIZE = 200
 

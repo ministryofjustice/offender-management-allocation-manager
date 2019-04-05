@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nomis
   module Elite2
     ApiPaginatedResponse = Struct.new(:meta, :data)

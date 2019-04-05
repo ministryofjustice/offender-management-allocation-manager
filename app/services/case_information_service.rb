@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CaseInformationService
   def self.get_case_information(prison)
     cases = CaseInformation.where(prison: prison)

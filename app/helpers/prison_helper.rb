@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PrisonHelper
   def show_prison_switcher?(caseloads)
     caseloads.present? && caseloads.count > 1

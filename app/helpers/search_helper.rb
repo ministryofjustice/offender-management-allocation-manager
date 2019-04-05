@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SearchHelper
   # rubocop:disable Metrics/MethodLength
   def cta_for_offender(offender)

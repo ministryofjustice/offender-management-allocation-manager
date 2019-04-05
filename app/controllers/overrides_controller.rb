@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class OverridesController < ApplicationController
   def new
     @prisoner = OffenderService.get_offender(params.require(:nomis_offender_id))

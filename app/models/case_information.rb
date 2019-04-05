@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CaseInformation < ApplicationRecord
   self.table_name = 'case_information'
   validates :nomis_offender_id, presence: true
