@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PomMailer < GovukNotifyRails::Mailer
   # rubocop:disable Metrics/MethodLength
   def new_allocation_email(params = {})

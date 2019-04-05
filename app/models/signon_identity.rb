@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SignonIdentity
   class << self
     def from_omniauth(omniauth_data)

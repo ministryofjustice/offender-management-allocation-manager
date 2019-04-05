@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EmailService
   # rubocop:disable Metrics/MethodLength
   def self.send_allocation_email(params)

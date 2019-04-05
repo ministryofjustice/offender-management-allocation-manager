@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PrisonOffenderManagerService
   def self.get_pom_detail(nomis_staff_id)
     PomDetail.find_or_create_by!(nomis_staff_id: nomis_staff_id.to_i) { |s|

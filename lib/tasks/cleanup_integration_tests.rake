@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :integration_tests do
   desc 'Clean up allocations created by staging integration tests'
   task clean_up: :environment do

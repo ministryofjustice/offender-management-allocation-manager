@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class OffenderService
   # rubocop:disable Metrics/MethodLength
   def self.get_offender(offender_no)
