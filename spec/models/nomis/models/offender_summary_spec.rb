@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Nomis::Models::OffenderShort, model: true do
+describe Nomis::Models::OffenderSummary, model: true do
   it "handles no earliest date" do
     o = described_class.new
     expect(o.earliest_release_date).to be_nil

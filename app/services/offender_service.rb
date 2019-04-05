@@ -65,7 +65,7 @@ class OffenderService
     Nomis::Elite2::OffenderApi.get_bulk_sentence_details(booking_ids)
   end
 
-  # Takes a list of OffenderShort or Offender objects, and returns them with their
+  # Takes a list of OffenderSummary or Offender objects, and returns them with their
   # allocated POM name set in :allocated_pom_name
   # rubocop:disable Metrics/MethodLength
   # rubocop:disable Metrics/LineLength

@@ -30,9 +30,9 @@ describe Bucket do
 
   it "can sort its items by default ASC" do
     b = described_class.new
-    b << Nomis::Models::OffenderShort.new.tap { |o| o.last_name = "Z" }
-    b << Nomis::Models::OffenderShort.new.tap { |o| o.last_name = "A" }
-    b << Nomis::Models::OffenderShort.new.tap { |o| o.last_name = "M" }
+    b << Nomis::Models::OffenderSummary.new.tap { |o| o.last_name = "Z" }
+    b << Nomis::Models::OffenderSummary.new.tap { |o| o.last_name = "A" }
+    b << Nomis::Models::OffenderSummary.new.tap { |o| o.last_name = "M" }
     expect(b.items.count).to be(3)
 
     b.sort(:last_name)
@@ -43,9 +43,9 @@ describe Bucket do
 
   it "can sort its items DESC" do
     b = described_class.new
-    b << Nomis::Models::OffenderShort.new.tap { |o| o.last_name = "A" }
-    b << Nomis::Models::OffenderShort.new.tap { |o| o.last_name = "M" }
-    b << Nomis::Models::OffenderShort.new.tap { |o| o.last_name = "Z" }
+    b << Nomis::Models::OffenderSummary.new.tap { |o| o.last_name = "A" }
+    b << Nomis::Models::OffenderSummary.new.tap { |o| o.last_name = "M" }
+    b << Nomis::Models::OffenderSummary.new.tap { |o| o.last_name = "Z" }
     expect(b.items.count).to be(3)
 
     b.sort(:last_name, :desc)
@@ -56,9 +56,9 @@ describe Bucket do
 
   it "can't sort by made up field" do
     b = described_class.new
-    b << Nomis::Models::OffenderShort.new.tap { |o| o.last_name = "A" }
-    b << Nomis::Models::OffenderShort.new.tap { |o| o.last_name = "M" }
-    b << Nomis::Models::OffenderShort.new.tap { |o| o.last_name = "Z" }
+    b << Nomis::Models::OffenderSummary.new.tap { |o| o.last_name = "A" }
+    b << Nomis::Models::OffenderSummary.new.tap { |o| o.last_name = "M" }
+    b << Nomis::Models::OffenderSummary.new.tap { |o| o.last_name = "Z" }
     expect(b.items.count).to be(3)
 
     b.sort(:test, :desc)

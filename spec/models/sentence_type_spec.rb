@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe SentenceType, type: :model do
   it 'can return a sentence type for an offender with known sentence' do
-    off = Nomis::Models::OffenderSummary.new.tap { |o| o.imprisonment_status = 'IPP' }
+    off = Nomis::Models::Offender.new.tap { |o| o.imprisonment_status = 'IPP' }
     sentence_type = described_class.create(off.imprisonment_status)
 
     expect(sentence_type.code).to eq('IPP')
@@ -11,7 +11,7 @@ RSpec.describe SentenceType, type: :model do
   end
 
   it 'can handle offenders with no sentence' do
-    off = Nomis::Models::OffenderSummary.new
+    off = Nomis::Models::Offender.new
     sentence_type = described_class.create(off.imprisonment_status)
 
     expect(sentence_type.code).to eq('UNK_SENT')

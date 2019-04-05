@@ -32,7 +32,8 @@ module Nomis
           [data, page_meta]
         }
 
-        offenders = api_deserialiser.deserialise_many(Nomis::Models::OffenderShort, data)
+        offenders = api_deserialiser.deserialise_many(
+          Nomis::Models::OffenderSummary, data)
         ApiPaginatedResponse.new(page_meta, offenders)
       end
       # rubocop:enable Metrics/MethodLength
@@ -43,7 +44,7 @@ module Nomis
           raise Nomis::Client::APIError, 'No data was returned' if data.empty?
         }
 
-        api_deserialiser.deserialise(Nomis::Models::OffenderSummary, response.first)
+        api_deserialiser.deserialise(Nomis::Models::Offender, response.first)
       rescue Nomis::Client::APIError => e
         AllocationManager::ExceptionHandler.capture_exception(e)
         Nomis::Models::NullOffender.new
