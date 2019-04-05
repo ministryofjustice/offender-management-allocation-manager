@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-#
+
 class EmailService
   def self.instance(params)
     offender = OffenderService.get_offender(params[:nomis_offender_id])
@@ -21,11 +21,12 @@ class EmailService
 
   def send_allocation_email
     return if @pom.emails.empty?
+
     send_deallocation_email if @last_allocation.present?
     send_new_allocation_email
   end
 
-  private
+private
 
   def previous_pom
     @previous_pom ||= PrisonOffenderManagerService.
