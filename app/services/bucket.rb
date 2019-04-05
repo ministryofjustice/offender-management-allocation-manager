@@ -14,6 +14,10 @@ class Bucket
     @items = []
   end
 
+  def count
+    @items.count
+  end
+
   def <<(item)
     @items << item
   end
