@@ -18,6 +18,13 @@ describe CaseInformationService, vcr: { cassette_name: :caseinfo_service_spec } 
     expect(cases[caseinfo.nomis_offender_id]).to be_kind_of(CaseInformation)
   end
 
+  it "can get case information for multiple offenders at once" do
+    cases = CaseInformationService.get_case_info_for_offenders(['X1000XX'],caseinfo.prison)
+    expect(cases).to be_kind_of(Hash)
+    expect(cases.length).to eq(1)
+    expect(cases[caseinfo.nomis_offender_id]).to be_kind_of(CaseInformation)
+  end
+
   it "can delete case information" do
     cases = CaseInformationService.get_case_information(caseinfo.prison)
     expect(cases.length).to eq(1)
