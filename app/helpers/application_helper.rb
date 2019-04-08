@@ -51,11 +51,12 @@ module ApplicationHelper
     ResponsibilityService.new.calculate_pom_responsibility(offender)
   end
 
-  def responsibility_label(offender_responsibility)
-    {
-      'Probation' => 'Community',
-      'Prison' => 'Custody'
-    }[offender_responsibility]
+  def responsibility_label(offender)
+    if pom_responsibility_label(offender) == 'Responsible'
+      'Custody'
+    else
+      'Community'
+    end
   end
 
   def sentence_type_label(offender)
