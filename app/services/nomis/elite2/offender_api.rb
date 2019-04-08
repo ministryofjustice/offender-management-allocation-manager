@@ -32,7 +32,8 @@ module Nomis
           [data, page_meta]
         }
 
-        offenders = api_deserialiser.deserialise_many(Nomis::Models::OffenderShort, data)
+        offenders = api_deserialiser.deserialise_many(
+          Nomis::Models::OffenderSummary, data)
         ApiPaginatedResponse.new(page_meta, offenders)
       end
       # rubocop:enable Metrics/MethodLength

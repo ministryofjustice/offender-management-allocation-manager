@@ -21,15 +21,9 @@ private
       setter = "#{key}="
       if memory_model.respond_to?(setter)
         memory_model.public_send(setter, value)
-      else
-        raise_warning_for(memory_model_class, key)
       end
     end
 
     memory_model
-  end
-
-  def raise_warning_for(klass, key)
-    Rails.logger.info("#{klass} is missing field #{key}")
   end
 end
