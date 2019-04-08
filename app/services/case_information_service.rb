@@ -1,6 +1,14 @@
 # frozen_string_literal: true
 
 class CaseInformationService
+  def self.get_case_info_for_offenders(nomis_id_list, prison)
+    CaseInformation.where(
+      nomis_offender_id: nomis_id_list, prison: prison
+    ).each_with_object({}) { |caseinfo, hash|
+      hash[caseinfo.nomis_offender_id] = caseinfo
+    }
+  end
+
   def self.get_case_information(prison)
     cases = CaseInformation.where(prison: prison)
     cases.each_with_object({}) do |c, hash|
