@@ -36,10 +36,12 @@ feature "edit a POM's details" do
 
     expect(page).to have_css('h1', text: 'Edit profile')
 
-    choose('working_pattern-2')
-    choose('Active')
+    choose('working_pattern-5')
+    choose('status-1')
 
-    expect(page).to have_content('Part time - 0.8')
+    click_button('Save')
+
+    expect(page).to have_content('0.5')
     expect(page).to have_content('Active')
   end
 

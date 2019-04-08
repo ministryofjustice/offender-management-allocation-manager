@@ -33,7 +33,7 @@ feature "get poms list" do
     visit "/poms/485752/edit"
 
     expect(page).to have_css(".govuk-button", count: 1)
-    expect(page).to have_css(".govuk-radios__item", count: 8)
+    expect(page).to have_css(".govuk-radios__item", count: 14)
     expect(page).to have_content("Edit profile")
     expect(page).to have_content("Working pattern")
     expect(page).to have_content("Status")
