@@ -10,8 +10,6 @@ class EmailService
     new(offender, pom, last_allocation, message)
   end
 
-  URL = Rails.application.routes.url_helpers.caseload_index_url
-
   def initialize(offender, pom, last_allocation, message)
     @offender = offender
     @pom = pom
@@ -27,6 +25,10 @@ class EmailService
   end
 
 private
+
+  def url
+    @url ||= Rails.application.routes.url_helpers.caseload_index_url
+  end
 
   def previous_pom
     @previous_pom ||= PrisonOffenderManagerService.
@@ -47,7 +49,7 @@ private
       offender_name: @offender.full_name,
       offender_no: @offender.offender_no,
       prison: PrisonService.name_for(@pom.agency_id),
-      url: URL
+      url: url
     ).deliver_later
   end
 
@@ -59,7 +61,7 @@ private
       offender_name: @offender.full_name,
       offender_no: @offender.offender_no,
       message: @message,
-      url: URL
+      url: url
     ).deliver_later
   end
 end
