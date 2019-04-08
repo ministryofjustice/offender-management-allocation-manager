@@ -51,8 +51,8 @@ module ApplicationHelper
     ResponsibilityService.new.calculate_pom_responsibility(offender)
   end
 
-  def responsibility_label(offender)
-    if pom_responsibility_label(offender) == 'Responsible'
+  def case_owner_label(offender)
+    if offender.case_owner == 'Prison'
       'Custody'
     else
       'Community'

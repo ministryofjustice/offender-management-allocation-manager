@@ -1,48 +1,6 @@
 require 'rails_helper'
 
 describe ResponsibilityService do
-  let(:offender_none) {
-    Nomis::Models::Offender.new
-  }
-  let(:offender_crc) {
-    Nomis::Models::Offender.new.tap { |o| o.case_allocation = 'CRC' }
-  }
-  let(:offender_nps_gt_10) {
-    Nomis::Models::Offender.new.tap { |o|
-      o.case_allocation = 'NPS'
-      o.release_date = DateTime.now.utc.to_date + 12.months
-    }
-  }
-  let(:offender_nps_lt_10) {
-    Nomis::Models::Offender.new.tap { |o|
-      o.case_allocation = 'NPS'
-      o.release_date = DateTime.now.utc.to_date + 6.months
-    }
-  }
-
-  let(:offender_omicable_nps_12months) {
-    Nomis::Models::Offender.new.tap { |o|
-      o.omicable = true
-      o.case_allocation = 'NPS'
-      o.release_date = DateTime.now.utc.to_date + 12.months
-    }
-  }
-
-  let(:offender_omicable_nps_3months) {
-    Nomis::Models::Offender.new.tap { |o|
-      o.omicable = true
-      o.case_allocation = 'NPS'
-      o.release_date = DateTime.now.utc.to_date + 3.months
-    }
-  }
-
-  let(:offender_not_omicable) {
-    Nomis::Models::Offender.new.tap { |o|
-      o.omicable = false
-      o.case_allocation = 'NPS'
-    }
-  }
-
   let(:offender_no_release_date) {
     Nomis::Models::Offender.new.tap { |o|
       o.release_date = nil
@@ -123,33 +81,6 @@ describe ResponsibilityService do
       o.release_date = DateTime.now.utc.to_date + 9.months
     }
   }
-
-  describe 'case owner' do
-    it "CRC allocations means Prison" do
-      resp = subject.calculate_case_owner(offender_crc)
-      expect(resp).to eq 'Prison'
-    end
-
-    it "NPS allocations with omic and > 12m" do
-      resp = subject.calculate_case_owner(offender_omicable_nps_12months)
-      expect(resp).to eq 'Prison'
-    end
-
-    it "NPS allocations with omic and 3 months" do
-      resp = subject.calculate_case_owner(offender_omicable_nps_3months)
-      expect(resp).to eq 'Probation'
-    end
-
-    it "NPS allocations with no omic" do
-      resp = subject.calculate_case_owner(offender_not_omicable)
-      expect(resp).to eq 'Probation'
-    end
-
-    it "No allocation" do
-      resp = subject.calculate_case_owner(offender_none)
-      expect(resp).to eq 'Unknown'
-    end
-  end
 
   describe 'pom responsibility' do
     context 'when offender has no release date' do
