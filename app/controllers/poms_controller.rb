@@ -23,25 +23,48 @@ class PomsController < ApplicationController
 
   def edit
     @pom = PrisonOffenderManagerService.get_pom(active_caseload, params[:nomis_staff_id])
+    @errors = {}
   end
 
+  # rubocop:disable Metrics/MethodLength
   def update
-    @pom = PrisonOffenderManagerService.get_pom_detail(params[:nomis_staff_id])
-    PrisonOffenderManagerService.update_pom(
+    @pom = PrisonOffenderManagerService.get_pom(active_caseload, params[:nomis_staff_id])
+
+    pom_detail = PrisonOffenderManagerService.update_pom(
       nomis_staff_id: params[:nomis_staff_id].to_i,
-      working_pattern: edit_pom_params[:working_pattern],
+      working_pattern: working_pattern,
       status: edit_pom_params[:status]
     )
-    redirect_to poms_path(id: @pom.nomis_staff_id)
+
+    if pom_detail.valid?
+      redirect_to pom_path(id: @pom.staff_id)
+      return
+    end
+
+    update_record_for_errors(pom_detail)
+    render :edit
   end
+# rubocop:enable Metrics/MethodLength
 
 private
+
+  def update_record_for_errors(pom_detail)
+    @pom.working_pattern = working_pattern
+    @pom.status = edit_pom_params[:status]
+    @errors = pom_detail.errors
+  end
+
+  def working_pattern
+    return '1.0' if edit_pom_params[:description] == 'FT'
+
+    edit_pom_params[:working_pattern]
+  end
 
   def pom
     PrisonOffenderManagerService.get_pom(active_caseload, params[:nomis_staff_id])
   end
 
   def edit_pom_params
-    params.require(:edit_pom).permit(:working_pattern, :status)
+    params.require(:edit_pom).permit(:working_pattern, :status, :description)
   end
 end
