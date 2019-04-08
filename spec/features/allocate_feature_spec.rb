@@ -49,7 +49,7 @@ feature 'Allocation' do
       click_link 'Allocate'
     end
 
-    expect(page).to have_css('h1', text: 'Why are you allocating a probation officer POM?')
+    expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
 
     check('override-2')
     check('override-3')
@@ -75,7 +75,7 @@ feature 'Allocation' do
       click_link 'Allocate'
     end
 
-    expect(page).to have_css('h1', text: 'Why are you allocating a probation officer POM?')
+    expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
 
     click_button('Continue')
     expect(page).to have_content('Select one or more reasons for not accepting the recommendation')
@@ -91,7 +91,7 @@ feature 'Allocation' do
       click_link 'Allocate'
     end
 
-    expect(page).to have_css('h1', text: 'Why are you allocating a probation officer POM?')
+    expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
 
     check('override-conditional-4')
     click_button('Continue')
@@ -108,7 +108,7 @@ feature 'Allocation' do
       click_link 'Allocate'
     end
 
-    expect(page).to have_css('h1', text: 'Why are you allocating a probation officer POM?')
+    expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
 
     check('override-conditional-1')
     click_button('Continue')

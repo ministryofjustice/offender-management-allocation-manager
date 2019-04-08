@@ -50,16 +50,33 @@ class PrisonOffenderManagerService
       allocation_list = allocation_list.offset(offset).limit(limit)
     end
 
+    offender_ids = allocation_list.map(&:nomis_offender_id)
     booking_ids = allocation_list.map(&:nomis_booking_id)
 
+    # Get an offender map of offender_id to sentence details and a hash of
+    # offender_no to case info details so we can fill in a fake offender
+    # object for each allocation. This will allow us to calculate the
+    # pom responsibility without having to make an API request per-offender.
+    offender_map = OffenderService.get_sentence_details(booking_ids)
+    case_info = CaseInformationService.get_case_info_for_offenders(offender_ids, prison)
+
     allocation_list_with_responsibility = allocation_list.map { |alloc|
-      offender = OffenderService.get_offender(alloc.nomis_offender_id)
+      offender_stub = Nomis::Models::Offender.new
+      if offender_map.key?(alloc.nomis_offender_id)
+        offender_stub.sentence_detail = offender_map[alloc.nomis_offender_id]
+      end
+
+      record = case_info[alloc.nomis_offender_id]
+      if record.present?
+        offender_stub.tier = record.tier
+        offender_stub.case_allocation = record.case_allocation
+        offender_stub.omicable = record.omicable
+      end
+
       alloc.responsibility =
-        ResponsibilityService.new.calculate_pom_responsibility(offender)
+        ResponsibilityService.new.calculate_pom_responsibility(offender_stub)
       alloc
     }
-
-    offender_map = OffenderService.get_sentence_details(booking_ids)
 
     allocations_and_offender = []
     allocation_list_with_responsibility.each do |alloc|
@@ -91,10 +108,14 @@ class PrisonOffenderManagerService
 
   def self.update_pom(params)
     pom = PomDetail.where(nomis_staff_id: params[:nomis_staff_id]).first
-    pom.working_pattern = params[:working_pattern] || pom.working_pattern
+    pom.working_pattern = params[:working_pattern]
     pom.status = params[:status] || pom.status
-    pom.save!
-    AllocationService.deallocate_pom(params[:nomis_staff_id]) if pom.status == 'inactive'
+    pom.save
+
+    if pom.valid? && pom.status == 'inactive'
+      AllocationService.deallocate_pom(params[:nomis_staff_id])
+    end
+
     pom
   end
 end

@@ -6,35 +6,43 @@
     <h2 class="govuk-heading-l"><%= @pom.first_name.titleize %> <%= @pom.last_name.titleize %></h2>
 
     <div class='govuk-!-margin-top-6'>
-      <div class="govuk-form-group">
-        <fieldset class="govuk-fieldset" aria-describedby="-edit_pom-conditional-hint">
-          <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-            <h1 class="govuk-fieldset__heading">Working pattern</h1>
-          </legend>
+      <fieldset class="govuk-fieldset" aria-describedby="-edit_pom-conditional-hint">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+          <h1 class="govuk-fieldset__heading">Working pattern</h1>
+        </legend>
+        <div class="govuk-form-group <% if @errors[:working_pattern].present? %>govuk-form-group--error<% end %>">
+        <% if @errors[:working_pattern].present? %>
+          <span class="govuk-error-message">
+            <%= @errors[:working_pattern].first %>
+          </span>
+        <% end %>
+
           <div class="govuk-radios" data-module="radios">
-            <div class="govuk-radios__item">
-              <%= radio_button_tag("edit_pom[working_pattern]", "1.0", @pom.working_pattern == '1.0', id: "working_pattern-1", class: "govuk-radios__input") %>
-              <%= label_tag "edit_pom[working_pattern]", "Full time", class: "govuk-label govuk-radios__label" %>
-            </div>
-            <div class="govuk-radios__item">
-              <%= radio_button_tag("edit_pom[working_pattern]", "0.8", @pom.working_pattern == '0.8', id: "working_pattern-2", class: "govuk-radios__input") %>
-              <%= label_tag "edit_pom[working_pattern]", "Part time - 0.8", class: "govuk-label govuk-radios__label" %>
-            </div>
-            <div class="govuk-radios__item">
-              <%= radio_button_tag("edit_pom[working_pattern]", "0.6", @pom.working_pattern == '0.6', id: "working_pattern-3", class: "govuk-radios__input") %>
-              <%= label_tag "edit_pom[working_pattern]", "Part time - 0.6", class: "govuk-label govuk-radios__label" %>
-            </div>
-            <div class="govuk-radios__item">
-              <%= radio_button_tag("edit_pom[working_pattern]", "0.4", @pom.working_pattern == '0.4', id: "working_pattern-4", class: "govuk-radios__input") %>
-              <%= label_tag "edit_pom[working_pattern]", "Part time - 0.4", class: "govuk-label govuk-radios__label" %>
-            </div>
-            <div class="govuk-radios__item">
-              <%= radio_button_tag("edit_pom[working_pattern]", "0.2", @pom.working_pattern == '0.2', id: "working_pattern-5", class: "govuk-radios__input") %>
-              <%= label_tag "edit_pom[working_pattern]", "Part time - 0.2", class: "govuk-label govuk-radios__label" %>
+            <div class="govuk-form-group">
+              <div class="govuk-radios__item">
+                <%= radio_button_tag("edit_pom[description]", "FT", @pom.working_pattern == '1.0', id: "working_pattern-ft", class: "govuk-radios__input") %>
+                <%= label_tag "edit_pom[description]", "Full time", class: "govuk-label govuk-radios__label" %>
+              </div>
+              <div class="govuk-radios govuk-radios--conditional" data-module="radios">
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="part-time-conditional-1" name="edit_pom[description]" type="radio" value="PT" data-aria-controls="conditional-part-time-conditional-1" <%= 'checked="checked"' if @pom.working_pattern != '1.0'%>>
+                  <label class="govuk-label govuk-radios__label" for="part-time-conditional-1">
+                    Part time
+                  </label>
+                </div>
+                <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-part-time-conditional-1">
+                  <% 9.downto(1).each do |value| %>
+                    <div class="govuk-radios__item">
+                      <%= radio_button_tag("edit_pom[working_pattern]", "0.#{value}", @pom.working_pattern == "0.#{value}", id: "working_pattern-#{value}", class: "govuk-radios__input") %>
+                      <%= label_tag "edit_pom[working_pattern]", "Part time 0.#{value} - #{working_pattern_to_days(value)}", class: "govuk-label govuk-radios__label" %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
             </div>
           </div>
-        </fieldset>
-      </div>
+        </div>
+      </fieldset>
     </div>
 
     <div class='govuk-!-margin-top-6'>
