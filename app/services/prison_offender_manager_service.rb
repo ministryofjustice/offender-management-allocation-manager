@@ -108,10 +108,14 @@ class PrisonOffenderManagerService
 
   def self.update_pom(params)
     pom = PomDetail.where(nomis_staff_id: params[:nomis_staff_id]).first
-    pom.working_pattern = params[:working_pattern] || pom.working_pattern
+    pom.working_pattern = params[:working_pattern]
     pom.status = params[:status] || pom.status
-    pom.save!
-    AllocationService.deallocate_pom(params[:nomis_staff_id]) if pom.status == 'inactive'
+    pom.save
+
+    if pom.valid? && pom.status == 'inactive'
+      AllocationService.deallocate_pom(params[:nomis_staff_id])
+    end
+
     pom
   end
 end
