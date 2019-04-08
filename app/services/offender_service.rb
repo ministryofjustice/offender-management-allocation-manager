@@ -9,7 +9,7 @@ class OffenderService
       if record.present?
         o.tier = record.tier
         o.case_allocation = record.case_allocation
-        o.omicable = record.omicable
+        o.omicable = record.omicable == 'Yes'
       end
 
       sentence_detail = get_sentence_details([o.latest_booking_id])
@@ -52,7 +52,7 @@ class OffenderService
       if record
         offender.tier = record.tier
         offender.case_allocation = record.case_allocation
-        offender.omicable = record.omicable
+        offender.omicable = record.omicable == 'Yes'
       end
 
       true

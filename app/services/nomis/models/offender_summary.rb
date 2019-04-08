@@ -2,7 +2,7 @@
 
 module Nomis
   module Models
-    class OffenderSummary
+    class OffenderSummary < OffenderBase
       include MemoryModel
 
       attribute :agency_id, :string
@@ -44,27 +44,6 @@ module Nomis
         SentenceTypeService.indeterminate_sentence?(imprisonment_status)
       end
 
-      def sentence_detail=(sentence_detail)
-        self.release_date = sentence_detail.release_date
-        self.sentence_start_date = sentence_detail.sentence_start_date
-        self.parole_eligibility_date = sentence_detail.parole_eligibility_date
-        self.tariff_date = sentence_detail.tariff_date
-        self.home_detention_curfew_eligibility_date =
-          sentence_detail.home_detention_curfew_eligibility_date
-      end
-
-      def earliest_release_date
-        dates = [
-          release_date,
-          parole_eligibility_date,
-          home_detention_curfew_eligibility_date,
-          tariff_date
-        ].compact
-        return nil if dates.empty?
-
-        dates.min
-      end
-
       def awaiting_allocation_for
         omic_start_date = Date.new(2019, 2, 4)
 
@@ -73,10 +52,6 @@ module Nomis
         else
           (Time.zone.today - sentence_start_date).to_i
         end
-      end
-
-      def full_name
-        "#{last_name}, #{first_name}".titleize
       end
     end
   end

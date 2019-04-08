@@ -40,7 +40,7 @@
           <%= format_date(offender.earliest_release_date) %>
         </td>
         <td aria-label="Case owner" class="govuk-table__cell">
-          <%= responsibility_label(ResponsibilityService.new.calculate_case_owner(offender)) %>
+          <%= case_owner_label(offender) %>
         </td>
         <td aria-label="Awaiting allocation for" class="govuk-table__cell">
           <%= offender.awaiting_allocation_for %> days
