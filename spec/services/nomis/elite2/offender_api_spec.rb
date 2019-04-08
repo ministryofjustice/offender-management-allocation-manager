@@ -8,7 +8,7 @@ describe Nomis::Elite2::OffenderApi do
 
       expect(response.data).not_to be_nil
       expect(response.data).to be_instance_of(Array)
-      expect(response.data).to all(be_an Nomis::Models::OffenderShort)
+      expect(response.data).to all(be_an Nomis::Models::OffenderSummary)
     end
 
     it "can get an offence description for a booking id",

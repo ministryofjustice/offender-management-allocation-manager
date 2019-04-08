@@ -2,41 +2,31 @@
 
 module Nomis
   module Models
-    class OffenderShort
+    class OffenderSummary
       include MemoryModel
 
-      attribute :booking_id, :integer
-      attribute :booking_no, :string
-      attribute :offender_no, :string
-      attribute :first_name, :string
-      attribute :middle_name, :string
-      attribute :last_name, :string
-      attribute :date_of_birth, :string
-      attribute :age, :integer
-      attribute :alerts_codes, :string
-      attribute :alerts_details, :string
       attribute :agency_id, :string
-      attribute :assigned_living_unit_id, :integer
-      attribute :assigned_living_unit_desc, :string
-      attribute :facial_image_id, :string
-      attribute :assigned_officer_user_id, :string
       attribute :aliases, :string
-      attribute :iep_level, :string
-      attribute :category_code, :string
-      attribute :band_code
-      attribute :rnum, :integer
-      attribute :tier, :string
+      attribute :booking_id, :integer
+      attribute :date_of_birth, :string
+      attribute :facial_image_id, :string
+      attribute :first_name, :string
+      attribute :last_name, :string
+      attribute :offender_no, :string
+
+      # custom attributes
       attribute :allocated_pom_name, :string
       attribute :allocation_date, :date
       attribute :case_allocation, :string
-      attribute :omicable, :boolean
       attribute :convicted_status, :string
-      attribute :imprisonment_status, :string
-      attribute :sentence_start_date, :date
-      attribute :release_date, :date
-      attribute :parole_eligibility_date, :date
       attribute :home_detention_curfew_eligibility_date, :date
+      attribute :imprisonment_status, :string
+      attribute :omicable, :boolean
+      attribute :parole_eligibility_date, :date
+      attribute :release_date, :date
+      attribute :sentence_start_date, :date
       attribute :tariff_date, :date
+      attribute :tier, :string
 
       def sentenced?
         # A prisoner will have had a sentence calculation and for our purposes
