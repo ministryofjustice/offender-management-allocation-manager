@@ -1,6 +1,22 @@
 module Nomis
   module Models
     class OffenderBase
+      include MemoryModel
+
+      attribute :first_name, :string
+      attribute :last_name, :string
+      attribute :date_of_birth, :string
+      attribute :offender_no, :string
+      attribute :convicted_status, :string
+      attribute :imprisonment_status, :string
+
+      # Custom attributes
+      attribute :allocated_pom_name, :string
+      attribute :case_allocation, :string
+      attribute :omicable, :boolean
+      attribute :tier, :string
+      attribute :sentence
+
       def sentenced?
         # A prisoner will have had a sentence calculation and for our purposes
         # this means that they will either have a:
