@@ -30,7 +30,7 @@ class Bucket
   end
 
   def valid_sort_fields
-    [:last_name, :earliest_release_date, :awaiting_allocation_for]
+    [:last_name, :earliest_release_date, :awaiting_allocation_for, :tier]
   end
 
   def take(count, from)
