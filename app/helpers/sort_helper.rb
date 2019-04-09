@@ -19,7 +19,21 @@ module SortHelper
     uri.query = Rack::Utils.build_query(query)
     uri.to_s
   end
-# rubocop:enable Naming/AccessorMethodName
+  # rubocop:enable Naming/AccessorMethodName
+
+  def display_arrow(field_name)
+    uri = URI.parse(request.original_url)
+
+    query = Rack::Utils.parse_query(uri.query)
+    current_sort = query['sort']
+    return '' unless current_sort.present? && current_sort.start_with?(field_name)
+
+    if current_sort.end_with?('asc')
+      '<span class="sort-arrow up">&#9650;</span>'.html_safe
+    else
+      '<span class="sort-arrow up">&#9660;</span>'.html_safe
+    end
+  end
 
 private
 

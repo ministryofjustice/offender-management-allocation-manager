@@ -26,18 +26,21 @@
         <a href="<%= set_search_param('last_name') %>">
           Prisoner name
         </a>
+        <%= display_arrow('last_name') %>
       </th>
       <th class="govuk-table__header sorter-false" scope="col">Prisoner number</th>
       <th class="govuk-table__header sorter-false" xscope="col">
         <a href="<%= set_search_param('earliest_release_date') %>">
-          Earliest release<br/>date</th>
+          Earliest release<br/>date
         </a>
+        <%= display_arrow('earliest_release_date') %>
       </th>
       <th class="govuk-table__header sorter-false" scope="col">Case owner</th>
       <th class="govuk-table__header sorter-false" scope="col">
         <a href="<%= set_search_param('awaiting_allocation_for') %>">
           Waiting
         </a>
+        <%= display_arrow('awaiting_allocation_for') %>
       </th>
       </th>
       <th class="govuk-table__header sorter-false" scope="col">Action</th>
