@@ -21,13 +21,9 @@ module Nomis
       # custom attributes
       attribute :allocated_pom_name, :string
       attribute :case_allocation, :string
-      attribute :home_detention_curfew_eligibility_date, :date
       attribute :omicable, :boolean
-      attribute :parole_eligibility_date, :date
-      attribute :release_date, :date
-      attribute :sentence_start_date, :date
-      attribute :tariff_date, :date
       attribute :tier, :string
+      attribute :sentence
     end
   end
 end

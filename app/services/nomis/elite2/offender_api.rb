@@ -76,8 +76,11 @@ module Nomis
 
           oid = record['offenderNo']
           hash[oid] = api_deserialiser.deserialise(
-            Nomis::Models::SentenceDetail, record
+            Nomis::Models::SentenceDetail, record['sentenceDetail']
           )
+          hash[oid].first_name = record['firstName']
+          hash[oid].last_name = record['lastName']
+          hash
         }
       end
     # rubocop:enable Metrics/MethodLength

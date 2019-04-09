@@ -14,7 +14,7 @@ class OffenderService
 
       sentence_detail = get_sentence_details([o.latest_booking_id])
       if sentence_detail.present? && sentence_detail.key?(offender_no)
-        o.sentence_detail = sentence_detail[offender_no]
+        o.sentence = sentence_detail[offender_no]
       end
 
       o.main_offence = Nomis::Elite2::OffenderApi.get_offence(o.latest_booking_id)
@@ -45,7 +45,7 @@ class OffenderService
 
     offenders.select { |offender|
       sentencing = sentence_details[offender.offender_no]
-      offender.sentence_detail = sentencing if sentencing.present?
+      offender.sentence = sentencing if sentencing.present?
       next false unless offender.sentenced?
 
       record = mapped_tiers[offender.offender_no]
