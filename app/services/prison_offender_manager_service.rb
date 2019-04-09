@@ -62,9 +62,7 @@ class PrisonOffenderManagerService
 
     allocation_list_with_responsibility = allocation_list.map { |alloc|
       offender_stub = Nomis::Models::Offender.new
-      if offender_map.key?(alloc.nomis_offender_id)
-        offender_stub.sentence_detail = offender_map[alloc.nomis_offender_id]
-      end
+      offender_stub.sentence = offender_map[alloc.nomis_offender_id]
 
       record = case_info[alloc.nomis_offender_id]
       if record.present?

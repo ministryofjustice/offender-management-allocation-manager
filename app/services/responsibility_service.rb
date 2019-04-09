@@ -9,7 +9,7 @@ class ResponsibilityService
   # rubocop:disable Metrics/CyclomaticComplexity
   # rubocop:disable Metrics/MethodLength
   def calculate_pom_responsibility(offender)
-    return RESPONSIBLE if offender.earliest_release_date.nil?
+    return RESPONSIBLE if offender.sentence.earliest_release_date.nil?
     return SUPPORTING unless omicable?(offender)
 
     return RESPONSIBLE if nps_case?(offender) &&
@@ -49,21 +49,21 @@ private
   end
 
   def release_date_gt_10_mths?(offender)
-    @release_date_gt_10_mths = offender.earliest_release_date >
+    @release_date_gt_10_mths = offender.sentence.earliest_release_date >
       DateTime.now.utc.to_date + 10.months
   end
 
   def release_date_gt_15_mths?(offender)
-    @release_date_gt_15_mths ||= offender.earliest_release_date >
+    @release_date_gt_15_mths ||= offender.sentence.earliest_release_date >
       DateTime.new(2019, 2, 4).utc.to_date + 15.months
   end
 
   def release_date_gt_12_weeks?(offender)
-    @release_date_gt_12_weeks ||= offender.earliest_release_date >
+    @release_date_gt_12_weeks ||= offender.sentence.earliest_release_date >
       DateTime.now.utc.to_date + 12.weeks
   end
 
   def new_case?(offender)
-    @new_case ||= offender.sentence_start_date > DateTime.new(2019, 2, 4).utc
+    @new_case ||= offender.sentence.sentence_start_date > DateTime.new(2019, 2, 4).utc
   end
 end

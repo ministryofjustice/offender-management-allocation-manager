@@ -19,7 +19,7 @@ describe PrisonOffenderManagerService do
       nomis_staff_id: staff_id,
       nomis_offender_id: 'G8060UF',
       created_by: 'Test User',
-      nomis_booking_id: 1,
+      nomis_booking_id: 971_856,
       allocated_at_tier: 'A',
       prison: 'LEI'
     )
@@ -30,7 +30,7 @@ describe PrisonOffenderManagerService do
       nomis_staff_id: staff_id,
       nomis_offender_id: 'G8624GK',
       created_by: 'Test User',
-      nomis_booking_id: 2,
+      nomis_booking_id: 76_908,
       allocated_at_tier: 'B',
       prison: 'LEI'
     )
@@ -41,7 +41,7 @@ describe PrisonOffenderManagerService do
       nomis_staff_id: staff_id,
       nomis_offender_id: 'G1714GU',
       created_by: 'Test User',
-      nomis_booking_id: 3,
+      nomis_booking_id: 31_777,
       allocated_at_tier: 'C',
       prison: 'LEI'
     )
