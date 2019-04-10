@@ -25,7 +25,12 @@ class Bucket
   def sort(field, direction = :asc)
     return unless valid_sort_fields.include?(field)
 
-    @items = @items.sort_by(&field)
+    if field == :earliest_release_date
+      @items = @items.sort_by { |e| e.send(field) || Date.new(1) }
+    else
+      @items = @items.sort_by(&field)
+    end
+
     @items = @items.reverse if direction == :desc
   end
 

@@ -66,4 +66,28 @@ describe Bucket do
     expect(b.items[1].last_name).to eq('M')
     expect(b.items[2].last_name).to eq('Z')
   end
+
+  it 'can sort dates containing nulls' do
+    b = described_class.new
+    b << Nomis::Models::OffenderSummary.new.tap { |o|
+      o.last_name = "A"
+      o.sentence = Nomis::Models::SentenceDetail.new
+    }
+    b << Nomis::Models::OffenderSummary.new.tap { |o|
+      o.last_name = "A"
+      o.sentence = Nomis::Models::SentenceDetail.new
+      o.sentence.release_date = Date.new(2000, 1, 1)
+    }
+    b.sort(:earliest_release_date)
+    items = b.take(2, 0)
+    expect(items.count).to eq(2)
+    expect(items.first.earliest_release_date).to be_nil
+    expect(items[1].earliest_release_date).not_to be_nil
+
+    b.sort(:earliest_release_date, :desc)
+    items = b.take(2, 0)
+    expect(items.count).to eq(2)
+    expect(items.first.earliest_release_date).not_to be_nil
+    expect(items[1].earliest_release_date).to be_nil
+  end
 end
