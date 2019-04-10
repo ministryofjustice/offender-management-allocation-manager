@@ -10,11 +10,21 @@
   <table class="govuk-table responsive tablesorter">
     <thead class="govuk-table__head">
     <tr class="govuk-table__row">
-      <th class="govuk-table__header" scope="col">Prisoner name</th>
+      <th class="govuk-table__header" scope="col">
+        <a href="<%= set_search_param('last_name') %>">
+          Prisoner name
+        </a>
+        <%= display_arrow('last_name') %>
+      </th>
       <th class="govuk-table__header" scope="col">Prisoner number</th>
       <th class="govuk-table__header" scope="col">Service provider</th>
       <th class="govuk-table__header" scope="col">Tier</th>
-      <th class="govuk-table__header" scope="col">Waiting</th>
+      <th class="govuk-table__header" scope="col">
+        <a href="<%= set_search_param('awaiting_allocation_for') %>">
+          Waiting
+        </a>
+        <%= display_arrow('awaiting_allocation_for') %>
+      </th>
       <th class="govuk-table__header" scope="col">Action</th>
     </tr>
     </thead>
