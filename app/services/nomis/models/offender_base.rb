@@ -5,7 +5,7 @@ module Nomis
 
       attribute :first_name, :string
       attribute :last_name, :string
-      attribute :date_of_birth, :string
+      attribute :date_of_birth, :date
       attribute :offender_no, :string
       attribute :convicted_status, :string
       attribute :imprisonment_status, :string

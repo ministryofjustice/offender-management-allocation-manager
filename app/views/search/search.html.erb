@@ -29,7 +29,7 @@
       <tr class="govuk-table__row allocated_offender_row_<%= i %>">
         <td aria-label="Prisoner name" class="govuk-table__cell"><%= highlight(offender.full_name, @q) %></td>
         <td aria-label="Prisoner number" class="govuk-table__cell"><%= highlight(offender.offender_no, @q) %></td>
-        <td aria-label="Date of birth" class="govuk-table__cell"><%= format_date_string(offender.date_of_birth) %></td>
+        <td aria-label="Date of birth" class="govuk-table__cell"><%= format_date(offender.date_of_birth) %></td>
         <td aria-label="Tier" class="govuk-table__cell"><%= offender.tier || '-' %></td>
         <td aria-label="POM" class="govuk-table__cell"><%= offender.allocated_pom_name || '-' %></td>
         <td aria-label="Action" class="govuk-table__cell "><%=
