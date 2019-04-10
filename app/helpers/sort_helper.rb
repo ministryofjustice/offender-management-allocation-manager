@@ -29,9 +29,9 @@ module SortHelper
     return '' unless current_sort.present? && current_sort.start_with?(field_name)
 
     if current_sort.end_with?('asc')
-      content_tag(:span, '&#9650'.html_safe, class: "sort-arrow" )
+      content_tag(:span, '&#9650'.html_safe, class: 'sort-arrow')
     else
-      content_tag(:span, '&#9660'.html_safe, class: "sort-arrow" )
+      content_tag(:span, '&#9660'.html_safe, class: 'sort-arrow')
     end
   end
 
