@@ -26,7 +26,7 @@ class Bucket
     return unless valid_sort_fields.include?(field)
 
     if field == :earliest_release_date
-      @items = @items.sort_by {|e| e.send(field) || Date.new(1)}
+      @items = @items.sort_by { |e| e.send(field) || Date.new(1) }
     else
       @items = @items.sort_by(&field)
     end

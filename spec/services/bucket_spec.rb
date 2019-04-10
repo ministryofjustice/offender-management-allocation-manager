@@ -82,12 +82,12 @@ describe Bucket do
     items = b.take(2, 0)
     expect(items.count).to eq(2)
     expect(items.first.earliest_release_date).to be_nil
-    expect(items[1].earliest_release_date).to_not be_nil
+    expect(items[1].earliest_release_date).not_to be_nil
 
     b.sort(:earliest_release_date, :desc)
     items = b.take(2, 0)
     expect(items.count).to eq(2)
-    expect(items.first.earliest_release_date).to_not be_nil
+    expect(items.first.earliest_release_date).not_to be_nil
     expect(items[1].earliest_release_date).to be_nil
   end
 end
