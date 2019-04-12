@@ -87,18 +87,11 @@ private
   end
 
   def recommended_and_nonrecommended_poms_for(offender)
-    pom_response = PrisonOffenderManagerService.get_poms(active_caseload) { |pom|
+    poms = PrisonOffenderManagerService.get_poms(active_caseload) { |pom|
       pom.status == 'active'
     }
 
-    recommended_type = 'Prison'
-    if %w[A B].include?(offender.tier)
-      recommended_type = 'Probation'
-    end
-
-    pom_response.partition { |pom|
-      pom.position_description.exclude?(recommended_type)
-    }
+    RecommendationService.recommended_poms(offender, poms)
   end
 
   def nomis_offender_id_from_url
