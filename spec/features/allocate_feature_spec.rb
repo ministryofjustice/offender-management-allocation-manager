@@ -30,16 +30,16 @@ feature 'Allocation' do
     end
 
     expect(page).to have_css('h1', text: 'Confirm allocation')
-    expect(page).to have_css('p', text: 'You are allocating Ozullirn Abbella to Toby Retallick')
+    expect(page).to have_css('p', text: 'You are allocating Ozullirn Abbella to Ross Jones')
 
     click_button 'Complete allocation'
 
     expect(page).to have_current_path summary_unallocated_path
-    expect(page).to have_css('.notification', text: 'Ozullirn Abbella has been allocated to Toby Retallick (Prison POM)')
+    expect(page).to have_css('.notification', text: 'Ozullirn Abbella has been allocated to Ross Jones (Probation POM)')
   end
 
   scenario 'overriding an allocation', vcr: { cassette_name: :override_allocation_feature } do
-    override_nomis_staff_id = 485_752
+    override_nomis_staff_id = 485_595
 
     signin_user
 
@@ -62,7 +62,7 @@ feature 'Allocation' do
     click_button 'Complete allocation'
 
     expect(page).to have_current_path summary_unallocated_path
-    expect(page).to have_css('.notification', text: 'Ozullirn Abbella has been allocated to Ross Jones (Probation POM)')
+    expect(page).to have_css('.notification', text: 'Ozullirn Abbella has been allocated to Toby Retallick (Prison POM)')
     expect(Override.count).to eq(0)
   end
 
