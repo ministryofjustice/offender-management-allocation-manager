@@ -17,7 +17,6 @@ module Nomis
         dates = [
             release_date,
             parole_eligibility_date,
-            home_detention_curfew_eligibility_date,
             tariff_date
         ].compact
         return nil if dates.empty?
