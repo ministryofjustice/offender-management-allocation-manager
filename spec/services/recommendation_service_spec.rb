@@ -11,29 +11,29 @@ describe RecommendationService do
     [
       Nomis::Models::PrisonOffenderManager.new.tap { |p|
         p.first_name = 'Alice'
-        p.position_description = 'Prison offender manager'
+        p.position = 'PRO'
       },
       Nomis::Models::PrisonOffenderManager.new.tap { |p|
         p.first_name = 'Bob'
-        p.position_description = 'Prison offender manager'
+        p.position = 'PRO'
       },
       Nomis::Models::PrisonOffenderManager.new.tap { |p|
         p.first_name = 'Clare'
-        p.position_description = 'Probation offender manager'
+        p.position = 'PO'
       },
       Nomis::Models::PrisonOffenderManager.new.tap { |p|
         p.first_name = 'Dave'
-        p.position_description = 'Probation offender manager'
+        p.position = 'PO'
       }
     ]
   }
 
   it "can determine the best type of POM for Tier A" do
-    expect(described_class.recommended_pom_type(tierA)).to eq(described_class::PROBATION)
+    expect(described_class.recommended_pom_type(tierA)).to eq(described_class::PROBATION_POM)
   end
 
   it "can determine the best type of POM for Tier D" do
-    expect(described_class.recommended_pom_type(tierD)).to eq(described_class::PRISON)
+    expect(described_class.recommended_pom_type(tierD)).to eq(described_class::PRISON_POM)
   end
 
   it "can partition POMs for a tier A offender" do

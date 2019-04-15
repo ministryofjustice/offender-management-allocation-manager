@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 class RecommendationService
-  PRISON = 'Prison'
-  PROBATION = 'Probation'
+  PRISON_POM = 'PRO'
+  PROBATION_POM = 'PO'
 
   def self.recommended_pom_type(offender)
-    return PROBATION if %w[A B].include?(offender.tier)
+    return PROBATION_POM if %w[A B].include?(offender.tier)
 
-    PRISON
+    PRISON_POM
   end
 
   def self.recommended_poms(offender, poms)
@@ -16,7 +16,7 @@ class RecommendationService
     # `offender`
     recommended_type = recommended_pom_type(offender)
     poms.partition { |pom|
-      pom.position_description.include?(recommended_type)
+      pom.position.include?(recommended_type)
     }
   end
 end
