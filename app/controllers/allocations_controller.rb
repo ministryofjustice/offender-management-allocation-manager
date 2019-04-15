@@ -9,8 +9,11 @@ class AllocationsController < ApplicationController
       AllocationService.previously_allocated_poms(nomis_offender_id_from_url)
     @recommended_poms, @not_recommended_poms =
       recommended_and_nonrecommended_poms_for(@prisoner)
+    @recommended_pom_type, @not_recommended_pom_type =
+      recommended_and_nonrecommended_poms_types_for(@prisoner)
   end
 
+  # rubocop:disable Metrics/MethodLength
   def edit
     unless AllocationService.active_allocation?(nomis_offender_id_from_url)
       redirect_to new_allocations_path(nomis_offender_id_from_url)
@@ -22,8 +25,11 @@ class AllocationsController < ApplicationController
       AllocationService.previously_allocated_poms(nomis_offender_id_from_url)
     @recommended_poms, @not_recommended_poms =
       recommended_and_nonrecommended_poms_for(@prisoner)
+    @recommended_pom_type, @not_recommended_pom_type =
+      recommended_and_nonrecommended_poms_types_for(@prisoner)
     @current_pom = current_pom_for(nomis_offender_id_from_url)
   end
+  # rubocop:enable Metrics/MethodLength
 
   def confirm
     @prisoner = offender(nomis_offender_id_from_url)
@@ -84,6 +90,18 @@ private
     nomis_staff_id = current_allocation[nomis_offender_id]['nomis_staff_id']
 
     PrisonOffenderManagerService.get_pom(active_caseload, nomis_staff_id)
+  end
+
+  def recommended_and_nonrecommended_poms_types_for(offender)
+    rec_type = RecommendationService.recommended_pom_type(offender)
+
+    if rec_type == RecommendationService::PRISON_POM
+      ['Prison officer',
+       'Probation officer']
+    else
+      ['Probation officer',
+       'Prison officer']
+    end
   end
 
   def recommended_and_nonrecommended_poms_for(offender)
