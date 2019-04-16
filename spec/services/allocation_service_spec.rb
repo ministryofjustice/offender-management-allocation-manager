@@ -6,9 +6,10 @@ RSpec.describe AllocationService do
       nomis_staff_id: 485_595,
       nomis_offender_id: 'G2911GD',
       created_by: 'Test User',
-      nomis_booking_id: 0,
+      nomis_booking_id: 1,
       allocated_at_tier: 'A',
-      prison: 'LEI'
+      prison: 'LEI',
+      created_at: '01/01/2019'
     )
   }
 
@@ -17,16 +18,44 @@ RSpec.describe AllocationService do
       nomis_staff_id: 485_595,
       nomis_offender_id: 'G2911GD',
       created_by: 'Test User',
-      nomis_booking_id: 0,
+      nomis_booking_id: 2,
       allocated_at_tier: 'A',
       prison: 'LEI',
-      active: false
+      active: false,
+      created_at: '01/01/2018'
+    )
+  }
+
+  let(:old_inactive_allocation) {
+    described_class.create_allocation(
+      nomis_staff_id: 485_752,
+      nomis_offender_id: 'G2911GD',
+      created_by: 'Test User',
+      nomis_booking_id: 3,
+      allocated_at_tier: 'A',
+      prison: 'PVI',
+      active: false,
+      created_at: '01/01/2017'
     )
   }
 
   it "Can get the active allocations", vcr: { cassette_name: 'allocation_service_get_allocations' } do
     alloc = described_class.active_allocations([allocation.nomis_offender_id])
     expect(alloc).to be_instance_of(Hash)
+  end
+
+  it "Can get the allocation history for an offender", vcr: { cassette_name: 'allocation_service_offender_history' } do
+    first_allocation = allocation
+    second_allocation = inactive_allocation
+    last_allocation = old_inactive_allocation
+
+    allocations = described_class.offender_allocation_history(allocation.nomis_offender_id)
+
+    expect(allocations.count).to eq(3)
+    expect(allocations[0].nomis_booking_id).to eq(first_allocation.nomis_booking_id)
+    expect(allocations[1].nomis_booking_id).to eq(second_allocation.nomis_booking_id)
+    expect(allocations[2].nomis_booking_id).to eq(last_allocation.nomis_booking_id)
+    expect(allocations[2].prison).to eq('PVI')
   end
 
   it "Can tell if an allocated offender has an active allocation", vcr: { cassette_name: 'allocation_service_has_active_allocation' } do
