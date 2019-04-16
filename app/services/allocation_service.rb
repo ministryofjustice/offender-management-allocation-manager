@@ -43,9 +43,11 @@ class AllocationService
   end
 
   def self.offender_allocation_history(nomis_offender_id)
-    Allocation.
+    allocations = Allocation.
       where(nomis_offender_id: nomis_offender_id).
       order('created_at DESC')
+
+    AllocationList.new(allocations)
   end
 
   def self.create_override(params)
