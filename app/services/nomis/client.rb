@@ -21,6 +21,15 @@ module Nomis
       end
     end
 
+    # Performs a basic GET request without processing the response. This is mostly
+    # used for when we do not want a JSON response from an endpoint.
+    def raw_get(route, queryparams: {}, extra_headers: {})
+      response = request(
+        :get, route, queryparams: queryparams, extra_headers: extra_headers
+      )
+      response.body
+    end
+
     # rubocop:disable Metrics/MethodLength
     def get(route, queryparams: {}, extra_headers: {})
       response = request(

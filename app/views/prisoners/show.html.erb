@@ -1,25 +1,25 @@
 <div class="govuk-grid-row govuk-!-margin-bottom-5">
   <div class="govuk-grid-column-one-quarter">
-    <img src="/public/images/prisoner.png" alt="Prisoner photo will be here" width="70%">
+    <img src="<%= prisoner_image_path(@offender.offender_no) %>" alt="Prisoner photo will be here" width="95%">
   </div>
   <div class="govuk-grid-column-three-quarters">
     <div class="govuk-grid-row">
       <div class='govuk-grid-column-full'>
-        <h2 class="govuk-heading-xl">Surname, Forename</h2>
+        <h2 class="govuk-heading-xl"><%= @offender.full_name %></h2>
       </div>
     </div>
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-third">
         <span class="govuk-body">Prisoner number</span>
-        <h3 class="govuk-heading-m">NOMS_ID</h3>
+        <h3 class="govuk-heading-m"><%= @offender.offender_no %></h3>
       </div>
       <div class="govuk-grid-column-one-third">
         <span class="govuk-body">Nationality</span>
-        <h3 class="govuk-heading-m">NATIONALITY</h3>
+        <h3 class="govuk-heading-m"><%= @offender.nationalities %></h3>
       </div>
       <div class="govuk-grid-column-one-third">
         <span class="govuk-body">Date of birth</span>
-        <h3 class="govuk-heading-m">DOB</h3>
+        <h3 class="govuk-heading-m"><%= format_date(@offender.date_of_birth) %></h3>
       </div>
     </div>
     <div class="govuk-grid-row">
@@ -28,18 +28,18 @@
         <h3 class="govuk-heading-m">ARRIVAL DATE</h3>
       </div>
       <div class="govuk-grid-column-one-third">
-        <span class="govuk-body">Release / parole eligibility date</span>
-        <h3 class="govuk-heading-m">RELEASE DATE</h3>
+        <span class="govuk-body">Earliest release date</span>
+        <h3 class="govuk-heading-m"><%= @offender.earliest_release_date %></h3>
       </div>
       <div class="govuk-grid-column-one-third">
         <span class="govuk-body">COM handover date</span>
-        <h3 class="govuk-heading-m">HANDOVER DATE</h3>
+        <h3 class="govuk-heading-m">Unknown</h3>
       </div>
     </div>
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-third">
-        <span class="govuk-body">Current responsibility</span>
-        <h3 class="govuk-heading-m">RESPONSIBILITY</h3>
+        <span class="govuk-body">Current case owner</span>
+        <h3 class="govuk-heading-m"><%= case_owner_label(@offender) %></h3>
       </div>
     </div>
     <div class='govuk-grid-row'>
@@ -65,27 +65,18 @@
         Allocations
       </a>
     </li>
-    <li class="govuk-tabs__list-item">
-      <a class="govuk-tabs__tab" href="#case-notes">
-        Case notes
-      </a>
-    </li>
   </ul>
 
   <section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="history">
     <%= render 'allocation_history' %>
   </section>
 
-  <section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="case-notes">
-    <%= render 'case_notes' %>
-  </section>
-
   <section class="govuk-tabs__panel govuk-tabs__panel--hidden"
            id="prisoner-info">
     <div>
-      <%# <%= render 'shared/offence_info' %> %>
-      <%# <%= render 'prisoners/case_information' %> %>
-      <%# <%= render 'prisoners/allocation_info' %> %>
+      <%# <%= render 'shared/offence_info' %>
+      <%# <%= render 'prisoners/case_information' %>
+      <%# <%= render 'prisoners/allocation_info' %>
     </div>
   </section>
 

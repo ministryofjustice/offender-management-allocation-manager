@@ -1,11 +1,11 @@
 require 'rails_helper'
 
 feature 'View a prisoner profile page' do
-  it 'shows the prisoner information' do
+  it 'shows the prisoner information', :raven_intercept_exception, vcr: { cassette_name: :show_offender_spec } do
     signin_user
 
-    visit '/prisoners/1'
+    visit '/prisoners/G7998GJ'
 
-    expect(page).to have_css('h2', text: 'Surname, Forename')
+    expect(page).to have_css('h2', text: 'Ahmonis, Okadonah')
   end
 end

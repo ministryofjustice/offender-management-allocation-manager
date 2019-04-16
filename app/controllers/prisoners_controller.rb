@@ -3,5 +3,24 @@
 class PrisonersController < ApplicationController
   before_action :authenticate_user
 
-  def show; end
+  def show
+    @offender = offender
+  end
+
+  def image
+    image_data = Nomis::Custody::ImageApi.image_data(id)
+
+    response.headers['Expires'] = 6.months.from_now.httpdate
+    send_data image_data, type: 'image/jpg', disposition: 'inline'
+  end
+
+private
+
+  def id
+    @id ||= params[:id]
+  end
+
+  def offender
+    @offender ||= OffenderService.get_offender(id)
+  end
 end
