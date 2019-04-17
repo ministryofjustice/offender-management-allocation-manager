@@ -42,6 +42,14 @@ class AllocationService
     ).map(&:nomis_staff_id)
   end
 
+  def self.offender_allocation_history(nomis_offender_id)
+    allocations = Allocation.
+      where(nomis_offender_id: nomis_offender_id).
+      order('created_at DESC')
+
+    AllocationList.new(allocations)
+  end
+
   def self.create_override(params)
     Override.find_or_create_by(
       nomis_staff_id: params[:nomis_staff_id],
