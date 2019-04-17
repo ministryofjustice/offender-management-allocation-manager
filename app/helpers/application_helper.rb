@@ -65,4 +65,8 @@ module ApplicationHelper
 
     'Determinate'
   end
+
+  def humanized_bool(bool_value)
+    bool_value ? 'Yes' : 'No'
+  end
 end
