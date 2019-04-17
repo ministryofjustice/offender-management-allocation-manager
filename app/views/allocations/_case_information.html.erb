@@ -16,7 +16,13 @@
       <%= pom_responsibility_label(@prisoner) %>
     </td>
   </tr>
-
+  <tr class="govuk-table__row">
+    <td class="govuk-table__cell">Last known address in Wales</td>
+    <td class="govuk-table__cell table_cell__left_align">
+      <%= humanized_bool(@prisoner.omicable) %>
+      <a class="govuk-link pull-right" href="<%= edit_case_information_path(@prisoner.offender_no) %>">Change</a>
+    </td>
+  </tr>
   <tr class="govuk-table__row">
     <td class="govuk-table__cell">Service provider</td>
     <td class="govuk-table__cell table_cell__left_align">
