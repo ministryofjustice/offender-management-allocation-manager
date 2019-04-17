@@ -8,7 +8,8 @@ Rails.application.routes.draw do
 
   get '/auth/:provider/callback', to: 'sessions#create'
   get '/signout', to: 'sessions#destroy'
-  get('/prisoners/:id' => 'prisoners#show', as: 'prisoners_show')
+  get('/prisoners/:id' => 'prisoners#show', as: 'prisoner_show')
+  get('/prisoners/:id/image.jpg' => 'prisoners#image', as: 'prisoner_image')
   get('/allocations/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocations#confirm', as: 'confirm_allocations')
 
   get('/summary' => 'summary#index')
