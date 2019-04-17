@@ -25,11 +25,11 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-third">
         <span class="govuk-body">Arrival date</span>
-        <h3 class="govuk-heading-m">ARRIVAL DATE</h3>
+        <h3 class="govuk-heading-m"><%= format_date(@offender.reception_date) %></h3>
       </div>
       <div class="govuk-grid-column-one-third">
         <span class="govuk-body">Earliest release date</span>
-        <h3 class="govuk-heading-m"><%= @offender.earliest_release_date %></h3>
+        <h3 class="govuk-heading-m"><%= format_date(@offender.earliest_release_date) %></h3>
       </div>
       <div class="govuk-grid-column-one-third">
         <span class="govuk-body">COM handover date</span>
