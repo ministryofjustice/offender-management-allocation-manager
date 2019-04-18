@@ -1,0 +1,25 @@
+
+<% @history.grouped_by_prison.each do |row| %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <div class="timeline">
+      <h2 class="govuk-heading-m"><%= prison_title(row.first) %></h2>
+      <ul>
+        <% row.last.each do |allocation| %>
+        <li class="action_needed">
+          <h2 class="govuk-heading-s">Prisoner allocation</h2>
+          <p>Prisoner allocated to
+            <%= link_to( "#{allocation.pom_detail_id}/#{allocation.nomis_staff_id}", pom_path(allocation.nomis_staff_id) ) %>
+          </p>
+          <p class="time"><%= format_date_long(allocation.created_at) %> by <%= allocation.created_by %></p>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+
+<% end %>

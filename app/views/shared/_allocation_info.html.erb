@@ -1,0 +1,43 @@
+<div class="govuk-!-margin-top-1">
+  <table class="govuk-table">
+    <tbody class="govuk-table__body">
+    <tr class="govuk-table__row">
+      <td class="govuk-table__header" scope="row">Allocation</td>
+      <td class="govuk-table__cell"></td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-width-one-half">Current responsibility</td>
+      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half"><%= case_owner_label(@prisoner) %></td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-width-one-half">POM</td>
+      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
+        <%= link_to @pom.full_name, pom_path(@pom.staff_id), class: "govuk-link" %>
+
+        <%= link_to 'Reallocate', edit_allocations_path(@prisoner.offender_no), class: "govuk-link pull-right" %>
+      </td>
+    </tr>
+    <!--
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell hmpps-table-cell__key">Co-working POM</td>
+      <td class="govuk-table__cell table_cell__left_align hmpps-table-cell__key"><%= @prisoner.offender_no %></td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-width-one-half">Keyworker</td>
+      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half"></td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell hmpps-table-cell__key">COM responsibility handover deadline</td>
+      <td class="govuk-table__cell table_cell__left_align hmpps-table-cell__key"></td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell hmpps-table-cell__key">COM</td>
+      <td class="govuk-table__cell table_cell__left_align hmpps-table-cell__key"></td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell hmpps-table-cell__key">Local Divisional Unit (LDU)</td>
+      <td class="govuk-table__cell table_cell__left_align hmpps-table-cell__key"></td>
+    </tr>
+    -->
+    </tbody>
+  </table>
