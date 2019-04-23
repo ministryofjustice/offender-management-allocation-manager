@@ -1,7 +1,7 @@
 require "rails_helper"
 
 feature "get poms list" do
-  it "shows the page", vcr: { cassette_name: :show_poms_feature } do
+  it "shows the page", vcr: { cassette_name: :show_poms_feature_list } do
     signin_user
 
     visit poms_path
@@ -15,7 +15,7 @@ feature "get poms list" do
     expect(page).to have_css('.govuk-breadcrumbs__link', count: 2)
   end
 
-  it "allows viewing a POM", vcr: { cassette_name: :show_poms_feature } do
+  it "allows viewing a POM", vcr: { cassette_name: :show_poms_feature_view } do
     signin_user
 
     visit "/poms/485752"
@@ -27,7 +27,7 @@ feature "get poms list" do
     expect(page).to have_css('.govuk-breadcrumbs__link', count: 3)
   end
 
-  it "allows editing a POM", vcr: { cassette_name: :show_poms_feature } do
+  it "allows editing a POM", vcr: { cassette_name: :show_poms_feature_edit } do
     signin_user
 
     visit "/poms/485752/edit"
