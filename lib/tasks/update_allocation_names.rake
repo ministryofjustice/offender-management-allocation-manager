@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 require 'rake'
 
 namespace :update_allocation_names do
@@ -44,3 +46,4 @@ namespace :update_allocation_names do
     }
   end
 end
+# rubocop:enable all
