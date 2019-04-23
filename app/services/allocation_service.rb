@@ -3,10 +3,15 @@
 class AllocationService
   # rubocop:disable Metrics/MethodLength
   def self.create_allocation(params)
-    pom_firstname, pom_secondname =
-      PrisonOffenderManagerService.get_pom_name(params[:nomis_staff_id])
-    user_firstname, user_secondname =
-      PrisonOffenderManagerService.get_user_name(params[:created_by])
+    set_names = proc { |alloc|
+      pom_firstname, pom_secondname =
+        PrisonOffenderManagerService.get_pom_name(params[:nomis_staff_id])
+      user_firstname, user_secondname =
+        PrisonOffenderManagerService.get_user_name(params[:created_by])
+
+      alloc.pom_name = "#{pom_firstname} #{pom_secondname}"
+      alloc.created_by_name = "#{user_firstname} #{user_secondname}"
+    }
 
     allocation = Allocation.transaction {
       Allocation.where(nomis_offender_id: params[:nomis_offender_id]).
@@ -16,8 +21,7 @@ class AllocationService
         get_pom_detail(params[:nomis_staff_id]).id
 
       Allocation.create!(params) do |alloc|
-        alloc.pom_name = "#{pom_firstname} #{pom_secondname}"
-        alloc.created_by_name = "#{user_firstname} #{user_secondname}"
+        set_names.call(alloc)
         alloc.active = params.fetch(:active, true)
         alloc.save!
       end

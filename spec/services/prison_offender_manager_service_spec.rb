@@ -57,16 +57,16 @@ describe PrisonOffenderManagerService do
 
   it "can get staff names",
     vcr: { cassette_name: :pom_service_staff_name } do
-      fname, lname = described_class.get_pom_name(staff_id)
-      expect(fname).to eq('JAY')
-      expect(lname).to eq('HEAL')
+    fname, lname = described_class.get_pom_name(staff_id)
+    expect(fname).to eq('JAY')
+    expect(lname).to eq('HEAL')
   end
 
   it "can get user names",
     vcr: { cassette_name: :pom_service_user_name } do
-      fname, lname = described_class.get_user_name('RJONES')
-      expect(fname).to eq('ROSS')
-      expect(lname).to eq('JONES')
+    fname, lname = described_class.get_user_name('RJONES')
+    expect(fname).to eq('ROSS')
+    expect(lname).to eq('JONES')
   end
 
   it "can get allocated offenders for a POM",
