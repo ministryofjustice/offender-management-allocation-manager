@@ -2,6 +2,7 @@ require "rails_helper"
 
 feature "edit a POM's details" do
   let(:nomis_staff_id) { 485_637 }
+  let(:fulltime_pom_id) { 485_737 }
   let(:nomis_offender_id) { 'G4273GI' }
 
   before do
@@ -11,17 +12,32 @@ feature "edit a POM's details" do
   it "setting unavailable shows selected on re-edit", vcr: { cassette_name: :edit_poms_unavailable_check } do
     signin_user
 
-    visit edit_pom_path(485_637)
+    visit edit_pom_path(nomis_staff_id)
     expect(page).to have_css('h1', text: 'Edit profile')
 
     choose('working_pattern-2')
     choose('Active but unavailable for new cases')
     click_on('Save')
 
-    visit edit_pom_path(485_637)
+    visit edit_pom_path(nomis_staff_id)
     expect(page).to have_css('h1', text: 'Edit profile')
 
     expect(page).to have_field('status-conditional-2', checked: true)
+  end
+
+  it "validates a POM when missing data", vcr: { cassette_name: :edit_poms_unavailable_check } do
+    signin_user
+
+    visit edit_pom_path(fulltime_pom_id)
+    expect(page).to have_css('h1', text: 'Edit profile')
+
+    # The only way to trigger (and therefore cover) the validation is for a full-time POM
+    # to be edited to part time but not choose a working pattern.
+    choose('part-time-conditional-1')
+    click_on('Save')
+
+    expect(page).to have_css('h1', text: 'Edit profile')
+    expect(page).to have_content('Select number of days worked')
   end
 
   it "makes an inactive POM active", vcr: { cassette_name: :edit_poms_activate_pom_feature } do
