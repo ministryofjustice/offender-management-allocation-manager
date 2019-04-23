@@ -37,7 +37,7 @@ AllocationService.create_allocation(
   nomis_booking_id: 1_153_753,
   prison: 'LEI',
   allocated_at_tier: 'C',
-  created_by: 'user@username.com',
+  created_by: 'PK000223',
   nomis_staff_id: 485_595
   )
 
@@ -46,7 +46,7 @@ AllocationService.create_allocation(
   nomis_booking_id: 1_153_753,
   prison: 'LEI',
   allocated_at_tier: 'A',
-  created_by: 'user@username.com',
+  created_by: 'PK000223',
   nomis_staff_id: 485_595
   )
 

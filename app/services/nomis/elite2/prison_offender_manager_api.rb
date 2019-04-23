@@ -5,6 +5,12 @@ module Nomis
     class PrisonOffenderManagerApi
       extend Elite2Api
 
+      def self.staff_detail(staff_id)
+        route = "/elite2api/api/staff/#{staff_id}"
+        data = e2_client.get(route)
+        api_deserialiser.deserialise(Nomis::Models::StaffDetails, data)
+      end
+
       def self.list(prison)
         route = "/elite2api/api/staff/roles/#{prison}/role/POM"
 

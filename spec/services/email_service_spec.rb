@@ -41,7 +41,7 @@ RSpec.describe EmailService do
           Allocation.new.tap do |a|
             a.nomis_staff_id = 485_737
             a.nomis_offender_id = 'G2911GD'
-            a.created_by = 'Test User'
+            a.created_by = 'PK000223'
             a.nomis_booking_id = 0
             a.allocated_at_tier = 'A'
             a.prison = 'LEI'
