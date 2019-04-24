@@ -39,7 +39,7 @@ feature "view an offender's allocation information" do
   end
 
   describe 'Offender does not have a key worker assigned', :raven_intercept_exception,
-           vcr: { cassette_name: :show_allocation_information_keyworker_not_assigned } do
+    vcr: { cassette_name: :show_allocation_information_keyworker_not_assigned } do
     before do
       create_case_information_for(nomis_offender_id_without_keyworker)
       create_allocation(nomis_offender_id_without_keyworker)
