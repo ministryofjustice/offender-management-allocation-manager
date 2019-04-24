@@ -123,7 +123,7 @@ feature 'Allocation' do
       nomis_booking_id: 1_153_753,
       prison: 'LEI',
       allocated_at_tier: 'A',
-      created_by: 'spo@leeds.hmpps.gov.uk',
+      created_by_username: 'SPO_LEEDS',
       active: true
     )
 

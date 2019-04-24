@@ -16,7 +16,7 @@ describe OmniAuth::Strategies::HmppsSso do
     context 'when #info' do
       it 'returns a hash with the username, active caseload, caseloads and email address' do
         leeds_prison = 'LEI'
-        username = 'Fred'
+        username = 'PK000223'
         caseloads = { 'LEI' => '', 'RNI' => '' }
         response = double(
           'staff_details',

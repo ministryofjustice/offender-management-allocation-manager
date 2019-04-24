@@ -9,6 +9,6 @@ namespace :integration_tests do
 
     Rails.logger.info 'Deleting integration test data'
 
-    Allocation.where(created_by: 'MOIC_INTEGRATION_TESTS').destroy_all
+    Allocation.where(created_by_username: 'MOIC_INTEGRATION_TESTS').destroy_all
   end
 end
