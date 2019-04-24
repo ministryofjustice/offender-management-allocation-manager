@@ -7,7 +7,7 @@ class AllocationService
       pom_firstname, pom_secondname =
         PrisonOffenderManagerService.get_pom_name(params[:nomis_staff_id])
       user_firstname, user_secondname =
-        PrisonOffenderManagerService.get_user_name(params[:created_by])
+        PrisonOffenderManagerService.get_user_name(params[:created_by_username])
 
       alloc.pom_name = "#{pom_firstname} #{pom_secondname}"
       alloc.created_by_name = "#{user_firstname} #{user_secondname}"

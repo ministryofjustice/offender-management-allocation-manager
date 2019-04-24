@@ -21,7 +21,7 @@ ActiveRecord::Schema.define(version: 2019_04_23_095925) do
     t.string "allocated_at_tier"
     t.string "override_reasons"
     t.string "override_detail"
-    t.string "created_by"
+    t.string "created_by_username"
     t.boolean "active"
     t.bigint "pom_detail_id"
     t.datetime "created_at", null: false

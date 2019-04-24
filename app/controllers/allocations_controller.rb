@@ -52,7 +52,7 @@ class AllocationsController < ApplicationController
     allocation = {
       nomis_staff_id: allocation_params[:nomis_staff_id].to_i,
       nomis_offender_id: allocation_params[:nomis_offender_id],
-      created_by: current_user,
+      created_by_username: current_user,
       nomis_booking_id: offender.latest_booking_id,
       allocated_at_tier: offender.tier,
       prison: active_caseload,

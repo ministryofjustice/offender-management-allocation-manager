@@ -5,7 +5,7 @@ RSpec.describe AllocationList, type: :model do
     AllocationService.create_allocation(
       nomis_staff_id: 485_595,
       nomis_offender_id: 'G2911GD',
-      created_by: 'PK000223',
+      created_by_username: 'PK000223',
       nomis_booking_id: 1,
       allocated_at_tier: 'A',
       prison: 'LEI',
@@ -17,7 +17,7 @@ RSpec.describe AllocationList, type: :model do
     AllocationService.create_allocation(
       nomis_staff_id: 485_752,
       nomis_offender_id: 'G2911GD',
-      created_by: 'PK000223',
+      created_by_username: 'PK000223',
       nomis_booking_id: 2,
       allocated_at_tier: 'A',
       prison: 'PVI',
@@ -30,7 +30,7 @@ RSpec.describe AllocationList, type: :model do
     AllocationService.create_allocation(
       nomis_staff_id: 485_752,
       nomis_offender_id: 'G2911GD',
-      created_by: 'PK000223',
+      created_by_username: 'PK000223',
       nomis_booking_id: 3,
       allocated_at_tier: 'A',
       prison: 'PVI',
@@ -43,7 +43,7 @@ RSpec.describe AllocationList, type: :model do
     AllocationService.create_allocation(
       nomis_staff_id: 485_595,
       nomis_offender_id: 'G2911GD',
-      created_by: 'PK000223',
+      created_by_username: 'PK000223',
       nomis_booking_id: 4,
       allocated_at_tier: 'A',
       prison: 'LEI',

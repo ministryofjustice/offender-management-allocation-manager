@@ -7,7 +7,7 @@ describe PrisonOffenderManagerService do
     AllocationService.create_allocation(
       nomis_staff_id: staff_id,
       nomis_offender_id: 'G4273GI',
-      created_by: 'RJONES',
+      created_by_username: 'RJONES',
       nomis_booking_id: 1_153_753,
       allocated_at_tier: 'A',
       prison: 'LEI'
@@ -18,7 +18,7 @@ describe PrisonOffenderManagerService do
     AllocationService.create_allocation(
       nomis_staff_id: staff_id,
       nomis_offender_id: 'G8060UF',
-      created_by: 'RJONES',
+      created_by_username: 'RJONES',
       nomis_booking_id: 971_856,
       allocated_at_tier: 'A',
       prison: 'LEI'
@@ -29,7 +29,7 @@ describe PrisonOffenderManagerService do
     AllocationService.create_allocation(
       nomis_staff_id: staff_id,
       nomis_offender_id: 'G8624GK',
-      created_by: 'RJONES',
+      created_by_username: 'RJONES',
       nomis_booking_id: 76_908,
       allocated_at_tier: 'B',
       prison: 'LEI'
@@ -40,7 +40,7 @@ describe PrisonOffenderManagerService do
     AllocationService.create_allocation(
       nomis_staff_id: staff_id,
       nomis_offender_id: 'G1714GU',
-      created_by: 'RJONES',
+      created_by_username: 'RJONES',
       nomis_booking_id: 31_777,
       allocated_at_tier: 'C',
       prison: 'LEI'
