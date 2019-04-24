@@ -9,6 +9,7 @@ describe Bucket do
     expect(b.items.count).to be(5)
     expect(b.items).to eq([1, 2, 3, 4, 5])
     expect(b.take(3, 2)).to eq([3, 4, 5])
+    expect(b.count).to eq(5)
   end
 
   it "can try to retrieve last n if we request too many" do
