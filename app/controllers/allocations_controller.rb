@@ -17,6 +17,7 @@ class AllocationsController < ApplicationController
       recommended_and_nonrecommended_poms_types_for(@prisoner)
   end
 
+  # rubocop:disable Metrics/LineLength
   def show
     @prisoner = offender(nomis_offender_id_from_url)
 
@@ -25,6 +26,7 @@ class AllocationsController < ApplicationController
 
     @history = AllocationService.offender_allocation_history(@prisoner.offender_no)
   end
+  # rubocop:enable Metrics/LineLength
 
   # rubocop:disable Metrics/MethodLength
   def edit
