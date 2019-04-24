@@ -10,7 +10,10 @@ Rails.application.routes.draw do
   get '/signout', to: 'sessions#destroy'
   get('/prisoners/:id' => 'prisoners#show', as: 'prisoner_show')
   get('/prisoners/:id/image.jpg' => 'prisoners#image', as: 'prisoner_image')
+
   get('/allocations/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocations#confirm', as: 'confirm_allocations')
+  # TODO: Figure out why this won't work in the resource...
+  get('/allocations/view/:nomis_offender_id' => 'allocations#show', as: 'show_allocations')
 
   get('/summary' => 'summary#index')
   get('/summary/allocated' => 'summary#allocated')
