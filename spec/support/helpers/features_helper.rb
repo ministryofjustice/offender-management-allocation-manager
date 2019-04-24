@@ -1,5 +1,5 @@
 module FeaturesHelper
-  def signin_user(name = 'Fred')
+  def signin_user(name = 'PK000223')
     hmpps_sso_response = {
       'info' => double('user_info', username: name, active_caseload: 'LEI', caseloads: %w[LEI RSI], roles: %w[ROLE_ALLOC_MGR]),
       'credentials' => double('credentials', expires_at: Time.zone.local(2030, 1, 1).to_i,
