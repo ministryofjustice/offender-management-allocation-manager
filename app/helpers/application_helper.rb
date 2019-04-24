@@ -23,6 +23,10 @@ module ApplicationHelper
     Date.parse(date_string).strftime('%d/%m/%Y')
   end
 
+  def format_date_long(date_obj)
+    date_obj.strftime("#{date_obj.day.ordinalize} %B %Y")
+  end
+
   def pom_level(level)
     {
       'PO' => 'Probation POM',

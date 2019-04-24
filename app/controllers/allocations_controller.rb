@@ -3,6 +3,10 @@
 class AllocationsController < ApplicationController
   before_action :authenticate_user
 
+  breadcrumb 'Allocated', :summary_allocated, only: [:show]
+  breadcrumb -> { offender(nomis_offender_id_from_url).full_name },
+    -> { show_allocations_path(nomis_offender_id_from_url) }, only: [:show]
+
   def new
     @prisoner = offender(nomis_offender_id_from_url)
     @previously_allocated_pom_ids =
@@ -12,6 +16,17 @@ class AllocationsController < ApplicationController
     @recommended_pom_type, @not_recommended_pom_type =
       recommended_and_nonrecommended_poms_types_for(@prisoner)
   end
+
+  # rubocop:disable Metrics/LineLength
+  def show
+    @prisoner = offender(nomis_offender_id_from_url)
+
+    allocation = AllocationService.active_allocations_with_pom_detail(@prisoner.offender_no).first
+    @pom = PrisonOffenderManagerService.get_pom(active_caseload, allocation.nomis_staff_id)
+
+    @history = AllocationService.offender_allocation_history(@prisoner.offender_no)
+  end
+  # rubocop:enable Metrics/LineLength
 
   # rubocop:disable Metrics/MethodLength
   def edit
