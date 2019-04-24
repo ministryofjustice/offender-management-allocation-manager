@@ -88,6 +88,7 @@ Several environment variables are required for the operation of this service.
 | NOMIS_OAUTH_CLIENT_ID | The client ID of the application in OAUTH |
 | NOMIS_OAUTH_AUTHORISATION | Oauth authorisation string (base64 encoded) |
 | NOMIS_OAUTH_PUBLIC_KEY  | This is the base64 encoded public key for decoding Tokens provided by the OAUTH server |
+| KEYWORKER_API_HOST | The host where the keyworker API is hosted |
 | SENTRY_DSN | The URL of a sentry installation. If no installation is available, then this should be present but an empty string ( "" )|
 | PROMETHEUS_METRICS | If set to 'on' then will enable the generation of prometheus metrics |
 

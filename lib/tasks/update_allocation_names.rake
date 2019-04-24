@@ -14,7 +14,7 @@ namespace :update_allocation_names do
     username_cache = {}
     pom_cache = {}
 
-    allocations = Allocation.where(created_by_username: nil)
+    allocations = Allocation.where(pom_name: nil)
 
     allocations.each { |allocation|
       if pom_cache.key?(allocation.nomis_staff_id)
@@ -33,7 +33,7 @@ namespace :update_allocation_names do
           user_firstname, user_secondname =
             PrisonOffenderManagerService.get_user_name(allocation.created_by_username)
         rescue
-          user_firstname, user_secondname = [allocation.crecreated_by_usernameated_by, ""]
+          user_firstname, user_secondname = [allocation.created_by_username, ""]
         end
 
         user_name = "#{user_firstname} #{user_secondname}"
