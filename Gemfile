@@ -4,7 +4,7 @@ git_source(:github) do |repo| "https://github.com/#{repo}.git" end
 ruby '2.6.2'
 
 gem 'bootsnap', '>= 1.1.0', require: false
-gem 'coffee-rails', '~> 4.2'
+gem 'coffee-rails', '~> 5.0'
 gem 'faraday'
 gem 'govuk_notify_rails'
 gem 'jbuilder', '~> 2.8'
