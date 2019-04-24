@@ -38,7 +38,7 @@ feature 'Allocation' do
     expect(page).to have_css('.notification', text: 'Ozullirn Abbella has been allocated to Ross Jones (Probation POM)')
   end
 
-  scenario 'overriding an allocation', vcr: { cassette_name: :override_allocation_feature } do
+  scenario 'overriding an allocation', vcr: { cassette_name: :override_allocation_feature_ok } do
     override_nomis_staff_id = 485_595
 
     signin_user
@@ -66,7 +66,7 @@ feature 'Allocation' do
     expect(Override.count).to eq(0)
   end
 
-  scenario 'overriding an allocation can validate missing reasons', vcr: { cassette_name: :override_allocation_feature } do
+  scenario 'overriding an allocation can validate missing reasons', vcr: { cassette_name: :override_allocation_feature_validate_reasons } do
     signin_user
 
     visit new_allocations_path(nomis_offender_id)
@@ -82,7 +82,7 @@ feature 'Allocation' do
     expect(Override.count).to eq(0)
   end
 
-  scenario 'overriding an allocation can validate missing Other detail', vcr: { cassette_name: :override_allocation_feature } do
+  scenario 'overriding an allocation can validate missing Other detail', vcr: { cassette_name: :override_allocation_feature_validate_other } do
     signin_user
 
     visit new_allocations_path(nomis_offender_id)
