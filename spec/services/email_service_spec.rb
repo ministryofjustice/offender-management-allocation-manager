@@ -6,7 +6,7 @@ RSpec.describe EmailService do
     {
       nomis_staff_id: 485_637,
       nomis_offender_id: 'G2911GD',
-      created_by: "PK000223",
+      created_by_username: "PK000223",
       nomis_booking_id: 1_153_753,
       allocated_at_tier: "A",
       prison: "LEI",
@@ -27,7 +27,7 @@ RSpec.describe EmailService do
   }
 
   context "when creating an initial POM allocation" do
-    it "Can send an allocation email", vcr: { cassette_name: 'email_service_send_allocation_email' } do
+    it "Can send an allocation email", vcr: { cassette_name: :email_service_send_allocation_email } do
       subject.send_allocation_email
       expect(enqueued_jobs.size).to eq(1)
       enqueued_jobs.clear
@@ -41,7 +41,7 @@ RSpec.describe EmailService do
           Allocation.new.tap do |a|
             a.nomis_staff_id = 485_737
             a.nomis_offender_id = 'G2911GD'
-            a.created_by = 'Test User'
+            a.created_by_username = 'PK000223'
             a.nomis_booking_id = 0
             a.allocated_at_tier = 'A'
             a.prison = 'LEI'
@@ -50,7 +50,7 @@ RSpec.describe EmailService do
       )
     end
 
-    it "Can send an allocation email", vcr: { cassette_name: 'email_service_send_deallocation_email' } do
+    it "Can send an allocation email", vcr: { cassette_name: :email_service_send_deallocation_email } do
       subject.send_allocation_email
       expect(enqueued_jobs.size).to eq(2)
       enqueued_jobs.clear

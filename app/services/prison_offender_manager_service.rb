@@ -37,6 +37,16 @@ class PrisonOffenderManagerService
     }
   end
 
+  def self.get_pom_name(nomis_staff_id)
+    staff = Nomis::Elite2::PrisonOffenderManagerApi.staff_detail(nomis_staff_id)
+    [staff.first_name, staff.last_name]
+  end
+
+  def self.get_user_name(username)
+    user = Nomis::Custody::UserApi.user_details(username)
+    [user.first_name, user.last_name]
+  end
+
   def self.get_allocations_for_pom(nomis_staff_id, prison)
     detail = get_pom_detail(nomis_staff_id)
     detail.allocations.where(active: true, prison: prison)

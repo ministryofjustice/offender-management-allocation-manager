@@ -7,7 +7,7 @@ describe PrisonOffenderManagerService do
     AllocationService.create_allocation(
       nomis_staff_id: staff_id,
       nomis_offender_id: 'G4273GI',
-      created_by: 'Test User',
+      created_by_username: 'RJONES',
       nomis_booking_id: 1_153_753,
       allocated_at_tier: 'A',
       prison: 'LEI'
@@ -18,7 +18,7 @@ describe PrisonOffenderManagerService do
     AllocationService.create_allocation(
       nomis_staff_id: staff_id,
       nomis_offender_id: 'G8060UF',
-      created_by: 'Test User',
+      created_by_username: 'RJONES',
       nomis_booking_id: 971_856,
       allocated_at_tier: 'A',
       prison: 'LEI'
@@ -29,7 +29,7 @@ describe PrisonOffenderManagerService do
     AllocationService.create_allocation(
       nomis_staff_id: staff_id,
       nomis_offender_id: 'G8624GK',
-      created_by: 'Test User',
+      created_by_username: 'RJONES',
       nomis_booking_id: 76_908,
       allocated_at_tier: 'B',
       prison: 'LEI'
@@ -40,7 +40,7 @@ describe PrisonOffenderManagerService do
     AllocationService.create_allocation(
       nomis_staff_id: staff_id,
       nomis_offender_id: 'G1714GU',
-      created_by: 'Test User',
+      created_by_username: 'RJONES',
       nomis_booking_id: 31_777,
       allocated_at_tier: 'C',
       prison: 'LEI'
@@ -54,6 +54,20 @@ describe PrisonOffenderManagerService do
   before(:each) {
     PomDetail.create(nomis_staff_id: 485_637, working_pattern: 1.0, status: 'inactive')
   }
+
+  it "can get staff names",
+    vcr: { cassette_name: :pom_service_staff_name } do
+    fname, lname = described_class.get_pom_name(staff_id)
+    expect(fname).to eq('JAY')
+    expect(lname).to eq('HEAL')
+  end
+
+  it "can get user names",
+    vcr: { cassette_name: :pom_service_user_name } do
+    fname, lname = described_class.get_user_name('RJONES')
+    expect(fname).to eq('ROSS')
+    expect(lname).to eq('JONES')
+  end
 
   it "can get allocated offenders for a POM",
     vcr: { cassette_name: :pom_service_allocated_offenders } do
@@ -89,14 +103,14 @@ describe PrisonOffenderManagerService do
   end
 
   it "can get a list of POMs",
-    vcr: { cassette_name: :pom_service_get_poms } do
+    vcr: { cassette_name: :pom_service_get_poms_list } do
     poms = described_class.get_poms('LEI')
     expect(poms).to be_kind_of(Array)
     expect(poms.count).to eq(13)
   end
 
   it "can get a filtered list of POMs",
-    vcr: { cassette_name: :pom_service_get_poms } do
+    vcr: { cassette_name: :pom_service_get_poms_filtered } do
     poms = described_class.get_poms('LEI') { |pom|
       pom.status == 'active'
     }
@@ -105,7 +119,7 @@ describe PrisonOffenderManagerService do
   end
 
   it "can get the names for POMs when given IDs",
-    vcr: { cassette_name: :pom_service_get_poms } do
+    vcr: { cassette_name: :pom_service_get_poms_by_ids } do
     names = described_class.get_pom_names('LEI')
     expect(names).to be_kind_of(Hash)
     expect(names.count).to eq(12)
