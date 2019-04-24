@@ -10,9 +10,11 @@
         <li class="action_needed">
           <h2 class="govuk-heading-s">Prisoner allocation</h2>
           <p>Prisoner allocated to
-            <%= link_to( "#{allocation.pom_detail_id}/#{allocation.nomis_staff_id}", pom_path(allocation.nomis_staff_id) ) %>
+            <%= link_to( allocation.pom_name.titlecase, pom_path(allocation.nomis_staff_id) ) %>
+            <br/>
+            Tier: <%= allocation.allocated_at_tier %>
           </p>
-          <p class="time"><%= format_date_long(allocation.created_at) %> by <%= allocation.created_by %></p>
+          <p class="time"><%= format_date_long(allocation.created_at) %> by <%= allocation.created_by_name.titlecase %></p>
         </li>
         <% end %>
       </ul>
