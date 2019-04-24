@@ -62,6 +62,12 @@ module Nomis
       def full_name_ordered
         "#{first_name} #{last_name}".titleize
       end
+
+      # rubocop:disable Rails/Date
+      def age
+        @age ||= ((Time.zone.now - date_of_birth.to_time) / 1.year.seconds).floor
+      end
+      # rubocop:enable Rails/Date
     end
   end
 end
