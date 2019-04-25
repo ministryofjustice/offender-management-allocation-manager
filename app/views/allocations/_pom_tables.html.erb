@@ -34,7 +34,7 @@ time left to serve into account.</p>
       <td aria-label="Total" class="govuk-table__cell "><%= pom.total_cases %></td>
       <td aria-label="Working pattern" class="govuk-table__cell"><%= working_pattern_name(pom.working_pattern) %></td>
       <td aria-label="Action" class="govuk-table__cell table_cell__left_align">
-      <%= link_to "Allocate", confirm_allocations_path(@prisoner.offender_no, pom.staff_id), class: "govuk-link" %>
+      <%= link_to "Allocate", confirm_allocation_path(@prisoner.offender_no, pom.staff_id), class: "govuk-link" %>
       </td>
     </tr>
   <% end %>

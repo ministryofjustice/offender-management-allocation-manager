@@ -15,11 +15,11 @@ module SearchHelper
     if offender.allocated_pom_name.blank?
       return link_to(
         'Allocate',
-        new_allocations_path(nomis_offender_id: offender_id)
+        new_allocation_path(nomis_offender_id: offender_id)
       )
     end
 
-    link_to('Reallocate', new_allocations_path(nomis_offender_id: offender_id))
+    link_to('Reallocate', new_allocation_path(nomis_offender_id: offender_id))
   end
   # rubocop:enable Metrics/MethodLength
 end

@@ -88,7 +88,7 @@ feature 'case information feature' do
     expect(CaseInformation.first.tier).to eq('A')
     expect(CaseInformation.first.case_allocation).to eq('CRC')
 
-    expect(page).to have_current_path new_allocations_path(nomis_offender_id)
+    expect(page).to have_current_path new_allocation_path(nomis_offender_id)
     expect(page).to have_content('CRC')
   end
 end

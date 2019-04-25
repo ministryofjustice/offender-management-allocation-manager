@@ -30,7 +30,7 @@ class OverridesController < ApplicationController
 private
 
   def redirect_on_success
-    redirect_to confirm_allocations_path(
+    redirect_to confirm_allocation_path(
       override_params[:nomis_offender_id],
       override_params[:nomis_staff_id]
     )
