@@ -8,6 +8,10 @@ module Nomis
       attribute :staff_id, :integer
       attribute :first_name, :string
       attribute :last_name, :string
+
+      def full_name
+        "#{last_name}, #{first_name}".titleize
+      end
     end
   end
 end
