@@ -25,7 +25,7 @@ feature "view an offender's allocation information" do
     it "displays the Key Worker's details" do
       signin_user
 
-      visit show_allocations_path(nomis_offender_id_with_keyworker)
+      visit allocations_path(nomis_offender_id: nomis_offender_id_with_keyworker)
 
       expect(page).to have_css('h1', text: 'Allocation information')
 
@@ -48,7 +48,7 @@ feature "view an offender's allocation information" do
     it "displays 'not assigned'" do
       signin_user
 
-      visit show_allocations_path(nomis_offender_id_without_keyworker)
+      visit allocations_path(nomis_offender_id: nomis_offender_id_without_keyworker)
 
       expect(page).to have_css('h1', text: 'Allocation information')
 

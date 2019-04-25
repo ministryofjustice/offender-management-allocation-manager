@@ -12,9 +12,6 @@ Rails.application.routes.draw do
   get('/prisoners/:id/image.jpg' => 'prisoners#image', as: 'prisoner_image')
 
   get('/allocations/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocations#confirm', as: 'confirm_allocations')
-  # TODO: Figure out why this won't work in the resource...
-  get('/allocations/view/:nomis_offender_id' => 'allocations#show', as: 'show_allocations')
-
   get('/summary' => 'summary#index')
   get('/summary/allocated' => 'summary#allocated')
   get('/summary/unallocated' => 'summary#unallocated')
@@ -30,14 +27,16 @@ Rails.application.routes.draw do
   resources :status, only: %i[ index ], controller: 'status'
   resource :overrides,  only: %i[ new create ], path_names: { new: 'new/:nomis_offender_id/:nomis_staff_id'}
   resources :poms, only: %i[ index show edit update ], param: :nomis_staff_id
-  resource :allocations, only: %i[ new create edit ], path_names: {
+  resource :allocations, only: %i[ show new create edit ], path_names: {
+    show: ':nomis_offender_id',
     new: 'new/:nomis_offender_id',
     edit: 'edit/:nomis_offender_id',
     confirm: 'confirm/:nomis_offender_id/:nomis_staff_id'
   }
-  resource :case_information, only: %i[new create edit update], controller: 'case_information', path_names: {
+  resource :case_information, only: %i[new create show edit update], controller: 'case_information', path_names: {
       new: 'new/:nomis_offender_id',
-      edit: 'edit/:nomis_offender_id'
+      edit: 'edit/:nomis_offender_id',
+      show: ':nomis_offender_id'
   }
 
   require 'sidekiq/web'
