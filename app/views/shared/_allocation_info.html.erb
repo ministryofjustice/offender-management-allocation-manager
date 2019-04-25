@@ -17,27 +17,28 @@
         <%= link_to 'Reallocate', edit_allocations_path(@prisoner.offender_no), class: "govuk-link pull-right" %>
       </td>
     </tr>
-    <!--
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell hmpps-table-cell__key">Co-working POM</td>
-      <td class="govuk-table__cell table_cell__left_align hmpps-table-cell__key"><%= @prisoner.offender_no %></td>
-    </tr>
+   <!--<tr class="govuk-table__row">-->
+      <!-- <td class="govuk&#45;table__cell hmpps&#45;table&#45;cell__key">Co&#45;working POM</td> -->
+      <!-- <td class="govuk&#45;table__cell table_cell__left_align hmpps&#45;table&#45;cell__key"></td> -->
+   <!--</tr>-->
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">Keyworker</td>
-      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half"></td>
+      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
+        <%= @keyworker.full_name %>
+      </td>
     </tr>
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell hmpps-table-cell__key">COM responsibility handover deadline</td>
-      <td class="govuk-table__cell table_cell__left_align hmpps-table-cell__key"></td>
-    </tr>
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell hmpps-table-cell__key">COM</td>
-      <td class="govuk-table__cell table_cell__left_align hmpps-table-cell__key"></td>
-    </tr>
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell hmpps-table-cell__key">Local Divisional Unit (LDU)</td>
-      <td class="govuk-table__cell table_cell__left_align hmpps-table-cell__key"></td>
-    </tr>
-    -->
+    <!-- <tr class="govuk&#45;table__row"> -->
+    <!--   <td class="govuk&#45;table__cell hmpps&#45;table&#45;cell__key">COM responsibility handover deadline</td> -->
+    <!--   <td class="govuk&#45;table__cell table_cell__left_align hmpps&#45;table&#45;cell__key"></td> -->
+    <!-- </tr> -->
+    <!-- <tr class="govuk&#45;table__row"> -->
+    <!--   <td class="govuk&#45;table__cell hmpps&#45;table&#45;cell__key">COM</td> -->
+    <!--   <td class="govuk&#45;table__cell table_cell__left_align hmpps&#45;table&#45;cell__key"></td> -->
+    <!-- </tr> -->
+    <!-- <tr class="govuk&#45;table__row"> -->
+    <!--   <td class="govuk&#45;table__cell hmpps&#45;table&#45;cell__key">Local Divisional Unit (LDU)</td> -->
+    <!--   <td class="govuk&#45;table__cell table_cell__left_align hmpps&#45;table&#45;cell__key"></td> -->
+    <!-- </tr> -->
     </tbody>
   </table>
+</div>

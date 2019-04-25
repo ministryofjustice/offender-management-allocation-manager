@@ -40,7 +40,9 @@
         <td aria-label="Allocation date" class="govuk-table__cell"><%= format_date(offender.allocation_date) %></td>
         <td aria-label="Action" class="govuk-table__cell "><%= link_to "Reallocate", edit_allocations_path(offender.offender_no) %></td>
         <!--
-          <td aria-label="Action" class="govuk-table__cell "><%= link_to "View", show_allocations_path(offender.offender_no) %></td>
+          <td aria-label="Action" class="govuk-table__cell ">
+            <#%= link_to "View", allocations_path(nomis_offender_id: offender.offender_no) %>
+          </td>
         -->
       </tr>
     <% end %>

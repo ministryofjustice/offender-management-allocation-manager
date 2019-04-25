@@ -5,7 +5,7 @@ class AllocationsController < ApplicationController
 
   breadcrumb 'Allocated', :summary_allocated, only: [:show]
   breadcrumb -> { offender(nomis_offender_id_from_url).full_name },
-    -> { show_allocations_path(nomis_offender_id_from_url) }, only: [:show]
+    -> { allocations_path(nomis_offender_id_from_url) }, only: [:show]
 
   def new
     @prisoner = offender(nomis_offender_id_from_url)
@@ -20,10 +20,9 @@ class AllocationsController < ApplicationController
   # rubocop:disable Metrics/LineLength
   def show
     @prisoner = offender(nomis_offender_id_from_url)
-
     allocation = AllocationService.active_allocations_with_pom_detail(@prisoner.offender_no).first
     @pom = PrisonOffenderManagerService.get_pom(active_caseload, allocation.nomis_staff_id)
-
+    @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(active_caseload, @prisoner.offender_no)
     @history = AllocationService.offender_allocation_history(@prisoner.offender_no)
   end
   # rubocop:enable Metrics/LineLength
