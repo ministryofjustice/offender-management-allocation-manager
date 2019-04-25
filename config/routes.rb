@@ -33,10 +33,9 @@ Rails.application.routes.draw do
     edit: 'edit/:nomis_offender_id',
     confirm: 'confirm/:nomis_offender_id/:nomis_staff_id'
   }
-  resource :case_information, only: %i[new create show edit update], controller: 'case_information', path_names: {
+  resource :case_information, only: %i[new create edit update], controller: 'case_information', path_names: {
       new: 'new/:nomis_offender_id',
-      edit: 'edit/:nomis_offender_id',
-      show: ':nomis_offender_id'
+      edit: 'edit/:nomis_offender_id'
   }
 
   require 'sidekiq/web'
