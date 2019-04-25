@@ -2,6 +2,12 @@
 
 module Nomis
   module Models
-    class NullKeyworker < KeyworkerDetails; end
+    class NullKeyworker < KeyworkerDetails
+
+      def full_name
+        'Not assigned'
+      end
+    
+    end
   end
 end
