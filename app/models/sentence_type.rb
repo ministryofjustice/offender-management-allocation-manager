@@ -18,6 +18,18 @@ class SentenceType
       st.duration_type = duration_type
     }
   end
+
+  def self.civil?(imprisonment_status)
+    %w[
+      CIVIL
+      CIVIL_CON
+      YOC_CONT
+      CIVIL_DT
+      A_CFINE
+      YO_CFINE
+      CIV_RMD
+    ].include? imprisonment_status
+  end
 end
 
 SENTENCE_TYPES = {

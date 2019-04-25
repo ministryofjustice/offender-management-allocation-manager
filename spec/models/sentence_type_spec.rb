@@ -18,4 +18,9 @@ RSpec.describe SentenceType, type: :model do
     expect(sentence_type.description).to eq('Unknown Sentenced')
     expect(sentence_type.duration_type).to eq(SentenceType::DETERMINATE)
   end
+
+  it 'knows what a civil sentence is' do
+    expect(described_class.civil?('CIVIL')).to be true
+    expect(described_class.civil?('IPP')).to be false
+  end
 end

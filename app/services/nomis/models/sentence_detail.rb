@@ -10,6 +10,8 @@ module Nomis
       attribute :home_detention_curfew_eligibility_date, :date
       attribute :parole_eligibility_date, :date
       attribute :release_date, :date
+      attribute :automatic_release_date, :date
+      attribute :conditional_release_date, :date
       attribute :sentence_start_date, :date
       attribute :tariff_date, :date
 
