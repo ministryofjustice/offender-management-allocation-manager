@@ -1,10 +1,15 @@
 <header class="govuk-header" role="banner">
   <div class="govuk-header__container govuk-width-container">
-    <a href="/" class="govuk-header__link govuk-header__link--homepage">
-      <span class="hmpps__logotype-crest"></span>
+      <a href="<%= Rails.configuration.nomis_oauth_host %>/auth/" class="govuk-header__link govuk-header__link--homepage">
+        <span class="hmpps__logotype-crest"></span>
+        <span class="govuk-header__logotype">
+          <span class="govuk-header__logotype-text moj-header__logotype-text">HMPPS </span>
+        </span>
+      </a>
       <span class="govuk-header__logotype">
-        <span class="govuk-header__logotype-text moj-header__logotype-text">HMPPS </span>
-        <span class="govuk-!-font-size-24 govuk-!-font-weight-regular">Allocate to a Prison Offender Manager (POM)</span>
+        <a href="/" class="govuk-header__link govuk-header__link--homepage">
+          <span class="govuk-!-font-size-24 govuk-!-font-weight-regular">Allocate to a Prison Offender Manager (POM)</span>
+        </a>
       </span>
     </a>
     <ul id="navigation" class="hmpps-header__navigation" aria-label="Top Level Navigation">
