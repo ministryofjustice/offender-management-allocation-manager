@@ -1,4 +1,3 @@
-
 <% @history.grouped_by_prison do |prison, allocations| %>
 
 <div class="govuk-grid-row">
@@ -16,12 +15,9 @@
           </p>
           <p class="time"><%= format_date_long(allocation.created_at) %> by <%= allocation.created_by_name.titlecase %></p>
         </li>
-        <% end %>
+      <% end %>
       </ul>
     </div>
   </div>
 </div>
-
-
-
 <% end %>
