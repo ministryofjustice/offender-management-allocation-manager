@@ -1,4 +1,4 @@
-<%= render :partial => "/shared/backlink", :locals => { :page => new_allocations_path(@prisoner.offender_no) } %>
+<%= render :partial => "/shared/backlink", :locals => { :page => new_allocation_path(@prisoner.offender_no) } %>
 
 <% if @override.errors.count > 0 %>
   <%= render :partial => "/shared/validation_errors", :locals => { :errors => @override.errors } %>

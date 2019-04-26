@@ -16,7 +16,7 @@ RSpec.describe SearchHelper do
         tier: 'A'
       )
       text, _link = cta_for_offender(offender)
-      expect(text).to eq('<a href="/allocations/new/A">Allocate</a>')
+      expect(text).to eq('<a href="/allocations/A/new">Allocate</a>')
     end
 
     it "will change to reallocate if there is an allocation" do
@@ -26,7 +26,7 @@ RSpec.describe SearchHelper do
         allocated_pom_name: 'Bob'
       )
       text, _link = cta_for_offender(offender)
-      expect(text).to eq('<a href="/allocations/new/A">Reallocate</a>')
+      expect(text).to eq('<a href="/allocations/A/new">Reallocate</a>')
     end
   end
 end
