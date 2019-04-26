@@ -2,10 +2,8 @@
 
 class AllocationList < Array
   # rubocop:disable Metrics/MethodLength
-  def grouped_by_prison!
-    # Groups the allocations in this array by the prison that it relates to,
-    # ensuring that it takes into account movements between prisons.
-    #
+  def grouped_by_prison(&_block)
+    # Groups the allocations in this array by the prison that it relates to.
     # Unfortunately we can't put this in a hash because a prisoner may have been
     # to a prison more than once, so a visit to Cardiff, then Leeds, then Cardiff
     # would mean they are out of order.  Instead we need to put it into a structure
@@ -17,27 +15,27 @@ class AllocationList < Array
     #      ['PrisonA', [alloc4]],
     #    ]
     #
-    # This method consumes the list during processing and so you should not
-    # attempt to use it afterwards, it'll be empty, primarily so we're not
-    # keeping two entire copies of the list around when there are large numbers
-    # of allocations.
+    # Instead of returning a list, and keeping multiple copies of data in RAM, the
+    # caller must provide a block `{ |prison, allocations| ... }` which will be called
+    # each time a new prison (row) is built
     return [] if empty?
 
-    results = []
+    idx = 0
+    last_idx = count
 
     loop do
-      prison = first.prison
-      allocations_for_prison = take_while { |p|
+      prison = self[idx].prison
+
+      slice_of_this = slice(idx, last_idx - idx)
+      allocations_for_prison = slice_of_this.take_while { |p|
         p.prison == prison
       }
 
-      results << [prison, allocations_for_prison]
-      shift(allocations_for_prison.count)
+      yield(prison, allocations_for_prison)
 
-      break if count == 0
+      idx += allocations_for_prison.count
+      break if idx >= last_idx
     end
-
-    results
   end
   # rubocop:enable Metrics/MethodLength
 end

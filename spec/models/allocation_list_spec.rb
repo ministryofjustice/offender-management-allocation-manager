@@ -56,19 +56,21 @@ RSpec.describe AllocationList, type: :model do
     list = AllocationList.new([current_allocation, middle_allocation1, middle_allocation2, old_allocation])
     expect(list.count).to eq(4)
 
-    # Extract the three expected rows from the list
-    first, second, third = list.grouped_by_prison!
-    expect(list.count).to eq(0)
+    results = []
 
-    prison, allocations = first
+    list.grouped_by_prison do |prison, allocations|
+      results << [prison, allocations]
+    end
+
+    prison, allocations = results.shift
     expect(prison).to eq('LEI')
     expect(allocations.count).to eq(1)
 
-    prison, allocations = second
+    prison, allocations = results.shift
     expect(prison).to eq('PVI')
     expect(allocations.count).to eq(2)
 
-    prison, allocations = third
+    prison, allocations = results.shift
     expect(prison).to eq('LEI')
     expect(allocations.count).to eq(1)
   end
