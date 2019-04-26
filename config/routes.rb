@@ -11,7 +11,7 @@ Rails.application.routes.draw do
   get('/prisoners/:id' => 'prisoners#show', as: 'prisoner_show')
   get('/prisoners/:id/image.jpg' => 'prisoners#image', as: 'prisoner_image')
 
-  get('/allocations/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocations#confirm', as: 'confirm_allocations')
+  get('/allocations/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocations#confirm', as: 'confirm_allocation')
   get('/summary' => 'summary#index')
   get('/summary/allocated' => 'summary#allocated')
   get('/summary/unallocated' => 'summary#unallocated')
@@ -27,11 +27,8 @@ Rails.application.routes.draw do
   resources :status, only: %i[ index ], controller: 'status'
   resource :overrides,  only: %i[ new create ], path_names: { new: 'new/:nomis_offender_id/:nomis_staff_id'}
   resources :poms, only: %i[ index show edit update ], param: :nomis_staff_id
-  resource :allocations, only: %i[ show new create edit ], path_names: {
-    show: ':nomis_offender_id',
-    new: 'new/:nomis_offender_id',
-    edit: 'edit/:nomis_offender_id',
-    confirm: 'confirm/:nomis_offender_id/:nomis_staff_id'
+  resources :allocations, only: %i[ show new create edit ], param: :nomis_offender_id, path_names: {
+    new: ':nomis_offender_id/new',
   }
   resource :case_information, only: %i[new create edit update], controller: 'case_information', path_names: {
       new: 'new/:nomis_offender_id',

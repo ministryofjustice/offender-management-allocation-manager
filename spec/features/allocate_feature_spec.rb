@@ -21,7 +21,7 @@ feature 'Allocation' do
   scenario 'accepting a recommended allocation', vcr: { cassette_name: :create_new_allocation_feature } do
     signin_user
 
-    visit new_allocations_path(nomis_offender_id)
+    visit new_allocation_path(nomis_offender_id)
 
     expect(page).to have_content('Determinate')
 
@@ -43,7 +43,7 @@ feature 'Allocation' do
 
     signin_user
 
-    visit new_allocations_path(nomis_offender_id)
+    visit new_allocation_path(nomis_offender_id)
 
     within('.not_recommended_pom_row_0') do
       click_link 'Allocate'
@@ -57,7 +57,7 @@ feature 'Allocation' do
 
     expect(Override.count).to eq(1)
 
-    expect(page).to have_current_path confirm_allocations_path(nomis_offender_id, override_nomis_staff_id)
+    expect(page).to have_current_path confirm_allocation_path(nomis_offender_id, override_nomis_staff_id)
 
     click_button 'Complete allocation'
 
@@ -69,7 +69,7 @@ feature 'Allocation' do
   scenario 'overriding an allocation can validate missing reasons', vcr: { cassette_name: :override_allocation_feature_validate_reasons } do
     signin_user
 
-    visit new_allocations_path(nomis_offender_id)
+    visit new_allocation_path(nomis_offender_id)
 
     within('.not_recommended_pom_row_0') do
       click_link 'Allocate'
@@ -85,7 +85,7 @@ feature 'Allocation' do
   scenario 'overriding an allocation can validate missing Other detail', vcr: { cassette_name: :override_allocation_feature_validate_other } do
     signin_user
 
-    visit new_allocations_path(nomis_offender_id)
+    visit new_allocation_path(nomis_offender_id)
 
     within('.not_recommended_pom_row_0') do
       click_link 'Allocate'
@@ -102,7 +102,7 @@ feature 'Allocation' do
   scenario 'overriding an allocation can validate missing suitabilitydetail', vcr: { cassette_name: :override_suitability_allocation_feature } do
     signin_user
 
-    visit new_allocations_path(nomis_offender_id)
+    visit new_allocation_path(nomis_offender_id)
 
     within('.not_recommended_pom_row_0') do
       click_link 'Allocate'
@@ -135,7 +135,7 @@ feature 'Allocation' do
       click_link 'Reallocate'
     end
 
-    expect(page).to have_current_path edit_allocations_path(nomis_offender_id)
+    expect(page).to have_current_path edit_allocation_path(nomis_offender_id)
     expect(page).to have_css('.current_pom_full_name', text: 'Duckett, Jenny')
     expect(page).to have_css('.current_pom_grade', text: 'Prison POM')
   end
@@ -144,7 +144,7 @@ feature 'Allocation' do
     allow(AllocationService).to receive(:create_allocation).and_return(false)
     signin_user
 
-    visit new_allocations_path(nomis_offender_id)
+    visit new_allocation_path(nomis_offender_id)
 
     within('.recommended_pom_row_0') do
       click_link 'Allocate'
@@ -162,7 +162,7 @@ feature 'Allocation' do
   scenario 'cannot reallocate a non-allocated offender', vcr: { cassette_name: :allocation_attempt_bad_reallocate } do
     signin_user
 
-    visit edit_allocations_path(never_allocated_offender)
-    expect(page).to have_current_path new_allocations_path(never_allocated_offender)
+    visit edit_allocation_path(never_allocated_offender)
+    expect(page).to have_current_path new_allocation_path(never_allocated_offender)
   end
 end

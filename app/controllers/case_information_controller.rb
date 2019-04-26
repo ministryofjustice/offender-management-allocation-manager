@@ -46,7 +46,7 @@ class CaseInformationController < ApplicationController
     case_info.omicable = case_information_params[:omicable]
     case_info.save
 
-    redirect_to new_allocations_path(case_info.nomis_offender_id)
+    redirect_to new_allocation_path(case_info.nomis_offender_id)
   end
 
 private

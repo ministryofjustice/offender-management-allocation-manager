@@ -1,4 +1,4 @@
-<%= render :partial => "/shared/backlink", :locals => { :page => new_allocations_path(@prisoner.offender_no) } %>
+<%= render :partial => "/shared/backlink", :locals => { :page => new_allocation_path(@prisoner.offender_no) } %>
 
 <div class="govuk-grid-row">
 
@@ -20,7 +20,7 @@
       <%= hidden_field_tag("allocations[nomis_offender_id]", @prisoner.offender_no) %>
       <%= hidden_field_tag("allocations[nomis_staff_id]", @pom.staff_id) %>
       <%= submit_tag "Complete allocation", role: "button", draggable: "false", class: "govuk-button" %>
-      <a class="govuk-link cancel-button" href="<%= new_allocations_path(@prisoner.offender_no) %>">Cancel</a>
+      <a class="govuk-link cancel-button" href="<%= new_allocation_path(@prisoner.offender_no) %>">Cancel</a>
     <% end %>
   </div>
 
