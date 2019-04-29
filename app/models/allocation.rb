@@ -18,12 +18,14 @@ class Allocation < ApplicationRecord
   scope :primary_pom_nomis_id, lambda { |nomis_offender_id|
     active_allocations(nomis_offender_id).first.primary_pom_nomis_id
   }
-  scope :deallocate_primary_pom, lambda { |nomis_staff_id|
-    all_primary_pom_allocations(nomis_staff_id).update_all(active: false)
-  }
-  scope :deallocate_offender, lambda { |nomis_offender_id|
+
+  def self.deallocate_offender(nomis_offender_id)
     active_allocations(nomis_offender_id).update_all(active: false)
-  }
+  end
+
+  def self.deallocate_primary_pom(nomis_staff_id)
+    all_primary_pom_allocations(nomis_staff_id).update_all(active: false)
+  end
 
   validates :nomis_offender_id,
     :primary_pom_nomis_id,
