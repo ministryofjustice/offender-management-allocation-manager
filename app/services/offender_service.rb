@@ -68,17 +68,17 @@ class OffenderService
   def self.set_allocated_pom_name(offenders, caseload)
     pom_names = PrisonOffenderManagerService.get_pom_names(caseload)
     nomis_offender_ids = offenders.map(&:offender_no)
-    offender_to_staff_hash = AllocationService.
-      active_allocations_with_pom_detail(nomis_offender_ids).
+    offender_to_staff_hash = Allocation.
+      active_allocations(nomis_offender_ids).
       map { |a|
-      [
-        a.nomis_offender_id,
-        {
-          pom_name: pom_names[a.pom_detail.nomis_staff_id],
-          allocation_date: a.created_at
-        }
-      ]
-    }.to_h
+        [
+          a.nomis_offender_id,
+          {
+            pom_name: pom_names[a.primary_pom_nomis_id],
+            allocation_date: a.created_at
+          }
+        ]
+      }.to_h
 
     offenders.map do |offender|
       if offender_to_staff_hash.key?(offender.offender_no)

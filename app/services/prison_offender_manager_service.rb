@@ -51,14 +51,13 @@ class PrisonOffenderManagerService
     [user.first_name, user.last_name]
   end
 
-  def self.get_allocations_for_pom(nomis_staff_id, prison)
-    detail = get_pom_detail(nomis_staff_id)
-    detail.allocations.where(active: true, prison: prison)
+  def self.get_allocations_for_primary_pom(nomis_staff_id, prison)
+    Allocation.where(primary_pom_nomis_id: nomis_staff_id, active: true, prison: prison)
   end
 
   # rubocop:disable Metrics/MethodLength
   def self.get_allocated_offenders(nomis_staff_id, prison, offset: nil, limit: nil)
-    allocation_list = get_allocations_for_pom(nomis_staff_id, prison)
+    allocation_list = get_allocations_for_primary_pom(nomis_staff_id, prison)
 
     if offset.present? && limit.present?
       allocation_list = allocation_list.offset(offset).limit(limit)
@@ -125,7 +124,7 @@ class PrisonOffenderManagerService
     pom.save
 
     if pom.valid? && pom.status == 'inactive'
-      AllocationService.deallocate_pom(params[:nomis_staff_id])
+      AllocationService.deallocate_primary_pom(params[:nomis_staff_id])
     end
 
     pom

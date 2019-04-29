@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_23_095925) do
+ActiveRecord::Schema.define(version: 2019_04_26_085505) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,17 +23,19 @@ ActiveRecord::Schema.define(version: 2019_04_23_095925) do
     t.string "override_detail"
     t.string "created_by_username"
     t.boolean "active"
-    t.bigint "pom_detail_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "nomis_staff_id"
+    t.integer "primary_pom_nomis_id"
     t.integer "nomis_booking_id"
     t.text "message"
     t.string "suitability_detail"
-    t.text "pom_name"
+    t.text "primary_pom_name"
     t.text "created_by_name"
+    t.text "secondary_pom_name"
+    t.integer "secondary_pom_nomis_id"
     t.index ["nomis_offender_id"], name: "index_allocations_on_nomis_offender_id"
-    t.index ["nomis_staff_id"], name: "index_allocations_on_nomis_staff_id"
+    t.index ["primary_pom_nomis_id"], name: "index_allocations_on_primary_pom_nomis_id"
+    t.index ["secondary_pom_nomis_id"], name: "index_allocations_on_secondary_pom_nomis_id"
   end
 
   create_table "case_information", force: :cascade do |t|
@@ -62,5 +64,4 @@ ActiveRecord::Schema.define(version: 2019_04_23_095925) do
     t.index ["nomis_staff_id"], name: "index_pom_details_on_nomis_staff_id"
   end
 
-  add_foreign_key "allocations", "pom_details"
 end

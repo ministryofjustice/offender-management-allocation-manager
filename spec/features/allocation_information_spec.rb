@@ -72,15 +72,15 @@ feature "view an offender's allocation information" do
   end
 
   def create_allocation(offender_no)
-    pom_detail.allocations.create!(
+    Allocation.create!(
       nomis_offender_id: offender_no,
-      nomis_staff_id: probation_officer_nomis_staff_id,
+      primary_pom_nomis_id: probation_officer_nomis_staff_id,
       nomis_booking_id: '1153753',
       prison: prison,
       allocated_at_tier: allocated_at_tier,
       created_by_username: 'SuperSPO',
       created_by_name: 'Super SPO',
-      pom_name: 'Ross Jones',
+      primary_pom_name: 'Ross Jones',
       active: true
     )
   end

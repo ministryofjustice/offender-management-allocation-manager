@@ -32,8 +32,9 @@ describe OffenderService, vcr: { cassette_name: :offender_service_offenders_by_p
     vcr: { cassette_name: :offender_service_pom_names_spec } do
 
     offenders = OffenderService.get_offenders_for_prison('LEI', page_size: 3)
+    nomis_staff_id = 485_752
 
-    PomDetail.create!(nomis_staff_id: 485_752, working_pattern: 1.0, status: 'active')
+    PomDetail.create!(nomis_staff_id: nomis_staff_id, working_pattern: 1.0, status: 'active')
 
     AllocationService.create_allocation(
       nomis_offender_id: offenders.first.offender_no,
@@ -41,7 +42,7 @@ describe OffenderService, vcr: { cassette_name: :offender_service_offenders_by_p
       prison: 'LEI',
       allocated_at_tier: 'C',
       created_by_username: 'PK000223',
-      nomis_staff_id: 485_752
+      primary_pom_nomis_id: nomis_staff_id
     )
 
     updated_offenders = OffenderService.set_allocated_pom_name(offenders, 'LEI')
