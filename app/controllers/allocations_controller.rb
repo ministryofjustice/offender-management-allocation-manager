@@ -20,7 +20,7 @@ class AllocationsController < ApplicationController
   # rubocop:disable Metrics/LineLength
   def show
     @prisoner = offender(nomis_offender_id_from_url)
-    primary_pom_nomis_id = AllocationService.primary_pom_nomis_id(@prisoner.offender_no)
+    primary_pom_nomis_id = Allocation.primary_pom_nomis_id(@prisoner.offender_no)
     @pom = PrisonOffenderManagerService.get_pom(active_caseload, primary_pom_nomis_id)
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(active_caseload, @prisoner.offender_no)
     @history = AllocationService.offender_allocation_history(@prisoner.offender_no)

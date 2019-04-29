@@ -78,18 +78,4 @@ RSpec.describe AllocationService do
     expect(staff_ids.count).to eq(1)
     expect(staff_ids.first).to eq(485_595)
   end
-
-  it "can deallocate for a POM", vcr: { cassette_name: :allocation_service_deallocate_a_pom } do
-    staff_id = allocation.primary_pom_nomis_id
-    described_class.deallocate_primary_pom(staff_id)
-    alloc = PrisonOffenderManagerService.get_allocations_for_primary_pom(staff_id, 'LEI')
-    expect(alloc).to eq([])
-  end
-
-  it "can deallocate for an offender", vcr: { cassette_name: :allocation_service_deallocate_an_offender } do
-    offender_id = allocation.nomis_offender_id
-    described_class.deallocate_offender(offender_id)
-    alloc = described_class.active_allocations([offender_id])
-    expect(alloc).to eq({})
-  end
 end

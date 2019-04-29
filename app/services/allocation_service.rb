@@ -14,9 +14,7 @@ class AllocationService
     }
 
     allocation = Allocation.transaction {
-      Allocation.where(nomis_offender_id: params[:nomis_offender_id]).
-        update_all(active: false)
-
+      Allocation.deallocate_offender(params[:nomis_offender_id])
       Allocation.create!(params) do |alloc|
         set_names.call(alloc)
         alloc.active = params.fetch(:active, true)
@@ -35,11 +33,11 @@ class AllocationService
   # rubocop:enable Metrics/MethodLength
 
   def self.active_allocation?(nomis_offender_id)
-    Allocation.where(nomis_offender_id: nomis_offender_id, active: true).count > 0
+    Allocation.active_allocations(nomis_offender_id).count > 0
   end
 
   def self.active_allocations(nomis_offender_ids)
-    Allocation.where(nomis_offender_id: nomis_offender_ids, active: true).map { |a|
+    Allocation.active_allocations(nomis_offender_ids).map { |a|
       [
         a[:nomis_offender_id],
         a
@@ -48,9 +46,8 @@ class AllocationService
   end
 
   def self.previously_allocated_poms(nomis_offender_id)
-    Allocation.where(
-      nomis_offender_id: nomis_offender_id, active: false
-    ).map(&:primary_pom_nomis_id)
+    Allocation.inactive_allocations(nomis_offender_id).
+      map(&:primary_pom_nomis_id)
   end
 
   def self.offender_allocation_history(nomis_offender_id)
@@ -73,29 +70,8 @@ class AllocationService
     }
   end
 
-  def self.deallocate_primary_pom(nomis_staff_id)
-    Allocation.where(primary_pom_nomis_id: nomis_staff_id).update_all(active: false)
-  end
-
-  def self.deallocate_offender(nomis_offender_id)
-    Allocation.where(nomis_offender_id: nomis_offender_id).update_all(active: false)
-  end
-
   def self.last_allocation(nomis_offender_id)
-    Allocation.where(
-      nomis_offender_id: nomis_offender_id,
-      active: false
-    ).last
-  end
-
-  def self.active_allocations_with_pom_detail(nomis_offender_ids)
-    Allocation.where(
-      nomis_offender_id: nomis_offender_ids, active: true
-    ).preload(:pom_detail)
-  end
-
-  def self.primary_pom_nomis_id(nomis_offender_id)
-    Allocation.active_allocations(nomis_offender_id).first.primary_pom_nomis_id
+    Allocation.inactive_allocations(nomis_offender_id).last
   end
 
 private

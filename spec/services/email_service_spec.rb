@@ -36,17 +36,15 @@ RSpec.describe EmailService do
 
   context "when allocating a prisoner to another POM" do
     before do
-      allow(Allocation).to receive(:where).and_return(
-        [
-          Allocation.new.tap do |a|
-            a.primary_pom_nomis_id = 485_737
-            a.nomis_offender_id = 'G2911GD'
-            a.created_by_username = 'PK000223'
-            a.nomis_booking_id = 0
-            a.allocated_at_tier = 'A'
-            a.prison = 'LEI'
-          end
-        ]
+      allow(AllocationService).to receive(:last_allocation).and_return(
+        Allocation.new.tap do |a|
+          a.primary_pom_nomis_id = 485_737
+          a.nomis_offender_id = 'G2911GD'
+          a.created_by_username = 'PK000223'
+          a.nomis_booking_id = 0
+          a.allocated_at_tier = 'A'
+          a.prison = 'LEI'
+        end
       )
     end
 
