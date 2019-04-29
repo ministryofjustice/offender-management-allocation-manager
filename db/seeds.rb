@@ -38,7 +38,7 @@ AllocationService.create_allocation(
   prison: 'LEI',
   allocated_at_tier: 'C',
   created_by_username: 'PK000223',
-  nomis_staff_id: 485_595
+  primary_pom_nomis_id: 485_595
   )
 
 AllocationService.create_allocation(
@@ -47,7 +47,7 @@ AllocationService.create_allocation(
   prison: 'LEI',
   allocated_at_tier: 'A',
   created_by_username: 'PK000223',
-  nomis_staff_id: 485_595
+  primary_pom_nomis_id: 485_595
   )
 
 CaseInformation.find_or_create_by!(
