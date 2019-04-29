@@ -124,4 +124,22 @@ describe PrisonOffenderManagerService do
     expect(names).to be_kind_of(Hash)
     expect(names.count).to eq(12)
   end
+
+  it "can fetch a single POM for a prison",
+    vcr: { cassette_name: :pom_service_get_pom_ok } do
+    pom = described_class.get_pom('LEI', staff_id)
+    expect(pom).not_to be nil
+  end
+
+  it "can handle no poms for a prison when fetching a pom",
+    vcr: { cassette_name: :pom_service_get_pom_none } do
+    pom = described_class.get_pom('CFI', 1234)
+    expect(pom).to be nil
+  end
+
+  it "can handle a pom not existing at a prison",
+    vcr: { cassette_name: :pom_service_get_pom_fail } do
+    pom = described_class.get_pom('LEI', 1234)
+    expect(pom).to be nil
+  end
 end
