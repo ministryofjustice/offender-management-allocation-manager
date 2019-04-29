@@ -54,19 +54,23 @@ RSpec.describe AllocationList, type: :model do
 
   it 'can group the allocations correctly', vcr: { cassette_name: :allocation_list_spec } do
     list = AllocationList.new([current_allocation, middle_allocation1, middle_allocation2, old_allocation])
-    expect(list.count).to be(4)
+    expect(list.count).to eq(4)
 
-    first, second, third = list.grouped_by_prison
+    results = []
 
-    prison, allocations = first
+    list.grouped_by_prison do |prison, allocations|
+      results << [prison, allocations]
+    end
+
+    prison, allocations = results.shift
     expect(prison).to eq('LEI')
     expect(allocations.count).to eq(1)
 
-    prison, allocations = second
+    prison, allocations = results.shift
     expect(prison).to eq('PVI')
     expect(allocations.count).to eq(2)
 
-    prison, allocations = third
+    prison, allocations = results.shift
     expect(prison).to eq('LEI')
     expect(allocations.count).to eq(1)
   end
