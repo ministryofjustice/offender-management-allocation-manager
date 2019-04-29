@@ -118,7 +118,7 @@ class PrisonOffenderManagerService
   end
 
   def self.update_pom(params)
-    pom = PomDetail.where(nomis_staff_id: params[:nomis_staff_id]).first
+    pom = PomDetail.by_nomis_staff_id(params[:nomis_staff_id])
     pom.working_pattern = params[:working_pattern]
     pom.status = params[:status] || pom.status
     pom.save
