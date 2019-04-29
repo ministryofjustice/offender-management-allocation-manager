@@ -52,7 +52,7 @@ class PrisonOffenderManagerService
   end
 
   def self.get_allocations_for_primary_pom(nomis_staff_id, prison)
-    Allocation.where(primary_pom_nomis_id: nomis_staff_id, active: true, prison: prison)
+    Allocation.active_primary_pom_allocations(nomis_staff_id, prison)
   end
 
   # rubocop:disable Metrics/MethodLength
@@ -124,7 +124,7 @@ class PrisonOffenderManagerService
     pom.save
 
     if pom.valid? && pom.status == 'inactive'
-      AllocationService.deallocate_primary_pom(params[:nomis_staff_id])
+      Allocation.deallocate_primary_pom(params[:nomis_staff_id])
     end
 
     pom

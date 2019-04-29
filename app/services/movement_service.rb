@@ -42,7 +42,7 @@ private
   def self.process_transfer(transfer)
     Rails.logger.info("Processing transfer for #{transfer.offender_no}")
 
-    AllocationService.deallocate_offender(transfer.offender_no)
+    Allocation.deallocate_offender(transfer.offender_no)
     CaseInformationService.change_prison(
       transfer.offender_no,
       transfer.from_agency,
@@ -58,7 +58,7 @@ private
   def self.process_release(release)
     Rails.logger.info("Processing release for #{release.offender_no}")
     CaseInformationService.delete_information(release.offender_no)
-    AllocationService.deallocate_offender(release.offender_no)
+    Allocation.deallocate_offender(release.offender_no)
 
     true
   end
