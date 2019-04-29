@@ -36,7 +36,7 @@ class CaseloadController < ApplicationController
 private
 
   def total_allocations
-    @total_allocations ||= PrisonOffenderManagerService.get_allocations_for_pom(
+    @total_allocations ||= PrisonOffenderManagerService.get_allocations_for_primary_pom(
       pom.staff_id, active_caseload
     ).count
   end

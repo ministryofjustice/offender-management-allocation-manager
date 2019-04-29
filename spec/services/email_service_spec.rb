@@ -4,7 +4,7 @@ RSpec.describe EmailService do
   include ActiveJob::TestHelper
   let(:params) {
     {
-      nomis_staff_id: 485_637,
+      primary_pom_nomis_id: 485_637,
       nomis_offender_id: 'G2911GD',
       created_by_username: "PK000223",
       nomis_booking_id: 1_153_753,
@@ -39,7 +39,7 @@ RSpec.describe EmailService do
       allow(Allocation).to receive(:where).and_return(
         [
           Allocation.new.tap do |a|
-            a.nomis_staff_id = 485_737
+            a.primary_pom_nomis_id = 485_737
             a.nomis_offender_id = 'G2911GD'
             a.created_by_username = 'PK000223'
             a.nomis_booking_id = 0

@@ -5,7 +5,7 @@ describe PrisonOffenderManagerService do
 
   let(:allocation_one) {
     AllocationService.create_allocation(
-      nomis_staff_id: staff_id,
+      primary_pom_nomis_id: staff_id,
       nomis_offender_id: 'G4273GI',
       created_by_username: 'RJONES',
       nomis_booking_id: 1_153_753,
@@ -16,7 +16,7 @@ describe PrisonOffenderManagerService do
 
   let(:allocation_two) {
     AllocationService.create_allocation(
-      nomis_staff_id: staff_id,
+      primary_pom_nomis_id: staff_id,
       nomis_offender_id: 'G8060UF',
       created_by_username: 'RJONES',
       nomis_booking_id: 971_856,
@@ -27,7 +27,7 @@ describe PrisonOffenderManagerService do
 
   let(:allocation_three) {
     AllocationService.create_allocation(
-      nomis_staff_id: staff_id,
+      primary_pom_nomis_id: staff_id,
       nomis_offender_id: 'G8624GK',
       created_by_username: 'RJONES',
       nomis_booking_id: 76_908,
@@ -38,7 +38,7 @@ describe PrisonOffenderManagerService do
 
   let(:allocation_four) {
     AllocationService.create_allocation(
-      nomis_staff_id: staff_id,
+      primary_pom_nomis_id: staff_id,
       nomis_offender_id: 'G1714GU',
       created_by_username: 'RJONES',
       nomis_booking_id: 31_777,
@@ -71,7 +71,7 @@ describe PrisonOffenderManagerService do
 
   it "can get allocated offenders for a POM",
     vcr: { cassette_name: :pom_service_allocated_offenders } do
-    allocated_offenders = described_class.get_allocated_offenders(allocation_one.nomis_staff_id, 'LEI')
+    allocated_offenders = described_class.get_allocated_offenders(allocation_one.primary_pom_nomis_id, 'LEI')
 
     alloc, sentence_detail = allocated_offenders.first
     expect(alloc).to be_kind_of(Allocation)
@@ -83,11 +83,11 @@ describe PrisonOffenderManagerService do
 
     expected_total = all_allocations.size
 
-    allocated_offenders = described_class.get_allocated_offenders(allocation_one.nomis_staff_id, 'LEI')
+    allocated_offenders = described_class.get_allocated_offenders(allocation_one.primary_pom_nomis_id, 'LEI')
     expect(allocated_offenders.count).to eq(expected_total)
 
     allocated_offenders = described_class.get_allocated_offenders(
-      allocation_one.nomis_staff_id, 'LEI',
+      allocation_one.primary_pom_nomis_id, 'LEI',
       offset: 2, limit: 2)
     expect(allocated_offenders.count).to eq(2)
   end
@@ -98,7 +98,7 @@ describe PrisonOffenderManagerService do
     allocation_two.created_at = 3.days.ago
     allocation_two.save!
 
-    allocated_offenders = described_class.get_new_cases(allocation_one.nomis_staff_id, 'LEI')
+    allocated_offenders = described_class.get_new_cases(allocation_one.primary_pom_nomis_id, 'LEI')
     expect(allocated_offenders.count).to eq 1
   end
 

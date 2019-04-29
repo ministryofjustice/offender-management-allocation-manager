@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe AllocationService do
   let(:allocation) {
     described_class.create_allocation(
-      nomis_staff_id: 485_595,
+      primary_pom_nomis_id: 485_595,
       nomis_offender_id: 'G2911GD',
       created_by_username: 'PK000223',
       nomis_booking_id: 1,
@@ -15,7 +15,7 @@ RSpec.describe AllocationService do
 
   let(:inactive_allocation) {
     described_class.create_allocation(
-      nomis_staff_id: 485_595,
+      primary_pom_nomis_id: 485_595,
       nomis_offender_id: 'G2911GD',
       created_by_username: 'PK000223',
       nomis_booking_id: 2,
@@ -28,7 +28,7 @@ RSpec.describe AllocationService do
 
   let(:old_inactive_allocation) {
     described_class.create_allocation(
-      nomis_staff_id: 485_752,
+      primary_pom_nomis_id: 485_752,
       nomis_offender_id: 'G2911GD',
       created_by_username: 'PK000223',
       nomis_booking_id: 3,
@@ -80,9 +80,9 @@ RSpec.describe AllocationService do
   end
 
   it "can deallocate for a POM", vcr: { cassette_name: :allocation_service_deallocate_a_pom } do
-    staff_id = allocation.nomis_staff_id
-    described_class.deallocate_pom(staff_id)
-    alloc = PrisonOffenderManagerService.get_allocations_for_pom(staff_id, 'LEI')
+    staff_id = allocation.primary_pom_nomis_id
+    described_class.deallocate_primary_pom(staff_id)
+    alloc = PrisonOffenderManagerService.get_allocations_for_primary_pom(staff_id, 'LEI')
     expect(alloc).to eq([])
   end
 

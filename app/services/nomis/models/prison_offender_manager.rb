@@ -42,7 +42,7 @@ module Nomis
       end
 
       def add_detail(pom_detail)
-        allocations = pom_detail.allocations.where(active: true)
+        allocations = Allocation.primary_poms(pom_detail.nomis_staff_id)
         allocation_counts = allocations.group_by(&:allocated_at_tier)
 
         self.tier_a = allocation_counts.fetch('A', []).count

@@ -3,7 +3,10 @@
 class EmailService
   def self.instance(params)
     offender = OffenderService.get_offender(params[:nomis_offender_id])
-    pom = PrisonOffenderManagerService.get_pom(params[:prison], params[:nomis_staff_id])
+    pom = PrisonOffenderManagerService.get_pom(
+      params[:prison],
+      params[:primary_pom_nomis_id]
+    )
     last_allocation = AllocationService.last_allocation(params[:nomis_offender_id])
     message = params[:message]
 
@@ -32,7 +35,7 @@ private
 
   def previous_pom
     @previous_pom ||= PrisonOffenderManagerService.
-      get_pom(@last_allocation[:prison], @last_allocation[:nomis_staff_id])
+      get_pom(@last_allocation[:prison], @last_allocation[:primary_pom_nomis_id])
   end
 
   def current_responsibility

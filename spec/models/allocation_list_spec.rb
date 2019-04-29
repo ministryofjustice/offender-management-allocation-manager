@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe AllocationList, type: :model do
   let(:current_allocation) {
     AllocationService.create_allocation(
-      nomis_staff_id: 485_595,
+      primary_pom_nomis_id: 485_595,
       nomis_offender_id: 'G2911GD',
       created_by_username: 'PK000223',
       nomis_booking_id: 1,
@@ -15,7 +15,7 @@ RSpec.describe AllocationList, type: :model do
 
   let(:middle_allocation1) {
     AllocationService.create_allocation(
-      nomis_staff_id: 485_752,
+      primary_pom_nomis_id: 485_752,
       nomis_offender_id: 'G2911GD',
       created_by_username: 'PK000223',
       nomis_booking_id: 2,
@@ -28,7 +28,7 @@ RSpec.describe AllocationList, type: :model do
 
   let(:middle_allocation2) {
     AllocationService.create_allocation(
-      nomis_staff_id: 485_752,
+      primary_pom_nomis_id: 485_752,
       nomis_offender_id: 'G2911GD',
       created_by_username: 'PK000223',
       nomis_booking_id: 3,
@@ -41,7 +41,7 @@ RSpec.describe AllocationList, type: :model do
 
   let(:old_allocation) {
     AllocationService.create_allocation(
-      nomis_staff_id: 485_595,
+      primary_pom_nomis_id: 485_595,
       nomis_offender_id: 'G2911GD',
       created_by_username: 'PK000223',
       nomis_booking_id: 4,

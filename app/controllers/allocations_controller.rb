@@ -20,8 +20,8 @@ class AllocationsController < ApplicationController
   # rubocop:disable Metrics/LineLength
   def show
     @prisoner = offender(nomis_offender_id_from_url)
-    allocation = AllocationService.active_allocations_with_pom_detail(@prisoner.offender_no).first
-    @pom = PrisonOffenderManagerService.get_pom(active_caseload, allocation.nomis_staff_id)
+    primary_pom_nomis_id = AllocationService.primary_pom_nomis_id(@prisoner.offender_no)
+    @pom = PrisonOffenderManagerService.get_pom(active_caseload, primary_pom_nomis_id)
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(active_caseload, @prisoner.offender_no)
     @history = AllocationService.offender_allocation_history(@prisoner.offender_no)
   end
@@ -64,7 +64,7 @@ class AllocationsController < ApplicationController
 
     @override = override
     allocation = {
-      nomis_staff_id: allocation_params[:nomis_staff_id].to_i,
+      primary_pom_nomis_id: allocation_params[:nomis_staff_id].to_i,
       nomis_offender_id: allocation_params[:nomis_offender_id],
       created_by_username: current_user,
       nomis_booking_id: offender.latest_booking_id,
@@ -101,7 +101,7 @@ private
 
   def current_pom_for(nomis_offender_id)
     current_allocation = AllocationService.active_allocations(nomis_offender_id)
-    nomis_staff_id = current_allocation[nomis_offender_id]['nomis_staff_id']
+    nomis_staff_id = current_allocation[nomis_offender_id]['primary_pom_nomis_id']
 
     PrisonOffenderManagerService.get_pom(active_caseload, nomis_staff_id)
   end

@@ -117,9 +117,9 @@ feature 'Allocation' do
   end
 
   scenario 're-allocating', vcr: { cassette_name: :re_allocate_feature } do
-    probation_officer_pom_detail.allocations.create!(
+    Allocation.create!(
       nomis_offender_id: nomis_offender_id,
-      nomis_staff_id: probation_officer_nomis_staff_id,
+      primary_pom_nomis_id: probation_officer_nomis_staff_id,
       nomis_booking_id: 1_153_753,
       prison: 'LEI',
       allocated_at_tier: 'A',
