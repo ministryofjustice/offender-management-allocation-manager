@@ -27,7 +27,7 @@ RSpec.describe EmailService do
   }
 
   context "when creating an initial POM allocation" do
-    it "Can send an allocation email", vcr: {cassette_name: :email_service_send_allocation_email} do
+    it "Can send an allocation email", vcr: { cassette_name: :email_service_send_allocation_email } do
       subject.send_allocation_email
       expect(enqueued_jobs.size).to eq(1)
       enqueued_jobs.clear
@@ -48,7 +48,7 @@ RSpec.describe EmailService do
       )
     end
 
-    it "Can send an allocation email", vcr: {cassette_name: :email_service_send_deallocation_email} do
+    it "Can send an allocation email", vcr: { cassette_name: :email_service_send_deallocation_email } do
       subject.send_allocation_email
       expect(enqueued_jobs.size).to eq(2)
       enqueued_jobs.clear
