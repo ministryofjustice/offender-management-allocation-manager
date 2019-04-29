@@ -67,7 +67,7 @@ feature "view an offender's allocation information" do
       create_allocation(nomis_offender_id_with_keyworker)
     end
 
-    it "displays the Key Worker's details" do
+    it "displays a link to the prisoner's New Nomis profile" do
       signin_user
 
       visit allocation_path(nomis_offender_id: nomis_offender_id_with_keyworker)
