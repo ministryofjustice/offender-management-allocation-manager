@@ -3,7 +3,7 @@ require 'rails_helper'
 describe Nomis::Elite2::OffenderApi do
   describe 'List of offenders' do
     it "can get a list of offenders",
-      vcr: { cassette_name: :offender_api_offender_list } do
+       vcr: { cassette_name: :offender_api_offender_list } do
       response = described_class.list('LEI')
 
       expect(response.data).not_to be_nil
@@ -12,7 +12,7 @@ describe Nomis::Elite2::OffenderApi do
     end
 
     it "can get an offence description for a booking id",
-      vcr: { cassette_name: :offender_api_get_offence_ok } do
+       vcr: { cassette_name: :offender_api_get_offence_ok } do
       booking_id = '1153753'
       response = described_class.get_offence(booking_id)
       expect(response).to be_instance_of(String)
@@ -22,7 +22,7 @@ describe Nomis::Elite2::OffenderApi do
 
   describe 'Bulk operations' do
     it 'can get bulk sentence details',
-      vcr: { cassette_name: :offender_api_bulk_sentence_details } do
+       vcr: { cassette_name: :offender_api_bulk_sentence_details } do
       booking_ids = [1_153_753]
 
       response = described_class.get_bulk_sentence_details(booking_ids)
@@ -38,7 +38,7 @@ describe Nomis::Elite2::OffenderApi do
 
   describe 'Single offender' do
     it "can get a single offender's details",
-      vcr: { cassette_name: :offender_api_single_offender_spec } do
+       vcr: { cassette_name: :offender_api_single_offender_spec } do
       noms_id = 'G2911GD'
 
       response = described_class.get_offender(noms_id)
@@ -47,7 +47,7 @@ describe Nomis::Elite2::OffenderApi do
     end
 
     it 'returns null if unable to find prisoner', :raven_intercept_exception,
-      vcr: { cassette_name: :offender_api_null_offender_spec  } do
+       vcr: { cassette_name: :offender_api_null_offender_spec  } do
       noms_id = 'AAA22D'
 
       response = described_class.get_offender(noms_id)

@@ -29,7 +29,7 @@ describe OffenderService, vcr: { cassette_name: :offender_service_offenders_by_p
   end
 
   it "gets the POM names for allocated offenders",
-    vcr: { cassette_name: :offender_service_pom_names_spec } do
+     vcr: { cassette_name: :offender_service_pom_names_spec } do
 
     offenders = OffenderService.get_offenders_for_prison('LEI', page_size: 3)
     nomis_staff_id = 485_752
