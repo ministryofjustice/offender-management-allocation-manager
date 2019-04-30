@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe Nomis::Elite2::PrisonOffenderManagerApi do
   it 'can get a of Prison Offender Managers (POMs)',
-    vcr: { cassette_name: :pom_api_list_spec  } do
+     vcr: { cassette_name: :pom_api_list_spec  } do
     response = described_class.list('LEI')
 
     expect(response).to be_instance_of(Array)
@@ -10,7 +10,7 @@ describe Nomis::Elite2::PrisonOffenderManagerApi do
   end
 
   it 'can handle no POMs for a prison',
-    vcr: { cassette_name: :pom_api_list_spec_none  } do
+     vcr: { cassette_name: :pom_api_list_spec_none  } do
     response = described_class.list('WEI')
 
     expect(response).to be_instance_of(Array)
@@ -20,7 +20,7 @@ describe Nomis::Elite2::PrisonOffenderManagerApi do
 
   describe '#fetch_email_addresses' do
     it "can get a user's single email address",
-      vcr: { cassette_name: :elite2_staff_api_get_email } do
+       vcr: { cassette_name: :elite2_staff_api_get_email } do
 
       response = described_class.fetch_email_addresses(485_637)
 
@@ -28,7 +28,7 @@ describe Nomis::Elite2::PrisonOffenderManagerApi do
     end
 
     it "can get multiple email addresses for a user",
-      vcr: { cassette_name: :elite2_staff_api_get_emails } do
+       vcr: { cassette_name: :elite2_staff_api_get_emails } do
 
       response = described_class.fetch_email_addresses(485_758)
 
@@ -36,7 +36,7 @@ describe Nomis::Elite2::PrisonOffenderManagerApi do
     end
 
     it "returns an empty list if a staff member doesn't have an email address",
-      vcr: { cassette_name: :elite2_staff_api_get_no_emails } do
+       vcr: { cassette_name: :elite2_staff_api_get_no_emails } do
 
       response = described_class.fetch_email_addresses(485_636)
 

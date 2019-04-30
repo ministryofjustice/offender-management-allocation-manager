@@ -28,9 +28,9 @@ class Allocation < ApplicationRecord
   end
 
   validates :nomis_offender_id,
-    :primary_pom_nomis_id,
-    :nomis_booking_id,
-    :prison,
-    :allocated_at_tier,
-    :created_by_username, presence: true
+            :primary_pom_nomis_id,
+            :nomis_booking_id,
+            :prison,
+            :allocated_at_tier,
+            :created_by_username, presence: true
 end

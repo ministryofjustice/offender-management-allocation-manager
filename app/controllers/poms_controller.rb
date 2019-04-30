@@ -5,7 +5,7 @@ class PomsController < ApplicationController
 
   breadcrumb 'Prison Offender Managers', :poms_path, only: [:index, :show]
   breadcrumb -> { pom.full_name },
-    -> {  poms_path(params[:nomis_staff_id]) }, only: [:show]
+             -> {  poms_path(params[:nomis_staff_id]) }, only: [:show]
 
   def index
     poms = PrisonOffenderManagerService.get_poms(active_caseload)

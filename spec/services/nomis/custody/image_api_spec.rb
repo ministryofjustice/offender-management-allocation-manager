@@ -3,7 +3,7 @@ require 'rails_helper'
 describe Nomis::Custody::ImageApi do
   describe '#fetching an image' do
     it "can get a user's jpg",
-      vcr: { cassette_name: :image_api_spec } do
+       vcr: { cassette_name: :image_api_spec } do
 
       data = described_class.image_data('G7998GJ')
       expect(data).not_to be_nil

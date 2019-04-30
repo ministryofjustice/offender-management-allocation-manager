@@ -5,7 +5,7 @@ describe Nomis::Keyworker::KeyworkerApi do
     let(:location) { 'LEI' }
 
     it 'can get details for a Keyworker',
-      vcr: { cassette_name: :keyworker_api_details_spec } do
+       vcr: { cassette_name: :keyworker_api_details_spec } do
       offender_no = 'G4273GI'
       response = described_class.get_keyworker(location, offender_no)
 
@@ -13,7 +13,7 @@ describe Nomis::Keyworker::KeyworkerApi do
     end
 
     it 'returns null if unable find a Keyworker', :raven_intercept_exception,
-      vcr: { cassette_name: :keyworker_api_details_not_found_spec } do
+       vcr: { cassette_name: :keyworker_api_details_not_found_spec } do
       unknown_offender_no = 'GGGGGGG'
       response = described_class.get_keyworker(location, unknown_offender_no)
 
