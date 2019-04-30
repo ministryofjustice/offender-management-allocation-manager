@@ -24,6 +24,7 @@ feature 'Allocation' do
     visit new_allocation_path(nomis_offender_id)
 
     expect(page).to have_content('Determinate')
+    expect(page).to have_content('There is 1 POM unavailable for new allocations.')
 
     within('.recommended_pom_row_0') do
       click_link 'Allocate'
