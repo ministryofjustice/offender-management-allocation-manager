@@ -5,7 +5,7 @@ class AllocationsController < ApplicationController
 
   breadcrumb 'Allocated', :summary_allocated, only: [:show]
   breadcrumb -> { offender(nomis_offender_id_from_url).full_name },
-    -> { allocation_path(nomis_offender_id_from_url) }, only: [:show]
+             -> { allocation_path(nomis_offender_id_from_url) }, only: [:show]
 
   def new
     @prisoner = offender(nomis_offender_id_from_url)

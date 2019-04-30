@@ -28,6 +28,7 @@ module OffenderManagementAllocationClient
     )
     config.sentry_dsn = ENV['SENTRY_DSN']
     config.keyworker_api_host = ENV['KEYWORKER_API_HOST']
+    config.new_nomis_host = ENV['NEW_NOMIS_HOST']
     config.nomis_oauth_host = ENV['NOMIS_OAUTH_HOST']
     config.nomis_oauth_client_id = ENV['NOMIS_OAUTH_CLIENT_ID']
     config.nomis_oauth_client_secret = ENV['NOMIS_OAUTH_CLIENT_SECRET']

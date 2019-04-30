@@ -4,10 +4,10 @@ describe SignonIdentity, model: true do
   let(:time_stamp) { 123_456 }
   let(:user_auth_data) {
     double('user_auth_data',
-      username: 'PK000223',
-      active_caseload: 'LEI',
-      caseloads: %w[LEI RNI],
-      roles: ['ROLE_ALLOC_MGR']
+           username: 'PK000223',
+           active_caseload: 'LEI',
+           caseloads: %w[LEI RNI],
+           roles: ['ROLE_ALLOC_MGR']
     )
   }
   let(:credentials) { double('credentials', expires_at: time_stamp) }

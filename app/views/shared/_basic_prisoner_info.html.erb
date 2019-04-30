@@ -14,8 +14,10 @@
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half"><%= format_date(@prisoner.date_of_birth) %></td>
     </tr>
     <tr class="govuk-table__row">
-      <td class="govuk-table__cell hmpps-table-cell__key">Prisoner number</td>
-      <td class="govuk-table__cell table_cell__left_align hmpps-table-cell__key"><%= @prisoner.offender_no %></td>
+      <td class="govuk-table__cell">Prisoner number</td>
+      <td class="govuk-table__cell table_cell__left_align">
+        <%= @prisoner.offender_no %>
+        <%= link_to 'View NOMIS profile', new_nomis_profile_path(@prisoner.offender_no), class: "govuk-link pull-right", target: "_blank" %>
     </tr>
     </tbody>
   </table>

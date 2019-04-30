@@ -5,9 +5,9 @@ class CaseloadController < ApplicationController
 
   breadcrumb 'Your caseload', :caseload_index_path, only: [:new]
   breadcrumb -> { 'Your caseload' },
-    -> { caseload_index_path }, only: [:index]
+             -> { caseload_index_path }, only: [:index]
   breadcrumb -> { 'New cases' },
-    -> { new_caseload_path }, only: [:new]
+             -> { new_caseload_path }, only: [:new]
 
   PAGE_SIZE = 10
 
