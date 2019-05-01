@@ -11,18 +11,18 @@ class Override < ApplicationRecord
     message: 'Select one or more reasons for not accepting the recommendation'
   }
   validates :more_detail,
-    presence: { message:
-      'Please provide extra detail when Other is selected'
-    },
-    if: proc { |o|
-          o.override_reasons.present? && o.override_reasons.include?('other')
-        }
+            presence: { message:
+              'Please provide extra detail when Other is selected'
+            },
+            if: proc { |o|
+                  o.override_reasons.present? && o.override_reasons.include?('other')
+                }
 
   validates :suitability_detail,
-    presence: { message:
-                    'Enter reason for allocating this POM'
-    },
-    if: proc { |o|
-      o.override_reasons.present? && o.override_reasons.include?('suitability')
-    }
+            presence: { message:
+                            'Enter reason for allocating this POM'
+            },
+            if: proc { |o|
+              o.override_reasons.present? && o.override_reasons.include?('suitability')
+            }
 end

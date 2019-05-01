@@ -39,7 +39,7 @@ feature "view an offender's allocation information" do
   end
 
   describe 'Offender does not have a key worker assigned', :raven_intercept_exception,
-    vcr: { cassette_name: :show_allocation_information_keyworker_not_assigned } do
+           vcr: { cassette_name: :show_allocation_information_keyworker_not_assigned } do
     before do
       create_case_information_for(nomis_offender_id_without_keyworker)
       create_allocation(nomis_offender_id_without_keyworker)
@@ -58,6 +58,23 @@ feature "view an offender's allocation information" do
       expect(page).to have_css('.govuk-table__cell', text: 'Duckett, Jenny')
       # Keyworker
       expect(page).to have_css('.govuk-table__cell', text: 'Not assigned')
+    end
+  end
+
+  describe 'Prisoner profile links', vcr: { cassette_name: :show_allocation_information_new_nomis_profile } do
+    before do
+      create_case_information_for(nomis_offender_id_with_keyworker)
+      create_allocation(nomis_offender_id_with_keyworker)
+    end
+
+    it "displays a link to the prisoner's New Nomis profile" do
+      signin_user
+
+      visit allocation_path(nomis_offender_id: nomis_offender_id_with_keyworker)
+
+      expect(page).to have_css('.govuk-table__cell', text: 'View NOMIS profile')
+      expect(find_link('View NOMIS profile')[:target]).to eq('_blank')
+      expect(find_link('View NOMIS profile')[:href]).to include('offenders/G4273GI/quick-look')
     end
   end
 
