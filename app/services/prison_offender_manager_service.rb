@@ -114,7 +114,7 @@ class PrisonOffenderManagerService
     user = Nomis::Custody::UserApi.user_details(current_user)
 
     poms_list = get_poms(prison)
-    @pom = poms_list.select { |p| p.staff_id.to_i == user.staff_id.to_i }.first
+    poms_list.select { |p| p.staff_id.to_i == user.staff_id.to_i }.first
   end
 
   def self.update_pom(params)

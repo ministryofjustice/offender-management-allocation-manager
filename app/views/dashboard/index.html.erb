@@ -37,26 +37,28 @@
   </div>
 </div>
 
-<h2 class="govuk-heading-m no-bottom-margin">See all prisoners allocated to you</h2>
-<hr class="govuk-section-break govuk-section-break--visible">
-<div class="govuk-grid-row dashboard-row">
-  <div class="govuk-grid-column-one-third">
-    <div class="wrapper">
-      <h1 class="govuk-heading-s">
-        <%= link_to "See your caseload", caseload_index_path, class:"govuk-link" %>
-      </h1>
-      <p class="govuk-body">All prisoners allocated to you.</p>
+<% if @is_pom %>
+  <h2 class="govuk-heading-m no-bottom-margin">See all prisoners allocated to you</h2>
+  <hr class="govuk-section-break govuk-section-break--visible">
+  <div class="govuk-grid-row dashboard-row">
+    <div class="govuk-grid-column-one-third">
+      <div class="wrapper">
+        <h1 class="govuk-heading-s">
+          <%= link_to "See your caseload", caseload_index_path, class:"govuk-link" %>
+        </h1>
+        <p class="govuk-body">All prisoners allocated to you.</p>
+      </div>
+    </div>
+    <div class="govuk-grid-column-one-third">
+      <div class="wrapper">
+        <h1 class="govuk-heading-s">
+          <%= link_to "See new allocations", new_caseload_path, class:"govuk-link" %>
+        </h1>
+        <p class="govuk-body">Prisoners allocated to you in the last seven days.</p>
+      </div>
     </div>
   </div>
-  <div class="govuk-grid-column-one-third">
-    <div class="wrapper">
-      <h1 class="govuk-heading-s">
-        <%= link_to "See new allocations", new_caseload_path, class:"govuk-link" %>
-      </h1>
-      <p class="govuk-body">Prisoners allocated to you in the last seven days.</p>
-    </div>
-  </div>
-</div>
+<% end %>
 
 <h2 class="govuk-heading-m no-bottom-margin">Manage staff</h2>
 <hr class="govuk-section-break govuk-section-break--visible">

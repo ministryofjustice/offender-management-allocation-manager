@@ -2,6 +2,7 @@
 
 class CaseloadController < ApplicationController
   before_action :authenticate_user
+  before_action :ensure_pom
 
   breadcrumb 'Your caseload', :caseload_index_path, only: [:new]
   breadcrumb -> { 'Your caseload' },
