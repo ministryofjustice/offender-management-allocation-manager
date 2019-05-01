@@ -15,6 +15,7 @@ class AllocationsController < ApplicationController
       recommended_and_nonrecommended_poms_for(@prisoner)
     @recommended_pom_type, @not_recommended_pom_type =
       recommended_and_nonrecommended_poms_types_for(@prisoner)
+    @unavailable_pom_count = unavailable_pom_count
   end
 
   # rubocop:disable Metrics/LineLength
@@ -41,6 +42,8 @@ class AllocationsController < ApplicationController
       recommended_and_nonrecommended_poms_for(@prisoner)
     @recommended_pom_type, @not_recommended_pom_type =
       recommended_and_nonrecommended_poms_types_for(@prisoner)
+    @unavailable_pom_count = unavailable_pom_count
+
     @current_pom = current_pom_for(nomis_offender_id_from_url)
   end
   # rubocop:enable Metrics/MethodLength
@@ -88,6 +91,12 @@ class AllocationsController < ApplicationController
 # rubocop:enable Metrics/LineLength
 
 private
+
+  def unavailable_pom_count
+    @unavailable_pom_count ||= PrisonOffenderManagerService.unavailable_pom_count(
+      active_caseload
+    )
+  end
 
   def offender(nomis_offender_id)
     OffenderService.get_offender(nomis_offender_id)

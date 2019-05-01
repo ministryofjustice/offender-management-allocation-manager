@@ -91,3 +91,16 @@ time left to serve into account.</p>
     </table>
   </div>
 </details>
+
+<% if @unavailable_pom_count > 0 %>
+  <p>
+    There
+    <% if @unavailable_pom_count == 1 %>
+      is <%= @unavailable_pom_count %> POM unavailable for new allocations.
+      <a href="<%= poms_path %>">See POM</a>
+    <% else %>
+      are <%= @unavailable_pom_count %> POMs unavailable for new allocations.
+      <a href="<%= poms_path %>">See all POMs</a>
+    <% end%>
+  </p>
+<% end %>

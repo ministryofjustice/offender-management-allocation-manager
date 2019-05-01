@@ -110,6 +110,13 @@ class PrisonOffenderManagerService
     }.count
   end
 
+  def self.unavailable_pom_count(prison)
+    poms = PrisonOffenderManagerService.get_poms(prison) { |pom|
+      pom.status != 'active'
+    }
+    poms.count
+  end
+
   def self.get_signed_in_pom_details(current_user, prison)
     user = Nomis::Custody::UserApi.user_details(current_user)
 
