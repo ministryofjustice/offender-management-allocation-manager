@@ -11,17 +11,17 @@
     <thead class="govuk-table__head">
     <tr class="govuk-table__row">
       <th class="govuk-table__header" scope="col">
-        <a href="<%= set_search_param('last_name') %>">
+        <a href="<%= sort_link('last_name') %>">
           Prisoner name
         </a>
-        <%= display_arrow('last_name') %>
+        <%= sort_arrow('last_name') %>
       </th>
       <th class="govuk-table__header sorter-false" scope="col">Prisoner number</th>
       <th class="govuk-table__header sorter-false" scope="col">
-        <a href="<%= set_search_param('earliest_release_date') %>">
+        <a href="<%= sort_link('earliest_release_date') %>">
           Earliest release date
         </a>
-        <%= display_arrow('earliest_release_date') %>
+        <%= sort_arrow('earliest_release_date') %>
       </th>
       <th class="govuk-table__header" scope="col">POM</th>
       <th class="govuk-table__header" scope="col">Allocation date</th>
