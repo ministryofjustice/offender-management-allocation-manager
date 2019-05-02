@@ -17,13 +17,13 @@ namespace :update_allocation_names do
     allocations = Allocation.where(primary_pom_name: nil)
 
     allocations.each { |allocation|
-      if pom_cache.key?(allocation.nomis_staff_id)
-        pom_name = pom_cache[allocation.nomis_staff_id]
+      if pom_cache.key?(allocation.primary_pom_nomis_id)
+        pom_name = pom_cache[allocation.primary_pom_nomis_id]
       else
         pom_firstname, pom_secondname =
-          PrisonOffenderManagerService.get_pom_name(allocation.nomis_staff_id)
+          PrisonOffenderManagerService.get_pom_name(allocation.primary_pom_nomis_id)
         pom_name = "#{pom_firstname} #{pom_secondname}"
-        pom_cache[allocation.nomis_staff_id] = pom_name
+        pom_cache[allocation.primary_pom_nomis_id] = pom_name
       end
 
       if username_cache.key?(allocation.created_by_username)
