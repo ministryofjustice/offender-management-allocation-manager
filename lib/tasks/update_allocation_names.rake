@@ -14,7 +14,7 @@ namespace :update_allocation_names do
     username_cache = {}
     pom_cache = {}
 
-    allocations = Allocation.where(pom_name: nil)
+    allocations = Allocation.where(primary_pom_name: nil)
 
     allocations.each { |allocation|
       if pom_cache.key?(allocation.nomis_staff_id)
@@ -40,7 +40,7 @@ namespace :update_allocation_names do
         username_cache[allocation.created_by_username] = user_name
       end
 
-      allocation.pom_name = pom_name
+      allocation.primary_pom_name = pom_name
       allocation.created_by_name = user_name
       allocation.save!
     }
