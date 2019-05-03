@@ -5,6 +5,8 @@ class ApplicationController < ActionController::Base
   helper_method :active_caseload
   helper_method :caseloads
 
+  before_action :set_paper_trail_whodunnit
+
   include SSOIdentity
 
   def authenticate_user
