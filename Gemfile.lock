@@ -151,6 +151,9 @@ GEM
     omniauth-oauth2 (1.6.0)
       oauth2 (~> 1.1)
       omniauth (~> 1.9)
+    paper_trail (10.3.0)
+      activerecord (>= 4.2, < 6.1)
+      request_store (~> 1.1)
     parallel (1.17.0)
     parser (2.6.3.0)
       ast (~> 2.4.0)
@@ -325,6 +328,7 @@ DEPENDENCIES
   logstash-event
   memory_profiler
   omniauth-oauth2
+  paper_trail
   pg
   plissken
   prometheus_exporter
