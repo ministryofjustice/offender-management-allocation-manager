@@ -10,4 +10,9 @@ describe SearchService do
     offenders = described_class.search_for_offenders('Cal', 'LEI')
     expect(offenders.count).to eq(6)
   end
+
+  it "will handle a nil search term", vcr: { cassette_name: :search_service_no_term } do
+    offenders = described_class.search_for_offenders(nil, 'LEI')
+    expect(offenders.count).to eq(0)
+  end
 end

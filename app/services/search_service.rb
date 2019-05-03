@@ -7,6 +7,8 @@ class SearchService
   # out offenders based on the provided text.
   # rubocop:disable Metrics/MethodLength
   def self.search_for_offenders(text, prison)
+    return [] if text.nil?
+
     number_of_requests = max_requests_count(prison)
     tier_map = CaseInformationService.get_case_information(prison)
 
