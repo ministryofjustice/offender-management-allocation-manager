@@ -110,6 +110,7 @@ class PrisonService
     'TSI' => 'HMP Thameside',
     'UKI' => 'HMP Usk',
     'UPI' => 'HMP/YOI Prescoed',
+    'VEI' => 'HMP The Verne',
     'WCI' => 'HMP Winchester',
     'WDI' => 'HMP Wakefield',
     'WEI' => 'HMP Wealstun',
