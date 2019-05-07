@@ -26,6 +26,7 @@ gem 'typhoeus'
 gem 'redis'
 gem 'plissken'
 gem 'fast_underscore', require: false
+gem 'flipflop'
 
 group :development, :test do
   gem 'brakeman'

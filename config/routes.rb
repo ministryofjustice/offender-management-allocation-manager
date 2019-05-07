@@ -37,4 +37,7 @@ Rails.application.routes.draw do
 
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
+
+  # TODO: Re-enable this engine for managing features when we have proper roles for admins
+  # mount Flipflop::Engine => "/flipflop"
 end

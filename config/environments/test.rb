@@ -1,4 +1,8 @@
 Rails.application.configure do
+  # Before filter for Flipflop dashboard. Replace with a lambda or method name
+  # defined in ApplicationController to implement access control.
+  config.flipflop.dashboard_access_filter = nil
+
   # Settings specified here will take precedence over those in config/application.rb.
   config.notify_api_key = ENV['TEST_NOTIFY_API_KEY']
   # The test environment is used exclusively to run your application's
