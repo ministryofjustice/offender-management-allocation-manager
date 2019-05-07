@@ -11,9 +11,31 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema.define(version: 2019_05_07_144554) do
-
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "allocation_versions", force: :cascade do |t|
+    t.string "nomis_offender_id"
+    t.string "prison"
+    t.string "allocated_at_tier"
+    t.string "override_reasons"
+    t.string "override_detail"
+    t.string "message"
+    t.string "suitability_detail"
+    t.string "primary_pom_name"
+    t.string "secondary_pom_name"
+    t.string "created_by_name"
+    t.integer "primary_pom_nomis_id"
+    t.integer "secondary_pom_nomis_id"
+    t.integer "nomis_booking_id"
+    t.integer "event"
+    t.integer "event_trigger"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["nomis_offender_id"], name: "index_allocation_versions_on_nomis_offender_id"
+    t.index ["primary_pom_nomis_id"], name: "index_allocation_versions_on_primary_pom_nomis_id"
+    t.index ["secondary_pom_nomis_id"], name: "index_allocation_versions_secondary_pom_nomis_id"
+  end
 
   create_table "allocations", force: :cascade do |t|
     t.string "nomis_offender_id"
@@ -69,6 +91,17 @@ ActiveRecord::Schema.define(version: 2019_05_07_144554) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["nomis_staff_id"], name: "index_pom_details_on_nomis_staff_id"
+  end
+
+  create_table "versions", force: :cascade do |t|
+    t.string "item_type", null: false
+    t.bigint "item_id", null: false
+    t.string "event", null: false
+    t.string "whodunnit"
+    t.text "object"
+    t.datetime "created_at"
+    t.text "object_changes"
+    t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
 end
