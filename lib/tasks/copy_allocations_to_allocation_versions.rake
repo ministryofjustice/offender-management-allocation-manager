@@ -33,7 +33,10 @@ namespace :allocations do
         if alloc_version.nil?
           AllocationVersion.create!(attributes)
         else
-          alloc_version.update!(attributes)
+          attr_copy = attributes.clone
+          # reallocate_primary_pom has an Enum value of 1
+          attr_copy[:event] = 1
+          alloc_version.update!(attr_copy)
         end
       end
     end
