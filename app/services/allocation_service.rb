@@ -55,22 +55,14 @@ class AllocationService
 
     return [] if allocation.nil?
 
-    allocation.versions.map { |version|
-      # 'create' events do not have '#reify' method
-      unless version.event == 'create'
-        version.reify.primary_pom_nomis_id
-      end
-    }.compact
+    get_versions_for(allocation)
   end
 
   def self.offender_allocation_history(nomis_offender_id)
     current_allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id)
 
     unless current_allocation.nil?
-      allocations = current_allocation.versions.map { |version|
-        version.reify unless version.event == 'create'
-      }.compact
-
+      allocations = get_versions_for(current_allocation)
       AllocationList.new(allocations.prepend current_allocation)
     end
   end
@@ -92,6 +84,13 @@ class AllocationService
   end
 
 private
+
+  def self.get_versions_for(allocation)
+    allocation.versions.map { |version|
+      # 'create' events do not have '#reify' method
+      version.reify unless version.event == 'create'
+    }.compact
+  end
 
   def self.delete_overrides(params)
     Override.where(

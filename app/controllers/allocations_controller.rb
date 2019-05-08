@@ -85,7 +85,7 @@ class AllocationsController < ApplicationController
 
     redirect_to summary_unallocated_path
   end
-  
+
 private
 
   def unavailable_pom_count
