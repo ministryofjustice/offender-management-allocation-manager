@@ -91,7 +91,7 @@ class AllocationService
   end
 
   def self.last_allocation(nomis_offender_id)
-    AllocationVersion.inactive_allocations(nomis_offender_id).last
+    AllocationVersion.allocations(nomis_offender_id).last
   end
 
 private
