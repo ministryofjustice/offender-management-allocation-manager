@@ -5,38 +5,64 @@ class AllocationVersion < ApplicationRecord
 
   attr_accessor :responsibility
 
-  enum event: [
-    :allocate_primary_pom,
-    :reallocate_primary_pom
-  ]
+  ALLOCATE_PRIMARY_POM = 0
+  REALLOCATE_PRIMARY_POM = 1
+  ALLOCATE_SECONDARY_POM = 2
+  REALLOCATE_SECONDARY_POM = 3
+  DEALLOCATE_PRIMARY_POM = 4
+  DEALLOCATE_SECONDARY_POM = 5
 
-  enum event_trigger: [
-    :user,
-    :movement
-  ]
+  USER = 0
+  OFFENDER_MOVEMENT = 1
 
-  scope :active_allocations, lambda { |nomis_offender_ids|
-    where(nomis_offender_id: nomis_offender_ids, active: true)
+  enum event: {
+    allocate_primary_pom: ALLOCATE_PRIMARY_POM,
+    reallocate_primary_pom: REALLOCATE_PRIMARY_POM,
+    allocate_secondary_pom: ALLOCATE_SECONDARY_POM,
+    reallocate_seondary_pom: REALLOCATE_SECONDARY_POM,
+    deallocate_primary_pom: DEALLOCATE_PRIMARY_POM,
+    deallocate_secondary_pom: DEALLOCATE_SECONDARY_POM
   }
-  scope :inactive_allocations, lambda { |nomis_offender_ids|
-    where(nomis_offender_id: nomis_offender_ids, active: false)
+
+  enum event_trigger: {
+    user: USER,
+    offender_movement: OFFENDER_MOVEMENT
+  }
+
+  scope :allocations, lambda { |nomis_offender_ids|
+    where(nomis_offender_id: nomis_offender_ids)
   }
   scope :all_primary_pom_allocations, lambda { |nomis_staff_id|
-    where(primary_pom_nomis_id: nomis_staff_id)
+    where(
+      primary_pom_nomis_id: nomis_staff_id,
+      event: ALLOCATE_PRIMARY_POM || REALLOCATE_PRIMARY_POM
+    )
   }
   scope :active_primary_pom_allocations, lambda { |nomis_staff_id, prison|
-    where(primary_pom_nomis_id: nomis_staff_id, prison: prison, active: true)
+    where(
+      primary_pom_nomis_id: nomis_staff_id,
+      prison: prison,
+      event: ALLOCATE_PRIMARY_POM || REALLOCATE_PRIMARY_POM
+    )
   }
   scope :primary_pom_nomis_id, lambda { |nomis_offender_id|
-    active_allocations(nomis_offender_id).first.primary_pom_nomis_id
+    allocations(nomis_offender_id).primary_pom_nomis_id
   }
 
   def self.deallocate_offender(nomis_offender_id)
-    active_allocations(nomis_offender_id).update_all(active: false)
+    allocations(nomis_offender_id).
+      update_all(
+        event: DEALLOCATE_PRIMARY_POM,
+        event_trigger: USER
+      )
   end
 
   def self.deallocate_primary_pom(nomis_staff_id)
-    all_primary_pom_allocations(nomis_staff_id).update_all(active: false)
+    all_primary_pom_allocations(nomis_staff_id).
+      update_all(
+        event: DEALLOCATE_PRIMARY_POM,
+        event_trigger: USER
+      )
   end
 
   validates :nomis_offender_id,
