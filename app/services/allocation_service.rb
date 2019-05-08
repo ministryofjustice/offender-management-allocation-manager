@@ -30,7 +30,6 @@ class AllocationService
 
     alloc_version
   end
-
   # rubocop:enable Metrics/MethodLength
 
   def self.all_allocations
@@ -54,16 +53,14 @@ class AllocationService
   def self.previously_allocated_poms(nomis_offender_id)
     allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id)
 
-    if allocation.nil?
-      []
-    else
-      allocation.versions.map { |version|
-        # 'create' events do not have '#reify' method
-        unless version.event == 'create'
-          version.reify.primary_pom_nomis_id
-        end
-      }.compact
-    end
+    return [] if allocation.nil?
+
+    allocation.versions.map { |version|
+      # 'create' events do not have '#reify' method
+      unless version.event == 'create'
+        version.reify.primary_pom_nomis_id
+      end
+    }.compact
   end
 
   def self.offender_allocation_history(nomis_offender_id)
@@ -94,12 +91,12 @@ class AllocationService
     AllocationVersion.allocations(nomis_offender_id).last
   end
 
-private
+  private
 
   def self.delete_overrides(params)
     Override.where(
       nomis_staff_id: params[:primary_pom_nomis_id],
       nomis_offender_id: params[:nomis_offender_id]).
-      destroy_all
+    destroy_all
   end
 end
