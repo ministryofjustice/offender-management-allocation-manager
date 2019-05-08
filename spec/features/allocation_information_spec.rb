@@ -89,7 +89,7 @@ feature "view an offender's allocation information" do
   end
 
   def create_allocation(offender_no)
-    Allocation.create!(
+    AllocationVersion.create!(
       nomis_offender_id: offender_no,
       primary_pom_nomis_id: probation_officer_nomis_staff_id,
       nomis_booking_id: '1153753',
@@ -98,7 +98,8 @@ feature "view an offender's allocation information" do
       created_by_username: 'SuperSPO',
       created_by_name: 'Super SPO',
       primary_pom_name: 'Ross Jones',
-      active: true
+      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+      event_trigger: AllocationVersion::USER
     )
   end
 end

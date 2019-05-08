@@ -1,81 +1,98 @@
 require 'rails_helper'
 
 RSpec.describe AllocationService do
-  let(:allocation) {
-    described_class.create_allocation(
+  let!(:allocation) {
+    described_class.create_or_update(
       primary_pom_nomis_id: 485_595,
       nomis_offender_id: 'G2911GD',
       created_by_username: 'PK000223',
       nomis_booking_id: 1,
       allocated_at_tier: 'A',
       prison: 'LEI',
-      created_at: '01/01/2019'
+      created_at: '01/01/2019',
+      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+      event_trigger: AllocationVersion::USER
     )
   }
 
-  let(:inactive_allocation) {
-    described_class.create_allocation(
-      primary_pom_nomis_id: 485_595,
+  let(:mock_email_service) { double('email_service_mock') }
+
+  before do
+    allow(mock_email_service).to receive(:send_allocation_email)
+    allow(EmailService).to receive(:instance).and_return(mock_email_service)
+  end
+
+  it 'can create a new record where none exists', vcr: { cassette_name: :allocation_service_create_allocation_version } do
+    params = {
       nomis_offender_id: 'G2911GD',
-      created_by_username: 'PK000223',
-      nomis_booking_id: 2,
-      allocated_at_tier: 'A',
       prison: 'LEI',
-      active: false,
-      created_at: '01/01/2018'
-    )
-  }
-
-  let(:old_inactive_allocation) {
-    described_class.create_allocation(
-      primary_pom_nomis_id: 485_752,
-      nomis_offender_id: 'G2911GD',
-      created_by_username: 'PK000223',
-      nomis_booking_id: 3,
       allocated_at_tier: 'A',
-      prison: 'PVI',
-      active: false,
-      created_at: '01/01/2017'
-    )
-  }
+      primary_pom_nomis_id: 485_595,
+      nomis_booking_id: 1,
+      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+      event_trigger: AllocationVersion::USER
+    }
 
-  it "Can get the active allocations", vcr: { cassette_name: :allocation_service_get_allocations } do
-    alloc = described_class.active_allocations([allocation.nomis_offender_id])
-    expect(alloc).to be_instance_of(Hash)
+    described_class.create_or_update(params)
+    expect(AllocationVersion.count).to be(1)
   end
 
-  it "Can get the allocation history for an offender", vcr: { cassette_name: 'allocation_service_offender_history' } do
-    first_allocation = allocation
-    second_allocation = inactive_allocation
-    last_allocation = old_inactive_allocation
+  it 'can update a record and store a version where one already exists', versioning: true, vcr: { cassette_name: :allocation_service_update_allocation_version } do
+    update_params = {
+      nomis_offender_id: 'G2911GD',
+      allocated_at_tier: 'B',
+      primary_pom_nomis_id: 485_752,
+      event: AllocationVersion::REALLOCATE_PRIMARY_POM
+    }
 
-    allocations = described_class.offender_allocation_history(allocation.nomis_offender_id)
+    described_class.create_or_update(update_params)
 
-    expect(allocations.count).to eq(3)
-    expect(allocations[0].nomis_booking_id).to eq(first_allocation.nomis_booking_id)
-    expect(allocations[1].nomis_booking_id).to eq(second_allocation.nomis_booking_id)
-    expect(allocations[2].nomis_booking_id).to eq(last_allocation.nomis_booking_id)
-    expect(allocations[2].prison).to eq('PVI')
+    expect(AllocationVersion.count).to be(1)
+    expect(AllocationVersion.find_by(nomis_offender_id: 'G2911GD').versions.count).to be(2)
   end
 
-  it "Can tell if an allocated offender has an active allocation", vcr: { cassette_name: :allocation_service_has_active_allocation } do
-    alloc = described_class.active_allocation?(allocation.nomis_offender_id)
-    expect(alloc).to eq(true)
+  it "Can get all allocations", vcr: { cassette_name: :allocation_service_get_allocations } do
+    allocations = described_class.all_allocations
+
+    expect(allocations).to be_instance_of(Hash)
+    expect(allocations['G2911GD']).to be_kind_of(AllocationVersion)
   end
 
-  it "Can tell if an allocated offender has no active allocation", vcr: { cassette_name: :allocation_service_has_no_active_allocation } do
-    alloc = described_class.active_allocation?('G1670VU')
-    expect(alloc).to eq(false)
-  end
-
-  it "Can get previous allocations for an offender where there are none", vcr: { cassette_name: :allocation_service_previous_allocations_none } do
+  it "Can get previous poms for an offender where there are none", versioning: true, vcr: { cassette_name: :allocation_service_previous_allocations_none } do
     staff_ids = described_class.previously_allocated_poms(allocation.nomis_offender_id)
+
     expect(staff_ids).to eq([])
   end
 
-  it "Can get previous allocations for an offender where there are some", vcr: { cassette_name: :allocation_service_previous_allocations } do
-    staff_ids = described_class.previously_allocated_poms(inactive_allocation.nomis_offender_id)
+  it "Can get previous poms for an offender where there are some", versioning: true, vcr: { cassette_name: :allocation_service_previous_allocations } do
+    allocation.update!(primary_pom_nomis_id: 485_752)
+
+    staff_ids = described_class.previously_allocated_poms(allocation.nomis_offender_id)
+
     expect(staff_ids.count).to eq(1)
     expect(staff_ids.first).to eq(485_595)
+  end
+
+  # TODO: Reinstate after changes to allocation history confirmed
+  xit "Can get the allocation history for an offender", versioning: true, vcr: { cassette_name: 'allocation_service_offender_history' } do
+    described_class.create_or_update(
+      nomis_offender_id: allocation.nomis_offender_id,
+      primary_pom_nomis_id: 485_752,
+      event: AllocationVersion::REALLOCATE_PRIMARY_POM
+    )
+    described_class.create_or_update(
+      nomis_offender_id: allocation.nomis_offender_id,
+      allocated_at_tier: 'D',
+      event: :reallocate_primary_pom
+    )
+
+    allocations = described_class.offender_allocation_history(allocation.nomis_offender_id)
+
+    expect(allocations.count).to eq(1)
+    expect(allocations.first.nomis_offender_id).to eq(allocation.nomis_offender_id)
+    expect(allocations.first.event).to eq('allocate_primary_pom')
+    expect(allocations.second.nomis_booking_id).to eq(first_reallocation.nomis_booking_id)
+    expect(allocations.last.nomis_booking_id).to eq(second_reallocation.nomis_booking_id)
+    expect(allocations.last.prison).to eq('PVI')
   end
 end

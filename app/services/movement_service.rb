@@ -19,6 +19,7 @@ class MovementService
 
     movements
   end
+
   # rubocop:enable Metrics/MethodLength
 
   def self.process_movement(movement)
@@ -29,8 +30,8 @@ class MovementService
     # We think that an ADM without a fromAgency is from court so there
     # will be nothing to delete/change.
     if movement.movement_type == Nomis::Models::MovementType::ADMISSION &&
-        movement.direction_code == Nomis::Models::MovementDirection::IN &&
-        movement.from_agency.present?
+      movement.direction_code == Nomis::Models::MovementDirection::IN &&
+      movement.from_agency.present?
       return process_transfer(movement)
     end
 
@@ -42,7 +43,8 @@ private
   def self.process_transfer(transfer)
     Rails.logger.info("Processing transfer for #{transfer.offender_no}")
 
-    Allocation.deallocate_offender(transfer.offender_no)
+    AllocationVersion.deallocate_offender(transfer.offender_no)
+
     CaseInformationService.change_prison(
       transfer.offender_no,
       transfer.from_agency,
@@ -58,7 +60,7 @@ private
   def self.process_release(release)
     Rails.logger.info("Processing release for #{release.offender_no}")
     CaseInformationService.delete_information(release.offender_no)
-    Allocation.deallocate_offender(release.offender_no)
+    AllocationVersion.deallocate_offender(release.offender_no)
 
     true
   end

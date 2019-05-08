@@ -2,53 +2,58 @@ require 'rails_helper'
 
 RSpec.describe AllocationList, type: :model do
   let(:current_allocation) {
-    AllocationService.create_allocation(
+    AllocationVersion.create!(
       primary_pom_nomis_id: 485_595,
       nomis_offender_id: 'G2911GD',
       created_by_username: 'PK000223',
       nomis_booking_id: 1,
       allocated_at_tier: 'A',
       prison: 'LEI',
-      created_at: '01/01/2019'
+      created_at: '01/01/2019',
+      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+      event_trigger: AllocationVersion::USER
     )
   }
 
   let(:middle_allocation1) {
-    AllocationService.create_allocation(
+    AllocationVersion.create!(
       primary_pom_nomis_id: 485_752,
       nomis_offender_id: 'G2911GD',
       created_by_username: 'PK000223',
       nomis_booking_id: 2,
       allocated_at_tier: 'A',
       prison: 'PVI',
-      active: false,
-      created_at: '01/01/2018'
+      created_at: '01/01/2018',
+      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+      event_trigger: AllocationVersion::USER
     )
   }
 
   let(:middle_allocation2) {
-    AllocationService.create_allocation(
+    AllocationVersion.create!(
       primary_pom_nomis_id: 485_752,
       nomis_offender_id: 'G2911GD',
       created_by_username: 'PK000223',
       nomis_booking_id: 3,
       allocated_at_tier: 'A',
       prison: 'PVI',
-      active: false,
-      created_at: '01/01/2017'
+      created_at: '01/01/2017',
+      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+      event_trigger: AllocationVersion::USER
     )
   }
 
   let(:old_allocation) {
-    AllocationService.create_allocation(
+    AllocationVersion.create!(
       primary_pom_nomis_id: 485_595,
       nomis_offender_id: 'G2911GD',
       created_by_username: 'PK000223',
       nomis_booking_id: 4,
       allocated_at_tier: 'A',
       prison: 'LEI',
-      active: false,
-      created_at: '01/01/2016'
+      created_at: '01/01/2016',
+      event: AllocationVersion::REALLOCATE_PRIMARY_POM,
+      event_trigger: AllocationVersion::USER
     )
   }
 
