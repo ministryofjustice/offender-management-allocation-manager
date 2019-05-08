@@ -91,7 +91,7 @@ class AllocationService
     AllocationVersion.allocations(nomis_offender_id).last
   end
 
-  private
+private
 
   def self.delete_overrides(params)
     Override.where(
