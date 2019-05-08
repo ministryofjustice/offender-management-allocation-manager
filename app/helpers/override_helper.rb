@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module OverrideHelper
-  def complex_reason_label(offender)
-    if offender.case_owner == 'Prison'
+  def complex_reason_label(recommended_type)
+    if recommended_type == 'Prison officer'
       return 'Prisoner assessed as not suitable for a prison officer POM'
     end
 

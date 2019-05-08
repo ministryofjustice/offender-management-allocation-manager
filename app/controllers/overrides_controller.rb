@@ -4,6 +4,9 @@ class OverridesController < ApplicationController
   def new
     @prisoner = OffenderService.get_offender(params.require(:nomis_offender_id))
     @pom = PrisonOffenderManagerService.get_pom(active_caseload, params[:nomis_staff_id])
+    @recommended_pom_type, @not_recommended_pom_type =
+      recommended_and_nonrecommended_poms_types_for(@prisoner)
+
     @override = Override.new
   end
 
@@ -22,12 +25,26 @@ class OverridesController < ApplicationController
     @prisoner = OffenderService.get_offender(override_params[:nomis_offender_id])
     @pom = PrisonOffenderManagerService.get_pom(
       active_caseload, override_params[:nomis_staff_id])
+    @recommended_pom_type, @not_recommended_pom_type =
+      recommended_and_nonrecommended_poms_types_for(@prisoner)
 
     render :new
   end
 # rubocop:enable Metrics/MethodLength
 
 private
+
+  def recommended_and_nonrecommended_poms_types_for(offender)
+    rec_type = RecommendationService.recommended_pom_type(offender)
+
+    if rec_type == RecommendationService::PRISON_POM
+      ['Prison officer',
+       'Probation officer']
+    else
+      ['Probation officer',
+       'Prison officer']
+    end
+  end
 
   def redirect_on_success
     redirect_to confirm_allocation_path(
