@@ -3,6 +3,8 @@
 # rubocop:disable Metrics/LineLength
 # rubocop:disable Metrics/MethodLength
 class AllocationsController < ApplicationController
+  delegate :update, to: :create
+
   before_action :authenticate_user
 
   breadcrumb 'Allocated', :summary_allocated, only: [:show]
@@ -66,7 +68,7 @@ class AllocationsController < ApplicationController
     @event_trigger = :user
   end
 
-  # TODO: Delegate #update to #create
+  # Note #update is delegated to #create
   def create
     offender = offender(allocation_params[:nomis_offender_id])
     allocation = allocation_attributes(offender)
@@ -83,24 +85,7 @@ class AllocationsController < ApplicationController
 
     redirect_to summary_unallocated_path
   end
-
-  def update
-    offender = offender(allocation_params[:nomis_offender_id])
-    allocation = allocation_attributes(offender)
-
-    @override = override
-
-    if AllocationService.create_or_update(allocation)
-      flash[:notice] =
-        "#{offender.full_name_ordered} has been allocated to #{pom.full_name_ordered} (#{pom.grade})"
-    else
-      flash[:alert] =
-        "#{offender.full_name_ordered} has not been allocated  - please try again"
-    end
-
-    redirect_to summary_unallocated_path
-  end
-
+  
 private
 
   def unavailable_pom_count
