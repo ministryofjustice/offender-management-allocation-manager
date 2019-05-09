@@ -15,6 +15,10 @@ class AllocationVersion < ApplicationRecord
   USER = 0
   OFFENDER_MOVEMENT = 1
 
+  # When adding a new 'event' or 'event trigger'
+  # make sure the constant it points to
+  # has a value that is sequential and does not
+  # re-assign an already existing value
   enum event: {
     allocate_primary_pom: ALLOCATE_PRIMARY_POM,
     reallocate_primary_pom: REALLOCATE_PRIMARY_POM,
@@ -24,6 +28,7 @@ class AllocationVersion < ApplicationRecord
     deallocate_secondary_pom: DEALLOCATE_SECONDARY_POM
   }
 
+  # 'Event triggers' capture the subject or action that triggered the event
   enum event_trigger: {
     user: USER,
     offender_movement: OFFENDER_MOVEMENT
