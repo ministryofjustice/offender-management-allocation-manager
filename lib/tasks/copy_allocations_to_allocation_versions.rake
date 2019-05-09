@@ -26,16 +26,15 @@ namespace :allocations do
           secondary_pom_name: alloc.secondary_pom_name,
           secondary_pom_nomis_id: alloc.secondary_pom_nomis_id,
           nomis_booking_id: alloc.nomis_booking_id,
-          event: 0,
-          event_trigger: 0
+          event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+          event_trigger: AllocationVersion::USER
         }
 
         if alloc_version.nil?
           AllocationVersion.create!(attributes)
         else
           attr_copy = attributes.clone
-          # reallocate_primary_pom has an Enum value of 1
-          attr_copy[:event] = 1
+          attr_copy[:event] = AllocationVersion::REALLOCATE_PRIMARY_POM
           alloc_version.update!(attr_copy)
         end
       end
