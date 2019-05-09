@@ -70,7 +70,7 @@ feature "edit a POM's details" do
     click_link "Edit profile"
 
     expect(page).to have_content("Kath Pobee Norris")
-    expect(Allocation.count).to eq 1
+    expect(AllocationVersion.count).to eq 1
 
     choose('working_pattern-2')
     choose('Inactive')

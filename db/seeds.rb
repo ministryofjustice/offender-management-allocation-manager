@@ -36,7 +36,7 @@ AllocationService.create_allocation(
   nomis_offender_id: 'G4273GI',
   nomis_booking_id: 1_153_753,
   prison: 'LEI',
-  allocated_at_tier: 'C',
+  allocated_at_tier: 'A',
   created_by_username: 'PK000223',
   primary_pom_nomis_id: 485_595
   )
@@ -45,10 +45,19 @@ AllocationService.create_allocation(
   nomis_offender_id: 'G4273GI',
   nomis_booking_id: 1_153_753,
   prison: 'LEI',
-  allocated_at_tier: 'A',
+  allocated_at_tier: 'B',
   created_by_username: 'PK000223',
-  primary_pom_nomis_id: 485_595
+  primary_pom_nomis_id: 485_752
   )
+
+AllocationService.create_allocation(
+  nomis_offender_id: 'G4273GI',
+  nomis_booking_id: 1_153_753,
+  prison: 'LEI',
+  allocated_at_tier: 'D',
+  created_by_username: 'PK000223',
+  primary_pom_nomis_id: 485_636
+)
 
 CaseInformation.find_or_create_by!(
   nomis_offender_id: 'G7806VO',

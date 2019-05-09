@@ -9,6 +9,7 @@ require 'support/helpers/jwt_helper'
 require 'support/helpers/features_helper'
 require 'capybara/rspec'
 require 'webmock/rspec'
+require 'paper_trail/frameworks/rspec'
 
 begin
   ActiveRecord::Migration.maintain_test_schema!

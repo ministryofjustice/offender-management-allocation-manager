@@ -3,7 +3,7 @@
 <div class="govuk-grid-row">
 
   <div class="govuk-grid-column-two-thirds">
-    <%= form_tag(allocations_path, method: :post, id: "confirm_allocation_form") do %>
+    <%= form_tag(allocations_path, id: "confirm_allocation_form") do %>
       <h1 class="govuk-heading-xl govuk-!-margin-top-4">Confirm allocation</h1>
       <p class="govuk-body">You are allocating <%= "#{@prisoner.first_name} #{@prisoner.last_name}".titleize %> to <%= "#{@pom.first_name} #{@pom.last_name}".titleize %>.</p>
       <% if @pom.emails.empty? %>

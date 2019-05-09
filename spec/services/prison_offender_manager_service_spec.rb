@@ -4,46 +4,54 @@ describe PrisonOffenderManagerService do
   let(:staff_id) { 485_737 }
 
   let(:allocation_one) {
-    AllocationService.create_allocation(
+    AllocationService.create_or_update(
       primary_pom_nomis_id: staff_id,
       nomis_offender_id: 'G4273GI',
       created_by_username: 'RJONES',
       nomis_booking_id: 1_153_753,
       allocated_at_tier: 'A',
-      prison: 'LEI'
+      prison: 'LEI',
+      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+      event_trigger: AllocationVersion::USER
     )
   }
 
   let(:allocation_two) {
-    AllocationService.create_allocation(
+    AllocationService.create_or_update(
       primary_pom_nomis_id: staff_id,
       nomis_offender_id: 'G8060UF',
       created_by_username: 'RJONES',
       nomis_booking_id: 971_856,
       allocated_at_tier: 'A',
-      prison: 'LEI'
+      prison: 'LEI',
+      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+      event_trigger: AllocationVersion::USER
     )
   }
 
   let(:allocation_three) {
-    AllocationService.create_allocation(
+    AllocationService.create_or_update(
       primary_pom_nomis_id: staff_id,
       nomis_offender_id: 'G8624GK',
       created_by_username: 'RJONES',
       nomis_booking_id: 76_908,
       allocated_at_tier: 'B',
-      prison: 'LEI'
+      prison: 'LEI',
+      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+      event_trigger: AllocationVersion::USER
     )
   }
 
   let(:allocation_four) {
-    AllocationService.create_allocation(
+    AllocationService.create_or_update(
       primary_pom_nomis_id: staff_id,
       nomis_offender_id: 'G1714GU',
       created_by_username: 'RJONES',
       nomis_booking_id: 31_777,
       allocated_at_tier: 'C',
-      prison: 'LEI'
+      prison: 'LEI',
+      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+      event_trigger: AllocationVersion::USER
     )
   }
 
@@ -74,7 +82,7 @@ describe PrisonOffenderManagerService do
     allocated_offenders = described_class.get_allocated_offenders(allocation_one.primary_pom_nomis_id, 'LEI')
 
     alloc, sentence_detail = allocated_offenders.first
-    expect(alloc).to be_kind_of(Allocation)
+    expect(alloc).to be_kind_of(AllocationVersion)
     expect(sentence_detail).to be_kind_of(Nomis::Models::SentenceDetail)
   end
 

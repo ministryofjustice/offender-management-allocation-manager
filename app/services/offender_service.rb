@@ -20,6 +20,7 @@ class OffenderService
       o.main_offence = Nomis::Elite2::OffenderApi.get_offence(o.latest_booking_id)
     }
   end
+
   # rubocop:enable Metrics/MethodLength
 
   # rubocop:disable Metrics/CyclomaticComplexity
@@ -54,6 +55,7 @@ class OffenderService
       true
     }
   end
+
   # rubocop:enable Metrics/MethodLength
   # rubocop:enable Metrics/CyclomaticComplexity
 
@@ -68,8 +70,8 @@ class OffenderService
   def self.set_allocated_pom_name(offenders, caseload)
     pom_names = PrisonOffenderManagerService.get_pom_names(caseload)
     nomis_offender_ids = offenders.map(&:offender_no)
-    offender_to_staff_hash = Allocation.
-      active_allocations(nomis_offender_ids).
+    offender_to_staff_hash = AllocationVersion.
+      where(nomis_offender_id: nomis_offender_ids).
       map { |a|
         [
           a.nomis_offender_id,

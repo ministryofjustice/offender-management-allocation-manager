@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/LineLength
+# rubocop:disable Metrics/MethodLength
 class AllocationsController < ApplicationController
+  delegate :update, to: :create
+
   before_action :authenticate_user
 
   breadcrumb 'Allocated', :summary_allocated, only: [:show]
@@ -18,19 +22,16 @@ class AllocationsController < ApplicationController
     @unavailable_pom_count = unavailable_pom_count
   end
 
-  # rubocop:disable Metrics/LineLength
   def show
     @prisoner = offender(nomis_offender_id_from_url)
-    primary_pom_nomis_id = Allocation.primary_pom_nomis_id(@prisoner.offender_no)
+    primary_pom_nomis_id = AllocationVersion.find_by(nomis_offender_id: @prisoner.offender_no).primary_pom_nomis_id
     @pom = PrisonOffenderManagerService.get_pom(active_caseload, primary_pom_nomis_id)
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(active_caseload, @prisoner.offender_no)
     @history = AllocationService.offender_allocation_history(@prisoner.offender_no)
   end
-  # rubocop:enable Metrics/LineLength
 
-  # rubocop:disable Metrics/MethodLength
   def edit
-    unless AllocationService.active_allocation?(nomis_offender_id_from_url)
+    unless AllocationVersion.active?(nomis_offender_id_from_url)
       redirect_to new_allocation_path(nomis_offender_id_from_url)
       return
     end
@@ -46,7 +47,6 @@ class AllocationsController < ApplicationController
 
     @current_pom = current_pom_for(nomis_offender_id_from_url)
   end
-  # rubocop:enable Metrics/MethodLength
 
   def confirm
     @prisoner = offender(nomis_offender_id_from_url)
@@ -54,41 +54,37 @@ class AllocationsController < ApplicationController
       active_caseload,
       nomis_staff_id_from_url
     )
+    @event = :allocate_primary_pom
+    @event_trigger = :user
   end
 
-  # rubocop:disable Metrics/MethodLength
-  # rubocop:disable Metrics/LineLength
+  def confirm_reallocation
+    @prisoner = offender(nomis_offender_id_from_url)
+    @pom = PrisonOffenderManagerService.get_pom(
+      active_caseload,
+      nomis_staff_id_from_url
+    )
+    @event = :reallocate_primary_pom
+    @event_trigger = :user
+  end
+
+  # Note #update is delegated to #create
   def create
     offender = offender(allocation_params[:nomis_offender_id])
-    pom = PrisonOffenderManagerService.get_pom(
-      active_caseload,
-      allocation_params[:nomis_staff_id]
-    )
+    allocation = allocation_attributes(offender)
 
     @override = override
-    allocation = {
-      primary_pom_nomis_id: allocation_params[:nomis_staff_id].to_i,
-      nomis_offender_id: allocation_params[:nomis_offender_id],
-      created_by_username: current_user,
-      nomis_booking_id: offender.latest_booking_id,
-      allocated_at_tier: offender.tier,
-      prison: active_caseload,
-      override_reasons: override_reasons,
-      suitability_detail: suitability_detail,
-      override_detail: override_detail,
-      message: allocation_params[:message]
-    }
 
-    if AllocationService.create_allocation allocation
-      flash[:notice] = "#{offender.full_name_ordered} has been allocated to #{pom.full_name_ordered} (#{pom.grade})"
+    if AllocationService.create_or_update(allocation)
+      flash[:notice] =
+        "#{offender.full_name_ordered} has been allocated to #{pom.full_name_ordered} (#{pom.grade})"
     else
-      flash[:alert] = "#{offender.full_name_ordered} has not been allocated  - please try again"
+      flash[:alert] =
+        "#{offender.full_name_ordered} has not been allocated  - please try again"
     end
 
     redirect_to summary_unallocated_path
   end
-# rubocop:enable Metrics/MethodLength
-# rubocop:enable Metrics/LineLength
 
 private
 
@@ -98,8 +94,32 @@ private
     )
   end
 
+  def allocation_attributes(offender)
+    {
+      primary_pom_nomis_id: allocation_params[:nomis_staff_id].to_i,
+      nomis_offender_id: allocation_params[:nomis_offender_id],
+      event: allocation_params[:event],
+      event_trigger: allocation_params[:event_trigger],
+      created_by_username: current_user,
+      nomis_booking_id: offender.latest_booking_id,
+      allocated_at_tier: offender.tier,
+      prison: active_caseload,
+      override_reasons: override_reasons,
+      suitability_detail: suitability_detail,
+      override_detail: override_detail,
+      message: allocation_params[:message]
+    }
+  end
+
   def offender(nomis_offender_id)
     OffenderService.get_offender(nomis_offender_id)
+  end
+
+  def pom
+    @pom ||= PrisonOffenderManagerService.get_pom(
+      active_caseload,
+      allocation_params[:nomis_staff_id]
+    )
   end
 
   def override
@@ -109,7 +129,7 @@ private
   end
 
   def current_pom_for(nomis_offender_id)
-    current_allocation = AllocationService.active_allocations(nomis_offender_id)
+    current_allocation = AllocationService.allocations(nomis_offender_id)
     nomis_staff_id = current_allocation[nomis_offender_id]['primary_pom_nomis_id']
 
     PrisonOffenderManagerService.get_pom(active_caseload, nomis_staff_id)
@@ -144,7 +164,13 @@ private
   end
 
   def allocation_params
-    params.require(:allocations).permit(:nomis_staff_id, :nomis_offender_id, :message)
+    params.require(:allocations).permit(
+      :nomis_staff_id,
+      :nomis_offender_id,
+      :message,
+      :event,
+      :event_trigger
+    )
   end
 
   def override_reasons
@@ -159,3 +185,5 @@ private
     @override[:suitability_detail] if @override.present?
   end
 end
+# rubocop:enable Metrics/LineLength
+# rubocop:enable Metrics/MethodLength

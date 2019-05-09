@@ -18,7 +18,7 @@ feature 'Allocation' do
     CaseInformation.create!(nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPS', omicable: 'No', prison: 'LEI')
   }
 
-  scenario 'accepting a recommended allocation', vcr: { cassette_name: :create_new_allocation_feature } do
+  scenario 'accepting a recommended allocation', versioning: true, vcr: { cassette_name: :create_new_allocation_feature } do
     signin_user
 
     visit new_allocation_path(nomis_offender_id)
@@ -117,15 +117,16 @@ feature 'Allocation' do
     expect(Override.count).to eq(0)
   end
 
-  scenario 're-allocating', vcr: { cassette_name: :re_allocate_feature } do
-    Allocation.create!(
+  scenario 're-allocating', versioning: true, vcr: { cassette_name: :re_allocate_feature } do
+    AllocationVersion.create!(
       nomis_offender_id: nomis_offender_id,
       primary_pom_nomis_id: probation_officer_nomis_staff_id,
       nomis_booking_id: 1_153_753,
       prison: 'LEI',
       allocated_at_tier: 'A',
       created_by_username: 'SPO_LEEDS',
-      active: true
+      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+      event_trigger: AllocationVersion::USER
     )
 
     signin_user
@@ -139,10 +140,21 @@ feature 'Allocation' do
     expect(page).to have_current_path edit_allocation_path(nomis_offender_id)
     expect(page).to have_css('.current_pom_full_name', text: 'Duckett, Jenny')
     expect(page).to have_css('.current_pom_grade', text: 'Prison POM')
+
+    within('.recommended_pom_row_0') do
+      click_link 'Allocate'
+    end
+
+    expect(page).to have_current_path confirm_reallocation_path(nomis_offender_id, prison_officer_nomis_staff_id)
+
+    click_button 'Complete allocation'
+
+    expect(AllocationVersion.find_by(nomis_offender_id: nomis_offender_id).event).to eq("reallocate_primary_pom")
   end
 
   scenario 'allocation fails', vcr: { cassette_name: :allocation_fails_feature } do
-    allow(AllocationService).to receive(:create_allocation).and_return(false)
+    allow(AllocationService).to receive(:create_or_update).and_return(false)
+
     signin_user
 
     visit new_allocation_path(nomis_offender_id)

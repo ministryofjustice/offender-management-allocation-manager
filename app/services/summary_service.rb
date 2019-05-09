@@ -42,7 +42,7 @@ class SummaryService
 
       # Check the allocations for the remaining offenders who have tiers.
       offender_nos = tiered_offenders.map(&:offender_no)
-      active_allocations_hash = AllocationService.active_allocations(offender_nos)
+      active_allocations_hash = AllocationService.allocations(offender_nos)
 
       # Put the offenders in the correct group based on whether we were able to
       # find an active allocation for them.

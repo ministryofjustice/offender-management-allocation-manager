@@ -36,13 +36,15 @@ describe OffenderService, vcr: { cassette_name: :offender_service_offenders_by_p
 
     PomDetail.create!(nomis_staff_id: nomis_staff_id, working_pattern: 1.0, status: 'active')
 
-    AllocationService.create_allocation(
+    AllocationService.create_or_update(
       nomis_offender_id: offenders.first.offender_no,
       nomis_booking_id: 1_153_753,
       prison: 'LEI',
       allocated_at_tier: 'C',
       created_by_username: 'PK000223',
-      primary_pom_nomis_id: nomis_staff_id
+      primary_pom_nomis_id: nomis_staff_id,
+      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+      event_trigger: AllocationVersion::USER
     )
 
     updated_offenders = OffenderService.set_allocated_pom_name(offenders, 'LEI')

@@ -2,42 +2,47 @@
 
 class AllocationService
   # rubocop:disable Metrics/MethodLength
-  def self.create_allocation(params)
-    set_names = proc { |alloc|
-      pom_firstname, pom_secondname =
-        PrisonOffenderManagerService.get_pom_name(params[:primary_pom_nomis_id])
-      user_firstname, user_secondname =
-        PrisonOffenderManagerService.get_user_name(params[:created_by_username])
+  def self.create_or_update(params)
+    params_copy = params.clone
+    pom_firstname, pom_secondname =
+      PrisonOffenderManagerService.get_pom_name(params_copy[:primary_pom_nomis_id])
+    user_firstname, user_secondname =
+      PrisonOffenderManagerService.get_user_name(params_copy[:created_by_username])
 
-      alloc.primary_pom_name = "#{pom_firstname} #{pom_secondname}"
-      alloc.created_by_name = "#{user_firstname} #{user_secondname}"
-    }
+    params_copy[:primary_pom_name] = "#{pom_firstname} #{pom_secondname}"
+    params_copy[:created_by_name] = "#{user_firstname} #{user_secondname}"
 
-    allocation = Allocation.transaction {
-      Allocation.deallocate_offender(params[:nomis_offender_id])
-      Allocation.create!(params) do |alloc|
-        set_names.call(alloc)
-        alloc.active = params.fetch(:active, true)
-        alloc.save!
-      end
-    }
+    alloc_version = AllocationVersion.find_by(
+      nomis_offender_id: params_copy[:nomis_offender_id]
+    )
 
-    params[:pom_detail_id] = PrisonOffenderManagerService.
-      get_pom_detail(params[:primary_pom_nomis_id]).id
+    if alloc_version.nil?
+      alloc_version = AllocationVersion.create!(params_copy)
+    else
+      alloc_version.update!(params_copy)
+    end
 
-    EmailService.instance(params).send_allocation_email
-    delete_overrides(params)
+    params_copy[:pom_detail_id] = PrisonOffenderManagerService.
+      get_pom_detail(params_copy[:primary_pom_nomis_id]).id
 
-    allocation
+    EmailService.instance(params_copy).send_allocation_email
+    delete_overrides(params_copy)
+
+    alloc_version
   end
   # rubocop:enable Metrics/MethodLength
 
-  def self.active_allocation?(nomis_offender_id)
-    Allocation.active_allocations(nomis_offender_id).count > 0
+  def self.all_allocations
+    AllocationVersion.all.map { |a|
+      [
+        a[:nomis_offender_id],
+        a
+      ]
+    }.to_h
   end
 
-  def self.active_allocations(nomis_offender_ids)
-    Allocation.active_allocations(nomis_offender_ids).map { |a|
+  def self.allocations(nomis_offender_ids)
+    AllocationVersion.where(nomis_offender_id: nomis_offender_ids).map { |a|
       [
         a[:nomis_offender_id],
         a
@@ -46,16 +51,21 @@ class AllocationService
   end
 
   def self.previously_allocated_poms(nomis_offender_id)
-    Allocation.inactive_allocations(nomis_offender_id).
+    allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id)
+
+    return [] if allocation.nil?
+
+    get_versions_for(allocation).
       map(&:primary_pom_nomis_id)
   end
 
   def self.offender_allocation_history(nomis_offender_id)
-    allocations = Allocation.
-      where(nomis_offender_id: nomis_offender_id).
-      order('created_at DESC')
+    current_allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id)
 
-    AllocationList.new(allocations)
+    unless current_allocation.nil?
+      allocations = get_versions_for(current_allocation)
+      AllocationList.new(allocations.prepend current_allocation)
+    end
   end
 
   def self.create_override(params)
@@ -71,15 +81,22 @@ class AllocationService
   end
 
   def self.last_allocation(nomis_offender_id)
-    Allocation.inactive_allocations(nomis_offender_id).last
+    AllocationVersion.allocations(nomis_offender_id).last
   end
 
 private
+
+  def self.get_versions_for(allocation)
+    allocation.versions.map { |version|
+      # 'create' events do not have '#reify' method
+      version.reify unless version.event == 'create'
+    }.compact
+  end
 
   def self.delete_overrides(params)
     Override.where(
       nomis_staff_id: params[:primary_pom_nomis_id],
       nomis_offender_id: params[:nomis_offender_id]).
-        destroy_all
+    destroy_all
   end
 end
