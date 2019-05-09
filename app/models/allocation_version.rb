@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'byebug'
-
 class AllocationVersion < ApplicationRecord
   has_paper_trail
 
