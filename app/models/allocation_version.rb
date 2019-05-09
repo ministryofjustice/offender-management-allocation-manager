@@ -53,18 +53,24 @@ class AllocationVersion < ApplicationRecord
   scope :primary_pom_nomis_id, lambda { |nomis_offender_id|
     allocations(nomis_offender_id).primary_pom_nomis_id
   }
-
+  
   def self.deallocate_offender(nomis_offender_id)
     allocations(nomis_offender_id).
       update_all(
+        primary_pom_nomis_id: nil,
+        primary_pom_name: nil,
+        secondary_pom_nomis_id: nil,
+        secondary_pom_name: nil,
         event: DEALLOCATE_PRIMARY_POM,
-        event_trigger: USER
+        event_trigger: OFFENDER_MOVEMENT
       )
   end
 
   def self.deallocate_primary_pom(nomis_staff_id)
     all_primary_pom_allocations(nomis_staff_id).
       update_all(
+        primary_pom_nomis_id: nil,
+        primary_pom_name: nil,
         event: DEALLOCATE_PRIMARY_POM,
         event_trigger: USER
       )
