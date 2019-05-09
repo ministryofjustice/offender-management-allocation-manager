@@ -55,7 +55,8 @@ class AllocationService
 
     return [] if allocation.nil?
 
-    get_versions_for(allocation)
+    get_versions_for(allocation).
+      map(&:primary_pom_nomis_id)
   end
 
   def self.offender_allocation_history(nomis_offender_id)
