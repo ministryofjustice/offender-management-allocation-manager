@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'byebug'
+
 class AllocationVersion < ApplicationRecord
   has_paper_trail
 
@@ -39,21 +41,24 @@ class AllocationVersion < ApplicationRecord
   }
   scope :all_primary_pom_allocations, lambda { |nomis_staff_id|
     where(
-      primary_pom_nomis_id: nomis_staff_id,
-      event: ALLOCATE_PRIMARY_POM || REALLOCATE_PRIMARY_POM
+      primary_pom_nomis_id: nomis_staff_id
     )
   }
   scope :active_primary_pom_allocations, lambda { |nomis_staff_id, prison|
     where(
       primary_pom_nomis_id: nomis_staff_id,
-      prison: prison,
-      event: ALLOCATE_PRIMARY_POM || REALLOCATE_PRIMARY_POM
+      prison: prison
     )
   }
   scope :primary_pom_nomis_id, lambda { |nomis_offender_id|
     allocations(nomis_offender_id).primary_pom_nomis_id
   }
-  
+
+  def self.active?(nomis_offender_id)
+    allocation = find_by(nomis_offender_id: nomis_offender_id)
+    !allocation.nil? && !allocation.primary_pom_nomis_id.nil?
+  end
+
   def self.deallocate_offender(nomis_offender_id)
     allocations(nomis_offender_id).
       update_all(

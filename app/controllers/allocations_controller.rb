@@ -31,7 +31,7 @@ class AllocationsController < ApplicationController
   end
 
   def edit
-    unless AllocationVersion.find_by(nomis_offender_id: nomis_offender_id_from_url)
+    unless AllocationVersion.active?(nomis_offender_id_from_url)
       redirect_to new_allocation_path(nomis_offender_id_from_url)
       return
     end
