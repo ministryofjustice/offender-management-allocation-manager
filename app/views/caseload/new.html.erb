@@ -16,7 +16,9 @@
       <th class="govuk-table__header" scope="col">Earliest release date</th>
       <th class="govuk-table__header" scope="col">Allocation<br/>date</th>
       <th class="govuk-table__header" scope="col">Role</th>
-      <th class="govuk-table__header" scope="col">Action</th>
+      <% if Flipflop.prisoner_profile? %>
+        <th class="govuk-table__header" scope="col">Action</th>
+      <% end %>
     </tr>
     </thead>
     <tbody class="govuk-table__body">
@@ -28,9 +30,11 @@
         <td aria-label="Release date" class="govuk-table__cell "><%= format_date(sentence.earliest_release_date) %></td>
         <td aria-label="Allocation date" class="govuk-table__cell "><%= format_date(allocation.created_at) %></td>
         <td aria-label="Role" class="govuk-table__cell "><%= allocation.responsibility %></td>
-        <td aria-label="Action" class="govuk-table__cell ">
-          View
-        </td>
+        <% if Flipflop.prisoner_profile? %>
+          <td aria-label="Action" class="govuk-table__cell ">
+            <%= link_to('View', prisoner_show_path(allocation.nomis_offender_id), class: "govuk-link" ) %>
+          </td>
+        <% end %>
       </tr>
     <% end %>
     </tbody>

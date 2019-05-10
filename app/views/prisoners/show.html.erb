@@ -1,83 +1,53 @@
 <div class="govuk-grid-row govuk-!-margin-bottom-5">
   <div class="govuk-grid-column-one-quarter">
-    <img src="<%= prisoner_image_path(@offender.offender_no) %>" alt="Prisoner photo will be here" width="95%">
+    <img src="<%= prisoner_image_path(@prisoner.offender_no) %>" alt="Prisoner photo will be here" width="95%">
   </div>
   <div class="govuk-grid-column-three-quarters">
     <div class="govuk-grid-row">
       <div class='govuk-grid-column-full'>
-        <h2 class="govuk-heading-xl"><%= @offender.full_name %></h2>
+        <h2 class="govuk-heading-xl"><%= @prisoner.full_name %></h2>
       </div>
     </div>
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-third">
         <span class="govuk-body">Prisoner number</span>
-        <h3 class="govuk-heading-m"><%= @offender.offender_no %></h3>
+        <h3 class="govuk-heading-m"><%= @prisoner.offender_no %></h3>
       </div>
       <div class="govuk-grid-column-one-third">
-        <span class="govuk-body">Nationality</span>
-        <h3 class="govuk-heading-m"><%= @offender.nationalities %></h3>
+        <span class="govuk-body">CRN number</span>
+        <h3 class="govuk-heading-m">N/A</h3>
       </div>
       <div class="govuk-grid-column-one-third">
         <span class="govuk-body">Date of birth</span>
-        <h3 class="govuk-heading-m"><%= format_date(@offender.date_of_birth) %></h3>
+        <h3 class="govuk-heading-m"><%= format_date(@prisoner.date_of_birth) %></h3>
       </div>
     </div>
     <div class="govuk-grid-row">
-      <div class="govuk-grid-column-one-third">
-        <span class="govuk-body">Arrival date</span>
-        <h3 class="govuk-heading-m"><%= format_date(@offender.reception_date) %></h3>
-      </div>
       <div class="govuk-grid-column-one-third">
         <span class="govuk-body">Earliest release date</span>
-        <h3 class="govuk-heading-m"><%= format_date(@offender.earliest_release_date) %></h3>
+        <h3 class="govuk-heading-m"><%= format_date(@prisoner.earliest_release_date) %></h3>
       </div>
       <div class="govuk-grid-column-one-third">
-        <span class="govuk-body">COM handover date</span>
-        <h3 class="govuk-heading-m">Unknown</h3>
+        <span class="govuk-body">Category</span>
+        <h3 class="govuk-heading-m">N/A</h3>
       </div>
-    </div>
-    <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-third">
-        <span class="govuk-body">Current case owner</span>
-        <h3 class="govuk-heading-m"><%= case_owner_label(@offender) %></h3>
+        <span class="govuk-body">Tier calculation</span>
+        <h3 class="govuk-heading-m"><%= @prisoner.tier %></h3>
       </div>
     </div>
     <div class='govuk-grid-row'>
       <div class='govuk-grid-column-full'>
         <div class='hmpps-nomis-button'>
-          <a class="govuk-body govuk-!-font-weight-bold" href="#">View NOMIS profile
-          </a>
+          <%= link_to 'View NOMIS profile', digital_prison_service_profile_path(@prisoner.offender_no), class: "govuk-link", target: "_blank" %>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<div class="govuk-tabs govuk-!-margin-top-9" data-module="tabs">
-  <ul class="govuk-tabs__list">
-    <li class="govuk-tabs__list-item">
-      <a class="govuk-tabs__tab" href="#prisoner-info">
-        Prisoner information
-      </a>
-    </li>
-    <li class="govuk-tabs__list-item">
-      <a class="govuk-tabs__tab govuk-tabs__tab--selected" href="#history">
-        Allocations
-      </a>
-    </li>
-  </ul>
 
-  <section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="history">
-    <%= render 'allocation_history' %>
-  </section>
-
-  <section class="govuk-tabs__panel govuk-tabs__panel--hidden"
-           id="prisoner-info">
-    <div>
-      <%# <%= render 'shared/offence_info' %>
-      <%# <%= render 'prisoners/case_information' %>
-      <%# <%= render 'prisoners/allocation_info' %>
-    </div>
-  </section>
-
-</div>
+<%= render 'prisoner_information'%>
+<%= render 'shared/offence_info' %>
+<%= render 'prison_allocation' %>
+<%= render 'community_information' %>

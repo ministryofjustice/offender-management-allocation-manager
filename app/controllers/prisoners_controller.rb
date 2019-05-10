@@ -3,8 +3,13 @@
 class PrisonersController < ApplicationController
   before_action :authenticate_user
 
+  breadcrumb 'Your caseload', :caseload_index, only: [:show]
+  breadcrumb -> { offender.full_name },
+             -> { '' }, only: [:show]
+
+
   def show
-    @offender = offender
+    @prisoner = offender
   end
 
   def image
