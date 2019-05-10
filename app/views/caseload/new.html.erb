@@ -13,9 +13,10 @@
       <th class="govuk-table__header" scope="col">Prisoner name</th>
       <th class="govuk-table__header" scope="col">Prisoner number</th>
       <th class="govuk-table__header" scope="col">Arrival date</th>
-      <th class="govuk-table__header" scope="col">Earliest release<br/> date</th>
+      <th class="govuk-table__header" scope="col">Earliest release date</th>
       <th class="govuk-table__header" scope="col">Allocation<br/>date</th>
       <th class="govuk-table__header" scope="col">Role</th>
+      <th class="govuk-table__header" scope="col">Action</th>
     </tr>
     </thead>
     <tbody class="govuk-table__body">
@@ -27,6 +28,9 @@
         <td aria-label="Release date" class="govuk-table__cell "><%= format_date(sentence.earliest_release_date) %></td>
         <td aria-label="Allocation date" class="govuk-table__cell "><%= format_date(allocation.created_at) %></td>
         <td aria-label="Role" class="govuk-table__cell "><%= allocation.responsibility %></td>
+        <td aria-label="Action" class="govuk-table__cell ">
+          View
+        </td>
       </tr>
     <% end %>
     </tbody>
