@@ -10,7 +10,7 @@ spec:
       containers:
       - name: move-allocations
         image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
-        command: ['sh', '-c', "bundle exec rake allocations:copy"]
+        command: ['sh', '-c', "bundle exec rails db:migrate && bundle exec rake allocations:copy"]
         envFrom:
           - configMapRef:
               name: shared-environment
