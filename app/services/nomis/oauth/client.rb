@@ -18,7 +18,8 @@ module Nomis
 
       def request(method, route)
         response = @connection.send(method) { |req|
-          req.url(@host + route)
+          url = URI.join(@host, route).to_s
+          req.url(url)
           req.headers['Authorization'] = authorisation
         }
 
