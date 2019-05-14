@@ -10,5 +10,33 @@ spec:
       containers:
       - name: pi
         image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
-        command: ["bundle", "exec", "rails", "allocations:copy"]
+        command: ['sh', '-c', "bundle exec rake allocations:copy"]
+        envFrom:
+          - configMapRef:
+              name: shared-environment
+          - secretRef:
+              name: allocation-manager-secrets
+        env:
+          - name: PROMETHEUS_METRICS
+            value: "off"
+          - name: POSTGRES_HOST
+            valueFrom:
+              secretKeyRef:
+                name: allocation-rds-instance-output
+                key: rds_instance_address
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: allocation-rds-instance-output
+                key: postgres_password
+          - name: POSTGRES_NAME
+            valueFrom:
+              secretKeyRef:
+                name: allocation-rds-instance-output
+                key: postgres_name
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: allocation-rds-instance-output
+                key: postgres_user
       restartPolicy: Never
