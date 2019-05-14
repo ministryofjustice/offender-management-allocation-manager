@@ -30,17 +30,17 @@ module OffenderManagementAllocationClient
       'ALLOCATION_MANAGER_HOST',
       'http://localhost:3000'
     )
-    config.sentry_dsn = ENV['SENTRY_DSN']
-    config.keyworker_api_host = ENV['KEYWORKER_API_HOST']
-    config.digital_prison_service_host = ENV['DIGITAL_PRISON_SERVICE_HOST']
-    config.nomis_oauth_host = ENV['NOMIS_OAUTH_HOST']
-    config.nomis_oauth_client_id = ENV['NOMIS_OAUTH_CLIENT_ID']
-    config.nomis_oauth_client_secret = ENV['NOMIS_OAUTH_CLIENT_SECRET']
-    config.nomis_oauth_public_key = ENV['NOMIS_OAUTH_PUBLIC_KEY']
-    config.prometheus_metrics = ENV['PROMETHEUS_METRICS']
-    config.ga_tracking_id = ENV['GA_TRACKING_ID']
-    config.support_email = ENV['SUPPORT_EMAIL']
-    config.redis_url = ENV['REDIS_URL']
-    config.redis_auth = ENV['REDIS_AUTH']
+    config.sentry_dsn = ENV['SENTRY_DSN']&.strip
+    config.keyworker_api_host = ENV['KEYWORKER_API_HOST']&.strip
+    config.digital_prison_service_host = ENV['DIGITAL_PRISON_SERVICE_HOST']&.strip
+    config.nomis_oauth_host = ENV['NOMIS_OAUTH_HOST']&.strip
+    config.nomis_oauth_client_id = ENV['NOMIS_OAUTH_CLIENT_ID']&.strip
+    config.nomis_oauth_client_secret = ENV['NOMIS_OAUTH_CLIENT_SECRET']&.strip
+    config.nomis_oauth_public_key = ENV['NOMIS_OAUTH_PUBLIC_KEY']&.strip
+    config.prometheus_metrics = ENV['PROMETHEUS_METRICS']&.strip
+    config.ga_tracking_id = ENV['GA_TRACKING_ID']&.strip
+    config.support_email = ENV['SUPPORT_EMAIL']&.strip
+    config.redis_url = ENV['REDIS_URL']&.strip
+    config.redis_auth = ENV['REDIS_AUTH']&.strip
   end
 end
