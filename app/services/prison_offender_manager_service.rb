@@ -100,13 +100,13 @@ class PrisonOffenderManagerService
 
   def self.get_new_cases(nomis_staff_id, prison)
     allocations = get_allocated_offenders(nomis_staff_id, prison)
-    allocations.select { |allocation, _offender| allocation.created_at >= 7.days.ago }
+    allocations.select { |allocation, _offender| allocation.updated_at >= 7.days.ago }
   end
 
   def self.get_new_cases_count(nomis_staff_id, prison)
     allocations = get_allocated_offenders(nomis_staff_id, prison)
     allocations.select { |allocation, _offender|
-      allocation.created_at >= 7.days.ago
+      allocation.updated_at >= 7.days.ago
     }.count
   end
 
