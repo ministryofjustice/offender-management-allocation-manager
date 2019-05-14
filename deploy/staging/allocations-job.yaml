@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: copy-allocations
+spec:
+  template:
+    metadata:
+      name: copy-allocations
+    spec:
+      containers:
+      - name: pi
+        image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
+        command: ["bundle", "exec", "allocations:copy"]
+      restartPolicy: Never
