@@ -10,5 +10,5 @@ spec:
       containers:
       - name: pi
         image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
-        command: ["bundle", "exec", "allocations:copy"]
+        command: ["bundle", "exec", "rails", "allocations:copy"]
       restartPolicy: Never
