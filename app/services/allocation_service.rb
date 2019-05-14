@@ -41,8 +41,11 @@ class AllocationService
     }.to_h
   end
 
-  def self.allocations(nomis_offender_ids)
-    AllocationVersion.where(nomis_offender_id: nomis_offender_ids).map { |a|
+  def self.allocations(nomis_offender_ids, prison)
+    AllocationVersion.where(
+      nomis_offender_id: nomis_offender_ids,
+      prison: prison).
+      map { |a|
       [
         a[:nomis_offender_id],
         a
