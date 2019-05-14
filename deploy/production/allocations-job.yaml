@@ -1,11 +1,11 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: copy-allocations
+  name: copy-old-allocations
 spec:
   template:
     metadata:
-      name: copy-allocations
+      name: copy-old-allocations
     spec:
       containers:
       - name: pi
