@@ -1,14 +1,14 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: copy-old-allocations
+  name: move-allocations
 spec:
   template:
     metadata:
-      name: copy-old-allocations
+      name: move-allocations
     spec:
       containers:
-      - name: pi
+      - name: move-allocations
         image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
         command: ['sh', '-c', "bundle exec rake allocations:copy"]
         envFrom:
