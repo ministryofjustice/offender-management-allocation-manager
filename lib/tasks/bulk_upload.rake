@@ -27,6 +27,7 @@ namespace :bulk_upload do
 end
 
 # rubocop:disable Metrics/MethodLength
+# rubocop:disable Metrics/CyclomaticComplexity
 def process_row(prison, row, row_position)
   id = row['ID']&.strip
   tier = row['Tier']&.strip
@@ -44,10 +45,11 @@ def process_row(prison, row, row_position)
     c.nomis_offender_id = id
     c.tier = tier
     c.case_allocation = provider
-    c.omicable = omic.casecmp('Y').zero?
+    c.omicable = omic.casecmp('Y').zero? ? 'Yes' : 'No'
     c.save!
   }
 end
+# rubocop:enable Metrics/CyclomaticComplexity
 # rubocop:enable Metrics/MethodLength
 
 def existing_case_info?(offender_id)
