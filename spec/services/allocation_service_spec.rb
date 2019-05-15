@@ -58,6 +58,41 @@ RSpec.describe AllocationService do
     expect(allocations['G2911GD']).to be_kind_of(AllocationVersion)
   end
 
+  it "Can get allocations by prison", vcr: { cassette_name: :allocation_service_get_allocations_by_prison } do
+    first_offender_id = 'JSHD000NN'
+    second_offender_id = 'SDHH87GD'
+    leeds_prison = 'LEI'
+
+    AllocationVersion.create!(
+      primary_pom_nomis_id: 456_987,
+      nomis_offender_id: first_offender_id,
+      created_by_username: 'ZZ00045',
+      nomis_booking_id: 5,
+      allocated_at_tier: 'B',
+      prison: leeds_prison,
+      created_at: '01/03/2019',
+      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+      event_trigger: AllocationVersion::USER
+    )
+
+    AllocationVersion.create!(
+      primary_pom_nomis_id: 485_595,
+      nomis_offender_id: second_offender_id,
+      created_by_username: 'AB00045',
+      nomis_booking_id: 1,
+      allocated_at_tier: 'B',
+      prison: 'USK',
+      created_at: '01/03/2019',
+      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+      event_trigger: AllocationVersion::USER
+    )
+
+    allocations = described_class.allocations([first_offender_id, second_offender_id], leeds_prison)
+
+    expect(allocations.keys.count).to be(1)
+    expect(allocations.keys.first).to eq(first_offender_id)
+  end
+
   it "Can get previous poms for an offender where there are none", versioning: true, vcr: { cassette_name: :allocation_service_previous_allocations_none } do
     staff_ids = described_class.previously_allocated_poms(allocation.nomis_offender_id)
 
