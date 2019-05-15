@@ -44,7 +44,7 @@ def process_row(prison, row, row_position)
     c.nomis_offender_id = id
     c.tier = tier
     c.case_allocation = provider
-    c.omicable = omic.casecmp('Y').zero?
+    c.omicable = omic.casecmp('Y').zero? ? "Yes" : "No"
     c.save!
   }
 end
