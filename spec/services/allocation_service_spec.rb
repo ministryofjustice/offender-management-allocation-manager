@@ -2,8 +2,9 @@ require 'rails_helper'
 
 RSpec.describe AllocationService do
   let!(:allocation) {
-    described_class.create_or_update(
+    AllocationVersion.create!(
       primary_pom_nomis_id: 485_595,
+      primary_pom_allocated_at: DateTime.now.utc,
       nomis_offender_id: 'G2911GD',
       created_by_username: 'PK000223',
       nomis_booking_id: 1,
@@ -28,6 +29,7 @@ RSpec.describe AllocationService do
       prison: 'LEI',
       allocated_at_tier: 'A',
       primary_pom_nomis_id: 485_595,
+      primary_pom_allocated_at: DateTime.now.utc,
       nomis_booking_id: 1,
       event: AllocationVersion::ALLOCATE_PRIMARY_POM,
       event_trigger: AllocationVersion::USER
@@ -65,6 +67,7 @@ RSpec.describe AllocationService do
 
     AllocationVersion.create!(
       primary_pom_nomis_id: 456_987,
+      primary_pom_allocated_at: DateTime.now.utc,
       nomis_offender_id: first_offender_id,
       created_by_username: 'ZZ00045',
       nomis_booking_id: 5,
@@ -77,6 +80,7 @@ RSpec.describe AllocationService do
 
     AllocationVersion.create!(
       primary_pom_nomis_id: 485_595,
+      primary_pom_allocated_at: DateTime.now.utc,
       nomis_offender_id: second_offender_id,
       created_by_username: 'AB00045',
       nomis_booking_id: 1,

@@ -43,6 +43,7 @@ describe OffenderService, vcr: { cassette_name: :offender_service_offenders_by_p
       allocated_at_tier: 'C',
       created_by_username: 'PK000223',
       primary_pom_nomis_id: nomis_staff_id,
+      primary_pom_allocated_at: DateTime.now.utc,
       event: AllocationVersion::ALLOCATE_PRIMARY_POM,
       event_trigger: AllocationVersion::USER
     )

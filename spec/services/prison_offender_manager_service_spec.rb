@@ -4,8 +4,9 @@ describe PrisonOffenderManagerService do
   let(:staff_id) { 485_737 }
 
   let(:allocation_one) {
-    AllocationService.create_or_update(
+    AllocationVersion.create!(
       primary_pom_nomis_id: staff_id,
+      primary_pom_allocated_at: DateTime.now.utc,
       nomis_offender_id: 'G4273GI',
       created_by_username: 'RJONES',
       nomis_booking_id: 1_153_753,
@@ -17,8 +18,9 @@ describe PrisonOffenderManagerService do
   }
 
   let(:allocation_two) {
-    AllocationService.create_or_update(
+    AllocationVersion.create!(
       primary_pom_nomis_id: staff_id,
+      primary_pom_allocated_at: DateTime.now.utc,
       nomis_offender_id: 'G8060UF',
       created_by_username: 'RJONES',
       nomis_booking_id: 971_856,
@@ -30,8 +32,9 @@ describe PrisonOffenderManagerService do
   }
 
   let(:allocation_three) {
-    AllocationService.create_or_update(
+    AllocationVersion.create!(
       primary_pom_nomis_id: staff_id,
+      primary_pom_allocated_at: DateTime.now.utc,
       nomis_offender_id: 'G8624GK',
       created_by_username: 'RJONES',
       nomis_booking_id: 76_908,
@@ -43,8 +46,9 @@ describe PrisonOffenderManagerService do
   }
 
   let(:allocation_four) {
-    AllocationService.create_or_update(
+    AllocationVersion.create!(
       primary_pom_nomis_id: staff_id,
+      primary_pom_allocated_at: DateTime.now.utc,
       nomis_offender_id: 'G1714GU',
       created_by_username: 'RJONES',
       nomis_booking_id: 31_777,

@@ -11,6 +11,7 @@ RSpec.describe AllocationVersion, type: :model do
       allocated_at_tier: 'A',
       primary_pom_name: 'Bob Jones',
       primary_pom_nomis_id: nomis_staff_id,
+      primary_pom_allocated_at: DateTime.now.utc,
       nomis_booking_id: 896_456,
       event: 0,
       event_trigger: 0
@@ -26,6 +27,7 @@ RSpec.describe AllocationVersion, type: :model do
     it { is_expected.to validate_presence_of(:allocated_at_tier) }
     it { is_expected.to validate_presence_of(:event) }
     it { is_expected.to validate_presence_of(:event_trigger) }
+    it { is_expected.to validate_presence_of(:primary_pom_allocated_at) }
   end
 
   describe 'Versions' do
@@ -36,6 +38,30 @@ RSpec.describe AllocationVersion, type: :model do
 
       expect(allocation.versions.count).to be(2)
       expect(allocation.versions.last.reify.allocated_at_tier).to eq('A')
+    end
+  end
+
+  describe 'when a Primary Pom is inactive' do
+    it 'removes the primary pom\'s from all allocations' do
+      AllocationVersion.deallocate_primary_pom(nomis_staff_id)
+
+      deallocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id)
+
+      expect(deallocation.primary_pom_nomis_id).to be_nil
+      expect(deallocation.primary_pom_name).to be_nil
+      expect(deallocation.primary_pom_allocated_at).to be_nil
+    end
+  end
+
+  describe 'when an offender moves prison' do
+    it 'removes the primary pom details in an Offender\'s allocation' do
+      AllocationVersion.deallocate_offender(nomis_offender_id)
+
+      deallocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id)
+
+      expect(deallocation.primary_pom_nomis_id).to be_nil
+      expect(deallocation.primary_pom_name).to be_nil
+      expect(deallocation.primary_pom_allocated_at).to be_nil
     end
   end
 

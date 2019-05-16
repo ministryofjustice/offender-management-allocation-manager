@@ -11,6 +11,7 @@ class AllocationService
 
     params_copy[:primary_pom_name] = "#{pom_firstname} #{pom_secondname}"
     params_copy[:created_by_name] = "#{user_firstname} #{user_secondname}"
+    params_copy[:primary_pom_allocated_at] = DateTime.now.utc
 
     alloc_version = AllocationVersion.find_by(
       nomis_offender_id: params_copy[:nomis_offender_id]
