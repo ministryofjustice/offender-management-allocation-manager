@@ -4,6 +4,7 @@ RSpec.describe AllocationList, type: :model do
   let(:current_allocation) {
     AllocationVersion.create!(
       primary_pom_nomis_id: 485_595,
+      primary_pom_allocated_at: DateTime.now.utc,
       nomis_offender_id: 'G2911GD',
       created_by_username: 'PK000223',
       nomis_booking_id: 1,
@@ -18,6 +19,7 @@ RSpec.describe AllocationList, type: :model do
   let(:middle_allocation1) {
     AllocationVersion.create!(
       primary_pom_nomis_id: 485_752,
+      primary_pom_allocated_at: DateTime.now.utc,
       nomis_offender_id: 'G2911GD',
       created_by_username: 'PK000223',
       nomis_booking_id: 2,
@@ -32,6 +34,7 @@ RSpec.describe AllocationList, type: :model do
   let(:middle_allocation2) {
     AllocationVersion.create!(
       primary_pom_nomis_id: 485_752,
+      primary_pom_allocated_at: DateTime.now.utc,
       nomis_offender_id: 'G2911GD',
       created_by_username: 'PK000223',
       nomis_booking_id: 3,
@@ -46,6 +49,7 @@ RSpec.describe AllocationList, type: :model do
   let(:old_allocation) {
     AllocationVersion.create!(
       primary_pom_nomis_id: 485_595,
+      primary_pom_allocated_at: DateTime.now.utc - 4.days,
       nomis_offender_id: 'G2911GD',
       created_by_username: 'PK000223',
       nomis_booking_id: 4,

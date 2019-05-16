@@ -92,6 +92,7 @@ feature "view an offender's allocation information" do
     AllocationVersion.create!(
       nomis_offender_id: offender_no,
       primary_pom_nomis_id: probation_officer_nomis_staff_id,
+      primary_pom_allocated_at: DateTime.now.utc,
       nomis_booking_id: '1153753',
       prison: prison,
       allocated_at_tier: allocated_at_tier,

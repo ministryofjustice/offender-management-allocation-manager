@@ -121,6 +121,7 @@ feature 'Allocation' do
     AllocationVersion.create!(
       nomis_offender_id: nomis_offender_id,
       primary_pom_nomis_id: probation_officer_nomis_staff_id,
+      primary_pom_allocated_at: DateTime.now.utc,
       nomis_booking_id: 1_153_753,
       prison: 'LEI',
       allocated_at_tier: 'A',
