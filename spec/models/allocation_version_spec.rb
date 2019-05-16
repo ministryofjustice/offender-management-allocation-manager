@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe AllocationVersion, type: :model do
-  let(:nomis_staff_id) {456_789}
-  let(:nomis_offender_id) {123_456}
+  let(:nomis_staff_id) { 456_789 }
+  let(:nomis_offender_id) { 123_456 }
 
   let(:attributes) {
     {
@@ -18,16 +18,16 @@ RSpec.describe AllocationVersion, type: :model do
     }
   }
 
-  let!(:allocation) {AllocationVersion.create!(attributes)}
+  let!(:allocation) { AllocationVersion.create!(attributes) }
 
   describe 'Validations' do
-    it {is_expected.to validate_presence_of(:nomis_offender_id)}
-    it {is_expected.to validate_presence_of(:nomis_booking_id)}
-    it {is_expected.to validate_presence_of(:prison)}
-    it {is_expected.to validate_presence_of(:allocated_at_tier)}
-    it {is_expected.to validate_presence_of(:event)}
-    it {is_expected.to validate_presence_of(:event_trigger)}
-    it {is_expected.to validate_presence_of(:primary_pom_allocated_at)}
+    it { is_expected.to validate_presence_of(:nomis_offender_id) }
+    it { is_expected.to validate_presence_of(:nomis_booking_id) }
+    it { is_expected.to validate_presence_of(:prison) }
+    it { is_expected.to validate_presence_of(:allocated_at_tier) }
+    it { is_expected.to validate_presence_of(:event) }
+    it { is_expected.to validate_presence_of(:event_trigger) }
+    it { is_expected.to validate_presence_of(:primary_pom_allocated_at) }
   end
 
   describe 'Versions' do
