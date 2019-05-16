@@ -62,6 +62,7 @@ class AllocationVersion < ApplicationRecord
       update_all(
         primary_pom_nomis_id: nil,
         primary_pom_name: nil,
+        primary_pom_allocated_at: nil,
         secondary_pom_nomis_id: nil,
         secondary_pom_name: nil,
         event: DEALLOCATE_PRIMARY_POM,
@@ -74,6 +75,7 @@ class AllocationVersion < ApplicationRecord
       update_all(
         primary_pom_nomis_id: nil,
         primary_pom_name: nil,
+        primary_pom_allocated_at: nil,
         event: DEALLOCATE_PRIMARY_POM,
         event_trigger: USER
       )
@@ -81,6 +83,7 @@ class AllocationVersion < ApplicationRecord
 
   validates :nomis_offender_id,
             :primary_pom_nomis_id,
+            :primary_pom_allocated_at,
             :nomis_booking_id,
             :prison,
             :allocated_at_tier,
