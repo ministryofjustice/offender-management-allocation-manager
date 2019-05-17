@@ -246,8 +246,8 @@ jobs:
       - deploy:
           name: Deploy to staging
           command: |
-            kubectl set image deployments/allocation-manager allocation-manager=${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_SHA1}
-            kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
+            kubectl set image cronjob/offender-manager-process-movements process-movements=${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_SHA1}
+            kubectl set image deployment/allocation-manager allocation-manager=${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_SHA1}
             kubectl apply --record=false -f ./deploy/staging
           environment:
             <<: *github_team_name_slug
@@ -305,7 +305,8 @@ jobs:
       - deploy:
           name: Deploy to production
           command: |
-            kubectl set image deployments/allocation-manager allocation-manager=${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_SHA1}
+            kubectl set image cronjob/offender-manager-process-movements process-movements=${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_SHA1}
+            kubectl set image deployment/allocation-manager allocation-manager=${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_SHA1}
             kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
             kubectl apply --record=false -f ./deploy/production
           environment:
