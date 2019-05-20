@@ -4,21 +4,13 @@ RSpec.describe AllocationVersion, type: :model do
   let(:nomis_staff_id) { 456_789 }
   let(:nomis_offender_id) { 123_456 }
 
-  let(:attributes) {
-    {
+  let!(:allocation) {
+    create(
+      :allocation_version,
       nomis_offender_id: nomis_offender_id,
-      prison: 'LEI',
-      allocated_at_tier: 'A',
-      primary_pom_name: 'Bob Jones',
-      primary_pom_nomis_id: nomis_staff_id,
-      primary_pom_allocated_at: DateTime.now.utc,
-      nomis_booking_id: 896_456,
-      event: 0,
-      event_trigger: 0
-    }
+      primary_pom_nomis_id: nomis_staff_id
+    )
   }
-
-  let!(:allocation) { AllocationVersion.create!(attributes) }
 
   describe 'Validations' do
     it { is_expected.to validate_presence_of(:nomis_offender_id) }

@@ -4,62 +4,42 @@ describe PrisonOffenderManagerService do
   let(:staff_id) { 485_737 }
 
   let(:allocation_one) {
-    AllocationVersion.create!(
+    create(
+      :allocation_version,
       primary_pom_nomis_id: staff_id,
-      primary_pom_allocated_at: DateTime.now.utc,
       nomis_offender_id: 'G4273GI',
-      created_by_username: 'RJONES',
-      nomis_booking_id: 1_153_753,
-      allocated_at_tier: 'A',
-      prison: 'LEI',
-      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
-      event_trigger: AllocationVersion::USER
-    )
+      nomis_booking_id: 1_153_753
+      )
   }
 
   let(:allocation_two) {
-    AllocationVersion.create!(
+    create(
+      :allocation_version,
       primary_pom_nomis_id: staff_id,
-      primary_pom_allocated_at: DateTime.now.utc,
       nomis_offender_id: 'G8060UF',
-      created_by_username: 'RJONES',
-      nomis_booking_id: 971_856,
-      allocated_at_tier: 'A',
-      prison: 'LEI',
-      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
-      event_trigger: AllocationVersion::USER
-    )
+      nomis_booking_id: 971_856
+      )
   }
 
   let(:allocation_three) {
-    AllocationVersion.create!(
+    create(
+      :allocation_version,
       primary_pom_nomis_id: staff_id,
-      primary_pom_allocated_at: DateTime.now.utc,
       nomis_offender_id: 'G8624GK',
-      created_by_username: 'RJONES',
-      nomis_booking_id: 76_908,
-      allocated_at_tier: 'B',
-      prison: 'LEI',
-      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
-      event_trigger: AllocationVersion::USER
-    )
+      nomis_booking_id: 76_908
+      )
   }
 
   let(:allocation_four) {
-    AllocationVersion.create!(
+    create(
+      :allocation_version,
       primary_pom_nomis_id: staff_id,
-      primary_pom_allocated_at: DateTime.now.utc,
       nomis_offender_id: 'G1714GU',
-      created_by_username: 'RJONES',
-      nomis_booking_id: 31_777,
-      allocated_at_tier: 'C',
-      prison: 'LEI',
-      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
-      event_trigger: AllocationVersion::USER
-    )
+      nomis_booking_id: 31_777
+      )
   }
 
-  let(:all_allocations) {
+  let!(:all_allocations) {
     [allocation_one, allocation_two, allocation_three, allocation_four]
   }
 
@@ -105,13 +85,11 @@ describe PrisonOffenderManagerService do
   end
 
   it "will get allocations for a POM made within the last 7 days", vcr: { cassette_name: :get_new_cases } do
-    allocation_one.updated_at = 10.days.ago
-    allocation_one.save!
-    allocation_two.updated_at = 3.days.ago
-    allocation_two.save!
+    allocation_one.update!(updated_at: 10.days.ago)
+    allocation_two.update!(updated_at: 3.days.ago)
 
     allocated_offenders = described_class.get_new_cases(allocation_one.primary_pom_nomis_id, 'LEI')
-    expect(allocated_offenders.count).to eq 1
+    expect(allocated_offenders.count).to eq 3
   end
 
   it "can get a list of POMs",
