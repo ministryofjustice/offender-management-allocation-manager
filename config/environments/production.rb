@@ -40,7 +40,6 @@ Rails.application.configure do
     )
   end
 
-
   if Rails.configuration.redis_url.present?
     config.cache_store = :redis_cache_store, {
       url: "rediss://#{config.redis_url}:6379/0",
