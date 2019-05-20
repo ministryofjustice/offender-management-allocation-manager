@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'byebug'
 
 describe DateMigrater do
   it "migrates 'created_at' dates from Allocations to AllocationVersions" do
