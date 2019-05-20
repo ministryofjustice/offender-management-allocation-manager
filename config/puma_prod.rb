@@ -9,6 +9,11 @@ rackup      DefaultRackup
 port        ENV['PORT']     || 3000
 environment ENV['RACK_ENV'] || 'production'
 
+on_worker_boot do
+  # Re-open appenders after forking the process
+  SemanticLogger.reopen
+end
+
 after_worker_boot do
   require 'prometheus_exporter/instrumentation'
   PrometheusExporter::Instrumentation::Puma.start

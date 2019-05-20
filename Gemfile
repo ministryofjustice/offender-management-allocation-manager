@@ -28,6 +28,8 @@ gem 'redis'
 gem 'plissken'
 gem 'fast_underscore', require: false
 gem 'flipflop'
+gem 'rails_semantic_logger'
+gem 'elasticsearch'
 
 group :development, :test do
   gem 'brakeman'

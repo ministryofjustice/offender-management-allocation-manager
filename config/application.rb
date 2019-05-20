@@ -42,5 +42,6 @@ module OffenderManagementAllocationClient
     config.support_email = ENV['SUPPORT_EMAIL']&.strip
     config.redis_url = ENV['REDIS_URL']&.strip
     config.redis_auth = ENV['REDIS_AUTH']&.strip
+    config.elastic_url = ENV['ELASTIC_URL']&.strip
   end
 end

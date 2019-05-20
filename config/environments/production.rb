@@ -6,7 +6,7 @@ Rails.application.configure do
   config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present?
   config.assets.js_compressor = :uglifier
   config.assets.compile = false
-  config.log_level = :debug
+  config.log_level = :info
   config.log_tags = [:request_id]
   config.action_mailer.perform_caching = false
   config.i18n.fallbacks = true
@@ -14,15 +14,32 @@ Rails.application.configure do
 
   config.notify_api_key = ENV['LIVE_NOTIFY_API_KEY']
 
-  if ENV['RAILS_LOG_TO_STDOUT'].present?
-    logger           = ActiveSupport::Logger.new(STDOUT)
-    logger.formatter = config.log_formatter
-    config.logger    = ActiveSupport::TaggedLogging.new(logger)
+  # Semantic logger -> Elasticsearch
+  # If there is an elastic_search available, this block will make sure that we stop
+  # logging to disk, and instead log solely to elastic.
+  if config.elastic_url.present?
+    config.log_level = :info
+
+    config.rails_semantic_logger.rendered = false
+    config.rails_semantic_logger.quiet_assets = true
+    config.rails_semantic_logger.add_file_appender = false
+
+    config.semantic_logger.add_appender(
+      appender: :elasticsearch,
+      index: "offender-management-allocation-#{Rails.env}",
+      url: config.elastic_url
+    )
   end
 
-  config.lograge.enabled = true
-  config.lograge.formatter = Lograge::Formatters::Logstash.new
-  config.lograge.logger = ActiveSupport::Logger.new(STDOUT)
+  # Semantic logger -> Stdout
+  if ENV['RAILS_LOG_TO_STDOUT'].present?
+    config.semantic_logger.add_appender(
+      io: STDOUT,
+      level: config.log_level,
+      formatter: config.rails_semantic_logger.format
+    )
+  end
+
 
   if Rails.configuration.redis_url.present?
     config.cache_store = :redis_cache_store, {
