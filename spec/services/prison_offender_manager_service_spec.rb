@@ -85,8 +85,8 @@ describe PrisonOffenderManagerService do
   end
 
   it "will get allocations for a POM made within the last 7 days", vcr: { cassette_name: :get_new_cases } do
-    allocation_one.update!(updated_at: 10.days.ago)
-    allocation_two.update!(updated_at: 3.days.ago)
+    allocation_one.update!(primary_pom_allocated_at: 10.days.ago)
+    allocation_two.update!(primary_pom_allocated_at: 3.days.ago)
 
     allocated_offenders = described_class.get_new_cases(allocation_one.primary_pom_nomis_id, 'LEI')
     expect(allocated_offenders.count).to eq 3
