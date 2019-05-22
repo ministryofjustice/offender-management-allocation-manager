@@ -36,7 +36,7 @@ describe OffenderService, vcr: { cassette_name: :offender_service_offenders_by_p
 
     PomDetail.create!(nomis_staff_id: nomis_staff_id, working_pattern: 1.0, status: 'active')
 
-    AllocationService.create_or_update(
+    AllocationVersion.create!(
       nomis_offender_id: offenders.first.offender_no,
       nomis_booking_id: 1_153_753,
       prison: 'LEI',
