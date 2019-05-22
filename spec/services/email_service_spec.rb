@@ -2,23 +2,43 @@ require 'rails_helper'
 
 RSpec.describe EmailService do
   include ActiveJob::TestHelper
-  let(:params) {
-    {
-      primary_pom_nomis_id: 485_637,
-      nomis_offender_id: 'G2911GD',
-      created_by_username: "PK000223",
-      nomis_booking_id: 1_153_753,
-      allocated_at_tier: "A",
-      prison: "LEI",
-      override_reasons: nil,
-      override_detail: nil,
-      message: "",
-      pom_detail_id: 5
+
+  let(:allocation) {
+    AllocationVersion.new.tap do |a|
+      a.primary_pom_nomis_id = 485_737
+      a.nomis_offender_id = 'G2911GD'
+      a.created_by_username = 'PK000223'
+      a.nomis_booking_id = 0
+      a.allocated_at_tier = 'A'
+      a.prison = 'LEI'
+    end
+  }
+
+  let(:reallocation) {
+    AllocationVersion.new.tap { |a|
+      a.primary_pom_nomis_id = 485_766
+      a.nomis_offender_id = 'G2911GD'
+      a.created_by_username = 'PK000223'
+      a.nomis_booking_id = 0
+      a.allocated_at_tier = 'A'
+      a.prison = 'LEI'
+      a.event = AllocationVersion::REALLOCATE_PRIMARY_POM
+      a.event_trigger = AllocationVersion::USER
     }
   }
 
-  let(:subject) {
-    described_class.instance(params)
+  let(:original_allocation) {
+    # The original allocation before the reallocation
+    AllocationVersion.new.tap { |a|
+      a.primary_pom_nomis_id = 485_737
+      a.nomis_offender_id = 'G2911GD'
+      a.created_by_username = 'PK000223'
+      a.nomis_booking_id = 0
+      a.allocated_at_tier = 'A'
+      a.prison = 'LEI'
+      a.event = AllocationVersion::ALLOCATE_PRIMARY_POM
+      a.event_trigger = AllocationVersion::USER
+    }
   }
 
   before(:each) {
@@ -26,32 +46,17 @@ RSpec.describe EmailService do
     PomDetail.create(nomis_staff_id: 485_637, working_pattern: 1.0, status: 'inactive')
   }
 
-  context "when creating an initial POM allocation" do
-    it "Can send an allocation email", vcr: { cassette_name: :email_service_send_allocation_email } do
-      subject.send_allocation_email
-      expect(enqueued_jobs.size).to eq(1)
-      enqueued_jobs.clear
-    end
+  it "Can send an allocation email", vcr: { cassette_name: :email_service_send_allocation_email }, versioning: true  do
+    described_class.instance(allocation: allocation, message: "").send_allocation_email
+    expect(enqueued_jobs.size).to eq(1)
+    enqueued_jobs.clear
   end
 
-  context "when allocating a prisoner to another POM" do
-    before do
-      allow(AllocationService).to receive(:last_allocation).and_return(
-        Allocation.new.tap do |a|
-          a.primary_pom_nomis_id = 485_737
-          a.nomis_offender_id = 'G2911GD'
-          a.created_by_username = 'PK000223'
-          a.nomis_booking_id = 0
-          a.allocated_at_tier = 'A'
-          a.prison = 'LEI'
-        end
-      )
-    end
+  it "Can send a reallocation email", vcr: { cassette_name: :email_service_send_deallocation_email }, versioning: true  do
+    allow(AllocationService).to receive(:get_versions_for).and_return([original_allocation])
 
-    it "Can send an allocation email", vcr: { cassette_name: :email_service_send_deallocation_email } do
-      subject.send_allocation_email
-      expect(enqueued_jobs.size).to eq(2)
-      enqueued_jobs.clear
-    end
+    described_class.instance(allocation: reallocation, message: "").send_allocation_email
+    expect(enqueued_jobs.size).to eq(2)
+    enqueued_jobs.clear
   end
 end

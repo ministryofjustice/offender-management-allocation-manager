@@ -26,7 +26,11 @@ class AllocationService
     params_copy[:pom_detail_id] = PrisonOffenderManagerService.
       get_pom_detail(params_copy[:primary_pom_nomis_id]).id
 
-    EmailService.instance(params_copy).send_allocation_email
+    EmailService.instance(
+      allocation: alloc_version,
+      message: params[:message]
+    ).send_allocation_email
+
     delete_overrides(params_copy)
 
     alloc_version
@@ -84,7 +88,7 @@ class AllocationService
     }
   end
 
-  def self.last_allocation(nomis_offender_id)
+  def self.current_allocation_for(nomis_offender_id)
     AllocationVersion.allocations(nomis_offender_id).last
   end
 

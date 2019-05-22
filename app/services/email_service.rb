@@ -2,29 +2,30 @@
 
 class EmailService
   def self.instance(params)
-    offender = OffenderService.get_offender(params[:nomis_offender_id])
-    pom = PrisonOffenderManagerService.get_pom(
-      params[:prison],
-      params[:primary_pom_nomis_id]
-    )
-    last_allocation = AllocationService.last_allocation(params[:nomis_offender_id])
     message = params[:message]
+    allocation = params[:allocation]
 
-    new(offender, pom, last_allocation, message)
+    new(allocation, message)
   end
 
-  def initialize(offender, pom, last_allocation, message)
-    @offender = offender
-    @pom = pom
-    @last_allocation = last_allocation
+  def initialize(allocation, message)
     @message = message
+    @allocation = allocation
+
+    @offender = OffenderService.get_offender(@allocation[:nomis_offender_id])
+    @pom = PrisonOffenderManagerService.get_pom(
+      @allocation.prison,
+      @allocation.primary_pom_nomis_id
+    )
   end
 
   def send_allocation_email
     return if @pom.emails.empty?
 
-    send_deallocation_email if @last_allocation.present?
-    send_new_allocation_email
+    if @allocation.event == 'reallocate_primary_pom' && previous_pom.present?
+      send_deallocation_email
+    end
+    deliver_new_allocation_email
   end
 
 private
@@ -33,14 +34,26 @@ private
     @url ||= Rails.application.routes.url_helpers.caseload_index_url
   end
 
-  def previous_pom
-    @previous_pom ||= PrisonOffenderManagerService.
-      get_pom(@last_allocation[:prison], @last_allocation[:primary_pom_nomis_id])
-  end
-
   def current_responsibility
     @current_responsibility ||= ResponsibilityService.new.
       calculate_pom_responsibility(@offender).downcase
+  end
+
+  def previous_pom
+    # Check the versions (there MUST be previous records if this is a reallocation)
+    # and find the first version with a primary_pom id that is not the same as the
+    # allocation. That will be the POM that is notified of a reallocation.
+    versions = AllocationService.get_versions_for(@allocation)
+
+    previous = versions.first { |version|
+      version.primary_pom_nomis_id != @allocation.primary_pom_nomis_id
+    }
+    return nil if previous.blank?
+
+    @previous_pom ||= PrisonOffenderManagerService.get_pom(
+      previous.prison,
+      previous.primary_pom_nomis_id
+    )
   end
 
   def send_deallocation_email
@@ -56,7 +69,7 @@ private
     ).deliver_later
   end
 
-  def send_new_allocation_email
+  def deliver_new_allocation_email
     PomMailer.new_allocation_email(
       pom_name: @pom.first_name.capitalize,
       responsibility: current_responsibility,
