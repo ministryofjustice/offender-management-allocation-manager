@@ -23,7 +23,8 @@ class EmailService
   def send_allocation_email
     return if @pom.emails.empty?
 
-    send_deallocation_email if @last_allocation.present?
+    # Temporarily disabled as it is sending reallocation emails incorrectly
+    # send_deallocation_email if @last_allocation.present?
     send_new_allocation_email
   end
 
