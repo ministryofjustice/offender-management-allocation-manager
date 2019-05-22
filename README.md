@@ -55,6 +55,14 @@ $ brew install direnv
 $ direnv allow .
 ```
 
+Add the following to your .bash_profile, or equivalent
+
+```sh
+eval "$(direnv hook bash)"
+```
+
+At this point you can reload your shell or just run the eval command above in your current shell.
+
 4. Install Postgres
 
 ```sh
@@ -73,7 +81,13 @@ $ rails db:setup
 $ rails s
 ```
 
-7. Check application status
+7. Run NPM install to load govuk styles
+
+```sh
+npm install
+```
+
+8. Check application status
 
 Visit `localhost:3000/status`
 
