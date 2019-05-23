@@ -29,7 +29,7 @@ class AllocationService
     EmailService.instance(
       allocation: alloc_version,
       message: params[:message]
-    ).send_allocation_email
+    ).send_email
 
     delete_overrides(params_copy)
 

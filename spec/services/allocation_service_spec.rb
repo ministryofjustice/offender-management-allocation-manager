@@ -4,7 +4,7 @@ describe AllocationService do
   let(:mock_email_service) { double('email_service_mock') }
 
   before do
-    allow(mock_email_service).to receive(:send_allocation_email)
+    allow(mock_email_service).to receive(:send_email)
     allow(EmailService).to receive(:instance).and_return(mock_email_service)
   end
 

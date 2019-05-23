@@ -47,7 +47,7 @@ RSpec.describe EmailService do
   }
 
   it "Can send an allocation email", vcr: { cassette_name: :email_service_send_allocation_email }, versioning: true  do
-    described_class.instance(allocation: allocation, message: "").send_allocation_email
+    described_class.instance(allocation: allocation, message: "").send_email
     expect(enqueued_jobs.size).to eq(1)
     enqueued_jobs.clear
   end
@@ -55,7 +55,7 @@ RSpec.describe EmailService do
   it "Can send a reallocation email", vcr: { cassette_name: :email_service_send_deallocation_email }, versioning: true  do
     allow(AllocationService).to receive(:get_versions_for).and_return([original_allocation])
 
-    described_class.instance(allocation: reallocation, message: "").send_allocation_email
+    described_class.instance(allocation: reallocation, message: "").send_email
     expect(enqueued_jobs.size).to eq(2)
     enqueued_jobs.clear
   end

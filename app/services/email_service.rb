@@ -19,7 +19,7 @@ class EmailService
     )
   end
 
-  def send_allocation_email
+  def send_email
     return if @pom.emails.empty?
 
     if @allocation.event == 'reallocate_primary_pom' && previous_pom.present?
