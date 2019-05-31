@@ -26,9 +26,9 @@ PomDetail.find_or_create_by!(
   working_pattern: 0.4
 )
 
-# Toby Retallick
+# Andrien Ricketts
 PomDetail.find_or_create_by!(
-  nomis_staff_id: 485_595,
+  nomis_staff_id: 485_833,
   status: 'active',
   working_pattern: 1
 )
@@ -102,7 +102,7 @@ AllocationService.create_or_update(
   prison: 'LEI',
   allocated_at_tier: 'D',
   created_by_username: 'PK000223',
-  primary_pom_nomis_id: 485_637,
+  primary_pom_nomis_id: 485_833,
   event: AllocationVersion::ALLOCATE_PRIMARY_POM,
   event_trigger: AllocationVersion::USER
 )
