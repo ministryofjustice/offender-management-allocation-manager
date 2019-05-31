@@ -72,7 +72,6 @@ describe PrisonOffenderManagerService do
 
   it "can get a subset of allocated offenders for a POM",
      vcr: { cassette_name: :pom_service_allocated_offenders_subset } do
-
     expected_total = all_allocations.size
 
     allocated_offenders = described_class.get_allocated_offenders(allocation_one.primary_pom_nomis_id, 'LEI')
