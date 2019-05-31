@@ -40,7 +40,7 @@ feature 'Allocation' do
   end
 
   scenario 'overriding an allocation', vcr: { cassette_name: :override_allocation_feature_ok } do
-    override_nomis_staff_id = 485_595
+    override_nomis_staff_id = 485_737
 
     signin_user
 
@@ -63,7 +63,7 @@ feature 'Allocation' do
     click_button 'Complete allocation'
 
     expect(page).to have_current_path summary_unallocated_path
-    expect(page).to have_css('.notification', text: 'Ozullirn Abbella has been allocated to Toby Retallick (Prison POM)')
+    expect(page).to have_css('.notification', text: 'Ozullirn Abbella has been allocated to Jay Heal (Prison POM)')
     expect(Override.count).to eq(0)
   end
 
