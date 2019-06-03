@@ -10,7 +10,7 @@ namespace :integration_tests do
     Rails.logger.info 'Deleting integration test data'
 
     ids = AllocationVersion.where(
-        created_by_username: 'MOIC_INTEGRATION_TESTS').
+      created_by_username: 'MOIC_INTEGRATION_TESTS').
         pluck(:nomis_offender_id)
     cases = CaseInformation.where(nomis_offender_id: ids)
     cases.destroy_all
