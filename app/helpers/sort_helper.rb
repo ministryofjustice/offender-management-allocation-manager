@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module SortHelper
+  # rubocop:disable Rails/HelperInstanceVariable
   class Sorter
     include ActionView::Helpers::TagHelper
 
@@ -62,6 +63,7 @@ module SortHelper
 
       'asc'
     end
+    # rubocop:enable Rails/HelperInstanceVariable
   end
 
   def sort_link(field_name)
@@ -74,7 +76,9 @@ module SortHelper
 
 private
 
+  # rubocop:disable Rails/HelperInstanceVariable
   def sorter
     @sorter ||= Sorter.new(request.original_url)
   end
+  # rubocop:enable Rails/HelperInstanceVariable
 end
