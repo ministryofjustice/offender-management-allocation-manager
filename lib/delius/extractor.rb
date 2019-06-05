@@ -7,6 +7,8 @@ module Delius
     MAPPED_CELLS = %w[crn pnc_no noms_no fullname tier roh_cds offender_manager org_private_ind org provider provider_cd ldu ldu_cd team team_cd mappa mappa_levels].freeze
     # rubocop:enable Metrics/LineLength
 
+    attr_reader :errors
+
     def initialize(filename)
       @filename = filename
       @errors = []
