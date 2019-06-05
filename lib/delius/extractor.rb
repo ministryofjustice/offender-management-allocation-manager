@@ -52,6 +52,7 @@ module Delius
       row.map { |c| c.value.strip } == HEADER_CELLS
     end
 
+    # rubocop:disable Metrics/MethodLength
     def clean_record(record)
       if record[:tier].nil?
         # Fill in @errors with a proper error
@@ -60,9 +61,9 @@ module Delius
       end
 
       required_fields = [:noms_no, :tier, :provider_cd, :ldu_cd]
-      record.keys.each { |key|
+      record.keys.each do |key|
         record.delete(key) unless required_fields.include?(key)
-      }
+      end
 
       record[:tier] = record[:tier][0]
       record[:provider_cd] = record[:provider_cd] == 'C' ? 'CRC' : 'NPS'
@@ -70,6 +71,7 @@ module Delius
 
       true
     end
+    # rubocop:enable Metrics/MethodLength
 
     def values_for_row(row, escape_func)
       MAPPED_CELLS.each_with_object([]) do |cell_label, lst|
