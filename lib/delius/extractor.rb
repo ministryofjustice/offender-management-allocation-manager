@@ -37,7 +37,7 @@ module Delius
 
           k = MAPPED_CELLS[i]
           v = cell.value.to_s.strip
-          record[k] = v
+          record[k.to_sym] = v
         end
 
         records << record if clean_record(record)
@@ -53,15 +53,15 @@ module Delius
     end
 
     def clean_record(record)
-      if record['tier'].nil?
+      if record[:tier].nil?
         # Fill in @errors with a proper error
         @errors << 'Bad record passed, missing tier'
         return false
       end
 
-      record['tier'] = record['tier'][0]
-      record['provider_cd'] = record['provider_cd'] == 'C' ? 'CRC' : 'NPS'
-      record['omicable'] = record['ldu_cd'].start_with?('WPT')
+      record[:tier] = record[:tier][0]
+      record[:provider_cd] = record[:provider_cd] == 'C' ? 'CRC' : 'NPS'
+      record[:omicable] = record[:ldu_cd].start_with?('WPT')
       true
     end
 
