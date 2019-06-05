@@ -11,6 +11,16 @@ RSpec.describe PrisonService do
     expect(name).to be_nil
   end
 
+  it "knows about english prisons" do
+    country = described_class.country_for('PVI')
+    expect(country).to eq(:england)
+  end
+
+  it "knows about welsh prisons" do
+    country = described_class.country_for('SWI')
+    expect(country).to eq(:wales)
+  end
+
   it "will return prison names from a list in alphabetical order" do
     prisons = described_class.prisons_from_list(%w[NWEB PVI LEI WEI])
 
