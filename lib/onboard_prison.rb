@@ -6,6 +6,7 @@ class OnboardPrison
     @prison = prison
     @offender_ids = filter_existing_records(offender_ids)
     @delius_records = list_to_lookup(delius_records)
+
     @additions = 0
     @delius_missing = 0
   end

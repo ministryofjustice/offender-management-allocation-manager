@@ -59,9 +59,15 @@ module Delius
         return false
       end
 
+      required_fields = [:noms_no, :tier, :provider_cd, :ldu_cd]
+      record.keys.each { |key|
+        record.delete(key) unless required_fields.include?(key)
+      }
+
       record[:tier] = record[:tier][0]
       record[:provider_cd] = record[:provider_cd] == 'C' ? 'CRC' : 'NPS'
       record[:omicable] = record[:ldu_cd].start_with?('WPT')
+
       true
     end
 
