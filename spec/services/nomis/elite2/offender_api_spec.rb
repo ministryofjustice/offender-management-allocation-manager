@@ -24,8 +24,6 @@ describe Nomis::Elite2::OffenderApi do
       response = described_class.list('LEI')
       expect(response.data.first.category_code).not_to be_nil
     end
-
-
   end
 
   describe 'Bulk operations' do
