@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   get('/prisoners/:id/image.jpg' => 'prisoners#image', as: 'prisoner_image')
 
   get('/allocations/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocations#confirm', as: 'confirm_allocation')
+  get('/allocations/:nomis_offender_id/history' => 'allocations#history', as: 'allocation_history')
   get('/reallocations/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocations#confirm_reallocation', as: 'confirm_reallocation')
 
   get('/summary' => 'summary#index')
