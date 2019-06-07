@@ -3,7 +3,7 @@ require 'delius/extractor.rb'
 
 describe Delius::Extractor do
   it 'parses an excel spreadsheet to extract hashes' do
-    filename = 'spec/fixtures/delius/delius_sample.xlsx'
+    filename = 'spec/fixtures/delius/delius_sample.csv'
     e = described_class.new(filename)
     records = e.fetch_records
 
