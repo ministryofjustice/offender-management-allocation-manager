@@ -6,23 +6,35 @@
     </tr>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">POM role</td>
-      <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"></td>
+      <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
+        <%= @pom_responsibility %>
+      </td>
     </tr>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">POM</td>
-      <td class="govuk-table__cell table_cell__left_align"></td>
+      <td class="govuk-table__cell table_cell__left_align">
+        <% if @allocation %>
+          <%= @allocation.primary_pom_name.titlecase %>
+        <% end %>
+      </td>
     </tr>
+  <!-- PENDING DATA
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Co-working POM</td>
       <td class="govuk-table__cell table_cell__left_align"></td>
     </tr>
+  -->
+<!-- PENDING DATA
     <tr class="govuk-table__row">
-      <td class="govuk-table__cell">Last allocation event</td>
+      <td class="govuk-table__cell">Allocation history</td>
       <td class="govuk-table__cell table_cell__left_align"></td>
     </tr>
+  -->
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Keyworker</td>
-      <td class="govuk-table__cell table_cell__left_align"></td>
+      <td class="govuk-table__cell table_cell__left_align">
+        <%= @keyworker.full_name %>
+      </td>
     </tr>
   </tbody>
 </table>

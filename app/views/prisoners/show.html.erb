@@ -14,8 +14,10 @@
         <h3 class="govuk-heading-m"><%= @prisoner.offender_no %></h3>
       </div>
       <div class="govuk-grid-column-one-third">
+      <!-- PENDING DATA
         <span class="govuk-body">CRN number</span>
         <h3 class="govuk-heading-m">N/A</h3>
+      -->
       </div>
       <div class="govuk-grid-column-one-third">
         <span class="govuk-body">Date of birth</span>
@@ -28,8 +30,10 @@
         <h3 class="govuk-heading-m"><%= format_date(@prisoner.earliest_release_date) %></h3>
       </div>
       <div class="govuk-grid-column-one-third">
+      <!-- PENDING DATA
         <span class="govuk-body">Category</span>
         <h3 class="govuk-heading-m">N/A</h3>
+      -->
       </div>
       <div class="govuk-grid-column-one-third">
         <span class="govuk-body">Tier calculation</span>
@@ -39,7 +43,7 @@
     <div class='govuk-grid-row'>
       <div class='govuk-grid-column-full'>
         <div class='hmpps-nomis-button'>
-          <%= link_to 'View NOMIS profile', digital_prison_service_profile_path(@prisoner.offender_no), class: "govuk-link", target: "_blank" %>
+          <%= link_to 'View full profile', digital_prison_service_profile_path(@prisoner.offender_no), class: "govuk-link", target: "_blank" %>
         </div>
       </div>
     </div>
@@ -50,4 +54,6 @@
 <%= render 'prisoner_information'%>
 <%= render 'shared/offence_info' %>
 <%= render 'prison_allocation' %>
-<%= render 'community_information' %>
+<!-- PENDING DATA
+  <%= render 'community_information' %>
+-->
