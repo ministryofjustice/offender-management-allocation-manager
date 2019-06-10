@@ -1,6 +1,6 @@
-<%= render :partial => "/shared/backlink", :locals => { :page => allocation_path(@history.first.nomis_offender_id) } %>
+<%= render :partial => "/shared/backlink", :locals => { :page => allocation_path(@prisoner.offender_no) } %>
 
-<h1 class="govuk-heading-l"><%= @prisoner_name %></h1>
+<h1 class="govuk-heading-l"><%= @prisoner.full_name %></h1>
 
 <% @history.grouped_by_prison do |prison, allocations| %>
   <div class="govuk-grid-row">

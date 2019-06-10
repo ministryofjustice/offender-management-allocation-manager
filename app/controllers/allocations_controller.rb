@@ -86,8 +86,7 @@ class AllocationsController < ApplicationController
   end
 
   def history
-    offender = offender(nomis_offender_id_from_url)
-    @prisoner_name = offender_name_by_last_name(offender)
+    @prisoner = offender(nomis_offender_id_from_url)
     @history = AllocationService.offender_allocation_history(nomis_offender_id_from_url)
   end
 
@@ -188,10 +187,6 @@ private
 
   def suitability_detail
     @override[:suitability_detail] if @override.present?
-  end
-
-  def offender_name_by_last_name(offender)
-    "#{offender.last_name.capitalize}, #{offender.first_name.capitalize}"
   end
 end
 # rubocop:enable Metrics/LineLength
