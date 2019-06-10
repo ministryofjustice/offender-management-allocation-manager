@@ -18,6 +18,12 @@ describe Nomis::Elite2::OffenderApi do
       expect(response).to be_instance_of(String)
       expect(response).to eq 'Section 18 - wounding with intent to resist / prevent arrest'
     end
+
+    it "returns category codes",
+       vcr: { cassette_name: :offender_api_offender_category_list } do
+      response = described_class.list('LEI')
+      expect(response.data.first.category_code).not_to be_nil
+    end
   end
 
   describe 'Bulk operations' do
