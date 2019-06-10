@@ -84,12 +84,6 @@ class PrisonOffenderManagerService
         offender_stub.omicable = record.omicable
       end
 
-      # TODO: Handle this properly, what happens when the sentence_start_date disappears
-      # for an already allocated offender? How does this happen? Is it a T3 only thing?
-      if offender_stub.sentence.sentence_start_date.nil?
-        offender_stub.sentence.sentence_start_date = DateTime.zone.now
-      end
-
       alloc.responsibility =
         ResponsibilityService.new.calculate_pom_responsibility(offender_stub)
       alloc
