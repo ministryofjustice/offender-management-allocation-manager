@@ -85,6 +85,11 @@ class AllocationsController < ApplicationController
     redirect_to summary_unallocated_path
   end
 
+  def history
+    @prisoner = offender(nomis_offender_id_from_url)
+    @history = AllocationService.offender_allocation_history(nomis_offender_id_from_url)
+  end
+
 private
 
   def unavailable_pom_count

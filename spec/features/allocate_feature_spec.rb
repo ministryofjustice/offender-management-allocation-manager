@@ -173,4 +173,22 @@ feature 'Allocation' do
     visit edit_allocation_path(never_allocated_offender)
     expect(page).to have_current_path new_allocation_path(never_allocated_offender)
   end
+
+  scenario 'view allocation history for an offender', versioning: true, vcr: { cassette_name: :view_allocation_history } do
+    create(
+      :allocation_version,
+      nomis_offender_id: nomis_offender_id,
+      primary_pom_nomis_id: probation_officer_nomis_staff_id
+    )
+
+    signin_user
+    visit allocation_history_path(nomis_offender_id)
+
+    allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id)
+    formatted_date = allocation.primary_pom_allocated_at.strftime("#{allocation.primary_pom_allocated_at.day.ordinalize} %B %Y")
+
+    expect(page).to have_css('h1', text: "Abbella, Ozullirn")
+    expect(page).to have_css('p', text: "Prisoner allocated to #{allocation.primary_pom_name.titlecase} Tier: #{allocation.allocated_at_tier}")
+    expect(page).to have_css('.time', text: "#{formatted_date} by #{allocation.created_by_name}")
+  end
 end
