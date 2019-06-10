@@ -11,7 +11,7 @@ references:
 
   test_container_config: &test_container_config
     docker:
-      - image: circleci/ruby:2.6.2-node-browsers
+      - image: circleci/ruby:2.6.3-node-browsers
         environment:
           RAILS_ENV: test
           PGHOST: 127.0.0.1
@@ -246,18 +246,10 @@ jobs:
       - deploy:
           name: Deploy to staging
           command: |
-            kubectl set image -f deploy/staging/deployment.yaml allocation-manager=${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_SHA1} --local -o yaml \
-            | kubectl annotate -f - kubernetes.io/change-cause="$CIRCLE_BUILD_URL" --local -o yaml \
-            | kubectl apply --record=false \
-              -f - \
-              -f ./deploy/staging/ingress.yaml \
-              -f ./deploy/staging/cronjob.yaml \
-              -f ./deploy/staging/service.yaml \
-              -f ./deploy/staging/service-monitor.yaml \
-              -f ./deploy/staging/network-policy.yaml \
-              -f ./deploy/staging/allocation-manager-secrets.yaml \
-              -f ./deploy/staging/shared-environment.yaml \
-              -f ./deploy/staging/dashboard.yaml \
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/cronjob.yaml
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/deployment.yaml
+            kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
+            kubectl apply --record=false -f ./deploy/staging
           environment:
             <<: *github_team_name_slug
 
@@ -314,19 +306,10 @@ jobs:
       - deploy:
           name: Deploy to production
           command: |
-            kubectl set image -f deploy/production/deployment.yaml allocation-manager=${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_SHA1} --local -o yaml \
-            | kubectl annotate -f - kubernetes.io/change-cause="$CIRCLE_BUILD_URL" --local -o yaml \
-            | kubectl apply --record=false \
-              -f - \
-              -f ./deploy/production/ingress.yaml \
-              -f ./deploy/production/cronjob.yaml \
-              -f ./deploy/production/service.yaml \
-              -f ./deploy/production/service-monitor.yaml \
-              -f ./deploy/production/network-policy.yaml \
-              -f ./deploy/production/certificate.yaml \
-              -f ./deploy/production/allocation-manager-secrets.yaml \
-              -f ./deploy/production/shared-environment.yaml \
-              -f ./deploy/production/dashboard.yaml \
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/cronjob.yaml
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/deployment.yaml
+            kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
+            kubectl apply --record=false -f ./deploy/production
           environment:
             <<: *github_team_name_slug
 

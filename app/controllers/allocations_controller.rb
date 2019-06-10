@@ -27,7 +27,6 @@ class AllocationsController < ApplicationController
     primary_pom_nomis_id = AllocationVersion.find_by(nomis_offender_id: @prisoner.offender_no).primary_pom_nomis_id
     @pom = PrisonOffenderManagerService.get_pom(active_caseload, primary_pom_nomis_id)
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(active_caseload, @prisoner.offender_no)
-    @history = AllocationService.offender_allocation_history(@prisoner.offender_no)
   end
 
   def edit
@@ -129,7 +128,7 @@ private
   end
 
   def current_pom_for(nomis_offender_id)
-    current_allocation = AllocationService.allocations(nomis_offender_id)
+    current_allocation = AllocationService.allocations(nomis_offender_id, active_caseload)
     nomis_staff_id = current_allocation[nomis_offender_id]['primary_pom_nomis_id']
 
     PrisonOffenderManagerService.get_pom(active_caseload, nomis_staff_id)

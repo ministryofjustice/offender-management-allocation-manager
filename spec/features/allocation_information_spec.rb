@@ -89,17 +89,12 @@ feature "view an offender's allocation information" do
   end
 
   def create_allocation(offender_no)
-    AllocationVersion.create!(
+    create(
+      :allocation_version,
       nomis_offender_id: offender_no,
       primary_pom_nomis_id: probation_officer_nomis_staff_id,
-      nomis_booking_id: '1153753',
       prison: prison,
-      allocated_at_tier: allocated_at_tier,
-      created_by_username: 'SuperSPO',
-      created_by_name: 'Super SPO',
-      primary_pom_name: 'Ross Jones',
-      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
-      event_trigger: AllocationVersion::USER
+      allocated_at_tier: allocated_at_tier
     )
   end
 end

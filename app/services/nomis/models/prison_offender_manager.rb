@@ -41,8 +41,9 @@ module Nomis
         "#{position_description.split(' ').first} POM"
       end
 
-      def add_detail(pom_detail)
-        allocations = Allocation.all_primary_pom_allocations(pom_detail.nomis_staff_id)
+      def add_detail(pom_detail, prison)
+        allocations = AllocationVersion.active_primary_pom_allocations(
+          pom_detail.nomis_staff_id, prison)
         allocation_counts = allocations.group_by(&:allocated_at_tier)
 
         self.tier_a = allocation_counts.fetch('A', []).count

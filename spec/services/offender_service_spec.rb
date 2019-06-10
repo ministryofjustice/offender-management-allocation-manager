@@ -30,19 +30,19 @@ describe OffenderService, vcr: { cassette_name: :offender_service_offenders_by_p
 
   it "gets the POM names for allocated offenders",
      vcr: { cassette_name: :offender_service_pom_names_spec } do
-
     offenders = OffenderService.get_offenders_for_prison('LEI', page_size: 3)
     nomis_staff_id = 485_752
 
     PomDetail.create!(nomis_staff_id: nomis_staff_id, working_pattern: 1.0, status: 'active')
 
-    AllocationService.create_or_update(
+    AllocationVersion.create!(
       nomis_offender_id: offenders.first.offender_no,
       nomis_booking_id: 1_153_753,
       prison: 'LEI',
       allocated_at_tier: 'C',
       created_by_username: 'PK000223',
       primary_pom_nomis_id: nomis_staff_id,
+      primary_pom_allocated_at: DateTime.now.utc,
       event: AllocationVersion::ALLOCATE_PRIMARY_POM,
       event_trigger: AllocationVersion::USER
     )

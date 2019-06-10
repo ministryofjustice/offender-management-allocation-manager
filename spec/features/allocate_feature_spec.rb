@@ -40,7 +40,7 @@ feature 'Allocation' do
   end
 
   scenario 'overriding an allocation', vcr: { cassette_name: :override_allocation_feature_ok } do
-    override_nomis_staff_id = 485_595
+    override_nomis_staff_id = 485_737
 
     signin_user
 
@@ -63,7 +63,7 @@ feature 'Allocation' do
     click_button 'Complete allocation'
 
     expect(page).to have_current_path summary_unallocated_path
-    expect(page).to have_css('.notification', text: 'Ozullirn Abbella has been allocated to Toby Retallick (Prison POM)')
+    expect(page).to have_css('.notification', text: 'Ozullirn Abbella has been allocated to Jay Heal (Prison POM)')
     expect(Override.count).to eq(0)
   end
 
@@ -118,15 +118,10 @@ feature 'Allocation' do
   end
 
   scenario 're-allocating', versioning: true, vcr: { cassette_name: :re_allocate_feature } do
-    AllocationVersion.create!(
+    create(
+      :allocation_version,
       nomis_offender_id: nomis_offender_id,
-      primary_pom_nomis_id: probation_officer_nomis_staff_id,
-      nomis_booking_id: 1_153_753,
-      prison: 'LEI',
-      allocated_at_tier: 'A',
-      created_by_username: 'SPO_LEEDS',
-      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
-      event_trigger: AllocationVersion::USER
+      primary_pom_nomis_id: probation_officer_nomis_staff_id
     )
 
     signin_user
@@ -169,7 +164,7 @@ feature 'Allocation' do
     expect(page).to have_css(
       '.alert',
       text: 'Ozullirn Abbella has not been allocated - please try again'
-                    )
+    )
   end
 
   scenario 'cannot reallocate a non-allocated offender', vcr: { cassette_name: :allocation_attempt_bad_reallocate } do

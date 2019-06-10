@@ -11,6 +11,7 @@ class AllocationService
 
     params_copy[:primary_pom_name] = "#{pom_firstname} #{pom_secondname}"
     params_copy[:created_by_name] = "#{user_firstname} #{user_secondname}"
+    params_copy[:primary_pom_allocated_at] = DateTime.now.utc
 
     alloc_version = AllocationVersion.find_by(
       nomis_offender_id: params_copy[:nomis_offender_id]
@@ -25,7 +26,11 @@ class AllocationService
     params_copy[:pom_detail_id] = PrisonOffenderManagerService.
       get_pom_detail(params_copy[:primary_pom_nomis_id]).id
 
-    EmailService.instance(params_copy).send_allocation_email
+    EmailService.instance(
+      allocation: alloc_version,
+      message: params[:message]
+    ).send_email
+
     delete_overrides(params_copy)
 
     alloc_version
@@ -41,8 +46,11 @@ class AllocationService
     }.to_h
   end
 
-  def self.allocations(nomis_offender_ids)
-    AllocationVersion.where(nomis_offender_id: nomis_offender_ids).map { |a|
+  def self.allocations(nomis_offender_ids, prison)
+    AllocationVersion.where(
+      nomis_offender_id: nomis_offender_ids,
+      prison: prison).
+      map { |a|
       [
         a[:nomis_offender_id],
         a
@@ -80,7 +88,7 @@ class AllocationService
     }
   end
 
-  def self.last_allocation(nomis_offender_id)
+  def self.current_allocation_for(nomis_offender_id)
     AllocationVersion.allocations(nomis_offender_id).last
   end
 

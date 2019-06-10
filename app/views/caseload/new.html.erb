@@ -28,7 +28,7 @@
         <td aria-label="Prisoner number" class="govuk-table__cell "><%= allocation.nomis_offender_id %></td>
         <td aria-label="Arrival date" class="govuk-table__cell "><%= format_date(sentence.sentence_start_date) %></td>
         <td aria-label="Release date" class="govuk-table__cell "><%= format_date(sentence.earliest_release_date) %></td>
-        <td aria-label="Allocation date" class="govuk-table__cell "><%= format_date(allocation.created_at) %></td>
+        <td aria-label="Allocation date" class="govuk-table__cell "><%= format_date(allocation.primary_pom_allocated_at) %></td>
         <td aria-label="Role" class="govuk-table__cell "><%= allocation.responsibility %></td>
         <% if Flipflop.prisoner_profile? %>
           <td aria-label="Action" class="govuk-table__cell ">

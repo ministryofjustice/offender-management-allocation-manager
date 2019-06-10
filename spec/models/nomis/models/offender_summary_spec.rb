@@ -11,6 +11,7 @@ describe Nomis::Models::OffenderSummary, model: true do
   it "handles an earliest date" do
     o = described_class.new.tap { |off|
       off.sentence = Nomis::Models::SentenceDetail.new
+      off.sentence.sentence_start_date = Date.new(2005, 2, 3)
       off.sentence.release_date = Date.new(2010, 1, 1)
       off.sentence.parole_eligibility_date = Date.new(2009, 1, 1)
     }

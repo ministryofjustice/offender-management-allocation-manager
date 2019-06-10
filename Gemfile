@@ -1,13 +1,13 @@
 source 'https://rubygems.org'
 git_source(:github) do |repo| "https://github.com/#{repo}.git" end
 
-ruby '2.6.2'
+ruby '2.6.3'
 
 gem 'bootsnap', '>= 1.1.0', require: false
 gem 'coffee-rails', '~> 5.0'
 gem 'faraday'
 gem 'govuk_notify_rails'
-gem 'jbuilder', '~> 2.8'
+gem 'jbuilder', '~> 2.9'
 gem 'jwt'
 gem 'lograge'
 gem 'logstash-event'
@@ -28,18 +28,22 @@ gem 'redis'
 gem 'plissken'
 gem 'fast_underscore', require: false
 gem 'flipflop'
+gem 'roo'
 
 group :development, :test do
   gem 'brakeman'
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
+  gem 'factory_bot_rails'
   gem 'rubocop'
   gem 'rubocop-rspec'
   gem 'rubocop-performance'
+  gem 'rubocop-rails'
 end
 
 group :test do
   gem 'capybara'
   gem 'database_cleaner'
+  gem 'faker'
   gem 'rspec-rails'
   gem 'launchy'
   gem 'selenium-webdriver'

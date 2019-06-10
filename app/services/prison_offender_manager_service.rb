@@ -13,7 +13,7 @@ class PrisonOffenderManagerService
 
     poms = poms.map { |pom|
       detail = get_pom_detail(pom.staff_id)
-      pom.add_detail(detail)
+      pom.add_detail(detail, prison)
       pom
     }.compact
 
@@ -107,13 +107,15 @@ class PrisonOffenderManagerService
 
   def self.get_new_cases(nomis_staff_id, prison)
     allocations = get_allocated_offenders(nomis_staff_id, prison)
-    allocations.select { |allocation, _offender| allocation.created_at >= 7.days.ago }
+    allocations.select do |allocation, _offender|
+      allocation.primary_pom_allocated_at >= 7.days.ago
+    end
   end
 
   def self.get_new_cases_count(nomis_staff_id, prison)
     allocations = get_allocated_offenders(nomis_staff_id, prison)
     allocations.select { |allocation, _offender|
-      allocation.created_at >= 7.days.ago
+      allocation.primary_pom_allocated_at >= 7.days.ago
     }.count
   end
 

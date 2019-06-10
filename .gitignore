@@ -30,7 +30,7 @@
 .idea/
 
 # Ignore VCR cassettes
-/spec/fixtures
+/spec/fixtures/vcr_cassettes
 
 # Ignore VIM swap files
 *.swp

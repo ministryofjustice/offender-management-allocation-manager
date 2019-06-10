@@ -21,7 +21,6 @@ describe Nomis::Elite2::PrisonOffenderManagerApi do
   describe '#fetch_email_addresses' do
     it "can get a user's single email address",
        vcr: { cassette_name: :elite2_staff_api_get_email } do
-
       response = described_class.fetch_email_addresses(485_637)
 
       expect(response).to eq(["kath.pobee-norris@digital.justice.gov.uk"])
@@ -29,7 +28,6 @@ describe Nomis::Elite2::PrisonOffenderManagerApi do
 
     it "can get multiple email addresses for a user",
        vcr: { cassette_name: :elite2_staff_api_get_emails } do
-
       response = described_class.fetch_email_addresses(485_758)
 
       expect(response).to eq(["ommiicc@digital.justice.gov.uk", "omic@digital.justice.gov.uk"])
@@ -37,7 +35,6 @@ describe Nomis::Elite2::PrisonOffenderManagerApi do
 
     it "returns an empty list if a staff member doesn't have an email address",
        vcr: { cassette_name: :elite2_staff_api_get_no_emails } do
-
       response = described_class.fetch_email_addresses(485_636)
 
       expect(response).to eq([])
