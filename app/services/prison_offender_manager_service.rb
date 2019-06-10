@@ -73,7 +73,6 @@ class PrisonOffenderManagerService
     offender_map = OffenderService.get_sentence_details(booking_ids)
     case_info = CaseInformationService.get_case_info_for_offenders(offender_ids, prison)
 
-
     allocation_list_with_responsibility = allocation_list.map { |alloc|
       offender_stub = Nomis::Models::Offender.new
       offender_stub.sentence = offender_map[alloc.nomis_offender_id]
@@ -88,7 +87,7 @@ class PrisonOffenderManagerService
       # TODO: Handle this properly, what happens when the sentence_start_date disappears
       # for an already allocated offender? How does this happen? Is it a T3 only thing?
       if offender_stub.sentence.sentence_start_date.nil?
-        offender_stub.sentence.sentence_start_date = DateTime.now
+        offender_stub.sentence.sentence_start_date = DateTime.zone.now
       end
 
       alloc.responsibility =
