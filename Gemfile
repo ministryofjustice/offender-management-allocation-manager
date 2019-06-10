@@ -28,6 +28,7 @@ gem 'redis'
 gem 'plissken'
 gem 'fast_underscore', require: false
 gem 'flipflop'
+gem 'roo'
 
 group :development, :test do
   gem 'brakeman'
