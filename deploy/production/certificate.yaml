@@ -16,4 +16,4 @@ spec:
       - moic.service.justice.gov.uk
       - allocation-manager-production.apps.live-1.cloud-platform.service.justice.gov.uk
       dns01:
-        provider: route53-dsd
+        provider: route53-cloud-platform

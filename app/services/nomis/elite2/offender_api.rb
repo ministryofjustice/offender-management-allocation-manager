@@ -9,7 +9,7 @@ module Nomis
       def self.list(prison, page = 0, page_size: 10)
         route = "/elite2api/api/locations/description/#{prison}/inmates"
 
-        queryparams = { 'convictedStatus' => 'Convicted' }
+        queryparams = { 'convictedStatus' => 'Convicted', 'returnCategory' => true }
 
         page_offset = page * page_size
         hdrs = paging_headers(page_size, page_offset)
