@@ -13,7 +13,7 @@ class PrisonOffenderManagerService
 
     poms = poms.map { |pom|
       detail = get_pom_detail(pom.staff_id)
-      pom.add_detail(detail)
+      pom.add_detail(detail, prison)
       pom
     }.compact
 
