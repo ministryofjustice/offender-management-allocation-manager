@@ -6,6 +6,6 @@ Flipflop.configure do
           default: false,
           description: 'Link allocation info page from allocated offenders tab'
   feature :prisoner_profile,
-          default: true,
+          default: false,
           description: 'Show the prisoner profile from caseload pages'
 end
