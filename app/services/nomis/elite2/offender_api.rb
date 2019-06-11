@@ -59,7 +59,7 @@ module Nomis
       end
 
       def self.get_category_code(offender_no)
-        route = "/elite2api/api/offender-assessments/CATEGORY"
+        route = '/elite2api/api/offender-assessments/CATEGORY'
         data = e2_client.post(route, [offender_no])
         return '' if data.empty?
 
