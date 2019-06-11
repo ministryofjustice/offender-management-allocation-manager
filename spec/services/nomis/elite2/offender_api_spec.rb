@@ -52,6 +52,13 @@ describe Nomis::Elite2::OffenderApi do
       expect(response).to be_instance_of(Nomis::Models::Offender)
     end
 
+    it 'can get category codes', :raven_intercept_exception,
+       vcr: { cassette_name: :offender_api_cat_code_spec } do
+      noms_id = 'G4273GI'
+      response = described_class.get_category_code(noms_id)
+      expect(response).to eq('C')
+    end
+
     it 'returns null if unable to find prisoner', :raven_intercept_exception,
        vcr: { cassette_name: :offender_api_null_offender_spec  } do
       noms_id = 'AAA22D'
