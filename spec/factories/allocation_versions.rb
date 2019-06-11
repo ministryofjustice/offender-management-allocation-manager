@@ -35,7 +35,7 @@ FactoryBot.define do
     end
 
     primary_pom_name do
-      "#{Faker::Name.first_name} #{Faker::Name.last_name}"
+      Faker::Name.name
     end
 
     primary_pom_allocated_at do
