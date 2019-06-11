@@ -1,0 +1,27 @@
+<%= render :partial => "/shared/backlink", :locals => { :page => allocation_path(@prisoner.offender_no) } %>
+
+<h1 class="govuk-heading-l"><%= @prisoner.full_name %></h1>
+
+<% @history.grouped_by_prison do |prison, allocations| %>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="timeline">
+        <h2 class="govuk-heading-m"><%= prison_title(prison) %></h2>
+        <ul>
+          <% allocations.each do |allocation| %>
+            <li class="action_needed">
+              <h2 class="govuk-heading-s">Prisoner allocation</h2>
+              <p>Prisoner allocated to
+                <%= link_to(allocation.primary_pom_name.titlecase, pom_path(allocation.primary_pom_nomis_id)) %>
+                <br/>
+                Tier: <%= allocation.allocated_at_tier %>
+              </p>
+              <p class="time"><%= format_date_long(allocation.primary_pom_allocated_at) %>
+                by <%= allocation.created_by_name.titlecase %></p>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  </div>
+<% end %>
