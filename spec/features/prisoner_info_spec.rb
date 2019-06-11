@@ -7,6 +7,7 @@ feature 'View a prisoner profile page' do
     visit prisoner_show_path('G7998GJ')
 
     expect(page).to have_css('h2', text: 'Ahmonis, Okadonah')
+    expect(page).to have_content('07/07/1968')
   end
 
   it 'shows the prisoner image', :raven_intercept_exception, vcr: { cassette_name: :show_offender_spec_image } do
