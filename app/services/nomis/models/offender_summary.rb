@@ -8,7 +8,6 @@ module Nomis
       attribute :agency_id, :string
       attribute :aliases, :string
       attribute :booking_id, :integer
-      attribute :category_code, :string
 
       # custom attributes
       attribute :allocation_date, :date

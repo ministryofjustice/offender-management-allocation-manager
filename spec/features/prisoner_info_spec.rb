@@ -8,6 +8,8 @@ feature 'View a prisoner profile page' do
 
     expect(page).to have_css('h2', text: 'Ahmonis, Okadonah')
     expect(page).to have_content('07/07/1968')
+    cat_code = find('h3#category-code').text
+    expect(cat_code).to eq('C')
   end
 
   it 'shows the prisoner image', :raven_intercept_exception, vcr: { cassette_name: :show_offender_spec_image } do

@@ -17,6 +17,7 @@ class OffenderService
         o.sentence = sentence_detail[offender_no]
       end
 
+      o.category_code = Nomis::Elite2::OffenderApi.get_category_code(o.offender_no)
       o.main_offence = Nomis::Elite2::OffenderApi.get_offence(o.latest_booking_id)
     }
   end
