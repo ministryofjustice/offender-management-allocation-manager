@@ -12,8 +12,7 @@ module Nomis
           client.get(route)
         }
         ApiDeserialiser.new.deserialise(Nomis::Models::KeyworkerDetails, response)
-      rescue Nomis::Client::APIError => e
-        AllocationManager::ExceptionHandler.capture_exception(e)
+      rescue Nomis::Client::APIError
         Nomis::Models::NullKeyworker.new
       end
 

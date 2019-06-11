@@ -4,7 +4,7 @@ module Nomis
   module Models
     class NullKeyworker < KeyworkerDetails
       def full_name
-        'Not assigned'
+        'Data not available'
       end
     end
   end
