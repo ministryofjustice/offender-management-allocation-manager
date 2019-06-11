@@ -188,7 +188,7 @@ feature 'Allocation' do
     formatted_date = allocation.primary_pom_allocated_at.strftime("#{allocation.updated_at.day.ordinalize} %B %Y")
 
     expect(page).to have_css('h1', text: "Abbella, Ozullirn")
-    expect(page).to have_css('p', text: "Prisoner allocated to #{allocation.primary_pom_name.titlecase} Tier: #{allocation.allocated_at_tier}")
+    expect(page).to have_css('p', text: "Prisoner allocated to #{allocation.primary_pom_name} Tier: #{allocation.allocated_at_tier}")
     expect(page).to have_css('.time', text: "#{formatted_date} by #{allocation.created_by_name}")
   end
 end
