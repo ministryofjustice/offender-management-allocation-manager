@@ -185,7 +185,7 @@ feature 'Allocation' do
     visit allocation_history_path(nomis_offender_id)
 
     allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id)
-    formatted_date = allocation.primary_pom_allocated_at.strftime("#{allocation.updated_at.day.ordinalize} %B %Y")
+    formatted_date = allocation.updated_at.strftime("#{allocation.updated_at.day.ordinalize} %B %Y")
 
     expect(page).to have_css('h1', text: "Abbella, Ozullirn")
     expect(page).to have_css('p', text: "Prisoner allocated to #{allocation.primary_pom_name} Tier: #{allocation.allocated_at_tier}")
