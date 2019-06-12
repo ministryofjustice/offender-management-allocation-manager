@@ -27,6 +27,7 @@ class AllocationsController < ApplicationController
     primary_pom_nomis_id = AllocationVersion.find_by(nomis_offender_id: @prisoner.offender_no).primary_pom_nomis_id
     @pom = PrisonOffenderManagerService.get_pom(active_caseload, primary_pom_nomis_id)
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(active_caseload, @prisoner.offender_no)
+    @allocation = AllocationVersion.where(nomis_offender_id: @prisoner.offender_no)
   end
 
   def edit

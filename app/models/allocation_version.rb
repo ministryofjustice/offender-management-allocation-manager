@@ -52,6 +52,11 @@ class AllocationVersion < ApplicationRecord
     allocations(nomis_offender_id).primary_pom_nomis_id
   }
 
+  def self.last_event(nomis_offender_id)
+    allocation = find_by(nomis_offender_id: nomis_offender_id)
+    allocation.event.to_s.humanize + ' - ' + allocation.updated_at.strftime('%d/%m/%Y')
+  end
+
   def self.active?(nomis_offender_id)
     allocation = find_by(nomis_offender_id: nomis_offender_id)
     !allocation.nil? && !allocation.primary_pom_nomis_id.nil?
