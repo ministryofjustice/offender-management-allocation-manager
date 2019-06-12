@@ -100,7 +100,6 @@ describe AllocationService do
     expect(staff_ids.first).to eq(previous_primary_pom_nomis_id)
   end
 
-  # TODO: Reinstate after changes to allocation history confirmed
   it "Can get the allocation history for an offender", versioning: true, vcr: { cassette_name: 'allocation_service_offender_history' } do
     nomis_offender_id = 'GHF1234'
 
