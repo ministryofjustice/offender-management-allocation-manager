@@ -45,7 +45,7 @@ feature "view an offender's allocation information" do
       create_allocation(nomis_offender_id_without_keyworker)
     end
 
-    it "displays 'not assigned'" do
+    it "displays 'Data not available'" do
       signin_user
 
       visit allocation_path(nomis_offender_id: nomis_offender_id_without_keyworker)
@@ -57,7 +57,7 @@ feature "view an offender's allocation information" do
       # Pom
       expect(page).to have_css('.govuk-table__cell', text: 'Duckett, Jenny')
       # Keyworker
-      expect(page).to have_css('.govuk-table__cell', text: 'Not assigned')
+      expect(page).to have_css('.govuk-table__cell', text: 'Data not available')
     end
   end
 
