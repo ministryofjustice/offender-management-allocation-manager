@@ -80,9 +80,9 @@ module Nomis
         }
 
         data.each_with_object({}) { |record, hash|
-          next unless record.key?('offenderNo')
+          next unless record.key?('bookingId')
 
-          oid = record['offenderNo']
+          oid = record['bookingId']
           hash[oid] = api_deserialiser.deserialise(
             Nomis::Models::SentenceDetail, record['sentenceDetail']
           )

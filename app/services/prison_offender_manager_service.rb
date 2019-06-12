@@ -75,7 +75,7 @@ class PrisonOffenderManagerService
 
     allocation_list_with_responsibility = allocation_list.map { |alloc|
       offender_stub = Nomis::Models::Offender.new
-      offender_stub.sentence = offender_map[alloc.nomis_offender_id]
+      offender_stub.sentence = offender_map[alloc.nomis_booking_id]
 
       record = case_info[alloc.nomis_offender_id]
       if record.present?
@@ -91,7 +91,7 @@ class PrisonOffenderManagerService
 
     allocations_and_offender = []
     allocation_list_with_responsibility.each do |alloc|
-      allocations_and_offender << [alloc, offender_map[alloc.nomis_offender_id]]
+      allocations_and_offender << [alloc, offender_map[alloc.nomis_booking_id]]
     end
 
     allocations_and_offender

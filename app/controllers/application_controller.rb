@@ -54,10 +54,10 @@ class ApplicationController < ActionController::Base
 private
 
   def allowed?
-    return true if Rails.env.test?
-
     user_roles = roles
-    user_roles.present? && user_roles.include?('ROLE_ALLOC_MGR')
+    user_roles.present? && (
+      user_roles.include?('ROLE_ALLOC_MGR') || user_roles.include?('ROLE_ALLOC_CASE_MGR')
+    )
   end
 
   def session_expired?
