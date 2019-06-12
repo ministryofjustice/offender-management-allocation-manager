@@ -100,26 +100,34 @@ describe AllocationService do
     expect(staff_ids.first).to eq(previous_primary_pom_nomis_id)
   end
 
-  # TODO: Reinstate after changes to allocation history confirmed
-  xit "Can get the allocation history for an offender", versioning: true, vcr: { cassette_name: 'allocation_service_offender_history' } do
+  it "Can get the allocation history for an offender", versioning: true, vcr: { cassette_name: 'allocation_service_offender_history' } do
+    nomis_offender_id = 'GHF1234'
+
     described_class.create_or_update(
-      nomis_offender_id: allocation.nomis_offender_id,
-      primary_pom_nomis_id: 485_752,
-      event: AllocationVersion::REALLOCATE_PRIMARY_POM
+      nomis_offender_id: nomis_offender_id,
+      nomis_booking_id: 1,
+      primary_pom_nomis_id: 485_766,
+      allocated_at_tier: 'A',
+      prison: 'PVI',
+      event: AllocationVersion::REALLOCATE_PRIMARY_POM,
+      event_trigger: AllocationVersion::USER
     )
     described_class.create_or_update(
-      nomis_offender_id: allocation.nomis_offender_id,
-      allocated_at_tier: 'D',
-      event: :reallocate_primary_pom
+      nomis_offender_id: nomis_offender_id,
+      nomis_booking_id: 1,
+      primary_pom_nomis_id: 485_737,
+      allocated_at_tier: 'A',
+      prison: 'LEI',
+      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+      event_trigger: AllocationVersion::USER
     )
 
-    allocations = described_class.offender_allocation_history(allocation.nomis_offender_id)
+    allocation_list = described_class.offender_allocation_history(nomis_offender_id)
 
-    expect(allocations.count).to eq(1)
-    expect(allocations.first.nomis_offender_id).to eq(allocation.nomis_offender_id)
-    expect(allocations.first.event).to eq('allocate_primary_pom')
-    expect(allocations.second.nomis_booking_id).to eq(first_reallocation.nomis_booking_id)
-    expect(allocations.last.nomis_booking_id).to eq(second_reallocation.nomis_booking_id)
-    expect(allocations.last.prison).to eq('PVI')
+    expect(allocation_list.count).to eq(2)
+    expect(allocation_list.first.nomis_offender_id).to eq(nomis_offender_id)
+    expect(allocation_list.first.event).to eq('allocate_primary_pom')
+    expect(allocation_list.second.nomis_booking_id).to eq(1)
+    expect(allocation_list.last.prison).to eq('PVI')
   end
 end
