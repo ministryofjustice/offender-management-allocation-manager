@@ -13,8 +13,8 @@ class OffenderService
       end
 
       sentence_detail = get_sentence_details([o.latest_booking_id])
-      if sentence_detail.present? && sentence_detail.key?(offender_no)
-        o.sentence = sentence_detail[offender_no]
+      if sentence_detail.present? && sentence_detail.key?(o.latest_booking_id)
+        o.sentence = sentence_detail[o.latest_booking_id]
       end
 
       o.category_code = Nomis::Elite2::OffenderApi.get_category_code(o.offender_no)
@@ -42,7 +42,7 @@ class OffenderService
       next false if offender.age < 18
       next false if SentenceType.civil?(offender.imprisonment_status)
 
-      sentencing = sentence_details[offender.offender_no]
+      sentencing = sentence_details[offender.booking_id]
       offender.sentence = sentencing if sentencing.present?
       next false unless offender.sentenced?
 
