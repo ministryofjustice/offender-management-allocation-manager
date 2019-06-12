@@ -11,7 +11,7 @@ FactoryBot.define do
     end
 
     created_by_name do
-      Faker::Name.name
+      "#{Faker::Name.first_name} #{Faker::Name.last_name}"
     end
 
     event do
@@ -35,7 +35,7 @@ FactoryBot.define do
     end
 
     primary_pom_name do
-      Faker::Name.name
+      "#{Faker::Name.first_name} #{Faker::Name.last_name}"
     end
 
     primary_pom_allocated_at do
