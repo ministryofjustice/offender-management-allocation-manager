@@ -181,14 +181,29 @@ feature 'Allocation' do
       primary_pom_nomis_id: probation_officer_nomis_staff_id
     )
 
+    reallocated_pom_name = Faker::Name.name
+    allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id)
+
+    allocation.update(event: AllocationVersion::REALLOCATE_PRIMARY_POM,
+                      primary_pom_nomis_id: prison_officer_nomis_staff_id,
+                      primary_pom_name: reallocated_pom_name
+    )
+
     signin_user
     visit allocation_history_path(nomis_offender_id)
 
-    allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id)
-    formatted_date = allocation.updated_at.strftime("#{allocation.updated_at.day.ordinalize} %B %Y")
+    current_formatted_date = allocation.updated_at.strftime(
+      "#{allocation.updated_at.day.ordinalize} %B %Y"
+    )
+
+    previous_formatted_date = allocation.paper_trail.previous_version.updated_at.strftime(
+      "#{allocation.paper_trail.previous_version.updated_at.day.ordinalize} %B %Y"
+    )
 
     expect(page).to have_css('h1', text: "Abbella, Ozullirn")
-    expect(page).to have_css('p', text: "Prisoner allocated to #{allocation.primary_pom_name} Tier: #{allocation.allocated_at_tier}")
-    expect(page).to have_css('.time', text: "#{formatted_date} by #{allocation.created_by_name}")
+    expect(page).to have_css('p', text: "Prisoner reallocated to #{allocation.primary_pom_name} Tier: #{allocation.allocated_at_tier}")
+    expect(page).to have_css('.time', text: "#{current_formatted_date} by #{allocation.created_by_name}")
+    expect(page).to have_css('p', text: "Prisoner allocated to #{allocation.paper_trail.previous_version.primary_pom_name} Tier: #{allocation.paper_trail.previous_version.allocated_at_tier}")
+    expect(page).to have_css('.time', text: "#{previous_formatted_date} by #{allocation.paper_trail.previous_version.created_by_name}")
   end
 end

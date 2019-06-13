@@ -38,4 +38,8 @@ class AllocationList < Array
     end
   end
   # rubocop:enable Metrics/MethodLength
+
+  def group_by_descending_date(allocations)
+    allocations.sort_by!(&:updated_at).reverse!
+  end
 end
