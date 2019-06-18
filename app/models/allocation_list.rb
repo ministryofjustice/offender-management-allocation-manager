@@ -6,18 +6,11 @@ class AllocationList < Array
     # Groups the allocations in this array by the prison that it relates to.
     # Unfortunately we can't put this in a hash because a prisoner may have been
     # to a prison more than once, so a visit to Cardiff, then Leeds, then Cardiff
-    # would mean they are out of order.  Instead we need to put it into a structure
-    # that looks like
+    # would mean they are out of order.
     #
-    #    [
-    #      ['PrisonA', [alloc1, alloc2]],
-    #      ['PrisonB', [alloc3]],
-    #      ['PrisonA', [alloc4]],
-    #    ]
-    #
-    # Instead of returning a list, and keeping multiple copies of data in RAM, the
-    # caller must provide a block `{ |prison, allocations| ... }` which will be called
-    # each time a new prison (row) is built
+    # Each time a new prison is found in the list, we yield the current prison
+    # and all of the allocations we have captured so far to the caller via the passed
+    # block.
     return [] if empty?
 
     idx = 0
