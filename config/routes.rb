@@ -6,6 +6,9 @@ Rails.application.routes.draw do
   match "/500", :to => "errors#internal_server_error", :via => :all
   match "/503", :to => "errors#internal_server_error", :via => :all
 
+  get '/help', to: 'pages#help'
+  get '/contact', to: 'pages#contact'
+
   get '/auth/:provider/callback', to: 'sessions#create'
   get '/signout', to: 'sessions#destroy'
 
