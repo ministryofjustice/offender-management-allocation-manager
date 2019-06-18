@@ -8,7 +8,7 @@
       <div class="timeline">
         <h2 class="govuk-heading-m"><%= prison_title(prison) %></h2>
         <ul>
-          <% allocations.group_by_descending_date(allocations).each do |allocation| %>
+          <% allocations.each do |allocation| %>
             <% if allocation.event == 'allocate_primary_pom' %>
               <%= render :partial => "allocate_primary_pom", :locals => { allocation: allocation } %>
             <% elsif allocation.event == 'reallocate_primary_pom' %>

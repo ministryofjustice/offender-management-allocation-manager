@@ -71,8 +71,11 @@ class AllocationService
     current_allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id)
 
     unless current_allocation.nil?
-      allocations = get_versions_for(current_allocation)
-      AllocationList.new(allocations.prepend current_allocation)
+      allocations = get_versions_for(current_allocation).
+          append(current_allocation).
+          sort_by!(&:updated_at).
+          reverse!
+      AllocationList.new(allocations)
     end
   end
 
