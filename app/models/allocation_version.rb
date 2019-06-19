@@ -90,8 +90,6 @@ class AllocationVersion < ApplicationRecord
   end
 
   validates :nomis_offender_id,
-            :primary_pom_nomis_id,
-            :primary_pom_allocated_at,
             :nomis_booking_id,
             :prison,
             :allocated_at_tier,

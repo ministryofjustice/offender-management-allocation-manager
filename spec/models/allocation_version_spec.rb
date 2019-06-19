@@ -19,7 +19,6 @@ RSpec.describe AllocationVersion, type: :model do
     it { is_expected.to validate_presence_of(:allocated_at_tier) }
     it { is_expected.to validate_presence_of(:event) }
     it { is_expected.to validate_presence_of(:event_trigger) }
-    it { is_expected.to validate_presence_of(:primary_pom_allocated_at) }
   end
 
   describe 'Versions' do

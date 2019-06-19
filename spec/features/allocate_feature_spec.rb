@@ -179,9 +179,9 @@ feature 'Allocation' do
       :allocation_version,
       nomis_offender_id: nomis_offender_id,
       primary_pom_nomis_id: probation_officer_nomis_staff_id,
-      created_at: Time.zone.now - 2.days,
-      updated_at: Time.zone.now - 2.days,
-      primary_pom_allocated_at: Time.zone.now - 2.days
+      created_at: Time.zone.now - 4.days,
+      updated_at: Time.zone.now - 4.days,
+      primary_pom_allocated_at: Time.zone.now - 4.days
     )
 
     reallocated_pom_name = "#{Faker::Name.first_name} #{Faker::Name.last_name}"
@@ -190,47 +190,64 @@ feature 'Allocation' do
     allocation.update(event: AllocationVersion::REALLOCATE_PRIMARY_POM,
                       primary_pom_nomis_id: prison_officer_nomis_staff_id,
                       primary_pom_name: reallocated_pom_name,
-                      updated_at: Time.zone.now - 1.day
+                      updated_at: Time.zone.now - 3.days
     )
 
     allocation.update(event: AllocationVersion::DEALLOCATE_PRIMARY_POM,
-                      prison: 'PVI',
+                      event_trigger: AllocationVersion::USER,
                       primary_pom_nomis_id: nil,
-                      primary_pom_name: nil)
+                      primary_pom_name: nil,
+                      updated_at: Time.zone.now - 2.days,
+                      primary_pom_allocated_at: nil
+    )
+
+    deallocate_date = allocation.updated_at.strftime("#{allocation.updated_at.day.ordinalize} %B %Y")
 
     new_prison_pom_name = "#{Faker::Name.first_name} #{Faker::Name.last_name}"
     allocation.update(event: AllocationVersion::ALLOCATE_PRIMARY_POM,
                       prison: 'PVI',
                       primary_pom_nomis_id: 485_132,
-                      primary_pom_name: new_prison_pom_name)
+                      primary_pom_name: new_prison_pom_name,
+                      updated_at: Time.zone.now - 1.day)
+
+    allocation.update(event: AllocationVersion::DEALLOCATE_PRIMARY_POM,
+                      event_trigger: AllocationVersion::OFFENDER_MOVEMENT,
+                      primary_pom_nomis_id: nil,
+                      primary_pom_name: nil,
+                      updated_at: Time.zone.now - 1.day,
+                      primary_pom_allocated_at: nil)
+
+    transfer_date = allocation.updated_at.strftime("#{allocation.updated_at.day.ordinalize} %B %Y ")
+
+    history = AllocationService.offender_allocation_history(nomis_offender_id)
 
     signin_user
     visit allocation_history_path(nomis_offender_id)
 
     expect(page).to have_css('h1', text: "Abbella, Ozullirn")
 
-    current_formatted_date = allocation.updated_at.strftime(
-      "#{allocation.updated_at.day.ordinalize} %B %Y"
-    )
-
     expect(page).to have_css('.govuk-heading-m', text: "HMP Pentonville")
-    expect(page).to have_css('p', text: "Prisoner allocated to #{allocation.primary_pom_name.titlecase} Tier: #{allocation.allocated_at_tier}")
-    expect(page).to have_css('.time', text: "#{current_formatted_date} by #{allocation.created_by_name.titlecase}")
 
-    previous_formatted_date = allocation.paper_trail.previous_version.updated_at.strftime(
-      "#{allocation.paper_trail.previous_version.updated_at.day.ordinalize} %B %Y"
-    )
+    expect(page).to have_css('.govuk-heading-s', text: "Prisoner unallocated (transfer)")
+    expect(page).to have_css('.time', text: transfer_date.to_s)
+
+    pvi_allocation_date = history[1].updated_at.strftime("#{history[1].updated_at.day.ordinalize} %B %Y")
+
+    expect(page).to have_css('p', text: "Prisoner allocated to #{history[1].primary_pom_name} Tier: #{history[1].allocated_at_tier}")
+    expect(page).to have_css('.time', text: "#{pvi_allocation_date} by #{history[1].created_by_name}")
 
     expect(page).to have_css('.govuk-heading-m', text: "HMP Leeds")
-    expect(page).to have_css('p', text: "Prisoner reallocated to #{allocation.paper_trail.previous_version.primary_pom_name} Tier: #{allocation.paper_trail.previous_version.allocated_at_tier}")
-    expect(page).to have_css('.time', text: "#{previous_formatted_date} by #{allocation.paper_trail.previous_version.created_by_name.titlecase}")
 
-    initial_allocation = allocation.paper_trail.previous_version
+    expect(page).to have_css('.govuk-heading-s', text: "Prisoner unallocated")
+    expect(page).to have_css('.time', text: deallocate_date.to_s)
 
-    initial_allocated_formatted_date = initial_allocation.paper_trail.previous_version.updated_at.strftime(
-      "#{initial_allocation.paper_trail.previous_version.updated_at.day.ordinalize} %B %Y"
-    )
-    expect(page).to have_css('p', text: "Prisoner allocated to #{initial_allocation.paper_trail.previous_version.primary_pom_name.titlecase} Tier: #{initial_allocation.paper_trail.previous_version.allocated_at_tier}")
-    expect(page).to have_css('.time', text: "#{initial_allocated_formatted_date} by #{initial_allocation.paper_trail.previous_version.created_by_name.titlecase}")
+    previous_formatted_date = history[2].updated_at.strftime("#{history[3].updated_at.day.ordinalize} %B %Y")
+
+    expect(page).to have_css('p', text: "Prisoner reallocated to #{history[3].primary_pom_name} Tier: #{history[3].allocated_at_tier}")
+    expect(page).to have_css('.time', text: "#{previous_formatted_date} by #{history[3].created_by_name}")
+
+    initial_allocated_date = history.last.updated_at.strftime("#{history.last.updated_at.day.ordinalize} %B %Y")
+    expect(page).to have_css('p', text: "Prisoner allocated to #{history.last.primary_pom_name} Tier: #{history.last.allocated_at_tier}")
+    expect(page).to have_css('.time', text: "#{initial_allocated_date} by #{history.last.created_by_name}")
   end
 end

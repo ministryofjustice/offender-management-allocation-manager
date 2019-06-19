@@ -13,6 +13,8 @@
               <%= render :partial => "allocate_primary_pom", :locals => { allocation: allocation } %>
             <% elsif allocation.event == 'reallocate_primary_pom' %>
               <%= render :partial => "reallocate_primary_pom", :locals => { allocation: allocation } %>
+            <% elsif allocation.event == 'deallocate_primary_pom' %>
+              <%= render :partial => "deallocate_primary_pom", :locals => { allocation: allocation } %>
             <% end %>
           <% end %>
         </ul>
