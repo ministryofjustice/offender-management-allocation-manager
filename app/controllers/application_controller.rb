@@ -32,6 +32,20 @@ class ApplicationController < ActionController::Base
     sso_identity['username'] if sso_identity.present?
   end
 
+  def admin_user?
+    r = roles
+    unless r.present? && r.include?('ROLE_ALLOC_MGR')
+      redirect_to '/'
+    end
+  end
+
+  def case_admin_user?
+    r = roles
+    unless r.present? && r.include?('ROLE_ALLOC_CASE_MGR')
+      redirect_to '/'
+    end
+  end
+
   def active_caseload
     sso_identity['active_caseload'] if sso_identity.present?
   end
