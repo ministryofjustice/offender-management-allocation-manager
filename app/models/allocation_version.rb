@@ -71,7 +71,6 @@ class AllocationVersion < ApplicationRecord
         primary_pom_allocated_at: nil,
         secondary_pom_nomis_id: nil,
         secondary_pom_name: nil,
-        prison: nil,
         event: DEALLOCATE_PRIMARY_POM,
         event_trigger: OFFENDER_MOVEMENT
       )
