@@ -64,11 +64,10 @@ class AllocationVersion < ApplicationRecord
 
   # rubocop:disable Metrics/MethodLength
   def self.deallocate_offender(nomis_offender_id)
-    alloc = AllocationVersion.where(
+    alloc = AllocationVersion.find_by(
       nomis_offender_id: nomis_offender_id
-    ).first
+    )
 
-    p "WTF" if alloc.nil?
     return if alloc.nil?
 
     alloc.primary_pom_nomis_id = nil
