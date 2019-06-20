@@ -16,7 +16,7 @@ module OffenderManagementAllocationClient
   class Application < Rails::Application
     # Before filter for Flipflop dashboard. Replace with a lambda or method name
     # defined in ApplicationController to implement access control.
-    config.flipflop.dashboard_access_filter = -> { head :forbidden }
+    config.flipflop.dashboard_access_filter = -> { :admin_user?   }
 
     config.load_defaults 5.2
     config.exceptions_app = routes
