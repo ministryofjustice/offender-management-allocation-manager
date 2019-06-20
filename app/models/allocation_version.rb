@@ -61,6 +61,7 @@ class AllocationVersion < ApplicationRecord
     allocation = find_by(nomis_offender_id: nomis_offender_id)
     !allocation.nil? && !allocation.primary_pom_nomis_id.nil?
   end
+
   def self.deallocate_offender(nomis_offender_id)
     allocations(nomis_offender_id).
       update_all(
@@ -73,7 +74,6 @@ class AllocationVersion < ApplicationRecord
         event_trigger: OFFENDER_MOVEMENT
       )
   end
-  # rubocop:enable Metrics/MethodLength
 
   def self.deallocate_primary_pom(nomis_staff_id)
     all_primary_pom_allocations(nomis_staff_id).
