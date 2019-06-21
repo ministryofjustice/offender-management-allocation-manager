@@ -184,7 +184,7 @@ feature 'Allocation' do
       primary_pom_allocated_at: Time.zone.now - 4.days
     )
 
-    reallocated_pom_name = "#{Faker::Name.first_name} #{Faker::Name.last_name}"
+    reallocated_pom_name = "#{Faker::Name.first_name} #{Faker::Name.last_name}".titleize
     allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id)
 
     allocation.update(event: AllocationVersion::REALLOCATE_PRIMARY_POM,
@@ -203,7 +203,7 @@ feature 'Allocation' do
 
     deallocate_date = allocation.updated_at.strftime("#{allocation.updated_at.day.ordinalize} %B %Y")
 
-    new_prison_pom_name = "#{Faker::Name.first_name} #{Faker::Name.last_name}"
+    new_prison_pom_name = "#{Faker::Name.first_name} #{Faker::Name.last_name}".titleize
     allocation.update(event: AllocationVersion::ALLOCATE_PRIMARY_POM,
                       prison: 'PVI',
                       primary_pom_nomis_id: 485_132,
