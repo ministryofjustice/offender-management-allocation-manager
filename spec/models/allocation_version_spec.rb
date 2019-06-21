@@ -44,10 +44,22 @@ RSpec.describe AllocationVersion, type: :model do
     end
   end
 
-  describe 'when an offender moves prison' do
+  describe 'when an offender moves prison', versioning: true, vcr: { cassette_name: :allocation_version_deallocate_offender }  do
     it 'removes the primary pom details in an Offender\'s allocation' do
-      AllocationVersion.deallocate_offender(nomis_offender_id)
+      nomis_offender_id = 'G2911GD'
+      params = {
+        nomis_offender_id: nomis_offender_id,
+        prison: 'LEI',
+        allocated_at_tier: 'A',
+        primary_pom_nomis_id: 485_833,
+        primary_pom_allocated_at: DateTime.now.utc,
+        nomis_booking_id: 1,
+        event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+        event_trigger: AllocationVersion::USER
+      }
+      AllocationService.create_or_update(params)
 
+      AllocationVersion.deallocate_offender(nomis_offender_id)
       deallocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id)
 
       expect(deallocation.primary_pom_nomis_id).to be_nil
