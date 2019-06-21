@@ -64,17 +64,21 @@ class AllocationVersion < ApplicationRecord
 
   # rubocop:disable Metrics/MethodLength
   def self.deallocate_offender(nomis_offender_id)
-    allocations(nomis_offender_id).
-      update_all(
-        primary_pom_nomis_id: nil,
-        primary_pom_name: nil,
-        primary_pom_allocated_at: nil,
-        secondary_pom_nomis_id: nil,
-        secondary_pom_name: nil,
-        prison: nil,
-        event: DEALLOCATE_PRIMARY_POM,
-        event_trigger: OFFENDER_MOVEMENT
-      )
+    alloc = AllocationVersion.find_by(
+      nomis_offender_id: nomis_offender_id
+    )
+
+    return if alloc.nil?
+
+    alloc.primary_pom_nomis_id = nil
+    alloc.primary_pom_name = nil
+    alloc.primary_pom_allocated_at = nil
+    alloc.secondary_pom_nomis_id = nil
+    alloc.secondary_pom_name = nil
+    alloc.event = DEALLOCATE_PRIMARY_POM
+    alloc.event_trigger = OFFENDER_MOVEMENT
+
+    alloc.save!
   end
   # rubocop:enable Metrics/MethodLength
 
