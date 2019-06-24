@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'csv'
-require_relative '../../lib/delius/extractor'
+require_relative '../../lib/delius/manual_extractor'
 require_relative '../../lib/onboard_prison'
 
 namespace :delius_etl do
@@ -56,5 +56,5 @@ def max_requests_count(prison)
 end
 
 def load_delius_records(file)
-  Delius::Extractor.new(file).fetch_records
+  Delius::ManualExtractor.new(file).fetch_records
 end

@@ -1,7 +1,7 @@
 require 'rails_helper'
-require 'delius/extractor.rb'
+require 'delius/manual_extractor.rb'
 
-describe Delius::Extractor do
+describe Delius::ManualExtractor do
   it 'parses an excel spreadsheet to extract hashes' do
     filename = 'spec/fixtures/delius/delius_sample.csv'
     e = described_class.new(filename)
