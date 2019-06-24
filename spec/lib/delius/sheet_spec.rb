@@ -1,7 +1,7 @@
 require 'rails_helper'
-require 'delius/parser'
+require 'delius/sheet'
 
-describe Delius::Parser do
+describe Delius::Sheet do
   it 'parses an excel spreadsheet get get lookup ids' do
     filename = 'spec/fixtures/delius/delius_sample.xlsx'
     zip_file = Zip::File.open(filename)
