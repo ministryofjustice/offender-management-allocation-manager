@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_16_112018) do
+ActiveRecord::Schema.define(version: 2019_06_24_130035) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -72,6 +72,29 @@ ActiveRecord::Schema.define(version: 2019_05_16_112018) do
     t.index ["nomis_offender_id"], name: "index_case_information_on_nomis_offender_id"
   end
 
+  create_table "delius_data", force: :cascade do |t|
+    t.string "crn"
+    t.string "pnc_no"
+    t.string "noms_no"
+    t.string "fullname"
+    t.string "tier"
+    t.string "roh_cds"
+    t.string "offender_manager"
+    t.string "org_private_ind"
+    t.string "org"
+    t.string "provider"
+    t.string "provider_code"
+    t.string "ldu"
+    t.string "ldu_code"
+    t.string "team"
+    t.string "team_code"
+    t.string "mappa"
+    t.string "mappa_levels"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["noms_no"], name: "index_delius_data_on_noms_no", unique: true
+  end
+
   create_table "flipflop_features", force: :cascade do |t|
     t.string "key", null: false
     t.boolean "enabled", default: false, null: false
@@ -94,6 +117,15 @@ ActiveRecord::Schema.define(version: 2019_05_16_112018) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["nomis_staff_id"], name: "index_pom_details_on_nomis_staff_id"
+  end
+
+  create_table "tier_changes", force: :cascade do |t|
+    t.string "noms_no"
+    t.string "old_tier"
+    t.string "new_tier"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["noms_no"], name: "index_tier_changes_on_noms_no"
   end
 
   create_table "versions", force: :cascade do |t|
