@@ -47,7 +47,7 @@ RSpec.describe AllocationVersion, type: :model do
   describe 'when an offender moves prison', versioning: true, vcr: { cassette_name: :allocation_version_deallocate_offender }  do
     it 'removes the primary pom details in an Offender\'s allocation' do
       nomis_offender_id = 'G2911GD'
-      movement_type = 'ADM'
+      movement_type = AllocationVersion::OFFENDER_TRANSFERRED
       params = {
         nomis_offender_id: nomis_offender_id,
         prison: 'LEI',

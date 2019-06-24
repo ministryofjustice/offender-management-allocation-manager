@@ -78,7 +78,7 @@ class AllocationVersion < ApplicationRecord
     alloc.secondary_pom_nomis_id = nil
     alloc.secondary_pom_name = nil
     alloc.event = DEALLOCATE_PRIMARY_POM
-    alloc.event_trigger = offender_movement_type(movement_type)
+    alloc.event_trigger = movement_type
 
     alloc.save!
   end
@@ -93,10 +93,6 @@ class AllocationVersion < ApplicationRecord
         event: DEALLOCATE_PRIMARY_POM,
         event_trigger: USER
       )
-  end
-
-  def self.offender_movement_type(movement_type)
-    movement_type == 'ADM' ? OFFENDER_TRANSFERRED : OFFENDER_RELEASED
   end
 
   validates :nomis_offender_id,
