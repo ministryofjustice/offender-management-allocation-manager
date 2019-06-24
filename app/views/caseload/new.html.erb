@@ -22,8 +22,8 @@
     </tr>
     </thead>
     <tbody class="govuk-table__body">
-    <% @new_cases.each do |allocation, sentence| %>
-      <tr class="govuk-table__row">
+    <% @new_cases.each_with_index do |(allocation, sentence), i| %>
+      <tr class="govuk-table__row offender_row_<%= i %>">
         <td aria-label="Prisoner name" class="govuk-table__cell "><%= sentence.full_name %></td>
         <td aria-label="Prisoner number" class="govuk-table__cell "><%= allocation.nomis_offender_id %></td>
         <td aria-label="Arrival date" class="govuk-table__cell "><%= format_date(sentence.sentence_start_date) %></td>
