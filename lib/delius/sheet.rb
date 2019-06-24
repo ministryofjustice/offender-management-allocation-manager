@@ -3,7 +3,7 @@
 require 'nokogiri'
 
 module Delius
-  class Parser < Nokogiri::XML::SAX::Document
+  class Sheet < Nokogiri::XML::SAX::Document
     def initialize(&block)
       @handler = block
       @current_row = []
