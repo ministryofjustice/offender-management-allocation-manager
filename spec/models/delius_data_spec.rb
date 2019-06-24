@@ -28,21 +28,3 @@ RSpec.describe DeliusData, type: :model do
     expect(TierChange.count).to eq(1)
   end
 end
-
-# t.string "crn"
-# t.string "pnc_no"
-# t.string "noms_no"
-# t.string "fullname"
-# t.string "tier"
-# t.string "roh_cds"
-# t.string "offender_manager"
-# t.string "org_private_ind"
-# t.string "org"
-# t.string "provider"
-# t.string "provider_code"
-# t.string "ldu"
-# t.string "ldu_code"
-# t.string "team"
-# t.string "team_code"
-# t.string "mappa"
-# t.string "mappa_levels"
