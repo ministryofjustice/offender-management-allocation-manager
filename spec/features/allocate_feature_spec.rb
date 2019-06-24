@@ -211,7 +211,7 @@ feature 'Allocation' do
                       updated_at: Time.zone.now - 1.day)
 
     allocation.update(event: AllocationVersion::DEALLOCATE_PRIMARY_POM,
-                      event_trigger: AllocationVersion::OFFENDER_MOVEMENT,
+                      event_trigger: AllocationVersion::OFFENDER_TRANSFERRED,
                       primary_pom_nomis_id: nil,
                       primary_pom_name: nil,
                       updated_at: Time.zone.now - 1.day,
