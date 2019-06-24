@@ -13,7 +13,8 @@ class AllocationVersion < ApplicationRecord
   DEALLOCATE_SECONDARY_POM = 5
 
   USER = 0
-  OFFENDER_MOVEMENT = 1
+  OFFENDER_TRANSFERRED = 1
+  OFFENDER_RELEASED = 2
 
   # When adding a new 'event' or 'event trigger'
   # make sure the constant it points to
@@ -31,7 +32,8 @@ class AllocationVersion < ApplicationRecord
   # 'Event triggers' capture the subject or action that triggered the event
   enum event_trigger: {
     user: USER,
-    offender_movement: OFFENDER_MOVEMENT
+    offender_transferred: OFFENDER_TRANSFERRED,
+    offender_released: OFFENDER_RELEASED
   }
 
   scope :allocations, lambda { |nomis_offender_ids|
@@ -63,7 +65,7 @@ class AllocationVersion < ApplicationRecord
   end
 
   # rubocop:disable Metrics/MethodLength
-  def self.deallocate_offender(nomis_offender_id)
+  def self.deallocate_offender(nomis_offender_id, movement_type)
     alloc = AllocationVersion.find_by(
       nomis_offender_id: nomis_offender_id
     )
@@ -76,7 +78,7 @@ class AllocationVersion < ApplicationRecord
     alloc.secondary_pom_nomis_id = nil
     alloc.secondary_pom_name = nil
     alloc.event = DEALLOCATE_PRIMARY_POM
-    alloc.event_trigger = OFFENDER_MOVEMENT
+    alloc.event_trigger = offender_movement_type(movement_type)
 
     alloc.save!
   end
@@ -91,6 +93,10 @@ class AllocationVersion < ApplicationRecord
         event: DEALLOCATE_PRIMARY_POM,
         event_trigger: USER
       )
+  end
+
+  def self.offender_movement_type(movement_type)
+    movement_type == 'ADM' ? OFFENDER_TRANSFERRED : OFFENDER_RELEASED
   end
 
   validates :nomis_offender_id,
