@@ -4,6 +4,9 @@ require 'nokogiri'
 
 module Delius
   class Sheet < Nokogiri::XML::SAX::Document
+    DATA_CELL = 'v'
+    ROW = 'row'
+
     def initialize(&block)
       @handler = block
       @current_row = []
@@ -11,7 +14,7 @@ module Delius
     end
 
     def start_element(name, _attrs = [])
-      @in_value = name == 'v'
+      @in_value = name == DATA_CELL
     end
 
     def characters(str)
@@ -19,7 +22,7 @@ module Delius
     end
 
     def end_element(name)
-      return unless name == 'row'
+      return unless name == ROW
 
       row = @current_row.map { |cell|
         cell.dup.strip.to_i
