@@ -129,8 +129,15 @@ feature 'Allocation' do
     visit summary_allocated_path
 
     within('.allocated_offender_row_0') do
-      click_link 'Reallocate'
+      click_link 'View'
     end
+
+    expect(page).to have_current_path allocation_path(nomis_offender_id)
+    expect(page).to have_link(nil, href: '/poms/485636')
+    expect(page).to have_css('.table_cell__left_align', text: 'Duckett, Jenny')
+    expect(page).to have_css('.table_cell__left_align', text: 'Supporting')
+
+    click_link 'Reallocate'
 
     expect(page).to have_current_path edit_allocation_path(nomis_offender_id)
     expect(page).to have_css('.current_pom_full_name', text: 'Duckett, Jenny')
