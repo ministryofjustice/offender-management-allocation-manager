@@ -14,3 +14,13 @@
 # ActiveSupport::Inflector.inflections(:en) do |inflect|
 #   inflect.acronym 'RESTful'
 # end
+
+# encoding: utf-8
+
+module ActiveSupport
+  module Inflector
+    def titleize(word, _keep_id_suffix = false)
+      word.split(/\b/).map(&:capitalize).join
+    end
+  end
+end
