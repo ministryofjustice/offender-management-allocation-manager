@@ -13,8 +13,34 @@ namespace :delius_import do
     Rails.logger.error('No file specified') if args[:file].blank?
     next if args[:file].blank?
 
+    total = 0
     processor = Delius::Processor.new(args[:file])
     processor.run { |row|
+      record = {}
+
+      row.each_with_index do |val, idx|
+        key = fields[idx]
+        record[key] = val
+      end
+      record[:tier] = record[:tier].present? ? record[:tier][0] : ''
+
+      if record[:noms_no].present?
+        DeliusData.upsert(record)
+        print "\r#{total}"
+        $stdout.flush
+        total += 1
+      end
     }
+  end
+
+  def fields
+    @fields ||= [
+      :crn, :pnc_no, :noms_no, :fullname, :tier, :roh_cds,
+      :offender_manager, :org_private_ind, :org,
+      :provider, :provider_code,
+      :ldu, :ldu_code,
+      :team, :team_code,
+      :mappa, :mappa_levels
+    ]
   end
 end
