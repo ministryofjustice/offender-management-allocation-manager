@@ -156,6 +156,15 @@ jobs:
           key: allocation-manager-v1-{{ checksum "Gemfile.lock" }}
           paths:
             - ~/repo/vendor/bundle
+      - run:
+          name: Build the tool for decrypting office files
+          command: |
+            cd /tmp
+            git clone https://github.com/herumi/cybozulib
+            git clone https://github.com/herumi/msoffice
+            cd msoffice
+            make -j RELEASE=1
+            mv /tmp/msoffice/bin/msoffice-crypt.exe ~/repo/bin/msoffice-crypt
       - persist_to_workspace:
           root: .
           paths:
