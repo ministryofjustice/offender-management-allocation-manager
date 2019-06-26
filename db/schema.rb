@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_24_130035) do
+ActiveRecord::Schema.define(version: 2019_06_26_063100) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -92,7 +92,7 @@ ActiveRecord::Schema.define(version: 2019_06_24_130035) do
     t.string "mappa_levels"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["noms_no"], name: "index_delius_data_on_noms_no", unique: true
+    t.index ["crn"], name: "index_delius_data_on_crn", unique: true
   end
 
   create_table "flipflop_features", force: :cascade do |t|
@@ -125,6 +125,7 @@ ActiveRecord::Schema.define(version: 2019_06_24_130035) do
     t.string "new_tier"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "crn"
     t.index ["noms_no"], name: "index_tier_changes_on_noms_no"
   end
 
