@@ -56,6 +56,7 @@ RUN \
   && yarn add govuk-frontend
 
 COPY Gemfile Gemfile.lock package.json ./
+COPY bin/msoffice-crypt ./bin/msoffice-crypt
 
 RUN bundle install --without development test --jobs 2 --retry 3
 
