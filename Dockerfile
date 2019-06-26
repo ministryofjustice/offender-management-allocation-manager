@@ -56,11 +56,20 @@ RUN \
   && yarn add govuk-frontend
 
 COPY Gemfile Gemfile.lock package.json ./
-COPY bin/msoffice-crypt ./bin/msoffice-crypt
 
 RUN bundle install --without development test --jobs 2 --retry 3
 
 COPY . /app
+
+RUN \
+  mkdir ./build \
+  && cd ./build \
+  && git clone https://github.com/herumi/cybozulib \
+  && git clone https://github.com/herumi/msoffice \
+  && cd msoffice \
+  && make -j RELEASE=1 \
+  && mv ./bin/msoffice-crypt.exe ../../bin/msoffice-crypt
+
 
 RUN mkdir -p /home/appuser && \
   useradd appuser -u 1001 --user-group --home /home/appuser && \
