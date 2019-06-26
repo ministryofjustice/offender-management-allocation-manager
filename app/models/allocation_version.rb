@@ -85,14 +85,15 @@ class AllocationVersion < ApplicationRecord
   # rubocop:enable Metrics/MethodLength
 
   def self.deallocate_primary_pom(nomis_staff_id)
-    all_primary_pom_allocations(nomis_staff_id).
-      update_all(
-        primary_pom_nomis_id: nil,
-        primary_pom_name: nil,
-        primary_pom_allocated_at: nil,
-        event: DEALLOCATE_PRIMARY_POM,
-        event_trigger: USER
-      )
+    all_primary_pom_allocations(nomis_staff_id).each do |alloc|
+      alloc.primary_pom_nomis_id = nil
+      alloc.primary_pom_name = nil
+      alloc.primary_pom_allocated_at = nil
+      alloc.event = DEALLOCATE_PRIMARY_POM
+      alloc.event_trigger = USER
+
+      alloc.save!
+    end
   end
 
   validates :nomis_offender_id,
