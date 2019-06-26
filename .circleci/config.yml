@@ -165,7 +165,6 @@ jobs:
             cd msoffice
             make -j RELEASE=1
             mv /tmp/msoffice/bin/msoffice-crypt.exe ~/repo/bin/msoffice-crypt
-            ls bin
       - persist_to_workspace:
           root: .
           paths:
@@ -235,6 +234,7 @@ jobs:
           at: ~/repo
       - setup_remote_docker:
           docker_layer_caching: true
+      - *install_aws_cli
       - *build_docker_image
       - *push_docker_image
 
