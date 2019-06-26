@@ -11,6 +11,7 @@ module Nomis
       attribute :imprisonment_status, :string
 
       # Custom attributes
+      attribute :crn, :string
       attribute :category_code, :string
       attribute :allocated_pom_name, :string
       attribute :case_allocation, :string

@@ -14,10 +14,8 @@
         <h3 class="govuk-heading-m"><%= @prisoner.offender_no %></h3>
       </div>
       <div class="govuk-grid-column-one-third">
-      <!-- PENDING DATA
         <span class="govuk-body">CRN number</span>
-        <h3 class="govuk-heading-m">N/A</h3>
-      -->
+        <h3 class="govuk-heading-m"><%= @prisoner.crn || "N/A" %></h3>
       </div>
       <div class="govuk-grid-column-one-third">
         <span class="govuk-body">Date of birth</span>
