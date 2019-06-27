@@ -21,7 +21,7 @@ namespace :delius_info do
     seen_noms_nos = {}
 
     processor = Delius::Processor.new(args[:file])
-    processor.run { |row|
+    processor.run do |row|
       record = {}
 
       row.each_with_index do |val, idx|
@@ -44,7 +44,7 @@ namespace :delius_info do
       end
 
       total_rows += 1
-    }
+    end
 
     puts "Total number of rows: #{total_rows}"
     puts "Number missing a tier: #{total_missing_tier}"
