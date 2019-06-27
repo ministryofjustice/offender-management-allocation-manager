@@ -8,6 +8,7 @@ Rails.application.routes.draw do
 
   get '/help', to: 'pages#help'
   get '/contact', to: 'pages#contact'
+  post '/contact', to: 'pages#create_contact'
 
   get '/auth/:provider/callback', to: 'sessions#create'
   get '/signout', to: 'sessions#destroy'
