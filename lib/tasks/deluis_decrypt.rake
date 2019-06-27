@@ -27,4 +27,3 @@ end
 def password
   @password ||= ENV['DELIUS_XLSX_PASSWORD']
 end
-
