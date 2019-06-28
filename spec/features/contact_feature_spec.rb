@@ -7,7 +7,7 @@ feature 'get contact' do
     visit '/contact'
 
     expect(page).to have_css('.govuk-label', text: 'You can use this form to ask a question, report a problem or suggest an improvement.')
-    expect(page).to have_css('#more-detail-hint', text: "Do not include sensitive information, such as a prisoners name or date of birth.")
+    expect(page).to have_css('#more-detail-hint', text: "Do not include sensitive information, such as a prisoner's name or date of birth.")
     expect(page).to have_css('.govuk-textarea')
     expect(page).to have_button('Submit')
   end
