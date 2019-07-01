@@ -73,8 +73,6 @@ class AllocationsController < ApplicationController
     offender = offender(allocation_params[:nomis_offender_id])
     allocation = allocation_attributes(offender)
 
-    @override = override
-
     if AllocationService.create_or_update(allocation)
       flash[:notice] =
         "#{offender.full_name_ordered} has been allocated to #{pom.full_name_ordered} (#{pom.grade})"
@@ -100,6 +98,7 @@ private
   end
 
   def allocation_attributes(offender)
+    @override = override
     {
       primary_pom_nomis_id: allocation_params[:nomis_staff_id].to_i,
       nomis_offender_id: allocation_params[:nomis_offender_id],
