@@ -72,4 +72,22 @@ describe Nomis::Client do
       expect { client.get(route) }.to raise_error(Nomis::Client::APIError)
     end
   end
+
+  describe 'when the server is unreachable' do
+    let(:error) do
+      Faraday::ConnectionFailed.new('cannot connect')
+    end
+    let(:route)        { "/" }
+
+    before do
+      WebMock.stub_request(:get, /\w/).to_raise(error)
+    end
+
+    it 'raises an APIError', :raven_intercept_exception do
+      broken_client = described_class.new('nosuchhost')
+
+      expect { broken_client.get(route) }.
+        to raise_error(Nomis::Client::APIError, 'Failed to connect to nosuchhost')
+    end
+  end
 end
