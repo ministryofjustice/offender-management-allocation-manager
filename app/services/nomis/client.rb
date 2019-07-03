@@ -73,6 +73,9 @@ module Nomis
         req.params.update(queryparams)
         req.body = body.to_json if body.present? && method == :post
       end
+    rescue Faraday::ConnectionFailed => e
+      AllocationManager::ExceptionHandler.capture_exception(e)
+      raise APIError, "Failed to connect to #{@root}"
     rescue Faraday::ResourceNotFound, Faraday::ClientError => e
       AllocationManager::ExceptionHandler.capture_exception(e)
       raise APIError, "Unexpected status #{e.response[:status]}"
