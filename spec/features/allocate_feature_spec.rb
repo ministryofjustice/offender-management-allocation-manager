@@ -248,7 +248,7 @@ feature 'Allocation' do
     expect(page).to have_css('.govuk-heading-s', text: "Prisoner unallocated")
     expect(page).to have_css('.time', text: deallocate_date.to_s)
 
-    previous_formatted_date = history[2].updated_at.strftime("#{history[3].updated_at.day.ordinalize} %B %Y")
+    previous_formatted_date = history[3].updated_at.strftime("#{history[3].updated_at.day.ordinalize} %B %Y")
 
     expect(page).to have_css('p', text: "Prisoner reallocated to #{history[3].primary_pom_name} Tier: #{history[3].allocated_at_tier}")
     expect(page).to have_css('.time', text: "#{previous_formatted_date} by #{history[3].created_by_name.titleize}")
