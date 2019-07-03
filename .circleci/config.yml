@@ -104,8 +104,8 @@ references:
   restore_cache: &restore_cache
     restore_cache:
       keys:
-        - integration-tests-v1-{{ checksum "Gemfile.lock" }}
-        - integration-tests-v1-
+        - integration-tests-v2-{{ checksum "Gemfile.lock" }}
+        - integration-tests-v2-
 
   install_gems: &install_gems
     run:
@@ -117,7 +117,7 @@ references:
 
   save_cache: &save_cache
     save_cache:
-      key: integration-tests-v1-{{ checksum "Gemfile.lock" }}
+      key: integration-tests-v2-{{ checksum "Gemfile.lock" }}
       paths:
         - ~/staging/vendor/bundle
 
@@ -143,8 +143,8 @@ jobs:
           command: bundle -v
       - restore_cache:
           keys:
-            - allocation-manager-v1-{{ checksum "Gemfile.lock" }}
-            - allocation-manager-v1-
+            - allocation-manager-v2-{{ checksum "Gemfile.lock" }}
+            - allocation-manager-v2-
       - run:
           name: Update npm
           command: 'sudo npm install -g npm@latest'
@@ -153,7 +153,7 @@ jobs:
           command: npm install
       - run: bundle check --path vendor/bundle || bundle install --path vendor/bundle
       - save_cache:
-          key: allocation-manager-v1-{{ checksum "Gemfile.lock" }}
+          key: allocation-manager-v2-{{ checksum "Gemfile.lock" }}
           paths:
             - ~/repo/vendor/bundle
       - persist_to_workspace:
