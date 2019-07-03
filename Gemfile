@@ -28,7 +28,7 @@ gem 'redis'
 gem 'plissken'
 gem 'fast_underscore', require: false
 gem 'flipflop'
-gem 'roo'
+gem 'hashdiff', ['>= 1.0.0.beta1', '< 2.0.0']
 
 group :development, :test do
   gem 'brakeman'
