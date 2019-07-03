@@ -46,12 +46,6 @@ private
     AllocationVersion.deallocate_offender(transfer.offender_no,
                                           AllocationVersion::OFFENDER_TRANSFERRED)
 
-    CaseInformationService.change_prison(
-      transfer.offender_no,
-      transfer.from_agency,
-      transfer.to_agency
-    )
-
     true
   end
 

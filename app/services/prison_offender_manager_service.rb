@@ -71,7 +71,7 @@ class PrisonOffenderManagerService
     # object for each allocation. This will allow us to calculate the
     # pom responsibility without having to make an API request per-offender.
     offender_map = OffenderService.get_sentence_details(booking_ids)
-    case_info = CaseInformationService.get_case_info_for_offenders(offender_ids, prison)
+    case_info = CaseInformationService.get_case_info_for_offenders(offender_ids)
 
     allocation_list_with_responsibility = allocation_list.map { |alloc|
       offender_stub = Nomis::Models::Offender.new

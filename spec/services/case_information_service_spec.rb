@@ -6,45 +6,31 @@ describe CaseInformationService, vcr: { cassette_name: :caseinfo_service_spec } 
       nomis_offender_id: 'X1000XX',
       tier: 'A',
       case_allocation: 'NPS',
-      omicable: 'Yes',
-      prison: 'LEI'
+      omicable: 'Yes'
     )
   }
 
   it "can get case information" do
-    cases = CaseInformationService.get_case_information(caseinfo.prison)
+    cases = CaseInformationService.get_case_information([caseinfo.nomis_offender_id])
     expect(cases).to be_kind_of(Hash)
     expect(cases.length).to eq(1)
     expect(cases[caseinfo.nomis_offender_id]).to be_kind_of(CaseInformation)
   end
 
   it "can get case information for multiple offenders at once" do
-    cases = CaseInformationService.get_case_info_for_offenders(['X1000XX'], caseinfo.prison)
+    cases = CaseInformationService.get_case_info_for_offenders([caseinfo.nomis_offender_id])
     expect(cases).to be_kind_of(Hash)
     expect(cases.length).to eq(1)
     expect(cases[caseinfo.nomis_offender_id]).to be_kind_of(CaseInformation)
   end
 
   it "can delete case information" do
-    cases = CaseInformationService.get_case_information(caseinfo.prison)
+    cases = CaseInformationService.get_case_information([caseinfo.nomis_offender_id])
     expect(cases.length).to eq(1)
 
-    CaseInformationService.delete_information(caseinfo.nomis_offender_id)
+    CaseInformationService.delete_information(['X1000XX'])
 
-    cases = CaseInformationService.get_case_information(caseinfo.prison)
+    cases = CaseInformationService.get_case_information(['X1000XX'])
     expect(cases.length).to eq(0)
-  end
-
-  it "can change prisons for case information" do
-    cases = CaseInformationService.get_case_information(caseinfo.prison)
-    expect(cases.length).to eq(1)
-
-    CaseInformationService.change_prison(caseinfo.nomis_offender_id, 'LEI', 'SWI')
-
-    cases = CaseInformationService.get_case_information('LEI')
-    expect(cases.length).to eq(0)
-
-    cases = CaseInformationService.get_case_information('SWI')
-    expect(cases.length).to eq(1)
   end
 end

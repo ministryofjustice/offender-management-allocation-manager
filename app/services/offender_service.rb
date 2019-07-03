@@ -25,9 +25,8 @@ class OffenderService
 
   # rubocop:enable Metrics/MethodLength
 
-  # rubocop:disable Metrics/CyclomaticComplexity
   # rubocop:disable Metrics/MethodLength
-  def self.get_offenders_for_prison(prison, page_number: 0, page_size: 10, tier_map: nil)
+  def self.get_offenders_for_prison(prison, page_number: 0, page_size: 10)
     offenders = Nomis::Elite2::OffenderApi.list(
       prison,
       page_number,
@@ -37,7 +36,8 @@ class OffenderService
     booking_ids = offenders.map(&:booking_id)
     sentence_details = Nomis::Elite2::OffenderApi.get_bulk_sentence_details(booking_ids)
 
-    mapped_tiers = tier_map || CaseInformationService.get_case_information(prison)
+    nomis_ids = offenders.map(&:offender_no)
+    mapped_tiers = CaseInformationService.get_case_information(nomis_ids)
 
     offenders.select { |offender|
       next false if offender.age < 18
@@ -58,9 +58,7 @@ class OffenderService
       true
     }
   end
-
   # rubocop:enable Metrics/MethodLength
-  # rubocop:enable Metrics/CyclomaticComplexity
 
   def self.get_sentence_details(booking_ids)
     Nomis::Elite2::OffenderApi.get_bulk_sentence_details(booking_ids)
