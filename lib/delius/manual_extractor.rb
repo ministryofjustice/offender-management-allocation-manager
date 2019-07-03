@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'csv'
+
 module Delius
   class ManualExtractor
     # rubocop:disable Metrics/LineLength
