@@ -106,7 +106,7 @@ GEM
     govuk_notify_rails (2.1.0)
       notifications-ruby-client (>= 2.9.0)
       rails (>= 4.1.0)
-    hashdiff (0.4.0)
+    hashdiff (1.0.0.beta1)
     hashie (3.6.0)
     i18n (1.6.0)
       concurrent-ruby (~> 1.0)
@@ -217,9 +217,6 @@ GEM
     regexp_parser (1.5.1)
     request_store (1.4.1)
       rack (>= 1.4)
-    roo (2.8.2)
-      nokogiri (~> 1)
-      rubyzip (>= 1.2.1, < 2.0.0)
     rspec-core (3.8.0)
       rspec-support (~> 3.8.0)
     rspec-expectations (3.8.3)
@@ -355,6 +352,7 @@ DEPENDENCIES
   flamegraph
   flipflop
   govuk_notify_rails
+  hashdiff (>= 1.0.0.beta1, < 2.0.0)
   jbuilder (~> 2.9)
   jwt
   launchy
@@ -372,7 +370,6 @@ DEPENDENCIES
   rack-mini-profiler
   rails (~> 5.2.3)
   redis
-  roo
   rspec-rails
   rubocop
   rubocop-performance
