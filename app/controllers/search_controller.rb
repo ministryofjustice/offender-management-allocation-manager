@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class SearchController < PrisonsApplicationController
-
   breadcrumb 'Search', -> { prison_search_path(active_prison) }, only: [:search]
 
   PAGE_SIZE = 10

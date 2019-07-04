@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class PomsController < PrisonsApplicationController
-
   breadcrumb 'Prison Offender Managers',
              -> { prison_poms_path(active_prison) }, only: [:index, :show]
   breadcrumb -> { pom.full_name },

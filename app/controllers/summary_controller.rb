@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class SummaryController < PrisonsApplicationController
-
   breadcrumb 'See allocations',
              -> { prison_summary_allocated_path(active_prison) },
              only: [:index, :allocated]

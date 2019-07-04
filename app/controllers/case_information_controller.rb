@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class CaseInformationController < PrisonsApplicationController
-
   def new
     @case_info = CaseInformation.new(
       nomis_offender_id: nomis_offender_id_from_url,
@@ -20,7 +19,6 @@ class CaseInformationController < PrisonsApplicationController
     @prisoner = prisoner(nomis_offender_id_from_url)
   end
 
-  # rubocop:disable Metrics/MethodLength
   def create
     @case_info = CaseInformation.create(
       nomis_offender_id: case_information_params[:nomis_offender_id],
@@ -35,7 +33,6 @@ class CaseInformationController < PrisonsApplicationController
     @prisoner = prisoner(case_information_params[:nomis_offender_id])
     render :new
   end
-  # rubocop:enable Metrics/MethodLength
 
   def update
     case_info = CaseInformation.find_by(

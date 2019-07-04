@@ -1,5 +1,4 @@
 class PrisonsApplicationController < ApplicationController
-
   before_action :authenticate_user, :check_prison_access
 
 protected

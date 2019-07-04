@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class PrisonersController < PrisonsApplicationController
-
   breadcrumb 'Your caseload',
              -> { prison_caseload_index_path(active_prison) }, only: [:show]
   breadcrumb -> { offender.full_name },
