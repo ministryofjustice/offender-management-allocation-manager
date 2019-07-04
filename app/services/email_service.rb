@@ -31,7 +31,7 @@ class EmailService
 private
 
   def url
-    @url ||= Rails.application.routes.url_helpers.caseload_index_url
+    @url ||= Rails.application.routes.url_helpers.prison_caseload_index_url(@allocation.prison)
   end
 
   def current_responsibility

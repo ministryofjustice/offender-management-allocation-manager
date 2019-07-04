@@ -3,30 +3,36 @@
 class SummaryController < ApplicationController
   before_action :authenticate_user
 
-  breadcrumb 'See allocations', :summary_allocated_path, only: [:index, :allocated]
-  breadcrumb 'Make allocations', :summary_unallocated_path, only: [:unallocated]
-  breadcrumb 'Update information', :summary_pending_path, only: [:pending]
+  breadcrumb 'See allocations', -> { prison_summary_allocated_path(active_prison) }, only: [:index, :allocated]
+  breadcrumb 'Make allocations', -> { prison_summary_unallocated_path(active_prison) }, only: [:unallocated]
+  breadcrumb 'Update information', -> { prison_summary_pending_path(active_prison) }, only: [:pending]
 
   def index
-    redirect_to summary_allocated_path
+    redirect_to prison_summary_allocated_path(active_prison)
   end
 
   def allocated
     @summary = create_summary(:allocated)
     @page_meta = @summary.page_meta(page, :allocated)
+    @prison = active_prison
   end
 
   def unallocated
     @summary = create_summary(:unallocated)
     @page_meta = @summary.page_meta(page, :unallocated)
+    @prison = active_prison
   end
 
   def pending
     @summary = create_summary(:pending)
     @page_meta = @summary.page_meta(page, :pending)
+    @prison = active_prison
   end
 
 private
+  def active_prison
+    params[:prison_id]
+  end
 
   def create_summary(summary_type)
     field, direction = sort_params(summary_type)
@@ -37,7 +43,7 @@ private
     )
 
     SummaryService.new.summary(
-      summary_type, active_caseload, page, params
+      summary_type, active_prison, page, params
     )
   end
 

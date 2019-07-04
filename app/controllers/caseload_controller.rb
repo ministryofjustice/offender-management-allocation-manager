@@ -4,11 +4,9 @@ class CaseloadController < ApplicationController
   before_action :authenticate_user
   before_action :ensure_pom
 
-  breadcrumb 'Your caseload', :caseload_index_path, only: [:new]
-  breadcrumb -> { 'Your caseload' },
-             -> { caseload_index_path }, only: [:index]
+  breadcrumb -> { 'Your caseload' }, -> { prison_caseload_index_path(active_prison) }
   breadcrumb -> { 'New cases' },
-             -> { new_caseload_path }, only: [:new]
+             -> { new_prison_caseload_path(active_prison) }, only: [:new]
 
   PAGE_SIZE = 10
 
@@ -16,29 +14,34 @@ class CaseloadController < ApplicationController
     return if pom.blank?
 
     @allocations = PrisonOffenderManagerService.get_allocated_offenders(
-      pom.staff_id, active_caseload,
+      pom.staff_id, active_prison,
       offset: offset, limit: PAGE_SIZE
     )
     @new_cases_count = PrisonOffenderManagerService.get_new_cases_count(
-      pom.staff_id, active_caseload
+      pom.staff_id, active_prison
     )
 
     @page_meta = new_page_meta(total_allocations, @allocations.count)
+    @prison = active_prison
   end
 
   def new
     if pom.present?
       @new_cases = PrisonOffenderManagerService.get_new_cases(
-        pom.staff_id, active_caseload
+        pom.staff_id, active_prison
       )
     end
+    @prison = active_prison
   end
 
 private
+  def active_prison
+    params[:prison_id]
+  end
 
   def total_allocations
     @total_allocations ||= PrisonOffenderManagerService.get_allocations_for_primary_pom(
-      pom.staff_id, active_caseload
+      pom.staff_id, active_prison
     ).count
   end
 
@@ -58,7 +61,7 @@ private
 
   def pom
     @pom ||= PrisonOffenderManagerService.
-        get_signed_in_pom_details(current_user, active_caseload)
+        get_signed_in_pom_details(current_user, active_prison)
   end
 
   def page

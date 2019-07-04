@@ -1,9 +1,9 @@
-<%= render :partial => "/shared/backlink", :locals => { :page => new_allocation_path(@prisoner.offender_no) } %>
+<%= render :partial => "/shared/backlink", :locals => { :page => new_prison_allocation_path(@prison, @prisoner.offender_no) } %>
 
 <div class="govuk-grid-row">
 
   <div class="govuk-grid-column-two-thirds">
-    <%= form_tag(allocations_path, id: "confirm_allocation_form") do %>
+    <%= form_tag(prison_allocations_path(@prison), id: "confirm_allocation_form") do %>
       <h1 class="govuk-heading-xl govuk-!-margin-top-4">Confirm allocation</h1>
       <p class="govuk-body">You are allocating <%= "#{@prisoner.first_name} #{@prisoner.last_name}".titleize %> to <%= "#{@pom.first_name} #{@pom.last_name}".titleize %>.</p>
       <% if @pom.emails.empty? %>
@@ -22,7 +22,7 @@
       <%= hidden_field_tag("allocations[event]", @event) %>
       <%= hidden_field_tag("allocations[event_trigger]", @event_trigger) %>
       <%= submit_tag "Complete allocation", role: "button", draggable: "false", class: "govuk-button" %>
-      <a class="govuk-link cancel-button" href="<%= new_allocation_path(@prisoner.offender_no) %>">Cancel</a>
+      <a class="govuk-link cancel-button" href="<%= new_prison_allocation_path(@prison, @prisoner.offender_no) %>">Cancel</a>
     <% end %>
   </div>
 

@@ -1,4 +1,4 @@
-<%= render :partial => "/shared/backlink", :locals => { :page => allocation_path(@prisoner.offender_no) } %>
+<%= render :partial => "/shared/backlink", :locals => { :page => prison_allocation_path(@prison, @prisoner.offender_no) } %>
 
 <h1 class="govuk-heading-l"><%= @prisoner.full_name %></h1>
 

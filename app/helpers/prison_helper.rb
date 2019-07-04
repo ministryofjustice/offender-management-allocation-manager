@@ -8,4 +8,9 @@ module PrisonHelper
   def prison_title(prison)
     PrisonService.name_for(prison)
   end
+
+  def prison_switcher_path(prison, path)
+    paths = path.split('/')[3..].join('/')
+    "/prisons/#{prison}/#{paths}"
+  end
 end

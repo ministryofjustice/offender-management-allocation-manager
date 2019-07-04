@@ -3,32 +3,35 @@
 class PomsController < ApplicationController
   before_action :authenticate_user
 
-  breadcrumb 'Prison Offender Managers', :poms_path, only: [:index, :show]
+  breadcrumb 'Prison Offender Managers', -> { prison_poms_path(active_prison) }, only: [:index, :show]
   breadcrumb -> { pom.full_name },
-             -> {  poms_path(params[:nomis_staff_id]) }, only: [:show]
+             -> { prison_poms_path(active_prison, params[:nomis_staff_id]) }, only: [:show]
 
   def index
-    poms = PrisonOffenderManagerService.get_poms(active_caseload)
+    poms = PrisonOffenderManagerService.get_poms(active_prison)
     @active_poms, @inactive_poms = poms.partition { |pom|
       %w[active unavailable].include? pom.status
     }
+    @prison = active_prison
   end
 
   def show
     @pom = pom
     @allocations = PrisonOffenderManagerService.get_allocated_offenders(
-      @pom.staff_id, active_caseload
+      @pom.staff_id, active_prison
     )
+    @prison = active_prison
   end
 
   def edit
-    @pom = PrisonOffenderManagerService.get_pom(active_caseload, params[:nomis_staff_id])
+    @pom = PrisonOffenderManagerService.get_pom(active_prison, params[:nomis_staff_id])
     @errors = {}
+    @prison = active_prison
   end
 
   # rubocop:disable Metrics/MethodLength
   def update
-    @pom = PrisonOffenderManagerService.get_pom(active_caseload, params[:nomis_staff_id])
+    @pom = PrisonOffenderManagerService.get_pom(active_prison, params[:nomis_staff_id])
 
     pom_detail = PrisonOffenderManagerService.update_pom(
       nomis_staff_id: params[:nomis_staff_id].to_i,
@@ -37,16 +40,20 @@ class PomsController < ApplicationController
     )
 
     if pom_detail.valid?
-      redirect_to pom_path(id: @pom.staff_id)
+      redirect_to prison_pom_path(active_prison, id: @pom.staff_id)
       return
     end
 
     update_record_for_errors(pom_detail)
+    @prison = active_prison
     render :edit
   end
 # rubocop:enable Metrics/MethodLength
 
 private
+  def active_prison
+    params[:prison_id]
+  end
 
   def update_record_for_errors(pom_detail)
     @pom.working_pattern = working_pattern
@@ -61,7 +68,7 @@ private
   end
 
   def pom
-    PrisonOffenderManagerService.get_pom(active_caseload, params[:nomis_staff_id])
+    PrisonOffenderManagerService.get_pom(active_prison, params[:nomis_staff_id])
   end
 
   def edit_pom_params

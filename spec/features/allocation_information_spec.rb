@@ -25,7 +25,7 @@ feature "view an offender's allocation information" do
     it "displays the Key Worker's details" do
       signin_user
 
-      visit allocation_path(nomis_offender_id: nomis_offender_id_with_keyworker)
+      visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_with_keyworker)
 
       expect(page).to have_css('h1', text: 'Allocation information')
 
@@ -48,7 +48,7 @@ feature "view an offender's allocation information" do
     it "displays 'Data not available'" do
       signin_user
 
-      visit allocation_path(nomis_offender_id: nomis_offender_id_without_keyworker)
+      visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_without_keyworker)
 
       expect(page).to have_css('h1', text: 'Allocation information')
 
@@ -70,7 +70,7 @@ feature "view an offender's allocation information" do
     it "displays a link to the prisoner's New Nomis profile" do
       signin_user
 
-      visit allocation_path(nomis_offender_id: nomis_offender_id_with_keyworker)
+      visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_with_keyworker)
 
       expect(page).to have_css('.govuk-table__cell', text: 'View NOMIS profile')
       expect(find_link('View NOMIS profile')[:target]).to eq('_blank')
