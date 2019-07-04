@@ -25,8 +25,6 @@ class SummaryService
     # each type of record.
     @counts = { allocated: 0, unallocated: 0, pending: 0, all: 0 }
 
-    # tier_map = CaseInformationService.get_case_information(prison)
-
     number_of_requests = max_requests_count(prison)
     (0..number_of_requests).each do |request_no|
       offenders = get_page_of_offenders(prison, request_no)
