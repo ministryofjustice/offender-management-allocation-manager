@@ -2,10 +2,8 @@
 
 # rubocop:disable Metrics/LineLength
 # rubocop:disable Metrics/MethodLength
-class AllocationsController < ApplicationController
+class AllocationsController < PrisonsApplicationController
   delegate :update, to: :create
-
-  before_action :authenticate_user
 
   breadcrumb 'Allocated', -> { prison_summary_allocated_path(active_prison) }, only: [:show]
   breadcrumb -> { offender(nomis_offender_id_from_url).full_name },
@@ -20,7 +18,6 @@ class AllocationsController < ApplicationController
     @recommended_pom_type, @not_recommended_pom_type =
       recommended_and_nonrecommended_poms_types_for(@prisoner)
     @unavailable_pom_count = unavailable_pom_count
-    @prison = active_prison
   end
 
   def show
@@ -29,7 +26,6 @@ class AllocationsController < ApplicationController
     @pom = PrisonOffenderManagerService.get_pom(active_prison, primary_pom_nomis_id)
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(active_prison, @prisoner.offender_no)
     @allocation = AllocationVersion.where(nomis_offender_id: @prisoner.offender_no)
-    @prison = active_prison
   end
 
   def edit
@@ -48,7 +44,6 @@ class AllocationsController < ApplicationController
     @unavailable_pom_count = unavailable_pom_count
 
     @current_pom = current_pom_for(nomis_offender_id_from_url)
-    @prison = active_prison
   end
 
   def confirm
@@ -59,7 +54,6 @@ class AllocationsController < ApplicationController
     )
     @event = :allocate_primary_pom
     @event_trigger = :user
-    @prison = active_prison
   end
 
   def confirm_reallocation
@@ -70,7 +64,6 @@ class AllocationsController < ApplicationController
     )
     @event = :reallocate_primary_pom
     @event_trigger = :user
-    @prison = active_prison
   end
 
   # Note #update is delegated to #create
@@ -90,16 +83,11 @@ class AllocationsController < ApplicationController
   end
 
   def history
-    @prison = active_prison
     @prisoner = offender(nomis_offender_id_from_url)
     @history = AllocationService.offender_allocation_history(nomis_offender_id_from_url)
   end
 
 private
-
-  def active_prison
-    params[:prison_id]
-  end
 
   def unavailable_pom_count
     @unavailable_pom_count ||= PrisonOffenderManagerService.unavailable_pom_count(

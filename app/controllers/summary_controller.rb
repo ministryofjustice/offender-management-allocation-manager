@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-class SummaryController < ApplicationController
-  before_action :authenticate_user
+class SummaryController < PrisonsApplicationController
 
   breadcrumb 'See allocations',
              -> { prison_summary_allocated_path(active_prison) },
@@ -18,26 +17,19 @@ class SummaryController < ApplicationController
   def allocated
     @summary = create_summary(:allocated)
     @page_meta = @summary.page_meta(page, :allocated)
-    @prison = active_prison
   end
 
   def unallocated
     @summary = create_summary(:unallocated)
     @page_meta = @summary.page_meta(page, :unallocated)
-    @prison = active_prison
   end
 
   def pending
     @summary = create_summary(:pending)
     @page_meta = @summary.page_meta(page, :pending)
-    @prison = active_prison
   end
 
 private
-
-  def active_prison
-    params[:prison_id]
-  end
 
   def create_summary(summary_type)
     field, direction = sort_params(summary_type)

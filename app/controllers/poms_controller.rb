@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-class PomsController < ApplicationController
-  before_action :authenticate_user
+class PomsController < PrisonsApplicationController
 
   breadcrumb 'Prison Offender Managers',
              -> { prison_poms_path(active_prison) }, only: [:index, :show]
@@ -14,7 +13,6 @@ class PomsController < ApplicationController
     @active_poms, @inactive_poms = poms.partition { |pom|
       %w[active unavailable].include? pom.status
     }
-    @prison = active_prison
   end
 
   def show
@@ -22,13 +20,11 @@ class PomsController < ApplicationController
     @allocations = PrisonOffenderManagerService.get_allocated_offenders(
       @pom.staff_id, active_prison
     )
-    @prison = active_prison
   end
 
   def edit
     @pom = PrisonOffenderManagerService.get_pom(active_prison, params[:nomis_staff_id])
     @errors = {}
-    @prison = active_prison
   end
 
   # rubocop:disable Metrics/MethodLength
@@ -47,16 +43,11 @@ class PomsController < ApplicationController
     end
 
     update_record_for_errors(pom_detail)
-    @prison = active_prison
     render :edit
   end
 # rubocop:enable Metrics/MethodLength
 
 private
-
-  def active_prison
-    params[:prison_id]
-  end
 
   def update_record_for_errors(pom_detail)
     @pom.working_pattern = working_pattern

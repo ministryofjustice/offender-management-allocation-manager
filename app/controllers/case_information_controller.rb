@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-class CaseInformationController < ApplicationController
-  before_action :authenticate_user
+class CaseInformationController < PrisonsApplicationController
 
   def new
     @case_info = CaseInformation.new(
@@ -10,7 +9,6 @@ class CaseInformationController < ApplicationController
     )
 
     @prisoner = prisoner(nomis_offender_id_from_url)
-    @prison = active_prison
   end
 
   def edit
@@ -20,7 +18,6 @@ class CaseInformationController < ApplicationController
     )
 
     @prisoner = prisoner(nomis_offender_id_from_url)
-    @prison = active_prison
   end
 
   # rubocop:disable Metrics/MethodLength
@@ -36,7 +33,6 @@ class CaseInformationController < ApplicationController
     return redirect_to prison_summary_pending_path(active_prison) if @case_info.valid?
 
     @prisoner = prisoner(case_information_params[:nomis_offender_id])
-    @prison = active_prison
     render :new
   end
   # rubocop:enable Metrics/MethodLength
@@ -55,10 +51,6 @@ class CaseInformationController < ApplicationController
   end
 
 private
-
-  def active_prison
-    params[:prison_id]
-  end
 
   def prisoner(nomis_id)
     @prisoner ||= OffenderService.get_offender(nomis_id)

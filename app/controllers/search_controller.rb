@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-class SearchController < ApplicationController
-  before_action :authenticate_user
+class SearchController < PrisonsApplicationController
 
   breadcrumb 'Search', -> { prison_search_path(active_prison) }, only: [:search]
 
@@ -15,14 +14,9 @@ class SearchController < ApplicationController
 
     @offenders = get_slice_for_page(offenders, page)
     @page_meta = create_page_meta(total, @offenders.count)
-    @prison = active_prison
   end
 
 private
-
-  def active_prison
-    params[:prison_id]
-  end
 
   def get_slice_for_page(offenders, page_number)
     start = [(page_number - 1) * PAGE_SIZE, 0].max

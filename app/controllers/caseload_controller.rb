@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-class CaseloadController < ApplicationController
-  before_action :authenticate_user
+class CaseloadController < PrisonsApplicationController
   before_action :ensure_pom
 
   breadcrumb -> { 'Your caseload' }, -> { prison_caseload_index_path(active_prison) }
@@ -22,7 +21,6 @@ class CaseloadController < ApplicationController
     )
 
     @page_meta = new_page_meta(total_allocations, @allocations.count)
-    @prison = active_prison
   end
 
   def new
@@ -31,14 +29,9 @@ class CaseloadController < ApplicationController
         pom.staff_id, active_prison
       )
     end
-    @prison = active_prison
   end
 
 private
-
-  def active_prison
-    params[:prison_id]
-  end
 
   def total_allocations
     @total_allocations ||= PrisonOffenderManagerService.get_allocations_for_primary_pom(

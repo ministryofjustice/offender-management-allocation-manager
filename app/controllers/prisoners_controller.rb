@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-class PrisonersController < ApplicationController
-  before_action :authenticate_user
+class PrisonersController < PrisonsApplicationController
 
   breadcrumb 'Your caseload',
              -> { prison_caseload_index_path(active_prison) }, only: [:show]
@@ -17,7 +16,6 @@ class PrisonersController < ApplicationController
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(
       active_prison, @prisoner.offender_no
     )
-    @prison = active_prison
   end
 
   def image
@@ -28,10 +26,6 @@ class PrisonersController < ApplicationController
   end
 
 private
-
-  def active_prison
-    params[:prison_id]
-  end
 
   def id
     @id ||= params[:id]

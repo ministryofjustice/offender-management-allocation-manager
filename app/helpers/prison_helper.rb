@@ -10,6 +10,7 @@ module PrisonHelper
   end
 
   def prison_switcher_path(prison, path)
+    # remove /prisons/LEI from start of URL (which the split turns into ['', 'prisons', 'LEI'])
     paths = path.split('/')[3..].join('/')
     "/prisons/#{prison}/#{paths}"
   end

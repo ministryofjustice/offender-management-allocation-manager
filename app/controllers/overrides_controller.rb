@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class OverridesController < ApplicationController
+class OverridesController < PrisonsApplicationController
   def new
     @prisoner = OffenderService.get_offender(params.require(:nomis_offender_id))
     @pom = PrisonOffenderManagerService.get_pom(active_prison, params[:nomis_staff_id])
@@ -8,7 +8,6 @@ class OverridesController < ApplicationController
       recommended_and_nonrecommended_poms_types_for(@prisoner)
 
     @override = Override.new
-    @prison = active_prison
   end
 
   # rubocop:disable Metrics/MethodLength
@@ -29,16 +28,11 @@ class OverridesController < ApplicationController
     @recommended_pom_type, @not_recommended_pom_type =
       recommended_and_nonrecommended_poms_types_for(@prisoner)
 
-    @prison = active_prison
     render :new
   end
 # rubocop:enable Metrics/MethodLength
 
 private
-
-  def active_prison
-    params[:prison_id]
-  end
 
   def recommended_and_nonrecommended_poms_types_for(offender)
     rec_type = RecommendationService.recommended_pom_type(offender)
