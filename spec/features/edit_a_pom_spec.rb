@@ -25,7 +25,7 @@ feature "edit a POM's details" do
     expect(page).to have_field('status-conditional-2', checked: true)
   end
 
-  it "validates a POM when missing data", vcr: { cassette_name: :edit_poms_unavailable_check } do
+  it "validates a POM when missing data", vcr: { cassette_name: :edit_poms_missing_check } do
     signin_user
 
     visit edit_pom_path(fulltime_pom_id)
