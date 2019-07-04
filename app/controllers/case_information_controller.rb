@@ -23,6 +23,7 @@ class CaseInformationController < ApplicationController
     @prison = active_prison
   end
 
+  # rubocop:disable Metrics/MethodLength
   def create
     @case_info = CaseInformation.create(
       nomis_offender_id: case_information_params[:nomis_offender_id],
@@ -38,6 +39,7 @@ class CaseInformationController < ApplicationController
     @prison = active_prison
     render :new
   end
+  # rubocop:enable Metrics/MethodLength
 
   def update
     case_info = CaseInformation.find_by(
@@ -53,6 +55,7 @@ class CaseInformationController < ApplicationController
   end
 
 private
+
   def active_prison
     params[:prison_id]
   end

@@ -19,7 +19,10 @@ module SearchHelper
       )
     end
 
-    link_to('Reallocate', new_prison_allocation_path(prison, nomis_offender_id: offender_id))
+    link_to(
+      'Reallocate',
+      new_prison_allocation_path(prison, nomis_offender_id: offender_id)
+    )
   end
   # rubocop:enable Metrics/MethodLength
 end

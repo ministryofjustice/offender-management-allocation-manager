@@ -35,6 +35,7 @@ class CaseloadController < ApplicationController
   end
 
 private
+
   def active_prison
     params[:prison_id]
   end

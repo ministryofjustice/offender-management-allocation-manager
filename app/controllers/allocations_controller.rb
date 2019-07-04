@@ -96,13 +96,14 @@ class AllocationsController < ApplicationController
   end
 
 private
+
   def active_prison
     params[:prison_id]
   end
 
   def unavailable_pom_count
     @unavailable_pom_count ||= PrisonOffenderManagerService.unavailable_pom_count(
-        active_prison
+      active_prison
     )
   end
 
@@ -130,7 +131,7 @@ private
 
   def pom
     @pom ||= PrisonOffenderManagerService.get_pom(
-        active_prison,
+      active_prison,
       allocation_params[:nomis_staff_id]
     )
   end

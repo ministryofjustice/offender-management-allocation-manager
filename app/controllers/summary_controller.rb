@@ -3,9 +3,13 @@
 class SummaryController < ApplicationController
   before_action :authenticate_user
 
-  breadcrumb 'See allocations', -> { prison_summary_allocated_path(active_prison) }, only: [:index, :allocated]
-  breadcrumb 'Make allocations', -> { prison_summary_unallocated_path(active_prison) }, only: [:unallocated]
-  breadcrumb 'Update information', -> { prison_summary_pending_path(active_prison) }, only: [:pending]
+  breadcrumb 'See allocations',
+             -> { prison_summary_allocated_path(active_prison) },
+             only: [:index, :allocated]
+  breadcrumb 'Make allocations',
+             -> { prison_summary_unallocated_path(active_prison) }, only: [:unallocated]
+  breadcrumb 'Update information',
+             -> { prison_summary_pending_path(active_prison) }, only: [:pending]
 
   def index
     redirect_to prison_summary_allocated_path(active_prison)
@@ -30,6 +34,7 @@ class SummaryController < ApplicationController
   end
 
 private
+
   def active_prison
     params[:prison_id]
   end

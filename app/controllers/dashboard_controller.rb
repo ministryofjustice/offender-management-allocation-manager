@@ -11,6 +11,7 @@ class DashboardController < ApplicationController
   end
 
 private
+
   def active_prison
     params[:prison_id]
   end

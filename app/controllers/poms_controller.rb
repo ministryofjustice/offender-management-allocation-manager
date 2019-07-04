@@ -3,9 +3,11 @@
 class PomsController < ApplicationController
   before_action :authenticate_user
 
-  breadcrumb 'Prison Offender Managers', -> { prison_poms_path(active_prison) }, only: [:index, :show]
+  breadcrumb 'Prison Offender Managers',
+             -> { prison_poms_path(active_prison) }, only: [:index, :show]
   breadcrumb -> { pom.full_name },
-             -> { prison_poms_path(active_prison, params[:nomis_staff_id]) }, only: [:show]
+             -> { prison_poms_path(active_prison, params[:nomis_staff_id]) },
+             only: [:show]
 
   def index
     poms = PrisonOffenderManagerService.get_poms(active_prison)
@@ -51,6 +53,7 @@ class PomsController < ApplicationController
 # rubocop:enable Metrics/MethodLength
 
 private
+
   def active_prison
     params[:prison_id]
   end

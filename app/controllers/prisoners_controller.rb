@@ -3,7 +3,8 @@
 class PrisonersController < ApplicationController
   before_action :authenticate_user
 
-  breadcrumb 'Your caseload', -> { prison_caseload_index_path(active_prison) }, only: [:show]
+  breadcrumb 'Your caseload',
+             -> { prison_caseload_index_path(active_prison) }, only: [:show]
   breadcrumb -> { offender.full_name },
              -> { '' }, only: [:show]
 
@@ -14,7 +15,7 @@ class PrisonersController < ApplicationController
       @prisoner
     )
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(
-        active_prison, @prisoner.offender_no
+      active_prison, @prisoner.offender_no
     )
     @prison = active_prison
   end
@@ -27,6 +28,7 @@ class PrisonersController < ApplicationController
   end
 
 private
+
   def active_prison
     params[:prison_id]
   end
