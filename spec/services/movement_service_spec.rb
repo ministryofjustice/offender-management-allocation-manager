@@ -38,16 +38,16 @@ describe MovementService do
   }
 
   it "can get recent movements",
-    vcr: { cassette_name: :movement_service_recent_spec }  do
-    movements = MovementService.movements_on(Date.iso8601('2019-02-20'))
+     vcr: { cassette_name: :movement_service_recent_spec }  do
+    movements = described_class.movements_on(Date.iso8601('2019-02-20'))
     expect(movements).to be_kind_of(Array)
     expect(movements.length).to eq(2)
     expect(movements.first).to be_kind_of(Nomis::Models::Movement)
   end
 
   it "can filter transfer type results",
-    vcr: { cassette_name: :movement_service_filter_type_spec }  do
-    movements = MovementService.movements_on(
+     vcr: { cassette_name: :movement_service_filter_type_spec }  do
+    movements = described_class.movements_on(
       Date.iso8601('2019-02-20'),
       type_filters: [Nomis::Models::MovementType::TRANSFER]
     )
@@ -56,8 +56,8 @@ describe MovementService do
   end
 
   it "can filter admissions",
-    vcr: { cassette_name: :movement_service_filter_adm_spec }  do
-    movements = MovementService.movements_on(
+     vcr: { cassette_name: :movement_service_filter_adm_spec }  do
+    movements = described_class.movements_on(
       Date.iso8601('2019-03-12'),
       type_filters: [Nomis::Models::MovementType::ADMISSION]
     )
@@ -68,8 +68,8 @@ describe MovementService do
   end
 
   it "can filter release type results",
-    vcr: { cassette_name: :movement_service_filter_release_spec }  do
-    movements = MovementService.movements_on(
+     vcr: { cassette_name: :movement_service_filter_release_spec }  do
+    movements = described_class.movements_on(
       Date.iso8601('2019-02-20'),
       type_filters: [Nomis::Models::MovementType::RELEASE]
     )
@@ -80,8 +80,8 @@ describe MovementService do
   end
 
   it "can filter results by direction IN",
-    vcr: { cassette_name: :movement_service_filter_direction_in_spec }  do
-    movements = MovementService.movements_on(
+     vcr: { cassette_name: :movement_service_filter_direction_in_spec }  do
+    movements = described_class.movements_on(
       Date.iso8601('2019-03-12'),
       direction_filters: [Nomis::Models::MovementDirection::IN]
     )
@@ -92,8 +92,8 @@ describe MovementService do
   end
 
   it "can filter results by direction OUT",
-    vcr: { cassette_name: :movement_service_filter_direction_out_spec }  do
-    movements = MovementService.movements_on(
+     vcr: { cassette_name: :movement_service_filter_direction_out_spec }  do
+    movements = described_class.movements_on(
       Date.iso8601('2019-02-20'),
       direction_filters: [Nomis::Models::MovementDirection::OUT]
     )
@@ -104,26 +104,26 @@ describe MovementService do
   end
 
   it "can process transfer movements IN",
-    vcr: { cassette_name: :movement_service_transfer_in_spec }  do
-    processed = MovementService.process_movement(transfer_adm)
+     vcr: { cassette_name: :movement_service_transfer_in_spec }  do
+    processed = described_class.process_movement(transfer_adm)
     expect(processed).to be true
   end
 
   it "can process release movements",
-    vcr: { cassette_name: :movement_service_process_release_spec }  do
-    processed = MovementService.process_movement(release)
+     vcr: { cassette_name: :movement_service_process_release_spec }  do
+    processed = described_class.process_movement(release)
     expect(processed).to be true
   end
 
   it "can ignore movements OUT",
-    vcr: { cassette_name: :movement_service_ignore_out_spec }  do
-    processed = MovementService.process_movement(transfer_out)
+     vcr: { cassette_name: :movement_service_ignore_out_spec }  do
+    processed = described_class.process_movement(transfer_out)
     expect(processed).to be false
   end
 
   it "can ignore new offenders arriving at prison",
-    vcr: { cassette_name: :movement_service_ignore_new_spec }  do
-    processed = MovementService.process_movement(new_offender)
+     vcr: { cassette_name: :movement_service_ignore_new_spec }  do
+    processed = described_class.process_movement(new_offender)
     expect(processed).to be false
   end
 end

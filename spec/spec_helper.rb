@@ -25,19 +25,29 @@ end
 
 require 'vcr'
 
+vcr_record_mode = ENV["VCR"] ? :all : :none
+
 VCR.configure do |config|
   config.cassette_library_dir = "spec/fixtures/vcr_cassettes"
   config.hook_into :webmock
   config.configure_rspec_metadata!
+  config.default_cassette_options = { record: vcr_record_mode }
   config.default_cassette_options = { match_requests_on: [
     :method,
     :query,
     :path,
-    :body
-  ]}
+    :body,
+    :paging_headers
+  ] }
 
-  record_mode = :once #ENV["VCR"] ? ENV["VCR"].to_sym : :new_episodes
-  config.default_cassette_options = { record: record_mode }
+  config.register_request_matcher :paging_headers do |r1, r2|
+    paging_headers = %w[Page-Limit Page-Offset]
+
+    r1.headers.keep_if do |k, _| paging_headers.include?(k) end
+    r2.headers.keep_if do |k, _| paging_headers.include?(k) end
+
+    r1.headers == r2.headers
+  end
 
   config.filter_sensitive_data('authorisation_header') do |interaction|
     interaction.request.headers['Authorization']&.first

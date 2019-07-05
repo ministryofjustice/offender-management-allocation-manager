@@ -2,7 +2,7 @@ require 'rails_helper'
 
 feature 'Switching prisons' do
   it 'Shows the switcher if the user has more than one prison',
-    vcr: { cassette_name: :prison_switching_feature_many_prisons_spec } do
+     vcr: { cassette_name: :prison_switching_feature_many_prisons_spec } do
     signin_user
     visit root_path
 
@@ -10,7 +10,7 @@ feature 'Switching prisons' do
   end
 
   it 'Shows the list of prisons I can switch to',
-    vcr: { cassette_name: :prison_switching_feature_list_spec }do
+     vcr: { cassette_name: :prison_switching_feature_list_spec }do
     signin_user
     visit root_path
 
@@ -21,7 +21,7 @@ feature 'Switching prisons' do
   end
 
   it 'Changes my prison when I choose one',
-    vcr: { cassette_name: :prison_switching_feature_change_prisons_spec }do
+     vcr: { cassette_name: :prison_switching_feature_change_prisons_spec }do
     signin_user
     visit root_path
 
@@ -33,7 +33,7 @@ feature 'Switching prisons' do
   end
 
   it 'Can remember where I was',
-    vcr: { cassette_name: :prison_switching_feature_remember_prison_spec } do
+     vcr: { cassette_name: :prison_switching_feature_remember_prison_spec } do
     signin_user
     visit poms_path
 
@@ -48,7 +48,7 @@ feature 'Switching prisons' do
   end
 
   it 'sends me to the dashboard if no referer',
-    vcr: { cassette_name: :prison_switching_feature_redirect_dash_spec } do
+     vcr: { cassette_name: :prison_switching_feature_redirect_dash_spec } do
     signin_user
     visit prisons_update_path(code: 'PVI')
     expect(page).to have_current_path(root_path)

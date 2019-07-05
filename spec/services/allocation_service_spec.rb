@@ -8,7 +8,7 @@ describe AllocationService do
     allow(EmailService).to receive(:instance).and_return(mock_email_service)
   end
 
-  it 'can create a new record where none exists', vcr: { cassette_name: :allocation_service_create_allocation_version } do
+  it 'can create a new record where none exists', versioning: true, vcr: { cassette_name: :allocation_service_create_allocation_version } do
     params = {
       nomis_offender_id: 'G2911GD',
       prison: 'LEI',

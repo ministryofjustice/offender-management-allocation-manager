@@ -16,13 +16,13 @@ feature "view an offender's allocation information" do
     )
   }
 
-  describe 'Offender has a key worker assigned', vcr: { cassette_name: :show_allocation_information_keyworker_assigned } do
+  describe 'Offender has a key worker assigned' do
     before do
       create_case_information_for(nomis_offender_id_with_keyworker)
       create_allocation(nomis_offender_id_with_keyworker)
     end
 
-    it "displays the Key Worker's details" do
+    it "displays the Key Worker's details", vcr: { cassette_name: :show_allocation_information_keyworker_assigned } do
       signin_user
 
       visit allocation_path(nomis_offender_id: nomis_offender_id_with_keyworker)
@@ -38,14 +38,14 @@ feature "view an offender's allocation information" do
     end
   end
 
-  describe 'Offender does not have a key worker assigned', :raven_intercept_exception,
-           vcr: { cassette_name: :show_allocation_information_keyworker_not_assigned } do
+  describe 'Offender does not have a key worker assigned' do
     before do
       create_case_information_for(nomis_offender_id_without_keyworker)
       create_allocation(nomis_offender_id_without_keyworker)
     end
 
-    it "displays 'Data not available'" do
+    it "displays 'Data not available'", :raven_intercept_exception,
+       vcr: { cassette_name: :show_allocation_information_keyworker_not_assigned } do
       signin_user
 
       visit allocation_path(nomis_offender_id: nomis_offender_id_without_keyworker)
@@ -61,13 +61,13 @@ feature "view an offender's allocation information" do
     end
   end
 
-  describe 'Prisoner profile links', vcr: { cassette_name: :show_allocation_information_new_nomis_profile } do
+  describe 'Prisoner profile links' do
     before do
       create_case_information_for(nomis_offender_id_with_keyworker)
       create_allocation(nomis_offender_id_with_keyworker)
     end
 
-    it "displays a link to the prisoner's New Nomis profile" do
+    it "displays a link to the prisoner's New Nomis profile", vcr: { cassette_name: :show_allocation_information_new_nomis_profile } do
       signin_user
 
       visit allocation_path(nomis_offender_id: nomis_offender_id_with_keyworker)
