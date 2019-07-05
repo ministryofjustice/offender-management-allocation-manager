@@ -5,17 +5,17 @@
   </h2>
   <ul class="govuk-tabs__list" role='tablist'>
       <li class="govuk-tabs__list-item">
-      <a class="govuk-tabs__tab <%= 'govuk-tabs__tab--selected' if active == :allocated %>" href="<%= summary_allocated_path %>">
+      <a class="govuk-tabs__tab <%= 'govuk-tabs__tab--selected' if active == :allocated %>" href="<%= prison_summary_allocated_path(@prison) %>">
           See allocations (<%= @summary.allocated_total %>)
       </a>
       </li>
       <li class="govuk-tabs__list-item">
-      <a class="govuk-tabs__tab <%= 'govuk-tabs__tab--selected' if active == :unallocated %>" href="<%= summary_unallocated_path %>">
+      <a class="govuk-tabs__tab <%= 'govuk-tabs__tab--selected' if active == :unallocated %>" href="<%= prison_summary_unallocated_path(@prison) %>">
           Make allocations (<%= @summary.unallocated_total %>)
       </a>
       </li>
       <li class="govuk-tabs__list-item">
-      <a class="govuk-tabs__tab <%= 'govuk-tabs__tab--selected' if active == :pending %>" href="<%= summary_pending_path %>">
+      <a class="govuk-tabs__tab <%= 'govuk-tabs__tab--selected' if active == :pending %>" href="<%= prison_summary_pending_path(@prison) %>">
           Update information (<%= @summary.pending_total %>)
       </a>
       </li>

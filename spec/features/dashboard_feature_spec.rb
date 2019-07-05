@@ -6,9 +6,11 @@ feature 'get dashboard' do
 
     visit '/'
 
+    expect(page).to have_current_path(prison_dashboard_index_url('LEI'))
+
     expect(page).to have_css('.dashboard-row', count: 3)
-    expect(page).to have_link('See all allocated prisoners', href: summary_allocated_path)
-    expect(page).to have_link('Make new allocations', href: summary_unallocated_path)
-    expect(page).to have_link('Update case information', href: summary_pending_path)
+    expect(page).to have_link('See all allocated prisoners', href: prison_summary_allocated_path('LEI'))
+    expect(page).to have_link('Make new allocations', href: prison_summary_unallocated_path('LEI'))
+    expect(page).to have_link('Update case information', href: prison_summary_pending_path('LEI'))
   end
 end

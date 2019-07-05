@@ -31,21 +31,15 @@ feature 'Switching prisons', vcr: { cassette_name: :prison_switching_feature_spe
 
   it 'Can remember where I was' do
     signin_user
-    visit poms_path
+    visit prison_poms_path('LEI')
 
     expect(page).to have_css('h2', text: 'HMP Leeds')
 
     click_link('Switch prison')
     click_link('HMP Risley')
 
-    expect(page).to have_current_path(poms_path)
+    expect(page).to have_current_path(prison_poms_path('RSI'))
     expect(page).not_to have_content('HMP Leeds')
     expect(page).to have_content('HMP Risley')
-  end
-
-  it 'sends me to the dashboard if no referer' do
-    signin_user
-    visit prisons_update_path(code: 'RIS')
-    expect(page).to have_current_path(root_path)
   end
 end
