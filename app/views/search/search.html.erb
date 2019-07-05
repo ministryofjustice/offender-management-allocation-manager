@@ -33,7 +33,7 @@
         <td aria-label="Tier" class="govuk-table__cell"><%= offender.tier || '-' %></td>
         <td aria-label="POM" class="govuk-table__cell"><%= offender.allocated_pom_name || '-' %></td>
         <td aria-label="Action" class="govuk-table__cell "><%=
-          cta_for_offender(offender)
+          cta_for_offender(@prison, offender)
         %></td>
       </tr>
     <% end %>

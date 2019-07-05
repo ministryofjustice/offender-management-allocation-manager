@@ -1,7 +1,7 @@
 <li class="action_needed">
   <h2 class="govuk-heading-s">Prisoner reallocated</h2>
   <p>Prisoner reallocated to
-    <%= link_to(allocation.primary_pom_name.titleize, pom_path(allocation.primary_pom_nomis_id)) %>
+    <%= link_to(allocation.primary_pom_name.titleize, prison_pom_path(@prison, allocation.primary_pom_nomis_id)) %>
     <br/>
     Tier: <%= allocation.allocated_at_tier %>
   <p class="time"><%= format_date_long(allocation.updated_at) %>

@@ -1,16 +1,14 @@
 # frozen_string_literal: true
 
-class SearchController < ApplicationController
-  before_action :authenticate_user
-
-  breadcrumb 'Search', :search_path, only: [:search]
+class SearchController < PrisonsApplicationController
+  breadcrumb 'Search', -> { prison_search_path(active_prison) }, only: [:search]
 
   PAGE_SIZE = 10
 
   def search
     @q = search_term
 
-    offenders = SearchService.search_for_offenders(@q, active_caseload)
+    offenders = SearchService.search_for_offenders(@q, active_prison)
     total = offenders.count
 
     @offenders = get_slice_for_page(offenders, page)
@@ -28,7 +26,7 @@ private
     # We will only show PAGE_SIZE at a time, so there is no need
     # to get the allocated POM name for offenders, we will just get them
     # for the much smaller slice.
-    OffenderService.set_allocated_pom_name(slice, active_caseload)
+    OffenderService.set_allocated_pom_name(slice, active_prison)
   end
 
   def create_page_meta(total_records, current_view)

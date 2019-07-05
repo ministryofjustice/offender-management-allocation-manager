@@ -10,7 +10,7 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-quarter">
       <div class="govuk-body">New cases</div>
-      <div class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24"><%= link_to "#{@new_cases_count}", new_caseload_path, class:"govuk-link"%></a></div>
+      <div class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24"><%= link_to "#{@new_cases_count}", new_prison_caseload_path(@prison), class:"govuk-link"%></a></div>
     </div>
     <div class="govuk-grid-column-one-quarter">
       <div class="govuk-body">Working pattern</div>
@@ -45,7 +45,7 @@
         <td aria-label="Role" class="govuk-table__cell "><%= allocation.responsibility %></td>
         <% if Flipflop.prisoner_profile? %>
           <td aria-label="Action" class="govuk-table__cell ">
-            <%= link_to('View', prisoner_show_path(allocation.nomis_offender_id), class: "govuk-link" ) %>
+            <%= link_to('View', prison_prisoner_show_path(@prison, allocation.nomis_offender_id), class: "govuk-link" ) %>
           </td>
         <% end %>
       </tr>

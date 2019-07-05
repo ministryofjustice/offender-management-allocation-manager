@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html class="govuk-template js flexbox">
+  <head>
+    <title>Manage Offenders in Custody</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= render 'layouts/analytics' %>
+    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+  </head>
+
+  <body class="govuk-template__body js-enabled">
+    <%= render '/layouts/errors_and_contact_header' %>
+    <%= render '/layouts/phase_banner' %>
+    <%= yield(:switcher) if content_for?(:switcher) %>
+
+    <div class='govuk-width-container'>
+      <main class='govuk-main-wrapper' id='main-content' role='main'>
+
+        <%= render '/shared/breadcrumbs' %>
+
+        <%= yield %>
+      </main>
+    </div>
+
+    <%= render '/layouts/footer' %>
+    <script>window.GOVUKFrontend.initAll()</script>
+  </body>
+</html>

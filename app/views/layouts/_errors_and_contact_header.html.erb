@@ -6,11 +6,6 @@
           <span class="govuk-header__logotype-text moj-header__logotype-text">HMPPS </span>
         </span>
       </a>
-      <span class="govuk-header__logotype">
-        <%= link_to 'Allocate to a Prison Offender Manager (POM)', prison_dashboard_index_path(@prison),
-                    class: "govuk-header__link govuk-header__link--homepage govuk-!-font-size-24 govuk-!-font-weight-regular"
-        %>
-      </span>
     <ul id="navigation" class="hmpps-header__navigation" aria-label="Top Level Navigation">
       <% if current_user.present? %>
       <li class="govuk-header__navigation-item govuk-header__navigation-item--active">

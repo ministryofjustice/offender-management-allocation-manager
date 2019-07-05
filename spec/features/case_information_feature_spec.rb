@@ -5,7 +5,7 @@ feature 'case information feature' do
     nomis_offender_id = 'G1821VA'
 
     signin_user
-    visit new_case_information_path(nomis_offender_id)
+    visit new_prison_case_information_path('LEI', nomis_offender_id)
 
     choose('case_information_omicable_Yes')
     choose('case_information_case_allocation_NPS')
@@ -16,7 +16,7 @@ feature 'case information feature' do
     expect(CaseInformation.first.nomis_offender_id).to eq(nomis_offender_id)
     expect(CaseInformation.first.tier).to eq('A')
     expect(CaseInformation.first.case_allocation).to eq('NPS')
-    expect(page).to have_current_path summary_pending_path
+    expect(page).to have_current_path prison_summary_pending_path('LEI')
 
     expect(page).to have_css('.offender_row_0', count: 1)
   end
@@ -25,8 +25,8 @@ feature 'case information feature' do
     nomis_offender_id = 'G1821VA'
 
     signin_user
-    visit new_case_information_path(nomis_offender_id)
-    expect(page).to have_current_path new_case_information_path(nomis_offender_id)
+    visit new_prison_case_information_path('LEI', nomis_offender_id)
+    expect(page).to have_current_path new_prison_case_information_path('LEI', nomis_offender_id)
 
     choose('case_information_tier_A')
     click_button 'Save'
@@ -40,8 +40,8 @@ feature 'case information feature' do
     nomis_offender_id = 'G1821VA'
 
     signin_user
-    visit new_case_information_path(nomis_offender_id)
-    expect(page).to have_current_path new_case_information_path(nomis_offender_id)
+    visit new_prison_case_information_path('LEI', nomis_offender_id)
+    expect(page).to have_current_path new_prison_case_information_path('LEI', nomis_offender_id)
 
     click_button 'Save'
 
@@ -55,8 +55,8 @@ feature 'case information feature' do
     nomis_offender_id = 'G1821VA'
 
     signin_user
-    visit new_case_information_path(nomis_offender_id)
-    expect(page).to have_current_path new_case_information_path(nomis_offender_id)
+    visit new_prison_case_information_path('LEI', nomis_offender_id)
+    expect(page).to have_current_path new_prison_case_information_path('LEI', nomis_offender_id)
 
     choose('case_information_case_allocation_NPS')
     click_button 'Save'
@@ -69,13 +69,13 @@ feature 'case information feature' do
     nomis_offender_id = 'G1821VA'
 
     signin_user
-    visit new_case_information_path(nomis_offender_id)
+    visit new_prison_case_information_path('LEI', nomis_offender_id)
     choose('case_information_omicable_No')
     choose('case_information_case_allocation_NPS')
     choose('case_information_tier_A')
     click_button 'Save'
 
-    visit edit_case_information_path(nomis_offender_id)
+    visit edit_prison_case_information_path('LEI', nomis_offender_id)
 
     expect(page).to have_content('Case information')
     expect(page).to have_content('G1821VA')
@@ -88,7 +88,7 @@ feature 'case information feature' do
     expect(CaseInformation.first.tier).to eq('A')
     expect(CaseInformation.first.case_allocation).to eq('CRC')
 
-    expect(page).to have_current_path new_allocation_path(nomis_offender_id)
+    expect(page).to have_current_path new_prison_allocation_path('LEI', nomis_offender_id)
     expect(page).to have_content('CRC')
   end
 end

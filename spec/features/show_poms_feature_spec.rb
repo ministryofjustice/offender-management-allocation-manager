@@ -4,7 +4,7 @@ feature "get poms list" do
   it "shows the page", vcr: { cassette_name: :show_poms_feature_list } do
     signin_user
 
-    visit poms_path
+    visit prison_poms_path('LEI')
 
     expect(page).to have_css(".govuk-table", count: 4)
     expect(page).to have_content("Prison Offender Managers")
@@ -18,7 +18,7 @@ feature "get poms list" do
   it "allows viewing a POM", vcr: { cassette_name: :show_poms_feature_view } do
     signin_user
 
-    visit "/poms/485752"
+    visit "/prisons/LEI/poms/485752"
 
     expect(page).to have_css(".govuk-button", count: 1)
     expect(page).to have_content("Jones, Ross")
@@ -30,7 +30,7 @@ feature "get poms list" do
   it "allows editing a POM", vcr: { cassette_name: :show_poms_feature_edit } do
     signin_user
 
-    visit "/poms/485752/edit"
+    visit "/prisons/LEI/poms/485752/edit"
 
     expect(page).to have_css(".govuk-button", count: 1)
     expect(page).to have_css(".govuk-radios__item", count: 14)
