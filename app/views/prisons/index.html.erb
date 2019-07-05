@@ -4,9 +4,9 @@
 <h1 class="govuk-heading-xl govuk-!-margin-top-0 govuk-!-margin-bottom-4">Choose prison</h1>
 
 <ul class="govuk-list">
-  <% PrisonService.prisons_from_list(caseloads).each do | code, title| %>
+  <% PrisonService.prisons_from_list(@prisons).each do | code, title| %>
     <li>
-      <a href="<%= prisons_update_path(code: code, next: @next) %>"><%= title %></a>
+      <a href="<%= prison_switcher_path(code, @next) %>"><%= title %></a>
     </li>
   <% end %>
 </ul>

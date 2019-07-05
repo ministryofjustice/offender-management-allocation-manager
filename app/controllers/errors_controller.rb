@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class ErrorsController < ApplicationController
+  # Errors need to not have the dashboard link in the header
+  layout 'errors_and_contact'
+
   def not_found
     render(status: :not_found)
   end
