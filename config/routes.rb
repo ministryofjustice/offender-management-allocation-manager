@@ -13,7 +13,8 @@ Rails.application.routes.draw do
   get '/auth/:provider/callback', to: 'sessions#create'
   get '/signout', to: 'sessions#destroy'
 
-  resources :prisons, only: :index do
+  resources :prisons do
+    resources :prisons, only: :index
     resources :dashboard, only: :index
     resources :caseload, only: %i[ index new ]
     get('/prisoners/:id' => 'prisoners#show', as: 'prisoner_show')

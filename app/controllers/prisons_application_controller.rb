@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+# This class is inherited by all controllers under the /prisons route
+# so that they have @prison and active_prison available
 class PrisonsApplicationController < ApplicationController
   before_action :authenticate_user, :check_prison_access
 
@@ -11,6 +15,6 @@ private
 
   def check_prison_access
     redirect_to '/401' unless caseloads.include?(active_prison)
-    @prison = params[:prison_id]
+    @prison = active_prison
   end
 end

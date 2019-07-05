@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class PrisonsController < ApplicationController
+class PrisonsController < PrisonsApplicationController
   before_action :authenticate_user
 
   def index
