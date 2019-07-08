@@ -121,7 +121,8 @@ feature 'Allocation' do
     create(
       :allocation_version,
       nomis_offender_id: nomis_offender_id,
-      primary_pom_nomis_id: probation_officer_nomis_staff_id
+      primary_pom_nomis_id: probation_officer_nomis_staff_id,
+      recommended_pom_type: 'probation'
     )
 
     signin_user
@@ -186,6 +187,7 @@ feature 'Allocation' do
       :allocation_version,
       nomis_offender_id: nomis_offender_id,
       primary_pom_nomis_id: probation_officer_nomis_staff_id,
+      recommended_pom_type: 'probation',
       created_at: Time.zone.now - 4.days,
       updated_at: Time.zone.now - 4.days,
       primary_pom_allocated_at: Time.zone.now - 4.days
@@ -197,6 +199,7 @@ feature 'Allocation' do
     allocation.update(event: AllocationVersion::REALLOCATE_PRIMARY_POM,
                       primary_pom_nomis_id: prison_officer_nomis_staff_id,
                       primary_pom_name: reallocated_pom_name,
+                      recommended_pom_type: 'prison',
                       updated_at: Time.zone.now - 3.days
     )
 
@@ -204,6 +207,7 @@ feature 'Allocation' do
                       event_trigger: AllocationVersion::USER,
                       primary_pom_nomis_id: nil,
                       primary_pom_name: nil,
+                      recommended_pom_type: nil,
                       updated_at: Time.zone.now - 2.days,
                       primary_pom_allocated_at: nil
     )
@@ -215,12 +219,14 @@ feature 'Allocation' do
                       prison: 'PVI',
                       primary_pom_nomis_id: 485_132,
                       primary_pom_name: new_prison_pom_name,
+                      recommended_pom_type: 'prison',
                       updated_at: Time.zone.now - 1.day)
 
     allocation.update(event: AllocationVersion::DEALLOCATE_PRIMARY_POM,
                       event_trigger: AllocationVersion::OFFENDER_TRANSFERRED,
                       primary_pom_nomis_id: nil,
                       primary_pom_name: nil,
+                      recommended_pom_type: nil,
                       updated_at: Time.zone.now - 1.day,
                       primary_pom_allocated_at: nil)
 

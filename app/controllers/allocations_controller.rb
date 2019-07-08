@@ -105,6 +105,7 @@ private
       created_by_username: current_user,
       nomis_booking_id: offender.latest_booking_id,
       allocated_at_tier: offender.tier,
+      recommended_pom_type: recommended_pom_type(offender),
       prison: active_prison,
       override_reasons: override_reasons,
       suitability_detail: suitability_detail,
@@ -135,6 +136,11 @@ private
     nomis_staff_id = current_allocation[nomis_offender_id]['primary_pom_nomis_id']
 
     PrisonOffenderManagerService.get_pom(active_prison, nomis_staff_id)
+  end
+
+  def recommended_pom_type(offender)
+    rec_type = RecommendationService.recommended_pom_type(offender)
+    rec_type == RecommendationService::PRISON_POM ? 'prison' : 'probation'
   end
 
   def recommended_and_nonrecommended_poms_types_for(offender)
