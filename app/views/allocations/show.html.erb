@@ -29,7 +29,7 @@
       <td class="govuk-table__cell">Tiering calculation</td>
       <td class="govuk-table__cell table_cell__left_align">
         Tier <%= @prisoner.tier %>
-        <a class="govuk-link pull-right" href="<%= edit_case_information_path(@prisoner.offender_no) %>">Change</a>
+        <a class="govuk-link pull-right" href="<%= edit_prison_case_information_path(@prison, @prisoner.offender_no) %>">Change</a>
       </td>
     </tr>
     <tr class="govuk-table__row">
@@ -53,14 +53,14 @@
       <td class="govuk-table__cell">Last known address in Wales</td>
       <td class="govuk-table__cell table_cell__left_align">
         <%= humanized_bool(@prisoner.omicable) %>
-        <a class="govuk-link pull-right" href="<%= edit_case_information_path(@prisoner.offender_no) %>">Change</a>
+        <a class="govuk-link pull-right" href="<%= edit_prison_case_information_path(@prison, @prisoner.offender_no) %>">Change</a>
       </td>
     </tr>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Service provider</td>
       <td class="govuk-table__cell table_cell__left_align">
         <%= service_provider_label(@prisoner.case_allocation) %>
-        <a class="govuk-link pull-right" href="<%= edit_case_information_path(@prisoner.offender_no) %>">Change</a>
+        <a class="govuk-link pull-right" href="<%= edit_prison_case_information_path(@prison, @prisoner.offender_no) %>">Change</a>
       </td>
     </tr>
     </tbody>
@@ -129,8 +129,8 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">POM</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-        <%= link_to @pom.full_name, pom_path(@pom.staff_id), class: "govuk-link" %>
-        <%= link_to 'Reallocate', edit_allocation_path(@prisoner.offender_no), class: "govuk-link pull-right" %>
+        <%= link_to @pom.full_name, prison_pom_path(@prison, @pom.staff_id), class: "govuk-link" %>
+        <%= link_to 'Reallocate', edit_prison_allocation_path(@prison, @prisoner.offender_no), class: "govuk-link pull-right" %>
       </td>
     </tr>
 <!--    <tr class="govuk-table__row">-->
@@ -145,7 +145,7 @@
       <td class="govuk-table__cell">Allocation history</td>
       <td class="govuk-table__cell table_cell__left_align">
         <%=@allocation.last_event(@prisoner.offender_no) %>
-        <%= link_to 'View', allocation_history_path(@prisoner.offender_no), class: "govuk-link pull-right" %>
+        <%= link_to 'View', prison_allocation_history_path(@prison, @prisoner.offender_no), class: "govuk-link pull-right" %>
       </td>
     </tr>
       <% end %>

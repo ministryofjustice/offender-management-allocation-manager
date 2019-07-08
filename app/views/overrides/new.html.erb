@@ -1,11 +1,11 @@
-<%= render :partial => "/shared/backlink", :locals => { :page => new_allocation_path(@prisoner.offender_no) } %>
+<%= render :partial => "/shared/backlink", :locals => { :page => new_prison_allocation_path(@prison, @prisoner.offender_no) } %>
 
 <% if @override.errors.count > 0 %>
   <%= render :partial => "/shared/validation_errors", :locals => { :errors => @override.errors } %>
 <% end %>
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    <%= form_tag(overrides_path, method: :post, id: "override_form")  do %>
+    <%= form_tag(prison_overrides_path(@prison), method: :post, id: "override_form")  do %>
 
       <h1 class="govuk-heading-xl govuk-!-margin-top-4">
         <%= "Why are you allocating a probation officer POM?" if @recommended_pom_type == 'Prison officer' %>
@@ -61,7 +61,6 @@
                   <label class="govuk-label" for="provide-detail">Please provide detail
                     here</label>
                   <textarea class="govuk-textarea" id="more-detail" name="override[more_detail]" rows="3" aria-describedby="more-detail-hint more-detail-error"></textarea>
-                </div>
               </div>
             </div>
           </fieldset>

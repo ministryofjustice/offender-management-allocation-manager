@@ -34,7 +34,7 @@ time left to serve into account.</p>
       <td aria-label="Total" class="govuk-table__cell "><%= pom.total_cases %></td>
       <td aria-label="Working pattern" class="govuk-table__cell"><%= working_pattern_name(pom.working_pattern) %></td>
       <td aria-label="Action" class="govuk-table__cell table_cell__left_align">
-      <%= link_to "Allocate", confirm_allocation_path(@prisoner.offender_no, pom.staff_id), class: "govuk-link" %>
+      <%= link_to "Allocate", prison_confirm_allocation_path(@prison, @prisoner.offender_no, pom.staff_id), class: "govuk-link" %>
       </td>
     </tr>
   <% end %>
@@ -83,7 +83,7 @@ time left to serve into account.</p>
           <td aria-label="Total" class="govuk-table__cell "><%= pom.total_cases %></td>
           <td aria-label="Working pattern" class="govuk-table__cell"><%= working_pattern_name(pom.working_pattern) %></td>
           <td aria-label="Action" class="govuk-table__cell table_cell__right_align">
-          <%= link_to "Allocate", new_overrides_path(@prisoner.offender_no, pom.staff_id), class: "govuk-link" %>
+          <%= link_to "Allocate", new_prison_overrides_path(@prison, @prisoner.offender_no, pom.staff_id), class: "govuk-link" %>
           </td>
         </tr>
       <% end %>
@@ -97,10 +97,10 @@ time left to serve into account.</p>
     There
     <% if @unavailable_pom_count == 1 %>
       is <%= @unavailable_pom_count %> POM unavailable for new allocations.
-      <a href="<%= poms_path %>">See POM</a>
+      <a href="<%= prison_poms_path(@prison) %>">See POM</a>
     <% else %>
       are <%= @unavailable_pom_count %> POMs unavailable for new allocations.
-      <a href="<%= poms_path %>">See all POMs</a>
+      <a href="<%= prison_poms_path(@prison) %>">See all POMs</a>
     <% end%>
   </p>
 <% end %>

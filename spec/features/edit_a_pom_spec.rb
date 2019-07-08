@@ -12,14 +12,14 @@ feature "edit a POM's details" do
   it "setting unavailable shows selected on re-edit", vcr: { cassette_name: :edit_poms_unavailable_check } do
     signin_user
 
-    visit edit_pom_path(nomis_staff_id)
+    visit edit_prison_pom_path('LEI', nomis_staff_id)
     expect(page).to have_css('h1', text: 'Edit profile')
 
     choose('working_pattern-2')
     choose('Active but unavailable for new cases')
     click_on('Save')
 
-    visit edit_pom_path(nomis_staff_id)
+    visit edit_prison_pom_path('LEI', nomis_staff_id)
     expect(page).to have_css('h1', text: 'Edit profile')
 
     expect(page).to have_field('status-conditional-2', checked: true)
@@ -28,7 +28,7 @@ feature "edit a POM's details" do
   it "validates a POM when missing data", vcr: { cassette_name: :edit_poms_missing_check } do
     signin_user
 
-    visit edit_pom_path(fulltime_pom_id)
+    visit edit_prison_pom_path('LEI', fulltime_pom_id)
     expect(page).to have_css('h1', text: 'Edit profile')
 
     # The only way to trigger (and therefore cover) the validation is for a full-time POM
@@ -43,7 +43,7 @@ feature "edit a POM's details" do
   it "makes an inactive POM active", vcr: { cassette_name: :edit_poms_activate_pom_feature } do
     signin_user
 
-    visit "/poms#inactive"
+    visit "/prisons/LEI/poms#inactive"
     within('.probation_pom_row_0') do
       click_link 'View'
     end
@@ -63,10 +63,10 @@ feature "edit a POM's details" do
 
   it "de-allocates all a POM's cases when made inactive", vcr: { cassette_name: :edit_poms_deactivate_pom_feature } do
     signin_user('PK000223')
-    visit "allocations/confirm/G4273GI/485637"
+    visit "/prisons/LEI/allocations/confirm/G4273GI/485637"
     click_button 'Complete allocation'
 
-    visit "/poms/485637"
+    visit "/prisons/LEI/poms/485637"
     click_link "Edit profile"
 
     expect(page).to have_content("Kath Pobee-Norris")

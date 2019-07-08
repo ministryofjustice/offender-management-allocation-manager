@@ -8,4 +8,10 @@ module PrisonHelper
   def prison_title(prison)
     PrisonService.name_for(prison)
   end
+
+  def prison_switcher_path(prison, path)
+    # remove /prisons/LEI from URL (which the split turns into ['', 'prisons', 'LEI'])
+    paths = path.split('/')[3..].join('/')
+    "/prisons/#{prison}/#{paths}"
+  end
 end

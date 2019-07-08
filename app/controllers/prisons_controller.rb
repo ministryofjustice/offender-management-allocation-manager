@@ -1,19 +1,11 @@
 # frozen_string_literal: true
 
-class PrisonsController < ApplicationController
+class PrisonsController < PrisonsApplicationController
   before_action :authenticate_user
 
   def index
     @next = referer
-  end
-
-  def set_active
-    redirect_path = next_page if redirect?
-    redirect_path = root_path unless caseloads.include?(code)
-
-    update_active_caseload(code)
-
-    redirect_to redirect_path || root_path
+    @prisons = caseloads
   end
 
 private

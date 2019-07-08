@@ -2,7 +2,6 @@
 
 class ApplicationController < ActionController::Base
   helper_method :current_user
-  helper_method :active_caseload
   helper_method :caseloads
 
   before_action :set_paper_trail_whodunnit
@@ -20,7 +19,7 @@ class ApplicationController < ActionController::Base
 
   def ensure_pom
     pom = PrisonOffenderManagerService.get_signed_in_pom_details(
-      current_user, active_caseload
+      current_user, params[:prison_id]
     )
 
     if pom.blank?
@@ -46,12 +45,8 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def active_caseload
+  def default_prison_code
     sso_identity['active_caseload'] if sso_identity.present?
-  end
-
-  def update_active_caseload(code)
-    session[:sso_data]['active_caseload'] = code
   end
 
   def roles
