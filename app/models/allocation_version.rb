@@ -77,6 +77,7 @@ class AllocationVersion < ApplicationRecord
     alloc.primary_pom_allocated_at = nil
     alloc.secondary_pom_nomis_id = nil
     alloc.secondary_pom_name = nil
+    alloc.recommended_pom_type = nil
     alloc.event = DEALLOCATE_PRIMARY_POM
     alloc.event_trigger = movement_type
 
@@ -88,6 +89,7 @@ class AllocationVersion < ApplicationRecord
     all_primary_pom_allocations(nomis_staff_id).each do |alloc|
       alloc.primary_pom_nomis_id = nil
       alloc.primary_pom_name = nil
+      alloc.recommended_pom_type = nil
       alloc.primary_pom_allocated_at = nil
       alloc.event = DEALLOCATE_PRIMARY_POM
       alloc.event_trigger = USER
