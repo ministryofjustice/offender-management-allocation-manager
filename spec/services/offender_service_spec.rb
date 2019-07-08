@@ -3,14 +3,14 @@ require 'rails_helper'
 describe OffenderService do
   it "get first page of offenders for a specific prison",
      vcr: { cassette_name: :offender_service_offenders_by_prison_first_page_spec } do
-    offenders = described_class.get_offenders_for_prison('LEI')
+    offenders = described_class.get_offenders_for_prison('LEI', page_number: 0, page_size: 10)
     expect(offenders).to be_kind_of(Array)
     expect(offenders.length).to eq(9)
     expect(offenders.first).to be_kind_of(Nomis::Models::OffenderSummary)
   end
 
   it "get last page of offenders for a specific prison", vcr: { cassette_name: :offender_service_offenders_by_prison_last_page_spec } do
-    offenders = described_class.get_offenders_for_prison('LEI', page_number: 93)
+    offenders = described_class.get_offenders_for_prison('LEI', page_number: 93, page_size: 10)
     expect(offenders).to be_kind_of(Array)
     expect(offenders.length).to eq(1)
     expect(offenders.first).to be_kind_of(Nomis::Models::OffenderSummary)
@@ -31,7 +31,7 @@ describe OffenderService do
 
   it "gets the POM names for allocated offenders",
      vcr: { cassette_name: :offender_service_pom_names_spec } do
-    offenders = described_class.get_offenders_for_prison('LEI', page_size: 3)
+    offenders = described_class.get_offenders_for_prison('LEI', page_size: 3, page_number: 0)
     nomis_staff_id = 485_752
 
     PomDetail.create!(nomis_staff_id: nomis_staff_id, working_pattern: 1.0, status: 'active')

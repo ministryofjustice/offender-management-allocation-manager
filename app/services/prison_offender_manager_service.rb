@@ -56,12 +56,8 @@ class PrisonOffenderManagerService
   end
 
   # rubocop:disable Metrics/MethodLength
-  def self.get_allocated_offenders(nomis_staff_id, prison, offset: nil, limit: nil)
+  def self.get_allocated_offenders(nomis_staff_id, prison)
     allocation_list = get_allocations_for_primary_pom(nomis_staff_id, prison)
-
-    if offset.present? && limit.present?
-      allocation_list = allocation_list.offset(offset).limit(limit)
-    end
 
     offender_ids = allocation_list.map(&:nomis_offender_id)
     booking_ids = allocation_list.map(&:nomis_booking_id)
@@ -73,7 +69,7 @@ class PrisonOffenderManagerService
     offender_map = OffenderService.get_sentence_details(booking_ids)
     case_info = CaseInformationService.get_case_info_for_offenders(offender_ids)
 
-    allocation_list_with_responsibility = allocation_list.map { |alloc|
+    allocation_list.each do |alloc|
       offender_stub = Nomis::Models::Offender.new
       offender_stub.sentence = offender_map[alloc.nomis_booking_id]
 
@@ -86,31 +82,13 @@ class PrisonOffenderManagerService
 
       alloc.responsibility =
         ResponsibilityService.new.calculate_pom_responsibility(offender_stub)
-      alloc
-    }
-
-    allocations_and_offender = []
-    allocation_list_with_responsibility.each do |alloc|
-      allocations_and_offender << [alloc, offender_map[alloc.nomis_booking_id]]
     end
 
-    allocations_and_offender
+    allocation_list.map do |alloc|
+      AllocationWithSentence.new(alloc, offender_map[alloc.nomis_booking_id])
+    end
   end
   # rubocop:enable Metrics/MethodLength
-
-  def self.get_new_cases(nomis_staff_id, prison)
-    allocations = get_allocated_offenders(nomis_staff_id, prison)
-    allocations.select do |allocation, _offender|
-      allocation.updated_at >= 7.days.ago
-    end
-  end
-
-  def self.get_new_cases_count(nomis_staff_id, prison)
-    allocations = get_allocated_offenders(nomis_staff_id, prison)
-    allocations.select { |allocation, _offender|
-      allocation.updated_at >= 7.days.ago
-    }.count
-  end
 
   def self.unavailable_pom_count(prison)
     poms = PrisonOffenderManagerService.get_poms(prison) { |pom|

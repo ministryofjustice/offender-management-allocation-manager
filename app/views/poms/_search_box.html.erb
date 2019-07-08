@@ -1,0 +1,27 @@
+<div class="search-box">
+  <%= form_tag(prison_caseload_index_path(@prison), method: :get, id: "search_form") do %>
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-three-quarters">
+        <label class="govuk-label" for="q">
+          Enter a prisoner name or number
+        </label>
+      </div>
+      <div>
+        <label class="govuk-label" for="role">
+          Role
+        </label>
+      </div>
+    </div>
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <input class="govuk-input" id="q" name="q" type="text" value="<%= @q %>" autofocus="true">
+      </div>
+      <div class="pull-right">
+        <%= select_tag 'role',
+                       options_for_select([ResponsibilityService::RESPONSIBLE, ResponsibilityService::SUPPORTING]),
+                       include_blank: 'All', class: 'govuk-select' %>
+        <input id="search-button" type="submit" class="govuk-button pull-right" value="Search"/>
+      </div>
+    </div>
+  <% end %>
+</div>

@@ -5,7 +5,7 @@ class SummaryService
   FETCH_SIZE = 200 # How many records to fetch from nomis at a time
 
   class SummaryParams
-    attr_reader :sort_field, :sort_direction, :search
+    attr_reader :sort_field, :sort_direction
 
     def initialize(sort_field: nil, sort_direction: :asc)
       @sort_field = sort_field
@@ -16,14 +16,14 @@ class SummaryService
   # rubocop:disable Metrics/MethodLength
   # rubocop:disable Metrics/PerceivedComplexity
   # rubocop:disable Metrics/CyclomaticComplexity
-  def summary(summary_type, prison, page, params)
+  def self.summary(summary_type, prison, page, params)
     # We expect to be passed summary_type, which is one of :allocated, :unallocated,
     # or :pending.  The other types will return totals, and do not contain any data.
-    @bucket = Bucket.new
+    bucket = Bucket.new
 
     # We want to store the total number of each item so we can show totals for
     # each type of record.
-    @counts = { allocated: 0, unallocated: 0, pending: 0, all: 0 }
+    counts = { allocated: 0, unallocated: 0, pending: 0, all: 0 }
 
     number_of_requests = max_requests_count(prison)
     (0..number_of_requests).each do |request_no|
@@ -35,8 +35,8 @@ class SummaryService
       tiered_offenders, no_tier_offenders = offenders.partition { |offender|
         offender.tier.present?
       }
-      @counts[:pending] += no_tier_offenders.count
-      @bucket.items += no_tier_offenders if summary_type == :pending
+      counts[:pending] += no_tier_offenders.count
+      bucket.items += no_tier_offenders if summary_type == :pending
 
       # Check the allocations for the remaining offenders who have tiers.
       offender_nos = tiered_offenders.map(&:offender_no)
@@ -47,24 +47,24 @@ class SummaryService
       allocated_offenders, unallocated_offenders = tiered_offenders.partition { |offender|
         active_allocations_hash.key?(offender.offender_no)
       }
-      @bucket.items += allocated_offenders if summary_type == :allocated
-      @bucket.items += unallocated_offenders if summary_type == :unallocated
+      bucket.items += allocated_offenders if summary_type == :allocated
+      bucket.items += unallocated_offenders if summary_type == :unallocated
 
-      @counts[:allocated] += allocated_offenders.count
-      @counts[:unallocated] += unallocated_offenders.count
+      counts[:allocated] += allocated_offenders.count
+      counts[:unallocated] += unallocated_offenders.count
     end
 
-    page_count = (@counts[summary_type] / PAGE_SIZE.to_f).ceil
+    page_count = (counts[summary_type] / PAGE_SIZE.to_f).ceil
 
     # If we are on the last page, we don't always want 10 items from the bucket
     # we just want the last digit, so if there are 138 items, the last page should
     # show 8.
     wanted_items = number_items_wanted(
       page_count == page,
-      @counts[summary_type].digits[0]
+      counts[summary_type].digits[0]
     )
     if params.sort_field.present?
-      @bucket.sort(params.sort_field, params.sort_direction)
+      bucket.sort(params.sort_field, params.sort_direction)
     end
 
     from = [(PAGE_SIZE * (page - 1)), 0].max
@@ -73,19 +73,19 @@ class SummaryService
     # name
     if summary_type == :allocated
       offender_items = OffenderService.set_allocated_pom_name(
-        @bucket.take(wanted_items, from) || [],
+        bucket.take(wanted_items, from) || [],
         prison
       )
     else
-      offender_items = @bucket.take(wanted_items, from) || []
+      offender_items = bucket.take(wanted_items, from) || []
     end
 
-    Summary.new.tap { |summary|
+    Summary.new(summary_type).tap { |summary|
       summary.offenders = offender_items
 
-      summary.allocated_total = @counts[:allocated]
-      summary.unallocated_total = @counts[:unallocated]
-      summary.pending_total = @counts[:pending]
+      summary.allocated_total = counts[:allocated]
+      summary.unallocated_total = counts[:unallocated]
+      summary.pending_total = counts[:pending]
 
       summary.page_count = page_count
     }
@@ -96,7 +96,7 @@ class SummaryService
 
 private
 
-  def max_requests_count(prison)
+  def self.max_requests_count(prison)
     # Fetch the first 1 prisoners just for the total number of pages so that we
     # can send batched queries.
     info_request = Nomis::Elite2::OffenderApi.list(prison, 1, page_size: 1)
@@ -106,7 +106,7 @@ private
     (info_request.meta.total_pages / FETCH_SIZE) + 1
   end
 
-  def get_page_of_offenders(prison, page_number)
+  def self.get_page_of_offenders(prison, page_number)
     OffenderService.get_offenders_for_prison(
       prison,
       page_number: page_number,
@@ -114,7 +114,7 @@ private
     )
   end
 
-  def number_items_wanted(is_last_page, last_digit_of_count)
+  def self.number_items_wanted(is_last_page, last_digit_of_count)
     if is_last_page && last_digit_of_count != 0
       last_digit_of_count
     else

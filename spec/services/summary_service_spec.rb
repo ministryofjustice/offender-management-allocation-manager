@@ -3,14 +3,14 @@ require 'rails_helper'
 describe SummaryService do
   # TODO: - Populate test db with Case Information
   it "will generate a summary", vcr: { cassette_name: :allocation_summary_service_summary } do
-    summary = described_class.new.summary(:pending, 'LEI', 15, SummaryService::SummaryParams.new)
+    summary = described_class.summary(:pending, 'LEI', 15, SummaryService::SummaryParams.new)
 
     expect(summary.offenders.count).to eq(10)
     expect(summary.page_count).to eq(82)
   end
 
   it "will sort a summary", vcr: { cassette_name: :allocation_summary_service_summary_sort } do
-    asc_summary = described_class.new.summary(
+    asc_summary = described_class.summary(
       :pending,
       'LEI',
       1,
@@ -18,7 +18,7 @@ describe SummaryService do
     )
     asc_cells = asc_summary.offenders.map(&:offender_no)
 
-    desc_summary = described_class.new.summary(
+    desc_summary = described_class.summary(
       :pending,
       'LEI',
       1,
