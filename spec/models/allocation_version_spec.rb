@@ -41,6 +41,7 @@ RSpec.describe AllocationVersion, type: :model do
       expect(deallocation.primary_pom_nomis_id).to be_nil
       expect(deallocation.primary_pom_name).to be_nil
       expect(deallocation.primary_pom_allocated_at).to be_nil
+      expect(deallocation.recommended_pom_type).to be_nil
     end
   end
 
@@ -55,6 +56,7 @@ RSpec.describe AllocationVersion, type: :model do
         primary_pom_nomis_id: 485_833,
         primary_pom_allocated_at: DateTime.now.utc,
         nomis_booking_id: 1,
+        recommended_pom_type: 'probation',
         event: AllocationVersion::ALLOCATE_PRIMARY_POM,
         event_trigger: AllocationVersion::USER
       }
@@ -66,6 +68,7 @@ RSpec.describe AllocationVersion, type: :model do
       expect(deallocation.primary_pom_nomis_id).to be_nil
       expect(deallocation.primary_pom_name).to be_nil
       expect(deallocation.primary_pom_allocated_at).to be_nil
+      expect(deallocation.recommended_pom_type).to be_nil
       expect(deallocation.event_trigger).to eq 'offender_transferred'
     end
   end
