@@ -43,10 +43,10 @@ VCR.configure do |config|
   config.register_request_matcher :paging_headers do |r1, r2|
     paging_headers = %w[Page-Limit Page-Offset]
 
-    r1.headers.keep_if do |k, _| paging_headers.include?(k) end
-    r2.headers.keep_if do |k, _| paging_headers.include?(k) end
+    r1_headers = r1.headers.select { |k, _| paging_headers.include?(k) }
+    r2_headers = r2.headers.select { |k, _| paging_headers.include?(k) }
 
-    r1.headers == r2.headers
+    r1_headers == r2_headers
   end
 
   config.filter_sensitive_data('authorisation_header') do |interaction|
