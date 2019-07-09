@@ -16,6 +16,7 @@ describe AllocationService do
       primary_pom_nomis_id: 485_595,
       primary_pom_allocated_at: DateTime.now.utc,
       nomis_booking_id: 1,
+      recommended_pom_type: 'probation',
       event: AllocationVersion::ALLOCATE_PRIMARY_POM,
       event_trigger: AllocationVersion::USER
     }
@@ -109,6 +110,7 @@ describe AllocationService do
       primary_pom_nomis_id: 485_766,
       allocated_at_tier: 'A',
       prison: 'PVI',
+      recommended_pom_type: 'probation',
       event: AllocationVersion::REALLOCATE_PRIMARY_POM,
       event_trigger: AllocationVersion::USER
     )
@@ -118,6 +120,7 @@ describe AllocationService do
       primary_pom_nomis_id: 485_737,
       allocated_at_tier: 'A',
       prison: 'LEI',
+      recommended_pom_type: 'probation',
       event: AllocationVersion::ALLOCATE_PRIMARY_POM,
       event_trigger: AllocationVersion::USER
     )

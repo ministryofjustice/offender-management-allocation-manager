@@ -8,6 +8,7 @@ feature "view an offender's allocation information" do
   let!(:nomis_offender_id_without_keyworker) { 'G9403UP' }
   let!(:allocated_at_tier) { 'A' }
   let!(:prison) { 'LEI' }
+  let!(:recommended_pom_type) { 'probation' }
   let!(:pom_detail) {
     PomDetail.create!(
       nomis_staff_id: probation_officer_nomis_staff_id,
@@ -94,7 +95,8 @@ feature "view an offender's allocation information" do
       nomis_offender_id: offender_no,
       primary_pom_nomis_id: probation_officer_nomis_staff_id,
       prison: prison,
-      allocated_at_tier: allocated_at_tier
+      allocated_at_tier: allocated_at_tier,
+      recommended_pom_type: recommended_pom_type
     )
   end
 end
