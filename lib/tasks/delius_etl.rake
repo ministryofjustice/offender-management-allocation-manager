@@ -31,26 +31,7 @@ namespace :delius_etl do
 end
 
 def fetch_offenders(prison)
-  results = []
-
-  number_of_requests = max_requests_count(prison)
-  (0..number_of_requests).each do |request_no|
-    offenders = OffenderService.get_offenders_for_prison(
-      prison,
-      page_number: request_no,
-      page_size: 200
-    )
-    break if offenders.blank?
-
-    results << offenders.map(&:offender_no)
-  end
-
-  results.flatten
-end
-
-def max_requests_count(prison)
-  info_request = Nomis::Elite2::OffenderApi.list(prison, 1, page_size: 1)
-  (info_request.meta.total_pages / 200) + 1
+  OffenderService.get_offenders_for_prison(prison).map(&:offender_no)
 end
 
 def load_delius_records(file)
