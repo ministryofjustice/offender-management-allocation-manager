@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_05_150401) do
+ActiveRecord::Schema.define(version: 2019_07_10_065151) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -69,7 +69,6 @@ ActiveRecord::Schema.define(version: 2019_07_05_150401) do
     t.string "case_allocation"
     t.string "nomis_offender_id"
     t.text "omicable"
-    t.text "prison"
     t.string "crn"
     t.index ["nomis_offender_id"], name: "index_case_information_on_nomis_offender_id"
   end
@@ -118,6 +117,7 @@ ActiveRecord::Schema.define(version: 2019_07_05_150401) do
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "email"
     t.index ["nomis_staff_id"], name: "index_pom_details_on_nomis_staff_id"
   end
 

@@ -25,11 +25,9 @@ class SummaryService
     # each type of record.
     @counts = { allocated: 0, unallocated: 0, pending: 0, all: 0 }
 
-    tier_map = CaseInformationService.get_case_information(prison)
-
     number_of_requests = max_requests_count(prison)
     (0..number_of_requests).each do |request_no|
-      offenders = get_page_of_offenders(prison, request_no, tier_map)
+      offenders = get_page_of_offenders(prison, request_no)
       break if offenders.blank?
 
       # Group the offenders without a tier, and the remaining ones
@@ -108,12 +106,11 @@ private
     (info_request.meta.total_pages / FETCH_SIZE) + 1
   end
 
-  def get_page_of_offenders(prison, page_number, tiers)
+  def get_page_of_offenders(prison, page_number)
     OffenderService.get_offenders_for_prison(
       prison,
       page_number: page_number,
-      page_size: FETCH_SIZE,
-      tier_map: tiers
+      page_size: FETCH_SIZE
     )
   end
 

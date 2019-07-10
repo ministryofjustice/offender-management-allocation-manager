@@ -84,8 +84,7 @@ feature "view an offender's allocation information" do
       nomis_offender_id: offender_no,
       tier: 'A',
       case_allocation: 'NPS',
-      omicable: 'No',
-      prison: prison
+      omicable: 'No'
     )
   end
 

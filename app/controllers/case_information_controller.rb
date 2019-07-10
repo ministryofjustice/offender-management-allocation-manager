@@ -3,8 +3,7 @@
 class CaseInformationController < PrisonsApplicationController
   def new
     @case_info = CaseInformation.new(
-      nomis_offender_id: nomis_offender_id_from_url,
-      prison: active_prison
+      nomis_offender_id: nomis_offender_id_from_url
     )
 
     @prisoner = prisoner(nomis_offender_id_from_url)
@@ -12,8 +11,7 @@ class CaseInformationController < PrisonsApplicationController
 
   def edit
     @case_info = CaseInformation.find_by(
-      nomis_offender_id: nomis_offender_id_from_url,
-      prison: active_prison
+      nomis_offender_id: nomis_offender_id_from_url
     )
 
     @prisoner = prisoner(nomis_offender_id_from_url)
@@ -24,8 +22,7 @@ class CaseInformationController < PrisonsApplicationController
       nomis_offender_id: case_information_params[:nomis_offender_id],
       tier: case_information_params[:tier],
       omicable: case_information_params[:omicable],
-      case_allocation: case_information_params[:case_allocation],
-      prison: active_prison
+      case_allocation: case_information_params[:case_allocation]
     )
 
     return redirect_to prison_summary_pending_path(active_prison) if @case_info.valid?
@@ -38,7 +35,6 @@ class CaseInformationController < PrisonsApplicationController
     case_info = CaseInformation.find_by(
       nomis_offender_id: case_information_params[:nomis_offender_id]
     )
-    case_info.prison = active_prison
     case_info.tier = case_information_params[:tier]
     case_info.case_allocation = case_information_params[:case_allocation]
     case_info.omicable = case_information_params[:omicable]

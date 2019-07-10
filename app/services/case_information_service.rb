@@ -1,25 +1,18 @@
 # frozen_string_literal: true
 
 class CaseInformationService
-  def self.get_case_info_for_offenders(nomis_id_list, prison)
+  def self.get_case_info_for_offenders(nomis_id_list)
     CaseInformation.where(
-      nomis_offender_id: nomis_id_list, prison: prison
+      nomis_offender_id: nomis_id_list
     ).each_with_object({}) { |caseinfo, hash|
       hash[caseinfo.nomis_offender_id] = caseinfo
     }
   end
 
-  def self.get_case_information(prison)
-    cases = CaseInformation.where(prison: prison)
-    cases.each_with_object({}) do |c, hash|
-      hash[c.nomis_offender_id] = c
-    end
-  end
-
-  def self.change_prison(nomis_offender_id, old_prison, new_prison)
-    CaseInformation.where(
-      nomis_offender_id: nomis_offender_id, prison: old_prison
-    ).update_all(prison: new_prison)
+  def self.get_case_information(offender_ids)
+    CaseInformation.where(nomis_offender_id: offender_ids).map { |case_info|
+      [case_info.nomis_offender_id, case_info]
+    }.to_h
   end
 
   def self.delete_information(nomis_offender_id)

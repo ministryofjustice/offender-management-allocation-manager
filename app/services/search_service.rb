@@ -10,8 +10,6 @@ class SearchService
     return [] if text.nil?
 
     number_of_requests = max_requests_count(prison)
-    tier_map = CaseInformationService.get_case_information(prison)
-
     search_term = text.upcase
     search_results = []
 
@@ -19,8 +17,7 @@ class SearchService
       offenders = OffenderService.get_offenders_for_prison(
         prison,
         page_number: request_no,
-        page_size: FETCH_SIZE,
-        tier_map: tier_map
+        page_size: FETCH_SIZE
       )
       break if offenders.blank?
 
