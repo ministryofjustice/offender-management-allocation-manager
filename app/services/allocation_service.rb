@@ -3,35 +3,34 @@
 class AllocationService
   # rubocop:disable Metrics/MethodLength
   def self.create_or_update(params)
-    params_copy = params.clone
     pom_firstname, pom_secondname =
-      PrisonOffenderManagerService.get_pom_name(params_copy[:primary_pom_nomis_id])
+      PrisonOffenderManagerService.get_pom_name(params[:primary_pom_nomis_id])
     user_firstname, user_secondname =
-      PrisonOffenderManagerService.get_user_name(params_copy[:created_by_username])
+      PrisonOffenderManagerService.get_user_name(params[:created_by_username])
 
-    params_copy[:primary_pom_name] = "#{pom_firstname} #{pom_secondname}"
-    params_copy[:created_by_name] = "#{user_firstname} #{user_secondname}"
-    params_copy[:primary_pom_allocated_at] = DateTime.now.utc
+    params_copy = params.merge(
+      primary_pom_name: "#{pom_firstname} #{pom_secondname}",
+      created_by_name: "#{user_firstname} #{user_secondname}",
+      primary_pom_allocated_at: DateTime.now.utc
+    )
 
     alloc_version = AllocationVersion.find_by(
       nomis_offender_id: params_copy[:nomis_offender_id]
     )
 
     if alloc_version.nil?
+      if AllocationVersion.where(prison: params_copy[:prison]).empty?
+        PomMailer.new_prison_allocation_email(params_copy[:prison]).deliver_later
+      end
+
       alloc_version = AllocationVersion.create!(params_copy)
     else
       alloc_version.update!(params_copy)
     end
 
-    params_copy[:pom_detail_id] = PrisonOffenderManagerService.
-      get_pom_detail(params_copy[:primary_pom_nomis_id]).id
+    EmailService.instance(allocation: alloc_version, message: params[:message]).send_email
 
-    EmailService.instance(
-      allocation: alloc_version,
-      message: params[:message]
-    ).send_email
-
-    delete_overrides(params_copy)
+    delete_overrides(params_copy[:primary_pom_nomis_id], params_copy[:nomis_offender_id])
 
     alloc_version
   end
@@ -104,10 +103,10 @@ private
     }.compact
   end
 
-  def self.delete_overrides(params)
+  def self.delete_overrides(nomis_staff_id, nomis_offender_id)
     Override.where(
-      nomis_staff_id: params[:primary_pom_nomis_id],
-      nomis_offender_id: params[:nomis_offender_id]).
+      nomis_staff_id: nomis_staff_id,
+      nomis_offender_id: nomis_offender_id).
     destroy_all
   end
 end

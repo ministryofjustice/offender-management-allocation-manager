@@ -31,14 +31,19 @@ VCR.configure do |config|
   config.cassette_library_dir = "spec/fixtures/vcr_cassettes"
   config.hook_into :webmock
   config.configure_rspec_metadata!
-  config.default_cassette_options = { record: vcr_record_mode }
-  config.default_cassette_options = { match_requests_on: [
-    :method,
-    :method, :uri, :body, :query,
-    :path,
-    :body,
-    :paging_headers
-  ] }
+  config.default_cassette_options = {
+    record: vcr_record_mode,
+    # not sure if we need this on or off - when we are doing the oauth2 interactions, it might repeat many times
+    # allow_playback_repeats: true,
+    match_requests_on: [
+      :method,
+      :uri,
+      :body,
+      :query,
+      :path,
+      :paging_headers
+    ]
+  }
 
   config.register_request_matcher :paging_headers do |r1, r2|
     paging_headers = %w[Page-Limit Page-Offset]
