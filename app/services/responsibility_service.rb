@@ -7,7 +7,6 @@ class ResponsibilityService
 
   # rubocop:disable Metrics/PerceivedComplexity
   # rubocop:disable Metrics/CyclomaticComplexity
-  # rubocop:disable Metrics/MethodLength
   def calculate_pom_responsibility(offender)
     return RESPONSIBLE if offender.sentence.earliest_release_date.nil?
     return SUPPORTING unless omicable?(offender)
@@ -34,7 +33,7 @@ class ResponsibilityService
       !new_case?(offender) &&
       !release_date_gt_15_mths?(offender)
   end
-# rubocop:enable Metrics/MethodLength
+
 # rubocop:enable Metrics/PerceivedComplexity
 # rubocop:enable Metrics/CyclomaticComplexity
 

@@ -66,7 +66,6 @@ module Nomis
         data.first['classificationCode']
       end
 
-      # rubocop:disable Metrics/MethodLength
       def self.get_bulk_sentence_details(booking_ids)
         return {} if booking_ids.empty?
 
@@ -91,7 +90,6 @@ module Nomis
           hash
         }
       end
-    # rubocop:enable Metrics/MethodLength
 
     private
 

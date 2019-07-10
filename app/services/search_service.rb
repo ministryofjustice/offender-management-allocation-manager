@@ -5,7 +5,6 @@ class SearchService
 
   # Fetch all of the offenders (for a given prison) filtering
   # out offenders based on the provided text.
-  # rubocop:disable Metrics/MethodLength
   def self.search_for_offenders(text, prison)
     return [] if text.nil?
 
@@ -33,7 +32,6 @@ class SearchService
 
     search_results
   end
-# rubocop:enable Metrics/MethodLength
 
 private
 

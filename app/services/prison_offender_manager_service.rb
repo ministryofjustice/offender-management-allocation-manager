@@ -55,7 +55,6 @@ class PrisonOffenderManagerService
     AllocationVersion.active_primary_pom_allocations(nomis_staff_id, prison)
   end
 
-  # rubocop:disable Metrics/MethodLength
   def self.get_allocated_offenders(nomis_staff_id, prison)
     allocation_list = get_allocations_for_primary_pom(nomis_staff_id, prison)
 
@@ -88,7 +87,6 @@ class PrisonOffenderManagerService
       AllocationWithSentence.new(alloc, offender_map[alloc.nomis_booking_id])
     end
   end
-  # rubocop:enable Metrics/MethodLength
 
   def self.unavailable_pom_count(prison)
     poms = PrisonOffenderManagerService.get_poms(prison) { |pom|

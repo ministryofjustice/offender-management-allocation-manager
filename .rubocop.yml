@@ -99,7 +99,7 @@ Metrics/LineLength:
 
 # Don't worry about long methods in specs.
 Metrics/MethodLength:
-  Max: 15
+  Max: 20
   Exclude:
     - 'spec/**/*'
     - 'app/helpers/form_elements_helper.rb'

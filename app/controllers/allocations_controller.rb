@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 # rubocop:disable Metrics/LineLength
-# rubocop:disable Metrics/MethodLength
 class AllocationsController < PrisonsApplicationController
   delegate :update, to: :create
 
@@ -194,4 +193,3 @@ private
   end
 end
 # rubocop:enable Metrics/LineLength
-# rubocop:enable Metrics/MethodLength

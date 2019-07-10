@@ -63,7 +63,6 @@ class OffenderService
 
   # Takes a list of OffenderSummary or Offender objects, and returns them with their
   # allocated POM name set in :allocated_pom_name
-  # rubocop:disable Metrics/MethodLength
   # rubocop:disable Metrics/LineLength
   def self.set_allocated_pom_name(offenders, caseload)
     pom_names = PrisonOffenderManagerService.get_pom_names(caseload)
@@ -89,5 +88,4 @@ class OffenderService
     end
   end
   # rubocop:enable Metrics/LineLength
-  # rubocop:enable Metrics/MethodLength
 end
