@@ -26,7 +26,6 @@ class PomsController < PrisonsApplicationController
     @errors = {}
   end
 
-  # rubocop:disable Metrics/MethodLength
   def update
     @pom = PrisonOffenderManagerService.get_pom(active_prison, params[:nomis_staff_id])
 
@@ -44,7 +43,6 @@ class PomsController < PrisonsApplicationController
     update_record_for_errors(pom_detail)
     render :edit
   end
-# rubocop:enable Metrics/MethodLength
 
 private
 

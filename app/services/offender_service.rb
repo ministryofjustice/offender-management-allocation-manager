@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class OffenderService
-  # rubocop:disable Metrics/MethodLength
   def self.get_offender(offender_no)
     Nomis::Elite2::OffenderApi.get_offender(offender_no).tap { |o|
       record = CaseInformation.find_by(nomis_offender_id: offender_no)
@@ -22,8 +21,6 @@ class OffenderService
       o.main_offence = Nomis::Elite2::OffenderApi.get_offence(o.latest_booking_id)
     }
   end
-
-  # rubocop:enable Metrics/MethodLength
 
   # rubocop:disable Metrics/MethodLength
   def self.get_offenders_for_prison(prison, page_number: 0, page_size: 10)

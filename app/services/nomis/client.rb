@@ -30,7 +30,6 @@ module Nomis
       response.body
     end
 
-    # rubocop:disable Metrics/MethodLength
     def get(route, queryparams: {}, extra_headers: {})
       response = request(
         :get, route, queryparams: queryparams, extra_headers: extra_headers
@@ -59,11 +58,9 @@ module Nomis
 
       JSON.parse(response.body)
     end
-  # rubocop:enable Metrics/MethodLength
 
   private
 
-    # rubocop:disable Metrics/MethodLength
     def request(method, route, queryparams: {}, extra_headers: {}, body: nil)
       @connection.send(method) do |req|
         req.url(@root + route)
@@ -80,7 +77,6 @@ module Nomis
       AllocationManager::ExceptionHandler.capture_exception(e)
       raise APIError, "Unexpected status #{e.response[:status]}"
     end
-    # rubocop:enable Metrics/MethodLength
 
     def token
       Nomis::Oauth::TokenService.valid_token
