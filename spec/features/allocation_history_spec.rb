@@ -3,48 +3,47 @@ require 'rails_helper'
 feature 'Allocation History' do
   let!(:probation_pom) do
     {
-        primary_pom_nomis_id: 485_752,
-        primary_pom_name: 'Ross Jones',
-        email: 'Ross.jonessss@digital.justice.gov.uk'
+      primary_pom_nomis_id: 485_752,
+      primary_pom_name: 'Ross Jones',
+      email: 'Ross.jonessss@digital.justice.gov.uk'
     }
   end
 
   let!(:prison_pom) do
     {
-        primary_pom_nomis_id: 485_737,
-        primary_pom_name: 'Jay Heal',
-        email: 'jay.heal@digital.justice.gov.uk'
+      primary_pom_nomis_id: 485_737,
+      primary_pom_name: 'Jay Heal',
+      email: 'jay.heal@digital.justice.gov.uk'
     }
   end
 
   let!(:probation_pom_2) do
     {
-        primary_pom_nomis_id: 485_637,
-        primary_pom_name: 'Kath Pobee-Norris',
-        email: 'kath.pobee-norris@digital.justice.gov.uk'
+      primary_pom_nomis_id: 485_637,
+      primary_pom_name: 'Kath Pobee-Norris',
+      email: 'kath.pobee-norris@digital.justice.gov.uk'
     }
   end
 
   let!(:pom_without_email) do
     {
-        primary_pom_nomis_id: 485_636,
-        primary_pom_name: "#{Faker::Name.first_name} #{Faker::Name.last_name}",
+      primary_pom_nomis_id: 485_636,
+      primary_pom_name: "#{Faker::Name.first_name} #{Faker::Name.last_name}"
     }
   end
 
   let!(:nomis_offender_id) { 'G4273GI' }
 
   scenario 'view offender allocation history', versioning: true, vcr: { cassette_name: :offender_allocation_history } do
-
     create(
-        :allocation_version,
-        nomis_offender_id: nomis_offender_id,
-        primary_pom_nomis_id: probation_pom[:primary_pom_nomis_id],
-        primary_pom_name: probation_pom[:primary_pom_name],
-        recommended_pom_type: 'probation',
-        created_at: Time.zone.now - 10.days,
-        updated_at: Time.zone.now - 10.days,
-        primary_pom_allocated_at: Time.zone.now - 10.days
+      :allocation_version,
+      nomis_offender_id: nomis_offender_id,
+      primary_pom_nomis_id: probation_pom[:primary_pom_nomis_id],
+      primary_pom_name: probation_pom[:primary_pom_name],
+      recommended_pom_type: 'probation',
+      created_at: Time.zone.now - 10.days,
+      updated_at: Time.zone.now - 10.days,
+      primary_pom_allocated_at: Time.zone.now - 10.days
     )
 
     allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id)
@@ -72,7 +71,7 @@ feature 'Allocation History' do
                       primary_pom_nomis_id: prison_pom[:primary_pom_nomis_id],
                       primary_pom_name: prison_pom[:primary_pom_name],
                       recommended_pom_type: 'prison',
-                      updated_at: Time.zone.now - 4.day)
+                      updated_at: Time.zone.now - 4.days)
 
     allocation.update(event: AllocationVersion::REALLOCATE_PRIMARY_POM,
                       primary_pom_nomis_id: pom_without_email[:primary_pom_nomis_id],
