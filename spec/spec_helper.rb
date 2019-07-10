@@ -34,7 +34,7 @@ VCR.configure do |config|
   config.default_cassette_options = { record: vcr_record_mode }
   config.default_cassette_options = { match_requests_on: [
     :method,
-    :query,
+    :method, :uri, :body, :query,
     :path,
     :body,
     :paging_headers

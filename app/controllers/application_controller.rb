@@ -17,16 +17,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def ensure_pom
-    pom = PrisonOffenderManagerService.get_signed_in_pom_details(
-      current_user, params[:prison_id]
-    )
-
-    if pom.blank?
-      redirect_to '/'
-    end
-  end
-
   def current_user
     sso_identity['username'] if sso_identity.present?
   end

@@ -65,29 +65,17 @@ describe PrisonOffenderManagerService do
      vcr: { cassette_name: :pom_service_allocated_offenders } do
     allocated_offenders = described_class.get_allocated_offenders(allocation_one.primary_pom_nomis_id, 'LEI')
 
-    alloc, sentence_detail = allocated_offenders.first
-    expect(alloc).to be_kind_of(AllocationVersion)
-    expect(sentence_detail).to be_kind_of(Nomis::Models::SentenceDetail)
-  end
-
-  it "can get a subset of allocated offenders for a POM",
-     vcr: { cassette_name: :pom_service_allocated_offenders_subset } do
-    expected_total = all_allocations.size
-
-    allocated_offenders = described_class.get_allocated_offenders(allocation_one.primary_pom_nomis_id, 'LEI')
-    expect(allocated_offenders.count).to eq(expected_total)
-
-    allocated_offenders = described_class.get_allocated_offenders(
-      allocation_one.primary_pom_nomis_id, 'LEI',
-      offset: 2, limit: 2)
-    expect(allocated_offenders.count).to eq(2)
+    alloc = allocated_offenders.first
+    expect(alloc).to be_kind_of(AllocationWithSentence)
   end
 
   it "will get allocations for a POM made within the last 7 days", vcr: { cassette_name: :get_new_cases } do
     allocation_one.update!(updated_at: 10.days.ago)
     allocation_two.update!(updated_at: 3.days.ago)
 
-    allocated_offenders = described_class.get_new_cases(allocation_one.primary_pom_nomis_id, 'LEI')
+    allocated_offenders = described_class.
+                            get_allocated_offenders(allocation_one.primary_pom_nomis_id, 'LEI').
+                            select(&:new_case?)
     expect(allocated_offenders.count).to eq 3
   end
 

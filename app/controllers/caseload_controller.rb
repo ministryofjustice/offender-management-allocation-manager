@@ -9,34 +9,75 @@ class CaseloadController < PrisonsApplicationController
 
   PAGE_SIZE = 10
 
+  # rubocop:disable Metrics/MethodLength
   def index
-    return if pom.blank?
-
-    @allocations = PrisonOffenderManagerService.get_allocated_offenders(
-      pom.staff_id, active_prison,
-      offset: offset, limit: PAGE_SIZE
-    )
-    @new_cases_count = PrisonOffenderManagerService.get_new_cases_count(
-      pom.staff_id, active_prison
+    allocations = PrisonOffenderManagerService.get_allocated_offenders(
+      @pom.staff_id, active_prison
     )
 
-    @page_meta = new_page_meta(total_allocations, @allocations.count)
+    @new_cases_count = allocations.select(&:new_case?).count
+    allocations = filter_allocations(allocations)
+    @total_allocations = allocations.count
+    allocations = sort_allocations(allocations)
+
+    @allocations = allocations.select.with_index { |_item, index|
+      index >= offset && index < offset + PAGE_SIZE
+    }
+
+    @page_meta = new_page_meta(@total_allocations, @allocations.count)
   end
+  # rubocop:enable Metrics/MethodLength
 
   def new
-    if pom.present?
-      @new_cases = PrisonOffenderManagerService.get_new_cases(
-        pom.staff_id, active_prison
-      )
-    end
+    @new_cases = PrisonOffenderManagerService.get_allocated_offenders(
+      @pom.staff_id, active_prison
+    ).select(&:new_case?)
   end
 
 private
 
-  def total_allocations
-    @total_allocations ||= PrisonOffenderManagerService.get_allocations_for_primary_pom(
-      pom.staff_id, active_prison
-    ).count
+  def sort_allocations(allocations)
+    if params['sort'].present?
+      sort_field, sort_direction = params['sort'].split.map(&:to_sym)
+    else
+      sort_field = :last_name
+      sort_direction = :asc
+    end
+
+    # cope with nil values by sorting using to_s - only dates and strings in these fields
+    allocations = allocations.sort_by { |sentence| sentence.public_send(sort_field).to_s }
+    allocations.reverse! if sort_direction == :desc
+
+    allocations
+  end
+
+  # rubocop:disable Metrics/MethodLength
+  def filter_allocations(allocations)
+    if params['q'].present?
+      @q = params['q']
+      query = @q.upcase
+      allocations = allocations.select { |a|
+        a.full_name.upcase.include?(query) || a.nomis_offender_id.include?(query)
+      }
+    end
+    if params['role'].present?
+      allocations = allocations.select { |a|
+        a.responsibility == params['role']
+      }
+    end
+    allocations
+  end
+  # rubocop:enable Metrics/MethodLength
+
+  def ensure_pom
+    @pom = PrisonOffenderManagerService.get_signed_in_pom_details(
+      current_user,
+      active_prison
+    )
+
+    if @pom.blank?
+      redirect_to '/'
+    end
   end
 
   def new_page_meta(total, count_on_page)
@@ -51,11 +92,6 @@ private
 
   def offset
     (PAGE_SIZE * page) - PAGE_SIZE
-  end
-
-  def pom
-    @pom ||= PrisonOffenderManagerService.
-        get_signed_in_pom_details(current_user, active_prison)
   end
 
   def page

@@ -38,13 +38,14 @@ group :development, :test do
   gem 'rubocop-rspec'
   gem 'rubocop-performance'
   gem 'rubocop-rails'
+  gem 'dotenv-rails'
+  gem 'rspec-rails'
 end
 
 group :test do
   gem 'capybara'
   gem 'database_cleaner'
   gem 'faker'
-  gem 'rspec-rails'
   gem 'launchy'
   gem 'selenium-webdriver'
   gem 'shoulda-matchers'
