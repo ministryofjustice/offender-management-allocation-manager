@@ -59,7 +59,7 @@ feature 'summary summary feature' do
   end
 
   describe 'paging' do
-    it 'shows pages for allocation', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders_paged_feature, match_requests_on: [:query] } do
+    it 'shows pages for allocation', :raven_intercept_exception, vcr: { cassette_name: :allocated_offenders_paged_feature } do
       signin_user
 
       visit prison_summary_pending_path('LEI')

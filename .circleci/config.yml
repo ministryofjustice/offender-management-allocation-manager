@@ -183,7 +183,7 @@ jobs:
           name: Run tests
           command: |
             ./cc-test-reporter before-build
-            bundle exec rake
+            VCR=1 bundle exec rake
             ./cc-test-reporter after-build --coverage-input-type simplecov --exit-code $?
           environment:
             ALLOCATION_MANAGER_HOST: https://allocation-manager-staging.apps.live-1.cloud-platform.service.justice.gov.uk
@@ -265,7 +265,7 @@ jobs:
           name: run integration tests
           command: |
             cd offender-management-integration-tests
-            bundle exec rspec spec/integration --no-color --format documentation --format RspecJunitFormatter -o screenshots/rspec.xml
+            VCR=1 bundle exec rspec spec/integration --no-color --format documentation --format RspecJunitFormatter -o screenshots/rspec.xml
           environment:
             STAGING_START_PAGE: https://allocation-manager-staging.apps.live-1.cloud-platform.service.justice.gov.uk
       - *store_test_results

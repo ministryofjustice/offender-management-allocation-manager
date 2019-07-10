@@ -1,14 +1,16 @@
 require 'rails_helper'
 
-feature 'Switching prisons', vcr: { cassette_name: :prison_switching_feature_spec } do
-  it 'Shows the switcher if the user has more than one prison' do
+feature 'Switching prisons' do
+  it 'Shows the switcher if the user has more than one prison',
+     vcr: { cassette_name: :prison_switching_feature_many_prisons_spec } do
     signin_user
     visit root_path
 
     expect(page).to have_css('h2', text: 'HMP Leeds')
   end
 
-  it 'Shows the list of prisons I can switch to' do
+  it 'Shows the list of prisons I can switch to',
+     vcr: { cassette_name: :prison_switching_feature_list_spec }do
     signin_user
     visit root_path
 
@@ -18,7 +20,8 @@ feature 'Switching prisons', vcr: { cassette_name: :prison_switching_feature_spe
     expect(page).to have_css('a', text: 'HMP Risley')
   end
 
-  it 'Changes my prison when I choose one' do
+  it 'Changes my prison when I choose one',
+     vcr: { cassette_name: :prison_switching_feature_change_prisons_spec }do
     signin_user
     visit root_path
 
@@ -29,7 +32,8 @@ feature 'Switching prisons', vcr: { cassette_name: :prison_switching_feature_spe
     expect(page).to have_content('HMP Risley')
   end
 
-  it 'Can remember where I was' do
+  it 'Can remember where I was',
+     vcr: { cassette_name: :prison_switching_feature_remember_prison_spec } do
     signin_user
     visit prison_poms_path('LEI')
 
