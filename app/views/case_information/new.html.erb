@@ -1,4 +1,4 @@
-<%= render :partial => "/shared/backlink", :locals => { :page => summary_pending_path } %>
+<%= render :partial => "/shared/backlink", :locals => { :page => prison_summary_pending_path(@prison) } %>
 
 
 <% if @case_info.errors.count > 0 %>
@@ -13,6 +13,6 @@
 
 
 <%= render :partial => "form", :locals => {
-      :action => case_information_path(),
+      :action => prison_case_information_path(@prison),
       :method => :post,
       :save_text => "Save" } %>

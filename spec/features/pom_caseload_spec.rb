@@ -11,11 +11,11 @@ feature "view POM's caseload" do
   it 'displays all cases for a specific POM',  vcr: { cassette_name: :show_poms_caseload } do
     signin_user('PK000223')
 
-    visit confirm_allocation_path(nomis_offender_id, nomis_staff_id)
+    visit prison_confirm_allocation_path('LEI', nomis_offender_id, nomis_staff_id)
 
     click_button 'Complete allocation'
 
-    visit caseload_index_path
+    visit prison_caseload_index_path('LEI')
 
     expect(page).to have_content("Showing 1 - 1 of 1 results")
     expect(page).to have_content("Your caseload")
@@ -25,11 +25,11 @@ feature "view POM's caseload" do
   it 'allows a POM to view the prisoner profile page for a specific offender',  vcr: { cassette_name: :show_poms_caseload_prisoner_profile } do
     signin_user('PK000223')
 
-    visit confirm_allocation_path(nomis_offender_id, nomis_staff_id)
+    visit prison_confirm_allocation_path('LEI', nomis_offender_id, nomis_staff_id)
 
     click_button 'Complete allocation'
 
-    visit caseload_index_path
+    visit prison_caseload_index_path('LEI')
 
     within('.offender_row_0') do
       click_link 'View'
@@ -44,10 +44,10 @@ feature "view POM's caseload" do
   it 'displays all cases that have been allocated to a specific POM in the last week', vcr: { cassette_name: :show_new_cases } do
     signin_user('PK000223')
 
-    visit confirm_allocation_path(nomis_offender_id, nomis_staff_id)
+    visit prison_confirm_allocation_path('LEI', nomis_offender_id, nomis_staff_id)
     click_button 'Complete allocation'
 
-    visit caseload_index_path
+    visit prison_caseload_index_path('LEI')
     click_link('1')
 
     expect(page).to have_content("New cases")
@@ -56,7 +56,8 @@ feature "view POM's caseload" do
 
   it 'stops staff without the POM role from viewing the my caseload page', vcr: { cassette_name: :non_pom_caseload }  do
     signin_user('NON_POM_GEN')
-    visit caseload_index_path
-    expect(page).to have_current_path('/')
+    visit prison_caseload_index_path('LEI')
+    # root path will redirect to default dashboard
+    expect(page).to have_current_path('/prisons/LEI/dashboard')
   end
 end

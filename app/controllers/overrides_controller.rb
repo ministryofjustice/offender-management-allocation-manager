@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-class OverridesController < ApplicationController
+class OverridesController < PrisonsApplicationController
   def new
     @prisoner = OffenderService.get_offender(params.require(:nomis_offender_id))
-    @pom = PrisonOffenderManagerService.get_pom(active_caseload, params[:nomis_staff_id])
+    @pom = PrisonOffenderManagerService.get_pom(active_prison, params[:nomis_staff_id])
     @recommended_pom_type, @not_recommended_pom_type =
       recommended_and_nonrecommended_poms_types_for(@prisoner)
 
@@ -24,7 +24,7 @@ class OverridesController < ApplicationController
 
     @prisoner = OffenderService.get_offender(override_params[:nomis_offender_id])
     @pom = PrisonOffenderManagerService.get_pom(
-      active_caseload, override_params[:nomis_staff_id])
+      active_prison, override_params[:nomis_staff_id])
     @recommended_pom_type, @not_recommended_pom_type =
       recommended_and_nonrecommended_poms_types_for(@prisoner)
 
@@ -47,7 +47,8 @@ private
   end
 
   def redirect_on_success
-    redirect_to confirm_allocation_path(
+    redirect_to prison_confirm_allocation_path(
+      active_prison,
       override_params[:nomis_offender_id],
       override_params[:nomis_staff_id]
     )

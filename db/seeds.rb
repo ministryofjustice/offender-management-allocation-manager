@@ -76,6 +76,7 @@ AllocationService.create_or_update(
     created_by_username: 'PK000223',
     primary_pom_nomis_id: 485_637,
     primary_pom_allocated_at: DateTime.now.utc,
+    recommended_pom_type: 'probation',
     event: AllocationVersion::ALLOCATE_PRIMARY_POM,
     event_trigger: AllocationVersion::USER
   )
@@ -87,6 +88,7 @@ AllocationService.create_or_update(
   allocated_at_tier: 'B',
   created_by_username: 'PK000223',
   primary_pom_nomis_id: 485_737,
+  recommended_pom_type: 'probation',
   event: AllocationVersion::ALLOCATE_PRIMARY_POM,
   event_trigger: AllocationVersion::USER
   )
@@ -98,6 +100,7 @@ AllocationService.create_or_update(
   allocated_at_tier: 'D',
   created_by_username: 'PK000223',
   primary_pom_nomis_id: 485_833,
+  recommended_pom_type: 'prison',
   event: AllocationVersion::ALLOCATE_PRIMARY_POM,
   event_trigger: AllocationVersion::USER
 )

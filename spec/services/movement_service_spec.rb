@@ -1,7 +1,7 @@
 require 'rails_helper'
 require_relative '../../app/services/nomis/models/movement'
 
-describe MovementService, vcr: { cassette_name: :movement_service_spec } do
+describe MovementService do
   let(:new_offender) {
     Nomis::Models::Movement.new.tap { |m|
       m.offender_no = 'G4273GI'
@@ -37,15 +37,17 @@ describe MovementService, vcr: { cassette_name: :movement_service_spec } do
     }
   }
 
-  it "can get recent movements" do
-    movements = MovementService.movements_on(Date.iso8601('2019-02-20'))
+  it "can get recent movements",
+     vcr: { cassette_name: :movement_service_recent_spec }  do
+    movements = described_class.movements_on(Date.iso8601('2019-02-20'))
     expect(movements).to be_kind_of(Array)
     expect(movements.length).to eq(2)
     expect(movements.first).to be_kind_of(Nomis::Models::Movement)
   end
 
-  it "can filter transfer type results" do
-    movements = MovementService.movements_on(
+  it "can filter transfer type results",
+     vcr: { cassette_name: :movement_service_filter_type_spec }  do
+    movements = described_class.movements_on(
       Date.iso8601('2019-02-20'),
       type_filters: [Nomis::Models::MovementType::TRANSFER]
     )
@@ -53,8 +55,9 @@ describe MovementService, vcr: { cassette_name: :movement_service_spec } do
     expect(movements.length).to eq(0)
   end
 
-  it "can filter admissions" do
-    movements = MovementService.movements_on(
+  it "can filter admissions",
+     vcr: { cassette_name: :movement_service_filter_adm_spec }  do
+    movements = described_class.movements_on(
       Date.iso8601('2019-03-12'),
       type_filters: [Nomis::Models::MovementType::ADMISSION]
     )
@@ -64,8 +67,9 @@ describe MovementService, vcr: { cassette_name: :movement_service_spec } do
     expect(movements.first.movement_type).to eq(Nomis::Models::MovementType::ADMISSION)
   end
 
-  it "can filter release type results" do
-    movements = MovementService.movements_on(
+  it "can filter release type results",
+     vcr: { cassette_name: :movement_service_filter_release_spec }  do
+    movements = described_class.movements_on(
       Date.iso8601('2019-02-20'),
       type_filters: [Nomis::Models::MovementType::RELEASE]
     )
@@ -75,8 +79,9 @@ describe MovementService, vcr: { cassette_name: :movement_service_spec } do
     expect(movements.first.movement_type).to eq(Nomis::Models::MovementType::RELEASE)
   end
 
-  it "can filter results by direction IN" do
-    movements = MovementService.movements_on(
+  it "can filter results by direction IN",
+     vcr: { cassette_name: :movement_service_filter_direction_in_spec }  do
+    movements = described_class.movements_on(
       Date.iso8601('2019-03-12'),
       direction_filters: [Nomis::Models::MovementDirection::IN]
     )
@@ -86,8 +91,9 @@ describe MovementService, vcr: { cassette_name: :movement_service_spec } do
     expect(movements.first.direction_code).to eq(Nomis::Models::MovementDirection::IN)
   end
 
-  it "can filter results by direction OUT" do
-    movements = MovementService.movements_on(
+  it "can filter results by direction OUT",
+     vcr: { cassette_name: :movement_service_filter_direction_out_spec }  do
+    movements = described_class.movements_on(
       Date.iso8601('2019-02-20'),
       direction_filters: [Nomis::Models::MovementDirection::OUT]
     )
@@ -97,23 +103,27 @@ describe MovementService, vcr: { cassette_name: :movement_service_spec } do
     expect(movements.first.direction_code).to eq(Nomis::Models::MovementDirection::OUT)
   end
 
-  it "can process transfer movements IN" do
-    processed = MovementService.process_movement(transfer_adm)
+  it "can process transfer movements IN",
+     vcr: { cassette_name: :movement_service_transfer_in_spec }  do
+    processed = described_class.process_movement(transfer_adm)
     expect(processed).to be true
   end
 
-  it "can process release movements" do
-    processed = MovementService.process_movement(release)
+  it "can process release movements",
+     vcr: { cassette_name: :movement_service_process_release_spec }  do
+    processed = described_class.process_movement(release)
     expect(processed).to be true
   end
 
-  it "can ignore movements OUT" do
-    processed = MovementService.process_movement(transfer_out)
+  it "can ignore movements OUT",
+     vcr: { cassette_name: :movement_service_ignore_out_spec }  do
+    processed = described_class.process_movement(transfer_out)
     expect(processed).to be false
   end
 
-  it "can ignore new offenders arriving at prison" do
-    processed = MovementService.process_movement(new_offender)
+  it "can ignore new offenders arriving at prison",
+     vcr: { cassette_name: :movement_service_ignore_new_spec }  do
+    processed = described_class.process_movement(new_offender)
     expect(processed).to be false
   end
 end

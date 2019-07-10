@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-class CaseInformationController < ApplicationController
-  before_action :authenticate_user
-
+class CaseInformationController < PrisonsApplicationController
   def new
     @case_info = CaseInformation.new(
       nomis_offender_id: nomis_offender_id_from_url
@@ -27,7 +25,7 @@ class CaseInformationController < ApplicationController
       case_allocation: case_information_params[:case_allocation]
     )
 
-    return redirect_to summary_pending_path if @case_info.valid?
+    return redirect_to prison_summary_pending_path(active_prison) if @case_info.valid?
 
     @prisoner = prisoner(case_information_params[:nomis_offender_id])
     render :new
@@ -42,7 +40,7 @@ class CaseInformationController < ApplicationController
     case_info.omicable = case_information_params[:omicable]
     case_info.save
 
-    redirect_to new_allocation_path(case_info.nomis_offender_id)
+    redirect_to new_prison_allocation_path(active_prison, case_info.nomis_offender_id)
   end
 
 private

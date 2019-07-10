@@ -8,7 +8,7 @@ describe AllocationService do
     allow(EmailService).to receive(:instance).and_return(mock_email_service)
   end
 
-  it 'can create a new record where none exists', vcr: { cassette_name: :allocation_service_create_allocation_version } do
+  it 'can create a new record where none exists', versioning: true, vcr: { cassette_name: :allocation_service_create_allocation_version } do
     params = {
       nomis_offender_id: 'G2911GD',
       prison: 'LEI',
@@ -16,6 +16,7 @@ describe AllocationService do
       primary_pom_nomis_id: 485_595,
       primary_pom_allocated_at: DateTime.now.utc,
       nomis_booking_id: 1,
+      recommended_pom_type: 'probation',
       event: AllocationVersion::ALLOCATE_PRIMARY_POM,
       event_trigger: AllocationVersion::USER
     }
@@ -109,6 +110,7 @@ describe AllocationService do
       primary_pom_nomis_id: 485_766,
       allocated_at_tier: 'A',
       prison: 'PVI',
+      recommended_pom_type: 'probation',
       event: AllocationVersion::REALLOCATE_PRIMARY_POM,
       event_trigger: AllocationVersion::USER
     )
@@ -118,6 +120,7 @@ describe AllocationService do
       primary_pom_nomis_id: 485_737,
       allocated_at_tier: 'A',
       prison: 'LEI',
+      recommended_pom_type: 'probation',
       event: AllocationVersion::ALLOCATE_PRIMARY_POM,
       event_trigger: AllocationVersion::USER
     )
