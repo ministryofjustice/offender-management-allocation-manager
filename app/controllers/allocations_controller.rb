@@ -84,6 +84,7 @@ class AllocationsController < PrisonsApplicationController
   def history
     @prisoner = offender(nomis_offender_id_from_url)
     @history = AllocationService.offender_allocation_history(nomis_offender_id_from_url)
+    @pom_emails = AllocationService.allocation_history_pom_emails(@history)
   end
 
 private
