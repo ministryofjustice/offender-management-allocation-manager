@@ -17,6 +17,16 @@ class PomMailer < GovukNotifyRails::Mailer
     mail(to: params[:pom_email])
   end
 
+  def new_prison_allocation_email(prison)
+    set_template('651da525-7564-4f04-85ff-b0343fb7c47d')
+    set_personalisation(
+      email_subject: 'New Allocation',
+      prison: PrisonService.name_for(prison)
+    )
+
+    mail(to: ENV['SUPPORT_EMAIL'])
+  end
+
   def deallocation_email(params = {})
     set_template('cd628495-6e7a-448e-b4ad-4d49d4d8567d')
 

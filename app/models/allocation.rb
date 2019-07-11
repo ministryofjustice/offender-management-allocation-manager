@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# TODO: - remove this class, as this model is no longer being used.
 class Allocation < ApplicationRecord
   attr_accessor :responsibility
 

@@ -12,6 +12,7 @@ Rails.application.configure do
   config.cache_classes = true
 
   config.action_controller.perform_caching = false
+  config.active_job.queue_adapter = :inline
   config.cache_store = :null_store
 
   # Do not eager load code on boot. This avoids loading your whole application
@@ -41,6 +42,10 @@ Rails.application.configure do
   # The :test delivery method accumulates sent emails in the
   # ActionMailer::Base.deliveries array.
   config.action_mailer.delivery_method = :test
+  # TODO: Ideally this should be enabled, but doing so makes
+  # the circle:ci build fail due to a lack of a TEST_NOTIFY_API_KEY
+  # combined with the fact that in Notify-land the ActionMailer::TestMailer
+  # isn't actually used despite delivery_method being set to :test
   config.action_mailer.perform_deliveries = false
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
