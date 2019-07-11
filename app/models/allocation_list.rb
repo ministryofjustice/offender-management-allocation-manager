@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class AllocationList < Array
-  # rubocop:disable Metrics/MethodLength
   def grouped_by_prison(&_block)
     # Groups the allocations in this array by the prison that it relates to.
     # Unfortunately we can't put this in a hash because a prisoner may have been
@@ -30,5 +29,4 @@ class AllocationList < Array
       break if idx >= last_idx
     end
   end
-  # rubocop:enable Metrics/MethodLength
 end

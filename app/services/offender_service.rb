@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class OffenderService
-  # rubocop:disable Metrics/MethodLength
   def self.get_offender(offender_no)
     Nomis::Elite2::OffenderApi.get_offender(offender_no).tap { |o|
       record = CaseInformation.find_by(nomis_offender_id: offender_no)
@@ -22,8 +21,6 @@ class OffenderService
       o.main_offence = Nomis::Elite2::OffenderApi.get_offence(o.latest_booking_id)
     }
   end
-
-  # rubocop:enable Metrics/MethodLength
 
   # rubocop:disable Metrics/MethodLength
   def self.get_offenders_for_prison(prison, page_number: 0, page_size: 10)
@@ -66,7 +63,6 @@ class OffenderService
 
   # Takes a list of OffenderSummary or Offender objects, and returns them with their
   # allocated POM name set in :allocated_pom_name
-  # rubocop:disable Metrics/MethodLength
   # rubocop:disable Metrics/LineLength
   def self.set_allocated_pom_name(offenders, caseload)
     pom_names = PrisonOffenderManagerService.get_pom_names(caseload)
@@ -92,5 +88,4 @@ class OffenderService
     end
   end
   # rubocop:enable Metrics/LineLength
-  # rubocop:enable Metrics/MethodLength
 end

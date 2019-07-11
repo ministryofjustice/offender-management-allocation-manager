@@ -30,7 +30,6 @@ namespace :delius_etl do
   end
 end
 
-# rubocop:disable Metrics/MethodLength
 def fetch_offenders(prison)
   results = []
 
@@ -48,7 +47,6 @@ def fetch_offenders(prison)
 
   results.flatten
 end
-# rubocop:enable Metrics/MethodLength
 
 def max_requests_count(prison)
   info_request = Nomis::Elite2::OffenderApi.list(prison, 1, page_size: 1)
