@@ -91,39 +91,38 @@ feature 'Allocation History' do
 
     history = AllocationService.offender_allocation_history(nomis_offender_id)
 
+    previous_formatted_date = history[1].updated_at.strftime("#{history[1].updated_at.day.ordinalize} %B %Y") + " (" + history[1].updated_at.strftime("%R") + ")"
+    pvi_allocation_date = history[2].updated_at.strftime("#{history[2].updated_at.day.ordinalize} %B %Y") + " (" + history[2].updated_at.strftime("%R") + ")"
+    old_formatted_date = history[4].updated_at.strftime("#{history[4].updated_at.day.ordinalize} %B %Y") + " (" + history[4].updated_at.strftime("%R") + ")"
+    initial_allocated_date = history.last.updated_at.strftime("#{history.last.updated_at.day.ordinalize} %B %Y") + " (" + history.last.updated_at.strftime("%R") + ")"
+
     signin_user
     visit prison_allocation_history_path('LEI', nomis_offender_id)
 
-    expect(page).to have_css('h1', text: "Abbella, Ozullirn")
+    TESTS = [
+        ['h1', "Abbella, Ozullirn"],
+        ['.govuk-heading-m', "HMP Pentonville"],
+        ['.govuk-heading-s', "Prisoner unallocated (transfer)"],
+        ['.time', transfer_date.to_s],
+        ['.govuk-heading-s', "Prisoner reallocated"],
+        ['p', "Prisoner reallocated to #{history[1].primary_pom_name} Tier: #{history[1].allocated_at_tier}"],
+        ['.time', "#{previous_formatted_date} by #{history[1].created_by_name.titleize}"],
+        ['.govuk-heading-s', "Prisoner allocation"],
+        ['p', "Prisoner allocated to #{history[2].primary_pom_name.titleize} - #{prison_pom[:email]} Tier: #{history[2].allocated_at_tier}"],
+        ['.time', "#{pvi_allocation_date} by #{history[2].created_by_name.titleize}"],
+        ['.govuk-heading-m', "HMP Leeds"],
+        ['.govuk-heading-s', "Prisoner unallocated"],
+        ['.time', deallocate_date.to_s],
+        ['.govuk-heading-s', "Prisoner reallocated"],
+        ['p', "Prisoner reallocated to #{history[4].primary_pom_name} - #{probation_pom_2[:email]} Tier: #{history[4].allocated_at_tier}"],
+        ['.time', "#{old_formatted_date} by #{history[4].created_by_name.titleize}"],
+        ['.govuk-heading-s', "Prisoner allocation"],
+        ['p', "Prisoner allocated to #{history.last.primary_pom_name.titleize} - #{probation_pom[:email]} Tier: #{history.last.allocated_at_tier}"],
+        ['.time', "#{initial_allocated_date} by #{history.last.created_by_name.titleize}"]
+    ]
 
-    expect(page).to have_css('.govuk-heading-m', text: "HMP Pentonville")
-
-    expect(page).to have_css('.govuk-heading-s', text: "Prisoner unallocated (transfer)")
-    expect(page).to have_css('.time', text: transfer_date.to_s)
-
-    expect(page).to have_css('.govuk-heading-s', text: "Prisoner reallocated")
-    expect(page).to have_css('p', text: "Prisoner reallocated to #{history[1].primary_pom_name} Tier: #{history[1].allocated_at_tier}")
-    previous_formatted_date = history[1].updated_at.strftime("#{history[1].updated_at.day.ordinalize} %B %Y") + " (" + history[1].updated_at.strftime("%R") + ")"
-    expect(page).to have_css('.time', text: "#{previous_formatted_date} by #{history[1].created_by_name.titleize}")
-
-    expect(page).to have_css('.govuk-heading-s', text: "Prisoner allocation")
-    expect(page).to have_css('p', text: "Prisoner allocated to #{history[2].primary_pom_name.titleize} - #{prison_pom[:email]} Tier: #{history[2].allocated_at_tier}")
-    pvi_allocation_date = history[2].updated_at.strftime("#{history[2].updated_at.day.ordinalize} %B %Y") + " (" + history[2].updated_at.strftime("%R") + ")"
-    expect(page).to have_css('.time', text: "#{pvi_allocation_date} by #{history[2].created_by_name.titleize}")
-
-    expect(page).to have_css('.govuk-heading-m', text: "HMP Leeds")
-
-    expect(page).to have_css('.govuk-heading-s', text: "Prisoner unallocated")
-    expect(page).to have_css('.time', text: deallocate_date.to_s)
-
-    expect(page).to have_css('.govuk-heading-s', text: "Prisoner reallocated")
-    expect(page).to have_css('p', text: "Prisoner reallocated to #{history[4].primary_pom_name} - #{probation_pom_2[:email]} Tier: #{history[4].allocated_at_tier}")
-    old_formatted_date = history[4].updated_at.strftime("#{history[4].updated_at.day.ordinalize} %B %Y") + " (" + history[4].updated_at.strftime("%R") + ")"
-    expect(page).to have_css('.time', text: "#{old_formatted_date} by #{history[4].created_by_name.titleize}")
-
-    expect(page).to have_css('.govuk-heading-s', text: "Prisoner allocation")
-    expect(page).to have_css('p', text: "Prisoner allocated to #{history.last.primary_pom_name.titleize} - #{probation_pom[:email]} Tier: #{history.last.allocated_at_tier}")
-    initial_allocated_date = history.last.updated_at.strftime("#{history.last.updated_at.day.ordinalize} %B %Y") + " (" + history.last.updated_at.strftime("%R") + ")"
-    expect(page).to have_css('.time', text: "#{initial_allocated_date} by #{history.last.created_by_name.titleize}")
+    TESTS.each do |key, val|
+      expect(page).to have_css(key, text: val)
+    end
   end
 end
