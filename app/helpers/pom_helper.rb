@@ -9,7 +9,6 @@ module PomHelper
     end
   end
 
-  # rubocop:disable Metrics/MethodLength
   def working_pattern_to_days(pattern)
     ['',
      'half a day',
@@ -23,5 +22,4 @@ module PomHelper
      'four and a half days'
     ][pattern]
   end
-  # rubocop:enable Metrics/MethodLength
 end

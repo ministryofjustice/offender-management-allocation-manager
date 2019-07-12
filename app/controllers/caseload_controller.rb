@@ -9,7 +9,6 @@ class CaseloadController < PrisonsApplicationController
 
   PAGE_SIZE = 10
 
-  # rubocop:disable Metrics/MethodLength
   def index
     allocations = PrisonOffenderManagerService.get_allocated_offenders(
       @pom.staff_id, active_prison
@@ -26,7 +25,6 @@ class CaseloadController < PrisonsApplicationController
 
     @page_meta = new_page_meta(@total_allocations, @allocations.count)
   end
-  # rubocop:enable Metrics/MethodLength
 
   def new
     @new_cases = PrisonOffenderManagerService.get_allocated_offenders(
@@ -51,7 +49,6 @@ private
     allocations
   end
 
-  # rubocop:disable Metrics/MethodLength
   def filter_allocations(allocations)
     if params['q'].present?
       @q = params['q']
@@ -67,7 +64,6 @@ private
     end
     allocations
   end
-  # rubocop:enable Metrics/MethodLength
 
   def ensure_pom
     @pom = PrisonOffenderManagerService.get_signed_in_pom_details(

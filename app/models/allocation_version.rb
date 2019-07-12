@@ -64,7 +64,6 @@ class AllocationVersion < ApplicationRecord
     !allocation.nil? && !allocation.primary_pom_nomis_id.nil?
   end
 
-  # rubocop:disable Metrics/MethodLength
   def self.deallocate_offender(nomis_offender_id, movement_type)
     alloc = AllocationVersion.find_by(
       nomis_offender_id: nomis_offender_id
@@ -83,7 +82,6 @@ class AllocationVersion < ApplicationRecord
 
     alloc.save!
   end
-  # rubocop:enable Metrics/MethodLength
 
   def self.deallocate_primary_pom(nomis_staff_id)
     all_primary_pom_allocations(nomis_staff_id).each do |alloc|

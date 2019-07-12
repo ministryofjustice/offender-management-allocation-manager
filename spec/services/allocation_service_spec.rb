@@ -6,6 +6,9 @@ describe AllocationService do
   before do
     allow(mock_email_service).to receive(:send_email)
     allow(EmailService).to receive(:instance).and_return(mock_email_service)
+
+    # needed as create_or_update calls a NOMIS API
+    signin_user
   end
 
   it 'can create a new record where none exists', versioning: true, vcr: { cassette_name: :allocation_service_create_allocation_version } do

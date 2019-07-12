@@ -11,7 +11,6 @@ class OnboardPrison
     @delius_missing = 0
   end
 
-  # rubocop:disable Metrics/MethodLength
   def complete_missing_info
     @offender_ids.each { |offender_id|
       record = @delius_records[offender_id]
@@ -31,7 +30,6 @@ class OnboardPrison
       @additions += 1
     }
   end
-# rubocop:enable Metrics/MethodLength
 
 private
 

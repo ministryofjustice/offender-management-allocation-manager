@@ -10,7 +10,6 @@ class OverridesController < PrisonsApplicationController
     @override = Override.new
   end
 
-  # rubocop:disable Metrics/MethodLength
   def create
     @override = AllocationService.create_override(
       nomis_staff_id: override_params[:nomis_staff_id],
@@ -30,7 +29,6 @@ class OverridesController < PrisonsApplicationController
 
     render :new
   end
-# rubocop:enable Metrics/MethodLength
 
 private
 
