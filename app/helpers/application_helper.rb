@@ -52,10 +52,6 @@ module ApplicationHelper
     'Part time'
   end
 
-  def pom_responsibility_label(offender)
-    ResponsibilityService.new.calculate_pom_responsibility(offender)
-  end
-
   def case_owner_label(offender)
     if offender.case_owner == 'Prison'
       'Custody'

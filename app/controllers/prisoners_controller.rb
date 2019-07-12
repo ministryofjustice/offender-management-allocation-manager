@@ -10,7 +10,7 @@ class PrisonersController < PrisonsApplicationController
     @prisoner = offender
     @allocation = AllocationService.current_allocation_for(@prisoner.offender_no)
     @pom_responsibility = ResponsibilityService.new.calculate_pom_responsibility(
-      @prisoner
+      offender
     )
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(
       active_prison, @prisoner.offender_no
