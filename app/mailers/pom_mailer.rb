@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class PomMailer < GovukNotifyRails::Mailer
-  # rubocop:disable Metrics/MethodLength
   def new_allocation_email(params = {})
     message = "Additional information: #{params[:message]}" if params[:message].present?
     set_template('9679ea4c-1495-4fa6-a00b-630de715e315')
@@ -16,6 +15,16 @@ class PomMailer < GovukNotifyRails::Mailer
     )
 
     mail(to: params[:pom_email])
+  end
+
+  def new_prison_allocation_email(prison)
+    set_template('651da525-7564-4f04-85ff-b0343fb7c47d')
+    set_personalisation(
+      email_subject: 'New Allocation',
+      prison: PrisonService.name_for(prison)
+    )
+
+    mail(to: ENV['SUPPORT_EMAIL'])
   end
 
   def deallocation_email(params = {})
@@ -35,4 +44,3 @@ class PomMailer < GovukNotifyRails::Mailer
     mail(to: params[:previous_pom_email])
   end
 end
-# rubocop:enable Metrics/MethodLength

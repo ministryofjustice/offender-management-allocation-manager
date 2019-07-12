@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class MovementService
-  # rubocop:disable Metrics/MethodLength
   def self.movements_on(date, direction_filters: [], type_filters: [])
     movements = Nomis::Elite2::MovementApi.movements_on_date(date)
 
@@ -19,8 +18,6 @@ class MovementService
 
     movements
   end
-
-  # rubocop:enable Metrics/MethodLength
 
   def self.process_movement(movement)
     if movement.movement_type == Nomis::Models::MovementType::RELEASE

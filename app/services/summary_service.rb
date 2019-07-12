@@ -2,7 +2,6 @@
 
 class SummaryService
   PAGE_SIZE = 10 # The number of items to show in the view
-  FETCH_SIZE = 200 # How many records to fetch from nomis at a time
 
   class SummaryParams
     attr_reader :sort_field, :sort_direction
@@ -14,6 +13,7 @@ class SummaryService
   end
 
   # rubocop:disable Metrics/MethodLength
+  # rubocop:disable Metrics/LineLength
   # rubocop:disable Metrics/PerceivedComplexity
   # rubocop:disable Metrics/CyclomaticComplexity
   def self.summary(summary_type, prison, page, params)
@@ -25,33 +25,20 @@ class SummaryService
     # each type of record.
     counts = { allocated: 0, unallocated: 0, pending: 0, all: 0 }
 
-    number_of_requests = max_requests_count(prison)
-    (0..number_of_requests).each do |request_no|
-      offenders = get_page_of_offenders(prison, request_no)
-      break if offenders.blank?
-
-      # Group the offenders without a tier, and the remaining ones
-      # are either allocated or unallocated
-      tiered_offenders, no_tier_offenders = offenders.partition { |offender|
-        offender.tier.present?
-      }
-      counts[:pending] += no_tier_offenders.count
-      bucket.items += no_tier_offenders if summary_type == :pending
-
-      # Check the allocations for the remaining offenders who have tiers.
-      offender_nos = tiered_offenders.map(&:offender_no)
-      active_allocations_hash = AllocationService.allocations(offender_nos, prison)
-
-      # Put the offenders in the correct group based on whether we were able to
-      # find an active allocation for them.
-      allocated_offenders, unallocated_offenders = tiered_offenders.partition { |offender|
-        active_allocations_hash.key?(offender.offender_no)
-      }
-      bucket.items += allocated_offenders if summary_type == :allocated
-      bucket.items += unallocated_offenders if summary_type == :unallocated
-
-      counts[:allocated] += allocated_offenders.count
-      counts[:unallocated] += unallocated_offenders.count
+    OffenderService.get_offenders_for_prison(prison).each do |offender|
+      if offender.tier.present?
+        active_allocations_hash = AllocationService.allocations([offender.offender_no], prison)
+        if active_allocations_hash.key?(offender.offender_no)
+          bucket.items << offender if summary_type == :allocated
+          counts[:allocated] += 1
+        else
+          bucket.items << offender if summary_type == :unallocated
+          counts[:unallocated] += 1
+        end
+      else
+        counts[:pending] += 1
+        bucket.items << offender if summary_type == :pending
+      end
     end
 
     page_count = (counts[summary_type] / PAGE_SIZE.to_f).ceil
@@ -91,28 +78,11 @@ class SummaryService
     }
   end
 # rubocop:enable Metrics/CyclomaticComplexity
+# rubocop:enable Metrics/LineLength
 # rubocop:enable Metrics/MethodLength
 # rubocop:enable Metrics/PerceivedComplexity
 
 private
-
-  def self.max_requests_count(prison)
-    # Fetch the first 1 prisoners just for the total number of pages so that we
-    # can send batched queries.
-    info_request = Nomis::Elite2::OffenderApi.list(prison, 1, page_size: 1)
-
-    # The maximum number of pages we need to fetch before we have all of
-    # the offenders
-    (info_request.meta.total_pages / FETCH_SIZE) + 1
-  end
-
-  def self.get_page_of_offenders(prison, page_number)
-    OffenderService.get_offenders_for_prison(
-      prison,
-      page_number: page_number,
-      page_size: FETCH_SIZE
-    )
-  end
 
   def self.number_items_wanted(is_last_page, last_digit_of_count)
     if is_last_page && last_digit_of_count != 0
