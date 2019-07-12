@@ -38,7 +38,6 @@ RSpec.describe OverrideHelper do
   end
 
   describe '#display_override_pom' do
-
     it 'displays which POM type was overriden, if present' do
       expect(display_override_pom(allocation_one)).to eq('Probation POM allocated instead of recommended Prison POM')
     end
@@ -49,7 +48,6 @@ RSpec.describe OverrideHelper do
   end
 
   describe '#display_override_details' do
-
     it 'displays which recommended POM type was not available, when present' do
       expect(display_override_details("no_staff", allocation_one)).to include('No available prison POMs')
     end
@@ -59,7 +57,6 @@ RSpec.describe OverrideHelper do
     end
 
     it 'displays the reason the prisoner wasn\'t suitable for the recommended POM type' do
-      expect(display_override_details("suitability", allocation_one)).to include('Prisoner assessed as suitable for a prison POM despite tiering calculation')
       expect(display_override_details("suitability", allocation_one)).to include('Prisoner too high risk')
     end
 
