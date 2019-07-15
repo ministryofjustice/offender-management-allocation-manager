@@ -24,7 +24,8 @@ module ApplicationHelper
   end
 
   def format_date_long(date_obj)
-    date_obj.strftime("#{date_obj.day.ordinalize} %B %Y")
+    date_obj.strftime("#{date_obj.day.ordinalize} %B %Y") +
+        ' (' + date_obj.strftime('%R') + ')'
   end
 
   def pom_level(level)

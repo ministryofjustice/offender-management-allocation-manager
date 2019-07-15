@@ -78,6 +78,17 @@ class AllocationService
     end
   end
 
+  def self.allocation_history_pom_emails(history)
+    pom_ids = history.map(&:primary_pom_nomis_id).uniq.compact
+    pom_emails = {}
+
+    pom_ids.each do |pom_id|
+      pom_emails[pom_id] = PrisonOffenderManagerService.get_pom_emails(pom_id).first
+    end
+
+    pom_emails
+  end
+
   def self.create_override(params)
     Override.find_or_create_by(
       nomis_staff_id: params[:nomis_staff_id],

@@ -136,4 +136,39 @@ describe AllocationService do
     expect(allocation_list.second.nomis_booking_id).to eq(1)
     expect(allocation_list.last.prison).to eq('PVI')
   end
+
+  it "can get email addresses of POM's who have been allocated to an offender given the allocation history", versioning: true, vcr: { cassette_name: 'pom_emails_on_offender_history' } do
+    nomis_offender_id = 'GHF1234'
+    previous_primary_pom_nomis_id = 485_752
+    updated_primary_pom_nomis_id = 485_637
+    primary_pom_without_email_id = 485_636
+
+    allocation = create(
+      :allocation_version,
+      nomis_offender_id: nomis_offender_id,
+      primary_pom_nomis_id: previous_primary_pom_nomis_id)
+
+    allocation.update!(
+      primary_pom_nomis_id: updated_primary_pom_nomis_id,
+      event: AllocationVersion::REALLOCATE_PRIMARY_POM
+    )
+
+    allocation.update!(
+      primary_pom_nomis_id: primary_pom_without_email_id,
+      event: AllocationVersion::REALLOCATE_PRIMARY_POM
+    )
+
+    allocation.update!(
+      primary_pom_nomis_id: updated_primary_pom_nomis_id,
+      event: AllocationVersion::REALLOCATE_PRIMARY_POM
+    )
+
+    allocation_list = described_class.offender_allocation_history(nomis_offender_id)
+    pom_emails = described_class.allocation_history_pom_emails(allocation_list)
+
+    expect(pom_emails.count).to eq(3)
+    expect(pom_emails[primary_pom_without_email_id]).to eq(nil)
+    expect(pom_emails[updated_primary_pom_nomis_id]).to eq('kath.pobee-norris@digital.justice.gov.uk')
+    expect(pom_emails[previous_primary_pom_nomis_id]).to eq('Ross.jonessss@digital.justice.gov.uk')
+  end
 end
