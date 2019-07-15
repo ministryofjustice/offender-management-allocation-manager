@@ -117,6 +117,23 @@ feature 'Allocation' do
     expect(Override.count).to eq(0)
   end
 
+  scenario 'overriding an allocation can validate the reason text area character limit', vcr: { cassette_name: :override_allocation__character_count_feature } do
+    signin_user
+
+    visit new_prison_allocation_path('LEI', nomis_offender_id)
+
+    within('.not_recommended_pom_row_0') do
+      click_link 'Allocate'
+    end
+
+    expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
+
+    check('override-conditional-1')
+    fill_in 'override[suitability_detail]', with: 'consectetur a eraconsectetur a erat nam at lectus urna duis convallis convallis tellus id interdum velit laoreet id donec ultrices tincidunt arcu non sodales neque sodales ut etiam'
+    click_button('Continue')
+    expect(page).to have_content('This reason cannot be more than 175 characters')
+  end
+
   scenario 're-allocating', versioning: true, vcr: { cassette_name: :re_allocate_feature } do
     create(
       :allocation_version,
