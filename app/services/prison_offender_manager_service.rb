@@ -29,9 +29,12 @@ class PrisonOffenderManagerService
     @pom = poms_list.select { |p| p.staff_id == nomis_staff_id.to_i }.first
     return nil if @pom.blank?
 
-    @pom.emails = Nomis::Elite2::PrisonOffenderManagerApi.
-        fetch_email_addresses(@pom.staff_id)
+    @pom.emails = get_pom_emails(@pom.staff_id)
     @pom
+  end
+
+  def self.get_pom_emails(nomis_staff_id)
+    Nomis::Elite2::PrisonOffenderManagerApi.fetch_email_addresses(nomis_staff_id)
   end
 
   def self.get_pom_names(prison)
