@@ -1,0 +1,37 @@
+<%= render :partial => "/shared/backlink", :locals => { :page => prison_allocation_path(@prison, nomis_offender_id: @prisoner.offender_no) } %>
+
+<h1 class="govuk-heading-l govuk-!-margin-bottom-5">Allocate a co-working Prison Offender Manager</h1>
+
+<%= render 'shared/basic_prisoner_info' %>
+
+<%= render 'allocations/pom_info' %>
+
+<hr class="govuk-section-break govuk-section-break--l govuk-section-break--invisible" />
+
+<h4 class="govuk-heading-m">Available POMs</h4>
+
+<h2 class="govuk-heading-s">Probation Officer POMs</h2>
+
+<%= render :partial => 'poms_table', :locals => { poms: @probation_poms } %>
+
+<!-- Spacer -->
+<div class="govuk-grid-row"><div class="govuk-grid-column-full govuk-!-margin-top-4"></div></div>
+
+<h2 class="govuk-heading-s">Prison Officer POMs</h2>
+
+<%= render :partial => 'poms_table', :locals => { poms: @prison_poms } %>
+
+<!-- Spacer -->
+<div class="govuk-grid-row"><div class="govuk-grid-column-full govuk-!-margin-top-4"></div></div>
+
+<% if @unavailable_poms.count > 0 %>
+  <p>
+    There
+    <% if @unavailable_poms.count == 1 %>
+      is <a href="<%= prison_poms_path(@prison) %>"> <%= @unavailable_poms.count %> unavailable POM </a> for new allocation
+    <% else %>
+      are <a href="<%= prison_poms_path(@prison) %>"> <%= @unavailable_poms.count %> unavailable POMs </a> for new allocation
+    <% end%>
+  </p>
+<% end %>
+
