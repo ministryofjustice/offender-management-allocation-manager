@@ -1,11 +1,23 @@
+# frozen_string_literal: true
+
 MessageContent = Struct.new(:date, :attachments)
 AttachmentContent = Struct.new(:content_type)
 
+# This class is intended to be monkey-patched into the default `Mail`
+# class. Where the original Mail class can read from a string and populate
+# it's attributes, this one uses a hash provided to read_from_string. This
+# will have been loaded from a fixture and should have a format like
+#  {
+#    "date": "21/01/2019",
+#    "attachments": [
+#      {
+#        "content_type": "application/zip"
+#      }
+#    ]
+#  }
+#
+# Currently no other information is required for the tests.
 class MockMailMessage
-  # We are no actually expecting a string here, we'll be passing a hash,
-  # which will have been loaded from the fixture data. The alternative is
-  # encoding a json object as a string inside the JSON object, or writing
-  # RFC822 format text in the JSON.
   def self.read_from_string(hash)
     date = Date.parse(hash['date'])
 
