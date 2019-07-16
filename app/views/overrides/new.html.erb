@@ -33,8 +33,12 @@
                   </span>
                 <% end %>
                 <div class="govuk-form-group <% if @override.errors[:suitability_detail].present? %>govuk-form-group--error<% end %>">
-                  <label class="govuk-label" for="provide-detail">Enter your reason for this decision</label>
-                  <textarea class="govuk-textarea" id="suitability-detail" name="override[suitability_detail]" rows="3" aria-describedby="suitability-detail-hint suitability-detail-error"></textarea>
+                  <div class="govuk-character-count" data-module="character-count" data-maxlength="175">
+                    <div class="govuk-form-group">
+                      <label class="govuk-label" for="provide-detail">Enter your reason for this decision</label>
+                      <textarea class="govuk-textarea js-character-count " id="suitability-detail" name="override[suitability_detail]" rows="3" aria-describedby="suitability-detail-hint suitability-detail-error"></textarea>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="govuk-checkboxes__item">
@@ -58,9 +62,13 @@
                     <%= @override.errors[:more_detail].first %>
                   </span>
                 <% end %>
-                  <label class="govuk-label" for="provide-detail">Please provide detail
-                    here</label>
-                  <textarea class="govuk-textarea" id="more-detail" name="override[more_detail]" rows="3" aria-describedby="more-detail-hint more-detail-error"></textarea>
+                <div class="govuk-character-count" data-module="character-count" data-maxlength="175">
+                  <div class="govuk-form-group">
+                    <label class="govuk-label" for="provide-detail">Please provide detail
+                      here</label>
+                    <textarea class="govuk-textarea js-character-count govuk-textarea--error" id="more-detail" name="override[more_detail]" rows="3" aria-describedby="more-detail-hint more-detail-error"></textarea>
+                  </div>
+                </div>
               </div>
             </div>
           </fieldset>

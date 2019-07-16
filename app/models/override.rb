@@ -16,7 +16,10 @@ class Override < ApplicationRecord
             },
             if: proc { |o|
                   o.override_reasons.present? && o.override_reasons.include?('other')
-                }
+                },
+            length: { maximum: 175,
+                      too_long: 'This reason cannot be more than 175 characters'
+            }
 
   validates :suitability_detail,
             presence: { message:
@@ -24,5 +27,8 @@ class Override < ApplicationRecord
             },
             if: proc { |o|
               o.override_reasons.present? && o.override_reasons.include?('suitability')
+            },
+            length: { maximum: 175,
+                      too_long: 'This reason cannot be more than 175 characters'
             }
 end
