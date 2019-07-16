@@ -8,6 +8,15 @@ RSpec.describe AllocationVersion, type: :model do
     create(
       :allocation_version,
       nomis_offender_id: nomis_offender_id,
+      primary_pom_nomis_id: nomis_staff_id,
+      override_reasons: "[\"suitability\", \"no_staff\", \"continuity\", \"other\"]"
+    )
+  }
+
+  let!(:allocation_no_overrides) {
+    create(
+      :allocation_version,
+      nomis_offender_id: nomis_offender_id,
       primary_pom_nomis_id: nomis_staff_id
     )
   }
@@ -82,6 +91,16 @@ RSpec.describe AllocationVersion, type: :model do
       AllocationVersion.deallocate_primary_pom(nomis_staff_id)
 
       expect(AllocationVersion.active?(nomis_offender_id)).to be(false)
+    end
+  end
+
+  describe '#override_reasons' do
+    it 'returns an array' do
+      expect(allocation.override_reasons).to eq ["suitability", "no_staff", "continuity", "other"]
+    end
+
+    it 'can handle an allocation without any override reasons' do
+      expect(allocation_no_overrides.override_reasons).to eq nil
     end
   end
 end

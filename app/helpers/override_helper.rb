@@ -10,10 +10,10 @@ module OverrideHelper
   end
 
   def display_override_pom(allocation)
-    if allocation.recommended_pom_type.present? &&
+    if allocation.recommended_pom_type &&
       allocation.recommended_pom_type == 'prison'
       'Probation POM allocated instead of recommended Prison POM'
-    elsif allocation.recommended_pom_type.present? &&
+    elsif allocation.recommended_pom_type &&
       allocation.recommended_pom_type == 'probation'
       'Prison POM allocated instead of recommended Probation POM'
     else

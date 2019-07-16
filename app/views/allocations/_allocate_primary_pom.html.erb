@@ -10,7 +10,7 @@
     <p class="govuk-body govuk-!-margin-bottom-1">
       <%= display_override_pom(allocation) %></p>
     <p class="govuk-body govuk-!-margin-bottom-1">Reason(s):</p>
-    <% JSON.parse(allocation.override_reasons).each do | reason| %>
+    <% allocation.override_reasons.each do | reason| %>
       <%= display_override_details(reason, allocation) %>
     <% end %>
   <% end %>
