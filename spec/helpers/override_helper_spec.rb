@@ -2,29 +2,21 @@ require 'rails_helper'
 
 RSpec.describe OverrideHelper do
   let(:allocation_one) {
-    AllocationVersion.new.tap do |a|
-      a.primary_pom_nomis_id = 485_737
-      a.nomis_offender_id = 'G2911GD'
-      a.created_by_username = 'PK000223'
-      a.nomis_booking_id = 0
-      a.allocated_at_tier = 'A'
-      a.recommended_pom_type = 'prison'
-      a.prison = 'LEI'
-      a.suitability_detail = "Prisoner too high risk"
-      a.override_detail = "Concerns around behaviour"
-    end
+    build(:allocation_version,
+          primary_pom_nomis_id: 485_737,
+          nomis_offender_id: 'G2911GD',
+          recommended_pom_type: 'prison',
+          suitability_detail: "Prisoner too high risk",
+          override_detail: "Concerns around behaviour"
+    )
   }
 
   let(:allocation_two) {
-    AllocationVersion.new.tap do |a|
-      a.primary_pom_nomis_id = 485_737
-      a.nomis_offender_id = 'G2911GD'
-      a.created_by_username = 'PK000223'
-      a.nomis_booking_id = 0
-      a.allocated_at_tier = 'A'
-      a.recommended_pom_type = nil
-      a.prison = 'LEI'
-    end
+    build(:allocation_version,
+          primary_pom_nomis_id: 485_737,
+          nomis_offender_id: 'G2911GD',
+          recommended_pom_type: nil
+    )
   }
 
   describe 'gets a complex override reason label' do
