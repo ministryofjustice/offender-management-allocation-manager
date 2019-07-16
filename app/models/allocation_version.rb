@@ -3,8 +3,6 @@
 class AllocationVersion < ApplicationRecord
   has_paper_trail
 
-  attr_accessor :responsibility
-
   ALLOCATE_PRIMARY_POM = 0
   REALLOCATE_PRIMARY_POM = 1
   ALLOCATE_SECONDARY_POM = 2
@@ -44,15 +42,30 @@ class AllocationVersion < ApplicationRecord
       primary_pom_nomis_id: nomis_staff_id
     )
   }
+  scope :active_pom_allocations, lambda { |nomis_staff_id, prison|
+    secondaries = where(secondary_pom_nomis_id: nomis_staff_id)
+
+    where(primary_pom_nomis_id: nomis_staff_id).or(secondaries).where(prison: prison)
+  }
   scope :active_primary_pom_allocations, lambda { |nomis_staff_id, prison|
     where(
       primary_pom_nomis_id: nomis_staff_id,
       prison: prison
     )
   }
-  scope :primary_pom_nomis_id, lambda { |nomis_offender_id|
-    allocations(nomis_offender_id).primary_pom_nomis_id
-  }
+
+  validate do |alloc|
+    if alloc.secondary_pom_nomis_id.present? && alloc.primary_pom_nomis_id.blank? &&
+      errors.add("Can't have a secondary POM in an allocation without a primary POM")
+    end
+  end
+
+  # Note - this only works for active allocations, not ones that have been de-allocated
+  # If this returns false it means that we are a secondary/co-working allocation
+  def for_primary_only?
+    secondary_pom_nomis_id.blank?
+  end
+
   validate do |av|
     if av.primary_pom_nomis_id.present? &&
       av.primary_pom_nomis_id == av.secondary_pom_nomis_id

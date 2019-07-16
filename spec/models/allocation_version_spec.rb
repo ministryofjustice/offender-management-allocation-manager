@@ -132,4 +132,33 @@ RSpec.describe AllocationVersion, type: :model do
       expect(allocation_no_overrides.override_reasons).to eq nil
     end
   end
+
+  describe '#active_pom_allocations' do
+    let!(:secondary_allocation) {
+      create(
+        :allocation_version,
+        nomis_offender_id: nomis_offender_id,
+        secondary_pom_nomis_id: nomis_staff_id
+      )
+    }
+    let!(:another_allocation) {
+      create(
+        :allocation_version,
+        nomis_offender_id: nomis_offender_id,
+        primary_pom_nomis_id: 27
+      )
+    }
+    let!(:another_prison) {
+      create(
+        :allocation_version,
+        nomis_offender_id: nomis_offender_id,
+        primary_pom_nomis_id: nomis_staff_id,
+        prison: 'RSI'
+      )
+    }
+
+    it 'returns both primary and secondary allocations' do
+      expect(AllocationVersion.active_pom_allocations(nomis_staff_id, 'LEI')).to match_array [secondary_allocation, allocation]
+    end
+  end
 end
