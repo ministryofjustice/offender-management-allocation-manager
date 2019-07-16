@@ -63,6 +63,8 @@ private
   end
 
   def new_case?(offender)
-    @new_case ||= offender.sentence.sentence_start_date > DateTime.new(2019, 2, 4).utc
+    return true unless offender.sentenced?
+
+    offender.sentence.sentence_start_date > DateTime.new(2019, 2, 4).utc
   end
 end
