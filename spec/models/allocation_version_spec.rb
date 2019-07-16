@@ -96,7 +96,7 @@ RSpec.describe AllocationVersion, type: :model do
 
   describe '#override_reasons' do
     it 'returns an array' do
-      expect(allocation.override_reasons).to eq ["suitability", "no_staff", "continuity", "other"]
+      expect(allocation.override_reasons).to eq %w[suitability no_staff continuity other]
     end
 
     it 'can handle an allocation without any override reasons' do
