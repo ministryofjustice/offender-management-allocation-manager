@@ -40,7 +40,9 @@ feature 'Allocation History' do
       nomis_offender_id: nomis_offender_id,
       primary_pom_nomis_id: probation_pom[:primary_pom_nomis_id],
       primary_pom_name: probation_pom[:primary_pom_name],
-      recommended_pom_type: 'probation',
+      recommended_pom_type: 'prison',
+      override_reasons: ["suitability"],
+      suitability_detail: "Too high risk",
       created_at: Time.zone.now - 10.days,
       updated_at: Time.zone.now - 10.days,
       primary_pom_allocated_at: Time.zone.now - 10.days
@@ -118,6 +120,7 @@ feature 'Allocation History' do
         ['.time', "#{old_formatted_date} by #{history[4].created_by_name.titleize}"],
         ['.govuk-heading-s', "Prisoner allocation"],
         ['p', "Prisoner allocated to #{history.last.primary_pom_name.titleize} - #{probation_pom[:email]} Tier: #{history.last.allocated_at_tier}"],
+        ['p', "Probation POM allocated instead of recommended Prison POM", "Reason(s):", "- Prisoner assessed as suitable for a prison POM despite tiering calculation", "Too high risk"],
         ['.time', "#{initial_allocated_date} by #{history.last.created_by_name.titleize}"]
     ]
 
