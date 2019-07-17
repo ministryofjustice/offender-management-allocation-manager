@@ -64,6 +64,10 @@ class AllocationVersion < ApplicationRecord
     !allocation.nil? && !allocation.primary_pom_nomis_id.nil?
   end
 
+  def override_reasons
+    JSON.parse(self[:override_reasons]) if self[:override_reasons].present?
+  end
+
   def self.deallocate_offender(nomis_offender_id, movement_type)
     alloc = AllocationVersion.find_by(
       nomis_offender_id: nomis_offender_id
