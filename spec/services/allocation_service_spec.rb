@@ -171,4 +171,25 @@ describe AllocationService do
     expect(pom_emails[updated_primary_pom_nomis_id]).to eq('kath.pobee-norris@digital.justice.gov.uk')
     expect(pom_emails[previous_primary_pom_nomis_id]).to eq('Ross.jonessss@digital.justice.gov.uk')
   end
+
+  it 'can get the current allocated primary POM', versioning: true, vcr: { cassette_name: 'current_allocated_primary_pom' }  do
+    nomis_offender_id = 'G2911GD'
+    previous_primary_pom_nomis_id = 485_637
+    updated_primary_pom_nomis_id = 485_752
+
+    allocation = create(
+      :allocation_version,
+      nomis_offender_id: nomis_offender_id,
+      primary_pom_nomis_id: previous_primary_pom_nomis_id)
+
+    allocation.update!(
+      primary_pom_nomis_id: updated_primary_pom_nomis_id,
+      event: AllocationVersion::REALLOCATE_PRIMARY_POM
+    )
+
+    current_pom = described_class.current_pom_for(nomis_offender_id, 'LEI')
+
+    expect(current_pom.full_name).to eq("Jones, Ross")
+    expect(current_pom.grade).to eq("Probation POM")
+  end
 end

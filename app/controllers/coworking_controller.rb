@@ -9,7 +9,10 @@ class CoworkingController < PrisonsApplicationController
       %w[active unavailable].include? pom.status
     }
 
-    @current_pom = current_pom_for(nomis_offender_id_from_url)
+    @current_pom = AllocationService.current_pom_for(
+      nomis_offender_id_from_url,
+      prison_id_from_url
+    )
     @prison_poms = @active_poms.select{ |pom| pom.position.include?('PRO') }
     @probation_poms = @active_poms.select{ |pom| pom.position.include?('PO') }
   end
@@ -23,8 +26,8 @@ class CoworkingController < PrisonsApplicationController
       prison_id_from_url, nomis_staff_id_from_url
     )
 
-    @event = :allocate_secondary_pom
-    @event_trigger = :user
+    @event = AllocationVersion::ALLOCATE_SECONDARY_POM
+    @event_trigger = AllocationVersion::USER
   end
 
   def create; end
@@ -49,14 +52,5 @@ private
 
   def primary_pom_id_from_url
     params.require(:primary_pom_id)
-  end
-
-  def current_pom_for(nomis_offender_id)
-    current_allocation = AllocationService.allocations(
-      nomis_offender_id, prison_id_from_url
-    )
-    nomis_staff_id = current_allocation[nomis_offender_id]['primary_pom_nomis_id']
-
-    PrisonOffenderManagerService.get_pom(prison_id_from_url, nomis_staff_id)
   end
 end

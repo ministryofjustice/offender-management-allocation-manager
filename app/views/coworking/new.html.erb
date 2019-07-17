@@ -26,12 +26,8 @@
 
 <% if @unavailable_poms.count > 0 %>
   <p>
-    There
-    <% if @unavailable_poms.count == 1 %>
-      is <a href="<%= prison_poms_path(@prison) %>"> <%= @unavailable_poms.count %> unavailable POM </a> for new allocation
-    <% else %>
-      are <a href="<%= prison_poms_path(@prison) %>"> <%= @unavailable_poms.count %> unavailable POMs </a> for new allocation
-    <% end%>
+    There <%= @unavailable_poms.count == 1 ? 'is' : 'are' %>
+    <a href="<%= prison_poms_path(@prison) %>"> <%= pluralize(@unavailable_poms.count, "unavailable POM") %></a> for new allocation
   </p>
 <% end %>
 

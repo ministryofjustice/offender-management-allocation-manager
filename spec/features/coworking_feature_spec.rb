@@ -50,6 +50,22 @@ feature 'Co-working' do
     co_working_content.each do |text|
       expect(page).to have_content(text)
     end
+
+    expect(page).not_to have_content('unavailable POM')
+
+    inactive_poms = [485_734, 485_833]
+    inactive_texts = ['There is 1 unavailable POM for new allocation',
+                      'There are 2 unavailable POMs for new allocation']
+
+    inactive_poms.each_with_index do |pom, i|
+      visit edit_prison_pom_path('LEI', pom)
+      choose('working_pattern-ft')
+      choose('Inactive')
+      click_button('Save')
+
+      visit new_prison_coworking_path('LEI', nomis_offender_id)
+      expect(page).to have_content(inactive_texts[i])
+    end
   end
 
   scenario 'show confirm co-working POM allocation page', vcr: { cassette_name: :show_confirm_coworking_page } do
