@@ -104,7 +104,7 @@ GEM
     govuk_notify_rails (2.1.0)
       notifications-ruby-client (>= 2.9.0)
       rails (>= 4.1.0)
-    hashdiff (1.0.0.beta1)
+    hashdiff (1.0.0)
     hashie (3.6.0)
     i18n (1.6.0)
       concurrent-ruby (~> 1.0)
