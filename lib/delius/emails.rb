@@ -34,7 +34,7 @@ module Delius
 
     def latest_attachment
       messages = sorted_mail_messages
-      messages.find do |msg|
+      messages.detect do |msg|
         attachment = zip_attachment(msg)
         next if attachment.blank?
 

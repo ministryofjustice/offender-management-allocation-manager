@@ -41,7 +41,7 @@ describe Delius::Emails do
       messages = emails.sorted_mail_messages
 
       expect(messages.count).to eq(3)
-      expect(messages[0].date).to eq(Date.parse('21/06/2019'))
+      expect(messages.map(&:date)).to eq([Date.parse('21/06/2019'), Date.parse('21/1/2019'), Date.parse('10/1/2019')])
     }
   end
 
