@@ -14,6 +14,9 @@ class AllocationService
       primary_pom_allocated_at: DateTime.now.utc
     )
 
+    # When we look up the current allocation, we only do this for the current
+    # offender, and NOT for the current prison. The offender may have been
+    # transferred here and their allocation record may have a nil prison.
     alloc_version = AllocationVersion.find_by(
       nomis_offender_id: params_copy[:nomis_offender_id]
     )
