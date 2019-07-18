@@ -26,8 +26,8 @@ class CoworkingController < PrisonsApplicationController
       prison_id_from_url, nomis_staff_id_from_url
     )
 
-    @event = AllocationVersion::ALLOCATE_SECONDARY_POM
-    @event_trigger = AllocationVersion::USER
+    @event = :allocate_secondary_pom
+    @event_trigger = :user
   end
 
   def create; end
