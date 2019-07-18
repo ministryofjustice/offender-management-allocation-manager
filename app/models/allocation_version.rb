@@ -83,6 +83,7 @@ class AllocationVersion < ApplicationRecord
     alloc.recommended_pom_type = nil
     alloc.event = DEALLOCATE_PRIMARY_POM
     alloc.event_trigger = movement_type
+    alloc.prison = nil if alloc.event_trigger == 'offender_released'
 
     alloc.save!
   end
@@ -102,8 +103,10 @@ class AllocationVersion < ApplicationRecord
 
   validates :nomis_offender_id,
             :nomis_booking_id,
-            :prison,
             :allocated_at_tier,
             :event,
             :event_trigger, presence: true
+
+  validates :prison, presence: true,
+                     unless: proc { |a| a.event_trigger == 'offender_released' }
 end
