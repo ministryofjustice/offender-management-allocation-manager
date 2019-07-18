@@ -27,6 +27,10 @@ class SummaryService
 
     OffenderService.get_offenders_for_prison(prison).each do |offender|
       if offender.tier.present?
+        # When trying to determine if this offender has a current allocation, we want to know
+        # if it is for this prison.  If the offender was recently transferred here their prison
+        # field should be nil, which means they will be pending allocation.  Once they are allocated
+        # the prison will be set on their existing allocation.
         active_allocations_hash = AllocationService.allocations([offender.offender_no], prison)
         if active_allocations_hash.key?(offender.offender_no)
           bucket.items << offender if summary_type == :allocated
