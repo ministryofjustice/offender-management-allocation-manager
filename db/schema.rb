@@ -47,6 +47,7 @@ ActiveRecord::Schema.define(version: 2019_07_17_064658) do
     t.string "nomis_offender_id"
     t.text "omicable"
     t.string "crn"
+    t.integer "mappa_level"
     t.index ["nomis_offender_id"], name: "index_case_information_on_nomis_offender_id"
   end
 

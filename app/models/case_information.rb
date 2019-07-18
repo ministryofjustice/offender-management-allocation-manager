@@ -12,4 +12,6 @@ class CaseInformation < ApplicationRecord
   validates :case_allocation, presence: {
     message: 'Select the service provider for this case'
   }
+
+  validates :mappa_level, inclusion: { in: [1, 2, 3], allow_nil: true }
 end
