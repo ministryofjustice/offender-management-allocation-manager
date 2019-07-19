@@ -2,23 +2,8 @@ require 'rails_helper'
 require_relative '../../app/services/nomis/models/movement'
 
 describe MovementService do
-  let(:new_offender) {
-    Nomis::Models::Movement.new.tap { |m|
-      m.offender_no = 'G4273GI'
-      m.to_agency = 'SWI'
-      m.direction_code = 'IN'
-      m.movement_type = 'ADM'
-    }
-  }
-  let(:transfer_out) {
-    Nomis::Models::Movement.new.tap { |m|
-      m.offender_no = 'G4273GI'
-      m.from_agency = 'LEI'
-      m.to_agency = 'SWI'
-      m.direction_code = 'OUT'
-      m.movement_type = 'TRN'
-    }
-  }
+  let!(:new_offender) { create(:movement, offender_no: 'G4273GI', from_agency: nil)   }
+  let!(:transfer_out) { create(:movement, offender_no: 'G4273GI', direction_code: 'OUT', movement_type: 'TRN')   }
 
   it "can get recent movements",
      vcr: { cassette_name: :movement_service_recent_spec }  do
@@ -99,28 +84,8 @@ describe MovementService do
   end
 
   describe "processing an offender transfer" do
-    let!(:allocation) {
-      # The original allocation before the transfer
-      AllocationVersion.find_or_create_by!(
-        primary_pom_nomis_id: 485_737,
-        nomis_offender_id: 'G4273GI',
-        created_by_username: 'PK000223',
-        nomis_booking_id: 0,
-        allocated_at_tier: 'A',
-        prison: 'LEI',
-        event: AllocationVersion::ALLOCATE_PRIMARY_POM,
-        event_trigger: AllocationVersion::USER
-      )
-    }
-    let(:transfer_adm) {
-      Nomis::Models::Movement.new.tap { |m|
-        m.offender_no = 'G4273GI'
-        m.from_agency = 'LEI'
-        m.to_agency = 'SWI'
-        m.direction_code = 'IN'
-        m.movement_type = 'ADM'
-      }
-    }
+    let!(:allocation) { create(:allocation_version, nomis_offender_id: 'G4273GI')   }
+    let!(:transfer_adm) { create(:movement, offender_no: 'G4273GI')   }
 
     it "can process transfer movements IN",
        vcr: { cassette_name: :movement_service_transfer_in_spec }  do
@@ -135,35 +100,9 @@ describe MovementService do
   end
 
   describe "processing an offender release" do
-    let!(:release) {
-      Nomis::Models::Movement.new.tap { |m|
-        m.offender_no = 'G4273GI'
-        m.from_agency = 'LEI'
-        m.direction_code = 'OUT'
-        m.movement_type = 'REL'
-      }
-    }
-    let!(:caseinfo) {
-      CaseInformation.find_or_create_by!(
-        nomis_offender_id: 'G4273GI',
-        tier: 'A',
-        case_allocation: 'NPS',
-        omicable: 'Yes'
-      )
-    }
-    let!(:allocation) {
-      # The original allocation before the release
-      AllocationVersion.find_or_create_by!(
-        primary_pom_nomis_id: 485_737,
-        nomis_offender_id: 'G4273GI',
-        created_by_username: 'PK000223',
-        nomis_booking_id: 0,
-        allocated_at_tier: 'A',
-        prison: 'LEI',
-        event: AllocationVersion::ALLOCATE_PRIMARY_POM,
-        event_trigger: AllocationVersion::USER
-      )
-    }
+    let!(:release) { create(:movement, offender_no: 'G4273GI', direction_code: 'OUT', movement_type: 'REL')   }
+    let!(:case_info) { create(:case_information, nomis_offender_id: 'G4273GI') }
+    let!(:allocation) { create(:allocation_version, nomis_offender_id: 'G4273GI') }
 
     it "can process release movements", vcr: { cassette_name: :movement_service_process_release_spec }  do
       processed = described_class.process_movement(release)
