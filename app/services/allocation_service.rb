@@ -23,7 +23,9 @@ class AllocationService
       secondary_pom_name: "#{coworking_pom_firstname} #{coworking_pom_secondname}",
       created_by_name: "#{user_firstname} #{user_secondname}",
       created_by_username: created_by_username,
-      secondary_pom_nomis_id: secondary_pom_nomis_id
+      secondary_pom_nomis_id: secondary_pom_nomis_id,
+      event: AllocationVersion::ALLOCATE_SECONDARY_POM,
+      event_trigger: AllocationVersion::USER
     )
 
     EmailService.instance(allocation: alloc_version, message: message,
@@ -33,8 +35,6 @@ class AllocationService
     EmailService.instance(allocation: alloc_version, message: message,
                           pom_nomis_id: secondary_pom_nomis_id).
       send_secondary_email(coworking_pom_firstname)
-
-    alloc_version
   end
   # rubocop:enable Metrics/MethodLength
 
