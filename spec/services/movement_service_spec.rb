@@ -10,15 +10,6 @@ describe MovementService do
       m.movement_type = 'ADM'
     }
   }
-  let(:transfer_adm) {
-    Nomis::Models::Movement.new.tap { |m|
-      m.offender_no = 'G4273GI'
-      m.from_agency = 'LEI'
-      m.to_agency = 'SWI'
-      m.direction_code = 'IN'
-      m.movement_type = 'ADM'
-    }
-  }
   let(:transfer_out) {
     Nomis::Models::Movement.new.tap { |m|
       m.offender_no = 'G4273GI'
@@ -26,14 +17,6 @@ describe MovementService do
       m.to_agency = 'SWI'
       m.direction_code = 'OUT'
       m.movement_type = 'TRN'
-    }
-  }
-  let(:release) {
-    Nomis::Models::Movement.new.tap { |m|
-      m.offender_no = 'G4273GI'
-      m.from_agency = 'LEI'
-      m.direction_code = 'OUT'
-      m.movement_type = 'REL'
     }
   }
 
@@ -103,18 +86,6 @@ describe MovementService do
     expect(movements.first.direction_code).to eq(Nomis::Models::MovementDirection::OUT)
   end
 
-  it "can process transfer movements IN",
-     vcr: { cassette_name: :movement_service_transfer_in_spec }  do
-    processed = described_class.process_movement(transfer_adm)
-    expect(processed).to be true
-  end
-
-  it "can process release movements",
-     vcr: { cassette_name: :movement_service_process_release_spec }  do
-    processed = described_class.process_movement(release)
-    expect(processed).to be true
-  end
-
   it "can ignore movements OUT",
      vcr: { cassette_name: :movement_service_ignore_out_spec }  do
     processed = described_class.process_movement(transfer_out)
@@ -125,5 +96,83 @@ describe MovementService do
      vcr: { cassette_name: :movement_service_ignore_new_spec }  do
     processed = described_class.process_movement(new_offender)
     expect(processed).to be false
+  end
+
+  describe "processing an offender transfer" do
+    let!(:allocation) {
+      # The original allocation before the transfer
+      AllocationVersion.find_or_create_by!(
+        primary_pom_nomis_id: 485_737,
+        nomis_offender_id: 'G4273GI',
+        created_by_username: 'PK000223',
+        nomis_booking_id: 0,
+        allocated_at_tier: 'A',
+        prison: 'LEI',
+        event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+        event_trigger: AllocationVersion::USER
+      )
+    }
+    let(:transfer_adm) {
+      Nomis::Models::Movement.new.tap { |m|
+        m.offender_no = 'G4273GI'
+        m.from_agency = 'LEI'
+        m.to_agency = 'SWI'
+        m.direction_code = 'IN'
+        m.movement_type = 'ADM'
+      }
+    }
+
+    it "can process transfer movements IN",
+       vcr: { cassette_name: :movement_service_transfer_in_spec }  do
+      processed = described_class.process_movement(transfer_adm)
+      updated_allocation = AllocationVersion.find_by(nomis_offender_id: transfer_adm.offender_no)
+
+      expect(updated_allocation.primary_pom_name).to be_nil
+      expect(updated_allocation.event).to eq 'deallocate_primary_pom'
+      expect(updated_allocation.event_trigger).to eq 'offender_transferred'
+      expect(processed).to be true
+    end
+  end
+
+  describe "processing an offender release" do
+    let!(:release) {
+      Nomis::Models::Movement.new.tap { |m|
+        m.offender_no = 'G4273GI'
+        m.from_agency = 'LEI'
+        m.direction_code = 'OUT'
+        m.movement_type = 'REL'
+      }
+    }
+    let!(:caseinfo) {
+      CaseInformation.find_or_create_by!(
+        nomis_offender_id: 'G4273GI',
+        tier: 'A',
+        case_allocation: 'NPS',
+        omicable: 'Yes'
+      )
+    }
+    let!(:allocation) {
+      # The original allocation before the release
+      AllocationVersion.find_or_create_by!(
+        primary_pom_nomis_id: 485_737,
+        nomis_offender_id: 'G4273GI',
+        created_by_username: 'PK000223',
+        nomis_booking_id: 0,
+        allocated_at_tier: 'A',
+        prison: 'LEI',
+        event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+        event_trigger: AllocationVersion::USER
+      )
+    }
+
+    it "can process release movements", vcr: { cassette_name: :movement_service_process_release_spec }  do
+      processed = described_class.process_movement(release)
+      updated_allocation = AllocationVersion.find_by(nomis_offender_id: release.offender_no)
+
+      expect(CaseInformationService.get_case_information([release.offender_no])).to be_empty
+      expect(updated_allocation.event_trigger).to eq 'offender_released'
+      expect(updated_allocation.prison).to be_nil
+      expect(processed).to be true
+    end
   end
 end
