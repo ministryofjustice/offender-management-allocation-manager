@@ -18,6 +18,7 @@ module Nomis
       attribute :omicable, :boolean
       attribute :tier, :string
       attribute :sentence
+      attribute :mappa_level, :integer
 
       def sentenced?
         # A prisoner will have had a sentence calculation and for our purposes

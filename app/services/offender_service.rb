@@ -10,6 +10,7 @@ class OffenderService
         o.case_allocation = record.case_allocation
         o.omicable = record.omicable == 'Yes'
         o.crn = record.crn
+        o.mappa_level = record.mappa_level
       end
 
       sentence_detail = get_sentence_details([o.latest_booking_id])
@@ -83,6 +84,7 @@ class OffenderService
           offender.case_allocation = record.case_allocation
           offender.omicable = record.omicable == 'Yes'
           offender.crn = record.crn
+          offender.mappa_level = record.mappa_level
         end
 
         true

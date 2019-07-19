@@ -5,7 +5,15 @@
     - <%= mail_to(@pom_emails[allocation.primary_pom_nomis_id]) %>
   <% end %>
   <br/>
-  Tier: <%= allocation.allocated_at_tier %>
+  Tier: <%= allocation.allocated_at_tier %></p>
+  <% if allocation.override_reasons.present? %>
+    <p class="govuk-body govuk-!-margin-bottom-1">
+      <%= display_override_pom(allocation) %></p>
+    <p class="govuk-body govuk-!-margin-bottom-1">Reason(s):</p>
+    <% allocation.override_reasons.each do | reason| %>
+      <%= display_override_details(reason, allocation) %>
+    <% end %>
+  <% end %>
 <p class="time"><%= format_date_long(allocation.updated_at) %>
   by <%= allocation.created_by_name.titleize %></p>
 </li>
