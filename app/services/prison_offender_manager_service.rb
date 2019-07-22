@@ -8,6 +8,7 @@ class PrisonOffenderManagerService
     }
   end
 
+  # Note - get_poms and get_pom return different data...
   def self.get_poms(prison)
     poms = Nomis::Elite2::PrisonOffenderManagerApi.list(prison)
 
