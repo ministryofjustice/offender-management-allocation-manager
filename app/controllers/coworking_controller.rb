@@ -9,7 +9,9 @@ class CoworkingController < PrisonsApplicationController
     )
 
     # get_pom and get_poms return different data - so have to compare theit staff_ids.
-    poms = PrisonOffenderManagerService.get_poms(active_prison).reject { |pom| pom.staff_id == @current_pom.staff_id }
+    poms = PrisonOffenderManagerService.get_poms(active_prison).reject { |pom|
+      pom.staff_id == @current_pom.staff_id
+    }
 
     @active_poms, @unavailable_poms = poms.partition { |pom|
       %w[active unavailable].include? pom.status
