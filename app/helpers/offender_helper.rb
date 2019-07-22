@@ -55,8 +55,10 @@ private
       [indeterminate_handover_date(offender), 'NPS Inderminate']
     elsif offender.parole_eligibility_date.present?
       [offender.parole_eligibility_date - 8.months, 'NPS Determinate Parole Case']
-    elsif offender.mappa_level == 1 || offender.mappa_level.blank?
-      [mappa1_handover_date(offender), 'NPS Determinate Mappa 1/0']
+    elsif offender.mappa_level.blank?
+      [nil, 'NPS - MAPPA missing from nDelius']
+    elsif offender.mappa_level.in? [1, 0]
+      [mappa1_handover_date(offender), 'NPS Determinate Mappa 1/N']
     else
       [mappa_23_handover_date(offender), 'NPS Determinate Mappa 2/3']
     end
@@ -69,6 +71,8 @@ private
     ].compact.map { |date| date - 8.months }.min
   end
 
+  # There are a couple of places where we need .5 of a month - which
+  # we have assumed 15.days is a reasonable compromise implementation
   def mappa_23_handover_date(offender)
     [
       offender.conditional_release_date,
