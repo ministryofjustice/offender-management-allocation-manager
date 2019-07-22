@@ -8,4 +8,7 @@ Flipflop.configure do
   feature :prisoner_profile,
           default: true,
           description: 'Show the prisoner profile from caseload pages'
+  feature :show_handover_dates,
+          default: false,
+          description: 'Show offender handover dates on prisoner profile'
 end
