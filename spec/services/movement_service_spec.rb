@@ -2,40 +2,8 @@ require 'rails_helper'
 require_relative '../../app/services/nomis/models/movement'
 
 describe MovementService do
-  let(:new_offender) {
-    Nomis::Models::Movement.new.tap { |m|
-      m.offender_no = 'G4273GI'
-      m.to_agency = 'SWI'
-      m.direction_code = 'IN'
-      m.movement_type = 'ADM'
-    }
-  }
-  let(:transfer_adm) {
-    Nomis::Models::Movement.new.tap { |m|
-      m.offender_no = 'G4273GI'
-      m.from_agency = 'LEI'
-      m.to_agency = 'SWI'
-      m.direction_code = 'IN'
-      m.movement_type = 'ADM'
-    }
-  }
-  let(:transfer_out) {
-    Nomis::Models::Movement.new.tap { |m|
-      m.offender_no = 'G4273GI'
-      m.from_agency = 'LEI'
-      m.to_agency = 'SWI'
-      m.direction_code = 'OUT'
-      m.movement_type = 'TRN'
-    }
-  }
-  let(:release) {
-    Nomis::Models::Movement.new.tap { |m|
-      m.offender_no = 'G4273GI'
-      m.from_agency = 'LEI'
-      m.direction_code = 'OUT'
-      m.movement_type = 'REL'
-    }
-  }
+  let!(:new_offender) { create(:movement, offender_no: 'G4273GI', from_agency: nil)   }
+  let!(:transfer_out) { create(:movement, offender_no: 'G4273GI', direction_code: 'OUT', movement_type: 'TRN')   }
 
   it "can get recent movements",
      vcr: { cassette_name: :movement_service_recent_spec }  do
@@ -103,18 +71,6 @@ describe MovementService do
     expect(movements.first.direction_code).to eq(Nomis::Models::MovementDirection::OUT)
   end
 
-  it "can process transfer movements IN",
-     vcr: { cassette_name: :movement_service_transfer_in_spec }  do
-    processed = described_class.process_movement(transfer_adm)
-    expect(processed).to be true
-  end
-
-  it "can process release movements",
-     vcr: { cassette_name: :movement_service_process_release_spec }  do
-    processed = described_class.process_movement(release)
-    expect(processed).to be true
-  end
-
   it "can ignore movements OUT",
      vcr: { cassette_name: :movement_service_ignore_out_spec }  do
     processed = described_class.process_movement(transfer_out)
@@ -125,5 +81,37 @@ describe MovementService do
      vcr: { cassette_name: :movement_service_ignore_new_spec }  do
     processed = described_class.process_movement(new_offender)
     expect(processed).to be false
+  end
+
+  describe "processing an offender transfer" do
+    let!(:allocation) { create(:allocation_version, nomis_offender_id: 'G4273GI')   }
+    let!(:transfer_adm) { create(:movement, offender_no: 'G4273GI')   }
+
+    it "can process transfer movements IN",
+       vcr: { cassette_name: :movement_service_transfer_in_spec }  do
+      processed = described_class.process_movement(transfer_adm)
+      updated_allocation = AllocationVersion.find_by(nomis_offender_id: transfer_adm.offender_no)
+
+      expect(updated_allocation.primary_pom_name).to be_nil
+      expect(updated_allocation.event).to eq 'deallocate_primary_pom'
+      expect(updated_allocation.event_trigger).to eq 'offender_transferred'
+      expect(processed).to be true
+    end
+  end
+
+  describe "processing an offender release" do
+    let!(:release) { create(:movement, offender_no: 'G4273GI', direction_code: 'OUT', movement_type: 'REL')   }
+    let!(:case_info) { create(:case_information, nomis_offender_id: 'G4273GI') }
+    let!(:allocation) { create(:allocation_version, nomis_offender_id: 'G4273GI') }
+
+    it "can process release movements", vcr: { cassette_name: :movement_service_process_release_spec }  do
+      processed = described_class.process_movement(release)
+      updated_allocation = AllocationVersion.find_by(nomis_offender_id: release.offender_no)
+
+      expect(CaseInformationService.get_case_information([release.offender_no])).to be_empty
+      expect(updated_allocation.event_trigger).to eq 'offender_released'
+      expect(updated_allocation.prison).to be_nil
+      expect(processed).to be true
+    end
   end
 end
