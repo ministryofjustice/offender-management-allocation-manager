@@ -82,6 +82,35 @@ RSpec.describe AllocationVersion, type: :model do
     end
   end
 
+  describe 'when an offender gets released from prison', versioning: true, vcr: { cassette_name: :allocation_version_deallocate_offender_released }  do
+    it 'removes the primary pom details & prison in an Offender\'s allocation' do
+      nomis_offender_id = 'G2911GD'
+      movement_type = AllocationVersion::OFFENDER_RELEASED
+      params = {
+        nomis_offender_id: nomis_offender_id,
+        prison: 'LEI',
+        allocated_at_tier: 'A',
+        primary_pom_nomis_id: 485_833,
+        primary_pom_allocated_at: DateTime.now.utc,
+        nomis_booking_id: 1,
+        recommended_pom_type: 'probation',
+        event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+        event_trigger: AllocationVersion::USER
+      }
+      AllocationService.create_or_update(params)
+
+      AllocationVersion.deallocate_offender(nomis_offender_id, movement_type)
+      deallocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id)
+
+      expect(deallocation.primary_pom_nomis_id).to be_nil
+      expect(deallocation.primary_pom_name).to be_nil
+      expect(deallocation.primary_pom_allocated_at).to be_nil
+      expect(deallocation.recommended_pom_type).to be_nil
+      expect(deallocation.prison).to be_nil
+      expect(deallocation.event_trigger).to eq 'offender_released'
+    end
+  end
+
   describe '#active?' do
     it 'return true if an Allocation has been assigned a Primary POM' do
       expect(AllocationVersion.active?(nomis_offender_id)).to be(true)
