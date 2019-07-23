@@ -18,8 +18,6 @@ class PrisonOffenderManagerService
       pom
     }.compact
 
-    poms = poms.select { |pom| yield pom } if block_given?
-
     poms
   end
 
@@ -93,8 +91,8 @@ class PrisonOffenderManagerService
   end
 
   def self.unavailable_pom_count(prison)
-    poms = PrisonOffenderManagerService.get_poms(prison) { |pom|
-      pom.status != 'active'
+    poms = PrisonOffenderManagerService.get_poms(prison).reject { |pom|
+      pom.status == 'active'
     }
     poms.count
   end

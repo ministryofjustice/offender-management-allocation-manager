@@ -158,8 +158,10 @@ private
   end
 
   def recommended_and_nonrecommended_poms_for(offender)
-    poms = PrisonOffenderManagerService.get_poms(active_prison) { |pom|
-      pom.status == 'active'
+    allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id_from_url)
+    # don't allow primary to be the same as the co-working POM
+    poms = PrisonOffenderManagerService.get_poms(active_prison).select { |pom|
+      pom.status == 'active' && pom.staff_id != allocation.try(:secondary_pom_nomis_id)
     }
 
     RecommendationService.recommended_poms(offender, poms)
