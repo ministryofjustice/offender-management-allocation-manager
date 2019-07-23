@@ -70,7 +70,7 @@ feature 'case information feature' do
     expect(page).to have_content("Select the prisoner’s tier")
   end
 
-  it 'allows editing case information for a prisoner', :raven_intercept_exception, vcr: { cassette_name: :case_information_editing_feature } do
+  xit 'allows editing case information for a prisoner', :raven_intercept_exception, vcr: { cassette_name: :case_information_editing_feature } do
     nomis_offender_id = 'G1821VA'
 
     signin_user

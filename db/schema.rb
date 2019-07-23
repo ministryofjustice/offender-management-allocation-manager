@@ -48,6 +48,8 @@ ActiveRecord::Schema.define(version: 2019_08_05_120051) do
     t.text "omicable"
     t.string "crn"
     t.integer "mappa_level"
+    t.string "ldu"
+    t.string "team"
     t.boolean "manual_entry", null: false
     t.bigint "local_divisional_unit_id"
     t.bigint "team_id"
@@ -57,7 +59,7 @@ ActiveRecord::Schema.define(version: 2019_08_05_120051) do
   end
 
   create_table "delius_data", force: :cascade do |t|
-    t.string "crn"
+    t.string "crn", null: false
     t.string "pnc_no"
     t.string "noms_no"
     t.string "fullname"
