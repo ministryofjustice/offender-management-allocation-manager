@@ -6,9 +6,8 @@ require_relative '../../lib/delius/manual_extractor'
 require_relative '../../lib/onboard_prison'
 
 namespace :delius_etl do
-
   desc 'Perform the end-to-end import of delius data from a spreadsheet'
-  task :process => [:environment] do |_task, _args|
+  task process: [:environment] do |_task, _args|
     if defined?(Rails) && Rails.env.development?
       Rails.logger = Logger.new(STDOUT)
     end

@@ -73,10 +73,15 @@ module Delius
     def decrypt_xlsx(encrypted_filename, decrypted_filename)
       Rails.logger.info("Decrypting #{encrypted_filename} to #{decrypted_filename}")
 
-      stdout_and_stderr_str, status = Open3.capture2e("msoffice-crypt -d -p #{ENV['DELIUS_DATA_PASSWORD']} #{encrypted_filename} #{decrypted_filename}")
-      raise DecryptionError.new(stdout_and_stderr_str) unless status.success?
+      pwd = ENV['DELIUS_DATA_PASSWORD']
+      cmd = "msoffice-crypt -d -p #{pwd} #{encrypted_filename} #{decrypted_filename}"
 
-      Rails.logger.info("Decrypting #{encrypted_filename} to #{decrypted_filename} complete")
+      stdout_and_stderr_str, status = Open3.capture2e(cmd)
+      raise DecryptionError, stdout_and_stderr_str unless status.success?
+
+      Rails.logger.info(
+        "Decrypting #{encrypted_filename} to #{decrypted_filename} complete"
+      )
     end
 
     # Import the data from the decrypted xlsx file into the delius_data table in the
