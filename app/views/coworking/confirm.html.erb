@@ -1,0 +1,28 @@
+<%= render :partial => "/shared/backlink", :locals => { :page => new_prison_coworking_path(@prison, nomis_offender_id: @prisoner.offender_no) } %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <%= form_tag(prison_coworking_path(@prison), method: :post, id: "confirm_coworking_allocation_form") do %>
+      <h1 class="govuk-heading-l govuk-!-margin-bottom-5">Confirm co-working allocation</h1>
+      <p class="govuk-body">You are allocating <%= "#{@secondary_pom.first_name} #{@secondary_pom.last_name}".titleize %> to work with <%= "#{@primary_pom.first_name} #{@primary_pom.last_name}".titleize %> on <%= "#{@prisoner.first_name} #{@prisoner.last_name}".titleize %></p>
+      <% if @secondary_pom.emails.empty? %>
+        <p class="govuk-body">No notification email will be sent to <%= "#{@secondary_pom.first_name} #{@secondary_pom.last_name}".titleize %> as they have no registered email address in NOMIS.</p>
+      <% else %>
+        <p class="govuk-body">We will send a confirmation email to <%= @secondary_pom.emails.first %></p>
+      <% end %>
+
+      <div class="govuk-form-group">
+        <label class="govuk-label govuk-!-font-weight-bold" for="message">Add a note to the email:</label>
+        <span id="message_hint" class="govuk-hint">For example, you can tell the prison offender manager about any special requirements.</span>
+        <textarea class="govuk-textarea" id="message" name="coworking_allocations[message]]" rows="3" aria-describedby="message"></textarea>
+      </div>
+      <%= hidden_field_tag("allocations[nomis_offender_id]", @prisoner.offender_no) %>
+      <%= hidden_field_tag("allocations[nomis_staff_id]", @secondary_pom.staff_id) %>
+      <%= hidden_field_tag("allocations[event]", @event) %>
+      <%= hidden_field_tag("allocations[event_trigger]", @event_trigger) %>
+      <%= submit_tag "Complete allocation", role: "button", draggable: "false", class: "govuk-button" %>
+      <a class="govuk-link cancel-button" href="<%= new_prison_coworking_path(@prison, @prisoner.offender_no) %>">Cancel</a>
+    <% end %>
+
+  </div>
+</div>

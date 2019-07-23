@@ -133,13 +133,17 @@
         <%= link_to 'Reallocate', edit_prison_allocation_path(@prison, @prisoner.offender_no), class: "govuk-link pull-right" %>
       </td>
     </tr>
-<!--    <tr class="govuk-table__row">-->
-<!--      <td class="govuk-table__cell govuk-!-width-one-half">Co-working POM</td>-->
-<!--      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">-->
-        <%#= link_to @pom.full_name, pom_path(@pom.staff_id), class: "govuk-link" %>
-        <%#= link_to 'Change', edit_allocation_path(@prisoner.offender_no), class: "govuk-link pull-right" %>
-<!--      </td>-->
-<!--    </tr>-->
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-width-one-half">Co-working POM</td>
+      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
+        <% if @coworker.nil? %>
+          N/A
+        <% else %>
+        <%= link_to @coworker.full_name, prison_pom_path(@prison, @coworker.staff_id), class: "govuk-link" %>
+        <% end %>
+        <%= link_to 'Allocate', new_prison_coworking_path(@prison, @prisoner.offender_no), class: "govuk-link pull-right" %>
+      </td>
+    </tr>
     <% if Flipflop.link_allocation_info? %>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Allocation history</td>

@@ -147,6 +147,13 @@ class AllocationService
     AllocationVersion.allocations(nomis_offender_id).last
   end
 
+  def self.current_pom_for(nomis_offender_id, prison_id)
+    current_allocation = allocations(nomis_offender_id, prison_id)
+    nomis_staff_id = current_allocation[nomis_offender_id]['primary_pom_nomis_id']
+
+    PrisonOffenderManagerService.get_pom(prison_id, nomis_staff_id)
+  end
+
 private
 
   def self.get_versions_for(allocation)
