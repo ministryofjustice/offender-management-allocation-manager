@@ -19,7 +19,14 @@ FactoryBot.define do
     end
 
     nomis_offender_id do
-      'G12345'
+      Faker::Alphanumeric.alpha(10)
     end
+
+    team do
+      "A nice team"
+    end
+
+    ldu do "LDU Name" end
+    crn { Faker::Alphanumeric.alpha(10) }
   end
 end

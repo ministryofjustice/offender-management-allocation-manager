@@ -17,6 +17,34 @@ class CaseInformationController < PrisonsApplicationController
     @prisoner = prisoner(nomis_offender_id_from_url)
   end
 
+  # rubocop:disable Metrics/MethodLength
+  def show
+    @case_info = CaseInformation.find_by(
+      nomis_offender_id: nomis_offender_id_from_url
+    )
+
+    @prisoner = prisoner(nomis_offender_id_from_url)
+    @delius_data = DeliusData.where(noms_no: nomis_offender_id_from_url)
+
+    if @delius_data.empty?
+      @delius_errors = [DeliusImportError.new(
+        nomis_offender_id: nomis_offender_id_from_url,
+        error_type: DeliusImportError::MISSING_DELIUS_RECORD
+      )]
+    else
+      @delius_errors = DeliusImportError.where(
+        nomis_offender_id: nomis_offender_id_from_url
+      )
+    end
+    last_delius = DeliusData.order(:updated_at).last
+    if last_delius.present?
+      @next_update_date = last_delius.updated_at + 1.day
+    else
+      @next_update_date = Date.tomorrow
+    end
+  end
+  # rubocop:enable Metrics/MethodLength
+
   def create
     @case_info = CaseInformation.create(
       nomis_offender_id: case_information_params[:nomis_offender_id],

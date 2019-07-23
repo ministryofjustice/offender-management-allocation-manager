@@ -11,4 +11,7 @@ Flipflop.configure do
   feature :show_handover_dates,
           default: false,
           description: 'Show offender handover dates on prisoner profile'
+  feature :auto_delius_import,
+          default: false,
+          description: 'Load case information via nDelius, disable manual editing'
 end

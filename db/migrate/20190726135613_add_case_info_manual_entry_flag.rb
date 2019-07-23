@@ -3,6 +3,6 @@ class AddCaseInfoManualEntryFlag < ActiveRecord::Migration[5.2]
     change_table :case_information do |t|
       t.boolean :manual_entry, null: false, default: true
     end
-    change_column_default :case_information, :manual_entry, nil
+    change_column_default :case_information, :manual_entry, from: true, to: nil
   end
 end

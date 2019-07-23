@@ -1,82 +1,88 @@
 require 'rails_helper'
 
 RSpec.describe DeliusData, type: :model do
-  it 'can insert clean data' do
-    described_class.upsert(
-      crn: '1',
-      noms_no: 'A1234Z',
-      tier: 'A'
-    )
+  describe 'tier changes' do
+    let!(:delius_data) do
+      described_class.create!(
+        crn: '1',
+        noms_no: 'A1234Z',
+        tier: 'A'
+      )
+    end
 
-    expect(described_class.count).to eq(1)
-    expect(TierChange.count).to eq(0)
+    it 'will create a tier change record' do
+      expect {
+        delius_data.update!(tier: 'B')
+      }.to change(TierChange, :count).by(1)
+      TierChange.last.tap do |tier_change|
+        expect(tier_change.old_tier).to eq('A')
+        expect(tier_change.new_tier).to eq('B')
+        expect(tier_change.noms_no).to eq('A1234Z')
+      end
+    end
   end
 
-  it 'can exercise upsert' do
-    described_class.upsert(
-      crn: '1',
-      noms_no: 'A1234Z',
-      tier: 'A'
-    )
-    expect(described_class.first.tier).to eq('A')
-    expect(TierChange.count).to eq(0)
+  describe '#omicable?' do
+    context 'when a record is Welsh' do
+      subject {
+        described_class.new(
+          crn: '1',
+          noms_no: 'A1234Z',
+          ldu_code: 'WPT123'
+        )
+      }
 
-    described_class.upsert(
-      crn: '1',
-      noms_no: 'A1234Z',
-      tier: 'B'
-    )
-    expect(described_class.first.tier).to eq('B')
-    expect(described_class.count).to eq(1)
-    expect(TierChange.count).to eq(1)
+      it { should be_omicable }
+    end
+
+    context 'when a record is not Welsh' do
+      subject {
+        described_class.new(
+          crn: '1',
+          noms_no: 'A1234Z',
+          ldu_code: 'XPT123'
+        )
+      }
+
+      it { should_not be_omicable }
+    end
   end
 
-  it 'can tell if a record is omicable' do
-    described_class.upsert(
-      crn: '1',
-      noms_no: 'A1234Z',
-      ldu_code: 'WPT123'
-    )
+  describe '#service_provider' do
+    context 'when provider code starts with C' do
+      subject {
+        described_class.new(
+          crn: '1',
+          noms_no: 'A1234Z',
+          provider_code: 'C123'
+        ).service_provider
+      }
 
-    expect(described_class.first.omicable?).to be true
-  end
+      it { should eq('CRC') }
+    end
 
-  it 'can tell if a record is not omicable' do
-    described_class.upsert(
-      crn: '1',
-      noms_no: 'A1234Z',
-      ldu_code: 'XPT123'
-    )
+    context 'when provider code starts with N' do
+      subject {
+        described_class.new(
+          crn: '1',
+          noms_no: 'A1234Z',
+          provider_code: 'N123'
+        ).service_provider
+      }
 
-    expect(described_class.first.omicable?).to be false
-  end
+      it { should eq('NPS') }
+    end
 
-  it 'can tell if a record is CRC' do
-    described_class.upsert(
-      crn: '1',
-      noms_no: 'A1234Z',
-      provider_code: 'C123'
-    )
+    context 'when provider code is invalid' do
+      subject {
+        described_class.new(
+          crn: '1',
+          noms_no: 'A1234Z',
+          provider_code: 'X123'
+        ).service_provider
+      }
 
-    expect(described_class.first.service_provider).to eq('CRC')
-  end
-
-  it 'can tell if a record is NPS' do
-    described_class.upsert(
-      crn: '1',
-      noms_no: 'A1234Z',
-      provider_code: 'X123'
-    )
-
-    expect(described_class.first.service_provider).to eq('NPS')
-  end
-
-  it 'can will default service provider to NPS' do
-    described_class.upsert(
-      crn: '1',
-      noms_no: 'A1234Z'
-    )
-
-    expect(described_class.first.service_provider).to eq('NPS')
+      it { should be_nil }
+    end
   end
 end

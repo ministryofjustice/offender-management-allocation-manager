@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_26_135613) do
+ActiveRecord::Schema.define(version: 2019_07_29_070713) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -48,6 +48,8 @@ ActiveRecord::Schema.define(version: 2019_07_26_135613) do
     t.text "omicable"
     t.string "crn"
     t.integer "mappa_level"
+    t.string "ldu"
+    t.string "team"
     t.boolean "manual_entry", null: false
     t.index ["nomis_offender_id"], name: "index_case_information_on_nomis_offender_id"
   end
@@ -72,7 +74,15 @@ ActiveRecord::Schema.define(version: 2019_07_26_135613) do
     t.string "mappa_levels"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "date_of_birth"
     t.index ["crn"], name: "index_delius_data_on_crn", unique: true
+  end
+
+  create_table "delius_import_errors", force: :cascade do |t|
+    t.string "nomis_offender_id"
+    t.integer "error_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "flipflop_features", force: :cascade do |t|
