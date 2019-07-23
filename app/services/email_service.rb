@@ -1,21 +1,18 @@
 # frozen_string_literal: true
 
 class EmailService
-  def self.instance(params)
-    message = params[:message]
-    allocation = params[:allocation]
-
-    new(allocation, message)
+  def self.instance(message:, allocation:, pom_nomis_id:)
+    new(allocation: allocation, message: message, pom_nomis_id: pom_nomis_id)
   end
 
-  def initialize(allocation, message)
+  def initialize(message:, allocation:, pom_nomis_id:)
     @message = message
     @allocation = allocation
 
     @offender = OffenderService.get_offender(@allocation[:nomis_offender_id])
     @pom = PrisonOffenderManagerService.get_pom(
       @allocation.prison,
-      @allocation.primary_pom_nomis_id
+      pom_nomis_id
     )
   end
 
@@ -28,6 +25,35 @@ class EmailService
     deliver_new_allocation_email
   end
 
+  def send_coworking_primary_email(pom_firstname, coworking_pom_name)
+    unless @pom.emails.empty?
+      PomMailer.allocate_coworking_pom(
+        message: @message,
+        pom_name: pom_firstname.capitalize,
+        offender_name: @offender.full_name,
+        nomis_offender_id: @offender.offender_no,
+        coworking_pom_name: coworking_pom_name,
+        pom_email: @pom.emails.first,
+        url: url
+      ).deliver_later
+    end
+  end
+
+  def send_secondary_email(pom_firstname)
+    unless @pom.emails.empty?
+      PomMailer.secondary_allocation_email(
+        message: @message,
+        pom_name: pom_firstname.capitalize,
+        offender_name: @offender.full_name,
+        nomis_offender_id: @offender.offender_no,
+        responsibility: current_responsibility,
+        responsible_pom_name: @allocation.primary_pom_name,
+        pom_email: @pom.emails.first,
+        url: url
+      ).deliver_later
+    end
+  end
+
 private
 
   # rubocop:disable Metrics/LineLength
@@ -37,7 +63,7 @@ private
   # rubocop:enable Metrics/LineLength
 
   def current_responsibility
-    @current_responsibility ||= ResponsibilityService.new.
+    ResponsibilityService.new.
       calculate_pom_responsibility(@offender).downcase
   end
 
