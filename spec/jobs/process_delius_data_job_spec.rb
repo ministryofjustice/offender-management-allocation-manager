@@ -45,7 +45,6 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
       expect {
         described_class.perform_now d1.noms_no
       }.to change(CaseInformation, :count).by(1)
-      expect(CaseInformation.last.tier).to eq('B')
     end
   end
 
