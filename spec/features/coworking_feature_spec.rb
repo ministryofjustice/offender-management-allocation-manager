@@ -18,7 +18,7 @@ feature 'Co-working' do
     }
   end
 
-  scenario 'show allocate a co-working POM page', vcr: { cassette_name: :show_allocate_coworking_page } do
+  let!(:allocation) {
     create(
       :allocation_version,
       nomis_offender_id: nomis_offender_id,
@@ -26,9 +26,15 @@ feature 'Co-working' do
       primary_pom_name: probation_pom[:pom_name],
       recommended_pom_type: 'probation'
     )
+  }
 
+  let(:secondary_alloc) { allocation.reload }
+
+  before(:each) do
     signin_user
+  end
 
+  scenario 'show allocate a co-working POM page', vcr: { cassette_name: :show_allocate_coworking_page } do
     visit new_prison_coworking_path('LEI', nomis_offender_id)
 
     expect(page).to have_link 'Back', href: prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id)
@@ -69,8 +75,6 @@ feature 'Co-working' do
   end
 
   scenario 'show confirm co-working POM allocation page', vcr: { cassette_name: :show_confirm_coworking_page } do
-    signin_user
-
     visit prison_confirm_coworking_allocation_path(
       'LEI',
       nomis_offender_id, probation_pom[:staff_id], secondary_pom[:staff_id]
@@ -81,5 +85,24 @@ feature 'Co-working' do
     expect(page).to have_content("We will send a confirmation email to #{secondary_pom[:email]}")
     expect(page).to have_button('Complete allocation')
     expect(page).to have_link('Cancel')
+
+    fill_in 'message', with: 'Some new information'
+
+    click_button 'Complete allocation'
+
+    expect(page).to have_current_path('/prisons/LEI/summary/unallocated')
+
+    expect(secondary_alloc.secondary_pom_nomis_id).to eq(secondary_pom[:staff_id])
+    expect(secondary_alloc.secondary_pom_name).to eq(secondary_pom[:pom_name].upcase)
+
+    visit prison_allocation_path('LEI', nomis_offender_id)
+    within '#co-working-pom' do
+      click_link 'Deallocate'
+    end
+
+    expect(page).to have_link 'Allocate'
+    within '#co-working-pom' do
+      expect(page).to have_content('N/A')
+    end
   end
 end

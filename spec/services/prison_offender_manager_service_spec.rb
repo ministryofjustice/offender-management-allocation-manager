@@ -88,7 +88,7 @@ describe PrisonOffenderManagerService do
 
   it "can get a filtered list of POMs",
      vcr: { cassette_name: :pom_service_get_poms_filtered } do
-    poms = described_class.get_poms('LEI') { |pom|
+    poms = described_class.get_poms('LEI').select { |pom|
       pom.status == 'active'
     }
     expect(poms).to be_kind_of(Array)

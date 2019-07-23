@@ -8,6 +8,7 @@ class PrisonOffenderManagerService
     }
   end
 
+  # Note - get_poms and get_pom return different data...
   def self.get_poms(prison)
     poms = Nomis::Elite2::PrisonOffenderManagerApi.list(prison)
 
@@ -16,8 +17,6 @@ class PrisonOffenderManagerService
       pom.add_detail(detail, prison)
       pom
     }.compact
-
-    poms = poms.select { |pom| yield pom } if block_given?
 
     poms
   end
@@ -92,8 +91,8 @@ class PrisonOffenderManagerService
   end
 
   def self.unavailable_pom_count(prison)
-    poms = PrisonOffenderManagerService.get_poms(prison) { |pom|
-      pom.status != 'active'
+    poms = PrisonOffenderManagerService.get_poms(prison).reject { |pom|
+      pom.status == 'active'
     }
     poms.count
   end
