@@ -108,6 +108,36 @@ Several environment variables are required for the operation of this service.
 | PROMETHEUS_METRICS | If set to 'on' then will enable the generation of prometheus metrics |
 
 
+### Delius data import - ETL
+
+To run the Extract/Transform/Load (ETL) task for importing data from delius into MOIC. As the encrypted attachments are retrieved from an IMAP
+account, extra environment variables are required.
+
+| Env var  | Description  |
+|---|---|
+| DELIUS_EMAIL_FOLDER  |  This is the IMAP folder containing the emails with attachments. For development this is likely to be 'Data/dev' |
+| DELIUS_EMAIL_USERNAME | The username (email address) of a valid IMAP account containing encrypted attachments |
+| DELIUS_EMAIL_PASSWORD | The password for the above IMAP account |
+| DELIUS_DATA_PASSWORD  | This is the phrase that is used to decrypt the attachment |
+
+In order for the ETL task to run correctly, you will need to install a tool to decrypt the data.  This can be installed with
+
+```
+mkdir ./build
+cd ./build
+git clone https://github.com/herumi/cybozulib
+git clone https://github.com/herumi/msoffice
+cd msoffice
+make -j RELEASE=1
+mv ./bin/msoffice-crypt.exe <SOMEWHERE_IN_PATH>/mssoffice-crypt
+```
+
+Once these steps have been completed, you can run the ETL task with
+
+```
+rails delius_etl:process
+```
+
 ### Further Technical Information
 
 - Access the runbook in the OCM workspace of the MoJ wiki.

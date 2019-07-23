@@ -1,10 +1,21 @@
 # frozen_string_literal: true
 
 require 'csv'
+require_relative '../../lib/delius/etl'
 require_relative '../../lib/delius/manual_extractor'
 require_relative '../../lib/onboard_prison'
 
 namespace :delius_etl do
+
+  desc 'Perform the end-to-end import of delius data from a spreadsheet'
+  task :process => [:environment] do |_task, _args|
+    if defined?(Rails) && Rails.env.development?
+      Rails.logger = Logger.new(STDOUT)
+    end
+
+    Delius::ETL.new.process
+  end
+
   desc 'Create CaseInformation records for a specific prison'
   task :onboard, [:prison, :file] => [:environment] do |_task, args|
     if defined?(Rails) && Rails.env.development?
