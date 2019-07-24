@@ -22,7 +22,7 @@ class AllocationVersion < ApplicationRecord
     allocate_primary_pom: ALLOCATE_PRIMARY_POM,
     reallocate_primary_pom: REALLOCATE_PRIMARY_POM,
     allocate_secondary_pom: ALLOCATE_SECONDARY_POM,
-    reallocate_seondary_pom: REALLOCATE_SECONDARY_POM,
+    reallocate_secondary_pom: REALLOCATE_SECONDARY_POM,
     deallocate_primary_pom: DEALLOCATE_PRIMARY_POM,
     deallocate_secondary_pom: DEALLOCATE_SECONDARY_POM
   }
@@ -76,7 +76,21 @@ class AllocationVersion < ApplicationRecord
 
   def self.last_event(nomis_offender_id)
     allocation = find_by(nomis_offender_id: nomis_offender_id)
-    allocation.event.to_s.humanize + ' - ' + allocation.updated_at.strftime('%d/%m/%Y')
+
+    event = event_type(allocation.event)
+    event + ' - ' + allocation.updated_at.strftime('%d/%m/%Y')
+  end
+
+  def self.event_type(event)
+    type = (event.include? 'primary_pom') ? 'POM ' : 'Co-working POM '
+
+    if event.include? 'reallocate'
+      type + 're-allocated'
+    elsif event.include? 'deallocate'
+      type + 'removed'
+    elsif event.include? 'allocate'
+      type + 'allocated'
+    end
   end
 
   def self.active?(nomis_offender_id)

@@ -97,7 +97,7 @@ feature 'Co-working' do
 
     visit prison_allocation_path('LEI', nomis_offender_id)
     within '#co-working-pom' do
-      click_link 'Deallocate'
+      click_link 'Remove'
     end
 
     expect(page).to have_link 'Allocate'
