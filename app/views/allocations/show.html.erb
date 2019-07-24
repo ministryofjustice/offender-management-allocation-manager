@@ -85,31 +85,31 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Conditional release date</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= format_date(@prisoner.sentence.conditional_release_date, replacement: 'N/A') %>
+        <%= format_date(@prisoner.conditional_release_date, replacement: 'N/A') %>
       </td>
     </tr>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Automatic release date</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= format_date(@prisoner.sentence.automatic_release_date, replacement: 'N/A') %>
+        <%= format_date(@prisoner.automatic_release_date, replacement: 'N/A') %>
       </td>
     </tr>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Parole eligibility</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= format_date(@prisoner.sentence.parole_eligibility_date, replacement: 'N/A') %>
+        <%= format_date(@prisoner.parole_eligibility_date, replacement: 'N/A') %>
       </td>
     </tr>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Home detention curfew eligibility</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= format_date(@prisoner.sentence.home_detention_curfew_eligibility_date, replacement: 'N/A') %>
+        <%= format_date(@prisoner.home_detention_curfew_eligibility_date, replacement: 'N/A') %>
       </td>
     </tr>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Tariff date</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= format_date(@prisoner.sentence.tariff_date, replacement: 'N/A') %>
+        <%= format_date(@prisoner.tariff_date, replacement: 'N/A') %>
       </td>
     </tr>
     </tbody>
@@ -133,13 +133,18 @@
         <%= link_to 'Reallocate', edit_prison_allocation_path(@prison, @prisoner.offender_no), class: "govuk-link pull-right" %>
       </td>
     </tr>
-<!--    <tr class="govuk-table__row">-->
-<!--      <td class="govuk-table__cell govuk-!-width-one-half">Co-working POM</td>-->
-<!--      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">-->
-        <%#= link_to @pom.full_name, pom_path(@pom.staff_id), class: "govuk-link" %>
-        <%#= link_to 'Change', edit_allocation_path(@prisoner.offender_no), class: "govuk-link pull-right" %>
-<!--      </td>-->
-<!--    </tr>-->
+    <tr class="govuk-table__row" id="co-working-pom">
+      <td class="govuk-table__cell govuk-!-width-one-half">Co-working POM</td>
+      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
+        <% if @coworker.nil? %>
+          N/A
+          <%= link_to 'Allocate', new_prison_coworking_path(@prison, @prisoner.offender_no), class: "govuk-link pull-right" %>
+        <% else %>
+          <%= link_to @coworker.full_name, prison_pom_path(@prison, @coworker.staff_id), class: "govuk-link" %>
+          <%= link_to 'Deallocate', prison_coworking_path(@prison, @prisoner.offender_no), method: :delete, class: "govuk-link pull-right" %>
+        <% end %>
+      </td>
+    </tr>
     <% if Flipflop.link_allocation_info? %>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Allocation history</td>

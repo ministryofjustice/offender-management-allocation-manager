@@ -10,6 +10,24 @@
         <%= case_owner_label(@prisoner) %>
       </td>
     </tr>
+    <% if Flipflop.show_handover_dates? %>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell govuk-!-width-one-half">Handover start date</td>
+        <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
+          <% handover_date, reason = handover_start_date(@prisoner) %>
+          <%= format_date(handover_date) %>
+          <span class="handover-reason">(<%= reason %>)</span>
+        </td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell govuk-!-width-one-half">Responsibility Handover</td>
+        <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
+          <% handover_date, reason = responsibility_handover_date(@prisoner) %>
+          <%= format_date(handover_date) %>
+          <span class="handover-reason">(<%= reason %>)</span>
+        </td>
+      </tr>
+    <% end %>
   <!-- PENDING DATA
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Early allocation eligibility</td>

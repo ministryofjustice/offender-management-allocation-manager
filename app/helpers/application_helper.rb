@@ -24,7 +24,8 @@ module ApplicationHelper
   end
 
   def format_date_long(date_obj)
-    date_obj.strftime("#{date_obj.day.ordinalize} %B %Y")
+    date_obj.strftime("#{date_obj.day.ordinalize} %B %Y") +
+        ' (' + date_obj.strftime('%R') + ')'
   end
 
   def pom_level(level)
@@ -49,10 +50,6 @@ module ApplicationHelper
     return 'Full time' if pattern.to_f == 1.0
 
     'Part time'
-  end
-
-  def pom_responsibility_label(offender)
-    ResponsibilityService.new.calculate_pom_responsibility(offender)
   end
 
   def case_owner_label(offender)

@@ -22,7 +22,9 @@ class AllocationsController < PrisonsApplicationController
   def show
     @prisoner = offender(nomis_offender_id_from_url)
     primary_pom_nomis_id = AllocationVersion.find_by(nomis_offender_id: @prisoner.offender_no).primary_pom_nomis_id
+    secondary_pom_nomis_id = AllocationVersion.find_by(nomis_offender_id: @prisoner.offender_no).secondary_pom_nomis_id
     @pom = PrisonOffenderManagerService.get_pom(active_prison, primary_pom_nomis_id)
+    @coworker = PrisonOffenderManagerService.get_pom(active_prison, secondary_pom_nomis_id)
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(active_prison, @prisoner.offender_no)
     @allocation = AllocationVersion.where(nomis_offender_id: @prisoner.offender_no)
   end
@@ -84,6 +86,7 @@ class AllocationsController < PrisonsApplicationController
   def history
     @prisoner = offender(nomis_offender_id_from_url)
     @history = AllocationService.offender_allocation_history(nomis_offender_id_from_url)
+    @pom_emails = AllocationService.allocation_history_pom_emails(@history)
   end
 
 private
@@ -155,8 +158,10 @@ private
   end
 
   def recommended_and_nonrecommended_poms_for(offender)
-    poms = PrisonOffenderManagerService.get_poms(active_prison) { |pom|
-      pom.status == 'active'
+    allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id_from_url)
+    # don't allow primary to be the same as the co-working POM
+    poms = PrisonOffenderManagerService.get_poms(active_prison).select { |pom|
+      pom.status == 'active' && pom.staff_id != allocation.try(:secondary_pom_nomis_id)
     }
 
     RecommendationService.recommended_poms(offender, poms)

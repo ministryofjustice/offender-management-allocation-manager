@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# This 'model' is just a raw dump of the XLSX file we get from nDelius and as such
+# is not part of our data model.
+# This data is loaded into case_information by the nDelius ETL process.
 class DeliusData < ApplicationRecord
   before_update do |data|
     if data.tier_changed?

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe EmailService do
+RSpec.describe EmailService, :queueing do
   include ActiveJob::TestHelper
 
   let(:allocation) {
@@ -42,21 +42,20 @@ RSpec.describe EmailService do
   }
 
   before(:each) {
-    ActiveJob::Base.queue_adapter = :test
     PomDetail.create(nomis_staff_id: 485_637, working_pattern: 1.0, status: 'inactive')
   }
 
   it "Can send an allocation email", vcr: { cassette_name: :email_service_send_allocation_email }, versioning: true  do
-    described_class.instance(allocation: allocation, message: "").send_email
-    expect(enqueued_jobs.size).to eq(1)
-    enqueued_jobs.clear
+    expect {
+      described_class.instance(allocation: allocation, message: "", pom_nomis_id: allocation.primary_pom_nomis_id).send_email
+    }.to change(enqueued_jobs, :size).by(1)
   end
 
   it "Can send a reallocation email", vcr: { cassette_name: :email_service_send_deallocation_email }, versioning: true  do
     allow(AllocationService).to receive(:get_versions_for).and_return([original_allocation])
 
-    described_class.instance(allocation: reallocation, message: "").send_email
-    expect(enqueued_jobs.size).to eq(2)
-    enqueued_jobs.clear
+    expect {
+      described_class.instance(allocation: reallocation, message: "", pom_nomis_id: allocation.primary_pom_nomis_id).send_email
+    }.to change(enqueued_jobs, :size).by(2)
   end
 end

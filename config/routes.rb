@@ -25,11 +25,15 @@ Rails.application.routes.draw do
     get('/allocations/:nomis_offender_id/history' => 'allocations#history', as: 'allocation_history')
     get('/allocations/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocations#confirm', as: 'confirm_allocation')
     get('/reallocations/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocations#confirm_reallocation', as: 'confirm_reallocation')
-
     resource :case_information, only: %i[new create edit update], controller: 'case_information', path_names: {
         new: 'new/:nomis_offender_id',
         edit: 'edit/:nomis_offender_id'
     }
+    resources :coworking, only: [:new, :create, :destroy], param: :nomis_offender_id, path_names: {
+      new: ':nomis_offender_id/new',
+    }
+    get('/coworking/confirm/:nomis_offender_id/:primary_pom_id/:secondary_pom_id' => 'coworking#confirm', as: 'confirm_coworking_allocation')
+
     resource :overrides,  only: %i[ new create ], path_names: { new: 'new/:nomis_offender_id/:nomis_staff_id'}
     resources :poms, only: %i[ index show edit update ], param: :nomis_staff_id
 

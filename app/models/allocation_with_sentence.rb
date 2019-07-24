@@ -6,11 +6,14 @@ class AllocationWithSentence
   delegate :last_name, :full_name, :earliest_release_date,
            :sentence_start_date, to: :@sentence
   delegate :updated_at, :nomis_offender_id, :primary_pom_allocated_at,
-           :responsibility, :allocated_at_tier, to: :@allocation
+           :allocated_at_tier, to: :@allocation
 
-  def initialize(allocation, sentence)
+  attr_reader :responsibility
+
+  def initialize(allocation, sentence, responsibility)
     @allocation = allocation
     @sentence = sentence
+    @responsibility = responsibility
   end
 
   def new_case?
