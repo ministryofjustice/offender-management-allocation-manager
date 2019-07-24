@@ -20,11 +20,10 @@ feature "view POM's caseload" do
   end
 
   context 'when paginating', vcr: { cassette_name: :show_poms_caseload } do
-
     before do
       stub_const("NAMES", ["Abbella, Ozullirn", "Bennany, Yruicafar", "Cadary, Avncent", "Daijedo, Egvaning",
-        'Ebonuardo, Omimchi', 'Felitha, Asjmonzo', 'Gabrijah, Eastzo', 'Hah, Dyfastoaul',
-        'Ibriyah, Aiamce', 'Jabexia, Elnuunbo', 'Kaceria, Omaertain'])
+                           'Ebonuardo, Omimchi', 'Felitha, Asjmonzo', 'Gabrijah, Eastzo', 'Hah, Dyfastoaul',
+                           'Ibriyah, Aiamce', 'Jabexia, Elnuunbo', 'Kaceria, Omaertain'])
       signin_user('PK000223')
 
       [offender1_case_info, offender2_case_info, offender3_case_info, offender4_case_info,
