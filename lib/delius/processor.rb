@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'nokogiri'
-require 'zip'
 
 require_relative 'sheet'
 require_relative 'string_collector'
