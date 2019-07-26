@@ -96,6 +96,8 @@ feature 'Allocation History' do
                        event_trigger: AllocationVersion::OFFENDER_TRANSFERRED,
                        primary_pom_nomis_id: nil,
                        primary_pom_name: nil,
+                       secondary_pom_nomis_id: nil,
+                       secondary_pom_name: nil,
                        recommended_pom_type: nil,
                        updated_at: Time.zone.now - 1.day,
                        primary_pom_allocated_at: nil)
@@ -117,7 +119,7 @@ feature 'Allocation History' do
         ['.govuk-heading-s', "Prisoner unallocated (transfer)"],
         ['.time', transfer_date.to_s],
         ['.govuk-heading-s', "Prisoner reallocated"],
-        ['p', "Prisoner reallocated to #{history1.primary_pom_name} Tier: #{history1.allocated_at_tier}"],
+        ['p', "Prisoner reallocated to #{history1.primary_pom_name} - (email address not found) Tier: #{history1.allocated_at_tier}"],
         ['.time', "#{formatted_date_for(history1)} by #{history1.created_by_name.titleize}"],
         ['.govuk-heading-s', "Prisoner allocation"],
         ['p', "Prisoner allocated to #{history2.primary_pom_name.titleize} - #{prison_pom[:email]} Tier: #{history2.allocated_at_tier}"],
