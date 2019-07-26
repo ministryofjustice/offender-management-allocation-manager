@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_10_065151) do
+ActiveRecord::Schema.define(version: 2019_07_17_064658) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -41,35 +41,13 @@ ActiveRecord::Schema.define(version: 2019_07_10_065151) do
     t.index ["secondary_pom_nomis_id"], name: "index_allocation_versions_secondary_pom_nomis_id"
   end
 
-  create_table "allocations", force: :cascade do |t|
-    t.string "nomis_offender_id"
-    t.string "prison"
-    t.string "allocated_at_tier"
-    t.string "override_reasons"
-    t.string "override_detail"
-    t.string "created_by_username"
-    t.boolean "active"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "primary_pom_nomis_id"
-    t.integer "nomis_booking_id"
-    t.text "message"
-    t.string "suitability_detail"
-    t.text "primary_pom_name"
-    t.text "created_by_name"
-    t.text "secondary_pom_name"
-    t.integer "secondary_pom_nomis_id"
-    t.index ["nomis_offender_id"], name: "index_allocations_on_nomis_offender_id"
-    t.index ["primary_pom_nomis_id"], name: "index_allocations_on_primary_pom_nomis_id"
-    t.index ["secondary_pom_nomis_id"], name: "index_allocations_on_secondary_pom_nomis_id"
-  end
-
   create_table "case_information", force: :cascade do |t|
     t.string "tier"
     t.string "case_allocation"
     t.string "nomis_offender_id"
     t.text "omicable"
     t.string "crn"
+    t.integer "mappa_level"
     t.index ["nomis_offender_id"], name: "index_case_information_on_nomis_offender_id"
   end
 
@@ -117,7 +95,6 @@ ActiveRecord::Schema.define(version: 2019_07_10_065151) do
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "email"
     t.index ["nomis_staff_id"], name: "index_pom_details_on_nomis_staff_id"
   end
 

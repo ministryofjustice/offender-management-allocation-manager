@@ -17,25 +17,25 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Release date</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= format_date(@prisoner.sentence.release_date, replacement: 'N/A') %>
+        <%= format_date(@prisoner.release_date, replacement: 'N/A') %>
       </td>
     </tr>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Parole eligibility</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= format_date(@prisoner.sentence.parole_eligibility_date, replacement: 'N/A') %>
+        <%= format_date(@prisoner.parole_eligibility_date, replacement: 'N/A') %>
       </td>
     </tr>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Home detention curfew eligibility</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= format_date(@prisoner.sentence.home_detention_curfew_eligibility_date, replacement: 'N/A') %>
+        <%= format_date(@prisoner.home_detention_curfew_eligibility_date, replacement: 'N/A') %>
       </td>
     </tr>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Tariff date</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= format_date(@prisoner.sentence.tariff_date, replacement: 'N/A') %>
+        <%= format_date(@prisoner.tariff_date, replacement: 'N/A') %>
       </td>
     </tr>
   </tbody>

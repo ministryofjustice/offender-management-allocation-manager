@@ -79,6 +79,66 @@ feature "view an offender's allocation information" do
     end
   end
 
+  describe 'Co-worker link' do
+    before do
+      create_case_information_for(nomis_offender_id_with_keyworker)
+      create_allocation(nomis_offender_id_with_keyworker)
+    end
+
+    it 'displays a link to allocate a co-worker', vcr: { cassette_name: :show_allocation_information_display_coworker_link } do
+      signin_user
+
+      visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_with_keyworker)
+
+      table_row = page.find(:css, 'tr.govuk-table__row', text: 'Co-working POM')
+
+      within table_row do
+        expect(page).to have_link('Allocate',
+                                  href: new_prison_coworking_path('LEI', nomis_offender_id_with_keyworker))
+        expect(page).to have_content('Co-working POM N/A')
+      end
+    end
+
+    it 'displays the name of the allocated co-worker', vcr: { cassette_name: :show_allocation_information_display_coworker_name } do
+      allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id_with_keyworker)
+
+      allocation.update!(event: AllocationVersion::ALLOCATE_SECONDARY_POM,
+                         secondary_pom_nomis_id: 485_752,
+                         secondary_pom_name: "Ross Jones")
+
+      signin_user
+
+      visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_with_keyworker)
+
+      table_row = page.find(:css, 'tr.govuk-table__row#co-working-pom', text: 'Co-working POM')
+
+      within table_row do
+        expect(page).to have_link('Remove')
+        expect(page).to have_content('Co-working POM Jones, Ross')
+      end
+    end
+  end
+
+  describe 'Allocation history link' do
+    before do
+      create_case_information_for(nomis_offender_id_with_keyworker)
+      create_allocation(nomis_offender_id_with_keyworker)
+    end
+
+    it 'displays a link to the allocation history', vcr: { cassette_name: :show_allocation_information_history_link } do
+      signin_user
+
+      visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_with_keyworker)
+
+      table_row = page.find(:css, 'tr.govuk-table__row', text: 'Allocation history')
+
+      within table_row do
+        expect(page).to have_link('View')
+        expect(page).to have_content("POM allocated - #{Time.zone.now.strftime('%d/%m/%Y')}")
+      end
+    end
+  end
+
   def create_case_information_for(offender_no)
     CaseInformation.create!(
       nomis_offender_id: offender_no,

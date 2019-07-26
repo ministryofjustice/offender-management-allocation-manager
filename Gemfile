@@ -14,7 +14,7 @@ gem 'logstash-event'
 gem 'omniauth-oauth2'
 gem 'paper_trail'
 gem 'pg'
-gem 'puma', '~> 3.12'
+gem 'puma', '~> 4.0'
 gem 'prometheus_exporter'
 gem 'rails', '~> 5.2.3'
 gem 'sass-rails', '~> 5.0'
@@ -29,6 +29,7 @@ gem 'plissken'
 gem 'fast_underscore', require: false
 gem 'flipflop'
 gem 'hashdiff', ['>= 1.0.0.beta1', '< 2.0.0']
+gem 'rubyzip'
 
 group :development, :test do
   gem 'brakeman'

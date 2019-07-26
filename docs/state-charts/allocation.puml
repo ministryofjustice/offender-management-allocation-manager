@@ -1,0 +1,32 @@
+@startuml
+
+title Allocation State Model
+
+PPOMState : PPOM
+SPOMState : SPOM
+BothPOMState : PPOM
+BothPOMState : SPOM
+NoAllocationState : ""
+
+
+[*] --> PPOMState  : Allocate a POM
+
+PPOMState -> PPOMState : Reallocate PPOM
+
+PPOMState -> BothPOMState : Assign SPOM
+BothPOMState -up-> PPOMState : Deallocate SPOM
+
+BothPOMState -> SPOMState : Inactive PPOM
+SPOMState -down-> NoAllocationState : Release
+SPOMState -> NoAllocationState : Transfer
+SPOMState -> BothPOMState : Allocate PPOM
+
+BothPOMState -> BothPOMState: Reallocate PPOM
+
+PPOMState -> NoAllocationState: Release
+PPOMState -> NoAllocationState: Transfer
+
+BothPOMState -> NoAllocationState: Release
+BothPOMState -> NoAllocationState: Transfer
+
+@enduml

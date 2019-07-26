@@ -52,6 +52,14 @@ RSpec.configure do |config|
   config.after(:each, :raven_intercept_exception) do
     Rails.configuration.sentry_dsn = nil
   end
+
+  config.around(:each, :queueing) do |example|
+    ActiveJob::Base.queue_adapter.tap do |adapter|
+      ActiveJob::Base.queue_adapter = :test
+      example.run
+      ActiveJob::Base.queue_adapter = adapter
+    end
+  end
 end
 
 Shoulda::Matchers.configure do |config|

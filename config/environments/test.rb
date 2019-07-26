@@ -13,7 +13,6 @@ Rails.application.configure do
 
   config.action_controller.perform_caching = false
   config.active_job.queue_adapter = :inline
-  config.cache_store = :null_store
 
   # Do not eager load code on boot. This avoids loading your whole application
   # just for the purpose of running a single test. If you are using a tool that
@@ -52,4 +51,5 @@ Rails.application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
+  Rails.application.routes.default_url_options[:host] = 'http://localhost:3000'
 end

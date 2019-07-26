@@ -17,6 +17,47 @@ class PomMailer < GovukNotifyRails::Mailer
     mail(to: params[:pom_email])
   end
 
+  # rubocop:disable Metrics/ParameterLists
+  def allocate_coworking_pom(
+    pom_email:, message:, pom_name:, coworking_pom_name:, url:,
+    offender_name:, nomis_offender_id:
+  )
+    set_template('a76f44a0-e214-4967-bfe3-4564d28e2951')
+
+    message = "Additional information: #{message}" if message.present?
+
+    set_personalisation(message: message || '',
+                        pom_name: pom_name,
+                        coworking_pom_name: coworking_pom_name,
+                        url: url,
+                        offender_name: offender_name,
+                        nomis_offender_id: nomis_offender_id)
+
+    mail(to: pom_email)
+  end
+  # rubocop:enable Metrics/ParameterLists
+
+  # rubocop:disable Metrics/ParameterLists
+  def secondary_allocation_email(
+    message:, pom_name:, offender_name:, nomis_offender_id:,
+    responsible_pom_name:, pom_email:, url:, responsibility:
+)
+    message = "Additional information: #{message}" if message.present?
+    set_template('8d63ef1a-8f85-47ec-875c-a8bd3a22bb0d')
+    set_personalisation(
+      pom_name: pom_name,
+      url: url,
+      responsibility: responsibility,
+      offender_name: offender_name,
+      nomis_offender_id: nomis_offender_id,
+      responsible_pom_name: responsible_pom_name,
+      message: message || ''
+    )
+
+    mail(to: pom_email)
+  end
+  # rubocop:enable Metrics/ParameterLists
+
   def new_prison_allocation_email(prison)
     set_template('651da525-7564-4f04-85ff-b0343fb7c47d')
     set_personalisation(
