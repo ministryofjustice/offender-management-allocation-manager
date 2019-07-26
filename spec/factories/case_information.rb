@@ -13,5 +13,9 @@ FactoryBot.define do
     case_allocation do
       'NPS'
     end
+
+    manual_entry do
+      true
+    end
   end
 end
