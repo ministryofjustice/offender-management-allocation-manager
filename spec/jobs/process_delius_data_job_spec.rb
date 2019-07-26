@@ -48,6 +48,17 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
     end
   end
 
+  context 'when tier contains extra characters' do
+    let!(:d1) { create(:delius_data, tier: 'B1') }
+
+    it 'creates case information' do
+      expect {
+        ProcessDeliusDataJob.perform_now d1.noms_no
+      }.to change(CaseInformation, :count).by(1)
+      expect(CaseInformation.last.tier).to eq('B')
+    end
+  end
+
   context 'when tier is invalid' do
     let!(:d1) { create(:delius_data, tier: 'X') }
 
@@ -85,6 +96,18 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
     it 'does not creates case information' do
       expect {
         described_class.perform_now d1.noms_no
+      }.not_to change(CaseInformation, :count)
+      expect(c1.reload.tier).to eq('C')
+    end
+  end
+
+  context 'when case information already present' do
+    let!(:c1) { create(:case_information, tier: 'B') }
+    let!(:d1) { create(:delius_data, noms_no: c1.nomis_offender_id, crn: c1.crn, tier: 'C') }
+
+    it 'does not creates case information' do
+      expect {
+        ProcessDeliusDataJob.perform_now d1.noms_no
       }.not_to change(CaseInformation, :count)
       expect(c1.reload.tier).to eq('C')
     end
