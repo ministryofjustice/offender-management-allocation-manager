@@ -53,7 +53,8 @@ private
         local_divisional_unit: ldu_record.persisted? ? ldu_record : nil,
         team: team_record.persisted? ? team_record : nil,
         case_allocation: delius_record.service_provider,
-        omicable: map_omicable(delius_record.omicable?)
+        omicable: map_omicable(delius_record.omicable?),
+        mappa_level: map_mappa_level(delius_record.mappa, delius_record.mappa_levels)
       )
     end
   end
@@ -80,6 +81,14 @@ private
       team.name = delius_record.team
       team.save
     }
+  end
+
+  def map_mappa_level(delius_mappa, delius_mappa_levels)
+    if delius_mappa == 'N'
+      0
+    elsif delius_mappa == 'Y'
+      delius_mappa_levels.split(',').reject { |ml| ml == 'Nominal' }.map(&:to_i).max
+    end
   end
 
   def map_omicable(omicable)

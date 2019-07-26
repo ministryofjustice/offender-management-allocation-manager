@@ -69,6 +69,56 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
     end
   end
 
+  describe '#mappa' do
+    context 'without delius mappa' do
+      let!(:d1) { create(:delius_data, mappa: 'N') }
+
+      it 'creates case information with mappa level 0' do
+        expect {
+          ProcessDeliusDataJob.perform_now d1.noms_no
+        }.to change(CaseInformation, :count).by(1)
+        expect(CaseInformation.last.mappa_level).to eq(0)
+      end
+    end
+
+    context 'with delius mappa' do
+      let!(:d1) { create(:delius_data, mappa: 'Y', mappa_levels: mappa_levels) }
+
+      context 'with delius mappa data is 1' do
+        let(:mappa_levels) { '1' }
+
+        it 'creates case information with mappa level 1' do
+          expect {
+            ProcessDeliusDataJob.perform_now d1.noms_no
+          }.to change(CaseInformation, :count).by(1)
+          expect(CaseInformation.last.mappa_level).to eq(1)
+        end
+      end
+
+      context 'with delius mappa data is 1,2' do
+        let(:mappa_levels) { '1,2' }
+
+        it 'creates case information with mappa level 2' do
+          expect {
+            ProcessDeliusDataJob.perform_now d1.noms_no
+          }.to change(CaseInformation, :count).by(1)
+          expect(CaseInformation.last.mappa_level).to eq(2)
+        end
+      end
+
+      context 'with delius mappa data is 1,Nominal' do
+        let(:mappa_levels) { '1,Nominal' }
+
+        it 'creates case information with mappa level 1' do
+          expect {
+            ProcessDeliusDataJob.perform_now d1.noms_no
+          }.to change(CaseInformation, :count).by(1)
+          expect(CaseInformation.last.mappa_level).to eq(1)
+        end
+      end
+    end
+  end
+
   context 'when tier is missing' do
     let!(:d1) { create(:delius_data, tier: nil) }
 

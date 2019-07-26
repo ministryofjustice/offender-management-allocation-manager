@@ -52,19 +52,19 @@ private
     end
 
     if SentenceTypeService.indeterminate_sentence?(offender.imprisonment_status)
-      [indeterminate_handover_date(offender), 'NPS Inderminate']
+      [indeterminate_responsibility_date(offender), 'NPS Inderminate']
     elsif offender.parole_eligibility_date.present?
       [offender.parole_eligibility_date - 8.months, 'NPS Determinate Parole Case']
     elsif offender.mappa_level.blank?
       [nil, 'NPS - MAPPA missing from nDelius']
     elsif offender.mappa_level.in? [1, 0]
-      [mappa1_handover_date(offender), 'NPS Determinate Mappa 1/N']
+      [mappa1_responsibility_date(offender), 'NPS Determinate Mappa 1/N']
     else
-      [mappa_23_handover_date(offender), 'NPS Determinate Mappa 2/3']
+      [mappa_23_responsibility_date(offender), 'NPS Determinate Mappa 2/3']
     end
   end
 
-  def indeterminate_handover_date(offender)
+  def indeterminate_responsibility_date(offender)
     [
       offender.parole_eligibility_date,
       offender.tariff_date
@@ -73,14 +73,14 @@ private
 
   # There are a couple of places where we need .5 of a month - which
   # we have assumed 15.days is a reasonable compromise implementation
-  def mappa_23_handover_date(offender)
+  def mappa_23_responsibility_date(offender)
     [
       offender.conditional_release_date,
       offender.automatic_release_date
     ].compact.map { |date| date - (7.months + 15.days) }.min
   end
 
-  def mappa1_handover_date(offender)
+  def mappa1_responsibility_date(offender)
     crd_ard = [
       offender.conditional_release_date,
       offender.automatic_release_date
