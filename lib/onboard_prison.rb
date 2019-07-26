@@ -25,8 +25,8 @@ class OnboardPrison
         omicable: record[:omicable] ? 'Yes' : 'No',
         tier: record[:tier],
         case_allocation: record[:provider_cd],
-        manual_entry: false,
-        crn: record[:crn]
+        crn: record[:crn],
+        manual_entry: false
       )
 
       @additions += 1
