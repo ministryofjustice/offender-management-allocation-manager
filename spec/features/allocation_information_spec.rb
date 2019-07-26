@@ -110,13 +110,31 @@ feature "view an offender's allocation information" do
 
       visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_with_keyworker)
 
-      table_row = page.find(:css, 'tr.govuk-table__row', text: 'Co-working POM')
+      table_row = page.find(:css, 'tr.govuk-table__row#co-working-pom', text: 'Co-working POM')
 
       within table_row do
-        # expect(page).to have_link('Deallocate',
-        #                           href: prison_remove_coworking_path('LEI', nomis_offender_id_with_keyworker))
-        expect(page).to have_link('Deallocate')
+        expect(page).to have_link('Remove')
         expect(page).to have_content('Co-working POM Jones, Ross')
+      end
+    end
+  end
+
+  describe 'Allocation history link' do
+    before do
+      create_case_information_for(nomis_offender_id_with_keyworker)
+      create_allocation(nomis_offender_id_with_keyworker)
+    end
+
+    it 'displays a link to the allocation history', vcr: { cassette_name: :show_allocation_information_history_link } do
+      signin_user
+
+      visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_with_keyworker)
+
+      table_row = page.find(:css, 'tr.govuk-table__row', text: 'Allocation history')
+
+      within table_row do
+        expect(page).to have_link('View')
+        expect(page).to have_content("POM allocated - #{Time.zone.now.strftime('%d/%m/%Y')}")
       end
     end
   end
