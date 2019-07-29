@@ -127,7 +127,7 @@ RSpec.describe AllocationVersion, type: :model do
       ]
 
       events.each do |key, val|
-        expect(AllocationVersion.event_type(key)).to eq(val)
+        expect(described_class.event_type(key)).to eq(val)
       end
     end
   end
