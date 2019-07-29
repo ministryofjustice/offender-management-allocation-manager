@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe PageMeta, model: true do
   it 'handles pages at the start' do
-    meta = PageMeta.new.tap { |p|
+    meta = described_class.new.tap { |p|
       p.size = 10
       p.total_elements = 612
       p.total_pages = 62
@@ -14,7 +14,7 @@ describe PageMeta, model: true do
   end
 
   it 'handles pages at the end' do
-    meta = PageMeta.new.tap { |p|
+    meta = described_class.new.tap { |p|
       p.size = 10
       p.total_elements = 612
       p.total_pages = 62
@@ -26,7 +26,7 @@ describe PageMeta, model: true do
   end
 
   it 'handles pages in the middle' do
-    meta = PageMeta.new.tap { |p|
+    meta = described_class.new.tap { |p|
       p.size = 10
       p.total_elements = 612
       p.total_pages = 62
@@ -38,7 +38,7 @@ describe PageMeta, model: true do
   end
 
   it 'handles the page 3 in' do
-    meta = PageMeta.new.tap { |p|
+    meta = described_class.new.tap { |p|
       p.size = 10
       p.total_elements = 612
       p.total_pages = 62
@@ -50,7 +50,7 @@ describe PageMeta, model: true do
   end
 
   it 'handles the page 3 from the end' do
-    meta = PageMeta.new.tap { |p|
+    meta = described_class.new.tap { |p|
       p.size = 10
       p.total_elements = 150
       p.total_pages = 15
@@ -62,7 +62,7 @@ describe PageMeta, model: true do
   end
 
   it 'handles a single page' do
-    meta = PageMeta.new.tap { |p|
+    meta = described_class.new.tap { |p|
       p.size = 10
       p.total_elements = 9
       p.total_pages = 1
@@ -74,7 +74,7 @@ describe PageMeta, model: true do
   end
 
   it 'handles missing data' do
-    meta = PageMeta.new.tap { |p|
+    meta = described_class.new.tap { |p|
       p.size = 10
       p.total_elements = 0
       p.total_pages = 0

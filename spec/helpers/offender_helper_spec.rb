@@ -55,15 +55,17 @@ RSpec.describe OffenderHelper do
 
     describe '#responsibility_handover_date' do
       context 'when CRC' do
-        CRCHandoverData = Struct.new(:nps_case?, :home_detention_curfew_eligibility_date, :conditional_release_date, :result)
+        before do
+          stub_const("CRCHandoverData", Struct.new(:nps_case?, :home_detention_curfew_eligibility_date, :conditional_release_date, :result))
 
-        CRC_CASES = [
-          CRCHandoverData.new(false, Date.new(2019, 9, 30), Date.new(2019, 8, 1), Date.new(2019, 5, 9)), # 12 weeks before CRD
-          CRCHandoverData.new(false, Date.new(2019, 8, 1), Date.new(2019, 8, 12), Date.new(2019, 5, 9)), # 12 weeks before HDC date
-          CRCHandoverData.new(false, nil, Date.new(2019, 8, 1), Date.new(2019, 5, 9)), # 12 weeks before CRD date
-          CRCHandoverData.new(false, Date.new(2019, 8, 1), nil, Date.new(2019, 5, 9)), # 12 weeks before HDC date
-          CRCHandoverData.new(false, nil, nil, nil) # no handover date
-        ]
+          stub_const("CRC_CASES", [
+            CRCHandoverData.new(false, Date.new(2019, 9, 30), Date.new(2019, 8, 1), Date.new(2019, 5, 9)), # 12 weeks before CRD
+            CRCHandoverData.new(false, Date.new(2019, 8, 1), Date.new(2019, 8, 12), Date.new(2019, 5, 9)), # 12 weeks before HDC date
+            CRCHandoverData.new(false, nil, Date.new(2019, 8, 1), Date.new(2019, 5, 9)), # 12 weeks before CRD date
+            CRCHandoverData.new(false, Date.new(2019, 8, 1), nil, Date.new(2019, 5, 9)), # 12 weeks before HDC date
+            CRCHandoverData.new(false, nil, nil, nil) # no handover date
+            ])
+        end
 
         context 'with tablular data source' do
           it 'returns the specified result' do

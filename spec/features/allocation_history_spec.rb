@@ -90,6 +90,7 @@ feature 'Allocation History' do
                        primary_pom_nomis_id: pom_without_email[:primary_pom_nomis_id],
                        primary_pom_name: pom_without_email[:primary_pom_name],
                        recommended_pom_type: 'probation',
+                       created_by_name: nil,
                        updated_at: Time.zone.now - 2.days)
 
     allocation.update!(event: AllocationVersion::DEALLOCATE_PRIMARY_POM,
@@ -113,7 +114,7 @@ feature 'Allocation History' do
     signin_user
     visit prison_allocation_history_path('LEI', nomis_offender_id)
 
-    TESTS = [
+    stub_const("TESTS", [
         ['h1', "Abbella, Ozullirn"],
         ['.govuk-heading-m', "HMP Pentonville"],
         ['.govuk-heading-s', "Prisoner unallocated (transfer)"],
@@ -137,7 +138,7 @@ feature 'Allocation History' do
         ['p', "Prisoner allocated to #{history.last.primary_pom_name.titleize} - #{probation_pom[:email]} Tier: #{history.last.allocated_at_tier}"],
         ['p', "Probation POM allocated instead of recommended Prison POM", "Reason(s):", "- Prisoner assessed as suitable for a prison POM despite tiering calculation", "Too high risk"],
         ['.time', "#{formatted_date_for(history.last)} by #{history.last.created_by_name.titleize}"]
-    ]
+    ])
 
     TESTS.each do |key, val|
       expect(page).to have_css(key, text: val)
