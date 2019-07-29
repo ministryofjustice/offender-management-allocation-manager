@@ -90,6 +90,7 @@ feature 'Allocation History' do
                        primary_pom_nomis_id: pom_without_email[:primary_pom_nomis_id],
                        primary_pom_name: pom_without_email[:primary_pom_name],
                        recommended_pom_type: 'probation',
+                       created_by_name: nil,
                        updated_at: Time.zone.now - 2.days)
 
     allocation.update!(event: AllocationVersion::DEALLOCATE_PRIMARY_POM,
@@ -118,7 +119,7 @@ feature 'Allocation History' do
           ['.time', transfer_date.to_s],
           ['.govuk-heading-s', "Prisoner reallocated"],
           ['p', "Prisoner reallocated to #{history1.primary_pom_name} Tier: #{history1.allocated_at_tier}"],
-          ['.time', "#{formatted_date_for(history1)} by #{history1.created_by_name.titleize}"],
+          ['.time', formatted_date_for(history1).to_s],
           ['.govuk-heading-s', "Prisoner allocation"],
           ['p', "Prisoner allocated to #{history2.primary_pom_name.titleize} - #{prison_pom[:email]} Tier: #{history2.allocated_at_tier}"],
           ['.time', "#{formatted_date_for(history2)} by #{history2.created_by_name.titleize}"],
