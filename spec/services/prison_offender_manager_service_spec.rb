@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 describe PrisonOffenderManagerService do
+  let(:other_staff_id) { 485_637 }
   let(:staff_id) { 485_737 }
 
   before(:each) {
@@ -26,63 +27,66 @@ describe PrisonOffenderManagerService do
   end
 
   describe '#get_allocated_offenders' do
-    let(:allocation_one) {
+    let(:old) { 8.days.ago }
+
+    let(:old_primary_alloc) {
+      Timecop.travel(old) do
+        create(
+          :allocation_version,
+          primary_pom_nomis_id: staff_id,
+          nomis_offender_id: 'G4273GI',
+          nomis_booking_id: 1_153_753
+        )
+      end
+    }
+
+    let(:old_secondary_alloc) {
+      Timecop.travel(old) do
+        create(
+          :allocation_version,
+          primary_pom_nomis_id: other_staff_id,
+          nomis_offender_id: 'G8060UF',
+          nomis_booking_id: 971_856
+        ).tap { |item|
+          item.update!(secondary_pom_nomis_id: staff_id)
+        }
+      end
+    }
+
+    let(:primary_alloc) {
       create(
         :allocation_version,
         primary_pom_nomis_id: staff_id,
-        nomis_offender_id: 'G4273GI',
-        nomis_booking_id: 1_153_753
-      )
-    }
-
-    let(:allocation_two) {
-      create(
-        :allocation_version,
-        primary_pom_nomis_id: staff_id,
-        nomis_offender_id: 'G8060UF',
-        nomis_booking_id: 971_856
-      )
-    }
-
-    let(:allocation_three) {
-      create(
-        :allocation_version,
-        secondary_pom_nomis_id: staff_id,
         nomis_offender_id: 'G8624GK',
         nomis_booking_id: 76_908
       )
     }
 
-    let(:allocation_four) {
+    let(:secondary_alloc) {
       create(
         :allocation_version,
-        primary_pom_nomis_id: staff_id,
+        primary_pom_nomis_id: other_staff_id,
         nomis_offender_id: 'G1714GU',
         nomis_booking_id: 31_777
-      )
+      ).tap { |item|
+        item.update!(secondary_pom_nomis_id: staff_id)
+      }
     }
 
     let!(:all_allocations) {
-      [allocation_one, allocation_two, allocation_three, allocation_four]
+      [old_primary_alloc, old_secondary_alloc, primary_alloc, secondary_alloc]
     }
 
-    it "can get allocated offenders for a POM",
-       vcr: { cassette_name: :pom_service_allocated_offenders } do
-      allocated_offenders = described_class.get_allocated_offenders(allocation_one.primary_pom_nomis_id, 'LEI')
-
-      alloc = allocated_offenders.first
-      expect(alloc).to be_kind_of(AllocationWithSentence)
+    before do
+      old_primary_alloc.update!(secondary_pom_nomis_id: other_staff_id)
     end
 
-    it "will get allocations for a POM made within the last 7 days", vcr: { cassette_name: :get_new_cases } do
-      allocation_one.update!(updated_at: 10.days.ago)
-      allocation_two.update!(updated_at: 3.days.ago)
-
+    it "will get allocations for a POM made within the last 7 days", :versioning, vcr: { cassette_name: :get_new_cases } do
       allocated_offenders = described_class.
-        get_allocated_offenders(allocation_one.primary_pom_nomis_id, 'LEI').
+        get_allocated_offenders(staff_id, 'LEI').
         select(&:new_case?)
-      expect(allocated_offenders.count).to eq 3
-      expect(allocated_offenders.map(&:responsibility)).to match_array [ResponsibilityService::SUPPORTING] * 2 + ['Co-Working']
+      expect(allocated_offenders.count).to eq 2
+      expect(allocated_offenders.map(&:responsibility)).to match_array [ResponsibilityService::SUPPORTING, 'Co-Working']
     end
   end
 

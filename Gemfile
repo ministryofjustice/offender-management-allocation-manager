@@ -44,6 +44,7 @@ group :development, :test do
 end
 
 group :test do
+  gem 'timecop'
   gem 'capybara'
   gem 'database_cleaner'
   gem 'faker'

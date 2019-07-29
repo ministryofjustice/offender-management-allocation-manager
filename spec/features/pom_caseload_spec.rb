@@ -109,7 +109,7 @@ feature "view POM's caseload" do
     expect(cat_code).to eq('C')
   end
 
-  it 'displays all cases that have been allocated to a specific POM in the last week', vcr: { cassette_name: :show_new_cases } do
+  it 'displays all cases that have been allocated to a specific POM in the last week', :versioning, vcr: { cassette_name: :show_new_cases } do
     signin_user('PK000223')
 
     visit prison_confirm_allocation_path('LEI', nomis_offender_id, nomis_staff_id)
