@@ -81,7 +81,7 @@ feature 'Co-working' do
           )
 
     expect(page).to have_content("Confirm co-working allocation")
-    expect(page).to have_content("You are allocating #{secondary_pom[:pom_name]} to work with #{probation_pom[:pom_name]} on Ozullirn Abbella")
+    expect(page).to have_content("You are allocating co-working POM #{secondary_pom[:pom_name]} to Ozullirn Abbella. The responsible POM is #{probation_pom[:pom_name]}.")
     expect(page).to have_content("We will send a confirmation email to #{secondary_pom[:email]}")
     expect(page).to have_button('Complete allocation')
     expect(page).to have_link('Cancel')
@@ -97,7 +97,7 @@ feature 'Co-working' do
 
     visit prison_allocation_path('LEI', nomis_offender_id)
     within '#co-working-pom' do
-      click_link 'Deallocate'
+      click_link 'Remove'
     end
 
     expect(page).to have_link 'Allocate'

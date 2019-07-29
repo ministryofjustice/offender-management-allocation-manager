@@ -141,7 +141,7 @@
           <%= link_to 'Allocate', new_prison_coworking_path(@prison, @prisoner.offender_no), class: "govuk-link pull-right" %>
         <% else %>
           <%= link_to @coworker.full_name, prison_pom_path(@prison, @coworker.staff_id), class: "govuk-link" %>
-          <%= link_to 'Deallocate', prison_coworking_path(@prison, @prisoner.offender_no), method: :delete, class: "govuk-link pull-right" %>
+          <%= link_to 'Remove', prison_coworking_path(@prison, @prisoner.offender_no), method: :delete, class: "govuk-link pull-right" %>
         <% end %>
       </td>
     </tr>

@@ -115,6 +115,23 @@ RSpec.describe AllocationVersion, type: :model do
     end
   end
 
+  describe '#event_type' do
+    it 'returns the event in a more readable format' do
+      events = [
+          ['allocate_primary_pom', 'POM allocated'],
+          ['allocate_secondary_pom', 'Co-working POM allocated'],
+          ['reallocate_primary_pom', 'POM re-allocated'],
+          ['reallocate_secondary_pom', 'Co-working POM re-allocated'],
+          ['deallocate_primary_pom', 'POM removed'],
+          ['deallocate_secondary_pom', 'Co-working POM removed']
+      ]
+
+      events.each do |key, val|
+        expect(AllocationVersion.event_type(key)).to eq(val)
+      end
+    end
+  end
+
   describe '#override_reasons' do
     let!(:allocation_no_overrides) {
       create(

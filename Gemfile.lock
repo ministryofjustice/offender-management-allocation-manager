@@ -358,6 +358,7 @@ DEPENDENCIES
   rubocop-performance
   rubocop-rails
   rubocop-rspec
+  rubyzip
   sass-rails (~> 5.0)
   selenium-webdriver
   sentry-raven
