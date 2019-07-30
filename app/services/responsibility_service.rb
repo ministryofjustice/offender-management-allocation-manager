@@ -3,6 +3,7 @@
 class ResponsibilityService
   RESPONSIBLE = 'Responsible'
   SUPPORTING = 'Supporting'
+  COWORKING = 'Co-Working'
   NPS = 'NPS'
 
   # rubocop:disable Metrics/PerceivedComplexity
