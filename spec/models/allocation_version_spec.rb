@@ -35,9 +35,9 @@ RSpec.describe AllocationVersion, type: :model do
 
   describe 'when a Primary Pom is inactive' do
     it 'removes the primary pom\'s from all allocations' do
-      AllocationVersion.deallocate_primary_pom(nomis_staff_id)
+      described_class.deallocate_primary_pom(nomis_staff_id)
 
-      deallocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id)
+      deallocation = described_class.find_by(nomis_offender_id: nomis_offender_id)
 
       expect(deallocation.primary_pom_nomis_id).to be_nil
       expect(deallocation.primary_pom_name).to be_nil
@@ -63,8 +63,8 @@ RSpec.describe AllocationVersion, type: :model do
       }
       AllocationService.create_or_update(params)
 
-      AllocationVersion.deallocate_offender(nomis_offender_id, movement_type)
-      deallocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id)
+      described_class.deallocate_offender(nomis_offender_id, movement_type)
+      deallocation = described_class.find_by(nomis_offender_id: nomis_offender_id)
 
       expect(deallocation.primary_pom_nomis_id).to be_nil
       expect(deallocation.primary_pom_name).to be_nil
@@ -91,8 +91,8 @@ RSpec.describe AllocationVersion, type: :model do
       }
       AllocationService.create_or_update(params)
 
-      AllocationVersion.deallocate_offender(nomis_offender_id, movement_type)
-      deallocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id)
+      described_class.deallocate_offender(nomis_offender_id, movement_type)
+      deallocation = described_class.find_by(nomis_offender_id: nomis_offender_id)
 
       expect(deallocation.primary_pom_nomis_id).to be_nil
       expect(deallocation.primary_pom_name).to be_nil
@@ -105,13 +105,13 @@ RSpec.describe AllocationVersion, type: :model do
 
   describe '#active?' do
     it 'return true if an Allocation has been assigned a Primary POM' do
-      expect(AllocationVersion.active?(nomis_offender_id)).to be(true)
+      expect(described_class.active?(nomis_offender_id)).to be(true)
     end
 
     it 'return false if an Allocation has not been assigned a Primary POM' do
-      AllocationVersion.deallocate_primary_pom(nomis_staff_id)
+      described_class.deallocate_primary_pom(nomis_staff_id)
 
-      expect(AllocationVersion.active?(nomis_offender_id)).to be(false)
+      expect(described_class.active?(nomis_offender_id)).to be(false)
     end
   end
 
@@ -127,7 +127,7 @@ RSpec.describe AllocationVersion, type: :model do
       ]
 
       events.each do |key, val|
-        expect(AllocationVersion.event_type(key)).to eq(val)
+        expect(described_class.event_type(key)).to eq(val)
       end
     end
   end
@@ -175,7 +175,7 @@ RSpec.describe AllocationVersion, type: :model do
     }
 
     it 'returns both primary and secondary allocations' do
-      expect(AllocationVersion.active_pom_allocations(nomis_staff_id, 'LEI')).to match_array [secondary_allocation, allocation]
+      expect(described_class.active_pom_allocations(nomis_staff_id, 'LEI')).to match_array [secondary_allocation, allocation]
     end
   end
 end

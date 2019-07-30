@@ -84,6 +84,7 @@ feature 'Allocation History' do
                        primary_pom_nomis_id: prison_pom[:primary_pom_nomis_id],
                        primary_pom_name: prison_pom[:primary_pom_name],
                        recommended_pom_type: 'prison',
+                       created_by_name: nil,
                        updated_at: Time.zone.now - 4.days)
 
     allocation.update!(event: AllocationVersion::REALLOCATE_PRIMARY_POM,
@@ -96,6 +97,8 @@ feature 'Allocation History' do
                        event_trigger: AllocationVersion::OFFENDER_TRANSFERRED,
                        primary_pom_nomis_id: nil,
                        primary_pom_name: nil,
+                       secondary_pom_nomis_id: nil,
+                       secondary_pom_name: nil,
                        recommended_pom_type: nil,
                        updated_at: Time.zone.now - 1.day,
                        primary_pom_allocated_at: nil)
@@ -111,17 +114,17 @@ feature 'Allocation History' do
     signin_user
     visit prison_allocation_history_path('LEI', nomis_offender_id)
 
-    TESTS = [
+    stub_const("TESTS", [
         ['h1', "Abbella, Ozullirn"],
         ['.govuk-heading-m', "HMP Pentonville"],
         ['.govuk-heading-s', "Prisoner unallocated (transfer)"],
         ['.time', transfer_date.to_s],
         ['.govuk-heading-s', "Prisoner reallocated"],
-        ['p', "Prisoner reallocated to #{history1.primary_pom_name} Tier: #{history1.allocated_at_tier}"],
-        ['.time', "#{formatted_date_for(history1)} by #{history1.created_by_name.titleize}"],
+        ['p', "Prisoner reallocated to #{history1.primary_pom_name} - (email address not found) Tier: #{history1.allocated_at_tier}"],
+        ['.time', formatted_date_for(history1).to_s],
         ['.govuk-heading-s', "Prisoner allocation"],
         ['p', "Prisoner allocated to #{history2.primary_pom_name.titleize} - #{prison_pom[:email]} Tier: #{history2.allocated_at_tier}"],
-        ['.time', "#{formatted_date_for(history2)} by #{history2.created_by_name.titleize}"],
+        ['.time', formatted_date_for(history2).to_s],
         ['p', "Prisoner allocated to #{hist_allocate_secondary.secondary_pom_name.titleize} - #{probation_pom[:email]} Tier: #{hist_allocate_secondary.allocated_at_tier}"],
         ['.time', "#{formatted_date_for(hist_allocate_secondary)} by #{hist_allocate_secondary.created_by_name.titleize}"],
         ['.govuk-heading-m', "HMP Leeds"],
@@ -135,7 +138,7 @@ feature 'Allocation History' do
         ['p', "Prisoner allocated to #{history.last.primary_pom_name.titleize} - #{probation_pom[:email]} Tier: #{history.last.allocated_at_tier}"],
         ['p', "Probation POM allocated instead of recommended Prison POM", "Reason(s):", "- Prisoner assessed as suitable for a prison POM despite tiering calculation", "Too high risk"],
         ['.time', "#{formatted_date_for(history.last)} by #{history.last.created_by_name.titleize}"]
-    ]
+    ])
 
     TESTS.each do |key, val|
       expect(page).to have_css(key, text: val)

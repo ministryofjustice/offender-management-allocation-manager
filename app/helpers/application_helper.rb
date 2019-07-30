@@ -70,4 +70,12 @@ module ApplicationHelper
   def humanized_bool(bool_value)
     bool_value ? 'Yes' : 'No'
   end
+
+  def format_email(email)
+    if email.nil?
+      '(email address not found)'
+    else
+      mail_to(email)
+    end
+  end
 end

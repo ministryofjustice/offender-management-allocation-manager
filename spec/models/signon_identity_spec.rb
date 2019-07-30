@@ -14,14 +14,14 @@ describe SignonIdentity, model: true do
   let(:omniauth_data) do
     { 'info' => user_auth_data, 'credentials' => credentials }
   end
-  let(:signon_identity) { SignonIdentity.from_omniauth(omniauth_data) }
+  let(:signon_identity) { described_class.from_omniauth(omniauth_data) }
 
   it 'creates a SignonIdentity instance' do
-    expect(signon_identity).to be_a_kind_of(SignonIdentity)
+    expect(signon_identity).to be_a_kind_of(described_class)
   end
 
   it 'does not crash if from_omniauth fails' do
-    ident = SignonIdentity.from_omniauth(nil)
+    ident = described_class.from_omniauth(nil)
     expect(ident).to be_nil
   end
 

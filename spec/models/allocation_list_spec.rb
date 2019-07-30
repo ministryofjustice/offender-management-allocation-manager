@@ -33,7 +33,7 @@ RSpec.describe AllocationList, type: :model do
   }
 
   it 'can group the allocations correctly', vcr: { cassette_name: :allocation_list_spec } do
-    list = AllocationList.new([current_allocation, middle_allocation1, middle_allocation2, old_allocation])
+    list = described_class.new([current_allocation, middle_allocation1, middle_allocation2, old_allocation])
     expect(list.count).to eq(4)
 
     results = []
