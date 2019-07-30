@@ -53,7 +53,7 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
 
     it 'creates case information' do
       expect {
-        ProcessDeliusDataJob.perform_now d1.noms_no
+        described_class.perform_now d1.noms_no
       }.to change(CaseInformation, :count).by(1)
       expect(CaseInformation.last.tier).to eq('B')
     end
@@ -75,7 +75,7 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
 
       it 'creates case information with mappa level 0' do
         expect {
-          ProcessDeliusDataJob.perform_now d1.noms_no
+          described_class.perform_now d1.noms_no
         }.to change(CaseInformation, :count).by(1)
         expect(CaseInformation.last.mappa_level).to eq(0)
       end
@@ -89,7 +89,7 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
 
         it 'creates case information with mappa level 1' do
           expect {
-            ProcessDeliusDataJob.perform_now d1.noms_no
+            described_class.perform_now d1.noms_no
           }.to change(CaseInformation, :count).by(1)
           expect(CaseInformation.last.mappa_level).to eq(1)
         end
@@ -100,7 +100,7 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
 
         it 'creates case information with mappa level 2' do
           expect {
-            ProcessDeliusDataJob.perform_now d1.noms_no
+            described_class.perform_now d1.noms_no
           }.to change(CaseInformation, :count).by(1)
           expect(CaseInformation.last.mappa_level).to eq(2)
         end
@@ -111,7 +111,7 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
 
         it 'creates case information with mappa level 1' do
           expect {
-            ProcessDeliusDataJob.perform_now d1.noms_no
+            described_class.perform_now d1.noms_no
           }.to change(CaseInformation, :count).by(1)
           expect(CaseInformation.last.mappa_level).to eq(1)
         end
@@ -157,7 +157,7 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
 
     it 'does not creates case information' do
       expect {
-        ProcessDeliusDataJob.perform_now d1.noms_no
+        described_class.perform_now d1.noms_no
       }.not_to change(CaseInformation, :count)
       expect(c1.reload.tier).to eq('C')
     end
