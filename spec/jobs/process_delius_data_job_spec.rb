@@ -152,7 +152,7 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
   end
 
   context 'when case information already present' do
-    let!(:c1) { create(:case_information, tier: 'B') }
+    let!(:c1) { create(:case_information, tier: 'B', nomis_offender_id: 'G4281GV') }
     let!(:d1) { create(:delius_data, noms_no: c1.nomis_offender_id, crn: c1.crn, tier: 'C') }
 
     it 'does not creates case information' do
