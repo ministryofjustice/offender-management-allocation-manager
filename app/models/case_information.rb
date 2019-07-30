@@ -3,7 +3,7 @@
 class CaseInformation < ApplicationRecord
   self.table_name = 'case_information'
 
-belongs_to :local_divisional_unit, optional: true
+  belongs_to :local_divisional_unit, optional: true
   belongs_to :team, optional: true
 
   validates :manual_entry, inclusion: { in: [true, false], allow_nil: false }
