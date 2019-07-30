@@ -76,6 +76,6 @@ RUN mkdir -p /home/appuser && \
   chown -R appuser:appuser /app && \
   chown -R appuser:appuser /home/appuser
 
-USER appuser
+USER 1001
 
 RUN RAILS_ENV=production rails assets:precompile
