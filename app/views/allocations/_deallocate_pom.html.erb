@@ -5,7 +5,11 @@
     <% end %>
   </h2>
   <p>
-  &nbsp;
+    <% unless allocation.event_trigger == 'offender_transferred' %>
+      Prisoner unallocated <%= allocation_type == 'Co-working' ? 'co-working POM ' : 'POM ' %>
+    <%= pom_name.titleize %> - <%= format_email(@pom_emails[pom_id]) %>
+    <% end %>
+  </p>
   <br/>
 &nbsp;
   <p class="time"><%= format_date_long(allocation.updated_at) %></p>
