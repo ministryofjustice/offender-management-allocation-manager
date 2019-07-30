@@ -28,6 +28,8 @@ namespace :delius_email do
       else
         Rails.logger.error('Unable to find an attachment')
       end
+
+      emails.cleanup
     }
   end
 end
