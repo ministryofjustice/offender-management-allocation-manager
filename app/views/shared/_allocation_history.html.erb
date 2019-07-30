@@ -13,7 +13,9 @@
                 Tier: <%= allocation.allocated_at_tier %>
               </p>
               <p class="time"><%= format_date_long(allocation.primary_pom_allocated_at) %>
-                by <%= allocation.created_by_name.titleize %></p>
+                <% if allocation.created_by_name.present? %>
+                  by <%= allocation.created_by_name.titleize %></p>
+                <% end %>
             </li>
           <% end %>
         </ul>

@@ -81,6 +81,7 @@ class PrisonOffenderManagerService
         responsibility = 'Co-Working'
       end
       AllocationWithSentence.new(
+        nomis_staff_id,
         alloc,
         offender_map[alloc.nomis_booking_id],
         responsibility
