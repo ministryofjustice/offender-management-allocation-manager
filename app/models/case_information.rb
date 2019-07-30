@@ -2,7 +2,7 @@
 
 class CaseInformation < ApplicationRecord
   self.table_name = 'case_information'
-  validates :manual_entry, presence: true
+  validates :manual_entry, inclusion: { in: [true, false], allow_nil: false }
   validates :nomis_offender_id, presence: true
   validates :omicable, presence: {
     message: 'Select yes if the prisoner’s last known address was in Wales'

@@ -18,6 +18,8 @@ FactoryBot.define do
       true
     end
 
-    nomis_offender_id { 'G12345' }
+    nomis_offender_id do
+      'G12345'
+    end
   end
 end

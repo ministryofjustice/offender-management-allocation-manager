@@ -16,4 +16,22 @@ RSpec.describe CaseInformation, type: :model do
       expect(subject).not_to be_valid
     end
   end
+
+  context 'with manual flag' do
+    it 'can be true' do
+      expect(build(:case_information, manual_entry: true)).to be_valid
+    end
+  end
+
+  context 'without manual flag' do
+    it 'can be false' do
+      expect(build(:case_information, manual_entry: false)).to be_valid
+    end
+  end
+
+  context 'with null manual flag' do
+    it 'cannot be nil' do
+      expect(build(:case_information, manual_entry: nil)).not_to be_valid
+    end
+  end
 end
