@@ -50,32 +50,6 @@ class CaseInformationController < PrisonsApplicationController
       nomis_offender_id: case_information_params[:nomis_offender_id],
       tier: case_information_params[:tier],
       omicable: case_information_params[:omicable],
-      case_allocation: case_information_params[:case_allocation]
-    )
-
-    return redirect_to prison_summary_pending_path(active_prison) if @case_info.valid?
-
-    @prisoner = prisoner(case_information_params[:nomis_offender_id])
-    render :new
-  end
-
-  def update
-    case_info = CaseInformation.find_by(
-      nomis_offender_id: case_information_params[:nomis_offender_id]
-    )
-    case_info.tier = case_information_params[:tier]
-    case_info.case_allocation = case_information_params[:case_allocation]
-    case_info.omicable = case_information_params[:omicable]
-    case_info.save
-
-    redirect_to new_prison_allocation_path(active_prison, case_info.nomis_offender_id)
-  end
-
-  def create
-    @case_info = CaseInformation.create(
-      nomis_offender_id: case_information_params[:nomis_offender_id],
-      tier: case_information_params[:tier],
-      omicable: case_information_params[:omicable],
       case_allocation: case_information_params[:case_allocation],
       manual_entry: true
     )
