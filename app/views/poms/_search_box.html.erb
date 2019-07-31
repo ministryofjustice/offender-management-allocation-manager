@@ -18,7 +18,9 @@
       </div>
       <div class="pull-right">
         <%= select_tag 'role',
-                       options_for_select([ResponsibilityService::RESPONSIBLE, ResponsibilityService::SUPPORTING]),
+                       options_for_select([ResponsibilityService::RESPONSIBLE,
+                                           ResponsibilityService::SUPPORTING,
+                                           ResponsibilityService::COWORKING]),
                        include_blank: 'All', class: 'govuk-select' %>
         <input id="search-button" type="submit" class="govuk-button pull-right" value="Search"/>
       </div>
