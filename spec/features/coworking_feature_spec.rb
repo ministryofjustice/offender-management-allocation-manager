@@ -28,8 +28,6 @@ feature 'Co-working' do
     )
   }
 
-  let(:secondary_alloc) { allocation.reload }
-
   before(:each) do
     signin_user
   end
@@ -58,7 +56,9 @@ feature 'Co-working' do
     end
 
     expect(page).not_to have_content('unavailable POM')
+  end
 
+  scenario 'show correct unavailable message', vcr: { cassette_name: :show_coworking_unavailable } do
     inactive_poms = [485_734, 485_833]
     inactive_texts = ['There is 1 unavailable POM for new allocation',
                       'There are 2 unavailable POMs for new allocation']
@@ -92,8 +92,9 @@ feature 'Co-working' do
 
     expect(page).to have_current_path('/prisons/LEI/summary/unallocated')
 
-    expect(secondary_alloc.secondary_pom_nomis_id).to eq(secondary_pom[:staff_id])
-    expect(secondary_alloc.secondary_pom_name).to eq(secondary_pom[:pom_name].upcase)
+    allocation.reload
+    expect(allocation.secondary_pom_nomis_id).to eq(secondary_pom[:staff_id])
+    expect(allocation.secondary_pom_name).to eq(secondary_pom[:pom_name].upcase)
 
     visit prison_allocation_path('LEI', nomis_offender_id)
     within '#co-working-pom' do
