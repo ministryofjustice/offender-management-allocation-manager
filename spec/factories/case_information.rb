@@ -13,5 +13,8 @@ FactoryBot.define do
     case_allocation do
       'NPS'
     end
+
+    nomis_offender_id { 'G12345' }
+
   end
 end
