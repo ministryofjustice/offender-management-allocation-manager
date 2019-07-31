@@ -15,6 +15,5 @@ FactoryBot.define do
     end
 
     nomis_offender_id { 'G12345' }
-
   end
 end

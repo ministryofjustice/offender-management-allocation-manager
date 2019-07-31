@@ -6,6 +6,6 @@ RSpec.describe CustomStatsLoggingJob, type: :job do
   end
 
   it 'does not crash' do
-    CustomStatsLoggingJob.perform_now
+    described_class.perform_now
   end
 end
