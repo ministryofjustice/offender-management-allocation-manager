@@ -52,24 +52,36 @@ class CoworkingController < PrisonsApplicationController
 
   def confirm_removal
     @prisoner = offender(coworking_nomis_offender_id_from_url)
+    @allocation = AllocationVersion.find_by!(
+      nomis_offender_id: coworking_nomis_offender_id_from_url
+    )
+    @primary_pom = PrisonOffenderManagerService.get_pom(
+      active_prison, @allocation.primary_pom_nomis_id
+    )
     @errors = OpenStruct.new(count: 0)
   end
 
+  # rubocop:disable Metrics/MethodLength
   def destroy
     # parse 'true'/'false' into True/False/nil
     reallocate = ActiveModel::Type::Boolean.new.cast(params[:reallocate])
+    @allocation = AllocationVersion.find_by!(
+      nomis_offender_id: nomis_offender_id_from_url
+    )
+    @primary_pom = PrisonOffenderManagerService.get_pom(
+      active_prison, @allocation.primary_pom_nomis_id
+    )
     if reallocate.nil?
       @prisoner = offender(nomis_offender_id_from_url)
       @errors = OpenStruct.new(count: 1,
                                messages: { reallocate: ['Please select Yes or No'] })
       render 'confirm_removal'
     else
-      AllocationVersion.find_by!(nomis_offender_id: nomis_offender_id_from_url).
-        update!(
-          secondary_pom_name: nil,
-          secondary_pom_nomis_id: nil,
-          event: AllocationVersion::DEALLOCATE_SECONDARY_POM,
-          event_trigger: AllocationVersion::USER
+      @allocation.update!(
+        secondary_pom_name: nil,
+        secondary_pom_nomis_id: nil,
+        event: AllocationVersion::DEALLOCATE_SECONDARY_POM,
+        event_trigger: AllocationVersion::USER
         )
       if reallocate
         redirect_to new_prison_coworking_path(active_prison, nomis_offender_id_from_url)
@@ -78,6 +90,7 @@ class CoworkingController < PrisonsApplicationController
       end
     end
   end
+# rubocop:enable Metrics/MethodLength
 
 private
 

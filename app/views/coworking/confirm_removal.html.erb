@@ -4,9 +4,9 @@
   <%= render :partial => "/shared/validation_errors", :locals => { :errors => @errors } %>
 <% end %>
 
-You are removing <%= @coworking_pom_name %> from co-working POM <%= @primary_pom_name %>
+You are removing <%= @allocation.secondary_pom_name %> from co-working POM <%= @allocation.primary_pom_name %>
 
-We will send a confirmation email to <%= @primary_pom_email %>
+We will send a confirmation email to <%= @primary_pom.emails.first %>
 
 Do you want to allocate this prisoner to a new co-working POM?
 

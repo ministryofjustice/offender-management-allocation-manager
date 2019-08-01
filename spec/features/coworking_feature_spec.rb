@@ -126,6 +126,9 @@ feature 'Co-working' do
       end
 
       expect(page).to have_current_path('/prisons/LEI/coworking/G4273GI/confirm_coworking_removal')
+
+      expect(page).to have_content 'You are removing Kath Pobee-Norris from co-working POM Ross Jones'
+      expect(page).to have_content 'We will send a confirmation email to Ross.jonessss@digital.justice.gov.uk'
     end
 
     scenario 'removing a co-working POM then changing our mind', vcr: { cassette_name: :coworking_remove_changed_mind } do
