@@ -11,6 +11,8 @@ gem 'jbuilder', '~> 2.9'
 gem 'jwt'
 gem 'lograge'
 gem 'logstash-event'
+# to enable custom log stats by writing logs directly
+gem 'logstash-logger'
 gem 'omniauth-oauth2'
 gem 'paper_trail'
 gem 'pg'
