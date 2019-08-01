@@ -110,7 +110,6 @@ describe MovementService do
 
       expect(CaseInformationService.get_case_information([release.offender_no])).to be_empty
       expect(updated_allocation.event_trigger).to eq 'offender_released'
-      expect(updated_allocation.prison).to be_nil
       expect(processed).to be true
     end
   end
