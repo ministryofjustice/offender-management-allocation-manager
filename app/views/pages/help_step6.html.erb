@@ -1,15 +1,17 @@
-<%= render :partial => "content" %>
+<%= render :partial => "content", locals: { page: 6 } %>
 
 <h1 class="govuk-heading-l govuk-!-margin-bottom-5">Start making allocations</h1>
+
 <div class="govuk-grid-column">
   <div class="govuk-body">
+
     <p>You are now ready to start making allocations.</p>
 
     <p>Initially, the allocations you make in the service will need to mirror existing allocations.
       For example, if an offender manager is working with a prisoner, then you will need to assign
       that same offender manager to the prisoner.</p>
 
-    <p>Sign in to <a href="https://moic.service.justice.gov.uk" class="govuk-link">https://moic.service.justice.gov.uk</a> and follow these steps:</p>
+    <p>Sign in to <%= link_to("https://moic.service.justice.gov.uk", "https://moic.service.justice.gov.uk") %> and follow these steps:</p>
 
     <ul>
       <li>go to ‘make new allocations’</li>

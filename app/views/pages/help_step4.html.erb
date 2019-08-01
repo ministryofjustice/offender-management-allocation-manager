@@ -1,15 +1,23 @@
-<%= render :partial => "content" %>
+<%= render :partial => "content", locals: { page: 4 } %>
 
 <h1 class="govuk-heading-l govuk-!-margin-bottom-5">Update POM profiles</h1>
+
 <div class="govuk-grid-column">
   <div class="govuk-body">
-    <p>Please note: This task can’t be started until task 2 has been completed</p>
+
+    <div class="govuk-warning-text">
+      <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+      <strong class="govuk-warning-text__text">
+        <span class="govuk-warning-text__assistive">Warning</span>
+        Please note: This task can’t be started until task 2 has been completed
+      </strong>
+    </div>
 
     <p>You need to update POMs working patterns and availability in the new allocations service before you can start allocating cases.</p>
 
-    <p>Sign in to <a href="https://moic.service.justice.gov.uk" class="govuk-link">https://moic.service.justice.gov.uk</a>  and follow these steps:</p>
+    <p>Sign in to <%= link_to("https://moic.service.justice.gov.uk", "https://moic.service.justice.gov.uk") %> and follow these steps:</p>
 
-    <ul>
+    <ul class="govuk-list--bullet">
       <li>go to ‘view all offender managers’ under ‘manage staff’</li>
       <li>choose a POM from the list and select ‘view’</li>
       <li>on the POM profile page, select ‘edit’</li>

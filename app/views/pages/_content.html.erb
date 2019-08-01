@@ -1,17 +1,57 @@
-<div class="govuk-grid-row dashboard-row">
-  <h1 class="govuk-heading-l govuk-!-margin-bottom-5">Help</h1>
-  <div class="govuk-grid-column govuk-body">
-    <aside class="govuk-section-break--visible">
-      <p>Contents</p>
-      <ol class="govuk-list--number">
-        <li><a href="help" class="govuk-link">Get started with the allocations service</a></li>
-        <li><a href="help_step1" class="govuk-link">List everyone using the service</a></li>
-        <li><a href="help_step2" class="govuk-link">Set up access in Digital Prison Services</a></li>
-        <li><a href="help_step3" class="govuk-link">Set up POMs in NOMIS</a></li>
-        <li><a href="help_step4" class="govuk-link">Update POM profiles</a></li>
-        <li><a href="help_step5" class="govuk-link">Update prisoner information</a></li>
-        <li><a href="help_step6" class="govuk-link">Start making allocations</a></li>
-      </ol>
-    </aside>
+<div class="govuk-grid-column govuk-body">
+  <div class="govuk-section-break--visible">
+    <h1 class="govuk-heading-l">Help</h1>
+    <p>Contents</p>
+    <ul class="govuk-list--bullet">
+      <li>
+        <% if page == 0 %>
+          Get started with the allocations service
+        <% else %>
+          <%= link_to "Get started with the allocations service", "help" %>
+        <% end %>
+      </li>
+      <li>
+        <% if page == 1 %>
+          List everyone using the service
+        <% else %>
+          <%= link_to "List everyone using the service", "help_step1" %>
+        <% end %>
+      </li>
+      <li>
+        <% if page == 2 %>
+          Set up access in Digital Prison Services
+        <% else %>
+          <%= link_to "Set up access in Digital Prison Services", "help_step2" %>
+        <% end %>
+      </li>
+      <li>
+        <% if page == 3 %>
+          Set up POMs in NOMIS
+        <% else %>
+          <%= link_to "Set up POMs in NOMIS", "help_step3" %>
+        <% end %>
+      </li>
+      <li>
+        <% if page == 4 %>
+          Update POM profiles
+        <% else %>
+          <%= link_to "Update POM profiles", "help_step4" %>
+        <% end %>
+      </li>
+      <li>
+        <% if page == 5 %>
+          Update prisoner information
+        <% else %>
+          <%= link_to "Update prisoner information", "help_step5" %>
+        <% end %>
+      </li>
+      <li>
+        <% if page == 6 %>
+          Start making allocations
+        <% else %>
+          <%= link_to "Start making allocations", "help_step6" %>
+        <% end %>
+      </li>
+    </ul>
   </div>
 </div>
