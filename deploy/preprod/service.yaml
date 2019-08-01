@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: allocation-manager
+  namespace: offender-management-preprod
+  labels:
+    app: allocation-manager
+spec:
+  ports:
+  - port: 3000
+    name: http
+    targetPort: 3000
+  - port: 9394
+    name: metrics
+    targetPort: 9394
+  selector:
+    app: allocation-manager
