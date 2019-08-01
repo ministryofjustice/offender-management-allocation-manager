@@ -78,7 +78,7 @@ class PrisonOffenderManagerService
         responsibility =
           ResponsibilityService.new.calculate_pom_responsibility(offender_stub)
       else
-        responsibility = 'Co-Working'
+        responsibility = ResponsibilityService::COWORKING
       end
       AllocationWithSentence.new(
         nomis_staff_id,
