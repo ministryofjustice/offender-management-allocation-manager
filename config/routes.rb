@@ -37,7 +37,9 @@ Rails.application.routes.draw do
     }
     resources :coworking, only: [:new, :create, :destroy], param: :nomis_offender_id, path_names: {
       new: ':nomis_offender_id/new',
-    }
+    } do
+      get('confirm_coworking_removal' => 'coworking#confirm_removal', as: 'confirm_removal')
+    end
     get('/coworking/confirm/:nomis_offender_id/:primary_pom_id/:secondary_pom_id' => 'coworking#confirm', as: 'confirm_coworking_allocation')
 
     resource :overrides,  only: %i[ new create ], path_names: { new: 'new/:nomis_offender_id/:nomis_staff_id'}
