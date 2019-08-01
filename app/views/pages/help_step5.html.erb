@@ -1,1 +1,36 @@
-<h1 class="govuk-heading-l govuk-!-margin-bottom-5">Help - Step 5</h1>
+<%= render :partial => "content", locals: { page: 5 } %>
+
+<h1 class="govuk-heading-l govuk-!-margin-bottom-5">Update prisoner information</h1>
+
+<div class="govuk-grid-column">
+  <div class="govuk-body">
+
+    <div class="govuk-warning-text">
+      <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+      <strong class="govuk-warning-text__text">
+        <span class="govuk-warning-text__assistive">Warning</span>
+        Please note: This task can’t be started until task 3 has been completed
+      </strong>
+    </div>
+
+
+    <p>You will need to update information about some prisoners in the allocations
+      service before you can start allocating POMs. This involves getting information
+      from NDelius and recording:
+    </p>
+
+    <ul>
+      <li>Whether the service provider is NPS or CRC</li>
+      <li>The prisoner’s tier</li>
+      <li>Whether the prisoner has a Welsh address (this is because Wales is piloting the new OMiC policy before it is rolled out across England)</li>
+    </ul>
+
+    <p>Sign in to <%= link_to("https://moic.service.justice.gov.uk", "https://moic.service.justice.gov.uk") %> and follow these steps:</p>
+
+    <ul>
+      <li>go to ‘update case information’</li>
+      <li>Select ‘edit’ by the name of the prisoner whose information needs updating</li>
+      <li>Answer the questions and ‘Save’</li>
+    </ul>
+  </div>
+</div>
