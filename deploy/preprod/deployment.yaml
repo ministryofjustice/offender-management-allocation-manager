@@ -1,0 +1,117 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: allocation-manager
+  labels:
+    app: allocation-manager
+  annotations:
+    kubernetes.io/change-cause: "<to be filled in deploy job command>"
+spec:
+  replicas: 3
+  revisionHistoryLimit: 1
+  minReadySeconds: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 2
+  selector:
+    matchLabels:
+      app: allocation-manager
+  template:
+    metadata:
+      labels:
+        app: allocation-manager
+    spec:
+      containers:
+        - name: allocation-manager
+          image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
+          imagePullPolicy: Always
+          command: ['sh', '-c', "bundle exec rails db:migrate && bundle exec puma -p 3000 -C ./config/puma_prod.rb --pidfile /tmp/server.pid"]
+          ports:
+            - containerPort: 3000
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 60
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 60
+          envFrom:
+            - configMapRef:
+                name: shared-environment
+            - secretRef:
+                name: allocation-manager-secrets
+          env:
+            - name: POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-rds-instance-output
+                  key: rds_instance_address
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-rds-instance-output
+                  key: postgres_password
+            - name: POSTGRES_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-rds-instance-output
+                  key: postgres_name
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-rds-instance-output
+                  key: postgres_user
+        - name: allocation-manager-sidekiq
+          image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
+          imagePullPolicy: Always
+          command: ['sh', '-c', "bundle exec sidekiq -C config/sidekiq.yml"]
+          envFrom:
+            - configMapRef:
+                name: shared-environment
+            - secretRef:
+                name: allocation-manager-secrets
+          env:
+            - name: POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-rds-instance-output
+                  key: rds_instance_address
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-rds-instance-output
+                  key: postgres_password
+            - name: POSTGRES_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-rds-instance-output
+                  key: postgres_name
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: allocation-rds-instance-output
+                  key: postgres_user
+        - name: allocation-manager-metrics
+          image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
+          imagePullPolicy: Always
+          command: ['sh', '-c', "bundle exec prometheus_exporter"]
+          ports:
+            - containerPort: 9394
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 9394
+            initialDelaySeconds: 10
+            periodSeconds: 60
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 9394
+            initialDelaySeconds: 10
+            periodSeconds: 60

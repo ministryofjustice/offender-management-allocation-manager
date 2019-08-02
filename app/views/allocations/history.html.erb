@@ -10,17 +10,18 @@
         <ul>
           <% allocations.each_with_index do |allocation, i| %>
             <% if allocation.event == 'allocate_primary_pom' %>
-              <%= render :partial => "allocate_pom",
-                         :locals => { allocation: allocation, allocation_type: 'Prisoner',
+              <%= render :partial => "allocate_primary_pom",
+                         :locals => { allocation: allocation,
                                       pom_name: allocation.primary_pom_name,
                                       pom_nomis_id: allocation.primary_pom_nomis_id } %>
             <% elsif allocation.event == 'reallocate_primary_pom' %>
               <%= render :partial => "reallocate_primary_pom",
-                         :locals => { allocation: allocation, pom_name: allocation.primary_pom_name,
+                         :locals => { allocation: allocation,
+                                      pom_name: allocation.primary_pom_name,
                                       pom_nomis_id: allocation.primary_pom_nomis_id} %>
             <% elsif allocation.event == 'allocate_secondary_pom' %>
-              <%= render :partial => "allocate_pom",
-                         :locals => { allocation: allocation, allocation_type: 'Co-working',
+              <%= render :partial => "allocate_secondary_pom",
+                         :locals => { allocation: allocation,
                                       pom_name: allocation.secondary_pom_name,
                                       pom_nomis_id: allocation.secondary_pom_nomis_id} %>
             <% elsif allocation.event == 'deallocate_primary_pom' %>

@@ -1,0 +1,39 @@
+<h1 class="govuk-heading-l govuk-!-margin-bottom-5">Confirm removal of co-working Prison Offender Manager</h1>
+
+<% if @errors.count > 0 %>
+  <%= render :partial => "/shared/validation_errors", :locals => { :errors => @errors } %>
+<% end %>
+
+<p class="govuk-body">
+You are removing <%= @allocation.secondary_pom_name %> from co-working POM <%= @allocation.primary_pom_name %>
+</p>
+
+<p class="govuk-body">
+We will send a confirmation email to <%= @primary_pom.emails.first %>
+</p>
+
+<p class="govuk-body">
+  <b>Do you want to allocate this prisoner to a new co-working POM?</b>
+</p>
+
+<%= form_tag(prison_coworking_path(@prison, @prisoner.offender_no), method: :delete) do %>
+  <div class='govuk-!-margin-top-6'>
+    <div class="govuk-form-group">
+      <div class="govuk-radios" data-module="radios">
+        <div class="govuk-radios__item">
+          <%= radio_button_tag("reallocate", true, false, class: "govuk-radios__input") %>
+          <%= label_tag "reallocate", "Yes", class: "govuk-label govuk-radios__label" %>
+        </div>
+        <div class="govuk-radios__item">
+          <%= radio_button_tag("reallocate", false, false, class: "govuk-radios__input") %>
+          <%= label_tag "reallocate", "No", class: "govuk-label govuk-radios__label" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="govuk-form-group">
+    <button type="submit" class="govuk-button">Continue</button>
+    <%= link_to 'Cancel',  prison_allocation_path(@prison, @prisoner.offender_no), class: 'govuk-link cancel-button' %>
+  </div>
+<% end %>
