@@ -98,6 +98,7 @@ RSpec.describe AllocationVersion, type: :model do
       expect(deallocation.primary_pom_name).to be_nil
       expect(deallocation.primary_pom_allocated_at).to be_nil
       expect(deallocation.recommended_pom_type).to be_nil
+      expect(deallocation.prison).to be_nil
       expect(deallocation.event_trigger).to eq 'offender_released'
     end
   end

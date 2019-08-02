@@ -28,7 +28,8 @@ class MovementService
     # will be nothing to delete/change.
     if movement.movement_type == Nomis::Models::MovementType::ADMISSION &&
       movement.direction_code == Nomis::Models::MovementDirection::IN &&
-      movement.from_agency.present?
+      movement.from_agency.present? &&
+      movement.to_agency.present?
       return process_transfer(movement)
     end
 

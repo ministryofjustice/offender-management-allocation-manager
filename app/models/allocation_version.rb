@@ -117,6 +117,7 @@ class AllocationVersion < ApplicationRecord
     alloc.recommended_pom_type = nil
     alloc.event = DEALLOCATE_PRIMARY_POM
     alloc.event_trigger = movement_type
+    alloc.prison = nil if alloc.event_trigger == 'offender_released'
 
     alloc.save!
   end
