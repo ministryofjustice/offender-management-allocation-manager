@@ -271,23 +271,30 @@ jobs:
       - *store_test_results
       - *store_artifacts
 
-  # test_production:
-  #   <<: *test_container_config
-  #   working_directory: ~/staging
-  #   steps:
-  #     - checkout
-  #     - *restore_cache
-  #     - *install_gems
-  #     - *save_cache
-  #     - run:
-  #         name: run smoke tests
-  #         command: |
-  #           cd offender-management-integration-tests
-  #           bundle exec rspec spec/smoke --no-color --format documentation --format RspecJunitFormatter -o screenshots/rspec.xml
-  #         environment:
-  #           PRODUCTION_START_PAGE: https://moic.service.justice.gov.uk
-  #     - *store_test_results
-  #     - *store_artifacts
+  deploy_preprod:
+    <<: *deploy_container_config
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: Kubectl deployment preproduction setup
+          command: |
+            setup-kube-auth
+            kubectl config use-context preprod
+      - *install_gpg
+      - *configure_gpg
+      - *decrypt_secrets
+      - deploy:
+          name: Deploy to pre-production
+          command: |
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/cronjob.yaml
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/deployment.yaml
+            kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
+            kubectl apply --record=false -f ./deploy/preprod
+          environment:
+            <<: *github_team_name_slug
+
 
   deploy_production:
     <<: *deploy_container_config
@@ -334,7 +341,9 @@ workflows:
             - rubocop
           filters:
             branches:
-              only: master
+              only:
+                - master
+                - preproduction
       - deploy_staging:
           requires:
             - build_and_push_docker_image
@@ -361,9 +370,9 @@ workflows:
           filters:
             branches:
               only: master
-      # - test_production:
-      #     requires:
-      #       - deploy_production
-      #     filters:
-      #       branches:
-      #         only: master
+      - deploy_preprod:
+          requires:
+            - build_and_push_docker_image
+          filters:
+            branches:
+              only: preproduction
