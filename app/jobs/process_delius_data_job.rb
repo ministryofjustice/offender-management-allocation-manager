@@ -10,25 +10,32 @@ class ProcessDeliusDataJob < ApplicationJob
       if delius_data.count > 1
         DeliusImportError.create! nomis_offender_id: nomis_offender_id,
                                   error_type: DeliusImportError::DUPLICATE_NOMIS_ID
-      else
-        delius_import(delius_data.first)
+      elsif delius_data.count == 1
+        import(delius_data.first)
       end
     end
   end
 
 private
 
-  def delius_import(delius_record)
+  def import(delius_record)
     offender = OffenderService.get_offender(delius_record.noms_no)
 
     if auto_delius_import_enabled?(offender.latest_location_id)
-      if offender.date_of_birth == Date.parse(delius_record.date_of_birth)
+      if dob_matches?(offender, delius_record)
         process_record(delius_record)
       else
-        DeliusImportError.create! nomis_offender_id: nomis_offender_id,
+        DeliusImportError.create! nomis_offender_id: delius_record.noms_no,
                                   error_type: DeliusImportError::MISMATCHED_DOB
       end
     end
+  rescue Nomis::Client::APIError
+    logger.error("Failed to retrieve NOMIS record #{delius_record.noms_no}")
+  end
+
+  def dob_matches?(offender, delius_record)
+    delius_record.date_of_birth.present? &&
+      offender.date_of_birth == Date.parse(delius_record.date_of_birth)
   end
 
   def process_record(delius_record)
@@ -43,15 +50,12 @@ private
   end
 
   def map_delius_to_case_info(delius_record)
-    ldu_record = make_ldu_record(delius_record)
-    team_record = make_team_record(delius_record)
-
     find_case_info(delius_record).tap do |case_info|
       case_info.assign_attributes(
         crn: delius_record.crn,
         tier: map_tier(delius_record.tier),
-        local_divisional_unit: ldu_record.persisted? ? ldu_record : nil,
-        team: team_record.persisted? ? team_record : nil,
+        local_divisional_unit: make_ldu_record(delius_record),
+        team: make_team_record(delius_record),
         case_allocation: delius_record.service_provider,
         omicable: map_omicable(delius_record.omicable?),
         mappa_level: map_mappa_level(delius_record.mappa, delius_record.mappa_levels)
@@ -68,19 +72,21 @@ private
   end
 
   def make_ldu_record(delius_record)
-    LocalDivisionalUnit.find_or_initialize_by(
+    ldu = LocalDivisionalUnit.find_or_initialize_by(
       code: delius_record.ldu_code
     ) { |item|
       item.name = delius_record.ldu
       item.save
     }
+    ldu if ldu.persisted?
   end
 
   def make_team_record(delius_record)
-    Team.find_or_initialize_by(code: delius_record.team_code) { |team|
-      team.name = delius_record.team
-      team.save
+    team = Team.find_or_initialize_by(code: delius_record.team_code) { |new_team|
+      new_team.name = delius_record.team
+      new_team.save
     }
+    team if team.persisted?
   end
 
   def map_mappa_level(delius_mappa, delius_mappa_levels)
