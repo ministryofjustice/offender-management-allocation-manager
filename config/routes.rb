@@ -7,6 +7,12 @@ Rails.application.routes.draw do
   match "/503", :to => "errors#internal_server_error", :via => :all
 
   get '/help', to: 'pages#help'
+  get '/help_step1', to: 'pages#help_step1'
+  get '/help_step2', to: 'pages#help_step2'
+  get '/help_step3', to: 'pages#help_step3'
+  get '/help_step4', to: 'pages#help_step4'
+  get '/help_step5', to: 'pages#help_step5'
+  get '/help_step6', to: 'pages#help_step6'
   get '/contact', to: 'pages#contact'
   post '/contact', to: 'pages#create_contact'
 
@@ -31,7 +37,9 @@ Rails.application.routes.draw do
     }
     resources :coworking, only: [:new, :create, :destroy], param: :nomis_offender_id, path_names: {
       new: ':nomis_offender_id/new',
-    }
+    } do
+      get('confirm_coworking_removal' => 'coworking#confirm_removal', as: 'confirm_removal')
+    end
     get('/coworking/confirm/:nomis_offender_id/:primary_pom_id/:secondary_pom_id' => 'coworking#confirm', as: 'confirm_coworking_allocation')
 
     resource :overrides,  only: %i[ new create ], path_names: { new: 'new/:nomis_offender_id/:nomis_staff_id'}
