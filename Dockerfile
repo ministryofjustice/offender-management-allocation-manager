@@ -59,8 +59,7 @@ COPY Gemfile Gemfile.lock package.json ./
 
 RUN bundle install --without development test --jobs 2 --retry 3
 
-COPY . /app
-
+# build msoffice-crypt and put it on the path
 RUN \
   mkdir ./build \
   && cd ./build \
@@ -68,8 +67,11 @@ RUN \
   && git clone https://github.com/herumi/msoffice \
   && cd msoffice \
   && make -j RELEASE=1 \
-  && mv ./bin/msoffice-crypt.exe ../../bin/msoffice-crypt
+  && mv ./bin/msoffice-crypt.exe /usr/local/bin/msoffice-crypt \
+  && cd ../.. \
+  && rm -rf build
 
+COPY . /app
 
 RUN mkdir -p /home/appuser && \
   useradd appuser -u 1001 --user-group --home /home/appuser && \
