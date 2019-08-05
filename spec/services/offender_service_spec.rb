@@ -14,7 +14,7 @@ describe OffenderService do
   it "get last page of offenders for a specific prison", vcr: { cassette_name: :offender_service_offenders_by_prison_last_page_spec } do
     offenders = described_class.get_offenders_for_prison('LEI').to_a
     expect(offenders).to be_kind_of(Array)
-    expect(offenders.length).to eq(816)
+    expect(offenders.length).to eq(823)
     expect(offenders.first).to be_kind_of(Nomis::Models::OffenderSummary)
   end
 
