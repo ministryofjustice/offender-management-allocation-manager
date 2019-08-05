@@ -57,7 +57,7 @@ feature 'Guidance' do
       expect(page).to have_css('h1', text: title)
       expect(page).to have_link('spreadsheet template')
       expect(page).to have_xpath("//img[contains(@src,'assets/spreadsheet_image')]")
-      expect(page).to have_link('hmoic@digital.justice.gov.uk')
+      expect(page).to have_link('moic@digital.justice.gov.uk')
       expect(page).to have_link('Task 2: Set up access in Digital Prison Services', href: 'guidance_step2')
     end
 
