@@ -14,6 +14,12 @@ FactoryBot.define do
       'NPS'
     end
 
-    nomis_offender_id { 'G12345' }
+    manual_entry do
+      true
+    end
+
+    nomis_offender_id do
+      'G12345'
+    end
   end
 end
