@@ -6,6 +6,16 @@ feature 'feedback' do
 
     visit '/'
 
-    expect(page).to have_link('feedback', href: 'https://www.research.net/r/MM8TNLW')
+    feedback_link = 'https://www.research.net/r/MM8TNLW'
+
+    banner = page.find(:css, '.govuk-phase-banner__text')
+    within banner do
+      expect(page).to have_link('feedback', href: feedback_link)
+    end
+
+    footer = page.find(:css, '.govuk-footer')
+    within footer do
+      expect(page).to have_link('Feedback', href: feedback_link)
+    end
   end
 end

@@ -1,31 +1,31 @@
 require 'rails_helper'
 
-feature 'Help' do
-  context 'when accessing help page' do
-    it 'provides a link to the help pages', vcr: { cassette_name: :help_link } do
+feature 'Guidance' do
+  context 'when accessing guidance page' do
+    it 'provides a link to the guidance pages', vcr: { cassette_name: :guidance_link } do
       signin_user('PK000223')
 
       visit '/'
-      expect(page).to have_link('Help', href: '/help')
+      expect(page).to have_link('Guidance', href: '/guidance')
     end
   end
 
-  context 'when viewing help pages' do
+  context 'when viewing guidance pages' do
     before do
-      visit '/help'
+      visit '/guidance'
     end
 
-    scenario 'initial help page', vcr: { cassette_name: :help_initial_page } do
-      help_links = [
-          ['List everyone using the service', 'help_step1'],
-          ['Set up access in Digital Prison Services', 'help_step2'],
-          ['Set up POMs in NOMIS', 'help_step3'],
-          ['Update POM profiles', 'help_step4'],
-          ['Update prisoner information', 'help_step5'],
-          ['Start making allocations', 'help_step6']
+    scenario 'initial guidance page', vcr: { cassette_name: :guidance_initial_page } do
+      guidance_links = [
+          ['List everyone using the service', 'guidance_step1'],
+          ['Set up access in Digital Prison Services', 'guidance_step2'],
+          ['Set up POMs in NOMIS', 'guidance_step3'],
+          ['Update POM profiles', 'guidance_step4'],
+          ['Update prisoner information', 'guidance_step5'],
+          ['Start making allocations', 'guidance_step6']
       ]
 
-      help_links.each do |key, val|
+      guidance_links.each do |key, val|
         expect(page).to have_link(key, href: val)
       end
 
@@ -36,7 +36,7 @@ feature 'Help' do
       expect(page).to have_link("https://moic.service.justice.gov.uk")
     end
 
-    scenario 'help step_1 page', vcr: { cassette_name: :help_step_1 } do
+    scenario 'guidance step_1 page', vcr: { cassette_name: :guidance_step_1 } do
       title = 'List everyone using the service'
 
       click_link(title)
@@ -45,10 +45,10 @@ feature 'Help' do
       expect(page).to have_link('spreadsheet template')
       expect(page).to have_xpath("//img[contains(@src,'assets/spreadsheet_image')]")
       expect(page).to have_link('hmoic@digital.justice.gov.uk')
-      expect(page).to have_link('task 2', href: 'help_step2')
+      expect(page).to have_link('task 2', href: 'guidance_step2')
     end
 
-    scenario 'help step_2 page', vcr: { cassette_name: :help_step_2 } do
+    scenario 'guidance step_2 page', vcr: { cassette_name: :guidance_step_2 } do
       title = 'Set up access in Digital Prison Services'
 
       click_link(title)
@@ -63,13 +63,13 @@ feature 'Help' do
       end
     end
 
-    scenario 'help step_3 page', vcr: { cassette_name: :help_step_3 } do
+    scenario 'guidance step_3 page', vcr: { cassette_name: :guidance_step_3 } do
       title = 'Set up POMs in NOMIS'
 
       click_link(title)
 
       expect(page).to have_css("h1", text: title)
-      expect(page).to have_link('task 4', href: 'help_step4')
+      expect(page).to have_link('task 4', href: 'guidance_step4')
 
       images = %w[caseload2_image search_box_image action_toolbar_image caseload1_image search_box_image]
 
@@ -78,7 +78,7 @@ feature 'Help' do
       end
     end
 
-    scenario 'help step_4 page', vcr: { cassette_name: :help_step_4 } do
+    scenario 'guidance step_4 page', vcr: { cassette_name: :guidance_step_4 } do
       title = 'Update POM profiles'
 
       click_link(title)
@@ -87,7 +87,7 @@ feature 'Help' do
       expect(page).to have_link('https://moic.service.justice.gov.uk')
     end
 
-    scenario 'help step_5 page', vcr: { cassette_name: :help_step_5 } do
+    scenario 'guidance step_5 page', vcr: { cassette_name: :guidance_step_5 } do
       title = 'Update prisoner information'
 
       click_link(title)
@@ -96,7 +96,7 @@ feature 'Help' do
       expect(page).to have_link('https://moic.service.justice.gov.uk')
     end
 
-    scenario 'help step_6 page', vcr: { cassette_name: :help_step_6 } do
+    scenario 'guidance step_6 page', vcr: { cassette_name: :guidance_step_6 } do
       title = 'Start making allocations'
 
       click_link(title)
