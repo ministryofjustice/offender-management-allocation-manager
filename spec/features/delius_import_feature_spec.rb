@@ -59,7 +59,7 @@ feature 'delius import scenarios', vcr: { cassette_name: :delius_import_scenario
     end
 
     context 'without LDU' do
-      let(:d1) { create(:delius_data, ldu: nil) }
+      let(:d1) { create(:delius_data, ldu: nil, ldu_code: nil) }
 
       before do
         ProcessDeliusDataJob.perform_now d1.noms_no

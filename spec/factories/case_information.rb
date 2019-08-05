@@ -22,11 +22,10 @@ FactoryBot.define do
       Faker::Alphanumeric.alpha(10)
     end
 
-    team do
-      "A nice team"
-    end
+    association :team, code: '1234', name: 'A nice team'
 
-    ldu do "LDU Name" end
+    association :local_divisional_unit, code: '123', name: "LDU Name"
+
     crn { Faker::Alphanumeric.alpha(10) }
   end
 end

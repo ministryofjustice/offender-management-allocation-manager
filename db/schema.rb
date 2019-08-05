@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_29_070713) do
+ActiveRecord::Schema.define(version: 2019_08_05_120051) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -48,10 +48,12 @@ ActiveRecord::Schema.define(version: 2019_07_29_070713) do
     t.text "omicable"
     t.string "crn"
     t.integer "mappa_level"
-    t.string "ldu"
-    t.string "team"
     t.boolean "manual_entry", null: false
+    t.bigint "local_divisional_unit_id"
+    t.bigint "team_id"
+    t.index ["local_divisional_unit_id"], name: "index_case_information_on_local_divisional_unit_id"
     t.index ["nomis_offender_id"], name: "index_case_information_on_nomis_offender_id"
+    t.index ["team_id"], name: "index_case_information_on_team_id"
   end
 
   create_table "delius_data", force: :cascade do |t|
@@ -92,6 +94,14 @@ ActiveRecord::Schema.define(version: 2019_07_29_070713) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "local_divisional_units", force: :cascade do |t|
+    t.string "code"
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_local_divisional_units_on_code"
+  end
+
   create_table "overrides", force: :cascade do |t|
     t.integer "nomis_staff_id"
     t.string "nomis_offender_id"
@@ -107,6 +117,14 @@ ActiveRecord::Schema.define(version: 2019_07_29_070713) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["nomis_staff_id"], name: "index_pom_details_on_nomis_staff_id"
+  end
+
+  create_table "teams", force: :cascade do |t|
+    t.string "code"
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_teams_on_code"
   end
 
   create_table "tier_changes", force: :cascade do |t|

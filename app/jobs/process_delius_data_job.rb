@@ -32,20 +32,7 @@ private
   end
 
   def process_record(delius_record)
-    case_information = CaseInformation.find_or_initialize_by(
-      nomis_offender_id: delius_record.noms_no
-    ) { |item|
-      item.manual_entry = false
-    }.tap { |ci|
-      ci.assign_attributes(
-        crn: delius_record.crn,
-        tier: map_tier(delius_record.tier),
-        ldu: delius_record.ldu,
-        team: delius_record.team,
-        case_allocation: delius_record.service_provider,
-        omicable: map_omicable(delius_record.omicable?)
-      )
-    }
+    case_information = map_delius_to_case_info(delius_record)
 
     unless case_information.save
       case_information.errors.each do |field, _errors|
@@ -53,6 +40,46 @@ private
                                   error_type: error_type(field)
       end
     end
+  end
+
+  def map_delius_to_case_info(delius_record)
+    ldu_record = make_ldu_record(delius_record)
+    team_record = make_team_record(delius_record)
+
+    find_case_info(delius_record).tap do |case_info|
+      case_info.assign_attributes(
+        crn: delius_record.crn,
+        tier: map_tier(delius_record.tier),
+        local_divisional_unit: ldu_record.persisted? ? ldu_record : nil,
+        team: team_record.persisted? ? team_record : nil,
+        case_allocation: delius_record.service_provider,
+        omicable: map_omicable(delius_record.omicable?)
+      )
+    end
+  end
+
+  def find_case_info(delius_record)
+    CaseInformation.find_or_initialize_by(
+      nomis_offender_id: delius_record.noms_no
+    ) { |item|
+      item.manual_entry = false
+    }
+  end
+
+  def make_ldu_record(delius_record)
+    LocalDivisionalUnit.find_or_initialize_by(
+      code: delius_record.ldu_code
+    ) { |item|
+      item.name = delius_record.ldu
+      item.save
+    }
+  end
+
+  def make_team_record(delius_record)
+    Team.find_or_initialize_by(code: delius_record.team_code) { |team|
+      team.name = delius_record.team
+      team.save
+    }
   end
 
   def map_omicable(omicable)
@@ -67,7 +94,7 @@ private
     {
       tier: DeliusImportError::INVALID_TIER,
       case_allocation: DeliusImportError::INVALID_CASE_ALLOCATION,
-      ldu: DeliusImportError::MISSING_LDU,
+      local_divisional_unit: DeliusImportError::MISSING_LDU,
       team: DeliusImportError::MISSING_TEAM
     }.fetch(field)
   end

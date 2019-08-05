@@ -18,6 +18,7 @@ FactoryBot.define do
     # By default delius data is omicable
     ldu_code do 'WPT001' end
     ldu do 'Somewhere in Wales' end
+    team_code do 'abcdefg' end
     team { 'A Welsh Team' }
   end
 end

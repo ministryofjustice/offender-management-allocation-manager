@@ -3,10 +3,13 @@
 class CaseInformation < ApplicationRecord
   self.table_name = 'case_information'
 
+  belongs_to :local_divisional_unit, optional: true
+  belongs_to :team, optional: true
+
   validates :manual_entry, inclusion: { in: [true, false], allow_nil: false }
   validates :nomis_offender_id, presence: true, uniqueness: true
 
-  validates :ldu, :team, presence: true, unless: ->{ manual_entry }
+  validates :local_divisional_unit, :team, presence: true, unless: ->{ manual_entry }
 
   validates :omicable, inclusion: {
     in: %w[Yes No],
