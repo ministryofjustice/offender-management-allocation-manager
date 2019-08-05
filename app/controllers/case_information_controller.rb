@@ -22,7 +22,8 @@ class CaseInformationController < PrisonsApplicationController
       nomis_offender_id: case_information_params[:nomis_offender_id],
       tier: case_information_params[:tier],
       omicable: case_information_params[:omicable],
-      case_allocation: case_information_params[:case_allocation]
+      case_allocation: case_information_params[:case_allocation],
+      manual_entry: true
     )
 
     return redirect_to prison_summary_pending_path(active_prison) if @case_info.valid?
@@ -38,6 +39,7 @@ class CaseInformationController < PrisonsApplicationController
     case_info.tier = case_information_params[:tier]
     case_info.case_allocation = case_information_params[:case_allocation]
     case_info.omicable = case_information_params[:omicable]
+    case_info.manual_entry = true
     case_info.save
 
     redirect_to new_prison_allocation_path(active_prison, case_info.nomis_offender_id)
