@@ -1,93 +1,93 @@
-CRN,PNC No,NOMS No,Fullname (O),Tier Cd (OMT),Risk Of Harm Cds,Offender Manager,Organisation Private Ind (OfM),Organisation (OfM),Provider (OfM),Provider Cd (OfM),LDU (OfM),LDU Cd (OfM),Team (OfM),Team Cd (OfM),MAPPA Y/N,MAPPA Levels
-crn code,pnc num,mangled nomis,Bobby Pin,C2,risk of harm,ROSS JONES,Y,CRC,NPS,C1234,NPS Trafford,N01TRF,Team 1,A,N,1
-crn code,pnc num,mangled nomis,Bobby Pin,A1,risk of harm,ROSS JONES,Y,NPS,NPS,N1234,Gwent LDU,WPTGWT,Team 1,A,Y,1
-crn code,pnc num,mangled nomis,Bobby Pin,C2,risk of harm,ROSS JONES,Y,NPS,NPS,N1234,West Wales,WPTWES,Team 1,A,N,1
-crn code,pnc num,mangled nomis,Bobby Pin,B2,risk of harm,ROSS JONES,N,NPS,NPS,C1234,CRC HEF,C172HEF,Team 1,A,Y,1
-crn code,pnc num,mangled nomis,Bobby Pin,D1,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,NPS Bolton,N014403,Team 1,A,Y,1
-crn code,pnc num,mangled nomis,Bobby Pin,D1,risk of harm,ROSS JONES,N,CRC,NPS,C1234,CRC HEF,C172HEF,Team 1,A,Y,1
-crn code,pnc num,mangled nomis,Bobby Pin,D2,risk of harm,ROSS JONES,Y,NPS,NPS,C1234,NPS Bolton,N014403,Team 1,A,Y,1
-crn code,pnc num,mangled nomis,Bobby Pin,A1,risk of harm,ROSS JONES,Y,CRC,NPS,C1234,Stoke LDU,SWM11G,Team 1,A,Y,1
-crn code,pnc num,mangled nomis,Bobby Pin,D2,risk of harm,ROSS JONES,N,CRC,NPS,N1234,CRC HEF,C172HEF,Team 1,A,N,1
-crn code,pnc num,mangled nomis,Bobby Pin,,risk of harm,ROSS JONES,N,CRC,NPS,N1234,Stoke LDU,SWM11G,Team 1,A,N,1
-crn code,pnc num,G5823GP,Bobby Pin,D1,risk of harm,ROSS JONES,N,CRC,NPS,N1234,NPS Trafford,N01TRF,Team 1,A,Y,1
-crn code,pnc num,G3902GW,Bobby Pin,C1,risk of harm,ROSS JONES,Y,NPS,NPS,C1234,Stoke LDU,SWM11G,Team 1,A,Y,1
-crn code,pnc num,G3757UN,Bobby Pin,B1,risk of harm,ROSS JONES,N,CRC,NPS,C1234,North Wales LDU,WPTNWS,Team 1,A,Y,1
-crn code,pnc num,G3892UH,Bobby Pin,A2,risk of harm,ROSS JONES,N,CRC,NPS,N1234,Essex Central Hub,C18HUB,Team 1,A,N,1
-crn code,pnc num,G0135GA,Bobby Pin,C1,risk of harm,ROSS JONES,N,CRC,NPS,N1234,NPS Trafford,N01TRF,Team 1,A,Y,1
-crn code,pnc num,G8152UC,Bobby Pin,B2,risk of harm,ROSS JONES,N,CRC,NPS,C1234,All NPS Wales LDU,N03ALL,Team 1,A,N,1
-crn code,pnc num,G2541VV,Bobby Pin,,risk of harm,ROSS JONES,N,CRC,NPS,N1234,Essex Central Hub,C18HUB,Team 1,A,N,1
-crn code,pnc num,G3933UL,Bobby Pin,C2,risk of harm,ROSS JONES,Y,CRC,NPS,C1234,East Yorkshire LDU,HBSEYK,Team 1,A,N,1
-crn code,pnc num,G1318GN,Bobby Pin,B2,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,East Yorkshire LDU,HBSEYK,Team 1,A,Y,1
-crn code,pnc num,G6877GE,Bobby Pin,D2,risk of harm,ROSS JONES,Y,NPS,NPS,C1234,NPS Bolton,N014403,Team 1,A,N,1
-crn code,pnc num,G5054VN,Bobby Pin,A1,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,Gwent LDU,WPTGWT,Team 1,A,Y,1
-crn code,pnc num,G7975UA,Bobby Pin,B1,risk of harm,ROSS JONES,Y,NPS,NPS,N1234,South Wales 2,WPTSW2,Team 1,A,N,1
-crn code,pnc num,G3610VX,Bobby Pin,D2,risk of harm,ROSS JONES,N,CRC,NPS,C1234,East Yorkshire LDU,HBSEYK,Team 1,A,N,1
-crn code,pnc num,G4739UP,Bobby Pin,A2,risk of harm,ROSS JONES,N,CRC,NPS,N1234,East Yorkshire LDU,HBSEYK,Team 1,A,N,1
-crn code,pnc num,G0633UV,Bobby Pin,B2,risk of harm,ROSS JONES,N,CRC,NPS,C1234,South Wales 2,WPTSW2,Team 1,A,N,1
-crn code,pnc num,G3140VC,Bobby Pin,D2,risk of harm,ROSS JONES,N,CRC,NPS,N1234,North Wales LDU,WPTNWS,Team 1,A,Y,1
-crn code,pnc num,G3873VI,Bobby Pin,B1,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,NPS Bolton,N014403,Team 1,A,Y,1
-crn code,pnc num,G6041UD,Bobby Pin,D2,risk of harm,ROSS JONES,Y,NPS,NPS,N1234,South Wales 2,WPTSW2,Team 1,A,N,1
-crn code,pnc num,G0126UD,Bobby Pin,D1,risk of harm,ROSS JONES,N,NPS,NPS,N1234,Gwent LDU,WPTGWT,Team 1,A,N,1
-crn code,pnc num,G1627GD,Bobby Pin,D2,risk of harm,ROSS JONES,N,CRC,NPS,N1234,CRC HEF,C172HEF,Team 1,A,Y,1
-crn code,pnc num,G2316UN,Bobby Pin,B1,risk of harm,ROSS JONES,N,NPS,NPS,N1234,NPS Trafford,N01TRF,Team 1,A,N,1
-crn code,pnc num,G6709GF,Bobby Pin,D2,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,NPS Trafford,N01TRF,Team 1,A,Y,1
-crn code,pnc num,G1237UD,Bobby Pin,B2,risk of harm,ROSS JONES,Y,NPS,NPS,C1234,South Wales 2,WPTSW2,Team 1,A,Y,1
-crn code,pnc num,G2613GF,Bobby Pin,D2,risk of harm,ROSS JONES,Y,NPS,NPS,C1234,All NPS Wales LDU,N03ALL,Team 1,A,Y,1
-crn code,pnc num,G9577VI,Bobby Pin,B2,risk of harm,ROSS JONES,Y,NPS,NPS,N1234,North Wales LDU,WPTNWS,Team 1,A,Y,1
-crn code,pnc num,G6217GE,Bobby Pin,B1,risk of harm,ROSS JONES,Y,NPS,NPS,N1234,NPS Trafford,N01TRF,Team 1,A,N,1
-crn code,pnc num,G4023GG,Bobby Pin,B2,risk of harm,ROSS JONES,N,NPS,NPS,N1234,NPS Trafford,N01TRF,Team 1,A,Y,1
-crn code,pnc num,G7350VX,Bobby Pin,B1,risk of harm,ROSS JONES,N,CRC,NPS,N1234,All NPS Wales LDU,N03ALL,Team 1,A,N,1
-crn code,pnc num,G4110UT,Bobby Pin,D1,risk of harm,ROSS JONES,N,NPS,NPS,C1234,West Wales,WPTWES,Team 1,A,Y,1
-crn code,pnc num,G4971UN,Bobby Pin,B1,risk of harm,ROSS JONES,N,NPS,NPS,C1234,East Yorkshire LDU,HBSEYK,Team 1,A,N,1
-crn code,pnc num,G9468UN,Bobby Pin,C2,risk of harm,ROSS JONES,N,NPS,NPS,C1234,Stoke LDU,SWM11G,Team 1,A,N,1
-crn code,pnc num,G1970VH,Bobby Pin,D2,risk of harm,ROSS JONES,N,CRC,NPS,C1234,South Wales 2,WPTSW2,Team 1,A,Y,1
-crn code,pnc num,G0723UO,Bobby Pin,C2,risk of harm,ROSS JONES,N,NPS,NPS,C1234,All NPS Wales LDU,N03ALL,Team 1,A,N,1
-crn code,pnc num,G4704UN,Bobby Pin,B1,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,CRC HEF,C172HEF,Team 1,A,N,1
-crn code,pnc num,G1531GV,Bobby Pin,D1,risk of harm,ROSS JONES,N,CRC,NPS,N1234,CRC HEF,C172HEF,Team 1,A,N,1
-crn code,pnc num,G9348UN,Bobby Pin,B2,risk of harm,ROSS JONES,N,CRC,NPS,C1234,South Wales 2,WPTSW2,Team 1,A,N,1
-crn code,pnc num,G4664UV,Bobby Pin,A2,risk of harm,ROSS JONES,N,CRC,NPS,C1234,North Wales LDU,WPTNWS,Team 1,A,Y,1
-crn code,pnc num,G5676GJ,Bobby Pin,D2,risk of harm,ROSS JONES,N,NPS,NPS,N1234,NPS Trafford,N01TRF,Team 1,A,Y,1
-crn code,pnc num,G1237GV,Bobby Pin,D2,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,East Yorkshire LDU,HBSEYK,Team 1,A,Y,1
-crn code,pnc num,G8156GT,Bobby Pin,B1,risk of harm,ROSS JONES,N,NPS,NPS,C1234,CRC HEF,C172HEF,Team 1,A,Y,1
-crn code,pnc num,G2214UP,Bobby Pin,D2,risk of harm,ROSS JONES,N,CRC,NPS,C1234,NPS Bolton,N014403,Team 1,A,N,1
-crn code,pnc num,G5687GJ,Bobby Pin,A2,risk of harm,ROSS JONES,Y,CRC,NPS,C1234,West Wales,WPTWES,Team 1,A,N,1
-crn code,pnc num,G1895GH,Bobby Pin,A1,risk of harm,ROSS JONES,N,CRC,NPS,C1234,North Wales LDU,WPTNWS,Team 1,A,Y,1
-crn code,pnc num,G3086UD,Bobby Pin,A2,risk of harm,ROSS JONES,Y,CRC,NPS,C1234,CRC HEF,C172HEF,Team 1,A,Y,1
-crn code,pnc num,G3365UI,Bobby Pin,A2,risk of harm,ROSS JONES,N,CRC,NPS,N1234,Essex Central Hub,C18HUB,Team 1,A,N,1
-crn code,pnc num,G7984UU,Bobby Pin,,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,Essex Central Hub,C18HUB,Team 1,A,Y,1
-crn code,pnc num,G1852UW,Bobby Pin,B1,risk of harm,ROSS JONES,N,NPS,NPS,N1234,Gwent LDU,WPTGWT,Team 1,A,N,1
-crn code,pnc num,G6168UN,Bobby Pin,C1,risk of harm,ROSS JONES,N,CRC,NPS,C1234,NPS Trafford,N01TRF,Team 1,A,N,1
-crn code,pnc num,G7913UN,Bobby Pin,A1,risk of harm,ROSS JONES,N,CRC,NPS,N1234,South Wales 2,WPTSW2,Team 1,A,N,1
-crn code,pnc num,G3874UT,Bobby Pin,B2,risk of harm,ROSS JONES,N,CRC,NPS,N1234,West Wales,WPTWES,Team 1,A,N,1
-crn code,pnc num,G3122UF,Bobby Pin,D1,risk of harm,ROSS JONES,Y,NPS,NPS,N1234,West Wales,WPTWES,Team 1,A,N,1
-crn code,pnc num,G8322UO,Bobby Pin,C1,risk of harm,ROSS JONES,Y,CRC,NPS,C1234,North Wales LDU,WPTNWS,Team 1,A,Y,1
-crn code,pnc num,G3321VF,Bobby Pin,B1,risk of harm,ROSS JONES,N,NPS,NPS,N1234,All NPS Wales LDU,N03ALL,Team 1,A,N,1
-crn code,pnc num,G2899VU,Bobby Pin,C2,risk of harm,ROSS JONES,N,CRC,NPS,N1234,NPS Trafford,N01TRF,Team 1,A,Y,1
-crn code,pnc num,G7747UD,Bobby Pin,,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,All NPS Wales LDU,N03ALL,Team 1,A,Y,1
-crn code,pnc num,G6473UO,Bobby Pin,C1,risk of harm,ROSS JONES,N,CRC,NPS,N1234,North Wales LDU,WPTNWS,Team 1,A,N,1
-crn code,pnc num,G6500UO,Bobby Pin,A2,risk of harm,ROSS JONES,N,NPS,NPS,C1234,Stoke LDU,SWM11G,Team 1,A,Y,1
-crn code,pnc num,G8242GE,Bobby Pin,D2,risk of harm,ROSS JONES,N,NPS,NPS,N1234,North Wales LDU,WPTNWS,Team 1,A,Y,1
-crn code,pnc num,G8130VE,Bobby Pin,D2,risk of harm,ROSS JONES,N,CRC,NPS,N1234,CRC HEF,C172HEF,Team 1,A,N,1
-crn code,pnc num,G8918VU,Bobby Pin,A1,risk of harm,ROSS JONES,N,CRC,NPS,C1234,All NPS Wales LDU,N03ALL,Team 1,A,Y,1
-crn code,pnc num,G1493UN,Bobby Pin,,risk of harm,ROSS JONES,N,NPS,NPS,C1234,West Wales,WPTWES,Team 1,A,N,1
-crn code,pnc num,G7166UG,Bobby Pin,D1,risk of harm,ROSS JONES,N,NPS,NPS,N1234,Gwent LDU,WPTGWT,Team 1,A,Y,1
-crn code,pnc num,G2341UP,Bobby Pin,,risk of harm,ROSS JONES,N,NPS,NPS,N1234,North Wales LDU,WPTNWS,Team 1,A,Y,1
-crn code,pnc num,G7633UV,Bobby Pin,C1,risk of harm,ROSS JONES,N,NPS,NPS,C1234,South Wales 2,WPTSW2,Team 1,A,Y,1
-crn code,pnc num,G7218GI,Bobby Pin,C2,risk of harm,ROSS JONES,N,NPS,NPS,C1234,Essex Central Hub,C18HUB,Team 1,A,N,1
-crn code,pnc num,G5060GO,Bobby Pin,D2,risk of harm,ROSS JONES,N,NPS,NPS,C1234,All NPS Wales LDU,N03ALL,Team 1,A,Y,1
-crn code,pnc num,G7704GG,Bobby Pin,A2,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,North Wales LDU,WPTNWS,Team 1,A,Y,1
-crn code,pnc num,G3868UN,Bobby Pin,D2,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,South Wales 2,WPTSW2,Team 1,A,Y,1
-crn code,pnc num,G0661GP,Bobby Pin,D1,risk of harm,ROSS JONES,N,CRC,NPS,C1234,North Wales LDU,WPTNWS,Team 1,A,N,1
-crn code,pnc num,G0806UN,Bobby Pin,B2,risk of harm,ROSS JONES,Y,CRC,NPS,C1234,All NPS Wales LDU,N03ALL,Team 1,A,N,1
-crn code,pnc num,G6754VV,Bobby Pin,C2,risk of harm,ROSS JONES,N,CRC,NPS,C1234,Essex Central Hub,C18HUB,Team 1,A,Y,1
-crn code,pnc num,G7331GT,Bobby Pin,A1,risk of harm,ROSS JONES,N,NPS,NPS,N1234,South Wales 2,WPTSW2,Team 1,A,Y,1
-crn code,pnc num,G4923UI,Bobby Pin,C1,risk of harm,ROSS JONES,Y,CRC,NPS,C1234,Gwent LDU,WPTGWT,Team 1,A,N,1
-crn code,pnc num,G9577GE,Bobby Pin,C1,risk of harm,ROSS JONES,Y,CRC,NPS,C1234,NPS Trafford,N01TRF,Team 1,A,N,1
-crn code,pnc num,G2350UP,Bobby Pin,C1,risk of harm,ROSS JONES,N,NPS,NPS,N1234,Gwent LDU,WPTGWT,Team 1,A,N,1
-crn code,pnc num,G0686GT,Bobby Pin,C2,risk of harm,ROSS JONES,Y,CRC,NPS,C1234,Stoke LDU,SWM11G,Team 1,A,N,1
-crn code,pnc num,G5235GT,Bobby Pin,D1,risk of harm,ROSS JONES,Y,NPS,NPS,C1234,NPS Bolton,N014403,Team 1,A,Y,1
-crn code,pnc num,G1955VA,Bobby Pin,A2,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,Essex Central Hub,C18HUB,Team 1,A,N,1
-crn code,pnc num,G7967UD,Bobby Pin,A1,risk of harm,ROSS JONES,N,CRC,NPS,C1234,Stoke LDU,SWM11G,Team 1,A,Y,1
-crn code,pnc num,G7142UL,Bobby Pin,C1,risk of harm,ROSS JONES,Y,NPS,NPS,N1234,Stoke LDU,SWM11G,Team 1,A,N,1
-crn code,pnc num,G5497GU,Bobby Pin,C1,risk of harm,ROSS JONES,N,CRC,NPS,C1234,CRC HEF,C172HEF,Team 1,A,Y,1
-crn code,pnc num,G3356GT,Bobby Pin,A1,risk of harm,ROSS JONES,N,NPS,NPS,C1234,NPS Bolton,N014403,Team 1,A,Y,1
+CRN,PNC No,NOMS No,Fullname (O),Tier Cd (OMT),Risk Of Harm Cds,Offender Manager,Organisation Private Ind (OfM),Organisation (OfM),Provider (OfM),Provider Cd (OfM),LDU (OfM),LDU Cd (OfM),Team (OfM),Team Cd (OfM),MAPPA Y/N,MAPPA Levels,Birth Dt (O)
+crn code,pnc num,mangled nomis,Bobby Pin,C2,risk of harm,ROSS JONES,Y,CRC,NPS,C1234,NPS Trafford,N01TRF,Team 1,A,N,1,01/01/1990
+crn code,pnc num,mangled nomis,Bobby Pin,A1,risk of harm,ROSS JONES,Y,NPS,NPS,N1234,Gwent LDU,WPTGWT,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,mangled nomis,Bobby Pin,C2,risk of harm,ROSS JONES,Y,NPS,NPS,N1234,West Wales,WPTWES,Team 1,A,N,1,01/01/1990
+crn code,pnc num,mangled nomis,Bobby Pin,B2,risk of harm,ROSS JONES,N,NPS,NPS,C1234,CRC HEF,C172HEF,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,mangled nomis,Bobby Pin,D1,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,NPS Bolton,N014403,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,mangled nomis,Bobby Pin,D1,risk of harm,ROSS JONES,N,CRC,NPS,C1234,CRC HEF,C172HEF,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,mangled nomis,Bobby Pin,D2,risk of harm,ROSS JONES,Y,NPS,NPS,C1234,NPS Bolton,N014403,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,mangled nomis,Bobby Pin,A1,risk of harm,ROSS JONES,Y,CRC,NPS,C1234,Stoke LDU,SWM11G,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,mangled nomis,Bobby Pin,D2,risk of harm,ROSS JONES,N,CRC,NPS,N1234,CRC HEF,C172HEF,Team 1,A,N,1,01/01/1990
+crn code,pnc num,mangled nomis,Bobby Pin,,risk of harm,ROSS JONES,N,CRC,NPS,N1234,Stoke LDU,SWM11G,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G5823GP,Bobby Pin,D1,risk of harm,ROSS JONES,N,CRC,NPS,N1234,NPS Trafford,N01TRF,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G3902GW,Bobby Pin,C1,risk of harm,ROSS JONES,Y,NPS,NPS,C1234,Stoke LDU,SWM11G,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G3757UN,Bobby Pin,B1,risk of harm,ROSS JONES,N,CRC,NPS,C1234,North Wales LDU,WPTNWS,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G3892UH,Bobby Pin,A2,risk of harm,ROSS JONES,N,CRC,NPS,N1234,Essex Central Hub,C18HUB,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G0135GA,Bobby Pin,C1,risk of harm,ROSS JONES,N,CRC,NPS,N1234,NPS Trafford,N01TRF,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G8152UC,Bobby Pin,B2,risk of harm,ROSS JONES,N,CRC,NPS,C1234,All NPS Wales LDU,N03ALL,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G2541VV,Bobby Pin,,risk of harm,ROSS JONES,N,CRC,NPS,N1234,Essex Central Hub,C18HUB,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G3933UL,Bobby Pin,C2,risk of harm,ROSS JONES,Y,CRC,NPS,C1234,East Yorkshire LDU,HBSEYK,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G1318GN,Bobby Pin,B2,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,East Yorkshire LDU,HBSEYK,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G6877GE,Bobby Pin,D2,risk of harm,ROSS JONES,Y,NPS,NPS,C1234,NPS Bolton,N014403,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G5054VN,Bobby Pin,A1,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,Gwent LDU,WPTGWT,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G7975UA,Bobby Pin,B1,risk of harm,ROSS JONES,Y,NPS,NPS,N1234,South Wales 2,WPTSW2,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G3610VX,Bobby Pin,D2,risk of harm,ROSS JONES,N,CRC,NPS,C1234,East Yorkshire LDU,HBSEYK,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G4739UP,Bobby Pin,A2,risk of harm,ROSS JONES,N,CRC,NPS,N1234,East Yorkshire LDU,HBSEYK,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G0633UV,Bobby Pin,B2,risk of harm,ROSS JONES,N,CRC,NPS,C1234,South Wales 2,WPTSW2,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G3140VC,Bobby Pin,D2,risk of harm,ROSS JONES,N,CRC,NPS,N1234,North Wales LDU,WPTNWS,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G3873VI,Bobby Pin,B1,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,NPS Bolton,N014403,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G6041UD,Bobby Pin,D2,risk of harm,ROSS JONES,Y,NPS,NPS,N1234,South Wales 2,WPTSW2,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G0126UD,Bobby Pin,D1,risk of harm,ROSS JONES,N,NPS,NPS,N1234,Gwent LDU,WPTGWT,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G1627GD,Bobby Pin,D2,risk of harm,ROSS JONES,N,CRC,NPS,N1234,CRC HEF,C172HEF,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G2316UN,Bobby Pin,B1,risk of harm,ROSS JONES,N,NPS,NPS,N1234,NPS Trafford,N01TRF,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G6709GF,Bobby Pin,D2,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,NPS Trafford,N01TRF,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G1237UD,Bobby Pin,B2,risk of harm,ROSS JONES,Y,NPS,NPS,C1234,South Wales 2,WPTSW2,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G2613GF,Bobby Pin,D2,risk of harm,ROSS JONES,Y,NPS,NPS,C1234,All NPS Wales LDU,N03ALL,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G9577VI,Bobby Pin,B2,risk of harm,ROSS JONES,Y,NPS,NPS,N1234,North Wales LDU,WPTNWS,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G6217GE,Bobby Pin,B1,risk of harm,ROSS JONES,Y,NPS,NPS,N1234,NPS Trafford,N01TRF,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G4023GG,Bobby Pin,B2,risk of harm,ROSS JONES,N,NPS,NPS,N1234,NPS Trafford,N01TRF,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G7350VX,Bobby Pin,B1,risk of harm,ROSS JONES,N,CRC,NPS,N1234,All NPS Wales LDU,N03ALL,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G4110UT,Bobby Pin,D1,risk of harm,ROSS JONES,N,NPS,NPS,C1234,West Wales,WPTWES,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G4971UN,Bobby Pin,B1,risk of harm,ROSS JONES,N,NPS,NPS,C1234,East Yorkshire LDU,HBSEYK,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G9468UN,Bobby Pin,C2,risk of harm,ROSS JONES,N,NPS,NPS,C1234,Stoke LDU,SWM11G,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G1970VH,Bobby Pin,D2,risk of harm,ROSS JONES,N,CRC,NPS,C1234,South Wales 2,WPTSW2,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G0723UO,Bobby Pin,C2,risk of harm,ROSS JONES,N,NPS,NPS,C1234,All NPS Wales LDU,N03ALL,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G4704UN,Bobby Pin,B1,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,CRC HEF,C172HEF,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G1531GV,Bobby Pin,D1,risk of harm,ROSS JONES,N,CRC,NPS,N1234,CRC HEF,C172HEF,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G9348UN,Bobby Pin,B2,risk of harm,ROSS JONES,N,CRC,NPS,C1234,South Wales 2,WPTSW2,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G4664UV,Bobby Pin,A2,risk of harm,ROSS JONES,N,CRC,NPS,C1234,North Wales LDU,WPTNWS,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G5676GJ,Bobby Pin,D2,risk of harm,ROSS JONES,N,NPS,NPS,N1234,NPS Trafford,N01TRF,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G1237GV,Bobby Pin,D2,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,East Yorkshire LDU,HBSEYK,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G8156GT,Bobby Pin,B1,risk of harm,ROSS JONES,N,NPS,NPS,C1234,CRC HEF,C172HEF,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G2214UP,Bobby Pin,D2,risk of harm,ROSS JONES,N,CRC,NPS,C1234,NPS Bolton,N014403,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G5687GJ,Bobby Pin,A2,risk of harm,ROSS JONES,Y,CRC,NPS,C1234,West Wales,WPTWES,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G1895GH,Bobby Pin,A1,risk of harm,ROSS JONES,N,CRC,NPS,C1234,North Wales LDU,WPTNWS,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G3086UD,Bobby Pin,A2,risk of harm,ROSS JONES,Y,CRC,NPS,C1234,CRC HEF,C172HEF,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G3365UI,Bobby Pin,A2,risk of harm,ROSS JONES,N,CRC,NPS,N1234,Essex Central Hub,C18HUB,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G7984UU,Bobby Pin,,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,Essex Central Hub,C18HUB,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G1852UW,Bobby Pin,B1,risk of harm,ROSS JONES,N,NPS,NPS,N1234,Gwent LDU,WPTGWT,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G6168UN,Bobby Pin,C1,risk of harm,ROSS JONES,N,CRC,NPS,C1234,NPS Trafford,N01TRF,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G7913UN,Bobby Pin,A1,risk of harm,ROSS JONES,N,CRC,NPS,N1234,South Wales 2,WPTSW2,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G3874UT,Bobby Pin,B2,risk of harm,ROSS JONES,N,CRC,NPS,N1234,West Wales,WPTWES,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G3122UF,Bobby Pin,D1,risk of harm,ROSS JONES,Y,NPS,NPS,N1234,West Wales,WPTWES,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G8322UO,Bobby Pin,C1,risk of harm,ROSS JONES,Y,CRC,NPS,C1234,North Wales LDU,WPTNWS,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G3321VF,Bobby Pin,B1,risk of harm,ROSS JONES,N,NPS,NPS,N1234,All NPS Wales LDU,N03ALL,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G2899VU,Bobby Pin,C2,risk of harm,ROSS JONES,N,CRC,NPS,N1234,NPS Trafford,N01TRF,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G7747UD,Bobby Pin,,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,All NPS Wales LDU,N03ALL,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G6473UO,Bobby Pin,C1,risk of harm,ROSS JONES,N,CRC,NPS,N1234,North Wales LDU,WPTNWS,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G6500UO,Bobby Pin,A2,risk of harm,ROSS JONES,N,NPS,NPS,C1234,Stoke LDU,SWM11G,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G8242GE,Bobby Pin,D2,risk of harm,ROSS JONES,N,NPS,NPS,N1234,North Wales LDU,WPTNWS,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G8130VE,Bobby Pin,D2,risk of harm,ROSS JONES,N,CRC,NPS,N1234,CRC HEF,C172HEF,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G8918VU,Bobby Pin,A1,risk of harm,ROSS JONES,N,CRC,NPS,C1234,All NPS Wales LDU,N03ALL,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G1493UN,Bobby Pin,,risk of harm,ROSS JONES,N,NPS,NPS,C1234,West Wales,WPTWES,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G7166UG,Bobby Pin,D1,risk of harm,ROSS JONES,N,NPS,NPS,N1234,Gwent LDU,WPTGWT,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G2341UP,Bobby Pin,,risk of harm,ROSS JONES,N,NPS,NPS,N1234,North Wales LDU,WPTNWS,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G7633UV,Bobby Pin,C1,risk of harm,ROSS JONES,N,NPS,NPS,C1234,South Wales 2,WPTSW2,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G7218GI,Bobby Pin,C2,risk of harm,ROSS JONES,N,NPS,NPS,C1234,Essex Central Hub,C18HUB,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G5060GO,Bobby Pin,D2,risk of harm,ROSS JONES,N,NPS,NPS,C1234,All NPS Wales LDU,N03ALL,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G7704GG,Bobby Pin,A2,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,North Wales LDU,WPTNWS,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G3868UN,Bobby Pin,D2,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,South Wales 2,WPTSW2,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G0661GP,Bobby Pin,D1,risk of harm,ROSS JONES,N,CRC,NPS,C1234,North Wales LDU,WPTNWS,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G0806UN,Bobby Pin,B2,risk of harm,ROSS JONES,Y,CRC,NPS,C1234,All NPS Wales LDU,N03ALL,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G6754VV,Bobby Pin,C2,risk of harm,ROSS JONES,N,CRC,NPS,C1234,Essex Central Hub,C18HUB,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G7331GT,Bobby Pin,A1,risk of harm,ROSS JONES,N,NPS,NPS,N1234,South Wales 2,WPTSW2,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G4923UI,Bobby Pin,C1,risk of harm,ROSS JONES,Y,CRC,NPS,C1234,Gwent LDU,WPTGWT,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G9577GE,Bobby Pin,C1,risk of harm,ROSS JONES,Y,CRC,NPS,C1234,NPS Trafford,N01TRF,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G2350UP,Bobby Pin,C1,risk of harm,ROSS JONES,N,NPS,NPS,N1234,Gwent LDU,WPTGWT,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G0686GT,Bobby Pin,C2,risk of harm,ROSS JONES,Y,CRC,NPS,C1234,Stoke LDU,SWM11G,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G5235GT,Bobby Pin,D1,risk of harm,ROSS JONES,Y,NPS,NPS,C1234,NPS Bolton,N014403,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G1955VA,Bobby Pin,A2,risk of harm,ROSS JONES,Y,CRC,NPS,N1234,Essex Central Hub,C18HUB,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G7967UD,Bobby Pin,A1,risk of harm,ROSS JONES,N,CRC,NPS,C1234,Stoke LDU,SWM11G,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G7142UL,Bobby Pin,C1,risk of harm,ROSS JONES,Y,NPS,NPS,N1234,Stoke LDU,SWM11G,Team 1,A,N,1,01/01/1990
+crn code,pnc num,G5497GU,Bobby Pin,C1,risk of harm,ROSS JONES,N,CRC,NPS,C1234,CRC HEF,C172HEF,Team 1,A,Y,1,01/01/1990
+crn code,pnc num,G3356GT,Bobby Pin,A1,risk of harm,ROSS JONES,N,NPS,NPS,C1234,NPS Bolton,N014403,Team 1,A,Y,1,01/01/1990

@@ -24,7 +24,8 @@ class OnboardPrison
         nomis_offender_id: offender_id,
         omicable: record[:omicable] ? 'Yes' : 'No',
         tier: record[:tier],
-        case_allocation: record[:provider_cd]
+        case_allocation: record[:provider_cd],
+        crn: record[:crn]
       )
 
       @additions += 1
