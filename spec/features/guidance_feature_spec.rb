@@ -32,8 +32,21 @@ feature 'Guidance' do
       title = 'Get started with the allocations service'
 
       expect(page).not_to have_link(title)
-      expect(page).to have_css("h1", text: title)
-      expect(page).to have_link("https://moic.service.justice.gov.uk")
+      expect(page).to have_css('h1', text: title)
+      expect(page).to have_link('https://moic.service.justice.gov.uk')
+
+      task_links = [
+          ['Task 1', 'guidance_step1'],
+          ['Task 2', 'guidance_step2'],
+          ['Task 3', 'guidance_step3'],
+          ['Task 4', 'guidance_step4'],
+          ['Task 5', 'guidance_step5'],
+          ['Task 6', 'guidance_step6']
+      ]
+
+      task_links.each do |key, val|
+        expect(page).to have_link(key, href: val)
+      end
     end
 
     scenario 'guidance step_1 page', vcr: { cassette_name: :guidance_step_1 } do
@@ -41,11 +54,11 @@ feature 'Guidance' do
 
       click_link(title)
 
-      expect(page).to have_css("h1", text: title)
+      expect(page).to have_css('h1', text: title)
       expect(page).to have_link('spreadsheet template')
       expect(page).to have_xpath("//img[contains(@src,'assets/spreadsheet_image')]")
       expect(page).to have_link('hmoic@digital.justice.gov.uk')
-      expect(page).to have_link('task 2', href: 'guidance_step2')
+      expect(page).to have_link('Task 2: Set up access in Digital Prison Services', href: 'guidance_step2')
     end
 
     scenario 'guidance step_2 page', vcr: { cassette_name: :guidance_step_2 } do
@@ -53,7 +66,7 @@ feature 'Guidance' do
 
       click_link(title)
 
-      expect(page).to have_css("h1", text: title)
+      expect(page).to have_css('h1', text: title)
       expect(page).to have_link('https://notm.service.hmpps.dsd.io/')
 
       images = %w[hmpps_login_image nomis_login_image admin_util_image search_staff_image staff_member_image staff_roles_image add_staff_image choose_role_image]
@@ -68,8 +81,9 @@ feature 'Guidance' do
 
       click_link(title)
 
-      expect(page).to have_css("h1", text: title)
-      expect(page).to have_link('task 4', href: 'guidance_step4')
+      expect(page).to have_css('h1', text: title)
+      expect(page).to have_link('Task 1: List everyone using the service', href: 'guidance_step1')
+      expect(page).to have_link('Task 4: Update POM profiles', href: 'guidance_step4')
 
       images = %w[caseload2_image search_box_image action_toolbar_image caseload1_image search_box_image]
 
@@ -83,7 +97,8 @@ feature 'Guidance' do
 
       click_link(title)
 
-      expect(page).to have_css("h1", text: title)
+      expect(page).to have_css('h1', text: title)
+      expect(page).to have_link('Task 2: Set up access in Digital Prison Services', href: 'guidance_step2')
       expect(page).to have_link('https://moic.service.justice.gov.uk')
     end
 
@@ -92,8 +107,10 @@ feature 'Guidance' do
 
       click_link(title)
 
-      expect(page).to have_css("h1", text: title)
+      expect(page).to have_css('h1', text: title)
+      expect(page).to have_link('Task 3: Set up POMs in NOMIS', href: 'guidance_step3')
       expect(page).to have_link('https://moic.service.justice.gov.uk')
+      expect(page).to have_link('Home', href: '/')
     end
 
     scenario 'guidance step_6 page', vcr: { cassette_name: :guidance_step_6 } do
@@ -101,7 +118,7 @@ feature 'Guidance' do
 
       click_link(title)
 
-      expect(page).to have_css("h1", text: title)
+      expect(page).to have_css('h1', text: title)
       expect(page).to have_link('https://moic.service.justice.gov.uk')
       expect(page).to have_link('moic@digital.justice.gov.uk')
     end

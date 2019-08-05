@@ -9,11 +9,11 @@
       <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
       <strong class="govuk-warning-text__text">
         <span class="govuk-warning-text__assistive">Warning</span>
-        Please note: This task can’t be started until task 1 has been completed
+        Please note: This task can’t be started until <%=link_to("Task 1: List everyone using the service", "guidance_step1") %> has been completed
       </strong>
     </div>
 
-    <p>a) Make sure POMs have the right ‘roles’ assigned in NOMIS</p>
+    <h2>a) Make sure POMs have the right ‘roles’ assigned in NOMIS</h2>
 
     <p>All POMs need to have a new staff role added in NOMIS.</p>
     <p>This will add them to the list of POMs in the new service.</p>
@@ -37,7 +37,7 @@
 
     <p><%=image_tag("action_toolbar_image.png") %></p>
 
-    <p>b) Check all email addresses are up to date in NOMIS</p>
+    <h2>b) Check all email addresses are up to date in NOMIS</h2>
 
     <p>POMs email addresses stored in NOMIS need to be up to date. That’s because the
       new service will send an email to let POMs know when they have been allocated to a prisoner.
@@ -55,6 +55,6 @@
     <p>Save the changes by pressing keyboard shortcut F9  or the yellow ‘disk’ icon in the toolbar at the top of the screen</p>
 
 
-    <p>Let the SPO know when this task has been completed, so that they can start <%= link_to "task 4", "guidance_step4" %>.</p>
+    <p>Let the SPO know when this task has been completed, so that they can start <%= link_to "Task 4: Update POM profiles", "guidance_step4" %>.</p>
   </div>
 </div>
