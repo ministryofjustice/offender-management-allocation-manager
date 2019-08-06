@@ -17,6 +17,7 @@ module Nomis
       attribute :nationalities, :string
       attribute :noms_id, :string
       attribute :reception_date, :date
+      attribute :latest_location_id, :string
 
       def early_allocation?
         false

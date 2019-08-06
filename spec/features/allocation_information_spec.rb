@@ -140,11 +140,11 @@ feature "view an offender's allocation information" do
   end
 
   def create_case_information_for(offender_no)
-    CaseInformation.create!(
-      nomis_offender_id: offender_no,
-      tier: 'A',
-      case_allocation: 'NPS',
-      omicable: 'No'
+    create(:case_information,
+           nomis_offender_id: offender_no,
+           tier: 'A',
+           case_allocation: 'NPS',
+           omicable: 'No'
     )
   end
 

@@ -71,6 +71,11 @@ module ApplicationHelper
     bool_value ? 'Yes' : 'No'
   end
 
+  def auto_delius_import_enabled?(prison)
+    Flipflop.auto_delius_import? ||
+      (ENV['AUTO_DELIUS_IMPORT'] || '').split(',').include?(prison)
+  end
+
   def format_email(email)
     if email.nil?
       '(email address not found)'
