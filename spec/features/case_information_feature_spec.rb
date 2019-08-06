@@ -1,7 +1,6 @@
 require 'rails_helper'
 
-# TODO: The case information editing feature will presumably come back when we add parole_review_date
-xfeature 'case information feature' do
+feature 'case information feature' do
   before do
     test_strategy = Flipflop::FeatureSet.current.test!
     test_strategy.switch!(:auto_delius_import, true)
@@ -71,7 +70,7 @@ xfeature 'case information feature' do
     expect(page).to have_content("Select the prisoner’s tier")
   end
 
-  xit 'allows editing case information for a prisoner', :raven_intercept_exception, vcr: { cassette_name: :case_information_editing_feature } do
+  it 'allows editing case information for a prisoner', :raven_intercept_exception, vcr: { cassette_name: :case_information_editing_feature } do
     nomis_offender_id = 'G1821VA'
 
     signin_user
