@@ -57,7 +57,7 @@ ActiveRecord::Schema.define(version: 2019_08_05_120051) do
   end
 
   create_table "delius_data", force: :cascade do |t|
-    t.string "crn", null: false
+    t.string "crn"
     t.string "pnc_no"
     t.string "noms_no"
     t.string "fullname"
