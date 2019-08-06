@@ -9,8 +9,6 @@ class CaseInformation < ApplicationRecord
   validates :manual_entry, inclusion: { in: [true, false], allow_nil: false }
   validates :nomis_offender_id, presence: true, uniqueness: true
 
-  validates :ldu, :team, presence: true, uniqueness: true
-
   validates :local_divisional_unit, :team, presence: true, unless: ->{ manual_entry }
 
   validates :omicable, inclusion: {

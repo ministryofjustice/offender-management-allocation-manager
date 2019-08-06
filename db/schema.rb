@@ -48,11 +48,6 @@ ActiveRecord::Schema.define(version: 2019_08_05_120051) do
     t.text "omicable"
     t.string "crn"
     t.integer "mappa_level"
-    t.string "ldu"
-    t.string "team"
-    t.boolean "manual_entry", null: false
-    t.string "ldu"
-    t.string "team"
     t.boolean "manual_entry", null: false
     t.bigint "local_divisional_unit_id"
     t.bigint "team_id"
