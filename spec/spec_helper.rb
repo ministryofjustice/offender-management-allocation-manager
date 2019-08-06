@@ -1,8 +1,6 @@
 require 'simplecov'
 
-# Take down to 96% as we are temporarily not using/testing CaseInformation editing
-# until we start hand-entering PPUD parole_review_dates.
-SimpleCov.minimum_coverage 96
+SimpleCov.minimum_coverage 97
 
 SimpleCov.start 'rails' do
   add_filter '/gems/'
