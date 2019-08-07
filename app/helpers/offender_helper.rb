@@ -52,31 +52,35 @@ private
     end
 
     if SentenceTypeService.indeterminate_sentence?(offender.imprisonment_status)
-      [indeterminate_handover_date(offender), 'NPS Inderminate']
+      [indeterminate_responsibility_date(offender), 'NPS Inderminate']
     elsif offender.parole_eligibility_date.present?
-      [parole_handover_date(offender), 'NPS Determinate Parole Case']
-    elsif offender.mappa_level == 1 || offender.mappa_level.blank?
-      [mappa1_handover_date(offender), 'NPS Determinate Mappa 1/0']
+      [offender.parole_eligibility_date - 8.months, 'NPS Determinate Parole Case']
+    elsif offender.mappa_level.blank?
+      [nil, 'NPS - MAPPA missing from nDelius']
+    elsif offender.mappa_level.in? [1, 0]
+      [mappa1_responsibility_date(offender), 'NPS Determinate Mappa 1/N']
     else
-      [mappa_23_handover_date(offender), 'NPS Determinate Mappa 2/3']
+      [mappa_23_responsibility_date(offender), 'NPS Determinate Mappa 2/3']
     end
   end
 
-  def indeterminate_handover_date(offender)
+  def indeterminate_responsibility_date(offender)
     [
       offender.parole_eligibility_date,
       offender.tariff_date
     ].compact.map { |date| date - 8.months }.min
   end
 
-  def mappa_23_handover_date(offender)
+  # There are a couple of places where we need .5 of a month - which
+  # we have assumed 15.days is a reasonable compromise implementation
+  def mappa_23_responsibility_date(offender)
     [
       offender.conditional_release_date,
       offender.automatic_release_date
     ].compact.map { |date| date - (7.months + 15.days) }.min
   end
 
-  def mappa1_handover_date(offender)
+  def mappa1_responsibility_date(offender)
     crd_ard = [
       offender.conditional_release_date,
       offender.automatic_release_date
@@ -86,10 +90,6 @@ private
       crd_ard,
       offender.home_detention_curfew_eligibility_date
     ].compact.min
-  end
-
-  def parole_handover_date(offender)
-    offender.parole_eligibility_date - 8.months
   end
 
   def early_allocation_handover_date(offender)

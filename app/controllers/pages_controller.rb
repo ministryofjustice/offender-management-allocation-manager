@@ -5,6 +5,8 @@ class PagesController < ApplicationController
 
   def help; end
 
+  def guidance; end
+
   def contact
     @contact = nil
   end

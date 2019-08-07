@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # This 'model' is just a raw dump of the XLSX file we get from nDelius and as such
-# is not part of our data model.
+# is not really part of our data model - although we do link to it for error cases.
 # This data is loaded into case_information by the nDelius ETL process.
 class DeliusData < ApplicationRecord
   before_update do |data|
@@ -10,19 +10,16 @@ class DeliusData < ApplicationRecord
     end
   end
 
-  # TODO: this will need changing in Rails 6 as it actually has an upsert method.
-  def self.upsert(record)
-    DeliusData.find_or_initialize_by(crn: record[:crn]).update(record.without(:crn))
-  end
-
   def omicable?
+    # WPT is the first 3 chars of the ldu_code for all Welsh LDU (Local Divisional Unit).
     ldu_code.present? && ldu_code.start_with?('WPT')
   end
 
   def service_provider
-    return 'CRC' if provider_code.present? && provider_code[0] == 'C'
-
-    'NPS'
+    if provider_code.present?
+      return 'CRC' if provider_code.starts_with? 'C'
+      return 'NPS' if provider_code.starts_with? 'N'
+    end
   end
 
 private

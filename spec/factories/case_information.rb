@@ -19,7 +19,13 @@ FactoryBot.define do
     end
 
     nomis_offender_id do
-      'G12345'
+      Faker::Alphanumeric.alpha(10)
     end
+
+    association :team, code: '1234', name: 'A nice team'
+
+    association :local_divisional_unit, code: '123', name: "LDU Name"
+
+    crn { Faker::Alphanumeric.alpha(10) }
   end
 end
