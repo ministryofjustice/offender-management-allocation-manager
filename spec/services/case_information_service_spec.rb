@@ -2,11 +2,11 @@ require 'rails_helper'
 
 describe CaseInformationService do
   let(:caseinfo) {
-    CaseInformation.find_or_create_by!(
-      nomis_offender_id: 'X1000XX',
-      tier: 'A',
-      case_allocation: 'NPS',
-      omicable: 'Yes'
+    create(:case_information,
+           nomis_offender_id: 'X1000XX',
+           tier: 'A',
+           case_allocation: 'NPS',
+           omicable: 'Yes'
     )
   }
 

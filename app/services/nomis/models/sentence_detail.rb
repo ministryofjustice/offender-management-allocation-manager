@@ -10,10 +10,23 @@ module Nomis
       attribute :home_detention_curfew_eligibility_date, :date
       attribute :parole_eligibility_date, :date
       attribute :release_date, :date
+
       attribute :automatic_release_date, :date
+      attribute :automatic_release_override_date, :date
+
       attribute :conditional_release_date, :date
+      attribute :conditional_release_override_date, :date
+
       attribute :sentence_start_date, :date
       attribute :tariff_date, :date
+
+      def automatic_release_date
+        automatic_release_override_date.presence || super
+      end
+
+      def conditional_release_date
+        conditional_release_override_date.presence || super
+      end
 
       def earliest_release_date
         dates = [

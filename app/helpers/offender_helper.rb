@@ -54,7 +54,7 @@ private
     if SentenceTypeService.indeterminate_sentence?(offender.imprisonment_status)
       [indeterminate_handover_date(offender), 'NPS Inderminate']
     elsif offender.parole_eligibility_date.present?
-      [parole_handover_date(offender), 'NPS Determinate Parole Case']
+      [offender.parole_eligibility_date - 8.months, 'NPS Determinate Parole Case']
     elsif offender.mappa_level == 1 || offender.mappa_level.blank?
       [mappa1_handover_date(offender), 'NPS Determinate Mappa 1/0']
     else
@@ -86,10 +86,6 @@ private
       crd_ard,
       offender.home_detention_curfew_eligibility_date
     ].compact.min
-  end
-
-  def parole_handover_date(offender)
-    offender.parole_eligibility_date - 8.months
   end
 
   def early_allocation_handover_date(offender)

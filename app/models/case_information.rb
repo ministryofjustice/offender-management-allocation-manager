@@ -2,14 +2,25 @@
 
 class CaseInformation < ApplicationRecord
   self.table_name = 'case_information'
-  validates :nomis_offender_id, presence: true
-  validates :omicable, presence: {
+
+  belongs_to :local_divisional_unit, optional: true
+  belongs_to :team, optional: true
+
+  validates :manual_entry, inclusion: { in: [true, false], allow_nil: false }
+  validates :nomis_offender_id, presence: true, uniqueness: true
+
+  validates :local_divisional_unit, :team, presence: true, unless: ->{ manual_entry }
+
+  validates :omicable, inclusion: {
+    in: %w[Yes No],
+    allow_nil: false,
     message: 'Select yes if the prisoner’s last known address was in Wales'
   }
-  validates :tier, presence: {
-    message: 'Select the prisoner’s tier'
-  }
-  validates :case_allocation, presence: {
+  validates :tier, inclusion: { in: %w[A B C D], message: 'Select the prisoner’s tier' }
+
+  validates :case_allocation, inclusion: {
+    in: %w[NPS CRC],
+    allow_nil: false,
     message: 'Select the service provider for this case'
   }
 
