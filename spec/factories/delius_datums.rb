@@ -19,6 +19,13 @@ FactoryBot.define do
     ldu_code do 'WPT001' end
     ldu do 'Somewhere in Wales' end
     team_code do 'abcdefg' end
-    team { 'A Welsh Team' }
+    team do 'A Welsh Team' end
+
+    trait :with_mappa do
+      mappa { 'Y' }
+    end
+
+    mappa  do 'N' end
+    mappa_levels do nil end
   end
 end

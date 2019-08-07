@@ -45,6 +45,16 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
       expect {
         described_class.perform_now d1.noms_no
       }.to change(CaseInformation, :count).by(1)
+    end
+  end
+
+  context 'when tier contains extra characters' do
+    let!(:d1) { create(:delius_data, tier: 'B1') }
+
+    it 'creates case information' do
+      expect {
+        described_class.perform_now d1.noms_no
+      }.to change(CaseInformation, :count).by(1)
       expect(CaseInformation.last.tier).to eq('B')
     end
   end
@@ -56,6 +66,56 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
       expect {
         described_class.perform_now d1.noms_no
       }.not_to change(CaseInformation, :count)
+    end
+  end
+
+  describe '#mappa' do
+    context 'without delius mappa' do
+      let!(:d1) { create(:delius_data, mappa: 'N') }
+
+      it 'creates case information with mappa level 0' do
+        expect {
+          described_class.perform_now d1.noms_no
+        }.to change(CaseInformation, :count).by(1)
+        expect(CaseInformation.last.mappa_level).to eq(0)
+      end
+    end
+
+    context 'with delius mappa' do
+      let!(:d1) { create(:delius_data, mappa: 'Y', mappa_levels: mappa_levels) }
+
+      context 'with delius mappa data is 1' do
+        let(:mappa_levels) { '1' }
+
+        it 'creates case information with mappa level 1' do
+          expect {
+            described_class.perform_now d1.noms_no
+          }.to change(CaseInformation, :count).by(1)
+          expect(CaseInformation.last.mappa_level).to eq(1)
+        end
+      end
+
+      context 'with delius mappa data is 1,2' do
+        let(:mappa_levels) { '1,2' }
+
+        it 'creates case information with mappa level 2' do
+          expect {
+            described_class.perform_now d1.noms_no
+          }.to change(CaseInformation, :count).by(1)
+          expect(CaseInformation.last.mappa_level).to eq(2)
+        end
+      end
+
+      context 'with delius mappa data is 1,Nominal' do
+        let(:mappa_levels) { '1,Nominal' }
+
+        it 'creates case information with mappa level 1' do
+          expect {
+            described_class.perform_now d1.noms_no
+          }.to change(CaseInformation, :count).by(1)
+          expect(CaseInformation.last.mappa_level).to eq(1)
+        end
+      end
     end
   end
 
@@ -82,6 +142,18 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
   context 'when case information already present' do
     let!(:d1) { create(:delius_data, tier: 'C') }
     let!(:c1) { create(:case_information, tier: 'B', nomis_offender_id: d1.noms_no, crn: d1.crn) }
+
+    it 'does not creates case information' do
+      expect {
+        described_class.perform_now d1.noms_no
+      }.not_to change(CaseInformation, :count)
+      expect(c1.reload.tier).to eq('C')
+    end
+  end
+
+  context 'when case information already present' do
+    let!(:c1) { create(:case_information, tier: 'B', nomis_offender_id: 'G4281GV') }
+    let!(:d1) { create(:delius_data, noms_no: c1.nomis_offender_id, crn: c1.crn, tier: 'C') }
 
     it 'does not creates case information' do
       expect {
