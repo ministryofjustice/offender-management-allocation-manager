@@ -24,5 +24,7 @@ class CaseInformation < ApplicationRecord
     message: 'Select the service provider for this case'
   }
 
-  validates :mappa_level, inclusion: { in: [1, 2, 3], allow_nil: true }
+  # nil means MAPPA level is completely unknown.
+  # 0 means MAPPA level is known to be not relevant for offender
+  validates :mappa_level, inclusion: { in: [0, 1, 2, 3], allow_nil: true }
 end

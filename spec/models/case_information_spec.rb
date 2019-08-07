@@ -4,8 +4,8 @@ RSpec.describe CaseInformation, type: :model do
   context 'with mappa level' do
     subject { build(:case_information, nomis_offender_id: '123456') }
 
-    it 'allows 1, 2, 3 and nil' do
-      [1, 2, 3, nil].each do |level|
+    it 'allows 0, 1, 2, 3 and nil' do
+      [0, 1, 2, 3, nil].each do |level|
         subject.mappa_level = level
         expect(subject).to be_valid
       end

@@ -142,6 +142,9 @@ RSpec.describe OffenderHelper do
 
             context 'when non-parole case' do
               context 'without mappa' do
+                # mappa level 0 means MAAPA doesn't apply
+                let(:mappa_level) { 0 }
+
                 context 'when crd before ard' do
                   it 'is 4.5 months before CRD' do
                     expect(helper.responsibility_handover_date(offender)[0]).to eq(Date.new(2020, 3, 1))
