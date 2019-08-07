@@ -11,6 +11,13 @@ feature 'Guidance' do
   end
 
   context 'when viewing guidance pages' do
+    let(:inset_text) do
+      { LSA: 'Local System Administrator (LSA) task',
+        SPO_HoOMU: 'Senior Probation Officer / Head of Offender Management Unit (SPO/HoOMU) task',
+        CASE_ADMIN: 'Senior Probation Officer / Head of Offender Management Unit (SPO/HoOMU) / Case admin task'
+      }
+    end
+
     before do
       visit '/guidance'
     end
@@ -32,7 +39,7 @@ feature 'Guidance' do
       title = 'Get started with the allocations service'
 
       expect(page).not_to have_link(title)
-      expect(page).to have_css('h1', text: title)
+      expect(page).to have_css('h2', text: title)
       expect(page).to have_link('https://moic.service.justice.gov.uk')
 
       task_links = [
@@ -54,7 +61,8 @@ feature 'Guidance' do
 
       click_link(title)
 
-      expect(page).to have_css('h1', text: title)
+      expect(page).to have_css('h2', text: title)
+      expect(page).to have_css('.govuk-inset-text', text: inset_text[:SPO_HoOMU])
       expect(page).to have_link('spreadsheet template')
       expect(page).to have_xpath("//img[contains(@src,'assets/spreadsheet_image')]")
       expect(page).to have_link('moic@digital.justice.gov.uk')
@@ -66,7 +74,8 @@ feature 'Guidance' do
 
       click_link(title)
 
-      expect(page).to have_css('h1', text: title)
+      expect(page).to have_css('h2', text: title)
+      expect(page).to have_css('.govuk-inset-text', text: inset_text[:LSA])
       expect(page).to have_link('https://notm.service.hmpps.dsd.io/')
 
       images = %w[hmpps_login_image nomis_login_image admin_util_image search_staff_image staff_member_image staff_roles_image add_staff_image choose_role_image]
@@ -81,7 +90,8 @@ feature 'Guidance' do
 
       click_link(title)
 
-      expect(page).to have_css('h1', text: title)
+      expect(page).to have_css('h2', text: title)
+      expect(page).to have_css('.govuk-inset-text', text: inset_text[:LSA])
       expect(page).to have_link('Task 1: List everyone using the service', href: 'guidance_step1')
       expect(page).to have_link('Task 4: Update POM profiles', href: 'guidance_step4')
 
@@ -97,7 +107,8 @@ feature 'Guidance' do
 
       click_link(title)
 
-      expect(page).to have_css('h1', text: title)
+      expect(page).to have_css('h2', text: title)
+      expect(page).to have_css('.govuk-inset-text', text: inset_text[:CASE_ADMIN])
       expect(page).to have_link('Task 2: Set up access in Digital Prison Services', href: 'guidance_step2')
       expect(page).to have_link('https://moic.service.justice.gov.uk')
     end
@@ -107,7 +118,8 @@ feature 'Guidance' do
 
       click_link(title)
 
-      expect(page).to have_css('h1', text: title)
+      expect(page).to have_css('h2', text: title)
+      expect(page).to have_css('.govuk-inset-text', text: inset_text[:CASE_ADMIN])
       expect(page).to have_link('Task 3: Set up POMs in NOMIS', href: 'guidance_step3')
       expect(page).to have_link('https://moic.service.justice.gov.uk')
       expect(page).to have_link('Home', href: '/')
@@ -118,7 +130,8 @@ feature 'Guidance' do
 
       click_link(title)
 
-      expect(page).to have_css('h1', text: title)
+      expect(page).to have_css('h2', text: title)
+      expect(page).to have_css('.govuk-inset-text', text: inset_text[:SPO_HoOMU])
       expect(page).to have_link('https://moic.service.justice.gov.uk')
       expect(page).to have_link('moic@digital.justice.gov.uk')
     end
