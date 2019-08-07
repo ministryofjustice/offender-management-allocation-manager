@@ -106,6 +106,10 @@ Several environment variables are required for the operation of this service.
 | KEYWORKER_API_HOST | The host where the keyworker API is hosted |
 | SENTRY_DSN | The URL of a sentry installation. If no installation is available, then this should be present but an empty string ( "" )|
 | PROMETHEUS_METRICS | If set to 'on' then will enable the generation of prometheus metrics |
+| DELIUS_EMAIL_USERNAME | Username for nDelius GMail import |
+| DELIUS_EMAIL_PASSWORD | Password for nDelius GMail import |
+| DELIUS_EMAIL_FOLDER | Folder where nDelius imports are delivered |
+| DELIUS_XLSX_PASSWORD | Password for encrypted nDelius spreahsheet |
 
 
 ### Further Technical Information
