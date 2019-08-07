@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 feature 'Getting help' do
-  context 'View help page' do
+  context 'when viewing the help page' do
     it "can show the help page", vcr: { cassette_name: :getting_help_text } do
       visit "help"
       expect(page).to have_content('Help')
@@ -25,7 +25,7 @@ feature 'Getting help' do
     end
   end
 
-  context 'View contact page' do
+  context 'when viewing the contact page' do
     it "can show the contact page", vcr: { cassette_name: :getting_help_contact } do
       visit "contact"
       expect(page).to have_content('Contact')
