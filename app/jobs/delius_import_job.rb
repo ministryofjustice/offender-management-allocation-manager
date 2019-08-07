@@ -1,6 +1,7 @@
 require 'delius/emails'
 require 'delius/processor'
 require 'open3'
+require 'zip'
 
 class DeliusImportJob < ApplicationJob
   queue_as :default
