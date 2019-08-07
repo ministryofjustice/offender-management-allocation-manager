@@ -1,6 +1,11 @@
 require 'rails_helper'
 
 feature 'case information feature' do
+  before do
+    test_strategy = Flipflop::FeatureSet.current.test!
+    test_strategy.switch!(:auto_delius_import, true)
+  end
+
   it 'adds tiering and case information for a prisoner', :raven_intercept_exception, vcr: { cassette_name: :case_information_feature } do
     nomis_offender_id = 'G1821VA'
 

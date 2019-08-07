@@ -14,14 +14,14 @@ describe OffenderService do
   it "get last page of offenders for a specific prison", vcr: { cassette_name: :offender_service_offenders_by_prison_last_page_spec } do
     offenders = described_class.get_offenders_for_prison('LEI').to_a
     expect(offenders).to be_kind_of(Array)
-    expect(offenders.length).to eq(816)
+    expect(offenders.length).to eq(823)
     expect(offenders.first).to be_kind_of(Nomis::Models::OffenderSummary)
   end
 
   it "gets a single offender", vcr: { cassette_name: :offender_service_single_offender_spec } do
     nomis_offender_id = 'G4273GI'
 
-    CaseInformation.create(nomis_offender_id: nomis_offender_id, tier: 'C', case_allocation: 'CRC', omicable: 'Yes')
+    create(:case_information, nomis_offender_id: nomis_offender_id, tier: 'C', case_allocation: 'CRC', omicable: 'Yes')
     offender = described_class.get_offender(nomis_offender_id)
 
     expect(offender).to be_kind_of(Nomis::Models::Offender)
