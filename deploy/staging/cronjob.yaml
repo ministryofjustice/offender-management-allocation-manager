@@ -102,7 +102,7 @@ metadata:
   name: offender-manager-custom-stats
 spec:
 #  Run every 15 minutes on staging - see if it works with perform_now but could be deferred with perform_later
-  schedule: "15 * * * *"
+  schedule: "*/15 * * * *"
   startingDeadlineSeconds: 10
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
