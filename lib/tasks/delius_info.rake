@@ -3,7 +3,7 @@
 require 'nokogiri'
 require_relative '../../lib/delius/processor'
 
-namespace :delius do
+namespace :delius_etl do
   desc 'Generates stats from the latest XLSX file'
   task :stats, [:file] => [:environment] do |_task, args|
     if defined?(Rails) && Rails.env.development?

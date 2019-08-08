@@ -2,7 +2,7 @@
 
 require 'open3'
 
-namespace :delius do
+namespace :delius_etl do
   desc 'decrypt delius export xlsx file'
   task :decrypt, [:input_file, :output_file] => [:environment] do |_task, args|
     if defined?(Rails) && Rails.env.development?
