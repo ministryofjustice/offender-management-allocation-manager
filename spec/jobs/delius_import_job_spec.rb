@@ -14,7 +14,7 @@ RSpec.describe DeliusImportJob, type: :job do
 
     expect {
       described_class.perform_now
-    }.to change(DeliusData, :count).by(2)
+    }.to change(DeliusData, :count).by(1)
     expect(DeliusData.last.crn).to eq('crn code')
     expect(DeliusData.last.tier).to eq('A1')
   end

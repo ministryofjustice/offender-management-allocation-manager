@@ -3,9 +3,9 @@
 require 'nokogiri'
 require_relative '../../lib/delius/processor'
 
-namespace :delius_import do
+namespace :delius do
   desc 'Loads delius information from a spreadsheet into the DB'
-  task :load, [:file] => [:environment] do |_task, args|
+  task :import_file, [:file] => [:environment] do |_task, args|
     if defined?(Rails) && Rails.env.development?
       Rails.logger = Logger.new(STDOUT)
     end
@@ -16,7 +16,7 @@ namespace :delius_import do
     total = 0
     row_count = 0
     processor = Delius::Processor.new(args[:file])
-    processor.run do |row|
+    processor.each do |row|
       record = {}
 
       row.each_with_index do |val, idx|

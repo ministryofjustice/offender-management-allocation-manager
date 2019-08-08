@@ -4,7 +4,7 @@ require 'csv'
 require_relative '../../lib/delius/manual_extractor'
 require_relative '../../lib/onboard_prison'
 
-namespace :delius_etl do
+namespace :delius do
   desc 'Create CaseInformation records for a specific prison'
   task :onboard, [:prison, :file] => [:environment] do |_task, args|
     if defined?(Rails) && Rails.env.development?

@@ -3,7 +3,7 @@
 require 'nokogiri'
 require_relative '../../lib/delius/processor'
 
-namespace :delius_info do
+namespace :delius do
   desc 'Generates stats from the latest XLSX file'
   task :stats, [:file] => [:environment] do |_task, args|
     if defined?(Rails) && Rails.env.development?
@@ -21,7 +21,7 @@ namespace :delius_info do
     seen_noms_nos = {}
 
     processor = Delius::Processor.new(args[:file])
-    processor.run do |row|
+    processor.each do |row|
       record = {}
 
       row.each_with_index do |val, idx|

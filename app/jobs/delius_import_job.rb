@@ -68,7 +68,10 @@ private
   def process_decrypted_file(filename)
     total = 0
     processor = Delius::Processor.new(filename)
-    processor.run { |row|
+    processor.each_with_index { |row, index|
+      # skip header row in row[0]
+      next if index == 0
+
       record = {}
 
       row.each_with_index do |val, idx|
