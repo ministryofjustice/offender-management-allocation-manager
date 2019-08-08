@@ -139,6 +139,19 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
     end
   end
 
+  context 'when date invalid' do
+    let!(:d1) { create(:delius_data, date_of_birth: '******') }
+
+    it 'creates an error record' do
+      expect {
+        expect {
+          described_class.perform_now d1.noms_no
+        }.not_to change(CaseInformation, :count)
+      }.to change(DeliusImportError, :count).by(1)
+    end
+    # expect(DeliusImportError.last.error_type).to eq(DeliusImportError::MISMATCHED_DOB)
+  end
+
   context 'when case information already present' do
     let!(:d1) { create(:delius_data, tier: 'C') }
     let!(:c1) { create(:case_information, tier: 'B', nomis_offender_id: d1.noms_no, crn: d1.crn) }

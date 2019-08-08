@@ -35,7 +35,13 @@ private
 
   def dob_matches?(offender, delius_record)
     delius_record.date_of_birth.present? &&
-      offender.date_of_birth == Date.parse(delius_record.date_of_birth)
+      offender.date_of_birth == safe_date_parse(delius_record.date_of_birth)
+  end
+
+  def safe_date_parse(dob)
+    Date.parse(dob)
+  rescue ArgumentError
+    nil
   end
 
   def process_record(delius_record)
