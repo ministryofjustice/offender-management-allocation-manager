@@ -29,14 +29,19 @@ feature 'delius import scenarios', vcr: { cassette_name: :delius_import_scenario
     end
 
     context 'without tier' do
-      let(:d1) { create(:delius_data, tier: 'XX') }
+      # This NOMIS id needs to appear on the first page of 'missing information'
+      let(:d1) { create(:delius_data, noms_no: 'G2911GD', date_of_birth: '05/06/1974', tier: 'XX') }
 
       before do
         ProcessDeliusDataJob.perform_now d1.noms_no
       end
 
       it 'displays the correct error message' do
-        visit prison_case_information_path('LEI', d1.noms_no)
+        visit prison_summary_pending_path('LEI')
+        within "#edit_#{d1.noms_no}" do
+          click_link 'Update'
+        end
+
         within '.govuk-error-summary' do
           expect(page).to have_content 'no tiering calculation found'
         end
