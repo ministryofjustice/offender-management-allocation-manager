@@ -4,6 +4,8 @@ metadata:
   name: shared-environment
 data:
   PROMETHEUS_METRICS: "on"
+  AUTO_DELIUS_IMPORT: "CFI,UFI"
+  DELIUS_EMAIL_FOLDER: "Data/prod"
   RAILS_ENV: "production"
   RAILS_SERVE_STATIC_FILES: "true"
   RAILS_WEB_CONCURRENCY: "5"
