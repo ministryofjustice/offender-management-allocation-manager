@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe CaseInformation, type: :model do
-  it 'should have timestamps' do
+  it 'has timestamps' do
     x = create(:case_information)
     expect(x.created_at).not_to be_nil
     sleep 2
