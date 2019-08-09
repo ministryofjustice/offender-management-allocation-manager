@@ -1,6 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe CaseInformation, type: :model do
+  it 'should have timestamps' do
+    x = create(:case_information)
+    expect(x.created_at).not_to be_nil
+    sleep 2
+    x.touch
+    expect(x.updated_at).not_to eq(x.created_at)
+  end
+
   context 'with mappa level' do
     subject { build(:case_information, nomis_offender_id: '123456') }
 
