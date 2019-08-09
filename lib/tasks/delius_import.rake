@@ -4,7 +4,7 @@ require 'nokogiri'
 require_relative '../../lib/delius/processor'
 
 namespace :delius_etl do
-  desc 'Loads delius information from a spreadsheet into the DB'
+  desc 'Loads delius information from a spreadsheet into DB and trigger'
   task :import_file, [:file] => [:environment] do |_task, args|
     if defined?(Rails) && Rails.env.development?
       Rails.logger = Logger.new(STDOUT)

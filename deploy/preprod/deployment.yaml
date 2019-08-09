@@ -70,7 +70,8 @@ spec:
         - name: allocation-manager-sidekiq
           image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
           imagePullPolicy: Always
-          command: ['sh', '-c', "bundle exec sidekiq -C config/sidekiq.yml"]
+#          The trigger call can be removed once the nDelius feature is fully enabled
+          command: ['sh', '-c', "bundle exec rake delius:trigger && bundle exec sidekiq -C config/sidekiq.yml"]
           envFrom:
             - configMapRef:
                 name: shared-environment
