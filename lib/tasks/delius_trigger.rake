@@ -1,6 +1,6 @@
 namespace :delius do
   desc 'Trigger CaseInformation records after changing auto-delius-import'
-  task :trigger => :environment do |_task|
+  task trigger: :environment do |_task|
     if defined?(Rails) && Rails.env.development?
       Rails.logger = Logger.new(STDOUT)
     end
