@@ -51,6 +51,14 @@ RSpec.describe EmailService, :queueing do
     }.to change(enqueued_jobs, :size).by(1)
   end
 
+  it "Can not crash when a pom has no email", vcr: { cassette_name: :email_service_send_allocation_email }, versioning: true  do
+    allow(PrisonOffenderManagerService).to receive(:get_pom_emails).and_return(nil)
+
+    expect {
+      described_class.instance(allocation: allocation, message: "", pom_nomis_id: allocation.primary_pom_nomis_id).send_email
+    }.to change(enqueued_jobs, :size).by(0)
+  end
+
   it "Can send a reallocation email", vcr: { cassette_name: :email_service_send_deallocation_email }, versioning: true  do
     allow(AllocationService).to receive(:get_versions_for).and_return([original_allocation])
 
