@@ -26,13 +26,11 @@ describe Nomis::Elite2::MovementApi do
       allow_any_instance_of(Nomis::Client).to receive(:post).and_return([
         {
           'offender_no' => '2',
-          'movementTime' => '2017-03-09T15:50:52.676892',
-          'movementType' => 'REL'
+          'movementTime' => '2017-03-09T15:50:52.676892'
         },
         {
           'offender_no' => '1',
-          'movementTime' => '2015-01-01T15:50:52.676892',
-          'movementType' => 'ADM'
+          'movementTime' => '2015-01-01T15:50:52.676892'
         }
       ])
 

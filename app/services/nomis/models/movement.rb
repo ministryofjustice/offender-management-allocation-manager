@@ -30,10 +30,6 @@ module Nomis
       attribute :movement_time
       attribute :movement_reason
       attribute :comment_text
-
-      def self.movement_types
-        [MovementType::RELEASE, MovementType::ADMISSION, MovementType::TRANSFER]
-      end
     end
   end
 end
