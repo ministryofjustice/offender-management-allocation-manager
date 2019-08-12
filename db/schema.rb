@@ -118,7 +118,6 @@ ActiveRecord::Schema.define(version: 2019_08_12_124731) do
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "email"
     t.index ["nomis_staff_id"], name: "index_pom_details_on_nomis_staff_id"
   end
 
