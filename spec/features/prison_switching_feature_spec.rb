@@ -9,6 +9,22 @@ feature 'Switching prisons' do
     expect(page).to have_css('h2', text: 'HMP Leeds')
   end
 
+  it 'shows dashboard links if there is no referrer', vcr: { cassette_name: :nav_to_prison_switcher } do
+    signin_user
+
+    visit root_path
+
+    visit prison_prisons_path('LEI')
+
+    expect(page).to have_css('a', text: 'HMP Leeds')
+    expect(page).to have_css('a', text: 'HMP Risley')
+
+    click_link('HMP Risley')
+
+    expect(page).not_to have_content('HMP Leeds')
+    expect(page).to have_content('HMP Risley')
+  end
+
   it 'Shows the list of prisons I can switch to',
      vcr: { cassette_name: :prison_switching_feature_list_spec }do
     signin_user
