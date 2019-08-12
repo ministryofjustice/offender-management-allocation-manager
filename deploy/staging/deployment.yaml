@@ -41,6 +41,13 @@ spec:
               port: 3000
             initialDelaySeconds: 10
             periodSeconds: 60
+          resources:
+            limits:
+              memory: "1Gi"
+              cpu: "100m"
+            requests:
+              memory: "500Mi"
+              cpu: "50m"
           envFrom:
             - configMapRef:
                 name: shared-environment
