@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_05_120051) do
+ActiveRecord::Schema.define(version: 2019_08_09_140516) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -51,8 +51,10 @@ ActiveRecord::Schema.define(version: 2019_08_05_120051) do
     t.boolean "manual_entry", null: false
     t.bigint "local_divisional_unit_id"
     t.bigint "team_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.index ["local_divisional_unit_id"], name: "index_case_information_on_local_divisional_unit_id"
-    t.index ["nomis_offender_id"], name: "index_case_information_on_nomis_offender_id"
+    t.index ["nomis_offender_id"], name: "index_case_information_on_nomis_offender_id", unique: true
     t.index ["team_id"], name: "index_case_information_on_team_id"
   end
 

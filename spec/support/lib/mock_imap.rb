@@ -80,7 +80,7 @@ class MockIMAP
   # in our tests with "ALL" which simply returns the imap message ids for all messages
   # in the current folder.
   def search(_term)
-    entries = Dir.entries(fixture_path).reject { |f| File.directory? f }
+    entries = Dir.entries(fixture_path).select { |f| f.ends_with?('.json') }
     entries.shuffle.map { |filename|
       File.basename(filename, '.json').to_i
     }

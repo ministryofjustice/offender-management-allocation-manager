@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-namespace :delius_decrypt do
+require 'open3'
+
+namespace :delius_etl do
   desc 'decrypt delius export xlsx file'
   task :decrypt, [:input_file, :output_file] => [:environment] do |_task, args|
     if defined?(Rails) && Rails.env.development?
@@ -15,7 +17,9 @@ namespace :delius_decrypt do
     Rails.logger.error('No output file specified') if output.blank?
     next unless input.present? && output.present?
 
-    std_output = `bin/msoffice-crypt -d #{input} #{output} -p #{password}`
+    std_output, _status = Open3.capture2(
+      'msoffice-crypt', '-d', '-p', password, encrypted_xlsx, filename
+    )
     lines = std_output.split("\n")
     if lines.count > 1
       Rails.logger.error(lines.last)
