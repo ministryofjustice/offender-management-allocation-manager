@@ -1,7 +1,23 @@
 # frozen_string_literal: true
 
 MessageContent = Struct.new(:date, :attachments)
-AttachmentContent = Struct.new(:content_type)
+
+class AttachmentContent
+  attr_reader :content_type
+
+  Body = Struct.new(:decoded)
+
+  def initialize(att)
+    @content_type = att['content_type']
+    @body = att['body']
+  end
+
+  def body
+    file = Rails.root.join('spec', 'fixtures', 'imap', 'delius_import_job', @body)
+
+    Body.new File.read(file)
+  end
+end
 
 # This class is intended to be monkey-patched into the default `Mail`
 # class. Where the original Mail class can read from a string and populate
@@ -12,6 +28,7 @@ AttachmentContent = Struct.new(:content_type)
 #    "attachments": [
 #      {
 #        "content_type": "application/zip"
+#        "body" : <filename>
 #      }
 #    ]
 #  }
@@ -22,7 +39,7 @@ class MockMailMessage
     date = Date.parse(hash['date'])
 
     attachments = hash['attachments'].map { |att|
-      AttachmentContent.new(att['content_type'])
+      AttachmentContent.new(att)
     }
 
     MessageContent.new(date, attachments)

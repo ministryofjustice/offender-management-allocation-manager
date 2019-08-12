@@ -131,24 +131,14 @@ describe PrisonOffenderManagerService do
     end
 
     context 'when pom not existing at a prison' do
-      let(:t3) { 'https://gateway.t3.nomis-api.hmpps.dsd.io' }
       let(:elite2api) { 'https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api' }
-      let(:access_token) { 'an access token' }
 
       before do
-        allow(Nomis::Oauth::TokenService).to receive(:valid_token).and_return(OpenStruct.new(access_token: access_token))
+        stub_auth_token
 
-        stub_request(:post, "#{t3}/auth/oauth/token?grant_type=client_credentials").
-          to_return(status: 200, body: {
-            "access_token": access_token,
-            "token_type": "bearer",
-            "expires_in": 1199,
-            "scope": "readwrite"
-          }.to_json, headers: {})
         stub_request(:get, "#{elite2api}/staff/roles/LEI/role/POM").
           with(
             headers: {
-              'Authorization' => "Bearer #{access_token}",
               'Page-Limit' => '100',
               'Page-Offset' => '0'
             }).

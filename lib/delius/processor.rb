@@ -7,6 +7,7 @@ require_relative 'string_collector'
 
 module Delius
   class Processor
+    include Enumerable
     # Given an XLSX file, this class is responsible for converting the data
     # found in sheet one, into a stream of rows. These rows will contain
     # the textual information from the original spreadsheet. XLSX files
@@ -25,7 +26,7 @@ module Delius
       @lookup_table = {}
     end
 
-    def run(&block)
+    def each(&block)
       # The &block passed to this function is used to report back to
       # the caller every time we have a row of data to give them.
       zip_file = Zip::File.open(@file)
