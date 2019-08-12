@@ -54,7 +54,7 @@ ActiveRecord::Schema.define(version: 2019_08_09_140516) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["local_divisional_unit_id"], name: "index_case_information_on_local_divisional_unit_id"
-    t.index ["nomis_offender_id"], name: "index_case_information_on_nomis_offender_id", unique: true
+    t.index ["nomis_offender_id"], name: "index_case_information_on_nomis_offender_id"
     t.index ["team_id"], name: "index_case_information_on_team_id"
   end
 
