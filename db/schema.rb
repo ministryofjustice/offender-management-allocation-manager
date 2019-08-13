@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_12_124731) do
+ActiveRecord::Schema.define(version: 2019_08_13_080602) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -38,6 +38,7 @@ ActiveRecord::Schema.define(version: 2019_08_12_124731) do
     t.string "recommended_pom_type"
     t.index ["nomis_offender_id"], name: "index_allocation_versions_on_nomis_offender_id"
     t.index ["primary_pom_nomis_id"], name: "index_allocation_versions_on_primary_pom_nomis_id"
+    t.index ["prison"], name: "index_allocation_versions_on_prison"
     t.index ["secondary_pom_nomis_id"], name: "index_allocation_versions_secondary_pom_nomis_id"
   end
 
