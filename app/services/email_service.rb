@@ -26,7 +26,7 @@ class EmailService
   end
 
   def send_coworking_primary_email(pom_firstname, coworking_pom_name)
-    unless @pom.emails.blank?
+    if @pom.emails.present?
       PomMailer.allocate_coworking_pom(
         message: @message,
         pom_name: pom_firstname.capitalize,
@@ -40,7 +40,7 @@ class EmailService
   end
 
   def send_secondary_email(pom_firstname)
-    unless @pom.emails.blank?
+    if @pom.emails.present?
       PomMailer.secondary_allocation_email(
         message: @message,
         pom_name: pom_firstname.capitalize,
