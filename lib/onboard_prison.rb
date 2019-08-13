@@ -20,7 +20,7 @@ class OnboardPrison
       end
 
       # Create a CaseInformation .....
-      CaseInformation.find_or_create_by!(
+      CaseInformation.find_or_create_by(
         nomis_offender_id: offender_id,
         omicable: record[:omicable] ? 'Yes' : 'No',
         tier: record[:tier],
