@@ -25,10 +25,10 @@ class SummaryService
     # each type of record.
     counts = { allocated: 0, unallocated: 0, pending: 0, all: 0 }
 
-    x = OffenderService.get_offenders_for_prison(prison)
-    active_allocations_hash = AllocationService.allocations(x.map(&:offender_no), prison)
+    offenders = OffenderService.get_offenders_for_prison(prison)
+    active_allocations_hash = AllocationService.allocations(offenders.map(&:offender_no), prison)
 
-    x.each do |offender|
+    offenders.each do |offender|
       if offender.tier.present?
         # When trying to determine if this offender has a current allocation, we want to know
         # if it is for this prison.  If the offender was recently transferred here their prison
