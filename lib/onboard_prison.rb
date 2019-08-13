@@ -26,7 +26,7 @@ class OnboardPrison
         tier: record[:tier],
         case_allocation: record[:provider_cd],
         crn: record[:crn],
-        manual_entry: false
+        manual_entry: true
       )
 
       @additions += 1
