@@ -1,11 +1,5 @@
 require 'rails_helper'
 
-# Note - this is a rubbish test. It doesn't actually test the search controller
-# it's part of a spike to demonstrate that we can write controller tests pretty easily
-# by hard-wiring the sso_data in the session.
-# It might be better to mock slightly higher up than done here - the normal flow of a controller
-# test is to setup models and then call the action - the current code doesn't really have a
-# nice clean 'data layer' where mocking could be introduced without being a source of defects.
 RSpec.describe SearchController, type: :controller do
   # Need to use a different prison than LEI to prevent filling Rails cache with mock data
   let(:prison) { 'WEI' }
@@ -39,7 +33,13 @@ RSpec.describe SearchController, type: :controller do
           'Page-Limit' => '200',
           'Page-Offset' => '0'
         }).
-      to_return(status: 200, body: {}.to_json, headers: {})
+      to_return(status: 200,
+                body: [{ "bookingId": 754_207, "bookingNo": "K09211", "offenderNo": "G7806VO", "firstName": "ONGMETAIN",
+                         "lastName": "ABDORIA", "dateOfBirth": "1990-12-06",
+                         "age": 28, "agencyId": "LEI", "assignedLivingUnitId": 13_139, "assignedLivingUnitDesc": "E-5-004",
+                         "facialImageId": 1_392_829,
+                         "categoryCode": "C", "imprisonmentStatus": "LR", "alertsCodes": [], "alertsDetails": [], "convictedStatus": "Convicted" }
+                ].to_json)
     stub_request(:get, elite2listapi).
       with(
         headers: {
