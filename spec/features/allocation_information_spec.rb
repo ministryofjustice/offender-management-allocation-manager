@@ -17,6 +17,10 @@ feature "view an offender's allocation information" do
     )
   }
 
+  before do
+    signin_user
+  end
+
   describe 'Offender has a key worker assigned' do
     before do
       create_case_information_for(nomis_offender_id_with_keyworker)
@@ -24,8 +28,6 @@ feature "view an offender's allocation information" do
     end
 
     it "displays the Key Worker's details", vcr: { cassette_name: :show_allocation_information_keyworker_assigned } do
-      signin_user
-
       visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_with_keyworker)
 
       expect(page).to have_css('h1', text: 'Allocation information')
@@ -47,8 +49,6 @@ feature "view an offender's allocation information" do
 
     it "displays 'Data not available'", :raven_intercept_exception,
        vcr: { cassette_name: :show_allocation_information_keyworker_not_assigned } do
-      signin_user
-
       visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_without_keyworker)
 
       expect(page).to have_css('h1', text: 'Allocation information')
@@ -69,8 +69,6 @@ feature "view an offender's allocation information" do
     end
 
     it "displays a link to the prisoner's New Nomis profile", vcr: { cassette_name: :show_allocation_information_new_nomis_profile } do
-      signin_user
-
       visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_with_keyworker)
 
       expect(page).to have_css('.govuk-table__cell', text: 'View NOMIS profile')
@@ -86,8 +84,6 @@ feature "view an offender's allocation information" do
     end
 
     it 'displays a link to allocate a co-worker', vcr: { cassette_name: :show_allocation_information_display_coworker_link } do
-      signin_user
-
       visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_with_keyworker)
 
       table_row = page.find(:css, 'tr.govuk-table__row', text: 'Co-working POM')
@@ -105,8 +101,6 @@ feature "view an offender's allocation information" do
       allocation.update!(event: AllocationVersion::ALLOCATE_SECONDARY_POM,
                          secondary_pom_nomis_id: 485_752,
                          secondary_pom_name: "Ross Jones")
-
-      signin_user
 
       visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_with_keyworker)
 
@@ -126,8 +120,6 @@ feature "view an offender's allocation information" do
     end
 
     it 'displays a link to the allocation history', vcr: { cassette_name: :show_allocation_information_history_link } do
-      signin_user
-
       visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_with_keyworker)
 
       table_row = page.find(:css, 'tr.govuk-table__row', text: 'Allocation history')
@@ -136,6 +128,33 @@ feature "view an offender's allocation information" do
         expect(page).to have_link('View')
         expect(page).to have_content("POM allocated - #{Time.zone.now.strftime('%d/%m/%Y')}")
       end
+    end
+
+    it 'does display change links' do
+      visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_with_keyworker)
+      expect(page).to have_content 'Change'
+    end
+  end
+
+  context 'with auto_delius_import enabled' do
+    let(:test_strategy) { Flipflop::FeatureSet.current.test! }
+
+    before do
+      test_strategy.switch!(:auto_delius_import, true)
+    end
+
+    after do
+      test_strategy.switch!(:auto_delius_import, false)
+    end
+
+    before do
+      create_case_information_for(nomis_offender_id_with_keyworker)
+      create_allocation(nomis_offender_id_with_keyworker)
+    end
+
+    it 'does not display change links' do
+      visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_with_keyworker)
+      expect(page).not_to have_content 'Change'
     end
   end
 
