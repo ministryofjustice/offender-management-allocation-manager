@@ -141,8 +141,18 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
       end
     end
 
+    context 'when date contains 8 stars' do
+      let!(:d1) { create(:delius_data, date_of_birth: '*' * 8) }
+
+      it 'creates a new case information record' do
+        expect {
+          described_class.perform_now d1.noms_no
+        }.to change(CaseInformation, :count).by(1)
+      end
+    end
+
     context 'when date invalid' do
-      let!(:d1) { create(:delius_data, date_of_birth: '******') }
+      let!(:d1) { create(:delius_data, date_of_birth: 'ohdearieme') }
 
       it 'creates an error record' do
         expect {
