@@ -32,6 +32,7 @@ gem 'fast_underscore', require: false
 gem 'flipflop'
 gem 'hashdiff', ['>= 1.0.0.beta1', '< 2.0.0']
 gem 'rubyzip'
+gem 'turnout'
 
 group :development, :test do
   gem 'brakeman'
