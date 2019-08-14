@@ -1,1 +1,14 @@
-<h1>Help</h1>
+<div class="govuk-grid-column govuk-body">
+  <p><%= back_link %></p>
+
+  <h1 class="govuk-heading-xl">Help</h1>
+
+    <h3 class="govuk-heading-m">Guidance</h3>
+    <p><%=link_to 'Read guidance', 'guidance' %> on how to set up the service to make allocations.</p>
+
+    <h3 class="govuk-heading-m">Contact us</h3>
+    <p>If you need help using the online service we can offer technical help.</p>
+    <p>You can contact us on:</p>
+    <span>Monday to Friday, 09:00am to 17:00pm</span>
+    <p><%=mail_to 'moic@digital.justice.gov.uk', 'moic@digital.justice.gov.uk' %></p>
+</div>
