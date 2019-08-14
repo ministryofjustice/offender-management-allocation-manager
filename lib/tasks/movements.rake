@@ -11,6 +11,6 @@ namespace :movements do
       Rails.logger = Logger.new(STDOUT)
     end
 
-    MovementsOnDateJob.perform_now(Time.zone.today.to_s)
+    MovementsOnDateJob.perform_later(Time.zone.today.to_s)
   end
 end
