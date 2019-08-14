@@ -45,19 +45,19 @@ RSpec.describe SearchController, type: :controller do
       with(
         body: "[754207]",
         headers: {
-          'Authorization'=>'Bearer token',
-          'Content-Type'=>'application/json',
-          'Expect'=>'',
-          'User-Agent'=>'Faraday v0.15.4'
+          'Authorization' => 'Bearer token',
+          'Content-Type' => 'application/json',
+          'Expect' => '',
+          'User-Agent' => 'Faraday v0.15.4'
         }).
-      to_return(status: 200, body:[
-        {"bookingId":754207,"offenderNo":"G4912VX","firstName":"EASTZO","lastName":"AUBUEL","agencyLocationId":"LEI",
-         "sentenceDetail":{"sentenceExpiryDate":"2014-02-16","automaticReleaseDate":"2011-01-28",
-                           "licenceExpiryDate":"2014-02-07","homeDetentionCurfewEligibilityDate":"2011-11-07",
-                           "bookingId":524586,"sentenceStartDate":"2009-02-08","automaticReleaseOverrideDate":"2012-03-17",
-                           "nonDtoReleaseDate":"2012-03-17","nonDtoReleaseDateType":"ARD","confirmedReleaseDate":"2012-03-17",
-                           "releaseDate":"2012-03-17"},"dateOfBirth":"1953-04-15","agencyLocationDesc":"LEEDS (HMP)",
-         "internalLocationDesc":"A-4-013","facialImageId":1399838}].to_json, headers: {})
+      to_return(status: 200, body: [
+        { "bookingId": 754_207, "offenderNo": "G4912VX", "firstName": "EASTZO", "lastName": "AUBUEL", "agencyLocationId": "LEI",
+          "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
+                              "licenceExpiryDate": "2014-02-07", "homeDetentionCurfewEligibilityDate": "2011-11-07",
+                              "bookingId": 524_586, "sentenceStartDate": "2009-02-08", "automaticReleaseOverrideDate": "2012-03-17",
+                              "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "confirmedReleaseDate": "2012-03-17",
+                              "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
+          "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 }].to_json, headers: {})
 
     stub_request(:get, elite2listapi).
       with(

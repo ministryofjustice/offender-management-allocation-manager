@@ -75,7 +75,7 @@ class OffenderService
         next false if SentenceType.civil?(offender.imprisonment_status)
 
         sentencing = sentence_details[offender.booking_id]
-        # TODO - if sentencing.present? is false, then we crash in offender#sentenced?
+        # TODO: - if sentencing.present? is false, then we crash in offender#sentenced?
         offender.sentence = sentencing if sentencing.present?
         next false unless offender.sentenced?
 
