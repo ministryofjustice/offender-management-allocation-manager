@@ -4,7 +4,7 @@ metadata:
   name: offender-manager-process-movements
 spec:
   schedule: "0 2 * * *"
-  startingDeadlineSeconds: 10
+  startingDeadlineSeconds: 180
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 1
@@ -53,10 +53,9 @@ metadata:
   name: offender-manager-delius-import
 spec:
   schedule: "15 20 * * *"
-  startingDeadlineSeconds: 10
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
-  failedJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
   jobTemplate:
     spec:
       template:
