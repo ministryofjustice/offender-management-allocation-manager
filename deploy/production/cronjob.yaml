@@ -52,7 +52,7 @@ kind: CronJob
 metadata:
   name: offender-manager-delius-import
 spec:
-  schedule: "15 20 * * *"
+  schedule: "15 21 * * *"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 2
