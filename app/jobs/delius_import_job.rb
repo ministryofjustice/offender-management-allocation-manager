@@ -16,6 +16,8 @@ class DeliusImportJob < ApplicationJob
     ].freeze
 
   def perform
+    ActiveRecord::Base.connection.disable_query_cache!
+
     username = ENV['DELIUS_EMAIL_USERNAME']
     password = ENV['DELIUS_EMAIL_PASSWORD']
     folder = ENV['DELIUS_EMAIL_FOLDER']
