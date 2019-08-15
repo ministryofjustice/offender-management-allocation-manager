@@ -19,6 +19,22 @@ class PomsController < PrisonsApplicationController
     @allocations = PrisonOffenderManagerService.get_allocated_offenders(
       @pom.staff_id, active_prison
     )
+    @allocations = sort_allocations(@allocations)
+  end
+
+  def sort_allocations(allocations)
+    if params['sort'].present?
+      sort_field, sort_direction = params['sort'].split.map(&:to_sym)
+    else
+      sort_field = :last_name
+      sort_direction = :asc
+    end
+
+    # cope with nil values by sorting using to_s - only dates and strings in these fields
+    allocations = allocations.sort_by { |sentence| sentence.public_send(sort_field).to_s }
+    allocations.reverse! if sort_direction == :desc
+
+    allocations
   end
 
   def edit
