@@ -7,7 +7,7 @@ metadata:
   annotations:
     kubernetes.io/change-cause: "<to be filled in deploy job command>"
 spec:
-  replicas: 3
+  replicas: 5
   revisionHistoryLimit: 1
   minReadySeconds: 10
   strategy:
@@ -41,6 +41,11 @@ spec:
               port: 3000
             initialDelaySeconds: 10
             periodSeconds: 60
+          resources:
+            limits:
+              cpu: "150m"
+            requests:
+              cpu: "100m"
           envFrom:
             - configMapRef:
                 name: shared-environment
@@ -70,12 +75,20 @@ spec:
         - name: allocation-manager-sidekiq
           image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
           imagePullPolicy: Always
-          command: ['sh', '-c', "bundle exec sidekiq -C config/sidekiq.yml"]
+#          The trigger call can be removed once the nDelius feature is fully enabled
+          command: ['sh', '-c', "bundle exec rake delius:trigger && bundle exec sidekiq -C config/sidekiq.yml"]
           envFrom:
             - configMapRef:
                 name: shared-environment
             - secretRef:
                 name: allocation-manager-secrets
+          resources:
+            limits:
+              memory: "500Mi"
+              cpu: "100m"
+            requests:
+              memory: "250Mi"
+              cpu: "50m"
           env:
             - name: POSTGRES_HOST
               valueFrom:
@@ -103,6 +116,13 @@ spec:
           command: ['sh', '-c', "bundle exec prometheus_exporter"]
           ports:
             - containerPort: 9394
+          resources:
+            limits:
+              memory: "200Mi"
+              cpu: "50m"
+            requests:
+              memory: "100Mi"
+              cpu: "10m"
           livenessProbe:
             httpGet:
               path: /metrics

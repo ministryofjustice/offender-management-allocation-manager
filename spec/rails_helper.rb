@@ -7,6 +7,7 @@ require 'rspec/rails'
 require 'spec_helper'
 require 'support/helpers/jwt_helper'
 require 'support/helpers/features_helper'
+require 'support/helpers/auth_helper'
 require 'capybara/rspec'
 require 'webmock/rspec'
 require 'paper_trail/frameworks/rspec'
@@ -48,6 +49,7 @@ RSpec.configure do |config|
   config.include ActiveSupport::Testing::TimeHelpers
   config.include JWTHelper
   config.include FeaturesHelper
+  config.include AuthHelper
 
   config.after(:each, :raven_intercept_exception) do
     Rails.configuration.sentry_dsn = nil
