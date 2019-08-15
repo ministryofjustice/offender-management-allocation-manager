@@ -16,7 +16,7 @@ module Nomis
 
         key = "pom_list_#{prison}"
 
-        data = Rails.cache.fetch(key, expires_in: 10.minutes) {
+        data = Rails.cache.fetch(key, expires_in: Rails.configuration.cache_expiry) {
           e2_client.get(route,  extra_headers: paging_options { |result|
             raise Nomis::Client::APIError, 'No data was returned' if result.empty?
           })
