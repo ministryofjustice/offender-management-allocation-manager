@@ -42,5 +42,7 @@ module OffenderManagementAllocationClient
     config.support_email = ENV['SUPPORT_EMAIL']&.strip
     config.redis_url = ENV['REDIS_URL']&.strip
     config.redis_auth = ENV['REDIS_AUTH']&.strip
+
+    config.cache_expiry = 60.minutes
   end
 end
