@@ -8,7 +8,7 @@ module Nomis
         h = Digest::SHA256.hexdigest(offender_no.to_s)
         key = "keyworker_details_for_offender_#{h}"
 
-        response = Rails.cache.fetch(key, expires_in: 10.minutes) {
+        response = Rails.cache.fetch(key, expires_in: Rails.configuration.cache_expiry) {
           client.get(route)
         }
         ApiDeserialiser.new.deserialise(Nomis::Models::KeyworkerDetails, response)
