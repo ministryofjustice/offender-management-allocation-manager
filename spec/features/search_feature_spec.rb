@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 feature 'Search for offenders' do
-  it 'Can search from the dashboard', vcr: { cassette_name: :search_feature } do
+  it 'Can search from the dashboard', vcr: { cassette_name: :dashboard_search_feature } do
     signin_user
     visit root_path
 
@@ -11,5 +11,41 @@ feature 'Search for offenders' do
 
     expect(page).to have_current_path(prison_search_path('LEI'), ignore_query: true)
     expect(page).to have_css('tbody tr', count: 6)
+  end
+
+  it 'Can search from the Allocations summary page', vcr: { cassette_name: :allocated_search_feature } do
+    signin_user
+    visit prison_summary_allocated_path('LEI')
+
+    expect(page).to have_text('See allocations')
+    fill_in 'q', with: 'Fra'
+    click_on('search-button')
+
+    expect(page).to have_current_path(prison_search_path('LEI'), ignore_query: true)
+    expect(page).to have_css('tbody tr', count: 9)
+  end
+
+  it 'Can search from the Awaiting Allocation summary page', vcr: { cassette_name: :waiting_allocation_search_feature } do
+    signin_user
+    visit prison_summary_unallocated_path('LEI')
+
+    expect(page).to have_text('Make allocations')
+    fill_in 'q', with: 'Tre'
+    click_on('search-button')
+
+    expect(page).to have_current_path(prison_search_path('LEI'), ignore_query: true)
+    expect(page).to have_css('tbody tr', count: 1)
+  end
+
+  it 'Can search from the Missing Information summary page', vcr: { cassette_name: :missing_info_search_feature } do
+    signin_user
+    visit  prison_summary_pending_path('LEI')
+
+    expect(page).to have_text('Make allocations')
+    fill_in 'q', with: 'Ste'
+    click_on('search-button')
+
+    expect(page).to have_current_path(prison_search_path('LEI'), ignore_query: true)
+    expect(page).to have_css('tbody tr', count: 4)
   end
 end
