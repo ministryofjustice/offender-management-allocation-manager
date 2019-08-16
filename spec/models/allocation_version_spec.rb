@@ -108,13 +108,15 @@ RSpec.describe AllocationVersion, type: :model do
 
   describe '#active?' do
     it 'return true if an Allocation has been assigned a Primary POM' do
-      expect(described_class.active?(nomis_offender_id)).to be(true)
+      alloc = AllocationService.current_allocation_for(nomis_offender_id)
+      expect(alloc.active?).to be(true)
     end
 
     it 'return false if an Allocation has not been assigned a Primary POM' do
       described_class.deallocate_primary_pom(nomis_staff_id)
+      alloc = AllocationService.current_allocation_for(nomis_offender_id)
 
-      expect(described_class.active?(nomis_offender_id)).to be(false)
+      expect(alloc.active?).to be(false)
     end
   end
 
