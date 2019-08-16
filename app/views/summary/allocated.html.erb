@@ -4,6 +4,9 @@
 
 <h1 class="govuk-heading-xl">Allocations</h1>
 
+<div class="govuk-!-margin-bottom-6 govuk-!-margin-top-6">
+  <%= render "search/search_box" %>
+</div>
 <%= render(:partial => 'tabs_start', :locals => {:active => :allocated}) %>
 
 <section class="govuk-tabs__panel" id="allocated">

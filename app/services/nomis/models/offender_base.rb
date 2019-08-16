@@ -22,6 +22,10 @@ module Nomis
       attribute :ldu, :string
       attribute :team, :string
 
+      def convicted?
+        convicted_status == 'Convicted'
+      end
+
       def sentenced?
         # A prisoner will have had a sentence calculation and for our purposes
         # this means that they will either have a:
