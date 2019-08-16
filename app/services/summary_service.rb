@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class SummaryService
-  PAGE_SIZE = 10 # The number of items to show in the view
+  PAGE_SIZE = 20 # The number of items to show in the view
 
   class SummaryParams
     attr_reader :sort_field, :sort_direction

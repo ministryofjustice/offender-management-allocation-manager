@@ -4,7 +4,17 @@ feature "view POM's caseload" do
   let(:nomis_staff_id) { 485_637 }
   let(:nomis_offender_id) { 'G4273GI' }
 
-  # create 11 allocations for prisoners named A-K so that we can verify that default sorted paging works
+  # create 21 allocations for prisoners named A-K so that we can verify that default sorted paging works
+  let!(:offender21_case_info) { create(:case_information, nomis_offender_id: 'G7266VD') }
+  let!(:offender20_case_info) { create(:case_information, nomis_offender_id: 'G8563UA') }
+  let!(:offender19_case_info) { create(:case_information, nomis_offender_id: 'G6068GV') }
+  let!(:offender18_case_info) { create(:case_information, nomis_offender_id: 'G0572VU') }
+  let!(:offender17_case_info) { create(:case_information, nomis_offender_id: 'G8668GF') }
+  let!(:offender16_case_info) { create(:case_information, nomis_offender_id: 'G9465UP') }
+  let!(:offender15_case_info) { create(:case_information, nomis_offender_id: 'G9372GQ') }
+  let!(:offender14_case_info) { create(:case_information, nomis_offender_id: 'G1618UI') }
+  let!(:offender13_case_info) { create(:case_information, nomis_offender_id: 'G4328GK') }
+  let!(:offender12_case_info) { create(:case_information, nomis_offender_id: 'G4143VX') }
   let!(:offender11_case_info) { create(:case_information, nomis_offender_id: 'G8180UO') }
   let!(:offender10_case_info) { create(:case_information, nomis_offender_id: 'G8909GV') }
   let!(:offender9_case_info) { create(:case_information, nomis_offender_id: 'G8339GD') }
@@ -21,14 +31,22 @@ feature "view POM's caseload" do
 
   context 'when paginating', vcr: { cassette_name: :show_poms_caseload } do
     before do
-      stub_const("NAMES", ["Abbella, Ozullirn", "Bennany, Yruicafar", "Cadary, Avncent", "Daijedo, Egvaning",
+      stub_const("NAMES", ["Abbella, Ozullirn", 'Allix, Aobmethani',
+                           'Almesa, Akoresjan', 'Amabeth, Eeonyan', 'Anasterie, Aobmethani', 'Andexia, Obinins',
+                           'Andoy, Demolarichard', 'Androne, Alblisdavid', 'Anikariah, Aeticake',
+                           'Annole, Omistius', 'Anslana, Diydonopher',
+                           "Bennany, Yruicafar", "Cadary, Avncent", "Daijedo, Egvaning",
                            'Ebonuardo, Omimchi', 'Felitha, Asjmonzo', 'Gabrijah, Eastzo', 'Hah, Dyfastoaul',
-                           'Ibriyah, Aiamce', 'Jabexia, Elnuunbo', 'Kaceria, Omaertain'])
+                           'Ibriyah, Aiamce', 'Jabexia, Elnuunbo', 'Kaceria, Omaertain'
+      ])
       signin_user('PK000223')
 
       [offender1_case_info, offender2_case_info, offender3_case_info, offender4_case_info,
        offender5_case_info, offender6_case_info, offender7_case_info, offender8_case_info,
-       offender9_case_info, offender10_case_info, offender11_case_info].each do |case_info|
+       offender9_case_info, offender10_case_info, offender11_case_info, offender12_case_info,
+       offender13_case_info, offender14_case_info, offender15_case_info, offender16_case_info,
+       offender17_case_info, offender18_case_info, offender19_case_info, offender20_case_info,
+       offender21_case_info].each do |case_info|
         visit prison_confirm_allocation_path('LEI', case_info.nomis_offender_id, nomis_staff_id)
         click_button 'Complete allocation'
       end
@@ -36,21 +54,21 @@ feature "view POM's caseload" do
     end
 
     it 'displays paginated cases for a specific POM' do
-      expect(page).to have_content("Showing 1 - 10 of 11 results")
+      expect(page).to have_content("Showing 1 - 20 of 21 results")
       expect(page).to have_content("Your caseload")
-      NAMES.first(10).each_with_index do |name, index|
+      NAMES.first(20).each_with_index do |name, index|
         within ".offender_row_#{index}" do
           expect(page).to have_content(name)
         end
       end
       click_link 'Next »'
-      expect(page).to have_content("Showing 11 - 11 of 11 results")
+      expect(page).to have_content("Showing 21 - 21 of 21 results")
       expect(page).to have_content(NAMES.last)
     end
 
     it 'can be reverse sorted by name' do
       click_link 'Prisoner name'
-      NAMES.last(10).reverse.each_with_index do |name, index|
+      NAMES.last(20).reverse.each_with_index do |name, index|
         within ".offender_row_#{index}" do
           expect(page).to have_content(name)
         end
@@ -59,11 +77,12 @@ feature "view POM's caseload" do
 
     it 'can be sorted by release date' do
       page.all('th')[2].find('a').click
+      save_and_open_page
       within '.offender_row_2' do
         expect(page).to have_content('Kaceria, Omaertain')
       end
       within '.offender_row_3' do
-        expect(page).to have_content('Gabrijah, Eastzo')
+        expect(page).to have_content('Anikariah, Aeticake')
       end
     end
 
@@ -85,7 +104,7 @@ feature "view POM's caseload" do
     it 'can be searched by role' do
       select 'Supporting', from: 'role'
       click_on 'Search'
-      expect(page).to have_content('Showing 1 - 7 of 7 results')
+      expect(page).to have_content('Showing 1 - 14 of 14 results')
     end
   end
 
