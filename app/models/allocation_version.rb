@@ -93,9 +93,8 @@ class AllocationVersion < ApplicationRecord
     end
   end
 
-  def self.active?(nomis_offender_id)
-    allocation = find_by(nomis_offender_id: nomis_offender_id)
-    !allocation.nil? && !allocation.primary_pom_nomis_id.nil?
+  def active?
+    primary_pom_nomis_id.present?
   end
 
   def override_reasons
