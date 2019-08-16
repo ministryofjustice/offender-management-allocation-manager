@@ -31,13 +31,12 @@ feature "view POM's caseload" do
 
   context 'when paginating', vcr: { cassette_name: :show_poms_caseload } do
     before do
-      stub_const("NAMES", ["Abbella, Ozullirn", 'Allix, Aobmethani',
-                           'Almesa, Akoresjan', 'Amabeth, Eeonyan', 'Anasterie, Aobmethani', 'Andexia, Obinins',
-                           'Andoy, Demolarichard', 'Androne, Alblisdavid', 'Anikariah, Aeticake',
-                           'Annole, Omistius', 'Anslana, Diydonopher',
-                           "Bennany, Yruicafar", "Cadary, Avncent", "Daijedo, Egvaning",
-                           'Ebonuardo, Omimchi', 'Felitha, Asjmonzo', 'Gabrijah, Eastzo', 'Hah, Dyfastoaul',
-                           'Ibriyah, Aiamce', 'Jabexia, Elnuunbo', 'Kaceria, Omaertain'
+      stub_const("NAMES", ["Abbella, Ozullirn", 'Allix, Aobmethani', 'Almesa, Akoresjan',
+                           'Amabeth, Eeonyan', 'Anasterie, Aobmethani', 'Andexia, Obinins', 'Andoy, Demolarichard',
+                           'Androne, Alblisdavid', 'Anikariah, Aeticake', 'Annole, Omistius', 'Anslana, Diydonopher',
+                           "Bennany, Yruicafar", "Cadary, Avncent", "Daijedo, Egvaning", 'Ebonuardo, Omimchi',
+                           'Felitha, Asjmonzo', 'Gabrijah, Eastzo', 'Hah, Dyfastoaul', 'Ibriyah, Aiamce',
+                           'Jabexia, Elnuunbo', 'Kaceria, Omaertain'
       ])
       signin_user('PK000223')
 
@@ -77,7 +76,6 @@ feature "view POM's caseload" do
 
     it 'can be sorted by release date' do
       page.all('th')[2].find('a').click
-      save_and_open_page
       within '.offender_row_2' do
         expect(page).to have_content('Kaceria, Omaertain')
       end
