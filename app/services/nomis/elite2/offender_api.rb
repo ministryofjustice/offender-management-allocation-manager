@@ -6,7 +6,7 @@ module Nomis
       extend Elite2Api
 
       # rubocop:disable Metrics/MethodLength
-      def self.list(prison, page = 0, page_size: 10)
+      def self.list(prison, page = 0, page_size: 20)
         route = "/elite2api/api/locations/description/#{prison}/inmates"
 
         queryparams = { 'convictedStatus' => 'Convicted', 'returnCategory' => true }

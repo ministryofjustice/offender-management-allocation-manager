@@ -7,7 +7,7 @@ class CaseloadController < PrisonsApplicationController
   breadcrumb -> { 'New cases' },
              -> { new_prison_caseload_path(active_prison) }, only: [:new]
 
-  PAGE_SIZE = 10
+  PAGE_SIZE = 20
 
   def index
     allocations = PrisonOffenderManagerService.get_allocated_offenders(

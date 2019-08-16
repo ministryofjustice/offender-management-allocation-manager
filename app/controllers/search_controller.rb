@@ -3,7 +3,7 @@
 class SearchController < PrisonsApplicationController
   breadcrumb 'Search', -> { prison_search_path(active_prison) }, only: [:search]
 
-  PAGE_SIZE = 10
+  PAGE_SIZE = 20
 
   def search
     @q = search_term

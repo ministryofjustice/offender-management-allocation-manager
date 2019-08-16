@@ -5,8 +5,8 @@ describe SummaryService do
   it "will generate a summary", vcr: { cassette_name: :allocation_summary_service_summary } do
     summary = described_class.summary(:pending, 'LEI', 15, SummaryService::SummaryParams.new)
 
-    expect(summary.offenders.count).to eq(10)
-    expect(summary.page_count).to eq(83)
+    expect(summary.offenders.count).to eq(20)
+    expect(summary.page_count).to eq(42)
   end
 
   it "will sort a summary", vcr: { cassette_name: :allocation_summary_service_summary_sort } do
