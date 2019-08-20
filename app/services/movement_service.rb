@@ -24,11 +24,13 @@ class MovementService
       return process_release(movement)
     end
 
-    # We think that an ADM without a fromAgency is from court so there
-    # will be nothing to delete/change.
+    # We need to check whether the from_agency is from without the prison estate
+    # to know whether it is a transfer.  If it isn't then we want to bail and
+    # not process the new admission.
     if movement.movement_type == Nomis::Models::MovementType::ADMISSION &&
       movement.direction_code == Nomis::Models::MovementDirection::IN &&
       movement.from_agency.present? &&
+      is_transfer?(movement.from_agency) &&
       movement.to_agency.present?
       return process_transfer(movement)
     end
@@ -58,6 +60,10 @@ private
                                           AllocationVersion::OFFENDER_RELEASED)
 
     true
+  end
+
+  def self.is_transfer?(from_agency_code)
+    PrisonService::PRISONS.include?(from_agency_code)
   end
 
   def self.should_process?(offender_no)
