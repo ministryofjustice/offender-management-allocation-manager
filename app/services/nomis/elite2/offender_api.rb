@@ -42,14 +42,10 @@ module Nomis
 
       def self.get_offender(offender_no)
         route = "/elite2api/api/prisoners/#{URI.encode_www_form_component(offender_no)}"
-        response = e2_client.get(route) { |data|
-          raise Nomis::Client::APIError, 'No data was returned' if data.empty?
-        }
+        response = e2_client.get(route)
+        return '' if response.empty?
 
         api_deserialiser.deserialise(Nomis::Models::Offender, response.first)
-      rescue Nomis::Client::APIError => e
-        AllocationManager::ExceptionHandler.capture_exception(e)
-        Nomis::Models::NullOffender.new
       end
 
       def self.get_offence(booking_id)

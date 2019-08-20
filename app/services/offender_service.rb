@@ -3,6 +3,8 @@
 class OffenderService
   def self.get_offender(offender_no)
     Nomis::Elite2::OffenderApi.get_offender(offender_no).tap { |o|
+      next false if o.blank?
+
       record = CaseInformation.find_by(nomis_offender_id: offender_no)
 
       if record.present?

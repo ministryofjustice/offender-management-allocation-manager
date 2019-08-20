@@ -59,13 +59,13 @@ describe Nomis::Elite2::OffenderApi do
       expect(response).to eq('C')
     end
 
-    it 'returns null if unable to find prisoner', :raven_intercept_exception,
+    it 'returns if unable to find prisoner',
        vcr: { cassette_name: :offender_api_null_offender_spec  } do
       noms_id = 'AAA22D'
 
       response = described_class.get_offender(noms_id)
 
-      expect(response).to be_instance_of(Nomis::Models::NullOffender)
+      expect(response).to eq ""
     end
   end
 end
