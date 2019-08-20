@@ -64,13 +64,14 @@ class SummaryService
 
     # For the allocated offenders, we need to provide the allocated POM's
     # name
+    offender_items = bucket.take(wanted_items, from) || []
+
     if summary_type == :allocated
-      offender_items = OffenderService.set_allocated_pom_name(
-        bucket.take(wanted_items, from) || [],
-        prison
-      )
-    else
-      offender_items = bucket.take(wanted_items, from) || []
+      offender_items.each { |offender|
+        alloc = active_allocations_hash[offender.offender_no]
+        offender.allocated_pom_name = alloc.primary_pom_name.titleize
+        offender.allocation_date = alloc.primary_pom_allocated_at
+      }
     end
 
     Summary.new(summary_type).tap { |summary|
