@@ -3,7 +3,7 @@ module DebuggingHelper
     if PrisonService::PRISONS.include?(code)
       PrisonService.name_for(code)
     else
-      "Location outside the prison estate"
+      'Location outside the prison estate'
     end
   end
 end
