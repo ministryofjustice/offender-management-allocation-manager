@@ -16,7 +16,6 @@ module OmniAuth
           caseloads: caseload_codes,
           roles: decode_roles
         }
-
       end
 
       #:nocov:
@@ -69,13 +68,14 @@ module OmniAuth
 
       def user_details
         @user_details = Nomis::Elite2::UserApi.user_details(username)
-        @user_details.nomis_caseloads = Nomis::Elite2::UserApi.user_caseloads(@user_details.staff_id)
+        @user_details.nomis_caseloads = Nomis::Elite2::UserApi.user_caseloads(
+          @user_details.staff_id)
         @user_details
       end
 
       def caseload_codes
         caseload_codes = []
-        @user_details.nomis_caseloads.each {|codes| caseload_codes << codes.first[1]}
+        @user_details.nomis_caseloads.each do |codes| caseload_codes << codes.first[1] end
         caseload_codes
       end
 
