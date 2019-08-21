@@ -3,7 +3,7 @@ require_relative '../../app/services/nomis/models/movement'
 
 describe MovementService do
   let!(:new_offender_court) { create(:movement, offender_no: 'G4273GI', from_agency: 'COURT')   }
-  let!(:new_offender_nil) { create(:movement, offender_no: 'G4273GI', from_agency: nil )   }
+  let!(:new_offender_nil) { create(:movement, offender_no: 'G4273GI', from_agency: nil)   }
   let!(:transfer_out) { create(:movement, offender_no: 'G4273GI', direction_code: 'OUT', movement_type: 'TRN')   }
 
   it "can get recent movements",

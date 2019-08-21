@@ -19,6 +19,7 @@ class MovementService
     movements
   end
 
+  # rubocop:disable Metrics/CyclomaticComplexity
   def self.process_movement(movement)
     if movement.movement_type == Nomis::Models::MovementType::RELEASE
       return process_release(movement)
@@ -30,13 +31,14 @@ class MovementService
     if movement.movement_type == Nomis::Models::MovementType::ADMISSION &&
       movement.direction_code == Nomis::Models::MovementDirection::IN &&
       movement.from_agency.present? &&
-      is_transfer?(movement.from_agency) &&
+      a_transfer?(movement.from_agency) &&
       movement.to_agency.present?
       return process_transfer(movement)
     end
 
     false
   end
+# rubocop:enable Metrics/CyclomaticComplexity
 
 private
 
@@ -62,7 +64,7 @@ private
     true
   end
 
-  def self.is_transfer?(from_agency_code)
+  def self.a_transfer?(from_agency_code)
     PrisonService::PRISONS.include?(from_agency_code)
   end
 
