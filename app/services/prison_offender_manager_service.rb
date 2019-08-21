@@ -43,7 +43,7 @@ class PrisonOffenderManagerService
   end
 
   def self.get_user_name(username)
-    user = Nomis::Custody::UserApi.user_details(username)
+    user = Nomis::Elite2::UserApi.user_details(username)
     [user.first_name, user.last_name]
   end
 
@@ -99,7 +99,7 @@ class PrisonOffenderManagerService
   end
 
   def self.get_signed_in_pom_details(current_user, prison)
-    user = Nomis::Custody::UserApi.user_details(current_user)
+    user = Nomis::Elite2::UserApi.user_details(current_user)
 
     poms_list = get_poms(prison)
     poms_list.select { |p| p.staff_id.to_i == user.staff_id.to_i }.first

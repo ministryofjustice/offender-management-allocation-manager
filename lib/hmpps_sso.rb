@@ -13,9 +13,10 @@ module OmniAuth
         {
           username: user_details.username,
           active_caseload: active_caseload.upcase,
-          caseloads: user_details.nomis_caseloads.keys.map(&:upcase),
+          caseloads: caseload_codes,
           roles: decode_roles
         }
+
       end
 
       #:nocov:
@@ -60,14 +61,22 @@ module OmniAuth
       end
 
       def active_caseload
-        caseload = user_details.active_nomis_caseload
+        caseload = user_details.active_case_load_id
         return caseload if caseload.present?
 
-        user_details.nomis_caseloads.keys.first
+        caseload_codes.first
       end
 
       def user_details
-        @user_details ||= Nomis::Custody::UserApi.user_details(username)
+        @user_details = Nomis::Elite2::UserApi.user_details(username)
+        @user_details.nomis_caseloads = Nomis::Elite2::UserApi.user_caseloads(@user_details.staff_id)
+        @user_details
+      end
+
+      def caseload_codes
+        caseload_codes = []
+        @user_details.nomis_caseloads.each {|codes| caseload_codes << codes.first[1]}
+        caseload_codes
       end
 
       #:nocov:

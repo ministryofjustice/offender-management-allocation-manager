@@ -17,15 +17,17 @@ describe OmniAuth::Strategies::HmppsSso do
       it 'returns a hash with the username, active caseload, caseloads and email address' do
         leeds_prison = 'LEI'
         username = 'PK000223'
+        staff_id = 485_637
         caseloads = { 'LEI' => '', 'RNI' => '' }
         response = double(
           'staff_details',
-          active_nomis_caseload: leeds_prison,
+          staff_id: staff_id,
           nomis_caseloads: caseloads,
+          active_nomis_caseload: leeds_prison,
           username: username
         )
+        allow(Nomis::Elite2::UserApi).to receive(:user_details).and_return(response)
 
-        allow(Nomis::Custody::UserApi).to receive(:user_details).and_return(response)
         allow(strategy).to receive(:username).and_return(username)
         allow(strategy).to receive(:decode_roles).and_return(['ROLE_ALLOC_MGR'])
 
@@ -44,7 +46,7 @@ describe OmniAuth::Strategies::HmppsSso do
           username: username
         )
 
-        allow(Nomis::Custody::UserApi).to receive(:user_details).and_return(response)
+        allow(Nomis::Elite2::UserApi).to receive(:user_details).and_return(response)
         allow(strategy).to receive(:username).and_return(username)
         allow(strategy).to receive(:decode_roles).and_return(['ROLE_ALLOC_MGR'])
 

@@ -80,6 +80,7 @@ module Nomis
           next unless record.key?('bookingId')
 
           oid = record['bookingId']
+
           hash[oid] = api_deserialiser.deserialise(
             Nomis::Models::SentenceDetail, record['sentenceDetail']
           )
@@ -87,6 +88,14 @@ module Nomis
           hash[oid].last_name = record['lastName']
           hash
         }
+      end
+
+      def self.get_image(booking_id)
+        details_route = '/elite2api/api/offender-sentences/bookings'
+        details = e2_client.post(details_route, [booking_id])
+
+        image_route = "/elite2api/api/images/#{details.first['facialImageId']}/data"
+        e2_client.raw_get(image_route)
       end
 
     private
