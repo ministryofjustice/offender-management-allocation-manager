@@ -21,7 +21,12 @@ module Nomis
       def self.movements_for(offender_no)
         route = '/elite2api/api/movements/offenders?movementTypes=ADM&movementTypes=TRN&movementTypes=REL&latestOnly=false'
 
-        data = e2_client.post(route, [offender_no])
+        if offender_no.is_a?(Array)
+          data = e2_client.post(route, offender_no)
+        else
+          data = e2_client.post(route, [offender_no])
+        end
+
         data.sort_by { |k| k['createDateTime'] }.map{ |movement|
           api_deserialiser.deserialise(Nomis::Movement, movement)
         }
