@@ -75,10 +75,34 @@ class SummaryService
       summary.page_count = page_count
     }
   end
-# rubocop:enable Metrics/CyclomaticComplexity
-# rubocop:enable Metrics/LineLength
-# rubocop:enable Metrics/MethodLength
-# rubocop:enable Metrics/PerceivedComplexity
+  # rubocop:enable Metrics/CyclomaticComplexity
+  # rubocop:enable Metrics/LineLength
+  # rubocop:enable Metrics/MethodLength
+  # rubocop:enable Metrics/PerceivedComplexity
+
+  def self.entered_prison_dates(offender_list)
+    return if offender_list.empty?
+
+    offenders = offender_list.map(&:offender_no)
+    prison_dates = []
+
+    unless offenders.nil?
+      omic_start_date = Date.new(2019, 2, 4)
+      movements = Nomis::Elite2::MovementApi.movements_for(offenders)
+
+      prison_dates = movements.map { |movement|
+        if movement.create_date_time.nil? ||
+            movement.create_date_time < omic_start_date
+          start_date = (Time.zone.today - omic_start_date).to_i
+        else
+          start_date = (Time.zone.today - movement.create_date_time).to_i
+        end
+        { offender_no: movement.offender_no, days_count: start_date }
+      }
+    end
+
+    prison_dates
+  end
 
 private
 

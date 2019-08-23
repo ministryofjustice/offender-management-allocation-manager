@@ -28,4 +28,19 @@ describe SummaryService do
 
     expect(asc_cells).not_to match_array(desc_cells)
   end
+
+  describe 'entered_prison_dates', vcr: { cassette_name: :allocation_summary_service_entered_prison_dates } do
+    asc_summary = described_class.summary(
+      :pending,
+      'LEI',
+      1,
+      SummaryService::SummaryParams.new(sort_field: :last_name)
+    )
+
+    it 'gets the prison dates for list of offenders' do
+      prison_dates = described_class.entered_prison_dates(asc_summary.offenders)
+      expect(prison_dates).to be_an(Array)
+      expect(prison_dates.first).to include(:offender_no, :days_count)
+    end
+  end
 end

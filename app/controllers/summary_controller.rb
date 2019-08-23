@@ -21,11 +21,13 @@ class SummaryController < PrisonsApplicationController
   def unallocated
     @summary = create_summary(:unallocated)
     @page_meta = @summary.page_meta(page)
+    @prison_dates = SummaryService.entered_prison_dates(@summary.offenders)
   end
 
   def pending
     @summary = create_summary(:pending)
     @page_meta = @summary.page_meta(page)
+    @prison_dates = SummaryService.entered_prison_dates(@summary.offenders)
   end
 
 private
