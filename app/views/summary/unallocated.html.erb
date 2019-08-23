@@ -61,7 +61,7 @@
           <%= case_owner_label(offender) %>
         </td>
         <td aria-label="Awaiting allocation for" class="govuk-table__cell">
-          <%= offender.awaiting_allocation_for %> days
+          <%= start_date(@prison_dates, offender.offender_no) %> days
         </td>
         <td aria-label="Action" class="govuk-table__cell ">
           <a href="<%= new_prison_allocation_path(@prison, offender.offender_no) %>">Allocate</a>
