@@ -84,24 +84,16 @@ class SummaryService
     return if offender_list.empty?
 
     offenders = offender_list.map(&:offender_no)
-    prison_dates = []
 
-    unless offenders.nil?
-      omic_start_date = Date.new(2019, 2, 4)
-      movements = Nomis::Elite2::MovementApi.movements_for(offenders)
+    return if offenders.nil?
 
-      prison_dates = movements.map { |movement|
-        if movement.create_date_time.nil? ||
-            movement.create_date_time < omic_start_date
-          start_date = (Time.zone.today - omic_start_date).to_i
-        else
-          start_date = (Time.zone.today - movement.create_date_time).to_i
-        end
-        { offender_no: movement.offender_no, days_count: start_date }
-      }
-    end
+    omic_start_date = Date.new(2019, 2, 4)
+    movements = Nomis::Elite2::MovementApi.movements_for(offenders)
 
-    prison_dates
+    movements.map { |movement|
+      prison_date = start_date(movement.create_date_time, omic_start_date)
+      { offender_no: movement.offender_no, days_count: prison_date }
+    }
   end
 
 private
@@ -112,5 +104,13 @@ private
 
     parts = name.split(' ')
     "#{parts[1]}, #{parts[0]}"
+  end
+
+  def self.start_date(prison_start_date, omic_date)
+    if prison_start_date.nil? || prison_start_date < omic_date
+      (Time.zone.today - omic_date).to_i
+    else
+      (Time.zone.today - prison_start_date).to_i
+    end
   end
 end
