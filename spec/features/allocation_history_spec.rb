@@ -4,7 +4,7 @@ feature 'Allocation History' do
   let!(:probation_pom) do
     {
       primary_pom_nomis_id: 485_752,
-      primary_pom_name: 'Ross Jones',
+      primary_pom_name: 'Jones, Ross',
       email: 'Ross.jonessss@digital.justice.gov.uk'
     }
   end
@@ -12,7 +12,7 @@ feature 'Allocation History' do
   let!(:prison_pom) do
     {
       primary_pom_nomis_id: 485_737,
-      primary_pom_name: 'Jay Heal',
+      primary_pom_name: 'Heal, Jay',
       email: 'jay.heal@digital.justice.gov.uk'
     }
   end
@@ -20,7 +20,7 @@ feature 'Allocation History' do
   let!(:probation_pom_2) do
     {
       primary_pom_nomis_id: 485_637,
-      primary_pom_name: 'Kath Pobee-Norris',
+      primary_pom_name: 'Pobee-Norris, Kath',
       email: 'kath.pobee-norris@digital.justice.gov.uk'
     }
   end
@@ -28,7 +28,7 @@ feature 'Allocation History' do
   let!(:pom_without_email) do
     {
       primary_pom_nomis_id: 485_636,
-      primary_pom_name: "#{Faker::Name.first_name} #{Faker::Name.last_name}"
+      primary_pom_name: "#{Faker::Name.last_name}, #{Faker::Name.first_name}"
     }
   end
 
