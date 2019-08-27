@@ -43,7 +43,7 @@ module Nomis
       def self.get_offender(offender_no)
         route = "/elite2api/api/prisoners/#{URI.encode_www_form_component(offender_no)}"
         response = e2_client.get(route)
-        return '' if response.empty?
+        return nil if response.empty?
 
         api_deserialiser.deserialise(Nomis::Models::Offender, response.first)
       end
