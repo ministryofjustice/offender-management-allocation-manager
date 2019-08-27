@@ -65,7 +65,7 @@ describe Nomis::Elite2::OffenderApi do
 
       response = described_class.get_offender(noms_id)
 
-      expect(response).to eq ""
+      expect(response).to be_nil
     end
   end
 end
