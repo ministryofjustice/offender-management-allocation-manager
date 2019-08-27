@@ -53,7 +53,7 @@ class SummaryService
     # we just want the last digit, so if there are 138 items, the last page should
     # show 8.
     wanted_items = number_items_wanted(
-      page_count == page,
+      page_count == page && page_count > 1,
       counts[summary_type].digits[0]
     )
     if params.sort_field.present?
