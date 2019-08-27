@@ -77,7 +77,6 @@ feature "view POM's caseload" do
 
     it 'can be sorted by release date' do
       page.all('th')[2].find('a').click
-      save_and_open_page
       within '.offender_row_2' do
         expect(page).to have_content('Kaceria, Omaertain')
       end
