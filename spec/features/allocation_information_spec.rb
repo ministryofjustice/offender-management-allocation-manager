@@ -81,7 +81,7 @@ feature "view an offender's allocation information" do
 
       allocation.update!(event: AllocationVersion::ALLOCATE_SECONDARY_POM,
                          secondary_pom_nomis_id: 485_752,
-                         secondary_pom_name: "Ross Jones")
+                         secondary_pom_name: "Jones, Ross")
 
       visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_with_keyworker)
 

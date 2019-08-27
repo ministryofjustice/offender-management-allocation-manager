@@ -20,7 +20,7 @@ class AllocationService
       PrisonOffenderManagerService.get_user_name(created_by_username)
 
     alloc_version.update!(
-      secondary_pom_name: "#{coworking_pom_firstname} #{coworking_pom_secondname}",
+      secondary_pom_name: "#{coworking_pom_secondname}, #{coworking_pom_firstname}",
       created_by_name: "#{user_firstname} #{user_secondname}",
       created_by_username: created_by_username,
       secondary_pom_nomis_id: secondary_pom_nomis_id,
@@ -46,7 +46,7 @@ class AllocationService
       PrisonOffenderManagerService.get_user_name(params[:created_by_username])
 
     params_copy = params.merge(
-      primary_pom_name: "#{pom_firstname} #{pom_secondname}",
+      primary_pom_name: "#{pom_secondname}, #{pom_firstname}",
       created_by_name: "#{user_firstname} #{user_secondname}",
       primary_pom_allocated_at: DateTime.now.utc
     )

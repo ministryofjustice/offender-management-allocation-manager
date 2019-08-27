@@ -64,13 +64,14 @@ class SummaryService
 
     # For the allocated offenders, we need to provide the allocated POM's
     # name
+    offender_items = bucket.take(wanted_items, from) || []
+
     if summary_type == :allocated
-      offender_items = OffenderService.set_allocated_pom_name(
-        bucket.take(wanted_items, from) || [],
-        prison
-      )
-    else
-      offender_items = bucket.take(wanted_items, from) || []
+      offender_items.each { |offender|
+        alloc = active_allocations_hash[offender.offender_no]
+        offender.allocated_pom_name = restructure_pom_name(alloc.primary_pom_name)
+        offender.allocation_date = alloc.primary_pom_allocated_at
+      }
     end
 
     Summary.new(summary_type).tap { |summary|
@@ -89,6 +90,14 @@ class SummaryService
 # rubocop:enable Metrics/PerceivedComplexity
 
 private
+
+  def self.restructure_pom_name(pom_name)
+    name = pom_name.titleize
+    return name if name.include? ','
+
+    parts = name.split(' ')
+    "#{parts[1]}, #{parts[0]}"
+  end
 
   def self.number_items_wanted(is_last_page, last_digit_of_count)
     if is_last_page && last_digit_of_count != 0
