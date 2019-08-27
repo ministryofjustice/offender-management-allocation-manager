@@ -186,6 +186,18 @@ jobs:
             curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
             chmod +x ./cc-test-reporter
       - run:
+          name: Setup MSOffice Crypt
+          command: |
+            mkdir ./build
+            cd ./build
+            git clone https://github.com/herumi/cybozulib
+            git clone https://github.com/herumi/msoffice
+            cd msoffice
+            make -j RELEASE=1
+            sudo mv ./bin/msoffice-crypt.exe /usr/local/bin/msoffice-crypt
+            cd ../..
+            rm -rf build
+      - run:
           name: Run tests
           command: |
             ./cc-test-reporter before-build

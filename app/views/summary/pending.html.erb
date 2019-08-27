@@ -2,8 +2,11 @@
   <%= render '/layouts/prison_switcher' %>
 <% end %>
 
-<h1 class="govuk-heading-xl">Allocations</h1>
+<h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Allocations</h1>
 
+<div class="govuk-!-margin-bottom-4">
+  <%= render "search/search_box" %>
+</div>
 <%= render(:partial => 'tabs_start', :locals => {:active => :pending}) %>
 
 <section class="govuk-tabs__panel" id="awaiting-information">
@@ -50,7 +53,13 @@
           <% end %>
         </td>
         <td aria-label="Waiting" class="govuk-table__cell"><%= offender.awaiting_allocation_for %> days</td>
-        <td aria-label="Action" class="govuk-table__cell "><%= link_to "Edit", new_prison_case_information_path(@prison, offender.offender_no) %></td>
+        <td aria-label="Action" class="govuk-table__cell" id="<%= "edit_#{offender.offender_no}" %>">
+          <% if auto_delius_import_enabled?(@prison) %>
+            <%= link_to "Update", prison_case_information_path(@prison, offender.offender_no) %>
+          <% else %>
+            <%= link_to "Edit", new_prison_case_information_path(@prison, offender.offender_no) %></td>
+          <% end %>
+        </td>
       </tr>
     <% end %>
     </tbody>
@@ -62,6 +71,4 @@
               :page_data => @page_meta,
               :param_name => 'page',
           }) %>
-</section>
-
 </section>

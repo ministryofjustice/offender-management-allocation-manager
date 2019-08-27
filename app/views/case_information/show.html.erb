@@ -1,0 +1,85 @@
+<%= render :partial => "/shared/backlink", :locals => { :page => prison_summary_pending_path(@prison) } %>
+
+<% if @delius_errors.any? %>
+  <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="error-summary">
+    <div class="govuk-error-summary__body">
+      <ul class="govuk-list govuk-error-summary__list">
+        <% @delius_errors.each do |error| %>
+          <li>
+            <%= delius_error_display(error.error_type) %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+<% end %>
+
+<h1 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-4">Case information</h1>
+
+<p class="govuk-!-margin-bottom-8">
+  <% if @delius_data.any? %>
+    Case information last updated from nDelius: <%= format_date(@delius_data.last.updated_at) %>
+  <% end %>
+  Next scheduled update: <%= format_date(@next_update_date) %>
+</p>
+
+<div class="govuk-!-margin-top-1">
+  <table class="govuk-table">
+    <tbody class="govuk-table__body">
+      <tr class="govuk-table__row">
+        <td class="govuk-table__header" scope="row">Prisoner</td>
+        <td class="govuk-table__cell"></td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell govuk-!-width-one-half">Name</td>
+        <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half"><%= @prisoner.full_name %></td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell govuk-!-width-one-half">Date of birth</td>
+        <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half"><%= format_date(@prisoner.date_of_birth) %></td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell govuk-!-width-one-half">Prisoner number</td>
+        <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
+          <%= @prisoner.offender_no %>
+          <span class="pull-right"><%= link_to 'View Full Profile', prison_prisoner_show_path(@prison, @prisoner.offender_no) %></span>
+        </td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell govuk-!-width-one-half">CRN number</td>
+        <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half" id="offender_crn">
+          <%= prisoner_crn_display(@prisoner, @delius_data) %>
+        </td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell govuk-!-width-one-half">Service provider</td>
+        <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
+          <%= service_provider_label(@prisoner.case_allocation) || 'Not found' %>
+        </td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell govuk-!-width-one-half">Tier calculation</td>
+        <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
+          <%= @prisoner.tier || 'Not found' %>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <%= render 'shared/offence_info' %>
+  <table class="govuk-table">
+    <tbody class="govuk-table__body">
+      <tr class="govuk-table__row">
+        <td class="govuk-table__header" scope="row">Community information</td>
+        <td class="govuk-table__cell"></td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell govuk-!-width-one-half">Local Divisional Unit (LDU)</td>
+        <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half"><%= @prisoner.ldu %></td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell govuk-!-width-one-half">Team</td>
+        <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half"><%= @prisoner.team %></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

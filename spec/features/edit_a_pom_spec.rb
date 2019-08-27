@@ -6,7 +6,7 @@ feature "edit a POM's details" do
   let(:nomis_offender_id) { 'G4273GI' }
 
   before do
-    CaseInformation.create(nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPC', omicable: 'Yes')
+    create(:case_information, nomis_offender_id: nomis_offender_id)
   end
 
   it "setting unavailable shows selected on re-edit", vcr: { cassette_name: :edit_poms_unavailable_check } do

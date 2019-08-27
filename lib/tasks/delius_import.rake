@@ -3,9 +3,9 @@
 require 'nokogiri'
 require_relative '../../lib/delius/processor'
 
-namespace :delius_import do
-  desc 'Loads delius information from a spreadsheet into the DB'
-  task :load, [:file] => [:environment] do |_task, args|
+namespace :delius_etl do
+  desc 'Loads delius information from a spreadsheet into DB and trigger'
+  task :import_file, [:file] => [:environment] do |_task, args|
     if defined?(Rails) && Rails.env.development?
       Rails.logger = Logger.new(STDOUT)
     end
@@ -14,23 +14,26 @@ namespace :delius_import do
     next if args[:file].blank?
 
     total = 0
+    row_count = 0
     processor = Delius::Processor.new(args[:file])
-    processor.run { |row|
+    processor.each do |row|
       record = {}
 
       row.each_with_index do |val, idx|
         key = fields[idx]
         record[key] = val
       end
-      record[:tier] = record[:tier].present? ? record[:tier][0] : ''
 
       if record[:noms_no].present?
-        DeliusData.upsert(record)
+        if DeliusDataService.upsert(record)
+          total += 1
+        end
         print "\r#{total}"
         $stdout.flush
-        total += 1
       end
-    }
+      row_count += 1
+    end
+    Rails.logger.info("#{row_count} Records processed #{total} changed records")
   end
 
   def fields
@@ -40,7 +43,7 @@ namespace :delius_import do
       :provider, :provider_code,
       :ldu, :ldu_code,
       :team, :team_code,
-      :mappa, :mappa_levels
+      :mappa, :mappa_levels, :date_of_birth
     ]
   end
 end

@@ -11,18 +11,6 @@ namespace :movements do
       Rails.logger = Logger.new(STDOUT)
     end
 
-    yesterday = Time.zone.today - 1.day
-
-    movements = MovementService.movements_on(
-      yesterday,
-      type_filters: [
-        Nomis::Models::MovementType::ADMISSION,
-        Nomis::Models::MovementType::RELEASE
-      ]
-    )
-
-    movements.each { |movement|
-      MovementService.process_movement(movement)
-    }
+    MovementsOnDateJob.perform_later(Time.zone.today.to_s)
   end
 end

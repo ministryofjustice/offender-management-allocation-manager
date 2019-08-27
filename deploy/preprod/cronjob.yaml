@@ -4,10 +4,9 @@ metadata:
   name: offender-manager-process-movements
 spec:
   schedule: "0 2 * * *"
-  startingDeadlineSeconds: 10
   concurrencyPolicy: Forbid
-  successfulJobsHistoryLimit: 3
-  failedJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
   jobTemplate:
     spec:
       template:
@@ -45,4 +44,52 @@ spec:
                   secretKeyRef:
                     name: allocation-rds-instance-output
                     key: postgres_user
+          restartPolicy: OnFailure
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: offender-manager-delius-import
+spec:
+  schedule: "15 20 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: delius-import
+              image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
+              imagePullPolicy: Always
+              command: ['sh', '-c', "bundle exec rails r DeliusImportJob.perform_later"]
+              envFrom:
+                - configMapRef:
+                    name: shared-environment
+                - secretRef:
+                    name: allocation-manager-secrets
+              env:
+                - name: PROMETHEUS_METRICS
+                  value: "off"
+                - name: POSTGRES_HOST
+                  valueFrom:
+                    secretKeyRef:
+                      name: allocation-rds-instance-output
+                      key: rds_instance_address
+                - name: POSTGRES_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: allocation-rds-instance-output
+                      key: postgres_password
+                - name: POSTGRES_NAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: allocation-rds-instance-output
+                      key: postgres_name
+                - name: POSTGRES_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: allocation-rds-instance-output
+                      key: postgres_user
           restartPolicy: OnFailure

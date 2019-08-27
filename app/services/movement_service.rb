@@ -28,7 +28,8 @@ class MovementService
     # will be nothing to delete/change.
     if movement.movement_type == Nomis::Models::MovementType::ADMISSION &&
       movement.direction_code == Nomis::Models::MovementDirection::IN &&
-      movement.from_agency.present?
+      movement.from_agency.present? &&
+      movement.to_agency.present?
       return process_transfer(movement)
     end
 
@@ -40,9 +41,10 @@ private
   def self.process_transfer(transfer)
     Rails.logger.info("Processing transfer for #{transfer.offender_no}")
 
+    return false unless should_process?(transfer.offender_no)
+
     AllocationVersion.deallocate_offender(transfer.offender_no,
                                           AllocationVersion::OFFENDER_TRANSFERRED)
-
     true
   end
 
@@ -56,5 +58,9 @@ private
                                           AllocationVersion::OFFENDER_RELEASED)
 
     true
+  end
+
+  def self.should_process?(offender_no)
+    OffenderService.get_offender(offender_no).convicted?
   end
 end

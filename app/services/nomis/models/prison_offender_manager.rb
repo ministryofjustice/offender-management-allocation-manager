@@ -42,14 +42,13 @@ module Nomis
       end
 
       def add_detail(pom_detail, prison)
-        allocations = AllocationVersion.active_primary_pom_allocations(
-          pom_detail.nomis_staff_id, prison)
-        allocation_counts = allocations.group_by(&:allocated_at_tier)
+        allocation_counts = AllocationVersion.active_primary_pom_allocations(
+          pom_detail.nomis_staff_id, prison).group(:allocated_at_tier).count
 
-        self.tier_a = allocation_counts.fetch('A', []).count
-        self.tier_b = allocation_counts.fetch('B', []).count
-        self.tier_c = allocation_counts.fetch('C', []).count
-        self.tier_d = allocation_counts.fetch('D', []).count
+        self.tier_a = allocation_counts.fetch('A', 0)
+        self.tier_b = allocation_counts.fetch('B', 0)
+        self.tier_c = allocation_counts.fetch('C', 0)
+        self.tier_d = allocation_counts.fetch('D', 0)
         self.total_cases = [tier_a, tier_b, tier_c, tier_d].sum
         self.status = pom_detail.status
         self.working_pattern = pom_detail.working_pattern

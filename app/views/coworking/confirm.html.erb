@@ -6,7 +6,7 @@
       <h1 class="govuk-heading-l govuk-!-margin-bottom-5">Confirm co-working allocation</h1>
       <p class="govuk-body">You are allocating co-working POM <%= "#{@secondary_pom.first_name} #{@secondary_pom.last_name}".titleize %> to <%= "#{@prisoner.first_name} #{@prisoner.last_name}".titleize %>.
         The responsible POM is <%= "#{@primary_pom.first_name} #{@primary_pom.last_name}".titleize %>.</p>
-      <% if @secondary_pom.emails.empty? %>
+      <% if @secondary_pom.emails.blank? %>
         <p class="govuk-body">No notification email will be sent to <%= "#{@secondary_pom.first_name} #{@secondary_pom.last_name}".titleize %> as they have no registered email address in NOMIS.</p>
       <% else %>
         <p class="govuk-body">We will send a confirmation email to <%= @secondary_pom.emails.first %></p>

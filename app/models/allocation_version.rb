@@ -93,9 +93,8 @@ class AllocationVersion < ApplicationRecord
     end
   end
 
-  def self.active?(nomis_offender_id)
-    allocation = find_by(nomis_offender_id: nomis_offender_id)
-    !allocation.nil? && !allocation.primary_pom_nomis_id.nil?
+  def active?
+    primary_pom_nomis_id.present?
   end
 
   def override_reasons
@@ -117,7 +116,15 @@ class AllocationVersion < ApplicationRecord
     alloc.recommended_pom_type = nil
     alloc.event = DEALLOCATE_PRIMARY_POM
     alloc.event_trigger = movement_type
-    alloc.prison = nil if alloc.event_trigger == 'offender_released'
+
+    # This is triggered when an offender is released, and previously we
+    # were setting their prison to nil to show that the current allocation
+    # object for this offender meant they were unallocated.  However, we use
+    # the absence of any POM ids to show the offender is allocated, and if
+    # we remove the prison, we remove the ability to see where the offender
+    # was released from. So now, we do not blank the prison.
+    #
+    # Perhaps a better event name is `OFFENDER_RELEASED`.
 
     alloc.save!
   end
@@ -139,8 +146,6 @@ class AllocationVersion < ApplicationRecord
             :nomis_booking_id,
             :allocated_at_tier,
             :event,
-            :event_trigger, presence: true
-
-  validates :prison, presence: true,
-                     unless: proc { |a| a.event_trigger == 'offender_released' }
+            :event_trigger,
+            :prison, presence: true
 end

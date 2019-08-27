@@ -86,6 +86,8 @@ describe MovementService do
   describe "processing an offender transfer" do
     let!(:allocation) { create(:allocation_version, nomis_offender_id: 'G4273GI')   }
     let!(:transfer_adm) { create(:movement, offender_no: 'G4273GI')   }
+    let!(:transfer_adm_no_to_agency) { create(:movement, offender_no: 'G4273GI', to_agency: nil)   }
+    let!(:transfer_in) { create(:movement, offender_no: 'G4273GI', direction_code: 'IN', movement_type: 'ADM', from_agency: 'VEI', to_agency: 'CFI')   }
 
     it "can process transfer movements IN",
        vcr: { cassette_name: :movement_service_transfer_in_spec }  do
@@ -96,6 +98,21 @@ describe MovementService do
       expect(updated_allocation.event).to eq 'deallocate_primary_pom'
       expect(updated_allocation.event_trigger).to eq 'offender_transferred'
       expect(processed).to be true
+    end
+
+    it "can process a movement with no 'to' agency",
+       vcr: { cassette_name: :movement_service_transfer_in_spec }  do
+      processed = described_class.process_movement(transfer_adm_no_to_agency)
+      expect(processed).to be false
+    end
+
+    it "will not process offenders on remand",
+       vcr: { cassette_name: :movement_service_transfer_in__not_convicted_spec }  do
+      allow(OffenderService).to receive(:get_offender).and_return(Nomis::Models::Offender.new.tap{ |o|
+        o.convicted_status = "Remand"
+      })
+      processed = described_class.process_movement(transfer_in)
+      expect(processed).to be false
     end
   end
 
@@ -110,7 +127,7 @@ describe MovementService do
 
       expect(CaseInformationService.get_case_information([release.offender_no])).to be_empty
       expect(updated_allocation.event_trigger).to eq 'offender_released'
-      expect(updated_allocation.prison).to be_nil
+      expect(updated_allocation.prison).to eq 'LEI'
       expect(processed).to be true
     end
   end

@@ -16,7 +16,9 @@ module Nomis
 
         key = "offender_list_#{prison}_#{page}_#{page_size}"
 
-        data, page_meta = Rails.cache.fetch(key, expires_in: 10.minutes) {
+        data, page_meta = Rails.cache.fetch(
+          key,
+          expires_in: Rails.configuration.cache_expiry) {
           page_meta = nil
 
           data = e2_client.get(
@@ -39,7 +41,7 @@ module Nomis
       # rubocop:enable Metrics/MethodLength
 
       def self.get_offender(offender_no)
-        route = "/elite2api/api/prisoners/#{offender_no}"
+        route = "/elite2api/api/prisoners/#{URI.encode_www_form_component(offender_no)}"
         response = e2_client.get(route) { |data|
           raise Nomis::Client::APIError, 'No data was returned' if data.empty?
         }
@@ -74,7 +76,7 @@ module Nomis
         h = Digest::SHA256.hexdigest(booking_ids.to_s)
         key = "bulk_sentence_#{h}"
 
-        data = Rails.cache.fetch(key, expires_in: 10.minutes) {
+        data = Rails.cache.fetch(key, expires_in: Rails.configuration.cache_expiry) {
           e2_client.post(route, booking_ids)
         }
 

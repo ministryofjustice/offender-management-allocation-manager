@@ -10,8 +10,13 @@ module PrisonHelper
   end
 
   def prison_switcher_path(prison, path)
-    # remove /prisons/LEI from URL (which the split turns into ['', 'prisons', 'LEI'])
-    paths = path.split('/')[3..].join('/')
-    "/prisons/#{prison}/#{paths}"
+    # They may be no referrer - go to dashboard
+    if path.present?
+      # remove /prisons/LEI from URL (which the split turns into ['', 'prisons', 'LEI'])
+      paths = path.split('/')[3..].join('/')
+      "/prisons/#{prison}/#{paths}"
+    else
+      "/prisons/#{prison}/dashboard"
+    end
   end
 end

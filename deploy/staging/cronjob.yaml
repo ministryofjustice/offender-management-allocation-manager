@@ -4,7 +4,6 @@ metadata:
   name: offender-manager-integration-test-cleanup
 spec:
   schedule: "0 0 * * *"
-  startingDeadlineSeconds: 10
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 1
@@ -45,103 +44,4 @@ spec:
                   secretKeyRef:
                     name: allocation-rds-instance-output
                     key: postgres_user
-          restartPolicy: OnFailure
----
-apiVersion: batch/v1beta1
-kind: CronJob
-metadata:
-  name: offender-manager-process-movements
-spec:
-  schedule: "0 2 * * *"
-  startingDeadlineSeconds: 10
-  concurrencyPolicy: Forbid
-  successfulJobsHistoryLimit: 3
-  failedJobsHistoryLimit: 1
-  jobTemplate:
-    spec:
-      template:
-        spec:
-          containers:
-          - name: process-movements
-            image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
-            imagePullPolicy: Always
-            command: ['sh', '-c', "bundle exec rake movements:process"]
-            envFrom:
-              - configMapRef:
-                  name: shared-environment
-              - secretRef:
-                  name: allocation-manager-secrets
-            env:
-              - name: PROMETHEUS_METRICS
-                value: "off"
-              - name: POSTGRES_HOST
-                valueFrom:
-                  secretKeyRef:
-                    name: allocation-rds-instance-output
-                    key: rds_instance_address
-              - name: POSTGRES_PASSWORD
-                valueFrom:
-                  secretKeyRef:
-                    name: allocation-rds-instance-output
-                    key: postgres_password
-              - name: POSTGRES_NAME
-                valueFrom:
-                  secretKeyRef:
-                    name: allocation-rds-instance-output
-                    key: postgres_name
-              - name: POSTGRES_USER
-                valueFrom:
-                  secretKeyRef:
-                    name: allocation-rds-instance-output
-                    key: postgres_user
-          restartPolicy: OnFailure
----
-apiVersion: batch/v1beta1
-kind: CronJob
-metadata:
-  name: offender-manager-custom-stats
-spec:
-#  Run every 15 minutes on staging - see if it works with perform_now but could be deferred with perform_later
-  schedule: "15 * * * *"
-  startingDeadlineSeconds: 10
-  concurrencyPolicy: Forbid
-  successfulJobsHistoryLimit: 3
-  failedJobsHistoryLimit: 1
-  jobTemplate:
-    spec:
-      template:
-        spec:
-          containers:
-            - name: custom-stats-logging
-              image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
-              imagePullPolicy: Always
-              command: ['sh', '-c', "bundle exec rails r CustomStatsLoggingJob.perform_now"]
-              envFrom:
-                - configMapRef:
-                    name: shared-environment
-                - secretRef:
-                    name: allocation-manager-secrets
-              env:
-                - name: PROMETHEUS_METRICS
-                  value: "off"
-                - name: POSTGRES_HOST
-                  valueFrom:
-                    secretKeyRef:
-                      name: allocation-rds-instance-output
-                      key: rds_instance_address
-                - name: POSTGRES_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: allocation-rds-instance-output
-                      key: postgres_password
-                - name: POSTGRES_NAME
-                  valueFrom:
-                    secretKeyRef:
-                      name: allocation-rds-instance-output
-                      key: postgres_name
-                - name: POSTGRES_USER
-                  valueFrom:
-                    secretKeyRef:
-                      name: allocation-rds-instance-output
-                      key: postgres_user
           restartPolicy: OnFailure

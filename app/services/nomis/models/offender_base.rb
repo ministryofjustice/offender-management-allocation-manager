@@ -19,6 +19,12 @@ module Nomis
       attribute :tier, :string
       attribute :sentence
       attribute :mappa_level, :integer
+      attribute :ldu, :string
+      attribute :team, :string
+
+      def convicted?
+        convicted_status == 'Convicted'
+      end
 
       def sentenced?
         # A prisoner will have had a sentence calculation and for our purposes

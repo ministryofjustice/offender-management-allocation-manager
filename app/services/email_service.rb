@@ -17,7 +17,7 @@ class EmailService
   end
 
   def send_email
-    return if @pom.emails.empty?
+    return if @pom.emails.blank?
 
     if @allocation.event == 'reallocate_primary_pom' && previous_pom.present?
       send_deallocation_email
@@ -26,7 +26,7 @@ class EmailService
   end
 
   def send_coworking_primary_email(pom_firstname, coworking_pom_name)
-    unless @pom.emails.empty?
+    if @pom.emails.present?
       PomMailer.allocate_coworking_pom(
         message: @message,
         pom_name: pom_firstname.capitalize,
@@ -40,7 +40,7 @@ class EmailService
   end
 
   def send_secondary_email(pom_firstname)
-    unless @pom.emails.empty?
+    if @pom.emails.present?
       PomMailer.secondary_allocation_email(
         message: @message,
         pom_name: pom_firstname.capitalize,

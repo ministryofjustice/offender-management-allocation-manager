@@ -2,9 +2,16 @@ require 'rails_helper'
 
 feature 'case information feature' do
   it 'adds tiering and case information for a prisoner', :raven_intercept_exception, vcr: { cassette_name: :case_information_feature } do
-    nomis_offender_id = 'G1821VA'
+    # This NOMIS id needs to appear on the first page of 'missing information'
+    nomis_offender_id = 'G2911GD'
 
     signin_user
+    visit prison_summary_pending_path('LEI')
+
+    expect(page).to have_content('Update information')
+    within "#edit_#{nomis_offender_id}" do
+      click_link 'Edit'
+    end
     visit new_prison_case_information_path('LEI', nomis_offender_id)
 
     choose('case_information_omicable_Yes')

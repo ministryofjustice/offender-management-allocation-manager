@@ -1,29 +1,14 @@
-<%= render :partial => "content", locals: { page: 0 } %>
+<div class="govuk-grid-column govuk-body">
+  <p><%= back_link %></p>
 
-<h1 class="govuk-heading-l govuk-!-margin-top-5">Get started with the allocations service</h1>
+  <h1 class="govuk-heading-xl">Help</h1>
 
-<div class="govuk-grid-column">
-  <div class="govuk-body">
+    <h3 class="govuk-heading-m">Guidance</h3>
+    <p><%=link_to 'Read guidance', 'guidance' %> on how to set up the service to make allocations.</p>
 
-    <p>You will be able to allocate prison offender managers to prisoners using the new allocations service.</p>
-
-    <p>There are a few tasks that need to be completed before you can start making allocations.
-      These need to be completed in the order that they are described in this guide.</p>
-
-    <p>You will need to work together to complete the set-up.</p>
-
-    <ul>
-      <li>Task 1: Senior Probation Officer (SPO) </li>
-      <li>Task 2: Local System Administrator </li>
-      <li>Task 3: Local System Administrator</li>
-      <li>Task 4: Senior Probation Officer (SPO) / Case admin</li>
-      <li>Task 5: Senior Probation Officer (SPO) / Case admin</li>
-      <li>Task 6: Senior Probation Officer (SPO)</li>
-    </ul>
-
-    <p>When you are set up, use Firefox to sign in to the service using your NOMIS ID
-        and password at:
-      <%= link_to("https://moic.service.justice.gov.uk", "https://moic.service.justice.gov.uk") %>
-    </p>
-  </div>
+    <h3 class="govuk-heading-m">Contact us</h3>
+    <p>If you need help using the online service we can offer technical help.</p>
+    <p>You can contact us on:</p>
+    <span>Monday to Friday, 09:00am to 17:00pm</span>
+    <p><%=mail_to 'moic@digital.justice.gov.uk', 'moic@digital.justice.gov.uk' %></p>
 </div>

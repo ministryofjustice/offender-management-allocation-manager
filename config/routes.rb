@@ -7,12 +7,13 @@ Rails.application.routes.draw do
   match "/503", :to => "errors#internal_server_error", :via => :all
 
   get '/help', to: 'pages#help'
-  get '/help_step1', to: 'pages#help_step1'
-  get '/help_step2', to: 'pages#help_step2'
-  get '/help_step3', to: 'pages#help_step3'
-  get '/help_step4', to: 'pages#help_step4'
-  get '/help_step5', to: 'pages#help_step5'
-  get '/help_step6', to: 'pages#help_step6'
+  get '/guidance', to: 'pages#guidance'
+  get '/guidance_step1', to: 'pages#guidance_step1'
+  get '/guidance_step2', to: 'pages#guidance_step2'
+  get '/guidance_step3', to: 'pages#guidance_step3'
+  get '/guidance_step4', to: 'pages#guidance_step4'
+  get '/guidance_step5', to: 'pages#guidance_step5'
+  get '/guidance_step6', to: 'pages#guidance_step6'
   get '/contact', to: 'pages#contact'
   post '/contact', to: 'pages#create_contact'
 
@@ -31,9 +32,8 @@ Rails.application.routes.draw do
     get('/allocations/:nomis_offender_id/history' => 'allocations#history', as: 'allocation_history')
     get('/allocations/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocations#confirm', as: 'confirm_allocation')
     get('/reallocations/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocations#confirm_reallocation', as: 'confirm_reallocation')
-    resource :case_information, only: %i[new create edit update], controller: 'case_information', path_names: {
+    resources :case_information, only: %i[new create edit update show], param: :nomis_offender_id, controller: 'case_information', path_names: {
         new: 'new/:nomis_offender_id',
-        edit: 'edit/:nomis_offender_id'
     }
     resources :coworking, only: [:new, :create, :destroy], param: :nomis_offender_id, path_names: {
       new: ':nomis_offender_id/new',

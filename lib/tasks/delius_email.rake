@@ -2,9 +2,9 @@
 
 require_relative '../../lib/delius/emails'
 
-namespace :delius_email do
+namespace :delius_etl do
   desc 'Fetches the most recent attachment from email'
-  task :fetch_latest, [:output_file] => [:environment] do |_task, args|
+  task :fetch_latest_email, [:output_file] => [:environment] do |_task, args|
     if defined?(Rails) && Rails.env.development?
       Rails.logger = Logger.new(STDOUT)
     end
@@ -28,6 +28,8 @@ namespace :delius_email do
       else
         Rails.logger.error('Unable to find an attachment')
       end
+
+      emails.cleanup
     }
   end
 end
