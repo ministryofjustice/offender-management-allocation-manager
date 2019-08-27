@@ -18,7 +18,7 @@ private
   end
 
   def offender(offender_no)
-    return [] if offender_no.blank?
+    return nil if offender_no.blank?
 
     OffenderService.get_offender(offender_no)
   end
