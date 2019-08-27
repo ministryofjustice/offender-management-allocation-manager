@@ -45,6 +45,7 @@ Rails.application.routes.draw do
     resource :overrides,  only: %i[ new create ], path_names: { new: 'new/:nomis_offender_id/:nomis_staff_id'}
     resources :poms, only: %i[ index show edit update ], param: :nomis_staff_id
 
+    get('/debugging' => 'debugging#debugging')
     get('/search' => 'search#search')
 
     get('/summary' => 'summary#index')
