@@ -45,7 +45,7 @@ module Nomis
       end
 
       def over_18?
-        age > 18
+        age >= 18
       end
 
       def awaiting_allocation_for
