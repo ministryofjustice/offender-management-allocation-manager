@@ -21,6 +21,8 @@ private
   def import(delius_record)
     offender = OffenderService.get_offender(delius_record.noms_no)
 
+    return unless offender.present? && offender.convicted?
+
     if auto_delius_import_enabled?(offender.latest_location_id)
       if dob_matches?(offender, delius_record)
         process_record(delius_record)
