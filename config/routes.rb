@@ -46,6 +46,7 @@ Rails.application.routes.draw do
     resources :poms, only: %i[ index show edit update ], param: :nomis_staff_id
 
     get('/debugging' => 'debugging#debugging')
+    resources :feedback, only: %i[ new create ]
     get('/search' => 'search#search')
 
     get('/summary' => 'summary#index')

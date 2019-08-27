@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_13_080602) do
+ActiveRecord::Schema.define(version: 2019_08_27_072512) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -88,6 +88,14 @@ ActiveRecord::Schema.define(version: 2019_08_13_080602) do
     t.integer "error_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "feedback_submissions", force: :cascade do |t|
+    t.text "body", null: false
+    t.string "email_address"
+    t.string "referrer"
+    t.string "user_agent"
+    t.string "prison_id"
   end
 
   create_table "flipflop_features", force: :cascade do |t|
