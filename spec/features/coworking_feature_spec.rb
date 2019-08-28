@@ -95,7 +95,7 @@ feature 'Co-working' do
 
       allocation.reload
       expect(allocation.secondary_pom_nomis_id).to eq(secondary_pom[:staff_id])
-      expect(allocation.secondary_pom_name).to eq(secondary_pom[:pom_name].upcase)
+      expect(allocation.secondary_pom_name).to eq("POBEE-NORRIS, KATH")
 
       visit prison_allocation_path('LEI', nomis_offender_id)
       within '#co-working-pom' do

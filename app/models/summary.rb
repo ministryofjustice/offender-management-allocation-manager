@@ -28,7 +28,7 @@ private
 
   def new_page_meta(current_page)
     PageMeta.new.tap{ |p|
-      p.size = 10
+      p.size = 20
       p.number = current_page
     }
   end

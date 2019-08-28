@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class SummaryService
-  PAGE_SIZE = 10 # The number of items to show in the view
+  PAGE_SIZE = 20 # The number of items to show in the view
 
   class SummaryParams
     attr_reader :sort_field, :sort_direction
@@ -49,13 +49,6 @@ class SummaryService
 
     page_count = (counts[summary_type] / PAGE_SIZE.to_f).ceil
 
-    # If we are on the last page, we don't always want 10 items from the bucket
-    # we just want the last digit, so if there are 138 items, the last page should
-    # show 8.
-    wanted_items = number_items_wanted(
-      page_count == page,
-      counts[summary_type].digits[0]
-    )
     if params.sort_field.present?
       bucket.sort(params.sort_field, params.sort_direction)
     end
@@ -64,13 +57,14 @@ class SummaryService
 
     # For the allocated offenders, we need to provide the allocated POM's
     # name
+    offender_items = bucket.take(PAGE_SIZE, from) || []
+
     if summary_type == :allocated
-      offender_items = OffenderService.set_allocated_pom_name(
-        bucket.take(wanted_items, from) || [],
-        prison
-      )
-    else
-      offender_items = bucket.take(wanted_items, from) || []
+      offender_items.each { |offender|
+        alloc = active_allocations_hash[offender.offender_no]
+        offender.allocated_pom_name = restructure_pom_name(alloc.primary_pom_name)
+        offender.allocation_date = alloc.primary_pom_allocated_at
+      }
     end
 
     Summary.new(summary_type).tap { |summary|
@@ -90,11 +84,11 @@ class SummaryService
 
 private
 
-  def self.number_items_wanted(is_last_page, last_digit_of_count)
-    if is_last_page && last_digit_of_count != 0
-      last_digit_of_count
-    else
-      PAGE_SIZE
-    end
+  def self.restructure_pom_name(pom_name)
+    name = pom_name.titleize
+    return name if name.include? ','
+
+    parts = name.split(' ')
+    "#{parts[1]}, #{parts[0]}"
   end
 end
