@@ -49,13 +49,6 @@ class SummaryService
 
     page_count = (counts[summary_type] / PAGE_SIZE.to_f).ceil
 
-    # If we are on the last page, we don't always want 10 items from the bucket
-    # we just want the last digit, so if there are 138 items, the last page should
-    # show 8.
-    wanted_items = number_items_wanted(
-      page_count == page && page_count > 1,
-      counts[summary_type].digits[0]
-    )
     if params.sort_field.present?
       bucket.sort(params.sort_field, params.sort_direction)
     end
@@ -64,7 +57,7 @@ class SummaryService
 
     # For the allocated offenders, we need to provide the allocated POM's
     # name
-    offender_items = bucket.take(wanted_items, from) || []
+    offender_items = bucket.take(PAGE_SIZE, from) || []
 
     if summary_type == :allocated
       offender_items.each { |offender|
@@ -97,13 +90,5 @@ private
 
     parts = name.split(' ')
     "#{parts[1]}, #{parts[0]}"
-  end
-
-  def self.number_items_wanted(is_last_page, last_digit_of_count)
-    if is_last_page && last_digit_of_count != 0
-      last_digit_of_count
-    else
-      PAGE_SIZE
-    end
   end
 end
