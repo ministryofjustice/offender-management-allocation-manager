@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class SummaryService
-  PAGE_SIZE = 10 # The number of items to show in the view
+  PAGE_SIZE = 20 # The number of items to show in the view
 
   class SummaryParams
     attr_reader :sort_field, :sort_direction
@@ -53,7 +53,7 @@ class SummaryService
     # we just want the last digit, so if there are 138 items, the last page should
     # show 8.
     wanted_items = number_items_wanted(
-      page_count == page,
+      page_count == page && page_count > 1,
       counts[summary_type].digits[0]
     )
     if params.sort_field.present?
