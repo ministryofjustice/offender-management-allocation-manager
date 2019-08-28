@@ -60,7 +60,7 @@ module OmniAuth
       end
 
       def active_caseload
-        caseload = user_details.active_case_load_id
+        caseload = @user_details.active_case_load_id
         return caseload if caseload.present?
 
         caseload_codes.first
@@ -74,9 +74,9 @@ module OmniAuth
       end
 
       def caseload_codes
-        caseload_codes = []
-        @user_details.nomis_caseloads.each do |codes| caseload_codes << codes.first[1] end
-        caseload_codes
+        @caseload_codes = @user_details.nomis_caseloads.map { |codes|
+          codes['caseLoadId']
+        }
       end
 
       #:nocov:

@@ -18,7 +18,7 @@ describe OmniAuth::Strategies::HmppsSso do
         leeds_prison = 'LEI'
         username = 'PK000223'
         staff_id = 485_637
-        caseloads = { 'LEI' => '', 'RNI' => '' }
+        caseloads = %w[LEI RNI]
         response = double(
           'staff_details',
           staff_id: staff_id,
@@ -26,6 +26,11 @@ describe OmniAuth::Strategies::HmppsSso do
           active_nomis_caseload: leeds_prison,
           username: username
         )
+        allow(response).to receive(:staff_id).and_return(staff_id)
+        allow(response).to receive(:active_case_load_id).and_return('LEI')
+
+        allow(response).to receive(:nomis_caseloads=)
+        allow(response).to receive(:nomis_caseloads).and_return(caseloads)
         allow(Nomis::Elite2::UserApi).to receive(:user_details).and_return(response)
 
         allow(strategy).to receive(:username).and_return(username)
@@ -37,15 +42,21 @@ describe OmniAuth::Strategies::HmppsSso do
 
       it 'sets active caseload from nomis caseloads if not present' do
         leeds_prison = 'LEI'
-        username = 'Frank'
-        caseloads = { 'LEI' => '', 'RNI' => '' }
+        username = 'PK000223'
+        staff_id = 485_637
+        caseloads = [{ "caseLoadId" => "LEI" }, { "caseLoadId" => "PVI" }, { "caseLoadId" => "SWI" }, { "caseLoadId" => "VEI" }, { "caseLoadId" => "WEI" }]
         response = double(
           'staff_details',
-          active_nomis_caseload: nil,
+          staff_id: staff_id,
           nomis_caseloads: caseloads,
+          active_nomis_caseload: leeds_prison,
           username: username
         )
+        allow(response).to receive(:staff_id).and_return(staff_id)
+        allow(response).to receive(:active_case_load_id).and_return(nil)
 
+        allow(response).to receive(:nomis_caseloads=)
+        allow(response).to receive(:nomis_caseloads).and_return(caseloads)
         allow(Nomis::Elite2::UserApi).to receive(:user_details).and_return(response)
         allow(strategy).to receive(:username).and_return(username)
         allow(strategy).to receive(:decode_roles).and_return(['ROLE_ALLOC_MGR'])
