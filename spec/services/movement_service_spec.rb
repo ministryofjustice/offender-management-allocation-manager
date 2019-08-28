@@ -2,7 +2,8 @@ require 'rails_helper'
 require_relative '../../app/services/nomis/models/movement'
 
 describe MovementService do
-  let!(:new_offender) { create(:movement, offender_no: 'G4273GI', from_agency: nil)   }
+  let!(:new_offender_court) { create(:movement, offender_no: 'G4273GI', from_agency: 'COURT')   }
+  let!(:new_offender_nil) { create(:movement, offender_no: 'G4273GI', from_agency: nil)   }
   let!(:transfer_out) { create(:movement, offender_no: 'G4273GI', direction_code: 'OUT', movement_type: 'TRN')   }
 
   it "can get recent movements",
@@ -77,9 +78,15 @@ describe MovementService do
     expect(processed).to be false
   end
 
-  it "can ignore new offenders arriving at prison",
-     vcr: { cassette_name: :movement_service_ignore_new_spec }  do
-    processed = described_class.process_movement(new_offender)
+  it "can ignore new offenders arriving at prison when from_agency is outside the prison estate",
+     vcr: { cassette_name: :movement_service_ignore_new__from_court_spec }  do
+    processed = described_class.process_movement(new_offender_court)
+    expect(processed).to be false
+  end
+
+  it "can ignore new offenders arriving at prison when from_agency is nil",
+     vcr: { cassette_name: :movement_service_ignore_new_from_nil_spec }  do
+    processed = described_class.process_movement(new_offender_nil)
     expect(processed).to be false
   end
 
