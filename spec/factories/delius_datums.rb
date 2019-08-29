@@ -10,7 +10,7 @@ FactoryBot.define do
       'G4281GV'
     end
     crn do
-      Faker::Number.number(8)
+      Faker::Number.number(digits: 8)
     end
     # This has to match the T3 record for G4281GV above
     date_of_birth do '11/11/1964' end
