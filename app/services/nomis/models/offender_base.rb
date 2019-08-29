@@ -44,6 +44,10 @@ module Nomis
         SentenceTypeService.indeterminate_sentence?(imprisonment_status)
       end
 
+      def recalled?
+        SentenceTypeService.recall_sentence?(imprisonment_status)
+      end
+
       def over_18?
         age >= 18
       end

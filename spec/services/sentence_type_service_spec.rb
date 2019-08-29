@@ -13,6 +13,18 @@ describe SentenceTypeService do
     expect(described_class.indeterminate_sentence?(off.imprisonment_status)).to eq true
   end
 
+  it "can determine recall sentences" do
+    off = Nomis::Models::OffenderSummary.new.tap { |o| o.imprisonment_status = 'LR_HDC' }
+
+    expect(described_class.recall_sentence?(off.imprisonment_status)).to eq true
+  end
+
+  it "can determine non-recall sentences" do
+    off = Nomis::Models::OffenderSummary.new.tap { |o| o.imprisonment_status = 'IPP' }
+
+    expect(described_class.recall_sentence?(off.imprisonment_status)).to eq false
+  end
+
   it "can describe a sentence for an offender" do
     off = Nomis::Models::OffenderSummary.new.tap { |o| o.imprisonment_status = 'IPP' }
     desc = described_class.describe_sentence(off.imprisonment_status)

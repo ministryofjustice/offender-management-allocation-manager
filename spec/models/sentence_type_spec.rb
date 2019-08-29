@@ -8,6 +8,7 @@ RSpec.describe SentenceType, type: :model do
     expect(sentence_type.code).to eq('IPP')
     expect(sentence_type.description).to eq('Indeterminate Sent for Public Protection')
     expect(sentence_type.duration_type).to eq(SentenceType::INDETERMINATE)
+    expect(sentence_type.recall_status).to eq(SentenceType::NON_RECALL)
   end
 
   it 'can handle offenders with no sentence' do
