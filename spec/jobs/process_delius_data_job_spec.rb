@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }, type: :job do
   let(:nomis_offender_id) { 'G4281GV' }
+  let(:remand_nomis_offender_id) { 'G3716UD' }
 
   context 'with auto_delius_import enabled' do
     let(:test_strategy) { Flipflop::FeatureSet.current.test! }
@@ -37,6 +38,16 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
         expect {
           described_class.perform_now d1.noms_no
         }.to change(CaseInformation, :count).by(1)
+      end
+    end
+
+    context 'when offender is not convicted' do
+      let!(:d1) { create(:delius_data, noms_no: remand_nomis_offender_id) }
+
+      it 'does not case information' do
+        expect {
+          described_class.perform_now d1.noms_no
+        }.to change(CaseInformation, :count).by(0)
       end
     end
 
@@ -141,8 +152,18 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
       end
     end
 
+    context 'when date contains 8 stars' do
+      let!(:d1) { create(:delius_data, date_of_birth: '*' * 8) }
+
+      it 'creates a new case information record' do
+        expect {
+          described_class.perform_now d1.noms_no
+        }.to change(CaseInformation, :count).by(1)
+      end
+    end
+
     context 'when date invalid' do
-      let!(:d1) { create(:delius_data, date_of_birth: '******') }
+      let!(:d1) { create(:delius_data, date_of_birth: 'ohdearieme') }
 
       it 'creates an error record' do
         expect {

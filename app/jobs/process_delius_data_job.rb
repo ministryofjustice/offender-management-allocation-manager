@@ -21,6 +21,12 @@ private
   def import(delius_record)
     offender = OffenderService.get_offender(delius_record.noms_no)
 
+    if offender.nil?
+      return logger.error("Failed to retrieve NOMIS record #{delius_record.noms_no}")
+    end
+
+    return unless offender.convicted?
+
     if auto_delius_import_enabled?(offender.latest_location_id)
       if dob_matches?(offender, delius_record)
         process_record(delius_record)
@@ -29,13 +35,12 @@ private
                                   error_type: DeliusImportError::MISMATCHED_DOB
       end
     end
-  rescue Nomis::Client::APIError
-    logger.error("Failed to retrieve NOMIS record #{delius_record.noms_no}")
   end
 
   def dob_matches?(offender, delius_record)
     delius_record.date_of_birth.present? &&
-      offender.date_of_birth == safe_date_parse(delius_record.date_of_birth)
+      (delius_record.date_of_birth == ('*' * 8) ||
+      offender.date_of_birth == safe_date_parse(delius_record.date_of_birth))
   end
 
   def safe_date_parse(dob)

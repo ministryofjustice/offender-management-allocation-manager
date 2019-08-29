@@ -6,7 +6,7 @@
     <%= form_tag(prison_allocations_path(@prison), id: "confirm_allocation_form") do %>
       <h1 class="govuk-heading-xl govuk-!-margin-top-4">Confirm allocation</h1>
       <p class="govuk-body">You are allocating <%= "#{@prisoner.first_name} #{@prisoner.last_name}".titleize %> to <%= "#{@pom.first_name} #{@pom.last_name}".titleize %>.</p>
-      <% if @pom.emails.empty? %>
+      <% if @pom.emails.blank? %>
         <p class="govuk-body">No notification email will be sent to <%= "#{@pom.first_name} #{@pom.last_name}".titleize %> as they have no registered email address in NOMIS.</p>
       <% else %>
         <p class="govuk-body">We will send a confirmation email to <%= @pom.emails.first %>.</p>

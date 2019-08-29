@@ -22,6 +22,10 @@ module Nomis
       attribute :ldu, :string
       attribute :team, :string
 
+      def convicted?
+        convicted_status == 'Convicted'
+      end
+
       def sentenced?
         # A prisoner will have had a sentence calculation and for our purposes
         # this means that they will either have a:
@@ -38,6 +42,10 @@ module Nomis
         sentence.home_detention_curfew_eligibility_date.present? ||
         sentence.tariff_date.present? ||
         SentenceTypeService.indeterminate_sentence?(imprisonment_status)
+      end
+
+      def over_18?
+        age >= 18
       end
 
       def awaiting_allocation_for

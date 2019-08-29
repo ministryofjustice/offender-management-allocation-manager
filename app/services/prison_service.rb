@@ -130,6 +130,10 @@ class PrisonService
     'WYI' => PrisonInfo.new('WYI', 'HMP/YOI Wetherby', :england)
   }
 
+  def self.prison_codes
+    PRISONS.keys
+  end
+
   def self.name_for(code)
     PRISONS[code]&.name
   end

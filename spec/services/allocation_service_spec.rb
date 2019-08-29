@@ -20,7 +20,7 @@ describe AllocationService do
       create(:allocation_version,
              nomis_offender_id: nomis_offender_id,
              primary_pom_nomis_id: primary_pom_id,
-             primary_pom_name: 'ROSS JONES')
+             primary_pom_name: 'JONES, ROSS')
     }
 
     it 'sends an email to both primary and secondary POMS', vcr: { cassette_name: :allocation_service_allocate_secondary } do
@@ -31,7 +31,7 @@ describe AllocationService do
                                            message: message
         )
         expect(allocation.reload.secondary_pom_nomis_id).to eq(secondary_pom_id)
-        expect(allocation.reload.secondary_pom_name).to eq('KATH POBEE-NORRIS')
+        expect(allocation.reload.secondary_pom_name).to eq('POBEE-NORRIS, KATH')
       }.to change(enqueued_jobs, :count).by(2)
 
       primary_email_job, secondary_email_job = enqueued_jobs.last(2)
@@ -44,7 +44,7 @@ describe AllocationService do
             "pom_name" => "Ross",
             "offender_name" => "Abdoria, Ongmetain",
             "nomis_offender_id" => "G7806VO",
-            "coworking_pom_name" => "KATH POBEE-NORRIS",
+            "coworking_pom_name" => "POBEE-NORRIS, KATH",
             "pom_email" => "Ross.jonessss@digital.justice.gov.uk",
             "url" => "http://localhost:3000/prisons/LEI/caseload"
           ))
@@ -58,7 +58,7 @@ describe AllocationService do
             "offender_name" => "Abdoria, Ongmetain",
             "nomis_offender_id" => "G7806VO",
             "responsibility" => "supporting",
-            "responsible_pom_name" => 'ROSS JONES',
+            "responsible_pom_name" => 'JONES, ROSS',
             "pom_email" => "kath.pobee-norris@digital.justice.gov.uk",
             "url" => "http://localhost:3000/prisons/LEI/caseload"
           ))
@@ -76,7 +76,8 @@ describe AllocationService do
         nomis_booking_id: 1,
         recommended_pom_type: 'probation',
         event: AllocationVersion::ALLOCATE_PRIMARY_POM,
-        event_trigger: AllocationVersion::USER
+        event_trigger: AllocationVersion::USER,
+        created_by_username: 'PK000223'
       }
 
       described_class.create_or_update(params)
@@ -92,7 +93,8 @@ describe AllocationService do
         nomis_offender_id: nomis_offender_id,
         allocated_at_tier: 'B',
         primary_pom_nomis_id: 485_752,
-        event: AllocationVersion::REALLOCATE_PRIMARY_POM
+        event: AllocationVersion::REALLOCATE_PRIMARY_POM,
+        created_by_username: 'PK000223'
       }
 
       described_class.create_or_update(update_params)
@@ -178,7 +180,8 @@ describe AllocationService do
         prison: 'PVI',
         recommended_pom_type: 'probation',
         event: AllocationVersion::REALLOCATE_PRIMARY_POM,
-        event_trigger: AllocationVersion::USER
+        event_trigger: AllocationVersion::USER,
+        created_by_username: 'PK000223'
       )
       described_class.create_or_update(
         nomis_offender_id: nomis_offender_id,
@@ -188,7 +191,8 @@ describe AllocationService do
         prison: 'LEI',
         recommended_pom_type: 'probation',
         event: AllocationVersion::ALLOCATE_PRIMARY_POM,
-        event_trigger: AllocationVersion::USER
+        event_trigger: AllocationVersion::USER,
+        created_by_username: 'PK000223'
       )
 
       allocation_list = described_class.offender_allocation_history(nomis_offender_id)

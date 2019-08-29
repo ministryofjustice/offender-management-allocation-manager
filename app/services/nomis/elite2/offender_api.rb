@@ -6,7 +6,7 @@ module Nomis
       extend Elite2Api
 
       # rubocop:disable Metrics/MethodLength
-      def self.list(prison, page = 0, page_size: 10)
+      def self.list(prison, page = 0, page_size: 20)
         route = "/elite2api/api/locations/description/#{prison}/inmates"
 
         queryparams = { 'convictedStatus' => 'Convicted', 'returnCategory' => true }
@@ -16,7 +16,9 @@ module Nomis
 
         key = "offender_list_#{prison}_#{page}_#{page_size}"
 
-        data, page_meta = Rails.cache.fetch(key, expires_in: 10.minutes) {
+        data, page_meta = Rails.cache.fetch(
+          key,
+          expires_in: Rails.configuration.cache_expiry) {
           page_meta = nil
 
           data = e2_client.get(
@@ -40,14 +42,10 @@ module Nomis
 
       def self.get_offender(offender_no)
         route = "/elite2api/api/prisoners/#{URI.encode_www_form_component(offender_no)}"
-        response = e2_client.get(route) { |data|
-          raise Nomis::Client::APIError, 'No data was returned' if data.empty?
-        }
+        response = e2_client.get(route)
+        return nil if response.empty?
 
         api_deserialiser.deserialise(Nomis::Models::Offender, response.first)
-      rescue Nomis::Client::APIError => e
-        AllocationManager::ExceptionHandler.capture_exception(e)
-        Nomis::Models::NullOffender.new
       end
 
       def self.get_offence(booking_id)
@@ -74,7 +72,7 @@ module Nomis
         h = Digest::SHA256.hexdigest(booking_ids.to_s)
         key = "bulk_sentence_#{h}"
 
-        data = Rails.cache.fetch(key, expires_in: 10.minutes) {
+        data = Rails.cache.fetch(key, expires_in: Rails.configuration.cache_expiry) {
           e2_client.post(route, booking_ids)
         }
 
@@ -82,6 +80,7 @@ module Nomis
           next unless record.key?('bookingId')
 
           oid = record['bookingId']
+
           hash[oid] = api_deserialiser.deserialise(
             Nomis::Models::SentenceDetail, record['sentenceDetail']
           )
@@ -89,6 +88,14 @@ module Nomis
           hash[oid].last_name = record['lastName']
           hash
         }
+      end
+
+      def self.get_image(booking_id)
+        details_route = '/elite2api/api/offender-sentences/bookings'
+        details = e2_client.post(details_route, [booking_id])
+
+        image_route = "/elite2api/api/images/#{details.first['facialImageId']}/data"
+        e2_client.raw_get(image_route)
       end
 
     private

@@ -6,6 +6,11 @@ RSpec.describe PrisonService do
     expect(name).to eq('HMP Leeds')
   end
 
+  it "can return all the prison codes" do
+    codes = described_class.prison_codes
+    expect(codes.count).to eq(124)
+  end
+
   it "will return nil for an unknown code" do
     name = described_class.name_for('ZZZ')
     expect(name).to be_nil

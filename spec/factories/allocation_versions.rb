@@ -7,7 +7,7 @@ FactoryBot.define do
     end
 
     created_by_username do
-      'SPO_LEEDS'
+      'PK000223'
     end
 
     created_by_name do

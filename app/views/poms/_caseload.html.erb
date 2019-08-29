@@ -2,12 +2,42 @@
 <table class="govuk-table responsive tablesorter">
   <thead class="govuk-table__head">
     <tr class="govuk-table__row">
-      <th class="govuk-table__header" scope="col">Prisoner name</th>
-      <th class="govuk-table__header" scope="col">Prisoner number</th>
-      <th class="govuk-table__header" scope="col">Earliest release<br/>date</th>
-      <th class="govuk-table__header" scope="col">Tier</th>
-      <th class="govuk-table__header" scope="col">Allocation date</th>
-      <th class="govuk-table__header" scope="col">Role</th>
+      <th class="govuk-table__header" scope="col">
+        <a href="<%= sort_link('last_name') %>">
+          Prisoner name
+        </a>
+        <%= sort_arrow('last_name') %>
+     </th>
+      <th class="govuk-table__header" scope="col">
+        <a href="<%= sort_link('nomis_offender_id') %>">
+          Prisoner number
+        </a>
+        <%= sort_arrow('nomis_offender_id') %>
+      </th>
+      <th class="govuk-table__header" scope="col">
+        <a href="<%= sort_link('earliest_release_date') %>">
+          Earliest release<br/>date
+        </a>
+        <%= sort_arrow('earliest_release_date') %>
+      </th>
+      <th class="govuk-table__header" scope="col">
+        <a href="<%= sort_link('allocated_at_tier') %>">
+          Tier
+        </a>
+        <%= sort_arrow('allocated_at_tier') %>
+      </th>
+      <th class="govuk-table__header" scope="col">
+        <a href="<%= sort_link('primary_pom_allocated_at') %>">
+          Allocation date
+        </a>
+        <%= sort_arrow('primary_pom_allocated_at') %>
+      </th>
+      <th class="govuk-table__header" scope="col">
+        <a href="<%= sort_link('responsibility') %>">
+          Role
+        </a>
+        <%= sort_arrow('responsibility') %>
+      </th>
     </tr>
   </thead>
   <tbody class="govuk-table__body">

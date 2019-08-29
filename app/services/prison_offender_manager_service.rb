@@ -4,9 +4,10 @@ class PrisonOffenderManagerService
   # Note - get_poms and get_pom return different data...
   def self.get_poms(prison)
     poms = Nomis::Elite2::PrisonOffenderManagerApi.list(prison)
+    pom_details = PomDetail.where(nomis_staff_id: poms.map(&:staff_id).map(&:to_i))
 
     poms = poms.map { |pom|
-      detail = get_pom_detail(pom.staff_id)
+      detail = get_pom_detail(pom_details, pom.staff_id.to_i)
       pom.add_detail(detail, prison)
       pom
     }.compact
@@ -42,7 +43,7 @@ class PrisonOffenderManagerService
   end
 
   def self.get_user_name(username)
-    user = Nomis::Custody::UserApi.user_details(username)
+    user = Nomis::Elite2::UserApi.user_details(username)
     [user.first_name, user.last_name]
   end
 
@@ -98,7 +99,7 @@ class PrisonOffenderManagerService
   end
 
   def self.get_signed_in_pom_details(current_user, prison)
-    user = Nomis::Custody::UserApi.user_details(current_user)
+    user = Nomis::Elite2::UserApi.user_details(current_user)
 
     poms_list = get_poms(prison)
     poms_list.select { |p| p.staff_id.to_i == user.staff_id.to_i }.first
@@ -119,10 +120,10 @@ class PrisonOffenderManagerService
 
 private
 
-  def self.get_pom_detail(nomis_staff_id)
-    PomDetail.find_or_create_by!(nomis_staff_id: nomis_staff_id.to_i) { |s|
-      s.working_pattern = s.working_pattern || 0.0
-      s.status = s.status || 'active'
-    }
+  def self.get_pom_detail(pom_details, nomis_staff_id)
+    pom_details.detect { |pd| pd.nomis_staff_id == nomis_staff_id } ||
+      PomDetail.create!(nomis_staff_id: nomis_staff_id,
+                        working_pattern: 0.0,
+                        status: 'active')
   end
 end

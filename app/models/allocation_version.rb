@@ -9,6 +9,7 @@ class AllocationVersion < ApplicationRecord
   REALLOCATE_SECONDARY_POM = 3
   DEALLOCATE_PRIMARY_POM = 4
   DEALLOCATE_SECONDARY_POM = 5
+  DEALLOCATE_RELEASED_OFFENDER = 6
 
   USER = 0
   OFFENDER_TRANSFERRED = 1
@@ -24,7 +25,8 @@ class AllocationVersion < ApplicationRecord
     allocate_secondary_pom: ALLOCATE_SECONDARY_POM,
     reallocate_secondary_pom: REALLOCATE_SECONDARY_POM,
     deallocate_primary_pom: DEALLOCATE_PRIMARY_POM,
-    deallocate_secondary_pom: DEALLOCATE_SECONDARY_POM
+    deallocate_secondary_pom: DEALLOCATE_SECONDARY_POM,
+    deallocate_released_offender: DEALLOCATE_RELEASED_OFFENDER
   }
 
   # 'Event triggers' capture the subject or action that triggered the event
@@ -93,9 +95,8 @@ class AllocationVersion < ApplicationRecord
     end
   end
 
-  def self.active?(nomis_offender_id)
-    allocation = find_by(nomis_offender_id: nomis_offender_id)
-    !allocation.nil? && !allocation.primary_pom_nomis_id.nil?
+  def active?
+    primary_pom_nomis_id.present?
   end
 
   def override_reasons
@@ -109,15 +110,29 @@ class AllocationVersion < ApplicationRecord
 
     return if alloc.nil?
 
+    alloc.prison = prison_fix(alloc, movement_type) if alloc.prison.nil?
+
     alloc.primary_pom_nomis_id = nil
     alloc.primary_pom_name = nil
     alloc.primary_pom_allocated_at = nil
     alloc.secondary_pom_nomis_id = nil
     alloc.secondary_pom_name = nil
     alloc.recommended_pom_type = nil
-    alloc.event = DEALLOCATE_PRIMARY_POM
+    if movement_type == 'offender_released'
+      alloc.event = DEALLOCATE_RELEASED_OFFENDER
+    else
+      alloc.event = DEALLOCATE_PRIMARY_POM
+    end
     alloc.event_trigger = movement_type
-    alloc.prison = nil if alloc.event_trigger == 'offender_released'
+
+    # This is triggered when an offender is released, and previously we
+    # were setting their prison to nil to show that the current allocation
+    # object for this offender meant they were unallocated.  However, we use
+    # the absence of any POM ids to show the offender is allocated, and if
+    # we remove the prison, we remove the ability to see where the offender
+    # was released from. So now, we do not blank the prison.
+    #
+    # Perhaps a better event name is `OFFENDER_RELEASED`.
 
     alloc.save!
   end
@@ -135,12 +150,27 @@ class AllocationVersion < ApplicationRecord
     end
   end
 
+  def self.prison_fix(allocation, movement_type)
+    # In some cases we have old historical data which has no prison set
+    # and this causes an issue should those offenders move or be released.
+    # To handle this we will attempt to set the prison to a valid code
+    # based on the event that has happened.
+    if movement_type == 'offender_released'
+      movements = Nomis::Elite2::MovementApi.movements_for(allocation.nomis_offender_id)
+      if movements.present?
+        movement = movements.first
+        allocation.prison = movement.from_agency if movement.from_prison?
+      end
+    elsif movement_type == 'offender_transferred'
+      offender = OffenderService.get_offender(allocation.nomis_offender_id)
+      allocation.prison = offender.latest_location_id
+    end
+  end
+
   validates :nomis_offender_id,
             :nomis_booking_id,
             :allocated_at_tier,
             :event,
-            :event_trigger, presence: true
-
-  validates :prison, presence: true,
-                     unless: proc { |a| a.event_trigger == 'offender_released' }
+            :event_trigger,
+            :prison, presence: true
 end
