@@ -6,6 +6,11 @@ class SentenceTypeService
       SentenceType::INDETERMINATE
   end
 
+  def self.recall_sentence?(sentence_type)
+    SentenceType.create(sentence_type).recall_status ==
+        SentenceType::RECALL
+  end
+
   def self.describe_sentence(sentence_type)
     SentenceType.create(sentence_type).description
   end

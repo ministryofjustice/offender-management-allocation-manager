@@ -48,6 +48,11 @@
       <td class="govuk-table__cell table_cell__left_align">
         <%= humanized_bool(@offender.sentenced?) %>
     </tr>
+    <tr class="govuk-table__row" id="recalled"">
+      <td class="govuk-table__cell">Recalled?</td>
+      <td class="govuk-table__cell table_cell__left_align">
+        <%= humanized_bool(@offender.recalled?) %>
+    </tr>
     <tr class="govuk-table__row" id="over-18">
       <td class="govuk-table__cell govuk-!-width-one-half">Over 18?</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half"><%= humanized_bool(@offender.over_18?) %></td>
