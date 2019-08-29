@@ -18,7 +18,8 @@ class PrisonersController < PrisonsApplicationController
   end
 
   def image
-    image_data = Nomis::Custody::ImageApi.image_data(id)
+    @prisoner = offender
+    image_data = Nomis::Elite2::OffenderApi.get_image(@prisoner.latest_booking_id)
 
     response.headers['Expires'] = 6.months.from_now.httpdate
     send_data image_data, type: 'image/jpg', disposition: 'inline'

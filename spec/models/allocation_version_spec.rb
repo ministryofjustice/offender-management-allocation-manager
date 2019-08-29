@@ -59,6 +59,7 @@ RSpec.describe AllocationVersion, type: :model do
         nomis_booking_id: 1,
         recommended_pom_type: 'probation',
         event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+        created_by_username: 'PK000223',
         event_trigger: AllocationVersion::USER
       }
       AllocationService.create_or_update(params)
@@ -87,7 +88,8 @@ RSpec.describe AllocationVersion, type: :model do
         nomis_booking_id: 1,
         recommended_pom_type: 'probation',
         event: AllocationVersion::ALLOCATE_PRIMARY_POM,
-        event_trigger: AllocationVersion::USER
+        event_trigger: AllocationVersion::USER,
+        created_by_username: 'PK000223'
       }
       AllocationService.create_or_update(params)
 

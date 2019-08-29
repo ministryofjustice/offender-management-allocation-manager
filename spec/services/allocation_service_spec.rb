@@ -76,7 +76,8 @@ describe AllocationService do
         nomis_booking_id: 1,
         recommended_pom_type: 'probation',
         event: AllocationVersion::ALLOCATE_PRIMARY_POM,
-        event_trigger: AllocationVersion::USER
+        event_trigger: AllocationVersion::USER,
+        created_by_username: 'PK000223'
       }
 
       described_class.create_or_update(params)
@@ -92,7 +93,8 @@ describe AllocationService do
         nomis_offender_id: nomis_offender_id,
         allocated_at_tier: 'B',
         primary_pom_nomis_id: 485_752,
-        event: AllocationVersion::REALLOCATE_PRIMARY_POM
+        event: AllocationVersion::REALLOCATE_PRIMARY_POM,
+        created_by_username: 'PK000223'
       }
 
       described_class.create_or_update(update_params)
@@ -178,7 +180,8 @@ describe AllocationService do
         prison: 'PVI',
         recommended_pom_type: 'probation',
         event: AllocationVersion::REALLOCATE_PRIMARY_POM,
-        event_trigger: AllocationVersion::USER
+        event_trigger: AllocationVersion::USER,
+        created_by_username: 'PK000223'
       )
       described_class.create_or_update(
         nomis_offender_id: nomis_offender_id,
@@ -188,7 +191,8 @@ describe AllocationService do
         prison: 'LEI',
         recommended_pom_type: 'probation',
         event: AllocationVersion::ALLOCATE_PRIMARY_POM,
-        event_trigger: AllocationVersion::USER
+        event_trigger: AllocationVersion::USER,
+        created_by_username: 'PK000223'
       )
 
       allocation_list = described_class.offender_allocation_history(nomis_offender_id)
