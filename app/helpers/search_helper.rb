@@ -19,8 +19,8 @@ module SearchHelper
     end
 
     link_to(
-      'Reallocate',
-      new_prison_allocation_path(prison, nomis_offender_id: offender_id)
+      'View',
+      prison_allocation_path(prison, nomis_offender_id: offender_id)
     )
   end
 end
