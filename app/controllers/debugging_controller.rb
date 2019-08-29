@@ -6,7 +6,7 @@ class DebuggingController < PrisonsApplicationController
 
     @offender = offender(nomis_offender_id)
     if @offender.present?
-      @allocation = AllocationVersion.where(nomis_offender_id: @offender.offender_no)
+      @allocation = AllocationVersion.find_by(nomis_offender_id: @offender.offender_no)
       @movements = Nomis::Elite2::MovementApi.movements_for(@offender.offender_no).first
     end
   end
