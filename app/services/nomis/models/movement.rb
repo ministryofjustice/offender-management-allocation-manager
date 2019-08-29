@@ -30,6 +30,14 @@ module Nomis
       attribute :movement_time
       attribute :movement_reason
       attribute :comment_text
+
+      def from_prison?
+        PrisonService::PRISONS.include?(from_agency)
+      end
+
+      def to_prison?
+        PrisonService::PRISONS.include?(to_agency)
+      end
     end
   end
 end

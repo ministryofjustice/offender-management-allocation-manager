@@ -106,6 +106,47 @@ RSpec.describe AllocationVersion, type: :model do
     end
   end
 
+  describe 'cleaning up old broken data' do
+    let!(:offender_no) { 'G2911GD' }
+    let!(:movement) {
+      create(:movement,
+             offender_no: offender_no,
+             direction_code: 'OUT',
+             movement_type: 'REL',
+             to_agency: 'OUT',
+             from_agency: 'BAI')
+    }
+    let!(:alloc) {
+      a = build(
+        :allocation_version,
+        nomis_offender_id: offender_no,
+        primary_pom_nomis_id: '12345',
+        prison: nil
+      )
+      a.save(validate: false)
+      a
+    }
+
+    it 'will set the prison when released' do
+      allow(Nomis::Elite2::MovementApi).to receive(:movements_for).and_return([movement])
+
+      described_class.deallocate_offender(offender_no, 'offender_released')
+
+      updated_allocation = described_class.find_by(nomis_offender_id: offender_no)
+      expect(updated_allocation.prison).not_to be_nil
+      expect(updated_allocation.prison).to eq('BAI')
+    end
+
+    it 'will set the prison when transferred',
+       vcr: { cassette_name: :allocation_version_transfer_prison_fix } do
+      described_class.deallocate_offender(offender_no, 'offender_transferred')
+
+      updated_allocation = described_class.find_by(nomis_offender_id: offender_no)
+      expect(updated_allocation.prison).not_to be_nil
+      expect(updated_allocation.prison).to eq('LEI')
+    end
+  end
+
   describe '#active?' do
     it 'return true if an Allocation has been assigned a Primary POM' do
       alloc = AllocationService.current_allocation_for(nomis_offender_id)
