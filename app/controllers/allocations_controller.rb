@@ -30,7 +30,9 @@ class AllocationsController < PrisonsApplicationController
   end
 
   def edit
-    unless AllocationVersion.active?(nomis_offender_id_from_url)
+    allocation = AllocationService.current_allocation_for(nomis_offender_id_from_url)
+
+    unless allocation.present? && allocation.active?
       redirect_to new_prison_allocation_path(active_prison, nomis_offender_id_from_url)
       return
     end

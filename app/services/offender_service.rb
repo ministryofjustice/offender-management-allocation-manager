@@ -3,6 +3,8 @@
 class OffenderService
   def self.get_offender(offender_no)
     Nomis::Elite2::OffenderApi.get_offender(offender_no).tap { |o|
+      next false if o.nil?
+
       record = CaseInformation.find_by(nomis_offender_id: offender_no)
 
       if record.present?
@@ -103,7 +105,8 @@ class OffenderService
   end
 
   # Takes a list of OffenderSummary or Offender objects, and returns them with their
-  # allocated POM name set in :allocated_pom_name
+  # allocated POM name set in :allocated_pom_name.
+  # This is now only used by the SearchController.
   # rubocop:disable Metrics/LineLength
   def self.set_allocated_pom_name(offenders, caseload)
     pom_names = PrisonOffenderManagerService.get_pom_names(caseload)

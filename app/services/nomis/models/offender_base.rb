@@ -44,6 +44,10 @@ module Nomis
         SentenceTypeService.indeterminate_sentence?(imprisonment_status)
       end
 
+      def over_18?
+        age >= 18
+      end
+
       def awaiting_allocation_for
         omic_start_date = Date.new(2019, 2, 4)
 

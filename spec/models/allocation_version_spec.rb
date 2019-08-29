@@ -59,6 +59,7 @@ RSpec.describe AllocationVersion, type: :model do
         nomis_booking_id: 1,
         recommended_pom_type: 'probation',
         event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+        created_by_username: 'PK000223',
         event_trigger: AllocationVersion::USER
       }
       AllocationService.create_or_update(params)
@@ -87,7 +88,8 @@ RSpec.describe AllocationVersion, type: :model do
         nomis_booking_id: 1,
         recommended_pom_type: 'probation',
         event: AllocationVersion::ALLOCATE_PRIMARY_POM,
-        event_trigger: AllocationVersion::USER
+        event_trigger: AllocationVersion::USER,
+        created_by_username: 'PK000223'
       }
       AllocationService.create_or_update(params)
 
@@ -106,15 +108,58 @@ RSpec.describe AllocationVersion, type: :model do
     end
   end
 
+  describe 'cleaning up old broken data' do
+    let!(:offender_no) { 'G2911GD' }
+    let!(:movement) {
+      create(:movement,
+             offender_no: offender_no,
+             direction_code: 'OUT',
+             movement_type: 'REL',
+             to_agency: 'OUT',
+             from_agency: 'BAI')
+    }
+    let!(:alloc) {
+      a = build(
+        :allocation_version,
+        nomis_offender_id: offender_no,
+        primary_pom_nomis_id: '12345',
+        prison: nil
+      )
+      a.save(validate: false)
+      a
+    }
+
+    it 'will set the prison when released' do
+      allow(Nomis::Elite2::MovementApi).to receive(:movements_for).and_return([movement])
+
+      described_class.deallocate_offender(offender_no, 'offender_released')
+
+      updated_allocation = described_class.find_by(nomis_offender_id: offender_no)
+      expect(updated_allocation.prison).not_to be_nil
+      expect(updated_allocation.prison).to eq('BAI')
+    end
+
+    it 'will set the prison when transferred',
+       vcr: { cassette_name: :allocation_version_transfer_prison_fix } do
+      described_class.deallocate_offender(offender_no, 'offender_transferred')
+
+      updated_allocation = described_class.find_by(nomis_offender_id: offender_no)
+      expect(updated_allocation.prison).not_to be_nil
+      expect(updated_allocation.prison).to eq('LEI')
+    end
+  end
+
   describe '#active?' do
     it 'return true if an Allocation has been assigned a Primary POM' do
-      expect(described_class.active?(nomis_offender_id)).to be(true)
+      alloc = AllocationService.current_allocation_for(nomis_offender_id)
+      expect(alloc.active?).to be(true)
     end
 
     it 'return false if an Allocation has not been assigned a Primary POM' do
       described_class.deallocate_primary_pom(nomis_staff_id)
+      alloc = AllocationService.current_allocation_for(nomis_offender_id)
 
-      expect(described_class.active?(nomis_offender_id)).to be(false)
+      expect(alloc.active?).to be(false)
     end
   end
 
