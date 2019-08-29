@@ -156,11 +156,7 @@
     </tbody>
   </table>
 
-<% if @allocation.blank? %>
-    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-    <h2 class="govuk-heading-s govuk-!-margin-top-4 govuk-!-margin-bottom-4">Not currently allocated</h2>
-    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-<% else %>
+<% if @allocation.present? && @allocation.active? %>
   <table class="govuk-table">
     <tbody class="govuk-table__body">
     <tr class="govuk-table__row">
@@ -175,7 +171,7 @@
     <tr class="govuk-table__row" id="pom">
       <td class="govuk-table__cell govuk-!-width-one-half">POM</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-        <%= @allocation.first.primary_pom_name.titleize%>
+        <%= @allocation.primary_pom_name.titleize%>
       </td>
     </tr>
     <tr class="govuk-table__row" id="co-working-pom">
@@ -184,18 +180,22 @@
         <% if @coworker.nil? %>
           N/A
         <% else %>
-          <%= @allocation.first.secondary_pom_name %>
+          <%= @allocation.secondary_pom_name %>
         <% end %>
       </td>
     </tr>
     <tr class="govuk-table__row" id="allocation-event">
       <td class="govuk-table__cell govuk-!-width-one-half">Last allocation event</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-        <%= @allocation.last_event(@offender.offender_no) %>
+        <%= AllocationVersion.last_event(@offender.offender_no) %>
       </td>
     </tr>
     </tbody>
   </table>
+<% else %>
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+    <h2 class="govuk-heading-s govuk-!-margin-top-4 govuk-!-margin-bottom-4">Not currently allocated</h2>
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
 <% end %>
 
 <% unless @movements.blank? %>
@@ -213,13 +213,13 @@
     <tr class="govuk-table__row" id="from-agency">
       <td class="govuk-table__cell">Starting point</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= agency(@movements.from_agency) %>
+        <%= agency(@movements.from_agency) %> (<%= @movements.from_agency %>)
       </td>
     </tr>
     <tr class="govuk-table__row" id="to-agency">
       <td class="govuk-table__cell govuk-!-width-one-half">Destination</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-        <%= agency(@movements.to_agency) %>
+        <%= agency(@movements.to_agency) %> (<%= @movements.to_agency %>)
       </td>
     </tr>
     <tr class="govuk-table__row" id="movement-direction">
