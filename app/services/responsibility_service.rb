@@ -9,8 +9,8 @@ class ResponsibilityService
   # rubocop:disable Metrics/PerceivedComplexity
   # rubocop:disable Metrics/CyclomaticComplexity
   def calculate_pom_responsibility(offender)
-    return RESPONSIBLE if offender.sentence.earliest_release_date.nil?
     return SUPPORTING unless omicable?(offender)
+    return RESPONSIBLE if offender.sentence.earliest_release_date.nil?
 
     return RESPONSIBLE if nps_case?(offender) &&
       new_case?(offender) &&

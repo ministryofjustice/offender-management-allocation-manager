@@ -97,7 +97,9 @@ describe ResponsibilityService do
       scenario 'is supporting' do
         resp = subject.calculate_pom_responsibility(offender_no_release_date)
 
-        expect(resp).to eq 'Responsible'
+        # For non-omicable offenders (until Oct 1st) this is Supporting, after
+        # which we would think it is Responsible.
+        expect(resp).to eq 'Supporting'
       end
     end
 
