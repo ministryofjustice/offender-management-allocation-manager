@@ -19,14 +19,14 @@ RSpec.describe SearchHelper do
       expect(text).to eq('<a href="/prisons/LEI/allocations/A/new">Allocate</a>')
     end
 
-    it "will change to reallocate if there is an allocation" do
+    it "will change to view if there is an allocation" do
       offender = Nomis::Models::Offender.new(
         offender_no: 'A',
         tier: 'A',
         allocated_pom_name: 'Bob'
       )
       text, _link = cta_for_offender('LEI', offender)
-      expect(text).to eq('<a href="/prisons/LEI/allocations/A/new">Reallocate</a>')
+      expect(text).to eq('<a href="/prisons/LEI/allocations/A">View</a>')
     end
   end
 end

@@ -112,9 +112,9 @@ describe MovementService do
       processed = described_class.process_movement(transfer_adm)
       updated_allocation = AllocationVersion.find_by(nomis_offender_id: transfer_adm.offender_no)
 
-      expect(updated_allocation.primary_pom_name).to be_nil
       expect(updated_allocation.event).to eq 'deallocate_primary_pom'
       expect(updated_allocation.event_trigger).to eq 'offender_transferred'
+      expect(updated_allocation.primary_pom_name).to be_nil
       expect(processed).to be true
     end
 

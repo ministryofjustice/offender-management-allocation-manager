@@ -23,15 +23,15 @@ FactoryBot.define do
     end
 
     nomis_booking_id do
-      Faker::Number.number(7)
+      Faker::Number.number(digits: 7)
     end
 
     nomis_offender_id do
-      Faker::Alphanumeric.alpha(10)
+      Faker::Alphanumeric.alpha(number: 10)
     end
 
     primary_pom_nomis_id do
-      Faker::Number.number(7)
+      Faker::Number.number(digits: 7)
     end
 
     primary_pom_name do
