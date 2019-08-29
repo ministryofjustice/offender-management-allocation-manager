@@ -13,7 +13,7 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">POM</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <% if @allocation %>
+        <% if @allocation && @allocation.active? %>
           <%= @allocation.primary_pom_name.titleize %>
         <% end %>
       </td>
