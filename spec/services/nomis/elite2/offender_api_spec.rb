@@ -68,4 +68,25 @@ describe Nomis::Elite2::OffenderApi do
       expect(response).to be_nil
     end
   end
+
+  describe 'fetching an image' do
+    it "can get a user's jpg",
+       vcr: { cassette_name: :offender_api_image_spec } do
+      booking_id = 1_153_753
+      response = described_class.get_image(booking_id)
+
+      expect(response).not_to be_nil
+
+      # JPEG files start with FF D8 FF as the first three bytes ...
+      # .. and end with FF D9 as the last two bytes. This should be
+      # an adequate test to see if we receive a valid JPG from the
+      # API call.
+      jpeg_start_sentinel = [0xFF, 0xD8, 0xFF]
+      jpeg_end_sentinel = [0xFF, 0xD9]
+
+      bytes = response.bytes.to_a
+      expect(bytes[0, 3]).to eq(jpeg_start_sentinel)
+      expect(bytes[-2, 2]).to eq(jpeg_end_sentinel)
+    end
+  end
 end
