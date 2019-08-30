@@ -2,7 +2,7 @@ class FeedbackController < PrisonsApplicationController
   before_action :authenticate_user
 
   def new
-    @user = Nomis::Custody::UserApi.user_details(current_user)
+    @user = Nomis::Elite2::UserApi.user_details(current_user)
     @feedback = FeedbackSubmission.new(
         email_address: @user.email_address.first,
         prison_id: @user.active_nomis_caseload)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_27_072512) do
+ActiveRecord::Schema.define(version: 2019_08_30_133619) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -59,6 +59,15 @@ ActiveRecord::Schema.define(version: 2019_08_27_072512) do
     t.index ["team_id"], name: "index_case_information_on_team_id"
   end
 
+  create_table "contact_submissions", force: :cascade do |t|
+    t.text "body", null: false
+    t.string "email_address"
+    t.string "referrer"
+    t.string "user_agent"
+    t.string "prison"
+    t.string "name"
+  end
+
   create_table "delius_data", force: :cascade do |t|
     t.string "crn"
     t.string "pnc_no"
@@ -88,14 +97,6 @@ ActiveRecord::Schema.define(version: 2019_08_27_072512) do
     t.integer "error_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-  end
-
-  create_table "feedback_submissions", force: :cascade do |t|
-    t.text "body", null: false
-    t.string "email_address"
-    t.string "referrer"
-    t.string "user_agent"
-    t.string "prison_id"
   end
 
   create_table "flipflop_features", force: :cascade do |t|

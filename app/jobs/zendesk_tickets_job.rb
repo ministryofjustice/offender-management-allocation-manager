@@ -7,43 +7,35 @@ class ZendeskTicketsJob < ActiveJob::Base
   BROWSER_FIELD = '23791776'.freeze
   PRISON_FIELD = '23984153'.freeze
 
-  def perform(feedback)
-    feedback.destroy! if ticket_raised!(feedback)
+  def perform(contact)
+    contact.destroy! if ticket_raised!(contact)
   end
 
   private
 
-  def ticket_raised!(feedback)
+  def ticket_raised!(contact)
     client = Zendesk::MOICClient.instance
-    Zendesk::MOICApi.new(client).raise_ticket(ticket_attrs(feedback))
+    byebug
+    Zendesk::MOICApi.new(client).raise_ticket(ticket_attrs(contact))
   end
 
-  def ticket_attrs(feedback)
+  def ticket_attrs(contact)
     attrs = {
-        description: feedback.body,
-        requester: { email: email_address_to_submit(feedback),
+        description: contact.body,
+        requester: { email: contact.email_address,
                      name: 'Unknown',
                      tags: ['moic'],
-                     custom_fields: custom_fields(feedback)}
+                     custom_fields: custom_fields(contact)}
     }
-    byebug
     attrs
   end
 
-  def email_address_to_submit(feedback)
-    feedback.email_address.presence
-  end
-
-  def custom_fields(feedback)
+  def custom_fields(contact)
     attrs = [
-        as_hash(URL_FIELD, feedback.referrer),
-        as_hash(BROWSER_FIELD, feedback.user_agent)
+        as_hash(URL_FIELD, contact.referrer),
+        as_hash(BROWSER_FIELD, contact.user_agent),
+        as_hash(PRISON_FIELD, contact.prison)
     ]
-
-    if feedback.prison_id
-      attrs << as_hash(PRISON_FIELD, feedback.prison.name)
-    end
-
     attrs
   end
 
