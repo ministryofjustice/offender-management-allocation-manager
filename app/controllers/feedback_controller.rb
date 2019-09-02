@@ -10,7 +10,6 @@ class FeedbackController < PrisonsApplicationController
 
   def create
     @feedback = FeedbackSubmission.new(feedback_params)
-    byebug
     if @feedback.save
       ZendeskTicketsJob.perform_later(@feedback)
       redirect_to prison_dashboard_index_path(default_prison_code),

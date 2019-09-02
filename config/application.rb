@@ -43,7 +43,8 @@ module OffenderManagementAllocationClient
     config.redis_url = ENV['REDIS_URL']&.strip
     config.redis_auth = ENV['REDIS_AUTH']&.strip
     config.zendesk_token = ENV['ZENDESK_TOKEN']&.strip
-    config.zendesk_url = ENV['ZENDESK_URL']
+    config.zendesk_password = ENV['ZENDESK_PASSWORD']&.strip
+    config.zendesk_url = ENV['ZENDESK_URL']&.strip
     config.zendesk_username = ENV['ZENDESK_USERNAME']&.strip
     config.connection_pool_size = ENV['RAILS_WEB_CONCURRENCY']&.strip || 5
 

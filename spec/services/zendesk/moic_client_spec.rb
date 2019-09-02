@@ -22,7 +22,6 @@ RSpec.describe Zendesk::MOICClient do
     end
 
     it 'has a zendesk username' do
-      byebug
       subject.request { |client| expect(client.config.username).to eq("#{username}/token") }
     end
 

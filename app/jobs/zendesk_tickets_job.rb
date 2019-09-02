@@ -3,7 +3,6 @@ class ZendeskTicketsJob < ActiveJob::Base
 
   # Custom ticket field IDs as configured in the MOJ Digital Zendesk account
   URL_FIELD = '23730083'.freeze
-  SERVICE_FIELD = '23757677'.freeze
   BROWSER_FIELD = '23791776'.freeze
   PRISON_FIELD = '23984153'.freeze
 
@@ -15,7 +14,6 @@ class ZendeskTicketsJob < ActiveJob::Base
 
   def ticket_raised!(contact)
     client = Zendesk::MOICClient.instance
-    byebug
     Zendesk::MOICApi.new(client).raise_ticket(ticket_attrs(contact))
   end
 
@@ -23,7 +21,7 @@ class ZendeskTicketsJob < ActiveJob::Base
     attrs = {
         description: contact.body,
         requester: { email: contact.email_address,
-                     name: 'Unknown',
+                     name: contact.name,
                      tags: ['moic'],
                      custom_fields: custom_fields(contact)}
     }

@@ -7,6 +7,7 @@ class CreateContactSubmission < ActiveRecord::Migration[5.2]
       t.string :user_agent
       t.string :prison
       t.string :name
+      t.string :role
     end
   end
 end

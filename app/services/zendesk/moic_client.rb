@@ -7,7 +7,7 @@ module Zendesk
         ZendeskAPI::Client.new do |config|
           config.url = Rails.configuration.zendesk_url
           config.username = Rails.configuration.zendesk_username
-          config.token = Rails.configuration.zendesk_token
+          config.password = Rails.configuration.zendesk_password
           config.retry = true
         end
       end
