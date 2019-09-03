@@ -89,7 +89,7 @@ class AllocationService
 
   def self.active_allocations(nomis_offender_ids, prison)
     AllocationVersion.where.not(
-      primary_pom_nomis_id:nil
+      primary_pom_nomis_id: nil
     ).where(
       nomis_offender_id: nomis_offender_ids, prison: prison
     ).map { |a|
