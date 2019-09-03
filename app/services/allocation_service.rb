@@ -87,11 +87,12 @@ class AllocationService
     }.to_h
   end
 
-  def self.allocations(nomis_offender_ids, prison)
-    AllocationVersion.where(
-      nomis_offender_id: nomis_offender_ids,
-      prison: prison).
-      map { |a|
+  def self.active_allocations(nomis_offender_ids, prison)
+    AllocationVersion.where.not(
+      primary_pom_nomis_id:nil
+    ).where(
+      nomis_offender_id: nomis_offender_ids, prison: prison
+    ).map { |a|
       [
         a[:nomis_offender_id],
         a
@@ -148,7 +149,7 @@ class AllocationService
   end
 
   def self.current_pom_for(nomis_offender_id, prison_id)
-    current_allocation = allocations(nomis_offender_id, prison_id)
+    current_allocation = active_allocations(nomis_offender_id, prison_id)
     nomis_staff_id = current_allocation[nomis_offender_id]['primary_pom_nomis_id']
 
     PrisonOffenderManagerService.get_pom(prison_id, nomis_staff_id)
