@@ -110,7 +110,7 @@ class AllocationVersion < ApplicationRecord
 
     return if alloc.nil?
 
-    alloc.prison = prison_fix(alloc, movement_type) if alloc.prison.nil?
+    alloc.prison = prison_fix(alloc, movement_type) if alloc.prison.blank?
 
     alloc.primary_pom_nomis_id = nil
     alloc.primary_pom_name = nil
@@ -159,11 +159,11 @@ class AllocationVersion < ApplicationRecord
       movements = Nomis::Elite2::MovementApi.movements_for(allocation.nomis_offender_id)
       if movements.present?
         movement = movements.first
-        allocation.prison = movement.from_agency if movement.from_prison?
+        return movement.from_agency if movement.from_prison?
       end
     elsif movement_type == 'offender_transferred'
       offender = OffenderService.get_offender(allocation.nomis_offender_id)
-      allocation.prison = offender.latest_location_id
+      return offender.latest_location_id
     end
   end
 
