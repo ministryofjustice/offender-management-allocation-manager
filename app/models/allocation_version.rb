@@ -163,7 +163,7 @@ class AllocationVersion < ApplicationRecord
       end
     elsif movement_type == 'offender_transferred'
       offender = OffenderService.get_offender(allocation.nomis_offender_id)
-      return offender.latest_location_id
+      offender.latest_location_id
     end
   end
 
