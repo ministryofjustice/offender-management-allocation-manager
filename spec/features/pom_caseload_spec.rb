@@ -134,7 +134,7 @@ feature "view POM's caseload" do
     it 'can be searched by role' do
       select 'Supporting', from: 'role'
       click_on 'Search'
-      expect(page).to have_content('Showing 1 - 14 of 14 results')
+      expect(page).to have_content('Showing 1 - 19 of 19 results')
     end
   end
 

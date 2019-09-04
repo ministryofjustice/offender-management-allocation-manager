@@ -3,31 +3,16 @@
 module Nomis
   module Models
     class PrisonOffenderManager
-      include MemoryModel
+      include Deserialisable
 
-      attribute :staff_id, :integer
-      attribute :first_name, :string
-      attribute :last_name, :string
-      attribute :agency_id, :string
-      attribute :agency_description, :string
-      attribute :from_date, :date
-      attribute :position, :string
-      attribute :position_description, :string
-      attribute :role, :string
-      attribute :role_description, :string
-      attribute :schedule_type, :string
-      attribute :schedule_type_description, :string
-      attribute :hours_per_week, :integer
-      attribute :thumbnail_id, :string
-      attribute :emails
-
-      attribute :tier_a, :integer
-      attribute :tier_b, :integer
-      attribute :tier_c, :integer
-      attribute :tier_d, :integer
-      attribute :total_cases, :integer
-      attribute :status, :string
-      attribute :working_pattern, :string
+      attr_accessor :staff_id, :first_name, :last_name,
+                    :agency_id, :agency_description,
+                    :from_date, :position, :position_description,
+                    :role, :role_description,
+                    :schedule_type, :schedule_type_description,
+                    :hours_per_week, :thumbnail_id, :emails,
+                    :tier_a, :tier_b, :tier_c, :tier_d,
+                    :total_cases, :status, :working_pattern
 
       def full_name
         "#{last_name}, #{first_name}".titleize
@@ -52,6 +37,26 @@ module Nomis
         self.total_cases = [tier_a, tier_b, tier_c, tier_d].sum
         self.status = pom_detail.status
         self.working_pattern = pom_detail.working_pattern
+      end
+
+      def self.from_json(payload)
+        PrisonOffenderManager.new.tap { |obj|
+          obj.staff_id = payload['staffId'].to_i
+          obj.first_name = payload['firstName']
+          obj.last_name = payload['lastName']
+          obj.agency_id = payload['agencyId']
+          obj.agency_description = payload['agencyDescription']
+          obj.from_date = deserialise_date(payload, 'fromDate')
+          obj.position = payload['position']
+          obj.position_description = payload['positionDescription']
+          obj.role = payload['role']
+          obj.role_description = payload['roleDescription']
+          obj.schedule_type = payload['scheduleType']
+          obj.schedule_type_description = payload['scheduleTypeDescription']
+          obj.hours_per_week = payload['hoursPerWeek']&.to_i
+          obj.thumbnail_id = payload['thumbnailId']
+          obj.emails = payload['emails']
+        }
       end
     end
   end

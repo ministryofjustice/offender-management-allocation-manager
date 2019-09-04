@@ -63,7 +63,7 @@ class SummaryService
       offender_items.each { |offender|
         alloc = active_allocations_hash[offender.offender_no]
         offender.allocated_pom_name = restructure_pom_name(alloc.primary_pom_name)
-        offender.allocation_date = alloc.primary_pom_allocated_at
+        offender.allocation_date = alloc.primary_pom_allocated_at.to_date
       }
     end
 
