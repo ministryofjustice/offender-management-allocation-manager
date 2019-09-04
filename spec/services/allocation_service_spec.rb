@@ -132,7 +132,7 @@ describe AllocationService do
         prison: 'USK'
       )
 
-      allocations = described_class.allocations([first_offender_id, second_offender_id], leeds_prison)
+      allocations = described_class.active_allocations([first_offender_id, second_offender_id], leeds_prison)
 
       expect(allocations.keys.count).to be(1)
       expect(allocations.keys.first).to eq(first_offender_id)
