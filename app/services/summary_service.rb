@@ -26,14 +26,12 @@ class SummaryService
     counts = { allocated: 0, unallocated: 0, pending: 0, all: 0 }
 
     offenders = OffenderService.get_offenders_for_prison(prison)
-    active_allocations_hash = AllocationService.allocations(offenders.map(&:offender_no), prison)
+    active_allocations_hash = AllocationService.active_allocations(offenders.map(&:offender_no), prison)
 
     offenders.each do |offender|
       if offender.tier.present?
-        # When trying to determine if this offender has a current allocation, we want to know
-        # if it is for this prison.  If the offender was recently transferred here their prison
-        # field should be nil, which means they will be pending allocation.  Once they are allocated
-        # the prison will be set on their existing allocation.
+        # When trying to determine if this offender has a current active allocation, we want to know
+        # if it is for this prison.
         if active_allocations_hash.key?(offender.offender_no)
           bucket.items << offender if summary_type == :allocated
           counts[:allocated] += 1

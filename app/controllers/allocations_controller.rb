@@ -136,7 +136,7 @@ private
   end
 
   def current_pom_for(nomis_offender_id)
-    current_allocation = AllocationService.allocations(nomis_offender_id, active_prison)
+    current_allocation = AllocationService.active_allocations(nomis_offender_id, active_prison)
     nomis_staff_id = current_allocation[nomis_offender_id]['primary_pom_nomis_id']
 
     PrisonOffenderManagerService.get_pom(active_prison, nomis_staff_id)
