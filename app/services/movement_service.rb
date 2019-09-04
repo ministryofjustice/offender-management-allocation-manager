@@ -29,7 +29,6 @@ class MovementService
     # not process the new admission.
     if [Nomis::Models::MovementType::ADMISSION,
         Nomis::Models::MovementType::TRANSFER].include?(movement.movement_type)
-
       return process_transfer(movement)
     end
 

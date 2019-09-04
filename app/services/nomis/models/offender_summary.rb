@@ -3,14 +3,26 @@
 module Nomis
   module Models
     class OffenderSummary < OffenderBase
-      include MemoryModel
+      include Deserialisable
 
-      attribute :agency_id, :string
-      attribute :aliases, :string
-      attribute :booking_id, :integer
+      attr_accessor :agency_id, :aliases, :booking_id
 
       # custom attributes
-      attribute :allocation_date, :date
+      attr_accessor :allocation_date
+
+      def self.from_json(payload)
+        OffenderSummary.new.tap { |obj|
+          obj.load_from_json(payload)
+        }
+      end
+
+      def load_from_json(payload)
+        @agency_id = payload['agencyId']
+        @aliases = payload['aliases']
+        @booking_id = payload['bookingId']&.to_i
+
+        super(payload)
+      end
     end
   end
 end

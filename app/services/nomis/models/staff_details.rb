@@ -3,13 +3,23 @@
 module Nomis
   module Models
     class StaffDetails
-      include MemoryModel
+      include Deserialisable
 
-      attribute :staff_id
-      attribute :first_name
-      attribute :last_name
-      attribute :status
-      attribute :thumbnail_id
+      attr_accessor :staff_id,
+                    :first_name,
+                    :last_name,
+                    :status,
+                    :thumbnail_id
+
+      def self.from_json(payload)
+        StaffDetails.new.tap { |obj|
+          obj.staff_id = payload['staffId']
+          obj.first_name = payload['firstName']
+          obj.last_name = payload['lastName']
+          obj.status = payload['status']
+          obj.thumbnail_id = payload['thumbnailId']
+        }
+      end
     end
   end
 end

@@ -10,6 +10,7 @@ describe Nomis::Keyworker::KeyworkerApi do
       response = described_class.get_keyworker(location, offender_no)
 
       expect(response).to be_instance_of(Nomis::Models::KeyworkerDetails)
+      expect(response.first_name).to eq('DOM')
     end
 
     it 'returns null if unable find a Keyworker', :raven_intercept_exception,

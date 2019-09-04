@@ -3,25 +3,43 @@
 module Nomis
   module Models
     class UserDetails
-      include MemoryModel
+      include Deserialisable
 
-      attribute :account_status, :string
-      attribute :active, :boolean
-      attribute :active_case_load_id
-      attribute :expiry_date
-      attribute :expired_flag
-      attribute :first_name, :string
-      attribute :last_name, :string
-      attribute :lock_date
-      attribute :locked_flag
-      attribute :staff_id, :integer
-      attribute :status, :string
-      attribute :thumbnail_id, :string
-      attribute :username, :string
+      attr_accessor :account_status,
+                    :active,
+                    :active_case_load_id,
+                    :expiry_date,
+                    :expired_flag,
+                    :first_name,
+                    :last_name,
+                    :lock_date,
+                    :locked_flag,
+                    :staff_id,
+                    :status,
+                    :thumbnail_id,
+                    :username
 
       # custom attribute - Elite2 requires a separate API call to
       # fetch a user's caseload
-      attribute :nomis_caseloads
+      attr_accessor :nomis_caseloads
+
+      def self.from_json(payload)
+        UserDetails.new.tap { |obj|
+          obj.account_status = payload['accountStatus']
+          obj.active = payload['active']
+          obj.active_case_load_id = payload['acticeCaseLoadId']
+          obj.expiry_date = payload['expiryDate']
+          obj.expired_flag = payload['expiredFlag']
+          obj.first_name = payload['firstName']
+          obj.last_name = payload['lastName']
+          obj.lock_date = payload['lockDate']
+          obj.locked_flag = payload['lockedFlag']
+          obj.staff_id = payload['staffId']&.to_i
+          obj.status = payload['status']
+          obj.thumbnail_id = payload['thumbnailId']
+          obj.username = payload['username']
+        }
+      end
     end
   end
 end

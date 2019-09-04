@@ -2,28 +2,18 @@
 
 class ApiDeserialiser
   def deserialise_many(memory_model_class, payload_list)
-    safe_list = payload_list.to_snake_keys
-    safe_list.map { |item|
-      deserialise_hash(memory_model_class, item)
-    }
+    if memory_model_class.respond_to?(:from_json)
+      payload_list.map { |payload|
+        memory_model_class.from_json(payload)
+      }
+    end
   end
 
   def deserialise(memory_model_class, payload)
-    deserialise_hash(memory_model_class, payload.to_snake_keys)
-  end
-
-private
-
-  def deserialise_hash(memory_model_class, payload)
-    memory_model = memory_model_class.new
-
-    payload.each do |key, value|
-      setter = "#{key}="
-      if memory_model.respond_to?(setter)
-        memory_model.public_send(setter, value)
-      end
+    # Ask the class to deserialize the payload into an instance if it knows how to,
+    # otherwise will rely on the `public_send` process.
+    if memory_model_class.respond_to?(:from_json)
+      memory_model_class.from_json(payload)
     end
-
-    memory_model
   end
 end
