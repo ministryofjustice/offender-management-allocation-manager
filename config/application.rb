@@ -47,6 +47,7 @@ module OffenderManagementAllocationClient
     config.zendesk_url = ENV['ZENDESK_URL']&.strip
     config.zendesk_username = ENV['ZENDESK_USERNAME']&.strip
     config.connection_pool_size = ENV['RAILS_WEB_CONCURRENCY']&.strip || 5
+    config.zendesk_enabled = [config.zendesk_username, config.zendesk_url, config.zendesk_password].all?
 
     config.cache_expiry = 60.minutes
   end

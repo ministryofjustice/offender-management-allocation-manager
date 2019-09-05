@@ -1,14 +1,86 @@
-<div class="govuk-grid-column govuk-body">
-  <p><%= back_link %></p>
+<% if current_user.present? %>
+  <div class="govuk-!-padding-bottom-4">
+    <%= link_to 'Home', prison_dashboard_index_path(@contact.prison) %>
+  </div>
+<% end %>
 
-  <h1 class="govuk-heading-xl">Help</h1>
+<% if notice.present? %>
+  <p class="notification govuk-!-margin-bottom-9" role="group" aria-labelledby="notice-heading">
+    <%= notice %>
+  </p>
+<% end %>
 
-    <h3 class="govuk-heading-m">Guidance</h3>
-    <p><%=link_to 'Read guidance', 'guidance' %> on how to set up the service to make allocations.</p>
-
-    <h3 class="govuk-heading-m">Contact us</h3>
-    <p>If you need help using the online service we can offer technical help.</p>
-    <p>You can contact us on:</p>
-    <span>Monday to Friday, 09:00am to 17:00pm</span>
-    <p><%=mail_to 'moic@digital.justice.gov.uk', 'moic@digital.justice.gov.uk' %></p>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-5">Help</h1>
+    <h2 class="govuk-heading-m">Getting set up</h2>
+    <p class="govuk-body">If you are new to this service, or have staff members you need to add, see the step by step
+      <%= link_to 'guide to getting set up', guidance_path %>
+    </p>
+  </div>
 </div>
+
+<div class="govuk-grid-row dashboard-row">
+  <div class="govuk-grid-column-two-thirds">
+  <% if @contact.errors.count > 0 %>
+    <%= render :partial => "/shared/validation_errors", :locals => { :errors => @contact.errors } %>
+  <% end %>
+  </div>
+
+  <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-form-group ">
+      <h2 class="govuk-heading-m">Contact us</h2>
+      <p class="govuk-body">Complete this form for technical help</p>
+
+      <%= form_tag(help_path, method: :post, id: "help_form") do %>
+        <div class="<%= class_type(@contact.errors) %>">
+          <%= label_tag "Full name", "Full name", class: 'govuk-label' %>
+          <% if @contact.errors[:name].present? %>
+                  <span class="govuk-error-message">
+                    <%= @contact.errors[:name].first %>
+                  </span>
+          <% end %>
+          <%= text_field_tag("name", @contact.name, id: "name", class: "govuk-input") %>
+        </div>
+        <div class="<%= class_type(@contact.errors) %>">
+          <%= label_tag "email_address", "Email address", class: 'govuk-label' %>
+          <% if @contact.errors[:email_address].present? %>
+                <span class="govuk-error-message">
+                  <%= @contact.errors[:email_address].first %>
+                </span>
+          <% end %>
+          <%= email_field_tag("email_address", @contact.email_address, id: "email_address", class: "govuk-input") %>
+        </div>
+        <div class="<%= class_type(@contact.errors) %>">
+          <%= label_tag "Your role", "Your role", class: 'govuk-label' %>
+          <% if @contact.errors[:role].present? %>
+                  <span class="govuk-error-message">
+                    <%= @contact.errors[:role].first %>
+                  </span>
+          <% end %>
+          <%= text_field_tag("role", nil, id: "role", class: "govuk-input") %>
+        </div>
+        <div class="<%= class_type(@contact.errors) %>">
+          <%= label_tag "prison", "Prison name", class: 'govuk-label' %>
+          <% if @contact.errors[:prison].present? %>
+                  <span class="govuk-error-message">
+                    <%= @contact.errors[:prison].first %>
+                  </span>
+          <% end %>
+          <%= text_field_tag("prison", PrisonService.name_for(@contact.prison), id: "prison", class: "govuk-input") %>
+        </div>
+        <div class="<%= class_type(@contact.errors) %>">
+          <%= label_tag "Describe what you need help with", "Describe what you need help with", class: 'govuk-label' %>
+          <% if @contact.errors[:body].present? %>
+                  <span class="govuk-error-message">
+                    <%= @contact.errors[:body].first %>
+                  </span>
+          <% end %>
+          <%= text_area_tag("body", nil, rows: 10, id: "body", class: "govuk-textarea") %>
+        </div>
+      </div>
+      <button class="govuk-button" type="submit">Submit</button>
+    <% end %>
+  </div>
+</div>
+

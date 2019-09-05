@@ -3,37 +3,69 @@
 class PagesController < ApplicationController
   layout 'errors_and_contact'
 
-  def help; end
-
-  def guidance; end
-
-  def contact
-    @contact = nil
+  def help
+    if current_user.present?
+      @user = Nomis::Elite2::UserApi.user_details(current_user)
+      @contact = ContactSubmission.new(email_address: @user.email_address.first,
+                                       name: @user.full_name_ordered,
+                                       prison: @user.active_case_load_id
+      )
+    else
+      @contact = ContactSubmission.new
+    end
   end
 
-  def create_contact
-    @user = Nomis::Elite2::UserApi.user_details(current_user)
+  def create_help
+    @user = Nomis::Elite2::UserApi.user_details(current_user) if current_user.present?
     @contact = ContactSubmission.new(
-        name: contact_params[:name],
-        role: contact_params[:role],
-        email_address: contact_params[:email_address],
-        prison: contact_params[:prison],
-        body: contact_params[:more_detail],
+        name: help_params[:name],
+        role: help_params[:role],
+        email_address: help_params[:email_address],
+        prison: save_prison_name,
+        body: help_params[:body],
         user_agent: request.headers['HTTP_USER_AGENT'],
         referrer: request.referrer
     )
     if @contact.save
-      ZendeskTicketsJob.perform_later(@contact)
-      redirect_to contact_path
-                  flash[:notice] = "Your contact form has been submitted"
+      ZendeskTicketsJob.perform_later(@contact) if Rails.configuration.zendesk_enabled
+
+      if current_user.present?
+        redirect_to prison_dashboard_index_path(@user.active_case_load_id)
+        flash[:notice] = "Your form has been submitted"
+      else
+        redirect_to help_path
+        flash[:notice] = "Your form has been submitted"
+      end
     else
-      render :contact
+      render :help
     end
   end
 
+  def guidance; end
+
+  def contact; end
+
 private
 
-  def contact_params
-    params.permit(:more_detail, :email_address, :name, :prison, :role)
+  def redirect_path
+    if current_user.present?
+      flash[:notice] = "Your form has been submitted"
+      redirect_to prison_dashboard_index_path(@user.active_case_load_id)
+    else
+      flash[:notice] = "Your form has been submitted"
+      redirect_to help_path
+    end
+  end
+
+  def save_prison_name
+    if PrisonService.prison_codes.include?(help_params[:prison])
+      PrisonService.name_for(help_params[:prison])
+    else
+      help_params[:prison]
+    end
+  end
+
+  def help_params
+    params.permit(:body, :email_address, :name, :prison, :role)
   end
 end

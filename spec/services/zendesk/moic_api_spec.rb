@@ -2,12 +2,12 @@ require 'rails_helper'
 
 RSpec.describe Zendesk::MOICApi do
   let(:zendesk_api_client) { double(ZendeskAPI::Client) }
-  let(:zendesk_moic_client) { Zendesk::Client.instance }
+  let(:zendes_moic_client) { Zendesk::MOICClient.instance }
 
-  subject { described_class.new(zendesk_moic_client) }
+  subject { described_class.new(zendes_moic_client) }
 
   before do
-    allow(zendesk_moic_client).to receive(:request).and_yield(zendesk_api_client)
+    allow(zendes_moic_client).to receive(:request).and_yield(zendesk_api_client)
   end
 
   describe '#cleanup_tickets' do
@@ -17,7 +17,7 @@ RSpec.describe Zendesk::MOICApi do
     let(:twelve_months_ago) { 12.months.ago.strftime('%Y-%m-%d') }
     let(:query) do
       {
-          query: "type:ticket tags:ENTER A TAG updated<#{twelve_months_ago}",
+          query: "type:ticket tags:moic updated<#{twelve_months_ago}",
           reload: true
       }
     end
@@ -44,15 +44,22 @@ RSpec.describe Zendesk::MOICApi do
       { id: ZendeskTicketsJob::BROWSER_FIELD, value: 'Mozilla' }
     end
 
+    let(:prison_custom_field) do
+      { id: ZendeskTicketsJob::PRISON_FIELD, value: 'LEI' }
+    end
+
     let(:ticket_attributes) do
       {
           description: 'text',
-          requester: { email: 'feedback@email.test.host', name: 'Unknown' },
-          custom_fields: [
-              url_custom_field,
-              browser_custom_field,
-              service_custom_field
-          ]
+          requester: { email: 'email@example.com',
+                       name: 'Frank',
+                       role: 'SPO',
+                       tags: ['moic'],
+                       custom_fields: [
+                           url_custom_field,
+                           browser_custom_field,
+                           prison_custom_field
+                       ]}
       }
     end
 

@@ -1,6 +1,21 @@
 class ContactSubmission < ApplicationRecord
-  validates :body, presence: true
-  validates :email_address, presence: true
-  validates :name, presence: true
-  validates :prison, presence: true
+  validates :email_address, presence: {
+      message: 'Email address is required'
+  }
+
+  validates :name, presence: {
+      message: 'Your name is required'
+  }
+
+  validates :prison, presence: {
+      message: 'The prison name is required'
+  }
+
+  validates :role, presence: {
+      message: 'Your role is required'
+  }
+  
+  validates :body, presence: {
+      message: 'A message is required'
+  }
 end

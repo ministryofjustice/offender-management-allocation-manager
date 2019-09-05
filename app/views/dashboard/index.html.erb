@@ -2,6 +2,12 @@
   <%= render '/layouts/prison_switcher' %>
 <% end %>
 
+<% if notice.present? %>
+  <p class="notification govuk-!-margin-bottom-9" role="group" aria-labelledby="notice-heading">
+    <%= notice %>
+  </p>
+<% end %>
+
 <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Dashboard</h1>
 
 <div class="govuk-!-margin-bottom-4">

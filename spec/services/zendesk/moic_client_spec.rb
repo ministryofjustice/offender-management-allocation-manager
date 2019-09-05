@@ -3,6 +3,10 @@ require 'rails_helper'
 RSpec.describe Zendesk::MOICClient do
   subject { described_class.instance }
 
+  let(:url) { 'https://zendesk_api.com' }
+  let(:username) { 'bob' }
+  let(:password) { '123456' }
+
   # Ensure that we have a new instance to prevent other specs interfering
   around do |ex|
     Singleton.__init__(described_class)
@@ -11,22 +15,23 @@ RSpec.describe Zendesk::MOICClient do
   end
 
   before do
-    ENV['ZENDESK_URL'] = 'https://zendesk_api.com'
-    ENV['ZENDESK_USERNAME'] = "bob"
-    ENV['ZENDESK_TOKEN'] = "123456"
+    allow(Rails.application.config).to receive(:zendesk_url).and_return('https://zendesk_api.com')
+    allow(Rails.application.config).to receive(:zendesk_username).and_return('bob')
+    allow(Rails.application.config).to receive(:zendesk_password).and_return('123456')
   end
 
   describe 'a valid instance' do
     it 'has a zendesk url' do
-      subject.request { |client| expect(client.config.url).to eq(url) }
+     expect(subject.request { |client| client.config.url }).to eq(url)
     end
 
     it 'has a zendesk username' do
-      subject.request { |client| expect(client.config.username).to eq("#{username}/token") }
+
+      expect(subject.request { |client| client.config.username }).to eq username
     end
 
-    it 'has a zendesk token' do
-      subject.request { |client| expect(client.config.token).to eq(token) }
+    it 'has a zendesk password' do
+      subject.request { |client| expect(client.config.password).to eq(password) }
     end
   end
 

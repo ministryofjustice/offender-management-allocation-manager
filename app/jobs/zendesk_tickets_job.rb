@@ -18,14 +18,14 @@ class ZendeskTicketsJob < ActiveJob::Base
   end
 
   def ticket_attrs(contact)
-    attrs = {
+    {
         description: contact.body,
         requester: { email: contact.email_address,
                      name: contact.name,
+                     role: contact.role,
                      tags: ['moic'],
                      custom_fields: custom_fields(contact)}
     }
-    attrs
   end
 
   def custom_fields(contact)
