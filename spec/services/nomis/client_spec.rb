@@ -49,6 +49,13 @@ describe Nomis::Client do
       expect(AllocationManager::ExceptionHandler).to receive(:capture_exception).with(error)
       expect { client.get(route) }.to raise_error(Nomis::Client::APIError)
     end
+
+    it 'does not send the error to sentry if told not to' do
+      non_logging_client = described_class.new(api_host, false)
+
+      expect(AllocationManager::ExceptionHandler).not_to receive(:capture_exception).with(error)
+      expect { non_logging_client.get(route) }.to raise_error(Nomis::Client::APIError)
+    end
   end
 
   describe 'when there is an 500 (server broken) error' do
@@ -64,7 +71,7 @@ describe Nomis::Client do
 
     it 'raises an APIError', :raven_intercept_exception do
       expect { client.get(route) }.
-        to raise_error(Nomis::Client::APIError, 'Unexpected status 500')
+        to raise_error(Nomis::Client::APIError, 'Client error: 500')
     end
 
     it 'sends the error to sentry' do
