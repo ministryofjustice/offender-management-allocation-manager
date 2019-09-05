@@ -11,11 +11,11 @@ class ContactSubmission < ApplicationRecord
     message: 'The prison name is required'
   }
 
-  validates :role, presence: {
+  validates :job_type, presence: {
     message: 'Your role is required'
   }
 
-  validates :body, presence: {
+  validates :message, presence: {
     message: 'A message is required'
   }
 end

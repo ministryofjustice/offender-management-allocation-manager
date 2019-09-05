@@ -19,10 +19,10 @@ private
 
   def ticket_attrs(contact)
     {
-      description: contact.body,
+      description: contact.message,
       requester: { email: contact.email_address,
                    name: contact.name,
-                   role: contact.role,
+                   job_type: contact.job_type,
                    tags: ['moic'],
                    custom_fields: custom_fields(contact) }
     }

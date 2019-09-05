@@ -8,7 +8,8 @@ class PagesController < ApplicationController
       @user = Nomis::Elite2::UserApi.user_details(current_user)
       @contact = ContactSubmission.new(email_address: @user.email_address.first,
                                        name: @user.full_name_ordered,
-                                       prison: @user.active_case_load_id
+                                       prison: PrisonService.name_for(
+                                         @user.active_case_load_id)
       )
     else
       @contact = ContactSubmission.new
@@ -19,10 +20,10 @@ class PagesController < ApplicationController
     @user = Nomis::Elite2::UserApi.user_details(current_user) if current_user.present?
     @contact = ContactSubmission.new(
       name: help_params[:name],
-      role: help_params[:role],
+      job_type: help_params[:job_type],
       email_address: help_params[:email_address],
-      prison: save_prison_name,
-      body: help_params[:body],
+      prison: help_params[:prison],
+      message: help_params[:message],
       user_agent: request.headers['HTTP_USER_AGENT'],
       referrer: request.referer
     )
@@ -50,15 +51,7 @@ private
     flash[:notice] = 'Your form has been submitted'
   end
 
-  def save_prison_name
-    if PrisonService.prison_codes.include?(help_params[:prison])
-      PrisonService.name_for(help_params[:prison])
-    else
-      help_params[:prison]
-    end
-  end
-
   def help_params
-    params.permit(:body, :email_address, :name, :prison, :role)
+    params.permit(:message, :email_address, :name, :prison, :job_type)
   end
 end

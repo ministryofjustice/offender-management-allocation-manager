@@ -5,13 +5,13 @@ RSpec.describe ZendeskTicketsJob, type: :job do
 
   let!(:contact) {
     ContactSubmission.create!(
-      body: 'text',
+      message: 'text',
       name: 'Frank',
       prison: 'Leeds',
       email_address: 'email@example.com',
       referrer: 'ref',
       user_agent: 'Mozilla',
-      role: 'SPO'
+      job_type: 'SPO'
     )
   }
 
@@ -45,7 +45,7 @@ RSpec.describe ZendeskTicketsJob, type: :job do
                 description: 'text',
                 requester: { email: 'email@example.com',
                              name: 'Frank',
-                             role: 'SPO',
+                             job_type: 'SPO',
                              tags: ['moic'],
                              custom_fields: [
                     url_custom_field,
@@ -66,7 +66,7 @@ RSpec.describe ZendeskTicketsJob, type: :job do
                 description: 'text',
                 requester: { email: 'email@example.com',
                              name: 'Frank',
-                             role: 'SPO',
+                             job_type: 'SPO',
                              tags: ['moic'],
                              custom_fields: [
                                  url_custom_field,
@@ -89,7 +89,7 @@ RSpec.describe ZendeskTicketsJob, type: :job do
                 description: 'text',
                 requester: { email: 'email@example.com',
                              name: 'Frank',
-                             role: 'SPO',
+                             job_type: 'SPO',
                              tags: ['moic'],
                              custom_fields: [
                                  url_custom_field,
