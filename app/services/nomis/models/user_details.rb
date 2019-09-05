@@ -27,7 +27,7 @@ module Nomis
         UserDetails.new.tap { |obj|
           obj.account_status = payload['accountStatus']
           obj.active = payload['active']
-          obj.active_case_load_id = payload['acticeCaseLoadId']
+          obj.active_case_load_id = payload['activeCaseLoadId']
           obj.expiry_date = payload['expiryDate']
           obj.expired_flag = payload['expiredFlag']
           obj.first_name = payload['firstName']
