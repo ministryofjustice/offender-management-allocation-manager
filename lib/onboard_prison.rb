@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class OnboardPrison
   attr_reader :offender_ids, :delius_records
   attr_accessor :delius_missing, :additions

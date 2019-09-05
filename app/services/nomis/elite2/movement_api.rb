@@ -12,7 +12,6 @@ module Nomis
                                movementDate: date.strftime('%F'),
                                fromDateTime: (date - 1.day).strftime('%FT%R')
                              })
-
         data.map { |movement|
           api_deserialiser.deserialise(Nomis::Models::Movement, movement)
         }

@@ -1,26 +1,20 @@
 module Nomis
   module Models
     class OffenderBase
-      include MemoryModel
-
-      attribute :first_name, :string
-      attribute :last_name, :string
-      attribute :date_of_birth, :date
-      attribute :offender_no, :string
-      attribute :convicted_status, :string
-      attribute :imprisonment_status, :string
+      attr_accessor :first_name,
+                    :last_name,
+                    :date_of_birth,
+                    :offender_no,
+                    :convicted_status,
+                    :imprisonment_status,
+                    :category_code
 
       # Custom attributes
-      attribute :crn, :string
-      attribute :category_code, :string
-      attribute :allocated_pom_name, :string
-      attribute :case_allocation, :string
-      attribute :omicable, :boolean
-      attribute :tier, :string
-      attribute :sentence
-      attribute :mappa_level, :integer
-      attribute :ldu, :string
-      attribute :team, :string
+      attr_accessor :crn,
+                    :allocated_pom_name, :case_allocation,
+                    :omicable, :tier,
+                    :sentence, :mappa_level,
+                    :ldu, :team
 
       def convicted?
         convicted_status == 'Convicted'
@@ -87,6 +81,19 @@ module Nomis
         @age ||= ((Time.zone.now - date_of_birth.to_time) / 1.year.seconds).floor
       end
       # rubocop:enable Rails/Date
+
+      def load_from_json(payload)
+        # It is expected that this method will be called by the subclass which
+        # will have been given a payload at the class level, and will call this
+        # method from it's own internal from_json
+        @first_name = payload['firstName']
+        @last_name = payload['lastName']
+        @offender_no = payload['offenderNo']
+        @convicted_status = payload['convictedStatus']
+        @imprisonment_status = payload['imprisonmentStatus']
+        @category_code = payload['categoryCode']
+        @date_of_birth = deserialise_date(payload, 'dateOfBirth')
+      end
     end
   end
 end

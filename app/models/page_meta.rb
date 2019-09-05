@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
 class PageMeta
-  include MemoryModel
-
-  attribute :size, :integer
-  attribute :total_elements, :integer
-  attribute :total_pages, :integer
-  attribute :number, :integer
-  attribute :items_on_page, :integer
+  attr_accessor :size,
+                :total_elements,
+                :total_pages,
+                :number,
+                :items_on_page
 
   def record_range
     return '0 - 0' if total_elements == 0

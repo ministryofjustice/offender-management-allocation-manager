@@ -27,7 +27,6 @@ gem 'uglifier', '>= 1.3.0'
 gem 'loaf'
 gem 'typhoeus'
 gem 'redis'
-gem 'plissken'
 gem 'fast_underscore', require: false
 gem 'flipflop'
 gem 'hashdiff', ['>= 1.0.0.beta1', '< 2.0.0']

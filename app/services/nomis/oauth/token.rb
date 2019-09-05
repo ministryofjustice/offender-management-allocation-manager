@@ -5,15 +5,22 @@ require 'base64'
 module Nomis
   module Oauth
     class Token
-      include MemoryModel
+      include Deserialisable
 
-      attribute :access_token, :string
-      attribute :token_type, :string
-      attribute :expires_in, :string
-      attribute :scope, :string
-      attribute :internal_user, :string
-      attribute :jti, :string
-      attribute :auth_source, :string
+      attr_accessor :access_token,
+                    :token_type,
+                    :expires_in,
+                    :scope,
+                    :internal_user,
+                    :jti,
+                    :auth_source
+
+      def initialize(fields = nil)
+        # Allow this object to be reconstituted from a hash, we can't use
+        # from_json as the one passed in will already be using the snake case
+        # names whereas from_json is expecting the elite2 camelcase names.
+        fields.each { |k, v| instance_variable_set("@#{k}", v) } if fields.present?
+      end
 
       def expired?
         JWT.decode(
@@ -26,6 +33,18 @@ module Nomis
       rescue JWT::ExpiredSignature => e
         Raven.capture_exception(e)
         true
+      end
+
+      def self.from_json(payload)
+        Token.new.tap { |obj|
+          obj.access_token = payload['access_token']
+          obj.token_type = payload['token_type']
+          obj.expires_in = payload['expires_in']
+          obj.scope = payload['scope']
+          obj.internal_user = payload['internal_user']
+          obj.jti = payload['jti']
+          obj.auth_source = payload['auth_source']
+        }
       end
 
     private
