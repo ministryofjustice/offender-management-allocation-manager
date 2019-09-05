@@ -7,8 +7,9 @@ module Nomis
   class Client
     APIError = Class.new(StandardError)
 
-    def initialize(root)
+    def initialize(root, log404 = true)
       @root = root
+      @log404 = log404
       @connection = Faraday.new do |faraday|
         faraday.request :retry, max: 3, interval: 0.05,
                                 interval_randomness: 0.5, backoff_factor: 2,
@@ -73,9 +74,12 @@ module Nomis
     rescue Faraday::ConnectionFailed => e
       AllocationManager::ExceptionHandler.capture_exception(e)
       raise APIError, "Failed to connect to #{@root}"
-    rescue Faraday::ResourceNotFound, Faraday::ClientError => e
-      AllocationManager::ExceptionHandler.capture_exception(e)
+    rescue Faraday::ResourceNotFound => e
+      AllocationManager::ExceptionHandler.capture_exception(e)  if @log404
       raise APIError, "Unexpected status #{e.response[:status]}"
+    rescue Faraday::ClientError => e
+      AllocationManager::ExceptionHandler.capture_exception(e)
+      raise APIError, "Client error: #{e.response[:status]}"
     end
 
     def token
