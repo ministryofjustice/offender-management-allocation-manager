@@ -39,6 +39,7 @@ module Nomis
           obj.thumbnail_id = payload['thumbnailId']
           obj.username = payload['username']
         }
+      end
 
       def full_name_ordered
         "#{first_name} #{last_name}".titleize
