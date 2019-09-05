@@ -18,7 +18,7 @@ module Nomis
 
       def self.client
         host = Rails.configuration.keyworker_api_host
-        Nomis::Client.new(host)
+        Nomis::Client.new(host, false)
       end
     end
   end

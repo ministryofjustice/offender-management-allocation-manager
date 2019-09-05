@@ -13,7 +13,7 @@ describe Nomis::Keyworker::KeyworkerApi do
       expect(response.first_name).to eq('DOM')
     end
 
-    it 'returns null if unable find a Keyworker', :raven_intercept_exception,
+    it 'returns nullkeyworker if unable find a Keyworker', :raven_intercept_exception,
        vcr: { cassette_name: :keyworker_api_details_not_found_spec } do
       unknown_offender_no = 'GGGGGGG'
       response = described_class.get_keyworker(location, unknown_offender_no)
