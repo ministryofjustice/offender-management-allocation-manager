@@ -68,7 +68,6 @@ module OmniAuth
 
       def user_details
         @user_details = Nomis::Elite2::UserApi.user_details(username)
-        @user_details
         @user_details.nomis_caseloads = Nomis::Elite2::UserApi.user_caseloads(
           @user_details.staff_id)
         @user_details

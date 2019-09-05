@@ -10,7 +10,8 @@ module Nomis
         response = e2_client.get(route)
 
         user = api_deserialiser.deserialise(Nomis::UserDetails, response)
-        user.email_address = Nomis::Elite2::PrisonOffenderManagerApi.fetch_email_addresses(user.staff_id)
+        user.email_address =
+          Nomis::Elite2::PrisonOffenderManagerApi.fetch_email_addresses(user.staff_id)
         user
       end
 

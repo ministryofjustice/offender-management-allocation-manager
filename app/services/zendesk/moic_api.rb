@@ -18,7 +18,7 @@ module Zendesk
       # rubocop:enable Lint/AssignmentInCondition
     end
 
-    private
+  private
 
     attr_accessor :zendesk_moic_client
 
@@ -38,8 +38,8 @@ module Zendesk
 
     def old_tickets_query_for(inbox)
       {
-          query: "type:ticket tags:#{inbox} updated<#{twelve_months_ago}",
-          reload: true
+        query: "type:ticket tags:#{inbox} updated<#{twelve_months_ago}",
+        reload: true
       }
     end
 

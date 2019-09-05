@@ -22,11 +22,10 @@ RSpec.describe Zendesk::MOICClient do
 
   describe 'a valid instance' do
     it 'has a zendesk url' do
-     expect(subject.request { |client| client.config.url }).to eq(url)
+      expect(subject.request { |client| client.config.url }).to eq(url)
     end
 
     it 'has a zendesk username' do
-
       expect(subject.request { |client| client.config.username }).to eq username
     end
 

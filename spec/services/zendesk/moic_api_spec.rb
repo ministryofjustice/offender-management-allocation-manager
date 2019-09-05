@@ -17,8 +17,8 @@ RSpec.describe Zendesk::MOICApi do
     let(:twelve_months_ago) { 12.months.ago.strftime('%Y-%m-%d') }
     let(:query) do
       {
-          query: "type:ticket tags:moic updated<#{twelve_months_ago}",
-          reload: true
+        query: "type:ticket tags:moic updated<#{twelve_months_ago}",
+        reload: true
       }
     end
 
@@ -50,16 +50,16 @@ RSpec.describe Zendesk::MOICApi do
 
     let(:ticket_attributes) do
       {
-          description: 'text',
-          requester: { email: 'email@example.com',
-                       name: 'Frank',
-                       role: 'SPO',
-                       tags: ['moic'],
-                       custom_fields: [
+        description: 'text',
+        requester: { email: 'email@example.com',
+                     name: 'Frank',
+                     role: 'SPO',
+                     tags: ['moic'],
+                     custom_fields: [
                            url_custom_field,
                            browser_custom_field,
                            prison_custom_field
-                       ]}
+                       ] }
       }
     end
 
@@ -67,8 +67,8 @@ RSpec.describe Zendesk::MOICApi do
       expect(ZendeskAPI::Ticket).
           to receive(:new).
               with(
-                  zendesk_api_client,
-                  ticket_attributes
+                zendesk_api_client,
+                ticket_attributes
               ).
               and_return(ticket)
 

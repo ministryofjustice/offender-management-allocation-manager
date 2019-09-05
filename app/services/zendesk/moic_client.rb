@@ -19,7 +19,7 @@ module Zendesk
       }
     end
 
-    private
+  private
 
     attr_accessor :pool
 

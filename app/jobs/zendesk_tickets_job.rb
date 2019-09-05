@@ -10,7 +10,7 @@ class ZendeskTicketsJob < ActiveJob::Base
     contact.destroy! if ticket_raised!(contact)
   end
 
-  private
+private
 
   def ticket_raised!(contact)
     client = Zendesk::MOICClient.instance
@@ -19,12 +19,12 @@ class ZendeskTicketsJob < ActiveJob::Base
 
   def ticket_attrs(contact)
     {
-        description: contact.body,
-        requester: { email: contact.email_address,
-                     name: contact.name,
-                     role: contact.role,
-                     tags: ['moic'],
-                     custom_fields: custom_fields(contact)}
+      description: contact.body,
+      requester: { email: contact.email_address,
+                   name: contact.name,
+                   role: contact.role,
+                   tags: ['moic'],
+                   custom_fields: custom_fields(contact) }
     }
   end
 

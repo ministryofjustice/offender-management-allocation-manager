@@ -24,7 +24,6 @@ feature 'Getting help' do
     click_button('Submit')
 
     expect(page).to have_content('There is a problem')
-
   end
 
   it 'redirects a signed in user to the dashboard' do

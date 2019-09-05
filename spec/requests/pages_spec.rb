@@ -4,8 +4,9 @@ describe 'POST /help', type: :request do
   before do
     allow(ZendeskTicketsJob).to receive(:perform_later).and_return(true)
   end
+
   it 'submits a form with contact information' do
-    post '/help', params: { "email_address"=>"kath@example.com", "name"=>"Kath", "role"=>"SPO", "prison"=>"Leeds", "body"=>"This is a query" }
+    post '/help', params: { "email_address" => "kath@example.com", "name" => "Kath", "role" => "SPO", "prison" => "Leeds", "body" => "This is a query" }
 
     expect(response.status).to eq(302)
   end

@@ -5,13 +5,13 @@ RSpec.describe ZendeskTicketsJob, type: :job do
 
   let!(:contact) {
     ContactSubmission.create!(
-        body: 'text',
-        name: 'Frank',
-        prison: 'Leeds',
-        email_address: 'email@example.com',
-        referrer: 'ref',
-        user_agent: 'Mozilla',
-        role: 'SPO'
+      body: 'text',
+      name: 'Frank',
+      prison: 'Leeds',
+      email_address: 'email@example.com',
+      referrer: 'ref',
+      user_agent: 'Mozilla',
+      role: 'SPO'
     )
   }
 
@@ -38,42 +38,41 @@ RSpec.describe ZendeskTicketsJob, type: :job do
   end
 
   context 'when contact is associated to a prison' do
-
     it 'creates a ticket with custom fields containing the prison' do
       expect(zendesk_moic_api).
           to receive(:raise_ticket).
               with(
-                  description: 'text',
-                  requester: { email: 'email@example.com',
-                               name: 'Frank',
-                               role: 'SPO',
-                               tags: ['moic'],
-                  custom_fields: [
-                      url_custom_field,
-                      browser_custom_field,
-                      prison_custom_field
-                  ]}
+                description: 'text',
+                requester: { email: 'email@example.com',
+                             name: 'Frank',
+                             role: 'SPO',
+                             tags: ['moic'],
+                             custom_fields: [
+                    url_custom_field,
+                    browser_custom_field,
+                    prison_custom_field
+                ] }
               ).and_return(true)
 
-       subject.perform_now(contact)
+      subject.perform_now(contact)
     end
   end
-  
+
   context 'when raising a ticket is successful' do
     it 'deletes the contact submission' do
       expect(zendesk_moic_api).
           to receive(:raise_ticket).
               with(
-                  description: 'text',
-                  requester: { email: 'email@example.com',
-                               name: 'Frank',
-                               role: 'SPO',
-                               tags: ['moic'],
-                               custom_fields: [
-                                   url_custom_field,
-                                   browser_custom_field,
-                                   prison_custom_field
-                               ]}
+                description: 'text',
+                requester: { email: 'email@example.com',
+                             name: 'Frank',
+                             role: 'SPO',
+                             tags: ['moic'],
+                             custom_fields: [
+                                 url_custom_field,
+                                 browser_custom_field,
+                                 prison_custom_field
+                             ] }
               ).and_return(true)
 
       subject.perform_now(contact)
@@ -87,16 +86,16 @@ RSpec.describe ZendeskTicketsJob, type: :job do
       allow(zendesk_moic_api).
           to receive(:raise_ticket).
               with(
-                  description: 'text',
-                  requester: { email: 'email@example.com',
-                               name: 'Frank',
-                               role: 'SPO',
-                               tags: ['moic'],
-                               custom_fields: [
-                                   url_custom_field,
-                                   browser_custom_field,
-                                   prison_custom_field
-                               ]}
+                description: 'text',
+                requester: { email: 'email@example.com',
+                             name: 'Frank',
+                             role: 'SPO',
+                             tags: ['moic'],
+                             custom_fields: [
+                                 url_custom_field,
+                                 browser_custom_field,
+                                 prison_custom_field
+                             ] }
               ).and_raise(ZendeskAPI::Error::ClientError.new('Error'))
 
       expect { subject.perform_now(contact) }.to raise_error(ZendeskAPI::Error::ClientError)

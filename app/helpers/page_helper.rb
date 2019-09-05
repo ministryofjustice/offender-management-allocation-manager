@@ -14,9 +14,9 @@ module PageHelper
 
   def class_type(contact_errors)
     if contact_errors.present?
-      "govuk-form-group govuk-form-group--error"
+      'govuk-form-group govuk-form-group--error'
     else
-      "govuk-form-group"
+      'govuk-form-group'
     end
   end
 end

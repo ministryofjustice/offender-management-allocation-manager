@@ -18,24 +18,18 @@ class PagesController < ApplicationController
   def create_help
     @user = Nomis::Elite2::UserApi.user_details(current_user) if current_user.present?
     @contact = ContactSubmission.new(
-        name: help_params[:name],
-        role: help_params[:role],
-        email_address: help_params[:email_address],
-        prison: save_prison_name,
-        body: help_params[:body],
-        user_agent: request.headers['HTTP_USER_AGENT'],
-        referrer: request.referrer
+      name: help_params[:name],
+      role: help_params[:role],
+      email_address: help_params[:email_address],
+      prison: save_prison_name,
+      body: help_params[:body],
+      user_agent: request.headers['HTTP_USER_AGENT'],
+      referrer: request.referer
     )
     if @contact.save
       ZendeskTicketsJob.perform_later(@contact) if Rails.configuration.zendesk_enabled
 
-      if current_user.present?
-        redirect_to prison_dashboard_index_path(@user.active_case_load_id)
-        flash[:notice] = "Your form has been submitted"
-      else
-        redirect_to help_path
-        flash[:notice] = "Your form has been submitted"
-      end
+      redirect_path
     else
       render :help
     end
@@ -49,12 +43,11 @@ private
 
   def redirect_path
     if current_user.present?
-      flash[:notice] = "Your form has been submitted"
       redirect_to prison_dashboard_index_path(@user.active_case_load_id)
     else
-      flash[:notice] = "Your form has been submitted"
       redirect_to help_path
     end
+    flash[:notice] = 'Your form has been submitted'
   end
 
   def save_prison_name
