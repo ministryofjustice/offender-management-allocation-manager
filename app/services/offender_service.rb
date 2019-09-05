@@ -118,7 +118,7 @@ class OffenderService
           a.nomis_offender_id,
           {
             pom_name: pom_names[a.primary_pom_nomis_id],
-            allocation_date: a.primary_pom_allocated_at.to_date
+            allocation_date: (a.primary_pom_allocated_at || a.updated_at)&.to_date
           }
         ]
       }.to_h
