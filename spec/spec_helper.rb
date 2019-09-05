@@ -1,6 +1,6 @@
 require 'simplecov'
 
-SimpleCov.minimum_coverage 97
+SimpleCov.minimum_coverage 95
 
 SimpleCov.start 'rails' do
   add_filter '/gems/'
