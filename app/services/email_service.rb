@@ -85,6 +85,10 @@ private
   end
 
   def send_deallocation_email
+    # If the previous pom does not have email configured, do not
+    # try and email them.
+    return if previous_pom.emails.blank?
+
     PomMailer.deallocation_email(
       previous_pom_name: previous_pom.first_name.capitalize,
       responsibility: current_responsibility,
