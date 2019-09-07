@@ -1,0 +1,76 @@
+# frozen_string_literal: true
+
+require_relative '../application_service'
+
+module MovementService
+  class ProcessMovement < ApplicationService
+    attr_reader :movement
+
+    def initialize(movement)
+      @movement = movement
+    end
+
+    def call
+      if @movement.movement_type == Nomis::Models::MovementType::RELEASE
+        return process_release(@movement)
+      end
+
+      # We need to check whether the from_agency is from within the prison estate
+      # to know whether it is a transfer.  If it isn't then we want to bail and
+      # not process the new admission.
+      if [Nomis::Models::MovementType::ADMISSION,
+          Nomis::Models::MovementType::TRANSFER].include?(@movement.movement_type)
+        return process_transfer(@movement)
+      end
+
+      false
+    end
+
+  private
+
+    def process_transfer(transfer)
+      # Bail if this is a new admission to prison
+      return false unless transfer.from_prison? && transfer.to_prison?
+      return false unless transfer.direction_code == 'IN'
+
+      # We only want to deallocate the offender if they have not already been
+      # allocated at their new prison
+      if AllocationVersion.where(
+        nomis_offender_id: transfer.offender_no,
+        prison: transfer.to_agency
+      ).count > 0
+
+        Rails.logger.info("Offender #{transfer.offender_no} was transferred but \
+          an allocation at #{transfer.to_agency} already exists")
+
+        return false
+      end
+
+      Rails.logger.info("Processing transfer for #{transfer.offender_no}")
+
+      return false unless should_process?(transfer.offender_no)
+
+      AllocationVersion.deallocate_offender(transfer.offender_no,
+                                            AllocationVersion::OFFENDER_TRANSFERRED)
+      true
+    end
+
+    # When an offender is released, we can no longer rely on their
+    # case information (in case they come back one day), and we
+    # should de-activate any current allocations.
+    def process_release(release)
+      return false unless release.to_agency == 'OUT' && release.from_prison?
+
+      Rails.logger.info("Processing release for #{release.offender_no}")
+      CaseInformationService.delete_information(release.offender_no)
+      AllocationVersion.deallocate_offender(release.offender_no,
+                                            AllocationVersion::OFFENDER_RELEASED)
+
+      true
+    end
+
+    def should_process?(offender_no)
+      OffenderService::Get.call(offender_no).convicted?
+    end
+  end
+end

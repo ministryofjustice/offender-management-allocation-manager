@@ -4,7 +4,7 @@ class MovementsOnDateJob < ApplicationJob
   def perform(date_string)
     yesterday = Date.parse(date_string) - 1.day
 
-    movements = MovementService.movements_on(
+    movements = MovementService::MovementsOn.call(
       yesterday,
       type_filters: [
         Nomis::Models::MovementType::ADMISSION,

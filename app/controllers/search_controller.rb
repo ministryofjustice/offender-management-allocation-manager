@@ -8,7 +8,7 @@ class SearchController < PrisonsApplicationController
   def search
     @q = search_term
 
-    offenders = SearchService.search_for_offenders(@q, active_prison)
+    offenders = SearchService::Search.call(@q, active_prison)
     total = offenders.count
 
     @offenders = get_slice_for_page(offenders, page)
