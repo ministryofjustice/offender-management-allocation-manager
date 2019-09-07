@@ -2,7 +2,7 @@
 
 require_relative '../application_service'
 
-module POM
+module POMService
   class GetPom < ApplicationService
     attr_reader :prison, :staff_id
 
@@ -18,7 +18,7 @@ module POM
       @pom = poms_list.select { |p| p.staff_id == @staff_id.to_i }.first
       return nil if @pom.blank?
 
-      @pom.emails = POM::GetPomEmails.call(@pom.staff_id)
+      @pom.emails = POMService::GetPomEmails.call(@pom.staff_id)
       @pom
     end
   end

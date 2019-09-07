@@ -10,7 +10,7 @@ class CoworkingController < PrisonsApplicationController
 
     # GetPom and GetPomsForPrison return different data
     # so have to compare theit staff_ids.
-    poms = POM::GetPomsForPrison.call(active_prison).reject { |pom|
+    poms = POMService::GetPomsForPrison.call(active_prison).reject { |pom|
       pom.staff_id == @current_pom.staff_id
     }
 
@@ -24,10 +24,10 @@ class CoworkingController < PrisonsApplicationController
 
   def confirm
     @prisoner = offender(nomis_offender_id_from_url)
-    @primary_pom = POM::GetPom.call(
+    @primary_pom = POMService::GetPom.call(
       active_prison, primary_pom_id_from_url
     )
-    @secondary_pom = POM::GetPom.call(
+    @secondary_pom = POMService::GetPom.call(
       active_prison, secondary_pom_id_from_url
     )
   end
@@ -35,7 +35,7 @@ class CoworkingController < PrisonsApplicationController
   # rubocop:disable Metrics/LineLength
   def create
     offender = offender(allocation_params[:nomis_offender_id])
-    pom = POM::GetPom.call(
+    pom = POMService::GetPom.call(
       active_prison,
       allocation_params[:nomis_staff_id]
     )
@@ -56,7 +56,7 @@ class CoworkingController < PrisonsApplicationController
     @allocation = AllocationVersion.find_by!(
       nomis_offender_id: coworking_nomis_offender_id_from_url
     )
-    @primary_pom = POM::GetPom.call(
+    @primary_pom = POMService::GetPom.call(
       active_prison, @allocation.primary_pom_nomis_id
     )
     @errors = OpenStruct.new(count: 0)
@@ -69,7 +69,7 @@ class CoworkingController < PrisonsApplicationController
     @allocation = AllocationVersion.find_by!(
       nomis_offender_id: nomis_offender_id_from_url
     )
-    @primary_pom = POM::GetPom.call(
+    @primary_pom = POMService::GetPom.call(
       active_prison, @allocation.primary_pom_nomis_id
     )
     if reallocate.nil?

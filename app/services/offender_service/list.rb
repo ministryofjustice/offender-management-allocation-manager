@@ -2,8 +2,8 @@
 
 require_relative '../application_service'
 
-module POM
-  class UnavailablePomCount < ApplicationService
+module OffenderService
+  class List < ApplicationService
     attr_reader :prison
 
     def initialize(prison)
@@ -11,10 +11,7 @@ module POM
     end
 
     def call
-      poms = POM::GetPomsForPrison.call(prison).reject { |pom|
-        pom.status == 'active'
-      }
-      poms.count
+      OffenderEnumerator.new(@prison)
     end
   end
 end

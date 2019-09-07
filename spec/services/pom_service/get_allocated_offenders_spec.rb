@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe POM::GetAllocatedOffenders do
+describe POMService::GetAllocatedOffenders do
   let(:staff_id) { 485_737 }
   let(:other_staff_id) { 485_637 }
 

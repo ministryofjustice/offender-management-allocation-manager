@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe POM::GetPomNames do
+describe POMService::GetPomNames do
   let(:prison) { 'LEI' }
 
   describe '#get_pom_names' do

@@ -2,7 +2,7 @@
 
 require_relative '../application_service'
 
-module POM
+module POMService
   class GetPomsForPrison < ApplicationService
     attr_reader :prison
 

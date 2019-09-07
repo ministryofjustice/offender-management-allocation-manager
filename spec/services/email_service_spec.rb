@@ -52,7 +52,7 @@ RSpec.describe EmailService, :queueing do
   end
 
   it "Can not crash when a pom has no email", vcr: { cassette_name: :email_service_send_allocation_email }, versioning: true  do
-    allow(POM::GetPomEmails).to receive(:call).and_return(nil)
+    allow(POMService::GetPomEmails).to receive(:call).and_return(nil)
 
     expect {
       described_class.instance(allocation: allocation, message: "", pom_nomis_id: allocation.primary_pom_nomis_id).send_email

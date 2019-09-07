@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe POM::GetPom do
+describe POMService::GetPom do
   let(:other_staff_id) { 485_637 }
   let(:staff_id) { 485_737 }
 

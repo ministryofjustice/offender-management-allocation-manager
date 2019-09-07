@@ -2,7 +2,7 @@
 
 require_relative '../application_service'
 
-module POM
+module POMService
   class GetAllocatedOffenders < ApplicationService
     attr_reader :prison, :staff_id
 

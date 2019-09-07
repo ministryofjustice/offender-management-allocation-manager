@@ -10,7 +10,7 @@ class CaseloadController < PrisonsApplicationController
   PAGE_SIZE = 20
 
   def index
-    allocations = POM::GetAllocatedOffenders.call(
+    allocations = POMService::GetAllocatedOffenders.call(
       @pom.staff_id, active_prison
     )
 
@@ -27,7 +27,7 @@ class CaseloadController < PrisonsApplicationController
   end
 
   def new
-    @new_cases = POM::GetAllocatedOffenders.call(
+    @new_cases = POMService::GetAllocatedOffenders.call(
       @pom.staff_id, active_prison
     ).select(&:new_case?)
   end
@@ -66,7 +66,7 @@ private
   end
 
   def ensure_pom
-    @pom = POM::GetSignedInPom.call(
+    @pom = POMService::GetSignedInPom.call(
       active_prison,
       current_user
     )

@@ -2,7 +2,7 @@
 
 require_relative '../application_service'
 
-module POM
+module POMService
   class GetUsername < ApplicationService
     attr_reader :username
 

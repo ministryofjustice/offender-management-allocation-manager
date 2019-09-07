@@ -2,7 +2,7 @@
 
 require_relative '../application_service'
 
-module POM
+module POMService
   class GetPomEmails < ApplicationService
     attr_reader :staff_id
 

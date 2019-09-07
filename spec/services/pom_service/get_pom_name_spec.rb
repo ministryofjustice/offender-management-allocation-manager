@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe POM::GetPomName do
+describe POMService::GetPomName do
   let(:staff_id) { 485_737 }
 
   before(:each) {

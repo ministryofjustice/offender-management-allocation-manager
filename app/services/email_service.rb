@@ -10,7 +10,7 @@ class EmailService
     @allocation = allocation
 
     @offender = OffenderService::Get.call(@allocation[:nomis_offender_id])
-    @pom = POM::GetPom.call(
+    @pom = POMService::GetPom.call(
       @allocation.prison,
       pom_nomis_id
     )
@@ -78,7 +78,7 @@ private
     }
     return nil if previous.blank?
 
-    @previous_pom ||= POM::GetPom.call(
+    @previous_pom ||= POMService::GetPom.call(
       previous.prison,
       previous.primary_pom_nomis_id
     )

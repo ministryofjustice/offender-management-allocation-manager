@@ -13,11 +13,11 @@ class AllocationService
     )
 
     pom_firstname, _pom_secondname =
-      POM::GetPomName.call(alloc_version.primary_pom_nomis_id)
+      POMService::GetPomName.call(alloc_version.primary_pom_nomis_id)
     coworking_pom_firstname, coworking_pom_secondname =
-      POM::GetPomName.call(secondary_pom_nomis_id)
+      POMService::GetPomName.call(secondary_pom_nomis_id)
     user_firstname, user_secondname =
-      POM::GetUsername.call(created_by_username)
+      POMService::GetUsername.call(created_by_username)
 
     alloc_version.update!(
       secondary_pom_name: "#{coworking_pom_secondname}, #{coworking_pom_firstname}",
@@ -41,9 +41,9 @@ class AllocationService
   # rubocop:disable Metrics/MethodLength
   def self.create_or_update(params)
     pom_firstname, pom_secondname =
-      POM::GetPomName.call(params[:primary_pom_nomis_id])
+      POMService::GetPomName.call(params[:primary_pom_nomis_id])
     user_firstname, user_secondname =
-      POM::GetUsername.call(params[:created_by_username])
+      POMService::GetUsername.call(params[:created_by_username])
 
     params_copy = params.merge(
       primary_pom_name: "#{pom_secondname}, #{pom_firstname}",
@@ -126,7 +126,7 @@ class AllocationService
     pom_emails = {}
 
     pom_ids.each do |pom_id|
-      pom_emails[pom_id] = POM::GetPomEmails.call(pom_id).first
+      pom_emails[pom_id] = POMService::GetPomEmails.call(pom_id).first
     end
 
     pom_emails
@@ -152,7 +152,7 @@ class AllocationService
     current_allocation = active_allocations(nomis_offender_id, prison_id)
     nomis_staff_id = current_allocation[nomis_offender_id]['primary_pom_nomis_id']
 
-    POM::GetPom.call(prison_id, nomis_staff_id)
+    POMService::GetPom.call(prison_id, nomis_staff_id)
   end
 
 private

@@ -2,8 +2,8 @@
 
 require_relative '../application_service'
 
-module POM
-  class GetPomNames < ApplicationService
+module POMService
+  class UnavailablePomCount < ApplicationService
     attr_reader :prison
 
     def initialize(prison)
@@ -11,10 +11,10 @@ module POM
     end
 
     def call
-      poms_list = POM::GetPomsForPrison.call(prison)
-      poms_list.each_with_object({}) { |p, hsh|
-        hsh[p.staff_id] = p.full_name
+      poms = POMService::GetPomsForPrison.call(prison).reject { |pom|
+        pom.status == 'active'
       }
+      poms.count
     end
   end
 end

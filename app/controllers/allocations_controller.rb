@@ -23,8 +23,8 @@ class AllocationsController < PrisonsApplicationController
     @prisoner = offender(nomis_offender_id_from_url)
     primary_pom_nomis_id = AllocationVersion.find_by(nomis_offender_id: @prisoner.offender_no).primary_pom_nomis_id
     secondary_pom_nomis_id = AllocationVersion.find_by(nomis_offender_id: @prisoner.offender_no).secondary_pom_nomis_id
-    @pom = POM::GetPom.call(active_prison, primary_pom_nomis_id)
-    @coworker = POM::GetPom.call(active_prison, secondary_pom_nomis_id)
+    @pom = POMService::GetPom.call(active_prison, primary_pom_nomis_id)
+    @coworker = POMService::GetPom.call(active_prison, secondary_pom_nomis_id)
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(active_prison, @prisoner.offender_no)
     @allocation = AllocationVersion.where(nomis_offender_id: @prisoner.offender_no)
   end
@@ -51,7 +51,7 @@ class AllocationsController < PrisonsApplicationController
 
   def confirm
     @prisoner = offender(nomis_offender_id_from_url)
-    @pom = POM::GetPom.call(
+    @pom = POMService::GetPom.call(
       active_prison,
       nomis_staff_id_from_url
     )
@@ -61,7 +61,7 @@ class AllocationsController < PrisonsApplicationController
 
   def confirm_reallocation
     @prisoner = offender(nomis_offender_id_from_url)
-    @pom = POM::GetPom.call(
+    @pom = POMService::GetPom.call(
       active_prison,
       nomis_staff_id_from_url
     )
@@ -94,7 +94,7 @@ class AllocationsController < PrisonsApplicationController
 private
 
   def unavailable_pom_count
-    @unavailable_pom_count ||= POM::UnavailablePomCount.call(
+    @unavailable_pom_count ||= POMService::UnavailablePomCount.call(
       active_prison
     )
   end
@@ -123,7 +123,7 @@ private
   end
 
   def pom
-    @pom ||= POM::GetPom.call(
+    @pom ||= POMService::GetPom.call(
       active_prison,
       allocation_params[:nomis_staff_id]
     )
@@ -139,7 +139,7 @@ private
     current_allocation = AllocationService.active_allocations(nomis_offender_id, active_prison)
     nomis_staff_id = current_allocation[nomis_offender_id]['primary_pom_nomis_id']
 
-    POM::GetPom.call(active_prison, nomis_staff_id)
+    POMService::GetPom.call(active_prison, nomis_staff_id)
   end
 
   def recommended_pom_type(offender)
@@ -162,7 +162,7 @@ private
   def recommended_and_nonrecommended_poms_for(offender)
     allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id_from_url)
     # don't allow primary to be the same as the co-working POM
-    poms = POM::GetPomsForPrison.call(active_prison).select { |pom|
+    poms = POMService::GetPomsForPrison.call(active_prison).select { |pom|
       pom.status == 'active' && pom.staff_id != allocation.try(:secondary_pom_nomis_id)
     }
 

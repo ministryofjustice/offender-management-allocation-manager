@@ -2,7 +2,7 @@
 
 class DashboardController < PrisonsApplicationController
   def index
-    @is_pom = POM::GetSignedInPom.call(
+    @is_pom = POMService::GetSignedInPom.call(
       active_prison, current_user
     ).present?
   end
