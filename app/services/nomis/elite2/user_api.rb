@@ -9,7 +9,7 @@ module Nomis
         route = "/elite2api/api/users/#{username}"
         response = e2_client.get(route)
 
-        api_deserialiser.deserialise(Nomis::Models::UserDetails, response)
+        api_deserialiser.deserialise(Nomis::UserDetails, response)
       end
 
       def self.user_caseloads(staff_id)

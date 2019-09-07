@@ -2,7 +2,7 @@
 
 require 'rake'
 require_relative '../../app//models/concerns/deserialisable.rb'
-require_relative '../../app/services/nomis/models/movement.rb'
+require_relative '../../app/models/nomis/movement.rb'
 
 namespace :movements do
   desc 'Process the movement events in the previous 24 hours'
