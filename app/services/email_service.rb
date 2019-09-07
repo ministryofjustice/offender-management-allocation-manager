@@ -9,7 +9,7 @@ class EmailService
     @message = message
     @allocation = allocation
 
-    @offender = OffenderService.get_offender(@allocation[:nomis_offender_id])
+    @offender = OffenderService::Get.call(@allocation[:nomis_offender_id])
     @pom = POM::GetPom.call(
       @allocation.prison,
       pom_nomis_id

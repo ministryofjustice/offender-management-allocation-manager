@@ -20,6 +20,6 @@ private
   def offender(offender_no)
     return nil if offender_no.blank?
 
-    OffenderService.get_offender(offender_no)
+    OffenderService::Get.call(offender_no)
   end
 end

@@ -79,6 +79,6 @@ private
   end
 
   def self.should_process?(offender_no)
-    OffenderService.get_offender(offender_no).convicted?
+    OffenderService::Get.call(offender_no).convicted?
   end
 end

@@ -25,7 +25,7 @@ module POM
       # offender_no to case_info_details so we can fill in a fake offender
       # object for each allocation. This will allow us to calculate the
       # pom responsibility without having to make an API request per-offender.
-      offender_map = OffenderService.get_sentence_details(booking_ids)
+      offender_map = OffenderService::SentenceDetails.call(booking_ids)
       case_info = CaseInformationService.get_case_info_for_offenders(offender_ids)
 
       allocation_list.map do |alloc|

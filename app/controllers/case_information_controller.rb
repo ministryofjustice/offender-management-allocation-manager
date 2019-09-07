@@ -76,7 +76,7 @@ class CaseInformationController < PrisonsApplicationController
 private
 
   def prisoner(nomis_id)
-    @prisoner ||= OffenderService.get_offender(nomis_id)
+    @prisoner ||= OffenderService::Get.call(nomis_id)
   end
 
   def nomis_offender_id_from_url

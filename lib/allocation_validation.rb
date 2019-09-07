@@ -22,7 +22,7 @@ class AllocationValidation
 
     allocations.each { |allocation|
       # Get the offender from NOMIS
-      offender = OffenderService.get_offender(allocation.nomis_offender_id)
+      offender = OffenderService::Get.call(allocation.nomis_offender_id)
       if offender.nil?
         puts "Can't find offender #{allocation.nomis_offender_id}"
         next

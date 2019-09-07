@@ -32,6 +32,6 @@ private
   end
 
   def offender
-    @offender ||= OffenderService.get_offender(id)
+    @offender ||= OffenderService::Get.call(id)
   end
 end

@@ -11,7 +11,7 @@ namespace :delius do
       end
     else
       (ENV['AUTO_DELIUS_IMPORT'] || '').split(',').each do |prison|
-        OffenderService.get_offenders_for_prison(prison).each do |offender|
+        OffenderService::List.call(prison).each do |offender|
           ProcessDeliusDataJob.perform_later offender.offender_no
         end
       end

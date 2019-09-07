@@ -132,7 +132,7 @@ describe MovementService do
 
     it "will not process offenders on remand",
        vcr: { cassette_name: :movement_service_transfer_in__not_convicted_spec }  do
-      allow(OffenderService).to receive(:get_offender).and_return(Nomis::Models::Offender.new.tap{ |o|
+      allow(OffenderService::Get).to receive(:call).and_return(Nomis::Models::Offender.new.tap{ |o|
         o.convicted_status = "Remand"
       })
       processed = described_class.process_movement(transfer_in)

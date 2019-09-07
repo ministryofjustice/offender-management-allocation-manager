@@ -25,7 +25,7 @@ class SummaryService
     # each type of record.
     counts = { allocated: 0, unallocated: 0, pending: 0, all: 0 }
 
-    offenders = OffenderService.get_offenders_for_prison(prison)
+    offenders = OffenderService::List.call(prison)
     active_allocations_hash = AllocationService.active_allocations(offenders.map(&:offender_no), prison)
 
     offenders.each do |offender|

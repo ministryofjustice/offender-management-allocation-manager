@@ -31,7 +31,7 @@ namespace :delius_etl do
 end
 
 def fetch_offenders(prison)
-  OffenderService.get_offenders_for_prison(prison).map(&:offender_no)
+  OffenderService::List.call(prison).map(&:offender_no)
 end
 
 def load_delius_records(file)

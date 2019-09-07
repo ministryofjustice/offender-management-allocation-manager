@@ -162,7 +162,7 @@ class AllocationVersion < ApplicationRecord
         return movement.from_agency if movement.from_prison?
       end
     elsif movement_type == 'offender_transferred'
-      offender = OffenderService.get_offender(allocation.nomis_offender_id)
+      offender = OffenderService::Get.call(allocation.nomis_offender_id)
       offender.latest_location_id
     end
   end

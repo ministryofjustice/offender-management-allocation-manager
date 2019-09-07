@@ -19,7 +19,7 @@ class ProcessDeliusDataJob < ApplicationJob
 private
 
   def import(delius_record)
-    offender = OffenderService.get_offender(delius_record.noms_no)
+    offender = OffenderService::Get.call(delius_record.noms_no)
 
     if offender.nil?
       return logger.error("Failed to retrieve NOMIS record #{delius_record.noms_no}")

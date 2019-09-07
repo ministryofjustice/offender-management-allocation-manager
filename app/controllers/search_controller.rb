@@ -26,7 +26,7 @@ private
     # We will only show PAGE_SIZE at a time, so there is no need
     # to get the allocated POM name for offenders, we will just get them
     # for the much smaller slice.
-    OffenderService.set_allocated_pom_name(slice, active_prison)
+    OffenderService::SetAllocatedPomName.call(slice, active_prison)
   end
 
   def create_page_meta(total_records, current_view)

@@ -101,7 +101,7 @@ private
   end
 
   def offender(nomis_offender_id)
-    OffenderService.get_offender(nomis_offender_id)
+    OffenderService::Get.call(nomis_offender_id)
   end
 
   def coworking_nomis_offender_id_from_url
