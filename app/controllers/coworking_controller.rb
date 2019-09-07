@@ -8,8 +8,9 @@ class CoworkingController < PrisonsApplicationController
       active_prison
     )
 
-    # get_pom and get_poms return different data - so have to compare theit staff_ids.
-    poms = PrisonOffenderManagerService.get_poms(active_prison).reject { |pom|
+    # GetPom and GetPomsForPrison return different data
+    # so have to compare theit staff_ids.
+    poms = POM::GetPomsForPrison.call(active_prison).reject { |pom|
       pom.staff_id == @current_pom.staff_id
     }
 
@@ -23,10 +24,10 @@ class CoworkingController < PrisonsApplicationController
 
   def confirm
     @prisoner = offender(nomis_offender_id_from_url)
-    @primary_pom = PrisonOffenderManagerService.get_pom(
+    @primary_pom = POM::GetPom.call(
       active_prison, primary_pom_id_from_url
     )
-    @secondary_pom = PrisonOffenderManagerService.get_pom(
+    @secondary_pom = POM::GetPom.call(
       active_prison, secondary_pom_id_from_url
     )
   end
@@ -34,7 +35,7 @@ class CoworkingController < PrisonsApplicationController
   # rubocop:disable Metrics/LineLength
   def create
     offender = offender(allocation_params[:nomis_offender_id])
-    pom = PrisonOffenderManagerService.get_pom(
+    pom = POM::GetPom.call(
       active_prison,
       allocation_params[:nomis_staff_id]
     )
@@ -55,7 +56,7 @@ class CoworkingController < PrisonsApplicationController
     @allocation = AllocationVersion.find_by!(
       nomis_offender_id: coworking_nomis_offender_id_from_url
     )
-    @primary_pom = PrisonOffenderManagerService.get_pom(
+    @primary_pom = POM::GetPom.call(
       active_prison, @allocation.primary_pom_nomis_id
     )
     @errors = OpenStruct.new(count: 0)
@@ -68,7 +69,7 @@ class CoworkingController < PrisonsApplicationController
     @allocation = AllocationVersion.find_by!(
       nomis_offender_id: nomis_offender_id_from_url
     )
-    @primary_pom = PrisonOffenderManagerService.get_pom(
+    @primary_pom = POM::GetPom.call(
       active_prison, @allocation.primary_pom_nomis_id
     )
     if reallocate.nil?

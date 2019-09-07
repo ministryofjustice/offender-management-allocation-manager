@@ -3,7 +3,7 @@
 class OverridesController < PrisonsApplicationController
   def new
     @prisoner = OffenderService.get_offender(params.require(:nomis_offender_id))
-    @pom = PrisonOffenderManagerService.get_pom(active_prison, params[:nomis_staff_id])
+    @pom = POM::GetPom.call(active_prison, params[:nomis_staff_id])
     @recommended_pom_type, @not_recommended_pom_type =
       recommended_and_nonrecommended_poms_types_for(@prisoner)
 
@@ -22,7 +22,7 @@ class OverridesController < PrisonsApplicationController
     return redirect_on_success if @override.valid?
 
     @prisoner = OffenderService.get_offender(override_params[:nomis_offender_id])
-    @pom = PrisonOffenderManagerService.get_pom(
+    @pom = POM::GetPom.call(
       active_prison, override_params[:nomis_staff_id])
     @recommended_pom_type, @not_recommended_pom_type =
       recommended_and_nonrecommended_poms_types_for(@prisoner)

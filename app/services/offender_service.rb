@@ -109,7 +109,7 @@ class OffenderService
   # This is now only used by the SearchController.
   # rubocop:disable Metrics/LineLength
   def self.set_allocated_pom_name(offenders, caseload)
-    pom_names = PrisonOffenderManagerService.get_pom_names(caseload)
+    pom_names = POM::GetPomNames.call(caseload)
     nomis_offender_ids = offenders.map(&:offender_no)
     offender_to_staff_hash = AllocationVersion.
       where(nomis_offender_id: nomis_offender_ids).

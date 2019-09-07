@@ -2,8 +2,8 @@
 
 class DashboardController < PrisonsApplicationController
   def index
-    @is_pom = PrisonOffenderManagerService.get_signed_in_pom_details(
-      current_user, active_prison
+    @is_pom = POM::GetSignedInPom.call(
+      active_prison, current_user
     ).present?
   end
 end

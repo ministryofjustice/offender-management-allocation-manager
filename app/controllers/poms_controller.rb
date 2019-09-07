@@ -8,7 +8,7 @@ class PomsController < PrisonsApplicationController
              only: [:show]
 
   def index
-    poms = PrisonOffenderManagerService.get_poms(active_prison)
+    poms = POM::GetPomsForPrison.call(active_prison)
     @active_poms, @inactive_poms = poms.partition { |pom|
       %w[active unavailable].include? pom.status
     }
@@ -16,7 +16,7 @@ class PomsController < PrisonsApplicationController
 
   def show
     @pom = pom
-    @allocations = PrisonOffenderManagerService.get_allocated_offenders(
+    @allocations = POM::GetAllocatedOffenders.call(
       @pom.staff_id, active_prison
     )
     @allocations = sort_allocations(@allocations)
@@ -38,17 +38,17 @@ class PomsController < PrisonsApplicationController
   end
 
   def edit
-    @pom = PrisonOffenderManagerService.get_pom(active_prison, params[:nomis_staff_id])
+    @pom = POM::GetPom.call(active_prison, params[:nomis_staff_id])
     @errors = {}
   end
 
   def update
-    @pom = PrisonOffenderManagerService.get_pom(active_prison, params[:nomis_staff_id])
+    @pom = POM::GetPom.call(active_prison, params[:nomis_staff_id])
 
-    pom_detail = PrisonOffenderManagerService.update_pom(
-      nomis_staff_id: params[:nomis_staff_id].to_i,
-      working_pattern: working_pattern,
-      status: edit_pom_params[:status]
+    pom_detail = POM::UpdatePom.call(
+      params[:nomis_staff_id].to_i,
+      working_pattern,
+      edit_pom_params[:status]
     )
 
     if pom_detail.valid?
@@ -75,7 +75,7 @@ private
   end
 
   def pom
-    PrisonOffenderManagerService.get_pom(active_prison, params[:nomis_staff_id])
+    POM::GetPom.call(active_prison, params[:nomis_staff_id])
   end
 
   def edit_pom_params
