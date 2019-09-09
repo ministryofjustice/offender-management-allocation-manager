@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_13_080602) do
+ActiveRecord::Schema.define(version: 2019_09_09_115431) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -57,6 +57,16 @@ ActiveRecord::Schema.define(version: 2019_08_13_080602) do
     t.index ["local_divisional_unit_id"], name: "index_case_information_on_local_divisional_unit_id"
     t.index ["nomis_offender_id"], name: "index_case_information_on_nomis_offender_id", unique: true
     t.index ["team_id"], name: "index_case_information_on_team_id"
+  end
+
+  create_table "contact_submissions", force: :cascade do |t|
+    t.text "message", null: false
+    t.string "email_address"
+    t.string "referrer"
+    t.string "user_agent"
+    t.string "prison"
+    t.string "name"
+    t.string "job_type"
   end
 
   create_table "delius_data", force: :cascade do |t|

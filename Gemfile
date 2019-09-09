@@ -32,6 +32,7 @@ gem 'flipflop'
 gem 'hashdiff', ['>= 1.0.0.beta1', '< 2.0.0']
 gem 'rubyzip'
 gem 'turnout'
+gem 'zendesk_api'
 
 group :development, :test do
   gem 'brakeman'
