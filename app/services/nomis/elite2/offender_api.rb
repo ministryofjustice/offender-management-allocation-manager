@@ -35,7 +35,7 @@ module Nomis
         }
 
         offenders = api_deserialiser.deserialise_many(
-          Nomis::Models::OffenderSummary, data)
+          Nomis::OffenderSummary, data)
         ApiPaginatedResponse.new(page_meta, offenders)
       end
       # rubocop:enable Metrics/MethodLength
@@ -45,7 +45,7 @@ module Nomis
         response = e2_client.get(route)
         return nil if response.empty?
 
-        api_deserialiser.deserialise(Nomis::Models::Offender, response.first)
+        api_deserialiser.deserialise(Nomis::Offender, response.first)
       end
 
       def self.get_offence(booking_id)
@@ -82,7 +82,7 @@ module Nomis
           oid = record['bookingId']
 
           hash[oid] = api_deserialiser.deserialise(
-            Nomis::Models::SentenceDetail, record['sentenceDetail']
+            Nomis::SentenceDetail, record['sentenceDetail']
           )
           hash[oid].first_name = record['firstName']
           hash[oid].last_name = record['lastName']

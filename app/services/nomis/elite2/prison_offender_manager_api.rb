@@ -8,7 +8,7 @@ module Nomis
       def self.staff_detail(staff_id)
         route = "/elite2api/api/staff/#{staff_id}"
         data = e2_client.get(route)
-        api_deserialiser.deserialise(Nomis::Models::StaffDetails, data)
+        api_deserialiser.deserialise(Nomis::StaffDetails, data)
       end
 
       def self.list(prison)
@@ -22,7 +22,7 @@ module Nomis
           })
         }
 
-        api_deserialiser.deserialise_many(Nomis::Models::PrisonOffenderManager, data)
+        api_deserialiser.deserialise_many(Nomis::PrisonOffenderManager, data)
       end
 
       def self.fetch_email_addresses(nomis_staff_id)

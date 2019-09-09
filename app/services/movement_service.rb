@@ -20,15 +20,15 @@ class MovementService
   end
 
   def self.process_movement(movement)
-    if movement.movement_type == Nomis::Models::MovementType::RELEASE
+    if movement.movement_type == Nomis::MovementType::RELEASE
       return process_release(movement)
     end
 
     # We need to check whether the from_agency is from within the prison estate
     # to know whether it is a transfer.  If it isn't then we want to bail and
     # not process the new admission.
-    if [Nomis::Models::MovementType::ADMISSION,
-        Nomis::Models::MovementType::TRANSFER].include?(movement.movement_type)
+    if [Nomis::MovementType::ADMISSION,
+        Nomis::MovementType::TRANSFER].include?(movement.movement_type)
       return process_transfer(movement)
     end
 

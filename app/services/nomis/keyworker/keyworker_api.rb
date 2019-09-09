@@ -11,9 +11,9 @@ module Nomis
         response = Rails.cache.fetch(key, expires_in: Rails.configuration.cache_expiry) {
           client.get(route)
         }
-        ApiDeserialiser.new.deserialise(Nomis::Models::KeyworkerDetails, response)
+        ApiDeserialiser.new.deserialise(Nomis::KeyworkerDetails, response)
       rescue Nomis::Client::APIError
-        Nomis::Models::NullKeyworker.new
+        Nomis::NullKeyworker.new
       end
 
       def self.client

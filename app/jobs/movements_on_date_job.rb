@@ -7,8 +7,8 @@ class MovementsOnDateJob < ApplicationJob
     movements = MovementService.movements_on(
       yesterday,
       type_filters: [
-        Nomis::Models::MovementType::ADMISSION,
-        Nomis::Models::MovementType::RELEASE
+        Nomis::MovementType::ADMISSION,
+        Nomis::MovementType::RELEASE
       ]
     )
 
