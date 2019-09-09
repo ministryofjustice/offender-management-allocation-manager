@@ -12,11 +12,11 @@ module SearchService
     end
 
     def call
-      return [] if text.nil?
+      return [] if @text.nil?
 
-      search_term = text.upcase
+      search_term = @text.upcase
 
-      OffenderService::List.call(prison).select do |offender|
+      OffenderService::List.call(@prison).select do |offender|
         offender.last_name.start_with?(search_term) ||
           offender.first_name.start_with?(search_term) ||
           offender.offender_no.include?(search_term)
