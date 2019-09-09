@@ -18,7 +18,7 @@ describe Nomis::Elite2::MovementApi do
       movements = described_class.movements_for('A5019DY')
 
       expect(movements).to be_kind_of(Array)
-      expect(movements.length).to eq(2)
+      expect(movements.length).to eq(1)
       expect(movements.first).to be_kind_of(Nomis::Movement)
     end
 
