@@ -7,7 +7,7 @@ describe Nomis::Elite2::UserApi do
       response = described_class.user_details('RJONES')
 
       expect(response).not_to be_nil
-      expect(response).to be_kind_of(Nomis::Models::UserDetails)
+      expect(response).to be_kind_of(Nomis::UserDetails)
     end
   end
 end

@@ -65,7 +65,7 @@ class PrisonOffenderManagerService
     case_info = CaseInformationService.get_case_info_for_offenders(offender_ids)
 
     allocation_list.map do |alloc|
-      offender_stub = Nomis::Models::Offender.new
+      offender_stub = Nomis::Offender.new
       offender_stub.sentence = offender_map[alloc.nomis_booking_id]
 
       record = case_info[alloc.nomis_offender_id]

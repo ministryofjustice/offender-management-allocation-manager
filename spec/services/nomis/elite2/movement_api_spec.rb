@@ -8,7 +8,7 @@ describe Nomis::Elite2::MovementApi do
 
       expect(movements).to be_kind_of(Array)
       expect(movements.length).to eq(2)
-      expect(movements.first).to be_kind_of(Nomis::Models::Movement)
+      expect(movements.first).to be_kind_of(Nomis::Movement)
     end
   end
 
@@ -19,7 +19,7 @@ describe Nomis::Elite2::MovementApi do
 
       expect(movements).to be_kind_of(Array)
       expect(movements.length).to eq(2)
-      expect(movements.first).to be_kind_of(Nomis::Models::Movement)
+      expect(movements.first).to be_kind_of(Nomis::Movement)
     end
 
     it 'sort movements (oldest first) for a specific_offender' do
