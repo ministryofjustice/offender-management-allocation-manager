@@ -20,7 +20,8 @@ module Nomis
 
     # custom attribute - Elite2 requires a separate API call to
     # fetch a user's caseload
-    attr_accessor :nomis_caseloads
+    attr_accessor :nomis_caseloads,
+                  :email_address
 
     def self.from_json(payload)
       UserDetails.new.tap { |obj|
@@ -39,5 +40,10 @@ module Nomis
         obj.username = payload['username']
       }
     end
+
+    def full_name_ordered
+      "#{first_name} #{last_name}".titleize
+    end
   end
+
 end
