@@ -6,7 +6,7 @@ describe Nomis::Elite2::PrisonOffenderManagerApi do
     response = described_class.list('LEI')
 
     expect(response).to be_instance_of(Array)
-    expect(response).to all(be_an Nomis::Models::PrisonOffenderManager)
+    expect(response).to all(be_an Nomis::PrisonOffenderManager)
   end
 
   it 'can handle no POMs for a prison',
@@ -15,7 +15,7 @@ describe Nomis::Elite2::PrisonOffenderManagerApi do
 
     expect(response).to be_instance_of(Array)
     expect(response.count).to eq(0)
-    expect(response).to all(be_an Nomis::Models::PrisonOffenderManager)
+    expect(response).to all(be_an Nomis::PrisonOffenderManager)
   end
 
   describe '#fetch_email_addresses' do

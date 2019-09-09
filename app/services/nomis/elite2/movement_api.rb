@@ -13,7 +13,7 @@ module Nomis
                                fromDateTime: (date - 1.day).strftime('%FT%R')
                              })
         data.map { |movement|
-          api_deserialiser.deserialise(Nomis::Models::Movement, movement)
+          api_deserialiser.deserialise(Nomis::Movement, movement)
         }
       end
 
@@ -23,7 +23,7 @@ module Nomis
 
         data = e2_client.post(route, [offender_no])
         data.sort_by { |k| k['movementTime'] }.map{ |movement|
-          api_deserialiser.deserialise(Nomis::Models::Movement, movement)
+          api_deserialiser.deserialise(Nomis::Movement, movement)
         }
       end
       # rubocop:enable Metrics/LineLength

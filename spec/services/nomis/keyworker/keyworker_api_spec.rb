@@ -9,7 +9,7 @@ describe Nomis::Keyworker::KeyworkerApi do
       offender_no = 'G4273GI'
       response = described_class.get_keyworker(location, offender_no)
 
-      expect(response).to be_instance_of(Nomis::Models::KeyworkerDetails)
+      expect(response).to be_instance_of(Nomis::KeyworkerDetails)
       expect(response.first_name).to eq('DOM')
     end
 
@@ -18,7 +18,7 @@ describe Nomis::Keyworker::KeyworkerApi do
       unknown_offender_no = 'GGGGGGG'
       response = described_class.get_keyworker(location, unknown_offender_no)
 
-      expect(response).to be_instance_of(Nomis::Models::NullKeyworker)
+      expect(response).to be_instance_of(Nomis::NullKeyworker)
     end
   end
 end

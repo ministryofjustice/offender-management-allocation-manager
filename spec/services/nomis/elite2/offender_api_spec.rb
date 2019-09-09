@@ -8,7 +8,7 @@ describe Nomis::Elite2::OffenderApi do
 
       expect(response.data).not_to be_nil
       expect(response.data).to be_instance_of(Array)
-      expect(response.data).to all(be_an Nomis::Models::OffenderSummary)
+      expect(response.data).to all(be_an Nomis::OffenderSummary)
     end
 
     it "can get an offence description for a booking id",
@@ -36,7 +36,7 @@ describe Nomis::Elite2::OffenderApi do
       expect(response).to be_instance_of(Hash)
 
       records = response.values
-      expect(records.first).to be_instance_of(Nomis::Models::SentenceDetail)
+      expect(records.first).to be_instance_of(Nomis::SentenceDetail)
       expect(records.first.release_date).to eq(Date.new(2020, 2, 7))
       expect(records.first.full_name).to eq('Abbella, Ozullirn')
     end
@@ -49,7 +49,7 @@ describe Nomis::Elite2::OffenderApi do
 
       response = described_class.get_offender(noms_id)
 
-      expect(response).to be_instance_of(Nomis::Models::Offender)
+      expect(response).to be_instance_of(Nomis::Offender)
     end
 
     it 'can get category codes', :raven_intercept_exception,

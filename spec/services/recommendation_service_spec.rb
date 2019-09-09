@@ -2,26 +2,26 @@ require 'rails_helper'
 
 describe RecommendationService do
   let(:tierA) {
-    Nomis::Models::OffenderSummary.new.tap { |o| o.tier = 'A' }
+    Nomis::OffenderSummary.new.tap { |o| o.tier = 'A' }
   }
   let(:tierD) {
-    Nomis::Models::OffenderSummary.new.tap { |o| o.tier = 'D' }
+    Nomis::OffenderSummary.new.tap { |o| o.tier = 'D' }
   }
   let(:poms) {
     [
-      Nomis::Models::PrisonOffenderManager.new.tap { |p|
+      Nomis::PrisonOffenderManager.new.tap { |p|
         p.first_name = 'Alice'
         p.position = 'PRO'
       },
-      Nomis::Models::PrisonOffenderManager.new.tap { |p|
+      Nomis::PrisonOffenderManager.new.tap { |p|
         p.first_name = 'Bob'
         p.position = 'PRO'
       },
-      Nomis::Models::PrisonOffenderManager.new.tap { |p|
+      Nomis::PrisonOffenderManager.new.tap { |p|
         p.first_name = 'Clare'
         p.position = 'PO'
       },
-      Nomis::Models::PrisonOffenderManager.new.tap { |p|
+      Nomis::PrisonOffenderManager.new.tap { |p|
         p.first_name = 'Dave'
         p.position = 'PO'
       }

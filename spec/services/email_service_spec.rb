@@ -5,7 +5,7 @@ RSpec.describe EmailService, :queueing do
 
   let(:allocation) {
     AllocationVersion.new.tap do |a|
-      a.primary_pom_nomis_id = 485_737
+      a.primary_pom_nomis_id = 485_833
       a.nomis_offender_id = 'G2911GD'
       a.created_by_username = 'PK000223'
       a.nomis_booking_id = 0
@@ -30,7 +30,7 @@ RSpec.describe EmailService, :queueing do
   let(:original_allocation) {
     # The original allocation before the reallocation
     AllocationVersion.new.tap { |a|
-      a.primary_pom_nomis_id = 485_737
+      a.primary_pom_nomis_id = 485_833
       a.nomis_offender_id = 'G2911GD'
       a.created_by_username = 'PK000223'
       a.nomis_booking_id = 0
