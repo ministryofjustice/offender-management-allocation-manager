@@ -93,5 +93,13 @@ module Nomis
       @category_code = payload['categoryCode']
       @date_of_birth = deserialise_date(payload, 'dateOfBirth')
     end
+
+    def handover_start_date
+      HandoverDateService.handover_start_date(self)
+    end
+
+    def responsibility_handover_date
+      HandoverDateService.responsibility_handover_date(self)
+    end
   end
 end
