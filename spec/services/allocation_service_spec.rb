@@ -186,7 +186,7 @@ describe AllocationService do
       described_class.create_or_update(
         nomis_offender_id: nomis_offender_id,
         nomis_booking_id: 1,
-        primary_pom_nomis_id: 485_737,
+        primary_pom_nomis_id: 485_833,
         allocated_at_tier: 'A',
         prison: 'LEI',
         recommended_pom_type: 'probation',

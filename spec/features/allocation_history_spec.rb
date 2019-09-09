@@ -11,9 +11,9 @@ feature 'Allocation History' do
 
   let!(:prison_pom) do
     {
-      primary_pom_nomis_id: 485_737,
+      primary_pom_nomis_id: 485_833,
       primary_pom_name: 'Heal, Jay',
-      email: 'jay.heal@digital.justice.gov.uk'
+      email: 'andrien.ricketts@digital.justice.gov.uk'
     }
   end
 
