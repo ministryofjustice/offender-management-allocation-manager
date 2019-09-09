@@ -1,6 +1,6 @@
 # Jay Heal
 PomDetail.find_or_create_by!(
-  nomis_staff_id: 485_737,
+  nomis_staff_id: 485_833,
   status: 'active',
   working_pattern: 1
 )

@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe OverrideHelper do
   let(:allocation_one) {
     build(:allocation_version,
-          primary_pom_nomis_id: 485_737,
+          primary_pom_nomis_id: 485_833,
           nomis_offender_id: 'G2911GD',
           recommended_pom_type: 'prison',
           suitability_detail: "Prisoner too high risk",
@@ -13,7 +13,7 @@ RSpec.describe OverrideHelper do
 
   let(:allocation_two) {
     build(:allocation_version,
-          primary_pom_nomis_id: 485_737,
+          primary_pom_nomis_id: 485_833,
           nomis_offender_id: 'G2911GD',
           recommended_pom_type: nil
     )

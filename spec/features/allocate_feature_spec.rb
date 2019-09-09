@@ -40,7 +40,7 @@ feature 'Allocation' do
   end
 
   scenario 'overriding an allocation', vcr: { cassette_name: :override_allocation_feature_ok } do
-    override_nomis_staff_id = 485_737
+    override_nomis_staff_id = 485_758
 
     signin_user
 
@@ -63,7 +63,12 @@ feature 'Allocation' do
     click_button 'Complete allocation'
 
     expect(page).to have_current_path prison_summary_unallocated_path('LEI')
-    expect(page).to have_css('.notification', text: 'Ozullirn Abbella has been allocated to Jay Heal (Prison POM)')
+
+    # Note: after removing an old team member as a POM the MOIC integration test user is now top of the list of POMS.
+    # This user is both a probation and prison POM in the system and therefore whilst it says 'Probation POM' in this
+    # test it is actually going through the test and passing as we'd expect, just that it say Probation and not Prison POM
+
+    expect(page).to have_css('.notification', text: 'Ozullirn Abbella has been allocated to Moic Integration-Tests (Probation POM)')
     expect(Override.count).to eq(0)
   end
 
