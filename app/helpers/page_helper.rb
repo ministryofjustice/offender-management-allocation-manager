@@ -11,4 +11,12 @@ module PageHelper
     end
   end
   # rubocop:enable Metrics/LineLength
+
+  def field_error(errors, field)
+    if errors.present? && errors[field].present?
+      'govuk-form-group govuk-form-group--error'
+    else
+      'govuk-form-group'
+    end
+  end
 end

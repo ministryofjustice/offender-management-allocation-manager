@@ -1,34 +1,28 @@
 require 'rails_helper'
 
 feature 'Getting help' do
-  context 'when viewing the help page' do
-    it "can show the help page", vcr: { cassette_name: :getting_help_text } do
-      visit "help"
-      expect(page).to have_content('Help')
-      expect(page).to have_link('Back')
-      expect(page).to have_link('Read guidance', href: 'guidance')
-      expect(page).to have_link('moic@digital.justice.gov.uk')
-    end
+  it 'shows an empty contact form when no user is signed in' do
+    visit '/help'
 
-    it "clicks back to an existing previous page", vcr: { cassette_name: :help_back_to_previous_page } do
-      visit "guidance"
-      click_link("Help")
-      click_link("Back")
-      expect(page).to have_css('.govuk-heading-l', text: 'Get started with the allocations service')
-    end
-
-    it "clicks back to root path if no previous page exists", vcr: { cassette_name: :help_root_path } do
-      signin_user
-      visit "help"
-      click_link("Back")
-      expect(page).to have_content('HMPPS Allocate to a Prison Offender Manager')
-    end
+    expect(page).to have_css('.govuk-body', text: 'Complete this form for technical help')
+    expect(page).to have_css('.govuk-label', text: "Full name")
+    expect(page).to have_css('.govuk-textarea')
+    expect(page).to have_button('Submit')
   end
 
-  context 'when viewing the contact page' do
-    it "can show the contact page", vcr: { cassette_name: :getting_help_contact } do
-      visit "contact"
-      expect(page).to have_content('Contact')
-    end
+  it 'shows a pre-filled contact form when a user is signed in', :raven_intercept_exception, vcr: { cassette_name: :help_logged_in } do
+    allow_any_instance_of(SSOIdentity).to receive(:sso_identity).and_return(
+      'username' => 'PK000223',
+      'caseload' => ['LEI'],
+      'active_caseload' => 'LEI'
+    )
+
+    signin_user('PK000223')
+    visit '/help'
+
+    expect(page.find("#prison").value).to eq('HMP Leeds')
+    expect(page.find("#name").value).to eq('Kath Pobee-Norris')
+
+    expect(page).to have_button('Submit')
   end
 end

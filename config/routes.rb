@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   match "/503", :to => "errors#internal_server_error", :via => :all
 
   get '/help', to: 'pages#help'
+  post '/help', to: 'pages#create_help'
   get '/guidance', to: 'pages#guidance'
   get '/guidance_step1', to: 'pages#guidance_step1'
   get '/guidance_step2', to: 'pages#guidance_step2'
@@ -15,7 +16,6 @@ Rails.application.routes.draw do
   get '/guidance_step5', to: 'pages#guidance_step5'
   get '/guidance_step6', to: 'pages#guidance_step6'
   get '/contact', to: 'pages#contact'
-  post '/contact', to: 'pages#create_contact'
 
   get '/auth/:provider/callback', to: 'sessions#create'
   get '/signout', to: 'sessions#destroy'
@@ -36,7 +36,7 @@ Rails.application.routes.draw do
         new: 'new/:nomis_offender_id',
     }
     resources :coworking, only: [:new, :create, :destroy], param: :nomis_offender_id, path_names: {
-      new: ':nomis_offender_id/new',
+        new: ':nomis_offender_id/new',
     } do
       get('confirm_coworking_removal' => 'coworking#confirm_removal', as: 'confirm_removal')
     end
