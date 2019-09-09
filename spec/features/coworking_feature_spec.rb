@@ -60,7 +60,7 @@ feature 'Co-working' do
     end
 
     scenario 'show correct unavailable message', vcr: { cassette_name: :show_coworking_unavailable } do
-      inactive_poms = [485_734, 485_833]
+      inactive_poms = [485_637, 485_833]
       inactive_texts = ['There is 1 unavailable POM for new allocation',
                         'There are 2 unavailable POMs for new allocation']
 

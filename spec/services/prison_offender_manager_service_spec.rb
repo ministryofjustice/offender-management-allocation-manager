@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe PrisonOffenderManagerService do
   let(:other_staff_id) { 485_637 }
-  let(:staff_id) { 485_737 }
+  let(:staff_id) { 485_833 }
 
   before(:each) {
     PomDetail.create(nomis_staff_id: 485_637, working_pattern: 1.0, status: 'inactive')
@@ -12,8 +12,8 @@ describe PrisonOffenderManagerService do
     it "can get staff names",
        vcr: { cassette_name: :pom_service_staff_name } do
       fname, lname = described_class.get_pom_name(staff_id)
-      expect(fname).to eq('JAY')
-      expect(lname).to eq('HEAL')
+      expect(fname).to eq('ANDRIEN')
+      expect(lname).to eq('RICKETTS')
     end
   end
 
