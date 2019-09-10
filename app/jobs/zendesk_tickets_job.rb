@@ -5,6 +5,8 @@ class ZendeskTicketsJob < ActiveJob::Base
   URL_FIELD = '23730083'.freeze
   BROWSER_FIELD = '23791776'.freeze
   PRISON_FIELD = '23984153'.freeze
+  JOB_TYPE_FIELD = '360003119357'.freeze
+  SERVICE_FIELD = '23757677'.freeze
 
   def perform(contact)
     contact.destroy! if ticket_raised!(contact)
@@ -21,10 +23,9 @@ private
     {
       description: contact.message,
       requester: { email: contact.email_address,
-                   name: contact.name,
-                   job_type: contact.job_type,
-                   tags: ['moic'],
-                   custom_fields: custom_fields(contact) }
+                   name: contact.name },
+      tags: ['moic'],
+      custom_fields: custom_fields(contact)
     }
   end
 
@@ -32,7 +33,9 @@ private
     attrs = [
         as_hash(URL_FIELD, contact.referrer),
         as_hash(BROWSER_FIELD, contact.user_agent),
-        as_hash(PRISON_FIELD, contact.prison)
+        as_hash(PRISON_FIELD, contact.prison),
+        as_hash(JOB_TYPE_FIELD, contact.job_type),
+        as_hash(SERVICE_FIELD, 'MOIC')
     ]
     attrs
   end
