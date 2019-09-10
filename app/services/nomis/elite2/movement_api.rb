@@ -19,7 +19,7 @@ module Nomis
 
       # rubocop:disable Metrics/LineLength
       def self.movements_for(offender_no)
-        route = '/elite2api/api/movements/offenders?movementTypes=ADM&movementTypes=TRN&movementTypes=REL'
+        route = '/elite2api/api/movements/offenders?movementTypes=ADM&movementTypes=TRN&movementTypes=REL&latestOnly=false'
 
         data = e2_client.post(route, [offender_no])
         data.sort_by { |k| k['movementTime'] }.map{ |movement|
