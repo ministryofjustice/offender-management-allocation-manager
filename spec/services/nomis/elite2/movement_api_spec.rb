@@ -18,7 +18,7 @@ describe Nomis::Elite2::MovementApi do
       movements = described_class.movements_for('A5019DY')
 
       expect(movements).to be_kind_of(Array)
-      expect(movements.length).to eq(1)
+      expect(movements.length).to eq(2)
       expect(movements.first).to be_kind_of(Nomis::Movement)
     end
 
@@ -39,6 +39,15 @@ describe Nomis::Elite2::MovementApi do
       expect(movements).to be_kind_of(Array)
       expect(movements.length).to eq(2)
       expect(movements.first.offender_no).to eq('1')
+    end
+
+    it 'can return multiple movements for a specific offender',
+       vcr: { cassette_name: :movement_api_multiple_movements } do
+      movements = described_class.movements_for('G1670VU')
+
+      expect(movements).to be_kind_of(Array)
+      expect(movements.length).to eq(5)
+      expect(movements.first).to be_kind_of(Nomis::Movement)
     end
   end
 end
