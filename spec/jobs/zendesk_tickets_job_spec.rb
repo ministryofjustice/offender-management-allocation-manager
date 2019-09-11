@@ -31,6 +31,14 @@ RSpec.describe ZendeskTicketsJob, type: :job do
     { id: ZendeskTicketsJob::PRISON_FIELD, value: contact.prison }
   end
 
+  let(:service_custom_field) do
+    { id: ZendeskTicketsJob::SERVICE_FIELD, value: 'MOIC' }
+  end
+
+  let(:job_type_custom_field) do
+    { id: ZendeskTicketsJob::JOB_TYPE_FIELD, value: contact.job_type }
+  end
+
   before do
     allow(Rails.application.config).to receive(:zendesk_url).and_return('https://zendesk_api.com')
     allow(Zendesk::MOICApi).to receive(:new).and_return(zendesk_moic_api)
@@ -43,14 +51,15 @@ RSpec.describe ZendeskTicketsJob, type: :job do
               with(
                 description: 'text',
                 requester: { email: 'email@example.com',
-                             name: 'Frank',
-                             job_type: 'SPO',
-                             tags: ['moic'],
-                             custom_fields: [
-                                 url_custom_field,
-                                 browser_custom_field,
-                                 prison_custom_field
-                             ] }
+                             name: 'Frank' },
+                tags: ['moic'],
+                custom_fields: [
+                   url_custom_field,
+                   browser_custom_field,
+                   prison_custom_field,
+                   job_type_custom_field,
+                   service_custom_field
+                ]
               ).and_return(true)
 
       subject.perform_now(contact)
@@ -64,14 +73,15 @@ RSpec.describe ZendeskTicketsJob, type: :job do
               with(
                 description: 'text',
                 requester: { email: 'email@example.com',
-                             name: 'Frank',
-                             job_type: 'SPO',
-                             tags: ['moic'],
-                             custom_fields: [
-                                 url_custom_field,
-                                 browser_custom_field,
-                                 prison_custom_field
-                             ] }
+                             name: 'Frank' },
+                tags: ['moic'],
+                custom_fields: [
+                    url_custom_field,
+                    browser_custom_field,
+                    prison_custom_field,
+                    job_type_custom_field,
+                    service_custom_field
+                ]
               ).and_return(true)
 
       subject.perform_now(contact)
@@ -87,14 +97,15 @@ RSpec.describe ZendeskTicketsJob, type: :job do
               with(
                 description: 'text',
                 requester: { email: 'email@example.com',
-                             name: 'Frank',
-                             job_type: 'SPO',
-                             tags: ['moic'],
-                             custom_fields: [
-                                 url_custom_field,
-                                 browser_custom_field,
-                                 prison_custom_field
-                             ] }
+                             name: 'Frank' },
+                tags: ['moic'],
+                custom_fields: [
+                    url_custom_field,
+                    browser_custom_field,
+                    prison_custom_field,
+                    job_type_custom_field,
+                    service_custom_field
+                ]
               ).and_raise(ZendeskAPI::Error::ClientError.new('Error'))
 
       expect { subject.perform_now(contact) }.to raise_error(ZendeskAPI::Error::ClientError)
