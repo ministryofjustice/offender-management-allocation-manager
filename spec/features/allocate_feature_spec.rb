@@ -46,8 +46,8 @@ feature 'Allocation' do
 
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
-    within('.not_recommended_pom_row_0') do
-      click_link 'Allocate'
+    within('.not_recommended_pom_row_0', visible:  false) do
+      click_link('Allocate', visible:  false)
     end
 
     expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
@@ -77,8 +77,8 @@ feature 'Allocation' do
 
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
-    within('.not_recommended_pom_row_0') do
-      click_link 'Allocate'
+    within('.not_recommended_pom_row_0', visible:  false) do
+      click_link('Allocate', visible:  false)
     end
 
     expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
@@ -93,8 +93,8 @@ feature 'Allocation' do
 
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
-    within('.not_recommended_pom_row_0') do
-      click_link 'Allocate'
+    within('.not_recommended_pom_row_0', visible:  false) do
+      click_link('Allocate', visible:  false)
     end
 
     expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
@@ -110,8 +110,8 @@ feature 'Allocation' do
 
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
-    within('.not_recommended_pom_row_0') do
-      click_link 'Allocate'
+    within('.not_recommended_pom_row_0', visible:  false) do
+      click_link('Allocate', visible:  false)
     end
 
     expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
@@ -127,8 +127,8 @@ feature 'Allocation' do
 
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
-    within('.not_recommended_pom_row_0') do
-      click_link 'Allocate'
+    within('.not_recommended_pom_row_0', visible:  false) do
+      click_link('Allocate', visible:  false)
     end
 
     expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
