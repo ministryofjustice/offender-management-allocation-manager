@@ -132,7 +132,7 @@ RSpec.describe AllocationVersion, type: :model do
     it 'will set the prison when released' do
       allow(Nomis::Elite2::MovementApi).to receive(:movements_for).and_return([movement])
 
-      described_class.deallocate_offender(offender_no, 'offender_released')
+      described_class.deallocate_offender(offender_no, AllocationVersion::OFFENDER_RELEASED)
 
       updated_allocation = described_class.find_by(nomis_offender_id: offender_no)
       expect(updated_allocation.prison).not_to be_nil
@@ -141,7 +141,7 @@ RSpec.describe AllocationVersion, type: :model do
 
     it 'will set the prison when transferred',
        vcr: { cassette_name: :allocation_version_transfer_prison_fix } do
-      described_class.deallocate_offender(offender_no, 'offender_transferred')
+      described_class.deallocate_offender(offender_no, AllocationVersion::OFFENDER_TRANSFERRED)
 
       updated_allocation = described_class.find_by(nomis_offender_id: offender_no)
       expect(updated_allocation.prison).not_to be_nil
