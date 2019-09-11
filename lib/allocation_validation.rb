@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class AllocationValidation
+  # rubocop:disable Metrics/MethodLength
   # rubocop:disable Metrics/LineLength
   # rubocop:disable Rails/Output
   def fixup(prison)
@@ -53,6 +54,7 @@ class AllocationValidation
   end
   # rubocop:enable Metrics/LineLength
   # rubocop:enable Rails/Output
+  # rubocop:enable Metrics/MethodLength
 
   def active_allocations_for_prison(prison)
     AllocationVersion.where.not(primary_pom_nomis_id: nil).where(prison: prison)
