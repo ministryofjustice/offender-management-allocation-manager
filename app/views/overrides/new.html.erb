@@ -17,7 +17,7 @@
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--s govuk-!-margin-bottom-4">
               <h1 class="govuk-fieldset__heading">Choose all that apply:</h1>
             </legend>
-            <div class="govuk-checkboxes" data-module="checkboxes">
+            <div class="govuk-checkboxes" data-module="govuk-checkboxes">
               <%= hidden_field_tag("override[nomis_offender_id]", @prisoner.offender_no) %>
               <%= hidden_field_tag("override[nomis_staff_id]", @pom.staff_id) %>
               <div class="govuk-checkboxes__item">
@@ -33,7 +33,7 @@
                   </span>
                 <% end %>
                 <div class="govuk-form-group <% if @override.errors[:suitability_detail].present? %>govuk-form-group--error<% end %>">
-                  <div class="govuk-character-count" data-module="character-count" data-maxlength="175">
+                  <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="175">
                     <div class="govuk-form-group">
                       <label class="govuk-label" for="provide-detail">Enter your reason for this decision</label>
                       <textarea class="govuk-textarea js-character-count " id="suitability-detail" name="override[suitability_detail]" rows="3" aria-describedby="suitability-detail-hint suitability-detail-error"></textarea>
@@ -62,7 +62,7 @@
                     <%= @override.errors[:more_detail].first %>
                   </span>
                 <% end %>
-                <div class="govuk-character-count" data-module="character-count" data-maxlength="175">
+                <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="175">
                   <div class="govuk-form-group">
                     <label class="govuk-label" for="provide-detail">Please provide detail
                       here</label>

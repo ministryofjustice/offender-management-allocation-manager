@@ -19,7 +19,7 @@ We will send a confirmation email to <%= @primary_pom.emails.first %>
 <%= form_tag(prison_coworking_path(@prison, @prisoner.offender_no), method: :delete) do %>
   <div class='govuk-!-margin-top-6'>
     <div class="govuk-form-group">
-      <div class="govuk-radios" data-module="radios">
+      <div class="govuk-radios" data-module="govuk-radios">
         <div class="govuk-radios__item">
           <%= radio_button_tag("reallocate", true, false, class: "govuk-radios__input") %>
           <%= label_tag "reallocate", "Yes", class: "govuk-label govuk-radios__label" %>

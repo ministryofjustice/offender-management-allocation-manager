@@ -1,7 +1,7 @@
 <%= render :partial => "/shared/backlink", :locals => { :page => prison_summary_pending_path(@prison) } %>
 
 <% if @delius_errors.any? %>
-  <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="error-summary">
+  <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
     <div class="govuk-error-summary__body">
       <ul class="govuk-list govuk-error-summary__list">
         <% @delius_errors.each do |error| %>
