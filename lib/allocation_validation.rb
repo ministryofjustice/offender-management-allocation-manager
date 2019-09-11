@@ -35,6 +35,7 @@ class AllocationValidation
         # be re-allocated against a new offense.
         puts "#{offender.offender_no} is not sentenced - deallocating"
         AllocationVersion.deallocate_offender(offender.offender_no, 'offender_released')
+        next
       end
 
       # If the offender is at this prison, we're good .
