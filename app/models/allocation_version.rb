@@ -118,7 +118,7 @@ class AllocationVersion < ApplicationRecord
     alloc.secondary_pom_nomis_id = nil
     alloc.secondary_pom_name = nil
     alloc.recommended_pom_type = nil
-    if movement_type == 'offender_released'
+    if movement_type == AllocationVersion::OFFENDER_RELEASED
       alloc.event = DEALLOCATE_RELEASED_OFFENDER
     else
       alloc.event = DEALLOCATE_PRIMARY_POM
@@ -155,13 +155,13 @@ class AllocationVersion < ApplicationRecord
     # and this causes an issue should those offenders move or be released.
     # To handle this we will attempt to set the prison to a valid code
     # based on the event that has happened.
-    if movement_type == 'offender_released'
+    if movement_type == AllocationVersion::OFFENDER_RELEASED
       movements = Nomis::Elite2::MovementApi.movements_for(allocation.nomis_offender_id)
       if movements.present?
         movement = movements.first
         return movement.from_agency if movement.from_prison?
       end
-    elsif movement_type == 'offender_transferred'
+    elsif movement_type == AllocationVersion::OFFENDER_TRANSFERRED
       offender = OffenderService.get_offender(allocation.nomis_offender_id)
       offender.latest_location_id
     end
