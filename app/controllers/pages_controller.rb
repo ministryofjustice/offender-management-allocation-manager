@@ -48,7 +48,7 @@ private
     else
       redirect_to help_path
     end
-    flash[:notice] = 'Your form has been submitted'
+    flash[:notice] = 'Your message has been submitted'
   end
 
   def help_params
