@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class AllocationValidation
+  # rubocop:disable Metrics/MethodLength
   # rubocop:disable Metrics/LineLength
   # rubocop:disable Rails/Output
   def fixup(prison)
@@ -28,6 +29,14 @@ class AllocationValidation
         next
       end
 
+      if offender.sentenced? == false
+        # This offender should not have any case information, and should not
+        # be allocated to anybody We will de-allocate the offender so they can
+        # be re-allocated against a new offense.
+        puts "#{offender.offender_no} is not sentenced - deallocating"
+        AllocationVersion.deallocate_offender(offender.offender_no, 'offender_released')
+      end
+
       # If the offender is at this prison, we're good .
       next if offender.latest_location_id == prison
 
@@ -45,6 +54,7 @@ class AllocationValidation
   end
   # rubocop:enable Metrics/LineLength
   # rubocop:enable Rails/Output
+  # rubocop:enable Metrics/MethodLength
 
   def active_allocations_for_prison(prison)
     AllocationVersion.where.not(primary_pom_nomis_id: nil).where(prison: prison)
