@@ -38,6 +38,23 @@ class PomMailer < GovukNotifyRails::Mailer
   # rubocop:enable Metrics/ParameterLists
 
   # rubocop:disable Metrics/ParameterLists
+  def deallocate_coworking_pom(email_address:, pom_name:,
+    secondary_pom_name:, nomis_offender_id:,
+    offender_name:, url:)
+    set_template('bbdd094b-037b-424d-8b9b-ee310e291c9e')
+
+    set_personalisation(pom_name: pom_name,
+                        email_address: email_address,
+                        secondary_pom_name: secondary_pom_name,
+                        nomis_offender_id: nomis_offender_id,
+                        offender_name: offender_name,
+                        url: url)
+
+    mail(to: email_address)
+  end
+  # rubocop:enable Metrics/ParameterLists
+
+  # rubocop:disable Metrics/ParameterLists
   def secondary_allocation_email(
     message:, pom_name:, offender_name:, nomis_offender_id:,
     responsible_pom_name:, pom_email:, url:, responsibility:

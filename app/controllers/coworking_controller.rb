@@ -70,12 +70,20 @@ class CoworkingController < PrisonsApplicationController
       nomis_offender_id: nomis_offender_id_from_url
     )
 
+    secondary_pom_name = @allocation.secondary_pom_name
+
     @allocation.update!(
       secondary_pom_name: nil,
       secondary_pom_nomis_id: nil,
       event: AllocationVersion::DEALLOCATE_SECONDARY_POM,
       event_trigger: AllocationVersion::USER
     )
+
+    EmailService.instance(allocation: @allocation,
+                          message: '',
+                          pom_nomis_id: @allocation.primary_pom_nomis_id
+    ).send_cowork_deallocation_email(secondary_pom_name)
+
     redirect_to prison_allocation_path(active_prison, nomis_offender_id_from_url)
   end
 

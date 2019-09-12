@@ -94,4 +94,40 @@ RSpec.describe PomMailer, type: :mailer do
              )
     end
   end
+
+  describe 'deallocate_coworking_pom' do
+    let(:params) do
+      {
+        email_address: "something@example.com",
+        pom_name: "Pobee-Norris, Kath",
+        secondary_pom_name: "Jones, Ross",
+        nomis_offender_id: "GE4595D",
+        offender_name: "Marks, Simon",
+        url: "http:://example.com"
+      }
+    end
+
+    let(:mail) { described_class.deallocate_coworking_pom(params) }
+
+    it 'sets the template' do
+      expect(mail.govuk_notify_template).
+          to eq 'bbdd094b-037b-424d-8b9b-ee310e291c9e'
+    end
+
+    it 'sets the To address of the email using the provided user' do
+      expect(mail.to).to eq(["something@example.com"])
+    end
+
+    it 'personalises the email' do
+      expect(mail.govuk_notify_personalisation).
+          to eq(
+            email_address: params[:email_address],
+            pom_name: params[:pom_name],
+            secondary_pom_name: params[:secondary_pom_name],
+            offender_name: params[:offender_name],
+            nomis_offender_id: params[:nomis_offender_id],
+            url: params[:url]
+             )
+    end
+  end
 end
