@@ -10,9 +10,19 @@ module Deserialisable
 
       Date.parse(payload[field])
     end
+
+    def base.deserialise_date_and_time(payload, field)
+      return nil unless payload.key? field
+
+      DateTime.parse(payload[field])
+    end
   end
 
   def deserialise_date(payload, field)
     self.class.deserialise_date(payload, field)
+  end
+
+  def deserialise_date_and_time(payload, field)
+    self.class.deserialise_date_and_time(payload, field)
   end
 end

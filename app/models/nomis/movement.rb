@@ -41,7 +41,7 @@ module Nomis
     def self.from_json(payload)
       Movement.new.tap { |obj|
         obj.offender_no = payload['offenderNo']
-        obj.create_date_time = deserialise_date(payload, 'createDateTime')
+        obj.create_date_time = deserialise_date_and_time(payload, 'createDateTime')
         obj.from_agency = payload['fromAgency']
         obj.from_agency_description = payload['fromAgencyDescription']
         obj.to_agency = payload['toAgency']

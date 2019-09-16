@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 feature 'Provide debugging information for an offender' do
-  let(:nomis_offender_id) { "G7806VO" }
+  let(:nomis_offender_id) { "G1670VU" }
 
   it 'returns information for an unallocated offender', vcr: { cassette_name: :debugging_feature } do
     signin_user
@@ -35,10 +35,16 @@ feature 'Provide debugging information for an offender' do
 
     expect(page).to have_css('tbody tr', count: 34)
 
-    table_row = page.find(:css, 'tr.govuk-table__row#pom', text: 'POM')
+    pom_table_row = page.find(:css, 'tr.govuk-table__row#pom', text: 'POM')
 
-    within table_row do
+    within pom_table_row do
       expect(page).to have_content('POM Rossana Spinka')
+    end
+
+    movement_table_row = page.find(:css, 'tr.govuk-table__row#movement_date', text: 'Movement date')
+
+    within movement_table_row do
+      expect(page).to have_content('Movement date 20/07/2018')
     end
   end
 
