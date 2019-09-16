@@ -14,7 +14,7 @@ RSpec.describe SummaryHelper do
     end
 
     it "formats an offender's prison start date if offender does not exist" do
-      expect(start_date(prison_dates, "Z1234WQ")).to eq('-')
+      expect(start_date(prison_dates, "Z1234WQ")).to eq('-1')
     end
   end
 end

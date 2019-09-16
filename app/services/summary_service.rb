@@ -85,7 +85,7 @@ class SummaryService
 
     offenders = offender_list.map(&:offender_no)
 
-    return if offenders.nil?
+    return if offenders.empty?
 
     omic_start_date = Date.new(2019, 2, 4)
     movements = Nomis::Elite2::MovementApi.movements_for(offenders)
