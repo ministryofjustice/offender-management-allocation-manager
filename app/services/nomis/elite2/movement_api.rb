@@ -22,16 +22,7 @@ module Nomis
         route = '/elite2api/api/movements/offenders?movementTypes=ADM&movementTypes=TRN&movementTypes=REL&latestOnly=false'
 
         data = e2_client.post(route, [offender_no])
-        data.sort_by { |k| k['movementTime'] }.map{ |movement|
-          api_deserialiser.deserialise(Nomis::Movement, movement)
-        }
-      end
-
-      def self.latest_movement_for(offender_no)
-        route = '/elite2api/api/movements/offenders?movementTypes=ADM&movementTypes=TRN&movementTypes=REL'
-
-        data = e2_client.post(route, [offender_no])
-        data.sort_by { |k| k['movementTime'] }.map{ |movement|
+        data.sort_by { |k| k['createDateTime'] }.map{ |movement|
           api_deserialiser.deserialise(Nomis::Movement, movement)
         }
       end
