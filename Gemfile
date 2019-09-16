@@ -33,6 +33,7 @@ gem 'hashdiff', ['>= 1.0.0.beta1', '< 2.0.0']
 gem 'rubyzip'
 gem 'turnout'
 gem 'zendesk_api'
+gem 'kaminari' # pagination
 
 group :development, :test do
   gem 'brakeman'
