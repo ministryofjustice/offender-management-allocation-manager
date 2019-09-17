@@ -13,14 +13,15 @@ RSpec.describe OffenderHelper do
 
     let!(:allocation) {
       create(
-          :allocation_version,
-          nomis_offender_id: nomis_offender_id,
-          primary_pom_nomis_id: nomis_staff_id,
-          event: 'allocate_primary_pom'
+        :allocation_version,
+        nomis_offender_id: nomis_offender_id,
+        primary_pom_nomis_id: nomis_staff_id,
+        event: 'allocate_primary_pom'
       )
     }
+
     it 'returns the event in a more readable format' do
-        expect(last_event(allocation)).to eq('POM allocated - 17/09/2019')
+      expect(last_event(allocation)).to eq('POM allocated - 17/09/2019')
     end
   end
 end

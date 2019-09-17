@@ -1,15 +1,16 @@
 require 'rails_helper'
 
 feature 'View a prisoner profile page' do
-    let!(:alloc) {
-      a = build(
-          :allocation_version,
-          nomis_offender_id: 'G7998GJ',
-          primary_pom_nomis_id: '485637'
-      )
-      a.save(validate: false)
-      a
-    }
+  let!(:alloc) {
+    a = build(
+      :allocation_version,
+      nomis_offender_id: 'G7998GJ',
+      primary_pom_nomis_id: '485637'
+    )
+    a.save(validate: false)
+    a
+  }
+
   it 'shows the prisoner information', :raven_intercept_exception, vcr: { cassette_name: :show_offender_spec } do
     signin_user
     visit prison_prisoner_show_path('LEI', 'G7998GJ')
