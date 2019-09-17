@@ -192,7 +192,7 @@
     <tr class="govuk-table__row" id="allocation-event">
       <td class="govuk-table__cell govuk-!-width-one-half">Last allocation event</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-        <%= AllocationVersion.last_event(@offender.offender_no) %>
+        <%= last_event(@allocation) %>
       </td>
     </tr>
     </tbody>

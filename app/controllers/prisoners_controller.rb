@@ -8,7 +8,7 @@ class PrisonersController < PrisonsApplicationController
 
   def show
     @prisoner = offender
-    @allocation = AllocationService.current_allocation_for(@prisoner.offender_no)
+    @allocation = AllocationVersion.where(nomis_offender_id: @prisoner.offender_no).first
     @pom_responsibility = ResponsibilityService.new.calculate_pom_responsibility(
       offender
     )
