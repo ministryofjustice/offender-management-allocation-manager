@@ -1,0 +1,158 @@
+<% content_for :switcher do %>
+  <%= render '/layouts/prison_switcher' %>
+<% end %>
+
+<h1 class="govuk-heading-xl govuk-!-margin-top-0">
+  Prison Debugging
+</h1>
+
+<hr/>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-one-quarter">
+    <p class="govuk-data-value">
+      <%= @summary.allocated_total %>
+    </p>
+    <p class="govuk-data-label">
+      Allocated offenders
+    </p>
+  </div>
+
+  <div class="govuk-grid-column-one-quarter">
+    <p class="govuk-data-value">
+      <%= @summary.unallocated_total %>
+    </p>
+    <p class="govuk-data-label">
+      Awaiting allocation
+    </p>
+  </div>
+
+  <div class="govuk-grid-column-one-quarter">
+    <p class="govuk-data-value">
+      <%=  @summary.pending_total %>
+    </p>
+    <p class="govuk-data-label">
+      With missing information
+    </p>
+  </div>
+</div>
+
+<hr/>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-one-quarter">
+    <p class="govuk-data-value">
+      <%= @unfiltered_offenders_count %>
+    </p>
+    <p class="govuk-data-label">
+      Convicted offenders in NOMIS
+    </p>
+  </div>
+
+  <div class="govuk-grid-column-one-quarter">
+    <p class="govuk-data-value">
+      <%= @filtered_offenders_count %>
+    </p>
+    <p class="govuk-data-label">
+      Convicted offenders after filters applied
+    </p>
+  </div>
+
+  <div class="govuk-grid-column-one-quarter">
+    <p class="govuk-data-value">
+      <%= @unfiltered_offenders_count - @filtered_offenders_count %>
+    </p>
+    <p class="govuk-data-label">
+      Offenders filtered from results
+    </p>
+  </div>
+</div>
+
+<hr/>
+<br/>
+<h2 class="govuk-heading-l govuk-!-margin-top-0">
+  Filtered offenders
+</h2>
+
+<div class="govuk-tabs" data-module="govuk-tabs">
+  <h2 class="govuk-tabs__title">
+    Filtered offenders
+  </h2>
+  <ul class="govuk-tabs__list" role='tablist'>
+    <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
+      <a class="govuk-tabs__tab" href="#under18">
+        Under 18
+      </a>
+    </li>
+    <li class="govuk-tabs__list-item">
+      <a class="govuk-tabs__tab" href="#unsentenced">
+        Unsentenced
+      </a>
+    </li>
+    <li class="govuk-tabs__list-item">
+      <a class="govuk-tabs__tab" href="#civil">
+        Civil sentences
+      </a>
+    </li>
+  </ul>
+
+  <section class="govuk-tabs__panel">
+    <div class="search-box govuk-grid-row">
+        <div class="govuk-form-group" style="display: inline;" >
+          <label class="govuk-label" for="q">
+            Enter a prisoner name or number
+          </label>
+          <input class="govuk-input" id="q" name="q" type="text" value="<%= @q %>" autofocus="true" onkeypress="onKeyPress();">
+
+          <input id="search-button" type="button" class="govuk-button" value="    Search    " onclick="filter_offenders()"/>
+        </div>
+    </div>
+  </section>
+
+  <section class="govuk-tabs__panel" id="under18">
+    <%= render partial: "filtered_offenders", locals: {key: :under18} %>
+  </section>
+
+  <section class="govuk-tabs__panel" id="unsentenced">
+    <%= render partial: "filtered_offenders", locals: {key: :unsentenced} %>
+  </section>
+
+  <section class="govuk-tabs__panel" id="civil">
+    <%= render partial: "filtered_offenders", locals: {key: :civil} %>
+  </section>
+</div>
+
+<script>
+  function onKeyPress() {
+    if (window.event.keyCode === 13) {
+        filter_offenders();
+        return false;
+    }
+    else {
+        return true;
+    }
+  }
+
+  function filter_offenders() {
+    event.stopPropagation()
+    var term = document.getElementById('q').value.toUpperCase()
+    var rows = document.querySelectorAll('tr.offender_details')
+    var reset = (term == "")
+
+    Array.from(rows).forEach((row) => {
+      if (reset) {
+        row.style.display = 'table-row'
+      } else {
+        var line = row.children[0].innerText + " " + row.children[1].innerText;
+        line = line.toUpperCase()
+
+        if (!line.includes(term)) {
+          row.style.display = 'none'
+        } else {
+          row.style.display = 'table-row'
+        }
+      }
+    });
+  }
+
+</script>

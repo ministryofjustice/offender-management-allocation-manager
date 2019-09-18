@@ -22,6 +22,10 @@ class SentenceType
     }
   end
 
+  def self.criminal?(imprisonment_status)
+    !civil?(imprisonment_status)
+  end
+
   def self.civil?(imprisonment_status)
     %w[
       CIVIL

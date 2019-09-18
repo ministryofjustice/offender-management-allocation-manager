@@ -1,0 +1,20 @@
+  <% if @filtered[key].blank?  %>
+    None
+  <% else %>
+    <table class="govuk-table responsive tablesorter">
+      <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <th class="govuk-table__header" scope="col">Prisoner number</th>
+        <th class="govuk-table__header" scope="col">Prisoner name</th>
+      </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        <% @filtered[key].each do |offender| %>
+          <tr class="govuk-table__row offender_details">
+            <td class="govuk-table__cell offender_detail"><%= offender.offender_no %></td>
+            <td class="govuk-table__cell offender_detail"><%= offender.full_name %></td>
+          <tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>

@@ -3,3 +3,15 @@ $govuk-image-url-function: "image-url";
 $govuk-font-url-function: "asset-url";
 
 @import "govuk/all";
+
+
+.govuk-data-value {
+   @extend .govuk-heading-l;
+   margin-bottom: 0;
+}
+.govuk-grid-column-one-sixth {
+   -webkit-box-sizing: border-box;
+           box-sizing: border-box;
+   width: 100%;
+   padding: 0;
+}
