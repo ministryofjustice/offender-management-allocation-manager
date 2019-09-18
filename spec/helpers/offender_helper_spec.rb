@@ -21,7 +21,7 @@ RSpec.describe OffenderHelper do
     }
 
     it 'returns the event in a more readable format' do
-      expect(last_event(allocation)).to eq('POM allocated - 17/09/2019')
+      expect(last_event(allocation)).to eq("POM allocated - #{allocation.updated_at.strftime('%d/%m/%Y')}")
     end
   end
 end
