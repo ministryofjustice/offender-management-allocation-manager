@@ -46,11 +46,11 @@ class CaseInformationController < PrisonsApplicationController
     )
 
     if @case_info.valid?
-      redirect_to prison_summary_pending_path(active_prison)
-    else
-      @prisoner = prisoner(case_information_params[:nomis_offender_id])
-      render :new
+      return redirect_to prison_summary_pending_path(active_prison, page: params[:page])
     end
+
+    @prisoner = prisoner(case_information_params[:nomis_offender_id])
+    render :new
   end
 
   def update

@@ -23,7 +23,7 @@ feature 'case information feature' do
     expect(CaseInformation.first.nomis_offender_id).to eq(nomis_offender_id)
     expect(CaseInformation.first.tier).to eq('A')
     expect(CaseInformation.first.case_allocation).to eq('NPS')
-    expect(page).to have_current_path prison_summary_pending_path('LEI')
+    expect(current_url).to have_content "/prisons/LEI/summary/pending"
 
     expect(page).to have_css('.offender_row_0', count: 1)
   end
@@ -36,10 +36,10 @@ feature 'case information feature' do
     within ".govuk-table tr:first-child td:nth-child(6)" do
       click_link 'Edit'
     end
-    expect(page).to have_selector('h1', text:'Case information')
+    expect(page).to have_selector('h1', text: 'Case information')
 
     click_link 'Back'
-    expect(page).to have_selector('h1', text:'Allocations')
+    expect(page).to have_selector('h1', text: 'Allocations')
   end
 
   it 'complains if allocation data is missing', :raven_intercept_exception, vcr: { cassette_name: :case_information_missing_case_feature } do
@@ -111,5 +111,23 @@ feature 'case information feature' do
 
     expect(page).to have_current_path new_prison_allocation_path('LEI', nomis_offender_id)
     expect(page).to have_content('CRC')
+  end
+
+  it 'returns to previously paginated page after saving',
+     vcr: { cassette_name: :case_information_return_to_previously_paginated_page } do
+    signin_user
+    visit prison_summary_pending_path('LEI', page: 3)
+
+    within ".govuk-table tr:first-child td:nth-child(6)" do
+      click_link 'Edit'
+    end
+    expect(page).to have_selector('h1', text: 'Case information')
+
+    choose('case_information_welsh_offender_No')
+    choose('case_information_case_allocation_NPS')
+    choose('case_information_tier_A')
+    click_button 'Save'
+
+    expect(current_url).to have_content("/prisons/LEI/summary/pending?page=3")
   end
 end
