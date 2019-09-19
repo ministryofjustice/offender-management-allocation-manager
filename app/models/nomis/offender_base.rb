@@ -57,7 +57,7 @@ module Nomis
     end
 
     def case_owner
-      pom_responsibility = ResponsibilityService.new.calculate_pom_responsibility(self)
+      pom_responsibility = ResponsibilityService.calculate_pom_responsibility(self)
       return 'Prison' if pom_responsibility == ResponsibilityService::RESPONSIBLE
 
       'Probation'

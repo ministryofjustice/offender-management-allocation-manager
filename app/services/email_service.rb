@@ -76,7 +76,7 @@ private
   # rubocop:enable Metrics/LineLength
 
   def current_responsibility
-    ResponsibilityService.new.
+    ResponsibilityService.
       calculate_pom_responsibility(@offender).downcase
   end
 
