@@ -15,7 +15,7 @@ feature 'Allocation' do
   }
 
   let!(:case_information) {
-    create(:case_information, nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPS', omicable: 'No')
+    create(:case_information, nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPS', welsh_offender: 'No')
   }
 
   scenario 'accepting a recommended allocation', versioning: true, vcr: { cassette_name: :create_new_allocation_feature } do

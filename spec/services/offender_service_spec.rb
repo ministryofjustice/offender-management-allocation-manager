@@ -21,7 +21,7 @@ describe OffenderService do
   it "gets a single offender", vcr: { cassette_name: :offender_service_single_offender_spec } do
     nomis_offender_id = 'G4273GI'
 
-    create(:case_information, nomis_offender_id: nomis_offender_id, tier: 'C', case_allocation: 'CRC', omicable: 'Yes')
+    create(:case_information, nomis_offender_id: nomis_offender_id, tier: 'C', case_allocation: 'CRC', welsh_offender: 'Yes')
     offender = described_class.get_offender(nomis_offender_id)
 
     expect(offender).to be_kind_of(Nomis::Offender)

@@ -6,7 +6,7 @@ describe CaseInformationService do
            nomis_offender_id: 'X1000XX',
            tier: 'A',
            case_allocation: 'NPS',
-           omicable: 'Yes'
+           welsh_offender: 'Yes'
     )
   }
 
