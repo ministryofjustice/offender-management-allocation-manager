@@ -130,8 +130,20 @@ class PrisonService
     'WYI' => PrisonInfo.new('WYI', 'HMP/YOI Wetherby', :england)
   }
 
+  PRIVATE_ENGLISH_PRISON_CODES = %w[ACI ASI DNI DGI FBI LGI OWI NLI PBI RHI TSI]
+
+  ENGLISH_HUB_PRISON_CODES = %w[IWI SLI VEI]
+
   def self.prison_codes
     PRISONS.keys
+  end
+
+  def self.english_private_prison?(code)
+    PRIVATE_ENGLISH_PRISON_CODES.include?(code)
+  end
+
+  def self.english_hub_prison?(code)
+    ENGLISH_HUB_PRISON_CODES.include?(code)
   end
 
   def self.name_for(code)
