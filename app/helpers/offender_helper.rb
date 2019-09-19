@@ -9,4 +9,30 @@ module OffenderHelper
   def pom_responsibility_label(offender)
     offender.pom_responsibility
   end
+
+  def case_owner_label(offender)
+    if offender.case_owner == 'Prison'
+      'Custody'
+    else
+      'Community'
+    end
+  end
+
+  def last_event(allocation)
+    event = event_type(allocation.event)
+    event + ' - ' + allocation.updated_at.strftime('%d/%m/%Y')
+  end
+
+  def event_type(event)
+    type = (event.include? 'primary_pom') ? 'POM ' : 'Co-working POM '
+
+    if event.include? 'reallocate'
+      type + 're-allocated'
+    elsif event.include? 'deallocate'
+      type + 'removed'
+    elsif event.include? 'allocate'
+      type + 'allocated'
+
+    end
+  end
 end
