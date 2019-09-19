@@ -28,6 +28,20 @@ feature 'case information feature' do
     expect(page).to have_css('.offender_row_0', count: 1)
   end
 
+  it "clicking back link after viewing prisoner's case information, returns back the same paginated page",
+     vcr: { cassette_name: :case_information_back_link }, js: true do
+    signin_user
+    visit prison_summary_pending_path('LEI', page: 3)
+
+    within ".govuk-table tr:first-child td:nth-child(6)" do
+      click_link 'Edit'
+    end
+    expect(page).to have_selector('h1', text:'Case information')
+
+    click_link 'Back'
+    expect(page).to have_selector('h1', text:'Allocations')
+  end
+
   it 'complains if allocation data is missing', :raven_intercept_exception, vcr: { cassette_name: :case_information_missing_case_feature } do
     nomis_offender_id = 'G1821VA'
 
