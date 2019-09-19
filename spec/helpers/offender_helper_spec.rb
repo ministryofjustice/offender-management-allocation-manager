@@ -7,6 +7,24 @@ RSpec.describe OffenderHelper do
     end
   end
 
+  describe '#event_type' do
+    let(:nomis_staff_id) { 456_789 }
+    let(:nomis_offender_id) { 123_456 }
+
+    let!(:allocation) {
+      create(
+        :allocation_version,
+        nomis_offender_id: nomis_offender_id,
+        primary_pom_nomis_id: nomis_staff_id,
+        event: 'allocate_primary_pom'
+      )
+    }
+
+    it 'returns the event in a more readable format' do
+      expect(last_event(allocation)).to eq("POM allocated - #{allocation.updated_at.strftime('%d/%m/%Y')}")
+    end
+  end
+
   describe 'generates labels for case owner ' do
     it 'can show Custody for Prison' do
       off = Nomis::Offender.new

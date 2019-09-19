@@ -1,4 +1,4 @@
-<%= render :partial => "/shared/backlink", :locals => { :page => prison_allocation_path(@prison, @prisoner.offender_no) } %>
+<%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
 
 <h1 class="govuk-heading-l"><%= @prisoner.full_name %></h1>
 
