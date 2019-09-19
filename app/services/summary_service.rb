@@ -66,7 +66,7 @@ class SummaryService
     end
 
     Summary.new(summary_type).tap { |summary|
-      summary.offenders = offender_items
+      summary.offenders = offender_items.map { |o| OffenderPresenter.new(o, nil) }
 
       summary.allocated_total = counts[:allocated]
       summary.unallocated_total = counts[:unallocated]

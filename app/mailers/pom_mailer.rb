@@ -17,6 +17,21 @@ class PomMailer < GovukNotifyRails::Mailer
     mail(to: params[:pom_email])
   end
 
+  def responsibility_override(
+    message:,
+    prisoner_number:,
+    prisoner_name:,
+    prison_name:,
+    emails:
+  )
+    set_template('ca952ba5-58b5-4e2d-8d87-60590d76560c')
+    set_personalisation(prisoner_name: prisoner_name,
+                        prisoner_number: prisoner_number,
+                        reason: message,
+                        prison_name: prison_name)
+    mail(to: emails)
+  end
+
   # rubocop:disable Metrics/ParameterLists
   def allocate_coworking_pom(
     pom_email:, message:, pom_name:, coworking_pom_name:, url:,

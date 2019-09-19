@@ -1,0 +1,66 @@
+<% content_for :switcher do %>
+  <%= render '/layouts/prison_switcher' %>
+<% end %>
+
+<% if @responsibility.errors.count > 0 %>
+  <%= render :partial => "/shared/validation_errors", :locals => { :errors => @responsibility.errors } %>
+<% end %>
+
+<%= form_for(@responsibility, url: confirm_prison_responsibilities_path(@prison, @responsibility)) do |f| %>
+  <%= f.hidden_field(:nomis_offender_id) %>
+
+  <div class="govuk-form-group">
+    <fieldset class="govuk-fieldset">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+        <h1 class="govuk-fieldset__heading">
+          Why are you changing responsibility for this case?
+        </h1>
+      </legend>
+      <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="reason_less_10" name="responsibility[reason]" type="radio" value="less_than_10_months_to_serve">
+          <label class="govuk-label govuk-radios__label" for="reason_less_10">
+            The prisoner has less than 10 months less to serve
+          </label>
+        </div>
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="reason_prob_team" name="responsibility[reason]" type="radio" value="community_team_to_work_with_offender">
+          <label class="govuk-label govuk-radios__label" for="reason_prob_team">
+            Decision made for the community probation team to work with this prisoner
+          </label>
+        </div>
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="reason_recall" name="responsibility[reason]" type="radio" value="prisoner_has_been_recalled">
+          <label class="govuk-label govuk-radios__label" for="reason_recall">
+            Prisoner has been recalled
+          </label>
+        </div>
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="reason_other" name="responsibility[reason]" type="radio" value="other_reason" data-aria-controls="conditional-reason_other"
+          <%= ' checked="checked"' if @responsibility.reason == 'other_reason' %> >
+          <label class="govuk-label govuk-radios__label" for="reason_other">
+            Other
+          </label>
+        </div>
+        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-reason_other">
+          <% if @responsibility.errors[:reason_text].present? %>
+            <span class="govuk-error-message">
+              <%= @responsibility.errors[:reason_text].first %>
+            </span>
+          <% end %>
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="other_reason_text">
+              Enter reason
+            </label>
+            <input class="govuk-input govuk-!-width-one-third govuk-textarea--error" id="other_reason_text" name="responsibility[reason_text]">
+          </div>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="govuk-form-group">
+    <button type="submit" class="govuk-button">Continue</button>
+    <%= link_to 'Cancel', new_prison_allocation_path(@prison, @responsibility.nomis_offender_id), class: 'govuk-link cancel-button' %>
+  </div>
+<% end %>
