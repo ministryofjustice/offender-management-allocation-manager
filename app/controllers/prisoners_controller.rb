@@ -9,7 +9,7 @@ class PrisonersController < PrisonsApplicationController
   def show
     @prisoner = offender
     @allocation = AllocationVersion.find_by(nomis_offender_id: @prisoner.offender_no)
-    @pom_responsibility = ResponsibilityService.new.calculate_pom_responsibility(
+    @pom_responsibility = ResponsibilityService.calculate_pom_responsibility(
       offender
     )
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(

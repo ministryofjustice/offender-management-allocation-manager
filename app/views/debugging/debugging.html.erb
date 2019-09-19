@@ -41,7 +41,7 @@
     <tr class="govuk-table__row" id="convicted">
       <td class="govuk-table__cell">Convicted?</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= humanized_bool(@offender.convicted?) %>
+        <%= humanized_bool(@offender.convicted?) %> (<%= @offender.convicted_status %>)
     </tr>
     <tr class="govuk-table__row" id="sentenced"">
       <td class="govuk-table__cell">Sentenced?</td>
@@ -108,7 +108,9 @@
     </tr>
     <tr class="govuk-table__row" id="imprisonment-status">
       <td class="govuk-table__cell govuk-!-width-one-half">Imprisonment status</td>
-      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half"><%= @offender.imprisonment_status %></td>
+      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
+        <%= @offender.imprisonment_status %> - <%= SentenceTypeService.describe_sentence(@offender.imprisonment_status) %>
+      </td>
     </tr>
     <tr class="govuk-table__row" id="sentence-type">
       <td class="govuk-table__cell">Sentence type</td>
