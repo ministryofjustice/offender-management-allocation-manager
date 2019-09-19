@@ -10,6 +10,14 @@ module OffenderHelper
     offender.pom_responsibility
   end
 
+  def case_owner_label(offender)
+    if offender.case_owner == 'Prison'
+      'Custody'
+    else
+      'Community'
+    end
+  end
+
   def last_event(allocation)
     event = event_type(allocation.event)
     event + ' - ' + allocation.updated_at.strftime('%d/%m/%Y')
@@ -24,6 +32,7 @@ module OffenderHelper
       type + 'removed'
     elsif event.include? 'allocate'
       type + 'allocated'
+
     end
   end
 end

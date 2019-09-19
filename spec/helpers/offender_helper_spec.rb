@@ -24,4 +24,21 @@ RSpec.describe OffenderHelper do
       expect(last_event(allocation)).to eq("POM allocated - #{allocation.updated_at.strftime('%d/%m/%Y')}")
     end
   end
+
+  describe 'generates labels for case owner ' do
+    it 'can show Custody for Prison' do
+      off = Nomis::Offender.new
+      off.sentence = Nomis::SentenceDetail.new
+
+      expect(case_owner_label(off)).to eq('Custody')
+    end
+
+    it 'can show Community for Probation' do
+      off = Nomis::Offender.new
+      off.sentence = Nomis::SentenceDetail.new
+      off.sentence.release_date = Time.zone.today
+
+      expect(case_owner_label(off)).to eq('Community')
+    end
+  end
 end
