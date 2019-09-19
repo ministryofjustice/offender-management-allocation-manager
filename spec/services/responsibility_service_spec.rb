@@ -95,7 +95,7 @@ describe ResponsibilityService do
   describe 'pom responsibility' do
     context 'when offender has no release date' do
       scenario 'is supporting' do
-        resp = subject.calculate_pom_responsibility(offender_no_release_date)
+        resp = described_class.calculate_pom_responsibility(offender_no_release_date)
 
         expect(resp).to eq 'Responsible'
       end
@@ -103,7 +103,7 @@ describe ResponsibilityService do
 
     context 'when offender is not Welsh' do
       scenario 'is supporting' do
-        resp = subject.calculate_pom_responsibility(offender_not_welsh)
+        resp = described_class.calculate_pom_responsibility(offender_not_welsh)
 
         expect(resp).to eq 'Supporting'
       end
@@ -113,7 +113,7 @@ describe ResponsibilityService do
       context 'when CRC case' do
         context 'when offender has less than 12 weeks to serve' do
           scenario 'is supporting' do
-            resp = subject.calculate_pom_responsibility(offender_welsh_crc_lt_12_wk)
+            resp = described_class.calculate_pom_responsibility(offender_welsh_crc_lt_12_wk)
 
             expect(resp).to eq 'Supporting'
           end
@@ -121,7 +121,7 @@ describe ResponsibilityService do
 
         context 'when offender has more than twelve weeks to serve' do
           scenario 'is responsible' do
-            resp = subject.calculate_pom_responsibility(offender_welsh_crc_gt_12_wk)
+            resp = described_class.calculate_pom_responsibility(offender_welsh_crc_gt_12_wk)
 
             expect(resp).to eq 'Responsible'
           end
@@ -132,7 +132,7 @@ describe ResponsibilityService do
         context 'when new case (sentence date after February 4 2019)' do
           context 'when time left to serve is greater than 10 months' do
             scenario 'is responsible' do
-              resp = subject.calculate_pom_responsibility(offender_welsh_nps_new_case_gt_10_mths)
+              resp = described_class.calculate_pom_responsibility(offender_welsh_nps_new_case_gt_10_mths)
 
               expect(resp).to eq 'Responsible'
             end
@@ -140,7 +140,7 @@ describe ResponsibilityService do
 
           context 'when time left to serve is less than 10 months' do
             scenario 'is supporting' do
-              resp = subject.calculate_pom_responsibility(offender_welsh_nps_new_case_lt_10_mths)
+              resp = described_class.calculate_pom_responsibility(offender_welsh_nps_new_case_lt_10_mths)
 
               expect(resp).to eq 'Supporting'
             end
@@ -150,7 +150,7 @@ describe ResponsibilityService do
         context 'when old case (sentence date before February 4 2019)' do
           context 'when time left to serve is greater than 15 months from February 4 2019' do
             scenario 'is responsible' do
-              resp = subject.calculate_pom_responsibility(offender_welsh_nps_old_case_gt_15_mths)
+              resp = described_class.calculate_pom_responsibility(offender_welsh_nps_old_case_gt_15_mths)
 
               expect(resp).to eq 'Responsible'
             end
@@ -158,7 +158,7 @@ describe ResponsibilityService do
 
           context 'when time left to serve is less than 15 months from February 4 2019' do
             scenario 'is supporting' do
-              resp = subject.calculate_pom_responsibility(offender_welsh_nps_old_case_lt_15_mths)
+              resp = described_class.calculate_pom_responsibility(offender_welsh_nps_old_case_lt_15_mths)
 
               expect(resp).to eq 'Supporting'
             end
