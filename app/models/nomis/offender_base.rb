@@ -11,7 +11,7 @@ module Nomis
     # Custom attributes
     attr_accessor :crn,
                   :allocated_pom_name, :case_allocation,
-                  :omicable, :tier,
+                  :welsh_offender, :tier,
                   :sentence, :mappa_level,
                   :ldu, :team
 

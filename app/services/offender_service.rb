@@ -10,7 +10,7 @@ class OffenderService
       if record.present?
         o.tier = record.tier
         o.case_allocation = record.case_allocation
-        o.omicable = record.omicable == 'Yes'
+        o.welsh_offender = record.welsh_offender == 'Yes'
         o.crn = record.crn
         o.mappa_level = record.mappa_level
       end
@@ -85,7 +85,7 @@ class OffenderService
         if record
           offender.tier = record.tier
           offender.case_allocation = record.case_allocation
-          offender.omicable = record.omicable == 'Yes'
+          offender.welsh_offender = record.welsh_offender == 'Yes'
           offender.crn = record.crn
           offender.mappa_level = record.mappa_level
         end

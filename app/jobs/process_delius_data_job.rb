@@ -68,7 +68,7 @@ private
         local_divisional_unit: make_ldu_record(delius_record),
         team: make_team_record(delius_record),
         case_allocation: delius_record.service_provider,
-        omicable: map_omicable(delius_record.omicable?),
+        welsh_offender: map_welsh_offender(delius_record.welsh_offender?),
         mappa_level: map_mappa_level(delius_record.mappa, delius_record.mappa_levels)
       )
     end
@@ -108,8 +108,8 @@ private
     end
   end
 
-  def map_omicable(omicable)
-    omicable ? 'Yes' : 'No'
+  def map_welsh_offender(welsh_offender)
+    welsh_offender ? 'Yes' : 'No'
   end
 
   def map_tier(tier)

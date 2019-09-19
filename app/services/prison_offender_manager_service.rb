@@ -78,7 +78,7 @@ class PrisonOffenderManagerService
       if record.present?
         offender_stub.tier = record.tier
         offender_stub.case_allocation = record.case_allocation
-        offender_stub.omicable = record.omicable
+        offender_stub.welsh_offender = record.welsh_offender
       end
 
       if alloc.for_primary_only?

@@ -17,13 +17,13 @@ describe OnboardPrison do
              nomis_offender_id: 'G5054VN',
              tier: 'A',
              case_allocation: 'NPS',
-             omicable: 'Yes'
+             welsh_offender: 'Yes'
       )
       create(:case_information,
              nomis_offender_id: 'G9468UN',
              tier: 'C',
              case_allocation: 'CRC',
-             omicable: 'Yes'
+             welsh_offender: 'Yes'
       )
 
       op = described_class.new('PVI', offender_ids, nil)
