@@ -48,7 +48,7 @@ class OffenderService
 
       # The maximum number of pages we need to fetch before we have all of
       # the offenders
-      (info_request.meta.total_pages / FETCH_SIZE) + 1
+      (info_request.total_pages / FETCH_SIZE) + 1
     end
 
     def get_offenders_for_prison(page_number:, page_size:)
