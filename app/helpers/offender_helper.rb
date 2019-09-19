@@ -9,4 +9,12 @@ module OffenderHelper
   def pom_responsibility_label(offender)
     offender.pom_responsibility
   end
+
+  def case_owner_label(offender)
+    if offender.case_owner == 'Prison'
+      'Custody'
+    else
+      'Community'
+    end
+  end
 end
