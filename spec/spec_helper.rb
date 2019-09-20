@@ -4,6 +4,7 @@ SimpleCov.minimum_coverage 95
 
 SimpleCov.start 'rails' do
   add_filter '/gems/'
+  add_group "Services", "app/services"
 end
 
 if ENV['CIRCLE_ARTIFACTS']
