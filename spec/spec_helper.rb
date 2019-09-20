@@ -1,9 +1,11 @@
 require 'simplecov'
 
-SimpleCov.minimum_coverage 95
+# Try to set this to current coverage levels so that it never goes down after a PR
+SimpleCov.minimum_coverage 96.39
 
 SimpleCov.start 'rails' do
   add_filter '/gems/'
+  add_group "Services", "app/services"
 end
 
 if ENV['CIRCLE_ARTIFACTS']
