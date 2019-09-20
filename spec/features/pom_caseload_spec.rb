@@ -26,7 +26,7 @@ feature "view POM's caseload" do
   let!(:offender3_case_info) { create(:case_information, nomis_offender_id: 'G4706UP') }
   let!(:offender2_case_info) { create(:case_information, nomis_offender_id: 'G9344UG') }
   let!(:offender1_case_info) do
-    create(:case_information, nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPS', omicable: 'Yes')
+    create(:case_information, nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPS', welsh_offender: 'Yes')
   end
 
   let!(:case_infos) {

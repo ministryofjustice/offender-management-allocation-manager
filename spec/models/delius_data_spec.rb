@@ -22,7 +22,7 @@ RSpec.describe DeliusData, type: :model do
     end
   end
 
-  describe '#omicable?' do
+  describe '#welsh_offender?' do
     context 'when a record is Welsh' do
       subject {
         described_class.new(
@@ -32,7 +32,7 @@ RSpec.describe DeliusData, type: :model do
         )
       }
 
-      it { should be_omicable }
+      it { should be_welsh_offender }
     end
 
     context 'when a record is not Welsh' do
@@ -44,7 +44,7 @@ RSpec.describe DeliusData, type: :model do
         )
       }
 
-      it { should_not be_omicable }
+      it { should_not be_welsh_offender }
     end
   end
 

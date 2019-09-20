@@ -11,7 +11,7 @@ class CaseInformation < ApplicationRecord
 
   validates :local_divisional_unit, :team, presence: true, unless: ->{ manual_entry }
 
-  validates :omicable, inclusion: {
+  validates :welsh_offender, inclusion: {
     in: %w[Yes No],
     allow_nil: false,
     message: 'Select yes if the prisoner’s last known address was in Wales'

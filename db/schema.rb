@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_09_115431) do
+ActiveRecord::Schema.define(version: 2019_09_19_074927) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -46,7 +46,7 @@ ActiveRecord::Schema.define(version: 2019_09_09_115431) do
     t.string "tier"
     t.string "case_allocation"
     t.string "nomis_offender_id"
-    t.text "omicable"
+    t.text "welsh_offender"
     t.string "crn"
     t.integer "mappa_level"
     t.boolean "manual_entry", null: false
@@ -112,6 +112,7 @@ ActiveRecord::Schema.define(version: 2019_09_09_115431) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "email_address"
     t.index ["code"], name: "index_local_divisional_units_on_code"
   end
 

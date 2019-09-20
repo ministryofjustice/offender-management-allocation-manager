@@ -48,13 +48,12 @@ class CoworkingController < PrisonsApplicationController
     redirect_to prison_summary_unallocated_path(active_prison),
                 notice: "#{offender.full_name_ordered} has been allocated to #{pom.full_name_ordered} (#{pom.grade})"
   end
-  # rubocop:enable Metrics/LineLength
 
-  # rubocop:disable Metrics/LineLength
+  # rubocop:enable Metrics/LineLength
   def confirm_removal
     @prisoner = offender(coworking_nomis_offender_id_from_url)
 
-    @responsibility_type = ResponsibilityService.new.calculate_pom_responsibility(@prisoner)
+    @responsibility_type = ResponsibilityService.calculate_pom_responsibility(@prisoner)
 
     @allocation = AllocationVersion.find_by!(
       nomis_offender_id: coworking_nomis_offender_id_from_url
@@ -63,7 +62,6 @@ class CoworkingController < PrisonsApplicationController
       active_prison, @allocation.primary_pom_nomis_id
     )
   end
-  # rubocop:enable Metrics/LineLength
 
   def destroy
     @allocation = AllocationVersion.find_by!(

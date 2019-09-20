@@ -11,7 +11,7 @@ module Nomis
     # Custom attributes
     attr_accessor :crn,
                   :allocated_pom_name, :case_allocation,
-                  :omicable, :tier,
+                  :welsh_offender, :tier,
                   :sentence, :mappa_level,
                   :ldu, :team
 
@@ -57,7 +57,7 @@ module Nomis
     end
 
     def case_owner
-      pom_responsibility = ResponsibilityService.new.calculate_pom_responsibility(self)
+      pom_responsibility = ResponsibilityService.calculate_pom_responsibility(self)
       return 'Prison' if pom_responsibility == ResponsibilityService::RESPONSIBLE
 
       'Probation'

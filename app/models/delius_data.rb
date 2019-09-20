@@ -10,7 +10,7 @@ class DeliusData < ApplicationRecord
     end
   end
 
-  def omicable?
+  def welsh_offender?
     # WPT is the first 3 chars of the ldu_code for all Welsh LDU (Local Divisional Unit).
     ldu_code.present? && ldu_code.start_with?('WPT')
   end
