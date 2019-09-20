@@ -78,7 +78,6 @@ feature "view POM's caseload" do
       ])
       signin_user('PK000223')
 
-      case_infos
       allocations
 
       visit prison_caseload_index_path('LEI')
