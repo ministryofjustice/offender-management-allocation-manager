@@ -21,6 +21,7 @@
       <%= hidden_field_tag("allocations[nomis_staff_id]", @pom.staff_id) %>
       <%= hidden_field_tag("allocations[event]", @event) %>
       <%= hidden_field_tag("allocations[event_trigger]", @event_trigger) %>
+      <%= hidden_field_tag("page", params[:page]) %>
       <%= submit_tag "Complete allocation", role: "button", draggable: "false", class: "govuk-button" %>
       <a class="govuk-link cancel-button" href="<%= new_prison_allocation_path(@prison, @prisoner.offender_no) %>">Cancel</a>
     <% end %>

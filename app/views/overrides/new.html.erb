@@ -1,4 +1,4 @@
-<%= render :partial => "/shared/backlink", :locals => { :page => new_prison_allocation_path(@prison, @prisoner.offender_no) } %>
+<%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
 
 <% if @override.errors.count > 0 %>
   <%= render :partial => "/shared/validation_errors", :locals => { :errors => @override.errors } %>
@@ -20,6 +20,7 @@
             <div class="govuk-checkboxes" data-module="govuk-checkboxes">
               <%= hidden_field_tag("override[nomis_offender_id]", @prisoner.offender_no) %>
               <%= hidden_field_tag("override[nomis_staff_id]", @pom.staff_id) %>
+              <%= hidden_field_tag("page", params[:page]) %>
               <div class="govuk-checkboxes__item">
                 <input class="govuk-checkboxes__input" id="override-conditional-1" name="override[override_reasons][]" type="checkbox" value="suitability" data-aria-controls="override-1"
                        <%= 'checked=checked' if override_reason_contains(@override, 'suitability') %> >

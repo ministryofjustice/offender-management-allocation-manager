@@ -37,7 +37,7 @@ feature 'Allocation' do
 
     click_button 'Complete allocation'
 
-    expect(page).to have_current_path prison_summary_unallocated_path('LEI')
+    expect(current_url).to have_content(prison_summary_unallocated_path('LEI'))
     expect(page).to have_css('.notification', text: 'Ozullirn Abbella has been allocated to Ross Jones (Probation POM)')
   end
 
@@ -58,11 +58,10 @@ feature 'Allocation' do
 
     expect(Override.count).to eq(1)
 
-    expect(page).to have_current_path prison_confirm_allocation_path('LEI', nomis_offender_id, override_nomis_staff_id)
-
+    expect(current_url).to have_content(prison_confirm_allocation_path('LEI', nomis_offender_id, override_nomis_staff_id))
     click_button 'Complete allocation'
 
-    expect(page).to have_current_path prison_summary_unallocated_path('LEI')
+    expect(current_url).to have_content(prison_summary_unallocated_path('LEI'))
 
     # Note: after removing an old team member as a POM the MOIC integration test user is now top of the list of POMS.
     # This user is both a probation and prison POM in the system and therefore whilst it says 'Probation POM' in this
@@ -145,14 +144,14 @@ feature 'Allocation' do
       click_link 'View'
     end
 
-    expect(page).to have_current_path prison_allocation_path('LEI', nomis_offender_id)
-    expect(page).to have_link(nil, href: '/prisons/LEI/poms/485637')
+    expect(current_url).to have_content(prison_allocation_path('LEI', nomis_offender_id))
+    expect(page).to have_link(nil, href: "/prisons/LEI/poms/485637")
     expect(page).to have_css('.table_cell__left_align', text: 'Pobee-Norris, Kath')
     expect(page).to have_css('.table_cell__left_align', text: 'Supporting')
 
     click_link 'Reallocate'
 
-    expect(page).to have_current_path edit_prison_allocation_path('LEI', nomis_offender_id)
+    expect(current_url).to have_content(edit_prison_allocation_path('LEI', nomis_offender_id))
     expect(page).to have_css('.current_pom_full_name', text: 'Pobee-Norris, Kath')
     expect(page).to have_css('.current_pom_grade', text: 'Probation POM')
 
@@ -160,7 +159,7 @@ feature 'Allocation' do
       click_link 'Allocate'
     end
 
-    expect(page).to have_current_path prison_confirm_reallocation_path('LEI', nomis_offender_id, prison_officer_nomis_staff_id)
+    expect(current_url).to have_content(prison_confirm_reallocation_path('LEI', nomis_offender_id, prison_officer_nomis_staff_id))
 
     click_button 'Complete allocation'
 
@@ -178,7 +177,8 @@ feature 'Allocation' do
 
     click_button 'Complete allocation'
 
-    expect(page).to have_current_path prison_summary_unallocated_path('LEI')
+    expect(current_url).to have_content(prison_summary_unallocated_path('LEI'))
+
     expect(page).to have_css(
       '.alert',
       text: 'Ozullirn Abbella has not been allocated - please try again'

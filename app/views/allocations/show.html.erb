@@ -148,7 +148,7 @@
       <td class="govuk-table__cell govuk-!-width-one-half">POM</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
         <%= link_to @pom.full_name, prison_pom_path(@prison, @pom.staff_id), class: "govuk-link" %>
-        <%= link_to 'Reallocate', edit_prison_allocation_path(@prison, @prisoner.offender_no), class: "govuk-link pull-right" %>
+        <%= link_to 'Reallocate', edit_prison_allocation_path(@prison, @prisoner.offender_no, page: params[:page]), class: "govuk-link pull-right" %>
       </td>
     </tr>
     <tr class="govuk-table__row" id="co-working-pom">
