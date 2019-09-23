@@ -19,7 +19,7 @@ feature 'Help' do
     end
 
     before do
-      visit '/help'
+      visit '/help_step0'
     end
 
     scenario 'initial help page', vcr: { cassette_name: :help_initial_page } do
