@@ -77,7 +77,7 @@ private
 
   def current_responsibility
     ResponsibilityService.
-      calculate_pom_responsibility(@offender).downcase
+      calculate_pom_responsibility(@offender).to_s.downcase
   end
 
   def previous_pom
