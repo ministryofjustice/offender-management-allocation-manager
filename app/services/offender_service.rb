@@ -13,6 +13,8 @@ class OffenderService
         o.welsh_offender = record.welsh_offender == 'Yes'
         o.crn = record.crn
         o.mappa_level = record.mappa_level
+        o.ldu = record.local_divisional_unit
+        o.team = record.team.try(:name)
       end
 
       sentence_detail = get_sentence_details([o.latest_booking_id])
@@ -88,6 +90,8 @@ class OffenderService
           offender.welsh_offender = record.welsh_offender == 'Yes'
           offender.crn = record.crn
           offender.mappa_level = record.mappa_level
+          offender.ldu = record.local_divisional_unit
+          offender.team = record.team.try(:name)
         end
 
         true

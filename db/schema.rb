@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_19_074927) do
+ActiveRecord::Schema.define(version: 2019_09_23_092754) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -36,6 +36,7 @@ ActiveRecord::Schema.define(version: 2019_09_19_074927) do
     t.string "created_by_username"
     t.datetime "primary_pom_allocated_at"
     t.string "recommended_pom_type"
+    t.string "com_name"
     t.index ["nomis_offender_id"], name: "index_allocation_versions_on_nomis_offender_id"
     t.index ["primary_pom_nomis_id"], name: "index_allocation_versions_on_primary_pom_nomis_id"
     t.index ["prison"], name: "index_allocation_versions_on_prison"
@@ -131,6 +132,15 @@ ActiveRecord::Schema.define(version: 2019_09_19_074927) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["nomis_staff_id"], name: "index_pom_details_on_nomis_staff_id"
+  end
+
+  create_table "responsibilities", force: :cascade do |t|
+    t.string "nomis_offender_id", null: false
+    t.integer "reason", null: false
+    t.string "reason_text"
+    t.string "value", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "teams", force: :cascade do |t|

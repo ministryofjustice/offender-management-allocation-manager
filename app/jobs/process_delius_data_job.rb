@@ -58,6 +58,15 @@ private
                                   error_type: error_type(field)
       end
     end
+
+    update_com_name(delius_record)
+  end
+
+  def update_com_name(delius_record)
+    allocation = AllocationVersion.find_by(nomis_offender_id: delius_record.noms_no)
+    return if allocation.blank?
+
+    allocation.update(com_name: delius_record.offender_manager)
   end
 
   def map_delius_to_case_info(delius_record)
