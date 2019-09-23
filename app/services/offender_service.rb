@@ -6,16 +6,7 @@ class OffenderService
       next false if o.nil?
 
       record = CaseInformation.find_by(nomis_offender_id: offender_no)
-
-      if record.present?
-        o.tier = record.tier
-        o.case_allocation = record.case_allocation
-        o.welsh_offender = record.welsh_offender == 'Yes'
-        o.crn = record.crn
-        o.mappa_level = record.mappa_level
-        o.ldu = record.local_divisional_unit
-        o.team = record.team.try(:name)
-      end
+      o.load_case_information(record)
 
       sentence_detail = get_sentence_details([o.latest_booking_id])
       if sentence_detail.present? && sentence_detail.key?(o.latest_booking_id)
@@ -83,16 +74,8 @@ class OffenderService
         offender.sentence = sentencing if sentencing.present?
         next false unless offender.sentenced?
 
-        record = mapped_tiers[offender.offender_no]
-        if record
-          offender.tier = record.tier
-          offender.case_allocation = record.case_allocation
-          offender.welsh_offender = record.welsh_offender == 'Yes'
-          offender.crn = record.crn
-          offender.mappa_level = record.mappa_level
-          offender.ldu = record.local_divisional_unit
-          offender.team = record.team.try(:name)
-        end
+        case_info_record = mapped_tiers[offender.offender_no]
+        offender.load_case_information(case_info_record)
 
         true
       }
