@@ -120,7 +120,7 @@ private
   end
 
   def self.release_date_gt_17_mths_at_policy_date?(offender)
-    offender.sentence.earliest_release_date >
+    offender.earliest_release_date >
       ENGLISH_POLICY_START_DATE + 17.months
   end
 
@@ -133,7 +133,7 @@ private
     return true unless offender.sentenced?
 
     if offender.welsh_offender
-      offender.sentence.sentence_start_date > WELSH_POLICY_START_DATE
+      offender.sentence_start_date > WELSH_POLICY_START_DATE
     else
       offender.sentence_start_date > ENGLISH_POLICY_START_DATE
     end

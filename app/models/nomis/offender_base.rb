@@ -40,8 +40,9 @@ module Nomis
       @sentence_type.code
     end
 
+    # sentence type may be nil if we are created as a stub
     def recalled?
-      @sentence_type.recall_sentence?
+      @sentence_type.try(:recall_sentence?)
     end
 
     def civil_sentence?
@@ -81,6 +82,10 @@ module Nomis
 
     def pom_responsibility
       ResponsibilityService.calculate_pom_responsibility(self)
+    end
+
+    def sentence_start_date
+      sentence.sentence_start_date
     end
 
     def full_name

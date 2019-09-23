@@ -4,25 +4,19 @@ describe ResponsibilityService do
   describe '#calculate_pom_responsibility' do
     context 'when offender is english' do
       let(:offender) {
-        Nomis::Offender.new.tap { |o|
-          o.welsh_offender = false
-          o.case_allocation = case_allocation
-          o.imprisonment_status = sentence_type
-          o.sentence = Nomis::SentenceDetail.new.tap { |s|
-            s.sentence_start_date = start_date
-            s.release_date = release_date
-            s.parole_eligibility_date = parole_date
-          }
-        }
+        OpenStruct.new welsh_offender: false,
+                       case_allocation: case_allocation,
+                       indeterminate_sentence?: indeterminate_sentence,
+                       recalled?: recalled,
+                       sentence_start_date: start_date,
+                       earliest_release_date: release_date,
+                       parole_eligibility_date: parole_date,
+                       sentenced?: true
       }
 
       let(:parole_date) { nil }
-      let(:sentence_type) { 'BOBC' } # determinate non-recall
-
-      it 'uses the correct default sentence type' do
-        expect(SentenceTypeService.indeterminate_sentence?(sentence_type)).to eq(false)
-        expect(SentenceTypeService.recall_sentence?(sentence_type)).to eq(false)
-      end
+      let(:indeterminate_sentence) { false }
+      let(:recalled) { false }
 
       context 'when sentenced before 30th Sept' do
         let(:start_date) { Date.new(2019, 9, 18) }
@@ -51,7 +45,8 @@ describe ResponsibilityService do
           end
 
           context 'when inderminate' do
-            let(:release_date) { nil }
+            let(:release_date) { parole_date }
+            let(:inderminate_sentence) { true }
 
             context 'with ped > 17 months away' do
               let(:parole_date) { DateTime.now.utc.to_date + 18.months }
@@ -101,11 +96,7 @@ describe ResponsibilityService do
 
         context 'when recalled' do
           let(:release_date) { Date.new(2019, 12, 1) }
-          let(:sentence_type) { 'LR_IPP' } # recall sentence type
-
-          it 'uses the correct sentence type' do
-            expect(SentenceTypeService.recall_sentence?(sentence_type)).to eq(true)
-          end
+          let(:recalled) { true }
 
           %w[NPS CRC].each do |case_allocation|
             let(:case_allocation) { case_allocation }
@@ -182,9 +173,10 @@ describe ResponsibilityService do
 
         context 'when recalled' do
           let(:release_date) { Date.new(2020, 12, 1) }
+          let(:recalled) { true }
 
           context 'when determinate' do
-            let(:sentence_type) { 'LR_EPP' } # determinate recall type
+            let(:inderminate) { false }
 
             context 'when NPS' do
               let(:case_allocation) { 'NPS' }
@@ -210,7 +202,7 @@ describe ResponsibilityService do
           # CRC indeterminate recall shouldn't be possible.
           context 'when indeterminate' do
             let(:case_allocation) { 'NPS' }
-            let(:sentence_type) { 'LR_IPP' }
+            let(:inderminate) { true }
 
             it 'is supporting' do
               resp = described_class.calculate_pom_responsibility(offender)
