@@ -1,9 +1,6 @@
 require 'rails_helper'
 
 describe HandoverDateService do
-  let(:determinate_status) { 'CRIM_CON' }
-  let(:indeterminate_status) { 'LIFE' }
-
   describe '#handover_start_date' do
     context 'when NPS' do
       context 'with early allocation' do
@@ -17,10 +14,10 @@ describe HandoverDateService do
       context 'with normal allocation' do
         let(:release_date) { Date.new(2020, 8, 30) }
 
-        let(:offender) { OpenStruct.new(imprisonment_status: status, nps_case?: true, earliest_release_date: release_date) }
+        let(:offender) { OpenStruct.new(indeterminate_sentence?: indeterminate, nps_case?: true, earliest_release_date: release_date) }
 
         context 'with determinate sentence' do
-          let(:status) { determinate_status }
+          let(:indeterminate) { false }
 
           it 'is 7.5 months before release date' do
             expect(described_class.handover_start_date(offender)[0]).to eq(Date.new(2020, 1, 15))
@@ -28,7 +25,7 @@ describe HandoverDateService do
         end
 
         context "with indeterminate sentence" do
-          let(:status) { indeterminate_status }
+          let(:indeterminate) { true }
 
           it 'is 8 months before release date' do
             expect(described_class.handover_start_date(offender)[0]).to eq(Date.new(2019, 12, 30))
@@ -115,7 +112,7 @@ describe HandoverDateService do
           let(:mappa_level) { nil }
 
           let(:offender) {
-            OpenStruct.new(imprisonment_status: determinate_status,
+            OpenStruct.new(inderminate_sentence?: false,
                            nps_case?: true,
                            mappa_level: mappa_level,
                            home_detention_curfew_eligibility_date: hdc_date,
@@ -189,7 +186,7 @@ describe HandoverDateService do
 
         context "with indeterminate sentence" do
           let(:offender) {
-            OpenStruct.new(imprisonment_status: indeterminate_status,
+            OpenStruct.new(indeterminate_sentence?: true,
                            nps_case?: true,
                            parole_eligibility_date: parole_date,
                            tariff_date: tariff_date)

@@ -5,7 +5,6 @@ module Nomis
                   :date_of_birth,
                   :offender_no,
                   :convicted_status,
-                  :imprisonment_status,
                   :category_code
 
     # Custom attributes
@@ -34,11 +33,27 @@ module Nomis
       sentence.parole_eligibility_date.present? ||
       sentence.home_detention_curfew_eligibility_date.present? ||
       sentence.tariff_date.present? ||
-      SentenceTypeService.indeterminate_sentence?(imprisonment_status)
+        @sentence_type.indeterminate_sentence?
+    end
+
+    def sentence_type_code
+      @sentence_type.code
     end
 
     def recalled?
-      SentenceTypeService.recall_sentence?(imprisonment_status)
+      @sentence_type.recall_sentence?
+    end
+
+    def civil_sentence?
+      @sentence_type.civil?
+    end
+
+    def indeterminate_sentence?
+      @sentence_type.indeterminate_sentence?
+    end
+
+    def describe_sentence
+      @sentence_type.description
     end
 
     def over_18?
@@ -89,7 +104,7 @@ module Nomis
       @last_name = payload['lastName']
       @offender_no = payload['offenderNo']
       @convicted_status = payload['convictedStatus']
-      @imprisonment_status = payload['imprisonmentStatus']
+      @sentence_type = SentenceType.new(payload['imprisonmentStatus'])
       @category_code = payload['categoryCode']
       @date_of_birth = deserialise_date(payload, 'dateOfBirth')
     end
