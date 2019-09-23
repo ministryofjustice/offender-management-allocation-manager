@@ -23,10 +23,6 @@ class SentenceType
     recall_status == RECALL
   end
 
-  def self.criminal?(imprisonment_status)
-    !civil?
-  end
-
   def civil?
     %w[
       CIVIL

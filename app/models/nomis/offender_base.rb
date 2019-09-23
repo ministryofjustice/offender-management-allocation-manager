@@ -44,6 +44,10 @@ module Nomis
       @sentence_type.recall_sentence?
     end
 
+    def criminal_sentence?
+      @sentence_type.civil? == false
+    end
+
     def civil_sentence?
       @sentence_type.civil?
     end

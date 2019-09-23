@@ -51,7 +51,7 @@ private
     unfiltered_offenders.group_by { |offender|
       if offender.age < 18
         :under18
-      elsif SentenceType.civil?(offender.imprisonment_status)
+      elsif offender.civil_sentence?
         :civil
       elsif offender.sentenced? == false
         :unsentenced

@@ -64,15 +64,13 @@ class OffenderService
       nomis_ids = offenders.map(&:offender_no)
       mapped_tiers = CaseInformationService.get_case_information(nomis_ids)
 
-      offenders.select { |offender|
+      offenders.each { |offender|
         sentencing = sentence_details[offender.booking_id]
         # TODO: - if sentencing.present? is false, then we crash in offender#sentenced?
         offender.sentence = sentencing if sentencing.present?
 
         case_info_record = mapped_tiers[offender.offender_no]
         offender.load_case_information(case_info_record)
-
-        true
       }
     end
   end
@@ -81,7 +79,7 @@ class OffenderService
     OffenderEnumerator.new(prison).select { |offender|
       offender.age >= 18 &&
       offender.sentenced? &&
-      SentenceType.criminal?(offender.imprisonment_status)
+      offender.criminal_sentence?
     }
   end
 
