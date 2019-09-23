@@ -10,7 +10,7 @@ class LDUEmailImporter
 
       next if address.blank?
 
-      LocalDivisionalUnit.where(code: code).update_all(email_address: address)
+      LocalDivisionalUnit.find_by(code: code)&.update!(email_address: address)
     end
   end
 end
