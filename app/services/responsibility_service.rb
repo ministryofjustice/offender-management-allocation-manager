@@ -59,7 +59,7 @@ private
 
   def self.welsh_prepolicy_rules(offender)
     if nps_case?(offender)
-      if release_date_gt_15_mths?(offender)
+      if release_date_gt_15_mths_at_policy_date?(offender)
         RESPONSIBLE
       else
         SUPPORTING
@@ -114,7 +114,7 @@ private
       DateTime.now.utc.to_date + 10.months
   end
 
-  def self.release_date_gt_15_mths?(offender)
+  def self.release_date_gt_15_mths_at_policy_date?(offender)
     offender.earliest_release_date >
       WELSH_POLICY_START_DATE + 15.months
   end
