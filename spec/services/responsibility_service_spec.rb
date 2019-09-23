@@ -18,7 +18,7 @@ describe ResponsibilityService do
       let(:indeterminate_sentence) { false }
       let(:recalled) { false }
 
-      context 'when sentenced before 30th Sept' do
+      context 'when (old case) sentenced before 30th Sept' do
         let(:start_date) { Date.new(2019, 9, 18) }
 
         context 'when NPS' do
@@ -110,7 +110,7 @@ describe ResponsibilityService do
         end
       end
 
-      context 'when sentenced after 1st Oct' do
+      context 'when (new case) sentenced after 1st Oct' do
         let(:start_date) { Date.new(2019, 10, 18) }
 
         context 'when NPS' do
