@@ -134,15 +134,6 @@ ActiveRecord::Schema.define(version: 2019_09_23_092754) do
     t.index ["nomis_staff_id"], name: "index_pom_details_on_nomis_staff_id"
   end
 
-  create_table "responsibilities", force: :cascade do |t|
-    t.string "nomis_offender_id", null: false
-    t.integer "reason", null: false
-    t.string "reason_text"
-    t.string "value", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "teams", force: :cascade do |t|
     t.string "code"
     t.string "name"
