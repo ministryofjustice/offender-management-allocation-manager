@@ -10,13 +10,15 @@ module OffenderHelper
     offender.pom_responsibility
   end
 
+  # rubocop:disable Metrics/LineLength
   def case_owner_label(offender)
-    if offender.case_owner == 'Prison'
+    if ResponsibilityService.calculate_pom_responsibility(offender) == ResponsibilityService::RESPONSIBLE
       'Custody'
     else
       'Community'
     end
   end
+  # rubocop:enable Metrics/LineLength
 
   def last_event(allocation)
     event = event_type(allocation.event)
