@@ -52,17 +52,8 @@ module ApplicationHelper
     'Part time'
   end
 
-  def case_owner_label(offender)
-    if offender.case_owner == 'Prison'
-      'Custody'
-    else
-      'Community'
-    end
-  end
-
   def sentence_type_label(offender)
-    sentence = offender.imprisonment_status
-    return 'Indeterminate' if SentenceTypeService.indeterminate_sentence?(sentence)
+    return 'Indeterminate' if offender.indeterminate_sentence?
 
     'Determinate'
   end

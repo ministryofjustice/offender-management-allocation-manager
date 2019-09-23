@@ -6,27 +6,28 @@ class SentenceType
   RECALL = :recall
   NON_RECALL = :non_recall
 
-  attr_accessor :code, :description, :duration_type, :recall_status
+  attr_reader :code, :description, :duration_type, :recall_status
 
-  def self.create(imprisonment_status)
-    code = imprisonment_status
-    code = 'UNK_SENT' if code.nil?
+  def initialize(imprisonment_status)
+    @code = imprisonment_status
+    @code = 'UNK_SENT' if @code.nil?
 
-    desc, duration_type, recall_status = SENTENCE_TYPES.fetch(code)
+    @description, @duration_type, @recall_status = SENTENCE_TYPES.fetch(@code)
+  end
 
-    SentenceType.new.tap { |st|
-      st.code = code
-      st.description = desc
-      st.duration_type = duration_type
-      st.recall_status = recall_status
-    }
+  def indeterminate_sentence?
+    duration_type == INDETERMINATE
+  end
+
+  def recall_sentence?
+    recall_status == RECALL
   end
 
   def self.criminal?(imprisonment_status)
-    !civil?(imprisonment_status)
+    !civil?
   end
 
-  def self.civil?(imprisonment_status)
+  def civil?
     %w[
       CIVIL
       CIVIL_CON
@@ -35,7 +36,7 @@ class SentenceType
       A_CFINE
       YO_CFINE
       CIV_RMD
-    ].include? imprisonment_status
+    ].include? code
   end
 end
 

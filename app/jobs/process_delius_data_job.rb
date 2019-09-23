@@ -58,6 +58,15 @@ private
                                   error_type: error_type(field)
       end
     end
+
+    update_com_name(delius_record)
+  end
+
+  def update_com_name(delius_record)
+    allocation = AllocationVersion.find_by(nomis_offender_id: delius_record.noms_no)
+    return if allocation.blank?
+
+    allocation.update(com_name: delius_record.offender_manager)
   end
 
   def map_delius_to_case_info(delius_record)
@@ -68,7 +77,7 @@ private
         local_divisional_unit: make_ldu_record(delius_record),
         team: make_team_record(delius_record),
         case_allocation: delius_record.service_provider,
-        omicable: map_omicable(delius_record.omicable?),
+        welsh_offender: map_welsh_offender(delius_record.welsh_offender?),
         mappa_level: map_mappa_level(delius_record.mappa, delius_record.mappa_levels)
       )
     end
@@ -108,8 +117,8 @@ private
     end
   end
 
-  def map_omicable(omicable)
-    omicable ? 'Yes' : 'No'
+  def map_welsh_offender(welsh_offender)
+    welsh_offender ? 'Yes' : 'No'
   end
 
   def map_tier(tier)

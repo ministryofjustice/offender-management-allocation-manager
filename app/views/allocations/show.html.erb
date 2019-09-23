@@ -54,7 +54,7 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Last known address in Wales</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= humanized_bool(@prisoner.omicable) %>
+        <%= humanized_bool(@prisoner.welsh_offender) %>
         <% unless auto_delius_import_enabled?(@prison) %>
           <a class="govuk-link pull-right" href="<%= edit_prison_case_information_path(@prison, @prisoner.offender_no) %>">Change</a>
         <% end %>
@@ -155,7 +155,7 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Allocation history</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%=@allocation.last_event(@prisoner.offender_no) %>
+        <%= last_event(@allocation) %>
         <%= link_to 'View', prison_allocation_history_path(@prison, @prisoner.offender_no), class: "govuk-link pull-right" %>
       </td>
     </tr>

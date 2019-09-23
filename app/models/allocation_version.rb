@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class AllocationVersion < ApplicationRecord
-  has_paper_trail
+  has_paper_trail ignore: [:com_name]
 
   ALLOCATE_PRIMARY_POM = 0
   REALLOCATE_PRIMARY_POM = 1
@@ -73,25 +73,6 @@ class AllocationVersion < ApplicationRecord
       av.primary_pom_nomis_id == av.secondary_pom_nomis_id
       errors.add(:primary_pom_nomis_id,
                  'Primary POM cannot be the same as co-working POM')
-    end
-  end
-
-  def self.last_event(nomis_offender_id)
-    allocation = find_by(nomis_offender_id: nomis_offender_id)
-
-    event = event_type(allocation.event)
-    event + ' - ' + allocation.updated_at.strftime('%d/%m/%Y')
-  end
-
-  def self.event_type(event)
-    type = (event.include? 'primary_pom') ? 'POM ' : 'Co-working POM '
-
-    if event.include? 'reallocate'
-      type + 're-allocated'
-    elsif event.include? 'deallocate'
-      type + 'removed'
-    elsif event.include? 'allocate'
-      type + 'allocated'
     end
   end
 

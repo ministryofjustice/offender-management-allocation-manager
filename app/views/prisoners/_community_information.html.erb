@@ -5,20 +5,32 @@
       <td class="govuk-table__cell govuk-!-width-one-half"></td>
     </tr>
     <tr class="govuk-table__row">
-      <td class="govuk-table__cell govuk-!-width-one-half">COM</td>
-      <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"></td>
-    </tr>
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell">Service provider</td>
-      <td class="govuk-table__cell table_cell__left_align"></td>
-    </tr>
-    <tr class="govuk-table__row">
       <td class="govuk-table__cell">Local divisional unit (LDU)</td>
-      <td class="govuk-table__cell table_cell__left_align"></td>
+      <td class="govuk-table__cell table_cell__left_align">
+        <%= @prisoner.ldu.try(:name) || "Unknown"%>
+      </td>
     </tr>
     <tr class="govuk-table__row">
-      <td class="govuk-table__cell">Last known address in Wales</td>
-      <td class="govuk-table__cell table_cell__left_align"></td>
+      <td class="govuk-table__cell">Local divisional unit (LDU) email address</td>
+      <td class="govuk-table__cell table_cell__left_align">
+        <% if @prisoner.ldu.try(:email_address) %>
+          <%= mail_to(@prisoner.ldu.email_address, @prisoner.ldu.email_address) %>
+        <% else %>
+          Unknown
+        <% end %>
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">Team</td>
+      <td class="govuk-table__cell table_cell__left_align">
+        <%= @prisoner.team.presence || "Unknown"%>
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-width-one-half">COM</td>
+      <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
+        <%= @allocation.com_name.presence || "Unknown" %>
+      </td>
     </tr>
   </tbody>
 </table>

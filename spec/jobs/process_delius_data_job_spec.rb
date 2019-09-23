@@ -41,6 +41,37 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
       end
     end
 
+    context 'when processing a com name' do
+      let!(:offender_id) { 'A1111A' }
+      let!(:com_name) { 'Bob Smith' }
+      let!(:d1) { create(:delius_data, offender_manager: com_name) }
+      let!(:allocation) { create(:allocation_version, nomis_offender_id: d1.noms_no) }
+
+      it 'does no update if no allocation' do
+        alloc = AllocationVersion.find_by(nomis_offender_id: offender_id)
+        expect(alloc).to be_nil
+
+        expect {
+          described_class.perform_now d1.noms_no
+        }.to change(CaseInformation, :count).by(1)
+
+        alloc = AllocationVersion.find_by(nomis_offender_id: offender_id)
+        expect(alloc).to be_nil
+      end
+
+      it 'updates existing allocation without new version' do
+        expect(allocation.version).to be_nil
+
+        expect {
+          described_class.perform_now d1.noms_no
+        }.to change(CaseInformation, :count).by(1)
+
+        allocation.reload
+        expect(allocation.version).to be_nil
+        expect(allocation.com_name).to eq(com_name)
+      end
+    end
+
     context 'when offender is not convicted' do
       let!(:d1) { create(:delius_data, noms_no: remand_nomis_offender_id) }
 

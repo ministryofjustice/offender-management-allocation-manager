@@ -24,7 +24,7 @@ class OnboardPrison
       # Create a CaseInformation .....
       CaseInformation.find_or_create_by(
         nomis_offender_id: offender_id,
-        omicable: record[:omicable] ? 'Yes' : 'No',
+        welsh_offender: record[:welsh_offender] ? 'Yes' : 'No',
         tier: record[:tier],
         case_allocation: record[:provider_cd],
         crn: record[:crn],
