@@ -53,8 +53,7 @@ module ApplicationHelper
   end
 
   def sentence_type_label(offender)
-    sentence = offender.imprisonment_status
-    return 'Indeterminate' if SentenceTypeService.indeterminate_sentence?(sentence)
+    return 'Indeterminate' if offender.indeterminate_sentence?
 
     'Determinate'
   end

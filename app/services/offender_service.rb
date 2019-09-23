@@ -74,7 +74,7 @@ class OffenderService
 
       offenders.select { |offender|
         next false if offender.age < 18
-        next false if SentenceType.civil?(offender.imprisonment_status)
+        next false if offender.civil_sentence?
 
         sentencing = sentence_details[offender.booking_id]
         # TODO: - if sentencing.present? is false, then we crash in offender#sentenced?
