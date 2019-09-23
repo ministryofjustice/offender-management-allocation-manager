@@ -22,6 +22,8 @@ feature 'Responsibility override' do
         click_link 'Change'
       end
 
+      expect(page).not_to have_css('govuk-textarea--error')
+
       click_button 'Continue'
 
       expect(page).to have_content 'Select a reason for overriding the responsibility'

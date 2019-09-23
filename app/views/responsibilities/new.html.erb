@@ -52,7 +52,7 @@
             <label class="govuk-label" for="other_reason_text">
               Enter reason
             </label>
-            <input class="govuk-input govuk-!-width-one-third govuk-textarea--error" id="other_reason_text" name="responsibility[reason_text]">
+            <input class="govuk-input govuk-!-width-one-third<%= ' govuk-textarea--error' if @responsibility.errors[:reason_text].present? %>" id="other_reason_text" name="responsibility[reason_text]">
           </div>
         </div>
       </div>
