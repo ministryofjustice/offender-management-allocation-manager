@@ -28,7 +28,9 @@ class ResponsibilityService
 private
 
   def self.welsh_rules(offender)
-    if new_case?(offender)
+    if offender.recalled?
+      SUPPORTING
+    elsif new_case?(offender)
       welsh_policy_rules(offender)
     else
       welsh_prepolicy_rules(offender)

@@ -215,6 +215,21 @@ describe ResponsibilityService do
     end
 
     context 'when offender is Welsh' do
+      context 'when recalled' do
+        let(:offender) {
+          OpenStruct.new welsh_offender: true,
+                         recalled?: true,
+                         earliest_release_date: Date.new(2021, 1, 2),
+                         sentenced?: true
+        }
+
+        it 'is always supporting' do
+          resp = described_class.calculate_pom_responsibility(offender)
+
+          expect(resp).to eq ResponsibilityService::SUPPORTING
+        end
+      end
+
       context 'when CRC case' do
         let(:offender) {
           Nomis::Offender.new.tap { |o|

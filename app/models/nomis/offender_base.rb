@@ -62,7 +62,11 @@ module Nomis
     end
 
     def awaiting_allocation_for
-      omic_start_date = Date.new(2019, 2, 4)
+      omic_start_date = if welsh_offender
+                          ResponsibilityService::WELSH_POLICY_START_DATE
+                        else
+                          ResponsibilityService::ENGLISH_POLICY_START_DATE
+                        end
 
       if sentence.sentence_start_date.nil? ||
           sentence.sentence_start_date < omic_start_date
