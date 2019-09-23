@@ -109,5 +109,17 @@ module Nomis
     def responsibility_handover_date
       HandoverDateService.responsibility_handover_date(self)
     end
+
+    def load_case_information(record)
+      return if record.blank?
+
+      @tier = record.tier
+      @case_allocation = record.case_allocation
+      @welsh_offender = record.welsh_offender == 'Yes'
+      @crn = record.crn
+      @mappa_level = record.mappa_level
+      @ldu = record.local_divisional_unit
+      @team = record.team.try(:name)
+    end
   end
 end
