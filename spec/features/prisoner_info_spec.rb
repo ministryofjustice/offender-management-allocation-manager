@@ -2,13 +2,7 @@ require 'rails_helper'
 
 feature 'View a prisoner profile page' do
   let!(:alloc) {
-    a = build(
-      :allocation_version,
-      nomis_offender_id: 'G7998GJ',
-      primary_pom_nomis_id: '485637'
-    )
-    a.save(validate: false)
-    a
+    create(:allocation_version, nomis_offender_id: 'G7998GJ', primary_pom_nomis_id: '485637')
   }
 
   it 'shows the prisoner information', :raven_intercept_exception, vcr: { cassette_name: :show_offender_spec } do
@@ -34,5 +28,42 @@ feature 'View a prisoner profile page' do
     visit prison_prisoner_show_path('LEI', 'G7998GJ')
     click_link "View"
     expect(page).to have_content('Prisoner allocation')
+  end
+
+  it "has community information when present",
+     :raven_intercept_exception, vcr: { cassette_name: :show_offender_community_info_full } do
+    ldu = create(:local_divisional_unit, name: 'An LDU', email_address: 'test@example.com')
+    team = create(:team, name: 'A team')
+    create(:case_information,
+           nomis_offender_id: alloc.nomis_offender_id,
+           local_divisional_unit: ldu,
+           team: team
+    )
+
+    alloc.update(com_name: 'Bob Smith')
+
+    signin_user
+    visit prison_prisoner_show_path('LEI', 'G7998GJ')
+
+    expect(page).to have_content(ldu.name)
+    expect(page).to have_content(ldu.email_address)
+    expect(page).to have_content(team.name)
+    expect(page).to have_content('Bob Smith')
+  end
+
+  it "has some community information when present",
+     :raven_intercept_exception, vcr: { cassette_name: :show_offender_community_info_partial } do
+    ldu = create(:local_divisional_unit, name: 'An LDU', email_address: nil)
+    create(:case_information,
+           nomis_offender_id: alloc.nomis_offender_id,
+           local_divisional_unit: ldu
+    )
+
+    signin_user
+    visit prison_prisoner_show_path('LEI', 'G7998GJ')
+
+    expect(page).not_to have_content('Bob Smith')
+    # Expect an Unknown for LDU Email and Team
+    expect(page).to have_content('Unknown', count: 2)
   end
 end
