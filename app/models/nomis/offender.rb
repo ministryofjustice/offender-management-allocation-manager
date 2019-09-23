@@ -34,7 +34,7 @@ module Nomis
     end
 
     def pom_responsibility
-      ResponsibilityService.calculate_pom_responsibility(self)
+      ResponsibilityService.calculate_pom_responsibility(self).to_s
     end
 
     def self.from_json(payload)

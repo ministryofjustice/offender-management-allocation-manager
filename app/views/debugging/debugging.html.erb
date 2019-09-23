@@ -43,12 +43,12 @@
       <td class="govuk-table__cell table_cell__left_align">
         <%= humanized_bool(@offender.convicted?) %> (<%= @offender.convicted_status %>)
     </tr>
-    <tr class="govuk-table__row" id="sentenced"">
+    <tr class="govuk-table__row" id="sentenced">
       <td class="govuk-table__cell">Sentenced?</td>
       <td class="govuk-table__cell table_cell__left_align">
         <%= humanized_bool(@offender.sentenced?) %>
     </tr>
-    <tr class="govuk-table__row" id="recalled"">
+    <tr class="govuk-table__row" id="recalled">
       <td class="govuk-table__cell">Recalled?</td>
       <td class="govuk-table__cell table_cell__left_align">
         <%= humanized_bool(@offender.recalled?) %>
@@ -83,7 +83,7 @@
         <%= humanized_bool(@offender.welsh_offender) %>
       </td>
     </tr>
-    <tr class="govuk-table__row" id="responsibility"">
+    <tr class="govuk-table__row" id="responsibility">
       <td class="govuk-table__cell govuk-!-width-one-half">Current responsibility</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
         <%= case_owner_label(@offender) %>
@@ -109,7 +109,7 @@
     <tr class="govuk-table__row" id="imprisonment-status">
       <td class="govuk-table__cell govuk-!-width-one-half">Imprisonment status</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-        <%= @offender.imprisonment_status %> - <%= SentenceTypeService.describe_sentence(@offender.imprisonment_status) %>
+        <%= @offender.sentence_type_code %> - <%= @offender.describe_sentence %>
       </td>
     </tr>
     <tr class="govuk-table__row" id="sentence-type">

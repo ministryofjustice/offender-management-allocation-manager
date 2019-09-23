@@ -48,7 +48,8 @@ class AllocationService
     params_copy = params.merge(
       primary_pom_name: "#{pom_secondname}, #{pom_firstname}",
       created_by_name: "#{user_firstname} #{user_secondname}",
-      primary_pom_allocated_at: DateTime.now.utc
+      primary_pom_allocated_at: DateTime.now.utc,
+      com_name: delius_com_name(params[:nomis_offender_id])
     )
 
     # When we look up the current allocation, we only do this for the current
@@ -156,6 +157,10 @@ class AllocationService
   end
 
 private
+
+  def self.delius_com_name(offender_id)
+    DeliusData.find_by(noms_no: offender_id).try(:offender_manager)
+  end
 
   def self.get_versions_for(allocation)
     allocation.versions.map { |version|

@@ -5,7 +5,6 @@ module Nomis
                   :date_of_birth,
                   :offender_no,
                   :convicted_status,
-                  :imprisonment_status,
                   :category_code
 
     # Custom attributes
@@ -34,11 +33,27 @@ module Nomis
       sentence.parole_eligibility_date.present? ||
       sentence.home_detention_curfew_eligibility_date.present? ||
       sentence.tariff_date.present? ||
-      SentenceTypeService.indeterminate_sentence?(imprisonment_status)
+        @sentence_type.indeterminate_sentence?
+    end
+
+    def sentence_type_code
+      @sentence_type.code
     end
 
     def recalled?
-      SentenceTypeService.recall_sentence?(imprisonment_status)
+      @sentence_type.recall_sentence?
+    end
+
+    def civil_sentence?
+      @sentence_type.civil?
+    end
+
+    def indeterminate_sentence?
+      @sentence_type.indeterminate_sentence?
+    end
+
+    def describe_sentence
+      @sentence_type.description
     end
 
     def over_18?
@@ -54,13 +69,6 @@ module Nomis
       else
         (Time.zone.today - sentence.sentence_start_date).to_i
       end
-    end
-
-    def case_owner
-      pom_responsibility = ResponsibilityService.calculate_pom_responsibility(self)
-      return 'Prison' if pom_responsibility == ResponsibilityService::RESPONSIBLE
-
-      'Probation'
     end
 
     def earliest_release_date
@@ -89,7 +97,7 @@ module Nomis
       @last_name = payload['lastName']
       @offender_no = payload['offenderNo']
       @convicted_status = payload['convictedStatus']
-      @imprisonment_status = payload['imprisonmentStatus']
+      @sentence_type = SentenceType.new(payload['imprisonmentStatus'])
       @category_code = payload['categoryCode']
       @date_of_birth = deserialise_date(payload, 'dateOfBirth')
     end
@@ -100,6 +108,18 @@ module Nomis
 
     def responsibility_handover_date
       HandoverDateService.responsibility_handover_date(self)
+    end
+
+    def load_case_information(record)
+      return if record.blank?
+
+      @tier = record.tier
+      @case_allocation = record.case_allocation
+      @welsh_offender = record.welsh_offender == 'Yes'
+      @crn = record.crn
+      @mappa_level = record.mappa_level
+      @ldu = record.local_divisional_unit
+      @team = record.team.try(:name)
     end
   end
 end

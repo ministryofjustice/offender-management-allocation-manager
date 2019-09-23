@@ -20,6 +20,8 @@ feature 'Co-working' do
 
   before(:each) do
     signin_user
+
+    create(:case_information, nomis_offender_id: nomis_offender_id)
   end
 
   context 'with just a primary POM allocated' do
