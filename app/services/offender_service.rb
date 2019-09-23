@@ -51,7 +51,6 @@ class OffenderService
       (info_request.meta.total_pages / FETCH_SIZE) + 1
     end
 
-    # rubocop:disable Metrics/MethodLength
     def get_offenders_for_prison(page_number:, page_size:)
       offenders = Nomis::Elite2::OffenderApi.list(
         @prison,
@@ -80,7 +79,6 @@ class OffenderService
         true
       }
     end
-    # rubocop:enable Metrics/MethodLength
   end
 
   def self.get_offenders_for_prison(prison)
