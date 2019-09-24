@@ -30,4 +30,19 @@
 # available at http://guides.rubyonrails.org/i18n.html.
 
 en:
-  hello: "Hello world"
+  views:
+    pagination:
+      first: "&laquo; First"
+      last: "Last &raquo;"
+      previous: "&lsaquo; Previous"
+      next: "Next &rsaquo;"
+      truncate: "&hellip;"
+  helpers:
+    page_entries_info:
+      one_page:
+        display_entries:
+          zero: "No %{entry_name} found"
+          one: "Showing 1 - 1 of 1 results"
+          other: "Showing 1 - %{count} of %{count} results"
+      more_pages:
+        display_entries: "Showing %{first}&nbsp;-&nbsp;%{last} of %{total} results"

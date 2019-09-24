@@ -2,7 +2,7 @@
 
 module Nomis
   module Elite2
-    ApiPaginatedResponse = Struct.new(:meta, :data)
+    ApiPaginatedResponse = Struct.new(:total_pages, :data)
 
     module Elite2Api
       def e2_client
