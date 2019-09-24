@@ -13,6 +13,12 @@
   No offenders were found. Please try a different search.
 </p>
 <% else %>
+    <%= render(
+            :partial => 'shared/kaminari',
+            :locals => {
+                :data => @offenders,
+            }) %>
+
   <table class="govuk-table responsive tablesorter govuk-!-margin-top-4">
     <thead class="govuk-table__head">
     <tr class="govuk-table__row">
@@ -40,11 +46,10 @@
     </tbody>
   </table>
 
-<%= render(
-          :partial => 'shared/pagination',
+  <%= render(
+          :partial => 'shared/kaminari',
           :locals => {
-              :page_data => @page_meta,
-              :param_name => 'page',
+              :data => @offenders,
           }) %>
 
 </div>
