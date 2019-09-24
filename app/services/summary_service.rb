@@ -45,17 +45,13 @@ class SummaryService
       end
     end
 
-    page_count = (counts[summary_type] / PAGE_SIZE.to_f).ceil
-
     if params.sort_field.present?
       bucket.sort(params.sort_field, params.sort_direction)
     end
 
-    from = [(PAGE_SIZE * (page - 1)), 0].max
-
     # For the allocated offenders, we need to provide the allocated POM's
     # name
-    offender_items = bucket.take(PAGE_SIZE, from) || []
+    offender_items = Kaminari.paginate_array(bucket.items).page(page)
 
     if summary_type == :allocated
       offender_items.each { |offender|
@@ -71,8 +67,6 @@ class SummaryService
       summary.allocated_total = counts[:allocated]
       summary.unallocated_total = counts[:unallocated]
       summary.pending_total = counts[:pending]
-
-      summary.page_count = page_count
     }
   end
 # rubocop:enable Metrics/CyclomaticComplexity

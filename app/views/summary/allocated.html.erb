@@ -10,6 +10,12 @@
 <%= render(:partial => 'tabs_start', :locals => {:active => :allocated}) %>
 
 <section class="govuk-tabs__panel" id="allocated">
+  <%= render(
+          :partial => 'shared/kaminari',
+          :locals => {
+              :data => @summary.offenders,
+          }) %>
+
   <table class="govuk-table responsive tablesorter">
     <thead class="govuk-table__head">
     <tr class="govuk-table__row">
@@ -54,10 +60,9 @@
   </table>
 
   <%= render(
-          :partial => 'shared/pagination',
+          :partial => 'shared/kaminari',
           :locals => {
-              :page_data => @page_meta,
-              :param_name => 'page',
+              :data => @summary.offenders,
           }) %>
 
 </section>

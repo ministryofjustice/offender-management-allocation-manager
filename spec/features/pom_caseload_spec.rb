@@ -67,16 +67,13 @@ feature "view POM's caseload" do
     end
 
     it 'displays paginated cases for a specific POM' do
-      expect(page).to have_content("Showing 1 - 20 of 21 results")
-      expect(page).to have_content("Your caseload")
+      expect(page).to have_content("Showing 1 - 21 of 21 results")
+      expect(page).to have_content("Your caseload (21)")
       NAMES.first(20).each_with_index do |name, index|
         within ".offender_row_#{index}" do
           expect(page).to have_content(name)
         end
       end
-      click_link 'Next »'
-      expect(page).to have_content("Showing 21 - 21 of 21 results")
-      expect(page).to have_content(NAMES.last)
     end
 
     it 'can be reverse sorted by name' do
