@@ -21,7 +21,6 @@ Rails.application.routes.draw do
   get '/missing_cases', to: 'pages#missing_cases'
   get '/repatriated', to: 'pages#repatriated'
   get '/scottish_northern_irish', to: 'pages#scottish_northern_irish'
-  get '/missing_cases', to: 'pages#missing_cases'
   get '/contact', to: 'pages#contact'
 
   get '/auth/:provider/callback', to: 'sessions#create'
