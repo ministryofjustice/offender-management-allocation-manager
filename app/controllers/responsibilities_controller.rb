@@ -2,13 +2,17 @@
 
 class ResponsibilitiesController < PrisonsApplicationController
   def new
-    @responsibility = Responsibility.new nomis_offender_id: params[:nomis_offender_id]
+    if ldu_email_address(params[:nomis_offender_id])
+      @responsibility = Responsibility.new nomis_offender_id: params[:nomis_offender_id]
+    else
+      render 'error'
+    end
   end
 
   def confirm
     @responsibility = Responsibility.new responsibility_params
     if @responsibility.valid?
-      @ldu_email_address = ldu_email_address
+      @ldu_email_address = ldu_email_address(@responsibility.nomis_offender_id)
     else
       render 'new'
     end
@@ -20,7 +24,7 @@ class ResponsibilitiesController < PrisonsApplicationController
 
     me = PrisonOffenderManagerService.get_signed_in_pom_details(current_user, @prison).emails.try(:first)
 
-    emails = [me, ldu_email_address].compact
+    emails = [me, ldu_email_address(@responsibility.nomis_offender_id)].compact
 
     unless emails.empty?
       PomMailer.responsibility_override(
@@ -38,9 +42,9 @@ class ResponsibilitiesController < PrisonsApplicationController
 
 private
 
-  def ldu_email_address
+  def ldu_email_address(nomis_offender_id)
     @ldu_email_address ||= CaseInformation.
-      find_by(nomis_offender_id: responsibility_params[:nomis_offender_id]).
+      find_by(nomis_offender_id: nomis_offender_id).
       try(:local_divisional_unit).
       try(:email_address)
   end

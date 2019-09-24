@@ -7,9 +7,9 @@ feature 'Responsibility override' do
     signin_user
   end
 
-  context 'when overriding responsibility', :queueing, vcr: { cassette_name: :override_responsibility } do
-    let(:offender_id) { 'G8060UF' }
+  let(:offender_id) { 'G8060UF' }
 
+  context 'when overriding responsibility', :queueing, vcr: { cassette_name: :override_responsibility } do
     before do
       ldu = create(:local_divisional_unit, email_address: 'ldu@test.com')
       create(:case_information, nomis_offender_id: offender_id, local_divisional_unit: ldu)
@@ -36,6 +36,23 @@ feature 'Responsibility override' do
       }.to change(enqueued_jobs, :count).by(1)
 
       expect(page).to have_content 'Current case owner Community'
+    end
+  end
+
+  context "when override isn't possible due to lack of LDU address", vcr: { cassette_name: :cant_override_responsibility } do
+    before do
+      ldu = create(:local_divisional_unit, email_address: nil)
+      create(:case_information, nomis_offender_id: offender_id, local_divisional_unit: ldu)
+    end
+
+    it 'doesnt override' do
+      visit new_prison_allocation_path('LEI', offender_id)
+
+      within '.responsibility_change' do
+        click_link 'Change'
+      end
+
+      expect(page).to have_content "Responsibility for this case can't be changed"
     end
   end
 end
