@@ -22,14 +22,14 @@ class PomMailer < GovukNotifyRails::Mailer
     prisoner_number:,
     prisoner_name:,
     prison_name:,
-    emails:
+    email:
   )
     set_template('ca952ba5-58b5-4e2d-8d87-60590d76560c')
     set_personalisation(prisoner_name: prisoner_name,
                         prisoner_number: prisoner_number,
                         reason: message,
                         prison_name: prison_name)
-    mail(to: emails)
+    mail(to: email)
   end
 
   # rubocop:disable Metrics/ParameterLists

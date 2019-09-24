@@ -26,14 +26,15 @@ class ResponsibilitiesController < PrisonsApplicationController
 
     emails = [me, ldu_email_address(@responsibility.nomis_offender_id)].compact
 
-    unless emails.empty?
+    # GovUk notify can only deliver to 1 address at a time.
+    emails.each do |email|
       PomMailer.responsibility_override(
         message: params[:message],
         prisoner_number: @responsibility.nomis_offender_id,
         prisoner_name: OffenderService.get_offender(@responsibility.nomis_offender_id).full_name,
         prison_name: PrisonService.name_for(@prison),
-        emails: emails
-    ).deliver_later
+        email: email
+      ).deliver_later
     end
 
     redirect_to new_prison_allocation_path(@prison, @responsibility.nomis_offender_id)
