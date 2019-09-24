@@ -17,7 +17,10 @@ Rails.application.routes.draw do
   get '/help_step5', to: 'pages#help_step5'
   get '/help_step6', to: 'pages#help_step6'
   get '/update_case_information', to: 'pages#update_case_information'
+  get '/updating_ndelius', to: 'pages#updating_ndelius'
   get '/missing_cases', to: 'pages#missing_cases'
+  get '/repatriated', to: 'pages#repatriated'
+  get '/scottish_northern_irish', to: 'pages#scottish_northern_irish'
   get '/contact', to: 'pages#contact'
 
   get '/auth/:provider/callback', to: 'sessions#create'
