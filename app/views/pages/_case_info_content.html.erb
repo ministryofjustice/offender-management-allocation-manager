@@ -1,0 +1,36 @@
+<div class="govuk-grid-column govuk-body">
+  <div class="govuk-breadcrumbs">
+    <ul class="govuk-breadcrumbs__list">
+      <li class="govuk-breadcrumbs__list-item">
+        <a class="govuk-breadcrumbs__link" href="/">Home</a>
+      </li>
+      <li class="govuk-breadcrumbs__list-item">
+        <a class="govuk-breadcrumbs__link" href= "help">Help</a>
+      </li>
+      <li class="govuk-breadcrumbs__list-item" aria-current="page">Updating case information</li>
+    </ul>
+    <br>
+  </div>
+
+  <div class="govuk-section-break--visible">
+    <h1 class="govuk-heading-l">Updating case information</h1>
+    <p>Contents</p>
+    <ul class="govuk-list--bullet">
+      <li>
+        <% if page == 0 %>
+          Overview
+        <% else %>
+          <%= link_to "Overview", update_case_information_path %>
+        <% end %>
+      </li>
+      <li>
+        <% if page == 1 %>
+          Updating nDelius
+        <% else %>
+          <%= link_to "Updating nDelius", updating_ndelius_path %>
+        <% end %>
+      </li>
+    </ul>
+  </div>
+</div>
+<br>

@@ -1,11 +1,14 @@
 <div class="govuk-grid-column govuk-body">
   <div class="govuk-breadcrumbs">
-    <ol class="govuk-breadcrumbs__list">
+    <ul class="govuk-breadcrumbs__list">
       <li class="govuk-breadcrumbs__list-item">
         <a class="govuk-breadcrumbs__link" href="/">Home</a>
       </li>
-      <li class="govuk-breadcrumbs__list-item" aria-current="page">Help</li>
-    </ol>
+      <li class="govuk-breadcrumbs__list-item">
+        <a class="govuk-breadcrumbs__link" href= "help">Help</a>
+      </li>
+      <li class="govuk-breadcrumbs__list-item" aria-current="page">Getting set up</li>
+    </ul>
     <br>
   </div>
 
@@ -17,7 +20,7 @@
         <% if page == 0 %>
           Overview
         <% else %>
-          <%= link_to "Get started with the allocations service", "help" %>
+          <%= link_to "Overview", "help_step0" %>
         <% end %>
       </li>
       <li>
