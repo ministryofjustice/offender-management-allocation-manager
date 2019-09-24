@@ -97,7 +97,7 @@ describe ResponsibilityService do
       scenario 'is supporting' do
         resp = described_class.calculate_pom_responsibility(offender_no_release_date)
 
-        expect(resp).to eq 'Responsible'
+        expect(resp).to eq ResponsibilityService::RESPONSIBLE
       end
     end
 
@@ -105,7 +105,7 @@ describe ResponsibilityService do
       scenario 'is supporting' do
         resp = described_class.calculate_pom_responsibility(offender_not_welsh)
 
-        expect(resp).to eq 'Supporting'
+        expect(resp).to eq ResponsibilityService::SUPPORTING
       end
     end
 
@@ -115,7 +115,7 @@ describe ResponsibilityService do
           scenario 'is supporting' do
             resp = described_class.calculate_pom_responsibility(offender_welsh_crc_lt_12_wk)
 
-            expect(resp).to eq 'Supporting'
+            expect(resp).to eq ResponsibilityService::SUPPORTING
           end
         end
 
@@ -123,7 +123,7 @@ describe ResponsibilityService do
           scenario 'is responsible' do
             resp = described_class.calculate_pom_responsibility(offender_welsh_crc_gt_12_wk)
 
-            expect(resp).to eq 'Responsible'
+            expect(resp).to eq ResponsibilityService::RESPONSIBLE
           end
         end
       end
@@ -134,7 +134,7 @@ describe ResponsibilityService do
             scenario 'is responsible' do
               resp = described_class.calculate_pom_responsibility(offender_welsh_nps_new_case_gt_10_mths)
 
-              expect(resp).to eq 'Responsible'
+              expect(resp).to eq ResponsibilityService::RESPONSIBLE
             end
           end
 
@@ -142,7 +142,7 @@ describe ResponsibilityService do
             scenario 'is supporting' do
               resp = described_class.calculate_pom_responsibility(offender_welsh_nps_new_case_lt_10_mths)
 
-              expect(resp).to eq 'Supporting'
+              expect(resp).to eq ResponsibilityService::SUPPORTING
             end
           end
         end
@@ -152,7 +152,7 @@ describe ResponsibilityService do
             scenario 'is responsible' do
               resp = described_class.calculate_pom_responsibility(offender_welsh_nps_old_case_gt_15_mths)
 
-              expect(resp).to eq 'Responsible'
+              expect(resp).to eq ResponsibilityService::RESPONSIBLE
             end
           end
 
@@ -160,7 +160,7 @@ describe ResponsibilityService do
             scenario 'is supporting' do
               resp = described_class.calculate_pom_responsibility(offender_welsh_nps_old_case_lt_15_mths)
 
-              expect(resp).to eq 'Supporting'
+              expect(resp).to eq ResponsibilityService::SUPPORTING
             end
           end
         end

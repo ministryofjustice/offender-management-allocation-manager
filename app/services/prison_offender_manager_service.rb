@@ -83,7 +83,7 @@ class PrisonOffenderManagerService
 
       if alloc.for_primary_only?
         responsibility =
-          ResponsibilityService.calculate_pom_responsibility(offender_stub)
+          ResponsibilityService.calculate_pom_responsibility(offender_stub).to_s
       else
         responsibility = ResponsibilityService::COWORKING
       end

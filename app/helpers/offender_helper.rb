@@ -11,7 +11,7 @@ module OffenderHelper
   end
 
   def case_owner_label(offender)
-    if offender.case_owner == 'Prison'
+    if ResponsibilityService.calculate_pom_responsibility(offender).custody?
       'Custody'
     else
       'Community'
