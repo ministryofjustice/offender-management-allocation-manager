@@ -7,7 +7,9 @@ class PrisonersController < PrisonsApplicationController
              -> { '' }, only: [:show]
 
   def show
-    @prisoner = offender
+    @prisoner = OffenderPresenter.new(offender,
+                                      Responsibility.find_by(nomis_offender_id: id))
+
     @allocation = AllocationVersion.find_by(nomis_offender_id: @prisoner.offender_no)
     @pom_responsibility = ResponsibilityService.calculate_pom_responsibility(
       offender
