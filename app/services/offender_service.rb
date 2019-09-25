@@ -5,13 +5,13 @@ class OffenderService
     Nomis::Elite2::OffenderApi.get_offender(offender_no).tap { |o|
       next false if o.nil?
 
-      record = CaseInformation.find_by(nomis_offender_id: offender_no)
-      o.load_case_information(record)
-
       sentence_detail = get_sentence_details([o.latest_booking_id])
       if sentence_detail.present? && sentence_detail.key?(o.latest_booking_id)
         o.sentence = sentence_detail[o.latest_booking_id]
       end
+
+      record = CaseInformation.find_by(nomis_offender_id: offender_no)
+      o.load_case_information(record)
 
       o.category_code = Nomis::Elite2::OffenderApi.get_category_code(o.offender_no)
       o.main_offence = Nomis::Elite2::OffenderApi.get_offence(o.latest_booking_id)

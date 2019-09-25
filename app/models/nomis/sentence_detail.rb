@@ -34,6 +34,14 @@ module Nomis
       dates.min.to_date
     end
 
+    def handover_start_date(offender_details)
+      HandoverDateService.handover_start_date(offender_details, self)
+    end
+
+    def responsibility_handover_date(offender_details)
+      HandoverDateService.responsibility_handover_date(offender_details, self)
+    end
+
     def full_name
       "#{last_name}, #{first_name}".titleize
     end

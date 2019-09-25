@@ -25,18 +25,6 @@ module Nomis
       fields.each { |k, v| instance_variable_set("@#{k}", v) } if fields.present?
     end
 
-    def early_allocation?
-      false
-    end
-
-    def nps_case?
-      case_allocation == 'NPS'
-    end
-
-    def pom_responsibility
-      ResponsibilityService.calculate_pom_responsibility(self).to_s
-    end
-
     def self.from_json(payload)
       Offender.new.tap { |obj|
         obj.load_from_json(payload)

@@ -60,6 +60,28 @@ module Nomis
       age >= 18
     end
 
+    def early_allocation?
+      false
+    end
+
+    def nps_case?
+      case_allocation == 'NPS'
+    end
+
+    def handover_start_date
+      @sentence.handover_start_date
+      HandoverData.from_offender(self)
+    end
+
+    def responsibility_handover_date
+      @sentence.responsibility_handover_date
+      HandoverData.from_offender(self)
+    end
+
+    def pom_responsibility
+      ResponsibilityService.calculate_pom_responsibility(self).to_s
+    end
+
     def awaiting_allocation_for
       omic_start_date = Date.new(2019, 2, 4)
 
@@ -100,14 +122,6 @@ module Nomis
       @sentence_type = SentenceType.new(payload['imprisonmentStatus'])
       @category_code = payload['categoryCode']
       @date_of_birth = deserialise_date(payload, 'dateOfBirth')
-    end
-
-    def handover_start_date
-      HandoverDateService.handover_start_date(self)
-    end
-
-    def responsibility_handover_date
-      HandoverDateService.responsibility_handover_date(self)
     end
 
     def load_case_information(record)
