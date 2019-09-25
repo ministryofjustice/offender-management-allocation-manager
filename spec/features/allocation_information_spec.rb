@@ -103,7 +103,7 @@ feature "view an offender's allocation information" do
     end
 
     context 'without auto_delius_import enabled' do
-      it 'does display change links' do
+      it 'displays change links' do
         expect(page).to have_content 'Change'
       end
     end

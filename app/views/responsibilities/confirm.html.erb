@@ -1,0 +1,41 @@
+<% content_for :switcher do %>
+  <%= render '/layouts/prison_switcher' %>
+<% end %>
+
+<%= form_for(@responsibility, url: prison_responsibilities_path(@prison, @responsibility)) do |f| %>
+  <%= f.hidden_field(:nomis_offender_id) %>
+  <%= f.hidden_field(:reason) %>
+  <%= f.hidden_field(:reason_text) %>
+
+  <div class="govuk-form-group">
+    <fieldset class="govuk-fieldset" aria-describedby="how-contacted-conditional-hint">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+        <h1 class="govuk-fieldset__heading">
+          Confirm change of responsibility for this case
+        </h1>
+      </legend>
+    </fieldset>
+    <p class="govuk-body">
+      The community probation team will be responsible for this case
+    </p>
+    <p class="govuk-body">
+      We will email the community probation team at <%= @ldu_email_address %>.
+      They will need to allocate a community offender manager if one has not yet been allocated.
+    </p>
+    <p class="govuk-body">
+      You will also receive a copy of this email for your records.
+    </p>
+    <div class="govuk-form-group">
+      <label class="govuk-label govuk-!-font-weight-bold" for="message">Add a note to the email:</label>
+      <span id="message_hint" class="govuk-hint">For example, you can tell the community team about any special requirements.</span>
+      <textarea class="govuk-textarea" id="message" name="message" rows="3" aria-describedby="message_hint"></textarea>
+    </div>
+  </div>
+
+  <div class="govuk-form-group">
+    <button type="submit" class="govuk-button">Confirm</button>
+    <%= link_to 'Cancel', new_prison_allocation_path(@prison, @responsibility.nomis_offender_id), class: 'govuk-link cancel-button' %>
+  </div>
+
+<% end %>
+

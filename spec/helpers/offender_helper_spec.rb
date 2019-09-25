@@ -29,16 +29,18 @@ RSpec.describe OffenderHelper do
     it 'can show Custody for Prison' do
       off = Nomis::Offender.new
       off.sentence = Nomis::SentenceDetail.new
+      offp = OffenderPresenter.new(off, nil)
 
-      expect(case_owner_label(off)).to eq('Custody')
+      expect(case_owner_label(offp)).to eq('Custody')
     end
 
     it 'can show Community for Probation' do
       off = Nomis::Offender.new
       off.sentence = Nomis::SentenceDetail.new
       off.sentence.release_date = Time.zone.today
+      offp = OffenderPresenter.new(off, nil)
 
-      expect(case_owner_label(off)).to eq('Community')
+      expect(case_owner_label(offp)).to eq('Community')
     end
   end
 end
