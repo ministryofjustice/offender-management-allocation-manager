@@ -32,7 +32,7 @@
       <h2 class="govuk-heading-m">Contact us</h2>
       <p class="govuk-body">Complete this form for technical help</p>
 
-      <%= form_tag(help_path, method: :post, id: "help_form") do %>
+      <%= form_tag(contact_us_path, method: :post, id: "help_form") do %>
         <div class="<%= field_error(@contact.errors, :name) %>">
           <%= label_tag "Full name", "Full name", class: 'govuk-label' %>
           <% if @contact.errors[:name].present? %>
