@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ContactSubmission < ApplicationRecord
   validates :email_address, presence: {
     message: 'Email address is required'

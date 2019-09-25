@@ -97,6 +97,14 @@ module Nomis
       sentence.earliest_release_date
     end
 
+    def sentence_start_date
+      sentence.sentence_start_date
+    end
+
+    def pom_responsibility
+      ResponsibilityService.calculate_pom_responsibility(self)
+    end
+
     def full_name
       "#{last_name}, #{first_name}".titleize
     end

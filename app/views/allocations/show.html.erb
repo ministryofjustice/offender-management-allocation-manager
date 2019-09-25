@@ -36,8 +36,11 @@
     </tr>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">Current responsibility</td>
-      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
+      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half responsibility_change">
         <%= case_owner_label(@prisoner) %>
+        <% if @prisoner.pom_responsibility.custody? %>
+          <%= link_to 'Change', new_prison_responsibility_path(@prison, nomis_offender_id: @prisoner.offender_no), class: 'govuk-link pull-right' %>
+        <% end %>
       </td>
 <!--    </tr>-->
 <!--    <tr class="govuk-table__row">-->
