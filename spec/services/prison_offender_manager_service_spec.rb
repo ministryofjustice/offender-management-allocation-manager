@@ -86,7 +86,7 @@ describe PrisonOffenderManagerService do
         get_allocated_offenders(staff_id, 'LEI').
         select(&:new_case?)
       expect(allocated_offenders.count).to eq 2
-      expect(allocated_offenders.map(&:responsibility)).to match_array [ResponsibilityService::SUPPORTING, 'Co-Working']
+      expect(allocated_offenders.map(&:responsibility)).to match_array %w[Supporting Co-Working]
     end
   end
 

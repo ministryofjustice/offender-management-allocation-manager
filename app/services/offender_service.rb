@@ -48,7 +48,7 @@ class OffenderService
 
       # The maximum number of pages we need to fetch before we have all of
       # the offenders
-      (info_request.meta.total_pages / FETCH_SIZE) + 1
+      (info_request.total_pages / FETCH_SIZE) + 1
     end
 
     def get_offenders_for_prison(page_number:, page_size:)
@@ -108,13 +108,13 @@ class OffenderService
         ]
       }.to_h
 
-    offenders.map do |offender|
+    offenders.each do |offender|
       if offender_to_staff_hash.key?(offender.offender_no)
         offender.allocated_pom_name = offender_to_staff_hash[offender.offender_no][:pom_name]
         offender.allocation_date = offender_to_staff_hash[offender.offender_no][:allocation_date]
       end
-      offender
     end
+    offenders
   end
   # rubocop:enable Metrics/LineLength
 end

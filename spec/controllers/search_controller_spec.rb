@@ -56,7 +56,6 @@ RSpec.describe SearchController, type: :controller do
       with(
         headers: {
           'Authorization' => 'Bearer token',
-          'Expect' => '',
           'Page-Limit' => '200',
           'Page-Offset' => '200'
         }).
@@ -65,7 +64,6 @@ RSpec.describe SearchController, type: :controller do
       with(
         headers: {
           'Authorization' => 'Bearer token',
-          'Expect' => '',
           'Page-Limit' => '100',
           'Page-Offset' => '0'
         }).
@@ -77,12 +75,5 @@ RSpec.describe SearchController, type: :controller do
 
     expect(assigns(:q)).to eq('Cal')
     expect(assigns(:offenders).size).to eq(0)
-
-    actual = assigns(:page_meta)
-    expect(actual.size).to eq(20)
-    expect(actual.total_pages).to eq(0)
-    expect(actual.total_elements).to eq(0)
-    expect(actual.number).to eq(1)
-    expect(actual.items_on_page).to eq(0)
   end
 end

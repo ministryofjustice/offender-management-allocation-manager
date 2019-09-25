@@ -1,8 +1,14 @@
 # frozen_string_literal: true
 
 class ResponsibilityService
-  RESPONSIBLE = 'Responsible'
-  SUPPORTING = 'Supporting'
+  Responsibility = Struct.new(:description, :custody?) do
+    def to_s
+      description
+    end
+  end
+
+  RESPONSIBLE = Responsibility.new 'Responsible', true
+  SUPPORTING = Responsibility.new 'Supporting', false
   COWORKING = 'Co-Working'
   NPS = 'NPS'
 

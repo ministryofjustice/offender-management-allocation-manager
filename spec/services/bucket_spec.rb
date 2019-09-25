@@ -8,7 +8,6 @@ describe Bucket do
     end
     expect(b.items.count).to be(5)
     expect(b.items).to eq([1, 2, 3, 4, 5])
-    expect(b.take(3, 2)).to eq([3, 4, 5])
     expect(b.count).to eq(5)
   end
 
@@ -19,14 +18,12 @@ describe Bucket do
     end
     expect(b.items.count).to be(5)
     expect(b.items).to eq([1, 2, 3, 4, 5])
-    expect(b.take(6, 0)).to eq([1, 2, 3, 4, 5])
   end
 
   it "can try to retrieve last n if we have an empty bucket" do
     b = described_class.new
     expect(b.items.count).to be(0)
     expect(b.items).to eq([])
-    expect(b.take(6, 0)).to eq([])
   end
 
   it "can sort its items by default ASC" do
@@ -80,13 +77,13 @@ describe Bucket do
       o.sentence.release_date = Date.new(2000, 1, 1)
     }
     b.sort(:earliest_release_date)
-    items = b.take(2, 0)
+    items = b.items[0..1]
     expect(items.count).to eq(2)
     expect(items.first.earliest_release_date).to be_nil
     expect(items[1].earliest_release_date).not_to be_nil
 
     b.sort(:earliest_release_date, :desc)
-    items = b.take(2, 0)
+    items = b.items[0..1]
     expect(items.count).to eq(2)
     expect(items.first.earliest_release_date).not_to be_nil
     expect(items[1].earliest_release_date).to be_nil

@@ -4,8 +4,6 @@ module Nomis
   module Elite2
     class OffenderApi
       extend Elite2Api
-
-      # rubocop:disable Metrics/MethodLength
       def self.list(prison, page = 0, page_size: 20)
         route = "/elite2api/api/locations/description/#{prison}/inmates"
 
@@ -14,31 +12,27 @@ module Nomis
         page_offset = page * page_size
         hdrs = paging_headers(page_size, page_offset)
 
-        key = "offender_list_#{prison}_#{page}_#{page_size}"
+        key = "offender_list_page_#{prison}_#{page}_#{page_size}"
 
-        data, page_meta = Rails.cache.fetch(
+        data, total_pages = Rails.cache.fetch(
           key,
           expires_in: Rails.configuration.cache_expiry) {
-          page_meta = nil
+          total_pages = nil
 
           data = e2_client.get(
             route, queryparams: queryparams, extra_headers: hdrs
-          ) { |json, response|
+          ) { |_json, response|
             total_records = response.headers['Total-Records'].to_i
-            records_shown = json.length
-            page_meta = make_page_meta(
-              page, page_size, total_records, records_shown
-            )
+            total_pages = (total_records / page_size.to_f).ceil
           }
 
-          [data, page_meta]
+          [data, total_pages]
         }
 
         offenders = api_deserialiser.deserialise_many(
           Nomis::OffenderSummary, data)
-        ApiPaginatedResponse.new(page_meta, offenders)
+        ApiPaginatedResponse.new(total_pages, offenders)
       end
-      # rubocop:enable Metrics/MethodLength
 
       def self.get_offender(offender_no)
         route = "/elite2api/api/prisoners/#{URI.encode_www_form_component(offender_no)}"
@@ -104,16 +98,6 @@ module Nomis
         {
           'Page-Limit' => page_size.to_s,
           'Page-Offset' => page_offset.to_s
-        }
-      end
-
-      def self.make_page_meta(current_page, size, total, records_shown)
-        PageMeta.new.tap{ |p|
-          p.size = size
-          p.total_elements = total
-          p.total_pages = (total / size.to_f).ceil
-          p.number = current_page
-          p.items_on_page = records_shown
         }
       end
     end
