@@ -49,9 +49,9 @@
         <td aria-label="Allocation date" class="govuk-table__cell"><%= format_date(offender.allocation_date) %></td>
         <td aria-label="Action" class="govuk-table__cell ">
           <% if Flipflop.link_allocation_info? %>
-            <%= link_to "View", prison_allocation_path(@prison, nomis_offender_id: offender.offender_no, page: params[:page] || 1) %>
+            <%= link_to "View", prison_allocation_path(@prison, nomis_offender_id: offender.offender_no, sort: params[:sort], page: params[:page] || 1) %>
           <% else %>
-            <%= link_to "Reallocate", edit_prison_allocation_path(@prison, offender.offender_no, page: params[:page] || 1) %>
+            <%= link_to "Reallocate", edit_prison_allocation_path(@prison, offender.offender_no, sort: params[:sort], page: params[:page] || 1) %>
           <% end %>
         </td>
       </tr>

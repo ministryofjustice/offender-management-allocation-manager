@@ -1,6 +1,7 @@
 
 <%= form_tag(action, method: method, id: "case_info_form") do %>
     <%= hidden_field_tag("case_information[nomis_offender_id]", @prisoner.offender_no) %>
+    <%= hidden_field_tag("sort", params[:sort])%>
     <%= hidden_field_tag("page", params[:page]) %>
 
     <div class="govuk-form-group <% if @case_info.errors[:welsh_offender].present? %>govuk-form-group--error<% end %>">

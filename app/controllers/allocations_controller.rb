@@ -83,9 +83,9 @@ class AllocationsController < PrisonsApplicationController
     end
 
     if allocation[:event] == 'allocate_primary_pom'
-      redirect_to prison_summary_unallocated_path(active_prison, page: params[:page])
+      redirect_to prison_summary_unallocated_path(active_prison, page: params[:page], sort: params[:sort])
     else
-      redirect_to prison_summary_allocated_path(active_prison, page: params[:page])
+      redirect_to prison_summary_allocated_path(active_prison, page: params[:page], sort: params[:sort])
     end
   end
 

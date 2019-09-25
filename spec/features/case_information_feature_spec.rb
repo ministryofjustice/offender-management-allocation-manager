@@ -116,7 +116,7 @@ feature 'case information feature' do
   it 'returns to previously paginated page after saving',
      vcr: { cassette_name: :case_information_return_to_previously_paginated_page } do
     signin_user
-    visit prison_summary_pending_path('LEI', page: 3)
+    visit prison_summary_pending_path('LEI', sort: "last_name desc", page: 3)
 
     within ".govuk-table tr:first-child td:nth-child(6)" do
       click_link 'Edit'
@@ -128,6 +128,6 @@ feature 'case information feature' do
     choose('case_information_tier_A')
     click_button 'Save'
 
-    expect(current_url).to have_content("/prisons/LEI/summary/pending?page=3")
+    expect(current_url).to have_content("/prisons/LEI/summary/pending?page=3&sort=last_name+desc")
   end
 end

@@ -54,6 +54,7 @@ private
         active_prison,
         override_params[:nomis_offender_id],
         override_params[:nomis_staff_id],
+        sort: params[:sort],
         page: params[:page]
       )
     else
@@ -61,6 +62,7 @@ private
         active_prison,
         override_params[:nomis_offender_id],
         override_params[:nomis_staff_id],
+        sort: params[:sort],
         page: params[:page]
       )
     end

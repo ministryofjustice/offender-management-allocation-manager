@@ -20,6 +20,7 @@
             <div class="govuk-checkboxes" data-module="govuk-checkboxes">
               <%= hidden_field_tag("override[nomis_offender_id]", @prisoner.offender_no) %>
               <%= hidden_field_tag("override[nomis_staff_id]", @pom.staff_id) %>
+              <%= hidden_field_tag("sort", params[:sort]) %>
               <%= hidden_field_tag("page", params[:page]) %>
               <div class="govuk-checkboxes__item">
                 <input class="govuk-checkboxes__input" id="override-conditional-1" name="override[override_reasons][]" type="checkbox" value="suitability" data-aria-controls="override-1"

@@ -70,7 +70,7 @@
           <%= offender.awaiting_allocation_for %> days
         </td>
         <td aria-label="Action" class="govuk-table__cell ">
-          <a href="<%= new_prison_allocation_path(@prison, offender.offender_no, page: params[:page] || 1) %>">Allocate</a>
+          <a href="<%= new_prison_allocation_path(@prison, offender.offender_no, sort: params[:sort], page: params[:page] || 1) %>">Allocate</a>
         </td>
       </tr>
     <% end %>
