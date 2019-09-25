@@ -7,5 +7,4 @@ class Summary
   def initialize(summary_type)
     @summary_type = summary_type
   end
-
 end
