@@ -11,14 +11,15 @@
 
     <h2 class="govuk-heading-l">Help</h2>
     <ul>
-      <li><%= link_to 'Getting set up', help_step0_path, class: "govuk-link" %>
-      <li><%= link_to 'Updating case information', update_case_information_path, class: "govuk-link" %></li>
-      <li><%= link_to 'Missing cases', missing_cases_path, class: "govuk-link" %></li>
+      <li><%= link_to 'Getting set up', help_step0_path %>
+      <li><%= link_to 'Updating case information', update_case_information_path %></li>
+      <li><%= link_to 'Missing cases', missing_cases_path %></li>
     </ul>
    <br>
     <div>
-      <p class="govuk-body">You can find a guide to help you set up new users, as well as detailed instructions on how to update case information.</p>
-      <p class="govuk-body">Check the information in <%= link_to 'Missing cases', missing_cases_path, class: "govuk-link" %> if there are cases you expect to see in the service.</p>
-      <p class="govuk-body"><%= link_to 'Contact us', contact_us_path, class: "govuk-link" %> if you are not able to find the answer you need. </p>
+      <p class="govuk-body">See how to set up new users in <%= link_to 'Getting set up', help_step0_path %>.</p>
+      <p class="govuk-body"><%= link_to 'Updating case information', update_case_information_path %> takes you through how to match nDelius and NOMIS prisoner records.</p>
+      <p class="govuk-body">Check the information in <%= link_to 'Missing cases', missing_cases_path %> if there are cases you expect to see in the service.</p>
+      <p class="govuk-body"><%= link_to 'Contact us', contact_us_path %> if you are not able to find the answer you need. </p>
     </div>
  </div>
