@@ -79,7 +79,7 @@ module Nomis
     end
 
     def pom_responsibility
-      ResponsibilityService.calculate_pom_responsibility(self).to_s
+      ResponsibilityService.calculate_pom_responsibility(self)
     end
 
     def awaiting_allocation_for
@@ -99,10 +99,6 @@ module Nomis
 
     def sentence_start_date
       sentence.sentence_start_date
-    end
-
-    def pom_responsibility
-      ResponsibilityService.calculate_pom_responsibility(self)
     end
 
     def full_name
