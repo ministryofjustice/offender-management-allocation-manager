@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DeliusImportError < ApplicationRecord
   DUPLICATE_NOMIS_ID = 0
   INVALID_TIER = 1

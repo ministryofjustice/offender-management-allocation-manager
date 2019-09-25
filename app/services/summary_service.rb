@@ -51,10 +51,8 @@ class SummaryService
 
     # For the allocated offenders, we need to provide the allocated POM's
     # name
-    offender_items = Kaminari.paginate_array(bucket.items).page(page)
-
     if summary_type == :allocated
-      offender_items.each { |offender|
+      bucket.items.each { |offender|
         alloc = active_allocations_hash[offender.offender_no]
         offender.allocated_pom_name = restructure_pom_name(alloc.primary_pom_name)
         offender.allocation_date = (alloc.primary_pom_allocated_at || alloc.updated_at)&.to_date
@@ -62,7 +60,9 @@ class SummaryService
     end
 
     Summary.new(summary_type).tap { |summary|
-      summary.offenders = offender_items
+      offenders = bucket.items.map { |o| OffenderPresenter.new(o, nil) }
+
+      summary.offenders = Kaminari.paginate_array(offenders).page(page)
 
       summary.allocated_total = counts[:allocated]
       summary.unallocated_total = counts[:unallocated]
