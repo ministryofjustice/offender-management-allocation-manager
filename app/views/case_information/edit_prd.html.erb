@@ -1,0 +1,24 @@
+<%= render :partial => "/shared/backlink", :locals => { :page => new_prison_allocation_path(@prison, @case_info.nomis_offender_id) } %>
+
+<h1 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-4">What is the next parole review date?</h1>
+<h2 class="govuk-heading-m"><%= @prisoner.full_name %> - <%= @prisoner.offender_no %></h2>
+
+<%= form_for(@case_info, url: prison_case_information_path(@prison), method: :put, id: "case_info_form") do |f| %>
+  <%= hidden_field_tag("case_information[nomis_offender_id]", @prisoner.offender_no) %>
+
+  <div class="form-group">
+    <!-- label text set in en.yml-->
+    <%= f.gov_uk_date_field :parole_review_date %>
+  </div>
+
+  <%= submit_tag "Update", role: "button", draggable: "false", class: "govuk-button govuk govuk-!-margin-top-4" %>
+
+<% end %>
+
+<%= render :partial => "/shared/analytics_form_event",
+           :locals => {
+               :form_id => 'case_info_form',
+               :event_name => 'Edit offender case info',
+               :event_action => 'submit'
+           }
+%>
