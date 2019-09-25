@@ -64,24 +64,29 @@ class OffenderService
       nomis_ids = offenders.map(&:offender_no)
       mapped_tiers = CaseInformationService.get_case_information(nomis_ids)
 
-      offenders.select { |offender|
-        next false if offender.age < 18
-        next false if offender.civil_sentence?
-
+      offenders.each { |offender|
         sentencing = sentence_details[offender.booking_id]
         # TODO: - if sentencing.present? is false, then we crash in offender#sentenced?
         offender.sentence = sentencing if sentencing.present?
-        next false unless offender.sentenced?
 
         case_info_record = mapped_tiers[offender.offender_no]
         offender.load_case_information(case_info_record)
-
-        true
       }
     end
   end
 
   def self.get_offenders_for_prison(prison)
+    OffenderEnumerator.new(prison).select { |offender|
+      offender.age >= 18 &&
+      offender.sentenced? &&
+      offender.criminal_sentence?
+    }
+  end
+
+  def self.get_unfiltered_offenders_for_prison(prison)
+    # Returns all offenders at the provided prison, and does not
+    # filter out under 18s or non-sentenced offenders in the same way
+    # that get_offenders_for_prison does.
     OffenderEnumerator.new(prison)
   end
 

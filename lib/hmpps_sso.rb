@@ -44,6 +44,7 @@ module OmniAuth
 
     private
 
+      #:nocov:
       def decode_roles
         public_key = Base64.urlsafe_decode64(
           Rails.configuration.nomis_oauth_public_key
@@ -58,6 +59,7 @@ module OmniAuth
 
         decoded_token.first.fetch('authorities', [])
       end
+      #:nocov:
 
       def active_caseload
         caseload = @user_details.active_case_load_id

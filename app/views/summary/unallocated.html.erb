@@ -23,7 +23,7 @@
 
 <section class="govuk-tabs__panel" id="awaiting-allocation">
   <%= render(
-          :partial => 'shared/kaminari',
+          :partial => 'shared/pagination',
           :locals => {
               :data => @summary.offenders,
           }) %>
@@ -78,7 +78,7 @@
   </table>
 
   <%= render(
-          :partial => 'shared/kaminari',
+          :partial => 'shared/pagination',
           :locals => {
               :data => @summary.offenders,
           }) %>
