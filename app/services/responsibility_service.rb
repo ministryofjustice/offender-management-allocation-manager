@@ -31,23 +31,17 @@ private
     if offender.recalled?
       SUPPORTING
     elsif nps_case?(offender)
-      if new_case?(offender)
-        welsh_policy_nps_rules(offender)
-      else
-        welsh_prepolicy_nps_rules(offender)
-      end
+      welsh_nps_rules(offender)
     else
       crc_rules(offender)
     end
   end
 
-  def self.english_rules(offender)
-    if offender.recalled?
-      SUPPORTING
-    elsif new_case?(offender)
-      english_policy_rules(offender)
+  def self.welsh_nps_rules(offender)
+    if new_case?(offender)
+      welsh_policy_nps_rules(offender)
     else
-      english_prepolicy_rules(offender)
+      welsh_prepolicy_nps_rules(offender)
     end
   end
 
@@ -64,6 +58,16 @@ private
       RESPONSIBLE
     else
       SUPPORTING
+    end
+  end
+
+  def self.english_rules(offender)
+    if offender.recalled?
+      SUPPORTING
+    elsif new_case?(offender)
+      english_policy_rules(offender)
+    else
+      english_prepolicy_rules(offender)
     end
   end
 
