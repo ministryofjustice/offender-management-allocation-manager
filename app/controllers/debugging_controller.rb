@@ -22,11 +22,7 @@ class DebuggingController < PrisonsApplicationController
       @summary.pending_total
     ].sum
 
-    # Make a request for a single offender to get the total number of
-    # unfiltered offenders in nomis
-    info = Nomis::Elite2::OffenderApi.list(@prison, 1, page_size: 1)
-    @unfiltered_offenders_count = info.meta.total_elements
-
+    @unfiltered_offenders_count = unfiltered_offenders.count
     @filtered = filtered_offenders
   end
 
@@ -43,12 +39,14 @@ private
     )
   end
 
-  def filtered_offenders
-    unfiltered_offenders = OffenderService.get_unfiltered_offenders_for_prison(
+  def unfiltered_offenders
+    @unfiltered_offenders ||= OffenderService.get_unfiltered_offenders_for_prison(
       active_prison
     )
+  end
 
-    unfiltered_offenders.group_by { |offender|
+  def filtered_offenders
+    @unfiltered_offenders.group_by { |offender|
       if offender.age < 18
         :under18
       elsif offender.civil_sentence?

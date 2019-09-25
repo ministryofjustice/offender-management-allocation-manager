@@ -51,19 +51,19 @@
 
   <div class="govuk-grid-column-one-quarter">
     <p class="govuk-data-value">
-      <%= @filtered_offenders_count %>
+      <%= @unfiltered_offenders_count - @filtered_offenders_count %>
     </p>
     <p class="govuk-data-label">
-      Convicted offenders after filters applied
+      Offenders filtered from results
     </p>
   </div>
 
   <div class="govuk-grid-column-one-quarter">
     <p class="govuk-data-value">
-      <%= @unfiltered_offenders_count - @filtered_offenders_count %>
+      <%= @filtered_offenders_count %>
     </p>
     <p class="govuk-data-label">
-      Offenders filtered from results
+      Convicted offenders after filters applied
     </p>
   </div>
 </div>

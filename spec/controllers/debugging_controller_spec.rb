@@ -23,7 +23,7 @@ RSpec.describe DebuggingController, type: :controller do
           'Page-Limit' => '1',
           'Page-Offset' => '1'
         }).
-      to_return(status: 200, body: {}.to_json, headers: { 'Total-Records' => '31' })
+      to_return(status: 200, body: {}.to_json, headers: { 'Total-Records' => '3' })
 
     stub_request(:get, elite2listapi).
     with(
@@ -33,7 +33,7 @@ RSpec.describe DebuggingController, type: :controller do
         'Page-Limit' => '200',
         'Page-Offset' => '200'
       }).
-    to_return(status: 200, body: {}.to_json, headers: { 'Total-Records' => '31' })
+    to_return(status: 200, body: {}.to_json, headers: { 'Total-Records' => '3' })
 
     stub_request(:get, elite2listapi).
       with(
@@ -85,7 +85,7 @@ RSpec.describe DebuggingController, type: :controller do
 
     expect(assigns(:prison_title)).to eq('HMP Wealstun')
     expect(assigns(:filtered_offenders_count)).to eq(1)
-    expect(assigns(:unfiltered_offenders_count)).to eq(31)
+    expect(assigns(:unfiltered_offenders_count)).to eq(3)
 
     filtered_offenders = assigns(:filtered)
     expect(filtered_offenders[:under18].count).to eq(1)
