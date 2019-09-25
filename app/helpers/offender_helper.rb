@@ -7,11 +7,11 @@ module OffenderHelper
   end
 
   def pom_responsibility_label(offender)
-    offender.pom_responsibility
+    offender.pom_responsibility.to_s
   end
 
   def case_owner_label(offender)
-    if ResponsibilityService.calculate_pom_responsibility(offender).custody?
+    if offender.pom_responsibility.custody?
       'Custody'
     else
       'Community'

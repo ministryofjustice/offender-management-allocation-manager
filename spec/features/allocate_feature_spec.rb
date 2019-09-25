@@ -18,9 +18,11 @@ feature 'Allocation' do
     create(:case_information, nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPS', welsh_offender: 'No')
   }
 
-  scenario 'accepting a recommended allocation', versioning: true, vcr: { cassette_name: :create_new_allocation_feature } do
+  before do
     signin_user
+  end
 
+  scenario 'accepting a recommended allocation', versioning: true, vcr: { cassette_name: :create_new_allocation_feature } do
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
     expect(page).to have_content('Determinate')
@@ -41,8 +43,6 @@ feature 'Allocation' do
 
   scenario 'overriding an allocation', vcr: { cassette_name: :override_allocation_feature_ok } do
     override_nomis_staff_id = 485_758
-
-    signin_user
 
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
@@ -73,8 +73,6 @@ feature 'Allocation' do
   end
 
   scenario 'overriding an allocation can validate missing reasons', vcr: { cassette_name: :override_allocation_feature_validate_reasons } do
-    signin_user
-
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
     within('.not_recommended_pom_row_0', visible:  false) do
@@ -89,8 +87,6 @@ feature 'Allocation' do
   end
 
   scenario 'overriding an allocation can validate missing Other detail', vcr: { cassette_name: :override_allocation_feature_validate_other } do
-    signin_user
-
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
     within('.not_recommended_pom_row_0', visible:  false) do
@@ -105,9 +101,7 @@ feature 'Allocation' do
     expect(Override.count).to eq(0)
   end
 
-  scenario 'overriding an allocation can validate missing suitabilitydetail', vcr: { cassette_name: :override_suitability_allocation_feature } do
-    signin_user
-
+  scenario 'overriding an allocation can validate missing suitability detail', vcr: { cassette_name: :override_suitability_allocation_feature } do
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
     within('.not_recommended_pom_row_0', visible:  false) do
@@ -123,8 +117,6 @@ feature 'Allocation' do
   end
 
   scenario 'overriding an allocation can validate the reason text area character limit', vcr: { cassette_name: :override_allocation__character_count_feature } do
-    signin_user
-
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
     within('.not_recommended_pom_row_0', visible:  false) do
@@ -146,8 +138,6 @@ feature 'Allocation' do
       primary_pom_nomis_id: 485_637,
       recommended_pom_type: 'probation'
     )
-
-    signin_user
 
     visit prison_summary_allocated_path('LEI')
 
@@ -178,9 +168,7 @@ feature 'Allocation' do
   end
 
   scenario 'allocation fails', vcr: { cassette_name: :allocation_fails_feature } do
-    allow(AllocationService).to receive(:create_or_update).and_return(false)
-
-    signin_user
+    expect(AllocationService).to receive(:create_or_update).and_return(false)
 
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
@@ -198,8 +186,6 @@ feature 'Allocation' do
   end
 
   scenario 'cannot reallocate a non-allocated offender', vcr: { cassette_name: :allocation_attempt_bad_reallocate } do
-    signin_user
-
     visit edit_prison_allocation_path('LEI', never_allocated_offender)
     expect(page).to have_current_path new_prison_allocation_path('LEI', never_allocated_offender)
   end
