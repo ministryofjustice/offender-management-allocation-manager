@@ -30,10 +30,14 @@ private
   def self.welsh_rules(offender)
     if offender.recalled?
       SUPPORTING
-    elsif new_case?(offender)
-      welsh_policy_rules(offender)
+    elsif nps_case?(offender)
+      if new_case?(offender)
+        welsh_policy_nps_rules(offender)
+      else
+        welsh_prepolicy_nps_rules(offender)
+      end
     else
-      welsh_prepolicy_rules(offender)
+      crc_rules(offender)
     end
   end
 
@@ -47,27 +51,19 @@ private
     end
   end
 
-  def self.welsh_policy_rules(offender)
-    if nps_case?(offender)
-      if release_date_gt_10_mths?(offender)
-        RESPONSIBLE
-      else
-        SUPPORTING
-      end
+  def self.welsh_policy_nps_rules(offender)
+    if release_date_gt_10_mths?(offender)
+      RESPONSIBLE
     else
-      crc_rules(offender)
+      SUPPORTING
     end
   end
 
-  def self.welsh_prepolicy_rules(offender)
-    if nps_case?(offender)
-      if release_date_gt_15_mths_at_policy_date?(offender)
-        RESPONSIBLE
-      else
-        SUPPORTING
-      end
+  def self.welsh_prepolicy_nps_rules(offender)
+    if release_date_gt_15_mths_at_policy_date?(offender)
+      RESPONSIBLE
     else
-      crc_rules(offender)
+      SUPPORTING
     end
   end
 
