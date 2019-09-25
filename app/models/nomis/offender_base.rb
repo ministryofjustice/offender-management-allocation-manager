@@ -27,7 +27,7 @@ module Nomis
       # If they do not have any of these we should be checking for a tariff date
       # Once we have all the dates we then need to display whichever is the
       # earliest one.
-      return false if sentence.sentence_start_date.blank?
+      return false if sentence&.sentence_start_date.blank?
 
       sentence.release_date.present? ||
       sentence.parole_eligibility_date.present? ||
@@ -42,6 +42,10 @@ module Nomis
 
     def recalled?
       @sentence_type.recall_sentence?
+    end
+
+    def criminal_sentence?
+      @sentence_type.civil? == false
     end
 
     def civil_sentence?

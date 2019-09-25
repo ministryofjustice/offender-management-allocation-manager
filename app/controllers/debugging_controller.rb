@@ -13,7 +13,50 @@ class DebuggingController < PrisonsApplicationController
     end
   end
 
+  def prison_info
+    @prison_title = PrisonService.name_for(active_prison)
+
+    @summary = create_summary
+    @filtered_offenders_count = [
+      @summary.allocated_total,
+      @summary.unallocated_total,
+      @summary.pending_total
+    ].sum
+
+    @unfiltered_offenders_count = unfiltered_offenders.count
+    @filtered = filtered_offenders
+  end
+
 private
+
+  def create_summary
+    params = SummaryService::SummaryParams.new(
+      sort_field: nil,
+      sort_direction: nil
+    )
+
+    @summary = SummaryService.summary(
+      :allocated, active_prison, 0, params
+    )
+  end
+
+  def unfiltered_offenders
+    @unfiltered_offenders ||= OffenderService.get_unfiltered_offenders_for_prison(
+      active_prison
+    )
+  end
+
+  def filtered_offenders
+    @unfiltered_offenders.group_by { |offender|
+      if offender.age < 18
+        :under18
+      elsif offender.civil_sentence?
+        :civil
+      elsif offender.sentenced? == false
+        :unsentenced
+      end
+    }.except!(nil)
+  end
 
   def id
     params[:offender_no]
