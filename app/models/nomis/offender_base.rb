@@ -69,13 +69,11 @@ module Nomis
     end
 
     def handover_start_date
-      @sentence.handover_start_date
-      HandoverData.from_offender(self)
+      @sentence.handover_start_date(HandoverData.from_offender(self))
     end
 
     def responsibility_handover_date
-      @sentence.responsibility_handover_date
-      HandoverData.from_offender(self)
+      @sentence.responsibility_handover_date(HandoverData.from_offender(self))
     end
 
     def pom_responsibility
