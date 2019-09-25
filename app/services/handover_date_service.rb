@@ -15,6 +15,8 @@ end
 class HandoverDateService
   # rubocop:disable Metrics/LineLength
   def self.handover_start_date(subject, dates)
+    return [nil, 'No earliest release date'] if dates.try(:earliest_release_date).nil?
+
     if subject.nps_case? && !subject.early_allocation?
       return [dates.earliest_release_date - 8.months, 'NPS Indeterminate'] if subject.indeterminate_sentence?
 
@@ -26,6 +28,8 @@ class HandoverDateService
   # rubocop:enable Metrics/LineLength
 
   def self.responsibility_handover_date(subject, dates)
+    return [nil, 'No earliest release date'] if dates.try(:earliest_release_date).nil?
+
     if subject.nps_case?
       nps_handover_date(subject, dates)
     else
