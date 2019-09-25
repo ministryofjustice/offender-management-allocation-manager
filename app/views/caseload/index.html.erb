@@ -26,7 +26,7 @@
     <%= render "poms/search_box" %>
   </div>
 
-  <%= render partial: 'shared/kaminari', locals: { data: @allocations } %>
+  <%= render partial: 'shared/pagination', locals: {data: @allocations } %>
 
   <table class="govuk-table responsive tablesorter">
     <thead class="govuk-table__head">
@@ -79,6 +79,6 @@
     </tbody>
   </table>
 
-  <%= render partial: 'shared/kaminari', locals: { data: @allocations } %>
+  <%= render partial: 'shared/pagination', locals: {data: @allocations } %>
 
 <% end %>
