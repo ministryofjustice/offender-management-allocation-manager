@@ -181,10 +181,10 @@ feature 'Help' do
       visit missing_cases_path
     end
 
-    scenario 'help when no POM allocated', vcr: { cassette_name: :help_missing_case_no_pom_allocated } do
+    scenario 'help when no POM allocation needed', vcr: { cassette_name: :help_missing_case_no_pom_allocation } do
       expect(page).to have_link('Repatriated cases', href: repatriated_path)
       expect(page).to have_link('Scottish and Northern Irish prisoners', href: scottish_northern_irish_path)
-      expect(page).to have_css('h2', text: 'No POM allocated')
+      expect(page).to have_css('h2', text: 'No POM allocation needed')
       expect(page).to have_link('https://intranet.noms.gsi.gov.uk/corporate/offender-management-model')
       expect(page).to have_link('Contact us', href: contact_us_path)
     end
@@ -194,7 +194,7 @@ feature 'Help' do
 
       click_link(title)
 
-      expect(page).to have_link('No POM allocated', href: missing_cases_path)
+      expect(page).to have_link('No POM allocation needed', href: missing_cases_path)
       expect(page).to have_css('h2', text: title)
     end
 
