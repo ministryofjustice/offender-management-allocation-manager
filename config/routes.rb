@@ -23,7 +23,9 @@ Rails.application.routes.draw do
   resources :prisons do
     resources :prisons, only: :index
     resources :dashboard, only: :index
-    resources :caseload, only: %i[ index new ]
+    resources :caseload, only: %i[ index new]
+    get('/caseload/handover_start' => 'caseload#handover_start', as: 'caseload_handover_start')
+
     get('/prisoners/:id' => 'prisoners#show', as: 'prisoner_show')
     get('/prisoners/:id/image.jpg' => 'prisoners#image', as: 'prisoner_image')
     resources :allocations, only: %i[ show new create edit update ], param: :nomis_offender_id, path_names: {

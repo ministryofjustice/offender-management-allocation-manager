@@ -3,9 +3,12 @@
 class CaseloadController < PrisonsApplicationController
   before_action :ensure_pom
 
-  breadcrumb -> { 'Your caseload' }, -> { prison_caseload_index_path(active_prison) }
+  breadcrumb -> { 'Your caseload' },
+             -> { prison_caseload_index_path(active_prison) }
   breadcrumb -> { 'New cases' },
              -> { new_prison_caseload_path(active_prison) }, only: [:new]
+  breadcrumb -> { 'Cases close to handover' },
+             -> { prison_caseload_handover_start_path(active_prison) }, only: [:handover_start]
 
   def index
     allocations = PrisonOffenderManagerService.get_allocated_offenders(
@@ -22,6 +25,17 @@ class CaseloadController < PrisonsApplicationController
     @new_cases = PrisonOffenderManagerService.get_allocated_offenders(
       @pom.staff_id, active_prison
     ).select(&:new_case?)
+  end
+
+  def handover_start
+    allocations = PrisonOffenderManagerService.get_allocated_offenders(
+      @pom.staff_id, active_prison
+    )
+
+    @new_cases_count = allocations.select(&:new_case?).count
+    allocations = sort_allocations(filter_allocations(allocations))
+    @total_allocations = allocations.count
+    @upcoming_handovers = Kaminari.paginate_array(allocations).page(page)
   end
 
 private

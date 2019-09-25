@@ -1,0 +1,40 @@
+<% content_for :switcher do %>
+  <%= render '/layouts/prison_switcher' %>
+<% end %>
+
+<% if @pom.blank? %>
+  <h2 class="govuk-heading-l">No pending cases </h2>
+<% else %>
+  <h2 class="govuk-heading-l">Cases close to handover</h2>
+
+  <p>All cases for start of handover to the community in the next 7 days</p>
+
+  <table class="govuk-table responsive tablesorter">
+    <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th class="govuk-table__header" scope="col">Prisoner name</th>
+      <th class="govuk-table__header" scope="col">Prisoner number</th>
+      <th class="govuk-table__header" scope="col">Handover<br/>start date</th>
+      <th class="govuk-table__header" scope="col">Responsibility<br/>handover</th>
+      <th class="govuk-table__header" scope="col">Earliest release<br/>date</th>
+      <th class="govuk-table__header" scope="col">Role</th>
+      <th class="govuk-table__header" scope="col">Action</th>
+    </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+    <% @upcoming_handovers.each_with_index do |offender_allocation, i| %>
+      <tr class="govuk-table__row offender_row_<%= i %>">
+        <td aria-label="Prisoner name" class="govuk-table__cell "><%= offender_allocation.full_name %></td>
+        <td aria-label="Prisoner number" class="govuk-table__cell "><%= offender_allocation.nomis_offender_id %></td>
+        <td aria-label="Handover start date" class="govuk-table__cell "><%= format_date(offender_allocation.handover_start_date.first) %></td>
+        <td aria-label="Responsibility handover" class="govuk-table__cell "><%= format_date(offender_allocation.responsibility_handover_date.first) %></td>
+        <td aria-label="Release date" class="govuk-table__cell "><%= format_date(offender_allocation.earliest_release_date) %></td>
+        <td aria-label="Role" class="govuk-table__cell "><%= offender_allocation.responsibility %></td>
+        <td aria-label="Action" class="govuk-table__cell ">
+          <%= link_to('View', prison_prisoner_show_path(@prison, offender_allocation.nomis_offender_id), class: "govuk-link" ) %>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+<% end  %>
