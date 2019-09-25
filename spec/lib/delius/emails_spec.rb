@@ -75,6 +75,5 @@ describe Delius::Emails do
       emails.folder = 'sorted_small'
       expect(emails.connected?).to eq(true)
     }
-
   end
 end
