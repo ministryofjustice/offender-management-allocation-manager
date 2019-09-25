@@ -14,7 +14,7 @@
 </p>
 <% else %>
     <%= render(
-            :partial => 'shared/kaminari',
+            :partial => 'shared/pagination',
             :locals => {
                 :data => @offenders,
             }) %>
@@ -47,7 +47,7 @@
   </table>
 
   <%= render(
-          :partial => 'shared/kaminari',
+          :partial => 'shared/pagination',
           :locals => {
               :data => @offenders,
           }) %>
