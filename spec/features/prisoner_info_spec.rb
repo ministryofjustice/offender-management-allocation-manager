@@ -64,6 +64,8 @@ feature 'View a prisoner profile page' do
 
     expect(page).not_to have_content('Bob Smith')
     # Expect an Unknown for LDU Email and Team
-    expect(page).to have_content('Unknown', count: 2)
+    within '#community_information' do
+      expect(page).to have_content('Unknown', count: 2)
+    end
   end
 end
