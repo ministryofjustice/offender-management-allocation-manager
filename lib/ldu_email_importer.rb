@@ -10,7 +10,7 @@ class LDUEmailImporter
 
       next if address.blank?
 
-      LocalDivisionalUnit.where(code: code).each {|unit|
+      LocalDivisionalUnit.where(code: code).each { |unit|
         unit.update!(email_address: address)
       }
     end
