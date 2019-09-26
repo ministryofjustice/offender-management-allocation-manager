@@ -83,9 +83,19 @@ private
     end
   end
 
+  def self.hub_or_private?(offender)
+    PrisonService.english_hub_prison?(offender.prison_id) ||
+      PrisonService.english_private_prison?(offender.prison_id)
+  end
+
   def self.english_prepolicy_rules(offender)
     if nps_case?(offender)
-      if release_date_gt_17_mths_at_policy_date?(offender)
+      if hub_or_private?(offender)
+        threshold = 20.months
+      else
+        threshold = 17.months
+      end
+      if release_date_gt_17_mths_at_policy_date?(offender, threshold)
         RESPONSIBLE
       else
         SUPPORTING
@@ -121,9 +131,9 @@ private
       WELSH_POLICY_START_DATE + 15.months
   end
 
-  def self.release_date_gt_17_mths_at_policy_date?(offender)
+  def self.release_date_gt_17_mths_at_policy_date?(offender, threshold)
     offender.earliest_release_date >
-      ENGLISH_POLICY_START_DATE + 17.months
+      ENGLISH_POLICY_START_DATE + threshold
   end
 
   def self.release_date_gt_12_weeks?(offender)
