@@ -18,16 +18,4 @@ private
     url += "?#{u.query}" if u.query.present?
     @referer ||= url
   end
-
-  def code
-    params.require(:code)
-  end
-
-  def next_page
-    params[:next]
-  end
-
-  def redirect?
-    params[:next].present?
-  end
 end

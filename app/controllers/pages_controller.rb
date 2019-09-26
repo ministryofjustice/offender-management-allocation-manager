@@ -3,7 +3,7 @@
 class PagesController < ApplicationController
   layout 'errors_and_contact'
 
-  def help
+  def contact_us
     if current_user.present?
       @user = Nomis::Elite2::UserApi.user_details(current_user)
       @contact = ContactSubmission.new(email_address: @user.email_address.first,
@@ -16,7 +16,7 @@ class PagesController < ApplicationController
     end
   end
 
-  def create_help
+  def create_contact_us
     @user = Nomis::Elite2::UserApi.user_details(current_user) if current_user.present?
     @contact = ContactSubmission.new(
       name: help_params[:name],
@@ -32,11 +32,11 @@ class PagesController < ApplicationController
 
       redirect_path
     else
-      render :help
+      render :contact_us
     end
   end
 
-  def guidance; end
+  def help; end
 
   def contact; end
 

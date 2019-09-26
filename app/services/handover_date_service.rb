@@ -3,6 +3,8 @@
 class HandoverDateService
   # rubocop:disable Metrics/LineLength
   def self.handover_start_date(offender)
+    return [nil, 'No earliest release date'] if offender.earliest_release_date.nil?
+
     if offender.nps_case? && !offender.early_allocation?
       return [offender.earliest_release_date - 8.months, 'NPS Indeterminate'] if offender.indeterminate_sentence?
 
@@ -14,6 +16,8 @@ class HandoverDateService
   # rubocop:enable Metrics/LineLength
 
   def self.responsibility_handover_date(offender)
+    return [nil, 'No earliest release date'] if offender.earliest_release_date.nil?
+
     if offender.nps_case?
       nps_handover_date(offender)
     else

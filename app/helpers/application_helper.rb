@@ -1,16 +1,6 @@
 # frozen_string_literal: true
 
 module ApplicationHelper
-  def replace_param(name, value)
-    uri = URI.parse(request.original_url)
-
-    query = Rack::Utils.parse_query(uri.query)
-    query[name] = value
-
-    uri.query = Rack::Utils.build_query(query)
-    uri.to_s
-  end
-
   def format_date(date_obj, replacement: '')
     return replacement if date_obj.nil?
 

@@ -21,6 +21,7 @@ class ApplicationController < ActionController::Base
     sso_identity['username'] if sso_identity.present?
   end
 
+  #:nocov:
   def admin_user?
     r = roles
     unless r.present? && r.include?('ROLE_ALLOC_MGR')
@@ -34,6 +35,7 @@ class ApplicationController < ActionController::Base
       redirect_to '/'
     end
   end
+  #:nocov:
 
   def default_prison_code
     sso_identity['active_caseload'] if sso_identity.present?

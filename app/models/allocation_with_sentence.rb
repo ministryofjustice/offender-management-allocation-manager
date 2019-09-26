@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This class is a 'presenter' designed to prevent clients having to know whether
 # a field lives in the allocation or sentence details when both are returned
 # e.g. PrisonerOffenderManagerService#get_allocated_offenders

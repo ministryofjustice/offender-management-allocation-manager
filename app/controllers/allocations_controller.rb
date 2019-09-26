@@ -119,7 +119,8 @@ private
   end
 
   def offender(nomis_offender_id)
-    OffenderService.get_offender(nomis_offender_id)
+    OffenderPresenter.new(OffenderService.get_offender(nomis_offender_id),
+                          Responsibility.find_by(nomis_offender_id: nomis_offender_id))
   end
 
   def pom

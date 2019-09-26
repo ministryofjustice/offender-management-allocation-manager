@@ -27,7 +27,7 @@ module Nomis
       # If they do not have any of these we should be checking for a tariff date
       # Once we have all the dates we then need to display whichever is the
       # earliest one.
-      return false if sentence.sentence_start_date.blank?
+      return false if sentence&.sentence_start_date.blank?
 
       sentence.release_date.present? ||
       sentence.parole_eligibility_date.present? ||
@@ -40,8 +40,13 @@ module Nomis
       @sentence_type.code
     end
 
+    # sentence type may be nil if we are created as a stub
     def recalled?
-      @sentence_type.recall_sentence?
+      @sentence_type.try(:recall_sentence?)
+    end
+
+    def criminal_sentence?
+      @sentence_type.civil? == false
     end
 
     def civil_sentence?
@@ -61,7 +66,11 @@ module Nomis
     end
 
     def awaiting_allocation_for
-      omic_start_date = Date.new(2019, 2, 4)
+      omic_start_date = if welsh_offender
+                          ResponsibilityService::WELSH_POLICY_START_DATE
+                        else
+                          ResponsibilityService::ENGLISH_POLICY_START_DATE
+                        end
 
       if sentence.sentence_start_date.nil? ||
           sentence.sentence_start_date < omic_start_date
@@ -73,6 +82,14 @@ module Nomis
 
     def earliest_release_date
       sentence.earliest_release_date
+    end
+
+    def pom_responsibility
+      ResponsibilityService.calculate_pom_responsibility(self)
+    end
+
+    def sentence_start_date
+      sentence.sentence_start_date
     end
 
     def full_name
