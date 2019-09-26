@@ -15,17 +15,14 @@ class SummaryController < PrisonsApplicationController
 
   def allocated
     @summary = create_summary(:allocated)
-    @page_meta = @summary.page_meta(page)
   end
 
   def unallocated
     @summary = create_summary(:unallocated)
-    @page_meta = @summary.page_meta(page)
   end
 
   def pending
     @summary = create_summary(:pending)
-    @page_meta = @summary.page_meta(page)
   end
 
 private

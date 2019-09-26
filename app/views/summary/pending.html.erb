@@ -10,6 +10,12 @@
 <%= render(:partial => 'tabs_start', :locals => {:active => :pending}) %>
 
 <section class="govuk-tabs__panel" id="awaiting-information">
+  <%= render(
+          :partial => 'shared/pagination',
+          :locals => {
+              :data => @summary.offenders,
+          }) %>
+
   <table class="govuk-table responsive tablesorter">
     <thead class="govuk-table__head">
     <tr class="govuk-table__row">
@@ -68,7 +74,6 @@
   <%= render(
           :partial => 'shared/pagination',
           :locals => {
-              :page_data => @page_meta,
-              :param_name => 'page',
+              :data => @summary.offenders,
           }) %>
 </section>

@@ -33,7 +33,7 @@ module Delius
           noms_no: row[2],
           tier: row[4].present? ? row[4][0] : '',
           provider_cd: row[10][0] == 'C' ? 'CRC' : 'NPS',
-          omicable: row[12].start_with?('WPT'),
+          welsh_offender: row[12].start_with?('WPT'),
           crn: row[0]
         }
 

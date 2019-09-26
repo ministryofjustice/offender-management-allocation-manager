@@ -17,10 +17,16 @@ class PrisonOffenderManagerService
 
   def self.get_pom(caseload, nomis_staff_id)
     poms_list = get_poms(caseload)
-    return nil if poms_list.blank?
+    if poms_list.blank?
+      log_missing_pom(caseload, nomis_staff_id)
+      return nil
+    end
 
     @pom = poms_list.select { |p| p.staff_id == nomis_staff_id.to_i }.first
-    return nil if @pom.blank?
+    if @pom.blank?
+      log_missing_pom(caseload, nomis_staff_id)
+      return nil
+    end
 
     @pom.emails = get_pom_emails(@pom.staff_id)
     @pom
@@ -72,12 +78,12 @@ class PrisonOffenderManagerService
       if record.present?
         offender_stub.tier = record.tier
         offender_stub.case_allocation = record.case_allocation
-        offender_stub.omicable = record.omicable
+        offender_stub.welsh_offender = record.welsh_offender
       end
 
       if alloc.for_primary_only?
         responsibility =
-          ResponsibilityService.new.calculate_pom_responsibility(offender_stub)
+          ResponsibilityService.calculate_pom_responsibility(offender_stub).to_s
       else
         responsibility = ResponsibilityService::COWORKING
       end
@@ -125,5 +131,9 @@ private
       PomDetail.create!(nomis_staff_id: nomis_staff_id,
                         working_pattern: 0.0,
                         status: 'active')
+  end
+
+  def self.log_missing_pom(caseload, nomis_staff_id)
+    Rails.logger.warn("POM #{nomis_staff_id} does not work at prison #{caseload}")
   end
 end

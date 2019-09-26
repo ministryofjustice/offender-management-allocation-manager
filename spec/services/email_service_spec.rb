@@ -41,6 +41,38 @@ RSpec.describe EmailService, :queueing do
     }
   }
 
+  let(:coworking_allocation) do
+    AllocationVersion.new.tap { |a|
+      a.primary_pom_nomis_id = 485_833
+      a.primary_pom_name = "Ricketts, Andrien"
+      a.nomis_offender_id = 'G2911GD'
+      a.created_by_username = 'PK000223'
+      a.nomis_booking_id = 0
+      a.secondary_pom_nomis_id = 485_752
+      a.secondary_pom_name = "Jones, Ross"
+      a.allocated_at_tier = 'A'
+      a.prison = 'LEI'
+      a.event = AllocationVersion::ALLOCATE_SECONDARY_POM
+      a.event_trigger = AllocationVersion::USER
+    }
+  end
+
+  let(:coworking_deallocation) do
+    AllocationVersion.new.tap { |a|
+      a.primary_pom_nomis_id = 485_833
+      a.primary_pom_name = "Ricketts, Andrien"
+      a.nomis_offender_id = 'G2911GD'
+      a.created_by_username = 'PK000223'
+      a.nomis_booking_id = 0
+      a.secondary_pom_nomis_id = nil
+      a.secondary_pom_name = nil
+      a.allocated_at_tier = 'A'
+      a.prison = 'LEI'
+      a.event = AllocationVersion::DEALLOCATE_SECONDARY_POM
+      a.event_trigger = AllocationVersion::USER
+    }
+  end
+
   before(:each) {
     PomDetail.create(nomis_staff_id: 485_637, working_pattern: 1.0, status: 'inactive')
   }
@@ -65,5 +97,29 @@ RSpec.describe EmailService, :queueing do
     expect {
       described_class.instance(allocation: reallocation, message: "", pom_nomis_id: allocation.primary_pom_nomis_id).send_email
     }.to change(enqueued_jobs, :size).by(2)
+  end
+
+  it "Can send a co-working de-allocation email",
+     vcr: { cassette_name: :email_service_send_coworking_deallocation_email }, versioning: true do
+    allow(AllocationService).to receive(:get_versions_for).and_return([coworking_allocation])
+
+    expect {
+      described_class.instance(allocation: coworking_deallocation,
+                               message: "",
+                               pom_nomis_id: coworking_deallocation.primary_pom_nomis_id
+      ).send_cowork_deallocation_email(coworking_allocation.secondary_pom_name)
+    }.to change(enqueued_jobs, :size).by(1)
+  end
+
+  it "Can not crash when primary pom has no email when deallocating a co-working pom",
+     vcr: { cassette_name: :email_service_send_coworking_deallocation_email_no_pom_email }, versioning: true do
+    allow(PrisonOffenderManagerService).to receive(:get_pom_emails).and_return(nil)
+
+    expect {
+      described_class.instance(allocation: coworking_deallocation,
+                               message: "",
+                               pom_nomis_id: coworking_deallocation.primary_pom_nomis_id
+      ).send_cowork_deallocation_email(coworking_allocation.secondary_pom_name)
+    }.to change(enqueued_jobs, :size).by(0)
   end
 end

@@ -62,4 +62,18 @@ describe Delius::Emails do
       expect(attachment).to be_nil
     }
   end
+
+  it 'can cleanup without crashing' do
+    described_class.connect(username, password) { |emails|
+      emails.folder = 'sorted_small'
+      emails.cleanup
+    }
+  end
+
+  it 'can check for connected' do
+    described_class.connect(username, password) { |emails|
+      emails.folder = 'sorted_small'
+      expect(emails.connected?).to eq(true)
+    }
+  end
 end

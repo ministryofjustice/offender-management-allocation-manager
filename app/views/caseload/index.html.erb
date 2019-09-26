@@ -26,6 +26,8 @@
     <%= render "poms/search_box" %>
   </div>
 
+  <%= render partial: 'shared/pagination', locals: {data: @allocations } %>
+
   <table class="govuk-table responsive tablesorter">
     <thead class="govuk-table__head">
     <tr class="govuk-table__row">
@@ -77,10 +79,6 @@
     </tbody>
   </table>
 
-  <%= render(
-            :partial => 'shared/pagination',
-            :locals => {
-                :page_data => @page_meta,
-                :param_name => 'page',
-            }) %>
+  <%= render partial: 'shared/pagination', locals: {data: @allocations } %>
+
 <% end %>

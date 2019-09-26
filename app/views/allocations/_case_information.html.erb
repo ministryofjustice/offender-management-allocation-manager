@@ -6,8 +6,11 @@
   </tr>
   <tr class="govuk-table__row">
     <td class="govuk-table__cell govuk-!-width-one-half">Current case owner</td>
-    <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
+    <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half responsibility_change">
       <%= case_owner_label(@prisoner) %>
+      <% if @prisoner.pom_responsibility.custody? %>
+        <%= link_to 'Change', new_prison_responsibility_path(@prison, nomis_offender_id: @prisoner.offender_no), class: 'govuk-link pull-right' %>
+      <% end %>
     </td>
   </tr>
   <tr class="govuk-table__row">
@@ -19,8 +22,8 @@
   <tr class="govuk-table__row">
     <td class="govuk-table__cell">Last known address in Wales</td>
     <td class="govuk-table__cell table_cell__left_align">
-      <%= humanized_bool(@prisoner.omicable) %>
-      <a class="govuk-link pull-right" href="<%= edit_prison_case_information_path(@prison, @prisoner.offender_no) %>">Change</a>
+      <%= humanized_bool(@prisoner.welsh_offender) %>
+      <%= link_to 'Change', edit_prison_case_information_path(@prison, @prisoner.offender_no), class: 'govuk-link pull-right' %>
     </td>
   </tr>
   <tr class="govuk-table__row">

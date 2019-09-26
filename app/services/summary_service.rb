@@ -45,20 +45,14 @@ class SummaryService
       end
     end
 
-    page_count = (counts[summary_type] / PAGE_SIZE.to_f).ceil
-
     if params.sort_field.present?
       bucket.sort(params.sort_field, params.sort_direction)
     end
 
-    from = [(PAGE_SIZE * (page - 1)), 0].max
-
     # For the allocated offenders, we need to provide the allocated POM's
     # name
-    offender_items = bucket.take(PAGE_SIZE, from) || []
-
     if summary_type == :allocated
-      offender_items.each { |offender|
+      bucket.items.each { |offender|
         alloc = active_allocations_hash[offender.offender_no]
         offender.allocated_pom_name = restructure_pom_name(alloc.primary_pom_name)
         offender.allocation_date = (alloc.primary_pom_allocated_at || alloc.updated_at)&.to_date
@@ -66,13 +60,13 @@ class SummaryService
     end
 
     Summary.new(summary_type).tap { |summary|
-      summary.offenders = offender_items
+      offenders = bucket.items.map { |o| OffenderPresenter.new(o, nil) }
+
+      summary.offenders = Kaminari.paginate_array(offenders).page(page)
 
       summary.allocated_total = counts[:allocated]
       summary.unallocated_total = counts[:unallocated]
       summary.pending_total = counts[:pending]
-
-      summary.page_count = page_count
     }
   end
 # rubocop:enable Metrics/CyclomaticComplexity

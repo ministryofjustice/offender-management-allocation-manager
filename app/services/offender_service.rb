@@ -6,14 +6,7 @@ class OffenderService
       next false if o.nil?
 
       record = CaseInformation.find_by(nomis_offender_id: offender_no)
-
-      if record.present?
-        o.tier = record.tier
-        o.case_allocation = record.case_allocation
-        o.omicable = record.omicable == 'Yes'
-        o.crn = record.crn
-        o.mappa_level = record.mappa_level
-      end
+      o.load_case_information(record)
 
       sentence_detail = get_sentence_details([o.latest_booking_id])
       if sentence_detail.present? && sentence_detail.key?(o.latest_booking_id)
@@ -55,10 +48,9 @@ class OffenderService
 
       # The maximum number of pages we need to fetch before we have all of
       # the offenders
-      (info_request.meta.total_pages / FETCH_SIZE) + 1
+      (info_request.total_pages / FETCH_SIZE) + 1
     end
 
-    # rubocop:disable Metrics/MethodLength
     def get_offenders_for_prison(page_number:, page_size:)
       offenders = Nomis::Elite2::OffenderApi.list(
         @prison,
@@ -72,31 +64,29 @@ class OffenderService
       nomis_ids = offenders.map(&:offender_no)
       mapped_tiers = CaseInformationService.get_case_information(nomis_ids)
 
-      offenders.select { |offender|
-        next false if offender.age < 18
-        next false if SentenceType.civil?(offender.imprisonment_status)
-
+      offenders.each { |offender|
         sentencing = sentence_details[offender.booking_id]
         # TODO: - if sentencing.present? is false, then we crash in offender#sentenced?
         offender.sentence = sentencing if sentencing.present?
-        next false unless offender.sentenced?
 
-        record = mapped_tiers[offender.offender_no]
-        if record
-          offender.tier = record.tier
-          offender.case_allocation = record.case_allocation
-          offender.omicable = record.omicable == 'Yes'
-          offender.crn = record.crn
-          offender.mappa_level = record.mappa_level
-        end
-
-        true
+        case_info_record = mapped_tiers[offender.offender_no]
+        offender.load_case_information(case_info_record)
       }
     end
-    # rubocop:enable Metrics/MethodLength
   end
 
   def self.get_offenders_for_prison(prison)
+    OffenderEnumerator.new(prison).select { |offender|
+      offender.age >= 18 &&
+      offender.sentenced? &&
+      offender.criminal_sentence?
+    }
+  end
+
+  def self.get_unfiltered_offenders_for_prison(prison)
+    # Returns all offenders at the provided prison, and does not
+    # filter out under 18s or non-sentenced offenders in the same way
+    # that get_offenders_for_prison does.
     OffenderEnumerator.new(prison)
   end
 
@@ -123,13 +113,13 @@ class OffenderService
         ]
       }.to_h
 
-    offenders.map do |offender|
+    offenders.each do |offender|
       if offender_to_staff_hash.key?(offender.offender_no)
         offender.allocated_pom_name = offender_to_staff_hash[offender.offender_no][:pom_name]
         offender.allocation_date = offender_to_staff_hash[offender.offender_no][:allocation_date]
       end
-      offender
     end
+    offenders
   end
   # rubocop:enable Metrics/LineLength
 end

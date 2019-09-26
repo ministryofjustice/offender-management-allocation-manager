@@ -262,4 +262,28 @@ describe AllocationService do
     expect(current_pom.full_name).to eq("Jones, Ross")
     expect(current_pom.grade).to eq("Probation POM")
   end
+
+  it 'can set the correct com_name', versioning: true, vcr: { cassette_name: 'allocation_service_com_name' }  do
+    nomis_offender_id = 'G2911GD'
+
+    create(:delius_data, noms_no: nomis_offender_id, offender_manager: 'Bob')
+
+    params = {
+      nomis_offender_id: nomis_offender_id,
+      prison: 'LEI',
+      allocated_at_tier: 'A',
+      primary_pom_nomis_id: 485_833,
+      primary_pom_allocated_at: DateTime.now.utc,
+      nomis_booking_id: 1,
+      recommended_pom_type: 'probation',
+      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+      event_trigger: AllocationVersion::USER,
+      created_by_username: 'PK000223'
+    }
+
+    described_class.create_or_update(params)
+
+    alloc = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id)
+    expect(alloc.com_name).to eq('Bob')
+  end
 end

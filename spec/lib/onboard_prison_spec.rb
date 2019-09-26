@@ -8,7 +8,7 @@ describe OnboardPrison do
       [
      { noms_no: 'A' },
      { noms_no: 'B' },
-     { noms_no: 'C' }
+     { noms_no: 'G9468UN', tier: 'B', provider_cd: 'NPS' }
         ]
     }
 
@@ -17,13 +17,13 @@ describe OnboardPrison do
              nomis_offender_id: 'G5054VN',
              tier: 'A',
              case_allocation: 'NPS',
-             omicable: 'Yes'
+             welsh_offender: 'Yes'
       )
       create(:case_information,
              nomis_offender_id: 'G9468UN',
              tier: 'C',
              case_allocation: 'CRC',
-             omicable: 'Yes'
+             welsh_offender: 'Yes'
       )
 
       op = described_class.new('PVI', offender_ids, nil)
@@ -34,6 +34,13 @@ describe OnboardPrison do
       op = described_class.new('PVI', offender_ids, delius_records)
       expect(op.delius_records).to be_kind_of(Hash)
       expect(op.delius_records.count).to eq(3)
+    end
+
+    it 'can complete missing info' do
+      op = described_class.new('PVI', offender_ids, delius_records)
+      expect {
+        op.complete_missing_info
+      }.to change(CaseInformation, :count).by(1)
     end
   end
 end

@@ -6,15 +6,21 @@ Rails.application.routes.draw do
   match "/500", :to => "errors#internal_server_error", :via => :all
   match "/503", :to => "errors#internal_server_error", :via => :all
 
+  get '/contact_us', to: 'pages#contact_us'
+  post '/contact_us', to: 'pages#create_contact_us'
   get '/help', to: 'pages#help'
-  post '/help', to: 'pages#create_help'
-  get '/guidance', to: 'pages#guidance'
-  get '/guidance_step1', to: 'pages#guidance_step1'
-  get '/guidance_step2', to: 'pages#guidance_step2'
-  get '/guidance_step3', to: 'pages#guidance_step3'
-  get '/guidance_step4', to: 'pages#guidance_step4'
-  get '/guidance_step5', to: 'pages#guidance_step5'
-  get '/guidance_step6', to: 'pages#guidance_step6'
+  get '/help_step0', to: 'pages#help_step0'
+  get '/help_step1', to: 'pages#help_step1'
+  get '/help_step2', to: 'pages#help_step2'
+  get '/help_step3', to: 'pages#help_step3'
+  get '/help_step4', to: 'pages#help_step4'
+  get '/help_step5', to: 'pages#help_step5'
+  get '/help_step6', to: 'pages#help_step6'
+  get '/update_case_information', to: 'pages#update_case_information'
+  get '/updating_ndelius', to: 'pages#updating_ndelius'
+  get '/missing_cases', to: 'pages#missing_cases'
+  get '/repatriated', to: 'pages#repatriated'
+  get '/scottish_northern_irish', to: 'pages#scottish_northern_irish'
   get '/contact', to: 'pages#contact'
 
   get '/auth/:provider/callback', to: 'sessions#create'
@@ -45,7 +51,14 @@ Rails.application.routes.draw do
     resource :overrides,  only: %i[ new create ], path_names: { new: 'new/:nomis_offender_id/:nomis_staff_id'}
     resources :poms, only: %i[ index show edit update ], param: :nomis_staff_id
 
+    resources :responsibilities, only: %i[new create] do
+      collection do
+        post('confirm' => 'responsibilities#confirm')
+      end
+    end
+
     get('/debugging' => 'debugging#debugging')
+    get('/debugging/prison' => 'debugging#prison_info')
     get('/search' => 'search#search')
 
     get('/summary' => 'summary#index')

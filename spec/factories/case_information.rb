@@ -6,7 +6,7 @@ FactoryBot.define do
       'A'
     end
 
-    omicable do
+    welsh_offender do
       'Yes'
     end
 

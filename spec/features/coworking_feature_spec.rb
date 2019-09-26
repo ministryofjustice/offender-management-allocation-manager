@@ -20,6 +20,8 @@ feature 'Co-working' do
 
   before(:each) do
     signin_user
+
+    create(:case_information, nomis_offender_id: nomis_offender_id)
   end
 
   context 'with just a primary POM allocated' do
@@ -126,45 +128,39 @@ feature 'Co-working' do
       end
 
       expect(page).to have_current_path('/prisons/LEI/coworking/G4273GI/confirm_coworking_removal')
-
-      expect(page).to have_content 'You are removing Kath Pobee-Norris from co-working POM Ross Jones'
-      expect(page).to have_content 'We will send a confirmation email to Ross.jonessss@digital.justice.gov.uk'
+      expect(page).to have_content "You are removing co-working POM #{secondary_pom[:pom_name]} who was working with Abbella, Ozullirn. The Supporting POM is #{probation_pom[:pom_name]}."
+      expect(page).to have_content "We will send a confirmation email to #{probation_pom[:email]}"
     end
 
-    scenario 'removing a co-working POM then changing our mind', vcr: { cassette_name: :coworking_remove_changed_mind } do
+    scenario 'cancel removal of a co-working POM', vcr: { cassette_name: :coworking_pom_cancel } do
+      visit prison_allocation_path('LEI', nomis_offender_id)
+
+      within '#co-working-pom' do
+        click_link 'Remove'
+      end
+
+      expect(page).to have_current_path('/prisons/LEI/coworking/G4273GI/confirm_coworking_removal')
       click_link 'Cancel'
+
       expect(page).to have_current_path(prison_allocation_path('LEI', nomis_offender_id))
-
-      allocation.reload
-      expect(allocation.secondary_pom_nomis_id).to eq(secondary_pom[:staff_id])
-      expect(allocation.secondary_pom_name).to eq(secondary_pom[:pom_name])
     end
 
-    scenario 'clicking continue without selecting Yes/No', vcr: { cassette_name: :coworking_hit_continue } do
-      click_button 'Continue'
-      expect(page).to have_current_path('/prisons/LEI/coworking/G4273GI')
-      expect(page).to have_content 'Please select Yes or No'
-    end
+    scenario 'removing a co-working POM', vcr: { cassette_name: :coworking_pom_remove } do
+      visit prison_allocation_path('LEI', nomis_offender_id)
 
-    scenario 'removing a co-working POM but not reallocating', vcr: { cassette_name: :coworking_realloc_no } do
-      page.find('#reallocate_false').click
-      click_button 'Continue'
+      within '#co-working-pom' do
+        click_link 'Remove'
+      end
+
+      expect(page).to have_current_path('/prisons/LEI/coworking/G4273GI/confirm_coworking_removal')
+
+      click_button 'Confirm'
       expect(page).to have_current_path('/prisons/LEI/allocations/G4273GI')
 
       expect(page).to have_link 'Allocate'
       within '#co-working-pom' do
         expect(page).to have_content('N/A')
       end
-    end
-
-    scenario 'removing a co-working POM then reallocating', vcr: { cassette_name: :coworking_realloc_yes } do
-      page.find('#reallocate_true').click
-      click_button 'Continue'
-      allocation.reload
-      expect(allocation.secondary_pom_nomis_id).to be_nil
-      expect(allocation.secondary_pom_name).to be_nil
-
-      expect(page).to have_current_path new_prison_coworking_path('LEI', nomis_offender_id)
     end
   end
 end

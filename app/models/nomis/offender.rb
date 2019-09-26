@@ -33,10 +33,6 @@ module Nomis
       case_allocation == 'NPS'
     end
 
-    def pom_responsibility
-      ResponsibilityService.new.calculate_pom_responsibility(self)
-    end
-
     def self.from_json(payload)
       Offender.new.tap { |obj|
         obj.load_from_json(payload)

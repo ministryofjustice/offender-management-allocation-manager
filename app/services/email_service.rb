@@ -54,6 +54,19 @@ class EmailService
     end
   end
 
+  def send_cowork_deallocation_email(secondary_pom_name)
+    return if @pom.emails.blank?
+
+    PomMailer.deallocate_coworking_pom(
+      pom_name: @pom.first_name.capitalize,
+      email_address: @pom.emails.first,
+      secondary_pom_name: secondary_pom_name,
+      nomis_offender_id: @offender.offender_no,
+      offender_name: @offender.full_name,
+      url: url
+    ).deliver_later
+  end
+
 private
 
   # rubocop:disable Metrics/LineLength
@@ -63,8 +76,8 @@ private
   # rubocop:enable Metrics/LineLength
 
   def current_responsibility
-    ResponsibilityService.new.
-      calculate_pom_responsibility(@offender).downcase
+    ResponsibilityService.
+      calculate_pom_responsibility(@offender).to_s.downcase
   end
 
   def previous_pom
