@@ -27,4 +27,8 @@ class CaseInformation < ApplicationRecord
   # nil means MAPPA level is completely unknown.
   # 0 means MAPPA level is known to be not relevant for offender
   validates :mappa_level, inclusion: { in: [0, 1, 2, 3], allow_nil: true }
+
+  acts_as_gov_uk_date :parole_review_date
+
+  validates :parole_review_date, date: { after: proc { Date.yesterday }, allow_nil: true }
 end
