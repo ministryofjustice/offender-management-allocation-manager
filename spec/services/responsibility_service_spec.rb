@@ -11,12 +11,14 @@ describe ResponsibilityService do
                        sentence_start_date: start_date,
                        earliest_release_date: release_date,
                        parole_eligibility_date: parole_date,
-                       sentenced?: true
+                       sentenced?: true,
+                       prison_id: prison
       }
 
       let(:parole_date) { nil }
       let(:indeterminate_sentence) { false }
       let(:recalled) { false }
+      let(:prison) { 'LEI' }
 
       context 'when (old case) sentenced before 30th Sept' do
         let(:start_date) { Date.new(2019, 9, 18) }
@@ -24,23 +26,73 @@ describe ResponsibilityService do
         context 'when NPS' do
           let(:case_allocation) { 'NPS' }
 
-          context 'with over 17 months left to serve' do
-            let(:release_date) { Date.new(2019, 10, 1) + 18.months }
+          context 'when in PSP (public service prison)' do
+            context 'with over 17 months left to serve' do
+              let(:release_date) { Date.new(2019, 10, 1) + 18.months }
 
-            it 'is responsible' do
-              resp = described_class.calculate_pom_responsibility(offender)
+              it 'is responsible' do
+                resp = described_class.calculate_pom_responsibility(offender)
 
-              expect(resp).to eq ResponsibilityService::RESPONSIBLE
+                expect(resp).to eq ResponsibilityService::RESPONSIBLE
+              end
+            end
+
+            context 'with < 17 months left' do
+              let(:release_date) { Date.new(2019, 10, 1) + 16.months }
+
+              it 'is supporting' do
+                resp = described_class.calculate_pom_responsibility(offender)
+
+                expect(resp).to eq ResponsibilityService::SUPPORTING
+              end
             end
           end
 
-          context 'with < 17 months left' do
-            let(:release_date) { Date.new(2019, 10, 1) + 16.months }
+          context 'when in a hub model prison' do
+            let(:prison) { 'VEI' }
 
-            it 'is supporting' do
-              resp = described_class.calculate_pom_responsibility(offender)
+            context 'with over 20 months left to serve' do
+              let(:release_date) { Date.new(2019, 10, 1) + 21.months }
 
-              expect(resp).to eq ResponsibilityService::SUPPORTING
+              it 'is responsible' do
+                resp = described_class.calculate_pom_responsibility(offender)
+
+                expect(resp).to eq ResponsibilityService::RESPONSIBLE
+              end
+            end
+
+            context 'with < 20 months left' do
+              let(:release_date) { Date.new(2019, 10, 1) + 19.months }
+
+              it 'is supporting' do
+                resp = described_class.calculate_pom_responsibility(offender)
+
+                expect(resp).to eq ResponsibilityService::SUPPORTING
+              end
+            end
+          end
+
+          context 'when in a private prison' do
+            let(:prison) { 'TSI' }
+
+            context 'with over 20 months left to serve' do
+              let(:release_date) { Date.new(2019, 10, 1) + 21.months }
+
+              it 'is responsible' do
+                resp = described_class.calculate_pom_responsibility(offender)
+
+                expect(resp).to eq ResponsibilityService::RESPONSIBLE
+              end
+            end
+
+            context 'with < 20 months left' do
+              let(:release_date) { Date.new(2019, 10, 1) + 19.months }
+
+              it 'is supporting' do
+                resp = described_class.calculate_pom_responsibility(offender)
+
+                expect(resp).to eq ResponsibilityService::SUPPORTING
+              end
             end
           end
 
