@@ -52,6 +52,7 @@ Rails.application.routes.draw do
     end
 
     get('/debugging' => 'debugging#debugging')
+    get('/debugging/prison' => 'debugging#prison_info')
     get('/search' => 'search#search')
 
     get('/summary' => 'summary#index')

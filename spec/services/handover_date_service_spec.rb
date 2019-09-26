@@ -46,14 +46,14 @@ describe HandoverDateService do
   describe '#responsibility_handover_date' do
     context 'when CRC' do
       before do
-        stub_const("CRCHandoverData", Struct.new(:nps_case?, :home_detention_curfew_eligibility_date, :conditional_release_date, :result))
+        stub_const("CRCHandoverData", Struct.new(:nps_case?, :home_detention_curfew_eligibility_date, :conditional_release_date, :earliest_release_date, :result))
 
         stub_const("CRC_CASES", [
-            CRCHandoverData.new(false, Date.new(2019, 9, 30), Date.new(2019, 8, 1), Date.new(2019, 5, 9)), # 12 weeks before CRD
-            CRCHandoverData.new(false, Date.new(2019, 8, 1), Date.new(2019, 8, 12), Date.new(2019, 5, 9)), # 12 weeks before HDC date
-            CRCHandoverData.new(false, nil, Date.new(2019, 8, 1), Date.new(2019, 5, 9)), # 12 weeks before CRD date
-            CRCHandoverData.new(false, Date.new(2019, 8, 1), nil, Date.new(2019, 5, 9)), # 12 weeks before HDC date
-            CRCHandoverData.new(false, nil, nil, nil) # no handover date
+            CRCHandoverData.new(false, Date.new(2019, 9, 30), Date.new(2019, 8, 1), Date.new(2019, 8, 1), Date.new(2019, 5, 9)), # 12 weeks before CRD
+            CRCHandoverData.new(false, Date.new(2019, 8, 1), Date.new(2019, 8, 12), Date.new(2019, 8, 1), Date.new(2019, 5, 9)), # 12 weeks before HDC date
+            CRCHandoverData.new(false, nil, Date.new(2019, 8, 1), Date.new(2019, 5, 9), Date.new(2019, 5, 9)), # 12 weeks before CRD date
+            CRCHandoverData.new(false, Date.new(2019, 8, 1), nil, Date.new(2019, 8, 1), Date.new(2019, 5, 9)), # 12 weeks before HDC date
+            CRCHandoverData.new(false, nil, nil, nil, nil) # no handover date
         ])
       end
 
@@ -72,12 +72,14 @@ describe HandoverDateService do
           OpenStruct.new(nps_case?: true,
                          early_allocation?: true,
                          conditional_release_date: crd,
-                         automatic_release_date: ard)
+                         automatic_release_date: ard,
+                         earliest_release_date: erd)
         }
 
         context 'when CRD earliest' do
           let(:ard) { Date.new(2019, 8, 1) }
           let(:crd) { Date.new(2019, 7, 1) }
+          let(:erd) { Date.new(2019, 7, 1) }
 
           it 'is 15 months before CRD' do
             expect(described_class.responsibility_handover_date(offender)[0]).to eq(Date.new(2018, 4, 1))
@@ -87,6 +89,7 @@ describe HandoverDateService do
         context 'when ARD earliest' do
           let(:ard) { Date.new(2019, 8, 1) }
           let(:crd) { Date.new(2019, 9, 30) }
+          let(:erd) { Date.new(2019, 8, 1) }
 
           it 'is 15 months before ARD' do
             expect(described_class.responsibility_handover_date(offender)[0]).to eq(Date.new(2018, 5, 1))
@@ -96,6 +99,7 @@ describe HandoverDateService do
         context 'with neither date' do
           let(:crd) { nil }
           let(:ard) { nil }
+          let(:erd) { nil }
 
           it 'cannot be calculated' do
             expect(described_class.responsibility_handover_date(offender)[0]).to be_nil
@@ -107,6 +111,7 @@ describe HandoverDateService do
         let(:parole_date) { nil }
         let(:crd) { Date.new(2020, 7, 16) }
         let(:hdc_date) { Date.new(2020, 6, 16) }
+        let(:erd) { Date.new(2020, 6, 16) }
 
         context 'with determinate sentence' do
           let(:mappa_level) { nil }
@@ -119,11 +124,13 @@ describe HandoverDateService do
                            conditional_release_date: crd,
                            automatic_release_date: Date.new(2020, 8, 16),
                            parole_eligibility_date: parole_date,
-                           tariff_date: Date.new(2020, 11, 1))
+                           tariff_date: Date.new(2020, 11, 1),
+                           earliest_release_date: Date.new(2020, 8, 16))
           }
 
           context 'with parole date' do
             let(:parole_date) { Date.new(2019, 9, 30) }
+            let(:erd) { Date.new(2019, 9, 30) }
 
             it 'is 8 months before parole date' do
               expect(described_class.responsibility_handover_date(offender)[0]).to eq(Date.new(2019, 1, 30))
@@ -189,12 +196,14 @@ describe HandoverDateService do
             OpenStruct.new(indeterminate_sentence?: true,
                            nps_case?: true,
                            parole_eligibility_date: parole_date,
-                           tariff_date: tariff_date)
+                           tariff_date: tariff_date,
+                           earliest_release_date: erd)
           }
 
           context 'with tariff date earliest' do
             let(:tariff_date) { Date.new(2020, 11, 1) }
             let(:parole_date) { Date.new(2020, 12, 1) }
+            let(:erd) { Date.new(2020, 11, 1) }
 
             it 'is 8 months before tariff date' do
               expect(described_class.responsibility_handover_date(offender)[0]).to eq(Date.new(2020, 3, 1))
@@ -204,6 +213,7 @@ describe HandoverDateService do
           context 'with parole_eligibility_date earliest' do
             let(:parole_date) { Date.new(2020, 10, 1) }
             let(:tariff_date) { Date.new(2020, 11, 1) }
+            let(:erd) { Date.new(2020, 10, 1) }
 
             it 'is 8 months before parole date' do
               expect(described_class.responsibility_handover_date(offender)[0]).to eq(Date.new(2020, 2, 1))
@@ -213,6 +223,7 @@ describe HandoverDateService do
           context 'with neither date' do
             let(:parole_date) { nil }
             let(:tariff_date) { nil }
+            let(:erd) { nil }
 
             it 'cannot be calculated' do
               expect(described_class.responsibility_handover_date(offender)[0]).to be_nil
