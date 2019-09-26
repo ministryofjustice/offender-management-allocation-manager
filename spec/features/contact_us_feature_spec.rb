@@ -2,7 +2,7 @@ require 'rails_helper'
 
 feature 'Getting help' do
   it 'shows an empty contact form when no user is signed in' do
-    visit '/help'
+    visit '/contact_us'
 
     expect(page).to have_css('.govuk-body', text: 'Complete this form for technical help')
     expect(page).to have_css('.govuk-label', text: "Full name")
@@ -18,7 +18,7 @@ feature 'Getting help' do
     )
 
     signin_user('PK000223')
-    visit '/help'
+    visit '/contact_us'
 
     expect(page.find("#prison").value).to eq('HMP Leeds')
     expect(page.find("#name").value).to eq('Kath Pobee-Norris')
