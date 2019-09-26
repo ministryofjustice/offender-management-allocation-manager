@@ -1,0 +1,42 @@
+<div class="govuk-grid-column govuk-body">
+  <div class="govuk-breadcrumbs">
+    <ul class="govuk-breadcrumbs__list">
+      <li class="govuk-breadcrumbs__list-item">
+        <a class="govuk-breadcrumbs__link" href="/">Home</a>
+      </li>
+      <li class="govuk-breadcrumbs__list-item">
+        <a class="govuk-breadcrumbs__link" href= <%= help_path %>>Help</a>
+      </li>
+      <li class="govuk-breadcrumbs__list-item" aria-current="page">Missing cases</li>
+    </ul>
+    <br>
+  </div>
+
+  <div class="govuk-section-break--visible">
+    <h1 class="govuk-heading-l">Missing cases</h1>
+    <p>Contents</p>
+    <ul class="govuk-list--bullet">
+      <li>
+        <% if page == 0 %>
+          No POM allocation needed
+        <% else %>
+          <%= link_to "No POM allocation needed", missing_cases_path %>
+        <% end %>
+      </li>
+      <li>
+        <% if page == 1 %>
+          Repatriated cases
+        <% else %>
+          <%= link_to "Repatriated cases", repatriated_path %>
+        <% end %>
+      </li>
+      <li>
+        <% if page == 2 %>
+          Scottish and Northern Irish prisoners
+        <% else %>
+          <%= link_to "Scottish and Northern Irish prisoners", scottish_northern_irish_path %>
+        <% end %>
+      </li>
+    </ul>
+  </div>
+</div>
