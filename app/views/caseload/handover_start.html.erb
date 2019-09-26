@@ -22,16 +22,16 @@
     </tr>
     </thead>
     <tbody class="govuk-table__body">
-    <% @upcoming_handovers.each_with_index do |offender_allocation, i| %>
+    <% @upcoming_handovers.each_with_index do |offender, i| %>
       <tr class="govuk-table__row offender_row_<%= i %>">
-        <td aria-label="Prisoner name" class="govuk-table__cell "><%= offender_allocation.full_name %></td>
-        <td aria-label="Prisoner number" class="govuk-table__cell "><%= offender_allocation.nomis_offender_id %></td>
-        <td aria-label="Handover start date" class="govuk-table__cell "><%= format_date(offender_allocation.handover_start_date.first) %></td>
-        <td aria-label="Responsibility handover" class="govuk-table__cell "><%= format_date(offender_allocation.responsibility_handover_date.first) %></td>
-        <td aria-label="Release date" class="govuk-table__cell "><%= format_date(offender_allocation.earliest_release_date) %></td>
-        <td aria-label="Role" class="govuk-table__cell "><%= offender_allocation.responsibility %></td>
+        <td aria-label="Prisoner name" class="govuk-table__cell "><%= offender.full_name %></td>
+        <td aria-label="Prisoner number" class="govuk-table__cell "><%= offender.offender_no %></td>
+        <td aria-label="Handover start date" class="govuk-table__cell "><%= format_date(offender.handover_start_date.first) %></td>
+        <td aria-label="Responsibility handover" class="govuk-table__cell "><%= format_date(offender.responsibility_handover_date.first) %></td>
+        <td aria-label="Release date" class="govuk-table__cell "><%= format_date(offender.earliest_release_date) %></td>
+        <td aria-label="Role" class="govuk-table__cell "><%= offender.pom_responsibility %></td>
         <td aria-label="Action" class="govuk-table__cell ">
-          <%= link_to('View', prison_prisoner_show_path(@prison, offender_allocation.nomis_offender_id), class: "govuk-link" ) %>
+          <%= link_to('View', prison_prisoner_show_path(@prison, offender.offender_no), class: "govuk-link" ) %>
         </td>
       </tr>
     <% end %>

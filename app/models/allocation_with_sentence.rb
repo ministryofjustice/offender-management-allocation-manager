@@ -10,7 +10,7 @@ class AllocationWithSentence
   delegate :updated_at, :nomis_offender_id, :primary_pom_allocated_at,
            :allocated_at_tier, to: :@allocation
   delegate :handover_start_date, :responsibility_handover_date,
-            to: :offender
+           to: :offender
 
   attr_reader :responsibility
 
@@ -33,6 +33,7 @@ class AllocationWithSentence
   end
 
 private
+
   def offender
     @offender ||= OffenderService.get_offender(@allocation.nomis_offender_id)
   end
