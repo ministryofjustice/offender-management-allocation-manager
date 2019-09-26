@@ -121,15 +121,17 @@
         <%= format_date(@prisoner.tariff_date, replacement: 'N/A') %>
       </td>
     </tr>
-`    <% if @prisoner.indeterminate_sentence? %>
-      <tr class="govuk-table__row">
-        <td class="govuk-table__cell">Parole Review date</td>
-        <td class="govuk-table__cell table_cell__left_align">
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">Parole Review date</td>
+      <td class="govuk-table__cell table_cell__left_align">
+        <% if @prisoner.indeterminate_sentence? %>
           <%= format_date(@prisoner.parole_review_date, replacement: 'Unknown') %>
           <%= link_to 'Update', prison_edit_prd_path(@prison, @prisoner.offender_no), class: "govuk-link pull-right" %>
-        </td>
-      </tr>
-    <% end %>
+        <% else %>
+          'N/A'
+        <% end %>
+      </td>
+    </tr>
     </tbody>
   </table>
 
