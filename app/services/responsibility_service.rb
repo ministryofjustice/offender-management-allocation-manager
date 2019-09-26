@@ -12,39 +12,96 @@ class ResponsibilityService
   COWORKING = 'Co-Working'
   NPS = 'NPS'
 
-  # rubocop:disable Metrics/PerceivedComplexity
-  # rubocop:disable Metrics/CyclomaticComplexity
+  WELSH_POLICY_START_DATE = DateTime.new(2019, 2, 4).utc.to_date
+  ENGLISH_POLICY_START_DATE = DateTime.new(2019, 10, 1).utc.to_date
+
   def self.calculate_pom_responsibility(offender)
     return RESPONSIBLE if offender.earliest_release_date.nil?
-    return SUPPORTING unless welsh_offender?(offender)
 
-    return RESPONSIBLE if nps_case?(offender) &&
-      new_case?(offender) &&
-      release_date_gt_10_mths?(offender)
-
-    return RESPONSIBLE if nps_case?(offender) &&
-      !new_case?(offender) &&
-      release_date_gt_15_mths?(offender)
-
-    return RESPONSIBLE if !nps_case?(offender) &&
-      release_date_gt_12_weeks?(offender)
-
-    return SUPPORTING if !nps_case?(offender) &&
-      !release_date_gt_12_weeks?(offender)
-
-    return SUPPORTING if nps_case?(offender) &&
-      new_case?(offender) &&
-      !release_date_gt_10_mths?(offender)
-
-    return SUPPORTING if nps_case?(offender) &&
-      !new_case?(offender) &&
-      !release_date_gt_15_mths?(offender)
+    if welsh_offender?(offender)
+      welsh_rules(offender)
+    else
+      english_rules(offender)
+    end
   end
 
-# rubocop:enable Metrics/PerceivedComplexity
-# rubocop:enable Metrics/CyclomaticComplexity
-
 private
+
+  def self.welsh_rules(offender)
+    if offender.recalled?
+      SUPPORTING
+    elsif nps_case?(offender)
+      welsh_nps_rules(offender)
+    else
+      crc_rules(offender)
+    end
+  end
+
+  def self.welsh_nps_rules(offender)
+    if new_case?(offender)
+      welsh_policy_nps_rules(offender)
+    else
+      welsh_prepolicy_nps_rules(offender)
+    end
+  end
+
+  def self.welsh_policy_nps_rules(offender)
+    if release_date_gt_10_mths?(offender)
+      RESPONSIBLE
+    else
+      SUPPORTING
+    end
+  end
+
+  def self.welsh_prepolicy_nps_rules(offender)
+    if release_date_gt_15_mths_at_policy_date?(offender)
+      RESPONSIBLE
+    else
+      SUPPORTING
+    end
+  end
+
+  def self.english_rules(offender)
+    if offender.recalled?
+      SUPPORTING
+    elsif new_case?(offender)
+      english_policy_rules(offender)
+    else
+      english_prepolicy_rules(offender)
+    end
+  end
+
+  def self.english_policy_rules(offender)
+    if nps_case?(offender)
+      if release_date_gt_10_mths?(offender)
+        RESPONSIBLE
+      else
+        SUPPORTING
+      end
+    else
+      crc_rules(offender)
+    end
+  end
+
+  def self.english_prepolicy_rules(offender)
+    if nps_case?(offender)
+      if release_date_gt_17_mths_at_policy_date?(offender)
+        RESPONSIBLE
+      else
+        SUPPORTING
+      end
+    else
+      crc_rules(offender)
+    end
+  end
+
+  def self.crc_rules(offender)
+    if release_date_gt_12_weeks?(offender)
+      RESPONSIBLE
+    else
+      SUPPORTING
+    end
+  end
 
   def self.welsh_offender?(offender)
     offender.welsh_offender == true
@@ -59,9 +116,14 @@ private
       DateTime.now.utc.to_date + 10.months
   end
 
-  def self.release_date_gt_15_mths?(offender)
+  def self.release_date_gt_15_mths_at_policy_date?(offender)
     offender.earliest_release_date >
-      DateTime.new(2019, 2, 4).utc.to_date + 15.months
+      WELSH_POLICY_START_DATE + 15.months
+  end
+
+  def self.release_date_gt_17_mths_at_policy_date?(offender)
+    offender.earliest_release_date >
+      ENGLISH_POLICY_START_DATE + 17.months
   end
 
   def self.release_date_gt_12_weeks?(offender)
@@ -72,6 +134,10 @@ private
   def self.new_case?(offender)
     return true unless offender.sentenced?
 
-    offender.sentence_start_date > DateTime.new(2019, 2, 4).utc
+    if offender.welsh_offender
+      offender.sentence_start_date > WELSH_POLICY_START_DATE
+    else
+      offender.sentence_start_date > ENGLISH_POLICY_START_DATE
+    end
   end
 end
