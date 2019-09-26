@@ -75,65 +75,7 @@
     </tbody>
   </table>
 
-  <table class="govuk-table">
-    <tbody class="govuk-table__body">
-    <tr class="govuk-table__row">
-      <td class="govuk-table__header govuk-!-width-one-half" scope="row">Offence</td>
-      <td class="govuk-table__cell govuk-!-width-one-half"></td>
-    </tr>
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell govuk-!-width-one-half">Main offence</td>
-      <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= @prisoner.main_offence %></td>
-    </tr>
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell">Sentence type</td>
-      <td class="govuk-table__cell table_cell__left_align">
-        <%= sentence_type_label(@prisoner) %>
-      </td>
-    </tr>
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell">Conditional release date</td>
-      <td class="govuk-table__cell table_cell__left_align">
-        <%= format_date(@prisoner.conditional_release_date, replacement: 'N/A') %>
-      </td>
-    </tr>
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell">Automatic release date</td>
-      <td class="govuk-table__cell table_cell__left_align">
-        <%= format_date(@prisoner.automatic_release_date, replacement: 'N/A') %>
-      </td>
-    </tr>
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell">Parole eligibility</td>
-      <td class="govuk-table__cell table_cell__left_align">
-        <%= format_date(@prisoner.parole_eligibility_date, replacement: 'N/A') %>
-      </td>
-    </tr>
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell">Home detention curfew eligibility</td>
-      <td class="govuk-table__cell table_cell__left_align">
-        <%= format_date(@prisoner.home_detention_curfew_eligibility_date, replacement: 'N/A') %>
-      </td>
-    </tr>
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell">Tariff date</td>
-      <td class="govuk-table__cell table_cell__left_align">
-        <%= format_date(@prisoner.tariff_date, replacement: 'N/A') %>
-      </td>
-    </tr>
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell">Parole Review date</td>
-      <td class="govuk-table__cell table_cell__left_align">
-        <% if @prisoner.indeterminate_sentence? %>
-          <%= format_date(@prisoner.parole_review_date, replacement: 'Unknown') %>
-          <%= link_to 'Update', prison_edit_prd_path(@prison, @prisoner.offender_no), class: "govuk-link pull-right" %>
-        <% else %>
-          'N/A'
-        <% end %>
-      </td>
-    </tr>
-    </tbody>
-  </table>
+  <%= render 'shared/offence_info' %>
 
   <table class="govuk-table">
     <tbody class="govuk-table__body">
