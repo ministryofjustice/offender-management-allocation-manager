@@ -2,20 +2,15 @@ require 'rails_helper'
 
 RSpec.describe OverridesController, type: :controller do
   before do
-    allow(Nomis::Oauth::TokenService).to receive(:valid_token).and_return(OpenStruct.new(access_token: 'token'))
-    session[:sso_data] = { 'expiry' => Time.zone.now + 1.day,
-                           'roles' => ['ROLE_ALLOC_MGR'],
-                           'caseloads' => [prison] }
+    stub_sso_data(prison)
   end
 
   let(:prison) { 'WEI' }
-
   let(:nomis_staff_id) { 'A12345' }
-
   let(:nomis_offender_id) { 'B44455' }
 
   let(:params) do
-    { prison_id: 'WEI' }
+    { prison_id: prison }
   end
 
   let(:override_params) do
