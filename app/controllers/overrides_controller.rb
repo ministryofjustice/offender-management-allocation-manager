@@ -45,11 +45,27 @@ private
   end
 
   def redirect_on_success
-    redirect_to prison_confirm_allocation_path(
-      active_prison,
-      override_params[:nomis_offender_id],
-      override_params[:nomis_staff_id]
+    previously_allocated = AllocationService.previously_allocated_poms(
+      override_params[:nomis_offender_id]
     )
+
+    if previously_allocated.empty?
+      redirect_to prison_confirm_allocation_path(
+        active_prison,
+        override_params[:nomis_offender_id],
+        override_params[:nomis_staff_id],
+        sort: params[:sort],
+        page: params[:page]
+      )
+    else
+      redirect_to prison_confirm_reallocation_path(
+        active_prison,
+        override_params[:nomis_offender_id],
+        override_params[:nomis_staff_id],
+        sort: params[:sort],
+        page: params[:page]
+      )
+    end
   end
 
   def override_params

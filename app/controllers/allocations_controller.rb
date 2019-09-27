@@ -82,7 +82,11 @@ class AllocationsController < PrisonsApplicationController
         "#{offender.full_name_ordered} has not been allocated  - please try again"
     end
 
-    redirect_to prison_summary_unallocated_path(active_prison)
+    if allocation[:event] == 'allocate_primary_pom'
+      redirect_to prison_summary_unallocated_path(active_prison, page: params[:page], sort: params[:sort])
+    else
+      redirect_to prison_summary_allocated_path(active_prison, page: params[:page], sort: params[:sort])
+    end
   end
 
   def history

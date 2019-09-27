@@ -7,11 +7,13 @@ feature "edit a POM's details" do
 
   before do
     create(:case_information, nomis_offender_id: nomis_offender_id)
+
+    create(:pom_detail, nomis_staff_id: fulltime_pom_id, working_pattern: 1)
+
+    signin_user
   end
 
   it "setting unavailable shows selected on re-edit", vcr: { cassette_name: :edit_poms_unavailable_check } do
-    signin_user
-
     visit edit_prison_pom_path('LEI', nomis_staff_id)
     expect(page).to have_css('h1', text: 'Edit profile')
 
@@ -26,10 +28,10 @@ feature "edit a POM's details" do
   end
 
   it "validates a POM when missing data", vcr: { cassette_name: :edit_poms_missing_check } do
-    signin_user
-
     visit edit_prison_pom_path('LEI', fulltime_pom_id)
     expect(page).to have_css('h1', text: 'Edit profile')
+
+    expect(page.find('#working_pattern-ft')).to be_checked
 
     # The only way to trigger (and therefore cover) the validation is for a full-time POM
     # to be edited to part time but not choose a working pattern.
@@ -41,8 +43,6 @@ feature "edit a POM's details" do
   end
 
   it "makes an inactive POM active", vcr: { cassette_name: :edit_poms_activate_pom_feature } do
-    signin_user
-
     visit "/prisons/LEI/poms#inactive"
     within('.probation_pom_row_0') do
       click_link 'View'
@@ -62,7 +62,6 @@ feature "edit a POM's details" do
   end
 
   it "de-allocates all a POM's cases when made inactive", vcr: { cassette_name: :edit_poms_deactivate_pom_feature } do
-    signin_user('PK000223')
     visit "/prisons/LEI/allocations/confirm/G4273GI/485637"
     click_button 'Complete allocation'
 

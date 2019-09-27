@@ -1,5 +1,4 @@
-<%= render :partial => "/shared/backlink", :locals => { :page => prison_summary_pending_path(@prison) } %>
-
+<%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
 
 <% if @case_info.errors.count > 0 %>
   <%= render :partial => "/shared/validation_errors", :locals => { :errors => @case_info.errors } %>
@@ -10,7 +9,6 @@
 <h2 class="govuk-heading-m"><%= @prisoner.offender_no %></h2>
 
 <p class="govuk-!-margin-bottom-8">You can find this information in NDelius.</p>
-
 
 <%= render :partial => "form", :locals => {
       :action => prison_case_information_index_path(@prison),

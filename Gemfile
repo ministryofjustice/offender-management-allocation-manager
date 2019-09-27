@@ -54,6 +54,7 @@ group :test do
   gem 'capybara'
   gem 'database_cleaner'
   gem 'faker'
+  gem 'geckodriver-helper'
   gem 'launchy'
   gem 'selenium-webdriver'
   gem 'shoulda-matchers'
