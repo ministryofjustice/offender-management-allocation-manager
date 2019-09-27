@@ -7,7 +7,7 @@ module Nomis
     attr_accessor :aliases, :booking_id
 
     # custom attributes
-    attr_accessor :allocation_date
+    attr_accessor :allocation_date, :reception_date
 
     attr_reader :prison_id
 
