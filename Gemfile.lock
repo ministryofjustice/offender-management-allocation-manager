@@ -380,8 +380,8 @@ DEPENDENCIES
   fast_underscore
   flamegraph
   flipflop
-  gov_uk_date_fields
   geckodriver-helper
+  gov_uk_date_fields
   govuk_notify_rails
   hashdiff (>= 1.0.0.beta1, < 2.0.0)
   jbuilder (~> 2.9)
