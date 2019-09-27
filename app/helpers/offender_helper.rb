@@ -32,7 +32,26 @@ module OffenderHelper
       type + 'removed'
     elsif event.include? 'allocate'
       type + 'allocated'
+    end
+  end
 
+  def recommended_pom_type_for(offender)
+    rec_type = RecommendationService.recommended_pom_type(offender)
+
+    if rec_type == RecommendationService::PRISON_POM
+      'Prison officer'
+    else
+      'Probation officer'
+    end
+  end
+
+  def non_recommended_pom_type_for(offender)
+    rec_type = RecommendationService.recommended_pom_type(offender)
+
+    if rec_type == RecommendationService::PRISON_POM
+      'Probation officer'
+    else
+      'Prison officer'
     end
   end
 end

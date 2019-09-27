@@ -14,8 +14,6 @@ class AllocationsController < PrisonsApplicationController
       AllocationService.previously_allocated_poms(nomis_offender_id_from_url)
     @recommended_poms, @not_recommended_poms =
       recommended_and_nonrecommended_poms_for(@prisoner)
-    @recommended_pom_type, @not_recommended_pom_type =
-      recommended_and_nonrecommended_poms_types_for(@prisoner)
     @unavailable_pom_count = unavailable_pom_count
   end
 
@@ -42,8 +40,6 @@ class AllocationsController < PrisonsApplicationController
       AllocationService.previously_allocated_poms(nomis_offender_id_from_url)
     @recommended_poms, @not_recommended_poms =
       recommended_and_nonrecommended_poms_for(@prisoner)
-    @recommended_pom_type, @not_recommended_pom_type =
-      recommended_and_nonrecommended_poms_types_for(@prisoner)
     @unavailable_pom_count = unavailable_pom_count
 
     @current_pom = current_pom_for(nomis_offender_id_from_url)
@@ -150,18 +146,6 @@ private
   def recommended_pom_type(offender)
     rec_type = RecommendationService.recommended_pom_type(offender)
     rec_type == RecommendationService::PRISON_POM ? 'prison' : 'probation'
-  end
-
-  def recommended_and_nonrecommended_poms_types_for(offender)
-    rec_type = RecommendationService.recommended_pom_type(offender)
-
-    if rec_type == RecommendationService::PRISON_POM
-      ['Prison officer',
-       'Probation officer']
-    else
-      ['Probation officer',
-       'Prison officer']
-    end
   end
 
   def recommended_and_nonrecommended_poms_for(offender)
