@@ -76,10 +76,6 @@ module Nomis
       age >= 18
     end
 
-    def awaiting_allocation_for
-      (Time.zone.today - reception_date).to_i
-    end
-
     def earliest_release_date
       sentence.earliest_release_date
     end
