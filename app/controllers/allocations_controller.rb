@@ -155,7 +155,17 @@ private
       pom.status == 'active' && pom.staff_id != allocation.try(:secondary_pom_nomis_id)
     }
 
-    RecommendationService.recommended_poms(offender, poms)
+    recommended_poms(offender, poms)
+  end
+
+  def recommended_poms(offender, poms)
+    # Returns a pair of lists where the first element contains the
+    # POMs from the `poms` parameter that are recommended for the
+    # `offender`
+    recommended_type = RecommendationService.recommended_pom_type(offender)
+    poms.partition { |pom|
+      pom.position.include?(recommended_type)
+    }
   end
 
   def nomis_offender_id_from_url

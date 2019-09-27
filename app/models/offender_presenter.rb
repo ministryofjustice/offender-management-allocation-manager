@@ -4,7 +4,7 @@ class OffenderPresenter
   delegate :offender_no, :first_name, :last_name, :latest_booking_id,
            :indeterminate_sentence?, :sentence_type_code, :describe_sentence,
            :full_name_ordered, :full_name, :main_offence,
-           :sentence_start_date, :team,
+           :sentence_start_date, :team, :prison_id,
            :home_detention_curfew_eligibility_date, :tariff_date,
            :date_of_birth, :release_date, :parole_eligibility_date,
            :welsh_offender, :case_allocation, :earliest_release_date,
