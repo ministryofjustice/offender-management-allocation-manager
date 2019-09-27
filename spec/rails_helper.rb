@@ -12,6 +12,9 @@ require 'capybara/rspec'
 require 'webmock/rspec'
 require 'paper_trail/frameworks/rspec'
 
+Capybara.default_max_wait_time = 4
+Capybara.asset_host = 'http://localhost:3000'
+
 begin
   ActiveRecord::Migration.maintain_test_schema!
 rescue ActiveRecord::PendingMigrationError => e
