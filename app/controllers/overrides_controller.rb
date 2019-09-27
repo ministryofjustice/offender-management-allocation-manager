@@ -2,24 +2,18 @@
 
 class OverridesController < PrisonsApplicationController
   def new
-    @prisoner = OffenderService.get_offender(params.require(:nomis_offender_id))
+    @prisoner = offender(params.require(:nomis_offender_id))
     @pom = PrisonOffenderManagerService.get_pom(active_prison, params[:nomis_staff_id])
 
     @override = Override.new
   end
 
   def create
-    @override = AllocationService.create_override(
-      nomis_staff_id: override_params[:nomis_staff_id],
-      nomis_offender_id: override_params[:nomis_offender_id],
-      override_reasons: override_params[:override_reasons],
-      suitability_detail: override_params[:suitability_detail],
-      more_detail: override_params[:more_detail]
-    )
+    @override = AllocationService.create_override(override_params)
 
     return redirect_on_success if @override.valid?
 
-    @prisoner = OffenderService.get_offender(override_params[:nomis_offender_id])
+    @prisoner = offender(override_params[:nomis_offender_id])
     @pom = PrisonOffenderManagerService.get_pom(
       active_prison, override_params[:nomis_staff_id])
 
@@ -27,6 +21,11 @@ class OverridesController < PrisonsApplicationController
   end
 
 private
+
+  def offender(nomis_offender_id)
+    OffenderPresenter.new(OffenderService.get_offender(nomis_offender_id),
+                          Responsibility.find_by(nomis_offender_id: nomis_offender_id))
+  end
 
   def redirect_on_success
     previously_allocated = AllocationService.previously_allocated_poms(

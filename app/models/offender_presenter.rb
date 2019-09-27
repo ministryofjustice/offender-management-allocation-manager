@@ -30,4 +30,24 @@ class OffenderPresenter
       @offender.pom_responsibility
     end
   end
+
+  def recommended_pom_type
+    rec_type = RecommendationService.recommended_pom_type(@offender)
+
+    if rec_type == RecommendationService::PRISON_POM
+      'Prison officer'
+    else
+      'Probation officer'
+    end
+  end
+
+  def non_recommended_pom_type
+    rec_type = RecommendationService.recommended_pom_type(@offender)
+
+    if rec_type == RecommendationService::PRISON_POM
+      'Probation officer'
+    else
+      'Prison officer'
+    end
+  end
 end

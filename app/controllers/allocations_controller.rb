@@ -68,6 +68,7 @@ class AllocationsController < PrisonsApplicationController
   # Note #update is delegated to #create
   def create
     offender = offender(allocation_params[:nomis_offender_id])
+    @override = override
     allocation = allocation_attributes(offender)
 
     if AllocationService.create_or_update(allocation)
@@ -100,7 +101,6 @@ private
   end
 
   def allocation_attributes(offender)
-    @override = override
     {
       primary_pom_nomis_id: allocation_params[:nomis_staff_id].to_i,
       nomis_offender_id: allocation_params[:nomis_offender_id],
