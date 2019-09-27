@@ -2,10 +2,16 @@ require 'rails_helper'
 
 describe RecommendationService do
   let(:tierA) {
-    Nomis::OffenderSummary.new.tap { |o| o.tier = 'A' }
+    Nomis::OffenderSummary.new.tap { |o|
+      o.tier = 'A'
+      o.sentence = Nomis::SentenceDetail.new
+    }
   }
   let(:tierD) {
-    Nomis::OffenderSummary.new.tap { |o| o.tier = 'D' }
+    Nomis::OffenderSummary.new.tap { |o|
+      o.tier = 'D'
+      o.sentence = Nomis::SentenceDetail.new
+    }
   }
 
   it "can determine the best type of POM for Tier A" do

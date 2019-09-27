@@ -49,16 +49,14 @@ RSpec.describe AllocationsController, type: :controller do
       with(
         body: "[754207]",
         headers: {
-          'Authorization' => 'Bearer token',
           'Content-Type' => 'application/json'
         }).
-      to_return(status: 200, body: [{ offenderNo: nomis_id }].to_json, headers: {})
+      to_return(status: 200, body: [{ offenderNo: nomis_id, bookingId: 754_207, sentenceDetail: {} }].to_json, headers: {})
 
     stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/offender-assessments/CATEGORY").
       with(
         body: [nomis_id].to_json,
         headers: {
-          'Authorization' => 'Bearer token',
           'Content-Type' => 'application/json'
         }).
       to_return(status: 200, body: {}.to_json, headers: {})
