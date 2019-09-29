@@ -55,7 +55,7 @@ feature 'Help' do
       title = 'Overview'
 
       expect(page).not_to have_link(title)
-      expect(page).to have_css('h2', text: title)
+      expect(page).to have_css('h1', text: title)
       expect(page).to have_link('https://moic.service.justice.gov.uk')
 
       task_links = [
@@ -77,7 +77,7 @@ feature 'Help' do
 
       click_link(title)
 
-      expect(page).to have_css('h2', text: title)
+      expect(page).to have_css('h1', text: title)
       expect(page).to have_css('.govuk-inset-text', text: inset_text[:SPO_HoOMU])
       expect(page).to have_link('spreadsheet template')
       expect(page).to have_xpath("//img[contains(@src,'assets/spreadsheet_image')]")
@@ -90,7 +90,7 @@ feature 'Help' do
 
       click_link(title)
 
-      expect(page).to have_css('h2', text: title)
+      expect(page).to have_css('h1', text: title)
       expect(page).to have_css('.govuk-inset-text', text: inset_text[:LSA])
       expect(page).to have_link('https://notm.service.hmpps.dsd.io/')
 
@@ -106,7 +106,7 @@ feature 'Help' do
 
       click_link(title)
 
-      expect(page).to have_css('h2', text: title)
+      expect(page).to have_css('h1', text: title)
       expect(page).to have_css('.govuk-inset-text', text: inset_text[:LSA])
       expect(page).to have_link('Task 1: List everyone using the service', href: 'help_step1')
       expect(page).to have_link('Task 4: Update POM profiles', href: 'help_step4')
@@ -123,7 +123,7 @@ feature 'Help' do
 
       click_link(title)
 
-      expect(page).to have_css('h2', text: title)
+      expect(page).to have_css('h1', text: title)
       expect(page).to have_css('.govuk-inset-text', text: inset_text[:CASE_ADMIN])
       expect(page).to have_link('Task 2: Set up access in Digital Prison Services', href: 'help_step2')
       expect(page).to have_link('https://moic.service.justice.gov.uk')
@@ -134,7 +134,7 @@ feature 'Help' do
 
       click_link(title)
 
-      expect(page).to have_css('h2', text: title)
+      expect(page).to have_css('h1', text: title)
       expect(page).to have_css('.govuk-inset-text', text: inset_text[:CASE_ADMIN])
       expect(page).to have_link('Task 3: Set up POMs in NOMIS', href: 'help_step3')
       expect(page).to have_link('https://moic.service.justice.gov.uk')
@@ -146,7 +146,7 @@ feature 'Help' do
 
       click_link(title)
 
-      expect(page).to have_css('h2', text: title)
+      expect(page).to have_css('h1', text: title)
       expect(page).to have_css('.govuk-inset-text', text: inset_text[:SPO_HoOMU])
       expect(page).to have_link('https://moic.service.justice.gov.uk')
       expect(page).to have_link('moic@digital.justice.gov.uk')
@@ -159,7 +159,7 @@ feature 'Help' do
     end
 
     scenario 'help updating case information overview', vcr: { cassette_name: :help_update_case_info_overview } do
-      expect(page).to have_css('h2', text: 'Overview')
+      expect(page).to have_css('h1', text: 'Overview')
       expect(page).to have_link('Updating nDelius', href: updating_ndelius_path)
     end
 
@@ -169,7 +169,7 @@ feature 'Help' do
       click_link(title)
 
       expect(page).to have_link('Overview', href: update_case_information_path)
-      expect(page).to have_css('h2', text: title)
+      expect(page).to have_css('h1', text: title)
       expect(page).to have_xpath("//img[contains(@src,'assets/ndelius_find_prisoner')]")
       expect(page).to have_xpath("//img[contains(@src,'assets/ndelius_dss_results')]")
       expect(page).to have_xpath("//img[contains(@src,'assets/ndelius_offender_details')]")
@@ -184,7 +184,7 @@ feature 'Help' do
     scenario 'help when no POM allocation needed', vcr: { cassette_name: :help_missing_case_no_pom_allocation } do
       expect(page).to have_link('Repatriated cases', href: repatriated_path)
       expect(page).to have_link('Scottish and Northern Irish prisoners', href: scottish_northern_irish_path)
-      expect(page).to have_css('h2', text: 'No POM allocation needed')
+      expect(page).to have_css('h1', text: 'No POM allocation needed')
       expect(page).to have_link('https://intranet.noms.gsi.gov.uk/corporate/offender-management-model')
       expect(page).to have_link('Contact us', href: contact_us_path)
     end
@@ -195,7 +195,7 @@ feature 'Help' do
       click_link(title)
 
       expect(page).to have_link('No POM allocation needed', href: missing_cases_path)
-      expect(page).to have_css('h2', text: title)
+      expect(page).to have_css('h1', text: title)
     end
 
     scenario 'help with scottish/irish prisoners', vcr: { cassette_name: :help_with_scottish_irish } do
@@ -203,7 +203,7 @@ feature 'Help' do
 
       click_link(title)
 
-      expect(page).to have_css('h2', text: title)
+      expect(page).to have_css('h1', text: title)
     end
   end
 end
