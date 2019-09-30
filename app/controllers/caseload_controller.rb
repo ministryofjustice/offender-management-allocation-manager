@@ -3,28 +3,65 @@
 class CaseloadController < PrisonsApplicationController
   before_action :ensure_pom
 
-  breadcrumb -> { 'Your caseload' }, -> { prison_caseload_index_path(active_prison) }
+  breadcrumb -> { 'Your caseload' },
+             -> { prison_caseload_index_path(active_prison) }
   breadcrumb -> { 'New cases' },
              -> { new_prison_caseload_path(active_prison) }, only: [:new]
+  breadcrumb -> { 'Cases close to handover' },
+             -> { prison_caseload_handover_start_path(active_prison) },
+             only: [:handover_start]
 
   def index
-    allocations = PrisonOffenderManagerService.get_allocated_offenders(
-      @pom.staff_id, active_prison
-    )
+    @new_cases_count = all_allocations.select(&:new_case?).count
+    sorted_allocations = sort_allocations(filter_allocations(all_allocations))
 
-    @new_cases_count = allocations.select(&:new_case?).count
-    allocations = sort_allocations(filter_allocations(allocations))
-    @total_allocations = allocations.count
-    @allocations = Kaminari.paginate_array(allocations).page(page)
+    @allocations = Kaminari.paginate_array(sorted_allocations).page(page)
+    @total_allocation_count = sorted_allocations.count
+    @pending_handover_count = pending_handover_count
   end
 
   def new
-    @new_cases = PrisonOffenderManagerService.get_allocated_offenders(
-      @pom.staff_id, active_prison
-    ).select(&:new_case?)
+    @new_cases = all_allocations.select(&:new_case?)
+  end
+
+  def handover_start
+    offenders = pending_handover_offenders
+    @upcoming_handovers = Kaminari.paginate_array(offenders).page(page)
   end
 
 private
+
+  def all_allocations
+    @all_allocations ||= PrisonOffenderManagerService.get_allocated_offenders(
+      @pom.staff_id, active_prison
+    )
+  end
+
+  def pending_handover_count
+    pending_handover_offenders.count
+  end
+
+  def pending_handover_offenders
+    ids = Set.new all_allocations.map(&:nomis_offender_id)
+    offenders = OffenderService.get_offenders_for_prison(active_prison)
+    allocated_offenders = offenders.select { |offender|
+      ids.include? offender.offender_no
+    }
+
+    one_week_time = Time.zone.today + 7.days
+
+    upcoming_offenders = allocated_offenders.select { |offender|
+      start_date = offender.handover_start_date.first
+
+      start_date.present? &&
+      start_date.between?(Time.zone.today, one_week_time)
+    }
+
+    upcoming_offenders.map{ |offender|
+      responsibility = Responsibility.find_by(nomis_offender_id: offender.offender_no)
+      OffenderPresenter.new(offender, responsibility)
+    }
+  end
 
   def sort_allocations(allocations)
     if params['sort'].present?
