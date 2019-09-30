@@ -5,7 +5,7 @@
 <%= form_for(@case_info, url: prison_case_information_path(@prison), method: :put, id: "case_info_form") do |f| %>
   <%= hidden_field_tag("case_information[nomis_offender_id]", @prisoner.offender_no) %>
 
-  <div class="form-group">
+  <div class="govuk-form-group">
     <!-- Change text in en.yml -->
     <%= f.gov_uk_date_field :parole_review_date, page_heading: false %>
   </div>
