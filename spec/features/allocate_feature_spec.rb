@@ -3,7 +3,8 @@ require 'rails_helper'
 feature 'Allocation' do
   let!(:probation_officer_nomis_staff_id) { 485_636 }
   let!(:prison_officer_nomis_staff_id) { 485_752 }
-  let!(:nomis_offender_id) { 'G4273GI' }
+  let!(:nomis_offender_id) { 'G7266VD' }
+  let(:offender_name) { 'Omistius Annole' }
   let!(:never_allocated_offender) { 'G1670VU' }
 
   let!(:probation_officer_pom_detail) {
@@ -29,16 +30,17 @@ feature 'Allocation' do
     expect(page).to have_content('There is 1 POM unavailable for new allocations.')
 
     within('.recommended_pom_row_0') do
+      expect(page).to have_content 'Jones, Ross'
       click_link 'Allocate'
     end
 
     expect(page).to have_css('h1', text: 'Confirm allocation')
-    expect(page).to have_css('p', text: 'You are allocating Ozullirn Abbella to Ross Jones')
+    expect(page).to have_css('p', text: "You are allocating #{offender_name} to Ross Jones")
 
     click_button 'Complete allocation'
 
     expect(current_url).to have_content(prison_summary_unallocated_path('LEI'))
-    expect(page).to have_css('.notification', text: 'Ozullirn Abbella has been allocated to Ross Jones (Probation POM)')
+    expect(page).to have_css('.notification', text: "#{offender_name} has been allocated to Ross Jones (Probation POM)")
   end
 
   scenario 'overriding an allocation', vcr: { cassette_name: :override_allocation_feature_ok } do
@@ -67,7 +69,7 @@ feature 'Allocation' do
     # This user is both a probation and prison POM in the system and therefore whilst it says 'Probation POM' in this
     # test it is actually going through the test and passing as we'd expect, just that it say Probation and not Prison POM
 
-    expect(page).to have_css('.notification', text: 'Ozullirn Abbella has been allocated to Moic Integration-Tests (Probation POM)')
+    expect(page).to have_css('.notification', text: "#{offender_name} has been allocated to Moic Integration-Tests (Probation POM)")
     expect(Override.count).to eq(0)
   end
 
@@ -147,7 +149,7 @@ feature 'Allocation' do
     expect(current_url).to have_content(prison_allocation_path('LEI', nomis_offender_id))
     expect(page).to have_link(nil, href: "/prisons/LEI/poms/485637")
     expect(page).to have_css('.table_cell__left_align', text: 'Pobee-Norris, Kath')
-    expect(page).to have_css('.table_cell__left_align', text: 'Supporting')
+    expect(page).to have_css('.table_cell__left_align', text: 'Responsible')
 
     click_link 'Reallocate'
 
@@ -181,7 +183,7 @@ feature 'Allocation' do
 
     expect(page).to have_css(
       '.alert',
-      text: 'Ozullirn Abbella has not been allocated - please try again'
+      text: "#{offender_name} has not been allocated - please try again"
     )
   end
 
