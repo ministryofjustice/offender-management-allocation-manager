@@ -38,6 +38,9 @@ en:
       next: "Next &rsaquo;"
       truncate: "&hellip;"
   helpers:
+    fieldset:
+      case_information:
+        parole_review_date: "What is the next parole review date?"
     page_entries_info:
       one_page:
         display_entries:
