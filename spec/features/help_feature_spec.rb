@@ -56,7 +56,6 @@ feature 'Help' do
 
       expect(page).not_to have_link(title)
       expect(page).to have_css('h1', text: title)
-      expect(page).to have_link('https://moic.service.justice.gov.uk')
 
       task_links = [
           ['Task 1', 'help_step1'],
@@ -149,7 +148,6 @@ feature 'Help' do
       expect(page).to have_css('h1', text: title)
       expect(page).to have_css('.govuk-inset-text', text: inset_text[:SPO_HoOMU])
       expect(page).to have_link('https://moic.service.justice.gov.uk')
-      expect(page).to have_link('moic@digital.justice.gov.uk')
     end
   end
 
