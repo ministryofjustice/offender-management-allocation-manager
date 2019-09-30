@@ -22,14 +22,14 @@ class PrisonOffenderManagerService
       return nil
     end
 
-    @pom = poms_list.select { |p| p.staff_id == nomis_staff_id.to_i }.first
-    if @pom.blank?
+    pom = poms_list.select { |p| p.staff_id == nomis_staff_id.to_i }.first
+    if pom.blank?
       log_missing_pom(caseload, nomis_staff_id)
       return nil
     end
 
-    @pom.emails = get_pom_emails(@pom.staff_id)
-    @pom
+    pom.emails = get_pom_emails(pom.staff_id)
+    pom
   end
 
   def self.get_pom_emails(nomis_staff_id)
