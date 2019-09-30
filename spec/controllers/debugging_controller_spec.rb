@@ -8,18 +8,13 @@ RSpec.describe DebuggingController, type: :controller do
   let(:elite2bookingsapi) { "#{elite2api}/offender-sentences/bookings" }
 
   before do
-    allow(Nomis::Oauth::TokenService).to receive(:valid_token).and_return(OpenStruct.new(access_token: 'token'))
-    session[:sso_data] = { 'expiry' => Time.zone.now + 1.day,
-                           'roles' => ['ROLE_ALLOC_MGR'],
-                           'caseloads' => [prison] }
+    stub_sso_data(prison)
   end
 
   it 'can show info' do
     stub_request(:get, elite2listapi).
       with(
         headers: {
-          'Authorization' => 'Bearer token',
-          'Expect' => '',
           'Page-Limit' => '1',
           'Page-Offset' => '1'
         }).
@@ -28,8 +23,6 @@ RSpec.describe DebuggingController, type: :controller do
     stub_request(:get, elite2listapi).
     with(
       headers: {
-        'Authorization' => 'Bearer token',
-        'Expect' => '',
         'Page-Limit' => '200',
         'Page-Offset' => '200'
       }).
@@ -38,8 +31,6 @@ RSpec.describe DebuggingController, type: :controller do
     stub_request(:get, elite2listapi).
       with(
         headers: {
-          'Authorization' => 'Bearer token',
-          'Expect' => '',
           'Page-Limit' => '200',
           'Page-Offset' => '0'
         }).
