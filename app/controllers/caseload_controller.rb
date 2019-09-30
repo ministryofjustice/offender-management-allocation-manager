@@ -21,9 +21,7 @@ class CaseloadController < PrisonsApplicationController
   end
 
   def new
-    @new_cases = PrisonOffenderManagerService.get_allocated_offenders(
-      @pom.staff_id, active_prison
-    ).select(&:new_case?)
+    @new_cases = all_allocations.select(&:new_case?)
   end
 
   def handover_start

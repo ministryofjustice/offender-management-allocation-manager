@@ -9,8 +9,6 @@ class AllocationWithSentence
            :sentence_start_date, to: :@sentence
   delegate :updated_at, :nomis_offender_id, :primary_pom_allocated_at,
            :allocated_at_tier, to: :@allocation
-  delegate :handover_start_date, :responsibility_handover_date,
-           to: :offender
 
   attr_reader :responsibility
 
@@ -30,11 +28,5 @@ class AllocationWithSentence
       c.key?('primary_pom_nomis_id') && c['primary_pom_nomis_id'][1] == @staff_id ||
       c.key?('secondary_pom_nomis_id') && c['secondary_pom_nomis_id'][1] == @staff_id
     }.any?
-  end
-
-private
-
-  def offender
-    @offender ||= OffenderService.get_offender(@allocation.nomis_offender_id)
   end
 end
