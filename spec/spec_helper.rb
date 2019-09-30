@@ -1,14 +1,15 @@
 require 'simplecov'
 
-# Try to set this to current coverage levels so that it never goes down after a PR
-# 23 lines uncovered at 99.02% coverage
-SimpleCov.minimum_coverage 99
-
 SimpleCov.start 'rails' do
   add_filter 'app/services/nomis/error/'
   add_filter 'lib/allocation_validation.rb'
   add_filter 'app/jobs/custom_stats_logging_job.rb'
   add_group "Services", "app/services"
+
+  # Try to set this to current coverage levels so that it never goes down after a PR
+  # 23 lines uncovered at 99.02% coverage
+  minimum_coverage 99
+  maximum_coverage_drop 0
 end
 
 if ENV['CIRCLE_ARTIFACTS']
