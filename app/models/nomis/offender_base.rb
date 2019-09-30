@@ -16,7 +16,7 @@ module Nomis
     # Custom attributes
     attr_accessor :crn,
                   :allocated_pom_name, :case_allocation,
-                  :welsh_offender, :tier,
+                  :welsh_offender, :tier, :parole_review_date,
                   :sentence, :mappa_level,
                   :ldu, :team
 
@@ -151,6 +151,7 @@ module Nomis
       @mappa_level = record.mappa_level
       @ldu = record.local_divisional_unit
       @team = record.team.try(:name)
+      @parole_review_date = record.parole_review_date
     end
   end
 end

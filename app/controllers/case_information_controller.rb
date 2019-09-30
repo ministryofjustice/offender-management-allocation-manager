@@ -1,29 +1,21 @@
 # frozen_string_literal: true
 
 class CaseInformationController < PrisonsApplicationController
+  before_action :set_case_info, only: [:edit, :edit_prd, :show]
+  before_action :set_prisoner_from_url, only: [:new, :edit, :edit_prd, :show]
+
   def new
     @case_info = CaseInformation.new(
       nomis_offender_id: nomis_offender_id_from_url
     )
-
-    @prisoner = prisoner(nomis_offender_id_from_url)
   end
 
-  def edit
-    @case_info = CaseInformation.find_by(
-      nomis_offender_id: nomis_offender_id_from_url
-    )
+  def edit; end
 
-    @prisoner = prisoner(nomis_offender_id_from_url)
-  end
+  # Just edit the parole_review_date field
+  def edit_prd; end
 
-  # rubocop:disable Metrics/MethodLength
   def show
-    @case_info = CaseInformation.find_by(
-      nomis_offender_id: nomis_offender_id_from_url
-    )
-
-    @prisoner = prisoner(nomis_offender_id_from_url)
     @delius_data = DeliusData.where(noms_no: nomis_offender_id_from_url)
 
     if @delius_data.empty?
@@ -43,7 +35,6 @@ class CaseInformationController < PrisonsApplicationController
       @next_update_date = Date.tomorrow
     end
   end
-  # rubocop:enable Metrics/MethodLength
 
   def create
     @case_info = CaseInformation.create(
@@ -54,26 +45,41 @@ class CaseInformationController < PrisonsApplicationController
       manual_entry: true
     )
 
-    return redirect_to prison_summary_pending_path(active_prison) if @case_info.valid?
+    if @case_info.valid?
+      return redirect_to prison_summary_pending_path(active_prison,
+                                                     sort: params[:sort],
+                                                     page: params[:page]
+                         )
+    end
 
     @prisoner = prisoner(case_information_params[:nomis_offender_id])
     render :new
   end
 
   def update
-    case_info = CaseInformation.find_by(
+    @case_info = CaseInformation.find_by(
       nomis_offender_id: case_information_params[:nomis_offender_id]
     )
-    case_info.tier = case_information_params[:tier]
-    case_info.case_allocation = case_information_params[:case_allocation]
-    case_info.welsh_offender = case_information_params[:welsh_offender]
-    case_info.manual_entry = true
-    case_info.save
-
-    redirect_to new_prison_allocation_path(active_prison, case_info.nomis_offender_id)
+    @prisoner = prisoner(case_information_params[:nomis_offender_id])
+    # The only item that can be badly entered is parole_review_date
+    if @case_info.update(case_information_params.merge(manual_entry: true))
+      redirect_to new_prison_allocation_path(active_prison, @case_info.nomis_offender_id)
+    else
+      render 'edit_prd'
+    end
   end
 
 private
+
+  def set_prisoner_from_url
+    @prisoner = prisoner(nomis_offender_id_from_url)
+  end
+
+  def set_case_info
+    @case_info = CaseInformation.find_by(
+      nomis_offender_id: nomis_offender_id_from_url
+    )
+  end
 
   def prisoner(nomis_id)
     @prisoner ||= OffenderService.get_offender(nomis_id)
@@ -85,6 +91,7 @@ private
 
   def case_information_params
     params.require(:case_information).
-      permit(:nomis_offender_id, :tier, :case_allocation, :welsh_offender)
+      permit(:nomis_offender_id, :tier, :case_allocation, :welsh_offender,
+             :parole_review_date_dd, :parole_review_date_mm, :parole_review_date_yyyy)
   end
 end
