@@ -32,7 +32,6 @@ module OffenderHelper
       type + 'removed'
     elsif event.include? 'allocate'
       type + 'allocated'
-
     end
   end
 end
