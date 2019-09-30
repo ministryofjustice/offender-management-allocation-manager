@@ -58,12 +58,5 @@ module Delius
 
       true
     end
-
-    def values_for_row(row, escape_func)
-      MAPPED_CELLS.each_with_object([]) do |cell_label, lst|
-        v = row[cell_label]
-        lst << "'#{escape_func.call(v)}'"
-      end.join(', ')
-    end
   end
 end
