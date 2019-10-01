@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/LineLength
 class AllocationsController < PrisonsApplicationController
   delegate :update, to: :create
 
@@ -198,4 +197,3 @@ private
     @override[:suitability_detail] if @override.present?
   end
 end
-# rubocop:enable Metrics/LineLength
