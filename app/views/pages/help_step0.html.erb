@@ -1,16 +1,12 @@
 <%= render :partial => "content", locals: { page: 0 } %>
 
-<h2 class="govuk-heading-l">Overview</h2>
+<h1 class="part-title">Overview</h1>
 
 <div class="govuk-grid-column">
   <div class="govuk-body">
 
-    <p>You will be able to allocate prison offender managers to prisoners using the new allocations service.</p>
-
-    <p>There are a few tasks that need to be completed before you can start making allocations.
-      These need to be completed in the order that they are described in this guide.</p>
-
-    <p>You will need to work together to complete the set-up.</p>
+    <p>You will need to follow these steps whenever you need to add new staff members.</p>
+    <p>The following people need to work together to complete the set-up.</p>
 
     <ul>
       <li><%=link_to "Task 1", "help_step1" %>: Senior Probation Officer / Head of Offender Management Unit (SPO/HoOMU)</li>
@@ -21,10 +17,9 @@
       <li><%=link_to "Task 6", "help_step6" %>: Senior Probation Officer / Head of Offender Management Unit (SPO/HoOMU)</li>
     </ul>
 
-    <p>When you are set up, use Firefox to sign in to the service using your NOMIS ID
-        and password at:
-      <%= link_to "https://moic.service.justice.gov.uk", "https://moic.service.justice.gov.uk" %>
-    </p>
+    <%= render :partial => "next_link", locals: { url: help_step1_path, next_page_title: 'List everyone using the service'} %>
   </div>
 </div>
+
+
 <br>
