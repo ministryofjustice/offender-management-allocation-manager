@@ -1,6 +1,6 @@
 <%= render :partial => "content", locals: { page: 1 }%>
 
-<h2 class="govuk-heading-l">List everyone using the service</h2>
+<h1 class="part-title">List everyone using the service</h1>
 <div class="govuk-inset-text">
   Senior Probation Officer / Head of Offender Management Unit (SPO/HoOMU) task
 </div>
@@ -27,8 +27,6 @@
 
     <p>Send the names, roles and email addresses to: <%= mail_to("moic@digital.justice.gov.uk")%></p>
 
-    <p>We will give everyone access to the new service and let you know when this has been done.</p>
-
     <h2>Share the information with the Local System Administrator (LSA)</h2>
 
     <p>You need to send the same list of names, roles and, (for POMs only),
@@ -36,5 +34,7 @@
       <%= link_to "Task 2: Set up access in Digital Prison Services", "help_step2" %>.</p>
 
     <p>They will also need to access this guide.</p>
+
+    <%= render :partial => "next_link", locals: { url: help_step2_path, next_page_title: 'Set up access in Digital Prison Services'} %>
   </div>
 </div>
