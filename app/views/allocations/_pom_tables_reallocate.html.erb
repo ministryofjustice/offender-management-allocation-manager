@@ -1,5 +1,5 @@
 <h4 class="govuk-heading-m">
-  Recommendation: <%= @recommended_pom_type %> POM
+  Recommendation: <%= @prisoner.recommended_pom_type %> POM
 </h4>
 
 <p>This recommendation takes the prisoner's tier and
@@ -7,7 +7,7 @@ time left to serve into account.</p>
 
 <table class="govuk-table responsive">
   <thead class="govuk-table__head">
-  <h2 class="govuk-heading-s">Active <%= @recommended_pom_type.downcase %> POMs</h2>
+  <h2 class="govuk-heading-s">Active <%= @prisoner.recommended_pom_type.downcase %> POMs</h2>
   <tr class="govuk-table__row">
     <th class="govuk-table__header" scope="col">Name</th>
     <th class="govuk-table__header" scope="col">Previous<br/>allocation</th>
@@ -34,7 +34,7 @@ time left to serve into account.</p>
       <td aria-label="Total" class="govuk-table__cell "><%= pom.total_cases %></td>
       <td aria-label="Working pattern" class="govuk-table__cell"><%= working_pattern_name(pom.working_pattern) %></td>
       <td aria-label="Action" class="govuk-table__cell table_cell__left_align">
-      <%= link_to "Allocate", prison_confirm_reallocation_path(@prison, @prisoner.offender_no, pom.staff_id), class: "govuk-link" %>
+      <%= link_to "Allocate", prison_confirm_reallocation_path(@prison, @prisoner.offender_no, pom.staff_id, sort: params[:sort], page: params[:page]), class: "govuk-link" %>
       </td>
     </tr>
   <% end %>
@@ -49,7 +49,7 @@ time left to serve into account.</p>
 <details class="govuk-details">
   <summary class="govuk-details__summary">
     <span class="govuk-details__summary-text">
-      Show active <%= @not_recommended_pom_type.downcase %> POMs
+      Show active <%= @prisoner.non_recommended_pom_type.downcase %> POMs
     </span>
   </summary>
   <div class="govuk-details__text">
@@ -83,7 +83,7 @@ time left to serve into account.</p>
           <td aria-label="Total" class="govuk-table__cell "><%= pom.total_cases %></td>
           <td aria-label="Working pattern" class="govuk-table__cell"><%= working_pattern_name(pom.working_pattern) %></td>
           <td aria-label="Action" class="govuk-table__cell table_cell__right_align">
-          <%= link_to "Allocate", new_prison_overrides_path(@prison, @prisoner.offender_no, pom.staff_id), class: "govuk-link" %>
+          <%= link_to "Allocate", new_prison_overrides_path(@prison, @prisoner.offender_no, pom.staff_id, sort: params[:sort], page: params[:page]), class: "govuk-link" %>
           </td>
         </tr>
       <% end %>

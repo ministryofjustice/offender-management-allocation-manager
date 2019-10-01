@@ -37,12 +37,10 @@ class OnboardPrison
 
 private
 
-  # rubocop:disable Metrics/LineLength
   def filter_existing_records(offender_ids)
     existing = CaseInformation.where(nomis_offender_id: offender_ids).pluck(:nomis_offender_id)
     offender_ids - existing
   end
-  # rubocop:enable Metrics/LineLength
 
   def list_to_lookup(delius_records)
     return {} if delius_records.blank?

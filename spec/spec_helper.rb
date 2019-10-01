@@ -1,7 +1,8 @@
 require 'simplecov'
 
 # Try to set this to current coverage levels so that it never goes down after a PR
-SimpleCov.minimum_coverage 98.85
+# 23 lines uncovered at 99.02% coverage
+SimpleCov.minimum_coverage 99
 
 SimpleCov.start 'rails' do
   add_filter 'app/services/nomis/error/'

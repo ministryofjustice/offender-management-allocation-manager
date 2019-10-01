@@ -40,17 +40,17 @@ class AllocationValidation
       end
 
       # If the offender is at this prison, we're good .
-      next if offender.latest_location_id == prison
+      next if offender.prison_id == prison
 
       # If the offender is out, deallocate as a release
-      if offender.latest_location_id == 'OUT'
+      if offender.prison_id == 'OUT'
         puts "#{offender.offender_no} appears to have been released - deallocating"
         AllocationVersion.deallocate_offender(offender.offender_no, 'offender_released')
         next
       end
 
       # The offender is at a different prison so deallocate as a transfer
-      puts "#{offender.offender_no} (allocated) appears to have been transferred to #{offender.latest_location_id} - deallocating"
+      puts "#{offender.offender_no} (allocated) appears to have been transferred to #{offender.prison_id} - deallocating"
       AllocationVersion.deallocate_offender(offender.offender_no, 'offender_transferred')
     }
   end

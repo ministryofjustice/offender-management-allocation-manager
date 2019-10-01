@@ -1,5 +1,11 @@
 module Nomis
   class OffenderBase
+    delegate :home_detention_curfew_eligibility_date,
+             :conditional_release_date, :release_date,
+             :parole_eligibility_date, :tariff_date,
+             :automatic_release_date,
+             to: :sentence
+
     attr_accessor :first_name,
                   :last_name,
                   :date_of_birth,
@@ -10,7 +16,7 @@ module Nomis
     # Custom attributes
     attr_accessor :crn,
                   :allocated_pom_name, :case_allocation,
-                  :welsh_offender, :tier,
+                  :welsh_offender, :tier, :parole_review_date,
                   :sentence, :mappa_level,
                   :ldu, :team
 
@@ -34,6 +40,14 @@ module Nomis
       sentence.home_detention_curfew_eligibility_date.present? ||
       sentence.tariff_date.present? ||
         @sentence_type.indeterminate_sentence?
+    end
+
+    def early_allocation?
+      false
+    end
+
+    def nps_case?
+      case_allocation == 'NPS'
     end
 
     def sentence_type_code
@@ -137,6 +151,7 @@ module Nomis
       @mappa_level = record.mappa_level
       @ldu = record.local_divisional_unit
       @team = record.team.try(:name)
+      @parole_review_date = record.parole_review_date
     end
   end
 end
