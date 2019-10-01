@@ -54,7 +54,7 @@ private
       start_date = offender.handover_start_date.first
 
       start_date.present? &&
-      start_date.between?(Time.zone.today, one_week_time)
+      start_date.between?(Time.zone.today - 1.year, one_week_time)
     }
 
     upcoming_offenders.map{ |offender|
