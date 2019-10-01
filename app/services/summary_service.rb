@@ -77,8 +77,12 @@ class SummaryService
 private
 
   def self.add_reception_date(offender)
-    detail = Nomis::Elite2::OffenderApi.get_offender(offender.offender_no)
-    offender.reception_date = detail.reception_date
+    movements = Nomis::Elite2::MovementApi.admissions_for(offender.offender_no)
+
+    arrival = movements.reverse.detect { |movement|
+      movement.to_agency == offender.prison_id
+    }
+    offender.reception_date = arrival.create_date_time
   end
 
   def self.restructure_pom_name(pom_name)

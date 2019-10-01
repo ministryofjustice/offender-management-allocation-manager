@@ -6,9 +6,9 @@ module Nomis
              :automatic_release_date,
              to: :sentence
 
-    attr_reader :first_name, :last_name, :offender_no, :date_of_birth
+    attr_reader :first_name, :last_name, :date_of_birth
 
-    attr_accessor :convicted_status, :category_code
+    attr_accessor :convicted_status, :category_code, :offender_no
 
     # Custom attributes
     attr_accessor :crn,

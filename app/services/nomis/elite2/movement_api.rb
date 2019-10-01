@@ -26,7 +26,22 @@ module Nomis
           api_deserialiser.deserialise(Nomis::Movement, movement)
         }
       end
+
       # rubocop:enable Metrics/LineLength
+      def self.admissions_for(offender_no)
+        # admissions need to include transfers from one place to another
+        route = '/elite2api/api/movements/offenders?movementTypes=ADM&movementTypes=TRN&latestOnly=false'
+
+        cache_key = "#{route}#{offender_no}"
+
+        Rails.cache.fetch(cache_key,
+                          expires_in: Rails.configuration.cache_expiry) do
+          data = e2_client.post(route, [offender_no])
+          data.sort_by { |k| k['createDateTime'] }.map{ |movement|
+            api_deserialiser.deserialise(Nomis::Movement, movement)
+          }
+        end
+      end
     end
   end
 end
