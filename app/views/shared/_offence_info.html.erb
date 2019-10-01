@@ -57,7 +57,7 @@
           <%= format_date(@prisoner.parole_review_date, replacement: 'Unknown') %>
           <%= link_to 'Update', prison_edit_prd_path(@prison, @prisoner.offender_no), class: "govuk-link pull-right" %>
         <% else %>
-          'N/A'
+          N/A
         <% end %>
       </td>
     </tr>
