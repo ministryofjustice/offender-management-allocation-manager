@@ -13,24 +13,28 @@
   </div>
 
   <div class="govuk-section-break--visible">
-    <h1 class="govuk-heading-l">Updating case information</h1>
-    <p>Contents</p>
-    <ul class="govuk-list--bullet">
-      <li>
-        <% if page == 0 %>
-          Overview
-        <% else %>
-          <%= link_to "Overview", update_case_information_path %>
-        <% end %>
-      </li>
-      <li>
-        <% if page == 1 %>
-          Updating nDelius
-        <% else %>
-          <%= link_to "Updating nDelius", updating_ndelius_path %>
-        <% end %>
-      </li>
-    </ul>
+    <h1 class="govuk-heading-xl">Updating case information</h1>
+    <nav class="gem-c-contents-list" role="navigation">
+
+      <h2 class="gem-c-contents-list__title">Contents</h2>
+      <ol class="gem-c-contents-list__list">
+        <li class="gem-c-contents-list__list-item gem-c-contents-list__list-item--dashed">
+          <% if page == 0 %>
+            Overview
+          <% else %>
+            <%= link_to "Overview", update_case_information_path %>
+          <% end %>
+        </li>
+
+        <li class="gem-c-contents-list__list-item gem-c-contents-list__list-item--dashed">
+          <% if page == 1 %>
+            Updating nDelius
+          <% else %>
+            <%= link_to "Updating nDelius", updating_ndelius_path %>
+          <% end %>
+        </li>
+      </ol>
+    </nav>
   </div>
 </div>
-<br>
+
