@@ -8,8 +8,8 @@
     <%= form_tag(prison_overrides_path(@prison), method: :post, id: "override_form")  do %>
 
       <h1 class="govuk-heading-xl govuk-!-margin-top-4">
-        <%= "Why are you allocating a probation officer POM?" if @recommended_pom_type == 'Prison officer' %>
-        <%= "Why are you allocating a prison officer POM?" if @recommended_pom_type == 'Probation officer' %>
+        <%= "Why are you allocating a probation officer POM?" if @prisoner.recommended_pom_type == 'Prison officer' %>
+        <%= "Why are you allocating a prison officer POM?" if @prisoner.recommended_pom_type == 'Probation officer' %>
       </h1>
       <div class='govuk-!-margin-top-4'>
         <div class="govuk-form-group <% if @override.errors[:override_reasons].present? %>govuk-form-group--error<% end %>">
@@ -26,7 +26,7 @@
                 <input class="govuk-checkboxes__input" id="override-conditional-1" name="override[override_reasons][]" type="checkbox" value="suitability" data-aria-controls="override-1"
                        <%= 'checked=checked' if override_reason_contains(@override, 'suitability') %> >
                 <label class="govuk-label govuk-checkboxes__label"
-                       for="override-conditional-1"><%= complex_reason_label(@recommended_pom_type) %></label>
+                       for="override-conditional-1"><%= complex_reason_label(@prisoner.recommended_pom_type) %></label>
               </div>
               <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="override-1">
                 <% if @override.errors[:suitability_detail].present? %>
@@ -45,7 +45,7 @@
               </div>
               <div class="govuk-checkboxes__item">
                 <%= check_box_tag("override[override_reasons][]", "no_staff", override_reason_contains(@override, 'no_staff'), id: "override-2", class: "govuk-checkboxes__input") %>
-                <%= label_tag "override[override_reasons][]", "No available #{@recommended_pom_type.downcase} POMs", class: 'govuk-label govuk-checkboxes__label' %>
+                <%= label_tag "override[override_reasons][]", "No available #{@prisoner.recommended_pom_type.downcase} POMs", class: 'govuk-label govuk-checkboxes__label' %>
               </div>
               <div class="govuk-checkboxes__item">
                 <%= check_box_tag("override[override_reasons][]", "continuity", override_reason_contains(@override, 'continuity'), id: "override-3", class: "govuk-checkboxes__input") %>
