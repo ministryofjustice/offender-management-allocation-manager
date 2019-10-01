@@ -13,7 +13,6 @@ class SummaryService
   end
 
   # rubocop:disable Metrics/MethodLength
-  # rubocop:disable Metrics/LineLength
   # rubocop:disable Metrics/PerceivedComplexity
   # rubocop:disable Metrics/CyclomaticComplexity
   def self.summary(summary_type, prison, page, params)
@@ -70,7 +69,7 @@ class SummaryService
     }
   end
 # rubocop:enable Metrics/CyclomaticComplexity
-# rubocop:enable Metrics/LineLength
+
 # rubocop:enable Metrics/MethodLength
 # rubocop:enable Metrics/PerceivedComplexity
 

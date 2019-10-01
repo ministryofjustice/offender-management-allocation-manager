@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class HandoverDateService
-  # rubocop:disable Metrics/LineLength
   def self.handover_start_date(offender)
     return [nil, 'No earliest release date'] if offender.earliest_release_date.nil?
 
@@ -13,7 +12,6 @@ class HandoverDateService
       [nil, 'CRC or Early Allocation']
     end
   end
-  # rubocop:enable Metrics/LineLength
 
   def self.responsibility_handover_date(offender)
     return [nil, 'No earliest release date'] if offender.earliest_release_date.nil?

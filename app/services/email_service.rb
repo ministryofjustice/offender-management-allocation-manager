@@ -69,11 +69,9 @@ class EmailService
 
 private
 
-  # rubocop:disable Metrics/LineLength
   def url
     @url ||= Rails.application.routes.url_helpers.prison_caseload_index_url(@allocation.prison)
   end
-  # rubocop:enable Metrics/LineLength
 
   def current_responsibility
     ResponsibilityService.

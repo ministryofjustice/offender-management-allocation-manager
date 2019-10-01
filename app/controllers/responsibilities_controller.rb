@@ -18,7 +18,6 @@ class ResponsibilitiesController < PrisonsApplicationController
     end
   end
 
-  # rubocop:disable Metrics/LineLength
   def create
     @responsibility = Responsibility.create! responsibility_params
 
@@ -39,7 +38,6 @@ class ResponsibilitiesController < PrisonsApplicationController
 
     redirect_to new_prison_allocation_path(@prison, @responsibility.nomis_offender_id)
   end
-# rubocop:enable Metrics/LineLength
 
 private
 
