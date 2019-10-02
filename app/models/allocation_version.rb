@@ -139,7 +139,7 @@ class AllocationVersion < ApplicationRecord
     if movement_type == AllocationVersion::OFFENDER_RELEASED
       movements = Nomis::Elite2::MovementApi.movements_for(allocation.nomis_offender_id)
       if movements.present?
-        movement = movements.first
+        movement = movements.last
         return movement.from_agency if movement.from_prison?
       end
     elsif movement_type == AllocationVersion::OFFENDER_TRANSFERRED
