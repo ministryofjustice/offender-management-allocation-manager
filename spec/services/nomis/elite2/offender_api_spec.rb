@@ -60,14 +60,6 @@ describe Nomis::Elite2::OffenderApi do
       response = described_class.get_multiple_offenders([])
       expect(response.count).to eq(0)
     end
-
-    it 'can return results as a hash',
-       vcr: { cassette_name: :offender_api_multiple_offenders_hash_spec } do
-      h = described_class.get_multiple_offenders_as_hash(offenders)
-
-      expect(h).to be_instance_of(Hash)
-      expect(h.key? offenders.first).not_to be_nil
-    end
   end
 
   describe 'Single offender' do

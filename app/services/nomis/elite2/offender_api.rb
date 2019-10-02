@@ -55,12 +55,6 @@ module Nomis
         )
       end
 
-      def self.get_multiple_offenders_as_hash(offender_nos)
-        get_multiple_offenders(offender_nos).map { |offender|
-          [offender.offender_no, offender]
-        }.to_h
-      end
-
       def self.get_offence(booking_id)
         route = "/elite2api/api/bookings/#{booking_id}/mainOffence"
         data = e2_client.get(route)
