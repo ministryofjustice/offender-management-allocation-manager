@@ -62,12 +62,6 @@ class AllocationVersion < ApplicationRecord
     end
   end
 
-  # Note - this only works for active allocations, not ones that have been de-allocated
-  # If this returns false it means that we are a secondary/co-working allocation
-  def for_primary_only?
-    secondary_pom_nomis_id.blank?
-  end
-
   validate do |av|
     if av.primary_pom_nomis_id.present? &&
       av.primary_pom_nomis_id == av.secondary_pom_nomis_id
