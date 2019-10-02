@@ -62,12 +62,6 @@ class AllocationVersion < ApplicationRecord
     end
   end
 
-  # Note - this only works for active allocations, not ones that have been de-allocated
-  # If this returns false it means that we are a secondary/co-working allocation
-  def for_primary_only?
-    secondary_pom_nomis_id.blank?
-  end
-
   validate do |av|
     if av.primary_pom_nomis_id.present? &&
       av.primary_pom_nomis_id == av.secondary_pom_nomis_id
@@ -139,7 +133,7 @@ class AllocationVersion < ApplicationRecord
     if movement_type == AllocationVersion::OFFENDER_RELEASED
       movements = Nomis::Elite2::MovementApi.movements_for(allocation.nomis_offender_id)
       if movements.present?
-        movement = movements.first
+        movement = movements.last
         return movement.from_agency if movement.from_prison?
       end
     elsif movement_type == AllocationVersion::OFFENDER_TRANSFERRED
