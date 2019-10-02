@@ -65,7 +65,7 @@ class PrisonOffenderManagerService
 
     # Get all of the offenders at this prison and select only those that
     # appear in an allocation.  Then for each one apply a map to determine
-    # the responsibility and pair it with the allocation and sentece.
+    # the responsibility and pair it with the allocation and sentence.
     OffenderService.get_offenders_for_prison(prison).select{ |offender|
       offender_ids.include?(offender.offender_no)
     }.map { |offender|
