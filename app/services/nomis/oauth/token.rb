@@ -35,6 +35,40 @@ module Nomis
         true
       end
 
+      def expiration_date?
+        payload = JWT.decode(
+          access_token,
+          OpenSSL::PKey::RSA.new(public_key),
+          true,
+          algorithm: 'RS256'
+        )
+
+        if payload.first['exp'].nil?
+          false
+        else
+          true
+        end
+      rescue JWT::DecodeError
+        false
+      end
+
+      def read_scope?
+        payload = JWT.decode(
+          access_token,
+          OpenSSL::PKey::RSA.new(public_key),
+          true,
+          algorithm: 'RS256'
+        )
+
+        if payload.first['scope'].nil? || !payload.first['scope'].include?('read')
+          false
+        else
+          true
+        end
+      rescue JWT::DecodeError
+        false
+      end
+
       def self.from_json(payload)
         Token.new.tap { |obj|
           obj.access_token = payload['access_token']
