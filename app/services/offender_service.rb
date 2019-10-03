@@ -75,6 +75,16 @@ class OffenderService
     end
   end
 
+  def self.get_multiple_offenders(offender_ids)
+    Nomis::Elite2::OffenderApi.get_multiple_offenders(offender_ids)
+  end
+
+  def self.get_multiple_offenders_as_hash(offender_ids)
+    Nomis::Elite2::OffenderApi.get_multiple_offenders(offender_ids).map { |offender|
+      [offender.offender_no, offender]
+    }.to_h
+  end
+
   def self.get_offenders_for_prison(prison)
     OffenderEnumerator.new(prison).select { |offender|
       offender.age >= 18 &&
