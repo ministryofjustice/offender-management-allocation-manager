@@ -21,7 +21,7 @@ class CaseloadController < PrisonsApplicationController
   end
 
   def new
-    @new_cases = all_allocations.select(&:new_case?)
+    @new_cases = sort_allocations(all_allocations.select(&:new_case?))
   end
 
   def handover_start
