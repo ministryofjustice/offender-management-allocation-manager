@@ -134,6 +134,8 @@ class PrisonService
 
   ENGLISH_HUB_PRISON_CODES = %w[IWI SLI VEI]
 
+  OPEN_PRISON_CODES = %w[HDI HBI KMI KVI LYI NSI UPI SPI EHI SUI TCI FDI]
+
   def self.prison_codes
     PRISONS.keys
   end
@@ -144,6 +146,10 @@ class PrisonService
 
   def self.english_hub_prison?(code)
     ENGLISH_HUB_PRISON_CODES.include?(code)
+  end
+
+  def self.open_prison?(code)
+    OPEN_PRISON_CODES.include?(code)
   end
 
   def self.name_for(code)
