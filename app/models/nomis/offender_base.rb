@@ -59,16 +59,16 @@ module Nomis
       @sentence_type.try(:recall_sentence?)
     end
 
+    def indeterminate_sentence?
+      @sentence_type.try(:indeterminate_sentence?)
+    end
+
     def criminal_sentence?
       @sentence_type.civil? == false
     end
 
     def civil_sentence?
       @sentence_type.civil?
-    end
-
-    def indeterminate_sentence?
-      @sentence_type.indeterminate_sentence?
     end
 
     def describe_sentence
@@ -131,6 +131,10 @@ module Nomis
       @sentence_type = SentenceType.new(payload['imprisonmentStatus'])
       @category_code = payload['categoryCode']
       @date_of_birth = deserialise_date(payload, 'dateOfBirth')
+    end
+
+    def inprisonment_status=(status)
+      @sentence_type = SentenceType.new(status)
     end
 
     def handover_start_date
