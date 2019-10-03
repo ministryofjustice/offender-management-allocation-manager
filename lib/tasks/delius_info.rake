@@ -60,7 +60,7 @@ namespace :delius_etl do
       :provider, :provider_code,
       :ldu, :ldu_code,
       :team, :team_code,
-      :mappa, :mappa_levels
+      :mappa, :mappa_levels, :date_of_birth
     ]
   end
 end
