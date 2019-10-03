@@ -56,7 +56,12 @@
         </a>
         <%= sort_arrow('last_name') %>
       </th>
-      <th class="govuk-table__header" scope="col">Prisoner number</th>
+      <th class="govuk-table__header" scope="col">
+        <a href="<%= sort_link('allocated_at_tier') %>">
+        Tier
+        </a>
+        <%= sort_arrow('allocated_at_tier') %>
+      </th>
       <th class="govuk-table__header" scope="col">
         <a href="<%= sort_link('earliest_release_date') %>">
           Earliest release<br/> date
@@ -83,8 +88,16 @@
     <tbody class="govuk-table__body">
     <% @allocations.each_with_index do |offender, i| %>
       <tr class="govuk-table__row offender_row_<%= i %>">
-        <td aria-label="Prisoner name" class="govuk-table__cell "><%= highlight(offender.full_name, @q) %></td>
-        <td aria-label="Prisoner number" class="govuk-table__cell "><%= highlight(offender.nomis_offender_id, @q) %></td>
+        <td aria-label="Prisoner name" class="govuk-table__cell ">
+          <%= highlight(offender.full_name, @q) %>
+          <br/>
+          <span class='govuk-hint govuk-!-margin-bottom-0'>
+            <%= highlight(offender.nomis_offender_id, @q) %>
+          </span>
+        </td>
+        <td aria-label="Tier" class="govuk-table__cell tier">
+          <%= offender.allocated_at_tier %>
+        </td>
         <td aria-label="Release date" class="govuk-table__cell "><%= format_date(offender.earliest_release_date) %></td>
         <td aria-label="Allocation date" class="govuk-table__cell "><%= format_date(offender.primary_pom_allocated_at) %></td>
         <td aria-label="Role" class="govuk-table__cell "><%= offender.responsibility %></td>
