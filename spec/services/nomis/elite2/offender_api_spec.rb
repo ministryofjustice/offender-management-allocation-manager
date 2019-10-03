@@ -42,6 +42,26 @@ describe Nomis::Elite2::OffenderApi do
     end
   end
 
+  describe 'Multiple offenders' do
+    let!(:offenders) {
+      %w[G4273GI G7806VO G3462VT G1670VU G5897GP G3536UF G7998GJ G2407UH G4879UP G8060UF]
+    }
+
+    it 'can get multiple offenders',
+       vcr: { cassette_name: :offender_api_multiple_offenders_spec } do
+      response = described_class.get_multiple_offenders(offenders)
+
+      expect(response.first).to be_instance_of(Nomis::Offender)
+      expect(response.count).to eq(10)
+    end
+
+    it 'can handle getting an empty list',
+       vcr: { cassette_name: :offender_api_multiple_offenders_empty_spec } do
+      response = described_class.get_multiple_offenders([])
+      expect(response.count).to eq(0)
+    end
+  end
+
   describe 'Single offender' do
     it "can get a single offender's details",
        vcr: { cassette_name: :offender_api_single_offender_spec } do
