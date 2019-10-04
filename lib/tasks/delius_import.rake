@@ -20,7 +20,7 @@ namespace :delius_etl do
       record = {}
 
       row.each_with_index do |val, idx|
-        key = fields[idx]
+        key = key_fields[idx]
         record[key] = val
       end
 
@@ -36,8 +36,8 @@ namespace :delius_etl do
     Rails.logger.info("#{row_count} Records processed #{total} changed records")
   end
 
-  def fields
-    @fields ||= [
+  def key_fields
+    @key_fields ||= [
       :crn, :pnc_no, :noms_no, :fullname, :tier, :roh_cds,
       :offender_manager, :org_private_ind, :org,
       :provider, :provider_code,

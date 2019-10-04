@@ -188,6 +188,12 @@ feature "view POM's caseload" do
       expect(page).to have_content('Showing 1 - 14 of 14 results')
     end
 
+    it 'shows the tier' do
+      within('.offender_row_20 .tier') do
+        expect(page).to have_content('A')
+      end
+    end
+
     it 'can be searched by responsible role' do
       select 'Responsible', from: 'role'
       click_on 'Search'
@@ -248,6 +254,35 @@ feature "view POM's caseload" do
 
     expect(page).to have_content("New cases")
     expect(page).to have_content("Abbella, Ozullirn")
+  end
+
+  it 'can sort all cases that have been allocated to a specific POM in the last week', :versioning, vcr: { cassette_name: :show_and_sort_new_cases } do
+    signin_user('PK000223')
+
+    visit prison_confirm_allocation_path('LEI', nomis_offender_id, nomis_staff_id)
+    click_button 'Complete allocation'
+
+    visit prison_caseload_index_path('LEI')
+    within('.new-cases-count') do
+      click_link('1')
+    end
+
+    expect(page).to have_content("New cases")
+
+    expected_name = 'Abbella, Ozullirn'
+
+    # The first name...
+    within('.offender_row_0') do
+      expect(find('.prisoner-name').text).to eq(expected_name)
+    end
+
+    # After sorting ...
+    click_link('Prisoner name')
+
+    # Should be the last name
+    within('.offender_row_20') do
+      expect(find('.prisoner-name').text).to eq(expected_name)
+    end
   end
 
   it 'stops staff without the POM role from viewing the my caseload page', vcr: { cassette_name: :non_pom_caseload }  do
