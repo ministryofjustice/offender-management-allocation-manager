@@ -22,7 +22,6 @@ class ResponsibilitiesController < PrisonsApplicationController
     @responsibility = Responsibility.create! responsibility_params
 
     me = Nomis::Elite2::UserApi.user_details(current_user).email_address.try(:first)
-    byebug
 
     emails = [me, ldu_email_address(@responsibility.nomis_offender_id)].compact
 
