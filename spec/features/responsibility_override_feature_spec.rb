@@ -33,7 +33,7 @@ feature 'Responsibility override' do
 
       expect {
         click_button 'Confirm'
-      }.to change(enqueued_jobs, :count).by(1)
+      }.to change(enqueued_jobs, :count).by(2)
 
       expect(page).to have_content 'Current case owner Community'
     end
