@@ -14,7 +14,12 @@ protected
 private
 
   def check_prison_access
+    unless PrisonService.exists?(active_prison)
+      redirect_to('/401')
+      return
+    end
     redirect_to '/401' unless caseloads.include?(active_prison)
+
     @prison = active_prison
   end
 end
