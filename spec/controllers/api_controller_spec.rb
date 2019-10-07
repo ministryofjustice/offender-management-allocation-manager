@@ -1,11 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe ApiController, type: :controller do
-  let(:private_key) { file_fixture('api/private.key').read }
-  let(:public_key) { file_fixture('api/public.key').read }
+  let(:rsa_private) { OpenSSL::PKey::RSA.generate 2048 }
+  let(:rsa_public) { Base64.strict_encode64(rsa_private.public_key.to_s) }
 
   before do
-    allow_any_instance_of(Nomis::Oauth::Token).to receive(:public_key).and_return(public_key)
+    allow(Rails.configuration).to receive(:nomis_oauth_public_key).and_return(rsa_public)
   end
 
   it 'blocks access for missing tokens' do
@@ -100,7 +100,7 @@ RSpec.describe ApiController, type: :controller do
   end
 
   def encode_payload(payload)
-    JWT.encode(payload, OpenSSL::PKey::RSA.new(private_key), 'RS256')
+    JWT.encode(payload, OpenSSL::PKey::RSA.new(rsa_private), 'RS256')
   end
 
   def request_header(payload)

@@ -50,8 +50,6 @@ module Nomis
         return false unless payload.first['scope'].include?('read')
 
         true
-      rescue JWT::DecodeError
-        false
       end
 
       def self.from_json(payload)

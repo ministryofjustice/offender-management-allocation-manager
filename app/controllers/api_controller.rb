@@ -12,7 +12,7 @@ private
   def verify_token
     access_token = parse_access_token(request.headers['AUTHORIZATION'])
 
-    if valid_token?(access_token)
+    if valid_token_with_scope?(access_token)
       true
     else
       render json: { status: 'error' }
@@ -27,15 +27,13 @@ private
     auth_header.split.last
   end
 
-  def valid_token?(access_token)
-    return false if Nomis::Oauth::Token.new(access_token: access_token).expired?
-
-    if Nomis::Oauth::Token.new(access_token: access_token).valid_token?
-      true
-    else
-      false
-    end
-  rescue JWT::DecodeError
+  def valid_token_with_scope?(access_token)
+    return true if Nomis::Oauth::Token.new(access_token: access_token).valid_token?
+  rescue JWT::DecodeError => e
+    Raven.capture_exception(e)
+    false
+  rescue JWT::ExpiredSignature => e
+    Raven.capture_exception(e)
     false
   end
 end
