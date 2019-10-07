@@ -12,15 +12,23 @@ private
   def verify_token
     access_token = parse_access_token(request.headers['AUTHORIZATION'])
 
-    if access_token.nil? || invalid_token?(access_token)
-      return render json: { status: 'error' }
-    end
+    return render_error if no_token(access_token)
 
-    return render json: { status: 'error' } unless expiry_key?(access_token)
+    return render_error unless expiry_key?(access_token)
 
-    return render json: { status: 'error' } unless valid_scope?(access_token)
+    return render_error unless valid_scope?(access_token)
 
     true
+  end
+
+  def no_token(access_token)
+    return true if access_token.nil?
+
+    invalid_token?(access_token)
+  end
+
+  def render_error
+    render json: { status: 'error' }
   end
 
   def parse_access_token(auth_header)
