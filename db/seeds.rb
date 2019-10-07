@@ -32,3 +32,58 @@ PomDetail.find_or_create_by!(
   status: 'active',
   working_pattern: 1
 )
+
+LocalDivisionalUnit.create!(
+    code: "WELDU",
+    name: "Welsh LDU",
+    email_address: "WalesNPS@example.com"
+)
+
+LocalDivisionalUnit.create!(
+    code: "ENLDU",
+    name: "English LDU",
+    email_address: "EnglishNPS@example.com"
+)
+
+# The offenders below are those with release dates a few years in the future and can therefore use the
+# responsibility override workflow
+
+CaseInformation.find_or_create_by!(
+    nomis_offender_id: 'G7658UL',
+    tier: 'A',
+    case_allocation: 'NPS',
+    welsh_offender: 'Yes',
+    manual_entry: true,
+    local_divisional_unit_id: 1,
+    team_id: 4
+)
+
+CaseInformation.find_or_create_by!(
+    nomis_offender_id: 'G7517GF',
+    tier: 'B',
+    case_allocation: 'NPS',
+    welsh_offender: 'Yes',
+    manual_entry: true,
+    local_divisional_unit_id: 1,
+    team_id: 51
+)
+
+CaseInformation.find_or_create_by!(
+    nomis_offender_id: 'G3536UF',
+    tier: 'A',
+    case_allocation: 'NPS',
+    welsh_offender: 'No',
+    manual_entry: true,
+    local_divisional_unit_id: 2,
+    team_id: 6
+)
+
+CaseInformation.find_or_create_by!(
+    nomis_offender_id: 'G2260UO',
+    tier: 'B',
+    case_allocation: 'NPS',
+    welsh_offender: 'No',
+    manual_entry: true,
+    local_divisional_unit_id: 2,
+    team_id: 34
+)
