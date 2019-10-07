@@ -45,9 +45,9 @@ module Nomis
 
         return false if payload.first['exp'].nil?
 
-        if payload.first['scope'].nil? || !payload.first['scope'].include?('read')
-          return false
-        end
+        return false if payload.first['scope'].nil?
+
+        return false unless payload.first['scope'].include?('read')
 
         true
       rescue JWT::DecodeError

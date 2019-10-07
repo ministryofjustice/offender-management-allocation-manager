@@ -28,9 +28,7 @@ private
   end
 
   def valid_token?(access_token)
-    if Nomis::Oauth::Token.new(access_token: access_token).expired?
-      return false
-    end
+    return false if Nomis::Oauth::Token.new(access_token: access_token).expired?
 
     if Nomis::Oauth::Token.new(access_token: access_token).valid_token?
       true
