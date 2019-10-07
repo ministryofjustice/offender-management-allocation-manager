@@ -45,6 +45,12 @@ LocalDivisionalUnit.create!(
     email_address: "EnglishNPS@example.com"
 )
 
+LocalDivisionalUnit.create!(
+    code: "OTHERLDU",
+    name: "English LDU 2",
+    email_address: nil
+)
+
 # The offenders below are those with release dates a few years in the future and can therefore use the
 # responsibility override workflow
 
@@ -84,6 +90,6 @@ CaseInformation.find_or_create_by!(
     case_allocation: 'NPS',
     welsh_offender: 'No',
     manual_entry: true,
-    local_divisional_unit_id: 2,
+    local_divisional_unit_id: 3,
     team_id: 34
 )
