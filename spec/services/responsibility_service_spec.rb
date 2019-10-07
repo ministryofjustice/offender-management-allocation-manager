@@ -2,11 +2,26 @@ require 'rails_helper'
 
 describe ResponsibilityService do
   describe '#calculate_pom_responsibility' do
+    context 'when indeterminate with dates in the past' do
+      let(:offender) {
+        OpenStruct.new indeterminate_sentence?: true,
+                       recalled?: false,
+                       earliest_release_date: Time.zone.today - 1.year,
+                       sentenced?: true
+      }
+
+      it 'is responsible' do
+        resp = described_class.calculate_pom_responsibility(offender)
+
+        expect(resp).to eq ResponsibilityService::RESPONSIBLE
+      end
+    end
+
     context 'when offender is english' do
       let(:offender) {
         OpenStruct.new welsh_offender: false,
                        case_allocation: case_allocation,
-                       indeterminate_sentence?: indeterminate_sentence,
+                       indeterminate_sentence?: false,
                        recalled?: recalled,
                        sentence_start_date: start_date,
                        earliest_release_date: release_date,
@@ -16,7 +31,6 @@ describe ResponsibilityService do
       }
 
       let(:parole_date) { nil }
-      let(:indeterminate_sentence) { false }
       let(:recalled) { false }
       let(:prison) { 'LEI' }
 
@@ -284,9 +298,10 @@ describe ResponsibilityService do
 
       context 'when CRC case' do
         let(:offender) {
-          Nomis::Offender.new.tap { |o|
-            o.welsh_offender = true
-            o.case_allocation = 'CRC'
+          Nomis::Offender.new(inprisonment_status: 'SENT_EXL',
+                              welsh_offender: true,
+                              case_allocation: 'CRC'
+                              ).tap { |o|
             o.sentence = Nomis::SentenceDetail.new
             o.sentence.release_date = release_date
           }
@@ -316,7 +331,7 @@ describe ResponsibilityService do
       context 'when NPS case' do
         context 'when new case (sentence date after February 4 2019)' do
           let(:offender_welsh_nps_new_case_gt_10_mths) {
-            Nomis::Offender.new.tap { |o|
+            Nomis::Offender.new(inprisonment_status: 'UNK_SENT').tap { |o|
               o.welsh_offender = true
               o.case_allocation = 'NPS'
               o.sentence = Nomis::SentenceDetail.new
@@ -326,7 +341,7 @@ describe ResponsibilityService do
           }
 
           let(:offender_welsh_nps_new_case_lt_10_mths) {
-            Nomis::Offender.new.tap { |o|
+            Nomis::Offender.new(inprisonment_status: 'UNK_SENT').tap { |o|
               o.welsh_offender = true
               o.case_allocation = 'NPS'
               o.sentence = Nomis::SentenceDetail.new
@@ -354,7 +369,7 @@ describe ResponsibilityService do
 
         context 'when old case (sentence date before February 4 2019)' do
           let(:offender_welsh_nps_old_case_gt_15_mths) {
-            Nomis::Offender.new.tap { |o|
+            Nomis::Offender.new(inprisonment_status: 'UNK_SENT').tap { |o|
               o.welsh_offender = true
               o.case_allocation = 'NPS'
               o.sentence = Nomis::SentenceDetail.new
@@ -364,7 +379,7 @@ describe ResponsibilityService do
           }
 
           let(:offender_welsh_nps_old_case_lt_15_mths) {
-            Nomis::Offender.new.tap { |o|
+            Nomis::Offender.new(inprisonment_status: 'UNK_SENT').tap { |o|
               o.welsh_offender = true
               o.case_allocation = 'NPS'
               o.sentence = Nomis::SentenceDetail.new

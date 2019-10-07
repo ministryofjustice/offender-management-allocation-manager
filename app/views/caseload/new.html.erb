@@ -10,12 +10,42 @@
   <table class="govuk-table responsive tablesorter">
     <thead class="govuk-table__head">
     <tr class="govuk-table__row">
-      <th class="govuk-table__header" scope="col">Prisoner name</th>
-      <th class="govuk-table__header" scope="col">Prisoner number</th>
-      <th class="govuk-table__header" scope="col">Arrival date</th>
-      <th class="govuk-table__header" scope="col">Earliest release date</th>
-      <th class="govuk-table__header" scope="col">Allocation<br/>date</th>
-      <th class="govuk-table__header" scope="col">Role</th>
+      <th class="govuk-table__header" scope="col">
+        <a href="<%= sort_link('last_name') %>">
+          Prisoner name
+        </a>
+        <%= sort_arrow('last_name') %>
+      </th>
+      <th class="govuk-table__header" scope="col">
+        <a href="<%= sort_link('allocated_at_tier') %>">
+        Tier
+        </a>
+        <%= sort_arrow('allocated_at_tier') %>
+      </th>
+      <th class="govuk-table__header" scope="col">
+        <a href="<%= sort_link('sentence_start_date') %>">
+          Arrival date
+        </a>
+        <%= sort_arrow('sentence_start_date') %>
+      </th>
+      <th class="govuk-table__header" scope="col">
+        <a href="<%= sort_link('earliest_release_date') %>">
+          Earliest release<br/> date
+        </a>
+        <%= sort_arrow('earliest_release_date') %>
+      </th>
+      <th class="govuk-table__header" scope="col">
+        <a href="<%= sort_link('primary_pom_allocated_at') %>">
+          Allocation<br/>date
+        </a>
+        <%= sort_arrow('primary_pom_allocated_at') %>
+      </th>
+      <th class="govuk-table__header" scope="col">
+        <a href="<%= sort_link('responsibility') %>">
+          Role
+        </a>
+        <%= sort_arrow('responsibility') %>
+      </th>
       <% if Flipflop.prisoner_profile? %>
         <th class="govuk-table__header" scope="col">Action</th>
       <% end %>
@@ -24,10 +54,19 @@
     <tbody class="govuk-table__body">
     <% @new_cases.each_with_index do |allocation, i| %>
       <tr class="govuk-table__row offender_row_<%= i %>">
-        <td aria-label="Prisoner name" class="govuk-table__cell "><%= allocation.full_name %></td>
-        <td aria-label="Prisoner number" class="govuk-table__cell "><%= allocation.nomis_offender_id %></td>
-        <td aria-label="Arrival date" class="govuk-table__cell "><%= format_date(allocation.sentence_start_date) %></td>
-        <td aria-label="Release date" class="govuk-table__cell "><%= format_date(allocation.earliest_release_date) %></td>
+        <td aria-label="Prisoner name" class="govuk-table__cell">
+          <span class='prisoner-name'>
+            <%= allocation.full_name %>
+          </span> <br/>
+          <span class='govuk-hint govuk-!-margin-bottom-0'>
+            <%= allocation.nomis_offender_id %>
+          </span>
+        </td>
+        <td aria-label="Tier" class="govuk-table__cell ">
+          <%= allocation.allocated_at_tier %>
+        </td>
+        <td aria-label="Arrival date" class="govuk-table__cell"><%= format_date(allocation.sentence_start_date) %></td>
+        <td aria-label="Release date" class="govuk-table__cell"><%= format_date(allocation.earliest_release_date) %></td>
         <td aria-label="Allocation date" class="govuk-table__cell "><%= format_date(allocation.primary_pom_allocated_at) %></td>
         <td aria-label="Role" class="govuk-table__cell "><%= allocation.responsibility %></td>
         <% if Flipflop.prisoner_profile? %>

@@ -31,7 +31,6 @@ class CoworkingController < PrisonsApplicationController
     )
   end
 
-  # rubocop:disable Metrics/LineLength
   def create
     offender = offender(allocation_params[:nomis_offender_id])
     pom = PrisonOffenderManagerService.get_pom(
@@ -49,7 +48,6 @@ class CoworkingController < PrisonsApplicationController
                 notice: "#{offender.full_name_ordered} has been allocated to #{pom.full_name_ordered} (#{pom.grade})"
   end
 
-  # rubocop:enable Metrics/LineLength
   def confirm_removal
     @prisoner = offender(coworking_nomis_offender_id_from_url)
 

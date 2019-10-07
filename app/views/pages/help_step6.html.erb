@@ -1,6 +1,6 @@
 <%= render :partial => "content", locals: { page: 6 } %>
 
-<h2 class="govuk-heading-l govuk-!-margin-bottom-5">Start making allocations</h2>
+<h1 class="part-title">Start making allocations</h1>
 <div class="govuk-inset-text">
   Senior Probation Officer / Head of Offender Management Unit (SPO/HoOMU) task
 </div>
@@ -16,20 +16,13 @@
 
     <p>Sign in to <%= link_to("https://moic.service.justice.gov.uk", "https://moic.service.justice.gov.uk") %> and follow these steps:</p>
 
-    <ul>
+    <ul class="govuk-list--bullet">
       <li>go to ‘make new allocations’</li>
       <li>Select ‘allocate’ by the name of the prisoner you are allocating</li>
       <li>Choose the prison or probation POM who will work with this prisoner</li>
       <li>Click ‘Complete allocation’</li>
     </ul>
-
+    <br>
     <p>The POM will receive an email to let them know about the allocation.</p>
-
-
-    <p>Tell us what you think</p>
-
-    <p>Your feedback is extremely valuable. It’ll help us make changes and improve things.</p>
-
-    <p>For feedback and any questions about our service, please email us on <%= mail_to("moic@digital.justice.gov.uk") %></p>
   </div>
 </div>

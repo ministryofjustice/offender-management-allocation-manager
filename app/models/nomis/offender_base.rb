@@ -1,5 +1,11 @@
 module Nomis
   class OffenderBase
+    delegate :home_detention_curfew_eligibility_date,
+             :conditional_release_date, :release_date,
+             :parole_eligibility_date, :tariff_date,
+             :automatic_release_date,
+             to: :sentence
+
     attr_accessor :first_name,
                   :last_name,
                   :date_of_birth,
@@ -36,6 +42,14 @@ module Nomis
         @sentence_type.indeterminate_sentence?
     end
 
+    def early_allocation?
+      false
+    end
+
+    def nps_case?
+      case_allocation == 'NPS'
+    end
+
     def sentence_type_code
       @sentence_type.code
     end
@@ -45,16 +59,16 @@ module Nomis
       @sentence_type.try(:recall_sentence?)
     end
 
+    def indeterminate_sentence?
+      @sentence_type.try(:indeterminate_sentence?)
+    end
+
     def criminal_sentence?
       @sentence_type.civil? == false
     end
 
     def civil_sentence?
       @sentence_type.civil?
-    end
-
-    def indeterminate_sentence?
-      @sentence_type.indeterminate_sentence?
     end
 
     def describe_sentence
@@ -117,6 +131,10 @@ module Nomis
       @sentence_type = SentenceType.new(payload['imprisonmentStatus'])
       @category_code = payload['categoryCode']
       @date_of_birth = deserialise_date(payload, 'dateOfBirth')
+    end
+
+    def inprisonment_status=(status)
+      @sentence_type = SentenceType.new(status)
     end
 
     def handover_start_date

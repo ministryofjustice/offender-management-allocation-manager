@@ -18,11 +18,10 @@ class ResponsibilitiesController < PrisonsApplicationController
     end
   end
 
-  # rubocop:disable Metrics/LineLength
   def create
     @responsibility = Responsibility.create! responsibility_params
 
-    me = PrisonOffenderManagerService.get_signed_in_pom_details(current_user, @prison).emails.try(:first)
+    me = Nomis::Elite2::UserApi.user_details(current_user).email_address.try(:first)
 
     emails = [me, ldu_email_address(@responsibility.nomis_offender_id)].compact
 
@@ -39,7 +38,6 @@ class ResponsibilitiesController < PrisonsApplicationController
 
     redirect_to new_prison_allocation_path(@prison, @responsibility.nomis_offender_id)
   end
-# rubocop:enable Metrics/LineLength
 
 private
 

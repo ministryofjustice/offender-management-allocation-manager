@@ -4,6 +4,7 @@ module Nomis
   module Elite2
     class OffenderApi
       extend Elite2Api
+
       def self.list(prison, page = 0, page_size: 20)
         route = "/elite2api/api/locations/description/#{prison}/inmates"
 
@@ -40,6 +41,18 @@ module Nomis
         return nil if response.empty?
 
         api_deserialiser.deserialise(Nomis::Offender, response.first)
+      end
+
+      def self.get_multiple_offenders(offender_nos)
+        route = '/elite2api/api/prisoners'
+        response = e2_client.post(route,
+                                  'offenderNos' => offender_nos
+                                  )
+        return [] if response.empty?
+
+        api_deserialiser.deserialise_many(
+          Nomis::Offender, response
+        )
       end
 
       def self.get_offence(booking_id)

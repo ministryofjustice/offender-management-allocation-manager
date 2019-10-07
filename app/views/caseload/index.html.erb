@@ -5,13 +5,32 @@
 <% if @pom.blank? %>
   <h2 class="govuk-heading-l">No allocated cases </h2>
 <% else %>
-  <h2 class="govuk-heading-l">Your caseload (<%= @total_allocations  %>)</h2>
+  <h2 class="govuk-heading-l">Your caseload (<%= @total_allocation_count  %>)</h2>
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-quarter">
       <div class="govuk-body">New cases</div>
-      <div class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24"><%= link_to "#{@new_cases_count}", new_prison_caseload_path(@prison), class:"govuk-link"%></a></div>
+      <div class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24 new-cases-count">
+        <% if @new_cases_count > 0 %>
+          <%= link_to "#{@new_cases_count}", new_prison_caseload_path(@prison), class:"govuk-link"%>
+        <% else %>
+          0
+        <% end %>
+      </div>
     </div>
+
+    <div class="govuk-grid-column-one-quarter">
+      <div class="govuk-body">Cases close to handover</div>
+      <div class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24 upcoming-handover-count">
+        <% if @pending_handover_count > 0 %>
+          <%= link_to "#{@pending_handover_count}", prison_caseload_handover_start_path(@prison), class:"govuk-link"%>
+        <% else %>
+          0
+        <% end %>
+      </div>
+    </div>
+
+
     <div class="govuk-grid-column-one-quarter">
       <div class="govuk-body">Working pattern</div>
       <div class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24"><%= working_pattern_name(@pom.working_pattern) %></div>
@@ -37,7 +56,12 @@
         </a>
         <%= sort_arrow('last_name') %>
       </th>
-      <th class="govuk-table__header" scope="col">Prisoner number</th>
+      <th class="govuk-table__header" scope="col">
+        <a href="<%= sort_link('allocated_at_tier') %>">
+        Tier
+        </a>
+        <%= sort_arrow('allocated_at_tier') %>
+      </th>
       <th class="govuk-table__header" scope="col">
         <a href="<%= sort_link('earliest_release_date') %>">
           Earliest release<br/> date
@@ -64,8 +88,16 @@
     <tbody class="govuk-table__body">
     <% @allocations.each_with_index do |offender, i| %>
       <tr class="govuk-table__row offender_row_<%= i %>">
-        <td aria-label="Prisoner name" class="govuk-table__cell "><%= highlight(offender.full_name, @q) %></td>
-        <td aria-label="Prisoner number" class="govuk-table__cell "><%= highlight(offender.nomis_offender_id, @q) %></td>
+        <td aria-label="Prisoner name" class="govuk-table__cell ">
+          <%= highlight(offender.full_name, @q) %>
+          <br/>
+          <span class='govuk-hint govuk-!-margin-bottom-0'>
+            <%= highlight(offender.nomis_offender_id, @q) %>
+          </span>
+        </td>
+        <td aria-label="Tier" class="govuk-table__cell tier">
+          <%= offender.allocated_at_tier %>
+        </td>
         <td aria-label="Release date" class="govuk-table__cell "><%= format_date(offender.earliest_release_date) %></td>
         <td aria-label="Allocation date" class="govuk-table__cell "><%= format_date(offender.primary_pom_allocated_at) %></td>
         <td aria-label="Role" class="govuk-table__cell "><%= offender.responsibility %></td>

@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/LineLength
 class AllocationsController < PrisonsApplicationController
   delegate :update, to: :create
 
@@ -14,8 +13,6 @@ class AllocationsController < PrisonsApplicationController
       AllocationService.previously_allocated_poms(nomis_offender_id_from_url)
     @recommended_poms, @not_recommended_poms =
       recommended_and_nonrecommended_poms_for(@prisoner)
-    @recommended_pom_type, @not_recommended_pom_type =
-      recommended_and_nonrecommended_poms_types_for(@prisoner)
     @unavailable_pom_count = unavailable_pom_count
   end
 
@@ -42,8 +39,6 @@ class AllocationsController < PrisonsApplicationController
       AllocationService.previously_allocated_poms(nomis_offender_id_from_url)
     @recommended_poms, @not_recommended_poms =
       recommended_and_nonrecommended_poms_for(@prisoner)
-    @recommended_pom_type, @not_recommended_pom_type =
-      recommended_and_nonrecommended_poms_types_for(@prisoner)
     @unavailable_pom_count = unavailable_pom_count
 
     @current_pom = current_pom_for(nomis_offender_id_from_url)
@@ -72,6 +67,7 @@ class AllocationsController < PrisonsApplicationController
   # Note #update is delegated to #create
   def create
     offender = offender(allocation_params[:nomis_offender_id])
+    @override = override
     allocation = allocation_attributes(offender)
 
     if AllocationService.create_or_update(allocation)
@@ -104,7 +100,6 @@ private
   end
 
   def allocation_attributes(offender)
-    @override = override
     {
       primary_pom_nomis_id: allocation_params[:nomis_staff_id].to_i,
       nomis_offender_id: allocation_params[:nomis_offender_id],
@@ -152,18 +147,6 @@ private
     rec_type == RecommendationService::PRISON_POM ? 'prison' : 'probation'
   end
 
-  def recommended_and_nonrecommended_poms_types_for(offender)
-    rec_type = RecommendationService.recommended_pom_type(offender)
-
-    if rec_type == RecommendationService::PRISON_POM
-      ['Prison officer',
-       'Probation officer']
-    else
-      ['Probation officer',
-       'Prison officer']
-    end
-  end
-
   def recommended_and_nonrecommended_poms_for(offender)
     allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id_from_url)
     # don't allow primary to be the same as the co-working POM
@@ -171,7 +154,17 @@ private
       pom.status == 'active' && pom.staff_id != allocation.try(:secondary_pom_nomis_id)
     }
 
-    RecommendationService.recommended_poms(offender, poms)
+    recommended_poms(offender, poms)
+  end
+
+  def recommended_poms(offender, poms)
+    # Returns a pair of lists where the first element contains the
+    # POMs from the `poms` parameter that are recommended for the
+    # `offender`
+    recommended_type = RecommendationService.recommended_pom_type(offender)
+    poms.partition { |pom|
+      pom.position.include?(recommended_type)
+    }
   end
 
   def nomis_offender_id_from_url
@@ -204,4 +197,3 @@ private
     @override[:suitability_detail] if @override.present?
   end
 end
-# rubocop:enable Metrics/LineLength

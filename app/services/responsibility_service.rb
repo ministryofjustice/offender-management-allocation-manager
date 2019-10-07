@@ -14,11 +14,12 @@ class ResponsibilityService
 
   WELSH_POLICY_START_DATE = DateTime.new(2019, 2, 4).utc.to_date
   ENGLISH_POLICY_START_DATE = DateTime.new(2019, 10, 1).utc.to_date
-
   def self.calculate_pom_responsibility(offender)
-    return RESPONSIBLE if offender.earliest_release_date.nil?
-
-    if welsh_offender?(offender)
+    if offender.earliest_release_date.nil?
+      RESPONSIBLE
+    elsif offender.indeterminate_sentence? && offender.earliest_release_date < Time.zone.today
+      RESPONSIBLE
+    elsif welsh_offender?(offender)
       welsh_rules(offender)
     else
       english_rules(offender)

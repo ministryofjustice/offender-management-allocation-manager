@@ -13,7 +13,10 @@ class CaseInformationController < PrisonsApplicationController
   def edit; end
 
   # Just edit the parole_review_date field
-  def edit_prd; end
+  def edit_prd
+    # blank out old value as it's not relevant
+    @case_info.parole_review_date = nil
+  end
 
   def show
     @delius_data = DeliusData.where(noms_no: nomis_offender_id_from_url)

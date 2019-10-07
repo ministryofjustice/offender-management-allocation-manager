@@ -1,7 +1,7 @@
 require "rails_helper"
 
 feature "get poms list" do
-  let!(:offender_missing_sentence_case_info) { create(:case_information, nomis_offender_id: 'G7949GQ') }
+  let!(:offender_missing_sentence_case_info) { create(:case_information, nomis_offender_id: 'G1247VX') }
 
   it "shows the page", vcr: { cassette_name: :show_poms_feature_list } do
     signin_user
@@ -25,7 +25,8 @@ feature "get poms list" do
 
     visit prison_pom_path('LEI', 485_637)
 
-    expect(page).to have_css(".govuk-table__row", count: 2)
+    expect(page).to have_css(".pom_cases_row_0", count: 1)
+    expect(page).not_to have_css(".pom_cases_row_1")
     expect(page).to have_content(offender_missing_sentence_case_info.nomis_offender_id)
   end
 
