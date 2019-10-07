@@ -33,19 +33,19 @@ PomDetail.find_or_create_by!(
   working_pattern: 1
 )
 
-LocalDivisionalUnit.create!(
+LocalDivisionalUnit.find_or_create_by!(
     code: "WELDU",
     name: "Welsh LDU",
     email_address: "WalesNPS@example.com"
 )
 
-LocalDivisionalUnit.create!(
+LocalDivisionalUnit.find_or_create_by!(
     code: "ENLDU",
     name: "English LDU",
     email_address: "EnglishNPS@example.com"
 )
 
-LocalDivisionalUnit.create!(
+LocalDivisionalUnit.find_or_create_by!(
     code: "OTHERLDU",
     name: "English LDU 2",
     email_address: nil
