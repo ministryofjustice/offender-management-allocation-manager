@@ -38,7 +38,7 @@ RSpec.describe ApiController, type: :controller do
       user_name: 'hello'
     }
 
-    set_header(payload)
+    request_header(payload)
     get :index
 
     expect(response).to have_http_status(200)
@@ -51,7 +51,7 @@ RSpec.describe ApiController, type: :controller do
       exp: 4.hours.ago.to_i
     }
 
-    set_header(payload)
+    request_header(payload)
     get :index
 
     expect(response).to have_http_status(200)
@@ -64,7 +64,7 @@ RSpec.describe ApiController, type: :controller do
       exp: 4.hours.from_now.to_i
     }
 
-    set_header(payload)
+    request_header(payload)
     get :index
 
     expect(response).to have_http_status(200)
@@ -78,7 +78,7 @@ RSpec.describe ApiController, type: :controller do
       exp: 4.hours.from_now.to_i
     }
 
-    set_header(payload)
+    request_header(payload)
     get :index
 
     expect(response).to have_http_status(200)
@@ -92,7 +92,7 @@ RSpec.describe ApiController, type: :controller do
       exp: 4.hours.from_now.to_i
     }
 
-    set_header(payload)
+    request_header(payload)
     get :index
 
     expect(response).to have_http_status(200)
@@ -103,7 +103,7 @@ RSpec.describe ApiController, type: :controller do
     JWT.encode(payload, OpenSSL::PKey::RSA.new(private_key), 'RS256')
   end
 
-  def set_header(payload)
+  def request_header(payload)
     token = encode_payload(payload)
     request.headers['AUTHORIZATION'] = "Bearer #{token}"
   end
