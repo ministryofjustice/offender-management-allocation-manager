@@ -58,7 +58,9 @@ module Delius
     end
 
     def zip_attachment(msg)
-      msg.attachments.detect { |a| a.content_type.start_with? 'application/zip' }
+      msg.attachments.detect { |a|
+        a.content_type.start_with?('application/zip', 'application/x-zip-compressed')
+      }
     end
 
     def close

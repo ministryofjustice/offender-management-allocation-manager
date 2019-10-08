@@ -160,6 +160,10 @@ class PrisonService
     PRISONS[code]&.country
   end
 
+  def self.exists?(code)
+    PRISONS.key? code
+  end
+
   def self.prisons_from_list(codelist)
     prisons = codelist.each_with_object({}) { |code, hash|
       hash[code] = PRISONS[code]&.name
