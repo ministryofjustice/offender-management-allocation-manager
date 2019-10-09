@@ -13,7 +13,7 @@ RSpec.describe MovementsOnDateJob, type: :job do
     allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new.tap{ |o|
       o.convicted_status = "Convicted"
       o.date_of_birth = "Tue, 17 Sep 1991"
-      o.inprisonment_status = ('SENT03')
+      o.inprisonment_status = 'SENT03'
     })
 
     stub_request(:get, "#{elite2api}/movements?fromDateTime=2019-06-29T00:00&movementDate=2019-06-30").
