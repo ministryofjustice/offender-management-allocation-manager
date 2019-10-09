@@ -45,7 +45,9 @@ class SummaryService
     end
 
     if params.sort_field.present?
-      bucket.items.each { |offender| add_reception_date(offender) } unless summary_type == :allocated
+      unless summary_type == :allocated
+        add_arrival_dates(bucket.items) if bucket.items.any?
+      end
       bucket.sort(params.sort_field, params.sort_direction)
     end
 
@@ -76,13 +78,15 @@ class SummaryService
 
 private
 
-  def self.add_reception_date(offender)
-    movements = Nomis::Elite2::MovementApi.admissions_for(offender.offender_no)
+  def self.add_arrival_dates(offenders)
+    movements = Nomis::Elite2::MovementApi.admissions_for(offenders.map(&:offender_no))
 
-    arrival = movements.reverse.detect { |movement|
-      movement.to_agency == offender.prison_id
-    }
-    offender.reception_date = arrival.create_date_time
+    offenders.each do |offender|
+      arrival = movements[offender.offender_no].reverse.detect { |movement|
+        movement.to_agency == offender.prison_id
+      }
+      offender.prison_arrival_date = arrival.create_date_time
+    end
   end
 
   def self.restructure_pom_name(pom_name)
