@@ -42,7 +42,7 @@
         <td class="govuk-table__cell govuk-!-width-one-half">Prisoner number</td>
         <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
           <%= @prisoner.offender_no %>
-          <span class="pull-right"><%= link_to 'View Full Profile', prison_prisoner_show_path(@prison, @prisoner.offender_no) %></span>
+          <span class="pull-right"><%= link_to 'View Full Profile', prison_prisoner_path(@prison, @prisoner.offender_no) %></span>
         </td>
       </tr>
       <tr class="govuk-table__row">
