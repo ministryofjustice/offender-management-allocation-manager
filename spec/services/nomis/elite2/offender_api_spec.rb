@@ -108,5 +108,38 @@ describe Nomis::Elite2::OffenderApi do
       expect(bytes[0, 3]).to eq(jpeg_start_sentinel)
       expect(bytes[-2, 2]).to eq(jpeg_end_sentinel)
     end
+
+    it "raises an error if there is no image available",
+       vcr: { cassette_name: :offender_api_image_not_found } do
+      booking_id = 1_153_753
+      image_id = 1_340_556
+      uri = "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/images/#{image_id}/data"
+
+      WebMock.stub_request(:get, uri).to_raise(
+        Faraday::ResourceNotFound.new('error', status: 404)
+      )
+
+      expect{ described_class.get_image(booking_id) }.to raise_error(Faraday::ResourceNotFound)
+    end
+
+    it "uses a default image if there is no available image",
+       vcr: { cassette_name: :offender_api_image_use_default_image } do
+      booking_id = 1_153_753
+      image_id = 1_340_556
+      uri = "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/images/#{image_id}/data"
+
+      WebMock.stub_request(:get, uri).to_return(body: "")
+
+      response = described_class.get_image(booking_id)
+      expect(response).not_to be nil?
+
+      jpeg_start_sentinel = [0xFF, 0xD8, 0xFF]
+      jpeg_end_sentinel = [0xFF, 0xD9]
+
+      bytes = response.bytes.to_a
+
+      expect(bytes[0, 3]).to eq(jpeg_start_sentinel)
+      expect(bytes[-2, 2]).to eq(jpeg_end_sentinel)
+    end
   end
 end

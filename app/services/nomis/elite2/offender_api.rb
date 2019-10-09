@@ -104,11 +104,15 @@ module Nomis
       end
 
       def self.get_image(booking_id)
+        # This method returns the raw bytes of an image, the equivalent of loading the
+        # image from file on disk.
         details_route = '/elite2api/api/offender-sentences/bookings'
         details = e2_client.post(details_route, [booking_id])
 
         image_route = "/elite2api/api/images/#{details.first['facialImageId']}/data"
-        e2_client.raw_get(image_route)
+
+        image = e2_client.raw_get(image_route)
+        image.presence || File.read(Rails.root.join('app/assets/images/default_profile_image.jpg'))
       end
 
     private
