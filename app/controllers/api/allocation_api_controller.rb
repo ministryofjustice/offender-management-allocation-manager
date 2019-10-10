@@ -2,10 +2,9 @@
 
 module Api
   class AllocationApiController < Api::ApiController
-
     def show
-      render_404('Not ready for allocation') and return if allocation.nil?
-      render_404('Not allocated') and return if allocation.primary_pom_nomis_id.nil?
+      render_404('Not ready for allocation') && return if allocation.nil?
+      render_404('Not allocated') && return if allocation.primary_pom_nomis_id.nil?
 
       render json: allocation_as_json
     end
@@ -15,7 +14,7 @@ module Api
     def allocation_as_json
       {
         primary_pom: primary_pom_details,
-        secondary_pom: secondary_pom_details,
+        secondary_pom: secondary_pom_details
       }
     end
 
@@ -27,7 +26,7 @@ module Api
     end
 
     def secondary_pom_details
-      return {} unless @allocation.secondary_pom_nomis_id.present?
+      return {} if @allocation.secondary_pom_nomis_id.blank?
 
       {
         staff_id: @allocation.secondary_pom_nomis_id,

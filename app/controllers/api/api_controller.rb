@@ -9,13 +9,13 @@ module Api
     end
 
     def render_404(msg)
-      render json:  { status: "error", message: msg }, status: 404
+      render json:  { status: 'error', message: msg }, status: :not_found
     end
 
   private
 
     def render_error(msg)
-      render json: { status: "error", message: msg }, status: 401
+      render json: { status: 'error', message: msg }, status: :unauthorized
     end
 
     def verify_token
