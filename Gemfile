@@ -20,7 +20,7 @@ gem 'paper_trail'
 gem 'pg'
 gem 'puma', '~> 4.2'
 gem 'prometheus_exporter'
-gem 'rails', '~> 5.2.3'
+gem 'rails', '~> 6.0.0'
 gem 'sass-rails', '~> 5.0'
 gem 'sidekiq'
 gem 'sentry-raven'
@@ -49,7 +49,7 @@ group :development, :test do
   gem 'rubocop-performance'
   gem 'rubocop-rails'
   gem 'dotenv-rails'
-  gem 'rspec-rails'
+  gem 'rspec-rails', '~> 4.0.0.beta2'
   gem 'rswag-specs'
 end
 
