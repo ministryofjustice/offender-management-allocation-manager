@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe ApiController, type: :controller do
   let(:rsa_private) { OpenSSL::PKey::RSA.generate 2048 }
   let(:rsa_public) { Base64.strict_encode64(rsa_private.public_key.to_s) }
-  let(:error_message) { {'status' => 'error', 'message' => 'Invalid token'} }
+  let(:error_message) { { 'status' => 'error', 'message' => 'Invalid token' } }
   let(:ok_message) { { 'status' => 'ok' } }
 
   before do
