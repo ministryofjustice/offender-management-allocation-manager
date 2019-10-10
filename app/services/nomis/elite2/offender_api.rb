@@ -109,10 +109,12 @@ module Nomis
         details_route = '/elite2api/api/offender-sentences/bookings'
         details = e2_client.post(details_route, [booking_id])
 
-        image_route = "/elite2api/api/images/#{details.first['facialImageId']}/data"
+        return default_image if details.first['facialImageId'].blank?
 
+        image_route = "/elite2api/api/images/#{details.first['facialImageId']}/data"
         image = e2_client.raw_get(image_route)
-        image.presence || File.read(Rails.root.join('app/assets/images/default_profile_image.jpg'))
+
+        image.presence || default_image
       end
 
     private
@@ -122,6 +124,10 @@ module Nomis
           'Page-Limit' => page_size.to_s,
           'Page-Offset' => page_offset.to_s
         }
+      end
+
+      def self.default_image
+        File.read(Rails.root.join('app/assets/images/default_profile_image.jpg'))
       end
     end
   end

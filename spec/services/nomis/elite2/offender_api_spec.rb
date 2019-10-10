@@ -141,5 +141,29 @@ describe Nomis::Elite2::OffenderApi do
       expect(bytes[0, 3]).to eq(jpeg_start_sentinel)
       expect(bytes[-2, 2]).to eq(jpeg_end_sentinel)
     end
+
+    it "uses the default image if no offender facialImageId found",
+       vcr: { cassette_name: :offender_api_no_facial_image_id } do
+      booking_id = 1_153_753
+      uri = "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/offender-sentences/bookings"
+
+      WebMock.stub_request(:post, uri).with(body: "[#{booking_id}]").to_return(
+        status: 200,
+        body: [
+          { "bookingId": 1_153_753,
+            "dateOfBirth": "1953-04-15"
+        }].to_json, headers: {})
+
+      response = described_class.get_image(booking_id)
+      expect(response).not_to be nil?
+
+      jpeg_start_sentinel = [0xFF, 0xD8, 0xFF]
+      jpeg_end_sentinel = [0xFF, 0xD9]
+
+      bytes = response.bytes.to_a
+
+      expect(bytes[0, 3]).to eq(jpeg_start_sentinel)
+      expect(bytes[-2, 2]).to eq(jpeg_end_sentinel)
+    end
   end
 end
