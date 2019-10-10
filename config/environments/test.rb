@@ -53,6 +53,5 @@ Rails.application.configure do
   # config.action_view.raise_on_missing_translations = true
   Rails.application.routes.default_url_options[:host] = 'http://localhost:3000'
 
-  # Tests take 3 minutes to run, so this just prevents bleed-through
-  config.cache_expiry = 3.minutes
+  config.cache_expiry = 1.second
 end
