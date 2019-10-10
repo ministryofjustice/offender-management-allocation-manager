@@ -123,6 +123,8 @@ GEM
     jbuilder (2.9.1)
       activesupport (>= 4.2.0)
     json (2.2.0)
+    json-schema (2.8.1)
+      addressable (>= 2.4)
     jwt (2.2.1)
     kaminari (1.1.1)
       activesupport (>= 4.1.0)
@@ -263,6 +265,19 @@ GEM
       rspec-mocks (~> 3.8.0)
       rspec-support (~> 3.8.0)
     rspec-support (3.8.2)
+    rswag (2.0.6)
+      rswag-api (= 2.0.6)
+      rswag-specs (= 2.0.6)
+      rswag-ui (= 2.0.6)
+    rswag-api (2.0.6)
+      railties (>= 3.1, < 6.1)
+    rswag-specs (2.0.6)
+      activesupport (>= 3.1, < 6.1)
+      json-schema (~> 2.2)
+      railties (>= 3.1, < 6.1)
+    rswag-ui (2.0.6)
+      actionpack (>= 3.1, < 6.1)
+      railties (>= 3.1, < 6.1)
     rubocop (0.75.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
@@ -404,6 +419,7 @@ DEPENDENCIES
   rails-controller-testing
   redis
   rspec-rails
+  rswag
   rubocop
   rubocop-performance
   rubocop-rails

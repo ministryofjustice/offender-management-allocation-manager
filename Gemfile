@@ -36,6 +36,7 @@ gem 'rubyzip'
 gem 'turnout'
 gem 'zendesk_api'
 gem 'kaminari' # pagination
+gem 'rswag' # api-documentation
 
 group :development, :test do
   gem 'brakeman'
