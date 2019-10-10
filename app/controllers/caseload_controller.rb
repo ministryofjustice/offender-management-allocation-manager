@@ -12,7 +12,7 @@ class CaseloadController < PrisonsApplicationController
              only: [:handover_start]
 
   def index
-    @new_cases_count = all_allocations.select(&:new_case?).count
+    @new_cases_count = all_allocations.count(&:new_case?)
     sorted_allocations = sort_allocations(filter_allocations(all_allocations))
 
     @allocations = Kaminari.paginate_array(sorted_allocations).page(page)

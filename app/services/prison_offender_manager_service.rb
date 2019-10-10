@@ -22,7 +22,7 @@ class PrisonOffenderManagerService
       return nil
     end
 
-    pom = poms_list.select { |p| p.staff_id == nomis_staff_id.to_i }.first
+    pom = poms_list.find { |p| p.staff_id == nomis_staff_id.to_i }
     if pom.blank?
       log_missing_pom(caseload, nomis_staff_id)
       return nil
@@ -103,7 +103,7 @@ class PrisonOffenderManagerService
     user = Nomis::Elite2::UserApi.user_details(current_user)
 
     poms_list = get_poms(prison)
-    poms_list.select { |p| p.staff_id.to_i == user.staff_id.to_i }.first
+    poms_list.find { |p| p.staff_id.to_i == user.staff_id.to_i }
   end
 
   def self.update_pom(params)
