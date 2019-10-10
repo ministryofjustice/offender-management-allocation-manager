@@ -74,6 +74,8 @@ Rails.application.routes.draw do
   resources :health, only: %i[ index ], controller: 'health'
   resources :status, only: %i[ index ], controller: 'status'
 
+  get('/api' => 'api#index')
+
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
   mount Flipflop::Engine => "/flip-flop-admin"

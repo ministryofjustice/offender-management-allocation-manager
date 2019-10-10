@@ -35,6 +35,25 @@ module Nomis
         true
       end
 
+      def valid_token_with_scope?(scope)
+        return false if payload['scope'].nil?
+        return false unless payload['scope'].include? scope
+
+        true
+      rescue JWT::DecodeError, JWT::ExpiredSignature => e
+        Raven.capture_exception(e)
+        false
+      end
+
+      def payload
+        @payload ||= JWT.decode(
+          access_token,
+          OpenSSL::PKey::RSA.new(public_key),
+          true,
+          algorithm: 'RS256'
+        ).first
+      end
+
       def self.from_json(payload)
         Token.new.tap { |obj|
           obj.access_token = payload['access_token']
