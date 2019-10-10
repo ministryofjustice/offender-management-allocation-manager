@@ -79,6 +79,7 @@ private
   end
 
   def self.should_process?(offender_no)
-    OffenderService.get_offender(offender_no).convicted?
+    offender = OffenderService.get_offender(offender_no)
+    offender.convicted? && offender.over_18? && offender.criminal_sentence?
   end
 end
