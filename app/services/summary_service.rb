@@ -22,7 +22,7 @@ class SummaryService
 
     # We want to store the total number of each item so we can show totals for
     # each type of record.
-    counts = { allocated: 0, unallocated: 0, pending: 0, all: 0 }
+    counts = { allocated: 0, unallocated: 0, pending: 0 }
 
     offenders = OffenderService.get_offenders_for_prison(prison)
     active_allocations_hash = AllocationService.active_allocations(offenders.map(&:offender_no), prison)
@@ -45,6 +45,9 @@ class SummaryService
     end
 
     if params.sort_field.present?
+      unless summary_type == :allocated
+        add_arrival_dates(bucket.items) if bucket.items.any?
+      end
       bucket.sort(params.sort_field, params.sort_direction)
     end
 
@@ -74,6 +77,17 @@ class SummaryService
 # rubocop:enable Metrics/PerceivedComplexity
 
 private
+
+  def self.add_arrival_dates(offenders)
+    movements = Nomis::Elite2::MovementApi.admissions_for(offenders.map(&:offender_no))
+
+    offenders.each do |offender|
+      arrival = movements[offender.offender_no].reverse.detect { |movement|
+        movement.to_agency == offender.prison_id
+      }
+      offender.prison_arrival_date = arrival.create_date_time
+    end
+  end
 
   def self.restructure_pom_name(pom_name)
     name = pom_name.titleize
