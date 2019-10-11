@@ -17,7 +17,8 @@ Rails.application.routes.draw do
         get('image' => 'prisoners#image', as: 'image')
       end
 
-      resource :early_allocation, only: [:new, :create] do
+      # show is only used with format PDF
+      resource :early_allocation, only: [:new, :create, :show] do
         post('discretionary')
       end
     end
