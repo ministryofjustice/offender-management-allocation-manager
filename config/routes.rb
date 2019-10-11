@@ -16,6 +16,10 @@ Rails.application.routes.draw do
       scope :format => true, :constraints => { :format => 'jpg' } do
         get('image' => 'prisoners#image', as: 'image')
       end
+
+      resource :early_allocation, only: [:new, :create] do
+        post('discretionary')
+      end
     end
 
     resources :allocations, only: %i[ show new create edit update ], param: :nomis_offender_id, path_names: {

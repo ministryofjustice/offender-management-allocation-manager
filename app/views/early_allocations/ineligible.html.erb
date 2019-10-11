@@ -1,0 +1,23 @@
+<% content_for :switcher do %>
+  <%= render '/layouts/prison_switcher' %>
+<% end %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-panel govuk-panel--confirmation">
+      <h1 class="govuk-panel__title">
+        Assessment Complete
+      </h1>
+      <div class="govuk-panel__body">
+        Not eligible for early allocation to the community probation team
+      </div>
+    </div>
+    <h2 class="govuk-heading-m">What happens next</h2>
+
+    <p class="govuk-body">
+      Based on the answers you have given, this case is not eligible to be handed over
+      to the community probation team.
+    </p>
+    <%= render(partial: 'landing_page_footer') %>
+  </div>
+</div>

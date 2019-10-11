@@ -1,0 +1,41 @@
+<% content_for :switcher do %>
+  <%= render '/layouts/prison_switcher' %>
+<% end %>
+
+<%= form_for(@early_assignment, url: discretionary_prison_prisoner_early_allocation_path(@prison, @early_assignment.nomis_offender_id)) do |form| %>
+
+  <% if @early_assignment.errors.count > 0 %>
+    <%= render :partial => "/shared/field_errors", :locals => { form: form, errors: @early_assignment.errors } %>
+  <% end %>
+
+  <h1 class="govuk-heading-xl govuk-!-margin-top-4">Assessment for early allocation to the community probation team</h1>
+
+  <% (EarlyAllocation::STAGE1_FIELDS + EarlyAllocation::ALL_STAGE2_FIELDS).each do |field| %>
+    <%= form.hidden_field(field) unless form.object.public_send(field).nil? %>
+  <% end %>
+  <%= form.hidden_field(:stage2_complete, value: true) %>
+
+  <div class="govuk-form-group">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-half">
+        <fieldset class="govuk-fieldset">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+            <%= form.label(:reason, 'Why are you referring this case for early allocation to the community?', class: 'govuk-label govuk-!-font-weight-bold') %>
+          </legend>
+
+          <%= render partial: 'error', locals: { form: form, errors: @early_assignment.errors, fieldname: :reason } %>
+
+          <%= form.text_area(:reason, rows: 3, class: 'govuk-textarea') %>
+        </fieldset>
+      </div>
+    </div>
+    <%= render partial: 'error', locals: { form: form, errors: @early_assignment.errors, fieldname: :approved } %>
+    <div class="govuk-checkboxes__item">
+      <%= form.check_box :approved, class: "govuk-checkboxes__input" %>
+      <%= form.label(:approved, 'Has the Head of Offender Management Delivery approved this referral?', class: 'govuk-label govuk-checkboxes__label') %>
+    </div>
+  </div>
+
+  <%= form.submit "Continue", role: "button", draggable: "false", class: "govuk-button" %>
+<% end %>
+

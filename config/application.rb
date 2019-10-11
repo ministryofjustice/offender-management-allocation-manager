@@ -51,5 +51,12 @@ module OffenderManagementAllocationClient
       [config.zendesk_username, config.zendesk_url, config.zendesk_password].all?
 
     config.cache_expiry = 60.minutes
+
+    # config.action_view.field_error_proc = Proc.new { |html_tag, instance|
+    #   "<div class=\"govuk-form-group govuk-form-group--error\">#{html_tag}</div>".html_safe
+    # }
+    config.action_view.field_error_proc = proc { |html_tag, _instance|
+      html_tag
+    }
   end
 end
