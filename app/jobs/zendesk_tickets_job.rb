@@ -15,8 +15,8 @@ class ZendeskTicketsJob < ActiveJob::Base
 private
 
   def ticket_raised!(contact)
-    client = Zendesk::MOICClient.instance
-    Zendesk::MOICApi.new(client).raise_ticket(ticket_attrs(contact))
+    client = Zendesk::MoicClient.instance
+    Zendesk::MoicApi.new(client).raise_ticket(ticket_attrs(contact))
   end
 
   def ticket_attrs(contact)

@@ -1,5 +1,5 @@
 module Zendesk
-  class MOICApi
+  class MoicApi
     def initialize(zendesk_moic_client)
       self.zendesk_moic_client = zendesk_moic_client
     end
