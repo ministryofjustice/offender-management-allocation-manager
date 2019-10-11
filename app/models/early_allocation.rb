@@ -102,6 +102,12 @@ class EarlyAllocation < ApplicationRecord
     !eligible? && !ineligible?
   end
 
+  def clear
+    (STAGE1_FIELDS + ALL_STAGE2_FIELDS).each do |field|
+      public_send("#{field}=", nil)
+    end
+  end
+
 private
 
   def stage1_eligible?

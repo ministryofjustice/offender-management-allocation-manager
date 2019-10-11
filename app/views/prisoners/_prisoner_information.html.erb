@@ -34,9 +34,9 @@
         <span class="pull-right">
           <% if @early_allocation.present? %>
             <% if @early_allocation.discretionary? && @early_allocation.community_decision.nil? %>
-              <%= link_to 'Update', edit_prison_prisoner_early_allocation_path(@prison, @prisoner.offender_no) %>
+              <%= link_to('Update', edit_prison_prisoner_early_allocation_path(@prison, @prisoner.offender_no)) %>
             <% else %>
-                Re-assess
+              <%= link_to 'Re-assess', edit_prison_prisoner_early_allocation_path(@prison, @prisoner.offender_no) %>
             <% end %>
           <% else %>
             <%= link_to 'Assess Eligibility', new_prison_prisoner_early_allocation_path(@prison, @prisoner.offender_no) %>

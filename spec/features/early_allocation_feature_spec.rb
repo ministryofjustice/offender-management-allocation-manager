@@ -36,10 +36,18 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
 
     before do
       test_strategy.switch!(:early_allocation, true)
-      click_link 'View'
-      expect(page).to have_content 'Early allocation eligibility'
-      click_link 'Assess Eligibility'
     end
+
+    after do
+      test_strategy.switch!(:early_allocation, false)
+    end
+
+    context 'without existing early allocation' do
+      before do
+        click_link 'View'
+        expect(page).to have_content 'Early allocation eligibility'
+        click_link 'Assess Eligibility'
+      end
 
     after do
       test_strategy.switch!(:early_allocation, false)
@@ -50,20 +58,16 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
         click_button 'Continue'
       end
 
-      scenario 'error case' do
-        expect(page).to have_css('.govuk-error-message')
+        scenario 'error case' doexpect(page).to have_css('.govuk-error-message')
         expect(page).to have_css('#early_allocation_oasys_risk_assessment_date_error')
         expect(page).to have_css('#early_allocation_high_profile_error')
         within '.govuk-error-summary' do
           expect(page).to have_text 'You must say if this case is \'high profile\''
           click_link 'You must say if this case is \'high profile\''
-
-          expect(all('li').count).to eq(6)
+          expect(all('li').count).to eq(6)end
         end
-      end
 
-      scenario 'stage1 happy path' do
-        expect {
+        scenario 'stage1 happy path' doexpect {
           stage1_eligible_answers
 
           click_button 'Continue'
@@ -71,7 +75,6 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
           # selecting any one of these as 'Yes' means that we progress to assessment complete (Yes)
           expect(page).to have_text('The community probation team will take responsibility')
         }.to change(EarlyAllocation, :count).by(1)
-
         click_link 'Return to prisoner page'
         expect(page).to have_text 'Eligible - Automatic'
       end
@@ -82,59 +85,42 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
         click_button 'Continue'
         expect(page).not_to have_css('.govuk-error-message')
         # selecting any one of these as 'Yes' means that we progress to assessment complete (Yes)
-        expect(page).to have_text('The community probation team will take responsibility')
-
-        click_link 'Save completed assessment (pdf)'
+        expect(page).to have_text('The community probation team will take responsibility')click_link 'Save completed assessment (pdf)'
         expect(page).to have_current_path('/prisons/LEI/prisoners/G4273GI/early_allocation.pdf')
-      end
-    end
+      endend
 
-    context 'when existing eligible early allocation' do
-      let!(:early_allocation) { create(:early_allocation, nomis_offender_id: nomis_offender_id) }
-
-      before do
-        visit prison_prisoner_path(prison, nomis_offender_id)
-      end
-
-      it 'show re-assess' do
-        within '#early_allocation' do
-          expect(page).to have_text('Re-assess')
-        end
-      end
-    end
-
-    context 'with stage 2 questions' do
-      before do
-        fill_in id: 'early_allocation_oasys_risk_assessment_date_dd', with: valid_date.day
-        fill_in id: 'early_allocation_oasys_risk_assessment_date_mm', with: valid_date.month
-        fill_in id: 'early_allocation_oasys_risk_assessment_date_yyyy', with: valid_date.year
-
-        find('#early_allocation_convicted_under_terrorisom_act_2000_false').click
-        find('#early_allocation_high_profile_false').click
-        find('#early_allocation_serious_crime_prevention_order_false').click
-        find('#early_allocation_mappa_level_3_false').click
-        find('#early_allocation_cppc_case_false').click
-
-        click_button 'Continue'
-        # make sure that we are displaying stage 2 questions before continuing
-        expect(page).to have_text 'Has the prisoner been held in an extremism'
-      end
-
-      scenario 'error path' do
-        click_button 'Continue'
-
-        expect(page).to have_css('.govuk-error-message')
-        expect(page).to have_css('.govuk-error-summary')
-
-        within '.govuk-error-summary' do
-          expect(page).to have_text 'You must say if this is a MAPPA 2 case'
-
-          expect(all('li').count).to eq(5)
-        end
-      end
-
-      context 'with discretionary path' do
+      context 'with stage 2 questions' do
         before do
+          fill_in id: 'early_allocation_oasys_risk_assessment_date_dd', with: valid_date.day
+          fill_in id: 'early_allocation_oasys_risk_assessment_date_mm', with: valid_date.month
+          fill_in id: 'early_allocation_oasys_risk_assessment_date_yyyy', with: valid_date.year
+
+          find('#early_allocation_convicted_under_terrorisom_act_2000_false').click
+          find('#early_allocation_high_profile_false').click
+          find('#early_allocation_serious_crime_prevention_order_false').click
+          find('#early_allocation_mappa_level_3_false').click
+          find('#early_allocation_cppc_case_false').click
+
+          click_button 'Continue'
+          # make sure that we are displaying stage 2 questions before continuing
+          expect(page).to have_text 'Has the prisoner been held in an extremism'
+        end
+
+        scenario 'error path' do
+          click_button 'Continue'
+
+          expect(page).to have_css('.govuk-error-message')
+          expect(page).to have_css('.govuk-error-summary')
+
+          within '.govuk-error-summary' do
+            expect(page).to have_text 'You must say if this is a MAPPA 2 case'
+
+            expect(all('li').count).to eq(5)
+          end
+        end
+
+        context 'with discretionary path' do
+        beforedo
           find('#early_allocation_extremism_separation_false').click
           find('#early_allocation_high_risk_of_serious_harm_false').click
           find('#early_allocation_mappa_level_2_false').click
@@ -159,8 +145,7 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
           expect(page).to have_text 'The community probation team will make a decision'
         end
 
-        scenario 'saving the PDF' do
-          click_link 'Save completed assessment (pdf)'
+        scenario 'saving the PDF' doclick_link 'Save completed assessment (pdf)'
           expect(page).to have_current_path('/prisons/LEI/prisoners/G4273GI/early_allocation.pdf')
         end
 
@@ -182,20 +167,39 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
           expect(page).to have_text('Re-assess')
           expect(page).to have_text 'Eligible - Discretionary'
         end
+      endscenario 'not eligible due to all answers false' do
+          find('#early_allocation_extremism_separation_false').click
+          find('#early_allocation_high_risk_of_serious_harm_false').click
+          find('#early_allocation_mappa_level_2_false').click
+          find('#early_allocation_pathfinder_process_false').click
+          find('#early_allocation_other_reason_false').click
+
+          click_button 'Continue'
+          expect(page).to have_text 'Not eligible for early allocation'
+          click_link 'Save completed assessment (pdf)'
+          expect(page).to have_current_path('/prisons/LEI/prisoners/G4273GI/early_allocation.pdf')
+        end
+      end
+    end
+
+    context 'when existing eligible early allocation' do
+      before do
+        create(:early_allocation, nomis_offender_id: nomis_offender_id)
+        click_link 'View'
       end
 
-      scenario 'not eligible due to all answers false' do
-        find('#early_allocation_extremism_separation_false').click
-        find('#early_allocation_high_risk_of_serious_harm_false').click
-        find('#early_allocation_mappa_level_2_false').click
-        find('#early_allocation_pathfinder_process_false').click
-        find('#early_allocation_other_reason_false').click
+      it 'has a re-assess link' do
+        expect(page).to have_link 'Re-assess'
+      end
 
-        click_button 'Continue'
-        expect(page).to have_text 'Not eligible for early allocation'
-
-        click_link 'Save completed assessment (pdf)'
-        expect(page).to have_current_path('/prisons/LEI/prisoners/G4273GI/early_allocation.pdf')
+      it 'overwrites assessment when re-assessed' do
+        within '#early_allocation' do
+          click_link 'Re-assess'
+        end
+        expect {
+          stage1_eligible_answers
+          click_button 'Continue'
+        }.not_to change(EarlyAllocation, :count)
       end
     end
   end
