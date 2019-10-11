@@ -27,9 +27,10 @@
 #   'true': 'foo'
 #
 # To learn more, please read the Rails Internationalization guide
-# available at http://guides.rubyonrails.org/i18n.html.
+# available at https://guides.rubyonrails.org/i18n.html.
 
 en:
+  hello: "Hello world"
   #  This does work, but alters it globally. We need Rails 6.0 to be able to
   #  override the format of error messages at a more granular level.
   errors:
