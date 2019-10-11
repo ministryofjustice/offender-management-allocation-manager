@@ -31,17 +31,18 @@ end
 
 require 'vcr'
 
-recording = ENV['VCR']
+vcr_mode = ENV['VCR']
+recording = vcr_mode.to_i > 0 unless vcr_mode.nil?
 
 vcr_record_mode = recording ? :all : :none
 
 VCR.configure do |config|
   config.cassette_library_dir = "spec/fixtures/vcr_cassettes"
 
-  if recording
-    config.hook_into :webmock
-  else
+  if vcr_mode.nil?
     config.hook_into :faraday
+  else
+    config.hook_into :webmock
   end
   config.configure_rspec_metadata!
   # this allows HTTP connections to go through to webmock if cassette not specified
