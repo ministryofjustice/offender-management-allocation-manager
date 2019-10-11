@@ -115,31 +115,54 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
         end
       end
 
-      scenario 'discretionary path' do
-        find('#early_allocation_extremism_separation_false').click
-        find('#early_allocation_high_risk_of_serious_harm_false').click
-        find('#early_allocation_mappa_level_2_false').click
-        find('#early_allocation_pathfinder_process_false').click
-        find('#early_allocation_other_reason_true').click
+      context 'with discretionary path' do
+        before do
+          find('#early_allocation_extremism_separation_false').click
+          find('#early_allocation_high_risk_of_serious_harm_false').click
+          find('#early_allocation_mappa_level_2_false').click
+          find('#early_allocation_pathfinder_process_false').click
+          find('#early_allocation_other_reason_true').click
 
-        click_button 'Continue'
-        expect(page).not_to have_text 'The community probation team will make a decision'
-
-        # Last prompt before end of journey
-        expect(page).to have_text 'Why are you referring this case for early allocation to the community?'
-        click_button 'Continue'
-        # we need to always tick the 'Head of Offender Management' box and fill in the reasons
-        expect(page).to have_css('.govuk-error-message')
-
-        expect {
-          fill_in id: 'early_allocation_reason', with: 'Just because'
-          find('#early_allocation_approved').click
           click_button 'Continue'
-        }.to change(EarlyAllocation, :count).by(1)
+          expect(page).not_to have_text 'The community probation team will make a decision'
 
-        expect(page).to have_text 'The community probation team will make a decision'
-        click_link 'Save completed assessment (pdf)'
-        expect(page).to have_current_path('/prisons/LEI/prisoners/G4273GI/early_allocation.pdf')
+          # Last prompt before end of journey
+          expect(page).to have_text 'Why are you referring this case for early allocation to the community?'
+          click_button 'Continue'
+          # we need to always tick the 'Head of Offender Management' box and fill in the reasons
+          expect(page).to have_css('.govuk-error-message')
+
+          expect {
+            fill_in id: 'early_allocation_reason', with: 'Just because'
+            find('#early_allocation_approved').click
+            click_button 'Continue'
+          }.to change(EarlyAllocation, :count).by(1)
+
+          expect(page).to have_text 'The community probation team will make a decision'
+        end
+
+        scenario 'saving the PDF' do
+          click_link 'Save completed assessment (pdf)'
+          expect(page).to have_current_path('/prisons/LEI/prisoners/G4273GI/early_allocation.pdf')
+        end
+
+        scenario 'completing the journey' do
+          click_link 'Return to prisoner page'
+          expect(page).to have_content 'Waiting for community decision'
+          within '#early_allocation' do
+            click_link 'Update'
+          end
+
+          click_button('Save')
+          expect(page).to have_css('.govuk-error-message')
+          within '.govuk-error-summary' do
+            expect(all('li').count).to eq(1)
+          end
+
+          find('#early_allocation_community_decision_true').click
+          click_button('Save')
+          expect(page).to have_text('Re-assess')
+        end
       end
 
       scenario 'not eligible due to all answers false' do
