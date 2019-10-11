@@ -16,7 +16,7 @@ RSpec.describe ZendeskTicketsJob, type: :job do
   }
 
   let(:client) { double(Zendesk::Client) }
-  let(:zendesk_moic_api) { double(Zendesk::MOICApi) }
+  let(:zendesk_moic_api) { double(Zendesk::MoicApi) }
   let(:ticket) { double(ZendeskAPI::Ticket, save!: nil) }
 
   let(:url_custom_field) do
@@ -41,7 +41,7 @@ RSpec.describe ZendeskTicketsJob, type: :job do
 
   before do
     allow(Rails.application.config).to receive(:zendesk_url).and_return('https://zendesk_api.com')
-    allow(Zendesk::MOICApi).to receive(:new).and_return(zendesk_moic_api)
+    allow(Zendesk::MoicApi).to receive(:new).and_return(zendesk_moic_api)
   end
 
   context 'when contact is associated to a prison' do
