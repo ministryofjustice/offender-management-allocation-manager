@@ -1,4 +1,4 @@
-module SSOIdentity
+module SsoIdentity
   extend ActiveSupport::Concern
 
   def sso_identity

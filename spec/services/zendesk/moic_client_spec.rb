@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Zendesk::MOICClient do
+RSpec.describe Zendesk::MoicClient do
   subject { described_class.instance }
 
   let(:url) { 'https://zendesk_api.com' }
