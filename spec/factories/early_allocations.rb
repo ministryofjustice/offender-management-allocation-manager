@@ -11,6 +11,8 @@ FactoryBot.define do
     cppc_case do true end
     stage2_validation do false end
 
+    association :case_information
+
     trait :discretionary do
       cppc_case do false end
       extremism_separation do
