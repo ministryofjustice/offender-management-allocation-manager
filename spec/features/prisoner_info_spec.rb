@@ -5,9 +5,12 @@ feature 'View a prisoner profile page' do
     create(:allocation_version, nomis_offender_id: 'G7998GJ', primary_pom_nomis_id: '485637')
   }
 
-  it 'shows the prisoner information', :raven_intercept_exception, vcr: { cassette_name: :show_offender_spec } do
+  before do
     signin_user
-    visit prison_prisoner_show_path('LEI', 'G7998GJ')
+  end
+
+  it 'shows the prisoner information', :raven_intercept_exception, vcr: { cassette_name: :show_offender_spec } do
+    visit prison_prisoner_path('LEI', 'G7998GJ')
 
     expect(page).to have_css('h2', text: 'Ahmonis, Okadonah')
     expect(page).to have_content('07/07/1968')
@@ -16,16 +19,13 @@ feature 'View a prisoner profile page' do
   end
 
   it 'shows the prisoner image', :raven_intercept_exception, vcr: { cassette_name: :show_offender_spec_image } do
-    signin_user
-
-    visit prison_prisoner_image_path('LEI', 'G7998GJ')
+    visit prison_prisoner_image_path('LEI', 'G7998GJ', format: :jpg)
     expect(page.response_headers['Content-Type']).to eq('image/jpg')
   end
 
   it "has a link to the allocation history",
      :raven_intercept_exception, vcr: { cassette_name: :link_to_allocation_history } do
-    signin_user
-    visit prison_prisoner_show_path('LEI', 'G7998GJ')
+    visit prison_prisoner_path('LEI', 'G7998GJ')
     click_link "View"
     expect(page).to have_content('Prisoner allocation')
   end
@@ -42,8 +42,7 @@ feature 'View a prisoner profile page' do
 
     alloc.update(com_name: 'Bob Smith')
 
-    signin_user
-    visit prison_prisoner_show_path('LEI', 'G7998GJ')
+    visit prison_prisoner_path('LEI', 'G7998GJ')
 
     expect(page).to have_content(ldu.name)
     expect(page).to have_content(ldu.email_address)
@@ -59,8 +58,7 @@ feature 'View a prisoner profile page' do
            local_divisional_unit: ldu
     )
 
-    signin_user
-    visit prison_prisoner_show_path('LEI', 'G7998GJ')
+    visit prison_prisoner_path('LEI', 'G7998GJ')
 
     expect(page).not_to have_content('Bob Smith')
     # Expect an Unknown for LDU Email and Team

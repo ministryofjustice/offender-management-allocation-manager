@@ -71,7 +71,7 @@
         <td aria-label="Role" class="govuk-table__cell "><%= allocation.responsibility %></td>
         <% if Flipflop.prisoner_profile? %>
           <td aria-label="Action" class="govuk-table__cell ">
-            <%= link_to('View', prison_prisoner_show_path(@prison, allocation.nomis_offender_id), class: "govuk-link" ) %>
+            <%= link_to('View', prison_prisoner_path(@prison, allocation.nomis_offender_id), class: "govuk-link" ) %>
           </td>
         <% end %>
       </tr>
