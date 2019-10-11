@@ -10,6 +10,7 @@ class EarlyAllocationsController < PrisonsApplicationController
   def create
     @early_assignment = EarlyAllocation.new early_allocation_params.merge(offender_id_from_url)
     if @early_assignment.save
+      send_email
       if @early_assignment.eligible?
         render 'eligible'
       else
@@ -24,6 +25,7 @@ class EarlyAllocationsController < PrisonsApplicationController
   def discretionary
     @early_assignment = EarlyAllocation.new early_allocation_params.merge(offender_id_from_url)
     if @early_assignment.save
+      send_email
       render
     else
       render 'stage3'
@@ -39,6 +41,15 @@ class EarlyAllocationsController < PrisonsApplicationController
     respond_to do |format|
       format.pdf
     end
+  end
+
+  def send_email
+    PomMailer.send_early_allocation_email(email: @offender.ldu.email_address,
+                                          prisoner_name: @offender.full_name,
+                                          prisoner_number: @offender.offender_no,
+                                          pom_name: @allocation.primary_pom_name,
+                                          pom_email: @pom.emails.first,
+                                          prison_name: PrisonService.name_for(@prison)).deliver_later
   end
 
 private

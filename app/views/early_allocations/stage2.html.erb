@@ -25,7 +25,7 @@
     in planning terrorism or considered to pose a risk to national security.
       </span>
 
-      <%= render partial: 'error', locals: { form: form, errors: @early_assignment.errors, fieldname: :extremism_separation }%>
+      <%= render partial: 'error', locals: { errors: @early_assignment.errors, fieldname: :extremism_separation }%>
 
       <div class="govuk-radios" data-module="govuk-radios">
         <div class="govuk-radios govuk-radios--conditional">
@@ -40,7 +40,7 @@
                 <h1 class="govuk-fieldset__heading">Are they due for release in the next 24 months or less?</h1>
               </legend>
 
-              <%= render partial: 'error', locals: { form: form, errors: @early_assignment.errors, fieldname: :due_for_release_in_less_than_24months }%>
+              <%= render partial: 'error', locals: { errors: @early_assignment.errors, fieldname: :due_for_release_in_less_than_24months }%>
 
               <div class="govuk-radios">
                 <div class="govuk-radios__item">
