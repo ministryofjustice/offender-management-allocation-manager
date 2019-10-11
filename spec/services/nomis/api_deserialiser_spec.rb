@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ApiDeserialiser do
+RSpec.describe Nomis::ApiDeserialiser do
   # rubocop:disable RSpec/LeakyConstantDeclaration
   class DeserialiseTest
     attr_accessor :foo, :string
