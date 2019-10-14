@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rails.application.routes.draw do
   root to: 'root#index'
 
@@ -10,8 +12,12 @@ Rails.application.routes.draw do
     resources :caseload, only: %i[ index new]
     get('/caseload/handover_start' => 'caseload#handover_start', as: 'caseload_handover_start')
 
-    get('/prisoners/:id' => 'prisoners#show', as: 'prisoner_show')
-    get('/prisoners/:id/image.jpg' => 'prisoners#image', as: 'prisoner_image')
+    resources :prisoners, only: [:show] do
+      scope :format => true, :constraints => { :format => 'jpg' } do
+        get('image' => 'prisoners#image', as: 'image')
+      end
+    end
+
     resources :allocations, only: %i[ show new create edit update ], param: :nomis_offender_id, path_names: {
         new: ':nomis_offender_id/new',
     }

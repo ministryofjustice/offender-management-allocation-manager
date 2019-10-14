@@ -1,18 +1,20 @@
 # frozen_string_literal: true
 
 class PrisonersController < PrisonsApplicationController
+  before_action :load_offender, only: [:show]
+
   breadcrumb 'Your caseload',
              -> { prison_caseload_index_path(active_prison) }, only: [:show]
-  breadcrumb -> { offender.full_name },
+  breadcrumb -> { @offender.full_name },
              -> { '' }, only: [:show]
 
   def show
-    @prisoner = OffenderPresenter.new(offender,
-                                      Responsibility.find_by(nomis_offender_id: id))
+    @prisoner = OffenderPresenter.new(@offender,
+                                      Responsibility.find_by(nomis_offender_id: id_for_show_action))
 
     @allocation = AllocationVersion.find_by(nomis_offender_id: @prisoner.offender_no)
     @pom_responsibility = ResponsibilityService.calculate_pom_responsibility(
-      offender
+      @offender
     )
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(
       active_prison, @prisoner.offender_no
@@ -20,7 +22,7 @@ class PrisonersController < PrisonsApplicationController
   end
 
   def image
-    @prisoner = offender
+    @prisoner = OffenderService.get_offender(params[:prisoner_id])
     image_data = Nomis::Elite2::OffenderApi.get_image(@prisoner.latest_booking_id)
 
     response.headers['Expires'] = 6.months.from_now.httpdate
@@ -29,11 +31,11 @@ class PrisonersController < PrisonsApplicationController
 
 private
 
-  def id
-    @id ||= params[:id]
+  def id_for_show_action
+    params[:id]
   end
 
-  def offender
-    @offender ||= OffenderService.get_offender(id)
+  def load_offender
+    @offender = OffenderService.get_offender(id_for_show_action)
   end
 end

@@ -28,9 +28,9 @@ describe Bucket do
 
   it "can sort its items by default ASC" do
     b = described_class.new
-    b << Nomis::OffenderSummary.new.tap { |o| o.last_name = "Z" }
-    b << Nomis::OffenderSummary.new.tap { |o| o.last_name = "A" }
-    b << Nomis::OffenderSummary.new.tap { |o| o.last_name = "M" }
+    b << OpenStruct.new(last_name: "Z")
+    b << OpenStruct.new(last_name: "A")
+    b << OpenStruct.new(last_name: "M")
     expect(b.items.count).to be(3)
 
     b.sort(:last_name)
@@ -41,9 +41,9 @@ describe Bucket do
 
   it "can sort its items DESC" do
     b = described_class.new
-    b << Nomis::OffenderSummary.new.tap { |o| o.last_name = "A" }
-    b << Nomis::OffenderSummary.new.tap { |o| o.last_name = "M" }
-    b << Nomis::OffenderSummary.new.tap { |o| o.last_name = "Z" }
+    b << OpenStruct.new(last_name: "A")
+    b << OpenStruct.new(last_name: "M")
+    b << OpenStruct.new(last_name: "Z")
     expect(b.items.count).to be(3)
 
     b.sort(:last_name, :desc)
@@ -54,9 +54,9 @@ describe Bucket do
 
   it "can't sort by made up field" do
     b = described_class.new
-    b << Nomis::OffenderSummary.new.tap { |o| o.last_name = "A" }
-    b << Nomis::OffenderSummary.new.tap { |o| o.last_name = "M" }
-    b << Nomis::OffenderSummary.new.tap { |o| o.last_name = "Z" }
+    b << OpenStruct.new(last_name: "A")
+    b << OpenStruct.new(last_name: "M")
+    b << OpenStruct.new(last_name: "Z")
     expect(b.items.count).to be(3)
 
     b.sort(:test, :desc)
@@ -67,15 +67,14 @@ describe Bucket do
 
   it 'can sort dates containing nulls' do
     b = described_class.new
-    b << Nomis::OffenderSummary.new.tap { |o|
-      o.last_name = "A"
-      o.sentence = Nomis::SentenceDetail.new
-    }
-    b << Nomis::OffenderSummary.new.tap { |o|
-      o.last_name = "A"
-      o.sentence = Nomis::SentenceDetail.new
-      o.sentence.release_date = Date.new(2000, 1, 1)
-    }
+    b << OpenStruct.new(
+      last_name: "A",
+      earliest_release_date: nil
+    )
+    b << OpenStruct.new(
+      last_name: "A",
+      earliest_release_date: Date.new(2000, 1, 1)
+    )
     b.sort(:earliest_release_date)
     items = b.items[0..1]
     expect(items.count).to eq(2)

@@ -6,12 +6,9 @@ module Nomis
              :automatic_release_date,
              to: :sentence
 
-    attr_accessor :first_name,
-                  :last_name,
-                  :date_of_birth,
-                  :offender_no,
-                  :convicted_status,
-                  :category_code
+    attr_reader :first_name, :last_name
+
+    attr_accessor :convicted_status, :category_code, :offender_no, :date_of_birth
 
     # Custom attributes
     attr_accessor :crn,
@@ -77,21 +74,6 @@ module Nomis
 
     def over_18?
       age >= 18
-    end
-
-    def awaiting_allocation_for
-      omic_start_date = if welsh_offender
-                          ResponsibilityService::WELSH_POLICY_START_DATE
-                        else
-                          ResponsibilityService::ENGLISH_POLICY_START_DATE
-                        end
-
-      if sentence.sentence_start_date.nil? ||
-          sentence.sentence_start_date < omic_start_date
-        (Time.zone.today - omic_start_date).to_i
-      else
-        (Time.zone.today - sentence.sentence_start_date).to_i
-      end
     end
 
     def earliest_release_date

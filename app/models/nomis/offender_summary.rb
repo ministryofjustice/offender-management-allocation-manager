@@ -7,9 +7,13 @@ module Nomis
     attr_accessor :aliases, :booking_id
 
     # custom attributes
-    attr_accessor :allocation_date
+    attr_accessor :allocation_date, :prison_arrival_date
 
     attr_reader :prison_id
+
+    def awaiting_allocation_for
+      (Time.zone.today - prison_arrival_date).to_i
+    end
 
     def self.from_json(payload)
       OffenderSummary.new.tap { |obj|

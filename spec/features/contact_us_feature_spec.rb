@@ -11,7 +11,7 @@ feature 'Getting help' do
   end
 
   it 'shows a pre-filled contact form when a user is signed in', :raven_intercept_exception, vcr: { cassette_name: :help_logged_in } do
-    allow_any_instance_of(SSOIdentity).to receive(:sso_identity).and_return(
+    allow_any_instance_of(SsoIdentity).to receive(:sso_identity).and_return(
       'username' => 'PK000223',
       'caseload' => ['LEI'],
       'active_caseload' => 'LEI'
