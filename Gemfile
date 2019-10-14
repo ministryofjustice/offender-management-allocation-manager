@@ -36,7 +36,8 @@ gem 'rubyzip'
 gem 'turnout'
 gem 'zendesk_api'
 gem 'kaminari' # pagination
-gem 'rswag' # api-documentation
+gem 'rswag-api' # api-documentation
+gem 'rswag-ui'  # api-documentation interface
 
 group :development, :test do
   gem 'brakeman'
@@ -48,6 +49,7 @@ group :development, :test do
   gem 'rubocop-rails'
   gem 'dotenv-rails'
   gem 'rspec-rails'
+  gem 'rswag-specs'
 end
 
 group :test do
