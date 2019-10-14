@@ -80,9 +80,15 @@ Rails.application.routes.draw do
   resources :health, only: %i[ index ], controller: 'health'
   resources :status, only: %i[ index ], controller: 'status'
 
-  get('/api' => 'api#index')
+  namespace :api do
+    get('/' => 'api#index')
+    resources :allocation, only: [:show], param: :offender_no, controller: 'allocation_api',path_names: { show: ':offender_no' }
+  end
 
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
+
   mount Flipflop::Engine => "/flip-flop-admin"
+  mount Rswag::Ui::Engine => '/api-docs'
+  mount Rswag::Api::Engine => '/api-docs'
 end
