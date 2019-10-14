@@ -28,6 +28,7 @@ RSpec.describe OffenderHelper do
   describe 'generates labels for case owner ' do
     it 'can show Custody for Prison' do
       off = Nomis::Offender.new
+      off.inprisonment_status = 'SENT03'
       off.sentence = Nomis::SentenceDetail.new
       offp = OffenderPresenter.new(off, nil)
 
@@ -36,6 +37,7 @@ RSpec.describe OffenderHelper do
 
     it 'can show Community for Probation' do
       off = Nomis::Offender.new
+      off.inprisonment_status = 'SENT03'
       off.sentence = Nomis::SentenceDetail.new
       off.sentence.release_date = Time.zone.today
       offp = OffenderPresenter.new(off, nil)

@@ -2,6 +2,21 @@ require 'rails_helper'
 
 describe ResponsibilityService do
   describe '#calculate_pom_responsibility' do
+    context 'when the offender is an immigration case' do
+      let(:offender) {
+        OpenStruct.new immigration_case?: true,
+                       determinate_sentence?: true,
+                       recalled?: false,
+                       sentenced?: true
+      }
+
+      it 'is responsible' do
+        resp = described_class.calculate_pom_responsibility(offender)
+
+        expect(resp).to eq ResponsibilityService::SUPPORTING
+      end
+    end
+
     context 'when indeterminate with dates in the past' do
       let(:offender) {
         OpenStruct.new indeterminate_sentence?: true,
