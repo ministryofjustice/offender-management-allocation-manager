@@ -6,8 +6,7 @@ describe ResponsibilityService do
       let(:offender) {
         OpenStruct.new immigration_case?: true,
                        determinate_sentence?: true,
-                       recalled?: false,
-                       sentenced?: true
+                       recalled?: false
       }
 
       it 'is responsible' do
