@@ -29,7 +29,7 @@ describe 'Allocation API' do
       parameter name: :offender_no, in: :path, type: :string
 
       response '200', 'Offender is allocated' do
-        security [Bearer: {}]
+        security [Bearer: []]
         schema type: :object,
                properties: {
                  primary_pom: {
@@ -67,7 +67,7 @@ describe 'Allocation API' do
       end
 
       response '401', 'Request is not authorised' do
-        security [Bearer: {}]
+        security [Bearer: []]
         schema type: :object,
                properties: {
                  status: { type: :string },
@@ -80,7 +80,7 @@ describe 'Allocation API' do
       end
 
       response '404', 'Allocation for offender not found' do
-        security [Bearer: {}]
+        security [Bearer: []]
         schema type: :object,
                properties: {
                  status: { type: :string },
