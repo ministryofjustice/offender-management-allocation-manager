@@ -70,7 +70,7 @@ describe 'Allocation API' do
         security [Bearer: {}]
         schema type: :object,
                properties: {
-                 staus: { type: :string },
+                 status: { type: :string },
                  message: { type: :string }
                }
 
@@ -83,7 +83,7 @@ describe 'Allocation API' do
         security [Bearer: {}]
         schema type: :object,
                properties: {
-                 staus: { type: :string },
+                 status: { type: :string },
                  message: { type: :string }
                }
 

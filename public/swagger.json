@@ -76,7 +76,7 @@
             "schema": {
               "type": "object",
               "properties": {
-                "staus": {
+                "status": {
                   "type": "string"
                 },
                 "message": {
@@ -90,7 +90,7 @@
             "schema": {
               "type": "object",
               "properties": {
-                "staus": {
+                "status": {
                   "type": "string"
                 },
                 "message": {
