@@ -32,8 +32,9 @@
         ],
         "security": [
           {
-            "Bearer": {
-            }
+            "Bearer": [
+
+            ]
           }
         ],
         "responses": {
