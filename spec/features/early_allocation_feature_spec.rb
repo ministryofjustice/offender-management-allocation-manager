@@ -122,9 +122,11 @@ feature "early allocation questionaire", type: :feature, vcr: { cassette_name: :
         # we need to always tick the 'Head of Offender Management' box and fill in the reasons
         expect(page).to have_css('.govuk-error-message')
 
-        fill_in id: 'early_allocation_reason', with: 'Just because'
-        find('#early_allocation_approved').click
-        click_button 'Continue'
+        expect {
+          fill_in id: 'early_allocation_reason', with: 'Just because'
+          find('#early_allocation_approved').click
+          click_button 'Continue'
+        }.to change(EarlyAllocation, :count).by(1)
 
         expect(page).to have_text 'The community probation team will make a decision'
         click_link 'Save completed assessment (pdf)'
