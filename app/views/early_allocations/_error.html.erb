@@ -1,0 +1,7 @@
+<div class="govuk-form-group <% if errors[fieldname].present? %>govuk-form-group--error<% end %>">
+  <% if errors[fieldname].present? %>
+    <span class="govuk-error-message" id="<%= "#{form.object.class.name.underscore}_#{fieldname}_error" %>">
+      <%= errors[fieldname].first %>
+    </span>
+  <% end %>
+</div>

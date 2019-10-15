@@ -1,0 +1,9 @@
+<% content_for :switcher do %>
+  <%= render '/layouts/prison_switcher' %>
+<% end %>
+
+<% if !@early_assignment.stage2_validation? %>
+  <%= render 'stage1' %>
+<% else %>
+  <%= render 'stage2' %>
+<% end %>

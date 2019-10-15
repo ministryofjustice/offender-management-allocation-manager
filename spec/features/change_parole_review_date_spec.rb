@@ -6,6 +6,7 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
   let!(:case_info) { create(:case_information, nomis_offender_id: nomis_offender_id) }
   let!(:alloc) { create(:allocation_version, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: 485_752) }
   let(:year) { Time.zone.today.year + 1 }
+  let(:yesterday) { Time.zone.yesterday }
 
   before do
     signin_user
@@ -35,7 +36,7 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
 
     click_button 'Update'
 
-    expect(page).to have_content('Parole review date must be after')
+    expect(page).to have_content("Parole review date must be after #{yesterday}")
     expect(case_info.reload.parole_review_date).to be_nil
   end
 end

@@ -28,18 +28,25 @@
         </td>
       </tr>
     <% end %>
-  <!-- PENDING DATA
-    <tr class="govuk-table__row">
+    <% if Flipflop.early_allocation? %>
+    <tr id="early_allocation" class="govuk-table__row">
       <td class="govuk-table__cell">Early allocation eligibility</td>
-      <td class="govuk-table__cell table_cell__left_align"></td>
+      <td class="govuk-table__cell table_cell__left_align">
+        <%= early_allocation_status(@early_allocation) %>
+        <span class="pull-right">
+          <% if @early_allocation.present? %>
+            <% if @early_allocation.discretionary? && @early_allocation.community_decision.nil? %>
+              <%= link_to 'Update', edit_prison_prisoner_early_allocation_path(@prison, @prisoner.offender_no) %>
+            <% else %>
+                Re-assess
+            <% end %>
+          <% else %>
+            <%= link_to 'Assess Eligibility', new_prison_prisoner_early_allocation_path(@prison, @prisoner.offender_no) %>
+          <% end %>
+        </span>
+      </td>
     </tr>
-  -->
-  <!-- PENDING DATA
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell">COM responsibility handover deadline</td>
-      <td class="govuk-table__cell table_cell__left_align"></td>
-    </tr>
-  -->
+  <% end %>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">Last known address in Wales</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">

@@ -19,6 +19,7 @@ class PrisonersController < PrisonsApplicationController
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(
       active_prison, @prisoner.offender_no
     )
+    @early_allocation = EarlyAllocation.find_by(nomis_offender_id: id_for_show_action)
   end
 
   def image

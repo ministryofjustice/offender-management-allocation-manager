@@ -51,5 +51,12 @@ module OffenderManagementAllocationClient
       [config.zendesk_username, config.zendesk_url, config.zendesk_password].all?
 
     config.cache_expiry = 60.minutes
+
+    # overriding the normal wrapping in a div with class 'field-with-errors' seems to be
+    # neccesary in this project, otherwise Gov Design system check-boxes and radio buttons
+    # don't 'check' visibly to the user even though they pass all the tests.
+    config.action_view.field_error_proc = proc { |html_tag, _instance|
+      html_tag
+    }
   end
 end
