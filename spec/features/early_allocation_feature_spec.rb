@@ -127,6 +127,8 @@ feature "early allocation questionaire", type: :feature, vcr: { cassette_name: :
         click_button 'Continue'
 
         expect(page).to have_text 'The community probation team will make a decision'
+        click_link 'Save completed assessment (pdf)'
+        expect(page).to have_current_path('/prisons/LEI/prisoners/G4273GI/early_allocation.pdf')
       end
 
       scenario 'not eligible due to all answers false' do
