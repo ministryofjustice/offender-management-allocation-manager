@@ -4,7 +4,7 @@
   </h2>
   <div class="govuk-error-summary__body">
     <ul class="govuk-list govuk-error-summary__list">
-      <% errors.messages.each do |field, _messages| %>
+      <% errors.messages.reject { |_f, m| m.empty? }.each do |field, _messages| %>
         <li>
           <%= link_to errors.full_messages_for(field).first, "##{form.object.class.name.underscore}_#{field}_error" %>
         </li>

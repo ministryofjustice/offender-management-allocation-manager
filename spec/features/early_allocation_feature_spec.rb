@@ -54,6 +54,8 @@ feature "early allocation questionaire", type: :feature, vcr: { cassette_name: :
       within '.govuk-error-summary' do
         expect(page).to have_text 'You must say if this case is \'high profile\''
         click_link 'You must say if this case is \'high profile\''
+
+        expect(all('li').count).to eq(6)
       end
 
       expect {
@@ -101,6 +103,13 @@ feature "early allocation questionaire", type: :feature, vcr: { cassette_name: :
         click_button 'Continue'
 
         expect(page).to have_css('.govuk-error-message')
+        expect(page).to have_css('.govuk-error-summary')
+
+        within '.govuk-error-summary' do
+          expect(page).to have_text 'You must say if this is a MAPPA 2 case'
+
+          expect(all('li').count).to eq(5)
+        end
       end
 
       scenario 'discretionary path' do
