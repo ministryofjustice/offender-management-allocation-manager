@@ -23,7 +23,7 @@ class EarlyAllocationsController < PrisonsApplicationController
 
   def discretionary
     @early_assignment = EarlyAllocation.new early_allocation_params.merge(offender_id_from_url)
-    if @early_assignment.valid?
+    if @early_assignment.save
       render
     else
       render 'stage3'

@@ -1,5 +1,4 @@
 require 'rails_helper'
-require_relative '../../app/models/nomis/movement'
 
 describe MovementService do
   let!(:new_offender_court) { create(:movement, offender_no: 'G4273GI', from_agency: 'COURT')   }
@@ -91,8 +90,6 @@ describe MovementService do
   end
 
   describe "processing an offender transfer" do
-    let!(:allocation) { create(:allocation_version, nomis_offender_id: 'G4273GI')   }
-    let!(:transfer_adm) { create(:movement, offender_no: 'G4273GI', from_agency: 'PRI', to_agency: 'PVI')   }
     let!(:transfer_adm_no_to_agency) { create(:movement, offender_no: 'G4273GI', to_agency: 'COURT')   }
     let!(:transfer_in) { create(:movement, offender_no: 'G4273GI', direction_code: 'IN', movement_type: 'ADM', from_agency: 'VEI', to_agency: 'CFI')   }
     let!(:admission) { create(:movement, offender_no: 'G4273GI', to_agency: 'LEI', from_agency: 'COURT')   }
@@ -107,15 +104,18 @@ describe MovementService do
       expect(processed).to be false
     end
 
-    it "can process transfer movements IN",
-       vcr: { cassette_name: :movement_service_transfer_in_spec }  do
-      processed = described_class.process_movement(transfer_adm)
-      updated_allocation = AllocationVersion.find_by(nomis_offender_id: transfer_adm.offender_no)
+    context 'when processing an admission' do
+      let(:transfer_adm) { create(:movement, offender_no: 'G4273GI', from_agency: 'PRI', to_agency: 'PVI')   }
+      let(:updated_allocation) { existing_allocation.reload }
 
-      expect(updated_allocation.event).to eq 'deallocate_primary_pom'
-      expect(updated_allocation.event_trigger).to eq 'offender_transferred'
-      expect(updated_allocation.primary_pom_name).to be_nil
-      expect(processed).to be true
+      it "can process transfer movements IN",
+         vcr: { cassette_name: :movement_service_transfer_in_spec }  do
+        expect(described_class.process_movement(transfer_adm)).to eq(true)
+
+        expect(updated_allocation.event).to eq 'deallocate_primary_pom'
+        expect(updated_allocation.event_trigger).to eq 'offender_transferred'
+        expect(updated_allocation.primary_pom_name).to be_nil
+      end
     end
 
     it "can process a movement with invalid 'to' agency",
