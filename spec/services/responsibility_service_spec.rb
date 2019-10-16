@@ -48,7 +48,6 @@ describe ResponsibilityService do
       end
     end
 
-
     context 'when offender is english' do
       let(:offender) {
         OpenStruct.new welsh_offender: false,
