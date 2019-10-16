@@ -107,7 +107,6 @@
         <% end %>
       </td>
     </tr>
-    <% if Flipflop.link_allocation_info? %>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Allocation history</td>
       <td class="govuk-table__cell table_cell__left_align">
@@ -115,7 +114,6 @@
         <%= link_to 'View', prison_allocation_history_path(@prison, @prisoner.offender_no), class: "govuk-link pull-right" %>
       </td>
     </tr>
-      <% end %>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">Keyworker</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
@@ -124,26 +122,4 @@
     </tr>
     </tbody>
   </table>
-<!--  <table class="govuk-table">-->
-<!--    <tbody class="govuk-table__body">-->
-<!--    <tr class="govuk-table__row">-->
-<!--      <td class="govuk-table__header govuk-!-width-one-half" scope="row">Community information</td>-->
-<!--      <td class="govuk-table__cell govuk-!-width-one-half"></td>-->
-<!--    <tr class="govuk-table__row">-->
-<!--      <td class="govuk-table__cell">Local Divisional Unit</td>-->
-<!--      <td class="govuk-table__cell table_cell__left_align">ADD INFO-->
-<!--      </td>-->
-<!--    </tr>-->
-<!--    <tr class="govuk-table__row">-->
-<!--      <td class="govuk-table__cell govuk-!-width-one-half">Team</td>-->
-<!--      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">ADD INFO-->
-<!--      </td>-->
-<!--    </tr>-->
-<!--    <tr class="govuk-table__row">-->
-<!--      <td class="govuk-table__cell govuk-!-width-one-half">COM</td>-->
-<!--      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">ADD INFO-->
-<!--      </td>-->
-<!--    </tr>-->
-<!--    </tbody>-->
-<!--  </table>-->
 </div>
