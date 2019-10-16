@@ -18,7 +18,7 @@ class PomMailer < GovukNotifyRails::Mailer
     mail(to: params[:pom_email])
   end
 
-  def send_early_allocation_email(email:, prisoner_name:, prisoner_number:, pom_name:, pom_email:, prison_name:)
+  def early_allocation_email(email:, prisoner_name:, prisoner_number:, pom_name:, pom_email:, prison_name:)
     set_template('5e546d65-57ff-49e1-8fae-c955a7b1da80')
     set_personalisation(prisoner_name: prisoner_name,
                         prisoner_number: prisoner_number,

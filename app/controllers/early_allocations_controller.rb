@@ -33,26 +33,29 @@ class EarlyAllocationsController < PrisonsApplicationController
   end
 
   def show
-    @offender = EarlyAllocation.find_by! offender_id_from_url
-    @prisoner = OffenderService.get_offender(params[:prisoner_id])
-    @allocation = AllocationVersion.find_by!(offender_id_from_url)
-    @pom = PrisonOffenderManagerService.get_pom(@prison, @allocation.primary_pom_nomis_id)
+    @early_assignment = EarlyAllocation.find_by!(offender_id_from_url)
 
     respond_to do |format|
       format.pdf
     end
   end
 
-  def send_email
-    PomMailer.send_early_allocation_email(email: @offender.ldu.email_address,
-                                          prisoner_name: @offender.full_name,
-                                          prisoner_number: @offender.offender_no,
-                                          pom_name: @allocation.primary_pom_name,
-                                          pom_email: @pom.emails.first,
-                                          prison_name: PrisonService.name_for(@prison)).deliver_later
+private
+
+  def load_prisoner
+    @offender = OffenderService.get_offender(params[:prisoner_id])
+    @allocation = AllocationVersion.find_by!(offender_id_from_url)
+    @pom = PrisonOffenderManagerService.get_pom(@prison, @allocation.primary_pom_nomis_id)
   end
 
-private
+  def send_email
+    PomMailer.early_allocation_email(email: @offender.ldu.email_address,
+                                     prisoner_name: @offender.full_name,
+                                     prisoner_number: @offender.offender_no,
+                                     pom_name: @allocation.primary_pom_name,
+                                     pom_email: @pom.emails.first,
+                                     prison_name: PrisonService.name_for(@prison)).deliver_later
+  end
 
   def create_error_page
     if !@early_assignment.stage2_validation?
@@ -76,12 +79,6 @@ private
     else
       'stage3'
     end
-  end
-
-  def load_prisoner
-    @offender = OffenderService.get_offender(params[:prisoner_id])
-    @allocation = AllocationVersion.find_by!(offender_id_from_url)
-    @pom = PrisonOffenderManagerService.get_pom(@prison, @allocation.primary_pom_nomis_id)
   end
 
   def early_allocation_params
