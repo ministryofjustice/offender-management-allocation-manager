@@ -34,16 +34,12 @@ private
   end
 
   def stage1
-    if @early_assignment.valid?
-      if @early_assignment.eligible?
-        @early_assignment.save!
-        render 'eligible'
-      else
-        @early_assignment.stage2_validation = true
-        render 'new'
-      end
-    else
+    if @early_assignment.save
+      render 'eligible'
+    elsif @early_assignment.any_stage1_field_errors?
       render 'new'
+    else
+      render 'stage2_new'
     end
   end
 
@@ -69,7 +65,7 @@ private
                  :oasys_risk_assessment_date_yyyy,
                  :oasys_risk_assessment_date,
                  :stage2_validation,
-                 :stage2_complete,
+                 :stage3_validation,
                  :reason,
                  :approved])
   end
