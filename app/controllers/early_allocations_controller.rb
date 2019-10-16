@@ -10,7 +10,13 @@ class EarlyAllocationsController < PrisonsApplicationController
   def create
     @early_assignment = EarlyAllocation.new early_allocation_params.merge(offender_id_from_url)
     if !@early_assignment.stage2_validation?
-      stage1
+      if @early_assignment.save
+        render 'eligible'
+      elsif @early_assignment.any_stage1_field_errors?
+        render 'new'
+      else
+        render 'stage2_new'
+      end
     else
       stage2
     end
@@ -21,7 +27,7 @@ class EarlyAllocationsController < PrisonsApplicationController
     if @early_assignment.valid?
       render
     else
-      render 'why'
+      render 'stage3'
     end
   end
 
@@ -33,23 +39,13 @@ private
     @pom = PrisonOffenderManagerService.get_pom(@prison, @allocation.primary_pom_nomis_id)
   end
 
-  def stage1
-    if @early_assignment.save
-      render 'eligible'
-    elsif @early_assignment.any_stage1_field_errors?
-      render 'new'
-    else
-      render 'stage2_new'
-    end
-  end
-
   def stage2
     if @early_assignment.valid?
       if @early_assignment.ineligible?
         @early_assignment.save!
         render 'ineligible'
       else
-        render 'why'
+        render 'stage3'
       end
     else
       render 'new'
