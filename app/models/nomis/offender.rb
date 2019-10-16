@@ -8,9 +8,10 @@ module Nomis
                   :latest_booking_id,
                   :main_offence,
                   :nationalities,
-                  :noms_id
+                  :noms_id,
+                  :prison_id
 
-    attr_reader :prison_id, :reception_date
+    attr_reader :reception_date
 
     def initialize(fields = nil)
       # Allow this object to be reconstituted from a hash, we can't use

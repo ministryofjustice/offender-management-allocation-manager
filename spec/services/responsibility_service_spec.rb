@@ -31,6 +31,24 @@ describe ResponsibilityService do
       end
     end
 
+    context 'when an NPS offender is in an open prison' do
+      let(:offender) {
+        OpenStruct.new prison_id: 'HDI',
+                       nps_case?: true,
+                       indeterminate_sentence?: true,
+                       recalled?: false,
+                       earliest_release_date: Time.zone.today - 1.year,
+                       sentenced?: true
+      }
+
+      it 'is supporting/community' do
+        resp = described_class.calculate_pom_responsibility(offender)
+
+        expect(resp).to eq ResponsibilityService::SUPPORTING
+      end
+    end
+
+
     context 'when offender is english' do
       let(:offender) {
         OpenStruct.new welsh_offender: false,
