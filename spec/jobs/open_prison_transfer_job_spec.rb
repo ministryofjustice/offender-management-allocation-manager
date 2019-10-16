@@ -54,16 +54,16 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
       o.last_name = 'Last'
     })
 
-    fakejob = double()
+    fakejob = double
     allow(fakejob).to receive(:deliver_later)
 
     expect(PomMailer).to receive(:responsibility_override_open_prison).with(hash_including(
-      prisoner_number: nomis_offender_id,
-      prisoner_name: 'Last, First',
-      responsible_pom_name: 'N/A',
-      responsible_pom_email: 'N/A',
-      prison_name: 'HMP/YOI Hatfield',
-      previous_prison_name: 'HMP Leeds'
+                                                                              prisoner_number: nomis_offender_id,
+                                                                              prisoner_name: 'Last, First',
+                                                                              responsible_pom_name: 'N/A',
+                                                                              responsible_pom_email: 'N/A',
+                                                                              prison_name: 'HMP/YOI Hatfield',
+                                                                              previous_prison_name: 'HMP Leeds'
     )).and_return(fakejob)
 
     described_class.perform_now(movement_json)
@@ -84,16 +84,16 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
     create(:allocation_version, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id, prison: 'LEI', primary_pom_name: 'Primary POMName')
     AllocationVersion.deallocate_offender(nomis_offender_id, AllocationVersion::OFFENDER_TRANSFERRED)
 
-    fakejob = double()
+    fakejob = double
     allow(fakejob).to receive(:deliver_later)
 
     expect(PomMailer).to receive(:responsibility_override_open_prison).with(hash_including(
-      prisoner_number: nomis_offender_id,
-      prisoner_name: 'Last, First',
-      responsible_pom_name: 'Primary POMName',
-      responsible_pom_email: 'pom@localhost.local',
-      prison_name: 'HMP/YOI Hatfield',
-      previous_prison_name: 'HMP Leeds'
+                                                                              prisoner_number: nomis_offender_id,
+                                                                              prisoner_name: 'Last, First',
+                                                                              responsible_pom_name: 'Primary POMName',
+                                                                              responsible_pom_email: 'pom@localhost.local',
+                                                                              prison_name: 'HMP/YOI Hatfield',
+                                                                              previous_prison_name: 'HMP Leeds'
     )).and_return(fakejob)
 
     described_class.perform_now(movement_json)
