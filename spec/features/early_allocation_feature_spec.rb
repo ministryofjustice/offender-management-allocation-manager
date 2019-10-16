@@ -66,6 +66,9 @@ feature "early allocation questionaire", type: :feature, vcr: { cassette_name: :
         # selecting any one of these as 'Yes' means that we progress to assessment complete (Yes)
         expect(page).to have_text('The community probation team will take responsibility')
       }.to change(EarlyAllocation, :count).by(1)
+
+      click_link 'Save completed assessment (pdf)'
+      expect(page).to have_current_path('/prisons/LEI/prisoners/G4273GI/early_allocation.pdf')
     end
 
     context 'when existing eligible early allocation' do
@@ -135,6 +138,8 @@ feature "early allocation questionaire", type: :feature, vcr: { cassette_name: :
         }.to change(EarlyAllocation, :count).by(1)
 
         expect(page).to have_text 'The community probation team will make a decision'
+        click_link 'Save completed assessment (pdf)'
+        expect(page).to have_current_path('/prisons/LEI/prisoners/G4273GI/early_allocation.pdf')
       end
 
       scenario 'not eligible due to all answers false' do
@@ -146,6 +151,9 @@ feature "early allocation questionaire", type: :feature, vcr: { cassette_name: :
 
         click_button 'Continue'
         expect(page).to have_text 'Not eligible for early allocation'
+
+        click_link 'Save completed assessment (pdf)'
+        expect(page).to have_current_path('/prisons/LEI/prisoners/G4273GI/early_allocation.pdf')
       end
     end
   end

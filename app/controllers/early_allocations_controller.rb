@@ -30,6 +30,17 @@ class EarlyAllocationsController < PrisonsApplicationController
     end
   end
 
+  def show
+    @offender = EarlyAllocation.find_by! offender_id_from_url
+    @prisoner = OffenderService.get_offender(params[:prisoner_id])
+    @allocation = AllocationVersion.find_by!(offender_id_from_url)
+    @pom = PrisonOffenderManagerService.get_pom(@prison, @allocation.primary_pom_nomis_id)
+
+    respond_to do |format|
+      format.pdf
+    end
+  end
+
 private
 
   def create_error_page
