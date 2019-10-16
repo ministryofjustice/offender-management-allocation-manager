@@ -7,8 +7,8 @@ SimpleCov.start 'rails' do
   add_group "Services", "app/services"
 
   # Try to set this to current coverage levels so that it never goes down after a PR
-  # 23 lines uncovered at 99.02% coverage
-  minimum_coverage 99
+  # 21 lines uncovered at 99.10% coverage
+  minimum_coverage 99.10
   maximum_coverage_drop 0
 end
 

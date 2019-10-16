@@ -30,6 +30,51 @@
 # available at http://guides.rubyonrails.org/i18n.html.
 
 en:
+  #  This does work, but alters it globally. We need Rails 6.0 to be able to
+  #  override the format of error messages at a more granular level.
+  errors:
+    format: "%{message}"
+  activerecord:
+    errors:
+      models:
+        case_information:
+          attributes:
+            parole_review_date:
+              after: "Parole review date must be after %{date}"
+        early_allocation:
+#          This is a Rails 6 feature (to customise messages per-model)
+#          format: "%{message}"
+          attributes:
+            oasys_risk_assessment_date:
+              blank: Enter the date of the last OASys risk assessment
+#           These attributes are all 'inclusion' because booleans are validated in: [true false] otherwise No isn't accepted
+            convicted_under_terrorisom_act_2000:
+              inclusion: You  must say if they were convicted under the Terrorism Act 2000
+            high_profile:
+              inclusion: You must say if this case is 'high profile'
+            serious_crime_prevention_order:
+              inclusion: You must say if they are subject to a Serious Crime Prevention Order
+            mappa_level_3:
+              inclusion: You must say if this is a MAPPA 3 case
+            cppc_case:
+              inclusion: You must say if this will be a CPPC case
+            extremism_separation:
+              inclusion: You must say if this prisoner has been in an extremism separation centre
+            due_for_release_in_less_than_24months:
+              inclusion: You must say if they will be released in the next 24 months
+            high_risk_of_serious_harm:
+              inclusion: You must say whether this prisoner presents a risk of serious harm
+            mappa_level_2:
+              inclusion: You must say if this is a MAPPA 2 case
+            pathfinder_process:
+              inclusion: You must say if this prisoner has been identified through the pathfinder process
+            other_reason:
+              inclusion: You must say if there is another reason for early allocation
+            reason:
+              blank: You must give a reason for referring this case
+#           Approved has to be 'true' so inclusion: [true] is the validation
+            approved:
+              inclusion: You must say if this referral has been approved
   views:
     pagination:
       first: "&laquo; First"
@@ -41,6 +86,8 @@ en:
     fieldset:
       case_information:
         parole_review_date: "What is the next parole review date?"
+      early_allocation:
+        oasys_risk_assessment_date: 'When was the last OASys risk assessment?'
     page_entries_info:
       one_page:
         display_entries:

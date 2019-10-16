@@ -1,5 +1,5 @@
 module Zendesk
-  class MOICClient
+  class MoicClient
     include Singleton
 
     def initialize

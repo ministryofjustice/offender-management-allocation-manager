@@ -6,7 +6,7 @@ class ApplicationController < ActionController::Base
 
   before_action :set_paper_trail_whodunnit
 
-  include SSOIdentity
+  include SsoIdentity
 
   def authenticate_user
     if sso_identity.nil? || session_expired?

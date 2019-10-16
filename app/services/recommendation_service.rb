@@ -5,7 +5,9 @@ class RecommendationService
   PROBATION_POM = 'PO'
 
   def self.recommended_pom_type(offender)
-    if ResponsibilityService.calculate_pom_responsibility(offender).custody?
+    if offender.immigration_case?
+      PRISON_POM
+    elsif ResponsibilityService.calculate_pom_responsibility(offender).custody?
       if %w[A B].include?(offender.tier)
         PROBATION_POM
       else

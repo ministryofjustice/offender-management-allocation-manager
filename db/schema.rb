@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_24_133346) do
+ActiveRecord::Schema.define(version: 2019_10_03_142825) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -98,6 +98,26 @@ ActiveRecord::Schema.define(version: 2019_09_24_133346) do
   create_table "delius_import_errors", force: :cascade do |t|
     t.string "nomis_offender_id"
     t.integer "error_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "early_allocations", force: :cascade do |t|
+    t.string "nomis_offender_id", null: false
+    t.date "oasys_risk_assessment_date", null: false
+    t.boolean "convicted_under_terrorisom_act_2000", null: false
+    t.boolean "high_profile", null: false
+    t.boolean "serious_crime_prevention_order", null: false
+    t.boolean "mappa_level_3", null: false
+    t.boolean "cppc_case", null: false
+    t.boolean "high_risk_of_serious_harm"
+    t.boolean "mappa_level_2"
+    t.boolean "pathfinder_process"
+    t.boolean "other_reason"
+    t.boolean "extremism_separation"
+    t.boolean "due_for_release_in_less_than_24months"
+    t.boolean "approved"
+    t.string "reason"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

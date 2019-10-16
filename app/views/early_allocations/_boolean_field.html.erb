@@ -1,0 +1,22 @@
+<div class="govuk-form-group">
+  <fieldset class="govuk-fieldset">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+      <h1 class="govuk-fieldset__heading"><%= heading_text %></h1>
+    </legend>
+
+    <span class="govuk-hint"><%= hint_text %></span>
+
+    <%= render partial: 'error', locals: { errors: errors, fieldname: fieldname, form: form }%>
+
+    <div class="govuk-radios">
+      <div class="govuk-radios__item">
+        <%= form.radio_button(fieldname, true, class: "govuk-radios__input") %>
+        <%= form.label "#{fieldname}_true", 'Yes', class: "govuk-label govuk-radios__label" %>
+      </div>
+      <div class="govuk-radios__item">
+        <%= form.radio_button(fieldname, false, class: "govuk-radios__input") %>
+        <%= form.label "#{fieldname}_false", 'No', class: "govuk-label govuk-radios__label" %>
+      </div>
+    </div>
+  </fieldset>
+</div>

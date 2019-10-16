@@ -1,0 +1,30 @@
+<% content_for :switcher do %>
+  <%= render '/layouts/prison_switcher' %>
+<% end %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-panel govuk-panel--confirmation">
+      <h1 class="govuk-panel__title">
+        Assessment Complete
+      </h1>
+      <div class="govuk-panel__body">
+        The community probation team will make a decision
+      </div>
+    </div>
+    <h2 class="govuk-heading-m">What happens next</h2>
+
+    <p class="govuk-body">
+      You should receive an email with a decision from the
+      community probation team about this case.
+    </p>
+    <p class="govuk-body">
+      You will need to record this decision on the prisoner profile page.
+    </p>
+    <p class="govuk-body">
+      A new handover date will be calculated
+      if the prisoner is accepted by the community probation team.
+    </p>
+    <%= render(partial: 'landing_page_footer') %>
+  </div>
+</div>

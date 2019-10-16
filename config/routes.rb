@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rails.application.routes.draw do
   root to: 'root#index'
 
@@ -10,8 +12,17 @@ Rails.application.routes.draw do
     resources :caseload, only: %i[ index new]
     get('/caseload/handover_start' => 'caseload#handover_start', as: 'caseload_handover_start')
 
-    get('/prisoners/:id' => 'prisoners#show', as: 'prisoner_show')
-    get('/prisoners/:id/image.jpg' => 'prisoners#image', as: 'prisoner_image')
+    resources :prisoners, only: [:show] do
+      scope :format => true, :constraints => { :format => 'jpg' } do
+        get('image' => 'prisoners#image', as: 'image')
+      end
+
+      # show is only used with format PDF
+      resource :early_allocation, only: [:new, :create, :show, :edit] do
+        post('discretionary')
+      end
+    end
+
     resources :allocations, only: %i[ show new create edit update ], param: :nomis_offender_id, path_names: {
         new: ':nomis_offender_id/new',
     }
@@ -74,9 +85,15 @@ Rails.application.routes.draw do
   resources :health, only: %i[ index ], controller: 'health'
   resources :status, only: %i[ index ], controller: 'status'
 
-  get('/api' => 'api#index')
+  namespace :api do
+    get('/' => 'api#index')
+    resources :allocation, only: [:show], param: :offender_no, controller: 'allocation_api',path_names: { show: ':offender_no' }
+  end
 
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
+
   mount Flipflop::Engine => "/flip-flop-admin"
+  mount Rswag::Ui::Engine => '/api-docs'
+  mount Rswag::Api::Engine => '/api-docs'
 end

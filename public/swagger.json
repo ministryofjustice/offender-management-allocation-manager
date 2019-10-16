@@ -1,0 +1,107 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Allocation API",
+    "version": "v1"
+  },
+  "securityDefinitions": {
+    "Bearer": {
+      "description": "A bearer token obtained from HMPPS SSO",
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "paths": {
+    "/api/allocation/{offender_no}": {
+      "get": {
+        "summary": "Retrieves the current allocation for an offender",
+        "tags": [
+          "Allocations"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "offender_no",
+            "in": "path",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "Bearer": [
+
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Offender is allocated",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "primary_pom": {
+                  "type": "object",
+                  "properties": {
+                    "staff_id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "secondary_pom": {
+                  "type": "object",
+                  "properties": {
+                    "staff_id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "required": [
+                "primary_pom",
+                "secondary_pom"
+              ]
+            }
+          },
+          "401": {
+            "description": "Request is not authorised",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Allocation for offender not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

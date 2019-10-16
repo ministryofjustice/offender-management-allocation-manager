@@ -76,6 +76,10 @@ module Nomis
       age >= 18
     end
 
+    def immigration_case?
+      sentence_type_code == 'DET'
+    end
+
     def earliest_release_date
       sentence.earliest_release_date
     end

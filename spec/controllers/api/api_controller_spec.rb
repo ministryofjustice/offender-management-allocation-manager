@@ -1,9 +1,8 @@
 require 'rails_helper'
 
-RSpec.describe ApiController, type: :controller do
+RSpec.describe Api::ApiController, type: :controller do
   let(:rsa_private) { OpenSSL::PKey::RSA.generate 2048 }
   let(:rsa_public) { Base64.strict_encode64(rsa_private.public_key.to_s) }
-  let(:error_message) { { 'status' => 'error', 'message' => 'Invalid token' } }
   let(:ok_message) { { 'status' => 'ok' } }
 
   before do
@@ -13,8 +12,8 @@ RSpec.describe ApiController, type: :controller do
   it 'blocks access for missing tokens' do
     get :index
 
-    expect(response).to have_http_status(200)
-    expect(JSON.parse(response.body)).to eq(error_message)
+    expect(response).to have_http_status(401)
+    expect(JSON.parse(response.body)['status']).to eq('error')
   end
 
   it 'blocks non-bearer tokens' do
@@ -22,8 +21,8 @@ RSpec.describe ApiController, type: :controller do
 
     get :index
 
-    expect(response).to have_http_status(200)
-    expect(JSON.parse(response.body)).to eq(error_message)
+    expect(response).to have_http_status(401)
+    expect(JSON.parse(response.body)['status']).to eq('error')
   end
 
   it 'blocks bearer tokens that can not be decrypted' do
@@ -31,8 +30,8 @@ RSpec.describe ApiController, type: :controller do
 
     get :index
 
-    expect(response).to have_http_status(200)
-    expect(JSON.parse(response.body)).to eq(error_message)
+    expect(response).to have_http_status(401)
+    expect(JSON.parse(response.body)['status']).to eq('error')
   end
 
   it 'blocks bearer tokens without an expiry date' do
@@ -43,8 +42,8 @@ RSpec.describe ApiController, type: :controller do
     request_header(payload)
     get :index
 
-    expect(response).to have_http_status(200)
-    expect(JSON.parse(response.body)).to eq(error_message)
+    expect(response).to have_http_status(401)
+    expect(JSON.parse(response.body)['status']).to eq('error')
   end
 
   it 'blocks expired bearer tokens' do
@@ -56,8 +55,8 @@ RSpec.describe ApiController, type: :controller do
     request_header(payload)
     get :index
 
-    expect(response).to have_http_status(200)
-    expect(JSON.parse(response.body)).to eq(error_message)
+    expect(response).to have_http_status(401)
+    expect(JSON.parse(response.body)['status']).to eq('error')
   end
 
   it 'blocks tokens without a scope' do
@@ -69,8 +68,8 @@ RSpec.describe ApiController, type: :controller do
     request_header(payload)
     get :index
 
-    expect(response).to have_http_status(200)
-    expect(JSON.parse(response.body)).to eq(error_message)
+    expect(response).to have_http_status(401)
+    expect(JSON.parse(response.body)['status']).to eq('error')
   end
 
   it 'blocks tokens that do not have a read scope' do
@@ -83,8 +82,8 @@ RSpec.describe ApiController, type: :controller do
     request_header(payload)
     get :index
 
-    expect(response).to have_http_status(200)
-    expect(JSON.parse(response.body)).to eq(error_message)
+    expect(response).to have_http_status(401)
+    expect(JSON.parse(response.body)['status']).to eq('error')
   end
 
   it 'accepts bearer tokens that are not expired with a read scope' do

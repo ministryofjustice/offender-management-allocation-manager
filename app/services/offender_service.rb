@@ -88,7 +88,7 @@ class OffenderService
   def self.get_offenders_for_prison(prison)
     OffenderEnumerator.new(prison).select { |offender|
       offender.age >= 18 &&
-      offender.sentenced? &&
+      (offender.sentenced? || offender.immigration_case?) &&
       offender.criminal_sentence?
     }
   end
