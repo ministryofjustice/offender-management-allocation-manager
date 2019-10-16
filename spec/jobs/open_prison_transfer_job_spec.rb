@@ -6,19 +6,29 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
   let(:nomis_offender_id) { 'G3462VT' }
   let(:nomis_staff_id) { 485_637 }
   let(:open_prison_code) { 'HDI' }
+  let(:closed_prison_code) { 'LEI' }
+  let(:poms) {
+    [{
+      staffId: nomis_staff_id,
+      firstName: 'Firstname',
+      lastName: 'Lastname',
+      position: 'PRO',
+      emails: ['pom@localhost.local']
+    }]
+  }
   let(:movement_json) {
     {
       offenderNo: nomis_offender_id,
-      fromAgency: "LEI",
+      fromAgency: closed_prison_code,
       toAgency: open_prison_code,
       movementType: "TRN",
       directionCode: "IN"
     }.to_json
   }
-  let(:elite2api) { 'https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api' }
 
   before do
     stub_auth_token
+    stub_poms(closed_prison_code, poms)
   end
 
   it 'does not send an email when no LDU email address' do
@@ -27,9 +37,6 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
       o.offender_no =  nomis_offender_id
       o.case_allocation = 'NPS'
     })
-
-    stub_request(:get, "#{elite2api}/staff/#{nomis_staff_id}/emails").
-      to_return(status: 200, body: ['pom@localhost.local'].to_json, headers: {})
 
     described_class.perform_now(movement_json)
 
@@ -47,19 +54,19 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
       o.last_name = 'Last'
     })
 
-    stub_request(:get, "#{elite2api}/staff/#{nomis_staff_id}/emails").
-      to_return(status: 200, body: ['pom@localhost.local'].to_json, headers: {})
+    fakejob = double()
+    allow(fakejob).to receive(:deliver_later)
 
-    expect {
-      described_class.perform_now(movement_json)
-    }.to have_enqueued_job.with { |_job, _method, _deliver_when, args|
-      expect(args[:prisoner_number]).to eq(nomis_offender_id)
-      expect(args[:prisoner_name]).to eq('Last, First')
-      expect(args[:responsible_pom_name]).to eq('N/A')
-      expect(args[:responsible_pom_email]).to eq('N/A')
-      expect(args[:prison_name]).to eq('HMP/YOI Hatfield')
-      expect(args[:previous_prison_name]).to eq('HMP Leeds')
-    }
+    expect(PomMailer).to receive(:responsibility_override_open_prison).with(hash_including(
+      prisoner_number: nomis_offender_id,
+      prisoner_name: 'Last, First',
+      responsible_pom_name: 'N/A',
+      responsible_pom_email: 'N/A',
+      prison_name: 'HMP/YOI Hatfield',
+      previous_prison_name: 'HMP Leeds'
+    )).and_return(fakejob)
+
+    described_class.perform_now(movement_json)
   end
 
   it 'can use previous allocation details where they exist', versioning: true do
@@ -72,24 +79,23 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
       o.last_name = 'Last'
     })
 
-    stub_request(:get, "#{elite2api}/staff/#{nomis_staff_id}/emails").
-      to_return(status: 200, body: ['pom@localhost.local'].to_json, headers: {})
-
     # Create an allocation where the offender is allocated, and then deallocate so we can
     # test finding the last pom that was allocated to this offender ....
     create(:allocation_version, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id, prison: 'LEI', primary_pom_name: 'Primary POMName')
     AllocationVersion.deallocate_offender(nomis_offender_id, AllocationVersion::OFFENDER_TRANSFERRED)
 
-    expect {
-      described_class.perform_now(movement_json)
-    }.to have_enqueued_job.with { |_job, _method, _deliver_when, args|
-      expect(args[:prisoner_number]).to eq(nomis_offender_id)
-      expect(args[:prisoner_name]).to eq('Last, First')
-      expect(args[:responsible_pom_name]).to eq('Primary POMName')
-      expect(args[:responsible_pom_email]).to eq('pom@localhost.local')
-      expect(args[:prison_name]).to eq('HMP/YOI Hatfield')
-      expect(args[:previous_prison_name]).to eq('HMP Leeds')
-      expect(args[:email]).to eq('ldu@local.local')
-    }
+    fakejob = double()
+    allow(fakejob).to receive(:deliver_later)
+
+    expect(PomMailer).to receive(:responsibility_override_open_prison).with(hash_including(
+      prisoner_number: nomis_offender_id,
+      prisoner_name: 'Last, First',
+      responsible_pom_name: 'Primary POMName',
+      responsible_pom_email: 'pom@localhost.local',
+      prison_name: 'HMP/YOI Hatfield',
+      previous_prison_name: 'HMP Leeds'
+    )).and_return(fakejob)
+
+    described_class.perform_now(movement_json)
   end
 end
