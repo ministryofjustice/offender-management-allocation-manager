@@ -4,7 +4,7 @@
 
 <%= render 'shared/basic_prisoner_info' %>
 
-<%= render 'shared/offence_info' %>
+<%= render partial: 'shared/offence_info', locals: { editable_prd: true }  %>
 
 <%= render 'allocations/case_information' %>
 
