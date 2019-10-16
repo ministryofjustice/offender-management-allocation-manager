@@ -16,6 +16,7 @@ class EarlyAllocationsController < PrisonsApplicationController
         render 'ineligible'
       end
     else
+      @early_assignment.errors.delete(:stage2_validation)
       render create_error_page
     end
   end
