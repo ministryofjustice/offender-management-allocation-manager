@@ -26,6 +26,18 @@ class EarlyAllocation < ApplicationRecord
 
   STAGE1_FIELDS = [:oasys_risk_assessment_date] + STAGE1_BOOLEAN_FIELDS
 
+  def any_stage1_field_errors?
+    STAGE1_FIELDS.map { |f| errors[f].present? }.any?
+  end
+
+  validate :validate_stage1, unless: -> { stage2_validation || stage3_validation }
+
+  # add an arbitrary error in stage1 if we're not eligible. This will push us onto stage2
+  # by asking any_stage1_field_errors? and prevent the save.
+  def validate_stage1
+    errors.add(:stage2_validation, 'cant save') unless stage1_eligible?
+  end
+
   attribute :stage2_validation, :boolean
 
   STAGE2_COMMON_FIELDS = [:high_risk_of_serious_harm,
@@ -53,14 +65,25 @@ class EarlyAllocation < ApplicationRecord
               in: [true, false],
               allow_nil: false }, if: -> { extremism_separation })
 
-  attribute :stage2_complete, :boolean
+  def any_stage2_field_errors?
+    ALL_STAGE2_FIELDS.map { |f| errors[f].present? }.any?
+  end
 
-  validates :reason, presence: true, if: -> { stage2_complete }
+  validate :validate_stage2, if: -> { stage2_validation  }
+
+  # add an arbitrary error in stage2 if we're not savable i.e. in discretionary state
+  def validate_stage2
+    errors.add(:stage2_validation, 'cant save') if discretionary?
+  end
+
+  attribute :stage3_validation, :boolean
+
+  validates :reason, presence: true, if: -> { stage3_validation }
 
   # approved checkbox must be ticked for final completion
   validates :approved, inclusion: { in: [true],
                                     allow_nil: false
-                                    }, if: -> { stage2_complete }
+                                    }, if: -> { stage3_validation }
 
   def eligible?
     stage1_eligible?

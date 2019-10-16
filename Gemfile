@@ -36,6 +36,7 @@ gem 'rubyzip'
 gem 'turnout'
 gem 'zendesk_api'
 gem 'kaminari' # pagination
+gem 'prawn-rails'
 gem 'rswag-api' # api-documentation
 gem 'rswag-ui'  # api-documentation interface
 

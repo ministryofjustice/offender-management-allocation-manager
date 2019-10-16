@@ -54,6 +54,8 @@ feature "early allocation questionaire", type: :feature, vcr: { cassette_name: :
       within '.govuk-error-summary' do
         expect(page).to have_text 'You must say if this case is \'high profile\''
         click_link 'You must say if this case is \'high profile\''
+
+        expect(all('li').count).to eq(6)
       end
 
       expect {
@@ -64,6 +66,9 @@ feature "early allocation questionaire", type: :feature, vcr: { cassette_name: :
         # selecting any one of these as 'Yes' means that we progress to assessment complete (Yes)
         expect(page).to have_text('The community probation team will take responsibility')
       }.to change(EarlyAllocation, :count).by(1)
+
+      click_link 'Save completed assessment (pdf)'
+      expect(page).to have_current_path('/prisons/LEI/prisoners/G4273GI/early_allocation.pdf')
     end
 
     context 'when existing eligible early allocation' do
@@ -101,6 +106,13 @@ feature "early allocation questionaire", type: :feature, vcr: { cassette_name: :
         click_button 'Continue'
 
         expect(page).to have_css('.govuk-error-message')
+        expect(page).to have_css('.govuk-error-summary')
+
+        within '.govuk-error-summary' do
+          expect(page).to have_text 'You must say if this is a MAPPA 2 case'
+
+          expect(all('li').count).to eq(5)
+        end
       end
 
       scenario 'discretionary path' do
@@ -119,11 +131,15 @@ feature "early allocation questionaire", type: :feature, vcr: { cassette_name: :
         # we need to always tick the 'Head of Offender Management' box and fill in the reasons
         expect(page).to have_css('.govuk-error-message')
 
-        fill_in id: 'early_allocation_reason', with: 'Just because'
-        find('#early_allocation_approved').click
-        click_button 'Continue'
+        expect {
+          fill_in id: 'early_allocation_reason', with: 'Just because'
+          find('#early_allocation_approved').click
+          click_button 'Continue'
+        }.to change(EarlyAllocation, :count).by(1)
 
         expect(page).to have_text 'The community probation team will make a decision'
+        click_link 'Save completed assessment (pdf)'
+        expect(page).to have_current_path('/prisons/LEI/prisoners/G4273GI/early_allocation.pdf')
       end
 
       scenario 'not eligible due to all answers false' do
@@ -135,6 +151,9 @@ feature "early allocation questionaire", type: :feature, vcr: { cassette_name: :
 
         click_button 'Continue'
         expect(page).to have_text 'Not eligible for early allocation'
+
+        click_link 'Save completed assessment (pdf)'
+        expect(page).to have_current_path('/prisons/LEI/prisoners/G4273GI/early_allocation.pdf')
       end
     end
   end
