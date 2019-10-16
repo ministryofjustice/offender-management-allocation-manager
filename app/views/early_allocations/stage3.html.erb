@@ -13,7 +13,7 @@
   <% (EarlyAllocation::STAGE1_FIELDS + EarlyAllocation::ALL_STAGE2_FIELDS).each do |field| %>
     <%= form.hidden_field(field) unless form.object.public_send(field).nil? %>
   <% end %>
-  <%= form.hidden_field(:stage2_complete, value: true) %>
+  <%= form.hidden_field(:stage3_validation, value: true) %>
 
   <div class="govuk-form-group">
     <div class="govuk-grid-row">
