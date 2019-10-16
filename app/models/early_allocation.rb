@@ -65,6 +65,17 @@ class EarlyAllocation < ApplicationRecord
               in: [true, false],
               allow_nil: false }, if: -> { extremism_separation })
 
+  def any_stage2_field_errors?
+    ALL_STAGE2_FIELDS.map { |f| errors[f].present? }.any?
+  end
+
+  validate :validate_stage2, if: -> { stage2_validation  }
+
+  # add an arbitrary error in stage2 if we're not savable i.e. in discretionary state
+  def validate_stage2
+    errors.add(:stage2_validation, 'cant save') if discretionary?
+  end
+
   attribute :stage3_validation, :boolean
 
   validates :reason, presence: true, if: -> { stage3_validation }
