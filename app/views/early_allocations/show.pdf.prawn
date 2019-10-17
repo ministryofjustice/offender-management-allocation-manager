@@ -24,7 +24,7 @@ def pdf_table(pdf, title, data)
   end
 end
 
-prawn_document do |pdf|
+prawn_document(disposition: "attachment") do |pdf|
   pdf.font_families.update('GDSTransport' => {
     normal: Rails.root.join('app', 'assets', 'fonts', 'GDSTransportWebsite.ttf'),
     bold: Rails.root.join('app', 'assets', 'fonts', 'GDSTransportWebsite-Bold.ttf')

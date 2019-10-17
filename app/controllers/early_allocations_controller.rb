@@ -5,6 +5,12 @@ class EarlyAllocationsController < PrisonsApplicationController
 
   def new
     @early_assignment = EarlyAllocation.new offender_id_from_url
+    case_info = CaseInformation.find_by offender_id_from_url
+    if case_info.local_divisional_unit.try(:email_address)
+      render
+    else
+      render 'dead_end'
+    end
   end
 
   def create
