@@ -10,24 +10,22 @@
         <%= case_owner_label(@prisoner) %>
       </td>
     </tr>
-    <% if Flipflop.show_handover_dates? %>
-      <tr class="govuk-table__row">
-        <td class="govuk-table__cell govuk-!-width-one-half">Handover start date</td>
-        <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-          <% handover_date, reason =  @prisoner.handover_start_date %>
-          <%= format_date(handover_date) %>
-          <span class="handover-reason">(<%= reason %>)</span>
-        </td>
-      </tr>
-      <tr class="govuk-table__row">
-        <td class="govuk-table__cell govuk-!-width-one-half">Responsibility Handover</td>
-        <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-          <% handover_date, reason = @prisoner.responsibility_handover_date %>
-          <%= format_date(handover_date, replacement: 'Unknown - missing MAPPA info') %>
-          <span class="handover-reason">(<%= reason %>)</span>
-        </td>
-      </tr>
-    <% end %>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-width-one-half">Handover start date</td>
+      <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
+        <% handover_date, reason =  @prisoner.handover_start_date %>
+        <%= format_date(handover_date) %>
+        <span class="handover-reason">(<%= reason %>)</span>
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-width-one-half">Responsibility Handover</td>
+      <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
+        <% handover_date, reason = @prisoner.responsibility_handover_date %>
+        <%= format_date(handover_date, replacement: 'Unknown - missing MAPPA info') %>
+        <span class="handover-reason">(<%= reason %>)</span>
+      </td>
+    </tr>
     <% if Flipflop.early_allocation? %>
     <tr id="early_allocation" class="govuk-table__row">
       <td class="govuk-table__cell">Early allocation eligibility</td>

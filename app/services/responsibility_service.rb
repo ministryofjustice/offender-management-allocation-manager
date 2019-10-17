@@ -17,6 +17,8 @@ class ResponsibilityService
   def self.calculate_pom_responsibility(offender)
     if offender.immigration_case?
       SUPPORTING
+    elsif open_prison_nps_offender?(offender)
+      SUPPORTING
     elsif offender.earliest_release_date.nil?
       RESPONSIBLE
     elsif offender.indeterminate_sentence? && offender.earliest_release_date < Time.zone.today
@@ -106,6 +108,10 @@ private
     else
       crc_rules(offender)
     end
+  end
+
+  def self.open_prison_nps_offender?(offender)
+    PrisonService.open_prison?(offender.prison_id) && offender.nps_case?
   end
 
   def self.crc_rules(offender)
