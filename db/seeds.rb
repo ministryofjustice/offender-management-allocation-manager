@@ -54,37 +54,34 @@ ldu3 = LocalDivisionalUnit.find_or_create_by!(
 # The offenders below are those with release dates a few years in the future and can therefore use the
 # responsibility override workflow
 
-CaseInformation.find_or_create_by!(
-    nomis_offender_id: 'G7658UL',
-    tier: 'A',
-    case_allocation: 'NPS',
-    welsh_offender: 'Yes',
-    manual_entry: true,
-    local_divisional_unit_id: ldu1.id
-)
+CaseInformation.find_or_create_by!(nomis_offender_id: 'G7658UL') do |info|
+    info.tier = 'A'
+    info.case_allocation = 'NPS'
+    info.welsh_offender = 'Yes'
+    info.manual_entry =  true
+    info.local_divisional_unit_id = ldu1.id
+end
 
-CaseInformation.find_or_create_by!(
-    nomis_offender_id: 'G7517GF',
-    tier: 'B',
-    case_allocation: 'NPS',
-    welsh_offender: 'Yes',
-    manual_entry: true,
-    local_divisional_unit_id: ldu1.id
-)
-CaseInformation.find_or_create_by!(
-    nomis_offender_id: 'G3536UF',
-    tier: 'A',
-    case_allocation: 'NPS',
-    welsh_offender: 'No',
-    manual_entry: true,
-    local_divisional_unit_id: ldu2.id
-)
+CaseInformation.find_or_create_by!(nomis_offender_id: 'G7517GF') do |info|
+  info.tier = 'B'
+    info.case_allocation = 'NPS'
+    info.welsh_offender = 'Yes'
+    info.manual_entry = true
+    info.local_divisional_unit_id = ldu1.id
+end
 
-CaseInformation.find_or_create_by!(
-    nomis_offender_id: 'G2260UO',
-    tier: 'B',
-    case_allocation: 'NPS',
-    welsh_offender: 'No',
-    manual_entry: true,
-    local_divisional_unit_id: ldu3.id
-)
+CaseInformation.find_or_create_by!(nomis_offender_id: 'G3536UF') do |info|
+  info.tier = 'A'
+  info.case_allocation = 'NPS'
+  info.welsh_offender = 'No'
+  info.manual_entry = true
+  info.local_divisional_unit_id = ldu2.id
+end
+
+CaseInformation.find_or_create_by!(nomis_offender_id: 'G2260UO') do |info|
+  info.tier = 'B'
+  info.case_allocation = 'NPS'
+  info.welsh_offender = 'No'
+  info.manual_entry = true
+  info.local_divisional_unit_id = ldu3.id
+end
