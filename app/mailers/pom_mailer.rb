@@ -44,7 +44,6 @@ class PomMailer < GovukNotifyRails::Mailer
     mail(to: email)
   end
 
-  # rubocop:disable Metrics/ParameterLists
   def responsibility_override_open_prison(
     prisoner_name:,
     prisoner_number:,
