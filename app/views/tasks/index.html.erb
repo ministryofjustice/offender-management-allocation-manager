@@ -1,0 +1,54 @@
+<% content_for :switcher do %>
+  <%= render '/layouts/prison_switcher' %>
+<% end %>
+
+<h1 class="govuk-heading-l govuk-!-margin-bottom-5">
+  <% if @pomtasks.blank? %>
+  There are no case updates needed
+  <% else %>
+  Case updated needed
+  <% end %>
+</h1>
+
+<% if @pomtasks.present? %>
+ <table class="govuk-table responsive tablesorter">
+    <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th class="govuk-table__header" scope="col">
+        <a href="<%= sort_link('last_name') %>">
+          Prisoner name
+        </a>
+        <%= sort_arrow('last_name') %>
+      </th>
+      <th class="govuk-table__header" scope="col">
+        <a href="<%= sort_link('broken-fix-me') %>">
+        Update needed
+        </a>
+        <%= sort_arrow('broken-fix-me') %>
+      </th>
+      <th class="govuk-table__header" scope="col">
+        Action
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @pomtasks.each do |pomtask|  %>
+      <tr class="govuk-table__row">
+        <td aria-label="Prisoner name" class="govuk-table__cell ">
+          <%= pomtask.offender.full_name %>
+          <br/>
+          <span class='govuk-hint govuk-!-margin-bottom-0'>
+            <%= pomtask.offender.offender_no %>
+          </span>
+        </td>
+        <td aria-label="Update needed" class="govuk-table__cell ">
+          <%= pomtask.action_label %>
+        </td>
+        <td aria-label="Action" class="govuk-table__cell ">
+          <%= link_to('View', pomtask.action_url) %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+<% end  %>
