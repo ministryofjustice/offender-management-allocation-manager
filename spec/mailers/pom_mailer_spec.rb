@@ -130,4 +130,41 @@ RSpec.describe PomMailer, type: :mailer do
              )
     end
   end
+
+  describe 'responsibility_override_open_prison' do
+    let(:params) do
+      {
+        prisoner_name: 'Prisoner, A',
+        prisoner_number: 'A1234AA',
+        responsible_pom_name: 'POM, Responsible',
+        responsible_pom_email: 'responsible_pom@localhost.local',
+        prison_name: 'HMP Current',
+        previous_prison_name: 'HMP Previous',
+        email: 'testuser@localhost.local'
+      }
+    end
+
+    let(:mail) { described_class.responsibility_override_open_prison(params) }
+
+    it 'sets the template' do
+      expect(mail.govuk_notify_template).
+          to eq 'e517ddc9-5854-462e-b9a1-f67c97ad5b63'
+    end
+
+    it 'sets the To address of the email using the provided user' do
+      expect(mail.to).to eq(["testuser@localhost.local"])
+    end
+
+    it 'personalises the email' do
+      expect(mail.govuk_notify_personalisation).
+        to eq(
+          prisoner_name: params[:prisoner_name],
+          prisoner_number: params[:prisoner_number],
+          responsible_pom_name: params[:responsible_pom_name],
+          responsible_pom_email: params[:responsible_pom_email],
+          prison_name: params[:prison_name],
+          previous_prison_name: params[:previous_prison_name]
+        )
+    end
+  end
 end
