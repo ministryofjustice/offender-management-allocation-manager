@@ -52,9 +52,9 @@ module Nomis
       data
     end
 
-    def post(route, body)
+    def post(route, body, extra_headers: {})
       response = request(
-        :post, route, body: body
+        :post, route, extra_headers: extra_headers, body: body
       )
 
       JSON.parse(response.body)
