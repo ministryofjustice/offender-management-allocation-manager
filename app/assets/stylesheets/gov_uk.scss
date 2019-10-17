@@ -3,6 +3,7 @@ $govuk-image-url-function: "image-url";
 $govuk-font-url-function: "asset-url";
 
 @import "govuk/all";
+@import "moj/all";
 
 
 .govuk-data-value {

@@ -11,6 +11,9 @@ Rails.application.config.assets.paths << Rails.root.join('node_modules/govuk-fro
 Rails.application.config.assets.paths << Rails.root.join('node_modules/govuk-frontend/govuk/assets/images')
 Rails.application.config.assets.paths << Rails.root.join('node_modules/govuk-frontend/govuk/assets/fonts/')
 
+Rails.application.config.assets.paths << Rails.root.join('node_modules/@ministryofjustice/frontend')
+Rails.application.config.assets.paths << Rails.root.join('node_modules/@ministryofjustice/frontend/moj/assets/images')
+
 # Precompile additional assets.
 # application.js, application.css, and all non-JS/CSS in the app/assets
 # folder are already added.
