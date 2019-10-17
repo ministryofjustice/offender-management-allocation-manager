@@ -42,7 +42,12 @@ class EarlyAllocationsController < PrisonsApplicationController
     @early_assignment = EarlyAllocation.find_by!(offender_id_from_url)
 
     respond_to do |format|
-      format.pdf
+      format.pdf {
+        send_data view_context.render_early_alloc_pdf(early_assignment: @early_assignment,
+                                                      offender: @offender,
+                                                      pom: @pom,
+                                                      allocation: @allocation)
+      }
     end
   end
 
