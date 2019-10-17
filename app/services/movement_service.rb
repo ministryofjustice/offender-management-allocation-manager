@@ -29,6 +29,7 @@ class MovementService
     # not process the new admission.
     if [Nomis::MovementType::ADMISSION,
         Nomis::MovementType::TRANSFER].include?(movement.movement_type)
+
       return process_transfer(movement)
     end
 
@@ -38,9 +39,17 @@ class MovementService
 private
 
   def self.process_transfer(transfer)
+    return false unless transfer.direction_code == 'IN'
+
+    if PrisonService.open_prison?(transfer.to_agency)
+      # There are special rules for responsibility when offenders
+      # move to open prisons so we will trigger this job to send
+      # an email to the LDU
+      OpenPrisonTransferJob.perform_later(transfer.to_json)
+    end
+
     # Bail if this is a new admission to prison
     return false unless transfer.from_prison? && transfer.to_prison?
-    return false unless transfer.direction_code == 'IN'
 
     # We only want to deallocate the offender if they have not already been
     # allocated at their new prison

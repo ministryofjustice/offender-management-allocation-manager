@@ -16,7 +16,6 @@ module Delius
       @errors = []
     end
 
-    # rubocop:disable Metrics/CyclomaticComplexity
     def fetch_records
       records = []
 
@@ -41,7 +40,6 @@ module Delius
       end
       records
     end
-  # rubocop:enable Metrics/CyclomaticComplexity
 
   private
 
