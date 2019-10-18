@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature "early allocation questionaire", type: :feature, vcr: { cassette_name: :early_allocations } do
+feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocations } do
   let(:nomis_staff_id) { 485_637 }
 
   # This booking id is the latest one for the offender in T3
@@ -24,14 +24,14 @@ feature "early allocation questionaire", type: :feature, vcr: { cassette_name: :
     expect(page).to have_content("Showing 1 - 1 of 1 results")
   end
 
-  context 'without early allocation enabled' do
+  context 'without switch' do
     it 'shouldnt show the section' do
       click_link 'View'
       expect(page).not_to have_content 'Early allocation eligibility'
     end
   end
 
-  context 'with Early allocation enabled' do
+  context 'with switch' do
     let(:test_strategy) { Flipflop::FeatureSet.current.test! }
 
     before do
