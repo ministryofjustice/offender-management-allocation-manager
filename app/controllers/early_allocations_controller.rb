@@ -43,7 +43,7 @@ class EarlyAllocationsController < PrisonsApplicationController
 
     respond_to do |format|
       format.pdf {
-        # attachment disposition is the default for send_data
+        # disposition 'attachment' is the default for send_data
         send_data pdf_as_string
       }
     end
