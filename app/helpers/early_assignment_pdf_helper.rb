@@ -1,7 +1,8 @@
 # rubocop:disable Metrics/ModuleLength
 module EarlyAssignmentPdfHelper
   def render_early_alloc_pdf(early_assignment:, offender:, allocation:, pom:)
-    prawn_document(disposition: 'attachment') do |pdf|
+    # prawn_document can only be called in an actual view context.
+    Prawn::Document.new do |pdf|
       setup_font(pdf)
 
       add_document_header(pdf, early_assignment)

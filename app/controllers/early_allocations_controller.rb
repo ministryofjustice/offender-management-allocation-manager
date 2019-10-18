@@ -43,10 +43,8 @@ class EarlyAllocationsController < PrisonsApplicationController
 
     respond_to do |format|
       format.pdf {
-        send_data view_context.render_early_alloc_pdf(early_assignment: @early_assignment,
-                                                      offender: @offender,
-                                                      pom: @pom,
-                                                      allocation: @allocation)
+        # attachment disposition is the default for send_data
+        send_data pdf_as_string
       }
     end
   end
@@ -59,13 +57,21 @@ private
     @pom = PrisonOffenderManagerService.get_pom(@prison, @allocation.primary_pom_nomis_id)
   end
 
+  def pdf_as_string
+    view_context.render_early_alloc_pdf(early_assignment: @early_assignment,
+                                        offender: @offender,
+                                        pom: @pom,
+                                        allocation: @allocation).render
+  end
+
   def send_email
     PomMailer.early_allocation_email(email: @offender.ldu.email_address,
                                      prisoner_name: @offender.full_name,
                                      prisoner_number: @offender.offender_no,
                                      pom_name: @allocation.primary_pom_name,
                                      pom_email: @pom.emails.first,
-                                     prison_name: PrisonService.name_for(@prison)).deliver_later
+                                     prison_name: PrisonService.name_for(@prison),
+                                     pdf: pdf_as_string).deliver_later
   end
 
   def create_error_page
