@@ -30,6 +30,9 @@ Rails.application.configure do
     config.cache_store = :null_store
   end
 
+  # This setting can be useful if you want jobs to run locally
+  # config.active_job.queue_adapter = :inline
+
   # Don't care if the mailer can't send.
   config.notify_api_key = ENV['DEV_NOTIFY_API_KEY']
   config.action_mailer.raise_delivery_errors = true

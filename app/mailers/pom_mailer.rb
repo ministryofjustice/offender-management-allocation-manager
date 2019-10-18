@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ParameterLists
 class PomMailer < GovukNotifyRails::Mailer
   def new_allocation_email(params = {})
-    message = "Additional information: #{params[:message]}" if params[:message].present?
+    message_detail = "Additional information: #{params[:message]}" if params[:message].present?
     set_template('9679ea4c-1495-4fa6-a00b-630de715e315')
     set_personalisation(
       email_subject: 'New OMIC allocation',
@@ -10,11 +11,23 @@ class PomMailer < GovukNotifyRails::Mailer
       responsibility: params[:responsibility],
       offender_name: params[:offender_name],
       nomis_offender_id: params[:offender_no],
-      message: message || '',
+      message: message_detail || '',
       url: params[:url]
     )
 
     mail(to: params[:pom_email])
+  end
+
+  def early_allocation_email(email:, prisoner_name:, prisoner_number:, pom_name:, pom_email:, prison_name:, pdf:)
+    set_template('5e546d65-57ff-49e1-8fae-c955a7b1da80')
+    set_personalisation(prisoner_name: prisoner_name,
+                        prisoner_number: prisoner_number,
+                        pom_name: pom_name,
+                        pom_email_address: pom_email,
+                        prison_name: prison_name,
+                        link_to_document: Notifications.prepare_upload(StringIO.new(pdf)))
+
+    mail(to: email)
   end
 
   def responsibility_override(
@@ -32,7 +45,6 @@ class PomMailer < GovukNotifyRails::Mailer
     mail(to: email)
   end
 
-  # rubocop:disable Metrics/ParameterLists
   def responsibility_override_open_prison(
     prisoner_name:,
     prisoner_number:,
@@ -71,9 +83,7 @@ class PomMailer < GovukNotifyRails::Mailer
 
     mail(to: pom_email)
   end
-  # rubocop:enable Metrics/ParameterLists
 
-  # rubocop:disable Metrics/ParameterLists
   def deallocate_coworking_pom(email_address:, pom_name:,
     secondary_pom_name:, nomis_offender_id:,
     offender_name:, url:)
@@ -88,9 +98,7 @@ class PomMailer < GovukNotifyRails::Mailer
 
     mail(to: email_address)
   end
-  # rubocop:enable Metrics/ParameterLists
 
-  # rubocop:disable Metrics/ParameterLists
   def secondary_allocation_email(
     message:, pom_name:, offender_name:, nomis_offender_id:,
     responsible_pom_name:, pom_email:, url:, responsibility:
@@ -109,7 +117,6 @@ class PomMailer < GovukNotifyRails::Mailer
 
     mail(to: pom_email)
   end
-  # rubocop:enable Metrics/ParameterLists
 
   def new_prison_allocation_email(prison)
     set_template('651da525-7564-4f04-85ff-b0343fb7c47d')
@@ -138,3 +145,4 @@ class PomMailer < GovukNotifyRails::Mailer
     mail(to: params[:previous_pom_email])
   end
 end
+# rubocop:enable Metrics/ParameterLists
