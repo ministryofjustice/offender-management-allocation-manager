@@ -45,30 +45,48 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
       test_strategy.switch!(:early_allocation, false)
     end
 
-    scenario 'error case followed by stage1 happy path' do
-      click_button 'Continue'
-
-      expect(page).to have_css('.govuk-error-message')
-      expect(page).to have_css('#early_allocation_oasys_risk_assessment_date_error')
-      expect(page).to have_css('#early_allocation_high_profile_error')
-      within '.govuk-error-summary' do
-        expect(page).to have_text 'You must say if this case is \'high profile\''
-        click_link 'You must say if this case is \'high profile\''
-
-        expect(all('li').count).to eq(6)
+    context 'when an immediate error occurs' do
+      before do
+        click_button 'Continue'
       end
 
-      expect {
+      scenario 'error case' do
+        expect(page).to have_css('.govuk-error-message')
+        expect(page).to have_css('#early_allocation_oasys_risk_assessment_date_error')
+        expect(page).to have_css('#early_allocation_high_profile_error')
+        within '.govuk-error-summary' do
+          expect(page).to have_text 'You must say if this case is \'high profile\''
+          click_link 'You must say if this case is \'high profile\''
+
+          expect(all('li').count).to eq(6)
+        end
+      end
+
+      scenario 'stage1 happy path' do
+        expect {
+          stage1_eligible_answers
+
+          click_button 'Continue'
+          expect(page).not_to have_css('.govuk-error-message')
+          # selecting any one of these as 'Yes' means that we progress to assessment complete (Yes)
+          expect(page).to have_text('The community probation team will take responsibility')
+        }.to change(EarlyAllocation, :count).by(1)
+
+        click_link 'Return to prisoner page'
+        expect(page).to have_text 'Eligible - Automatic'
+      end
+
+      scenario 'displaying the PDF' do
         stage1_eligible_answers
 
         click_button 'Continue'
         expect(page).not_to have_css('.govuk-error-message')
         # selecting any one of these as 'Yes' means that we progress to assessment complete (Yes)
         expect(page).to have_text('The community probation team will take responsibility')
-      }.to change(EarlyAllocation, :count).by(1)
 
-      click_link 'Save completed assessment (pdf)'
-      expect(page).to have_current_path('/prisons/LEI/prisoners/G4273GI/early_allocation.pdf')
+        click_link 'Save completed assessment (pdf)'
+        expect(page).to have_current_path('/prisons/LEI/prisoners/G4273GI/early_allocation.pdf')
+      end
     end
 
     context 'when existing eligible early allocation' do
@@ -162,6 +180,7 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
           find('#early_allocation_community_decision_true').click
           click_button('Save')
           expect(page).to have_text('Re-assess')
+          expect(page).to have_text 'Eligible - Discretionary'
         end
       end
 
