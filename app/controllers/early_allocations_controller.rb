@@ -54,7 +54,7 @@ class EarlyAllocationsController < PrisonsApplicationController
     if @early_assignment.update(community_decision_params)
       redirect_to prison_prisoner_path(@prison, @early_assignment.nomis_offender_id)
     else
-      render 'edit'
+      render 'community_decision'
     end
   end
 
