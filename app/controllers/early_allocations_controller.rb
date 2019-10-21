@@ -113,17 +113,6 @@ private
     end
   end
 
-  def save_model_and_email
-    @early_assignment.save!
-
-    PomMailer.send_early_allocation_email(email: @offender.ldu.email_address,
-                                          prisoner_name: @offender.full_name,
-                                          prisoner_number: @offender.offender_no,
-                                          pom_name: @allocation.primary_pom_name,
-                                          pom_email: @pom.emails.first,
-                                          prison_name: PrisonService.name_for(@prison)).deliver_later
-  end
-
   def community_decision_params
     params.fetch(:early_allocation, {}).permit(:community_decision).merge(recording_community_decision: true)
   end
