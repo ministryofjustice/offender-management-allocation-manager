@@ -15,16 +15,18 @@ class PrisonOffenderManagerService
     poms
   end
 
-  def self.get_pom(caseload, nomis_staff_id)
-    poms_list = get_poms(caseload)
+  def self.get_pom(prison_id, nomis_staff_id)
+    raise ArgumentError.new('PrisonOffenderManagerService#get_pom(nil)') if nomis_staff_id.nil?
+
+    poms_list = get_poms(prison_id)
     if poms_list.blank?
-      log_missing_pom(caseload, nomis_staff_id)
+      log_missing_pom(prison_id, nomis_staff_id)
       return nil
     end
 
     pom = poms_list.find { |p| p.staff_id == nomis_staff_id.to_i }
     if pom.blank?
-      log_missing_pom(caseload, nomis_staff_id)
+      log_missing_pom(prison_id, nomis_staff_id)
       return nil
     end
 
