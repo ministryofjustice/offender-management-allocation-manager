@@ -18,11 +18,16 @@ class AllocationsController < PrisonsApplicationController
 
   def show
     @prisoner = offender(nomis_offender_id_from_url)
+
     allocation = AllocationVersion.find_by(nomis_offender_id: @prisoner.offender_no)
-    primary_pom_nomis_id = allocation.primary_pom_nomis_id
+    @pom = PrisonOffenderManagerService.get_pom(active_prison, allocation.primary_pom_nomis_id)
+
     secondary_pom_nomis_id = allocation.secondary_pom_nomis_id
-    @pom = PrisonOffenderManagerService.get_pom(active_prison, primary_pom_nomis_id)
-    @coworker = PrisonOffenderManagerService.get_pom(active_prison, secondary_pom_nomis_id) unless secondary_pom_nomis_id.nil?
+    unless secondary_pom_nomis_id.nil?
+      @coworker = PrisonOffenderManagerService.get_pom(active_prison,
+                                                       secondary_pom_nomis_id)
+    end
+
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(active_prison, @prisoner.offender_no)
     @allocation = AllocationVersion.find_by(nomis_offender_id: @prisoner.offender_no)
   end

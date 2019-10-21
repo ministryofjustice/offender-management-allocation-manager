@@ -16,7 +16,7 @@ class PrisonOffenderManagerService
   end
 
   def self.get_pom(prison_id, nomis_staff_id)
-    raise ArgumentError.new('PrisonOffenderManagerService#get_pom(nil)') if nomis_staff_id.nil?
+    raise ArgumentError, 'PrisonOffenderManagerService#get_pom(nil)' if nomis_staff_id.nil?
 
     poms_list = get_poms(prison_id)
     if poms_list.blank?
