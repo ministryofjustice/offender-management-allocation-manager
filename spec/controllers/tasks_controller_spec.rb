@@ -59,7 +59,7 @@ RSpec.describe TasksController, type: :controller do
                             "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "confirmedReleaseDate": "2012-03-17",
                             "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
         "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 },
-      { "bookingId": 754_204, "offenderNo": "G1234AB", "firstName": "ROSS", "lastName": "JONES", "agencyLocationId": prison,
+      { "bookingId": 754_204, "offenderNo": "G1234GG", "firstName": "ROSS", "lastName": "JONES", "agencyLocationId": prison,
         "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
                             "licenceExpiryDate": "2014-02-07", "homeDetentionCurfewEligibilityDate": "2011-11-07",
                             "bookingId": 754_207, "sentenceStartDate": "2009-02-08", "automaticReleaseOverrideDate": "2012-03-17",
@@ -124,7 +124,7 @@ RSpec.describe TasksController, type: :controller do
 
       offender_nos.each { |offender_no|
         create(:case_information, nomis_offender_id: offender_no, tier: 'A', mappa_level: 1)
-        create(:allocation_version, nomis_offender_id: offender_nos, primary_pom_nomis_id: staff_id)
+        create(:allocation_version, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
       }
 
       create(:early_allocation, :discretionary, :skip_validate, nomis_offender_id: offender_nos.first)

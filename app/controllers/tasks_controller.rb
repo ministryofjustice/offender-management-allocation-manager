@@ -15,7 +15,6 @@ private
     # For each passed AllocationWithSentence we want to find out if the offender
     # requires any changes to it.  If so we will construct a PomTaskPresenter and
     # return it. Otherwise nil.
-
     offender_nos = allocations.map(&:nomis_offender_id)
     @early_allocations = preload_early_allocations(offender_nos)
 
