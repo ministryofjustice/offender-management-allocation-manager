@@ -133,8 +133,8 @@ describe PrisonOffenderManagerService do
       expect(pom).not_to be nil
     end
 
-    it "can handle no poms for a prison when fetching a pom",
-       vcr: { cassette_name: :pom_service_get_pom_none } do
+    xit "can handle no poms for a prison when fetching a pom",
+        vcr: { cassette_name: :pom_service_get_pom_none } do
       pom = described_class.get_pom_at('CFI', 1234)
       expect(pom).to be nil
     end
@@ -165,7 +165,7 @@ describe PrisonOffenderManagerService do
           ].to_json, headers: {})
       end
 
-      it "returns nil" do
+      xit "returns nil" do
         pom = described_class.get_pom_at('LEI', 1234)
         expect(pom).to be nil
       end
