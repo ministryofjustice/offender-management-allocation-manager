@@ -24,22 +24,37 @@ class EarlyAllocationsController < PrisonsApplicationController
       end
     else
       @early_assignment.errors.delete(:stage2_validation)
-      render create_error_page
+      render create_error_page 'new'
     end
   end
 
-  # 'edit' is recording a community decision (changing 'maybe' into a yes or a no)
+  # edit results in all the user-facing fields being cleared
   def edit
+    @early_assignment = EarlyAllocation.find_by!(offender_id_from_url)
+    @early_assignment.clear
+  end
+
+  def update
+    @early_assignment = EarlyAllocation.find_by(offender_id_from_url)
+    if @early_assignment.update(early_allocation_params)
+      render create_error_page 'edit'
+    else
+      render 'edit'
+    end
+  end
+
+  # record a community decision (changing 'maybe' into a yes or a no)
+  def community_decision
     @early_assignment = EarlyAllocation.find_by!(offender_id_from_url)
   end
 
-  def community_decision
+  def record_community_decision
     @early_assignment = EarlyAllocation.find_by!(offender_id_from_url)
 
     if @early_assignment.update(community_decision_params)
       redirect_to prison_prisoner_path(@prison, @early_assignment.nomis_offender_id)
     else
-      render 'edit'
+      render 'community_decision'
     end
   end
 
@@ -89,25 +104,25 @@ private
                                      pdf: pdf_as_string).deliver_later
   end
 
-  def create_error_page
+  def create_error_page(prefix)
     if !@early_assignment.stage2_validation?
-      stage1_error_page
+      stage1_error_page prefix
     else
-      stage2_error_page
+      stage2_error_page prefix
     end
   end
 
-  def stage1_error_page
+  def stage1_error_page(prefix)
     if @early_assignment.any_stage1_field_errors?
-      'new'
+      prefix
     else
-      'stage2_new'
+      "stage2_#{prefix}"
     end
   end
 
-  def stage2_error_page
+  def stage2_error_page(prefix)
     if @early_assignment.any_stage2_field_errors?
-      'stage2_new'
+      "stage2_#{prefix}"
     else
       'stage3'
     end
