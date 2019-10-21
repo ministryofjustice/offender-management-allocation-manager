@@ -12,7 +12,7 @@ class PomsController < PrisonsApplicationController
              only: [:show]
 
   def index
-    poms = PrisonOffenderManagerService.get_poms(active_prison_id)
+    poms = PrisonOffenderManagerService.get_poms_for(active_prison_id)
     @active_poms, @inactive_poms = poms.partition { |pom|
       %w[active unavailable].include? pom.status
     }
@@ -78,7 +78,7 @@ private
   end
 
   def load_pom
-    @pom = PrisonOffenderManagerService.get_pom(active_prison_id, nomis_staff_id)
+    @pom = PrisonOffenderManagerService.get_pom_at(active_prison_id, nomis_staff_id)
   end
 
   def edit_pom_params

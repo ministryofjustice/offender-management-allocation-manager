@@ -29,14 +29,14 @@ describe PrisonOffenderManagerService do
   describe '#get_poms' do
     it "can get a list of POMs",
        vcr: { cassette_name: :pom_service_get_poms_list } do
-      poms = described_class.get_poms('LEI')
+      poms = described_class.get_poms_for('LEI')
       expect(poms).to be_kind_of(Array)
       expect(poms.count).to eq(14)
     end
 
     it "can get a filtered list of POMs",
        vcr: { cassette_name: :pom_service_get_poms_filtered } do
-      poms = described_class.get_poms('LEI').select { |pom|
+      poms = described_class.get_poms_for('LEI').select { |pom|
         pom.status == 'active'
       }
       expect(poms).to be_kind_of(Array)
@@ -129,13 +129,13 @@ describe PrisonOffenderManagerService do
   describe '#get_pom' do
     it "can fetch a single POM for a prison",
        vcr: { cassette_name: :pom_service_get_pom_ok } do
-      pom = described_class.get_pom('LEI', staff_id)
+      pom = described_class.get_pom_at('LEI', staff_id)
       expect(pom).not_to be nil
     end
 
     it "can handle no poms for a prison when fetching a pom",
        vcr: { cassette_name: :pom_service_get_pom_none } do
-      pom = described_class.get_pom('CFI', 1234)
+      pom = described_class.get_pom_at('CFI', 1234)
       expect(pom).to be nil
     end
 
@@ -166,7 +166,7 @@ describe PrisonOffenderManagerService do
       end
 
       it "returns nil" do
-        pom = described_class.get_pom('LEI', 1234)
+        pom = described_class.get_pom_at('LEI', 1234)
         expect(pom).to be nil
       end
     end
