@@ -75,6 +75,8 @@ en:
 #           Approved has to be 'true' so inclusion: [true] is the validation
             approved:
               inclusion: You must say if this referral has been approved
+            community_decision:
+              inclusion: You must say whether the community has accepted this case or not
   views:
     pagination:
       first: "&laquo; First"

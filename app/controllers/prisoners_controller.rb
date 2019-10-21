@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class PrisonersController < PrisonsApplicationController
+  # This is needed so that the breadcrumb can work correctly
   before_action :load_offender, only: [:show]
 
   breadcrumb 'Your caseload',

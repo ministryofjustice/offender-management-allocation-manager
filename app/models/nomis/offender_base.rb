@@ -40,7 +40,7 @@ module Nomis
     end
 
     def early_allocation?
-      false
+      @early_allocation
     end
 
     def nps_case?
@@ -117,6 +117,7 @@ module Nomis
       @sentence_type = SentenceType.new(payload['imprisonmentStatus'])
       @category_code = payload['categoryCode']
       @date_of_birth = deserialise_date(payload, 'dateOfBirth')
+      @early_allocation = false
     end
 
     def inprisonment_status=(status)
@@ -142,6 +143,8 @@ module Nomis
       @ldu = record.local_divisional_unit
       @team = record.team.try(:name)
       @parole_review_date = record.parole_review_date
+      @early_allocation = record.early_allocation.present? &&
+        (record.early_allocation.eligible? || record.early_allocation.community_decision?)
     end
   end
 end

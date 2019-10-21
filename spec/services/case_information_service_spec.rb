@@ -17,13 +17,6 @@ describe CaseInformationService do
     expect(cases[caseinfo.nomis_offender_id]).to be_kind_of(CaseInformation)
   end
 
-  it "can get case information for multiple offenders at once" do
-    cases = described_class.get_case_info_for_offenders([caseinfo.nomis_offender_id])
-    expect(cases).to be_kind_of(Hash)
-    expect(cases.length).to eq(1)
-    expect(cases[caseinfo.nomis_offender_id]).to be_kind_of(CaseInformation)
-  end
-
   it "can delete case information" do
     cases = described_class.get_case_information([caseinfo.nomis_offender_id])
     expect(cases.length).to eq(1)
