@@ -1,0 +1,18 @@
+<% content_for :switcher do %>
+  <%= render '/layouts/prison_switcher' %>
+<% end %>
+
+<%= form_for @early_assignment, url: community_decision_prison_prisoner_early_allocation_path(@prison, @early_assignment.nomis_offender_id), method: :put do |form| %>
+  <% if @early_assignment.errors.count > 0 %>
+    <%= render :partial => "/shared/field_errors", :locals => { :errors => @early_assignment.errors, form: form } %>
+  <% end %>
+
+  <h1 class="govuk-heading-xl govuk-!-margin-top-4">Record a decision from the community probation team about early allocation</h1>
+
+  <%= render partial: "boolean_field", locals: { form: form,
+                                                 heading_text: "What decision did the community probation team make?",
+                                                 hint_text: "If the community agreed to take this case early, a new handover date will be calculated automatically",
+                                                 errors: @early_assignment.errors,
+                                                 fieldname: :community_decision} %>
+  <%= form.submit 'Save', role: "button", draggable: "false", class: "govuk-button" %>
+<% end %>
