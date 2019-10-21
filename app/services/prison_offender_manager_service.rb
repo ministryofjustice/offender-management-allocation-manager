@@ -16,18 +16,14 @@ class PrisonOffenderManagerService
   end
 
   def self.get_pom_at(prison_id, nomis_staff_id)
-    raise ArgumentError, 'PrisonOffenderManagerService#get_pom(nil)' if nomis_staff_id.nil?
+    raise ArgumentError, 'PrisonOffenderManagerService#get_pom_at(nil)' if nomis_staff_id.nil?
 
     poms_list = get_poms_for(prison_id)
-    if poms_list.blank?
-      log_missing_pom(prison_id, nomis_staff_id)
-      raise "No POMS at #{prison_id} - failed to find POM (#{nomis_staff_id})"
-    end
-
     pom = poms_list.find { |p| p.staff_id == nomis_staff_id.to_i }
     if pom.blank?
       log_missing_pom(prison_id, nomis_staff_id)
-      raise "Failed to find POM ##{nomis_staff_id} at #{prison_id}"
+      pom_staff_ids = poms_list.map(&:staff_id)
+      raise StandardError, "Failed to find POM ##{nomis_staff_id} at #{prison_id} - list is #{pom_staff_ids}"
     end
 
     pom.emails = get_pom_emails(pom.staff_id)

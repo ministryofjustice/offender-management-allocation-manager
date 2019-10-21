@@ -6,7 +6,7 @@ class CommunityEarlyAllocationEmailJob < ApplicationJob
   def perform(prison, offender_no, encoded_pdf)
     offender = OffenderService.get_offender(offender_no)
     allocation = AllocationVersion.find_by!(nomis_offender_id: offender_no)
-    pom = PrisonOffenderManagerService.get_pom(prison, allocation.primary_pom_nomis_id)
+    pom = PrisonOffenderManagerService.get_pom_at(prison, allocation.primary_pom_nomis_id)
     pdf = Base64.decode64 encoded_pdf
     PomMailer.community_early_allocation(email: offender.ldu.email_address,
                                          prisoner_name: offender.full_name,

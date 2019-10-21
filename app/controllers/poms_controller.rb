@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class PomsController < PrisonsApplicationController
-  before_action :load_pom, except: [:show_non_pom, :index, :show, :edit]
   # so that breadcrumb has staff member available
   before_action :load_pom_staff_member, only: [:show, :edit]
 
@@ -75,10 +74,6 @@ private
     return '1.0' if edit_pom_params[:description] == 'FT'
 
     edit_pom_params[:working_pattern]
-  end
-
-  def load_pom
-    @pom = PrisonOffenderManagerService.get_pom_at(active_prison_id, nomis_staff_id)
   end
 
   def edit_pom_params
