@@ -20,6 +20,7 @@ Rails.application.routes.draw do
       # show is only used with format PDF
       resource :early_allocation, only: [:new, :create, :show, :edit] do
         post('discretionary')
+        post('community_decision')
       end
     end
 

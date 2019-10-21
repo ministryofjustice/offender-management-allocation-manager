@@ -28,6 +28,21 @@ class EarlyAllocationsController < PrisonsApplicationController
     end
   end
 
+  # 'edit' is recording a community decision (changing 'maybe' into a yes or a no)
+  def edit
+    @early_assignment = EarlyAllocation.find_by!(offender_id_from_url)
+  end
+
+  def community_decision
+    @early_assignment = EarlyAllocation.find_by!(offender_id_from_url)
+
+    if @early_assignment.update(community_decision_params)
+      redirect_to prison_prisoner_path(@prison, @early_assignment.nomis_offender_id)
+    else
+      render 'edit'
+    end
+  end
+
   def discretionary
     @early_assignment = EarlyAllocation.new early_allocation_params.merge(offender_id_from_url)
     if @early_assignment.save
@@ -96,6 +111,10 @@ private
     else
       'stage3'
     end
+  end
+
+  def community_decision_params
+    params.fetch(:early_allocation, {}).permit(:community_decision).merge(recording_community_decision: true)
   end
 
   def early_allocation_params

@@ -13,11 +13,15 @@ private
 
   def active_status(early_allocation)
     if early_allocation.eligible?
-      'Eligible'
+      'Eligible - Automatic'
     elsif early_allocation.ineligible?
       'Not Eligible'
-    else
+    elsif early_allocation.community_decision.nil?
       'Waiting for community decision'
+    elsif early_allocation.community_decision?
+      'Eligible - Discretionary'
+    else
+      'Not Eligible'
     end
   end
 end
