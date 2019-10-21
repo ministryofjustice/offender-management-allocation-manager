@@ -21,13 +21,13 @@ class PrisonOffenderManagerService
     poms_list = get_poms(prison_id)
     if poms_list.blank?
       log_missing_pom(prison_id, nomis_staff_id)
-      return nil
+      raise "Failed to find POM #{nomis_staff_id} at #{caseload}"
     end
 
     pom = poms_list.find { |p| p.staff_id == nomis_staff_id.to_i }
     if pom.blank?
       log_missing_pom(prison_id, nomis_staff_id)
-      return nil
+      raise "Failed to find POM #{nomis_staff_id} at #{caseload}"
     end
 
     pom.emails = get_pom_emails(pom.staff_id)
