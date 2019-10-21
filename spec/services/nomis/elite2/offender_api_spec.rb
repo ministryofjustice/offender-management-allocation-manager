@@ -44,7 +44,7 @@ describe Nomis::Elite2::OffenderApi do
 
   describe 'Multiple offenders' do
     let!(:offenders) {
-      %w[G4273GI G7806VO G3462VT G1670VU G5897GP G3536UF G7998GJ G2407UH G4879UP G8060UF]
+      %w[G4273GI G7806VO G3462VT G1670VU G5897GP G3536UF G7998GJ G2407UH G4879UP G8060UF G9412UU G1221UA]
     }
 
     it 'can get multiple offenders',
@@ -52,7 +52,7 @@ describe Nomis::Elite2::OffenderApi do
       response = described_class.get_multiple_offenders(offenders)
 
       expect(response.first).to be_instance_of(Nomis::Offender)
-      expect(response.count).to eq(10)
+      expect(response.count).to eq(12)
     end
 
     it 'can handle getting an empty list',
@@ -105,6 +105,63 @@ describe Nomis::Elite2::OffenderApi do
       jpeg_end_sentinel = [0xFF, 0xD9]
 
       bytes = response.bytes.to_a
+      expect(bytes[0, 3]).to eq(jpeg_start_sentinel)
+      expect(bytes[-2, 2]).to eq(jpeg_end_sentinel)
+    end
+
+    it "raises an error if there is no image available",
+       vcr: { cassette_name: :offender_api_image_not_found } do
+      booking_id = 1_153_753
+      image_id = 1_340_556
+      uri = "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/images/#{image_id}/data"
+
+      WebMock.stub_request(:get, uri).to_raise(
+        Faraday::ResourceNotFound.new('error', status: 404)
+      )
+
+      expect{ described_class.get_image(booking_id) }.to raise_error(Faraday::ResourceNotFound)
+    end
+
+    it "uses a default image if there is no available image",
+       vcr: { cassette_name: :offender_api_image_use_default_image } do
+      booking_id = 1_153_753
+      image_id = 1_340_556
+      uri = "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/images/#{image_id}/data"
+
+      WebMock.stub_request(:get, uri).to_return(body: "")
+
+      response = described_class.get_image(booking_id)
+      expect(response).not_to be nil?
+
+      jpeg_start_sentinel = [0xFF, 0xD8, 0xFF]
+      jpeg_end_sentinel = [0xFF, 0xD9]
+
+      bytes = response.bytes.to_a
+
+      expect(bytes[0, 3]).to eq(jpeg_start_sentinel)
+      expect(bytes[-2, 2]).to eq(jpeg_end_sentinel)
+    end
+
+    it "uses the default image if no offender facialImageId found",
+       vcr: { cassette_name: :offender_api_no_facial_image_id } do
+      booking_id = 1_153_753
+      uri = "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/offender-sentences/bookings"
+
+      WebMock.stub_request(:post, uri).with(body: "[#{booking_id}]").to_return(
+        status: 200,
+        body: [
+          { "bookingId": 1_153_753,
+            "dateOfBirth": "1953-04-15"
+        }].to_json, headers: {})
+
+      response = described_class.get_image(booking_id)
+      expect(response).not_to be nil?
+
+      jpeg_start_sentinel = [0xFF, 0xD8, 0xFF]
+      jpeg_end_sentinel = [0xFF, 0xD9]
+
+      bytes = response.bytes.to_a
+
       expect(bytes[0, 3]).to eq(jpeg_start_sentinel)
       expect(bytes[-2, 2]).to eq(jpeg_end_sentinel)
     end

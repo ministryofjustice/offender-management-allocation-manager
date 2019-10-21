@@ -1,3 +1,9 @@
+<h2 class="govuk-heading-m">Save this assessment</h2>
+<p class="govuk-body">
+  <%= link_to('Save completed assessment (pdf)',
+              prison_prisoner_early_allocation_path(@prison, @offender.offender_no, format: :pdf),
+              class: 'govuk-link') %>
+</p>
 <p class="govuk-body">
   <%= link_to('Return to prisoner page', prison_prisoner_path(@prison, @early_assignment.nomis_offender_id), class: 'govuk-link') %>
 </p>
