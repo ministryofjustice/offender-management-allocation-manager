@@ -30,7 +30,7 @@ class EarlyAllocation < ApplicationRecord
     STAGE1_FIELDS.map { |f| errors[f].present? }.any?
   end
 
-  validate :validate_stage1, unless: -> { stage2_validation || stage3_validation }
+  validate :validate_stage1, unless: -> { stage2_validation || stage3_validation || recording_community_decision }
 
   # add an arbitrary error in stage1 if we're not eligible. This will push us onto stage2
   # by asking any_stage1_field_errors? and prevent the save.
@@ -84,6 +84,11 @@ class EarlyAllocation < ApplicationRecord
   validates :approved, inclusion: { in: [true],
                                     allow_nil: false
                                     }, if: -> { stage3_validation }
+
+  attribute :recording_community_decision, :boolean
+  validates :community_decision,
+            inclusion: { in: [true, false], allow_nil: false },
+            if: -> { recording_community_decision }
 
   def eligible?
     stage1_eligible?

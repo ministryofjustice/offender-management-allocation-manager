@@ -11,7 +11,7 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
     subject { build(:early_allocation) }
 
     it 'says eligible' do
-      expect(helper.early_allocation_status(subject)).to eq('Eligible')
+      expect(helper.early_allocation_status(subject)).to eq('Eligible - Automatic')
     end
   end
 
@@ -28,6 +28,22 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
 
     it 'says pending when deferred to community' do
       expect(helper.early_allocation_status(subject)).to eq('Waiting for community decision')
+    end
+  end
+
+  context 'when deferred but community said yes' do
+    subject { build(:early_allocation, :discretionary, community_decision: true) }
+
+    it 'says eligible' do
+      expect(helper.early_allocation_status(subject)).to eq('Eligible - Discretionary')
+    end
+  end
+
+  context 'when deferred but community said no' do
+    subject { build(:early_allocation, :discretionary, community_decision: false) }
+
+    it 'says ineligible' do
+      expect(helper.early_allocation_status(subject)).to eq('Not Eligible')
     end
   end
 end
