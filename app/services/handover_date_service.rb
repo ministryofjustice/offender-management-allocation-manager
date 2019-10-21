@@ -4,19 +4,23 @@ class HandoverDateService
   def self.handover_start_date(offender)
     return [nil, 'No earliest release date'] if offender.earliest_release_date.nil?
 
-    if offender.nps_case? && !offender.early_allocation?
-      return [offender.earliest_release_date - 8.months, 'NPS Indeterminate'] if offender.indeterminate_sentence?
-
-      [offender.earliest_release_date - (7.months + 15.days), 'NPS Determinate']
+    if offender.nps_case?
+      if offender.early_allocation?
+        [early_allocation_handover_date(offender), 'Early Allocation']
+      elsif offender.indeterminate_sentence?
+        [offender.earliest_release_date - 8.months, 'NPS Indeterminate']
+      else
+        [offender.earliest_release_date - (7.months + 15.days), 'NPS Determinate']
+      end
     else
-      [nil, 'CRC or Early Allocation']
+      [nil, 'CRC Case']
     end
   end
 
   def self.responsibility_handover_date(offender)
-    return [nil, 'No earliest release date'] if offender.earliest_release_date.nil?
-
-    if offender.nps_case?
+    if offender.earliest_release_date.nil?
+      [nil, 'No earliest release date']
+    elsif offender.nps_case?
       nps_handover_date(offender)
     else
       [crc_handover_date(offender), 'CRC']

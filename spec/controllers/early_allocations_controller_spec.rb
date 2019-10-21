@@ -37,64 +37,84 @@ RSpec.describe EarlyAllocationsController, type: :controller do
     stub_poms(prison, poms)
 
     create(:allocation_version, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
-    create(:case_information, nomis_offender_id: nomis_offender_id)
   end
 
-  context 'when stage 1' do
-    let(:date_params) {
-      { "oasys_risk_assessment_date_dd" => valid_date.day,
-        "oasys_risk_assessment_date_mm" => valid_date.month,
-        "oasys_risk_assessment_date_yyyy" => valid_date.year
+  context 'with not ldu email address' do
+    let(:ldu) { create(:local_divisional_unit, email_address: nil) }
+
+    before do
+      create(:case_information, nomis_offender_id: nomis_offender_id, local_divisional_unit: ldu)
+    end
+
+    it 'goes to the dead end' do
+      get :new, params: { prison_id: prison,
+                          prisoner_id: nomis_offender_id }
+
+      assert_template 'dead_end'
+    end
+  end
+
+  context 'with a good ldu complete with email address' do
+    before do
+      create(:case_information, nomis_offender_id: nomis_offender_id)
+    end
+
+    context 'when stage 1' do
+      let(:date_params) {
+        { "oasys_risk_assessment_date_dd" => valid_date.day,
+          "oasys_risk_assessment_date_mm" => valid_date.month,
+          "oasys_risk_assessment_date_yyyy" => valid_date.year
+        }
       }
-    }
 
-    context 'when any one boolean true' do
-      it 'declares assessment complete and eligible' do
-        s1_boolean_param_names.each do |field|
-          s1_boolean_params[field] = 'true'
+      context 'when any one boolean true' do
+        it 'declares assessment complete and eligible' do
+          s1_boolean_param_names.each do |field|
+            s1_boolean_params[field] = 'true'
 
+            post :create, params: { prison_id: prison,
+                                    prisoner_id: nomis_offender_id,
+                                    early_allocation: date_params.merge(s1_boolean_params) }
+            assert_template('eligible')
+          end
+        end
+      end
+
+      context 'when no booleans true' do
+        render_views
+        it 'renders the second screen of questions' do
           post :create, params: { prison_id: prison,
                                   prisoner_id: nomis_offender_id,
                                   early_allocation: date_params.merge(s1_boolean_params) }
-          assert_template('eligible')
+          expect(response.body).to include('Extremism separation centres')
         end
       end
     end
 
-    context 'when no booleans true' do
-      render_views
-      it 'renders the second screen of questions' do
-        post :create, params: { prison_id: prison,
-                                prisoner_id: nomis_offender_id,
-                                early_allocation: date_params.merge(s1_boolean_params) }
-        expect(response.body).to include('Extremism separation centres')
-      end
-    end
-  end
-
-  context 'when stage 2' do
-    let(:s2_boolean_param_names) {
-      [:due_for_release_in_less_than_24months,
-       :high_risk_of_serious_harm,
-       :mappa_level_2,
-       :pathfinder_process,
-       :other_reason]
-    }
-
-    let(:s2_boolean_params) { s2_boolean_param_names.map { |p| [p, 'false'] }.to_h }
-
-    it 'is ineligible if <24 months is false but extremism_separation is true' do
-      post :create, params: {
-        prison_id: prison,
-        prisoner_id: nomis_offender_id,
-        early_allocation: {
-          oasys_risk_assessment_date: valid_date,
-          extremism_separation: true,
-          stage2_validation: true
-        }.merge(s1_boolean_params).merge(s2_boolean_params)
+    context 'when stage 2' do
+      let(:s2_boolean_param_names) {
+        [:due_for_release_in_less_than_24months,
+         :high_risk_of_serious_harm,
+         :mappa_level_2,
+         :pathfinder_process,
+         :other_reason]
       }
 
-      assert_template 'ineligible'
+      let(:s2_boolean_params) { s2_boolean_param_names.map { |p| [p, 'false'] }.to_h }
+
+      it 'is ineligible if <24 months is false but extremism_separation is true' do
+        post :create, params: {
+          prison_id: prison,
+          prisoner_id: nomis_offender_id,
+          early_allocation: {
+            oasys_risk_assessment_date: valid_date,
+            extremism_separation: true,
+            stage2_validation: true
+          }.merge(s1_boolean_params).merge(s2_boolean_params)
+        }
+
+        assert_template 'ineligible'
+      end
     end
   end
 end
