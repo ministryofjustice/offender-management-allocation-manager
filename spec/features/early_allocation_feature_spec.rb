@@ -92,15 +92,7 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
 
       context 'with stage 2 questions' do
         before do
-          fill_in id: 'early_allocation_oasys_risk_assessment_date_dd', with: valid_date.day
-          fill_in id: 'early_allocation_oasys_risk_assessment_date_mm', with: valid_date.month
-          fill_in id: 'early_allocation_oasys_risk_assessment_date_yyyy', with: valid_date.year
-
-          find('#early_allocation_convicted_under_terrorisom_act_2000_false').click
-          find('#early_allocation_high_profile_false').click
-          find('#early_allocation_serious_crime_prevention_order_false').click
-          find('#early_allocation_mappa_level_3_false').click
-          find('#early_allocation_cppc_case_false').click
+          stage1_stage2_answers
 
           click_button 'Continue'
           # make sure that we are displaying stage 2 questions before continuing
@@ -189,7 +181,9 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
 
     context 'when existing eligible early allocation' do
       before do
-        create(:early_allocation, nomis_offender_id: nomis_offender_id)
+        create(:early_allocation, :discretionary,
+               nomis_offender_id: nomis_offender_id,
+               community_decision: true)
         click_link 'View'
       end
 
@@ -197,14 +191,25 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
         expect(page).to have_link 'Re-assess'
       end
 
-      it 'overwrites assessment when re-assessed' do
-        within '#early_allocation' do
-          click_link 'Re-assess'
+      context 'when reassessing' do
+        before do
+          within '#early_allocation' do
+            click_link 'Re-assess'
+          end
         end
-        expect {
-          stage1_eligible_answers
+
+        it 'overwrites assessment' do
+          expect {
+            stage1_eligible_answers
+            click_button 'Continue'
+          }.not_to change(EarlyAllocation, :count)
+        end
+
+        it 'can do stage2' do
+          stage1_stage2_answers
           click_button 'Continue'
-        }.not_to change(EarlyAllocation, :count)
+          expect(page).not_to have_css('.govuk-error-message')
+        end
       end
     end
   end
@@ -215,6 +220,18 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
     fill_in id: 'early_allocation_oasys_risk_assessment_date_yyyy', with: valid_date.year
 
     find('#early_allocation_convicted_under_terrorisom_act_2000_true').click
+    find('#early_allocation_high_profile_false').click
+    find('#early_allocation_serious_crime_prevention_order_false').click
+    find('#early_allocation_mappa_level_3_false').click
+    find('#early_allocation_cppc_case_false').click
+  end
+
+  def stage1_stage2_answers
+    fill_in id: 'early_allocation_oasys_risk_assessment_date_dd', with: valid_date.day
+    fill_in id: 'early_allocation_oasys_risk_assessment_date_mm', with: valid_date.month
+    fill_in id: 'early_allocation_oasys_risk_assessment_date_yyyy', with: valid_date.year
+
+    find('#early_allocation_convicted_under_terrorisom_act_2000_false').click
     find('#early_allocation_high_profile_false').click
     find('#early_allocation_serious_crime_prevention_order_false').click
     find('#early_allocation_mappa_level_3_false').click

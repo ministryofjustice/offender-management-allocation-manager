@@ -22,6 +22,9 @@ FactoryBot.define do
       mappa_level_2 do false end
       pathfinder_process do false end
       other_reason { true }
+      reason { 'Just a reason' }
+      approved { true }
+      stage3_validation { true }
     end
 
     trait :ineligible do
