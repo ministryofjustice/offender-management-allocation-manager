@@ -36,14 +36,14 @@ RSpec.describe SummaryController, type: :controller do
 
     stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/movements/offenders?latestOnly=false&movementTypes=TRN").
       with(body: "[\"G7514GW\",\"G1234VV\"]").
-      to_return(status: 200, body: [{offenderNo: 'G7514GW', toAgency: prison, createDateTime: Date.new(2018, 10, 1)},
-                                    {offenderNo: 'G1234VV', toAgency: prison, createDateTime: Date.new(2018, 9, 1)}].to_json)
+      to_return(status: 200, body: [{ offenderNo: 'G7514GW', toAgency: prison, createDateTime: Date.new(2018, 10, 1) },
+                                    { offenderNo: 'G1234VV', toAgency: prison, createDateTime: Date.new(2018, 9, 1) }].to_json)
   end
 
   it 'gets pending records' do
     get :pending, params: { prison_id: prison }
     # Expecting offender (2) to use sentenceStartDate as it is newer than last arrival date in prison
-    expect(assigns(:summary).offenders.map(&:awaiting_allocation_for).map { |x| Time.zone.today - x}).
+    expect(assigns(:summary).offenders.map(&:awaiting_allocation_for).map { |x| Time.zone.today - x }).
       to match_array [Date.new(2018, 10, 1), Date.new(2019, 2, 8)]
   end
 end
