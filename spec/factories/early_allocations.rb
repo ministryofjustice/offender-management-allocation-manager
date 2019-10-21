@@ -21,9 +21,9 @@ FactoryBot.define do
       high_risk_of_serious_harm do false end
       mappa_level_2 do false end
       pathfinder_process do false end
-      other_reason { true }
-      reason { 'Just a reason' }
-      approved { true }
+      other_reason do true end
+      reason do 'Just a reason' end
+      approved do true end
       stage3_validation { true }
     end
 
