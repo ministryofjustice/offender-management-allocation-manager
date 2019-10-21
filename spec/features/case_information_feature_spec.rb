@@ -130,4 +130,22 @@ feature 'case information feature' do
 
     expect(current_url).to have_content("/prisons/LEI/summary/pending?page=3&sort=last_name+desc")
   end
+
+  it 'does not show update link on view only case info', :raven_intercept_exception,
+    vcr: { cassette_name: :case_information_no_update_feature } do
+
+    # When auto-delius is on there should be no update link to modify the case info
+    # as it may not exist yet. We run this test with an indeterminate and a determine offender
+    signin_user
+
+    # Indeterminate offender
+    nomis_offender_id = 'G0806GQ'
+    visit prison_case_information_path('LEI', nomis_offender_id)
+    expect(page).to_not have_css('#edit-prd-link')
+
+    # Determinate offender
+    nomis_offender_id = 'G2911GD'
+    visit prison_case_information_path('LEI', nomis_offender_id)
+    expect(page).to_not have_css('#edit-prd-link')
+  end
 end
