@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 class EarlyAllocation < ApplicationRecord
+  belongs_to :case_information,
+             primary_key: :nomis_offender_id,
+             foreign_key: :nomis_offender_id,
+             inverse_of: :early_allocation
+
   validates :oasys_risk_assessment_date,
             presence: true,
             date: {
