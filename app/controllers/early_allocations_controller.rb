@@ -95,13 +95,7 @@ private
   end
 
   def send_email
-    PomMailer.early_allocation_email(email: @offender.ldu.email_address,
-                                     prisoner_name: @offender.full_name,
-                                     prisoner_number: @offender.offender_no,
-                                     pom_name: @allocation.primary_pom_name,
-                                     pom_email: @pom.emails.first,
-                                     prison_name: PrisonService.name_for(@prison),
-                                     pdf: pdf_as_string).deliver_later
+    SendEarlyAllocationEmailJob.perform_later(@prison, @offender.offender_no, Base64.encode64(pdf_as_string))
   end
 
   def create_error_page(prefix)
