@@ -52,7 +52,8 @@ module Nomis
       def self.get_multiple_offenders(offender_nos)
         route = '/elite2api/api/prisoners'
         response = e2_client.post(route,
-                                  'offenderNos' => offender_nos
+                                  { 'offenderNos' => offender_nos },
+                                  extra_headers: paging_headers(offender_nos.count, 0)
                                   )
         return [] if response.empty?
 

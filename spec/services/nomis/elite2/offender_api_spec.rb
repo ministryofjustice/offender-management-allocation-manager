@@ -44,7 +44,7 @@ describe Nomis::Elite2::OffenderApi do
 
   describe 'Multiple offenders' do
     let!(:offenders) {
-      %w[G4273GI G7806VO G3462VT G1670VU G5897GP G3536UF G7998GJ G2407UH G4879UP G8060UF]
+      %w[G4273GI G7806VO G3462VT G1670VU G5897GP G3536UF G7998GJ G2407UH G4879UP G8060UF G9412UU G1221UA]
     }
 
     it 'can get multiple offenders',
@@ -52,7 +52,7 @@ describe Nomis::Elite2::OffenderApi do
       response = described_class.get_multiple_offenders(offenders)
 
       expect(response.first).to be_instance_of(Nomis::Offender)
-      expect(response.count).to eq(10)
+      expect(response.count).to eq(12)
     end
 
     it 'can handle getting an empty list',
