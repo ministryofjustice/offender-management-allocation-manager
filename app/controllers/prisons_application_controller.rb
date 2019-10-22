@@ -18,7 +18,8 @@ private
       redirect_to('/401')
       return
     end
-    redirect_to '/401' unless caseloads.include?(active_prison)
+
+    return redirect_to('/401') if caseloads.nil? || !caseloads.include?(active_prison)
 
     @prison = active_prison
   end
