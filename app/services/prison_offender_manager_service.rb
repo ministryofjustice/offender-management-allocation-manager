@@ -125,7 +125,7 @@ private
 
   def self.get_pom_detail(pom_details, nomis_staff_id)
     pom_details.detect { |pd| pd.nomis_staff_id == nomis_staff_id } ||
-      PomDetail.create!(nomis_staff_id: nomis_staff_id,
+      PomDetail.find_or_create_by!(nomis_staff_id: nomis_staff_id,
                         working_pattern: 0.0,
                         status: 'active')
   end
