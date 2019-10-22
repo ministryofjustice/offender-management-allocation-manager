@@ -6,11 +6,9 @@ require_relative '../../lib/delius/processor'
 namespace :delius_etl do
   desc 'Loads delius information from a spreadsheet into DB and trigger'
   task :import_file, [:file] => [:environment] do |_task, args|
-    if defined?(Rails) && Rails.env.development?
-      Rails.logger = Logger.new(STDOUT)
-    end
+    Rails.logger = Logger.new(STDOUT)
 
-    Rails.logger.error('No file specified') if args[:file].blank?
+    Rails.logger.error('No file specified during manual delius import') if args[:file].blank?
     next if args[:file].blank?
 
     total = 0
