@@ -122,10 +122,10 @@ RSpec.describe TasksController, type: :controller do
       stub_offender(offender_nos.first, booking_number: 754_205)
       stub_offender(offender_nos.last, booking_number: 754_204)
 
-      offender_nos.each { |offender_no|
+      offender_nos.each do |offender_no|
         create(:case_information, nomis_offender_id: offender_no, tier: 'A', mappa_level: 1)
         create(:allocation_version, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
-      }
+      end
 
       create(:early_allocation, :discretionary, :skip_validate, nomis_offender_id: offender_nos.first)
       create(:early_allocation, :stage2, :skip_validate, nomis_offender_id: offender_nos.last)
