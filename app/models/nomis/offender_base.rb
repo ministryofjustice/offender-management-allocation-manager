@@ -6,7 +6,7 @@ module Nomis
              :automatic_release_date,
              to: :sentence
 
-    attr_accessor :convicted_status,
+    attr_accessor :convicted_status, :booking_id,
                   :category_code, :offender_no, :date_of_birth,
                   :first_name, :last_name
 
