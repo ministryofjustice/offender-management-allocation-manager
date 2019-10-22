@@ -35,10 +35,10 @@
     <% @pomtasks.each do |pomtask|  %>
       <tr class="govuk-table__row">
         <td aria-label="Prisoner name" class="govuk-table__cell ">
-          <%= pomtask.offender.full_name %>
+          <%= pomtask.offender_name %>
           <br/>
           <span class='govuk-hint govuk-!-margin-bottom-0'>
-            <%= pomtask.offender.offender_no %>
+            <%= pomtask.offender_number %>
           </span>
         </td>
         <td aria-label="Update needed" class="govuk-table__cell ">

@@ -90,7 +90,7 @@ RSpec.describe TasksController, type: :controller do
 
       pomtasks = assigns(:pomtasks)
       expect(pomtasks.count).to eq(1)
-      expect(pomtasks.first.offender.offender_no).to eq(offender_no)
+      expect(pomtasks.first.offender_number).to eq(offender_no)
       expect(pomtasks.first.action_label).to eq('Parole review date')
     end
   end
@@ -110,7 +110,7 @@ RSpec.describe TasksController, type: :controller do
 
       pomtasks = assigns(:pomtasks)
       expect(pomtasks.count).to eq(1)
-      expect(pomtasks.first.offender.offender_no).to eq(offender_no)
+      expect(pomtasks.first.offender_number).to eq(offender_no)
       expect(pomtasks.first.action_label).to eq('nDelius case matching')
     end
   end
@@ -136,7 +136,7 @@ RSpec.describe TasksController, type: :controller do
 
       pomtasks = assigns(:pomtasks)
       expect(pomtasks.count).to eq(1)
-      expect(pomtasks.first.offender.offender_no).to eq(offender_nos.first)
+      expect(pomtasks.first.offender_number).to eq(offender_nos.first)
       expect(pomtasks.first.action_label).to eq('Early allocation decision')
     end
   end
