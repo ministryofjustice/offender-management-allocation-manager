@@ -5,7 +5,6 @@ module Nomis
     include Deserialisable
 
     attr_accessor :gender,
-                  :latest_booking_id,
                   :main_offence,
                   :nationalities,
                   :noms_id,
@@ -28,7 +27,7 @@ module Nomis
 
     def load_from_json(payload)
       @gender = payload['gender']
-      @latest_booking_id = payload['latestBookingId']&.to_i
+      @booking_id = payload['latestBookingId']&.to_i
       @main_offence = payload['mainOffence']
       @nationalities = payload['nationalities']
       @noms_id = payload['nomsId']
