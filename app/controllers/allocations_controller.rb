@@ -112,7 +112,7 @@ private
       event: allocation_params[:event],
       event_trigger: allocation_params[:event_trigger],
       created_by_username: current_user,
-      nomis_booking_id: offender.latest_booking_id,
+      nomis_booking_id: offender.booking_id,
       allocated_at_tier: offender.tier,
       recommended_pom_type: recommended_pom_type(offender),
       prison: active_prison,

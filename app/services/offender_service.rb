@@ -8,13 +8,13 @@ class OffenderService
       record = CaseInformation.find_by(nomis_offender_id: offender_no)
       o.load_case_information(record)
 
-      sentence_detail = get_sentence_details([o.latest_booking_id])
-      if sentence_detail.present? && sentence_detail.key?(o.latest_booking_id)
-        o.sentence = sentence_detail[o.latest_booking_id]
+      sentence_detail = get_sentence_details([o.booking_id])
+      if sentence_detail.present? && sentence_detail.key?(o.booking_id)
+        o.sentence = sentence_detail[o.booking_id]
       end
 
       o.category_code = Nomis::Elite2::OffenderApi.get_category_code(o.offender_no)
-      o.main_offence = Nomis::Elite2::OffenderApi.get_offence(o.latest_booking_id)
+      o.main_offence = Nomis::Elite2::OffenderApi.get_offence(o.booking_id)
     }
   end
 
@@ -78,14 +78,14 @@ class OffenderService
   def self.get_multiple_offenders(offender_ids)
     offenders = Nomis::Elite2::OffenderApi.get_multiple_offenders(offender_ids)
 
-    booking_ids = offenders.map(&:latest_booking_id)
+    booking_ids = offenders.map(&:booking_id)
     sentence_details = Nomis::Elite2::OffenderApi.get_bulk_sentence_details(booking_ids)
 
     nomis_ids = offenders.map(&:offender_no)
     mapped_tiers = CaseInformationService.get_case_information(nomis_ids)
 
     offenders.each { |offender|
-      sentencing = sentence_details[offender.latest_booking_id]
+      sentencing = sentence_details[offender.booking_id]
       offender.sentence = sentencing if sentencing.present?
 
       case_info_record = mapped_tiers[offender.offender_no]
