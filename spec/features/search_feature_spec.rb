@@ -1,6 +1,52 @@
 require 'rails_helper'
 
 feature 'Search for offenders' do
+  context 'with delius import on' do
+    let(:test_strategy) { Flipflop::FeatureSet.current.test! }
+
+    before do
+      test_strategy.switch!(:auto_delius_import, true)
+    end
+
+    after do
+      test_strategy.switch!(:auto_delius_import, false)
+    end
+
+    it 'shows update not edit' do
+      signin_user
+      visit prison_summary_allocated_path('LEI')
+
+      expect(page).to have_text('See allocations')
+      fill_in 'q', with: 'G4273GI'
+      click_on('search-button')
+
+      update_link = find('td a')
+      expect(update_link.text).to eq('Update')
+      expect(page).to have_current_path(prison_search_path('LEI'), ignore_query: true)
+    end
+  end
+
+  context 'with delius import off' do
+    let(:test_strategy) { Flipflop::FeatureSet.current.test! }
+
+    before do
+      test_strategy.switch!(:auto_delius_import, false)
+    end
+
+    it 'shows update not edit' do
+      signin_user
+      visit prison_summary_allocated_path('LEI')
+
+      expect(page).to have_text('See allocations')
+      fill_in 'q', with: 'G4273GI'
+      click_on('search-button')
+
+      update_link = find('td a')
+      expect(update_link.text).to eq('Edit')
+      expect(page).to have_current_path(prison_search_path('LEI'), ignore_query: true)
+    end
+  end
+
   it 'Can search from the dashboard', vcr: { cassette_name: :dashboard_search_feature } do
     signin_user
     visit root_path

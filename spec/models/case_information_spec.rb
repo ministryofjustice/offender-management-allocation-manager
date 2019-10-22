@@ -1,12 +1,29 @@
 require 'rails_helper'
 
 RSpec.describe CaseInformation, type: :model do
+  let(:case_info) { create(:case_information) }
+
   it 'has timestamps' do
-    x = create(:case_information)
-    expect(x.created_at).not_to be_nil
+    expect(case_info.created_at).not_to be_nil
     sleep 2
-    x.touch
-    expect(x.updated_at).not_to eq(x.created_at)
+    case_info.touch
+    expect(case_info.updated_at).not_to eq(case_info.created_at)
+  end
+
+  describe '#early_allocation' do
+    context 'when not setup' do
+      it 'is nil' do
+        expect(case_info.early_allocation).to be_nil
+      end
+    end
+
+    context 'with an allocation' do
+      let!(:early_allocation) { create(:early_allocation, nomis_offender_id: case_info.nomis_offender_id) }
+
+      it 'is not nil' do
+        expect(case_info.early_allocation).to eq(early_allocation)
+      end
+    end
   end
 
   context 'with mappa level' do

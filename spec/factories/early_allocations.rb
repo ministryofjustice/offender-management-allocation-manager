@@ -11,6 +11,8 @@ FactoryBot.define do
     cppc_case do true end
     stage2_validation do false end
 
+    association :case_information
+
     trait :discretionary do
       cppc_case do false end
       extremism_separation do
@@ -19,7 +21,10 @@ FactoryBot.define do
       high_risk_of_serious_harm do false end
       mappa_level_2 do false end
       pathfinder_process do false end
-      other_reason { true }
+      other_reason do true end
+      reason do 'Just a reason' end
+      approved do true end
+      stage3_validation { true }
     end
 
     trait :ineligible do

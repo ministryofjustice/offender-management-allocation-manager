@@ -5,6 +5,7 @@ require File.expand_path('../config/environment', __dir__)
 abort('The Rails environment is running in production mode!') if Rails.env.production?
 require 'rspec/rails'
 require 'spec_helper'
+require 'support/helpers/api_helper'
 require 'support/helpers/jwt_helper'
 require 'support/helpers/features_helper'
 require 'support/helpers/auth_helper'

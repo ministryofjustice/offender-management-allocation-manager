@@ -5,11 +5,18 @@ class EarlyAllocationsController < PrisonsApplicationController
 
   def new
     @early_assignment = EarlyAllocation.new offender_id_from_url
+    case_info = CaseInformation.find_by offender_id_from_url
+    if case_info.local_divisional_unit.try(:email_address)
+      render
+    else
+      render 'dead_end'
+    end
   end
 
   def create
     @early_assignment = EarlyAllocation.new early_allocation_params.merge(offender_id_from_url)
     if @early_assignment.save
+      send_email
       if @early_assignment.eligible?
         render 'eligible'
       else
@@ -17,13 +24,44 @@ class EarlyAllocationsController < PrisonsApplicationController
       end
     else
       @early_assignment.errors.delete(:stage2_validation)
-      render create_error_page
+      render create_error_page 'new'
+    end
+  end
+
+  # edit results in all the user-facing fields being cleared
+  def edit
+    @early_assignment = EarlyAllocation.find_by!(offender_id_from_url)
+    @early_assignment.clear
+  end
+
+  def update
+    @early_assignment = EarlyAllocation.find_by(offender_id_from_url)
+    if @early_assignment.update(early_allocation_params)
+      render create_error_page 'edit'
+    else
+      render 'edit'
+    end
+  end
+
+  # record a community decision (changing 'maybe' into a yes or a no)
+  def community_decision
+    @early_assignment = EarlyAllocation.find_by!(offender_id_from_url)
+  end
+
+  def record_community_decision
+    @early_assignment = EarlyAllocation.find_by!(offender_id_from_url)
+
+    if @early_assignment.update(community_decision_params)
+      redirect_to prison_prisoner_path(@prison, @early_assignment.nomis_offender_id)
+    else
+      render 'community_decision'
     end
   end
 
   def discretionary
     @early_assignment = EarlyAllocation.new early_allocation_params.merge(offender_id_from_url)
     if @early_assignment.save
+      send_email
       render
     else
       render 'stage3'
@@ -31,46 +69,61 @@ class EarlyAllocationsController < PrisonsApplicationController
   end
 
   def show
-    @offender = EarlyAllocation.find_by! offender_id_from_url
-    @prisoner = OffenderService.get_offender(params[:prisoner_id])
-    @allocation = AllocationVersion.find_by!(offender_id_from_url)
-    @pom = PrisonOffenderManagerService.get_pom(@prison, @allocation.primary_pom_nomis_id)
+    @early_assignment = EarlyAllocation.find_by!(offender_id_from_url)
 
     respond_to do |format|
-      format.pdf
+      format.pdf {
+        # disposition 'attachment' is the default for send_data
+        send_data pdf_as_string
+      }
     end
   end
 
 private
 
-  def create_error_page
+  def load_prisoner
+    @offender = OffenderService.get_offender(params[:prisoner_id])
+    @allocation = AllocationVersion.find_by!(offender_id_from_url)
+    @pom = PrisonOffenderManagerService.get_pom(@prison, @allocation.primary_pom_nomis_id)
+  end
+
+  def pdf_as_string
+    view_context.render_early_alloc_pdf(early_assignment: @early_assignment,
+                                        offender: @offender,
+                                        pom: @pom,
+                                        allocation: @allocation).render
+  end
+
+  def send_email
+    SendEarlyAllocationEmailJob.perform_later(@prison, @offender.offender_no, Base64.encode64(pdf_as_string))
+  end
+
+  def create_error_page(prefix)
     if !@early_assignment.stage2_validation?
-      stage1_error_page
+      stage1_error_page prefix
     else
-      stage2_error_page
+      stage2_error_page prefix
     end
   end
 
-  def stage1_error_page
+  def stage1_error_page(prefix)
     if @early_assignment.any_stage1_field_errors?
-      'new'
+      prefix
     else
-      'stage2_new'
+      "stage2_#{prefix}"
     end
   end
 
-  def stage2_error_page
+  def stage2_error_page(prefix)
     if @early_assignment.any_stage2_field_errors?
-      'stage2_new'
+      "stage2_#{prefix}"
     else
       'stage3'
     end
   end
 
-  def load_prisoner
-    @offender = OffenderService.get_offender(params[:prisoner_id])
-    @allocation = AllocationVersion.find_by!(offender_id_from_url)
-    @pom = PrisonOffenderManagerService.get_pom(@prison, @allocation.primary_pom_nomis_id)
+  def community_decision_params
+    params.fetch(:early_allocation, {}).permit(:community_decision).merge(recording_community_decision: true)
   end
 
   def early_allocation_params
