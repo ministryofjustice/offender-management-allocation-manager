@@ -6,7 +6,7 @@ class TasksController < PrisonsApplicationController
   before_action :ensure_pom
 
   def index
-    sorted_tasks = sort_tasks(PomTasks.new(active_prison).for_offenders(offenders))
+    sorted_tasks = sort_tasks(PomTasks.new(active_prison_id).for_offenders(offenders))
     @pomtasks = Kaminari.paginate_array(sorted_tasks).page(page)
   end
 
@@ -28,13 +28,13 @@ private
   end
 
   def offenders
-    @offenders ||= PomCaseload.new(@pom.staff_id, active_prison).allocations.map(&:offender)
+    @offenders ||= PomCaseload.new(@pom.staff_id, active_prison_id).allocations.map(&:offender)
   end
 
   def ensure_pom
     @pom = PrisonOffenderManagerService.get_signed_in_pom_details(
       current_user,
-      active_prison
+      active_prison_id
     )
 
     if @pom.blank?

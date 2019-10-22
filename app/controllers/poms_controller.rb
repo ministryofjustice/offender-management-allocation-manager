@@ -19,7 +19,7 @@ class PomsController < PrisonsApplicationController
   end
 
   def show
-    @caseload = PomCaseload.new(@pom.staff_id, active_prison)
+    @caseload = PomCaseload.new(@pom.staff_id, active_prison_id)
     @allocations = sort_allocations(@caseload.allocations)
   end
 
