@@ -36,12 +36,6 @@ class OffenderService
     }
   end
 
-  def self.get_multiple_offenders_as_hash(offender_ids)
-    get_multiple_offenders(offender_ids).map { |offender|
-      [offender.offender_no, offender]
-    }.to_h
-  end
-
   def self.get_sentence_details(booking_ids)
     Nomis::Elite2::OffenderApi.get_bulk_sentence_details(booking_ids)
   end
