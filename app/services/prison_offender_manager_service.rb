@@ -127,7 +127,7 @@ private
     pom_details.detect { |pd| pd.nomis_staff_id == nomis_staff_id } ||
         PomDetail.find_or_create_by!(nomis_staff_id: nomis_staff_id) do |pom|
           pom.working_pattern = 0.0
-          pom.status =  'active'
+          pom.status = 'active'
         end
   end
 
