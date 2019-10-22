@@ -1,8 +1,8 @@
-<%= render :partial => "/shared/backlink", :locals => { :page => new_prison_allocation_path(@prison, @case_info.nomis_offender_id) } %>
+<%= render :partial => "/shared/backlink", :locals => { :page => new_prison_allocation_path(@prison.code, @case_info.nomis_offender_id) } %>
 
 <h2 class="govuk-heading-m"><%= @prisoner.full_name %> - <%= @prisoner.offender_no %></h2>
 
-<%= form_for(@case_info, url: prison_case_information_path(@prison), method: :put, id: "case_info_form") do |f| %>
+<%= form_for(@case_info, url: prison_case_information_path(@prison.code), method: :put, id: "case_info_form") do |f| %>
   <%= hidden_field_tag("case_information[nomis_offender_id]", @prisoner.offender_no) %>
 
   <div class="govuk-form-group">

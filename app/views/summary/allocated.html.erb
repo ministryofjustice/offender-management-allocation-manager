@@ -48,7 +48,7 @@
         <td aria-label="POM" class="govuk-table__cell"><%= offender.allocated_pom_name %></td>
         <td aria-label="Allocation date" class="govuk-table__cell"><%= format_date(offender.allocation_date) %></td>
         <td aria-label="Action" class="govuk-table__cell ">
-          <%= link_to "View", prison_allocation_path(@prison, nomis_offender_id: offender.offender_no, sort: params[:sort], page: params[:page] || 1) %>
+          <%= link_to "View", prison_allocation_path(@prison.code, nomis_offender_id: offender.offender_no, sort: params[:sort], page: params[:page] || 1) %>
         </td>
       </tr>
     <% end %>

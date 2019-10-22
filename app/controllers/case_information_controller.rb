@@ -49,7 +49,7 @@ class CaseInformationController < PrisonsApplicationController
     )
 
     if @case_info.valid?
-      return redirect_to prison_summary_pending_path(active_prison,
+      return redirect_to prison_summary_pending_path(active_prison_id,
                                                      sort: params[:sort],
                                                      page: params[:page]
                          )
@@ -66,7 +66,7 @@ class CaseInformationController < PrisonsApplicationController
     @prisoner = prisoner(case_information_params[:nomis_offender_id])
     # The only item that can be badly entered is parole_review_date
     if @case_info.update(case_information_params.merge(manual_entry: true))
-      redirect_to new_prison_allocation_path(active_prison, @case_info.nomis_offender_id)
+      redirect_to new_prison_allocation_path(active_prison_id, @case_info.nomis_offender_id)
     else
       render 'edit_prd'
     end

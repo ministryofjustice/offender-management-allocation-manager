@@ -2,7 +2,7 @@
   <%= render '/layouts/prison_switcher' %>
 <% end %>
 
-<%= form_for(@early_assignment, url: discretionary_prison_prisoner_early_allocations_path(@prison, @early_assignment.nomis_offender_id)) do |form| %>
+<%= form_for(@early_assignment, url: discretionary_prison_prisoner_early_allocations_path(@prison.code, @early_assignment.nomis_offender_id)) do |form| %>
 
   <% if @early_assignment.errors.count > 0 %>
     <%= render :partial => "/shared/field_errors", :locals => { form: form, errors: @early_assignment.errors } %>

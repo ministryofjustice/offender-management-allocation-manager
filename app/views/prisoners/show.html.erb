@@ -8,7 +8,7 @@
 
 <div class="govuk-grid-row govuk-!-margin-bottom-5">
   <div class="govuk-grid-column-one-quarter">
-    <img src="<%= prison_prisoner_image_path(@prison, @prisoner.offender_no, format: :jpg) %>" alt="Prisoner photo will be here" width="95%">
+    <img src="<%= prison_prisoner_image_path(@prison.code, @prisoner.offender_no, format: :jpg) %>" alt="Prisoner photo will be here" width="95%">
   </div>
   <div class="govuk-grid-column-three-quarters">
     <div class="govuk-grid-row">

@@ -2,8 +2,8 @@
   <div class="govuk-phase-banner govuk-width-container app-site-
   width-container govuk-!-padding-bottom-0 prison-switcher">
       <h2 class="govuk-heading-m govuk-!-margin-0 govuk-!-padding-0">
-        <%= prison_title(@prison) %>
+        <%= prison_title(@prison.code) %>
       </h2>
-      <a href="<%= prison_prisons_path(@prison) %>">Switch prison</a>
+      <a href="<%= prison_prisons_path(@prison.code) %>">Switch prison</a>
   </div>
 <% end %>

@@ -60,10 +60,10 @@
         </td>
         <td aria-label="Waiting" class="govuk-table__cell"><%= offender.awaiting_allocation_for %> days</td>
         <td aria-label="Action" class="govuk-table__cell" id="<%= "edit_#{offender.offender_no}" %>">
-          <% if auto_delius_import_enabled?(@prison) %>
-            <%= link_to "Update", prison_case_information_path(@prison, offender.offender_no) %>
+          <% if auto_delius_import_enabled?(@prison.code) %>
+            <%= link_to "Update", prison_case_information_path(@prison.code, offender.offender_no) %>
           <% else %>
-            <%= link_to "Edit", new_prison_case_information_path(@prison, offender.offender_no, sort: params[:sort], page: params[:page] || 1) %></td>
+            <%= link_to "Edit", new_prison_case_information_path(@prison.code, offender.offender_no, sort: params[:sort], page: params[:page] || 1) %></td>
           <% end %>
         </td>
       </tr>

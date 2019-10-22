@@ -1,8 +1,8 @@
-<%= render :partial => "/shared/backlink", :locals => { :page => new_prison_coworking_path(@prison, nomis_offender_id: @prisoner.offender_no) } %>
+<%= render :partial => "/shared/backlink", :locals => { :page => new_prison_coworking_path(@prison.code, nomis_offender_id: @prisoner.offender_no) } %>
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <%= form_tag(prison_coworking_index_path(@prison), method: :post, id: "confirm_coworking_allocation_form") do %>
+    <%= form_tag(prison_coworking_index_path(@prison.code), method: :post, id: "confirm_coworking_allocation_form") do %>
       <h1 class="govuk-heading-l govuk-!-margin-bottom-5">Confirm co-working allocation</h1>
       <p class="govuk-body">You are allocating co-working POM <%= "#{@secondary_pom.first_name} #{@secondary_pom.last_name}".titleize %> to <%= "#{@prisoner.first_name} #{@prisoner.last_name}".titleize %>.
         The responsible POM is <%= "#{@primary_pom.first_name} #{@primary_pom.last_name}".titleize %>.</p>
@@ -20,7 +20,7 @@
       <%= hidden_field_tag("coworking_allocations[nomis_offender_id]", @prisoner.offender_no) %>
       <%= hidden_field_tag("coworking_allocations[nomis_staff_id]", @secondary_pom.staff_id) %>
       <%= submit_tag "Complete allocation", role: "button", draggable: "false", class: "govuk-button" %>
-      <a class="govuk-link cancel-button" href="<%= new_prison_coworking_path(@prison, @prisoner.offender_no) %>">Cancel</a>
+      <a class="govuk-link cancel-button" href="<%= new_prison_coworking_path(@prison.code, @prisoner.offender_no) %>">Cancel</a>
     <% end %>
   </div>
 </div>

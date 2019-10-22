@@ -7,10 +7,10 @@
 
 <p class="govuk-body">We will send a confirmation email to <%= @primary_pom.emails.first %></p>
 
-<%= form_tag(prison_coworking_path(@prison, @prisoner.offender_no), method: :delete) do %>
+<%= form_tag(prison_coworking_path(@prison.code, @prisoner.offender_no), method: :delete) do %>
   <div class="govuk-form-group">
     <button type="submit" class="govuk-button">Confirm</button>
-    <%= link_to 'Cancel',  prison_allocation_path(@prison, @prisoner.offender_no),
+    <%= link_to 'Cancel',  prison_allocation_path(@prison.code, @prisoner.offender_no),
                 class: 'govuk-link cancel-button' %>
   </div>
 <% end %>

@@ -4,11 +4,11 @@ class CaseloadController < PrisonsApplicationController
   before_action :ensure_pom
 
   breadcrumb -> { 'Your caseload' },
-             -> { prison_caseload_index_path(active_prison) }
+             -> { prison_caseload_index_path(active_prison_id) }
   breadcrumb -> { 'New cases' },
-             -> { new_prison_caseload_path(active_prison) }, only: [:new]
+             -> { new_prison_caseload_path(active_prison_id) }, only: [:new]
   breadcrumb -> { 'Cases close to handover' },
-             -> { prison_caseload_handover_start_path(active_prison) },
+             -> { prison_caseload_handover_start_path(active_prison_id) },
              only: [:handover_start]
 
   def index
@@ -94,7 +94,7 @@ private
   def ensure_pom
     @pom = PrisonOffenderManagerService.get_signed_in_pom_details(
       current_user,
-      active_prison
+      active_prison_id
     )
 
     if @pom.blank?

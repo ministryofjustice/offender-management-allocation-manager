@@ -16,7 +16,7 @@ namespace :delius_etl do
     Rails.logger.error('No file specified') if args[:file].blank?
     next unless args[:file].present? && args[:prison].present?
 
-    offender_ids = fetch_offenders(args[:prison])
+    offender_ids = fetch_offenders(Prison.new(args[:prison]))
     Rails.logger.info("Found #{offender_ids.count} for #{args[:prison]}")
 
     delius_records = load_delius_records(args[:file])
@@ -31,7 +31,7 @@ namespace :delius_etl do
 end
 
 def fetch_offenders(prison)
-  OffenderService.get_offenders_for_prison(prison).map(&:offender_no)
+  prison.offenders.map(&:offender_no)
 end
 
 def load_delius_records(file)

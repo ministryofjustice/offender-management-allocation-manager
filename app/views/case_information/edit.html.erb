@@ -9,6 +9,6 @@
 <p class="govuk-!-margin-bottom-8">You can find this information in NDelius.</p>
 
 <%= render :partial => "form", :locals => {
-      :action => prison_case_information_path(@prison),
+      :action => prison_case_information_path(@prison.code),
       :method => :put,
       :save_text => "Update" } %>

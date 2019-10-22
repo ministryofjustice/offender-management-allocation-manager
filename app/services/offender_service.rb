@@ -30,7 +30,7 @@ class OffenderService
       number_of_requests = max_requests_count
 
       (0..number_of_requests).each do |request_no|
-        offenders = get_offenders_for_prison(
+        offenders = fetch_page_of_offenders(
           page_number: request_no,
           page_size: FETCH_SIZE
         )
@@ -51,7 +51,7 @@ class OffenderService
       (info_request.total_pages / FETCH_SIZE) + 1
     end
 
-    def get_offenders_for_prison(page_number:, page_size:)
+    def fetch_page_of_offenders(page_number:, page_size:)
       offenders = Nomis::Elite2::OffenderApi.list(
         @prison,
         page_number,

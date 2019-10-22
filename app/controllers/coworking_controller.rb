@@ -5,11 +5,11 @@ class CoworkingController < PrisonsApplicationController
     @prisoner = offender(nomis_offender_id_from_url)
     @current_pom = AllocationService.current_pom_for(
       nomis_offender_id_from_url,
-      active_prison
+      active_prison_id
     )
 
     # get_pom and get_poms return different data - so have to compare theit staff_ids.
-    poms = PrisonOffenderManagerService.get_poms(active_prison).reject { |pom|
+    poms = PrisonOffenderManagerService.get_poms(active_prison_id).reject { |pom|
       pom.staff_id == @current_pom.staff_id
     }
 
@@ -24,17 +24,17 @@ class CoworkingController < PrisonsApplicationController
   def confirm
     @prisoner = offender(nomis_offender_id_from_url)
     @primary_pom = PrisonOffenderManagerService.get_pom(
-      active_prison, primary_pom_id_from_url
+      active_prison_id, primary_pom_id_from_url
     )
     @secondary_pom = PrisonOffenderManagerService.get_pom(
-      active_prison, secondary_pom_id_from_url
+      active_prison_id, secondary_pom_id_from_url
     )
   end
 
   def create
     offender = offender(allocation_params[:nomis_offender_id])
     pom = PrisonOffenderManagerService.get_pom(
-      active_prison,
+      active_prison_id,
       allocation_params[:nomis_staff_id]
     )
 
@@ -44,7 +44,7 @@ class CoworkingController < PrisonsApplicationController
       created_by_username: current_user,
       message: allocation_params[:message]
     )
-    redirect_to prison_summary_unallocated_path(active_prison),
+    redirect_to prison_summary_unallocated_path(active_prison_id),
                 notice: "#{offender.full_name_ordered} has been allocated to #{pom.full_name_ordered} (#{pom.grade})"
   end
 
@@ -57,7 +57,7 @@ class CoworkingController < PrisonsApplicationController
       nomis_offender_id: coworking_nomis_offender_id_from_url
     )
     @primary_pom = PrisonOffenderManagerService.get_pom(
-      active_prison, @allocation.primary_pom_nomis_id
+      active_prison_id, @allocation.primary_pom_nomis_id
     )
   end
 
@@ -80,7 +80,7 @@ class CoworkingController < PrisonsApplicationController
                           pom_nomis_id: @allocation.primary_pom_nomis_id
     ).send_cowork_deallocation_email(secondary_pom_name)
 
-    redirect_to prison_allocation_path(active_prison, nomis_offender_id_from_url)
+    redirect_to prison_allocation_path(active_prison_id, nomis_offender_id_from_url)
   end
 
 private

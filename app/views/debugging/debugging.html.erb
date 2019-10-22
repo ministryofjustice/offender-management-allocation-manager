@@ -5,7 +5,7 @@
 <h1 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-4">Debugging</h1>
 
 <div class="search-box govuk-grid-row">
-  <%= form_tag(prison_debugging_path(@prison), method: :get, id: "debugging_form") do %>
+  <%= form_tag(prison_debugging_path(@prison.code), method: :get, id: "debugging_form") do %>
     <div class="govuk-form-group" style="display: inline;" >
       <label class="govuk-label" for="offender_no">
         Enter a prisoner number
