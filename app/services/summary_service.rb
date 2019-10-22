@@ -72,7 +72,6 @@ class SummaryService
     }
   end
 # rubocop:enable Metrics/CyclomaticComplexity
-
 # rubocop:enable Metrics/MethodLength
 # rubocop:enable Metrics/PerceivedComplexity
 
@@ -85,7 +84,7 @@ private
       arrival = movements[offender.offender_no].reverse.detect { |movement|
         movement.to_agency == offender.prison_id
       }
-      offender.prison_arrival_date = arrival.create_date_time
+      offender.prison_arrival_date = [offender.sentence_start_date, arrival.create_date_time].compact.max
     end
   end
 
