@@ -5,6 +5,11 @@ class CaseInformation < ApplicationRecord
 
   belongs_to :local_divisional_unit, optional: true
   belongs_to :team, optional: true
+  has_one :early_allocation,
+          foreign_key: :nomis_offender_id,
+          primary_key: :nomis_offender_id,
+          inverse_of: :case_information,
+          dependent: :destroy
 
   validates :manual_entry, inclusion: { in: [true, false], allow_nil: false }
   validates :nomis_offender_id, presence: true, uniqueness: true
