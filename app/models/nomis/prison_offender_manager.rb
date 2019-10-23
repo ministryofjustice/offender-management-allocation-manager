@@ -13,6 +13,10 @@ module Nomis
                   :tier_a, :tier_b, :tier_c, :tier_d,
                   :total_cases, :status, :working_pattern
 
+    def email_address
+      emails.first
+    end
+
     def full_name
       "#{last_name}, #{first_name}".titleize
     end

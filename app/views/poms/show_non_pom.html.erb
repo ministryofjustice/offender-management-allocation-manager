@@ -1,0 +1,25 @@
+<% content_for :switcher do %>
+  <%= render '/layouts/prison_switcher' %>
+<% end %>
+
+<h1 class="govuk-heading-l">This Prison Offender Manager does not appear to be active</h1>
+<p class="govuk-body">This Prison Offender Manager no longer has a POM role assigned to them at this prison.</p>
+<p class="govuk-body">If this POM has changed jobs, or is going to be away from work for a while, you can set their status to inactive,
+  this will release their cases so they can be reallocated</p>
+
+<p class="govuk-body">
+<%= link_to "Update this POM's status", prison_pom_path(@prison, @nomis_staff_id), class: 'govuk-link' %>
+</p>
+
+<h2 class="govuk-heading-m">If you think this is a mistake</h2>
+<p class="govuk-body">If this POM is still managing a caseload you, or your LSA, need to check that:</p>
+<ul>
+  <li>
+    <p>the correct role is assigned to the POM in Digital Prison Services</p>
+  </li>
+  <li>
+    <p>their NOMIS account is active and the correct roles are assigned</p>
+  </li>
+</ul>
+
+<p>See the steps to do this in the <%= link_to("Guide to getting set up", help_step0_path) %>. You will not be able to manage or reallocate this POMs cases until their status is updated, or their roles are added correctly.</p>

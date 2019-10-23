@@ -21,8 +21,9 @@ module ApplicationHelper
   def pom_level(level)
     {
       'PO' => 'Probation POM',
-      'PRO' => 'Prison POM'
-    }[level]
+      'PRO' => 'Prison POM',
+      'STAFF' => 'N/A'
+    }.fetch(level)
   end
 
   def override_reason_contains(override, val)
