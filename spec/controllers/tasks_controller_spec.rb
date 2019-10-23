@@ -22,13 +22,13 @@ RSpec.describe TasksController, type: :controller do
     stub_signed_in_pom(staff_id, username)
 
     offenders = [
-      { "latestBookingId": 754_207, "offenderNo": "G7514GW", "firstName": "Indeter", "lastName": "Minate-Offender",
+      { "latestBookingId": 754_207, "offenderNo": "G7514GW", "firstName": "Alice", "lastName": "Aliceson",
         "dateOfBirth": "1990-12-06", "age": 28, "agencyId": prison, "categoryCode": "C", "imprisonmentStatus": "LIFE" },
-      { "latestBookingId": 754_206, "offenderNo": "G1234VV", "firstName": "ROSS", "lastName": "JONES",
+      { "latestBookingId": 754_206, "offenderNo": "G1234VV", "firstName": "Bob", "lastName": "Bibby",
         "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03" },
-      { "latestBookingId": 754_205, "offenderNo": "G1234AB", "firstName": "ROSS", "lastName": "JONES",
+      { "latestBookingId": 754_205, "offenderNo": "G1234AB", "firstName": "Carole", "lastName": "Caroleson",
         "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03" },
-      { "latestBookingId": 754_204, "offenderNo": "G1234GG", "firstName": "ROSS", "lastName": "JONES",
+      { "latestBookingId": 754_204, "offenderNo": "G1234GG", "firstName": "David", "lastName": "Davidson",
         "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03" }
     ]
 
@@ -163,6 +163,29 @@ RSpec.describe TasksController, type: :controller do
 
       pomtasks = assigns(:pomtasks)
       expect(pomtasks.count).to eq(3)
+    end
+
+    it 'can sort the results' do
+      # One offender (G1234VV) should have missing case info and one should have no PRD
+      create(:case_information, nomis_offender_id: 'G1234AB', tier: 'A', mappa_level: 1, parole_review_date: next_week)
+      create(:case_information, nomis_offender_id: 'G1234GG', tier: 'A', mappa_level: 1, parole_review_date: next_week)
+      create(:case_information, nomis_offender_id: 'G7514GW', tier: 'A', mappa_level: 1)
+
+      # One offender should have a pending early allocation
+      create(:early_allocation, :discretionary, :skip_validate, nomis_offender_id: test_offender_no)
+      create(:early_allocation, :stage2, :skip_validate, nomis_offender_id: test_offender_no)
+
+      get :index, params: { prison_id: prison, sort: 'offender_name asc' }
+      expect(response).to be_successful
+      pomtasks = assigns(:pomtasks)
+      expect(pomtasks[0].offender_name).to eq('Aliceson, Alice')
+      expect(pomtasks[2].offender_name).to eq('Caroleson, Carole')
+
+      get :index, params: { prison_id: prison, sort: 'offender_name desc' }
+      expect(response).to be_successful
+      pomtasks = assigns(:pomtasks)
+      expect(pomtasks[0].offender_name).to eq('Caroleson, Carole')
+      expect(pomtasks[2].offender_name).to eq('Aliceson, Alice')
     end
   end
 end
