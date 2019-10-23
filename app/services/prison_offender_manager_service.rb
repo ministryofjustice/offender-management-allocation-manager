@@ -64,13 +64,9 @@ class PrisonOffenderManagerService
     )
 
     offender_ids = allocation_list.map(&:nomis_offender_id)
+    offenders = OffenderService.get_multiple_offenders(offender_ids)
 
-    # Get all of the offenders at this prison and select only those that
-    # appear in an allocation.  Then for each one apply a map to determine
-    # the responsibility and pair it with the allocation and sentence.
-    OffenderService.get_offenders_for_prison(prison).select{ |offender|
-      offender_ids.include?(offender.offender_no)
-    }.map { |offender|
+    offenders.map { |offender|
       # This is potentially slow, possibly of the order O(NM)
       allocation = allocation_list.detect { |alloc|
         alloc.nomis_offender_id == offender.offender_no
@@ -87,7 +83,7 @@ class PrisonOffenderManagerService
       AllocationWithSentence.new(
         nomis_staff_id,
         allocation,
-        offender.sentence,
+        offender,
         responsibility
       )
     }

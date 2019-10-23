@@ -10,12 +10,13 @@ class AllocationWithSentence
   delegate :updated_at, :nomis_offender_id, :primary_pom_allocated_at,
            :allocated_at_tier, to: :@allocation
 
-  attr_reader :responsibility
+  attr_reader :responsibility, :offender
 
-  def initialize(staff_id, allocation, sentence, responsibility)
+  def initialize(staff_id, allocation, offender, responsibility)
     @staff_id = staff_id
     @allocation = allocation
-    @sentence = sentence
+    @offender = offender
+    @sentence = @offender.sentence
     @responsibility = responsibility
   end
 

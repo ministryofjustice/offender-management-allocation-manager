@@ -18,15 +18,15 @@ class PomTasks
       # TODO: Replace this with a call to OffenderService.get_multiple_offenders_as_hash
       # earlier in the method so that we can look up the offender from a local
       # hash so that we are not doing N+1 API calls.
-      offender = OffenderService.get_offender(allocation.nomis_offender_id)
+      # offender = OffenderService.get_offender(allocation.nomis_offender_id)
 
-      prd_task = parole_review_date_task(offender)
+      prd_task = parole_review_date_task(allocation.offender)
       next prd_task if prd_task.present?
 
-      delius_task = missing_info_task(offender)
+      delius_task = missing_info_task(allocation.offender)
       next delius_task if delius_task.present?
 
-      early_task = early_allocation_update_task(offender)
+      early_task = early_allocation_update_task(allocation.offender)
       next early_task if early_task.present?
     }.compact
   end
