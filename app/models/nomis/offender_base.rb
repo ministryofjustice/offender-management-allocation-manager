@@ -143,8 +143,8 @@ module Nomis
       @ldu = record.local_divisional_unit
       @team = record.team.try(:name)
       @parole_review_date = record.parole_review_date
-      @early_allocation = record.early_allocation.present? &&
-        (record.early_allocation.eligible? || record.early_allocation.community_decision?)
+      @early_allocation = record.latest_early_allocation.present? &&
+        (record.latest_early_allocation.eligible? || record.latest_early_allocation.community_decision?)
     end
   end
 end

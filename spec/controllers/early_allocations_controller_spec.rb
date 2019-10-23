@@ -22,8 +22,8 @@ RSpec.describe EarlyAllocationsController, type: :controller do
     ]
   }
 
-  # any date less than 2 years in the past
-  let(:valid_date) { Time.zone.today - 6.months }
+  # any date less than 3 months in the past
+  let(:valid_date) { Time.zone.today - 2.months }
   let(:prison) { 'WEI' }
   let(:nomis_offender_id) { 'B44455' }
   let(:s1_boolean_param_names) { [:convicted_under_terrorisom_act_2000, :high_profile, :serious_crime_prevention_order, :mappa_level_3, :cppc_case] }

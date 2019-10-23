@@ -5,11 +5,16 @@ class CaseInformation < ApplicationRecord
 
   belongs_to :local_divisional_unit, optional: true
   belongs_to :team, optional: true
-  has_one :early_allocation,
-          foreign_key: :nomis_offender_id,
-          primary_key: :nomis_offender_id,
-          inverse_of: :case_information,
-          dependent: :destroy
+  has_many :early_allocations,
+           foreign_key: :nomis_offender_id,
+           primary_key: :nomis_offender_id,
+           inverse_of: :case_information,
+           dependent: :destroy
+
+  # We only normally show/edit the most recent early allocation
+  def latest_early_allocation
+    early_allocations.last
+  end
 
   validates :manual_entry, inclusion: { in: [true, false], allow_nil: false }
   validates :nomis_offender_id, presence: true, uniqueness: true

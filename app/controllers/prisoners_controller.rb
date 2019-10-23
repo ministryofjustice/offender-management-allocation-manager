@@ -22,7 +22,12 @@ class PrisonersController < PrisonsApplicationController
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(
       active_prison, @prisoner.offender_no
     )
-    @early_allocation = EarlyAllocation.find_by(nomis_offender_id: id_for_show_action)
+    case_information = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: id_for_show_action)
+    # Only show an early allocation if it was completed after sentence start
+    if case_information.present? && case_information.latest_early_allocation.present? &&
+      case_information.latest_early_allocation.updated_at > @offender.sentence_start_date
+      @early_allocation = case_information.latest_early_allocation
+    end
   end
 
   def image

@@ -4,14 +4,14 @@ require 'rails_helper'
 
 RSpec.describe EarlyAllocationHelper, type: :helper do
   it 'says not assessed for nil' do
-    expect(helper.early_allocation_status(nil)).to eq('Not Assessed')
+    expect(helper.early_allocation_status(nil)).to eq('Not assessed')
   end
 
   context 'when eligible' do
     subject { build(:early_allocation) }
 
     it 'says eligible' do
-      expect(helper.early_allocation_status(subject)).to eq('Eligible - Automatic')
+      expect(helper.early_allocation_status(subject)).to eq('Eligible')
     end
   end
 
@@ -19,7 +19,7 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
     subject { build(:early_allocation, :ineligible) }
 
     it 'says ineligible' do
-      expect(helper.early_allocation_status(subject)).to eq('Not Eligible')
+      expect(helper.early_allocation_status(subject)).to eq('Not eligible')
     end
   end
 
@@ -35,7 +35,7 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
     subject { build(:early_allocation, :discretionary, community_decision: true) }
 
     it 'says eligible' do
-      expect(helper.early_allocation_status(subject)).to eq('Eligible - Discretionary')
+      expect(helper.early_allocation_status(subject)).to eq('Eligible')
     end
   end
 
@@ -43,7 +43,7 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
     subject { build(:early_allocation, :discretionary, community_decision: false) }
 
     it 'says ineligible' do
-      expect(helper.early_allocation_status(subject)).to eq('Not Eligible')
+      expect(helper.early_allocation_status(subject)).to eq('Not eligible')
     end
   end
 end

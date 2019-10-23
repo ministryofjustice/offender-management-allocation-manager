@@ -5,7 +5,7 @@ module EarlyAllocationHelper
     if early_allocation.present?
       active_status(early_allocation)
     else
-      'Not Assessed'
+      'Not assessed'
     end
   end
 
@@ -13,15 +13,15 @@ private
 
   def active_status(early_allocation)
     if early_allocation.eligible?
-      'Eligible - Automatic'
+      'Eligible'
     elsif early_allocation.ineligible?
-      'Not Eligible'
+      'Not eligible'
     elsif early_allocation.community_decision.nil?
       'Waiting for community decision'
     elsif early_allocation.community_decision?
-      'Eligible - Discretionary'
+      'Eligible'
     else
-      'Not Eligible'
+      'Not eligible'
     end
   end
 end

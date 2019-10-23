@@ -4,13 +4,13 @@ class EarlyAllocation < ApplicationRecord
   belongs_to :case_information,
              primary_key: :nomis_offender_id,
              foreign_key: :nomis_offender_id,
-             inverse_of: :early_allocation
+             inverse_of: :early_allocations
 
   validates :oasys_risk_assessment_date,
             presence: true,
             date: {
               before: proc { Time.zone.today },
-              after: proc { Time.zone.today - 2.years },
+              after: proc { Time.zone.today - 3.months },
               # validating presence, so stop date validator double-checking
               allow_nil: true
             }
@@ -105,12 +105,6 @@ class EarlyAllocation < ApplicationRecord
 
   def discretionary?
     !eligible? && !ineligible?
-  end
-
-  def clear
-    (STAGE1_FIELDS + ALL_STAGE2_FIELDS).each do |field|
-      public_send("#{field}=", nil)
-    end
   end
 
 private

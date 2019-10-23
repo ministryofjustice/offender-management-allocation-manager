@@ -19,7 +19,7 @@
       </td>
     </tr>
     <tr class="govuk-table__row">
-      <td class="govuk-table__cell govuk-!-width-one-half">Responsibility Handover</td>
+      <td class="govuk-table__cell govuk-!-width-one-half">Responsibility handover</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
         <% handover_date, reason = @prisoner.responsibility_handover_date %>
         <%= format_date(handover_date, replacement: 'Unknown - missing MAPPA info') %>
@@ -34,12 +34,12 @@
         <span class="pull-right">
           <% if @early_allocation.present? %>
             <% if @early_allocation.discretionary? && @early_allocation.community_decision.nil? %>
-              <%= link_to('Update', community_decision_prison_prisoner_early_allocation_path(@prison, @prisoner.offender_no)) %>
+              <%= link_to('Update', edit_prison_prisoner_early_allocation_path(@prison, @prisoner.offender_no)) %>
             <% else %>
-              <%= link_to 'Re-assess', edit_prison_prisoner_early_allocation_path(@prison, @prisoner.offender_no) %>
+              <%= link_to 'Re-assess', new_prison_prisoner_early_allocations_path(@prison, @prisoner.offender_no) %>
             <% end %>
           <% else %>
-            <%= link_to 'Assess Eligibility', new_prison_prisoner_early_allocation_path(@prison, @prisoner.offender_no) %>
+            <%= link_to 'Assess eligibility', new_prison_prisoner_early_allocations_path(@prison, @prisoner.offender_no) %>
           <% end %>
         </span>
       </td>
