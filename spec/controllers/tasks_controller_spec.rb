@@ -166,8 +166,6 @@ RSpec.describe TasksController, type: :controller do
 
       pomtasks = assigns(:pomtasks)
       expect(pomtasks.count).to eq(3)
-      #expect(pomtasks.first.offender_number).to eq(test_offender_no)
-      #expect(pomtasks.first.action_label).to eq('Early allocation decision')
     end
   end
 end
