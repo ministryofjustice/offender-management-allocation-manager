@@ -46,7 +46,7 @@ private
         responsibility = ResponsibilityService::COWORKING
       end
 
-      AllocatedOffenderWithSentence.new(
+      AllocatedOffender.new(
         @staff_id,
         allocation,
         offender,

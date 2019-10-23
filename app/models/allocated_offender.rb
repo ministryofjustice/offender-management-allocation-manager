@@ -4,7 +4,7 @@
 # a field lives in the allocation or sentence details when both are returned
 # e.g. PomCaseload.new().allocations
 #
-class AllocatedOffenderWithSentence
+class AllocatedOffender
   delegate :last_name, :full_name, :earliest_release_date,
            :sentence_start_date, to: :@offender
   delegate :updated_at, :nomis_offender_id, :primary_pom_allocated_at,

@@ -8,7 +8,7 @@ class PomTasks
   end
 
   def for_offenders(offenders)
-    # For each AllocatedOffenderWithSentence we want to find out if the offender
+    # For each AllocatedOffender we want to find out if the offender
     # requires any changes to it. This may return multiple tasks for the
     # same offender.
     early_allocs = get_early_allocations(offenders.map(&:offender_no))
