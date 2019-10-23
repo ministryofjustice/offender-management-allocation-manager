@@ -1,44 +1,47 @@
 # frozen_string_literal: true
 
-class PomTasks
+class PomCaseload
   include Rails.application.routes.url_helpers
 
-  def initialize(prison)
-    @active_prison = prison
+  def initialize(pom_staff_id, prison_id)
+    @staff_id = pom_staff_id
+    @prison_id = prison_id
   end
 
-  def tasks_for_offenders(allocations)
-    # For each passed AllocationWithSentence we want to find out if the offender
-    # requires any changes to it.  If so we will construct a PomTaskPresenter and
-    # return it. Otherwise nil.
+  def allocations
+    @allocations ||= load_allocations
+  end
+
+  def tasks_for_offenders
+    # For each AllocationWithSentence we want to find out if the offender
+    # requires any changes to it. This may return multiple tasks for the
+    # same offender.
     offender_nos = allocations.map(&:nomis_offender_id)
     @early_allocations = preload_early_allocations(offender_nos)
 
     allocations.map { |allocation|
-      # TODO: Replace this with a call to OffenderService.get_multiple_offenders_as_hash
-      # earlier in the method so that we can look up the offender from a local
-      # hash so that we are not doing N+1 API calls.
-      # offender = OffenderService.get_offender(allocation.nomis_offender_id)
-
-      prd_task = parole_review_date_task(allocation.offender)
-      next prd_task if prd_task.present?
-
-      delius_task = missing_info_task(allocation.offender)
-      next delius_task if delius_task.present?
-
-      early_task = early_allocation_update_task(allocation.offender)
-      next early_task if early_task.present?
-    }.compact
+      tasks_for_offender(allocation.offender)
+    }.flatten
   end
 
   def tasks_for_offender(offender)
-    @early_allocations = preload_early_allocations([offender.offender_no])
-    [
-      parole_review_date_task(offender),
-      missing_info_task(offender),
-      early_allocation_update_task(offender)
-    ].compact
+    offender_nos = allocations.map(&:nomis_offender_id)
+    @early_allocations = preload_early_allocations(offender_nos)
+
+    tasks = []
+    prd_task = parole_review_date_task(offender)
+    tasks << prd_task if prd_task.present?
+
+    delius_task = missing_info_task(offender)
+    tasks << delius_task if delius_task.present?
+
+    early_task = early_allocation_update_task(offender)
+    tasks << early_task if early_task.present?
+
+    tasks
   end
+
+private
 
   def parole_review_date_task(offender)
     # Offender is indeterminate and their parole review date is old or missing
@@ -50,7 +53,7 @@ class PomTasks
         presenter.offender_number = offender.offender_no
         presenter.action_label = 'Parole review date'
         presenter.long_label = 'Parole review date must be updated so handover dates can be calculated.'
-        presenter.action_url = prison_edit_prd_path(@active_prison, offender.offender_no)
+        presenter.action_url = prison_edit_prd_path(@prison_id, offender.offender_no)
       }
     end
   end
@@ -66,7 +69,7 @@ class PomTasks
         presenter.long_label = 'This prisoner must be linked to an nDelius record so '\
           'community probation details are available. '\
           'See <a href="/update_case_information">how to update case information</a>'
-        presenter.action_url = prison_case_information_path(@active_prison, offender.offender_no)
+        presenter.action_url = prison_case_information_path(@prison_id, offender.offender_no)
       }
     end
   end
@@ -81,7 +84,7 @@ class PomTasks
         presenter.action_label = 'Early allocation decision'
         presenter.long_label = 'The community probation team’s decision about early allocation must be recorded.'
         presenter.action_url = community_decision_prison_prisoner_early_allocation_path(
-          @active_prison, offender.offender_no)
+          @prison_id, offender.offender_no)
       }
     end
   end
@@ -98,4 +101,37 @@ class PomTasks
       end
     }.compact.to_h
   end
+
+  # rubocop:disable Metrics/MethodLength
+  def load_allocations
+    allocation_list = AllocationVersion.active_pom_allocations(
+      @staff_id, @prison_id
+    )
+
+    offender_ids = allocation_list.map(&:nomis_offender_id)
+    offenders = OffenderService.get_multiple_offenders(offender_ids)
+
+    offenders.map { |offender|
+      # This is potentially slow, possibly of the order O(NM)
+      allocation = allocation_list.detect { |alloc|
+        alloc.nomis_offender_id == offender.offender_no
+      }
+
+      # If this is the primary POM, work out responsibility
+      if allocation.primary_pom_nomis_id == @staff_id
+        responsibility =
+          ResponsibilityService.calculate_pom_responsibility(offender).to_s
+      else
+        responsibility = ResponsibilityService::COWORKING
+      end
+
+      AllocationWithSentence.new(
+        @staff_id,
+        allocation,
+        offender,
+        responsibility
+      )
+    }
+  end
+  # rubocop:enable Metrics/MethodLength
 end

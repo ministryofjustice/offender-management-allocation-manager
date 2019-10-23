@@ -12,9 +12,7 @@ class TasksController < PrisonsApplicationController
 private
 
   def caseload
-    @caseload ||= PrisonOffenderManagerService.get_allocated_offenders(
-      @pom.staff_id, active_prison
-    )
+    @caseload ||= PomCaseload.new(@pom.staff_id, active_prison).allocations
   end
 
   def ensure_pom
