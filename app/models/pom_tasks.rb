@@ -7,37 +7,34 @@ class PomTasks
     @active_prison = prison
   end
 
-  def tasks_for_offenders(allocations)
-    # For each passed AllocationWithSentence we want to find out if the offender
-    # requires any changes to it.  If so we will construct a PomTaskPresenter and
-    # return it. Otherwise nil.
-    offender_nos = allocations.map(&:nomis_offender_id)
-    @early_allocations = preload_early_allocations(offender_nos)
+  def for_offenders(offenders)
+    # For each AllocatedOffenderWithSentence we want to find out if the offender
+    # requires any changes to it. This may return multiple tasks for the
+    # same offender.
+    early_allocs = get_early_allocations(offenders.map(&:offender_no))
 
-    allocations.map { |allocation|
-      # TODO: Replace this with a call to OffenderService.get_multiple_offenders_as_hash
-      # earlier in the method so that we can look up the offender from a local
-      # hash so that we are not doing N+1 API calls.
-      # offender = OffenderService.get_offender(allocation.nomis_offender_id)
-
-      prd_task = parole_review_date_task(allocation.offender)
-      next prd_task if prd_task.present?
-
-      delius_task = missing_info_task(allocation.offender)
-      next delius_task if delius_task.present?
-
-      early_task = early_allocation_update_task(allocation.offender)
-      next early_task if early_task.present?
-    }.compact
+    offenders.map { |offender|
+      for_offender(offender, early_allocations: early_allocs)
+    }.flatten
   end
 
-  def tasks_for_offender(offender)
-    @early_allocations = preload_early_allocations([offender.offender_no])
-    [
-      parole_review_date_task(offender),
-      missing_info_task(offender),
-      early_allocation_update_task(offender)
-    ].compact
+  def for_offender(offender, early_allocations: nil)
+    if early_allocations.nil?
+      early_allocations = get_early_allocations([offender.offender_no])
+    end
+
+    tasks = []
+    prd_task = parole_review_date_task(offender)
+    tasks << prd_task if prd_task.present?
+
+    delius_task = missing_info_task(offender)
+    tasks << delius_task if delius_task.present?
+
+    if early_allocations.key?(offender.offender_no)
+      tasks << early_allocation_update_task(offender)
+    end
+
+    tasks
   end
 
   def parole_review_date_task(offender)
@@ -74,19 +71,17 @@ class PomTasks
   def early_allocation_update_task(offender)
     # An early allocation request has been made but is pending a response from
     # the community, and therefore needs updating.
-    if @early_allocations.key?(offender.offender_no)
-      PomTaskPresenter.new.tap { |presenter|
-        presenter.offender_name = offender.full_name
-        presenter.offender_number = offender.offender_no
-        presenter.action_label = 'Early allocation decision'
-        presenter.long_label = 'The community probation team’s decision about early allocation must be recorded.'
-        presenter.action_url = community_decision_prison_prisoner_early_allocation_path(
-          @active_prison, offender.offender_no)
-      }
-    end
+    PomTaskPresenter.new.tap { |presenter|
+      presenter.offender_name = offender.full_name
+      presenter.offender_number = offender.offender_no
+      presenter.action_label = 'Early allocation decision'
+      presenter.long_label = 'The community probation team’s decision about early allocation must be recorded.'
+      presenter.action_url = community_decision_prison_prisoner_early_allocation_path(
+        @active_prison, offender.offender_no)
+    }
   end
 
-  def preload_early_allocations(offender_nos)
+  def get_early_allocations(offender_nos)
     # For the provided offender numbers, determines whether they have an outstanding
     # early allocation and then adds them to a hash for quick lookup.  If a specific
     # offender does have an outstanding early allocation their offender number will

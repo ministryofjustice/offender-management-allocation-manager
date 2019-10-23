@@ -89,7 +89,7 @@ RSpec.describe TasksController, type: :controller do
       expect(response).to be_successful
 
       pomtasks = assigns(:pomtasks)
-      expect(pomtasks.count).to eq(1)
+      expect(pomtasks.count).to eq(2)
 
       # We expect only one of these to have a parole review date task
       expect(pomtasks.first.offender_number).to eq(offender_no)

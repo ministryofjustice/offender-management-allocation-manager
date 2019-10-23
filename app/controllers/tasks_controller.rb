@@ -6,13 +6,13 @@ class TasksController < PrisonsApplicationController
   before_action :ensure_pom
 
   def index
-    @pomtasks = PomTasks.new(active_prison).tasks_for_offenders(caseload)
+    @pomtasks = PomTasks.new(active_prison).for_offenders(offenders)
   end
 
 private
 
-  def caseload
-    @caseload ||= PomCaseload.new(@pom.staff_id, active_prison).allocations
+  def offenders
+    @offenders ||= PomCaseload.new(@pom.staff_id, active_prison).allocations.map(&:offender)
   end
 
   def ensure_pom
