@@ -9,8 +9,8 @@ class SearchService
     search_term = text.upcase
 
     OffenderService.get_offenders_for_prison(prison).select do |offender|
-      offender.last_name.include?(search_term) ||
-        offender.first_name.include?(search_term) ||
+      offender.last_name.start_with?(search_term) ||
+        offender.first_name.start_with?(search_term) ||
         offender.offender_no.include?(search_term)
     end
   end
