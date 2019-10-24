@@ -19,10 +19,6 @@ class DeliusImportJob < ApplicationJob
   def perform
     ActiveRecord::Base.connection.disable_query_cache!
 
-    unless Rails.env.test?
-      Rails.logger = Logger.new(STDOUT)
-    end
-
     username = ENV['DELIUS_EMAIL_USERNAME']
     password = ENV['DELIUS_EMAIL_PASSWORD']
     folder = ENV['DELIUS_EMAIL_FOLDER']
