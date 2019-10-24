@@ -17,7 +17,6 @@ class DeliusImportJob < ApplicationJob
 
   def perform
     ActiveRecord::Base.connection.disable_query_cache!
-    Rails.logger = Logger.new(STDOUT)
 
     username = ENV['DELIUS_EMAIL_USERNAME']
     password = ENV['DELIUS_EMAIL_PASSWORD']
@@ -25,35 +24,51 @@ class DeliusImportJob < ApplicationJob
 
     Rails.logger.info('[DELIUS] Retrieving most recent email')
 
-    Delius::Emails.connect(username, password) { |emails|
+    decoded_attachment_content = nil
+
+    Delius::Emails.connect(username, password) do |emails|
       Rails.logger.info("[DELIUS] Set IMAP folder to #{folder}")
       emails.folder = folder
 
       Rails.logger.info('[DELIUS] Fetching latest email attachment')
       attachment = emails.latest_attachment
-      Rails.logger.info('[DELIUS] Attachment retrieved')
 
       if attachment.present?
-        process_attachment(attachment.body.decoded)
+        # At this point attachment.body is the base64 encoded attachment
+        # and so we want to store the un-encoded version ready for
+        # processing. We want to store the bytes rather than attempt
+        # to either convert to string or allow ruby to convert to
+        # string in case there are invalid UTF-8 markers in the bytearray
+        decoded_attachment_content = attachment.body.decoded.bytes
+        Rails.logger.info('[DELIUS] Attachment retrieved')
       else
         Rails.logger.error('[DELIUS] Unable to find an attachment')
       end
-    }
+    end
+
+    process_attachment(decoded_attachment_content) if decoded_attachment_content.present?
   end
 
 private
 
   # rubocop:disable Metrics/MethodLength
-  def process_attachment(contents)
+  def process_attachment(attachment_bytes)
+    # This method is passed the contents of the attachment as a bytearray
+    # once it has been base64 decoded which it will then write to a file (in
+    # binary format) before processing further.
+
     Rails.logger.info('[DELIUS] Processing attachment')
 
     Dir.mktmpdir do |directory|
-      # Unzip the provided file so that we can process the contents. This
-      # should contain a single encrypted XLSX file.
+      # Given the attachment as a bytearray, write it to a local file for
+      # processing.
       zipfile = File.join(directory, 'encrypted.zip')
       File.open(zipfile, 'wb') do |file|
-        file.write(contents)
+        file.write(attachment_bytes.pack('C*'))
       end
+
+      # Unzip the provided file so that we can process the contents. This
+      # should contain a single encrypted XLSX file.
       zipcontents = Zip::File.open(zipfile).entries.first.get_input_stream
       encrypted_xlsx = File.join(directory, 'decrypted_attachment')
       File.open(encrypted_xlsx, 'wb') do |file|
