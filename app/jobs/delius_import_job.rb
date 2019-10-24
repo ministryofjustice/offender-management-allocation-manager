@@ -15,7 +15,6 @@ class DeliusImportJob < ApplicationJob
       :mappa, :mappa_levels, :date_of_birth
     ].freeze
 
-  # rubocop:disable Metrics/MethodLength
   def perform
     ActiveRecord::Base.connection.disable_query_cache!
 
@@ -49,7 +48,6 @@ class DeliusImportJob < ApplicationJob
 
     process_attachment(decoded_attachment_content) if decoded_attachment_content.present?
   end
-# rubocop:enable Metrics/MethodLength
 
 private
 
