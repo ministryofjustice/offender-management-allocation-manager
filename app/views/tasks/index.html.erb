@@ -47,7 +47,7 @@
           <%= pomtask.action_label %>
         </td>
         <td aria-label="Action" class="govuk-table__cell ">
-          <%= link_to('View', pomtask.action_url) %>
+          <%= link_to('View', prison_prisoner_path(active_prison, pomtask.offender_number)) %>
         </td>
       </tr>
     <% end %>

@@ -47,7 +47,6 @@ class PomTasks
         presenter.offender_number = offender.offender_no
         presenter.action_label = 'Parole review date'
         presenter.long_label = 'Parole review date must be updated so handover dates can be calculated.'
-        presenter.action_url = prison_edit_prd_path(@active_prison, offender.offender_no)
       }
     end
   end
@@ -63,7 +62,6 @@ class PomTasks
         presenter.long_label = 'This prisoner must be linked to an nDelius record so '\
           'community probation details are available. '\
           'See <a href="/update_case_information">how to update case information</a>'
-        presenter.action_url = prison_case_information_path(@active_prison, offender.offender_no)
       }
     end
   end
@@ -76,8 +74,6 @@ class PomTasks
       presenter.offender_number = offender.offender_no
       presenter.action_label = 'Early allocation decision'
       presenter.long_label = 'The community probation team’s decision about early allocation must be recorded.'
-      presenter.action_url = community_decision_prison_prisoner_early_allocation_path(
-        @active_prison, offender.offender_no)
     }
   end
 
