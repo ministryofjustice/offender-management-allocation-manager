@@ -8,7 +8,8 @@ module Nomis
                   :main_offence,
                   :nationalities,
                   :noms_id,
-                  :prison_id
+                  :prison_id,
+                  :booking_id
 
     attr_reader :reception_date
 

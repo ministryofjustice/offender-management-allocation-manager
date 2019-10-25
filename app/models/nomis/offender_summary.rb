@@ -4,7 +4,7 @@ module Nomis
   class OffenderSummary < OffenderBase
     include Deserialisable
 
-    attr_accessor :aliases
+    attr_accessor :aliases, :booking_id
 
     # custom attributes
     attr_accessor :allocation_date, :prison_arrival_date
