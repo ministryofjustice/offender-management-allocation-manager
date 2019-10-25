@@ -12,9 +12,7 @@ class OpenPrisonTransferJob < ApplicationJob
     movement = Nomis::Movement.new(JSON.parse(movement_json))
 
     offender = OffenderService.get_offender(movement.offender_no)
-    return if offender.nil?
-
-    return unless offender.nps_case?
+    return if offender.nil? || !offender.nps_case?
 
     # Re-check that they're in an open prison
     return unless PrisonService.open_prison?(offender.prison_id)

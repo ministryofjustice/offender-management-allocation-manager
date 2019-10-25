@@ -39,6 +39,18 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
     expect(email_job).to be_nil
   end
 
+  it 'does not send an email if the offender case_information is not NPS' do
+    allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new.tap{ |o|
+      o.prison_id = open_prison_code
+      o.offender_no =  nomis_offender_id
+      o.case_allocation = 'CRC'
+    })
+    described_class.perform_now(movement_json)
+
+    email_job = enqueued_jobs.first
+    expect(email_job).to be_nil
+  end
+
   it 'does not send an email when no LDU email address' do
     allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new.tap{ |o|
       o.prison_id = open_prison_code
