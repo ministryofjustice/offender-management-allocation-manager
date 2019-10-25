@@ -38,14 +38,15 @@ module Nomis
       def self.get_offender(offender_no)
         # Bad NOMIS numbers mustn't produce invalid URLs
         route = "/elite2api/api/prisoners/#{URI.encode_www_form_component(offender_no)}"
-        Rails.cache.fetch(route,
-                          expires_in: Rails.configuration.cache_expiry) do
-          response = e2_client.get(route)
-          if response.empty?
-            nil
-          else
-            api_deserialiser.deserialise(Nomis::Offender, response.first)
-          end
+        response = Rails.cache.fetch("offender-#{route}",
+                                     expires_in: Rails.configuration.cache_expiry) {
+          e2_client.get(route)
+        }
+
+        if response.empty?
+          nil
+        else
+          api_deserialiser.deserialise(Nomis::Offender, response.first)
         end
       end
 
