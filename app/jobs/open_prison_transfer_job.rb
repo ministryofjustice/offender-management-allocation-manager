@@ -8,9 +8,12 @@ class OpenPrisonTransferJob < ApplicationJob
   queue_as :default
 
   def perform(movement_json)
-    movement = Nomis::Movement.from_json(JSON.parse(movement_json))
+    # movement_json is already in snake case format so we just need to call Movement.new
+    movement = Nomis::Movement.new(JSON.parse(movement_json))
 
     offender = OffenderService.get_offender(movement.offender_no)
+    return if offender.nil?
+
     return unless offender.nps_case?
 
     # Re-check that they're in an open prison
