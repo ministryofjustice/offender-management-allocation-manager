@@ -18,17 +18,37 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
   }
   let(:movement_json) {
     {
-      offenderNo: nomis_offender_id,
-      fromAgency: closed_prison_code,
-      toAgency: open_prison_code,
-      movementType: "TRN",
-      directionCode: "IN"
+      offender_no: nomis_offender_id,
+      from_agency: closed_prison_code,
+      to_agency: open_prison_code,
+      movement_type: "TRN",
+      direction_code: "IN"
     }.to_json
   }
 
   before do
     stub_auth_token
     stub_poms(closed_prison_code, poms)
+  end
+
+  it 'does not send an email if offender_no not found on Nomis' do
+    allow(OffenderService).to receive(:get_offender).and_return(nil)
+
+    described_class.perform_now(movement_json)
+    email_job = enqueued_jobs.first
+    expect(email_job).to be_nil
+  end
+
+  it 'does not send an email if the offender case_information is not NPS' do
+    allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new.tap{ |o|
+      o.prison_id = open_prison_code
+      o.offender_no =  nomis_offender_id
+      o.case_allocation = 'CRC'
+    })
+    described_class.perform_now(movement_json)
+
+    email_job = enqueued_jobs.first
+    expect(email_job).to be_nil
   end
 
   it 'does not send an email when no LDU email address' do
