@@ -53,6 +53,33 @@ describe PrisonOffenderManagerService do
     end
   end
 
+  describe '#get_poms' do
+    it "can get a list of POMs",
+       vcr: { cassette_name: :pom_service_get_poms_list } do
+      poms = described_class.get_poms('LEI')
+      expect(poms).to be_kind_of(Array)
+      expect(poms.count).to eq(14)
+    end
+
+    it "can get a filtered list of POMs",
+       vcr: { cassette_name: :pom_service_get_poms_filtered } do
+      poms = described_class.get_poms('LEI').select { |pom|
+        pom.status == 'active'
+      }
+      expect(poms).to be_kind_of(Array)
+      expect(poms.count).to eq(13)
+    end
+  end
+
+  describe '#get_pom_names' do
+    it "can get the names for POMs when given IDs",
+       vcr: { cassette_name: :pom_service_get_poms_by_ids } do
+      names = described_class.get_pom_names('LEI')
+      expect(names).to be_kind_of(Hash)
+      expect(names.count).to eq(13)
+    end
+  end
+
   describe '#get_pom' do
     it "can fetch a single POM for a prison",
        vcr: { cassette_name: :pom_service_get_pom_ok } do
@@ -96,33 +123,6 @@ describe PrisonOffenderManagerService do
         pom = described_class.get_pom('LEI', 1234)
         expect(pom).to be nil
       end
-    end
-  end
-
-  describe '#get_poms' do
-    it "can get a list of POMs",
-       vcr: { cassette_name: :pom_service_get_poms_list } do
-      poms = described_class.get_poms('LEI')
-      expect(poms).to be_kind_of(Array)
-      expect(poms.count).to eq(14)
-    end
-
-    it "can get a filtered list of POMs",
-       vcr: { cassette_name: :pom_service_get_poms_filtered } do
-      poms = described_class.get_poms('LEI').select { |pom|
-        pom.status == 'active'
-      }
-      expect(poms).to be_kind_of(Array)
-      expect(poms.count).to eq(13)
-    end
-  end
-
-  describe '#get_pom_names' do
-    it "can get the names for POMs when given IDs",
-       vcr: { cassette_name: :pom_service_get_poms_by_ids } do
-      names = described_class.get_pom_names('LEI')
-      expect(names).to be_kind_of(Hash)
-      expect(names.count).to eq(13)
     end
   end
 
