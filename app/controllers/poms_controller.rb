@@ -16,10 +16,8 @@ class PomsController < PrisonsApplicationController
 
   def show
     @pom = pom
-    @allocations = PrisonOffenderManagerService.get_allocated_offenders(
-      @pom.staff_id, active_prison
-    )
-    @allocations = sort_allocations(@allocations)
+    @caseload = PomCaseload.new(@pom.staff_id, active_prison)
+    @allocations = sort_allocations(@caseload.allocations)
   end
 
   def sort_allocations(allocations)
