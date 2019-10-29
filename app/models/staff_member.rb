@@ -27,9 +27,9 @@ class StaffMember
   end
 
   def pom_at?(prison_id)
-    poms_list = PrisonOffenderManagerService.get_poms(prison_id)
+    poms_list = Nomis::Elite2::PrisonOffenderManagerApi.list(prison_id)
 
-    poms_list.detect { |pom| pom.staff_id == @staff_id }
+    poms_list.detect { |pom| pom.staff_id == @staff_id }.present?
   end
 
   def position(prison_id)
