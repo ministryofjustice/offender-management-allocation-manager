@@ -10,18 +10,19 @@ RSpec.describe CaseInformation, type: :model do
     expect(case_info.updated_at).not_to eq(case_info.created_at)
   end
 
-  describe '#early_allocation' do
+  describe '#early_allocations' do
     context 'when not setup' do
-      it 'is nil' do
-        expect(case_info.early_allocation).to be_nil
+      it 'is empty' do
+        expect(case_info.early_allocations).to be_empty
       end
     end
 
     context 'with an allocation' do
       let!(:early_allocation) { create(:early_allocation, nomis_offender_id: case_info.nomis_offender_id) }
+      let!(:early_allocation2) { create(:early_allocation, nomis_offender_id: case_info.nomis_offender_id) }
 
-      it 'is not nil' do
-        expect(case_info.early_allocation).to eq(early_allocation)
+      it 'has some entries' do
+        expect(case_info.early_allocations).to eq([early_allocation, early_allocation2])
       end
     end
   end

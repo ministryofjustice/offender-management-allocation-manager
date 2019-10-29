@@ -78,6 +78,8 @@ group :development do
   gem 'flamegraph'
   gem 'stackprof'
   gem 'memory_profiler'
+  gem 'binding_of_caller'
+  gem 'better_errors'
 end
 
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]

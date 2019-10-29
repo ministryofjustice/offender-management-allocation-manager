@@ -23,6 +23,9 @@ class PomsController < PrisonsApplicationController
       @pom.staff_id, active_prison
     )
     @allocations = sort_allocations(@allocations)
+    
+    @pom = pom
+    @caseload = PomCaseload.new(@pom.staff_id, active_prison)
   end
 
   # This is for the situation where the user is no longer a POM

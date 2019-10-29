@@ -1,0 +1,25 @@
+<div class="govuk-form-group">
+  <fieldset class="govuk-fieldset">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+      <h1 class="govuk-fieldset__heading"><%= heading_text %></h1>
+    </legend>
+
+    <span class="govuk-hint"><%= hint_text %></span>
+
+    <%= render partial: 'error', locals: { errors: errors, fieldname: fieldname, form: form }%>
+
+    <div class="govuk-radios" data-module="govuk-radios">
+      <div class="govuk-radios__item">
+        <%= form.radio_button(fieldname, true, class: "govuk-radios__input", data: { aria_controls: "show_when_decision_yes"}) %>
+        <%= form.label "#{fieldname}_true", 'Yes, eligible for early allocation', class: "govuk-label govuk-radios__label" %>
+      </div>
+      <span class="govuk-hint govuk-radios__conditional govuk-radios__conditional--hidden" id="show_when_decision_yes">
+        A new handover date will be calculated for this case
+      </span>
+      <div class="govuk-radios__item">
+        <%= form.radio_button(fieldname, false, class: "govuk-radios__input") %>
+        <%= form.label "#{fieldname}_false", 'No, this prisoner is not eligible for early allocation', class: "govuk-label govuk-radios__label" %>
+      </div>
+    </div>
+  </fieldset>
+</div>

@@ -1,4 +1,4 @@
-<%= form_for(@early_assignment, url: prison_prisoner_early_allocation_path(@prison, @early_assignment.nomis_offender_id), method: form_method) do |f| %>
+<%= form_for(@early_assignment, url: prison_prisoner_early_allocations_path(@prison, @early_assignment.nomis_offender_id), method: form_method) do |f| %>
   <% if @early_assignment.errors.count > 0 %>
     <%= render :partial => "/shared/field_errors", :locals => { form: f, errors: @early_assignment.errors } %>
   <% end %>
@@ -6,7 +6,7 @@
   <h1 class="govuk-heading-xl govuk-!-margin-top-4">Assessment for early allocation to the community probation team</h1>
 
   <p class="govuk-body">
-    Some cases will be referred to the community automatically. Other need the
+    Some cases will be referred to the community automatically. Others need the
     agreement of both the Head of Offender Management Delivery and the
     community probation team. This assessment will help you determine what
     kind of community referral you need to make.
@@ -14,20 +14,20 @@
 
   <%= f.gov_uk_date_field(:oasys_risk_assessment_date, legend_options: { class: 'govuk-fieldset__legend govuk-fieldset__legend--s' }) %>
 
-  <%= render partial: 'boolean_field', locals: {form: f,
+  <%= render partial: 'yes_no_boolean_field', locals: {form: f,
                                                 heading_text: 'Was this prisoner convicted under the Terrorism Act 2000?',
                                                 hint_text: '',
                                                 errors: @early_assignment.errors,
                                                 fieldname: :convicted_under_terrorisom_act_2000, } %>
 
-  <%= render partial: 'boolean_field', locals: {
+  <%= render partial: 'yes_no_boolean_field', locals: {
       form: f,
       heading_text: 'Has this case been identified as \'High Profile\'',
       hint_text: 'This usually means the case will receive media coverage or attention from other interest groups. See Equip for more information.',
       errors: @early_assignment.errors,
       fieldname: :high_profile} %>
 
-  <%= render partial: 'boolean_field', locals: {
+  <%= render partial: 'yes_no_boolean_field', locals: {
       form: f,
       heading_text: 'Was this prisoner given a Serious Crime Prevention Order?',
       hint_text: 'This usually means they were prosecuted by the National Crime Agency',
@@ -35,7 +35,7 @@
       fieldname: :serious_crime_prevention_order
   } %>
 
-  <%= render partial: 'boolean_field', locals: {
+  <%= render partial: 'yes_no_boolean_field', locals: {
       form: f,
       heading_text: 'Does this prisoner need to be managed as a Multi-Agency Public Protection (MAPPA) level 3 case?',
       hint_text: 'If a MAPPA assessment has not taken place, give the most likely answer, or ask for an assessment to be carried out by the community probation team',
@@ -43,7 +43,7 @@
       fieldname: :mappa_level_3
   } %>
 
-  <%= render partial: 'boolean_field', locals: {
+  <%= render partial: 'yes_no_boolean_field', locals: {
       form: f,
       heading_text: 'Is this likely to be a Critical Protection Case (CPPC)?',
       hint_text: 'This usually means it is also a Multi-Agency Public Protection (MAPPA) level 3 case. See Equip for more about CPPC cases.',

@@ -47,15 +47,17 @@ en:
           attributes:
             oasys_risk_assessment_date:
               blank: Enter the date of the last OASys risk assessment
+              after: This date must be in the last 3 months
+              before: This must not be a date in the future
 #           These attributes are all 'inclusion' because booleans are validated in: [true false] otherwise No isn't accepted
             convicted_under_terrorisom_act_2000:
-              inclusion: You  must say if they were convicted under the Terrorism Act 2000
+              inclusion: You must say if they were convicted under the Terrorism Act 2000
             high_profile:
               inclusion: You must say if this case is 'high profile'
             serious_crime_prevention_order:
               inclusion: You must say if they are subject to a Serious Crime Prevention Order
             mappa_level_3:
-              inclusion: You must say if this is a MAPPA 3 case
+              inclusion: You must say if this is a MAPPA level 3 case
             cppc_case:
               inclusion: You must say if this will be a CPPC case
             extremism_separation:
@@ -65,7 +67,7 @@ en:
             high_risk_of_serious_harm:
               inclusion: You must say whether this prisoner presents a risk of serious harm
             mappa_level_2:
-              inclusion: You must say if this is a MAPPA 2 case
+              inclusion: You must say if this is a MAPPA level 2 case
             pathfinder_process:
               inclusion: You must say if this prisoner has been identified through the pathfinder process
             other_reason:
