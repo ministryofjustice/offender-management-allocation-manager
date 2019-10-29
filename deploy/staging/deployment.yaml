@@ -85,6 +85,8 @@ spec:
             - secretRef:
                 name: allocation-manager-secrets
           env:
+            - name: RAILS_LOG_TO_STDOUT
+              value: "on"
             - name: POSTGRES_HOST
               valueFrom:
                 secretKeyRef:

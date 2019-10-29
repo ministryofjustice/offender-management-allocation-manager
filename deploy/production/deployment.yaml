@@ -93,6 +93,8 @@ spec:
               memory: "250Mi"
               cpu: "50m"
           env:
+            - name: RAILS_LOG_TO_STDOUT
+              value: "on"
             - name: POSTGRES_HOST
               valueFrom:
                 secretKeyRef:
