@@ -21,7 +21,7 @@ feature 'Inactive POM' do
     end
 
     it 'will deallocate the caseload' do
-      click_link("Update this POM's status")
+      click_link("Set this POM's status to inactive")
 
       click_link("Edit profile")
       choose("Inactive")
