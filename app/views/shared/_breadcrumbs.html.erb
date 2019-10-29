@@ -2,7 +2,7 @@
     <div class="govuk-breadcrumbs govuk-!-margin-top-0 govuk-!-margin-bottom-6">
     <ol class="govuk-breadcrumbs__list">
         <li class="govuk-breadcrumbs__list-item">
-        <a class="govuk-breadcrumbs__link" href="/prisons/<%= @prison %>/dashboard">Home</a>
+        <a class="govuk-breadcrumbs__link" href="/prisons/<%= @prison.code %>/dashboard">Home</a>
         </li>
         <% breadcrumb_trail do |crumb| %>
         <li class="govuk-breadcrumbs__list-item" <%= crumb.current? ? 'aria-current="page"' : '' %> >
