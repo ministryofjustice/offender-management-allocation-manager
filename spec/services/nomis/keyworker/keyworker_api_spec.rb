@@ -1,16 +1,13 @@
 require 'rails_helper'
 
 describe Nomis::Keyworker::KeyworkerApi do
-
-
-
   before do
     stub_request(:get, "https://keyworker-api-dev.prison.service.justice.gov.uk/key-worker/LEI/offender/G4273GI").
      to_return(status: 200, body: {
-                                    staffId: 1,
-                                    firstName: 'DOM',
-                                    lastName: 'JONES'
-                                  }.to_json)
+       staffId: 1,
+       firstName: 'DOM',
+       lastName: 'JONES'
+     }.to_json)
     stub_request(:get, "https://keyworker-api-dev.prison.service.justice.gov.uk/key-worker/LEI/offender/GGGGGGG").
     to_return(status: 404)
   end
