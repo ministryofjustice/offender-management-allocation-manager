@@ -46,6 +46,8 @@ Rails.application.routes.draw do
     resource :overrides,  only: %i[ new create ], path_names: { new: 'new/:nomis_offender_id/:nomis_staff_id'}
     resources :poms, only: %i[ index show edit update ], param: :nomis_staff_id
 
+    resources :tasks, only: %i[ index ]
+
     resources :responsibilities, only: %i[new create] do
       collection do
         post('confirm' => 'responsibilities#confirm')

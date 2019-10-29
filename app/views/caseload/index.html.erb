@@ -2,6 +2,12 @@
   <%= render '/layouts/prison_switcher' %>
 <% end %>
 
+<% if @pending_task_count > 0 %>
+  <%= render partial: 'shared/info_banner', locals: {
+    content: "#{@pending_task_count} case updates are needed. <a href='#{prison_tasks_path(@prison)}'>Check now</a>".html_safe }
+  %>
+<% end %>
+
 <% if @pom.blank? %>
   <h2 class="govuk-heading-l">No allocated cases </h2>
 <% else %>

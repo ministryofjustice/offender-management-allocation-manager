@@ -66,4 +66,20 @@ module ApiHelper
     stub_request(:post, elite2bookingsapi).with(body: booking_ids.to_json).
       to_return(status: 200, body: bookings.to_json, headers: {})
   end
+
+  def stub_multiple_offenders(offenders, bookings)
+    elite2api = 'https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api'
+    elite2listapi = "#{elite2api}/prisoners"
+    elite2bookingsapi = "#{elite2api}/offender-sentences/bookings"
+
+    stub_request(:post, elite2listapi).to_return(
+      status: 200,
+      body: offenders.to_json
+    )
+
+    # Get the booking ids provided and add a non-existent booking in
+    # case none were provided
+    stub_request(:post, elite2bookingsapi).
+      to_return(status: 200, body: bookings.to_json, headers: {})
+  end
 end

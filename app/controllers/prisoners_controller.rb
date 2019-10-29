@@ -13,6 +13,8 @@ class PrisonersController < PrisonsApplicationController
     @prisoner = OffenderPresenter.new(@offender,
                                       Responsibility.find_by(nomis_offender_id: id_for_show_action))
 
+    @tasks = PomTasks.new(active_prison).for_offender(@prisoner)
+
     @allocation = AllocationVersion.find_by(nomis_offender_id: @prisoner.offender_no)
     @pom_responsibility = ResponsibilityService.calculate_pom_responsibility(
       @offender

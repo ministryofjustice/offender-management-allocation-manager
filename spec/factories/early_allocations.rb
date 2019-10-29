@@ -50,5 +50,9 @@ FactoryBot.define do
       pathfinder_process do false end
       other_reason { false }
     end
+
+    trait :skip_validate do
+      to_create { |instance| instance.save(validate: false) }
+    end
   end
 end

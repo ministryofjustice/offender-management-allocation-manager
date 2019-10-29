@@ -55,45 +55,6 @@ class PrisonOffenderManagerService
     [user.first_name, user.last_name]
   end
 
-  # rubocop:disable Metrics/MethodLength
-  def self.get_allocated_offenders(nomis_staff_id, prison)
-    # Get all the allocations for the POM at this prison
-    allocation_list = AllocationVersion.active_pom_allocations(
-      nomis_staff_id,
-      prison
-    )
-
-    offender_ids = allocation_list.map(&:nomis_offender_id)
-
-    # Get all of the offenders at this prison and select only those that
-    # appear in an allocation.  Then for each one apply a map to determine
-    # the responsibility and pair it with the allocation and sentence.
-    OffenderService.get_offenders_for_prison(prison).select{ |offender|
-      offender_ids.include?(offender.offender_no)
-    }.map { |offender|
-      # This is potentially slow, possibly of the order O(NM)
-      allocation = allocation_list.detect { |alloc|
-        alloc.nomis_offender_id == offender.offender_no
-      }
-
-      # If this is the primary POM, work out responsibility
-      if allocation.primary_pom_nomis_id == nomis_staff_id
-        responsibility =
-          ResponsibilityService.calculate_pom_responsibility(offender).to_s
-      else
-        responsibility = ResponsibilityService::COWORKING
-      end
-
-      AllocationWithSentence.new(
-        nomis_staff_id,
-        allocation,
-        offender.sentence,
-        responsibility
-      )
-    }
-  end
-  # rubocop:enable Metrics/MethodLength
-
   def self.unavailable_pom_count(prison)
     poms = PrisonOffenderManagerService.get_poms(prison).reject { |pom|
       pom.status == 'active'

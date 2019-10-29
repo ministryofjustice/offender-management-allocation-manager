@@ -44,7 +44,7 @@
 </div>
 
 <% if @is_pom %>
-  <h2 class="govuk-heading-m no-bottom-margin">See all prisoners allocated to you</h2>
+  <h2 class="govuk-heading-m no-bottom-margin">Manage cases</h2>
   <hr class="govuk-section-break govuk-section-break--visible">
   <div class="govuk-grid-row dashboard-row">
     <div class="govuk-grid-column-one-third">
@@ -72,6 +72,17 @@
       </div>
     </div>
   </div>
+  <div class="govuk-grid-row dashboard-row">
+    <div class="govuk-grid-column-one-third">
+      <div class="wrapper">
+        <h1 class="govuk-heading-s">
+          <%= link_to "Case updates needed", prison_tasks_path(@prison), class:"govuk-link" %>
+        </h1>
+        <p class="govuk-body">Update information so handover dates and community probation details are correct.</p>
+      </div>
+    </div>
+  </div>
+
 <% end %>
 
 <h2 class="govuk-heading-m no-bottom-margin">Manage staff</h2>

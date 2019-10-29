@@ -1,3 +1,11 @@
+
+<% @tasks.each do |task| %>
+  <%= render partial: 'shared/info_banner', locals: {
+    content: task.long_label.html_safe }
+  %>
+<% end %>
+
+
 <div class="govuk-grid-row govuk-!-margin-bottom-5">
   <div class="govuk-grid-column-one-quarter">
     <img src="<%= prison_prisoner_image_path(@prison, @prisoner.offender_no, format: :jpg) %>" alt="Prisoner photo will be here" width="95%">
