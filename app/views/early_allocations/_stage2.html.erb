@@ -1,4 +1,4 @@
-<%= form_for(@early_assignment, url: prison_prisoner_early_allocation_path(@prison, @early_assignment.nomis_offender_id), method: form_method) do |form| %>
+<%= form_for(@early_assignment, url: prison_prisoner_early_allocations_path(@prison, @early_assignment.nomis_offender_id), method: form_method) do |form| %>
   <% if @early_assignment.errors.count > 0 %>
     <%= render :partial => "/shared/field_errors", :locals => { form: form, errors: @early_assignment.errors } %>
   <% end %>
@@ -59,28 +59,28 @@
     </fieldset>
   </div>
 
-  <%= render partial: 'boolean_field', locals: {
+  <%= render partial: 'yes_no_boolean_field', locals: {
       form: form,
       heading_text: 'Does the prisoner present a very high risk of serious harm?',
       errors: @early_assignment.errors,
       hint_text: '',
       fieldname: :high_risk_of_serious_harm
   } %>
-  <%= render partial: 'boolean_field', locals: {
+  <%= render partial: 'yes_no_boolean_field', locals: {
       form: form,
       heading_text: 'Does this prisoner need to be managed as a Multi-Agency Public Protection (MAPPA) level 2 case?',
       errors: @early_assignment.errors,
       hint_text: 'If a MAPPA assessment has not taken place, give the most likely answer, or ask for an assessment to be carried out by the community probation team.',
       fieldname: :mappa_level_2
   } %>
-  <%= render partial: 'boolean_field', locals: {
+  <%= render partial: 'yes_no_boolean_field', locals: {
       form: form,
       heading_text: 'Has this prisoner been identified through the \'pathfinder\' process for early allocation?',
       errors: @early_assignment.errors,
       hint_text: 'The pathfinder process helps to identify potential terrorists or extremists who were not prosecuted under the Terrorism Act 2000 (TACT). See Equip for further information.',
       fieldname: :pathfinder_process
   } %>
-  <%= render partial: 'boolean_field', locals: {
+  <%= render partial: 'yes_no_boolean_field', locals: {
       form: form,
       heading_text: 'Is there another reason this prisoner should be considered for early allocation to the probation team?',
       errors: @early_assignment.errors,

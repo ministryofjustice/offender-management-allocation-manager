@@ -8,8 +8,8 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
   # This booking id is the latest one for the offender in T3
   let(:nomis_offender_id) { 'G4273GI' }
   let(:booking_id) { 1_153_753 }
-  # any date less than 2 years in the past
-  let(:valid_date) { Time.zone.today - 6.months }
+  # any date less than 3 months
+  let(:valid_date) { Time.zone.today - 2.months }
   let(:prison) { 'LEI' }
 
   before do
@@ -46,7 +46,7 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
       before do
         click_link 'View'
         expect(page).to have_content 'Early allocation eligibility'
-        click_link 'Assess Eligibility'
+        click_link 'Assess eligibility'
       end
 
       context 'when an immediate error occurs' do
@@ -76,7 +76,7 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
           expect(page).to have_text('The community probation team will take responsibility')
         }.to change(EarlyAllocation, :count).by(1)
         click_link 'Return to prisoner page'
-        expect(page).to have_text 'Eligible - Automatic'
+        expect(page).to have_text 'Eligible'
       end
 
       scenario 'displaying the PDF' do
@@ -106,7 +106,7 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
           expect(page).to have_css('.govuk-error-summary')
 
           within '.govuk-error-summary' do
-            expect(page).to have_text 'You must say if this is a MAPPA 2 case'
+            expect(page).to have_text 'You must say if this is a MAPPA level 2 case'
 
             expect(all('li').count).to eq(5)
           end
@@ -160,7 +160,7 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
             find('#early_allocation_community_decision_true').click
             click_button('Save')
             expect(page).to have_text('Re-assess')
-            expect(page).to have_text 'Eligible - Discretionary'
+            expect(page).to have_text 'Eligible'
           end
         end
 
@@ -198,11 +198,11 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
           end
         end
 
-        it 'overwrites assessment' do
+        it 'creates a new assessment' do
           expect {
             stage1_eligible_answers
             click_button 'Continue'
-          }.not_to change(EarlyAllocation, :count)
+          }.to change(EarlyAllocation, :count).by(1)
         end
 
         it 'can do stage2' do

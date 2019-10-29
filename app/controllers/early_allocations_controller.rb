@@ -4,8 +4,8 @@ class EarlyAllocationsController < PrisonsApplicationController
   before_action :load_prisoner
 
   def new
-    @early_assignment = EarlyAllocation.new offender_id_from_url
     case_info = CaseInformation.find_by offender_id_from_url
+    @early_assignment = case_info.early_allocations.new
     if case_info.local_divisional_unit.try(:email_address)
       render
     else
@@ -16,52 +16,37 @@ class EarlyAllocationsController < PrisonsApplicationController
   def create
     @early_assignment = EarlyAllocation.new early_allocation_params.merge(offender_id_from_url)
     if @early_assignment.save
-      send_email
       if @early_assignment.eligible?
+        AutoEarlyAllocationEmailJob.perform_later(@prison, @offender.offender_no, Base64.encode64(pdf_as_string))
         render 'eligible'
       else
         render 'ineligible'
       end
     else
       @early_assignment.errors.delete(:stage2_validation)
-      render create_error_page 'new'
-    end
-  end
-
-  # edit results in all the user-facing fields being cleared
-  def edit
-    @early_assignment = EarlyAllocation.find_by!(offender_id_from_url)
-    @early_assignment.clear
-  end
-
-  def update
-    @early_assignment = EarlyAllocation.find_by(offender_id_from_url)
-    if @early_assignment.update(early_allocation_params)
-      render create_error_page 'edit'
-    else
-      render 'edit'
+      render create_error_page
     end
   end
 
   # record a community decision (changing 'maybe' into a yes or a no)
-  def community_decision
-    @early_assignment = EarlyAllocation.find_by!(offender_id_from_url)
+  def edit
+    @early_assignment = EarlyAllocation.where(offender_id_from_url).last
   end
 
-  def record_community_decision
-    @early_assignment = EarlyAllocation.find_by!(offender_id_from_url)
+  def update
+    @early_assignment = EarlyAllocation.where(offender_id_from_url).last
 
     if @early_assignment.update(community_decision_params)
       redirect_to prison_prisoner_path(@prison, @early_assignment.nomis_offender_id)
     else
-      render 'community_decision'
+      render 'edit'
     end
   end
 
   def discretionary
     @early_assignment = EarlyAllocation.new early_allocation_params.merge(offender_id_from_url)
     if @early_assignment.save
-      send_email
+      CommunityEarlyAllocationEmailJob.perform_later(@prison, @offender.offender_no, Base64.encode64(pdf_as_string))
       render
     else
       render 'stage3'
@@ -94,29 +79,25 @@ private
                                         allocation: @allocation).render
   end
 
-  def send_email
-    SendEarlyAllocationEmailJob.perform_later(@prison, @offender.offender_no, Base64.encode64(pdf_as_string))
-  end
-
-  def create_error_page(prefix)
+  def create_error_page
     if !@early_assignment.stage2_validation?
-      stage1_error_page prefix
+      stage1_error_page
     else
-      stage2_error_page prefix
+      stage2_error_page
     end
   end
 
-  def stage1_error_page(prefix)
+  def stage1_error_page
     if @early_assignment.any_stage1_field_errors?
-      prefix
+      'new'
     else
-      "stage2_#{prefix}"
+      'stage2'
     end
   end
 
-  def stage2_error_page(prefix)
+  def stage2_error_page
     if @early_assignment.any_stage2_field_errors?
-      "stage2_#{prefix}"
+      'stage2'
     else
       'stage3'
     end

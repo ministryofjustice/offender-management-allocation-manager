@@ -17,12 +17,12 @@ Rails.application.routes.draw do
         get('image' => 'prisoners#image', as: 'image')
       end
 
-      # show is only used with format PDF
-      resource :early_allocation, only: [:new, :create, :show, :edit, :update] do
+      resource :early_allocations, only: [:new, :create] do
         post('discretionary')
-        get('community_decision')
-        put('community_decision' => 'early_allocations#record_community_decision')
       end
+
+      # show action produces the most recent assessment - format PDF only
+      resource :early_allocation, only: [:show, :edit, :update]
     end
 
     resources :allocations, only: %i[ show new create edit update ], param: :nomis_offender_id, path_names: {
