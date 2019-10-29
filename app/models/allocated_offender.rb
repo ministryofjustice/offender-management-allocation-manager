@@ -2,20 +2,20 @@
 
 # This class is a 'presenter' designed to prevent clients having to know whether
 # a field lives in the allocation or sentence details when both are returned
-# e.g. PrisonerOffenderManagerService#get_allocated_offenders
+# e.g. PomCaseload.new().allocations
 #
-class AllocationWithSentence
+class AllocatedOffender
   delegate :last_name, :full_name, :earliest_release_date,
-           :sentence_start_date, to: :@sentence
+           :sentence_start_date, to: :@offender
   delegate :updated_at, :nomis_offender_id, :primary_pom_allocated_at,
            :allocated_at_tier, to: :@allocation
 
-  attr_reader :responsibility
+  attr_reader :responsibility, :offender
 
-  def initialize(staff_id, allocation, sentence, responsibility)
+  def initialize(staff_id, allocation, offender, responsibility)
     @staff_id = staff_id
     @allocation = allocation
-    @sentence = sentence
+    @offender = offender
     @responsibility = responsibility
   end
 
