@@ -21,7 +21,7 @@ namespace :delius do
           counter += 1
         end
 
-        Rails.logger.info("[DELIUS] Created #{counter} jobs for #{prison}")
+        Rails.logger.info("[DELIUS] Created #{counter} jobs for #{prison_code}")
       end
     end
   end

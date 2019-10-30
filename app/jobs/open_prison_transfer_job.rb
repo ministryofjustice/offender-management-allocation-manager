@@ -17,6 +17,7 @@ class OpenPrisonTransferJob < ApplicationJob
     # Re-check that they're in an open prison
     return unless PrisonService.open_prison?(offender.prison_id)
 
+    Rails.logger.info("[MOVEMENT] Processing move to open prison for #{offender.offender_no}")
     send_email(offender, movement) if ldu_email_address(offender).present?
   end
 
