@@ -10,10 +10,12 @@ namespace :delius do
         ProcessDeliusDataJob.perform_later delius_record.noms_no
       end
     else
-      (ENV['AUTO_DELIUS_IMPORT'] || '').split(',').each do |prison|
+      (ENV['AUTO_DELIUS_IMPORT'] || '').split(',').each do |prison_code|
         Rails.logger.info("[DELIUS] Creating jobs for #{prison}")
 
         counter = 0
+        prison = Prison.new(prison_code)
+
         prison.offenders.each do |offender|
           ProcessDeliusDataJob.perform_later offender.offender_no
           counter += 1
