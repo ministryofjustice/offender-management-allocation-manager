@@ -18,6 +18,9 @@ if ENV['CIRCLE_ARTIFACTS']
   SimpleCov.coverage_dir(dir)
 end
 
+# patch to support SAMPLE=nn to only run nn tests
+require "test_prof/recipes/rspec/sample"
+
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
