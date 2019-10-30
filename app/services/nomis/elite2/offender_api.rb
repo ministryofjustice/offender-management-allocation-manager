@@ -117,6 +117,11 @@ module Nomis
         image = e2_client.raw_get(image_route)
 
         image.presence || default_image
+      rescue Faraday::ResourceNotFound
+        # It's possible that the offender does not yet have an image of their
+        # face, and so when an image can't be found, we will return the default
+        # image instead.
+        default_image
       end
 
     private
