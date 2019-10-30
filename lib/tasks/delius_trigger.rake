@@ -11,7 +11,7 @@ namespace :delius do
       end
     else
       (ENV['AUTO_DELIUS_IMPORT'] || '').split(',').each do |prison_code|
-        Rails.logger.info("[DELIUS] Creating jobs for #{prison}")
+        Rails.logger.info("[DELIUS] Creating jobs for #{prison_code}")
 
         counter = 0
         prison = Prison.new(prison_code)
