@@ -24,8 +24,8 @@ class SummaryService
     # each type of record.
     counts = { allocated: 0, unallocated: 0, pending: 0 }
 
-    offenders = OffenderService.get_offenders_for_prison(prison)
-    active_allocations_hash = AllocationService.active_allocations(offenders.map(&:offender_no), prison)
+    offenders = prison.offenders
+    active_allocations_hash = AllocationService.active_allocations(offenders.map(&:offender_no), prison.code)
 
     offenders.each do |offender|
       if offender.tier.present?

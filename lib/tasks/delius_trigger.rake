@@ -14,7 +14,7 @@ namespace :delius do
         Rails.logger.info("[DELIUS] Creating jobs for #{prison}")
 
         counter = 0
-        OffenderService.get_offenders_for_prison(prison).each do |offender|
+        prison.offenders.each do |offender|
           ProcessDeliusDataJob.perform_later offender.offender_no
           counter += 1
         end

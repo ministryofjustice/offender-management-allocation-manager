@@ -4,7 +4,7 @@
 
 <% if @pending_task_count > 0 %>
   <%= render partial: 'shared/info_banner', locals: {
-    content: "#{@pending_task_count} case updates are needed. <a href='#{prison_tasks_path(@prison)}'>Check now</a>".html_safe }
+    content: "#{@pending_task_count} case updates are needed. <a href='#{prison_tasks_path(@prison.code)}'>Check now</a>".html_safe }
   %>
 <% end %>
 
@@ -18,7 +18,7 @@
       <div class="govuk-body">New cases</div>
       <div class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24 new-cases-count">
         <% if @new_cases_count > 0 %>
-          <%= link_to "#{@new_cases_count}", new_prison_caseload_path(@prison), class:"govuk-link"%>
+          <%= link_to "#{@new_cases_count}", new_prison_caseload_path(@prison.code), class:"govuk-link"%>
         <% else %>
           0
         <% end %>
@@ -29,7 +29,7 @@
       <div class="govuk-body">Cases close to handover</div>
       <div class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24 upcoming-handover-count">
         <% if @pending_handover_count > 0 %>
-          <%= link_to "#{@pending_handover_count}", prison_caseload_handover_start_path(@prison), class:"govuk-link"%>
+          <%= link_to "#{@pending_handover_count}", prison_caseload_handover_start_path(@prison.code), class:"govuk-link"%>
         <% else %>
           0
         <% end %>
@@ -106,7 +106,7 @@
         <td aria-label="Allocation date" class="govuk-table__cell "><%= format_date(offender.primary_pom_allocated_at) %></td>
         <td aria-label="Role" class="govuk-table__cell "><%= offender.responsibility %></td>
         <td aria-label="Action" class="govuk-table__cell ">
-          <%= link_to('View', prison_prisoner_path(@prison, offender.nomis_offender_id), class: "govuk-link" ) %>
+          <%= link_to('View', prison_prisoner_path(@prison.code, offender.nomis_offender_id), class: "govuk-link" ) %>
         </td>
       </tr>
     <% end %>

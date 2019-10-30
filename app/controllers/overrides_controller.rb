@@ -3,7 +3,7 @@
 class OverridesController < PrisonsApplicationController
   def new
     @prisoner = offender(params.require(:nomis_offender_id))
-    @pom = PrisonOffenderManagerService.get_pom(active_prison, params[:nomis_staff_id])
+    @pom = PrisonOffenderManagerService.get_pom(active_prison_id, params[:nomis_staff_id])
 
     @override = Override.new
   end
@@ -15,7 +15,7 @@ class OverridesController < PrisonsApplicationController
 
     @prisoner = offender(override_params[:nomis_offender_id])
     @pom = PrisonOffenderManagerService.get_pom(
-      active_prison, override_params[:nomis_staff_id])
+      active_prison_id, override_params[:nomis_staff_id])
 
     render :new
   end
@@ -34,7 +34,7 @@ private
 
     if previously_allocated.empty?
       redirect_to prison_confirm_allocation_path(
-        active_prison,
+        active_prison_id,
         override_params[:nomis_offender_id],
         override_params[:nomis_staff_id],
         sort: params[:sort],
@@ -42,7 +42,7 @@ private
       )
     else
       redirect_to prison_confirm_reallocation_path(
-        active_prison,
+        active_prison_id,
         override_params[:nomis_offender_id],
         override_params[:nomis_staff_id],
         sort: params[:sort],

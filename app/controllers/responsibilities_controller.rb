@@ -31,12 +31,12 @@ class ResponsibilitiesController < PrisonsApplicationController
         message: params[:message],
         prisoner_number: @responsibility.nomis_offender_id,
         prisoner_name: OffenderService.get_offender(@responsibility.nomis_offender_id).full_name,
-        prison_name: PrisonService.name_for(@prison),
+        prison_name: PrisonService.name_for(@prison.code),
         email: email
       ).deliver_later
     end
 
-    redirect_to new_prison_allocation_path(@prison, @responsibility.nomis_offender_id)
+    redirect_to new_prison_allocation_path(@prison.code, @responsibility.nomis_offender_id)
   end
 
 private

@@ -1,4 +1,4 @@
-<%= render :partial => "/shared/backlink", :locals => { :page => prison_summary_pending_path(@prison) } %>
+<%= render :partial => "/shared/backlink", :locals => { :page => prison_summary_pending_path(@prison.code) } %>
 
 <% if @delius_errors.any? %>
   <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
@@ -42,7 +42,7 @@
         <td class="govuk-table__cell govuk-!-width-one-half">Prisoner number</td>
         <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
           <%= @prisoner.offender_no %>
-          <span class="pull-right"><%= link_to 'View Full Profile', prison_prisoner_path(@prison, @prisoner.offender_no) %></span>
+          <span class="pull-right"><%= link_to 'View Full Profile', prison_prisoner_path(@prison.code, @prisoner.offender_no) %></span>
         </td>
       </tr>
       <tr class="govuk-table__row">

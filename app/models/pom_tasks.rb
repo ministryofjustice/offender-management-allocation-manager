@@ -3,10 +3,6 @@
 class PomTasks
   include Rails.application.routes.url_helpers
 
-  def initialize(prison)
-    @active_prison = prison
-  end
-
   def for_offenders(offenders)
     # For each AllocatedOffender we want to find out if the offender
     # requires any changes to it. This may return multiple tasks for the

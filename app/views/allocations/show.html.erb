@@ -29,8 +29,8 @@
       <td class="govuk-table__cell">Tiering calculation</td>
       <td class="govuk-table__cell table_cell__left_align">
         Tier <%= @prisoner.tier %>
-        <% unless auto_delius_import_enabled?(@prison) %>
-          <a class="govuk-link pull-right" href="<%= edit_prison_case_information_path(@prison, @prisoner.offender_no) %>">Change</a>
+        <% unless auto_delius_import_enabled?(@prison.code) %>
+          <a class="govuk-link pull-right" href="<%= edit_prison_case_information_path(@prison.code, @prisoner.offender_no) %>">Change</a>
         <% end %>
       </td>
     </tr>
@@ -39,7 +39,7 @@
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half responsibility_change">
         <%= case_owner_label(@prisoner) %>
         <% if @prisoner.pom_responsibility.custody? %>
-          <%= link_to 'Change', new_prison_responsibility_path(@prison, nomis_offender_id: @prisoner.offender_no), class: 'govuk-link pull-right' %>
+          <%= link_to 'Change', new_prison_responsibility_path(@prison.code, nomis_offender_id: @prisoner.offender_no), class: 'govuk-link pull-right' %>
         <% end %>
       </td>
 <!--    </tr>-->
@@ -58,8 +58,8 @@
       <td class="govuk-table__cell">Last known address in Wales</td>
       <td class="govuk-table__cell table_cell__left_align">
         <%= humanized_bool(@prisoner.welsh_offender) %>
-        <% unless auto_delius_import_enabled?(@prison) %>
-          <a class="govuk-link pull-right" href="<%= edit_prison_case_information_path(@prison, @prisoner.offender_no) %>">Change</a>
+        <% unless auto_delius_import_enabled?(@prison.code) %>
+          <a class="govuk-link pull-right" href="<%= edit_prison_case_information_path(@prison.code, @prisoner.offender_no) %>">Change</a>
         <% end %>
       </td>
     </tr>
@@ -67,8 +67,8 @@
       <td class="govuk-table__cell">Service provider</td>
       <td class="govuk-table__cell table_cell__left_align">
         <%= service_provider_label(@prisoner.case_allocation) %>
-        <% unless auto_delius_import_enabled?(@prison) %>
-          <a class="govuk-link pull-right" href="<%= edit_prison_case_information_path(@prison, @prisoner.offender_no) %>">Change</a>
+        <% unless auto_delius_import_enabled?(@prison.code) %>
+          <a class="govuk-link pull-right" href="<%= edit_prison_case_information_path(@prison.code, @prisoner.offender_no) %>">Change</a>
         <% end %>
       </td>
     </tr>
@@ -91,8 +91,8 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">POM</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-        <%= link_to @pom.full_name, prison_pom_path(@prison, @pom.staff_id), class: "govuk-link" %>
-        <%= link_to 'Reallocate', edit_prison_allocation_path(@prison, @prisoner.offender_no, sort: params[:sort], page: params[:page]), class: "govuk-link pull-right" %>
+        <%= link_to @pom.full_name, prison_pom_path(@prison.code, @pom.staff_id), class: "govuk-link" %>
+        <%= link_to 'Reallocate', edit_prison_allocation_path(@prison.code, @prisoner.offender_no, sort: params[:sort], page: params[:page]), class: "govuk-link pull-right" %>
       </td>
     </tr>
     <tr class="govuk-table__row" id="co-working-pom">
@@ -100,10 +100,10 @@
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
         <% if @coworker.nil? %>
           N/A
-          <%= link_to 'Allocate', new_prison_coworking_path(@prison, @prisoner.offender_no), class: "govuk-link pull-right" %>
+          <%= link_to 'Allocate', new_prison_coworking_path(@prison.code, @prisoner.offender_no), class: "govuk-link pull-right" %>
         <% else %>
-          <%= link_to @coworker.full_name, prison_pom_path(@prison, @coworker.staff_id), class: "govuk-link" %>
-          <%= link_to 'Remove', prison_coworking_confirm_removal_path(@prison, @prisoner.offender_no), class: "govuk-link pull-right" %>
+          <%= link_to @coworker.full_name, prison_pom_path(@prison.code, @coworker.staff_id), class: "govuk-link" %>
+          <%= link_to 'Remove', prison_coworking_confirm_removal_path(@prison.code, @prisoner.offender_no), class: "govuk-link pull-right" %>
         <% end %>
       </td>
     </tr>
@@ -111,7 +111,7 @@
       <td class="govuk-table__cell">Allocation history</td>
       <td class="govuk-table__cell table_cell__left_align">
         <%= last_event(@allocation) %>
-        <%= link_to 'View', prison_allocation_history_path(@prison, @prisoner.offender_no), class: "govuk-link pull-right" %>
+        <%= link_to 'View', prison_allocation_history_path(@prison.code, @prisoner.offender_no), class: "govuk-link pull-right" %>
       </td>
     </tr>
     <tr class="govuk-table__row">

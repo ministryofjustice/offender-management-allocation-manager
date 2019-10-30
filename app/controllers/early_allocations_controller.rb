@@ -17,7 +17,7 @@ class EarlyAllocationsController < PrisonsApplicationController
     @early_assignment = EarlyAllocation.new early_allocation_params.merge(offender_id_from_url)
     if @early_assignment.save
       if @early_assignment.eligible?
-        AutoEarlyAllocationEmailJob.perform_later(@prison, @offender.offender_no, Base64.encode64(pdf_as_string))
+        AutoEarlyAllocationEmailJob.perform_later(@prison.code, @offender.offender_no, Base64.encode64(pdf_as_string))
         render 'eligible'
       else
         render 'ineligible'
@@ -37,7 +37,7 @@ class EarlyAllocationsController < PrisonsApplicationController
     @early_assignment = EarlyAllocation.where(offender_id_from_url).last
 
     if @early_assignment.update(community_decision_params)
-      redirect_to prison_prisoner_path(@prison, @early_assignment.nomis_offender_id)
+      redirect_to prison_prisoner_path(@prison.code, @early_assignment.nomis_offender_id)
     else
       render 'edit'
     end
@@ -46,7 +46,9 @@ class EarlyAllocationsController < PrisonsApplicationController
   def discretionary
     @early_assignment = EarlyAllocation.new early_allocation_params.merge(offender_id_from_url)
     if @early_assignment.save
-      CommunityEarlyAllocationEmailJob.perform_later(@prison, @offender.offender_no, Base64.encode64(pdf_as_string))
+      CommunityEarlyAllocationEmailJob.perform_later(@prison.code,
+                                                     @offender.offender_no,
+                                                     Base64.encode64(pdf_as_string))
       render
     else
       render 'stage3'
@@ -69,7 +71,7 @@ private
   def load_prisoner
     @offender = OffenderService.get_offender(params[:prisoner_id])
     @allocation = AllocationVersion.find_by!(offender_id_from_url)
-    @pom = PrisonOffenderManagerService.get_pom(@prison, @allocation.primary_pom_nomis_id)
+    @pom = PrisonOffenderManagerService.get_pom(@prison.code, @allocation.primary_pom_nomis_id)
   end
 
   def pdf_as_string

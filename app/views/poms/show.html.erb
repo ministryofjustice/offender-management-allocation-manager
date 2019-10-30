@@ -5,7 +5,7 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-one-quarter">
     <div class="govuk-body">POM level</div>
-    <div class="govuk-body govuk-!-font-weight-bold"><%= pom_level(@pom.position(@prison)) %></div>
+    <div class="govuk-body govuk-!-font-weight-bold"><%= pom_level(@pom.position(@prison.code)) %></div>
   </div>
   <div class="govuk-grid-column-one-quarter">
     <div class="govuk-body">Working pattern</div>
@@ -17,7 +17,7 @@
   </div>
 </div>
 
-<%= link_to("Edit profile", edit_prison_pom_path(@prison, nomis_staff_id: @pom.staff_id), class: "govuk-button") %>
+<%= link_to("Edit profile", edit_prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id), class: "govuk-button") %>
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-one-quarter">

@@ -6,7 +6,7 @@
   <%= render :partial => "/shared/validation_errors", :locals => { :errors => @responsibility.errors } %>
 <% end %>
 
-<%= form_for(@responsibility, url: confirm_prison_responsibilities_path(@prison, @responsibility)) do |f| %>
+<%= form_for(@responsibility, url: confirm_prison_responsibilities_path(@prison.code, @responsibility)) do |f| %>
   <%= f.hidden_field(:nomis_offender_id) %>
 
   <div class="govuk-form-group">
@@ -61,6 +61,6 @@
 
   <div class="govuk-form-group">
     <button type="submit" class="govuk-button">Continue</button>
-    <%= link_to 'Cancel', new_prison_allocation_path(@prison, @responsibility.nomis_offender_id), class: 'govuk-link cancel-button' %>
+    <%= link_to 'Cancel', new_prison_allocation_path(@prison.code, @responsibility.nomis_offender_id), class: 'govuk-link cancel-button' %>
   </div>
 <% end %>

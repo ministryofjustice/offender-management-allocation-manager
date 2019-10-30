@@ -3,9 +3,9 @@
 class AllocationsController < PrisonsApplicationController
   delegate :update, to: :create
 
-  breadcrumb 'Allocated', -> { prison_summary_allocated_path(active_prison) }, only: [:show]
+  breadcrumb 'Allocated', -> { prison_summary_allocated_path(active_prison_id) }, only: [:show]
   breadcrumb -> { offender(nomis_offender_id_from_url).full_name },
-             -> { prison_allocation_path(active_prison, nomis_offender_id_from_url) }, only: [:show]
+             -> { prison_allocation_path(active_prison_id, nomis_offender_id_from_url) }, only: [:show]
 
   def new
     @prisoner = offender(nomis_offender_id_from_url)
@@ -21,22 +21,22 @@ class AllocationsController < PrisonsApplicationController
 
     @allocation = AllocationVersion.find_by(nomis_offender_id: @prisoner.offender_no)
     @pom = StaffMember.new(@allocation.primary_pom_nomis_id)
-    redirect_to prison_pom_non_pom_path(@prison, @pom.staff_id) unless @pom.pom_at?(@prison)
+    redirect_to prison_pom_non_pom_path(@prison.code, @pom.staff_id) unless @pom.pom_at?(@prison.code)
 
     secondary_pom_nomis_id = @allocation.secondary_pom_nomis_id
     unless secondary_pom_nomis_id.nil?
       @coworker = StaffMember.new(secondary_pom_nomis_id)
-      redirect_to prison_pom_non_pom_path(@prison, @coworker.staff_id) unless @coworker.pom_at?(@prison)
+      redirect_to prison_pom_non_pom_path(@prison, @coworker.staff_id) unless @coworker.pom_at?(@prison.code)
     end
 
-    @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(active_prison, @prisoner.offender_no)
+    @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(active_prison_id, @prisoner.offender_no)
   end
 
   def edit
     allocation = AllocationService.current_allocation_for(nomis_offender_id_from_url)
 
     unless allocation.present? && allocation.active?
-      redirect_to new_prison_allocation_path(active_prison, nomis_offender_id_from_url)
+      redirect_to new_prison_allocation_path(active_prison_id, nomis_offender_id_from_url)
       return
     end
 
@@ -53,7 +53,7 @@ class AllocationsController < PrisonsApplicationController
   def confirm
     @prisoner = offender(nomis_offender_id_from_url)
     @pom = PrisonOffenderManagerService.get_pom(
-      active_prison,
+      active_prison_id,
       nomis_staff_id_from_url
     )
     @event = :allocate_primary_pom
@@ -63,7 +63,7 @@ class AllocationsController < PrisonsApplicationController
   def confirm_reallocation
     @prisoner = offender(nomis_offender_id_from_url)
     @pom = PrisonOffenderManagerService.get_pom(
-      active_prison,
+      active_prison_id,
       nomis_staff_id_from_url
     )
     @event = :reallocate_primary_pom
@@ -85,9 +85,9 @@ class AllocationsController < PrisonsApplicationController
     end
 
     if allocation[:event] == 'allocate_primary_pom'
-      redirect_to prison_summary_unallocated_path(active_prison, page: params[:page], sort: params[:sort])
+      redirect_to prison_summary_unallocated_path(active_prison_id, page: params[:page], sort: params[:sort])
     else
-      redirect_to prison_summary_allocated_path(active_prison, page: params[:page], sort: params[:sort])
+      redirect_to prison_summary_allocated_path(active_prison_id, page: params[:page], sort: params[:sort])
     end
   end
 
@@ -101,7 +101,7 @@ private
 
   def unavailable_pom_count
     @unavailable_pom_count ||= PrisonOffenderManagerService.unavailable_pom_count(
-      active_prison
+      active_prison_id
     )
   end
 
@@ -115,7 +115,7 @@ private
       nomis_booking_id: offender.booking_id,
       allocated_at_tier: offender.tier,
       recommended_pom_type: recommended_pom_type(offender),
-      prison: active_prison,
+      prison: active_prison_id,
       override_reasons: override_reasons,
       suitability_detail: suitability_detail,
       override_detail: override_detail,
@@ -130,7 +130,7 @@ private
 
   def pom
     @pom ||= PrisonOffenderManagerService.get_pom(
-      active_prison,
+      active_prison_id,
       allocation_params[:nomis_staff_id]
     )
   end
@@ -142,10 +142,10 @@ private
   end
 
   def current_pom_for(nomis_offender_id)
-    current_allocation = AllocationService.active_allocations(nomis_offender_id, active_prison)
+    current_allocation = AllocationService.active_allocations(nomis_offender_id, active_prison_id)
     nomis_staff_id = current_allocation[nomis_offender_id]['primary_pom_nomis_id']
 
-    PrisonOffenderManagerService.get_pom(active_prison, nomis_staff_id)
+    PrisonOffenderManagerService.get_pom(active_prison_id, nomis_staff_id)
   end
 
   def recommended_pom_type(offender)
@@ -156,7 +156,7 @@ private
   def recommended_and_nonrecommended_poms_for(offender)
     allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id_from_url)
     # don't allow primary to be the same as the co-working POM
-    poms = PrisonOffenderManagerService.get_poms(active_prison).select { |pom|
+    poms = PrisonOffenderManagerService.get_poms(active_prison_id).select { |pom|
       pom.status == 'active' && pom.staff_id != allocation.try(:secondary_pom_nomis_id)
     }
 

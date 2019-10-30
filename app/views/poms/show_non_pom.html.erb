@@ -8,7 +8,7 @@
   this will release their cases so they can be reallocated</p>
 
 <p class="govuk-body">
-<%= link_to "Set this POM's status to inactive", prison_pom_path(@prison, @nomis_staff_id), class: 'govuk-link' %>
+<%= link_to "Set this POM's status to inactive", prison_pom_path(@prison.code, @nomis_staff_id), class: 'govuk-link' %>
 </p>
 
 <h2 class="govuk-heading-m">If you think this is a mistake</h2>

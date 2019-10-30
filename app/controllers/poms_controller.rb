@@ -6,20 +6,20 @@ class PomsController < PrisonsApplicationController
   before_action :load_pom_staff_member, only: [:show, :edit]
 
   breadcrumb 'Prison Offender Managers',
-             -> { prison_poms_path(active_prison) }, only: [:index, :show]
+             -> { prison_poms_path(active_prison_id) }, only: [:index, :show]
   breadcrumb -> { @pom.full_name },
-             -> { prison_poms_path(active_prison, params[:nomis_staff_id]) },
+             -> { prison_poms_path(active_prison_id, params[:nomis_staff_id]) },
              only: [:show]
 
   def index
-    poms = PrisonOffenderManagerService.get_poms(active_prison)
+    poms = PrisonOffenderManagerService.get_poms(active_prison_id)
     @active_poms, @inactive_poms = poms.partition { |pom|
       %w[active unavailable].include? pom.status
     }
   end
 
   def show
-    @caseload = PomCaseload.new(@pom.staff_id, active_prison)
+    @caseload = PomCaseload.new(@pom.staff_id, active_prison_id)
     @allocations = sort_allocations(@caseload.allocations)
   end
 
@@ -56,7 +56,7 @@ class PomsController < PrisonsApplicationController
     )
 
     if pom_detail.valid?
-      redirect_to prison_pom_path(active_prison, id: params[:nomis_staff_id])
+      redirect_to prison_pom_path(active_prison_id, id: params[:nomis_staff_id])
     else
       @pom = StaffMember.new params[:nomis_staff_id], pom_detail
       @errors = pom_detail.errors
@@ -77,7 +77,7 @@ private
   end
 
   def load_pom
-    @pom = PrisonOffenderManagerService.get_pom(active_prison, params[:nomis_staff_id])
+    @pom = PrisonOffenderManagerService.get_pom(active_prison_id, params[:nomis_staff_id])
   end
 
   def edit_pom_params

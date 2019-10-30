@@ -1,4 +1,4 @@
-<%= render :partial => "/shared/backlink", :locals => { :page => prison_allocation_path(@prison, nomis_offender_id: @prisoner.offender_no) } %>
+<%= render :partial => "/shared/backlink", :locals => { :page => prison_allocation_path(@prison.code, nomis_offender_id: @prisoner.offender_no) } %>
 
 <h1 class="govuk-heading-l govuk-!-margin-bottom-5">Allocate a co-working Prison Offender Manager</h1>
 
@@ -27,7 +27,7 @@
 <% if @unavailable_poms.count > 0 %>
   <p>
     There <%= @unavailable_poms.count == 1 ? 'is' : 'are' %>
-    <a href="<%= prison_poms_path(@prison) %>"> <%= pluralize(@unavailable_poms.count, "unavailable POM") %></a> for new allocation
+    <a href="<%= prison_poms_path(@prison.code) %>"> <%= pluralize(@unavailable_poms.count, "unavailable POM") %></a> for new allocation
   </p>
 <% end %>
 

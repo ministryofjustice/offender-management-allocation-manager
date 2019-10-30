@@ -5,7 +5,7 @@ class PrisonersController < PrisonsApplicationController
   before_action :load_offender, only: [:show]
 
   breadcrumb 'Your caseload',
-             -> { prison_caseload_index_path(active_prison) }, only: [:show]
+             -> { prison_caseload_index_path(active_prison_id) }, only: [:show]
   breadcrumb -> { @offender.full_name },
              -> { '' }, only: [:show]
 
@@ -13,14 +13,14 @@ class PrisonersController < PrisonsApplicationController
     @prisoner = OffenderPresenter.new(@offender,
                                       Responsibility.find_by(nomis_offender_id: id_for_show_action))
 
-    @tasks = PomTasks.new(active_prison).for_offender(@prisoner)
+    @tasks = PomTasks.new.for_offender(@prisoner)
 
     @allocation = AllocationVersion.find_by(nomis_offender_id: @prisoner.offender_no)
     @pom_responsibility = ResponsibilityService.calculate_pom_responsibility(
       @offender
     )
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(
-      active_prison, @prisoner.offender_no
+      active_prison_id, @prisoner.offender_no
     )
     case_information = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: id_for_show_action)
     # Only show an early allocation if it was completed after sentence start

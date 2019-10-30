@@ -1,7 +1,7 @@
-<%= render :partial => "/shared/backlink", :locals => {:page => prison_poms_path(@prison, id: @pom.staff_id)} %>
+<%= render :partial => "/shared/backlink", :locals => {:page => prison_poms_path(@prison.code, id: @pom.staff_id)} %>
 
 <div>
-  <%= form_tag prison_pom_path(@prison, nomis_staff_id: @pom.staff_id), method: :put, id: "edit_pom_form" do %>
+  <%= form_tag prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id), method: :put, id: "edit_pom_form" do %>
     <h1 class="govuk-heading-xl govuk-!-margin-top-4">Edit profile</h1>
     <h2 class="govuk-heading-l"><%= @pom.first_name.titleize %> <%= @pom.last_name.titleize %></h2>
 
@@ -85,7 +85,7 @@
 
     <div class="govuk-form-group">
       <button type="submit" class="govuk-button">Save</button>
-      <a href="<%= prison_poms_path(@prison, nomis_staff_id: @pom.staff_id) %>" class="govuk-link">Cancel</a>
+      <a href="<%= prison_poms_path(@prison.code, nomis_staff_id: @pom.staff_id) %>" class="govuk-link">Cancel</a>
     </div>
 
     </form>

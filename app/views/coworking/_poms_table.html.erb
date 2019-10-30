@@ -25,7 +25,7 @@
       <td aria-label="Working pattern" class="govuk-table__cell"><%= format_working_pattern(pom.working_pattern) %></td>
       <td aria-label="Action" class="govuk-table__cell ">
         <%= link_to 'Allocate', prison_confirm_coworking_allocation_path(
-            @prison, @prisoner.offender_no, @current_pom.staff_id, pom.staff_id),
+            @prison.code, @prisoner.offender_no, @current_pom.staff_id, pom.staff_id),
                     class: "govuk-link" %></td>
     </tr>
   <% end %>

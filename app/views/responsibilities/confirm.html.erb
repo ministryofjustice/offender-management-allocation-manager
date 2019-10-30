@@ -2,7 +2,7 @@
   <%= render '/layouts/prison_switcher' %>
 <% end %>
 
-<%= form_for(@responsibility, url: prison_responsibilities_path(@prison, @responsibility)) do |f| %>
+<%= form_for(@responsibility, url: prison_responsibilities_path(@prison.code, @responsibility)) do |f| %>
   <%= f.hidden_field(:nomis_offender_id) %>
   <%= f.hidden_field(:reason) %>
   <%= f.hidden_field(:reason_text) %>
@@ -34,7 +34,7 @@
 
   <div class="govuk-form-group">
     <button type="submit" class="govuk-button">Confirm</button>
-    <%= link_to 'Cancel', new_prison_allocation_path(@prison, @responsibility.nomis_offender_id), class: 'govuk-link cancel-button' %>
+    <%= link_to 'Cancel', new_prison_allocation_path(@prison.code, @responsibility.nomis_offender_id), class: 'govuk-link cancel-button' %>
   </div>
 
 <% end %>

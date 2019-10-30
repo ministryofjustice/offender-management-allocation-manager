@@ -20,7 +20,7 @@
   <div class="govuk-grid-column-one-third">
     <div class="wrapper">
       <h1 class="govuk-heading-s">
-        <%= link_to "See all allocated prisoners", prison_summary_allocated_path(@prison), class:"govuk-link" %>
+        <%= link_to "See all allocated prisoners", prison_summary_allocated_path(@prison.code), class:"govuk-link" %>
       </h1>
       <p class="govuk-body">All prisoners who have been allocated to a Prison Offender Manager.</p>
     </div>
@@ -28,7 +28,7 @@
   <div class="govuk-grid-column-one-third">
     <div class="wrapper">
       <h1 class="govuk-heading-s">
-        <%= link_to "Make new allocations", prison_summary_unallocated_path(@prison), class:"govuk-link" %>
+        <%= link_to "Make new allocations", prison_summary_unallocated_path(@prison.code), class:"govuk-link" %>
       </h1>
       <p class="govuk-body">Prisoners who need to be allocated to a Prison Offender Manager.</p>
     </div>
@@ -36,7 +36,7 @@
   <div class="govuk-grid-column-one-third">
     <div class="wrapper">
       <h1 class="govuk-heading-s">
-        <%= link_to "Update case information", prison_summary_pending_path(@prison), class:"govuk-link" %>
+        <%= link_to "Update case information", prison_summary_pending_path(@prison.code), class:"govuk-link" %>
       </h1>
       <p class="govuk-body">Prisoners with missing case information. This needs to be updated before they can be allocated.</p>
     </div>
@@ -50,7 +50,7 @@
     <div class="govuk-grid-column-one-third">
       <div class="wrapper">
         <h1 class="govuk-heading-s">
-          <%= link_to "See your caseload", prison_caseload_index_path(@prison), class:"govuk-link" %>
+          <%= link_to "See your caseload", prison_caseload_index_path(@prison.code), class:"govuk-link" %>
         </h1>
         <p class="govuk-body">All prisoners allocated to you.</p>
       </div>
@@ -58,7 +58,7 @@
     <div class="govuk-grid-column-one-third">
       <div class="wrapper">
         <h1 class="govuk-heading-s">
-          <%= link_to "See new allocations", new_prison_caseload_path(@prison), class:"govuk-link" %>
+          <%= link_to "See new allocations", new_prison_caseload_path(@prison.code), class:"govuk-link" %>
         </h1>
         <p class="govuk-body">Prisoners allocated to you in the last seven days.</p>
       </div>
@@ -66,7 +66,7 @@
     <div class="govuk-grid-column-one-third">
       <div class="wrapper">
         <h1 class="govuk-heading-s">
-          <%= link_to "See cases close to handover", prison_caseload_handover_start_path(@prison), class:"govuk-link" %>
+          <%= link_to "See cases close to handover", prison_caseload_handover_start_path(@prison.code), class:"govuk-link" %>
         </h1>
         <p class="govuk-body">All cases for start of handover to the community in the next thirty days</p>
       </div>
@@ -76,7 +76,7 @@
     <div class="govuk-grid-column-one-third">
       <div class="wrapper">
         <h1 class="govuk-heading-s">
-          <%= link_to "Case updates needed", prison_tasks_path(@prison), class:"govuk-link" %>
+          <%= link_to "Case updates needed", prison_tasks_path(@prison.code), class:"govuk-link" %>
         </h1>
         <p class="govuk-body">Update information so handover dates and community probation details are correct.</p>
       </div>
@@ -91,7 +91,7 @@
   <div class="govuk-grid-column-one-third">
     <div class="wrapper">
       <h1 class="govuk-heading-s">
-        <%= link_to "View all offender managers", prison_poms_path(@prison), class:"govuk-link" %>
+        <%= link_to "View all offender managers", prison_poms_path(@prison.code), class:"govuk-link" %>
       </h1>
       <p class="govuk-body">Check and edit availability of offender managers.</p>
     </div>

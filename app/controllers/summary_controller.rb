@@ -2,15 +2,15 @@
 
 class SummaryController < PrisonsApplicationController
   breadcrumb 'See allocations',
-             -> { prison_summary_allocated_path(active_prison) },
+             -> { prison_summary_allocated_path(active_prison_id) },
              only: [:index, :allocated]
   breadcrumb 'Make allocations',
-             -> { prison_summary_unallocated_path(active_prison) }, only: [:unallocated]
+             -> { prison_summary_unallocated_path(active_prison_id) }, only: [:unallocated]
   breadcrumb 'Update information',
-             -> { prison_summary_pending_path(active_prison) }, only: [:pending]
+             -> { prison_summary_pending_path(active_prison_id) }, only: [:pending]
 
   def index
-    redirect_to prison_summary_allocated_path(active_prison)
+    redirect_to prison_summary_allocated_path(active_prison_id)
   end
 
   def allocated
@@ -36,7 +36,7 @@ private
     )
 
     SummaryService.summary(
-      summary_type, active_prison, page, params
+      summary_type, @prison, page, params
     )
   end
 

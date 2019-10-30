@@ -9,7 +9,7 @@
     <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half responsibility_change">
       <%= case_owner_label(@prisoner) %>
       <% if @prisoner.pom_responsibility.custody? %>
-        <%= link_to 'Change', new_prison_responsibility_path(@prison, nomis_offender_id: @prisoner.offender_no), class: 'govuk-link pull-right' %>
+        <%= link_to 'Change', new_prison_responsibility_path(@prison.code, nomis_offender_id: @prisoner.offender_no), class: 'govuk-link pull-right' %>
       <% end %>
     </td>
   </tr>
@@ -23,21 +23,21 @@
     <td class="govuk-table__cell">Last known address in Wales</td>
     <td class="govuk-table__cell table_cell__left_align">
       <%= humanized_bool(@prisoner.welsh_offender) %>
-      <%= link_to 'Change', edit_prison_case_information_path(@prison, @prisoner.offender_no), class: 'govuk-link pull-right' %>
+      <%= link_to 'Change', edit_prison_case_information_path(@prison.code, @prisoner.offender_no), class: 'govuk-link pull-right' %>
     </td>
   </tr>
   <tr class="govuk-table__row">
     <td class="govuk-table__cell">Service provider</td>
     <td class="govuk-table__cell table_cell__left_align">
       <%= service_provider_label(@prisoner.case_allocation) %>
-      <a class="govuk-link pull-right" href="<%= edit_prison_case_information_path(@prison, @prisoner.offender_no) %>">Change</a>
+      <a class="govuk-link pull-right" href="<%= edit_prison_case_information_path(@prison.code, @prisoner.offender_no) %>">Change</a>
     </td>
   </tr>
   <tr class="govuk-table__row">
     <td class="govuk-table__cell">Tiering calculation</td>
     <td class="govuk-table__cell table_cell__left_align">
     Tier <%= @prisoner.tier %>
-      <a class="govuk-link pull-right" href="<%= edit_prison_case_information_path(@prison, @prisoner.offender_no) %>">Change</a>
+      <a class="govuk-link pull-right" href="<%= edit_prison_case_information_path(@prison.code, @prisoner.offender_no) %>">Change</a>
     </td>
   </tr>
   </tbody>

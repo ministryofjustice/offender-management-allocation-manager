@@ -1,4 +1,4 @@
-<%= form_for(@early_assignment, url: prison_prisoner_early_allocations_path(@prison, @early_assignment.nomis_offender_id), method: form_method) do |form| %>
+<%= form_for(@early_assignment, url: prison_prisoner_early_allocations_path(@prison.code, @early_assignment.nomis_offender_id), method: form_method) do |form| %>
   <% if @early_assignment.errors.count > 0 %>
     <%= render :partial => "/shared/field_errors", :locals => { form: form, errors: @early_assignment.errors } %>
   <% end %>
