@@ -179,7 +179,6 @@ RSpec.describe TasksController, type: :controller do
       create(:early_allocation, :discretionary, :skip_validate, nomis_offender_id: 'G1234GG')
       create(:early_allocation, :stage2, :skip_validate, nomis_offender_id: 'G1234GG')
 
-
       get :index, params: { prison_id: prison, sort: 'offender_name asc' }
       expect(response).to be_successful
       pomtasks = assigns(:pomtasks)
