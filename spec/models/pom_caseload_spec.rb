@@ -74,7 +74,7 @@ RSpec.describe PomCaseload, type: :model do
 
   it 'can get tasks within a caseload' do
     caseload = described_class.new(staff_id, prison)
-    expect(caseload.tasks_for_offenders.count).to eq(5)
+    expect(caseload.tasks_for_offenders.count).to eq(1)
   end
 
   it 'can get tasks within a caseload for a single offender' do
@@ -82,7 +82,7 @@ RSpec.describe PomCaseload, type: :model do
 
     caseload = described_class.new(staff_id, prison)
     tasks = caseload.tasks_for_offender(offender)
-    expect(tasks.count).to eq(2)
+    expect(tasks.count).to eq(1)
   end
 
   context 'when a POM has new and old allocations' do
