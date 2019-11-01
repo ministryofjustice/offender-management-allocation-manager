@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class PomTasks
+  include ApplicationHelper
   include Rails.application.routes.url_helpers
 
   def for_offenders(offenders)
@@ -48,6 +49,8 @@ class PomTasks
   end
 
   def missing_info_task(offender)
+    return unless auto_delius_import_enabled?(offender.prison_id)
+
     # Offender had their delius data manually added and as a result are missing
     # new key fields.
     if offender.mappa_level.blank? || offender.ldu.blank?
