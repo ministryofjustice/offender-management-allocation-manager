@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class PomCaseload
-  include Rails.application.routes.url_helpers
 
   def initialize(pom_staff_id, prison_id)
     @staff_id = pom_staff_id

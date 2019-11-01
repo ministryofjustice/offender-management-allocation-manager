@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class CaseloadController < PrisonsApplicationController
+  include CaseloadHelper
+
   before_action :ensure_pom
 
   breadcrumb -> { 'Your caseload' },
@@ -18,6 +20,7 @@ class CaseloadController < PrisonsApplicationController
     sorted_allocations = sort_allocations(filter_allocations(@caseload.allocations))
 
     @allocations = Kaminari.paginate_array(sorted_allocations).page(page)
+    @facets = filter_facets(sorted_allocations)
 
     @total_allocation_count = sorted_allocations.count
     @pending_handover_count = pending_handover_count
