@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class PomCaseload
-
   def initialize(pom_staff_id, prison_id)
     @staff_id = pom_staff_id
     @prison_id = prison_id
