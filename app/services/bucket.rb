@@ -9,9 +9,11 @@
 # N items, and it's recommended not to subclass core classes
 class Bucket
   attr_accessor :items
+  attr_reader :label
 
-  def initialize
+  def initialize(sortable_fields)
     @items = []
+    @valid_sort_fields = sortable_fields || default_sortable_fields
   end
 
   def count
@@ -23,7 +25,7 @@ class Bucket
   end
 
   def sort(field, direction = :asc)
-    return unless valid_sort_fields.include?(field)
+    return unless @valid_sort_fields.include?(field)
 
     if field == :earliest_release_date
       @items = @items.sort_by { |e| e.send(field) || Date.new(1) }
@@ -34,7 +36,7 @@ class Bucket
     @items = @items.reverse if direction == :desc
   end
 
-  def valid_sort_fields
+  def default_sortable_fields
     [:last_name, :earliest_release_date, :awaiting_allocation_for, :tier]
   end
 end
