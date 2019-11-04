@@ -157,6 +157,7 @@ describe ResponsibilityService do
 
             context 'with ped < 17 months away' do
               let(:parole_date) { DateTime.now.utc.to_date + 16.months }
+              let(:release_date) { Date.new(2020, 9, 18) }
 
               it 'is supporting' do
                 resp = described_class.calculate_pom_responsibility(offender)
