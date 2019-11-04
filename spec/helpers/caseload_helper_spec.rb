@@ -149,5 +149,11 @@ RSpec.describe CaseloadHelper do
       expect(facets[CaseloadFilters::ROLE_SUPPORTING]).to eq(2)
       expect(facets[CaseloadFilters::ROLE_COWORKING]).to eq(1)
     end
+
+    context 'when filtering allocations' do
+      it 'returns what it is given if there are no filters' do
+        expect(filtered_allocations([], [])).to eq([])
+      end
+    end
   end
 end

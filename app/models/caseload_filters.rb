@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 #:nocov:
 module CaseloadFilters
   NEW_ALLOCATION = :new_allocation
