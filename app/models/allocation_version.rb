@@ -39,11 +39,6 @@ class AllocationVersion < ApplicationRecord
   scope :allocations, lambda { |nomis_offender_ids|
     where(nomis_offender_id: nomis_offender_ids)
   }
-  scope :all_primary_pom_allocations, lambda { |nomis_staff_id|
-    where(
-      primary_pom_nomis_id: nomis_staff_id
-    )
-  }
   scope :active_pom_allocations, lambda { |nomis_staff_id, prison|
     secondaries = where(secondary_pom_nomis_id: nomis_staff_id)
 
@@ -112,8 +107,8 @@ class AllocationVersion < ApplicationRecord
     alloc.save!
   end
 
-  def self.deallocate_primary_pom(nomis_staff_id)
-    all_primary_pom_allocations(nomis_staff_id).each do |alloc|
+  def self.deallocate_primary_pom(nomis_staff_id, prison)
+    active_pom_allocations(nomis_staff_id, prison).each do |alloc|
       alloc.primary_pom_nomis_id = nil
       alloc.primary_pom_name = nil
       alloc.recommended_pom_type = nil

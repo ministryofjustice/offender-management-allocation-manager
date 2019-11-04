@@ -21,7 +21,7 @@ describe CaseInformationService do
     cases = described_class.get_case_information([caseinfo.nomis_offender_id])
     expect(cases.length).to eq(1)
 
-    described_class.delete_information(['X1000XX'])
+    CaseInformation.where(nomis_offender_id: ['X1000XX']).destroy_all
 
     cases = described_class.get_case_information(['X1000XX'])
     expect(cases.length).to eq(0)

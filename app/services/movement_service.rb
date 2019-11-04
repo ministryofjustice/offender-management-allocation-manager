@@ -80,7 +80,7 @@ private
     return false unless release.to_agency == 'OUT' && release.from_prison?
 
     Rails.logger.info("Processing release for #{release.offender_no}")
-    CaseInformationService.delete_information(release.offender_no)
+    CaseInformation.where(nomis_offender_id: release.offender_no).destroy_all
     AllocationVersion.deallocate_offender(release.offender_no,
                                           AllocationVersion::OFFENDER_RELEASED)
 

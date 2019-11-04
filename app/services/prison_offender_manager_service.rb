@@ -69,19 +69,6 @@ class PrisonOffenderManagerService
     poms_list.find { |p| p.staff_id.to_i == user.staff_id.to_i }
   end
 
-  def self.update_pom(params)
-    pom = PomDetail.by_nomis_staff_id(params[:nomis_staff_id])
-    pom.working_pattern = params[:working_pattern]
-    pom.status = params[:status] || pom.status
-    pom.save
-
-    if pom.valid? && pom.status == 'inactive'
-      AllocationVersion.deallocate_primary_pom(params[:nomis_staff_id])
-    end
-
-    pom
-  end
-
 private
 
   def self.get_pom_detail(pom_details, nomis_staff_id)
