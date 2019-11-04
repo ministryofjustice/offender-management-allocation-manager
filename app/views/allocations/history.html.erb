@@ -5,9 +5,8 @@
 <% @history.grouped_by_prison do |prison, allocations| %>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column">
-      <div class="timeline">
-        <h2 class="govuk-heading-m"><%= prison_title(prison) %></h2>
-        <ul>
+      <h2 class="govuk-heading-m"><%= prison_title(prison) %></h2>
+      <div class="moj-timeline">
           <% allocations.each_with_index do |allocation, i| %>
             <% if allocation.event == 'allocate_primary_pom' %>
               <%= render :partial => "allocate_primary_pom",
@@ -38,7 +37,6 @@
                                       pom_id: allocations[i + 1].secondary_pom_nomis_id } %>
             <% end %>
           <% end %>
-        </ul>
       </div>
     </div>
   </div>
