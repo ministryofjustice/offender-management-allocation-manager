@@ -43,7 +43,7 @@ feature 'delius import scenarios', vcr: { cassette_name: :delius_import_scenario
         end
 
         within '.govuk-error-summary' do
-          expect(page).to have_content 'no tiering calculation found'
+          expect(page).to have_content 'There’s no tier recorded in nDelius'
         end
       end
     end
@@ -73,7 +73,7 @@ feature 'delius import scenarios', vcr: { cassette_name: :delius_import_scenario
       it 'displays the correct error message' do
         visit prison_case_information_path('LEI', d1.noms_no)
         within '.govuk-error-summary' do
-          expect(page).to have_content 'no local divisional unit (LDU) information found'
+          expect(page).to have_content 'There are no community probation team details in nDelius'
         end
       end
     end
@@ -88,7 +88,7 @@ feature 'delius import scenarios', vcr: { cassette_name: :delius_import_scenario
       it 'displays the correct error message' do
         visit prison_case_information_path('LEI', d1.noms_no)
         within '.govuk-error-summary' do
-          expect(page).to have_content 'no community team information found'
+          expect(page).to have_content 'There are no community probation team details in nDelius'
         end
       end
     end
@@ -98,7 +98,7 @@ feature 'delius import scenarios', vcr: { cassette_name: :delius_import_scenario
     it 'shows a message that there is no nDelius record' do
       visit prison_case_information_path('LEI', 'G7998GJ')
       within '.govuk-error-summary' do
-        expect(page).to have_content 'No nDelius record found with this prisoner number'
+        expect(page).to have_content 'There’s no nDelius match for this case'
       end
     end
   end
@@ -114,7 +114,7 @@ feature 'delius import scenarios', vcr: { cassette_name: :delius_import_scenario
     it 'displays a duplicate error message, and the 2 affected CRNs' do
       visit prison_case_information_path('LEI', d1.noms_no)
       within '.govuk-error-summary' do
-        expect(page).to have_content 'More than one nDelius record found with this prisoner number'
+        expect(page).to have_content 'There’s more than one nDelius record with this NOMIS number'
       end
       within '#offender_crn' do
         expect(page).to have_content "#{d1.crn}#{d2.crn}"

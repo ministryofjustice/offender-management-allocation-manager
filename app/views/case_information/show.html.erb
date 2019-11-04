@@ -6,7 +6,7 @@
       <ul class="govuk-list govuk-error-summary__list">
         <% @delius_errors.each do |error| %>
           <li>
-            <%= delius_error_display(error.error_type) %>
+            <%= render :partial => delius_error_display(error.error_type) %>
           </li>
         <% end %>
       </ul>

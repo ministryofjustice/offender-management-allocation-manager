@@ -1,6 +1,8 @@
 module CaseInformationHelper
   def delius_error_display(error_type)
-    ERROR_MESSAGES.fetch(error_type)
+    return nil if error_type.blank?
+
+    "case_information/errors/#{ERROR_PARTIALS[error_type]}"
   end
 
   def prisoner_crn_display(prisoner, delius_data)
@@ -13,30 +15,13 @@ module CaseInformationHelper
 
 private
 
-  ERROR_MESSAGES = {
-    DeliusImportError::DUPLICATE_NOMIS_ID =>
-      'More than one nDelius record found with this prisoner number.
-         You need to update nDelius so there is only one record before you can allocate.',
-    DeliusImportError::INVALID_TIER =>
-      'nDelius record with matching prisoner number but no tiering
-         calculation found. You need to update nDelius with the tiering calculation
-         before you can allocate.',
-    DeliusImportError::INVALID_CASE_ALLOCATION =>
-      'nDelius record with matching prisoner number but no service provider
-         information found. You need to update nDelius with the service provider
-         before you can allocate.',
-    DeliusImportError::MISSING_DELIUS_RECORD =>
-      'No nDelius record found with this prisoner number. This may be because
-      the case information has not yet been updated. This prisoner needs to be
-      matched with an nDelius record before you can allocate.',
-    DeliusImportError::MISSING_LDU => 'nDelius record with matching prisoner number
-       but no local divisional unit (LDU) information found. You need to update nDelius
-       with the LDU before you can allocate.',
-    DeliusImportError::MISSING_TEAM => 'nDelius record found with matching prisoner
-       number but no community team information found. You need to update nDelius with the
-       team information before you can allocate.',
-    DeliusImportError::MISMATCHED_DOB => 'nDelius record found with matching prisoner
-       number but a different date of birth. You need to check the data in nDelius and
-       correct before you can allocate.'
+  ERROR_PARTIALS = {
+    DeliusImportError::DUPLICATE_NOMIS_ID => 'duplicate_nomis_id',
+    DeliusImportError::INVALID_TIER => 'invalid_tier',
+    DeliusImportError::INVALID_CASE_ALLOCATION => 'invalid_case_allocation',
+    DeliusImportError::MISSING_DELIUS_RECORD => 'missing_delius_record',
+    DeliusImportError::MISSING_LDU => 'missing_ldu',
+    DeliusImportError::MISSING_TEAM => 'missing_team',
+    DeliusImportError::MISMATCHED_DOB => 'mismatched_dob'
   }.freeze
 end
