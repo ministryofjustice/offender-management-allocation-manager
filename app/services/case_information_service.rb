@@ -6,8 +6,4 @@ class CaseInformationService
       [case_info.nomis_offender_id, case_info]
     }.to_h
   end
-
-  def self.delete_information(nomis_offender_id)
-    CaseInformation.where(nomis_offender_id: nomis_offender_id).destroy_all
-  end
 end

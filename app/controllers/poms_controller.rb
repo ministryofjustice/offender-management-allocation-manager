@@ -8,7 +8,7 @@ class PomsController < PrisonsApplicationController
   breadcrumb 'Prison Offender Managers',
              -> { prison_poms_path(active_prison_id) }, only: [:index, :show]
   breadcrumb -> { @pom.full_name },
-             -> { prison_poms_path(active_prison_id, params[:nomis_staff_id]) },
+             -> { prison_poms_path(active_prison_id, nomis_staff_id) },
              only: [:show]
 
   def index
@@ -26,7 +26,7 @@ class PomsController < PrisonsApplicationController
   # This is for the situation where the user is no longer a POM
   # the user will probably mark this POM inactive
   def show_non_pom
-    @nomis_staff_id = params[:nomis_staff_id]
+    @nomis_staff_id = nomis_staff_id
   end
 
   def sort_allocations(allocations)
@@ -49,16 +49,17 @@ class PomsController < PrisonsApplicationController
   end
 
   def update
-    pom_detail = PrisonOffenderManagerService.update_pom(
-      nomis_staff_id: params[:nomis_staff_id].to_i,
-      working_pattern: working_pattern,
-      status: edit_pom_params[:status]
-    )
+    pom_detail = PomDetail.find_by(nomis_staff_id: nomis_staff_id)
+    pom_detail.working_pattern = working_pattern
+    pom_detail.status = edit_pom_params[:status] || pom.status
 
-    if pom_detail.valid?
-      redirect_to prison_pom_path(active_prison_id, id: params[:nomis_staff_id])
+    if pom_detail.save
+      if pom_detail.status == 'inactive'
+        AllocationVersion.deallocate_primary_pom(nomis_staff_id, active_prison_id)
+      end
+      redirect_to prison_pom_path(active_prison_id, id: nomis_staff_id)
     else
-      @pom = StaffMember.new params[:nomis_staff_id], pom_detail
+      @pom = StaffMember.new nomis_staff_id, pom_detail
       @errors = pom_detail.errors
       render :edit
     end
@@ -67,7 +68,7 @@ class PomsController < PrisonsApplicationController
 private
 
   def load_pom_staff_member
-    @pom = StaffMember.new params[:nomis_staff_id]
+    @pom = StaffMember.new nomis_staff_id
   end
 
   def working_pattern
@@ -77,10 +78,14 @@ private
   end
 
   def load_pom
-    @pom = PrisonOffenderManagerService.get_pom(active_prison_id, params[:nomis_staff_id])
+    @pom = PrisonOffenderManagerService.get_pom(active_prison_id, nomis_staff_id)
   end
 
   def edit_pom_params
     params.require(:edit_pom).permit(:working_pattern, :status, :description)
+  end
+
+  def nomis_staff_id
+    params[:nomis_staff_id].to_i
   end
 end

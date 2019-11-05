@@ -35,7 +35,7 @@ RSpec.describe AllocationVersion, type: :model do
 
   describe 'when a Primary Pom is inactive' do
     it 'removes the primary pom\'s from all allocations' do
-      described_class.deallocate_primary_pom(nomis_staff_id)
+      described_class.deallocate_primary_pom(nomis_staff_id, allocation.prison)
 
       deallocation = described_class.find_by(nomis_offender_id: nomis_offender_id)
 
@@ -156,7 +156,7 @@ RSpec.describe AllocationVersion, type: :model do
     end
 
     it 'return false if an Allocation has not been assigned a Primary POM' do
-      described_class.deallocate_primary_pom(nomis_staff_id)
+      described_class.deallocate_primary_pom(nomis_staff_id, allocation.prison)
       alloc = AllocationService.current_allocation_for(nomis_offender_id)
 
       expect(alloc.active?).to be(false)
