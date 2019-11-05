@@ -147,5 +147,19 @@ RSpec.describe PomCaseload, type: :model do
       expect(allocated_offenders.count).to eq 2
       expect(allocated_offenders.map(&:responsibility)).to match_array %w[Supporting Co-Working]
     end
+
+    it "will get show the correct responsibility if one is overridden", :versioning, vcr: { cassette_name: :get_overridden_responsibilities } do
+      # Find a responsible offender
+      allocated_offenders = described_class.new(staff_id, prison).allocations
+      responsible_pom = allocated_offenders.detect { |offender| offender.responsibility == 'Responsible' }.offender
+
+      # Override their responsibility
+      create(:responsibility, nomis_offender_id: responsible_pom.offender_no)
+
+      # Confirm that the responsible offender is now supporting
+      allocated_offenders = described_class.new(staff_id, prison).allocations
+      responsible_pom = allocated_offenders.detect { |a| a.offender.offender_no == responsible_pom.offender_no }
+      expect(responsible_pom.responsibility).to eq('Supporting')
+    end
   end
 end
