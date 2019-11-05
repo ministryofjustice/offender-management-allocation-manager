@@ -46,4 +46,27 @@ RSpec.describe SummaryController, type: :controller do
     expect(assigns(:summary).offenders.map(&:awaiting_allocation_for).map { |x| Time.zone.today - x }).
       to match_array [Date.new(2018, 10, 1), Date.new(2019, 2, 8)]
   end
+
+  it 'handles trying to sort by missing field for allocated offenders' do
+    # When viewing allocated, cannot sort by awaiting_allocation_for as it is not available and is
+    # meaningless in this context. We do not want to crash if passed a field that is not searchable
+    # within a specific context.
+    offender_id = 'G7514GW'
+    offenders = [{ "bookingId": 754_207, "offenderNo": offender_id, "firstName": "Indeter", "lastName": "Minate-Offender",
+                   "dateOfBirth": "1990-12-06", "age": 28, "agencyId": prison, "categoryCode": "C", "imprisonmentStatus": "LIFE" }]
+
+    bookings = [{ "bookingId": 754_207, "offenderNo": "G7514GW", "firstName": "Indeter", "lastName": "Minate-Offender", "agencyLocationId": prison,
+                  "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
+                                      "bookingId": 754_207, "sentenceStartDate": "2009-02-08",
+                                      "releaseDate": "2012-03-17" },
+                  "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
+                  "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 }]
+    stub_offenders_for_prison(prison, offenders, bookings)
+
+    create(:case_information, nomis_offender_id: offender_id)
+    create(:allocation_version, nomis_offender_id: offender_id, primary_pom_nomis_id: 234)
+
+    get :allocated, params: { prison_id: prison, sort: 'awaiting_allocation_for asc' }
+    expect(assigns(:summary).offenders.count).to eq(1)
+  end
 end

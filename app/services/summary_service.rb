@@ -18,7 +18,8 @@ class SummaryService
   def self.summary(summary_type, prison, page, params)
     # We expect to be passed summary_type, which is one of :allocated, :unallocated,
     # or :pending.  The other types will return totals, and do not contain any data.
-    bucket = Bucket.new
+    sortable_fields = (summary_type == :allocated ? sort_fields_for_allocated : nil)
+    bucket = Bucket.new(sortable_fields)
 
     # We want to store the total number of each item so we can show totals for
     # each type of record.
@@ -48,6 +49,7 @@ class SummaryService
       unless summary_type == :allocated
         add_arrival_dates(bucket.items) if bucket.items.any?
       end
+
       bucket.sort(params.sort_field, params.sort_direction)
     end
 
@@ -76,6 +78,10 @@ class SummaryService
 # rubocop:enable Metrics/PerceivedComplexity
 
 private
+
+  def self.sort_fields_for_allocated
+    [:last_name, :earliest_release_date, :tier]
+  end
 
   def self.add_arrival_dates(offenders)
     movements = Nomis::Elite2::MovementApi.admissions_for(offenders.map(&:offender_no))
