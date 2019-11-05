@@ -10,7 +10,7 @@ class EmailService
     @allocation = allocation
 
     @offender = OffenderService.get_offender(@allocation[:nomis_offender_id])
-    @pom = PrisonOffenderManagerService.get_pom(
+    @pom = PrisonOffenderManagerService.get_pom_at(
       @allocation.prison,
       pom_nomis_id
     )
@@ -89,7 +89,7 @@ private
     }
     return nil if previous.blank?
 
-    @previous_pom ||= PrisonOffenderManagerService.get_pom(
+    @previous_pom ||= PrisonOffenderManagerService.get_pom_at(
       previous.prison,
       previous.primary_pom_nomis_id
     )

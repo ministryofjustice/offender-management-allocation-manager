@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class PrisonOffenderManagerService
-  # Note - get_poms and get_pom return different data...
-  def self.get_poms(prison)
+  # Note - get_poms_for and get_pom_at return different data...
+  def self.get_poms_for(prison)
     poms = Nomis::Elite2::PrisonOffenderManagerApi.list(prison)
     pom_details = PomDetail.where(nomis_staff_id: poms.map(&:staff_id).map(&:to_i))
 
@@ -15,19 +15,15 @@ class PrisonOffenderManagerService
     poms
   end
 
-  def self.get_pom(prison_id, nomis_staff_id)
-    raise ArgumentError, 'PrisonOffenderManagerService#get_pom(nil)' if nomis_staff_id.nil?
+  def self.get_pom_at(prison_id, nomis_staff_id)
+    raise ArgumentError, 'PrisonOffenderManagerService#get_pom_at(nil)' if nomis_staff_id.nil?
 
-    poms_list = get_poms(prison_id)
-    if poms_list.blank?
-      log_missing_pom(prison_id, nomis_staff_id)
-      return nil
-    end
-
+    poms_list = get_poms_for(prison_id)
     pom = poms_list.find { |p| p.staff_id == nomis_staff_id.to_i }
     if pom.blank?
       log_missing_pom(prison_id, nomis_staff_id)
-      return nil
+      pom_staff_ids = poms_list.map(&:staff_id)
+      raise StandardError, "Failed to find POM ##{nomis_staff_id} at #{prison_id} - list is #{pom_staff_ids}"
     end
 
     pom.emails = get_pom_emails(pom.staff_id)
@@ -39,7 +35,7 @@ class PrisonOffenderManagerService
   end
 
   def self.get_pom_names(prison)
-    poms_list = get_poms(prison)
+    poms_list = get_poms_for(prison)
     poms_list.each_with_object({}) { |p, hsh|
       hsh[p.staff_id] = p.full_name
     }
@@ -56,7 +52,7 @@ class PrisonOffenderManagerService
   end
 
   def self.unavailable_pom_count(prison)
-    poms = PrisonOffenderManagerService.get_poms(prison).reject { |pom|
+    poms = PrisonOffenderManagerService.get_poms_for(prison).reject { |pom|
       pom.status == 'active'
     }
     poms.count
@@ -65,7 +61,7 @@ class PrisonOffenderManagerService
   def self.get_signed_in_pom_details(current_user, prison)
     user = Nomis::Elite2::UserApi.user_details(current_user)
 
-    poms_list = get_poms(prison)
+    poms_list = get_poms_for(prison)
     poms_list.find { |p| p.staff_id.to_i == user.staff_id.to_i }
   end
 

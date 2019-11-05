@@ -9,7 +9,7 @@ class CoworkingController < PrisonsApplicationController
     )
 
     # get_pom and get_poms return different data - so have to compare theit staff_ids.
-    poms = PrisonOffenderManagerService.get_poms(active_prison_id).reject { |pom|
+    poms = PrisonOffenderManagerService.get_poms_for(active_prison_id).reject { |pom|
       pom.staff_id == @current_pom.staff_id
     }
 
@@ -23,17 +23,17 @@ class CoworkingController < PrisonsApplicationController
 
   def confirm
     @prisoner = offender(nomis_offender_id_from_url)
-    @primary_pom = PrisonOffenderManagerService.get_pom(
+    @primary_pom = PrisonOffenderManagerService.get_pom_at(
       active_prison_id, primary_pom_id_from_url
     )
-    @secondary_pom = PrisonOffenderManagerService.get_pom(
+    @secondary_pom = PrisonOffenderManagerService.get_pom_at(
       active_prison_id, secondary_pom_id_from_url
     )
   end
 
   def create
     offender = offender(allocation_params[:nomis_offender_id])
-    pom = PrisonOffenderManagerService.get_pom(
+    pom = PrisonOffenderManagerService.get_pom_at(
       active_prison_id,
       allocation_params[:nomis_staff_id]
     )
@@ -56,7 +56,7 @@ class CoworkingController < PrisonsApplicationController
     @allocation = AllocationVersion.find_by!(
       nomis_offender_id: coworking_nomis_offender_id_from_url
     )
-    @primary_pom = PrisonOffenderManagerService.get_pom(
+    @primary_pom = PrisonOffenderManagerService.get_pom_at(
       active_prison_id, @allocation.primary_pom_nomis_id
     )
   end

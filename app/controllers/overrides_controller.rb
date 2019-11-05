@@ -3,7 +3,7 @@
 class OverridesController < PrisonsApplicationController
   def new
     @prisoner = offender(params.require(:nomis_offender_id))
-    @pom = PrisonOffenderManagerService.get_pom(active_prison_id, params[:nomis_staff_id])
+    @pom = PrisonOffenderManagerService.get_pom_at(active_prison_id, params[:nomis_staff_id])
 
     @override = Override.new
   end
@@ -14,7 +14,7 @@ class OverridesController < PrisonsApplicationController
     return redirect_on_success if @override.valid?
 
     @prisoner = offender(override_params[:nomis_offender_id])
-    @pom = PrisonOffenderManagerService.get_pom(
+    @pom = PrisonOffenderManagerService.get_pom_at(
       active_prison_id, override_params[:nomis_staff_id])
 
     render :new

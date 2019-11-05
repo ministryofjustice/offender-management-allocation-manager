@@ -28,7 +28,6 @@ class AllocationsController < PrisonsApplicationController
       @coworker = StaffMember.new(secondary_pom_nomis_id)
       redirect_to prison_pom_non_pom_path(@prison, @coworker.staff_id) unless @coworker.pom_at?(@prison.code)
     end
-
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(active_prison_id, @prisoner.offender_no)
   end
 
@@ -52,7 +51,7 @@ class AllocationsController < PrisonsApplicationController
 
   def confirm
     @prisoner = offender(nomis_offender_id_from_url)
-    @pom = PrisonOffenderManagerService.get_pom(
+    @pom = PrisonOffenderManagerService.get_pom_at(
       active_prison_id,
       nomis_staff_id_from_url
     )
@@ -62,7 +61,7 @@ class AllocationsController < PrisonsApplicationController
 
   def confirm_reallocation
     @prisoner = offender(nomis_offender_id_from_url)
-    @pom = PrisonOffenderManagerService.get_pom(
+    @pom = PrisonOffenderManagerService.get_pom_at(
       active_prison_id,
       nomis_staff_id_from_url
     )
@@ -129,7 +128,7 @@ private
   end
 
   def pom
-    @pom ||= PrisonOffenderManagerService.get_pom(
+    @pom ||= PrisonOffenderManagerService.get_pom_at(
       active_prison_id,
       allocation_params[:nomis_staff_id]
     )
@@ -145,7 +144,7 @@ private
     current_allocation = AllocationService.active_allocations(nomis_offender_id, active_prison_id)
     nomis_staff_id = current_allocation[nomis_offender_id]['primary_pom_nomis_id']
 
-    PrisonOffenderManagerService.get_pom(active_prison_id, nomis_staff_id)
+    PrisonOffenderManagerService.get_pom_at(active_prison_id, nomis_staff_id)
   end
 
   def recommended_pom_type(offender)
@@ -156,7 +155,7 @@ private
   def recommended_and_nonrecommended_poms_for(offender)
     allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id_from_url)
     # don't allow primary to be the same as the co-working POM
-    poms = PrisonOffenderManagerService.get_poms(active_prison_id).select { |pom|
+    poms = PrisonOffenderManagerService.get_poms_for(active_prison_id).select { |pom|
       pom.status == 'active' && pom.staff_id != allocation.try(:secondary_pom_nomis_id)
     }
 

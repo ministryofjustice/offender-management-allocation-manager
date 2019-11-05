@@ -51,7 +51,7 @@ private
   def last_pom_email(allocation)
     return nil if allocation.blank?
 
-    pom = PrisonOffenderManagerService.get_pom(allocation.prison, allocation.primary_pom_nomis_id)
+    pom = PrisonOffenderManagerService.get_pom_at(allocation.prison, allocation.primary_pom_nomis_id)
     pom.emails.first
   end
 
