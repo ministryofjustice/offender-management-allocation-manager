@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class CaseloadController < PrisonsApplicationController
-  before_action :load_pom
+  before_action :ensure_pom
 
   breadcrumb -> { 'Your caseload' },
              -> { prison_caseload_index_path(active_prison_id) }
