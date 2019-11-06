@@ -145,13 +145,13 @@ RSpec.describe PomCaseload, type: :model do
     it "will get allocations for a POM made within the last 7 days", :versioning, vcr: { cassette_name: :get_new_cases } do
       allocated_offenders = described_class.new(staff_id, prison).allocations.select(&:new_case?)
       expect(allocated_offenders.count).to eq 2
-      expect(allocated_offenders.map(&:responsibility)).to match_array %w[Supporting Co-Working]
+      expect(allocated_offenders.map(&:pom_responsibility)).to match_array %w[Supporting Co-Working]
     end
 
     it "will get show the correct responsibility if one is overridden", :versioning, vcr: { cassette_name: :get_overridden_responsibilities } do
       # Find a responsible offender
       allocated_offenders = described_class.new(staff_id, prison).allocations
-      responsible_pom = allocated_offenders.detect { |offender| offender.responsibility == 'Responsible' }.offender
+      responsible_pom = allocated_offenders.detect { |offender| offender.pom_responsibility == 'Responsible' }.offender
 
       # Override their responsibility
       create(:responsibility, nomis_offender_id: responsible_pom.offender_no)
@@ -159,13 +159,13 @@ RSpec.describe PomCaseload, type: :model do
       # Confirm that the responsible offender is now supporting
       allocated_offenders = described_class.new(staff_id, prison).allocations
       responsible_pom = allocated_offenders.detect { |a| a.offender.offender_no == responsible_pom.offender_no }
-      expect(responsible_pom.responsibility).to eq('Supporting')
+      expect(responsible_pom.pom_responsibility).to eq('Supporting')
     end
 
     it "will get show the correct responsibility if one is overridden to prison", :versioning, vcr: { cassette_name: :get_overridden_responsibilities_prison } do
       # Find a responsible offender
       allocated_offenders = described_class.new(staff_id, prison).allocations
-      responsible_pom = allocated_offenders.detect { |offender| offender.responsibility == 'Supporting' }.offender
+      responsible_pom = allocated_offenders.detect { |offender| offender.pom_responsibility == 'Supporting' }.offender
 
       # Override their responsibility
       create(:responsibility, nomis_offender_id: responsible_pom.offender_no, value: 'Prison')
@@ -173,7 +173,7 @@ RSpec.describe PomCaseload, type: :model do
       # Confirm that the responsible offender is now supporting
       allocated_offenders = described_class.new(staff_id, prison).allocations
       responsible_pom = allocated_offenders.detect { |a| a.offender.offender_no == responsible_pom.offender_no }
-      expect(responsible_pom.responsibility).to eq('Responsible')
+      expect(responsible_pom.pom_responsibility).to eq('Responsible')
     end
   end
 end
