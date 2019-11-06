@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class SummaryController < PrisonsApplicationController
+  before_action :ensure_admin_user
+
   breadcrumb 'See allocations',
              -> { prison_summary_allocated_path(active_prison_id) },
              only: [:index, :allocated]

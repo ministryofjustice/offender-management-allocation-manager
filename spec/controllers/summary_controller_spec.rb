@@ -2,6 +2,15 @@ require 'rails_helper'
 
 RSpec.describe SummaryController, type: :controller do
   let(:prison) { 'LEI' }
+  let(:poms) {
+    [
+      {
+        firstName: 'Alice',
+        position: 'PRO',
+        staffId: 1
+      }
+    ]
+  }
 
   before do
     stub_sso_data(prison)
@@ -38,6 +47,22 @@ RSpec.describe SummaryController, type: :controller do
       with(body: "[\"G7514GW\",\"G1234VV\"]").
       to_return(status: 200, body: [{ offenderNo: 'G7514GW', toAgency: prison, createDateTime: Date.new(2018, 10, 1) },
                                     { offenderNo: 'G1234VV', toAgency: prison, createDateTime: Date.new(2018, 9, 1) }].to_json)
+  end
+
+  context 'when user is a POM' do
+    before do
+      stub_poms(prison, poms)
+      stub_sso_pom_data(prison)
+      stub_signed_in_pom(1, 'Alice')
+      stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/users/").
+        with(headers: { 'Authorization' => 'Bearer token' }).
+        to_return(status: 200, body: { staffId: 1 }.to_json, headers: {})
+    end
+
+    it 'is not visible' do
+      get :pending, params: { prison_id: prison }
+      expect(response).to redirect_to('/')
+    end
   end
 
   it 'gets pending records' do
