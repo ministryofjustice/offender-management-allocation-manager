@@ -3,7 +3,7 @@
 class TasksController < PrisonsApplicationController
   breadcrumb 'Case updates needed', ''
 
-  before_action :load_pom
+  before_action :ensure_pom
 
   def index
     sorted_tasks = sort_tasks(PomTasks.new.for_offenders(offenders))
@@ -31,11 +31,15 @@ private
     @offenders ||= PomCaseload.new(@pom.staff_id, active_prison_id).allocations.map(&:offender)
   end
 
-  def load_pom
+  def ensure_pom
     @pom = PrisonOffenderManagerService.get_signed_in_pom_details(
       current_user,
       active_prison_id
     )
+
+    if @pom.blank?
+      redirect_to '/'
+    end
   end
 
   def page

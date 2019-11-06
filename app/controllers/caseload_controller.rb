@@ -91,11 +91,15 @@ private
     allocations
   end
 
-  def load_pom
+  def ensure_pom
     @pom = PrisonOffenderManagerService.get_signed_in_pom_details(
       current_user,
       active_prison_id
     )
+
+    if @pom.blank?
+      redirect_to '/'
+    end
   end
 
   def page
