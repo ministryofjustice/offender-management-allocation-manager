@@ -113,7 +113,6 @@ RSpec.describe PomCaseload, type: :model do
     expect(released_offender).to be_nil
   end
 
-
   context 'when a POM has new and old allocations' do
     let(:old) { 8.days.ago }
 
