@@ -33,6 +33,8 @@ class MovementService
       return process_transfer(movement)
     end
 
+    Rails.logger.info("[MOVEMENT] Ignoring #{movement.movement_type}")
+
     false
   end
 
@@ -40,6 +42,8 @@ private
 
   def self.process_transfer(transfer)
     return false unless transfer.direction_code == 'IN'
+
+    Rails.logger.info("[MOVEMENT] Processing transfer for #{transfer.offender_no}")
 
     if PrisonService.open_prison?(transfer.to_agency)
       # There are special rules for responsibility when offenders
@@ -58,15 +62,13 @@ private
       prison: transfer.to_agency
     ).count > 0
 
-      Rails.logger.info("Offender #{transfer.offender_no} was transferred but \
+      Rails.logger.info("[MOVEMENT] Offender #{transfer.offender_no} was transferred but \
         an allocation at #{transfer.to_agency} already exists")
 
       return false
     end
 
-    Rails.logger.info("Processing transfer for #{transfer.offender_no}")
-
-    return false unless should_process?(transfer.offender_no)
+    Rails.logger.info("[MOVEMENT] De-allocating #{transfer.offender_no}")
 
     AllocationVersion.deallocate_offender(transfer.offender_no,
                                           AllocationVersion::OFFENDER_TRANSFERRED)
@@ -79,16 +81,12 @@ private
   def self.process_release(release)
     return false unless release.to_agency == 'OUT' && release.from_prison?
 
-    Rails.logger.info("Processing release for #{release.offender_no}")
+    Rails.logger.info("[MOVEMENT] Processing release for #{release.offender_no}")
+
     CaseInformation.where(nomis_offender_id: release.offender_no).destroy_all
     AllocationVersion.deallocate_offender(release.offender_no,
                                           AllocationVersion::OFFENDER_RELEASED)
 
     true
-  end
-
-  def self.should_process?(offender_no)
-    offender = OffenderService.get_offender(offender_no)
-    offender.convicted? && offender.over_18? && offender.criminal_sentence?
   end
 end
