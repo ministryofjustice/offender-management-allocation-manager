@@ -41,10 +41,10 @@
         <%= sort_arrow('primary_pom_allocated_at') %>
       </th>
       <th class="govuk-table__header" scope="col">
-        <a href="<%= sort_link('responsibility') %>">
+        <a href="<%= sort_link('pom_responsibility') %>">
           Role
         </a>
-        <%= sort_arrow('responsibility') %>
+        <%= sort_arrow('pom_responsibility') %>
       </th>
       <th class="govuk-table__header" scope="col">Action</th>
     </tr>
@@ -66,7 +66,7 @@
         <td aria-label="Arrival date" class="govuk-table__cell"><%= format_date(allocation.sentence_start_date) %></td>
         <td aria-label="Release date" class="govuk-table__cell"><%= format_date(allocation.earliest_release_date) %></td>
         <td aria-label="Allocation date" class="govuk-table__cell "><%= format_date(allocation.primary_pom_allocated_at) %></td>
-        <td aria-label="Role" class="govuk-table__cell "><%= allocation.responsibility %></td>
+        <td aria-label="Role" class="govuk-table__cell "><%= allocation.pom_responsibility %></td>
         <td aria-label="Action" class="govuk-table__cell ">
           <%= link_to('View', prison_prisoner_path(@prison.code, allocation.nomis_offender_id), class: "govuk-link" ) %>
         </td>

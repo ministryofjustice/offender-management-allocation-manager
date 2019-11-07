@@ -20,6 +20,9 @@ class OffenderPresenter
   end
 
   def pom_responsibility
+    # If this presenter was provided with a responsibility object from
+    # a responsibility override, we will return that, falling back on
+    # asking the offender class to calculate it.
     if @responsibility
       if @responsibility.value == Responsibility::PRISON
         ResponsibilityService::RESPONSIBLE
