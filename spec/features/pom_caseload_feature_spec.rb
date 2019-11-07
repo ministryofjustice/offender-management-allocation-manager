@@ -119,8 +119,6 @@ feature "view POM's caseload" do
                               "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
           "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 }
         ].to_json, headers: {})
-
-    allow_any_instance_of(Nomis::OffenderBase).to receive(:handover_start_date).and_return([tomorrow, nil])
   end
 
   context 'when paginating', vcr: { cassette_name: :show_poms_caseload } do
@@ -202,23 +200,31 @@ feature "view POM's caseload" do
   end
 
   context 'when looking at handover start', vcr: { cassette_name: :show_poms_caseload_handover_start } do
+    # T3 has old data, so we need to go back in time to see anyone waiting to
+    # be handed-over in the 'next' month
+    let(:todays_date) { Date.new(2016, 8, 10) }
+
     before {
       signin_pom_user
-      visit prison_caseload_index_path('LEI')
+      Timecop.travel todays_date do
+        visit prison_caseload_index_path('LEI')
+      end
     }
 
     it 'shows the number of upcoming handovers' do
       within('.upcoming-handover-count') do
-        expect(find('a').text).to eq('21')
+        expect(find('a').text).to eq('2')
       end
     end
 
     it 'can show us all upcoming handovers' do
       within('.upcoming-handover-count') do
-        click_link('21')
+        Timecop.travel todays_date do
+          click_link('2')
+        end
       end
 
-      expect(page).to have_css('tbody tr.govuk-table__row', count: 21)
+      expect(page).to have_css('tbody tr.govuk-table__row', count: 2)
     end
   end
 
