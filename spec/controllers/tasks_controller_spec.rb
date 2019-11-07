@@ -23,13 +23,17 @@ RSpec.describe TasksController, type: :controller do
 
     offenders = [
       { "latestBookingId": 754_207, "offenderNo": "G7514GW", "firstName": "Alice", "lastName": "Aliceson",
-        "dateOfBirth": "1990-12-06", "age": 28, "agencyId": prison, "categoryCode": "C", "imprisonmentStatus": "LIFE" },
+        "dateOfBirth": "1990-12-06", "age": 28, "categoryCode": "C", "imprisonmentStatus": "LIFE",
+        "convictedStatus": "Convicted", "latestLocationId": prison },
       { "latestBookingId": 754_206, "offenderNo": "G1234VV", "firstName": "Bob", "lastName": "Bibby",
-        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03" },
+        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03",
+        "convictedStatus": "Convicted", "latestLocationId": prison },
       { "latestBookingId": 754_205, "offenderNo": "G1234AB", "firstName": "Carole", "lastName": "Caroleson",
-        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03" },
+        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03",
+        "convictedStatus": "Convicted", "latestLocationId": prison },
       { "latestBookingId": 754_204, "offenderNo": "G1234GG", "firstName": "David", "lastName": "Davidson",
-        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03" }
+        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03",
+        "convictedStatus": "Convicted", "latestLocationId": prison }
     ]
 
     bookings = [

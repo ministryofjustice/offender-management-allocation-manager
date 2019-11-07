@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class PomCaseload
-  include Rails.application.routes.url_helpers
-
   def initialize(pom_staff_id, prison_id)
     @staff_id = pom_staff_id
     @prison_id = prison_id
@@ -37,11 +35,13 @@ private
         alloc.nomis_offender_id == offender.offender_no
       }
 
-      AllocatedOffender.new(
+      allocated_offender = AllocatedOffender.new(
         @staff_id,
         allocation,
         offender
       )
-    }
+
+      allocated_offender if allocated_offender.valid?
+    }.compact
   end
 end
