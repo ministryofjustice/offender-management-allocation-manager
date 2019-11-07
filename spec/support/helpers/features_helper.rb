@@ -1,5 +1,4 @@
 module FeaturesHelper
-
   # Signs in a user which historically has always been an SPO. For backwards
   # compatability this continues to mock sso for an SPO, but we should move
   # in future to one of the explicit signin_*_user methods below.
