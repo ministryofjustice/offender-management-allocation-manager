@@ -51,7 +51,7 @@ describe ResponsibilityService do
     context 'when offender is english' do
       let(:offender) {
         OpenStruct.new welsh_offender: false,
-                       case_allocation: case_allocation,
+                       nps_case?: case_allocation == 'NPS',
                        indeterminate_sentence?: false,
                        recalled?: recalled,
                        sentence_start_date: start_date,

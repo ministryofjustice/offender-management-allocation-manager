@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class HandoverDateService
+  # These 2 methods both return a pair of results - the actual answer and the
+  # reason for the calculation. The reason is put into hidden parts of the web
+  # page to help with debugging
   def self.handover_start_date(offender)
     return [nil, 'No earliest release date'] if offender.earliest_release_date.nil?
 

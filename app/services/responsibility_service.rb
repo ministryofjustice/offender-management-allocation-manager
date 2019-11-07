@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class ResponsibilityService
+  # This is to prevent clients asking ResponsibilityService#calculate_pom_responsibility == 'Responsible'
   Responsibility = Struct.new(:description, :custody?) do
     def to_s
       description
@@ -10,7 +11,6 @@ class ResponsibilityService
   RESPONSIBLE = Responsibility.new 'Responsible', true
   SUPPORTING = Responsibility.new 'Supporting', false
   COWORKING = 'Co-Working'
-  NPS = 'NPS'
 
   WELSH_POLICY_START_DATE = DateTime.new(2019, 2, 4).utc.to_date
   ENGLISH_POLICY_START_DATE = DateTime.new(2019, 10, 1).utc.to_date
@@ -38,7 +38,7 @@ private
   def self.welsh_rules(offender)
     if offender.recalled?
       SUPPORTING
-    elsif nps_case?(offender)
+    elsif offender.nps_case?
       welsh_nps_rules(offender)
     else
       crc_rules(offender)
@@ -80,7 +80,7 @@ private
   end
 
   def self.english_policy_rules(offender)
-    if nps_case?(offender)
+    if offender.nps_case?
       if release_date_gt_10_mths?(offender)
         RESPONSIBLE
       else
@@ -97,7 +97,7 @@ private
   end
 
   def self.english_prepolicy_rules(offender)
-    if nps_case?(offender)
+    if offender.nps_case?
       if hub_or_private?(offender)
         threshold = 20.months
       else
@@ -127,10 +127,6 @@ private
 
   def self.welsh_offender?(offender)
     offender.welsh_offender == true
-  end
-
-  def self.nps_case?(offender)
-    offender.case_allocation == NPS
   end
 
   def self.release_date_gt_10_mths?(offender)
