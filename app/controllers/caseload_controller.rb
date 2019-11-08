@@ -97,10 +97,6 @@ private
       current_user,
       active_prison_id
     )
-
-    if @pom.blank?
-      redirect_to '/'
-    end
   end
 
   def page
