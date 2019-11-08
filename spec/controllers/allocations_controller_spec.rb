@@ -252,13 +252,14 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
   describe '#new' do
     let(:prison) { 'WSI' }
 
-    let(:offender_no) { 'G7806VO' }
-
+    # This needs to be indeterminate so that it comes back 'RESPONSIBLE'
     before do
-      stub_offender(offender_no)
+      stub_offender(offender_no, imprisonment_status: 'SEC94')
     end
 
     context 'when tier A offender' do
+      let(:offender_no) { 'G7806VX' }
+
       it 'serves recommended POMs' do
         create(:case_information, nomis_offender_id: offender_no, tier: 'A')
 
@@ -271,6 +272,8 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
     end
 
     context 'when tier D offender' do
+      let(:offender_no) { 'G7807VV' }
+
       it 'serves recommended POMs' do
         create(:case_information, nomis_offender_id: offender_no, tier: 'D')
 

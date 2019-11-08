@@ -125,11 +125,19 @@ module Nomis
     end
 
     def handover_start_date
-      HandoverDateService.handover_start_date(self)
+      if @sentence_type.recall_sentence?
+        [nil, 'Recalled']
+      else
+        HandoverDateService.handover_start_date(self)
+      end
     end
 
     def responsibility_handover_date
-      HandoverDateService.responsibility_handover_date(self)
+      if @sentence_type.recall_sentence?
+        [nil, 'Recalled']
+      else
+        HandoverDateService.responsibility_handover_date(self)
+      end
     end
 
     def load_case_information(record)
