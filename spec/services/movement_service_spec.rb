@@ -132,11 +132,15 @@ describe MovementService do
 
     it "will not process offenders on remand",
        vcr: { cassette_name: :movement_service_transfer_in__not_convicted_spec }  do
+      # Originally we did not want to process non-convicted offenders, so offenders on remand
+      # who were moved were not de-allocated (as they should never have been allocated).  This
+      # optimisation has come back to bite us as it is entirely possible someone who is allocated
+      # could be switched to remand immediately, so now we expect this to succeed.
       allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new.tap{ |o|
         o.convicted_status = "Remand"
       })
       processed = described_class.process_movement(transfer_in)
-      expect(processed).to be false
+      expect(processed).to be true
     end
   end
 

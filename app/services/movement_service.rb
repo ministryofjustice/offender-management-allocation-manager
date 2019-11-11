@@ -66,8 +66,6 @@ private
 
     Rails.logger.info("Processing transfer for #{transfer.offender_no}")
 
-    return false unless should_process?(transfer.offender_no)
-
     AllocationVersion.deallocate_offender(transfer.offender_no,
                                           AllocationVersion::OFFENDER_TRANSFERRED)
     true
@@ -85,10 +83,5 @@ private
                                           AllocationVersion::OFFENDER_RELEASED)
 
     true
-  end
-
-  def self.should_process?(offender_no)
-    offender = OffenderService.get_offender(offender_no)
-    offender.convicted? && offender.over_18? && offender.criminal_sentence?
   end
 end
