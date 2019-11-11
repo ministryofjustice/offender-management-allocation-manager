@@ -35,13 +35,11 @@ private
         alloc.nomis_offender_id == offender.offender_no
       }
 
-      allocated_offender = AllocatedOffender.new(
+      AllocatedOffender.new(
         @staff_id,
         allocation,
         offender
       )
-
-      allocated_offender if allocated_offender.valid?
-    }.compact
+    }.select(&:valid?)
   end
 end
