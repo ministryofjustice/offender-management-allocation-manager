@@ -98,7 +98,7 @@ class AllocationVersion < ApplicationRecord
     alloc.deallocate_and_save(event, movement_type)
   end
 
-  def deallocate_and_save event, event_trigger
+  def deallocate_and_save(event, event_trigger)
     self.primary_pom_nomis_id = nil
     self.primary_pom_name = nil
     self.primary_pom_allocated_at = nil
