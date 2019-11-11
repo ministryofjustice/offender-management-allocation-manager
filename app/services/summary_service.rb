@@ -87,10 +87,10 @@ private
     movements = Nomis::Elite2::MovementApi.admissions_for(offenders.map(&:offender_no))
 
     offenders.each do |offender|
-      arrival = movements[offender.offender_no].reverse.detect { |movement|
+      arrival = movements.fetch(offender.offender_no, []).reverse.detect { |movement|
         movement.to_agency == offender.prison_id
       }
-      offender.prison_arrival_date = [offender.sentence_start_date, arrival.create_date_time].compact.max
+      offender.prison_arrival_date = [offender.sentence_start_date, arrival&.create_date_time].compact.max
     end
   end
 
