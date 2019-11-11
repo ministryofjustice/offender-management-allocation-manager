@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 describe MovementService do
+  include ActiveJob::TestHelper
+
   let!(:new_offender_court) { create(:movement, offender_no: 'G4273GI', from_agency: 'COURT')   }
   let!(:new_offender_nil) { create(:movement, offender_no: 'G4273GI', from_agency: nil)   }
   let!(:transfer_out) { create(:movement, offender_no: 'G4273GI', direction_code: 'OUT', movement_type: 'TRN')   }
@@ -124,6 +126,16 @@ describe MovementService do
       expect(processed).to be false
     end
 
+    it "can starts an open prison transfer",
+       vcr: { cassette_name: :movement_service_transfer_to_open_spec }  do
+      open_prison_transfer = create(:movement, offender_no: 'G4273GI', to_agency: 'HDI')
+
+      expect {
+        processed = described_class.process_movement(open_prison_transfer)
+        expect(processed).to be true
+      }.to change(enqueued_jobs, :count).by(1)
+    end
+
     it "can process a movement with no 'to' agency",
        vcr: { cassette_name: :movement_service_admission_in_spec }  do
       processed = described_class.process_movement(admission)
@@ -141,6 +153,13 @@ describe MovementService do
       })
       processed = described_class.process_movement(transfer_in)
       expect(processed).to be true
+    end
+
+    it "will ignore an unknown movement type",
+       vcr: { cassette_name: :movement_service_unknown_spec }  do
+      unknown_movement_type = create(:movement, offender_no: 'G4273GI', movement_type: 'TMP')
+      processed = described_class.process_movement(unknown_movement_type)
+      expect(processed).to be false
     end
   end
 
