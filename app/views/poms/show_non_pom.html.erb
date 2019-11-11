@@ -4,8 +4,8 @@
 
 <h1 class="govuk-heading-l">This Prison Offender Manager does not appear to be active</h1>
 <p class="govuk-body">This Prison Offender Manager no longer has a POM role assigned to them at this prison.</p>
-<p class="govuk-body">If this POM has changed jobs, or is going to be away from work for a while, you must set their status to inactive,
-  this will release their cases so they can be reallocated</p>
+<p class="govuk-body">If this POM has changed jobs, or is going to be away from work for a while, you must set their status to inactive.
+  This will release their cases so they can be reallocated.</p>
 
 <p class="govuk-body">
 <%= link_to "Set this POM's status to inactive", prison_pom_path(@prison.code, @nomis_staff_id), class: 'govuk-link' %>
