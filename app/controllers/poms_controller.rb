@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class PomsController < PrisonsApplicationController
+  before_action :ensure_admin_user
+
   # so that breadcrumb has staff member available
   before_action :load_pom_staff_member, only: [:show, :edit]
 
