@@ -16,7 +16,7 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
     create(:case_information, nomis_offender_id: nomis_offender_id)
     create(:allocation_version, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id, nomis_booking_id: booking_id)
 
-    signin_user
+    signin_pom_user
 
     visit prison_caseload_index_path(prison)
 
