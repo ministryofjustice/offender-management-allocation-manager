@@ -6,13 +6,11 @@ class PrisonOffenderManagerService
     poms = Nomis::Elite2::PrisonOffenderManagerApi.list(prison)
     pom_details = PomDetail.where(nomis_staff_id: poms.map(&:staff_id).map(&:to_i))
 
-    poms = poms.map { |pom|
+    poms.map { |pom|
       detail = get_pom_detail(pom_details, pom.staff_id.to_i)
       pom.add_detail(detail, prison)
       pom
-    }.compact
-
-    poms
+    }
   end
 
   def self.get_pom_at(prison_id, nomis_staff_id)
@@ -65,14 +63,14 @@ class PrisonOffenderManagerService
     poms_list.find { |p| p.staff_id.to_i == user.staff_id.to_i }
   end
 
-private
+  private
 
   def self.get_pom_detail(pom_details, nomis_staff_id)
     pom_details.detect { |pd| pd.nomis_staff_id == nomis_staff_id } ||
-        PomDetail.find_or_create_by!(nomis_staff_id: nomis_staff_id) do |pom|
-          pom.working_pattern = 0.0
-          pom.status = 'active'
-        end
+      PomDetail.find_or_create_by!(nomis_staff_id: nomis_staff_id) do |pom|
+        pom.working_pattern = 0.0
+        pom.status = 'active'
+      end
   end
 
   def self.log_missing_pom(caseload, nomis_staff_id)
