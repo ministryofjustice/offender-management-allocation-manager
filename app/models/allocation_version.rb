@@ -102,7 +102,9 @@ class AllocationVersion < ApplicationRecord
   end
 
   # note: this creates an allocation where the co-working POM is set, but the primary
-  # one is not. It should still show up in the 'waiting to allocate' bucket
+  # one is not. It should still show up in the 'waiting to allocate' bucket.
+  # This appears to be safe as allocations only show up for viewing if they have
+  # a non-nil primary_pom_nomis_id
   def self.deallocate_primary_pom(nomis_staff_id, prison)
     active_pom_allocations(nomis_staff_id, prison).each do |alloc|
       alloc.primary_pom_nomis_id = nil
