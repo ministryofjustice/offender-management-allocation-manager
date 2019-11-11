@@ -1,8 +1,28 @@
 <%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
 
 <% if @override.errors.count > 0 %>
-  <%= render :partial => "/shared/validation_errors", :locals => { :errors => @override.errors } %>
+  <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+    <h2 class="govuk-error-summary__title" id="error-summary-title">
+      There is a problem
+    </h2>
+    <div class="govuk-error-summary__body">
+      <ul class="govuk-list govuk-error-summary__list">
+        <% if @override.errors[:override_reasons] %>
+          <li><a href="#override-conditional-1"><%= @override.errors[:override_reasons].first %></a></li>
+        <% end %>
+
+        <% if @override.errors[:suitability_detail] %>
+          <li><a href="#suitability-detail"><%= @override.errors[:suitability_detail].first %></a></li>
+        <% end %>
+
+        <% if @override.errors[:more_detail] %>
+          <li><a href="#more-detail"><%= @override.errors[:more_detail].first %></a></li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
 <% end %>
+
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
     <%= form_tag(prison_overrides_path(@prison.code), method: :post, id: "override_form")  do %>
@@ -17,6 +37,11 @@
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--s govuk-!-margin-bottom-4">
               <h1 class="govuk-fieldset__heading">Choose all that apply:</h1>
             </legend>
+
+            <span id="override-error" class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> <%= @override.errors[:override_reasons].first %>
+            </span>
+
             <div class="govuk-checkboxes" data-module="govuk-checkboxes">
               <%= hidden_field_tag("override[nomis_offender_id]", @prisoner.offender_no) %>
               <%= hidden_field_tag("override[nomis_staff_id]", @pom.staff_id) %>
@@ -28,6 +53,7 @@
                 <label class="govuk-label govuk-checkboxes__label"
                        for="override-conditional-1"><%= complex_reason_label(@prisoner.recommended_pom_type) %></label>
               </div>
+
               <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="override-1">
                 <% if @override.errors[:suitability_detail].present? %>
                   <span class="govuk-error-message">
@@ -64,10 +90,12 @@
                     <%= @override.errors[:more_detail].first %>
                   </span>
                 <% end %>
-                <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="175">
-                  <div class="govuk-form-group">
-                    <label class="govuk-label" for="provide-detail">Please provide detail here</label>
-                    <textarea class="govuk-textarea js-character-count govuk-textarea--error" id="more-detail" name="override[more_detail]" rows="3" aria-describedby="more-detail-hint more-detail-error"></textarea>
+                <div class="govuk-form-group <% if @override.errors[:more_detail].present? %>govuk-form-group--error<% end %>">
+                  <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="175">
+                    <div class="govuk-form-group">
+                      <label class="govuk-label" for="provide-detail">Please provide detail here</label>
+                      <textarea class="govuk-textarea js-character-count" id="more-detail" name="override[more_detail]" rows="3" aria-describedby="more-detail-hint more-detail-error"></textarea>
+                    </div>
                   </div>
                 </div>
               </div>
