@@ -51,12 +51,6 @@ class AllocationVersion < ApplicationRecord
     )
   }
 
-  validate do |alloc|
-    if alloc.secondary_pom_nomis_id.present? && alloc.primary_pom_nomis_id.blank? &&
-      errors.add(:secondary_pom_nomis_id, "Can't have a secondary POM in an allocation without a primary POM")
-    end
-  end
-
   validate do |av|
     if av.primary_pom_nomis_id.present? &&
       av.primary_pom_nomis_id == av.secondary_pom_nomis_id
@@ -82,6 +76,19 @@ class AllocationVersion < ApplicationRecord
 
     alloc.prison = prison_fix(alloc, movement_type) if alloc.prison.blank?
 
+    alloc.primary_pom_nomis_id = nil
+    alloc.primary_pom_name = nil
+    alloc.primary_pom_allocated_at = nil
+    alloc.secondary_pom_nomis_id = nil
+    alloc.secondary_pom_name = nil
+    alloc.recommended_pom_type = nil
+    if movement_type == AllocationVersion::OFFENDER_RELEASED
+      alloc.event = DEALLOCATE_RELEASED_OFFENDER
+    else
+      alloc.event = DEALLOCATE_PRIMARY_POM
+    end
+    alloc.event_trigger = movement_type
+
     # This is triggered when an offender is released, and previously we
     # were setting their prison to nil to show that the current allocation
     # object for this offender meant they were unallocated.  However, we use
@@ -90,29 +97,22 @@ class AllocationVersion < ApplicationRecord
     # was released from. So now, we do not blank the prison.
     #
     # Perhaps a better event name is `OFFENDER_RELEASED`.
-    event = if movement_type == AllocationVersion::OFFENDER_RELEASED
-              DEALLOCATE_RELEASED_OFFENDER
-            else
-              DEALLOCATE_PRIMARY_POM
-            end
-    alloc.deallocate_and_save(event, movement_type)
+
+    alloc.save!
   end
 
-  def deallocate_and_save(event, event_trigger)
-    self.primary_pom_nomis_id = nil
-    self.primary_pom_name = nil
-    self.primary_pom_allocated_at = nil
-    self.secondary_pom_nomis_id = nil
-    self.secondary_pom_name = nil
-    self.recommended_pom_type = nil
-    self.event = event
-    self.event_trigger = event_trigger
-    save!
-  end
-
+  # note: this creates an allocation where the co-working POM is set, but the primary
+  # one is not. It should still show up in the 'waiting to allocate' bucket
   def self.deallocate_primary_pom(nomis_staff_id, prison)
     active_pom_allocations(nomis_staff_id, prison).each do |alloc|
-      alloc.deallocate_and_save DEALLOCATE_PRIMARY_POM, USER
+      alloc.primary_pom_nomis_id = nil
+      alloc.primary_pom_name = nil
+      alloc.recommended_pom_type = nil
+      alloc.primary_pom_allocated_at = nil
+      alloc.event = DEALLOCATE_PRIMARY_POM
+      alloc.event_trigger = USER
+
+      alloc.save!
     end
   end
 
