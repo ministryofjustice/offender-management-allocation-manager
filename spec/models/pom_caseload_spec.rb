@@ -3,7 +3,8 @@ require 'rails_helper'
 RSpec.describe PomCaseload, type: :model do
   let(:prison) { 'LEI' }
   let(:staff_id) { 123 }
-  let(:offenders) { [
+  let(:offenders) {
+    [
       OpenStruct.new(offender_no: 'G7514GW', prison_id: prison, convicted?: true, sentenced?: true,
                      indeterminate_sentence?: true, nps_case?: true, pom_responsibility: 'Supporting'),
       OpenStruct.new(offender_no: 'G1234VV', prison_id: prison, convicted?: true, sentenced?: true,
@@ -15,13 +16,13 @@ RSpec.describe PomCaseload, type: :model do
       # We expect the offender below to not count towards the caseload totals because they have been released,
       # they may however be returned from get_multiple_offenders where the IDs to fetched are obtained from
       # current allocations (e.g. an invalid allocation)
-      OpenStruct.new(offender_no: 'G9999GG', prison_id: 'OUT', convicted?: true, sentenced?: true, nps_case?: true),
+      OpenStruct.new(offender_no: 'G9999GG', prison_id: 'OUT', convicted?: true, sentenced?: true, nps_case?: true)
     ]
   }
 
   before do
-    allow(OffenderService).to receive(:get_multiple_offenders)
-      .and_return(offenders)
+    allow(OffenderService).to receive(:get_multiple_offenders).
+      and_return(offenders)
 
     # # Allocate all of the offenders to this POM
     offenders.each do |offender|
