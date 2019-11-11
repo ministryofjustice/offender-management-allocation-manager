@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class CaseInformationController < PrisonsApplicationController
+  before_action :ensure_admin_user
   before_action :set_case_info, only: [:edit, :edit_prd, :show]
   before_action :set_prisoner_from_url, only: [:new, :edit, :edit_prd, :show]
 
