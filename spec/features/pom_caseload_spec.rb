@@ -133,7 +133,7 @@ feature "view POM's caseload" do
                            'Ebonuardo, Omimchi', 'Felitha, Asjmonzo', 'Gabrijah, Eastzo', 'Hah, Dyfastoaul',
                            'Ibriyah, Aiamce', 'Jabexia, Elnuunbo', 'Kaceria, Omaertain'
       ])
-      signin_user('PK000223')
+      signin_pom_user
 
       visit prison_caseload_index_path('LEI')
     end
@@ -203,7 +203,7 @@ feature "view POM's caseload" do
 
   context 'when looking at handover start', vcr: { cassette_name: :show_poms_caseload_handover_start } do
     before {
-      signin_user('PK000223')
+      signin_pom_user
       visit prison_caseload_index_path('LEI')
     }
 
@@ -223,12 +223,7 @@ feature "view POM's caseload" do
   end
 
   it 'allows a POM to view the prisoner profile page for a specific offender',  vcr: { cassette_name: :show_poms_caseload_prisoner_profile } do
-    signin_user('PK000223')
-
-    visit prison_confirm_allocation_path('LEI', nomis_offender_id, nomis_staff_id)
-
-    click_button 'Complete allocation'
-
+    signin_pom_user
     visit prison_caseload_index_path('LEI')
 
     within('.offender_row_0') do
@@ -242,11 +237,7 @@ feature "view POM's caseload" do
   end
 
   it 'displays all cases that have been allocated to a specific POM in the last week', :versioning, vcr: { cassette_name: :show_new_cases } do
-    signin_user('PK000223')
-
-    visit prison_confirm_allocation_path('LEI', nomis_offender_id, nomis_staff_id)
-    click_button 'Complete allocation'
-
+    signin_pom_user
     visit prison_caseload_index_path('LEI')
     within('.new-cases-count') do
       click_link('1')
@@ -257,11 +248,8 @@ feature "view POM's caseload" do
   end
 
   it 'can sort all cases that have been allocated to a specific POM in the last week', :versioning, vcr: { cassette_name: :show_and_sort_new_cases } do
-    signin_user('PK000223')
-
-    visit prison_confirm_allocation_path('LEI', nomis_offender_id, nomis_staff_id)
-    click_button 'Complete allocation'
-
+    # Sign in as a POM
+    signin_pom_user
     visit prison_caseload_index_path('LEI')
     within('.new-cases-count') do
       click_link('1')

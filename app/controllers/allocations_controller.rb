@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class AllocationsController < PrisonsApplicationController
+  before_action :ensure_admin_user
+
   delegate :update, to: :create
 
   breadcrumb 'Allocated', -> { prison_summary_allocated_path(active_prison_id) }, only: [:show]
