@@ -91,6 +91,33 @@ RSpec.describe EmailService, :queueing do
     }.to change(enqueued_jobs, :size).by(0)
   end
 
+  context 'when offender has been released', versioning: true do
+    let!(:released_allocation) do
+      x = create(:allocation_version,
+                 nomis_offender_id: original_allocation.nomis_offender_id,
+                 primary_pom_nomis_id: original_allocation.primary_pom_nomis_id)
+      AllocationVersion.deallocate_offender(x.nomis_offender_id, AllocationVersion::OFFENDER_RELEASED)
+      x.reload
+      x.update!(primary_pom_nomis_id: reallocation.primary_pom_nomis_id,
+                event: AllocationVersion::REALLOCATE_PRIMARY_POM,
+                event_trigger: AllocationVersion::USER)
+      AllocationVersion.deallocate_offender(x.nomis_offender_id, AllocationVersion::OFFENDER_RELEASED)
+      x.reload
+      x.update!(primary_pom_nomis_id: original_allocation.primary_pom_nomis_id,
+                event: AllocationVersion::REALLOCATE_PRIMARY_POM,
+                event_trigger: AllocationVersion::USER)
+      x
+    end
+
+    it "Can send a reallocation email", vcr: { cassette_name: :email_service_reallocation_crash } do
+      expect {
+        described_class.instance(allocation: released_allocation, message: "", pom_nomis_id: released_allocation.primary_pom_nomis_id).send_email
+      }.to change(enqueued_jobs, :size).by(2)
+      # POM 485_833 is Andrien
+      expect(enqueued_jobs.last[:args][3]['pom_email']).to eq("andrien.ricketts@digital.justice.gov.uk")
+    end
+  end
+
   it "Can send a reallocation email", vcr: { cassette_name: :email_service_send_deallocation_email }, versioning: true  do
     allow(AllocationService).to receive(:get_versions_for).and_return([original_allocation])
 
