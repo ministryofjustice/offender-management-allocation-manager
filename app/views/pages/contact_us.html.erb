@@ -66,44 +66,58 @@
                   <span class="govuk-error-message">
                     <%= @contact.errors[:name].first %>
                   </span>
+            <%= text_field_tag("name", @contact.name, id: "name", class: "govuk-input govuk-input--error") %>
+          <% else %>
+            <%= text_field_tag("name", @contact.name, id: "name", class: "govuk-input") %>
           <% end %>
-          <%= text_field_tag("name", @contact.name, id: "name", class: "govuk-input") %>
         </div>
+
         <div class="<%= field_error(@contact.errors, :email_address) %>">
           <%= label_tag "email_address", "Email address", class: 'govuk-label' %>
           <% if @contact.errors[:email_address].present? %>
                 <span class="govuk-error-message">
                   <%= @contact.errors[:email_address].first %>
                 </span>
+            <%= email_field_tag("email_address", @contact.email_address, id: "email_address", class: "govuk-input govuk-input--error") %>
+          <% else %>
+            <%= email_field_tag("email_address", @contact.email_address, id: "email_address", class: "govuk-input") %>
           <% end %>
-          <%= email_field_tag("email_address", @contact.email_address, id: "email_address", class: "govuk-input") %>
         </div>
+
         <div class="<%= field_error(@contact.errors, :job_type) %>">
           <%= label_tag "Your job role", "Your job role", class: 'govuk-label' %>
           <% if @contact.errors[:job_type].present? %>
                   <span class="govuk-error-message">
                     <%= @contact.errors[:job_type].first %>
                   </span>
+            <%= text_field_tag("job_type", nil, id: "job_type", class: "govuk-input govuk-input--error") %>
+          <% else %>
+            <%= text_field_tag("job_type", nil, id: "job_type", class: "govuk-input") %>
           <% end %>
-          <%= text_field_tag("job_type", nil, id: "job_type", class: "govuk-input") %>
         </div>
+
         <div class="<%= field_error(@contact.errors, :prison) %>">
           <%= label_tag "prison", "Prison name", class: 'govuk-label' %>
           <% if @contact.errors[:prison].present? %>
                   <span class="govuk-error-message">
                     <%= @contact.errors[:prison].first %>
                   </span>
+            <%= text_field_tag("prison", @contact.prison, id: "prison", class: "govuk-input govuk-input--error") %>
+          <% else %>
+            <%= text_field_tag("prison", @contact.prison, id: "prison", class: "govuk-input") %>
           <% end %>
-          <%= text_field_tag("prison", @contact.prison, id: "prison", class: "govuk-input") %>
         </div>
+
         <div class="<%= field_error(@contact.errors, :message) %>">
           <%= label_tag "Describe what you need help with", "Describe what you need help with", class: 'govuk-label' %>
           <% if @contact.errors[:message].present? %>
                   <span class="govuk-error-message">
                     <%= @contact.errors[:message].first %>
                   </span>
+            <%= text_area_tag("message", nil, rows: 10, id: "message", class: "govuk-textarea govuk-textarea--error") %>
+          <% else %>
+            <%= text_area_tag("message", nil, rows: 10, id: "message", class: "govuk-textarea") %>
           <% end %>
-          <%= text_area_tag("message", nil, rows: 10, id: "message", class: "govuk-textarea") %>
         </div>
         <button class="govuk-button" type="submit">Submit</button>
       <% end %>
