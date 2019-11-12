@@ -5,9 +5,9 @@
   </h2>
   <div class="govuk-error-summary__body">
     <ul class="govuk-list govuk-error-summary__list">
-      <% errors.messages.each_with_index do |(_field, message), index| %>
+      <% errors.messages.each do |_field, message| %>
         <li>
-          <%= link_to(message.first, url_path[index]) %>
+          <%= link_to(message.first) %>
         </li>
       <% end %>
     </ul>
