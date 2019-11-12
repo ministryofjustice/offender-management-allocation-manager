@@ -3,14 +3,16 @@
 class PrisonOffenderManagerService
   # Note - get_poms_for and get_pom_at return different data...
   def self.get_poms_for(prison)
+    # This API call doesn't do what it says on the tin. It can return duplicate
+    # staff_ids in the situation where someone has more than one role.
     poms = Nomis::Elite2::PrisonOffenderManagerApi.list(prison)
-    pom_details = PomDetail.where(nomis_staff_id: poms.map(&:staff_id).map(&:to_i))
+    pom_details = PomDetail.where(nomis_staff_id: poms.map(&:staff_id))
 
     poms.map { |pom|
       detail = get_pom_detail(pom_details, pom.staff_id.to_i)
       pom.add_detail(detail, prison)
       pom
-    }
+    }.select { |pom| pom.prison_officer? || pom.probation_officer? }.uniq(&:staff_id)
   end
 
   def self.get_pom_at(prison_id, nomis_staff_id)
@@ -63,7 +65,7 @@ class PrisonOffenderManagerService
     poms_list.find { |p| p.staff_id.to_i == user.staff_id.to_i }
   end
 
-  private
+private
 
   def self.get_pom_detail(pom_details, nomis_staff_id)
     pom_details.detect { |pd| pd.nomis_staff_id == nomis_staff_id } ||

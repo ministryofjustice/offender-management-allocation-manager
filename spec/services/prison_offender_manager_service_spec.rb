@@ -28,13 +28,21 @@ describe PrisonOffenderManagerService do
     end
 
     describe '#get_poms_for' do
+      subject {
+        described_class.get_poms_for('LEI')
+      }
+
+      let(:moic_integration_tests) { subject.detect { |x| x.first_name == 'MOIC' } }
+
       it "can get a list of POMs",
          vcr: { cassette_name: :pom_service_get_poms_list } do
-        poms = described_class.get_poms_for('LEI')
-        expect(poms).to be_kind_of(Array)
-        expect(poms.count).to eq(14)
-        # 1 POM in T3 (Toby Retallick) is marked inactive, so expect 13 active ones
-        expect(poms.select { |pom| pom.status == 'active' }.count).to eq(13)
+        expect(subject).to be_kind_of(Enumerable)
+        expect(subject.count).to eq(13)
+        # 1 POM in T3 (Toby Retallick) is marked inactive, so expect one less active one
+        expect(subject.select { |pom| pom.status == 'active' }.count).to eq(12)
+        # would like these to both be true as integratopn test user has both positions
+        # expect(moic_integration_tests.prison_officer?).to eq(true)
+        expect(moic_integration_tests.probation_officer?).to eq(true)
       end
     end
 
@@ -87,28 +95,36 @@ describe PrisonOffenderManagerService do
       }
       let(:charles) {
         {
-          firstName: 'Charles',
+          firstName: 'Alison',
           position: 'PPO',
-          staffId: 3,
+          staffId: 1,
           emails: ['test@digital.justice.org.uk']
         }
       }
       let(:dave) {
         {
-          firstName: 'Dave',
+          firstName: 'Billy Bob',
           position: 'AO',
-          staffId: 4,
+          staffId: 2,
+          emails: ['test@digital.justice.org.uk']
+        }
+      }
+      let(:eric) {
+        {
+          firstName: 'Billy Bob Eric',
+          position: 'PO',
+          staffId: 2,
           emails: ['test@digital.justice.org.uk']
         }
       }
 
-      let(:poms) { [alice, billy, charles, dave] }
+      let(:poms) { [dave, alice, billy, charles, eric] }
 
       before do
         stub_poms('WSI', poms)
       end
 
-      it 'filters out non PRO/PO people marked as POMs' do
+      it 'removes duplicate staff ids, keeping the valid position' do
         expect(described_class.get_poms_for('WSI').map(&:first_name)).to eq([alice, billy].map { |p| p[:firstName] })
       end
     end
