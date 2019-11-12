@@ -9,7 +9,7 @@ RSpec.describe PomCaseload, type: :model do
       {
         staffId: staff_id,
         username: username,
-        position: 'PRO'
+        position: RecommendationService::PRISON_POM
       }
     ]
   }

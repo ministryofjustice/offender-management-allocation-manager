@@ -5,22 +5,22 @@ RSpec.describe AllocationsController, type: :controller do
     [
       {
         firstName: 'Alice',
-        position: 'PRO',
+        position: RecommendationService::PRISON_POM,
         staffId: 1
       },
       {
         firstName: 'Bob',
-        position: 'PRO',
+        position: RecommendationService::PRISON_POM,
         staffId: 2
       },
       {
         firstName: 'Clare',
-        position: 'PO',
+        position: RecommendationService::PROBATION_POM,
         staffId: 3
       },
       {
         firstName: 'Dave',
-        position: 'PO',
+        position: RecommendationService::PROBATION_POM,
         staffId: 4
       }
     ]
@@ -60,7 +60,7 @@ RSpec.describe AllocationsController, type: :controller do
       let(:poms) {
         [{
           firstName: 'Alice',
-          position: 'PRO',
+          position: RecommendationService::PRISON_POM,
           staffId: 123
         }]
       }

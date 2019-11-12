@@ -35,7 +35,13 @@ class StaffMember
   def position(prison_id)
     poms = Nomis::Elite2::PrisonOffenderManagerApi.list(prison_id)
     this_pom = poms.detect { |pom| pom.staff_id == @staff_id }
-    this_pom.nil? ? 'STAFF' : this_pom.position
+    if this_pom.nil?
+      'STAFF'
+    elsif this_pom.prison_officer?
+      RecommendationService::PRISON_POM
+    else
+      RecommendationService::PROBATION_POM
+    end
   end
 
   def working_pattern
