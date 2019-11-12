@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'prometheus/client'
 
 class SearchController < PrisonsApplicationController
@@ -17,7 +18,7 @@ class SearchController < PrisonsApplicationController
     found_offenders = SearchService.search_for_offenders(@q, @prison)
     @offenders = get_slice_for_page(found_offenders)
 
-    MetricsService.instance.search_counter.increment()
+    MetricsService.instance.search_counter.increment
   end
 
 private

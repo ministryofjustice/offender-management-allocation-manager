@@ -6,7 +6,11 @@ unless Rails.env.test?
   require 'prometheus/middleware/collector'
   require 'prometheus/middleware/exporter'
 
-  use Rack::Deflater, :if => lambda { |*, body| sum=0; body.each { |i| sum += i.length }; sum > 512 }
+  use Rack::Deflater, if: lambda { |*, body|
+    sum = 0
+    body.each do |i| sum += i.length end
+    sum > 512
+  }
 
   use Prometheus::Middleware::Collector
   use Prometheus::Middleware::Exporter

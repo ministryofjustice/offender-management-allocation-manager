@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'prometheus/client'
-require "prometheus/client/data_stores/direct_file_store"
+require 'prometheus/client/data_stores/direct_file_store'
 require 'singleton'
 
 class MetricsService
@@ -19,12 +19,12 @@ class MetricsService
 
     @search_counter = @prometheus.counter(
       :search_total,
-      docstring: 'A counter of searches made',
+      docstring: 'A counter of searches made'
     )
 
     @delius_data_jobs = @prometheus.gauge(:delius_data_jobs,
-      docstring: "A gauge of the number of delius data jobs",
-      store_settings: { aggregation: :max }
+                                          docstring: 'A gauge of the number of delius data jobs',
+                                          store_settings: { aggregation: :max }
     )
   end
 end
