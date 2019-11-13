@@ -73,27 +73,21 @@ class AllocationVersion < ApplicationRecord
     JSON.parse(self[:override_reasons]) if self[:override_reasons].present?
   end
 
-  def self.deallocate_offender(nomis_offender_id, movement_type)
-    alloc = AllocationVersion.find_by(
-      nomis_offender_id: nomis_offender_id
-    )
+  def deallocate_offender(movement_type)
+    self.prison = prison_fix(movement_type) if prison.blank?
 
-    return if alloc.nil?
-
-    alloc.prison = prison_fix(alloc, movement_type) if alloc.prison.blank?
-
-    alloc.primary_pom_nomis_id = nil
-    alloc.primary_pom_name = nil
-    alloc.primary_pom_allocated_at = nil
-    alloc.secondary_pom_nomis_id = nil
-    alloc.secondary_pom_name = nil
-    alloc.recommended_pom_type = nil
+    self.primary_pom_nomis_id = nil
+    self.primary_pom_name = nil
+    self.primary_pom_allocated_at = nil
+    self.secondary_pom_nomis_id = nil
+    self.secondary_pom_name = nil
+    self.recommended_pom_type = nil
     if movement_type == AllocationVersion::OFFENDER_RELEASED
-      alloc.event = DEALLOCATE_RELEASED_OFFENDER
+      self.event = DEALLOCATE_RELEASED_OFFENDER
     else
-      alloc.event = DEALLOCATE_PRIMARY_POM
+      self.event = DEALLOCATE_PRIMARY_POM
     end
-    alloc.event_trigger = movement_type
+    self.event_trigger = movement_type
 
     # This is triggered when an offender is released, and previously we
     # were setting their prison to nil to show that the current allocation
@@ -104,7 +98,7 @@ class AllocationVersion < ApplicationRecord
     #
     # Perhaps a better event name is `OFFENDER_RELEASED`.
 
-    alloc.save!
+    save!
   end
 
   def self.deallocate_primary_pom(nomis_staff_id, prison)
@@ -120,19 +114,19 @@ class AllocationVersion < ApplicationRecord
     end
   end
 
-  def self.prison_fix(allocation, movement_type)
+  def prison_fix(movement_type)
     # In some cases we have old historical data which has no prison set
     # and this causes an issue should those offenders move or be released.
     # To handle this we will attempt to set the prison to a valid code
     # based on the event that has happened.
     if movement_type == AllocationVersion::OFFENDER_RELEASED
-      movements = Nomis::Elite2::MovementApi.movements_for(allocation.nomis_offender_id)
+      movements = Nomis::Elite2::MovementApi.movements_for(nomis_offender_id)
       if movements.present?
         movement = movements.last
         return movement.from_agency if movement.from_prison?
       end
     elsif movement_type == AllocationVersion::OFFENDER_TRANSFERRED
-      offender = OffenderService.get_offender(allocation.nomis_offender_id)
+      offender = OffenderService.get_offender(nomis_offender_id)
       offender.prison_id
     end
   end

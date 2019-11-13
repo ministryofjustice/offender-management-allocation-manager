@@ -96,12 +96,12 @@ RSpec.describe EmailService, :queueing do
       x = create(:allocation_version,
                  nomis_offender_id: original_allocation.nomis_offender_id,
                  primary_pom_nomis_id: original_allocation.primary_pom_nomis_id)
-      AllocationVersion.deallocate_offender(x.nomis_offender_id, AllocationVersion::OFFENDER_RELEASED)
+      x.deallocate_offender(AllocationVersion::OFFENDER_RELEASED)
       x.reload
       x.update!(primary_pom_nomis_id: reallocation.primary_pom_nomis_id,
                 event: AllocationVersion::REALLOCATE_PRIMARY_POM,
                 event_trigger: AllocationVersion::USER)
-      AllocationVersion.deallocate_offender(x.nomis_offender_id, AllocationVersion::OFFENDER_RELEASED)
+      x.deallocate_offender(AllocationVersion::OFFENDER_RELEASED)
       x.reload
       x.update!(primary_pom_nomis_id: original_allocation.primary_pom_nomis_id,
                 event: AllocationVersion::REALLOCATE_PRIMARY_POM,
