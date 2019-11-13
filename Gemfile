@@ -54,18 +54,21 @@ group :development, :test do
 end
 
 group :test do
-  gem 'timecop'
   gem 'capybara'
   gem 'database_cleaner'
   gem 'faker'
   gem 'geckodriver-helper'
   gem 'launchy'
+  gem 'rails-controller-testing'
+  gem 'ruby-prof', '>= 0.16.0', require: false
   gem 'selenium-webdriver'
   gem 'shoulda-matchers'
   gem 'simplecov'
+  # https://evilmartians.com/chronicles/testprof-a-good-doctor-for-slow-ruby-tests
+  gem 'test-prof'
+  gem 'timecop'
   gem 'vcr'
   gem 'webmock'
-  gem 'rails-controller-testing'
 end
 
 group :development do
