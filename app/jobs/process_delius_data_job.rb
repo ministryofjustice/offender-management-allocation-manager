@@ -5,6 +5,8 @@ class ProcessDeliusDataJob < ApplicationJob
 
   def perform(nomis_offender_id)
     DeliusData.transaction do
+      logger.info("[DELIUS] Processing delius data for #{nomis_offender_id}")
+
       DeliusImportError.where(nomis_offender_id: nomis_offender_id).destroy_all
       delius_data = DeliusData.where(noms_no: nomis_offender_id)
       if delius_data.count > 1
@@ -22,7 +24,7 @@ private
     offender = OffenderService.get_offender(delius_record.noms_no)
 
     if offender.nil?
-      return logger.error("Failed to retrieve NOMIS record #{delius_record.noms_no}")
+      return logger.error("[DELIUS] Failed to retrieve NOMIS record #{delius_record.noms_no}")
     end
 
     return unless offender.convicted?
