@@ -60,6 +60,5 @@ private
     else
       params.permit(:message, :email_address, :name, :prison, :job_type, :utf8, :authenticity_token)
     end
-
   end
 end
