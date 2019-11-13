@@ -51,12 +51,6 @@ class AllocationVersion < ApplicationRecord
     )
   }
 
-  validate do |alloc|
-    if alloc.secondary_pom_nomis_id.present? && alloc.primary_pom_nomis_id.blank? &&
-      errors.add("Can't have a secondary POM in an allocation without a primary POM")
-    end
-  end
-
   validate do |av|
     if av.primary_pom_nomis_id.present? &&
       av.primary_pom_nomis_id == av.secondary_pom_nomis_id
@@ -107,6 +101,10 @@ class AllocationVersion < ApplicationRecord
     alloc.save!
   end
 
+  # note: this creates an allocation where the co-working POM is set, but the primary
+  # one is not. It should still show up in the 'waiting to allocate' bucket.
+  # This appears to be safe as allocations only show up for viewing if they have
+  # a non-nil primary_pom_nomis_id
   def self.deallocate_primary_pom(nomis_staff_id, prison)
     active_pom_allocations(nomis_staff_id, prison).each do |alloc|
       alloc.primary_pom_nomis_id = nil
