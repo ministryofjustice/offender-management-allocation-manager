@@ -6,6 +6,7 @@ feature 'Inactive POM' do
     let(:inactive_pom)      { 485_595 }
     let(:nomis_offender_id) { "G4273GI" }
     let(:prison)            { "LEI" }
+    let(:active_pom) { 485_637 }
 
     before do
       signin_user
@@ -13,7 +14,8 @@ feature 'Inactive POM' do
       create(
         :allocation_version,
         nomis_offender_id: nomis_offender_id,
-        primary_pom_nomis_id: inactive_pom
+        primary_pom_nomis_id: inactive_pom,
+        secondary_pom_nomis_id: active_pom
       )
       create(:pom_detail, nomis_staff_id: inactive_pom)
       visit prison_allocation_path(prison, nomis_offender_id)
