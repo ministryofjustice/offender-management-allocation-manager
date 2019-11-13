@@ -1,4 +1,4 @@
-if Rails.configuration.prometheus_metrics == 'on'
+if Rails.configuration.collect_prometheus_metrics
   require 'prometheus_exporter/instrumentation'
   require 'prometheus_exporter/middleware'
 
