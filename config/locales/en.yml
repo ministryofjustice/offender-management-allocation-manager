@@ -27,13 +27,10 @@
 #   'true': 'foo'
 #
 # To learn more, please read the Rails Internationalization guide
-# available at http://guides.rubyonrails.org/i18n.html.
+# available at https://guides.rubyonrails.org/i18n.html.
 
 en:
-  #  This does work, but alters it globally. We need Rails 6.0 to be able to
-  #  override the format of error messages at a more granular level.
-  errors:
-    format: "%{message}"
+  hello: "Hello world"
   activerecord:
     errors:
       models:
@@ -42,8 +39,8 @@ en:
             parole_review_date:
               after: "Parole review date must be after %{date}"
         early_allocation:
-#          This is a Rails 6 feature (to customise messages per-model)
-#          format: "%{message}"
+          # This is a Rails 6 feature (to customise messages per-model)
+          format: "%{message}"
           attributes:
             oasys_risk_assessment_date:
               blank: Enter the date of the last OASys risk assessment

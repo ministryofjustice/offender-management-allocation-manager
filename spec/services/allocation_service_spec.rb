@@ -37,7 +37,9 @@ describe AllocationService do
       primary_email_job, secondary_email_job = enqueued_jobs.last(2)
 
       # mail telling the primary POM about the co-working POM
-      expect(primary_email_job[:args][3]).
+      primary_args_hash = primary_email_job[:args][3]['args'][0]
+      secondary_args_hash = secondary_email_job[:args][3]['args'][0]
+      expect(primary_args_hash).
         to match(
           hash_including(
             "message" => message,
@@ -50,7 +52,7 @@ describe AllocationService do
           ))
 
       # message telling co-working POM who the Primary POM is.
-      expect(secondary_email_job[:args][3]).
+      expect(secondary_args_hash).
         to match(
           hash_including(
             "message" => message,

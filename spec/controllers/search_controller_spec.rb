@@ -13,7 +13,7 @@ RSpec.describe SearchController, type: :controller do
       [
         {
           firstName: 'Alice',
-          position: 'PRO',
+          position: RecommendationService::PRISON_POM,
           staffId: 1
         }
       ]

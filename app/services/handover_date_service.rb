@@ -46,7 +46,7 @@ private
     elsif offender.parole_eligibility_date.present?
       [offender.parole_eligibility_date - 8.months, 'NPS Determinate Parole Case']
     elsif offender.mappa_level.blank?
-      [nil, 'NPS - MAPPA missing from nDelius']
+      [mappa1_responsibility_date(offender), 'NPS - MAPPA level unknown']
     elsif offender.mappa_level.in? [1, 0]
       [mappa1_responsibility_date(offender), 'NPS Determinate Mappa 1/N']
     else
