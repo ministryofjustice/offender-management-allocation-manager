@@ -170,7 +170,11 @@ private
     # `offender`
     recommended_type = RecommendationService.recommended_pom_type(offender)
     poms.partition { |pom|
-      pom.position.include?(recommended_type)
+      if recommended_type == RecommendationService::PRISON_POM
+        pom.prison_officer?
+      else
+        pom.probation_officer?
+      end
     }
   end
 

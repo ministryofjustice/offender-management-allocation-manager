@@ -17,8 +17,8 @@ class CoworkingController < PrisonsApplicationController
       %w[active unavailable].include? pom.status
     }
 
-    @prison_poms = @active_poms.select{ |pom| pom.position.include?('PRO') }
-    @probation_poms = @active_poms.select{ |pom| pom.position.include?('PO') }
+    @prison_poms = @active_poms.select(&:prison_officer?)
+    @probation_poms = @active_poms.select(&:probation_officer?)
   end
 
   def confirm
