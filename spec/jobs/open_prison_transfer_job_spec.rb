@@ -101,8 +101,8 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
 
     # Create an allocation where the offender is allocated, and then deallocate so we can
     # test finding the last pom that was allocated to this offender ....
-    create(:allocation_version, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id, prison: 'LEI', primary_pom_name: 'Primary POMName')
-    AllocationVersion.deallocate_offender(nomis_offender_id, AllocationVersion::OFFENDER_TRANSFERRED)
+    alloc = create(:allocation_version, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id, prison: 'LEI', primary_pom_name: 'Primary POMName')
+    alloc.deallocate_offender(AllocationVersion::OFFENDER_TRANSFERRED)
 
     fakejob = double
     allow(fakejob).to receive(:deliver_later)

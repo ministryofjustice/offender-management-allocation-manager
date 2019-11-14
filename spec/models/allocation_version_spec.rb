@@ -63,9 +63,10 @@ RSpec.describe AllocationVersion, type: :model do
         event_trigger: AllocationVersion::USER
       }
       AllocationService.create_or_update(params)
+      alloc = described_class.find_by!(nomis_offender_id: nomis_offender_id)
 
-      described_class.deallocate_offender(nomis_offender_id, movement_type)
-      deallocation = described_class.find_by(nomis_offender_id: nomis_offender_id)
+      alloc.deallocate_offender(movement_type)
+      deallocation = alloc.reload
 
       expect(deallocation.primary_pom_nomis_id).to be_nil
       expect(deallocation.primary_pom_name).to be_nil
@@ -93,8 +94,9 @@ RSpec.describe AllocationVersion, type: :model do
       }
       AllocationService.create_or_update(params)
 
-      described_class.deallocate_offender(nomis_offender_id, movement_type)
-      deallocation = described_class.find_by(nomis_offender_id: nomis_offender_id)
+      alloc = described_class.find_by(nomis_offender_id: nomis_offender_id)
+      alloc.deallocate_offender(movement_type)
+      deallocation = alloc.reload
 
       expect(deallocation.primary_pom_nomis_id).to be_nil
       expect(deallocation.primary_pom_name).to be_nil
@@ -132,18 +134,20 @@ RSpec.describe AllocationVersion, type: :model do
     it 'will set the prison when released' do
       allow(Nomis::Elite2::MovementApi).to receive(:movements_for).and_return([movement])
 
-      described_class.deallocate_offender(offender_no, AllocationVersion::OFFENDER_RELEASED)
+      alloc = described_class.find_by(nomis_offender_id: offender_no)
+      alloc.deallocate_offender(AllocationVersion::OFFENDER_RELEASED)
 
-      updated_allocation = described_class.find_by(nomis_offender_id: offender_no)
+      updated_allocation = alloc.reload
       expect(updated_allocation.prison).not_to be_nil
       expect(updated_allocation.prison).to eq('BAI')
     end
 
     it 'will set the prison when transferred',
        vcr: { cassette_name: :allocation_version_transfer_prison_fix } do
-      described_class.deallocate_offender(offender_no, AllocationVersion::OFFENDER_TRANSFERRED)
+      alloc = described_class.find_by(nomis_offender_id: offender_no)
+      alloc.deallocate_offender(AllocationVersion::OFFENDER_TRANSFERRED)
 
-      updated_allocation = described_class.find_by(nomis_offender_id: offender_no)
+      updated_allocation = alloc.reload
       expect(updated_allocation.prison).not_to be_nil
       expect(updated_allocation.prison).to eq('LEI')
     end
