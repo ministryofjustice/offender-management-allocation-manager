@@ -29,13 +29,11 @@ private
 
     return unless offender.convicted?
 
-    if auto_delius_import_enabled?(offender.prison_id)
-      if dob_matches?(offender, delius_record)
-        process_record(delius_record)
-      else
-        DeliusImportError.create! nomis_offender_id: delius_record.noms_no,
-                                  error_type: DeliusImportError::MISMATCHED_DOB
-      end
+    if dob_matches?(offender, delius_record)
+      process_record(delius_record)
+    else
+      DeliusImportError.create! nomis_offender_id: delius_record.noms_no,
+                                error_type: DeliusImportError::MISMATCHED_DOB
     end
   end
 
