@@ -29,6 +29,8 @@ private
 
     return unless offender.convicted?
 
+    # as a compromise, we always import the DeliusData into the case_information record now,
+    # but only disable manual editing for prisons that are actually enabled.
     if dob_matches?(offender, delius_record)
       process_record(delius_record)
     else
