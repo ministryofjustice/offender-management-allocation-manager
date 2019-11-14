@@ -138,6 +138,16 @@ describe HandoverDateService do
           end
 
           context 'when non-parole case' do
+            context 'when mappa unknown' do
+              let(:mappa_level) { nil }
+
+              context 'when crd before ard' do
+                it 'is 4.5 months before CRD' do
+                  expect(described_class.responsibility_handover_date(offender)[0]).to eq(Date.new(2020, 3, 1))
+                end
+              end
+            end
+
             context 'without mappa' do
               # mappa level 0 means MAAPA doesn't apply
               let(:mappa_level) { 0 }
