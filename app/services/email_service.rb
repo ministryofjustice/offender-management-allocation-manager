@@ -80,19 +80,21 @@ private
 
   def previous_pom
     # Check the versions (there MUST be previous records if this is a reallocation)
-    # and find the first version with a primary_pom id that is not the same as the
+    # and find the last version with a primary_pom id that is not the same as the
     # allocation. That will be the POM that is notified of a reallocation.
-    versions = AllocationService.get_versions_for(@allocation)
+    @previous_pom ||= begin
+      versions = AllocationService.get_versions_for(@allocation)
 
-    previous = versions.first { |version|
-      version.primary_pom_nomis_id != @allocation.primary_pom_nomis_id
-    }
-    return nil if previous.blank?
+      previous = versions.reverse.detect { |version|
+        version.primary_pom_nomis_id.present? && version.primary_pom_nomis_id != @allocation.primary_pom_nomis_id
+      }
+      return nil if previous.blank?
 
-    @previous_pom ||= PrisonOffenderManagerService.get_pom_at(
-      previous.prison,
-      previous.primary_pom_nomis_id
-    )
+      PrisonOffenderManagerService.get_pom_at(
+        previous.prison,
+        previous.primary_pom_nomis_id
+      )
+    end
   end
 
   def send_deallocation_email

@@ -30,6 +30,13 @@ feature 'View a prisoner profile page' do
       expect(cat_code).to eq('C')
     end
 
+    it 'shows an overridden responsibility', :raven_intercept_exception, vcr: { cassette_name: :show_offender_with_override_spec } do
+      create(:responsibility, nomis_offender_id: 'G7998GJ')
+      visit prison_prisoner_path('LEI', 'G7998GJ')
+
+      expect(page).to have_content('Supporting')
+    end
+
     it 'shows the prisoner image', :raven_intercept_exception, vcr: { cassette_name: :show_offender_spec_image } do
       visit prison_prisoner_image_path('LEI', 'G7998GJ', format: :jpg)
       expect(page.response_headers['Content-Type']).to eq('image/jpg')
