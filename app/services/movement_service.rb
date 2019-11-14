@@ -70,8 +70,22 @@ private
 
     Rails.logger.info("[MOVEMENT] De-allocating #{transfer.offender_no}")
 
-    AllocationVersion.deallocate_offender(transfer.offender_no,
-                                          AllocationVersion::OFFENDER_TRANSFERRED)
+    alloc = AllocationVersion.find_by(nomis_offender_id: transfer.offender_no)
+
+    # frozen_string_literal: true
+    # We need to check whether the from_agency is from within the prison estate
+    # to know whether it is a transfer.  If it isn't then we want to bail and
+    # not process the new admission.
+    # There are special rules for responsibility when offenders
+    # move to open prisons so we will trigger this job to send
+    # an email to the LDU
+    # Bail if this is a new admission to prison
+    # We only want to deallocate the offender if they have not already been
+    # allocated at their new prison
+    # When an offender is released, we can no longer rely on their
+    # case information (in case they come back one day), and we
+    # should de-activate any current allocations.
+    alloc&.deallocate_offender(AllocationVersion::OFFENDER_TRANSFERRED)
     true
   end
 
@@ -84,8 +98,21 @@ private
     Rails.logger.info("[MOVEMENT] Processing release for #{release.offender_no}")
 
     CaseInformation.where(nomis_offender_id: release.offender_no).destroy_all
-    AllocationVersion.deallocate_offender(release.offender_no,
-                                          AllocationVersion::OFFENDER_RELEASED)
+    alloc = AllocationVersion.find_by(nomis_offender_id: release.offender_no)
+    # frozen_string_literal: true
+    # We need to check whether the from_agency is from within the prison estate
+    # to know whether it is a transfer.  If it isn't then we want to bail and
+    # not process the new admission.
+    # There are special rules for responsibility when offenders
+    # move to open prisons so we will trigger this job to send
+    # an email to the LDU
+    # Bail if this is a new admission to prison
+    # We only want to deallocate the offender if they have not already been
+    # allocated at their new prison
+    # When an offender is released, we can no longer rely on their
+    # case information (in case they come back one day), and we
+    # should de-activate any current allocations.
+    alloc&.deallocate_offender(AllocationVersion::OFFENDER_RELEASED)
 
     true
   end
