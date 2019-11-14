@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class RecommendationService
+  # yes this looks backwards. However the string 'PRO' already existed in NOMIS for 'PRISON_OFFICER'
+  # so 'PO' was chosen for 'Probation Officer'
   PRISON_POM = 'PRO'
   PROBATION_POM = 'PO'
 

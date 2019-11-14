@@ -9,13 +9,13 @@ RSpec.describe EarlyAllocationsController, type: :controller do
     [
       {
         firstName: 'Alice',
-        position: 'PRO',
+        position: RecommendationService::PRISON_POM,
         staffId: nomis_staff_id,
         emails: ['test@digital.justice.org.uk']
       },
       {
         firstName: 'Bob',
-        position: 'PRO',
+        position: RecommendationService::PRISON_POM,
         staffId: 2,
         emails: ['test@digital.justice.org.uk']
       }
