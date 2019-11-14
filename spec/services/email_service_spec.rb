@@ -91,7 +91,7 @@ RSpec.describe EmailService, :queueing do
     }.to change(enqueued_jobs, :size).by(0)
   end
 
-  context 'when offender has been released', versioning: true do
+  context 'when offender has been released', versioning: true, queueing: false do
     let!(:released_allocation) do
       x = create(:allocation_version,
                  nomis_offender_id: original_allocation.nomis_offender_id,
@@ -110,11 +110,30 @@ RSpec.describe EmailService, :queueing do
     end
 
     it "Can send a reallocation email", vcr: { cassette_name: :email_service_reallocation_crash } do
-      expect {
-        described_class.instance(allocation: released_allocation, message: "", pom_nomis_id: released_allocation.primary_pom_nomis_id).send_email
-      }.to change(enqueued_jobs, :size).by(2)
-      # POM 485_833 is Andrien
-      expect(enqueued_jobs.last[:args][3]['pom_email']).to eq("andrien.ricketts@digital.justice.gov.uk")
+      expect(PomMailer).to receive(:deallocation_email).with(
+        previous_pom_name: 'Leigh',
+        responsibility: 'supporting',
+        previous_pom_email: "leigh.money@digital.justice.gov.uk",
+        new_pom_name: "Ricketts, Andrien",
+        offender_name: "Ahmonis, Imanjah",
+        offender_no: "G2911GD",
+        prison: 'HMP Leeds',
+        url: 'http://localhost:3000/prisons/LEI/caseload'
+      ).and_return OpenStruct.new(deliver_later: true)
+
+      expect(PomMailer).to receive(:new_allocation_email).with(
+        pom_name: 'Andrien',
+        responsibility: 'supporting',
+        pom_email: 'andrien.ricketts@digital.justice.gov.uk',
+        offender_name: "Ahmonis, Imanjah",
+        offender_no: "G2911GD",
+        message: '',
+        url: 'http://localhost:3000/prisons/LEI/caseload'
+      ).and_return OpenStruct.new(deliver_later: true)
+
+      described_class.
+        instance(allocation: released_allocation, message: "", pom_nomis_id: released_allocation.primary_pom_nomis_id).
+        send_email
     end
   end
 
