@@ -12,7 +12,7 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
       staffId: nomis_staff_id,
       firstName: 'Firstname',
       lastName: 'Lastname',
-      position: 'PRO',
+      position: RecommendationService::PRISON_POM,
       emails: ['pom@localhost.local']
     }]
   }
