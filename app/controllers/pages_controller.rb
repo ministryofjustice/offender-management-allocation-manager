@@ -52,13 +52,6 @@ private
   end
 
   def help_params
-    # Unpermitted params when running development and test env
-    # resulting in failures when attempting to submit form so
-    # added the additional values in those scenarios.
-    if Rails.env.production?
-      params.permit(:message, :email_address, :name, :prison, :job_type)
-    else
-      params.permit(:message, :email_address, :name, :prison, :job_type, :utf8, :authenticity_token)
-    end
+    params.require(:contact_submission).permit(:message, :email_address, :name, :prison, :job_type)
   end
 end
