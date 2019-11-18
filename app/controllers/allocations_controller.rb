@@ -95,7 +95,9 @@ class AllocationsController < PrisonsApplicationController
   def history
     @prisoner = offender(nomis_offender_id_from_url)
     history = offender_allocation_history(nomis_offender_id_from_url)
-    @history = AllocationList.new(history)
+    # The history is now collected forwards (to incorporate nil prison ids) but as a result
+    # needs to be 'deep reversed' in order to work properly (as AllocationList produces a list of lists)
+    @history = AllocationList.new(history).to_a.reverse.map { |prison, allocations| [prison, allocations.reverse] }
     @pom_emails = AllocationService.allocation_history_pom_emails(history)
   end
 
@@ -107,8 +109,7 @@ private
     unless current_allocation.nil?
       AllocationService.get_versions_for(current_allocation).
         append(current_allocation).
-        sort_by!(&:updated_at).
-        reverse!
+        sort_by!(&:updated_at)
     end
   end
 
