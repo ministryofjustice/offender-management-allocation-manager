@@ -120,11 +120,10 @@ class AllocationService
       current_allocation.updated_at = YAML.load(current_allocation.versions.last.object_changes)['updated_at'][1]
     end
     unless current_allocation.nil?
-      allocations = get_versions_for(current_allocation).
+      get_versions_for(current_allocation).
           append(current_allocation).
           sort_by!(&:updated_at).
           reverse!
-      AllocationList.new(allocations)
     end
   end
 
