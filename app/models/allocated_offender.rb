@@ -33,6 +33,21 @@ class AllocatedOffender
     }.any?
   end
 
+  def valid?
+    unless @offender.convicted?
+      Rails.logger.warn("[ALLOC] #{@offender.offender_no} has an allocation but is not convicted")
+      return false
+    end
+
+    unless @offender.prison_id == @allocation.prison
+      Rails.logger.warn("[ALLOC] #{@offender.offender_no} has an allocation at"\
+                        " #{@allocation.prison} but is at #{@offender.prison_id}")
+      return false
+    end
+
+    true
+  end
+
 private
 
   def overridden_responsibility
