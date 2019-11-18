@@ -3,7 +3,12 @@
     "postdeploy": "bundle exec rails db:migrate db:seed"
   },
   "addons": [
-    "heroku-postgresql",
+    {
+      "plan": "heroku-postgresql",
+      "options": {
+        "version": "9.6"
+      }
+    },
     "heroku-redis"
   ],
   "buildpacks": [
