@@ -20,7 +20,7 @@ gem 'paper_trail'
 gem 'pg'
 gem 'puma', '~> 4.2'
 gem 'prometheus_exporter'
-gem 'rails', '~> 5.2.3'
+gem 'rails', '~> 6.0.1'
 gem 'sass-rails', '~> 5.0'
 gem 'sidekiq'
 gem 'sentry-raven'
@@ -49,23 +49,27 @@ group :development, :test do
   gem 'rubocop-performance'
   gem 'rubocop-rails'
   gem 'dotenv-rails'
-  gem 'rspec-rails'
+  # needed to support Rails 6.0
+  gem 'rspec-rails', '~> 4.0.0.beta2'
   gem 'rswag-specs'
 end
 
 group :test do
-  gem 'timecop'
   gem 'capybara'
   gem 'database_cleaner'
   gem 'faker'
   gem 'geckodriver-helper'
   gem 'launchy'
+  gem 'rails-controller-testing'
+  gem 'ruby-prof', '>= 0.16.0', require: false
   gem 'selenium-webdriver'
   gem 'shoulda-matchers'
   gem 'simplecov'
+  # https://evilmartians.com/chronicles/testprof-a-good-doctor-for-slow-ruby-tests
+  gem 'test-prof'
+  gem 'timecop'
   gem 'vcr'
   gem 'webmock'
-  gem 'rails-controller-testing'
 end
 
 group :development do

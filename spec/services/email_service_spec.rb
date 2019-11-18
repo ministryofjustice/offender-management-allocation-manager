@@ -91,6 +91,52 @@ RSpec.describe EmailService, :queueing do
     }.to change(enqueued_jobs, :size).by(0)
   end
 
+  context 'when offender has been released', versioning: true, queueing: false do
+    let!(:released_allocation) do
+      x = create(:allocation_version,
+                 nomis_offender_id: original_allocation.nomis_offender_id,
+                 primary_pom_nomis_id: original_allocation.primary_pom_nomis_id)
+      x.deallocate_offender(AllocationVersion::OFFENDER_RELEASED)
+      x.reload
+      x.update!(primary_pom_nomis_id: reallocation.primary_pom_nomis_id,
+                event: AllocationVersion::REALLOCATE_PRIMARY_POM,
+                event_trigger: AllocationVersion::USER)
+      x.deallocate_offender(AllocationVersion::OFFENDER_RELEASED)
+      x.reload
+      x.update!(primary_pom_nomis_id: original_allocation.primary_pom_nomis_id,
+                event: AllocationVersion::REALLOCATE_PRIMARY_POM,
+                event_trigger: AllocationVersion::USER)
+      x
+    end
+
+    it "Can send a reallocation email", vcr: { cassette_name: :email_service_reallocation_crash } do
+      expect(PomMailer).to receive(:deallocation_email).with(
+        previous_pom_name: 'Leigh',
+        responsibility: 'supporting',
+        previous_pom_email: "leigh.money@digital.justice.gov.uk",
+        new_pom_name: "Ricketts, Andrien",
+        offender_name: "Ahmonis, Imanjah",
+        offender_no: "G2911GD",
+        prison: 'HMP Leeds',
+        url: 'http://localhost:3000/prisons/LEI/caseload'
+      ).and_return OpenStruct.new(deliver_later: true)
+
+      expect(PomMailer).to receive(:new_allocation_email).with(
+        pom_name: 'Andrien',
+        responsibility: 'supporting',
+        pom_email: 'andrien.ricketts@digital.justice.gov.uk',
+        offender_name: "Ahmonis, Imanjah",
+        offender_no: "G2911GD",
+        message: '',
+        url: 'http://localhost:3000/prisons/LEI/caseload'
+      ).and_return OpenStruct.new(deliver_later: true)
+
+      described_class.
+        instance(allocation: released_allocation, message: "", pom_nomis_id: released_allocation.primary_pom_nomis_id).
+        send_email
+    end
+  end
+
   it "Can send a reallocation email", vcr: { cassette_name: :email_service_send_deallocation_email }, versioning: true  do
     allow(AllocationService).to receive(:get_versions_for).and_return([original_allocation])
 

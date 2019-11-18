@@ -9,7 +9,7 @@ RSpec.describe TasksController, type: :controller do
       {
         staffId: staff_id,
         username: username,
-        position: 'PRO'
+        position: RecommendationService::PRISON_POM
       }
     ]
   }
