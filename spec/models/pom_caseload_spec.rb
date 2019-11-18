@@ -3,68 +3,31 @@ require 'rails_helper'
 RSpec.describe PomCaseload, type: :model do
   let(:prison) { 'LEI' }
   let(:staff_id) { 123 }
-  let(:username) { 'alice' }
-  let(:pom) {
+  let(:offenders) {
     [
-      {
-        staffId: staff_id,
-        username: username,
-        position: RecommendationService::PRISON_POM
-      }
+      OpenStruct.new(offender_no: 'G7514GW', prison_id: prison, convicted?: true, sentenced?: true,
+                     indeterminate_sentence?: true, nps_case?: true, pom_responsibility: 'Supporting'),
+      OpenStruct.new(offender_no: 'G1234VV', prison_id: prison, convicted?: true, sentenced?: true,
+                     nps_case?: true, pom_responsibility: 'Responsible'),
+      OpenStruct.new(offender_no: 'G1234AB', prison_id: prison, convicted?: true, sentenced?: true,
+                     nps_case?: true, pom_responsibility: 'Responsible'),
+      OpenStruct.new(offender_no: 'G1234GG', prison_id: prison, convicted?: true, sentenced?: true,
+                     nps_case?: true, pom_responsibility: 'Responsible'),
+      # We expect the offender below to not count towards the caseload totals because they have been released,
+      # they may however be returned from get_multiple_offenders where the IDs to fetched are obtained from
+      # current allocations (e.g. an invalid allocation)
+      OpenStruct.new(offender_no: 'G9999GG', prison_id: 'OUT', convicted?: true, sentenced?: true, nps_case?: true)
     ]
   }
 
   before do
-    stub_poms(prison, pom)
+    allow(OffenderService).to receive(:get_multiple_offenders).
+      and_return(offenders)
 
-    offenders = [
-      { "latestBookingId": 754_207, "offenderNo": "G7514GW", "firstName": "Indeter", "lastName": "Minate-Offender",
-        "dateOfBirth": "1990-12-06", "age": 28, "agencyId": prison, "categoryCode": "C", "imprisonmentStatus": "LIFE" },
-      { "latestBookingId": 754_206, "offenderNo": "G1234VV", "firstName": "ROSS", "lastName": "JONES",
-        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03" },
-      { "latestBookingId": 754_205, "offenderNo": "G1234AB", "firstName": "ROSS", "lastName": "JONES",
-        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03" },
-      { "latestBookingId": 754_204, "offenderNo": "G1234GG", "firstName": "ROSS", "lastName": "JONES",
-        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03" }
-    ]
-
-    bookings = [
-      { "bookingId": 754_207, "offenderNo": "G7514GW", "firstName": "Indeter", "lastName": "Minate-Offender", "agencyLocationId": prison,
-        "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
-                            "licenceExpiryDate": "2014-02-07", "homeDetentionCurfewEligibilityDate": "2011-11-07",
-                            "bookingId": 754_207, "sentenceStartDate": "2009-02-08", "automaticReleaseOverrideDate": "2012-03-17",
-                            "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "confirmedReleaseDate": "2012-03-17",
-                            "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
-        "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 },
-      { "bookingId": 754_206, "offenderNo": "G1234VV", "firstName": "ROSS", "lastName": "JONES", "agencyLocationId": prison,
-        "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
-                            "licenceExpiryDate": "2014-02-07", "homeDetentionCurfewEligibilityDate": "2011-11-07",
-                            "bookingId": 754_207, "sentenceStartDate": "2009-02-08", "automaticReleaseOverrideDate": "2012-03-17",
-                            "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "confirmedReleaseDate": "2012-03-17",
-                            "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
-        "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 },
-      { "bookingId": 754_205, "offenderNo": "G1234AB", "firstName": "ROSS", "lastName": "JONES", "agencyLocationId": prison,
-        "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
-                            "licenceExpiryDate": "2014-02-07", "homeDetentionCurfewEligibilityDate": "2011-11-07",
-                            "bookingId": 754_207, "sentenceStartDate": "2009-02-08", "automaticReleaseOverrideDate": "2012-03-17",
-                            "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "confirmedReleaseDate": "2012-03-17",
-                            "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
-        "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 },
-      { "bookingId": 754_204, "offenderNo": "G1234GG", "firstName": "ROSS", "lastName": "JONES", "agencyLocationId": prison,
-        "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
-                            "licenceExpiryDate": "2014-02-07", "homeDetentionCurfewEligibilityDate": "2011-11-07",
-                            "bookingId": 754_207, "sentenceStartDate": "2009-02-08", "automaticReleaseOverrideDate": "2012-03-17",
-                            "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "confirmedReleaseDate": "2012-03-17",
-                            "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
-        "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 }
-    ]
-
-    # Allocate all of the offenders to this POM
+    # # Allocate all of the offenders to this POM
     offenders.each do |offender|
-      create(:allocation_version, nomis_offender_id: offender[:offenderNo], primary_pom_nomis_id: staff_id)
+      create(:allocation_version, nomis_offender_id: offender.offender_no, primary_pom_nomis_id: staff_id)
     end
-
-    stub_multiple_offenders(offenders, bookings)
   end
 
   it 'can get the allocations for the POM at a specific prison' do
@@ -78,11 +41,17 @@ RSpec.describe PomCaseload, type: :model do
   end
 
   it 'can get tasks within a caseload for a single offender' do
-    offender = OpenStruct.new(offender_no: 'G7514GW', indeterminate_sentence?: true, nps_case?: true)
-
     caseload = described_class.new(staff_id, prison)
-    tasks = caseload.tasks_for_offender(offender)
+    tasks = caseload.tasks_for_offender(offenders[0])
     expect(tasks.count).to eq(1)
+  end
+
+  it "will hide invalid allocations" do
+    allocated_offenders = described_class.new(staff_id, prison).allocations
+    expect(allocated_offenders.count).to eq 4
+
+    released_offender = allocated_offenders.detect { |ao| ao.offender.offender_no == 'G9999GG' }
+    expect(released_offender).to be_nil
   end
 
   context 'when a POM has new and old allocations' do
@@ -126,7 +95,8 @@ RSpec.describe PomCaseload, type: :model do
         :allocation_version,
         primary_pom_nomis_id: other_staff_id,
         nomis_offender_id: 'G1234GG',
-        nomis_booking_id: 31_777
+        nomis_booking_id: 31_777,
+        secondary_pom_nomis_id: staff_id
       ).tap { |item|
         item.update!(secondary_pom_nomis_id: staff_id)
       }
@@ -142,13 +112,13 @@ RSpec.describe PomCaseload, type: :model do
       old_primary_alloc.update!(secondary_pom_nomis_id: other_staff_id)
     end
 
-    it "will get allocations for a POM made within the last 7 days", :versioning, vcr: { cassette_name: :get_new_cases } do
+    it "will get allocations for a POM made within the last 7 days", :versioning do
       allocated_offenders = described_class.new(staff_id, prison).allocations.select(&:new_case?)
       expect(allocated_offenders.count).to eq 2
-      expect(allocated_offenders.map(&:pom_responsibility)).to match_array %w[Supporting Co-Working]
+      expect(allocated_offenders.map(&:pom_responsibility)).to match_array %w[Responsible Co-Working]
     end
 
-    it "will get show the correct responsibility if one is overridden", :versioning, vcr: { cassette_name: :get_overridden_responsibilities } do
+    it "will get show the correct responsibility if one is overridden" do
       # Find a responsible offender
       allocated_offenders = described_class.new(staff_id, prison).allocations
       responsible_pom = allocated_offenders.detect { |offender| offender.pom_responsibility == 'Responsible' }.offender
@@ -162,18 +132,18 @@ RSpec.describe PomCaseload, type: :model do
       expect(responsible_pom.pom_responsibility).to eq('Supporting')
     end
 
-    it "will get show the correct responsibility if one is overridden to prison", :versioning, vcr: { cassette_name: :get_overridden_responsibilities_prison } do
+    it "will get show the correct responsibility if one is overridden to probation" do
       # Find a responsible offender
       allocated_offenders = described_class.new(staff_id, prison).allocations
-      responsible_pom = allocated_offenders.detect { |offender| offender.pom_responsibility == 'Supporting' }.offender
+      responsible_pom = allocated_offenders.detect { |offender| offender.pom_responsibility == 'Responsible' }.offender
 
       # Override their responsibility
-      create(:responsibility, nomis_offender_id: responsible_pom.offender_no, value: 'Prison')
+      create(:responsibility, nomis_offender_id: responsible_pom.offender_no, value: 'Probation')
 
       # Confirm that the responsible offender is now supporting
       allocated_offenders = described_class.new(staff_id, prison).allocations
       responsible_pom = allocated_offenders.detect { |a| a.offender.offender_no == responsible_pom.offender_no }
-      expect(responsible_pom.pom_responsibility).to eq('Responsible')
+      expect(responsible_pom.pom_responsibility).to eq('Supporting')
     end
   end
 end
