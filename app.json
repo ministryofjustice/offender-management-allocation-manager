@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "postdeploy": "bundle exec rails db:migrate db:seed"
+    "postdeploy": "bundle exec rails db:seed"
   },
   "addons": [
     {
