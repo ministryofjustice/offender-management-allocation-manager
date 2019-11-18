@@ -1,4 +1,8 @@
 {
+  "scripts": {
+    "postdeploy": "bundle exec rails db:migrate db:seed heroku:post_deploy",
+    "pr-predestroy": "bundle exec rails heroku:pr_destroy"
+  },
   "addons": [
     "heroku-postgresql",
     "heroku-redis"
