@@ -21,7 +21,7 @@
 
         <div class="govuk-radios">
           <div class="govuk-radios__item">
-            <%= radio_button_tag("case_information[welsh_offender]", 'Yes', @case_info.welsh_offender == 'Yes', class: "govuk-radios__input") %>
+            <%= radio_button_tag("case_information[welsh_offender]", 'Yes', @case_info.welsh_offender == 'Yes', class: "govuk-radios__input", id: 'welsh_offender') %>
             <%= label_tag "case_information[welsh_offender]", 'Yes', class: "govuk-label govuk-radios__label" %>
           </div>
           <div class="govuk-radios__item">
@@ -45,7 +45,7 @@
 
         <div class="govuk-radios">
           <div class="govuk-radios__item">
-            <%= radio_button_tag("case_information[case_allocation]", "NPS", @case_info.case_allocation == 'NPS', class: "govuk-radios__input") %>
+            <%= radio_button_tag("case_information[case_allocation]", "NPS", @case_info.case_allocation == 'NPS', class: "govuk-radios__input", id: 'case_allocation') %>
             <%= label_tag "case_information[case_allocation]", "National Probation Service (NPS)", class: "govuk-label govuk-radios__label" %>
           </div>
           <div class="govuk-radios__item">
@@ -70,7 +70,7 @@
 
       <div class="govuk-radios">
         <div class="govuk-radios__item">
-          <%= radio_button_tag("case_information[tier]", "A", @case_info[:tier] == 'A', class: "govuk-radios__input") %>
+          <%= radio_button_tag("case_information[tier]", "A", @case_info[:tier] == 'A', class: "govuk-radios__input", id: 'tier') %>
           <%= label_tag "case_information[tier]", "A", class: "govuk-label govuk-radios__label" %>
         </div>
         <div class="govuk-radios__item">

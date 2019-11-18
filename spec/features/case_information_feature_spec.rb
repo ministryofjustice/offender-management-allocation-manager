@@ -14,9 +14,9 @@ feature 'case information feature' do
     end
     visit new_prison_case_information_path('LEI', nomis_offender_id)
 
-    choose('case_information_welsh_offender_Yes')
-    choose('case_information_case_allocation_NPS')
-    choose('case_information_tier_A')
+    choose('welsh_offender')
+    choose('case_allocation')
+    choose('tier')
     click_button 'Save'
 
     expect(CaseInformation.count).to eq(1)
@@ -49,7 +49,7 @@ feature 'case information feature' do
     visit new_prison_case_information_path('LEI', nomis_offender_id)
     expect(page).to have_current_path new_prison_case_information_path('LEI', nomis_offender_id)
 
-    choose('case_information_tier_A')
+    choose('tier')
     click_button 'Save'
 
     expect(CaseInformation.count).to eq(0)
@@ -79,7 +79,7 @@ feature 'case information feature' do
     visit new_prison_case_information_path('LEI', nomis_offender_id)
     expect(page).to have_current_path new_prison_case_information_path('LEI', nomis_offender_id)
 
-    choose('case_information_case_allocation_NPS')
+    choose('case_allocation')
     click_button 'Save'
 
     expect(CaseInformation.count).to eq(0)
@@ -92,8 +92,8 @@ feature 'case information feature' do
     signin_user
     visit new_prison_case_information_path('LEI', nomis_offender_id)
     choose('case_information_welsh_offender_No')
-    choose('case_information_case_allocation_NPS')
-    choose('case_information_tier_A')
+    choose('case_allocation')
+    choose('tier')
     click_button 'Save'
 
     visit edit_prison_case_information_path('LEI', nomis_offender_id)
@@ -124,8 +124,8 @@ feature 'case information feature' do
     expect(page).to have_selector('h1', text: 'Case information')
 
     choose('case_information_welsh_offender_No')
-    choose('case_information_case_allocation_NPS')
-    choose('case_information_tier_A')
+    choose('case_allocation')
+    choose('tier')
     click_button 'Save'
 
     expect(current_url).to have_content("/prisons/LEI/summary/pending?page=3&sort=last_name+desc")

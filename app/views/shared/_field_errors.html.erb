@@ -5,9 +5,13 @@
   <div class="govuk-error-summary__body">
     <ul class="govuk-list govuk-error-summary__list">
       <% errors.messages.reject { |_f, m| m.empty? }.each do |field, _messages| %>
-        <li>
-          <%= link_to errors.full_messages_for(field).first, "##{form.object.class.name.underscore}_#{field}_error" %>
-        </li>
+        <% if local_assigns[:disable_refresh] %>
+          <li>
+            <%= link_to errors.full_messages_for(field).first, "##{field}", data: { turbolinks: false } %>
+          </li>
+        <% else %>
+          <li><%= link_to errors.full_messages_for(field).first, "##{field}" %></li>
+        <% end %>
       <% end %>
     </ul>
   </div>

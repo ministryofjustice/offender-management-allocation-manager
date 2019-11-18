@@ -1,26 +1,7 @@
 <%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
 
 <% if @override.errors.count > 0 %>
-  <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
-    <h2 class="govuk-error-summary__title" id="error-summary-title">
-      There is a problem
-    </h2>
-    <div class="govuk-error-summary__body">
-      <ul class="govuk-list govuk-error-summary__list">
-        <% if @override.errors[:override_reasons] %>
-          <li><a href="#override-conditional-1"><%= @override.errors[:override_reasons].first %></a></li>
-        <% end %>
-
-        <% if @override.errors[:suitability_detail] %>
-          <li><a href="#suitability-detail"><%= @override.errors[:suitability_detail].first %></a></li>
-        <% end %>
-
-        <% if @override.errors[:more_detail] %>
-          <li><a href="#more-detail"><%= @override.errors[:more_detail].first %></a></li>
-        <% end %>
-      </ul>
-    </div>
-  </div>
+  <%= render partial: 'shared/field_errors', :locals => { :errors => @override.errors } %>
 <% end %>
 
 <div class="govuk-grid-row">
@@ -48,7 +29,7 @@
               <%= hidden_field_tag("sort", params[:sort]) %>
               <%= hidden_field_tag("page", params[:page]) %>
               <div class="govuk-checkboxes__item">
-                <input class="govuk-checkboxes__input" id="override-conditional-1" name="override[override_reasons][]" type="checkbox" value="suitability" data-aria-controls="override-1"
+                <input class="govuk-checkboxes__input" id="override_reasons" name="override[override_reasons][]" type="checkbox" value="suitability" data-aria-controls="override-1"
                        <%= 'checked=checked' if override_reason_contains(@override, 'suitability') %> >
                 <label class="govuk-label govuk-checkboxes__label"
                        for="override-conditional-1"><%= complex_reason_label(@prisoner.recommended_pom_type) %></label>
@@ -64,7 +45,7 @@
                   <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="175">
                     <div class="govuk-form-group">
                       <label class="govuk-label" for="provide-detail">Enter your reason for this decision</label>
-                      <textarea class="govuk-textarea js-character-count " id="suitability-detail" name="override[suitability_detail]" rows="3" aria-describedby="suitability-detail-hint suitability-detail-error"></textarea>
+                      <textarea class="govuk-textarea js-character-count " id="suitability_detail" name="override[suitability_detail]" rows="3" aria-describedby="suitability-detail-hint suitability-detail-error"></textarea>
                     </div>
                   </div>
                 </div>
@@ -94,7 +75,7 @@
                   <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="175">
                     <div class="govuk-form-group">
                       <label class="govuk-label" for="provide-detail">Please provide detail here</label>
-                      <textarea class="govuk-textarea js-character-count" id="more-detail" name="override[more_detail]" rows="3" aria-describedby="more-detail-hint more-detail-error"></textarea>
+                      <textarea class="govuk-textarea js-character-count" id="more_detail" name="override[more_detail]" rows="3" aria-describedby="more-detail-hint more-detail-error"></textarea>
                     </div>
                   </div>
                 </div>

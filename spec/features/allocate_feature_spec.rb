@@ -108,7 +108,7 @@ feature 'Allocation' do
 
     expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
 
-    check('override-conditional-1')
+    check('override_reasons')
     click_button('Continue')
     expect(page).to have_content('Enter reason for allocating this POM')
     expect(Override.count).to eq(0)
@@ -123,7 +123,7 @@ feature 'Allocation' do
 
     expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
 
-    check('override-conditional-1')
+    check('override_reasons')
     fill_in 'override[suitability_detail]', with: 'consectetur a eraconsectetur a erat nam at lectus urna duis convallis convallis tellus id interdum velit laoreet id donec ultrices tincidunt arcu non sodales neque sodales ut etiam'
     click_button('Continue')
     expect(page).to have_content('This reason cannot be more than 175 characters')
