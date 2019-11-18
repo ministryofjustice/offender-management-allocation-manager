@@ -28,9 +28,13 @@ module ApiHelper
         }).
       to_return(status: 200, body: poms.to_json)
     poms.each do |pom|
-      stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/staff/#{pom[:staffId]}/emails").
-        to_return(status: 200, body: pom[:emails].to_json)
+      stub_pom_emails(pom[:staffId], pom[:emails])
     end
+  end
+
+  def stub_pom_emails(staff_id, emails)
+    stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/staff/#{staff_id}/emails").
+      to_return(status: 200, body: emails.to_json)
   end
 
   def stub_signed_in_pom(staff_id, username)

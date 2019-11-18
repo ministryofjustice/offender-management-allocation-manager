@@ -95,75 +95,57 @@ RSpec.describe AllocationsController, type: :controller do
       create(:case_information, nomis_offender_id: offender_no)
 
       stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/staff/1").
-        with(
-          headers: {
-            'Authorization' => 'Bearer token',
-            'Expect' => '',
-            'User-Agent' => 'Faraday v0.15.4'
-          }).
         to_return(status: 200, body: {}.to_json, headers: {})
 
       stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/users/PK000223").
-        with(
-          headers: {
-            'Authorization' => 'Bearer token',
-            'Expect' => '',
-            'User-Agent' => 'Faraday v0.15.4'
-          }).
         to_return(status: 200, body: { staffId: 3 }.to_json, headers: {})
 
-      stub_poms('PVI', [{ staffId: 4, position: 'PO', emails: ['pom4@prison.gov.uk'] }])
       stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/staff/4").
-        with(
-          headers: {
-            'Authorization' => 'Bearer token',
-            'Expect' => '',
-            'User-Agent' => 'Faraday v0.15.4'
-          }).
         to_return(status: 200, body: {}.to_json, headers: {})
-      stub_poms('LEI', [{ staffId: 5, position: 'PO', emails: [] }])
-      stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/staff/5").
-        with(
-          headers: {
-            'Authorization' => 'Bearer token',
-            'Expect' => '',
-            'User-Agent' => 'Faraday v0.15.4'
-          }).
-        to_return(status: 200, body: {}.to_json, headers: {})
-    end
 
-    it "Can get the allocation history for an offender", versioning: true do
-      AllocationVersion.create!(
-        nomis_offender_id: offender_no,
-        nomis_booking_id: 1,
-        primary_pom_nomis_id: 4,
-        allocated_at_tier: 'A',
-        prison: 'PVI',
-        recommended_pom_type: 'probation',
+      stub_pom_emails(5, [])
+      stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/staff/5").
+        to_return(status: 200, body: {}.to_json, headers: {})
+
+      allocation = create(:allocation_version,
+                          nomis_offender_id: offender_no,
+                          nomis_booking_id: 1,
+                          primary_pom_nomis_id: 4,
+                          allocated_at_tier: 'A',
+                          prison: 'PVI',
+                          recommended_pom_type: 'probation',
+                          event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+                          event_trigger: AllocationVersion::USER,
+                          created_by_username: 'PK000223'
+      )
+      allocation.update!(
+        primary_pom_nomis_id: 5,
+        prison: 'LEI',
         event: AllocationVersion::REALLOCATE_PRIMARY_POM,
         event_trigger: AllocationVersion::USER,
         created_by_username: 'PK000223'
       )
-      AllocationVersion.update(
-        nomis_offender_id: offender_no,
-        nomis_booking_id: 1,
-        primary_pom_nomis_id: 5,
-        allocated_at_tier: 'A',
-        prison: 'LEI',
-        recommended_pom_type: 'probation',
-        event: AllocationVersion::ALLOCATE_PRIMARY_POM,
-        event_trigger: AllocationVersion::USER,
-        created_by_username: 'PK000223'
-      )
+    end
 
+    it "Can get the allocation history for an offender", versioning: true do
       get :history, params: { prison_id: prison, nomis_offender_id: offender_no }
       allocation_list = assigns(:history).to_a
 
       expect(allocation_list.count).to eq(2)
-      expect(allocation_list.first[1].first.nomis_offender_id).to eq(offender_no)
-      expect(allocation_list.first[1].first.event).to eq('allocate_primary_pom')
-      expect(allocation_list.second[1].first.nomis_booking_id).to eq(1)
-      expect(allocation_list.last[0]).to eq('PVI')
+      # We get back a list of prison, allocation_array pairs
+      expect(allocation_list.map(&:size)).to eq([2, 2])
+      # Prisons are 1 each - LEI then PVI
+      expect(allocation_list.first.first).to eq('LEI')
+      expect(allocation_list.last.first).to eq('PVI')
+
+      # we have 2 1-element arrays
+      arrays = allocation_list.map { |al| al.second.first }
+      expect(arrays.size).to eq(2)
+
+      expect(arrays.first.nomis_offender_id).to eq(offender_no)
+      # expect to see reallocate event before allocate as the history is reversed
+      expect(arrays.first.event).to eq('reallocate_primary_pom')
+      expect(arrays.last.nomis_booking_id).to eq(1)
     end
 
     it "can get email addresses of POM's who have been allocated to an offender given the allocation history", versioning: true do
