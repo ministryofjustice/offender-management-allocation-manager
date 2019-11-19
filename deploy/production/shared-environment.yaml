@@ -4,7 +4,6 @@ metadata:
   name: shared-environment
 data:
   PROMETHEUS_METRICS: "on"
-  AUTO_DELIUS_IMPORT: "UKI,LEI,WSI,DMI,CFI"
   DELIUS_EMAIL_FOLDER: "Data/prod"
   RAILS_ENV: "production"
   RAILS_SERVE_STATIC_FILES: "true"

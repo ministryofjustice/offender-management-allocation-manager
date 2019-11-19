@@ -29,13 +29,13 @@ private
 
     return unless offender.convicted?
 
-    if auto_delius_import_enabled?(offender.prison_id)
-      if dob_matches?(offender, delius_record)
-        process_record(delius_record)
-      else
-        DeliusImportError.create! nomis_offender_id: delius_record.noms_no,
-                                  error_type: DeliusImportError::MISMATCHED_DOB
-      end
+    # as a compromise, we always import the DeliusData into the case_information record now,
+    # but only disable manual editing for prisons that are actually enabled.
+    if dob_matches?(offender, delius_record)
+      process_record(delius_record)
+    else
+      DeliusImportError.create! nomis_offender_id: delius_record.noms_no,
+                                error_type: DeliusImportError::MISMATCHED_DOB
     end
   end
 

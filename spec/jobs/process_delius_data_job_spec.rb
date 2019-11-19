@@ -257,10 +257,10 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
       context 'when on the happy path' do
         let!(:d1) { create(:delius_data) }
 
-        it 'does not create case information' do
+        it 'creates case information' do
           expect {
             described_class.perform_now d1.noms_no
-          }.not_to change(CaseInformation, :count)
+          }.to change(CaseInformation, :count).by(1)
         end
       end
     end
