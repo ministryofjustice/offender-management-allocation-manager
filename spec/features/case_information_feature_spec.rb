@@ -8,7 +8,7 @@ feature 'case information feature' do
     signin_user
     visit prison_summary_pending_path('LEI')
 
-    expect(page).to have_content('Update information')
+    expect(page).to have_content('Add missing information')
     within "#edit_#{nomis_offender_id}" do
       click_link 'Edit'
     end
@@ -33,13 +33,13 @@ feature 'case information feature' do
     signin_user
     visit prison_summary_pending_path('LEI', page: 3)
 
-    within ".govuk-table tr:first-child td:nth-child(6)" do
+    within ".govuk-table tr:first-child td:nth-child(5)" do
       click_link 'Edit'
     end
     expect(page).to have_selector('h1', text: 'Case information')
 
     click_link 'Back'
-    expect(page).to have_selector('h1', text: 'Allocations')
+    expect(page).to have_selector('h1', text: 'Add missing information')
   end
 
   it 'complains if allocation data is missing', :raven_intercept_exception, vcr: { cassette_name: :case_information_missing_case_feature } do
@@ -118,7 +118,7 @@ feature 'case information feature' do
     signin_user
     visit prison_summary_pending_path('LEI', sort: "last_name desc", page: 3)
 
-    within ".govuk-table tr:first-child td:nth-child(6)" do
+    within ".govuk-table tr:first-child td:nth-child(5)" do
       click_link 'Edit'
     end
     expect(page).to have_selector('h1', text: 'Case information')

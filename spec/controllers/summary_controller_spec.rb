@@ -77,6 +77,19 @@ RSpec.describe SummaryController, type: :controller do
       end
     end
 
+    it 'can show new arrivals' do
+      stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/movements/offenders?latestOnly=false&movementTypes=TRN").
+        with(body: %w[G1234GY G7514GW G1234VV].to_json).
+        to_return(status: 200, body: [{ offenderNo: 'G7514GW', toAgency: prison, createDateTime: Time.zone.today }].to_json)
+
+      get :new_arrivals, params: { prison_id: prison }
+
+      summary_offenders = assigns(:summary).offenders
+      expect(summary_offenders.count).to eq(1)
+      expect(summary_offenders.first.offender_no).to eq('G7514GW')
+      expect(summary_offenders.first.awaiting_allocation_for).to eq(0)
+    end
+
     it 'gets pending records' do
       get :pending, params: { prison_id: prison }
       # Expecting offender (2) to use sentenceStartDate as it is newer than last arrival date in prison
@@ -163,6 +176,11 @@ RSpec.describe SummaryController, type: :controller do
   end
 
   it 'handles trying to sort by missing field for allocated offenders' do
+    # Allocated offenders do have to have their prison_arrival_date even if they don't use it
+    # because we now need it to calculate the totals.
+    stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/movements/offenders?latestOnly=false&movementTypes=TRN").
+      to_return(status: 200, body: [].to_json)
+
     # When viewing allocated, cannot sort by awaiting_allocation_for as it is not available and is
     # meaningless in this context. We do not want to crash if passed a field that is not searchable
     # within a specific context.

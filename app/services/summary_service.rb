@@ -6,17 +6,25 @@ class SummaryService
   # rubocop:disable Metrics/MethodLength
   def self.summary(summary_type, prison)
     # We expect to be passed summary_type, which is one of :allocated, :unallocated,
-    # or :pending.  The other types will return totals, and do not contain any data.
+    # :pending, or :new_arrivals.  The other types will return totals, and do not contain
+    # any data.
     sortable_fields = (summary_type == :allocated ? sort_fields_for_allocated : default_sortable_fields)
 
     # We want to store the total number of each item so we can show totals for
     # each type of record.
     buckets = { allocated: Bucket.new(sortable_fields),
                 unallocated: Bucket.new(sortable_fields),
-                pending: Bucket.new(sortable_fields) }
+                pending: Bucket.new(sortable_fields),
+                new_arrivals: Bucket.new(sortable_fields)
+    }
 
     offenders = prison.offenders
     active_allocations_hash = AllocationService.active_allocations(offenders.map(&:offender_no), prison.code)
+
+    # We need arrival dates for all offenders and all summary types because it is used to
+    # detect new arrivals and so we would not be able to count them without knowing their
+    # prison_arrival_date
+    add_arrival_dates(offenders) if offenders.any?
 
     offenders.each do |offender|
       if offender.tier.present?
@@ -27,8 +35,13 @@ class SummaryService
         else
           buckets[:unallocated].items << offender
         end
+      elsif offender.awaiting_allocation_for > 2
+        # If the offender has been waiting more than 48 hours for their
+        # data to be updated, then they will appear in the pending bucket,
+        # otherwise the newly_arrived bucket
+        bucket[:pending].items << offender
       else
-        buckets[:pending].items << offender
+        bucket[:new_arrivals].items << offender
       end
     end
 
@@ -47,6 +60,7 @@ class SummaryService
       summary.allocated = buckets[:allocated]
       summary.unallocated = buckets[:unallocated]
       summary.pending = buckets[:pending]
+      summary.new_arrivals = buckets[:new_arrivals]
     }
   end
 
