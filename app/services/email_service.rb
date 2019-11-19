@@ -90,22 +90,19 @@ private
       }
       return nil if previous.blank?
 
-      PrisonOffenderManagerService.get_pom_at(
-        previous.prison,
-        previous.primary_pom_nomis_id
-      )
+      StaffMember.new(previous.primary_pom_nomis_id)
     end
   end
 
   def send_deallocation_email
     # If the previous pom does not have email configured, do not
     # try and email them.
-    return if previous_pom.emails.blank?
+    return if previous_pom.email_address.blank?
 
     PomMailer.deallocation_email(
       previous_pom_name: previous_pom.first_name.capitalize,
       responsibility: current_responsibility,
-      previous_pom_email: previous_pom.emails.first,
+      previous_pom_email: previous_pom.email_address,
       new_pom_name: @pom.full_name,
       offender_name: @offender.full_name,
       offender_no: @offender.offender_no,
