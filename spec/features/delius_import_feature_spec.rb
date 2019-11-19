@@ -12,6 +12,24 @@ feature 'delius import scenarios', vcr: { cassette_name: :delius_import_scenario
   end
 
   context 'when one delius record' do
+    context 'when updating the COM name', :versioning do
+      let!(:d1) { create(:delius_data, offender_manager: 'Mr Todd') }
+      let(:create_time) { 3.days.ago }
+      let(:update_time) { 2.days.ago }
+      let(:subject) { AllocationService.offender_allocation_history(d1.noms_no) }
+
+      before do
+        x = create(:allocation_version, allocated_at_tier: 'C', nomis_offender_id: d1.noms_no, created_at: create_time, updated_at: create_time)
+        x.update(allocated_at_tier: 'D', updated_at: update_time)
+        ProcessDeliusDataJob.perform_now d1.noms_no
+      end
+
+      it 'doesnt mess up the allocation history' do
+        expect(subject.size).to eq(2)
+        expect(subject.map(&:updated_at)).to eq([update_time, create_time])
+      end
+    end
+
     context 'with all data' do
       let!(:d1) { create(:delius_data) }
 

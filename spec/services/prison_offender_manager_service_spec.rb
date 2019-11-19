@@ -39,7 +39,7 @@ describe PrisonOffenderManagerService do
         expect(subject).to be_kind_of(Enumerable)
         expect(subject.count).to eq(13)
         # 1 POM in T3 (Toby Retallick) is marked inactive, so expect one less active one
-        expect(subject.select { |pom| pom.status == 'active' }.count).to eq(12)
+        expect(subject.count { |pom| pom.status == 'active' }).to eq(12)
         # would like these to both be true as integratopn test user has both positions
         # expect(moic_integration_tests.prison_officer?).to eq(true)
         expect(moic_integration_tests.probation_officer?).to eq(true)

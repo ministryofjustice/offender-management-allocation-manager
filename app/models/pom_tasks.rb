@@ -2,7 +2,6 @@
 
 class PomTasks
   include ApplicationHelper
-  include Rails.application.routes.url_helpers
 
   def for_offenders(offenders)
     # For each AllocatedOffender we want to find out if the offender

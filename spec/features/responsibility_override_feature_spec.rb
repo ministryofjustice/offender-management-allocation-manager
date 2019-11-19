@@ -8,6 +8,7 @@ feature 'Responsibility override' do
   end
 
   let(:offender_id) { 'G8060UF' }
+  let(:pom_id) { 485_752 }
 
   context 'when overriding responsibility', :queueing, vcr: { cassette_name: :override_responsibility } do
     before do
@@ -16,6 +17,7 @@ feature 'Responsibility override' do
     end
 
     it 'overrides' do
+      create(:allocation_version, primary_pom_nomis_id: pom_id, nomis_offender_id: offender_id)
       visit new_prison_allocation_path('LEI', offender_id)
 
       within '.responsibility_change' do
@@ -35,7 +37,9 @@ feature 'Responsibility override' do
         click_button 'Confirm'
       }.to change(enqueued_jobs, :count).by(2)
 
-      expect(page).to have_content 'Current case owner Community'
+      expect(page).to have_content 'Current responsibility Community'
+
+      expect(page).to have_current_path(prison_allocation_path('LEI', offender_id))
     end
   end
 

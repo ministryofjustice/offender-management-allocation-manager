@@ -113,6 +113,12 @@ class AllocationService
   def self.offender_allocation_history(nomis_offender_id)
     current_allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id)
 
+    # Sometimes we do an update that doesn't create a history record in the 'versions' table
+    # so we need to take 'our' update time as the target update from the history record rather than the
+    # current update time which may reflect an update that was not stored by paper_trail
+    if current_allocation.versions.any?
+      current_allocation.updated_at = YAML.load(current_allocation.versions.last.object_changes)['updated_at'][1]
+    end
     unless current_allocation.nil?
       allocations = get_versions_for(current_allocation).
           append(current_allocation).

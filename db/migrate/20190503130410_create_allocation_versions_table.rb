@@ -18,8 +18,6 @@ class CreateAllocationVersionsTable < ActiveRecord::Migration[5.2]
       t.integer :nomis_booking_id
       t.integer :event
       t.integer :event_trigger
-      t.datetime :created_at, null: false
-      t.datetime :updated_at, null: false
       t.timestamps
       t.index [:nomis_offender_id], name: :index_allocation_versions_on_nomis_offender_id
       t.index [:primary_pom_nomis_id], name: :index_allocation_versions_on_primary_pom_nomis_id
