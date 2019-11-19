@@ -4,13 +4,15 @@
   </h2>
   <div class="govuk-error-summary__body">
     <ul class="govuk-list govuk-error-summary__list">
-      <% errors.messages.reject { |_f, m| m.empty? }.each do |field, _messages| %>
+      <% errors.messages.each do |field, message| %>
         <% if local_assigns[:disable_refresh] %>
           <li>
-            <%= link_to errors.full_messages_for(field).first, "##{field}", data: { turbolinks: false } %>
+            <%= link_to message.first, "##{field}", data: { turbolinks: false } %>
           </li>
         <% else %>
-          <li><%= link_to errors.full_messages_for(field).first, "##{field}" %></li>
+          <li>
+            <%= link_to message.first, "##{field}" %>
+          </li>
         <% end %>
       <% end %>
     </ul>
