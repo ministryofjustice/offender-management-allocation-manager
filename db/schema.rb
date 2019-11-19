@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_26_081703) do
+ActiveRecord::Schema.define(version: 2019_12_04_142527) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -170,7 +170,10 @@ ActiveRecord::Schema.define(version: 2019_11_26_081703) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "shadow_code"
+    t.bigint "local_divisional_unit_id"
     t.index ["code"], name: "index_teams_on_code"
+    t.index ["local_divisional_unit_id"], name: "index_teams_on_local_divisional_unit_id"
   end
 
   create_table "tier_changes", force: :cascade do |t|

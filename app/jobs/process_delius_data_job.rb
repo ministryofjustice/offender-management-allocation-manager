@@ -13,14 +13,14 @@ class ProcessDeliusDataJob < ApplicationJob
         DeliusImportError.create! nomis_offender_id: nomis_offender_id,
                                   error_type: DeliusImportError::DUPLICATE_NOMIS_ID
       elsif delius_data.count == 1
-        import(delius_data.first)
+        import_data(delius_data.first)
       end
     end
   end
 
 private
 
-  def import(delius_record)
+  def import_data(delius_record)
     offender = OffenderService.get_offender(delius_record.noms_no)
 
     if offender.nil?
@@ -73,16 +73,22 @@ private
 
   def map_delius_to_case_info(delius_record)
     find_case_info(delius_record).tap do |case_info|
+      team = map_team(delius_record.team_code)
+      ldu = team.local_divisional_unit if team
       case_info.assign_attributes(
         crn: delius_record.crn,
         tier: map_tier(delius_record.tier),
-        local_divisional_unit: make_ldu_record(delius_record),
-        team: make_team_record(delius_record),
+        team: team,
+        local_divisional_unit: ldu,
         case_allocation: delius_record.service_provider,
         welsh_offender: map_welsh_offender(delius_record.welsh_offender?),
         mappa_level: map_mappa_level(delius_record.mappa, delius_record.mappa_levels)
       )
     end
+  end
+
+  def map_team(team_code)
+    Team.find_by(shadow_code: team_code) || Team.find_by(code: team_code)
   end
 
   def find_case_info(delius_record)
@@ -91,24 +97,6 @@ private
     ) { |item|
       item.manual_entry = false
     }
-  end
-
-  def make_ldu_record(delius_record)
-    ldu = LocalDivisionalUnit.find_or_initialize_by(
-      code: delius_record.ldu_code
-    ) { |item|
-      item.name = delius_record.ldu
-      item.save
-    }
-    ldu if ldu.persisted?
-  end
-
-  def make_team_record(delius_record)
-    team = Team.find_or_initialize_by(code: delius_record.team_code) { |new_team|
-      new_team.name = delius_record.team
-      new_team.save
-    }
-    team if team.persisted?
   end
 
   def map_mappa_level(delius_mappa, delius_mappa_levels)
