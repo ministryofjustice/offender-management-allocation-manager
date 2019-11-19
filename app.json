@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "postdeploy": "bundle exec rails db:seed"
+    "postdeploy": "bundle exec rails db:seed",
+    "pr-predestroy": "bundle exec rake heroku:pr_destroy"
   },
   "addons": [
     {
