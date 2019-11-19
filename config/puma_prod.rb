@@ -11,6 +11,7 @@ environment ENV['RACK_ENV'] || 'production'
 
 after_worker_boot do
   require 'prometheus_exporter/instrumentation'
+  require 'prometheus_exporter/client'
   PrometheusExporter::Instrumentation::Puma.start
   PrometheusExporter::Instrumentation::Process.start(type: 'web')
 end
