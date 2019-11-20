@@ -35,7 +35,7 @@ feature 'Allocation History' do
   let!(:nomis_offender_id) { 'G4273GI' }
 
   scenario 'view offender allocation history', versioning: true, vcr: { cassette_name: :offender_allocation_history } do
-    create(
+    allocation = create(
       :allocation_version,
       nomis_offender_id: nomis_offender_id,
       primary_pom_nomis_id: probation_pom[:primary_pom_nomis_id],
@@ -47,8 +47,6 @@ feature 'Allocation History' do
       updated_at: Time.zone.now - 10.days,
       primary_pom_allocated_at: Time.zone.now - 12.days
     )
-
-    allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id)
 
     allocation.update!(event: AllocationVersion::REALLOCATE_PRIMARY_POM,
                        primary_pom_nomis_id: probation_pom_2[:primary_pom_nomis_id],
@@ -105,7 +103,7 @@ feature 'Allocation History' do
 
     transfer_date = allocation.updated_at.strftime("#{allocation.updated_at.day.ordinalize} %B %Y") + " (" + allocation.updated_at.strftime("%R") + ")"
 
-    history = AllocationService.offender_allocation_history(nomis_offender_id)
+    history = offender_allocation_history(allocation)
     history1 = history[1]
     history2 = history[2]
     hist_allocate_secondary = history[5]
@@ -147,5 +145,12 @@ feature 'Allocation History' do
 
   def formatted_date_for(history)
     history.updated_at.strftime("#{history.updated_at.day.ordinalize} %B %Y") + " (" + history.updated_at.strftime("%R") + ")"
+  end
+
+  def offender_allocation_history(current_allocation)
+    AllocationService.get_versions_for(current_allocation).
+      append(current_allocation).
+      sort_by!(&:updated_at).
+      reverse!
   end
 end
