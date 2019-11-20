@@ -33,7 +33,7 @@ module OffenderManagementAllocationClient
   )
     Rails.application.routes.default_url_options[:host] =
       if ENV['HEROKU_APP_NAME'].present?
-        ENV.fetch('HEROKU_APP_NAME') + ".herokuapp.com"
+        ENV.fetch('HEROKU_APP_NAME') + '.herokuapp.com'
       else
         ENV.fetch(
           'ALLOCATION_MANAGER_HOST',
