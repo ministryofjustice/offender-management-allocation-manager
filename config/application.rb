@@ -26,14 +26,21 @@ module OffenderManagementAllocationClient
     config.exceptions_app = routes
     config.generators.system_tests = nil
     config.active_job.queue_adapter = :sidekiq
-    config.allocation_manager_host = ENV.fetch(
-      'ALLOCATION_MANAGER_HOST',
-      'http://localhost:3000'
-    )
-    Rails.application.routes.default_url_options[:host] = ENV.fetch(
-      'ALLOCATION_MANAGER_HOST',
-      'http://localhost:3000'
-    )
+    config.allocation_manager_host =
+      ENV.fetch(
+        'ALLOCATION_MANAGER_HOST',
+        'http://localhost:3000'
+  )
+    Rails.application.routes.default_url_options[:host] =
+      if ENV['HEROKU_APP_NAME'].present?
+        ENV.fetch('HEROKU_APP_NAME') + ".herokuapp.com"
+      else
+        ENV.fetch(
+          'ALLOCATION_MANAGER_HOST',
+          'http://localhost:3000'
+        )
+      end
+
     config.sentry_dsn = ENV['SENTRY_DSN']&.strip
     config.keyworker_api_host = ENV['KEYWORKER_API_HOST']&.strip
     config.digital_prison_service_host = ENV['DIGITAL_PRISON_SERVICE_HOST']&.strip
