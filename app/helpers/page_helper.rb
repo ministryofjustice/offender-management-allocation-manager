@@ -17,4 +17,12 @@ module PageHelper
       'govuk-form-group'
     end
   end
+
+  def field_element_error(errors, field, class_value)
+    if errors.present? && errors[field].present?
+      class_value + " #{class_value}--error"
+    else
+      class_value
+    end
+  end
 end

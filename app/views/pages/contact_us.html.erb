@@ -39,10 +39,8 @@
                   <span class="govuk-error-message">
                     <%= @contact.errors[:name].first %>
                   </span>
-            <%= f.text_field("name", id: "name", class: "govuk-input govuk-input--error") %>
-          <% else %>
-            <%= f.text_field("name", id: "name", class: "govuk-input") %>
           <% end %>
+          <%= f.text_field("name", id: "name", class: field_element_error(@contact.errors, :name, "govuk-input")) %>
         </div>
 
         <div class="<%= field_error(@contact.errors, :email_address) %>">
@@ -51,10 +49,8 @@
                 <span class="govuk-error-message">
                   <%= @contact.errors[:email_address].first %>
                 </span>
-            <%= f.email_field("email_address", id: "email_address", class: "govuk-input govuk-input--error") %>
-          <% else %>
-            <%= f.email_field("email_address", id: "email_address", class: "govuk-input") %>
           <% end %>
+          <%= f.email_field("email_address", id: "email_address", class: field_element_error(@contact.errors, :email_address, "govuk-input")) %>
         </div>
 
         <div class="<%= field_error(@contact.errors, :job_type) %>">
@@ -63,10 +59,8 @@
                   <span class="govuk-error-message">
                     <%= @contact.errors[:job_type].first %>
                   </span>
-            <%= f.text_field("job_type", id: "job_type", class: "govuk-input govuk-input--error") %>
-          <% else %>
-            <%= f.text_field("job_type", id: "job_type", class: "govuk-input") %>
           <% end %>
+          <%= f.text_field("job_type", id: "job_type", class: field_element_error(@contact.errors, :job_type, "govuk-input")) %>
         </div>
 
         <div class="<%= field_error(@contact.errors, :prison) %>">
@@ -75,10 +69,8 @@
                   <span class="govuk-error-message">
                     <%= @contact.errors[:prison].first %>
                   </span>
-            <%= f.text_field("prison", id: "prison", class: "govuk-input govuk-input--error") %>
-          <% else %>
-            <%= f.text_field("prison", id: "prison", class: "govuk-input") %>
           <% end %>
+          <%= f.text_field("prison", id: "prison", class: field_element_error(@contact.errors, :prison, 'govuk-input')) %>
         </div>
 
         <div class="<%= field_error(@contact.errors, :message) %>">
@@ -87,11 +79,10 @@
                   <span class="govuk-error-message">
                     <%= @contact.errors[:message].first %>
                   </span>
-            <%= f.text_area("message", rows: 10, id: "message", class: "govuk-textarea govuk-textarea--error") %>
-          <% else %>
-            <%= f.text_area("message", rows: 10, id: "message", class: "govuk-textarea") %>
           <% end %>
+          <%= f.text_area("message", rows: 10, id: "message", class: field_element_error(@contact.errors, :message, 'govuk-textarea')) %>
         </div>
+
         <%= f.submit 'Submit', class: "govuk-button" %>
       <% end %>
       </div>

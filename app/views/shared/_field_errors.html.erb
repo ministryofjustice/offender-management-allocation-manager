@@ -4,16 +4,10 @@
   </h2>
   <div class="govuk-error-summary__body">
     <ul class="govuk-list govuk-error-summary__list">
-      <% errors.messages.each do |field, message| %>
-        <% if local_assigns[:disable_refresh] %>
-          <li>
-            <%= link_to message.first, "##{field}", data: { turbolinks: false } %>
-          </li>
-        <% else %>
-          <li>
-            <%= link_to message.first, "##{field}" %>
-          </li>
-        <% end %>
+      <% errors.messages.reject {|_f, m| m.empty? }.each do |field, message| %>
+        <li>
+          <a href="#<%= field %>" <%= "data-turbolinks=false" if local_assigns[:disable_refresh] %>><%= message.first %></a>
+        </li>
       <% end %>
     </ul>
   </div>
