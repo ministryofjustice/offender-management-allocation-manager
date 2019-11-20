@@ -122,7 +122,14 @@ RSpec.describe AllocationsController, type: :controller do
 
       it 'doesnt mess up the allocation history' do
         get :history, params: { prison_id: prison, nomis_offender_id: d1.noms_no }
-        allocation_list = assigns(:history).first.second
+        history = assigns(:history)
+        # one set of history as only 1 prison involved
+        expect(history.size).to eq(1)
+        # history is array of pairs - [prison, allocations]
+        expect(history.first.size).to eq(2)
+        expect(history.first.first).to eq 'LEI'
+
+        allocation_list = history.first.second
         expect(allocation_list.size).to eq(2)
         expect(allocation_list.map(&:updated_at).map(&:to_date)).to eq([update_time, create_time].map(&:to_date))
       end
