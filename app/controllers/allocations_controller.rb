@@ -104,7 +104,7 @@ class AllocationsController < PrisonsApplicationController
 private
 
   def offender_allocation_history(nomis_offender_id)
-    current_allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id)
+    current_allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id)
 
     unless current_allocation.nil?
       AllocationService.get_versions_for(current_allocation).

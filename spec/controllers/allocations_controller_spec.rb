@@ -114,7 +114,7 @@ RSpec.describe AllocationsController, type: :controller do
       let(:update_time) { 2.days.ago }
 
       before do
-        x = create(:allocation_version, primary_pom_nomis_id: 1, allocated_at_tier: 'C', nomis_offender_id: d1.noms_no,
+        x = create(:allocation, primary_pom_nomis_id: 1, allocated_at_tier: 'C', nomis_offender_id: d1.noms_no,
                                         created_at: create_time, updated_at: create_time)
         x.update(allocated_at_tier: 'D', updated_at: update_time)
         ProcessDeliusDataJob.perform_now offender_no
@@ -137,22 +137,22 @@ RSpec.describe AllocationsController, type: :controller do
 
     context 'without DeliusDataJob' do
       before do
-        allocation = create(:allocation_version,
+        allocation = create(:allocation,
                             nomis_offender_id: offender_no,
                             nomis_booking_id: 1,
                             primary_pom_nomis_id: 4,
                             allocated_at_tier: 'A',
                             prison: 'PVI',
                             recommended_pom_type: 'probation',
-                            event: AllocationVersion::ALLOCATE_PRIMARY_POM,
-                            event_trigger: AllocationVersion::USER,
+                            event: Allocation::ALLOCATE_PRIMARY_POM,
+                            event_trigger: Allocation::USER,
                             created_by_username: 'PK000223'
         )
         allocation.update!(
           primary_pom_nomis_id: 5,
           prison: 'LEI',
-          event: AllocationVersion::REALLOCATE_PRIMARY_POM,
-          event_trigger: AllocationVersion::USER,
+          event: Allocation::REALLOCATE_PRIMARY_POM,
+          event_trigger: Allocation::USER,
           created_by_username: 'PK000223'
         )
       end
@@ -184,23 +184,23 @@ RSpec.describe AllocationsController, type: :controller do
         primary_pom_without_email_id = 5
 
         allocation = create(
-          :allocation_version,
+          :allocation,
           nomis_offender_id: offender_no,
           primary_pom_nomis_id: previous_primary_pom_nomis_id)
 
         allocation.update!(
           primary_pom_nomis_id: updated_primary_pom_nomis_id,
-          event: AllocationVersion::REALLOCATE_PRIMARY_POM
+          event: Allocation::REALLOCATE_PRIMARY_POM
         )
 
         allocation.update!(
           primary_pom_nomis_id: primary_pom_without_email_id,
-          event: AllocationVersion::REALLOCATE_PRIMARY_POM
+          event: Allocation::REALLOCATE_PRIMARY_POM
         )
 
         allocation.update!(
           primary_pom_nomis_id: updated_primary_pom_nomis_id,
-          event: AllocationVersion::REALLOCATE_PRIMARY_POM
+          event: Allocation::REALLOCATE_PRIMARY_POM
         )
 
         get :history, params: { prison_id: prison, nomis_offender_id: offender_no }
