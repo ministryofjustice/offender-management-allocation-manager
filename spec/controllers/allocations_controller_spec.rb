@@ -124,7 +124,7 @@ RSpec.describe AllocationsController, type: :controller do
         get :history, params: { prison_id: prison, nomis_offender_id: d1.noms_no }
         allocation_list = assigns(:history).first.second
         expect(allocation_list.size).to eq(2)
-        expect(allocation_list.map(&:updated_at)).to eq([update_time, create_time])
+        expect(allocation_list.map(&:updated_at).map(&:to_date)).to eq([update_time, create_time].map(&:to_date))
       end
     end
 
