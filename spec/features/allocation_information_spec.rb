@@ -77,9 +77,9 @@ feature "view an offender's allocation information" do
     end
 
     it 'displays the name of the allocated co-worker', vcr: { cassette_name: :show_allocation_information_display_coworker_name } do
-      allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id_with_keyworker)
+      allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id_with_keyworker)
 
-      allocation.update!(event: AllocationVersion::ALLOCATE_SECONDARY_POM,
+      allocation.update!(event: Allocation::ALLOCATE_SECONDARY_POM,
                          secondary_pom_nomis_id: 485_752,
                          secondary_pom_name: "Jones, Ross")
 
@@ -138,7 +138,7 @@ feature "view an offender's allocation information" do
 
   def create_allocation(offender_no)
     create(
-      :allocation_version,
+      :allocation,
       nomis_offender_id: offender_no,
       primary_pom_nomis_id: probation_officer_nomis_staff_id,
       prison: prison,

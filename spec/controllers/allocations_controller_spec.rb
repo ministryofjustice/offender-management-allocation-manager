@@ -72,7 +72,7 @@ RSpec.describe AllocationsController, type: :controller do
         stub_poms(prison, poms)
 
         create(:case_information, nomis_offender_id: offender_no)
-        create(:allocation_version, nomis_offender_id: offender_no, primary_pom_nomis_id: pom_staff_id)
+        create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: pom_staff_id)
 
         stub_request(:get, "https://keyworker-api-dev.prison.service.justice.gov.uk/key-worker/WEI/offender/G7806VO").
           to_return(status: 200, body: { staffId: 123_456 }.to_json, headers: {})

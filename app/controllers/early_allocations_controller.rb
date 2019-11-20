@@ -70,7 +70,7 @@ private
 
   def load_prisoner
     @offender = OffenderService.get_offender(params[:prisoner_id])
-    @allocation = AllocationVersion.find_by!(offender_id_from_url)
+    @allocation = Allocation.find_by!(offender_id_from_url)
     @pom = PrisonOffenderManagerService.get_pom_at(@prison.code, @allocation.primary_pom_nomis_id)
   end
 

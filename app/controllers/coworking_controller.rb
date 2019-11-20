@@ -53,7 +53,7 @@ class CoworkingController < PrisonsApplicationController
 
     @responsibility_type = ResponsibilityService.calculate_pom_responsibility(@prisoner)
 
-    @allocation = AllocationVersion.find_by!(
+    @allocation = Allocation.find_by!(
       nomis_offender_id: coworking_nomis_offender_id_from_url
     )
     @primary_pom = PrisonOffenderManagerService.get_pom_at(
@@ -62,7 +62,7 @@ class CoworkingController < PrisonsApplicationController
   end
 
   def destroy
-    @allocation = AllocationVersion.find_by!(
+    @allocation = Allocation.find_by!(
       nomis_offender_id: nomis_offender_id_from_url
     )
 
@@ -71,8 +71,8 @@ class CoworkingController < PrisonsApplicationController
     @allocation.update!(
       secondary_pom_name: nil,
       secondary_pom_nomis_id: nil,
-      event: AllocationVersion::DEALLOCATE_SECONDARY_POM,
-      event_trigger: AllocationVersion::USER
+      event: Allocation::DEALLOCATE_SECONDARY_POM,
+      event_trigger: Allocation::USER
     )
 
     EmailService.instance(allocation: @allocation,

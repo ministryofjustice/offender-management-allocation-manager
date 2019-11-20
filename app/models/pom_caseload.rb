@@ -22,7 +22,7 @@ class PomCaseload
 private
 
   def load_allocations
-    allocation_list = AllocationVersion.active_pom_allocations(
+    allocation_list = Allocation.active_pom_allocations(
       @staff_id, @prison_id
     )
 

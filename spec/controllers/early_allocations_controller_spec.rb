@@ -36,7 +36,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
 
     stub_poms(prison, poms)
 
-    create(:allocation_version, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
+    create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
   end
 
   context 'with not ldu email address' do

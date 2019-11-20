@@ -46,7 +46,7 @@ class OffenderService
   def self.set_allocated_pom_name(offenders, prison_id)
     pom_names = PrisonOffenderManagerService.get_pom_names(prison_id)
     nomis_offender_ids = offenders.map(&:offender_no)
-    offender_to_staff_hash = AllocationVersion.
+    offender_to_staff_hash = Allocation.
       where(nomis_offender_id: nomis_offender_ids).
       map { |a|
         [

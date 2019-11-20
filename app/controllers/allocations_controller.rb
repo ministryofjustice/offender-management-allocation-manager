@@ -21,7 +21,7 @@ class AllocationsController < PrisonsApplicationController
   def show
     @prisoner = offender(nomis_offender_id_from_url)
 
-    @allocation = AllocationVersion.find_by(nomis_offender_id: @prisoner.offender_no)
+    @allocation = Allocation.find_by(nomis_offender_id: @prisoner.offender_no)
     @pom = StaffMember.new(@allocation.primary_pom_nomis_id)
     redirect_to prison_pom_non_pom_path(@prison.code, @pom.staff_id) unless @pom.pom_at?(@prison.code)
 
@@ -168,7 +168,7 @@ private
   end
 
   def recommended_and_nonrecommended_poms_for(offender)
-    allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id_from_url)
+    allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id_from_url)
     # don't allow primary to be the same as the co-working POM
     poms = PrisonOffenderManagerService.get_poms_for(active_prison_id).select { |pom|
       pom.status == 'active' && pom.staff_id != allocation.try(:secondary_pom_nomis_id)

@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe OverrideHelper do
   let(:allocation_one) {
-    build(:allocation_version,
+    build(:allocation,
           primary_pom_nomis_id: 485_833,
           nomis_offender_id: 'G2911GD',
           recommended_pom_type: 'prison',
@@ -12,7 +12,7 @@ RSpec.describe OverrideHelper do
   }
 
   let(:allocation_two) {
-    build(:allocation_version,
+    build(:allocation,
           primary_pom_nomis_id: 485_833,
           nomis_offender_id: 'G2911GD',
           recommended_pom_type: nil

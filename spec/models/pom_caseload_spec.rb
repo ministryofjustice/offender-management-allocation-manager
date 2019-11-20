@@ -26,7 +26,7 @@ RSpec.describe PomCaseload, type: :model do
 
     # # Allocate all of the offenders to this POM
     offenders.each do |offender|
-      create(:allocation_version, nomis_offender_id: offender.offender_no, primary_pom_nomis_id: staff_id)
+      create(:allocation, nomis_offender_id: offender.offender_no, primary_pom_nomis_id: staff_id)
     end
   end
 
@@ -60,7 +60,7 @@ RSpec.describe PomCaseload, type: :model do
     let(:old_primary_alloc) {
       Timecop.travel(old) do
         create(
-          :allocation_version,
+          :allocation,
           primary_pom_nomis_id: staff_id,
           nomis_offender_id: 'G7514GW',
           nomis_booking_id: 1_153_753
@@ -71,7 +71,7 @@ RSpec.describe PomCaseload, type: :model do
     let(:old_secondary_alloc) {
       Timecop.travel(old) do
         create(
-          :allocation_version,
+          :allocation,
           primary_pom_nomis_id: other_staff_id,
           nomis_offender_id: 'G1234VV',
           nomis_booking_id: 971_856
@@ -83,7 +83,7 @@ RSpec.describe PomCaseload, type: :model do
 
     let(:primary_alloc) {
       create(
-        :allocation_version,
+        :allocation,
         primary_pom_nomis_id: staff_id,
         nomis_offender_id: 'G1234AB',
         nomis_booking_id: 76_908
@@ -92,7 +92,7 @@ RSpec.describe PomCaseload, type: :model do
 
     let(:secondary_alloc) {
       create(
-        :allocation_version,
+        :allocation,
         primary_pom_nomis_id: other_staff_id,
         nomis_offender_id: 'G1234GG',
         nomis_booking_id: 31_777,

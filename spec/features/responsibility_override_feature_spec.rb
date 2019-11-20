@@ -17,7 +17,7 @@ feature 'Responsibility override' do
     end
 
     it 'overrides' do
-      create(:allocation_version, primary_pom_nomis_id: pom_id, nomis_offender_id: offender_id)
+      create(:allocation, primary_pom_nomis_id: pom_id, nomis_offender_id: offender_id)
       visit new_prison_allocation_path('LEI', offender_id)
 
       within '.responsibility_change' do
