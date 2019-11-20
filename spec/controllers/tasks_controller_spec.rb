@@ -25,42 +25,38 @@ RSpec.describe TasksController, type: :controller do
         "dateOfBirth": "1990-12-06", "age": 28, "categoryCode": "C", "imprisonmentStatus": "LIFE",
         "convictedStatus": "Convicted", "latestLocationId": prison },
       { "bookingId": 754_206, "offenderNo": "G1234VV", "firstName": "Bob", "lastName": "Bibby",
-        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03",
+        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "LIFE",
         "convictedStatus": "Convicted", "latestLocationId": prison },
       { "bookingId": 754_205, "offenderNo": "G1234AB", "firstName": "Carole", "lastName": "Caroleson",
-        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03",
+        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "LIFE",
         "convictedStatus": "Convicted", "latestLocationId": prison },
       { "bookingId": 754_204, "offenderNo": "G1234GG", "firstName": "David", "lastName": "Davidson",
-        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03",
+        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "LIFE",
         "convictedStatus": "Convicted", "latestLocationId": prison }
     ]
 
     bookings = [
       { "bookingId": 754_207, "offenderNo": "G7514GW", "firstName": "Indeter", "lastName": "Minate-Offender", "agencyLocationId": prison,
         "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
-                            "homeDetentionCurfewEligibilityDate": "2011-11-07",
                             "bookingId": 754_207, "sentenceStartDate": "2009-02-08", "automaticReleaseOverrideDate": "2012-03-17",
-                            "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "confirmedReleaseDate": "2012-03-17",
+                            "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "paroleEligibilityDate": "2012-03-17",
                             "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15"
          },
-      { "bookingId": 754_206, "offenderNo": "G1234VV", "firstName": "ROSS", "lastName": "JONES", "agencyLocationId": prison,
+      { "bookingId": 754_206, "offenderNo": "G1234VV", "firstName": "Old", "lastName": "Tariff Date", "agencyLocationId": prison,
         "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
-                            "homeDetentionCurfewEligibilityDate": "2011-11-07",
                             "bookingId": 754_207, "sentenceStartDate": "2009-02-08", "automaticReleaseOverrideDate": "2012-03-17",
-                            "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "confirmedReleaseDate": "2012-03-17",
+                            "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "tariffDate": "2012-03-17",
                             "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15"
         },
       { "bookingId": 754_205, "offenderNo": "G1234AB", "firstName": "ROSS", "lastName": "JONES", "agencyLocationId": prison,
         "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
-                            "homeDetentionCurfewEligibilityDate": "2011-11-07",
-                            "bookingId": 754_207, "sentenceStartDate": "2009-02-08", "automaticReleaseOverrideDate": "2012-03-17",
+                            "bookingId": 754_207, "sentenceStartDate": "2009-02-08", "tariffDate": "2022-03-17",
                             "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "confirmedReleaseDate": "2012-03-17",
                             "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15"
          },
       { "bookingId": 754_204, "offenderNo": "G1234GG", "firstName": "ROSS", "lastName": "JONES", "agencyLocationId": prison,
         "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
-                            "homeDetentionCurfewEligibilityDate": "2011-11-07",
-                            "bookingId": 754_207, "sentenceStartDate": "2009-02-08", "automaticReleaseOverrideDate": "2012-03-17",
+                            "bookingId": 754_207, "sentenceStartDate": "2009-02-08", "paroleEligibilityDate": "2022-03-17",
                             "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "confirmedReleaseDate": "2012-03-17",
                             "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15"
          }
@@ -91,11 +87,8 @@ RSpec.describe TasksController, type: :controller do
       expect(response).to be_successful
 
       pomtasks = assigns(:pomtasks)
-      expect(pomtasks.count).to eq(1)
-
-      # We expect only one of these to have a parole review date task
-      expect(pomtasks.first.offender_number).to eq(offender_no)
-      expect(pomtasks.first.action_label).to eq('Parole review date')
+      expect(pomtasks.map(&:offender_number)).to match_array %w[G7514GW G1234VV]
+      expect(pomtasks.map(&:action_label)).to match_array ['Parole review date', 'Parole review date']
     end
   end
 
@@ -173,7 +166,7 @@ RSpec.describe TasksController, type: :controller do
       expect(response).to be_successful
 
       pomtasks = assigns(:pomtasks)
-      expect(pomtasks.count).to eq(2)
+      expect(pomtasks.count).to eq(3)
     end
 
     it 'can sort the results' do
@@ -193,13 +186,13 @@ RSpec.describe TasksController, type: :controller do
       expect(response).to be_successful
       pomtasks = assigns(:pomtasks)
       expect(pomtasks[0].offender_name).to eq('Aliceson, Alice')
-      expect(pomtasks[2].offender_name).to eq('Davidson, David')
+      expect(pomtasks[2].offender_name).to eq('Caroleson, Carole')
 
       get :index, params: { prison_id: prison, sort: 'offender_name desc' }
       expect(response).to be_successful
       pomtasks = assigns(:pomtasks)
       expect(pomtasks[0].offender_name).to eq('Davidson, David')
-      expect(pomtasks[2].offender_name).to eq('Aliceson, Alice')
+      expect(pomtasks[2].offender_name).to eq('Bibby, Bob')
     end
   end
 end
