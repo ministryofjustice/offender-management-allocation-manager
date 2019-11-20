@@ -2,6 +2,14 @@
   "scripts": {
     "postdeploy": "bundle exec rails db:seed"
   },
+  "formation": {
+    "web": {
+      "quantity": 1
+    },
+    "worker": {
+      "quantity": 1
+    }
+  },
   "addons": [
     {
       "plan": "heroku-postgresql",
