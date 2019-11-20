@@ -3,6 +3,9 @@
 class SummaryService
   PAGE_SIZE = 20 # The number of items to show in the view
 
+  # The maximum number of days for an offender to be considered newly arrived
+  NEWLY_ARRIVED_DAYS = 2
+
   # rubocop:disable Metrics/MethodLength
   def self.summary(summary_type, prison)
     # We expect to be passed summary_type, which is one of :allocated, :unallocated,
@@ -35,8 +38,8 @@ class SummaryService
         else
           buckets[:unallocated].items << offender
         end
-      elsif offender.awaiting_allocation_for > 2
-        # If the offender has been waiting more than 48 hours for their
+      elsif offender.awaiting_allocation_for > NEWLY_ARRIVED_DAYS
+        # If the offender has been waiting more than 2 days for their
         # data to be updated, then they will appear in the pending bucket,
         # otherwise the newly_arrived bucket
         bucket[:pending].items << offender
