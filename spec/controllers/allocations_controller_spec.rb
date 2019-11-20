@@ -87,7 +87,7 @@ RSpec.describe AllocationsController, type: :controller do
 
   describe '#history' do
     let(:prison) { 'AYI' }
-    let(:offender_no) { 'G7806VO' }
+    let(:offender_no) { 'G1234VO' }
     let(:pom_staff_id) { 1 }
 
     before do
@@ -108,19 +108,23 @@ RSpec.describe AllocationsController, type: :controller do
         to_return(status: 200, body: {}.to_json, headers: {})
     end
 
-    context 'when DeliusDataJob updating the COM name', :versioning do
-      let!(:d1) { create(:delius_data, offender_manager: 'Mr Todd', noms_no: offender_no) }
+    context 'when DeliusDataJob has updated the COM name', :versioning do
+      # set DOB to 8 stars so that Delius matching ignores DoB
+      let!(:d1) { create(:delius_data, date_of_birth: '********', offender_manager: 'Mr Todd', noms_no: offender_no) }
       let(:create_time) { 3.days.ago }
-      let(:update_time) { 2.days.ago }
 
       before do
-        x = create(:allocation_version, primary_pom_nomis_id: 1, allocated_at_tier: 'C', nomis_offender_id: d1.noms_no,
+        x = create(:allocation_version, primary_pom_nomis_id: 1, allocated_at_tier: 'C',
+                                        nomis_offender_id: d1.noms_no,
                                         created_at: create_time, updated_at: create_time)
-        x.update(allocated_at_tier: 'D', updated_at: update_time)
-        ProcessDeliusDataJob.perform_now offender_no
+        Timecop.travel 2.days.ago do
+          ProcessDeliusDataJob.perform_now offender_no
+        end
+        x.reload
+        x.update(allocated_at_tier: 'D')
       end
 
-      it 'doesnt mess up the allocation history' do
+      it 'doesnt mess up the allocation history updated_at as we surface the value' do
         get :history, params: { prison_id: prison, nomis_offender_id: d1.noms_no }
         history = assigns(:history)
         # one set of history as only 1 prison involved
@@ -131,7 +135,7 @@ RSpec.describe AllocationsController, type: :controller do
 
         allocation_list = history.first.second
         expect(allocation_list.size).to eq(2)
-        expect(allocation_list.map(&:updated_at).map(&:to_date)).to eq([update_time, create_time].map(&:to_date))
+        expect(allocation_list.map(&:updated_at).map(&:to_date)).to eq([Time.zone.today, create_time].map(&:to_date))
       end
     end
 
