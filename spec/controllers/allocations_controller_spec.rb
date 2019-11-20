@@ -106,7 +106,6 @@ RSpec.describe AllocationsController, type: :controller do
       stub_pom_emails(5, [])
       stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/staff/5").
         to_return(status: 200, body: {}.to_json, headers: {})
-
     end
 
     context 'when DeliusDataJob updating the COM name', :versioning do
@@ -116,7 +115,7 @@ RSpec.describe AllocationsController, type: :controller do
 
       before do
         x = create(:allocation_version, primary_pom_nomis_id: 1, allocated_at_tier: 'C', nomis_offender_id: d1.noms_no,
-                   created_at: create_time, updated_at: create_time)
+                                        created_at: create_time, updated_at: create_time)
         x.update(allocated_at_tier: 'D', updated_at: update_time)
         ProcessDeliusDataJob.perform_now offender_no
       end
