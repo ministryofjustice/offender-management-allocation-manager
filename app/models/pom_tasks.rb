@@ -21,13 +21,11 @@ class PomTasks
     end
 
     tasks = []
-    unless offender.indeterminate_sentence?
-      prd_task = parole_review_date_task(offender)
-      tasks << prd_task if prd_task.present?
+    if offender.indeterminate_sentence?
+      tasks << parole_review_date_task(offender)
     end
 
-    delius_task = missing_info_task(offender)
-    tasks << delius_task if delius_task.present?
+    tasks << missing_info_task(offender)
 
     if early_allocations.key?(offender.offender_no)
       tasks << early_allocation_update_task(offender)
