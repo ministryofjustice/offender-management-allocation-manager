@@ -107,9 +107,15 @@ private
     current_allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id)
 
     unless current_allocation.nil?
-      AllocationService.get_versions_for(current_allocation).
-        append(current_allocation).
-        sort_by!(&:updated_at)
+      # we need to overwrite the 'updated_at' in the history with the 'to' value (index 1)
+      # so that if it is changed later w/o history (e.g. by updating the COM name)
+      # we don't produce the wrong answer
+      allocs = AllocationService.get_versions_for(current_allocation).
+        append(current_allocation)
+      allocs.zip(current_allocation.versions).each do |alloc, raw_version|
+        alloc.updated_at = YAML.load(raw_version.object_changes).fetch('updated_at')[1]
+      end
+      allocs
     end
   end
 
