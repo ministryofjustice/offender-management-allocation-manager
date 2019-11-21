@@ -115,9 +115,9 @@ RSpec.describe AllocationsController, type: :controller do
 
       before do
         x = create(:allocation, primary_pom_nomis_id: 1, allocated_at_tier: 'C',
-                                        nomis_offender_id: d1.noms_no,
-                                        created_at: create_time, 
-                                        updated_at: create_time)
+                                nomis_offender_id: d1.noms_no,
+                                created_at: create_time,
+                                updated_at: create_time)
         Timecop.travel 2.days.ago do
           ProcessDeliusDataJob.perform_now offender_no
         end
