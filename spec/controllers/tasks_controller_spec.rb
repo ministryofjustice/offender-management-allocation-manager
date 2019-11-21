@@ -101,29 +101,37 @@ RSpec.describe TasksController, type: :controller do
     end
   end
 
-  # TODO: Re-enable this context when auto-delius is active
-  # context 'when showing ndelius update pom tasks' do
-  #   let(:offender_no) { 'G1234VV' }
+  context 'when showing ndelius update pom tasks' do
+    let(:test_strategy) { Flipflop::FeatureSet.current.test! }
+    let(:offender_no) { 'G1234VV' }
 
-  #   it 'can show offenders needing nDelius updates' do
-  #     stub_offender(offender_no, booking_number: 754_206)
+    before do
+      test_strategy.switch!(:auto_delius_import, true)
+    end
 
-  #     # Ensure only one of our offenders has missing data and that G7514GW (indeterminate) has a PRD
-  #     create(:case_information, nomis_offender_id: offender_no, tier: 'A', local_divisional_unit: nil)
-  #     create(:case_information, nomis_offender_id: 'G1234AB', tier: 'A', mappa_level: 1)
-  #     create(:case_information, nomis_offender_id: 'G1234GG', tier: 'A', mappa_level: 1)
-  #     create(:case_information, nomis_offender_id: 'G7514GW', tier: 'A', mappa_level: 1, parole_review_date: next_week)
+    after do
+      test_strategy.switch!(:auto_delius_import, false)
+    end
 
-  #     get :index, params: { prison_id: prison }
+    it 'can show offenders needing nDelius updates' do
+      stub_offender(offender_no, booking_number: 754_206)
 
-  #     expect(response).to be_successful
+      # Ensure only one of our offenders has missing data and that G7514GW (indeterminate) has a PRD
+      create(:case_information, nomis_offender_id: offender_no, tier: 'A', local_divisional_unit: nil)
+      create(:case_information, nomis_offender_id: 'G1234AB', tier: 'A', mappa_level: 1)
+      create(:case_information, nomis_offender_id: 'G1234GG', tier: 'A', mappa_level: 1)
+      create(:case_information, nomis_offender_id: 'G7514GW', tier: 'A', mappa_level: 1, parole_review_date: next_week)
 
-  #     pomtasks = assigns(:pomtasks)
-  #     expect(pomtasks.count).to eq(0)
-  #     expect(pomtasks.first.offender_number).to eq(offender_no)
-  #     expect(pomtasks.first.action_label).to eq('nDelius case matching')
-  #   end
-  # end
+      get :index, params: { prison_id: prison }
+
+      expect(response).to be_successful
+
+      pomtasks = assigns(:pomtasks)
+      expect(pomtasks.count).to eq(1)
+      expect(pomtasks.first.offender_number).to eq(offender_no)
+      expect(pomtasks.first.action_label).to eq('nDelius case matching')
+    end
+  end
 
   context 'when showing early allocation decisions required' do
     let(:offender_nos) { %w[G1234AB G1234GG G7514GW G1234VV] }
