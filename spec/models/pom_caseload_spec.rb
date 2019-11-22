@@ -26,7 +26,7 @@ RSpec.describe PomCaseload, type: :model do
 
     # # Allocate all of the offenders to this POM
     offenders.each do |offender|
-      create(:allocat_version, nomis_offender_id: offender.offender_no, primary_pom_nomis_id: staff_id)
+      create(:allocation_version, nomis_offender_id: offender.offender_no, primary_pom_nomis_id: staff_id)
     end
   end
 
