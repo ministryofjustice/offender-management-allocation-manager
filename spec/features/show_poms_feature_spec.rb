@@ -55,8 +55,8 @@ feature "get poms list" do
         primary_pom_nomis_id: 485_752,
         primary_pom_allocated_at: DateTime.now.utc,
         recommended_pom_type: 'probation',
-        event: AllocationVersion::ALLOCATE_PRIMARY_POM,
-        event_trigger: AllocationVersion::USER
+        event: Allocation::ALLOCATE_PRIMARY_POM,
+        event_trigger: Allocation::USER
       )
     end
 

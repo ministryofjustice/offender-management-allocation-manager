@@ -59,6 +59,6 @@ class AllocationValidation
   # rubocop:enable Metrics/MethodLength
 
   def active_allocations_for_prison(prison)
-    AllocationVersion.where.not(primary_pom_nomis_id: nil).where(prison: prison)
+    Allocation.where.not(primary_pom_nomis_id: nil).where(prison: prison)
   end
 end

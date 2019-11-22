@@ -96,7 +96,7 @@ describe MovementService do
     let!(:transfer_in) { create(:movement, offender_no: 'G4273GI', direction_code: 'IN', movement_type: 'ADM', from_agency: 'VEI', to_agency: 'CFI')   }
     let!(:admission) { create(:movement, offender_no: 'G4273GI', to_agency: 'LEI', from_agency: 'COURT')   }
 
-    let!(:existing_allocation) { create(:allocation_version, nomis_offender_id: 'G4273GI', prison: 'LEI')   }
+    let!(:existing_allocation) { create(:allocation, nomis_offender_id: 'G4273GI', prison: 'LEI')   }
     let!(:existing_alloc_transfer) { create(:movement, offender_no: 'G4273GI', from_agency: 'PRI', to_agency: 'LEI')   }
 
     it "can process transfers were offender already allocated at new prison",
@@ -169,11 +169,11 @@ describe MovementService do
     let!(:invalid_release2) { create(:movement, offender_no: 'G4273GI', direction_code: 'OUT', movement_type: 'REL', from_agency: 'COURT')   }
 
     let!(:case_info) { create(:case_information, nomis_offender_id: 'G4273GI') }
-    let!(:allocation) { create(:allocation_version, nomis_offender_id: 'G4273GI') }
+    let!(:allocation) { create(:allocation, nomis_offender_id: 'G4273GI') }
 
     it "can process release movements", vcr: { cassette_name: :movement_service_process_release_spec }  do
       processed = described_class.process_movement(valid_release)
-      updated_allocation = AllocationVersion.find_by(nomis_offender_id: valid_release.offender_no)
+      updated_allocation = Allocation.find_by(nomis_offender_id: valid_release.offender_no)
 
       expect(CaseInformationService.get_case_information([valid_release.offender_no])).to be_empty
       expect(updated_allocation.event_trigger).to eq 'offender_released'

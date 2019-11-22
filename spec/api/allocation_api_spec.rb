@@ -51,7 +51,7 @@ describe 'Allocation API' do
 
         let(:offender_no) { 'G4273GI' }
         let!(:allocation) {
-          create(:allocation_version, nomis_offender_id: offender_no, primary_pom_name: 'Hyon Zboncak')
+          create(:allocation, nomis_offender_id: offender_no, primary_pom_name: 'Hyon Zboncak')
         }
         let(:Authorization) { "Bearer #{token}" }
 

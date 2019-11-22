@@ -27,7 +27,7 @@ feature 'Co-working' do
   context 'with just a primary POM allocated' do
     let!(:allocation) {
       create(
-        :allocation_version,
+        :allocation,
         nomis_offender_id: nomis_offender_id,
         primary_pom_nomis_id: probation_pom[:staff_id],
         primary_pom_name: probation_pom[:pom_name],
@@ -110,7 +110,7 @@ feature 'Co-working' do
   context 'with a secondary POM allocated' do
     let!(:allocation) {
       create(
-        :allocation_version,
+        :allocation,
         nomis_offender_id: nomis_offender_id,
         primary_pom_nomis_id: probation_pom[:staff_id],
         primary_pom_name: probation_pom[:pom_name],

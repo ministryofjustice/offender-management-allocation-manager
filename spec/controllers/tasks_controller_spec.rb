@@ -69,7 +69,7 @@ RSpec.describe TasksController, type: :controller do
 
     # Allocate all of the offenders to this POM
     offenders.each do |offender|
-      create(:allocation_version, nomis_offender_id: offender[:offenderNo], primary_pom_nomis_id: staff_id)
+      create(:allocation, nomis_offender_id: offender[:offenderNo], primary_pom_nomis_id: staff_id)
     end
 
     stub_multiple_offenders(offenders, bookings)

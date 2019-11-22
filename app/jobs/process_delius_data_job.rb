@@ -65,7 +65,7 @@ private
   end
 
   def update_com_name(delius_record)
-    allocation = AllocationVersion.find_by(nomis_offender_id: delius_record.noms_no)
+    allocation = Allocation.find_by(nomis_offender_id: delius_record.noms_no)
     return if allocation.blank?
 
     allocation.update(com_name: delius_record.offender_manager)

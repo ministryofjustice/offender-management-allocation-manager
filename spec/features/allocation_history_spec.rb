@@ -36,7 +36,7 @@ feature 'Allocation History' do
 
   scenario 'view offender allocation history', versioning: true, vcr: { cassette_name: :offender_allocation_history } do
     allocation = create(
-      :allocation_version,
+      :allocation,
       nomis_offender_id: nomis_offender_id,
       primary_pom_nomis_id: probation_pom[:primary_pom_nomis_id],
       primary_pom_name: probation_pom[:primary_pom_name],
@@ -48,26 +48,26 @@ feature 'Allocation History' do
       primary_pom_allocated_at: Time.zone.now - 12.days
     )
 
-    allocation.update!(event: AllocationVersion::REALLOCATE_PRIMARY_POM,
+    allocation.update!(event: Allocation::REALLOCATE_PRIMARY_POM,
                        primary_pom_nomis_id: probation_pom_2[:primary_pom_nomis_id],
                        primary_pom_name: probation_pom_2[:primary_pom_name],
                        recommended_pom_type: 'probation',
                        updated_at: Time.zone.now - 10.days
     )
-    allocation.update!(event: AllocationVersion::ALLOCATE_SECONDARY_POM,
+    allocation.update!(event: Allocation::ALLOCATE_SECONDARY_POM,
                        secondary_pom_nomis_id: probation_pom[:primary_pom_nomis_id],
                        secondary_pom_name: probation_pom[:primary_pom_name],
                        updated_at: Time.zone.now - 8.days
     )
-    allocation.update!(event: AllocationVersion::DEALLOCATE_SECONDARY_POM,
+    allocation.update!(event: Allocation::DEALLOCATE_SECONDARY_POM,
                        secondary_pom_nomis_id: nil,
                        secondary_pom_name: nil,
                        recommended_pom_type: nil,
                        updated_at: Time.zone.now - 7.days
     )
 
-    allocation.update!(event: AllocationVersion::DEALLOCATE_PRIMARY_POM,
-                       event_trigger: AllocationVersion::USER,
+    allocation.update!(event: Allocation::DEALLOCATE_PRIMARY_POM,
+                       event_trigger: Allocation::USER,
                        primary_pom_nomis_id: nil,
                        primary_pom_name: nil,
                        recommended_pom_type: nil,
@@ -77,7 +77,7 @@ feature 'Allocation History' do
 
     deallocate_date = allocation.updated_at.strftime("#{allocation.updated_at.day.ordinalize} %B %Y")
 
-    allocation.update!(event: AllocationVersion::ALLOCATE_PRIMARY_POM,
+    allocation.update!(event: Allocation::ALLOCATE_PRIMARY_POM,
                        prison: 'PVI',
                        primary_pom_nomis_id: prison_pom[:primary_pom_nomis_id],
                        primary_pom_name: prison_pom[:primary_pom_name],
@@ -85,14 +85,14 @@ feature 'Allocation History' do
                        created_by_name: nil,
                        updated_at: Time.zone.now - 4.days)
 
-    allocation.update!(event: AllocationVersion::REALLOCATE_PRIMARY_POM,
+    allocation.update!(event: Allocation::REALLOCATE_PRIMARY_POM,
                        primary_pom_nomis_id: pom_without_email[:primary_pom_nomis_id],
                        primary_pom_name: pom_without_email[:primary_pom_name],
                        recommended_pom_type: 'probation',
                        updated_at: Time.zone.now - 2.days)
 
-    allocation.update!(event: AllocationVersion::DEALLOCATE_PRIMARY_POM,
-                       event_trigger: AllocationVersion::OFFENDER_TRANSFERRED,
+    allocation.update!(event: Allocation::DEALLOCATE_PRIMARY_POM,
+                       event_trigger: Allocation::OFFENDER_TRANSFERRED,
                        primary_pom_nomis_id: nil,
                        primary_pom_name: nil,
                        secondary_pom_nomis_id: nil,

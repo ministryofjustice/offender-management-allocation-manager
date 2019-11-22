@@ -27,7 +27,7 @@ class AllocationList
       slice_of_this = @array.slice(idx, last_idx - idx)
       allocations_for_prison = slice_of_this.take_while { |p|
         # The nil? piece here is impossible to test as we have changed our minds about
-        # nilling out prison in allocation_version, however in production we still have some
+        # nilling out prison in allocation, however in production we still have some
         # history records in the 'versions' table with a nil prison in them.
         # These need to be swept up as belonging to the 'current' prison as they are typically de-allocations
         p.prison == prison || p.prison.nil?
