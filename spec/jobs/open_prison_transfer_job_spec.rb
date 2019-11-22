@@ -8,13 +8,13 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
   let(:open_prison_code) { 'HDI' }
   let(:closed_prison_code) { 'LEI' }
   let(:poms) {
-    [{
-      staffId: nomis_staff_id,
-      firstName: 'Firstname',
-      lastName: 'Lastname',
-      position: RecommendationService::PRISON_POM,
-      emails: ['pom@localhost.local']
-    }]
+    [build(:pom,
+           staffId: nomis_staff_id,
+           firstName: 'Firstname',
+           lastName: 'Lastname',
+           position: RecommendationService::PRISON_POM,
+           emails: ['pom@localhost.local']
+     )]
   }
   let(:movement_json) {
     {

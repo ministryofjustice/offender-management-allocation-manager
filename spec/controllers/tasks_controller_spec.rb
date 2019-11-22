@@ -6,11 +6,10 @@ RSpec.describe TasksController, type: :controller do
   let(:username) { 'alice' }
   let(:pom) {
     [
-      {
-        staffId: staff_id,
-        username: username,
-        position: RecommendationService::PRISON_POM
-      }
+      build(:pom,
+            staffId: staff_id,
+            position: RecommendationService::PRISON_POM
+      )
     ]
   }
   let(:next_week) { Time.zone.today + 7.days }
