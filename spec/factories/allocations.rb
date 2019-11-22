@@ -1,7 +1,7 @@
 require 'faker'
 
 FactoryBot.define do
-  factory :allocation_version do
+  factory :allocation do
     allocated_at_tier do
       'A'
     end
@@ -15,11 +15,11 @@ FactoryBot.define do
     end
 
     event do
-      AllocationVersion::ALLOCATE_PRIMARY_POM
+      Allocation::ALLOCATE_PRIMARY_POM
     end
 
     event_trigger do
-      AllocationVersion::USER
+      Allocation::USER
     end
 
     nomis_booking_id do

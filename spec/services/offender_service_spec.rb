@@ -64,7 +64,7 @@ describe OffenderService do
   end
 
   def allocate_offender(allocated_date)
-    AllocationVersion.create!(
+    Allocation.create!(
       nomis_offender_id: offenders.first.offender_no,
       nomis_booking_id: 1_153_753,
       prison: 'LEI',
@@ -73,8 +73,8 @@ describe OffenderService do
       primary_pom_nomis_id: nomis_staff_id,
       primary_pom_allocated_at: allocated_date,
       recommended_pom_type: 'prison',
-      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
-      event_trigger: AllocationVersion::USER
+      event: Allocation::ALLOCATE_PRIMARY_POM,
+      event_trigger: Allocation::USER
     )
   end
 end

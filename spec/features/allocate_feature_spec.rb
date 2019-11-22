@@ -131,7 +131,7 @@ feature 'Allocation' do
 
   scenario 're-allocating', versioning: true, vcr: { cassette_name: :re_allocate_feature } do
     create(
-      :allocation_version,
+      :allocation,
       nomis_offender_id: nomis_offender_id,
       primary_pom_nomis_id: 485_637,
       recommended_pom_type: 'probation'
@@ -162,7 +162,7 @@ feature 'Allocation' do
 
     click_button 'Complete allocation'
 
-    expect(AllocationVersion.find_by(nomis_offender_id: nomis_offender_id).event).to eq("reallocate_primary_pom")
+    expect(Allocation.find_by(nomis_offender_id: nomis_offender_id).event).to eq("reallocate_primary_pom")
   end
 
   scenario 'allocation fails', vcr: { cassette_name: :allocation_fails_feature } do

@@ -13,7 +13,7 @@ class PrisonersController < PrisonsApplicationController
     @prisoner = OffenderPresenter.new(@offender,
                                       Responsibility.find_by(nomis_offender_id: id_for_show_action))
     @tasks = PomTasks.new.for_offender(@prisoner)
-    @allocation = AllocationVersion.find_by(nomis_offender_id: @prisoner.offender_no)
+    @allocation = Allocation.find_by(nomis_offender_id: @prisoner.offender_no)
 
     @pom_responsibility = pom_responsibility
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(

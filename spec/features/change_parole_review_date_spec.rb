@@ -4,7 +4,7 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
   # This ID has an indeterminate sentence
   let(:nomis_offender_id) { 'G0549UO' }
   let!(:case_info) { create(:case_information, nomis_offender_id: nomis_offender_id) }
-  let!(:alloc) { create(:allocation_version, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: 485_752) }
+  let!(:alloc) { create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: 485_752) }
   let(:year) { Time.zone.today.year + 1 }
   let(:yesterday) { Time.zone.yesterday }
 

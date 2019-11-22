@@ -40,7 +40,7 @@ private
   def last_allocation(offender)
     # Find the last allocation for an offender where they had a primary
     # pom. May return nil.
-    alloc = AllocationVersion.find_by(nomis_offender_id: offender.offender_no)
+    alloc = Allocation.find_by(nomis_offender_id: offender.offender_no)
     return nil if alloc.blank?
 
     AllocationService.get_versions_for(alloc).detect { |allocation|

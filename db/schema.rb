@@ -10,12 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_22_074139) do
+ActiveRecord::Schema.define(version: 2019_11_20_095310) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "allocation_versions", force: :cascade do |t|
+  create_table "allocations", force: :cascade do |t|
     t.string "nomis_offender_id"
     t.string "prison"
     t.string "allocated_at_tier"
@@ -37,9 +37,9 @@ ActiveRecord::Schema.define(version: 2019_10_22_074139) do
     t.datetime "primary_pom_allocated_at"
     t.string "recommended_pom_type"
     t.string "com_name"
-    t.index ["nomis_offender_id"], name: "index_allocation_versions_on_nomis_offender_id"
-    t.index ["primary_pom_nomis_id"], name: "index_allocation_versions_on_primary_pom_nomis_id"
-    t.index ["prison"], name: "index_allocation_versions_on_prison"
+    t.index ["nomis_offender_id"], name: "index_allocations_on_nomis_offender_id"
+    t.index ["primary_pom_nomis_id"], name: "index_allocations_on_primary_pom_nomis_id"
+    t.index ["prison"], name: "index_allocations_on_prison"
     t.index ["secondary_pom_nomis_id"], name: "index_allocation_versions_secondary_pom_nomis_id"
   end
 

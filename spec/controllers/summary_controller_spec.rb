@@ -176,7 +176,7 @@ RSpec.describe SummaryController, type: :controller do
     stub_offenders_for_prison(prison, offenders, bookings)
 
     create(:case_information, nomis_offender_id: offender_id)
-    create(:allocation_version, nomis_offender_id: offender_id, primary_pom_nomis_id: 234)
+    create(:allocation, nomis_offender_id: offender_id, primary_pom_nomis_id: 234)
 
     get :allocated, params: { prison_id: prison, sort: 'awaiting_allocation_for asc' }
     expect(assigns(:summary).offenders.count).to eq(1)

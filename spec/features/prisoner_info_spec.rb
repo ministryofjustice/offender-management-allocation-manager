@@ -18,7 +18,7 @@ feature 'View a prisoner profile page' do
 
   context 'with an allocation' do
     let!(:alloc) {
-      create(:allocation_version, nomis_offender_id: 'G7998GJ', primary_pom_nomis_id: '485637')
+      create(:allocation, nomis_offender_id: 'G7998GJ', primary_pom_nomis_id: '485637')
     }
 
     it 'shows the prisoner information', :raven_intercept_exception, vcr: { cassette_name: :show_offender_spec } do

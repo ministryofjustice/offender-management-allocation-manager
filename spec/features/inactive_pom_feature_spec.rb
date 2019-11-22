@@ -12,7 +12,7 @@ feature 'Inactive POM' do
       signin_user
 
       create(
-        :allocation_version,
+        :allocation,
         nomis_offender_id: nomis_offender_id,
         primary_pom_nomis_id: inactive_pom,
         secondary_pom_nomis_id: active_pom
@@ -29,7 +29,7 @@ feature 'Inactive POM' do
       choose("Inactive")
       click_button("Save")
 
-      expect(AllocationVersion.where(primary_pom_nomis_id: inactive_pom).count).to eq(0)
+      expect(Allocation.where(primary_pom_nomis_id: inactive_pom).count).to eq(0)
     end
 
     it "will redirect to the help page" do
