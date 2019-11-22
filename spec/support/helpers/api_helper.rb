@@ -42,6 +42,7 @@ module ApiHelper
   end
 
   def stub_signed_in_pom(staff_id, username)
+    stub_auth_token
     stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/users/#{username}").
       to_return(status: 200, body: { 'staffId': staff_id }.to_json)
   end

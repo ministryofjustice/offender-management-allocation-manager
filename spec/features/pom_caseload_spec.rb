@@ -276,7 +276,6 @@ feature "view POM's caseload" do
   it 'stops staff without the POM role from viewing the my caseload page', vcr: { cassette_name: :non_pom_caseload }  do
     signin_user('NON_POM_GEN')
     visit prison_caseload_index_path('LEI')
-    # root path will redirect to default dashboard
-    expect(page).to have_current_path('/prisons/LEI/dashboard')
+    expect(page).to have_current_path('/401')
   end
 end
