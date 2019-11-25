@@ -9,7 +9,7 @@ class CoworkingController < PrisonsApplicationController
     )
 
     # get_pom and get_poms return different data - so have to compare theit staff_ids.
-    poms = PrisonOffenderManagerService.get_poms(active_prison_id).reject { |pom|
+    poms = PrisonOffenderManagerService.get_poms_for(active_prison_id).reject { |pom|
       pom.staff_id == @current_pom.staff_id
     }
 
@@ -17,23 +17,23 @@ class CoworkingController < PrisonsApplicationController
       %w[active unavailable].include? pom.status
     }
 
-    @prison_poms = @active_poms.select{ |pom| pom.position.include?('PRO') }
-    @probation_poms = @active_poms.select{ |pom| pom.position.include?('PO') }
+    @prison_poms = @active_poms.select(&:prison_officer?)
+    @probation_poms = @active_poms.select(&:probation_officer?)
   end
 
   def confirm
     @prisoner = offender(nomis_offender_id_from_url)
-    @primary_pom = PrisonOffenderManagerService.get_pom(
+    @primary_pom = PrisonOffenderManagerService.get_pom_at(
       active_prison_id, primary_pom_id_from_url
     )
-    @secondary_pom = PrisonOffenderManagerService.get_pom(
+    @secondary_pom = PrisonOffenderManagerService.get_pom_at(
       active_prison_id, secondary_pom_id_from_url
     )
   end
 
   def create
     offender = offender(allocation_params[:nomis_offender_id])
-    pom = PrisonOffenderManagerService.get_pom(
+    pom = PrisonOffenderManagerService.get_pom_at(
       active_prison_id,
       allocation_params[:nomis_staff_id]
     )
@@ -53,16 +53,16 @@ class CoworkingController < PrisonsApplicationController
 
     @responsibility_type = ResponsibilityService.calculate_pom_responsibility(@prisoner)
 
-    @allocation = AllocationVersion.find_by!(
+    @allocation = Allocation.find_by!(
       nomis_offender_id: coworking_nomis_offender_id_from_url
     )
-    @primary_pom = PrisonOffenderManagerService.get_pom(
+    @primary_pom = PrisonOffenderManagerService.get_pom_at(
       active_prison_id, @allocation.primary_pom_nomis_id
     )
   end
 
   def destroy
-    @allocation = AllocationVersion.find_by!(
+    @allocation = Allocation.find_by!(
       nomis_offender_id: nomis_offender_id_from_url
     )
 
@@ -71,8 +71,8 @@ class CoworkingController < PrisonsApplicationController
     @allocation.update!(
       secondary_pom_name: nil,
       secondary_pom_nomis_id: nil,
-      event: AllocationVersion::DEALLOCATE_SECONDARY_POM,
-      event_trigger: AllocationVersion::USER
+      event: Allocation::DEALLOCATE_SECONDARY_POM,
+      event_trigger: Allocation::USER
     )
 
     EmailService.instance(allocation: @allocation,

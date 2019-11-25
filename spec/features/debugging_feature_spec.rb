@@ -22,7 +22,7 @@ feature 'Provide debugging information for an offender' do
   end
 
   it 'returns information for an allocated offender', vcr: { cassette_name: :debugging_allocated_offender_feature } do
-    create(:allocation_version,
+    create(:allocation,
            nomis_offender_id: nomis_offender_id,
            primary_pom_name: "Rossana Spinka"
            )

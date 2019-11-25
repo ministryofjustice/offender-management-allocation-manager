@@ -33,6 +33,8 @@ class MovementService
       return process_transfer(movement)
     end
 
+    Rails.logger.info("[MOVEMENT] Ignoring #{movement.movement_type}")
+
     false
   end
 
@@ -40,6 +42,8 @@ private
 
   def self.process_transfer(transfer)
     return false unless transfer.direction_code == 'IN'
+
+    Rails.logger.info("[MOVEMENT] Processing transfer for #{transfer.offender_no}")
 
     if PrisonService.open_prison?(transfer.to_agency)
       # There are special rules for responsibility when offenders
@@ -53,23 +57,35 @@ private
 
     # We only want to deallocate the offender if they have not already been
     # allocated at their new prison
-    if AllocationVersion.where(
+    if Allocation.where(
       nomis_offender_id: transfer.offender_no,
       prison: transfer.to_agency
     ).count > 0
 
-      Rails.logger.info("Offender #{transfer.offender_no} was transferred but \
+      Rails.logger.info("[MOVEMENT] Offender #{transfer.offender_no} was transferred but \
         an allocation at #{transfer.to_agency} already exists")
 
       return false
     end
 
-    Rails.logger.info("Processing transfer for #{transfer.offender_no}")
+    Rails.logger.info("[MOVEMENT] De-allocating #{transfer.offender_no}")
 
-    return false unless should_process?(transfer.offender_no)
+    alloc = Allocation.find_by(nomis_offender_id: transfer.offender_no)
 
-    AllocationVersion.deallocate_offender(transfer.offender_no,
-                                          AllocationVersion::OFFENDER_TRANSFERRED)
+    # frozen_string_literal: true
+    # We need to check whether the from_agency is from within the prison estate
+    # to know whether it is a transfer.  If it isn't then we want to bail and
+    # not process the new admission.
+    # There are special rules for responsibility when offenders
+    # move to open prisons so we will trigger this job to send
+    # an email to the LDU
+    # Bail if this is a new admission to prison
+    # We only want to deallocate the offender if they have not already been
+    # allocated at their new prison
+    # When an offender is released, we can no longer rely on their
+    # case information (in case they come back one day), and we
+    # should de-activate any current allocations.
+    alloc&.deallocate_offender(Allocation::OFFENDER_TRANSFERRED)
     true
   end
 
@@ -79,16 +95,25 @@ private
   def self.process_release(release)
     return false unless release.to_agency == 'OUT' && release.from_prison?
 
-    Rails.logger.info("Processing release for #{release.offender_no}")
-    CaseInformationService.delete_information(release.offender_no)
-    AllocationVersion.deallocate_offender(release.offender_no,
-                                          AllocationVersion::OFFENDER_RELEASED)
+    Rails.logger.info("[MOVEMENT] Processing release for #{release.offender_no}")
+
+    CaseInformation.where(nomis_offender_id: release.offender_no).destroy_all
+    alloc = Allocation.find_by(nomis_offender_id: release.offender_no)
+    # frozen_string_literal: true
+    # We need to check whether the from_agency is from within the prison estate
+    # to know whether it is a transfer.  If it isn't then we want to bail and
+    # not process the new admission.
+    # There are special rules for responsibility when offenders
+    # move to open prisons so we will trigger this job to send
+    # an email to the LDU
+    # Bail if this is a new admission to prison
+    # We only want to deallocate the offender if they have not already been
+    # allocated at their new prison
+    # When an offender is released, we can no longer rely on their
+    # case information (in case they come back one day), and we
+    # should de-activate any current allocations.
+    alloc&.deallocate_offender(Allocation::OFFENDER_RELEASED)
 
     true
-  end
-
-  def self.should_process?(offender_no)
-    offender = OffenderService.get_offender(offender_no)
-    offender.convicted? && offender.over_18? && offender.criminal_sentence?
   end
 end

@@ -6,12 +6,22 @@ module Nomis
 
     attr_accessor :staff_id, :first_name, :last_name,
                   :agency_id, :agency_description,
-                  :from_date, :position, :position_description,
+                  :from_date, :position_description,
                   :role, :role_description,
                   :schedule_type, :schedule_type_description,
                   :hours_per_week, :thumbnail_id, :emails,
                   :tier_a, :tier_b, :tier_c, :tier_d,
                   :total_cases, :status, :working_pattern
+
+    attr_writer :position
+
+    def prison_officer?
+      @position == RecommendationService::PRISON_POM
+    end
+
+    def probation_officer?
+      @position == RecommendationService::PROBATION_POM
+    end
 
     def email_address
       emails.first
@@ -30,7 +40,7 @@ module Nomis
     end
 
     def add_detail(pom_detail, prison)
-      allocation_counts = AllocationVersion.active_primary_pom_allocations(
+      allocation_counts = Allocation.active_primary_pom_allocations(
         pom_detail.nomis_staff_id, prison).group(:allocated_at_tier).count
 
       self.tier_a = allocation_counts.fetch('A', 0)

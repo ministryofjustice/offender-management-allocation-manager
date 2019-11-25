@@ -5,6 +5,8 @@ class ProcessDeliusDataJob < ApplicationJob
 
   def perform(nomis_offender_id)
     DeliusData.transaction do
+      logger.info("[DELIUS] Processing delius data for #{nomis_offender_id}")
+
       DeliusImportError.where(nomis_offender_id: nomis_offender_id).destroy_all
       delius_data = DeliusData.where(noms_no: nomis_offender_id)
       if delius_data.count > 1
@@ -22,18 +24,18 @@ private
     offender = OffenderService.get_offender(delius_record.noms_no)
 
     if offender.nil?
-      return logger.error("Failed to retrieve NOMIS record #{delius_record.noms_no}")
+      return logger.error("[DELIUS] Failed to retrieve NOMIS record #{delius_record.noms_no}")
     end
 
     return unless offender.convicted?
 
-    if auto_delius_import_enabled?(offender.prison_id)
-      if dob_matches?(offender, delius_record)
-        process_record(delius_record)
-      else
-        DeliusImportError.create! nomis_offender_id: delius_record.noms_no,
-                                  error_type: DeliusImportError::MISMATCHED_DOB
-      end
+    # as a compromise, we always import the DeliusData into the case_information record now,
+    # but only disable manual editing for prisons that are actually enabled.
+    if dob_matches?(offender, delius_record)
+      process_record(delius_record)
+    else
+      DeliusImportError.create! nomis_offender_id: delius_record.noms_no,
+                                error_type: DeliusImportError::MISMATCHED_DOB
     end
   end
 
@@ -63,7 +65,7 @@ private
   end
 
   def update_com_name(delius_record)
-    allocation = AllocationVersion.find_by(nomis_offender_id: delius_record.noms_no)
+    allocation = Allocation.find_by(nomis_offender_id: delius_record.noms_no)
     return if allocation.blank?
 
     allocation.update(com_name: delius_record.offender_manager)

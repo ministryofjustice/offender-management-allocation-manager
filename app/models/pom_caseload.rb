@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class PomCaseload
-  include Rails.application.routes.url_helpers
-
   def initialize(pom_staff_id, prison_id)
     @staff_id = pom_staff_id
     @prison_id = prison_id
@@ -23,9 +21,8 @@ class PomCaseload
 
 private
 
-  # rubocop:disable Metrics/MethodLength
   def load_allocations
-    allocation_list = AllocationVersion.active_pom_allocations(
+    allocation_list = Allocation.active_pom_allocations(
       @staff_id, @prison_id
     )
 
@@ -38,21 +35,11 @@ private
         alloc.nomis_offender_id == offender.offender_no
       }
 
-      # If this is the primary POM, work out responsibility
-      if allocation.primary_pom_nomis_id == @staff_id
-        responsibility =
-          ResponsibilityService.calculate_pom_responsibility(offender).to_s
-      else
-        responsibility = ResponsibilityService::COWORKING
-      end
-
       AllocatedOffender.new(
         @staff_id,
         allocation,
-        offender,
-        responsibility
+        offender
       )
-    }
+    }.select(&:valid?)
   end
-  # rubocop:enable Metrics/MethodLength
 end

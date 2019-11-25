@@ -9,13 +9,13 @@ RSpec.describe EarlyAllocationsController, type: :controller do
     [
       {
         firstName: 'Alice',
-        position: 'PRO',
+        position: RecommendationService::PRISON_POM,
         staffId: nomis_staff_id,
         emails: ['test@digital.justice.org.uk']
       },
       {
         firstName: 'Bob',
-        position: 'PRO',
+        position: RecommendationService::PRISON_POM,
         staffId: 2,
         emails: ['test@digital.justice.org.uk']
       }
@@ -36,7 +36,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
 
     stub_poms(prison, poms)
 
-    create(:allocation_version, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
+    create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
   end
 
   context 'with not ldu email address' do

@@ -6,14 +6,16 @@ feature 'Inactive POM' do
     let(:inactive_pom)      { 485_595 }
     let(:nomis_offender_id) { "G4273GI" }
     let(:prison)            { "LEI" }
+    let(:active_pom) { 485_637 }
 
     before do
       signin_user
 
       create(
-        :allocation_version,
+        :allocation,
         nomis_offender_id: nomis_offender_id,
-        primary_pom_nomis_id: inactive_pom
+        primary_pom_nomis_id: inactive_pom,
+        secondary_pom_nomis_id: active_pom
       )
       create(:pom_detail, nomis_staff_id: inactive_pom)
       visit prison_allocation_path(prison, nomis_offender_id)
@@ -27,7 +29,7 @@ feature 'Inactive POM' do
       choose("Inactive")
       click_button("Save")
 
-      expect(AllocationVersion.where(primary_pom_nomis_id: inactive_pom).count).to eq(0)
+      expect(Allocation.where(primary_pom_nomis_id: inactive_pom).count).to eq(0)
     end
 
     it "will redirect to the help page" do

@@ -10,7 +10,7 @@ class EmailService
     @allocation = allocation
 
     @offender = OffenderService.get_offender(@allocation[:nomis_offender_id])
-    @pom = PrisonOffenderManagerService.get_pom(
+    @pom = PrisonOffenderManagerService.get_pom_at(
       @allocation.prison,
       pom_nomis_id
     )
@@ -80,30 +80,29 @@ private
 
   def previous_pom
     # Check the versions (there MUST be previous records if this is a reallocation)
-    # and find the first version with a primary_pom id that is not the same as the
+    # and find the last version with a primary_pom id that is not the same as the
     # allocation. That will be the POM that is notified of a reallocation.
-    versions = AllocationService.get_versions_for(@allocation)
+    @previous_pom ||= begin
+      versions = AllocationService.get_versions_for(@allocation)
 
-    previous = versions.first { |version|
-      version.primary_pom_nomis_id != @allocation.primary_pom_nomis_id
-    }
-    return nil if previous.blank?
+      previous = versions.reverse.detect { |version|
+        version.primary_pom_nomis_id.present? && version.primary_pom_nomis_id != @allocation.primary_pom_nomis_id
+      }
+      return nil if previous.blank?
 
-    @previous_pom ||= PrisonOffenderManagerService.get_pom(
-      previous.prison,
-      previous.primary_pom_nomis_id
-    )
+      StaffMember.new(previous.primary_pom_nomis_id)
+    end
   end
 
   def send_deallocation_email
     # If the previous pom does not have email configured, do not
     # try and email them.
-    return if previous_pom.emails.blank?
+    return if previous_pom.email_address.blank?
 
     PomMailer.deallocation_email(
       previous_pom_name: previous_pom.first_name.capitalize,
       responsibility: current_responsibility,
-      previous_pom_email: previous_pom.emails.first,
+      previous_pom_email: previous_pom.email_address,
       new_pom_name: @pom.full_name,
       offender_name: @offender.full_name,
       offender_no: @offender.offender_no,

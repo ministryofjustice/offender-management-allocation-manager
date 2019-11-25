@@ -44,7 +44,8 @@ feature 'Allocation' do
   end
 
   scenario 'overriding an allocation', vcr: { cassette_name: :override_allocation_feature_ok } do
-    override_nomis_staff_id = 485_758
+    # This is Amit's staff_id - he is top of the Prison POM list
+    override_nomis_staff_id = 485_787
 
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
@@ -65,11 +66,7 @@ feature 'Allocation' do
 
     expect(current_url).to have_content(prison_summary_unallocated_path('LEI'))
 
-    # Note: after removing an old team member as a POM the MOIC integration test user is now top of the list of POMS.
-    # This user is both a probation and prison POM in the system and therefore whilst it says 'Probation POM' in this
-    # test it is actually going through the test and passing as we'd expect, just that it say Probation and not Prison POM
-
-    expect(page).to have_css('.notification', text: "#{offender_name} has been allocated to Moic Integration-Tests (Probation POM)")
+    expect(page).to have_css('.notification', text: "#{offender_name} has been allocated to Amit Muthu (Prison POM)")
     expect(Override.count).to eq(0)
   end
 
@@ -134,7 +131,7 @@ feature 'Allocation' do
 
   scenario 're-allocating', versioning: true, vcr: { cassette_name: :re_allocate_feature } do
     create(
-      :allocation_version,
+      :allocation,
       nomis_offender_id: nomis_offender_id,
       primary_pom_nomis_id: 485_637,
       recommended_pom_type: 'probation'
@@ -165,7 +162,7 @@ feature 'Allocation' do
 
     click_button 'Complete allocation'
 
-    expect(AllocationVersion.find_by(nomis_offender_id: nomis_offender_id).event).to eq("reallocate_primary_pom")
+    expect(Allocation.find_by(nomis_offender_id: nomis_offender_id).event).to eq("reallocate_primary_pom")
   end
 
   scenario 'allocation fails', vcr: { cassette_name: :allocation_fails_feature } do

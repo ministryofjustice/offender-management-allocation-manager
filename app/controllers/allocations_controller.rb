@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class AllocationsController < PrisonsApplicationController
+  before_action :ensure_admin_user
+
   delegate :update, to: :create
 
   breadcrumb 'Allocated', -> { prison_summary_allocated_path(active_prison_id) }, only: [:show]
@@ -19,7 +21,7 @@ class AllocationsController < PrisonsApplicationController
   def show
     @prisoner = offender(nomis_offender_id_from_url)
 
-    @allocation = AllocationVersion.find_by(nomis_offender_id: @prisoner.offender_no)
+    @allocation = Allocation.find_by(nomis_offender_id: @prisoner.offender_no)
     @pom = StaffMember.new(@allocation.primary_pom_nomis_id)
     redirect_to prison_pom_non_pom_path(@prison.code, @pom.staff_id) unless @pom.pom_at?(@prison.code)
 
@@ -28,7 +30,6 @@ class AllocationsController < PrisonsApplicationController
       @coworker = StaffMember.new(secondary_pom_nomis_id)
       redirect_to prison_pom_non_pom_path(@prison, @coworker.staff_id) unless @coworker.pom_at?(@prison.code)
     end
-
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(active_prison_id, @prisoner.offender_no)
   end
 
@@ -52,7 +53,7 @@ class AllocationsController < PrisonsApplicationController
 
   def confirm
     @prisoner = offender(nomis_offender_id_from_url)
-    @pom = PrisonOffenderManagerService.get_pom(
+    @pom = PrisonOffenderManagerService.get_pom_at(
       active_prison_id,
       nomis_staff_id_from_url
     )
@@ -62,7 +63,7 @@ class AllocationsController < PrisonsApplicationController
 
   def confirm_reallocation
     @prisoner = offender(nomis_offender_id_from_url)
-    @pom = PrisonOffenderManagerService.get_pom(
+    @pom = PrisonOffenderManagerService.get_pom_at(
       active_prison_id,
       nomis_staff_id_from_url
     )
@@ -93,11 +94,30 @@ class AllocationsController < PrisonsApplicationController
 
   def history
     @prisoner = offender(nomis_offender_id_from_url)
-    @history = AllocationService.offender_allocation_history(nomis_offender_id_from_url)
-    @pom_emails = AllocationService.allocation_history_pom_emails(@history)
+    history = offender_allocation_history(nomis_offender_id_from_url)
+    # The history is now collected forwards (to incorporate nil prison ids) but as a result
+    # needs to be 'deep reversed' in order to work properly (as AllocationList produces a list of lists)
+    @history = AllocationList.new(history).to_a.reverse.map { |prison, allocations| [prison, allocations.reverse] }
+    @pom_emails = AllocationService.allocation_history_pom_emails(history)
   end
 
 private
+
+  def offender_allocation_history(nomis_offender_id)
+    current_allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id)
+
+    unless current_allocation.nil?
+      # we need to overwrite the 'updated_at' in the history with the 'to' value (index 1)
+      # so that if it is changed later w/o history (e.g. by updating the COM name)
+      # we don't produce the wrong answer
+      allocs = AllocationService.get_versions_for(current_allocation).
+        append(current_allocation)
+      allocs.zip(current_allocation.versions).each do |alloc, raw_version|
+        alloc.updated_at = YAML.load(raw_version.object_changes).fetch('updated_at')[1]
+      end
+      allocs
+    end
+  end
 
   def unavailable_pom_count
     @unavailable_pom_count ||= PrisonOffenderManagerService.unavailable_pom_count(
@@ -129,7 +149,7 @@ private
   end
 
   def pom
-    @pom ||= PrisonOffenderManagerService.get_pom(
+    @pom ||= PrisonOffenderManagerService.get_pom_at(
       active_prison_id,
       allocation_params[:nomis_staff_id]
     )
@@ -145,7 +165,7 @@ private
     current_allocation = AllocationService.active_allocations(nomis_offender_id, active_prison_id)
     nomis_staff_id = current_allocation[nomis_offender_id]['primary_pom_nomis_id']
 
-    PrisonOffenderManagerService.get_pom(active_prison_id, nomis_staff_id)
+    PrisonOffenderManagerService.get_pom_at(active_prison_id, nomis_staff_id)
   end
 
   def recommended_pom_type(offender)
@@ -154,9 +174,9 @@ private
   end
 
   def recommended_and_nonrecommended_poms_for(offender)
-    allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id_from_url)
+    allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id_from_url)
     # don't allow primary to be the same as the co-working POM
-    poms = PrisonOffenderManagerService.get_poms(active_prison_id).select { |pom|
+    poms = PrisonOffenderManagerService.get_poms_for(active_prison_id).select { |pom|
       pom.status == 'active' && pom.staff_id != allocation.try(:secondary_pom_nomis_id)
     }
 
@@ -169,7 +189,11 @@ private
     # `offender`
     recommended_type = RecommendationService.recommended_pom_type(offender)
     poms.partition { |pom|
-      pom.position.include?(recommended_type)
+      if recommended_type == RecommendationService::PRISON_POM
+        pom.prison_officer?
+      else
+        pom.probation_officer?
+      end
     }
   end
 

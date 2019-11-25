@@ -40,7 +40,7 @@ private
   def last_allocation(offender)
     # Find the last allocation for an offender where they had a primary
     # pom. May return nil.
-    alloc = AllocationVersion.find_by(nomis_offender_id: offender.offender_no)
+    alloc = Allocation.find_by(nomis_offender_id: offender.offender_no)
     return nil if alloc.blank?
 
     AllocationService.get_versions_for(alloc).detect { |allocation|
@@ -51,7 +51,7 @@ private
   def last_pom_email(allocation)
     return nil if allocation.blank?
 
-    pom = PrisonOffenderManagerService.get_pom(allocation.prison, allocation.primary_pom_nomis_id)
+    pom = PrisonOffenderManagerService.get_pom_at(allocation.prison, allocation.primary_pom_nomis_id)
     pom.emails.first
   end
 

@@ -45,17 +45,17 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
       let!(:offender_id) { 'A1111A' }
       let!(:com_name) { 'Bob Smith' }
       let!(:d1) { create(:delius_data, offender_manager: com_name) }
-      let!(:allocation) { create(:allocation_version, nomis_offender_id: d1.noms_no) }
+      let!(:allocation) { create(:allocation, nomis_offender_id: d1.noms_no) }
 
       it 'does no update if no allocation' do
-        alloc = AllocationVersion.find_by(nomis_offender_id: offender_id)
+        alloc = Allocation.find_by(nomis_offender_id: offender_id)
         expect(alloc).to be_nil
 
         expect {
           described_class.perform_now d1.noms_no
         }.to change(CaseInformation, :count).by(1)
 
-        alloc = AllocationVersion.find_by(nomis_offender_id: offender_id)
+        alloc = Allocation.find_by(nomis_offender_id: offender_id)
         expect(alloc).to be_nil
       end
 
@@ -257,10 +257,10 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
       context 'when on the happy path' do
         let!(:d1) { create(:delius_data) }
 
-        it 'does not create case information' do
+        it 'creates case information' do
           expect {
             described_class.perform_now d1.noms_no
-          }.not_to change(CaseInformation, :count)
+          }.to change(CaseInformation, :count).by(1)
         end
       end
     end

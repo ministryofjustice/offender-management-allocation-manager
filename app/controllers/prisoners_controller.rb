@@ -12,16 +12,14 @@ class PrisonersController < PrisonsApplicationController
   def show
     @prisoner = OffenderPresenter.new(@offender,
                                       Responsibility.find_by(nomis_offender_id: id_for_show_action))
-
     @tasks = PomTasks.new.for_offender(@prisoner)
+    @allocation = Allocation.find_by(nomis_offender_id: @prisoner.offender_no)
 
-    @allocation = AllocationVersion.find_by(nomis_offender_id: @prisoner.offender_no)
-    @pom_responsibility = ResponsibilityService.calculate_pom_responsibility(
-      @offender
-    )
+    @pom_responsibility = pom_responsibility
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(
       active_prison_id, @prisoner.offender_no
     )
+
     case_information = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: id_for_show_action)
     # Only show an early allocation if it was completed after sentence start
     if case_information.present? && case_information.latest_early_allocation.present? &&
@@ -39,6 +37,27 @@ class PrisonersController < PrisonsApplicationController
   end
 
 private
+
+  def pom_responsibility
+    @pom_responsibility ||= overridden_responsibility || calculated_responsibility
+  end
+
+  def overridden_responsibility
+    override = Responsibility.find_by(nomis_offender_id: @offender.offender_no)
+    return nil if override.nil?
+
+    if override.value == Responsibility::PRISON
+      ResponsibilityService::RESPONSIBLE.to_s
+    else
+      ResponsibilityService::SUPPORTING.to_s
+    end
+  end
+
+  def calculated_responsibility
+    ResponsibilityService.calculate_pom_responsibility(
+      @offender
+    )
+  end
 
   def id_for_show_action
     params[:id]

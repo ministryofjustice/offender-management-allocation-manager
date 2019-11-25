@@ -9,7 +9,7 @@ RSpec.describe TasksController, type: :controller do
       {
         staffId: staff_id,
         username: username,
-        position: 'PRO'
+        position: RecommendationService::PRISON_POM
       }
     ]
   }
@@ -23,13 +23,17 @@ RSpec.describe TasksController, type: :controller do
 
     offenders = [
       { "latestBookingId": 754_207, "offenderNo": "G7514GW", "firstName": "Alice", "lastName": "Aliceson",
-        "dateOfBirth": "1990-12-06", "age": 28, "agencyId": prison, "categoryCode": "C", "imprisonmentStatus": "LIFE" },
+        "dateOfBirth": "1990-12-06", "age": 28, "categoryCode": "C", "imprisonmentStatus": "LIFE",
+        "convictedStatus": "Convicted", "latestLocationId": prison },
       { "latestBookingId": 754_206, "offenderNo": "G1234VV", "firstName": "Bob", "lastName": "Bibby",
-        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03" },
+        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03",
+        "convictedStatus": "Convicted", "latestLocationId": prison },
       { "latestBookingId": 754_205, "offenderNo": "G1234AB", "firstName": "Carole", "lastName": "Caroleson",
-        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03" },
+        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03",
+        "convictedStatus": "Convicted", "latestLocationId": prison },
       { "latestBookingId": 754_204, "offenderNo": "G1234GG", "firstName": "David", "lastName": "Davidson",
-        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03" }
+        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03",
+        "convictedStatus": "Convicted", "latestLocationId": prison }
     ]
 
     bookings = [
@@ -65,7 +69,7 @@ RSpec.describe TasksController, type: :controller do
 
     # Allocate all of the offenders to this POM
     offenders.each do |offender|
-      create(:allocation_version, nomis_offender_id: offender[:offenderNo], primary_pom_nomis_id: staff_id)
+      create(:allocation, nomis_offender_id: offender[:offenderNo], primary_pom_nomis_id: staff_id)
     end
 
     stub_multiple_offenders(offenders, bookings)
@@ -97,29 +101,37 @@ RSpec.describe TasksController, type: :controller do
     end
   end
 
-  # TODO: Re-enable this context when auto-delius is active
-  # context 'when showing ndelius update pom tasks' do
-  #   let(:offender_no) { 'G1234VV' }
+  context 'when showing ndelius update pom tasks' do
+    let(:test_strategy) { Flipflop::FeatureSet.current.test! }
+    let(:offender_no) { 'G1234VV' }
 
-  #   it 'can show offenders needing nDelius updates' do
-  #     stub_offender(offender_no, booking_number: 754_206)
+    before do
+      test_strategy.switch!(:auto_delius_import, true)
+    end
 
-  #     # Ensure only one of our offenders has missing data and that G7514GW (indeterminate) has a PRD
-  #     create(:case_information, nomis_offender_id: offender_no, tier: 'A', local_divisional_unit: nil)
-  #     create(:case_information, nomis_offender_id: 'G1234AB', tier: 'A', mappa_level: 1)
-  #     create(:case_information, nomis_offender_id: 'G1234GG', tier: 'A', mappa_level: 1)
-  #     create(:case_information, nomis_offender_id: 'G7514GW', tier: 'A', mappa_level: 1, parole_review_date: next_week)
+    after do
+      test_strategy.switch!(:auto_delius_import, false)
+    end
 
-  #     get :index, params: { prison_id: prison }
+    it 'can show offenders needing nDelius updates' do
+      stub_offender(offender_no, booking_number: 754_206)
 
-  #     expect(response).to be_successful
+      # Ensure only one of our offenders has missing data and that G7514GW (indeterminate) has a PRD
+      create(:case_information, nomis_offender_id: offender_no, tier: 'A', local_divisional_unit: nil)
+      create(:case_information, nomis_offender_id: 'G1234AB', tier: 'A', mappa_level: 1)
+      create(:case_information, nomis_offender_id: 'G1234GG', tier: 'A', mappa_level: 1)
+      create(:case_information, nomis_offender_id: 'G7514GW', tier: 'A', mappa_level: 1, parole_review_date: next_week)
 
-  #     pomtasks = assigns(:pomtasks)
-  #     expect(pomtasks.count).to eq(0)
-  #     expect(pomtasks.first.offender_number).to eq(offender_no)
-  #     expect(pomtasks.first.action_label).to eq('nDelius case matching')
-  #   end
-  # end
+      get :index, params: { prison_id: prison }
+
+      expect(response).to be_successful
+
+      pomtasks = assigns(:pomtasks)
+      expect(pomtasks.count).to eq(1)
+      expect(pomtasks.first.offender_number).to eq(offender_no)
+      expect(pomtasks.first.action_label).to eq('nDelius case matching')
+    end
+  end
 
   context 'when showing early allocation decisions required' do
     let(:offender_nos) { %w[G1234AB G1234GG G7514GW G1234VV] }

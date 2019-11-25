@@ -7,8 +7,8 @@ SimpleCov.start 'rails' do
   add_group "Services", "app/services"
 
   # Try to set this to current coverage levels so that it never goes down after a PR
-  # 26 lines uncovered at 99.15% coverage
-  minimum_coverage 99.15
+  # 22 lines uncovered at 99.24% coverage
+  minimum_coverage 99.23
   # sometimes coverage drops between branches - don't fail in these cases
   maximum_coverage_drop 0.1
 end
@@ -17,6 +17,9 @@ if ENV['CIRCLE_ARTIFACTS']
   dir = File.join(ENV['CIRCLE_ARTIFACTS'], "coverage")
   SimpleCov.coverage_dir(dir)
 end
+
+# patch to support SAMPLE=nn to only run nn tests
+require "test_prof/recipes/rspec/sample"
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
@@ -70,5 +73,10 @@ VCR.configure do |config|
 
   config.filter_sensitive_data('authorisation_header') do |interaction|
     interaction.request.headers['Authorization']&.first
+  end
+
+  config.ignore_request do |request|
+    # don't record auth requests as they clutter the recordings
+    request.uri =~ /__identify__|session|auth/
   end
 end

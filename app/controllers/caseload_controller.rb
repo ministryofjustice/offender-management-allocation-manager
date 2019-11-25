@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class CaseloadController < PrisonsApplicationController
+  before_action :ensure_case_admin_user
   before_action :ensure_pom
 
   breadcrumb -> { 'Your caseload' },
@@ -85,7 +86,7 @@ private
     end
     if params['role'].present?
       allocations = allocations.select { |a|
-        a.responsibility == params['role']
+        a.pom_responsibility == params['role']
       }
     end
     allocations
@@ -96,10 +97,6 @@ private
       current_user,
       active_prison_id
     )
-
-    if @pom.blank?
-      redirect_to '/'
-    end
   end
 
   def page

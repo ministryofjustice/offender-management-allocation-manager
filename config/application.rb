@@ -10,26 +10,37 @@ require 'action_view/railtie'
 require 'action_cable/engine'
 require 'sprockets/railtie'
 
+# Require the gems listed in Gemfile, including any gems
+# you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
 module OffenderManagementAllocationClient
   class Application < Rails::Application
+    # allow customization of full error messages on a per-model basis
+    config.active_model.i18n_customize_full_message = true
     # Before filter for Flipflop dashboard. Replace with a lambda or method name
     # defined in ApplicationController to implement access control.
-    config.flipflop.dashboard_access_filter = -> { :admin_user?   }
+    config.flipflop.dashboard_access_filter = -> { :current_user_is_spo? }
 
-    config.load_defaults 5.2
+    config.load_defaults 6.0
     config.exceptions_app = routes
     config.generators.system_tests = nil
     config.active_job.queue_adapter = :sidekiq
-    config.allocation_manager_host = ENV.fetch(
-      'ALLOCATION_MANAGER_HOST',
-      'http://localhost:3000'
-    )
-    Rails.application.routes.default_url_options[:host] = ENV.fetch(
-      'ALLOCATION_MANAGER_HOST',
-      'http://localhost:3000'
-    )
+    config.allocation_manager_host =
+      ENV.fetch(
+        'ALLOCATION_MANAGER_HOST',
+        'http://localhost:3000'
+  )
+    Rails.application.routes.default_url_options[:host] =
+      if ENV['HEROKU_APP_NAME'].present?
+        ENV.fetch('HEROKU_APP_NAME') + '.herokuapp.com'
+      else
+        ENV.fetch(
+          'ALLOCATION_MANAGER_HOST',
+          'http://localhost:3000'
+        )
+      end
+
     config.sentry_dsn = ENV['SENTRY_DSN']&.strip
     config.keyworker_api_host = ENV['KEYWORKER_API_HOST']&.strip
     config.digital_prison_service_host = ENV['DIGITAL_PRISON_SERVICE_HOST']&.strip
