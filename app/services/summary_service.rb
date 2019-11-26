@@ -38,7 +38,7 @@ class SummaryService
         else
           buckets[:unallocated].items << offender
         end
-      elsif offender.awaiting_allocation_for > NEWLY_ARRIVED_DAYS
+      elsif offender.awaiting_allocation_for >= NEWLY_ARRIVED_DAYS
         # If the offender has been waiting more than 2 days for their
         # data to be updated, then they will appear in the pending bucket,
         # otherwise the newly_arrived bucket
