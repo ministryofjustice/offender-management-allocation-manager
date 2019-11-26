@@ -3,6 +3,15 @@
 class SummaryController < PrisonsApplicationController
   before_action :ensure_admin_user
 
+  breadcrumb 'See allocations',
+             -> { prison_summary_allocated_path(active_prison_id) },
+             only: [:index, :allocated]
+  breadcrumb 'Make allocations',
+             -> { prison_summary_unallocated_path(active_prison_id) }, only: [:unallocated]
+  breadcrumb 'Update information',
+             -> { prison_summary_pending_path(active_prison_id) }, only: [:pending]
+  breadcrumb 'Newly arrived', -> { prison_summary_new_arrivals_path(active_prison_id) }, only: :new_arrivals
+
   def index
     redirect_to prison_summary_allocated_path(active_prison_id)
   end
