@@ -11,12 +11,16 @@ class ParoleReviewDateForm
 
   validates :parole_review_date, date: { after: proc { Date.yesterday }, allow_nil: true }
 
+  # more stuff required by acts_as_gov_uk_date
   define_model_callbacks :initialize
 
   acts_as_gov_uk_date :parole_review_date
 
   def initialize(args)
     @case_information = CaseInformation.find_by!(nomis_offender_id: args[:nomis_offender_id])
+
+    # This (and other stuff) is needed to use acts_as_gov_uk_date outside ActiveRecord -
+    # see https://github.com/ministryofjustice/gov_uk_date_fields/issues/15
     run_callbacks(:initialize) { super }
   end
 
@@ -34,6 +38,7 @@ class ParoleReviewDateForm
     end
   end
 
+  # more stuff required by acts_as_gov_uk_date
   def new_record?
     false
   end
