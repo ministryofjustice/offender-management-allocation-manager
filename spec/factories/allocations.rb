@@ -31,7 +31,7 @@ FactoryBot.define do
     end
 
     primary_pom_nomis_id do
-      485_752
+      485_926
       # using fake POM numbers tends to cause crashes
       # Faker::Number.number(digits: 7)
     end

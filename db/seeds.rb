@@ -5,9 +5,9 @@ PomDetail.find_or_create_by!(
   working_pattern: 1
 )
 
-# Ross Jones
+# Moic POM
 PomDetail.find_or_create_by!(
-  nomis_staff_id: 485_752,
+  nomis_staff_id: 485_926,
   status: 'active',
   working_pattern: 0.2
 )

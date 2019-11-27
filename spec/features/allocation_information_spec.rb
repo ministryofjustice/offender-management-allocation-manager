@@ -80,8 +80,8 @@ feature "view an offender's allocation information" do
       allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id_with_keyworker)
 
       allocation.update!(event: Allocation::ALLOCATE_SECONDARY_POM,
-                         secondary_pom_nomis_id: 485_752,
-                         secondary_pom_name: "Jones, Ross")
+                         secondary_pom_nomis_id: 485_926,
+                         secondary_pom_name: "Pom, Moic")
 
       visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_with_keyworker)
 
@@ -89,7 +89,7 @@ feature "view an offender's allocation information" do
 
       within table_row do
         expect(page).to have_link('Remove')
-        expect(page).to have_content('Co-working POM Jones, Ross')
+        expect(page).to have_content('Co-working POM Pom, Moic')
       end
     end
 
