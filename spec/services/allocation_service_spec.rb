@@ -43,7 +43,6 @@ describe AllocationService do
         to match(
           hash_including(
             "message" => message,
-            "pom_name" => "Ross",
             "offender_name" => "Abdoria, Ongmetain",
             "nomis_offender_id" => "G7806VO",
             "pom_email" => "pom@digital.justice.gov.uk",

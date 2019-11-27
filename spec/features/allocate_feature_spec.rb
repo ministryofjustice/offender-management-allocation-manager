@@ -143,7 +143,6 @@ feature 'Allocation' do
       click_link 'View'
     end
 
-
     expect(current_url).to have_content(prison_allocation_path('LEI', nomis_offender_id))
     expect(page).to have_link(nil, href: "/prisons/LEI/poms/485637")
     expect(page).to have_css('.table_cell__left_align', text: 'Pobee-Norris, Kath')
@@ -159,7 +158,7 @@ feature 'Allocation' do
       click_link 'Allocate'
     end
 
-    expect(current_url).to have_content(prison_confirm_reallocation_path('LEI', nomis_offender_id, 485758))
+    expect(current_url).to have_content(prison_confirm_reallocation_path('LEI', nomis_offender_id, 485_758))
 
     click_button 'Complete allocation'
 
