@@ -56,7 +56,7 @@
         <% if @prisoner.indeterminate_sentence? %>
           <%= format_date(@prisoner.parole_review_date, replacement: 'Unknown') %>
           <% if editable_prd %>
-            <%= link_to 'Update', prison_edit_prd_path(@prison.code, @prisoner.offender_no), class: "govuk-link pull-right", id: 'edit-prd-link' %>
+            <%= link_to 'Update', edit_prd_prison_case_information_path(@prison.code, @prisoner.offender_no), class: "govuk-link pull-right", id: 'edit-prd-link' %>
           <% end %>
         <% else %>
           N/A
