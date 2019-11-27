@@ -35,7 +35,7 @@ describe OffenderService do
 
   describe "#set_allocated_pom_name" do
     let(:offenders) { Prison.new('LEI').offenders.first(3) }
-    let(:nomis_staff_id) { 485_752 }
+    let(:nomis_staff_id) { 485_926 }
 
     before do
       PomDetail.create!(nomis_staff_id: nomis_staff_id, working_pattern: 1.0, status: 'active')
@@ -49,7 +49,7 @@ describe OffenderService do
       expect(updated_offenders).to be_kind_of(Array)
       expect(updated_offenders.first).to be_kind_of(Nomis::OffenderSummary)
       expect(updated_offenders.count).to eq(offenders.count)
-      expect(updated_offenders.first.allocated_pom_name).to eq('Jones, Ross')
+      expect(updated_offenders.first.allocated_pom_name).to eq('Pom, Moic')
       expect(updated_offenders.first.allocation_date).to be_kind_of(Date)
     end
 
@@ -58,7 +58,7 @@ describe OffenderService do
       allocate_offender(nil)
 
       updated_offenders = described_class.set_allocated_pom_name(offenders, 'LEI')
-      expect(updated_offenders.first.allocated_pom_name).to eq('Jones, Ross')
+      expect(updated_offenders.first.allocated_pom_name).to eq('Pom, Moic')
       expect(updated_offenders.first.allocation_date).to be_kind_of(Date)
     end
   end

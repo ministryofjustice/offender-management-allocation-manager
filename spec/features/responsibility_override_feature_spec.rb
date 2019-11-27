@@ -8,7 +8,7 @@ feature 'Responsibility override' do
   end
 
   let(:offender_id) { 'G8060UF' }
-  let(:pom_id) { 485_752 }
+  let(:pom_id) { 485_926 }
 
   context 'when overriding responsibility', :queueing, vcr: { cassette_name: :override_responsibility } do
     before do

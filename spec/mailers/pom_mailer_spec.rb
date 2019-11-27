@@ -4,7 +4,7 @@ RSpec.describe PomMailer, type: :mailer do
   describe 'new_allocation_email' do
     let(:params) do
       {
-        pom_name: "Jones, Ross",
+        pom_name: "Pom, Moic",
         pom_email: "something@example.com",
         responsibility: "supporting",
         offender_name: "Franks, Jason",
@@ -61,7 +61,7 @@ RSpec.describe PomMailer, type: :mailer do
         previous_pom_name: "Pobee-Norris, Kath",
         responsibility: "Supporting",
         previous_pom_email: "another@example.com",
-        new_pom_name: "Jones, Ross",
+        new_pom_name: "Pom, Moic",
         offender_name: "Marks, Simon",
         offender_no: "GE4595D",
         url: "http:://example.com",
@@ -100,7 +100,7 @@ RSpec.describe PomMailer, type: :mailer do
       {
         email_address: "something@example.com",
         pom_name: "Pobee-Norris, Kath",
-        secondary_pom_name: "Jones, Ross",
+        secondary_pom_name: "Pom, Moic",
         nomis_offender_id: "GE4595D",
         offender_name: "Marks, Simon",
         url: "http:://example.com"
