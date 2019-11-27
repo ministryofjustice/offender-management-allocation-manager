@@ -30,6 +30,7 @@ class SummaryService
     add_arrival_dates(offenders) if offenders.any?
 
     offenders.each do |offender|
+      # Having a 'tier' is an alias for having a case information record
       if offender.tier.present?
         # When trying to determine if this offender has a current active allocation, we want to know
         # if it is for this prison.
