@@ -1,7 +1,30 @@
-<h1 class="govuk-heading-l">This service is currently available in only a few prisons</h1>
+<h1 class="govuk-heading-l">This service is not available</h1>
 
 <div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds govuk-body-l">
-    It’s a new service that will be available in more prisons soon.
+  <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-body-l">
+      There are a few reasons that may explain why you are seeing this page
+    </div>
+    <div class="govuk-body-l">
+      - you work in a women's or open prison, the service is currently only available for the male closed estate
+    </div>
+    <div class="govuk-body-l">
+      - you work in more than one prison, and have not been given access to the service for both prisons
+      (check which prison you're signed in to in digital prison services)
+    </div>
+    <div class="govuk-body-l">
+      - You need to have the 'alloc_case_manager' role added in digital prison service by your local system
+      administrator (LSA) following <%= link_to 'these instructions', help_step2_path %>
+    </div>
+    <div class="govuk-body-l">
+      - You need to have the PRO (Prison Officer) or PO (Probation Officer) role added in NOMIS by your local
+      system administrator (LSA) following <%= link_to 'these instructions', help_step3_path %>
+    </div>
+    <div class="govuk-body-l">
+      - You entered an incorrect web address
+    </div>
+    <div class="govuk-body-l">
+      If you don't think any of these reasons apply to you, contact the <%= link_to 'allocations service team', contact_us_path %>
+    </div>
   </div>
 </div>
