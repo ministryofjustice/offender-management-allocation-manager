@@ -1,7 +1,7 @@
 require 'faker'
 
 FactoryBot.define do
-  factory :movement, class: Nomis::Movement do
+  factory :movement, class: 'Nomis::Movement' do
     skip_create
     from_agency do
       'LEI'

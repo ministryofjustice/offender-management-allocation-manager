@@ -3,9 +3,9 @@ require 'rails_helper'
 feature 'Allocation History' do
   let!(:probation_pom) do
     {
-      primary_pom_nomis_id: 485_752,
-      primary_pom_name: 'Jones, Ross',
-      email: 'Ross.jonessss@digital.justice.gov.uk'
+      primary_pom_nomis_id: 485_926,
+      primary_pom_name: 'Pom, Moic',
+      email: 'pom@digital.justice.gov.uk'
     }
   end
 

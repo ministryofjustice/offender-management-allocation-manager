@@ -10,7 +10,7 @@ describe AllocationService do
 
   describe '#allocate_secondary', :queueing do
     let(:kath_id) { 485_637 }
-    let(:ross_id) { 485_752 }
+    let(:ross_id) { 485_926 }
     let(:nomis_offender_id) { 'G7806VO' }
     let(:primary_pom_id) { ross_id }
     let(:secondary_pom_id) { kath_id }
@@ -20,7 +20,7 @@ describe AllocationService do
       create(:allocation,
              nomis_offender_id: nomis_offender_id,
              primary_pom_nomis_id: primary_pom_id,
-             primary_pom_name: 'JONES, ROSS')
+             primary_pom_name: 'Pom, Moic')
     }
 
     it 'sends an email to both primary and secondary POMS', vcr: { cassette_name: :allocation_service_allocate_secondary } do
@@ -43,11 +43,10 @@ describe AllocationService do
         to match(
           hash_including(
             "message" => message,
-            "pom_name" => "Ross",
             "offender_name" => "Abdoria, Ongmetain",
             "nomis_offender_id" => "G7806VO",
-            "coworking_pom_name" => "POBEE-NORRIS, KATH",
-            "pom_email" => "Ross.jonessss@digital.justice.gov.uk",
+            "pom_email" => "pom@digital.justice.gov.uk",
+            "pom_name" => "Moic",
             "url" => "http://localhost:3000/prisons/LEI/caseload"
           ))
 
@@ -60,7 +59,7 @@ describe AllocationService do
             "offender_name" => "Abdoria, Ongmetain",
             "nomis_offender_id" => "G7806VO",
             "responsibility" => "supporting",
-            "responsible_pom_name" => 'JONES, ROSS',
+            "responsible_pom_name" => 'Pom, Moic',
             "pom_email" => "kath.pobee-norris@digital.justice.gov.uk",
             "url" => "http://localhost:3000/prisons/LEI/caseload"
           ))
@@ -94,7 +93,7 @@ describe AllocationService do
       update_params = {
         nomis_offender_id: nomis_offender_id,
         allocated_at_tier: 'B',
-        primary_pom_nomis_id: 485_752,
+        primary_pom_nomis_id: 485_926,
         event: Allocation::REALLOCATE_PRIMARY_POM,
         created_by_username: 'PK000223'
       }
@@ -151,7 +150,7 @@ describe AllocationService do
     it "Can get previous poms for an offender where there are some", versioning: true, vcr: { cassette_name: :allocation_service_previous_allocations } do
       nomis_offender_id = 'GHF1234'
       previous_primary_pom_nomis_id = 345_567
-      updated_primary_pom_nomis_id = 485_752
+      updated_primary_pom_nomis_id = 485_926
 
       allocation = create(
         :allocation,
@@ -173,7 +172,7 @@ describe AllocationService do
   it 'can get the current allocated primary POM', versioning: true, vcr: { cassette_name: 'current_allocated_primary_pom' }  do
     nomis_offender_id = 'G2911GD'
     previous_primary_pom_nomis_id = 485_637
-    updated_primary_pom_nomis_id = 485_752
+    updated_primary_pom_nomis_id = 485_926
 
     allocation = create(
       :allocation,
@@ -187,8 +186,8 @@ describe AllocationService do
 
     current_pom = described_class.current_pom_for(nomis_offender_id, 'LEI')
 
-    expect(current_pom.full_name).to eq("Jones, Ross")
-    expect(current_pom.grade).to eq("Probation POM")
+    expect(current_pom.full_name).to eq("Pom, Moic")
+    expect(current_pom.grade).to eq("Prison POM")
   end
 
   it 'can set the correct com_name', versioning: true, vcr: { cassette_name: 'allocation_service_com_name' }  do

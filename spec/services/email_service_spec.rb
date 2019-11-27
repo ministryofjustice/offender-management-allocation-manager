@@ -48,8 +48,8 @@ RSpec.describe EmailService do
       a.nomis_offender_id = 'G2911GD'
       a.created_by_username = 'PK000223'
       a.nomis_booking_id = 0
-      a.secondary_pom_nomis_id = 485_752
-      a.secondary_pom_name = "Jones, Ross"
+      a.secondary_pom_nomis_id = 485_926
+      a.secondary_pom_name = "Pom, Moic"
       a.allocated_at_tier = 'A'
       a.prison = 'LEI'
       a.event = Allocation::ALLOCATE_SECONDARY_POM
