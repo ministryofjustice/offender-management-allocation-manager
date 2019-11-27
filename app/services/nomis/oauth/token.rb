@@ -23,13 +23,10 @@ module Nomis
       end
 
       def expired?
-        JWT.decode(
-          access_token,
-          OpenSSL::PKey::RSA.new(public_key),
-          true,
-          algorithm: 'RS256'
-        )
-        false
+        x = payload.fetch('exp')
+        expiry_seconds = Time.zone.at(x) - Time.zone.now
+        # consider token expired if it has less than 10 seconds to go
+        expiry_seconds < 10
       rescue JWT::ExpiredSignature => e
         Raven.capture_exception(e)
         true
