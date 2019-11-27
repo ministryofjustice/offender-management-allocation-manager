@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe SummaryController, type: :controller do
-  let(:prison) { 'LEI' }
   let(:poms) {
     [
       build(:pom,
@@ -17,6 +16,8 @@ RSpec.describe SummaryController, type: :controller do
   end
 
   context 'with 2 offenders' do
+    let(:prison) { 'BRI' }
+
     before do
       sleep 1 # bust the 1 second cache as we're changing returned data
 
@@ -73,7 +74,7 @@ RSpec.describe SummaryController, type: :controller do
       get :new_arrivals, params: { prison_id: prison }
 
       summary_offenders = assigns(:summary).offenders.map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
-      expect(summary_offenders).to eq({ 'G7514GW' => 0, 'G1234GY' => 1})
+      expect(summary_offenders).to eq('G7514GW' => 0, 'G1234GY' => 1)
     end
 
     context 'when user is a POM' do
@@ -112,6 +113,7 @@ RSpec.describe SummaryController, type: :controller do
   end
 
   context 'with enough offenders to page' do
+    let(:prison) { 'LEI' }
     let(:range) { 0.upto(119) }
     let(:offenders) {
       range.map { |i|
@@ -153,7 +155,7 @@ RSpec.describe SummaryController, type: :controller do
     end
 
     it 'gets page 1 by default' do
-      get :pending, params: { prison_id: 'LEI' }
+      get :pending, params: { prison_id: prison }
 
       expect(summary_offenders.size).to eq(50)
       expect(summary_offenders.current_page).to eq(1)
@@ -161,7 +163,7 @@ RSpec.describe SummaryController, type: :controller do
     end
 
     it 'gets page 2' do
-      get :pending, params: { prison_id: 'LEI', page: 2 }
+      get :pending, params: { prison_id: prison, page: 2 }
 
       expect(summary_offenders.size).to eq(50)
       expect(summary_offenders.current_page).to eq(2)
@@ -169,7 +171,7 @@ RSpec.describe SummaryController, type: :controller do
     end
 
     it 'gets page 3' do
-      get :pending, params: { prison_id: 'LEI', page: 3 }
+      get :pending, params: { prison_id: prison, page: 3 }
 
       expect(summary_offenders.size).to eq(20)
       expect(summary_offenders.current_page).to eq(3)
@@ -177,31 +179,35 @@ RSpec.describe SummaryController, type: :controller do
     end
   end
 
-  it 'handles trying to sort by missing field for allocated offenders' do
-    # Allocated offenders do have to have their prison_arrival_date even if they don't use it
-    # because we now need it to calculate the totals.
-    stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/movements/offenders?latestOnly=false&movementTypes=TRN").
-      to_return(status: 200, body: [].to_json)
+  context 'when sorting' do
+    let(:prison) { 'BXI' }
 
-    # When viewing allocated, cannot sort by awaiting_allocation_for as it is not available and is
-    # meaningless in this context. We do not want to crash if passed a field that is not searchable
-    # within a specific context.
-    offender_id = 'G7514GW'
-    offenders = [{ "bookingId": 754_207, "offenderNo": offender_id, "firstName": "Indeter", "lastName": "Minate-Offender",
-                   "dateOfBirth": "1990-12-06", "age": 28, "agencyId": prison, "categoryCode": "C", "imprisonmentStatus": "LIFE" }]
+    it 'handles trying to sort by missing field for allocated offenders' do
+      # Allocated offenders do have to have their prison_arrival_date even if they don't use it
+      # because we now need it to calculate the totals.
+      stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/movements/offenders?latestOnly=false&movementTypes=TRN").
+        to_return(status: 200, body: [].to_json)
 
-    bookings = [{ "bookingId": 754_207, "offenderNo": "G7514GW", "firstName": "Indeter", "lastName": "Minate-Offender", "agencyLocationId": prison,
-                  "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
-                                      "bookingId": 754_207, "sentenceStartDate": "2009-02-08",
-                                      "releaseDate": "2012-03-17" },
-                  "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
-                  "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 }]
-    stub_offenders_for_prison(prison, offenders, bookings)
+      # When viewing allocated, cannot sort by awaiting_allocation_for as it is not available and is
+      # meaningless in this context. We do not want to crash if passed a field that is not searchable
+      # within a specific context.
+      offender_id = 'G7514GW'
+      offenders = [{ "bookingId": 754_207, "offenderNo": offender_id, "firstName": "Indeter", "lastName": "Minate-Offender",
+                     "dateOfBirth": "1990-12-06", "age": 28, "agencyId": prison, "categoryCode": "C", "imprisonmentStatus": "LIFE" }]
 
-    create(:case_information, nomis_offender_id: offender_id)
-    create(:allocation, nomis_offender_id: offender_id, primary_pom_nomis_id: 234)
+      bookings = [{ "bookingId": 754_207, "offenderNo": "G7514GW", "firstName": "Indeter", "lastName": "Minate-Offender", "agencyLocationId": prison,
+                    "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
+                                        "bookingId": 754_207, "sentenceStartDate": "2009-02-08",
+                                        "releaseDate": "2012-03-17" },
+                    "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
+                    "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 }]
+      stub_offenders_for_prison(prison, offenders, bookings)
 
-    get :allocated, params: { prison_id: prison, sort: 'awaiting_allocation_for asc' }
-    expect(assigns(:offenders).count).to eq(1)
+      create(:case_information, nomis_offender_id: offender_id)
+      create(:allocation, nomis_offender_id: offender_id, primary_pom_nomis_id: 234, prison: prison)
+
+      get :allocated, params: { prison_id: prison, sort: 'awaiting_allocation_for asc' }
+      expect(assigns(:offenders).count).to eq(1)
+    end
   end
 end
