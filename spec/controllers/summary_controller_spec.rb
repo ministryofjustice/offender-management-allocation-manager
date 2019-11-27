@@ -65,28 +65,8 @@ RSpec.describe SummaryController, type: :controller do
 
       stub_offenders_for_prison(prison, offenders, bookings)
 
-      stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/movements/offenders?latestOnly=false&movementTypes=TRN").
-        with(body: %w[G1234GY G7514GW G1234VV G4234GG].to_json).
-        to_return(status: 200, body: [{ offenderNo: 'G7514GW', toAgency: prison, createDateTime: Date.new(2018, 10, 1) },
-                                      { offenderNo: 'G1234VV', toAgency: prison, createDateTime: Date.new(2018, 9, 1) }].to_json)
       # if we already have case information then they don't turn up
       create(:case_information, nomis_offender_id: 'G4234GG')
-    end
-
-    it 'can show new arrivals' do
-      stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/movements/offenders?latestOnly=false&movementTypes=TRN").
-        with(body: %w[G1234GY G7514GW G1234VV G4234GG].to_json).
-        to_return(status: 200, body: [
-          { offenderNo: 'G7514GW', toAgency: prison, createDateTime: Time.zone.today },
-          { offenderNo: 'G1234GY', toAgency: prison, createDateTime: Time.zone.today - 1 },
-          { offenderNo: 'G1234VV', toAgency: prison, createDateTime: Time.zone.today - 2 },
-          { offenderNo: 'G4234GG', toAgency: prison, createDateTime: Time.zone.today - 1 }
-        ].to_json)
-
-      get :new_arrivals, params: { prison_id: prison }
-
-      summary_offenders = assigns(:summary).offenders.map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
-      expect(summary_offenders).to eq('G7514GW' => 0, 'G1234GY' => 1)
     end
 
     context 'when user is a POM' do
@@ -95,7 +75,6 @@ RSpec.describe SummaryController, type: :controller do
         stub_sso_pom_data(prison, 'alice')
         stub_signed_in_pom(1, 'Alice')
         stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/users/").
-          with(headers: { 'Authorization' => 'Bearer token' }).
           to_return(status: 200, body: { staffId: 1 }.to_json, headers: {})
       end
 
@@ -105,22 +84,62 @@ RSpec.describe SummaryController, type: :controller do
       end
     end
 
-    it 'gets pending records' do
-      get :pending, params: { prison_id: prison }
-      # Expecting offender (2) to use sentenceStartDate as it is newer than last arrival date in prison
-      expect(assigns(:offenders).map(&:awaiting_allocation_for).map { |x| Time.zone.today - x }).
-        to match_array [Date.new(2009, 2, 8), Date.new(2018, 10, 1), Date.new(2019, 2, 8), Date.new(2019, 2, 8)]
+    context 'when there are new arrivals' do
+      before do
+        stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/movements/offenders?latestOnly=false&movementTypes=TRN").
+          with(body: %w[G1234GY G7514GW G1234VV G4234GG].to_json).
+          to_return(status: 200, body: [
+            { offenderNo: 'G7514GW', toAgency: prison, createDateTime: Time.zone.today },
+            { offenderNo: 'G1234GY', toAgency: prison, createDateTime: Time.zone.today - 1 },
+            { offenderNo: 'G1234VV', toAgency: prison, createDateTime: Time.zone.today - 2 },
+            { offenderNo: 'G4234GG', toAgency: prison, createDateTime: Time.zone.today - 1 }
+          ].to_json)
+      end
+
+      it 'can show new arrivals' do
+        get :new_arrivals, params: { prison_id: prison }
+
+        summary_offenders = assigns(:summary).offenders.map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
+        expect(summary_offenders).to eq('G7514GW' => 0, 'G1234GY' => 1)
+      end
+
+      it 'can show pending records' do
+        get :pending, params: { prison_id: prison }
+
+        expect(assigns(:summary).offenders.map(&:offender_no)).to match_array ['G1234VV']
+      end
+
+      it 'can show unallocated records' do
+        get :unallocated, params: { prison_id: prison }
+
+        expect(assigns(:summary).offenders.map(&:offender_no)).to match_array ['G4234GG']
+      end
     end
 
-    it 'sorts ascending by default' do
-      get :pending, params: { prison_id: prison, sort: 'last_name' } # Default direction is asc.
-      expect(assigns(:offenders).map(&:last_name)).to eq(%w[JONES Minate-Offender Offender SMITH])
-    end
+    context 'without new arrivals' do
+      before do
+        stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/movements/offenders?latestOnly=false&movementTypes=TRN").
+          with(body: %w[G1234GY G7514GW G1234VV G4234GG].to_json).
+          to_return(status: 200, body: [{ offenderNo: 'G7514GW', toAgency: prison, createDateTime: Date.new(2018, 10, 1) },
+                                        { offenderNo: 'G1234VV', toAgency: prison, createDateTime: Date.new(2018, 9, 1) }].to_json)
+      end
+      it 'gets pending records' do
+        get :pending, params: { prison_id: prison }
+        # Expecting offender (2) to use sentenceStartDate as it is newer than last arrival date in prison
+        expect(assigns(:offenders).map(&:awaiting_allocation_for).map { |x| Time.zone.today - x }).
+          to match_array [Date.new(2009, 2, 8), Date.new(2018, 10, 1), Date.new(2019, 2, 8)]
+      end
 
-    it 'sorts descending' do
-      get :pending, params: { prison_id: prison, sort: 'last_name desc' }
+      it 'sorts ascending by default' do
+        get :pending, params: { prison_id: prison, sort: 'last_name' } # Default direction is asc.
+        expect(assigns(:offenders).map(&:last_name)).to eq(%w[JONES Minate-Offender SMITH])
+      end
 
-      expect(assigns(:offenders).map(&:last_name)).to eq(%w[SMITH Offender Minate-Offender JONES])
+      it 'sorts descending' do
+        get :pending, params: { prison_id: prison, sort: 'last_name desc' }
+
+        expect(assigns(:offenders).map(&:last_name)).to eq(%w[SMITH Minate-Offender JONES])
+      end
     end
   end
 
