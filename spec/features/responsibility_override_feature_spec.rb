@@ -39,7 +39,7 @@ feature 'Responsibility override' do
 
       expect(page).to have_content 'Current responsibility Community'
 
-      expect(page).to have_current_path(prison_allocation_path('LEI', offender_id))
+      expect(page).to have_current_path(prison_prisoner_path('LEI', offender_id))
     end
   end
 

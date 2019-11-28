@@ -36,7 +36,7 @@ class ResponsibilitiesController < PrisonsApplicationController
       ).deliver_later
     end
 
-    redirect_to prison_allocation_path(@prison.code, @responsibility.nomis_offender_id)
+    redirect_to prison_prisoner_path(@prison.code, @responsibility.nomis_offender_id)
   end
 
 private
