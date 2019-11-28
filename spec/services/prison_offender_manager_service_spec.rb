@@ -78,54 +78,52 @@ describe PrisonOffenderManagerService do
 
     describe '#get_poms_for' do
       let(:alice) {
-        {
-          firstName: 'Alice',
-          position: 'PO',
-          staffId: 1,
-          emails: ['test@digital.justice.org.uk']
-        }
+        build(:pom,
+              firstName: 'Alice',
+              position: 'PO',
+              staffId: 1,
+              emails: ['test@digital.justice.org.uk']
+        )
       }
       let(:billy) {
-        {
-          firstName: 'Billy',
-          position: 'PRO',
-          staffId: 2,
-          emails: ['test@digital.justice.org.uk']
-        }
+        build(:pom,
+              firstName: 'Billy',
+              position: 'PRO',
+              staffId: 2,
+              emails: ['test@digital.justice.org.uk']
+        )
       }
       let(:charles) {
-        {
-          firstName: 'Alison',
-          position: 'PPO',
-          staffId: 1,
-          emails: ['test@digital.justice.org.uk']
-        }
+        build(:pom,
+              firstName: 'Alison',
+              position: 'PPO',
+              staffId: 1,
+              emails: ['test@digital.justice.org.uk']
+        )
       }
       let(:dave) {
-        {
-          firstName: 'Billy Bob',
-          position: 'AO',
-          staffId: 2,
-          emails: ['test@digital.justice.org.uk']
-        }
+        build(:pom,
+              firstName: 'Billy Bob',
+              position: 'AO',
+              staffId: 2,
+              emails: ['test@digital.justice.org.uk']
+        )
       }
       let(:eric) {
-        {
-          firstName: 'Billy Bob Eric',
-          position: 'PO',
-          staffId: 2,
-          emails: ['test@digital.justice.org.uk']
-        }
+        build(:pom,
+              firstName: 'Billy Bob Eric',
+              position: 'PO',
+              staffId: 2,
+              emails: ['test@digital.justice.org.uk']
+        )
       }
 
-      let(:poms) { [dave, alice, billy, charles, eric] }
-
       before do
-        stub_poms('WSI', poms)
+        stub_poms('WSI', [dave, alice, billy, charles, eric])
       end
 
       it 'removes duplicate staff ids, keeping the valid position' do
-        expect(described_class.get_poms_for('WSI').map(&:first_name)).to eq([alice, billy].map { |p| p[:firstName] })
+        expect(described_class.get_poms_for('WSI').map(&:first_name)).to eq([alice, billy].map(&:firstName))
       end
     end
 
