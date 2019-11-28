@@ -2,7 +2,7 @@
 
 module OverrideHelper
   def complex_reason_label(recommended_type)
-    if recommended_type == 'Prison officer'
+    if recommended_type == RecommendationService::PRISON_POM
       return 'Prisoner assessed as not suitable for a prison officer POM'
     end
 

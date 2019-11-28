@@ -125,6 +125,7 @@ private
     )
   end
 
+  # rubocop:disable Metrics/LineLength
   def allocation_attributes(offender)
     {
       primary_pom_nomis_id: allocation_params[:nomis_staff_id].to_i,
@@ -134,7 +135,7 @@ private
       created_by_username: current_user,
       nomis_booking_id: offender.booking_id,
       allocated_at_tier: offender.tier,
-      recommended_pom_type: recommended_pom_type(offender),
+      recommended_pom_type: (offender.recommended_pom_type == RecommendationService::PRISON_POM) ? 'prison' : 'probation',
       prison: active_prison_id,
       override_reasons: override_reasons,
       suitability_detail: suitability_detail,
@@ -142,6 +143,7 @@ private
       message: allocation_params[:message]
     }
   end
+  # rubocop:enable Metrics/LineLength
 
   def offender(nomis_offender_id)
     OffenderPresenter.new(OffenderService.get_offender(nomis_offender_id),
@@ -168,11 +170,6 @@ private
     PrisonOffenderManagerService.get_pom_at(active_prison_id, nomis_staff_id)
   end
 
-  def recommended_pom_type(offender)
-    rec_type = RecommendationService.recommended_pom_type(offender)
-    rec_type == RecommendationService::PRISON_POM ? 'prison' : 'probation'
-  end
-
   def recommended_and_nonrecommended_poms_for(offender)
     allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id_from_url)
     # don't allow primary to be the same as the co-working POM
@@ -187,7 +184,7 @@ private
     # Returns a pair of lists where the first element contains the
     # POMs from the `poms` parameter that are recommended for the
     # `offender`
-    recommended_type = RecommendationService.recommended_pom_type(offender)
+    recommended_type = offender.recommended_pom_type
     poms.partition { |pom|
       if recommended_type == RecommendationService::PRISON_POM
         pom.prison_officer?

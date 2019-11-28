@@ -34,7 +34,7 @@ class OffenderPresenter
     end
   end
 
-  def recommended_pom_type
+  def recommended_pom_type_label
     rec_type = RecommendationService.recommended_pom_type(@offender)
 
     if rec_type == RecommendationService::PRISON_POM
@@ -44,7 +44,11 @@ class OffenderPresenter
     end
   end
 
-  def non_recommended_pom_type
+  def recommended_pom_type
+    RecommendationService.recommended_pom_type(@offender)
+  end
+
+  def non_recommended_pom_type_label
     rec_type = RecommendationService.recommended_pom_type(@offender)
 
     if rec_type == RecommendationService::PRISON_POM
