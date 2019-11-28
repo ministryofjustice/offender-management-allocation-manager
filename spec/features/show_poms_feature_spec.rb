@@ -33,10 +33,10 @@ feature "get poms list" do
   it "allows viewing a POM", vcr: { cassette_name: :show_poms_feature_view } do
     signin_user
 
-    visit "/prisons/LEI/poms/485752"
+    visit "/prisons/LEI/poms/485926"
 
     expect(page).to have_css(".govuk-button", count: 1)
-    expect(page).to have_content("Jones, Ross")
+    expect(page).to have_content("Pom, Moic")
     expect(page).to have_content("Caseload")
     expect(page).to have_css('.govuk-breadcrumbs')
     expect(page).to have_css('.govuk-breadcrumbs__link', count: 3)
@@ -52,18 +52,18 @@ feature "get poms list" do
         prison: 'LEI',
         allocated_at_tier: 'A',
         created_by_username: 'PK000223',
-        primary_pom_nomis_id: 485_752,
+        primary_pom_nomis_id: 485_926,
         primary_pom_allocated_at: DateTime.now.utc,
-        recommended_pom_type: 'probation',
+        recommended_pom_type: 'prison',
         event: Allocation::ALLOCATE_PRIMARY_POM,
         event_trigger: Allocation::USER
       )
     end
 
-    visit "/prisons/LEI/poms/485752"
+    visit "/prisons/LEI/poms/485926"
 
     expect(page).to have_css(".govuk-button", count: 1)
-    expect(page).to have_content("Jones, Ross")
+    expect(page).to have_content("Pom, Moic")
     expect(page).to have_content("Caseload")
     expect(page).to have_css('.govuk-breadcrumbs')
     expect(page).to have_css('.govuk-breadcrumbs__link', count: 3)
@@ -90,7 +90,7 @@ feature "get poms list" do
   it "allows editing a POM", vcr: { cassette_name: :show_poms_feature_edit } do
     signin_user
 
-    visit "/prisons/LEI/poms/485752/edit"
+    visit "/prisons/LEI/poms/485926/edit"
 
     expect(page).to have_css(".govuk-button", count: 1)
     expect(page).to have_css(".govuk-radios__item", count: 14)

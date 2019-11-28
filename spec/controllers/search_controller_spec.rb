@@ -11,11 +11,11 @@ RSpec.describe SearchController, type: :controller do
   context 'when user is a POM ' do
     let(:poms) {
       [
-        {
-          firstName: 'Alice',
-          position: RecommendationService::PRISON_POM,
-          staffId: 1
-        }
+        build(:pom,
+              firstName: 'Alice',
+              position: RecommendationService::PRISON_POM,
+              staffId: 1
+        )
       ]
     }
 

@@ -5,11 +5,11 @@ RSpec.describe DashboardController, type: :controller do
     let(:prison) { 'LEI' }
     let(:poms) {
       [
-        {
-          firstName: 'Alice',
-          position: RecommendationService::PRISON_POM,
-          staffId: 1
-        }
+        build(:pom,
+              firstName: 'Alice',
+              position: RecommendationService::PRISON_POM,
+              staffId: 1
+      )
       ]
     }
 

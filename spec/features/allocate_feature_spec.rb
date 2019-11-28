@@ -2,7 +2,7 @@ require 'rails_helper'
 
 feature 'Allocation' do
   let!(:probation_officer_nomis_staff_id) { 485_636 }
-  let!(:prison_officer_nomis_staff_id) { 485_752 }
+  let!(:prison_officer_nomis_staff_id) { 485_926 }
   let!(:nomis_offender_id) { 'G7266VD' }
   let(:offender_name) { 'Omistius Annole' }
   let!(:never_allocated_offender) { 'G1670VU' }
@@ -30,17 +30,17 @@ feature 'Allocation' do
     expect(page).to have_content('There is 1 POM unavailable for new allocations.')
 
     within('.recommended_pom_row_0') do
-      expect(page).to have_content 'Jones, Ross'
+      expect(page).to have_content 'Integration-Tests, Moic'
       click_link 'Allocate'
     end
 
     expect(page).to have_css('h1', text: 'Confirm allocation')
-    expect(page).to have_css('p', text: "You are allocating #{offender_name} to Ross Jones")
+    expect(page).to have_css('p', text: "You are allocating #{offender_name} to Moic Integration-Tests")
 
     click_button 'Complete allocation'
 
     expect(current_url).to have_content(prison_summary_unallocated_path('LEI'))
-    expect(page).to have_css('.notification', text: "#{offender_name} has been allocated to Ross Jones (Probation POM)")
+    expect(page).to have_css('.notification', text: "#{offender_name} has been allocated to Moic Integration-Tests (Probation POM)")
   end
 
   scenario 'overriding an allocation', vcr: { cassette_name: :override_allocation_feature_ok } do
@@ -158,7 +158,7 @@ feature 'Allocation' do
       click_link 'Allocate'
     end
 
-    expect(current_url).to have_content(prison_confirm_reallocation_path('LEI', nomis_offender_id, prison_officer_nomis_staff_id))
+    expect(current_url).to have_content(prison_confirm_reallocation_path('LEI', nomis_offender_id, 485_758))
 
     click_button 'Complete allocation'
 
