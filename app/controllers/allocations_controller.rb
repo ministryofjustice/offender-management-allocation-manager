@@ -21,8 +21,6 @@ class AllocationsController < PrisonsApplicationController
   def show
     @prisoner = offender(nomis_offender_id_from_url)
 
-    # @allocation = Allocation.find_by(nomis_offender_id: @prisoner.offender_no)
-    # @allocation.updated_at = YAML.load(@allocation.versions.last.object_changes).fetch('updated_at')[1]
     allocation = Allocation.find_by!(nomis_offender_id: @prisoner.offender_no)
     @allocation = AllocationPresenter.new(allocation, allocation.versions.last)
 
@@ -111,15 +109,6 @@ private
     current_allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id)
 
     unless current_allocation.nil?
-      # we need to overwrite the 'updated_at' in the history with the 'to' value (index 1)
-      # so that if it is changed later w/o history (e.g. by updating the COM name)
-      # we don't produce the wrong answer
-      # allocs = AllocationService.get_versions_for(current_allocation).
-      #   append(current_allocation)
-      # allocs.zip(current_allocation.versions).each do |alloc, raw_version|
-      #   alloc.updated_at = YAML.load(raw_version.object_changes).fetch('updated_at')[1]
-      # end
-      # allocs
       allocs = AllocationService.get_versions_for(current_allocation).append(current_allocation)
       allocs.zip(current_allocation.versions).map do |alloc, raw_version|
         AllocationPresenter.new(alloc, raw_version)
