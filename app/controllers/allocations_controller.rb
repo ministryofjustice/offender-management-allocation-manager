@@ -22,6 +22,8 @@ class AllocationsController < PrisonsApplicationController
     @prisoner = offender(nomis_offender_id_from_url)
 
     @allocation = Allocation.find_by(nomis_offender_id: @prisoner.offender_no)
+    @allocation.updated_at = YAML.load(@allocation.versions.last.object_changes).fetch('updated_at')[1]
+
     @pom = StaffMember.new(@allocation.primary_pom_nomis_id)
     redirect_to prison_pom_non_pom_path(@prison.code, @pom.staff_id) unless @pom.pom_at?(@prison.code)
 
