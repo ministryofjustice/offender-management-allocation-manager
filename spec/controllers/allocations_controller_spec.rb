@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe AllocationsController, type: :controller do
+RSpec.describe AllocationsController, :versioning, type: :controller do
   let(:poms) {
     [
       build(:pom,
@@ -108,7 +108,7 @@ RSpec.describe AllocationsController, type: :controller do
         to_return(status: 200, body: {}.to_json, headers: {})
     end
 
-    context 'when DeliusDataJob has updated the COM name', :versioning do
+    context 'when DeliusDataJob has updated the COM name' do
       # set DOB to 8 stars so that Delius matching ignores DoB
       let!(:d1) { create(:delius_data, date_of_birth: '*' * 8, offender_manager: 'Mr Todd', noms_no: offender_no) }
       let(:create_time) { 3.days.ago }
@@ -118,9 +118,9 @@ RSpec.describe AllocationsController, type: :controller do
       context 'when create, delius, update' do
         before do
           x = create(:allocation, primary_pom_nomis_id: 1, allocated_at_tier: 'C',
-                     nomis_offender_id: d1.noms_no,
-                     created_at: create_time,
-                     updated_at: create_time)
+                                  nomis_offender_id: d1.noms_no,
+                                  created_at: create_time,
+                                  updated_at: create_time)
           Timecop.travel 2.days.ago do
             ProcessDeliusDataJob.perform_now offender_no
           end
@@ -148,9 +148,9 @@ RSpec.describe AllocationsController, type: :controller do
       context 'when delius updated' do
         before do
           create(:allocation, primary_pom_nomis_id: 1, allocated_at_tier: 'C',
-                     nomis_offender_id: d1.noms_no,
-                     created_at: create_time,
-                     updated_at: create_time)
+                              nomis_offender_id: d1.noms_no,
+                              created_at: create_time,
+                              updated_at: create_time)
           Timecop.travel 2.days.ago do
             ProcessDeliusDataJob.perform_now offender_no
           end
