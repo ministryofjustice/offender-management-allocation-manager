@@ -22,7 +22,7 @@ feature 'Responsibility override' do
       end
 
       it 'overrides' do
-        visit new_prison_allocation_path('LEI', offender_id)
+        visit prison_allocation_path('LEI', offender_id)
 
         within '.responsibility_change' do
           click_link 'Change'
