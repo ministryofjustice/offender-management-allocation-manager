@@ -29,8 +29,8 @@ RSpec.describe OffenderHelper do
     it 'can show Custody for Prison' do
       off = build(:offender).tap { |o|
         o.load_case_information(build(:case_information))
-        o.sentence = HmppsApi::SentenceDetail.new sentence_start_date: Time.zone.today - 20.months,
-                                               automatic_release_date: Time.zone.today + 20.months
+        o.sentence = HmppsApi::SentenceDetail.from_json('sentenceStartDate' => (Time.zone.today - 20.months).to_s,
+                                                         'automaticReleaseDate' => (Time.zone.today + 20.months).to_s)
       }
       offp = OffenderPresenter.new(off)
 
@@ -39,7 +39,7 @@ RSpec.describe OffenderHelper do
 
     it 'can show Community for Probation' do
       off = build(:offender).tap { |o|
-        o.sentence = HmppsApi::SentenceDetail.new automatic_release_date: Time.zone.today
+        o.sentence = HmppsApi::SentenceDetail.from_json("automaticReleaseDate" => Time.zone.today.to_s)
       }
       offp = OffenderPresenter.new(off)
 
@@ -51,8 +51,8 @@ RSpec.describe OffenderHelper do
     it 'returns false if offender is not sentenced' do
       offender = build(:offender).tap { |o|
         o.load_case_information(build(:case_information))
-        o.sentence = HmppsApi::SentenceDetail.new sentence_start_date: Time.zone.today - 20.months,
-                                                  automatic_release_date: Time.zone.today + 20.months
+        o.sentence = HmppsApi::SentenceDetail.from_json('sentenceStartDate' => (Time.zone.today - 20.months).to_s,
+                                                         'automaticReleaseDate' => (Time.zone.today + 20.months).to_s)
       }
 
       expect(offender.sentenced?).to eq(false)
@@ -62,8 +62,8 @@ RSpec.describe OffenderHelper do
     it 'returns false if offender does not have a handover start date' do
       offender = build(:offender, :indeterminate).tap { |o|
         o.load_case_information(build(:case_information))
-        o.sentence = HmppsApi::SentenceDetail.new sentence_start_date: Time.zone.today + 20.months,
-                                                  automatic_release_date: nil
+        o.sentence = HmppsApi::SentenceDetail.from_json('sentenceStartDate' => (Time.zone.today + 20.months).to_s,
+            )
       }
 
       expect(helper.needs_com_but_ldu_is_uncontactable?(offender)).to eq(false)
@@ -72,9 +72,9 @@ RSpec.describe OffenderHelper do
     it 'returns false if offender has more than 45 days until start of handover' do
       offender = build(:offender).tap { |o|
         o.load_case_information(build(:case_information))
-        o.sentence = HmppsApi::SentenceDetail.new sentence_start_date: Time.zone.today - 20.months,
-                                                  automatic_release_date: Time.zone.today + 20.months,
-                                                  release_date: Time.zone.today + 20.months
+        o.sentence = HmppsApi::SentenceDetail.from_json('sentenceStartDate' => (Time.zone.today - 20.months).to_s,
+                                                         'automaticReleaseDate' => (Time.zone.today + 20.months).to_s,
+                                                         'releaseDate' => (Time.zone.today + 20.months).to_s)
       }
 
       expect(helper.needs_com_but_ldu_is_uncontactable?(offender)).to eq(false)
@@ -84,9 +84,9 @@ RSpec.describe OffenderHelper do
       it "returns false if offender has a 'COM'" do
         offender = build(:offender).tap { |o|
           o.load_case_information(build(:case_information, com_name: "Betty White"))
-          o.sentence = HmppsApi::SentenceDetail.new sentence_start_date: Time.zone.today - 20.months,
-                                                    automatic_release_date: Time.zone.today + 8.months,
-                                                    release_date: Time.zone.today + 20.months
+          o.sentence = HmppsApi::SentenceDetail.from_json('sentenceStartDate' => (Time.zone.today - 20.months).to_s,
+                                                           'automaticReleaseDate' => (Time.zone.today + 8.months).to_s,
+                                                           'releaseDate' => (Time.zone.today + 20.months).to_s)
         }
 
         expect(helper.needs_com_but_ldu_is_uncontactable?(offender)).to eq(false)
@@ -96,9 +96,9 @@ RSpec.describe OffenderHelper do
         it "returns false if offender has an LDU email address" do
           offender = build(:offender).tap { |o|
             o.load_case_information(build(:case_information))
-            o.sentence = HmppsApi::SentenceDetail.new sentence_start_date: Time.zone.today - 20.months,
-                                                      automatic_release_date: Time.zone.today + 8.months,
-                                                      release_date: Time.zone.today + 20.months
+            o.sentence = HmppsApi::SentenceDetail.from_json('sentenceStartDate' => (Time.zone.today - 20.months).to_s,
+                                                             'automaticReleaseDate' => (Time.zone.today + 8.months).to_s,
+                                                             'releaseDate' => (Time.zone.today + 20.months).to_s)
           }
 
           expect(helper.needs_com_but_ldu_is_uncontactable?(offender)).to eq(false)
@@ -107,9 +107,9 @@ RSpec.describe OffenderHelper do
         it "returns true if offender has no LDU" do
           offender = build(:offender).tap { |o|
             o.load_case_information(build(:case_information, team: nil))
-            o.sentence = HmppsApi::SentenceDetail.new sentence_start_date: Time.zone.today - 20.months,
-                                                      automatic_release_date: Time.zone.today + 8.months,
-                                                      release_date: Time.zone.today + 20.months
+            o.sentence = HmppsApi::SentenceDetail.from_json('sentenceStartDate' => (Time.zone.today - 20.months).to_s,
+                                                              'automaticReleaseDate' => (Time.zone.today + 8.months).to_s,
+                                                              'releaseDate' => (Time.zone.today + 20.months).to_s)
           }
 
           expect(helper.needs_com_but_ldu_is_uncontactable?(offender)).to eq(true)
@@ -119,9 +119,9 @@ RSpec.describe OffenderHelper do
           offender = build(:offender).tap { |o|
             o.load_case_information(build(:case_information,
                                           team: build(:team, local_divisional_unit: build(:local_divisional_unit, email_address: nil))))
-            o.sentence = HmppsApi::SentenceDetail.new sentence_start_date: Time.zone.today - 20.months,
-                                                      automatic_release_date: Time.zone.today + 8.months,
-                                                      release_date: Time.zone.today + 20.months
+            o.sentence = HmppsApi::SentenceDetail.from_json('sentenceStartDate' => (Time.zone.today - 20.months).to_s,
+                                                              'automaticReleaseDate' => (Time.zone.today + 8.months).to_s,
+                                                              'releaseDate' => (Time.zone.today + 20.months).to_s)
           }
 
           expect(helper.needs_com_but_ldu_is_uncontactable?(offender)).to eq(true)

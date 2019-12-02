@@ -139,6 +139,10 @@ module HmppsApi
       @responsibility_override.present?
     end
 
+    # This list must only contain fields that are both supplied by
+    # https://api-dev.prison.service.justice.gov.uk/swagger-ui.html#//prisoners/getPrisonersOffenderNo
+    # and also by
+    # https://api-dev.prison.service.justice.gov.uk/swagger-ui.html#//locations/getOffendersAtLocationDescription
     def load_from_json(payload)
       # It is expected that this method will be called by the subclass which
       # will have been given a payload at the class level, and will call this

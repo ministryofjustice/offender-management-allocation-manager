@@ -11,14 +11,10 @@ module HmppsApi
                 :licence_expiry_date,
                 :sentence_start_date,
                 :tariff_date,
-                :sentence_expiry_date,
                 :actual_parole_date
 
-    def initialize(fields = {})
-      fields.each do |k, v|
-        instance_variable_set("@#{k}", v)
-      end
-    end
+    # Note - this is hiding a defect - we never get sentence_expiry_date from NOMIS (but maybe we should?)
+    attr_accessor :sentence_expiry_date
 
     def automatic_release_date
       @automatic_release_override_date.presence || @automatic_release_date
