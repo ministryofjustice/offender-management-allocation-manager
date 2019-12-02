@@ -26,7 +26,7 @@
                 <input class="govuk-checkboxes__input" id="override-conditional-1" name="override[override_reasons][]" type="checkbox" value="suitability" data-aria-controls="override-1"
                        <%= 'checked=checked' if override_reason_contains(@override, 'suitability') %> >
                 <label class="govuk-label govuk-checkboxes__label"
-                       for="override-conditional-1"><%= complex_reason_label(@prisoner.recommended_pom_type) %></label>
+                       for="override-conditional-1"><%= @prisoner.complex_reason_label %></label>
               </div>
               <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="override-1">
                 <% if @override.errors[:suitability_detail].present? %>
