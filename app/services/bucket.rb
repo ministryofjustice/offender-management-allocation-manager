@@ -1,19 +1,11 @@
 # frozen_string_literal: true
 
-# The Bucket class is a simple data structure that can contain a fixed
-# number of things. The initial capacity of the bucket is set on
-# creation and once full, any attempts to put more items in the
-# bucket will be ignored.
-#
-# This would just be an array apart from the handling of the last
-# N items, and it's recommended not to subclass core classes
 class Bucket
-  attr_accessor :items
-  attr_reader :label
+  attr_reader :items
 
   def initialize(sortable_fields)
     @items = []
-    @valid_sort_fields = sortable_fields || default_sortable_fields
+    @valid_sort_fields = sortable_fields
   end
 
   def count
@@ -34,9 +26,5 @@ class Bucket
     end
 
     @items = @items.reverse if direction == :desc
-  end
-
-  def default_sortable_fields
-    [:last_name, :earliest_release_date, :awaiting_allocation_for, :tier]
   end
 end

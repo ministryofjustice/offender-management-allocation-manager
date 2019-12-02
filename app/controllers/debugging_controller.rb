@@ -18,9 +18,9 @@ class DebuggingController < PrisonsApplicationController
 
     @summary = create_summary
     @filtered_offenders_count = [
-      @summary.allocated_total,
-      @summary.unallocated_total,
-      @summary.pending_total
+      @summary.allocated.count,
+      @summary.unallocated.count,
+      @summary.pending.count
     ].sum
 
     @unfiltered_offenders_count = unfiltered_offenders.count
@@ -30,13 +30,8 @@ class DebuggingController < PrisonsApplicationController
 private
 
   def create_summary
-    params = SummaryService::SummaryParams.new(
-      sort_field: nil,
-      sort_direction: nil
-    )
-
     @summary = SummaryService.summary(
-      :allocated, @prison, params
+      :allocated, @prison
     )
   end
 
