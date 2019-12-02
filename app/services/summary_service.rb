@@ -3,15 +3,6 @@
 class SummaryService
   PAGE_SIZE = 20 # The number of items to show in the view
 
-  class SummaryParams
-    attr_reader :sort_field, :sort_direction
-
-    def initialize(sort_field: nil, sort_direction: :asc)
-      @sort_field = sort_field
-      @sort_direction = sort_direction
-    end
-  end
-
   # rubocop:disable Metrics/MethodLength
   def self.summary(summary_type, prison)
     # We expect to be passed summary_type, which is one of :allocated, :unallocated,
