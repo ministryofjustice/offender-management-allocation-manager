@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.feature "ChangeParoleReviewDates", type: :feature do
+RSpec.feature "ChangeParoleReviewDates", :versioning, type: :feature do
   # This ID has an indeterminate sentence
   let(:nomis_offender_id) { 'G0549UO' }
   let!(:case_info) { create(:case_information, nomis_offender_id: nomis_offender_id) }

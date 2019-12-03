@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe AllocationsController, type: :controller do
+RSpec.describe AllocationsController, :versioning, type: :controller do
   let(:poms) {
     [
       build(:pom,
@@ -107,35 +107,62 @@ RSpec.describe AllocationsController, type: :controller do
         to_return(status: 200, body: {}.to_json, headers: {})
     end
 
-    context 'when DeliusDataJob has updated the COM name', :versioning do
+    context 'when DeliusDataJob has updated the COM name' do
       # set DOB to 8 stars so that Delius matching ignores DoB
-      let!(:d1) { create(:delius_data, date_of_birth: '********', offender_manager: 'Mr Todd', noms_no: offender_no) }
+      let!(:d1) { create(:delius_data, date_of_birth: '*' * 8, offender_manager: 'Mr Todd', noms_no: offender_no) }
       let(:create_time) { 3.days.ago }
+      let(:create_date) { create_time.to_date }
+      let(:yesterday) { 1.day.ago.to_date }
 
-      before do
-        x = create(:allocation, primary_pom_nomis_id: 1, allocated_at_tier: 'C',
-                                nomis_offender_id: d1.noms_no,
-                                created_at: create_time,
-                                updated_at: create_time)
-        Timecop.travel 2.days.ago do
-          ProcessDeliusDataJob.perform_now offender_no
+      context 'when create, delius, update' do
+        before do
+          x = create(:allocation, primary_pom_nomis_id: 1, allocated_at_tier: 'C',
+                                  nomis_offender_id: d1.noms_no,
+                                  created_at: create_time,
+                                  updated_at: create_time)
+          Timecop.travel 2.days.ago do
+            ProcessDeliusDataJob.perform_now offender_no
+          end
+          x.reload
+          Timecop.travel 1.day.ago do
+            x.update(allocated_at_tier: 'D')
+          end
         end
-        x.reload
-        x.update(allocated_at_tier: 'D')
+
+        it 'doesnt mess up the allocation history updated_at as we surface the value' do
+          get :history, params: { prison_id: prison, nomis_offender_id: d1.noms_no }
+          history = assigns(:history)
+          # one set of history as only 1 prison involved
+          expect(history.size).to eq(1)
+          # history is array of pairs - [prison, allocations]
+          expect(history.first.size).to eq(2)
+          expect(history.first.first).to eq 'LEI'
+
+          allocation_list = history.first.second
+          expect(allocation_list.size).to eq(2)
+          expect(allocation_list.map(&:updated_at).map(&:to_date)).to eq([yesterday, create_date])
+        end
       end
 
-      it 'doesnt mess up the allocation history updated_at as we surface the value' do
-        get :history, params: { prison_id: prison, nomis_offender_id: d1.noms_no }
-        history = assigns(:history)
-        # one set of history as only 1 prison involved
-        expect(history.size).to eq(1)
-        # history is array of pairs - [prison, allocations]
-        expect(history.first.size).to eq(2)
-        expect(history.first.first).to eq 'LEI'
+      context 'when delius updated' do
+        before do
+          create(:allocation, primary_pom_nomis_id: 1, allocated_at_tier: 'C',
+                              nomis_offender_id: d1.noms_no,
+                              created_at: create_time,
+                              updated_at: create_time)
+          Timecop.travel 2.days.ago do
+            ProcessDeliusDataJob.perform_now offender_no
+          end
 
-        allocation_list = history.first.second
-        expect(allocation_list.size).to eq(2)
-        expect(allocation_list.map(&:updated_at).map(&:to_date)).to eq([Time.zone.today, create_time].map(&:to_date))
+          stub_request(:get, "https://keyworker-api-dev.prison.service.justice.gov.uk/key-worker/AYI/offender/G1234VO").
+            to_return(status: 200, body: { staffId: 123_456 }.to_json, headers: {})
+        end
+
+        it 'shows the correct date on the show page' do
+          get :show, params: { prison_id: prison, nomis_offender_id: d1.noms_no }
+          alloc = assigns(:allocation)
+          expect(alloc.updated_at.to_date).to eq(create_date)
+        end
       end
     end
 
