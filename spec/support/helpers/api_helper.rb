@@ -32,7 +32,7 @@ module ApiHelper
         }).
       to_return(status: 200, body: poms.to_json)
     poms.each do |pom|
-      stub_pom_emails(pom[:staffId], pom[:emails])
+      stub_pom_emails(pom.staffId, pom.emails)
     end
   end
 

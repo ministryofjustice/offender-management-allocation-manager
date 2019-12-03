@@ -3,28 +3,28 @@ require 'rails_helper'
 RSpec.describe AllocationsController, type: :controller do
   let(:poms) {
     [
-      {
-        firstName: 'Alice',
-        position: RecommendationService::PRISON_POM,
-        staffId: 1
-      },
-      {
-        firstName: 'Bob',
-        position: RecommendationService::PRISON_POM,
-        staffId: 2
-      },
-      {
-        firstName: 'Clare',
-        position: RecommendationService::PROBATION_POM,
-        staffId: 3,
-        emails: ['pom3@prison.gov.uk']
-      },
-      {
-        firstName: 'Dave',
-        position: RecommendationService::PROBATION_POM,
-        staffId: 4,
-        emails: ['pom4@prison.gov.uk']
-      }
+      build(:pom,
+            firstName: 'Alice',
+            position: RecommendationService::PRISON_POM,
+            staffId: 1
+      ),
+      build(:pom,
+            firstName: 'Bob',
+            position: RecommendationService::PRISON_POM,
+            staffId: 2
+        ),
+      build(:pom,
+            firstName: 'Clare',
+            position: RecommendationService::PROBATION_POM,
+            staffId: 3,
+            emails: ['pom3@prison.gov.uk']
+        ),
+      build(:pom,
+            firstName: 'Dave',
+            position: RecommendationService::PROBATION_POM,
+            staffId: 4,
+            emails: ['pom4@prison.gov.uk']
+        )
     ]
   }
 
@@ -60,11 +60,11 @@ RSpec.describe AllocationsController, type: :controller do
       let(:offender_no) { 'G7806VO' }
       let(:pom_staff_id) { 543_453 }
       let(:poms) {
-        [{
-          firstName: 'Alice',
-          position: RecommendationService::PRISON_POM,
-          staffId: 123
-        }]
+        [build(:pom,
+               firstName: 'Alice',
+               position: RecommendationService::PRISON_POM,
+               staffId: 123
+         )]
       }
 
       before do
