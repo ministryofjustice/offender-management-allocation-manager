@@ -45,9 +45,10 @@ private
     params = sort_params(summary_type)
     offenders.sort params[0], params[1]
 
-    overrides_hash = Responsibility.where(nomis_offender_id: offenders.items.map(&:offender_no)).
-      map { |r| [r.nomis_offender_id, r] }.to_h
-    offenders.items.map { |o| OffenderPresenter.new(o, overrides_hash[o.offender_no]) }
+    # TODO: bug fix is to bring this data into scope and attach it to the OffenderPresenter
+    # overrides_hash = Responsibility.where(nomis_offender_id: offenders.items.map(&:offender_no)).
+    #   map { |r| [r.nomis_offender_id, r] }.to_h
+    offenders.items.map { |o| OffenderPresenter.new(o, nil) }
   end
 
   def create_summary(summary_type)
