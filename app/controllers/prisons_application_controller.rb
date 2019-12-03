@@ -11,6 +11,16 @@ protected
     params[:prison_id]
   end
 
+  def ensure_pom
+    unless current_user_is_pom?
+      redirect_to '/401'
+    end
+  end
+
+  def current_user_is_pom?
+    roles.include?('ROLE_ALLOC_CASE_MGR') && pom_at_active_prison?
+  end
+
 private
 
   def check_prison_access
@@ -22,5 +32,10 @@ private
     return redirect_to('/401') if caseloads.nil? || !caseloads.include?(active_prison_id)
 
     @prison = Prison.new(active_prison_id)
+  end
+
+  def pom_at_active_prison?
+    user = Nomis::Elite2::UserApi.user_details(current_user)
+    StaffMember.new(user.staff_id).pom_at?(active_prison_id)
   end
 end

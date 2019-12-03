@@ -25,19 +25,9 @@ class ApplicationController < ActionController::Base
     roles.include?('ROLE_ALLOC_MGR')
   end
 
-  def current_user_is_pom?
-    roles.include?('ROLE_ALLOC_CASE_MGR')
-  end
-
   def ensure_admin_user
     unless current_user_is_spo?
-      redirect_to '/'
-    end
-  end
-
-  def ensure_case_admin_user
-    unless current_user_is_pom?
-      redirect_to '/'
+      redirect_to '/401'
     end
   end
 
