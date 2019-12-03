@@ -142,6 +142,7 @@ RSpec.describe SummaryController, type: :controller do
 
       expect(summary.offenders.size).to eq(50)
       expect(summary.offenders.current_page).to eq(1)
+      expect(summary.offenders.total_pages).to eq(3)
     end
 
     it 'gets page 2' do
@@ -149,6 +150,7 @@ RSpec.describe SummaryController, type: :controller do
 
       expect(summary.offenders.size).to eq(50)
       expect(summary.offenders.current_page).to eq(2)
+      expect(summary.offenders.total_pages).to eq(3)
     end
 
     it 'gets page 3' do
@@ -156,6 +158,7 @@ RSpec.describe SummaryController, type: :controller do
 
       expect(summary.offenders.size).to eq(20)
       expect(summary.offenders.current_page).to eq(3)
+      expect(summary.offenders.total_pages).to eq(3)
     end
   end
 

@@ -2,9 +2,7 @@
 
 <h2 class="govuk-heading-m"><%= @prisoner.full_name %> - <%= @prisoner.offender_no %></h2>
 
-<%= form_for(@case_info, url: prison_case_information_path(@prison.code), method: :put, id: "case_info_form") do |f| %>
-  <%= hidden_field_tag("case_information[nomis_offender_id]", @prisoner.offender_no) %>
-
+<%= form_for(@case_info, url: update_prd_prison_case_information_path(@prison.code, @prisoner.offender_no), method: :put, id: "case_info_form") do |f| %>
   <div class="govuk-form-group">
     <!-- Change text in en.yml -->
     <%= f.gov_uk_date_field :parole_review_date, page_heading: false %>
