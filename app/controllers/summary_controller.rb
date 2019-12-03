@@ -15,16 +15,6 @@ class SummaryController < PrisonsApplicationController
     redirect_to prison_summary_allocated_path(active_prison_id)
   end
 
-  class SummaryPresenter
-    attr_reader :unallocated_total, :allocated_total, :pending_total
-
-    def initialize(summary)
-      @unallocated_total = summary.unallocated.count
-      @allocated_total = summary.allocated.count
-      @pending_total = summary.pending.count
-    end
-  end
-
   def allocated
     summary = create_summary(:allocated)
     items = offenders(:allocated, summary.allocated)
