@@ -36,7 +36,12 @@ class ResponsibilitiesController < PrisonsApplicationController
       ).deliver_later
     end
 
-    redirect_to prison_allocation_path(@prison.code, @responsibility.nomis_offender_id)
+    allocation = Allocation.find_by(nomis_offender_id: @responsibility.nomis_offender_id, prison: @prison.code)
+    if allocation.try(:active?)
+      redirect_to prison_allocation_path(@prison.code, @responsibility.nomis_offender_id)
+    else
+      redirect_to new_prison_allocation_path(@prison.code, @responsibility.nomis_offender_id)
+    end
   end
 
 private

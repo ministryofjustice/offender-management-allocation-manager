@@ -15,7 +15,7 @@ class SummaryService
   # rubocop:disable Metrics/MethodLength
   # rubocop:disable Metrics/PerceivedComplexity
   # rubocop:disable Metrics/CyclomaticComplexity
-  def self.summary(summary_type, prison, page, params)
+  def self.summary(summary_type, prison, params)
     # We expect to be passed summary_type, which is one of :allocated, :unallocated,
     # or :pending.  The other types will return totals, and do not contain any data.
     sortable_fields = (summary_type == :allocated ? sort_fields_for_allocated : nil)
@@ -64,9 +64,7 @@ class SummaryService
     end
 
     Summary.new(summary_type).tap { |summary|
-      offenders = bucket.items.map { |o| OffenderPresenter.new(o, nil) }
-
-      summary.offenders = Kaminari.paginate_array(offenders).page(page)
+      summary.offenders = bucket.items
 
       summary.allocated_total = counts[:allocated]
       summary.unallocated_total = counts[:unallocated]
