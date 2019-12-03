@@ -14,6 +14,9 @@ class ResponsibilityService
 
   WELSH_POLICY_START_DATE = DateTime.new(2019, 2, 4).utc.to_date
   ENGLISH_POLICY_START_DATE = DateTime.new(2019, 10, 1).utc.to_date
+
+  ORIGINAL_ENGLISH_POLICY_START_DATE = DateTime.new(2019, 9, 16).utc.to_date
+
   def self.calculate_pom_responsibility(offender)
     if offender.immigration_case?
       SUPPORTING
@@ -142,7 +145,7 @@ private
 
   def self.release_date_gt_17_mths_at_policy_date?(offender, threshold)
     offender.earliest_release_date >
-      ENGLISH_POLICY_START_DATE + threshold
+      ORIGINAL_ENGLISH_POLICY_START_DATE + threshold
   end
 
   def self.release_date_gt_12_weeks?(offender)
