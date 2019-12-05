@@ -21,7 +21,6 @@ gem 'pg'
 gem 'puma', '~> 4.2'
 gem 'prometheus_exporter'
 gem 'rails', '~> 6.0.1'
-gem 'sass-rails', '~> 5.0'
 gem 'sidekiq'
 gem 'sentry-raven'
 gem 'turbolinks', '~> 5'
@@ -39,6 +38,7 @@ gem 'kaminari' # pagination
 gem 'prawn-rails'
 gem 'rswag-api' # api-documentation
 gem 'rswag-ui'  # api-documentation interface
+gem 'sassc-rails'
 
 group :development, :test do
   gem 'brakeman'
