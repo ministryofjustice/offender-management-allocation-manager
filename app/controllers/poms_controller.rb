@@ -20,8 +20,16 @@ class PomsController < PrisonsApplicationController
   end
 
   def show
-    caseload = PomCaseload.new(@pom.staff_id, active_prison_id)
-    @allocations = sort_allocations(caseload.allocations)
+    # caseload = PomCaseload.new(@pom.staff_id, active_prison_id)
+    # @allocations = sort_allocations(caseload.allocations)
+    offender_hash = @prison.offenders.map { |o| [o.offender_no, o] }.to_h
+    allocations = Allocation.
+      where(nomis_offender_id: offender_hash.keys).
+      active_pom_allocations(@pom.staff_id, active_prison_id)
+    allocations = allocations.map { |alloc|
+      AllocatedOffender.new(@pom.staff_id, alloc, offender_hash.fetch(alloc.nomis_offender_id))
+    }
+    @allocations = sort_allocations(allocations)
   end
 
   # This is for the situation where the user is no longer a POM
