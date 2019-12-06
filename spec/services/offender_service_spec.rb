@@ -3,16 +3,6 @@ require 'rails_helper'
 describe OffenderService do
   let(:tier_map) { CaseInformationService.get_case_information('LEI') }
 
-  it "can get multiple offenders at once",
-     vcr: { cassette_name: :offender_service_multiple_offenders_spec } do
-    offender_ids = %w[G4273GI G7806VO G3462VT]
-    offenders = described_class.get_multiple_offenders(offender_ids)
-
-    expect(offenders).to be_kind_of(Array)
-    expect(offenders.length).to eq(3)
-    expect(offenders.first).to be_kind_of(Nomis::Offender)
-  end
-
   it "gets a single offender", vcr: { cassette_name: :offender_service_single_offender_spec } do
     nomis_offender_id = 'G4273GI'
 

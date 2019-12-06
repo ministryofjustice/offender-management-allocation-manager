@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe TasksController, type: :controller do
-  let(:prison) { 'LEI' }
+  let(:prison) { build(:prison).code }
   let(:staff_id) { 123 }
   let(:username) { 'alice' }
   let(:pom) {
@@ -21,16 +21,16 @@ RSpec.describe TasksController, type: :controller do
     stub_signed_in_pom(staff_id, username)
 
     offenders = [
-      { "latestBookingId": 754_207, "offenderNo": "G7514GW", "firstName": "Alice", "lastName": "Aliceson",
+      { "bookingId": 754_207, "offenderNo": "G7514GW", "firstName": "Alice", "lastName": "Aliceson",
         "dateOfBirth": "1990-12-06", "age": 28, "categoryCode": "C", "imprisonmentStatus": "LIFE",
         "convictedStatus": "Convicted", "latestLocationId": prison },
-      { "latestBookingId": 754_206, "offenderNo": "G1234VV", "firstName": "Bob", "lastName": "Bibby",
+      { "bookingId": 754_206, "offenderNo": "G1234VV", "firstName": "Bob", "lastName": "Bibby",
         "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03",
         "convictedStatus": "Convicted", "latestLocationId": prison },
-      { "latestBookingId": 754_205, "offenderNo": "G1234AB", "firstName": "Carole", "lastName": "Caroleson",
+      { "bookingId": 754_205, "offenderNo": "G1234AB", "firstName": "Carole", "lastName": "Caroleson",
         "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03",
         "convictedStatus": "Convicted", "latestLocationId": prison },
-      { "latestBookingId": 754_204, "offenderNo": "G1234GG", "firstName": "David", "lastName": "Davidson",
+      { "bookingId": 754_204, "offenderNo": "G1234GG", "firstName": "David", "lastName": "Davidson",
         "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03",
         "convictedStatus": "Convicted", "latestLocationId": prison }
     ]
@@ -68,10 +68,10 @@ RSpec.describe TasksController, type: :controller do
 
     # Allocate all of the offenders to this POM
     offenders.each do |offender|
-      create(:allocation, nomis_offender_id: offender[:offenderNo], primary_pom_nomis_id: staff_id)
+      create(:allocation, nomis_offender_id: offender[:offenderNo], primary_pom_nomis_id: staff_id, prison: prison)
     end
 
-    stub_multiple_offenders(offenders, bookings)
+    stub_offenders_for_prison(prison, offenders, bookings)
   end
 
   context 'when showing parole review date pom tasks' do

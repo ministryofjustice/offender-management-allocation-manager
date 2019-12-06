@@ -13,7 +13,7 @@ class CaseloadController < PrisonsApplicationController
              only: [:handover_start]
 
   def index
-    caseload = PomCaseload.new(@pom.staff_id, active_prison_id)
+    caseload = PomCaseload.new(@pom.staff_id, @prison)
 
     @new_cases_count = caseload.allocations.count(&:new_case?)
     sorted_allocations = sort_allocations(filter_allocations(caseload.allocations))
@@ -26,12 +26,12 @@ class CaseloadController < PrisonsApplicationController
   end
 
   def new
-    caseload = PomCaseload.new(@pom.staff_id, active_prison_id)
+    caseload = PomCaseload.new(@pom.staff_id, @prison)
     @new_cases = sort_allocations(caseload.allocations.select(&:new_case?))
   end
 
   def handover_start
-    offenders = pending_handover_offenders PomCaseload.new(@pom.staff_id, active_prison_id).allocations.map(&:offender)
+    offenders = pending_handover_offenders PomCaseload.new(@pom.staff_id, @prison).allocations.map(&:offender)
 
     @upcoming_handovers = Kaminari.paginate_array(offenders).page(page)
   end
