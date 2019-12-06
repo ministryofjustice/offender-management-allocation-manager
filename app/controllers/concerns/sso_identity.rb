@@ -42,10 +42,14 @@ class SsoIdentity
   end
 
   def session_expired?
-    @sso_identity['expiry'] && Time.current > Time.zone.at(@sso_identity['expiry'])
+    !session_current?
   end
 
 private
+
+  def session_current?
+    @sso_identity['expiry'] && Time.current < Time.zone.at(@sso_identity['expiry'])
+  end
 
   def roles
     @roles ||= if @sso_identity.present? && @sso_identity['roles']
