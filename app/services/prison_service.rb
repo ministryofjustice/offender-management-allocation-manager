@@ -92,6 +92,7 @@ class PrisonService
     PrisonInfo.new('ONI', 'HMP Onley', :england),
     PrisonInfo.new('OWI', 'HMP Oakwood', :england),
     PrisonInfo.new('PBI', 'HMP Peterborough', :england),
+    PrisonInfo.new('PFI', 'HMP Peterborough (Female)', :england),
     PrisonInfo.new('PDI', 'HMP/YOI Portland', :england),
     PrisonInfo.new('PNI', 'HMP Preston', :england),
     PrisonInfo.new('PRI', 'HMP Parc', :wales),
