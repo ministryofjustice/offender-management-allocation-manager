@@ -37,9 +37,13 @@ private
       sort_direction: direction
     )
 
-    SummaryService.summary(
-      summary_type, @prison, page, params
+    summary = SummaryService.summary(
+      summary_type, @prison, params
     )
+
+    paged_offenders = Kaminari.paginate_array(summary.offenders).page(page)
+    summary.offenders = paged_offenders
+    summary
   end
 
   def page
