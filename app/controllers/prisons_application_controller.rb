@@ -18,7 +18,7 @@ protected
   end
 
   def current_user_is_pom?
-    roles.include?('ROLE_ALLOC_CASE_MGR') && pom_at_active_prison?
+    sso_identity.current_user_is_pom? && pom_at_active_prison?
   end
 
 private
