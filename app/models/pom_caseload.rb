@@ -4,7 +4,6 @@ class PomCaseload
   def initialize(pom_staff_id, prison_id)
     @staff_id = pom_staff_id
     @prison_id = prison_id
-    @tasks = PomTasks.new
   end
 
   def allocations
@@ -12,11 +11,11 @@ class PomCaseload
   end
 
   def tasks_for_offenders
-    @tasks.for_offenders(allocations.map(&:offender))
+    PomTasks.new.for_offenders(allocations.map(&:offender))
   end
 
   def tasks_for_offender(offender)
-    @tasks.for_offender(offender)
+    PomTasks.new.for_offender(offender)
   end
 
 private
