@@ -1,4 +1,7 @@
-class ActiveAdminOAuth2Adapter < ActiveAdmin::AuthorizationAdapter
+# we have the world's simplest authenticaton requirements for
+# ActiveAdmin.  you're either allowed in because you're considered to
+# be an admin (actually implemented as SPO) or you're not authorised to do anything.
+class MoicOAuth2Adapter < ActiveAdmin::AuthorizationAdapter
   def authorized?(_action, _subject = nil)
     user.admin?
   end
@@ -70,7 +73,7 @@ ActiveAdmin.setup do |config|
   # ensure that there is a user with proper rights. You can use
   # CanCanAdapter or make your own. Please refer to documentation.
   # config.authorization_adapter = ActiveAdmin::CanCanAdapter
-  config.authorization_adapter = ActiveAdminOAuth2Adapter
+  config.authorization_adapter = MoicOAuth2Adapter
 
   # In case you prefer Pundit over other solutions you can here pass
   # the name of default policy class. This policy will be used in every
