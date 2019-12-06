@@ -13,7 +13,7 @@ class SignonIdentity
     @username = omniauth_data.fetch('info').username
     @active_caseload = omniauth_data.fetch('info').active_caseload
     @caseloads = omniauth_data.fetch('info').caseloads
-    @expiry = omniauth_data.fetch('credentials').expires_at
+    @expiry = omniauth_data['credentials'].try(:expires_at)
     @roles = omniauth_data.fetch('info').roles
   end
 
