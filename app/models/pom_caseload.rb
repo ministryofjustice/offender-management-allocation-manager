@@ -14,10 +14,6 @@ class PomCaseload
     PomTasks.new.for_offenders(allocations.map(&:offender))
   end
 
-  def tasks_for_offender(offender)
-    PomTasks.new.for_offender(offender)
-  end
-
 private
 
   def load_allocations

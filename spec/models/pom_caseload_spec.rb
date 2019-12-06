@@ -38,12 +38,6 @@ RSpec.describe PomCaseload, type: :model do
       expect(caseload.tasks_for_offenders.count).to eq(1)
     end
 
-    it 'can get tasks within a caseload for a single offender' do
-      caseload = described_class.new(staff_id, prison)
-      tasks = caseload.tasks_for_offender(offenders[0])
-      expect(tasks.count).to eq(1)
-    end
-
     it "will hide invalid allocations" do
       allocated_offenders = described_class.new(staff_id, prison).allocations
       expect(allocated_offenders.count).to eq 4
