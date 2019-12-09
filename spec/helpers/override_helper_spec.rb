@@ -19,13 +19,21 @@ RSpec.describe OverrideHelper do
     )
   }
 
-  describe 'gets a complex override reason label' do
-    it "can get for a prison owned offender" do
-      expect(complex_reason_label('Prison officer')).to eq('Prisoner assessed as not suitable for a prison officer POM')
+  describe '#complex_reason_label' do
+    context 'when a prison POM' do
+      let(:subject) { OffenderPresenter.new(OpenStruct.new(immigration_case?: true), nil) }
+
+      it "can get for a prison owned offender" do
+        expect(subject.complex_reason_label).to eq('Prisoner assessed as not suitable for a prison officer POM')
+      end
     end
 
-    it "can get for a probation owned offender" do
-      expect(complex_reason_label('Probation officer')).to eq('Prisoner assessed as suitable for a prison officer POM despite tiering calculation')
+    context 'when a probation POM' do
+      let(:subject) { OffenderPresenter.new(OpenStruct.new(immigration_case?: false, tier: 'A'), nil) }
+
+      it "can get for a probation owned offender" do
+        expect(subject.complex_reason_label).to eq('Prisoner assessed as suitable for a prison officer POM despite tiering calculation')
+      end
     end
   end
 
