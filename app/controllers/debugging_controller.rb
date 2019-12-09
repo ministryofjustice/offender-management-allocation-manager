@@ -36,7 +36,7 @@ private
     )
 
     @summary = SummaryService.summary(
-      :allocated, @prison, 0, params
+      :allocated, @prison, params
     )
   end
 

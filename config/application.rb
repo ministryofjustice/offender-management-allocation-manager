@@ -16,6 +16,9 @@ Bundler.require(*Rails.groups)
 
 module OffenderManagementAllocationClient
   class Application < Rails::Application
+    # Disable CSS compression to enable SASSC support
+    config.assets.css_compressor = nil
+
     # allow customization of full error messages on a per-model basis
     config.active_model.i18n_customize_full_message = true
     # Before filter for Flipflop dashboard. Replace with a lambda or method name
