@@ -7,7 +7,7 @@ class TasksController < PrisonsApplicationController
   before_action :load_pom
 
   def index
-    offenders = PomCaseload.new(@pom.staff_id, @prison).allocations.map(&:offender)
+    offenders = @prison.allocations_for(@pom.staff_id).map(&:offender)
     sorted_tasks = sort_tasks(PomTasks.new.for_offenders(offenders))
     @pomtasks = Kaminari.paginate_array(sorted_tasks).page(page)
   end

@@ -1,7 +1,7 @@
 require 'rails_helper'
 
-RSpec.describe PomCaseload, type: :model do
-  let(:prison) { Prison.new('LEI') }
+RSpec.describe Prison, type: :model do
+  let(:prison) { described_class.new('LEI') }
   let(:staff_id) { 123 }
   let(:offenders) {
     [
@@ -29,18 +29,18 @@ RSpec.describe PomCaseload, type: :model do
     end
 
     it 'can get the allocations for the POM at a specific prison' do
-      caseload = described_class.new(staff_id, prison)
-      expect(caseload.allocations.count).to eq(4)
+      allocations = prison.allocations_for(staff_id)
+      expect(allocations.count).to eq(4)
     end
 
     it 'can get tasks within a caseload' do
-      caseload = described_class.new(staff_id, prison)
-      tasks = PomTasks.new.for_offenders(caseload.allocations.map(&:offender))
+      allocations = prison.allocations_for(staff_id)
+      tasks = PomTasks.new.for_offenders(allocations.map(&:offender))
       expect(tasks.count).to eq(1)
     end
 
     it "will hide invalid allocations" do
-      allocated_offenders = described_class.new(staff_id, prison).allocations
+      allocated_offenders = prison.allocations_for(staff_id)
       expect(allocated_offenders.count).to eq 4
 
       released_offender = allocated_offenders.detect { |ao| ao.offender.offender_no == 'G9999GG' }
@@ -107,35 +107,35 @@ RSpec.describe PomCaseload, type: :model do
     end
 
     it "will get allocations for a POM made within the last 7 days", :versioning do
-      allocated_offenders = described_class.new(staff_id, prison).allocations.select(&:new_case?)
+      allocated_offenders = prison.allocations_for(staff_id).select(&:new_case?)
       expect(allocated_offenders.count).to eq 2
       expect(allocated_offenders.map(&:pom_responsibility)).to match_array %w[Responsible Co-Working]
     end
 
     it "will get show the correct responsibility if one is overridden" do
       # Find a responsible offender
-      allocated_offenders = described_class.new(staff_id, prison).allocations
+      allocated_offenders = prison.allocations_for(staff_id)
       responsible_pom = allocated_offenders.detect { |offender| offender.pom_responsibility == 'Responsible' }.offender
 
       # Override their responsibility
       create(:responsibility, nomis_offender_id: responsible_pom.offender_no)
 
       # Confirm that the responsible offender is now supporting
-      allocated_offenders = described_class.new(staff_id, prison).allocations
+      allocated_offenders = prison.allocations_for(staff_id)
       responsible_pom = allocated_offenders.detect { |a| a.offender.offender_no == responsible_pom.offender_no }
       expect(responsible_pom.pom_responsibility).to eq('Supporting')
     end
 
     it "will get show the correct responsibility if one is overridden to probation" do
       # Find a responsible offender
-      allocated_offenders = described_class.new(staff_id, prison).allocations
+      allocated_offenders = prison.allocations_for(staff_id)
       responsible_pom = allocated_offenders.detect { |offender| offender.pom_responsibility == 'Responsible' }.offender
 
       # Override their responsibility
       create(:responsibility, nomis_offender_id: responsible_pom.offender_no, value: 'Probation')
 
       # Confirm that the responsible offender is now supporting
-      allocated_offenders = described_class.new(staff_id, prison).allocations
+      allocated_offenders = prison.allocations_for(staff_id)
       responsible_pom = allocated_offenders.detect { |a| a.offender.offender_no == responsible_pom.offender_no }
       expect(responsible_pom.pom_responsibility).to eq('Supporting')
     end
