@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature 'Co-working' do
+feature 'Co-working', :versioning do
   let!(:nomis_offender_id) { 'G4273GI' }
   let!(:prison_pom) do
     {

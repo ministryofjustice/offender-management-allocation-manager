@@ -8,7 +8,7 @@ RSpec.describe DebuggingController, type: :controller do
   let(:elite2bookingsapi) { "#{elite2api}/offender-sentences/bookings" }
 
   before do
-    stub_sso_data(prison)
+    stub_sso_data(prison, 'user')
   end
 
   it 'can show info' do

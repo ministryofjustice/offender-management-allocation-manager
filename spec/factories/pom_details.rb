@@ -22,7 +22,7 @@ FactoryBot.define do
     attr_accessor :position, :staffId, :emails, :firstName, :lastName
   end
 
-  factory :pom, class: Elite2POM do
+  factory :pom, class: 'Elite2POM' do
     position do 'PRO' end
     sequence(:emails) do |x| ["staff#{x}@justice.gov.uk"]  end
     sequence(:staffId) do |x| x + 1  end

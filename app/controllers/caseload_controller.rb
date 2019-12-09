@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class CaseloadController < PrisonsApplicationController
-  before_action :ensure_case_admin_user
   before_action :ensure_pom
+  before_action :load_pom
 
   breadcrumb -> { 'Your caseload' },
              -> { prison_caseload_index_path(active_prison_id) }
@@ -92,7 +92,7 @@ private
     allocations
   end
 
-  def ensure_pom
+  def load_pom
     @pom = PrisonOffenderManagerService.get_signed_in_pom_details(
       current_user,
       active_prison_id

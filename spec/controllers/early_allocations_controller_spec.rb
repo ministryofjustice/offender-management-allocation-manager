@@ -30,7 +30,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
   let(:s1_boolean_params) { s1_boolean_param_names.map { |p| [p, 'false'] }.to_h }
 
   before do
-    stub_sso_data(prison)
+    stub_sso_data(prison, 'alice')
 
     stub_offender(nomis_offender_id)
 

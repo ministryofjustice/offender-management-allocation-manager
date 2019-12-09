@@ -6,7 +6,7 @@ RSpec.describe PrisonsController, type: :controller do
 
     context 'when caseloads is not empty' do
       before do
-        stub_sso_data(prison)
+        stub_sso_data(prison, 'spo')
       end
 
       it 'renders the dashboard page when caseload contains the active_prison' do

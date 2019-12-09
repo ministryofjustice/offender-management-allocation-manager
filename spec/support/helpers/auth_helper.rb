@@ -14,17 +14,19 @@ module AuthHelper
       }.to_json, headers: {})
   end
 
-  def stub_sso_data(prison)
+  def stub_sso_data(prison, username = 'user')
     allow(Nomis::Oauth::TokenService).to receive(:valid_token).and_return(OpenStruct.new(access_token: 'token'))
     session[:sso_data] = { 'expiry' => Time.zone.now + 1.day,
                            'roles' => ['ROLE_ALLOC_MGR'],
-                           'caseloads' => [prison] }
+                           'caseloads' => [prison],
+                           'username' => username }
   end
 
-  def stub_sso_pom_data(prison)
+  def stub_sso_pom_data(prison, username)
     allow(Nomis::Oauth::TokenService).to receive(:valid_token).and_return(OpenStruct.new(access_token: 'token'))
     session[:sso_data] = { 'expiry' => Time.zone.now + 1.day,
                            'roles' => ['ROLE_ALLOC_CASE_MGR'],
-                           'caseloads' => [prison] }
+                           'caseloads' => [prison],
+                           'username' => username }
   end
 end
