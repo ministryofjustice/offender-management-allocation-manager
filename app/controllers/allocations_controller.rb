@@ -21,7 +21,9 @@ class AllocationsController < PrisonsApplicationController
   def show
     @prisoner = offender(nomis_offender_id_from_url)
 
-    @allocation = Allocation.find_by(nomis_offender_id: @prisoner.offender_no)
+    allocation = Allocation.find_by!(nomis_offender_id: @prisoner.offender_no)
+    @allocation = AllocationPresenter.new(allocation, allocation.versions.last)
+
     @pom = StaffMember.new(@allocation.primary_pom_nomis_id)
     redirect_to prison_pom_non_pom_path(@prison.code, @pom.staff_id) unless @pom.pom_at?(@prison.code)
 
@@ -107,15 +109,10 @@ private
     current_allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id)
 
     unless current_allocation.nil?
-      # we need to overwrite the 'updated_at' in the history with the 'to' value (index 1)
-      # so that if it is changed later w/o history (e.g. by updating the COM name)
-      # we don't produce the wrong answer
-      allocs = AllocationService.get_versions_for(current_allocation).
-        append(current_allocation)
-      allocs.zip(current_allocation.versions).each do |alloc, raw_version|
-        alloc.updated_at = YAML.load(raw_version.object_changes).fetch('updated_at')[1]
+      allocs = AllocationService.get_versions_for(current_allocation).append(current_allocation)
+      allocs.zip(current_allocation.versions).map do |alloc, raw_version|
+        AllocationPresenter.new(alloc, raw_version)
       end
-      allocs
     end
   end
 
@@ -125,6 +122,7 @@ private
     )
   end
 
+  # rubocop:disable Metrics/LineLength
   def allocation_attributes(offender)
     {
       primary_pom_nomis_id: allocation_params[:nomis_staff_id].to_i,
@@ -134,7 +132,7 @@ private
       created_by_username: current_user,
       nomis_booking_id: offender.booking_id,
       allocated_at_tier: offender.tier,
-      recommended_pom_type: recommended_pom_type(offender),
+      recommended_pom_type: (offender.recommended_pom_type == RecommendationService::PRISON_POM) ? 'prison' : 'probation',
       prison: active_prison_id,
       override_reasons: override_reasons,
       suitability_detail: suitability_detail,
@@ -142,6 +140,7 @@ private
       message: allocation_params[:message]
     }
   end
+  # rubocop:enable Metrics/LineLength
 
   def offender(nomis_offender_id)
     OffenderPresenter.new(OffenderService.get_offender(nomis_offender_id),
@@ -168,11 +167,6 @@ private
     PrisonOffenderManagerService.get_pom_at(active_prison_id, nomis_staff_id)
   end
 
-  def recommended_pom_type(offender)
-    rec_type = RecommendationService.recommended_pom_type(offender)
-    rec_type == RecommendationService::PRISON_POM ? 'prison' : 'probation'
-  end
-
   def recommended_and_nonrecommended_poms_for(offender)
     allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id_from_url)
     # don't allow primary to be the same as the co-working POM
@@ -187,7 +181,7 @@ private
     # Returns a pair of lists where the first element contains the
     # POMs from the `poms` parameter that are recommended for the
     # `offender`
-    recommended_type = RecommendationService.recommended_pom_type(offender)
+    recommended_type = offender.recommended_pom_type
     poms.partition { |pom|
       if recommended_type == RecommendationService::PRISON_POM
         pom.prison_officer?

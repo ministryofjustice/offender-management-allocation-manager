@@ -6,17 +6,16 @@ RSpec.describe TasksController, type: :controller do
   let(:username) { 'alice' }
   let(:pom) {
     [
-      {
-        staffId: staff_id,
-        username: username,
-        position: RecommendationService::PRISON_POM
-      }
+      build(:pom,
+            staffId: staff_id,
+            position: RecommendationService::PRISON_POM
+      )
     ]
   }
   let(:next_week) { Time.zone.today + 7.days }
 
   before do
-    stub_sso_pom_data(prison)
+    stub_sso_pom_data(prison, username)
 
     stub_poms(prison, pom)
     stub_signed_in_pom(staff_id, username)
@@ -73,7 +72,6 @@ RSpec.describe TasksController, type: :controller do
     end
 
     stub_multiple_offenders(offenders, bookings)
-    allow_any_instance_of(described_class).to receive(:current_user).and_return('alice')
   end
 
   context 'when showing parole review date pom tasks' do

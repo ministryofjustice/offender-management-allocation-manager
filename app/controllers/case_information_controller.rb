@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class CaseInformationController < PrisonsApplicationController
-  before_action :set_case_info, only: [:edit, :edit_prd, :show]
-  before_action :set_prisoner_from_url, only: [:new, :edit, :edit_prd, :show]
+  before_action :set_case_info, only: [:edit, :show]
+  before_action :set_prisoner_from_url, only: [:new, :edit, :edit_prd, :update_prd, :show]
 
   def new
     @case_info = CaseInformation.new(
@@ -14,8 +14,16 @@ class CaseInformationController < PrisonsApplicationController
 
   # Just edit the parole_review_date field
   def edit_prd
-    # blank out old value as it's not relevant
-    @case_info.parole_review_date = nil
+    @case_info = ParoleReviewDateForm.new nomis_offender_id: nomis_offender_id_from_url
+  end
+
+  def update_prd
+    @case_info = ParoleReviewDateForm.new nomis_offender_id: nomis_offender_id_from_url
+    if @case_info.update(parole_review_date_params)
+      redirect_to new_prison_allocation_path(active_prison_id, @case_info.nomis_offender_id)
+    else
+      render 'edit_prd'
+    end
   end
 
   def show
@@ -64,12 +72,9 @@ class CaseInformationController < PrisonsApplicationController
       nomis_offender_id: case_information_params[:nomis_offender_id]
     )
     @prisoner = prisoner(case_information_params[:nomis_offender_id])
-    # The only item that can be badly entered is parole_review_date
-    if @case_info.update(case_information_params.merge(manual_entry: true))
-      redirect_to new_prison_allocation_path(active_prison_id, @case_info.nomis_offender_id)
-    else
-      render 'edit_prd'
-    end
+    # Nothing here can fail due to radio buttons being unselectable
+    @case_info.update!(case_information_params.merge(manual_entry: true))
+    redirect_to new_prison_allocation_path(active_prison_id, @case_info.nomis_offender_id)
   end
 
 private
@@ -96,5 +101,10 @@ private
     params.require(:case_information).
       permit(:nomis_offender_id, :tier, :case_allocation, :welsh_offender,
              :parole_review_date_dd, :parole_review_date_mm, :parole_review_date_yyyy)
+  end
+
+  def parole_review_date_params
+    params.require(:parole_review_date_form).
+      permit(:parole_review_date_dd, :parole_review_date_mm, :parole_review_date_yyyy)
   end
 end

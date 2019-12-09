@@ -4,16 +4,16 @@ RSpec.describe SummaryController, type: :controller do
   let(:prison) { 'LEI' }
   let(:poms) {
     [
-      {
-        firstName: 'Alice',
-        position: RecommendationService::PRISON_POM,
-        staffId: 1
-      }
+      build(:pom,
+            firstName: 'Alice',
+            position: RecommendationService::PRISON_POM,
+            staffId: 1
+      )
     ]
   }
 
   before do
-    stub_sso_data(prison)
+    stub_sso_data(prison, 'alice')
   end
 
   context 'with 2 offenders' do
@@ -64,7 +64,7 @@ RSpec.describe SummaryController, type: :controller do
     context 'when user is a POM' do
       before do
         stub_poms(prison, poms)
-        stub_sso_pom_data(prison)
+        stub_sso_pom_data(prison, 'alice')
         stub_signed_in_pom(1, 'Alice')
         stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/users/").
           with(headers: { 'Authorization' => 'Bearer token' }).
@@ -73,7 +73,7 @@ RSpec.describe SummaryController, type: :controller do
 
       it 'is not visible' do
         get :pending, params: { prison_id: prison }
-        expect(response).to redirect_to('/')
+        expect(response).to redirect_to('/401')
       end
     end
 
@@ -142,6 +142,7 @@ RSpec.describe SummaryController, type: :controller do
 
       expect(summary.offenders.size).to eq(50)
       expect(summary.offenders.current_page).to eq(1)
+      expect(summary.offenders.total_pages).to eq(3)
     end
 
     it 'gets page 2' do
@@ -149,6 +150,7 @@ RSpec.describe SummaryController, type: :controller do
 
       expect(summary.offenders.size).to eq(50)
       expect(summary.offenders.current_page).to eq(2)
+      expect(summary.offenders.total_pages).to eq(3)
     end
 
     it 'gets page 3' do
@@ -156,6 +158,7 @@ RSpec.describe SummaryController, type: :controller do
 
       expect(summary.offenders.size).to eq(20)
       expect(summary.offenders.current_page).to eq(3)
+      expect(summary.offenders.total_pages).to eq(3)
     end
   end
 
