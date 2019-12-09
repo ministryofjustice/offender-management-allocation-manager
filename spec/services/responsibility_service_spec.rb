@@ -72,8 +72,8 @@ describe ResponsibilityService do
           let(:case_allocation) { 'NPS' }
 
           context 'when in PSP (public service prison)' do
-            context 'with over 17 months left to serve' do
-              let(:release_date) { Date.new(2019, 10, 1) + 18.months }
+            context 'with > 16.5 months left to serve' do
+              let(:release_date) { Date.new(2019, 10, 1) + 16.months + 3.weeks }
 
               it 'is responsible' do
                 resp = described_class.calculate_pom_responsibility(offender)
@@ -82,8 +82,8 @@ describe ResponsibilityService do
               end
             end
 
-            context 'with < 17 months left' do
-              let(:release_date) { Date.new(2019, 10, 1) + 16.months }
+            context 'with < 16.5 months left' do
+              let(:release_date) { Date.new(2019, 10, 1) + 16.months + 2.weeks }
 
               it 'is supporting' do
                 resp = described_class.calculate_pom_responsibility(offender)
