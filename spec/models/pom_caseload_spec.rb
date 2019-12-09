@@ -35,7 +35,8 @@ RSpec.describe PomCaseload, type: :model do
 
     it 'can get tasks within a caseload' do
       caseload = described_class.new(staff_id, prison)
-      expect(caseload.tasks_for_offenders.count).to eq(1)
+      tasks = PomTasks.new.for_offenders(caseload.allocations.map(&:offender))
+      expect(tasks.count).to eq(1)
     end
 
     it "will hide invalid allocations" do

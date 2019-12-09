@@ -1,17 +1,12 @@
 # frozen_string_literal: true
 
 class PomCaseload
+  attr_reader :allocations
+
   def initialize(pom_staff_id, prison)
     @staff_id = pom_staff_id
     @prison = prison
-  end
-
-  def allocations
-    @allocations ||= load_allocations
-  end
-
-  def tasks_for_offenders
-    PomTasks.new.for_offenders(allocations.map(&:offender))
+    @allocations = load_allocations
   end
 
 private
