@@ -25,7 +25,7 @@
   <%= render(
           :partial => 'shared/pagination',
           :locals => {
-              :data => @summary.offenders,
+              :data => @offenders,
           }) %>
 
   <table class="govuk-table responsive tablesorter">
@@ -56,7 +56,7 @@
     </tr>
     </thead>
     <tbody class="govuk-table__body">
-    <% @summary.offenders.each_with_index do |offender, i| %>
+    <% @offenders.each_with_index do |offender, i| %>
       <tr class="govuk-table__row offender_row_<%= i %>">
         <td aria-label="Prisoner name" class="govuk-table__cell "><%= offender.full_name %></td>
         <td aria-label="Prisoner number" class="govuk-table__cell"><%= offender.offender_no %></td>
@@ -80,7 +80,7 @@
   <%= render(
           :partial => 'shared/pagination',
           :locals => {
-              :data => @summary.offenders,
+              :data => @offenders,
           }) %>
 
 </section>
