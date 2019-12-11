@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe Bucket do
   it "can retrieve last n" do
-    b = described_class.new(nil)
+    b = described_class.new([])
     (1..5).each do |num|
       b << num
     end
@@ -12,7 +12,7 @@ describe Bucket do
   end
 
   it "can try to retrieve last n if we request too many" do
-    b = described_class.new(nil)
+    b = described_class.new([])
     (1..5).each do |num|
       b << num
     end
@@ -21,13 +21,13 @@ describe Bucket do
   end
 
   it "can try to retrieve last n if we have an empty bucket" do
-    b = described_class.new(nil)
+    b = described_class.new([])
     expect(b.items.count).to be(0)
     expect(b.items).to eq([])
   end
 
   it "can sort its items by default ASC" do
-    b = described_class.new(nil)
+    b = described_class.new([:last_name])
     b << OpenStruct.new(last_name: "Z")
     b << OpenStruct.new(last_name: "A")
     b << OpenStruct.new(last_name: "M")
@@ -40,7 +40,7 @@ describe Bucket do
   end
 
   it "can sort its items DESC" do
-    b = described_class.new(nil)
+    b = described_class.new([:last_name])
     b << OpenStruct.new(last_name: "A")
     b << OpenStruct.new(last_name: "M")
     b << OpenStruct.new(last_name: "Z")
@@ -53,7 +53,7 @@ describe Bucket do
   end
 
   it "can't sort by made up field, using defaults" do
-    b = described_class.new(nil)
+    b = described_class.new([])
     b << OpenStruct.new(last_name: "A")
     b << OpenStruct.new(last_name: "M")
     b << OpenStruct.new(last_name: "Z")
@@ -79,7 +79,7 @@ describe Bucket do
   end
 
   it 'can sort dates containing nulls' do
-    b = described_class.new(nil)
+    b = described_class.new([:earliest_release_date])
     b << OpenStruct.new(
       last_name: "A",
       earliest_release_date: nil
