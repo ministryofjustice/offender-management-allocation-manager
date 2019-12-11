@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../ldu_email_importer'
-
 namespace :ldu_team do
   desc 'Loads email address into the local_division_unit table'
   task :import, [:filename] => [:environment] do |_task, args|
