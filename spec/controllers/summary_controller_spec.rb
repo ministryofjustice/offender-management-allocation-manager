@@ -99,20 +99,20 @@ RSpec.describe SummaryController, type: :controller do
       it 'can show new arrivals' do
         get :new_arrivals, params: { prison_id: prison }
 
-        summary_offenders = assigns(:summary).offenders.map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
+        summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
         expect(summary_offenders).to eq('G7514GW' => 0, 'G1234GY' => 1)
       end
 
       it 'can show pending records' do
         get :pending, params: { prison_id: prison }
 
-        expect(assigns(:summary).offenders.map(&:offender_no)).to match_array ['G1234VV']
+        expect(assigns(:offenders).map(&:offender_no)).to match_array ['G1234VV']
       end
 
       it 'can show unallocated records' do
         get :unallocated, params: { prison_id: prison }
 
-        expect(assigns(:summary).offenders.map(&:offender_no)).to match_array ['G4234GG']
+        expect(assigns(:offenders).map(&:offender_no)).to match_array ['G4234GG']
       end
     end
 

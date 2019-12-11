@@ -43,14 +43,11 @@ class SummaryService
         # If the offender has been waiting more than 2 days for their
         # data to be updated, then they will appear in the pending bucket,
         # otherwise the newly_arrived bucket
-        bucket[:pending].items << offender
+        buckets[:pending].items << offender
       else
-        bucket[:new_arrivals].items << offender
+        buckets[:new_arrivals].items << offender
       end
     end
-
-    add_arrival_dates(buckets[:unallocated].items) if buckets[:unallocated].items.any?
-    add_arrival_dates(buckets[:pending].items) if buckets[:pending].items.any?
 
     # For the allocated offenders, we need to provide the allocated POM's
     # name
@@ -60,12 +57,10 @@ class SummaryService
       offender.allocation_date = (alloc.primary_pom_allocated_at || alloc.updated_at)&.to_date
     end
 
-    Summary.new(summary_type).tap { |summary|
-      summary.allocated = buckets[:allocated]
-      summary.unallocated = buckets[:unallocated]
-      summary.pending = buckets[:pending]
-      summary.new_arrivals = buckets[:new_arrivals]
-    }
+    Summary.new(summary_type, allocated: buckets[:allocated],
+                              unallocated: buckets[:unallocated],
+                              pending: buckets[:pending],
+                              new_arrivals: buckets[:new_arrivals])
   end
 
 # rubocop:enable Metrics/MethodLength

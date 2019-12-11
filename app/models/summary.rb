@@ -2,15 +2,11 @@
 
 class Summary
   attr_accessor :allocated, :unallocated, :pending, :new_arrivals
-
-  # rubocop:disable Metrics/ParameterLists
-  def initialize(summary_type, offenders:, allocated_total:, unallocated_total:, pending_total:, new_arrivals_total:)
+  def initialize(summary_type, allocated:, unallocated:, pending:, new_arrivals:)
     @summary_type = summary_type
-    @offenders = offenders
-    @allocated_total = allocated_total
-    @unallocated_total = unallocated_total
-    @pending_total = pending_total
-    @new_arrivals_total = new_arrivals_total
+    @allocated = allocated
+    @unallocated = unallocated
+    @pending = pending
+    @new_arrivals = new_arrivals
   end
-  # rubocop:enable Metrics/ParameterLists
 end

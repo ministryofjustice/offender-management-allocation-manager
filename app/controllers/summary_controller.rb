@@ -41,7 +41,11 @@ class SummaryController < PrisonsApplicationController
   end
 
   def new_arrivals
-    @summary = create_summary(:new_arrivals)
+    summary = create_summary(:new_arrivals)
+    items = offenders(:new_arrivals, summary.new_arrivals)
+
+    @offenders = Kaminari.paginate_array(items).page(page)
+    @summary = SummaryPresenter.new summary
   end
 
 private
