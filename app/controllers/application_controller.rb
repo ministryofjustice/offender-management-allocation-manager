@@ -7,11 +7,11 @@ class ApplicationController < ActionController::Base
   before_action :set_paper_trail_whodunnit
 
   def authenticate_user
-    if sso_identity.absent? || session_expired?
+    if sso_identity.absent? || sso_identity.session_expired?
       session[:redirect_path] = request.original_fullpath
       redirect_to '/auth/hmpps_sso'
     else
-      redirect_to '/401' unless allowed?
+      redirect_to '/401' unless sso_identity.allowed?
     end
   end
 
@@ -38,14 +38,6 @@ class ApplicationController < ActionController::Base
   end
 
 private
-
-  def allowed?
-    sso_identity.allowed?
-  end
-
-  def session_expired?
-    sso_identity.session_expired?
-  end
 
   def sso_identity
     @sso_identity ||= SsoIdentity.new session
