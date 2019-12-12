@@ -3,6 +3,7 @@
 class AllocationPresenter
   delegate :primary_pom_nomis_id, :event, :event_trigger, :secondary_pom_nomis_id, :prison,
            :allocated_at_tier, :nomis_offender_id, :primary_pom_name, :override_reasons, :suitability_detail,
+           :override_detail,
            :created_by_name, :nomis_booking_id, :recommended_pom_type, :secondary_pom_name, to: :@allocation
 
   def initialize(allocation, version)
