@@ -34,7 +34,7 @@ class OffenderPresenter
     end
   end
 
-  def recommended_pom_type
+  def recommended_pom_type_label
     rec_type = RecommendationService.recommended_pom_type(@offender)
 
     if rec_type == RecommendationService::PRISON_POM
@@ -44,13 +44,23 @@ class OffenderPresenter
     end
   end
 
-  def non_recommended_pom_type
-    rec_type = RecommendationService.recommended_pom_type(@offender)
+  def recommended_pom_type
+    @recommended_pom_type ||= RecommendationService.recommended_pom_type(@offender)
+  end
 
-    if rec_type == RecommendationService::PRISON_POM
+  def non_recommended_pom_type_label
+    if recommended_pom_type == RecommendationService::PRISON_POM
       'Probation officer'
     else
       'Prison officer'
+    end
+  end
+
+  def complex_reason_label
+    if recommended_pom_type == RecommendationService::PRISON_POM
+      'Prisoner assessed as not suitable for a prison officer POM'
+    else
+      'Prisoner assessed as suitable for a prison officer POM despite tiering calculation'
     end
   end
 end

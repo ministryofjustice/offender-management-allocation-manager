@@ -11,14 +11,9 @@ feature 'Getting help' do
   end
 
   it 'shows a pre-filled contact form when a user is signed in', :raven_intercept_exception, vcr: { cassette_name: :help_logged_in } do
-    allow_any_instance_of(SsoIdentity).to receive(:sso_identity).and_return(
-      'username' => 'PK000223',
-      'caseload' => ['LEI'],
-      'active_caseload' => 'LEI'
-    )
-
     signin_user('PK000223')
-    visit '/contact_us'
+    visit '/'
+    click_link 'Contact us'
 
     expect(page.find("#prison").value).to eq('HMP Leeds')
     expect(page.find("#name").value).to eq('Kath Pobee-Norris')

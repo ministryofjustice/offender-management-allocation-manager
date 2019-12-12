@@ -10,7 +10,7 @@
   <div class="moj-timeline__description">
     <% unless allocation.event_trigger == 'offender_transferred' %>
       Prisoner unallocated <%= allocation_type == 'Co-working' ? 'co-working POM ' : 'POM ' %>
-    <%= pom_name.titleize %> - <%= format_email(@pom_emails[pom_id]) %>
+    <%= pom_name.titleize %> - <%= format_email(pom_email) %>
     <% end %>
   </div>
   <br/>

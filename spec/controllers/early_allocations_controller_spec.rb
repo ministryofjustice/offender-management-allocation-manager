@@ -7,18 +7,18 @@ RSpec.describe EarlyAllocationsController, type: :controller do
 
   let(:poms) {
     [
-      {
-        firstName: 'Alice',
-        position: RecommendationService::PRISON_POM,
-        staffId: nomis_staff_id,
-        emails: ['test@digital.justice.org.uk']
-      },
-      {
-        firstName: 'Bob',
-        position: RecommendationService::PRISON_POM,
-        staffId: 2,
-        emails: ['test@digital.justice.org.uk']
-      }
+      build(:pom,
+            firstName: 'Alice',
+            position: RecommendationService::PRISON_POM,
+            staffId: nomis_staff_id,
+            emails: ['test@digital.justice.org.uk']
+      ),
+      build(:pom,
+            firstName: 'Bob',
+            position: RecommendationService::PRISON_POM,
+            staffId: 2,
+            emails: ['test@digital.justice.org.uk']
+      )
     ]
   }
 
@@ -30,13 +30,13 @@ RSpec.describe EarlyAllocationsController, type: :controller do
   let(:s1_boolean_params) { s1_boolean_param_names.map { |p| [p, 'false'] }.to_h }
 
   before do
-    stub_sso_data(prison)
+    stub_sso_data(prison, 'alice')
 
     stub_offender(nomis_offender_id)
 
     stub_poms(prison, poms)
 
-    create(:allocation_version, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
+    create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
   end
 
   context 'with not ldu email address' do

@@ -1,7 +1,7 @@
 require 'faker'
 
 FactoryBot.define do
-  factory :allocation_version do
+  factory :allocation do
     allocated_at_tier do
       'A'
     end
@@ -15,11 +15,11 @@ FactoryBot.define do
     end
 
     event do
-      AllocationVersion::ALLOCATE_PRIMARY_POM
+      Allocation::ALLOCATE_PRIMARY_POM
     end
 
     event_trigger do
-      AllocationVersion::USER
+      Allocation::USER
     end
 
     nomis_booking_id do
@@ -31,7 +31,7 @@ FactoryBot.define do
     end
 
     primary_pom_nomis_id do
-      485_752
+      485_926
       # using fake POM numbers tends to cause crashes
       # Faker::Number.number(digits: 7)
     end

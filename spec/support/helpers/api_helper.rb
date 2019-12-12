@@ -1,7 +1,11 @@
 module ApiHelper
   def stub_offender(nomis_id, booking_number: 754_165, imprisonment_status: 'SENT03')
     stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/prisoners/#{nomis_id}").
-      to_return(status: 200, body: [{ offenderNo: nomis_id, gender: 'Male', latestBookingId: booking_number, imprisonmentStatus: imprisonment_status }].to_json)
+      to_return(status: 200, body: [{ offenderNo: nomis_id,
+                                      gender: 'Male',
+                                      convictedStatus: 'Convicted',
+                                      latestBookingId: booking_number,
+                                      imprisonmentStatus: imprisonment_status }].to_json)
 
     stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/offender-sentences/bookings").
       with(
@@ -28,12 +32,17 @@ module ApiHelper
         }).
       to_return(status: 200, body: poms.to_json)
     poms.each do |pom|
-      stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/staff/#{pom[:staffId]}/emails").
-        to_return(status: 200, body: pom[:emails].to_json)
+      stub_pom_emails(pom.staffId, pom.emails)
     end
   end
 
+  def stub_pom_emails(staff_id, emails)
+    stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/staff/#{staff_id}/emails").
+      to_return(status: 200, body: emails.to_json)
+  end
+
   def stub_signed_in_pom(staff_id, username)
+    stub_auth_token
     stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/users/#{username}").
       to_return(status: 200, body: { 'staffId': staff_id }.to_json)
   end

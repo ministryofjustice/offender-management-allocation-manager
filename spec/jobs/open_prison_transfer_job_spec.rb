@@ -8,13 +8,13 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
   let(:open_prison_code) { 'HDI' }
   let(:closed_prison_code) { 'LEI' }
   let(:poms) {
-    [{
-      staffId: nomis_staff_id,
-      firstName: 'Firstname',
-      lastName: 'Lastname',
-      position: RecommendationService::PRISON_POM,
-      emails: ['pom@localhost.local']
-    }]
+    [build(:pom,
+           staffId: nomis_staff_id,
+           firstName: 'Firstname',
+           lastName: 'Lastname',
+           position: RecommendationService::PRISON_POM,
+           emails: ['pom@localhost.local']
+     )]
   }
   let(:movement_json) {
     {
@@ -101,8 +101,8 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
 
     # Create an allocation where the offender is allocated, and then deallocate so we can
     # test finding the last pom that was allocated to this offender ....
-    alloc = create(:allocation_version, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id, prison: 'LEI', primary_pom_name: 'Primary POMName')
-    alloc.deallocate_offender(AllocationVersion::OFFENDER_TRANSFERRED)
+    alloc = create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id, prison: 'LEI', primary_pom_name: 'Primary POMName')
+    alloc.deallocate_offender(Allocation::OFFENDER_TRANSFERRED)
 
     fakejob = double
     allow(fakejob).to receive(:deliver_later)

@@ -7,7 +7,7 @@ describe Nomis::SentenceDetail, model: true do
   describe '#automatic_release_date' do
     context 'when override present' do
       before do
-        subject._automatic_release_date = date
+        subject.automatic_release_date = date
         subject.automatic_release_override_date = override
       end
 
@@ -18,7 +18,7 @@ describe Nomis::SentenceDetail, model: true do
 
     context 'without override' do
       before do
-        subject._automatic_release_date = date
+        subject.automatic_release_date = date
         subject.automatic_release_override_date = nil
       end
 
@@ -31,7 +31,7 @@ describe Nomis::SentenceDetail, model: true do
   describe '#conditional_release_date' do
     context 'when override present' do
       before do
-        subject._conditional_release_date = date
+        subject.conditional_release_date = date
         subject.conditional_release_override_date = override
       end
 
@@ -42,7 +42,7 @@ describe Nomis::SentenceDetail, model: true do
 
     context 'without override' do
       before do
-        subject._conditional_release_date = date
+        subject.conditional_release_date = date
       end
 
       it 'uses original' do

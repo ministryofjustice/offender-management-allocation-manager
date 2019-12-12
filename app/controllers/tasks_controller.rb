@@ -4,8 +4,10 @@ class TasksController < PrisonsApplicationController
   breadcrumb 'Case updates needed', ''
 
   before_action :ensure_pom
+  before_action :load_pom
 
   def index
+    offenders = @prison.allocations_for(@pom.staff_id).map(&:offender)
     sorted_tasks = sort_tasks(PomTasks.new.for_offenders(offenders))
     @pomtasks = Kaminari.paginate_array(sorted_tasks).page(page)
   end
@@ -27,19 +29,11 @@ private
     sorted_tasks
   end
 
-  def offenders
-    @offenders ||= PomCaseload.new(@pom.staff_id, active_prison_id).allocations.map(&:offender)
-  end
-
-  def ensure_pom
+  def load_pom
     @pom = PrisonOffenderManagerService.get_signed_in_pom_details(
       current_user,
       active_prison_id
     )
-
-    if @pom.blank?
-      redirect_to '/'
-    end
   end
 
   def page

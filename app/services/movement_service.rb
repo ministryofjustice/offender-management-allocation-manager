@@ -57,7 +57,7 @@ private
 
     # We only want to deallocate the offender if they have not already been
     # allocated at their new prison
-    if AllocationVersion.where(
+    if Allocation.where(
       nomis_offender_id: transfer.offender_no,
       prison: transfer.to_agency
     ).count > 0
@@ -70,7 +70,7 @@ private
 
     Rails.logger.info("[MOVEMENT] De-allocating #{transfer.offender_no}")
 
-    alloc = AllocationVersion.find_by(nomis_offender_id: transfer.offender_no)
+    alloc = Allocation.find_by(nomis_offender_id: transfer.offender_no)
 
     # frozen_string_literal: true
     # We need to check whether the from_agency is from within the prison estate
@@ -85,7 +85,7 @@ private
     # When an offender is released, we can no longer rely on their
     # case information (in case they come back one day), and we
     # should de-activate any current allocations.
-    alloc&.deallocate_offender(AllocationVersion::OFFENDER_TRANSFERRED)
+    alloc&.deallocate_offender(Allocation::OFFENDER_TRANSFERRED)
     true
   end
 
@@ -98,7 +98,7 @@ private
     Rails.logger.info("[MOVEMENT] Processing release for #{release.offender_no}")
 
     CaseInformation.where(nomis_offender_id: release.offender_no).destroy_all
-    alloc = AllocationVersion.find_by(nomis_offender_id: release.offender_no)
+    alloc = Allocation.find_by(nomis_offender_id: release.offender_no)
     # frozen_string_literal: true
     # We need to check whether the from_agency is from within the prison estate
     # to know whether it is a transfer.  If it isn't then we want to bail and
@@ -112,7 +112,7 @@ private
     # When an offender is released, we can no longer rely on their
     # case information (in case they come back one day), and we
     # should de-activate any current allocations.
-    alloc&.deallocate_offender(AllocationVersion::OFFENDER_RELEASED)
+    alloc&.deallocate_offender(Allocation::OFFENDER_RELEASED)
 
     true
   end

@@ -2,7 +2,7 @@
 
 <h1 class="govuk-heading-l"><%= @prisoner.full_name %></h1>
 
-<% @history.grouped_by_prison do |prison, allocations| %>
+<% @history.each do |prison, allocations| %>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column">
       <h2 class="govuk-heading-m"><%= prison_title(prison) %></h2>
@@ -28,13 +28,13 @@
                          :locals => { allocation: allocation,
                                       allocation_type: 'Prisoner',
                                       pom_name: allocations[i + 1].primary_pom_name,
-                                      pom_id: allocations[i + 1].primary_pom_nomis_id }%>
+                                      pom_email: @pom_emails[allocations[i + 1].primary_pom_nomis_id] }%>
             <% elsif allocation.event == 'deallocate_secondary_pom' %>
               <%= render :partial => "deallocate_pom",
                          :locals => { allocation: allocation,
                                       allocation_type: 'Co-working',
                                       pom_name: allocations[i + 1].secondary_pom_name,
-                                      pom_id: allocations[i + 1].secondary_pom_nomis_id } %>
+                                      pom_email: @pom_emails[allocations[i + 1].secondary_pom_nomis_id] } %>
             <% end %>
           <% end %>
       </div>

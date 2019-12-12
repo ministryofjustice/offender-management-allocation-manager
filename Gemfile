@@ -18,10 +18,9 @@ gem 'logstash-logger'
 gem 'omniauth-oauth2'
 gem 'paper_trail'
 gem 'pg'
-gem 'puma', '~> 4.2'
+gem 'puma', '~> 4.3'
 gem 'prometheus_exporter'
 gem 'rails', '~> 6.0.1'
-gem 'sass-rails', '~> 5.0'
 gem 'sidekiq'
 gem 'sentry-raven'
 gem 'turbolinks', '~> 5'
@@ -39,6 +38,7 @@ gem 'kaminari' # pagination
 gem 'prawn-rails'
 gem 'rswag-api' # api-documentation
 gem 'rswag-ui'  # api-documentation interface
+gem 'sassc-rails'
 
 group :development, :test do
   gem 'brakeman'
@@ -73,7 +73,7 @@ group :test do
 end
 
 group :development do
-  gem 'listen', '>= 3.0.5', '< 3.2'
+  gem 'listen', '>= 3.0.5', '< 3.3'
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'web-console', '>= 3.3.0'

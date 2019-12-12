@@ -51,7 +51,7 @@ describe 'Allocation API' do
 
         let(:offender_no) { 'G4273GI' }
         let!(:allocation) {
-          create(:allocation_version, nomis_offender_id: offender_no, primary_pom_name: 'Hyon Zboncak')
+          create(:allocation, nomis_offender_id: offender_no, primary_pom_name: 'Hyon Zboncak')
         }
         let(:Authorization) { "Bearer #{token}" }
 
@@ -59,7 +59,7 @@ describe 'Allocation API' do
           primary_pom = JSON.parse(response.body)['primary_pom']
           secondary_pom = JSON.parse(response.body)['secondary_pom']
 
-          expect(primary_pom['staff_id']).to eq(485_752)
+          expect(primary_pom['staff_id']).to eq(485_926)
           expect(primary_pom['name']).to eq('Hyon Zboncak')
 
           expect(secondary_pom).to eq({})

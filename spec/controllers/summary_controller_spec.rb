@@ -4,16 +4,16 @@ RSpec.describe SummaryController, type: :controller do
   let(:prison) { 'LEI' }
   let(:poms) {
     [
-      {
-        firstName: 'Alice',
-        position: RecommendationService::PRISON_POM,
-        staffId: 1
-      }
+      build(:pom,
+            firstName: 'Alice',
+            position: RecommendationService::PRISON_POM,
+            staffId: 1
+      )
     ]
   }
 
   before do
-    stub_sso_data(prison)
+    stub_sso_data(prison, 'alice')
   end
 
   context 'with 2 offenders' do
@@ -64,7 +64,7 @@ RSpec.describe SummaryController, type: :controller do
     context 'when user is a POM' do
       before do
         stub_poms(prison, poms)
-        stub_sso_pom_data(prison)
+        stub_sso_pom_data(prison, 'alice')
         stub_signed_in_pom(1, 'Alice')
         stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/users/").
           with(headers: { 'Authorization' => 'Bearer token' }).
@@ -73,26 +73,26 @@ RSpec.describe SummaryController, type: :controller do
 
       it 'is not visible' do
         get :pending, params: { prison_id: prison }
-        expect(response).to redirect_to('/')
+        expect(response).to redirect_to('/401')
       end
     end
 
     it 'gets pending records' do
       get :pending, params: { prison_id: prison }
       # Expecting offender (2) to use sentenceStartDate as it is newer than last arrival date in prison
-      expect(assigns(:summary).offenders.map(&:awaiting_allocation_for).map { |x| Time.zone.today - x }).
+      expect(assigns(:offenders).map(&:awaiting_allocation_for).map { |x| Time.zone.today - x }).
         to match_array [Date.new(2009, 2, 8), Date.new(2018, 10, 1), Date.new(2019, 2, 8)]
     end
 
     it 'sorts ascending by default' do
       get :pending, params: { prison_id: prison, sort: 'last_name' } # Default direction is asc.
-      expect(assigns(:summary).offenders.map(&:last_name)).to eq(%w[JONES Minate-Offender SMITH])
+      expect(assigns(:offenders).map(&:last_name)).to eq(%w[JONES Minate-Offender SMITH])
     end
 
     it 'sorts descending' do
       get :pending, params: { prison_id: prison, sort: 'last_name desc' }
 
-      expect(assigns(:summary).offenders.map(&:last_name)).to eq(%w[SMITH Minate-Offender JONES])
+      expect(assigns(:offenders).map(&:last_name)).to eq(%w[SMITH Minate-Offender JONES])
     end
   end
 
@@ -118,7 +118,7 @@ RSpec.describe SummaryController, type: :controller do
     let(:moves) {
       range.map { |i| "G#{10_000 - i}GW" }
     }
-    let(:summary) { assigns(:summary) }
+    let(:summary_offenders) { assigns(:offenders) }
 
     render_views
 
@@ -140,22 +140,25 @@ RSpec.describe SummaryController, type: :controller do
     it 'gets page 1 by default' do
       get :pending, params: { prison_id: 'LEI' }
 
-      expect(summary.offenders.size).to eq(50)
-      expect(summary.offenders.current_page).to eq(1)
+      expect(summary_offenders.size).to eq(50)
+      expect(summary_offenders.current_page).to eq(1)
+      expect(summary_offenders.total_pages).to eq(3)
     end
 
     it 'gets page 2' do
       get :pending, params: { prison_id: 'LEI', page: 2 }
 
-      expect(summary.offenders.size).to eq(50)
-      expect(summary.offenders.current_page).to eq(2)
+      expect(summary_offenders.size).to eq(50)
+      expect(summary_offenders.current_page).to eq(2)
+      expect(summary_offenders.total_pages).to eq(3)
     end
 
     it 'gets page 3' do
       get :pending, params: { prison_id: 'LEI', page: 3 }
 
-      expect(summary.offenders.size).to eq(20)
-      expect(summary.offenders.current_page).to eq(3)
+      expect(summary_offenders.size).to eq(20)
+      expect(summary_offenders.current_page).to eq(3)
+      expect(summary_offenders.total_pages).to eq(3)
     end
   end
 
@@ -176,9 +179,9 @@ RSpec.describe SummaryController, type: :controller do
     stub_offenders_for_prison(prison, offenders, bookings)
 
     create(:case_information, nomis_offender_id: offender_id)
-    create(:allocation_version, nomis_offender_id: offender_id, primary_pom_nomis_id: 234)
+    create(:allocation, nomis_offender_id: offender_id, primary_pom_nomis_id: 234)
 
     get :allocated, params: { prison_id: prison, sort: 'awaiting_allocation_for asc' }
-    expect(assigns(:summary).offenders.count).to eq(1)
+    expect(assigns(:offenders).count).to eq(1)
   end
 end

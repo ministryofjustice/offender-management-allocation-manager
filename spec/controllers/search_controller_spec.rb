@@ -11,17 +11,17 @@ RSpec.describe SearchController, type: :controller do
   context 'when user is a POM ' do
     let(:poms) {
       [
-        {
-          firstName: 'Alice',
-          position: RecommendationService::PRISON_POM,
-          staffId: 1
-        }
+        build(:pom,
+              firstName: 'Alice',
+              position: RecommendationService::PRISON_POM,
+              staffId: 1
+        )
       ]
     }
 
     before do
       stub_poms(prison, poms)
-      stub_sso_pom_data(prison)
+      stub_sso_pom_data(prison, 'alice')
       stub_signed_in_pom(1, 'Alice')
       stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/users/").
         with(headers: { 'Authorization' => 'Bearer token' }).
@@ -36,7 +36,7 @@ RSpec.describe SearchController, type: :controller do
 
   context 'when user is an SPO ' do
     before do
-      stub_sso_data(prison)
+      stub_sso_data(prison, 'alice')
     end
 
     it 'can search' do

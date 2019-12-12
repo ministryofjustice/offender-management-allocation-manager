@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class PomTasks
+  # Just for auto_delius_import_enabled
   include ApplicationHelper
 
   def for_offenders(offenders)
@@ -19,18 +20,16 @@ class PomTasks
       early_allocations = get_early_allocations([offender.offender_no])
     end
 
-    tasks = []
-    prd_task = parole_review_date_task(offender)
-    tasks << prd_task if prd_task.present?
-
-    delius_task = missing_info_task(offender)
-    tasks << delius_task if delius_task.present?
+    tasks = [
+      parole_review_date_task(offender),
+      missing_info_task(offender)
+    ]
 
     if early_allocations.key?(offender.offender_no)
       tasks << early_allocation_update_task(offender)
     end
 
-    tasks
+    tasks.compact
   end
 
   def parole_review_date_task(offender)

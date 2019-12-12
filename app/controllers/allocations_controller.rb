@@ -21,7 +21,9 @@ class AllocationsController < PrisonsApplicationController
   def show
     @prisoner = offender(nomis_offender_id_from_url)
 
-    @allocation = AllocationVersion.find_by(nomis_offender_id: @prisoner.offender_no)
+    allocation = Allocation.find_by!(nomis_offender_id: @prisoner.offender_no)
+    @allocation = AllocationPresenter.new(allocation, allocation.versions.last)
+
     @pom = StaffMember.new(@allocation.primary_pom_nomis_id)
     redirect_to prison_pom_non_pom_path(@prison.code, @pom.staff_id) unless @pom.pom_at?(@prison.code)
 
@@ -94,11 +96,25 @@ class AllocationsController < PrisonsApplicationController
 
   def history
     @prisoner = offender(nomis_offender_id_from_url)
-    @history = AllocationService.offender_allocation_history(nomis_offender_id_from_url)
-    @pom_emails = AllocationService.allocation_history_pom_emails(@history)
+    history = offender_allocation_history(nomis_offender_id_from_url)
+    # The history is now collected forwards (to incorporate nil prison ids) but as a result
+    # needs to be 'deep reversed' in order to work properly (as AllocationList produces a list of lists)
+    @history = AllocationList.new(history).to_a.reverse.map { |prison, allocations| [prison, allocations.reverse] }
+    @pom_emails = AllocationService.allocation_history_pom_emails(history)
   end
 
 private
+
+  def offender_allocation_history(nomis_offender_id)
+    current_allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id)
+
+    unless current_allocation.nil?
+      allocs = AllocationService.get_versions_for(current_allocation).append(current_allocation)
+      allocs.zip(current_allocation.versions).map do |alloc, raw_version|
+        AllocationPresenter.new(alloc, raw_version)
+      end
+    end
+  end
 
   def unavailable_pom_count
     @unavailable_pom_count ||= PrisonOffenderManagerService.unavailable_pom_count(
@@ -106,6 +122,7 @@ private
     )
   end
 
+  # rubocop:disable Metrics/LineLength
   def allocation_attributes(offender)
     {
       primary_pom_nomis_id: allocation_params[:nomis_staff_id].to_i,
@@ -115,7 +132,7 @@ private
       created_by_username: current_user,
       nomis_booking_id: offender.booking_id,
       allocated_at_tier: offender.tier,
-      recommended_pom_type: recommended_pom_type(offender),
+      recommended_pom_type: (offender.recommended_pom_type == RecommendationService::PRISON_POM) ? 'prison' : 'probation',
       prison: active_prison_id,
       override_reasons: override_reasons,
       suitability_detail: suitability_detail,
@@ -123,6 +140,7 @@ private
       message: allocation_params[:message]
     }
   end
+  # rubocop:enable Metrics/LineLength
 
   def offender(nomis_offender_id)
     OffenderPresenter.new(OffenderService.get_offender(nomis_offender_id),
@@ -149,13 +167,8 @@ private
     PrisonOffenderManagerService.get_pom_at(active_prison_id, nomis_staff_id)
   end
 
-  def recommended_pom_type(offender)
-    rec_type = RecommendationService.recommended_pom_type(offender)
-    rec_type == RecommendationService::PRISON_POM ? 'prison' : 'probation'
-  end
-
   def recommended_and_nonrecommended_poms_for(offender)
-    allocation = AllocationVersion.find_by(nomis_offender_id: nomis_offender_id_from_url)
+    allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id_from_url)
     # don't allow primary to be the same as the co-working POM
     poms = PrisonOffenderManagerService.get_poms_for(active_prison_id).select { |pom|
       pom.status == 'active' && pom.staff_id != allocation.try(:secondary_pom_nomis_id)
@@ -168,7 +181,7 @@ private
     # Returns a pair of lists where the first element contains the
     # POMs from the `poms` parameter that are recommended for the
     # `offender`
-    recommended_type = RecommendationService.recommended_pom_type(offender)
+    recommended_type = offender.recommended_pom_type
     poms.partition { |pom|
       if recommended_type == RecommendationService::PRISON_POM
         pom.prison_officer?

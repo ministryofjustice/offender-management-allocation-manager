@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe MovementsOnDateJob, type: :job do
   let(:nomis_offender_id) { 'G3462VT' }
-  let!(:alloc) { create(:allocation_version, nomis_offender_id: nomis_offender_id, secondary_pom_nomis_id: 123_435, prison: 'MDI') }
+  let!(:alloc) { create(:allocation, nomis_offender_id: nomis_offender_id, secondary_pom_nomis_id: 123_435, prison: 'MDI') }
   let(:elite2api) { 'https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api' }
 
   before do

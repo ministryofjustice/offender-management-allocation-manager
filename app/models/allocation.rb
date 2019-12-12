@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AllocationVersion < ApplicationRecord
+class Allocation < ApplicationRecord
   has_paper_trail ignore: [:com_name]
 
   ALLOCATE_PRIMARY_POM = 0
@@ -44,11 +44,13 @@ class AllocationVersion < ApplicationRecord
 
     where(primary_pom_nomis_id: nomis_staff_id).or(secondaries).where(prison: prison)
   }
-  scope :active_primary_pom_allocations, lambda { |nomis_staff_id, prison|
-    where(
-      primary_pom_nomis_id: nomis_staff_id,
-      prison: prison
-    )
+
+  scope :active, lambda { |nomis_offender_ids, prison|
+    where.not(
+      primary_pom_nomis_id: nil
+      ).where(
+        nomis_offender_id: nomis_offender_ids, prison: prison
+      )
   }
 
   validate do |av|
@@ -76,7 +78,7 @@ class AllocationVersion < ApplicationRecord
     self.secondary_pom_nomis_id = nil
     self.secondary_pom_name = nil
     self.recommended_pom_type = nil
-    if movement_type == AllocationVersion::OFFENDER_RELEASED
+    if movement_type == Allocation::OFFENDER_RELEASED
       self.event = DEALLOCATE_RELEASED_OFFENDER
     else
       self.event = DEALLOCATE_PRIMARY_POM
@@ -117,13 +119,13 @@ class AllocationVersion < ApplicationRecord
     # and this causes an issue should those offenders move or be released.
     # To handle this we will attempt to set the prison to a valid code
     # based on the event that has happened.
-    if movement_type == AllocationVersion::OFFENDER_RELEASED
+    if movement_type == Allocation::OFFENDER_RELEASED
       movements = Nomis::Elite2::MovementApi.movements_for(nomis_offender_id)
       if movements.present?
         movement = movements.last
         return movement.from_agency if movement.from_prison?
       end
-    elsif movement_type == AllocationVersion::OFFENDER_TRANSFERRED
+    elsif movement_type == Allocation::OFFENDER_TRANSFERRED
       offender = OffenderService.get_offender(nomis_offender_id)
       offender.prison_id
     end

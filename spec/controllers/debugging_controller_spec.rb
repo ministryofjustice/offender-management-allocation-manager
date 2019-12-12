@@ -8,7 +8,18 @@ RSpec.describe DebuggingController, type: :controller do
   let(:elite2bookingsapi) { "#{elite2api}/offender-sentences/bookings" }
 
   before do
-    stub_sso_data(prison)
+    stub_sso_data(prison, 'user')
+
+    stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/movements/offenders?latestOnly=false&movementTypes=TRN").
+      with(
+        body: "[\"G7806VO\"]",
+        headers: {
+          'Authorization' => 'Bearer token',
+          'Content-Type' => 'application/json',
+          'Expect' => '',
+          'User-Agent' => 'Faraday v0.15.4'
+        }).
+      to_return(status: 200, body: [].to_json, headers: {})
   end
 
   it 'can show info' do
@@ -84,8 +95,8 @@ RSpec.describe DebuggingController, type: :controller do
     expect(filtered_offenders[:unsentenced].count).to eq(1)
 
     summary = assigns(:summary)
-    expect(summary.allocated_total).to eq(0)
-    expect(summary.unallocated_total).to eq(0)
-    expect(summary.pending_total).to eq(1)
+    expect(summary.allocated.count).to eq(0)
+    expect(summary.unallocated.count).to eq(0)
+    expect(summary.pending.count).to eq(1)
   end
 end

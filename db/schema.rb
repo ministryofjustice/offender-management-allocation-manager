@@ -2,20 +2,20 @@
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
 #
-# Note that this schema.rb definition is the authoritative source for your
-# database schema. If you need to create the application database on another
-# system, you should be using db:schema:load, not running all the migrations
-# from scratch. The latter is a flawed and unsustainable approach (the more migrations
-# you'll amass, the slower it'll run and the greater likelihood for issues).
+# This file is the source Rails uses to define your schema when running `rails
+# db:schema:load`. When creating a new database, `rails db:schema:load` tends to
+# be faster and is potentially less error prone than running all of your
+# migrations from scratch. Old migrations may fail to apply correctly if those
+# migrations use external dependencies or application code.
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_22_074139) do
+ActiveRecord::Schema.define(version: 2019_11_26_081703) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "allocation_versions", force: :cascade do |t|
+  create_table "allocations", force: :cascade do |t|
     t.string "nomis_offender_id"
     t.string "prison"
     t.string "allocated_at_tier"
@@ -37,9 +37,9 @@ ActiveRecord::Schema.define(version: 2019_10_22_074139) do
     t.datetime "primary_pom_allocated_at"
     t.string "recommended_pom_type"
     t.string "com_name"
-    t.index ["nomis_offender_id"], name: "index_allocation_versions_on_nomis_offender_id"
-    t.index ["primary_pom_nomis_id"], name: "index_allocation_versions_on_primary_pom_nomis_id"
-    t.index ["prison"], name: "index_allocation_versions_on_prison"
+    t.index ["nomis_offender_id"], name: "index_allocations_on_nomis_offender_id"
+    t.index ["primary_pom_nomis_id"], name: "index_allocations_on_primary_pom_nomis_id"
+    t.index ["prison"], name: "index_allocations_on_prison"
     t.index ["secondary_pom_nomis_id"], name: "index_allocation_versions_secondary_pom_nomis_id"
   end
 

@@ -1,12 +1,12 @@
 require 'rails_helper'
 
-feature 'Co-working' do
+feature 'Co-working', :versioning do
   let!(:nomis_offender_id) { 'G4273GI' }
-  let!(:probation_pom) do
+  let!(:prison_pom) do
     {
-      staff_id: 485_752,
-      pom_name: 'Ross Jones',
-      email: 'Ross.jonessss@digital.justice.gov.uk'
+      staff_id: 485_926,
+      pom_name: 'Moic Pom',
+      email: 'pom@digital.justice.gov.uk'
     }
   end
 
@@ -27,10 +27,10 @@ feature 'Co-working' do
   context 'with just a primary POM allocated' do
     let!(:allocation) {
       create(
-        :allocation_version,
+        :allocation,
         nomis_offender_id: nomis_offender_id,
-        primary_pom_nomis_id: probation_pom[:staff_id],
-        primary_pom_name: probation_pom[:pom_name],
+        primary_pom_nomis_id: prison_pom[:staff_id],
+        primary_pom_name: prison_pom[:pom_name],
         recommended_pom_type: 'probation'
       )
     }
@@ -80,11 +80,11 @@ feature 'Co-working' do
     scenario 'show confirm co-working POM allocation page', vcr: { cassette_name: :show_confirm_coworking_page } do
       visit prison_confirm_coworking_allocation_path(
         'LEI',
-        nomis_offender_id, probation_pom[:staff_id], secondary_pom[:staff_id]
+        nomis_offender_id, prison_pom[:staff_id], secondary_pom[:staff_id]
             )
 
       expect(page).to have_content("Confirm co-working allocation")
-      expect(page).to have_content("You are allocating co-working POM #{secondary_pom[:pom_name]} to Ozullirn Abbella. The responsible POM is #{probation_pom[:pom_name]}.")
+      expect(page).to have_content("You are allocating co-working POM #{secondary_pom[:pom_name]} to Ozullirn Abbella. The responsible POM is #{prison_pom[:pom_name]}.")
       expect(page).to have_content("We will send a confirmation email to #{secondary_pom[:email]}")
       expect(page).to have_button('Complete allocation')
       expect(page).to have_link('Cancel')
@@ -110,10 +110,10 @@ feature 'Co-working' do
   context 'with a secondary POM allocated' do
     let!(:allocation) {
       create(
-        :allocation_version,
+        :allocation,
         nomis_offender_id: nomis_offender_id,
-        primary_pom_nomis_id: probation_pom[:staff_id],
-        primary_pom_name: probation_pom[:pom_name],
+        primary_pom_nomis_id: prison_pom[:staff_id],
+        primary_pom_name: prison_pom[:pom_name],
         secondary_pom_nomis_id: secondary_pom[:staff_id],
         secondary_pom_name: secondary_pom[:pom_name],
         recommended_pom_type: 'probation'
@@ -128,8 +128,8 @@ feature 'Co-working' do
       end
 
       expect(page).to have_current_path('/prisons/LEI/coworking/G4273GI/confirm_coworking_removal')
-      expect(page).to have_content "You are removing co-working POM #{secondary_pom[:pom_name]} who was working with Abbella, Ozullirn. The Supporting POM is #{probation_pom[:pom_name]}."
-      expect(page).to have_content "We will send a confirmation email to #{probation_pom[:email]}"
+      expect(page).to have_content "You are removing co-working POM #{secondary_pom[:pom_name]} who was working with Abbella, Ozullirn. The Supporting POM is #{prison_pom[:pom_name]}."
+      expect(page).to have_content "We will send a confirmation email to #{prison_pom[:email]}"
     end
 
     scenario 'cancel removal of a co-working POM', vcr: { cassette_name: :coworking_pom_cancel } do

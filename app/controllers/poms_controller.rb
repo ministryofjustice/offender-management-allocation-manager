@@ -20,8 +20,7 @@ class PomsController < PrisonsApplicationController
   end
 
   def show
-    @caseload = PomCaseload.new(@pom.staff_id, active_prison_id)
-    @allocations = sort_allocations(@caseload.allocations)
+    @allocations = sort_allocations(@prison.allocations_for(@pom.staff_id))
   end
 
   # This is for the situation where the user is no longer a POM
@@ -56,7 +55,7 @@ class PomsController < PrisonsApplicationController
 
     if pom_detail.save
       if pom_detail.status == 'inactive'
-        AllocationVersion.deallocate_primary_pom(nomis_staff_id, active_prison_id)
+        Allocation.deallocate_primary_pom(nomis_staff_id, active_prison_id)
       end
       redirect_to prison_pom_path(active_prison_id, id: nomis_staff_id)
     else

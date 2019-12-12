@@ -23,7 +23,7 @@ fi
 # Check for any filenames containing "secret" in the list of files which are not
 # encrypted with git-crypt:
 #
-git-crypt status -u | grep secret
+git-crypt status -u | grep -E "secret|app/data"
 # grep returns 0 if it finds some matches and 1 if there are no matches:
 if [[ $? -eq 0 ]]; then
   echo "Found a secrets file which is not encrypted with git-crypt"

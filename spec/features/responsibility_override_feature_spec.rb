@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature 'Responsibility override' do
+feature 'Responsibility override', :versioning do
   include ActiveJob::TestHelper
 
   before do
@@ -8,7 +8,7 @@ feature 'Responsibility override' do
   end
 
   let(:offender_id) { 'G8060UF' }
-  let(:pom_id) { 485_752 }
+  let(:pom_id) { 485_926 }
 
   context 'when overriding responsibility', :queueing, vcr: { cassette_name: :override_responsibility } do
     before do
@@ -16,30 +16,52 @@ feature 'Responsibility override' do
       create(:case_information, nomis_offender_id: offender_id, local_divisional_unit: ldu)
     end
 
-    it 'overrides' do
-      create(:allocation_version, primary_pom_nomis_id: pom_id, nomis_offender_id: offender_id)
-      visit new_prison_allocation_path('LEI', offender_id)
-
-      within '.responsibility_change' do
-        click_link 'Change'
+    context 'with an allocation' do
+      before do
+        create(:allocation, primary_pom_nomis_id: pom_id, nomis_offender_id: offender_id)
       end
 
-      expect(page).not_to have_css('govuk-textarea--error')
+      it 'overrides' do
+        visit prison_allocation_path('LEI', offender_id)
 
-      click_button 'Continue'
+        within '.responsibility_change' do
+          click_link 'Change'
+        end
 
-      expect(page).to have_content 'Select a reason for overriding the responsibility'
+        expect(page).not_to have_css('govuk-textarea--error')
+        click_button 'Continue'
 
-      find('#reason_recall').click
-      click_button 'Continue'
+        expect(page).to have_content 'Select a reason for overriding the responsibility'
+        find('#reason_recall').click
+        click_button 'Continue'
 
-      expect {
-        click_button 'Confirm'
-      }.to change(enqueued_jobs, :count).by(2)
+        expect {
+          click_button 'Confirm'
+        }.to change(enqueued_jobs, :count).by(2)
 
-      expect(page).to have_content 'Current responsibility Community'
+        expect(page).to have_content 'Current responsibility Community'
+        expect(page).to have_current_path(prison_allocation_path('LEI', offender_id))
+      end
+    end
 
-      expect(page).to have_current_path(prison_allocation_path('LEI', offender_id))
+    context 'without allocation' do
+      it 'overrides' do
+        visit new_prison_allocation_path('LEI', offender_id)
+
+        within '.responsibility_change' do
+          click_link 'Change'
+        end
+
+        find('#reason_prob_team').click
+        click_button 'Continue'
+
+        expect {
+          click_button 'Confirm'
+        }.to change(enqueued_jobs, :count).by(2)
+
+        expect(page).to have_current_path(new_prison_allocation_path('LEI', offender_id))
+        expect(page).to have_content 'Current case owner Community'
+      end
     end
   end
 

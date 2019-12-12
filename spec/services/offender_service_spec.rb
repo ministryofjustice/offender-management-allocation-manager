@@ -3,16 +3,6 @@ require 'rails_helper'
 describe OffenderService do
   let(:tier_map) { CaseInformationService.get_case_information('LEI') }
 
-  it "can get multiple offenders at once",
-     vcr: { cassette_name: :offender_service_multiple_offenders_spec } do
-    offender_ids = %w[G4273GI G7806VO G3462VT]
-    offenders = described_class.get_multiple_offenders(offender_ids)
-
-    expect(offenders).to be_kind_of(Array)
-    expect(offenders.length).to eq(3)
-    expect(offenders.first).to be_kind_of(Nomis::Offender)
-  end
-
   it "gets a single offender", vcr: { cassette_name: :offender_service_single_offender_spec } do
     nomis_offender_id = 'G4273GI'
 
@@ -35,7 +25,7 @@ describe OffenderService do
 
   describe "#set_allocated_pom_name" do
     let(:offenders) { Prison.new('LEI').offenders.first(3) }
-    let(:nomis_staff_id) { 485_752 }
+    let(:nomis_staff_id) { 485_926 }
 
     before do
       PomDetail.create!(nomis_staff_id: nomis_staff_id, working_pattern: 1.0, status: 'active')
@@ -49,7 +39,7 @@ describe OffenderService do
       expect(updated_offenders).to be_kind_of(Array)
       expect(updated_offenders.first).to be_kind_of(Nomis::OffenderSummary)
       expect(updated_offenders.count).to eq(offenders.count)
-      expect(updated_offenders.first.allocated_pom_name).to eq('Jones, Ross')
+      expect(updated_offenders.first.allocated_pom_name).to eq('Pom, Moic')
       expect(updated_offenders.first.allocation_date).to be_kind_of(Date)
     end
 
@@ -58,13 +48,13 @@ describe OffenderService do
       allocate_offender(nil)
 
       updated_offenders = described_class.set_allocated_pom_name(offenders, 'LEI')
-      expect(updated_offenders.first.allocated_pom_name).to eq('Jones, Ross')
+      expect(updated_offenders.first.allocated_pom_name).to eq('Pom, Moic')
       expect(updated_offenders.first.allocation_date).to be_kind_of(Date)
     end
   end
 
   def allocate_offender(allocated_date)
-    AllocationVersion.create!(
+    Allocation.create!(
       nomis_offender_id: offenders.first.offender_no,
       nomis_booking_id: 1_153_753,
       prison: 'LEI',
@@ -73,8 +63,8 @@ describe OffenderService do
       primary_pom_nomis_id: nomis_staff_id,
       primary_pom_allocated_at: allocated_date,
       recommended_pom_type: 'prison',
-      event: AllocationVersion::ALLOCATE_PRIMARY_POM,
-      event_trigger: AllocationVersion::USER
+      event: Allocation::ALLOCATE_PRIMARY_POM,
+      event_trigger: Allocation::USER
     )
   end
 end

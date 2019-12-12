@@ -84,8 +84,7 @@ Rails.application.configure do
 
   if Rails.configuration.redis_url.present?
     config.cache_store = :redis_cache_store, {
-      url: "rediss://#{config.redis_url}:6379/0",
-      password: config.redis_auth,
+      url: config.redis_url.to_s,
       network_timeout: 5,
       read_timeout: 1.0,
       write_timeout: 1.0,

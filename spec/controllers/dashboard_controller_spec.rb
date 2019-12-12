@@ -5,11 +5,11 @@ RSpec.describe DashboardController, type: :controller do
     let(:prison) { 'LEI' }
     let(:poms) {
       [
-        {
-          firstName: 'Alice',
-          position: RecommendationService::PRISON_POM,
-          staffId: 1
-        }
+        build(:pom,
+              firstName: 'Alice',
+              position: RecommendationService::PRISON_POM,
+              staffId: 1
+      )
       ]
     }
 
@@ -17,12 +17,10 @@ RSpec.describe DashboardController, type: :controller do
       render_views
 
       before do
+        stub_auth_token
         stub_poms(prison, poms)
-        stub_sso_pom_data(prison)
-        stub_signed_in_pom(1, 'Alice')
-        stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/users/").
-          with(headers: { 'Authorization' => 'Bearer token' }).
-          to_return(status: 200, body: { staffId: 1 }.to_json, headers: {})
+        stub_sso_pom_data(prison, 'alice')
+        stub_signed_in_pom(1, 'alice')
       end
 
       it 'shows me only Manage case tasks' do
@@ -49,7 +47,7 @@ RSpec.describe DashboardController, type: :controller do
 
       before do
         stub_poms(prison, poms)
-        stub_sso_data(prison)
+        stub_sso_data(prison, 'alice')
         stub_signed_in_pom(1, 'Alice')
         stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/users/").
           with(headers: { 'Authorization' => 'Bearer token' }).
