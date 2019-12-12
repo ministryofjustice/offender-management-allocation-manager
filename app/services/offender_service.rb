@@ -18,24 +18,6 @@ class OffenderService
     }
   end
 
-  def self.get_multiple_offenders(offender_ids)
-    offenders = Nomis::Elite2::OffenderApi.get_multiple_offenders(offender_ids)
-
-    booking_ids = offenders.map(&:booking_id)
-    sentence_details = Nomis::Elite2::OffenderApi.get_bulk_sentence_details(booking_ids)
-
-    nomis_ids = offenders.map(&:offender_no)
-    mapped_tiers = CaseInformationService.get_case_information(nomis_ids)
-
-    offenders.each { |offender|
-      sentencing = sentence_details[offender.booking_id]
-      offender.sentence = sentencing if sentencing.present?
-
-      case_info_record = mapped_tiers[offender.offender_no]
-      offender.load_case_information(case_info_record)
-    }
-  end
-
   def self.get_sentence_details(booking_ids)
     Nomis::Elite2::OffenderApi.get_bulk_sentence_details(booking_ids)
   end
