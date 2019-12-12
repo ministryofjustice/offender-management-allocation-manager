@@ -37,6 +37,11 @@ class ApplicationController < ActionController::Base
     sso_identity.caseloads
   end
 
+  # called by active admin
+  def access_denied(_active_admin_context)
+    redirect_to '/401'
+  end
+
 private
 
   def sso_identity
