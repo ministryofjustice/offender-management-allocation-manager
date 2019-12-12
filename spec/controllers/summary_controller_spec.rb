@@ -80,19 +80,19 @@ RSpec.describe SummaryController, type: :controller do
     it 'gets pending records' do
       get :pending, params: { prison_id: prison }
       # Expecting offender (2) to use sentenceStartDate as it is newer than last arrival date in prison
-      expect(assigns(:summary).offenders.map(&:awaiting_allocation_for).map { |x| Time.zone.today - x }).
+      expect(assigns(:offenders).map(&:awaiting_allocation_for).map { |x| Time.zone.today - x }).
         to match_array [Date.new(2009, 2, 8), Date.new(2018, 10, 1), Date.new(2019, 2, 8)]
     end
 
     it 'sorts ascending by default' do
       get :pending, params: { prison_id: prison, sort: 'last_name' } # Default direction is asc.
-      expect(assigns(:summary).offenders.map(&:last_name)).to eq(%w[JONES Minate-Offender SMITH])
+      expect(assigns(:offenders).map(&:last_name)).to eq(%w[JONES Minate-Offender SMITH])
     end
 
     it 'sorts descending' do
       get :pending, params: { prison_id: prison, sort: 'last_name desc' }
 
-      expect(assigns(:summary).offenders.map(&:last_name)).to eq(%w[SMITH Minate-Offender JONES])
+      expect(assigns(:offenders).map(&:last_name)).to eq(%w[SMITH Minate-Offender JONES])
     end
   end
 
@@ -118,7 +118,7 @@ RSpec.describe SummaryController, type: :controller do
     let(:moves) {
       range.map { |i| "G#{10_000 - i}GW" }
     }
-    let(:summary) { assigns(:summary) }
+    let(:summary_offenders) { assigns(:offenders) }
 
     render_views
 
@@ -140,25 +140,25 @@ RSpec.describe SummaryController, type: :controller do
     it 'gets page 1 by default' do
       get :pending, params: { prison_id: 'LEI' }
 
-      expect(summary.offenders.size).to eq(50)
-      expect(summary.offenders.current_page).to eq(1)
-      expect(summary.offenders.total_pages).to eq(3)
+      expect(summary_offenders.size).to eq(50)
+      expect(summary_offenders.current_page).to eq(1)
+      expect(summary_offenders.total_pages).to eq(3)
     end
 
     it 'gets page 2' do
       get :pending, params: { prison_id: 'LEI', page: 2 }
 
-      expect(summary.offenders.size).to eq(50)
-      expect(summary.offenders.current_page).to eq(2)
-      expect(summary.offenders.total_pages).to eq(3)
+      expect(summary_offenders.size).to eq(50)
+      expect(summary_offenders.current_page).to eq(2)
+      expect(summary_offenders.total_pages).to eq(3)
     end
 
     it 'gets page 3' do
       get :pending, params: { prison_id: 'LEI', page: 3 }
 
-      expect(summary.offenders.size).to eq(20)
-      expect(summary.offenders.current_page).to eq(3)
-      expect(summary.offenders.total_pages).to eq(3)
+      expect(summary_offenders.size).to eq(20)
+      expect(summary_offenders.current_page).to eq(3)
+      expect(summary_offenders.total_pages).to eq(3)
     end
   end
 
@@ -182,6 +182,6 @@ RSpec.describe SummaryController, type: :controller do
     create(:allocation, nomis_offender_id: offender_id, primary_pom_nomis_id: 234)
 
     get :allocated, params: { prison_id: prison, sort: 'awaiting_allocation_for asc' }
-    expect(assigns(:summary).offenders.count).to eq(1)
+    expect(assigns(:offenders).count).to eq(1)
   end
 end
