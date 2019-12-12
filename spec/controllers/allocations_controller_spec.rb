@@ -188,6 +188,8 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
         )
       end
 
+      render_views
+
       it "Can get the allocation history for an offender", versioning: true do
         get :history, params: { prison_id: prison, nomis_offender_id: offender_no }
         allocation_list = assigns(:history).to_a
@@ -217,6 +219,8 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
         allocation = create(
           :allocation,
           nomis_offender_id: offender_no,
+          prison: prison,
+          override_reasons: ['other'],
           primary_pom_nomis_id: previous_primary_pom_nomis_id)
 
         allocation.update!(
