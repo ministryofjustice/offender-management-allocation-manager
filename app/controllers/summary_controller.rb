@@ -16,34 +16,45 @@ class SummaryController < PrisonsApplicationController
   end
 
   def allocated
-    @summary = create_summary(:allocated)
+    summary = create_summary(:allocated)
+    items = offenders(:allocated, summary.allocated)
+
+    @offenders = Kaminari.paginate_array(items).page(page)
+    @summary = SummaryPresenter.new summary
   end
 
   def unallocated
-    @summary = create_summary(:unallocated)
+    summary = create_summary(:unallocated)
+    items = offenders(:unallocated, summary.unallocated)
+
+    @offenders = Kaminari.paginate_array(items).page(page)
+    @summary = SummaryPresenter.new summary
   end
 
   def pending
-    @summary = create_summary(:pending)
+    summary = create_summary(:pending)
+    items = offenders(:pending, summary.pending)
+
+    @offenders = Kaminari.paginate_array(items).page(page)
+    @summary = SummaryPresenter.new summary
   end
 
 private
 
+  def offenders(summary_type, offenders)
+    params = sort_params(summary_type)
+    offenders.sort params[0], params[1]
+
+    # TODO: bug fix is to bring this data into scope and attach it to the OffenderPresenter
+    # overrides_hash = Responsibility.where(nomis_offender_id: offenders.items.map(&:offender_no)).
+    #   map { |r| [r.nomis_offender_id, r] }.to_h
+    offenders.items.map { |o| OffenderPresenter.new(o, nil) }
+  end
+
   def create_summary(summary_type)
-    field, direction = sort_params(summary_type)
-
-    params = SummaryService::SummaryParams.new(
-      sort_field: field,
-      sort_direction: direction
+    SummaryService.summary(
+      summary_type, @prison
     )
-
-    summary = SummaryService.summary(
-      summary_type, @prison, params
-    )
-
-    paged_offenders = Kaminari.paginate_array(summary.offenders).page(page)
-    summary.offenders = paged_offenders
-    summary
   end
 
   def page
