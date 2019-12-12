@@ -55,7 +55,6 @@ feature 'View a prisoner profile page' do
       team = create(:team, name: 'A team', local_divisional_unit: ldu)
       create(:case_information,
              nomis_offender_id: alloc.nomis_offender_id,
-             local_divisional_unit: ldu,
              team: team
       )
 
@@ -72,9 +71,10 @@ feature 'View a prisoner profile page' do
     it "has some community information when present",
        :raven_intercept_exception, vcr: { cassette_name: :show_offender_community_info_partial } do
       ldu = create(:local_divisional_unit, name: 'An LDU', email_address: nil)
+      team = create(:team, local_divisional_unit: ldu)
       create(:case_information,
              nomis_offender_id: alloc.nomis_offender_id,
-             local_divisional_unit: ldu
+             team: team
       )
 
       visit prison_prisoner_path('LEI', 'G7998GJ')

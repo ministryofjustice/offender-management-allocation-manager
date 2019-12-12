@@ -24,8 +24,6 @@ FactoryBot.define do
 
     association :team, code: '1234', name: 'A nice team'
 
-    association :local_divisional_unit, code: '123', name: "LDU Name", email_address: 'testldu@example.org'
-
     crn { Faker::Alphanumeric.alpha(number: 10) }
   end
 end

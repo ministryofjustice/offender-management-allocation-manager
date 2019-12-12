@@ -74,12 +74,10 @@ private
   def map_delius_to_case_info(delius_record)
     find_case_info(delius_record).tap do |case_info|
       team = map_team(delius_record.team_code)
-      ldu = team.local_divisional_unit if team
       case_info.assign_attributes(
         crn: delius_record.crn,
         tier: map_tier(delius_record.tier),
         team: team,
-        local_divisional_unit: ldu,
         case_allocation: delius_record.service_provider,
         welsh_offender: map_welsh_offender(delius_record.welsh_offender?),
         mappa_level: map_mappa_level(delius_record.mappa, delius_record.mappa_levels)
