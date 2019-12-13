@@ -13,17 +13,15 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">Handover start date</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-        <% handover_date, reason =  @prisoner.handover_start_date %>
-        <%= format_date(handover_date) %>
-        <span class="handover-reason">(<%= reason %>)</span>
+        <%= format_date(@prisoner.handover_start_date) %>
+        <span class="handover-reason">(<%= @prisoner.handover_reason %>)</span>
       </td>
     </tr>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">Responsibility handover</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-        <% handover_date, reason = @prisoner.responsibility_handover_date %>
-        <%= format_date(handover_date, replacement: 'Unknown - missing MAPPA info') %>
-        <span class="handover-reason">(<%= reason %>)</span>
+        <%= format_date(@prisoner.responsibility_handover_date, replacement: 'Unknown - missing MAPPA info') %>
+        <span class="handover-reason">(<%= @prisoner.handover_reason %>)</span>
       </td>
     </tr>
     <% if Flipflop.early_allocation? %>
