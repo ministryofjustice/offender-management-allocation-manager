@@ -107,7 +107,8 @@ class AllocationService
   end
 
   def self.allocation_history_pom_emails(history)
-    pom_ids = history.map(&:primary_pom_nomis_id).uniq.compact
+    pom_ids = history.map { |h| [h.primary_pom_nomis_id, h.secondary_pom_nomis_id] }.flatten.compact.uniq
+
     pom_emails = {}
 
     pom_ids.each do |pom_id|

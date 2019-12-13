@@ -213,4 +213,44 @@ describe AllocationService do
     alloc = Allocation.find_by(nomis_offender_id: nomis_offender_id)
     expect(alloc.com_name).to eq('Bob')
   end
+
+  describe '#allocation_history_pom_emails' do
+    it 'can retrieve all the POMs email addresses for ', versioning: true, vcr: { cassette_name: :allocation_service_history_spec } do
+      nomis_offender_id = 'G2911GD'
+      previous_primary_pom_nomis_id = 485_637
+      updated_primary_pom_nomis_id = 485_926
+      secondary_pom_nomis_id = 485_833
+
+      allocation = create(
+          :allocation,
+          nomis_offender_id: nomis_offender_id,
+          primary_pom_nomis_id: previous_primary_pom_nomis_id)
+
+      allocation.update!(
+          primary_pom_nomis_id: updated_primary_pom_nomis_id,
+          event: Allocation::REALLOCATE_PRIMARY_POM
+      )
+
+      allocation.update!(
+          secondary_pom_nomis_id: secondary_pom_nomis_id,
+          event: Allocation::ALLOCATE_SECONDARY_POM
+      )
+
+      history = offender_allocation_history(nomis_offender_id)
+      emails = described_class.allocation_history_pom_emails(history)
+
+      expect(emails.count).to eq(3)
+    end
+  end
+
+  def offender_allocation_history(nomis_offender_id)
+    current_allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id)
+
+    unless current_allocation.nil?
+      allocs = AllocationService.get_versions_for(current_allocation).append(current_allocation)
+      allocs.zip(current_allocation.versions).map do |alloc, raw_version|
+        AllocationPresenter.new(alloc, raw_version)
+      end
+    end
+  end
 end
