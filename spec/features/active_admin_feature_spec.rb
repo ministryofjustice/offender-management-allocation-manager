@@ -31,6 +31,8 @@ feature 'ActiveAdmin' do
   context 'when spo' do
     before do
       signin_spo_user
+      ci = create(:case_information)
+      create(:allocation, nomis_offender_id: ci.nomis_offender_id)
     end
 
     it 'displays the dashboard' do

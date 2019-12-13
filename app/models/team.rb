@@ -3,5 +3,5 @@
 class Team < ApplicationRecord
   validates :name, :code, presence: true
 
-  belongs_to :local_divisional_unit, optional: true
+  belongs_to :local_divisional_unit
 end
