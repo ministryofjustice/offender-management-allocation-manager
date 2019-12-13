@@ -8,6 +8,7 @@ class DebuggingController < PrisonsApplicationController
     if @offender.present?
       @offender = OffenderPresenter.new(@offender, nil)
       @allocation = Allocation.find_by(nomis_offender_id: @offender.offender_no)
+      @override = Responsibility.find_by(nomis_offender_id: @offender.offender_no)
       @movements =
         Nomis::Elite2::MovementApi.movements_for(@offender.offender_no).last
     end

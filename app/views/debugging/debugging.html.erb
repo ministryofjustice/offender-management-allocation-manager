@@ -88,7 +88,12 @@
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
         <%= case_owner_label(@offender) %>
       </td>
-
+    <tr class="govuk-table__row" id="responsibility-override">
+      <td class="govuk-table__cell govuk-!-width-one-half">Responsibility overridden?</td>
+      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
+        <%= @override.nil? ? 'No' : 'Yes' %>
+      </td>
+    </tr>
     </tbody>
   </table>
 
@@ -116,6 +121,12 @@
       <td class="govuk-table__cell">Sentence type</td>
       <td class="govuk-table__cell table_cell__left_align">
         <%= sentence_type_label(@offender) %>
+      </td>
+    </tr>
+    <tr class="govuk-table__row" id="sentence-start-date">
+      <td class="govuk-table__cell">Sentence start date</td>
+      <td class="govuk-table__cell table_cell__left_align">
+        <%= format_date(@offender.sentence_start_date, replacement: 'N/A') %>
       </td>
     </tr>
     <tr class="govuk-table__row" id="earliest-release-date">
