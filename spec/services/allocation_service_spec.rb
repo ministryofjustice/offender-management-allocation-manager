@@ -222,18 +222,18 @@ describe AllocationService do
       secondary_pom_nomis_id = 485_833
 
       allocation = create(
-          :allocation,
-          nomis_offender_id: nomis_offender_id,
-          primary_pom_nomis_id: previous_primary_pom_nomis_id)
+        :allocation,
+        nomis_offender_id: nomis_offender_id,
+        primary_pom_nomis_id: previous_primary_pom_nomis_id)
 
       allocation.update!(
-          primary_pom_nomis_id: updated_primary_pom_nomis_id,
-          event: Allocation::REALLOCATE_PRIMARY_POM
+        primary_pom_nomis_id: updated_primary_pom_nomis_id,
+        event: Allocation::REALLOCATE_PRIMARY_POM
       )
 
       allocation.update!(
-          secondary_pom_nomis_id: secondary_pom_nomis_id,
-          event: Allocation::ALLOCATE_SECONDARY_POM
+        secondary_pom_nomis_id: secondary_pom_nomis_id,
+        event: Allocation::ALLOCATE_SECONDARY_POM
       )
 
       history = offender_allocation_history(nomis_offender_id)
