@@ -50,7 +50,7 @@ private
     end
 
     def policy_rules(offender)
-      if release_date_gt_10_mths?(offender)
+      if release_date_gt_10_mths?(offender) && (HandoverDateService.handover(offender).handover_date > Time.zone.today)
         RESPONSIBLE
       else
         SUPPORTING
@@ -61,7 +61,7 @@ private
 
     def release_date_gt_10_mths?(offender)
       offender.earliest_release_date >
-        DateTime.now.utc.to_date + 10.months
+        offender.sentence_start_date + 10.months
     end
   end
 
@@ -150,12 +150,27 @@ private
     PrisonService.open_prison?(offender.prison_id) && offender.nps_case?
   end
 
-  def self.crc_rules(offender)
-    if release_date_gt_12_weeks?(offender)
-      RESPONSIBLE
-    else
-      SUPPORTING
+  class CrcRules
+    def self.responsibility(offender)
+      if release_date_gt_12_weeks?(offender)
+        RESPONSIBLE
+      else
+        SUPPORTING
+      end
     end
+
+    private
+
+    # CRC can look at HDC date, NPS is not supposed to
+    def self.release_date_gt_12_weeks?(offender)
+      earliest_release_date = [offender.earliest_release_date, offender.home_detention_curfew_eligibility_date].compact.min
+
+      earliest_release_date > DateTime.now.utc.to_date + 12.weeks
+    end
+  end
+
+  def self.crc_rules(offender)
+    CrcRules.responsibility(offender)
   end
 
   def self.welsh_offender?(offender)
@@ -163,11 +178,7 @@ private
   end
 
   def self.nps_case?(offender)
-    offender.case_allocation == NPS
+    offender.nps_case?
   end
 
-  def self.release_date_gt_12_weeks?(offender)
-    offender.earliest_release_date >
-      DateTime.now.utc.to_date + 12.weeks
-  end
 end

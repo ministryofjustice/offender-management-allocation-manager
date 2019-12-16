@@ -51,7 +51,7 @@ describe ResponsibilityService do
     context 'when offender is english' do
       let(:offender) {
         OpenStruct.new welsh_offender: false,
-                       case_allocation: case_allocation,
+                       nps_case?: case_allocation == 'NPS',
                        indeterminate_sentence?: false,
                        recalled?: recalled,
                        sentence_start_date: start_date,
@@ -174,7 +174,7 @@ describe ResponsibilityService do
           context 'with > 12 weeks left to serve' do
             let(:release_date) { DateTime.now.utc.to_date + 13.weeks }
 
-            it 'is reponsible' do
+            it 'is responsible' do
               resp = described_class.calculate_pom_responsibility(offender)
 
               expect(resp).to eq ResponsibilityService::RESPONSIBLE
@@ -215,7 +215,7 @@ describe ResponsibilityService do
           let(:case_allocation) { 'NPS' }
 
           context 'when < 10 months left to serve' do
-            let(:release_date) { DateTime.now.utc.to_date + 9.months }
+            let(:release_date) { start_date + 9.months }
 
             it 'is supporting' do
               resp = described_class.calculate_pom_responsibility(offender)
@@ -225,12 +225,22 @@ describe ResponsibilityService do
           end
 
           context 'when > 10 months left to serve' do
-            let(:release_date) { DateTime.now.utc.to_date + 11.months }
+            let(:release_date) { start_date + 11.months }
+            let(:parole_date) { release_date }
 
             it 'is responsible' do
               resp = described_class.calculate_pom_responsibility(offender)
 
               expect(resp).to eq ResponsibilityService::RESPONSIBLE
+            end
+
+            it 'is supporting on the handover date' do
+              Timecop.travel start_date + 9.months do
+
+                resp = described_class.calculate_pom_responsibility(offender)
+
+                expect(resp).to eq ResponsibilityService::SUPPORTING
+              end
             end
           end
 
@@ -246,20 +256,40 @@ describe ResponsibilityService do
         end
 
         context 'when CRC' do
-          let(:case_allocation) { 'CRC' }
+          let(:offender) {
+            OpenStruct.new nps_case?: false,
+                           recalled?: false,
+                           sentence_start_date: start_date,
+                           earliest_release_date: release_date,
+                           home_detention_curfew_eligibility_date: hdc_date,
+                           sentenced?: true,
+                           prison_id: prison
+          }
 
           context 'with > 12 weeks left to serve' do
             let(:release_date) { DateTime.now.utc.to_date + 13.weeks }
+            let(:hdc_date) { nil }
 
             it 'is reponsible' do
               resp = described_class.calculate_pom_responsibility(offender)
 
               expect(resp).to eq ResponsibilityService::RESPONSIBLE
             end
+
+            context 'when HDC date within the 12 weeks' do
+              let(:hdc_date) { DateTime.now.utc.to_date + 11.weeks }
+
+              it 'is supporting' do
+                resp = described_class.calculate_pom_responsibility(offender)
+
+                expect(resp).to eq ResponsibilityService::SUPPORTING
+              end
+            end
           end
 
           context 'with < 12 weeks left to serve' do
             let(:release_date) { DateTime.now.utc.to_date + 11.weeks }
+            let(:hdc_date) { nil }
 
             it 'is supporting' do
               resp = described_class.calculate_pom_responsibility(offender)
@@ -267,6 +297,7 @@ describe ResponsibilityService do
               expect(resp).to eq ResponsibilityService::SUPPORTING
             end
           end
+
         end
 
         context 'when recalled' do
@@ -369,6 +400,7 @@ describe ResponsibilityService do
               o.sentence = Nomis::SentenceDetail.new
               o.sentence.sentence_start_date = DateTime.new(2019, 2, 19).utc
               o.sentence.release_date = DateTime.now.utc.to_date + 11.months
+              o.sentence.conditional_release_date = o.sentence.release_date
             }
           }
 
@@ -379,6 +411,7 @@ describe ResponsibilityService do
               o.sentence = Nomis::SentenceDetail.new
               o.sentence.sentence_start_date = DateTime.new(2019, 2, 20).utc
               o.sentence.release_date = DateTime.now.utc.to_date + 9.months
+              o.sentence.conditional_release_date = o.sentence.sentence_start_date + 8.months
             }
           }
 
