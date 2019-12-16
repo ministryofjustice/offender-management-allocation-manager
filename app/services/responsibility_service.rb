@@ -36,7 +36,7 @@ private
     end
   end
 
-  class ResponsibilityRules
+  class NpsResponsibilityRules
     def initialize(policy_start_date)
       @policy_start_date = policy_start_date
     end
@@ -49,7 +49,7 @@ private
       end
     end
 
-    def policy_nps_rules(offender)
+    def policy_rules(offender)
       if release_date_gt_10_mths?(offender)
         RESPONSIBLE
       else
@@ -65,7 +65,7 @@ private
     end
   end
 
-  class WelshNpsResponsibiltyRules < ResponsibilityRules
+  class WelshNpsResponsibiltyRules < NpsResponsibilityRules
     WELSH_POLICY_START_DATE = DateTime.new(2019, 2, 4).utc.to_date
 
     def initialize
@@ -74,15 +74,15 @@ private
 
     def responsibility(offender)
       if new_case?(offender)
-        policy_nps_rules(offender)
+        policy_rules(offender)
       else
-        welsh_prepolicy_nps_rules(offender)
+        welsh_prepolicy_rules(offender)
       end
     end
 
   private
 
-    def welsh_prepolicy_nps_rules(offender)
+    def welsh_prepolicy_rules(offender)
       if release_date_gt_15_mths_at_policy_date?(offender)
         RESPONSIBLE
       else
@@ -96,7 +96,7 @@ private
     end
   end
 
-  class EnglishNpsResponsibilityRules < ResponsibilityRules
+  class EnglishNpsResponsibilityRules < NpsResponsibilityRules
     ENGLISH_POLICY_START_DATE = DateTime.new(2019, 10, 1).utc.to_date
     ORIGINAL_ENGLISH_POLICY_START_DATE = DateTime.new(2019, 9, 16).utc.to_date
 
@@ -106,21 +106,21 @@ private
 
     def responsibility(offender)
       if new_case?(offender)
-        policy_nps_rules(offender)
+        policy_rules(offender)
       else
-        english_prepolicy_nps_rules(offender)
+        english_prepolicy_rules(offender)
       end
     end
 
   private
 
-    def english_prepolicy_nps_rules(offender)
+    def english_prepolicy_rules(offender)
       if hub_or_private?(offender)
         threshold = 20.months
       else
         threshold = 17.months
       end
-      if release_date_gt_17_mths_at_policy_date?(offender, threshold)
+      if release_date_gt_mths_at_policy_date?(offender, threshold)
         RESPONSIBLE
       else
         SUPPORTING
@@ -132,7 +132,7 @@ private
         PrisonService.english_private_prison?(offender.prison_id)
     end
 
-    def release_date_gt_17_mths_at_policy_date?(offender, threshold)
+    def release_date_gt_mths_at_policy_date?(offender, threshold)
       offender.earliest_release_date >
         ORIGINAL_ENGLISH_POLICY_START_DATE + threshold
     end
