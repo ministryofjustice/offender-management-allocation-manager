@@ -3,7 +3,6 @@
 class CaseInformation < ApplicationRecord
   self.table_name = 'case_information'
 
-  # belongs_to :local_divisional_unit, optional: true
   belongs_to :team, optional: true
 
   has_many :early_allocations,
