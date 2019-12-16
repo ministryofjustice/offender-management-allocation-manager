@@ -3,6 +3,8 @@ require 'rails_helper'
 RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }, type: :job do
   let(:nomis_offender_id) { 'G4281GV' }
   let(:remand_nomis_offender_id) { 'G3716UD' }
+  let(:ldu) {  create(:local_divisional_unit) }
+  let(:team) { create(:team, local_divisional_unit: ldu) }
 
   context 'with auto_delius_import enabled' do
     let(:test_strategy) { Flipflop::FeatureSet.current.test! }
@@ -16,8 +18,14 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
     end
 
     context 'when duplicate NOMIS ids exist' do
-      let!(:d1) { create(:delius_data, noms_no: nomis_offender_id) }
-      let!(:d2) { create(:delius_data, noms_no: nomis_offender_id) }
+      let!(:d1) {
+        create(:delius_data, noms_no: nomis_offender_id, team_code: team.code, team: team.name,
+                             ldu_code: ldu.code, ldu: ldu.name)
+      }
+      let!(:d2) {
+        create(:delius_data, noms_no: nomis_offender_id, team_code: team.code, team: team.name,
+                             ldu_code: ldu.code, ldu: ldu.name)
+      }
 
       it 'flags up the duplicate IDs' do
         expect {
@@ -32,7 +40,10 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
     end
 
     context 'when on the happy path' do
-      let!(:d1) { create(:delius_data) }
+      let!(:d1) {
+        create(:delius_data, team_code: team.shadow_code, team: team.name,
+                             ldu_code: ldu.code, ldu: ldu.name)
+      }
 
       it 'creates case information' do
         expect {
@@ -44,7 +55,10 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
     context 'when processing a com name' do
       let!(:offender_id) { 'A1111A' }
       let!(:com_name) { 'Bob Smith' }
-      let!(:d1) { create(:delius_data, offender_manager: com_name) }
+      let!(:d1) {
+        create(:delius_data, offender_manager: com_name, team_code: team.shadow_code, team: team.name,
+                             ldu_code: ldu.code, ldu: ldu.name)
+      }
       let!(:allocation) { create(:allocation, nomis_offender_id: d1.noms_no) }
 
       it 'does no update if no allocation' do
@@ -73,7 +87,10 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
     end
 
     context 'when offender is not convicted' do
-      let!(:d1) { create(:delius_data, noms_no: remand_nomis_offender_id) }
+      let!(:d1) {
+        create(:delius_data, noms_no: remand_nomis_offender_id, team_code: team.shadow_code, team: team.name,
+                             ldu_code: ldu.code, ldu: ldu.name)
+      }
 
       it 'does not case information' do
         expect {
@@ -83,7 +100,10 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
     end
 
     context 'when tier contains extra characters' do
-      let!(:d1) { create(:delius_data, tier: 'B1') }
+      let!(:d1) {
+        create(:delius_data, tier: 'B1', team_code: team.shadow_code, team: team.name,
+                             ldu_code: ldu.code, ldu: ldu.name)
+      }
 
       it 'creates case information' do
         expect {
@@ -93,7 +113,10 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
     end
 
     context 'when tier contains extra characters' do
-      let!(:d1) { create(:delius_data, tier: 'B1') }
+      let!(:d1) {
+        create(:delius_data, tier: 'B1', team_code: team.shadow_code, team: team.name,
+                             ldu_code: ldu.code, ldu: ldu.name)
+      }
 
       it 'creates case information' do
         expect {
@@ -104,7 +127,10 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
     end
 
     context 'when tier is invalid' do
-      let!(:d1) { create(:delius_data, tier: 'X') }
+      let!(:d1) {
+        create(:delius_data, tier: 'X', team_code: team.shadow_code, team: team.name,
+                             ldu_code: ldu.code, ldu: ldu.name)
+      }
 
       it 'does not creates case information' do
         expect {
@@ -115,7 +141,10 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
 
     describe '#mappa' do
       context 'without delius mappa' do
-        let!(:d1) { create(:delius_data, mappa: 'N') }
+        let!(:d1) {
+          create(:delius_data, mappa: 'N', team_code: team.shadow_code, team: team.name,
+                               ldu_code: ldu.code, ldu: ldu.name)
+        }
 
         it 'creates case information with mappa level 0' do
           expect {
@@ -126,7 +155,10 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
       end
 
       context 'with delius mappa' do
-        let!(:d1) { create(:delius_data, mappa: 'Y', mappa_levels: mappa_levels) }
+        let!(:d1) {
+          create(:delius_data, mappa: 'Y', mappa_levels: mappa_levels, team_code: team.shadow_code, team: team.name,
+                               ldu_code: ldu.code, ldu: ldu.name)
+        }
 
         context 'with delius mappa data is 1' do
           let(:mappa_levels) { '1' }
@@ -164,7 +196,10 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
     end
 
     context 'when tier is missing' do
-      let!(:d1) { create(:delius_data, tier: nil) }
+      let!(:d1) {
+        create(:delius_data, tier: nil, team_code: team.shadow_code, team: team.name,
+                             ldu_code: ldu.code, ldu: ldu.name)
+      }
 
       it 'does not creates case information' do
         expect {
@@ -174,7 +209,10 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
     end
 
     context 'when invalid service provider' do
-      let!(:d1) { create(:delius_data, provider_code: 'X123') }
+      let!(:d1) {
+        create(:delius_data, provider_code: 'X123', team_code: team.shadow_code, team: team.name,
+                             ldu_code: ldu.code, ldu: ldu.name)
+      }
 
       it 'does not creates case information' do
         expect {
@@ -184,7 +222,10 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
     end
 
     context 'when date contains 8 stars' do
-      let!(:d1) { create(:delius_data, date_of_birth: '*' * 8) }
+      let!(:d1) {
+        create(:delius_data, date_of_birth: '*' * 8, team_code: team.shadow_code, team: team.name,
+                             ldu_code: ldu.code, ldu: ldu.name)
+      }
 
       it 'creates a new case information record' do
         expect {
@@ -194,7 +235,10 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
     end
 
     context 'when date invalid' do
-      let!(:d1) { create(:delius_data, date_of_birth: 'ohdearieme') }
+      let!(:d1) {
+        create(:delius_data, date_of_birth: 'ohdearieme', team_code: team.shadow_code, team: team.name,
+                             ldu_code: ldu.code, ldu: ldu.name)
+      }
 
       it 'creates an error record' do
         expect {
@@ -208,7 +252,10 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
     end
 
     context 'when case information already present' do
-      let!(:d1) { create(:delius_data, tier: 'C') }
+      let!(:d1) {
+        create(:delius_data, tier: 'C', team_code: team.shadow_code, team: team.name,
+                             ldu_code: ldu.code, ldu: ldu.name)
+      }
       let!(:c1) { create(:case_information, tier: 'B', nomis_offender_id: d1.noms_no, crn: d1.crn) }
 
       it 'does not creates case information' do
@@ -221,7 +268,12 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
 
     context 'when case information already present' do
       let!(:c1) { create(:case_information, tier: 'B', nomis_offender_id: 'G4281GV') }
-      let!(:d1) { create(:delius_data, noms_no: c1.nomis_offender_id, crn: c1.crn, tier: 'C') }
+      let!(:d1) {
+        create(:delius_data,
+               noms_no: c1.nomis_offender_id, crn: c1.crn, tier: 'C',
+               team_code: team.shadow_code, team: team.name,
+               ldu_code: ldu.code, ldu: ldu.name)
+      }
 
       it 'does not creates case information' do
         expect {
@@ -239,7 +291,10 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
       end
 
       context 'when on the happy path' do
-        let!(:d1) { create(:delius_data) }
+        let!(:d1) {
+          create(:delius_data, team_code: team.shadow_code, team: team.name,
+                               ldu_code: ldu.code, ldu: ldu.name)
+        }
 
         it 'creates case information' do
           expect {
@@ -255,7 +310,10 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
       end
 
       context 'when on the happy path' do
-        let!(:d1) { create(:delius_data) }
+        let!(:d1) {
+          create(:delius_data, team_code: team.shadow_code, team: team.name,
+                               ldu_code: ldu.code, ldu: ldu.name)
+        }
 
         it 'creates case information' do
           expect {
