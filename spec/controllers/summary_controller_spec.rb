@@ -114,6 +114,26 @@ RSpec.describe SummaryController, type: :controller do
 
         expect(assigns(:offenders).map(&:offender_no)).to match_array ['G4234GG']
       end
+
+      context 'when today is monday' do
+        Timecop.travel Date.new(2019, 12, 16) do
+          before do
+            stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/movements/offenders?latestOnly=false&movementTypes=TRN").
+              with(body: %w[G1234GY G7514GW G1234VV G4234GG].to_json).
+              to_return(status: 200, body: [
+                { offenderNo: 'G7514GW', toAgency: prison, createDateTime: Time.zone.today },
+                { offenderNo: 'G1234GY', toAgency: prison, createDateTime: Time.zone.today - 1 },
+                { offenderNo: 'G1234VV', toAgency: prison, createDateTime: Time.zone.today - 3 }
+              ].to_json)
+          end
+
+          it 'even shows friday arrivals as new' do
+            get :new_arrivals, params: { prison_id: prison }
+
+            expect(assigns(:offenders).map(&:offender_no)).to match_array(%w[G1234GY G7514GW G1234VV])
+          end
+        end
+      end
     end
 
     context 'without new arrivals' do

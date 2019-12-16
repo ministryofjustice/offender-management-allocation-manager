@@ -3,9 +3,6 @@
 class SummaryService
   PAGE_SIZE = 20 # The number of items to show in the view
 
-  # The maximum number of days for an offender to be considered newly arrived
-  NEWLY_ARRIVED_DAYS = 2
-
   # rubocop:disable Metrics/MethodLength
   def self.summary(summary_type, prison)
     # We expect to be passed summary_type, which is one of :allocated, :unallocated,
@@ -39,13 +36,10 @@ class SummaryService
         else
           buckets[:unallocated].items << offender
         end
-      elsif offender.awaiting_allocation_for >= NEWLY_ARRIVED_DAYS
-        # If the offender has been waiting more than 2 days for their
-        # data to be updated, then they will appear in the pending bucket,
-        # otherwise the newly_arrived bucket
-        buckets[:pending].items << offender
-      else
+      elsif new_arrival?(offender)
         buckets[:new_arrivals].items << offender
+      else
+        buckets[:pending].items << offender
       end
     end
 
@@ -66,6 +60,16 @@ class SummaryService
 # rubocop:enable Metrics/MethodLength
 
 private
+
+  # anyone newly arrived (< 2 days) hasn't been matched via nDelius, so its good to have a separate bucket
+  # due to the way nDelius matching works (prisoner arrives on Friday, report run Friday night,
+  # NART person picks up report on Monday, sends email to Omic, nDelius process runs Monday night)
+  # anyone arriving on Friday won't get picked up for potential allocation via nDelius until
+  # Tuesday - so consider them newly arrived even on Monday (when awaiting_allocation_for == 3)
+  def self.new_arrival?(offender)
+    offender.awaiting_allocation_for < 2 ||
+      offender.prison_arrival_date.friday? && offender.awaiting_allocation_for < 4
+  end
 
   def self.sort_fields_for_allocated
     [:last_name, :earliest_release_date, :tier]
