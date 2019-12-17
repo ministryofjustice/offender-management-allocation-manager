@@ -13,39 +13,30 @@ class CaseloadController < PrisonsApplicationController
              only: [:handover_start]
 
   def index
-    @caseload = PomCaseload.new(@pom.staff_id, active_prison_id)
+    allocations = @prison.allocations_for(@pom.staff_id)
 
-    @new_cases_count = @caseload.allocations.count(&:new_case?)
-    sorted_allocations = sort_allocations(filter_allocations(@caseload.allocations))
-
+    @new_cases_count = allocations.count(&:new_case?)
+    sorted_allocations = sort_allocations(filter_allocations(allocations))
     @allocations = Kaminari.paginate_array(sorted_allocations).page(page)
-
     @total_allocation_count = sorted_allocations.count
-    @pending_handover_count = pending_handover_count
-    @pending_task_count = @caseload.tasks_for_offenders.count
+
+    @pending_handover_count = pending_handover_offenders(allocations.map(&:offender)).count
+    @pending_task_count = PomTasks.new.for_offenders(allocations.map(&:offender)).count
   end
 
   def new
-    @caseload = PomCaseload.new(@pom.staff_id, active_prison_id)
-    @new_cases = sort_allocations(@caseload.allocations.select(&:new_case?))
+    @new_cases = sort_allocations(@prison.allocations_for(@pom.staff_id).select(&:new_case?))
   end
 
   def handover_start
-    @caseload = PomCaseload.new(@pom.staff_id, active_prison_id)
-    offenders = pending_handover_offenders
+    offenders = pending_handover_offenders @prison.allocations_for(@pom.staff_id).map(&:offender)
 
     @upcoming_handovers = Kaminari.paginate_array(offenders).page(page)
   end
 
 private
 
-  def pending_handover_count
-    pending_handover_offenders.count
-  end
-
-  def pending_handover_offenders
-    allocated_offenders = @caseload.allocations.map(&:offender)
-
+  def pending_handover_offenders(allocated_offenders)
     one_month_time = Time.zone.today + 30.days
 
     upcoming_offenders = allocated_offenders.select { |offender|

@@ -8,19 +8,20 @@ module Nomis
                   :home_detention_curfew_eligibility_date,
                   :parole_eligibility_date,
                   :release_date,
-                  :_automatic_release_date,
-                  :automatic_release_override_date,
-                  :_conditional_release_date,
-                  :conditional_release_override_date,
                   :sentence_start_date,
                   :tariff_date
 
+    attr_writer :automatic_release_date,
+                :automatic_release_override_date,
+                :conditional_release_date,
+                :conditional_release_override_date
+
     def automatic_release_date
-      automatic_release_override_date.presence || _automatic_release_date
+      @automatic_release_override_date.presence || @automatic_release_date
     end
 
     def conditional_release_date
-      conditional_release_override_date.presence || _conditional_release_date
+      @conditional_release_override_date.presence || @conditional_release_date
     end
 
     def earliest_release_date
@@ -48,8 +49,8 @@ module Nomis
         obj.release_date = deserialise_date(payload, 'releaseDate')
         obj.sentence_start_date = deserialise_date(payload, 'sentenceStartDate')
         obj.tariff_date = deserialise_date(payload, 'tariffDate')
-        obj._automatic_release_date = deserialise_date(payload, 'automaticReleaseDate')
-        obj._conditional_release_date = deserialise_date(
+        obj.automatic_release_date = deserialise_date(payload, 'automaticReleaseDate')
+        obj.conditional_release_date = deserialise_date(
           payload, 'conditionalReleaseDate'
         )
         obj.automatic_release_override_date = deserialise_date(

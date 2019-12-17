@@ -50,19 +50,6 @@ module Nomis
         end
       end
 
-      def self.get_multiple_offenders(offender_nos)
-        route = '/elite2api/api/prisoners'
-        response = e2_client.post(route,
-                                  { 'offenderNos' => offender_nos },
-                                  extra_headers: paging_headers(offender_nos.count, 0)
-                                  )
-        return [] if response.empty?
-
-        api_deserialiser.deserialise_many(
-          Nomis::Offender, response
-        )
-      end
-
       def self.get_offence(booking_id)
         route = "/elite2api/api/bookings/#{booking_id}/mainOffence"
         data = e2_client.get(route)
