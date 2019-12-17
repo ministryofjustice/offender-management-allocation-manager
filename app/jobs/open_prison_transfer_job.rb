@@ -43,7 +43,7 @@ private
     alloc = Allocation.find_by(nomis_offender_id: offender.offender_no)
     return nil if alloc.blank?
 
-    AllocationService.get_versions_for(alloc).detect { |allocation|
+    AllocationService.get_versions_for(alloc).reverse.detect { |allocation|
       allocation.primary_pom_nomis_id.present?
     }
   end
