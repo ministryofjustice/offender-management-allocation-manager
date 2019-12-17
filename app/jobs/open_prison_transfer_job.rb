@@ -49,7 +49,7 @@ private
   end
 
   def last_pom_email(allocation)
-    return nil if allocation.blank?
+    return nil if allocation.blank? || !allocation.active?
 
     StaffMember.new(allocation.primary_pom_nomis_id).email_address
   end
