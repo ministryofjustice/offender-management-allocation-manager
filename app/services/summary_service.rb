@@ -68,7 +68,7 @@ private
   # Tuesday - so consider them newly arrived even on Monday (when awaiting_allocation_for == 3)
   def self.new_arrival?(offender)
     offender.awaiting_allocation_for < 2 ||
-      offender.prison_arrival_date.friday? && offender.awaiting_allocation_for < 4
+      ((offender.prison_arrival_date.friday? || offender.prison_arrival_date.saturday?) && offender.awaiting_allocation_for < 4)
   end
 
   def self.sort_fields_for_allocated
