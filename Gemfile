@@ -39,6 +39,7 @@ gem 'prawn-rails'
 gem 'rswag-api' # api-documentation
 gem 'rswag-ui'  # api-documentation interface
 gem 'sassc-rails'
+gem 'activeadmin'
 
 group :development, :test do
   gem 'brakeman'

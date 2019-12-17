@@ -41,9 +41,10 @@ RSpec.describe EarlyAllocationsController, type: :controller do
 
   context 'with not ldu email address' do
     let(:ldu) { create(:local_divisional_unit, email_address: nil) }
+    let(:team) { create(:team, local_divisional_unit: ldu) }
 
     before do
-      create(:case_information, nomis_offender_id: nomis_offender_id, local_divisional_unit: ldu)
+      create(:case_information, nomis_offender_id: nomis_offender_id, team: team)
     end
 
     it 'goes to the dead end' do

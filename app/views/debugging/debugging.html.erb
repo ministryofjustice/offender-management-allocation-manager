@@ -83,12 +83,42 @@
         <%= humanized_bool(@offender.welsh_offender) %>
       </td>
     </tr>
+    </tbody>
+  </table>
+
+  <table class="govuk-table">
+    <tbody class="govuk-table__body">
+    <tr class="govuk-table__row">
+      <td class="govuk-table__header govuk-!-width-one-half" scope="row">Responsibility & handover information</td>
+      <td class="govuk-table__cell govuk-!-width-one-half"></td>
+    </tr>
     <tr class="govuk-table__row" id="responsibility">
       <td class="govuk-table__cell govuk-!-width-one-half">Current responsibility</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
         <%= case_owner_label(@offender) %>
       </td>
-
+    <tr class="govuk-table__row" id="responsibility-override">
+      <td class="govuk-table__cell govuk-!-width-one-half">Responsibility overridden?</td>
+      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
+        <%= @override.nil? ? 'No' : 'Yes' %>
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-width-one-half">Handover start date</td>
+      <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
+        <% handover_date, reason =  @offender.handover_start_date %>
+        <%= format_date(handover_date) %>
+        <span class="handover-reason">(<%= reason %>)</span>
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-width-one-half">Responsibility handover date</td>
+      <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
+        <% handover_date, reason = @offender.responsibility_handover_date %>
+        <%= format_date(handover_date, replacement: 'Unknown - missing MAPPA info') %>
+        <span class="handover-reason">(<%= reason %>)</span>
+      </td>
+    </tr>
     </tbody>
   </table>
 
@@ -116,6 +146,12 @@
       <td class="govuk-table__cell">Sentence type</td>
       <td class="govuk-table__cell table_cell__left_align">
         <%= sentence_type_label(@offender) %>
+      </td>
+    </tr>
+    <tr class="govuk-table__row" id="sentence-start-date">
+      <td class="govuk-table__cell">Sentence start date</td>
+      <td class="govuk-table__cell table_cell__left_align">
+        <%= format_date(@offender.sentence_start_date, replacement: 'N/A') %>
       </td>
     </tr>
     <tr class="govuk-table__row" id="earliest-release-date">
