@@ -7,13 +7,13 @@ class DeliusImportJob < ApplicationJob
   queue_as :default
 
   FIELDS = [
-      :crn, :pnc_no, :noms_no, :fullname, :tier, :roh_cds,
-      :offender_manager, :org_private_ind, :org,
-      :provider, :provider_code,
-      :ldu, :ldu_code,
-      :team, :team_code,
-      :mappa, :mappa_levels, :date_of_birth
-    ].freeze
+    :crn, :pnc_no, :noms_no, :fullname, :tier, :roh_cds,
+    :offender_manager, :org_private_ind, :org,
+    :provider, :provider_code,
+    :ldu, :ldu_code,
+    :team, :team_code,
+    :mappa, :mappa_levels, :date_of_birth
+  ].freeze
 
   def perform
     ActiveRecord::Base.connection.disable_query_cache!

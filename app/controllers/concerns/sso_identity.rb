@@ -7,6 +7,10 @@ class SsoIdentity
     @sso_identity.nil?
   end
 
+  def to_s
+    current_user
+  end
+
   def current_user
     @sso_identity['username'] if @sso_identity.present?
   end
