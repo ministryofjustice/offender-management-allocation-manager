@@ -159,11 +159,12 @@ private
       end
     end
 
-    private
+  private
 
     # CRC can look at HDC date, NPS is not supposed to
     def self.release_date_gt_12_weeks?(offender)
-      earliest_release_date = [offender.earliest_release_date, offender.home_detention_curfew_eligibility_date].compact.min
+      earliest_release_date =
+        [offender.earliest_release_date, offender.home_detention_curfew_eligibility_date].compact.min
 
       earliest_release_date > DateTime.now.utc.to_date + 12.weeks
     end
@@ -180,5 +181,4 @@ private
   def self.nps_case?(offender)
     offender.nps_case?
   end
-
 end

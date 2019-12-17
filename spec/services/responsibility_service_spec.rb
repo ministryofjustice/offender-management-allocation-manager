@@ -236,7 +236,6 @@ describe ResponsibilityService do
 
             it 'is supporting on the handover date' do
               Timecop.travel start_date + 9.months do
-
                 resp = described_class.calculate_pom_responsibility(offender)
 
                 expect(resp).to eq ResponsibilityService::SUPPORTING
@@ -297,7 +296,6 @@ describe ResponsibilityService do
               expect(resp).to eq ResponsibilityService::SUPPORTING
             end
           end
-
         end
 
         context 'when recalled' do
