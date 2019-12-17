@@ -109,13 +109,7 @@ class AllocationService
   def self.allocation_history_pom_emails(history)
     pom_ids = history.map { |h| [h.primary_pom_nomis_id, h.secondary_pom_nomis_id] }.flatten.compact.uniq
 
-    pom_emails = {}
-
-    pom_ids.each do |pom_id|
-      pom_emails[pom_id] = PrisonOffenderManagerService.get_pom_emails(pom_id).first
-    end
-
-    pom_emails
+    pom_ids.map { |pom_id|  [pom_id, PrisonOffenderManagerService.get_pom_emails(pom_id).first] }.to_h
   end
 
   def self.create_override(params)
