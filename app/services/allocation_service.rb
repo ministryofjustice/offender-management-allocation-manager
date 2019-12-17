@@ -141,6 +141,8 @@ private
     DeliusData.find_by(noms_no: offender_id).try(:offender_manager)
   end
 
+  # Gets the versions in *forward* order - so often we want to reverse
+  # this list as we're interested in recent rather than ancient history
   def self.get_versions_for(allocation)
     allocation.versions.map { |version|
       # 'create' events do not have '#reify' method

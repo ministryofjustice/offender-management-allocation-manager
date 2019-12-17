@@ -43,7 +43,7 @@ private
     alloc = Allocation.find_by(nomis_offender_id: offender.offender_no)
     return nil if alloc.blank?
 
-    AllocationService.get_versions_for(alloc).detect { |allocation|
+    AllocationService.get_versions_for(alloc).reverse.detect { |allocation|
       allocation.primary_pom_nomis_id.present?
     }
   end
@@ -51,8 +51,7 @@ private
   def last_pom_email(allocation)
     return nil if allocation.blank?
 
-    pom = PrisonOffenderManagerService.get_pom_at(allocation.prison, allocation.primary_pom_nomis_id)
-    pom.emails.first
+    StaffMember.new(allocation.primary_pom_nomis_id).email_address
   end
 
   def ldu_email_address(offender)
