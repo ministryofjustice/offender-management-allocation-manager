@@ -120,7 +120,7 @@ feature "view POM's caseload" do
           "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 }
         ].to_json, headers: {})
 
-    allow_any_instance_of(Nomis::OffenderBase).to receive(:handover_start_date).and_return([tomorrow, nil])
+    allow_any_instance_of(Nomis::OffenderBase).to receive(:handover_start_date).and_return(tomorrow)
   end
 
   context 'when paginating', vcr: { cassette_name: :show_poms_caseload } do

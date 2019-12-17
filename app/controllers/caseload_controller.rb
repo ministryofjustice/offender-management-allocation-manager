@@ -40,7 +40,7 @@ private
     one_month_time = Time.zone.today + 30.days
 
     upcoming_offenders = allocated_offenders.select { |offender|
-      start_date = offender.handover_start_date.first
+      start_date = offender.handover_start_date
 
       start_date.present? &&
       start_date.between?(Time.zone.today, one_month_time)
