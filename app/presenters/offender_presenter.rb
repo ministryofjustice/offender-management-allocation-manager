@@ -7,7 +7,7 @@ class OffenderPresenter
            :sentence_start_date, :team, :prison_id,
            :home_detention_curfew_eligibility_date, :tariff_date,
            :date_of_birth, :release_date, :parole_eligibility_date,
-           :welsh_offender, :case_allocation, :earliest_release_date,
+           :welsh_offender, :case_allocation,
            :category_code, :conditional_release_date, :automatic_release_date,
            :awaiting_allocation_for, :allocated_pom_name, :allocation_date,
            :tier, :parole_review_date, :crn, :convicted_status, :convicted?, :ldu,
@@ -17,6 +17,10 @@ class OffenderPresenter
   def initialize(offender, responsibility)
     @offender = offender
     @responsibility = responsibility
+  end
+
+  def earliest_release_date
+    HandoverDateService.earliest_release_date(@offender.sentence)
   end
 
   def pom_responsibility

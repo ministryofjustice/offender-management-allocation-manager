@@ -15,9 +15,9 @@ class ResponsibilityService
   def self.calculate_pom_responsibility(offender)
     if offender.immigration_case? || open_prison_nps_offender?(offender)
       SUPPORTING
-    elsif offender.earliest_release_date.nil?
+    elsif HandoverDateService.earliest_release_date(offender).nil?
       RESPONSIBLE
-    elsif offender.indeterminate_sentence? && offender.earliest_release_date < Time.zone.today
+    elsif offender.indeterminate_sentence? && HandoverDateService.earliest_release_date(offender) < Time.zone.today
       RESPONSIBLE
     else
       standard_rules(offender)
@@ -60,7 +60,7 @@ private
   private
 
     def release_date_gt_10_mths?(offender)
-      offender.earliest_release_date >
+      HandoverDateService.earliest_release_date(offender) >
         DateTime.now.utc.to_date + 10.months
     end
   end
@@ -91,7 +91,7 @@ private
     end
 
     def release_date_gt_15_mths_at_policy_date?(offender)
-      offender.earliest_release_date >
+      HandoverDateService.earliest_release_date(offender) >
         WELSH_POLICY_START_DATE + 15.months
     end
   end
@@ -133,7 +133,7 @@ private
     end
 
     def release_date_gt_mths_at_policy_date?(offender, threshold)
-      offender.earliest_release_date >
+      HandoverDateService.earliest_release_date(offender) >
         ORIGINAL_ENGLISH_POLICY_START_DATE + threshold
     end
   end
@@ -167,7 +167,7 @@ private
   end
 
   def self.release_date_gt_12_weeks?(offender)
-    offender.earliest_release_date >
+    HandoverDateService.earliest_release_date(offender) >
       DateTime.now.utc.to_date + 12.weeks
   end
 end

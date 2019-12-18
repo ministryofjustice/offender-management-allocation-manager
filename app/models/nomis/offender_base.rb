@@ -80,10 +80,6 @@ module Nomis
       sentence_type_code == 'DET'
     end
 
-    def earliest_release_date
-      sentence.earliest_release_date
-    end
-
     def pom_responsibility
       ResponsibilityService.calculate_pom_responsibility(self)
     end

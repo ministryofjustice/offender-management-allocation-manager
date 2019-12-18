@@ -14,7 +14,7 @@ describe HandoverDateService do
       context 'with normal allocation' do
         let(:release_date) { Date.new(2020, 8, 30) }
 
-        let(:offender) { OpenStruct.new(indeterminate_sentence?: indeterminate, nps_case?: true, earliest_release_date: release_date) }
+        let(:offender) { OpenStruct.new(indeterminate_sentence?: indeterminate, nps_case?: true, release_date: release_date) }
 
         context 'with determinate sentence' do
           let(:indeterminate) { false }
@@ -45,15 +45,24 @@ describe HandoverDateService do
 
   describe '#responsibility_handover_date' do
     context 'when CRC' do
-      before do
-        stub_const("CRCHandoverData", Struct.new(:nps_case?, :home_detention_curfew_eligibility_date, :conditional_release_date, :earliest_release_date, :result))
+      # rubocop:disable RSpec/LeakyConstantDeclaration
+      CrcHandoverData = Struct.new(:nps_case?, :home_detention_curfew_eligibility_date, :conditional_release_date, :release_date, :result) do
+        def tariff_date
+          nil
+        end
 
+        def parole_eligibility_date
+          nil
+        end
+      end
+      # rubocop:enable RSpec/LeakyConstantDeclaration
+      before do
         stub_const("CRC_CASES", [
-            CRCHandoverData.new(false, Date.new(2019, 9, 30), Date.new(2019, 8, 1), Date.new(2019, 8, 1), Date.new(2019, 5, 9)), # 12 weeks before CRD
-            CRCHandoverData.new(false, Date.new(2019, 8, 1), Date.new(2019, 8, 12), Date.new(2019, 8, 1), Date.new(2019, 5, 9)), # 12 weeks before HDC date
-            CRCHandoverData.new(false, nil, Date.new(2019, 8, 1), Date.new(2019, 5, 9), Date.new(2019, 5, 9)), # 12 weeks before CRD date
-            CRCHandoverData.new(false, Date.new(2019, 8, 1), nil, Date.new(2019, 8, 1), Date.new(2019, 5, 9)), # 12 weeks before HDC date
-            CRCHandoverData.new(false, nil, nil, nil, nil) # no handover date
+          CrcHandoverData.new(false, Date.new(2019, 9, 30), Date.new(2019, 8, 1), Date.new(2019, 8, 1), Date.new(2019, 5, 9)), # 12 weeks before CRD
+          CrcHandoverData.new(false, Date.new(2019, 8, 1), Date.new(2019, 8, 12), Date.new(2019, 8, 1), Date.new(2019, 5, 9)), # 12 weeks before HDC date
+          CrcHandoverData.new(false, nil, Date.new(2019, 8, 1), Date.new(2019, 5, 9), Date.new(2019, 5, 9)), # 12 weeks before CRD date
+          CrcHandoverData.new(false, Date.new(2019, 8, 1), nil, Date.new(2019, 8, 1), Date.new(2019, 5, 9)), # 12 weeks before HDC date
+          CrcHandoverData.new(false, nil, nil, nil, nil) # no handover date
         ])
       end
 
@@ -73,7 +82,7 @@ describe HandoverDateService do
                          early_allocation?: true,
                          conditional_release_date: crd,
                          automatic_release_date: ard,
-                         earliest_release_date: erd)
+                         release_date: erd)
         }
 
         context 'when CRD earliest' do
@@ -125,7 +134,7 @@ describe HandoverDateService do
                            automatic_release_date: Date.new(2020, 8, 16),
                            parole_eligibility_date: parole_date,
                            tariff_date: Date.new(2020, 11, 1),
-                           earliest_release_date: Date.new(2020, 8, 16))
+                           release_date: Date.new(2020, 8, 16))
           }
 
           context 'with parole date' do
@@ -207,7 +216,7 @@ describe HandoverDateService do
                            nps_case?: true,
                            parole_eligibility_date: parole_date,
                            tariff_date: tariff_date,
-                           earliest_release_date: erd)
+                           release_date: erd)
           }
 
           context 'with tariff date earliest' do

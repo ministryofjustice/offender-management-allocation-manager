@@ -2,10 +2,9 @@
 
 # This class is a 'presenter' designed to prevent clients having to know whether
 # a field lives in the allocation or sentence details when both are returned
-# e.g. PomCaseload.new().allocations
 #
 class AllocatedOffender
-  delegate :last_name, :full_name, :earliest_release_date,
+  delegate :last_name, :full_name,
            :sentence_start_date, :tier, to: :@offender
   delegate :updated_at, :nomis_offender_id, :primary_pom_allocated_at,
            to: :@allocation
@@ -16,6 +15,10 @@ class AllocatedOffender
     @staff_id = staff_id
     @allocation = allocation
     @offender = offender
+  end
+
+  def earliest_release_date
+    HandoverDateService.earliest_release_date(@offender)
   end
 
   def pom_responsibility

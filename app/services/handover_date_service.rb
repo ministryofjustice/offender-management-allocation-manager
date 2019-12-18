@@ -4,7 +4,7 @@ class HandoverDateService
   HandoverData = Struct.new :start_date, :handover_date, :reason
 
   def self.handover(offender)
-    if offender.earliest_release_date.nil?
+    if earliest_release_date(offender).nil?
       HandoverData.new nil, nil, 'No earliest release date'
     elsif offender.nps_case?
       date, reason = nps_handover_date(offender)
@@ -14,15 +14,23 @@ class HandoverDateService
     end
   end
 
+  def self.earliest_release_date(offender)
+    [
+      offender.release_date,
+      offender.parole_eligibility_date,
+      offender.tariff_date
+    ].compact.min
+  end
+
 private
 
   def self.nps_start_date(offender)
     if offender.early_allocation?
       early_allocation_handover_date(offender)
     elsif offender.indeterminate_sentence?
-      offender.earliest_release_date - 8.months
+      earliest_release_date(offender) - 8.months
     else
-      offender.earliest_release_date - (7.months + 15.days)
+      earliest_release_date(offender) - (7.months + 15.days)
     end
   end
 

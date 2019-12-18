@@ -24,17 +24,6 @@ module Nomis
       @conditional_release_override_date.presence || @conditional_release_date
     end
 
-    def earliest_release_date
-      dates = [
-          release_date,
-          parole_eligibility_date,
-          tariff_date
-      ].compact
-      return nil if dates.empty?
-
-      dates.min.to_date
-    end
-
     def full_name
       "#{last_name}, #{first_name}".titleize
     end

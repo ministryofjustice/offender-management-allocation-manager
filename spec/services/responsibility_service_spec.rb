@@ -20,7 +20,7 @@ describe ResponsibilityService do
       let(:offender) {
         OpenStruct.new indeterminate_sentence?: true,
                        recalled?: false,
-                       earliest_release_date: Time.zone.today - 1.year,
+                       release_date: Time.zone.today - 1.year,
                        sentenced?: true
       }
 
@@ -37,7 +37,7 @@ describe ResponsibilityService do
                        nps_case?: true,
                        indeterminate_sentence?: true,
                        recalled?: false,
-                       earliest_release_date: Time.zone.today - 1.year,
+                       release_date: Time.zone.today - 1.year,
                        sentenced?: true
       }
 
@@ -55,7 +55,7 @@ describe ResponsibilityService do
                        indeterminate_sentence?: false,
                        recalled?: recalled,
                        sentence_start_date: start_date,
-                       earliest_release_date: release_date,
+                       release_date: release_date,
                        parole_eligibility_date: parole_date,
                        sentenced?: true,
                        prison_id: prison
@@ -317,7 +317,7 @@ describe ResponsibilityService do
         let(:offender) {
           OpenStruct.new welsh_offender: true,
                          recalled?: true,
-                         earliest_release_date: Date.new(2021, 1, 2),
+                         release_date: Date.new(2021, 1, 2),
                          sentenced?: true
         }
 
