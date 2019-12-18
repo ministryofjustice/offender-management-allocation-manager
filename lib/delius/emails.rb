@@ -33,8 +33,7 @@ module Delius
     end
 
     def latest_attachment
-      messages = sorted_mail_messages
-      messages.detect do |msg|
+      sorted_mail_messages.detect do |msg|
         attachment = zip_attachment(msg)
         next if attachment.blank?
 
@@ -43,14 +42,11 @@ module Delius
     end
 
     def cleanup
-      # Mark all but the latest five messages as \Deleted and then
-      # force the server to remove them (rather than wait for the
-      # deletion when the connection is closed)
-      ids = sorted_imap_ids
-      old_message_ids = ids - ids.first(5)
-      old_message_ids.each { |old_id|
-        @imap.store(old_id, '+FLAGS', [:Deleted])
-      }
+      # In GMail, you have to move things to the Bin folder rather than delete them
+      old_uids.each do |old_id|
+        @imap.move(old_id, '[Gmail]/Bin')
+      end
+      @imap.expunge
     end
 
     def connected?
@@ -70,28 +66,30 @@ module Delius
       @imap.disconnect
     end
 
-    def uids
-      @imap.search('ALL')
+    def recent_uids
+      @imap.search(['SINCE', last_week])
+    end
+
+    def old_uids
+      @imap.search(['BEFORE', last_week])
     end
 
     def sorted_mail_messages
       # Obtain a list of messages in RFC822 format so that they can later
       # be sorted by date.  Unfortunately gmail IMAP claims not to support
       # the 'SORT' instruction.
-      messages = @imap.fetch(uids, %w[RFC822]).map { |imap_message|
+      messages = @imap.fetch(recent_uids, %w[RFC822]).map { |imap_message|
         Mail.read_from_string imap_message.attr['RFC822']
       }
 
       messages.sort_by(&:date).reverse
     end
 
-    def sorted_imap_ids
-      # Obtain a list of IMAP ids. Unfortunately gmail IMAP claims not to support
-      # the 'SORT' instruction.
-      @imap.fetch(uids, %w[RFC822]).sort_by { |imap_message|
-        mail = Mail.read_from_string imap_message.attr['RFC822']
-        mail.date
-      }.reverse
+  private
+
+    # IMAP requires dates in the form dd-MON-yyyy e.g 4-Dec-2019
+    def last_week
+      (Time.zone.today - 7.days).strftime('%d-%b-%Y')
     end
   end
 end

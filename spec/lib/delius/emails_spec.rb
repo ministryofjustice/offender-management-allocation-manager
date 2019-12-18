@@ -28,7 +28,7 @@ describe Delius::Emails do
   it 'can get imap ids for a folder' do
     described_class.connect(username, password) { |emails|
       emails.folder = 'sorted_small'
-      ids = emails.uids
+      ids = emails.recent_uids
 
       expect(ids.count).to eq(3)
       expect(ids.sort).to eq([1, 2, 3])
