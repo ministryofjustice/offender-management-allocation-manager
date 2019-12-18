@@ -17,17 +17,16 @@ describe Delius::Emails do
   end
 
   it 'can handle failed login' do
-    expect{ described_class.connect('fake', 'incorrect') }.to raise_error(Net::IMAP::BadResponseError)
+    expect{ described_class.connect('fake', 'incorrect', 'folder') }.to raise_error(Net::IMAP::BadResponseError)
   end
 
   it 'can login' do
-    described_class.connect(username, password) { |emails|
+    described_class.connect(username, password, 'folder') { |emails|
     }
   end
 
   it 'can get imap ids for a folder' do
-    described_class.connect(username, password) { |emails|
-      emails.folder = 'sorted_small'
+    described_class.connect(username, password, 'sorted_small') { |emails|
       ids = emails.recent_uids
 
       expect(ids.count).to eq(3)
@@ -36,8 +35,7 @@ describe Delius::Emails do
   end
 
   it 'can sort messages in a folder' do
-    described_class.connect(username, password) { |emails|
-      emails.folder = 'sorted_small'
+    described_class.connect(username, password, 'sorted_small') { |emails|
       messages = emails.sorted_mail_messages
 
       expect(messages.count).to eq(3)
@@ -46,8 +44,7 @@ describe Delius::Emails do
   end
 
   it 'can retrieve an attachment' do
-    described_class.connect(username, password) { |emails|
-      emails.folder = 'sorted_small'
+    described_class.connect(username, password, 'sorted_small') { |emails|
       attachment = emails.latest_attachment
 
       expect(attachment).not_to be_nil
@@ -55,8 +52,7 @@ describe Delius::Emails do
   end
 
   it 'can work with no attachment' do
-    described_class.connect(username, password) { |emails|
-      emails.folder = 'no_attachments'
+    described_class.connect(username, password, 'no_attachments') { |emails|
       attachment = emails.latest_attachment
 
       expect(attachment).to be_nil
@@ -64,15 +60,11 @@ describe Delius::Emails do
   end
 
   it 'can cleanup without crashing' do
-    described_class.connect(username, password) { |emails|
-      emails.folder = 'sorted_small'
-      emails.cleanup
-    }
+    described_class.connect(username, password, 'sorted_small', &:cleanup)
   end
 
   it 'can check for connected' do
-    described_class.connect(username, password) { |emails|
-      emails.folder = 'sorted_small'
+    described_class.connect(username, password, 'sorted_small') { |emails|
       expect(emails.connected?).to eq(true)
     }
   end

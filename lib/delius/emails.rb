@@ -5,8 +5,8 @@ require 'mail'
 
 module Delius
   class Emails
-    def self.connect(username, password)
-      emails = Emails.new(username, password)
+    def self.connect(username, password, folder)
+      emails = Emails.new(username, password, folder)
 
       return emails unless block_given?
 
@@ -17,19 +17,16 @@ module Delius
       end
     end
 
-    def initialize(username, password)
+    def initialize(username, password, folder)
       @imap = Net::IMAP.new('imap.googlemail.com', 993, true)
       begin
         @imap.login(username, password)
+        @imap.examine(folder)
       rescue Net::IMAP::BadResponseError => e
         Rails.logger.error('Failed to log on to IMAP with supplied credentials')
         close
         raise e
       end
-    end
-
-    def folder=(folder)
-      @imap.examine(folder)
     end
 
     def latest_attachment
