@@ -43,7 +43,6 @@ module Delius
       old_uids.each do |old_id|
         @imap.move(old_id, '[Gmail]/Bin')
       end
-      @imap.expunge
     end
 
     def connected?
