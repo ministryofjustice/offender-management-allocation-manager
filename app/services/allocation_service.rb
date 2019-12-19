@@ -79,15 +79,6 @@ class AllocationService
   end
   # rubocop:enable Metrics/MethodLength
 
-  def self.all_allocations
-    Allocation.all.map { |a|
-      [
-        a[:nomis_offender_id],
-        a
-      ]
-    }.to_h
-  end
-
   def self.active_allocations(nomis_offender_ids, prison)
     Allocation.active(nomis_offender_ids, prison).map { |a|
       [
