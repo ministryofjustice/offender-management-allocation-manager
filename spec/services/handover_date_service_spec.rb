@@ -7,7 +7,7 @@ describe HandoverDateService do
         let(:offender) { OpenStruct.new(nps_case?: true, early_allocation?: true) }
 
         it 'is not set' do
-          expect(described_class.handover_start_date(offender)[0]).to be_nil
+          expect(described_class.handover(offender).start_date).to be_nil
         end
       end
 
@@ -20,7 +20,7 @@ describe HandoverDateService do
           let(:indeterminate) { false }
 
           it 'is 7.5 months before release date' do
-            expect(described_class.handover_start_date(offender)[0]).to eq(Date.new(2020, 1, 15))
+            expect(described_class.handover(offender).start_date).to eq(Date.new(2020, 1, 15))
           end
         end
 
@@ -28,7 +28,7 @@ describe HandoverDateService do
           let(:indeterminate) { true }
 
           it 'is 8 months before release date' do
-            expect(described_class.handover_start_date(offender)[0]).to eq(Date.new(2019, 12, 30))
+            expect(described_class.handover(offender).start_date).to eq(Date.new(2019, 12, 30))
           end
         end
       end
@@ -38,7 +38,7 @@ describe HandoverDateService do
       let(:offender) { OpenStruct.new(nps_case?: false) }
 
       it 'is not set' do
-        expect(described_class.handover_start_date(offender)[0]).to be_nil
+        expect(described_class.handover(offender).start_date).to be_nil
       end
     end
   end
@@ -60,7 +60,7 @@ describe HandoverDateService do
       context 'with tablular data source' do
         it 'returns the specified result' do
           CRC_CASES.each do |data|
-            expect(described_class.responsibility_handover_date(data)[0]).to eq(data.result)
+            expect(described_class.handover(data).handover_date).to eq(data.result)
           end
         end
       end
@@ -82,7 +82,7 @@ describe HandoverDateService do
           let(:erd) { Date.new(2019, 7, 1) }
 
           it 'is 15 months before CRD' do
-            expect(described_class.responsibility_handover_date(offender)[0]).to eq(Date.new(2018, 4, 1))
+            expect(described_class.handover(offender).handover_date).to eq(Date.new(2018, 4, 1))
           end
         end
 
@@ -92,7 +92,7 @@ describe HandoverDateService do
           let(:erd) { Date.new(2019, 8, 1) }
 
           it 'is 15 months before ARD' do
-            expect(described_class.responsibility_handover_date(offender)[0]).to eq(Date.new(2018, 5, 1))
+            expect(described_class.handover(offender).handover_date).to eq(Date.new(2018, 5, 1))
           end
         end
 
@@ -102,7 +102,7 @@ describe HandoverDateService do
           let(:erd) { nil }
 
           it 'cannot be calculated' do
-            expect(described_class.responsibility_handover_date(offender)[0]).to be_nil
+            expect(described_class.handover(offender).handover_date).to be_nil
           end
         end
       end
@@ -133,7 +133,7 @@ describe HandoverDateService do
             let(:erd) { Date.new(2019, 9, 30) }
 
             it 'is 8 months before parole date' do
-              expect(described_class.responsibility_handover_date(offender)[0]).to eq(Date.new(2019, 1, 30))
+              expect(described_class.handover(offender).handover_date).to eq(Date.new(2019, 1, 30))
             end
           end
 
@@ -143,7 +143,7 @@ describe HandoverDateService do
 
               context 'when crd before ard' do
                 it 'is 4.5 months before CRD' do
-                  expect(described_class.responsibility_handover_date(offender)[0]).to eq(Date.new(2020, 3, 1))
+                  expect(described_class.handover(offender).handover_date).to eq(Date.new(2020, 3, 1))
                 end
               end
             end
@@ -154,7 +154,7 @@ describe HandoverDateService do
 
               context 'when crd before ard' do
                 it 'is 4.5 months before CRD' do
-                  expect(described_class.responsibility_handover_date(offender)[0]).to eq(Date.new(2020, 3, 1))
+                  expect(described_class.handover(offender).handover_date).to eq(Date.new(2020, 3, 1))
                 end
               end
 
@@ -162,7 +162,7 @@ describe HandoverDateService do
                 let(:crd) { Date.new(2020, 8, 17) }
 
                 it 'is 4.5 months before ARD' do
-                  expect(described_class.responsibility_handover_date(offender)[0]).to eq(Date.new(2020, 4, 1))
+                  expect(described_class.handover(offender).handover_date).to eq(Date.new(2020, 4, 1))
                 end
               end
 
@@ -170,7 +170,7 @@ describe HandoverDateService do
                 let(:hdc_date) { Date.new(2020, 2, 28) }
 
                 it 'is on HDC date' do
-                  expect(described_class.responsibility_handover_date(offender)[0]).to eq(Date.new(2020, 2, 28))
+                  expect(described_class.handover(offender).handover_date).to eq(Date.new(2020, 2, 28))
                 end
               end
             end
@@ -179,7 +179,7 @@ describe HandoverDateService do
               let(:mappa_level) { 1 }
 
               it 'is 4.5 months before CRD/ARD date or on HDC date' do
-                expect(described_class.responsibility_handover_date(offender)[0]).to eq(Date.new(2020, 3, 1))
+                expect(described_class.handover(offender).handover_date).to eq(Date.new(2020, 3, 1))
               end
             end
 
@@ -187,7 +187,7 @@ describe HandoverDateService do
               let(:mappa_level) { 2 }
 
               it 'is 7.5 months before CRD/ARD date' do
-                expect(described_class.responsibility_handover_date(offender)[0]).to eq(Date.new(2019, 12, 1))
+                expect(described_class.handover(offender).handover_date).to eq(Date.new(2019, 12, 1))
               end
             end
 
@@ -195,7 +195,7 @@ describe HandoverDateService do
               let(:mappa_level) { 3 }
 
               it 'is 7.5 months before CRD/ARD date' do
-                expect(described_class.responsibility_handover_date(offender)[0]).to eq(Date.new(2019, 12, 1))
+                expect(described_class.handover(offender).handover_date).to eq(Date.new(2019, 12, 1))
               end
             end
           end
@@ -216,7 +216,7 @@ describe HandoverDateService do
             let(:erd) { Date.new(2020, 11, 1) }
 
             it 'is 8 months before tariff date' do
-              expect(described_class.responsibility_handover_date(offender)[0]).to eq(Date.new(2020, 3, 1))
+              expect(described_class.handover(offender).handover_date).to eq(Date.new(2020, 3, 1))
             end
           end
 
@@ -226,7 +226,7 @@ describe HandoverDateService do
             let(:erd) { Date.new(2020, 10, 1) }
 
             it 'is 8 months before parole date' do
-              expect(described_class.responsibility_handover_date(offender)[0]).to eq(Date.new(2020, 2, 1))
+              expect(described_class.handover(offender).handover_date).to eq(Date.new(2020, 2, 1))
             end
           end
 
@@ -236,7 +236,7 @@ describe HandoverDateService do
             let(:erd) { nil }
 
             it 'cannot be calculated' do
-              expect(described_class.responsibility_handover_date(offender)[0]).to be_nil
+              expect(described_class.handover(offender).handover_date).to be_nil
             end
           end
         end

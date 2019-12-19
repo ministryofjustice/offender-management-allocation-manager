@@ -1,33 +1,30 @@
 # frozen_string_literal: true
 
 class HandoverDateService
-  def self.handover_start_date(offender)
-    return [nil, 'No earliest release date'] if offender.earliest_release_date.nil?
+  HandoverData = Struct.new :start_date, :handover_date, :reason
 
-    if offender.nps_case?
-      if offender.early_allocation?
-        [early_allocation_handover_date(offender), 'Early Allocation']
-      elsif offender.indeterminate_sentence?
-        [offender.earliest_release_date - 8.months, 'NPS Indeterminate']
-      else
-        [offender.earliest_release_date - (7.months + 15.days), 'NPS Determinate']
-      end
-    else
-      [nil, 'CRC Case']
-    end
-  end
-
-  def self.responsibility_handover_date(offender)
+  def self.handover(offender)
     if offender.earliest_release_date.nil?
-      [nil, 'No earliest release date']
+      HandoverData.new nil, nil, 'No earliest release date'
     elsif offender.nps_case?
-      nps_handover_date(offender)
+      date, reason = nps_handover_date(offender)
+      HandoverData.new nps_start_date(offender), date, reason
     else
-      [crc_handover_date(offender), 'CRC']
+      HandoverData.new nil, crc_handover_date(offender), 'CRC Case'
     end
   end
 
 private
+
+  def self.nps_start_date(offender)
+    if offender.early_allocation?
+      early_allocation_handover_date(offender)
+    elsif offender.indeterminate_sentence?
+      offender.earliest_release_date - 8.months
+    else
+      offender.earliest_release_date - (7.months + 15.days)
+    end
+  end
 
   def self.crc_handover_date(offender)
     [

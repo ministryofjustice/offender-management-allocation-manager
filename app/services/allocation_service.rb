@@ -98,14 +98,9 @@ class AllocationService
   end
 
   def self.allocation_history_pom_emails(history)
-    pom_ids = history.map(&:primary_pom_nomis_id).uniq.compact
-    pom_emails = {}
+    pom_ids = history.map { |h| [h.primary_pom_nomis_id, h.secondary_pom_nomis_id] }.flatten.compact.uniq
 
-    pom_ids.each do |pom_id|
-      pom_emails[pom_id] = PrisonOffenderManagerService.get_pom_emails(pom_id).first
-    end
-
-    pom_emails
+    pom_ids.map { |pom_id|  [pom_id, PrisonOffenderManagerService.get_pom_emails(pom_id).first] }.to_h
   end
 
   def self.create_override(params)
@@ -137,6 +132,8 @@ private
     DeliusData.find_by(noms_no: offender_id).try(:offender_manager)
   end
 
+  # Gets the versions in *forward* order - so often we want to reverse
+  # this list as we're interested in recent rather than ancient history
   def self.get_versions_for(allocation)
     allocation.versions.map { |version|
       # 'create' events do not have '#reify' method
