@@ -97,6 +97,10 @@ class MockIMAP
     }
   end
 
+  def move(*args); end
+
+  def expunge; end
+
   def disconnect
     @connected = false
   end
