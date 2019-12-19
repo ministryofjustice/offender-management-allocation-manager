@@ -21,7 +21,7 @@ FactoryBot.define do
     # offender numbers are of the form <letter><4 numbers><2 letters>
     sequence(:nomis_offender_id) do |seq|
       number = seq / 26 + 1000
-      letter = seq % 26
+      letter = ('A'..'Z').to_a[seq % 26]
       "T#{number}T#{letter}"
     end
 
