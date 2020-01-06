@@ -26,8 +26,8 @@
       <tr class="govuk-table__row offender_row_<%= i %>">
         <td aria-label="Prisoner name" class="govuk-table__cell "><%= offender.full_name %></td>
         <td aria-label="Prisoner number" class="govuk-table__cell "><%= offender.offender_no %></td>
-        <td aria-label="Handover start date" class="govuk-table__cell "><%= format_date(offender.handover_start_date.first) %></td>
-        <td aria-label="Responsibility handover" class="govuk-table__cell "><%= format_date(offender.responsibility_handover_date.first) %></td>
+        <td aria-label="Handover start date" class="govuk-table__cell "><%= format_date(offender.handover_start_date) %></td>
+        <td aria-label="Responsibility handover" class="govuk-table__cell "><%= format_date(offender.responsibility_handover_date) %></td>
         <td aria-label="Release date" class="govuk-table__cell "><%= format_date(offender.earliest_release_date) %></td>
         <td aria-label="Role" class="govuk-table__cell "><%= offender.pom_responsibility %></td>
         <td aria-label="Action" class="govuk-table__cell ">

@@ -18,13 +18,14 @@ FactoryBot.define do
       true
     end
 
-    nomis_offender_id do
-      Faker::Alphanumeric.alpha(number: 10)
+    # offender numbers are of the form <letter><4 numbers><2 letters>
+    sequence(:nomis_offender_id) do |seq|
+      number = seq / 26 + 1000
+      letter = ('A'..'Z').to_a[seq % 26]
+      "T#{number}T#{letter}"
     end
 
     association :team, code: '1234', name: 'A nice team'
-
-    association :local_divisional_unit, code: '123', name: "LDU Name", email_address: 'testldu@example.org'
 
     crn { Faker::Alphanumeric.alpha(number: 10) }
   end

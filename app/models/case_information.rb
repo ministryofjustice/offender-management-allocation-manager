@@ -3,13 +3,17 @@
 class CaseInformation < ApplicationRecord
   self.table_name = 'case_information'
 
-  belongs_to :local_divisional_unit, optional: true
   belongs_to :team, optional: true
+
   has_many :early_allocations,
            foreign_key: :nomis_offender_id,
            primary_key: :nomis_offender_id,
            inverse_of: :case_information,
            dependent: :destroy
+
+  def local_divisional_unit
+    team.try(:local_divisional_unit)
+  end
 
   # We only normally show/edit the most recent early allocation
   def latest_early_allocation
