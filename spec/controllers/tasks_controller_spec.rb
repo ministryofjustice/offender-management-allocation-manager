@@ -108,7 +108,7 @@ RSpec.describe TasksController, type: :controller do
       stub_offender(offender_no, booking_number: 754_206)
 
       # Ensure only one of our offenders has missing data and that G7514GW (indeterminate) has a PRD
-      create(:case_information, nomis_offender_id: offender_no, tier: 'A', local_divisional_unit: nil)
+      create(:case_information, nomis_offender_id: offender_no, tier: 'A', team: nil)
       create(:case_information, nomis_offender_id: 'G1234AB', tier: 'A', mappa_level: 1)
       create(:case_information, nomis_offender_id: 'G1234GG', tier: 'A', mappa_level: 1)
       create(:case_information, nomis_offender_id: 'G7514GW', tier: 'A', mappa_level: 1, parole_review_date: next_week)

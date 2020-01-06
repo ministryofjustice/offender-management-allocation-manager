@@ -5,6 +5,7 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
 
   let(:nomis_offender_id) { 'G3462VT' }
   let(:nomis_staff_id) { 485_637 }
+  let(:other_staff_id) { 485_636 }
   let(:open_prison_code) { 'HDI' }
   let(:closed_prison_code) { 'LEI' }
   let(:poms) {
@@ -101,7 +102,9 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
 
     # Create an allocation where the offender is allocated, and then deallocate so we can
     # test finding the last pom that was allocated to this offender ....
-    alloc = create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id, prison: 'LEI', primary_pom_name: 'Primary POMName')
+    alloc = create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: other_staff_id, prison: 'LEI',
+                                primary_pom_name: 'Primary POMName')
+    alloc.update(primary_pom_nomis_id: nomis_staff_id)
     alloc.deallocate_offender(Allocation::OFFENDER_TRANSFERRED)
 
     fakejob = double

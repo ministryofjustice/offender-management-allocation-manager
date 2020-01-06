@@ -7,14 +7,13 @@ class DeliusImportJob < ApplicationJob
   queue_as :default
 
   FIELDS = [
-      :crn, :pnc_no, :noms_no, :fullname, :tier, :roh_cds,
-      :offender_manager, :org_private_ind, :org,
-      :provider, :provider_code,
-      :ldu, :ldu_code,
-      :team, :team_code,
-      :mappa, :mappa_levels, :date_of_birth
-    ].freeze
-
+    :crn, :pnc_no, :noms_no, :fullname, :tier, :roh_cds,
+    :offender_manager, :org_private_ind, :org,
+    :provider, :provider_code,
+    :ldu, :ldu_code,
+    :team, :team_code,
+    :mappa, :mappa_levels, :date_of_birth
+  ].freeze
   def perform
     ActiveRecord::Base.connection.disable_query_cache!
 
@@ -22,31 +21,36 @@ class DeliusImportJob < ApplicationJob
     password = ENV['DELIUS_EMAIL_PASSWORD']
     folder = ENV['DELIUS_EMAIL_FOLDER']
 
-    Rails.logger.info('[DELIUS] Retrieving most recent email')
+    Rails.logger.info("[DELIUS] Set IMAP folder to #{folder}")
 
     decoded_attachment_content = nil
+    Delius::Emails.connect(username, password, folder) do |emails|
+      decoded_attachment_content = process_emails(emails)
+    end
+    process_attachment(decoded_attachment_content) if decoded_attachment_content.present?
+  end
 
-    Delius::Emails.connect(username, password) do |emails|
-      Rails.logger.info("[DELIUS] Set IMAP folder to #{folder}")
-      emails.folder = folder
+  def process_emails(emails)
+    decoded_attachment_content = nil
+    Rails.logger.info('[DELIUS] Fetching latest email attachment')
+    attachment = emails.latest_attachment
 
-      Rails.logger.info('[DELIUS] Fetching latest email attachment')
-      attachment = emails.latest_attachment
-
-      if attachment.present?
-        # At this point attachment.body is the base64 encoded attachment
-        # and so we want to store the un-encoded version ready for
-        # processing. We want to store the bytes rather than attempt
-        # to either convert to string or allow ruby to convert to
-        # string in case there are invalid UTF-8 markers in the bytearray
-        decoded_attachment_content = attachment.body.decoded.bytes
-        Rails.logger.info('[DELIUS] Attachment retrieved')
-      else
-        Rails.logger.error('[DELIUS] Unable to find an attachment')
-      end
+    if attachment.present?
+      # At this point attachment.body is the base64 encoded attachment
+      # and so we want to store the un-encoded version ready for
+      # processing. We want to store the bytes rather than attempt
+      # to either convert to string or allow ruby to convert to
+      # string in case there are invalid UTF-8 markers in the bytearray
+      decoded_attachment_content = attachment.body.decoded.bytes
+      Rails.logger.info('[DELIUS] Attachment retrieved')
+    else
+      Rails.logger.error('[DELIUS] Unable to find an attachment')
     end
 
-    process_attachment(decoded_attachment_content) if decoded_attachment_content.present?
+    Rails.logger.info('[DELIUS] cleaning up inbox')
+    emails.cleanup
+    Rails.logger.info('[DELIUS] cleaned inbox')
+    decoded_attachment_content
   end
 
 private

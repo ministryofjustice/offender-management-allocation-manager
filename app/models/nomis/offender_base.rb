@@ -125,11 +125,15 @@ module Nomis
     end
 
     def handover_start_date
-      HandoverDateService.handover_start_date(self)
+      handover.start_date
+    end
+
+    def handover_reason
+      handover.reason
     end
 
     def responsibility_handover_date
-      HandoverDateService.responsibility_handover_date(self)
+      handover.handover_date
     end
 
     def load_case_information(record)
@@ -145,6 +149,12 @@ module Nomis
       @parole_review_date = record.parole_review_date
       @early_allocation = record.latest_early_allocation.present? &&
         (record.latest_early_allocation.eligible? || record.latest_early_allocation.community_decision?)
+    end
+
+  private
+
+    def handover
+      @handover ||= HandoverDateService.handover(self)
     end
   end
 end

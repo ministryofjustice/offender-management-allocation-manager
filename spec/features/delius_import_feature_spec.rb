@@ -2,6 +2,9 @@ require 'rails_helper'
 
 # All these tests can use the same VCR cassette as they all visit the same path
 feature 'delius import scenarios', vcr: { cassette_name: :delius_import_scenarios } do
+  let(:ldu) {  create(:local_divisional_unit) }
+  let(:team) { create(:team, local_divisional_unit: ldu) }
+
   before do
     test_strategy = Flipflop::FeatureSet.current.test!
     test_strategy.switch!(:auto_delius_import, true)
@@ -13,7 +16,11 @@ feature 'delius import scenarios', vcr: { cassette_name: :delius_import_scenario
 
   context 'when one delius record' do
     context 'with all data' do
-      let!(:d1) { create(:delius_data) }
+      let!(:d1) {
+        create(:delius_data,
+               team_code: team.shadow_code, team: team.name,
+               ldu_code: ldu.code, ldu: ldu.name)
+      }
 
       before do
         ProcessDeliusDataJob.perform_now d1.noms_no
@@ -30,7 +37,10 @@ feature 'delius import scenarios', vcr: { cassette_name: :delius_import_scenario
 
     context 'without tier' do
       # This NOMIS id needs to appear on the first page of 'missing information'
-      let(:d1) { create(:delius_data, noms_no: 'G2911GD', date_of_birth: '05/06/1974', tier: 'XX') }
+      let(:d1) {
+        create(:delius_data, team_code: team.code, team: team.name,
+                             ldu_code: ldu.code, ldu: ldu.name, noms_no: 'G2911GD', date_of_birth: '05/06/1974', tier: 'XX')
+      }
 
       before do
         ProcessDeliusDataJob.perform_now d1.noms_no
@@ -49,7 +59,10 @@ feature 'delius import scenarios', vcr: { cassette_name: :delius_import_scenario
     end
 
     context 'without provider code' do
-      let(:d1) { create(:delius_data, provider_code: nil) }
+      let(:d1) {
+        create(:delius_data, provider_code: nil, team_code: team.code, team: team.name,
+                             ldu_code: ldu.code, ldu: ldu.name)
+      }
 
       before do
         ProcessDeliusDataJob.perform_now d1.noms_no
@@ -78,8 +91,8 @@ feature 'delius import scenarios', vcr: { cassette_name: :delius_import_scenario
       end
     end
 
-    context 'without team' do
-      let(:d1) { create(:delius_data, team: nil) }
+    context 'with non-existant team' do
+      let(:d1) { create(:delius_data, team_code: 'XXYX') }
 
       before do
         ProcessDeliusDataJob.perform_now d1.noms_no
@@ -104,8 +117,14 @@ feature 'delius import scenarios', vcr: { cassette_name: :delius_import_scenario
   end
 
   context 'when a duplicate noms_no detected' do
-    let!(:d1) { create(:delius_data) }
-    let!(:d2) { create(:delius_data, noms_no: d1.noms_no) }
+    let!(:d1) {
+      create(:delius_data, team_code: team.code, team: team.name,
+                           ldu_code: ldu.code, ldu: ldu.name)
+    }
+    let!(:d2) {
+      create(:delius_data, noms_no: d1.noms_no, team_code: team.code, team: team.name,
+                           ldu_code: ldu.code, ldu: ldu.name)
+    }
 
     before do
       ProcessDeliusDataJob.perform_now d1.noms_no

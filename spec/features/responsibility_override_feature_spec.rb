@@ -13,7 +13,8 @@ feature 'Responsibility override', :versioning do
   context 'when overriding responsibility', :queueing, vcr: { cassette_name: :override_responsibility } do
     before do
       ldu = create(:local_divisional_unit, email_address: 'ldu@test.com')
-      create(:case_information, nomis_offender_id: offender_id, local_divisional_unit: ldu)
+      team = create(:team, local_divisional_unit: ldu)
+      create(:case_information, nomis_offender_id: offender_id, team: team)
     end
 
     context 'with an allocation' do
@@ -68,7 +69,8 @@ feature 'Responsibility override', :versioning do
   context "when override isn't possible due to lack of LDU address", vcr: { cassette_name: :cant_override_responsibility } do
     before do
       ldu = create(:local_divisional_unit, email_address: nil)
-      create(:case_information, nomis_offender_id: offender_id, local_divisional_unit: ldu)
+      team = create(:team, local_divisional_unit: ldu)
+      create(:case_information, nomis_offender_id: offender_id, team: team)
     end
 
     it 'doesnt override' do
