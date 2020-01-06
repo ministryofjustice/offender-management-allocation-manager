@@ -105,16 +105,6 @@ describe AllocationService do
     end
   end
 
-  describe '#all_allocations' do
-    it "Can get all allocations", vcr: { cassette_name: :allocation_service_get_allocations } do
-      allocation = create(:allocation)
-      allocations = described_class.all_allocations
-
-      expect(allocations).to be_instance_of(Hash)
-      expect(allocations[allocation.nomis_offender_id]).to be_kind_of(Allocation)
-    end
-  end
-
   describe '#allocations' do
     it "Can get allocations by prison", vcr: { cassette_name: :allocation_service_get_allocations_by_prison } do
       first_offender_id = 'JSHD000NN'
