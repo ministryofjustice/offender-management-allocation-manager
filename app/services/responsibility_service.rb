@@ -63,11 +63,11 @@ private
       if offender.parole_eligibility_date.present?
         offender.parole_eligibility_date > offender.sentence_start_date + 10.months
       else
-      [
-        offender.conditional_release_date,
-        offender.automatic_release_date
-      ].compact.min >
-        offender.sentence_start_date + 10.months
+        [
+          offender.conditional_release_date,
+          offender.automatic_release_date
+        ].compact.min >
+          offender.sentence_start_date + 10.months
       end
     end
   end

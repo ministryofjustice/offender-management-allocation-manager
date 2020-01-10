@@ -5,12 +5,12 @@ describe ResponsibilityService do
     context 'when a determinate NPS offender (new case)' do
       context 'with more than 10 months left to serve' do
         let(:offender) {
-            OpenStruct.new  conditional_release_date: Date.today + 15.months,
-                            automatic_release_date: Date.today + 14.months,
-                            sentence_start_date: Date.today,
-                            nps_case?: true,
-                            welsh_offender?: false
-          }
+          OpenStruct.new  conditional_release_date: Time.zone.today + 15.months,
+                          automatic_release_date: Time.zone.today + 14.months,
+                          sentence_start_date: Time.zone.today,
+                          nps_case?: true,
+                          welsh_offender?: false
+        }
 
         it 'the POM will be responsible' do
           resp = described_class.calculate_pom_responsibility(offender)
@@ -20,12 +20,12 @@ describe ResponsibilityService do
 
       context 'with less than 10 months left to serve' do
         let(:offender) {
-            OpenStruct.new  conditional_release_date: Date.today + 7.months,
-                            automatic_release_date: Date.today + 6.months,
-                            sentence_start_date: Date.today,
-                            nps_case?: true,
-                            welsh_offender?: false
-          }
+          OpenStruct.new  conditional_release_date: Time.zone.today + 7.months,
+                          automatic_release_date: Time.zone.today + 6.months,
+                          sentence_start_date: Time.zone.today,
+                          nps_case?: true,
+                          welsh_offender?: false
+        }
 
         it 'the POM will be supporting' do
           resp = described_class.calculate_pom_responsibility(offender)
@@ -37,8 +37,8 @@ describe ResponsibilityService do
     context 'when a determinate NPS offender with parole eligibility (new case)' do
       context 'with more than 10 months left to service' do
         let(:offender) {
-          OpenStruct.new  parole_eligibility_date: Date.today + 12.months,
-                          sentence_start_date: Date.today,
+          OpenStruct.new  parole_eligibility_date: Time.zone.today + 12.months,
+                          sentence_start_date: Time.zone.today,
                           nps_case?: true,
                           welsh_offender?: false
         }
@@ -48,10 +48,11 @@ describe ResponsibilityService do
           expect(resp).to eq ResponsibilityService::RESPONSIBLE
         end
       end
+
       context 'with less than 10 months left to serve' do
         let(:offender) {
-          OpenStruct.new  parole_eligibility_date: Date.today + 6.months,
-                          sentence_start_date: Date.today,
+          OpenStruct.new  parole_eligibility_date: Time.zone.today + 6.months,
+                          sentence_start_date: Time.zone.today,
                           nps_case?: true,
                           welsh_offender?: false
         }
@@ -62,9 +63,8 @@ describe ResponsibilityService do
         end
       end
     end
+  end
 end
-end
-
 
 # describe ResponsibilityService do
 #   describe '#calculate_pom_responsibility' do
