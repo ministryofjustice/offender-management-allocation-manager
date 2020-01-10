@@ -407,7 +407,7 @@ GEM
     tilt (2.0.10)
     timecop (0.9.1)
     ttfunk (1.5.1)
-    turbolinks (5.2.0)
+    turbolinks (5.2.1)
       turbolinks-source (~> 5.2)
     turbolinks-source (5.2.0)
     turnout (2.5.0)
