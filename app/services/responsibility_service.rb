@@ -15,8 +15,8 @@ class ResponsibilityService
   def self.calculate_pom_responsibility(offender)
     if offender.immigration_case? || open_prison_nps_offender?(offender)
       SUPPORTING
-    elsif offender.earliest_release_date.nil?
-      RESPONSIBLE
+    # elsif offender.earliest_release_date.nil?
+    #   RESPONSIBLE
     elsif offender.indeterminate_sentence? && offender.earliest_release_date < Time.zone.today
       RESPONSIBLE
     else
@@ -60,8 +60,15 @@ private
   private
 
     def release_date_gt_10_mths?(offender)
-      offender.earliest_release_date >
+      if offender.parole_eligibility_date.present?
+        offender.parole_eligibility_date > offender.sentence_start_date + 10.months
+      else
+      [
+        offender.conditional_release_date,
+        offender.automatic_release_date
+      ].compact.min >
         offender.sentence_start_date + 10.months
+      end
     end
   end
 
