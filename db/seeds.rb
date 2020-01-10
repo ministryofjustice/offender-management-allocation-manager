@@ -51,6 +51,27 @@ ldu3 = LocalDivisionalUnit.find_or_create_by!(
     email_address: nil
 )
 
+team1 = Team.find_or_create_by!(
+    code: "WELSH1",
+    name: "NPS - Wales",
+    shadow_code: "W01",
+    local_divisional_unit: ldu1
+)
+
+team2 = Team.find_or_create_by!(
+    code: "ENG1",
+    name: "NPS - England",
+    shadow_code: "E01",
+    local_divisional_unit: ldu2
+)
+
+team3 = Team.find_or_create_by!(
+    code: "ENG2",
+    name: "NPS - England 2",
+    shadow_code: "E02",
+    local_divisional_unit: ldu3
+)
+
 # The offenders below are those with release dates a few years in the future and can therefore use the
 # responsibility override workflow
 
@@ -59,7 +80,7 @@ CaseInformation.find_or_create_by!(nomis_offender_id: 'G7658UL') do |info|
     info.case_allocation = 'NPS'
     info.welsh_offender = 'Yes'
     info.manual_entry =  true
-    info.local_divisional_unit_id = ldu1.id
+    info.team_id = team1.id
 end
 
 CaseInformation.find_or_create_by!(nomis_offender_id: 'G7517GF') do |info|
@@ -67,7 +88,7 @@ CaseInformation.find_or_create_by!(nomis_offender_id: 'G7517GF') do |info|
     info.case_allocation = 'NPS'
     info.welsh_offender = 'Yes'
     info.manual_entry = true
-    info.local_divisional_unit_id = ldu1.id
+    info.team_id = team2.id
 end
 
 CaseInformation.find_or_create_by!(nomis_offender_id: 'G3536UF') do |info|
@@ -75,7 +96,7 @@ CaseInformation.find_or_create_by!(nomis_offender_id: 'G3536UF') do |info|
   info.case_allocation = 'NPS'
   info.welsh_offender = 'No'
   info.manual_entry = true
-  info.local_divisional_unit_id = ldu2.id
+  info.team_id = team2.id
 end
 
 CaseInformation.find_or_create_by!(nomis_offender_id: 'G2260UO') do |info|
@@ -83,5 +104,5 @@ CaseInformation.find_or_create_by!(nomis_offender_id: 'G2260UO') do |info|
   info.case_allocation = 'NPS'
   info.welsh_offender = 'No'
   info.manual_entry = true
-  info.local_divisional_unit_id = ldu3.id
+  info.team_id = team3.id
 end
