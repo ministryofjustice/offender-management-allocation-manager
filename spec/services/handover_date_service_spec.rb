@@ -13,8 +13,8 @@ describe HandoverDateService do
 
       context 'with normal allocation' do
         let(:release_date) { Date.new(2020, 8, 30) }
-
-        let(:offender) { OpenStruct.new(indeterminate_sentence?: indeterminate, nps_case?: true, earliest_release_date: release_date) }
+        # TODO: This is an interim measure as we have not yet amended the HandoverDateService code
+        let(:offender) { OpenStruct.new(indeterminate_sentence?: indeterminate, nps_case?: true, automatic_release_date: release_date, earliest_release_date: release_date) }
 
         context 'with determinate sentence' do
           let(:indeterminate) { false }

@@ -4,10 +4,14 @@ class HandoverDateService
   HandoverData = Struct.new :start_date, :handover_date, :reason
 
   def self.handover(offender)
-    # if offender.earliest_release_date.nil?
-    #   HandoverData.new nil, nil, 'No earliest release date'
-    # els
-    if offender.nps_case?
+    if offender.recalled?
+      HandoverData.new nil, nil, 'Recall case - no handover date calculation'
+    elsif offender.nps_case? && offender.indeterminate_sentence? && offender.earliest_release_date.nil?
+
+      # if offender.earliest_release_date.nil?
+      HandoverData.new nil, nil, 'No earliest release date'
+
+    elsif offender.nps_case?
       date, reason = nps_handover_date(offender)
       HandoverData.new nps_start_date(offender), date, reason
     else

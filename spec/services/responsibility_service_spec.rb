@@ -12,7 +12,7 @@ describe ResponsibilityService do
                           welsh_offender?: false
         }
 
-        it 'the POM will be responsible' do
+        it 'will show the POM as having a responsible role' do
           resp = described_class.calculate_pom_responsibility(offender)
           expect(resp).to eq ResponsibilityService::RESPONSIBLE
         end
@@ -27,7 +27,7 @@ describe ResponsibilityService do
                           welsh_offender?: false
         }
 
-        it 'the POM will be supporting' do
+        it 'will show the POM as having a supporting role' do
           resp = described_class.calculate_pom_responsibility(offender)
           expect(resp).to eq ResponsibilityService::SUPPORTING
         end
@@ -43,7 +43,7 @@ describe ResponsibilityService do
                           welsh_offender?: false
         }
 
-        it 'the POM will be responsible' do
+        it 'will show the POM as having a responsible role' do
           resp = described_class.calculate_pom_responsibility(offender)
           expect(resp).to eq ResponsibilityService::RESPONSIBLE
         end
@@ -57,9 +57,107 @@ describe ResponsibilityService do
                           welsh_offender?: false
         }
 
-        it 'the POM will be supporting' do
+        it 'will show the POM as having a supporting role' do
           resp = described_class.calculate_pom_responsibility(offender)
           expect(resp).to eq ResponsibilityService::SUPPORTING
+        end
+      end
+    end
+
+    context 'when CRC (new case)' do
+      context 'with less than 12 weeks left to serve with home_detention_curfew_eligibility_date' do
+        let(:offender) {
+          OpenStruct.new  sentence_start_date: Time.zone.today,
+                          home_detention_curfew_eligibility_date: Time.zone.today + 10.weeks,
+                          conditional_release_date: nil,
+                          automatic_release_date: nil,
+                          nps_case?: false,
+                          welsh_offender?: false
+        }
+
+        it 'will show the POM as having a supporting role' do
+          resp = described_class.calculate_pom_responsibility(offender)
+          expect(resp).to eq ResponsibilityService::SUPPORTING
+        end
+      end
+
+      context 'with less than 12 weeks left to serve with conditional_release_date' do
+        let(:offender) {
+          OpenStruct.new  sentence_start_date: Time.zone.today,
+                          home_detention_curfew_eligibility_date: nil,
+                          conditional_release_date: Time.zone.today + 11.weeks,
+                          automatic_release_date: Time.zone.today + 15.weeks,
+                          nps_case?: false,
+                          welsh_offender?: false
+        }
+
+        it 'will show the POM as having a supporting role' do
+          resp = described_class.calculate_pom_responsibility(offender)
+          expect(resp).to eq ResponsibilityService::SUPPORTING
+        end
+      end
+
+      context 'with less than 12 weeks left to serve with home_detention_curfew_actual_date' do
+        let(:offender) {
+          OpenStruct.new  sentence_start_date: Time.zone.today,
+                          home_detention_curfew_actual_date: Time.zone.today + 9.weeks,
+                          conditional_release_date: nil,
+                          automatic_release_date: nil,
+                          nps_case?: false,
+                          welsh_offender?: false
+        }
+
+        it 'will show the POM as having a supporting role' do
+          resp = described_class.calculate_pom_responsibility(offender)
+          expect(resp).to eq ResponsibilityService::SUPPORTING
+        end
+      end
+
+      context 'when more than 12 weeks left to serve with home_detention_curfew_eligibility_date' do
+        let(:offender) {
+          OpenStruct.new  sentence_start_date: Time.zone.today,
+                          home_detention_curfew_eligibility_date: Time.zone.today + 15.weeks,
+                          conditional_release_date: nil,
+                          automatic_release_date: nil,
+                          nps_case?: false,
+                          welsh_offender?: false
+        }
+
+        it 'will show the POM as having a responsible role' do
+          resp = described_class.calculate_pom_responsibility(offender)
+          expect(resp).to eq ResponsibilityService::RESPONSIBLE
+        end
+      end
+
+      context 'when more than 12 weeks left to serve with conditional_release_date' do
+        let(:offender) {
+          OpenStruct.new  sentence_start_date: Time.zone.today,
+                          home_detention_curfew_eligibility_date: nil,
+                          conditional_release_date: Time.zone.today + 14.weeks,
+                          automatic_release_date: Time.zone.today + 15.weeks,
+                          nps_case?: false,
+                          welsh_offender?: false
+        }
+
+        it 'will show the POM as having a responsible role' do
+          resp = described_class.calculate_pom_responsibility(offender)
+          expect(resp).to eq ResponsibilityService::RESPONSIBLE
+        end
+      end
+
+      context 'when more than 12 weeks left to serve with home_detention_curfew_actual_date' do
+        let(:offender) {
+          OpenStruct.new  sentence_start_date: Time.zone.today,
+                          home_detention_curfew_actual_date: Time.zone.today + 14.weeks,
+                          conditional_release_date: nil,
+                          automatic_release_date: nil,
+                          nps_case?: false,
+                          welsh_offender?: false
+        }
+
+        it 'will show the POM as having a responsible role' do
+          resp = described_class.calculate_pom_responsibility(offender)
+          expect(resp).to eq ResponsibilityService::RESPONSIBLE
         end
       end
     end

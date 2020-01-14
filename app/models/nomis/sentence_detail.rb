@@ -6,6 +6,7 @@ module Nomis
 
     attr_accessor :first_name, :last_name,
                   :home_detention_curfew_eligibility_date,
+                  :home_detention_curfew_actual_date,
                   :parole_eligibility_date,
                   :release_date,
                   :sentence_start_date,
@@ -58,6 +59,9 @@ module Nomis
         )
         obj.home_detention_curfew_eligibility_date = deserialise_date(
           payload, 'homeDetentionCurfewEligibilityDate'
+        )
+        obj.home_detention_curfew_actual_date = deserialise_date(
+          payload, 'homeDetentionCurfewActualDate'
         )
         obj.conditional_release_override_date = deserialise_date(
           payload, 'conditionalReleaseOverrideDate'
