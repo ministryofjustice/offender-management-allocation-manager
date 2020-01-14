@@ -259,7 +259,7 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
     end
 
     context 'when tier A offender' do
-      it 'serves recommended POMs' do
+       it 'serves recommended POMs' do
         create(:case_information, nomis_offender_id: offender_no, tier: 'A')
 
         get :new, params: { prison_id: prison, nomis_offender_id: offender_no }

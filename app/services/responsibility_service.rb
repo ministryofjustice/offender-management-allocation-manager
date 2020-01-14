@@ -143,7 +143,9 @@ private
     end
 
     def release_date_gt_mths_at_policy_date?(offender, threshold)
-      offender.earliest_release_date >
+      earliest_release_date = [offender.conditional_release_date, offender.automatic_release_date].compact.min
+
+      earliest_release_date >
         ORIGINAL_ENGLISH_POLICY_START_DATE + threshold
     end
   end

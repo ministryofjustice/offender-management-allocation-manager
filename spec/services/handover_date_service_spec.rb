@@ -46,14 +46,14 @@ describe HandoverDateService do
   describe '#responsibility_handover_date' do
     context 'when CRC' do
       before do
-        stub_const("CRCHandoverData", Struct.new(:nps_case?, :home_detention_curfew_eligibility_date, :conditional_release_date, :earliest_release_date, :result))
+        stub_const("CRCHandoverData", Struct.new(:recalled?, :nps_case?, :home_detention_curfew_eligibility_date, :conditional_release_date, :earliest_release_date, :result))
 
         stub_const("CRC_CASES", [
-            CRCHandoverData.new(false, Date.new(2019, 9, 30), Date.new(2019, 8, 1), Date.new(2019, 8, 1), Date.new(2019, 5, 9)), # 12 weeks before CRD
-            CRCHandoverData.new(false, Date.new(2019, 8, 1), Date.new(2019, 8, 12), Date.new(2019, 8, 1), Date.new(2019, 5, 9)), # 12 weeks before HDC date
-            CRCHandoverData.new(false, nil, Date.new(2019, 8, 1), Date.new(2019, 5, 9), Date.new(2019, 5, 9)), # 12 weeks before CRD date
-            CRCHandoverData.new(false, Date.new(2019, 8, 1), nil, Date.new(2019, 8, 1), Date.new(2019, 5, 9)), # 12 weeks before HDC date
-            CRCHandoverData.new(false, nil, nil, nil, nil) # no handover date
+            CRCHandoverData.new(false, false, Date.new(2019, 9, 30), Date.new(2019, 8, 1), Date.new(2019, 8, 1), Date.new(2019, 5, 9)), # 12 weeks before CRD
+            CRCHandoverData.new(false, false, Date.new(2019, 8, 1), Date.new(2019, 8, 12), Date.new(2019, 8, 1), Date.new(2019, 5, 9)), # 12 weeks before HDC date
+            CRCHandoverData.new(false, false, nil, Date.new(2019, 8, 1), Date.new(2019, 5, 9), Date.new(2019, 5, 9)), # 12 weeks before CRD date
+            CRCHandoverData.new(false, false, Date.new(2019, 8, 1), nil, Date.new(2019, 8, 1), Date.new(2019, 5, 9)), # 12 weeks before HDC date
+            CRCHandoverData.new(false, false, nil, nil, nil, nil) # no handover date
         ])
       end
 
