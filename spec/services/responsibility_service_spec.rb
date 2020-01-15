@@ -161,6 +161,38 @@ describe ResponsibilityService do
         end
       end
     end
+
+    context 'when an indeterminate NPS offender (new case)' do
+      context 'with more than 10 months left to serve' do
+        let(:offender) {
+          OpenStruct.new  tariff_date: Time.zone.today + 14.months,
+                          sentence_start_date: Time.zone.today,
+                          nps_case?: true,
+                          welsh_offender?: false,
+                          indeterminate_sentence?: true
+        }
+
+        it 'will show the POM as having a responsible role' do
+          resp = described_class.calculate_pom_responsibility(offender)
+          expect(resp).to eq ResponsibilityService::RESPONSIBLE
+        end
+      end
+
+      context 'with less than 10 months left to serve' do
+        let(:offender) {
+          OpenStruct.new  tariff_date: Time.zone.today + 4.months,
+                          sentence_start_date: Time.zone.today,
+                          nps_case?: true,
+                          welsh_offender?: false,
+                          indeterminate_sentence?: true
+        }
+
+        it 'will show the POM as having a supporting role' do
+          resp = described_class.calculate_pom_responsibility(offender)
+          expect(resp).to eq ResponsibilityService::SUPPORTING
+        end
+      end
+    end
   end
 end
 

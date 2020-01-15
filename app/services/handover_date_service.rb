@@ -6,7 +6,7 @@ class HandoverDateService
   def self.handover(offender)
     if offender.recalled?
       HandoverData.new nil, nil, 'Recall case - no handover date calculation'
-    elsif offender.nps_case? && offender.indeterminate_sentence? && offender.earliest_release_date.nil?
+    elsif offender.nps_case? && offender.indeterminate_sentence? && offender.tariff_date.nil? # earliest_release_date
 
       # if offender.earliest_release_date.nil?
       HandoverData.new nil, nil, 'No earliest release date'
@@ -25,7 +25,7 @@ private
     if offender.early_allocation?
       early_allocation_handover_date(offender)
     elsif offender.indeterminate_sentence?
-      offender.earliest_release_date - 8.months
+      offender.tariff_date - 8.months # earliest_release_date
     elsif offender.parole_eligibility_date.present?
       offender.parole_eligibility_date - 8.months
     else

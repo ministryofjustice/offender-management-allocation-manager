@@ -19,8 +19,8 @@ class ResponsibilityService
       SUPPORTING
     # elsif offender.earliest_release_date.nil?
     #   RESPONSIBLE
-    elsif offender.indeterminate_sentence? && (offender.earliest_release_date.nil? ||
-        offender.earliest_release_date < Time.zone.today)
+    elsif offender.indeterminate_sentence? && (offender.tariff_date.nil? ||
+       offender.tariff_date < Time.zone.today)
       RESPONSIBLE
     else
       standard_rules(offender)
@@ -65,12 +65,14 @@ private
     def release_date_gt_10_mths?(offender)
       if offender.parole_eligibility_date.present?
         offender.parole_eligibility_date > offender.sentence_start_date + 10.months
+      elsif offender.indeterminate_sentence?
+        offender.tariff_date > offender.sentence_start_date + 10.months
       else
         [
           offender.conditional_release_date,
           offender.automatic_release_date
         ].compact.min >
-          offender.sentence_start_date + 10.months
+        offender.sentence_start_date + 10.months
       end
     end
   end
