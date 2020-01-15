@@ -7,8 +7,8 @@ class DebuggingController < PrisonsApplicationController
     prisoner = OffenderService.get_offender(nomis_offender_id)
 
     if prisoner.present?
-      @offender = OffenderPresenter.new((prisoner),
-                            Responsibility.find_by(nomis_offender_id: nomis_offender_id))
+      @offender = OffenderPresenter.new(prisoner,
+                                        Responsibility.find_by(nomis_offender_id: nomis_offender_id))
 
       @allocation = Allocation.find_by(nomis_offender_id: @offender.offender_no)
       @movements =

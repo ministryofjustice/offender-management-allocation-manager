@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class OffenderPresenter
-
   attr_reader :offender
 
   delegate :offender_no, :first_name, :last_name, :booking_id,
