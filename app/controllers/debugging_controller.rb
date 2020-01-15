@@ -2,7 +2,8 @@
 
 class DebuggingController < PrisonsApplicationController
   def debugging
-    nomis_offender_id = id
+
+    nomis_offender_id = id.present? ? id.strip! : id
 
     @offender = offender(nomis_offender_id)
     if @offender.present?

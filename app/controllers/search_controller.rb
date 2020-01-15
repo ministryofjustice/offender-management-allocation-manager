@@ -11,7 +11,7 @@ class SearchController < PrisonsApplicationController
       redirect_to(prison_caseload_index_path(q: search_term)) && return
     end
 
-    @q = search_term
+    @q = search_term.strip!
     offenders = SearchService.search_for_offenders(@q, @prison)
     @offenders = get_slice_for_page(offenders)
 
