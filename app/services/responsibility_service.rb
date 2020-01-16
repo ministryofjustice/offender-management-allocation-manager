@@ -103,7 +103,12 @@ private
     end
 
     def release_date_gt_15_mths_at_policy_date?(offender)
-      offender.earliest_release_date >
+      earliest_release_date = if offender.parole_eligibility_date.present?
+                                  offender.parole_eligibility_date
+                                else
+                                  [offender.conditional_release_date, offender.automatic_release_date].compact.min
+                              end
+      earliest_release_date >
         WELSH_POLICY_START_DATE + 15.months
     end
   end
@@ -145,7 +150,11 @@ private
     end
 
     def release_date_gt_mths_at_policy_date?(offender, threshold)
-      earliest_release_date = [offender.conditional_release_date, offender.automatic_release_date].compact.min
+      earliest_release_date = if offender.parole_eligibility_date.present?
+                                offender.parole_eligibility_date
+                              else
+                                [offender.conditional_release_date, offender.automatic_release_date].compact.min
+                              end
 
       earliest_release_date >
         ORIGINAL_ENGLISH_POLICY_START_DATE + threshold
