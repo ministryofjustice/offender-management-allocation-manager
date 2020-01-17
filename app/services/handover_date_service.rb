@@ -6,11 +6,8 @@ class HandoverDateService
   def self.handover(offender)
     if offender.recalled?
       HandoverData.new nil, nil, 'Recall case - no handover date calculation'
-    elsif offender.nps_case? && offender.indeterminate_sentence? && offender.tariff_date.nil? # earliest_release_date
-
-      # if offender.earliest_release_date.nil?
+    elsif offender.nps_case? && offender.indeterminate_sentence? && offender.tariff_date.nil?
       HandoverData.new nil, nil, 'No earliest release date'
-
     elsif offender.nps_case?
       date, reason = nps_handover_date(offender)
       HandoverData.new nps_start_date(offender), date, reason
@@ -23,7 +20,7 @@ private
 
   def self.nps_start_date(offender)
     if offender.early_allocation?
-      early_allocation_handover_date(offender)
+      offender.conditional_release_date - 18.months
     elsif offender.indeterminate_sentence?
       offender.tariff_date - 8.months # earliest_release_date
     elsif offender.parole_eligibility_date.present?
@@ -37,10 +34,18 @@ private
   end
 
   def self.crc_handover_date(offender)
-    [
-        offender.home_detention_curfew_eligibility_date,
-        offender.conditional_release_date
+    crd_ard = [
+        offender.conditional_release_date,
+        offender.automatic_release_date
     ].compact.map { |date| date - 12.weeks }.min
+
+    if offender.home_detention_curfew_actual_date.present?
+      offender.home_detention_curfew_actual_date
+    elsif offender.home_detention_curfew_eligibility_date.present?
+      offender.home_detention_curfew_eligibility_date
+    else
+      crd_ard
+    end
   end
 
   def self.nps_handover_date(offender)
@@ -61,38 +66,36 @@ private
     end
   end
 
+  # We can not calculate the handover date for NPS Indeterminate
+  # with parole cases where the TED is in the past as we need
+  # the parole board decision which currently is not available to us.
   def self.indeterminate_responsibility_date(offender)
     [
-        offender.parole_eligibility_date,
-        offender.tariff_date
+      offender.parole_eligibility_date,
+      offender.tariff_date
     ].compact.map { |date| date - 8.months }.min
   end
 
   # There are a couple of places where we need .5 of a month - which
   # we have assumed 15.days is a reasonable compromise implementation
-  def self.mappa_23_responsibility_date(offender)
-    [
-        offender.conditional_release_date,
-        offender.automatic_release_date
-    ].compact.map { |date| date - (7.months + 15.days) }.min
+  def self.mappa_23_responsibility_date(_offender)
+    Time.zone.today
   end
 
   def self.mappa1_responsibility_date(offender)
-    crd_ard = [
+    if offender.home_detention_curfew_actual_date.present?
+      offender.home_detention_curfew_actual_date
+    elsif offender.home_detention_curfew_eligibility_date.present?
+      offender.home_detention_curfew_eligibility_date
+    else
+      [
         offender.conditional_release_date,
         offender.automatic_release_date
-    ].compact.map { |date| date - (4.months + 15.days) }.min
-
-    [
-        crd_ard,
-        offender.home_detention_curfew_eligibility_date
-    ].compact.min
+      ].compact.map { |date| date - (4.months + 15.days) }.min
+    end
   end
 
   def self.early_allocation_handover_date(offender)
-    [
-        offender.conditional_release_date,
-        offender.automatic_release_date
-    ].compact.map { |date| date - 15.months }.min
+    offender.conditional_release_date - 15.months
   end
 end

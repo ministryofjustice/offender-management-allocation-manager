@@ -19,6 +19,8 @@ class ResponsibilityService
   def self.calculate_pom_responsibility(offender)
     if offender.immigration_case? || open_prison_nps_offender?(offender)
       SUPPORTING
+    elsif offender.indeterminate_sentence? == false && offender.automatic_release_date.nil? && offender.conditional_release_date && offender.parole_eligibility_date.nil? && offender.home_detention_curfew_eligibility_date.nil?
+      RESPONSIBLE
     elsif offender.indeterminate_sentence? && (offender.tariff_date.nil? ||
        offender.tariff_date < Time.zone.today)
       RESPONSIBLE
@@ -103,11 +105,9 @@ private
     end
 
     def release_date_gt_15_mths_at_policy_date?(offender)
-      earliest_release_date = if offender.parole_eligibility_date.present?
-                                  offender.parole_eligibility_date
-                                else
-                                  [offender.conditional_release_date, offender.automatic_release_date].compact.min
-                              end
+      earliest_release_date = offender.parole_eligibility_date.presence ||
+        [offender.conditional_release_date, offender.automatic_release_date].
+        compact.min
       earliest_release_date >
         WELSH_POLICY_START_DATE + 15.months
     end
@@ -150,11 +150,9 @@ private
     end
 
     def release_date_gt_mths_at_policy_date?(offender, threshold)
-      earliest_release_date = if offender.parole_eligibility_date.present?
-                                offender.parole_eligibility_date
-                              else
-                                [offender.conditional_release_date, offender.automatic_release_date].compact.min
-                              end
+      earliest_release_date = offender.parole_eligibility_date.presence ||
+        [offender.conditional_release_date, offender.automatic_release_date].
+        compact.min
 
       earliest_release_date >
         ORIGINAL_ENGLISH_POLICY_START_DATE + threshold

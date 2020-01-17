@@ -16,13 +16,27 @@ describe ResponsibilityService do
 
     context 'when an offender has been recalled' do
       let(:offender) {
-        OpenStruct.new recalled?: true
+        OpenStruct.new recalled?: true,
+                       automatic_release_date: Time.zone.today
       }
 
       it 'will show the POM as supporting' do
         resp = described_class.calculate_pom_responsibility(offender)
 
         expect(resp).to eq ResponsibilityService::SUPPORTING
+      end
+    end
+
+    context 'when relevant release dates are missing' do
+      let(:offender) {
+        OpenStruct.new immigration_case?: false,
+                       indeterminate_sentence?: false
+      }
+
+      it 'will default to responsible' do
+        resp = described_class.calculate_pom_responsibility(offender)
+
+        expect(resp).to eq ResponsibilityService::RESPONSIBLE
       end
     end
 
@@ -41,8 +55,8 @@ describe ResponsibilityService do
         }
 
         context 'with less than 12 weeks left to serve with home_detention_curfew_eligibility_date' do
-          let(:ard) { nil}
-          let(:crd) { nil }
+          let(:ard)   { nil }
+          let(:crd)   { nil }
           let(:hdcad) { nil }
           let(:hdced) { Time.zone.today + 10.weeks }
 
@@ -53,8 +67,8 @@ describe ResponsibilityService do
         end
 
         context 'with less than 12 weeks left to serve with conditional_release_date' do
-          let(:ard) { Time.zone.today + 15.weeks }
-          let(:crd) { Time.zone.today + 11.weeks }
+          let(:ard)   { Time.zone.today + 15.weeks }
+          let(:crd)   { Time.zone.today + 11.weeks }
           let(:hdcad) { nil }
           let(:hdced) { nil }
 
@@ -65,10 +79,10 @@ describe ResponsibilityService do
         end
 
         context 'with less than 12 weeks left to serve with home_detention_curfew_actual_date' do
-          let(:ard) { nil }
-          let(:crd) { nil }
+          let(:ard)   { nil }
+          let(:crd)   { nil }
           let(:hdcad) { Time.zone.today + 9.weeks }
-          let(:hdced) { nil }
+          let(:hdced) { Time.zone.today + 14.weeks }
 
           it 'will show the POM as having a supporting role' do
             resp = described_class.calculate_pom_responsibility(offender)
@@ -142,6 +156,7 @@ describe ResponsibilityService do
                               conditional_release_date: crd,
                               sentenced?: true
             }
+
             context 'with over 20 months left to serve' do
               let(:ard)   { sentence_start_date + 21.months }
               let(:crd)   { sentence_start_date + 22.months }
@@ -152,6 +167,7 @@ describe ResponsibilityService do
                 expect(resp).to eq ResponsibilityService::RESPONSIBLE
               end
             end
+
             context 'with less than 20 months left to serve' do
               let(:ard)   { sentence_start_date + 11.months }
               let(:crd)   { sentence_start_date + 10.months }
@@ -175,6 +191,7 @@ describe ResponsibilityService do
                               conditional_release_date: crd,
                               sentenced?: true
             }
+
             context 'with over 20 months left to serve' do
               let(:ard)   { sentence_start_date + 21.months }
               let(:crd)   { sentence_start_date + 22.months }
@@ -185,6 +202,7 @@ describe ResponsibilityService do
                 expect(resp).to eq ResponsibilityService::RESPONSIBLE
               end
             end
+
             context 'with less than 20 months left to serve' do
               let(:ard)   { sentence_start_date + 11.months }
               let(:crd)   { sentence_start_date + 10.months }
@@ -267,6 +285,7 @@ describe ResponsibilityService do
                               tariff_date: ted,
                               sentenced?: true
             }
+
             context 'with more than 10 months left to serve' do
               let(:ted) { Time.zone.today + 14.months }
 
@@ -284,8 +303,9 @@ describe ResponsibilityService do
                 expect(resp).to eq ResponsibilityService::SUPPORTING
               end
             end
+          end
         end
-        end
+
         context 'when sentenced after policy start date' do
           context 'when a determinate NPS offender' do
             let(:offender) {
@@ -353,6 +373,7 @@ describe ResponsibilityService do
                               sentence_start_date: Time.zone.today,
                               tariff_date: ted
             }
+
             context 'with more than 10 months left to serve' do
               let(:ted) { Time.zone.today + 14.months }
 
@@ -376,95 +397,97 @@ describe ResponsibilityService do
 
       context 'when a Welsh offender' do
         context 'when sentenced before policy start date' do
-            context 'when a determinate NPS offender' do
-              let(:sentence_start_date) { Date.parse('03-02-2019') }
-              let(:offender) {
-                OpenStruct.new  nps_case?: true,
-                                welsh_offender: true,
-                                sentence_start_date: sentence_start_date,
-                                automatic_release_date: ard,
-                                conditional_release_date: crd,
-                                sentenced?: true
-              }
+          context 'when a determinate NPS offender' do
+            let(:sentence_start_date) { Date.parse('03-02-2019') }
+            let(:offender) {
+              OpenStruct.new  nps_case?: true,
+                              welsh_offender: true,
+                              sentence_start_date: sentence_start_date,
+                              automatic_release_date: ard,
+                              conditional_release_date: crd,
+                              sentenced?: true
+            }
 
-              context 'with more than 15 months left to serve' do
-                let(:ard)   { sentence_start_date + 16.months }
-                let(:crd)   { sentence_start_date + 17.months }
+            context 'with more than 15 months left to serve' do
+              let(:ard)   { sentence_start_date + 16.months }
+              let(:crd)   { sentence_start_date + 17.months }
 
-                it 'will show the POM as having a responsible role' do
-                  resp = described_class.calculate_pom_responsibility(offender)
-                  expect(resp).to eq ResponsibilityService::RESPONSIBLE
-                end
-              end
-
-              context 'with less than 15 months left to serve' do
-                let(:ard)   { sentence_start_date + 6.months }
-                let(:crd)   { sentence_start_date + 7.months }
-
-                it 'will show the POM as having a supporting role' do
-                  resp = described_class.calculate_pom_responsibility(offender)
-                  expect(resp).to eq ResponsibilityService::SUPPORTING
-                end
+              it 'will show the POM as having a responsible role' do
+                resp = described_class.calculate_pom_responsibility(offender)
+                expect(resp).to eq ResponsibilityService::RESPONSIBLE
               end
             end
 
-            context 'when a determinate NPS offender with parole eligibility' do
-              let(:offender) {
-                OpenStruct.new  nps_case?: true,
-                                welsh_offender: true,
-                                indeterminate_sentence?: false,
-                                sentence_start_date: Time.zone.today,
-                                parole_eligibility_date: ped,
-                                sentenced?: true
-              }
+            context 'with less than 15 months left to serve' do
+              let(:ard)   { sentence_start_date + 6.months }
+              let(:crd)   { sentence_start_date + 7.months }
 
-              context 'with more than 10 months left to serve' do
-                let(:ped) { Time.zone.today + 12.months }
-
-                it 'will show the POM as having a responsible role' do
-                  resp = described_class.calculate_pom_responsibility(offender)
-                  expect(resp).to eq ResponsibilityService::RESPONSIBLE
-                end
-              end
-
-              context 'with less than 10 months left to serve' do
-                let(:ped) { Time.zone.today + 6.months }
-
-                it 'will show the POM as having a supporting role' do
-                  resp = described_class.calculate_pom_responsibility(offender)
-                  expect(resp).to eq ResponsibilityService::SUPPORTING
-                end
-              end
-            end
-
-            context 'when an indeterminate NPS offender' do
-              let(:offender) {
-                OpenStruct.new  nps_case?: true,
-                                welsh_offender: true,
-                                indeterminate_sentence?: true,
-                                sentence_start_date: Time.zone.today,
-                                tariff_date: ted,
-                                sentenced?: true
-              }
-              context 'with more than 10 months left to serve' do
-                let(:ted) { Time.zone.today + 14.months }
-
-                it 'will show the POM as having a responsible role' do
-                  resp = described_class.calculate_pom_responsibility(offender)
-                  expect(resp).to eq ResponsibilityService::RESPONSIBLE
-                end
-              end
-
-              context 'with less than 10 months left to serve' do
-                let(:ted) { Time.zone.today + 4.months }
-
-                it 'will show the POM as having a supporting role' do
-                  resp = described_class.calculate_pom_responsibility(offender)
-                  expect(resp).to eq ResponsibilityService::SUPPORTING
-                end
+              it 'will show the POM as having a supporting role' do
+                resp = described_class.calculate_pom_responsibility(offender)
+                expect(resp).to eq ResponsibilityService::SUPPORTING
               end
             end
           end
+
+          context 'when a determinate NPS offender with parole eligibility' do
+            let(:offender) {
+              OpenStruct.new  nps_case?: true,
+                              welsh_offender: true,
+                              indeterminate_sentence?: false,
+                              sentence_start_date: Time.zone.today,
+                              parole_eligibility_date: ped,
+                              sentenced?: true
+            }
+
+            context 'with more than 10 months left to serve' do
+              let(:ped) { Time.zone.today + 12.months }
+
+              it 'will show the POM as having a responsible role' do
+                resp = described_class.calculate_pom_responsibility(offender)
+                expect(resp).to eq ResponsibilityService::RESPONSIBLE
+              end
+            end
+
+            context 'with less than 10 months left to serve' do
+              let(:ped) { Time.zone.today + 6.months }
+
+              it 'will show the POM as having a supporting role' do
+                resp = described_class.calculate_pom_responsibility(offender)
+                expect(resp).to eq ResponsibilityService::SUPPORTING
+              end
+            end
+          end
+
+          context 'when an indeterminate NPS offender' do
+            let(:offender) {
+              OpenStruct.new  nps_case?: true,
+                              welsh_offender: true,
+                              indeterminate_sentence?: true,
+                              sentence_start_date: Time.zone.today,
+                              tariff_date: ted,
+                              sentenced?: true
+            }
+
+            context 'with more than 10 months left to serve' do
+              let(:ted) { Time.zone.today + 14.months }
+
+              it 'will show the POM as having a responsible role' do
+                resp = described_class.calculate_pom_responsibility(offender)
+                expect(resp).to eq ResponsibilityService::RESPONSIBLE
+              end
+            end
+
+            context 'with less than 10 months left to serve' do
+              let(:ted) { Time.zone.today + 4.months }
+
+              it 'will show the POM as having a supporting role' do
+                resp = described_class.calculate_pom_responsibility(offender)
+                expect(resp).to eq ResponsibilityService::SUPPORTING
+              end
+            end
+          end
+        end
+
         context 'when sentenced after policy start date' do
           context 'when a determinate NPS offender' do
             let(:offender) {
@@ -535,6 +558,7 @@ describe ResponsibilityService do
                               tariff_date: ted,
                               sentenced?: true
             }
+
             context 'with more than 10 months left to serve' do
               let(:ted) { Time.zone.today + 14.months }
 
