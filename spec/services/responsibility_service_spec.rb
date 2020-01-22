@@ -30,7 +30,12 @@ describe ResponsibilityService do
     context 'when relevant release dates are missing' do
       let(:offender) {
         OpenStruct.new immigration_case?: false,
-                       indeterminate_sentence?: false
+                       indeterminate_sentence?: false,
+                       automatic_release_date: nil,
+                       conditional_release_date: nil,
+                       home_detention_curfew_eligibility_date: nil,
+                       parole_eligibility_date: nil,
+                       sentenced?: true
       }
 
       it 'will default to responsible' do

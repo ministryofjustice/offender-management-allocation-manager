@@ -19,7 +19,7 @@ class ResponsibilityService
   def self.calculate_pom_responsibility(offender)
     if offender.immigration_case? || open_prison_nps_offender?(offender)
       SUPPORTING
-    elsif offender.indeterminate_sentence? == false && offender.automatic_release_date.nil? && offender.conditional_release_date && offender.parole_eligibility_date.nil? && offender.home_detention_curfew_eligibility_date.nil?
+    elsif determinate_with_no_release_dates?(offender)
       RESPONSIBLE
     elsif offender.indeterminate_sentence? && (offender.tariff_date.nil? ||
        offender.tariff_date < Time.zone.today)
@@ -203,5 +203,13 @@ private
 
   def self.nps_case?(offender)
     offender.nps_case?
+  end
+
+  def self.determinate_with_no_release_dates?(offender)
+    offender.indeterminate_sentence? == false &&
+        offender.automatic_release_date.nil? &&
+        offender.conditional_release_date.nil? &&
+        offender.parole_eligibility_date.nil? &&
+        offender.home_detention_curfew_eligibility_date.nil?
   end
 end
