@@ -53,7 +53,7 @@ private
   end
 
   def id
-    params[:offender_no]
+    params[:offender_no].present? ? params[:offender_no].strip : params[:offender_no]
   end
 
   def offender(offender_no)
