@@ -241,6 +241,43 @@
     <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
 <% end %>
 
+  <table class="govuk-table" id="community_information">
+    <tbody class="govuk-table__body">
+    <tr class="govuk-table__row">
+      <td class="govuk-table__header govuk-!-width-one-half" scope="row">Community information</td>
+      <td class="govuk-table__cell govuk-!-width-one-half"></td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">Local divisional unit (LDU)</td>
+      <td class="govuk-table__cell table_cell__left_align">
+        <%= @offender.ldu.try(:name) || "Unknown"%>
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">Local divisional unit (LDU) email address</td>
+      <td class="govuk-table__cell table_cell__left_align">
+        <% if @offender.ldu.try(:email_address) %>
+          <%= mail_to(@offender.ldu.email_address, @offender.ldu.email_address) %>
+        <% else %>
+          Unknown
+        <% end %>
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">Team</td>
+      <td class="govuk-table__cell table_cell__left_align">
+        <%= @offender.team.presence || "Unknown"%>
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-width-one-half">COM</td>
+      <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
+        <%= @allocation&.com_name.presence || "Unknown" %>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
 <% unless @movements.blank? %>
   <table class="govuk-table">
     <tbody class="govuk-table__body">
