@@ -36,6 +36,6 @@ private
   end
 
   def search_term
-    params['q']
+    params['q'].strip
   end
 end
