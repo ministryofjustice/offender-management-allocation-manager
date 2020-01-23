@@ -2,7 +2,7 @@
 
 class DebuggingController < PrisonsApplicationController
   def debugging
-    nomis_offender_id = id.present? ? id.strip! : id
+    nomis_offender_id = id
 
     @offender = offender(nomis_offender_id)
     if @offender.present?
@@ -53,7 +53,7 @@ private
   end
 
   def id
-    params[:offender_no]
+    params[:offender_no].present? ? params[:offender_no].strip : params[:offender_no]
   end
 
   def offender(offender_no)
