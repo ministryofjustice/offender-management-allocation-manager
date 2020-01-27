@@ -86,27 +86,33 @@ RSpec.describe SummaryController, type: :controller do
 
     context 'when there are new arrivals' do
       before do
-        stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/movements/offenders?latestOnly=false&movementTypes=TRN").
-          with(body: %w[G1234GY G7514GW G1234VV G4234GG].to_json).
-          to_return(status: 200, body: [
-            { offenderNo: 'G7514GW', toAgency: prison, createDateTime: Time.zone.today },
-            { offenderNo: 'G1234GY', toAgency: prison, createDateTime: Time.zone.today - 1 },
-            { offenderNo: 'G1234VV', toAgency: prison, createDateTime: Time.zone.today - 2 },
-            { offenderNo: 'G4234GG', toAgency: prison, createDateTime: Time.zone.today - 1 }
-          ].to_json)
+        travel_to Time.zone.local(2019, 12, 18) do
+          stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/movements/offenders?latestOnly=false&movementTypes=TRN").
+            with(body: %w[G1234GY G7514GW G1234VV G4234GG].to_json).
+            to_return(status: 200, body: [
+              { offenderNo: 'G7514GW', toAgency: prison, createDateTime: Time.zone.today },
+              { offenderNo: 'G1234GY', toAgency: prison, createDateTime: Time.zone.today - 1 },
+              { offenderNo: 'G1234VV', toAgency: prison, createDateTime: Time.zone.today - 2 },
+              { offenderNo: 'G4234GG', toAgency: prison, createDateTime: Time.zone.today - 1 }
+            ].to_json)
+        end
       end
 
       it 'can show new arrivals' do
-        get :new_arrivals, params: { prison_id: prison }
+        travel_to Time.zone.local(2019, 12, 18) do
+          get :new_arrivals, params: { prison_id: prison }
 
-        summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
-        expect(summary_offenders).to eq('G7514GW' => 0, 'G1234GY' => 1)
+          summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
+          expect(summary_offenders).to eq('G7514GW' => 0, 'G1234GY' => 1)
+        end
       end
 
       it 'can show pending records' do
-        get :pending, params: { prison_id: prison }
+        travel_to Time.zone.local(2019, 12, 18) do
+          get :pending, params: { prison_id: prison }
 
-        expect(assigns(:offenders).map(&:offender_no)).to match_array ['G1234VV']
+          expect(assigns(:offenders).map(&:offender_no)).to match_array ['G1234VV']
+        end
       end
 
       it 'can show unallocated records' do
