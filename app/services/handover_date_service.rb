@@ -34,17 +34,14 @@ private
   end
 
   def self.crc_handover_date(offender)
-    crd_ard = [
-        offender.conditional_release_date,
-        offender.automatic_release_date
-    ].compact.map { |date| date - 12.weeks }.min
-
     if offender.home_detention_curfew_actual_date.present?
       offender.home_detention_curfew_actual_date
     elsif offender.home_detention_curfew_eligibility_date.present?
       offender.home_detention_curfew_eligibility_date
     else
-      crd_ard
+      [offender.conditional_release_date,
+       offender.automatic_release_date
+].compact.map { |date| date - 12.weeks }.min
     end
   end
 
@@ -76,12 +73,12 @@ private
     ].compact.map { |date| date - 8.months }.min
   end
 
-  # There are a couple of places where we need .5 of a month - which
-  # we have assumed 15.days is a reasonable compromise implementation
   def self.mappa_23_responsibility_date(_offender)
     Time.zone.today
   end
 
+  # There are a couple of places where we need .5 of a month - which
+  # we have assumed 15.days is a reasonable compromise implementation
   def self.mappa1_responsibility_date(offender)
     if offender.home_detention_curfew_actual_date.present?
       offender.home_detention_curfew_actual_date
