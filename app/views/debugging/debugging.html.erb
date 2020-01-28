@@ -100,7 +100,7 @@
     <tr class="govuk-table__row" id="responsibility-override">
       <td class="govuk-table__cell govuk-!-width-one-half">Responsibility overridden?</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-        <%= @override.nil? ? 'No' : 'Yes' %>
+        <%= @offender.responsibility.present? ? 'Yes' : 'No' %>
       </td>
     </tr>
     <tr class="govuk-table__row">
