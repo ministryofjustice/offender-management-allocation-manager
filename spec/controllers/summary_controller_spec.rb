@@ -11,14 +11,14 @@ RSpec.describe SummaryController, type: :controller do
     ]
   }
 
+  after { Rails.cache.clear }
+
   before { stub_sso_data(prison, 'alice') }
 
   let(:prison) { 'BRI' }
 
   context 'with 2 offenders' do
     before do
-      sleep 1 # bust the 1 second cache as we're changing returned data
-
       offenders = [
         { "bookingId": 754_208, "offenderNo": "G1234GY", "firstName": "BOB", "lastName": "SMITH",
           "dateOfBirth": "1995-02-02", "age": 34, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "LR" },
@@ -135,13 +135,6 @@ RSpec.describe SummaryController, type: :controller do
     let(:summary_offenders) { assigns(:offenders) }
 
     render_views
-
-    # need to bust the 1 seconds cache timeout from previous page
-    # rubocop:disable RSpec/BeforeAfterAll
-    before(:all) do
-      sleep 1
-    end
-    # rubocop:enable RSpec/BeforeAfterAll
 
     before do
       stub_offenders_for_prison(prison, offenders, bookings)
