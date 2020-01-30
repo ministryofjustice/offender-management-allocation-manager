@@ -60,16 +60,11 @@ class SummaryService
 # rubocop:enable Metrics/MethodLength
 
 private
-
-  # anyone newly arrived (< 2 days) hasn't been matched via nDelius, so its good to have a separate bucket
-  # due to the way nDelius matching works (prisoner arrives on Friday, report run Friday night,
-  # NART person picks up report on Monday, sends email to Omic, nDelius process runs Monday night)
-  # anyone arriving on Friday won't get picked up for potential allocation via nDelius until
-  # Tuesday - so consider them newly arrived even on Monday (when awaiting_allocation_for == 3)
   def self.new_arrival?(offender)
-    offender.awaiting_allocation_for < 2 ||
-      (offender.awaiting_allocation_for < 4 &&
-      ((offender.prison_arrival_date.friday? || offender.prison_arrival_date.saturday?)))
+    grace_period_in_days = 2
+    grace_period_in_days = 4 if Date.today.monday? || Date.today.tuesday?
+
+    offender.awaiting_allocation_for <= grace_period_in_days
   end
 
   def self.sort_fields_for_allocated
