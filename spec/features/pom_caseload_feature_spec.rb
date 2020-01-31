@@ -163,7 +163,7 @@ feature "view POM's caseload" do
         expect(page).to have_content('Allix, Aobmethani')
       end
       within '.offender_row_5' do
-        expect(page).to have_content('Andoy, Demolarichard')
+        expect(page).to have_content('Andexia, Obinins')
       end
     end
 
