@@ -11,11 +11,11 @@ RSpec.describe SummaryController, type: :controller do
     ]
   }
 
-  after { Rails.cache.clear }
+  let(:prison) { 'BRI' }
 
   before { stub_sso_data(prison, 'alice') }
 
-  let(:prison) { 'BRI' }
+  after do Rails.cache.clear end
 
   context 'with 2 offenders' do
     before do
@@ -244,18 +244,19 @@ RSpec.describe SummaryController, type: :controller do
         offender_two,
         offender_three,
         offender_four,
-        offender_five
+        offender_five,
+        offender_six
       ]
 
-      inmates = offenders.map do |offender|
+      inmates = offenders.map { |offender|
         {
           bookingId: offender[:booking_id],
           offenderNo: offender[:nomis_id],
           dateOfBirth: 30.years.ago.strftime('%F')
         }
-      end
+      }
 
-      bookings = offenders.map do |offender|
+      bookings = offenders.map { |offender|
         {
           bookingId: offender[:booking_id],
           sentenceDetail: {
@@ -263,30 +264,27 @@ RSpec.describe SummaryController, type: :controller do
             releaseDate: 30.years.from_now.strftime('%F')
           }
         }
-      end
+      }
 
-      @inmates = inmates
-      @bookings = bookings
+      stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/locations/description/BRI/inmates?convictedStatus=Convicted&returnCategory=true").
+        with(headers: { "Page-Limit": '1' }).
+        to_return(body: [].to_json, headers: { "Total Records": "6" })
 
-      stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/locations/description/BRI/inmates?convictedStatus=Convicted&returnCategory=true")
-        .with(headers: {"Page-Limit": '1'})
-        .to_return(body: [].to_json, headers: {"Total Records": "4"})
-
-      stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/locations/description/BRI/inmates?convictedStatus=Convicted&returnCategory=true")
-        .with(headers: {'Page-Offset' => '0'})
-        .to_return(body: inmates.to_json)
+      stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/locations/description/BRI/inmates?convictedStatus=Convicted&returnCategory=true").
+        with(headers: { 'Page-Offset' => '0' }).
+        to_return(body: inmates.to_json)
 
       # I think the fact it requests this second page is a bug,
       # but let's worry about that later...
-      stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/locations/description/BRI/inmates?convictedStatus=Convicted&returnCategory=true")
-        .with(headers: {'Page-Offset' => '200'})
-        .to_return(body: [].to_json)
+      stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/locations/description/BRI/inmates?convictedStatus=Convicted&returnCategory=true").
+        with(headers: { 'Page-Offset' => '200' }).
+        to_return(body: [].to_json)
 
-      stub_request(:post, 'https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/offender-sentences/bookings')
-        .to_return(body: bookings.to_json)
+      stub_request(:post, 'https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/offender-sentences/bookings').
+        to_return(body: bookings.to_json)
 
-      stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/movements/offenders?latestOnly=false&movementTypes=TRN")
-        .to_return(status: 200, body: [].to_json)
+      stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/movements/offenders?latestOnly=false&movementTypes=TRN").
+        to_return(status: 200, body: [].to_json)
     end
 
     context 'when today is Thursday' do
@@ -315,7 +313,7 @@ RSpec.describe SummaryController, type: :controller do
         Timecop.travel(today) do
           get :new_arrivals, params: { prison_id: prison }
           summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
-          expect(summary_offenders.keys).to_not include('D1111DD')
+          expect(summary_offenders.keys).not_to include('D1111DD')
         end
       end
 
@@ -324,26 +322,6 @@ RSpec.describe SummaryController, type: :controller do
           get :pending, params: { prison_id: prison }
           summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
           expect(summary_offenders.keys).to include('D1111DD')
-        end
-      end
-
-      it 'includes arrivals with case information in unallocated instead' do
-        create(:case_information, nomis_offender_id: 'A1111AA')
-
-        Timecop.travel(today) do
-          get :unallocated, params: { prison_id: prison }
-          summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
-          expect(summary_offenders.keys).to include('A1111AA')
-        end
-      end
-
-      it 'excludes arrivals with case information from new arrivals' do
-        create(:case_information, nomis_offender_id: 'A1111AA')
-
-        Timecop.travel(today) do
-          get :new_arrivals, params: { prison_id: prison }
-          summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
-          expect(summary_offenders.keys).to_not include('A1111AA')
         end
       end
     end
@@ -363,7 +341,7 @@ RSpec.describe SummaryController, type: :controller do
         Timecop.travel(today) do
           get :new_arrivals, params: { prison_id: prison }
           summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
-          expect(summary_offenders.keys).to_not include('F1111FF')
+          expect(summary_offenders.keys).not_to include('F1111FF')
         end
       end
     end
@@ -383,11 +361,33 @@ RSpec.describe SummaryController, type: :controller do
         Timecop.travel(today) do
           get :new_arrivals, params: { prison_id: prison }
           summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
-          expect(summary_offenders.keys).to_not include('F1111FF')
+          expect(summary_offenders.keys).not_to include('F1111FF')
         end
       end
     end
 
-    xcontext 'the offender has been moved' do; end
+    context 'when previously allocated offender has been transferred from another prison' do
+      let(:today) { 'Thu 17 Jan 2019'.to_date }
+
+      it 'includes arrivals with case information in unallocated instead' do
+        create(:case_information, nomis_offender_id: 'A1111AA')
+
+        Timecop.travel(today) do
+          get :unallocated, params: { prison_id: prison }
+          summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
+          expect(summary_offenders.keys).to include('A1111AA')
+        end
+      end
+
+      it 'excludes arrivals with case information from new arrivals' do
+        create(:case_information, nomis_offender_id: 'A1111AA')
+
+        Timecop.travel(today) do
+          get :new_arrivals, params: { prison_id: prison }
+          summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
+          expect(summary_offenders.keys).not_to include('A1111AA')
+        end
+      end
+    end
   end
 end

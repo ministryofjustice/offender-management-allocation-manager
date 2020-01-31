@@ -60,9 +60,10 @@ class SummaryService
 # rubocop:enable Metrics/MethodLength
 
 private
+
   def self.new_arrival?(offender)
     grace_period_in_days = 2
-    grace_period_in_days = 4 if Date.today.monday? || Date.today.tuesday?
+    grace_period_in_days = 4 if Time.zone.today .monday? || Time.zone.today .tuesday?
 
     offender.awaiting_allocation_for <= grace_period_in_days
   end
