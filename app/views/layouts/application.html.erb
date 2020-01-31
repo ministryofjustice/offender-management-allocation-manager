@@ -11,6 +11,7 @@
 
   <body class="govuk-template__body js-enabled">
     <%= render '/layouts/header' %>
+    <%= render '/layouts/phase_banner' %>
     <%= yield(:switcher) if content_for?(:switcher) %>
 
     <div class='govuk-width-container'>
