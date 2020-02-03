@@ -8,7 +8,13 @@ class SummaryService
     # We expect to be passed summary_type, which is one of :allocated, :unallocated,
     # :pending, or :new_arrivals.  The other types will return totals, and do not contain
     # any data.
-    sortable_fields = (summary_type == :allocated ? sort_fields_for_allocated : default_sortable_fields)
+    sortable_fields = if summary_type == :allocated
+                        sort_fields_for_allocated
+                      elsif summary_type == :new_arrivals
+                        sort_fields_for_new_arrivals
+                      else
+                        default_sortable_fields
+                      end
 
     # We want to store the total number of each item so we can show totals for
     # each type of record.
@@ -70,6 +76,10 @@ private
 
   def self.sort_fields_for_allocated
     [:last_name, :earliest_release_date, :tier]
+  end
+
+  def self.sort_fields_for_new_arrivals
+    [:last_name, :arrival_date, :earliest_release_date]
   end
 
   def self.default_sortable_fields
