@@ -4,7 +4,7 @@ RSpec.describe AllocatedOffender, type: :model do
   let(:staff_id) { 1 }
 
   describe 'when determining what responsibility the POM has' do
-    let(:offender) { OpenStruct.new(offender_no: 'G7514GW', prison_id: 'WEI', convicted?: true, conditional_release_date: Time.zone.today + 10.months) }
+    let(:offender) { OpenStruct.new(offender_no: 'G7514GW', prison_id: 'WEI', convicted?: true) }
     let(:primary_allocation) { OpenStruct.new(nomis_offender_id: 'A1111A', primary_pom_nomis_id: staff_id, prison: 'LEI') }
     let(:secondary_allocation) { OpenStruct.new(nomis_offender_id: 'B1111B', secondary_pom_nomis_id: staff_id, prison: 'LEI') }
     let(:community_responsibility) {  OpenStruct.new(nomis_offender_id: 'A1111A', value: 'Probation') }
