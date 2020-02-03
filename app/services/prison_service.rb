@@ -4,8 +4,8 @@ PrisonInfo = Struct.new(:code, :name, :country)
 
 class PrisonService
   PRISONS = [
-    PrisonInfo.new('AGI', 'HMP/YOI Askham Grange', :england),
     PrisonInfo.new('ACI', 'HMP Altcourse', :england),
+    PrisonInfo.new('AGI', 'HMP/YOI Askham Grange', :england),
     PrisonInfo.new('ALI', 'HMP Albany', :england),
     PrisonInfo.new('ASI', 'HMP Ashfield', :england),
     PrisonInfo.new('AYI', 'HMP Aylesbury', :england),
