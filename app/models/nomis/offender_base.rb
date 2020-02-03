@@ -2,6 +2,7 @@ module Nomis
   class OffenderBase
     delegate :home_detention_curfew_eligibility_date,
              :post_recall_release_date, :post_recall_release_override_date,
+             :home_detention_curfew_actual_date,
              :conditional_release_date, :release_date,
              :parole_eligibility_date, :tariff_date,
              :automatic_release_date,
