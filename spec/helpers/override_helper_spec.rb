@@ -21,9 +21,7 @@ RSpec.describe OverrideHelper do
 
   describe '#complex_reason_label' do
     context 'when a prison POM' do
-      # we need to set up this test to return a Prison POM recommendation; we are using an
-      # Immigration case as they are always recommended to Prison POMs
-      let(:subject) { OffenderPresenter.new(OpenStruct.new(immigration_case?: true, nps_case?: false), nil) }
+      let(:subject) { OffenderPresenter.new(OpenStruct.new(immigration_case?: true), nil) }
 
       it "can get for a prison owned offender" do
         expect(subject.complex_reason_label).to eq('Prisoner assessed as not suitable for a prison officer POM')
@@ -31,17 +29,7 @@ RSpec.describe OverrideHelper do
     end
 
     context 'when a probation POM' do
-      let(:crd)         { Time.zone.today + 15.months }
-      let(:start_date)  { Time.zone.today }
-      let(:subject)     {
-        OffenderPresenter.new(OpenStruct.new(
-                                immigration_case?: false,
-                                tier: 'A',
-                                nps_case?: true,
-                                sentence_start_date: start_date,
-                                conditional_release_date: crd),
-                              nil)
-      }
+      let(:subject) { OffenderPresenter.new(OpenStruct.new(immigration_case?: false, tier: 'A'), nil) }
 
       it "can get for a probation owned offender" do
         expect(subject.complex_reason_label).to eq('Prisoner assessed as suitable for a prison officer POM despite tiering calculation')

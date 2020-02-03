@@ -11,9 +11,7 @@ module ApiHelper
       with(
         body: [booking_number].to_json
       ).
-      to_return(status: 200, body: [{ offenderNo: nomis_id, bookingId: booking_number,
-                                      sentenceDetail: { sentenceStartDate: Time.zone.today - 2.months,
-                                                        conditionalReleaseDate: Time.zone.today + 22.months } }].to_json)
+      to_return(status: 200, body: [{ offenderNo: nomis_id, bookingId: booking_number, sentenceDetail: {} }].to_json)
 
     stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/offender-assessments/CATEGORY").
       with(

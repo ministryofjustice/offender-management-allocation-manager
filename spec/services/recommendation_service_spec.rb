@@ -6,8 +6,6 @@ describe RecommendationService do
       o.tier = 'A'
       o.sentence = Nomis::SentenceDetail.new
       o.inprisonment_status = 'SENT03'
-      o.sentence.sentence_start_date = Time.zone.today
-      o.sentence.automatic_release_date = Time.zone.today + 15.months
     }
   }
   let(:tierD) {
@@ -15,8 +13,6 @@ describe RecommendationService do
       o.tier = 'D'
       o.sentence = Nomis::SentenceDetail.new
       o.inprisonment_status = 'SENT03'
-      o.sentence.sentence_start_date = Time.zone.today
-      o.sentence.automatic_release_date = Time.zone.today + 10.months
     }
   }
 
