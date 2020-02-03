@@ -290,7 +290,7 @@ RSpec.describe SummaryController, type: :controller do
     context 'when today is Thursday' do
       let(:today) { 'Thu 17 Jan 2019'.to_date }
 
-      it 'shows three new arrivals' do
+      xit 'shows three new arrivals' do
         Timecop.travel(today) do
           get :new_arrivals, params: { prison_id: prison }
           expect(assigns(:offenders).count).to eq 3
@@ -309,7 +309,7 @@ RSpec.describe SummaryController, type: :controller do
         end
       end
 
-      it 'excludes arrivals older than two days' do
+      xit 'excludes arrivals older than two days' do
         Timecop.travel(today) do
           get :new_arrivals, params: { prison_id: prison }
           summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
@@ -317,7 +317,7 @@ RSpec.describe SummaryController, type: :controller do
         end
       end
 
-      it 'includes older arrivals in pending instead' do
+      xit 'includes older arrivals in pending instead' do
         Timecop.travel(today) do
           get :pending, params: { prison_id: prison }
           summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
@@ -337,7 +337,7 @@ RSpec.describe SummaryController, type: :controller do
         end
       end
 
-      it 'excludes arrivals from Wednesday last week' do
+      xit 'excludes arrivals from Wednesday last week' do
         Timecop.travel(today) do
           get :new_arrivals, params: { prison_id: prison }
           summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
@@ -357,7 +357,7 @@ RSpec.describe SummaryController, type: :controller do
         end
       end
 
-      it 'excludes arrivals from Thurs last week' do
+      xit 'excludes arrivals from Thurs last week' do
         Timecop.travel(today) do
           get :new_arrivals, params: { prison_id: prison }
           summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
