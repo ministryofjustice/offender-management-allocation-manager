@@ -19,7 +19,10 @@ class HandoverDateService
 private
 
   def self.nps_start_date(offender)
-    if offender.early_allocation?
+    if offender.conditional_release_date.blank? &&
+      offender.automatic_release_date.blank?
+     'Unknown'
+    elsif offender.early_allocation?
       offender.conditional_release_date - 18.months
     elsif offender.indeterminate_sentence?
       offender.tariff_date - 8.months # earliest_release_date

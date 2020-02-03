@@ -53,6 +53,20 @@ describe HandoverDateService do
         expect(described_class.handover(offender).start_date).to eq(Date.new(2019, 12, 2))
       end
     end
+
+    context 'when data is missing' do
+      let(:offender) {
+        OpenStruct.new indeterminate_sentence?: false,
+                       nps_case?: true,
+                       automatic_release_date: nil,
+                       tariff_date: nil
+      }
+
+      it 'is unknown' do
+        result = described_class.handover(offender)
+        expect(result.start_date).to eq("Unknown")
+      end
+    end
   end
 
   describe '#responsibility_handover_date' do
