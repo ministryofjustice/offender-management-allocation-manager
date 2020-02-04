@@ -105,7 +105,7 @@ private
     end
 
     def release_date_gt_15_mths_at_policy_date?(offender)
-      earliest_release_date = offender.parole_eligibility_date.presence ||
+      earliest_release_date = offender.parole_eligibility_date.presence || offender.tariff_date.presence ||
         [offender.conditional_release_date, offender.automatic_release_date].
         compact.min
       earliest_release_date >
@@ -137,6 +137,7 @@ private
       else
         threshold = 17.months
       end
+
       if release_date_gt_mths_at_policy_date?(offender, threshold)
         RESPONSIBLE
       else
@@ -150,7 +151,7 @@ private
     end
 
     def release_date_gt_mths_at_policy_date?(offender, threshold)
-      earliest_release_date = offender.parole_eligibility_date.presence ||
+      earliest_release_date = offender.parole_eligibility_date.presence || offender.tariff_date.presence ||
         [offender.conditional_release_date, offender.automatic_release_date].
         compact.min
 

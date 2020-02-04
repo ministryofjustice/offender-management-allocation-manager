@@ -282,17 +282,18 @@ describe ResponsibilityService do
           end
 
           context 'when an indeterminate NPS offender' do
+            let(:sentence_start_date) { Date.new(2019, 8, 1) }
             let(:offender) {
               OpenStruct.new  nps_case?: true,
                               welsh_offender: false,
                               indeterminate_sentence?: true,
-                              sentence_start_date: Time.zone.today,
+                              sentence_start_date: sentence_start_date,
                               tariff_date: ted,
                               sentenced?: true
             }
 
-            context 'with more than 10 months left to serve' do
-              let(:ted) { Time.zone.today + 14.months }
+            context 'with more than 17 months left to serve' do
+              let(:ted) { sentence_start_date + 20.months }
 
               it 'will show the POM as having a responsible role' do
                 resp = described_class.calculate_pom_responsibility(offender)
@@ -300,13 +301,20 @@ describe ResponsibilityService do
               end
             end
 
-            context 'with less than 10 months left to serve' do
-              let(:ted) { Time.zone.today + 4.months }
+            context 'with less than 17 months left to serve' do
+              let(:ted) { sentence_start_date + 4.months }
+
 
               it 'will show the POM as having a supporting role' do
-                resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::SUPPORTING
+                # We need to travel back to a date that is before the tariff date, otherwise
+                # the test will fail as calculate_pom_responsibility will set responsibility
+                # to RESPONSIBLE if tariff date is in the past.
+                Timecop.travel sentence_start_date + 2.months do
+                  resp = described_class.calculate_pom_responsibility(offender)
+                  expect(resp).to eq ResponsibilityService::SUPPORTING
+                end
               end
+
             end
           end
         end
@@ -464,17 +472,18 @@ describe ResponsibilityService do
           end
 
           context 'when an indeterminate NPS offender' do
+            let(:sentence_start_date) { Date.new(2019, 1, 1) }
             let(:offender) {
               OpenStruct.new  nps_case?: true,
                               welsh_offender: true,
                               indeterminate_sentence?: true,
-                              sentence_start_date: Time.zone.today,
+                              sentence_start_date: sentence_start_date,
                               tariff_date: ted,
                               sentenced?: true
             }
 
-            context 'with more than 10 months left to serve' do
-              let(:ted) { Time.zone.today + 14.months }
+            context 'with more than 15 months left to serve' do
+              let(:ted) { sentence_start_date + 18.months }
 
               it 'will show the POM as having a responsible role' do
                 resp = described_class.calculate_pom_responsibility(offender)
@@ -482,12 +491,17 @@ describe ResponsibilityService do
               end
             end
 
-            context 'with less than 10 months left to serve' do
-              let(:ted) { Time.zone.today + 4.months }
+            context 'with less than 15 months left to serve' do
+              let(:ted) { sentence_start_date + 8.months }
 
               it 'will show the POM as having a supporting role' do
-                resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::SUPPORTING
+                # We need to travel back to a date that is before the tariff date, otherwise
+                # the test will fail as calculate_pom_responsibility will set responsibility
+                # to RESPONSIBLE if tariff date is in the past.
+                Timecop.travel sentence_start_date + 2.months do
+                  resp = described_class.calculate_pom_responsibility(offender)
+                  expect(resp).to eq ResponsibilityService::SUPPORTING
+                end
               end
             end
           end
