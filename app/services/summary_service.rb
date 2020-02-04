@@ -81,7 +81,7 @@ private
   end
 
   def self.sort_fields_for_new_arrivals
-    [:last_name, :arrival_date, :earliest_release_date]
+    [:last_name, :prison_arrival_date, :earliest_release_date]
   end
 
   def self.default_sortable_fields
