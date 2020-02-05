@@ -401,7 +401,7 @@ GEM
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
     stackprof (0.2.13)
-    test-prof (0.10.1)
+    test-prof (0.10.2)
     thor (1.0.1)
     thread_safe (0.3.6)
     tilt (2.0.10)
