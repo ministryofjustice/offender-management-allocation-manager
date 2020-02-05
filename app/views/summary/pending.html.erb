@@ -2,14 +2,15 @@
   <%= render '/layouts/prison_switcher' %>
 <% end %>
 
-<h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Allocations</h1>
-
 <div class="govuk-!-margin-bottom-4">
   <%= render "search/search_box" %>
 </div>
-<%= render(:partial => 'tabs_start', :locals => {:active => :pending}) %>
 
-<section class="govuk-tabs__panel" id="awaiting-information">
+<%= render(:partial => 'summary_subnav', :locals => {:active => :pending}) %>
+
+<h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Add missing information</h1>
+
+<section id="awaiting-information">
   <%= render(
           :partial => 'shared/pagination',
           :locals => {
@@ -21,11 +22,10 @@
     <tr class="govuk-table__row">
       <th class="govuk-table__header" scope="col">
         <a href="<%= sort_link('last_name') %>">
-          Prisoner name
+          Prisoner
         </a>
         <%= sort_arrow('last_name') %>
       </th>
-      <th class="govuk-table__header" scope="col">Prisoner number</th>
       <th class="govuk-table__header" scope="col">Service provider</th>
       <th class="govuk-table__header" scope="col">Tier</th>
       <th class="govuk-table__header" scope="col">
@@ -40,8 +40,13 @@
     <tbody class="govuk-table__body">
     <% @offenders.each_with_index do |offender, i| %>
       <tr class="govuk-table__row offender_row_<%= i %>">
-        <td aria-label="Prisoner full name" class="govuk-table__cell "><%= offender.full_name %></td>
-        <td aria-label="Prisoner number" class="govuk-table__cell "><%= offender.offender_no %></td>
+        <td aria-label="Prisoner full name" class="govuk-table__cell ">
+          <%= offender.full_name %>
+          <br/>
+          <span class='govuk-hint govuk-!-margin-bottom-0'>
+            <%= offender.offender_no %>
+          </span>
+        </td>
 
         <!-- Todo: REFACTOR THIS SECTION TO USE PRESENTERS -->
         <td aria-label="Service provider" class="govuk-table__cell ">

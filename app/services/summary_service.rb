@@ -4,21 +4,37 @@ class SummaryService
   PAGE_SIZE = 20 # The number of items to show in the view
 
   # rubocop:disable Metrics/MethodLength
+  # rubocop:disable Metrics/PerceivedComplexity
   def self.summary(summary_type, prison)
     # We expect to be passed summary_type, which is one of :allocated, :unallocated,
-    # or :pending.  The other types will return totals, and do not contain any data.
-    sortable_fields = (summary_type == :allocated ? sort_fields_for_allocated : default_sortable_fields)
+    # :pending, or :new_arrivals.  The other types will return totals, and do not contain
+    # any data.
+    sortable_fields = if summary_type == :allocated
+                        sort_fields_for_allocated
+                      elsif summary_type == :new_arrivals
+                        sort_fields_for_new_arrivals
+                      else
+                        default_sortable_fields
+                      end
 
     # We want to store the total number of each item so we can show totals for
     # each type of record.
     buckets = { allocated: Bucket.new(sortable_fields),
                 unallocated: Bucket.new(sortable_fields),
-                pending: Bucket.new(sortable_fields) }
+                pending: Bucket.new(sortable_fields),
+                new_arrivals: Bucket.new(sortable_fields)
+    }
 
     offenders = prison.offenders
     active_allocations_hash = AllocationService.active_allocations(offenders.map(&:offender_no), prison.code)
 
+    # We need arrival dates for all offenders and all summary types because it is used to
+    # detect new arrivals and so we would not be able to count them without knowing their
+    # prison_arrival_date
+    add_arrival_dates(offenders) if offenders.any?
+
     offenders.each do |offender|
+      # Having a 'tier' is an alias for having a case information record
       if offender.tier.present?
         # When trying to determine if this offender has a current active allocation, we want to know
         # if it is for this prison.
@@ -27,13 +43,12 @@ class SummaryService
         else
           buckets[:unallocated].items << offender
         end
+      elsif new_arrival?(offender)
+        buckets[:new_arrivals].items << offender
       else
         buckets[:pending].items << offender
       end
     end
-
-    add_arrival_dates(buckets[:unallocated].items) if buckets[:unallocated].items.any?
-    add_arrival_dates(buckets[:pending].items) if buckets[:pending].items.any?
 
     # For the allocated offenders, we need to provide the allocated POM's
     # name
@@ -43,19 +58,30 @@ class SummaryService
       offender.allocation_date = (alloc.primary_pom_allocated_at || alloc.updated_at)&.to_date
     end
 
-    Summary.new(summary_type).tap { |summary|
-      summary.allocated = buckets[:allocated]
-      summary.unallocated = buckets[:unallocated]
-      summary.pending = buckets[:pending]
-    }
+    Summary.new(summary_type, allocated: buckets[:allocated],
+                              unallocated: buckets[:unallocated],
+                              pending: buckets[:pending],
+                              new_arrivals: buckets[:new_arrivals])
   end
 
 # rubocop:enable Metrics/MethodLength
+# rubocop:enable Metrics/PerceivedComplexity
 
 private
 
+  def self.new_arrival?(offender)
+    grace_period_in_days = 2
+    grace_period_in_days = 4 if Time.zone.today .monday? || Time.zone.today .tuesday?
+
+    offender.awaiting_allocation_for <= grace_period_in_days
+  end
+
   def self.sort_fields_for_allocated
     [:last_name, :earliest_release_date, :tier]
+  end
+
+  def self.sort_fields_for_new_arrivals
+    [:last_name, :prison_arrival_date, :earliest_release_date]
   end
 
   def self.default_sortable_fields

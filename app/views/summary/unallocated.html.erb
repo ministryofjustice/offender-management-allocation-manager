@@ -14,14 +14,15 @@
   </p>
 <% end %>
 
-<h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Allocations</h1>
-
 <div class="govuk-!-margin-bottom-4">
   <%= render "search/search_box" %>
 </div>
-<%= render(:partial => 'tabs_start', :locals => {:active => :unallocated}) %>
 
-<section class="govuk-tabs__panel" id="awaiting-allocation">
+<%= render(:partial => 'summary_subnav', :locals => {:active => :unallocated}) %>
+
+<h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Make allocations</h1>
+
+<section id="awaiting-allocation">
   <%= render(
           :partial => 'shared/pagination',
           :locals => {
@@ -33,11 +34,10 @@
     <tr class="govuk-table__row">
       <th class="govuk-table__header" scope="col">
         <a href="<%= sort_link('last_name') %>">
-          Prisoner name
+          Prisoner
         </a>
         <%= sort_arrow('last_name') %>
       </th>
-      <th class="govuk-table__header sorter-false" scope="col">Prisoner number</th>
       <th class="govuk-table__header sorter-false" xscope="col">
         <a href="<%= sort_link('earliest_release_date') %>">
           Earliest release<br/>date
@@ -58,8 +58,14 @@
     <tbody class="govuk-table__body">
     <% @offenders.each_with_index do |offender, i| %>
       <tr class="govuk-table__row offender_row_<%= i %>">
-        <td aria-label="Prisoner name" class="govuk-table__cell "><%= offender.full_name %></td>
-        <td aria-label="Prisoner number" class="govuk-table__cell"><%= offender.offender_no %></td>
+        <td aria-label="Prisoner name" class="govuk-table__cell ">
+          <%= offender.full_name %>
+          <br/>
+          <span class='govuk-hint govuk-!-margin-bottom-0'>
+            <%= offender.offender_no %>
+          </span>
+        </td>
+
         <td aria-label="Earliest release<br/>date" class="govuk-table__cell">
           <%= format_date(offender.earliest_release_date) %>
         </td>

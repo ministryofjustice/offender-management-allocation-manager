@@ -23,6 +23,8 @@ RSpec.describe DebuggingController, type: :controller do
 
   context 'when debugging at a prison level' do
     it 'can show debugging information for an entire prison' do
+      stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/movements/offenders?latestOnly=false&movementTypes=TRN").
+      to_return(status: 200, body: [].to_json)
       stub_request(:get, elite2listapi).
           with(
             headers: {
