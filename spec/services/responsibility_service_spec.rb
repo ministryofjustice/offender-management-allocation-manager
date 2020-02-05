@@ -304,7 +304,6 @@ describe ResponsibilityService do
             context 'with less than 17 months left to serve' do
               let(:ted) { sentence_start_date + 4.months }
 
-
               it 'will show the POM as having a supporting role' do
                 # We need to travel back to a date that is before the tariff date, otherwise
                 # the test will fail as calculate_pom_responsibility will set responsibility
@@ -314,7 +313,6 @@ describe ResponsibilityService do
                   expect(resp).to eq ResponsibilityService::SUPPORTING
                 end
               end
-
             end
           end
         end
