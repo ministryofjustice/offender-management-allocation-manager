@@ -58,6 +58,10 @@ RSpec.configure do |config|
     DatabaseCleaner.clean
   end
 
+  config.before(:each) do
+    Rails.cache.clear
+  end
+
   config.include ActiveSupport::Testing::TimeHelpers
   config.include JWTHelper
   config.include FeaturesHelper

@@ -11,7 +11,7 @@ describe AllocationService do
   describe '#allocate_secondary', :queueing do
     let(:kath_id) { 485_637 }
     let(:ross_id) { 485_926 }
-    let(:nomis_offender_id) { 'G7806VO' }
+    let(:nomis_offender_id) { 'G4273GI' }
     let(:primary_pom_id) { ross_id }
     let(:secondary_pom_id) { kath_id }
     let(:message) { 'Additional text' }
@@ -43,8 +43,8 @@ describe AllocationService do
         to match(
           hash_including(
             "message" => message,
-            "offender_name" => "Abdoria, Ongmetain",
-            "nomis_offender_id" => "G7806VO",
+            "offender_name" => "Abbella, Ozullirn",
+            "nomis_offender_id" => "G4273GI",
             "pom_email" => "pom@digital.justice.gov.uk",
             "pom_name" => "Moic",
             "url" => "http://localhost:3000/prisons/LEI/caseload"
@@ -56,8 +56,8 @@ describe AllocationService do
           hash_including(
             "message" => message,
             "pom_name" => "Kath",
-            "offender_name" => "Abdoria, Ongmetain",
-            "nomis_offender_id" => "G7806VO",
+            "offender_name" => "Abbella, Ozullirn",
+            "nomis_offender_id" => "G4273GI",
             "responsibility" => "supporting",
             "responsible_pom_name" => 'Pom, Moic',
             "pom_email" => "kath.pobee-norris@digital.justice.gov.uk",

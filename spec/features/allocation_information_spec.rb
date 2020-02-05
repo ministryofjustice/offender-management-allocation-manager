@@ -16,12 +16,13 @@ feature "view an offender's allocation information", :versioning do
       status: 'Active'
     )
   }
+  let(:offender_no) { "G4273GI" }
 
   before do
     signin_user
   end
 
-  describe 'Offender does not have a key worker assigned' do
+  context 'when offender does not have a key worker assigned' do
     before do
       create_case_information_for(nomis_offender_id_without_keyworker)
       create_allocation(nomis_offender_id_without_keyworker)
@@ -39,6 +40,54 @@ feature "view an offender's allocation information", :versioning do
       expect(page).to have_css('.govuk-table__cell', text: 'Duckett, Jenny')
       # Keyworker
       expect(page).to have_css('.govuk-table__cell', text: 'Data not available')
+    end
+  end
+
+  context 'when an NPS, Determinate, English  offender has a key worker assigned' do
+    context 'when the offender has over 10 months left to serve' do
+      before do
+        create_case_information_for(offender_no)
+        create_allocation(offender_no)
+
+        stub_api_calls_for_prison_allocation_path(sentence_start_date: "2020-01-01",
+                                                  conditional_release_date: "2020-11-02",
+                                                  automatic_release_date: "2020-11-02",
+                                                  hdced: "2020-11-02",
+                                                  release_date: "2023-01-01")
+
+        visit prison_allocation_path('LEI', nomis_offender_id: offender_no)
+      end
+
+      it "displays a POM as responsible" do
+        expect(page).to have_content('Responsible')
+      end
+
+      it "displays the case owner as custody" do
+        expect(page).to have_css('.govuk-table__cell', text: 'Custody')
+      end
+    end
+
+    context 'when the offender has less than 10 months left to serve' do
+      before do
+        create_case_information_for(offender_no)
+        create_allocation(offender_no)
+
+        stub_api_calls_for_prison_allocation_path(sentence_start_date: "2020-01-01",
+                                                  conditional_release_date: "2020-06-02",
+                                                  automatic_release_date: "2020-06-02",
+                                                  hdced: "2020-06-02",
+                                                  release_date: "2023-01-01")
+
+        visit prison_allocation_path('LEI', nomis_offender_id: offender_no)
+      end
+
+      it "displays a POM as supporting if the offender has less than 10 months left to serve" do
+        expect(page).to have_content('Supporting')
+      end
+
+      it "displays the case owner as community" do
+        expect(page).to have_css('.govuk-table__cell', text: 'Community')
+      end
     end
   end
 
@@ -145,5 +194,35 @@ feature "view an offender's allocation information", :versioning do
       allocated_at_tier: allocated_at_tier,
       recommended_pom_type: recommended_pom_type
     )
+  end
+
+private
+
+  def stub_api_calls_for_prison_allocation_path(sentence_start_date:, conditional_release_date:, automatic_release_date:, hdced:, release_date:)
+    stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/auth/oauth/token?grant_type=client_credentials").
+            to_return(status: 200, body: {}.to_json, headers: {})
+
+    stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/prisoners/#{offender_no}").
+      to_return(status: 200, body: [{ offenderNo: offender_no, title: "MR", firstName: "OZULLIRN", middleNames: "TESSE", lastName: "ABBELLA", dateOfBirth: "1980-08-15", gender: "Male", sexCode: "M", nationalities: "sxiVsxi", currentlyInPrison: "Y", latestBookingId: "1153753", latestLocationId: "LEI", latestLocation: "Leeds(HMP)", internalLocation: "LEI-B-4-021", pncNumber: "97/39395W", croNumber: "043735/97V", ethnicity: "White:Eng./Welsh/Scot./N.Irish/British", birthCountry: "England", religion: "EfJSmIEfJSm", convictedStatus: "Convicted", imprisonmentStatus: "SENT03", receptionDate: "2016-11-26", maritalStatus: "sjedbztIaJRRzRZVIYadsjedbztIaJRRzRZVIYa" }].to_json)
+
+    stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/offender-sentences/bookings").
+      with(body: "[1153753]").
+        to_return(status: 200, body: [{ bookingId: 1_153_753, offenderNo: offender_no, firstName: "OZULLIRN", lastName: "ABBELLA", agencyLocationId: "LEI", sentenceDetail: { sentenceExpiryDate: "2023-06-03", conditionalReleaseDate: conditional_release_date, automaticReleaseDate: automatic_release_date, homeDetentionCurfewEligibilityDate: hdced,  licenceExpiryDate: "2023-05-22", bookingId: 1_153_753, sentenceStartDate: sentence_start_date, nonDtoReleaseDate: "2020-03-16", nonDtoReleaseDateType: "CRD", confirmedReleaseDate: "2020-02-07", releaseDate: release_date }, dateOfBirth: "1980-08-15", agencyLocationDesc: "LEEDS(HMP)", internalLocationDesc: "B-4-021", facialImageId: 1_340_556 }].to_json, headers: {})
+
+    stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/offender-assessments/CATEGORY").
+      with(body: "[\"#{offender_no}\"]").
+        to_return(status: 200, body: [{ bookingId: 1_153_753, offenderNo: offender_no, classificationCode: "C", classification: "CatC", assessmentCode: "CATEGORY", assessmentDescription: "Categorisation", cellSharingAlertFlag: false, assessmentDate: "2017-01-19", nextReviewDate: "2019-09-09", approvalDate: "2017-01-20", assessmentAgencyId: "LEI", assessmentStatus: "A", assessmentSeq: 5 }].to_json, headers: {})
+
+    stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/bookings/1153753/mainOffence").
+      to_return(status: 200, body: [{ bookingId: 1_153_753, offenceDescription: "Section 18 - wounding with intent to resist / prevent arrest" }].to_json, headers: {})
+
+    stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/staff/roles/LEI/role/POM").
+      to_return(status: 200, body: [{ staffId: 485_636, firstName: "JENNY", lastName: "DUCKETT", status: "ACTIVE", gender: "F", dateOfBirth: "1970-01-01", agencyId: "LEI", agencyDescription: "Leeds(HMP)", fromDate: "2019-01-22", position: "PRO", positionDescription: "PrisonOfficer", role: "POM", roleDescription: "Prison Offender Manager", scheduleType: "FT", scheduleTypeDescription: "FullTime", hoursPerWeek: 35 }].to_json, headers: {})
+
+    stub_request(:get, "https://keyworker-api-dev.prison.service.justice.gov.uk/key-worker/LEI/offender/#{offender_no}").
+      to_return(status: 200, body: { staffId: 485_572, firstName: "DOM", lastName: "BULL" }.to_json, headers: {})
+
+    stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/staff/485636").
+      to_return(status: 200, body: { staffId: 485_636, firstName: "JENNY", lastName: "DUCKETT", status: "ACTIVE", gender: "F", dateOfBirth: "1970-01-01" }.to_json, headers: {})
   end
 end
