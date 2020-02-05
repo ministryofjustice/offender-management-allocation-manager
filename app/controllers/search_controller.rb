@@ -14,6 +14,8 @@ class SearchController < PrisonsApplicationController
     @q = search_term
     offenders = SearchService.search_for_offenders(@q, @prison)
     @offenders = get_slice_for_page(offenders)
+
+    MetricsService.instance.increment_search_count
   end
 
 private
@@ -34,6 +36,6 @@ private
   end
 
   def search_term
-    params['q']
+    params['q'].strip
   end
 end

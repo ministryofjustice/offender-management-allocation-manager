@@ -51,7 +51,7 @@ module OffenderManagementAllocationClient
     config.nomis_oauth_client_id = ENV['NOMIS_OAUTH_CLIENT_ID']&.strip
     config.nomis_oauth_client_secret = ENV['NOMIS_OAUTH_CLIENT_SECRET']&.strip
     config.nomis_oauth_public_key = ENV['NOMIS_OAUTH_PUBLIC_KEY']&.strip
-    config.prometheus_metrics = ENV['PROMETHEUS_METRICS']&.strip
+    config.collect_prometheus_metrics = ENV['PROMETHEUS_METRICS']&.strip == 'on'
     config.ga_tracking_id = ENV['GA_TRACKING_ID']&.strip
     config.support_email = ENV['SUPPORT_EMAIL']&.strip
     config.redis_url = ENV['REDIS_URL']&.strip

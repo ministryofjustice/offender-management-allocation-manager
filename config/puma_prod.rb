@@ -14,4 +14,9 @@ after_worker_boot do
   require 'prometheus_exporter/client'
   PrometheusExporter::Instrumentation::Puma.start
   PrometheusExporter::Instrumentation::Process.start(type: 'web')
+
+  PrometheusExporter::Instrumentation::ActiveRecord.start(
+    custom_labels: { type: 'puma_worker' },
+    config_labels: [:database, :host]
+  )
 end
