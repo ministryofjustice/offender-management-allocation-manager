@@ -3,6 +3,8 @@
 class HandoverDateService
   HandoverData = Struct.new :start_date, :handover_date, :reason
 
+  # rubocop:disable Metrics/CyclomaticComplexity
+  # rubocop:disable Metrics/PerceivedComplexity
   def self.handover(offender)
     if offender.recalled?
       HandoverData.new nil, nil, 'Recall case - no handover date calculation'
@@ -21,6 +23,8 @@ class HandoverDateService
       HandoverData.new nil, crc_handover_date(offender), 'CRC Case'
     end
   end
+# rubocop:enable Metrics/CyclomaticComplexity
+# rubocop:enable Metrics/PerceivedComplexity
 
 private
 
