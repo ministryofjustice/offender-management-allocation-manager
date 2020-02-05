@@ -6,10 +6,17 @@
   <%= render "search/search_box" %>
 </div>
 
-<%= render(:partial => 'summary_subnav', :locals => {:active => :allocated}) %>
-<h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Allocations</h1>
+<%= render(:partial => 'summary_subnav', :locals => {:active => :new_arrivals}) %>
 
-<section id="allocated">
+<h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Newly arrived</h1>
+<p>
+  Case information for these prisoners will be matched with nDelius records in the
+  next 24-48 hours. If case information is matched successfully you will be able to
+  allocate a POM. If not, the case will move to 'Add missing information’ for you
+  to update first.
+</p>
+
+<section id="awaiting-allocation">
   <%= render(
           :partial => 'shared/pagination',
           :locals => {
@@ -26,33 +33,40 @@
         <%= sort_arrow('last_name') %>
       </th>
       <th class="govuk-table__header sorter-false" scope="col">
+        <a href="<%= sort_link('prison_arrival_date') %>">
+          Arrival date
+        </a>
+        <%= sort_arrow('prison_arrival_date') %>
+      </th>
+      <th class="govuk-table__header sorter-false" xscope="col">
         <a href="<%= sort_link('earliest_release_date') %>">
           Earliest release date
         </a>
         <%= sort_arrow('earliest_release_date') %>
       </th>
-      <th class="govuk-table__header" scope="col">POM</th>
-      <th class="govuk-table__header" scope="col">Allocation date</th>
-      <th class="govuk-table__header sorter-false" scope="col">Action</th>
+      <th class="govuk-table__header sorter-false" scope="col">
+        Matching with nDelius scheduled for
+      </th>
     </tr>
     </thead>
     <tbody class="govuk-table__body">
     <% @offenders.each_with_index do |offender, i| %>
-      <tr class="govuk-table__row allocated_offender_row_<%= i %>">
-        <td aria-label="Prisoner" class="govuk-table__cell">
+      <tr class="govuk-table__row offender_row_<%= i %>">
+        <td aria-label="Prisoner name" class="govuk-table__cell ">
           <%= offender.full_name %>
           <br/>
           <span class='govuk-hint govuk-!-margin-bottom-0'>
             <%= offender.offender_no %>
           </span>
         </td>
-        <td aria-label="Release date" class="govuk-table__cell">
+        <td aria-label="Arrival date" class="govuk-table__cell">
+          <%= format_date(offender.prison_arrival_date) %>
+        </td>
+        <td aria-label="Earliest release<br/>date" class="govuk-table__cell">
           <%= format_date(offender.earliest_release_date) %>
         </td>
-        <td aria-label="POM" class="govuk-table__cell"><%= offender.allocated_pom_name %></td>
-        <td aria-label="Allocation date" class="govuk-table__cell"><%= format_date(offender.allocation_date) %></td>
-        <td aria-label="Action" class="govuk-table__cell ">
-          <%= link_to "View", prison_allocation_path(@prison.code, nomis_offender_id: offender.offender_no, sort: params[:sort], page: params[:page] || 1) %>
+        <td aria-label="Matching with nDelius scheduled for" class="govuk-table__cell">
+          <%= delius_schedule_for(offender.prison_arrival_date) %>, 9:15PM
         </td>
       </tr>
     <% end %>
@@ -66,4 +80,3 @@
           }) %>
 
 </section>
-

@@ -14,23 +14,30 @@ feature 'summary summary feature' do
     it 'displays offenders awaiting information', vcr: { cassette_name: :awaiting_information_feature } do
       visit prison_summary_pending_path('LEI')
 
-      expect(page).to have_css('.govuk-tabs__tab')
-      expect(page).to have_content('Update information')
+      expect(page).to have_css('.moj-sub-navigation__item')
+      expect(page).to have_content('Add missing information')
       expect(page).to have_css('.pagination ul.links li', count: 16)
     end
 
     it 'displays offenders pending allocation', vcr: { cassette_name: :awaiting_allocation_feature } do
       visit prison_summary_unallocated_path('LEI')
 
-      expect(page).to have_css('.govuk-tabs__tab')
-      expect(page).to have_content('Update information')
+      expect(page).to have_css('.moj-sub-navigation__item')
+      expect(page).to have_content('Add missing information')
     end
 
     it 'displays offenders already allocated', vcr: { cassette_name: :allocated_offenders_feature } do
       visit prison_summary_allocated_path('LEI')
 
-      expect(page).to have_css('.govuk-tabs__tab')
+      expect(page).to have_css('.moj-sub-navigation__item')
       expect(page).to have_content('See allocations')
+    end
+
+    it 'displays offenders just arrived allocated', vcr: { cassette_name: :new_offenders_feature } do
+      visit prison_summary_new_arrivals_path('LEI')
+
+      expect(page).to have_css('.moj-sub-navigation__item')
+      expect(page).to have_content('Newly arrived')
     end
   end
 end
