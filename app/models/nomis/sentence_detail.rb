@@ -7,6 +7,8 @@ module Nomis
     attr_accessor :first_name, :last_name,
                   :home_detention_curfew_eligibility_date,
                   :parole_eligibility_date,
+                  :post_recall_release_date,
+                  :post_recall_release_override_date,
                   :release_date,
                   :sentence_start_date,
                   :tariff_date
@@ -50,6 +52,8 @@ module Nomis
         obj.sentence_start_date = deserialise_date(payload, 'sentenceStartDate')
         obj.tariff_date = deserialise_date(payload, 'tariffDate')
         obj.automatic_release_date = deserialise_date(payload, 'automaticReleaseDate')
+        obj.post_recall_release_date = deserialise_date(payload, 'postRecallReleaseDate')
+        obj.post_recall_release_override_date = deserialise_date(payload, 'postRecallReleaseOverrideDate')
         obj.conditional_release_date = deserialise_date(
           payload, 'conditionalReleaseDate'
         )
