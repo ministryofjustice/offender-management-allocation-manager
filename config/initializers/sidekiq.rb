@@ -22,6 +22,8 @@ if Rails.env.production?
       read_timeout: 1.0,
       write_timeout: 1.0
     }
+
+    config.logger.level = Logger::FATAL
   end
 
   Sidekiq.configure_client do |config|
