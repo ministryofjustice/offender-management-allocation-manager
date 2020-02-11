@@ -1,21 +1,66 @@
 require 'rails_helper'
 
-describe Nomis::OffenderSummary, model: true do
-  it "handles no earliest date" do
-    o = described_class.new
-    o.sentence = Nomis::SentenceDetail.new
-    expect(o.sentence.earliest_release_date).to be_nil
-    expect(o.sentenced?).to be false
+describe Nomis::OffenderSummary do
+  describe '#earliest_release_date' do
+    context 'with blank sentence detail' do
+      before { subject.sentence = Nomis::SentenceDetail.new }
+
+      it 'responds with no earliest release date' do
+        expect(subject.sentence.earliest_release_date).to be_nil
+      end
+    end
+
+    context 'with sentence detail with dates' do
+      before do
+        subject.sentence = Nomis::SentenceDetail.new.tap do |sentence|
+          sentence.sentence_start_date = Date.new(2005, 2, 3)
+          sentence.release_date = release_date
+          sentence.parole_eligibility_date = parole_eligibility_date
+        end
+      end
+
+      context 'with a release date after a parole eligibility date' do
+        let(:parole_eligibility_date) { Date.new(2009, 1, 1) }
+        let(:release_date) { Date.new(2010, 1, 1) }
+
+        it 'uses parole eligibility date' do
+          expect(subject.sentence.earliest_release_date).
+            to eq(parole_eligibility_date)
+        end
+      end
+
+      context 'with a release date before a parole eligibility date' do
+        let(:parole_eligibility_date) { Date.new(2010, 1, 1) }
+        let(:release_date) { Date.new(2009, 1, 1) }
+
+        it 'uses release date' do
+          expect(subject.sentence.earliest_release_date).
+            to eq(release_date)
+        end
+      end
+    end
   end
 
-  it "handles an earliest date" do
-    o = described_class.new.tap { |off|
-      off.sentence = Nomis::SentenceDetail.new
-      off.sentence.sentence_start_date = Date.new(2005, 2, 3)
-      off.sentence.release_date = Date.new(2010, 1, 1)
-      off.sentence.parole_eligibility_date = Date.new(2009, 1, 1)
-    }
-    expect(o.sentence.earliest_release_date).to eq(Date.new(2009, 1, 1))
-    expect(o.sentenced?).to be true
+  describe '#sentenced?' do
+    context 'with sentence detail with a release date' do
+      before do
+        subject.sentence = Nomis::SentenceDetail.new.tap do |sentence|
+          sentence.sentence_start_date = Date.new(2005, 2, 3)
+          sentence.release_date = Time.zone.today
+        end
+      end
+
+      it 'marks the offender as sentenced' do
+        expect(subject.sentenced?).to be true
+      end
+    end
+
+    context 'with blank sentence detail' do
+      before { subject.sentence = Nomis::SentenceDetail.new }
+
+      it 'marks the offender as not sentenced' do
+        expect(subject.sentenced?).to be false
+      end
+    end
   end
 end
