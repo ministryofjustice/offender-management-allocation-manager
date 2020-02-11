@@ -63,4 +63,22 @@ describe Nomis::OffenderSummary do
       end
     end
   end
+
+  describe '#age' do
+    context 'with a date of birth 50 years ago' do
+      before { subject.date_of_birth = 50.years.ago }
+
+      it 'returns 50' do
+        expect(subject.age).to eq(50)
+      end
+    end
+
+    context 'with a date of birth 50 years and one day ago' do
+      before { subject.date_of_birth = 50.years.ago - 1.day }
+
+      it 'returns 49' do
+        expect(subject.age).to eq(49)
+      end
+    end
+  end
 end
