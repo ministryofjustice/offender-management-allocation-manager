@@ -10,6 +10,7 @@ class SummaryController < PrisonsApplicationController
              -> { prison_summary_unallocated_path(active_prison_id) }, only: [:unallocated]
   breadcrumb 'Update information',
              -> { prison_summary_pending_path(active_prison_id) }, only: [:pending]
+  breadcrumb 'Newly arrived', -> { prison_summary_new_arrivals_path(active_prison_id) }, only: :new_arrivals
 
   def index
     redirect_to prison_summary_allocated_path(active_prison_id)
@@ -34,6 +35,14 @@ class SummaryController < PrisonsApplicationController
   def pending
     summary = create_summary(:pending)
     items = offenders(:pending, summary.pending)
+
+    @offenders = Kaminari.paginate_array(items).page(page)
+    @summary = SummaryPresenter.new summary
+  end
+
+  def new_arrivals
+    summary = create_summary(:new_arrivals)
+    items = offenders(:new_arrivals, summary.new_arrivals)
 
     @offenders = Kaminari.paginate_array(items).page(page)
     @summary = SummaryPresenter.new summary

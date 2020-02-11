@@ -43,6 +43,18 @@
     </div>
   </div>
 </div>
+
+<div class="govuk-grid-row dashboard-row">
+  <div class="govuk-grid-column-one-third">
+    <div class="wrapper">
+      <h1 class="govuk-heading-s">
+        <%= link_to "Newly arrived", prison_summary_new_arrivals_path(@prison.code), class:"govuk-link" %>
+      </h1>
+      <p class="govuk-body">Prisoners whose case information has not yet been matched with nDelius.</p>
+    </div>
+  </div>
+</div>
+
 <% end  %>
 
 <% if @is_pom %>

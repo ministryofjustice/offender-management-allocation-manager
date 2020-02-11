@@ -11,6 +11,8 @@ SimpleCov.start 'rails' do
   # had to drop this by .01 as a result of re-structuring code and exposing a path that
   # we were not testing anyway.
   minimum_coverage 99.22
+  # 22 lines uncovered at 99.25% coverage
+  minimum_coverage 99.25
   # sometimes coverage drops between branches - don't fail in these cases
   maximum_coverage_drop 0.1
 end

@@ -22,6 +22,9 @@ if Rails.env.production?
       read_timeout: 1.0,
       write_timeout: 1.0
     }
+
+    # Sidekiq logger initialised and the level is set to FATAL to ensure that sensitive data isn't logged.
+    config.logger.level = Logger::FATAL
   end
 
   Sidekiq.configure_client do |config|
