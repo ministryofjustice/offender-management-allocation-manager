@@ -73,7 +73,7 @@ private
     if Time.zone.today.monday?
       offender.awaiting_allocation_for <= 2
     else
-      offender.prison_arrival_date == Time.zone.today
+      offender.prison_arrival_date.to_date == Time.zone.today
     end
   end
 
