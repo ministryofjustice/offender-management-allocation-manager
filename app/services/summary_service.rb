@@ -70,10 +70,11 @@ class SummaryService
 private
 
   def self.new_arrival?(offender)
-    grace_period_in_days = 2
-    grace_period_in_days = 4 if Time.zone.today .monday? || Time.zone.today .tuesday?
-
-    offender.awaiting_allocation_for <= grace_period_in_days
+    if Time.zone.today.monday?
+      offender.awaiting_allocation_for <= 2
+    else
+      offender.prison_arrival_date == Time.zone.today
+    end
   end
 
   def self.sort_fields_for_allocated

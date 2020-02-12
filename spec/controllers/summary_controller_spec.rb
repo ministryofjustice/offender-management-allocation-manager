@@ -227,25 +227,11 @@ RSpec.describe SummaryController, type: :controller do
         sentence_start_date: today - 3.days
       }
 
-      offender_five = {
-        nomis_id: 'E1111EE',
-        booking_id: 555_555,
-        sentence_start_date: today - 4.days
-      }
-
-      offender_six = {
-        nomis_id: 'F1111FF',
-        booking_id: 666_666,
-        sentence_start_date: today - 5.days
-      }
-
       offenders = [
         offender_one,
         offender_two,
         offender_three,
-        offender_four,
-        offender_five,
-        offender_six
+        offender_four
       ]
 
       inmates = offenders.map { |offender|
@@ -290,10 +276,10 @@ RSpec.describe SummaryController, type: :controller do
     context 'when today is Thursday' do
       let(:today) { 'Thu 17 Jan 2019'.to_date }
 
-      it 'shows three new arrivals' do
+      it 'shows one new arrival' do
         Timecop.travel(today) do
           get :new_arrivals, params: { prison_id: prison }
-          expect(assigns(:offenders).count).to eq 3
+          expect(assigns(:offenders).count).to eq 1
         end
       end
 
@@ -302,26 +288,24 @@ RSpec.describe SummaryController, type: :controller do
           get :new_arrivals, params: { prison_id: prison }
           summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
           expect(summary_offenders).to include(
-            'A1111AA' => 0,
-            'B1111BB' => 1,
-            'C1111CC' => 2
+            'A1111AA' => 0
           )
         end
       end
 
-      it 'excludes arrivals older than two days' do
+      it 'excludes arrivals from yesterday' do
         Timecop.travel(today) do
           get :new_arrivals, params: { prison_id: prison }
           summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
-          expect(summary_offenders.keys).not_to include('D1111DD')
+          expect(summary_offenders.keys).not_to include('B1111BB')
         end
       end
 
-      it 'includes older arrivals in pending instead' do
+      it 'includes yesterday arrivals in pending instead' do
         Timecop.travel(today) do
           get :pending, params: { prison_id: prison }
           summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
-          expect(summary_offenders.keys).to include('D1111DD')
+          expect(summary_offenders.keys).to include('B1111BB')
         end
       end
     end
@@ -329,39 +313,26 @@ RSpec.describe SummaryController, type: :controller do
     context 'when today is Monday' do
       let(:today) { 'Mon 14 Jan 2019'.to_date }
 
-      it 'includes arrivals from Thursday last week' do
+      it 'shows three new arrivals' do
         Timecop.travel(today) do
           get :new_arrivals, params: { prison_id: prison }
-          summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
-          expect(summary_offenders.keys).to include('E1111EE')
+          expect(assigns(:offenders).count).to eq 3
         end
       end
 
-      it 'excludes arrivals from Wednesday last week' do
+      it 'includes arrivals from Saturday' do
         Timecop.travel(today) do
           get :new_arrivals, params: { prison_id: prison }
           summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
-          expect(summary_offenders.keys).not_to include('F1111FF')
-        end
-      end
-    end
-
-    context 'when today is Tuesday' do
-      let(:today) { 'Tue 15 Jan 2019'.to_date }
-
-      it 'includes arrivals from Friday last week' do
-        Timecop.travel(today) do
-          get :new_arrivals, params: { prison_id: prison }
-          summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
-          expect(summary_offenders.keys).to include('E1111EE')
+          expect(summary_offenders.keys).to include('C1111CC')
         end
       end
 
-      it 'excludes arrivals from Thurs last week' do
+      it 'excludes arrivals from Friday last week' do
         Timecop.travel(today) do
           get :new_arrivals, params: { prison_id: prison }
           summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
-          expect(summary_offenders.keys).not_to include('F1111FF')
+          expect(summary_offenders.keys).not_to include('D1111DD')
         end
       end
     end
