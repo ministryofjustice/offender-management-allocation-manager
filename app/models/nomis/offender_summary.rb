@@ -12,7 +12,7 @@ module Nomis
     attr_reader :prison_id
 
     def awaiting_allocation_for
-      (Time.zone.today - prison_arrival_date).to_i
+      (Time.zone.today - prison_arrival_date.to_date).to_i
     end
 
     def self.from_json(payload)
