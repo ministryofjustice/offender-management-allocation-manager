@@ -15,8 +15,6 @@ RSpec.describe SummaryController, type: :controller do
 
   before { stub_sso_data(prison, 'alice') }
 
-  after do Rails.cache.clear end
-
   context 'with 2 offenders' do
     before do
       offenders = [
