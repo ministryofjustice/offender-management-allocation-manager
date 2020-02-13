@@ -108,5 +108,20 @@ context 'when NOMIS is missing information' do
         expect(page).to have_content('Prisoner information')
       end
     end
+
+    describe 'the handover start page' do
+      before do
+        stub_request(:get, "#{stub_api_host}/locations/description/#{prison_code}/inmates?convictedStatus=Convicted&returnCategory=true").
+          to_return(status: 200, body: [].to_json, headers: {})
+      end
+
+      it 'does not error' do
+        create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: 1)
+
+        visit prison_caseload_handover_start_path(prison_code)
+
+        expect(page).to have_content('All cases for start of handover to the community in the next 30 days')
+      end
+    end
   end
 end
