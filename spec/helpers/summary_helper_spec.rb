@@ -1,32 +1,63 @@
 require 'rails_helper'
 
-RSpec.describe SummaryHelper do
-  it "says schedule is tomorrow if arrival date is today" do
-    # '18/11/2019' was a Monday. We need to travel to a weekday
-    # as otherwise this will fail if run over the weekend
-    Timecop.travel(Date.parse('18/11/2019')) do
-      sched = delius_schedule_for(Time.zone.today)
-      expect(sched).to eq('Tomorrow')
+describe SummaryHelper do
+  describe 'the next delius import' do
+    let(:result) { Timecop.travel(today) { delius_schedule_for(arrival) } }
+
+    context 'when today is Monday' do
+      let(:today) { Date.parse('Monday 18 Nov 2019') }
+
+      context 'when the prisoner arrived today' do
+        let(:arrival) { today }
+
+        it 'is tomorrow' do
+          expect(result).to eq('Tomorrow')
+        end
+      end
+
+      context 'when the prisoner arrived yesterday' do
+        let(:arrival) { today - 1 }
+
+        it 'is tomorrow' do
+          expect(result).to eq('Today')
+        end
+      end
+
+      context 'when the prisoner arrived today at 4pm' do
+        let(:arrival) { today + 16.hours }
+
+        it 'is tomorrow' do
+          expect(result).to eq('Tomorrow')
+        end
+      end
+
+      context 'when the prisoner arrived yesterday at 4pm' do
+        let(:arrival) { today - 8.hours }
+
+        it 'is tomorrow' do
+          expect(result).to eq('Today')
+        end
+      end
     end
-  end
 
-  it "says schedule is today if arrival date is yesterday" do
-    # '19/11/2019' was a Tuesday. We need to travel to a weekday
-    # as otherwise this will fail if run over the weekend
-    Timecop.travel(Date.parse('19/11/2019')) do
-      sched = delius_schedule_for(Time.zone.today - 1.day)
-      expect(sched).to eq('Today')
-    end
-  end
+    context 'when today is Saturday' do
+      let(:today) { Date.parse('Saturday 16 Nov 2019') }
 
-  it "says monday if today is not mon-fri" do
-    # '16/11/2019' was a saturday
-    Timecop.travel(Date.parse('16/11/2019')) do
-      sched = delius_schedule_for(Time.zone.today)
-      expect(sched).to eq('Monday')
+      context 'when the prisoner arrived today' do
+        let(:arrival) { today }
 
-      sched = delius_schedule_for(Time.zone.today - 1.day)
-      expect(sched).to eq('Monday')
+        it 'is Monday' do
+          expect(result).to eq('Monday')
+        end
+      end
+
+      context 'when the prisoner arrived yesterday' do
+        let(:arrival) { today - 1 }
+
+        it 'is Monday' do
+          expect(result).to eq('Monday')
+        end
+      end
     end
   end
 end
