@@ -189,4 +189,113 @@ describe MovementService do
       expect(processed).to be false
     end
   end
+
+  describe "processing offenders moved to/from immigration estates" do
+    before do
+      create(:allocation, nomis_offender_id: 'G4273GI')
+    end
+
+    let(:allocation) { Allocation.find_by(nomis_offender_id: 'G4273GI') }
+
+    let(:immigration_movement) do
+      create(:movement, offender_no: 'G4273GI', direction_code: direction_code, create_date_time: Date.new(2020, 1, 6),
+                        movement_type: movement_type, from_agency: from_agency, to_agency: to_agency)
+    end
+
+    context 'when movement is a transfer' do
+      let(:case_info) { create(:case_information, nomis_offender_id: 'G4273GI') }
+
+      context 'when the from_agency is MHI' do
+        context 'with the offender going into a prison estate' do
+          let(:from_agency) { 'MHI' }
+          let(:to_agency){ 'PVI' }
+          let(:movement_type) { 'ADM' }
+          let(:direction_code) { 'IN' }
+
+          it 'does not process movement' do
+            processed = described_class.process_movement(immigration_movement)
+            expect(processed).to be false
+          end
+        end
+
+        context 'with the offender moving OUT of the prison estate' do
+          let(:from_agency) { 'MHI' }
+          let(:to_agency) { 'IMM' }
+          let(:movement_type) { 'TRN' }
+          let(:direction_code) { 'IN' }
+
+          it 'can process release movement for offender', vcr: { cassette_name: :immigration_movement_service_successful } do
+            processed = described_class.process_movement(immigration_movement)
+
+            expect(CaseInformationService.get_case_information([immigration_movement.offender_no])).to be_empty
+            expect(allocation.event_trigger).to eq 'offender_released'
+            expect(processed).to be true
+          end
+        end
+      end
+
+      context 'when the from_agency is IMM' do
+        context 'with the offender going into a prison estate' do
+          let(:from_agency) { 'IMM' }
+          let(:to_agency) { 'PVI' }
+          let(:movement_type) { 'TRN' }
+          let(:direction_code) { 'IN' }
+
+          it 'does not process movement' do
+            processed = described_class.process_movement(immigration_movement)
+            expect(processed).to be false
+          end
+        end
+
+        context 'when the offender is moving OUT of the prison estate' do
+          let(:from_agency) { 'IMM' }
+          let(:to_agency) { 'MHI' }
+          let(:movement_type) { 'ADM' }
+          let(:direction_code) { 'IN' }
+
+          it 'can process release movement for offender', vcr: { cassette_name: :immigration_movement_service_successful } do
+            processed = described_class.process_movement(immigration_movement)
+
+            expect(CaseInformationService.get_case_information([immigration_movement.offender_no])).to be_empty
+            expect(allocation.event_trigger).to eq 'offender_released'
+            expect(processed).to be true
+          end
+        end
+      end
+    end
+
+    context 'when movement is a release' do
+      context 'when offender moving to an immigration centre' do
+        context 'when the from_agency is MHI' do
+          let(:from_agency) { 'MHI' }
+          let(:to_agency) { 'OUT' }
+          let(:movement_type) { 'REL' }
+          let(:direction_code) { 'OUT' }
+
+          it 'can release movement' do
+            processed = described_class.process_movement(immigration_movement)
+
+            expect(CaseInformationService.get_case_information([immigration_movement.offender_no])).to be_empty
+            expect(allocation.event_trigger).to eq 'offender_released'
+            expect(processed).to be true
+          end
+        end
+
+        context 'when the from_agency is IMM' do
+          let(:from_agency) { 'IMM' }
+          let(:to_agency) { 'OUT' }
+          let(:movement_type) { 'REL' }
+          let(:direction_code) { 'OUT' }
+
+          it 'can release movement' do
+            processed = described_class.process_movement(immigration_movement)
+
+            expect(CaseInformationService.get_case_information([immigration_movement.offender_no])).to be_empty
+            expect(allocation.event_trigger).to eq 'offender_released'
+            expect(processed).to be true
+          end
+        end
+      end
+    end
+  end
 end
