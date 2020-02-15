@@ -212,7 +212,8 @@ describe MovementService do
           let(:movement_type) { 'ADM' }
           let(:direction_code) { 'IN' }
 
-          it 'does not process movement' do
+          it 'does not process movement',
+             vcr: { cassette_name: :immigration_transfer_from_MHI_to_prison_not_successful } do
             processed = described_class.process_movement(immigration_movement)
             expect(processed).to be false
           end
@@ -224,7 +225,24 @@ describe MovementService do
           let(:movement_type) { 'TRN' }
           let(:direction_code) { 'IN' }
 
-          it 'can process release movement for offender', vcr: { cassette_name: :immigration_movement_service_successful } do
+          it 'can process release movement for offender',
+             vcr: { cassette_name: :immigration_transfer_from_MHI_to_IMM_successful } do
+            processed = described_class.process_movement(immigration_movement)
+
+            expect(CaseInformationService.get_case_information([immigration_movement.offender_no])).to be_empty
+            expect(allocation.event_trigger).to eq 'offender_released'
+            expect(processed).to be true
+          end
+        end
+
+        context 'with the offender moving from a prison to MHI or IMM' do
+          let(:from_agency) { 'LEI' }
+          let(:to_agency) { 'MHI' }
+          let(:movement_type) { 'ADM' }
+          let(:direction_code) { 'IN' }
+
+          it 'can process release movement for offender',
+             vcr: { cassette_name: :immigration_transfer_from_prison_to_IMM_successful } do
             processed = described_class.process_movement(immigration_movement)
 
             expect(CaseInformationService.get_case_information([immigration_movement.offender_no])).to be_empty
@@ -241,7 +259,8 @@ describe MovementService do
           let(:movement_type) { 'TRN' }
           let(:direction_code) { 'IN' }
 
-          it 'does not process movement' do
+          it 'does not process movement',
+             vcr: { cassette_name: :immigration_transfer_from_IMM_to_prison_not_successful } do
             processed = described_class.process_movement(immigration_movement)
             expect(processed).to be false
           end
@@ -253,7 +272,8 @@ describe MovementService do
           let(:movement_type) { 'ADM' }
           let(:direction_code) { 'IN' }
 
-          it 'can process release movement for offender', vcr: { cassette_name: :immigration_movement_service_successful } do
+          it 'can process release movement for offender',
+             vcr: { cassette_name: :immigration_transfer_from_IMM_to_MHI_successful } do
             processed = described_class.process_movement(immigration_movement)
 
             expect(CaseInformationService.get_case_information([immigration_movement.offender_no])).to be_empty
@@ -272,7 +292,8 @@ describe MovementService do
           let(:movement_type) { 'REL' }
           let(:direction_code) { 'OUT' }
 
-          it 'can release movement' do
+          it 'can release movement',
+             vcr: { cassette_name: :immigration_release_from_MHI_to_OUT_successful } do
             processed = described_class.process_movement(immigration_movement)
 
             expect(CaseInformationService.get_case_information([immigration_movement.offender_no])).to be_empty
@@ -287,7 +308,8 @@ describe MovementService do
           let(:movement_type) { 'REL' }
           let(:direction_code) { 'OUT' }
 
-          it 'can release movement' do
+          it 'can release movement',
+             vcr: { cassette_name: :immigration_release_from_IMM_to_OUT_successful } do
             processed = described_class.process_movement(immigration_movement)
 
             expect(CaseInformationService.get_case_information([immigration_movement.offender_no])).to be_empty

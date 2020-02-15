@@ -53,9 +53,12 @@ private
       OpenPrisonTransferJob.perform_later(transfer.to_json)
     end
 
-    # When the movement is from immigration or a detention centre and is not going back to a prison,
-    # remove the case information and deallocate offender
-    if (transfer.from_agency == 'IMM' || transfer.from_agency == 'MHI') && !transfer.to_prison?
+    # Remove the case information and deallocate offender
+    # when the movement is from immigration or a detention centre
+    # and is not going back to a prison OR
+    # when the movement is from a prison to an immigration or detention centre
+    if ((%w[IMM MHI].include? transfer.from_agency) && !transfer.to_prison?) ||
+    ((%w[IMM MHI].include? transfer.to_agency) && transfer.from_prison?)
       release_offender(transfer.offender_no)
 
       return true
