@@ -3,17 +3,15 @@ require 'rails_helper'
 context 'when NOMIS is missing information' do
   let(:prison_code) { 'LEI' }
   let(:offender_no) { 'A1' }
-  let(:stub_api_host) { 'http://nomis.mock/elite2api/api' }
+  let(:stub_auth_host) { Rails.configuration.nomis_oauth_host }
+  let(:stub_api_host) { "#{stub_auth_host}/elite2api/api" }
+  let(:stub_keyworker_host) { Rails.configuration.keyworker_api_host }
 
   describe 'when logged in' do
     before do
       user_name = 'example_user'
       staff_id = 1
-
-      stub_auth_host = 'http://nomis.mock'
       stub_poms = [{ staffId: 1, position: RecommendationService::PRISON_POM }]
-
-      Rails.configuration.nomis_oauth_host = stub_auth_host
 
       stub_request(:post, "#{stub_auth_host}/auth/oauth/token").
         with(query: { grant_type: 'client_credentials' }).
@@ -93,10 +91,6 @@ context 'when NOMIS is missing information' do
 
         stub_request(:post, "#{stub_api_host}/offender-sentences/bookings").
           to_return(status: 200, body: stub_bookings.to_json)
-
-        stub_keyworker_host = 'http://keyworker.mock'
-
-        Rails.configuration.keyworker_api_host = stub_keyworker_host
 
         stub_request(:get, "#{stub_keyworker_host}/key-worker/#{prison_code}/offender/#{offender_no}").
           to_return(status: 200, body: {}.to_json)
