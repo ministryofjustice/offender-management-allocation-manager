@@ -183,6 +183,16 @@ describe ResponsibilityService do
                 expect(resp).to eq ResponsibilityService::SUPPORTING
               end
             end
+
+            context 'when the CRD and ARD are missing' do
+              let(:ard) { nil }
+              let(:crd) { nil }
+
+              it 'will return no responsibility' do
+                expect(described_class.calculate_pom_responsibility(offender)).
+                  to be_nil
+              end
+            end
           end
 
           context 'when the prison is private' do
@@ -247,6 +257,16 @@ describe ResponsibilityService do
               it 'will show the POM as having a supporting role' do
                 resp = described_class.calculate_pom_responsibility(offender)
                 expect(resp).to eq ResponsibilityService::SUPPORTING
+              end
+            end
+
+            context 'when the CRD and ARD are missing' do
+              let(:ard) { nil }
+              let(:crd) { nil }
+
+              it 'will return no responsibility' do
+                expect(described_class.calculate_pom_responsibility(offender)).
+                  to be_nil
               end
             end
           end
@@ -430,6 +450,16 @@ describe ResponsibilityService do
               it 'will show the POM as having a supporting role' do
                 resp = described_class.calculate_pom_responsibility(offender)
                 expect(resp).to eq ResponsibilityService::SUPPORTING
+              end
+            end
+
+            context 'when the CRD and ARD are missing' do
+              let(:ard) { nil }
+              let(:crd) { nil }
+
+              it 'will return no responsibility' do
+                expect(described_class.calculate_pom_responsibility(offender)).
+                  to be_nil
               end
             end
           end
