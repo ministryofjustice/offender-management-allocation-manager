@@ -104,13 +104,15 @@ module Nomis
     def age
       now = Time.zone.now
 
+      if now.month == date_of_birth.month
+        birthday_passed = now.day >= date_of_birth.day
+      elsif now.month > date_of_birth.month
+        birthday_passed = true
+      end
+
       birth_years_ago = now.year - date_of_birth.year
 
-      month_passed = date_of_birth.month >= now.month
-      day_passed = date_of_birth.day >= now.day
-      birthday_passed_this_year = month_passed & day_passed
-
-      @age ||= birthday_passed_this_year ? birth_years_ago : birth_years_ago - 1
+      @age ||= birthday_passed ? birth_years_ago : birth_years_ago - 1
     end
 
     def load_from_json(payload)
