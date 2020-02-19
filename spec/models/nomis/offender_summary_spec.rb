@@ -73,11 +73,21 @@ describe Nomis::OffenderSummary do
       end
     end
 
-    context 'with a date of birth 50 years and one day ago' do
-      before { subject.date_of_birth = 50.years.ago - 1.day }
+    context 'with a date of birth just under 50 years ago' do
+      before { subject.date_of_birth = 50.years.ago + 1.day }
 
       it 'returns 49' do
         expect(subject.age).to eq(49)
+      end
+    end
+
+    context 'with an 18th birthday in a past month' do
+      Timecop.travel('19 Feb 2020') do
+        before { subject.date_of_birth = '5 Jan 2002'.to_date }
+
+        it 'returns 18' do
+          expect(subject.age).to eq(18)
+        end
       end
     end
   end
