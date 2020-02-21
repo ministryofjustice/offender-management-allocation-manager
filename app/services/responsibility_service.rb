@@ -12,17 +12,12 @@ class ResponsibilityService
   COWORKING = 'Co-Working'
   NPS = 'NPS'
 
-  # We currently don't have access to the date of the parole board decision, which means that we cannot correctly
-  # calculate responsibility for NPS indeterminate cases with parole eligibility where the TED is in the past.
-  # A decision has been made to display a notice so staff can check whether they need to override their case or not;
-  # this is until we get access to this data.
   def self.calculate_pom_responsibility(offender)
     if offender.immigration_case? || open_prison_nps_offender?(offender)
       SUPPORTING
-    elsif determinate_with_no_release_dates?(offender)
+    elsif offender.earliest_release_date.nil?
       RESPONSIBLE
-    elsif offender.indeterminate_sentence? && (offender.tariff_date.nil? ||
-       offender.tariff_date < Time.zone.today)
+    elsif offender.indeterminate_sentence? && offender.earliest_release_date < Time.zone.today
       RESPONSIBLE
     else
       standard_rules(offender)
@@ -55,7 +50,7 @@ private
     end
 
     def policy_rules(offender)
-      if release_date_gt_10_mths?(offender) && (HandoverDateService.handover(offender).handover_date > Time.zone.today)
+      if release_date_gt_10_mths?(offender)
         RESPONSIBLE
       else
         SUPPORTING
@@ -65,17 +60,8 @@ private
   private
 
     def release_date_gt_10_mths?(offender)
-      if offender.parole_eligibility_date.present?
-        offender.parole_eligibility_date > offender.sentence_start_date + 10.months
-      elsif offender.indeterminate_sentence?
-        offender.tariff_date > offender.sentence_start_date + 10.months
-      else
-        [
-          offender.conditional_release_date,
-          offender.automatic_release_date
-        ].compact.min >
-        offender.sentence_start_date + 10.months
-      end
+      offender.earliest_release_date >
+        DateTime.now.utc.to_date + 10.months
     end
   end
 
@@ -105,10 +91,7 @@ private
     end
 
     def release_date_gt_15_mths_at_policy_date?(offender)
-      earliest_release_date = offender.parole_eligibility_date.presence ||
-        [offender.conditional_release_date, offender.automatic_release_date].
-        compact.min
-      earliest_release_date >
+      offender.earliest_release_date >
         WELSH_POLICY_START_DATE + 15.months
     end
   end
@@ -150,11 +133,7 @@ private
     end
 
     def release_date_gt_mths_at_policy_date?(offender, threshold)
-      earliest_release_date = offender.parole_eligibility_date.presence ||
-        [offender.conditional_release_date, offender.automatic_release_date].
-        compact.min
-
-      earliest_release_date >
+      offender.earliest_release_date >
         ORIGINAL_ENGLISH_POLICY_START_DATE + threshold
     end
   end
@@ -171,30 +150,12 @@ private
     PrisonService.open_prison?(offender.prison_id) && offender.nps_case?
   end
 
-  class CrcRules
-    def self.responsibility(offender)
-      if release_date_gt_12_weeks?(offender)
-        RESPONSIBLE
-      else
-        SUPPORTING
-      end
-    end
-
-  private
-
-    # CRC can look at HDC date, NPS is not supposed to
-    def self.release_date_gt_12_weeks?(offender)
-      earliest_release_date =
-        offender.home_detention_curfew_actual_date.presence ||
-            [offender.automatic_release_date,
-             offender.conditional_release_date,
-             offender.home_detention_curfew_eligibility_date].compact.min
-      earliest_release_date > DateTime.now.utc.to_date + 12.weeks
-    end
-  end
-
   def self.crc_rules(offender)
-    CrcRules.responsibility(offender)
+    if release_date_gt_12_weeks?(offender)
+      RESPONSIBLE
+    else
+      SUPPORTING
+    end
   end
 
   def self.welsh_offender?(offender)
@@ -202,14 +163,11 @@ private
   end
 
   def self.nps_case?(offender)
-    offender.nps_case?
+    offender.case_allocation == NPS
   end
 
-  def self.determinate_with_no_release_dates?(offender)
-    offender.indeterminate_sentence? == false &&
-        offender.automatic_release_date.nil? &&
-        offender.conditional_release_date.nil? &&
-        offender.parole_eligibility_date.nil? &&
-        offender.home_detention_curfew_eligibility_date.nil?
+  def self.release_date_gt_12_weeks?(offender)
+    offender.earliest_release_date >
+      DateTime.now.utc.to_date + 12.weeks
   end
 end
