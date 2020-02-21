@@ -15,11 +15,11 @@ class StaffMember
   end
 
   def first_name
-    staff_detail.first_name&.titleize
+    staff_detail.first_name.titleize
   end
 
   def last_name
-    staff_detail.last_name&.titleize
+    staff_detail.last_name.titleize
   end
 
   def email_address
