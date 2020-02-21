@@ -20,40 +20,16 @@ private
 
   def self.nps_start_date(offender)
     if offender.early_allocation?
-      early_allocation_handover_start_date(offender)
-    else
-      if offender.indeterminate_sentence?
-        indeterminate_sentence_handover_start_date(offender)
-      else
-        determinate_sentence_handover_start_date(offender)
-      end
-    end
-  end
-
-  def self.early_allocation_handover_start_date(offender)
-    return nil if offender.conditional_release_date.nil?
-
-    offender.conditional_release_date - 18.months
-  end
-
-  def self.indeterminate_sentence_handover_start_date(offender)
-    return nil if offender.tariff_date.nil?
-
-    offender.tariff_date - 8.months
-  end
-
-  def self.determinate_sentence_handover_start_date(offender)
-    if offender.parole_eligibility_date.present?
+      offender.conditional_release_date - 18.months
+    elsif offender.indeterminate_sentence?
+      offender.tariff_date - 8.months # earliest_release_date
+    elsif offender.parole_eligibility_date.present?
       offender.parole_eligibility_date - 8.months
     else
-      if offender.conditional_release_date.present? || offender.automatic_release_date.present?
-        earliest_release_date = [
-          offender.conditional_release_date,
-          offender.automatic_release_date
-        ].compact.min
-
-        earliest_release_date - (7.months + 15.days)
-      end
+      [
+        offender.conditional_release_date,
+        offender.automatic_release_date
+      ].compact.min - (7.months + 15.days)
     end
   end
 

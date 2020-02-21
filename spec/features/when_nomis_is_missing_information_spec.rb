@@ -30,39 +30,36 @@ context 'when NOMIS is missing information' do
     end
 
     describe 'the caseload page' do
-      context 'with an NPS offender with a determinate sentence, but no release dates' do
-        before do
-          stub_offenders = [{
-            offenderNo: offender_no,
-            bookingId: 1,
-            dateOfBirth: '1990-01-01',
-            imprisonmentStatus: 'SEC91'
-          }]
+      before do
+        stub_offenders = [{
+          offenderNo: offender_no,
+          bookingId: 1,
+          dateOfBirth: '1990-01-01',
+          imprisonmentStatus: 'LIFE'
+        }]
 
-          stub_bookings = [{
-            bookingId: 1,
-            sentenceDetail: {
-              releaseDate: 30.years.from_now.iso8601,
-              sentenceStartDate: Time.zone.now.iso8601
-            }
-          }]
+        stub_bookings = [{
+          bookingId: 1,
+          sentenceDetail: {
+            releaseDate: 30.years.from_now.iso8601,
+            sentenceStartDate: Time.zone.now.iso8601
+          }
+        }]
 
-          stub_request(:get, "#{stub_api_host}/locations/description/#{prison_code}/inmates").
-            with(query: { convictedStatus: 'Convicted', returnCategory: true }).
-            to_return(status: 200, body: stub_offenders.to_json)
+        stub_request(:get, "#{stub_api_host}/locations/description/#{prison_code}/inmates").
+          with(query: { convictedStatus: 'Convicted', returnCategory: true }).
+          to_return(status: 200, body: stub_offenders.to_json)
 
-          stub_request(:post, "#{stub_api_host}/offender-sentences/bookings").
-            to_return(status: 200, body: stub_bookings.to_json)
+        stub_request(:post, "#{stub_api_host}/offender-sentences/bookings").
+          to_return(status: 200, body: stub_bookings.to_json)
+      end
 
-          create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: 1)
-          create(:case_information, nomis_offender_id: offender_no, case_allocation: 'NPS')
-        end
+      it 'does not error' do
+        create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: 1)
 
-        it 'does not error' do
-          visit prison_caseload_index_path(prison_code)
+        visit prison_caseload_index_path(prison_code)
 
-          expect(page).to have_content('Showing 1 - 1 of 1 results')
-        end
+        expect(page).to have_content('Showing 1 - 1 of 1 results')
       end
     end
 
@@ -108,8 +105,7 @@ context 'when NOMIS is missing information' do
 
     describe 'the handover start page' do
       before do
-        stub_request(:get, "#{stub_api_host}/locations/description/#{prison_code}/inmates").
-          with(query: { convictedStatus: "Convicted", returnCategory: true }).
+        stub_request(:get, "#{stub_api_host}/locations/description/#{prison_code}/inmates?convictedStatus=Convicted&returnCategory=true").
           to_return(status: 200, body: [].to_json, headers: {})
       end
 
