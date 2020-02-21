@@ -103,8 +103,6 @@ module Nomis
     end
 
     def age
-      return nil if date_of_birth.blank?
-
       now = Time.zone.now
 
       if now.month == date_of_birth.month

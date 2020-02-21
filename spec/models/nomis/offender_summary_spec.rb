@@ -90,13 +90,5 @@ describe Nomis::OffenderSummary do
         end
       end
     end
-
-    context 'with no date of birth' do
-      before { subject.date_of_birth = nil }
-
-      it 'returns nil' do
-        expect(subject.age).to be_nil
-      end
-    end
   end
 end
