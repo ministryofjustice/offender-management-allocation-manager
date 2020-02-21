@@ -55,24 +55,26 @@ private
     end
 
     def policy_rules(offender)
-      release_date = offender.parole_eligibility_date
-
-      if offender.indeterminate_sentence?
-        release_date ||= offender.tariff_date
-      else
-        possible_dates = [offender.conditional_release_date, offender.automatic_release_date]
-        release_date ||= possible_dates.compact.min
-      end
-
-      return nil if release_date.blank?
-
-      expected_time_in_custody_gt_10_months = release_date > offender.sentence_start_date + 10.months
-      handover_date_in_future = HandoverDateService.handover(offender).handover_date > Time.zone.today
-
-      if expected_time_in_custody_gt_10_months && handover_date_in_future
+      if release_date_gt_10_mths?(offender) && (HandoverDateService.handover(offender).handover_date > Time.zone.today)
         RESPONSIBLE
       else
         SUPPORTING
+      end
+    end
+
+  private
+
+    def release_date_gt_10_mths?(offender)
+      if offender.parole_eligibility_date.present?
+        offender.parole_eligibility_date > offender.sentence_start_date + 10.months
+      elsif offender.indeterminate_sentence?
+        offender.tariff_date > offender.sentence_start_date + 10.months
+      else
+        [
+          offender.conditional_release_date,
+          offender.automatic_release_date
+        ].compact.min >
+        offender.sentence_start_date + 10.months
       end
     end
   end
@@ -95,20 +97,19 @@ private
   private
 
     def welsh_prepolicy_rules(offender)
-      earliest_release_date = offender.parole_eligibility_date.presence ||
-        [offender.conditional_release_date, offender.automatic_release_date].
-        compact.min
-
-      return nil if earliest_release_date.blank?
-
-      release_date_gt_15_mths_at_policy_date = earliest_release_date >
-        WELSH_POLICY_START_DATE + 15.months
-
-      if release_date_gt_15_mths_at_policy_date
+      if release_date_gt_15_mths_at_policy_date?(offender)
         RESPONSIBLE
       else
         SUPPORTING
       end
+    end
+
+    def release_date_gt_15_mths_at_policy_date?(offender)
+      earliest_release_date = offender.parole_eligibility_date.presence ||
+        [offender.conditional_release_date, offender.automatic_release_date].
+        compact.min
+      earliest_release_date >
+        WELSH_POLICY_START_DATE + 15.months
     end
   end
 
@@ -136,17 +137,7 @@ private
       else
         threshold = 17.months
       end
-
-      release_date = offender.parole_eligibility_date
-
-      possible_dates = [offender.conditional_release_date, offender.automatic_release_date]
-      release_date ||= possible_dates.compact.min
-
-      return nil if release_date.blank?
-
-      expected_time_in_custody_gt_x_months = release_date > ORIGINAL_ENGLISH_POLICY_START_DATE + threshold
-
-      if expected_time_in_custody_gt_x_months
+      if release_date_gt_mths_at_policy_date?(offender, threshold)
         RESPONSIBLE
       else
         SUPPORTING
@@ -156,6 +147,15 @@ private
     def hub_or_private?(offender)
       PrisonService.english_hub_prison?(offender.prison_id) ||
         PrisonService.english_private_prison?(offender.prison_id)
+    end
+
+    def release_date_gt_mths_at_policy_date?(offender, threshold)
+      earliest_release_date = offender.parole_eligibility_date.presence ||
+        [offender.conditional_release_date, offender.automatic_release_date].
+        compact.min
+
+      earliest_release_date >
+        ORIGINAL_ENGLISH_POLICY_START_DATE + threshold
     end
   end
 
