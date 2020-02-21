@@ -150,8 +150,9 @@ describe ResponsibilityService do
 
       context 'when an English offender' do
         context 'when sentenced before policy start date' do
+          let(:sentence_start_date) { Date.parse('15-09-2019') }
+
           context 'when the prison is a hub' do
-            let(:sentence_start_date) { Date.parse('15-09-2019') }
             let(:offender) {
               OpenStruct.new  prison_id: 'VEI',
                               nps_case?: true,
@@ -196,33 +197,30 @@ describe ResponsibilityService do
           end
 
           context 'when the prison is private' do
-            let(:sentence_start_date) { Date.parse('15-09-2019') }
             let(:offender) {
               OpenStruct.new  prison_id: 'TSI',
                               nps_case?: true,
                               welsh_offender: false,
                               sentence_start_date: sentence_start_date,
                               automatic_release_date: ard,
-                              conditional_release_date: crd,
+                              conditional_release_date: nil,
                               sentenced?: true
             }
 
-            context 'with over 20 months left to serve' do
-              let(:ard)   { sentence_start_date + 21.months }
-              let(:crd)   { sentence_start_date + 22.months }
+            context 'with expected release on the cutoff date' do
+              let(:ard) { '1 June 2021'.to_date }
 
-              it 'is responsible' do
+              it 'returns responsible' do
                 resp = described_class.calculate_pom_responsibility(offender)
 
                 expect(resp).to eq ResponsibilityService::RESPONSIBLE
               end
             end
 
-            context 'with less than 20 months left to serve' do
-              let(:ard)   { sentence_start_date + 11.months }
-              let(:crd)   { sentence_start_date + 10.months }
+            context 'with expected release before the cutoff date' do
+              let(:ard) { '31 May 2021'.to_date }
 
-              it 'is responsible' do
+              it 'returns supporting' do
                 resp = described_class.calculate_pom_responsibility(offender)
 
                 expect(resp).to eq ResponsibilityService::SUPPORTING
@@ -231,38 +229,37 @@ describe ResponsibilityService do
           end
 
           context 'when a determinate NPS offender' do
-            let(:sentence_start_date) { Date.parse('15-09-2019') }
             let(:offender) {
-              OpenStruct.new  nps_case?: true,
-                              welsh_offender: false,
-                              sentence_start_date: sentence_start_date,
-                              automatic_release_date: ard,
-                              conditional_release_date: crd
+              OpenStruct.new(
+                nps_case?: true,
+                welsh_offender: false,
+                sentence_start_date: sentence_start_date,
+                automatic_release_date: ard,
+                conditional_release_date: nil,
+                sentenced?: true
+              )
             }
 
-            context 'when with the CRD or ARD is greater than 17 months after the policy start date' do
-              let(:ard)   { sentence_start_date + 18.months }
-              let(:crd)   { sentence_start_date + 19.months }
+            context 'with expected release on the cutoff date' do
+              let(:ard) { '15 Feb 2021'.to_date }
 
-              it 'will show the POM as having a responsible role' do
+              it 'returns responsible' do
                 resp = described_class.calculate_pom_responsibility(offender)
                 expect(resp).to eq ResponsibilityService::RESPONSIBLE
               end
             end
 
-            context 'when with the CRD or ARD is less than 17 months after the policy start date' do
-              let(:ard)   { sentence_start_date + 6.months }
-              let(:crd)   { sentence_start_date + 7.months }
+            context 'with expected release before the cutoff date' do
+              let(:ard) { '14 Feb 2021'.to_date }
 
-              it 'will show the POM as having a supporting role' do
+              it 'returns supporting' do
                 resp = described_class.calculate_pom_responsibility(offender)
                 expect(resp).to eq ResponsibilityService::SUPPORTING
               end
             end
 
-            context 'when the CRD and ARD are missing' do
+            context 'when the release dates are missing' do
               let(:ard) { nil }
-              let(:crd) { nil }
 
               it 'will return no responsibility' do
                 expect(described_class.calculate_pom_responsibility(offender)).
@@ -429,25 +426,23 @@ describe ResponsibilityService do
                               welsh_offender: true,
                               sentence_start_date: sentence_start_date,
                               automatic_release_date: ard,
-                              conditional_release_date: crd,
+                              conditional_release_date: nil,
                               sentenced?: true
             }
 
-            context 'with more than 15 months left to serve' do
-              let(:ard)   { sentence_start_date + 16.months }
-              let(:crd)   { sentence_start_date + 17.months }
+            context 'with expected release on the cutoff date' do
+              let(:ard) { '4 May 2020'.to_date }
 
-              it 'will show the POM as having a responsible role' do
+              it 'returns responsible' do
                 resp = described_class.calculate_pom_responsibility(offender)
                 expect(resp).to eq ResponsibilityService::RESPONSIBLE
               end
             end
 
-            context 'with less than 15 months left to serve' do
-              let(:ard)   { sentence_start_date + 6.months }
-              let(:crd)   { sentence_start_date + 7.months }
+            context 'with expected release before the cutoff date' do
+              let(:ard) { '3 May 2020'.to_date }
 
-              it 'will show the POM as having a supporting role' do
+              it 'returns supporting' do
                 resp = described_class.calculate_pom_responsibility(offender)
                 expect(resp).to eq ResponsibilityService::SUPPORTING
               end
@@ -455,7 +450,6 @@ describe ResponsibilityService do
 
             context 'when the CRD and ARD are missing' do
               let(:ard) { nil }
-              let(:crd) { nil }
 
               it 'will return no responsibility' do
                 expect(described_class.calculate_pom_responsibility(offender)).
