@@ -95,20 +95,15 @@ private
   private
 
     def welsh_prepolicy_rules(offender)
-      earliest_release_date = offender.parole_eligibility_date.presence ||
-        [offender.conditional_release_date, offender.automatic_release_date].
-        compact.min
+      cutoff = '4 May 2020'.to_date
 
-      return nil if earliest_release_date.blank?
+      possible_dates = [offender.conditional_release_date, offender.automatic_release_date]
+      release_date = offender.parole_eligibility_date
+      release_date ||= possible_dates.compact.min
 
-      release_date_gt_15_mths_at_policy_date = earliest_release_date >
-        WELSH_POLICY_START_DATE + 15.months
+      return nil if release_date.blank?
 
-      if release_date_gt_15_mths_at_policy_date
-        RESPONSIBLE
-      else
-        SUPPORTING
-      end
+      release_date >= cutoff ? RESPONSIBLE : SUPPORTING
     end
   end
 
@@ -131,26 +126,18 @@ private
   private
 
     def english_prepolicy_rules(offender)
-      if hub_or_private?(offender)
-        threshold = 20.months
-      else
-        threshold = 17.months
-      end
-
-      release_date = offender.parole_eligibility_date
+      private_cutoff = '1 Jun 2021'.to_date
+      public_cutoff = '15 Feb 2021'.to_date
 
       possible_dates = [offender.conditional_release_date, offender.automatic_release_date]
+      release_date = offender.parole_eligibility_date
       release_date ||= possible_dates.compact.min
 
       return nil if release_date.blank?
 
-      expected_time_in_custody_gt_x_months = release_date > ORIGINAL_ENGLISH_POLICY_START_DATE + threshold
+      cutoff = hub_or_private?(offender) ? private_cutoff : public_cutoff
 
-      if expected_time_in_custody_gt_x_months
-        RESPONSIBLE
-      else
-        SUPPORTING
-      end
+      release_date >= cutoff ? RESPONSIBLE : SUPPORTING
     end
 
     def hub_or_private?(offender)
