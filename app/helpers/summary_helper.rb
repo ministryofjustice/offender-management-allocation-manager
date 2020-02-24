@@ -3,7 +3,7 @@
 module SummaryHelper
   def delius_schedule_for(arrival_date)
     return 'Monday' if Time.zone.today.on_weekend?
-    return 'Tomorrow' if arrival_date == Time.zone.today
+    return 'Tomorrow' if arrival_date.to_date == Time.zone.today
 
     'Today'
   end
