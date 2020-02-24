@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class MovementService
+  ADMISSION_MOVEMENT_CODE = 'IN'
+  RELEASE_MOVEMENT_CODE = 'OUT'
+  IMMIGRATION_MOVEMENT_CODES = %w[IMM MHI].freeze
+
   def self.movements_on(date, direction_filters: [], type_filters: [])
     movements = Nomis::Elite2::MovementApi.movements_on_date(date)
 
@@ -42,7 +46,7 @@ private
 
   # rubocop:disable Metrics/MethodLength
   def self.process_transfer(transfer)
-    return false unless transfer.direction_code == 'IN'
+    return false unless transfer.direction_code == ADMISSION_MOVEMENT_CODE
 
     Rails.logger.info("[MOVEMENT] Processing transfer for #{transfer.offender_no}")
 
@@ -57,8 +61,8 @@ private
     # when the movement is from immigration or a detention centre
     # and is not going back to a prison OR
     # when the movement is from a prison to an immigration or detention centre
-    if ((%w[IMM MHI].include? transfer.from_agency) && !transfer.to_prison?) ||
-    ((%w[IMM MHI].include? transfer.to_agency) && transfer.from_prison?)
+    if ((IMMIGRATION_MOVEMENT_CODES.include? transfer.from_agency) && !transfer.to_prison?) ||
+    ((IMMIGRATION_MOVEMENT_CODES.include? transfer.to_agency) && transfer.from_prison?)
       release_offender(transfer.offender_no)
 
       return true
@@ -106,9 +110,9 @@ private
   # case information (in case they come back one day), and we
   # should de-activate any current allocations.
   def self.process_release(release)
-    return false unless release.to_agency == 'OUT'
+    return false unless release.to_agency == RELEASE_MOVEMENT_CODE
 
-    if release.from_agency == 'MHI' || release.from_agency == 'IMM'
+    if release.from_agency == IMMIGRATION_MOVEMENT_CODES.first || release.from_agency == IMMIGRATION_MOVEMENT_CODES.last
       release_offender(release.offender_no)
 
       return true
