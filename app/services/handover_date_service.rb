@@ -8,7 +8,7 @@ class HandoverDateService
       HandoverData.new nil, nil, 'Recall case - no handover date calculation'
     elsif offender.nps_case? && offender.indeterminate_sentence? && offender.tariff_date.nil?
       HandoverData.new nil, nil, 'No earliest release date'
-    elsif offender.nps_case?
+    elsif offender.nps_case? || offender.indeterminate_sentence?
       date, reason = nps_handover_date(offender)
       HandoverData.new nps_start_date(offender), date, reason
     else

@@ -46,6 +46,21 @@ describe HandoverDateService do
       end
     end
 
+    context 'when incorrect service provider entered for indeterminate offender' do
+      let(:offender) {
+        OpenStruct.new indeterminate_sentence?: true,
+                       nps_case?: false,
+                       tariff_date: tariff_date
+      }
+
+      let(:release_date) { Date.new(2020, 8, 30) }
+      let(:tariff_date) { release_date }
+
+      it 'is 8 months before release date' do
+        expect(described_class.handover(offender).start_date).to eq(Date.new(2019, 12, 30))
+      end
+    end
+
     context 'with early allocation' do
       let(:offender) { OpenStruct.new(nps_case?: true, early_allocation?: true, conditional_release_date: Date.new(2021, 6, 2)) }
 

@@ -45,6 +45,22 @@ describe ResponsibilityService do
       end
     end
 
+    context 'when incorrect service provider entered for indeterminate offender' do
+      let(:offender) {
+        OpenStruct.new  nps_case?: false,
+                        welsh_offender: false,
+                        indeterminate_sentence?: true,
+                        sentence_start_date: Time.zone.today,
+                        tariff_date: Time.zone.today + 24.months,
+                        sentenced?: true
+      }
+
+      it 'will calculate the responsibility using NPS rules' do
+        resp = described_class.calculate_pom_responsibility(offender)
+        expect(resp).to eq ResponsibilityService::RESPONSIBLE
+      end
+    end
+
     context 'when CRC case' do
       # CRC rules do not take into account whether the offender is located at an open or closed prison, the rules
       # remain the same

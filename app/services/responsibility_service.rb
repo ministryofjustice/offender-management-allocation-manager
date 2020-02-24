@@ -34,7 +34,7 @@ private
   def self.standard_rules(offender)
     if offender.recalled?
       SUPPORTING
-    elsif nps_case?(offender)
+    elsif nps_case?(offender) || offender.indeterminate_sentence?
       nps_rules(offender)
     else
       crc_rules(offender)
