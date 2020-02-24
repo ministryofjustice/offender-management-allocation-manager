@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class MovementService
+  ADMISSION_MOVEMENT_CODE = 'IN'
+  RELEASE_MOVEMENT_CODE = 'OUT'
+  IMMIGRATION_MOVEMENT_CODES = %w[IMM MHI].freeze
+
   def self.movements_on(date, direction_filters: [], type_filters: [])
     movements = Nomis::Elite2::MovementApi.movements_on_date(date)
 
@@ -40,8 +44,9 @@ class MovementService
 
 private
 
+  # rubocop:disable Metrics/MethodLength
   def self.process_transfer(transfer)
-    return false unless transfer.direction_code == 'IN'
+    return false unless transfer.direction_code == ADMISSION_MOVEMENT_CODE
 
     Rails.logger.info("[MOVEMENT] Processing transfer for #{transfer.offender_no}")
 
@@ -50,6 +55,17 @@ private
       # move to open prisons so we will trigger this job to send
       # an email to the LDU
       OpenPrisonTransferJob.perform_later(transfer.to_json)
+    end
+
+    # Remove the case information and deallocate offender
+    # when the movement is from immigration or a detention centre
+    # and is not going back to a prison OR
+    # when the movement is from a prison to an immigration or detention centre
+    if ((IMMIGRATION_MOVEMENT_CODES.include? transfer.from_agency) && !transfer.to_prison?) ||
+    ((IMMIGRATION_MOVEMENT_CODES.include? transfer.to_agency) && transfer.from_prison?)
+      release_offender(transfer.offender_no)
+
+      return true
     end
 
     # Bail if this is a new admission to prison
@@ -88,17 +104,31 @@ private
     alloc&.deallocate_offender(Allocation::OFFENDER_TRANSFERRED)
     true
   end
+  # rubocop:enable Metrics/MethodLength
 
   # When an offender is released, we can no longer rely on their
   # case information (in case they come back one day), and we
   # should de-activate any current allocations.
   def self.process_release(release)
-    return false unless release.to_agency == 'OUT' && release.from_prison?
+    return false unless release.to_agency == RELEASE_MOVEMENT_CODE
 
-    Rails.logger.info("[MOVEMENT] Processing release for #{release.offender_no}")
+    if release.from_agency == IMMIGRATION_MOVEMENT_CODES.first || release.from_agency == IMMIGRATION_MOVEMENT_CODES.last
+      release_offender(release.offender_no)
 
-    CaseInformation.where(nomis_offender_id: release.offender_no).destroy_all
-    alloc = Allocation.find_by(nomis_offender_id: release.offender_no)
+      return true
+    end
+
+    return false unless release.from_prison?
+
+    release_offender(release.offender_no)
+    true
+  end
+
+  def self.release_offender(offender_no)
+    Rails.logger.info("[MOVEMENT] Processing release for #{offender_no}")
+
+    CaseInformation.where(nomis_offender_id: offender_no).destroy_all
+    alloc = Allocation.find_by(nomis_offender_id: offender_no)
     # frozen_string_literal: true
     # We need to check whether the from_agency is from within the prison estate
     # to know whether it is a transfer.  If it isn't then we want to bail and
@@ -113,7 +143,5 @@ private
     # case information (in case they come back one day), and we
     # should de-activate any current allocations.
     alloc&.deallocate_offender(Allocation::OFFENDER_RELEASED)
-
-    true
   end
 end
