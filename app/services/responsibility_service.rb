@@ -97,9 +97,14 @@ private
     def welsh_prepolicy_rules(offender)
       cutoff = '4 May 2020'.to_date
 
-      possible_dates = [offender.conditional_release_date, offender.automatic_release_date]
       release_date = offender.parole_eligibility_date
-      release_date ||= possible_dates.compact.min
+
+      if offender.indeterminate_sentence?
+        release_date ||= offender.tariff_date
+      else
+        possible_dates = [offender.conditional_release_date, offender.automatic_release_date]
+        release_date ||= possible_dates.compact.min
+      end
 
       return nil if release_date.blank?
 
@@ -129,9 +134,14 @@ private
       private_cutoff = '1 Jun 2021'.to_date
       public_cutoff = '15 Feb 2021'.to_date
 
-      possible_dates = [offender.conditional_release_date, offender.automatic_release_date]
       release_date = offender.parole_eligibility_date
-      release_date ||= possible_dates.compact.min
+
+      if offender.indeterminate_sentence?
+        release_date ||= offender.tariff_date
+      else
+        possible_dates = [offender.conditional_release_date, offender.automatic_release_date]
+        release_date ||= possible_dates.compact.min
+      end
 
       return nil if release_date.blank?
 
