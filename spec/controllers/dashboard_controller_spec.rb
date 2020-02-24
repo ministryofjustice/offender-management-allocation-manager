@@ -43,7 +43,7 @@ RSpec.describe DashboardController, type: :controller do
       end
     end
 
-    context 'when logged in as POM' do
+    context 'when logged in as SPO' do
       render_views
 
       before do
