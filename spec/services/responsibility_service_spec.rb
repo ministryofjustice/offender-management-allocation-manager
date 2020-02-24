@@ -420,6 +420,7 @@ describe ResponsibilityService do
       context 'when a Welsh offender' do
         context 'when sentenced before policy start date' do
           let(:sentence_start_date) { Date.parse('03-02-2019') }
+
           context 'when a determinate NPS offender' do
             let(:offender) {
               OpenStruct.new  nps_case?: true,

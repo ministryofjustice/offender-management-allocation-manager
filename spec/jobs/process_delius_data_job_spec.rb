@@ -109,19 +109,6 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
         expect {
           described_class.perform_now d1.noms_no
         }.to change(CaseInformation, :count).by(1)
-      end
-    end
-
-    context 'when tier contains extra characters' do
-      let!(:d1) {
-        create(:delius_data, tier: 'B1', team_code: team.shadow_code, team: team.name,
-                             ldu_code: ldu.code, ldu: ldu.name)
-      }
-
-      it 'creates case information' do
-        expect {
-          described_class.perform_now d1.noms_no
-        }.to change(CaseInformation, :count).by(1)
         expect(CaseInformation.last.tier).to eq('B')
       end
     end
@@ -257,23 +244,6 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
                              ldu_code: ldu.code, ldu: ldu.name)
       }
       let!(:c1) { create(:case_information, tier: 'B', nomis_offender_id: d1.noms_no, crn: d1.crn) }
-
-      it 'does not creates case information' do
-        expect {
-          described_class.perform_now d1.noms_no
-        }.not_to change(CaseInformation, :count)
-        expect(c1.reload.tier).to eq('C')
-      end
-    end
-
-    context 'when case information already present' do
-      let!(:c1) { create(:case_information, tier: 'B', nomis_offender_id: 'G4281GV') }
-      let!(:d1) {
-        create(:delius_data,
-               noms_no: c1.nomis_offender_id, crn: c1.crn, tier: 'C',
-               team_code: team.shadow_code, team: team.name,
-               ldu_code: ldu.code, ldu: ldu.name)
-      }
 
       it 'does not creates case information' do
         expect {
