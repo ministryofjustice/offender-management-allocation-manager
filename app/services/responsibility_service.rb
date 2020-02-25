@@ -19,6 +19,8 @@ class ResponsibilityService
   def self.calculate_pom_responsibility(offender)
     if offender.immigration_case? || open_prison_nps_offender?(offender)
       SUPPORTING
+    elsif offender.recalled?
+      SUPPORTING
     elsif determinate_with_no_release_dates?(offender)
       RESPONSIBLE
     elsif offender.indeterminate_sentence? && (offender.tariff_date.nil? ||
@@ -32,9 +34,7 @@ class ResponsibilityService
 private
 
   def self.standard_rules(offender)
-    if offender.recalled?
-      SUPPORTING
-    elsif nps_case?(offender) || offender.indeterminate_sentence?
+    if nps_case?(offender) || offender.indeterminate_sentence?
       nps_rules(offender)
     else
       crc_rules(offender)
