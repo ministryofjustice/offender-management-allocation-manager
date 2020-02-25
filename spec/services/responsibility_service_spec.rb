@@ -27,6 +27,18 @@ describe ResponsibilityService do
       end
     end
 
+    context 'when an offender has been recalled & does not have any relevant release dates' do
+      let(:offender) {
+        OpenStruct.new recalled?: true
+      }
+
+      it 'will show the case as POM supporting' do
+        resp = described_class.calculate_pom_responsibility(offender)
+
+        expect(resp).to eq ResponsibilityService::SUPPORTING
+      end
+    end
+
     context 'when relevant release dates are missing' do
       let(:offender) {
         OpenStruct.new immigration_case?: false,

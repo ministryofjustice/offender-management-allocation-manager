@@ -185,7 +185,7 @@ feature "view POM's caseload" do
     it 'can be searched by supporting role' do
       select 'Supporting', from: 'role'
       click_on 'Search'
-      expect(page).to have_content('Showing 1 - 10 of 10 results')
+      expect(page).to have_content('Showing 1 - 15 of 15 results')
     end
 
     it 'shows the tier' do
@@ -197,7 +197,7 @@ feature "view POM's caseload" do
     it 'can be searched by responsible role' do
       select 'Responsible', from: 'role'
       click_on 'Search'
-      expect(page).to have_content('Showing 1 - 11 of 11 results')
+      expect(page).to have_content('Showing 1 - 6 of 6 results')
     end
   end
 
