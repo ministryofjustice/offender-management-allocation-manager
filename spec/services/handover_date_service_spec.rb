@@ -179,8 +179,10 @@ describe HandoverDateService do
                 end
               end
 
-              context 'when HDCED is present' do
+              context 'when HDCED is present and earlier than the ARD/CRD calculated date' do
                 let(:hdced_date) {  Date.new(2020, 6, 16) }
+                let(:ard) { Date.new(2020, 11, 10) }
+                let(:crd) { Date.new(2020, 12, 5) }
 
                 it 'is set to HDCED' do
                   expect(described_class.handover(offender).handover_date).to eq(hdced_date)
@@ -215,11 +217,19 @@ describe HandoverDateService do
                 end
               end
 
-              context 'when HDC date earlier than date indicated by CRD/ARD' do
+              context 'when HDC date earlier than the CRD/ARD calculated date' do
                 let(:hdced_date) { Date.new(2020, 2, 28) }
 
                 it 'is on HDC date' do
                   expect(described_class.handover(offender).handover_date).to eq(Date.new(2020, 2, 28))
+                end
+              end
+
+              context 'when HDCED date later than date indicated by CRD/ARD' do
+                let(:hdced_date) { Date.new(2021, 2, 14) }
+
+                it 'is 4.5 months before CRD' do
+                  expect(described_class.handover(offender).handover_date).to eq(Date.new(2020, 3, 1))
                 end
               end
 

@@ -102,13 +102,13 @@ private
   def self.mappa1_responsibility_date(offender)
     if offender.home_detention_curfew_actual_date.present?
       offender.home_detention_curfew_actual_date
-    elsif offender.home_detention_curfew_eligibility_date.present?
-      offender.home_detention_curfew_eligibility_date
     else
-      [
+      earliest_date = [
         offender.conditional_release_date,
         offender.automatic_release_date
       ].compact.map { |date| date - (4.months + 15.days) }.min
+
+      [earliest_date, offender.home_detention_curfew_eligibility_date].compact.min
     end
   end
 
