@@ -30,7 +30,7 @@ class AllocationsController < PrisonsApplicationController
     secondary_pom_nomis_id = @allocation.secondary_pom_nomis_id
     unless secondary_pom_nomis_id.nil?
       @coworker = StaffMember.new(secondary_pom_nomis_id)
-      redirect_to prison_pom_non_pom_path(@prison, @coworker.staff_id) unless @coworker.pom_at?(@prison.code)
+      redirect_to prison_pom_non_pom_path(@prison.code, @coworker.staff_id) unless @coworker.pom_at?(@prison.code)
     end
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(active_prison_id, @prisoner.offender_no)
   end
