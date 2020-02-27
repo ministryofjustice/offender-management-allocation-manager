@@ -268,21 +268,36 @@ describe ResponsibilityService do
               )
             }
 
-            context 'with expected release on the cutoff date' do
-              let(:ard) { '15 Feb 2021'.to_date }
+            context 'when release date greater than cutoff date and within the handover window' do
+              let(:ard) { '16 Feb 2021'.to_date }
 
-              it 'returns responsible' do
-                resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::RESPONSIBLE
+              it 'returns supporting' do
+                Timecop.travel('20 Dec 2020') do
+                  resp = described_class.calculate_pom_responsibility(offender)
+                  expect(resp).to eq ResponsibilityService::SUPPORTING
+                end
               end
             end
 
-            context 'with expected release before the cutoff date' do
-              let(:ard) { '14 Feb 2021'.to_date }
+            context 'when release date greater than cutoff date and before the handover window' do
+              let(:ard) { '16 Feb 2021'.to_date }
+
+              it 'returns responsible' do
+                Timecop.travel('20 Sep 2020') do
+                  resp = described_class.calculate_pom_responsibility(offender)
+                  expect(resp).to eq ResponsibilityService::RESPONSIBLE
+                end
+              end
+            end
+
+            context 'when released date less than cutoff date' do
+              let(:ard) { '16 Jan 2021'.to_date }
 
               it 'returns supporting' do
-                resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::SUPPORTING
+                Timecop.travel('16 Jan 2021') do
+                  resp = described_class.calculate_pom_responsibility(offender)
+                  expect(resp).to eq ResponsibilityService::SUPPORTING
+                end
               end
             end
 
@@ -459,21 +474,36 @@ describe ResponsibilityService do
                               sentenced?: true
             }
 
-            context 'with expected release on the cutoff date' do
-              let(:ard) { '4 May 2020'.to_date }
+            context 'when release date greater than cutoff date and within the handover window' do
+              let(:ard) { '20 May 2020'.to_date }
 
-              it 'returns responsible' do
-                resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::RESPONSIBLE
+              it 'returns supporting' do
+                Timecop.travel('20 Apr 2020') do
+                  resp = described_class.calculate_pom_responsibility(offender)
+                  expect(resp).to eq ResponsibilityService::SUPPORTING
+                end
               end
             end
 
-            context 'with expected release before the cutoff date' do
-              let(:ard) { '3 May 2020'.to_date }
+            context 'when release date greater than cutoff date and before the handover window' do
+              let(:ard) { '20 May 2020'.to_date }
+
+              it 'returns responsible' do
+                Timecop.travel('1 Jan 2020') do
+                  resp = described_class.calculate_pom_responsibility(offender)
+                  expect(resp).to eq ResponsibilityService::RESPONSIBLE
+                end
+              end
+            end
+
+            context 'when released date less than cutoff date' do
+              let(:ard) { '1 May 2020'.to_date }
 
               it 'returns supporting' do
-                resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::SUPPORTING
+                Timecop.travel('1 Apr 2020') do
+                  resp = described_class.calculate_pom_responsibility(offender)
+                  expect(resp).to eq ResponsibilityService::SUPPORTING
+                end
               end
             end
 
@@ -529,9 +559,22 @@ describe ResponsibilityService do
             context 'with more than 15 months left to serve' do
               let(:ted) { sentence_start_date + 18.months }
 
-              it 'will show the POM as having a responsible role' do
-                resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::RESPONSIBLE
+              context 'when within the handover window' do
+                it 'will show the POM as having a supporting role' do
+                  Timecop.travel('5 May 2020') do
+                    resp = described_class.calculate_pom_responsibility(offender)
+                    expect(resp).to eq ResponsibilityService::SUPPORTING
+                  end
+                end
+              end
+
+              context 'when outside the handover window' do
+                it 'will show the POM as having a responsible role' do
+                  Timecop.travel('1 Nov 2019') do
+                    resp = described_class.calculate_pom_responsibility(offender)
+                    expect(resp).to eq ResponsibilityService::RESPONSIBLE
+                  end
+                end
               end
             end
 
