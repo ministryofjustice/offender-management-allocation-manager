@@ -108,7 +108,13 @@ private
 
       return nil if release_date.blank?
 
-      release_date >= cutoff ? RESPONSIBLE : SUPPORTING
+      handover_date_in_future = HandoverDateService.handover(offender).handover_date > Time.zone.today
+
+      if handover_date_in_future && release_date >= cutoff
+        RESPONSIBLE
+      else
+        SUPPORTING
+      end
     end
   end
 
@@ -147,7 +153,13 @@ private
 
       cutoff = hub_or_private?(offender) ? private_cutoff : public_cutoff
 
-      release_date >= cutoff ? RESPONSIBLE : SUPPORTING
+      handover_date_in_future = HandoverDateService.handover(offender).handover_date > Time.zone.today
+
+      if handover_date_in_future && release_date >= cutoff
+        RESPONSIBLE
+      else
+        SUPPORTING
+      end
     end
 
     def hub_or_private?(offender)
