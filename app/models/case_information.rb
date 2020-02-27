@@ -23,7 +23,8 @@ class CaseInformation < ApplicationRecord
   validates :manual_entry, inclusion: { in: [true, false], allow_nil: false }
   validates :nomis_offender_id, presence: true, uniqueness: true
 
-  validates :local_divisional_unit, :team, presence: true, unless: ->{ manual_entry }
+  # Temporarily removing this validation as it's preventing us from adding the team codes to CaseInformation records
+  # validates :local_divisional_unit, :team, presence: true, unless: ->{ manual_entry }
 
   validates :welsh_offender, inclusion: {
     in: %w[Yes No],
