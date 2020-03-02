@@ -48,7 +48,7 @@ private
     else
       redirect_to help_path
     end
-    flash[:notice] = 'Your message has been submitted'
+    flash[:notice] = 'Thank you for your message. We aim to reply within 2 working days.'
   end
 
   def help_params
