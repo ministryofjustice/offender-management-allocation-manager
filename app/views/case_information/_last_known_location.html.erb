@@ -1,0 +1,52 @@
+<%= form_for(@case_info, url: prison_case_information_index_path(@prison.code), method: form_method) do |form| %>
+  <%= form.hidden_field(:nomis_offender_id, value: @prisoner.offender_no) %>
+  <%= hidden_field_tag("sort", params[:sort])%>
+  <%= hidden_field_tag("page", params[:page]) %>
+  <%= hidden_field_tag("form_page", 'location') %>
+
+  <div class="govuk-form-group">
+    <fieldset class="govuk-fieldset">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+        <h1 class="govuk-fieldset__heading">Was this prisoner's last known address in Northern Ireland, Scotland or Wales?</h1>
+      </legend>
+
+      <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+        <div class="govuk-radios__item">
+          <%= form.radio_button(:last_known_location, 'Yes', class: "govuk-radios__input", id:'last_known_location_yes', data: { aria_controls: "conditional-last_known_location_yes", aria_expanded: "true"} ) %>
+          <%= form.label :last_known_location, 'Yes', class: "govuk-label govuk-radios__label" %>
+        </div>
+
+        <div class="govuk-radios__conditional" id="conditional-last_known_location_yes">
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="yes">
+              Which country did they live in?
+            </label>
+
+            <div class="govuk-radios">
+              <div class="govuk-radios__item">
+                <%= form.radio_button(:probation_service, 'Scotland', class: "govuk-radios__input" ) %>
+                <%= form.label :probation_service, 'Scotland', class: "govuk-label govuk-radios__label" %>
+              </div>
+              <div class="govuk-radios__item">
+                <%= form.radio_button(:probation_service, 'Northern Ireland', class: "govuk-radios__input" ) %>
+                <%= form.label :probation_service, 'Northern Ireland', class: "govuk-label govuk-radios__label" %>
+              </div>
+              <div class="govuk-radios__item">
+                <%= form.radio_button(:probation_service, 'Wales', class: "govuk-radios__input" ) %>
+                <%= form.label :probation_service, 'Wales', class: "govuk-label govuk-radios__label" %>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="govuk-radios__item">
+          <%= form.radio_button(:last_known_location, 'No', class: "govuk-radios__input" ) %>
+          <%= form.label :last_known_location, 'No', class: "govuk-label govuk-radios__label" %>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+
+  <%= form.submit "Continue", role: "button", draggable: "false", class: "govuk-button" %>
+<% end %>
+
