@@ -114,8 +114,12 @@ RSpec.describe TasksController, type: :controller do
     it 'can show offenders needing nDelius updates' do
       stub_offender(offender_no, booking_number: 754_206)
 
+      # Manual creation of case information cannot have a nil team, so create on here
+      ldu = LocalDivisionalUnit.create!(code: "ENLDU", name: "English LDU", email_address: "EnglishNPS@example.com")
+      team = Team.create!(code: "ENG1", name: 'NPS - England', shadow_code: "E01", local_divisional_unit_id: ldu.id)
+
       # Ensure only one of our offenders has missing data and that G7514GW (indeterminate) has a PRD
-      create(:case_information, nomis_offender_id: offender_no, tier: 'A', team: nil)
+      create(:case_information, nomis_offender_id: offender_no, tier: 'A', team: team)
       create(:case_information, nomis_offender_id: 'G1234AB', tier: 'A', mappa_level: 1)
       create(:case_information, nomis_offender_id: 'G1234GG', tier: 'A', mappa_level: 1)
       create(:case_information, nomis_offender_id: 'G7514GW', tier: 'A', mappa_level: 1, parole_review_date: next_week)

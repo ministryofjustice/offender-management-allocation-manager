@@ -1,0 +1,21 @@
+#remove_team {
+  color: #1d70b8;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+#remove_team:hover {
+  color: #003078
+}
+
+#remove_team:visited {
+  color: #4c2c92;
+}
+
+.autocomplete__menu {
+  font-family: "GDS Transport", Arial, sans-serif;
+}
+
+#chosen_team {
+  font-weight: bold;
+}

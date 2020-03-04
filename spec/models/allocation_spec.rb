@@ -7,7 +7,7 @@ RSpec.describe Allocation, type: :model do
 
   describe '#without_ldu_emails' do
     let!(:c1) {
-      ci = create(:case_information, team: nil)
+      ci = create(:case_information, probation_service: 'Scotland', team: nil)
       create(:allocation, nomis_offender_id: ci.nomis_offender_id)
     }
     let!(:c2) {

@@ -14,4 +14,5 @@
 //= require turbolinks
 //= require 'govuk/all'
 //= require 'moj/all'
+//= require 'accessible-autocomplete.min'
 //= require_tree .
