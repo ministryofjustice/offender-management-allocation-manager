@@ -10,7 +10,4 @@
 
 <p class="govuk-!-margin-bottom-8">You can find this information in NDelius.</p>
 
-<%= render :partial => "form", :locals => {
-      :action => prison_case_information_index_path(@prison.code),
-      :method => :post,
-      :save_text => "Save" } %>
+<%= render 'last_known_location', form_method: :post %>

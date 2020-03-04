@@ -51,21 +51,31 @@ class CaseInformationController < PrisonsApplicationController
     @case_info = CaseInformation.create(
       nomis_offender_id: case_information_params[:nomis_offender_id],
       tier: case_information_params[:tier],
-      welsh_offender: case_information_params[:welsh_offender],
       case_allocation: case_information_params[:case_allocation],
-      probation_service: 'England',
+      probation_service: case_information_params[:probation_service],
+      last_known_location: case_information_params[:last_known_location],
       manual_entry: true
     )
 
-    if @case_info.valid?
-      return redirect_to prison_summary_pending_path(active_prison_id,
-                                                     sort: params[:sort],
-                                                     page: params[:page]
-                         )
+    if ['Scotland', 'Northern Ireland'].include?(case_information_params[:probation_service])
+      @case_info.tier = 'N/A'
+      @case_info.case_allocation = 'N/A'
+      @case_info.team = nil
     end
 
-    @prisoner = prisoner(case_information_params[:nomis_offender_id])
-    render :new
+    if @case_info.valid?
+      @case_info.save
+      redirect_to prison_summary_pending_path(active_prison_id, sort: params[:sort], page: params[:page])
+    else
+      if case_information_params[:last_known_address].nil?
+        @case_info.errors.messages.reject! do |f, _m|
+          f != :probation_service && f != :last_known_address
+        end
+      end
+
+      @prisoner = prisoner(case_information_params[:nomis_offender_id])
+      render :new
+    end
   end
 
   def update
@@ -100,8 +110,9 @@ private
 
   def case_information_params
     params.require(:case_information).
-      permit(:nomis_offender_id, :tier, :case_allocation, :welsh_offender,
-             :parole_review_date_dd, :parole_review_date_mm, :parole_review_date_yyyy, :probation_service)
+      permit(:nomis_offender_id, :tier, :case_allocation,
+             :parole_review_date_dd, :parole_review_date_mm, :parole_review_date_yyyy,
+             :probation_service, :last_known_location)
   end
 
   def parole_review_date_params

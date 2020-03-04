@@ -28,8 +28,10 @@ class OnboardPrison
         tier: record[:tier],
         case_allocation: record[:provider_cd],
         crn: record[:crn],
-        # if probation_service does not exist, default to England
-        probation_service: record[:probation_service].presence  || 'England',
+        # probation_service will not exist, default to Scotland
+        # or Northern Ireland. This is currently the only way the record will
+        # be saved without a team.
+        probation_service: record[:probation_service].presence || 'Scotland',
         manual_entry: true
       )
 

@@ -11,6 +11,8 @@ class CaseInformation < ApplicationRecord
            inverse_of: :case_information,
            dependent: :destroy
 
+  attr_accessor :last_known_location
+
   def local_divisional_unit
     team.try(:local_divisional_unit)
   end
@@ -23,17 +25,19 @@ class CaseInformation < ApplicationRecord
   validates :manual_entry, inclusion: { in: [true, false], allow_nil: false }
   validates :nomis_offender_id, presence: true, uniqueness: true
 
-  validates :local_divisional_unit, :team, presence: true, unless: ->{ manual_entry }
+  validates :local_divisional_unit, :team,
+            presence: { message: "You must select the prisoner's team" },
+            unless:
+            proc { |c|
+              c.manual_entry &&
+              (c.probation_service == 'Scotland' ||
+              c.probation_service == 'Northern Ireland')
+            }
 
-  validates :welsh_offender, inclusion: {
-    in: %w[Yes No],
-    allow_nil: false,
-    message: 'Select yes if the prisoner’s last known address was in Wales'
-  }
-  validates :tier, inclusion: { in: %w[A B C D], message: 'Select the prisoner’s tier' }
+  validates :tier, inclusion: { in: %w[A B C D N/A], message: 'Select the prisoner’s tier' }
 
   validates :case_allocation, inclusion: {
-    in: %w[NPS CRC],
+    in: %w[NPS CRC N/A],
     allow_nil: false,
     message: 'Select the service provider for this case'
   }
@@ -48,4 +52,11 @@ class CaseInformation < ApplicationRecord
     message: "You must say if the prisoner's last known address was in Northern Ireland, Scotland or Wales"
   }, if: -> { manual_entry }
 
+  # We only want to validate last known location in forms
+  validates :last_known_location,
+            inclusion: {
+              in: %w[Yes No],
+              allow_nil: true,
+              message: "Select yes if the prisoner's last known address was in Northern Ireland, Scotland or Wales"
+            }, if: -> { manual_entry }
 end
