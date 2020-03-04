@@ -79,4 +79,30 @@ RSpec.describe CaseInformation, type: :model do
       expect(build(:case_information, manual_entry: nil)).not_to be_valid
     end
   end
+
+  context 'when probation service' do
+    context 'with manual flag, it is required' do
+      subject {
+        build(:case_information, probation_service: nil)
+      }
+
+      it 'gives the correct validation error message' do
+        expect(subject).not_to be_valid
+        expect(subject.errors.messages).to eq(probation_service: ["You must say if the prisoner's last known address was in Northern Ireland, Scotland or Wales"])
+      end
+
+      it 'allows England, Wales, Scotland & Northern Ireland' do
+        ['England', 'Wales', 'Scotland', 'Northern Ireland'].each do |service|
+          subject.probation_service = service
+          expect(subject).to be_valid
+        end
+      end
+    end
+
+    context 'without manual flag, it is not required' do
+      it 'does not raise an error when not present' do
+        expect(build(:case_information, probation_service: nil, manual_entry: false)).to be_valid
+      end
+    end
+  end
 end

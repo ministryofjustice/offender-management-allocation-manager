@@ -28,5 +28,9 @@ FactoryBot.define do
     association :team, code: '1234', name: 'A nice team'
 
     crn { Faker::Alphanumeric.alpha(number: 10) }
+
+    probation_service do
+      'Wales'
+    end
   end
 end

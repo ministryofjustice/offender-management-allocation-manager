@@ -41,4 +41,11 @@ class CaseInformation < ApplicationRecord
   # nil means MAPPA level is completely unknown.
   # 0 means MAPPA level is known to be not relevant for offender
   validates :mappa_level, inclusion: { in: [0, 1, 2, 3], allow_nil: true }
+
+  validates :probation_service, inclusion: {
+    in: ['Scotland', 'Northern Ireland', 'Wales', 'England'],
+    allow_nil: false,
+    message: "You must say if the prisoner's last known address was in Northern Ireland, Scotland or Wales"
+  }, if: -> { manual_entry }
+
 end

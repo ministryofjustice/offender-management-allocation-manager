@@ -55,6 +55,7 @@ ActiveRecord::Schema.define(version: 2020_05_28_165050) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.date "parole_review_date"
+    t.string "probation_service"
     t.index ["nomis_offender_id"], name: "index_case_information_on_nomis_offender_id", unique: true
     t.index ["team_id"], name: "index_case_information_on_team_id"
   end
