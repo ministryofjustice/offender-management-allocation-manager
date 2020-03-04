@@ -53,6 +53,7 @@ class CaseInformationController < PrisonsApplicationController
       tier: case_information_params[:tier],
       welsh_offender: case_information_params[:welsh_offender],
       case_allocation: case_information_params[:case_allocation],
+      probation_service: 'England',
       manual_entry: true
     )
 
@@ -100,7 +101,7 @@ private
   def case_information_params
     params.require(:case_information).
       permit(:nomis_offender_id, :tier, :case_allocation, :welsh_offender,
-             :parole_review_date_dd, :parole_review_date_mm, :parole_review_date_yyyy)
+             :parole_review_date_dd, :parole_review_date_mm, :parole_review_date_yyyy, :probation_service)
   end
 
   def parole_review_date_params

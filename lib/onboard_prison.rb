@@ -28,6 +28,8 @@ class OnboardPrison
         tier: record[:tier],
         case_allocation: record[:provider_cd],
         crn: record[:crn],
+        # if probation_service does not exist, default to England
+        probation_service: record[:probation_service].presence  || 'England',
         manual_entry: true
       )
 
