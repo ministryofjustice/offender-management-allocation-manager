@@ -15,8 +15,10 @@
  *= require_self
  */
 
+@import "accessible-autocomplete";
 @import "tables";
 @import "pagination";
+@import "case_info";
 
 a:visited {
     color: #005ea5;

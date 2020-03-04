@@ -7,7 +7,7 @@ RSpec.describe Allocation, type: :model do
 
   describe '#without_ldu_emails' do
     let!(:c1) {
-      ci = create(:case_information, team: nil)
+      ci = create(:case_information, probation_service: 'Scotland', team: nil)
       create(:allocation, nomis_offender_id: ci.nomis_offender_id)
     }
     let!(:c2) {
@@ -103,7 +103,7 @@ RSpec.describe Allocation, type: :model do
           nomis_booking_id: 1,
           recommended_pom_type: 'probation',
           event: Allocation::ALLOCATE_PRIMARY_POM,
-          created_by_username: 'PK000223',
+          created_by_username: 'MOIC_POM',
           event_trigger: Allocation::USER
         }
         AllocationService.create_or_update(params)
@@ -134,7 +134,7 @@ RSpec.describe Allocation, type: :model do
           recommended_pom_type: 'probation',
           event: Allocation::ALLOCATE_PRIMARY_POM,
           event_trigger: Allocation::USER,
-          created_by_username: 'PK000223'
+          created_by_username: 'MOIC_POM'
         }
         AllocationService.create_or_update(params)
 

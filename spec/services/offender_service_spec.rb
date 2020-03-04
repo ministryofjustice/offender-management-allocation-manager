@@ -59,7 +59,7 @@ describe OffenderService do
       nomis_booking_id: 1_153_753,
       prison: 'LEI',
       allocated_at_tier: 'C',
-      created_by_username: 'PK000223',
+      created_by_username: 'MOIC_POM',
       primary_pom_nomis_id: nomis_staff_id,
       primary_pom_allocated_at: allocated_date,
       recommended_pom_type: 'prison',

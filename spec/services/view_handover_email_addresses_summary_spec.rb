@@ -51,7 +51,7 @@ describe ViewHandoverEmailAddressesSummary do
   context 'with an offender that has case information but no team link' do
     let(:offenders) { [double(offender_no: 1)] }
 
-    before { create(:case_information, nomis_offender_id: 1, team: nil) }
+    before { create(:case_information, :no_team, nomis_offender_id: 1) }
 
     it 'returns the right counts' do
       expect(result).to eq(
@@ -69,7 +69,7 @@ describe ViewHandoverEmailAddressesSummary do
     let(:offenders) { [double(offender_no: 1)] }
 
     before do
-      create(:case_information, nomis_offender_id: 1, team_id: 1)
+      create(:case_information, :no_team, nomis_offender_id: 1, team_id: 1)
       Team.destroy_all
     end
 
@@ -89,9 +89,9 @@ describe ViewHandoverEmailAddressesSummary do
     let(:offenders) { [double(offender_no: 1)] }
 
     before do
-      create(:case_information, nomis_offender_id: 1, team_id: 10)
-      team_without_ldu = build(:team, id: 10, local_divisional_unit: nil)
+      team_without_ldu = build(:team, local_divisional_unit: nil)
       team_without_ldu.save(validate: false)
+      create(:case_information, nomis_offender_id: 1, team: team_without_ldu)
     end
 
     it 'returns the right counts' do
@@ -110,11 +110,9 @@ describe ViewHandoverEmailAddressesSummary do
     let(:offenders) { [double(offender_no: 1)] }
 
     before do
-      create(:case_information, nomis_offender_id: 1, team_id: 10)
-
       ldu = create(:local_divisional_unit, email_address: nil)
-
-      create(:team, id: 10, local_divisional_unit: ldu)
+      team = create(:team, local_divisional_unit: ldu)
+      create(:case_information, nomis_offender_id: 1, team: team)
     end
 
     it 'returns the right counts' do
@@ -133,8 +131,8 @@ describe ViewHandoverEmailAddressesSummary do
     let(:offenders) { [double(offender_no: 1)] }
 
     before do
-      create(:case_information, nomis_offender_id: 1, team_id: 10)
-      create(:team, id: 10, local_divisional_unit: create(:local_divisional_unit))
+      team = create(:team, local_divisional_unit: create(:local_divisional_unit))
+      create(:case_information, nomis_offender_id: 1, team: team)
     end
 
     it 'returns the correct counts' do
