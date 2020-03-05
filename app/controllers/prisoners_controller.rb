@@ -15,6 +15,12 @@ class PrisonersController < PrisonsApplicationController
     @tasks = PomTasks.new.for_offender(@prisoner)
     @allocation = Allocation.find_by(nomis_offender_id: @prisoner.offender_no)
 
+    @primary_pom_name = fetch_pom_name(@allocation.primary_pom_nomis_id) if @allocation.present?
+
+    if @allocation.present? && @allocation.secondary_pom_name.present?
+      @secondary_pom_name = fetch_pom_name(@allocation.secondary_pom_nomis_id)
+    end
+
     @pom_responsibility = pom_responsibility
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(
       active_prison_id, @prisoner.offender_no
@@ -37,6 +43,12 @@ class PrisonersController < PrisonsApplicationController
   end
 
 private
+
+  def fetch_pom_name(staff_id)
+    pom_firstname, pom_secondname =
+      PrisonOffenderManagerService.get_pom_name(staff_id)
+    "#{pom_secondname.titleize}, #{pom_firstname.titleize}"
+  end
 
   def pom_responsibility
     @pom_responsibility ||= overridden_responsibility || calculated_responsibility

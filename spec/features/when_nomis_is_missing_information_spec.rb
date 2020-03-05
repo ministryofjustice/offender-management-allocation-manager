@@ -83,6 +83,9 @@ context 'when NOMIS is missing information' do
           latestBookingId: booking_id
         }]
 
+        stub_request(:get, "#{stub_api_host}/staff/#{staff_id}").
+            to_return(status: 200, body: { staffId: staff_id, firstName: "TEST", lastName: "MOIC" }.to_json)
+
         stub_request(:get, "#{stub_api_host}/prisoners/#{offender_no}").
           to_return(status: 200, body: stub_offender.to_json)
 
@@ -97,6 +100,9 @@ context 'when NOMIS is missing information' do
 
         stub_request(:get, "#{stub_keyworker_host}/key-worker/#{prison_code}/offender/#{offender_no}").
           to_return(status: 200, body: {}.to_json)
+
+        create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
+        create(:case_information, nomis_offender_id: offender_no, case_allocation: 'NPS')
       end
 
       it 'does not error' do

@@ -21,7 +21,7 @@ module Api
     def primary_pom_details
       {
         staff_id: @allocation.primary_pom_nomis_id,
-        name: @allocation.primary_pom_name
+        name: fetch_pom_name(@allocation.primary_pom_nomis_id)
       }
     end
 
@@ -30,7 +30,7 @@ module Api
 
       {
         staff_id: @allocation.secondary_pom_nomis_id,
-        name: @allocation.secondary_pom_name
+        name: fetch_pom_name(@allocation.primary_pom_nomis_id)
       }
     end
 
@@ -40,6 +40,12 @@ module Api
 
     def offender_number
       params[:offender_no]
+    end
+
+    def fetch_pom_name(staff_id)
+      pom_firstname, pom_secondname =
+        PrisonOffenderManagerService.get_pom_name(staff_id)
+      "#{pom_secondname}, #{pom_firstname}"
     end
   end
 end

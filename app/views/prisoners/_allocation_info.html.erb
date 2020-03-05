@@ -1,14 +1,14 @@
 <tr class="govuk-table__row">
   <td class="govuk-table__cell">POM</td>
   <td class="govuk-table__cell table_cell__left_align">
-    <%= allocation.primary_pom_name.titleize %>
+    <%= @primary_pom_name %>
   </td>
 </tr>
 <tr class="govuk-table__row">
   <td class="govuk-table__cell">Co-working POM</td>
   <td class="govuk-table__cell table_cell__left_align">
     <% if allocation.secondary_pom_name.present? %>
-      <%= allocation.secondary_pom_name.titleize %>
+      <%= @secondary_pom_name %>
     <% else %>
       N/A
     <% end %>
