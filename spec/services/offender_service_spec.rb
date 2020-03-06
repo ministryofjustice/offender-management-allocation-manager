@@ -10,7 +10,6 @@ describe OffenderService do
     offender = described_class.get_offender(nomis_offender_id)
 
     expect(offender).to be_kind_of(Nomis::Offender)
-    expect(offender.sentence.release_date).to eq Date.new(2020, 2, 7)
     expect(offender.tier).to eq 'C'
     expect(offender.main_offence).to eq 'Section 18 - wounding with intent to resist / prevent arrest'
     expect(offender.case_allocation).to eq 'CRC'

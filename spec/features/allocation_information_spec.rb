@@ -52,8 +52,7 @@ feature "view an offender's allocation information", :versioning do
         stub_api_calls_for_prison_allocation_path(sentence_start_date: "2020-01-01",
                                                   conditional_release_date: "2020-11-02",
                                                   automatic_release_date: "2020-11-02",
-                                                  hdced: "2020-11-02",
-                                                  release_date: "2023-01-01")
+                                                  hdced: "2020-11-02")
 
         visit prison_allocation_path('LEI', nomis_offender_id: offender_no)
       end
@@ -75,8 +74,7 @@ feature "view an offender's allocation information", :versioning do
         stub_api_calls_for_prison_allocation_path(sentence_start_date: "2020-01-01",
                                                   conditional_release_date: "2020-06-02",
                                                   automatic_release_date: "2020-06-02",
-                                                  hdced: "2020-06-02",
-                                                  release_date: "2023-01-01")
+                                                  hdced: "2020-06-02")
 
         visit prison_allocation_path('LEI', nomis_offender_id: offender_no)
       end
@@ -198,7 +196,7 @@ feature "view an offender's allocation information", :versioning do
 
 private
 
-  def stub_api_calls_for_prison_allocation_path(sentence_start_date:, conditional_release_date:, automatic_release_date:, hdced:, release_date:)
+  def stub_api_calls_for_prison_allocation_path(sentence_start_date:, conditional_release_date:, automatic_release_date:, hdced:)
     stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/auth/oauth/token?grant_type=client_credentials").
             to_return(status: 200, body: {}.to_json, headers: {})
 
@@ -207,7 +205,7 @@ private
 
     stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/offender-sentences/bookings").
       with(body: "[1153753]").
-        to_return(status: 200, body: [{ bookingId: 1_153_753, offenderNo: offender_no, firstName: "OZULLIRN", lastName: "ABBELLA", agencyLocationId: "LEI", sentenceDetail: { sentenceExpiryDate: "2023-06-03", conditionalReleaseDate: conditional_release_date, automaticReleaseDate: automatic_release_date, homeDetentionCurfewEligibilityDate: hdced,  licenceExpiryDate: "2023-05-22", bookingId: 1_153_753, sentenceStartDate: sentence_start_date, nonDtoReleaseDate: "2020-03-16", nonDtoReleaseDateType: "CRD", confirmedReleaseDate: "2020-02-07", releaseDate: release_date }, dateOfBirth: "1980-08-15", agencyLocationDesc: "LEEDS(HMP)", internalLocationDesc: "B-4-021", facialImageId: 1_340_556 }].to_json, headers: {})
+        to_return(status: 200, body: [{ bookingId: 1_153_753, offenderNo: offender_no, firstName: "OZULLIRN", lastName: "ABBELLA", agencyLocationId: "LEI", sentenceDetail: { sentenceExpiryDate: "2023-06-03", conditionalReleaseDate: conditional_release_date, automaticReleaseDate: automatic_release_date, homeDetentionCurfewEligibilityDate: hdced,  licenceExpiryDate: "2023-05-22", bookingId: 1_153_753, sentenceStartDate: sentence_start_date, nonDtoReleaseDate: "2020-03-16", nonDtoReleaseDateType: "CRD", confirmedReleaseDate: "2020-02-07" }, dateOfBirth: "1980-08-15", agencyLocationDesc: "LEEDS(HMP)", internalLocationDesc: "B-4-021", facialImageId: 1_340_556 }].to_json, headers: {})
 
     stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/offender-assessments/CATEGORY").
       with(body: "[\"#{offender_no}\"]").

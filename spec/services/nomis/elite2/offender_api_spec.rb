@@ -37,7 +37,6 @@ describe Nomis::Elite2::OffenderApi do
 
       records = response.values
       expect(records.first).to be_instance_of(Nomis::SentenceDetail)
-      expect(records.first.release_date).to eq(Date.new(2020, 2, 7))
       expect(records.first.full_name).to eq('Abbella, Ozullirn')
     end
   end

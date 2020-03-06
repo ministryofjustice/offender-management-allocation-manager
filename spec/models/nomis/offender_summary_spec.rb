@@ -14,14 +14,14 @@ describe Nomis::OffenderSummary do
       before do
         subject.sentence = Nomis::SentenceDetail.new.tap do |sentence|
           sentence.sentence_start_date = Date.new(2005, 2, 3)
-          sentence.release_date = release_date
           sentence.parole_eligibility_date = parole_eligibility_date
+          sentence.conditional_release_date = conditional_release_date
         end
       end
 
-      context 'with a release date after a parole eligibility date' do
+      context 'with a conditional release date after a parole eligibility date' do
         let(:parole_eligibility_date) { Date.new(2009, 1, 1) }
-        let(:release_date) { Date.new(2010, 1, 1) }
+        let(:conditional_release_date) { Date.new(2009, 2, 3) }
 
         it 'uses parole eligibility date' do
           expect(subject.sentence.earliest_release_date).
@@ -29,13 +29,13 @@ describe Nomis::OffenderSummary do
         end
       end
 
-      context 'with a release date before a parole eligibility date' do
+      context 'with a conditional release date before a parole eligibility date' do
+        let(:conditional_release_date) { Date.new(2009, 12, 3) }
         let(:parole_eligibility_date) { Date.new(2010, 1, 1) }
-        let(:release_date) { Date.new(2009, 1, 1) }
 
-        it 'uses release date' do
+        it 'uses conditional release date' do
           expect(subject.sentence.earliest_release_date).
-            to eq(release_date)
+            to eq(conditional_release_date)
         end
       end
     end

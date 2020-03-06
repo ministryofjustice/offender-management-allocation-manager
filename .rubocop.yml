@@ -95,7 +95,7 @@ Naming/FileName:
 Metrics/ClassLength:
   Max: 200
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 120
   Exclude:
     - 'spec/**/*'

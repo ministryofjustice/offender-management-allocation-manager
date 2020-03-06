@@ -6,12 +6,12 @@ describe HandoverDateService do
       let(:offender) {
         OpenStruct.new indeterminate_sentence?: indeterminate,
                        nps_case?: true,
-                       automatic_release_date: release_date,
+                       automatic_release_date: automatic_release_date,
                        tariff_date: tariff_date
       }
 
-      let(:release_date) { Date.new(2020, 8, 30) }
-      let(:tariff_date) { release_date }
+      let(:automatic_release_date) { Date.new(2020, 8, 30) }
+      let(:tariff_date) { Date.new(2020, 8, 30) }
 
       context 'with a determinate sentence' do
         let(:indeterminate) { false }
@@ -53,8 +53,7 @@ describe HandoverDateService do
                        tariff_date: tariff_date
       }
 
-      let(:release_date) { Date.new(2020, 8, 30) }
-      let(:tariff_date) { release_date }
+      let(:tariff_date) { Date.new(2020, 8, 30) }
 
       it 'is 8 months before release date' do
         expect(described_class.handover(offender).start_date).to eq(Date.new(2019, 12, 30))

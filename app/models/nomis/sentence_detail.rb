@@ -29,7 +29,10 @@ module Nomis
 
     def earliest_release_date
       dates = [
-          release_date,
+          automatic_release_date,
+          conditional_release_date,
+          home_detention_curfew_actual_date,
+          home_detention_curfew_eligibility_date,
           parole_eligibility_date,
           tariff_date
       ].compact
