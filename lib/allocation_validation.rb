@@ -2,7 +2,7 @@
 
 class AllocationValidation
   # rubocop:disable Metrics/MethodLength
-  # rubocop:disable Layout/LineLength
+  # rubocop:disable Metrics/LineLength
   # rubocop:disable Rails/Output
   def fixup(prison)
     # Looks for offenders who have an allocation at this prison
@@ -54,7 +54,7 @@ class AllocationValidation
       allocation.deallocate_offender('offender_transferred')
     }
   end
-  # rubocop:enable Layout/LineLength
+  # rubocop:enable Metrics/LineLength
   # rubocop:enable Rails/Output
   # rubocop:enable Metrics/MethodLength
 

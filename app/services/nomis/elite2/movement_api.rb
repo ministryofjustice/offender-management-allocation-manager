@@ -17,7 +17,7 @@ module Nomis
         }
       end
 
-      # rubocop:disable Layout/LineLength
+      # rubocop:disable Metrics/LineLength
       def self.movements_for(offender_no)
         route = '/elite2api/api/movements/offenders?movementTypes=ADM&movementTypes=TRN&movementTypes=REL&latestOnly=false'
 
@@ -26,7 +26,7 @@ module Nomis
           api_deserialiser.deserialise(Nomis::Movement, movement)
         }
       end
-      # rubocop:enable Layout/LineLength
+      # rubocop:enable Metrics/LineLength
 
       def self.admissions_for(offender_nos)
         # admissions need to include transfers from one place to another

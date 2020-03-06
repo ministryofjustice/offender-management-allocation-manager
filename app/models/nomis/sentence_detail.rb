@@ -38,7 +38,18 @@ module Nomis
       ].compact
       return nil if dates.empty?
 
-      dates.min.to_date
+      past_dates = []
+      future_dates = []
+
+      dates.each do |date|
+        date >= Time.zone.today ? future_dates << date : past_dates << date
+      end
+
+      if future_dates.present?
+        future_dates.min.to_date
+      else
+        past_dates.min.to_date
+      end
     end
 
     def full_name
