@@ -1,0 +1,110 @@
+<%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
+
+<% if @case_info.errors.count > 0 %>
+  <%= render :partial => "/shared/validation_errors", :locals => { :errors => @case_info.errors } %>
+<% end %>
+
+<h1 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-4">Add missing information</h1>
+<h2 class="govuk-!-margin-bottom-0 govuk-heading-m"><%= @prisoner.full_name %> (<%= format_date(@prisoner.date_of_birth) %>)</h2>
+<h2 class="govuk-heading-m"><%= @prisoner.offender_no %></h2>
+<p class="govuk-!-margin-bottom-8">You can find this information in NDelius.</p>
+
+<%= form_for(@case_info, url: prison_case_information_index_path(@prison.code), method: :post) do |form| %>
+  <%= form.hidden_field(:nomis_offender_id, value: @prisoner.offender_no) %>
+  <%= form.hidden_field(:last_known_location, value: params.dig(:case_information, :last_known_location)) %>
+  <%= form.hidden_field(:probation_service, value: params.dig(:case_information, :probation_service)) %>
+  <%= hidden_field_tag("sort", params[:sort])%>
+  <%= hidden_field_tag("page", params[:page]) %>
+  <%= hidden_field_tag("stage", 'missing_info') %>
+
+  <fieldset class="govuk-fieldset">
+    <div class="govuk-form-group">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+        <h1 class="govuk-fieldset__heading">Select the service provider</h1>
+      </legend>
+
+      <div class="govuk-radios" data-module="govuk-radios">
+        <div class="govuk-radios__item">
+          <%= form.radio_button(:case_allocation, 'NPS', class: "govuk-radios__input") %>
+          <%= form.label :case_allocation, 'National Probation Service (NPS)', class: "govuk-label govuk-radios__label" %>
+        </div>
+        <div class="govuk-radios__item">
+          <%= form.radio_button(:case_allocation, 'CRC', class: "govuk-radios__input") %>
+          <%= form.label :case_allocation, 'Community Rehabilitation Company (CRC)', class: "govuk-label govuk-radios__label" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="govuk-form-group">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+        <h1 class="govuk-fieldset__heading">Choose the prisoner's tier</h1>
+      </legend>
+
+      <div class="govuk-radios" data-module="govuk-radios">
+        <div class="govuk-radios__item">
+          <%= form.radio_button(:tier, 'A', class: "govuk-radios__input") %>
+          <%= form.label :tier, 'A', class: "govuk-label govuk-radios__label" %>
+        </div>
+        <div class="govuk-radios__item">
+          <%= form.radio_button(:tier, 'B', class: "govuk-radios__input") %>
+          <%= form.label :tier, 'B', class: "govuk-label govuk-radios__label" %>
+        </div>
+        <div class="govuk-radios__item">
+          <%= form.radio_button(:tier, 'C', class: "govuk-radios__input") %>
+          <%= form.label :tier, 'C', class: "govuk-label govuk-radios__label" %>
+        </div>
+        <div class="govuk-radios__item">
+          <%= form.radio_button(:tier, 'D', class: "govuk-radios__input") %>
+          <%= form.label :tier, 'D', class: "govuk-label govuk-radios__label" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="govuk-form-group">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+        <h1 class="govuk-fieldset__heading">Select the prisoner's Team</h1>
+      </legend>
+      <span class="govuk-hint">
+        Enter the full name of the Team, for example 'NPS Croydon'
+      </span>
+
+      <div id="search-field" class="govuk-form-group">
+        <div class="govuk-grid-column-one-half">
+          <div class="govuk-grid-row">
+            <%= form.select(:team_id, Team.all.collect { |team| [team.name, team.id]}, {include_blank: true}, class: "govuk-select") %>
+          </div>
+          <!--          <div class="govuk-grid-row govuk-!-margin-top-6">-->
+          <!--            <h2 class="govuk-heading-m">The following Team has been selected:</h2>-->
+          <!--          </div>-->
+        </div>
+      </div>
+    </div>
+
+    <!--    <table class="govuk-table">-->
+    <!--      <tbody class="govuk-table__body">-->
+    <!--        <tr class="govuk-table__row">-->
+    <!--          <th class="govuk-table__cell govuk-body" scope="row">-->
+    <!--            <h3 class="govuk-body proceeding-item"><strong>NPS Lambeth</strong></h3>-->
+    <!--          </th>-->
+    <!--          <td class="govuk-table__cell govuk-table__cell--numeric">-->
+    <!--            <a href="search">Remove <span class="govuk-visually-hidden">blank</span></a>-->
+    <!--          </td>-->
+    <!--        </tr>-->
+    <!--      </tbody>-->
+    <!--    </table>-->
+
+    <details class="govuk-details" data-module="govuk-details">
+      <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">
+          If there's no Team on nDelius
+        </span>
+      </summary>
+      <div class="govuk-details__text">
+        This may be because the prisoner was sentenced outside the UK bit is returning to serve their sentence.
+        See <a href="https://moic.service.justice.gov.uk/repatriated" class="govuk-link">prisoners
+        returning to the UK</a> for more information.
+      </div>
+    </details>
+  </fieldset>
+  <%= form.submit "Continue", role: "button", draggable: "false", class: "govuk-button" %>
+<% end %>

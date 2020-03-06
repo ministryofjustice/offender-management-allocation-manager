@@ -88,6 +88,150 @@ feature 'case information feature' do
         expect(page).to have_css('.offender_row_0', count: 1)
       end
     end
+
+    context "when the prisoner's last known address is in England or Wales" do
+      it 'adds tiering, service provider and team for English prisoner',
+         :raven_intercept_exception,
+         vcr: { cassette_name: :case_information_english_feature } do
+        signin_user
+        visit prison_summary_pending_path('LEI')
+
+        expect(page).to have_content('Update information')
+        within "#edit_#{nomis_offender_id}" do
+          click_link 'Edit'
+        end
+
+        visit new_prison_case_information_path('LEI', nomis_offender_id)
+
+        choose('case_information_last_known_location_no')
+        click_button 'Continue'
+
+        expect(page).to have_content('You can find this information in NDelius')
+
+        choose('case_information_case_allocation_nps')
+        choose('case_information_tier_a')
+
+        select('NPS - England', from: 'case_information_team_id')
+        click_button 'Continue'
+
+        expectations(probation_service: 'England', tier: 'A', team: 'NPS - England', case_allocation: 'NPS')
+        expect(current_url).to have_content "/prisons/LEI/summary/pending"
+
+        expect(page).to have_css('.offender_row_0', count: 1)
+      end
+
+      it 'adds tiering, service provider and team for Welsh prisoner',
+         :raven_intercept_exception,
+         vcr: { cassette_name: :case_information_welsh_feature } do
+        signin_user
+        visit prison_summary_pending_path('LEI')
+
+        expect(page).to have_content('Update information')
+        within "#edit_#{nomis_offender_id}" do
+          click_link 'Edit'
+        end
+
+        visit new_prison_case_information_path('LEI', nomis_offender_id)
+
+        choose('last_known_location_yes')
+        choose('case_information_probation_service_wales')
+        click_button 'Continue'
+
+        expect(page).to have_content('You can find this information in NDelius')
+
+        choose('case_information_case_allocation_crc')
+        choose('case_information_tier_d')
+
+        select('NPS - Wales', from: 'case_information_team_id')
+        click_button 'Continue'
+
+        expectations(probation_service: 'Wales', tier: 'D', team: 'NPS - Wales', case_allocation: 'CRC')
+        expect(current_url).to have_content "/prisons/LEI/summary/pending"
+
+        expect(page).to have_css('.offender_row_0', count: 1)
+      end
+
+      it 'complains if service provider has not been selected',
+         :raven_intercept_exception,
+         vcr: { cassette_name: :case_information_missing_service_provider_feature } do
+        signin_user
+        visit prison_summary_pending_path('LEI')
+
+        expect(page).to have_content('Update information')
+        within "#edit_#{nomis_offender_id}" do
+          click_link 'Edit'
+        end
+
+        visit new_prison_case_information_path('LEI', nomis_offender_id)
+
+        choose('case_information_last_known_location_no')
+        click_button 'Continue'
+
+        expect(page).to have_content('You can find this information in NDelius')
+
+        choose('case_information_tier_a')
+
+        select('NPS - England 2', from: 'case_information_team_id')
+        click_button 'Continue'
+
+        expect(CaseInformation.count).to eq(0)
+        expect(page).to have_content("Select the service provider for this case")
+      end
+
+      it 'complains if tier has not been selected',
+         :raven_intercept_exception,
+         vcr: { cassette_name: :case_information_missing_tier_feature } do
+        signin_user
+        visit prison_summary_pending_path('LEI')
+
+        expect(page).to have_content('Update information')
+        within "#edit_#{nomis_offender_id}" do
+          click_link 'Edit'
+        end
+
+        visit new_prison_case_information_path('LEI', nomis_offender_id)
+
+        choose('case_information_last_known_location_no')
+        click_button 'Continue'
+
+        expect(page).to have_content('You can find this information in NDelius')
+
+        choose('case_information_case_allocation_nps')
+
+        select('NPS - England 2', from: 'case_information_team_id')
+        click_button 'Continue'
+
+        expect(CaseInformation.count).to eq(0)
+        expect(page).to have_content("Select the prisoner's tier")
+      end
+
+      it 'complains if team has not been selected',
+         :raven_intercept_exception,
+         vcr: { cassette_name: :case_information_missing_team_feature } do
+        signin_user
+        visit prison_summary_pending_path('LEI')
+
+        expect(page).to have_content('Update information')
+        within "#edit_#{nomis_offender_id}" do
+          click_link 'Edit'
+        end
+
+        visit new_prison_case_information_path('LEI', nomis_offender_id)
+
+        choose('case_information_last_known_location_no')
+        click_button 'Continue'
+
+        expect(page).to have_content('You can find this information in NDelius')
+
+        choose('case_information_case_allocation_nps')
+        choose('case_information_tier_a')
+
+        click_button 'Continue'
+
+        expect(CaseInformation.count).to eq(0)
+        expect(page).to have_content("You must select the prisoner's team")
+      end
+    end
   end
 
   xit 'adds tiering and case information for a prisoner', :raven_intercept_exception, vcr: { cassette_name: :case_information_feature } do
@@ -157,7 +301,7 @@ feature 'case information feature' do
 
     expect(CaseInformation.count).to eq(0)
     expect(page).to have_content("Select the service provider for this case")
-    expect(page).to have_content("Select the prisoner’s tier")
+    expect(page).to have_content("Select the prisoner's tier")
     expect(page).to have_content("Select yes if the prisoner’s last known address was in Wales")
   end
 

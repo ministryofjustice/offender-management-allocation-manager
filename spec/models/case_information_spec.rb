@@ -58,7 +58,7 @@ RSpec.describe CaseInformation, type: :model do
 
     it 'gives the correct error message' do
       expect(subject).not_to be_valid
-      expect(subject.errors.messages).to eq(tier: ['Select the prisoner’s tier'])
+      expect(subject.errors.messages).to eq(tier: ["Select the prisoner's tier"])
     end
   end
 

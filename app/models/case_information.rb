@@ -34,7 +34,7 @@ class CaseInformation < ApplicationRecord
               c.probation_service == 'Northern Ireland')
             }
 
-  validates :tier, inclusion: { in: %w[A B C D N/A], message: 'Select the prisoner’s tier' }
+  validates :tier, inclusion: { in: %w[A B C D N/A], message: "Select the prisoner's tier" }
 
   validates :case_allocation, inclusion: {
     in: %w[NPS CRC N/A],
@@ -59,4 +59,32 @@ class CaseInformation < ApplicationRecord
               allow_nil: true,
               message: "Select yes if the prisoner's last known address was in Northern Ireland, Scotland or Wales"
             }, if: -> { manual_entry }
+
+  def scottish_or_ni?
+    return true if probation_service == 'Scotland' || probation_service == 'Northern Ireland'
+
+    false
+  end
+
+  def save_scottish_or_ni
+    self.tier = 'N/A'
+    self.case_allocation = 'N/A'
+    self.team = nil
+  end
+
+  def english_or_welsh?
+    return true if last_known_location == 'No' || probation_service == 'Wales' || probation_service == 'England'
+
+    false
+  end
+
+  def english?
+    last_known_location == 'No'
+  end
+
+  def stage2_filled?
+    return false if tier.nil? || team.nil? || case_allocation.nil?
+
+    true
+  end
 end
