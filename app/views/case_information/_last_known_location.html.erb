@@ -2,7 +2,7 @@
   <%= form.hidden_field(:nomis_offender_id, value: @prisoner.offender_no) %>
   <%= hidden_field_tag("sort", params[:sort])%>
   <%= hidden_field_tag("page", params[:page]) %>
-  <%= hidden_field_tag("form_page", 'location') %>
+  <%= hidden_field_tag("stage", 'last_location') %>
 
   <div class="govuk-form-group">
     <fieldset class="govuk-fieldset">

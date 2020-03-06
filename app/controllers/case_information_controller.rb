@@ -10,6 +10,29 @@ class CaseInformationController < PrisonsApplicationController
     )
   end
 
+  def create
+    @case_info = CaseInformation.create(
+      nomis_offender_id: case_information_params[:nomis_offender_id],
+      tier: case_information_params[:tier],
+      case_allocation: case_information_params[:case_allocation],
+      probation_service: case_information_params[:probation_service],
+      last_known_location: case_information_params[:last_known_location],
+      team_id: case_information_params[:team_id],
+      manual_entry: true
+    )
+
+    if params[:stage] == 'last_location'
+      handle_stage1
+    elsif params[:stage] == 'missing_info'
+      handle_stage2
+    end
+
+    if @case_info.valid?
+      @case_info.save
+      redirect_to prison_summary_pending_path(active_prison_id, sort: params[:sort], page: params[:page])
+    end
+  end
+
   def edit; end
 
   # Just edit the parole_review_date field
@@ -47,37 +70,6 @@ class CaseInformationController < PrisonsApplicationController
     end
   end
 
-  def create
-    @case_info = CaseInformation.create(
-      nomis_offender_id: case_information_params[:nomis_offender_id],
-      tier: case_information_params[:tier],
-      case_allocation: case_information_params[:case_allocation],
-      probation_service: case_information_params[:probation_service],
-      last_known_location: case_information_params[:last_known_location],
-      manual_entry: true
-    )
-
-    if ['Scotland', 'Northern Ireland'].include?(case_information_params[:probation_service])
-      @case_info.tier = 'N/A'
-      @case_info.case_allocation = 'N/A'
-      @case_info.team = nil
-    end
-
-    if @case_info.valid?
-      @case_info.save
-      redirect_to prison_summary_pending_path(active_prison_id, sort: params[:sort], page: params[:page])
-    else
-      if case_information_params[:last_known_address].nil?
-        @case_info.errors.messages.reject! do |f, _m|
-          f != :probation_service && f != :last_known_address
-        end
-      end
-
-      @prisoner = prisoner(case_information_params[:nomis_offender_id])
-      render :new
-    end
-  end
-
   def update
     @case_info = CaseInformation.find_by(
       nomis_offender_id: case_information_params[:nomis_offender_id]
@@ -108,11 +100,54 @@ private
     params.require(:nomis_offender_id)
   end
 
+  def stage1_errors
+    if case_information_params[:last_known_location].nil?
+      @case_info.errors.messages.reject! do |f, _m|
+        f != :probation_service && f != :last_known_location
+      end
+      display_address_page
+    elsif case_information_params[:last_known_location] == 'Yes' && case_information_params[:probation_service].nil?
+      @case_info.errors.messages.select! do |f, _m|
+        f == :probation_service
+      end
+      display_address_page
+    end
+  end
+
+  def display_address_page
+    @prisoner = prisoner(case_information_params[:nomis_offender_id])
+    render :new
+  end
+
+  def handle_stage1
+    if @case_info.scottish_or_ni?
+      @case_info.save_scottish_or_ni
+    elsif @case_info.english_or_welsh?
+      @prisoner = prisoner(case_information_params[:nomis_offender_id])
+      @case_info.errors.clear
+      render :missing_info
+    else
+      stage1_errors
+    end
+  end
+
+  def handle_stage2
+    @case_info.probation_service = 'England' if @case_info.english?
+
+    unless @case_info.stage2_filled?
+      @prisoner = prisoner(case_information_params[:nomis_offender_id])
+      @case_info.errors.messages.reject! do |f, _m|
+        [:welsh_offender, :probation_service].include?(f)
+      end
+      render :missing_info
+    end
+  end
+
   def case_information_params
     params.require(:case_information).
       permit(:nomis_offender_id, :tier, :case_allocation,
              :parole_review_date_dd, :parole_review_date_mm, :parole_review_date_yyyy,
-             :probation_service, :last_known_location)
+             :probation_service, :last_known_location, :team_id)
   end
 
   def parole_review_date_params
