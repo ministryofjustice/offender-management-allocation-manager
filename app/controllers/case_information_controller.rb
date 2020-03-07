@@ -33,7 +33,20 @@ class CaseInformationController < PrisonsApplicationController
     end
   end
 
-  def edit; end
+  def edit
+    @case_info.probation_service == 'England' ? @case_info.last_known_location = 'No' : @case_info.last_known_location = 'Yes'
+  end
+
+  def update
+    @case_info = CaseInformation.find_by(nomis_offender_id: case_information_params[:nomis_offender_id])
+    @prisoner = prisoner(case_information_params[:nomis_offender_id])
+
+    if case_information_updated?
+      redirect_to new_prison_allocation_path(active_prison_id, @case_info.nomis_offender_id)
+    else
+      render :edit
+    end
+  end
 
   # Just edit the parole_review_date field
   def edit_prd
@@ -70,15 +83,7 @@ class CaseInformationController < PrisonsApplicationController
     end
   end
 
-  def update
-    @case_info = CaseInformation.find_by(
-      nomis_offender_id: case_information_params[:nomis_offender_id]
-    )
-    @prisoner = prisoner(case_information_params[:nomis_offender_id])
-    # Nothing here can fail due to radio buttons being unselectable
-    @case_info.update!(case_information_params.merge(manual_entry: true))
-    redirect_to new_prison_allocation_path(active_prison_id, @case_info.nomis_offender_id)
-  end
+
 
 private
 
@@ -140,6 +145,32 @@ private
         [:welsh_offender, :probation_service].include?(f)
       end
       render :missing_info
+    end
+  end
+
+  def case_information_updated?
+    if ["Scotland", "Northern Ireland"].include?(case_information_params[:probation_service]) &&
+      case_information_params[:last_known_location] == 'Yes'
+      @case_info.update(
+        probation_service: case_information_params[:probation_service],
+        tier: 'N/A',
+        case_allocation: 'N/A',
+        team: nil,
+        manual_entry: true
+      )
+    else
+      @case_info.probation_service = if case_information_params[:last_known_location] == 'No'
+                                       "England"
+                                     else
+                                       case_information_params[:probation_service]
+                                     end
+      @case_info.update(
+        probation_service: @case_info.probation_service,
+        tier: case_information_params[:tier],
+        case_allocation: case_information_params[:case_allocation],
+        team_id: case_information_params[:team_id],
+        manual_entry: true
+      )
     end
   end
 
