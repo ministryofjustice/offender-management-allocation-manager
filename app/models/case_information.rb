@@ -25,7 +25,7 @@ class CaseInformation < ApplicationRecord
   validates :manual_entry, inclusion: { in: [true, false], allow_nil: false }
   validates :nomis_offender_id, presence: true, uniqueness: true
 
-  validates :local_divisional_unit, :team,
+  validates :team,
             presence: { message: "You must select the prisoner's team" },
             unless:
             proc { |c|
