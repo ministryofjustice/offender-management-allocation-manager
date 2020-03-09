@@ -4,10 +4,10 @@ require 'csv'
 
 module Delius
   class ManualExtractor
-    # rubocop:disable Metrics/LineLength
+    # rubocop:disable Layout/LineLength
     HEADER_CELLS = ['CRN', 'PNC No', 'NOMS No', 'Fullname (O)', 'Tier Cd (OMT)', 'Risk Of Harm Cds', 'Offender Manager', 'Organisation Private Ind (OfM)', 'Organisation (OfM)', 'Provider (OfM)', 'Provider Cd (OfM)', 'LDU (OfM)', 'LDU Cd (OfM)', 'Team (OfM)', 'Team Cd (OfM)', 'MAPPA Y/N', 'MAPPA Levels', 'Birth Dt (O)'].freeze
     MAPPED_CELLS = %w[crn pnc_no noms_no fullname tier roh_cds offender_manager org_private_ind org provider provider_cd ldu ldu_cd team team_cd mappa mappa_levels date_of_birth].freeze
-    # rubocop:enable Metrics/LineLength
+    # rubocop:enable Layout/LineLength
 
     attr_reader :errors
 
