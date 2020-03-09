@@ -47,7 +47,7 @@
           </span>
         </td>
         <td aria-label="Earliest release date" class="govuk-table__cell">
-          <%= format_date(offender.earliest_release_date) %>
+          <%= format_date(offender.earliest_release_date, replacement: 'Unknown') %>
         </td>
         <td aria-label="POM" class="govuk-table__cell"><%= offender.allocated_pom_name %></td>
         <td aria-label="Allocation date" class="govuk-table__cell"><%= format_date(offender.allocation_date) %></td>

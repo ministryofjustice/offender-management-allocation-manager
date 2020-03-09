@@ -63,7 +63,7 @@
           <%= format_date(offender.prison_arrival_date) %>
         </td>
         <td aria-label="Earliest release<br/>date" class="govuk-table__cell">
-          <%= format_date(offender.earliest_release_date) %>
+          <%= format_date(offender.earliest_release_date, replacement: "Unknown") %>
         </td>
         <td aria-label="Matching with nDelius scheduled for" class="govuk-table__cell">
           <%= delius_schedule_for(offender.prison_arrival_date) %>, 9:15PM
