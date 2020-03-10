@@ -18,7 +18,7 @@ feature 'View a prisoner profile page' do
 
   context 'with an allocation' do
     let!(:alloc) {
-      create(:allocation, nomis_offender_id: 'G7998GJ', primary_pom_nomis_id: '485637')
+      create(:allocation, nomis_offender_id: 'G7998GJ', primary_pom_nomis_id: '485637', primary_pom_name: 'Pobno, Kath')
     }
 
     it 'shows the prisoner information', :raven_intercept_exception, vcr: { cassette_name: :show_offender_spec } do
@@ -28,6 +28,18 @@ feature 'View a prisoner profile page' do
       expect(page).to have_content('07/07/1968')
       cat_code = find('h3#category-code').text
       expect(cat_code).to eq('C')
+    end
+
+    it 'shows the POM name (fetched from NOMIS)', :raven_intercept_exception, vcr: { cassette_name: :show_offender_pom_spec } do
+      visit prison_prisoner_path('LEI', 'G7998GJ')
+
+      # check the primary POM name stored in the allocation
+      allocation = Allocation.last
+      expect(allocation.primary_pom_name).to eq('Pobno, Kath')
+
+      # ensure that the POM name displayed is the one actually returned from NOMIS
+      pom_name = find('#primary_pom_name').text
+      expect(pom_name).to eq('Pobee-Norris, Kath')
     end
 
     it 'shows an overridden responsibility', :raven_intercept_exception, vcr: { cassette_name: :show_offender_with_override_spec } do
