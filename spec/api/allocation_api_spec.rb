@@ -51,15 +51,20 @@ describe 'Allocation API' do
 
         let(:offender_no) { 'G4273GI' }
         let!(:allocation) {
-          create(:allocation, nomis_offender_id: offender_no, primary_pom_name: 'POM, MOIC')
+          create(:allocation, nomis_offender_id: offender_no, primary_pom_name: 'OLD_NAME, MOIC')
         }
         let(:Authorization) { "Bearer #{token}" }
 
         run_test! do |_|
+          # check primary POM name stored in allocation
+          allocation = Allocation.last
+          expect(allocation.primary_pom_name).to eq('OLD_NAME, MOIC')
+
           primary_pom = JSON.parse(response.body)['primary_pom']
           secondary_pom = JSON.parse(response.body)['secondary_pom']
 
           expect(primary_pom['staff_id']).to eq(485_926)
+          # ensure the API returns the POM name stored in NOMIS rather than the allocation
           expect(primary_pom['name']).to eq('POM, MOIC')
 
           expect(secondary_pom).to eq({})
