@@ -95,7 +95,7 @@ Naming/FileName:
 Metrics/ClassLength:
   Max: 200
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 120
   Exclude:
     - 'spec/**/*'
@@ -116,6 +116,15 @@ Metrics/MethodLength:
 
 # Don't worry about the complexity of spec methods
 Metrics/AbcSize:
+  Enabled: false
+
+Style/HashEachMethods:
+  Enabled: false
+
+Style/HashTransformKeys:
+  Enabled: false
+
+Style/HashTransformValues:
   Enabled: false
 
 # Enforce single quotes everywhere except in specs (because there's a lot of
