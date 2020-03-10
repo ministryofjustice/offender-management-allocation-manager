@@ -77,7 +77,7 @@ context 'when NOMIS is missing information' do
             sentenceStartDate: Time.zone.now.iso8601
           }
         }]
-
+\
         stub_offender = [{
           offenderNo: offender_no,
           latestBookingId: booking_id
@@ -103,6 +103,9 @@ context 'when NOMIS is missing information' do
         visit prison_prisoner_path(prison_code, offender_no)
 
         expect(page).to have_content('Prisoner information')
+
+        earliest_release_date = find('#earliest_release_date').text
+        expect(earliest_release_date).to eq('Unknown')
       end
     end
 

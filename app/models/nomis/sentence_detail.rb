@@ -42,14 +42,14 @@ module Nomis
       future_dates = []
 
       dates.each do |date|
-        date >= Time.zone.today ? future_dates << date : past_dates << date
+        if date >= Time.zone.today
+          future_dates << date
+        else
+          past_dates << date
+        end
       end
 
-      if future_dates.present?
-        future_dates.min.to_date
-      else
-        past_dates.min.to_date
-      end
+      future_dates.present? ? future_dates.min.to_date : past_dates.min.to_date
     end
 
     def full_name
