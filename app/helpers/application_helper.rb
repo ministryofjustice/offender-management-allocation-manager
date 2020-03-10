@@ -68,7 +68,7 @@ module ApplicationHelper
 
   def fetch_pom_name(staff_id)
     pom_firstname, pom_secondname =
-        PrisonOffenderManagerService.get_pom_name(staff_id)
+      PrisonOffenderManagerService.get_pom_name(staff_id)
     "#{pom_secondname}, #{pom_firstname}"
   end
 end

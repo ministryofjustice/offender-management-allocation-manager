@@ -84,7 +84,7 @@ context 'when NOMIS is missing information' do
         }]
 
         stub_request(:get, "#{stub_api_host}/staff/#{staff_id}").
-            to_return(status: 200, body: { staffId: staff_id, firstName: "TEST", lastName: "MOIC" }.to_json)
+          to_return(status: 200, body: { staffId: staff_id, firstName: "TEST", lastName: "MOIC" }.to_json)
 
         stub_request(:get, "#{stub_api_host}/prisoners/#{offender_no}").
           to_return(status: 200, body: stub_offender.to_json)
