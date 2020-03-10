@@ -2,7 +2,7 @@
 
 class ResponsibilitiesController < PrisonsApplicationController
   def new
-    if ldu_email_address(params[:nomis_offender_id])
+    if ldu_email_address(params[:nomis_offender_id]).present?
       @responsibility = Responsibility.new nomis_offender_id: params[:nomis_offender_id]
     else
       render 'error'
