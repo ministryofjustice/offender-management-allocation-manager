@@ -66,7 +66,7 @@ feature 'Responsibility override', :versioning do
     end
   end
 
-  context "when override isn't possible due to lack of LDU address", vcr: { cassette_name: :cant_override_responsibility } do
+  context "when override isn't possible due to email address is nil", vcr: { cassette_name: :cant_override_responsibility_nil_email } do
     before do
       ldu = create(:local_divisional_unit, email_address: nil)
       team = create(:team, local_divisional_unit: ldu)
@@ -74,6 +74,24 @@ feature 'Responsibility override', :versioning do
     end
 
     it 'doesnt override' do
+      visit new_prison_allocation_path('LEI', offender_id)
+
+      within '.responsibility_change' do
+        click_link 'Change'
+      end
+
+      expect(page).to have_content "Responsibility for this case can't be changed"
+    end
+  end
+
+  context "when override isn't possible due to email address is an empty string", vcr: { cassette_name: :cant_override_responsibility_blank_email } do
+    before do
+      ldu = create(:local_divisional_unit, email_address: "")
+      team = create(:team, local_divisional_unit: ldu)
+      create(:case_information, nomis_offender_id: offender_id, team: team)
+    end
+
+    it 'doesnt allow an override to take place' do
       visit new_prison_allocation_path('LEI', offender_id)
 
       within '.responsibility_change' do
