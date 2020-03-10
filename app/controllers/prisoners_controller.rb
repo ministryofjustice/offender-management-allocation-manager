@@ -15,10 +15,13 @@ class PrisonersController < PrisonsApplicationController
     @tasks = PomTasks.new.for_offender(@prisoner)
     @allocation = Allocation.find_by(nomis_offender_id: @prisoner.offender_no)
 
-    @primary_pom_name = helpers.fetch_pom_name(@allocation.primary_pom_nomis_id).titleize if @allocation.present?
+    if @allocation.present?
+      @primary_pom_name = helpers.fetch_pom_name(@allocation.primary_pom_nomis_id).
+          titleize
+    end
 
     if @allocation.present? && @allocation.secondary_pom_name.present?
-      @secondary_pom_name = fetch_pom_name(@allocation.secondary_pom_nomis_id).titleize
+      @secondary_pom_name = helpers.fetch_pom_name(@allocation.secondary_pom_nomis_id).titleize
     end
 
     @pom_responsibility = pom_responsibility

@@ -6,4 +6,10 @@ RSpec.describe PomHelper do
       expect(format_working_pattern(1.0)).to eq('Full time')
     end
   end
+
+  describe 'fetch_pom_name' do
+    it 'fetches the POM name from NOMIS' do
+      expect(fetch_pom_name(485_926)).to eq('POM, MOIC')
+    end
+  end
 end
