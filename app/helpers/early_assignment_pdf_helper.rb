@@ -64,7 +64,7 @@ private
     pom_email: 'POM email',
     main_offence: 'Main offence',
     sentence_type: 'Sentence type',
-    release_date: 'Release date',
+    earliest_release_date: 'Earliest release date',
     full_name: 'Prisoner name',
     offender_no: 'Prisoner number',
     crn: 'CRN number',
@@ -111,7 +111,7 @@ private
     offence_info = {
       main_offence: offender.main_offence,
       sentence_type: sentence_type_label(offender),
-      release_date: format_date(offender.release_date)
+      earliest_release_date: format_date(offender.earliest_release_date)
     }
 
     pdf_table pdf, 'Offence', offence_info

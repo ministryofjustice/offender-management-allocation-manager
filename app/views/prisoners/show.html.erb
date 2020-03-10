@@ -31,7 +31,7 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-third">
         <span class="govuk-body">Earliest release date</span>
-        <h3 class="govuk-heading-m"><%= format_date(@prisoner.earliest_release_date) %></h3>
+        <h3 class="govuk-heading-m" id="earliest_release_date"><%= format_date(@prisoner.earliest_release_date, replacement: "Unknown") %></h3>
       </div>
       <div class="govuk-grid-column-one-third">
         <span class="govuk-body">Category</span>

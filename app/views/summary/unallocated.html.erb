@@ -67,7 +67,7 @@
         </td>
 
         <td aria-label="Earliest release<br/>date" class="govuk-table__cell">
-          <%= format_date(offender.earliest_release_date) %>
+          <%= format_date(offender.earliest_release_date, replacement: 'Unknown') %>
         </td>
         <td aria-label="Case owner" class="govuk-table__cell">
           <%= case_owner_label(offender) %>

@@ -29,13 +29,27 @@ module Nomis
 
     def earliest_release_date
       dates = [
-          release_date,
+          automatic_release_date,
+          conditional_release_date,
+          home_detention_curfew_actual_date,
+          home_detention_curfew_eligibility_date,
           parole_eligibility_date,
           tariff_date
       ].compact
       return nil if dates.empty?
 
-      dates.min.to_date
+      past_dates = []
+      future_dates = []
+
+      dates.each do |date|
+        if date >= Time.zone.today
+          future_dates << date
+        else
+          past_dates << date
+        end
+      end
+
+      future_dates.present? ? future_dates.min.to_date : past_dates.min.to_date
     end
 
     def full_name

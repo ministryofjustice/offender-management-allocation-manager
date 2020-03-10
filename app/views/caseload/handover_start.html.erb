@@ -28,7 +28,7 @@
         <td aria-label="Prisoner number" class="govuk-table__cell "><%= offender.offender_no %></td>
         <td aria-label="Handover start date" class="govuk-table__cell "><%= format_date(offender.handover_start_date) %></td>
         <td aria-label="Responsibility handover" class="govuk-table__cell "><%= format_date(offender.responsibility_handover_date) %></td>
-        <td aria-label="Release date" class="govuk-table__cell "><%= format_date(offender.earliest_release_date) %></td>
+        <td aria-label="Earliest release date" class="govuk-table__cell "><%= format_date(offender.earliest_release_date, replacement: "Unknown") %></td>
         <td aria-label="Role" class="govuk-table__cell "><%= offender.pom_responsibility %></td>
         <td aria-label="Action" class="govuk-table__cell ">
           <%= link_to('View', prison_prisoner_path(@prison.code, offender.offender_no), class: "govuk-link" ) %>

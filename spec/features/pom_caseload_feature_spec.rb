@@ -159,11 +159,11 @@ feature "view POM's caseload" do
 
     it 'can be sorted by release date' do
       page.all('th')[2].find('a').click
-      within '.offender_row_4' do
-        expect(page).to have_content('Allix, Aobmethani')
+      within '.offender_row_6' do
+        expect(page).to have_content('Anikariah, Aeticake')
       end
-      within '.offender_row_5' do
-        expect(page).to have_content('Andexia, Obinins')
+      within '.offender_row_7' do
+        expect(page).to have_content('Kaceria, Omaertain')
       end
     end
 

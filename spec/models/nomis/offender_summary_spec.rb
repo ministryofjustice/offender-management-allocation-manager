@@ -14,14 +14,36 @@ describe Nomis::OffenderSummary do
       before do
         subject.sentence = Nomis::SentenceDetail.new.tap do |sentence|
           sentence.sentence_start_date = Date.new(2005, 2, 3)
-          sentence.release_date = release_date
           sentence.parole_eligibility_date = parole_eligibility_date
+          sentence.conditional_release_date = conditional_release_date
         end
       end
 
-      context 'with a release date after a parole eligibility date' do
+      context 'when comprised of dates in the past and the future' do
         let(:parole_eligibility_date) { Date.new(2009, 1, 1) }
-        let(:release_date) { Date.new(2010, 1, 1) }
+        let(:automatic_release_date) { Time.zone.today }
+        let(:conditional_release_date) { Time.zone.today + 3.days }
+
+        it 'will display the earliest of the dates in the future' do
+          expect(subject.sentence.earliest_release_date).
+              to eq(conditional_release_date)
+        end
+      end
+
+      context 'when comprised solely of dates in the past' do
+        let(:parole_eligibility_date) { Date.new(2009, 1, 1) }
+        let(:automatic_release_date) { Date.new(2009, 1, 11) }
+        let(:conditional_release_date) { Date.new(2009, 1, 21) }
+
+        it 'will display the earliest of the dates in the past' do
+          expect(subject.sentence.earliest_release_date).
+              to eq(parole_eligibility_date)
+        end
+      end
+
+      context 'with a conditional release date after a parole eligibility date' do
+        let(:parole_eligibility_date) { Date.new(2009, 1, 1) }
+        let(:conditional_release_date) { Date.new(2009, 1, 10) }
 
         it 'uses parole eligibility date' do
           expect(subject.sentence.earliest_release_date).
@@ -29,13 +51,13 @@ describe Nomis::OffenderSummary do
         end
       end
 
-      context 'with a release date before a parole eligibility date' do
-        let(:parole_eligibility_date) { Date.new(2010, 1, 1) }
-        let(:release_date) { Date.new(2009, 1, 1) }
+      context 'with a conditional release date before a parole eligibility date' do
+        let(:conditional_release_date) { Date.new(2009, 12, 3) }
+        let(:parole_eligibility_date) { Date.new(2009, 12, 28) }
 
-        it 'uses release date' do
+        it 'uses conditional release date' do
           expect(subject.sentence.earliest_release_date).
-            to eq(release_date)
+            to eq(conditional_release_date)
         end
       end
     end
