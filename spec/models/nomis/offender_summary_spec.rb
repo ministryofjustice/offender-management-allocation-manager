@@ -30,6 +30,17 @@ describe Nomis::OffenderSummary do
         end
       end
 
+      context 'when comprised solely of dates in the past' do
+        let(:parole_eligibility_date) { Date.new(2009, 1, 1) }
+        let(:automatic_release_date) { Date.new(2009, 1, 11) }
+        let(:conditional_release_date) { Date.new(2009, 1, 21) }
+
+        it 'will display the earliest of the dates in the past' do
+          expect(subject.sentence.earliest_release_date).
+              to eq(parole_eligibility_date)
+        end
+      end
+
       context 'with a conditional release date after a parole eligibility date' do
         let(:parole_eligibility_date) { Date.new(2009, 1, 1) }
         let(:conditional_release_date) { Date.new(2009, 1, 10) }

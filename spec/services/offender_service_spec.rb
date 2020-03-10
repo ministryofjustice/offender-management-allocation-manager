@@ -11,6 +11,7 @@ describe OffenderService do
 
     expect(offender).to be_kind_of(Nomis::Offender)
     expect(offender.tier).to eq 'C'
+    expect(offender.sentence.conditional_release_date).to eq(Date.new(2020, 3, 16))
     expect(offender.main_offence).to eq 'Section 18 - wounding with intent to resist / prevent arrest'
     expect(offender.case_allocation).to eq 'CRC'
   end
