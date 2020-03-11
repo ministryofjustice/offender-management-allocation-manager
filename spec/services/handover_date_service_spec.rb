@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe HandoverDateService do
-  describe '#handover_start_date' do
+  describe 'calculating when community start supporting custody' do
     context 'when NPS' do
       let(:offender) {
         OpenStruct.new indeterminate_sentence?: indeterminate,
@@ -69,7 +69,7 @@ describe HandoverDateService do
     end
   end
 
-  describe '#responsibility_handover_date' do
+  describe 'calculating when responsibilty switches from custody to community' do
     let(:ard) { nil }
     let(:crd) { nil }
     let(:hdcad) { nil }
