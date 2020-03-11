@@ -191,8 +191,7 @@ describe HandoverDateService do
               end
             end
 
-            context 'without mappa' do
-              # mappa level 0 means MAAPA doesn't apply
+            context "with mappa level 0 (maapa doesn't apply)" do
               let(:mappa_level) { 0 }
 
               context 'when crd before ard' do
