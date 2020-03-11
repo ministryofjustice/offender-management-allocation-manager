@@ -70,94 +70,101 @@ describe HandoverDateService do
   end
 
   describe 'calculating when responsibilty switches from custody to community' do
+    let(:result) { described_class.handover(offender).handover_date }
+
+    let(:offender) do
+      double(
+        recalled?: false,
+        nps_case?: nps_case,
+        indeterminate_sentence?: indeterminate_sentence,
+        early_allocation?: early_allocation,
+        automatic_release_date: ard,
+        conditional_release_date: crd,
+        home_detention_curfew_actual_date: hdcad,
+        home_detention_curfew_eligibility_date: hdced,
+        mappa_level: mappa_level,
+        parole_eligibility_date: parole_date,
+        tariff_date: tariff_date
+      )
+    end
+
     let(:ard) { nil }
     let(:crd) { nil }
     let(:hdcad) { nil }
     let(:hdced) { nil }
+    let(:parole_date) { nil }
+    let(:mappa_level) { nil }
+    let(:tariff_date) { nil }
+    let(:indeterminate_sentence) { nil }
+    let(:early_allocation) { nil }
 
     context 'when CRC' do
-      let(:offender) {
-        OpenStruct.new  recalled?: false,
-                        nps_case?: false,
-                        automatic_release_date: ard,
-                        conditional_release_date: crd,
-                        home_detention_curfew_actual_date: hdcad,
-                        home_detention_curfew_eligibility_date: hdced
-      }
+      let(:nps_case) { false }
 
       context 'when 12 weeks before the CRD date' do
-        let(:ard)   { Date.new(2019, 8, 1) }
-        let(:crd)   { Date.new(2019, 8, 12) }
+        let(:ard) { Date.new(2019, 8, 1) }
+        let(:crd) { Date.new(2019, 8, 12) }
 
         it 'will return the handover date 12 weeks before the CRD' do
-          expect(described_class.handover(offender).handover_date).to eq Date.new(2019, 5, 9)
+          expect(result).to eq Date.new(2019, 5, 9)
         end
       end
 
       context 'when 12 weeks before the ARD date' do
-        let(:ard)   { Date.new(2019, 8, 12) }
-        let(:crd)   { Date.new(2019, 8, 1) }
+        let(:ard) { Date.new(2019, 8, 12) }
+        let(:crd) { Date.new(2019, 8, 1) }
 
         it 'will return the handover date 12 weeks before the ARD' do
-          expect(described_class.handover(offender).handover_date).to eq Date.new(2019, 5, 9)
+          expect(result).to eq Date.new(2019, 5, 9)
         end
       end
 
       context 'when HDCED date is present' do
-        let(:ard)   { Date.new(2019, 8, 1) }
-        let(:crd)   { Date.new(2019, 8, 12) }
+        let(:ard) { Date.new(2019, 8, 1) }
+        let(:crd) { Date.new(2019, 8, 12) }
         let(:hdced) { Date.new(2019, 7, 25) }
 
         it 'the handover date will be on the HDCED date' do
-          expect(described_class.handover(offender).handover_date).to eq Date.new(2019, 7, 25)
+          expect(result).to eq Date.new(2019, 7, 25)
         end
       end
 
       context 'when HDCAD date is present' do
-        let(:ard)   { Date.new(2019, 8, 1) }
-        let(:crd)   { Date.new(2019, 8, 12) }
+        let(:ard) { Date.new(2019, 8, 1) }
+        let(:crd) { Date.new(2019, 8, 12) }
         let(:hdcad) { Date.new(2019, 7, 26) }
         let(:hdced) { Date.new(2019, 7, 25) }
 
         it 'the handover date will be on the HDCAD date' do
-          expect(described_class.handover(offender).handover_date).to eq Date.new(2019, 7, 26)
+          expect(result).to eq Date.new(2019, 7, 26)
         end
       end
 
       context 'when there are no release related dates' do
         it 'will return no handover date' do
-          expect(described_class.handover(offender).handover_date).to eq nil
+          expect(result).to be_nil
         end
       end
     end
 
     context 'when NPS' do
+      let(:nps_case) { true }
+
       context 'with normal allocation' do
-        let(:ted)         { Date.new(2020, 11, 1) }
-        let(:crd)         { Date.new(2020, 7, 16) }
-        let(:ard)         { Date.new(2020, 8, 16) }
-        let(:parole_date) { nil }
+        let(:early_allocation) { false }
+
+        let(:tariff_date) { Date.new(2020, 11, 1) }
+        let(:crd) { Date.new(2020, 7, 16) }
+        let(:ard) { Date.new(2020, 8, 16) }
 
         context 'with determinate sentence' do
-          let(:mappa_level) { nil }
-
-          let(:offender) {
-            OpenStruct.new(inderminate_sentence?: false,
-                           nps_case?: true,
-                           mappa_level: mappa_level,
-                           home_detention_curfew_eligibility_date: hdced,
-                           conditional_release_date: crd,
-                           automatic_release_date: ard,
-                           parole_eligibility_date: parole_date,
-                           tariff_date: ted,
-                           home_detention_curfew_actual_date: hdcad)
-          }
+          let(:indeterminate_sentence) { false }
 
           context 'with parole eligibility' do
             let(:parole_date) { Date.new(2019, 9, 30) }
 
             it 'is 8 months before parole date' do
-              expect(described_class.handover(offender).handover_date).to eq(Date.new(2019, 1, 30))
+              expect(result).to eq(Date.new(2019, 1, 30))
             end
           end
 
@@ -167,7 +174,7 @@ describe HandoverDateService do
 
               context 'when crd before ard' do
                 it 'is 4.5 months before CRD' do
-                  expect(described_class.handover(offender).handover_date).to eq(Date.new(2020, 3, 1))
+                  expect(result).to eq(Date.new(2020, 3, 1))
                 end
               end
 
@@ -177,7 +184,7 @@ describe HandoverDateService do
                 let(:crd) { Date.new(2020, 12, 5) }
 
                 it 'is set to HDCED' do
-                  expect(described_class.handover(offender).handover_date).to eq(hdced)
+                  expect(result).to eq(hdced)
                 end
               end
 
@@ -186,7 +193,7 @@ describe HandoverDateService do
                 let(:hdcad) { Date.new(2020, 6, 20) }
 
                 it 'is set to HDCAD' do
-                  expect(described_class.handover(offender).handover_date).to eq(hdcad)
+                  expect(result).to eq(hdcad)
                 end
               end
             end
@@ -196,7 +203,7 @@ describe HandoverDateService do
 
               context 'when crd before ard' do
                 it 'is 4.5 months before CRD' do
-                  expect(described_class.handover(offender).handover_date).to eq(Date.new(2020, 3, 1))
+                  expect(result).to eq(Date.new(2020, 3, 1))
                 end
               end
 
@@ -204,7 +211,7 @@ describe HandoverDateService do
                 let(:crd) { Date.new(2020, 8, 17) }
 
                 it 'is 4.5 months before ARD' do
-                  expect(described_class.handover(offender).handover_date).to eq(Date.new(2020, 4, 1))
+                  expect(result).to eq(Date.new(2020, 4, 1))
                 end
               end
 
@@ -212,7 +219,7 @@ describe HandoverDateService do
                 let(:hdced) { Date.new(2020, 2, 28) }
 
                 it 'is on HDC date' do
-                  expect(described_class.handover(offender).handover_date).to eq(Date.new(2020, 2, 28))
+                  expect(result).to eq(Date.new(2020, 2, 28))
                 end
               end
 
@@ -220,7 +227,7 @@ describe HandoverDateService do
                 let(:hdced) { Date.new(2021, 2, 14) }
 
                 it 'is 4.5 months before CRD' do
-                  expect(described_class.handover(offender).handover_date).to eq(Date.new(2020, 3, 1))
+                  expect(result).to eq(Date.new(2020, 3, 1))
                 end
               end
 
@@ -229,7 +236,7 @@ describe HandoverDateService do
                 let(:hdced) { Date.new(2020, 2, 28) }
 
                 it 'is on HDCAD date' do
-                  expect(described_class.handover(offender).handover_date).to eq(Date.new(2020, 2, 15))
+                  expect(result).to eq(Date.new(2020, 2, 15))
                 end
               end
             end
@@ -238,7 +245,7 @@ describe HandoverDateService do
               let(:mappa_level) { 1 }
 
               it 'is 4.5 months before CRD/ARD date or on HDC date' do
-                expect(described_class.handover(offender).handover_date).to eq(Date.new(2020, 3, 1))
+                expect(result).to eq(Date.new(2020, 3, 1))
               end
             end
 
@@ -246,7 +253,7 @@ describe HandoverDateService do
               let(:mappa_level) { 2 }
 
               it 'is todays date' do
-                expect(described_class.handover(offender).handover_date).to eq(Time.zone.today)
+                expect(result).to eq(Time.zone.today)
               end
             end
 
@@ -254,49 +261,41 @@ describe HandoverDateService do
               let(:mappa_level) { 3 }
 
               it 'is todays date' do
-                expect(described_class.handover(offender).handover_date).to eq(Time.zone.today)
+                expect(result).to eq(Time.zone.today)
               end
             end
           end
         end
 
         context "with indeterminate sentence" do
-          let(:offender) {
-            OpenStruct.new(indeterminate_sentence?: true,
-                           nps_case?: true,
-                           tariff_date: tariff_date)
-          }
+          let(:indeterminate_sentence) { true }
 
           context 'with tariff date in the future' do
             let(:tariff_date) { Date.new(2020, 11, 1) }
 
             it 'is 8 months before tariff date' do
-              expect(described_class.handover(offender).handover_date).to eq(Date.new(2020, 3, 1))
+              expect(result).to eq(Date.new(2020, 3, 1))
             end
           end
 
-          context 'with neither date' do
+          context 'with no tariff date' do
             let(:tariff_date) { nil }
 
             it 'cannot be calculated' do
-              expect(described_class.handover(offender).handover_date).to be_nil
+              expect(result).to be_nil
             end
           end
         end
       end
 
       context 'with early_allocation' do
-        let(:offender) {
-          OpenStruct.new(nps_case?: true,
-                         early_allocation?: true,
-                         conditional_release_date: crd)
-        }
+        let(:early_allocation) { true }
 
         context 'when CRD earliest' do
           let(:crd) { Date.new(2019, 7, 1) }
 
           it 'is 15 months before CRD' do
-            expect(described_class.handover(offender).handover_date).to eq(Date.new(2018, 4, 1))
+            expect(result).to eq(Date.new(2018, 4, 1))
           end
         end
       end
