@@ -93,8 +93,13 @@ private
     ].compact.map { |date| date - 8.months }.min
   end
 
-  def self.mappa_23_responsibility_date(_offender)
-    Time.zone.today
+  def self.mappa_23_responsibility_date(offender)
+    earliest_date = [
+      offender.conditional_release_date,
+      offender.automatic_release_date
+    ].compact.map { |date| date - (4.months + 15.days) }.min
+
+    [Time.zone.today, earliest_date].max
   end
 
   # There are a couple of places where we need .5 of a month - which
