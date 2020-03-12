@@ -78,20 +78,20 @@ describe HandoverDateService do
         nps_case?: nps_case,
         indeterminate_sentence?: indeterminate_sentence,
         early_allocation?: early_allocation,
-        automatic_release_date: ard,
-        conditional_release_date: crd,
-        home_detention_curfew_actual_date: hdcad,
-        home_detention_curfew_eligibility_date: hdced,
+        automatic_release_date: automatic_release_date,
+        conditional_release_date: conditional_release_date,
+        home_detention_curfew_actual_date: home_detention_curfew_actual_date,
+        home_detention_curfew_eligibility_date: home_detention_curfew_eligibility_date,
         mappa_level: mappa_level,
         parole_eligibility_date: parole_date,
         tariff_date: tariff_date
       )
     end
 
-    let(:ard) { nil }
-    let(:crd) { nil }
-    let(:hdcad) { nil }
-    let(:hdced) { nil }
+    let(:automatic_release_date) { nil }
+    let(:conditional_release_date) { nil }
+    let(:home_detention_curfew_actual_date) { nil }
+    let(:home_detention_curfew_eligibility_date) { nil }
     let(:parole_date) { nil }
     let(:mappa_level) { nil }
     let(:tariff_date) { nil }
@@ -102,8 +102,8 @@ describe HandoverDateService do
       let(:nps_case) { false }
 
       context 'when 12 weeks before the CRD date' do
-        let(:ard) { Date.new(2019, 8, 1) }
-        let(:crd) { Date.new(2019, 8, 12) }
+        let(:automatic_release_date) { Date.new(2019, 8, 1) }
+        let(:conditional_release_date) { Date.new(2019, 8, 12) }
 
         it 'will return the handover date 12 weeks before the CRD' do
           expect(result).to eq Date.new(2019, 5, 9)
@@ -111,8 +111,8 @@ describe HandoverDateService do
       end
 
       context 'when 12 weeks before the ARD date' do
-        let(:ard) { Date.new(2019, 8, 12) }
-        let(:crd) { Date.new(2019, 8, 1) }
+        let(:automatic_release_date) { Date.new(2019, 8, 12) }
+        let(:conditional_release_date) { Date.new(2019, 8, 1) }
 
         it 'will return the handover date 12 weeks before the ARD' do
           expect(result).to eq Date.new(2019, 5, 9)
@@ -120,9 +120,9 @@ describe HandoverDateService do
       end
 
       context 'when HDCED date is present' do
-        let(:ard) { Date.new(2019, 8, 1) }
-        let(:crd) { Date.new(2019, 8, 12) }
-        let(:hdced) { Date.new(2019, 7, 25) }
+        let(:automatic_release_date) { Date.new(2019, 8, 1) }
+        let(:conditional_release_date) { Date.new(2019, 8, 12) }
+        let(:home_detention_curfew_eligibility_date) { Date.new(2019, 7, 25) }
 
         it 'the handover date will be on the HDCED date' do
           expect(result).to eq Date.new(2019, 7, 25)
@@ -130,10 +130,10 @@ describe HandoverDateService do
       end
 
       context 'when HDCAD date is present' do
-        let(:ard) { Date.new(2019, 8, 1) }
-        let(:crd) { Date.new(2019, 8, 12) }
-        let(:hdcad) { Date.new(2019, 7, 26) }
-        let(:hdced) { Date.new(2019, 7, 25) }
+        let(:automatic_release_date) { Date.new(2019, 8, 1) }
+        let(:conditional_release_date) { Date.new(2019, 8, 12) }
+        let(:home_detention_curfew_actual_date) { Date.new(2019, 7, 26) }
+        let(:home_detention_curfew_eligibility_date) { Date.new(2019, 7, 25) }
 
         it 'the handover date will be on the HDCAD date' do
           expect(result).to eq Date.new(2019, 7, 26)
@@ -154,8 +154,8 @@ describe HandoverDateService do
         let(:early_allocation) { false }
 
         let(:tariff_date) { Date.new(2020, 11, 1) }
-        let(:crd) { Date.new(2020, 7, 16) }
-        let(:ard) { Date.new(2020, 8, 16) }
+        let(:conditional_release_date) { Date.new(2020, 7, 16) }
+        let(:automatic_release_date) { Date.new(2020, 8, 16) }
 
         context 'with determinate sentence' do
           let(:indeterminate_sentence) { false }
@@ -179,21 +179,21 @@ describe HandoverDateService do
               end
 
               context 'when HDCED is present and earlier than the ARD/CRD calculated date' do
-                let(:hdced) {  Date.new(2020, 6, 16) }
-                let(:ard) { Date.new(2020, 11, 10) }
-                let(:crd) { Date.new(2020, 12, 5) }
+                let(:home_detention_curfew_eligibility_date) {  Date.new(2020, 6, 16) }
+                let(:automatic_release_date) { Date.new(2020, 11, 10) }
+                let(:conditional_release_date) { Date.new(2020, 12, 5) }
 
                 it 'is set to HDCED' do
-                  expect(result).to eq(hdced)
+                  expect(result).to eq(home_detention_curfew_eligibility_date)
                 end
               end
 
               context 'when HDCAD is present' do
-                let(:hdced) { Date.new(2020, 6, 16) }
-                let(:hdcad) { Date.new(2020, 6, 20) }
+                let(:home_detention_curfew_eligibility_date) { Date.new(2020, 6, 16) }
+                let(:home_detention_curfew_actual_date) { Date.new(2020, 6, 20) }
 
                 it 'is set to HDCAD' do
-                  expect(result).to eq(hdcad)
+                  expect(result).to eq(home_detention_curfew_actual_date)
                 end
               end
             end
@@ -208,7 +208,7 @@ describe HandoverDateService do
               end
 
               context 'when crd after ard' do
-                let(:crd) { Date.new(2020, 8, 17) }
+                let(:conditional_release_date) { Date.new(2020, 8, 17) }
 
                 it 'is 4.5 months before ARD' do
                   expect(result).to eq(Date.new(2020, 4, 1))
@@ -216,7 +216,7 @@ describe HandoverDateService do
               end
 
               context 'when HDC date earlier than the CRD/ARD calculated date' do
-                let(:hdced) { Date.new(2020, 2, 28) }
+                let(:home_detention_curfew_eligibility_date) { Date.new(2020, 2, 28) }
 
                 it 'is on HDC date' do
                   expect(result).to eq(Date.new(2020, 2, 28))
@@ -224,7 +224,7 @@ describe HandoverDateService do
               end
 
               context 'when HDCED date later than date indicated by CRD/ARD' do
-                let(:hdced) { Date.new(2021, 2, 14) }
+                let(:home_detention_curfew_eligibility_date) { Date.new(2021, 2, 14) }
 
                 it 'is 4.5 months before CRD' do
                   expect(result).to eq(Date.new(2020, 3, 1))
@@ -232,8 +232,8 @@ describe HandoverDateService do
               end
 
               context 'when HDCAD is present' do
-                let(:hdcad) { Date.new(2020, 2, 15) }
-                let(:hdced) { Date.new(2020, 2, 28) }
+                let(:home_detention_curfew_actual_date) { Date.new(2020, 2, 15) }
+                let(:home_detention_curfew_eligibility_date) { Date.new(2020, 2, 28) }
 
                 it 'is on HDCAD date' do
                   expect(result).to eq(Date.new(2020, 2, 15))
@@ -292,7 +292,7 @@ describe HandoverDateService do
         let(:early_allocation) { true }
 
         context 'when CRD earliest' do
-          let(:crd) { Date.new(2019, 7, 1) }
+          let(:conditional_release_date) { Date.new(2019, 7, 1) }
 
           it 'is 15 months before CRD' do
             expect(result).to eq(Date.new(2018, 4, 1))
