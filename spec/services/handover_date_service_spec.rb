@@ -255,6 +255,15 @@ describe HandoverDateService do
               it 'is todays date' do
                 expect(result).to eq(Time.zone.today)
               end
+
+              context 'with release dates far in the future' do
+                let(:conditional_release_date) { '20 June 2100'.to_date }
+                let(:automatic_release_date) { '20 June 2100'.to_date }
+
+                it 'returns 4.5 months before those release dates' do
+                  expect(result).to eq('5 Feb 2100'.to_date)
+                end
+              end
             end
 
             context 'with mappa level 3' do
@@ -262,6 +271,15 @@ describe HandoverDateService do
 
               it 'is todays date' do
                 expect(result).to eq(Time.zone.today)
+              end
+
+              context 'with release dates far in the future' do
+                let(:conditional_release_date) { '20 June 2100'.to_date }
+                let(:automatic_release_date) { '20 June 2100'.to_date }
+
+                it 'returns 4.5 months before those release dates' do
+                  expect(result).to eq('5 Feb 2100'.to_date)
+                end
               end
             end
           end
