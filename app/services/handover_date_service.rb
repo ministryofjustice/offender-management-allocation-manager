@@ -99,7 +99,7 @@ private
       offender.automatic_release_date
     ].compact.map { |date| date - (4.months + 15.days) }.min
 
-    [Time.zone.today, earliest_date].max
+    [Time.zone.today, earliest_date].compact.max
   end
 
   # There are a couple of places where we need .5 of a month - which

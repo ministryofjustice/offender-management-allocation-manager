@@ -264,6 +264,15 @@ describe HandoverDateService do
                   expect(result).to eq('5 Feb 2100'.to_date)
                 end
               end
+
+              context 'with missing release dates' do
+                let(:conditional_release_date) { nil }
+                let(:automatic_release_date) { nil }
+
+                it 'returns today' do
+                  expect(result).to eq(Time.zone.today)
+                end
+              end
             end
 
             context 'with mappa level 3' do
@@ -279,6 +288,15 @@ describe HandoverDateService do
 
                 it 'returns 4.5 months before those release dates' do
                   expect(result).to eq('5 Feb 2100'.to_date)
+                end
+              end
+
+              context 'with missing release dates' do
+                let(:conditional_release_date) { nil }
+                let(:automatic_release_date) { nil }
+
+                it 'returns today' do
+                  expect(result).to eq(Time.zone.today)
                 end
               end
             end
