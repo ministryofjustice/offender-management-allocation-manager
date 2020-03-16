@@ -4,6 +4,12 @@
       <td class="govuk-table__header govuk-!-width-one-half" scope="row">Community information</td>
       <td class="govuk-table__cell govuk-!-width-one-half"></td>
     </tr>
+    <tr class="govuk-table__row" id="probation_service">
+      <td class="govuk-table__cell">Community probation service</td>
+      <td class="govuk-table__cell table_cell__left_align">
+        <%= @prisoner.probation_service || "Unknown" %>
+      </td>
+    </tr>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Local divisional unit (LDU)</td>
       <td class="govuk-table__cell table_cell__left_align">
