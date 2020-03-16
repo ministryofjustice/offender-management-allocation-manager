@@ -26,6 +26,13 @@
       <%= link_to 'Change', edit_prison_case_information_path(@prison.code, @prisoner.offender_no), class: 'govuk-link pull-right' %>
     </td>
   </tr>
+  <tr class="govuk-table__row" id="probation_service">
+    <td class="govuk-table__cell">Community probation service</td>
+    <td class="govuk-table__cell table_cell__left_align">
+      <%= @prisoner.probation_service.presence || 'Unknown' %>
+      <%= link_to 'Change', edit_prison_case_information_path(@prison.code, @prisoner.offender_no), class: 'govuk-link pull-right' %>
+    </td>
+  </tr>
   <tr class="govuk-table__row">
     <td class="govuk-table__cell">Service provider</td>
     <td class="govuk-table__cell table_cell__left_align">

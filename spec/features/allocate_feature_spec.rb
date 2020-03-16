@@ -16,7 +16,8 @@ feature 'Allocation' do
   }
 
   let!(:case_information) {
-    create(:case_information, nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPS', welsh_offender: 'No')
+    create(:case_information, nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPS',
+           welsh_offender: 'No', probation_service: 'England')
   }
 
   before do
@@ -27,6 +28,7 @@ feature 'Allocation' do
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
     expect(page).to have_content('Determinate')
+    expect(page).to have_css('#probation_service', text: 'England')
     expect(page).to have_content('There is 1 POM unavailable for new allocations.')
 
     within('.recommended_pom_row_0') do
