@@ -8,6 +8,4 @@
 <h2 class="govuk-!-margin-bottom-0 govuk-heading-m"><%= @prisoner.full_name %> (<%= format_date(@prisoner.date_of_birth) %>)</h2>
 <h2 class="govuk-heading-m"><%= @prisoner.offender_no %></h2>
 
-<p class="govuk-!-margin-bottom-8">You can find this information in NDelius.</p>
-
 <%= render 'last_known_location', form_method: :post %>

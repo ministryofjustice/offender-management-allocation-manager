@@ -7,7 +7,7 @@
   <div class="govuk-form-group">
     <fieldset class="govuk-fieldset">
       <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-        <h1 class="govuk-fieldset__heading">Was this prisoner's last known address in Northern Ireland, Scotland or Wales?</h1>
+        <h1 class="govuk-fieldset__heading">Was the prisoner's last known address in Northern Ireland, Scotland or Wales?</h1>
       </legend>
 
       <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
@@ -25,11 +25,11 @@
             <div class="govuk-radios">
               <div class="govuk-radios__item">
                 <%= form.radio_button(:probation_service, 'Scotland', class: "govuk-radios__input" ) %>
-                <%= form.label :probation_service, 'Scotland', class: "govuk-label govuk-radios__label" %>
+                <%= form.label :probation_service, 'Scotland - to be managed by Scottish probation', class: "govuk-label govuk-radios__label" %>
               </div>
               <div class="govuk-radios__item">
                 <%= form.radio_button(:probation_service, 'Northern Ireland', class: "govuk-radios__input" ) %>
-                <%= form.label :probation_service, 'Northern Ireland', class: "govuk-label govuk-radios__label" %>
+                <%= form.label :probation_service, 'Northern Ireland - to be managed by Northern Irish probation', class: "govuk-label govuk-radios__label" %>
               </div>
               <div class="govuk-radios__item">
                 <%= form.radio_button(:probation_service, 'Wales', class: "govuk-radios__input" ) %>
