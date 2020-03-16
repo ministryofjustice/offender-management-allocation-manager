@@ -397,8 +397,8 @@ feature 'case information feature' do
       end
 
       it 'complains if country not selected when changing to another country',
-        :raven_intercept_exception,
-        vcr: { cassette_name: :case_information_updating_location_validation_errors } do
+         :raven_intercept_exception,
+         vcr: { cassette_name: :case_information_updating_location_validation_errors } do
         signin_user
         visit new_prison_case_information_path('LEI', nomis_offender_id)
 
@@ -416,7 +416,7 @@ feature 'case information feature' do
   end
 
   it "clicking back link after viewing prisoner's case information, returns back the same paginated page",
-      vcr: { cassette_name: :case_information_back_link }, js: true do
+     vcr: { cassette_name: :case_information_back_link }, js: true do
     signin_user
     visit prison_summary_pending_path('LEI', page: 3)
 
@@ -457,7 +457,7 @@ feature 'case information feature' do
   # end
 
   it 'returns to previously paginated page after saving',
-      vcr: { cassette_name: :case_information_return_to_previously_paginated_page } do
+     vcr: { cassette_name: :case_information_return_to_previously_paginated_page } do
     signin_user
     visit prison_summary_pending_path('LEI', sort: "last_name desc", page: 3)
 

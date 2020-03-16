@@ -34,7 +34,11 @@ class CaseInformationController < PrisonsApplicationController
   end
 
   def edit
-    @case_info.probation_service == 'England' ? @case_info.last_known_location = 'No' : @case_info.last_known_location = 'Yes'
+    @case_info.last_known_location = if @case_info.probation_service == 'England'
+                                       'No'
+                                     else
+                                       'Yes'
+                                     end
   end
 
   def update
@@ -82,8 +86,6 @@ class CaseInformationController < PrisonsApplicationController
       @next_update_date = Date.tomorrow
     end
   end
-
-
 
 private
 
@@ -149,28 +151,19 @@ private
   end
 
   def case_information_updated?
-    if ["Scotland", "Northern Ireland"].include?(case_information_params[:probation_service]) &&
+    if ['Scotland', 'Northern Ireland'].include?(case_information_params[:probation_service]) &&
       case_information_params[:last_known_location] == 'Yes'
-      @case_info.update(
-        probation_service: case_information_params[:probation_service],
-        tier: 'N/A',
-        case_allocation: 'N/A',
-        team: nil,
-        manual_entry: true
-      )
+      @case_info.update(probation_service: case_information_params[:probation_service], tier: 'N/A',
+                        case_allocation: 'N/A', team: nil, manual_entry: true)
     else
       @case_info.probation_service = if case_information_params[:last_known_location] == 'No'
-                                       "England"
+                                       'England'
                                      else
                                        case_information_params[:probation_service]
                                      end
-      @case_info.update(
-        probation_service: @case_info.probation_service,
-        tier: case_information_params[:tier],
-        case_allocation: case_information_params[:case_allocation],
-        team_id: case_information_params[:team_id],
-        manual_entry: true
-      )
+      @case_info.update(probation_service: @case_info.probation_service, tier: case_information_params[:tier],
+                        case_allocation: case_information_params[:case_allocation],
+                        team_id: case_information_params[:team_id], manual_entry: true)
     end
   end
 
