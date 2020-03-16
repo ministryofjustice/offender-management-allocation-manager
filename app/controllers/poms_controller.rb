@@ -56,6 +56,7 @@ class PomsController < PrisonsApplicationController
     if pom_detail.save
       if pom_detail.status == 'inactive'
         Allocation.deallocate_primary_pom(nomis_staff_id, active_prison_id)
+        Allocation.deallocate_secondary_pom(nomis_staff_id, active_prison_id)
       end
       redirect_to prison_pom_path(active_prison_id, id: nomis_staff_id)
     else
