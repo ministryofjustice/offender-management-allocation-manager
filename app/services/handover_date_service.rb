@@ -97,7 +97,7 @@ private
     earliest_date = [
       offender.conditional_release_date,
       offender.automatic_release_date
-    ].compact.map { |date| date - (4.months + 15.days) }.min
+    ].compact.map { |date| date - (7.months + 15.days) }.min
 
     [Time.zone.today, earliest_date].max
   end
