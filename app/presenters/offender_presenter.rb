@@ -10,7 +10,7 @@ class OffenderPresenter
            :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date,
            :tariff_date,
            :date_of_birth, :release_date, :parole_eligibility_date,
-           :welsh_offender, :case_allocation, :earliest_release_date,
+           :welsh_offender, :case_allocation, :probation_service, :earliest_release_date,
            :category_code, :conditional_release_date, :automatic_release_date,
            :awaiting_allocation_for, :allocated_pom_name, :allocation_date, :allocated_com_name,
            :tier, :parole_review_date, :crn, :convicted_status, :convicted?, :ldu,
