@@ -121,6 +121,17 @@ class Allocation < ApplicationRecord
     end
   end
 
+  def self.deallocate_secondary_pom(nomis_staff_id, prison)
+    active_pom_allocations(nomis_staff_id, prison).each do |alloc|
+      alloc.secondary_pom_nomis_id = nil
+      alloc.secondary_pom_name = nil
+      alloc.event = DEALLOCATE_SECONDARY_POM
+      alloc.event_trigger = USER
+
+      alloc.save!
+    end
+  end
+
   def prison_fix(movement_type)
     # In some cases we have old historical data which has no prison set
     # and this causes an issue should those offenders move or be released.

@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe Allocation, type: :model do
   let(:nomis_staff_id) { 456_789 }
   let(:nomis_offender_id) { 123_456 }
+  let(:another_nomis_offender_id) { 654_321 }
 
   describe '#without_ldu_emails' do
     let!(:c1) {
@@ -36,7 +37,7 @@ RSpec.describe Allocation, type: :model do
     it { is_expected.to validate_presence_of(:event_trigger) }
   end
 
-  context 'with one allocation' do
+  context 'with allocations' do
     let!(:allocation) {
       create(
         :allocation,
@@ -57,8 +58,18 @@ RSpec.describe Allocation, type: :model do
       end
     end
 
-    describe 'when a Primary Pom is inactive' do
-      it 'removes the primary pom\'s from all allocations' do
+    describe 'when a POM is inactive' do
+      let!(:another_allocaton) {
+        create(
+          :allocation,
+          nomis_offender_id: another_nomis_offender_id,
+          primary_pom_nomis_id: 485_926,
+          secondary_pom_nomis_id: nomis_staff_id,
+          override_reasons: "[\"suitability\", \"no_staff\", \"continuity\", \"other\"]"
+        )
+      }
+
+      it 'removes them as the primary pom\'s from all allocations' do
         described_class.deallocate_primary_pom(nomis_staff_id, allocation.prison)
 
         deallocation = described_class.find_by(nomis_offender_id: nomis_offender_id)
@@ -67,6 +78,15 @@ RSpec.describe Allocation, type: :model do
         expect(deallocation.primary_pom_name).to be_nil
         expect(deallocation.primary_pom_allocated_at).to be_nil
         expect(deallocation.recommended_pom_type).to be_nil
+      end
+
+      it 'removes them as the secondary pom from all allocations' do
+        described_class.deallocate_secondary_pom(nomis_staff_id, allocation.prison)
+
+        deallocation = described_class.find_by(nomis_offender_id: another_nomis_offender_id)
+
+        expect(deallocation.secondary_pom_nomis_id).to be_nil
+        expect(deallocation.secondary_pom_name).to be_nil
       end
     end
 
