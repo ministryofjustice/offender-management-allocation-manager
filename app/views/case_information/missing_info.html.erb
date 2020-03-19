@@ -64,21 +64,33 @@
       <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
         <h1 class="govuk-fieldset__heading">Select the prisoner's Team</h1>
       </legend>
-      <span class="govuk-hint">
-        Enter the full name of the Team, for example 'NPS Croydon'
-      </span>
+      <span class="govuk-hint">Enter the full name of the Team, for example 'NPS Croydon'</span>
 
-      <div id="search-field" class="govuk-form-group">
-        <div class="govuk-grid-column-one-half">
-          <div class="govuk-grid-row">
-            <%= form.select(:team_id, Team.all.collect { |team| [team.name, team.id]}, {include_blank: true}, class: "govuk-select") %>
-          </div>
-          <!--          <div class="govuk-grid-row govuk-!-margin-top-6">-->
-          <!--            <h2 class="govuk-heading-m">The following Team has been selected:</h2>-->
-          <!--          </div>-->
-        </div>
-      </div>
+      <div id="team_autocomplete" class="autocomplete-wrapper govuk-input--width-30"></div>
+
+           <!-- Get a list of the Team names for use by auto-complete -->
+      <%= content_tag :div, class: "team_information", data: {team: Team.all.pluck(:name)} do %><% end %>
     </div>
+
+<!--    <div class="govuk-form-group">-->
+<!--      <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">-->
+<!--        <h1 class="govuk-fieldset__heading">Select the prisoner's Team</h1>-->
+<!--      </legend>-->
+<!--      <span class="govuk-hint">-->
+<!--        Enter the full name of the Team, for example 'NPS Croydon'-->
+<!--      </span>-->
+
+<!--      <div id="search-field" class="govuk-form-group">-->
+<!--        <div class="govuk-grid-column-one-half">-->
+<!--          <div class="govuk-grid-row">-->
+            <%#= form.select(:team_id, Team.all.collect { |team| [team.name, team.id]}, {include_blank: true}, class: "govuk-select") %>
+<!--          </div>-->
+<!--                   <div class="govuk-grid-row govuk-!-margin-top-6">-->
+<!--                    <h2 class="govuk-heading-m">The following Team has been selected:</h2>-->
+<!--                </div>-->-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
 
     <!--    <table class="govuk-table">-->
     <!--      <tbody class="govuk-table__body">-->
