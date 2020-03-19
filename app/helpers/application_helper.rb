@@ -33,7 +33,8 @@ module ApplicationHelper
   def service_provider_label(provider)
     {
       'CRC' => 'Community Rehabilitation Company (CRC)',
-      'NPS' => 'National Probation Service (NPS)'
+      'NPS' => 'National Probation Service (NPS)',
+      'N/A' => 'N/A'
     }[provider]
   end
 

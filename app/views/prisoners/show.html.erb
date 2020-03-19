@@ -56,4 +56,4 @@
 <%= render 'prisoner_information'%>
 <%= render partial: 'shared/offence_info', locals: { editable_prd: true}  %>
 <%= render 'prison_allocation' %>
-<%= render 'shared/community_information' %>
+<%= render partial: 'shared/community_information', locals: { editable: false} %>
