@@ -17,7 +17,7 @@ class CaseInformationController < PrisonsApplicationController
       case_allocation: case_information_params[:case_allocation],
       probation_service: case_information_params[:probation_service],
       last_known_location: case_information_params[:last_known_location],
-      team_id: case_information_params[:team_id],
+      team_id: team_identifier,
       manual_entry: true
     )
 
@@ -39,6 +39,7 @@ class CaseInformationController < PrisonsApplicationController
                                      else
                                        'Yes'
                                      end
+    @team_name = Team.find_by(id: @case_info.team_id)&.name
   end
 
   def update
@@ -163,8 +164,12 @@ private
                                      end
       @case_info.update(probation_service: @case_info.probation_service, tier: case_information_params[:tier],
                         case_allocation: case_information_params[:case_allocation],
-                        team_id: case_information_params[:team_id], manual_entry: true)
+                        team_id: team_identifier, manual_entry: true)
     end
+  end
+
+  def team_identifier
+    Team.find_by(name: params['input-autocomplete'])&.id
   end
 
   def case_information_params
