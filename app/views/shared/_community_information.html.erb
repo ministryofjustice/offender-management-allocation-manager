@@ -7,7 +7,12 @@
     <tr class="govuk-table__row" id="probation_service">
       <td class="govuk-table__cell">Community probation service</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= @prisoner.probation_service || "Unknown" %>
+        <%= @prisoner.probation_service.presence || "Unknown" %>
+        <% unless auto_delius_import_enabled?(@prison.code) %>
+          <% if editable %>
+            <%= link_to( 'Change', edit_prison_case_information_path(@prison.code, @prisoner.offender_no), class: "govuk-link pull-right") %>
+          <% end %>
+        <% end %>
       </td>
     </tr>
     <tr class="govuk-table__row">
@@ -26,10 +31,15 @@
         <% end %>
       </td>
     </tr>
-    <tr class="govuk-table__row">
+    <tr class="govuk-table__row" id="team">
       <td class="govuk-table__cell">Team</td>
       <td class="govuk-table__cell table_cell__left_align">
         <%= @prisoner.team.presence || "Unknown"%>
+        <% unless auto_delius_import_enabled?(@prison.code) %>
+          <% if editable && @prisoner.team.presence %>
+            <%= link_to( 'Change', edit_prison_case_information_path(@prison.code, @prisoner.offender_no), class: "govuk-link pull-right") %>
+          <% end %>
+        <%end %>
       </td>
     </tr>
     <tr class="govuk-table__row">

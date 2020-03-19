@@ -22,6 +22,38 @@ feature "view an offender's allocation information", :versioning do
     signin_user
   end
 
+  context 'with community information' do
+    before do
+      create_case_information_for(nomis_offender_id_without_keyworker)
+      create_allocation(nomis_offender_id_without_keyworker)
+    end
+
+    it 'displays community information with update links', :raven_intercept_exception,
+       vcr: { cassette_name: :show_allocation_information_community_info } do
+      visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_without_keyworker)
+      expect(page).to have_css('h1', text: 'Allocation information')
+
+      within('#community_information') do
+        within("#probation_service") do
+          expect(page).to have_content('Wales')
+          expect(page).to have_link('Change', href: edit_prison_case_information_path('LEI', nomis_offender_id_without_keyworker))
+        end
+
+        expect(page).to have_content('Local divisional unit (LDU)')
+        expect(page).to have_content('LDU Name')
+        expect(page).to have_content('Local divisional unit (LDU) email address')
+        expect(page).to have_content('testldu@example.org')
+
+        within("#team") do
+          expect(page).to have_content('A nice team')
+          expect(page).to have_link('Change', href: edit_prison_case_information_path('LEI', nomis_offender_id_without_keyworker))
+        end
+
+        expect(page).to have_content('COM')
+      end
+    end
+  end
+
   context 'when offender does not have a key worker assigned' do
     before do
       create_case_information_for(nomis_offender_id_without_keyworker)
@@ -168,7 +200,6 @@ feature "view an offender's allocation information", :versioning do
 
       it 'does not display change links' do
         visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_with_keyworker)
-
         expect(page).not_to have_content 'Change'
       end
     end

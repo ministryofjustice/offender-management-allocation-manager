@@ -86,7 +86,7 @@ feature 'delius import scenarios', vcr: { cassette_name: :delius_import_scenario
       it 'displays the correct error message' do
         visit prison_case_information_path('LEI', d1.noms_no)
         within '.govuk-error-summary' do
-          expect(page).to have_content 'no local divisional unit (LDU) information found'
+          expect(page).to have_content 'no community team information found'
         end
       end
     end
