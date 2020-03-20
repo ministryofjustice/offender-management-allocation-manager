@@ -40,6 +40,7 @@ RSpec.describe DashboardController, type: :controller do
         expect(response.body).not_to have_content('Update case information')
         expect(response.body).not_to have_content('Newly arrived')
         expect(response.body).not_to have_content('View all offender managers')
+        expect(response.body).not_to have_content('See all handover cases')
       end
     end
 
@@ -72,6 +73,7 @@ RSpec.describe DashboardController, type: :controller do
         expect(response.body).to have_content('Update case information')
         expect(response.body).to have_content('Newly arrived')
         expect(response.body).to have_content('View all offender managers')
+        expect(response.body).to have_content('See all handover cases')
       end
     end
   end

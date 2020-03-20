@@ -53,6 +53,14 @@
       <p class="govuk-body">Prisoners whose case information has not yet been matched with nDelius.</p>
     </div>
   </div>
+  <div class="govuk-grid-column-one-third">
+    <div class="wrapper">
+      <h1 class="govuk-heading-s">
+        <%= link_to "See all handover cases", prison_summary_handovers_path(@prison.code), class:"govuk-link" %>
+      </h1>
+      <p class="govuk-body">All cases that are within the handover period or start the handover process to the community in the next 30 days.</p>
+    </div>
+  </div>
 </div>
 
 <% end  %>
