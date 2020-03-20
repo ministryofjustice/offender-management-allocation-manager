@@ -68,6 +68,7 @@ Rails.application.routes.draw do
     get('/summary/unallocated' => 'summary#unallocated')
     get('/summary/pending' => 'summary#pending')
     get('/summary/new-arrivals' => 'summary#new_arrivals')
+    get('/summary/handovers' => 'summary#handovers')
   end
 
   match "/401", :to => "errors#unauthorized", :via => :all

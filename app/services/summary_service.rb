@@ -22,7 +22,8 @@ class SummaryService
     buckets = { allocated: Bucket.new(sortable_fields),
                 unallocated: Bucket.new(sortable_fields),
                 pending: Bucket.new(sortable_fields),
-                new_arrivals: Bucket.new(sortable_fields)
+                new_arrivals: Bucket.new(sortable_fields),
+                handovers: Bucket.new(sortable_fields)
     }
 
     offenders = prison.offenders
@@ -48,6 +49,9 @@ class SummaryService
       else
         buckets[:pending].items << offender
       end
+
+      # TODO: Add filtering logic for upcoming handover cases. All offenders are included for now.
+      buckets[:handovers].items << offender
     end
 
     # For the allocated offenders, we need to provide the allocated POM's
@@ -61,7 +65,8 @@ class SummaryService
     Summary.new(summary_type, allocated: buckets[:allocated],
                               unallocated: buckets[:unallocated],
                               pending: buckets[:pending],
-                              new_arrivals: buckets[:new_arrivals])
+                              new_arrivals: buckets[:new_arrivals],
+                              handovers: buckets[:handovers])
   end
 
 # rubocop:enable Metrics/MethodLength

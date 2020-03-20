@@ -27,6 +27,12 @@
         Newly arrived (<%= @summary.new_arrivals_total %>)
       </a>
     </li>
+
+    <li class="moj-sub-navigation__item">
+      <a class="moj-sub-navigation__link" <%= 'aria-current=page' if active == :handovers %>
+        href="<%= prison_summary_handovers_path(@prison.code) %>">
+        Handover cases (<%= @summary.handovers_total %>)
+      </a>
+    </li>
   </ul>
 </nav>
-
