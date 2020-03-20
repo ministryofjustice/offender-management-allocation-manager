@@ -1,0 +1,91 @@
+<% content_for :switcher do %>
+  <%= render '/layouts/prison_switcher' %>
+<% end %>
+
+<div class="govuk-!-margin-bottom-4">
+  <%= render "search/search_box" %>
+</div>
+
+<%= render(:partial => 'summary_subnav', :locals => {:active => :handovers}) %>
+
+<h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Handover cases</h1>
+<p>
+  All cases that are within the handover period or start the handover process to the community in the next 30 days.
+</p>
+
+<section id="awaiting-allocation">
+  <%= render(
+          :partial => 'shared/pagination',
+          :locals => {
+              :data => @offenders,
+          }) %>
+
+  <table class="govuk-table responsive tablesorter">
+    <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th class="govuk-table__header" scope="col">
+        <a href="<%= sort_link('last_name') %>">
+          Prisoner
+        </a>
+        <%= sort_arrow('last_name') %>
+      </th>
+      <th class="govuk-table__header sorter-false" xscope="col">
+        <a href="<%= sort_link('earliest_release_date') %>">
+          Earliest release date
+        </a>
+        <%= sort_arrow('earliest_release_date') %>
+      </th>
+      <th class="govuk-table__header sorter-false" xscope="col">
+        <a href="<%= sort_link('handover_start_date') %>">
+          Handover start date
+        </a>
+        <%= sort_arrow('handover_start_date') %>
+      </th>
+      <th class="govuk-table__header sorter-false" xscope="col">
+        <a href="<%= sort_link('responsibility_handover_date') %>">
+          Responsibility changes
+        </a>
+        <%= sort_arrow('responsibility_handover_date') %>
+      </th>
+      <th class="govuk-table__header sorter-false" xscope="col">
+        <a href="<%= sort_link('responsibility_handover_date') %>">
+          POM
+        </a>
+        <%= sort_arrow('responsibility_handover_date') %>
+      </th>
+      <th class="govuk-table__header sorter-false" xscope="col">
+        <a href="<%= sort_link('responsibility_handover_date') %>">
+          Service provider
+        </a>
+        <%= sort_arrow('responsibility_handover_date') %>
+      </th>
+    </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+    <% @offenders.each_with_index do |offender, i| %>
+      <tr class="govuk-table__row offender_row_<%= i %>">
+        <td aria-label="Prisoner name" class="govuk-table__cell ">
+          <%= offender.full_name %>
+          <br/>
+          <span class='govuk-hint govuk-!-margin-bottom-0'>
+            <%= offender.offender_no %>
+          </span>
+        </td>
+        <td aria-label="Arrival date" class="govuk-table__cell">
+          <%= format_date(offender.prison_arrival_date) %>
+        </td>
+        <td aria-label="Earliest release date" class="govuk-table__cell">
+          <%= format_date(offender.earliest_release_date, replacement: "Unknown") %>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+
+  <%= render(
+          :partial => 'shared/pagination',
+          :locals => {
+              :data => @offenders,
+          }) %>
+
+</section>
