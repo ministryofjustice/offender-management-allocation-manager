@@ -61,21 +61,39 @@ feature "edit a POM's details" do
     expect(page).to have_content('Active')
   end
 
-  it "de-allocates all a POM's cases when made inactive", vcr: { cassette_name: :edit_poms_deactivate_pom_feature } do
-    visit "/prisons/LEI/allocations/confirm/G4273GI/485637"
-    click_button 'Complete allocation'
+  context 'when a POM is made inactive' do
+    before do
+      # create an allocation with the POM as the primary POM
+      create(
+        :allocation,
+        nomis_offender_id: 'G7806VO',
+        primary_pom_nomis_id: 485_926,
+        prison: 'LEI'
+      )
 
-    visit "/prisons/LEI/poms/485637"
-    click_link "Edit profile"
+      # create an allocation with the POM as the co-working POM
+      create(
+        :allocation,
+        nomis_offender_id: 'G1670VU',
+        primary_pom_nomis_id: 485_833,
+        secondary_pom_nomis_id: 485_926,
+        prison: 'LEI'
+          )
+    end
 
-    expect(page).to have_content("Kath Pobee-Norris")
-    expect(Allocation.count).to eq 1
+    it "de-allocates all a POM's cases", vcr: { cassette_name: :edit_poms_deactivate_pom_feature } do
+      visit "/prisons/LEI/poms/485926"
+      click_link "Edit profile"
 
-    choose('working_pattern-2')
-    choose('Inactive')
-    click_button('Save')
+      expect(page).to have_content("Moic Pom")
+      expect(Allocation.count).to eq 2
 
-    expect(page).to have_content("Pobee-Norris, Kath")
-    expect(page).to have_css('.pom_cases_row_0', count: 0)
+      choose('working_pattern-2')
+      choose('Inactive')
+      click_button('Save')
+
+      expect(page).to have_content("Pom, Moic")
+      expect(page).to have_css('.pom_cases_row_0', count: 0)
+    end
   end
 end

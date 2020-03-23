@@ -100,10 +100,6 @@ Rails.application.routes.draw do
     resources :allocation, only: [:show], param: :offender_no, controller: 'allocation_api',path_names: { show: ':offender_no' }
   end
 
-  require 'sidekiq/web'
-  mount Sidekiq::Web => '/sidekiq'
-
-  mount Flipflop::Engine => "/flip-flop-admin"
   mount Rswag::Ui::Engine => '/api-docs'
   mount Rswag::Api::Engine => '/api-docs'
 end
