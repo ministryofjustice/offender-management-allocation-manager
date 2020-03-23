@@ -54,12 +54,10 @@ class SummaryService
       buckets[:handovers].items << offender
     end
 
-    # For the allocated offenders, we need to provide the allocated POM's
-    # name
-    buckets[:allocated].items.each do |offender|
-      alloc = active_allocations_hash[offender.offender_no]
-      offender.allocated_pom_name = restructure_pom_name(alloc.primary_pom_name)
-      offender.allocation_date = (alloc.primary_pom_allocated_at || alloc.updated_at)&.to_date
+    # For the allocated and handover offenders, we need to provide the allocated POM's name
+    [:allocated, :handovers].each do |bucket_name|
+      bucket_offenders = buckets[bucket_name].items
+      add_allocated_poms(bucket_offenders, active_allocations_hash)
     end
 
     Summary.new(summary_type, allocated: buckets[:allocated],
@@ -102,6 +100,15 @@ private
         movement.to_agency == offender.prison_id
       }
       offender.prison_arrival_date = [offender.sentence_start_date, arrival&.create_date_time].compact.max
+    end
+  end
+
+  def self.add_allocated_poms(offenders, active_allocations_hash)
+    offenders.each do |offender|
+      alloc = active_allocations_hash[offender.offender_no]
+      next unless active_allocations_hash.key?(offender.offender_no)
+      offender.allocated_pom_name = restructure_pom_name(alloc.primary_pom_name)
+      offender.allocation_date = (alloc.primary_pom_allocated_at || alloc.updated_at)&.to_date
     end
   end
 
