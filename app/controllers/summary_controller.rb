@@ -79,15 +79,22 @@ private
   end
 
   def sort_params(summary_type)
-    if params['sort'].blank?
-      return [:sentence_start_date, :asc] unless summary_type == :allocated
-
-      return [nil, nil]
-    end
+    return default_sort_params(summary_type) if params['sort'].blank?
 
     parts = params['sort'].split.map { |s| s.downcase.to_sym }
     return [parts[0], :asc] if parts.count == 1
 
     parts
+  end
+
+  def default_sort_params(summary_type)
+    case summary_type
+    when :allocated
+      [nil, nil]
+    when :handovers
+      [:handover_start_date, :asc]
+    else
+      [:sentence_start_date, :asc]
+    end
   end
 end
