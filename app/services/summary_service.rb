@@ -104,7 +104,7 @@ private
   end
 
   def self.sort_fields_for_handovers
-    [:last_name, :earliest_release_date, :handover_start_date, :responsibility_handover_date, :allocated_pom_name]
+    [:last_name, :handover_start_date, :responsibility_handover_date, :case_allocation]
   end
 
   def self.default_sortable_fields
