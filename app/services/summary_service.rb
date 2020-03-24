@@ -31,6 +31,9 @@ class SummaryService
     offenders = prison.offenders
     active_allocations_hash = AllocationService.active_allocations(offenders.map(&:offender_no), prison.code)
 
+    # Add POM allocation details to offender objects. We use this information in 'allocated' and 'handovers' views.
+    add_allocated_poms(offenders, active_allocations_hash)
+
     # We need arrival dates for all offenders and all summary types because it is used to
     # detect new arrivals and so we would not be able to count them without knowing their
     # prison_arrival_date
@@ -55,12 +58,6 @@ class SummaryService
       if approaching_handover?(offender)
         buckets[:handovers].items << offender
       end
-    end
-
-    # For the allocated and handover offenders, we need to provide the allocated POM's name
-    [:allocated, :handovers].each do |bucket_name|
-      bucket_offenders = buckets[bucket_name].items
-      add_allocated_poms(bucket_offenders, active_allocations_hash)
     end
 
     Summary.new(summary_type, allocated: buckets[:allocated],
