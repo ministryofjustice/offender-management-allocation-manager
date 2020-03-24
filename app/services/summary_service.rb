@@ -31,8 +31,7 @@ class SummaryService
     offenders = prison.offenders
     active_allocations_hash = AllocationService.active_allocations(offenders.map(&:offender_no), prison.code)
 
-    # Add POM allocation details to offender objects. We use this information in 'allocated' and 'handovers' views.
-    add_allocated_poms(offenders, active_allocations_hash)
+    add_allocated_poms_and_coms(offenders, active_allocations_hash)
 
     # We need arrival dates for all offenders and all summary types because it is used to
     # detect new arrivals and so we would not be able to count them without knowing their
@@ -123,12 +122,18 @@ private
     end
   end
 
-  def self.add_allocated_poms(offenders, active_allocations_hash)
+  def self.add_allocated_poms_and_coms(offenders, active_allocations_hash)
     offenders.each do |offender|
-      alloc = active_allocations_hash[offender.offender_no]
       next unless active_allocations_hash.key?(offender.offender_no)
+
+      alloc = active_allocations_hash[offender.offender_no]
+
+      # Add POM details
       offender.allocated_pom_name = restructure_pom_name(alloc.primary_pom_name)
       offender.allocation_date = (alloc.primary_pom_allocated_at || alloc.updated_at)&.to_date
+
+      # Add COM details
+      offender.allocated_com_name = alloc.com_name
     end
   end
 
