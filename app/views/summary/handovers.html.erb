@@ -78,7 +78,7 @@
           <%= offender.allocated_pom_name || "Not allocated" %>
         </td>
         <td aria-label="COM" class="govuk-table__cell">
-          TODO
+          <%= offender.allocated_com_name || "Not allocated" %>
         </td>
         <td aria-label="Service provider" class="govuk-table__cell">
           <%= service_provider_label(offender.case_allocation) %>
