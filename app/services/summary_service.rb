@@ -13,6 +13,8 @@ class SummaryService
                         sort_fields_for_allocated
                       elsif summary_type == :new_arrivals
                         sort_fields_for_new_arrivals
+                      elsif summary_type == :handovers
+                        sort_fields_for_handovers
                       else
                         default_sortable_fields
                       end
@@ -86,6 +88,10 @@ private
 
   def self.sort_fields_for_new_arrivals
     [:last_name, :prison_arrival_date, :earliest_release_date]
+  end
+
+  def self.sort_fields_for_handovers
+    [:last_name, :earliest_release_date, :handover_start_date, :responsibility_handover_date, :allocated_pom_name]
   end
 
   def self.default_sortable_fields
