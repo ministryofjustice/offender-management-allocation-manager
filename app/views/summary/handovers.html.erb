@@ -53,6 +53,9 @@
         </a>
         <%= sort_arrow('case_allocation') %>
       </th>
+      <th class="govuk-table__header sorter-false" xscope="col">
+        Action
+      </th>
     </tr>
     </thead>
     <tbody class="govuk-table__body">
@@ -78,7 +81,10 @@
           <%= offender.allocated_com_name || "Not allocated" %>
         </td>
         <td aria-label="Service provider" class="govuk-table__cell">
-          <%= service_provider_label(offender.case_allocation) %>
+          <%= offender.case_allocation %>
+        </td>
+        <td aria-label="Action" class="govuk-table__cell ">
+          <%= cta_for_offender(@prison.code, offender) %>
         </td>
       </tr>
     <% end %>
