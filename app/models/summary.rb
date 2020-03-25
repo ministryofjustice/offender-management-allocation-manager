@@ -2,12 +2,12 @@
 
 class Summary
   attr_accessor :allocated, :unallocated, :pending, :new_arrivals, :handovers
-  def initialize(summary_type, allocated:, unallocated:, pending:, new_arrivals:, handovers:)
+  def initialize(summary_type, buckets)
     @summary_type = summary_type
-    @allocated = allocated
-    @unallocated = unallocated
-    @pending = pending
-    @new_arrivals = new_arrivals
-    @handovers = handovers
+    @allocated = buckets[:allocated]
+    @unallocated = buckets[:unallocated]
+    @pending = buckets[:pending]
+    @new_arrivals = buckets[:new_arrivals]
+    @handovers = buckets[:handovers]
   end
 end

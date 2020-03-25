@@ -59,11 +59,7 @@ class SummaryService
       end
     end
 
-    Summary.new(summary_type, allocated: buckets[:allocated],
-                              unallocated: buckets[:unallocated],
-                              pending: buckets[:pending],
-                              new_arrivals: buckets[:new_arrivals],
-                              handovers: buckets[:handovers])
+    Summary.new(summary_type, buckets)
   end
 
 # rubocop:enable Metrics/MethodLength
