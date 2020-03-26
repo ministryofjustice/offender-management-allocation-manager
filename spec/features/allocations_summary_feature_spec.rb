@@ -44,7 +44,7 @@ feature 'summary summary feature' do
       visit prison_summary_handovers_path('LEI')
 
       expect(page).to have_css('.moj-sub-navigation__item')
-      expect(page).to have_content('Handover cases')
+      expect(page).to have_content('Case handover status')
     end
   end
 end
