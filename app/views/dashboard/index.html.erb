@@ -56,9 +56,9 @@
   <div class="govuk-grid-column-one-third">
     <div class="wrapper">
       <h1 class="govuk-heading-s">
-        <%= link_to "See all handover cases", prison_summary_handovers_path(@prison.code), class:"govuk-link" %>
+        <%= link_to "See case handover status", prison_summary_handovers_path(@prison.code), class:"govuk-link" %>
       </h1>
-      <p class="govuk-body">All cases that are within the handover period or start the handover process to the community in the next 30 days.</p>
+      <p class="govuk-body">Cases where responsibility is being handed over (or is within 30 days of handover) to the community probation team.</p>
     </div>
   </div>
 </div>
