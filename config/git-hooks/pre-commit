@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# Usage:
-#    $> cd /path/to/repository
-#    $> ln -s ../../config/git-hooks/pre-commit.sh .git/hooks/pre-commit
-#
-
 ################################################################################
 # https://github.com/AGWA/git-crypt/issues/45#issuecomment-151985431
 # Pre-commit hook to avoid accidentally adding unencrypted files which are
@@ -30,3 +25,7 @@ if [[ $? -eq 0 ]]; then
   echo "Did you mean to add this file to the git-crypt config in .gitattributes?"
   exit 1
 fi
+
+# Check only new files with govuk cops
+git diff --cached --name-only --diff-filter=ACM |
+  xargs bundle exec rubocop --config .rubocop-govuk.yml

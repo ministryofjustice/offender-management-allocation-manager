@@ -49,6 +49,7 @@ group :development, :test do
   gem 'rubocop-rspec'
   gem 'rubocop-performance'
   gem 'rubocop-rails'
+  gem 'rubocop-govuk'
   gem 'dotenv-rails'
   # needed to support Rails 6.0
   gem 'rspec-rails', '~> 4.0.0.beta2'
