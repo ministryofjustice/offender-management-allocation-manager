@@ -23,13 +23,10 @@ This application uses Ruby v2.6.2. Use [RVM](https://rvm.io/) or similar to mana
 
 ### Setup
 
-Install the git pre-commit hook before you start working on this repository so
-that we're all using some checks to help us avoid committing unencrypted
-secrets. From the root of the repo:
-
-```
-ln -s ../../config/git-hooks/pre-commit.sh .git/hooks/pre-commit
-```
+Run `make setup` to install git pre-commit hooks that:
+- check you have git-crypt installed
+- help you avoid committing unencrypted secrets
+- lint changed files using govuk rubocop
 
 To test that the pre-commit hook is set up correctly, try removing the `diff`
 attribute from a line in a `.gitattributes` file and then committing something -
