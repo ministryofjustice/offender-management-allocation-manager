@@ -79,12 +79,16 @@ private
   end
 
   def sort_params(summary_type)
-    return default_sort_params(summary_type) if params['sort'].blank?
+    sort_params = params['sort'] || ''
+    parts = sort_params.split.map { |s| s.downcase.to_sym }
 
-    parts = params['sort'].split.map { |s| s.downcase.to_sym }
-    return [parts[0], :asc] if parts.count == 1
-
-    parts
+    if parts.blank?
+      default_sort_params(summary_type)
+    elsif parts.second.blank?
+      parts + [:asc]
+    else
+      parts
+    end
   end
 
   def default_sort_params(summary_type)
