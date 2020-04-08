@@ -8,12 +8,14 @@ $(document).on("turbolinks:load", function(){
             id: id,
             source: team_names(),
             onConfirm: (val) => {
-                document.getElementById("chosen_team").innerHTML = val.bold();
+                if (val !== undefined) {
+                    document.getElementById("chosen_team").innerHTML = val.bold();
+                }
             }
         });
     }
 
-    if ($(".case_information.edit").length > 0){
+    if ($(".edit_case_information").length > 0){
         if((document.getElementById('case_information_probation_service_scotland').checked) ||
             (document.getElementById('case_information_probation_service_northern_ireland').checked)){
                 hide_element();
@@ -36,7 +38,6 @@ function team_names() {
 function remove_team() {
     if (document.getElementById("chosen_team").innerText.length > 0) {
         document.getElementById("chosen_team").innerText = "";
-        documeent.getElementById("autocomplete-default").innerText = "";
-        // clear the value in id 'autocomplete-default'
+        document.getElementsByName("input-autocomplete")[0].value = "";
     }
 }
