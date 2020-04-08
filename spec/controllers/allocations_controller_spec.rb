@@ -241,7 +241,7 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
         get :history, params: { prison_id: prison, nomis_offender_id: offender_no }
         pom_emails = assigns(:pom_emails)
 
-        expect(pom_emails.count).to eq(3)
+        expect(pom_emails.count).to eq(2)
         expect(pom_emails[primary_pom_without_email_id]).to eq(nil)
         expect(pom_emails[updated_primary_pom_nomis_id]).to eq('pom4@prison.gov.uk')
         expect(pom_emails[previous_primary_pom_nomis_id]).to eq('pom3@prison.gov.uk')

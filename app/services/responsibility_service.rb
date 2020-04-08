@@ -109,7 +109,6 @@ private
       return nil if release_date.blank?
 
       handover_date_in_future = HandoverDateService.handover(offender).handover_date > Time.zone.today
-
       if handover_date_in_future && release_date >= cutoff
         RESPONSIBLE
       else
