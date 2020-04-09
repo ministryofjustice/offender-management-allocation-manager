@@ -582,8 +582,10 @@ describe ResponsibilityService do
               let(:ted) { sentence_start_date + 14.months }
 
               it 'will show the POM as having a supporting role' do
-                resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::SUPPORTING
+                Timecop.travel('1 March 2020') do
+                  resp = described_class.calculate_pom_responsibility(offender)
+                  expect(resp).to eq ResponsibilityService::SUPPORTING
+                end
               end
             end
           end
