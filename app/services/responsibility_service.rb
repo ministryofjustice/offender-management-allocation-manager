@@ -25,7 +25,7 @@ class ResponsibilityService
       RESPONSIBLE
     elsif offender.indeterminate_sentence? && (offender.tariff_date.nil? ||
        offender.tariff_date < Time.zone.today)
-       
+
       RESPONSIBLE
     else
       standard_rules(offender)
