@@ -3,6 +3,10 @@ module CaseInformationHelper
     ERROR_MESSAGES.fetch(error_type)
   end
 
+  def delius_email_message(error_type)
+    EMAIL_MESSAGES.fetch(error_type, 'No match could be made.')
+  end
+
   def prisoner_crn_display(prisoner, delius_data)
     if delius_data.size > 1
       delius_data.map(&:crn).map { |c| h(c) }.join('<br/>').html_safe
@@ -39,4 +43,15 @@ private
        number but a different date of birth. You need to check the data in nDelius and
        correct before you can allocate.'
   }.freeze
+
+  EMAIL_MESSAGES = {
+    DeliusImportError::DUPLICATE_NOMIS_ID =>
+      'There’s more than one nDelius record with this NOMIS number.',
+    DeliusImportError::INVALID_TIER =>
+      'There’s no tier recorded in nDelius. You may need to contact the sentencing court.',
+    DeliusImportError::INVALID_CASE_ALLOCATION =>
+      'There’s no service provider in nDelius. You may need to contact the sentencing court.',
+    DeliusImportError::MISMATCHED_DOB =>
+      'There’s an nDelius record with this NOMIS number but a different date of birth.'
+  }
 end
