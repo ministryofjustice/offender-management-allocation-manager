@@ -154,5 +154,23 @@ class PomMailer < GovukNotifyRails::Mailer
 
     mail(to: params[:previous_pom_email])
   end
+
+  def manual_case_info_update(
+    email_address:, ldu_name:, offender_name:, nomis_offender_id:, offender_dob:, prison_name:, message:, spo_notice:
+  )
+    set_template('3a795dc1-6e8a-4e7b-93d7-f30813389d84')
+
+    set_personalisation(
+      ldu_name: ldu_name,
+      offender_name: offender_name,
+      nomis_offender_id: nomis_offender_id,
+      offender_dob: offender_dob,
+      prison_name: prison_name,
+      message: message,
+      spo_notice: spo_notice
+    )
+
+    mail(to: email_address)
+  end
 end
 # rubocop:enable Metrics/ParameterLists

@@ -61,7 +61,8 @@ class CaseInformation < ApplicationRecord
             }, if: -> { manual_entry }
 
   def scottish_or_ni?
-    return true if probation_service == 'Scotland' || probation_service == 'Northern Ireland'
+    return true if last_known_location == 'Yes' &&
+      (probation_service == 'Scotland' || probation_service == 'Northern Ireland')
 
     false
   end

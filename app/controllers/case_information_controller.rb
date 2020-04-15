@@ -29,6 +29,7 @@ class CaseInformationController < PrisonsApplicationController
 
     if @case_info.valid?
       @case_info.save
+      send_email
       redirect_to prison_summary_pending_path(active_prison_id, sort: params[:sort], page: params[:page])
     end
   end
@@ -46,7 +47,11 @@ class CaseInformationController < PrisonsApplicationController
     @case_info = CaseInformation.find_by(nomis_offender_id: case_information_params[:nomis_offender_id])
     @prisoner = prisoner(case_information_params[:nomis_offender_id])
 
+    # we only send email if the ldu is different from previous
     if case_information_updated?
+      if ldu_changed?(@case_info.saved_change_to_team_id)
+        send_email
+      end
       redirect_to new_prison_allocation_path(active_prison_id, @case_info.nomis_offender_id)
     else
       render :edit
@@ -131,6 +136,7 @@ private
     if @case_info.scottish_or_ni?
       @case_info.save_scottish_or_ni
     elsif @case_info.english_or_welsh?
+      @case_info.probation_service = 'England' if @case_info.last_known_location == 'No'
       @prisoner = prisoner(case_information_params[:nomis_offender_id])
       @case_info.errors.clear
       render :missing_info
@@ -162,14 +168,64 @@ private
                                      else
                                        case_information_params[:probation_service]
                                      end
+
       @case_info.update(probation_service: @case_info.probation_service, tier: case_information_params[:tier],
                         case_allocation: case_information_params[:case_allocation],
                         team_id: team_identifier, manual_entry: true)
+
     end
+  end
+
+  def ldu_changed?(arg)
+    return false if arg.blank? # has not been changed
+
+    return false if arg.last.nil? # from eng/wales to scot/ni
+
+    return true if arg.first.nil? # from scot/ni to eng/wales
+
+    # We need to find out the ldu for the old team and the new team. If they are different then we need to send email
+    old_team = Team.find_by(id: arg.first)
+    old_ldu = LocalDivisionalUnit.find_by(id: old_team.local_divisional_unit_id)
+
+    new_team = Team.find_by(id: arg.last)
+    new_ldu = LocalDivisionalUnit.find_by(id: new_team.local_divisional_unit_id)
+
+    old_ldu != new_ldu
   end
 
   def team_identifier
     Team.find_by(name: params['input-autocomplete'])&.id
+  end
+
+  def send_email
+    return unless @case_info.probation_service == 'England' || @case_info.probation_service == 'Wales'
+
+    me = Nomis::Elite2::UserApi.user_details(current_user).email_address.try(:first)
+    team = Team.find_by(id: @case_info.team_id)
+    ldu = LocalDivisionalUnit.find_by(id: team.local_divisional_unit_id)
+    emails = [ldu.email_address, me]
+    delius_error = DeliusImportError.where(nomis_offender_id: @case_info.nomis_offender_id).first
+    message = helpers.delius_email_message(delius_error&.error_type)
+    notice_to_spo = spo_message(ldu)
+
+    emails.each do |email|
+      next if email.blank?
+
+      CaseAllocationEmailJob.perform_later(email: email,
+                                           ldu: ldu,
+                                           nomis_offender_id: @case_info.nomis_offender_id,
+                                           message: message,
+                                           notice: email == me ? notice_to_spo : '')
+    end
+  end
+
+  def spo_message(ldu)
+    if ldu.email_address.blank?
+      "We were unable to send an email to #{ldu.name} as we do not have their email address. "\
+      'You need to find another way to provide them with this information.'
+    else
+      'This is a copy of the email sent to the LDU for your records'
+    end
   end
 
   def case_information_params

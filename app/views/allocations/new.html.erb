@@ -8,7 +8,7 @@
 
 <%= render 'allocations/case_information' %>
 
-<%= render 'prisoners/community_information' %>
+<%= render partial: 'shared/community_information', locals: { editable: true } %>
 
 <hr class="govuk-section-break govuk-section-break--l govuk-section-break--invisible" />
 

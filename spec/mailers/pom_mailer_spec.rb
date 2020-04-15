@@ -167,4 +167,43 @@ RSpec.describe PomMailer, type: :mailer do
         )
     end
   end
+
+  describe 'manual_case_info_update' do
+    let(:params) do
+      {
+        email_address: 'testuser@localhost.local',
+        ldu_name: 'LDU1',
+        offender_name: 'Prisoner, Alphabet',
+        nomis_offender_id: 'A1234AA',
+        offender_dob: '24 May 1984',
+        prison_name: 'HMP Lockdown',
+        message: "No match could be found",
+        spo_notice: "This is a copy of the message sent to the LDU"
+      }
+    end
+
+    let(:mail) { described_class.manual_case_info_update(params) }
+
+    it 'sets the template' do
+      expect(mail.govuk_notify_template).
+      to eq '3a795dc1-6e8a-4e7b-93d7-f30813389d84'
+    end
+
+    it 'sets the To address of the email using the provided user' do
+      expect(mail.to).to eq(["testuser@localhost.local"])
+    end
+
+    it 'personalises the email' do
+      expect(mail.govuk_notify_personalisation).
+      to eq(
+        ldu_name: params[:ldu_name],
+        offender_name: params[:offender_name],
+        nomis_offender_id: params[:nomis_offender_id],
+        offender_dob: params[:offender_dob],
+        prison_name: params[:prison_name],
+        message: params[:message],
+        spo_notice: params[:spo_notice]
+         )
+    end
+  end
 end
