@@ -78,7 +78,7 @@ feature 'Provide debugging information for our team to use' do
       visit prison_debugging_prison_path('LEI')
 
       expect(page).to have_text("Prison Debugging")
-      expect(page).to have_css('tbody tr', count: 228)
+      expect(page).to have_css('tbody tr', minimum: 220)
       expect(page).to have_css('.govuk-data-label', text: 'With missing information')
     end
   end
