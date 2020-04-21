@@ -34,7 +34,7 @@ feature "view an offender's allocation information", :versioning do
       expect(page).to have_css('h1', text: 'Allocation information')
 
       within('#community_information') do
-        within("#probation_service") do
+        within("#community_probation_service") do
           expect(page).to have_content('Wales')
           expect(page).to have_link('Change', href: edit_prison_case_information_path('LEI', nomis_offender_id_without_keyworker))
         end
