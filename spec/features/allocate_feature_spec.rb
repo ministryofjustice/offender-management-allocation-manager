@@ -29,7 +29,7 @@ feature 'Allocation' do
 
     expect(page).to have_content('Determinate')
 
-    within('#probation_service') do
+    within('#community_probation_service') do
       expect(page).to have_content('England')
       expect(page).to have_link('Change', href: edit_prison_case_information_path('LEI', nomis_offender_id))
     end

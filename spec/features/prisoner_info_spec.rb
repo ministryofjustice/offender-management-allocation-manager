@@ -97,7 +97,7 @@ feature 'View a prisoner profile page' do
         expect(page).to have_content('Unknown', count: 2)
       end
 
-      within '#probation_service' do
+      within '#community_probation_service' do
         expect(page).to have_content('Wales')
       end
     end
