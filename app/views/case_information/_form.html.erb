@@ -4,134 +4,132 @@
   <%= hidden_field_tag("sort", params[:sort])%>
   <%= hidden_field_tag("page", params[:page]) %>
 
-  <div class="govuk-form-group">
-    <fieldset class="govuk-fieldset">
-      <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-        <h1 class="govuk-fieldset__heading">Was this prisoner's last known address in Northern Ireland, Scotland or Wales?</h1>
-      </legend>
+  <fieldset class="govuk-fieldset">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+      <h1 class="govuk-fieldset__heading">Was this prisoner's last known address in Northern Ireland, Scotland or Wales?</h1>
+    </legend>
 
-      <div class="govuk-form-group">
-        <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
-          <div class="govuk-radios__item">
-            <%= form.radio_button(:last_known_location, 'Yes', checked: @case_info.last_known_location == 'Yes', class: "govuk-radios__input", id:'last_known_location_yes', data: { aria_controls: "conditional-last_known_location_yes", aria_expanded: "true"} ) %>
-            <%= form.label :last_known_location, 'Yes', class: "govuk-label govuk-radios__label" %>
-          </div>
+    <div class="govuk-form-group">
+      <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+        <div class="govuk-radios__item">
+          <%= form.radio_button(:last_known_location, 'Yes', checked: @case_info.last_known_location == 'Yes', class: "govuk-radios__input", id:'last_known_location_yes', data: { aria_controls: "conditional-last_known_location_yes", aria_expanded: "true"} ) %>
+          <%= form.label :last_known_location, 'Yes', class: "govuk-label govuk-radios__label" %>
+        </div>
 
-          <div class="govuk-radios__conditional" id="conditional-last_known_location_yes">
-            <div class="govuk-form-group">
-              <label class="govuk-label" for="yes">
-                Which country did they live in?
-              </label>
+        <div class="govuk-radios__conditional" id="conditional-last_known_location_yes">
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="yes">
+              Which country did they live in?
+            </label>
 
-              <div class="govuk-radios">
-                <div class="govuk-radios__item">
-                  <%= form.radio_button(:probation_service, 'Scotland', checked: @case_info.probation_service == 'Scotland', class: "govuk-radios__input", data: {behavior: "last-location"}, onclick: "hide_element()" ) %>
-                  <%= form.label :probation_service, 'Scotland', class: "govuk-label govuk-radios__label" %>
-                </div>
-                <div class="govuk-radios__item">
-                  <%= form.radio_button(:probation_service, 'Northern Ireland', checked: @case_info.probation_service == 'Northern Ireland', class: "govuk-radios__input", data: {behavior: "last-location"}, onclick: "hide_element()" ) %>
-                  <%= form.label :probation_service, 'Northern Ireland', class: "govuk-label govuk-radios__label" %>
-                </div>
-                <div class="govuk-radios__item">
-                  <%= form.radio_button(:probation_service, 'Wales', checked: @case_info.probation_service == 'Wales', class: "govuk-radios__input", data: {behavior: "last-location"}, onclick: "show_element()" ) %>
-                  <%= form.label :probation_service, 'Wales', class: "govuk-label govuk-radios__label" %>
-                </div>
+            <div class="govuk-radios">
+              <div class="govuk-radios__item">
+                <%= form.radio_button(:probation_service, 'Scotland', checked: @case_info.probation_service == 'Scotland', class: "govuk-radios__input", data: {behavior: "last-location"}, onclick: "hide_element()" ) %>
+                <%= form.label :probation_service, 'Scotland', class: "govuk-label govuk-radios__label" %>
+              </div>
+              <div class="govuk-radios__item">
+                <%= form.radio_button(:probation_service, 'Northern Ireland', checked: @case_info.probation_service == 'Northern Ireland', class: "govuk-radios__input", data: {behavior: "last-location"}, onclick: "hide_element()" ) %>
+                <%= form.label :probation_service, 'Northern Ireland', class: "govuk-label govuk-radios__label" %>
+              </div>
+              <div class="govuk-radios__item">
+                <%= form.radio_button(:probation_service, 'Wales', checked: @case_info.probation_service == 'Wales', class: "govuk-radios__input", data: {behavior: "last-location"}, onclick: "show_element()" ) %>
+                <%= form.label :probation_service, 'Wales', class: "govuk-label govuk-radios__label" %>
               </div>
             </div>
           </div>
+        </div>
 
+        <div class="govuk-radios__item">
+          <%= form.radio_button(:last_known_location, 'No', checked: @case_info.last_known_location == 'No', class: "govuk-radios__input", data: {behavior: "last-location"}, onclick: "show_element()" ) %>
+          <%= form.label :last_known_location, 'No', class: "govuk-label govuk-radios__label" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="optional-case-info">
+      <div class="govuk-form-group">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+          <h1 class="govuk-fieldset__heading">Select the service provider</h1>
+        </legend>
+
+        <div class="govuk-radios" data-module="govuk-radios">
           <div class="govuk-radios__item">
-            <%= form.radio_button(:last_known_location, 'No', checked: @case_info.last_known_location == 'No', class: "govuk-radios__input", data: {behavior: "last-location"}, onclick: "show_element()" ) %>
-            <%= form.label :last_known_location, 'No', class: "govuk-label govuk-radios__label" %>
+            <%= form.radio_button(:case_allocation, 'NPS', checked: @case_info.case_allocation == 'NPS', class: "govuk-radios__input") %>
+            <%= form.label :case_allocation, 'National Probation Service (NPS)', class: "govuk-label govuk-radios__label" %>
+          </div>
+          <div class="govuk-radios__item">
+            <%= form.radio_button(:case_allocation, 'CRC', checked: @case_info.case_allocation == 'CRC', class: "govuk-radios__input") %>
+            <%= form.label :case_allocation, 'Community Rehabilitation Company (CRC)', class: "govuk-label govuk-radios__label" %>
           </div>
         </div>
       </div>
 
-      <div class="optional-case-info">
-        <div class="govuk-form-group">
-          <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-            <h1 class="govuk-fieldset__heading">Select the service provider</h1>
-          </legend>
+      <div class="govuk-form-group">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+          <h1 class="govuk-fieldset__heading">Choose the prisoner's tier</h1>
+        </legend>
 
-          <div class="govuk-radios" data-module="govuk-radios">
-            <div class="govuk-radios__item">
-              <%= form.radio_button(:case_allocation, 'NPS', checked: @case_info.case_allocation == 'NPS', class: "govuk-radios__input") %>
-              <%= form.label :case_allocation, 'National Probation Service (NPS)', class: "govuk-label govuk-radios__label" %>
-            </div>
-            <div class="govuk-radios__item">
-              <%= form.radio_button(:case_allocation, 'CRC', checked: @case_info.case_allocation == 'CRC', class: "govuk-radios__input") %>
-              <%= form.label :case_allocation, 'Community Rehabilitation Company (CRC)', class: "govuk-label govuk-radios__label" %>
-            </div>
+        <div class="govuk-radios" data-module="govuk-radios">
+          <div class="govuk-radios__item">
+            <%= form.radio_button(:tier, 'A', checked: @case_info.tier == 'A', class: "govuk-radios__input") %>
+            <%= form.label :tier, 'A', class: "govuk-label govuk-radios__label" %>
+          </div>
+          <div class="govuk-radios__item">
+            <%= form.radio_button(:tier, 'B', checked: @case_info.tier == 'B', class: "govuk-radios__input") %>
+            <%= form.label :tier, 'B', class: "govuk-label govuk-radios__label" %>
+          </div>
+          <div class="govuk-radios__item">
+            <%= form.radio_button(:tier, 'C', checked: @case_info.tier == 'C', class: "govuk-radios__input") %>
+            <%= form.label :tier, 'C', class: "govuk-label govuk-radios__label" %>
+          </div>
+          <div class="govuk-radios__item">
+            <%= form.radio_button(:tier, 'D', checked: @case_info.tier == 'D', class: "govuk-radios__input") %>
+            <%= form.label :tier, 'D', class: "govuk-label govuk-radios__label" %>
           </div>
         </div>
-
-        <div class="govuk-form-group">
-          <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-            <h1 class="govuk-fieldset__heading">Choose the prisoner's tier</h1>
-          </legend>
-
-          <div class="govuk-radios" data-module="govuk-radios">
-            <div class="govuk-radios__item">
-              <%= form.radio_button(:tier, 'A', checked: @case_info.tier == 'A', class: "govuk-radios__input") %>
-              <%= form.label :tier, 'A', class: "govuk-label govuk-radios__label" %>
-            </div>
-            <div class="govuk-radios__item">
-              <%= form.radio_button(:tier, 'B', checked: @case_info.tier == 'B', class: "govuk-radios__input") %>
-              <%= form.label :tier, 'B', class: "govuk-label govuk-radios__label" %>
-            </div>
-            <div class="govuk-radios__item">
-              <%= form.radio_button(:tier, 'C', checked: @case_info.tier == 'C', class: "govuk-radios__input") %>
-              <%= form.label :tier, 'C', class: "govuk-label govuk-radios__label" %>
-            </div>
-            <div class="govuk-radios__item">
-              <%= form.radio_button(:tier, 'D', checked: @case_info.tier == 'D', class: "govuk-radios__input") %>
-              <%= form.label :tier, 'D', class: "govuk-label govuk-radios__label" %>
-            </div>
-          </div>
-        </div>
-
-        <div class="govuk-form-group">
-          <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-            <h1 class="govuk-fieldset__heading">Select the prisoner's Team</h1>
-          </legend>
-          <span class="govuk-hint">Enter the full name of the Team, for example 'NPS Croydon'</span>
-
-          <div id="team_autocomplete" class="autocomplete-wrapper govuk-input--width-30"></div>
-
-          <!-- Get a list of the Team names for use by auto-complete -->
-          <%= content_tag :div, class: "team_information", data: {team: Team.all.pluck(:name)} do %><% end %>
-        </div>
-
-        <table class="govuk-table">
-          <tbody class="govuk-table__body">
-          <tr class="govuk-table__row">
-            <th class="govuk-table__cell govuk-body" scope="row">
-              <h3 class="govuk-body proceeding-item" id="chosen_team"><%= @team_name %></h3>
-            </th>
-            <td class="govuk-table__cell govuk-table__cell--numeric">
-              <span id="remove_team" onclick="remove_team()">Remove</span>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-
-        <details class="govuk-details" data-module="govuk-details">
-          <summary class="govuk-details__summary">
-          <span class="govuk-details__summary-text">
-            If there's no Team on nDelius
-          </span>
-          </summary>
-          <div class="govuk-details__text">
-            This may be because the prisoner was sentenced outside the UK but is returning to serve their sentence.
-            See <a href="https://moic.service.justice.gov.uk/repatriated" class="govuk-link">prisoners
-            returning to the UK</a> for more information.
-          </div>
-        </details>
       </div>
-    </fieldset>
 
-    <%= form.submit "Update", role: "button", draggable: "false", class: "govuk-button" %>
-  </div>
+      <div class="govuk-form-group">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+          <h1 class="govuk-fieldset__heading">Select the prisoner's Team</h1>
+        </legend>
+        <span class="govuk-hint">Enter the full name of the Team, for example 'NPS Croydon'</span>
+
+        <div id="team_autocomplete" class="autocomplete-wrapper govuk-input--width-30"></div>
+
+        <!-- Get a list of the Team names for use by auto-complete -->
+        <%= content_tag :div, class: "team_information", data: {team: Team.all.pluck(:name)} do %><% end %>
+      </div>
+
+      <table class="govuk-table">
+        <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+          <th class="govuk-table__cell govuk-body" scope="row">
+            <h3 class="govuk-body proceeding-item" id="chosen_team"><%= @team_name %></h3>
+          </th>
+          <td class="govuk-table__cell govuk-table__cell--numeric">
+            <span id="remove_team" onclick="remove_team()">Remove</span>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+
+      <details class="govuk-details" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">
+          If there's no Team on nDelius
+        </span>
+        </summary>
+        <div class="govuk-details__text">
+          This may be because the prisoner was sentenced outside the UK but is returning to serve their sentence.
+          See <a href="https://moic.service.justice.gov.uk/repatriated" class="govuk-link">prisoners
+          returning to the UK</a> for more information.
+        </div>
+      </details>
+    </div>
+  </fieldset>
+
+  <%= form.submit "Update", role: "button", draggable: "false", class: "govuk-button" %>
 <% end %>
 
 <%= render :partial => "/shared/analytics_form_event",
