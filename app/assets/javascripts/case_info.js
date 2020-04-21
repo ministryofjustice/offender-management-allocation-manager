@@ -7,6 +7,7 @@ $(document).on("turbolinks:load", function(){
             element: element,
             id: id,
             source: team_names(),
+            defaultValue: current_team(),
             onConfirm: (val) => {
                 if (val !== undefined) {
                     document.getElementById("chosen_team").innerHTML = val.bold();
@@ -22,6 +23,16 @@ $(document).on("turbolinks:load", function(){
         }
     }
 });
+
+function current_team() {
+    if ($(".edit_case_information").length > 0){
+        let team_name = document.getElementById("chosen_team").innerText;
+        if (team_name !== '') {
+            return team_name
+        }
+    }
+    return ''
+}
 
 function hide_element() {
     $('.optional-case-info').hide();
