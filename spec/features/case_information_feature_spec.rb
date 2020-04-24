@@ -105,6 +105,9 @@ feature 'case information feature' do
         expect{
           click_button 'Continue'
         }.to change(enqueued_jobs, :size).by(0)
+
+        expect(page).not_to have_css(".notification")
+        expect(page).not_to have_css(".alert")
       end
     end
 
@@ -246,6 +249,13 @@ feature 'case information feature' do
                                     notice: 'This is a copy of the email sent to the LDU for your records')
           }.exactly(:twice)
 
+          within ".notification" do
+            offender_name = "Ahmonis, Imanjah"
+            expect(page).to have_content("There’s more than one nDelius record with this NOMIS number "\
+                                         "#{nomis_offender_id} for #{offender_name}. The community probation team "\
+                                         "need to update nDelius. Automatic email sent.")
+          end
+
           expectations(probation_service: 'England', tier: 'A', team: 'NPS - England', case_allocation: 'NPS')
         end
 
@@ -275,6 +285,19 @@ feature 'case information feature' do
                                             "information.")
           }.exactly(:once)
 
+          within ".notification" do
+            offender_name = "Ahmonis, Imanjah"
+            expect(page).to have_content("There’s more than one nDelius record with this NOMIS number "\
+                                         "#{nomis_offender_id} for #{offender_name}. The community probation team "\
+                                         "need to update nDelius. Automatic email sent.")
+          end
+
+          within ".alert" do
+            expect(page).to have_content("An email could not be sent to the community probation team - English LDU 2 "\
+                                         "because there is no email address saved. You need to find an alternative way"\
+                                         " to contact them.")
+          end
+
           expectations(probation_service: 'England', tier: 'A', team: 'NPS - England 2', case_allocation: 'NPS')
         end
 
@@ -301,6 +324,19 @@ feature 'case information feature' do
             click_button 'Continue'
           }.to change(enqueued_jobs, :size).by(1)
 
+          within ".notification" do
+            offender_name = "Ahmonis, Imanjah"
+            expect(page).to have_content("There’s more than one nDelius record with this NOMIS number "\
+                                         "#{nomis_offender_id} for #{offender_name}. The community probation team "\
+                                         "need to update nDelius. Automatic email sent.")
+          end
+
+          within ".alert" do
+            expect(page).to have_content("We could not send you an email because there is no valid email address "\
+                                         "saved to your account. You need to contact the local system administrator "\
+                                         "in your prison to update your email address.")
+          end
+
           expectations(probation_service: 'England', tier: 'A', team: 'NPS - England', case_allocation: 'NPS')
         end
 
@@ -326,6 +362,23 @@ feature 'case information feature' do
           expect {
             click_button 'Continue'
           }.to change(enqueued_jobs, :size).by(0)
+
+          within ".notification" do
+            offender_name = "Ahmonis, Imanjah"
+            expect(page).to have_content("There’s more than one nDelius record with this NOMIS number "\
+                                         "#{nomis_offender_id} for #{offender_name}. The community probation team "\
+                                         "need to update nDelius. Automatic email sent.")
+          end
+
+          within ".alert" do
+            expect(page).to have_content("An email could not be sent to the community probation team - English LDU 2 "\
+                                         "because there is no email address saved. You need to find an alternative "\
+                                         "way to contact them. We could not send you an email because there is no "\
+                                         "valid email address saved to your account. You need to contact the "\
+                                         "local system administrator in your prison to update your email address.")
+
+
+          end
 
           expectations(probation_service: 'England', tier: 'A', team: 'NPS - England 2', case_allocation: 'NPS')
         end
@@ -539,6 +592,8 @@ feature 'case information feature' do
           click_button 'Update'
         }.to change(enqueued_jobs, :size).by(0)
 
+        expect(page).not_to have_css(".notification")
+        expect(page).not_to have_css(".alert")
         expectations(probation_service: 'Wales', tier: 'C', team: 'NPS - Wales', case_allocation: 'NPS')
         expect(current_url).to have_content "/prisons/LEI/allocations/#{nomis_offender_id}/new"
       end
@@ -556,6 +611,8 @@ feature 'case information feature' do
         expect {
           click_button 'Update'
         }.to change(enqueued_jobs, :size).by(0)
+        expect(page).not_to have_css(".notification")
+        expect(page).not_to have_css(".alert")
       end
 
       it 'does not send email when updating team has the same ldu', :raven_intercept_exception,
@@ -573,6 +630,8 @@ feature 'case information feature' do
           click_button 'Update'
         }.to change(enqueued_jobs, :size).by(0)
 
+        expect(page).not_to have_css(".notification")
+        expect(page).not_to have_css(".alert")
         expectations(probation_service: 'England', tier: 'B', team: 'NPS - England 3', case_allocation: 'NPS')
       end
 
@@ -599,6 +658,14 @@ feature 'case information feature' do
                                   notice: 'This is a copy of the email sent to the LDU for your records')
         }.exactly(:twice)
 
+        within ".notification" do
+          offender_name = "Ahmonis, Imanjah"
+          expect(page).to have_content("There’s more than one nDelius record with this NOMIS number "\
+                                         "#{nomis_offender_id} for #{offender_name}. The community probation team "\
+                                         "need to update nDelius. Automatic email sent.")
+        end
+
+        expect(page).not_to have_css(".alert")
         expectations(probation_service: 'Wales', tier: 'B', team: 'NPS - Wales', case_allocation: 'CRC')
       end
 
@@ -624,6 +691,14 @@ feature 'case information feature' do
                                   notice: 'This is a copy of the email sent to the LDU for your records')
         }.exactly(:twice)
 
+        within ".notification" do
+          offender_name = "Ahmonis, Imanjah"
+          expect(page).to have_content("There’s more than one nDelius record with this NOMIS number "\
+                                         "#{nomis_offender_id} for #{offender_name}. The community probation team "\
+                                         "need to update nDelius. Automatic email sent.")
+        end
+
+        expect(page).not_to have_css(".alert")
         expectations(probation_service: 'England', tier: 'A', team: 'NPS - England 3', case_allocation: 'NPS')
       end
     end

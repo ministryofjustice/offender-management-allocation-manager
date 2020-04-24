@@ -49,7 +49,7 @@ class CaseInformationController < PrisonsApplicationController
 
     # we only send email if the ldu is different from previous
     if case_information_updated?
-      if ldu_changed?(@case_info.saved_change_to_team_id)
+      if CaseInformationService.ldu_changed?(@case_info.saved_change_to_team_id)
         send_email
       end
       redirect_to new_prison_allocation_path(active_prison_id, @case_info.nomis_offender_id)
@@ -176,23 +176,6 @@ private
     end
   end
 
-  def ldu_changed?(arg)
-    return false if arg.blank? # has not been changed
-
-    return false if arg.last.nil? # from eng/wales to scot/ni
-
-    return true if arg.first.nil? # from scot/ni to eng/wales
-
-    # We need to find out the ldu for the old team and the new team. If they are different then we need to send email
-    old_team = Team.find_by(id: arg.first)
-    old_ldu = LocalDivisionalUnit.find_by(id: old_team.local_divisional_unit_id)
-
-    new_team = Team.find_by(id: arg.last)
-    new_ldu = LocalDivisionalUnit.find_by(id: new_team.local_divisional_unit_id)
-
-    old_ldu != new_ldu
-  end
-
   def team_identifier
     Team.find_by(name: params['input-autocomplete'])&.id
   end
@@ -201,12 +184,11 @@ private
     return unless @case_info.probation_service == 'England' || @case_info.probation_service == 'Wales'
 
     me = Nomis::Elite2::UserApi.user_details(current_user).email_address.try(:first)
-    team = Team.find_by(id: @case_info.team_id)
-    ldu = LocalDivisionalUnit.find_by(id: team.local_divisional_unit_id)
-    emails = [ldu.email_address, me]
+    ldu = @case_info.team.try(:local_divisional_unit)
+    emails = [ldu.try(:email_address), me]
     delius_error = DeliusImportError.where(nomis_offender_id: @case_info.nomis_offender_id).first
     message = helpers.delius_email_message(delius_error&.error_type)
-    notice_to_spo = spo_message(ldu)
+    notice_to_spo = helpers.spo_message(ldu)
 
     emails.each do |email|
       next if email.blank?
@@ -217,15 +199,10 @@ private
                                            message: message,
                                            notice: email == me ? notice_to_spo : '')
     end
-  end
 
-  def spo_message(ldu)
-    if ldu.email_address.blank?
-      "We were unable to send an email to #{ldu.name} as we do not have their email address. "\
-      'You need to find another way to provide them with this information.'
-    else
-      'This is a copy of the email sent to the LDU for your records'
-    end
+    prisoner = prisoner(@case_info.nomis_offender_id)
+    flash[:notice] = helpers.flash_notice_text(delius_error&.error_type, prisoner)
+    flash[:alert] = helpers.flash_alert_text(me, ldu, @case_info.team.name)
   end
 
   def case_information_params
