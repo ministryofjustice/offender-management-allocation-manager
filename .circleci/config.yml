@@ -201,7 +201,7 @@ jobs:
           name: Run tests
           command: |
             ./cc-test-reporter before-build
-            VCR=1 bundle exec rake
+            bundle exec rake
             ./cc-test-reporter after-build --coverage-input-type simplecov --exit-code $?
           environment:
             ALLOCATION_MANAGER_HOST: https://allocation-manager-staging.apps.live-1.cloud-platform.service.justice.gov.uk

@@ -39,25 +39,13 @@ end
 
 require 'vcr'
 
-recording = ENV['VCR']
-
-vcr_record_mode = recording ? :all : :none
-
 VCR.configure do |config|
   config.cassette_library_dir = "spec/fixtures/vcr_cassettes"
-
-  if recording
-    config.hook_into :webmock
-  else
-    config.hook_into :faraday
-  end
+  config.hook_into :webmock
   config.configure_rspec_metadata!
-  # this allows HTTP connections to go through to webmock if cassette not specified
   config.allow_http_connections_when_no_cassette = true
   config.default_cassette_options = {
-    record: vcr_record_mode,
-    # not sure if we need this on or off - when we are doing the oauth2 interactions, it might repeat many times
-    # allow_playback_repeats: true,
+    record: :all,
     match_requests_on: [
       :method,
       :uri,
