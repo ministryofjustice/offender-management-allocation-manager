@@ -1,11 +1,12 @@
 module ApiHelper
-  def stub_offender(nomis_id, booking_number: 754_165, imprisonment_status: 'SENT03')
+  def stub_offender(nomis_id, booking_number: 754_165, imprisonment_status: 'SENT03', dob: "1985-03-19")
     stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/prisoners/#{nomis_id}").
       to_return(status: 200, body: [{ offenderNo: nomis_id,
                                       gender: 'Male',
                                       convictedStatus: 'Convicted',
                                       latestBookingId: booking_number,
-                                      imprisonmentStatus: imprisonment_status }].to_json)
+                                      imprisonmentStatus: imprisonment_status,
+                                      dateOfBirth: dob }].to_json)
 
     stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/offender-sentences/bookings").
       with(
@@ -91,5 +92,9 @@ module ApiHelper
     # case none were provided
     stub_request(:post, elite2bookingsapi).
       to_return(status: 200, body: bookings.to_json, headers: {})
+  end
+
+  def reload_page
+    visit current_path
   end
 end
