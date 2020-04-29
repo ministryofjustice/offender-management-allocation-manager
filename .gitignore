@@ -28,6 +28,7 @@
 
 # Ignore IDEs
 .idea/
+.vscode/
 
 # Ignore VCR cassettes
 /spec/fixtures/vcr_cassettes
