@@ -2,3 +2,8 @@ inherit_gem:
   rubocop-govuk:
     - config/default.yml
     - config/rails.yml
+
+Style/StringLiterals:
+  EnforcedStyle: single_quotes
+  Exclude:
+    - 'spec/**/*'
