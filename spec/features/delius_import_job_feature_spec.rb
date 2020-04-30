@@ -49,23 +49,52 @@ feature "Delius import feature" do
 
     ENV['DELIUS_EMAIL_FOLDER'] = 'delius_import_feature'
     ENV['DELIUS_XLSX_PASSWORD'] = 'secret'
-
-    create(:team, code: 'A')
   end
 
-  it "imports the Delius spreadsheet and creates case information" do
-    visit prison_summary_pending_path(prison)
-    expect(page).to have_content("Add missing information")
-    expect(page).to have_content(offender_no)
+  context "when the team is associated with an LDU" do
+    before do
+      create(:team, code: 'A')
+    end
 
-    DeliusImportJob.perform_now
+    it "imports the Delius spreadsheet and creates case information" do
+      visit prison_summary_pending_path(prison)
+      expect(page).to have_content("Add missing information")
+      expect(page).to have_content(offender_no)
 
-    reload_page
-    expect(page).to have_content("Add missing information")
-    expect(page).not_to have_content(offender_no)
+      DeliusImportJob.perform_now
 
-    visit prison_summary_unallocated_path(prison)
-    expect(page).to have_content("Make allocations")
-    expect(page).to have_content(offender_no)
+      reload_page
+      expect(page).to have_content("Add missing information")
+      expect(page).not_to have_content(offender_no)
+
+      visit prison_summary_unallocated_path(prison)
+      expect(page).to have_content("Make allocations")
+      expect(page).to have_content(offender_no)
+    end
+  end
+
+  context "when the team is not associated with an LDU" do
+    before do
+      team = build(:team, code: 'A')
+      team.local_divisional_unit = nil
+      team.save(validate: false)
+      create(:local_divisional_unit, code: 'N01TRF')
+    end
+
+    it "imports the Delius spreadsheet and creates case information" do
+      visit prison_summary_pending_path(prison)
+      expect(page).to have_content("Add missing information")
+      expect(page).to have_content(offender_no)
+
+      DeliusImportJob.perform_now
+
+      reload_page
+      expect(page).to have_content("Add missing information")
+      expect(page).not_to have_content(offender_no)
+
+      visit prison_summary_unallocated_path(prison)
+      expect(page).to have_content("Make allocations")
+      expect(page).to have_content(offender_no)
+    end
   end
 end
