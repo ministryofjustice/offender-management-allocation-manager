@@ -7,9 +7,13 @@ class UpdateTeamNameAndLduService
     @team = Team.find_by(code: team_code)
     @team_name = team_name
     @ldu_code = ldu_code
+
+    Rails.logger.error("Couldn't find team with code #{team_code}") if @team.nil?
   end
 
   def update
+    return if @team.nil?
+
     return unless name_needs_updating? || ldu_needs_updating?
 
     if name_needs_updating?
@@ -19,6 +23,7 @@ class UpdateTeamNameAndLduService
     if ldu_needs_updating?
       ldu = LocalDivisionalUnit.find_by(code: @ldu_code)
       @team.local_divisional_unit = ldu
+      return Rails.logger.error("Couldn't find LDU with code #{@ldu_code}") if ldu.nil?
     end
 
     @team.save
