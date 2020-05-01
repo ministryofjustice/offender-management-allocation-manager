@@ -110,19 +110,7 @@ private
   end
 
   def update_team_names_and_ldus(processor)
-    processor.each_with_index do |row, index|
-      # skip header row in row[0]
-      next if index == 0
-
-      record = {}
-
-      # For each row, map the column to the appropriate column name
-      # as the existing column names are not very hash/symbol friendly
-      row.each_with_index do |val, idx|
-        key = FIELDS[idx]
-        record[key] = val
-      end
-
+    for_each_record(processor) do |record|
       UpdateTeamNameAndLduService.update(
         team_code: record[:team_code],
         team_name: record[:team],
@@ -133,6 +121,18 @@ private
 
   def upsert_delius_data_records(processor)
     total = 0
+
+    for_each_record(processor) do |record|
+      if record[:noms_no].present?
+        DeliusDataService.upsert(record)
+        total += 1
+      end
+    end
+
+    Rails.logger.info("[DELIUS] #{total} records attempted upsert")
+  end
+
+  def for_each_record(processor)
     processor.each_with_index do |row, index|
       # skip header row in row[0]
       next if index == 0
@@ -146,12 +146,7 @@ private
         record[key] = val
       end
 
-      if record[:noms_no].present?
-        DeliusDataService.upsert(record)
-        total += 1
-      end
+      yield(record)
     end
-
-    Rails.logger.info("[DELIUS] #{total} records attempted upsert")
   end
 end
