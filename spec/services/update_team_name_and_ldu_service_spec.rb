@@ -55,4 +55,29 @@ RSpec.describe UpdateTeamNameAndLduService do
       described_class.update(team_code: 'TEAM1', team_name: 'Team One', ldu_code: 'LDU1')
     end
   end
+
+  context "when the team doesn't exist" do
+    it "logs an error" do
+      expect_message = "Couldn't find team with code TEAM1"
+      expect(Rails.logger).to receive(:error).with(expect_message)
+      described_class.update(team_code: 'TEAM1', team_name: 'Team One', ldu_code: 'LDU1')
+    end
+  end
+
+  context "when the team exists, but the LDU doesn't" do
+    before do
+      create(:team, code: 'TEAM1')
+    end
+
+    it "logs an error" do
+      expect_message = "Couldn't find LDU with code LDU1"
+      expect(Rails.logger).to receive(:error).with(expect_message)
+      described_class.update(team_code: 'TEAM1', team_name: 'Team One', ldu_code: 'LDU1')
+    end
+
+    it "doesn't update the team record" do
+      expect_any_instance_of(Team).not_to receive(:save)
+      described_class.update(team_code: 'TEAM1', team_name: 'Team One', ldu_code: 'LDU1')
+    end
+  end
 end
