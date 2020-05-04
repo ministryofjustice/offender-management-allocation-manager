@@ -122,7 +122,6 @@ private
     )
   end
 
-  # rubocop:disable Layout/LineLength
   def allocation_attributes(offender)
     {
       primary_pom_nomis_id: allocation_params[:nomis_staff_id].to_i,
@@ -140,7 +139,6 @@ private
       message: allocation_params[:message]
     }
   end
-  # rubocop:enable Layout/LineLength
 
   def offender(nomis_offender_id)
     OffenderPresenter.new(OffenderService.get_offender(nomis_offender_id),

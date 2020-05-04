@@ -1,3 +1,8 @@
+inherit_gem:
+  rubocop-govuk:
+    - config/default.yml
+    - config/rails.yml
+
 require:
   - rubocop-rspec
   - rubocop-performance
@@ -24,7 +29,7 @@ AllCops:
     - 'spec/dummy/db/**/*'
     - 'config/routes.rb'
 
-  DisplayCopNames: true
+  DisplayCopNames: {}
 
 Rails:
   Enabled: true
@@ -116,15 +121,6 @@ Metrics/MethodLength:
 
 # Don't worry about the complexity of spec methods
 Metrics/AbcSize:
-  Enabled: false
-
-Style/HashEachMethods:
-  Enabled: false
-
-Style/HashTransformKeys:
-  Enabled: false
-
-Style/HashTransformValues:
   Enabled: false
 
 # Enforce single quotes everywhere except in specs (because there's a lot of
@@ -324,4 +320,20 @@ Lint/AmbiguousBlockAssociation:
   Enabled: false
 
 Capybara/FeatureMethods:
+  Enabled: false
+
+# Below here is the set of failures against the govuk styles
+Style/WordArray:
+  Enabled: false
+
+Style/TrailingCommaInHashLiteral:
+  Enabled: false
+
+Style/TrailingCommaInArguments:
+  Enabled: false
+
+Style/TrailingCommaInArrayLiteral:
+  Enabled: false
+
+Style/MethodCalledOnDoEndBlock:
   Enabled: false

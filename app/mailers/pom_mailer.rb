@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/ParameterLists
 class PomMailer < GovukNotifyRails::Mailer
   def new_allocation_email(params = {})
     message_detail = "Additional information: #{params[:message]}" if params[:message].present?
@@ -73,9 +72,7 @@ class PomMailer < GovukNotifyRails::Mailer
                         previous_prison_name: previous_prison_name)
     mail(to: email)
   end
-  # rubocop:enable Metrics/ParameterLists
 
-  # rubocop:disable Metrics/ParameterLists
   def allocate_coworking_pom(
     pom_email:, message:, pom_name:, coworking_pom_name:, url:,
     offender_name:, nomis_offender_id:
@@ -155,4 +152,3 @@ class PomMailer < GovukNotifyRails::Mailer
     mail(to: params[:previous_pom_email])
   end
 end
-# rubocop:enable Metrics/ParameterLists

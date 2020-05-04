@@ -74,7 +74,6 @@ module Nomis
       "#{last_name}, #{first_name}".titleize
     end
 
-    # rubocop:disable Metrics/MethodLength
     def self.from_json(payload)
       SentenceDetail.new.tap { |obj|
         obj.first_name = payload['firstName']
@@ -106,6 +105,5 @@ module Nomis
         )
       }
     end
-    # rubocop:enable Metrics/MethodLength
   end
 end

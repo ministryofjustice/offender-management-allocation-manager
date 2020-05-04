@@ -27,5 +27,5 @@ if [[ $? -eq 0 ]]; then
 fi
 
 # Check only new files with govuk cops
-git diff --cached --name-only --diff-filter=ACM |
-  xargs bundle exec rubocop --config .rubocop-govuk.yml
+#git diff --cached --name-only --diff-filter=ACM |
+#  xargs bundle exec rubocop

@@ -2,9 +2,6 @@
 
 class SummaryService
   PAGE_SIZE = 20 # The number of items to show in the view
-
-  # rubocop:disable Metrics/MethodLength
-  # rubocop:disable Metrics/PerceivedComplexity
   def self.summary(summary_type, prison)
     # We expect to be passed summary_type, which is one of :allocated, :unallocated,
     # :pending, or :new_arrivals.  The other types will return totals, and do not contain
@@ -62,8 +59,8 @@ class SummaryService
     Summary.new(summary_type, buckets)
   end
 
-# rubocop:enable Metrics/MethodLength
-# rubocop:enable Metrics/PerceivedComplexity
+
+
 
 private
 

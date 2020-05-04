@@ -1,4 +1,3 @@
-# rubocop:disable Metrics/ModuleLength
 module EarlyAssignmentPdfHelper
   def render_early_alloc_pdf(early_assignment:, offender:, allocation:, pom:)
     # prawn_document can only be called in an actual view context.
@@ -171,4 +170,3 @@ private
     end
   end
 end
-# rubocop:enable Metrics/ModuleLength
