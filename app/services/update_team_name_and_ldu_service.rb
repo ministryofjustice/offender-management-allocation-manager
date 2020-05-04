@@ -14,19 +14,9 @@ class UpdateTeamNameAndLduService
   def update
     return if @team.nil?
 
-    return unless name_needs_updating? || ldu_needs_updating?
-
-    if name_needs_updating?
-      @team.name = @team_name
-    end
-
-    if ldu_needs_updating?
-      ldu = LocalDivisionalUnit.find_by(code: @ldu_code)
-      @team.local_divisional_unit = ldu
-      return Rails.logger.error("Couldn't find LDU with code #{@ldu_code}") if ldu.nil?
-    end
-
-    @team.save
+    update_name if name_needs_updating?
+    update_ldu if ldu_needs_updating?
+    @team.save if @team.changed?
   end
 
 private
@@ -35,7 +25,18 @@ private
     @team.name != @team_name
   end
 
+  def update_name
+    @team.name = @team_name
+  end
+
   def ldu_needs_updating?
     @team.local_divisional_unit&.code != @ldu_code
+  end
+
+  def update_ldu
+    ldu = LocalDivisionalUnit.find_by(code: @ldu_code)
+    return Rails.logger.error("Couldn't find LDU with code #{@ldu_code}") if ldu.nil?
+
+    @team.local_divisional_unit = ldu
   end
 end
