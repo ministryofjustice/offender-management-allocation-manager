@@ -52,9 +52,7 @@ feature "Delius import feature" do
   end
 
   context "when the team is associated with an LDU" do
-    before do
-      create(:team, code: 'A')
-    end
+    before { create(:team, code: 'A') }
 
     it "imports the Delius spreadsheet and creates case information" do
       visit prison_summary_pending_path(prison)
