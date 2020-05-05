@@ -75,7 +75,9 @@ group :test do
 end
 
 group :development do
-  gem 'listen', '>= 3.0.5', '< 3.3'
+  # for some reason listen 3.2.x interferes with VCR 5.x so that we end up with flakey specs
+  # which seem to fail around 50% of the time. So peg it back to 3.1 for now.
+  gem 'listen', '>= 3.0.5', '< 3.2'
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'web-console', '>= 3.3.0'
