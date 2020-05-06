@@ -6,10 +6,9 @@ describe Nomis::SentenceDetail, model: true do
 
   describe "#automatic_release_date" do
     context "when override present" do
-      before do
-        subject.automatic_release_date = date
-        subject.automatic_release_override_date = override
-      end
+      subject {
+        described_class.new automatic_release_date: date, automatic_release_override_date: override
+      }
 
       it "overrides" do
         expect(subject.automatic_release_date).to eq(override)
@@ -17,10 +16,9 @@ describe Nomis::SentenceDetail, model: true do
     end
 
     context "without override" do
-      before do
-        subject.automatic_release_date = date
-        subject.automatic_release_override_date = nil
-      end
+      subject {
+        described_class.new automatic_release_date: date, automatic_release_override_date: nil
+      }
 
       it "uses original" do
         expect(subject.automatic_release_date).to eq(date)
@@ -30,10 +28,9 @@ describe Nomis::SentenceDetail, model: true do
 
   describe "#conditional_release_date" do
     context "when override present" do
-      before do
-        subject.conditional_release_date = date
-        subject.conditional_release_override_date = override
-      end
+      subject {
+        described_class.new conditional_release_date: date, conditional_release_override_date: override
+      }
 
       it "overrides" do
         expect(subject.conditional_release_date).to eq(override)
@@ -41,9 +38,9 @@ describe Nomis::SentenceDetail, model: true do
     end
 
     context "without override" do
-      before do
-        subject.conditional_release_date = date
-      end
+      subject {
+        described_class.new conditional_release_date: date
+      }
 
       it "uses original" do
         expect(subject.conditional_release_date).to eq(date)

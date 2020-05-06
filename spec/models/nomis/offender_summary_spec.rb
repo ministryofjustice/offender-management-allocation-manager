@@ -12,11 +12,10 @@ describe Nomis::OffenderSummary do
 
     context 'with sentence detail with dates' do
       before do
-        subject.sentence = Nomis::SentenceDetail.new.tap do |sentence|
-          sentence.sentence_start_date = Date.new(2005, 2, 3)
-          sentence.parole_eligibility_date = parole_eligibility_date
-          sentence.conditional_release_date = conditional_release_date
-        end
+        subject.sentence = Nomis::SentenceDetail.new(
+          sentence_start_date: Date.new(2005, 2, 3),
+          parole_eligibility_date: parole_eligibility_date,
+          conditional_release_date: conditional_release_date)
       end
 
       context 'when comprised of dates in the past and the future' do
@@ -66,10 +65,9 @@ describe Nomis::OffenderSummary do
   describe '#sentenced?' do
     context 'with sentence detail with a release date' do
       before do
-        subject.sentence = Nomis::SentenceDetail.new.tap do |sentence|
-          sentence.sentence_start_date = Date.new(2005, 2, 3)
-          sentence.release_date = Time.zone.today
-        end
+        subject.sentence = Nomis::SentenceDetail.new(
+          sentence_start_date: Date.new(2005, 2, 3),
+          release_date: Time.zone.today)
       end
 
       it 'marks the offender as sentenced' do

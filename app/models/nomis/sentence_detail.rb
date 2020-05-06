@@ -4,22 +4,21 @@ module Nomis
   class SentenceDetail
     include Deserialisable
 
-    attr_accessor :first_name, :last_name,
-                  :home_detention_curfew_eligibility_date,
-                  :home_detention_curfew_actual_date,
-                  :parole_eligibility_date,
-                  :release_date,
-                  :sentence_start_date,
-                  :tariff_date,
-                  :licence_expiry_date
+    attr_accessor :first_name, :last_name
 
-    attr_writer :automatic_release_date,
-                :automatic_release_override_date,
-                :conditional_release_date,
-                :conditional_release_override_date,
-                :actual_parole_date,
-                :nomis_post_recall_release_date,
-                :nomis_post_recall_release_override_date
+    attr_reader :home_detention_curfew_eligibility_date,
+                :home_detention_curfew_actual_date,
+                :parole_eligibility_date,
+                :post_recall_release_date,
+                :release_date,
+                :sentence_start_date,
+                :tariff_date
+
+    def initialize(fields = {})
+      fields.each do |k, v|
+        instance_variable_set("@#{k}", v)
+      end
+    end
 
     def automatic_release_date
       @automatic_release_override_date.presence || @automatic_release_date
@@ -76,34 +75,35 @@ module Nomis
 
     def self.from_json(payload)
       SentenceDetail.new.tap { |obj|
-        obj.first_name = payload['firstName']
-        obj.last_name = payload['lastName']
-
-        obj.parole_eligibility_date = deserialise_date(payload, 'paroleEligibilityDate')
-        obj.release_date = deserialise_date(payload, 'releaseDate')
-        obj.sentence_start_date = deserialise_date(payload, 'sentenceStartDate')
-        obj.tariff_date = deserialise_date(payload, 'tariffDate')
-        obj.automatic_release_date = deserialise_date(payload, 'automaticReleaseDate')
-        obj.nomis_post_recall_release_date = deserialise_date(payload, 'postRecallReleaseDate')
-        obj.nomis_post_recall_release_override_date = deserialise_date(payload, 'postRecallReleaseOverrideDate')
-        obj.licence_expiry_date = deserialise_date(payload, 'licenceExpiryDate')
-        obj.actual_parole_date = deserialise_date(payload, 'actualParoleDate')
-        obj.conditional_release_date = deserialise_date(
-          payload, 'conditionalReleaseDate'
-        )
-        obj.automatic_release_override_date = deserialise_date(
-          payload, 'automaticReleaseOverrideDate'
-        )
-        obj.home_detention_curfew_eligibility_date = deserialise_date(
-          payload, 'homeDetentionCurfewEligibilityDate'
-        )
-        obj.home_detention_curfew_actual_date = deserialise_date(
-          payload, 'homeDetentionCurfewActualDate'
-        )
-        obj.conditional_release_override_date = deserialise_date(
-          payload, 'conditionalReleaseOverrideDate'
-        )
+        obj.load_from_json(payload)
       }
+    end
+
+    # rubocop:disable Metrics/MethodLength
+    def load_from_json(payload)
+      @parole_eligibility_date = deserialise_date(payload, 'paroleEligibilityDate')
+      @release_date = deserialise_date(payload, 'releaseDate')
+      @sentence_start_date = deserialise_date(payload, 'sentenceStartDate')
+      @tariff_date = deserialise_date(payload, 'tariffDate')
+      @automatic_release_date = deserialise_date(payload, 'automaticReleaseDate')
+      @post_recall_release_date = deserialise_date(payload, 'postRecallReleaseDate')
+      @post_recall_release_override_date = deserialise_date(payload, 'postRecallReleaseOverrideDate')
+      @conditional_release_date = deserialise_date(
+        payload, 'conditionalReleaseDate'
+      )
+      @automatic_release_override_date = deserialise_date(
+        payload, 'automaticReleaseOverrideDate'
+      )
+      @home_detention_curfew_eligibility_date = deserialise_date(
+        payload, 'homeDetentionCurfewEligibilityDate'
+      )
+      @home_detention_curfew_actual_date = deserialise_date(
+        payload, 'homeDetentionCurfewActualDate'
+      )
+      @conditional_release_override_date = deserialise_date(
+        payload, 'conditionalReleaseOverrideDate'
+      )
+      @actual_parole_date = deserialise_date(payload, 'actualParoleDate')
     end
   end
 end
