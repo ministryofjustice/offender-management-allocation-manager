@@ -104,9 +104,35 @@ private
 
   def process_decrypted_file(filename)
     Rails.logger.info('[DELIUS] Processing decrypted file')
-
-    total = 0
     processor = Delius::Processor.new(filename)
+    update_team_names_and_ldus(processor)
+    upsert_delius_data_records(processor)
+  end
+
+  def update_team_names_and_ldus(processor)
+    for_each_record(processor) do |record|
+      UpdateTeamNameAndLduService.update(
+        team_code: record[:team_code],
+        team_name: record[:team],
+        ldu_code: record[:ldu_code]
+      )
+    end
+  end
+
+  def upsert_delius_data_records(processor)
+    total = 0
+
+    for_each_record(processor) do |record|
+      if record[:noms_no].present?
+        DeliusDataService.upsert(record)
+        total += 1
+      end
+    end
+
+    Rails.logger.info("[DELIUS] #{total} records attempted upsert")
+  end
+
+  def for_each_record(processor)
     processor.each_with_index do |row, index|
       # skip header row in row[0]
       next if index == 0
@@ -120,12 +146,7 @@ private
         record[key] = val
       end
 
-      if record[:noms_no].present?
-        DeliusDataService.upsert(record)
-        total += 1
-      end
+      yield(record)
     end
-
-    Rails.logger.info("[DELIUS] #{total} records attempted upsert")
   end
 end

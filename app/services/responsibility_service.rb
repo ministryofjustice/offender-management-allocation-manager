@@ -25,6 +25,7 @@ class ResponsibilityService
       RESPONSIBLE
     elsif offender.indeterminate_sentence? && (offender.tariff_date.nil? ||
        offender.tariff_date < Time.zone.today)
+
       RESPONSIBLE
     else
       standard_rules(offender)
@@ -109,7 +110,6 @@ private
       return nil if release_date.blank?
 
       handover_date_in_future = HandoverDateService.handover(offender).handover_date > Time.zone.today
-
       if handover_date_in_future && release_date >= cutoff
         RESPONSIBLE
       else
