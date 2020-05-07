@@ -28,6 +28,7 @@ class CaseInformationController < PrisonsApplicationController
     end
 
     if @case_info.valid?
+      @case_info.probation_service == 'Wales' ? @case_info.welsh_offender = 'Yes' : @case_info.welsh_offender = 'No'
       @case_info.save
       send_email
       redirect_to prison_summary_pending_path(active_prison_id, sort: params[:sort], page: params[:page])
@@ -161,18 +162,19 @@ private
     if ['Scotland', 'Northern Ireland'].include?(case_information_params[:probation_service]) &&
       case_information_params[:last_known_location] == 'Yes'
       @case_info.update(probation_service: case_information_params[:probation_service], tier: 'N/A',
-                        case_allocation: 'N/A', team: nil, manual_entry: true)
+                        case_allocation: 'N/A', team: nil, welsh_offender: 'No', manual_entry: true)
     else
-      @case_info.probation_service = if case_information_params[:last_known_location] == 'No'
-                                       'England'
-                                     else
-                                       case_information_params[:probation_service]
-                                     end
+      if case_information_params[:last_known_location] == 'No'
+        probation = 'England'
+        welsh = 'No'
+      else
+        probation = case_information_params[:probation_service]
+        welsh = 'Yes'
+      end
 
-      @case_info.update(probation_service: @case_info.probation_service, tier: case_information_params[:tier],
+      @case_info.update(probation_service: probation, tier: case_information_params[:tier],
                         case_allocation: case_information_params[:case_allocation],
-                        team_id: team_identifier, manual_entry: true)
-
+                        team_id: team_identifier, welsh_offender: welsh, manual_entry: true)
     end
   end
 
@@ -183,9 +185,9 @@ private
   def send_email
     return unless @case_info.probation_service == 'England' || @case_info.probation_service == 'Wales'
 
-    me = Nomis::Elite2::UserApi.user_details(current_user).email_address.try(:first)
+    spo = Nomis::Elite2::UserApi.user_details(current_user).email_address.try(:first)
     ldu = @case_info.team.try(:local_divisional_unit)
-    emails = [ldu.try(:email_address), me]
+    emails = [ldu.try(:email_address), spo]
     delius_error = DeliusImportError.where(nomis_offender_id: @case_info.nomis_offender_id).first
     message = helpers.delius_email_message(delius_error&.error_type)
     notice_to_spo = helpers.spo_message(ldu)
@@ -197,12 +199,12 @@ private
                                            ldu: ldu,
                                            nomis_offender_id: @case_info.nomis_offender_id,
                                            message: message,
-                                           notice: email == me ? notice_to_spo : '')
+                                           notice: email == spo ? notice_to_spo : '')
     end
 
     prisoner = prisoner(@case_info.nomis_offender_id)
-    flash[:notice] = helpers.flash_notice_text(delius_error&.error_type, prisoner)
-    flash[:alert] = helpers.flash_alert_text(me, ldu, @case_info.team.name)
+    flash[:notice] = helpers.flash_notice_text(error_type: delius_error&.error_type, prisoner: prisoner)
+    flash[:alert] = helpers.flash_alert_text(spo: spo, ldu: ldu, team_name: @case_info.team.name)
   end
 
   def case_information_params

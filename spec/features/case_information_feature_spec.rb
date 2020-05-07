@@ -376,8 +376,6 @@ feature 'case information feature' do
                                          "way to contact them. We could not send you an email because there is no "\
                                          "valid email address saved to your account. You need to contact the "\
                                          "local system administrator in your prison to update your email address.")
-
-
           end
 
           expectations(probation_service: 'England', tier: 'A', team: 'NPS - England 2', case_allocation: 'NPS')
