@@ -8,7 +8,7 @@ module CaseInformationHelper
   end
 
   # rubocop:disable Metrics/MethodLength
-  def flash_notice_text(error_type:, prisoner:)
+  def flash_notice_text(error_type:, prisoner:, email_count:)
     case error_type
     when DeliusImportError::DUPLICATE_NOMIS_ID
       msg = "There’s more than one nDelius record with this NOMIS number #{prisoner.offender_no} for "\
@@ -30,7 +30,7 @@ module CaseInformationHelper
             'handover to the community. The community probation team need to update nDelius.'
     end
 
-    msg + ' Automatic email sent.'
+    email_count > 0 ? msg + ' Automatic email sent.' : msg
   end
   # rubocop:enable Metrics/MethodLength
 
