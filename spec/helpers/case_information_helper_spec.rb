@@ -62,32 +62,39 @@ RSpec.describe CaseInformationHelper do
       notice_msgs = [
         [DeliusImportError::DUPLICATE_NOMIS_ID,
          "There’s more than one nDelius record with this NOMIS number #{prisoner.offender_no} for "\
-                "#{prisoner.full_name}. The community probation team need to update nDelius. Automatic email sent."
+                "#{prisoner.full_name}. The community probation team need to update nDelius."
         ],
         [DeliusImportError::MISSING_DELIUS_RECORD,
          "There’s no nDelius match for #{prisoner.full_name}, NOMIS number #{prisoner.offender_no}. The community "\
-                'probation team need to update nDelius. Automatic email sent.'
+                'probation team need to update nDelius.'
         ],
         [DeliusImportError::INVALID_TIER,
          "There’s no tier recorded in nDelius for #{prisoner.full_name}, NOMIS number #{prisoner.offender_no}. "\
-                'The community probation team need to update nDelius. Automatic email sent.'
+                'The community probation team need to update nDelius.'
         ],
         [DeliusImportError::INVALID_CASE_ALLOCATION,
          "There’s no service provider in nDelius for #{prisoner.full_name}, NOMIS number #{prisoner.offender_no}. "\
-                'The community probation team need to update nDelius. Automatic email sent.'
+                'The community probation team need to update nDelius.'
         ],
         [DeliusImportError::MISMATCHED_DOB,
          "There’s an nDelius record with NOMIS number #{prisoner.offender_no} - #{prisoner.full_name} but a "\
-                'different date of birth. The community probation team need to update nDelius. Automatic email sent.'
+                'different date of birth. The community probation team need to update nDelius.'
         ],
         [DeliusImportError::MISSING_TEAM,
          "#{prisoner.full_name}, NOMIS number #{prisoner.offender_no} must be linked to an nDelius record for "\
-                'handover to the community. The community probation team need to update nDelius. Automatic email sent.'
+                'handover to the community. The community probation team need to update nDelius.'
         ]
       ]
 
       notice_msgs.each do |msg|
-        expect(flash_notice_text(error_type: msg.first, prisoner: prisoner)).to eq(msg.last)
+        email_range = [1, 2]
+        size = email_range.sample(1)
+        expect(flash_notice_text(error_type: msg.first, prisoner: prisoner, email_count: size.first)).to eq(msg.last + " Automatic email sent.")
+      end
+
+      notice_msgs.each do |msg|
+        size = 0
+        expect(flash_notice_text(error_type: msg.first, prisoner: prisoner, email_count: size)).to eq(msg.last)
       end
     end
   end
