@@ -10,13 +10,19 @@ class ViewHandoverEmailAddressesSummary
   def offender_category(offender)
     case_info = CaseInformation.find_by(nomis_offender_id: offender.offender_no)
 
-    return :missing_delius_record if missing_delius_record?(case_info)
-    return :missing_team_link if missing_team_link?(case_info)
-    return :missing_team_information if missing_team_information?(case_info)
-    return :missing_local_delivery_unit if missing_local_delivery_unit?(case_info)
-    return :missing_local_delivery_unit_email if missing_email?(case_info)
-
-    :has_email_address
+    if missing_delius_record?(case_info)
+      :missing_delius_record
+    elsif missing_team_link?(case_info)
+      :missing_team_link
+    elsif missing_team_information?(case_info)
+      :missing_team_information
+    elsif missing_local_delivery_unit?(case_info)
+      :missing_local_delivery_unit
+    elsif missing_email?(case_info)
+      :missing_local_delivery_unit_email
+    else
+      :has_email_address
+    end
   end
 
   def missing_delius_record?(case_info)
@@ -46,7 +52,7 @@ class ViewHandoverEmailAddressesSummary
       missing_team_link: 0,
       missing_team_information: 0,
       missing_local_delivery_unit: 0,
-      missing_local_delivery_unit_email: 0
+      missing_local_delivery_unit_email: 0,
     }
   end
 end
