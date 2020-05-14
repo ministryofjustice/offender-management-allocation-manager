@@ -47,7 +47,6 @@ feature "Delius import feature" do
 
     stub_const("Mail", MockMailMessage)
 
-    ENV['DELIUS_EMAIL_FOLDER'] = 'delius_import_feature'
     ENV['DELIUS_XLSX_PASSWORD'] = 'secret'
   end
 
@@ -98,6 +97,13 @@ feature "Delius import feature" do
       expect(page).to have_content("Make allocations")
       expect(page).to have_content(offender_no)
     end
+
+    it "does not attempt to process the active team as if it were a shadow team" do
+      expect(Rails.logger).not_to receive(:error)
+      DeliusImportJob.perform_now
+    end
+  end
+
   context "when the shadow team is not associated with an active team" do
     before do
       ENV['DELIUS_EMAIL_FOLDER'] = 'delius_import_feature_shadow'
@@ -122,6 +128,11 @@ feature "Delius import feature" do
       visit prison_summary_unallocated_path(prison)
       expect(page).to have_content("Make allocations")
       expect(page).to have_content(offender_no)
+    end
+
+    it "does not attempt to process the shadow team as if it were an active team" do
+      expect(Rails.logger).not_to receive(:error)
+      DeliusImportJob.perform_now
     end
   end
 end

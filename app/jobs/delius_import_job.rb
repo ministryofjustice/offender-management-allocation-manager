@@ -112,6 +112,8 @@ private
 
   def update_shadow_team_associations(processor)
     for_each_record(processor) do |record|
+      next unless shadow_ldu?(record[:ldu_code])
+
       UpdateShadowTeamAssociationService.update(
         shadow_code: record[:team_code],
         shadow_name: record[:team]
@@ -121,6 +123,8 @@ private
 
   def update_team_names_and_ldus(processor)
     for_each_record(processor) do |record|
+      next unless active_ldu?(record[:ldu_code])
+
       UpdateTeamNameAndLduService.update(
         team_code: record[:team_code],
         team_name: record[:team],
@@ -158,5 +162,13 @@ private
 
       yield(record)
     end
+  end
+
+  def shadow_ldu?(ldu_code)
+    ldu_code.match?(/N\d{2}OMIC/)
+  end
+
+  def active_ldu?(ldu_code)
+    !shadow_ldu?(ldu_code)
   end
 end
