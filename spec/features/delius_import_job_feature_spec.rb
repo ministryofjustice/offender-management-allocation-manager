@@ -52,7 +52,10 @@ feature "Delius import feature" do
   end
 
   context "when the team is associated with an LDU" do
-    before { create(:team, code: 'A') }
+    before do
+      ENV['DELIUS_EMAIL_FOLDER'] = 'delius_import_feature'
+      create(:team, code: 'A', name: 'NPS - Team 1')
+    end
 
     it "imports the Delius spreadsheet and creates case information" do
       visit prison_summary_pending_path(prison)
@@ -73,6 +76,7 @@ feature "Delius import feature" do
 
   context "when the team is not associated with an LDU" do
     before do
+      ENV['DELIUS_EMAIL_FOLDER'] = 'delius_import_feature'
       team = build(:team, code: 'A')
       team.local_divisional_unit = nil
       team.save(validate: false)
@@ -80,6 +84,31 @@ feature "Delius import feature" do
     end
 
     it "imports the Delius spreadsheet and creates case information" do
+      visit prison_summary_pending_path(prison)
+      expect(page).to have_content("Add missing information")
+      expect(page).to have_content(offender_no)
+
+      DeliusImportJob.perform_now
+
+      reload_page
+      expect(page).to have_content("Add missing information")
+      expect(page).not_to have_content(offender_no)
+
+      visit prison_summary_unallocated_path(prison)
+      expect(page).to have_content("Make allocations")
+      expect(page).to have_content(offender_no)
+    end
+  context "when the shadow team is not associated with an active team" do
+    before do
+      ENV['DELIUS_EMAIL_FOLDER'] = 'delius_import_feature_shadow'
+      local_divisional_unit = create(:local_divisional_unit, code: 'LDU1')
+      team = build(:team, code: 'A', name: 'NPS - Team 1')
+      team.shadow_code = nil
+      team.local_divisional_unit = local_divisional_unit
+      team.save
+    end
+
+    it "imports the Delius spreadsheet updates shadow code for the team and creates case information" do
       visit prison_summary_pending_path(prison)
       expect(page).to have_content("Add missing information")
       expect(page).to have_content(offender_no)

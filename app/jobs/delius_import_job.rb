@@ -106,7 +106,17 @@ private
     Rails.logger.info('[DELIUS] Processing decrypted file')
     processor = Delius::Processor.new(filename)
     update_team_names_and_ldus(processor)
+    update_shadow_team_associations(processor)
     upsert_delius_data_records(processor)
+  end
+
+  def update_shadow_team_associations(processor)
+    for_each_record(processor) do |record|
+      UpdateShadowTeamAssociationService.update(
+        shadow_code: record[:team_code],
+        shadow_name: record[:team]
+      )
+    end
   end
 
   def update_team_names_and_ldus(processor)
