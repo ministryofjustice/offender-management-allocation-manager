@@ -7,7 +7,7 @@
     <tr class="govuk-table__row" id="community_probation_service">
       <td class="govuk-table__cell">Community probation service</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= @prisoner.probation_service.presence || "Unknown" %>
+        <%= @prisoner.probation_service.presence || "N/A" %>
         <% unless auto_delius_import_enabled?(@prison.code) %>
           <% if editable %>
             <%= link_to( 'Change', edit_prison_case_information_path(@prison.code, @prisoner.offender_no), class: "govuk-link pull-right") %>
@@ -18,7 +18,7 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Local divisional unit (LDU)</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= @prisoner.ldu.try(:name) || "Unknown"%>
+        <%= @prisoner.ldu.try(:name) || "N/A"%>
       </td>
     </tr>
     <tr class="govuk-table__row">
@@ -27,14 +27,14 @@
         <% if @prisoner.ldu.try(:email_address) %>
           <%= mail_to(@prisoner.ldu.email_address, @prisoner.ldu.email_address) %>
         <% else %>
-          Unknown
+          N/A
         <% end %>
       </td>
     </tr>
     <tr class="govuk-table__row" id="team">
       <td class="govuk-table__cell">Team</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= @prisoner.team.presence || "Unknown"%>
+        <%= @prisoner.team.presence || "N/A"%>
         <% unless auto_delius_import_enabled?(@prison.code) %>
           <% if editable && @prisoner.team.presence %>
             <%= link_to( 'Change', edit_prison_case_information_path(@prison.code, @prisoner.offender_no), class: "govuk-link pull-right") %>

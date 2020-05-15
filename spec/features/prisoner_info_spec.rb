@@ -92,9 +92,10 @@ feature 'View a prisoner profile page' do
       visit prison_prisoner_path('LEI', 'G7998GJ')
 
       expect(page).not_to have_content('Bob Smith')
-      # Expect an Unknown for LDU Email and Team
+      # Expect an Unknown for Com name and N/A for LDU email
       within '#community_information' do
-        expect(page).to have_content('Unknown', count: 2)
+        expect(page).to have_content('Unknown', count: 1)
+        expect(page).to have_content('N/A', count: 1)
       end
 
       within '#community_probation_service' do
