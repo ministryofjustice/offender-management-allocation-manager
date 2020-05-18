@@ -3,6 +3,24 @@ require 'support/lib/mock_imap'
 require 'support/lib/mock_mail'
 require 'delius_import_job'
 
+RSpec.shared_examples "imports the Delius spreadsheet and creates case information" do
+  it "imports the Delius spreadsheet and creates case information" do
+    visit prison_summary_pending_path(prison)
+    expect(page).to have_content("Add missing information")
+    expect(page).to have_content(offender_no)
+
+    DeliusImportJob.perform_now
+
+    reload_page
+    expect(page).to have_content("Add missing information")
+    expect(page).not_to have_content(offender_no)
+
+    visit prison_summary_unallocated_path(prison)
+    expect(page).to have_content("Make allocations")
+    expect(page).to have_content(offender_no)
+  end
+end
+
 feature "Delius import feature" do
   let(:stub_auth_host) { Rails.configuration.nomis_oauth_host }
   let(:stub_api_host) { "#{stub_auth_host}/elite2api/api" }
@@ -56,21 +74,7 @@ feature "Delius import feature" do
       create(:team, code: 'A', name: 'NPS - Team 1')
     end
 
-    it "imports the Delius spreadsheet and creates case information" do
-      visit prison_summary_pending_path(prison)
-      expect(page).to have_content("Add missing information")
-      expect(page).to have_content(offender_no)
-
-      DeliusImportJob.perform_now
-
-      reload_page
-      expect(page).to have_content("Add missing information")
-      expect(page).not_to have_content(offender_no)
-
-      visit prison_summary_unallocated_path(prison)
-      expect(page).to have_content("Make allocations")
-      expect(page).to have_content(offender_no)
-    end
+    include_examples "imports the Delius spreadsheet and creates case information"
   end
 
   context "when the team is not associated with an LDU" do
@@ -82,21 +86,7 @@ feature "Delius import feature" do
       create(:local_divisional_unit, code: 'N01TRF')
     end
 
-    it "imports the Delius spreadsheet and creates case information" do
-      visit prison_summary_pending_path(prison)
-      expect(page).to have_content("Add missing information")
-      expect(page).to have_content(offender_no)
-
-      DeliusImportJob.perform_now
-
-      reload_page
-      expect(page).to have_content("Add missing information")
-      expect(page).not_to have_content(offender_no)
-
-      visit prison_summary_unallocated_path(prison)
-      expect(page).to have_content("Make allocations")
-      expect(page).to have_content(offender_no)
-    end
+    include_examples "imports the Delius spreadsheet and creates case information"
 
     it "does not attempt to process the active team as if it were a shadow team" do
       expect(Rails.logger).not_to receive(:error)
@@ -114,21 +104,7 @@ feature "Delius import feature" do
       team.save
     end
 
-    it "imports the Delius spreadsheet updates shadow code for the team and creates case information" do
-      visit prison_summary_pending_path(prison)
-      expect(page).to have_content("Add missing information")
-      expect(page).to have_content(offender_no)
-
-      DeliusImportJob.perform_now
-
-      reload_page
-      expect(page).to have_content("Add missing information")
-      expect(page).not_to have_content(offender_no)
-
-      visit prison_summary_unallocated_path(prison)
-      expect(page).to have_content("Make allocations")
-      expect(page).to have_content(offender_no)
-    end
+    include_examples "imports the Delius spreadsheet and creates case information"
 
     it "does not attempt to process the shadow team as if it were an active team" do
       expect(Rails.logger).not_to receive(:error)
