@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 feature 'case information feature' do
-  it 'adds tiering and case information for a prisoner', :raven_intercept_exception, vcr: { cassette_name: :case_information_feature } do
+  it 'adds tiering and case information for a prisoner', vcr: { cassette_name: :case_information_feature } do
     # This NOMIS id needs to appear on the first page of 'missing information'
     nomis_offender_id = 'G2911GD'
 
@@ -42,7 +42,7 @@ feature 'case information feature' do
     expect(page).to have_selector('h1', text: 'Add missing information')
   end
 
-  it 'complains if allocation data is missing', :raven_intercept_exception, vcr: { cassette_name: :case_information_missing_case_feature } do
+  it 'complains if allocation data is missing', vcr: { cassette_name: :case_information_missing_case_feature } do
     nomis_offender_id = 'G1821VA'
 
     signin_user
@@ -57,7 +57,7 @@ feature 'case information feature' do
     expect(page).to have_content("Select yes if the prisoner’s last known address was in Wales")
   end
 
-  it 'complains if all data is missing', :raven_intercept_exception, vcr: { cassette_name: :case_information_missing_all_feature } do
+  it 'complains if all data is missing', vcr: { cassette_name: :case_information_missing_all_feature } do
     nomis_offender_id = 'G1821VA'
 
     signin_user
@@ -72,7 +72,7 @@ feature 'case information feature' do
     expect(page).to have_content("Select yes if the prisoner’s last known address was in Wales")
   end
 
-  it 'complains if tier data is missing', :raven_intercept_exception, vcr: { cassette_name: :case_information_missing_tier_feature } do
+  it 'complains if tier data is missing', vcr: { cassette_name: :case_information_missing_tier_feature } do
     nomis_offender_id = 'G1821VA'
 
     signin_user
@@ -86,7 +86,7 @@ feature 'case information feature' do
     expect(page).to have_content("Select the prisoner’s tier")
   end
 
-  it 'allows editing case information for a prisoner', :raven_intercept_exception, vcr: { cassette_name: :case_information_editing_feature } do
+  it 'allows editing case information for a prisoner', vcr: { cassette_name: :case_information_editing_feature } do
     nomis_offender_id = 'G1821VA'
 
     signin_user
@@ -131,7 +131,7 @@ feature 'case information feature' do
     expect(current_url).to have_content("/prisons/LEI/summary/pending?page=3&sort=last_name+desc")
   end
 
-  it 'does not show update link on view only case info', :raven_intercept_exception,
+  it 'does not show update link on view only case info',
      vcr: { cassette_name: :case_information_no_update_feature } do
     # When auto-delius is on there should be no update link to modify the case info
     # as it may not exist yet. We run this test with an indeterminate and a determine offender
