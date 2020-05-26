@@ -35,7 +35,7 @@ class ResponsibilityService
 private
 
   def self.standard_rules(offender)
-    if nps_case?(offender) || offender.indeterminate_sentence?
+    if offender.nps_case? || offender.indeterminate_sentence?
       nps_rules(offender)
     else
       crc_rules(offender)
@@ -205,10 +205,6 @@ private
 
   def self.welsh_offender?(offender)
     offender.welsh_offender == true
-  end
-
-  def self.nps_case?(offender)
-    offender.nps_case?
   end
 
   def self.determinate_with_no_release_dates?(offender)
