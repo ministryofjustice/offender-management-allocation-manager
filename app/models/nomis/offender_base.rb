@@ -84,7 +84,7 @@ module Nomis
     end
 
     def pom_responsibility
-      ResponsibilityService.calculate_pom_responsibility(self)
+      @pom_responsibility ||= ResponsibilityService.calculate_pom_responsibility(self)
     end
 
     def sentence_start_date
@@ -163,7 +163,11 @@ module Nomis
   private
 
     def handover
-      @handover ||= HandoverDateService.handover(self)
+      @handover ||= if pom_responsibility&.custody?
+                      HandoverDateService.handover(self)
+                    else
+                      HandoverDateService::NO_HANDOVER_DATE
+                    end
     end
   end
 end
