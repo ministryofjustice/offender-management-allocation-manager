@@ -44,8 +44,11 @@ VCR.configure do |config|
   config.hook_into :webmock
   config.configure_rspec_metadata!
   config.allow_http_connections_when_no_cassette = true
+  # weirdly this assignment is implemented as a merge in VCR, so it only
+  # overwrites the specified configuration options
   config.default_cassette_options = {
-    record: :all,
+    # the default in :once, which seems to mess-up our cassette re-use
+    record: :new_episodes,
     match_requests_on: [
       :method,
       :uri,
