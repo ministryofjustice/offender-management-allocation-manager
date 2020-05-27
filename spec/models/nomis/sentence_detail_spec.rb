@@ -57,11 +57,12 @@ describe Nomis::SentenceDetail, model: true do
         subject.nomis_post_recall_release_date = date
         subject.nomis_post_recall_release_override_date = override
       end
-  
+
       it "overrides" do
         expect(subject.nomis_post_recall_release_date).to eq(override)
       end
     end
+
     context "without override" do
       before do
         subject.nomis_post_recall_release_date = date
@@ -91,7 +92,7 @@ describe Nomis::SentenceDetail, model: true do
         expect(subject.post_recall_release_date).to eq(earliest_date)
       end
     end
-    
+
     context "when actual_parole_date comes after post_recall_release_date" do
       let(:actual_parole_date) { latest_date }
       let(:nomis_post_recall_release_date) { earliest_date }

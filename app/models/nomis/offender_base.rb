@@ -21,7 +21,7 @@ module Nomis
                   :ldu, :team
 
     def convicted?
-      convicted_status == "Convicted"
+      convicted_status == 'Convicted'
     end
 
     def sentenced?

@@ -19,8 +19,7 @@ module Nomis
                 :conditional_release_override_date,
                 :actual_parole_date,
                 :nomis_post_recall_release_date,
-                :nomis_post_recall_release_override_date,
-
+                :nomis_post_recall_release_override_date
 
     def automatic_release_date
       @automatic_release_override_date.presence || @automatic_release_date
@@ -33,7 +32,7 @@ module Nomis
     def post_recall_release_date
       post_recall_release_date = nomis_post_recall_release_date
 
-      return post_recall_release_date unless @actual_parole_date.present?
+      return post_recall_release_date if @actual_parole_date.blank?
 
       if @actual_parole_date.before?(post_recall_release_date)
         @actual_parole_date
@@ -75,12 +74,13 @@ module Nomis
       "#{last_name}, #{first_name}".titleize
     end
 
+    # rubocop:disable Metrics/MethodLength
     def self.from_json(payload)
       SentenceDetail.new.tap { |obj|
         obj.first_name = payload['firstName']
         obj.last_name = payload['lastName']
 
-        obj.parole_eligibility_date = deserialise_date(payload, 'paroleEligibilityDate',)
+        obj.parole_eligibility_date = deserialise_date(payload, 'paroleEligibilityDate')
         obj.release_date = deserialise_date(payload, 'releaseDate')
         obj.sentence_start_date = deserialise_date(payload, 'sentenceStartDate')
         obj.tariff_date = deserialise_date(payload, 'tariffDate')
@@ -106,5 +106,6 @@ module Nomis
         )
       }
     end
+    # rubocop:enable Metrics/MethodLength
   end
 end
