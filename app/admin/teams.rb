@@ -13,4 +13,18 @@ ActiveAdmin.register Team do
   #   permitted << :other if params[:action] == 'create' && current_user.admin?
   #   permitted
   # end
+  index do
+    selectable_column
+    id_column
+    column :name
+    column :code
+    column 'Shadow code', :shadow_code
+    column 'LDU', :local_divisional_unit
+    column 'Offenders' do |team|
+      team.case_information.count
+    end
+    column 'Created at', :created_at
+    column 'Updated at', :updated_at
+    actions
+  end
 end
