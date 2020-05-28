@@ -7,7 +7,7 @@
 class AllocatedOffender
   delegate :last_name, :full_name, :earliest_release_date,
            :sentence_start_date, :tier, to: :@offender
-  delegate :updated_at, :nomis_offender_id, :primary_pom_allocated_at,
+  delegate :updated_at, :nomis_offender_id, :primary_pom_allocated_at, :prison,
            to: :@allocation
 
   attr_reader :offender
@@ -16,6 +16,10 @@ class AllocatedOffender
     @staff_id = staff_id
     @allocation = allocation
     @offender = offender
+  end
+
+  def latest_movement_date
+    @offender.latest_movement&.create_date_time&.to_date
   end
 
   def pom_responsibility

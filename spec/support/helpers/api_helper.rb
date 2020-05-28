@@ -68,7 +68,7 @@ module ApiHelper
     # and if you provide a booking, that the id matches between the offender and booking hashes.
     elite2listapi = "#{T3}/locations/description/#{prison}/inmates?convictedStatus=Convicted&returnCategory=true"
     elite2bookingsapi = "#{T3}/offender-sentences/bookings"
-    elite2latestmove = "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/movements/offenders?latestOnly=true&movementTypes=TAP"
+    elite2latestmove = "#{T3}/movements/offenders?latestOnly=false&movementTypes=TAP"
 
     # Stub the call that will get the total number of records
     stub_request(:get, elite2listapi).to_return(

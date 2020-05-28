@@ -68,7 +68,20 @@ RSpec.describe CaseloadController, type: :controller do
     let(:offenders) { build_list(:nomis_offender, 3).sort_by { |x| x.fetch(:lastName) } }
 
     before do
-      stub_offenders_for_prison(prison, offenders)
+      # we need 3 data points - 1 in, 1 out on ROTL, 1 out on ROTL and returned.
+      movements = [
+        { offenderNo: offenders.first.fetch(:offenderNo),
+          directionCode: 'OUT',
+          createDateTime: today },
+        { offenderNo: offenders.last.fetch(:offenderNo),
+          directionCode: 'OUT',
+          createDateTime: yesterday },
+        { offenderNo: offenders.last.fetch(:offenderNo),
+          directionCode: 'IN',
+          createDateTime: today }
+      ]
+
+      stub_offenders_for_prison(prison, offenders, movements)
 
       # Need to create history records because AllocatedOffender#new_case? doesn't cope otherwise
       offenders.each do |offender|

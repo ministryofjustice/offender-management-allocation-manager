@@ -36,7 +36,6 @@
       </div>
     </div>
 
-
     <div class="govuk-grid-column-one-quarter">
       <div class="govuk-body">Working pattern</div>
       <div class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24"><%= working_pattern_name(@pom.working_pattern) %></div>
@@ -63,6 +62,12 @@
         <%= sort_arrow('last_name') %>
       </th>
       <th class="govuk-table__header" scope="col">
+        <a href="<%= sort_link('latest_movement_date') %>">
+          Location
+        </a>
+        <%= sort_arrow('latest_movement_date') %>
+      </th>
+      <th class="govuk-table__header" scope="col">
         <a href="<%= sort_link('tier') %>">
         Tier
         </a>
@@ -86,18 +91,20 @@
         </a>
         <%= sort_arrow('pom_responsibility') %>
       </th>
-      <th class="govuk-table__header" scope="col">Action</th>
     </tr>
     </thead>
     <tbody class="govuk-table__body">
     <% @allocations.each_with_index do |offender, i| %>
       <tr class="govuk-table__row offender_row_<%= i %>">
-        <td aria-label="Prisoner name" class="govuk-table__cell ">
-          <%= highlight(offender.full_name, @q) %>
+        <td aria-label="Prisoner name" class="govuk-table__cell">
+          <%= link_to(highlight(offender.full_name, @q), prison_prisoner_path(@prison.code, offender.nomis_offender_id), class: "govuk-link" ) %>
           <br/>
           <span class='govuk-hint govuk-!-margin-bottom-0'>
             <%= highlight(offender.nomis_offender_id, @q) %>
           </span>
+        </td>
+        <td aria-label="Location" class="govuk-table__cell">
+          <%= offender.latest_movement_date.nil? ? PrisonService.name_for(offender.prison) : "Temporary absence (out #{offender.latest_movement_date})" %>
         </td>
         <td aria-label="Tier" class="govuk-table__cell tier">
           <%= offender.tier %>
@@ -105,9 +112,6 @@
         <td aria-label="Earliest release date" class="govuk-table__cell "><%= format_date(offender.earliest_release_date, replacement: "Unknown") %></td>
         <td aria-label="Allocation date" class="govuk-table__cell "><%= format_date(offender.primary_pom_allocated_at) %></td>
         <td aria-label="Role" class="govuk-table__cell "><%= offender.pom_responsibility %></td>
-        <td aria-label="Action" class="govuk-table__cell ">
-          <%= link_to('View', prison_prisoner_path(@prison.code, offender.nomis_offender_id), class: "govuk-link" ) %>
-        </td>
       </tr>
     <% end %>
     </tbody>

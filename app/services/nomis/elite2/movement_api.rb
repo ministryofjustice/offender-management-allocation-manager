@@ -18,9 +18,9 @@ module Nomis
       end
 
       def self.movements_for(offender_no)
-        route = '/movements/offenders?movementTypes=ADM&movementTypes=TRN&movementTypes=REL&latestOnly=false'
+        route = '/movements/offenders'
 
-        data = e2_client.post(route, [offender_no])
+        data = e2_client.post(route, [offender_no], queryparams: { latestOnly: false, movementTypes: %w[ADM TRN REL] })
         data.sort_by { |k| k['createDateTime'] }.map { |movement|
           api_deserialiser.deserialise(Nomis::Movement, movement)
         }
@@ -28,13 +28,15 @@ module Nomis
 
       def self.admissions_for(offender_nos)
         # admissions need to include transfers from one place to another
-        route = '/movements/offenders?movementTypes=ADM&movementTypes=TRN&latestOnly=false'
+        route = '/movements/offenders'
 
-        cache_key = "#{route}_#{Digest::SHA256.hexdigest(offender_nos.to_s)}"
+        cache_key = "#{route}_#{Digest::SHA256.hexdigest(offender_nos.to_s)}_ADM_TRN"
 
         Rails.cache.fetch(cache_key,
                           expires_in: Rails.configuration.cache_expiry) do
-          data = e2_client.post(route, offender_nos).group_by { |x| x['offenderNo'] }.values
+          data = e2_client.post(route, offender_nos,
+                                queryparams: { latestOnly: false, movementTypes: %w[ADM TRN] }).
+            group_by { |x| x['offenderNo'] }.values
           movements = data.map { |d|
             d.sort_by { |k| k['createDateTime'] }.map { |movement|
               api_deserialiser.deserialise(Nomis::Movement, movement)
@@ -42,6 +44,25 @@ module Nomis
           }
           # return a hash of offender_no => [Nomis::Movement]
           movements.index_by { |m| m.first.offender_no }
+        end
+      end
+
+      def self.latest_temp_movement_for(offender_nos)
+        route = '/movements/offenders'
+
+        cache_key = "#{route}_#{Digest::SHA256.hexdigest(offender_nos.to_s)}_TAP"
+
+        Rails.cache.fetch(cache_key,
+                          expires_in: Rails.configuration.cache_expiry) do
+          data = e2_client.post(route, offender_nos,
+                                queryparams: { latestOnly: false, movementTypes: %w[TAP] }).
+            group_by { |x| x['offenderNo'] }.values
+          movements = data.map { |d|
+            movement = d.max_by { |k| k['createDateTime'] }
+            api_deserialiser.deserialise(Nomis::Movement, movement)
+          }
+          # only return OUT TAP movements - if the last was an IN, then they haven't moved.
+          movements.select { |m| m.direction_code == 'OUT' }.index_by(&:offender_no)
         end
       end
     end

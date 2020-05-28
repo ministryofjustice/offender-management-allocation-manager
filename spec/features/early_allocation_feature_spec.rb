@@ -25,8 +25,8 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
   end
 
   context 'without switch' do
-    it 'shouldnt show the section' do
-      click_link 'View'
+    it 'does not show the section' do
+      click_link 'Abbella, Ozullirn'
       expect(page).not_to have_content 'Early allocation eligibility'
     end
   end
@@ -44,7 +44,7 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
 
     context 'without existing early allocation' do
       before do
-        click_link 'View'
+        click_link 'Abbella, Ozullirn'
         expect(page).to have_content 'Early allocation eligibility'
         click_link 'Assess eligibility'
       end
@@ -184,7 +184,7 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
         create(:early_allocation, :discretionary,
                nomis_offender_id: nomis_offender_id,
                community_decision: true)
-        click_link 'View'
+        click_link 'Abbella, Ozullirn'
       end
 
       it 'has a re-assess link' do
