@@ -3,7 +3,7 @@
 class CaseInformation < ApplicationRecord
   self.table_name = 'case_information'
 
-  belongs_to :team, optional: true
+  belongs_to :team, optional: true, counter_cache: :case_information_count
 
   has_many :early_allocations,
            foreign_key: :nomis_offender_id,
