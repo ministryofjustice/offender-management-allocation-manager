@@ -20,8 +20,8 @@ ActiveAdmin.register Team do
     column :code
     column 'Shadow code', :shadow_code
     column 'LDU', :local_divisional_unit
-    column 'Offenders' do |team|
-      team.case_information.count
+    column 'Offenders', sortable: :case_information_count do |team|
+      team.case_information.size
     end
     column 'Created at', :created_at
     column 'Updated at', :updated_at
