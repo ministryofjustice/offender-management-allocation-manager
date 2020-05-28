@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_28_112343) do
+ActiveRecord::Schema.define(version: 2020_05_28_165050) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -173,6 +173,7 @@ ActiveRecord::Schema.define(version: 2020_05_28_112343) do
     t.integer "case_information_count", default: 0, null: false
     t.index ["code"], name: "index_teams_on_code"
     t.index ["local_divisional_unit_id"], name: "index_teams_on_local_divisional_unit_id"
+    t.index ["shadow_code"], name: "index_teams_on_shadow_code"
   end
 
   create_table "tier_changes", force: :cascade do |t|
