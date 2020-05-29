@@ -28,98 +28,10 @@ AllCops:
     - 'spec/dummy/db/**/*'
     - 'config/routes.rb'
 
-  DisplayCopNames: {}
-
-Rails:
-  Enabled: true
-
-# private/protected/public
-Layout/AccessModifierIndentation:
-  EnforcedStyle: outdent
-
-# Just indent parameters by two spaces. It's less volatile if methods change,
-# and there's less busy work lining things up.
-Layout/ParameterAlignment:
-  EnforcedStyle: with_fixed_indentation
-
-Style/AsciiComments:
-  Enabled: false
-
-# Use Weirich style
-Style/BlockDelimiters:
-  EnforcedStyle: semantic
-  FunctionalMethods:
-    - before
-    - let
-    - let!
-    - subject
-    - watch
-    - expect
-
-# Allow ===. It's useful.
-Style/CaseEquality:
-  Enabled: false
-
-Style/CollectionMethods:
-  PreferredMethods:
-    inject: 'inject'
-    reduce: 'inject'
-
-# Chain methods with trailing dots.
-Layout/DotPosition:
-  EnforcedStyle: trailing
-
-# Percent-formatting and hash interpolation both have their place. Don't
-# enforce any particular one.
-Style/FormatString:
-  Enabled: false
-
 Style/MultilineBlockChain:
   Enabled: false
 
-# It's not really clearer to replace every if with a return if.
-Style/GuardClause:
-  Enabled: false
-
 Style/SymbolArray:
-  Enabled: false
-
-Style/SymbolProc:
-  Exclude:
-    - 'spec/factories/**/*'
-
-# You can't use attr_reader to define a foo? method from @foo.
-Style/TrivialAccessors:
-  AllowPredicates: true
-
-Naming/FileName:
-  Enabled: false
-
-# Default is 100
-Metrics/ClassLength:
-  Max: 200
-
-Metrics/LineLength:
-  Max: 120
-  Exclude:
-    - 'spec/**/*'
-
-Metrics/PerceivedComplexity:
-  Max: 10
-
-Metrics/CyclomaticComplexity:
-  Max: 10
-
-# Don't worry about long methods in specs.
-Metrics/MethodLength:
-  Max: 20
-  Exclude:
-    - 'spec/**/*'
-    - 'app/helpers/form_elements_helper.rb'
-    - 'app/metrics/**/*' # Some very long SQL based methods there.
-
-# Don't worry about the complexity of spec methods
-Metrics/AbcSize:
   Enabled: false
 
 # Enforce single quotes everywhere except in specs (because there's a lot of
@@ -131,37 +43,9 @@ Style/StringLiterals:
   Exclude:
     - 'spec/**/*'
 
-# Prefer sensible naming to comments everywhere.
-Style/Documentation:
-  Description: Document classes and non-namespace modules.
-  Enabled: false
-
-Style/DoubleNegation:
-  Enabled: false
-
-# Would enforce do_y if x over if x / do y / end. As with GuardClause above,
-# this enforces code organisation that doesn't necesarily make things clearer.
-Style/IfUnlessModifier:
-  Enabled: false
-
-# Don't allow safe assignment in conditions.
+## Don't allow safe assignment in conditions.
 Lint/AssignmentInCondition:
   AllowSafeAssignment: false
-
-# Just a preference to use %w[] over %w()
-Style/PercentLiteralDelimiters:
-  PreferredDelimiters:
-    '%i': '[]'
-    '%w': '[]'
-    '%W': '[]'
-    '%': '{}'
-
-Style/ClassAndModuleChildren:
-  Enabled: false
-
-# This encourages bad style IMHO
-Rails/Delegate:
-  Enabled: false
 
 RSpec/AnyInstance:
   Enabled: false
@@ -170,15 +54,6 @@ Bundler/OrderedGems:
   Enabled: false
 
 Metrics/BlockLength:
-  Enabled: false
-
-Performance/CompareWithBlock:
-  Enabled: false
-
-Performance/RangeInclude:
-  Enabled: false
-
-Performance/TimesMap:
   Enabled: false
 
 RSpec/EmptyExampleGroup:
@@ -214,9 +89,6 @@ RSpec/NamedSubject:
 RSpec/NestedGroups:
   Enabled: false
 
-RSpec/RepeatedExample:
-  Enabled: false
-
 RSpec/ScatteredSetup:
   Enabled: false
 
@@ -229,16 +101,7 @@ RSpec/VerifiedDoubles:
 Rails/FilePath:
   Enabled: false
 
-Rails/HttpPositionalArguments:
-  Enabled: false
-
 Rails/OutputSafety:
-  Enabled: false
-
-Rails/SkipsModelValidations:
-  Enabled: false
-
-Rails/ApplicationRecord:
   Enabled: false
 
 Rails/ApplicationJob:
@@ -247,25 +110,10 @@ Rails/ApplicationJob:
 Security/YAMLLoad:
   Enabled: false
 
-Style/Alias:
-  Enabled: false
-
-Layout/ClosingParenthesisIndentation:
-  Enabled: false
-
 Style/ConditionalAssignment:
   Enabled: false
 
-Style/EmptyCaseCondition:
-  Enabled: false
-
 Layout/ExtraSpacing:
-  Enabled: false
-
-Style/FrozenStringLiteralComment:
-  Enabled: false
-
-Layout/FirstArrayElementIndentation:
   Enabled: false
 
 Layout/MultilineArrayBraceLayout:
@@ -275,9 +123,6 @@ Layout/MultilineHashBraceLayout:
   Enabled: false
 
 Layout/MultilineMethodCallBraceLayout:
-  Enabled: false
-
-Layout/MultilineMethodCallIndentation:
   Enabled: false
 
 Layout/MultilineOperationIndentation:
@@ -295,16 +140,7 @@ Style/NumericLiteralPrefix:
 Style/NumericPredicate:
   Enabled: false
 
-Style/SignalException:
-  Enabled: false
-
-Layout/SpaceAroundKeyword:
-  Enabled: false
-
 Layout/SpaceBeforeBlockBraces:
-  Enabled: false
-
-Layout/SpaceInsidePercentLiteralDelimiters:
   Enabled: false
 
 Style/TernaryParentheses:
@@ -316,13 +152,10 @@ Lint/UselessAccessModifier:
 Lint/IneffectiveAccessModifier:
   Enabled: false
 
-Lint/AmbiguousBlockAssociation:
-  Enabled: false
-
 Capybara/FeatureMethods:
   Enabled: false
 
-# Below here is the set of failures against the govuk styles
+## Below here is the set of (arbitrary) failures against the govuk styles
 Style/WordArray:
   Enabled: false
 
