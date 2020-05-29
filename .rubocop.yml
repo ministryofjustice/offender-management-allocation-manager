@@ -54,13 +54,10 @@ Bundler/OrderedGems:
   Enabled: false
 
 Metrics/BlockLength:
-  Enabled: false
-
-RSpec/EmptyExampleGroup:
-  Enabled: false
+  Max: 38
 
 RSpec/ExampleLength:
-  Enabled: false
+  Max: 95
 
 RSpec/HookArgument:
   Enabled: false
@@ -81,13 +78,13 @@ RSpec/MessageSpies:
   Enabled: false
 
 RSpec/MultipleExpectations:
-  Enabled: false
+  Max: 13
 
 RSpec/NamedSubject:
   Enabled: false
 
 RSpec/NestedGroups:
-  Enabled: false
+  Max: 8
 
 RSpec/ScatteredSetup:
   Enabled: false

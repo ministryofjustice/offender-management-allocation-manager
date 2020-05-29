@@ -3,6 +3,7 @@
 require 'swagger_helper'
 
 # rubocop:disable RSpec/DescribeClass
+# rubocop:disable RSpec/EmptyExampleGroup
 # The DescribeClass cop has been disabled as it is insists that the describe
 # block contain the name of the tested class.  However rswag is using this
 # text as part of the API documentation generated from these tests.
@@ -99,4 +100,5 @@ describe 'Allocation API' do
     end
   end
 end
+# rubocop:enable RSpec/EmptyExampleGroup
 # rubocop:enable RSpec/DescribeClass
