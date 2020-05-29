@@ -46,7 +46,7 @@ private
       start_date.between?(Time.zone.today, one_month_time)
     }
 
-    upcoming_offenders.map{ |offender|
+    upcoming_offenders.map { |offender|
       responsibility = Responsibility.find_by(nomis_offender_id: offender.offender_no)
       OffenderPresenter.new(offender, responsibility)
     }

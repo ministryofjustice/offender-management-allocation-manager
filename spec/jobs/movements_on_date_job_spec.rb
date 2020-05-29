@@ -10,7 +10,7 @@ RSpec.describe MovementsOnDateJob, type: :job do
   end
 
   it 'deallocates' do
-    allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new.tap{ |o|
+    allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new.tap { |o|
       o.convicted_status = "Convicted"
       o.date_of_birth = "Tue, 17 Sep 1991"
       o.inprisonment_status = 'SENT03'

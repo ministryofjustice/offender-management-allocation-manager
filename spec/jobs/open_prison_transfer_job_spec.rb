@@ -41,7 +41,7 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
   end
 
   it 'does not send an email if the offender case_information is not NPS' do
-    allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new.tap{ |o|
+    allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new.tap { |o|
       o.prison_id = open_prison_code
       o.offender_no =  nomis_offender_id
       o.case_allocation = 'CRC'
@@ -53,7 +53,7 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
   end
 
   it 'does not send an email when no LDU email address' do
-    allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new.tap{ |o|
+    allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new.tap { |o|
       o.prison_id = open_prison_code
       o.offender_no =  nomis_offender_id
       o.case_allocation = 'NPS'
@@ -66,7 +66,7 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
   end
 
   it 'sends an email when there was no previous allocation' do
-    allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new.tap{ |o|
+    allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new.tap { |o|
       o.prison_id = open_prison_code
       o.offender_no =  nomis_offender_id
       o.case_allocation = 'NPS'
@@ -91,7 +91,7 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
   end
 
   it 'can use previous allocation details where they exist', versioning: true do
-    allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new.tap{ |o|
+    allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new.tap { |o|
       o.prison_id = open_prison_code
       o.offender_no =  nomis_offender_id
       o.case_allocation = 'NPS'
