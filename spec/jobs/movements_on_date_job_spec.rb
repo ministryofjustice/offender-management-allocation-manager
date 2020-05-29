@@ -28,7 +28,7 @@ RSpec.describe MovementsOnDateJob, type: :job do
     expect(alloc.primary_pom_nomis_id).not_to be_nil
     expect(alloc.secondary_pom_nomis_id).not_to be_nil
 
-    described_class.perform_now(Date.new(2019, 07, 1).to_s)
+    described_class.perform_now(Date.new(2019, 0o7, 1).to_s)
 
     alloc.reload
 

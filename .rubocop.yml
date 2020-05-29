@@ -119,9 +119,6 @@ Layout/MultilineOperationIndentation:
 Style/NestedParenthesizedCalls:
   Enabled: false
 
-Style/NumericLiteralPrefix:
-  Enabled: false
-
 Style/NumericPredicate:
   Enabled: false
 
@@ -140,7 +137,7 @@ Lint/IneffectiveAccessModifier:
 Capybara/FeatureMethods:
   Enabled: false
 
-## Below here is the set of (arbitrary) failures against the govuk styles
+# Below here is the set of (arbitrary) style failures against the govuk versions
 Style/WordArray:
   Enabled: false
 
