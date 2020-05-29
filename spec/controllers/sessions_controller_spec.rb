@@ -8,9 +8,10 @@ RSpec.describe SessionsController, type: :controller do
   let(:signon_identity) { double(SignonIdentity, to_session: sso_data) }
 
   describe '#create' do
+    subject(:create) { get :create, params: { provider: 'hmpps_sso' } }
+
     let(:auth_hash) { { 'info' => 'anything' } }
 
-    subject(:create) { get :create, params: { provider: 'hmpps_sso' } }
 
     before do
       request.env['omniauth.auth'] = auth_hash

@@ -2,15 +2,16 @@ require 'rails_helper'
 
 # rubocop:disable RSpec/FilePath
 describe OmniAuth::Strategies::HmppsSso do
+  subject(:strategy) do
+    described_class.new(app, 'client_id', 'secret')
+  end
+
   let(:app) {
     Rack::Builder.new do |b|
       b.run ->(_env) { [200, {}, ['Hello']] }
     end.to_app
   }
 
-  subject(:strategy) do
-    described_class.new(app, 'client_id', 'secret')
-  end
 
   context 'when methods' do
     context 'when #info' do
