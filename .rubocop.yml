@@ -101,9 +101,6 @@ Rails/FilePath:
 Rails/OutputSafety:
   Enabled: false
 
-Rails/ApplicationJob:
-  Enabled: false
-
 Security/YAMLLoad:
   Enabled: false
 
