@@ -85,11 +85,11 @@ class Allocation < ApplicationRecord
     self.secondary_pom_nomis_id = nil
     self.secondary_pom_name = nil
     self.recommended_pom_type = nil
-    if movement_type == Allocation::OFFENDER_RELEASED
-      self.event = DEALLOCATE_RELEASED_OFFENDER
-    else
-      self.event = DEALLOCATE_PRIMARY_POM
-    end
+    self.event = if movement_type == Allocation::OFFENDER_RELEASED
+                   DEALLOCATE_RELEASED_OFFENDER
+                 else
+                   DEALLOCATE_PRIMARY_POM
+                 end
     self.event_trigger = movement_type
 
     # This is triggered when an offender is released, and previously we

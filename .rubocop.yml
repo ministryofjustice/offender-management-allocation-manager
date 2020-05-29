@@ -101,9 +101,6 @@ Rails/OutputSafety:
 Security/YAMLLoad:
   Enabled: false
 
-Style/ConditionalAssignment:
-  Enabled: false
-
 Layout/ExtraSpacing:
   Enabled: false
 
