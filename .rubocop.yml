@@ -43,7 +43,7 @@ Style/StringLiterals:
   Exclude:
     - 'spec/**/*'
 
-## Don't allow safe assignment in conditions.
+# Don't allow safe assignment in conditions.
 Lint/AssignmentInCondition:
   AllowSafeAssignment: false
 
