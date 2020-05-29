@@ -168,4 +168,4 @@ SENTENCE_TYPES = {
   '14FTRHDC_ORA' => ['14 Day Fixed Term Recall from HDC', :determinate, :recall],
   'SEC236A' => ['Section 236A SOPC CJA03', :determinate, :non_recall],
   'LR_SEC236A' => ['LR - Section 236A SOPC CJA03', :determinate, :recall]
-}
+}.freeze

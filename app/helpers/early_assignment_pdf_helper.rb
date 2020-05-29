@@ -69,7 +69,7 @@ private
     crn: 'CRN number',
     reason: 'Detail about why this case needs to be referred early',
     approved: 'Approval from the Head of Offender Management Delivery'
-  }
+  }.freeze
 
   def add_assessment_info(pdf, early_assignment)
     info_hash = {}

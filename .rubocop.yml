@@ -125,9 +125,6 @@ Layout/MultilineMethodCallBraceLayout:
 Layout/MultilineOperationIndentation:
   Enabled: false
 
-Style/MutableConstant:
-  Enabled: false
-
 Style/NestedParenthesizedCalls:
   Enabled: false
 

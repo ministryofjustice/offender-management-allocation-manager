@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AuthHelper
   T3 = 'https://gateway.t3.nomis-api.hmpps.dsd.io'
   ACCESS_TOKEN = 'an access token'
