@@ -13,4 +13,27 @@ ActiveAdmin.register Team do
   #   permitted << :other if params[:action] == 'create' && current_user.admin?
   #   permitted
   # end
+
+  # Columns for index page
+  index do
+    selectable_column
+    id_column
+    column :name
+    column :code
+    column 'Shadow code', :shadow_code
+    column 'LDU', :local_divisional_unit
+    column 'Offenders', sortable: :case_information_count do |team|
+      team.case_information.size
+    end
+    column 'Created at', :created_at
+    column 'Updated at', :updated_at
+    actions
+  end
+
+  # Filter fields
+  filter :name
+  filter :code
+  filter :shadow_code
+  filter :local_divisional_unit, collection: proc { LocalDivisionalUnit.order(:name) }
+  filter :case_information_count, label: 'Offender count'
 end
