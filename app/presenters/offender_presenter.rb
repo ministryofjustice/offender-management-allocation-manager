@@ -15,8 +15,8 @@ class OffenderPresenter
            :awaiting_allocation_for, :allocated_pom_name, :allocation_date, :allocated_com_name,
            :tier, :parole_review_date, :crn, :convicted_status, :convicted?, :ldu,
            :handover_start_date, :responsibility_handover_date, :handover_reason, :prison_arrival_date,
-           :post_recall_release_date, :post_recall_release_override_date,
-           :over_18?, :recalled?, :sentenced?, :immigration_case?, :mappa_level,  to: :@offender
+           :licence_expiry_date, :post_recall_release_date,
+           :over_18?, :recalled?, :sentenced?, :immigration_case?, :mappa_level, to: :@offender
 
   def initialize(offender, responsibility)
     @offender = offender

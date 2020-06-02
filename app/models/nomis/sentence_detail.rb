@@ -8,16 +8,18 @@ module Nomis
                   :home_detention_curfew_eligibility_date,
                   :home_detention_curfew_actual_date,
                   :parole_eligibility_date,
-                  :post_recall_release_date,
-                  :post_recall_release_override_date,
                   :release_date,
                   :sentence_start_date,
-                  :tariff_date
+                  :tariff_date,
+                  :licence_expiry_date
 
     attr_writer :automatic_release_date,
                 :automatic_release_override_date,
                 :conditional_release_date,
-                :conditional_release_override_date
+                :conditional_release_override_date,
+                :actual_parole_date,
+                :nomis_post_recall_release_date,
+                :nomis_post_recall_release_override_date
 
     def automatic_release_date
       @automatic_release_override_date.presence || @automatic_release_date
@@ -25,6 +27,22 @@ module Nomis
 
     def conditional_release_date
       @conditional_release_override_date.presence || @conditional_release_date
+    end
+
+    def post_recall_release_date
+      post_recall_release_date = nomis_post_recall_release_date
+
+      return post_recall_release_date if @actual_parole_date.blank?
+
+      if @actual_parole_date.before?(post_recall_release_date)
+        @actual_parole_date
+      else
+        post_recall_release_date
+      end
+    end
+
+    def nomis_post_recall_release_date
+      @nomis_post_recall_release_override_date.presence || @nomis_post_recall_release_date
     end
 
     def earliest_release_date
@@ -67,8 +85,10 @@ module Nomis
         obj.sentence_start_date = deserialise_date(payload, 'sentenceStartDate')
         obj.tariff_date = deserialise_date(payload, 'tariffDate')
         obj.automatic_release_date = deserialise_date(payload, 'automaticReleaseDate')
-        obj.post_recall_release_date = deserialise_date(payload, 'postRecallReleaseDate')
-        obj.post_recall_release_override_date = deserialise_date(payload, 'postRecallReleaseOverrideDate')
+        obj.nomis_post_recall_release_date = deserialise_date(payload, 'postRecallReleaseDate')
+        obj.nomis_post_recall_release_override_date = deserialise_date(payload, 'postRecallReleaseOverrideDate')
+        obj.licence_expiry_date = deserialise_date(payload, 'licenceExpiryDate')
+        obj.actual_parole_date = deserialise_date(payload, 'actualParoleDate')
         obj.conditional_release_date = deserialise_date(
           payload, 'conditionalReleaseDate'
         )
