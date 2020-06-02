@@ -104,7 +104,7 @@ spec:
         - name: allocation-manager-metrics
           image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
           imagePullPolicy: Always
-          command: ['sh', '-c', "bundle exec prometheus_exporter"]
+          command: ['sh', '-c', "bundle exec prometheus_exporter --bind 0.0.0.0"]
           ports:
             - containerPort: 9394
           livenessProbe:
