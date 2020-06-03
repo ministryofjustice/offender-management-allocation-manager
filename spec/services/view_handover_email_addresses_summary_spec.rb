@@ -1,11 +1,9 @@
 require 'rails_helper'
 
-describe 'view handover email addresses summary' do
-  subject { ViewHandoverEmailAddressesSummary.new }
-
+describe ViewHandoverEmailAddressesSummary do
   let(:result) { subject.execute(offenders) }
 
-  context 'given an empty list of offenders' do
+  context 'with an empty list of offenders' do
     let(:offenders) { [] }
 
     it 'returns zero for each category' do
@@ -20,7 +18,7 @@ describe 'view handover email addresses summary' do
     end
   end
 
-  context 'given one offender with no associated case information' do
+  context 'with one offender and no associated case information' do
     let(:offenders) { [double(offender_no: 1)] }
 
     it 'returns the right counts' do
@@ -35,7 +33,7 @@ describe 'view handover email addresses summary' do
     end
   end
 
-  context 'given two offenders with no case information' do
+  context 'with two offenders and no case information' do
     let(:offenders) { [double(offender_no: 1), double(offender_no: 2)] }
 
     it 'returns the right counts' do
@@ -50,7 +48,7 @@ describe 'view handover email addresses summary' do
     end
   end
 
-  context 'given an offender with case information with no team link' do
+  context 'with an offender that has case information but no team link' do
     let(:offenders) { [double(offender_no: 1)] }
 
     before { create(:case_information, nomis_offender_id: 1, team: nil) }
@@ -67,7 +65,7 @@ describe 'view handover email addresses summary' do
     end
   end
 
-  context 'given an offender with case information with an orphaned team link' do
+  context 'with an offender that has case information with an orphaned team link' do
     let(:offenders) { [double(offender_no: 1)] }
 
     before do
@@ -87,7 +85,7 @@ describe 'view handover email addresses summary' do
     end
   end
 
-  context 'given an offender that cannot be linked to a local delivery unit' do
+  context 'with an offender that cannot be linked to a local delivery unit' do
     let(:offenders) { [double(offender_no: 1)] }
 
     before do
@@ -108,7 +106,7 @@ describe 'view handover email addresses summary' do
     end
   end
 
-  context 'given an offender that is linked to a local delivery unit with no email' do
+  context 'with an offender that is linked to a local delivery unit which has no email address' do
     let(:offenders) { [double(offender_no: 1)] }
 
     before do
@@ -131,7 +129,7 @@ describe 'view handover email addresses summary' do
     end
   end
 
-  context 'given an offender with a local delivery unit email' do
+  context 'with an offender that has a local delivery unit email address' do
     let(:offenders) { [double(offender_no: 1)] }
 
     before do
