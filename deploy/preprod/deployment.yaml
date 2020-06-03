@@ -69,10 +69,10 @@ spec:
                   name: allocation-rds-instance-output
                   key: postgres_user
             - name: REDIS_URL
-                valueFrom:
-                  secretKeyRef:
-                    name: elasticache-offender-management-allocation-manager-token-cache-preprod
-                    key: url
+              valueFrom:
+                secretKeyRef:
+                  name: elasticache-offender-management-allocation-manager-token-cache-preprod
+                  key: url
         - name: allocation-manager-sidekiq
           image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
           imagePullPolicy: Always
@@ -107,10 +107,10 @@ spec:
                   name: allocation-rds-instance-output
                   key: postgres_user
             - name: REDIS_URL
-                valueFrom:
-                  secretKeyRef:
-                    name: elasticache-offender-management-allocation-manager-token-cache-preprod
-                    key: url
+              valueFrom:
+                secretKeyRef:
+                  name: elasticache-offender-management-allocation-manager-token-cache-preprod
+                  key: url
         - name: allocation-manager-metrics
           image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
           imagePullPolicy: Always
