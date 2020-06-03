@@ -16,10 +16,10 @@ class ViewHandoverEmailAddressesSummary
       :missing_team_link
     elsif missing_team_information?(case_info)
       :missing_team_information
-    elsif missing_local_delivery_unit?(case_info)
-      :missing_local_delivery_unit
+    elsif missing_local_divisional_unit?(case_info)
+      :missing_local_divisional_unit
     elsif missing_email?(case_info)
-      :missing_local_delivery_unit_email
+      :missing_local_divisional_unit_email
     else
       :has_email_address
     end
@@ -37,7 +37,7 @@ class ViewHandoverEmailAddressesSummary
     case_info.team.blank?
   end
 
-  def missing_local_delivery_unit?(case_info)
+  def missing_local_divisional_unit?(case_info)
     case_info.team.local_divisional_unit_id.blank?
   end
 
@@ -51,8 +51,8 @@ class ViewHandoverEmailAddressesSummary
       missing_delius_record: 0,
       missing_team_link: 0,
       missing_team_information: 0,
-      missing_local_delivery_unit: 0,
-      missing_local_delivery_unit_email: 0,
+      missing_local_divisional_unit: 0,
+      missing_local_divisional_unit_email: 0,
     }
   end
 end

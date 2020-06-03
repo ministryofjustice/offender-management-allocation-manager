@@ -12,8 +12,8 @@ describe ViewHandoverEmailAddressesSummary do
         missing_delius_record: 0,
         missing_team_link: 0,
         missing_team_information: 0,
-        missing_local_delivery_unit: 0,
-        missing_local_delivery_unit_email: 0
+        missing_local_divisional_unit: 0,
+        missing_local_divisional_unit_email: 0
                            )
     end
   end
@@ -27,8 +27,8 @@ describe ViewHandoverEmailAddressesSummary do
         missing_delius_record: 1,
         missing_team_link: 0,
         missing_team_information: 0,
-        missing_local_delivery_unit: 0,
-        missing_local_delivery_unit_email: 0
+        missing_local_divisional_unit: 0,
+        missing_local_divisional_unit_email: 0
                            )
     end
   end
@@ -42,8 +42,8 @@ describe ViewHandoverEmailAddressesSummary do
         missing_delius_record: 2,
         missing_team_link: 0,
         missing_team_information: 0,
-        missing_local_delivery_unit: 0,
-        missing_local_delivery_unit_email: 0
+        missing_local_divisional_unit: 0,
+        missing_local_divisional_unit_email: 0
                            )
     end
   end
@@ -59,8 +59,8 @@ describe ViewHandoverEmailAddressesSummary do
         missing_delius_record: 0,
         missing_team_link: 1,
         missing_team_information: 0,
-        missing_local_delivery_unit: 0,
-        missing_local_delivery_unit_email: 0
+        missing_local_divisional_unit: 0,
+        missing_local_divisional_unit_email: 0
                            )
     end
   end
@@ -79,13 +79,13 @@ describe ViewHandoverEmailAddressesSummary do
         missing_delius_record: 0,
         missing_team_link: 0,
         missing_team_information: 1,
-        missing_local_delivery_unit: 0,
-        missing_local_delivery_unit_email: 0
+        missing_local_divisional_unit: 0,
+        missing_local_divisional_unit_email: 0
                            )
     end
   end
 
-  context 'with an offender that cannot be linked to a local delivery unit' do
+  context 'with an offender that cannot be linked to a local divisional unit' do
     let(:offenders) { [double(offender_no: 1)] }
 
     before do
@@ -100,13 +100,13 @@ describe ViewHandoverEmailAddressesSummary do
         missing_delius_record: 0,
         missing_team_link: 0,
         missing_team_information: 0,
-        missing_local_delivery_unit: 1,
-        missing_local_delivery_unit_email: 0
+        missing_local_divisional_unit: 1,
+        missing_local_divisional_unit_email: 0
                            )
     end
   end
 
-  context 'with an offender that is linked to a local delivery unit which has no email address' do
+  context 'with an offender that is linked to a local divisional unit which has no email address' do
     let(:offenders) { [double(offender_no: 1)] }
 
     before do
@@ -123,13 +123,13 @@ describe ViewHandoverEmailAddressesSummary do
         missing_delius_record: 0,
         missing_team_link: 0,
         missing_team_information: 0,
-        missing_local_delivery_unit: 0,
-        missing_local_delivery_unit_email: 1
+        missing_local_divisional_unit: 0,
+        missing_local_divisional_unit_email: 1
                            )
     end
   end
 
-  context 'with an offender that has a local delivery unit email address' do
+  context 'with an offender that has a local divisional unit email address' do
     let(:offenders) { [double(offender_no: 1)] }
 
     before do
@@ -143,8 +143,8 @@ describe ViewHandoverEmailAddressesSummary do
         missing_delius_record: 0,
         missing_team_link: 0,
         missing_team_information: 0,
-        missing_local_delivery_unit: 0,
-        missing_local_delivery_unit_email: 0
+        missing_local_divisional_unit: 0,
+        missing_local_divisional_unit_email: 0
                            )
     end
   end
