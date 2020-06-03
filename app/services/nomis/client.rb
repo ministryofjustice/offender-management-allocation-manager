@@ -39,11 +39,11 @@ module Nomis
       # Elite2 can return a 204 to mean empty results, and we don't know if
       # it is meant to be a {} or a []. For now, we are going to use nil and
       # let the caller handle it.
-      if response.status == 204
-        data = nil
-      else
-        data = JSON.parse(response.body)
-      end
+      data = if response.status == 204
+               nil
+             else
+               JSON.parse(response.body)
+             end
 
       if block_given?
         yield data, response

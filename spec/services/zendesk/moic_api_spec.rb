@@ -1,10 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe Zendesk::MoicApi do
+  subject { described_class.new(zendes_moic_client) }
+
   let(:zendesk_api_client) { double(ZendeskAPI::Client) }
   let(:zendes_moic_client) { Zendesk::MoicClient.instance }
 
-  subject { described_class.new(zendes_moic_client) }
 
   before do
     allow(zendes_moic_client).to receive(:request).and_yield(zendesk_api_client)

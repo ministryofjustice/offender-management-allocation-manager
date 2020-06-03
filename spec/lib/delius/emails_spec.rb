@@ -17,7 +17,7 @@ describe Delius::Emails do
   end
 
   it 'can handle failed login' do
-    expect{ described_class.connect('fake', 'incorrect', 'folder') }.to raise_error(Net::IMAP::BadResponseError)
+    expect { described_class.connect('fake', 'incorrect', 'folder') }.to raise_error(Net::IMAP::BadResponseError)
   end
 
   it 'can login' do

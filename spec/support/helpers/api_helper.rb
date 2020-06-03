@@ -73,7 +73,7 @@ module ApiHelper
       }).to_return(status: 200, body: offenders.to_json)
 
     # Get the booking ids provided
-    booking_ids = bookings.map{ |h| h[:bookingId] }.compact
+    booking_ids = bookings.map { |h| h[:bookingId] }.compact
     stub_request(:post, elite2bookingsapi).with(body: booking_ids.to_json).
       to_return(status: 200, body: bookings.to_json, headers: {})
   end

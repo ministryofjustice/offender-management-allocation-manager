@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe 'coworking routes', type: :routing do
   describe post: '/prisons/LEI/coworking' do
-    it { should route_to controller: 'coworking', action: 'create', prison_id: 'LEI' }
+    it { is_expected.to route_to controller: 'coworking', action: 'create', prison_id: 'LEI' }
   end
 
   describe get: '/prisons/LEI/coworking/confirm/G123456/456765/654232' do

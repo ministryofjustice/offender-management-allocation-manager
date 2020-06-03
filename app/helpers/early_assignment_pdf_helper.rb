@@ -1,4 +1,3 @@
-# rubocop:disable Metrics/ModuleLength
 module EarlyAssignmentPdfHelper
   def render_early_alloc_pdf(early_assignment:, offender:, allocation:, pom:)
     # prawn_document can only be called in an actual view context.
@@ -70,7 +69,7 @@ private
     crn: 'CRN number',
     reason: 'Detail about why this case needs to be referred early',
     approved: 'Approval from the Head of Offender Management Delivery'
-  }
+  }.freeze
 
   def add_assessment_info(pdf, early_assignment)
     info_hash = {}
@@ -171,4 +170,3 @@ private
     end
   end
 end
-# rubocop:enable Metrics/ModuleLength

@@ -32,7 +32,7 @@ RSpec.describe DeliusData, type: :model do
         )
       }
 
-      it { should be_welsh_offender }
+      it { is_expected.to be_welsh_offender }
     end
 
     context 'when a record is not Welsh' do
@@ -44,7 +44,7 @@ RSpec.describe DeliusData, type: :model do
         )
       }
 
-      it { should_not be_welsh_offender }
+      it { is_expected.not_to be_welsh_offender }
     end
   end
 
@@ -58,7 +58,7 @@ RSpec.describe DeliusData, type: :model do
         ).service_provider
       }
 
-      it { should eq('CRC') }
+      it { is_expected.to eq('CRC') }
     end
 
     context 'when provider code starts with N' do
@@ -70,7 +70,7 @@ RSpec.describe DeliusData, type: :model do
         ).service_provider
       }
 
-      it { should eq('NPS') }
+      it { is_expected.to eq('NPS') }
     end
 
     context 'when provider code is invalid' do
@@ -82,7 +82,7 @@ RSpec.describe DeliusData, type: :model do
         ).service_provider
       }
 
-      it { should be_nil }
+      it { is_expected.to be_nil }
     end
   end
 end

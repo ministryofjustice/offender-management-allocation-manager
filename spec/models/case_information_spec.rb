@@ -48,7 +48,7 @@ RSpec.describe CaseInformation, type: :model do
       build(:case_information)
     }
 
-    it { should be_valid }
+    it { is_expected.to be_valid }
   end
 
   context 'with missing tier' do

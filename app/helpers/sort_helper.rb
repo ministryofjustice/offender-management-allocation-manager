@@ -15,13 +15,13 @@ module SortHelper
     end
 
     def link_for_field(field_name)
-      if @current_sort_field.present? && @current_sort_field.start_with?(field_name)
+      @query['sort'] = if @current_sort_field.present? && @current_sort_field.start_with?(field_name)
         # Check if name is already in query, and invert the search if it is
-        @query['sort'] = "#{field_name} #{invert_sort_parameter(@current_sort_field)}"
-      else
+                         "#{field_name} #{invert_sort_parameter(@current_sort_field)}"
+                       else
         # If it isn't, choose the appropriate default
-        @query['sort'] = "#{field_name} #{default_direction(field_name)}"
-      end
+                         "#{field_name} #{default_direction(field_name)}"
+                       end
 
       @uri.query = Rack::Utils.build_query(@query)
       @uri.to_s

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class AllocationService
-  # rubocop:disable Metrics/MethodLength
   def self.allocate_secondary(
     nomis_offender_id:,
     secondary_pom_nomis_id:,
@@ -36,9 +35,7 @@ class AllocationService
                           pom_nomis_id: secondary_pom_nomis_id).
       send_secondary_email(coworking_pom_firstname)
   end
-  # rubocop:enable Metrics/MethodLength
 
-  # rubocop:disable Metrics/MethodLength
   def self.create_or_update(params)
     pom_firstname, pom_secondname =
       PrisonOffenderManagerService.get_pom_name(params[:primary_pom_nomis_id])
@@ -77,7 +74,6 @@ class AllocationService
 
     alloc_version
   end
-  # rubocop:enable Metrics/MethodLength
 
   def self.active_allocations(nomis_offender_ids, prison)
     Allocation.active(nomis_offender_ids, prison).map { |a|

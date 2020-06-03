@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 class AllocationValidation
-  # rubocop:disable Metrics/MethodLength
-  # rubocop:disable Layout/LineLength
-  # rubocop:disable Rails/Output
   def fixup(prison)
     # Looks for offenders who have an allocation at this prison
     # who are allocated incorrectly because of a release or a transfer.
@@ -54,9 +51,6 @@ class AllocationValidation
       allocation.deallocate_offender('offender_transferred')
     }
   end
-  # rubocop:enable Layout/LineLength
-  # rubocop:enable Rails/Output
-  # rubocop:enable Metrics/MethodLength
 
   def active_allocations_for_prison(prison)
     Allocation.where.not(primary_pom_nomis_id: nil).where(prison: prison)

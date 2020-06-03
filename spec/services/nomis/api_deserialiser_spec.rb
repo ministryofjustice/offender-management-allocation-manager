@@ -16,6 +16,8 @@ RSpec.describe Nomis::ApiDeserialiser do
   end
   # rubocop:enable RSpec/LeakyConstantDeclaration
 
+  subject { model.from_json(payload) }
+
   let!(:memory_model_class) { DeserialiseTest }
   let!(:failing_memory_model_class) { DeserialiseTestFail }
 
@@ -23,7 +25,6 @@ RSpec.describe Nomis::ApiDeserialiser do
     { 'foo' => 'bar', 'unknown_attribute' => 'boom' }
   end
 
-  subject { model.from_json(payload) }
 
   it 'will serialise a payload with unknown attributes', :raven_intercept_exception do
     expect(described_class.new.deserialise(memory_model_class, payload)).to have_attributes foo: 'bar'

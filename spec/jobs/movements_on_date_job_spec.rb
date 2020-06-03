@@ -10,7 +10,7 @@ RSpec.describe MovementsOnDateJob, type: :job do
   end
 
   it 'deallocates' do
-    allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new.tap{ |o|
+    allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new.tap { |o|
       o.convicted_status = "Convicted"
       o.date_of_birth = "Tue, 17 Sep 1991"
       o.inprisonment_status = 'SENT03'
@@ -28,7 +28,7 @@ RSpec.describe MovementsOnDateJob, type: :job do
     expect(alloc.primary_pom_nomis_id).not_to be_nil
     expect(alloc.secondary_pom_nomis_id).not_to be_nil
 
-    described_class.perform_now(Date.new(2019, 07, 1).to_s)
+    described_class.perform_now(Date.new(2019, 7, 1).to_s)
 
     alloc.reload
 

@@ -44,7 +44,6 @@ class MovementService
 
 private
 
-  # rubocop:disable Metrics/MethodLength
   def self.process_transfer(transfer)
     return false unless transfer.direction_code == ADMISSION_MOVEMENT_CODE
 
@@ -104,7 +103,6 @@ private
     alloc&.deallocate_offender(Allocation::OFFENDER_TRANSFERRED)
     true
   end
-  # rubocop:enable Metrics/MethodLength
 
   # When an offender is released, we can no longer rely on their
   # case information (in case they come back one day), and we

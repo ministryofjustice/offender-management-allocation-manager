@@ -55,7 +55,6 @@ class DeliusImportJob < ApplicationJob
 
 private
 
-  # rubocop:disable Metrics/MethodLength
   def process_attachment(attachment_bytes)
     # This method is passed the contents of the attachment as a bytearray
     # once it has been base64 decoded which it will then write to a file (in
@@ -100,7 +99,6 @@ private
       process_decrypted_file(filename)
     end
   end
-  # rubocop:enable Metrics/MethodLength
 
   def process_decrypted_file(filename)
     Rails.logger.info('[DELIUS] Processing decrypted file')
