@@ -16,11 +16,14 @@ RSpec.describe SummaryController, type: :controller do
   before { stub_sso_data(prison, 'alice') }
 
   context 'with 2 offenders' do
+    let(:today_plus_10) { (Time.zone.today + 10.days).to_s }
+    let(:today_plus_13_weeks) { (Time.zone.today + 13.weeks).to_s }
+
     before do
       offenders = [
-        { "bookingId": 754_208, "offenderNo": "G1234GY", "firstName": "BOB", "lastName": "SMITH",
+        { "bookingId": 754_208, "offenderNo": "G7514GW", "firstName": "BOB", "lastName": "SMITH",
           "dateOfBirth": "1995-02-02", "age": 34, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "LR" },
-        { "bookingId": 754_207, "offenderNo": "G7514GW", "firstName": "Indeter", "lastName": "Minate-Offender",
+        { "bookingId": 754_207, "offenderNo": "G1234GY", "firstName": "Indeter", "lastName": "Minate-Offender",
           "dateOfBirth": "1990-12-06", "age": 28, "agencyId": prison, "categoryCode": "C", "imprisonmentStatus": "LIFE" },
         { "bookingId": 754_206, "offenderNo": "G1234VV", "firstName": "ROSS", "lastName": "JONES",
           "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03" },
@@ -30,13 +33,13 @@ RSpec.describe SummaryController, type: :controller do
 
       bookings = [
         { "bookingId": 754_208, "offenderNo": "G7514GW", "firstName": "Indeter", "lastName": "Minate-Offender", "agencyLocationId": prison,
-          "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
-                              "licenceExpiryDate": "2014-02-07", "homeDetentionCurfewEligibilityDate": "2011-11-07",
-                              "bookingId": 754_207, "sentenceStartDate": "2009-02-08", "automaticReleaseOverrideDate": "2012-03-17",
+          "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": today_plus_10,
+                              "licenceExpiryDate": "2014-02-07", "homeDetentionCurfewActualDate": today_plus_10,
+                              "bookingId": 754_208, "sentenceStartDate": "2009-02-08", "automaticReleaseOverrideDate": "2012-03-17",
                               "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "confirmedReleaseDate": "2012-03-17",
                               "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
           "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 },
-        { "bookingId": 754_207, "offenderNo": "G7514GW", "firstName": "Indeter", "lastName": "Minate-Offender", "agencyLocationId": prison,
+        { "bookingId": 754_207, "offenderNo": "G1234GY", "firstName": "Indeter", "lastName": "Minate-Offender", "agencyLocationId": prison,
           "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
                               "licenceExpiryDate": "2014-02-07", "homeDetentionCurfewEligibilityDate": "2011-11-07",
                               "bookingId": 754_207, "sentenceStartDate": "2009-02-08", "automaticReleaseOverrideDate": "2012-03-17",
@@ -44,24 +47,39 @@ RSpec.describe SummaryController, type: :controller do
                               "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
           "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 },
         { "bookingId": 754_206, "offenderNo": "G1234VV", "firstName": "ROSS", "lastName": "JONES", "agencyLocationId": prison,
-          "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
-                              "licenceExpiryDate": "2014-02-07", "homeDetentionCurfewEligibilityDate": "2011-11-07",
-                              "bookingId": 754_207, "sentenceStartDate": "2019-02-08", "automaticReleaseOverrideDate": "2012-03-17",
+          "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": today_plus_13_weeks,
+                              "licenceExpiryDate": "2014-02-07",
+                              "bookingId": 754_206, "sentenceStartDate": "2019-02-08",
                               "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "confirmedReleaseDate": "2012-03-17",
                               "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
           "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 },
-        { "bookingId": 754_205, "offenderNo": "G1234VV", "firstName": "Fourth", "lastName": "Offender", "agencyLocationId": prison,
-          "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
-                              "licenceExpiryDate": "2014-02-07", "homeDetentionCurfewEligibilityDate": "2011-11-07",
-                              "bookingId": 754_207, "sentenceStartDate": "2019-02-08", "automaticReleaseOverrideDate": "2012-03-17",
+        { "bookingId": 754_205, "offenderNo": "G4234GG", "firstName": "Fourth", "lastName": "Offender", "agencyLocationId": prison,
+          "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": today_plus_10,
+                              "licenceExpiryDate": "2014-02-07", "homeDetentionCurfewActualDate": today_plus_10,
+                              "bookingId": 754_205, "sentenceStartDate": "2019-02-08",
                               "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "confirmedReleaseDate": "2012-03-17",
                               "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
           "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 }
       ]
 
-      create(:case_information, nomis_offender_id: 'G4234GG')
+      create(:case_information, case_allocation: 'NPS', nomis_offender_id: 'G4234GG')
 
       stub_offenders_for_prison(prison, offenders, bookings)
+    end
+
+    describe '#handover' do
+      before do
+        stub_movements
+        create(:allocation, nomis_offender_id: 'G4234GG')
+        create(:case_information, case_allocation: 'CRC', nomis_offender_id: 'G1234VV')
+        create(:allocation, nomis_offender_id: 'G1234VV')
+      end
+
+      it 'returns CRC and NPS cases that are within the thirty day window' do
+        get :handovers, params: { prison_id: prison }
+        expect(response).to be_successful
+        expect(assigns(:offenders).map(&:offender_no)).to match_array(["G1234VV", "G4234GG"])
+      end
     end
 
     context 'when user is a POM' do
@@ -82,7 +100,7 @@ RSpec.describe SummaryController, type: :controller do
     context 'without new arrivals' do
       before do
         stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/movements/offenders?latestOnly=false&movementTypes=TRN").
-          with(body: %w[G1234GY G7514GW G1234VV G4234GG].to_json).
+          with(body: %w[G7514GW G1234GY G1234VV G4234GG].to_json).
           to_return(status: 200, body: [{ offenderNo: 'G7514GW', toAgency: prison, createDateTime: Date.new(2018, 10, 1) },
                                         { offenderNo: 'G1234VV', toAgency: prison, createDateTime: Date.new(2018, 9, 1) }].to_json)
       end
