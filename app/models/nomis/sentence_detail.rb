@@ -10,7 +10,9 @@ module Nomis
                 :release_date,
                 :licence_expiry_date,
                 :sentence_start_date,
-                :tariff_date
+                :tariff_date,
+                :sentence_expiry_date,
+                :actual_parole_date
 
     def initialize(fields = {})
       fields.each do |k, v|
@@ -44,27 +46,25 @@ module Nomis
 
     def earliest_release_date
       dates = [
-          automatic_release_date,
-          conditional_release_date,
-          home_detention_curfew_actual_date,
-          home_detention_curfew_eligibility_date,
-          parole_eligibility_date,
-          tariff_date
+        automatic_release_date,
+        conditional_release_date,
+        home_detention_curfew_actual_date,
+        home_detention_curfew_eligibility_date,
+        parole_eligibility_date,
+        tariff_date
       ].compact
-      return nil if dates.empty?
 
-      past_dates = []
-      future_dates = []
-
-      dates.each do |date|
-        if date >= Time.zone.today
-          future_dates << date
-        else
-          past_dates << date
-        end
+      if dates.empty?
+        dates = [
+          sentence_expiry_date,
+          licence_expiry_date,
+          post_recall_release_date,
+          actual_parole_date].compact
       end
 
-      future_dates.present? ? future_dates.min.to_date : past_dates.min.to_date
+      past_dates, future_dates = dates.partition { |date| date < Time.zone.today }
+
+      future_dates.any? ? future_dates.min.to_date : past_dates.max.try(:to_date)
     end
 
     def self.from_json(payload)
@@ -81,6 +81,7 @@ module Nomis
       @automatic_release_date = deserialise_date(payload, 'automaticReleaseDate')
       @nomis_post_recall_release_date = deserialise_date(payload, 'postRecallReleaseDate')
       @nomis_post_recall_release_override_date = deserialise_date(payload, 'postRecallReleaseOverrideDate')
+
       @conditional_release_date = deserialise_date(
         payload, 'conditionalReleaseDate'
       )

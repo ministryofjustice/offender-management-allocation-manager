@@ -5,7 +5,7 @@ module Nomis
              :conditional_release_date, :release_date,
              :parole_eligibility_date, :tariff_date,
              :automatic_release_date, :licence_expiry_date,
-             :post_recall_release_date,
+             :post_recall_release_date, :earliest_release_date,
              to: :sentence
 
     attr_accessor :convicted_status, :booking_id,
@@ -81,10 +81,6 @@ module Nomis
 
     def immigration_case?
       sentence_type_code == 'DET'
-    end
-
-    def earliest_release_date
-      sentence.earliest_release_date
     end
 
     def pom_responsibility

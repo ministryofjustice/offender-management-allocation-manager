@@ -6,7 +6,72 @@ describe Nomis::OffenderSummary do
       before { subject.sentence = Nomis::SentenceDetail.new }
 
       it 'responds with no earliest release date' do
-        expect(subject.sentence.earliest_release_date).to be_nil
+        expect(subject.earliest_release_date).to be_nil
+      end
+    end
+
+    context 'when main dates are missing' do
+      let(:today_plus1) { Time.zone.today + 1.day }
+
+      context 'with just the sentence expiry date' do
+        before do
+          subject.sentence = Nomis::SentenceDetail.new(sentence_expiry_date: today_plus1)
+        end
+
+        it 'uses the SED' do
+          expect(subject.earliest_release_date).to eq(today_plus1)
+        end
+      end
+
+      context 'with many dates' do
+        before do
+          subject.sentence = Nomis::SentenceDetail.new(sentence_expiry_date: sentence_expiry_date,
+                                                       licence_expiry_date: licence_expiry_date,
+                                                       nomis_post_recall_release_date: post_recall_release_date,
+                                                       actual_parole_date: actual_parole_date)
+        end
+
+        context 'with future dates' do
+          let(:licence_expiry_date) { Time.zone.today + 2.days }
+          let(:sentence_expiry_date) { Time.zone.today + 3.days }
+          let(:post_recall_release_date) { Time.zone.today + 4.days }
+          let(:actual_parole_date) { Time.zone.today + 5.days }
+
+          context 'with licence date nearest' do
+            let(:licence_expiry_date) { today_plus1 }
+
+            it 'uses the licence expiry date' do
+              expect(subject.earliest_release_date).to eq(licence_expiry_date)
+            end
+          end
+
+          context 'with post_recall_release_date nearest' do
+            let(:post_recall_release_date) { today_plus1 }
+
+            it 'uses the post_recall_release_date' do
+              expect(subject.earliest_release_date).to eq(post_recall_release_date)
+            end
+          end
+
+          context 'with actual_parole_date nearest' do
+            let(:actual_parole_date) { today_plus1 }
+
+            it 'uses the actual_parole_date' do
+              expect(subject.earliest_release_date).to eq(actual_parole_date)
+            end
+          end
+        end
+
+        context 'with all dates in the past' do
+          let(:sentence_expiry_date) { Time.zone.today - 2.days }
+          let(:licence_expiry_date) { Time.zone.today - 3.days }
+          let(:post_recall_release_date) { Time.zone.today - 4.days }
+          let(:actual_parole_date) { Time.zone.today - 5.days }
+
+          it 'uses the closest to today' do
+            expect(subject.earliest_release_date).to eq(sentence_expiry_date)
+          end
+        end
       end
     end
 
@@ -24,7 +89,7 @@ describe Nomis::OffenderSummary do
         let(:conditional_release_date) { Time.zone.today + 3.days }
 
         it 'will display the earliest of the dates in the future' do
-          expect(subject.sentence.earliest_release_date).
+          expect(subject.earliest_release_date).
               to eq(conditional_release_date)
         end
       end
@@ -34,29 +99,9 @@ describe Nomis::OffenderSummary do
         let(:automatic_release_date) { Date.new(2009, 1, 11) }
         let(:conditional_release_date) { Date.new(2009, 1, 21) }
 
-        it 'will display the earliest of the dates in the past' do
-          expect(subject.sentence.earliest_release_date).
-              to eq(parole_eligibility_date)
-        end
-      end
-
-      context 'with a conditional release date after a parole eligibility date' do
-        let(:parole_eligibility_date) { Date.new(2009, 1, 1) }
-        let(:conditional_release_date) { Date.new(2009, 1, 10) }
-
-        it 'uses parole eligibility date' do
-          expect(subject.sentence.earliest_release_date).
-            to eq(parole_eligibility_date)
-        end
-      end
-
-      context 'with a conditional release date before a parole eligibility date' do
-        let(:conditional_release_date) { Date.new(2009, 12, 3) }
-        let(:parole_eligibility_date) { Date.new(2009, 12, 28) }
-
-        it 'uses conditional release date' do
-          expect(subject.sentence.earliest_release_date).
-            to eq(conditional_release_date)
+        it 'will display the most recent of the dates in the past' do
+          expect(subject.earliest_release_date).
+              to eq(conditional_release_date)
         end
       end
     end
