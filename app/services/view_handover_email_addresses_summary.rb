@@ -1,5 +1,15 @@
 # frozen_string_literal: true
 
+# See how many of the given offenders are missing an email address for handover, and why
+#
+# Use this via the rake task:
+#   rails handover_email_summary_by_prison [PRISON_CODE]
+#
+# Or in the Rails console:
+#   prison = Prison.new(PRISON_CODE)
+#   offenders = prison.offenders
+#   pp ViewHandoverEmailAddressesSummary.new.execute(offenders)
+
 class ViewHandoverEmailAddressesSummary
   def execute(offenders)
     grouped_offenders = offenders.group_by { |offender| offender_category(offender) }
