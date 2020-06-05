@@ -67,16 +67,6 @@ feature "view POM's caseload" do
       to_return(status: 200, body: {}.to_json, headers: { 'Total-Records' => '3' })
 
     stub_request(:get, elite2listapi).
-    with(
-      headers: {
-        'Authorization' => 'Bearer token',
-        'Expect' => '',
-        'Page-Limit' => '200',
-        'Page-Offset' => '200'
-      }).
-    to_return(status: 200, body: {}.to_json, headers: { 'Total-Records' => '3' })
-
-    stub_request(:get, elite2listapi).
       with(
         headers: {
           'Authorization' => 'Bearer token',
