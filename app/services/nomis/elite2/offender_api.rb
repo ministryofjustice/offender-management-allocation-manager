@@ -86,8 +86,6 @@ module Nomis
           hash[oid] = api_deserialiser.deserialise(
             Nomis::SentenceDetail, record['sentenceDetail']
           )
-          hash[oid].first_name = record['firstName']
-          hash[oid].last_name = record['lastName']
           hash
         }
       end
