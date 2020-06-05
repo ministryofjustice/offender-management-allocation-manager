@@ -6,10 +6,9 @@ describe Nomis::SentenceDetail, model: true do
 
   describe "#automatic_release_date" do
     context "when override present" do
-      before do
-        subject.automatic_release_date = date
-        subject.automatic_release_override_date = override
-      end
+      subject {
+        described_class.new automatic_release_date: date, automatic_release_override_date: override
+      }
 
       it "overrides" do
         expect(subject.automatic_release_date).to eq(override)
@@ -17,10 +16,9 @@ describe Nomis::SentenceDetail, model: true do
     end
 
     context "without override" do
-      before do
-        subject.automatic_release_date = date
-        subject.automatic_release_override_date = nil
-      end
+      subject {
+        described_class.new automatic_release_date: date, automatic_release_override_date: nil
+      }
 
       it "uses original" do
         expect(subject.automatic_release_date).to eq(date)
@@ -30,10 +28,9 @@ describe Nomis::SentenceDetail, model: true do
 
   describe "#conditional_release_date" do
     context "when override present" do
-      before do
-        subject.conditional_release_date = date
-        subject.conditional_release_override_date = override
-      end
+      subject {
+        described_class.new conditional_release_date: date, conditional_release_override_date: override
+      }
 
       it "overrides" do
         expect(subject.conditional_release_date).to eq(override)
@@ -41,9 +38,9 @@ describe Nomis::SentenceDetail, model: true do
     end
 
     context "without override" do
-      before do
-        subject.conditional_release_date = date
-      end
+      subject {
+        described_class.new conditional_release_date: date
+      }
 
       it "uses original" do
         expect(subject.conditional_release_date).to eq(date)
@@ -52,21 +49,18 @@ describe Nomis::SentenceDetail, model: true do
   end
 
   describe "#nomis_post_recall_release_date" do
-    context "when override present" do
-      before do
-        subject.nomis_post_recall_release_date = date
-        subject.nomis_post_recall_release_override_date = override
-      end
+    subject do
+      described_class.new nomis_post_recall_release_date: date, nomis_post_recall_release_override_date: override
+    end
 
+    context "when override present" do
       it "overrides" do
         expect(subject.nomis_post_recall_release_date).to eq(override)
       end
     end
 
     context "without override" do
-      before do
-        subject.nomis_post_recall_release_date = date
-      end
+      let(:override) { nil }
 
       it "uses original" do
         expect(subject.nomis_post_recall_release_date).to eq(date)
@@ -75,13 +69,19 @@ describe Nomis::SentenceDetail, model: true do
   end
 
   describe "#post_recall_release_date" do
+    subject {
+      described_class.new automatic_release_date: date,
+                          automatic_release_override_date: override,
+                          actual_parole_date: actual_parole_date
+    }
+
     let(:earliest_date) { Date.new(2019, 1, 2) }
     let(:latest_date) { Date.new(2019, 5, 4) }
     let(:no_date) { nil }
 
+
     before do
       allow(subject).to receive(:nomis_post_recall_release_date).and_return(nomis_post_recall_release_date)
-      subject.actual_parole_date = actual_parole_date
     end
 
     context "when actual_parole_date comes before post_recall_release_date" do
