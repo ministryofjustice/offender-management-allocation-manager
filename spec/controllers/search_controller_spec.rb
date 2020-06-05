@@ -72,13 +72,6 @@ RSpec.describe SearchController, type: :controller do
                                 "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
             "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 }].to_json, headers: {})
 
-      stub_request(:get, elite2listapi).
-        with(
-          headers: {
-            'Page-Limit' => '200',
-            'Page-Offset' => '200'
-          }).
-        to_return(status: 200, body: {}.to_json, headers: {})
       stub_request(:get, "#{elite2api}/staff/roles/#{prison}/role/POM").
         with(
           headers: {

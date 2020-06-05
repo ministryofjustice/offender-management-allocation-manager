@@ -37,14 +37,6 @@ RSpec.describe DebuggingController, type: :controller do
           with(
             headers: {
               'Page-Limit' => '200',
-              'Page-Offset' => '200'
-            }).
-          to_return(status: 200, body: {}.to_json, headers: { 'Total-Records' => '3' })
-
-      stub_request(:get, elite2listapi).
-          with(
-            headers: {
-              'Page-Limit' => '200',
               'Page-Offset' => '0'
             }).
           to_return(status: 200,
