@@ -37,9 +37,8 @@ describe PrisonOffenderManagerService do
       it "can get a list of POMs",
          vcr: { cassette_name: :pom_service_get_poms_list } do
         expect(subject).to be_kind_of(Enumerable)
-        expect(subject.count).to eq(15)
         # 1 POM in T3 (Toby Retallick) is marked inactive, so expect one less active one
-        expect(subject.count { |pom| pom.status == 'active' }).to eq(14)
+        expect(subject.count { |pom| pom.status == 'active' }).to eq(subject.count - 1)
         # would like these to both be true as integratopn test user has both positions
         # expect(moic_integration_tests.prison_officer?).to eq(true)
         expect(moic_integration_tests.probation_officer?).to eq(true)
@@ -51,7 +50,7 @@ describe PrisonOffenderManagerService do
          vcr: { cassette_name: :pom_service_get_poms_by_ids } do
         names = described_class.get_pom_names('LEI')
         expect(names).to be_kind_of(Hash)
-        expect(names.count).to eq(15)
+        expect(names.count).to be > 10
       end
     end
 
