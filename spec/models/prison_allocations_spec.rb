@@ -104,7 +104,7 @@ RSpec.describe Prison, type: :model do
       [old_primary_alloc, old_secondary_alloc, primary_alloc, secondary_alloc]
     }
 
-    let(:other_staff_id) { 485_637 }
+    let(:other_staff_id) { 485_735 }
 
     before do
       old_primary_alloc.update!(secondary_pom_nomis_id: other_staff_id)

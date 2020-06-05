@@ -20,10 +20,10 @@ feature "get poms list" do
   it "handles missing sentence data", vcr: { cassette_name: :show_poms_feature_missing_sentence } do
     signin_user('PK000223')
 
-    visit prison_confirm_allocation_path('LEI', offender_missing_sentence_case_info.nomis_offender_id, 485_637)
+    visit prison_confirm_allocation_path('LEI', offender_missing_sentence_case_info.nomis_offender_id, 485_735)
     click_button 'Complete allocation'
 
-    visit prison_pom_path('LEI', 485_637)
+    visit prison_pom_path('LEI', 485_735)
 
     expect(page).to have_css(".pom_cases_row_0", count: 1)
     expect(page).not_to have_css(".pom_cases_row_1")

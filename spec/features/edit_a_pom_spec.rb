@@ -1,7 +1,7 @@
 require "rails_helper"
 
 feature "edit a POM's details" do
-  let(:nomis_staff_id) { 485_637 }
+  let(:nomis_staff_id) { 485_735 }
   let(:fulltime_pom_id) { 485_833 }
   let(:nomis_offender_id) { 'G4273GI' }
 

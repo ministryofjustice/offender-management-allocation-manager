@@ -74,7 +74,7 @@ RSpec.describe EmailService do
   end
 
   before(:each) {
-    PomDetail.create(nomis_staff_id: 485_637, working_pattern: 1.0, status: 'inactive')
+    PomDetail.create(nomis_staff_id: 485_735, working_pattern: 1.0, status: 'inactive')
   }
 
   context 'when queueing', :queueing do

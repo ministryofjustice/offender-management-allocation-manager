@@ -19,9 +19,9 @@ feature 'Allocation History' do
 
   let!(:probation_pom_2) do
     {
-      primary_pom_nomis_id: 485_637,
-      primary_pom_name: 'Pobee-Norris, Kath',
-      email: 'kath.pobee-norris@digital.justice.gov.uk'
+      primary_pom_nomis_id: 485_735,
+      primary_pom_name: 'Jara Duncan, Laura',
+      email: 'laura.jaraduncan@digital.justice.gov.uk'
     }
   end
 

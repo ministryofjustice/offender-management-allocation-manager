@@ -87,7 +87,7 @@ feature 'case information feature' do
   end
 
   it 'allows editing case information for a prisoner', :raven_intercept_exception, vcr: { cassette_name: :case_information_editing_feature } do
-    nomis_offender_id = 'G1821VA'
+    nomis_offender_id = 'G2911GD'
 
     signin_user
     visit new_prison_case_information_path('LEI', nomis_offender_id)
@@ -99,7 +99,7 @@ feature 'case information feature' do
     visit edit_prison_case_information_path('LEI', nomis_offender_id)
 
     expect(page).to have_content('Case information')
-    expect(page).to have_content('G1821VA')
+    expect(page).to have_content('G2911GD')
     choose('case_information_welsh_offender_No')
     choose('case_information_case_allocation_CRC')
     click_button 'Update'

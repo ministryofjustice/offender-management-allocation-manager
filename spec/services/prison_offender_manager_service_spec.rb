@@ -1,11 +1,11 @@
 require 'rails_helper'
 
 describe PrisonOffenderManagerService do
-  let(:other_staff_id) { 485_637 }
+  let(:other_staff_id) { 485_735 }
   let(:staff_id) { 485_833 }
 
   before(:each) {
-    PomDetail.create(nomis_staff_id: 485_637, working_pattern: 1.0, status: 'inactive')
+    PomDetail.create(nomis_staff_id: 485_735, working_pattern: 1.0, status: 'inactive')
   }
 
   context 'when using T3 and VCR' do

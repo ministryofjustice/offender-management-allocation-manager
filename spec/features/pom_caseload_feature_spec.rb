@@ -1,7 +1,7 @@
 require "rails_helper"
 
 feature "view POM's caseload" do
-  let(:nomis_staff_id) { 485_637 }
+  let(:nomis_staff_id) { 485_735 }
   let(:nomis_offender_id) { 'G4273GI' }
   let(:tomorrow) { Date.tomorrow }
 

@@ -21,9 +21,9 @@ describe Nomis::Elite2::PrisonOffenderManagerApi do
   describe '#fetch_email_addresses' do
     it "can get a user's single email address",
        vcr: { cassette_name: :elite2_staff_api_get_email } do
-      response = described_class.fetch_email_addresses(485_637)
+      response = described_class.fetch_email_addresses(485_735)
 
-      expect(response).to eq(["kath.pobee-norris@digital.justice.gov.uk"])
+      expect(response).to eq(["laura.jaraduncan@digital.justice.gov.uk"])
     end
 
     it "can get multiple email addresses for a user",

@@ -4,7 +4,7 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
   include ActiveJob::TestHelper
 
   let(:nomis_offender_id) { 'G3462VT' }
-  let(:nomis_staff_id) { 485_637 }
+  let(:nomis_staff_id) { 485_735 }
   let(:other_staff_id) { 485_636 }
   let(:open_prison_code) { 'HDI' }
   let(:closed_prison_code) { 'LEI' }
