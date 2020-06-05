@@ -47,12 +47,7 @@ context 'when NOMIS is missing information' do
             }
           }]
 
-          stub_request(:get, "#{stub_api_host}/locations/description/#{prison_code}/inmates").
-            with(query: { convictedStatus: 'Convicted', returnCategory: true }).
-            to_return(status: 200, body: stub_offenders.to_json)
-
-          stub_request(:post, "#{stub_api_host}/offender-sentences/bookings").
-            to_return(status: 200, body: stub_bookings.to_json)
+          stub_offenders_for_prison(prison_code, stub_offenders, stub_bookings)
 
           create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
           create(:case_information, nomis_offender_id: offender_no, case_allocation: 'NPS')
@@ -77,10 +72,11 @@ context 'when NOMIS is missing information' do
             sentenceStartDate: Time.zone.now.iso8601
           }
         }]
-\
+
         stub_offender = [{
           offenderNo: offender_no,
-          latestBookingId: booking_id
+          latestBookingId: booking_id,
+          bookingId: booking_id
         }]
 
         stub_request(:get, "#{stub_api_host}/staff/#{staff_id}").
@@ -95,11 +91,10 @@ context 'when NOMIS is missing information' do
         stub_request(:get, "#{stub_api_host}/bookings/#{booking_id}/mainOffence").
           to_return(status: 200, body: {}.to_json)
 
-        stub_request(:post, "#{stub_api_host}/offender-sentences/bookings").
-          to_return(status: 200, body: stub_bookings.to_json)
-
         stub_request(:get, "#{stub_keyworker_host}/key-worker/#{prison_code}/offender/#{offender_no}").
           to_return(status: 200, body: {}.to_json)
+
+        stub_offenders_for_prison(prison_code, stub_offender, stub_bookings)
 
         create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
         create(:case_information, nomis_offender_id: offender_no, case_allocation: 'NPS')
@@ -116,10 +111,24 @@ context 'when NOMIS is missing information' do
     end
 
     describe 'the handover start page' do
+      let(:booking_id) { 3 }
+
       before do
-        stub_request(:get, "#{stub_api_host}/locations/description/#{prison_code}/inmates").
-          with(query: { convictedStatus: "Convicted", returnCategory: true }).
-          to_return(status: 200, body: [].to_json, headers: {})
+        stub_bookings = [{
+          bookingId: booking_id,
+          sentenceDetail: {
+            releaseDate: 30.years.from_now.iso8601,
+            sentenceStartDate: Time.zone.now.iso8601
+          }
+        }]
+
+        stub_offenders = [{
+          offenderNo: offender_no,
+          latestBookingId: booking_id,
+          bookingId: booking_id
+        }]
+
+        stub_offenders_for_prison(prison_code, stub_offenders, stub_bookings)
       end
 
       it 'does not error' do
@@ -160,15 +169,10 @@ context 'when NOMIS is missing information' do
           dateOfBirth: 50.years.ago.iso8601
         }
 
+        stub_offenders_for_prison(prison_code, [stub_offender], stub_bookings)
+
         stub_request(:get, "#{stub_api_host}/prisoners/#{offender_no}").
           to_return(status: 200, body: [stub_offender].to_json)
-
-        stub_request(:get, "#{stub_api_host}/locations/description/#{prison_code}/inmates").
-          with(query: { convictedStatus: 'Convicted', returnCategory: true }).
-          to_return(status: 200, body: [stub_offender].to_json)
-
-        stub_request(:post, "#{stub_api_host}/offender-sentences/bookings").
-          to_return(status: 200, body: stub_bookings.to_json)
 
         stub_request(:post, "#{stub_api_host}/offender-assessments/CATEGORY").
           to_return(status: 200, body: {}.to_json)
