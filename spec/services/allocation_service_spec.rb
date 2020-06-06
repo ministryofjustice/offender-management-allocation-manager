@@ -9,11 +9,11 @@ describe AllocationService do
   end
 
   describe '#allocate_secondary', :queueing do
-    let(:kath_id) { 485_637 }
+    let(:moic_test_id) { 485_758 }
     let(:ross_id) { 485_926 }
     let(:nomis_offender_id) { 'G4273GI' }
     let(:primary_pom_id) { ross_id }
-    let(:secondary_pom_id) { kath_id }
+    let(:secondary_pom_id) { moic_test_id }
     let(:message) { 'Additional text' }
 
     let!(:allocation) {
@@ -31,7 +31,7 @@ describe AllocationService do
                                            message: message
         )
         expect(allocation.reload.secondary_pom_nomis_id).to eq(secondary_pom_id)
-        expect(allocation.reload.secondary_pom_name).to eq('POBEE-NORRIS, KATH')
+        expect(allocation.reload.secondary_pom_name).to eq('INTEGRATION-TESTS, MOIC')
       }.to change(enqueued_jobs, :count).by(2)
 
       primary_email_job, secondary_email_job = enqueued_jobs.last(2)
@@ -55,12 +55,12 @@ describe AllocationService do
         to match(
           hash_including(
             "message" => message,
-            "pom_name" => "Kath",
+            "pom_name" => "Moic",
             "offender_name" => "Abbella, Ozullirn",
             "nomis_offender_id" => "G4273GI",
             "responsibility" => "supporting",
             "responsible_pom_name" => 'Pom, Moic',
-            "pom_email" => "kath.pobee-norris@digital.justice.gov.uk",
+            "pom_email" => "ommiicc@digital.justice.gov.uk",
             "url" => "http://localhost:3000/prisons/LEI/caseload"
           ))
     end

@@ -15,7 +15,7 @@ describe Nomis::Client do
     it 'sets the Authorization header' do
       WebMock.stub_request(:get, /\w/).to_return(body: '{}')
 
-      username = 'PK000223'
+      username = 'MOIC_POM'
       route = "/elite2api/api/users/#{username}"
       client.get(route)
 

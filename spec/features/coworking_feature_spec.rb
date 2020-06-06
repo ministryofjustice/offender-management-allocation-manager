@@ -12,9 +12,9 @@ feature 'Co-working', :versioning do
 
   let!(:secondary_pom) do
     {
-      staff_id: 485_637,
-      pom_name: 'Kath Pobee-Norris',
-      email: 'kath.pobee-norris@digital.justice.gov.uk'
+      staff_id: 485_758,
+      pom_name: 'Moic Integration-Tests',
+      email: 'ommiicc@digital.justice.gov.uk'
     }
   end
 
@@ -62,7 +62,7 @@ feature 'Co-working', :versioning do
     end
 
     scenario 'show correct unavailable message', vcr: { cassette_name: :show_coworking_unavailable } do
-      inactive_poms = [485_637, 485_833]
+      inactive_poms = [485_758, 485_833]
       inactive_texts = ['There is 1 unavailable POM for new allocation',
                         'There are 2 unavailable POMs for new allocation']
 
@@ -97,12 +97,12 @@ feature 'Co-working', :versioning do
 
       allocation.reload
       expect(allocation.secondary_pom_nomis_id).to eq(secondary_pom[:staff_id])
-      expect(allocation.secondary_pom_name).to eq("POBEE-NORRIS, KATH")
+      expect(allocation.secondary_pom_name).to eq("INTEGRATION-TESTS, MOIC")
 
       visit prison_allocation_path('LEI', nomis_offender_id)
       within '#co-working-pom' do
         expect(page).to have_content 'Remove'
-        expect(page).to have_content 'Pobee-Norris, Kath'
+        expect(page).to have_content 'Integration-Tests, Moic'
       end
     end
   end

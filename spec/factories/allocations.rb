@@ -7,7 +7,7 @@ FactoryBot.define do
     end
 
     created_by_username do
-      'PK000223'
+      'MOIC_POM'
     end
 
     created_by_name do
