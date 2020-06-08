@@ -220,20 +220,7 @@ RSpec.describe SummaryController, type: :controller do
         }
       }
 
-      stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/locations/description/BRI/inmates?convictedStatus=Convicted&returnCategory=true").
-        with(headers: { "Page-Limit": '1' }).
-        to_return(body: [].to_json, headers: { "Total Records": "6" })
-
-      stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/locations/description/BRI/inmates?convictedStatus=Convicted&returnCategory=true").
-        with(headers: { 'Page-Offset' => '0' }).
-        to_return(body: inmates.to_json)
-
-      stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/locations/description/BRI/inmates?convictedStatus=Convicted&returnCategory=true").
-        with(headers: { 'Page-Offset' => '200' }).
-        to_return(body: [].to_json)
-
-      stub_request(:post, 'https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/offender-sentences/bookings').
-        to_return(body: bookings.to_json)
+      stub_offenders_for_prison(prison, inmates, bookings)
 
       stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/movements/offenders?latestOnly=false&movementTypes=TRN").
         to_return(status: 200, body: movements.to_json)

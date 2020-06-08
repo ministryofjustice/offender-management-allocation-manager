@@ -1,12 +1,6 @@
 # frozen_string_literal: true
 
 module Nomis
-  class MovementType
-    RELEASE = 'REL'
-    TRANSFER = 'TRN'
-    ADMISSION = 'ADM'
-  end
-
   class MovementDirection
     IN = 'IN'
     OUT = 'OUT'
