@@ -1,7 +1,7 @@
 require "rails_helper"
 
 feature "view POM's caseload" do
-  let(:nomis_staff_id) { 485_637 }
+  let(:nomis_staff_id) { 485_926 }
   let(:nomis_offender_id) { 'G4273GI' }
   let(:tomorrow) { Date.tomorrow }
 
@@ -34,27 +34,27 @@ feature "view POM's caseload" do
     create(:case_information, nomis_offender_id: 'G9344UG')
     create(:case_information, nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPS', welsh_offender: 'Yes')
 
-    create(:allocation, nomis_offender_id: 'G7266VD', primary_pom_nomis_id: '485637', nomis_booking_id: '1073602')
-    create(:allocation, nomis_offender_id: 'G8563UA', primary_pom_nomis_id: '485637', nomis_booking_id: '1020605')
-    create(:allocation, nomis_offender_id: 'G6068GV', primary_pom_nomis_id: '485637', nomis_booking_id: '1030841')
-    create(:allocation, nomis_offender_id: 'G0572VU', primary_pom_nomis_id: '485637', nomis_booking_id: '861029')
-    create(:allocation, nomis_offender_id: 'G8668GF', primary_pom_nomis_id: '485637', nomis_booking_id: '1106348')
-    create(:allocation, nomis_offender_id: 'G9465UP', primary_pom_nomis_id: '485637', nomis_booking_id: '1186259')
-    create(:allocation, nomis_offender_id: 'G9372GQ', primary_pom_nomis_id: '485637', nomis_booking_id: '752833')
-    create(:allocation, nomis_offender_id: 'G1618UI', primary_pom_nomis_id: '485637', nomis_booking_id: '1161236')
-    create(:allocation, nomis_offender_id: 'G4328GK', primary_pom_nomis_id: '485637', nomis_booking_id: '1055341')
-    create(:allocation, nomis_offender_id: 'G4143VX', primary_pom_nomis_id: '485637', nomis_booking_id: '1083858')
-    create(:allocation, nomis_offender_id: 'G8180UO', primary_pom_nomis_id: '485637', nomis_booking_id: '1172076')
-    create(:allocation, nomis_offender_id: 'G8909GV', primary_pom_nomis_id: '485637', nomis_booking_id: '877782')
-    create(:allocation, nomis_offender_id: 'G8339GD', primary_pom_nomis_id: '485637', nomis_booking_id: '260708')
-    create(:allocation, nomis_offender_id: 'G1992GH', primary_pom_nomis_id: '485637', nomis_booking_id: '1179167')
-    create(:allocation, nomis_offender_id: 'G1986GG', primary_pom_nomis_id: '485637', nomis_booking_id: '1165890')
-    create(:allocation, nomis_offender_id: 'G6262GI', primary_pom_nomis_id: '485637', nomis_booking_id: '961997')
-    create(:allocation, nomis_offender_id: 'G6653UC', primary_pom_nomis_id: '485637', nomis_booking_id: '1009990')
-    create(:allocation, nomis_offender_id: 'G1718GG', primary_pom_nomis_id: '485637', nomis_booking_id: '928042')
-    create(:allocation, nomis_offender_id: 'G4706UP', primary_pom_nomis_id: '485637', nomis_booking_id: '1180800')
-    create(:allocation, nomis_offender_id: 'G9344UG', primary_pom_nomis_id: '485637', nomis_booking_id: '841994')
-    create(:allocation, nomis_offender_id: 'G4273GI', primary_pom_nomis_id: '485637', nomis_booking_id: '1153753')
+    create(:allocation, nomis_offender_id: 'G7266VD', primary_pom_nomis_id: '485926', nomis_booking_id: '1073602')
+    create(:allocation, nomis_offender_id: 'G8563UA', primary_pom_nomis_id: '485926', nomis_booking_id: '1020605')
+    create(:allocation, nomis_offender_id: 'G6068GV', primary_pom_nomis_id: '485926', nomis_booking_id: '1030841')
+    create(:allocation, nomis_offender_id: 'G0572VU', primary_pom_nomis_id: '485926', nomis_booking_id: '861029')
+    create(:allocation, nomis_offender_id: 'G8668GF', primary_pom_nomis_id: '485926', nomis_booking_id: '1106348')
+    create(:allocation, nomis_offender_id: 'G9465UP', primary_pom_nomis_id: '485926', nomis_booking_id: '1186259')
+    create(:allocation, nomis_offender_id: 'G9372GQ', primary_pom_nomis_id: '485926', nomis_booking_id: '752833')
+    create(:allocation, nomis_offender_id: 'G1618UI', primary_pom_nomis_id: '485926', nomis_booking_id: '1161236')
+    create(:allocation, nomis_offender_id: 'G4328GK', primary_pom_nomis_id: '485926', nomis_booking_id: '1055341')
+    create(:allocation, nomis_offender_id: 'G4143VX', primary_pom_nomis_id: '485926', nomis_booking_id: '1083858')
+    create(:allocation, nomis_offender_id: 'G8180UO', primary_pom_nomis_id: '485926', nomis_booking_id: '1172076')
+    create(:allocation, nomis_offender_id: 'G8909GV', primary_pom_nomis_id: '485926', nomis_booking_id: '877782')
+    create(:allocation, nomis_offender_id: 'G8339GD', primary_pom_nomis_id: '485926', nomis_booking_id: '260708')
+    create(:allocation, nomis_offender_id: 'G1992GH', primary_pom_nomis_id: '485926', nomis_booking_id: '1179167')
+    create(:allocation, nomis_offender_id: 'G1986GG', primary_pom_nomis_id: '485926', nomis_booking_id: '1165890')
+    create(:allocation, nomis_offender_id: 'G6262GI', primary_pom_nomis_id: '485926', nomis_booking_id: '961997')
+    create(:allocation, nomis_offender_id: 'G6653UC', primary_pom_nomis_id: '485926', nomis_booking_id: '1009990')
+    create(:allocation, nomis_offender_id: 'G1718GG', primary_pom_nomis_id: '485926', nomis_booking_id: '928042')
+    create(:allocation, nomis_offender_id: 'G4706UP', primary_pom_nomis_id: '485926', nomis_booking_id: '1180800')
+    create(:allocation, nomis_offender_id: 'G9344UG', primary_pom_nomis_id: '485926', nomis_booking_id: '841994')
+    create(:allocation, nomis_offender_id: 'G4273GI', primary_pom_nomis_id: '485926', nomis_booking_id: '1153753')
 
     stub_request(:get, elite2listapi).
       with(

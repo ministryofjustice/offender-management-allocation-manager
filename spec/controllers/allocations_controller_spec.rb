@@ -96,7 +96,7 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
       stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/staff/1").
         to_return(status: 200, body: {}.to_json, headers: {})
 
-      stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/users/PK000223").
+      stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/users/MOIC_POM").
         to_return(status: 200, body: { staffId: 3 }.to_json, headers: {})
 
       stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/staff/4").
@@ -180,14 +180,14 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
                               recommended_pom_type: 'probation',
                               event: Allocation::ALLOCATE_PRIMARY_POM,
                               event_trigger: Allocation::USER,
-                              created_by_username: 'PK000223'
+                              created_by_username: 'MOIC_POM'
           )
           allocation.update!(
             primary_pom_nomis_id: 5,
             prison: 'LEI',
             event: Allocation::REALLOCATE_PRIMARY_POM,
             event_trigger: Allocation::USER,
-            created_by_username: 'PK000223'
+            created_by_username: 'MOIC_POM'
           )
         end
 

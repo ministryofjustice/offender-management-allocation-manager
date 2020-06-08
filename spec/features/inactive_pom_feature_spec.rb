@@ -6,7 +6,7 @@ feature 'Inactive POM' do
     let(:inactive_pom)      { 485_595 }
     let(:nomis_offender_id) { "G4273GI" }
     let(:prison)            { "LEI" }
-    let(:active_pom) { 485_637 }
+    let(:active_pom) { 485_926 }
 
     before do
       signin_user

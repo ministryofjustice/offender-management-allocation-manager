@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocations } do
-  let(:nomis_staff_id) { 485_637 }
+  let(:nomis_staff_id) { 485_926 }
 
   # This booking id is the latest one for the offender in T3
   let(:nomis_offender_id) { 'G4273GI' }

@@ -133,7 +133,7 @@ feature 'Allocation' do
     create(
       :allocation,
       nomis_offender_id: nomis_offender_id,
-      primary_pom_nomis_id: 485_637,
+      primary_pom_nomis_id: 485_735,
       recommended_pom_type: 'probation'
     )
 
@@ -144,14 +144,14 @@ feature 'Allocation' do
     end
 
     expect(current_url).to have_content(prison_allocation_path('LEI', nomis_offender_id))
-    expect(page).to have_link(nil, href: "/prisons/LEI/poms/485637")
-    expect(page).to have_css('.table_cell__left_align', text: 'Pobee-Norris, Kath')
+    expect(page).to have_link(nil, href: "/prisons/LEI/poms/485735")
+    expect(page).to have_css('.table_cell__left_align', text: 'Jara Duncan, Laura')
     expect(page).to have_css('.table_cell__left_align', text: 'Responsible')
 
     click_link 'Reallocate'
 
     expect(current_url).to have_content(edit_prison_allocation_path('LEI', nomis_offender_id))
-    expect(page).to have_css('.current_pom_full_name', text: 'Pobee-Norris, Kath')
+    expect(page).to have_css('.current_pom_full_name', text: 'Jara Duncan, Laura')
     expect(page).to have_css('.current_pom_grade', text: 'Probation POM')
 
     within('.recommended_pom_row_0') do
