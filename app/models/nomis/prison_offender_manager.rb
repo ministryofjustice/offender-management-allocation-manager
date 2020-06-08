@@ -11,7 +11,7 @@ module Nomis
                   :schedule_type, :schedule_type_description,
                   :hours_per_week, :thumbnail_id, :emails,
                   :tier_a, :tier_b, :tier_c, :tier_d,
-                  :total_cases, :status, :working_pattern
+                  :status, :working_pattern
 
     attr_writer :position
 
@@ -39,19 +39,8 @@ module Nomis
       "#{position_description.split(' ').first} POM"
     end
 
-    def add_detail(pom_detail, prison)
-      allocations = Allocation.active_pom_allocations(
-        pom_detail.nomis_staff_id, prison).map(&:nomis_offender_id)
-      allocation_counts = CaseInformation.where(nomis_offender_id: allocations).
-        group_by(&:tier)
-
-      self.tier_a = allocation_counts.fetch('A', []).size
-      self.tier_b = allocation_counts.fetch('B', []).size
-      self.tier_c = allocation_counts.fetch('C', []).size
-      self.tier_d = allocation_counts.fetch('D', []).size
-      self.total_cases = [tier_a, tier_b, tier_c, tier_d].sum
-      self.status = pom_detail.status
-      self.working_pattern = pom_detail.working_pattern
+    def total_cases
+      [tier_a, tier_b, tier_c, tier_d].sum
     end
 
     def self.from_json(payload)

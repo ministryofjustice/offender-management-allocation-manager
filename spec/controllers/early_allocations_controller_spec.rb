@@ -33,8 +33,8 @@ RSpec.describe EarlyAllocationsController, type: :controller do
     stub_sso_data(prison, 'alice')
 
     stub_offender(nomis_offender_id)
-
     stub_poms(prison, poms)
+    stub_offenders_for_prison(prison, [], [])
 
     create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
   end
