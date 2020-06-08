@@ -2,6 +2,14 @@ require 'rails_helper'
 
 describe HandoverDateService do
   describe 'calculating when community start supporting custody' do
+    context 'when recalled' do
+      let(:offender) { OpenStruct.new(recalled?: true) }
+
+      it 'is not calculated' do
+        expect(described_class.handover(offender).start_date).to be_nil
+      end
+    end
+
     context 'when NPS' do
       let(:offender) {
         OpenStruct.new indeterminate_sentence?: indeterminate,

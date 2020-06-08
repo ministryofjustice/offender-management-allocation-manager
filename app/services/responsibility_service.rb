@@ -35,7 +35,7 @@ class ResponsibilityService
 private
 
   def self.standard_rules(offender)
-    if nps_case?(offender) || offender.indeterminate_sentence?
+    if offender.nps_case? || offender.indeterminate_sentence?
       nps_rules(offender)
     else
       crc_rules(offender)
@@ -182,23 +182,20 @@ private
 
   class CrcRules
     def self.responsibility(offender)
-      if release_date_gt_12_weeks?(offender)
+      # CRC can look at HDC date, NPS is not supposed to
+      earliest_release_date =
+        offender.home_detention_curfew_actual_date.presence ||
+          [offender.automatic_release_date,
+           offender.conditional_release_date,
+           offender.home_detention_curfew_eligibility_date].compact.min
+
+      return nil if earliest_release_date.nil?
+
+      if earliest_release_date > DateTime.now.utc.to_date + 12.weeks
         RESPONSIBLE
       else
         SUPPORTING
       end
-    end
-
-  private
-
-    # CRC can look at HDC date, NPS is not supposed to
-    def self.release_date_gt_12_weeks?(offender)
-      earliest_release_date =
-        offender.home_detention_curfew_actual_date.presence ||
-            [offender.automatic_release_date,
-             offender.conditional_release_date,
-             offender.home_detention_curfew_eligibility_date].compact.min
-      earliest_release_date > DateTime.now.utc.to_date + 12.weeks
     end
   end
 
@@ -208,10 +205,6 @@ private
 
   def self.welsh_offender?(offender)
     offender.welsh_offender == true
-  end
-
-  def self.nps_case?(offender)
-    offender.nps_case?
   end
 
   def self.determinate_with_no_release_dates?(offender)

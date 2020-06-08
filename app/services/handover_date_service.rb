@@ -3,6 +3,9 @@
 class HandoverDateService
   HandoverData = Struct.new :start_date, :handover_date, :reason
 
+  # if COM responsible, then handover dates all empty
+  NO_HANDOVER_DATE = HandoverData.new nil, nil, 'COM Responsibility'
+
   def self.handover(offender)
     if offender.recalled?
       HandoverData.new nil, nil, 'Recall case - no handover date calculation'
