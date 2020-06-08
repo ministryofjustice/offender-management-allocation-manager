@@ -34,7 +34,9 @@ class CaseInformation < ApplicationRecord
     allow_nil: false,
     message: 'Select yes if the prisoner’s last known address was in Wales'
   }
-  validates :tier, inclusion: { in: %w[A B C D], message: 'Select the prisoner’s tier' }
+  # Don't think this is as simple as allowing nil. In the specific case of Scot/NI
+  # prisoners it makes sense to have N/A (as this is genuine) but not otherwise
+  validates :tier, inclusion: { in: %w[A B C D N/A], message: 'Select the prisoner’s tier' }
 
   validates :case_allocation, inclusion: {
     in: %w[NPS CRC],
