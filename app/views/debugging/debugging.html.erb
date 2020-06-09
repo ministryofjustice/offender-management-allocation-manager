@@ -106,17 +106,19 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">Handover start date</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-        <% handover_date, reason =  @offender.handover_start_date %>
-        <%= format_date(handover_date) %>
-        <span class="handover-reason">(<%= reason %>)</span>
+        <%= format_date(@offender.handover_start_date, replacement: 'N/A') %>
       </td>
     </tr>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">Responsibility handover date</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-        <% handover_date, reason = @offender.responsibility_handover_date %>
-        <%= format_date(handover_date, replacement: 'Unknown - missing MAPPA info') %>
-        <span class="handover-reason">(<%= reason %>)</span>
+        <%= format_date(@offender.responsibility_handover_date, replacement: 'N/A') %>
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-width-one-half">Reason for handover dates</td>
+      <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
+        <%= @offender.handover_reason %>
       </td>
     </tr>
     </tbody>
