@@ -27,9 +27,9 @@ FactoryBot.define do
     firstName { Faker::Name.first_name }
     # We have some issues with corrupting the display
     # of names containing Mc or Du :-(
-    lastName do
-      Faker::Name.last_name.titleize
-    end
+    # also ensure uniqueness as duplicate last names can cause issues
+    # in tests, as ruby sort isn't stable by default
+    sequence(:lastName) { |c| "#{Faker::Name.last_name.titleize}_#{c}" }
     categoryCode { 'C' }
   end
 

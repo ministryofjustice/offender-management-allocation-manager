@@ -39,7 +39,7 @@ feature "view POM's caseload" do
       map { |nomis_id, booking_id| attributes_for(:offender).merge(offenderNo: nomis_id, bookingId: booking_id) }
   }
   let(:sorted_offenders) {
-    offenders.sort_by { |o| "#{o.fetch(:lastName)}, #{o.fetch(:firstName)}" }
+    offenders.sort_by { |o| o.fetch(:lastName) }
   }
   let(:first_offender) { sorted_offenders.first }
   let(:moved_offender) { sorted_offenders.fourth }
