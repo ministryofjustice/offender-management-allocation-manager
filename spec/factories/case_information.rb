@@ -22,7 +22,8 @@ FactoryBot.define do
     sequence(:nomis_offender_id) do |seq|
       number = seq / 26 + 1000
       letter = ('A'..'Z').to_a[seq % 26]
-      "T#{number}T#{letter}"
+      # This and the offender should produce different values to avoid clashes
+      "T#{number}C#{letter}"
     end
 
     association :team, code: '1234', name: 'A nice team'

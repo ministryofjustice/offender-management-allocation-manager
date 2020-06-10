@@ -10,7 +10,7 @@ FactoryBot.define do
   end
 
   factory :offender, class: 'Nomis::OffenderSummary' do
-    initialize_with { Nomis::OffenderSummary.from_json(attributes) }
+    initialize_with { Nomis::OffenderSummary.from_json(attributes.stringify_keys) }
 
     imprisonmentStatus { 'SENT03' }
     prisonId { 'LEI' }
@@ -19,7 +19,8 @@ FactoryBot.define do
     sequence(:offenderNo) do |seq|
       number = seq / 26 + 1000
       letter = ('A'..'Z').to_a[seq % 26]
-      "T#{number}T#{letter}"
+      # This and case_information should produce different values to avoid clashes
+      "T#{number}O#{letter}"
     end
     sequence(:bookingId) { |x| x + 700_000 }
     convictedStatus { 'Convicted' }
