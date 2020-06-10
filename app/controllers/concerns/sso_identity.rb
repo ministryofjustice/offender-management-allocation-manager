@@ -19,6 +19,10 @@ class SsoIdentity
     roles.include?('ROLE_ALLOC_MGR')
   end
 
+  def is_global_admin?
+    current_user_is_spo? && caseloads.size == PrisonService.prison_codes.size
+  end
+
   def current_user_is_pom?
     roles.include?('ROLE_ALLOC_CASE_MGR')
   end

@@ -10,13 +10,17 @@ module FeaturesHelper
     mock_sso_response(name, ['ROLE_ALLOC_MGR'])
   end
 
+  def signin_global_admin_user
+    mock_sso_response('MOIC_POM', ['ROLE_ALLOC_MGR'], PrisonService.prison_codes)
+  end
+
   def signin_pom_user(name = 'MOIC_POM')
     mock_sso_response(name, ['ROLE_ALLOC_CASE_MGR'])
   end
 
-  def mock_sso_response(name, roles)
+  def mock_sso_response(name, roles, caseloads = %w[LEI RSI])
     hmpps_sso_response = {
-      'info' => double('user_info', username: name, active_caseload: 'LEI', caseloads: %w[LEI RSI], roles: roles),
+      'info' => double('user_info', username: name, active_caseload: 'LEI', caseloads: caseloads, roles: roles),
       'credentials' => double('credentials', expires_at: Time.zone.local(2030, 1, 1).to_i,
                                              'authorities': roles)
     }
