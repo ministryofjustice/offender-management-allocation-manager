@@ -132,8 +132,8 @@ describe HandoverDateService do
         let(:conditional_release_date) { Date.new(2019, 8, 12) }
         let(:home_detention_curfew_eligibility_date) { Date.new(2019, 7, 25) }
 
-        it 'the handover date will be on the HDCED date' do
-          expect(result).to eq Date.new(2019, 7, 25)
+        it 'the handover date will be on the HDCED date minus 12 weeks' do
+          expect(result).to eq Date.new(2019, 5, 2)
         end
       end
 
@@ -143,8 +143,8 @@ describe HandoverDateService do
         let(:home_detention_curfew_actual_date) { Date.new(2019, 7, 26) }
         let(:home_detention_curfew_eligibility_date) { Date.new(2019, 7, 25) }
 
-        it 'the handover date will be on the HDCAD date' do
-          expect(result).to eq Date.new(2019, 7, 26)
+        it 'the handover date will be on the HDCAD date minus 12 weeks' do
+          expect(result).to eq Date.new(2019, 5, 3)
         end
       end
 
