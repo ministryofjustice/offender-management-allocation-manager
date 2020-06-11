@@ -5,6 +5,8 @@ module Nomis
     class OffenderApi
       extend Elite2Api
 
+      ELITE2API = '/elite2api/api'
+
       def self.list(prison, page = 0, page_size: 20)
         route = "/elite2api/api/locations/description/#{prison}/inmates"
 
@@ -66,10 +68,18 @@ module Nomis
         data.first['classificationCode']
       end
 
+      class << self
+        def get_sentence_terms(booking_id)
+          route = "#{ELITE2API}/offender-sentences/booking/#{booking_id}/sentenceTerms"
+          data = e2_client.get(route)
+          api_deserialiser.deserialise_many(Nomis::SentenceTerms, data)
+        end
+      end
+
       def self.get_bulk_sentence_details(booking_ids)
         return {} if booking_ids.empty?
 
-        route = '/elite2api/api/offender-sentences/bookings'
+        route = "#{ELITE2API}/offender-sentences/bookings"
 
         h = Digest::SHA256.hexdigest(booking_ids.to_s)
         key = "bulk_sentence_#{h}"
@@ -93,7 +103,7 @@ module Nomis
       def self.get_image(booking_id)
         # This method returns the raw bytes of an image, the equivalent of loading the
         # image from file on disk.
-        details_route = '/elite2api/api/offender-sentences/bookings'
+        details_route = "#{ELITE2API}/offender-sentences/bookings"
         details = e2_client.post(details_route, [booking_id])
 
         return default_image if details.first['facialImageId'].blank?
