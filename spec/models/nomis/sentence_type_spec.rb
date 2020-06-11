@@ -1,13 +1,13 @@
 require 'rails_helper'
 
-RSpec.describe SentenceType, type: :model do
+RSpec.describe Nomis::SentenceType, type: :model do
   it 'can return a sentence type for an offender with known sentence' do
     sentence_type = described_class.new('IPP')
 
     expect(sentence_type.code).to eq('IPP')
     expect(sentence_type.description).to eq('Indeterminate Sent for Public Protection')
-    expect(sentence_type.duration_type).to eq(SentenceType::INDETERMINATE)
-    expect(sentence_type.recall_status).to eq(SentenceType::NON_RECALL)
+    expect(sentence_type.duration_type).to eq(Nomis::SentenceType::INDETERMINATE)
+    expect(sentence_type.recall_status).to eq(Nomis::SentenceType::NON_RECALL)
   end
 
   it 'can handle offenders with no sentence' do
@@ -15,7 +15,7 @@ RSpec.describe SentenceType, type: :model do
 
     expect(sentence_type.code).to eq('UNK_SENT')
     expect(sentence_type.description).to eq('Unknown Sentenced')
-    expect(sentence_type.duration_type).to eq(SentenceType::DETERMINATE)
+    expect(sentence_type.duration_type).to eq(Nomis::SentenceType::DETERMINATE)
   end
 
   it 'knows what a civil sentence is' do
