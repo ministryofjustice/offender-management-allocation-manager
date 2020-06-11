@@ -30,6 +30,8 @@ module ApiHelper
 
     stub_request(:get, "#{T3}/bookings/#{booking_number}/mainOffence").
       to_return(body: {}.to_json)
+
+    stub_sentence_type(booking_number)
   end
 
   def stub_movements(movements = [])
@@ -100,6 +102,10 @@ module ApiHelper
 
     stub_request(:post, elite2bookingsapi).
       to_return(body: bookings.to_json)
+  end
+
+  def stub_sentence_type(booking_id)
+    stub_request(:get, "#{T3}/offender-sentences/booking/#{booking_id}/sentenceTerms").to_return(body: [].to_json)
   end
 
   def reload_page

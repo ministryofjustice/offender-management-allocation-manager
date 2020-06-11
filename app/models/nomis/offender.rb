@@ -24,7 +24,7 @@ module Nomis
     end
 
     def load_from_json(payload)
-      @booking_id = payload['latestBookingId']&.to_i
+      @booking_id = payload.fetch('latestBookingId').to_i
       @prison_id = payload['latestLocationId']
       @reception_date = deserialise_date(payload, 'receptionDate')
 

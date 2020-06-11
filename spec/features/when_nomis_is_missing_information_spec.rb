@@ -1,12 +1,17 @@
 require 'rails_helper'
 
-context 'when NOMIS is missing information' do
+feature 'when NOMIS is missing information' do
   let(:prison_code) { 'LEI' }
   let(:offender_no) { 'A1' }
   let(:stub_keyworker_host) { Rails.configuration.keyworker_api_host }
   let(:staff_id) { 111_111 }
+  let(:booking_id) { 3 }
 
-  describe 'when logged in as a POM' do
+  before do
+    stub_sentence_type(booking_id)
+  end
+
+  context 'when logged in as a POM' do
     before do
       user_name = 'example_user'
       stub_poms = [{ staffId: staff_id, position: RecommendationService::PRISON_POM }]
@@ -110,8 +115,6 @@ context 'when NOMIS is missing information' do
     end
 
     context 'with an NPS offender with an indeterminate sentence, but no release dates' do
-      let(:booking_id) { 4 }
-
       before do
         stub_offender = build(:nomis_offender, offenderNo: offender_no)
 

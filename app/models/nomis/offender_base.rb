@@ -68,7 +68,7 @@ module Nomis
     end
 
     def describe_sentence
-      @sentence_type.description
+      (sentence_terms || @sentence_type).description
     end
 
     def over_18?
@@ -157,6 +157,12 @@ module Nomis
     end
 
   private
+
+    def sentence_terms
+      Rails.cache.fetch(@sentence_type.code, expires_in: Rails.configuration.cache_expiry) {
+        Nomis::Elite2::OffenderApi::get_sentence_terms(@booking_id).detect { |term| term.code == @sentence_type.code  }
+      }
+    end
 
     def handover
       @handover ||= if pom_responsibility&.custody?

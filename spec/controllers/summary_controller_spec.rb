@@ -14,14 +14,17 @@ RSpec.describe SummaryController, type: :controller do
     ]
   }
 
-  before { stub_sso_data(prison, 'alice') }
+  before {
+    stub_sso_data(prison, 'alice')
+    offenders.each { |o| stub_sentence_type(o.fetch(:bookingId)) }
+  }
 
   context 'with 4 offenders' do
     let(:today_plus_10) { (Time.zone.today + 10.days).to_s }
     let(:today_plus_13_weeks) { (Time.zone.today + 13.weeks).to_s }
 
-    before do
-      offenders = [
+    let(:offenders) {
+      [
         build(:nomis_offender,
               offenderNo: "G7514GW",
               imprisonmentStatus: "LR",
@@ -46,6 +49,7 @@ RSpec.describe SummaryController, type: :controller do
                               sentenceStartDate: "2019-02-08",
               ))
       ]
+    }
 
       create(:case_information, case_allocation: 'NPS', nomis_offender_id: 'G4234GG')
 
@@ -165,6 +169,11 @@ RSpec.describe SummaryController, type: :controller do
 
   context 'when sorting' do
     let(:prison) { 'BXI' }
+    let(:offender_id) { 'G7514GW' }
+    let(:offenders) {
+      [{ "bookingId": 754_207, "offenderNo": offender_id, "firstName": "Indeter", "lastName": "Minate-Offender",
+                   "dateOfBirth": "1990-12-06", "age": 28, "agencyId": prison, "categoryCode": "C", "imprisonmentStatus": "LIFE" }]
+    }
 
     it 'handles trying to sort by missing field for allocated offenders' do
       # Allocated offenders do have to have their prison_arrival_date even if they don't use it
@@ -188,13 +197,14 @@ RSpec.describe SummaryController, type: :controller do
   end
 
   describe 'new arrivals feature' do
-    before do
-      inmates = offenders.map { |offender|
+    let(:offenders) {
+      offender_list.map { |offender|
         build(:nomis_offender,
               offenderNo: offender[:nomis_id],
               sentence: build(:nomis_sentence_detail,
                               sentenceStartDate: offender.fetch(:sentence_start_date).strftime('%F')))
       }
+    }
 
       stub_offenders_for_prison(prison, inmates)
 
@@ -203,7 +213,7 @@ RSpec.describe SummaryController, type: :controller do
     end
 
     context 'with no movements and four offenders' do
-      let(:offenders) { [offender_one, offender_two, offender_three, offender_four] }
+      let(:offender_list) { [offender_one, offender_two, offender_three, offender_four] }
       let(:offender_one) do
         {
           nomis_id: 'A1111AA',
@@ -316,7 +326,7 @@ RSpec.describe SummaryController, type: :controller do
     end
 
     context 'with a movement arriving on Monday, 5pm' do
-      let(:offenders) do
+      let(:offender_list) do
         [{
           nomis_id: 'A1111AA',
           booking_id: 111_111,

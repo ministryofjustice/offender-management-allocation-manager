@@ -4,7 +4,7 @@ module Nomis
   class SentenceTerms
     include Deserialisable
 
-    attr_reader :sentence_type, :sentence_type_description
+    attr_reader :code, :description
 
     class << self
       def from_json(payload)
@@ -15,8 +15,8 @@ module Nomis
     end
 
     def load_from_json(payload)
-      @sentence_type = payload.fetch('sentenceType')
-      @sentence_type_description = payload.fetch('sentenceTypeDescription')
+      @code = payload.fetch('sentenceType')
+      @description = payload.fetch('sentenceTypeDescription')
       @life_sentence = payload.fetch('lifeSentence')
     end
 

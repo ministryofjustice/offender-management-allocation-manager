@@ -31,17 +31,17 @@ describe Nomis::Elite2::OffenderApi do
       booking_id = 1_153_753
 
       result = described_class.get_sentence_terms(booking_id).map do |st|
-        { type: st.sentence_type, desc: st.sentence_type_description, indeterminate: st.indeterminate_sentence? }
+        { code: st.code, desc: st.description, indeterminate: st.indeterminate_sentence? }
       end
       expect(result)
                .to match_array([
-                     { type: 'ADIMP',
+                     { code: 'ADIMP',
       desc: 'CJA03 Standard Determinate Sentence',
       indeterminate: false },
-                     { type: 'ADIMP_ORA',
+                     { code: 'ADIMP_ORA',
       desc: 'ORA CJA03 Standard Determinate Sentence',
       indeterminate: false },
-                     { type: 'ADIMP_ORA',
+                     { code: 'ADIMP_ORA',
       desc: 'ORA CJA03 Standard Determinate Sentence',
       indeterminate: false }
                                ])
