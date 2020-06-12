@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-require 'nokogiri'
-require_relative '../../lib/delius/processor'
+require_relative '../../lib/delius/extract_file_reader'
 
 namespace :delius_etl do
   desc 'Generates stats from the latest XLSX file'
@@ -13,22 +12,15 @@ namespace :delius_etl do
     Rails.logger.error('No file specified') if args[:file].blank?
     next if args[:file].blank?
 
-    total_rows = 0
+    total_records = 0
     total_missing_tier = 0
     total_missing_noms_no = 0
     duplicate_noms_nos = []
 
     seen_noms_nos = {}
 
-    processor = Delius::Processor.new(args[:file])
-    processor.each do |row|
-      record = {}
-
-      row.each_with_index do |val, idx|
-        key = fields[idx]
-        record[key] = val
-      end
-
+    reader = Delius::ExtractFileReader.new(args[:file])
+    reader.each do |record|
       if record[:noms_no].present? && seen_noms_nos.key?(record[:noms_no])
         duplicate_noms_nos << record[:noms_no]
       else
@@ -43,24 +35,13 @@ namespace :delius_etl do
         total_missing_noms_no += 1
       end
 
-      total_rows += 1
+      total_records += 1
     end
 
-    puts "Total number of rows: #{total_rows}"
+    puts "Total number of records: #{total_records}"
     puts "Number missing a tier: #{total_missing_tier}"
     puts "Number without noms no: #{total_missing_noms_no}"
     puts "Multi-use noms no count: #{duplicate_noms_nos.count}"
     puts "Multi-use noms no: #{duplicate_noms_nos}"
-  end
-
-  def fields
-    @fields ||= [
-      :crn, :pnc_no, :noms_no, :fullname, :tier, :roh_cds,
-      :offender_manager, :org_private_ind, :org,
-      :provider, :provider_code,
-      :ldu, :ldu_code,
-      :team, :team_code,
-      :mappa, :mappa_levels, :date_of_birth
-    ]
   end
 end

@@ -1,19 +1,11 @@
 require 'delius/emails'
-require 'delius/processor'
+require 'delius/extract_file_reader'
 require 'open3'
 require 'zip'
 
 class DeliusImportJob < ApplicationJob
   queue_as :default
 
-  FIELDS = [
-    :crn, :pnc_no, :noms_no, :fullname, :tier, :roh_cds,
-    :offender_manager, :org_private_ind, :org,
-    :provider, :provider_code,
-    :ldu, :ldu_code,
-    :team, :team_code,
-    :mappa, :mappa_levels, :date_of_birth
-  ].freeze
   def perform
     ActiveRecord::Base.connection.disable_query_cache!
 
@@ -102,14 +94,14 @@ private
 
   def process_decrypted_file(filename)
     Rails.logger.info('[DELIUS] Processing decrypted file')
-    processor = Delius::Processor.new(filename)
-    update_team_names_and_ldus(processor)
-    update_shadow_team_associations(processor)
-    upsert_delius_data_records(processor)
+    reader = Delius::ExtractFileReader.new(filename)
+    update_team_names_and_ldus(reader)
+    update_shadow_team_associations(reader)
+    upsert_delius_data_records(reader)
   end
 
-  def update_shadow_team_associations(processor)
-    for_each_record(processor) do |record|
+  def update_shadow_team_associations(reader)
+    reader.each do |record|
       next unless shadow_ldu?(record[:ldu_code])
 
       UpdateShadowTeamAssociationService.update(
@@ -119,8 +111,8 @@ private
     end
   end
 
-  def update_team_names_and_ldus(processor)
-    for_each_record(processor) do |record|
+  def update_team_names_and_ldus(reader)
+    reader.each do |record|
       next unless active_ldu?(record[:ldu_code])
 
       UpdateTeamNameAndLduService.update(
@@ -131,10 +123,10 @@ private
     end
   end
 
-  def upsert_delius_data_records(processor)
+  def upsert_delius_data_records(reader)
     total = 0
 
-    for_each_record(processor) do |record|
+    reader.each do |record|
       if record[:noms_no].present?
         DeliusDataService.upsert(record)
         total += 1
@@ -142,24 +134,6 @@ private
     end
 
     Rails.logger.info("[DELIUS] #{total} records attempted upsert")
-  end
-
-  def for_each_record(processor)
-    processor.each_with_index do |row, index|
-      # skip header row in row[0]
-      next if index == 0
-
-      record = {}
-
-      # For each row, map the column to the appropriate column name
-      # as the existing column names are not very hash/symbol friendly
-      row.each_with_index do |val, idx|
-        key = FIELDS[idx]
-        record[key] = val
-      end
-
-      yield(record)
-    end
   end
 
   def shadow_ldu?(ldu_code)
