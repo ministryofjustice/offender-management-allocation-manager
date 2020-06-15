@@ -260,6 +260,7 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
 
     before do
       stub_offender(offender_no)
+      stub_offenders_for_prison(prison, [], [])
     end
 
     context 'when tier A offender' do

@@ -7,10 +7,24 @@ class PrisonOffenderManagerService
     # staff_ids in the situation where someone has more than one role.
     poms = Nomis::Elite2::PrisonOffenderManagerApi.list(prison)
     pom_details = PomDetail.where(nomis_staff_id: poms.map(&:staff_id))
+    offender_numbers = Prison.new(prison).offenders.map(&:offender_no)
 
     poms.map { |pom|
       detail = get_pom_detail(pom_details, pom.staff_id.to_i)
-      pom.add_detail(detail, prison)
+
+      allocations = Allocation.active_pom_allocations(detail.nomis_staff_id, prison).
+        where(nomis_offender_id: offender_numbers).
+        map(&:nomis_offender_id)
+      allocation_counts = CaseInformation.where(nomis_offender_id: allocations).
+        group_by(&:tier)
+
+      pom.tier_a = allocation_counts.fetch('A', []).size
+      pom.tier_b = allocation_counts.fetch('B', []).size
+      pom.tier_c = allocation_counts.fetch('C', []).size
+      pom.tier_d = allocation_counts.fetch('D', []).size
+      pom.status = detail.status
+      pom.working_pattern = detail.working_pattern
+
       pom
     }.select { |pom| pom.prison_officer? || pom.probation_officer? }.uniq(&:staff_id)
   end
@@ -52,7 +66,7 @@ class PrisonOffenderManagerService
   end
 
   def self.unavailable_pom_count(prison)
-    poms = PrisonOffenderManagerService.get_poms_for(prison).reject { |pom|
+    poms = get_poms_for(prison).reject { |pom|
       pom.status == 'active'
     }
     poms.count
