@@ -72,4 +72,38 @@ describe Delius::ExtractFileReader do
       expect(record[:team]).to eq('N&S-Bury St Edmunds')
     end
   end
+
+  context 'when the row contains an empty cell' do
+    # The 10th record (row 11) has an empty 'tier' cell
+    let(:record) { subject.to_a[9] }
+
+    it 'still aligns field names and values correctly' do
+      expect_record = {
+        crn: 'crn code',
+        pnc_no: 'pnc num',
+        noms_no: 'mangled nomis',
+        fullname: 'Bobby Pin',
+        tier: '', # tier should be an empty string
+        roh_cds: 'risk of harm',
+        offender_manager: 'ROSS JONES',
+        org_private_ind: 'N',
+        org: 'CRC',
+        provider: 'NPS',
+        provider_code: 'N1234',
+        ldu: 'Stoke LDU',
+        ldu_code: 'SWM11G',
+        team: 'Team 1',
+        team_code: 'A',
+        mappa: 'N',
+        mappa_levels: '1',
+        date_of_birth: '19/03/1985'
+      }
+
+      expect(record).to eq(expect_record)
+    end
+
+    it 'the empty cell becomes an empty string' do
+      expect(record[:tier]).to eq('')
+    end
+  end
 end

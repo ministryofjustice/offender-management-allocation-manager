@@ -20,7 +20,7 @@ module Delius
     end
 
     def each
-      @spreadsheet.each_row_streaming(offset: 1) do |row|
+      @spreadsheet.each_row_streaming(offset: 1, pad_cells: true) do |row|
         record = map_row_to_fields(row)
         yield(record)
       end
@@ -29,7 +29,16 @@ module Delius
   private
 
     def map_row_to_fields(row)
-      values = row.map { |r| r.value.to_s }
+      # Create an array of string values for the row object given
+      # Empty cells (represented as `nil`) become empty strings
+      values = row.map do |cell|
+        if cell.nil?
+          ''
+        else
+          cell.value.to_s
+        end
+      end
+
       FIELDS.zip(values).to_h
     end
   end
