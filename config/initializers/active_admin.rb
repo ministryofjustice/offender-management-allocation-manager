@@ -2,12 +2,8 @@
 # ActiveAdmin.  you're either allowed in because you're considered to
 # be an SPO or you're not authorised to do anything.
 class MoicOAuth2Adapter < ActiveAdmin::AuthorizationAdapter
-  def authorized?(action, _subject = nil)
-    if action == :destroy
-      false
-    else
-      user.is_global_admin?
-    end
+  def authorized?(_action, _subject = nil)
+    user.is_global_admin?
   end
 end
 
