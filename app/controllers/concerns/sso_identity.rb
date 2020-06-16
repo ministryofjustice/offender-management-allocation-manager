@@ -20,6 +20,8 @@ class SsoIdentity
   end
 
   def is_global_admin?
+    # TODO - change this to roles.include?('ROLE_MOIC_ADMIN') (or whatever name is chosen)
+    # once the name has been agreed and the role has been set up in T3/preprod/production
     current_user_is_spo? && caseloads.size == PrisonService.prison_codes.size
   end
 
