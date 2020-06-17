@@ -9,8 +9,8 @@ FactoryBot.define do
     # rubocop:enable Naming/VariableName
   end
 
-  factory :offender, class: 'Nomis::OffenderSummary' do
-    initialize_with { Nomis::OffenderSummary.from_json(attributes.stringify_keys) }
+  factory :offender, class: 'Nomis::Offender' do
+    initialize_with { Nomis::Offender.from_json(attributes.stringify_keys) }
 
     imprisonmentStatus { 'SENT03' }
     prisonId { 'LEI' }

@@ -3,7 +3,7 @@
 class PomsController < PrisonsApplicationController
   before_action :ensure_admin_user
 
-  # so that breadcrumb has staff member available
+  # so that breadcrumb has @pom available
   before_action :load_pom_staff_member, only: [:show, :edit]
 
   breadcrumb 'Prison Offender Managers',
