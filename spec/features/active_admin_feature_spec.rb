@@ -28,9 +28,20 @@ feature 'ActiveAdmin' do
     end
   end
 
-  context 'when spo' do
+  context 'when SPO' do
     before do
       signin_spo_user
+    end
+
+    it 'is unauthorised' do
+      visit('/admin')
+      expect(page).to have_http_status(:unauthorized)
+    end
+  end
+
+  context 'when a global admin' do
+    before do
+      signin_global_admin_user
       ci = create(:case_information, team: nil)
       create(:allocation, nomis_offender_id: ci.nomis_offender_id)
     end

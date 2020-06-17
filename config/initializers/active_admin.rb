@@ -6,7 +6,7 @@ class MoicOAuth2Adapter < ActiveAdmin::AuthorizationAdapter
     if action == :destroy
       false
     else
-      user.current_user_is_spo?
+      user.is_global_admin?
     end
   end
 end
