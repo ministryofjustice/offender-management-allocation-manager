@@ -23,7 +23,7 @@
   </p>
   <% else %>
 
-<div class="govuk-!-margin-top-1">
+<div class="govuk-!-margin-top-1" id="prisoner-information">
   <table class="govuk-table">
     <tbody class="govuk-table__body">
     <tr class="govuk-table__row">
@@ -122,7 +122,7 @@
     </tbody>
   </table>
 
-  <table class="govuk-table">
+  <table class="govuk-table" id="sentence-information">
     <tbody class="govuk-table__body">
     <tr class="govuk-table__row">
       <td class="govuk-table__header govuk-!-width-one-half" scope="row">Sentence information</td>
@@ -188,6 +188,18 @@
       <td class="govuk-table__cell">Tariff date</td>
       <td class="govuk-table__cell table_cell__left_align">
         <%= format_date(@offender.tariff_date, replacement: 'N/A') %>
+      </td>
+    </tr>
+    <tr class="govuk-table__row" id="post-recall-release-date">
+      <td class="govuk-table__cell">Post recall release date</td>
+      <td class="govuk-table__cell table_cell__left_align">
+        <%= format_date(@offender.post_recall_release_date, replacement: 'N/A') %>
+      </td>
+    </tr>
+    <tr class="govuk-table__row" id="licence-expiry-date">
+      <td class="govuk-table__cell">Sentence/ license end date</td>
+      <td class="govuk-table__cell table_cell__left_align">
+        <%= format_date(@offender.licence_expiry_date, replacement: 'N/A') %>
       </td>
     </tr>
     </tbody>

@@ -32,6 +32,7 @@ private
     return redirect_to('/401') if caseloads.nil? || !caseloads.include?(active_prison_id)
 
     @prison = Prison.new(active_prison_id)
+    @caseloads = caseloads
   end
 
   def pom_at_active_prison?
