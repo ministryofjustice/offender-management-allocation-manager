@@ -17,6 +17,9 @@ feature 'ActiveAdmin' do
   #   end
   # end
 
+  let(:ldu) { create(:local_divisional_unit) }
+  let!(:new_team) { create(:team, local_divisional_unit: ldu) }
+
   context 'when pom' do
     before do
       signin_pom_user
@@ -47,8 +50,45 @@ feature 'ActiveAdmin' do
     end
 
     it 'displays the dashboard' do
+      ci = create(:case_information, team: nil)
+      create(:allocation, nomis_offender_id: ci.nomis_offender_id)
+
       visit('/admin')
       expect(page).to have_http_status(:success)
+    end
+
+    context 'with teams' do
+      before do
+        visit('/admin/teams')
+      end
+
+      it 'displays the list of teams' do
+        expect(page).to have_http_status(:success)
+        expect(page).to have_content(new_team.name.to_s)
+      end
+
+      it 'can delete a team' do
+        within("#team_#{new_team.id}") do
+          click_link("Delete")
+        end
+
+        expect(page).to have_content('Team was successfully destroyed')
+      end
+    end
+
+    context 'with local divisional units' do
+      before do
+        visit('/admin/ldus')
+      end
+
+      it "displays the list of LDU's" do
+        expect(page).to have_http_status(:success)
+        expect(page).to have_content(ldu.name.to_s)
+      end
+
+      it 'cannot delete an ldu' do
+        expect(page).not_to have_link('Delete')
+      end
     end
   end
 end
