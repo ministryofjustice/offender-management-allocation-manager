@@ -21,6 +21,8 @@ module Delius
 
     def each
       @spreadsheet.each_row_streaming(offset: 1, pad_cells: true) do |row|
+        next if row_is_empty?(row)
+
         record = map_row_to_fields(row)
         yield(record)
       end
@@ -40,6 +42,10 @@ module Delius
       end
 
       FIELDS.zip(values).to_h
+    end
+
+    def row_is_empty?(row)
+      row.filter(&:present?).empty?
     end
   end
 end

@@ -63,6 +63,18 @@ describe Delius::ExtractFileReader do
     expect(subject.to_a.last).to eq(last_record)
   end
 
+  context 'when the spreadsheet contains blank rows' do
+    # This fixture contains 3 blank rows and 3 rows of data
+    let(:filename) { 'spec/fixtures/delius/delius_sample_with_empty_rows.xlsx' }
+
+    it 'ignores the blank rows' do
+      expect(subject.count).to eq(3)
+      expect_ids = %w[G5823GP G3902GW G3757UN]
+      got_ids = subject.to_a.map { |record| record[:noms_no] }
+      expect(got_ids).to eq(expect_ids)
+    end
+  end
+
   context 'when the LDU and team names contain ampersands (&)' do
     # The 3rd record (row 4) contains ampersands
     let(:record) { subject.to_a[2] }
