@@ -49,10 +49,10 @@ feature "view an offender's allocation information", :versioning do
         create_case_information_for(offender_no)
         create_allocation(offender_no)
 
-        stub_api_calls_for_prison_allocation_path(sentence_start_date: "2020-01-01",
-                                                  conditional_release_date: "2020-11-02",
-                                                  automatic_release_date: "2020-11-02",
-                                                  hdced: "2020-11-02")
+        stub_api_calls_for_prison_allocation_path(sentence_start_date: (Time.zone.today - 4.months),
+                                                  conditional_release_date: (Time.zone.today + 7.months),
+                                                  automatic_release_date: (Time.zone.today + 7.months),
+                                                  hdced: (Time.zone.today + 7.months))
 
         visit prison_allocation_path('LEI', nomis_offender_id: offender_no)
       end

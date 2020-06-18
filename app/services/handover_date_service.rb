@@ -3,6 +3,9 @@
 class HandoverDateService
   HandoverData = Struct.new :start_date, :handover_date, :reason
 
+  # if COM responsible, then handover dates all empty
+  NO_HANDOVER_DATE = HandoverData.new nil, nil, 'COM Responsibility'
+
   def self.handover(offender)
     if offender.recalled?
       HandoverData.new nil, nil, 'Recall case - no handover date calculation'
@@ -54,15 +57,12 @@ private
   end
 
   def self.crc_handover_date(offender)
-    if offender.home_detention_curfew_actual_date.present?
-      offender.home_detention_curfew_actual_date
-    elsif offender.home_detention_curfew_eligibility_date.present?
-      offender.home_detention_curfew_eligibility_date
-    else
-      [offender.conditional_release_date,
-       offender.automatic_release_date
-].compact.map { |date| date - 12.weeks }.min
-    end
+    date = offender.home_detention_curfew_actual_date.presence ||
+      offender.home_detention_curfew_eligibility_date.presence ||
+             [offender.conditional_release_date,
+              offender.automatic_release_date
+             ].compact.min
+    date - 12.weeks if date
   end
 
   def self.nps_handover_date(offender)

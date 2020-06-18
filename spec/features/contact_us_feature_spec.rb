@@ -11,12 +11,12 @@ feature 'Getting help' do
   end
 
   it 'shows a pre-filled contact form when a user is signed in', :raven_intercept_exception, vcr: { cassette_name: :help_logged_in } do
-    signin_user('PK000223')
+    signin_user('MOIC_POM')
     visit '/'
     click_link 'Contact us'
 
     expect(page.find("#prison").value).to eq('HMP Leeds')
-    expect(page.find("#name").value).to eq('Kath Pobee-Norris')
+    expect(page.find("#name").value).to eq('Moic Pom')
 
     expect(page).to have_button('Submit')
   end

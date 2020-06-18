@@ -96,7 +96,7 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
       stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/staff/1").
         to_return(status: 200, body: {}.to_json, headers: {})
 
-      stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/users/PK000223").
+      stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/users/MOIC_POM").
         to_return(status: 200, body: { staffId: 3 }.to_json, headers: {})
 
       stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/staff/4").
@@ -167,50 +167,54 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
     end
 
     context 'without DeliusDataJob' do
-      before do
-        allocation = create(:allocation,
-                            nomis_offender_id: offender_no,
-                            nomis_booking_id: 1,
-                            primary_pom_nomis_id: 4,
-                            allocated_at_tier: 'A',
-                            prison: 'PVI',
-                            recommended_pom_type: 'probation',
-                            event: Allocation::ALLOCATE_PRIMARY_POM,
-                            event_trigger: Allocation::USER,
-                            created_by_username: 'PK000223'
-        )
-        allocation.update!(
-          primary_pom_nomis_id: 5,
-          prison: 'LEI',
-          event: Allocation::REALLOCATE_PRIMARY_POM,
-          event_trigger: Allocation::USER,
-          created_by_username: 'PK000223'
-        )
-      end
-
       render_views
 
-      it "Can get the allocation history for an offender", versioning: true do
-        get :history, params: { prison_id: prison, nomis_offender_id: offender_no }
-        allocation_list = assigns(:history).to_a
+      context 'with an allocation' do
+        before do
+          allocation = create(:allocation,
+                              nomis_offender_id: offender_no,
+                              nomis_booking_id: 1,
+                              primary_pom_nomis_id: 4,
+                              allocated_at_tier: 'A',
+                              prison: 'PVI',
+                              recommended_pom_type: 'probation',
+                              event: Allocation::ALLOCATE_PRIMARY_POM,
+                              event_trigger: Allocation::USER,
+                              created_by_username: 'MOIC_POM'
+          )
+          allocation.update!(
+            primary_pom_nomis_id: 5,
+            prison: 'LEI',
+            event: Allocation::REALLOCATE_PRIMARY_POM,
+            event_trigger: Allocation::USER,
+            created_by_username: 'MOIC_POM'
+          )
+        end
 
-        expect(allocation_list.count).to eq(2)
-        # We get back a list of prison, allocation_array pairs
-        expect(allocation_list.map(&:size)).to eq([2, 2])
-        # Prisons are 1 each - LEI then PVI
-        expect(allocation_list.first.first).to eq('LEI')
-        expect(allocation_list.last.first).to eq('PVI')
+        it "Can get the allocation history for an offender", versioning: true do
+          get :history, params: { prison_id: prison, nomis_offender_id: offender_no }
+          allocation_list = assigns(:history).to_a
 
-        # we have 2 1-element arrays
-        arrays = allocation_list.map { |al| al.second.first }
-        expect(arrays.size).to eq(2)
+          expect(allocation_list.count).to eq(2)
+          # We get back a list of prison, allocation_array pairs
+          expect(allocation_list.map(&:size)).to eq([2, 2])
+          # Prisons are 1 each - LEI then PVI
+          expect(allocation_list.first.first).to eq('LEI')
+          expect(allocation_list.last.first).to eq('PVI')
 
-        expect(arrays.first.nomis_offender_id).to eq(offender_no)
-        # expect to see reallocate event before allocate as the history is reversed
-        expect(arrays.first.event).to eq('reallocate_primary_pom')
-        expect(arrays.last.nomis_booking_id).to eq(1)
+          # we have 2 1-element arrays
+          arrays = allocation_list.map { |al| al.second.first }
+          expect(arrays.size).to eq(2)
+
+          expect(arrays.first.nomis_offender_id).to eq(offender_no)
+          # expect to see reallocate event before allocate as the history is reversed
+          expect(arrays.first.event).to eq('reallocate_primary_pom')
+          expect(arrays.last.nomis_booking_id).to eq(1)
+        end
       end
+    end
 
+    context 'with a different allocation' do
       it "can get email addresses of POM's who have been allocated to an offender given the allocation history", versioning: true do
         previous_primary_pom_nomis_id = 3
         updated_primary_pom_nomis_id = 4
@@ -256,6 +260,7 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
 
     before do
       stub_offender(offender_no)
+      stub_offenders_for_prison(prison, [], [])
     end
 
     context 'when tier A offender' do

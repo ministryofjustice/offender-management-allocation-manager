@@ -17,8 +17,8 @@ describe OmniAuth::Strategies::HmppsSso do
     context 'when #info' do
       it 'returns a hash with the username, active caseload, caseloads and email address' do
         leeds_prison = 'LEI'
-        username = 'PK000223'
-        staff_id = 485_637
+        username = 'MOIC_POM'
+        staff_id = 485_926
         caseloads = %w[LEI RNI]
         response = double(
           'staff_details',
@@ -43,8 +43,8 @@ describe OmniAuth::Strategies::HmppsSso do
 
       it 'sets active caseload from nomis caseloads if not present' do
         leeds_prison = 'LEI'
-        username = 'PK000223'
-        staff_id = 485_637
+        username = 'MOIC_POM'
+        staff_id = 485_926
         caseloads = [{ "caseLoadId" => "LEI" }, { "caseLoadId" => "PVI" }, { "caseLoadId" => "SWI" }, { "caseLoadId" => "VEI" }, { "caseLoadId" => "WEI" }]
         response = double(
           'staff_details',

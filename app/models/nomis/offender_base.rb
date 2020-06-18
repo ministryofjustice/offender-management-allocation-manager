@@ -5,7 +5,7 @@ module Nomis
              :conditional_release_date, :release_date,
              :parole_eligibility_date, :tariff_date,
              :automatic_release_date, :licence_expiry_date,
-             :post_recall_release_date,
+             :post_recall_release_date, :earliest_release_date,
              to: :sentence
 
     attr_accessor :convicted_status, :booking_id,
@@ -83,12 +83,8 @@ module Nomis
       sentence_type_code == 'DET'
     end
 
-    def earliest_release_date
-      sentence.earliest_release_date
-    end
-
     def pom_responsibility
-      ResponsibilityService.calculate_pom_responsibility(self)
+      @pom_responsibility ||= ResponsibilityService.calculate_pom_responsibility(self)
     end
 
     def sentence_start_date
@@ -167,7 +163,11 @@ module Nomis
   private
 
     def handover
-      @handover ||= HandoverDateService.handover(self)
+      @handover ||= if pom_responsibility&.custody?
+                      HandoverDateService.handover(self)
+                    else
+                      HandoverDateService::NO_HANDOVER_DATE
+                    end
     end
   end
 end

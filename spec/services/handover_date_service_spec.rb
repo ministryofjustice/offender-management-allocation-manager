@@ -2,6 +2,14 @@ require 'rails_helper'
 
 describe HandoverDateService do
   describe 'calculating when community start supporting custody' do
+    context 'when recalled' do
+      let(:offender) { OpenStruct.new(recalled?: true) }
+
+      it 'is not calculated' do
+        expect(described_class.handover(offender).start_date).to be_nil
+      end
+    end
+
     context 'when NPS' do
       let(:offender) {
         OpenStruct.new indeterminate_sentence?: indeterminate,
@@ -124,8 +132,8 @@ describe HandoverDateService do
         let(:conditional_release_date) { Date.new(2019, 8, 12) }
         let(:home_detention_curfew_eligibility_date) { Date.new(2019, 7, 25) }
 
-        it 'the handover date will be on the HDCED date' do
-          expect(result).to eq Date.new(2019, 7, 25)
+        it 'the handover date will be on the HDCED date minus 12 weeks' do
+          expect(result).to eq Date.new(2019, 5, 2)
         end
       end
 
@@ -135,8 +143,8 @@ describe HandoverDateService do
         let(:home_detention_curfew_actual_date) { Date.new(2019, 7, 26) }
         let(:home_detention_curfew_eligibility_date) { Date.new(2019, 7, 25) }
 
-        it 'the handover date will be on the HDCAD date' do
-          expect(result).to eq Date.new(2019, 7, 26)
+        it 'the handover date will be on the HDCAD date minus 12 weeks' do
+          expect(result).to eq Date.new(2019, 5, 3)
         end
       end
 

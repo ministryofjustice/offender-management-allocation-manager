@@ -18,12 +18,12 @@ feature "get poms list" do
   end
 
   it "handles missing sentence data", vcr: { cassette_name: :show_poms_feature_missing_sentence } do
-    signin_user('PK000223')
+    signin_user('MOIC_POM')
 
-    visit prison_confirm_allocation_path('LEI', offender_missing_sentence_case_info.nomis_offender_id, 485_637)
+    visit prison_confirm_allocation_path('LEI', offender_missing_sentence_case_info.nomis_offender_id, 485_926)
     click_button 'Complete allocation'
 
-    visit prison_pom_path('LEI', 485_637)
+    visit prison_pom_path('LEI', 485_926)
 
     expect(page).to have_css(".pom_cases_row_0", count: 1)
     expect(page).not_to have_css(".pom_cases_row_1")
@@ -51,7 +51,7 @@ feature "get poms list" do
         nomis_booking_id: booking,
         prison: 'LEI',
         allocated_at_tier: 'A',
-        created_by_username: 'PK000223',
+        created_by_username: 'MOIC_POM',
         primary_pom_nomis_id: 485_926,
         primary_pom_allocated_at: DateTime.now.utc,
         recommended_pom_type: 'prison',

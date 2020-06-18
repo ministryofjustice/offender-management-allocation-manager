@@ -47,7 +47,7 @@ private
     def each
       number_of_requests = max_requests_count
 
-      (0..number_of_requests).each do |request_no|
+      (0..number_of_requests - 1).each do |request_no|
         offenders = fetch_page_of_offenders(
           page_number: request_no,
           page_size: FETCH_SIZE
@@ -84,7 +84,6 @@ private
 
       offenders.each { |offender|
         sentencing = sentence_details[offender.booking_id]
-        # TODO: - if sentencing.present? is false, then we crash in offender#sentenced?
         offender.sentence = sentencing if sentencing.present?
 
         case_info_record = mapped_tiers[offender.offender_no]

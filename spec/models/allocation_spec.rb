@@ -155,14 +155,14 @@ RSpec.describe Allocation, type: :model do
     end
 
     describe 'cleaning up old broken data' do
-      let!(:offender_no) { 'G2911GD' }
-      let!(:movement) {
-        create(:movement,
-               offender_no: offender_no,
-               direction_code: 'OUT',
-               movement_type: 'REL',
-               to_agency: 'OUT',
-               from_agency: 'BAI')
+      let(:offender_no) { 'G2911GD' }
+      let(:movement) {
+        build(:movement,
+              offenderNo: offender_no,
+              directionCode: 'OUT',
+              movementType: 'REL',
+              toAgency: 'OUT',
+              fromAgency: 'BAI')
       }
       let!(:alloc) {
         a = build(

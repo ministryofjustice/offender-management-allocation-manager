@@ -3,9 +3,9 @@ require 'rails_helper'
 describe MovementService do
   include ActiveJob::TestHelper
 
-  let!(:new_offender_court) { create(:movement, offender_no: 'G4273GI', from_agency: 'COURT')   }
-  let!(:new_offender_nil) { create(:movement, offender_no: 'G4273GI', from_agency: nil)   }
-  let!(:transfer_out) { create(:movement, offender_no: 'G4273GI', direction_code: 'OUT', movement_type: 'TRN')   }
+  let(:new_offender_court) { build(:movement, offenderNo: 'G4273GI', fromAgency: 'COURT')   }
+  let(:new_offender_nil) { build(:movement, offenderNo: 'G4273GI', fromAgency: nil)   }
+  let(:transfer_out) { build(:movement, offenderNo: 'G4273GI', directionCode: 'OUT', movementType: 'TRN')   }
 
   it "can get recent movements",
      vcr: { cassette_name: :movement_service_recent_spec }  do
@@ -92,12 +92,12 @@ describe MovementService do
   end
 
   describe "processing an offender transfer" do
-    let!(:transfer_adm_no_to_agency) { create(:movement, offender_no: 'G4273GI', to_agency: 'COURT')   }
-    let!(:transfer_in) { create(:movement, offender_no: 'G4273GI', direction_code: 'IN', movement_type: 'ADM', from_agency: 'VEI', to_agency: 'CFI')   }
-    let!(:admission) { create(:movement, offender_no: 'G4273GI', to_agency: 'LEI', from_agency: 'COURT')   }
+    let(:transfer_adm_no_to_agency) { build(:movement, offenderNo: 'G4273GI', toAgency: 'COURT')   }
+    let(:transfer_in) { build(:movement, offenderNo: 'G4273GI', directionCode: 'IN', movementType: 'ADM', fromAgency: 'VEI', toAgency: 'CFI')   }
+    let(:admission) { create(:movement, offenderNo: 'G4273GI', toAgency: 'LEI', fromAgency: 'COURT')   }
 
     let!(:existing_allocation) { create(:allocation, nomis_offender_id: 'G4273GI', prison: 'LEI')   }
-    let!(:existing_alloc_transfer) { create(:movement, offender_no: 'G4273GI', from_agency: 'PRI', to_agency: 'LEI')   }
+    let(:existing_alloc_transfer) { build(:movement, offenderNo: 'G4273GI', fromAgency: 'PRI', toAgency: 'LEI')   }
 
     it "can process transfers were offender already allocated at new prison",
        vcr: { cassette_name: :movement_service_transfer_in_existing_spec }  do
@@ -107,7 +107,7 @@ describe MovementService do
     end
 
     context 'when processing an admission' do
-      let(:transfer_adm) { create(:movement, offender_no: 'G4273GI', from_agency: 'PRI', to_agency: 'PVI')   }
+      let(:transfer_adm) { build(:movement, offenderNo: 'G4273GI', fromAgency: 'PRI', toAgency: 'PVI')   }
       let(:updated_allocation) { existing_allocation.reload }
 
       it "can process transfer movements IN",
@@ -128,7 +128,7 @@ describe MovementService do
 
     it "can starts an open prison transfer",
        vcr: { cassette_name: :movement_service_transfer_to_open_spec }  do
-      open_prison_transfer = create(:movement, offender_no: 'G4273GI', to_agency: 'HDI')
+      open_prison_transfer = build(:movement, offenderNo: 'G4273GI', toAgency: 'HDI')
 
       expect {
         processed = described_class.process_movement(open_prison_transfer)
@@ -157,16 +157,16 @@ describe MovementService do
 
     it "will ignore an unknown movement type",
        vcr: { cassette_name: :movement_service_unknown_spec }  do
-      unknown_movement_type = create(:movement, offender_no: 'G4273GI', movement_type: 'TMP')
+      unknown_movement_type = build(:movement, offenderNo: 'G4273GI', movementType: 'TMP')
       processed = described_class.process_movement(unknown_movement_type)
       expect(processed).to be false
     end
   end
 
   describe "processing an offender release" do
-    let!(:valid_release) { create(:movement, offender_no: 'G4273GI', direction_code: 'OUT', movement_type: 'REL', to_agency: 'OUT', from_agency: 'BAI')   }
-    let!(:invalid_release1) { create(:movement, offender_no: 'G4273GI', direction_code: 'OUT', movement_type: 'REL', to_agency: 'LEI')   }
-    let!(:invalid_release2) { create(:movement, offender_no: 'G4273GI', direction_code: 'OUT', movement_type: 'REL', from_agency: 'COURT')   }
+    let(:valid_release) { build(:movement, offenderNo: 'G4273GI', directionCode: 'OUT', movementType: 'REL', toAgency: 'OUT', fromAgency: 'BAI')   }
+    let(:invalid_release1) { build(:movement, offenderNo: 'G4273GI', directionCode: 'OUT', movementType: 'REL', toAgency: 'LEI')   }
+    let(:invalid_release2) { build(:movement, offenderNo: 'G4273GI', directionCode: 'OUT', movementType: 'REL', fromAgency: 'COURT')   }
 
     let!(:case_info) { create(:case_information, nomis_offender_id: 'G4273GI') }
     let!(:allocation) { create(:allocation, nomis_offender_id: 'G4273GI') }
@@ -198,8 +198,8 @@ describe MovementService do
     let(:allocation) { Allocation.find_by(nomis_offender_id: 'G4273GI') }
 
     let(:immigration_movement) do
-      create(:movement, offender_no: 'G4273GI', direction_code: direction_code, create_date_time: Date.new(2020, 1, 6),
-                        movement_type: movement_type, from_agency: from_agency, to_agency: to_agency)
+      build(:movement, offenderNo: 'G4273GI', directionCode: direction_code, createDateTime: Date.new(2020, 1, 6).to_s,
+                       movementType: movement_type, fromAgency: from_agency, toAgency: to_agency)
     end
 
     context 'when movement is a transfer' do

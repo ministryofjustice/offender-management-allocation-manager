@@ -3,7 +3,7 @@ require 'rails_helper'
 feature 'Help' do
   context 'when accessing help page' do
     it 'provides a link to the help pages', vcr: { cassette_name: :help_link } do
-      signin_user('PK000223')
+      signin_user('MOIC_POM')
 
       visit '/'
       expect(page).to have_link('Help', href: '/help')

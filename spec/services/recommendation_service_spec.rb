@@ -2,30 +2,18 @@ require 'rails_helper'
 
 describe RecommendationService do
   let(:tierA) {
-    Nomis::OffenderSummary.new.tap { |o|
-      o.tier = 'A'
-      o.sentence = Nomis::SentenceDetail.new
-      o.inprisonment_status = 'SENT03'
-      o.sentence.sentence_start_date = Time.zone.today
-      o.sentence.automatic_release_date = Time.zone.today + 15.months
-    }
+    build(:offender_summary, tier: 'A', sentence: Nomis::SentenceDetail.new(
+      sentence_start_date: Time.zone.today,
+      automatic_release_date: Time.zone.today + 15.months))
   }
   let(:tierD) {
-    Nomis::OffenderSummary.new.tap { |o|
-      o.tier = 'D'
-      o.sentence = Nomis::SentenceDetail.new
-      o.inprisonment_status = 'SENT03'
-      o.sentence.sentence_start_date = Time.zone.today
-      o.sentence.automatic_release_date = Time.zone.today + 10.months
-    }
+    build(:offender_summary, tier: 'D', sentence: Nomis::SentenceDetail.new(
+      sentence_start_date: Time.zone.today,
+      automatic_release_date: Time.zone.today + 10.months))
   }
 
   let(:tierA_and_immigration_case) {
-    Nomis::OffenderSummary.new.tap { |o|
-      o.tier = 'A'
-      o.sentence = Nomis::SentenceDetail.new
-      o.inprisonment_status = 'DET'
-    }
+    build(:offender_summary, tier: 'A', inprisonment_status: 'DET', sentence: Nomis::SentenceDetail.new)
   }
 
   it "can determine the best type of POM for Tier A" do
