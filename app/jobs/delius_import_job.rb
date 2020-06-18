@@ -149,6 +149,8 @@ private
       # skip header row in row[0]
       next if index == 0
 
+      next if row.filter(&:present?).empty?
+
       record = {}
 
       # For each row, map the column to the appropriate column name
