@@ -29,12 +29,15 @@ RSpec.describe EarlyAllocationsController, type: :controller do
   let(:s1_boolean_param_names) { [:convicted_under_terrorisom_act_2000, :high_profile, :serious_crime_prevention_order, :mappa_level_3, :cppc_case] }
   let(:s1_boolean_params) { s1_boolean_param_names.map { |p| [p, 'false'] }.to_h }
 
+  let(:offender) { attributes_for(:offender, offenderNo: nomis_offender_id) }
+  let(:booking) { attributes_for(:booking, bookingId: offender.fetch(:bookingId)) }
+
   before do
     stub_sso_data(prison, 'alice')
 
     stub_offender(nomis_offender_id)
     stub_poms(prison, poms)
-    stub_offenders_for_prison(prison, [], [])
+    stub_offenders_for_prison(prison, [offender], [booking])
 
     create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
   end
