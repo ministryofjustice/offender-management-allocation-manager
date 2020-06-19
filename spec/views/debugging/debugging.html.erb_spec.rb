@@ -1,11 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe "debugging/debugging", type: :view do
-
   describe "debugging/debugging.html.erb" do
-
     it "displays offender full_name" do
-      offender = build(:offender_detail, firstName:'John', lastName: 'Dory')
+      offender = build(:offender_detail, firstName: 'John', lastName: 'Dory')
       offender.sentence = Nomis::SentenceDetail.new(
         sentence_start_date: Time.zone.today,
         automatic_release_date: Time.zone.today + 10.months)
@@ -13,16 +11,15 @@ RSpec.describe "debugging/debugging", type: :view do
 
       assign(:offender, OffenderPresenter.new(offender, nil))
       assign(:prison, prison)
-  
+
       render
       page = Nokogiri::HTML(rendered)
       full_name = page.css('#prisoner-information').css('#name').first
-      expect(full_name.text).to match /Dory, John/
+      expect(full_name.text).to match(/Dory, John/)
     end
   end
 
   describe "debugging/debugging.html.erb" do
-
     it "displays tariff date" do
       offender = build(:offender_detail)
       offender.sentence = Nomis::SentenceDetail.new(
@@ -30,10 +27,10 @@ RSpec.describe "debugging/debugging", type: :view do
         automatic_release_date: Time.zone.today + 10.months,
         tariff_date: Date.new(2033, 8, 1))
       prison = build(:prison)
-      
+
       assign(:offender, OffenderPresenter.new(offender, nil))
       assign(:prison, prison)
-      
+
       render
       page = Nokogiri::HTML(rendered)
       tariff_date = page.css('#sentence-information').css('#tariff-date').first
@@ -47,7 +44,7 @@ RSpec.describe "debugging/debugging", type: :view do
         automatic_release_date: Time.zone.today + 10.months,
         nomis_post_recall_release_date: Date.new(2028, 11, 8))
       prison = build(:prison)
-      
+
       assign(:offender, OffenderPresenter.new(offender, nil))
       assign(:prison, prison)
 
@@ -61,10 +58,10 @@ RSpec.describe "debugging/debugging", type: :view do
       offender = build(:offender_detail)
       offender.sentence = Nomis::SentenceDetail.new(
         sentence_start_date: Time.zone.today,
-        automatic_release_date: Time.zone.today + 10.months, 
+        automatic_release_date: Time.zone.today + 10.months,
         licence_expiry_date: Date.new(2025, 10, 7))
       prison = build(:prison)
-      
+
       assign(:offender, OffenderPresenter.new(offender, nil))
       assign(:prison, prison)
 
