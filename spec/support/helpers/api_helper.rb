@@ -5,7 +5,7 @@ module ApiHelper
 
   def stub_offender(nomis_id, booking_number: 754_165, imprisonment_status: 'SENT03', dob: "1985-03-19")
     stub_request(:get, "#{T3}/prisoners/#{nomis_id}").
-      to_return(body: [{ offenderNo: nomis_id,
+      to_return(status: 200, body: [{ offenderNo: nomis_id,
                                       gender: 'Male',
                                       convictedStatus: 'Convicted',
                                       latestBookingId: booking_number,
@@ -50,13 +50,13 @@ module ApiHelper
 
   def stub_pom_emails(staff_id, emails)
     stub_request(:get, "#{T3}/staff/#{staff_id}/emails").
-      to_return(body: emails.to_json)
+      to_return(status: 200, body: emails.to_json)
   end
 
   def stub_signed_in_pom(staff_id, username)
     stub_auth_token
     stub_request(:get, "#{T3}/users/#{username}").
-      to_return(body: { 'staffId': staff_id }.to_json)
+      to_return(status: 200, body: { 'staffId': staff_id }.to_json)
   end
 
   def stub_offenders_for_prison(prison, offenders, bookings)

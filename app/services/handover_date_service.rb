@@ -15,7 +15,7 @@ class HandoverDateService
       date, reason = nps_handover_date(offender)
       HandoverData.new nps_start_date(offender), date, reason
     else
-      HandoverData.new nil, crc_handover_date(offender), 'CRC Case'
+      HandoverData.new crc_handover_date(offender), crc_handover_date(offender), 'CRC Case'
     end
   end
 
