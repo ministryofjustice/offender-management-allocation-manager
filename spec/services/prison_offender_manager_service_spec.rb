@@ -113,10 +113,13 @@ describe PrisonOffenderManagerService do
               emails: ['test@digital.justice.org.uk']
         )
       }
+      let(:offender) { attributes_for(:offender) }
+      let(:booking) { attributes_for(:booking, bookingId: offender.fetch(:bookingId)) }
+
 
       before do
         stub_poms('WSI', [dave, alice, billy, charles, eric])
-        stub_offenders_for_prison('WSI', [], [])
+        stub_offenders_for_prison('WSI', [offender], [booking])
       end
 
       it 'removes duplicate staff ids, keeping the valid position' do

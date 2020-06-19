@@ -82,7 +82,7 @@ module ApiHelper
     # Get the booking ids provided
     booking_ids = offenders.map { |h| h.fetch(:bookingId) }
     stub_request(:post, elite2bookingsapi).with(body: booking_ids.to_json).
-      to_return(body: bookings.to_json, headers: {})
+      to_return(body: bookings.to_json)
   end
 
   def stub_multiple_offenders(offenders, bookings)

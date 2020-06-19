@@ -258,9 +258,12 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
 
     let(:offender_no) { 'G7806VO' }
 
+    let(:offender) { attributes_for(:offender, offenderNo: offender_no) }
+    let(:booking) { attributes_for(:booking, bookingId: offender.fetch(:bookingId)) }
+
     before do
       stub_offender(offender_no)
-      stub_offenders_for_prison(prison, [], [])
+      stub_offenders_for_prison(prison, [offender], [booking])
     end
 
     context 'when tier A offender' do
