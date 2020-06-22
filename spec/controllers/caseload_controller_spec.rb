@@ -7,9 +7,8 @@ RSpec.describe CaseloadController, type: :controller do
     [
       build(:pom,
             firstName: 'Alice',
-            position: RecommendationService::PRISON_POM,
-            staffId: staff_id
-      )
+            staffId:  staff_id,
+            position: RecommendationService::PRISON_POM)
     ]
   }
 
@@ -20,25 +19,50 @@ RSpec.describe CaseloadController, type: :controller do
   end
 
   describe '#handover_start' do
-    let(:today_plus_13_weeks) { Time.zone.today + 13.weeks }
-    let(:offender) { attributes_for(:offender) }
-
     before do
-      bookings = [offender].map { |o|
-        b = attributes_for(:booking).merge(offenderNo: o.fetch(:offenderNo),
-                                           bookingId: o.fetch(:bookingId))
-        b.fetch(:sentenceDetail)[:automaticReleaseDate] = today_plus_13_weeks
-        b
-      }
       stub_offenders_for_prison(prison, [offender], bookings)
-      create(:case_information, case_allocation: 'CRC', nomis_offender_id: offender.fetch(:offenderNo))
+      create(:case_information, case_allocation: case_allocation, nomis_offender_id: offender.fetch(:offenderNo))
       create(:allocation, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: staff_id, prison: prison)
     end
 
-    it 'can pull back a CRC offender due for handover' do
-      get :handover_start, params: { prison_id: prison }
-      expect(response).to be_successful
-      expect(assigns(:upcoming_handovers).map(&:offender_no)).to match_array([offender.fetch(:offenderNo)])
+    let(:offender) { attributes_for(:offender) }
+
+    context 'when NPS' do
+      let(:today_plus_36_weeks) { (Time.zone.today + 36.weeks).to_s }
+      let(:bookings) {
+        [offender].map { |o|
+          b = attributes_for(:booking).merge(offenderNo: o.fetch(:offenderNo),
+                                             bookingId: o.fetch(:bookingId))
+          b.fetch(:sentenceDetail)[:paroleEligibilityDate] = today_plus_36_weeks
+          b
+        }
+      }
+      let(:case_allocation) { 'NPS' }
+
+      it 'can pull back a NPS offender due for handover' do
+        get :handover_start, params: { prison_id: prison }
+        expect(response).to be_successful
+        expect(assigns(:upcoming_handovers).map(&:offender_no)).to match_array([offender.fetch(:offenderNo)])
+      end
+    end
+
+    context 'when CRC' do
+      let(:bookings) {
+        [offender].map { |o|
+          b = attributes_for(:booking).merge(offenderNo: o.fetch(:offenderNo),
+                                             bookingId: o.fetch(:bookingId))
+          b.fetch(:sentenceDetail)[:automaticReleaseDate] = today_plus_13_weeks
+          b
+        }
+      }
+      let(:case_allocation) { 'CRC' }
+      let(:today_plus_13_weeks) { (Time.zone.today + 13.weeks).to_s }
+
+      it 'can pull back a CRC offender due for handover' do
+        get :handover_start, params: { prison_id: prison }
+        expect(response).to be_successful
+        expect(assigns(:upcoming_handovers).map(&:offender_no)).to match_array([offender.fetch(:offenderNo)])
+      end
     end
   end
 
