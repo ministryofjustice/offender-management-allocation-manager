@@ -66,7 +66,7 @@ RSpec.describe CaseloadController, type: :controller do
     end
   end
 
-  describe '#index' do
+  context 'with 3 offenders', :versioning do
     let(:today) { Time.zone.today }
     let(:yesterday) { Time.zone.today - 1.day }
 
@@ -80,17 +80,31 @@ RSpec.describe CaseloadController, type: :controller do
 
       stub_offenders_for_prison(prison, offenders, bookings)
 
-      # Allocate all of the offenders to this POM
+      # Need to create history records because AllocatedOffender#new_case? doesn't cope otherwise
       offenders.each do |offender|
-        create(:allocation, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: staff_id, prison: prison)
+        alloc = create(:allocation, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: staff_id, prison: prison)
+        alloc.update!(primary_pom_nomis_id: staff_id,
+                      event: Allocation::REALLOCATE_PRIMARY_POM,
+                      event_trigger: Allocation::USER)
       end
     end
 
-    it 'returns the caseload' do
-      get :index, params: { prison_id: prison }
-      expect(response).to be_successful
+    describe '#index' do
+      it 'returns the caseload' do
+        get :index, params: { prison_id: prison }
+        expect(response).to be_successful
 
-      expect(assigns(:allocations).map(&:nomis_offender_id)).to match_array(offenders.map { |o| o.fetch(:offenderNo) })
+        expect(assigns(:allocations).map(&:nomis_offender_id)).to match_array(offenders.map { |o| o.fetch(:offenderNo) })
+      end
+    end
+
+    describe '#new' do
+      it 'returns the caseload' do
+        get :new, params: { prison_id: prison }
+        expect(response).to be_successful
+
+        expect(assigns(:new_cases).map(&:nomis_offender_id)).to match_array(offenders.map { |o| o.fetch(:offenderNo) })
+      end
     end
   end
 end
