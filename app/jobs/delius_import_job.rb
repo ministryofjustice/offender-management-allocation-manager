@@ -103,6 +103,10 @@ private
   def process_decrypted_file(filename)
     Rails.logger.info('[DELIUS] Processing decrypted file')
     processor = Delius::Processor.new(filename)
+    # A key fact here is that update_team_names_and_ldus()
+    # only operates on 'active' records
+    # and update_shadow_team_associations() only operates on 'shadow'
+    # records - so their behaviours do not overlap.
     update_team_names_and_ldus(processor)
     update_shadow_team_associations(processor)
     upsert_delius_data_records(processor)
