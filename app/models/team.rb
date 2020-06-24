@@ -3,7 +3,7 @@
 class Team < ApplicationRecord
   validates :name, :code, presence: true
 
-  validates :shadow_code, uniqueness: true, if: -> { nps? }
+  validates :shadow_code, uniqueness: true, if: -> { nps? && shadow_code.present? }
   validates :code, uniqueness: true, if: -> { nps? }
   validates :name, uniqueness: true, if: -> { nps? }
 

@@ -132,9 +132,10 @@ private
       next unless active_ldu?(record[:ldu_code])
 
       UpdateTeamNameAndLduService.update(
-        team_code: record[:team_code],
-        team_name: record[:team],
-        ldu_code: record[:ldu_code]
+        team_code: record.fetch(:team_code),
+        team_name: record.fetch(:team),
+        ldu_code: record.fetch(:ldu_code),
+        ldu_name: record.fetch(:ldu)
       )
     end
   end
