@@ -54,6 +54,7 @@ group :development, :test do
   # needed to support Rails 6.0
   gem 'rspec-rails', '~> 4.0.0.beta2'
   gem 'rswag-specs'
+  gem 'spring'
 end
 
 group :test do
@@ -76,7 +77,6 @@ end
 
 group :development do
   gem 'listen', '>= 3.0.5', '< 3.2'
-  gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'web-console', '>= 3.3.0'
 
