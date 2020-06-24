@@ -14,7 +14,7 @@
   </thead>
   <tbody class="govuk-table__body">
   <% poms.each_with_index do |pom, i| %>
-    <tr class="govuk-table__row prison_pom_row_<%= i %>">
+    <tr class="govuk-table__row <%= pom_type %>_pom_row_<%= i %>">
       <td aria-label="POM name" class="govuk-table__cell "><%= pom.full_name %></td>
       <td aria-label="Tier A cases" class="govuk-table__cell ">-</td>
       <td aria-label="Tier A cases" class="govuk-table__cell "><%= pom.tier_a %></td>

@@ -12,14 +12,14 @@
 
 <h2 class="govuk-heading-s">Probation Officer POMs</h2>
 
-<%= render :partial => 'poms_table', :locals => { poms: @probation_poms } %>
+<%= render :partial => 'poms_table', :locals => { poms: @probation_poms, pom_type: 'probation' } %>
 
 <!-- Spacer -->
 <div class="govuk-grid-row"><div class="govuk-grid-column-full govuk-!-margin-top-4"></div></div>
 
 <h2 class="govuk-heading-s">Prison Officer POMs</h2>
 
-<%= render :partial => 'poms_table', :locals => { poms: @prison_poms } %>
+<%= render :partial => 'poms_table', :locals => { poms: @prison_poms, pom_type: 'prison' } %>
 
 <!-- Spacer -->
 <div class="govuk-grid-row"><div class="govuk-grid-column-full govuk-!-margin-top-4"></div></div>
