@@ -14,6 +14,7 @@ class DeliusImportJob < ApplicationJob
     :team, :team_code,
     :mappa, :mappa_levels, :date_of_birth
   ].freeze
+
   def perform
     ActiveRecord::Base.connection.disable_query_cache!
 
@@ -27,8 +28,25 @@ class DeliusImportJob < ApplicationJob
     Delius::Emails.connect(username, password, folder) do |emails|
       decoded_attachment_content = process_emails(emails)
     end
-    process_attachment(decoded_attachment_content) if decoded_attachment_content.present?
+    if decoded_attachment_content.present?
+      process_attachment(decoded_attachment_content) do |processor|
+        Rails.logger.info('[DELIUS] Processing decrypted file')
+        process_decrypted_file(processor)
+      end
+    end
   end
+
+  def process_decrypted_file(processor)
+    # A key fact here is that update_team_names_and_ldus()
+    # only operates on 'active' records
+    # and update_shadow_team_associations() only operates on 'shadow'
+    # records - so their behaviours do not overlap.
+    update_team_names_and_ldus(processor)
+    update_shadow_team_associations(processor)
+    upsert_delius_data_records(processor)
+  end
+
+private
 
   def process_emails(emails)
     decoded_attachment_content = nil
@@ -52,8 +70,6 @@ class DeliusImportJob < ApplicationJob
     Rails.logger.info('[DELIUS] cleaned inbox')
     decoded_attachment_content
   end
-
-private
 
   def process_attachment(attachment_bytes)
     # This method is passed the contents of the attachment as a bytearray
@@ -96,20 +112,8 @@ private
 
       Rails.logger.info('[DELIUS] Attachment decrypted')
 
-      process_decrypted_file(filename)
+      yield Delius::Processor.new(filename)
     end
-  end
-
-  def process_decrypted_file(filename)
-    Rails.logger.info('[DELIUS] Processing decrypted file')
-    processor = Delius::Processor.new(filename)
-    # A key fact here is that update_team_names_and_ldus()
-    # only operates on 'active' records
-    # and update_shadow_team_associations() only operates on 'shadow'
-    # records - so their behaviours do not overlap.
-    update_team_names_and_ldus(processor)
-    update_shadow_team_associations(processor)
-    upsert_delius_data_records(processor)
   end
 
   def update_shadow_team_associations(processor)
