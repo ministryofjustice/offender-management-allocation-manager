@@ -98,5 +98,10 @@ spec:
                     secretKeyRef:
                       name: allocation-rds-instance-output
                       key: postgres_user
+                - name: REDIS_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: elasticache-offender-management-allocation-manager-token-cache-production
+                      key: url
           restartPolicy: OnFailure
 
