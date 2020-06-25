@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: offender-manager-process-movements
 spec:
-  schedule: "*/20 * * * *"
+  schedule: "0 2 * * *"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 2
   failedJobsHistoryLimit: 2
