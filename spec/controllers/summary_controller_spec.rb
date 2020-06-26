@@ -244,7 +244,7 @@ RSpec.describe SummaryController, type: :controller do
           bookingId: offender[:booking_id],
           sentenceDetail: {
             sentenceStartDate: offender[:sentence_start_date].strftime('%F'),
-            releaseDate: 30.years.from_now.strftime('%F')
+            conditionalReleaseDate: 30.years.from_now.strftime('%F')
           }
         }
       }

@@ -2,7 +2,7 @@ module Nomis
   class OffenderBase
     delegate :home_detention_curfew_eligibility_date,
              :home_detention_curfew_actual_date,
-             :conditional_release_date, :release_date,
+             :conditional_release_date,
              :parole_eligibility_date, :tariff_date,
              :automatic_release_date, :licence_expiry_date,
              :post_recall_release_date, :earliest_release_date,
@@ -27,15 +27,23 @@ module Nomis
     def sentenced?
       # A prisoner will have had a sentence calculation and for our purposes
       # this means that they will either have a:
-      # 1) Release date, or
-      # 2) Parole eligibility date, or
-      # 3) HDC release date (homeDetentionCurfewEligibilityDate field).
-      # If they do not have any of these we should be checking for a tariff date
-      # Once we have all the dates we then need to display whichever is the
-      # earliest one.
+      # 1) Conditional release date (CRD) or
+      # 2) Automatic release date (ARD) or
+      # 3) Home detention curfew actual date (HDCAD) or
+      # 4) Post recall release date (PRRD) or
+      # 5) Sentence licence expiry date (SLED) or
+      # 6) Parole eligibility date (PED) or
+      # 7) Home detention curfew eligibility date (HDCED) or
+      # 8) Tariff end date (TED)
+      # 9) Or have an indeterminate sentence
+
       return false if sentence&.sentence_start_date.blank?
 
-      sentence.release_date.present? ||
+      sentence.conditional_release_date.present? ||
+        sentence.automatic_release_date.present? ||
+        sentence.home_detention_curfew_actual_date.present? ||
+        sentence.post_recall_release_date.present? ||
+        sentence.licence_expiry_date.present? ||
         sentence.parole_eligibility_date.present? ||
         sentence.home_detention_curfew_eligibility_date.present? ||
         sentence.tariff_date.present? ||

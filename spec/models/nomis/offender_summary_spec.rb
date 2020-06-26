@@ -112,7 +112,7 @@ describe Nomis::OffenderSummary do
       before do
         subject.sentence = Nomis::SentenceDetail.new(
           sentence_start_date: Date.new(2005, 2, 3),
-          release_date: Time.zone.today)
+          automatic_release_date: Time.zone.today)
       end
 
       it 'marks the offender as sentenced' do
