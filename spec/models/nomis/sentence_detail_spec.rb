@@ -102,6 +102,15 @@ describe Nomis::SentenceDetail, model: true do
       end
     end
 
+    context "when post_recall_release_date is not present" do
+      let(:actual_parole_date) { latest_date }
+      let(:nomis_post_recall_release_date) { no_date }
+
+      it "shows actual parole date" do
+        expect(subject.post_recall_release_date).to eq(latest_date)
+      end
+    end
+
     context "when actual_parole_date and post_recall_release_date are not present" do
       let(:actual_parole_date) { no_date }
       let(:nomis_post_recall_release_date) { no_date }
