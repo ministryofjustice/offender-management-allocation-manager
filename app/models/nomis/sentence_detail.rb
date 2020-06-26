@@ -33,6 +33,8 @@ module Nomis
 
       return post_recall_release_date if @actual_parole_date.blank?
 
+      return @actual_parole_date if post_recall_release_date.blank?
+
       if @actual_parole_date.before?(post_recall_release_date)
         @actual_parole_date
       else
