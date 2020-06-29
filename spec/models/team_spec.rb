@@ -3,8 +3,13 @@ require 'rails_helper'
 RSpec.describe Team, type: :model do
   it {
     expect(subject).to validate_presence_of :name
-    expect(subject).to validate_presence_of :code
   }
+
+  it 'expects one of shadow code and code to be present' do
+    expect(build(:team, code: nil, shadow_code: nil)).not_to be_valid
+    expect(build(:team, code: 'N123', shadow_code: nil)).to be_valid
+    expect(build(:team, code: nil, shadow_code: 'N123')).to be_valid
+  end
 
   context 'when NPS' do
     before do

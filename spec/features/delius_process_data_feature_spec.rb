@@ -76,6 +76,9 @@ feature 'delius import scenarios', vcr: { cassette_name: :delius_import_scenario
       end
     end
 
+    #TODO: - I'm not sure if this scenario makes sense. Would we ever receive
+    # a delius extract record with team but no LDU? Think we might need to add
+    # validation to prevent this scenario occuring
     context 'without LDU' do
       let(:d1) { create(:delius_data, ldu: nil, ldu_code: nil) }
 
@@ -86,7 +89,7 @@ feature 'delius import scenarios', vcr: { cassette_name: :delius_import_scenario
       it 'displays the correct error message' do
         visit prison_case_information_path('LEI', d1.noms_no)
         within '.govuk-error-summary' do
-          expect(page).to have_content 'no local divisional unit (LDU) information found'
+          expect(page).to have_content 'no community team information found'
         end
       end
     end
