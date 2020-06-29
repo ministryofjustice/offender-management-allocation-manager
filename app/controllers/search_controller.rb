@@ -36,6 +36,7 @@ private
   end
 
   def search_term
-    params['q'].strip
+    # defaults to an empty string if the key 'q' can't be found
+    params.fetch('q', '').strip
   end
 end
