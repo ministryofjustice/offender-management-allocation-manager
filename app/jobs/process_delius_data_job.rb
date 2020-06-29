@@ -86,7 +86,9 @@ private
   end
 
   def map_team(team_code)
-    Team.find_by(shadow_code: team_code) || Team.find_by(code: team_code)
+    team = Team.find_by(shadow_code: team_code) || Team.find_by(code: team_code)
+    # don't map a team if it doesn't have an LDU
+    team if team&.local_divisional_unit.present?
   end
 
   def find_case_info(delius_record)
