@@ -34,4 +34,21 @@ RSpec.describe DeliusImportJob, type: :job do
     expect(DeliusData.last.crn).to eq('crn code')
     expect(DeliusData.last.tier).to eq('A1')
   end
+
+  context 'when LDU and team names contain ampersands (&)' do
+    before do
+      stub_offender('mangled nomis')
+    end
+
+    it 'imports their names correctly' do
+      ENV['DELIUS_EMAIL_FOLDER'] = 'delius_import_with_ampersands'
+      ENV['DELIUS_XLSX_PASSWORD'] = 'secret'
+
+      described_class.perform_now
+      imported = DeliusData.first
+
+      expect(imported.ldu).to eq('Norfolk & Suffolk LDU')
+      expect(imported.team).to eq('N&S-Bury St Edmunds')
+    end
+  end
 end
