@@ -65,26 +65,6 @@ describe ViewHandoverEmailAddressesSummary do
     end
   end
 
-  context 'with an offender that has case information with an orphaned team link' do
-    let(:offenders) { [double(offender_no: 1)] }
-
-    before do
-      create(:case_information, :no_team, nomis_offender_id: 1, team_id: 1)
-      Team.destroy_all
-    end
-
-    it 'returns the right counts' do
-      expect(result).to eq(
-        has_email_address: 0,
-        missing_delius_record: 0,
-        missing_team_link: 0,
-        missing_team_information: 1,
-        missing_local_divisional_unit: 0,
-        missing_local_divisional_unit_email: 0
-                        )
-    end
-  end
-
   context 'with an offender that cannot be linked to a local divisional unit' do
     let(:offenders) { [double(offender_no: 1)] }
 
