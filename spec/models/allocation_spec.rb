@@ -103,7 +103,7 @@ RSpec.describe Allocation, type: :model do
           nomis_booking_id: 1,
           recommended_pom_type: 'probation',
           event: Allocation::ALLOCATE_PRIMARY_POM,
-          created_by_username: 'PK000223',
+          created_by_username: 'MOIC_POM',
           event_trigger: Allocation::USER
         }
         AllocationService.create_or_update(params)
@@ -134,7 +134,7 @@ RSpec.describe Allocation, type: :model do
           recommended_pom_type: 'probation',
           event: Allocation::ALLOCATE_PRIMARY_POM,
           event_trigger: Allocation::USER,
-          created_by_username: 'PK000223'
+          created_by_username: 'MOIC_POM'
         }
         AllocationService.create_or_update(params)
 
