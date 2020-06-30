@@ -27,7 +27,7 @@ describe AllocationService do
       expect {
         described_class.allocate_secondary(nomis_offender_id: nomis_offender_id,
                                            secondary_pom_nomis_id: secondary_pom_id,
-                                           created_by_username: 'PK000223',
+                                           created_by_username: 'MOIC_POM',
                                            message: message
         )
         expect(allocation.reload.secondary_pom_nomis_id).to eq(secondary_pom_id)
@@ -78,7 +78,7 @@ describe AllocationService do
         recommended_pom_type: 'probation',
         event: Allocation::ALLOCATE_PRIMARY_POM,
         event_trigger: Allocation::USER,
-        created_by_username: 'PK000223'
+        created_by_username: 'MOIC_POM'
       }
 
       described_class.create_or_update(params)
@@ -95,7 +95,7 @@ describe AllocationService do
         allocated_at_tier: 'B',
         primary_pom_nomis_id: 485_926,
         event: Allocation::REALLOCATE_PRIMARY_POM,
-        created_by_username: 'PK000223'
+        created_by_username: 'MOIC_POM'
       }
 
       described_class.create_or_update(update_params)
@@ -195,7 +195,7 @@ describe AllocationService do
       recommended_pom_type: 'probation',
       event: Allocation::ALLOCATE_PRIMARY_POM,
       event_trigger: Allocation::USER,
-      created_by_username: 'PK000223'
+      created_by_username: 'MOIC_POM'
     }
 
     described_class.create_or_update(params)

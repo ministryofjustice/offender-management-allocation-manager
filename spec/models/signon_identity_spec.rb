@@ -4,7 +4,7 @@ describe SignonIdentity, model: true do
   let(:time_stamp) { 123_456 }
   let(:user_auth_data) {
     double('user_auth_data',
-           username: 'PK000223',
+           username: 'MOIC_POM',
            active_caseload: 'LEI',
            caseloads: %w[LEI RNI],
            roles: ['ROLE_ALLOC_MGR']
@@ -27,7 +27,7 @@ describe SignonIdentity, model: true do
 
   it 'creates session data' do
     session = {
-      username: 'PK000223',
+      username: 'MOIC_POM',
       active_caseload: 'LEI',
       caseloads: %w[LEI RNI],
       expiry: time_stamp,
