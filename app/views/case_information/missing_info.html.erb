@@ -11,8 +11,7 @@
 
 <%= form_for(@case_info, url: prison_case_information_index_path(@prison.code), method: :post) do |form| %>
   <%= form.hidden_field(:nomis_offender_id, value: @prisoner.offender_no) %>
-  <%= form.hidden_field(:last_known_location, value: params.dig(:case_information, :last_known_location)) %>
-  <%= form.hidden_field(:probation_service, value: params.dig(:case_information, :probation_service)) %>
+  <%= form.hidden_field(:probation_service, value: @case_info.probation_service) %>
   <%= hidden_field_tag("sort", params[:sort])%>
   <%= hidden_field_tag("page", params[:page]) %>
   <%= hidden_field_tag("stage", 'missing_info') %>

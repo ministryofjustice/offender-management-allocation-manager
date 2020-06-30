@@ -111,6 +111,10 @@ private
     welsh_offender ? 'Wales' : 'England'
   end
 
+  def map_probation_service(welsh_offender)
+    welsh_offender ? 'Wales' : 'England'
+  end
+
   def map_tier(tier)
     tier[0] if tier.present?
   end

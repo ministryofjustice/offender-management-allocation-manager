@@ -24,8 +24,6 @@ class ViewHandoverEmailAddressesSummary
       :missing_delius_record
     elsif missing_team_link?(case_info)
       :missing_team_link
-    elsif missing_team_information?(case_info)
-      :missing_team_information
     elsif missing_local_divisional_unit?(case_info)
       :missing_local_divisional_unit
     elsif missing_email?(case_info)
@@ -41,10 +39,6 @@ class ViewHandoverEmailAddressesSummary
 
   def missing_team_link?(case_info)
     case_info.team_id.blank?
-  end
-
-  def missing_team_information?(case_info)
-    case_info.team.blank?
   end
 
   def missing_local_divisional_unit?(case_info)
