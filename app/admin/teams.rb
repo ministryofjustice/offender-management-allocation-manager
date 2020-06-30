@@ -36,4 +36,14 @@ ActiveAdmin.register Team do
   filter :shadow_code
   filter :local_divisional_unit, collection: proc { LocalDivisionalUnit.order(:name) }
   filter :case_information_count, label: 'Offender count'
+
+  form do |_form|
+    inputs do
+      input :local_divisional_unit, collection: LocalDivisionalUnit.with_email_address.order(:name)
+      input :code
+      input :shadow_code
+      input :name
+    end
+    actions
+  end
 end
