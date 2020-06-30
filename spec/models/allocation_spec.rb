@@ -33,7 +33,7 @@ RSpec.describe Allocation, type: :model do
     }
 
     it 'picks up NPS allocations without emails' do
-      expect(described_class.without_ldu_emails).to match_array([c1, c2])
+      expect(described_class.without_ldu_emails).to match_array([c2])
     end
   end
 

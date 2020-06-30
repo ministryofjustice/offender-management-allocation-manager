@@ -34,4 +34,10 @@ module FeaturesHelper
     stub_request(:get, "#{ApiHelper::T3}/staff/#{staff_id}/emails").
       to_return(body: [].to_json)
   end
+
+  # The Gov Uk styles seem to make the actual radio buttons invisible - this
+  # works around the issue so that tests can call click_radio_button('England')
+  def choose_radio_button(value)
+    choose(value, allow_label_click: true)
+  end
 end

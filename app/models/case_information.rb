@@ -13,7 +13,7 @@ class CaseInformation < ApplicationRecord
 
   scope :nps, -> { where(case_allocation: 'NPS') }
 
-  attr_accessor :last_known_location
+  before_validation :save_scottish_or_ni, if: -> { manual_entry && (probation_service == 'Scotland' || probation_service == 'Northern Ireland') }
 
   def local_divisional_unit
     team.try(:local_divisional_unit)
@@ -58,40 +58,11 @@ class CaseInformation < ApplicationRecord
     probation_service == 'Wales'
   end
 
-  # We only want to validate last known location in forms
-  validates :last_known_location,
-            inclusion: {
-              in: %w[Yes No],
-              allow_nil: true,
-              message: "Select yes if the prisoner's last known address was in Northern Ireland, Scotland or Wales"
-            }, if: -> { manual_entry }
-
-  def scottish_or_ni?
-    return true if last_known_location == 'Yes' &&
-      (probation_service == 'Scotland' || probation_service == 'Northern Ireland')
-
-    false
-  end
+private
 
   def save_scottish_or_ni
-    self.tier = 'N/A'
-    self.case_allocation = 'N/A'
-    self.team = nil
-  end
-
-  def english_or_welsh?
-    return true if last_known_location == 'No' || probation_service == 'Wales' || probation_service == 'England'
-
-    false
-  end
-
-  def english?
-    last_known_location == 'No'
-  end
-
-  def stage2_filled?
-    return false if tier.nil? || team.nil? || case_allocation.nil?
-
-    true
+    assign_attributes(tier: 'N/A',
+                      case_allocation: 'N/A',
+                      team: nil)
   end
 end
