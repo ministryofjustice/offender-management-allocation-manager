@@ -52,6 +52,7 @@ class CaseInformationController < PrisonsApplicationController
       nomis_offender_id: case_information_params[:nomis_offender_id],
       tier: case_information_params[:tier],
       welsh_offender: case_information_params[:welsh_offender],
+      probation_service: case_information_params[:welsh_offender] ? 'Wales' : 'England',
       case_allocation: case_information_params[:case_allocation],
       manual_entry: true
     )

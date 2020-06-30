@@ -56,7 +56,7 @@ RSpec.describe CaseInformation, type: :model do
       build(:case_information, tier: nil)
     }
 
-    it 'gives the correct message' do
+    it 'gives the correct error message' do
       expect(subject).not_to be_valid
       expect(subject.errors.messages).to eq(tier: ['Select the prisoner’s tier'])
     end
@@ -77,6 +77,24 @@ RSpec.describe CaseInformation, type: :model do
   context 'with null manual flag' do
     it 'wont be valid' do
       expect(build(:case_information, manual_entry: nil)).not_to be_valid
+    end
+  end
+
+  context 'when probation service' do
+    subject {
+      build(:case_information, probation_service: nil)
+    }
+
+    it 'gives the correct validation error message' do
+      expect(subject).not_to be_valid
+      expect(subject.errors.messages).to eq(probation_service: ["You must say if the prisoner's last known address was in Northern Ireland, Scotland or Wales"])
+    end
+
+    it 'allows England, Wales, Scotland & Northern Ireland' do
+      ['England', 'Wales', 'Scotland', 'Northern Ireland'].each do |service|
+        subject.probation_service = service
+        expect(subject).to be_valid
+      end
     end
   end
 end

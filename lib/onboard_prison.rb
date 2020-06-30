@@ -28,6 +28,7 @@ class OnboardPrison
         tier: record[:tier],
         case_allocation: record[:provider_cd],
         crn: record[:crn],
+        probation_service: record[:welsh_offender] ? 'England' : 'Wales',
         manual_entry: true
       )
 
