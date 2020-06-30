@@ -9,6 +9,7 @@ module Delius
     def initialize(&block)
       @inside_cell = false
       @block = block
+      @str = ''
     end
 
     def start_element(name, _attrs)
@@ -16,11 +17,12 @@ module Delius
     end
 
     def characters(str)
-      @block.call(str) if @inside_cell
-      @inside_cell = false
+      @str += str if @inside_cell
     end
 
     def end_element(_name)
+      @block.call(@str) if @inside_cell
+      @str = ''
       @inside_cell = false
     end
   end
