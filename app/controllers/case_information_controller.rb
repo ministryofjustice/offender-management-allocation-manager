@@ -5,46 +5,59 @@ class CaseInformationController < PrisonsApplicationController
   before_action :set_prisoner_from_url, only: [:new, :edit, :edit_prd, :update_prd, :show]
 
   def new
-    @case_info = CaseInformation.new(
+    @last_location = LastLocation.new(
       nomis_offender_id: nomis_offender_id_from_url
     )
   end
 
   def create
-    @case_info = CaseInformation.create(
-      nomis_offender_id: case_information_params[:nomis_offender_id],
-      tier: case_information_params[:tier],
-      case_allocation: case_information_params[:case_allocation],
-      probation_service: case_information_params[:probation_service],
-      last_known_location: case_information_params[:last_known_location],
-      team_id: team_identifier,
-      manual_entry: true
-    )
-
-    params[:stage] == 'last_location' ? handle_stage1 : handle_stage2
-
-    if @case_info.valid?
-      @case_info.save
+    if params[:stage] == 'last_location'
+      @last_location = LastLocation.new(last_location_params)
+      @case_info = CaseInformation.new(
+        nomis_offender_id: @last_location.nomis_offender_id,
+        probation_service: @last_location.probation_service,
+        manual_entry: true
+      )
+      if @last_location.valid?
+        unless @case_info.valid?
+          @prisoner = prisoner(@last_location.nomis_offender_id)
+          render :missing_info
+        end
+      else
+        display_address_page
+      end
+    else
+      @last_location = Struct.new(:valid?).new(true)
+      @case_info = CaseInformation.new(case_information_params.merge(team_id: team_identifier, manual_entry: true))
+      unless @case_info.valid?
+        handle_stage2_rendering
+      end
+    end
+    if @last_location.valid? && @case_info.valid?
+      @case_info.save!
       send_email
       redirect_to prison_summary_pending_path(active_prison_id, sort: params[:sort], page: params[:page])
     end
   end
 
   def edit
-    @case_info.last_known_location = if @case_info.probation_service == 'England'
-                                       'No'
-                                     else
-                                       'Yes'
-                                     end
-    @team_name = Team.find_by(id: @case_info.team_id)&.name
+    @edit_case_info = EditCaseInformation.from_case_info(@case_info)
+
+    @team_name = @case_info.team&.name
   end
 
   def update
-    @case_info = CaseInformation.find_by(nomis_offender_id: case_information_params[:nomis_offender_id])
-    @prisoner = prisoner(case_information_params[:nomis_offender_id])
+    @case_info = CaseInformation.find_by!(nomis_offender_id: nomis_offender_id_from_url)
+    @prisoner = prisoner(nomis_offender_id_from_url)
+    @edit_case_info = EditCaseInformation.new edit_case_information_params.merge(team: team_param)
 
-    # we only send email if the ldu is different from previous
-    if case_information_updated?
+    if @edit_case_info.valid?
+      @case_info.update!(probation_service: @edit_case_info.probation_service,
+                      tier: @edit_case_info.tier,
+                      case_allocation: @edit_case_info.case_allocation,
+                      team: @edit_case_info.team,
+                      manual_entry: true)
+      # we only send email if the ldu is different from previous
       if CaseInformationService.ldu_changed?(@case_info.saved_change_to_team_id)
         send_email
       end
@@ -109,70 +122,22 @@ private
     params.require(:nomis_offender_id)
   end
 
-  def stage1_errors
-    if case_information_params[:last_known_location].nil?
-      @case_info.errors.messages.reject! do |f, _m|
-        f != :probation_service && f != :last_known_location
-      end
-      display_address_page
-    elsif case_information_params[:last_known_location] == 'Yes' && case_information_params[:probation_service].nil?
-      @case_info.errors.messages.select! do |f, _m|
-        f == :probation_service
-      end
-      display_address_page
-    end
-  end
-
   def display_address_page
-    @prisoner = prisoner(case_information_params[:nomis_offender_id])
+    @prisoner = prisoner(@last_location.nomis_offender_id)
     render :new
   end
 
-  def handle_stage1
-    if @case_info.scottish_or_ni?
-      @case_info.save_scottish_or_ni
-    elsif @case_info.english_or_welsh?
-      @case_info.probation_service = 'England' if @case_info.last_known_location == 'No'
-      @prisoner = prisoner(case_information_params[:nomis_offender_id])
-      @case_info.errors.clear
-      render :missing_info
-    else
-      stage1_errors
-    end
-  end
-
-  def handle_stage2
-    @case_info.probation_service = 'England' if @case_info.english?
-
-    unless @case_info.stage2_filled?
-      @prisoner = prisoner(case_information_params[:nomis_offender_id])
-      @case_info.errors.messages.reject! do |f, _m|
-        [:probation_service].include?(f)
-      end
-      render :missing_info
-    end
-  end
-
-  def case_information_updated?
-    if ['Scotland', 'Northern Ireland'].include?(case_information_params[:probation_service]) &&
-      case_information_params[:last_known_location] == 'Yes'
-      @case_info.update(probation_service: case_information_params[:probation_service], tier: 'N/A',
-                        case_allocation: 'N/A', team: nil, manual_entry: true)
-    else
-      probation = if case_information_params[:last_known_location] == 'No'
-                    'England'
-                  else
-                    case_information_params[:probation_service]
-                  end
-
-      @case_info.update(probation_service: probation, tier: case_information_params[:tier],
-                        case_allocation: case_information_params[:case_allocation],
-                        team_id: team_identifier,  manual_entry: true)
-    end
+  def handle_stage2_rendering
+    @prisoner = prisoner(case_information_params[:nomis_offender_id])
+    render :missing_info
   end
 
   def team_identifier
     Team.find_by(name: params['input-autocomplete'])&.id
+  end
+
+  def team_param
+    Team.find_by(name: params['input-autocomplete'])
   end
 
   def send_email
@@ -214,7 +179,20 @@ private
     params.require(:case_information).
       permit(:nomis_offender_id, :tier, :case_allocation,
              :parole_review_date_dd, :parole_review_date_mm, :parole_review_date_yyyy,
-             :probation_service, :last_known_location, :team_id)
+             :probation_service, :team_id)
+  end
+
+  def edit_case_information_params
+    params.require(:edit_case_information).
+      permit(:tier, :case_allocation,
+             :last_known_location,
+             :last_known_address)
+  end
+
+  def last_location_params
+    params.require(:last_location).
+      permit(:nomis_offender_id,
+             :last_known_address, :last_known_location)
   end
 
   def parole_review_date_params

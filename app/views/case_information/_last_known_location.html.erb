@@ -1,4 +1,4 @@
-<%= form_for(@case_info, url: prison_case_information_index_path(@prison.code), method: form_method) do |form| %>
+<%= form_for(@last_location, url: prison_case_information_index_path(@prison.code), method: form_method) do |form| %>
   <%= form.hidden_field(:nomis_offender_id, value: @prisoner.offender_no) %>
   <%= hidden_field_tag("sort", params[:sort])%>
   <%= hidden_field_tag("page", params[:page]) %>
@@ -24,16 +24,16 @@
 
             <div class="govuk-radios">
               <div class="govuk-radios__item">
-                <%= form.radio_button(:probation_service, 'Scotland', class: "govuk-radios__input" ) %>
-                <%= form.label :probation_service, 'Scotland - to be managed by Scottish probation', class: "govuk-label govuk-radios__label" %>
+                <%= form.radio_button(:last_known_address, 'Scotland', class: "govuk-radios__input" ) %>
+                <%= form.label :last_known_address, 'Scotland - to be managed by Scottish probation', class: "govuk-label govuk-radios__label" %>
               </div>
               <div class="govuk-radios__item">
-                <%= form.radio_button(:probation_service, 'Northern Ireland', class: "govuk-radios__input" ) %>
-                <%= form.label :probation_service, 'Northern Ireland - to be managed by Northern Irish probation', class: "govuk-label govuk-radios__label" %>
+                <%= form.radio_button(:last_known_address, 'Northern Ireland', class: "govuk-radios__input" ) %>
+                <%= form.label :last_known_address, 'Northern Ireland - to be managed by Northern Irish probation', class: "govuk-label govuk-radios__label" %>
               </div>
               <div class="govuk-radios__item">
-                <%= form.radio_button(:probation_service, 'Wales', class: "govuk-radios__input" ) %>
-                <%= form.label :probation_service, 'Wales', class: "govuk-label govuk-radios__label" %>
+                <%= form.radio_button(:last_known_address, 'Wales', class: "govuk-radios__input" ) %>
+                <%= form.label :last_known_address, 'Wales', class: "govuk-label govuk-radios__label" %>
               </div>
             </div>
           </div>

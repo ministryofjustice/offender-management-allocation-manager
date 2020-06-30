@@ -16,16 +16,16 @@ $(document).on("turbolinks:load", function(){
         });
     }
 
-    if ($(".edit_case_information").length > 0){
-        if((document.getElementById('case_information_probation_service_scotland').checked) ||
-            (document.getElementById('case_information_probation_service_northern_ireland').checked)){
+    if ($(".new_edit_case_information").length > 0){
+        if((document.getElementById('edit_case_information_last_known_address_scotland').checked) ||
+            (document.getElementById('edit_case_information_last_known_address_northern_ireland').checked)){
                 hide_element();
         }
     }
 });
 
 function current_team() {
-    if ($(".edit_case_information").length > 0){
+    if ($(".new_edit_case_information").length > 0){
         let team_name = document.getElementById("chosen_team").innerText;
         if (team_name !== '') {
             return team_name

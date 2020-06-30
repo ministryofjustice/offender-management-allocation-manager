@@ -99,9 +99,9 @@ RSpec.describe CaseInformation, type: :model do
       end
     end
 
-    context 'without manual flag, it is still required' do
+    context 'without manual flag, it is not required' do
       it 'does not raise an error when not present' do
-        expect(build(:case_information, probation_service: nil, manual_entry: false)).not_to be_valid
+        expect(build(:case_information, probation_service: nil, manual_entry: false)).to be_valid
       end
     end
   end
@@ -123,32 +123,6 @@ RSpec.describe CaseInformation, type: :model do
       context 'with Scotland or Northern Ireland offender' do
         it 'is valid without team' do
           expect(build(:case_information, team: nil, probation_service: 'Northern Ireland')).to be_valid
-        end
-      end
-    end
-  end
-
-  context 'with last_known_location' do
-    context 'without manual flag' do
-      it 'will be valid' do
-        expect(build(:case_information, manual_entry: false, last_known_location: nil)).to be_valid
-      end
-    end
-
-    context 'with manual flag' do
-      it 'is valid if nil' do
-        expect(build(:case_information, manual_entry: true, last_known_location: nil)).to be_valid
-      end
-
-      # only values accepted are nil, Yes or No
-      context 'when value is not Yes or No' do
-        subject {
-          build(:case_information, manual_entry: true, last_known_location: 'Maybe')
-        }
-
-        it 'gives the correct message if value not in Yes or No' do
-          expect(subject).not_to be_valid
-          expect(subject.errors.messages).to eq(last_known_location: ["Select yes if the prisoner's last known address was in Northern Ireland, Scotland or Wales"])
         end
       end
     end
