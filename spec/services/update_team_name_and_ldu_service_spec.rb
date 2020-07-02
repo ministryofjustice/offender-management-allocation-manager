@@ -3,15 +3,16 @@ require 'rails_helper'
 RSpec.describe UpdateTeamNameAndLduService do
   context "when the team has the wrong name" do
     before do
-      team = create(:team, code: 'TEAM1', name: 'The wrong team name')
-      team.local_divisional_unit.code = 'LDU1'
-      team.local_divisional_unit.save
+      ldu = create(:local_divisional_unit)
+      create(:team, code: 'TEAM1', name: 'The wrong team name', local_divisional_unit: ldu)
     end
 
+    let(:team) { Team.first }
+    let(:ldu) { team.local_divisional_unit }
+
     it "updates the team name" do
-      described_class.update(team_code: 'TEAM1', team_name: 'Team One', ldu_code: 'LDU1')
-      team = Team.find_by(code: 'TEAM1')
-      expect(team.name).to eq('Team One')
+      described_class.update(team_code: 'TEAM1', team_name: 'Team One', ldu_code: ldu.code, ldu_name: ldu.name)
+      expect(team.reload.name).to eq('Team One')
     end
   end
 
@@ -23,8 +24,10 @@ RSpec.describe UpdateTeamNameAndLduService do
       create(:local_divisional_unit, code: 'LDU1')
     end
 
+    let(:ldu) { LocalDivisionalUnit.first }
+
     it "associates the team with the LDU" do
-      described_class.update(team_code: 'TEAM1', team_name: 'Team One', ldu_code: 'LDU1')
+      described_class.update(team_code: 'TEAM1', team_name: 'Team One', ldu_code: ldu.code, ldu_name: ldu.name)
       team = Team.find_by(code: 'TEAM1')
       expect(team.local_divisional_unit.code).to eq('LDU1')
     end
@@ -36,8 +39,10 @@ RSpec.describe UpdateTeamNameAndLduService do
       create(:local_divisional_unit, code: 'LDU1')
     end
 
+    let(:ldu) { LocalDivisionalUnit.find_by!(code: 'LDU1') }
+
     it "associates the team with the correct LDU" do
-      described_class.update(team_code: 'TEAM1', team_name: 'Team One', ldu_code: 'LDU1')
+      described_class.update(team_code: 'TEAM1', team_name: 'Team One', ldu_code: ldu.code, ldu_name: ldu.name)
       team = Team.find_by(code: 'TEAM1')
       expect(team.local_divisional_unit.code).to eq('LDU1')
     end
@@ -45,22 +50,28 @@ RSpec.describe UpdateTeamNameAndLduService do
 
   context "when the team name and LDU are already correct" do
     before do
-      team = create(:team, code: 'TEAM1', name: 'Team One')
-      team.local_divisional_unit.code = 'LDU1'
-      team.local_divisional_unit.save
+      create(:team, code: 'TEAM1', name: 'Team One')
     end
+
+    let(:team) { Team.first }
 
     it "doesn't update the team record" do
       expect_any_instance_of(Team).not_to receive(:save)
-      described_class.update(team_code: 'TEAM1', team_name: 'Team One', ldu_code: 'LDU1')
+      described_class.update(team_code: 'TEAM1', team_name: 'Team One', ldu_code: team.local_divisional_unit.code, ldu_name: team.local_divisional_unit.name)
     end
   end
 
   context "when a team with the specified code doesn't exist" do
-    it "logs an error" do
-      expect_message = "Couldn't find team with code TEAM1"
-      expect(Rails.logger).to receive(:error).with(expect_message)
-      described_class.update(team_code: 'TEAM1', team_name: 'Team One', ldu_code: 'LDU1')
+    before do
+      create(:local_divisional_unit)
+    end
+
+    let(:ldu) { LocalDivisionalUnit.first }
+
+    it "creates a new team" do
+      expect {
+        described_class.update(team_code: 'TEAM1', team_name: 'Team One', ldu_code: ldu.code, ldu_name: ldu.name)
+      }.to change(Team, :count).by(1)
     end
   end
 
@@ -69,10 +80,12 @@ RSpec.describe UpdateTeamNameAndLduService do
       create(:team, code: 'TEAM1')
     end
 
-    it "logs an error" do
-      expect_message = "Couldn't find LDU with code LDU1"
-      expect(Rails.logger).to receive(:error).with(expect_message)
-      described_class.update(team_code: 'TEAM1', team_name: 'Team One', ldu_code: 'LDU1')
+    let(:ldu) { build(:local_divisional_unit) }
+
+    it "creates a new LDU" do
+      expect {
+        described_class.update(team_code: 'TEAM1', team_name: 'Team One', ldu_code: ldu.code, ldu_name: ldu.name)
+      }.to change(LocalDivisionalUnit, :count).by(1)
     end
   end
 end

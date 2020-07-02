@@ -64,10 +64,10 @@ RSpec.describe UpdateShadowTeamAssociationService do
   context "when no active team exists with a matching name" do
     let(:team_name) { 'Some other team name' }
 
-    it "logs an error" do
-      expect_message = "Couldn't find a team named 'Team 1' to associate with shadow team 'OMIC Team 1'"
-      expect(Rails.logger).to receive(:error).with(expect_message)
-      described_class.update(shadow_code: 'SHAD01', shadow_name: 'OMIC Team 1')
+    it "creates a new team" do
+      expect {
+        described_class.update(shadow_code: 'SHAD01', shadow_name: 'OMIC Team 1')
+      }.to change(Team, :count).by(1)
     end
   end
 end

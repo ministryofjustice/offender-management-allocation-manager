@@ -44,18 +44,4 @@ describe LDUEmailImporter do
     a4 = LocalDivisionalUnit.find_by(code: 'A4')
     expect(a4).to be_nil
   end
-
-  it "can update duplicates" do
-    create(:local_divisional_unit, code: 'A1', email_address: 'test@example.com')
-    create(:local_divisional_unit, code: 'A1', email_address: 'test@example.com')
-    create(:local_divisional_unit, code: 'A1', email_address: 'test@example.com')
-
-    described_class.import(file_path)
-
-    units = LocalDivisionalUnit.where(code: 'A1')
-    expect(units.count).to eq(3)
-    units.each { |unit|
-      expect(unit.email_address).to eq('test@example.com')
-    }
-  end
 end
