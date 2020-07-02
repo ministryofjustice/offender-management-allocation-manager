@@ -86,8 +86,8 @@ feature 'ActiveAdmin' do
         expect(page).to have_content(ldu.name.to_s)
       end
 
-      it 'cannot delete an ldu' do
-        expect(page).not_to have_link('Delete')
+      it 'can delete an ldu' do
+        expect(page).to have_link('Delete')
       end
     end
   end
