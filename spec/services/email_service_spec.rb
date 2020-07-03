@@ -152,7 +152,7 @@ RSpec.describe EmailService do
         offender_name: "Ahmonis, Imanjah",
         offender_no: "G2911GD",
         prison: 'HMP Leeds',
-        url: 'http://localhost:3000/prisons/LEI/caseload'
+        url: 'http://localhost:3000/prisons/LEI/staff/485833/caseload'
       ).and_return OpenStruct.new(deliver_later: true)
 
       expect(PomMailer).to receive(:new_allocation_email).with(
@@ -162,7 +162,7 @@ RSpec.describe EmailService do
         offender_name: "Ahmonis, Imanjah",
         offender_no: "G2911GD",
         message: '',
-        url: 'http://localhost:3000/prisons/LEI/caseload'
+        url: 'http://localhost:3000/prisons/LEI/staff/485833/caseload'
       ).and_return OpenStruct.new(deliver_later: true)
 
       described_class.

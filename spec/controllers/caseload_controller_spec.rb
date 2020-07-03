@@ -3,12 +3,17 @@ require 'rails_helper'
 RSpec.describe CaseloadController, type: :controller do
   let(:prison) { build(:prison).code }
   let(:staff_id) { 456_987 }
+  let(:not_signed_in) { 123_456 }
   let(:poms) {
     [
-      build(:pom,
-            firstName: 'Alice',
-            staffId:  staff_id,
-            position: RecommendationService::PRISON_POM)
+        build(:pom,
+              firstName: 'Alice',
+              staffId:  staff_id,
+              position: RecommendationService::PRISON_POM),
+        build(:pom,
+              firstName: 'John',
+              staffId:  not_signed_in,
+              position: RecommendationService::PRISON_POM)
     ]
   }
 
@@ -27,6 +32,10 @@ RSpec.describe CaseloadController, type: :controller do
     let(:offender) { attributes_for(:offender) }
 
     context 'when NPS' do
+      before do
+        stub_sso_data(prison, 'alice')
+      end
+
       let(:today_plus_36_weeks) { (Time.zone.today + 36.weeks).to_s }
       let(:bookings) {
         [offender].map { |o|
@@ -39,7 +48,7 @@ RSpec.describe CaseloadController, type: :controller do
       let(:case_allocation) { 'NPS' }
 
       it 'can pull back a NPS offender due for handover' do
-        get :handover_start, params: { prison_id: prison }
+        get :handover_start, params: { prison_id: prison, staff_id: staff_id }
         expect(response).to be_successful
         expect(assigns(:upcoming_handovers).map(&:offender_no)).to match_array([offender.fetch(:offenderNo)])
       end
@@ -58,7 +67,7 @@ RSpec.describe CaseloadController, type: :controller do
       let(:today_plus_13_weeks) { (Time.zone.today + 13.weeks).to_s }
 
       pending 'can pull back a CRC offender due for handover' do
-        get :handover_start, params: { prison_id: prison }
+        get :handover_start, params: { prison_id: prison, staff_id: staff_id }
         expect(response).to be_successful
         expect(assigns(:upcoming_handovers).map(&:offender_no)).to match_array([offender.fetch(:offenderNo)])
       end
@@ -89,17 +98,52 @@ RSpec.describe CaseloadController, type: :controller do
     end
 
     describe '#index' do
-      it 'returns the caseload' do
-        get :index, params: { prison_id: prison }
-        expect(response).to be_successful
+      before do
+        stub_sso_data(prison, 'alice')
+      end
 
-        expect(assigns(:allocations).map(&:nomis_offender_id)).to match_array(offenders.map { |o| o.fetch(:offenderNo) })
+      context 'when user is an SPO' do
+        before do
+          stub_sso_data(prison, 'alice')
+        end
+
+        it 'returns the caseload for an SPO' do
+          get :index, params: { prison_id: prison, staff_id: staff_id }
+          expect(response).to be_successful
+
+          expect(assigns(:allocations).map(&:nomis_offender_id)).to match_array(offenders.map { |o| o.fetch(:offenderNo) })
+        end
+      end
+
+      context 'when user is a different POM to the one signed in' do
+        before do
+          stub_signed_in_pom(staff_id, 'alice')
+          stub_sso_pom_data(prison, 'alice')
+        end
+
+        it 'cant see the caseload' do
+          get :index, params: { prison_id: prison, staff_id: not_signed_in }
+          expect(response).to redirect_to('/401')
+        end
+      end
+
+      context 'when user is the signed in POM' do
+        it 'returns the caseload' do
+          get :index, params: { prison_id: prison, staff_id: staff_id }
+          expect(response).to be_successful
+
+          expect(assigns(:allocations).map(&:nomis_offender_id)).to match_array(offenders.map { |o| o.fetch(:offenderNo) })
+        end
       end
     end
 
     describe '#new' do
+      before do
+        stub_sso_data(prison, 'alice')
+      end
+
       it 'returns the caseload' do
-        get :new, params: { prison_id: prison }
+        get :new, params: { prison_id: prison, staff_id: staff_id }
         expect(response).to be_successful
 
         expect(assigns(:new_cases).map(&:nomis_offender_id)).to match_array(offenders.map { |o| o.fetch(:offenderNo) })

@@ -72,7 +72,7 @@
     <div class="govuk-grid-column-one-third">
       <div class="wrapper">
         <h1 class="govuk-heading-s">
-          <%= link_to "See your caseload", prison_caseload_index_path(@prison.code), class:"govuk-link" %>
+          <%= link_to "See your caseload", prison_staff_caseload_index_path(@prison.code, @staff_id ), class:"govuk-link" %>
         </h1>
         <p class="govuk-body">All prisoners allocated to you.</p>
       </div>
@@ -80,7 +80,7 @@
     <div class="govuk-grid-column-one-third">
       <div class="wrapper">
         <h1 class="govuk-heading-s">
-          <%= link_to "See new allocations", new_prison_caseload_path(@prison.code), class:"govuk-link" %>
+          <%= link_to "See new allocations", new_prison_staff_caseload_path(@prison.code, @staff_id), class:"govuk-link" %>
         </h1>
         <p class="govuk-body">Prisoners allocated to you in the last seven days.</p>
       </div>
@@ -88,7 +88,7 @@
     <div class="govuk-grid-column-one-third">
       <div class="wrapper">
         <h1 class="govuk-heading-s">
-          <%= link_to "See cases close to handover", prison_caseload_handover_start_path(@prison.code), class:"govuk-link" %>
+          <%= link_to "See cases close to handover", prison_staff_caseload_handover_start_path(@prison.code, @staff_id), class:"govuk-link" %>
         </h1>
         <p class="govuk-body">All cases for start of handover to the community in the next thirty days</p>
       </div>

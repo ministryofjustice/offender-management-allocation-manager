@@ -47,7 +47,7 @@ describe AllocationService do
             "nomis_offender_id" => "G4273GI",
             "pom_email" => "pom@digital.justice.gov.uk",
             "pom_name" => "Moic",
-            "url" => "http://localhost:3000/prisons/LEI/caseload"
+            "url" => "http://localhost:3000/prisons/LEI/staff/485926/caseload"
           ))
 
       # message telling co-working POM who the Primary POM is.
@@ -61,7 +61,7 @@ describe AllocationService do
             "responsibility" => "supporting",
             "responsible_pom_name" => 'Pom, Moic',
             "pom_email" => "ommiicc@digital.justice.gov.uk",
-            "url" => "http://localhost:3000/prisons/LEI/caseload"
+            "url" => "http://localhost:3000/prisons/LEI/staff/485758/caseload"
           ))
     end
   end

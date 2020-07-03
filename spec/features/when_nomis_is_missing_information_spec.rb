@@ -54,7 +54,7 @@ context 'when NOMIS is missing information' do
         end
 
         it 'does not error' do
-          visit prison_caseload_index_path(prison_code)
+          visit prison_staff_caseload_index_path(prison_code, staff_id)
 
           expect(page).to have_content('Showing 1 - 1 of 1 results')
         end
@@ -134,7 +134,7 @@ context 'when NOMIS is missing information' do
       it 'does not error' do
         create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
 
-        visit prison_caseload_handover_start_path(prison_code)
+        visit prison_staff_caseload_handover_start_path(prison_code, staff_id)
 
         expect(page).to have_content('All cases for start of handover to the community in the next 30 days')
       end
@@ -147,7 +147,11 @@ context 'when NOMIS is missing information' do
         with(query: { grant_type: 'client_credentials' }).
         to_return(status: 200, body: {}.to_json)
 
-      signin_spo_user('example SPO')
+      signin_spo_user('example_SPO')
+      stub_request(:get, "#{ApiHelper::T3}/users/example_SPO").
+          to_return(status: 200, body: { 'staffId': 754_732 }.to_json)
+      stub_request(:get, "#{ApiHelper::T3}/staff/754732/emails").
+          to_return(status: 200, body: [].to_json)
     end
 
     context 'with an NPS offender with an indeterminate sentence, but no release dates' do
