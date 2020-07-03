@@ -8,7 +8,7 @@ class SearchController < PrisonsApplicationController
     # and instead they should be redirected to the caseload search instead. If a user
     # is both SPO _and_ POM then we'll let them do an actionable search.
     unless current_user_is_spo?
-      redirect_to(prison_caseload_index_path(q: search_term)) && return
+      redirect_to(prison_staff_caseload_index_path(active_prison_id, @staff_id, q: search_term)) && return
     end
 
     @q = search_term

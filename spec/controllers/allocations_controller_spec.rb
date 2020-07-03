@@ -41,7 +41,7 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
     before do
       stub_poms(prison, poms)
       stub_sso_pom_data(prison, 'alice')
-      stub_signed_in_pom(1, 'Alice')
+      stub_signed_in_pom(1, 'alice')
       stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/users/").
         to_return(status: 200, body: { staffId: 1 }.to_json, headers: {})
     end
@@ -96,7 +96,7 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
       stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/staff/1").
         to_return(status: 200, body: {}.to_json, headers: {})
 
-      stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/users/MOIC_POM").
+      stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/users/alice").
         to_return(status: 200, body: { staffId: 3 }.to_json, headers: {})
 
       stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/staff/4").

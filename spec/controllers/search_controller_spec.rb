@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe SearchController, type: :controller do
-  # Need to use a different prison than LEI to prevent filling Rails cache with mock data
+  # Need to use a different prison than LEI to prevent filling Rails cache with mock data }
   let(:prison) { 'WEI' }
   let(:booking_id) { 'booking3' }
   let(:elite2api) { 'https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api' }
@@ -22,7 +22,7 @@ RSpec.describe SearchController, type: :controller do
     before do
       stub_poms(prison, poms)
       stub_sso_pom_data(prison, 'alice')
-      stub_signed_in_pom(1, 'Alice')
+      stub_signed_in_pom(1, 'alice')
       stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/users/").
         with(headers: { 'Authorization' => 'Bearer token' }).
         to_return(status: 200, body: { staffId: 1 }.to_json, headers: {})
@@ -30,7 +30,7 @@ RSpec.describe SearchController, type: :controller do
 
     it 'user is redirected to caseload' do
       get :search, params: { prison_id: prison, q: 'Cal' }
-      expect(response).to redirect_to(prison_caseload_index_path(q: 'Cal'))
+      expect(response).to redirect_to(prison_staff_caseload_index_path(prison, 1, q: 'Cal'))
     end
   end
 

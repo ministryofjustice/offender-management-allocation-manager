@@ -77,7 +77,7 @@ feature "view POM's caseload" do
     before do
       signin_pom_user
 
-      visit prison_caseload_index_path('LEI')
+      visit prison_staff_caseload_index_path('LEI', nomis_staff_id)
     end
 
     it 'displays paginated cases for a specific POM' do
@@ -157,7 +157,7 @@ feature "view POM's caseload" do
   context 'when looking at handover start' do
     before {
       signin_pom_user
-      visit prison_caseload_index_path('LEI')
+      visit prison_staff_caseload_index_path('LEI', nomis_staff_id)
     }
 
     it 'shows the number of upcoming handovers' do
@@ -180,7 +180,7 @@ feature "view POM's caseload" do
     stub_offender(first_offender.fetch(:offenderNo))
     stub_request(:get, "https://keyworker-api-dev.prison.service.justice.gov.uk/key-worker/LEI/offender/#{first_offender.fetch(:offenderNo)}").
       to_return(body: { staffId: 485_572, firstName: "DOM", lastName: "BULL" }.to_json)
-    visit prison_caseload_index_path(prison)
+    visit prison_staff_caseload_index_path(prison, nomis_staff_id)
 
     expected_name = "#{first_offender.fetch(:lastName)}, #{first_offender.fetch(:firstName)}"
 
@@ -195,7 +195,7 @@ feature "view POM's caseload" do
   it 'can sort all cases that have been allocated to a specific POM in the last week', :versioning do
     # Sign in as a POM
     signin_pom_user
-    visit prison_caseload_index_path('LEI')
+    visit  prison_staff_caseload_index_path('LEI', nomis_staff_id)
     within('.new-cases-count') do
       click_link('1')
     end
@@ -216,11 +216,5 @@ feature "view POM's caseload" do
     within('.offender_row_20') do
       expect(find('.prisoner-name').text).to eq(expected_name)
     end
-  end
-
-  it 'stops staff without the POM role from viewing the my caseload page', vcr: { cassette_name: :non_pom_caseload }  do
-    signin_user('NON_POM_GEN')
-    visit prison_caseload_index_path('LEI')
-    expect(page).to have_current_path('/401')
   end
 end
