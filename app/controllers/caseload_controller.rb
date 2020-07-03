@@ -1,15 +1,14 @@
 # frozen_string_literal: true
 
 class CaseloadController < PrisonsApplicationController
-  before_action :ensure_pom
-  before_action :load_pom
+  before_action :ensure_signed_in_pom_is_this_pom, :load_pom
 
   breadcrumb -> { 'Your caseload' },
-             -> { prison_caseload_index_path(active_prison_id) }
+             -> { prison_staff_caseload_index_path(active_prison_id, staff_id) }
   breadcrumb -> { 'New cases' },
-             -> { new_prison_caseload_path(active_prison_id) }, only: [:new]
+             -> { new_prison_staff_caseload_path(active_prison_id, staff_id) }, only: [:new]
   breadcrumb -> { 'Cases close to handover' },
-             -> { prison_caseload_handover_start_path(active_prison_id) },
+             -> { prison_staff_caseload_handover_start_path(active_prison_id, staff_id) },
              only: [:handover_start]
 
   def index
@@ -84,13 +83,21 @@ private
   end
 
   def load_pom
-    @pom = PrisonOffenderManagerService.get_signed_in_pom_details(
-      current_user,
-      active_prison_id
-    )
+    @pom = StaffMember.new(params[:staff_id])
+  end
+
+  def ensure_signed_in_pom_is_this_pom
+    user = Nomis::Elite2::UserApi.user_details(current_user)
+    unless staff_id == user.staff_id || current_user_is_spo?
+      redirect_to '/401'
+    end
   end
 
   def page
     params.fetch('page', 1).to_i
+  end
+
+  def staff_id
+    params[:staff_id]
   end
 end

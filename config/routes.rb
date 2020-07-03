@@ -10,8 +10,10 @@ Rails.application.routes.draw do
   resources :prisons do
     resources :prisons, only: :index
     resources :dashboard, only: :index
-    resources :caseload, only: %i[ index new]
-    get('/caseload/handover_start' => 'caseload#handover_start', as: 'caseload_handover_start')
+    resources :staff do
+      resources :caseload, only: %i[ index new]
+      get('/caseload/handover_start' => 'caseload#handover_start', as: 'caseload_handover_start')
+    end
 
     resources :prisoners, only: [:show] do
       scope :format => true, :constraints => { :format => 'jpg' } do
