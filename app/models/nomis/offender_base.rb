@@ -25,29 +25,9 @@ module Nomis
     end
 
     def sentenced?
-      # A prisoner will have had a sentence calculation and for our purposes
-      # this means that they will either have a:
-      # 1) Conditional release date (CRD) or
-      # 2) Automatic release date (ARD) or
-      # 3) Home detention curfew actual date (HDCAD) or
-      # 4) Post recall release date (PRRD) or
-      # 5) Sentence licence expiry date (SLED) or
-      # 6) Parole eligibility date (PED) or
-      # 7) Home detention curfew eligibility date (HDCED) or
-      # 8) Tariff end date (TED)
-      # 9) Or have an indeterminate sentence
-
       return false if sentence&.sentence_start_date.blank?
 
-      sentence.conditional_release_date.present? ||
-        sentence.automatic_release_date.present? ||
-        sentence.home_detention_curfew_actual_date.present? ||
-        sentence.post_recall_release_date.present? ||
-        sentence.licence_expiry_date.present? ||
-        sentence.parole_eligibility_date.present? ||
-        sentence.home_detention_curfew_eligibility_date.present? ||
-        sentence.tariff_date.present? ||
-        @sentence_type.indeterminate_sentence?
+      has_determinate_dates? || has_indeterminate_dates? || has_recall_dates?
     end
 
     def early_allocation?
@@ -176,6 +156,27 @@ module Nomis
                     else
                       HandoverDateService::NO_HANDOVER_DATE
                     end
+    end
+
+    def has_determinate_dates?
+      !indeterminate_sentence? &&
+        (sentence.conditional_release_date.present? ||
+        sentence.automatic_release_date.present? ||
+        sentence.home_detention_curfew_actual_date.present? ||
+        sentence.home_detention_curfew_eligibility_date.present? ||
+        sentence.parole_eligibility_date.present?)
+    end
+
+    def has_indeterminate_dates?
+      indeterminate_sentence? &&
+        sentence.tariff_date.present? ||
+        sentence.parole_eligibility_date.present?
+    end
+
+    def has_recall_dates?
+      recalled? &&
+        sentence.post_recall_release_date.present? ||
+        sentence.licence_expiry_date.present?
     end
   end
 end
