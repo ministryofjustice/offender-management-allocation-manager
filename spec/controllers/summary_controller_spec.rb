@@ -213,7 +213,7 @@ RSpec.describe SummaryController, type: :controller do
                      "dateOfBirth": "1990-12-06", "age": 28, "agencyId": prison, "categoryCode": "C", "imprisonmentStatus": "LIFE" }]
 
       bookings = [{ "bookingId": 754_207, "offenderNo": "G7514GW", "firstName": "Indeter", "lastName": "Minate-Offender", "agencyLocationId": prison,
-                    "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
+                    "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "tariffDate": "2011-01-28",
                                         "bookingId": 754_207, "sentenceStartDate": "2009-02-08",
                                         "releaseDate": "2012-03-17" },
                     "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
