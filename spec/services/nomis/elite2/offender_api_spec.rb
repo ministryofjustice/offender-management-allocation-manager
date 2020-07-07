@@ -92,7 +92,7 @@ describe Nomis::Elite2::OffenderApi do
        vcr: { cassette_name: :offender_api_image_not_found } do
       booking_id = 1_153_753
       image_id = 1_340_556
-      uri = "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/images/#{image_id}/data"
+      uri = "#{ApiHelper::T3}/images/#{image_id}/data"
 
       stub_request(:get, uri).to_return(status: 404)
 
@@ -107,7 +107,7 @@ describe Nomis::Elite2::OffenderApi do
        vcr: { cassette_name: :offender_api_image_use_default_image } do
       booking_id = 1_153_753
       image_id = 1_340_556
-      uri = "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/images/#{image_id}/data"
+      uri = "#{ApiHelper::T3}/images/#{image_id}/data"
 
       WebMock.stub_request(:get, uri).to_return(body: "")
 
@@ -126,14 +126,13 @@ describe Nomis::Elite2::OffenderApi do
     it "uses the default image if no offender facialImageId found",
        vcr: { cassette_name: :offender_api_no_facial_image_id } do
       booking_id = 1_153_753
-      uri = "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/offender-sentences/bookings"
+      uri = "#{ApiHelper::T3}/offender-sentences/bookings"
 
       WebMock.stub_request(:post, uri).with(body: "[#{booking_id}]").to_return(
-        status: 200,
         body: [
           { "bookingId": 1_153_753,
             "dateOfBirth": "1953-04-15"
-        }].to_json, headers: {})
+        }].to_json)
 
       response = described_class.get_image(booking_id)
       expect(response).not_to be nil?

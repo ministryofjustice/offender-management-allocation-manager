@@ -27,39 +27,25 @@ feature "Delius import feature" do
   let(:offender_no) { "GCA2H2A" }
   let(:prison) { "LEI" }
   let(:booking_id) { 754_207 }
-  let(:offenders) {
-    [{
-      "bookingId": booking_id,
-      "offenderNo": offender_no,
-      "dateOfBirth": "1985-03-19",
-      "agencyId": prison,
-      "imprisonmentStatus": "DET"
-    }]
-  }
-  let(:bookings) {
-    [{  "bookingId": booking_id,
-        "offenderNo": offender_no,
-        "agencyLocationId": prison,
-        "sentenceDetail": { "homeDetentionCurfewEligibilityDate": "2011-11-07",
-                            "sentenceStartDate": "2009-02-08"
-                          }
-    }]
-  }
+  let(:offenders) { [build(:nomis_offender, offenderNo: offender_no)] }
 
   before do
     signin_spo_user
 
     stub_request(:post, "#{stub_auth_host}/auth/oauth/token").
       with(query: { grant_type: 'client_credentials' }).
-        to_return(status: 200, body: {}.to_json)
+        to_return(body: {}.to_json)
+    stub_request(:get, "#{ApiHelper::T3}/users/MOIC_POM").
+      to_return(body: { 'staffId': 1 }.to_json)
+    stub_pom_emails(1, [])
 
-    stub_offender(offender_no, booking_number: booking_id, imprisonment_status: 'DET', dob: "1985-03-19")
+    stub_offender(build(:nomis_offender, offenderNo: offender_no, imprisonmentStatus: 'DET', dateOfBirth: "1985-03-19"))
 
-    stub_offenders_for_prison("LEI", offenders, bookings)
+    stub_offenders_for_prison("LEI", offenders)
 
     stub_request(:post, "#{stub_api_host}/movements/offenders?latestOnly=false&movementTypes=TRN").
       with(body: [offender_no].to_json).
-        to_return(status: 200, body: [{ offenderNo: offender_no, toAgency: prison }].to_json)
+        to_return(body: [{ offenderNo: offender_no, toAgency: prison }].to_json)
 
     stub_const("Net::IMAP", MockIMAP)
 

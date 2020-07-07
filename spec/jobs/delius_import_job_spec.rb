@@ -20,7 +20,7 @@ RSpec.describe DeliusImportJob, type: :job do
                    G4923UI G9577GE G2350UP G0686GT G5235GT G1955VA G7967UD G7142UL
                    G5497GU G3356GT]
     offenders.each { |offender|
-      stub_offender(offender)
+      stub_offender(build(:nomis_offender, offenderNo: offender))
     }
   end
 
@@ -37,7 +37,7 @@ RSpec.describe DeliusImportJob, type: :job do
 
   context 'when LDU and team names contain ampersands (&)' do
     before do
-      stub_offender('mangled nomis')
+      stub_offender(build(:nomis_offender, offenderNo: 'mangled nomis'))
     end
 
     it 'imports their names correctly' do

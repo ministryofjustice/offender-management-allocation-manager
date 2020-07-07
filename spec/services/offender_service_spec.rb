@@ -1,8 +1,6 @@
 require 'rails_helper'
 
 describe OffenderService do
-  let(:tier_map) { CaseInformationService.get_case_information('LEI') }
-
   it "gets a single offender", vcr: { cassette_name: :offender_service_single_offender_spec } do
     nomis_offender_id = 'G4273GI'
 

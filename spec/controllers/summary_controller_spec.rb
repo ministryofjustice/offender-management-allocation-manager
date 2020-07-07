@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe SummaryController, type: :controller do
+  let(:prison) { build(:prison).code }
   let(:poms) {
     [
       build(:pom,
@@ -11,60 +14,42 @@ RSpec.describe SummaryController, type: :controller do
     ]
   }
 
-  let(:prison) { 'BRI' }
-
   before { stub_sso_data(prison, 'alice') }
 
-  context 'with 2 offenders' do
+  context 'with 4 offenders' do
     let(:today_plus_10) { (Time.zone.today + 10.days).to_s }
     let(:today_plus_13_weeks) { (Time.zone.today + 13.weeks).to_s }
 
     before do
       offenders = [
-        { "bookingId": 754_208, "offenderNo": "G7514GW", "firstName": "BOB", "lastName": "SMITH",
-          "dateOfBirth": "1995-02-02", "age": 34, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "LR" },
-        { "bookingId": 754_207, "offenderNo": "G1234GY", "firstName": "Indeter", "lastName": "Minate-Offender",
-          "dateOfBirth": "1990-12-06", "age": 28, "agencyId": prison, "categoryCode": "C", "imprisonmentStatus": "LIFE" },
-        { "bookingId": 754_206, "offenderNo": "G1234VV", "firstName": "ROSS", "lastName": "JONES",
-          "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03" },
-        { "bookingId": 754_205, "offenderNo": "G4234GG", "firstName": "Fourth", "lastName": "Offender",
-          "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03" }
-      ]
-
-      bookings = [
-        { "bookingId": 754_208, "offenderNo": "G7514GW", "firstName": "Indeter", "lastName": "Minate-Offender", "agencyLocationId": prison,
-          "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": today_plus_10,
-                              "licenceExpiryDate": "2014-02-07", "homeDetentionCurfewActualDate": today_plus_10,
-                              "bookingId": 754_208, "sentenceStartDate": "2009-02-08", "automaticReleaseOverrideDate": "2012-03-17",
-                              "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "confirmedReleaseDate": "2012-03-17",
-                              "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
-          "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 },
-        { "bookingId": 754_207, "offenderNo": "G1234GY", "firstName": "Indeter", "lastName": "Minate-Offender", "agencyLocationId": prison,
-          "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
-                              "licenceExpiryDate": "2014-02-07", "homeDetentionCurfewEligibilityDate": "2011-11-07",
-                              "bookingId": 754_207, "sentenceStartDate": "2009-02-08", "automaticReleaseOverrideDate": "2012-03-17",
-                              "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "confirmedReleaseDate": "2012-03-17",
-                              "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
-          "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 },
-        { "bookingId": 754_206, "offenderNo": "G1234VV", "firstName": "ROSS", "lastName": "JONES", "agencyLocationId": prison,
-          "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": today_plus_13_weeks,
-                              "licenceExpiryDate": "2014-02-07",
-                              "bookingId": 754_206, "sentenceStartDate": "2019-02-08",
-                              "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "confirmedReleaseDate": "2012-03-17",
-                              "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
-          "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 },
-        { "bookingId": 754_205, "offenderNo": "G4234GG", "firstName": "Fourth", "lastName": "Offender", "agencyLocationId": prison,
-          "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": today_plus_10,
-                              "licenceExpiryDate": "2014-02-07", "homeDetentionCurfewActualDate": today_plus_10,
-                              "bookingId": 754_205, "sentenceStartDate": "2019-02-08",
-                              "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "confirmedReleaseDate": "2012-03-17",
-                              "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
-          "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 }
+        build(:nomis_offender,
+              offenderNo: "G7514GW",
+              imprisonmentStatus: "LR",
+              lastName: 'SMITH',
+              sentence: build(:nomis_sentence_detail)),
+        build(:nomis_offender, offenderNo: "G1234GY", imprisonmentStatus: "LIFE",
+              lastName: 'Minate-Offender',
+              sentence: build(:nomis_sentence_detail,
+                              sentenceStartDate: "2009-02-08",
+                              automaticReleaseDate: "2011-01-28")),
+        build(:nomis_offender, offenderNo: "G1234VV",
+              lastName: 'JONES',
+              sentence: build(:nomis_sentence_detail,
+                              sentenceStartDate: "2019-02-08",
+                              automaticReleaseDate: today_plus_13_weeks)),
+        build(:nomis_offender, offenderNo: "G4234GG",
+              imprisonmentStatus: "SENT03",
+              firstName: "Fourth", lastName: "Offender",
+              sentence: build(:nomis_sentence_detail,
+                              automaticReleaseDate: today_plus_10,
+                              homeDetentionCurfewActualDate: today_plus_10,
+                              sentenceStartDate: "2019-02-08",
+              ))
       ]
 
       create(:case_information, case_allocation: 'NPS', nomis_offender_id: 'G4234GG')
 
-      stub_offenders_for_prison(prison, offenders, bookings)
+      stub_offenders_for_prison(prison, offenders)
     end
 
     describe '#handover' do
@@ -97,8 +82,8 @@ RSpec.describe SummaryController, type: :controller do
       before do
         stub_poms(prison, poms)
         stub_signed_in_pom(prison, 1, 'Alice')
-        stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/users/").
-          to_return(status: 200, body: { staffId: 1 }.to_json, headers: {})
+        stub_request(:get, "#{ApiHelper::T3}/users/").
+          to_return(body: { staffId: 1 }.to_json)
       end
 
       it 'is not visible' do
@@ -109,17 +94,19 @@ RSpec.describe SummaryController, type: :controller do
 
     context 'without new arrivals' do
       before do
-        stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/movements/offenders?latestOnly=false&movementTypes=TRN").
+        stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN").
           with(body: %w[G7514GW G1234GY G1234VV G4234GG].to_json).
-          to_return(status: 200, body: [{ offenderNo: 'G7514GW', toAgency: prison, createDateTime: Date.new(2018, 10, 1) },
-                                        { offenderNo: 'G1234VV', toAgency: prison, createDateTime: Date.new(2018, 9, 1) }].to_json)
+          to_return(body: [{ offenderNo: 'G7514GW', toAgency: prison, createDateTime: Date.new(2018, 10, 1) },
+                           { offenderNo: 'G1234VV', toAgency: prison, createDateTime: Date.new(2018, 9, 1) }].to_json)
       end
 
       it 'gets pending records' do
         get :pending, params: { prison_id: prison }
         # Expecting offender (2) to use sentenceStartDate as it is newer than last arrival date in prison
-        expect(assigns(:offenders).map(&:awaiting_allocation_for).map { |x| Time.zone.today - x }).
-          to match_array [Date.new(2009, 2, 8), Date.new(2018, 10, 1), Date.new(2019, 2, 8)]
+        off = assigns(:offenders).map { |o| [o.offender_no, Time.zone.today - o.awaiting_allocation_for] }.to_h
+        expect(off).to eq("G1234GY" => Date.new(2009, 2, 8),
+                  "G7514GW" => Date.new(2018, 10, 1),
+                  "G1234VV" => Date.new(2019, 2, 8))
       end
 
       it 'sorts ascending by default' do
@@ -136,38 +123,19 @@ RSpec.describe SummaryController, type: :controller do
   end
 
   context 'with enough offenders to page' do
-    let(:prison) { 'LEI' }
-    let(:range) { 0.upto(119) }
-    let(:offenders) {
-      range.map { |i|
-        { "bookingId": i, "offenderNo": "G#{10_000 - i}GW", "firstName": "Offen", "lastName": "DerNum#{i}",
-          "dateOfBirth": "1990-12-06", "age": 28, "agencyId": prison, "categoryCode": "C", "imprisonmentStatus": "LIFE" }
-      }
-    }
-    let(:bookings) {
-      range.map do |i|
-        { "bookingId": i, "offenderNo": "G#{10_000 - i}GW", "firstName": "Offen", "lastName": "DerNum#{i}", "agencyLocationId": prison,
-          "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
-                              "licenceExpiryDate": "2014-02-07", "homeDetentionCurfewEligibilityDate": "2011-11-07",
-                              "bookingId": 754_207, "sentenceStartDate": "2019-02-08", "automaticReleaseOverrideDate": "2012-03-17",
-                              "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "confirmedReleaseDate": "2012-03-17",
-                              "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
-          "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 }
-      end
-    }
+    let(:offenders) { build_list(:nomis_offender, 120) }
     let(:moves) {
-      range.map { |i| "G#{10_000 - i}GW" }
+      offenders.map { |o| o.fetch(:offenderNo) }
     }
     let(:summary_offenders) { assigns(:offenders) }
 
     render_views
 
     before do
-      stub_offenders_for_prison(prison, offenders, bookings)
-      stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/movements/offenders?latestOnly=false&movementTypes=TRN").
+      stub_offenders_for_prison(prison, offenders)
+      stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN").
         with(body: moves.to_json).
-        to_return(status: 200,
-                  body: moves.map { |offender_no| { offenderNo: offender_no, toAgency: prison, createDateTime: Date.new(2018, 10, 1) } }.to_json)
+        to_return(body: moves.map { |offender_no| { offenderNo: offender_no, toAgency: prison, createDateTime: Date.new(2018, 10, 1) } }.to_json)
     end
 
     it 'gets page 1 by default' do
@@ -201,23 +169,15 @@ RSpec.describe SummaryController, type: :controller do
     it 'handles trying to sort by missing field for allocated offenders' do
       # Allocated offenders do have to have their prison_arrival_date even if they don't use it
       # because we now need it to calculate the totals.
-      stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/movements/offenders?latestOnly=false&movementTypes=TRN").
-        to_return(status: 200, body: [].to_json)
+      stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN").
+        to_return(body: [].to_json)
 
       # When viewing allocated, cannot sort by awaiting_allocation_for as it is not available and is
       # meaningless in this context. We do not want to crash if passed a field that is not searchable
       # within a specific context.
       offender_id = 'G7514GW'
-      offenders = [{ "bookingId": 754_207, "offenderNo": offender_id, "firstName": "Indeter", "lastName": "Minate-Offender",
-                     "dateOfBirth": "1990-12-06", "age": 28, "agencyId": prison, "categoryCode": "C", "imprisonmentStatus": "LIFE" }]
-
-      bookings = [{ "bookingId": 754_207, "offenderNo": "G7514GW", "firstName": "Indeter", "lastName": "Minate-Offender", "agencyLocationId": prison,
-                    "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
-                                        "bookingId": 754_207, "sentenceStartDate": "2009-02-08",
-                                        "releaseDate": "2012-03-17" },
-                    "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
-                    "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 }]
-      stub_offenders_for_prison(prison, offenders, bookings)
+      offenders = [build(:nomis_offender, offenderNo: offender_id)]
+      stub_offenders_for_prison(prison, offenders)
 
       create(:case_information, nomis_offender_id: offender_id)
       create(:allocation, nomis_offender_id: offender_id, primary_pom_nomis_id: 234, prison: prison)
@@ -230,28 +190,16 @@ RSpec.describe SummaryController, type: :controller do
   describe 'new arrivals feature' do
     before do
       inmates = offenders.map { |offender|
-        {
-          bookingId: offender[:booking_id],
-          offenderNo: offender[:nomis_id],
-          dateOfBirth: 30.years.ago.strftime('%F'),
-          agencyId: offender[:prison_id]
-        }
+        build(:nomis_offender,
+              offenderNo: offender[:nomis_id],
+              sentence: build(:nomis_sentence_detail,
+                              sentenceStartDate: offender.fetch(:sentence_start_date).strftime('%F')))
       }
 
-      bookings = offenders.map { |offender|
-        {
-          bookingId: offender[:booking_id],
-          sentenceDetail: {
-            sentenceStartDate: offender[:sentence_start_date].strftime('%F'),
-            releaseDate: 30.years.from_now.strftime('%F')
-          }
-        }
-      }
+      stub_offenders_for_prison(prison, inmates)
 
-      stub_offenders_for_prison(prison, inmates, bookings)
-
-      stub_request(:post, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/movements/offenders?latestOnly=false&movementTypes=TRN").
-        to_return(status: 200, body: movements.to_json)
+      stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN").
+        to_return(body: movements.to_json)
     end
 
     context 'with no movements and four offenders' do

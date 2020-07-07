@@ -18,53 +18,13 @@ RSpec.describe TasksController, type: :controller do
     stub_poms(prison, pom)
     stub_signed_in_pom(prison, staff_id, username)
 
-    offenders = [
-      { "bookingId": 754_207, "offenderNo": "G7514GW", "firstName": "Alice", "lastName": "Aliceson",
-        "dateOfBirth": "1990-12-06", "age": 28, "categoryCode": "C", "imprisonmentStatus": "LIFE",
-        "convictedStatus": "Convicted", "latestLocationId": prison },
-      { "bookingId": 754_206, "offenderNo": "G1234VV", "firstName": "Bob", "lastName": "Bibby",
-        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03",
-        "convictedStatus": "Convicted", "latestLocationId": prison },
-      { "bookingId": 754_205, "offenderNo": "G1234AB", "firstName": "Carole", "lastName": "Caroleson",
-        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03",
-        "convictedStatus": "Convicted", "latestLocationId": prison },
-      { "bookingId": 754_204, "offenderNo": "G1234GG", "firstName": "David", "lastName": "Davidson",
-        "dateOfBirth": "2001-02-02", "age": 18, "agencyId": prison, "categoryCode": "D", "imprisonmentStatus": "SENT03",
-        "convictedStatus": "Convicted", "latestLocationId": prison }
+    offenders = [build(:nomis_offender, imprisonmentStatus: 'LIFE', offenderNo: 'G7514GW', firstName: "Alice", lastName: "Aliceson"),
+                 build(:nomis_offender, offenderNo: 'G1234VV', firstName: "Bob", lastName: "Bibby"),
+                 build(:nomis_offender, offenderNo: 'G1234AB', firstName: "Carole", lastName: "Caroleson"),
+                 build(:nomis_offender, offenderNo: 'G1234GG', firstName: "David", lastName: "Davidson")
     ]
 
-    bookings = [
-      { "bookingId": 754_207, "offenderNo": "G7514GW", "firstName": "Indeter", "lastName": "Minate-Offender", "agencyLocationId": prison,
-        "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
-                            "licenceExpiryDate": "2014-02-07", "homeDetentionCurfewEligibilityDate": "2011-11-07",
-                            "bookingId": 754_207, "sentenceStartDate": "2009-02-08", "automaticReleaseOverrideDate": "2012-03-17",
-                            "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "confirmedReleaseDate": "2012-03-17",
-                            "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
-        "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 },
-      { "bookingId": 754_206, "offenderNo": "G1234VV", "firstName": "ROSS", "lastName": "JONES", "agencyLocationId": prison,
-        "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
-                            "licenceExpiryDate": "2014-02-07", "homeDetentionCurfewEligibilityDate": "2011-11-07",
-                            "bookingId": 754_207, "sentenceStartDate": "2009-02-08", "automaticReleaseOverrideDate": "2012-03-17",
-                            "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "confirmedReleaseDate": "2012-03-17",
-                            "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
-        "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 },
-      { "bookingId": 754_205, "offenderNo": "G1234AB", "firstName": "ROSS", "lastName": "JONES", "agencyLocationId": prison,
-        "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
-                            "licenceExpiryDate": "2014-02-07", "homeDetentionCurfewEligibilityDate": "2011-11-07",
-                            "bookingId": 754_207, "sentenceStartDate": "2009-02-08", "automaticReleaseOverrideDate": "2012-03-17",
-                            "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "confirmedReleaseDate": "2012-03-17",
-                            "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
-        "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 },
-      { "bookingId": 754_204, "offenderNo": "G1234GG", "firstName": "ROSS", "lastName": "JONES", "agencyLocationId": prison,
-        "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
-                            "licenceExpiryDate": "2014-02-07", "homeDetentionCurfewEligibilityDate": "2011-11-07",
-                            "bookingId": 754_207, "sentenceStartDate": "2009-02-08", "automaticReleaseOverrideDate": "2012-03-17",
-                            "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "confirmedReleaseDate": "2012-03-17",
-                            "releaseDate": "2012-03-17" }, "dateOfBirth": "1953-04-15", "agencyLocationDesc": "LEEDS (HMP)",
-        "internalLocationDesc": "A-4-013", "facialImageId": 1_399_838 }
-    ]
-
-    stub_offenders_for_prison(prison, offenders, bookings)
+    stub_offenders_for_prison(prison, offenders)
   end
 
   context 'when an SPO' do
@@ -100,7 +60,7 @@ RSpec.describe TasksController, type: :controller do
     end
 
     it 'can show offenders needing parole review date updates' do
-      stub_offender(offender_no, booking_number: 754_207, imprisonment_status: 'LIFE')
+      stub_offender(build(:nomis_offender, offenderNo: offender_no, imprisonmentStatus: 'LIFE'))
 
       get :index, params: { prison_id: prison }
 
@@ -122,7 +82,7 @@ RSpec.describe TasksController, type: :controller do
     before do
       test_strategy.switch!(:auto_delius_import, true)
 
-      stub_offender(offender_no, booking_number: 754_206)
+      stub_offender(build(:nomis_offender, offenderNo: offender_no))
 
       # Ensure only one of our offenders has missing data and that G7514GW (indeterminate) has a PRD
       create(:case_information, nomis_offender_id: offender_no, tier: 'A', mappa_level: 1, team: nil)

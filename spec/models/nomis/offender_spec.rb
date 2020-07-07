@@ -4,7 +4,7 @@ describe Nomis::Offender do
   describe '#handover_start_date' do
     context 'when in custody' do
       let(:offender) {
-        build(:offender).tap { |o|
+        build(:offender_summary).tap { |o|
           o.sentence = Nomis::SentenceDetail.new(automatic_release_date: Time.zone.today + 1.year,
                                                  sentence_start_date: Time.zone.today)
           o.load_case_information(build(:case_information, case_allocation: 'NPS', mappa_level: 0))
@@ -18,7 +18,7 @@ describe Nomis::Offender do
 
     context 'when COM responsible already' do
       let(:offender) {
-        build(:offender).tap { |o|
+        build(:offender_summary).tap { |o|
           o.sentence = Nomis::SentenceDetail.new
           o.load_case_information(build(:case_information))
         }

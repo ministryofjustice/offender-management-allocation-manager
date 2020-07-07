@@ -113,13 +113,11 @@ describe PrisonOffenderManagerService do
               emails: ['test@digital.justice.org.uk']
         )
       }
-      let(:offender) { attributes_for(:offender) }
-      let(:booking) { attributes_for(:booking, bookingId: offender.fetch(:bookingId)) }
-
+      let(:offender) { build(:nomis_offender) }
 
       before do
         stub_poms('WSI', [dave, alice, billy, charles, eric])
-        stub_offenders_for_prison('WSI', [offender], [booking])
+        stub_offenders_for_prison('WSI', [offender])
       end
 
       it 'removes duplicate staff ids, keeping the valid position' do
@@ -129,16 +127,14 @@ describe PrisonOffenderManagerService do
 
     describe '#get_pom_at' do
       context 'when pom not existing at a prison' do
-        let(:elite2api) { 'https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api' }
-
         before do
-          stub_request(:get, "#{elite2api}/staff/roles/LEI/role/POM").
+          stub_request(:get, "#{ApiHelper::T3}/staff/roles/LEI/role/POM").
             with(
               headers: {
                 'Page-Limit' => '100',
                 'Page-Offset' => '0'
               }).
-            to_return(status: 200, body: [
+            to_return(body: [
               { "staffId": 485_833, "firstName": "FRED", "lastName": "BLOGGS", "status": "ACTIVE", "gender": "F",
                 "dateOfBirth": "1980-01-01", "agencyId": "LEI", "agencyDescription": "Leeds (HMP)",
                 "fromDate": "2019-05-31", "position": "PRO", "positionDescription": "Prison Officer",
@@ -149,7 +145,7 @@ describe PrisonOffenderManagerService do
                 "position": "PRO", "positionDescription": "Prison Officer", "role": "POM",
                 "roleDescription": "Prison Offender Manager", "scheduleType": "FT", "scheduleTypeDescription": "Full Time",
                 "hoursPerWeek": 35 }
-            ].to_json, headers: {})
+            ].to_json)
         end
 
         it "raises" do

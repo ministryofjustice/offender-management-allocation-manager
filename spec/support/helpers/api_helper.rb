@@ -3,27 +3,28 @@
 module ApiHelper
   T3_HOST = Rails.configuration.nomis_oauth_host
   T3 = "#{T3_HOST}/elite2api/api"
+  KEYWORKER_API_HOST = ENV.fetch('KEYWORKER_API_HOST')
 
-  def stub_offender(nomis_id, booking_number: 754_165, imprisonment_status: 'SENT03', dob: "1985-03-19")
-    stub_request(:get, "#{T3}/prisoners/#{nomis_id}").
-      to_return(status: 200, body: [{ offenderNo: nomis_id,
+  def stub_offender(offender)
+    booking_number = 1
+    stub_request(:get, "#{T3}/prisoners/#{offender.fetch(:offenderNo)}").
+      to_return(body: [{ offenderNo: offender.fetch(:offenderNo),
                                       gender: 'Male',
                                       convictedStatus: 'Convicted',
                                       latestBookingId: booking_number,
-                                      imprisonmentStatus: imprisonment_status,
-                                      dateOfBirth: dob }].to_json)
+                                      imprisonmentStatus: offender.fetch(:imprisonmentStatus),
+                                      dateOfBirth: offender.fetch(:dateOfBirth) }].to_json)
 
     stub_request(:post, "#{T3}/offender-sentences/bookings").
       with(
         body: [booking_number].to_json
       ).
-      to_return(body: [{ offenderNo: nomis_id, bookingId: booking_number,
-                                      sentenceDetail: { sentenceStartDate: Time.zone.today - 2.months,
-                                                        conditionalReleaseDate: Time.zone.today + 22.months } }].to_json)
+      to_return(body: [{ offenderNo: offender.fetch(:offenderNo), bookingId: booking_number,
+                                      sentenceDetail: offender.fetch(:sentence) }].to_json)
 
     stub_request(:post, "#{T3}/offender-assessments/CATEGORY").
       with(
-        body: [nomis_id].to_json
+        body: [offender.fetch(:offenderNo)].to_json
       ).
       to_return(body: {}.to_json)
 
@@ -61,7 +62,7 @@ module ApiHelper
       to_return(body: { 'staffId': staff_id }.to_json)
   end
 
-  def stub_offenders_for_prison(prison, offenders, bookings)
+  def stub_offenders_for_prison(prison, offenders)
     # Stub the call to get_offenders_for_prison. Takes a list of offender hashes (in nomis camelCase format) and
     # a list of bookings (same key format). It it your responsibility to make sure they contain the data you want
     # and if you provide a booking, that the id matches between the offender and booking hashes.
@@ -74,15 +75,17 @@ module ApiHelper
       headers: { 'Total-Records' => offenders.count.to_s }
     )
 
+    # make up a set of booking ids
+    booking_ids = 1.upto(offenders.size)
+
     # Return the actual offenders from the call to /locations/description/PRISON/inmates
     stub_request(:get, elite2listapi).with(
       headers: {
         'Page-Limit' => '200',
         'Page-Offset' => '0'
-      }).to_return(body: offenders.to_json)
+      }).to_return(body: offenders.zip(booking_ids).map { |o, booking_id| o.except(:sentence).merge('bookingId' => booking_id, 'agencyId' => prison) }.to_json)
 
-    # Get the booking ids provided
-    booking_ids = offenders.map { |h| h.fetch(:bookingId) }
+    bookings = booking_ids.zip(offenders).map { |booking_id, offender| { 'bookingId' => booking_id, 'sentenceDetail' => offender.fetch(:sentence) } }
     stub_request(:post, elite2bookingsapi).with(body: booking_ids.to_json).
       to_return(body: bookings.to_json)
   end
@@ -96,7 +99,7 @@ module ApiHelper
     )
 
     stub_request(:post, elite2bookingsapi).
-      to_return(body: bookings.to_json, headers: {})
+      to_return(body: bookings.to_json)
   end
 
   def reload_page
