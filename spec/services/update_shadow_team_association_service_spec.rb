@@ -36,7 +36,8 @@ RSpec.describe UpdateShadowTeamAssociationService do
       "OMIC Some Team" => "Some Team",
       "OMIC - NPS - Team 1" => "NPS - Team 1",
       "OMiC - Another team" => "Another team",
-      "omic lowercase team" => "lowercase team"
+      "omic lowercase team" => "lowercase team",
+      "*OMIC A Nice Team" => "A Nice Team"
     }
 
     example_team_names.each_with_index do |(shadow_name, active_name), index|
@@ -53,11 +54,12 @@ RSpec.describe UpdateShadowTeamAssociationService do
   end
 
   context "when the shadow name doesn't begin with 'OMIC'" do
-    it "logs an error" do
+    it "raises an error" do
       bad_shadow_name = 'Not a shadow team name'
       expect_message = "This doesn't look like a shadow team name: '#{bad_shadow_name}'"
-      expect(Rails.logger).to receive(:error).with(expect_message)
-      described_class.update(shadow_code: 'SHAD01', shadow_name: bad_shadow_name)
+      expect {
+        described_class.update(shadow_code: 'SHAD01', shadow_name: bad_shadow_name)
+      }.to raise_error(expect_message)
     end
   end
 

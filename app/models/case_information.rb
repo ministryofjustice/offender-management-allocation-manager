@@ -11,6 +11,8 @@ class CaseInformation < ApplicationRecord
            inverse_of: :case_information,
            dependent: :destroy
 
+  scope :nps, -> { where(case_allocation: 'NPS') }
+
   def local_divisional_unit
     team.try(:local_divisional_unit)
   end
