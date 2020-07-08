@@ -40,9 +40,9 @@ feature "view an offender's allocation information", :versioning do
         end
 
         expect(page).to have_content('Local divisional unit (LDU)')
-        expect(page).to have_content('LDU Name')
+        expect(page).to have_content('An Uninteresting LDU')
         expect(page).to have_content('Local divisional unit (LDU) email address')
-        expect(page).to have_content('testldu@example.org')
+        expect(page).to have_content(LocalDivisionalUnit.first.email_address)
 
         within("#team") do
           expect(page).to have_content('A nice team')
@@ -60,7 +60,7 @@ feature "view an offender's allocation information", :versioning do
       create_allocation(nomis_offender_id_without_keyworker)
     end
 
-    it "displays 'Data not available'", :raven_intercept_exception,
+    it "displays 'Data not available'",
        vcr: { cassette_name: :show_allocation_information_keyworker_not_assigned } do
       visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_without_keyworker)
 
