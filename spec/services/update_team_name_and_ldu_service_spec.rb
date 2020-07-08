@@ -88,4 +88,18 @@ RSpec.describe UpdateTeamNameAndLduService do
       }.to change(LocalDivisionalUnit, :count).by(1)
     end
   end
+
+  context 'with a duplicate team name' do
+    before do
+      create(:team, code: 'NTTR1', name: 'A team')
+    end
+
+    let(:ldu) { build(:local_divisional_unit) }
+
+    it 'errors' do
+      expect {
+        described_class.update(team_code: 'NTTR2', team_name: 'A team', ldu_code: ldu.code, ldu_name: ldu.name)
+      }.to raise_error(ActiveRecord::RecordInvalid, 'Validation failed: Name has already been taken')
+    end
+  end
 end
