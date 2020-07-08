@@ -7,6 +7,15 @@ require_relative 'string_collector'
 
 module Delius
   class Processor
+    FIELDS = [
+      :crn, :pnc_no, :noms_no, :fullname, :tier, :roh_cds,
+      :offender_manager, :org_private_ind, :org,
+      :provider, :provider_code,
+      :ldu, :ldu_code,
+      :team, :team_code,
+      :mappa, :mappa_levels, :date_of_birth
+    ].freeze
+
     include Enumerable
     # Given an XLSX file, this class is responsible for converting the data
     # found in sheet one, into a stream of rows. These rows will contain
@@ -57,9 +66,23 @@ module Delius
         entry.name == 'xl/worksheets/sheet1.xml'
       }.first
 
-      doc = Delius::Sheet.new { |row|
-        new_row = row.map { |i| @lookup_table[i] }
-        yield(new_row)
+      sheet_index = 0
+      doc = Delius::Sheet.new { |raw_row|
+        row = raw_row.map { |i| @lookup_table[i] }
+
+        # skip header row in row[0]
+        if sheet_index != 0 && !row.filter(&:present?).empty?
+          record = {}
+          # For each row, map the column to the appropriate column name
+          # as the existing column names are not very hash/symbol friendly
+          row.each_with_index do |val, idx|
+            key = Delius::Processor::FIELDS[idx]
+            record[key] = val
+          end
+
+          yield(record)
+        end
+        sheet_index += 1
       }
 
       parser = Nokogiri::XML::SAX::Parser.new(doc)
