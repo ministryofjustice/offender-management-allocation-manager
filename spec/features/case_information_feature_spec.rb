@@ -359,7 +359,6 @@ feature 'case information feature' do
         expect(page).not_to have_css(".notification")
         expect(page).not_to have_css(".alert")
         expectations(probation_service: 'Wales', tier: 'C', team: 'NPS - Wales', case_allocation: 'NPS')
-        expect(current_url).to have_content "/prisons/LEI/allocations/#{nomis_offender_id}/new"
       end
 
       it 'does not send email if probation_service changed to Scotland or Northern Ireland', :raven_intercept_exception,
