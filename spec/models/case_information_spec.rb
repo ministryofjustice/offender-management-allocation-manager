@@ -99,9 +99,9 @@ RSpec.describe CaseInformation, type: :model do
       end
     end
 
-    context 'without manual flag, it is not required' do
+    context 'without manual flag, it is still required' do
       it 'does not raise an error when not present' do
-        expect(build(:case_information, probation_service: nil, manual_entry: false)).to be_valid
+        expect(build(:case_information, probation_service: nil, manual_entry: false)).not_to be_valid
       end
     end
   end

@@ -22,15 +22,18 @@ class OnboardPrison
       end
 
       # Create a CaseInformation .....
-      CaseInformation.find_or_create_by(
-        nomis_offender_id: offender_id,
-        welsh_offender: record[:welsh_offender] ? 'Yes' : 'No',
-        tier: record[:tier],
-        case_allocation: record[:provider_cd],
-        crn: record[:crn],
-        probation_service: record[:welsh_offender] ? 'England' : 'Wales',
-        manual_entry: true
-      )
+      CaseInformation.find_or_create_by!(
+        nomis_offender_id: offender_id) do |ci|
+        ci.assign_attributes(
+          welsh_offender: record[:welsh_offender] ? 'Yes' : 'No',
+            tier: record[:tier],
+            case_allocation: record[:provider_cd],
+            crn: record[:crn],
+            probation_service: record[:welsh_offender] ? 'England' : 'Wales',
+            team: Team.find_by!(code: record.fetch(:team_code)),
+          manual_entry: true
+        )
+      end
 
       @additions += 1
     }
