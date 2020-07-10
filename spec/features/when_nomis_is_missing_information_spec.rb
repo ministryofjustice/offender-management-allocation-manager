@@ -142,16 +142,15 @@ context 'when NOMIS is missing information' do
   end
 
   context 'when logged in as an SPO' do
+    let(:staff_id) { 754_732 }
     before do
       stub_request(:post, "#{stub_auth_host}/auth/oauth/token").
         with(query: { grant_type: 'client_credentials' }).
         to_return(status: 200, body: {}.to_json)
 
       signin_spo_user('example_SPO')
-      stub_request(:get, "#{ApiHelper::T3}/users/example_SPO").
-          to_return(status: 200, body: { 'staffId': 754_732 }.to_json)
-      stub_request(:get, "#{ApiHelper::T3}/staff/#{754_732}/emails").
-          to_return(status: 200, body: [].to_json)
+      stub_retrieve_spo_staff_id(staff_id, 'example_SPO')
+      stub_spo_emails(staff_id)
     end
 
     context 'with an NPS offender with an indeterminate sentence, but no release dates' do

@@ -24,8 +24,8 @@ module AuthHelper
                            'username' => username }
     stub_request(:get, "#{T3}/elite2api/api/users/#{username}").
         to_return(status: 200, body: { 'staffId': 754_732 }.to_json)
-    stub_request(:get, "#{T3}/elite2api/api/staff/#{754_732}/emails").
-        to_return(status: 200, body: [].to_json)
+
+    stub_spo_emails(754_732)
   end
 
   def stub_sso_pom_data(prison, username)

@@ -27,4 +27,14 @@ module FeaturesHelper
 
     OmniAuth.config.add_mock(:hmpps_sso, hmpps_sso_response)
   end
+
+  def stub_spo_emails(staff_id)
+    stub_request(:get, "#{ApiHelper::T3}/staff/#{staff_id}/emails").
+        to_return(status: 200, body: [].to_json)
+  end
+
+  def stub_retrieve_spo_staff_id(staff_id, example_spo)
+    stub_request(:get, "#{ApiHelper::T3}/users/#{example_spo}").
+        to_return(status: 200, body: { 'staffId': staff_id }.to_json)
+  end
 end
