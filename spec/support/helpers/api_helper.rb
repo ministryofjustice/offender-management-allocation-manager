@@ -57,6 +57,7 @@ module ApiHelper
     stub_auth_token
     stub_request(:get, "#{T3}/users/#{username}").
       to_return(status: 200, body: { 'staffId': staff_id }.to_json)
+    stub_pom_emails(staff_id, [])
   end
 
   def stub_offenders_for_prison(prison, offenders, bookings)

@@ -5,7 +5,7 @@ class PrisonersController < PrisonsApplicationController
   before_action :load_offender, only: [:show]
 
   breadcrumb 'Your caseload',
-             -> { prison_caseload_index_path(active_prison_id) }, only: [:show]
+             -> { prison_staff_caseload_index_path(active_prison_id, @staff_id) }, only: [:show]
   breadcrumb -> { @offender.full_name },
              -> { '' }, only: [:show]
 

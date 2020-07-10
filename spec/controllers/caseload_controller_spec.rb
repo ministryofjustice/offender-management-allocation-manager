@@ -34,6 +34,9 @@ RSpec.describe CaseloadController, type: :controller do
     let(:offender) { attributes_for(:offender) }
 
     context 'when NPS' do
+      before do
+        stub_sso_data(prison, 'alice')
+      end
       let(:today_plus_36_weeks) { (Time.zone.today + 36.weeks).to_s }
       let(:bookings) {
         [offender].map { |o|
@@ -46,7 +49,7 @@ RSpec.describe CaseloadController, type: :controller do
       let(:case_allocation) { 'NPS' }
 
       it 'can pull back a NPS offender due for handover' do
-        get :handover_start, params: { prison_id: prison }
+        get :handover_start, params: {prison_id: prison, staff_id: staff_id}
         expect(response).to be_successful
         expect(assigns(:upcoming_handovers).map(&:offender_no)).to match_array([offender.fetch(:offenderNo)])
       end
@@ -65,7 +68,7 @@ RSpec.describe CaseloadController, type: :controller do
       let(:today_plus_13_weeks) { (Time.zone.today + 13.weeks).to_s }
 
       pending 'can pull back a CRC offender due for handover' do
-        get :handover_start, params: { prison_id: prison }
+        get :handover_start, params: { prison_id: prison, staff_id: staff_id }
         expect(response).to be_successful
         expect(assigns(:upcoming_handovers).map(&:offender_no)).to match_array([offender.fetch(:offenderNo)])
       end
@@ -136,8 +139,11 @@ RSpec.describe CaseloadController, type: :controller do
     end
 
     describe '#new' do
+      before do
+        stub_sso_data(prison, 'alice')
+      end
       it 'returns the caseload' do
-        get :new, params: { prison_id: prison }
+        get :new, params: { prison_id: prison, staff_id: staff_id }
         expect(response).to be_successful
 
         expect(assigns(:new_cases).map(&:nomis_offender_id)).to match_array(offenders.map { |o| o.fetch(:offenderNo) })

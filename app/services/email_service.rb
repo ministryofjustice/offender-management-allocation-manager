@@ -70,7 +70,7 @@ class EmailService
 private
 
   def url
-    @url ||= Rails.application.routes.url_helpers.prison_caseload_index_url(@allocation.prison)
+    @url ||= Rails.application.routes.url_helpers.prison_staff_caseload_index_url(@allocation.prison, @pom.staff_id)
   end
 
   def current_responsibility

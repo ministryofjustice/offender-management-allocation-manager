@@ -3,9 +3,9 @@
 # This class is inherited by all controllers under the /prisons route
 # so that they have @prison and active_prison_id available
 class PrisonsApplicationController < ApplicationController
-  before_action :authenticate_user, :check_prison_access
+  before_action :authenticate_user, :check_prison_access, :load_staff_id
 
-protected
+  protected
 
   def active_prison_id
     params[:prison_id]
@@ -37,5 +37,10 @@ private
   def pom_at_active_prison?
     user = Nomis::Elite2::UserApi.user_details(current_user)
     StaffMember.new(user.staff_id).pom_at?(active_prison_id)
+  end
+
+  def load_staff_id
+    user = Nomis::Elite2::UserApi.user_details(current_user)
+    @staff_id = user.staff_id
   end
 end

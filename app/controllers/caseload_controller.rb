@@ -98,6 +98,6 @@ private
   end
 
   def staff_id
-    params[:staff_id]
+    params[:staff_id].to_i
   end
 end
