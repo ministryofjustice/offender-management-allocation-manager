@@ -72,7 +72,7 @@ feature 'Provide debugging information for our team to use' do
     end
   end
 
-  context 'when debugging at a prison level' do
+  context 'when debugging at a prison level', vcr: { cassette_name: :debugging_prison_level } do
     it 'displays a dashboard' do
       signin_user
       visit prison_debugging_prison_path('LEI')
