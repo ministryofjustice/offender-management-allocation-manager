@@ -149,13 +149,13 @@ feature "view an offender's allocation information", :versioning do
       end
     end
 
-    context 'without auto_delius_import enabled' do
+    context 'without auto_delius_import enabled', vcr: { cassette_name: :allocation_auto_delius_off } do
       it 'displays change links' do
         expect(page).to have_content 'Change'
       end
     end
 
-    context 'with auto_delius_import enabled' do
+    context 'with auto_delius_import enabled', vcr: { cassette_name: :allocation_auto_delius_on } do
       let(:test_strategy) { Flipflop::FeatureSet.current.test! }
 
       before do
