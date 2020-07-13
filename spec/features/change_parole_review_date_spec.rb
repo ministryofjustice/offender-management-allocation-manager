@@ -12,7 +12,7 @@ RSpec.feature "ChangeParoleReviewDates", :versioning, type: :feature do
     signin_user
   end
 
-  it 'updates the date' do
+  it 'updates the date',  vcr: { cassette_name: :change_parole_date } do
     visit prison_allocation_path('LEI', nomis_offender_id)
 
     click_link 'Update'
@@ -26,7 +26,7 @@ RSpec.feature "ChangeParoleReviewDates", :versioning, type: :feature do
     expect(case_info.reload.parole_review_date).to eq(Date.new(year, 5, 13))
   end
 
-  it 'bounces properly' do
+  it 'bounces properly', vcr: { cassette_name: :change_parole_date_bounce } do
     visit prison_allocation_path('LEI', nomis_offender_id)
 
     click_link 'Update'
