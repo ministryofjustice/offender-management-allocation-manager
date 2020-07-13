@@ -22,7 +22,6 @@ RSpec.describe CaseInformationController, type: :controller do
       expect {
         post :create, params: { prison_id: prison,
                                 case_information: {
-                                  last_known_location: 'Yes',
                                   nomis_offender_id: offender_no,
                                   probation_service: 'England',
                                   tier: 'A',

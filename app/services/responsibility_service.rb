@@ -17,7 +17,7 @@ class ResponsibilityService
   # A decision has been made to display a notice so staff can check whether they need to override their case or not;
   # this is until we get access to this data.
   def self.calculate_pom_responsibility(offender)
-    if offender.immigration_case? || open_prison_nps_offender?(offender)
+    if offender.immigration_case? || open_prison_nps_offender?(offender) || offender.scottish_or_ni?
       SUPPORTING
     elsif offender.recalled?
       SUPPORTING
