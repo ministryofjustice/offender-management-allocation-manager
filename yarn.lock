@@ -9,6 +9,13 @@
   dependencies:
     moment "^2.22.2"
 
+accessible-autocomplete@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/accessible-autocomplete/-/accessible-autocomplete-2.0.3.tgz#3ed8d529b227b77e99ab509eec5d2c8d1b8bea8b"
+  integrity sha512-bUswBs/mDH17dUFRAJMTtcGafJ++w1YLPPFjdfJj3lnuBsLpByAw2gmr8qxXX8oc7tzoKS3Ay5FKOPM+WMBxIw==
+  dependencies:
+    preact "^8.3.1"
+
 govuk-frontend@^3.4.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/govuk-frontend/-/govuk-frontend-3.4.0.tgz#f6694245fbec2dd476d8e161c36be2a4ea785ce3"
@@ -18,3 +25,8 @@ moment@^2.22.2:
   version "2.24.0"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
   integrity sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg==
+
+preact@^8.3.1:
+  version "8.5.3"
+  resolved "https://registry.yarnpkg.com/preact/-/preact-8.5.3.tgz#78c2a5562fcecb1fed1d0055fa4ac1e27bde17c1"
+  integrity sha512-O3kKP+1YdgqHOFsZF2a9JVdtqD+RPzCQc3rP+Ualf7V6rmRDchZ9MJbiGTT7LuyqFKZqlHSOyO/oMFmI2lVTsw==
