@@ -160,6 +160,10 @@ module Nomis
         (record.latest_early_allocation.eligible? || record.latest_early_allocation.community_decision?)
     end
 
+    def scottish_or_ni?
+      ['Scotland', 'Northern Ireland'].include?(@probation_service)
+    end
+
   private
 
     def handover

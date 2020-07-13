@@ -14,6 +14,30 @@ describe ResponsibilityService do
       end
     end
 
+    context 'when a scottish offender' do
+      subject {
+        build(:offender_summary).tap { |offender|
+          offender.load_case_information(build(:case_information, probation_service: 'Scotland'))
+        }
+      }
+
+      it 'will show the POM as supporting' do
+        expect(described_class.calculate_pom_responsibility(subject)).to eq ResponsibilityService::SUPPORTING
+      end
+    end
+
+    context 'when a irish offender' do
+      subject {
+        build(:offender_summary).tap { |offender|
+          offender.load_case_information(build(:case_information, probation_service: 'Northern Ireland'))
+        }
+      }
+
+      it 'will show the POM as supporting' do
+        expect(described_class.calculate_pom_responsibility(subject)).to eq ResponsibilityService::SUPPORTING
+      end
+    end
+
     context 'when an offender has been recalled' do
       let(:offender) {
         OpenStruct.new recalled?: true,
