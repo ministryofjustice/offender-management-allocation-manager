@@ -20,6 +20,10 @@ RSpec.describe ApplicationHelper do
     it "for service provider NPS" do
       expect(service_provider_label('NPS')).to eq('National Probation Service (NPS)')
     end
+
+    it "for N/A service provider" do
+      expect(service_provider_label('N/A')).to eq('N/A')
+    end
   end
 
   describe 'displays mail_to link of a given email' do
