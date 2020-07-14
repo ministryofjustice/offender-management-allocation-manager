@@ -5,7 +5,7 @@
 class PrisonsApplicationController < ApplicationController
   before_action :authenticate_user, :check_prison_access, :load_staff_id
 
-  protected
+protected
 
   def active_prison_id
     params[:prison_id]

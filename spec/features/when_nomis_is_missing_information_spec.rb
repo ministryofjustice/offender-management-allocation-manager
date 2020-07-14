@@ -143,6 +143,7 @@ context 'when NOMIS is missing information' do
 
   context 'when logged in as an SPO' do
     let(:staff_id) { 754_732 }
+
     before do
       stub_request(:post, "#{stub_auth_host}/auth/oauth/token").
         with(query: { grant_type: 'client_credentials' }).
