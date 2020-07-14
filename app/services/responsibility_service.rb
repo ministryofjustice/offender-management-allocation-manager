@@ -169,7 +169,7 @@ private
   end
 
   def self.nps_rules(offender)
-    if welsh_offender?(offender)
+    if offender.welsh_offender
       WelshNpsResponsibiltyRules.new.responsibility(offender)
     else
       EnglishNpsResponsibilityRules.new.responsibility(offender)
@@ -201,10 +201,6 @@ private
 
   def self.crc_rules(offender)
     CrcRules.responsibility(offender)
-  end
-
-  def self.welsh_offender?(offender)
-    offender.welsh_offender == true
   end
 
   def self.determinate_with_no_release_dates?(offender)

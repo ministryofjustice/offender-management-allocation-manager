@@ -14,7 +14,7 @@ describe ViewHandoverEmailAddressesSummary do
         missing_team_information: 0,
         missing_local_divisional_unit: 0,
         missing_local_divisional_unit_email: 0
-                        )
+                           )
     end
   end
 
@@ -29,7 +29,7 @@ describe ViewHandoverEmailAddressesSummary do
         missing_team_information: 0,
         missing_local_divisional_unit: 0,
         missing_local_divisional_unit_email: 0
-                        )
+                           )
     end
   end
 
@@ -44,7 +44,7 @@ describe ViewHandoverEmailAddressesSummary do
         missing_team_information: 0,
         missing_local_divisional_unit: 0,
         missing_local_divisional_unit_email: 0
-                        )
+                           )
     end
   end
 
@@ -61,7 +61,7 @@ describe ViewHandoverEmailAddressesSummary do
         missing_team_information: 0,
         missing_local_divisional_unit: 0,
         missing_local_divisional_unit_email: 0
-                        )
+                           )
     end
   end
 
@@ -81,7 +81,7 @@ describe ViewHandoverEmailAddressesSummary do
         missing_team_information: 1,
         missing_local_divisional_unit: 0,
         missing_local_divisional_unit_email: 0
-                        )
+                           )
     end
   end
 
@@ -102,7 +102,7 @@ describe ViewHandoverEmailAddressesSummary do
         missing_team_information: 0,
         missing_local_divisional_unit: 1,
         missing_local_divisional_unit_email: 0
-                        )
+                           )
     end
   end
 
@@ -125,7 +125,7 @@ describe ViewHandoverEmailAddressesSummary do
         missing_team_information: 0,
         missing_local_divisional_unit: 0,
         missing_local_divisional_unit_email: 1
-                        )
+                           )
     end
   end
 
@@ -145,7 +145,7 @@ describe ViewHandoverEmailAddressesSummary do
         missing_team_information: 0,
         missing_local_divisional_unit: 0,
         missing_local_divisional_unit_email: 0
-                        )
+                           )
     end
   end
 end

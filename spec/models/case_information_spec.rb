@@ -87,11 +87,13 @@ RSpec.describe CaseInformation, type: :model do
 
     it 'gives the correct validation error message' do
       expect(subject).not_to be_valid
-      expect(subject.errors.messages).to eq(probation_service: ["You must say if the prisoner's last known address was in Northern Ireland, Scotland or Wales"])
+      expect(subject.errors.messages).
+        to eq(probation_service: ["You must say if the prisoner's last known address was in Northern Ireland, Scotland or Wales"],
+              welsh_offender: ["Select yes if the prisoner’s last known address was in Wales"])
     end
 
-    it 'allows England, Wales, Scotland & Northern Ireland' do
-      ['England', 'Wales', 'Scotland', 'Northern Ireland'].each do |service|
+    it 'allows England, Wales' do
+      ['England', 'Wales'].each do |service|
         subject.probation_service = service
         expect(subject).to be_valid
       end

@@ -11,6 +11,8 @@ class CaseInformation < ApplicationRecord
            inverse_of: :case_information,
            dependent: :destroy
 
+  before_validation :set_welsh_offender
+
   def local_divisional_unit
     team.try(:local_divisional_unit)
   end
@@ -43,8 +45,15 @@ class CaseInformation < ApplicationRecord
   validates :mappa_level, inclusion: { in: [0, 1, 2, 3], allow_nil: true }
 
   validates :probation_service, inclusion: {
-    in: ['Scotland', 'Northern Ireland', 'Wales', 'England'],
+    in: ['Wales', 'England'],
     allow_nil: false,
     message: "You must say if the prisoner's last known address was in Northern Ireland, Scotland or Wales"
   }
+
+private
+
+  def set_welsh_offender
+    self.welsh_offender = 'Yes' if probation_service == 'Wales'
+    self.welsh_offender = 'No' if probation_service == 'England'
+  end
 end

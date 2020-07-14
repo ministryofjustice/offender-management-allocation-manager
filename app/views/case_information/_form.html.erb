@@ -21,12 +21,12 @@
 
         <div class="govuk-radios">
           <div class="govuk-radios__item">
-            <%= radio_button_tag("case_information[welsh_offender]", 'Yes', @case_info.welsh_offender == 'Yes', class: "govuk-radios__input") %>
-            <%= label_tag "case_information[welsh_offender]", 'Yes', class: "govuk-label govuk-radios__label" %>
+            <%= radio_button_tag("case_information[probation_service]", 'Wales', @case_info.welsh_offender == 'Yes', class: "govuk-radios__input") %>
+            <%= label_tag "case_information[probation_service]", 'Wales', class: "govuk-label govuk-radios__label" %>
           </div>
           <div class="govuk-radios__item">
-            <%= radio_button_tag("case_information[welsh_offender]", 'No', @case_info.welsh_offender == 'No', class: "govuk-radios__input") %>
-            <%= label_tag "case_information[welsh_offender]", "No", class: "govuk-label govuk-radios__label" %>
+            <%= radio_button_tag("case_information[probation_service]", 'England', @case_info.welsh_offender == 'No', class: "govuk-radios__input") %>
+            <%= label_tag "case_information[probation_service]", "England", class: "govuk-label govuk-radios__label" %>
           </div>
         </div>
       </fieldset>

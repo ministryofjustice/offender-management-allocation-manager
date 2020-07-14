@@ -6,10 +6,6 @@ FactoryBot.define do
       'A'
     end
 
-    welsh_offender do
-      'Yes'
-    end
-
     case_allocation do
       'NPS'
     end
