@@ -93,10 +93,10 @@
         </legend>
         <span class="govuk-hint">Enter the full name of the Team, for example 'NPS Croydon'</span>
 
-        <div id="team_autocomplete" class="autocomplete-wrapper govuk-input--width-30"></div>
-
-        <!-- Get a list of the Team names for use by auto-complete -->
-        <%= content_tag :div, class: "team_information", data: {team: Team.all.pluck(:name)} do %><% end %>
+        <%= form.select(:team_id,
+                        Team.with_ldu.map { |team| [team.name, team.id] },
+                        { include_blank: true },
+                        { id:"team_autocomplete", class: "govuk-input--width-30" } ) %>
       </div>
 
       <table class="govuk-table">

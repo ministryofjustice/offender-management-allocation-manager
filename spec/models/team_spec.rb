@@ -11,6 +11,30 @@ RSpec.describe Team, type: :model do
     expect(build(:team, code: nil, shadow_code: 'N123')).to be_valid
   end
 
+  describe '#with_email_address' do
+    before do
+      create(:team, local_divisional_unit: build(:local_divisional_unit, email_address: nil))
+      create(:team, local_divisional_unit: build(:local_divisional_unit))
+      create(:team, local_divisional_unit: nil)
+    end
+
+    it 'finds just one team' do
+      expect(described_class.with_email_address.count).to eq(1)
+    end
+  end
+
+  describe '#with_email_address' do
+    before do
+      create(:team, local_divisional_unit: build(:local_divisional_unit, email_address: nil))
+      create(:team, local_divisional_unit: build(:local_divisional_unit))
+      create(:team, local_divisional_unit: nil)
+    end
+
+    it 'finds just one team' do
+      expect(described_class.with_email_address.count).to eq(1)
+    end
+  end
+
   context 'when NPS' do
     before do
       create(:team, :nps)

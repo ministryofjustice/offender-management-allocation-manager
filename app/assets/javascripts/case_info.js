@@ -1,18 +1,9 @@
 $(document).on("turbolinks:load", function(){
     if ($("#team_autocomplete").length > 0) {
         var element = document.querySelector('#team_autocomplete');
-        var id = 'autocomplete-default';
 
-        accessibleAutocomplete({
-            element: element,
-            id: id,
-            source: team_names(),
-            defaultValue: current_team(),
-            onConfirm: function (val) {
-                if (val !== undefined) {
-                    document.getElementById("chosen_team").innerHTML = val.bold();
-                }
-            }
+        accessibleAutocomplete.enhanceSelectElement({
+            selectElement: element
         });
     }
 

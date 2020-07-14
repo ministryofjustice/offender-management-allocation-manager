@@ -15,6 +15,10 @@ class Team < ApplicationRecord
 
   scope :nps, -> { where('teams.code like ?', 'N%') }
 
+  scope :with_email_address, -> { joins(:local_divisional_unit).merge(LocalDivisionalUnit.with_email_address) }
+
+  scope :with_ldu, -> { where.not(local_divisional_unit_id: nil) }
+
   def nps?
     code&.starts_with?('N')
   end

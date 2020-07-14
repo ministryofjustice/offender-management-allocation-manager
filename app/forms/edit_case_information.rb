@@ -3,7 +3,7 @@
 class EditCaseInformation
   include ActiveModel::Model
 
-  attr_accessor :last_known_location, :last_known_address, :tier, :case_allocation, :team
+  attr_accessor :last_known_location, :last_known_address, :tier, :case_allocation, :team_id
 
   validates :last_known_address, inclusion: {
     in: ['Scotland', 'Northern Ireland', 'Wales'],
@@ -19,7 +19,7 @@ class EditCaseInformation
     message: 'Select the service provider for this case'
   }
 
-  validates :team,
+  validates :team_id,
             presence: { message: "You must select the prisoner's team" },
             if: -> {
                   last_known_location == 'No' ||
@@ -35,7 +35,8 @@ class EditCaseInformation
       last_known_location: case_info.probation_service == 'England' ? 'No' : 'Yes',
       last_known_address: case_info.probation_service,
       tier: case_info.tier,
-      case_allocation: case_info.case_allocation
+      case_allocation: case_info.case_allocation,
+      team_id: case_info.team_id
     )
   end
 end
