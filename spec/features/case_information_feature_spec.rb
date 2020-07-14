@@ -2,14 +2,15 @@ require 'rails_helper'
 
 feature 'case information feature' do
   include ActiveJob::TestHelper
+
   before do
     ldu1 = create(:local_divisional_unit, code: "WELDU", name: "Welsh LDU", email_address: "WalesNPS@example.com")
     ldu2 = create(:local_divisional_unit, code: "ENLDU", name: "English LDU", email_address: "EnglishNPS@example.com")
     ldu3 = create(:local_divisional_unit, code: "OTHERLDU", name: "English LDU 2", email_address: nil)
-    Team.create!(code: "WELSH1", name: 'NPS - Wales', shadow_code: "W01", local_divisional_unit: ldu1)
-    Team.create!(code: "ENG1", name: 'NPS - England', shadow_code: "E01", local_divisional_unit: ldu2)
-    Team.create!(code: "ENG2", name: 'NPS - England 2', shadow_code: "E02", local_divisional_unit: ldu3)
-    Team.create!(code: "ENG3", name: 'NPS - England 3', shadow_code: "E03", local_divisional_unit: ldu2)
+    create(:team, code: "WELSH1", name: 'NPS - Wales', shadow_code: "W01", local_divisional_unit: ldu1)
+    create(:team, code: "ENG1", name: 'NPS - England 1', shadow_code: "E01", local_divisional_unit: ldu2)
+    create(:team, code: "ENG2", name: 'NPS - England 2', shadow_code: "E02", local_divisional_unit: ldu3)
+    create(:team, code: "ENG3", name: 'NPS - England 3', shadow_code: "E03", local_divisional_unit: ldu2)
   end
 
   let(:nomis_offender_id) { 'G2911GD' } # This NOMIS id needs to appear on the first page of 'missing information' also a determinate offender
@@ -133,7 +134,7 @@ feature 'case information feature' do
           choose_country(country: 'England', prefix: 'last_location_form')
           click_button 'Continue'
 
-          second_page_form(case_alloc: 'nps', tier: 'a', team_option: 'NPS - England')
+          second_page_form(case_alloc: 'nps', tier: 'a', team_option: 'NPS - England 1')
           email_expectations(button_name: 'Continue',
                              emails: %w[EnglishNPS@example.com spo_user@digital-justice.uk],
                              spo_notice: 'This is a copy of the email sent to the LDU for your records',
@@ -142,7 +143,7 @@ feature 'case information feature' do
           within ".notification" do
             expect(page).to have_content(notification_with_email)
           end
-          expectations(probation_service: 'England', tier: 'A', team: 'NPS - England', case_allocation: 'NPS')
+          expectations(probation_service: 'England', tier: 'A', team: 'NPS - England 1', case_allocation: 'NPS')
         end
 
         it 'when there is no LDU email address, send email to SPO only',
@@ -176,7 +177,7 @@ feature 'case information feature' do
           choose_country(country: 'England', prefix: 'last_location_form')
           click_button 'Continue'
 
-          second_page_form(case_alloc: 'nps', tier: 'a', team_option: 'NPS - England')
+          second_page_form(case_alloc: 'nps', tier: 'a', team_option: 'NPS - England 1')
           user_details.email_address = []
 
           expect {
@@ -193,7 +194,7 @@ feature 'case information feature' do
                                          "in your prison to update your email address.")
           end
 
-          expectations(probation_service: 'England', tier: 'A', team: 'NPS - England', case_allocation: 'NPS')
+          expectations(probation_service: 'England', tier: 'A', team: 'NPS - England 1', case_allocation: 'NPS')
         end
 
         it 'when there are no email addresses for LDU or SPO, no email sent', :raven_intercept_exception,
@@ -246,7 +247,7 @@ feature 'case information feature' do
 
           if new_countries[index] == 'England'
             choose_country(country: 'England', prefix: 'edit_case_information')
-            second_page_form(case_alloc: 'crc', tier: 'd', team_option: 'NPS - England')
+            second_page_form(case_alloc: 'crc', tier: 'd', team_option: 'NPS - England 1')
           else
             choose_radio_button('Wales')
             second_page_form(case_alloc: 'nps', tier: 'b', team_option: 'NPS - Wales')
@@ -256,7 +257,7 @@ feature 'case information feature' do
         end
 
         group_expectations(probation_services: %w[England Wales], tiers: %w[D B],
-                           teams: ['NPS - England', 'NPS - Wales'], case_allocs: %w[CRC NPS])
+                           teams: ['NPS - England 1', 'NPS - Wales'], case_allocs: %w[CRC NPS])
       end
 
       it 'complains if tier, case_allocation or team not selected when changing to England or Wales',
@@ -290,7 +291,7 @@ feature 'case information feature' do
           click_button 'Continue'
 
           if country == 'England'
-            second_page_form(case_alloc: 'nps', tier: 'c', team_option: 'NPS - England')
+            second_page_form(case_alloc: 'nps', tier: 'c', team_option: 'NPS - England 1')
           else
             second_page_form(case_alloc: 'crc', tier: 'd', team_option: 'NPS - Wales')
           end
@@ -302,12 +303,12 @@ feature 'case information feature' do
             choose_country(country: 'Scotland', prefix: 'edit_case_information')
           else
             choose_country(country: 'England', prefix: 'edit_case_information')
-            second_page_form(case_alloc: 'crc', tier: 'a', team_option: 'NPS - England')
+            second_page_form(case_alloc: 'crc', tier: 'a', team_option: 'NPS - England 1')
           end
           click_button 'Update'
         end
 
-        group_expectations(probation_services: %w[Scotland England], tiers: %w[N/A A], teams: [nil, 'NPS - England'], case_allocs: %w[N/A CRC])
+        group_expectations(probation_services: %w[Scotland England], tiers: %w[N/A A], teams: [nil, 'NPS - England 1'], case_allocs: %w[N/A CRC])
       end
 
       it 'complains if country not selected when changing to another country',
@@ -317,7 +318,7 @@ feature 'case information feature' do
 
         choose_country(country: 'England', prefix: 'last_location_form')
         click_button 'Continue'
-        second_page_form(case_alloc: 'crc', tier: 'd', team_option: 'NPS - England')
+        second_page_form(case_alloc: 'crc', tier: 'd', team_option: 'NPS - England 1')
         click_button 'Continue'
 
         visit edit_prison_case_information_path('LEI', nomis_offender_id)
@@ -326,7 +327,7 @@ feature 'case information feature' do
 
         expect(page).to have_content("You must say if the prisoner's last known address was in Northern Ireland, "\
                                     "Scotland or Wales")
-        expectations(probation_service: 'England', tier: 'D', team: 'NPS - England', case_allocation: 'CRC')
+        expectations(probation_service: 'England', tier: 'D', team: 'NPS - England 1', case_allocation: 'CRC')
       end
     end
 
@@ -352,10 +353,11 @@ feature 'case information feature' do
 
         expect {
           click_button 'Update'
-        }.to change(enqueued_jobs, :size).by(0)
+        }.not_to change(enqueued_jobs, :size)
 
         expect(page).not_to have_css(".notification")
         expect(page).not_to have_css(".alert")
+        expect(page).not_to have_css(".govuk-error-summary")
         expectations(probation_service: 'Wales', tier: 'C', team: 'NPS - Wales', case_allocation: 'NPS')
       end
 
@@ -371,21 +373,23 @@ feature 'case information feature' do
 
         expect {
           click_button 'Update'
-        }.to change(enqueued_jobs, :size).by(0)
+        }.not_to change(enqueued_jobs, :size)
         expect(page).not_to have_css(".notification")
         expect(page).not_to have_css(".alert")
+        expect(page).not_to have_css(".govuk-error-summary")
+        expectations(probation_service: 'Northern Ireland', tier: 'N/A', team: nil, case_allocation: 'N/A')
       end
 
       it 'does not send email when updating team has the same ldu',
          vcr: { cassette_name: :case_information_update_email_not_triggered_when_updated_team_has_same_ldu } do
         choose_country(country: 'England', prefix: 'last_location_form')
         click_button 'Continue'
-        second_page_form(case_alloc: 'nps', tier: 'b', team_option: 'NPS - England')
+        second_page_form(case_alloc: 'nps', tier: 'b', team_option: 'NPS - England 1')
         click_button 'Continue'
 
         visit edit_prison_case_information_path('LEI', nomis_offender_id)
 
-        page.execute_script("document.getElementsByName('input-autocomplete')[0].value='NPS - England 3'")
+        choose_team('NPS - England 3')
 
         expect {
           click_button 'Update'
@@ -538,7 +542,13 @@ feature 'case information feature' do
   def second_page_form(case_alloc:, tier:, team_option:)
     choose_radio_button(service_provider_label(case_alloc)) unless case_alloc.nil?
     choose_radio_button(tier.upcase) unless tier.nil?
-    page.execute_script("document.getElementsByName('input-autocomplete')[0].value='#{team_option}'")
+    choose_team(team_option)
+  end
+
+  def choose_team(team_name)
+    team_autocomplete = find('#team_autocomplete')
+    team_autocomplete.send_keys(team_name)
+    team_autocomplete.click
   end
 
   def choose_country(country:, prefix:)

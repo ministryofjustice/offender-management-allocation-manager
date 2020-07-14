@@ -28,7 +28,7 @@ class CaseInformationController < PrisonsApplicationController
       end
     else
       @last_location = Struct.new(:valid?).new(true)
-      @case_info = CaseInformation.new(case_information_params.merge(team_id: team_identifier, manual_entry: true))
+      @case_info = CaseInformation.new(case_information_params.merge(manual_entry: true))
       unless @case_info.valid?
         handle_stage2_rendering
       end
@@ -49,13 +49,13 @@ class CaseInformationController < PrisonsApplicationController
   def update
     @case_info = CaseInformation.find_by!(nomis_offender_id: nomis_offender_id_from_url)
     @prisoner = prisoner(nomis_offender_id_from_url)
-    @edit_case_info = EditCaseInformation.new edit_case_information_params.merge(team: team_param)
+    @edit_case_info = EditCaseInformation.new edit_case_information_params
 
     if @edit_case_info.valid?
       @case_info.update!(probation_service: @edit_case_info.probation_service,
                       tier: @edit_case_info.tier,
                       case_allocation: @edit_case_info.case_allocation,
-                      team: @edit_case_info.team,
+                      team: @edit_case_info.team_id.blank? ? nil : Team.find(@edit_case_info.team_id),
                       manual_entry: true)
       # we only send email if the ldu is different from previous
       if CaseInformationService.ldu_changed?(@case_info.saved_change_to_team_id)
@@ -132,14 +132,6 @@ private
     render :missing_info
   end
 
-  def team_identifier
-    Team.find_by(name: params['input-autocomplete'])&.id
-  end
-
-  def team_param
-    Team.find_by(name: params['input-autocomplete'])
-  end
-
   def send_email
     return unless @case_info.probation_service == 'England' || @case_info.probation_service == 'Wales'
 
@@ -184,7 +176,7 @@ private
 
   def edit_case_information_params
     params.require(:edit_case_information).
-      permit(:tier, :case_allocation,
+      permit(:tier, :case_allocation, :team_id,
              :last_known_location,
              :last_known_address)
   end
