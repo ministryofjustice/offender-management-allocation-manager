@@ -7,7 +7,7 @@ RSpec.describe Allocation, type: :model do
 
   describe '#without_ldu_emails' do
     before do
-      crcci1 = create(:case_information, case_allocation: 'CRC', team: nil)
+      crcci1 = create(:case_information, case_allocation: 'CRC', team: nil, probation_service: 'Scotland')
       create(:allocation, nomis_offender_id: crcci1.nomis_offender_id)
 
       blank_team = create(:team, local_divisional_unit: build(:local_divisional_unit, email_address: nil))
@@ -16,7 +16,7 @@ RSpec.describe Allocation, type: :model do
     end
 
     let!(:c1) {
-      ci1 = create(:case_information, team: nil)
+      ci1 = create(:case_information, probation_service: 'Scotland', team: nil)
       create(:allocation, nomis_offender_id: ci1.nomis_offender_id)
     }
     let!(:c2) {

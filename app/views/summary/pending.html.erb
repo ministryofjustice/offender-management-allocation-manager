@@ -2,6 +2,18 @@
   <%= render '/layouts/prison_switcher' %>
 <% end %>
 
+<% if notice.present? %>
+  <p class="notification govuk-!-margin-bottom-9" role="group" aria-labelledby="notice-heading">
+    <%= notice %>
+  </p>
+<% end %>
+
+<% if alert.present? %>
+  <p class="alert govuk-!-margin-bottom-9" role="group" aria-labelledby="error-summary-heading">
+    <%= alert %>
+  </p>
+<% end %>
+
 <div class="govuk-!-margin-bottom-4">
   <%= render "search/search_box" %>
 </div>

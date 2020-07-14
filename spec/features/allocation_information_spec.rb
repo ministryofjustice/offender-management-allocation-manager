@@ -22,6 +22,43 @@ feature "view an offender's allocation information", :versioning do
     signin_user
   end
 
+  context 'with community information' do
+    before do
+      create(:case_information, nomis_offender_id: nomis_offender_id_without_keyworker)
+      create(
+        :allocation,
+        nomis_offender_id: nomis_offender_id_without_keyworker,
+        primary_pom_nomis_id: probation_officer_nomis_staff_id,
+        prison: prison
+      )
+    end
+
+    it 'displays community information with update links', :raven_intercept_exception,
+       vcr: { cassette_name: :show_allocation_information_community_info } do
+      visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_without_keyworker)
+      expect(page).to have_css('h1', text: 'Allocation information')
+
+      within('#community_information') do
+        within("#community_probation_service") do
+          expect(page).to have_content('Wales')
+          expect(page).to have_link('Change', href: edit_prison_case_information_path('LEI', nomis_offender_id_without_keyworker))
+        end
+
+        expect(page).to have_content('Local divisional unit (LDU)')
+        expect(page).to have_content('An Uninteresting LDU')
+        expect(page).to have_content('Local divisional unit (LDU) email address')
+        expect(page).to have_content(LocalDivisionalUnit.first.email_address)
+
+        within("#team") do
+          expect(page).to have_content('A nice team')
+          expect(page).to have_link('Change', href: edit_prison_case_information_path('LEI', nomis_offender_id_without_keyworker))
+        end
+
+        expect(page).to have_content('COM')
+      end
+    end
+  end
+
   context 'when offender does not have a key worker assigned' do
     before do
       create(:case_information, nomis_offender_id: nomis_offender_id_without_keyworker)
@@ -198,7 +235,6 @@ feature "view an offender's allocation information", :versioning do
 
       it 'does not display change links' do
         visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_with_keyworker)
-
         expect(page).not_to have_content 'Change'
       end
     end

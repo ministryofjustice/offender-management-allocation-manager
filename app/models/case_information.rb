@@ -13,6 +13,8 @@ class CaseInformation < ApplicationRecord
 
   scope :nps, -> { where(case_allocation: 'NPS') }
 
+  attr_accessor :last_known_location
+
   def local_divisional_unit
     team.try(:local_divisional_unit)
   end
@@ -25,12 +27,19 @@ class CaseInformation < ApplicationRecord
   validates :manual_entry, inclusion: { in: [true, false], allow_nil: false }
   validates :nomis_offender_id, presence: true, uniqueness: true
 
-  validates :team, presence: true, unless: -> { manual_entry }
+  validates :team,
+            presence: { message: "You must select the prisoner's team" },
+            unless:
+            proc { |c|
+              c.manual_entry &&
+              (c.probation_service == 'Scotland' ||
+              c.probation_service == 'Northern Ireland')
+            }
 
-  validates :tier, inclusion: { in: %w[A B C D], message: 'Select the prisoner’s tier' }
+  validates :tier, inclusion: { in: %w[A B C D N/A], message: "Select the prisoner's tier" }
 
   validates :case_allocation, inclusion: {
-    in: %w[NPS CRC],
+    in: %w[NPS CRC N/A],
     allow_nil: false,
     message: 'Select the service provider for this case'
   }
@@ -40,12 +49,49 @@ class CaseInformation < ApplicationRecord
   validates :mappa_level, inclusion: { in: [0, 1, 2, 3], allow_nil: true }
 
   validates :probation_service, inclusion: {
-    in: ['Wales', 'England'],
+    in: ['Scotland', 'Northern Ireland', 'Wales', 'England'],
     allow_nil: false,
-    message: 'Select yes if the prisoner’s last known address was in Wales'
+    message: "You must say if the prisoner's last known address was in Northern Ireland, Scotland or Wales"
   }
 
   def welsh?
     probation_service == 'Wales'
+  end
+
+  # We only want to validate last known location in forms
+  validates :last_known_location,
+            inclusion: {
+              in: %w[Yes No],
+              allow_nil: true,
+              message: "Select yes if the prisoner's last known address was in Northern Ireland, Scotland or Wales"
+            }, if: -> { manual_entry }
+
+  def scottish_or_ni?
+    return true if last_known_location == 'Yes' &&
+      (probation_service == 'Scotland' || probation_service == 'Northern Ireland')
+
+    false
+  end
+
+  def save_scottish_or_ni
+    self.tier = 'N/A'
+    self.case_allocation = 'N/A'
+    self.team = nil
+  end
+
+  def english_or_welsh?
+    return true if last_known_location == 'No' || probation_service == 'Wales' || probation_service == 'England'
+
+    false
+  end
+
+  def english?
+    last_known_location == 'No'
+  end
+
+  def stage2_filled?
+    return false if tier.nil? || team.nil? || case_allocation.nil?
+
+    true
   end
 end

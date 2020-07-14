@@ -17,7 +17,7 @@ module Nomis
 
     attr_accessor :sentence, :allocated_pom_name, :allocated_com_name, :case_allocation, :mappa_level, :tier
 
-    attr_reader :crn,
+    attr_reader :crn, :probation_service,
                 :welsh_offender, :parole_review_date,
                 :ldu, :team
 
@@ -146,6 +146,7 @@ module Nomis
       @tier = record.tier
       @case_allocation = record.case_allocation
       @welsh_offender = record.welsh?
+      @probation_service = record.probation_service
       @crn = record.crn
       @mappa_level = record.mappa_level
       @ldu = record.local_divisional_unit

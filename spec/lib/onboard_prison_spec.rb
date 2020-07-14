@@ -4,11 +4,12 @@ require 'onboard_prison.rb'
 describe OnboardPrison do
   context 'when we initiailize the onboarder' do
     let!(:offender_ids)  { %w[G9468UN G5054VN G1895GH] }
+    let(:team) { create(:team) }
     let!(:delius_records) {
       [
      { noms_no: 'A' },
      { noms_no: 'B' },
-     { noms_no: 'G9468UN', tier: 'B', provider_cd: 'NPS' }
+     { noms_no: 'G9468UN', tier: 'B', provider_cd: 'NPS', team_code: team.code }
         ]
     }
 
