@@ -45,12 +45,12 @@ feature 'ActiveAdmin' do
   context 'when a global admin' do
     before do
       signin_global_admin_user
-      ci = create(:case_information, team: nil)
+      ci = create(:case_information, probation_service: 'Scotland', team: nil)
       create(:allocation, nomis_offender_id: ci.nomis_offender_id)
     end
 
     it 'displays the dashboard' do
-      ci = create(:case_information, team: nil)
+      ci = create(:case_information)
       create(:allocation, nomis_offender_id: ci.nomis_offender_id)
 
       visit('/admin')
