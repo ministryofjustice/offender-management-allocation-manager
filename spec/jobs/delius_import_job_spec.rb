@@ -51,4 +51,11 @@ RSpec.describe DeliusImportJob, type: :job do
       expect(imported.team).to eq('N&S-Bury St Edmunds')
     end
   end
+
+  context "when the shadow name doesn't begin with 'OMIC'", :raven_intercept_exception do
+    it "captures an exception" do
+      bad_shadow_name = 'Not a shadow team name'
+      subject.process_decrypted_file([ldu_code: 'N01OMIC', ldu: 'An LDU', team_code: 'SHAD01', team: bad_shadow_name])
+    end
+  end
 end

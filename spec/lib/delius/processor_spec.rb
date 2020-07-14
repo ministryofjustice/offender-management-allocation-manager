@@ -6,6 +6,6 @@ describe Delius::Processor do
     filename = 'spec/fixtures/delius/delius_sample.xlsx'
     e = described_class.new(filename)
 
-    expect(e.count).to eq(93)
+    expect(e.count).to eq(92)
   end
 end

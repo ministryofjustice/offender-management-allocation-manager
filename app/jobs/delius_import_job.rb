@@ -6,15 +6,6 @@ require 'zip'
 class DeliusImportJob < ApplicationJob
   queue_as :default
 
-  FIELDS = [
-    :crn, :pnc_no, :noms_no, :fullname, :tier, :roh_cds,
-    :offender_manager, :org_private_ind, :org,
-    :provider, :provider_code,
-    :ldu, :ldu_code,
-    :team, :team_code,
-    :mappa, :mappa_levels, :date_of_birth
-  ].freeze
-
   def perform
     ActiveRecord::Base.connection.disable_query_cache!
 
@@ -37,12 +28,7 @@ class DeliusImportJob < ApplicationJob
   end
 
   def process_decrypted_file(processor)
-    # A key fact here is that update_team_names_and_ldus()
-    # only operates on 'active' records
-    # and update_shadow_team_associations() only operates on 'shadow'
-    # records - so their behaviours do not overlap.
     update_team_names_and_ldus(processor)
-    update_shadow_team_associations(processor)
     upsert_delius_data_records(processor)
   end
 
@@ -116,34 +102,33 @@ private
     end
   end
 
-  def update_shadow_team_associations(processor)
-    for_each_record(processor) do |record|
-      next unless shadow_ldu?(record[:ldu_code])
-
-      UpdateShadowTeamAssociationService.update(
-        shadow_code: record[:team_code],
-        shadow_name: record[:team]
-      )
-    end
-  end
-
   def update_team_names_and_ldus(processor)
-    for_each_record(processor) do |record|
-      next unless active_ldu?(record[:ldu_code])
-
-      UpdateTeamNameAndLduService.update(
-        team_code: record.fetch(:team_code),
-        team_name: record.fetch(:team),
-        ldu_code: record.fetch(:ldu_code),
-        ldu_name: record.fetch(:ldu)
-      )
+    processor.each do |record|
+      begin
+        if active_ldu?(record.fetch(:ldu_code))
+          UpdateTeamNameAndLduService.update(
+            team_code: record.fetch(:team_code),
+            team_name: record.fetch(:team),
+            ldu_code: record.fetch(:ldu_code),
+            ldu_name: record.fetch(:ldu)
+          )
+        else
+          UpdateShadowTeamAssociationService.update(
+            shadow_code: record.fetch(:team_code),
+            shadow_name: record.fetch(:team)
+          )
+        end
+      rescue StandardError => e
+        Raven.extra_context [:team_code, :team, :ldu_code, :ldu].map { |field| [field, record.fetch(field)] }.to_h
+        Raven::capture_exception(e)
+      end
     end
   end
 
   def upsert_delius_data_records(processor)
     total = 0
 
-    for_each_record(processor) do |record|
+    processor.each do |record|
       if record[:noms_no].present?
         DeliusDataService.upsert(record)
         total += 1
@@ -151,26 +136,6 @@ private
     end
 
     Rails.logger.info("[DELIUS] #{total} records attempted upsert")
-  end
-
-  def for_each_record(processor)
-    processor.each_with_index do |row, index|
-      # skip header row in row[0]
-      next if index == 0
-
-      next if row.filter(&:present?).empty?
-
-      record = {}
-
-      # For each row, map the column to the appropriate column name
-      # as the existing column names are not very hash/symbol friendly
-      row.each_with_index do |val, idx|
-        key = FIELDS[idx]
-        record[key] = val
-      end
-
-      yield(record)
-    end
   end
 
   def shadow_ldu?(ldu_code)
