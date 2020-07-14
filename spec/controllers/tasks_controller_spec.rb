@@ -74,6 +74,19 @@ RSpec.describe TasksController, type: :controller do
     stub_offenders_for_prison(prison, offenders, bookings)
   end
 
+  context 'when an SPO' do
+    before do
+      stub_sso_data(prison)
+    end
+
+    it 'return a 401' do
+      get :index, params: { prison_id: prison }
+
+      expect(response).to redirect_to '/401'
+    end
+  end
+
+
   context 'when showing parole review date pom tasks' do
     let(:offender_no) { 'G7514GW' }
 
