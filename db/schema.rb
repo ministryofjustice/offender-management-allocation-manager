@@ -47,7 +47,6 @@ ActiveRecord::Schema.define(version: 2020_08_03_135050) do
     t.string "tier"
     t.string "case_allocation"
     t.string "nomis_offender_id"
-    t.text "welsh_offender"
     t.string "crn"
     t.integer "mappa_level"
     t.boolean "manual_entry", null: false
@@ -55,7 +54,7 @@ ActiveRecord::Schema.define(version: 2020_08_03_135050) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.date "parole_review_date"
-    t.string "probation_service"
+    t.string "probation_service", null: false
     t.index ["nomis_offender_id"], name: "index_case_information_on_nomis_offender_id", unique: true
     t.index ["team_id"], name: "index_case_information_on_team_id"
   end
