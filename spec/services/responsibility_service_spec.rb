@@ -351,11 +351,14 @@ describe ResponsibilityService do
                               sentenced?: true
             }
 
-            context 'with more than 17 months left to serve' do
+            context 'with more than 17 months left to serve and handover in future' do
               let(:ted) { sentence_start_date + 18.months }
 
               it 'will show the POM as having a responsible role' do
-                resp = described_class.calculate_pom_responsibility(offender)
+                resp = Timecop.travel Date.new(2020, 6, 1) do
+                  described_class.calculate_pom_responsibility(offender)
+                end
+
                 expect(resp).to eq ResponsibilityService::RESPONSIBLE
               end
             end
