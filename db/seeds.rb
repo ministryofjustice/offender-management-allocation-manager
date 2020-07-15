@@ -76,19 +76,21 @@ team3 = Team.find_or_create_by!(
 # responsibility override workflow
 
 CaseInformation.find_or_create_by!(nomis_offender_id: 'G7658UL') do |info|
-    info.tier = 'A'
-    info.case_allocation = 'NPS'
-    info.welsh_offender = 'Yes'
-    info.manual_entry =  true
-    info.team_id = team1.id
+  info.tier = 'A'
+  info.case_allocation = 'NPS'
+  info.welsh_offender = 'Yes'
+  info.manual_entry =  true
+  info.team_id = team1.id
+  info.probation_service = "Wales"
 end
 
 CaseInformation.find_or_create_by!(nomis_offender_id: 'G7517GF') do |info|
   info.tier = 'B'
-    info.case_allocation = 'NPS'
-    info.welsh_offender = 'Yes'
-    info.manual_entry = true
-    info.team_id = team2.id
+  info.case_allocation = 'NPS'
+  info.welsh_offender = 'Yes'
+  info.manual_entry = true
+  info.team_id = team2.id
+  info.probation_service = "Wales"
 end
 
 CaseInformation.find_or_create_by!(nomis_offender_id: 'G3536UF') do |info|
@@ -97,6 +99,7 @@ CaseInformation.find_or_create_by!(nomis_offender_id: 'G3536UF') do |info|
   info.welsh_offender = 'No'
   info.manual_entry = true
   info.team_id = team2.id
+  info.probation_service = "England"
 end
 
 CaseInformation.find_or_create_by!(nomis_offender_id: 'G2260UO') do |info|
@@ -105,4 +108,5 @@ CaseInformation.find_or_create_by!(nomis_offender_id: 'G2260UO') do |info|
   info.welsh_offender = 'No'
   info.manual_entry = true
   info.team_id = team3.id
+  info.probation_service = "England"
 end
