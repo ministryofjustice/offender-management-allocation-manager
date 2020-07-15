@@ -177,6 +177,9 @@ feature "view POM's caseload" do
 
   it 'allows a POM to view the prisoner profile page for a specific offender' do
     signin_pom_user
+    stub_offender(first_offender.fetch(:offenderNo))
+    stub_request(:get, "https://keyworker-api-dev.prison.service.justice.gov.uk/key-worker/LEI/offender/#{first_offender.fetch(:offenderNo)}").
+      to_return(body: { staffId: 485_572, firstName: "DOM", lastName: "BULL" }.to_json)
     visit prison_caseload_index_path(prison)
 
     expected_name = "#{first_offender.fetch(:lastName)}, #{first_offender.fetch(:firstName)}"

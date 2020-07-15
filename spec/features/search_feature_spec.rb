@@ -12,7 +12,7 @@ feature 'Search for offenders' do
       test_strategy.switch!(:auto_delius_import, false)
     end
 
-    it 'shows update not edit' do
+    it 'shows update not edit', vcr: { cassette_name: :search_update_edit } do
       signin_user
       visit prison_summary_allocated_path('LEI')
 
@@ -33,7 +33,7 @@ feature 'Search for offenders' do
       test_strategy.switch!(:auto_delius_import, false)
     end
 
-    it 'shows update not edit' do
+    it 'shows update not edit', vcr: { cassette_name: :search_update_edit_no_delius } do
       signin_user
       visit prison_summary_allocated_path('LEI')
 
