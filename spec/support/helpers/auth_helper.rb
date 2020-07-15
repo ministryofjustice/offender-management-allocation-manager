@@ -2,32 +2,24 @@
 
 module AuthHelper
   T3 = 'https://gateway.t3.nomis-api.hmpps.dsd.io'
-  ACCESS_TOKEN = 'an access token'
+  ACCESS_TOKEN = Struct.new(:access_token).new('an-access-token')
 
   def stub_auth_token
-    allow(Nomis::Oauth::TokenService).to receive(:valid_token).and_return(OpenStruct.new(access_token: ACCESS_TOKEN))
+    allow(Nomis::Oauth::TokenService).to receive(:valid_token).and_return(ACCESS_TOKEN)
 
     stub_request(:post, "#{T3}/auth/oauth/token?grant_type=client_credentials").
-      to_return(status: 200, body: {
-        "access_token": ACCESS_TOKEN,
+      to_return(body: {
+        "access_token": ACCESS_TOKEN.access_token,
         "token_type": "bearer",
         "expires_in": 1199,
         "scope": "readwrite"
-      }.to_json, headers: {})
+      }.to_json)
   end
 
-  def stub_sso_data(prison, username = 'user')
-    allow(Nomis::Oauth::TokenService).to receive(:valid_token).and_return(OpenStruct.new(access_token: 'token'))
+  def stub_sso_data(prison, username = 'user', role = 'ROLE_ALLOC_MGR')
+    allow(Nomis::Oauth::TokenService).to receive(:valid_token).and_return(ACCESS_TOKEN)
     session[:sso_data] = { 'expiry' => Time.zone.now + 1.day,
-                           'roles' => ['ROLE_ALLOC_MGR'],
-                           'caseloads' => [prison],
-                           'username' => username }
-  end
-
-  def stub_sso_pom_data(prison, username)
-    allow(Nomis::Oauth::TokenService).to receive(:valid_token).and_return(OpenStruct.new(access_token: 'token'))
-    session[:sso_data] = { 'expiry' => Time.zone.now + 1.day,
-                           'roles' => ['ROLE_ALLOC_CASE_MGR'],
+                           'roles' => [role],
                            'caseloads' => [prison],
                            'username' => username }
   end

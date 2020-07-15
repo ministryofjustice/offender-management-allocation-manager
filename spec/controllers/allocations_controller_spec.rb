@@ -40,8 +40,7 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
 
     before do
       stub_poms(prison, poms)
-      stub_sso_pom_data(prison, 'alice')
-      stub_signed_in_pom(1, 'Alice')
+      stub_signed_in_pom(prison, 1, 'Alice')
       stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/users/").
         to_return(status: 200, body: { staffId: 1 }.to_json, headers: {})
     end

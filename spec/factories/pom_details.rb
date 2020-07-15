@@ -23,9 +23,12 @@ FactoryBot.define do
   end
 
   factory :pom, class: 'Elite2POM' do
-    position do 'PRO' end
-    sequence(:emails) do |x| ["staff#{x}@justice.gov.uk"]  end
-    sequence(:staffId) do |x| x + 1  end
+    position { 'PRO' }
+    sequence(:emails) { |x| ["staff#{x}@justice.gov.uk"]  }
+    sequence(:staffId) { |x| x + 1000  }
+
+    firstName { Faker::Name.first_name }
+    lastName { Faker::Name.last_name }
 
     trait :probation_officer do
       position { 'PO' }

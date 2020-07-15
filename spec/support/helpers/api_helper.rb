@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module ApiHelper
-  T3 = 'https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api'
+  T3_HOST = Rails.configuration.nomis_oauth_host
+  T3 = "#{T3_HOST}/elite2api/api"
 
   def stub_offender(nomis_id, booking_number: 754_165, imprisonment_status: 'SENT03', dob: "1985-03-19")
     stub_request(:get, "#{T3}/prisoners/#{nomis_id}").
@@ -50,13 +51,14 @@ module ApiHelper
 
   def stub_pom_emails(staff_id, emails)
     stub_request(:get, "#{T3}/staff/#{staff_id}/emails").
-      to_return(status: 200, body: emails.to_json)
+      to_return(body: emails.to_json)
   end
 
-  def stub_signed_in_pom(staff_id, username)
+  def stub_signed_in_pom(prison, staff_id, username)
     stub_auth_token
+    stub_sso_data(prison, username, 'ROLE_ALLOC_CASE_MGR')
     stub_request(:get, "#{T3}/users/#{username}").
-      to_return(status: 200, body: { 'staffId': staff_id }.to_json)
+      to_return(body: { 'staffId': staff_id }.to_json)
   end
 
   def stub_offenders_for_prison(prison, offenders, bookings)

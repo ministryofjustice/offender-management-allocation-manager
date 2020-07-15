@@ -1,6 +1,6 @@
 FactoryBot.define do
   class Elite2Prison
-    attr_accessor :code
+    attr_accessor :code, :name
   end
 
   factory :prison, class: 'Elite2Prison' do
@@ -9,5 +9,7 @@ FactoryBot.define do
       codes = PrisonService.prison_codes
       codes[c % codes.size]
     end
+
+    name { PrisonService.name_for(code) }
   end
 end

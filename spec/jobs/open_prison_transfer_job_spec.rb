@@ -41,11 +41,11 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
   end
 
   it 'does not send an email if the offender case_information is not NPS' do
-    allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new.tap { |o|
-      o.prison_id = open_prison_code
-      o.offender_no =  nomis_offender_id
-      o.case_allocation = 'CRC'
-    })
+    allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new(
+                                                                  case_allocation: 'CRC',
+                                                                  prison_id: open_prison_code,
+                                                                  offender_no:  nomis_offender_id
+    ))
     described_class.perform_now(movement_json)
 
     email_job = enqueued_jobs.first
@@ -53,11 +53,10 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
   end
 
   it 'does not send an email when no LDU email address' do
-    allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new.tap { |o|
-      o.prison_id = open_prison_code
-      o.offender_no =  nomis_offender_id
-      o.case_allocation = 'NPS'
-    })
+    allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new(
+                                                                  case_allocation: 'NPS',
+                                                                  prison_id: open_prison_code,
+                                                                  offender_no: nomis_offender_id))
 
     described_class.perform_now(movement_json)
 
@@ -66,14 +65,14 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
   end
 
   it 'sends an email when there was no previous allocation' do
-    allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new.tap { |o|
-      o.prison_id = open_prison_code
-      o.offender_no =  nomis_offender_id
-      o.case_allocation = 'NPS'
-      o.ldu = LocalDivisionalUnit.new.tap { |l| l.email_address = 'ldu@local.local' }
-      o.first_name = 'First'
-      o.last_name = 'Last'
-    })
+    allow(OffenderService).to receive(:get_offender).
+      and_return(Nomis::Offender.new(prison_id: open_prison_code,
+                                     offender_no: nomis_offender_id,
+                                     first_name: 'First',
+                                     last_name: 'Last',
+                                     case_allocation: 'NPS',
+                                     ldu: LocalDivisionalUnit.new.tap { |l| l.email_address = 'ldu@local.local' }
+                                     ))
 
     fakejob = double
     allow(fakejob).to receive(:deliver_later)
@@ -91,14 +90,12 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
   end
 
   it 'can use previous allocation details where they exist', versioning: true do
-    allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new.tap { |o|
-      o.prison_id = open_prison_code
-      o.offender_no =  nomis_offender_id
-      o.case_allocation = 'NPS'
-      o.ldu = LocalDivisionalUnit.new.tap { |l| l.email_address = 'ldu@local.local' }
-      o.first_name = 'First'
-      o.last_name = 'Last'
-    })
+    allow(OffenderService).to receive(:get_offender).
+      and_return(Nomis::Offender.new(prison_id: open_prison_code,
+                                     offender_no: nomis_offender_id,
+                                     first_name: 'First',
+                                     last_name: 'Last', case_allocation: 'NPS',
+                                     ldu: LocalDivisionalUnit.new.tap { |l| l.email_address = 'ldu@local.local' }))
 
     # Create an allocation where the offender is allocated, and then deallocate so we can
     # test finding the last pom that was allocated to this offender ....

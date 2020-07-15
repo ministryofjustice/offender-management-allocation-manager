@@ -1,26 +1,29 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe DashboardController, type: :controller do
-  describe '#index' do
-    let(:prison) { 'LEI' }
-    let(:poms) {
-      [
-        build(:pom,
-              firstName: 'Alice',
-              position: RecommendationService::PRISON_POM,
-              staffId: 1
+  let(:prison) { build(:prison).code }
+  let(:poms) {
+    [
+      build(:pom,
+            firstName: 'Alice',
+            position: RecommendationService::PRISON_POM,
+            staffId: 1
       )
-      ]
-    }
+    ]
+  }
 
+  before do
+    stub_poms(prison, poms)
+  end
+
+  describe '#index' do
     context 'when logged in as POM' do
       render_views
 
       before do
-        stub_auth_token
-        stub_poms(prison, poms)
-        stub_sso_pom_data(prison, 'alice')
-        stub_signed_in_pom(1, 'alice')
+        stub_signed_in_pom(prison, 1, 'alice')
       end
 
       it 'shows me only Manage case tasks' do
@@ -48,12 +51,9 @@ RSpec.describe DashboardController, type: :controller do
       render_views
 
       before do
-        stub_poms(prison, poms)
         stub_sso_data(prison, 'alice')
-        stub_signed_in_pom(1, 'Alice')
-        stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/users/").
-          with(headers: { 'Authorization' => 'Bearer token' }).
-          to_return(status: 200, body: { staffId: 1 }.to_json, headers: {})
+        stub_request(:get, "#{ApiHelper::T3}/users/").
+          to_return(body: { staffId: 1 }.to_json)
       end
 
       it 'shows me only SPO tasks' do

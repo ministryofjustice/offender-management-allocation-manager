@@ -148,9 +148,7 @@ describe MovementService do
       # who were moved were not de-allocated (as they should never have been allocated).  This
       # optimisation has come back to bite us as it is entirely possible someone who is allocated
       # could be switched to remand immediately, so now we expect this to succeed.
-      allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new.tap { |o|
-        o.convicted_status = "Remand"
-      })
+      allow(OffenderService).to receive(:get_offender).and_return(Nomis::Offender.new(convicted_status: "Remand"))
       processed = described_class.process_movement(transfer_in)
       expect(processed).to be true
     end
