@@ -13,8 +13,6 @@ class CaseInformation < ApplicationRecord
 
   scope :nps, -> { where(case_allocation: 'NPS') }
 
-  before_validation :set_probation_service
-
   def local_divisional_unit
     team.try(:local_divisional_unit)
   end
@@ -29,11 +27,6 @@ class CaseInformation < ApplicationRecord
 
   validates :team, presence: true, unless: -> { manual_entry }
 
-  validates :welsh_offender, inclusion: {
-    in: %w[Yes No],
-    allow_nil: false,
-    message: 'Select yes if the prisoner’s last known address was in Wales'
-  }
   validates :tier, inclusion: { in: %w[A B C D], message: 'Select the prisoner’s tier' }
 
   validates :case_allocation, inclusion: {
@@ -48,13 +41,11 @@ class CaseInformation < ApplicationRecord
 
   validates :probation_service, inclusion: {
     in: ['Wales', 'England'],
-    allow_nil: false
+    allow_nil: false,
+    message: 'Select yes if the prisoner’s last known address was in Wales'
   }
 
-private
-
-  def set_probation_service
-    self.probation_service = 'England' if welsh_offender == 'No'
-    self.probation_service = 'Wales' if welsh_offender == 'Yes'
+  def welsh_offender
+    probation_service == 'Wales' ? 'Yes' : 'No'
   end
 end

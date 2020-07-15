@@ -179,7 +179,7 @@ feature "view an offender's allocation information", :versioning do
            nomis_offender_id: offender_no,
            tier: 'A',
            case_allocation: 'NPS',
-           welsh_offender: 'No'
+           probation_service: 'England'
     )
   end
 

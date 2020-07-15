@@ -4,7 +4,7 @@
     <%= hidden_field_tag("sort", params[:sort])%>
     <%= hidden_field_tag("page", params[:page]) %>
 
-    <div class="govuk-form-group <% if @case_info.errors[:welsh_offender].present? %>govuk-form-group--error<% end %>">
+    <div class="govuk-form-group <% if @case_info.errors[:probation_service].present? %>govuk-form-group--error<% end %>">
       <fieldset class="govuk-fieldset">
         <legend class="govuk-fieldset__legend--s govuk-!-margin-bottom-2">
           Was this prisoner's last known address in Wales?
@@ -13,20 +13,20 @@
           Only prisoners with a Welsh address will be allocated a responsible<br/> prison or probation POM.
         </p>
 
-        <% if @case_info.errors[:welsh_offender].present? %>
+        <% if @case_info.errors[:probation_service].present? %>
           <span class="govuk-error-message">
-            <%= @case_info.errors[:welsh_offender].first %>
+            <%= @case_info.errors[:probation_service].first %>
           </span>
         <% end %>
 
         <div class="govuk-radios">
           <div class="govuk-radios__item">
-            <%= radio_button_tag("case_information[welsh_offender]", 'Yes', @case_info.welsh_offender == 'Yes', class: "govuk-radios__input") %>
-            <%= label_tag "case_information[welsh_offender]", 'Yes', class: "govuk-label govuk-radios__label" %>
+            <%= radio_button_tag("case_information[probation_service]", 'Wales', @case_info.probation_service == 'Wales', class: "govuk-radios__input") %>
+            <%= label_tag "case_information[probation_service]", 'Yes', class: "govuk-label govuk-radios__label" %>
           </div>
           <div class="govuk-radios__item">
-            <%= radio_button_tag("case_information[welsh_offender]", 'No', @case_info.welsh_offender == 'No', class: "govuk-radios__input") %>
-            <%= label_tag "case_information[welsh_offender]", "No", class: "govuk-label govuk-radios__label" %>
+            <%= radio_button_tag("case_information[probation_service]", 'England', @case_info.probation_service == 'England', class: "govuk-radios__input") %>
+            <%= label_tag "case_information[probation_service]", "No", class: "govuk-label govuk-radios__label" %>
           </div>
         </div>
       </fieldset>
