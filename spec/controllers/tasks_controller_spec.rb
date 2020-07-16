@@ -15,10 +15,8 @@ RSpec.describe TasksController, type: :controller do
   let(:next_week) { Time.zone.today + 7.days }
 
   before do
-    stub_sso_pom_data(prison, username)
-
     stub_poms(prison, pom)
-    stub_signed_in_pom(staff_id, username)
+    stub_signed_in_pom(prison, staff_id, username)
 
     offenders = [
       { "bookingId": 754_207, "offenderNo": "G7514GW", "firstName": "Alice", "lastName": "Aliceson",
