@@ -1,14 +1,21 @@
 require 'rails_helper'
 
 RSpec.describe "debugging/debugging", type: :view do
+  let(:offender) do
+    offender = build(:offender, firstName: 'John', lastName: 'Dory')
+    offender.sentence = Nomis::SentenceDetail.new(
+      sentence_start_date: Time.zone.today,
+      automatic_release_date: Time.zone.today + 10.months,
+      tariff_date: Date.new(2033, 8, 1),
+      nomis_post_recall_release_date: Date.new(2028, 11, 8),
+      licence_expiry_date: Date.new(2025, 10, 7))
+    return offender
+  end
+
+  let(:prison) { build(:prison) }
+
   describe "debugging/debugging.html.erb" do
     it "displays offender full_name" do
-      offender = build(:offender_detail, firstName: 'John', lastName: 'Dory')
-      offender.sentence = Nomis::SentenceDetail.new(
-        sentence_start_date: Time.zone.today,
-        automatic_release_date: Time.zone.today + 10.months)
-      prison = build(:prison)
-
       assign(:offender, OffenderPresenter.new(offender, nil))
       assign(:prison, prison)
 
@@ -21,13 +28,6 @@ RSpec.describe "debugging/debugging", type: :view do
 
   describe "debugging/debugging.html.erb" do
     it "displays tariff date" do
-      offender = build(:offender_detail)
-      offender.sentence = Nomis::SentenceDetail.new(
-        sentence_start_date: Time.zone.today,
-        automatic_release_date: Time.zone.today + 10.months,
-        tariff_date: Date.new(2033, 8, 1))
-      prison = build(:prison)
-
       assign(:offender, OffenderPresenter.new(offender, nil))
       assign(:prison, prison)
 
@@ -38,13 +38,6 @@ RSpec.describe "debugging/debugging", type: :view do
     end
 
     it "displays post recall release date" do
-      offender = build(:offender_detail)
-      offender.sentence = Nomis::SentenceDetail.new(
-        sentence_start_date: Time.zone.today,
-        automatic_release_date: Time.zone.today + 10.months,
-        nomis_post_recall_release_date: Date.new(2028, 11, 8))
-      prison = build(:prison)
-
       assign(:offender, OffenderPresenter.new(offender, nil))
       assign(:prison, prison)
 
@@ -55,13 +48,6 @@ RSpec.describe "debugging/debugging", type: :view do
     end
 
     it "displays licence end date" do
-      offender = build(:offender_detail)
-      offender.sentence = Nomis::SentenceDetail.new(
-        sentence_start_date: Time.zone.today,
-        automatic_release_date: Time.zone.today + 10.months,
-        licence_expiry_date: Date.new(2025, 10, 7))
-      prison = build(:prison)
-
       assign(:offender, OffenderPresenter.new(offender, nil))
       assign(:prison, prison)
 
