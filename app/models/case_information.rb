@@ -13,6 +13,8 @@ class CaseInformation < ApplicationRecord
 
   scope :nps, -> { where(case_allocation: 'NPS') }
 
+  before_validation :set_probation_service
+
   def local_divisional_unit
     team.try(:local_divisional_unit)
   end
@@ -43,4 +45,16 @@ class CaseInformation < ApplicationRecord
   # nil means MAPPA level is completely unknown.
   # 0 means MAPPA level is known to be not relevant for offender
   validates :mappa_level, inclusion: { in: [0, 1, 2, 3], allow_nil: true }
+
+  validates :probation_service, inclusion: {
+    in: ['Wales', 'England'],
+    allow_nil: false
+  }
+
+private
+
+  def set_probation_service
+    self.probation_service = 'England' if welsh_offender == 'No'
+    self.probation_service = 'Wales' if welsh_offender == 'Yes'
+  end
 end
