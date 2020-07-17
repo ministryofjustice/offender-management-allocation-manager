@@ -11,8 +11,11 @@
   <div class="govuk-grid-column-three-quarters">
     <div class="govuk-grid-row">
       <div class='govuk-grid-column-full'>
-        <h2 class="govuk-heading-xl"><%= @prisoner.full_name %></h2>
+        <h1 class="govuk-heading-l"><%= @prisoner.full_name %></h1>
       </div>
+    </div>
+    <div class="case-type-badge">
+      <%= render 'shared/case_type_badge', offender: @prisoner %>
     </div>
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-third">

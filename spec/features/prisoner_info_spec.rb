@@ -9,10 +9,11 @@ feature 'View a prisoner profile page' do
     it 'doesnt crash', vcr: { cassette_name: :show_unallocated_offender } do
       visit prison_prisoner_path('LEI', 'G7998GJ')
 
-      expect(page).to have_css('h2', text: 'Ahmonis, Okadonah')
+      expect(page).to have_css('h1', text: 'Ahmonis, Okadonah')
       expect(page).to have_content('07/07/1968')
       cat_code = find('h3#category-code').text
       expect(cat_code).to eq('C')
+      expect(page).to have_css('#prisoner-case-type', text: 'Determinate')
     end
   end
 
@@ -24,7 +25,7 @@ feature 'View a prisoner profile page' do
     it 'shows the prisoner information', :raven_intercept_exception, vcr: { cassette_name: :show_offender_spec } do
       visit prison_prisoner_path('LEI', 'G7998GJ')
 
-      expect(page).to have_css('h2', text: 'Ahmonis, Okadonah')
+      expect(page).to have_css('h1', text: 'Ahmonis, Okadonah')
       expect(page).to have_content('07/07/1968')
       cat_code = find('h3#category-code').text
       expect(cat_code).to eq('C')
