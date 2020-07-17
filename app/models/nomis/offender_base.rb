@@ -8,17 +8,16 @@ module Nomis
              :post_recall_release_date, :earliest_release_date,
              to: :sentence
 
-    attr_accessor :convicted_status, :booking_id,
-                  :category_code, :offender_no, :date_of_birth,
-                  :first_name, :last_name
+    attr_accessor :category_code, :date_of_birth
 
-    # Custom attributes
-    attr_accessor :crn,
-                  :allocated_pom_name, :case_allocation,
-                  :allocated_com_name,
-                  :welsh_offender, :tier, :parole_review_date,
-                  :sentence, :mappa_level,
-                  :ldu, :team
+    attr_reader :first_name, :last_name, :booking_id,
+                :offender_no, :convicted_status
+
+    attr_accessor :sentence, :allocated_pom_name, :allocated_com_name, :case_allocation, :mappa_level, :tier
+
+    attr_reader :crn,
+                :welsh_offender, :parole_review_date,
+                :ldu, :team
 
     def convicted?
       convicted_status == 'Convicted'
@@ -121,7 +120,7 @@ module Nomis
       # method from it's own internal from_json
       @first_name = payload['firstName']
       @last_name = payload['lastName']
-      @offender_no = payload['offenderNo']
+      @offender_no = payload.fetch('offenderNo')
       @convicted_status = payload['convictedStatus']
       @sentence_type = SentenceType.new(payload['imprisonmentStatus'])
       @category_code = payload['categoryCode']

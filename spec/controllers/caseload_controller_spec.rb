@@ -19,8 +19,7 @@ RSpec.describe CaseloadController, type: :controller do
 
   before do
     stub_poms(prison, poms)
-    stub_sso_pom_data(prison, 'alice')
-    stub_signed_in_pom(staff_id, 'alice')
+    stub_signed_in_pom(prison, staff_id, 'alice')
   end
 
   describe '#handover_start' do

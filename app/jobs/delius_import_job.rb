@@ -102,25 +102,33 @@ private
     end
   end
 
+  def process_record_logging_errors record
+    begin
+      yield record
+    rescue StandardError => e
+      Raven.extra_context [:team_code, :team].map { |field| [field, record.fetch(field)] }.to_h
+      Raven::capture_exception(e)
+    end
+  end
+
   def update_team_names_and_ldus(processor)
-    processor.each do |record|
-      begin
-        if active_ldu?(record.fetch(:ldu_code))
-          UpdateTeamNameAndLduService.update(
-            team_code: record.fetch(:team_code),
-            team_name: record.fetch(:team),
-            ldu_code: record.fetch(:ldu_code),
-            ldu_name: record.fetch(:ldu)
-          )
-        else
-          UpdateShadowTeamAssociationService.update(
-            shadow_code: record.fetch(:team_code),
-            shadow_name: record.fetch(:team)
-          )
-        end
-      rescue StandardError => e
-        Raven.extra_context [:team_code, :team, :ldu_code, :ldu].map { |field| [field, record.fetch(field)] }.to_h
-        Raven::capture_exception(e)
+    processor.select { |record| active_ldu?(record.fetch(:ldu_code)) }.uniq { |r| r.fetch(:team_code) }.each do |rec|
+      process_record_logging_errors(rec) do |record|
+        UpdateTeamNameAndLduService.update(
+          team_code: record.fetch(:team_code),
+          team_name: record.fetch(:team),
+          ldu_code: record.fetch(:ldu_code),
+          ldu_name: record.fetch(:ldu)
+        )
+      end
+    end
+
+    processor.select { |record| shadow_ldu?(record.fetch(:ldu_code)) }.uniq { |r| r.fetch(:team) }.each do |rec|
+      process_record_logging_errors(rec) do |record|
+        UpdateShadowTeamAssociationService.update(
+          shadow_name: record.fetch(:team),
+          shadow_code: record.fetch(:team_code)
+        )
       end
     end
   end

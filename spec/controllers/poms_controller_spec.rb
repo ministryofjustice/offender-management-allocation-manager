@@ -47,7 +47,7 @@ RSpec.describe PomsController, type: :controller do
       missing_offender = create(:case_information)
       create(:allocation, nomis_offender_id: missing_offender.nomis_offender_id, primary_pom_nomis_id: active_staff_id, prison: prison.code)
 
-      stub_request(:get, "https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api/staff/#{active_staff_id}").
+      stub_request(:get, "#{ApiHelper::T3}/staff/#{active_staff_id}").
         to_return(body: { staffId: active_staff_id, lastName: 'LastName', firstName: 'FirstName' }.to_json)
 
       offenders = offenderNos.map.with_index { |nomis_id, index|

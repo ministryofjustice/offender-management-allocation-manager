@@ -4,19 +4,17 @@ module Nomis
   class Offender < OffenderBase
     include Deserialisable
 
-    attr_accessor :gender,
-                  :main_offence,
-                  :nationalities,
-                  :noms_id,
-                  :prison_id
+    attr_accessor :main_offence
 
-    attr_reader :reception_date
+    attr_reader :reception_date, :prison_id
 
-    def initialize(fields = nil)
+    def initialize(fields = {})
       # Allow this object to be reconstituted from a hash, we can't use
       # from_json as the one passed in will already be using the snake case
       # names whereas from_json is expecting the elite2 camelcase names.
-      fields.each { |k, v| public_send("#{k}=", v) } if fields.present?
+      fields.each do |k, v|
+        instance_variable_set("@#{k}", v)
+      end
     end
 
     def self.from_json(payload)
@@ -26,11 +24,7 @@ module Nomis
     end
 
     def load_from_json(payload)
-      @gender = payload['gender']
       @booking_id = payload['latestBookingId']&.to_i
-      @main_offence = payload['mainOffence']
-      @nationalities = payload['nationalities']
-      @noms_id = payload['nomsId']
       @prison_id = payload['latestLocationId']
       @reception_date = deserialise_date(payload, 'receptionDate')
 
