@@ -16,7 +16,7 @@ module AuthHelper
       }.to_json)
   end
 
-  def stub_sso_data(prison, username = 'user', role = 'ROLE_ALLOC_MGR')
+  def stub_sso_data(prison, username = 'user', _role = 'ROLE_ALLOC_MGR')
     allow(Nomis::Oauth::TokenService).to receive(:valid_token).and_return(ACCESS_TOKEN)
     session[:sso_data] = { 'expiry' => Time.zone.now + 1.day,
                            'roles' => ['ROLE_ALLOC_MGR'],

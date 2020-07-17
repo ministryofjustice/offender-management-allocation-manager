@@ -58,7 +58,6 @@ module ApiHelper
     stub_auth_token
     stub_sso_data(prison, username, 'ROLE_ALLOC_CASE_MGR')
     stub_request(:get, "#{T3}/users/#{username}").
-
       to_return(status: 200, body: { 'staffId': staff_id }.to_json)
     stub_pom_emails(staff_id, [])
   end
