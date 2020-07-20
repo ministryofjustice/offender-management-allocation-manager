@@ -73,6 +73,8 @@ private
   end
 
   def self.approaching_handover?(offender)
+    return false unless offender.has_case_information?
+
     today = Time.zone.today
     thirty_days_time = today + 30.days
 

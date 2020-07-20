@@ -59,26 +59,26 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
         create(:delius_data, offender_manager: com_name, team_code: team.shadow_code, team: team.name,
                              ldu_code: ldu.code, ldu: ldu.name)
       }
-      let!(:allocation) { create(:allocation, nomis_offender_id: d1.noms_no) }
 
       it 'does no update if no allocation' do
-        alloc = Allocation.find_by(nomis_offender_id: offender_id)
+        alloc = Allocation.find_by(nomis_offender_id: d1.noms_no)
         expect(alloc).to be_nil
 
         expect {
           described_class.perform_now d1.noms_no
         }.to change(CaseInformation, :count).by(1)
 
-        alloc = Allocation.find_by(nomis_offender_id: offender_id)
+        alloc = Allocation.find_by(nomis_offender_id: d1.noms_no)
         expect(alloc).to be_nil
       end
 
       it 'updates existing allocation without new version' do
+        allocation = create(:allocation, nomis_offender_id: d1.noms_no)
         expect(allocation.version).to be_nil
 
         expect {
           described_class.perform_now d1.noms_no
-        }.to change(CaseInformation, :count).by(1)
+        }.not_to change(CaseInformation, :count)
 
         allocation.reload
         expect(allocation.version).to be_nil

@@ -49,8 +49,8 @@ context 'when NOMIS is missing information' do
 
           stub_offenders_for_prison(prison_code, stub_offenders, stub_bookings)
 
-          create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
-          create(:case_information, nomis_offender_id: offender_no, case_allocation: 'NPS')
+          create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id,
+                 case_information: build(:case_information, case_allocation: 'NPS'))
         end
 
         it 'does not error' do
@@ -96,8 +96,8 @@ context 'when NOMIS is missing information' do
 
         stub_offenders_for_prison(prison_code, stub_offender, stub_bookings)
 
-        create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
-        create(:case_information, nomis_offender_id: offender_no, case_allocation: 'NPS')
+        create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id,
+               case_information: build(:case_information, case_allocation: 'NPS'))
       end
 
       it 'does not error' do
@@ -194,13 +194,12 @@ context 'when NOMIS is missing information' do
         stub_request(:get, "#{stub_keyworker_host}/key-worker/#{prison_code}/offender/#{offender_no}").
           to_return(status: 200, body: {}.to_json)
 
-        create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
-        create(
-          :case_information,
-          nomis_offender_id: offender_no,
-          case_allocation: 'NPS',
-          welsh_offender: welsh
-        )
+        create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id,
+               case_information: build(
+                 :case_information,
+                 case_allocation: 'NPS',
+                 welsh_offender: welsh
+        ))
       end
 
       describe 'the pom details page' do

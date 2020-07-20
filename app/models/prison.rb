@@ -86,8 +86,7 @@ private
         sentencing = sentence_details[offender.booking_id]
         offender.sentence = sentencing if sentencing.present?
 
-        case_info_record = mapped_tiers[offender.offender_no]
-        offender.load_case_information(case_info_record)
+        offender.case_information = mapped_tiers[offender.offender_no]
       }
     end
   end

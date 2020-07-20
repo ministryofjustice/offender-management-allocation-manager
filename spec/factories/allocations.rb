@@ -47,5 +47,9 @@ FactoryBot.define do
     prison do
       'LEI'
     end
+
+    case_information do
+      build(:case_information, nomis_offender_id: nomis_offender_id)
+    end
   end
 end

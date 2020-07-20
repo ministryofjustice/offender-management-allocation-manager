@@ -13,11 +13,19 @@ module Nomis
     attr_reader :first_name, :last_name, :booking_id,
                 :offender_no, :convicted_status
 
-    attr_accessor :sentence, :allocated_pom_name, :allocated_com_name, :case_allocation, :mappa_level, :tier
+    # readers for case_information data
+    attr_reader :welsh_offender, :crn, :parole_review_date,
+                :mappa_level, :tier
+    # attr_reader :case_allocation
+    delegate :case_allocation, to: :@case_information
 
-    attr_reader :crn,
-                :welsh_offender, :parole_review_date,
-                :ldu, :team
+    attr_accessor :allocated_pom_name,
+                  :allocated_com_name,
+                  :sentence
+
+    def has_case_information?
+      !!@case_information
+    end
 
     def convicted?
       convicted_status == 'Convicted'
@@ -144,16 +152,24 @@ module Nomis
       handover.handover_date
     end
 
-    def load_case_information(record)
+    def ldu
+      @team.try(:local_divisional_unit)
+    end
+
+    def team
+      @team.try(:name)
+    end
+
+    def case_information=(record)
       return if record.blank?
 
+      @case_information = record
+
       @tier = record.tier
-      @case_allocation = record.case_allocation
       @welsh_offender = record.welsh_offender == 'Yes'
       @crn = record.crn
       @mappa_level = record.mappa_level
-      @ldu = record.local_divisional_unit
-      @team = record.team.try(:name)
+      @team = record.team
       @parole_review_date = record.parole_review_date
       @early_allocation = record.latest_early_allocation.present? &&
         (record.latest_early_allocation.eligible? || record.latest_early_allocation.community_decision?)

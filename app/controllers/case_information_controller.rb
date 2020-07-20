@@ -90,7 +90,7 @@ private
   end
 
   def prisoner(nomis_id)
-    @prisoner ||= OffenderService.get_offender(nomis_id)
+    @prisoner ||= OffenderPresenter.new(OffenderService.get_offender(nomis_id), nil)
   end
 
   def nomis_offender_id_from_url

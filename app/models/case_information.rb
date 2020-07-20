@@ -15,6 +15,12 @@ class CaseInformation < ApplicationRecord
 
   before_validation :set_probation_service
 
+  belongs_to :allocation,
+             foreign_key: :nomis_offender_id,
+             primary_key: :nomis_offender_id,
+             inverse_of: :case_information,
+             optional: true
+
   def local_divisional_unit
     team.try(:local_divisional_unit)
   end

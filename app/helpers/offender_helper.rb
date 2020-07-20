@@ -11,10 +11,14 @@ module OffenderHelper
   end
 
   def case_owner_label(offender)
-    if offender.pom_responsibility.custody?
-      'Custody'
+    if offender.pom_responsibility
+      if offender.pom_responsibility.custody?
+        'Custody'
+      else
+        'Community'
+      end
     else
-      'Community'
+      'Unknown'
     end
   end
 
