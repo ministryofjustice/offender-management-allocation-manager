@@ -163,4 +163,40 @@ feature 'Co-working', :versioning do
       end
     end
   end
+
+  context 'with a secondary from somewhere else' do
+    let(:another_pom) do
+      {
+        staff_id: 123_456,
+        pom_name: 'Some Other POM',
+        email: 'ommiicc@digital.justice.gov.uk'
+      }
+    end
+
+    let!(:allocation) {
+      create(
+        :allocation,
+        nomis_offender_id: nomis_offender_id,
+        primary_pom_nomis_id: prison_pom[:staff_id],
+        primary_pom_name: prison_pom[:pom_name],
+        secondary_pom_nomis_id: another_pom[:staff_id],
+        secondary_pom_name: another_pom[:pom_name],
+        recommended_pom_type: 'probation'
+      )
+    }
+
+    scenario 'allocating', vcr: { cassette_name: :coworking_with_another_pom } do
+      expect(allocation.secondary_pom_nomis_id).to eq(123456)
+      visit prison_allocation_path('LEI', nomis_offender_id)
+
+      click_link 'Allocate'
+
+      within '.probation_pom_row_0' do
+        click_link 'Allocate'
+      end
+      click_button 'Complete allocation'
+      expect(allocation.reload.secondary_pom_nomis_id).to eq(485758)
+      expect(page).to have_current_path(prison_summary_unallocated_path('LEI'), ignore_query: true)
+    end
+  end
 end

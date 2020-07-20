@@ -19,7 +19,7 @@ FactoryBot.define do
   end
 
   class Elite2POM
-    attr_accessor :position, :staffId, :emails, :firstName, :lastName
+    attr_accessor :position, :staffId, :emails, :firstName, :lastName, :positionDescription
   end
 
   factory :pom, class: 'Elite2POM' do
@@ -29,6 +29,7 @@ FactoryBot.define do
 
     firstName { Faker::Name.first_name }
     lastName { Faker::Name.last_name }
+    positionDescription { Faker::Company.type }
 
     trait :probation_officer do
       position { 'PO' }
