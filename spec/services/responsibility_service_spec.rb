@@ -16,7 +16,9 @@ describe ResponsibilityService do
 
     context 'when a scottish offender' do
       subject {
-        build(:offender_summary, probation_service: 'Scotland')
+        build(:offender_summary).tap { |offender|
+          offender.load_case_information(build(:case_information, probation_service: 'Scotland'))
+        }
       }
 
       it 'will show the POM as supporting' do
@@ -26,7 +28,9 @@ describe ResponsibilityService do
 
     context 'when a irish offender' do
       subject {
-        build(:offender_summary, probation_service: 'Northern Ireland')
+        build(:offender_summary).tap { |offender|
+          offender.load_case_information(build(:case_information, probation_service: 'Northern Ireland'))
+        }
       }
 
       it 'will show the POM as supporting' do
