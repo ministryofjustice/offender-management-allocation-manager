@@ -36,6 +36,10 @@ RSpec.configure do |config|
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
   end
+
+  config.before(:each, :js) do
+    page.driver.browser.manage.window.resize_to(1280,3072)
+  end
   
   config.before(:each, :raven_intercept_exception) do
     Rails.configuration.sentry_dsn = 'https://test.com'

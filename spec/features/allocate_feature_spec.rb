@@ -49,8 +49,10 @@ feature 'Allocation' do
 
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
-    within('.not_recommended_pom_row_0', visible:  false) do
-      click_link('Allocate', visible:  false)
+    find('.govuk-details__summary-text').click
+
+    within('.not_recommended_pom_row_0') do
+      click_link('Allocate')
     end
 
     expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
@@ -73,8 +75,10 @@ feature 'Allocation' do
   scenario 'overriding an allocation can validate missing reasons', vcr: { cassette_name: :override_allocation_feature_validate_reasons } do
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
-    within('.not_recommended_pom_row_0', visible:  false) do
-      click_link('Allocate', visible:  false)
+    find('.govuk-details__summary-text').click
+
+    within('.not_recommended_pom_row_0') do
+      click_link('Allocate')
     end
 
     expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
@@ -87,8 +91,10 @@ feature 'Allocation' do
   scenario 'overriding an allocation can validate missing Other detail', vcr: { cassette_name: :override_allocation_feature_validate_other } do
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
-    within('.not_recommended_pom_row_0', visible:  false) do
-      click_link('Allocate', visible:  false)
+    find('.govuk-details__summary-text').click
+
+    within('.not_recommended_pom_row_0') do
+      click_link('Allocate')
     end
 
     expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
@@ -102,8 +108,10 @@ feature 'Allocation' do
   scenario 'overriding an allocation can validate missing suitability detail', vcr: { cassette_name: :override_suitability_allocation_feature } do
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
-    within('.not_recommended_pom_row_0', visible:  false) do
-      click_link('Allocate', visible:  false)
+    find('.govuk-details__summary-text').click
+
+    within('.not_recommended_pom_row_0') do
+      click_link('Allocate')
     end
 
     expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
@@ -117,8 +125,10 @@ feature 'Allocation' do
   scenario 'overriding an allocation can validate the reason text area character limit', vcr: { cassette_name: :override_allocation__character_count_feature } do
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
-    within('.not_recommended_pom_row_0', visible:  false) do
-      click_link('Allocate', visible:  false)
+    find('.govuk-details__summary-text').click
+
+    within('.not_recommended_pom_row_0') do
+      click_link('Allocate')
     end
 
     expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
