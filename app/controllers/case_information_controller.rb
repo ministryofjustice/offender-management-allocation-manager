@@ -154,11 +154,9 @@ private
     message = helpers.delius_email_message(delius_error&.error_type)
     notice_to_spo = helpers.spo_message(ldu)
 
-    emails.each do |email|
-      next if email.blank?
-
-      notice_info = send_notice(email, spo, notice_to_spo)
-      CaseAllocationEmailJob.perform_later(email: email,
+    emails.reject(&:blank?).each do |email_address|
+      notice_info = send_notice(email_address, spo, notice_to_spo)
+      CaseAllocationEmailJob.perform_later(email: email_address,
                                            ldu: ldu,
                                            nomis_offender_id: @case_info.nomis_offender_id,
                                            message: message,
