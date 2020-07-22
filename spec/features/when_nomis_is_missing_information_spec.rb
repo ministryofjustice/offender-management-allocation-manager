@@ -145,7 +145,7 @@ context 'when NOMIS is missing information' do
           :case_information,
           nomis_offender_id: offender_no,
           case_allocation: 'NPS',
-          welsh_offender: welsh
+          probation_service: welsh == 'Yes' ? 'Wales' : 'England'
         )
       end
 
