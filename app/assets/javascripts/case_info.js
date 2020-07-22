@@ -19,9 +19,17 @@ $(document).on("turbolinks:load", function(){
     if ($(".new_edit_case_information").length > 0){
         if((document.getElementById('edit_case_information_last_known_address_scotland').checked) ||
             (document.getElementById('edit_case_information_last_known_address_northern_ireland').checked)){
-                hide_element();
+            $('.optional-case-info').hide();
         }
     }
+
+    $('.hide-optional-case-info').click(function() {
+        $('.optional-case-info').hide();
+    });
+
+    $('.show-optional-case-info').click(function() {
+        $('.optional-case-info').show();
+    });
 });
 
 function current_team() {
@@ -32,14 +40,6 @@ function current_team() {
         }
     }
     return ''
-}
-
-function hide_element() {
-    $('.optional-case-info').hide();
-}
-
-function show_element() {
-    $('.optional-case-info').show();
 }
 
 function team_names() {

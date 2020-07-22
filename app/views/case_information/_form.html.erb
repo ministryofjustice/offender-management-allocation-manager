@@ -22,15 +22,15 @@
 
             <div class="govuk-radios">
               <div class="govuk-radios__item">
-                <%= form.radio_button(:last_known_address, 'Scotland', class: "govuk-radios__input", data: {behavior: "last-location"}, onclick: "hide_element()" ) %>
+                <%= form.radio_button(:last_known_address, 'Scotland', class: "govuk-radios__input hide-optional-case-info", data: {behavior: "last-location"} ) %>
                 <%= form.label :last_known_address, 'Scotland', value: 'Scotland', class: "govuk-label govuk-radios__label" %>
               </div>
               <div class="govuk-radios__item">
-                <%= form.radio_button(:last_known_address, 'Northern Ireland', class: "govuk-radios__input", data: {behavior: "last-location"}, onclick: "hide_element()" ) %>
+                <%= form.radio_button(:last_known_address, 'Northern Ireland', class: "govuk-radios__input hide-optional-case-info", data: {behavior: "last-location"} ) %>
                 <%= form.label :last_known_address, 'Northern Ireland', value: 'Northern Ireland', class: "govuk-label govuk-radios__label" %>
               </div>
               <div class="govuk-radios__item">
-                <%= form.radio_button(:last_known_address, 'Wales', class: "govuk-radios__input", data: {behavior: "last-location"}, onclick: "show_element()" ) %>
+                <%= form.radio_button(:last_known_address, 'Wales', class: "govuk-radios__input show-optional-case-info", data: {behavior: "last-location"} ) %>
                 <%= form.label :last_known_address, 'Wales', value: 'Wales', class: "govuk-label govuk-radios__label" %>
               </div>
             </div>
@@ -38,8 +38,8 @@
         </div>
 
         <div class="govuk-radios__item">
-          <%= form.radio_button(:last_known_location, 'No', checked: @edit_case_info.last_known_location == 'No', class: "govuk-radios__input", data: {behavior: "last-location"}, onclick: "show_element()" ) %>
-          <%= form.label :last_known_location, 'No', class: "govuk-label govuk-radios__label" %>
+          <%= form.radio_button(:last_known_location, 'No', class: "govuk-radios__input show-optional-case-info", data: {behavior: "last-location"} ) %>
+          <%= form.label :last_known_location, 'No', value: 'No', class: "govuk-label govuk-radios__label" %>
         </div>
       </div>
     </div>

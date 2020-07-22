@@ -237,9 +237,6 @@ feature 'case information feature' do
         signin_user
 
         old_countries.each_with_index do |country, index|
-          # visit new_prison_case_information_path('LEI', offenders[index])
-          # choose_country(country: country)
-          # click_button 'Continue'
           CaseInformation.find_by!(nomis_offender_id: offenders[index]).update!(probation_service: country)
           visit edit_prison_case_information_path('LEI', offenders[index])
           expect(page).not_to have_css("div.optional-case-info")
