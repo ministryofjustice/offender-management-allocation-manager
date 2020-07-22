@@ -14,7 +14,7 @@ feature 'case information feature' do
     end
     visit new_prison_case_information_path('LEI', nomis_offender_id)
 
-    choose('case_information_welsh_offender_Yes')
+    choose('case_information_probation_service_Wales')
     choose('case_information_case_allocation_NPS')
     choose('case_information_tier_A')
     click_button 'Save'
@@ -91,7 +91,7 @@ feature 'case information feature' do
 
     signin_user
     visit new_prison_case_information_path('LEI', nomis_offender_id)
-    choose('case_information_welsh_offender_No')
+    choose('case_information_probation_service_England')
     choose('case_information_case_allocation_NPS')
     choose('case_information_tier_A')
     click_button 'Save'
@@ -100,7 +100,7 @@ feature 'case information feature' do
 
     expect(page).to have_content('Case information')
     expect(page).to have_content('G1821VA')
-    choose('case_information_welsh_offender_No')
+    choose('case_information_probation_service_England')
     choose('case_information_case_allocation_CRC')
     click_button 'Update'
 
@@ -123,7 +123,7 @@ feature 'case information feature' do
     end
     expect(page).to have_selector('h1', text: 'Case information')
 
-    choose('case_information_welsh_offender_No')
+    choose('case_information_probation_service_England')
     choose('case_information_case_allocation_NPS')
     choose('case_information_tier_A')
     click_button 'Save'
