@@ -1,14 +1,14 @@
 $(document).on("turbolinks:load", function(){
     if ($("#team_autocomplete").length > 0) {
-        let element = document.querySelector('#team_autocomplete');
-        let id = 'autocomplete-default';
+        var element = document.querySelector('#team_autocomplete');
+        var id = 'autocomplete-default';
 
         accessibleAutocomplete({
             element: element,
             id: id,
             source: team_names(),
             defaultValue: current_team(),
-            onConfirm: (val) => {
+            onConfirm: function (val) {
                 if (val !== undefined) {
                     document.getElementById("chosen_team").innerHTML = val.bold();
                 }
@@ -26,7 +26,7 @@ $(document).on("turbolinks:load", function(){
 
 function current_team() {
     if ($(".edit_case_information").length > 0){
-        let team_name = document.getElementById("chosen_team").innerText;
+        var team_name = document.getElementById("chosen_team").innerText;
         if (team_name !== '') {
             return team_name
         }
