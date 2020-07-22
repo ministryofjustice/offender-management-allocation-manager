@@ -6,10 +6,6 @@ FactoryBot.define do
       'A'
     end
 
-    welsh_offender do
-      'Yes'
-    end
-
     case_allocation do
       'NPS'
     end
@@ -28,6 +24,15 @@ FactoryBot.define do
 
     association :team, code: '1234', name: 'A nice team'
 
-    crn { Faker::Alphanumeric.alpha(number: 10) }
+    crn do Faker::Alphanumeric.alpha(number: 10) end
+
+    probation_service do
+      'Wales'
+    end
+
+    trait :no_team do
+      probation_service { 'Scotland' }
+      team { nil }
+    end
   end
 end

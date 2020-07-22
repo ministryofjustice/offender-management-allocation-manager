@@ -22,14 +22,13 @@ class OnboardPrison
       end
 
       # Create a CaseInformation .....
-      CaseInformation.find_or_create_by(
-        nomis_offender_id: offender_id,
-        welsh_offender: record[:welsh_offender] ? 'Yes' : 'No',
-        tier: record[:tier],
-        case_allocation: record[:provider_cd],
-        crn: record[:crn],
-        manual_entry: true
-      )
+      CaseInformation.find_or_create_by(nomis_offender_id: offender_id) do |ci|
+        ci.tier = record[:tier]
+        ci.case_allocation = record[:provider_cd]
+        ci.crn = record[:crn]
+        ci.probation_service = record[:welsh_offender] ? 'England' : 'Wales'
+        ci.manual_entry = true
+      end
 
       @additions += 1
     }

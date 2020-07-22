@@ -142,7 +142,7 @@ module Nomis
 
       @tier = record.tier
       @case_allocation = record.case_allocation
-      @welsh_offender = record.welsh_offender == 'Yes'
+      @welsh_offender = record.welsh?
       @crn = record.crn
       @mappa_level = record.mappa_level
       @ldu = record.local_divisional_unit

@@ -79,7 +79,7 @@ private
         tier: map_tier(delius_record.tier),
         team: team,
         case_allocation: delius_record.service_provider,
-        welsh_offender: map_welsh_offender(delius_record.welsh_offender?),
+        probation_service: map_probation_service(delius_record.welsh_offender?),
         mappa_level: map_mappa_level(delius_record.mappa, delius_record.mappa_levels)
       )
     end
@@ -107,8 +107,8 @@ private
     end
   end
 
-  def map_welsh_offender(welsh_offender)
-    welsh_offender ? 'Yes' : 'No'
+  def map_probation_service(welsh_offender)
+    welsh_offender ? 'Wales' : 'England'
   end
 
   def map_tier(tier)

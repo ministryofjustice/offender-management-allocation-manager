@@ -67,7 +67,7 @@ feature "view POM's caseload" do
       create(:case_information, nomis_offender_id: nomis_offender_id)
       create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id, nomis_booking_id: nomis_booking_id)
     end
-    create(:case_information, nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPS', welsh_offender: 'Yes')
+    create(:case_information, nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPS', probation_service: 'Wales')
     create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id, nomis_booking_id: 1_153_753)
 
     offenders.last(15).each do |o|
