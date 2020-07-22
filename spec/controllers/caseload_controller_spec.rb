@@ -117,8 +117,7 @@ RSpec.describe CaseloadController, type: :controller do
 
       context 'when user is a different POM to the one signed in' do
         before do
-          stub_signed_in_pom(staff_id, 'alice')
-          stub_sso_pom_data(prison, 'alice')
+          stub_signed_in_pom(prison, staff_id, 'alice')
         end
 
         it 'cant see the caseload' do
