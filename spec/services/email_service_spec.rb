@@ -126,6 +126,7 @@ RSpec.describe EmailService do
   end
 
   context 'when offender has been released', versioning: true do
+    let(:staff_id) { '485833' }
     let!(:released_allocation) do
       x = create(:allocation,
                  nomis_offender_id: original_allocation.nomis_offender_id,
@@ -152,7 +153,7 @@ RSpec.describe EmailService do
         offender_name: "Ahmonis, Imanjah",
         offender_no: "G2911GD",
         prison: 'HMP Leeds',
-        url: 'http://localhost:3000/prisons/LEI/staff/485833/caseload'
+        url: "http://localhost:3000/prisons/LEI/staff/#{staff_id}/caseload"
       ).and_return OpenStruct.new(deliver_later: true)
 
       expect(PomMailer).to receive(:new_allocation_email).with(
@@ -162,7 +163,7 @@ RSpec.describe EmailService do
         offender_name: "Ahmonis, Imanjah",
         offender_no: "G2911GD",
         message: '',
-        url: 'http://localhost:3000/prisons/LEI/staff/485833/caseload'
+        url: "http://localhost:3000/prisons/LEI/staff/#{staff_id}/caseload"
       ).and_return OpenStruct.new(deliver_later: true)
 
       described_class.
