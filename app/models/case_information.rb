@@ -39,6 +39,8 @@ class CaseInformation < ApplicationRecord
           inverse_of: :case_information,
           dependent: :destroy
 
+  scope :nps, -> { where(case_allocation: 'NPS') }
+
   before_validation :set_probation_service
 
   def nps?
@@ -59,11 +61,6 @@ class CaseInformation < ApplicationRecord
 
   validates :team, presence: true, unless: -> { manual_entry || local_delivery_unit.present? }
 
-  validates :welsh_offender, inclusion: {
-    in: %w[Yes No],
-    allow_nil: false,
-    message: 'Select yes if the prisoner’s last known address was in Wales'
-  }
   # Don't think this is as simple as allowing nil. In the specific case of Scot/NI
   # prisoners it makes sense to have N/A (as this is genuine) but not otherwise
   validates :tier, inclusion: { in: %w[A B C D N/A], message: 'Select the prisoner’s tier' }
@@ -80,13 +77,11 @@ class CaseInformation < ApplicationRecord
 
   validates :probation_service, inclusion: {
     in: ['Wales', 'England'],
-    allow_nil: false
+    allow_nil: false,
+    message: 'Select yes if the prisoner’s last known address was in Wales'
   }
 
-private
-
-  def set_probation_service
-    self.probation_service = 'England' if welsh_offender == 'No'
-    self.probation_service = 'Wales' if welsh_offender == 'Yes'
+  def welsh?
+    probation_service == 'Wales'
   end
 end

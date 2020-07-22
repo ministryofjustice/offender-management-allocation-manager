@@ -64,7 +64,7 @@ feature 'case information feature' do
         click_link 'Edit'
       end
 
-      find('label[for=case_information_welsh_offender_No]').click
+      find('label[for=case_information_probation_service_England]').click
       find('label[for=case_information_case_allocation_NPS]').click
       find('label[for=case_information_tier_A]').click
       click_button 'Save'
@@ -135,7 +135,7 @@ feature 'case information feature' do
       nomis_offender_id = 'G1821VA'
 
       visit new_prison_case_information_path('LEI', nomis_offender_id)
-      find('label[for=case_information_welsh_offender_No]').click
+      find('label[for=case_information_probation_service_England]').click
       find('label[for=case_information_case_allocation_NPS]').click
       find('label[for=case_information_tier_A]').click
       click_button 'Save'
@@ -144,7 +144,7 @@ feature 'case information feature' do
 
       expect(page).to have_content('Case information')
       expect(page).to have_content('G1821VA')
-      find('label[for=case_information_welsh_offender_No]').click
+      find('label[for=case_information_probation_service_England]').click
       find('label[for=case_information_case_allocation_CRC]').click
       click_button 'Update'
 
@@ -166,7 +166,7 @@ feature 'case information feature' do
       end
       expect(page).to have_selector('h1', text: 'Case information')
 
-      find('label[for=case_information_welsh_offender_No]').click
+      find('label[for=case_information_probation_service_England]').click
       find('label[for=case_information_case_allocation_NPS]').click
       find('label[for=case_information_tier_A]').click
       click_button 'Save'
