@@ -8,7 +8,7 @@ class OffenderPresenter
            :full_name_ordered, :full_name, :main_offence,
            :sentence_start_date, :team, :prison_id,
            :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date,
-           :tariff_date, :probation_service,
+           :tariff_date,
            :date_of_birth, :release_date, :parole_eligibility_date,
            :welsh_offender, :case_allocation, :probation_service, :earliest_release_date,
            :category_code, :conditional_release_date, :automatic_release_date,

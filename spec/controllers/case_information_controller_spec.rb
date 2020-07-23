@@ -26,8 +26,9 @@ RSpec.describe CaseInformationController, type: :controller do
                                   probation_service: 'England',
                                   tier: 'A',
                                   case_allocation: 'NPS',
+                                  team_id: team.id
                                 },
-                                'input-autocomplete'.to_sym => team.name }
+        }
       }.to change(CaseInformation, :count).by(1)
 
       expect(response).to redirect_to(prison_summary_pending_path(prison))
