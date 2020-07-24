@@ -106,6 +106,7 @@ feature 'case information feature' do
         # visit new_prison_case_information_path('LEI', nomis_offender_id)
         choose_country(country: "England", prefix: 'last_location_form')
         click_button('Continue')
+        expect(page).not_to have_css(".govuk-error-summary")
 
         # attempt to save form without filling in the additional fields
         click_button('Continue')

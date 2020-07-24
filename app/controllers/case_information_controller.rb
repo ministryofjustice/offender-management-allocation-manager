@@ -21,6 +21,10 @@ class CaseInformationController < PrisonsApplicationController
       if @last_location.valid?
         unless @case_info.valid?
           @prisoner = prisoner(@last_location.nomis_offender_id)
+          # clear case_information errors for missing info page
+          @case_info = CaseInformation.new(
+            probation_service: @last_location.probation_service,
+          )
           render :missing_info
         end
       else
