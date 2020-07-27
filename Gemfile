@@ -44,13 +44,14 @@ gem 'activeadmin'
 group :development, :test do
   gem 'brakeman'
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
+  gem 'dotenv-rails'
   gem 'factory_bot_rails'
+  gem 'parallel_tests'
   gem 'rubocop'
   gem 'rubocop-rspec'
   gem 'rubocop-performance'
   gem 'rubocop-rails'
   gem 'rubocop-govuk'
-  gem 'dotenv-rails'
   # needed to support Rails 6.0
   gem 'rspec-rails', '~> 4.0.0.beta2'
   gem 'rswag-specs'
@@ -76,16 +77,14 @@ group :test do
 end
 
 group :development do
-  gem 'listen', '>= 3.0.5', '< 3.2'
-  gem 'spring-watcher-listen', '~> 2.0.0'
-  gem 'web-console', '>= 3.3.0'
-
-  gem 'rack-mini-profiler'
-  gem 'flamegraph'
-  gem 'stackprof'
-  gem 'memory_profiler'
-  gem 'binding_of_caller'
   gem 'better_errors'
+  gem 'binding_of_caller'
+  gem 'flamegraph'
+  gem 'listen', '>= 3.0.5', '< 3.2'
+  gem 'memory_profiler'
+  gem 'rack-mini-profiler'
+  gem 'spring-watcher-listen', '~> 2.0.0'
+  gem 'stackprof'
 end
 
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
