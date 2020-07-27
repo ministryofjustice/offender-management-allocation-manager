@@ -58,5 +58,5 @@ Rails.application.configure do
   # config.action_view.raise_on_missing_translations = true
   Rails.application.routes.default_url_options[:host] = 'http://localhost:3000'
 
-  config.cache_expiry = 1.second
+  config.cache_store = :null_store
 end

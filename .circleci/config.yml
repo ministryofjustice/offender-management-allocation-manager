@@ -6,10 +6,12 @@ references:
     GITHUB_TEAM_NAME_SLUG: offender-management
 
   deploy_container_config: &deploy_container_config
+    resource_class: small
     docker:
       - image: ${ECR_ENDPOINT}/cloud-platform/tools:circleci
 
   test_container_config: &test_container_config
+    resource_class: small
     docker:
       - image: circleci/ruby:2.6.3-node-browsers
         environment:
@@ -129,7 +131,7 @@ references:
     store_artifacts:
       path: ./offender-management-integration-tests/screenshots
 
-version: 2
+version: 2.1
 jobs:
   install_dependencies:
     <<: *defaults
@@ -146,18 +148,51 @@ jobs:
             - allocation-manager-v2-{{ checksum "Gemfile.lock" }}
             - allocation-manager-v2-
       - run:
-          name: Install GOV.UK frontend modules
+          name: Install frontend modules
           command: yarn install
       - run: bundle check --path vendor/bundle || bundle install --path vendor/bundle
+      - run:
+          name: Ensure Local Bin Drectory exists
+          command: mkdir -p ~/.local/bin
+      - run:
+          name: Setup MSOffice Crypt
+          command: |
+            if [ `which msoffice-crypt` ]
+            then
+              echo "msoffice-crypt cached ok"
+            else
+              mkdir ./build
+              cd ./build
+              git clone https://github.com/herumi/cybozulib
+              git clone https://github.com/herumi/msoffice
+              cd msoffice
+              make -j RELEASE=1
+              mv ./bin/msoffice-crypt.exe ~/.local/bin/msoffice-crypt
+              chmod +x ~/.local/bin/msoffice-crypt
+              cd ../..
+              rm -rf build
+            fi
+      - run:
+          name: Download Code Climate
+          command: |
+            if [ `which cc-test-reporter` ]
+            then
+              echo "CC test reporter cached"
+            else
+              curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ~/.local/bin/cc-test-reporter
+              chmod +x ~/.local/bin/cc-test-reporter
+            fi
       - save_cache:
           key: allocation-manager-v2-{{ checksum "Gemfile.lock" }}
           paths:
             - ~/repo/vendor/bundle
+            - ~/.local/bin
       - persist_to_workspace:
-          root: .
+          root: ~/
           paths:
-            - vendor/bundle
-            - node_modules/
+            - repo/vendor/bundle
+            - repo/node_modules/
+            - .local/bin
 
   test:
     <<: *defaults
@@ -165,12 +200,8 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ~/repo
+          at: ~/
       - run: bundle --path vendor/bundle
-      - run:
-          name: Migrate database
-          command: |
-            bundle exec rake db:create db:schema:load --trace db:migrate
       - run:
           name: Rubocop
           command: bundle exec rubocop
@@ -178,28 +209,15 @@ jobs:
           name: Security analysis
           command: bundle exec brakeman -o ~/test-results/brakeman/brakeman.json -o ~/test-results/brakeman/brakeman.html
       - run:
-          name: Download Code Climate
+          name: Setup database
           command: |
-            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-            chmod +x ./cc-test-reporter
-      - run:
-          name: Setup MSOffice Crypt
-          command: |
-            mkdir ./build
-            cd ./build
-            git clone https://github.com/herumi/cybozulib
-            git clone https://github.com/herumi/msoffice
-            cd msoffice
-            make -j RELEASE=1
-            sudo mv ./bin/msoffice-crypt.exe /usr/local/bin/msoffice-crypt
-            cd ../..
-            rm -rf build
+            bundle exec rake db:setup
       - run:
           name: Run tests
           command: |
-            ./cc-test-reporter before-build
+            cc-test-reporter before-build
             bundle exec rake
-            ./cc-test-reporter after-build --coverage-input-type simplecov --exit-code $?
+            cc-test-reporter after-build --coverage-input-type simplecov --exit-code $?
           environment:
             ALLOCATION_MANAGER_HOST: https://allocation-manager-staging.apps.live-1.cloud-platform.service.justice.gov.uk
             RAILS_ENV: test
@@ -316,7 +334,6 @@ jobs:
             <<: *github_team_name_slug
 
 workflows:
-  version: 2
   build_and_test:
     jobs:
       - install_dependencies
