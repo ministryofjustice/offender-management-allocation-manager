@@ -117,7 +117,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "(container_memory_usage_bytes{namespace='$namespace',container_name='allocation-manager'})",
+              "expr": "(container_memory_usage_bytes{namespace='$namespace',container='allocation-manager'})",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "POD: {{ pod_name}}",
@@ -224,21 +224,21 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum by (pod_name)(rate(container_cpu_usage_seconds_total{namespace='$namespace',container_name='allocation-manager'}[5m]))",
+              "expr": "sum by (pod_name)(rate(container_cpu_usage_seconds_total{namespace='$namespace',container='allocation-manager'}[5m]))",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "POD: {{ pod_name}}",
               "refId": "A"
             },
             {
-              "expr": "avg(kube_pod_container_resource_requests_cpu_cores{namespace='$namespace',container_name='allocation-manager'})",
+              "expr": "avg(kube_pod_container_resource_requests_cpu_cores{namespace='$namespace',container='allocation-manager'})",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "Requested (soft limit)",
               "refId": "B"
             },
             {
-              "expr": "avg(kube_pod_container_resource_limits_cpu_cores{namespace='$namespace',container_name='allocation-manager'})",
+              "expr": "avg(kube_pod_container_resource_limits_cpu_cores{namespace='$namespace',container='allocation-manager'})",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "Limit (hard limit)",
