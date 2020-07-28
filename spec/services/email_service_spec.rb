@@ -3,6 +3,10 @@ require 'rails_helper'
 RSpec.describe EmailService do
   include ActiveJob::TestHelper
 
+  before do
+    create(:case_information, nomis_offender_id: 'G2911GD')
+  end
+
   let(:allocation) {
     Allocation.new.tap do |a|
       a.primary_pom_nomis_id = 485_833

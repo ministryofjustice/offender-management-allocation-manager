@@ -3,6 +3,8 @@ require 'rails_helper'
 describe AllocationService do
   include ActiveJob::TestHelper
 
+  let(:nomis_offender_id) { 'G4273GI' }
+
   before do
     # needed as create_or_update calls a NOMIS API
     signin_user
@@ -11,7 +13,6 @@ describe AllocationService do
   describe '#allocate_secondary', :queueing do
     let(:moic_test_id) { 485_758 }
     let(:ross_id) { 485_926 }
-    let(:nomis_offender_id) { 'G4273GI' }
     let(:primary_pom_id) { ross_id }
     let(:secondary_pom_id) { moic_test_id }
     let(:message) { 'Additional text' }
@@ -44,7 +45,7 @@ describe AllocationService do
           hash_including(
             "message" => message,
             "offender_name" => "Abbella, Ozullirn",
-            "nomis_offender_id" => "G4273GI",
+            "nomis_offender_id" => nomis_offender_id,
             "pom_email" => "pom@digital.justice.gov.uk",
             "pom_name" => "Moic",
             "url" => "http://localhost:3000/prisons/LEI/caseload"
@@ -57,7 +58,7 @@ describe AllocationService do
             "message" => message,
             "pom_name" => "Moic",
             "offender_name" => "Abbella, Ozullirn",
-            "nomis_offender_id" => "G4273GI",
+            "nomis_offender_id" => nomis_offender_id,
             "responsibility" => "supporting",
             "responsible_pom_name" => 'Pom, Moic',
             "pom_email" => "ommiicc@digital.justice.gov.uk",
@@ -67,41 +68,51 @@ describe AllocationService do
   end
 
   describe '#create_or_update' do
-    it 'can create a new record where none exists', versioning: true, vcr: { cassette_name: :allocation_service_create_allocation__spec } do
-      params = {
-        nomis_offender_id: 'G2911GD',
-        prison: 'LEI',
-        allocated_at_tier: 'A',
-        primary_pom_nomis_id: 485_833,
-        primary_pom_allocated_at: DateTime.now.utc,
-        nomis_booking_id: 1,
-        recommended_pom_type: 'probation',
-        event: Allocation::ALLOCATE_PRIMARY_POM,
-        event_trigger: Allocation::USER,
-        created_by_username: 'MOIC_POM'
-      }
+    context 'without an existing' do
+      before do
+        create(:case_information, nomis_offender_id: nomis_offender_id)
+      end
 
-      described_class.create_or_update(params)
-      expect(Allocation.count).to be(1)
+      it 'can create a new record', versioning: true, vcr: { cassette_name: :allocation_service_create_allocation__spec } do
+        params = {
+          nomis_offender_id: nomis_offender_id,
+          prison: 'LEI',
+          allocated_at_tier: 'A',
+          primary_pom_nomis_id: 485_833,
+          primary_pom_allocated_at: DateTime.now.utc,
+          nomis_booking_id: 1,
+          recommended_pom_type: 'probation',
+          event: Allocation::ALLOCATE_PRIMARY_POM,
+          event_trigger: Allocation::USER,
+          created_by_username: 'MOIC_POM'
+        }
+
+        expect {
+          described_class.create_or_update(params)
+        }.to change(Allocation, :count).by(1)
+      end
     end
 
-    it 'can update a record and store a version where one already exists', versioning: true, vcr: { cassette_name: :allocation_service_update_allocation_spec } do
-      nomis_offender_id = 'G2911GD'
+    context 'when one already exists' do
+      before do
+        create(:allocation, nomis_offender_id: nomis_offender_id)
+      end
 
-      create(:allocation, nomis_offender_id: nomis_offender_id)
+      it 'can update a record and store a version', versioning: true, vcr: { cassette_name: :allocation_service_update_allocation_spec } do
+        update_params = {
+          nomis_offender_id: nomis_offender_id,
+          allocated_at_tier: 'B',
+          primary_pom_nomis_id: 485_926,
+          event: Allocation::REALLOCATE_PRIMARY_POM,
+          created_by_username: 'MOIC_POM'
+        }
 
-      update_params = {
-        nomis_offender_id: nomis_offender_id,
-        allocated_at_tier: 'B',
-        primary_pom_nomis_id: 485_926,
-        event: Allocation::REALLOCATE_PRIMARY_POM,
-        created_by_username: 'MOIC_POM'
-      }
-
-      described_class.create_or_update(update_params)
-
-      expect(Allocation.count).to be(1)
-      expect(Allocation.find_by(nomis_offender_id: nomis_offender_id).versions.count).to be(2)
+        expect {
+          expect {
+            described_class.create_or_update(update_params)
+          }.not_to change(Allocation, :count)
+        }.to change { Allocation.find_by(nomis_offender_id: nomis_offender_id).versions.count }.by(1)
+      end
     end
   end
 
@@ -160,7 +171,6 @@ describe AllocationService do
   end
 
   it 'can get the current allocated primary POM', versioning: true, vcr: { cassette_name: 'current_allocated_primary_pom' }  do
-    nomis_offender_id = 'G2911GD'
     previous_primary_pom_nomis_id = 485_637
     updated_primary_pom_nomis_id = 485_926
 
@@ -181,9 +191,8 @@ describe AllocationService do
   end
 
   it 'can set the correct com_name', versioning: true, vcr: { cassette_name: 'allocation_service_com_name' }  do
-    nomis_offender_id = 'G2911GD'
-
     create(:delius_data, noms_no: nomis_offender_id, offender_manager: 'Bob')
+    create(:case_information, nomis_offender_id: nomis_offender_id)
 
     params = {
       nomis_offender_id: nomis_offender_id,
@@ -206,7 +215,6 @@ describe AllocationService do
 
   describe '#allocation_history_pom_emails' do
     it 'can retrieve all the POMs email addresses for ', versioning: true, vcr: { cassette_name: :allocation_service_history_spec } do
-      nomis_offender_id = 'G2911GD'
       previous_primary_pom_nomis_id = 485_637
       updated_primary_pom_nomis_id = 485_926
       secondary_pom_nomis_id = 485_833

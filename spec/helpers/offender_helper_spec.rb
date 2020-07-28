@@ -21,27 +21,31 @@ RSpec.describe OffenderHelper do
     }
 
     it 'returns the event in a more readable format' do
-      expect(last_event(allocation)).to eq("POM allocated - #{allocation.updated_at.strftime('%d/%m/%Y')}")
+      expect(helper.last_event(allocation)).to eq("POM allocated - #{allocation.updated_at.strftime('%d/%m/%Y')}")
     end
   end
 
   describe 'generates labels for case owner ' do
     it 'can show Custody for Prison' do
-      off = Nomis::Offender.new
-      off.inprisonment_status = 'SENT03'
+      off = Nomis::Offender.new.tap { |o|
+        o.load_case_information(build(:case_information))
+        o.inprisonment_status = 'SENT03'
+        o.sentence = Nomis::SentenceDetail.new sentence_start_date: Time.zone.today - 20.months,
+                                               automatic_release_date: Time.zone.today + 20.months
+      }
       offp = OffenderPresenter.new(off, nil)
-      off.sentence = Nomis::SentenceDetail.new automatic_release_date: Time.zone.today + 20.months
 
-      expect(case_owner_label(offp)).to eq('Custody')
+      expect(helper.case_owner_label(offp)).to eq('Custody')
     end
 
     it 'can show Community for Probation' do
-      off = Nomis::Offender.new
-      off.inprisonment_status = 'SENT03'
-      off.sentence = Nomis::SentenceDetail.new automatic_release_date: Time.zone.today
-      offp = OffenderPresenter.new(off, nil)
+      off = Nomis::Offender.new.tap { |o|
+        o.inprisonment_status = 'SENT03'
+        o.sentence = Nomis::SentenceDetail.new automatic_release_date: Time.zone.today
+      }
+      offp = OffenderPresenter.new(off, build(:responsibility, value: 'Probation'))
 
-      expect(case_owner_label(offp)).to eq('Community')
+      expect(helper.case_owner_label(offp)).to eq('Community')
     end
   end
 end
