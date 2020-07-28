@@ -84,12 +84,8 @@ RSpec.describe TasksController, type: :controller do
 
       stub_offender(build(:nomis_offender, offenderNo: offender_no))
 
-      # Manual creation of case information cannot have a nil team, so create on here
-      ldu = LocalDivisionalUnit.create!(code: "ENLDU", name: "English LDU", email_address: "EnglishNPS@example.com")
-      team = Team.create!(code: "ENG1", name: 'NPS - England', shadow_code: "E01", local_divisional_unit_id: ldu.id)
-
       # Ensure only one of our offenders has missing data and that G7514GW (indeterminate) has a PRD
-      create(:case_information, nomis_offender_id: offender_no, tier: 'A', mappa_level: 1, team: team)
+      create(:case_information, nomis_offender_id: offender_no, tier: 'A', mappa_level: 1, team: nil, probation_service: 'Scotland')
       create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id, prison: prison)
 
       create(:case_information,  nomis_offender_id: 'G1234AB', tier: 'A', mappa_level: 1)
