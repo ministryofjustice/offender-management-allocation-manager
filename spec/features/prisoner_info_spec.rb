@@ -54,15 +54,14 @@ feature 'View a prisoner profile page' do
       expect(page.response_headers['Content-Type']).to eq('image/jpg')
     end
 
-    it "has a link to the allocation history",
-       :versioning, vcr: { cassette_name: :link_to_allocation_history } do
+    it "has a link to the allocation history", :versioning, vcr: { cassette_name: :link_to_allocation_history } do
       visit prison_prisoner_path('LEI', 'G7998GJ')
       click_link "View"
       expect(page).to have_content('Prisoner allocation')
     end
 
     it "has community information when present",
-       :raven_intercept_exception, vcr: { cassette_name: :show_offender_community_info_full } do
+       vcr: { cassette_name: :show_offender_community_info_full } do
       ldu = create(:local_divisional_unit, name: 'An LDU', email_address: 'test@example.com')
       team = create(:team, name: 'A team', local_divisional_unit: ldu)
       create(:case_information,
@@ -81,7 +80,7 @@ feature 'View a prisoner profile page' do
     end
 
     it "has some community information when present",
-       :raven_intercept_exception, vcr: { cassette_name: :show_offender_community_info_partial } do
+       vcr: { cassette_name: :show_offender_community_info_partial } do
       ldu = create(:local_divisional_unit, name: 'An LDU', email_address: nil)
       team = create(:team, local_divisional_unit: ldu)
       create(:case_information,

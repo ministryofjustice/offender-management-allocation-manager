@@ -17,6 +17,7 @@ feature 'Allocation' do
 
   let!(:case_information) {
     create(:case_information, nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPS', welsh_offender: 'No')
+    create(:case_information, nomis_offender_id: never_allocated_offender)
   }
 
   before do

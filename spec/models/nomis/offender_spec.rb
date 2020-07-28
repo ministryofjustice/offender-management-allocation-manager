@@ -7,8 +7,7 @@ describe Nomis::Offender do
         build(:offender).tap { |o|
           o.sentence = Nomis::SentenceDetail.new(automatic_release_date: Time.zone.today + 1.year,
                                                  sentence_start_date: Time.zone.today)
-          o.case_allocation = 'NPS'
-          o.mappa_level = 0
+          o.load_case_information(build(:case_information, case_allocation: 'NPS', mappa_level: 0))
         }
       }
 
@@ -18,7 +17,12 @@ describe Nomis::Offender do
     end
 
     context 'when COM responsible already' do
-      let(:offender) { build(:offender).tap { |o| o.sentence = Nomis::SentenceDetail.new } }
+      let(:offender) {
+        build(:offender).tap { |o|
+          o.sentence = Nomis::SentenceDetail.new
+          o.load_case_information(build(:case_information))
+        }
+      }
 
       it 'doesnt has a value' do
         expect(offender.handover_start_date).to eq(nil)

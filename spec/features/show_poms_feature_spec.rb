@@ -3,9 +3,11 @@ require "rails_helper"
 feature "get poms list" do
   let!(:offender_missing_sentence_case_info) { create(:case_information, nomis_offender_id: 'G1247VX') }
 
-  it "shows the page", vcr: { cassette_name: :show_poms_feature_list } do
+  before do
     signin_user
+  end
 
+  it "shows the page", vcr: { cassette_name: :show_poms_feature_list } do
     visit prison_poms_path('LEI')
 
     expect(page).to have_css(".govuk-table", count: 4)
@@ -18,8 +20,6 @@ feature "get poms list" do
   end
 
   it "handles missing sentence data", vcr: { cassette_name: :show_poms_feature_missing_sentence } do
-    signin_user('MOIC_POM')
-
     visit prison_confirm_allocation_path('LEI', offender_missing_sentence_case_info.nomis_offender_id, 485_926)
     click_button 'Complete allocation'
 
@@ -31,8 +31,6 @@ feature "get poms list" do
   end
 
   it "allows viewing a POM", vcr: { cassette_name: :show_poms_feature_view } do
-    signin_user
-
     visit "/prisons/LEI/poms/485926"
 
     expect(page).to have_css(".govuk-button", count: 1)
@@ -43,9 +41,8 @@ feature "get poms list" do
   end
 
   it "can sort offenders allocated to a POM", vcr: { cassette_name: :show_poms_feature_view_sorting } do
-    signin_user
-
     [['G7806VO', 754_207], ['G2911GD', 1_175_317]].each do |offender_id, booking|
+      create(:case_information, nomis_offender_id: offender_id)
       AllocationService.create_or_update(
         nomis_offender_id: offender_id,
         nomis_booking_id: booking,
@@ -88,8 +85,6 @@ feature "get poms list" do
   end
 
   it "allows editing a POM", vcr: { cassette_name: :show_poms_feature_edit } do
-    signin_user
-
     visit "/prisons/LEI/poms/485926/edit"
 
     expect(page).to have_css(".govuk-button", count: 1)
