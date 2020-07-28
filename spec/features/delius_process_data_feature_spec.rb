@@ -4,10 +4,14 @@ require 'rails_helper'
 feature 'delius import scenarios', vcr: { cassette_name: :delius_import_scenarios } do
   let(:ldu) {  create(:local_divisional_unit) }
   let(:team) { create(:team, local_divisional_unit: ldu) }
+  let(:test_strategy) { Flipflop::FeatureSet.current.test! }
 
   before do
-    test_strategy = Flipflop::FeatureSet.current.test!
     test_strategy.switch!(:auto_delius_import, true)
+  end
+
+  after do
+    test_strategy.switch!(:auto_delius_import, false)
   end
 
   before do
