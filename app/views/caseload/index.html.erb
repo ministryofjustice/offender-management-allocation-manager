@@ -18,7 +18,7 @@
       <div class="govuk-body">New cases</div>
       <div class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24 new-cases-count">
         <% if @new_cases_count > 0 %>
-          <%= link_to "#{@new_cases_count}", new_prison_caseload_path(@prison.code), class:"govuk-link"%>
+          <%= link_to "#{@new_cases_count}", new_prison_staff_caseload_path(@prison.code), class:"govuk-link"%>
         <% else %>
           0
         <% end %>
@@ -29,7 +29,7 @@
       <div class="govuk-body">Cases close to handover</div>
       <div class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24 upcoming-handover-count">
         <% if @pending_handover_count > 0 %>
-          <%= link_to "#{@pending_handover_count}", prison_caseload_handover_start_path(@prison.code), class:"govuk-link"%>
+          <%= link_to "#{@pending_handover_count}", prison_staff_caseload_handover_start_path(@prison.code), class:"govuk-link"%>
         <% else %>
           0
         <% end %>

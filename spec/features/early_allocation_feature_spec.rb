@@ -4,7 +4,6 @@ require 'rails_helper'
 
 feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocations } do
   let(:nomis_staff_id) { 485_926 }
-
   # This booking id is the latest one for the offender in T3
   let(:nomis_offender_id) { 'G4273GI' }
   let(:booking_id) { 1_153_753 }
@@ -17,8 +16,9 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
     create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id, nomis_booking_id: booking_id)
 
     signin_pom_user
+    signin_spo_user
 
-    visit prison_caseload_index_path(prison)
+    visit prison_staff_caseload_index_path(prison, nomis_staff_id)
 
     # assert that our setup created a caseload record
     expect(page).to have_content("Showing 1 - 1 of 1 results")
