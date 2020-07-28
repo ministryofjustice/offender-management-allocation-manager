@@ -3,9 +3,14 @@ require 'rails_helper'
 RSpec.describe DeliusDataService, :queueing do
   include ActiveJob::TestHelper
 
+  let(:test_strategy) { Flipflop::FeatureSet.current.test! }
+
   before do
-    test_strategy = Flipflop::FeatureSet.current.test!
     test_strategy.switch!(:auto_delius_import, true)
+  end
+
+  after do
+    test_strategy.switch!(:auto_delius_import, false)
   end
 
   describe '#upsert' do
