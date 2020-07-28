@@ -160,7 +160,7 @@ module Nomis
       @team.try(:name)
     end
 
-    def case_information=(record)
+    def load_case_information(record)
       return if record.blank?
 
       @case_information = record

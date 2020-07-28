@@ -18,6 +18,7 @@ feature 'View a prisoner profile page' do
 
   context 'with an allocation' do
     let!(:alloc) {
+      create(:case_information, nomis_offender_id: 'G7998GJ')
       create(:allocation, nomis_offender_id: 'G7998GJ', primary_pom_nomis_id: '485637', primary_pom_name: 'Pobno, Kath')
     }
 
@@ -64,7 +65,7 @@ feature 'View a prisoner profile page' do
        vcr: { cassette_name: :show_offender_community_info_full } do
       ldu = create(:local_divisional_unit, name: 'An LDU', email_address: 'test@example.com')
       team = create(:team, name: 'A team', local_divisional_unit: ldu)
-      alloc.case_information.update(team: team)
+      CaseInformation.find_by(nomis_offender_id: alloc.nomis_offender_id).update(team: team)
 
       alloc.update(com_name: 'Bob Smith')
 
@@ -80,7 +81,7 @@ feature 'View a prisoner profile page' do
        vcr: { cassette_name: :show_offender_community_info_partial } do
       ldu = create(:local_divisional_unit, name: 'An LDU', email_address: nil)
       team = create(:team, local_divisional_unit: ldu)
-      alloc.case_information.update(team: team)
+      CaseInformation.find_by(nomis_offender_id: alloc.nomis_offender_id).update(team: team)
 
       visit prison_prisoner_path('LEI', 'G7998GJ')
 

@@ -3,14 +3,6 @@
 class Allocation < ApplicationRecord
   has_paper_trail ignore: [:com_name]
 
-  has_one :case_information,
-          primary_key: :nomis_offender_id,
-          foreign_key: :nomis_offender_id,
-          inverse_of: :allocation,
-          # allocation(histories) are never destroyed in the normal cycle,
-          # they are kept in case offender returns to the system
-          dependent: :restrict_with_exception
-
   ALLOCATE_PRIMARY_POM = 0
   REALLOCATE_PRIMARY_POM = 1
   ALLOCATE_SECONDARY_POM = 2

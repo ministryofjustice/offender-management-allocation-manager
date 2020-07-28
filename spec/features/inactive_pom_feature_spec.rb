@@ -11,6 +11,7 @@ feature 'Inactive POM' do
     before do
       signin_user
 
+      create(:case_information, nomis_offender_id: nomis_offender_id)
       create(
         :allocation,
         nomis_offender_id: nomis_offender_id,

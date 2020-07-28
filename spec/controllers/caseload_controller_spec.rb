@@ -81,6 +81,7 @@ RSpec.describe CaseloadController, type: :controller do
 
       # Need to create history records because AllocatedOffender#new_case? doesn't cope otherwise
       offenders.each do |offender|
+        create(:case_information, nomis_offender_id: offender.fetch(:offenderNo))
         alloc = create(:allocation, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: staff_id, prison: prison)
         alloc.update!(primary_pom_nomis_id: staff_id,
                       event: Allocation::REALLOCATE_PRIMARY_POM,

@@ -18,6 +18,7 @@ describe AllocationService do
     let(:message) { 'Additional text' }
 
     let!(:allocation) {
+      create(:case_information, nomis_offender_id: nomis_offender_id)
       create(:allocation,
              nomis_offender_id: nomis_offender_id,
              primary_pom_nomis_id: primary_pom_id,
@@ -95,6 +96,7 @@ describe AllocationService do
 
     context 'when one already exists' do
       before do
+        create(:case_information, nomis_offender_id: nomis_offender_id)
         create(:allocation, nomis_offender_id: nomis_offender_id)
       end
 

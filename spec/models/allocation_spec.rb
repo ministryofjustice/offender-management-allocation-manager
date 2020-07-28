@@ -16,17 +16,20 @@ RSpec.describe Allocation, type: :model do
     end
 
     let!(:c1) {
-      create(:allocation, case_information: build(:case_information, team: nil))
+      ci1 = create(:case_information, team: nil)
+      create(:allocation, nomis_offender_id: ci1.nomis_offender_id)
     }
     let!(:c2) {
       ldu = create(:local_divisional_unit, email_address: nil)
       team = create(:team, local_divisional_unit: ldu)
-      create(:allocation, case_information: build(:case_information, team: team))
+      ci2 = create(:case_information, team: team)
+      create(:allocation, nomis_offender_id: ci2.nomis_offender_id)
     }
     let!(:c3) {
       ldu = create(:local_divisional_unit, email_address: 'someone@example.com')
       team = create(:team, local_divisional_unit: ldu)
-      create(:allocation, case_information: build(:case_information, team: team))
+      ci3 = create(:case_information, team: team)
+      create(:allocation, nomis_offender_id: ci3.nomis_offender_id)
     }
 
     it 'picks up NPS allocations without emails' do

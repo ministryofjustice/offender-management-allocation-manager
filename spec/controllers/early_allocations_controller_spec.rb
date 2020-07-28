@@ -59,7 +59,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
 
   context 'with a good ldu complete with email address' do
     before do
-      create(:case_information, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
+      create(:case_information, nomis_offender_id: nomis_offender_id)
       create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
     end
 

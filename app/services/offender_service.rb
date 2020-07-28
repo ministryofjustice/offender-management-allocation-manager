@@ -5,7 +5,7 @@ class OffenderService
     Nomis::Elite2::OffenderApi.get_offender(offender_no).tap { |o|
       next false if o.nil?
 
-      o.case_information = CaseInformation.find_by(nomis_offender_id: offender_no)
+      o.load_case_information(CaseInformation.find_by(nomis_offender_id: offender_no))
 
       sentence_detail = get_sentence_details([o.booking_id])
       if sentence_detail.present? && sentence_detail.key?(o.booking_id)
