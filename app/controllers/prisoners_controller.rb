@@ -24,7 +24,7 @@ class PrisonersController < PrisonsApplicationController
       @secondary_pom_name = helpers.fetch_pom_name(@allocation.secondary_pom_nomis_id).titleize
     end
 
-    @pom_responsibility = pom_responsibility
+    @pom_responsibility = @prisoner.pom_responsibility
     @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(
       active_prison_id, @prisoner.offender_no
     )
@@ -46,27 +46,6 @@ class PrisonersController < PrisonsApplicationController
   end
 
 private
-
-  def pom_responsibility
-    @pom_responsibility ||= overridden_responsibility || calculated_responsibility
-  end
-
-  def overridden_responsibility
-    override = Responsibility.find_by(nomis_offender_id: @offender.offender_no)
-    return nil if override.nil?
-
-    if override.value == Responsibility::PRISON
-      ResponsibilityService::RESPONSIBLE.to_s
-    else
-      ResponsibilityService::SUPPORTING.to_s
-    end
-  end
-
-  def calculated_responsibility
-    ResponsibilityService.calculate_pom_responsibility(
-      @offender
-    )
-  end
 
   def id_for_show_action
     params[:id]

@@ -12,9 +12,9 @@ RSpec.describe SearchHelper do
 
     it "will change to allocate if there is no allocation" do
       offender = Nomis::Offender.new(
-        offender_no: 'A',
-        tier: 'A'
-      )
+        offender_no: 'A').tap { |o|
+        o.load_case_information(build(:case_information, tier: 'A'))
+      }
       text, _link = cta_for_offender('LEI', offender)
       expect(text).to eq('<a href="/prisons/LEI/allocations/A/new">Allocate</a>')
     end
@@ -22,9 +22,9 @@ RSpec.describe SearchHelper do
     it "will change to view if there is an allocation" do
       offender = Nomis::Offender.new(
         offender_no: 'A',
-        tier: 'A',
         allocated_pom_name: 'Bob'
-      )
+      ).tap { |o| o.load_case_information(build(:case_information, tier: 'A')) }
+
       text, _link = cta_for_offender('LEI', offender)
       expect(text).to eq('<a href="/prisons/LEI/allocations/A">View</a>')
     end

@@ -81,7 +81,7 @@ RSpec.describe Allocation, type: :model do
       it 'removes them as the primary pom\'s from all allocations' do
         described_class.deallocate_primary_pom(nomis_staff_id, allocation.prison)
 
-        deallocation = described_class.find_by(nomis_offender_id: nomis_offender_id)
+        deallocation = described_class.find_by!(nomis_offender_id: nomis_offender_id)
 
         expect(deallocation.primary_pom_nomis_id).to be_nil
         expect(deallocation.primary_pom_name).to be_nil
@@ -102,6 +102,8 @@ RSpec.describe Allocation, type: :model do
     describe 'when an offender moves prison', versioning: true, vcr: { cassette_name: :allocation_deallocate_offender }  do
       it 'removes the primary pom details in an Offender\'s allocation' do
         nomis_offender_id = 'G2911GD'
+        create(:case_information, nomis_offender_id: nomis_offender_id)
+
         movement_type = Allocation::OFFENDER_TRANSFERRED
         params = {
           nomis_offender_id: nomis_offender_id,
@@ -132,6 +134,8 @@ RSpec.describe Allocation, type: :model do
     describe 'when an offender gets released from prison', versioning: true, vcr: { cassette_name: :allocation_deallocate_offender_released }  do
       it 'removes the primary pom details in an Offender\'s allocation' do
         nomis_offender_id = 'G2911GD'
+        create(:case_information, nomis_offender_id: nomis_offender_id)
+
         movement_type = Allocation::OFFENDER_RELEASED
         params = {
           nomis_offender_id: nomis_offender_id,
