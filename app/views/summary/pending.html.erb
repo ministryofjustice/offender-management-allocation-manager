@@ -80,7 +80,7 @@
           <% if auto_delius_import_enabled?(@prison.code) %>
             <%= link_to "Update", prison_case_information_path(@prison.code, offender.offender_no) %>
           <% else %>
-            <%= link_to "Edit", new_prison_case_information_path(@prison.code, offender.offender_no, sort: params[:sort], page: params[:page] || 1) %></td>
+            <%= link_to "Edit", edit_prison_case_information_path(@prison.code, offender.offender_no, sort: params[:sort], page: params[:page] || 1) %></td>
           <% end %>
         </td>
       </tr>

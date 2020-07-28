@@ -1,8 +1,18 @@
-<%= form_for(@last_location, url: prison_case_information_index_path(@prison.code), method: form_method) do |form| %>
+<%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
+
+<% if @probation_service_form.errors.count > 0 %>
+  <%= render :partial => "/shared/validation_errors", :locals => { :errors => @probation_service_form.errors } %>
+<% end %>
+
+<h1 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-4">Case information</h1>
+<h2 class="govuk-heading-m"><%= @prisoner.full_name %> - <%= @prisoner.offender_no %></h2>
+<p class="govuk-!-margin-bottom-8">You can find this information in NDelius.</p>
+
+<%= form_for(@probation_service_form, url: prison_case_information_path(@prison.code, @prisoner.offender_no), method: :put) do |form| %>
   <%= form.hidden_field(:nomis_offender_id, value: @prisoner.offender_no) %>
   <%= hidden_field_tag("sort", params[:sort])%>
   <%= hidden_field_tag("page", params[:page]) %>
-  <%= hidden_field_tag("stage", 'last_location') %>
+  <%= hidden_field_tag("form", "probation_service") %>
 
   <div class="govuk-form-group">
     <fieldset class="govuk-fieldset">
@@ -49,4 +59,3 @@
 
   <%= form.submit "Continue", role: "button", draggable: "false", class: "govuk-button" %>
 <% end %>
-

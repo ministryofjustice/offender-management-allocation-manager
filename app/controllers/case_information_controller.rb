@@ -1,73 +1,73 @@
 # frozen_string_literal: true
 
 class CaseInformationController < PrisonsApplicationController
-  before_action :set_case_info, only: [:edit, :show]
-  before_action :set_prisoner_from_url, only: [:new, :edit, :edit_prd, :update_prd, :show]
+  before_action :set_case_info, only: [:show]
+  before_action :find_or_initialize_case_info, only: [:edit, :update]
+  before_action :set_prisoner_from_url, only: [:edit, :update, :edit_prd, :update_prd, :show]
 
   def new
-    @last_location = LastLocationForm.new(
-      nomis_offender_id: nomis_offender_id_from_url
-    )
-  end
-
-  def create
-    if params[:stage] == 'last_location'
-      @last_location = LastLocationForm.new(last_location_params)
-      @case_info = CaseInformation.new(
-        nomis_offender_id: @last_location.nomis_offender_id,
-        probation_service: @last_location.probation_service,
-        manual_entry: true
-      )
-      if @last_location.valid?
-        unless @case_info.valid?
-          @prisoner = prisoner(@last_location.nomis_offender_id)
-          # clear case_information errors for missing info page
-          @case_info = CaseInformation.new(
-            probation_service: @last_location.probation_service,
-          )
-          render :missing_info
-        end
-      else
-        display_address_page
-      end
-    else
-      @last_location = Struct.new(:valid?).new(true)
-      @case_info = CaseInformation.new(case_information_params.merge(manual_entry: true))
-      unless @case_info.valid?
-        handle_stage2_rendering
-      end
-    end
-    if @last_location.valid? && @case_info.valid?
-      @case_info.save!
-      send_email
-      redirect_to prison_summary_pending_path(active_prison_id, sort: params[:sort], page: params[:page])
-    end
+    # The edit journey automatically creates new records if they don't exist yet
+    redirect_to edit_prison_case_information_path(@prison.code, nomis_offender_id_from_url)
   end
 
   def edit
-    @edit_case_info = EditCaseInformation.from_case_info(@case_info)
+    @probation_service_form = EditProbationServiceForm.new(
+      nomis_offender_id: nomis_offender_id_from_url,
+      probation_service: @case_info.probation_service
+    )
 
-    @team_name = @case_info.team&.name
+    # Render page 1 of the edit form, where users will set the probation service
+    render 'edit_probation_service'
   end
 
   def update
-    @case_info = CaseInformation.find_by!(nomis_offender_id: nomis_offender_id_from_url)
-    @prisoner = prisoner(nomis_offender_id_from_url)
-    @edit_case_info = EditCaseInformation.new edit_case_information_params
-
-    if @edit_case_info.valid?
-      @case_info.update!(probation_service: @edit_case_info.probation_service,
-                      tier: @edit_case_info.tier,
-                      case_allocation: @edit_case_info.case_allocation,
-                      team: @edit_case_info.team_id.blank? ? nil : Team.find(@edit_case_info.team_id),
-                      manual_entry: true)
-      # we only send email if the ldu is different from previous
-      if CaseInformationService.ldu_changed?(@case_info.saved_change_to_team_id)
-        send_email
-      end
-      redirect_to new_prison_allocation_path(active_prison_id, @case_info.nomis_offender_id)
+    case params[:form]
+    when 'probation_service' # page 1 form was submitted
+      update_probation_service
+    when 'probation_data' # page 2 form was submitted
+      update_probation_data
     else
-      render :edit
+      render body: 'Invalid form submission', status: :bad_request
+    end
+  end
+
+  def update_probation_service
+    @probation_service_form = EditProbationServiceForm.new(
+      edit_probation_service_params
+    )
+
+    unless @probation_service_form.valid?
+      # Show validation errors to user
+      return render 'edit_probation_service'
+    end
+
+    @case_info.probation_service = @probation_service_form.probation_service
+
+    if %w(England Wales).include?(@case_info.probation_service)
+      # England/Wales
+      # Render page 2 of the edit form to collect more info
+      render 'edit_probation_data'
+    else
+      # Scotland/Northern Ireland
+      # We don't need any more info - save and redirect
+      save_case_info
+    end
+  end
+
+  def update_probation_data
+    data = edit_probation_data_params
+    @case_info.assign_attributes(
+      probation_service: data[:probation_service],
+      tier: data[:tier],
+      case_allocation: data[:case_allocation],
+      team_id: data[:team_id],
+    )
+
+    if @case_info.valid?
+      save_case_info
+    else
+      # Show validation errors to user
+      render 'edit_probation_data'
     end
   end
 
@@ -118,6 +118,13 @@ private
     )
   end
 
+  def find_or_initialize_case_info
+    @case_info = CaseInformation.find_or_initialize_by(
+      nomis_offender_id: nomis_offender_id_from_url
+    )
+    @case_info.manual_entry = true
+  end
+
   def prisoner(nomis_id)
     @prisoner ||= OffenderService.get_offender(nomis_id)
   end
@@ -126,23 +133,24 @@ private
     params.require(:nomis_offender_id)
   end
 
-  def display_address_page
-    @prisoner = prisoner(@last_location.nomis_offender_id)
-    render :new
+  def save_case_info
+    new_record = @case_info.new_record?
+
+    @case_info.save!
+
+    if %(England Wales).include?(@case_info.probation_service) &&
+      CaseInformationService.ldu_changed?(@case_info.saved_change_to_team_id)
+      send_email_to_ldu
+    end
+
+    if new_record
+      redirect_to prison_summary_pending_path(active_prison_id, sort: params[:sort], page: params[:page])
+    else
+      redirect_to new_prison_allocation_path(active_prison_id, @case_info.nomis_offender_id)
+    end
   end
 
-  def handle_stage2_rendering
-    @prisoner = prisoner(case_information_params[:nomis_offender_id])
-    render :missing_info
-  end
-
-  def send_email
-    return unless @case_info.probation_service == 'England' || @case_info.probation_service == 'Wales'
-
-    prepare_email
-  end
-
-  def prepare_email
+  def send_email_to_ldu
     spo = Nomis::Elite2::UserApi.user_details(current_user).email_address.try(:first)
     ldu = @case_info.team.try(:local_divisional_unit)
     emails = [ldu.try(:email_address), spo]
@@ -169,24 +177,14 @@ private
     email == spo_email ? notice : ''
   end
 
-  def case_information_params
+  def edit_probation_service_params
+    params.require(:edit_probation_service_form).
+      permit(:nomis_offender_id, :last_known_address, :last_known_location)
+  end
+
+  def edit_probation_data_params
     params.require(:case_information).
-      permit(:nomis_offender_id, :tier, :case_allocation,
-             :parole_review_date_dd, :parole_review_date_mm, :parole_review_date_yyyy,
-             :probation_service, :team_id)
-  end
-
-  def edit_case_information_params
-    params.require(:edit_case_information).
-      permit(:tier, :case_allocation, :team_id,
-             :last_known_location,
-             :last_known_address)
-  end
-
-  def last_location_params
-    params.require(:last_location_form).
-      permit(:nomis_offender_id,
-             :last_known_address, :last_known_location)
+      permit(:nomis_offender_id, :probation_service, :tier, :case_allocation, :team_id)
   end
 
   def parole_review_date_params

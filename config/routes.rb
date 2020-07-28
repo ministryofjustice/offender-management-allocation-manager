@@ -36,7 +36,7 @@ Rails.application.routes.draw do
     get('/reallocations/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocations#confirm_reallocation', as: 'confirm_reallocation')
 
     resources :case_information, only: %i[new create edit update show], param: :nomis_offender_id, controller: 'case_information', path_names: {
-        new: 'new/:nomis_offender_id',
+        new: ':nomis_offender_id/new',
     } do
       get('edit_prd' => 'case_information#edit_prd', as: 'edit_prd', on: :member)
       put('update_prd' => 'case_information#update_prd', as: 'update_prd', on: :member)

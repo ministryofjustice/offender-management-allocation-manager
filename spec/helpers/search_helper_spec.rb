@@ -7,7 +7,7 @@ RSpec.describe SearchHelper do
         offender_no: 'A'
       )
       text, _link = cta_for_offender('LEI', offender)
-      expect(text).to eq('<a href="/prisons/LEI/case_information/new/A">Edit</a>')
+      expect(text).to eq('<a href="/prisons/LEI/case_information/A/new">Edit</a>')
     end
 
     it "will change to allocate if there is no allocation" do

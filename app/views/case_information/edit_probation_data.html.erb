@@ -9,12 +9,12 @@
 <h2 class="govuk-heading-m"><%= @prisoner.offender_no %></h2>
 <p class="govuk-!-margin-bottom-8">You can find this information in NDelius.</p>
 
-<%= form_for(@case_info, url: prison_case_information_index_path(@prison.code), method: :post) do |form| %>
+<%= form_for(@case_info, url: prison_case_information_path(@prison.code, @prisoner.offender_no), method: :put) do |form| %>
   <%= form.hidden_field(:nomis_offender_id, value: @prisoner.offender_no) %>
   <%= form.hidden_field(:probation_service, value: @case_info.probation_service) %>
   <%= hidden_field_tag("sort", params[:sort])%>
   <%= hidden_field_tag("page", params[:page]) %>
-  <%= hidden_field_tag("stage", 'missing_info') %>
+  <%= hidden_field_tag("form", "probation_data") %>
 
   <fieldset class="govuk-fieldset">
     <div class="govuk-form-group">
@@ -70,19 +70,6 @@
                       { include_blank: true },
                       { id:"team_autocomplete", class: "govuk-input--width-30" } ) %>
     </div>
-
-    <table class="govuk-table">
-      <tbody class="govuk-table__body">
-        <tr class="govuk-table__row">
-          <th class="govuk-table__cell govuk-body" scope="row">
-            <h3 class="govuk-body proceeding-item" id="chosen_team"></h3>
-          </th>
-          <td class="govuk-table__cell govuk-table__cell--numeric">
-            <span id="remove_team" onclick="remove_team()">Remove</span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
 
     <details class="govuk-details" data-module="govuk-details">
       <summary class="govuk-details__summary">
