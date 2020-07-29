@@ -8,6 +8,8 @@ module Nomis
              :post_recall_release_date, :earliest_release_date,
              to: :sentence
 
+    delegate :indeterminate_sentence?, to: :@sentence_type
+
     attr_accessor :category_code, :date_of_birth
 
     attr_reader :first_name, :last_name, :booking_id,
@@ -53,13 +55,8 @@ module Nomis
       @sentence_type.code
     end
 
-    # sentence type may be nil if we are created as a stub
     def recalled?
-      @sentence_type.try(:recall_sentence?)
-    end
-
-    def indeterminate_sentence?
-      @sentence_type.try(:indeterminate_sentence?)
+      @sentence_type.recall_sentence?
     end
 
     def criminal_sentence?

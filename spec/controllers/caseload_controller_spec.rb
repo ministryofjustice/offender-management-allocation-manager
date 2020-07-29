@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe CaseloadController, type: :controller do
@@ -16,20 +18,19 @@ RSpec.describe CaseloadController, type: :controller do
               position: RecommendationService::PRISON_POM)
     ]
   }
+  let(:pom) { poms.first }
 
   before do
     stub_poms(prison, poms)
-    stub_signed_in_pom(prison, staff_id, 'alice')
+    stub_signed_in_pom(prison, pom.staffId, 'alice')
   end
 
   describe '#handover_start' do
     before do
-      stub_offenders_for_prison(prison, [offender], bookings)
+      stub_offenders_for_prison(prison, [offender])
       create(:case_information, case_allocation: case_allocation, nomis_offender_id: offender.fetch(:offenderNo))
-      create(:allocation, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: staff_id, prison: prison)
+      create(:allocation, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: pom.staffId, prison: prison)
     end
-
-    let(:offender) { attributes_for(:offender) }
 
     context 'when NPS' do
       before do
@@ -37,14 +38,7 @@ RSpec.describe CaseloadController, type: :controller do
       end
 
       let(:today_plus_36_weeks) { (Time.zone.today + 36.weeks).to_s }
-      let(:bookings) {
-        [offender].map { |o|
-          b = attributes_for(:booking).merge(offenderNo: o.fetch(:offenderNo),
-                                             bookingId: o.fetch(:bookingId))
-          b.fetch(:sentenceDetail)[:paroleEligibilityDate] = today_plus_36_weeks
-          b
-        }
-      }
+      let(:offender) { build(:nomis_offender, sentence: build(:nomis_sentence_detail, paroleEligibilityDate: today_plus_36_weeks)) }
       let(:case_allocation) { 'NPS' }
 
       it 'can pull back a NPS offender due for handover' do
@@ -55,14 +49,7 @@ RSpec.describe CaseloadController, type: :controller do
     end
 
     context 'when CRC' do
-      let(:bookings) {
-        [offender].map { |o|
-          b = attributes_for(:booking).merge(offenderNo: o.fetch(:offenderNo),
-                                             bookingId: o.fetch(:bookingId))
-          b.fetch(:sentenceDetail)[:automaticReleaseDate] = today_plus_13_weeks
-          b
-        }
-      }
+      let(:offender) { build(:nomis_offender, sentence: build(:nomis_sentence_detail, automaticReleaseDate: today_plus_13_weeks)) }
       let(:case_allocation) { 'CRC' }
       let(:today_plus_13_weeks) { (Time.zone.today + 13.weeks).to_s }
 
@@ -78,20 +65,15 @@ RSpec.describe CaseloadController, type: :controller do
     let(:today) { Time.zone.today }
     let(:yesterday) { Time.zone.today - 1.day }
 
-    let(:offenders) { attributes_for_list(:offender, 3).sort_by { |x| x.fetch(:lastName) } }
+    let(:offenders) { build_list(:nomis_offender, 3).sort_by { |x| x.fetch(:lastName) } }
 
     before do
-      bookings = offenders.map { |o|
-        attributes_for(:booking).merge(offenderNo: o.fetch(:offenderNo),
-                                       bookingId: o.fetch(:bookingId))
-      }
-
-      stub_offenders_for_prison(prison, offenders, bookings)
+      stub_offenders_for_prison(prison, offenders)
 
       # Need to create history records because AllocatedOffender#new_case? doesn't cope otherwise
       offenders.each do |offender|
-        alloc = create(:allocation, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: staff_id, prison: prison)
-        alloc.update!(primary_pom_nomis_id: staff_id,
+        alloc = create(:allocation, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: pom.staffId, prison: prison)
+        alloc.update!(primary_pom_nomis_id: pom.staffId,
                       event: Allocation::REALLOCATE_PRIMARY_POM,
                       event_trigger: Allocation::USER)
       end

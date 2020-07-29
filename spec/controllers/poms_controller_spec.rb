@@ -2,10 +2,10 @@ require 'rails_helper'
 
 RSpec.describe PomsController, type: :controller do
   let(:prison) { build(:prison) }
-  let(:a_offenders) { build_list(:offender, 2) }
-  let(:b_offenders) { build_list(:offender, 4) }
-  let(:c_offenders) { build_list(:offender, 3) }
-  let(:d_offenders) { build_list(:offender, 1) }
+  let(:a_offenders) { build_list(:nomis_offender, 2) }
+  let(:b_offenders) { build_list(:nomis_offender, 4) }
+  let(:c_offenders) { build_list(:nomis_offender, 3) }
+  let(:d_offenders) { build_list(:nomis_offender, 1) }
 
   before do
     stub_sso_data(prison.code)
@@ -17,10 +17,10 @@ RSpec.describe PomsController, type: :controller do
       build(:pom, staffId: active.nomis_staff_id),
       build(:pom, staffId: unavailable.nomis_staff_id)
     ])
-    a1 = create(:case_information, tier: 'A', nomis_offender_id: a_offenders.first.offender_no)
+    a1 = create(:case_information, tier: 'A', nomis_offender_id: a_offenders.first.fetch(:offenderNo))
     create(:allocation, nomis_offender_id: a1.nomis_offender_id, primary_pom_nomis_id: active.nomis_staff_id, prison: prison.code)
 
-    a2 = create(:case_information, tier: 'A', nomis_offender_id: a_offenders.last.offender_no)
+    a2 = create(:case_information, tier: 'A', nomis_offender_id: a_offenders.last.fetch(:offenderNo))
     create(:allocation, nomis_offender_id: a2.nomis_offender_id, primary_pom_nomis_id: inactive.nomis_staff_id, secondary_pom_nomis_id: active.nomis_staff_id, prison: prison.code)
 
     {
@@ -28,7 +28,7 @@ RSpec.describe PomsController, type: :controller do
       'C': c_offenders,
       'D': d_offenders,
     }.each do |tier, offenders|
-      offenders.map(&:offender_no).each do |offender_no|
+      offenders.map { |o| o.fetch(:offenderNo) }.each do |offender_no|
         create(:case_information, tier: tier.to_s, nomis_offender_id: offender_no)
         create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: active.nomis_staff_id, prison: prison.code)
       end
@@ -40,7 +40,6 @@ RSpec.describe PomsController, type: :controller do
   context 'with an extra unsentenced offender' do
     let(:active_staff_id) { PomDetail.where(status: 'active').first!.nomis_staff_id }
     let(:unavailable_staff_id) { PomDetail.where(status: 'unavailable').first!.nomis_staff_id }
-    let(:offenderNos) { (a_offenders + b_offenders + c_offenders + d_offenders).map(&:offender_no) }
 
     before do
       # This guy doesn't turn up in Prison#offenders, and hence doesn't show up on caseload or stats
@@ -50,25 +49,9 @@ RSpec.describe PomsController, type: :controller do
       stub_request(:get, "#{ApiHelper::T3}/staff/#{active_staff_id}").
         to_return(body: { staffId: active_staff_id, lastName: 'LastName', firstName: 'FirstName' }.to_json)
 
-      offenders = offenderNos.map.with_index { |nomis_id, index|
-        { "bookingId": 754_207 + index,
-          "offenderNo": nomis_id,
-          "dateOfBirth": "1990-12-06", "convictedStatus": "Convicted",
-          "categoryCode": "C", "imprisonmentStatus": "SENT03" }
-      }
+      offenders = a_offenders + b_offenders + c_offenders + d_offenders
 
-      bookings = offenders.map { |offender|
-        { "bookingId": offender.fetch(:bookingId),
-                                   "offenderNo": offender.fetch(:offenderNo),
-                                   "agencyLocationId": prison.code,
-                "sentenceDetail": { "sentenceExpiryDate": "2014-02-16", "automaticReleaseDate": "2011-01-28",
-                   "licenceExpiryDate": "2014-02-07", "homeDetentionCurfewEligibilityDate": "2011-11-07",
-                   "bookingId": 754_207, "sentenceStartDate": "2009-02-08",
-                   "nonDtoReleaseDate": "2012-03-17", "nonDtoReleaseDateType": "ARD", "confirmedReleaseDate": "2012-03-17",
-                   "releaseDate": "2012-03-17" } }
-      }
-
-      stub_offenders_for_prison(prison.code, offenders, bookings)
+      stub_offenders_for_prison(prison.code, offenders)
     end
 
     it 'omits the allocation which does not show up in Prison#offenders' do

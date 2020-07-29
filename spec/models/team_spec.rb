@@ -39,12 +39,11 @@ RSpec.describe Team, type: :model do
     end
 
     context 'with a duplicate team name' do
-      let(:team) { build(:team, name: oldteam.name) }
+      let(:team) { build(:team, :nps, name: oldteam.name) }
 
       it 'is not valid' do
         expect(team).not_to be_valid
-        expect(team.errors.count).to eq(1)
-        expect(team.errors.first).to eq([:name, "has already been taken"])
+        expect(team.errors.to_a).to eq(["Name has already been taken"])
       end
     end
   end

@@ -20,7 +20,7 @@ module Nomis
 
     def load_from_json(payload)
       @booking_id = payload.fetch('bookingId').to_i
-      @prison_id = payload['agencyId']
+      @prison_id = payload.fetch('agencyId')
       @facial_image_id = payload['facialImageId']&.to_i
 
       super(payload)

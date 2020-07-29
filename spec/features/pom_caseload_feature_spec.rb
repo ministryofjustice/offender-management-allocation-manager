@@ -6,9 +6,6 @@ feature "view POM's caseload" do
   let(:tomorrow) { Date.tomorrow }
 
   let(:prison) { 'LEI' }
-  let(:elite2api) { 'https://gateway.t3.nomis-api.hmpps.dsd.io/elite2api/api' }
-  let(:elite2listapi) { "#{elite2api}/locations/description/#{prison}/inmates?convictedStatus=Convicted&returnCategory=true" }
-  let(:elite2bookingsapi) { "#{elite2api}/offender-sentences/bookings" }
 
   let(:offender_map) {
     {
@@ -36,14 +33,18 @@ feature "view POM's caseload" do
   }
   let(:offenders) {
     offender_map.merge(nomis_offender_id => 1_153_753).
-      map { |nomis_id, booking_id| attributes_for(:offender).merge(offenderNo: nomis_id, bookingId: booking_id) }
+      map { |nomis_id, booking_id|
+      build(:nomis_offender,
+            offenderNo: nomis_id,
+            sentence: build(:nomis_sentence_detail,
+                            tariffDate: Time.zone.today + booking_id.minutes))
+    }
   }
   let(:sorted_offenders) {
     offenders.sort_by { |o| o.fetch(:lastName) }
   }
   let(:first_offender) { sorted_offenders.first }
   let(:moved_offender) { sorted_offenders.fourth }
-  let(:bookings) { offenders.map { |o| attributes_for(:booking).merge(offenderNo: o.fetch(:offenderNo), bookingId: o.fetch(:bookingId)) } }
 
   # create 21 allocations for prisoners named A-K so that we can verify that default sorted paging works
   before do
@@ -57,7 +58,7 @@ feature "view POM's caseload" do
       ]
 
     stub_poms(prison, poms)
-    stub_offenders_for_prison(prison, offenders, bookings)
+    stub_offenders_for_prison(prison, offenders)
 
     offender_map.each do |nomis_offender_id, nomis_booking_id|
       create(:case_information, nomis_offender_id: nomis_offender_id)
@@ -105,7 +106,7 @@ feature "view POM's caseload" do
     it 'can be sorted by earliest release date' do
       page.all('th')[2].find('a').click
 
-      bookings_by_release_date = bookings.sort_by { |o| o.fetch(:sentenceDetail).fetch('tariffDate') }
+      bookings_by_release_date = offenders.sort_by { |o| o.fetch(:sentence).fetch(:tariffDate) }
       [6, 7].each do |row_index|
         within ".offender_row_#{row_index}" do
           offender = offenders.detect { |o| o.fetch(:offenderNo) == bookings_by_release_date[row_index].fetch(:offenderNo) }
@@ -177,8 +178,8 @@ feature "view POM's caseload" do
 
   it 'allows a POM to view the prisoner profile page for a specific offender' do
     signin_pom_user
-    stub_offender(first_offender.fetch(:offenderNo))
-    stub_request(:get, "https://keyworker-api-dev.prison.service.justice.gov.uk/key-worker/LEI/offender/#{first_offender.fetch(:offenderNo)}").
+    stub_offender(first_offender)
+    stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/LEI/offender/#{first_offender.fetch(:offenderNo)}").
       to_return(body: { staffId: 485_572, firstName: "DOM", lastName: "BULL" }.to_json)
     visit prison_staff_caseload_index_path(prison, nomis_staff_id)
 

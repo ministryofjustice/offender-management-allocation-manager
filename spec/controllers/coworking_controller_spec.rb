@@ -4,8 +4,8 @@ RSpec.describe CoworkingController, type: :controller do
   context 'when there is an existing invalid co-worker' do
     before do
       stub_sso_data(prison, username)
-      stub_offender(offender_no)
-      stub_offenders_for_prison(prison, [offender], [booking])
+      stub_offender(offender)
+      stub_offenders_for_prison(prison, [offender])
       stub_poms(prison, [primary_pom, new_secondary_pom])
       stub_request(:get, "#{ApiHelper::T3}/staff/#{primary_pom.staffId}").
         to_return(body: { 'firstName' => 'fred' }.to_json)
@@ -27,8 +27,7 @@ RSpec.describe CoworkingController, type: :controller do
     let(:primary_pom) { build(:pom) }
     let(:secondary_pom) { build(:pom) }
     let(:new_secondary_pom) { build(:pom) }
-    let(:offender) { attributes_for(:offender) }
-    let(:booking) { attributes_for(:booking, bookingId: offender.fetch(:bookingId)) }
+    let(:offender) { build(:nomis_offender) }
     let(:offender_no) { offender.fetch(:offenderNo) }
 
     it 'allocates' do
