@@ -94,6 +94,7 @@ Rails.application.routes.draw do
   get '/repatriated', to: 'pages#repatriated'
   get '/scottish_northern_irish', to: 'pages#scottish_northern_irish'
   get '/contact', to: 'pages#contact'
+  get '/whats-new', to: 'pages#whats_new'
 
   resources :health, only: %i[ index ], controller: 'health'
   resources :status, only: %i[ index ], controller: 'status'
