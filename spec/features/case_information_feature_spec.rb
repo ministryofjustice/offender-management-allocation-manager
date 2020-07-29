@@ -110,7 +110,6 @@ feature 'case information feature' do
           click_link 'Edit'
         end
 
-        # visit new_prison_case_information_path('LEI', nomis_offender_id)
         choose_country('England')
         click_button('Continue')
         expect(page).not_to have_css(".govuk-error-summary")
@@ -133,15 +132,15 @@ feature 'case information feature' do
           within "#edit_#{nomis_offender_id}" do
             click_link 'Edit'
           end
-          # visit new_prison_case_information_path('LEI', nomis_offender_id)
+
+          choose_country('England')
+          click_button 'Continue'
+          fill_probation_data_form(case_allocation: 'NPS', tier: 'A')
         end
 
         it 'enqueue emails to LDU and SPO when email addresses present',
            vcr: { cassette_name: :case_information_send_emails_to_ldu_and_spo } do
-          choose_country('England')
-          click_button 'Continue'
-
-          second_page_form(case_alloc: 'nps', tier: 'a', team_option: 'NPS - England 1')
+          fill_probation_data_form(team: 'NPS - England 1')
           email_expectations(button_name: 'Continue',
                              emails: %w[EnglishNPS@example.com spo_user@digital-justice.uk],
                              spo_notice: 'This is a copy of the email sent to the LDU for your records',
@@ -155,10 +154,7 @@ feature 'case information feature' do
 
         it 'when there is no LDU email address, send email to SPO only',
            vcr: { cassette_name: :case_information_no_ldu_email } do
-          choose_country('England')
-          click_button 'Continue'
-
-          second_page_form(case_alloc: 'nps', tier: 'a', team_option: 'NPS - England 2')
+          fill_probation_data_form(team: 'NPS - England 2')
           email_expectations(button_name: 'Continue',
                              emails: %w[spo_user@digital-justice.uk],
                              spo_notice: "We were unable to send an email to English LDU 2 as we do not have their "\
@@ -181,11 +177,8 @@ feature 'case information feature' do
 
         it 'when there is no SPO email address, send email to LDU only',
            vcr: { cassette_name: :case_information_no_spo_email } do
-          choose_country('England')
-          click_button 'Continue'
-
-          second_page_form(case_alloc: 'nps', tier: 'a', team_option: 'NPS - England 1')
           user_details.email_address = []
+          fill_probation_data_form(team: 'NPS - England 1')
 
           expect {
             click_button 'Continue'
@@ -206,11 +199,8 @@ feature 'case information feature' do
 
         it 'when there are no email addresses for LDU or SPO, no email sent', :raven_intercept_exception,
            vcr: { cassette_name: :case_information_no_ldu_or_spo_email } do
-          choose_country('England')
-          click_button 'Continue'
-
-          second_page_form(case_alloc: 'nps', tier: 'a', team_option: 'NPS - England 2')
           user_details.email_address = []
+          fill_probation_data_form(team: 'NPS - England 2')
 
           expect {
             click_button 'Continue'
@@ -251,11 +241,11 @@ feature 'case information feature' do
           if new_countries[index] == 'England'
             choose_country('England')
             click_button 'Continue'
-            second_page_form(case_alloc: 'crc', tier: 'd', team_option: 'NPS - England 1')
+            fill_probation_data_form(case_allocation: 'CRC', tier: 'D', team: 'NPS - England 1')
           else
             choose_radio_button('Wales')
             click_button 'Continue'
-            second_page_form(case_alloc: 'nps', tier: 'b', team_option: 'NPS - Wales')
+            fill_probation_data_form(case_allocation: 'NPS', tier: 'B', team: 'NPS - Wales')
           end
 
           click_button 'Continue'
@@ -308,7 +298,7 @@ feature 'case information feature' do
           else
             choose_country('England')
             click_button 'Continue'
-            second_page_form(case_alloc: 'crc', tier: 'a', team_option: 'NPS - England 1')
+            fill_probation_data_form(case_allocation: 'CRC', tier: 'A', team: 'NPS - England 1')
           end
 
           click_button 'Continue'
@@ -418,7 +408,7 @@ feature 'case information feature' do
 
         choose_country('Wales')
         click_button 'Continue'
-        second_page_form(case_alloc: 'crc', tier: 'b', team_option: 'NPS - Wales')
+        fill_probation_data_form(case_allocation: 'CRC', tier: 'B', team: 'NPS - Wales')
 
         email_expectations(button_name: 'Continue',
                            emails: %w[WalesNPS@example.com spo_user@digital-justice.uk],
@@ -445,7 +435,7 @@ feature 'case information feature' do
 
         choose_country('England')
         click_button 'Continue'
-        second_page_form(case_alloc: 'nps', tier: 'a', team_option: 'NPS - England 3')
+        fill_probation_data_form(team: 'NPS - England 3')
 
         email_expectations(button_name: 'Continue',
                            emails: %w[EnglishNPS@example.com spo_user@digital-justice.uk],
@@ -546,10 +536,10 @@ feature 'case information feature' do
     expect(CaseInformation.last.tier).to eq(tiers.last)
   end
 
-  def second_page_form(case_alloc:, tier:, team_option:)
-    choose_radio_button(service_provider_label(case_alloc)) unless case_alloc.nil?
+  def fill_probation_data_form(case_allocation: nil, tier: nil, team: nil)
+    choose_radio_button(service_provider_label(case_allocation)) unless case_allocation.nil?
     choose_radio_button(tier.upcase) unless tier.nil?
-    choose_team(team_option)
+    choose_team(team) unless team.nil?
   end
 
   def choose_team(team_name)
@@ -569,8 +559,8 @@ feature 'case information feature' do
 
   def service_provider_label(provider)
     {
-      'crc' => 'Community Rehabilitation Company (CRC)',
-      'nps' => 'National Probation Service (NPS)'
-    }.fetch(provider)
+      'CRC' => 'Community Rehabilitation Company (CRC)',
+      'NPS' => 'National Probation Service (NPS)'
+    }.fetch(provider.upcase)
   end
 end
