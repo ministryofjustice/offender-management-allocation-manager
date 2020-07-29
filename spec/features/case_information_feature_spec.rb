@@ -283,24 +283,24 @@ feature 'case information feature' do
 
     context "when the prisoner is from England or Wales" do
       it 'can be changed to Scotland, Wales or NI',
+         # TODO: This test name is misleading – it doesn't test NI, but I think it probably should...
          vcr: { cassette_name: :case_information_update_change_country } do
         old_countries = %w[England Wales]
         offenders = [nomis_offender_id, other_nomis_offender_id]
 
+        # Welsh record
+        create(:case_information,
+               nomis_offender_id: nomis_offender_id,
+               probation_service: 'Wales',
+               team: Team.find_by(code: 'WELSH1'))
+
+        # English record
+        create(:case_information,
+               nomis_offender_id: other_nomis_offender_id,
+               probation_service: 'England',
+               team: Team.find_by(code: 'ENG1'))
+
         old_countries.zip(offenders).each do |country, offender|
-          # Create
-          visit new_prison_case_information_path('LEI', offender)
-          choose_country(country)
-          click_button 'Continue'
-
-          if country == 'England'
-            second_page_form(case_alloc: 'nps', tier: 'c', team_option: 'NPS - England 1')
-          else
-            second_page_form(case_alloc: 'crc', tier: 'd', team_option: 'NPS - Wales')
-          end
-          click_button 'Continue'
-
-          # Edit
           visit edit_prison_case_information_path('LEI', offender)
 
           if country == 'England'
@@ -319,15 +319,13 @@ feature 'case information feature' do
 
       it 'complains if country not selected when changing to another country',
          vcr: { cassette_name: :case_information_update_location_validation_errors } do
-        # Create
-        visit new_prison_case_information_path('LEI', nomis_offender_id)
+        create(:case_information,
+               nomis_offender_id: nomis_offender_id,
+               probation_service: 'England',
+               tier: 'D',
+               team: Team.find_by(name: 'NPS - England 1'),
+               case_allocation: 'CRC')
 
-        choose_country('England')
-        click_button 'Continue'
-        second_page_form(case_alloc: 'crc', tier: 'd', team_option: 'NPS - England 1')
-        click_button 'Continue'
-
-        # Edit
         visit edit_prison_case_information_path('LEI', nomis_offender_id)
         choose_radio_button('Yes')
         click_button 'Continue'
@@ -343,21 +341,20 @@ feature 'case information feature' do
         allow(Nomis::Elite2::UserApi).to receive(:user_details).with("MOIC_POM").and_return(user_details)
         DeliusImportError.create(nomis_offender_id: nomis_offender_id,
                                  error_type: DeliusImportError::DUPLICATE_NOMIS_ID)
-
-        visit new_prison_case_information_path('LEI', nomis_offender_id)
       end
 
       it 'does not send email if team has not been updated', :js,
          vcr: { cassette_name: :case_information_update_email_not_triggered_when_team_not_changed } do
-        # Create
-        choose_country('Wales')
-        click_button 'Continue'
-        second_page_form(case_alloc: 'nps', tier: 'b', team_option: 'NPS - Wales')
-        click_button 'Continue'
+        create(:case_information,
+               nomis_offender_id: nomis_offender_id,
+               probation_service: 'Wales',
+               case_allocation: 'NPS',
+               tier: 'B',
+               team: Team.find_by(name: 'NPS - Wales'))
 
-        # Edit
         visit edit_prison_case_information_path('LEI', nomis_offender_id)
         click_button 'Continue'
+
         choose_radio_button('C')
 
         expect {
@@ -372,10 +369,9 @@ feature 'case information feature' do
 
       it 'does not send email if last_known_address changed to Scotland or Northern Ireland',
          vcr: { cassette_name: :case_information_update_email_not_triggered_when_probation_scotland_or_ni } do
-        choose_country('Wales')
-        click_button 'Continue'
-        second_page_form(case_alloc: 'nps', tier: 'b', team_option: 'NPS - Wales')
-        click_button 'Continue'
+        create(:case_information,
+               nomis_offender_id: nomis_offender_id,
+               probation_service: 'Wales')
 
         visit edit_prison_case_information_path('LEI', nomis_offender_id)
         choose_country('Northern Ireland')
@@ -389,15 +385,15 @@ feature 'case information feature' do
         expectations(probation_service: 'Northern Ireland', tier: 'N/A', team: nil, case_allocation: 'N/A')
       end
 
-      it 'does not send email when updating team has the same ldu',
+      it 'does not send email when updating team has the same LDU',
          vcr: { cassette_name: :case_information_update_email_not_triggered_when_updated_team_has_same_ldu } do
-        # Create
-        choose_country('England')
-        click_button 'Continue'
-        second_page_form(case_alloc: 'nps', tier: 'b', team_option: 'NPS - England 1')
-        click_button 'Continue'
+        create(:case_information,
+               nomis_offender_id: nomis_offender_id,
+               probation_service: 'England',
+               tier: 'B',
+               case_allocation: 'NPS',
+               team: Team.find_by(name: 'NPS - England 1'))
 
-        # Edit
         visit edit_prison_case_information_path('LEI', nomis_offender_id)
         click_button 'Continue'
 
@@ -414,9 +410,9 @@ feature 'case information feature' do
 
       it 'will send an email when last_known_address changed to England or Wales from Scotland or Northern Ireland',
          vcr: { cassette_name: :case_information_update_email_sent_when_probation_changed_from_scot_or_ni } do
-        # choose_country('Northern Ireland')
-        # click_button 'Continue'
-        create(:case_information, nomis_offender_id: nomis_offender_id, probation_service: 'Northern Ireland')
+        create(:case_information,
+               nomis_offender_id: nomis_offender_id,
+               probation_service: 'Northern Ireland')
 
         visit edit_prison_case_information_path('LEI', nomis_offender_id)
 
@@ -438,12 +434,12 @@ feature 'case information feature' do
         expectations(probation_service: 'Wales', tier: 'B', team: 'NPS - Wales', case_allocation: 'CRC')
       end
 
-      it 'will send an email when updating team which has a different ldu',
+      it 'will send an email when updating team which has a different LDU',
          vcr: { cassette_name: :case_information_update_email_sent_when_updated_team_has_different_ldu } do
-        choose_country('Wales')
-        click_button 'Continue'
-        second_page_form(case_alloc: 'crc', tier: 'd', team_option: 'NPS - Wales')
-        click_button 'Continue'
+        create(:case_information,
+               nomis_offender_id: nomis_offender_id,
+               probation_service: 'Wales',
+               team: Team.find_by(name: 'NPS - Wales'))
 
         visit edit_prison_case_information_path('LEI', nomis_offender_id)
 
