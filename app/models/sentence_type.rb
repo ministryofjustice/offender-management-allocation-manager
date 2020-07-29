@@ -6,7 +6,7 @@ class SentenceType
   RECALL = :recall
   NON_RECALL = :non_recall
 
-  attr_reader :code, :description, :duration_type, :recall_status
+  attr_reader :code, :description
 
   def initialize(imprisonment_status)
     @code = imprisonment_status
@@ -15,12 +15,16 @@ class SentenceType
     @description, @duration_type, @recall_status = SENTENCE_TYPES.fetch(@code)
   end
 
+  def immigration_case?
+    @code == 'DET'
+  end
+
   def indeterminate_sentence?
-    duration_type == INDETERMINATE
+    @duration_type == INDETERMINATE
   end
 
   def recall_sentence?
-    recall_status == RECALL
+    @recall_status == RECALL
   end
 
   def civil?
@@ -32,7 +36,7 @@ class SentenceType
       A_CFINE
       YO_CFINE
       CIV_RMD
-    ].include? code
+    ].include? @code
   end
 end
 

@@ -36,8 +36,7 @@ class SummaryService
     add_arrival_dates(offenders) if offenders.any?
 
     offenders.each do |offender|
-      # Having a 'tier' is an alias for having a case information record
-      if offender.tier.present?
+      if offender.has_case_information?
         # When trying to determine if this offender has a current active allocation, we want to know
         # if it is for this prison.
         if active_allocations_hash.key?(offender.offender_no)
@@ -45,22 +44,20 @@ class SummaryService
         else
           buckets[:unallocated].items << offender
         end
+
+        # can only be approaching handover if we have a tier
+        if approaching_handover?(offender)
+          buckets[:handovers].items << offender
+        end
       elsif new_arrival?(offender)
         buckets[:new_arrivals].items << offender
       else
         buckets[:pending].items << offender
       end
-
-      if approaching_handover?(offender)
-        buckets[:handovers].items << offender
-      end
     end
 
     Summary.new(summary_type, buckets)
   end
-
-
-
 
 private
 

@@ -10,6 +10,8 @@ module Nomis
 
     delegate :indeterminate_sentence?, to: :@sentence_type
 
+    delegate :indeterminate_sentence?, :immigration_case?, to: :@sentence_type
+
     attr_accessor :category_code, :date_of_birth
 
     attr_reader :first_name, :last_name, :booking_id,
@@ -20,6 +22,8 @@ module Nomis
     attr_reader :crn,
                 :welsh_offender, :parole_review_date,
                 :ldu, :team
+
+    attr_reader :sentence_type
 
     def convicted?
       convicted_status == 'Convicted'
@@ -47,12 +51,13 @@ module Nomis
       @early_allocation
     end
 
-    def nps_case?
-      case_allocation == 'NPS'
+    # Having a 'tier' is an alias for having a case information record
+    def has_case_information?
+      tier.present?
     end
 
-    def sentence_type_code
-      @sentence_type.code
+    def nps_case?
+      case_allocation == 'NPS'
     end
 
     def recalled?
@@ -68,15 +73,11 @@ module Nomis
     end
 
     def describe_sentence
-      @sentence_type.description
+      "#{@sentence_type.code} - #{@sentence_type.description}"
     end
 
     def over_18?
       age >= 18
-    end
-
-    def immigration_case?
-      sentence_type_code == 'DET'
     end
 
     def pom_responsibility

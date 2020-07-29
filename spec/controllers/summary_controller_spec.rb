@@ -65,6 +65,14 @@ RSpec.describe SummaryController, type: :controller do
         end
       end
 
+      context 'when no case information' do
+        it 'doesnt show up' do
+          get :handovers, params: { prison_id: prison }
+          expect(response).to be_successful
+          expect(assigns(:offenders).map(&:offender_no)).to match_array(['G4234GG'])
+        end
+      end
+
       context 'when CRC case' do
         before do
           create(:case_information, case_allocation: 'CRC', nomis_offender_id: 'G1234VV')
