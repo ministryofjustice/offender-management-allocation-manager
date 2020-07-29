@@ -4,6 +4,7 @@ feature 'case information feature' do
   include ActiveJob::TestHelper
 
   before do
+    signin_spo_user
     ldu1 = create(:local_divisional_unit, code: "WELDU", name: "Welsh LDU", email_address: "WalesNPS@example.com")
     ldu2 = create(:local_divisional_unit, code: "ENLDU", name: "English LDU", email_address: "EnglishNPS@example.com")
     ldu3 = create(:local_divisional_unit, code: "OTHERLDU", name: "English LDU 2", email_address: nil)
@@ -39,7 +40,6 @@ feature 'case information feature' do
   context 'when creating case information' do
     it 'redirects to the edit page',
        vcr: { cassette_name: :case_information_redirect_new_to_edit } do
-      signin_user
       new_path = new_prison_case_information_path('LEI', nomis_offender_id)
       edit_path = edit_prison_case_information_path('LEI', nomis_offender_id)
 
@@ -54,7 +54,6 @@ feature 'case information feature' do
         let(:error_msg2) { "You must say if the prisoner's last known address was in Northern Ireland, Scotland or Wales" }
 
         before do
-          signin_user
           visit edit_prison_case_information_path('LEI', offender_id)
           expect(page).to have_current_path edit_prison_case_information_path('LEI', offender_id)
         end
@@ -79,7 +78,6 @@ feature 'case information feature' do
          vcr: { cassette_name: :case_information_scotland_and_ni } do
         countries = ['Northern Ireland', 'Scotland']
         offenders = [nomis_offender_id, other_nomis_offender_id]
-        signin_user
 
         countries.each_with_index do |country, index|
           visit prison_summary_pending_path('LEI')
@@ -105,7 +103,6 @@ feature 'case information feature' do
     context "when the offender is Welsh or considered English", js: true do
       it 'shows error messages when second page of form not filled',
          vcr: { cassette_name: :case_information_missing_error_messages } do
-        signin_user
         visit prison_summary_pending_path('LEI')
         expect(page).to have_content('Update information')
 
@@ -132,7 +129,6 @@ feature 'case information feature' do
           allow(Nomis::Elite2::UserApi).to receive(:user_details).with("MOIC_POM").and_return(user_details)
           DeliusImportError.create(nomis_offender_id: nomis_offender_id, error_type: DeliusImportError::DUPLICATE_NOMIS_ID)
 
-          signin_user
           visit prison_summary_pending_path('LEI')
           within "#edit_#{nomis_offender_id}" do
             click_link 'Edit'
@@ -246,7 +242,6 @@ feature 'case information feature' do
         new_countries = %w[England Wales]
         offenders = [nomis_offender_id, other_nomis_offender_id]
         offenders.each { |o| create(:case_information, nomis_offender_id: o) }
-        signin_user
 
         old_countries.each_with_index do |country, index|
           CaseInformation.find_by!(nomis_offender_id: offenders[index]).update!(probation_service: country)
@@ -272,7 +267,6 @@ feature 'case information feature' do
 
       it 'complains if tier, case_allocation or team not selected when changing to England or Wales',
          vcr: { cassette_name: :case_information_update_validation_errors } do
-        signin_user
         create(:case_information, nomis_offender_id: nomis_offender_id, probation_service: 'Scotland', team: nil)
 
         visit edit_prison_case_information_path('LEI', nomis_offender_id)
@@ -292,7 +286,6 @@ feature 'case information feature' do
          vcr: { cassette_name: :case_information_update_change_country } do
         old_countries = %w[England Wales]
         offenders = [nomis_offender_id, other_nomis_offender_id]
-        signin_user
 
         old_countries.zip(offenders).each do |country, offender|
           # Create
@@ -327,7 +320,6 @@ feature 'case information feature' do
       it 'complains if country not selected when changing to another country',
          vcr: { cassette_name: :case_information_update_location_validation_errors } do
         # Create
-        signin_user
         visit new_prison_case_information_path('LEI', nomis_offender_id)
 
         choose_country('England')
@@ -352,7 +344,6 @@ feature 'case information feature' do
         DeliusImportError.create(nomis_offender_id: nomis_offender_id,
                                  error_type: DeliusImportError::DUPLICATE_NOMIS_ID)
 
-        signin_user
         visit new_prison_case_information_path('LEI', nomis_offender_id)
       end
 
@@ -479,7 +470,6 @@ feature 'case information feature' do
   it "clicking back link after viewing prisoner's case information, returns back the same paginated page",
      :raven_intercept_exception,
      vcr: { cassette_name: :case_information_back_link }, js: true do
-    signin_user
     visit prison_summary_pending_path('LEI', page: 3)
 
     within ".govuk-table tr:first-child td:nth-child(5)" do
@@ -493,7 +483,6 @@ feature 'case information feature' do
 
   it 'returns to previously paginated page after saving',
      vcr: { cassette_name: :case_information_return_to_previously_paginated_page } do
-    signin_user
     visit prison_summary_pending_path('LEI', sort: "last_name desc", page: 3)
 
     within ".govuk-table tr:first-child td:nth-child(5)" do
@@ -509,7 +498,6 @@ feature 'case information feature' do
      vcr: { cassette_name: :case_information_no_update } do
     # When auto-delius is on there should be no update link to modify the case info
     # as it may not exist yet. We run this test with an indeterminate and a determine offender
-    signin_user
 
     # Indeterminate offender
     offender_id = 'G0806GQ'
