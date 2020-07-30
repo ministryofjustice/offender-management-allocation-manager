@@ -53,7 +53,7 @@ RSpec.describe CaseloadController, type: :controller do
       let(:case_allocation) { 'CRC' }
       let(:today_plus_13_weeks) { (Time.zone.today + 13.weeks).to_s }
 
-      pending 'can pull back a CRC offender due for handover' do
+      it 'can pull back a CRC offender due for handover' do
         get :handover_start, params: { prison_id: prison, staff_id: staff_id }
         expect(response).to be_successful
         expect(assigns(:upcoming_handovers).map(&:offender_no)).to match_array([offender.fetch(:offenderNo)])

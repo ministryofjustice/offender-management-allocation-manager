@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class SummaryService
-  PAGE_SIZE = 20 # The number of items to show in the view
   def self.summary(summary_type, prison)
     # We expect to be passed summary_type, which is one of :allocated, :unallocated,
     # :pending, or :new_arrivals.  The other types will return totals, and do not contain
@@ -45,7 +44,6 @@ class SummaryService
           buckets[:unallocated].items << offender
         end
 
-        # can only be approaching handover if we have a tier
         if approaching_handover?(offender)
           buckets[:handovers].items << offender
         end

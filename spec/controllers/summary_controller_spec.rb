@@ -4,15 +4,6 @@ require 'rails_helper'
 
 RSpec.describe SummaryController, type: :controller do
   let(:prison) { build(:prison).code }
-  let(:poms) {
-    [
-      build(:pom,
-            firstName: 'Alice',
-            position: RecommendationService::PRISON_POM,
-            staffId: 1
-      )
-    ]
-  }
 
   before { stub_sso_data(prison, 'alice') }
 
@@ -58,18 +49,10 @@ RSpec.describe SummaryController, type: :controller do
       end
 
       context 'when NPS case' do
-        it 'returns cases that are within the thirty day window' do
+        it 'returns cases that are within the thirty day window, but not those that dont have case information' do
           get :handovers, params: { prison_id: prison }
           expect(response).to be_successful
           expect(assigns(:offenders).map(&:offender_no)).to match_array(["G4234GG"])
-        end
-      end
-
-      context 'when no case information' do
-        it 'doesnt show up' do
-          get :handovers, params: { prison_id: prison }
-          expect(response).to be_successful
-          expect(assigns(:offenders).map(&:offender_no)).to match_array(['G4234GG'])
         end
       end
 
@@ -78,25 +61,11 @@ RSpec.describe SummaryController, type: :controller do
           create(:case_information, case_allocation: 'CRC', nomis_offender_id: 'G1234VV')
         end
 
-        pending 'returns cases that are within the thirty day window' do
+        it 'returns cases that are within the thirty day window' do
           get :handovers, params: { prison_id: prison }
           expect(response).to be_successful
           expect(assigns(:offenders).map(&:offender_no)).to match_array(['G4234GG', "G1234VV"])
         end
-      end
-    end
-
-    context 'when user is a POM' do
-      before do
-        stub_poms(prison, poms)
-        stub_signed_in_pom(prison, 1, 'Alice')
-        stub_request(:get, "#{ApiHelper::T3}/users/").
-          to_return(body: { staffId: 1 }.to_json)
-      end
-
-      it 'is not visible' do
-        get :pending, params: { prison_id: prison }
-        expect(response).to redirect_to('/401')
       end
     end
 
@@ -127,6 +96,30 @@ RSpec.describe SummaryController, type: :controller do
 
         expect(assigns(:offenders).map(&:last_name)).to eq(%w[SMITH Minate-Offender JONES])
       end
+    end
+  end
+
+  context 'when user is a POM' do
+    let(:poms) {
+      [
+        build(:pom,
+              firstName: 'Alice',
+              position: RecommendationService::PRISON_POM,
+              staffId: 1
+        )
+      ]
+    }
+
+    before do
+      stub_poms(prison, poms)
+      stub_signed_in_pom(prison, 1, 'Alice')
+      stub_request(:get, "#{ApiHelper::T3}/users/").
+        to_return(body: { staffId: 1 }.to_json)
+    end
+
+    it 'is not visible' do
+      get :pending, params: { prison_id: prison }
+      expect(response).to redirect_to('/401')
     end
   end
 

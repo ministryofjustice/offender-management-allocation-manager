@@ -8,8 +8,6 @@ module Nomis
              :post_recall_release_date, :earliest_release_date,
              to: :sentence
 
-    delegate :indeterminate_sentence?, to: :@sentence_type
-
     delegate :indeterminate_sentence?, :immigration_case?, to: :@sentence_type
 
     attr_accessor :category_code, :date_of_birth
