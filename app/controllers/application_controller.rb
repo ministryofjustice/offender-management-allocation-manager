@@ -24,7 +24,7 @@ class ApplicationController < ActionController::Base
   end
 
   def service_notifications
-    roles = [current_user_is_spo? ? 'SPO' : '', sso_identity.current_user_is_pom? ? 'POM' : '']
+    roles = [current_user_is_spo? ? 'SPO' : nil, sso_identity.current_user_is_pom? ? 'POM' : nil].compact
     ServiceNotificationsService.notifications(roles)
   end
 
