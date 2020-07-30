@@ -13,6 +13,7 @@
     <%= render '/layouts/header' %>
     <%= render '/layouts/phase_banner' %>
     <%= yield(:switcher) if content_for?(:switcher) %>
+    <%= render 'layouts/service_notification_banner' %>
 
     <div class='govuk-width-container'>
       <main class='govuk-main-wrapper' id='main-content' role='main'>

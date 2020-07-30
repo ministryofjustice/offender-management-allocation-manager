@@ -2,7 +2,7 @@
 
 class ApplicationController < ActionController::Base
   helper_method :current_user
-  helper_method :caseloads, :current_user_is_spo?
+  helper_method :caseloads, :current_user_is_spo?, :service_notifications
 
   before_action :set_paper_trail_whodunnit
 
@@ -21,6 +21,11 @@ class ApplicationController < ActionController::Base
 
   def current_user_is_spo?
     sso_identity.current_user_is_spo?
+  end
+
+  def service_notifications
+    roles = [current_user_is_spo? ? 'SPO' : '', sso_identity.current_user_is_pom? ? 'POM' : '']
+    ServiceNotificationsService.notifications(roles)
   end
 
   def ensure_admin_user
