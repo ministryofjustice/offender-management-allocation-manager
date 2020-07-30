@@ -135,11 +135,11 @@ private
 
   def save_case_info
     new_record = @case_info.new_record?
+    ldu_changed = @case_info.ldu_changed?
 
     @case_info.save!
 
-    if %(England Wales).include?(@case_info.probation_service) &&
-      CaseInformationService.ldu_changed?(@case_info.saved_change_to_team_id)
+    if %(England Wales).include?(@case_info.probation_service) && ldu_changed
       send_email_to_ldu
     end
 

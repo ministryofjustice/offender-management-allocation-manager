@@ -58,6 +58,17 @@ class CaseInformation < ApplicationRecord
     probation_service == 'Wales'
   end
 
+  def ldu_changed?
+    return false unless team_id_changed?
+
+    team_ids = team_id_change.reject(&:nil?)
+    return true unless team_ids.count == 2
+
+    teams = Team.where(id: team_ids)
+    ldu_ids = teams.map(&:local_divisional_unit_id)
+    ldu_ids.uniq.count == 2
+  end
+
 private
 
   def save_scottish_or_ni

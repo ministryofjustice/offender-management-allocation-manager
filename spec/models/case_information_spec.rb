@@ -119,4 +119,70 @@ RSpec.describe CaseInformation, type: :model do
       end
     end
   end
+
+  describe '#ldu_changed?' do
+    context 'when the team has not been changed' do
+      subject { create(:case_information) }
+
+      it 'returns false' do
+        expect(subject.ldu_changed?).to be(false)
+      end
+    end
+
+    context 'when the team has changed, but it belongs to the same LDU as the previous team' do
+      subject { create(:case_information, team: team1) }
+
+      let(:ldu) { create(:local_divisional_unit) }
+      let(:team1) { create(:team, local_divisional_unit: ldu) }
+      let(:team2) { create(:team, local_divisional_unit: ldu) }
+
+      before { subject.team = team2 }
+
+      it 'returns false' do
+        expect(subject.ldu_changed?).to be(false)
+      end
+    end
+
+    context 'when the team has changed and it belongs to a different LDU than the previous team' do
+      subject { create(:case_information) }
+
+      let(:new_team_and_ldu) { create(:team) }
+
+      before { subject.team = new_team_and_ldu }
+
+      it 'returns true' do
+        expect(subject.ldu_changed?).to be(true)
+      end
+
+      context 'when the changes have been saved to the database' do
+        before { subject.save }
+
+        it 'returns false' do
+          expect(subject.ldu_changed?).to be(false)
+        end
+      end
+    end
+
+    context 'when the team has been set, where it was previously nil' do
+      subject { create(:case_information, :no_team) }
+
+      let(:team) { create(:team) }
+
+      before { subject.team = team }
+
+      it 'returns true' do
+        expect(subject.ldu_changed?).to be(true)
+      end
+    end
+
+    context 'when the team has been set to nil, where it previously belonged to an LDU' do
+      subject { create(:case_information) }
+
+      before { subject.team = nil }
+
+      it 'returns true' do
+        expect(subject.ldu_changed?).to be(true)
+      end
+    end
+  end
 end
