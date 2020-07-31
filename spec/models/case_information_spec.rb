@@ -51,39 +51,28 @@ RSpec.describe CaseInformation, type: :model do
     it { is_expected.to be_valid }
   end
 
-  context 'with missing tier' do
-    subject {
-      build(:case_information, tier: nil)
-    }
-
-    it 'gives the correct error message' do
-      expect(subject).not_to be_valid
-      expect(subject.errors.messages).to eq(tier: ["Select the prisoner's tier"])
+  describe '#manual_entry' do
+    context 'when true' do
+      it 'will be valid' do
+        expect(build(:case_information, manual_entry: true)).to be_valid
+      end
     end
-  end
 
-  context 'with manual flag' do
-    it 'will be valid' do
-      expect(build(:case_information, manual_entry: true)).to be_valid
+    context 'when false' do
+      it 'will be valid' do
+        expect(build(:case_information, manual_entry: false)).to be_valid
+      end
     end
-  end
 
-  context 'without manual flag' do
-    it 'will be valid' do
-      expect(build(:case_information, manual_entry: false)).to be_valid
-    end
-  end
-
-  context 'with null manual flag' do
-    it 'wont be valid' do
-      expect(build(:case_information, manual_entry: nil)).not_to be_valid
+    context 'when nil' do
+      it 'will not be valid' do
+        expect(build(:case_information, manual_entry: nil)).not_to be_valid
+      end
     end
   end
 
   describe '#probation_service' do
-    subject {
-      build(:case_information, probation_service: nil)
-    }
+    subject { build(:case_information, probation_service: nil) }
 
     it 'gives the correct validation error message' do
       expect(subject).not_to be_valid
@@ -98,23 +87,93 @@ RSpec.describe CaseInformation, type: :model do
     end
   end
 
-  context 'with team' do
-    context 'without manual flag' do
-      it 'is not valid without team' do
-        expect(build(:case_information, team: nil, manual_entry: false)).not_to be_valid
+  ['Scotland', 'Northern Ireland'].each do |country|
+    context "when probation_service is #{country}" do
+      subject {
+        build(:case_information, probation_service: country,
+              tier: 'A', case_allocation: 'NPS', team: build(:team)
+        )
+      }
+
+      before do
+        subject.valid?
+      end
+
+      it 'sets tier to N/A' do
+        expect(subject.tier).to eq('N/A')
+      end
+
+      it 'sets case_allocation to N/A' do
+        expect(subject.case_allocation).to eq('N/A')
+      end
+
+      it 'sets team to nil' do
+        expect(subject.team).to be_nil
+      end
+
+      it 'is valid' do
+        expect(subject.valid?).to be(true)
       end
     end
+  end
 
-    context 'with manual flag' do
-      context 'with Welsh or England offender' do
-        it 'is not valid without team' do
-          expect(build(:case_information, team: nil, probation_service: 'Wales')).not_to be_valid
+  %w[England Wales].each do |country|
+    context "when probation_service is #{country}" do
+      subject {
+        build(:case_information, probation_service: country,
+              tier: 'A', case_allocation: 'NPS', team: build(:team)
+        )
+      }
+
+      describe '#tier' do
+        it 'gives the correct error message' do
+          subject.tier = nil
+          expect(subject).not_to be_valid
+          expect(subject.errors.messages).to eq(tier: ["Select the prisoner's tier"])
+        end
+
+        it 'allows A, B, C, D' do
+          %w[A B C D].each do |value|
+            subject.tier = value
+            expect(subject).to be_valid
+          end
+        end
+
+        it 'does not allow other values' do
+          [nil, 'E', 1, '0'].each do |value|
+            subject.tier = value
+            expect(subject).not_to be_valid
+          end
         end
       end
 
-      context 'with Scotland or Northern Ireland offender' do
-        it 'is valid without team' do
-          expect(build(:case_information, team: nil, probation_service: 'Northern Ireland')).to be_valid
+      describe '#case_allocation' do
+        it 'gives the correct error message' do
+          subject.case_allocation = nil
+          expect(subject).not_to be_valid
+          expect(subject.errors.messages).to eq(case_allocation: ['Select the service provider for this case'])
+        end
+
+        it 'allows NPS, CRC' do
+          %w[NPS CRC].each do |value|
+            subject.case_allocation = value
+            expect(subject).to be_valid
+          end
+        end
+
+        it 'does not allow other values' do
+          [nil, 'N/A', true].each do |value|
+            subject.case_allocation = value
+            expect(subject).not_to be_valid
+          end
+        end
+      end
+
+      describe '#team' do
+        it 'cannot be blank' do
+          subject.team = nil
+          expect(subject).not_to be_valid
+          expect(subject.errors.messages).to eq(team: ["You must select the prisoner's team"])
         end
       end
     end
@@ -154,7 +213,7 @@ RSpec.describe CaseInformation, type: :model do
         expect(subject.ldu_changed?).to be(true)
       end
 
-      context 'when the changes have been saved to the database' do
+      describe 'once the changes have been saved to the database' do
         before { subject.save }
 
         it 'returns false' do

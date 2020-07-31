@@ -13,7 +13,7 @@ class CaseInformation < ApplicationRecord
 
   scope :nps, -> { where(case_allocation: 'NPS') }
 
-  before_validation :save_scottish_or_ni, if: -> { manual_entry && (probation_service == 'Scotland' || probation_service == 'Northern Ireland') }
+  before_validation :save_scottish_or_ni, unless: :requires_probation_data?
 
   def local_divisional_unit
     team.try(:local_divisional_unit)
@@ -27,22 +27,26 @@ class CaseInformation < ApplicationRecord
   validates :manual_entry, inclusion: { in: [true, false], allow_nil: false }
   validates :nomis_offender_id, presence: true, uniqueness: true
 
-  validates :team,
-            presence: { message: "You must select the prisoner's team" },
-            unless:
-            proc { |c|
-              c.manual_entry &&
-              (c.probation_service == 'Scotland' ||
-              c.probation_service == 'Northern Ireland')
-            }
+  # English and Welsh cases
+  with_options if: :requires_probation_data?, allow_nil: false do
+    validates :tier, inclusion: {
+      in: %w[A B C D],
+      message: "Select the prisoner's tier"
+    }
+    validates :case_allocation, inclusion: {
+      in: %w[NPS CRC],
+      message: 'Select the service provider for this case'
+    }
+    validates :team, presence: {
+      message: "You must select the prisoner's team"
+    }
+  end
 
-  validates :tier, inclusion: { in: %w[A B C D N/A], message: "Select the prisoner's tier" }
-
-  validates :case_allocation, inclusion: {
-    in: %w[NPS CRC N/A],
-    allow_nil: false,
-    message: 'Select the service provider for this case'
-  }
+  # Scottish and Northern Irish cases
+  with_options unless: :requires_probation_data?, allow_nil: false do
+    validates :tier, inclusion: { in: %w[N/A] }
+    validates :case_allocation, inclusion: { in: %w[N/A] }
+  end
 
   # nil means MAPPA level is completely unknown.
   # 0 means MAPPA level is known to be not relevant for offender
@@ -67,6 +71,10 @@ class CaseInformation < ApplicationRecord
     teams = Team.where(id: team_ids)
     ldu_ids = teams.map(&:local_divisional_unit_id)
     ldu_ids.uniq.count == 2
+  end
+
+  def requires_probation_data?
+    %w[England Wales].include?(probation_service)
   end
 
 private

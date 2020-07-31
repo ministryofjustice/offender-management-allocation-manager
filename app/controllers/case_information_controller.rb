@@ -43,7 +43,7 @@ class CaseInformationController < PrisonsApplicationController
 
     @case_info.probation_service = @probation_service_form.probation_service
 
-    if %w(England Wales).include?(@case_info.probation_service)
+    if @case_info.requires_probation_data?
       # England/Wales
       # Render page 2 of the edit form to collect more info
       render 'edit_probation_data'
@@ -139,7 +139,7 @@ private
 
     @case_info.save!
 
-    if %(England Wales).include?(@case_info.probation_service) && ldu_changed
+    if @case_info.requires_probation_data? && ldu_changed
       send_email_to_ldu
     end
 
