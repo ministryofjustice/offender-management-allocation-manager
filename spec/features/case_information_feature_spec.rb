@@ -47,7 +47,7 @@ feature 'case information feature' do
       expect(page).to have_current_path edit_path
     end
 
-    context "when the offender is Scottish or Northern Irish" do
+    context "when the offender is Scottish or Northern Irish", js: true do
       context 'when the form has errors' do
         let(:offender_id) { 'G1821VA' }
         let(:error_msg) { "Select yes if the prisoner's last known address was in Northern Ireland, Scotland or Wales" }
@@ -240,10 +240,28 @@ feature 'case information feature' do
         end
       end
     end
+
+    describe 'the page header' do
+      before do
+        visit edit_prison_case_information_path('LEI', nomis_offender_id)
+      end
+
+      it 'is "Add missing information" on page 1',
+         vcr: { cassette_name: :case_information_create_page_1_header } do
+        expect_page_heading 'Add missing information'
+      end
+
+      it 'is "Add missing information" on page 2',
+         vcr: { cassette_name: :case_information_create_page_2_header } do
+        choose_country 'England'
+        click_button 'Continue'
+        expect_page_heading 'Add missing information'
+      end
+    end
   end
 
-  context 'when updating an offenders case information', js: true do
-    context 'when offender is Scottish or Northern Irish' do
+  context 'when updating an offenders case information' do
+    context 'when offender is Scottish or Northern Irish', js: true do
       it 'can be changed to England or Wales',
          vcr: { cassette_name: :case_information_update_when_scottish_or_ni } do
         old_countries = ['Northern Ireland', 'Scotland']
@@ -289,7 +307,7 @@ feature 'case information feature' do
       end
     end
 
-    context "when the prisoner is from England or Wales" do
+    context "when the prisoner is from England or Wales", js: true do
       it 'can be changed to Scotland, Wales or NI',
          # TODO: This test name is misleading – it doesn't test NI, but I think it probably should...
          vcr: { cassette_name: :case_information_update_change_country } do
@@ -344,7 +362,7 @@ feature 'case information feature' do
       end
     end
 
-    context "when submitting form enqueue emails" do
+    context "when submitting form enqueue emails", js: true do
       before do
         allow(Nomis::Elite2::UserApi).to receive(:user_details).with("MOIC_POM").and_return(user_details)
         DeliusImportError.create(nomis_offender_id: nomis_offender_id,
@@ -469,33 +487,56 @@ feature 'case information feature' do
         expectations(probation_service: 'England', tier: 'A', team: 'NPS - England 3', case_allocation: 'NPS')
       end
     end
+
+    describe 'the page header' do
+      before do
+        create(:case_information, nomis_offender_id: nomis_offender_id)
+        visit edit_prison_case_information_path('LEI', nomis_offender_id)
+      end
+
+      it 'is "Edit case information" on page 1',
+         vcr: { cassette_name: :case_information_update_page_1_header } do
+        expect_page_heading 'Edit case information'
+      end
+
+      it 'is "Edit case information" on page 2',
+         vcr: { cassette_name: :case_information_update_page_2_header } do
+        choose_country 'England'
+        click_button 'Continue'
+        expect_page_heading 'Edit case information'
+      end
+    end
   end
 
-  it "clicking back link after viewing prisoner's case information, returns back the same paginated page",
+  it "clicking back link after browsing to edit a prisoner's case information, returns back the same paginated page",
      :raven_intercept_exception,
      vcr: { cassette_name: :case_information_back_link }, js: true do
-    visit prison_summary_pending_path('LEI', page: 3)
+    start_page = prison_summary_pending_path('LEI', page: 3)
+
+    visit start_page
 
     within ".govuk-table tr:first-child td:nth-child(5)" do
       click_link 'Edit'
     end
-    expect(page).to have_selector('h1', text: 'Case information')
-
+    expect(page).to have_content("Was the prisoner's last known address in Northern Ireland, Scotland or Wales?")
     click_link 'Back'
-    expect(page).to have_selector('h1', text: 'Add missing information')
+
+    expect(page).to have_current_path start_page
   end
 
   it 'returns to previously paginated page after saving',
      vcr: { cassette_name: :case_information_return_to_previously_paginated_page } do
-    visit prison_summary_pending_path('LEI', sort: "last_name desc", page: 3)
+    start_page = prison_summary_pending_path('LEI', sort: "last_name desc", page: 3)
+    visit start_page
 
     within ".govuk-table tr:first-child td:nth-child(5)" do
       click_link 'Edit'
     end
-    expect(page).to have_selector('h1', text: 'Case information')
+    expect(page).to have_content("Was the prisoner's last known address in Northern Ireland, Scotland or Wales?")
     choose_country('Scotland')
     click_button 'Continue'
-    expect(current_url).to have_content("/prisons/LEI/summary/pending?page=3&sort=last_name+desc")
+
+    expect(page).to have_current_path start_page
   end
 
   it 'does not show update link on view only case info',
@@ -511,6 +552,12 @@ feature 'case information feature' do
     # Determinate offender
     visit prison_case_information_path('LEI', nomis_offender_id)
     expect(page).not_to have_css('#edit-prd-link')
+  end
+
+  def expect_page_heading(text)
+    within "h1" do
+      expect(page).to have_content(text)
+    end
   end
 
   def expectations(probation_service:, tier:, team:, case_allocation:)

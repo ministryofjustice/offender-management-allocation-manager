@@ -4,7 +4,13 @@
   <%= render :partial => "/shared/validation_errors", :locals => { :errors => @probation_service_form.errors } %>
 <% end %>
 
-<h1 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-4">Case information</h1>
+<h1 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-4">
+  <% if @case_info.new_record? %>
+    Add missing information
+  <% else %>
+    Edit case information
+  <% end %>
+</h1>
 <h2 class="govuk-heading-m"><%= @prisoner.full_name %> - <%= @prisoner.offender_no %></h2>
 <p class="govuk-!-margin-bottom-8">You can find this information in NDelius.</p>
 
@@ -17,7 +23,7 @@
   <div class="govuk-form-group">
     <fieldset class="govuk-fieldset">
       <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-        <h1 class="govuk-fieldset__heading">Was the prisoner's last known address in Northern Ireland, Scotland or Wales?</h1>
+        <h2 class="govuk-fieldset__heading">Was the prisoner's last known address in Northern Ireland, Scotland or Wales?</h2>
       </legend>
 
       <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
