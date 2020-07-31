@@ -10,8 +10,8 @@ describe RecommendationService do
       build(:offender_summary,  sentence: Nomis::SentenceDetail.new(
         sentence_start_date: Time.zone.today,
         automatic_release_date: Time.zone.today + 15.months)).tap { |o|
-      o.load_case_information(build(:case_information, tier: 'A'))
-    }
+        o.load_case_information(build(:case_information, tier: 'A'))
+      }
     }
 
     it "can determine the best type of POM for Tier A" do
@@ -24,28 +24,21 @@ describe RecommendationService do
       build(:offender_summary,  sentence: Nomis::SentenceDetail.new(
         sentence_start_date: Time.zone.today,
         automatic_release_date: Time.zone.today + 10.months)).tap { |o|
-      o.load_case_information(build(:case_information, tier: 'D'))
-    }
+        o.load_case_information(build(:case_information, tier: 'D'))
+      }
     }
 
-  let(:tierA_and_immigration_case) {
-    build(:offender_summary,
-          inprisonment_status: 'DET', sentence: Nomis::SentenceDetail.new).tap { |o|
-      o.load_case_information(build(:case_information, tier: 'A'))
-    }
-  }
-
-  it "can determine the best type of POM for Tier A" do
-    expect(described_class.recommended_pom_type(tierA)).to eq(described_class::PROBATION_POM)
-  end
-
-  it "can determine the best type of POM for Tier D" do
-    expect(described_class.recommended_pom_type(tierD)).to eq(described_class::PRISON_POM)
+    it "can determine the best type of POM for Tier D" do
+      expect(described_class.recommended_pom_type(tierD)).to eq(described_class::PRISON_POM)
+    end
   end
 
   context 'when tierA and immigration_case' do
     let(:offender) {
-      build(:offender_summary, tier: 'A', inprisonment_status: 'DET', sentence: Nomis::SentenceDetail.new)
+      build(:offender_summary,
+            inprisonment_status: 'DET', sentence: Nomis::SentenceDetail.new).tap { |o|
+        o.load_case_information(build(:case_information, tier: 'A'))
+      }
     }
 
     it "can determine the best type of POM for an immigration case" do
