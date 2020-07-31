@@ -29,7 +29,7 @@ describe RecommendationService do
     }
 
     it "can determine the best type of POM for Tier D" do
-      expect(described_class.recommended_pom_type(tierD)).to eq(described_class::PRISON_POM)
+      expect(described_class.recommended_pom_type(offender)).to eq(described_class::PRISON_POM)
     end
   end
 

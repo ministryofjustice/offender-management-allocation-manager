@@ -12,7 +12,7 @@ FactoryBot.define do
       # This and case_information should produce different values to avoid clashes
       "T#{number}O#{letter}"
     end
-    sequence(:bookingId) { |x| x + 700_000 }
+    sequence(:latestBookingId) { |x| x + 700_000 }
     convictedStatus { 'Convicted' }
     dateOfBirth { Date.new(1990, 12, 6).to_s }
     firstName { Faker::Name.first_name }

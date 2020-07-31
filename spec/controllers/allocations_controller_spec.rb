@@ -13,7 +13,8 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
   }
   let(:pom_without_emails) { poms.first }
   let(:prison) { build(:prison).code }
-  let(:offender_no) { build(:offender).offender_no }
+  let(:offender) { build(:nomis_offender) }
+  let(:offender_no) { offender.fetch(:offenderNo) }
 
   before do
     stub_poms(prison, poms)
@@ -35,7 +36,7 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
   context 'when user is an SPO' do
     before do
       stub_sso_data(prison)
-      stub_offender(build(:nomis_offender, offenderNo: offender_no))
+      stub_offender(offender)
     end
 
     describe '#show' do
@@ -211,8 +212,6 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
     end
 
     describe '#new' do
-      let(:offender) { build(:nomis_offender, offenderNo: offender_no) }
-
       before do
         stub_offender(offender)
         stub_offenders_for_prison(prison, [offender])
