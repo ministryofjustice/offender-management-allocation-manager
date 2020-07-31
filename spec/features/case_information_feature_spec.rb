@@ -86,7 +86,6 @@ feature 'case information feature' do
             click_link 'Edit'
           end
 
-          visit new_prison_case_information_path('LEI', offenders[index])
           choose_country(country)
 
           expect { click_button 'Continue' }.to change(enqueued_jobs, :size).by(0)
@@ -97,6 +96,25 @@ feature 'case information feature' do
         end
 
         group_expectations(probation_services: ['Northern Ireland', 'Scotland'], tiers: %w[N/A N/A], teams: [nil, nil], case_allocs: %w[N/A N/A])
+      end
+
+      context 'when form saved' do
+        before do
+          visit prison_summary_pending_path('LEI')
+
+          within "#edit_#{nomis_offender_id}" do
+            click_link 'Edit'
+          end
+
+          choose_country('Scotland')
+        end
+
+        it 'does not send emails',
+           vcr: { cassette_name: :case_information_scotland_and_ni_emails } do
+          expect {
+            click_button 'Continue'
+          }.not_to change(enqueued_jobs, :size)
+        end
       end
     end
 
@@ -357,7 +375,7 @@ feature 'case information feature' do
         expectations(probation_service: 'Wales', tier: 'C', team: 'NPS - Wales', case_allocation: 'NPS')
       end
 
-      it 'does not send email if last_known_address changed to Scotland or Northern Ireland',
+      it 'does not send email if probation_service changed to Scotland or Northern Ireland',
          vcr: { cassette_name: :case_information_update_email_not_triggered_when_probation_scotland_or_ni } do
         create(:case_information,
                nomis_offender_id: nomis_offender_id,
@@ -398,7 +416,7 @@ feature 'case information feature' do
         expectations(probation_service: 'England', tier: 'B', team: 'NPS - England 3', case_allocation: 'NPS')
       end
 
-      it 'will send an email when last_known_address changed to England or Wales from Scotland or Northern Ireland',
+      it 'will send an email when probation_service changed to England or Wales from Scotland or Northern Ireland',
          vcr: { cassette_name: :case_information_update_email_sent_when_probation_changed_from_scot_or_ni } do
         create(:case_information,
                nomis_offender_id: nomis_offender_id,
