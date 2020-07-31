@@ -15,40 +15,40 @@
  *= require_self
  */
 
-@import "autocomplete";
-@import "tables";
-@import "pagination";
-@import "case_info";
+@import "accessible-autocomplete/src/autocomplete";
 
 a:visited {
-    color: #005ea5;
+  color: #005ea5;
 }
- .no-bottom-margin {
-     margin-bottom: 0;
- }
 
- .dashboard-row {
-     margin-top: 20px;
+.no-bottom-margin {
+  margin-bottom: 0;
+}
 
-     .wrapper {
-        min-height: 160px;
-        background-color: #f9f9f9;
-    }
-    .govuk-heading-s {
-        background-color: #eaeaea;
-        padding: 8px;
-        margin-bottom: 0;
-    }
-    .govuk-body {
-        padding: 8px;
-    }
- }
+.dashboard-row {
+  margin-top: 20px;
 
- .cancel-button {
-    line-height: 38px;
-    margin-left: 20px;
- }
+  .wrapper {
+    min-height: 160px;
+    background-color: #f9f9f9;
+  }
 
- .govuk-header__navigation-item a {
-     color: white !important;
- }
+  .govuk-heading-s {
+    background-color: #eaeaea;
+    padding: 8px;
+    margin-bottom: 0;
+  }
+
+  .govuk-body {
+    padding: 8px;
+  }
+}
+
+.cancel-button {
+  line-height: 38px;
+  margin-left: 20px;
+}
+
+.govuk-header__navigation-item a {
+  color: white !important;
+}
