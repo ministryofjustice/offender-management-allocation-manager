@@ -17,7 +17,7 @@ class CaseInformationController < PrisonsApplicationController
     )
 
     # Render page 1 of the edit form, where users will set the probation service
-    render 'edit_probation_service'
+    render_edit_probation_service
   end
 
   def update
@@ -38,7 +38,7 @@ class CaseInformationController < PrisonsApplicationController
 
     unless @probation_service_form.valid?
       # Show validation errors to user
-      return render 'edit_probation_service'
+      return render_edit_probation_service
     end
 
     @case_info.probation_service = @probation_service_form.probation_service
@@ -46,7 +46,7 @@ class CaseInformationController < PrisonsApplicationController
     if @case_info.requires_probation_data?
       # England/Wales
       # Render page 2 of the edit form to collect more info
-      render 'edit_probation_data'
+      render_edit_probation_data
     else
       # Scotland/Northern Ireland
       # We don't need any more info - save and redirect
@@ -67,7 +67,7 @@ class CaseInformationController < PrisonsApplicationController
       save_case_info
     else
       # Show validation errors to user
-      render 'edit_probation_data'
+      render_edit_probation_data
     end
   end
 
@@ -171,6 +171,18 @@ private
     flash[:notice] = helpers.flash_notice_text(error_type: delius_error&.error_type, prisoner: prisoner,
                                                email_count: emails.compact.count)
     flash[:alert] = helpers.flash_alert_text(spo: spo, ldu: ldu, team_name: @case_info.team.name)
+  end
+
+  def render_edit_probation_service
+    @form = 'probation_service'
+    @errors = @probation_service_form.errors
+    render 'edit'
+  end
+
+  def render_edit_probation_data
+    @form = 'probation_data'
+    @errors = @case_info.errors
+    render 'edit'
   end
 
   def send_notice(email, spo_email, notice)
