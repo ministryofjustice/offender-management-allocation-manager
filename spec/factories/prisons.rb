@@ -4,9 +4,9 @@ FactoryBot.define do
   end
 
   factory :prison, class: 'Elite2Prison' do
-    # rotate around every prison - can't use arbitrary codes as we sometimes lookup names in PrisonService
+    # rotate around every closed prison - open prisons have different rules
     sequence(:code) do |c|
-      codes = PrisonService.prison_codes
+      codes = PrisonService.prison_codes.reject { |x| PrisonService::OPEN_PRISON_CODES.include?(x) }
       codes[c % codes.size]
     end
 
