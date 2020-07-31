@@ -4,91 +4,109 @@
   <%= render :partial => "/shared/validation_errors", :locals => { :errors => @case_info.errors } %>
 <% end %>
 
-<h1 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-4">
-  <% if @case_info.new_record? %>
-    Add missing information
-  <% else %>
-    Edit case information
-  <% end %>
-</h1>
-<h2 class="govuk-!-margin-bottom-0 govuk-heading-m"><%= @prisoner.full_name %> (<%= format_date(@prisoner.date_of_birth) %>)</h2>
-<h2 class="govuk-heading-m"><%= @prisoner.offender_no %></h2>
-<p class="govuk-!-margin-bottom-8">You can find this information in NDelius.</p>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
 
-<%= form_for(@case_info, url: prison_case_information_path(@prison.code, @prisoner.offender_no), method: :put) do |form| %>
-  <%= form.hidden_field(:nomis_offender_id, value: @prisoner.offender_no) %>
-  <%= form.hidden_field(:probation_service, value: @case_info.probation_service) %>
-  <%= hidden_field_tag("sort", params[:sort])%>
-  <%= hidden_field_tag("page", params[:page]) %>
-  <%= hidden_field_tag("form", "probation_data") %>
+    <h1 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-4">
+      <% if @case_info.new_record? %>
+        Add missing information
+      <% else %>
+        Edit case information
+      <% end %>
+    </h1>
+    <p class="govuk-!-margin-bottom-8">You can find this information in NDelius.</p>
 
-  <fieldset class="govuk-fieldset">
-    <div class="govuk-form-group">
-      <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-        <h2 class="govuk-fieldset__heading">Select the service provider</h2>
-      </legend>
+    <%= form_for(@case_info, url: prison_case_information_path(@prison.code, @prisoner.offender_no), method: :put) do |form| %>
+      <%= form.hidden_field(:nomis_offender_id, value: @prisoner.offender_no) %>
+      <%= form.hidden_field(:probation_service, value: @case_info.probation_service) %>
+      <%= hidden_field_tag("sort", params[:sort])%>
+      <%= hidden_field_tag("page", params[:page]) %>
+      <%= hidden_field_tag("form", "probation_data") %>
 
-      <div class="govuk-radios" data-module="govuk-radios">
-        <div class="govuk-radios__item">
-          <%= form.radio_button(:case_allocation, 'NPS', class: "govuk-radios__input") %>
-          <%= form.label :case_allocation, 'National Probation Service (NPS)', value: 'NPS', class: "govuk-label govuk-radios__label" %>
+      <fieldset class="govuk-fieldset">
+        <div class="govuk-form-group">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+            <h2 class="govuk-fieldset__heading">Select the service provider</h2>
+          </legend>
+
+          <div class="govuk-radios" data-module="govuk-radios">
+            <div class="govuk-radios__item">
+              <%= form.radio_button(:case_allocation, 'NPS', class: "govuk-radios__input") %>
+              <%= form.label :case_allocation, 'National Probation Service (NPS)', value: 'NPS', class: "govuk-label govuk-radios__label" %>
+            </div>
+            <div class="govuk-radios__item">
+              <%= form.radio_button(:case_allocation, 'CRC', class: "govuk-radios__input") %>
+              <%= form.label :case_allocation, 'Community Rehabilitation Company (CRC)', value: 'CRC', class: "govuk-label govuk-radios__label" %>
+            </div>
+          </div>
         </div>
-        <div class="govuk-radios__item">
-          <%= form.radio_button(:case_allocation, 'CRC', class: "govuk-radios__input") %>
-          <%= form.label :case_allocation, 'Community Rehabilitation Company (CRC)', value: 'CRC', class: "govuk-label govuk-radios__label" %>
-        </div>
-      </div>
-    </div>
 
-    <div class="govuk-form-group">
-      <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-        <h2 class="govuk-fieldset__heading">Choose the prisoner's tier</h2>
-      </legend>
+        <div class="govuk-form-group">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+            <h2 class="govuk-fieldset__heading">Choose the prisoner's tier</h2>
+          </legend>
 
-      <div class="govuk-radios" data-module="govuk-radios">
-        <div class="govuk-radios__item">
-          <%= form.radio_button(:tier, 'A', class: "govuk-radios__input") %>
-          <%= form.label :tier, 'A', value: 'A', class: "govuk-label govuk-radios__label" %>
+          <div class="govuk-radios" data-module="govuk-radios">
+            <div class="govuk-radios__item">
+              <%= form.radio_button(:tier, 'A', class: "govuk-radios__input") %>
+              <%= form.label :tier, 'A', value: 'A', class: "govuk-label govuk-radios__label" %>
+            </div>
+            <div class="govuk-radios__item">
+              <%= form.radio_button(:tier, 'B', class: "govuk-radios__input") %>
+              <%= form.label :tier, 'B', value: 'B', class: "govuk-label govuk-radios__label" %>
+            </div>
+            <div class="govuk-radios__item">
+              <%= form.radio_button(:tier, 'C', class: "govuk-radios__input") %>
+              <%= form.label :tier, 'C', value: 'C', class: "govuk-label govuk-radios__label" %>
+            </div>
+            <div class="govuk-radios__item">
+              <%= form.radio_button(:tier, 'D', class: "govuk-radios__input") %>
+              <%= form.label :tier, 'D', value: 'D', class: "govuk-label govuk-radios__label" %>
+            </div>
+          </div>
         </div>
-        <div class="govuk-radios__item">
-          <%= form.radio_button(:tier, 'B', class: "govuk-radios__input") %>
-          <%= form.label :tier, 'B', value: 'B', class: "govuk-label govuk-radios__label" %>
-        </div>
-        <div class="govuk-radios__item">
-          <%= form.radio_button(:tier, 'C', class: "govuk-radios__input") %>
-          <%= form.label :tier, 'C', value: 'C', class: "govuk-label govuk-radios__label" %>
-        </div>
-        <div class="govuk-radios__item">
-          <%= form.radio_button(:tier, 'D', class: "govuk-radios__input") %>
-          <%= form.label :tier, 'D', value: 'D', class: "govuk-label govuk-radios__label" %>
-        </div>
-      </div>
-    </div>
 
-    <div class="govuk-form-group">
-      <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-        <h2 class="govuk-fieldset__heading">Select the prisoner's Team</h2>
-      </legend>
-      <span class="govuk-hint">Enter the full name of the Team, for example 'NPS Croydon'</span>
+        <div class="govuk-form-group">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+            <h2 class="govuk-fieldset__heading">Select the prisoner's Team</h2>
+          </legend>
+          <span class="govuk-hint">Enter the full name of the Team, for example 'NPS Croydon'</span>
 
-      <%= form.select(:team_id,
-                      Team.with_ldu.map { |team| [team.name, team.id] },
-                      { include_blank: true },
-                      { id:"team_autocomplete", class: "govuk-input--width-30" } ) %>
-    </div>
+          <%= form.select(:team_id,
+                          Team.with_ldu.map { |team| [team.name, team.id] },
+                          { include_blank: true },
+                          { id:"team_autocomplete", class: "govuk-input--width-30" } ) %>
+        </div>
 
-    <details class="govuk-details" data-module="govuk-details">
-      <summary class="govuk-details__summary">
-        <span class="govuk-details__summary-text">
-          If there's no Team on nDelius
-        </span>
-      </summary>
-      <div class="govuk-details__text">
-        This may be because the prisoner was sentenced outside the UK bit is returning to serve their sentence.
-        See <a href="https://moic.service.justice.gov.uk/repatriated" class="govuk-link">prisoners
-        returning to the UK</a> for more information.
-      </div>
-    </details>
-  </fieldset>
-  <%= form.submit "Continue", role: "button", draggable: "false", class: "govuk-button" %>
-<% end %>
+        <details class="govuk-details" data-module="govuk-details">
+          <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+              If there's no Team on nDelius
+            </span>
+          </summary>
+          <div class="govuk-details__text">
+            This may be because the prisoner was sentenced outside the UK but is returning to serve their sentence.
+            See <a href="https://moic.service.justice.gov.uk/repatriated" class="govuk-link">prisoners
+            returning to the UK</a> for more information.
+          </div>
+        </details>
+      </fieldset>
+      <%= form.submit "Continue", role: "button", draggable: "false", class: "govuk-button" %>
+    <% end %>
+
+  </div>
+  <div class="govuk-grid-column-one-third">
+    <aside class="subsection govuk-!-margin-top-4 govuk-body" role="complementary">
+      <h2 class="govuk-heading-m">
+        <%= @prisoner.full_name %>
+      </h2>
+
+      <dl class="vertical-definition-list">
+        <dt>Date of birth</dt>
+        <dd><%= format_date(@prisoner.date_of_birth) %></dd>
+        <dt>Prisoner number</dt>
+        <dd><%= @prisoner.offender_no %></dd>
+      </dl>
+    </aside>
+  </div>
+</div>

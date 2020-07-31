@@ -1,0 +1,15 @@
+.vertical-definition-list {
+  > dt,
+  > dd {
+    margin: 0;
+    padding: 0;
+  }
+
+  > dt {
+    font-weight: bold;
+  }
+
+  > dd {
+    margin-bottom: 10px;
+  }
+}
