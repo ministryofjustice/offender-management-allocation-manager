@@ -1,16 +1,16 @@
 document.addEventListener("turbolinks:load", function() {
-    let buttons = document.getElementsByClassName('close-service-notification');
+    var buttons = document.getElementsByClassName('close-service-notification');
 
-    for (let item of buttons) {
-        if(localStorage.getItem(item.id)) {
-            cancelThisNotification(item);
+    for (var i = 0; i < buttons.length; i++) {
+        if (localStorage.getItem(buttons[i].id)) {
+            cancelThisNotification(buttons[i]);
         }
     }
 });
 
 function cancelThisNotification(element){
-    let id = element.id;
-    let parent = element.parentElement;
+    var id = element.id;
+    var parent = element.parentElement;
 
     parent.style.display = 'none';
 
