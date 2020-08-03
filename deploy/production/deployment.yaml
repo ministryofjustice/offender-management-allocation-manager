@@ -45,10 +45,10 @@ spec:
           resources:
             limits:
               memory: "1500Mi"
-              cpu: "150m"
+              cpu: "300m"
             requests:
               memory: "500Mi"
-              cpu: "100m"
+              cpu: "150m"
           envFrom:
             - configMapRef:
                 name: shared-environment
