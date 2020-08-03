@@ -41,7 +41,7 @@ module Nomis
             }
           }
           # return a hash of offender_no => [Nomis::Movement]
-          movements.map { |m| [m.first.offender_no, m] }.to_h
+          movements.index_by { |m| m.first.offender_no }
         end
       end
     end

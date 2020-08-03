@@ -106,7 +106,7 @@ private
     begin
       yield record
     rescue StandardError => e
-      Raven.extra_context [:team_code, :team].map { |field| [field, record.fetch(field)] }.to_h
+      Raven.extra_context([:team_code, :team].index_with { |field| record.fetch(field) })
       Raven::capture_exception(e)
     end
   end

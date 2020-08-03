@@ -45,6 +45,6 @@ private
   def list_to_lookup(delius_records)
     return {} if delius_records.blank?
 
-    Hash[delius_records.collect { |record| [record[:noms_no], record] }]
+    delius_records.index_by { |record| record[:noms_no] }
   end
 end

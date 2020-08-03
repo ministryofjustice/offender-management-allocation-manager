@@ -6,7 +6,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
   # any date less than 3 months in the past
   let(:valid_date) { Time.zone.today - 2.months }
   let(:s1_boolean_param_names) { [:convicted_under_terrorisom_act_2000, :high_profile, :serious_crime_prevention_order, :mappa_level_3, :cppc_case] }
-  let(:s1_boolean_params) { s1_boolean_param_names.map { |p| [p, 'false'] }.to_h }
+  let(:s1_boolean_params) { s1_boolean_param_names.index_with { 'false' } }
 
   let(:prison) { build(:prison).code }
   let(:first_pom) { build(:pom) }
@@ -95,7 +95,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
          :other_reason]
       }
 
-      let(:s2_boolean_params) { s2_boolean_param_names.map { |p| [p, 'false'] }.to_h }
+      let(:s2_boolean_params) { s2_boolean_param_names.index_with { |_p| 'false' }.to_h }
 
       it 'is ineligible if <24 months is false but extremism_separation is true' do
         post :create, params: {

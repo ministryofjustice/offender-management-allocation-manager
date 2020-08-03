@@ -25,7 +25,7 @@ class Prison
   end
 
   def allocations_for(staff_id)
-    offender_hash = offenders.map { |o| [o.offender_no, o] }.to_h
+    offender_hash = offenders.index_by(&:offender_no)
     allocations = Allocation.
       where(nomis_offender_id: offender_hash.keys).
       active_pom_allocations(staff_id, @code)
