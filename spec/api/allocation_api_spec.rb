@@ -7,7 +7,7 @@ require 'swagger_helper'
 # The DescribeClass cop has been disabled as it is insists that the describe
 # block contain the name of the tested class.  However rswag is using this
 # text as part of the API documentation generated from these tests.
-describe 'Allocation API' do
+describe 'Allocation API', vcr: { cassette_name: :allocation_api } do
   let!(:private_key) { OpenSSL::PKey::RSA.generate 2048 }
   let!(:public_key) { Base64.strict_encode64(private_key.public_key.to_s) }
   let!(:payload) {

@@ -57,6 +57,7 @@ feature "view POM's caseload" do
         )
       ]
 
+    stub_auth_token
     stub_poms(prison, poms)
     stub_offenders_for_prison(prison, offenders)
 
@@ -77,6 +78,7 @@ feature "view POM's caseload" do
   context 'when paginating' do
     before do
       signin_pom_user
+      stub_user staff_id: nomis_staff_id
 
       visit prison_staff_caseload_index_path('LEI', nomis_staff_id)
     end
@@ -158,6 +160,8 @@ feature "view POM's caseload" do
   context 'when looking at handover start' do
     before {
       signin_pom_user
+      stub_user staff_id: nomis_staff_id
+
       visit prison_staff_caseload_index_path('LEI', nomis_staff_id)
     }
 
@@ -177,10 +181,16 @@ feature "view POM's caseload" do
   end
 
   it 'allows a POM to view the prisoner profile page for a specific offender' do
+    stub_auth_token
     signin_pom_user
+    stub_user staff_id: nomis_staff_id
+
     stub_offender(first_offender)
     stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/LEI/offender/#{first_offender.fetch(:offenderNo)}").
       to_return(body: { staffId: 485_572, firstName: "DOM", lastName: "BULL" }.to_json)
+    stub_request(:get, "#{ApiHelper::T3}/staff/#{nomis_staff_id}").
+      to_return(body: { staffId: nomis_staff_id, firstName: "TEST", lastName: "MOIC" }.to_json)
+
     visit prison_staff_caseload_index_path(prison, nomis_staff_id)
 
     expected_name = "#{first_offender.fetch(:lastName)}, #{first_offender.fetch(:firstName)}"
@@ -196,6 +206,8 @@ feature "view POM's caseload" do
   it 'can sort all cases that have been allocated to a specific POM in the last week', :versioning do
     # Sign in as a POM
     signin_pom_user
+    stub_user staff_id: nomis_staff_id
+
     visit  prison_staff_caseload_index_path('LEI', nomis_staff_id)
     within('.new-cases-count') do
       click_link('1')

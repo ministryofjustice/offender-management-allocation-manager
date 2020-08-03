@@ -51,7 +51,7 @@ feature "SPO viewing upcoming handover cases" do
     end
   end
 
-  it 'stops staff without the SPO role from viewing the page'  do
+  it 'stops staff without the SPO role from viewing the page', vcr: { cassette_name: :spo_handover_cases_pom } do
     signin_pom_user
     visit prison_summary_handovers_path(prison)
     expect(page).to have_current_path('/401')
