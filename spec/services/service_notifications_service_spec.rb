@@ -5,7 +5,7 @@ describe ServiceNotificationsService do
     let(:pom_role) { ['POM'] }
     let(:spo_role) { ['SPO'] }
     let(:both_roles) { %w(SPO POM) }
-    let(:filename) { 'app/data/service_notifications.yaml' }
+    let(:filename) { 'app/notifications/service_notifications.yaml' }
 
     it 'returns an empty array if file is empty' do
       allow(YAML).to receive(:load).with(File.read(filename)).and_return('')
