@@ -7,7 +7,8 @@ feature "SPO viewing upcoming handover cases" do
     before do
       allow_any_instance_of(Nomis::OffenderBase).to receive_messages(
         handover_start_date: handover_start_date,
-        responsibility_handover_date: responsibility_handover_date
+        responsibility_handover_date: responsibility_handover_date,
+        tier: 'A'
       )
       signin_spo_user
       visit prison_summary_handovers_path(prison)

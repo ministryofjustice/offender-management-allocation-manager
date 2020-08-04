@@ -4,7 +4,7 @@ class OffenderPresenter
   attr_reader :responsibility
 
   delegate :offender_no, :first_name, :last_name, :booking_id,
-           :indeterminate_sentence?, :sentence_type_code, :describe_sentence,
+           :indeterminate_sentence?, :describe_sentence,
            :full_name_ordered, :full_name, :main_offence,
            :sentence_start_date, :team, :prison_id,
            :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date,
