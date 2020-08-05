@@ -48,7 +48,7 @@ module OffenderManagementAllocationClient
     config.keyworker_api_host = ENV['KEYWORKER_API_HOST']&.strip
     config.digital_prison_service_host = ENV['DIGITAL_PRISON_SERVICE_HOST']&.strip
     config.nomis_oauth_host = ENV['NOMIS_OAUTH_HOST']&.strip
-    config.nomis_api_host = ENV['NOMIS_API_HOST']&.strip
+    config.prison_api_host = ENV['PRISON_API_HOST']&.strip
     config.nomis_oauth_client_id = ENV['NOMIS_OAUTH_CLIENT_ID']&.strip
     config.nomis_oauth_client_secret = ENV['NOMIS_OAUTH_CLIENT_SECRET']&.strip
     config.nomis_oauth_public_key = ENV['NOMIS_OAUTH_PUBLIC_KEY']&.strip
