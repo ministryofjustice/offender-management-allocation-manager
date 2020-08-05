@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe Nomis::Client do
-  let(:api_host) { Rails.configuration.nomis_api_host }
+  let(:api_host) { Rails.configuration.prison_api_host }
   let(:client) { described_class.new(api_host) }
   let(:token_service) { Nomis::Oauth::TokenService }
   let(:access_token) { "access_token" }

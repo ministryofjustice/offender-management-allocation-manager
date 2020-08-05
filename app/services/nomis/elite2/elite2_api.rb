@@ -6,7 +6,7 @@ module Nomis
 
     module Elite2Api
       def e2_client
-        host = Rails.configuration.nomis_api_host
+        host = Rails.configuration.prison_api_host
         Nomis::Client.new(host + '/api')
       end
 
