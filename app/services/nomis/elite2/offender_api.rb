@@ -6,7 +6,7 @@ module Nomis
       extend Elite2Api
 
       def self.list(prison, page = 0, page_size: 20)
-        route = "/elite2api/api/locations/description/#{prison}/inmates"
+        route = "/locations/description/#{prison}/inmates"
 
         queryparams = { 'convictedStatus' => 'Convicted', 'returnCategory' => true }
 
@@ -37,7 +37,7 @@ module Nomis
 
       def self.get_offender(offender_no)
         # Bad NOMIS numbers mustn't produce invalid URLs
-        route = "/elite2api/api/prisoners/#{URI.encode_www_form_component(offender_no)}"
+        route = "/prisoners/#{URI.encode_www_form_component(offender_no)}"
         response = Rails.cache.fetch("offender-#{route}",
                                      expires_in: Rails.configuration.cache_expiry) {
           e2_client.get(route)
@@ -51,7 +51,7 @@ module Nomis
       end
 
       def self.get_offence(booking_id)
-        route = "/elite2api/api/bookings/#{booking_id}/mainOffence"
+        route = "/bookings/#{booking_id}/mainOffence"
         data = e2_client.get(route)
         return '' if data.empty?
 
@@ -59,7 +59,7 @@ module Nomis
       end
 
       def self.get_category_code(offender_no)
-        route = '/elite2api/api/offender-assessments/CATEGORY'
+        route = '/offender-assessments/CATEGORY'
         data = e2_client.post(route, [offender_no])
         return '' if data.empty?
 
@@ -69,7 +69,7 @@ module Nomis
       def self.get_bulk_sentence_details(booking_ids)
         return {} if booking_ids.empty?
 
-        route = '/elite2api/api/offender-sentences/bookings'
+        route = '/offender-sentences/bookings'
 
         h = Digest::SHA256.hexdigest(booking_ids.to_s)
         key = "bulk_sentence_#{h}"
@@ -93,12 +93,12 @@ module Nomis
       def self.get_image(booking_id)
         # This method returns the raw bytes of an image, the equivalent of loading the
         # image from file on disk.
-        details_route = '/elite2api/api/offender-sentences/bookings'
+        details_route = '/offender-sentences/bookings'
         details = e2_client.post(details_route, [booking_id])
 
         return default_image if details.first['facialImageId'].blank?
 
-        image_route = "/elite2api/api/images/#{details.first['facialImageId']}/data"
+        image_route = "/images/#{details.first['facialImageId']}/data"
         image = e2_client.raw_get(image_route)
 
         image.presence || default_image

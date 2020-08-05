@@ -6,13 +6,13 @@ module Nomis
       extend Elite2Api
 
       def self.staff_detail(staff_id)
-        route = "/elite2api/api/staff/#{staff_id}"
+        route = "/staff/#{staff_id}"
         data = e2_client.get(route)
         api_deserialiser.deserialise(Nomis::StaffDetails, data)
       end
 
       def self.list(prison)
-        route = "/elite2api/api/staff/roles/#{prison}/role/POM"
+        route = "/staff/roles/#{prison}/role/POM"
 
         key = "pom_list_#{prison}"
 
@@ -26,7 +26,7 @@ module Nomis
       end
 
       def self.fetch_email_addresses(nomis_staff_id)
-        route = "/elite2api/api/staff/#{nomis_staff_id}/emails"
+        route = "/staff/#{nomis_staff_id}/emails"
         data = e2_client.get(route)
         return [] if data.nil?
 
