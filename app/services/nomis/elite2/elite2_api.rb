@@ -6,8 +6,8 @@ module Nomis
 
     module Elite2Api
       def e2_client
-        host = Rails.configuration.nomis_oauth_host
-        Nomis::Client.new(host)
+        host = Rails.configuration.nomis_api_host
+        Nomis::Client.new(host + '/api')
       end
 
       def api_deserialiser

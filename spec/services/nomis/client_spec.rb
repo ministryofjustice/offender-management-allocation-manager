@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe Nomis::Client do
-  let(:api_host) { Rails.configuration.nomis_oauth_host }
+  let(:api_host) { Rails.configuration.nomis_api_host }
   let(:client) { described_class.new(api_host) }
   let(:token_service) { Nomis::Oauth::TokenService }
   let(:access_token) { "access_token" }
@@ -16,7 +16,7 @@ describe Nomis::Client do
       WebMock.stub_request(:get, /\w/).to_return(body: '{}')
 
       username = 'MOIC_POM'
-      route = "/elite2api/api/users/#{username}"
+      route = "/api/users/#{username}"
       client.get(route)
 
       expect(WebMock).to have_requested(:get, /\w/).
@@ -63,7 +63,7 @@ describe Nomis::Client do
       Faraday::ClientError.new('error', status: 500)
     end
     let(:offender_no) { 'A1234AB' }
-    let(:route)        { "/elite2api/api/prisoners/#{offender_no}" }
+    let(:route)        { "/api/prisoners/#{offender_no}" }
 
     before do
       WebMock.stub_request(:get, /\w/).to_raise(error)
