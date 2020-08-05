@@ -19,6 +19,7 @@ references:
           PGHOST: 127.0.0.1
           PGUSER: ubuntu
           RACK_ENV: test
+          VCR: 1
       - image: circleci/postgres:10.5-alpine
         environment:
           POSTGRES_USER: ubuntu

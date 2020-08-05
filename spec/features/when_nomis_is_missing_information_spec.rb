@@ -8,7 +8,6 @@ context 'when NOMIS is missing information' do
 
   describe 'when logged in as a POM' do
     before do
-      user_name = 'example_user'
       stub_poms = [{ staffId: staff_id, position: RecommendationService::PRISON_POM }]
 
       stub_request(:post, "#{ApiHelper::T3_HOST}/auth/oauth/token").
@@ -24,7 +23,8 @@ context 'when NOMIS is missing information' do
       stub_request(:get, "#{ApiHelper::T3}/staff/roles/#{prison_code}/role/POM").
         to_return(body: stub_poms.to_json)
 
-      signin_pom_user(user_name)
+      signin_pom_user
+      stub_user staff_id: staff_id
     end
 
     describe 'the caseload page' do

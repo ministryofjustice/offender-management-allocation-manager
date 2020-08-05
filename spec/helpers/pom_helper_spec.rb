@@ -7,7 +7,7 @@ RSpec.describe PomHelper do
     end
   end
 
-  describe 'fetch_pom_name' do
+  describe 'fetch_pom_name', vcr: { cassette_name: :pom_helper_fetch_pom_name } do
     it 'fetches the POM name from NOMIS' do
       expect(fetch_pom_name(485_926)).to eq('POM, MOIC')
     end

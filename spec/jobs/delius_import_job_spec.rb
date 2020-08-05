@@ -18,10 +18,12 @@ RSpec.describe DeliusImportJob, type: :job do
                    G6500UO G8242GE G8130VE G8918VU G1493UN G7166UG G2341UP G7633UV
                    G7218GI G5060GO G7704GG G3868UN G0661GP G0806UN G6754VV G7331GT
                    G4923UI G9577GE G2350UP G0686GT G5235GT G1955VA G7967UD G7142UL
-                   G5497GU G3356GT]
+                   G5497GU G3356GT GCA2H2A]
     offenders.each { |offender|
       stub_offender(build(:nomis_offender, offenderNo: offender))
     }
+    stub_offender(build(:nomis_offender, offenderNo: 'mangled+nomis'))
+    stub_auth_token
   end
 
   it 'doesnt crash' do
@@ -36,10 +38,6 @@ RSpec.describe DeliusImportJob, type: :job do
   end
 
   context 'when LDU and team names contain ampersands (&)' do
-    before do
-      stub_offender(build(:nomis_offender, offenderNo: 'mangled nomis'))
-    end
-
     it 'imports their names correctly' do
       ENV['DELIUS_EMAIL_FOLDER'] = 'delius_import_with_ampersands'
       ENV['DELIUS_XLSX_PASSWORD'] = 'secret'

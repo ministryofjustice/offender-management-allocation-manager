@@ -57,6 +57,19 @@ describe ResponsibilityService do
       end
     end
 
+    context 'when indeterminate with no tariff date' do
+      let(:offender) {
+        OpenStruct.new immigration_case?: false,
+                       indeterminate_sentence?: true,
+                       tariff_date: nil,
+                       sentenced?: true
+      }
+
+      it 'will default to responsible' do
+        expect(described_class.calculate_pom_responsibility(offender)).to eq ResponsibilityService::RESPONSIBLE
+      end
+    end
+
     context 'when incorrect service provider entered for indeterminate offender' do
       let(:offender) {
         OpenStruct.new  nps_case?: false,

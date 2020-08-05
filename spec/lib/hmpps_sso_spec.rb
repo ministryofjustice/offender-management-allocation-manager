@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 # rubocop:disable RSpec/FilePath
-describe OmniAuth::Strategies::HmppsSso do
+describe OmniAuth::Strategies::HmppsSso, vcr: { cassette_name: :hmpps_sso } do
   subject(:strategy) do
     described_class.new(app, 'client_id', 'secret')
   end
@@ -11,7 +11,6 @@ describe OmniAuth::Strategies::HmppsSso do
       b.run ->(_env) { [200, {}, ['Hello']] }
     end.to_app
   }
-
 
   context 'when methods' do
     context 'when #info' do

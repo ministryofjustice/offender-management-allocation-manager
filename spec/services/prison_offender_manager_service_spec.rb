@@ -128,6 +128,8 @@ describe PrisonOffenderManagerService do
     describe '#get_pom_at' do
       context 'when pom not existing at a prison' do
         before do
+          stub_auth_token
+          stub_offenders_for_prison('LEI', [build(:nomis_offender)])
           stub_request(:get, "#{ApiHelper::T3}/staff/roles/LEI/role/POM").
             with(
               headers: {

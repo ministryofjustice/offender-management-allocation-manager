@@ -38,14 +38,16 @@ require 'vcr'
 
 VCR.configure do |config|
   config.cassette_library_dir = "spec/fixtures/vcr_cassettes"
-  config.hook_into :webmock
+  # using this higher-level hook allows WebMock to write-out stub calls when not in VCR-mode
+  config.hook_into :faraday
   config.configure_rspec_metadata!
   config.allow_http_connections_when_no_cassette = true
   # weirdly this assignment is implemented as a merge in VCR, so it only
   # overwrites the specified configuration options
   config.default_cassette_options = {
-    # the default in :once, which seems to mess-up our cassette re-use
-    record: :new_episodes,
+    # the default is :once, which seems to mess-up our cassette re-use
+    # set VCR=1 when you wish to record new interactions with T3 (hopefully never)
+    record: ENV.fetch('VCR', '0').to_i.zero? ? :none : :new_episodes,
     match_requests_on: [
       :method,
       :uri,
