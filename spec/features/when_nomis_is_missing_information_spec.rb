@@ -10,7 +10,7 @@ context 'when NOMIS is missing information' do
     before do
       stub_poms = [{ staffId: staff_id, position: RecommendationService::PRISON_POM }]
 
-      stub_request(:post, "#{ApiHelper::T3_HOST}/auth/oauth/token").
+      stub_request(:post, "#{ApiHelper::AUTH_HOST}/auth/oauth/token").
         with(query: { grant_type: 'client_credentials' }).
         to_return(body: {}.to_json)
 
@@ -98,7 +98,7 @@ context 'when NOMIS is missing information' do
 
   context 'when logged in as an SPO' do
     before do
-      stub_request(:post, "#{ApiHelper::T3_HOST}/auth/oauth/token").
+      stub_request(:post, "#{ApiHelper::AUTH_HOST}/auth/oauth/token").
         with(query: { grant_type: 'client_credentials' }).
         to_return(body: {}.to_json)
 
