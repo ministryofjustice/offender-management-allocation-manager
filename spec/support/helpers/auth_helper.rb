@@ -6,7 +6,7 @@ module AuthHelper
   def stub_auth_token
     allow(Nomis::Oauth::TokenService).to receive(:valid_token).and_return(ACCESS_TOKEN)
 
-    stub_request(:post, "#{ApiHelper::T3_HOST}/auth/oauth/token?grant_type=client_credentials").
+    stub_request(:post, "#{ApiHelper::AUTH_HOST}/auth/oauth/token?grant_type=client_credentials").
       to_return(body: {
         "access_token": ACCESS_TOKEN.access_token,
         "token_type": "bearer",
