@@ -35,6 +35,26 @@ RSpec.describe Team, type: :model do
     end
   end
 
+  describe '#with_ldu' do
+    before do
+      create(:team, name: 'AAAA', local_divisional_unit: nil)
+      create(:team, name: 'ZZZ', local_divisional_unit: build(:local_divisional_unit))
+      create(:team, name: 'DGGG', local_divisional_unit: build(:local_divisional_unit))
+      create(:team, name: 'AAAB', local_divisional_unit: build(:local_divisional_unit))
+    end
+
+    it 'finds all teams with an ldu, sorted by team name in ascending order' do
+      teams = described_class.with_ldu
+      ordered_team_list = %w(AAAB DGGG ZZZ)
+
+      expect(teams.count).to eq(3)
+
+      teams.each_with_index do |team, index|
+        expect(team.name).to eq(ordered_team_list[index])
+      end
+    end
+  end
+
   context 'when NPS' do
     before do
       create(:team, :nps)

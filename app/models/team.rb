@@ -17,7 +17,7 @@ class Team < ApplicationRecord
 
   scope :with_email_address, -> { joins(:local_divisional_unit).merge(LocalDivisionalUnit.with_email_address) }
 
-  scope :with_ldu, -> { where.not(local_divisional_unit_id: nil) }
+  scope :with_ldu, -> { where.not(local_divisional_unit_id: nil).order(name: :asc) }
 
   def nps?
     code&.starts_with?('N')
