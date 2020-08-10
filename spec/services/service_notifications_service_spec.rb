@@ -5,15 +5,14 @@ describe ServiceNotificationsService do
     let(:pom_role) { ['POM'] }
     let(:spo_role) { ['SPO'] }
     let(:both_roles) { %w(SPO POM) }
-    let(:filename) { 'app/notifications/service_notifications.yaml' }
 
     it 'returns an empty array if file is empty' do
-      allow(YAML).to receive(:load).with(File.read(filename)).and_return('')
+      stub_const("ServiceNotifications::Yaml::Data", '')
       expect(described_class.notifications(pom_role)).to eq([])
     end
 
     it 'returns an empty array if YAML does not return an array' do
-      allow(YAML).to receive(:load).with(File.read(filename)).and_return('{"notifications"=>nil}')
+      stub_const("ServiceNotifications::Yaml::Data", '{"notifications"=>nil}')
       expect(described_class.notifications(both_roles)).to eq([])
     end
 
@@ -33,7 +32,7 @@ describe ServiceNotificationsService do
           ]
         }
 
-      allow(YAML).to receive(:load).with(File.read(filename)).and_return(data)
+      stub_const("ServiceNotifications::Yaml::Data", data)
       expect(described_class.notifications(roles)).to eq([])
     end
 
@@ -52,7 +51,7 @@ describe ServiceNotificationsService do
           ]
         }
 
-      allow(YAML).to receive(:load).with(File.read(filename)).and_return(data)
+      stub_const("ServiceNotifications::Yaml::Data", data)
       expect(described_class.notifications(spo_role)).to eq([])
     end
 
@@ -71,7 +70,7 @@ describe ServiceNotificationsService do
           ]
         }
 
-      allow(YAML).to receive(:load).with(File.read(filename)).and_return(data)
+      stub_const("ServiceNotifications::Yaml::Data", data)
       expect(described_class.notifications(pom_role)).to eq([])
     end
 
@@ -108,7 +107,7 @@ describe ServiceNotificationsService do
           ]
         }
 
-      allow(YAML).to receive(:load).with(File.read(filename)).and_return(data)
+      stub_const("ServiceNotifications::Yaml::Data", data)
       expect(described_class.notifications(both_roles)).to eq(data['notifications'].take(2))
     end
   end

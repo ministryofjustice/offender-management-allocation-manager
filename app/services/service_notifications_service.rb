@@ -4,8 +4,7 @@ class ServiceNotificationsService
   def self.notifications(user_roles)
     return [] if user_roles.empty?
 
-    data = YAML.load(File.read('app/notifications/service_notifications.yaml'))
-    notification_list = data['notifications']
+    notification_list = ServiceNotifications::Yaml::Data['notifications']
     return [] unless notification_list.is_a?(Array)
 
     role_notifications = alerts_by_role(notification_list, user_roles)
