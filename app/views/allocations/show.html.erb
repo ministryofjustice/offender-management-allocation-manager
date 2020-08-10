@@ -30,7 +30,7 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Tiering calculation</td>
       <td class="govuk-table__cell table_cell__left_align">
-        Tier <%= @prisoner.tier %>
+        <%= @prisoner.tier == 'N/A' ? @prisoner.tier : "Tier #{@prisoner.tier}" %>
         <% unless auto_delius_import_enabled?(@prison.code) %>
           <a class="govuk-link pull-right" href="<%= edit_prison_case_information_path(@prison.code, @prisoner.offender_no) %>">Change</a>
         <% end %>
