@@ -55,12 +55,13 @@ feature 'Service Notification' do
         click_on(class: 'close-service-notification')
         expect(page).not_to have_css('.service_banner')
 
-        # sign out of service
-        click_link 'Sign out'
+        # go to a static page (where service notifications are not displayed)
+        visit help_path
 
-        # sign back into service, with no notifications displayed
-        signin_user
+        # go back to home page
         visit root_path
+
+        # should have no notifications displayed
         expect(page).not_to have_css('.service_banner')
       end
     end
