@@ -19,7 +19,7 @@ feature 'Service Notification' do
         { 'id' => 'testing',
           'start_date' => 2.days.ago.strftime("%d/%m/%Y"),
           'role' => ["SPO"],
-          'duration' => 14,
+          'end_date' => 4.days.from_now.strftime("%d/%m/%Y"),
           'text' => 'An example message'
         }
       ]

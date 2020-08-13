@@ -5,7 +5,7 @@
 
 # role:           Who the banner is aimed at, SPO, POM  (This is an array as role could be both SPO and POM)
 
-# duration:       The length of days the banner should appear
+# end_date:       The last date that the banner should appear
 
 # text:           The information to be displayed to the user
 
@@ -16,14 +16,14 @@
 #    start_date: 20/07/2020
 #    role:
 #      - POM
-#    duration: 14
+#    end_date: 14/08/2020
 #    text: This is a test banner
 #  - id: my-updated-feature-1
 #    start_date: 30/08/2020
 #    role:
 #      - SPO
 #      - POM
-#    duration: 28
+#    end_date: 28/09/2020
 #    text: Early Allocation feature is coming soon - <a href="/whats-new">read the release notes to find out more</a>
 
 ---

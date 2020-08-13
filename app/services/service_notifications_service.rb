@@ -29,7 +29,7 @@ private
     notifications.each do |alert|
       today = Time.zone.now.to_date
       start_date = alert['start_date'].to_date
-      end_date = start_date + alert['duration'].days
+      end_date = alert['end_date'].to_date
       alerts << alert if today >= start_date && today <= end_date
     end
 
