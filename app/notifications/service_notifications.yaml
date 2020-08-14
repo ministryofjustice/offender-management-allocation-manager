@@ -1,0 +1,30 @@
+# id:             This is a unique identifier for the notification. We use this reference to hide the notification using
+#                 local storage should the user choose to close the notification so that they don't see it again
+
+# start_date:     The date the banner should appear on the service
+
+# role:           Who the banner is aimed at, SPO, POM  (This is an array as role could be both SPO and POM)
+
+# end_date:       The last date that the banner should appear
+
+# text:           The information to be displayed to the user
+
+# Example yaml
+#---
+#notifications:
+#  - id: my-new-feature
+#    start_date: 20/07/2020
+#    role:
+#      - POM
+#    end_date: 14/08/2020
+#    text: This is a test banner
+#  - id: my-updated-feature-1
+#    start_date: 30/08/2020
+#    role:
+#      - SPO
+#      - POM
+#    end_date: 28/09/2020
+#    text: Early Allocation feature is coming soon - <a href="/whats-new">read the release notes to find out more</a>
+
+---
+notifications:

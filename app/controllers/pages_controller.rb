@@ -40,6 +40,8 @@ class PagesController < ApplicationController
 
   def contact; end
 
+  def whats_new; end
+
 private
 
   def redirect_path

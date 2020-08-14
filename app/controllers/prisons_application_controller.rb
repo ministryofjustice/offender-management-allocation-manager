@@ -3,7 +3,7 @@
 # This class is inherited by all controllers under the /prisons route
 # so that they have @prison and active_prison_id available
 class PrisonsApplicationController < ApplicationController
-  before_action :authenticate_user, :check_prison_access, :load_staff_id
+  before_action :authenticate_user, :check_prison_access, :load_staff_id, :service_notifications
 
 protected
 
@@ -43,5 +43,10 @@ private
   def load_staff_id
     user = Nomis::Elite2::UserApi.user_details(current_user)
     @staff_id = user.staff_id
+  end
+
+  def service_notifications
+    roles = [current_user_is_spo? ? 'SPO' : nil, sso_identity.current_user_is_pom? ? 'POM' : nil].compact
+    @service_notifications = ServiceNotificationsService.notifications(roles)
   end
 end
