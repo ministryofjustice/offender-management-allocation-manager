@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module ApiHelper
-  T3_HOST = Rails.configuration.nomis_oauth_host
-  T3 = "#{T3_HOST}/elite2api/api"
+  AUTH_HOST = Rails.configuration.nomis_oauth_host
+  T3 = "#{Rails.configuration.prison_api_host}/api"
   KEYWORKER_API_HOST = ENV.fetch('KEYWORKER_API_HOST')
 
   def stub_offender(offender)

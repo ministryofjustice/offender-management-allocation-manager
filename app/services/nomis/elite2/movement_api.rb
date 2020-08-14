@@ -6,7 +6,7 @@ module Nomis
       extend Elite2Api
 
       def self.movements_on_date(date)
-        route = '/elite2api/api/movements'
+        route = '/movements'
 
         data = e2_client.get(route, queryparams: {
                                movementDate: date.strftime('%F'),
@@ -18,7 +18,7 @@ module Nomis
       end
 
       def self.movements_for(offender_no)
-        route = '/elite2api/api/movements/offenders?movementTypes=ADM&movementTypes=TRN&movementTypes=REL&latestOnly=false'
+        route = '/movements/offenders?movementTypes=ADM&movementTypes=TRN&movementTypes=REL&latestOnly=false'
 
         data = e2_client.post(route, [offender_no])
         data.sort_by { |k| k['createDateTime'] }.map { |movement|
@@ -28,7 +28,7 @@ module Nomis
 
       def self.admissions_for(offender_nos)
         # admissions need to include transfers from one place to another
-        route = '/elite2api/api/movements/offenders?movementTypes=ADM&movementTypes=TRN&latestOnly=false'
+        route = '/movements/offenders?movementTypes=ADM&movementTypes=TRN&latestOnly=false'
 
         cache_key = "#{route}_#{Digest::SHA256.hexdigest(offender_nos.to_s)}"
 

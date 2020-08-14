@@ -6,7 +6,7 @@ module Nomis
       extend Elite2Api
 
       def self.user_details(username)
-        route = "/elite2api/api/users/#{username}"
+        route = "/users/#{username}"
         response = e2_client.get(route)
 
         user = api_deserialiser.deserialise(Nomis::UserDetails, response)
@@ -16,7 +16,7 @@ module Nomis
       end
 
       def self.user_caseloads(staff_id)
-        route = "/elite2api/api/staff/#{staff_id}/caseloads"
+        route = "/staff/#{staff_id}/caseloads"
         response = e2_client.get(route)
 
         response

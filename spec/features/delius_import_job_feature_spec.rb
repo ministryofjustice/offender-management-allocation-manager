@@ -23,7 +23,7 @@ end
 
 feature "Delius import feature" do
   let(:stub_auth_host) { Rails.configuration.nomis_oauth_host }
-  let(:stub_api_host) { "#{stub_auth_host}/elite2api/api" }
+  let(:stub_api_host) { "#{Rails.configuration.prison_api_host}/api" }
   let(:offender_no) { "GCA2H2A" }
   let(:prison) { "LEI" }
   let(:booking_id) { 754_207 }

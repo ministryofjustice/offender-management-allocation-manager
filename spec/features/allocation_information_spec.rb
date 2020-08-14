@@ -203,7 +203,7 @@ feature "view an offender's allocation information", :versioning do
 private
 
   def stub_api_calls_for_prison_allocation_path(sentence_start_date:, conditional_release_date:, automatic_release_date:, hdced:)
-    stub_request(:post, "#{ApiHelper::T3_HOST}/auth/oauth/token?grant_type=client_credentials").
+    stub_request(:post, "#{ApiHelper::AUTH_HOST}/auth/oauth/token?grant_type=client_credentials").
             to_return(body: {}.to_json)
 
     stub_request(:get, "#{ApiHelper::T3}/users/MOIC_POM").
