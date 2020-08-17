@@ -325,7 +325,7 @@ describe ResponsibilityService do
           end
 
           context 'when a determinate NPS offender with parole eligibility' do
-            let(:sentence_start_date) { Date.parse('15-09-2019') }
+            let(:sentence_start_date) { Time.zone.today - 10.months }
             let(:offender) {
               OpenStruct.new  nps_case?: true,
                               welsh_offender: false,
