@@ -48,8 +48,8 @@ class Allocation < ApplicationRecord
   scope :active, lambda { |nomis_offender_ids, prison|
     where.not(
       primary_pom_nomis_id: nil
-      ).where(
-        nomis_offender_id: nomis_offender_ids, prison: prison
+      ).where(prison: prison).where(
+        'nomis_offender_id in (?)', nomis_offender_ids
       )
   }
 
