@@ -129,7 +129,7 @@ class PrisonService
     PrisonInfo.new('WTI', 'HMP Whatton', :england),
     PrisonInfo.new('WWI', 'HMP Wandsworth', :england),
     PrisonInfo.new('WYI', 'HMP/YOI Wetherby', :england)
-  ].index_by(&:code)
+  ].index_by(&:code).freeze
 
   PRIVATE_ENGLISH_PRISON_CODES = %w[ACI ASI DNI DGI FBI LGI OWI NLI PBI RHI TSI].freeze
 
