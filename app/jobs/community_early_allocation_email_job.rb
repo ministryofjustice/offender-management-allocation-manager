@@ -12,7 +12,7 @@ class CommunityEarlyAllocationEmailJob < ApplicationJob
                                          prisoner_name: offender.full_name,
                                          prisoner_number: offender.offender_no,
                                          pom_name: allocation.primary_pom_name,
-                                         pom_email: pom.emails.first,
+                                         pom_email: pom.email_address,
                                          prison_name: PrisonService.name_for(prison),
                                          pdf: pdf).deliver_now
   end

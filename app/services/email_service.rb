@@ -17,7 +17,7 @@ class EmailService
   end
 
   def send_email
-    return if @pom.emails.blank?
+    return if @pom.email_address.blank?
 
     if @allocation.event == 'reallocate_primary_pom' && previous_pom.present?
       send_deallocation_email
@@ -26,21 +26,21 @@ class EmailService
   end
 
   def send_coworking_primary_email(pom_firstname, coworking_pom_name)
-    if @pom.emails.present?
+    if @pom.email_address.present?
       PomMailer.allocate_coworking_pom(
         message: @message,
         pom_name: pom_firstname.capitalize,
         offender_name: @offender.full_name,
         nomis_offender_id: @offender.offender_no,
         coworking_pom_name: coworking_pom_name,
-        pom_email: @pom.emails.first,
+        pom_email: @pom.email_address,
         url: url
       ).deliver_later
     end
   end
 
   def send_secondary_email(pom_firstname)
-    if @pom.emails.present?
+    if @pom.email_address.present?
       PomMailer.secondary_allocation_email(
         message: @message,
         pom_name: pom_firstname.capitalize,
@@ -48,18 +48,18 @@ class EmailService
         nomis_offender_id: @offender.offender_no,
         responsibility: current_responsibility,
         responsible_pom_name: @allocation.primary_pom_name,
-        pom_email: @pom.emails.first,
+        pom_email: @pom.email_address,
         url: url
       ).deliver_later
     end
   end
 
   def send_cowork_deallocation_email(secondary_pom_name)
-    return if @pom.emails.blank?
+    return if @pom.email_address.blank?
 
     PomMailer.deallocate_coworking_pom(
       pom_name: @pom.first_name.capitalize,
-      email_address: @pom.emails.first,
+      email_address: @pom.email_address,
       secondary_pom_name: secondary_pom_name,
       nomis_offender_id: @offender.offender_no,
       offender_name: @offender.full_name,
@@ -115,7 +115,7 @@ private
     PomMailer.new_allocation_email(
       pom_name: @pom.first_name.capitalize,
       responsibility: current_responsibility,
-      pom_email: @pom.emails.first,
+      pom_email: @pom.email_address,
       offender_name: @offender.full_name,
       offender_no: @offender.offender_no,
       message: @message,
