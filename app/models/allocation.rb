@@ -58,8 +58,11 @@ class Allocation < ApplicationRecord
   validate do |av|
     if av.primary_pom_nomis_id.present? &&
       av.primary_pom_nomis_id == av.secondary_pom_nomis_id
+      # POM-778 Just not covered by tests
+      #:nocov:
       errors.add(:primary_pom_nomis_id,
                  'Primary POM cannot be the same as co-working POM')
+      #:nocov:
     end
   end
 
