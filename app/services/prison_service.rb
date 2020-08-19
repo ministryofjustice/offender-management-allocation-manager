@@ -129,7 +129,7 @@ class PrisonService
     PrisonInfo.new('WTI', 'HMP Whatton', :england),
     PrisonInfo.new('WWI', 'HMP Wandsworth', :england),
     PrisonInfo.new('WYI', 'HMP/YOI Wetherby', :england)
-  ].map { |p| [p.code, p] }.to_h
+  ].index_by(&:code).freeze
 
   PRIVATE_ENGLISH_PRISON_CODES = %w[ACI ASI DNI DGI FBI LGI OWI NLI PBI RHI TSI].freeze
 
@@ -166,9 +166,7 @@ class PrisonService
   end
 
   def self.prisons_from_list(codelist)
-    prisons = codelist.each_with_object({}) { |code, hash|
-      hash[code] = PRISONS[code]&.name
-    }
+    prisons = codelist.index_with { |code| PRISONS[code]&.name }
     prisons.compact.sort_by { |_code, prison| prison }.to_h
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_28_165050) do
+ActiveRecord::Schema.define(version: 2020_08_03_135050) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -135,7 +135,7 @@ ActiveRecord::Schema.define(version: 2020_05_28_165050) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "email_address"
-    t.index ["code"], name: "index_local_divisional_units_on_code"
+    t.index ["code"], name: "index_local_divisional_units_on_code", unique: true
   end
 
   create_table "overrides", force: :cascade do |t|

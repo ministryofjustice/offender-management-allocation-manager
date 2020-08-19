@@ -76,12 +76,9 @@ class AllocationService
   end
 
   def self.active_allocations(nomis_offender_ids, prison)
-    Allocation.active(nomis_offender_ids, prison).map { |a|
-      [
-        a[:nomis_offender_id],
-        a
-      ]
-    }.to_h
+    Allocation.active(nomis_offender_ids, prison).index_by { |a|
+      a[:nomis_offender_id]
+    }
   end
 
   def self.previously_allocated_poms(nomis_offender_id)
@@ -96,7 +93,7 @@ class AllocationService
   def self.allocation_history_pom_emails(history)
     pom_ids = history.map { |h| [h.primary_pom_nomis_id, h.secondary_pom_nomis_id] }.flatten.compact.uniq
 
-    pom_ids.map { |pom_id|  [pom_id, PrisonOffenderManagerService.get_pom_emails(pom_id).first] }.to_h
+    pom_ids.index_with { |pom_id| PrisonOffenderManagerService.get_pom_emails(pom_id).first }
   end
 
   def self.create_override(params)
