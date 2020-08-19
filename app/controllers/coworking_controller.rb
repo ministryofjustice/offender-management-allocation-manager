@@ -75,10 +75,13 @@ class CoworkingController < PrisonsApplicationController
       event_trigger: Allocation::USER
     )
 
-    EmailService.instance(allocation: @allocation,
-                          message: '',
-                          pom_nomis_id: @allocation.primary_pom_nomis_id
-    ).send_cowork_deallocation_email(secondary_pom_name)
+    # stop double-bounces from sending invalid emails.
+    if secondary_pom_name.present?
+      EmailService.instance(allocation: @allocation,
+                            message: '',
+                            pom_nomis_id: @allocation.primary_pom_nomis_id
+      ).send_cowork_deallocation_email(secondary_pom_name)
+    end
 
     redirect_to prison_allocation_path(active_prison_id, nomis_offender_id_from_url)
   end
