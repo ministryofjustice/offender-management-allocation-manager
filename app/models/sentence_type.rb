@@ -3,8 +3,6 @@
 class SentenceType
   DETERMINATE = :determinate
   INDETERMINATE = :indeterminate
-  RECALL = :recall
-  NON_RECALL = :non_recall
 
   LEGAL_STATUS_RECALL = 'RECALL'
 
