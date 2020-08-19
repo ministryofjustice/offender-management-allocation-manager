@@ -2,10 +2,8 @@ FactoryBot.define do
   factory :sentence_detail, class: 'Nomis::SentenceDetail' do
     initialize_with { Nomis::SentenceDetail.from_json(attributes.stringify_keys) }
 
-    paroleEligibilityDate { "2011-01-28" }
     releaseDate { "2011-01-28" }
     sentenceStartDate { "2011-01-28" }
-    tariffDate { "2011-01-28" }
     automaticReleaseDate { "2011-01-28" }
     postRecallReleaseDate { "2011-01-28" }
     conditionalReleaseDate { "2011-01-28" }

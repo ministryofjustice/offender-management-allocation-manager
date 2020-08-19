@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :offender, class: 'Nomis::Offender' do
-    initialize_with { Nomis::Offender.from_json(attributes.stringify_keys) }
+    initialize_with { Nomis::Offender.from_json(attributes.stringify_keys).tap { |offender| offender.sentence = attributes.fetch(:sentence)} }
 
     imprisonmentStatus { 'SENT03' }
     prisonId { 'LEI' }
@@ -22,6 +22,21 @@ FactoryBot.define do
     # in tests, as ruby sort isn't stable by default
     sequence(:lastName) { |c| "#{Faker::Name.last_name.titleize}_#{c}" }
     categoryCode { 'C' }
+
+    sentence { association :sentence_detail }
+
+    trait :determinate do
+      imprisonmentStatus {'SEC90'}
+    end
+    trait :indeterminate do
+      imprisonmentStatus {'LIFE'}
+    end
+    trait :indeterminate_recall do
+      imprisonmentStatus {'LR_LIFE'}
+    end
+    trait :determinate_recall do
+      imprisonmentStatus {'LR_EPP'}
+    end
   end
 
   factory :nomis_offender, class: Hash do

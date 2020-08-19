@@ -75,6 +75,10 @@ feature "view an offender's allocation information", :versioning do
       it "displays the case owner as custody" do
         expect(page).to have_css('.govuk-table__cell', text: 'Custody')
       end
+
+      it "displays a badge" do
+        expect(page).to have_css('#prisoner-case-type', text: 'Determinate')
+      end
     end
 
     context 'when the offender has less than 10 months left to serve' do

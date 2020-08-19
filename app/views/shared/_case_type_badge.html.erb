@@ -1,0 +1,5 @@
+
+
+<span id="prisoner-case-type" class="moj-badge moj-badge--<%=badge_colour(offender) %>"><%=badge_text(offender)%></span>
+<%= render('shared/recall_badge') if offender.recalled? %>
+<%= render('shared/parole_badge') if badge_for_parole?(offender) %>
