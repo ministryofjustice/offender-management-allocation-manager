@@ -118,14 +118,10 @@ module Nomis
       @last_name = payload['lastName']
       @offender_no = payload.fetch('offenderNo')
       @convicted_status = payload['convictedStatus']
-      @sentence_type = SentenceType.new(payload['imprisonmentStatus'])
+      @sentence_type = SentenceType.new(payload['imprisonmentStatus'], payload['legalStatus'])
       @category_code = payload['categoryCode']
       @date_of_birth = deserialise_date(payload, 'dateOfBirth')
       @early_allocation = false
-    end
-
-    def inprisonment_status=(status)
-      @sentence_type = SentenceType.new(status)
     end
 
     def handover_start_date

@@ -27,9 +27,8 @@ RSpec.describe OffenderHelper do
 
   describe 'generates labels for case owner ' do
     it 'can show Custody for Prison' do
-      off = Nomis::Offender.new.tap { |o|
+      off = build(:offender).tap { |o|
         o.load_case_information(build(:case_information))
-        o.inprisonment_status = 'SENT03'
         o.sentence = Nomis::SentenceDetail.new sentence_start_date: Time.zone.today - 20.months,
                                                automatic_release_date: Time.zone.today + 20.months
       }
@@ -39,8 +38,7 @@ RSpec.describe OffenderHelper do
     end
 
     it 'can show Community for Probation' do
-      off = Nomis::Offender.new.tap { |o|
-        o.inprisonment_status = 'SENT03'
+      off = build(:offender).tap { |o|
         o.sentence = Nomis::SentenceDetail.new automatic_release_date: Time.zone.today
       }
       offp = OffenderPresenter.new(off, build(:responsibility, value: 'Probation'))
