@@ -9,14 +9,17 @@ rackup      DefaultRackup
 port        ENV['PORT']     || 3000
 environment ENV['RACK_ENV'] || 'production'
 
-after_worker_boot do
-  require 'prometheus_exporter/instrumentation'
-  require 'prometheus_exporter/client'
-  PrometheusExporter::Instrumentation::Puma.start
-  PrometheusExporter::Instrumentation::Process.start(type: 'web')
+# Configure Prometheus Exporter
+if ENV['PROMETHEUS_METRICS']&.strip == 'on'
+  after_worker_boot do
+    require 'prometheus_exporter/instrumentation'
+    require 'prometheus_exporter/client'
+    PrometheusExporter::Instrumentation::Puma.start
+    PrometheusExporter::Instrumentation::Process.start(type: 'web')
 
-  PrometheusExporter::Instrumentation::ActiveRecord.start(
-    custom_labels: { type: 'puma_worker' },
-    config_labels: [:database, :host]
-  )
+    PrometheusExporter::Instrumentation::ActiveRecord.start(
+      custom_labels: { type: 'puma_worker' },
+      config_labels: [:database, :host]
+    )
+  end
 end
