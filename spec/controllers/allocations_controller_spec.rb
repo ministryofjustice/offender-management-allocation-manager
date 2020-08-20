@@ -102,15 +102,9 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
           it 'doesnt mess up the allocation history updated_at because we surface the value' do
             get :history, params: { prison_id: prison, nomis_offender_id: d1.noms_no }
             history = assigns(:history)
-            # one set of history as only 1 prison involved
-            expect(history.size).to eq(1)
-            # history is array of pairs - [prison, allocations]
-            expect(history.first.size).to eq(2)
-            expect(history.first.first).to eq 'LEI'
-
-            allocation_list = history.first.second
-            expect(allocation_list.size).to eq(2)
-            expect(allocation_list.map(&:updated_at).map(&:to_date)).to eq([yesterday, create_date])
+            expect(history.size).to eq(2)
+            expect(history.first.prison).to eq 'LEI'
+            expect(history.map(&:updated_at).map(&:to_date)).to eq([create_date, yesterday])
           end
         end
 
@@ -163,10 +157,9 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
 
           it "Can get the allocation history for an offender", versioning: true do
             get :history, params: { prison_id: prison, nomis_offender_id: offender_no }
-            allocation_list = assigns(:history).to_a
+            allocation_list = assigns(:history)
 
-            # We get back a list of prison, allocation_array pairs
-            expect(allocation_list.map { |item| [item.first, item.second.map(&:event)] }).to eq([['LEI', ['reallocate_primary_pom']], ['PVI', ['allocate_primary_pom']]])
+            expect(allocation_list.map { |item| [item.prison, item.event] }).to eq([['PVI', 'allocate_primary_pom'], ['LEI', 'reallocate_primary_pom']])
           end
         end
       end
