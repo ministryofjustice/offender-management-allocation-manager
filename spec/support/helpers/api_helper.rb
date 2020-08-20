@@ -8,12 +8,7 @@ module ApiHelper
   def stub_offender(offender)
     booking_number = 1
     stub_request(:get, "#{T3}/prisoners/#{offender.fetch(:offenderNo)}").
-      to_return(body: [{ offenderNo: offender.fetch(:offenderNo),
-                                      gender: 'Male',
-                                      convictedStatus: 'Convicted',
-                                      latestBookingId: booking_number,
-                                      imprisonmentStatus: offender.fetch(:imprisonmentStatus),
-                                      dateOfBirth: offender.fetch(:dateOfBirth) }].to_json)
+      to_return(body: [offender.except(:sentence).merge('latestBookingId' => booking_number)].to_json)
 
     stub_request(:post, "#{T3}/offender-sentences/bookings").
       with(
