@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe AllocationList, type: :model do
+RSpec.describe HistoryHelper do
   let(:current_allocation) {
     build_stubbed(
       :allocation,
@@ -32,8 +32,9 @@ RSpec.describe AllocationList, type: :model do
     )
   }
 
-  it 'can group the allocations correctly', vcr: { cassette_name: :allocation_list_spec } do
-    list = described_class.new([current_allocation, middle_allocation1, middle_allocation2, old_allocation])
+  it 'can group the allocations correctly' do
+    list = HistoryHelper::AllocationList.new([current_allocation, middle_allocation1, middle_allocation2, old_allocation])
+
     expect(list.count).to eq(3)
 
     results = list.to_a
