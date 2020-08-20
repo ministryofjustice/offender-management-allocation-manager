@@ -47,5 +47,9 @@ FactoryBot.define do
     prison do
       'LEI'
     end
+
+    updated_at do
+      DateTime.now.utc
+    end
   end
 end
