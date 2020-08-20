@@ -10,9 +10,11 @@
     <% if allocation.override_reasons.present? %>
       <p class="govuk-body govuk-!-margin-bottom-1"><%= display_override_pom(allocation) %></p>
       <p class="govuk-body govuk-!-margin-bottom-1">Reason(s):</p>
-      <% allocation.override_reasons.each do | reason| %>
-        <%= display_override_details(reason, allocation) %>
-      <% end %>
+      <div id="override-reason-allocation">
+        <% allocation.override_reasons.each do | reason| %>
+          <%= display_override_details(reason, allocation) %>
+        <% end %>
+      </div>
     <% end %>
   </div>
 
