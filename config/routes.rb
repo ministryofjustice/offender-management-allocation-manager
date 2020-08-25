@@ -38,6 +38,8 @@ Rails.application.routes.draw do
     resources :case_information, only: %i[new create edit update show], param: :nomis_offender_id, controller: 'case_information', path_names: {
         new: ':nomis_offender_id/new',
     } do
+      get('edit/probation_data' => 'case_information#edit', as: 'edit_probation_data', on: :member, form: 'probation_data')
+
       get('edit_prd' => 'case_information#edit_prd', as: 'edit_prd', on: :member)
       put('update_prd' => 'case_information#update_prd', as: 'update_prd', on: :member)
     end

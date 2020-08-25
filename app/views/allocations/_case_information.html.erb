@@ -23,14 +23,14 @@
     <td class="govuk-table__cell">Service provider</td>
     <td class="govuk-table__cell table_cell__left_align">
       <%= service_provider_label(@prisoner.case_allocation) %>
-      <a class="govuk-link pull-right" href="<%= edit_prison_case_information_path(@prison.code, @prisoner.offender_no) %>">Change</a>
+      <a class="govuk-link pull-right" href="<%= edit_probation_data_prison_case_information_path(@prison.code, @prisoner.offender_no) %>">Change</a>
     </td>
   </tr>
   <tr class="govuk-table__row">
     <td class="govuk-table__cell">Tiering calculation</td>
     <td class="govuk-table__cell table_cell__left_align">
       <%= @prisoner.tier == 'N/A' ? @prisoner.tier : "Tier #{@prisoner.tier}" %>
-      <a class="govuk-link pull-right" href="<%= edit_prison_case_information_path(@prison.code, @prisoner.offender_no) %>">Change</a>
+      <a class="govuk-link pull-right" href="<%= edit_probation_data_prison_case_information_path(@prison.code, @prisoner.offender_no) %>">Change</a>
     </td>
   </tr>
   </tbody>

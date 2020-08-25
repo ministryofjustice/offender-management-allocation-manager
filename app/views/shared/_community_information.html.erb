@@ -37,7 +37,7 @@
         <%= @prisoner.team.presence || "N/A"%>
         <% unless auto_delius_import_enabled?(@prison.code) %>
           <% if editable && @prisoner.team.presence %>
-            <%= link_to( 'Change', edit_prison_case_information_path(@prison.code, @prisoner.offender_no), class: "govuk-link pull-right") %>
+            <%= link_to( 'Change', edit_probation_data_prison_case_information_path(@prison.code, @prisoner.offender_no), class: "govuk-link pull-right") %>
           <% end %>
         <%end %>
       </td>

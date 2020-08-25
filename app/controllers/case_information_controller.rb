@@ -11,13 +11,19 @@ class CaseInformationController < PrisonsApplicationController
   end
 
   def edit
-    @probation_service_form = EditProbationServiceForm.new(
-      nomis_offender_id: nomis_offender_id_from_url,
-      probation_service: @case_info.probation_service
-    )
+    if params[:form] == 'probation_data' && @case_info.requires_probation_data?
+      # Render page 2 of the edit form, where users set the probation data
+      # This is only possible when editing an existing England / Wales record
+      render_edit_probation_data
+    else
+      # Render page 1 of the edit form, where users will set the probation service
+      @probation_service_form = EditProbationServiceForm.new(
+        nomis_offender_id: nomis_offender_id_from_url,
+        probation_service: @case_info.probation_service
+      )
 
-    # Render page 1 of the edit form, where users will set the probation service
-    render_edit_probation_service
+      render_edit_probation_service
+    end
   end
 
   def update
@@ -136,6 +142,7 @@ private
   def save_case_info
     new_record = @case_info.new_record?
     ldu_changed = @case_info.ldu_changed?
+    already_allocated = !new_record && Allocation.find_by(nomis_offender_id: @case_info.nomis_offender_id).present?
 
     @case_info.save!
 
@@ -144,8 +151,13 @@ private
     end
 
     if new_record
+      # Go to 'Add missing information' summary page
       redirect_to prison_summary_pending_path(active_prison_id, sort: params[:sort], page: params[:page])
+    elsif already_allocated
+      # Go to 'Allocation information' page
+      redirect_to prison_allocation_path(active_prison_id, @case_info.nomis_offender_id)
     else
+      # Go to 'Allocate a Prison Offender Manager' page
       redirect_to new_prison_allocation_path(active_prison_id, @case_info.nomis_offender_id)
     end
   end
