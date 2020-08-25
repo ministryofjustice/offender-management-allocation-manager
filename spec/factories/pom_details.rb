@@ -19,13 +19,14 @@ FactoryBot.define do
   end
 
   class Elite2POM
-    attr_accessor :position, :staffId, :emails, :firstName, :lastName, :positionDescription
+    attr_accessor :position, :staffId, :emails, :firstName, :lastName, :positionDescription, :status
   end
 
   factory :pom, class: 'Elite2POM' do
     position { 'PRO' }
     sequence(:emails) { |x| ["staff#{x}@justice.gov.uk"]  }
     sequence(:staffId) { |x| x + 1000  }
+    status { 'ACTIVE' }
 
     firstName { Faker::Name.first_name }
     lastName { Faker::Name.last_name }

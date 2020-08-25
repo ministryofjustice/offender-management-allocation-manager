@@ -50,6 +50,11 @@ module ApiHelper
       to_return(body: emails.to_json)
   end
 
+  def stub_pom(pom)
+    stub_request(:get, "#{T3}/staff/#{pom.staffId}").
+      to_return(body: pom.to_json)
+  end
+
   def stub_signed_in_pom(prison, staff_id, username)
     stub_auth_token
     stub_sso_data(prison, username, 'ROLE_ALLOC_CASE_MGR')
