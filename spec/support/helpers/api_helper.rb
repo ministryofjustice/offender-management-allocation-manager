@@ -102,6 +102,11 @@ module ApiHelper
       to_return(body: bookings.to_json)
   end
 
+  def stub_keyworker(prison_code, offender_id, keyworker)
+    stub_request(:get, "#{KEYWORKER_API_HOST}/key-worker/#{prison_code}/offender/#{offender_id}").
+      to_return(body: keyworker.to_json)
+  end
+
   def reload_page
     visit current_path
   end
