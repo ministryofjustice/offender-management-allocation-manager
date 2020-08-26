@@ -8,12 +8,7 @@ module ApiHelper
   def stub_offender(offender)
     booking_number = 1
     stub_request(:get, "#{T3}/prisoners/#{offender.fetch(:offenderNo)}").
-      to_return(body: [{ offenderNo: offender.fetch(:offenderNo),
-                                      gender: 'Male',
-                                      convictedStatus: 'Convicted',
-                                      latestBookingId: booking_number,
-                                      imprisonmentStatus: offender.fetch(:imprisonmentStatus),
-                                      dateOfBirth: offender.fetch(:dateOfBirth) }].to_json)
+      to_return(body: [offender.except(:sentence).merge('latestBookingId' => booking_number)].to_json)
 
     stub_request(:post, "#{T3}/offender-sentences/bookings").
       with(
@@ -53,6 +48,11 @@ module ApiHelper
   def stub_pom_emails(staff_id, emails)
     stub_request(:get, "#{T3}/staff/#{staff_id}/emails").
       to_return(body: emails.to_json)
+  end
+
+  def stub_pom(pom)
+    stub_request(:get, "#{T3}/staff/#{pom.staffId}").
+      to_return(body: pom.to_json)
   end
 
   def stub_signed_in_pom(prison, staff_id, username)
@@ -100,6 +100,11 @@ module ApiHelper
 
     stub_request(:post, elite2bookingsapi).
       to_return(body: bookings.to_json)
+  end
+
+  def stub_keyworker(prison_code, offender_id, keyworker)
+    stub_request(:get, "#{KEYWORKER_API_HOST}/key-worker/#{prison_code}/offender/#{offender_id}").
+      to_return(body: keyworker.to_json)
   end
 
   def reload_page
