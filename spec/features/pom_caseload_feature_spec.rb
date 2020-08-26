@@ -60,7 +60,7 @@ feature "view POM's caseload" do
     stub_auth_token
     stub_poms(prison, poms)
     stub_offenders_for_prison(prison, offenders, [
-      attributes_for(:movement, :tap, offenderNo: moved_offender.fetch(:offenderNo))
+      attributes_for(:movement, :rotl, offenderNo: moved_offender.fetch(:offenderNo))
     ])
 
     offender_map.each do |nomis_offender_id, nomis_booking_id|

@@ -6,7 +6,6 @@ module Nomis
 
     attr_accessor :latest_movement
 
-    # custom attributes
     attr_accessor :allocation_date, :prison_arrival_date
 
     attr_reader :prison_id, :facial_image_id

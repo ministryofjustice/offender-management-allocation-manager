@@ -24,14 +24,8 @@ describe Nomis::Elite2::MovementApi do
 
     it 'sort movements (oldest first) for a specific_offender' do
       allow_any_instance_of(Nomis::Client).to receive(:post).and_return([
-        {
-          'offenderNo' => '2',
-          'createDateTime' => '2017-03-09T15:50:52.676892'
-        },
-        {
-          'offenderNo' => '1',
-          'createDateTime' => '2015-01-01T15:50:52.676892'
-        }
+        attributes_for(:movement, offenderNo: '2', createDateTime: '2017-03-09T15:50:52.676892').stringify_keys,
+        attributes_for(:movement, offenderNo: '1', createDateTime: '2015-01-01T15:50:52.676892').stringify_keys
       ])
 
       movements = described_class.movements_for('A5019DY')

@@ -29,13 +29,15 @@ module Nomis
       def self.admissions_for(offender_nos)
         # admissions need to include transfers from one place to another
         route = '/movements/offenders'
+        types = [Nomis::MovementType::ADMISSION,
+                 Nomis::MovementType::TRANSFER].freeze
 
-        cache_key = "#{route}_#{Digest::SHA256.hexdigest(offender_nos.to_s)}_ADM_TRN"
+        cache_key = "#{route}_#{Digest::SHA256.hexdigest(offender_nos.to_s)}_#{types}"
 
         Rails.cache.fetch(cache_key,
                           expires_in: Rails.configuration.cache_expiry) do
           data = e2_client.post(route, offender_nos,
-                                queryparams: { latestOnly: false, movementTypes: %w[ADM TRN] }).
+                                queryparams: { latestOnly: false, movementTypes: types }).
             group_by { |x| x['offenderNo'] }.values
           movements = data.map { |d|
             d.sort_by { |k| k['createDateTime'] }.map { |movement|
@@ -49,21 +51,29 @@ module Nomis
 
       def self.latest_temp_movement_for(offender_nos)
         route = '/movements/offenders'
+        types = [Nomis::MovementType::ADMISSION,
+                 Nomis::MovementType::TRANSFER,
+                 Nomis::MovementType::TEMPORARY].freeze
 
-        cache_key = "#{route}_#{Digest::SHA256.hexdigest(offender_nos.to_s)}_TAP"
+        cache_key = "#{route}_#{Digest::SHA256.hexdigest(offender_nos.to_s)}_#{types}"
 
-        Rails.cache.fetch(cache_key,
-                          expires_in: Rails.configuration.cache_expiry) do
-          data = e2_client.post(route, offender_nos,
-                                queryparams: { latestOnly: false, movementTypes: %w[TAP] }).
+        # 'data' is an array of arrays, with one array for each offenderNo
+        data = Rails.cache.fetch(cache_key,
+                                 expires_in: Rails.configuration.cache_expiry) do
+          e2_client.post(route, offender_nos,
+                         queryparams: { latestOnly: false, movementTypes: types }).
             group_by { |x| x['offenderNo'] }.values
-          movements = data.map { |d|
-            movement = d.max_by { |k| k['createDateTime'] }
-            api_deserialiser.deserialise(Nomis::Movement, movement)
-          }
-          # only return OUT TAP movements - if the last was an IN, then they haven't moved.
-          movements.select { |m| m.direction_code == 'OUT' }.index_by(&:offender_no)
         end
+
+        # This reduces the data to the most recent per offender
+        # (one array rather than an array of arrays)
+        movements = data.map { |d|
+          movement = d.max_by { |k| k['createDateTime'] }
+          api_deserialiser.deserialise(Nomis::Movement, movement)
+        }
+        # filter out non-temp movements - so if the last movement was
+        # not temp, the resulting array will not have an entry for that offender
+        movements.select { |m| m.out? && m.temporary? }.index_by(&:offender_no)
       end
     end
   end

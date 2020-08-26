@@ -17,11 +17,11 @@ module Nomis
                   :direction_code, :movement_time,
                   :movement_reason, :comment_text
 
-    def initialize(fields = nil)
+    def initialize(fields = {})
       # Allow this object to be reconstituted from a hash, we can't use
       # from_json as the one passed in will already be using the snake case
       # names whereas from_json is expecting the elite2 camelcase names.
-      fields.each { |k, v| instance_variable_set("@#{k}", v) } if fields.present?
+      fields.each { |k, v| instance_variable_set("@#{k}", v) }
     end
 
     def from_prison?
@@ -32,9 +32,17 @@ module Nomis
       PrisonService::PRISONS.include?(to_agency)
     end
 
+    def temporary?
+      movement_type == Nomis::MovementType::TEMPORARY
+    end
+
+    def out?
+      direction_code == MovementDirection::OUT
+    end
+
     def self.from_json(payload)
       Movement.new.tap { |obj|
-        obj.offender_no = payload['offenderNo']
+        obj.offender_no = payload.fetch('offenderNo')
         obj.create_date_time = deserialise_date_and_time(payload, 'createDateTime')
         obj.from_agency = payload['fromAgency']
         obj.from_agency_description = payload['fromAgencyDescription']
@@ -42,9 +50,9 @@ module Nomis
         obj.to_agency_description = payload['toAgencyDescription']
         obj.from_city = payload['fromCity']
         obj.to_city = payload['toCity']
-        obj.movement_type = payload['movementType']
+        obj.movement_type = payload.fetch('movementType')
         obj.movement_type_description = payload['movementTypeDescription']
-        obj.direction_code = payload['directionCode']
+        obj.direction_code = payload.fetch('directionCode')
         obj.movement_time = payload['movementTime']
         obj.movement_reason = payload['movementReason']
         obj.comment_text = payload['commentText']

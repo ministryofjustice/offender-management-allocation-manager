@@ -1,14 +1,17 @@
 FactoryBot.define do
   factory :movement, class: 'Nomis::Movement' do
-    skip_create
-
     initialize_with do
       Nomis::Movement.from_json(attributes.stringify_keys)
     end
 
-    trait :tap do
-      movementType do 'TAP' end
+    trait :rotl do
+      movementType { 'TAP' }
       directionCode  { 'OUT' }
+    end
+
+    trait :out do
+      directionCode { 'OUT' }
+      movementType { 'REL' }
     end
 
     fromAgency do
@@ -23,12 +26,8 @@ FactoryBot.define do
       'SWI'
     end
 
-    directionCode do
-      'IN'
-    end
-
-    movementType do
-      'ADM'
-    end
+    # default movement is 'in' (IN/ADM)
+    directionCode { 'IN' }
+    movementType { 'ADM' }
   end
 end
