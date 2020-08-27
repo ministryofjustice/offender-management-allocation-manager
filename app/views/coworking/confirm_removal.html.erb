@@ -5,7 +5,7 @@
   The <%= @responsibility_type %> POM is <%= @allocation.primary_pom_name %>.
 </p>
 
-<p class="govuk-body">We will send a confirmation email to <%= @primary_pom.emails.first %></p>
+<p class="govuk-body">We will send a confirmation email to <%= @primary_pom.email_address %></p>
 
 <%= form_tag(prison_coworking_path(@prison.code, @prisoner.offender_no), method: :delete) do %>
   <div class="govuk-form-group">

@@ -9,11 +9,11 @@ module Nomis
                   :from_date, :position_description,
                   :role, :role_description,
                   :schedule_type, :schedule_type_description,
-                  :hours_per_week, :thumbnail_id, :emails,
+                  :hours_per_week, :thumbnail_id,
                   :tier_a, :tier_b, :tier_c, :tier_d,
                   :status, :working_pattern
 
-    attr_writer :position
+    attr_writer :position, :emails
 
     def prison_officer?
       @position == RecommendationService::PRISON_POM
@@ -24,7 +24,7 @@ module Nomis
     end
 
     def email_address
-      emails.first
+      @emails.first
     end
 
     def full_name

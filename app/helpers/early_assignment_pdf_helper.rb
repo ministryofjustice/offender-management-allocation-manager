@@ -100,7 +100,7 @@ private
     prison_info = {
       prison: PrisonService.name_for(offender.prison_id),
       pom_name: allocation.primary_pom_name,
-      pom_email: pom.emails.first
+      pom_email: pom.email_address
     }
 
     pdf_table pdf, 'Prison information', prison_info
