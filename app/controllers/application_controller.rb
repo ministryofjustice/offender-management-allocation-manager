@@ -29,6 +29,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def ensure_global_admin_user
+    unless sso_identity.is_global_admin?
+      redirect_to '/401'
+    end
+  end
+
   def default_prison_code
     sso_identity.default_prison_code
   end
