@@ -59,7 +59,9 @@ feature "view POM's caseload" do
 
     stub_auth_token
     stub_poms(prison, poms)
-    stub_offenders_for_prison(prison, offenders)
+    stub_offenders_for_prison(prison, offenders, [
+      attributes_for(:movement, :rotl, offenderNo: moved_offender.fetch(:offenderNo))
+    ])
 
     offender_map.each do |nomis_offender_id, nomis_booking_id|
       create(:case_information, nomis_offender_id: nomis_offender_id)
@@ -106,7 +108,7 @@ feature "view POM's caseload" do
     end
 
     it 'can be sorted by earliest release date' do
-      page.all('th')[2].find('a').click
+      page.all('th')[3].find('a').click
 
       bookings_by_release_date = offenders.sort_by { |o| o.fetch(:sentence).fetch(:tariffDate) }
       [6, 7].each do |row_index|
@@ -115,6 +117,14 @@ feature "view POM's caseload" do
           name = "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}"
           expect(page).to have_content(name)
         end
+      end
+    end
+
+    it 'can be sorted by location/move date' do
+      click_link 'Location'
+      click_link 'Location'
+      within ".offender_row_0" do
+        expect(page).to have_content(moved_offender.fetch(:lastName))
       end
     end
 
@@ -197,7 +207,7 @@ feature "view POM's caseload" do
 
     within('.offender_row_0') do
       expect(page).to have_content(expected_name)
-      click_link 'View'
+      click_link expected_name
     end
 
     expect(page).to have_current_path(prison_prisoner_path(prison, first_offender.fetch(:offenderNo)), ignore_query: true)

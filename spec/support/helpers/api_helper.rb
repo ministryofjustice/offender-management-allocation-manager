@@ -62,12 +62,13 @@ module ApiHelper
       to_return(body: { 'staffId': staff_id }.to_json)
   end
 
-  def stub_offenders_for_prison(prison, offenders)
+  def stub_offenders_for_prison(prison, offenders, movements = [])
     # Stub the call to get_offenders_for_prison. Takes a list of offender hashes (in nomis camelCase format) and
     # a list of bookings (same key format). It it your responsibility to make sure they contain the data you want
     # and if you provide a booking, that the id matches between the offender and booking hashes.
     elite2listapi = "#{T3}/locations/description/#{prison}/inmates?convictedStatus=Convicted&returnCategory=true"
     elite2bookingsapi = "#{T3}/offender-sentences/bookings"
+    elite2latestmove = "#{T3}/movements/offenders?latestOnly=false&movementTypes=TAP"
 
     # Stub the call that will get the total number of records
     stub_request(:get, elite2listapi).to_return(
@@ -88,6 +89,10 @@ module ApiHelper
     bookings = booking_ids.zip(offenders).map { |booking_id, offender| { 'bookingId' => booking_id, 'sentenceDetail' => offender.fetch(:sentence) } }
     stub_request(:post, elite2bookingsapi).with(body: booking_ids.to_json).
       to_return(body: bookings.to_json)
+
+    stub_request(:post, elite2latestmove).with(
+      body: offenders.map { |offender| offender.fetch(:offenderNo) }.to_json).
+      to_return(body: movements.to_json)
   end
 
   def stub_multiple_offenders(offenders, bookings)

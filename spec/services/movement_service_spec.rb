@@ -94,7 +94,7 @@ describe MovementService do
   describe "processing an offender transfer" do
     let(:transfer_adm_no_to_agency) { build(:movement, offenderNo: 'G4273GI', toAgency: 'COURT')   }
     let(:transfer_in) { build(:movement, offenderNo: 'G4273GI', directionCode: 'IN', movementType: 'ADM', fromAgency: 'VEI', toAgency: 'CFI')   }
-    let(:admission) { create(:movement, offenderNo: 'G4273GI', toAgency: 'LEI', fromAgency: 'COURT')   }
+    let(:admission) { build(:movement, offenderNo: 'G4273GI', toAgency: 'LEI', fromAgency: 'COURT')   }
 
     let!(:existing_allocation) { create(:allocation, nomis_offender_id: 'G4273GI', prison: 'LEI')   }
     let(:existing_alloc_transfer) { build(:movement, offenderNo: 'G4273GI', fromAgency: 'PRI', toAgency: 'LEI')   }

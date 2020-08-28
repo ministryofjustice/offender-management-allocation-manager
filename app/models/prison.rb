@@ -82,12 +82,16 @@ private
       nomis_ids = offenders.map(&:offender_no)
       mapped_tiers = CaseInformationService.get_case_information(nomis_ids)
 
+      temp_movements = Nomis::Elite2::MovementApi.latest_temp_movement_for(nomis_ids)
+
       offenders.each { |offender|
         sentencing = sentence_details[offender.booking_id]
         offender.sentence = sentencing if sentencing.present?
 
         case_info_record = mapped_tiers[offender.offender_no]
         offender.load_case_information(case_info_record)
+
+        offender.latest_movement = temp_movements[offender.offender_no]
       }
     end
   end

@@ -45,7 +45,7 @@ feature "Delius import feature" do
 
     stub_request(:post, "#{stub_api_host}/movements/offenders?latestOnly=false&movementTypes=TRN").
       with(body: [offender_no].to_json).
-        to_return(body: [{ offenderNo: offender_no, toAgency: prison }].to_json)
+        to_return(body: [attributes_for(:movement, offenderNo: offender_no, toAgency: prison)].to_json)
 
     stub_const("Net::IMAP", MockIMAP)
 
