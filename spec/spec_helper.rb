@@ -39,6 +39,11 @@ end
 
 require 'vcr'
 
+# the default is :once, which seems to mess-up our cassette re-use
+# set VCR=1 when you wish to record new interactions with T3 (hopefully never)
+# set VCR=2 when the world changes dramatically e.g. new host, change API
+RECORD_MODES = { 0 => :none, 1 => :new_episodes, 2 => :all }.freeze
+
 VCR.configure do |config|
   config.cassette_library_dir = "spec/fixtures/vcr_cassettes"
   # using this higher-level hook allows WebMock to write-out stub calls when not in VCR-mode
@@ -48,9 +53,7 @@ VCR.configure do |config|
   # weirdly this assignment is implemented as a merge in VCR, so it only
   # overwrites the specified configuration options
   config.default_cassette_options = {
-    # the default is :once, which seems to mess-up our cassette re-use
-    # set VCR=1 when you wish to record new interactions with T3 (hopefully never)
-    record: ENV.fetch('VCR', '0').to_i.zero? ? :none : :new_episodes,
+    record: RECORD_MODES.fetch(ENV.fetch('VCR', '0').to_i),
     match_requests_on: [
       :method,
       :uri,

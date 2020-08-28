@@ -30,15 +30,29 @@ module Nomis
           [data, total_pages]
         }
 
+        search_route = '/prisoner-numbers'
+        offenders = data.map { |o| o.fetch('offenderNo') }
+        search_key = "#{search_route}_#{Digest::SHA256.hexdigest(offenders.to_s)}"
+        search_response = Rails.cache.fetch(search_key,
+                                            expires_in: Rails.configuration.cache_expiry) {
+                            search_client.post(search_route, prisonerNumbers: offenders)
+                          }.index_by { |o| o.fetch('prisonerNumber') }
+
+        offender_list = data.map do |offender|
+          recall_data = search_response.fetch(offender.fetch('offenderNo'), {})
+          offender.merge('recall' => recall_data.fetch('recall', false))
+        end
+
         offenders = api_deserialiser.deserialise_many(
-          Nomis::OffenderSummary, data)
+          Nomis::OffenderSummary, offender_list)
         ApiPaginatedResponse.new(total_pages, offenders)
       end
 
       def self.get_offender(offender_no)
         # Bad NOMIS numbers mustn't produce invalid URLs
-        route = "/prisoners/#{URI.encode_www_form_component(offender_no)}"
-        response = Rails.cache.fetch("offender-#{route}",
+        url_offender_no = URI.encode_www_form_component(offender_no)
+        route = "/prisoners/#{url_offender_no}"
+        response = Rails.cache.fetch(route,
                                      expires_in: Rails.configuration.cache_expiry) {
           e2_client.get(route)
         }
@@ -46,7 +60,14 @@ module Nomis
         if response.empty?
           nil
         else
-          api_deserialiser.deserialise(Nomis::Offender, response.first)
+          recall_route = "/offenders/#{url_offender_no}"
+          recall_response = Rails.cache.fetch(recall_route,
+                                              expires_in: Rails.configuration.cache_expiry) {
+            e2_client.get(recall_route)
+          }
+          # api_deserialiser.deserialise(Nomis::Offender, response.first)
+          api_deserialiser.deserialise(Nomis::Offender,
+                                       response.first.merge('recall' => recall_response.fetch('recall', false)))
         end
       end
 

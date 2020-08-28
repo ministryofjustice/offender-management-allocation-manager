@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe SentenceType, type: :model do
   it 'can return a sentence type for an offender with known sentence' do
-    sentence_type = described_class.new('IPP', 'DETERMINATE')
+    sentence_type = described_class.new('IPP', false)
 
     expect(sentence_type.code).to eq('IPP')
     expect(sentence_type.description).to eq('Indeterminate Sent for Public Protection')
@@ -36,13 +36,13 @@ RSpec.describe SentenceType, type: :model do
   end
 
   it "can determine recall sentences" do
-    off = described_class.new nil, 'RECALL'
+    off = described_class.new nil, true
 
     expect(off.recall_sentence?).to eq true
   end
 
   it "can determine non-recall sentences" do
-    off = described_class.new 'IPP', nil
+    off = described_class.new 'IPP', false
 
     expect(off.recall_sentence?).to eq false
   end

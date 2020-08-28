@@ -4,14 +4,12 @@ class SentenceType
   DETERMINATE = :determinate
   INDETERMINATE = :indeterminate
 
-  LEGAL_STATUS_RECALL = 'RECALL'
-
   attr_reader :code, :description
 
-  def initialize(imprisonment_status, legal_status)
+  def initialize(imprisonment_status, recall_flag)
     @code = imprisonment_status
     @code = 'UNK_SENT' if @code.nil?
-    @legal_status = legal_status
+    @recall_flag = recall_flag
 
     @description, @duration_type, = SENTENCE_TYPES.fetch(@code)
   end
@@ -25,7 +23,7 @@ class SentenceType
   end
 
   def recall_sentence?
-    @legal_status == LEGAL_STATUS_RECALL
+    @recall_flag
   end
 
   def civil?

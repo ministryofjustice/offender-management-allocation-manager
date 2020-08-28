@@ -22,7 +22,7 @@ FactoryBot.define do
     # in tests, as ruby sort isn't stable by default
     sequence(:lastName) { |c| "#{Faker::Name.last_name.titleize}_#{c}" }
     categoryCode { 'C' }
-    legalStatus {  'DETERMINATE' }
+    recall {  false }
 
     sentence { association :sentence_detail }
 
@@ -34,11 +34,11 @@ FactoryBot.define do
     end
     trait :indeterminate_recall do
       imprisonmentStatus {'LR_LIFE'}
-      legalStatus { 'RECALL' }
+      recall { true }
     end
     trait :determinate_recall do
       imprisonmentStatus {'LR_EPP'}
-      legalStatus { 'RECALL' }
+      recall { true }
     end
   end
 
@@ -64,7 +64,7 @@ FactoryBot.define do
     # in tests, as ruby sort isn't stable by default
     sequence(:lastName) { |c| "#{Faker::Name.last_name.titleize}_#{c}" }
     categoryCode { 'C' }
-    legalStatus { 'INDETERMINATE_SENTENCE' }
+    recall { false }
 
     sentence do
       association :nomis_sentence_detail

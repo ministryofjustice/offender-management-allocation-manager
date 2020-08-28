@@ -3,23 +3,32 @@
 module ApiHelper
   AUTH_HOST = Rails.configuration.nomis_oauth_host
   T3 = "#{Rails.configuration.prison_api_host}/api"
+  T3_SEARCH = "#{Rails.configuration.prisoner_search_host}/prisoner-search"
   KEYWORKER_API_HOST = ENV.fetch('KEYWORKER_API_HOST')
 
   def stub_offender(offender)
     booking_number = 1
-    stub_request(:get, "#{T3}/prisoners/#{offender.fetch(:offenderNo)}").
-      to_return(body: [offender.except(:sentence).merge('latestBookingId' => booking_number)].to_json)
+    offender_no = offender.fetch(:offenderNo)
+    stub_request(:get, "#{T3}/prisoners/#{offender_no}").
+      to_return(body: [offender.except(:sentence, :recall).merge('latestBookingId' => booking_number)].to_json)
+
+    stub_request(:get, "#{T3}/offenders/#{offender_no}").
+      to_return(body: { 'recall' => offender.fetch(:recall) }.to_json)
 
     stub_request(:post, "#{T3}/offender-sentences/bookings").
       with(
         body: [booking_number].to_json
       ).
-      to_return(body: [{ offenderNo: offender.fetch(:offenderNo), bookingId: booking_number,
-                                      sentenceDetail: offender.fetch(:sentence) }].to_json)
+      to_return(body: [
+        {
+          offenderNo: offender_no,
+          bookingId: booking_number,
+          sentenceDetail: offender.fetch(:sentence)
+        }].to_json)
 
     stub_request(:post, "#{T3}/offender-assessments/CATEGORY").
       with(
-        body: [offender.fetch(:offenderNo)].to_json
+        body: [offender_no].to_json
       ).
       to_return(body: {}.to_json)
 
@@ -69,6 +78,7 @@ module ApiHelper
     elite2listapi = "#{T3}/locations/description/#{prison}/inmates?convictedStatus=Convicted&returnCategory=true"
     elite2bookingsapi = "#{T3}/offender-sentences/bookings"
     elite2latestmove = "#{T3}/movements/offenders?latestOnly=true&movementTypes=TAP"
+    elite2recallapi = "#{T3_SEARCH}/prisoner-numbers"
 
     # Stub the call that will get the total number of records
     stub_request(:get, elite2listapi).to_return(
@@ -84,7 +94,15 @@ module ApiHelper
       headers: {
         'Page-Limit' => '200',
         'Page-Offset' => '0'
-      }).to_return(body: offenders.zip(booking_ids).map { |o, booking_id| o.except(:sentence).merge('bookingId' => booking_id, 'agencyId' => prison) }.to_json)
+      }).to_return(body: offenders.zip(booking_ids).map { |o, booking_id| o.except(:sentence, :recall).merge('bookingId' => booking_id, 'agencyId' => prison) }.to_json)
+
+    stub_request(:post, elite2recallapi).
+      to_return(body: offenders.map { |offender|
+                        {
+                          prisonerNumber: offender.fetch(:offenderNo),
+                          recall: offender.fetch(:recall)
+                        }
+                      }.to_json)
 
     bookings = booking_ids.zip(offenders).map { |booking_id, offender| { 'bookingId' => booking_id, 'sentenceDetail' => offender.fetch(:sentence) } }
     stub_request(:post, elite2bookingsapi).with(body: booking_ids.to_json).
