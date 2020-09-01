@@ -14,6 +14,7 @@ SimpleCov.start 'rails' do
   maximum_coverage_drop 0.5
 
   # Increase the merge timeout as tests sometimes take longer than the default 10 mins
+  # 1200 seconds is 20 minutes
   merge_timeout 1200
 end
 
