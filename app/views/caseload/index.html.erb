@@ -104,7 +104,7 @@
           </span>
         </td>
         <td aria-label="Location" class="govuk-table__cell">
-          <%= offender.latest_movement_date.nil? ? PrisonService.name_for(offender.prison) : "Temporary absence (out #{offender.latest_movement_date})" %>
+          <%= offender.latest_movement_date.nil? ? PrisonService.name_for(offender.prison) : "Temporary absence (out #{format_date(offender.latest_movement_date)})" %>
         </td>
         <td aria-label="Tier" class="govuk-table__cell tier">
           <%= offender.tier %>
