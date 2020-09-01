@@ -22,6 +22,7 @@ class PrisonOffenderManagerService
       pom.tier_b = allocation_counts.fetch('B', []).size
       pom.tier_c = allocation_counts.fetch('C', []).size
       pom.tier_d = allocation_counts.fetch('D', []).size
+      pom.no_tier = allocation_counts.fetch('N/A', []).size
       pom.status = detail.status
       pom.working_pattern = detail.working_pattern
 

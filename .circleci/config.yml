@@ -212,12 +212,12 @@ jobs:
       - run:
           name: Setup database
           command: |
-            bundle exec rake parallel:setup[4]
+            bundle exec rake parallel:setup[3]
       - run:
           name: Run tests
           command: |
             cc-test-reporter before-build
-            bundle exec rake parallel:spec[4]
+            bundle exec rake parallel:spec[3]
             cc-test-reporter after-build --coverage-input-type simplecov --exit-code $?
           environment:
             ALLOCATION_MANAGER_HOST: https://allocation-manager-staging.apps.live-1.cloud-platform.service.justice.gov.uk

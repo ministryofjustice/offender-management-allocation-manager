@@ -211,12 +211,41 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
         stub_offenders_for_prison(prison, [offender])
       end
 
-      context 'when tier A offender' do
-        it 'serves recommended POMs' do
-          create(:case_information, nomis_offender_id: offender_no, tier: 'A')
+      context 'with existing allocations' do
+        let(:alice) { poms.first }
 
+        before do
+          { a: 5, b: 4, c: 3, d: 2 }.each do |tier, quantity|
+            0.upto(quantity - 1) do
+              info = create(:case_information, tier: tier.to_s.upcase)
+              create(:allocation, prison: prison, nomis_offender_id: info.nomis_offender_id, primary_pom_nomis_id: alice.staffId)
+            end
+          end
+          info = create(:case_information, tier: 'N/A')
+          create(:allocation, prison: prison, nomis_offender_id: info.nomis_offender_id, primary_pom_nomis_id: alice.staffId)
+
+          offenders = CaseInformation.all.map { |ci| build(:nomis_offender, offenderNo: ci.nomis_offender_id) }
+          stub_offenders_for_prison(prison, offenders)
+        end
+
+        it 'serves correct counts' do
           get :new, params: { prison_id: prison, nomis_offender_id: offender_no }
+          expect(response).to be_successful
 
+          pom = assigns(:recommended_poms).detect { |c| c.first_name == alice.firstName }
+
+          expect(tier_a: pom.tier_a, tier_b: pom.tier_b, tier_c: pom.tier_c, tier_d: pom.tier_d, no_tier: pom.no_tier, total_cases: pom.total_cases)
+            .to eq(tier_a: 5, tier_b: 4, tier_c: 3, tier_d: 2, no_tier: 1, total_cases: 15)
+        end
+      end
+
+      context 'when tier A offender' do
+        before do
+          create(:case_information, nomis_offender_id: offender_no, tier: 'A')
+        end
+
+        it 'serves recommended POMs' do
+          get :new, params: { prison_id: prison, nomis_offender_id: offender_no }
           expect(response).to be_successful
 
           expect(assigns(:recommended_poms).map(&:first_name)).to match_array(poms.last(2).map(&:firstName))

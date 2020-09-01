@@ -6,6 +6,7 @@ RSpec.describe PomsController, type: :controller do
   let(:b_offenders) { build_list(:nomis_offender, 4) }
   let(:c_offenders) { build_list(:nomis_offender, 3) }
   let(:d_offenders) { build_list(:nomis_offender, 1) }
+  let(:na_offenders) { build_list(:nomis_offender, 5) }
 
   before do
     stub_sso_data(prison.code)
@@ -27,6 +28,7 @@ RSpec.describe PomsController, type: :controller do
       'B': b_offenders,
       'C': c_offenders,
       'D': d_offenders,
+      'N/A': na_offenders
     }.each do |tier, offenders|
       offenders.map { |o| o.fetch(:offenderNo) }.each do |offender_no|
         create(:case_information, tier: tier.to_s, nomis_offender_id: offender_no)
@@ -49,26 +51,40 @@ RSpec.describe PomsController, type: :controller do
       stub_request(:get, "#{ApiHelper::T3}/staff/#{active_staff_id}").
         to_return(body: { staffId: active_staff_id, lastName: 'LastName', firstName: 'FirstName' }.to_json)
 
-      offenders = a_offenders + b_offenders + c_offenders + d_offenders
+      offenders = a_offenders + b_offenders + c_offenders + d_offenders + na_offenders
 
       stub_offenders_for_prison(prison.code, offenders)
     end
 
-    it 'omits the allocation which does not show up in Prison#offenders' do
+    it 'does omit the allocation which does not show up in Prison#offenders' do
       get :index, params: { prison_id: prison.code }
       expect(response).to be_successful
 
       expect(assigns(:inactive_poms).count).to eq(1)
-      active_poms = assigns(:active_poms).map { |pom| { staff_id: pom.staff_id, tier_a: pom.tier_a, tier_b: pom.tier_b, tier_c: pom.tier_c, tier_d: pom.tier_d, total_cases: pom.total_cases } }
+      active_poms = assigns(:active_poms).map do |pom|
+        {
+          staff_id: pom.staff_id,
+          tier_a: pom.tier_a, tier_b: pom.tier_b, tier_c: pom.tier_c, tier_d: pom.tier_d, no_tier: pom.no_tier,
+          total_cases: pom.total_cases
+        }
+      end
 
-      expect(active_poms).to match_array [{ staff_id: active_staff_id, tier_a: 2, tier_b: 4, tier_c: 3, tier_d: 1, total_cases: 10 },
-                                          { staff_id: unavailable_staff_id, tier_a: 0, tier_b: 0, tier_c: 0, tier_d: 0, total_cases: 0 }]
+      expect(active_poms).to match_array [{ staff_id: active_staff_id,
+                                           tier_a: 2, tier_b: 4, tier_c: 3, tier_d: 1, no_tier: 5,
+                                           total_cases: 15 },
+                                          { staff_id: unavailable_staff_id,
+                                            tier_a: 0, tier_b: 0, tier_c: 0, tier_d: 0, no_tier: 0,
+                                            total_cases: 0 }]
     end
 
     it 'shows the caseload on the show action' do
       get :show, params: { prison_id: prison.code, nomis_staff_id: active_staff_id }
       expect(response).to be_successful
-      expect(assigns(:allocations).map(&:tier)).to match_array(["A", 'A', "B", "B", "B", "B", "C", "C", "C", "D"])
+      expect(assigns(:allocations).map(&:tier)).to match_array(["A", 'A',
+                                                                "B", "B", "B", "B",
+                                                                "C", "C", "C",
+                                                                "D",
+                                                                "N/A", "N/A", "N/A", "N/A", "N/A"])
     end
   end
 end

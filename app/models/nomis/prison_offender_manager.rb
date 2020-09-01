@@ -10,7 +10,7 @@ module Nomis
                   :role, :role_description,
                   :schedule_type, :schedule_type_description,
                   :hours_per_week, :thumbnail_id,
-                  :tier_a, :tier_b, :tier_c, :tier_d,
+                  :tier_a, :tier_b, :tier_c, :tier_d, :no_tier,
                   :status, :working_pattern
 
     attr_writer :position, :emails
@@ -40,7 +40,7 @@ module Nomis
     end
 
     def total_cases
-      [tier_a, tier_b, tier_c, tier_d].sum
+      [tier_a, tier_b, tier_c, tier_d, no_tier].sum
     end
 
     def self.from_json(payload)
