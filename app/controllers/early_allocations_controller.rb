@@ -56,7 +56,7 @@ class EarlyAllocationsController < PrisonsApplicationController
   end
 
   def show
-    @early_assignment = EarlyAllocation.find_by!(offender_id_from_url)
+    @early_assignment = EarlyAllocation.where(offender_id_from_url).last
 
     respond_to do |format|
       format.pdf {

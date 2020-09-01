@@ -31,6 +31,17 @@ RSpec.describe EarlyAllocationsController, type: :controller do
     create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
   end
 
+  describe '#show' do
+    before do
+      create(:case_information, nomis_offender_id: nomis_offender_id, early_allocations: build_list(:early_allocation, 5))
+    end
+
+    it 'shows the most recent' do
+      get :show, params: { prison_id: prison, prisoner_id: nomis_offender_id }, format: :pdf
+      expect(assigns(:early_assignment)).to eq(CaseInformation.last.early_allocations.last)
+    end
+  end
+
   context 'with not ldu email address' do
     let(:ldu) { create(:local_divisional_unit, email_address: nil) }
     let(:team) { create(:team, local_divisional_unit: ldu) }
