@@ -13,9 +13,11 @@ SimpleCov.start 'rails' do
   # sometimes coverage drops between branches - don't fail in these cases
   maximum_coverage_drop 0.5
 
-  # Increase the merge timeout as tests sometimes take longer than the default 10 mins
+  # Increase the merge timeout for circle:ci
+  # as tests sometimes take longer than the default 10 mins
+
   # 1200 seconds is 20 minutes
-  merge_timeout 1200
+  merge_timeout 1200 if ENV['CIRCLE_ARTIFACTS']
 end
 
 if ENV['CIRCLE_ARTIFACTS']
