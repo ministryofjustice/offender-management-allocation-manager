@@ -12,6 +12,9 @@ SimpleCov.start 'rails' do
   minimum_coverage 99.34
   # sometimes coverage drops between branches - don't fail in these cases
   maximum_coverage_drop 0.5
+
+  # Needed for parallel specs
+  command_name "specs" + (ENV['TEST_ENV_NUMBER'] || '')
 end
 
 if ENV['CIRCLE_ARTIFACTS']
