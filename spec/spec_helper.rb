@@ -13,8 +13,8 @@ SimpleCov.start 'rails' do
   # sometimes coverage drops between branches - don't fail in these cases
   maximum_coverage_drop 0.5
 
-  # Needed for parallel specs
-  command_name "specs" + (ENV['TEST_ENV_NUMBER'] || '')
+  # Increase the merge timeout as tests sometimes take longer than the default 10 mins
+  merge_timeout 1200
 end
 
 if ENV['CIRCLE_ARTIFACTS']
