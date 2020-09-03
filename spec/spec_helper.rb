@@ -12,6 +12,9 @@ SimpleCov.start 'rails' do
   minimum_coverage 99.34
   # sometimes coverage drops between branches - don't fail in these cases
   maximum_coverage_drop 0.5
+
+  # set merge_timeout to 30 minutes on circle:ci
+  merge_timeout 1800 if ENV['CIRCLECI']
 end
 
 if ENV['CIRCLE_ARTIFACTS']
