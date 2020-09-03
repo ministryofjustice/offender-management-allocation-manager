@@ -158,7 +158,7 @@ module Nomis
   private
 
     def handover
-      @handover ||= if pom_responsibility&.custody?
+      @handover ||= if pom_responsibility.custody?
                       HandoverDateService.handover(self)
                     else
                       HandoverDateService::NO_HANDOVER_DATE
