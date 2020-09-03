@@ -9,6 +9,7 @@ class ResponsibilityService
 
   RESPONSIBLE = Responsibility.new 'Responsible', true
   SUPPORTING = Responsibility.new 'Supporting', false
+  UNKNOWN = Responsibility.new 'Unknown', false
   COWORKING = 'Co-Working'
   NPS = 'NPS'
 
@@ -65,7 +66,7 @@ private
         release_date ||= possible_dates.compact.min
       end
 
-      return nil if release_date.blank?
+      return UNKNOWN if release_date.blank?
 
       expected_time_in_custody_gt_10_months = release_date > offender.sentence_start_date + 10.months
       handover_date_in_future = HandoverDateService.handover(offender).handover_date > Time.zone.today
@@ -107,7 +108,7 @@ private
         release_date ||= possible_dates.compact.min
       end
 
-      return nil if release_date.blank?
+      return UNKNOWN if release_date.blank?
 
       handover_date_in_future = HandoverDateService.handover(offender).handover_date > Time.zone.today
       if handover_date_in_future && release_date >= cutoff
@@ -136,10 +137,10 @@ private
 
   private
 
-    def english_prepolicy_rules(offender)
-      private_cutoff = '1 Jun 2021'.to_date
-      public_cutoff = '15 Feb 2021'.to_date
+    PRIVATE_CUTOFF = '1 Jun 2021'.to_date.freeze
+    PUBLIC_CUTOFF = '15 Feb 2021'.to_date.freeze
 
+    def english_prepolicy_rules(offender)
       release_date = offender.parole_eligibility_date
 
       if offender.indeterminate_sentence?
@@ -149,9 +150,9 @@ private
         release_date ||= possible_dates.compact.min
       end
 
-      return nil if release_date.blank?
+      return UNKNOWN if release_date.blank?
 
-      cutoff = hub_or_private?(offender) ? private_cutoff : public_cutoff
+      cutoff = hub_or_private?(offender) ? PRIVATE_CUTOFF : PUBLIC_CUTOFF
 
       handover_date_in_future = HandoverDateService.handover(offender).handover_date > Time.zone.today
 
@@ -189,7 +190,7 @@ private
            offender.conditional_release_date,
            offender.home_detention_curfew_eligibility_date].compact.min
 
-      return nil if earliest_release_date.nil?
+      return UNKNOWN if earliest_release_date.nil?
 
       if earliest_release_date > DateTime.now.utc.to_date + 12.weeks
         RESPONSIBLE
