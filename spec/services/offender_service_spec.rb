@@ -14,11 +14,15 @@ describe OffenderService do
     expect(offender.case_allocation).to eq 'CRC'
   end
 
-  it "returns nil if offender record not found", vcr: { cassette_name: :offender_service_single_offender_not_found_spec } do
-    nomis_offender_id = 'AAA121212CV4G4GGVV'
+  context 'when offender record not found', vcr: { cassette_name: :offender_service_single_offender_not_found_spec } do
+    let(:nomis_offender_id) { 'C4443CV' }
 
-    offender = described_class.get_offender(nomis_offender_id)
-    expect(offender).to be_nil
+    it "returns nil" do
+      nomis_offender_id = 'C4443CV'
+
+      offender = described_class.get_offender(nomis_offender_id)
+      expect(offender).to be_nil
+    end
   end
 
   describe "#set_allocated_pom_name" do

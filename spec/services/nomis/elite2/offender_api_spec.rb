@@ -80,13 +80,14 @@ describe Nomis::Elite2::OffenderApi do
       expect(response).to eq('C')
     end
 
-    it 'returns nil if unable to find prisoner',
-       vcr: { cassette_name: :offender_api_null_offender_spec  } do
-      noms_id = 'AAA22D'
+    context 'when unable to find prisoner', vcr: { cassette_name: :offender_api_null_offender_spec } do
+      let(:noms_id) { 'A2222DD' }
 
-      response = described_class.get_offender(noms_id)
+      it 'returns nil' do
+        response = described_class.get_offender(noms_id)
 
-      expect(response).to be_nil
+        expect(response).to be_nil
+      end
     end
   end
 
