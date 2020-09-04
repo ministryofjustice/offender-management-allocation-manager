@@ -61,7 +61,7 @@ module Nomis
         data = Rails.cache.fetch(cache_key,
                                  expires_in: Rails.configuration.cache_expiry) do
           e2_client.post(route, offender_nos,
-                         queryparams: { latestOnly: false, movementTypes: types }).
+                         queryparams: { latestOnly: true, movementTypes: types }).
             group_by { |x| x['offenderNo'] }.values
         end
 

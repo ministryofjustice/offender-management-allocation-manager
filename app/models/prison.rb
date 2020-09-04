@@ -45,13 +45,23 @@ private
     end
 
     def each
-      number_of_requests = max_requests_count
+      first_page = Nomis::Elite2::OffenderApi.list(
+        @prison,
+        0,
+        page_size: FETCH_SIZE
+      )
+      offenders = first_page.data
+      enrich_offenders(offenders)
+      offenders.each { |offender| yield offender }
 
-      (0..number_of_requests - 1).each do |request_no|
-        offenders = fetch_page_of_offenders(
-          page_number: request_no,
+      1.upto(first_page.total_pages - 1).each do |page_number|
+        offenders = Nomis::Elite2::OffenderApi.list(
+          @prison,
+          page_number,
           page_size: FETCH_SIZE
-        )
+        ).data
+
+        enrich_offenders(offenders)
 
         offenders.each { |offender| yield offender }
       end
@@ -59,23 +69,7 @@ private
 
   private
 
-    def max_requests_count
-      # Fetch the first 1 prisoners just for the total number of pages so that we
-      # can send batched queries.
-      info_request = Nomis::Elite2::OffenderApi.list(@prison, 1, page_size: 1)
-
-      # The maximum number of pages we need to fetch before we have all of
-      # the offenders
-      (info_request.total_pages / FETCH_SIZE) + 1
-    end
-
-    def fetch_page_of_offenders(page_number:, page_size:)
-      offenders = Nomis::Elite2::OffenderApi.list(
-        @prison,
-        page_number,
-        page_size: page_size
-      ).data
-
+    def enrich_offenders(offenders)
       booking_ids = offenders.map(&:booking_id)
       sentence_details = Nomis::Elite2::OffenderApi.get_bulk_sentence_details(booking_ids)
 

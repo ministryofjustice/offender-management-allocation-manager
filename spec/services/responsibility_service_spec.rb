@@ -232,7 +232,7 @@ describe ResponsibilityService do
 
               it 'will return no responsibility' do
                 expect(described_class.calculate_pom_responsibility(offender)).
-                  to be_nil
+                  to eq ResponsibilityService::UNKNOWN
               end
             end
           end
@@ -319,7 +319,7 @@ describe ResponsibilityService do
 
               it 'will return no responsibility' do
                 expect(described_class.calculate_pom_responsibility(offender)).
-                  to be_nil
+                  to eq ResponsibilityService::UNKNOWN
               end
             end
           end
@@ -528,7 +528,7 @@ describe ResponsibilityService do
 
               it 'will return no responsibility' do
                 expect(described_class.calculate_pom_responsibility(offender)).
-                  to be_nil
+                  to eq ResponsibilityService::UNKNOWN
               end
             end
           end

@@ -11,11 +11,7 @@ module OffenderHelper
   end
 
   def case_owner_label(offender)
-    if offender.pom_responsibility.custody?
-      'Custody'
-    else
-      'Community'
-    end
+    offender.pom_responsibility.case_owner
   end
 
   def last_event(allocation)
