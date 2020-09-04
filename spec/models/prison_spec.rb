@@ -24,17 +24,7 @@ RSpec.describe Prison, type: :model do
 
       before do
         stub_auth_token
-        stub_request(:get, "https://api-dev.prison.service.justice.gov.uk/api/locations/description/LEI/inmates?convictedStatus=Convicted&returnCategory=true").
-          with(
-            headers: {
-              'Page-Limit' => '1',
-              'Page-Offset' => '1',
-            }).
-          to_return(
-            body: {}.to_json,
-            headers: { 'Total-Records' => '200' }
-          )
-        stub_request(:get, "https://api-dev.prison.service.justice.gov.uk/api/locations/description/LEI/inmates?convictedStatus=Convicted&returnCategory=true").
+        stub_request(:get, "#{ApiHelper::T3}/locations/description/LEI/inmates?convictedStatus=Convicted&returnCategory=true").
           with(
             headers: {
               'Page-Limit' => '200',
@@ -42,26 +32,12 @@ RSpec.describe Prison, type: :model do
             }).
           to_return(body: offenders.to_json)
 
-        # stub_request(:post, "https://api-dev.prison.service.justice.gov.uk/api/movements/offenders?latestOnly=false&movementTypes=TAP").
-        #   with(body: offenders.map { |o| o.fetch(:offenderNo) }.to_json).
-        #   to_return(body: [].to_json)
-        stub_request(:post, "https://api-dev.prison.service.justice.gov.uk/api/movements/offenders?latestOnly=false&movementTypes=TAP").
+        stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=true&movementTypes=TAP").
+          with(body: offenders.map { |o| o.fetch(:offenderNo) }.to_json).
           to_return(body: [].to_json)
-
-        stub_request(:get, "https://api-dev.prison.service.justice.gov.uk/api/locations/description/LEI/inmates?convictedStatus=Convicted&returnCategory=true").
-          with(
-            headers: {
-              'Page-Limit' => '200',
-              'Page-Offset' => '200',
-            }).
-          to_return(body: [].to_json)
-
-        # stub_request(:post, "https://api-dev.prison.service.justice.gov.uk/api/movements/offenders?latestOnly=false&movementTypes=TAP").
-        #   with(body: [].to_json).
-        #   to_return(body: [].to_json)
 
         bookings = offenders.map { |offender| { 'bookingId' => offender.fetch(:bookingId), 'sentenceDetail' => offender.fetch(:sentence) } }
-        stub_request(:post, "https://api-dev.prison.service.justice.gov.uk/api/offender-sentences/bookings").
+        stub_request(:post, "#{ApiHelper::T3}/offender-sentences/bookings").
           with(body: offenders.map { |o| o.fetch(:bookingId) }.to_json).
           to_return(body: bookings.to_json)
       end
