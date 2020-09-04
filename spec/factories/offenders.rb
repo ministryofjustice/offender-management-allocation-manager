@@ -43,7 +43,7 @@ FactoryBot.define do
     initialize_with { attributes }
 
     imprisonmentStatus { 'SENT03' }
-    prisonId { 'LEI' }
+    agencyId { 'LEI' }
 
     # offender numbers are of the form <letter><4 numbers><2 letters>
     sequence(:offenderNo) do |seq|
@@ -65,5 +65,7 @@ FactoryBot.define do
     sentence do
       association :nomis_sentence_detail
     end
+
+    sequence(:bookingId) { |c| c + 100_000 }
   end
 end
