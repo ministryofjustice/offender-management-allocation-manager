@@ -18,8 +18,9 @@ FactoryBot.define do
       'LEI'
     end
 
+    # This should be far enough in the past so that the offender isn't considered a 'new arrival' by default
     sequence(:createDateTime) do |seq|
-      (Time.zone.today - seq.days).to_s
+      (Time.zone.today - 1.year - seq.days).to_s
     end
 
     toAgency do
