@@ -12,8 +12,13 @@ module ApiHelper
     stub_request(:get, "#{T3}/prisoners/#{offender_no}").
       to_return(body: [offender.except(:sentence, :recall).merge('latestBookingId' => booking_number)].to_json)
 
-    stub_request(:get, "#{T3}/offenders/#{offender_no}").
-      to_return(body: { 'recall' => offender.fetch(:recall) }.to_json)
+    stub_request(:post, "#{T3_SEARCH}/prisoner-numbers").with(body: { prisonerNumbers: [offender_no] }).
+      to_return(body: [
+        {
+          prisonerNumber: offender_no,
+          recall: offender.fetch(:recall)
+        }
+      ].to_json)
 
     stub_request(:post, "#{T3}/offender-sentences/bookings").
       with(
@@ -78,7 +83,6 @@ module ApiHelper
     elite2listapi = "#{T3}/locations/description/#{prison}/inmates?convictedStatus=Convicted&returnCategory=true"
     elite2bookingsapi = "#{T3}/offender-sentences/bookings"
     elite2latestmove = "#{T3}/movements/offenders?latestOnly=true&movementTypes=TAP"
-    elite2recallapi = "#{T3_SEARCH}/prisoner-numbers"
 
     # Stub the call that will get the total number of records
     stub_request(:get, elite2listapi).to_return(
@@ -96,7 +100,7 @@ module ApiHelper
         'Page-Offset' => '0'
       }).to_return(body: offenders.zip(booking_ids).map { |o, booking_id| o.except(:sentence, :recall).merge('bookingId' => booking_id, 'agencyId' => prison) }.to_json)
 
-    stub_request(:post, elite2recallapi).
+    stub_request(:post, "#{T3_SEARCH}/prisoner-numbers").with(body: { prisonerNumbers: offenders.map { |offender| offender.fetch(:offenderNo) } }.to_json).
       to_return(body: offenders.map { |offender|
                         {
                           prisonerNumber: offender.fetch(:offenderNo),

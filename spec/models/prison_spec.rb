@@ -37,7 +37,10 @@ RSpec.describe Prison, type: :model do
           with(
             body: { prisonerNumbers: offender_nos }.to_json
           ).
-          to_return(body: [].to_json)
+          to_return(body: offenders.map { |o|
+                            { prisonerNumber: o.fetch(:offenderNo),
+                                                recall: o.fetch(:recall) }
+                          }                          .to_json)
 
         stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=true&movementTypes=TAP").
           with(body: offender_nos.to_json).

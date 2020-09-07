@@ -164,4 +164,22 @@ describe Nomis::OffenderSummary do
       end
     end
   end
+
+  describe '#recalled' do
+    context 'when recall flag set' do
+      let(:offender) { build(:offender, recall: true) }
+
+      it 'is true' do
+        expect(offender.recalled?).to eq(true)
+      end
+    end
+
+    context 'when recall flag unset' do
+      let(:offender) { build(:offender, recall: false) }
+
+      it 'is false' do
+        expect(offender.recalled?).to eq(false)
+      end
+    end
+  end
 end

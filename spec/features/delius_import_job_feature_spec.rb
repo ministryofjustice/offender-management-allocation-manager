@@ -27,21 +27,19 @@ feature "Delius import feature" do
   let(:offender_no) { "GCA2H2A" }
   let(:prison) { "LEI" }
   let(:booking_id) { 754_207 }
-  let(:offenders) { [build(:nomis_offender, offenderNo: offender_no)] }
+  let(:offender) { build(:nomis_offender, offenderNo: offender_no, imprisonmentStatus: 'DET', dateOfBirth: "1985-03-19") }
 
   before do
     signin_spo_user
 
-    stub_request(:post, "#{stub_auth_host}/auth/oauth/token").
-      with(query: { grant_type: 'client_credentials' }).
-        to_return(body: {}.to_json)
+    stub_auth_token
     stub_request(:get, "#{ApiHelper::T3}/users/MOIC_POM").
       to_return(body: { 'staffId': 1 }.to_json)
     stub_pom_emails(1, [])
 
-    stub_offender(build(:nomis_offender, offenderNo: offender_no, imprisonmentStatus: 'DET', dateOfBirth: "1985-03-19"))
+    stub_offender(offender)
 
-    stub_offenders_for_prison("LEI", offenders)
+    stub_offenders_for_prison("LEI", [offender])
 
     stub_request(:post, "#{stub_api_host}/movements/offenders?latestOnly=false&movementTypes=TRN").
       with(body: [offender_no].to_json).
@@ -54,7 +52,7 @@ feature "Delius import feature" do
     ENV['DELIUS_XLSX_PASSWORD'] = 'secret'
   end
 
-  context "when the team is associated with an LDU" do
+  context "when the team is associated with an LDU", :js do
     before do
       ENV['DELIUS_EMAIL_FOLDER'] = 'delius_import_feature'
       create(:team, code: 'A', name: 'NPS - Team 1')

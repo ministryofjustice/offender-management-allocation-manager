@@ -59,7 +59,7 @@ module Nomis
     end
 
     def recalled?
-      @sentence_type.recall_sentence?
+      @recall_flag
     end
 
     def criminal_sentence?
@@ -118,7 +118,8 @@ module Nomis
       @last_name = payload.fetch('lastName')
       @offender_no = payload.fetch('offenderNo')
       @convicted_status = payload['convictedStatus']
-      @sentence_type = SentenceType.new(payload['imprisonmentStatus'], payload['recall'])
+      @recall_flag = payload['recall']
+      @sentence_type = SentenceType.new(payload['imprisonmentStatus'])
       @category_code = payload['categoryCode']
       @date_of_birth = deserialise_date(payload, 'dateOfBirth')
       @early_allocation = false
