@@ -60,16 +60,24 @@ module Nomis
       JSON.parse(response.body)
     end
 
+    def put(route, body, queryparams: {}, extra_headers: {})
+      response = request(
+        :put, route, queryparams: queryparams, extra_headers: extra_headers, body: body
+      )
+
+      JSON.parse(response.body)
+    end
+
   private
 
     def request(method, route, queryparams: {}, extra_headers: {}, body: nil)
       @connection.send(method) do |req|
         req.url(@root + route)
         req.headers['Authorization'] = "Bearer #{token.access_token}"
-        req.headers['Content-Type'] = 'application/json' if method == :post
+        req.headers['Content-Type'] = 'application/json' unless body.nil?
         req.headers.merge!(extra_headers)
         req.params.update(queryparams)
-        req.body = body.to_json if body.present? && method == :post
+        req.body = body.to_json unless body.nil?
       end
     rescue Faraday::ConnectionFailed => e
       AllocationManager::ExceptionHandler.capture_exception(e)
