@@ -28,3 +28,10 @@
 
 ---
 notifications:
+  - id: recall-badges-09-2020
+    start_date: 08/09/2020
+    role:
+      - POM
+      - SPO
+    end_date: 18/09/2020
+    text: "<b>NEW FEATURE:</b> Prisoners on recall can now be identified by the 'Recall' badge shown on their case details page. <a href='/whats-new'>Read more</a>"
