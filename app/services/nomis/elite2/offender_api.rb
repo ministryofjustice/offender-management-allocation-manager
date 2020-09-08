@@ -51,9 +51,9 @@ module Nomis
         if response.empty?
           nil
         else
-          recall_response = get_recall_flags([url_offender_no])
+          recall_data = get_recall_flags([url_offender_no])
           api_deserialiser.deserialise(Nomis::Offender,
-                                       response.first.merge('recall' => recall_response.fetch(url_offender_no).fetch('recall', false)))
+                                       response.first.merge(recall_data.fetch(url_offender_no)))
         end
       end
 
@@ -124,7 +124,7 @@ module Nomis
         Rails.cache.fetch(search_key,
                           expires_in: Rails.configuration.cache_expiry) {
           search_client.post(search_route, prisonerNumbers: offenders)
-        }.index_by { |o| o.fetch('prisonerNumber') }
+        }.map { |prisoner| [prisoner.fetch('prisonerNumber'), { 'recall' => prisoner.fetch('recall', false) }] }.to_h
       end
 
       def self.paging_headers(page_size, page_offset)

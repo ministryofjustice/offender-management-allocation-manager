@@ -118,7 +118,7 @@ module Nomis
       @last_name = payload.fetch('lastName')
       @offender_no = payload.fetch('offenderNo')
       @convicted_status = payload['convictedStatus']
-      @recall_flag = payload['recall']
+      @recall_flag = payload.fetch('recall')
       @sentence_type = SentenceType.new(payload['imprisonmentStatus'])
       @category_code = payload['categoryCode']
       @date_of_birth = deserialise_date(payload, 'dateOfBirth')
