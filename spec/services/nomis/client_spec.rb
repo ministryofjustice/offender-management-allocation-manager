@@ -97,4 +97,114 @@ describe Nomis::Client do
         to raise_error(Nomis::Client::APIError, 'Failed to connect to nosuchhost')
     end
   end
+
+  describe 'instance method' do
+    let(:route) { '/api/some/endpoint' }
+    let(:stub_url) { api_host + route }
+    let(:response_body) { '{"key": "value", "success": true}' }
+
+    shared_examples 'handles JSON response' do
+      it 'decodes the response JSON' do
+        expect(response).to be_a(Hash)
+        expect(response).to eq JSON.parse(response_body)
+      end
+    end
+
+    describe '#get' do
+      let(:response) do
+        client.get(route)
+      end
+
+      before do
+        WebMock.stub_request(:get, stub_url).
+          to_return(body: response_body)
+
+        # Trigger the request
+        response
+      end
+
+      it 'performs an authenticated GET request' do
+        expect(WebMock).to have_requested(:get, stub_url).
+          with(
+            headers: {
+              'Authorization': "Bearer #{access_token}"
+            }
+          )
+      end
+
+      include_examples 'handles JSON response'
+    end
+
+    describe '#post' do
+      let(:request_body) { { id: 123, someKey: 'Some value' } }
+      let(:response) do
+        client.post(route, request_body)
+      end
+
+      before do
+        WebMock.stub_request(:post, stub_url).
+          to_return(body: response_body)
+
+        # Trigger the request
+        response
+      end
+
+      it 'performs an authenticated POST request' do
+        expect(WebMock).to have_requested(:post, stub_url).
+          with(
+            headers: {
+              'Authorization': "Bearer #{access_token}"
+            }
+          )
+      end
+
+      it 'encodes the request body as JSON' do
+        expect(WebMock).to have_requested(:post, stub_url).
+          with(
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: request_body.to_json
+          )
+      end
+
+      include_examples 'handles JSON response'
+    end
+
+    describe '#put' do
+      let(:request_body) { { id: 123, someKey: 'Some value' } }
+      let(:response) do
+        client.put(route, request_body)
+      end
+
+      before do
+        WebMock.stub_request(:put, stub_url).
+          to_return(body: response_body)
+
+        # Trigger the request
+        response
+      end
+
+      it 'performs an authenticated PUT request' do
+        expect(WebMock).to have_requested(:put, stub_url).
+          with(
+            headers: {
+              'Authorization': "Bearer #{access_token}"
+            }
+          )
+      end
+
+      it 'encodes the request body as JSON' do
+        expect(WebMock).to have_requested(:put, stub_url).
+          with(
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: request_body.to_json
+          )
+      end
+
+      include_examples 'handles JSON response'
+    end
+  end
 end
