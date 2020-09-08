@@ -7,7 +7,6 @@ RSpec.describe SentenceType, type: :model do
     expect(sentence_type.code).to eq('IPP')
     expect(sentence_type.description).to eq('Indeterminate Sent for Public Protection')
     expect(sentence_type.indeterminate_sentence?).to eq(true)
-    expect(sentence_type.recall_sentence?).to eq(false)
   end
 
   it 'can handle offenders with no sentence' do
@@ -33,18 +32,6 @@ RSpec.describe SentenceType, type: :model do
     off = described_class.new 'IPP'
 
     expect(off.indeterminate_sentence?).to eq true
-  end
-
-  it "can determine recall sentences" do
-    off = described_class.new 'LR_HDC'
-
-    expect(off.recall_sentence?).to eq true
-  end
-
-  it "can determine non-recall sentences" do
-    off = described_class.new 'IPP'
-
-    expect(off.recall_sentence?).to eq false
   end
 
   it "can describe a sentence for an offender" do

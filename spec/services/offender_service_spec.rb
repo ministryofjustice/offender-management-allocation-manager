@@ -7,7 +7,7 @@ describe OffenderService do
     create(:case_information, nomis_offender_id: nomis_offender_id, tier: 'C', case_allocation: 'CRC', welsh_offender: 'Yes')
     offender = described_class.get_offender(nomis_offender_id)
 
-    expect(offender).to be_kind_of(Nomis::Offender)
+    expect(offender).to be_kind_of(Nomis::OffenderBase)
     expect(offender.tier).to eq 'C'
     expect(offender.sentence.conditional_release_date).to eq(Date.new(2020, 3, 16))
     expect(offender.main_offence).to eq 'Section 18 - wounding with intent to resist / prevent arrest'

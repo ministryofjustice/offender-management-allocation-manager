@@ -3,8 +3,6 @@
 class SentenceType
   DETERMINATE = :determinate
   INDETERMINATE = :indeterminate
-  RECALL = :recall
-  NON_RECALL = :non_recall
 
   attr_reader :code, :description
 
@@ -12,7 +10,7 @@ class SentenceType
     @code = imprisonment_status
     @code = 'UNK_SENT' if @code.nil?
 
-    @description, @duration_type, @recall_status = SENTENCE_TYPES.fetch(@code)
+    @description, @duration_type, = SENTENCE_TYPES.fetch(@code)
   end
 
   def immigration_case?
@@ -21,10 +19,6 @@ class SentenceType
 
   def indeterminate_sentence?
     @duration_type == INDETERMINATE
-  end
-
-  def recall_sentence?
-    @recall_status == RECALL
   end
 
   def civil?

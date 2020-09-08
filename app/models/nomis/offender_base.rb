@@ -59,7 +59,7 @@ module Nomis
     end
 
     def recalled?
-      @sentence_type.recall_sentence?
+      @recall_flag
     end
 
     def criminal_sentence?
@@ -114,18 +114,15 @@ module Nomis
       # It is expected that this method will be called by the subclass which
       # will have been given a payload at the class level, and will call this
       # method from it's own internal from_json
-      @first_name = payload['firstName']
-      @last_name = payload['lastName']
+      @first_name = payload.fetch('firstName')
+      @last_name = payload.fetch('lastName')
       @offender_no = payload.fetch('offenderNo')
       @convicted_status = payload['convictedStatus']
+      @recall_flag = payload.fetch('recall')
       @sentence_type = SentenceType.new(payload['imprisonmentStatus'])
       @category_code = payload['categoryCode']
       @date_of_birth = deserialise_date(payload, 'dateOfBirth')
       @early_allocation = false
-    end
-
-    def inprisonment_status=(status)
-      @sentence_type = SentenceType.new(status)
     end
 
     def handover_start_date
