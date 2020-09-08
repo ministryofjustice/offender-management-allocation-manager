@@ -21,6 +21,7 @@ RSpec.describe Prison, type: :model do
 
     context 'when there are exactly 200 offenders' do
       let(:offenders) { build_list(:nomis_offender, 200) }
+      let(:offender_nos) { offenders.map { |o| o.fetch(:offenderNo) } }
 
       before do
         stub_auth_token
@@ -32,8 +33,17 @@ RSpec.describe Prison, type: :model do
             }).
           to_return(body: offenders.to_json)
 
+        stub_request(:post, "#{ApiHelper::T3_SEARCH}/prisoner-numbers").
+          with(
+            body: { prisonerNumbers: offender_nos }.to_json
+          ).
+          to_return(body: offenders.map { |o|
+                            { prisonerNumber: o.fetch(:offenderNo),
+                                                recall: o.fetch(:recall) }
+                          }                          .to_json)
+
         stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=true&movementTypes=TAP").
-          with(body: offenders.map { |o| o.fetch(:offenderNo) }.to_json).
+          with(body: offender_nos.to_json).
           to_return(body: [].to_json)
 
         bookings = offenders.map { |offender| { 'bookingId' => offender.fetch(:bookingId), 'sentenceDetail' => offender.fetch(:sentence) } }

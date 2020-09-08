@@ -10,6 +10,11 @@ module Nomis
         Nomis::Client.new(host + '/api')
       end
 
+      def search_client
+        host = Rails.configuration.prisoner_search_host
+        Nomis::Client.new(host + '/prisoner-search')
+      end
+
       def api_deserialiser
         ApiDeserialiser.new
       end

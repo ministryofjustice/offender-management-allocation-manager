@@ -30,15 +30,20 @@ module Nomis
           [data, total_pages]
         }
 
-        offenders = api_deserialiser.deserialise_many(
-          Nomis::OffenderSummary, data)
+        recall_data = get_recall_flags(data.map { |o| o.fetch('offenderNo') })
+        data.each do |offender|
+          offender.merge!(recall_data.fetch(offender.fetch('offenderNo')))
+        end
+
+        offenders = api_deserialiser.deserialise_many(Nomis::OffenderSummary, data)
         ApiPaginatedResponse.new(total_pages, offenders)
       end
 
       def self.get_offender(offender_no)
         # Bad NOMIS numbers mustn't produce invalid URLs
-        route = "/prisoners/#{URI.encode_www_form_component(offender_no)}"
-        response = Rails.cache.fetch("offender-#{route}",
+        url_offender_no = URI.encode_www_form_component(offender_no)
+        route = "/prisoners/#{url_offender_no}"
+        response = Rails.cache.fetch(route,
                                      expires_in: Rails.configuration.cache_expiry) {
           e2_client.get(route)
         }
@@ -46,7 +51,9 @@ module Nomis
         if response.empty?
           nil
         else
-          api_deserialiser.deserialise(Nomis::Offender, response.first)
+          recall_data = get_recall_flags([url_offender_no])
+          api_deserialiser.deserialise(Nomis::Offender,
+                                       response.first.merge(recall_data.fetch(url_offender_no)))
         end
       end
 
@@ -110,6 +117,15 @@ module Nomis
       end
 
     private
+
+      def self.get_recall_flags(offenders)
+        search_route = '/prisoner-numbers'
+        search_key = "#{search_route}_#{Digest::SHA256.hexdigest(offenders.to_s)}"
+        Rails.cache.fetch(search_key,
+                          expires_in: Rails.configuration.cache_expiry) {
+          search_client.post(search_route, prisonerNumbers: offenders)
+        }.map { |prisoner| [prisoner.fetch('prisonerNumber'), { 'recall' => prisoner.fetch('recall', false) }] }.to_h
+      end
 
       def self.paging_headers(page_size, page_offset)
         {
