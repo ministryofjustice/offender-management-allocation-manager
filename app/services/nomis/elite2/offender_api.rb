@@ -118,13 +118,14 @@ module Nomis
 
     private
 
-      def self.get_recall_flags(offenders)
+      def self.get_recall_flags(offender_nos)
         search_route = '/prisoner-numbers'
-        search_key = "#{search_route}_#{Digest::SHA256.hexdigest(offenders.to_s)}"
-        Rails.cache.fetch(search_key,
-                          expires_in: Rails.configuration.cache_expiry) {
-          search_client.post(search_route, prisonerNumbers: offenders)
-        }.map { |prisoner| [prisoner.fetch('prisonerNumber'), { 'recall' => prisoner.fetch('recall', false) }] }.to_h
+        search_key = "#{search_route}_#{Digest::SHA256.hexdigest(offender_nos.to_s)}"
+        search_result = Rails.cache.fetch(search_key,
+                                          expires_in: Rails.configuration.cache_expiry) {
+                          search_client.post(search_route, prisonerNumbers: offender_nos)
+                        }.index_by { |prisoner| prisoner.fetch('prisonerNumber') }
+        offender_nos.index_with { |nomis_id| { 'recall' => search_result.fetch(nomis_id, {}).fetch('recall', false) } }
       end
 
       def self.paging_headers(page_size, page_offset)
