@@ -27,11 +27,6 @@ class CaseInformation < ApplicationRecord
 
   validates :team, presence: true, unless: -> { manual_entry }
 
-  validates :welsh_offender, inclusion: {
-    in: %w[Yes No],
-    allow_nil: false,
-    message: 'Select yes if the prisoner’s last known address was in Wales'
-  }
   # Don't think this is as simple as allowing nil. In the specific case of Scot/NI
   # prisoners it makes sense to have N/A (as this is genuine) but not otherwise
   validates :tier, inclusion: { in: %w[A B C D N/A], message: 'Select the prisoner’s tier' }
