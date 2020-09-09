@@ -3,7 +3,7 @@
       <div class="govuk-width-container app-site-width-container">
         <div class="service_banner">
           <button onclick="cancelThisNotification(this)" type="button" class="close-service-notification" id="<%= "ServiceNotifications." + service_alert['id'] %>">
-            <%= image_tag('icon-close-cross-black.svg', alt:"close notification", class: "close-button") %>
+            <%= image_tag(asset_path('@ministryofjustice/frontend/moj/assets/images/icon-close-cross-black.svg'), alt:"close notification", class: "close-button") %>
           </button>
           <p><%= raw(service_alert['text']) %></p>
         </div>
