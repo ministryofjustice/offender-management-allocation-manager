@@ -19,8 +19,21 @@ RSpec.describe Prison, type: :model do
       expect(offender_array.first).to be_kind_of(Nomis::OffenderSummary)
     end
 
+    context 'when recall flag set' do
+      let(:offenders) { build_list(:nomis_offender, 2, recall: true) }
+
+      before do
+        stub_auth_token
+        stub_offenders_for_prison('LEI', offenders)
+      end
+
+      it 'populates the recall flag' do
+        expect(subject.map(&:recalled?)).to eq [true, true]
+      end
+    end
+
     context 'when the search API misses someone' do
-      let(:offenders) { build_list(:nomis_offender, 10) }
+      let(:offenders) { build_list(:nomis_offender, 5, recall: true) }
       let(:offender_nos) { offenders.map { |o| o.fetch(:offenderNo) } }
 
       before do
@@ -52,8 +65,8 @@ RSpec.describe Prison, type: :model do
           to_return(body: bookings.to_json)
       end
 
-      it 'doesnt crash' do
-        expect(subject.count).to eq(10)
+      it 'returns falses when missing' do
+        expect(subject.map(&:recalled?)).to eq([true, true, false, false, false])
       end
     end
 

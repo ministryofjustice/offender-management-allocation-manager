@@ -125,7 +125,7 @@ module Nomis
                                           expires_in: Rails.configuration.cache_expiry) {
                           search_client.post(search_route, prisonerNumbers: offender_nos)
                         }.index_by { |prisoner| prisoner.fetch('prisonerNumber') }
-        offender_nos.index_with { |_nomis_id| { 'recall' => search_result.fetch('recall', false) } }
+        offender_nos.index_with { |nomis_id| { 'recall' => search_result.fetch(nomis_id, {}).fetch('recall', false) } }
       end
 
       def self.paging_headers(page_size, page_offset)
