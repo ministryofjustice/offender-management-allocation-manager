@@ -42,13 +42,35 @@ describe Nomis::Elite2::OffenderApi do
   end
 
   describe 'Single offender' do
-    it "can get a single offender's details",
-       vcr: { cassette_name: :offender_api_single_offender_spec } do
-      noms_id = 'G2911GD'
+    describe '#get_offender' do
+      subject { described_class.get_offender(offender_no) }
 
-      response = described_class.get_offender(noms_id)
+      let(:offender) { build(:nomis_offender, recall: true) }
+      let(:offender_no) { offender.fetch(:offenderNo) }
 
-      expect(response).to be_instance_of(Nomis::Offender)
+
+      before do
+        stub_auth_token
+        stub_offender(offender)
+      end
+
+      context 'when offender search succeeds' do
+        it "can get a single offender's details including recall flag" do
+          expect(subject).to be_instance_of(Nomis::Offender)
+          expect(subject.recalled?).to eq(true)
+        end
+      end
+
+      context 'when offender search fails' do
+        before do
+          stub_request(:post, "#{ApiHelper::T3_SEARCH}/prisoner-numbers").with(body: { prisonerNumbers: [offender_no] }).
+            to_return(body: [].to_json)
+        end
+
+        it "defaults the recall flag to false" do
+          expect(subject.recalled?).to eq(false)
+        end
+      end
     end
 
     it 'can get category codes', :raven_intercept_exception,
@@ -58,7 +80,7 @@ describe Nomis::Elite2::OffenderApi do
       expect(response).to eq('C')
     end
 
-    it 'returns if unable to find prisoner',
+    it 'returns nil if unable to find prisoner',
        vcr: { cassette_name: :offender_api_null_offender_spec  } do
       noms_id = 'AAA22D'
 
