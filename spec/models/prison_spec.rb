@@ -33,7 +33,7 @@ RSpec.describe Prison, type: :model do
     end
 
     context 'when the search API misses someone' do
-      let(:offenders) { build_list(:nomis_offender, 5, recall: true) }
+      let(:offenders) { [build(:nomis_offender, recall: true), build(:nomis_offender, recall: false), build(:nomis_offender, recall: true)] }
       let(:offender_nos) { offenders.map { |o| o.fetch(:offenderNo) } }
 
       before do
@@ -66,7 +66,7 @@ RSpec.describe Prison, type: :model do
       end
 
       it 'returns falses when missing' do
-        expect(subject.map(&:recalled?)).to eq([true, true, false, false, false])
+        expect(subject.map(&:recalled?)).to eq([true, false, false])
       end
     end
 
