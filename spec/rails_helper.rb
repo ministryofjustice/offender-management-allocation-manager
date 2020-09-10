@@ -6,10 +6,10 @@ abort('The Rails environment is running in production mode!') if Rails.env.produ
 require 'rspec/rails'
 require 'spec_helper'
 require 'support/helpers/api_helper'
-require 'support/helpers/jwt_helper'
-require 'support/helpers/features_helper'
 require 'support/helpers/auth_helper'
-require 'support/helpers/api_helper'
+require 'support/helpers/community_api_helper'
+require 'support/helpers/features_helper'
+require 'support/helpers/jwt_helper'
 require 'capybara/rspec'
 require 'webmock/rspec'
 require 'paper_trail/frameworks/rspec'
@@ -64,10 +64,11 @@ RSpec.configure do |config|
   end
 
   config.include ActiveSupport::Testing::TimeHelpers
-  config.include JWTHelper
-  config.include FeaturesHelper
-  config.include AuthHelper
   config.include ApiHelper
+  config.include AuthHelper
+  config.include CommunityApiHelper
+  config.include FeaturesHelper
+  config.include JWTHelper
 
   config.after(:each, :raven_intercept_exception) do
     Rails.configuration.sentry_dsn = nil
