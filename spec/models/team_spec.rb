@@ -11,6 +11,34 @@ RSpec.describe Team, type: :model do
     expect(build(:team, code: nil, shadow_code: 'N123')).to be_valid
   end
 
+  describe '#code' do
+    subject { build(:team, code: code) }
+
+    context 'with non-alpha' do
+      let(:code) { "ND4\t" }
+
+      it 'is invalid' do
+        expect(subject).not_to be_valid
+      end
+    end
+
+    context 'with upper-case and numbers' do
+      let(:code) { 'ND143A' }
+
+      it 'is valid' do
+        expect(subject).to be_valid
+      end
+    end
+
+    context 'with lower-case and numbers' do
+      let(:code) { 'nd143a' }
+
+      it 'is valid' do
+        expect(subject).to be_valid
+      end
+    end
+  end
+
   context 'when NPS' do
     before do
       create(:team, :nps)

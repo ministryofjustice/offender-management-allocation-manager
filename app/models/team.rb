@@ -2,6 +2,7 @@
 
 class Team < ApplicationRecord
   validates :name, presence: true
+  validates :code, format: { with: /\A[a-zA-Z0-9]+\z/, allow_nil: true }
 
   validates :shadow_code, uniqueness: true, if: -> { nps? && shadow_code.present? }
   validates :code, uniqueness: true, if: -> { nps? && code.present? }
@@ -22,6 +23,9 @@ class Team < ApplicationRecord
     code&.starts_with?('N')
   end
 
+  # This should strictly be a non-optional association, but without it we
+  # will just attach the a shadow-only team to the 'OMIC Responsibility' team.
+  # Maybe that's what we should do?
   belongs_to :local_divisional_unit, optional: true
 
   has_many :case_information, dependent: :restrict_with_error, counter_cache: :case_information_count
