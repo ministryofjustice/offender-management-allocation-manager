@@ -7,6 +7,14 @@ describe Nomis::Client do
   let(:access_token) { "access_token" }
   let(:valid_token) { Nomis::Oauth::Token.new(access_token: access_token) }
 
+  let(:auth_header) {
+    {
+      headers: {
+        'Authorization': "Bearer #{access_token}"
+      }
+    }
+  }
+
   before do
     allow(token_service).to receive(:valid_token).and_return(valid_token)
   end
@@ -20,11 +28,7 @@ describe Nomis::Client do
       client.get(route)
 
       expect(WebMock).to have_requested(:get, /\w/).
-        with(
-          headers: {
-            'Authorization': "Bearer #{access_token}"
-          }
-      )
+        with(auth_header)
     end
   end
 
@@ -125,11 +129,7 @@ describe Nomis::Client do
 
       it 'performs an authenticated GET request' do
         expect(WebMock).to have_requested(:get, stub_url).
-          with(
-            headers: {
-              'Authorization': "Bearer #{access_token}"
-            }
-          )
+          with(auth_header)
       end
 
       include_examples 'handles JSON response'
@@ -151,11 +151,7 @@ describe Nomis::Client do
 
       it 'performs an authenticated POST request' do
         expect(WebMock).to have_requested(:post, stub_url).
-          with(
-            headers: {
-              'Authorization': "Bearer #{access_token}"
-            }
-          )
+          with(auth_header)
       end
 
       it 'encodes the request body as JSON' do
@@ -187,11 +183,7 @@ describe Nomis::Client do
 
       it 'performs an authenticated PUT request' do
         expect(WebMock).to have_requested(:put, stub_url).
-          with(
-            headers: {
-              'Authorization': "Bearer #{access_token}"
-            }
-          )
+          with(auth_header)
       end
 
       it 'encodes the request body as JSON' do
@@ -205,6 +197,20 @@ describe Nomis::Client do
       end
 
       include_examples 'handles JSON response'
+    end
+
+    describe '#delete' do
+      before do
+        WebMock.stub_request(:delete, stub_url).
+          to_return(status: 200)
+
+        client.delete(route)
+      end
+
+      it 'performs an authenticated DELETE request' do
+        expect(WebMock).to have_requested(:delete, stub_url).
+          with(auth_header)
+      end
     end
   end
 end
