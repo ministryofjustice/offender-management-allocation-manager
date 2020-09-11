@@ -102,4 +102,22 @@ RSpec.describe UpdateTeamNameAndLduService do
       }.to raise_error(ActiveRecord::RecordInvalid, 'Validation failed: Name has already been taken')
     end
   end
+
+  context 'when a shadow team of the same name exists' do
+    before do
+      create(:team, code: nil, local_divisional_unit: nil)
+      create(:local_divisional_unit)
+    end
+
+    let(:ldu) { LocalDivisionalUnit.last }
+
+    let(:team) { Team.last }
+    let(:team_code) { 'NTTR2' }
+
+    it 'matches, and updates the LDU' do
+      described_class.update(team_code: team_code, team_name: team.name, ldu_code: ldu.code, ldu_name: ldu.name)
+      expect(team.reload.attributes.symbolize_keys.except(:id, :case_information_count, :created_at, :updated_at)).
+        to eq(attributes_for(:team, shadow_code: team.shadow_code, code: team_code, name: team.name, local_divisional_unit_id: ldu.id))
+    end
+  end
 end
