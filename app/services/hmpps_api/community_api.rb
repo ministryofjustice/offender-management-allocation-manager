@@ -39,8 +39,15 @@ module HmppsApi
 
       dates.stringify_keys.each do |code, date|
         route = base_route + code
-        body = { date: date.strftime('%F') }
-        self.client.put(route, body)
+
+        if date.nil?
+          # Delete the date from nDelius
+          self.client.delete(route)
+        else
+          # Create/update the date in nDelius
+          body = { date: date.strftime('%F') }
+          self.client.put(route, body)
+        end
       end
 
       # So long as the API calls didn't error, return true
