@@ -1,4 +1,4 @@
 //= link_tree ../images
-//= link @ministryofjustice/frontend/moj/assets/images/icon-close-cross-black.svg
+//= link_tree ../../../node_modules/@ministryofjustice/frontend/moj/assets/images
 //= link_directory ../javascripts .js
 //= link_directory ../stylesheets .css
