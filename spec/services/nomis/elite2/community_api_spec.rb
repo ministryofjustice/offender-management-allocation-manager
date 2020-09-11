@@ -40,33 +40,96 @@ describe Nomis::Elite2::CommunityApi do
   end
 
   describe '.set_handover_dates' do
+    subject {
+      described_class.set_handover_dates(
+        offender_no: offender_no,
+        handover_start_date: handover_start_date,
+        responsibility_handover_date: responsibility_handover_date
+      )
+    }
+
     let(:stub_base_url) { "#{api_host}/secure/offenders/nomsNumber/#{offender_no}/custody/keyDates" }
 
     before do
       stub_request(:put, "#{stub_base_url}/POM1").to_return(status: 200, body: '{}')
       stub_request(:put, "#{stub_base_url}/POM2").to_return(status: 200, body: '{}')
+      stub_request(:delete, "#{stub_base_url}/POM1").to_return(status: 200)
+      stub_request(:delete, "#{stub_base_url}/POM2").to_return(status: 200)
+
+      # Trigger the request
+      subject
     end
 
-    it 'sets both handover dates for the given offender' do
-      described_class.set_handover_dates(
-        offender_no: offender_no,
-        handover_start_date: Date.parse('01/02/2020'),
-        responsibility_handover_date: Date.parse('18/10/2020')
-      )
+    describe 'when both handover dates are given' do
+      let(:handover_start_date) { Date.parse('01/02/2020') }
+      let(:responsibility_handover_date) { Date.parse('18/10/2020') }
 
-      # Handover start date = POM1
-      expect(WebMock).to have_requested(:put, "#{stub_base_url}/POM1").
-        with(
-          headers: { 'Content-Type': 'application/json' },
-          body: { date: '2020-02-01' }.to_json
-        )
+      it 'sets both handover dates for the given offender' do
+        # Handover start date = POM1
+        expect(WebMock).to have_requested(:put, "#{stub_base_url}/POM1").
+          with(
+            headers: { 'Content-Type': 'application/json' },
+            body: { date: '2020-02-01' }.to_json
+          )
 
-      # Responsibility handover date = POM2
-      expect(WebMock).to have_requested(:put, "#{stub_base_url}/POM2").
-        with(
-          headers: { 'Content-Type': 'application/json' },
-          body: { date: '2020-10-18' }.to_json
-        )
+        # Responsibility handover date = POM2
+        expect(WebMock).to have_requested(:put, "#{stub_base_url}/POM2").
+          with(
+            headers: { 'Content-Type': 'application/json' },
+            body: { date: '2020-10-18' }.to_json
+          )
+      end
+    end
+
+    describe 'when both the dates are nil' do
+      let(:handover_start_date) { nil }
+      let(:responsibility_handover_date) { nil }
+
+      it 'deletes both dates for the given offender' do
+        # Handover start date = POM1
+        expect(WebMock).to have_requested(:delete, "#{stub_base_url}/POM1")
+
+        # Responsibility handover date = POM2
+        expect(WebMock).to have_requested(:delete, "#{stub_base_url}/POM2")
+      end
+    end
+
+    describe 'when handover start date is nil' do
+      let(:handover_start_date) { nil }
+      let(:responsibility_handover_date) { Date.parse('25/12/2021') }
+
+      it 'deletes handover start date' do
+        # Handover start date = POM1
+        expect(WebMock).to have_requested(:delete, "#{stub_base_url}/POM1")
+      end
+
+      it 'still sets responsibility handover date' do
+        # Responsibility handover date = POM2
+        expect(WebMock).to have_requested(:put, "#{stub_base_url}/POM2").
+          with(
+            headers: { 'Content-Type': 'application/json' },
+            body: { date: '2021-12-25' }.to_json
+          )
+      end
+    end
+
+    describe 'when responsibility handover date is nil' do
+      let(:handover_start_date) { Date.parse('01/12/2021') }
+      let(:responsibility_handover_date) { nil }
+
+      it 'still sets handover start date' do
+        # Handover start date = POM1
+        expect(WebMock).to have_requested(:put, "#{stub_base_url}/POM1").
+          with(
+            headers: { 'Content-Type': 'application/json' },
+            body: { date: '2021-12-01' }.to_json
+          )
+      end
+
+      it 'deletes responsibility handover date' do
+        # Responsibility handover date = POM2
+        expect(WebMock).to have_requested(:delete, "#{stub_base_url}/POM2")
+      end
     end
   end
 end

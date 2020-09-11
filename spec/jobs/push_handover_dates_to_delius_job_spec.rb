@@ -7,6 +7,7 @@ RSpec.describe PushHandoverDatesToDeliusJob, type: :job do
   before do
     stub_auth_token
     stub_offender(nomis_offender)
+    create(:case_information, nomis_offender_id: offender_no, case_allocation: 'NPS')
     allow(Nomis::Elite2::CommunityApi).to receive(:set_handover_dates)
   end
 
