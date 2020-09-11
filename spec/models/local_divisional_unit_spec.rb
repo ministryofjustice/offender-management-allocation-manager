@@ -12,6 +12,14 @@ RSpec.describe LocalDivisionalUnit, type: :model do
   describe '#code' do
     let(:ldu) { build(:local_divisional_unit, code: code) }
 
+    context 'with blank' do
+      let(:code) { '' }
+
+      it 'is invalid' do
+        expect(subject).not_to be_valid
+      end
+    end
+
     context 'with non-alpha' do
       let(:code) { "ND4\t" }
 

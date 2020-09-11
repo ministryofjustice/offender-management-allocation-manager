@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
 class Team < ApplicationRecord
+  TEAM_LDU_CODE_REGEX = /\A[a-zA-Z0-9]+\z/.freeze
+
   validates :name, presence: true
-  validates :code, format: { with: /\A[a-zA-Z0-9]+\z/, allow_nil: true }
+  validates :code, format: { with: TEAM_LDU_CODE_REGEX }, unless: -> { code.blank? }
+  validates :shadow_code, format: { with: TEAM_LDU_CODE_REGEX }, unless: -> { shadow_code.blank? }
 
   validates :shadow_code, uniqueness: true, if: -> { nps? && shadow_code.present? }
   validates :code, uniqueness: true, if: -> { nps? && code.present? }
