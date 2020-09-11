@@ -68,6 +68,12 @@ module Nomis
       JSON.parse(response.body)
     end
 
+    def delete(route, queryparams: {}, extra_headers: {})
+      request(
+        :delete, route, queryparams: queryparams, extra_headers: extra_headers
+      )
+    end
+
   private
 
     def request(method, route, queryparams: {}, extra_headers: {}, body: nil)
