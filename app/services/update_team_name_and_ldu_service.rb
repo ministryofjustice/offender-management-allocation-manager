@@ -5,9 +5,10 @@ class UpdateTeamNameAndLduService
     ldu = LocalDivisionalUnit.find_or_create_by!(code: ldu_code) do |l|
       l.name = ldu_name
     end
-    # If there is a code-less team with this name, match to it as it used to be a 'shadow-only' team
-    existing_team = Team.find_by(name: team_name)
-    if existing_team.present? && existing_team.code.nil?
+    existing_teams = Team.where(name: team_name).reject { |t| t.code == team_code }
+    # If this looks like an NPS team, and there is an unique existing team with this name but different code, match to it
+    if Team.new(code: team_code, name: team_name, local_divisional_unit: ldu).nps? && existing_teams.count == 1
+      existing_team = existing_teams.first
       existing_team.assign_attributes(code: team_code, local_divisional_unit: ldu)
       existing_team.save! if existing_team.changed?
     else
