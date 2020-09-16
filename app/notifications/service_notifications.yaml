@@ -34,4 +34,4 @@ notifications:
       - POM
       - SPO
     end_date: 23/09/2020
-    text: "<b>We are aware that the service is picking up inactive recalls which is causing incorrect responsibility calculations. We are working hard to resolve this. Sorry for any inconvenience.</b>"
+    text: "<b>We are aware that the service is picking up some inactive recalls which is causing incorrect responsibility calculations. We are working hard to resolve this. Sorry for any inconvenience.</b>"
