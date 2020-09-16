@@ -120,7 +120,7 @@ feature 'Allocation History' do
         ['.moj-timeline__title', "Prisoner reallocated"],
         ['.moj-timeline__description', "Prisoner reallocated to #{history1.primary_pom_name.titleize} - (email address not found) Tier: #{history1.allocated_at_tier}"],
         ['.moj-timeline__date', formatted_date_for(history1).to_s],
-        ['.moj-timeline__title', "Prisoner allocation"],
+        ['.moj-timeline__title', "Prisoner allocated"],
         ['.moj-timeline__description', "Prisoner allocated to #{history2.primary_pom_name.titleize} - #{prison_pom[:email]} Tier: #{history2.allocated_at_tier}"],
         ['.moj-timeline__date', formatted_date_for(history2).to_s],
         ['.moj-timeline__description', "Prisoner allocated to #{hist_allocate_secondary.secondary_pom_name.titleize} - #{probation_pom[:email]} Tier: #{hist_allocate_secondary.allocated_at_tier}"],
@@ -132,7 +132,7 @@ feature 'Allocation History' do
         ['.moj-timeline__title', "Prisoner reallocated"],
         ['.moj-timeline__description', "Prisoner reallocated to #{history6.primary_pom_name.titleize} - #{probation_pom_2[:email]} Tier: #{history6.allocated_at_tier}"],
         ['.moj-timeline__date', "#{formatted_date_for(history6)} by #{history6.created_by_name.titleize}"],
-        ['.moj-timeline__title', "Prisoner allocation"],
+        ['.moj-timeline__title', "Prisoner allocated"],
         ['.moj-timeline__description', "Prisoner allocated to #{history.last.primary_pom_name.titleize} - #{probation_pom[:email]} Tier: #{history.last.allocated_at_tier}"],
         ['.moj-timeline__description', "Probation POM allocated instead of recommended Prison POM", "Reason(s):", "- Prisoner assessed as suitable for a prison POM despite tiering calculation", "Too high risk"],
         ['.moj-timeline__date', "#{formatted_date_for(history.last)} by #{history.last.created_by_name.titleize}"]

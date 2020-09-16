@@ -24,19 +24,32 @@ RSpec.describe OverridesController, type: :controller do
     }
   end
 
-  context 'when creating an override' do
-    it 'redirects to confirm#allocation when offender has no previous allocations' do
+  context 'without an allocation' do
+    it 'redirects to confirm #allocation' do
       post :create, params: params.merge(override_params)
 
       expect(response).to redirect_to prison_confirm_allocation_path(prison, nomis_offender_id, nomis_staff_id)
     end
+  end
 
-    it 'redirects to confirm#reallocation when offender has been previously allocated' do
-      allow(AllocationService).to receive(:previously_allocated_poms).and_return([nomis_offender_id])
-
+  context 'with an allocation' do
+    it 'redirects to confirm#reallocation' do
+      create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
       post :create, params: params.merge(override_params)
 
       expect(response).to redirect_to prison_confirm_reallocation_path(prison, nomis_offender_id, nomis_staff_id)
+    end
+  end
+
+  context 'with an inactive allocation' do
+    before do
+      allocation = create(:allocation, nomis_offender_id: nomis_offender_id)
+      allocation.deallocate_offender(Allocation::OFFENDER_RELEASED)
+    end
+
+    it 'redirects to confirm#allocation' do
+      post :create, params: params.merge(override_params)
+      expect(response).to redirect_to prison_confirm_allocation_path(prison, nomis_offender_id, nomis_staff_id)
     end
   end
 end
