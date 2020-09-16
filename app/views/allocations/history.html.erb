@@ -8,7 +8,8 @@
       <h2 class="govuk-heading-m"><%= prison_title(prison) %></h2>
       <div class="moj-timeline">
           <% allocations.each_with_index do |allocation, i| %>
-            <% if allocation.event == 'allocate_primary_pom' %>
+<!-- It is size-1 because the list is displayed backwards -->
+            <% if allocation.event == 'allocate_primary_pom' || i == allocations.size-1 %>
               <%= render :partial => "allocate_primary_pom",
                          :locals => { allocation: allocation,
                                       pom_name: allocation.primary_pom_name,
