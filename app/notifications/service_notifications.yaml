@@ -28,10 +28,10 @@
 
 ---
 notifications:
-  - id: recall-badges-09-2020
-    start_date: 08/09/2020
+  - id: recall-problem-16-09-2020
+    start_date: 16/09/2020
     role:
       - POM
       - SPO
-    end_date: 18/09/2020
-    text: "<b>NEW FEATURE:</b> Prisoners on recall can now be identified by the 'Recall' badge shown on their case details page. <a href='/whats-new'>Read more</a>"
+    end_date: 23/09/2020
+    text: "<b>We are aware that the service is picking up inactive recalls which is causing incorrect responsibility calculations. We are working hard to resolve this. Sorry for any inconvenience.</b>"
