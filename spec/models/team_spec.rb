@@ -46,6 +46,15 @@ RSpec.describe Team, type: :model do
         expect(team.errors.to_a).to eq(["Name has already been taken"])
       end
     end
+
+    context 'with a duplicate CRC team name' do
+      let(:team) { create(:team, :crc, name: oldteam.name) }
+
+      it 'is valid' do
+        expect(team).to be_valid
+        expect(oldteam).to be_valid
+      end
+    end
   end
 
   context 'when CRC' do
