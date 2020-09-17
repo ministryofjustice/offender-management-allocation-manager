@@ -95,17 +95,17 @@ RSpec.describe UpdateTeamNameAndLduService do
     end
 
     let(:ldu) { build(:local_divisional_unit) }
+    let(:team) { Team.last }
 
-    it 'errors' do
-      expect {
-        described_class.update(team_code: 'NTTR2', team_name: 'A team', ldu_code: ldu.code, ldu_name: ldu.name)
-      }.to raise_error(ActiveRecord::RecordInvalid, 'Validation failed: Name has already been taken')
+    it 'matches to the existing team and updates the code' do
+      described_class.update(team_code: 'NTTR2', team_name: 'A team', ldu_code: ldu.code, ldu_name: ldu.name)
+      expect(team.code).to eq('NTTR2')
     end
   end
 
   context 'when a shadow team of the same name exists' do
     before do
-      create(:team, code: nil, local_divisional_unit: nil)
+      create(:team, code: '', local_divisional_unit: nil)
       create(:local_divisional_unit)
     end
 

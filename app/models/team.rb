@@ -5,11 +5,14 @@ class Team < ApplicationRecord
 
   validates :shadow_code, uniqueness: true, if: -> { nps? && shadow_code.present? }
   validates :code, uniqueness: true, if: -> { nps? && code.present? }
-  validates :name, uniqueness: true, if: -> { nps? }
 
   validate do |team|
     unless team.code.present? || team.shadow_code.present?
       team.errors.add(:code, 'can\'t be blank if shadow_code is blank')
+    end
+
+    if team.name.present? && team.nps? && Team.nps.where(name: team.name).any? { |t| t.id != team.id }
+      team.errors.add(:name, :taken)
     end
   end
 
