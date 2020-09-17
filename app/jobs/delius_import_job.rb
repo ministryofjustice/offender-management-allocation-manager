@@ -115,9 +115,9 @@ private
     processor.select { |record| active_ldu?(record.fetch(:ldu_code)) }.uniq { |r| r.fetch(:team_code) }.each do |rec|
       process_record_logging_errors(rec) do |record|
         UpdateTeamNameAndLduService.update(
-          team_code: record.fetch(:team_code),
+          team_code: record.fetch(:team_code).strip,
           team_name: record.fetch(:team),
-          ldu_code: record.fetch(:ldu_code),
+          ldu_code: record.fetch(:ldu_code).strip,
           ldu_name: record.fetch(:ldu)
         )
       end
@@ -127,7 +127,7 @@ private
       process_record_logging_errors(rec) do |record|
         UpdateShadowTeamAssociationService.update(
           shadow_name: record.fetch(:team),
-          shadow_code: record.fetch(:team_code)
+          shadow_code: record.fetch(:team_code).strip
         )
       end
     end
