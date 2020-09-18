@@ -40,10 +40,6 @@ FactoryBot.define do
       "#{Faker::Name.last_name}, #{Faker::Name.first_name}"
     end
 
-    secondary_pom_name do
-      "#{Faker::Name.last_name}, #{Faker::Name.first_name}"
-    end
-
     primary_pom_allocated_at do
       DateTime.now.utc
     end
