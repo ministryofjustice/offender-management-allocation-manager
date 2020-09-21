@@ -34,7 +34,7 @@ RSpec.describe CaseloadController, type: :controller do
 
     context 'when NPS' do
       before do
-        stub_sso_data(prison, 'alice')
+        stub_sso_data(prison)
       end
 
       let(:today_plus_36_weeks) { (Time.zone.today + 36.weeks).to_s }
@@ -95,13 +95,9 @@ RSpec.describe CaseloadController, type: :controller do
     end
 
     describe '#index' do
-      before do
-        stub_sso_data(prison, 'alice')
-      end
-
       context 'when user is an SPO' do
         before do
-          stub_sso_data(prison, 'alice')
+          stub_sso_data(prison)
         end
 
         it 'is allowed' do
@@ -122,6 +118,10 @@ RSpec.describe CaseloadController, type: :controller do
       end
 
       context 'when user is the signed in POM' do
+        before do
+          stub_signed_in_pom(prison, staff_id, 'alice')
+        end
+
         let(:allocations) { assigns(:allocations).index_by(&:nomis_offender_id) }
 
         before do
@@ -144,7 +144,7 @@ RSpec.describe CaseloadController, type: :controller do
 
     describe '#new' do
       before do
-        stub_sso_data(prison, 'alice')
+        stub_sso_data(prison)
       end
 
       it 'returns the caseload' do

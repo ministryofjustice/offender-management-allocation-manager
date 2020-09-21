@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe SummaryController, type: :controller do
   let(:prison) { build(:prison).code }
 
-  before { stub_sso_data(prison, 'alice') }
+  before { stub_sso_data(prison) }
 
   context 'with 4 offenders' do
     let(:today_plus_10) { (Time.zone.today + 10.days).to_s }

@@ -1,0 +1,38 @@
+<%= link_to 'Back', :back, class: :back %>
+
+<%= form_for(@responsibility, url: prison_responsibility_path(@prison.code, @responsibility.nomis_offender_id),
+             method: :delete,
+             builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |f| %>
+  <!--  Just so we alwways submit something in the form -->
+  <%= f.hidden_field :nomis_offender_id %>
+
+  <%= render :partial => "/shared/field_errors", :locals => { form: f, errors: @responsibility.errors } %>
+
+  <div class="govuk-form-group">
+    <fieldset class="govuk-fieldset">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+        <h1 class="govuk-fieldset__heading">
+          Confirm change of responsibility for this case
+        </h1>
+      </legend>
+    </fieldset>
+    <p class="govuk-body">
+      The community probation team will not longer be responsible for this case.
+      We will email the community probation team at <%= @ldu_email_address %>
+    </p>
+    <p class="govuk-body">
+      You will also receive a copy of this email for your records.
+    </p>
+    <%= f.govuk_text_area :reason_text,
+                          label: { text: 'Why are you changing responsibility for this case?' },
+                          hint_text: 'This will be included in the email to the community team',
+                          rows: 3 %>
+  </div>
+
+  <div class="govuk-form-group">
+    <button type="submit" class="govuk-button">Confirm</button>
+    <%= link_to 'Cancel', new_prison_allocation_path(@prison.code, @responsibility.nomis_offender_id), class: 'govuk-link cancel-button' %>
+  </div>
+
+<% end %>
+

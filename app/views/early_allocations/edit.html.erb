@@ -3,9 +3,7 @@
 <% end %>
 
 <%= form_for @early_assignment, url: prison_prisoner_early_allocation_path(@prison.code, @early_assignment.nomis_offender_id), method: :put do |form| %>
-  <% if @early_assignment.errors.count > 0 %>
-    <%= render :partial => "/shared/field_errors", :locals => { :errors => @early_assignment.errors, form: form } %>
-  <% end %>
+  <%= render :partial => "/shared/field_errors", :locals => { :errors => @early_assignment.errors, form: form } %>
 
   <h1 class="govuk-heading-xl govuk-!-margin-top-4">Record a decision from the community probation team about early allocation</h1>
 

@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class OffenderPresenter
-  attr_reader :responsibility
-
   delegate :offender_no, :first_name, :last_name, :booking_id,
            :indeterminate_sentence?, :describe_sentence,
            :full_name_ordered, :full_name, :main_offence,
@@ -27,7 +25,7 @@ class OffenderPresenter
     # If this presenter was provided with a responsibility object from
     # a responsibility override, we will return that, falling back on
     # asking the offender class to calculate it.
-    if @responsibility
+    if @responsibility.present?
       if @responsibility.value == Responsibility::PRISON
         ResponsibilityService::RESPONSIBLE
       else
@@ -36,6 +34,10 @@ class OffenderPresenter
     else
       @offender.pom_responsibility
     end
+  end
+
+  def responsibility_override?
+    @responsibility.present?
   end
 
   def recommended_pom_type_label
