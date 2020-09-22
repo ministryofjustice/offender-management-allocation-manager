@@ -3,8 +3,18 @@
 class Team < ApplicationRecord
   TEAM_LDU_CODE_REGEX = /\A[a-zA-Z0-9]+\z/.freeze
 
+  class NpsUniquenessValidator < ActiveModel::EachValidator
+    def validate_each(record, attribute, value)
+      if record.new_record?
+        record.errors.add(attribute, :taken) if Team.nps.find_by(attribute => value).present?
+      elsif Team.nps.where(attribute => value).where.not(id: record.id).any?
+        record.errors.add(attribute, :taken)
+      end
+    end
+  end
+
   validates :name, presence: true
-  validates :name, uniqueness: true, if: -> { nps? }
+  validates :name, nps_uniqueness: true, if: -> { nps? }
 
   validates :code, format: { with: TEAM_LDU_CODE_REGEX }, unless: -> { code.blank? }
   validates :code, uniqueness: true, if: -> { nps? && code.present? }
