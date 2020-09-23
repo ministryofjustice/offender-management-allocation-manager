@@ -1,17 +1,18 @@
 require 'rails_helper'
 
-feature 'ActiveAdmin' do
+feature 'admin urls' do
   # This works as expected (i.e. it sends the user to login)
   # but doesn't work in test-land for some unknown reason
-  # context 'unauthorised' do
+  # context 'without login' do
   #   before do
   #     OmniAuth.config.test_mode = false
   #   end
+  #
   #   after do
   #     OmniAuth.config.test_mode = true
   #   end
   #
-  #   scenario 'unauthorised' do
+  #   xit 'is unauthorised' do
   #     visit('/admin')
   #     expect(page).to have_http_status(:unauthorized)
   #   end
@@ -19,6 +20,7 @@ feature 'ActiveAdmin' do
 
   let(:ldu) { create(:local_divisional_unit) }
   let!(:new_team) { create(:team, local_divisional_unit: ldu) }
+  let(:admin_urls) { ['/admin', '/flip-flop-admin'] }
 
   context 'when pom' do
     before do
@@ -26,8 +28,11 @@ feature 'ActiveAdmin' do
     end
 
     it 'is unauthorised' do
-      visit('/admin')
-      expect(page).to have_http_status(:unauthorized)
+      admin_urls.each do |admin_url|
+        visit(admin_url)
+
+        expect(page).to have_http_status(:unauthorized)
+      end
     end
   end
 
@@ -37,8 +42,11 @@ feature 'ActiveAdmin' do
     end
 
     it 'is unauthorised' do
-      visit('/admin')
-      expect(page).to have_http_status(:unauthorized)
+      admin_urls.each do |admin_url|
+        visit(admin_url)
+
+        expect(page).to have_http_status(:unauthorized)
+      end
     end
   end
 
@@ -47,6 +55,14 @@ feature 'ActiveAdmin' do
       signin_global_admin_user
       ci = create(:case_information, team: nil)
       create(:allocation, nomis_offender_id: ci.nomis_offender_id)
+    end
+
+    it 'is ok' do
+      admin_urls.each do |admin_url|
+        visit(admin_url)
+
+        expect(page).to have_http_status(:ok)
+      end
     end
 
     it 'displays the dashboard' do
