@@ -56,4 +56,12 @@ RSpec.describe DeliusImportJob, type: :job do
       subject.process_decrypted_file([ldu_code: 'N01OMIC', ldu: 'An LDU', team_code: 'SHAD01', team: bad_shadow_name])
     end
   end
+
+  context 'with tabs on the end of the team code' do
+    it 'still works correctly due to stripping' do
+      expect {
+        subject.process_decrypted_file([ldu_code: 'N50LDU', ldu: 'An LDU', team_code: "NN01\t", team: 'Team Name'])
+      }.to change(Team, :count).by(1)
+    end
+  end
 end

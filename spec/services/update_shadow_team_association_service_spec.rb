@@ -13,7 +13,7 @@ RSpec.describe UpdateShadowTeamAssociationService do
   end
 
   context "when the team has a different shadow code" do
-    let(:team_shadow_code) { 'A_DIFFERENT_SHADOW_CODE' }
+    let(:team_shadow_code) { 'SHAD02' }
 
     it "updates the team's shadow code" do
       described_class.update(shadow_code: 'SHAD01', shadow_name: 'OMIC NPS - Team 1')
