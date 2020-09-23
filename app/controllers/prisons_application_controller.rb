@@ -36,12 +36,12 @@ private
   end
 
   def pom_at_active_prison?
-    user = Nomis::Elite2::UserApi.user_details(current_user)
+    user = HmppsApi::Prison::User.user_details(current_user)
     StaffMember.new(user.staff_id).pom_at?(active_prison_id)
   end
 
   def load_staff_id
-    user = Nomis::Elite2::UserApi.user_details(current_user)
+    user = HmppsApi::Prison::User.user_details(current_user)
     @staff_id = user.staff_id
   end
 

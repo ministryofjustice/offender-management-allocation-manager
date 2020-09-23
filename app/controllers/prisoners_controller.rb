@@ -25,7 +25,7 @@ class PrisonersController < PrisonsApplicationController
     end
 
     @pom_responsibility = @prisoner.pom_responsibility
-    @keyworker = Nomis::Keyworker::KeyworkerApi.get_keyworker(
+    @keyworker = HmppsApi::Keyworker::Keyworker.get_keyworker(
       active_prison_id, @prisoner.offender_no
     )
 
@@ -39,7 +39,7 @@ class PrisonersController < PrisonsApplicationController
 
   def image
     @prisoner = OffenderService.get_offender(params[:prisoner_id])
-    image_data = Nomis::Elite2::OffenderApi.get_image(@prisoner.booking_id)
+    image_data = HmppsApi::Prison::Offender.get_image(@prisoner.booking_id)
 
     response.headers['Expires'] = 6.months.from_now.httpdate
     send_data image_data, type: 'image/jpg', disposition: 'inline'

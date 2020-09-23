@@ -1,0 +1,23 @@
+# frozen_string_literal: true
+
+module HmppsApi
+  module Prison
+    ApiPaginatedResponse = Struct.new(:total_pages, :data)
+
+    module PrisonApiBase
+      def e2_client
+        host = Rails.configuration.prison_api_host
+        HmppsApi::Client.new(host + '/api')
+      end
+
+      def search_client
+        host = Rails.configuration.prisoner_search_host
+        HmppsApi::Client.new(host + '/prisoner-search')
+      end
+
+      def api_deserialiser
+        ApiDeserialiser.new
+      end
+    end
+  end
+end

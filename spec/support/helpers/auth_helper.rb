@@ -4,7 +4,7 @@ module AuthHelper
   ACCESS_TOKEN = Struct.new(:access_token).new('an-access-token')
 
   def stub_auth_token
-    allow(Nomis::Oauth::TokenService).to receive(:valid_token).and_return(ACCESS_TOKEN)
+    allow(HmppsApi::Oauth::TokenService).to receive(:valid_token).and_return(ACCESS_TOKEN)
 
     stub_request(:post, "#{ApiHelper::AUTH_HOST}/auth/oauth/token?grant_type=client_credentials").
       to_return(body: {
@@ -16,7 +16,7 @@ module AuthHelper
   end
 
   def stub_sso_data(prison, username = 'user', role = 'ROLE_ALLOC_MGR')
-    allow(Nomis::Oauth::TokenService).to receive(:valid_token).and_return(ACCESS_TOKEN)
+    allow(HmppsApi::Oauth::TokenService).to receive(:valid_token).and_return(ACCESS_TOKEN)
     session[:sso_data] = { 'expiry' => Time.zone.now + 1.day,
                            'roles' => [role],
                            'caseloads' => [prison],

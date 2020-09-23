@@ -21,7 +21,7 @@ module Api
     def verify_token
       access_token = parse_access_token(request.headers['AUTHORIZATION'])
 
-      token = Nomis::Oauth::Token.new(access_token: access_token)
+      token = HmppsApi::Oauth::Token.new(access_token: access_token)
       unless token.valid_token_with_scope?('read')
         render_error('Valid authorisation token required')
       end

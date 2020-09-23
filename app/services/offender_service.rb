@@ -2,7 +2,7 @@
 
 class OffenderService
   def self.get_offender(offender_no)
-    Nomis::Elite2::OffenderApi.get_offender(offender_no).tap { |o|
+    HmppsApi::Prison::Offender.get_offender(offender_no).tap { |o|
       next false if o.nil?
 
       record = CaseInformation.find_by(nomis_offender_id: offender_no)
@@ -13,13 +13,13 @@ class OffenderService
         o.sentence = sentence_detail[o.booking_id]
       end
 
-      o.category_code = Nomis::Elite2::OffenderApi.get_category_code(o.offender_no)
-      o.main_offence = Nomis::Elite2::OffenderApi.get_offence(o.booking_id)
+      o.category_code = HmppsApi::Prison::Offender.get_category_code(o.offender_no)
+      o.main_offence = HmppsApi::Prison::Offender.get_offence(o.booking_id)
     }
   end
 
   def self.get_sentence_details(booking_ids)
-    Nomis::Elite2::OffenderApi.get_bulk_sentence_details(booking_ids)
+    HmppsApi::Prison::Offender.get_bulk_sentence_details(booking_ids)
   end
 
   # Takes a list of OffenderSummary or Offender objects, and returns them with their

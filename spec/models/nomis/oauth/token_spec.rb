@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Nomis::Oauth::Token, model: true do
+describe HmppsApi::Oauth::Token, model: true do
   it 'can confirm if it is not expired' do
     access_token = generate_jwt_token
     token = described_class.new(access_token: access_token, expires_in: 4.hours)

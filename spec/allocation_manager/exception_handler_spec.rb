@@ -6,7 +6,7 @@ RSpec.describe AllocationManager::ExceptionHandler do
     allow(Rails.configuration).to receive(:sentry_dsn).and_return(sentry_dsn)
   end
 
-  let(:exception) { Nomis::Error::UnhandledApiField.new('something went wrong') }
+  let(:exception) { HmppsApi::Error::UnhandledApiField.new('something went wrong') }
 
   context 'when Rails.configuration.sentry_dsn is set' do
     let(:sentry_dsn) { 'something' }
