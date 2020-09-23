@@ -27,7 +27,7 @@ RSpec.describe PrisonsController, type: :controller do
 
     context 'when caseloads is nil' do
       it 'redirects to /401' do
-        allow(Nomis::Oauth::TokenService).to receive(:valid_token).and_return(OpenStruct.new(access_token: 'token'))
+        allow(HmppsApi::Oauth::TokenService).to receive(:valid_token).and_return(OpenStruct.new(access_token: 'token'))
         session[:sso_data] = {}
 
         get :index, params: { prison_id: prison }

@@ -5,7 +5,7 @@ class PrisonOffenderManagerService
   def self.get_poms_for(prison)
     # This API call doesn't do what it says on the tin. It can return duplicate
     # staff_ids in the situation where someone has more than one role.
-    poms = Nomis::Elite2::PrisonOffenderManagerApi.list(prison)
+    poms = HmppsApi::Prison::PrisonOffenderManager.list(prison)
     pom_details = PomDetail.where(nomis_staff_id: poms.map(&:staff_id))
     offender_numbers = Prison.new(prison).offenders.map(&:offender_no)
 
@@ -46,7 +46,7 @@ class PrisonOffenderManagerService
   end
 
   def self.get_pom_emails(nomis_staff_id)
-    Nomis::Elite2::PrisonOffenderManagerApi.fetch_email_addresses(nomis_staff_id)
+    HmppsApi::Prison::PrisonOffenderManager.fetch_email_addresses(nomis_staff_id)
   end
 
   def self.get_pom_names(prison)
@@ -57,12 +57,12 @@ class PrisonOffenderManagerService
   end
 
   def self.get_pom_name(nomis_staff_id)
-    staff = Nomis::Elite2::PrisonOffenderManagerApi.staff_detail(nomis_staff_id)
+    staff = HmppsApi::Prison::PrisonOffenderManager.staff_detail(nomis_staff_id)
     [staff.first_name, staff.last_name]
   end
 
   def self.get_user_name(username)
-    user = Nomis::Elite2::UserApi.user_details(username)
+    user = HmppsApi::Prison::User.user_details(username)
     [user.first_name, user.last_name]
   end
 
@@ -74,7 +74,7 @@ class PrisonOffenderManagerService
   end
 
   def self.get_signed_in_pom_details(current_user, prison)
-    user = Nomis::Elite2::UserApi.user_details(current_user)
+    user = HmppsApi::Prison::User.user_details(current_user)
 
     poms_list = get_poms_for(prison)
     poms_list.find { |p| p.staff_id.to_i == user.staff_id.to_i }
