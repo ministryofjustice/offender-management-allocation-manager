@@ -5,9 +5,10 @@ class Team < ApplicationRecord
 
   class NpsUniquenessValidator < ActiveModel::EachValidator
     def validate_each(record, attribute, value)
+      scope = Team.nps
       if record.new_record?
-        record.errors.add(attribute, :taken) if Team.nps.find_by(attribute => value).present?
-      elsif Team.nps.where(attribute => value).where.not(id: record.id).any?
+        record.errors.add(attribute, :taken) if scope.find_by(attribute => value).present?
+      elsif scope.where(attribute => value).where.not(id: record.id).any?
         record.errors.add(attribute, :taken)
       end
     end
