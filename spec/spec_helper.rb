@@ -1,7 +1,7 @@
 require 'simplecov'
 
 SimpleCov.start 'rails' do
-  add_filter 'app/services/nomis/error/'
+  add_filter 'app/services/hmpps_api/error/'
   add_filter 'lib/allocation_validation.rb'
   add_filter 'app/jobs/custom_stats_logging_job.rb'
   add_filter 'app/admin/'
