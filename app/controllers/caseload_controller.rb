@@ -87,7 +87,7 @@ private
   end
 
   def ensure_signed_in_pom_is_this_pom
-    user = HmppsApi::Prison::User.user_details(current_user)
+    user = HmppsApi::PrisonApi::UserApi.user_details(current_user)
     unless staff_id == user.staff_id || current_user_is_spo?
       redirect_to '/401'
     end

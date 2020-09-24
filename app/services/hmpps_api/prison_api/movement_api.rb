@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module HmppsApi
-  module Prison
-    class Movement
+  module PrisonApi
+    class MovementApi
       extend PrisonApiBase
 
       def self.movements_on_date(date)

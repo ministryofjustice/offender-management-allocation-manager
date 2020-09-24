@@ -45,7 +45,7 @@ private
     end
 
     def each
-      first_page = HmppsApi::Prison::Offender.list(
+      first_page = HmppsApi::PrisonApi::OffenderApi.list(
         @prison,
         0,
         page_size: FETCH_SIZE
@@ -55,7 +55,7 @@ private
       offenders.each { |offender| yield offender }
 
       1.upto(first_page.total_pages - 1).each do |page_number|
-        offenders = HmppsApi::Prison::Offender.list(
+        offenders = HmppsApi::PrisonApi::OffenderApi.list(
           @prison,
           page_number,
           page_size: FETCH_SIZE
@@ -71,12 +71,12 @@ private
 
     def enrich_offenders(offenders)
       booking_ids = offenders.map(&:booking_id)
-      sentence_details = HmppsApi::Prison::Offender.get_bulk_sentence_details(booking_ids)
+      sentence_details = HmppsApi::PrisonApi::OffenderApi.get_bulk_sentence_details(booking_ids)
 
       nomis_ids = offenders.map(&:offender_no)
       mapped_tiers = CaseInformationService.get_case_information(nomis_ids)
 
-      temp_movements = HmppsApi::Prison::Movement.latest_temp_movement_for(nomis_ids)
+      temp_movements = HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for(nomis_ids)
 
       offenders.each { |offender|
         sentencing = sentence_details[offender.booking_id]

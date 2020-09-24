@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module HmppsApi
-  module Prison
-    class PrisonOffenderManager
+  module PrisonApi
+    class PrisonOffenderManagerApi
       extend PrisonApiBase
 
       def self.staff_detail(staff_id)

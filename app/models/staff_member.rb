@@ -23,17 +23,17 @@ class StaffMember
   end
 
   def email_address
-    HmppsApi::Prison::PrisonOffenderManager.fetch_email_addresses(@staff_id).first
+    HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(@staff_id).first
   end
 
   def pom_at?(prison_id)
-    poms_list = HmppsApi::Prison::PrisonOffenderManager.list(prison_id)
+    poms_list = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(prison_id)
 
     poms_list.detect { |pom| pom.staff_id == @staff_id }.present?
   end
 
   def position(prison_id)
-    poms = HmppsApi::Prison::PrisonOffenderManager.list(prison_id)
+    poms = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(prison_id)
     this_pom = poms.detect { |pom| pom.staff_id == @staff_id }
     if this_pom.nil?
       'STAFF'
@@ -62,6 +62,6 @@ private
   end
 
   def staff_detail
-    @staff_detail ||= HmppsApi::Prison::PrisonOffenderManager.staff_detail(@staff_id)
+    @staff_detail ||= HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(@staff_id)
   end
 end

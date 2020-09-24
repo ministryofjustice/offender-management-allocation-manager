@@ -189,7 +189,7 @@ RSpec.describe Allocation, type: :model do
       }
 
       it 'will set the prison when released' do
-        allow(HmppsApi::Prison::Movement).to receive(:movements_for).and_return([movement])
+        allow(HmppsApi::PrisonApi::MovementApi).to receive(:movements_for).and_return([movement])
 
         alloc = described_class.find_by(nomis_offender_id: offender_no)
         alloc.deallocate_offender(Allocation::OFFENDER_RELEASED)

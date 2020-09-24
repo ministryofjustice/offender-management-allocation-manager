@@ -69,8 +69,8 @@ module OmniAuth
       end
 
       def user_details
-        @user_details = HmppsApi::Prison::User.user_details(username)
-        @user_details.nomis_caseloads = HmppsApi::Prison::User.user_caseloads(
+        @user_details = HmppsApi::PrisonApi::UserApi.user_details(username)
+        @user_details.nomis_caseloads = HmppsApi::PrisonApi::UserApi.user_caseloads(
           @user_details.staff_id)
         @user_details
       end

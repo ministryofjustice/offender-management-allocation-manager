@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module HmppsApi
-  module Prison
+  module PrisonApi
     ApiPaginatedResponse = Struct.new(:total_pages, :data)
 
     module PrisonApiBase

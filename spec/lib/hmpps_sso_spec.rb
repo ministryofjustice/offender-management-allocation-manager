@@ -31,7 +31,7 @@ describe OmniAuth::Strategies::HmppsSso, vcr: { cassette_name: :hmpps_sso } do
 
         allow(response).to receive(:nomis_caseloads=)
         allow(response).to receive(:nomis_caseloads).and_return(caseloads)
-        allow(HmppsApi::Prison::User).to receive(:user_details).and_return(response)
+        allow(HmppsApi::PrisonApi::UserApi).to receive(:user_details).and_return(response)
 
         allow(strategy).to receive(:username).and_return(username)
         allow(strategy).to receive(:decode_roles).and_return(['ROLE_ALLOC_MGR'])
@@ -57,7 +57,7 @@ describe OmniAuth::Strategies::HmppsSso, vcr: { cassette_name: :hmpps_sso } do
 
         allow(response).to receive(:nomis_caseloads=)
         allow(response).to receive(:nomis_caseloads).and_return(caseloads)
-        allow(HmppsApi::Prison::User).to receive(:user_details).and_return(response)
+        allow(HmppsApi::PrisonApi::UserApi).to receive(:user_details).and_return(response)
         allow(strategy).to receive(:username).and_return(username)
         allow(strategy).to receive(:decode_roles).and_return(['ROLE_ALLOC_MGR'])
 

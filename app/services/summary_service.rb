@@ -100,7 +100,7 @@ private
   end
 
   def self.add_arrival_dates(offenders)
-    movements = HmppsApi::Prison::Movement.admissions_for(offenders.map(&:offender_no))
+    movements = HmppsApi::PrisonApi::MovementApi.admissions_for(offenders.map(&:offender_no))
 
     offenders.each do |offender|
       arrival = movements.fetch(offender.offender_no, []).reverse.detect { |movement|
