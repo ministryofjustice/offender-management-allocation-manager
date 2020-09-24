@@ -3,7 +3,7 @@
 module HmppsApi
   module PrisonApi
     class MovementApi
-      extend PrisonApiBase
+      extend PrisonApiClient
 
       def self.movements_on_date(date)
         route = '/movements'
