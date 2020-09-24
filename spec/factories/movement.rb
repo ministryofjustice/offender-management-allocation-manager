@@ -1,7 +1,7 @@
 FactoryBot.define do
-  factory :movement, class: 'Nomis::Movement' do
+  factory :movement, class: 'HmppsApi::Movement' do
     initialize_with do
-      Nomis::Movement.from_json(attributes.stringify_keys)
+      HmppsApi::Movement.from_json(attributes.stringify_keys)
     end
 
     trait :rotl do

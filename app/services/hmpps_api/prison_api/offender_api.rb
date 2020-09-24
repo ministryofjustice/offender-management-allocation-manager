@@ -35,7 +35,7 @@ module HmppsApi
           offender.merge!(recall_data.fetch(offender.fetch('offenderNo')))
         end
 
-        offenders = api_deserialiser.deserialise_many(Nomis::OffenderSummary, data)
+        offenders = api_deserialiser.deserialise_many(HmppsApi::OffenderSummary, data)
         ApiPaginatedResponse.new(total_pages, offenders)
       end
 
@@ -52,7 +52,7 @@ module HmppsApi
           nil
         else
           recall_data = get_recall_flags([url_offender_no])
-          api_deserialiser.deserialise(Nomis::Offender,
+          api_deserialiser.deserialise(HmppsApi::Offender,
                                        response.first.merge(recall_data.fetch(url_offender_no)))
         end
       end
@@ -91,7 +91,7 @@ module HmppsApi
           oid = record['bookingId']
 
           hash[oid] = api_deserialiser.deserialise(
-            Nomis::SentenceDetail, record['sentenceDetail']
+            HmppsApi::SentenceDetail, record['sentenceDetail']
           )
           hash
         }

@@ -8,7 +8,7 @@ describe HmppsApi::PrisonApi::OffenderApi do
 
       expect(response.data).not_to be_nil
       expect(response.data).to be_instance_of(Array)
-      expect(response.data).to all(be_an Nomis::OffenderSummary)
+      expect(response.data).to all(be_an HmppsApi::OffenderSummary)
     end
 
     it "can get an offence description for a booking id",
@@ -36,7 +36,7 @@ describe HmppsApi::PrisonApi::OffenderApi do
       expect(response).to be_instance_of(Hash)
 
       records = response.values
-      expect(records.first).to be_instance_of(Nomis::SentenceDetail)
+      expect(records.first).to be_instance_of(HmppsApi::SentenceDetail)
       expect(records.first.conditional_release_date).to eq(Date.new(2020, 3, 16))
     end
   end
@@ -56,7 +56,7 @@ describe HmppsApi::PrisonApi::OffenderApi do
 
       context 'when offender search succeeds' do
         it "can get a single offender's details including recall flag" do
-          expect(subject).to be_instance_of(Nomis::Offender)
+          expect(subject).to be_instance_of(HmppsApi::Offender)
           expect(subject.recalled?).to eq(true)
         end
       end

@@ -74,7 +74,7 @@ feature "view POM's caseload" do
       create(:responsibility, nomis_offender_id: o.fetch(:offenderNo), value: Responsibility::PROBATION)
     end
 
-    allow_any_instance_of(Nomis::OffenderBase).to receive(:handover_start_date).and_return(tomorrow)
+    allow_any_instance_of(HmppsApi::OffenderBase).to receive(:handover_start_date).and_return(tomorrow)
   end
 
   context 'when paginating' do

@@ -8,7 +8,7 @@ module HmppsApi
       def self.staff_detail(staff_id)
         route = "/staff/#{staff_id}"
         data = e2_client.get(route)
-        api_deserialiser.deserialise(Nomis::StaffDetails, data)
+        api_deserialiser.deserialise(HmppsApi::StaffDetails, data)
       end
 
       def self.list(prison)
@@ -22,7 +22,7 @@ module HmppsApi
           })
         }
 
-        api_deserialiser.deserialise_many(Nomis::PrisonOffenderManager, data)
+        api_deserialiser.deserialise_many(HmppsApi::PrisonOffenderManager, data)
       end
 
       def self.fetch_email_addresses(nomis_staff_id)

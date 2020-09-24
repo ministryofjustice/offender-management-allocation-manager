@@ -1,6 +1,6 @@
 FactoryBot.define do
-  factory :offender, class: 'Nomis::Offender' do
-    initialize_with { Nomis::Offender.from_json(attributes.stringify_keys).tap { |offender| offender.sentence = attributes.fetch(:sentence)} }
+  factory :offender, class: 'HmppsApi::Offender' do
+    initialize_with { HmppsApi::Offender.from_json(attributes.stringify_keys).tap { |offender| offender.sentence = attributes.fetch(:sentence)} }
 
     imprisonmentStatus { 'SENT03' }
     prisonId { 'LEI' }

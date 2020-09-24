@@ -9,7 +9,7 @@ class OpenPrisonTransferJob < ApplicationJob
 
   def perform(movement_json)
     # movement_json is already in snake case format so we just need to call Movement.new
-    movement = Nomis::Movement.new(JSON.parse(movement_json))
+    movement = HmppsApi::Movement.new(JSON.parse(movement_json))
 
     offender = OffenderService.get_offender(movement.offender_no)
     return if offender.nil? || !offender.nps_case?

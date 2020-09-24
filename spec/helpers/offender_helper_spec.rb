@@ -29,7 +29,7 @@ RSpec.describe OffenderHelper do
     it 'can show Custody for Prison' do
       off = build(:offender).tap { |o|
         o.load_case_information(build(:case_information))
-        o.sentence = Nomis::SentenceDetail.new sentence_start_date: Time.zone.today - 20.months,
+        o.sentence = HmppsApi::SentenceDetail.new sentence_start_date: Time.zone.today - 20.months,
                                                automatic_release_date: Time.zone.today + 20.months
       }
       offp = OffenderPresenter.new(off, nil)
@@ -39,7 +39,7 @@ RSpec.describe OffenderHelper do
 
     it 'can show Community for Probation' do
       off = build(:offender).tap { |o|
-        o.sentence = Nomis::SentenceDetail.new automatic_release_date: Time.zone.today
+        o.sentence = HmppsApi::SentenceDetail.new automatic_release_date: Time.zone.today
       }
       offp = OffenderPresenter.new(off, build(:responsibility, value: 'Probation'))
 

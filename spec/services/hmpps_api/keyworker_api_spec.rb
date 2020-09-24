@@ -20,7 +20,7 @@ describe HmppsApi::KeyworkerApi do
       offender_no = 'G4273GI'
       response = described_class.get_keyworker(location, offender_no)
 
-      expect(response).to be_instance_of(Nomis::KeyworkerDetails)
+      expect(response).to be_instance_of(HmppsApi::KeyworkerDetails)
       expect(response.first_name).to eq('DOM')
     end
 
@@ -28,7 +28,7 @@ describe HmppsApi::KeyworkerApi do
       unknown_offender_no = 'GGGGGGG'
       response = described_class.get_keyworker(location, unknown_offender_no)
 
-      expect(response).to be_instance_of(Nomis::NullKeyworker)
+      expect(response).to be_instance_of(HmppsApi::NullKeyworker)
     end
   end
 end

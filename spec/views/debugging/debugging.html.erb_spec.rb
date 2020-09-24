@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe "debugging/debugging", type: :view do
   let(:offender) do
     offender = build(:offender, firstName: 'John', lastName: 'Dory')
-    offender.sentence = Nomis::SentenceDetail.new(
+    offender.sentence = HmppsApi::SentenceDetail.new(
       sentence_start_date: Time.zone.today,
       automatic_release_date: Time.zone.today + 10.months,
       tariff_date: Date.new(2033, 8, 1),

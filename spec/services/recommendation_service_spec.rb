@@ -3,7 +3,7 @@ require 'rails_helper'
 describe RecommendationService do
   let(:tierA) {
     build(:offender,
-          sentence: Nomis::SentenceDetail.new(
+          sentence: HmppsApi::SentenceDetail.new(
             sentence_start_date: Time.zone.today,
             automatic_release_date: Time.zone.today + 15.months)).tap { |o|
       o.load_case_information(build(:case_information, tier: 'A'))
@@ -11,7 +11,7 @@ describe RecommendationService do
   }
   let(:tierD) {
     build(:offender,
-          sentence: Nomis::SentenceDetail.new(
+          sentence: HmppsApi::SentenceDetail.new(
             sentence_start_date: Time.zone.today,
             automatic_release_date: Time.zone.today + 10.months)).tap { |o|
       o.load_case_information(build(:case_information, tier: 'D'))
@@ -20,7 +20,7 @@ describe RecommendationService do
 
   let(:tierA_and_immigration_case) {
     build(:offender,
-          imprisonmentStatus: 'DET', sentence: Nomis::SentenceDetail.new).tap { |o|
+          imprisonmentStatus: 'DET', sentence: HmppsApi::SentenceDetail.new).tap { |o|
       o.load_case_information(build(:case_information, tier: 'A'))
     }
   }

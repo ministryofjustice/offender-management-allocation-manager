@@ -7,7 +7,7 @@ describe HmppsApi::PrisonApi::UserApi do
       response = described_class.user_details('RJONES')
 
       expect(response).not_to be_nil
-      expect(response).to be_kind_of(Nomis::UserDetails)
+      expect(response).to be_kind_of(HmppsApi::UserDetails)
     end
   end
 end
