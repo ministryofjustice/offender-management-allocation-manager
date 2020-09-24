@@ -20,7 +20,7 @@ module HmppsApi
           expires_in: Rails.configuration.cache_expiry) {
           total_pages = nil
 
-          data = e2_client.get(
+          data = client.get(
             route, queryparams: queryparams, extra_headers: hdrs
           ) { |_json, response|
             total_records = response.headers['Total-Records'].to_i
@@ -45,7 +45,7 @@ module HmppsApi
         route = "/prisoners/#{url_offender_no}"
         response = Rails.cache.fetch(route,
                                      expires_in: Rails.configuration.cache_expiry) {
-          e2_client.get(route)
+          client.get(route)
         }
 
         if response.empty?
@@ -59,7 +59,7 @@ module HmppsApi
 
       def self.get_offence(booking_id)
         route = "/bookings/#{booking_id}/mainOffence"
-        data = e2_client.get(route)
+        data = client.get(route)
         return '' if data.empty?
 
         data.first['offenceDescription']
@@ -67,7 +67,7 @@ module HmppsApi
 
       def self.get_category_code(offender_no)
         route = '/offender-assessments/CATEGORY'
-        data = e2_client.post(route, [offender_no])
+        data = client.post(route, [offender_no])
         return '' if data.empty?
 
         data.first['classificationCode']
@@ -82,7 +82,7 @@ module HmppsApi
         key = "bulk_sentence_#{h}"
 
         data = Rails.cache.fetch(key, expires_in: Rails.configuration.cache_expiry) {
-          e2_client.post(route, booking_ids)
+          client.post(route, booking_ids)
         }
 
         data.each_with_object({}) { |record, hash|
@@ -101,12 +101,12 @@ module HmppsApi
         # This method returns the raw bytes of an image, the equivalent of loading the
         # image from file on disk.
         details_route = '/offender-sentences/bookings'
-        details = e2_client.post(details_route, [booking_id])
+        details = client.post(details_route, [booking_id])
 
         return default_image if details.first['facialImageId'].blank?
 
         image_route = "/images/#{details.first['facialImageId']}/data"
-        image = e2_client.raw_get(image_route)
+        image = client.raw_get(image_route)
 
         image.presence || default_image
       rescue Faraday::ResourceNotFound

@@ -8,7 +8,7 @@ module HmppsApi
       def self.movements_on_date(date)
         route = '/movements'
 
-        data = e2_client.get(route, queryparams: {
+        data = client.get(route, queryparams: {
                                movementDate: date.strftime('%F'),
                                fromDateTime: (date - 1.day).strftime('%FT%R')
                              })
@@ -20,7 +20,7 @@ module HmppsApi
       def self.movements_for(offender_no)
         route = '/movements/offenders'
 
-        data = e2_client.post(route, [offender_no], queryparams: { latestOnly: false, movementTypes: %w[ADM TRN REL] })
+        data = client.post(route, [offender_no], queryparams: { latestOnly: false, movementTypes: %w[ADM TRN REL] })
         data.sort_by { |k| k['createDateTime'] }.map { |movement|
           api_deserialiser.deserialise(HmppsApi::Movement, movement)
         }
@@ -36,8 +36,8 @@ module HmppsApi
 
         Rails.cache.fetch(cache_key,
                           expires_in: Rails.configuration.cache_expiry) do
-          data = e2_client.post(route, offender_nos,
-                                queryparams: { latestOnly: false, movementTypes: types }).
+          data = client.post(route, offender_nos,
+                             queryparams: { latestOnly: false, movementTypes: types }).
             group_by { |x| x['offenderNo'] }.values
           movements = data.map { |d|
             d.sort_by { |k| k['createDateTime'] }.map { |movement|
@@ -60,8 +60,8 @@ module HmppsApi
         # 'data' is an array of arrays, with one array for each offenderNo
         data = Rails.cache.fetch(cache_key,
                                  expires_in: Rails.configuration.cache_expiry) do
-          e2_client.post(route, offender_nos,
-                         queryparams: { latestOnly: true, movementTypes: types }).
+          client.post(route, offender_nos,
+                      queryparams: { latestOnly: true, movementTypes: types }).
             group_by { |x| x['offenderNo'] }.values
         end
 
