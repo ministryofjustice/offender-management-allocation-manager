@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe HmppsApi::Keyworker::Keyworker do
+describe HmppsApi::KeyworkerApi do
   before do
     stub_auth_token
     stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/LEI/offender/G4273GI").

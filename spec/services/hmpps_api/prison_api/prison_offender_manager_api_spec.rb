@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe HmppsApi::Prison::PrisonOffenderManager do
+describe HmppsApi::PrisonApi::PrisonOffenderManagerApi do
   it 'can get a of Prison Offender Managers (POMs)',
      vcr: { cassette_name: :pom_api_list_spec  } do
     response = described_class.list('LEI')

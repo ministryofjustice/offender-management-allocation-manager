@@ -5,7 +5,7 @@ class PagesController < ApplicationController
 
   def contact_us
     if current_user.present?
-      @user = HmppsApi::Prison::User.user_details(current_user)
+      @user = HmppsApi::PrisonApi::UserApi.user_details(current_user)
       @contact = ContactSubmission.new(email_address: @user.email_address.first,
                                        name: @user.full_name_ordered,
                                        prison: PrisonService.name_for(
@@ -17,7 +17,7 @@ class PagesController < ApplicationController
   end
 
   def create_contact_us
-    @user = HmppsApi::Prison::User.user_details(current_user) if current_user.present?
+    @user = HmppsApi::PrisonApi::UserApi.user_details(current_user) if current_user.present?
     @contact = ContactSubmission.new(
       name: help_params[:name],
       job_type: help_params[:job_type],

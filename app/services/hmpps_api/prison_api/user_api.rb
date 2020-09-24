@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module HmppsApi
-  module Prison
-    class User
+  module PrisonApi
+    class UserApi
       extend PrisonApiBase
 
       def self.user_details(username)
@@ -11,7 +11,7 @@ module HmppsApi
 
         user = api_deserialiser.deserialise(Nomis::UserDetails, response)
         user.email_address =
-          HmppsApi::Prison::PrisonOffenderManager.fetch_email_addresses(user.staff_id)
+          HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(user.staff_id)
         user
       end
 

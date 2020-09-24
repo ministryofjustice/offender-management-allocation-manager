@@ -6,7 +6,7 @@ class MovementService
   IMMIGRATION_MOVEMENT_CODES = %w[IMM MHI].freeze
 
   def self.movements_on(date, direction_filters: [], type_filters: [])
-    movements = HmppsApi::Prison::Movement.movements_on_date(date)
+    movements = HmppsApi::PrisonApi::MovementApi.movements_on_date(date)
 
     if direction_filters.any?
       movements = movements.select { |m|

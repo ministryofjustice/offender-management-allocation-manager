@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe HmppsApi::Prison::Movement do
+describe HmppsApi::PrisonApi::MovementApi do
   describe 'Movements for date' do
     it 'can get movements on a specific date',
        vcr: { cassette_name: :movement_api_on_date } do

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe HmppsApi::Prison::Offender do
+describe HmppsApi::PrisonApi::OffenderApi do
   describe 'List of offenders' do
     it "can get a list of offenders",
        vcr: { cassette_name: :offender_api_offender_list } do

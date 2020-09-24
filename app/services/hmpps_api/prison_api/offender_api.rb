@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module HmppsApi
-  module Prison
-    class Offender
+  module PrisonApi
+    class OffenderApi
       extend PrisonApiBase
 
       def self.list(prison, page = 0, page_size: 20)

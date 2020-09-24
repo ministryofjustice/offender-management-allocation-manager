@@ -34,7 +34,7 @@ class AllocationsController < PrisonsApplicationController
         @coworker = coworker
       end
     end
-    @keyworker = HmppsApi::Keyworker::Keyworker.get_keyworker(active_prison_id, @prisoner.offender_no)
+    @keyworker = HmppsApi::KeyworkerApi.get_keyworker(active_prison_id, @prisoner.offender_no)
   end
 
   def edit

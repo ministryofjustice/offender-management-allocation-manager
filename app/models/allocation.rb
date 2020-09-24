@@ -139,7 +139,7 @@ class Allocation < ApplicationRecord
     # To handle this we will attempt to set the prison to a valid code
     # based on the event that has happened.
     if movement_type == Allocation::OFFENDER_RELEASED
-      movements = HmppsApi::Prison::Movement.movements_for(nomis_offender_id)
+      movements = HmppsApi::PrisonApi::MovementApi.movements_for(nomis_offender_id)
       if movements.present?
         movement = movements.last
         return movement.from_agency if movement.from_prison?
