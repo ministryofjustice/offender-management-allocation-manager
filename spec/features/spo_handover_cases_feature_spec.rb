@@ -5,7 +5,7 @@ feature "SPO viewing upcoming handover cases" do
 
   context 'when signed in as an SPO', vcr: { cassette_name: :spo_handover_cases_feature } do
     before do
-      allow_any_instance_of(Nomis::OffenderBase).to receive_messages(
+      allow_any_instance_of(HmppsApi::OffenderBase).to receive_messages(
         handover_start_date: handover_start_date,
         responsibility_handover_date: responsibility_handover_date,
         tier: 'A'

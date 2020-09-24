@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Nomis
+module HmppsApi
   class NullKeyworker < KeyworkerDetails
     def full_name
       'Data not available'

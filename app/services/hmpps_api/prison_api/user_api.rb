@@ -9,7 +9,7 @@ module HmppsApi
         route = "/users/#{username}"
         response = e2_client.get(route)
 
-        user = api_deserialiser.deserialise(Nomis::UserDetails, response)
+        user = api_deserialiser.deserialise(HmppsApi::UserDetails, response)
         user.email_address =
           HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(user.staff_id)
         user

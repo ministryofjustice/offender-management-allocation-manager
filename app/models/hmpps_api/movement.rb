@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Nomis
+module HmppsApi
   class MovementDirection
     IN = 'IN'
     OUT = 'OUT'
@@ -33,7 +33,7 @@ module Nomis
     end
 
     def temporary?
-      movement_type == Nomis::MovementType::TEMPORARY
+      movement_type == HmppsApi::MovementType::TEMPORARY
     end
 
     def out?

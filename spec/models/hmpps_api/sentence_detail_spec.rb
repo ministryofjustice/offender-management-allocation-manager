@@ -1,6 +1,6 @@
 require "rails_helper"
 
-describe Nomis::SentenceDetail, model: true do
+describe HmppsApi::SentenceDetail, model: true do
   let(:date) { Date.new(2019, 2, 3) }
   let(:override) { Date.new(2019, 5, 3) }
 

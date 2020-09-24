@@ -10,9 +10,9 @@ module HmppsApi
       response = Rails.cache.fetch(key, expires_in: Rails.configuration.cache_expiry) {
         client.get(route)
       }
-      ApiDeserialiser.new.deserialise(Nomis::KeyworkerDetails, response)
+      ApiDeserialiser.new.deserialise(HmppsApi::KeyworkerDetails, response)
     rescue HmppsApi::Client::APIError
-      Nomis::NullKeyworker.new
+      HmppsApi::NullKeyworker.new
     end
 
     def self.client

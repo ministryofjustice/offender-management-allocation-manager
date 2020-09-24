@@ -42,7 +42,7 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
 
   it 'does not send an email if the offender case_information is not NPS' do
     allow(OffenderService).to receive(:get_offender).
-      and_return(Nomis::Offender.new(offender_no: nomis_offender_id,
+      and_return(HmppsApi::Offender.new(offender_no: nomis_offender_id,
                                      prison_id: open_prison_code).tap { |o|
                    o.load_case_information(build(:case_information, case_allocation: 'CRC'))
                  })
@@ -54,7 +54,7 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
 
   it 'does not send an email when no LDU email address' do
     allow(OffenderService).to receive(:get_offender).
-      and_return(Nomis::Offender.new(offender_no: nomis_offender_id,
+      and_return(HmppsApi::Offender.new(offender_no: nomis_offender_id,
                                      prison_id: open_prison_code
       ).tap { |o|
                    o.load_case_information(build(:case_information,
@@ -70,7 +70,7 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
 
   it 'sends an email when there was no previous allocation' do
     allow(OffenderService).to receive(:get_offender).
-      and_return(Nomis::Offender.new(offender_no: nomis_offender_id,
+      and_return(HmppsApi::Offender.new(offender_no: nomis_offender_id,
                                      prison_id: open_prison_code,
                                      first_name: 'First',
                                      last_name: 'Last').tap { |o|
@@ -97,7 +97,7 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
 
   it 'can use previous allocation details where they exist', versioning: true do
     allow(OffenderService).to receive(:get_offender).
-      and_return(Nomis::Offender.new(offender_no: nomis_offender_id,
+      and_return(HmppsApi::Offender.new(offender_no: nomis_offender_id,
                                      prison_id: open_prison_code,
                                      first_name: 'First',
                                      last_name: 'Last'

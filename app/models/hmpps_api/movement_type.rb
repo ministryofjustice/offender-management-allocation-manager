@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Nomis
+module HmppsApi
   module MovementType
     RELEASE = 'REL'
     TRANSFER = 'TRN'

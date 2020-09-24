@@ -1,4 +1,4 @@
-module Nomis
+module HmppsApi
   class OffenderBase
     delegate :home_detention_curfew_eligibility_date,
              :home_detention_curfew_actual_date,

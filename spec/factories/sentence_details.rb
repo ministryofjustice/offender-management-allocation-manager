@@ -1,6 +1,6 @@
 FactoryBot.define do
-  factory :sentence_detail, class: 'Nomis::SentenceDetail' do
-    initialize_with { Nomis::SentenceDetail.from_json(attributes.stringify_keys) }
+  factory :sentence_detail, class: 'HmppsApi::SentenceDetail' do
+    initialize_with { HmppsApi::SentenceDetail.from_json(attributes.stringify_keys) }
 
     releaseDate { "2011-01-28" }
     sentenceStartDate { "2011-01-28" }

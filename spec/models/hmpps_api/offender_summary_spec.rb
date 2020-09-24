@@ -1,9 +1,9 @@
 require 'rails_helper'
 
-describe Nomis::OffenderSummary do
+describe HmppsApi::OffenderSummary do
   describe '#earliest_release_date' do
     context 'with blank sentence detail' do
-      before { subject.sentence = Nomis::SentenceDetail.new }
+      before { subject.sentence = HmppsApi::SentenceDetail.new }
 
       it 'responds with no earliest release date' do
         expect(subject.earliest_release_date).to be_nil
@@ -15,7 +15,7 @@ describe Nomis::OffenderSummary do
 
       context 'with just the sentence expiry date' do
         before do
-          subject.sentence = Nomis::SentenceDetail.new(sentence_expiry_date: today_plus1)
+          subject.sentence = HmppsApi::SentenceDetail.new(sentence_expiry_date: today_plus1)
         end
 
         it 'uses the SED' do
@@ -25,7 +25,7 @@ describe Nomis::OffenderSummary do
 
       context 'with many dates' do
         before do
-          subject.sentence = Nomis::SentenceDetail.new(sentence_expiry_date: sentence_expiry_date,
+          subject.sentence = HmppsApi::SentenceDetail.new(sentence_expiry_date: sentence_expiry_date,
                                                        licence_expiry_date: licence_expiry_date,
                                                        nomis_post_recall_release_date: post_recall_release_date,
                                                        actual_parole_date: actual_parole_date)
@@ -77,7 +77,7 @@ describe Nomis::OffenderSummary do
 
     context 'with sentence detail with dates' do
       before do
-        subject.sentence = Nomis::SentenceDetail.new(
+        subject.sentence = HmppsApi::SentenceDetail.new(
           sentence_start_date: Date.new(2005, 2, 3),
           parole_eligibility_date: parole_eligibility_date,
           conditional_release_date: conditional_release_date)
@@ -110,7 +110,7 @@ describe Nomis::OffenderSummary do
   describe '#sentenced?' do
     context 'with sentence detail with a release date' do
       before do
-        subject.sentence = Nomis::SentenceDetail.new(
+        subject.sentence = HmppsApi::SentenceDetail.new(
           sentence_start_date: Date.new(2005, 2, 3),
           release_date: Time.zone.today)
       end
@@ -121,7 +121,7 @@ describe Nomis::OffenderSummary do
     end
 
     context 'with blank sentence detail' do
-      before { subject.sentence = Nomis::SentenceDetail.new }
+      before { subject.sentence = HmppsApi::SentenceDetail.new }
 
       it 'marks the offender as not sentenced' do
         expect(subject.sentenced?).to be false
