@@ -3,7 +3,7 @@
 module HmppsApi
   module PrisonApi
     class UserApi
-      extend PrisonApiBase
+      extend PrisonApiClient
 
       def self.user_details(username)
         route = "/users/#{username}"

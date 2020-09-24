@@ -3,7 +3,7 @@
 module HmppsApi
   module PrisonApi
     class OffenderApi
-      extend PrisonApiBase
+      extend PrisonApiClient
 
       def self.list(prison, page = 0, page_size: 20)
         route = "/locations/description/#{prison}/inmates"

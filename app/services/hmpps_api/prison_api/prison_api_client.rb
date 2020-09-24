@@ -4,7 +4,7 @@ module HmppsApi
   module PrisonApi
     ApiPaginatedResponse = Struct.new(:total_pages, :data)
 
-    module PrisonApiBase
+    module PrisonApiClient
       def e2_client
         host = Rails.configuration.prison_api_host
         HmppsApi::Client.new(host + '/api')
