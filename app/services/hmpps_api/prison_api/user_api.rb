@@ -7,7 +7,7 @@ module HmppsApi
 
       def self.user_details(username)
         route = "/users/#{username}"
-        response = e2_client.get(route)
+        response = client.get(route)
 
         user = api_deserialiser.deserialise(HmppsApi::UserDetails, response)
         user.email_address =
@@ -17,7 +17,7 @@ module HmppsApi
 
       def self.user_caseloads(staff_id)
         route = "/staff/#{staff_id}/caseloads"
-        response = e2_client.get(route)
+        response = client.get(route)
 
         response
       end

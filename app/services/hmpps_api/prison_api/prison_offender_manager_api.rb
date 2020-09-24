@@ -7,7 +7,7 @@ module HmppsApi
 
       def self.staff_detail(staff_id)
         route = "/staff/#{staff_id}"
-        data = e2_client.get(route)
+        data = client.get(route)
         api_deserialiser.deserialise(HmppsApi::StaffDetails, data)
       end
 
@@ -17,7 +17,7 @@ module HmppsApi
         key = "pom_list_#{prison}"
 
         data = Rails.cache.fetch(key, expires_in: Rails.configuration.cache_expiry) {
-          e2_client.get(route,  extra_headers: paging_options { |result|
+          client.get(route, extra_headers: paging_options { |result|
             raise HmppsApi::Client::APIError, 'No data was returned' if result.empty?
           })
         }
@@ -27,7 +27,7 @@ module HmppsApi
 
       def self.fetch_email_addresses(nomis_staff_id)
         route = "/staff/#{nomis_staff_id}/emails"
-        data = e2_client.get(route)
+        data = client.get(route)
         return [] if data.nil?
 
         data
