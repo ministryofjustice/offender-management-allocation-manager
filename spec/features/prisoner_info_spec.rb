@@ -58,7 +58,7 @@ feature 'View a prisoner profile page' do
     it "has a link to the allocation history", :versioning, vcr: { cassette_name: :link_to_allocation_history } do
       visit prison_prisoner_path('LEI', 'G7998GJ')
       click_link "View"
-      expect(page).to have_content('Prisoner allocation')
+      expect(page).to have_content('Prisoner allocated')
     end
 
     it "has community information when present",
