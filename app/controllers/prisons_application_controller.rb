@@ -3,7 +3,7 @@
 # This class is inherited by all controllers under the /prisons route
 # so that they have @prison and active_prison_id available
 class PrisonsApplicationController < ApplicationController
-  before_action :authenticate_user, :check_prison_access, :load_staff_id, :service_notifications
+  before_action :authenticate_user, :check_prison_access, :load_staff_member, :service_notifications
 
 protected
 
@@ -35,14 +35,14 @@ private
     @caseloads = caseloads
   end
 
-  def pom_at_active_prison?
+  def load_staff_member
     user = HmppsApi::PrisonApi::UserApi.user_details(current_user)
-    StaffMember.new(user.staff_id).pom_at?(active_prison_id)
+    @staff_member = StaffMember.new(user.staff_id)
+    @staff_id = user.staff_id
   end
 
-  def load_staff_id
-    user = HmppsApi::PrisonApi::UserApi.user_details(current_user)
-    @staff_id = user.staff_id
+  def pom_at_active_prison?
+    @staff_member.pom_at?(active_prison_id)
   end
 
   def service_notifications
