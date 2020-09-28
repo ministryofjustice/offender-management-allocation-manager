@@ -151,7 +151,7 @@ GEM
     has_scope (0.7.2)
       actionpack (>= 4.1)
       activesupport (>= 4.1)
-    hashdiff (1.0.0)
+    hashdiff (1.0.1)
     hashie (4.1.0)
     i18n (1.8.5)
       concurrent-ruby (~> 1.0)
