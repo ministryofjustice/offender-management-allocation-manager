@@ -13,7 +13,7 @@ module HmppsApi
     attr_accessor :category_code, :date_of_birth
 
     attr_reader :first_name, :last_name, :booking_id,
-                :offender_no, :convicted_status
+                :offender_no
 
     attr_accessor :sentence, :allocated_pom_name, :allocated_com_name, :case_allocation, :mappa_level, :tier
 
@@ -24,7 +24,7 @@ module HmppsApi
     attr_reader :sentence_type
 
     def convicted?
-      convicted_status == 'Convicted'
+      @convicted_status == 'Convicted'
     end
 
     def sentenced?
