@@ -42,14 +42,6 @@ describe HmppsApi::CommunityApi do
   end
 
   describe '.set_handover_dates' do
-    subject {
-      described_class.set_handover_dates(
-        offender_no: offender_no,
-        handover_start_date: handover_start_date,
-        responsibility_handover_date: responsibility_handover_date
-      )
-    }
-
     let(:stub_base_url) { "#{api_host}/secure/offenders/nomsNumber/#{offender_no}/custody/keyDates" }
 
     before do
@@ -59,7 +51,11 @@ describe HmppsApi::CommunityApi do
       stub_request(:delete, "#{stub_base_url}/POM2").to_return(status: 200)
 
       # Trigger the request
-      subject
+      described_class.set_handover_dates(
+        offender_no: offender_no,
+        handover_start_date: handover_start_date,
+        responsibility_handover_date: responsibility_handover_date
+      )
     end
 
     describe 'when both handover dates are given' do
