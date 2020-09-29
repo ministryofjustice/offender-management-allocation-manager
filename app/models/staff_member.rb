@@ -3,6 +3,7 @@
 # This object represents a staff member who may or my not be a POM. It is up to the caller to check
 # and do something interesting if they are not a POM at a specific prison.
 class StaffMember
+  # maybe this method shouldn't be here?
   attr_reader :staff_id
 
   def initialize(nomis_staff_id, pom_detail = default_pom_detail(nomis_staff_id))

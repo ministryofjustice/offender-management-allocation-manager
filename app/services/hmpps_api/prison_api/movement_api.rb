@@ -32,21 +32,22 @@ module HmppsApi
         types = [HmppsApi::MovementType::ADMISSION,
                  HmppsApi::MovementType::TRANSFER].freeze
 
-        cache_key = "#{route}_#{Digest::SHA256.hexdigest(offender_nos.to_s)}_#{types}"
+        cache_key = "#{route}_#{Digest::SHA256.hexdigest(offender_nos.to_s)}_#{types}_latestOnly_false"
 
-        Rails.cache.fetch(cache_key,
-                          expires_in: Rails.configuration.cache_expiry) do
-          data = client.post(route, offender_nos,
-                             queryparams: { latestOnly: false, movementTypes: types }).
+        data = Rails.cache.fetch(cache_key,
+                                 expires_in: Rails.configuration.cache_expiry) do
+          client.post(route, offender_nos,
+                      queryparams: { latestOnly: false, movementTypes: types }).
             group_by { |x| x['offenderNo'] }.values
-          movements = data.map { |d|
-            d.sort_by { |k| k['createDateTime'] }.map { |movement|
-              api_deserialiser.deserialise(HmppsApi::Movement, movement)
-            }
-          }
-          # return a hash of offender_no => [HmppsApi::Movement]
-          movements.index_by { |m| m.first.offender_no }
         end
+
+        movements = data.map { |d|
+          d.sort_by { |k| k['createDateTime'] }.map { |movement|
+            api_deserialiser.deserialise(HmppsApi::Movement, movement)
+          }
+        }
+        # return a hash of offender_no => [HmppsApi::Movement]
+        movements.index_by { |m| m.first.offender_no }
       end
 
       def self.latest_temp_movement_for(offender_nos)
