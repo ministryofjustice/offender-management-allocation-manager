@@ -2,6 +2,12 @@
 
 module HmppsApi
   class CommunityApi
+    class KeyDate
+      # These are `{typeCode}` values for 'key dates' in the Community API
+      HANDOVER_START_DATE = 'POM1'
+      RESPONSIBILITY_HANDOVER_DATE = 'POM2'
+    end
+
     def self.client
       host = Rails.configuration.community_api_host
       HmppsApi::Client.new(host + '/secure')
@@ -33,8 +39,8 @@ module HmppsApi
 
       # Map dates to the correct `{typeCode}` for the Community API
       dates = {
-        POM1: handover_start_date,
-        POM2: responsibility_handover_date
+        KeyDate::HANDOVER_START_DATE => handover_start_date,
+        KeyDate::RESPONSIBILITY_HANDOVER_DATE => responsibility_handover_date
       }
 
       dates.stringify_keys.each do |code, date|
