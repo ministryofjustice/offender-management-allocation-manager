@@ -10,6 +10,8 @@
       <%= case_owner_label(@prisoner) %>
       <% if @prisoner.pom_responsibility.custody? %>
         <%= link_to 'Change', new_prison_responsibility_path(@prison.code, nomis_offender_id: @prisoner.offender_no), class: 'govuk-link pull-right' %>
+      <% elsif @prisoner.responsibility_override? %>
+        <%= link_to 'Change', confirm_removal_prison_responsibility_path(@prison.code, @prisoner.offender_no), class: 'govuk-link pull-right' %>
       <% end %>
     </td>
   </tr>

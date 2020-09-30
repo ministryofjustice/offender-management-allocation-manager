@@ -2,8 +2,8 @@
 
 class ResponsibilitiesController < PrisonsApplicationController
   def new
-    if ldu_email_address(params[:nomis_offender_id]).present?
-      @responsibility = Responsibility.new nomis_offender_id: params[:nomis_offender_id]
+    if ldu_email_address(nomis_offender_id_from_url).present?
+      @responsibility = Responsibility.new nomis_offender_id: nomis_offender_id_from_url
     else
       render 'error'
     end
@@ -44,7 +44,52 @@ class ResponsibilitiesController < PrisonsApplicationController
     end
   end
 
+  def confirm_removal
+    @responsibility = RemoveResponsibilityForm.new nomis_offender_id: nomis_offender_id_from_url
+    @ldu_email_address = ldu_email_address(nomis_offender_id_from_url)
+  end
+
+  def destroy
+    @responsibility = RemoveResponsibilityForm.new(responsibility_params)
+    @ldu_email_address = ldu_email_address(nomis_offender_id_from_url)
+
+    allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id_from_url)
+
+    emails = [@staff_member.email_address, @ldu_email_address]
+
+    if @responsibility.valid?
+      Responsibility.find_by!(nomis_offender_id: nomis_offender_id_from_url).destroy
+      offender = OffenderService.get_offender(nomis_offender_id_from_url)
+
+      if allocation && allocation.active?
+        pom_email = StaffMember.new(allocation.primary_pom_nomis_id).email_address
+        emails << pom_email
+        ResponsibilityMailer.responsibility_to_custody_with_pom(emails: emails.compact,
+                                                                       pom_name: allocation.primary_pom_name,
+                                                                       pom_email: pom_email,
+                                                                       prisoner_name: offender.full_name,
+                                                                       prisoner_number: nomis_offender_id_from_url,
+                                                                       prison_name: @prison.name,
+                                                                       notes: @responsibility.reason_text).deliver_later
+      else
+        ResponsibilityMailer.responsibility_to_custody(emails: emails.compact,
+                                                       prisoner_name: offender.full_name,
+                                                       prisoner_number: nomis_offender_id_from_url,
+                                                       prison_name: @prison.name,
+                                                       notes: @responsibility.reason_text).deliver_later
+      end
+
+      redirect_to new_prison_allocation_path(@prison.code, nomis_offender_id_from_url)
+    else
+      render :confirm_removal
+    end
+  end
+
 private
+
+  def nomis_offender_id_from_url
+    params.fetch(:nomis_offender_id)
+  end
 
   def ldu_email_address(nomis_offender_id)
     @ldu_email_address ||= CaseInformation.

@@ -199,4 +199,32 @@ feature 'Allocation' do
     visit edit_prison_allocation_path('LEI', never_allocated_offender)
     expect(page).to have_current_path new_prison_allocation_path('LEI', never_allocated_offender)
   end
+
+  context 'with a community override' do
+    before do
+      create(:responsibility, nomis_offender_id: never_allocated_offender)
+    end
+
+    scenario 'removing a community override', vcr: { cassette_name: :allocation_remove_community_override } do
+      visit prison_dashboard_index_path('LEI')
+
+      click_link 'Make new allocations'
+      find '.offender_row_0'
+      within '.offender_row_0' do
+        click_link 'Allocate'
+      end
+
+      find '.responsibility_change'
+      within '.responsibility_change' do
+        click_link 'Change'
+      end
+      click_button 'Confirm'
+      expect(all('.govuk-error-summary').count).to eq(1)
+
+      fill_in('responsibility[reason_text]', with: Faker::Lorem.sentence)
+      click_button 'Confirm'
+
+      expect(page).to have_current_path(new_prison_allocation_path('LEI', never_allocated_offender), ignore_query: true)
+    end
+  end
 end

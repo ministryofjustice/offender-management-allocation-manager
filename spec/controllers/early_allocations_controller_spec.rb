@@ -23,7 +23,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
   let(:nomis_offender_id) { offender.fetch(:offenderNo) }
 
   before do
-    stub_sso_data(prison, 'alice')
+    stub_sso_data(prison)
 
     stub_offender(offender)
     stub_poms(prison, poms)

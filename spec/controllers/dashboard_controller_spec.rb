@@ -51,7 +51,7 @@ RSpec.describe DashboardController, type: :controller do
       render_views
 
       before do
-        stub_sso_data(prison, 'alice')
+        stub_sso_data(prison)
         stub_request(:get, "#{ApiHelper::T3}/users/").
           to_return(body: { staffId: 1 }.to_json)
       end

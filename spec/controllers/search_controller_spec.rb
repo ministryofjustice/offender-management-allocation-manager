@@ -31,7 +31,7 @@ RSpec.describe SearchController, type: :controller do
 
   context 'when user is an SPO ' do
     before do
-      stub_sso_data(prison, 'alice')
+      stub_sso_data(prison)
     end
 
     it 'can search' do

@@ -7,6 +7,10 @@ class Prison
     @code = prison_code
   end
 
+  def name
+    PrisonService.name_for(@code)
+  end
+
   def offenders
     OffenderEnumerator.new(@code).select do |offender|
       next if offender.age.blank?

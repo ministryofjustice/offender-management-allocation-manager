@@ -55,7 +55,10 @@ Rails.application.routes.draw do
 
     resources :tasks, only: %i[ index ]
 
-    resources :responsibilities, only: %i[new create] do
+    resources :responsibilities, only: %i[new create destroy], param: :nomis_offender_id do
+      member do
+        get :confirm_removal
+      end
       collection do
         post('confirm' => 'responsibilities#confirm')
       end

@@ -30,7 +30,14 @@
 # available at https://guides.rubyonrails.org/i18n.html.
 
 en:
-  hello: "Hello world"
+  activemodel:
+    errors:
+      models:
+        responsibility:
+          format: "%{message}"
+          attributes:
+            reason_text:
+              blank: You must say why you are changing responsibility for this case
   activerecord:
     errors:
       models:
