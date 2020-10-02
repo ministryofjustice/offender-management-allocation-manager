@@ -9,6 +9,10 @@ A service for allocating Prisoners to Prisoner Offender Managers (POMs).
 This is a Ruby on Rails application that exposes an interface for Prison staff
 to manage the allocation of POMs to Prisoners.
 
+[![auto-updating container diagram](https://static.structurizr.com/workspace/56937/diagrams/omic-container.png)](https://structurizr.com/share/56937/diagrams#omic-container)
+
+👆 edit in [hmpps-architecture-as-code](https://github.com/ministryofjustice/hmpps-architecture-as-code/blob/9990e7fbb3aa545208d2ebc40104f6f3d5a9813d/src/main/kotlin/model/OffenderManagementInCustody.kt)
+
 ### Dependencies
 
 - [Nomis Oauth2 Server](https://github.com/ministryofjustice/nomis-oauth2-server) - for logging into the application
