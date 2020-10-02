@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe PomsController, type: :controller do
+RSpec.describe PomsController, :allocation, type: :controller do
   let(:prison) { build(:prison) }
   let(:a_offenders) { build_list(:nomis_offender, 2) }
   let(:b_offenders) { build_list(:nomis_offender, 4) }

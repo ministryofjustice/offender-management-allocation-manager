@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe TasksController, type: :controller do
+RSpec.describe TasksController, :allocation, type: :controller do
   let(:prison) { build(:prison).code }
   let(:staff_id) { 123 }
   let(:pom) {

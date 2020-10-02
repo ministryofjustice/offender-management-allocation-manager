@@ -5,7 +5,7 @@ RSpec.describe Allocation, type: :model do
   let(:nomis_offender_id) { 'A3434LK' }
   let(:another_nomis_offender_id) { 654_321 }
 
-  describe '#without_ldu_emails' do
+  describe '#without_ldu_emails', :allocation do
     before do
       crcci1 = create(:case_information, case_allocation: 'CRC', team: nil)
       create(:allocation, nomis_offender_id: crcci1.nomis_offender_id)
@@ -46,7 +46,7 @@ RSpec.describe Allocation, type: :model do
     it { is_expected.to validate_presence_of(:event_trigger) }
   end
 
-  context 'with allocations' do
+  context 'with allocations', :allocation do
     let(:prison) { build(:prison) }
     let(:pom) { build(:pom, staffId: nomis_staff_id) }
 
@@ -104,7 +104,7 @@ RSpec.describe Allocation, type: :model do
       end
     end
 
-    describe 'when an offender moves prison', vcr: { cassette_name: :allocation_deallocate_offender }  do
+    describe 'when an offender moves prison', :allocation, vcr: { cassette_name: :allocation_deallocate_offender }  do
       it 'removes the primary pom details in an Offender\'s allocation' do
         nomis_offender_id = 'G2911GD'
         create(:case_information, nomis_offender_id: nomis_offender_id)
@@ -135,7 +135,7 @@ RSpec.describe Allocation, type: :model do
       end
     end
 
-    describe 'when an offender gets released from prison', vcr: { cassette_name: :allocation_deallocate_offender_released }  do
+    describe 'when an offender gets released from prison', :allocation, vcr: { cassette_name: :allocation_deallocate_offender_released }  do
       it 'removes the primary pom details in an Offender\'s allocation' do
         nomis_offender_id = 'G2911GD'
         create(:case_information, nomis_offender_id: nomis_offender_id)
@@ -170,7 +170,7 @@ RSpec.describe Allocation, type: :model do
       end
     end
 
-    describe '#active?' do
+    describe '#active?', :allocation do
       it 'return true if an Allocation has been assigned a Primary POM' do
         alloc = AllocationService.current_allocation_for(nomis_offender_id)
         expect(alloc.active?).to be(true)
@@ -184,7 +184,7 @@ RSpec.describe Allocation, type: :model do
       end
     end
 
-    describe '#override_reasons' do
+    describe '#override_reasons', :allocation do
       let!(:allocation_no_overrides) {
         create(
           :allocation,
@@ -201,7 +201,7 @@ RSpec.describe Allocation, type: :model do
       end
     end
 
-    describe '#active_pom_allocations' do
+    describe '#active_pom_allocations', :allocation do
       let!(:secondary_allocation) {
         create(
           :allocation,
@@ -226,6 +226,61 @@ RSpec.describe Allocation, type: :model do
 
       it 'returns both primary and secondary allocations' do
         expect(described_class.active_pom_allocations(nomis_staff_id, allocation.prison)).to match_array [secondary_allocation, allocation]
+      end
+    end
+  end
+
+  describe 'automate pushing the primary pom to ndelius' do
+    let(:prison) { build(:prison).code }
+
+    context 'when a new allocation is created and a POM is set' do
+      before do
+        expect(PrisonOffenderManagerService).to receive(:get_pom_name).with(nomis_staff_id).and_return ['Bill', 'Jones']
+        expect(HmppsApi::CommunityApi).to receive(:set_pom).with offender_no: nomis_offender_id, prison: prison, forename: 'Bill', surname: 'Jones'
+      end
+
+
+      it 'pushes the POM name to Ndelius'do
+        create(:allocation, :primary, nomis_offender_id: nomis_offender_id, prison: prison, primary_pom_nomis_id: nomis_staff_id)
+      end
+    end
+
+    context 'with an existing allocation' do
+      before do
+        expect(PrisonOffenderManagerService).to receive(:get_pom_name).with(nomis_staff_id).and_return ['Bill', 'Jones']
+        expect(HmppsApi::CommunityApi).to receive(:set_pom).with offender_no: nomis_offender_id, prison: prison, forename: 'Bill', surname: 'Jones'
+        create(:allocation, :primary, nomis_offender_id: nomis_offender_id, prison: prison, primary_pom_nomis_id: nomis_staff_id)
+      end
+
+      let(:allocation) { described_class.last }
+
+      describe 'updating secondary POM' do
+        it 'doesnt update delius' do
+          allocation.update!(secondary_pom_nomis_id: 24689)
+        end
+      end
+
+      describe 'de-allocated POM' do
+        before do
+          expect(HmppsApi::CommunityApi).to receive(:unset_pom).with nomis_offender_id
+        end
+
+        it 'deletes the POM from Ndelius' do
+          allocation.update!(primary_pom_nomis_id: nil)
+        end
+      end
+
+      describe 're-allocated POM ' do
+        before do
+          expect(PrisonOffenderManagerService).to receive(:get_pom_name).with(updated_nomis_staff_id).and_return ['Sally', 'Albright']
+          expect(HmppsApi::CommunityApi).to receive(:set_pom).with offender_no: nomis_offender_id, prison: prison, forename: 'Sally', surname: 'Albright'
+        end
+
+        let(:updated_nomis_staff_id) { 146890 }
+
+        it 'updates the POM in Ndelius' do
+          allocation.update!(primary_pom_nomis_id: updated_nomis_staff_id)
+        end
       end
     end
   end

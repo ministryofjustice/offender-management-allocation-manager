@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe SummaryController, type: :controller do
+RSpec.describe SummaryController, :allocation, type: :controller do
   let(:prison) { build(:prison).code }
 
   before { stub_sso_data(prison) }

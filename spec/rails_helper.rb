@@ -10,6 +10,7 @@ require 'support/helpers/jwt_helper'
 require 'support/helpers/features_helper'
 require 'support/helpers/auth_helper'
 require 'support/helpers/api_helper'
+require 'support/helpers/community_api_helper'
 require 'capybara/rspec'
 require 'webmock/rspec'
 
@@ -68,6 +69,7 @@ RSpec.configure do |config|
   config.include FeaturesHelper
   config.include AuthHelper
   config.include ApiHelper
+  config.include CommunityApiHelper
 
   config.before(:each, type: :view) do
     # This is needed for any view test that uses the sort_link and sort_arrow helpers
@@ -93,6 +95,12 @@ RSpec.configure do |config|
     WebMock.allow_net_connect!
     example.run
     WebMock.disable_net_connect!(allow_localhost: true)
+  end
+
+  # This is to prevent test from having to mock this callback due
+  # to an after_save call back in Allocation.
+  config.before(:each, :allocation) do
+    allow(PushPomToDeliusJob).to receive(:perform_later)
   end
 end
 

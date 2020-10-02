@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe CaseloadController, type: :controller do
+RSpec.describe CaseloadController, :allocation, type: :controller do
   let(:prison) { build(:prison).code }
   let(:staff_id) { 456_987 }
   let(:not_signed_in) { 123_456 }

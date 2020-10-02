@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe DebuggingController, type: :controller do
+RSpec.describe DebuggingController, :allocation, type: :controller do
   let(:prison) { build(:prison) }
   let(:prison_id) { prison.code }
 

@@ -43,7 +43,7 @@ RSpec.describe ResponsibilitiesController, type: :controller do
       end
     end
 
-    context 'with an allocation' do
+    context 'with an allocation', :allocation do
       before do
         create(:allocation, nomis_offender_id: responsibility.nomis_offender_id, primary_pom_nomis_id: pom.staffId)
         stub_poms(prison.code, [pom])

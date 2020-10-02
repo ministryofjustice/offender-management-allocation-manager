@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe StaffMember, type: :model do
+RSpec.describe StaffMember, :allocation, type: :model do
   let(:prison) { Prison.new('LEI') }
   let(:staff_id) { 123 }
   let(:user) { described_class.new(prison, staff_id) }

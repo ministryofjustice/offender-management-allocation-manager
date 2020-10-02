@@ -18,11 +18,11 @@ module HmppsApi
       route = "/offenders/nomsNumber/#{safe_offender_no}/prisonOffenderManager"
 
       body = {
-        nomsPrisonInstitutionCode: prison,
-        officer: {
-          forenames: forename,
-          surname: surname
-        }
+          nomsPrisonInstitutionCode: prison,
+          officer: {
+              forenames: forename,
+              surname: surname
+          }
       }
 
       # We don't use a cache here because we're not 'getting' data, but 'pushing' it
@@ -30,6 +30,20 @@ module HmppsApi
 
       # So long as the API call didn't error, return true
       # The API response body isn't useful to us
+      #
+      true
+    end
+
+    def self.unset_pom(offender_no)
+      safe_offender_no = URI.encode_www_form_component(offender_no)
+      route = "/offenders/nomsNumber/#{safe_offender_no}/prisonOffenderManager"
+
+
+      self.client.delete(route)
+
+      # So long as the API call didn't error, return true
+      # The API response body isn't useful to us
+
       true
     end
 

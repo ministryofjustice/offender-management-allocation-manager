@@ -89,6 +89,5 @@ FactoryBot.define do
       suitability_detail {Faker::Lorem.sentence}
       override_reasons { ["suitability"] }
     end
-
   end
 end
