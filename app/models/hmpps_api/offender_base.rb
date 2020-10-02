@@ -10,7 +10,7 @@ module HmppsApi
 
     delegate :indeterminate_sentence?, :immigration_case?, to: :@sentence_type
 
-    attr_accessor :category_code, :date_of_birth
+    attr_accessor :category_code, :date_of_birth, :prison_arrival_date
 
     attr_reader :first_name, :last_name, :booking_id,
                 :offender_no

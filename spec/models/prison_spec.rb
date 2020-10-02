@@ -63,6 +63,12 @@ RSpec.describe Prison, type: :model do
         stub_request(:post, "#{ApiHelper::T3}/offender-sentences/bookings").
           with(body: offenders.map { |o| o.fetch(:bookingId) }.to_json).
           to_return(body: bookings.to_json)
+
+        stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN").
+            with(
+              body: offenders.map { |o| o.fetch(:offenderNo) }.to_json,
+            ).
+            to_return(body: [].to_json)
       end
 
       it 'returns falses when missing' do
@@ -101,6 +107,12 @@ RSpec.describe Prison, type: :model do
         stub_request(:post, "#{ApiHelper::T3}/offender-sentences/bookings").
           with(body: offenders.map { |o| o.fetch(:bookingId) }.to_json).
           to_return(body: bookings.to_json)
+
+        stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN").
+            with(
+              body: offenders.map { |o| o.fetch(:offenderNo) }.to_json,
+                ).
+            to_return(body: [].to_json)
       end
 
       it 'fetches one page only' do

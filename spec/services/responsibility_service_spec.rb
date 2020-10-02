@@ -2,6 +2,73 @@ require 'rails_helper'
 
 describe ResponsibilityService do
   describe '#calculate_pom_responsibility' do
+    context 'when prescoed' do
+      let(:recent_date) { ResponsibilityService::PRESCOED_CUTOFF_DATE }
+      let(:past_date) { ResponsibilityService::PRESCOED_CUTOFF_DATE - 1.day }
+
+      context 'with recent arrival' do
+        let(:arrival_date) { recent_date }
+
+        context 'when welsh' do
+          let(:offender) {
+            build(:offender, :prescoed, sentence: build(:sentence_detail, :welsh_policy_sentence)).tap { |o|
+              o.prison_arrival_date = arrival_date
+              o.load_case_information(case_info)
+            }
+          }
+
+          context 'with NPS' do
+            let(:case_info) { build(:case_information, :welsh, :nps) }
+
+            it 'is responsible' do
+              expect(described_class.calculate_pom_responsibility(offender)).to eq(ResponsibilityService::RESPONSIBLE)
+            end
+          end
+
+          context 'with CRC' do
+            let(:case_info) { build(:case_information, :welsh, :crc) }
+
+            it 'is responsible' do
+              expect(described_class.calculate_pom_responsibility(offender)).to eq(ResponsibilityService::RESPONSIBLE)
+            end
+          end
+        end
+
+        context 'when english' do
+          let(:offender) {
+            build(:offender_summary, :prescoed, sentence: build(:sentence_detail, :english_policy_sentence)).tap { |o|
+              o.prison_arrival_date = arrival_date
+              o.load_case_information(case_info)
+            }
+          }
+
+          context 'with NPS english offender' do
+            let(:case_info) { build(:case_information, :english, :nps) }
+
+            it 'is supporting' do
+              expect(described_class.calculate_pom_responsibility(offender)).to eq(ResponsibilityService::SUPPORTING)
+            end
+          end
+        end
+      end
+
+      context 'with past NPS welsh offender' do
+        let(:offender) {
+          build(:offender, :prescoed, sentence: build(:sentence_detail, :welsh_policy_sentence)).tap { |o|
+            o.prison_arrival_date = arrival_date
+            o.load_case_information(case_info)
+          }
+        }
+
+        let(:arrival_date) { past_date }
+        let(:case_info) { build(:case_information, :welsh, :nps) }
+
+        it 'is supporting' do
+          expect(described_class.calculate_pom_responsibility(offender)).to eq(ResponsibilityService::SUPPORTING)
+        end
+      end
+    end
+
     context 'when an immigration offender' do
       let(:offender) {
         OpenStruct.new immigration_case?: true

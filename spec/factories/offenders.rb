@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :offender, class: 'HmppsApi::Offender' do
-    initialize_with { HmppsApi::Offender.from_json(attributes.stringify_keys).tap { |offender| offender.sentence = attributes.fetch(:sentence)} }
-
+  factory :offender_base, class: 'HmppsApi::Offender' do
     imprisonmentStatus { 'SENT03' }
     prisonId { 'LEI' }
 
@@ -41,6 +39,14 @@ FactoryBot.define do
     trait :determinate_recall do
       imprisonmentStatus {'LR_EPP'}
       recall { true }
+    end
+  end
+
+  factory :offender, parent: :offender_base, class: 'HmppsApi::Offender' do
+    initialize_with { HmppsApi::Offender.from_json(attributes.stringify_keys).tap { |offender| offender.sentence = attributes.fetch(:sentence)} }
+
+    trait :prescoed do
+      latestLocationId { PrisonService::PRESCOED_CODE }
     end
   end
 

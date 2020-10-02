@@ -53,7 +53,11 @@ module HmppsApi
         else
           recall_data = get_recall_flags([url_offender_no])
           api_deserialiser.deserialise(HmppsApi::Offender,
-                                       response.first.merge(recall_data.fetch(url_offender_no)))
+                                       response.first.merge(recall_data.fetch(url_offender_no))).tap do |offender|
+            sentence_details = get_bulk_sentence_details([offender.booking_id])
+            offender.sentence = sentence_details.fetch(offender.booking_id)
+            add_arrival_dates([offender])
+          end
         end
       end
 
@@ -114,6 +118,17 @@ module HmppsApi
         # face, and so when an image can't be found, we will return the default
         # image instead.
         default_image
+      end
+
+      def self.add_arrival_dates(offenders)
+        movements = HmppsApi::PrisonApi::MovementApi.admissions_for(offenders.map(&:offender_no))
+
+        offenders.each do |offender|
+          arrival = movements.fetch(offender.offender_no, []).reverse.detect { |movement|
+            movement.to_agency == offender.prison_id
+          }
+          offender.prison_arrival_date = [offender.sentence_start_date, arrival&.create_date_time].compact.max
+        end
       end
 
     private

@@ -29,11 +29,6 @@ class SummaryService
 
     add_allocated_poms_and_coms(offenders, active_allocations_hash)
 
-    # We need arrival dates for all offenders and all summary types because it is used to
-    # detect new arrivals and so we would not be able to count them without knowing their
-    # prison_arrival_date
-    add_arrival_dates(offenders) if offenders.any?
-
     offenders.each do |offender|
       if offender.has_case_information?
         # When trying to determine if this offender has a current active allocation, we want to know
@@ -97,17 +92,6 @@ private
 
   def self.default_sortable_fields
     [:last_name, :earliest_release_date, :awaiting_allocation_for, :tier]
-  end
-
-  def self.add_arrival_dates(offenders)
-    movements = HmppsApi::PrisonApi::MovementApi.admissions_for(offenders.map(&:offender_no))
-
-    offenders.each do |offender|
-      arrival = movements.fetch(offender.offender_no, []).reverse.detect { |movement|
-        movement.to_agency == offender.prison_id
-      }
-      offender.prison_arrival_date = [offender.sentence_start_date, arrival&.create_date_time].compact.max
-    end
   end
 
   def self.add_allocated_poms_and_coms(offenders, active_allocations_hash)
