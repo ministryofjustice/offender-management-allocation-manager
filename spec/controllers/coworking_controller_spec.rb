@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe CoworkingController, type: :controller do
+RSpec.describe CoworkingController, :allocation, type: :controller do
   let(:prison) { build(:prison).code }
   let(:primary_pom) { build(:pom) }
   let(:offender) { build(:nomis_offender) }

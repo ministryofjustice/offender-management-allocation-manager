@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe OverridesController, type: :controller do
+RSpec.describe OverridesController, :allocation, type: :controller do
   before do
     stub_sso_data(prison)
   end

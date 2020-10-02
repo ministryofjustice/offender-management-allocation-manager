@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature 'Allocation' do
+feature 'Allocation', :allocation do
   let!(:probation_officer_nomis_staff_id) { 485_636 }
   let!(:prison_officer_nomis_staff_id) { 485_926 }
   let!(:nomis_offender_id) { 'G7266VD' }

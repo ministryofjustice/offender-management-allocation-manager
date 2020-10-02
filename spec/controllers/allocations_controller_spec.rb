@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe AllocationsController, type: :controller do
+RSpec.describe AllocationsController, :allocation, type: :controller do
   let(:poms) {
     [
       build(:pom, :prison_officer, emails: []),

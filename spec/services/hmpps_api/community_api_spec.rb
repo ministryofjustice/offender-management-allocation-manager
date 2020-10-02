@@ -41,6 +41,22 @@ describe HmppsApi::CommunityApi do
     end
   end
 
+  describe '.delete_pom' do
+    describe 'when pom name is nil' do
+      let(:stub_url) { "#{api_host}/secure/offenders/nomsNumber/#{offender_no}/prisonOffenderManager" }
+
+      before do
+        stub_request(:delete, stub_url).to_return(status: 200)
+      end
+
+      it 'deletes the POM name for the given offender' do
+        described_class.unset_pom(offender_no)
+
+        expect(WebMock).to have_requested(:delete, stub_url)
+      end
+    end
+  end
+
   describe '.set_handover_dates' do
     let(:stub_base_url) { "#{api_host}/secure/offenders/nomsNumber/#{offender_no}/custody/keyDates" }
 

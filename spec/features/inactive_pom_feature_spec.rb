@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 feature 'Inactive POM' do
-  context 'when viewing an inactive POMs caseload', vcr: { cassette_name: :deallocate_non_pom_caseload } do
+  context 'when viewing an inactive POMs caseload', :allocation, vcr: { cassette_name: :deallocate_non_pom_caseload } do
     # We need an inactive POM to test this feature, Toby has had his POM role removed and therefore a good candidate!
     let(:inactive_pom)      { 485_595 }
     let(:nomis_offender_id) { "G4273GI" }
@@ -22,7 +22,7 @@ feature 'Inactive POM' do
       expect(page).to have_text("This Prison Offender Manager does not appear to be active")
     end
 
-    it 'will deallocate the caseload' do
+    it 'will deallocate the caseload'do
       click_link("Set this POM's status to inactive")
 
       click_link("Edit profile")

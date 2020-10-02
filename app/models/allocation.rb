@@ -15,6 +15,9 @@ class Allocation < ApplicationRecord
   OFFENDER_TRANSFERRED = 1
   OFFENDER_RELEASED = 2
 
+  before_save :check_push
+  after_commit :push_pom_to_community_api
+
   # When adding a new 'event' or 'event trigger'
   # make sure the constant it points to
   # has a value that is sequential and does not
@@ -158,5 +161,17 @@ private
     )
 
     PomMailer.offender_deallocated(mail_params).deliver_later
+  end
+
+  def check_push
+    if primary_pom_nomis_id_changed?
+      @do_push = true
+    end
+  end
+
+  def push_pom_to_community_api
+    if @do_push
+      PushPomToDeliusJob.perform_later(self)
+    end
   end
 end

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe MovementService do
+describe MovementService, :allocation do
   let(:new_offender_court) { build(:movement, offenderNo: 'G4273GI', fromAgency: 'COURT')   }
   let(:new_offender_nil) { build(:movement, offenderNo: 'G4273GI', fromAgency: nil)   }
   let(:transfer_out) { build(:movement, offenderNo: 'G4273GI', directionCode: 'OUT', movementType: 'TRN')   }

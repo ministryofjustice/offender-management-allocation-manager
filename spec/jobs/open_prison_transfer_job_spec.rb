@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe OpenPrisonTransferJob, type: :job do
+RSpec.describe OpenPrisonTransferJob, :allocation, type: :job do
   include ActiveJob::TestHelper
 
   let(:nomis_offender_id) { 'G3462VT' }

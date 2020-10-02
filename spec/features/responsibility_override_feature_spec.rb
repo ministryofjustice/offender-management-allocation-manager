@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature 'Responsibility override' do
+feature 'Responsibility override', :allocation do
   include ActiveJob::TestHelper
 
   before do

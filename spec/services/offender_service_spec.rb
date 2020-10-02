@@ -29,8 +29,7 @@ describe OffenderService do
       PomDetail.create!(nomis_staff_id: nomis_staff_id, working_pattern: 1.0, status: 'active')
     end
 
-    it "gets the POM names for allocated offenders",
-       vcr: { cassette_name: :offender_service_pom_names_spec } do
+    it "gets the POM names for allocated offenders", :allocation, vcr: { cassette_name: :offender_service_pom_names_spec } do
       allocate_offender(DateTime.now.utc)
 
       updated_offenders = described_class.set_allocated_pom_name(offenders, 'LEI')
@@ -41,7 +40,7 @@ describe OffenderService do
       expect(updated_offenders.first.allocation_date).to be_kind_of(Date)
     end
 
-    it "uses 'updated_at' date when 'primary_pom_allocated_at' date is nil",
+    it "uses 'updated_at' date when 'primary_pom_allocated_at' date is nil", :allocation,
        vcr: { cassette_name: :offender_service_set_allocated_pom_when_primary_pom_date_nil } do
       allocate_offender(nil)
 

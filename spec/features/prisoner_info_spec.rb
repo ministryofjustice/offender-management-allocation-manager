@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature 'View a prisoner profile page' do
+feature 'View a prisoner profile page', :allocation do
   before do
     signin_spo_user
   end
