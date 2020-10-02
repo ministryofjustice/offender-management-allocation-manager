@@ -3,6 +3,9 @@
 class CaseInformation < ApplicationRecord
   self.table_name = 'case_information'
 
+  NPS = 'NPS'
+  CRC = 'CRC'
+
   belongs_to :team, optional: true, counter_cache: :case_information_count
 
   has_many :early_allocations,
@@ -11,7 +14,7 @@ class CaseInformation < ApplicationRecord
            inverse_of: :case_information,
            dependent: :destroy
 
-  scope :nps, -> { where(case_allocation: 'NPS') }
+  scope :nps, -> { where(case_allocation: NPS) }
 
   before_validation :set_probation_service
 
@@ -39,7 +42,7 @@ class CaseInformation < ApplicationRecord
   validates :tier, inclusion: { in: %w[A B C D N/A], message: 'Select the prisoner’s tier' }
 
   validates :case_allocation, inclusion: {
-    in: %w[NPS CRC],
+    in: [NPS, CRC],
     allow_nil: false,
     message: 'Select the service provider for this case'
   }

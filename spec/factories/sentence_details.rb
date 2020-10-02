@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :sentence_detail, class: 'HmppsApi::SentenceDetail' do
-    initialize_with { HmppsApi::SentenceDetail.from_json(attributes.stringify_keys) }
+    initialize_with { HmppsApi::SentenceDetail.from_json(attributes.reject { |_k, v| v.nil? }.stringify_keys) }
 
     releaseDate { "2011-01-28" }
     sentenceStartDate { "2011-01-28" }
@@ -11,6 +11,14 @@ FactoryBot.define do
     homeDetentionCurfewActualDate { "2011-01-28" }
     actualParoleDate { "2011-01-28" }
     licenceExpiryDate { "2011-01-28" }
+
+    trait :welsh_policy_sentence do
+      sentenceStartDate { '2019-02-05' }
+      homeDetentionCurfewActualDate { nil }
+      homeDetentionCurfewEligibilityDate { nil }
+      conditionalReleaseDate { "2022-01-28" }
+      automaticReleaseDate { "2022-01-28" }
+    end
   end
 
   factory :nomis_sentence_detail, class: Hash do
