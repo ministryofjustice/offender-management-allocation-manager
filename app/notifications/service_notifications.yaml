@@ -28,10 +28,10 @@
 
 ---
 notifications:
-  - id: recall-problem-16-09-2020
-    start_date: 16/09/2020
+  - id: panel-signup-2-10-2020
+    start_date: 02/10/2020
     role:
       - POM
       - SPO
-    end_date: 23/09/2020
-    text: "<b>We are aware that the service is picking up some inactive recalls which is causing incorrect responsibility calculations. We are working hard to resolve this. Sorry for any inconvenience.</b>"
+    end_date: 16/10/2020
+    text: 'You can help us improve this service by participating in research and giving us feedback. Sign up to the HMPPS Digital research panel <a href="https://www.surveymonkey.co.uk/r/79MHSJX">here</a>'
