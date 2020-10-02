@@ -19,7 +19,7 @@ module HmppsApi
 
     attr_reader :crn,
                 :welsh_offender, :parole_review_date,
-                :ldu, :team
+                :ldu, :team, :responsibility
 
     attr_reader :sentence_type
 
@@ -150,6 +150,7 @@ module HmppsApi
       @parole_review_date = record.parole_review_date
       @early_allocation = record.latest_early_allocation.present? &&
         (record.latest_early_allocation.eligible? || record.latest_early_allocation.community_decision?)
+      @responsibility = record.responsibility
     end
 
   private
