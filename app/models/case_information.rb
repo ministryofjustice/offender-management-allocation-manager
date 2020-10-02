@@ -14,7 +14,17 @@ class CaseInformation < ApplicationRecord
            inverse_of: :case_information,
            dependent: :destroy
 
+<<<<<<< HEAD
   scope :nps, -> { where(case_allocation: NPS) }
+=======
+  has_one :responsibility,
+          foreign_key: :nomis_offender_id,
+          primary_key: :nomis_offender_id,
+          inverse_of: :case_information,
+          dependent: :destroy
+
+  scope :nps, -> { where(case_allocation: 'NPS') }
+>>>>>>> Create a one-to-one relationship between CaseInformation and Responsibility models.
 
   before_validation :set_probation_service
 

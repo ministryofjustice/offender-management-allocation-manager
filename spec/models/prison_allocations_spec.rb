@@ -121,6 +121,9 @@ RSpec.describe Prison, type: :model do
       allocated_offenders = prison.allocations_for(staff_id)
       responsible_pom = allocated_offenders.detect { |offender| offender.pom_responsibility == 'Responsible' }.offender
 
+      # Create a case information record
+      create(:case_information, nomis_offender_id: responsible_pom.offender_no)
+
       # Override their responsibility
       create(:responsibility, nomis_offender_id: responsible_pom.offender_no)
 
@@ -134,6 +137,9 @@ RSpec.describe Prison, type: :model do
       # Find a responsible offender
       allocated_offenders = prison.allocations_for(staff_id)
       responsible_pom = allocated_offenders.detect { |offender| offender.pom_responsibility == 'Responsible' }.offender
+
+      # Create a case information record
+      create(:case_information, nomis_offender_id: responsible_pom.offender_no)
 
       # Override their responsibility
       create(:responsibility, nomis_offender_id: responsible_pom.offender_no, value: 'Probation')
