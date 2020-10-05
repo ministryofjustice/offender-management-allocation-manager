@@ -32,9 +32,9 @@ context 'when NOMIS is missing information' do
         before do
           stub_offenders = [build(:nomis_offender, offenderNo: offender_no,
                                   imprisonmentStatus: 'SEC91',
-                                  sentence: build(:nomis_sentence_detail,
-                                                  releaseDate: 30.years.from_now.iso8601,
-                                 sentenceStartDate: Time.zone.now.iso8601))]
+                                  sentence: attributes_for(:sentence_detail,
+                                                           releaseDate: 30.years.from_now.iso8601,
+                                                           sentenceStartDate: Time.zone.now.iso8601))]
 
           stub_offenders_for_prison(prison_code, stub_offenders)
 
@@ -52,7 +52,10 @@ context 'when NOMIS is missing information' do
 
     describe 'the prisoner page' do
       before do
-        offender = build(:nomis_offender, offenderNo: offender_no, sentence: build(:nomis_sentence_detail, conditionalReleaseDate: Time.zone.today + 22.months))
+        offender = build(:nomis_offender, offenderNo: offender_no,
+                         sentence: attributes_for(:sentence_detail,
+                                                  automaticReleaseDate: Time.zone.today + 3.years,
+                                                  conditionalReleaseDate: Time.zone.today + 22.months))
 
         stub_request(:get, "#{ApiHelper::T3}/staff/#{staff_id}").
           to_return(body: { staffId: staff_id, firstName: "TEST", lastName: "MOIC" }.to_json)

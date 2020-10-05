@@ -69,7 +69,7 @@ FactoryBot.define do
     recall { false }
 
     sentence do
-      association :nomis_sentence_detail
+      attributes_for :sentence_detail
     end
 
     sequence(:bookingId) { |c| c + 100_000 }

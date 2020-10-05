@@ -215,11 +215,11 @@ private
     stub_pom_emails(1, [])
 
     stub_offender(build(:nomis_offender, offenderNo: offender_no,
-                        sentence: build(:nomis_sentence_detail,
-                                        sentenceStartDate: sentence_start_date,
-                                        conditionalReleaseDate: conditional_release_date,
-                                        automaticReleaseDate: automatic_release_date,
-                                        homeDetentionCurfewEligibilityDate: hdced
+                        sentence: attributes_for(:sentence_detail,
+                                                 sentenceStartDate: sentence_start_date,
+                                                 conditionalReleaseDate: conditional_release_date,
+                                                 automaticReleaseDate: automatic_release_date,
+                                                 homeDetentionCurfewEligibilityDate: hdced
                                         )))
 
     stub_request(:get, "#{ApiHelper::T3}/staff/roles/LEI/role/POM").
