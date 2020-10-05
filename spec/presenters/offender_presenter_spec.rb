@@ -13,18 +13,10 @@ RSpec.describe OffenderPresenter do
     end
 
     context 'when a probation POM' do
-      let(:crd)         { Time.zone.today + 15.months }
-      let(:start_date)  { Time.zone.today }
-      let(:subject)     {
-        described_class.new(OpenStruct.new(
-                              immigration_case?: false,
-                              tier: 'A',
-                              nps_case?: true,
-                              sentence_start_date: start_date,
-                              conditional_release_date: crd))
-      }
-
       it "can get for a probation owned offender" do
+        offender = build(:offender,  sentence: build(:sentence_detail_with_minimal_dates))
+        offender.tier = 'A'
+        subject = described_class.new(offender)
         expect(subject.complex_reason_label).to eq('Prisoner assessed as suitable for a prison officer POM despite tiering calculation')
       end
     end

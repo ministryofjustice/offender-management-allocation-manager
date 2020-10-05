@@ -17,6 +17,13 @@ FactoryBot.define do
     actualParoleDate { "2021-01-28" }
     licenceExpiryDate { "2021-01-28" }
   end
+
+  factory :sentence_detail_with_minimal_dates, class: 'HmppsApi::SentenceDetail' do
+    initialize_with { HmppsApi::SentenceDetail.from_json(attributes.stringify_keys) }
+
+    releaseDate { "2011-01-28" }
+    sentenceStartDate { "2011-01-28" }
+  end
 end
 
 
