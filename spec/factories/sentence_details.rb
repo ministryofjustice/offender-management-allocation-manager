@@ -8,6 +8,7 @@ FactoryBot.define do
       HmppsApi::SentenceDetail.from_json(values_hash)
     end
 
+    # 1 day after policy start in Wales
     sentenceStartDate { '2019-02-05' }
     releaseDate { "2021-01-28" }
     automaticReleaseDate { "2022-01-28" }
@@ -15,21 +16,6 @@ FactoryBot.define do
     conditionalReleaseDate { "2022-01-28" }
     actualParoleDate { "2021-01-28" }
     licenceExpiryDate { "2021-01-28" }
-  end
-
-  factory :nomis_sentence_detail, class: Hash do
-    initialize_with {
-      # remove nil values from hash, so that SentenceDetail#from_json doesn't choke
-      attributes.reject { |_k, v| v.nil? }
-    }
-
-    sentenceStartDate { "2011-01-20" }
-    releaseDate { "2031-01-19" }
-    tariffDate { "2031-01-21" }
-    automaticReleaseDate { "2031-01-22" }
-    postRecallReleaseDate { "2031-01-23" }
-    conditionalReleaseDate { "2031-01-24" }
-    actualParoleDate { "2031-01-27" }
   end
 end
 

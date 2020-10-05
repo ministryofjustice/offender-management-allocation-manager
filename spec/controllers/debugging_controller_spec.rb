@@ -18,7 +18,7 @@ RSpec.describe DebuggingController, type: :controller do
       offenders = [
         build(:nomis_offender),
         build(:nomis_offender, dateOfBirth: Time.zone.today - 15.years),
-        build(:nomis_offender, sentence: build(:nomis_sentence_detail, releaseDate: nil,
+        build(:nomis_offender, sentence: attributes_for(:sentence_detail, releaseDate: nil,
                      paroleEligibilityDate: nil, homeDetentionCurfewEligibilityDate: nil, tariffDate: nil))
       ]
 

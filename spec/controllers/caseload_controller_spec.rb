@@ -38,7 +38,7 @@ RSpec.describe CaseloadController, type: :controller do
       end
 
       let(:today_plus_36_weeks) { (Time.zone.today + 36.weeks).to_s }
-      let(:offender) { build(:nomis_offender, sentence: build(:nomis_sentence_detail, paroleEligibilityDate: today_plus_36_weeks)) }
+      let(:offender) { build(:nomis_offender, sentence: attributes_for(:sentence_detail, paroleEligibilityDate: today_plus_36_weeks)) }
       let(:case_allocation) { 'NPS' }
 
       it 'can pull back a NPS offender due for handover' do
@@ -49,7 +49,7 @@ RSpec.describe CaseloadController, type: :controller do
     end
 
     context 'when CRC' do
-      let(:offender) { build(:nomis_offender, sentence: build(:nomis_sentence_detail, automaticReleaseDate: today_plus_13_weeks)) }
+      let(:offender) { build(:nomis_offender, sentence: attributes_for(:sentence_detail, automaticReleaseDate: today_plus_13_weeks)) }
       let(:case_allocation) { 'CRC' }
       let(:today_plus_13_weeks) { (Time.zone.today + 13.weeks).to_s }
 

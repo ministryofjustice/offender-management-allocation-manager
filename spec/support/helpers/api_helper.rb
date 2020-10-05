@@ -108,7 +108,13 @@ module ApiHelper
                         }
                       }.to_json)
 
-    bookings = booking_ids.zip(offenders).map { |booking_id, offender| { 'bookingId' => booking_id, 'sentenceDetail' => offender.fetch(:sentence) } }
+    bookings = booking_ids.zip(offenders).map do |booking_id, offender|
+      {
+          'bookingId' => booking_id,
+          'sentenceDetail' => offender.fetch(:sentence).reject { |_k, v| v.nil? }
+      }
+    end
+
     stub_request(:post, elite2bookingsapi).with(body: booking_ids.to_json).
       to_return(body: bookings.to_json)
 

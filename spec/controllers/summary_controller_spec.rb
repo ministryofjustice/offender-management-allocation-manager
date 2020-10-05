@@ -17,24 +17,24 @@ RSpec.describe SummaryController, type: :controller do
               offenderNo: "G7514GW",
               imprisonmentStatus: "LR",
               lastName: 'SMITH',
-              sentence: build(:nomis_sentence_detail)),
+              sentence: attributes_for(:sentence_detail, sentenceStartDate: "2011-01-20")),
         build(:nomis_offender, offenderNo: "G1234GY", imprisonmentStatus: "LIFE",
               lastName: 'Minate-Offender',
-              sentence: build(:nomis_sentence_detail,
-                              sentenceStartDate: "2009-02-08",
-                              automaticReleaseDate: "2011-01-28")),
+              sentence: attributes_for(:sentence_detail,
+                                       sentenceStartDate: "2009-02-08",
+                                       automaticReleaseDate: "2011-01-28")),
         build(:nomis_offender, offenderNo: "G1234VV",
               lastName: 'JONES',
-              sentence: build(:nomis_sentence_detail,
-                              sentenceStartDate: "2019-02-08",
-                              automaticReleaseDate: today_plus_13_weeks)),
+              sentence: attributes_for(:sentence_detail,
+                                       sentenceStartDate: "2019-02-08",
+                                       automaticReleaseDate: today_plus_13_weeks)),
         build(:nomis_offender, offenderNo: "G4234GG",
               imprisonmentStatus: "SENT03",
               firstName: "Fourth", lastName: "Offender",
-              sentence: build(:nomis_sentence_detail,
-                              automaticReleaseDate: today_plus_10,
-                              homeDetentionCurfewActualDate: today_plus_10,
-                              sentenceStartDate: "2019-02-08",
+              sentence: attributes_for(:sentence_detail,
+                                       automaticReleaseDate: today_plus_10,
+                                       homeDetentionCurfewActualDate: today_plus_10,
+                                       sentenceStartDate: "2019-02-08",
               ))
       ]
 
@@ -193,8 +193,8 @@ RSpec.describe SummaryController, type: :controller do
       inmates = offenders.map { |offender|
         build(:nomis_offender,
               offenderNo: offender[:nomis_id],
-              sentence: build(:nomis_sentence_detail,
-                              sentenceStartDate: offender.fetch(:sentence_start_date).strftime('%F')))
+              sentence: attributes_for(:sentence_detail,
+                                       sentenceStartDate: offender.fetch(:sentence_start_date).strftime('%F')))
       }
 
       stub_offenders_for_prison(prison, inmates)

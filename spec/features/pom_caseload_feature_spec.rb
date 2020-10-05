@@ -36,8 +36,10 @@ feature "view POM's caseload" do
       map { |nomis_id, booking_id|
       build(:nomis_offender,
             offenderNo: nomis_id,
-            sentence: build(:nomis_sentence_detail,
-                            tariffDate: Time.zone.today + booking_id.minutes))
+            sentence: attributes_for(:sentence_detail,
+                                     automaticReleaseDate: "2031-01-22",
+                                     conditionalReleaseDate: "2031-01-24",
+                                     tariffDate: Time.zone.today + booking_id.minutes))
     }
   }
   let(:sorted_offenders) {
