@@ -11,14 +11,15 @@ class ResponsibilityService
   SUPPORTING = Responsibility.new 'Supporting', false, 'Community'
   UNKNOWN = Responsibility.new 'Unknown', false, 'Unknown'
   COWORKING = 'Co-Working'
-  NPS = 'NPS'
 
   # We currently don't have access to the date of the parole board decision, which means that we cannot correctly
   # calculate responsibility for NPS indeterminate cases with parole eligibility where the TED is in the past.
   # A decision has been made to display a notice so staff can check whether they need to override their case or not;
   # this is until we get access to this data.
   def self.calculate_pom_responsibility(offender)
-    if offender.immigration_case? || open_prison_nps_offender?(offender)
+    if offender.immigration_case?
+      SUPPORTING
+    elsif open_prison_nps_offender?(offender)
       SUPPORTING
     elsif offender.recalled?
       SUPPORTING

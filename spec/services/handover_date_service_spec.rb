@@ -81,19 +81,16 @@ describe HandoverDateService do
     let(:result) { described_class.handover(offender).handover_date }
 
     let(:offender) do
-      double(
-        recalled?: false,
-        nps_case?: nps_case,
-        indeterminate_sentence?: indeterminate_sentence,
-        early_allocation?: early_allocation,
-        automatic_release_date: automatic_release_date,
-        conditional_release_date: conditional_release_date,
-        home_detention_curfew_actual_date: home_detention_curfew_actual_date,
-        home_detention_curfew_eligibility_date: home_detention_curfew_eligibility_date,
-        mappa_level: mappa_level,
-        parole_eligibility_date: parole_date,
-        tariff_date: tariff_date
-      )
+      # these are both non-recall scenarios
+      build(:offender, indeterminate_sentence ? :indeterminate : :determinate,
+            sentence: build(:sentence_detail,
+                            automaticReleaseDate: automatic_release_date&.to_s,
+                            conditionalReleaseDate: conditional_release_date&.to_s,
+                            paroleEligibilityDate: parole_date&.to_s,
+                            homeDetentionCurfewActualDate: home_detention_curfew_actual_date&.to_s,
+                            homeDetentionCurfewEligibilityDate: home_detention_curfew_eligibility_date&.to_s,
+                            tariffDate: tariff_date&.to_s)).
+          tap { |o| o.load_case_information(case_info) }
     end
 
     let(:automatic_release_date) { nil }
@@ -107,7 +104,7 @@ describe HandoverDateService do
     let(:early_allocation) { nil }
 
     context 'when CRC' do
-      let(:nps_case) { false }
+      let(:case_info) { build(:case_information, :crc) }
 
       context 'when 12 weeks before the CRD date' do
         let(:automatic_release_date) { Date.new(2019, 8, 1) }
@@ -156,10 +153,8 @@ describe HandoverDateService do
     end
 
     context 'when NPS' do
-      let(:nps_case) { true }
-
       context 'with normal allocation' do
-        let(:early_allocation) { false }
+        let(:case_info) { build(:case_information, :nps, mappa_level: mappa_level) }
 
         let(:tariff_date) { Date.new(2020, 11, 1) }
         let(:conditional_release_date) { Date.new(2020, 7, 16) }
@@ -333,7 +328,7 @@ describe HandoverDateService do
       end
 
       context 'with early_allocation' do
-        let(:early_allocation) { true }
+        let(:case_info) { build(:case_information, :nps, mappa_level: mappa_level, early_allocations: [build(:early_allocation)]) }
 
         context 'when CRD earliest' do
           let(:conditional_release_date) { Date.new(2019, 7, 1) }
