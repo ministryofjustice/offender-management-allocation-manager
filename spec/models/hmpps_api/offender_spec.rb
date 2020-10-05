@@ -29,4 +29,41 @@ describe HmppsApi::Offender do
       end
     end
   end
+
+  describe '#pom_responsibility' do
+    # These tests are only handling when there is already a Responsibility record, if a record does not exist
+    # then service calls the ResponsibilityService.calculate_pom_responsibility method.
+    # There are adequate tests to cover those in spec/services/responsibility_service_spec.rb.
+    # TODO: Refactor the setup to be more concise
+    context 'when a Responsibility record exists' do
+      let(:offender) {
+        build(:offender).tap { |o|
+          o.sentence = HmppsApi::SentenceDetail.new(automatic_release_date: Time.zone.today + 1.year,
+                                                    sentence_start_date: Time.zone.today)
+        }
+      }
+
+      it "returns Supporting when Responsibility.value is 'Probation'" do
+        case_info = create(:case_information, nomis_offender_id: offender.offender_no, case_allocation: 'NPS', mappa_level: 0)
+        create(:responsibility, nomis_offender_id: offender.offender_no, value: 'Probation')
+        offender.load_case_information(case_info)
+
+        responsibility = offender.pom_responsibility
+        expect(responsibility.case_owner).to eq('Community')
+        expect(responsibility.custody?).to eq(false)
+        expect(responsibility.description).to eq('Supporting')
+      end
+
+      it "returns Responsible when Responsibility.value is 'Prison'" do
+        case_info = create(:case_information, nomis_offender_id: offender.offender_no, case_allocation: 'NPS', mappa_level: 0)
+        create(:responsibility, nomis_offender_id: offender.offender_no, value: 'Prison')
+        offender.load_case_information(case_info)
+
+        responsibility = offender.pom_responsibility
+        expect(responsibility.case_owner).to eq('Custody')
+        expect(responsibility.custody?).to eq(true)
+        expect(responsibility.description).to eq('Responsible')
+      end
+    end
+  end
 end

@@ -79,7 +79,13 @@ module HmppsApi
     end
 
     def pom_responsibility
-      @pom_responsibility ||= ResponsibilityService.calculate_pom_responsibility(self)
+      if @responsibility.nil?
+        ResponsibilityService.calculate_pom_responsibility(self)
+      elsif @responsibility.value == Responsibility::PRISON
+        ResponsibilityService::RESPONSIBLE
+      else
+        ResponsibilityService::SUPPORTING
+      end
     end
 
     def sentence_start_date
