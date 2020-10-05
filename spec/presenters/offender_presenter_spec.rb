@@ -1,29 +1,11 @@
 require 'rails_helper'
 
-RSpec.describe OverrideHelper do
-  let(:allocation_one) {
-    build(:allocation,
-          primary_pom_nomis_id: 485_833,
-          nomis_offender_id: 'G2911GD',
-          recommended_pom_type: 'prison',
-          suitability_detail: "Prisoner too high risk",
-          override_detail: "Concerns around behaviour"
-    )
-  }
-
-  let(:allocation_two) {
-    build(:allocation,
-          primary_pom_nomis_id: 485_833,
-          nomis_offender_id: 'G2911GD',
-          recommended_pom_type: nil
-    )
-  }
-
+RSpec.describe OffenderPresenter do
   describe '#complex_reason_label' do
     context 'when a prison POM' do
       # we need to set up this test to return a Prison POM recommendation; we are using an
       # Immigration case as they are always recommended to Prison POMs
-      let(:subject) { OffenderPresenter.new(OpenStruct.new(immigration_case?: true, nps_case?: false), nil) }
+      let(:subject) { described_class.new(OpenStruct.new(immigration_case?: true, nps_case?: false)) }
 
       it "can get for a prison owned offender" do
         expect(subject.complex_reason_label).to eq('Prisoner assessed as not suitable for a prison officer POM')
@@ -34,13 +16,12 @@ RSpec.describe OverrideHelper do
       let(:crd)         { Time.zone.today + 15.months }
       let(:start_date)  { Time.zone.today }
       let(:subject)     {
-        OffenderPresenter.new(OpenStruct.new(
-                                immigration_case?: false,
-                                tier: 'A',
-                                nps_case?: true,
-                                sentence_start_date: start_date,
-                                conditional_release_date: crd),
-                              nil)
+        described_class.new(OpenStruct.new(
+                              immigration_case?: false,
+                              tier: 'A',
+                              nps_case?: true,
+                              sentence_start_date: start_date,
+                              conditional_release_date: crd))
       }
 
       it "can get for a probation owned offender" do
@@ -49,36 +30,51 @@ RSpec.describe OverrideHelper do
     end
   end
 
-  describe '#display_override_pom' do
-    it 'displays which POM type was overriden, if present' do
-      expect(display_override_pom(allocation_one)).to eq('Probation POM allocated instead of recommended Prison POM')
+  describe '#responsibility_override?' do
+    it 'returns false when no responsibility found for offender' do
+      subject = described_class.new(OpenStruct.new(immigration_case?: false, nps_case?: false, responsibility: nil))
+
+      expect(subject.responsibility_override?).to eq(false)
     end
 
-    it 'displays generic message if POM type not present' do
-      expect(display_override_pom(allocation_two)).to eq('Prisoner not allocated to recommended POM')
+    it 'returns true when there is a responsibility found for an offender' do
+      create(:case_information, nomis_offender_id: 'A1234XX')
+      resp = create(:responsibility, nomis_offender_id: 'A1234XX')
+      subject = described_class.new(OpenStruct.new(offender_no: 'A1234XX', immigration_case?: false, nps_case?: false, responsibility: resp))
+
+      expect(subject.responsibility_override?).to eq(true)
     end
   end
 
-  describe '#display_override_details' do
-    it 'displays which recommended POM type was not available, when present' do
-      expect(display_override_details("no_staff", allocation_one)).to include('No available prison POMs')
+  describe '#recommended_pom_type_label' do
+    it "returns 'Prison officer' if RecommendService is PRISON_POM" do
+      allow(RecommendationService).to receive(:recommended_pom_type).and_return(RecommendationService::PRISON_POM)
+      subject = described_class.new(OpenStruct.new(immigration_case?: true, nps_case?: false, responsibility: nil))
+
+      expect(subject.recommended_pom_type_label).to eq('Prison officer')
     end
 
-    it 'displays a generic message if reason is POM type not available, and the POM type is not present' do
-      expect(display_override_details("no_staff", allocation_two)).to include('No available recommended POMs')
+    it "returns 'Probation officer' if RecommendService is PROBATION_POM" do
+      allow(RecommendationService).to receive(:recommended_pom_type).and_return(RecommendationService::PROBATION_POM)
+      subject = described_class.new(OpenStruct.new(immigration_case?: false, nps_case?: true, tier: 'A', responsibility: nil))
+
+      expect(subject.recommended_pom_type_label).to eq('Probation officer')
+    end
+  end
+
+  describe '#non_recommended_pom_type_label' do
+    it "returns 'Probation officer' when RecommendationService is PRISON_POM" do
+      allow(RecommendationService).to receive(:recommended_pom_type).and_return(RecommendationService::PRISON_POM)
+      subject = described_class.new(OpenStruct.new(immigration_case?: false, nps_case?: false, responsibility: nil))
+
+      expect(subject.non_recommended_pom_type_label).to eq('Probation officer')
     end
 
-    it 'displays the reason the prisoner wasn\'t suitable for the recommended POM type' do
-      expect(display_override_details("suitability", allocation_one)).to include('Prisoner too high risk')
-    end
+    it "returns 'Prison officer' when RecommendationServicce is PROBATION_POM" do
+      allow(RecommendationService).to receive(:recommended_pom_type).and_return(RecommendationService::PROBATION_POM)
+      subject = described_class.new(OpenStruct.new(immigration_case?: false, nps_case?: false, responsibility: nil))
 
-    it 'returns that the POM has worked with the prisoner before ' do
-      expect(display_override_details("continuity", allocation_one)).to include('This POM has worked with the prisoner before')
-    end
-
-    it "returns the details for choosing 'other reason'" do
-      expect(display_override_details("other", allocation_one)).to include('Other reason')
-      expect(display_override_details("other", allocation_one)).to include('Concerns around behaviour')
+      expect(subject.non_recommended_pom_type_label).to eq('Prison officer')
     end
   end
 end

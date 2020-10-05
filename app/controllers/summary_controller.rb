@@ -65,7 +65,7 @@ private
     # TODO: bug fix is to bring this data into scope and attach it to the OffenderPresenter
     # overrides_hash = Responsibility.where(nomis_offender_id: offenders.items.map(&:offender_no)).
     #   map { |r| [r.nomis_offender_id, r] }.to_h
-    offenders.items.map { |o| OffenderPresenter.new(o, nil) }
+    offenders.items.map { |o| OffenderPresenter.new(o) }
   end
 
   def create_summary(summary_type)

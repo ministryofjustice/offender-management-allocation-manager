@@ -16,7 +16,7 @@ RSpec.describe "debugging/debugging", type: :view do
 
   describe "debugging/debugging.html.erb" do
     it "displays offender full_name" do
-      assign(:offender, OffenderPresenter.new(offender, nil))
+      assign(:offender, OffenderPresenter.new(offender))
       assign(:prison, prison)
 
       render
@@ -28,7 +28,7 @@ RSpec.describe "debugging/debugging", type: :view do
 
   describe "debugging/debugging.html.erb" do
     it "displays tariff date" do
-      assign(:offender, OffenderPresenter.new(offender, nil))
+      assign(:offender, OffenderPresenter.new(offender))
       assign(:prison, prison)
 
       render
@@ -38,7 +38,7 @@ RSpec.describe "debugging/debugging", type: :view do
     end
 
     it "displays post recall release date" do
-      assign(:offender, OffenderPresenter.new(offender, nil))
+      assign(:offender, OffenderPresenter.new(offender))
       assign(:prison, prison)
 
       render
@@ -48,7 +48,7 @@ RSpec.describe "debugging/debugging", type: :view do
     end
 
     it "displays licence end date" do
-      assign(:offender, OffenderPresenter.new(offender, nil))
+      assign(:offender, OffenderPresenter.new(offender))
       assign(:prison, prison)
 
       render

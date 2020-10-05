@@ -21,12 +21,11 @@ class OffenderPresenter
   end
 
   def pom_responsibility
-    # TODO: Is this the right approach? or is there a better way?
     @offender.pom_responsibility
   end
 
   def responsibility_override?
-    @responsibility.present?
+    @offender.responsibility.present?
   end
 
   def recommended_pom_type_label

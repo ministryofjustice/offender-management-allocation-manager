@@ -32,7 +32,7 @@ RSpec.describe OffenderHelper do
         o.sentence = HmppsApi::SentenceDetail.new sentence_start_date: Time.zone.today - 20.months,
                                                automatic_release_date: Time.zone.today + 20.months
       }
-      offp = OffenderPresenter.new(off, nil)
+      offp = OffenderPresenter.new(off)
 
       expect(helper.case_owner_label(offp)).to eq('Custody')
     end
@@ -41,7 +41,7 @@ RSpec.describe OffenderHelper do
       off = build(:offender).tap { |o|
         o.sentence = HmppsApi::SentenceDetail.new automatic_release_date: Time.zone.today
       }
-      offp = OffenderPresenter.new(off, build(:responsibility, value: 'Probation'))
+      offp = OffenderPresenter.new(off)
 
       expect(helper.case_owner_label(offp)).to eq('Community')
     end
