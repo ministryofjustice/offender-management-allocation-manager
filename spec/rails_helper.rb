@@ -40,11 +40,6 @@ RSpec.configure do |config|
   config.before(:each, :js) do
     page.driver.browser.manage.window.resize_to(1280,3072)
   end
-  
-  config.before(:each, :raven_intercept_exception) do
-    Rails.configuration.sentry_dsn = 'https://test.com'
-    allow(Raven).to receive(:capture_exception)
-  end
 
   config.before(:each) do
     DatabaseCleaner.strategy = :transaction
@@ -68,10 +63,6 @@ RSpec.configure do |config|
   config.include FeaturesHelper
   config.include AuthHelper
   config.include ApiHelper
-
-  config.after(:each, :raven_intercept_exception) do
-    Rails.configuration.sentry_dsn = nil
-  end
 
   config.around(:each, :queueing) do |example|
     ActiveJob::Base.queue_adapter.tap do |adapter|

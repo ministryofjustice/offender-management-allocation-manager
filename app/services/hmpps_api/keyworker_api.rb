@@ -11,13 +11,13 @@ module HmppsApi
         client.get(route)
       }
       ApiDeserialiser.new.deserialise(HmppsApi::KeyworkerDetails, response)
-    rescue HmppsApi::Client::APIError
+    rescue Faraday::ResourceNotFound # 404 Not Found error
       HmppsApi::NullKeyworker.new
     end
 
     def self.client
       host = Rails.configuration.keyworker_api_host
-      HmppsApi::Client.new(host, false)
+      HmppsApi::Client.new(host)
     end
   end
 end

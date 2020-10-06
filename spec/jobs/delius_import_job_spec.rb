@@ -50,7 +50,7 @@ RSpec.describe DeliusImportJob, type: :job do
     end
   end
 
-  context "when the shadow name doesn't begin with 'OMIC'", :raven_intercept_exception do
+  context "when the shadow name doesn't begin with 'OMIC'" do
     it "captures an exception" do
       bad_shadow_name = 'Not a shadow team name'
       subject.process_decrypted_file([ldu_code: 'N01OMIC', ldu: 'An LDU', team_code: 'SHAD01', team: bad_shadow_name])

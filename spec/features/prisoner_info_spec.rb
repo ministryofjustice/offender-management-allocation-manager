@@ -22,7 +22,7 @@ feature 'View a prisoner profile page' do
       create(:allocation, nomis_offender_id: 'G7998GJ', primary_pom_nomis_id: '485637', primary_pom_name: 'Pobno, Kath')
     }
 
-    it 'shows the prisoner information', :raven_intercept_exception, vcr: { cassette_name: :show_offender_spec } do
+    it 'shows the prisoner information', vcr: { cassette_name: :show_offender_spec } do
       visit prison_prisoner_path('LEI', 'G7998GJ')
 
       expect(page).to have_css('h1', text: 'Ahmonis, Okadonah')
@@ -31,7 +31,7 @@ feature 'View a prisoner profile page' do
       expect(cat_code).to eq('C')
     end
 
-    it 'shows the POM name (fetched from NOMIS)', :raven_intercept_exception, vcr: { cassette_name: :show_offender_pom_spec } do
+    it 'shows the POM name (fetched from NOMIS)', vcr: { cassette_name: :show_offender_pom_spec } do
       visit prison_prisoner_path('LEI', 'G7998GJ')
 
       # check the primary POM name stored in the allocation
@@ -43,14 +43,14 @@ feature 'View a prisoner profile page' do
       expect(pom_name).to eq('Pobee-Norris, Kath')
     end
 
-    it 'shows an overridden responsibility', :raven_intercept_exception, vcr: { cassette_name: :show_offender_with_override_spec } do
+    it 'shows an overridden responsibility', vcr: { cassette_name: :show_offender_with_override_spec } do
       create(:responsibility, nomis_offender_id: 'G7998GJ')
       visit prison_prisoner_path('LEI', 'G7998GJ')
 
       expect(page).to have_content('Supporting')
     end
 
-    it 'shows the prisoner image', :raven_intercept_exception, vcr: { cassette_name: :show_offender_spec_image } do
+    it 'shows the prisoner image', vcr: { cassette_name: :show_offender_spec_image } do
       visit prison_prisoner_image_path('LEI', 'G7998GJ', format: :jpg)
       expect(page.response_headers['Content-Type']).to eq('image/jpg')
     end

@@ -32,73 +32,54 @@ describe HmppsApi::Client do
     end
   end
 
-  describe 'when there is an 404 (missing resource) error' do
-    let(:error) do
-      Faraday::ResourceNotFound.new('error', status: 401)
-    end
-    let(:offender_id) { '12344556' }
-    let(:offender_no) { 'A1234AB' }
-    let(:route)        {  "/elite2api/api/prisoners/#{offender_no}" }
+  describe 'when a HTTP error response is received' do
+    let(:status) { nil }
+    let(:route) { '/api/endpoint' }
 
     before do
-      WebMock.stub_request(:get, /\w/).to_raise(error)
+      WebMock.stub_request(:get, api_host + route).
+        to_return(status: status)
     end
 
-    it 'raises an APIError', :raven_intercept_exception do
-      expect { client.get(route) }.
-        to raise_error(HmppsApi::Client::APIError, 'Unexpected status 401')
+    describe 'a 4xx error' do
+      let(:status) { 401 }
+
+      it 'raises a Faraday::ClientError error' do
+        expect { client.get(route) }.
+          to raise_error(Faraday::ClientError, "the server responded with status #{status}")
+      end
     end
 
-    it 'sends the error to sentry' do
-      expect(AllocationManager::ExceptionHandler).to receive(:capture_exception).with(error)
-      expect { client.get(route) }.to raise_error(HmppsApi::Client::APIError)
+    describe '404 Not Found' do
+      let(:status) { 404 }
+
+      it 'raises a Faraday::ResourceNotFound error' do
+        expect { client.get(route) }.
+          to raise_error(Faraday::ResourceNotFound, "the server responded with status #{status}")
+      end
     end
 
-    it 'does not send the error to sentry if told not to' do
-      non_logging_client = described_class.new(api_host, false)
+    describe 'a 5xx error' do
+      let(:status) { 500 }
 
-      expect(AllocationManager::ExceptionHandler).not_to receive(:capture_exception).with(error)
-      expect { non_logging_client.get(route) }.to raise_error(HmppsApi::Client::APIError)
+      it 'raises a Faraday::ClientError error' do
+        expect { client.get(route) }.
+          to raise_error(Faraday::ClientError, "the server responded with status #{status}")
+      end
     end
   end
 
-  describe 'when there is an 500 (server broken) error' do
-    let(:error) do
-      Faraday::ClientError.new('error', status: 500)
-    end
-    let(:offender_no) { 'A1234AB' }
-    let(:route)        { "/api/prisoners/#{offender_no}" }
+  describe 'when the request times out' do
+    let(:route) { '/api/endpoint' }
 
     before do
-      WebMock.stub_request(:get, /\w/).to_raise(error)
+      WebMock.stub_request(:get, api_host + route).
+        to_timeout
     end
 
-    it 'raises an APIError', :raven_intercept_exception do
+    it 'raises a Faraday::TimeoutError' do
       expect { client.get(route) }.
-        to raise_error(HmppsApi::Client::APIError, 'Client error: 500')
-    end
-
-    it 'sends the error to sentry' do
-      expect(AllocationManager::ExceptionHandler).to receive(:capture_exception).with(error)
-      expect { client.get(route) }.to raise_error(HmppsApi::Client::APIError)
-    end
-  end
-
-  describe 'when the server is unreachable' do
-    let(:error) do
-      Faraday::ConnectionFailed.new('cannot connect')
-    end
-    let(:route)        { "/" }
-
-    before do
-      WebMock.stub_request(:get, /\w/).to_raise(error)
-    end
-
-    it 'raises an APIError', :raven_intercept_exception do
-      broken_client = described_class.new('nosuchhost')
-
-      expect { broken_client.get(route) }.
-        to raise_error(HmppsApi::Client::APIError, 'Failed to connect to nosuchhost')
+        to raise_error(Faraday::TimeoutError, 'request timed out')
     end
   end
 
