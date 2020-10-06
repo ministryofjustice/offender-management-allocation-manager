@@ -1,4 +1,7 @@
-<%= form_for(@early_assignment, url: prison_prisoner_early_allocations_path(@prison.code, @early_assignment.nomis_offender_id), method: form_method) do |form| %>
+<%= form_for(@early_assignment,
+             url: prison_prisoner_early_allocations_path(@prison.code, @early_assignment.nomis_offender_id),
+             method: form_method,
+             builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |form| %>
   <%= render :partial => "/shared/field_errors", :locals => { form: form, errors: @early_assignment.errors } %>
 
   <h1 class="govuk-heading-xl govuk-!-margin-top-4">Assessment for early allocation to the community probation team</h1>
