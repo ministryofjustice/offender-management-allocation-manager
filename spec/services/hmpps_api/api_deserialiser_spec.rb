@@ -26,11 +26,11 @@ RSpec.describe HmppsApi::ApiDeserialiser do
   end
 
 
-  it 'will serialise a payload with unknown attributes', :raven_intercept_exception do
+  it 'will serialise a payload with unknown attributes' do
     expect(described_class.new.deserialise(memory_model_class, payload)).to have_attributes foo: 'bar'
   end
 
-  it 'fail for classes not implementing from_json', :raven_intercept_exception do
+  it 'fail for classes not implementing from_json' do
     expect(described_class.new.deserialise(failing_memory_model_class, payload)).to be_nil
   end
 end
