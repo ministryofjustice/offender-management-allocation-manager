@@ -4,6 +4,7 @@
 # so that they have @prison and active_prison_id available
 class PrisonsApplicationController < ApplicationController
   before_action :authenticate_user, :check_prison_access, :load_staff_member, :service_notifications
+  helper_method :current_user_is_pom?
 
 protected
 

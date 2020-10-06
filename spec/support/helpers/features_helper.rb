@@ -5,6 +5,10 @@ module FeaturesHelper
     mock_sso_response(name, [SsoIdentity::SPO_ROLE])
   end
 
+  def signin_spo_pom_user(name = 'MOIC_POM')
+    mock_sso_response(name, ['ROLE_ALLOC_MGR', 'ROLE_ALLOC_CASE_MGR'])
+  end
+
   def signin_global_admin_user
     mock_sso_response('MOIC_POM', [SsoIdentity::SPO_ROLE, SsoIdentity::ADMIN_ROLE], PrisonService.prison_codes)
   end

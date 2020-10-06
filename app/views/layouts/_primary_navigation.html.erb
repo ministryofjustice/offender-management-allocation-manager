@@ -1,0 +1,23 @@
+<div class="moj-primary-navigation">
+  <div class="moj-primary-navigation__container">
+    <div class="moj-primary-navigation__nav">
+      <nav class="moj-primary-navigation" aria-label="Primary navigation">
+        <ul class="moj-primary-navigation__list">
+          <%= render 'layouts/nav_link', text: 'Home', path: prison_dashboard_index_path(@prison.code) %>
+          <% if current_user_is_spo? %>
+            <%= render 'layouts/nav_link', text: 'Allocations', path: prison_summary_unallocated_path(@prison.code) %>
+          <% end %>
+          <% if current_user_is_pom? %>
+            <%= render 'layouts/nav_link', text: 'Caseload', path: prison_staff_caseload_index_path(@prison.code, @staff_id) %>
+          <% end %>
+          <% if current_user_is_spo? %>
+            <%= render 'layouts/nav_link', text: 'Handover', path: prison_summary_handovers_path(@prison.code) %>
+            <%= render 'layouts/nav_link', text: 'Staff', path: prison_poms_path(@prison.code) %>
+          <% else %>
+            <%= render 'layouts/nav_link', text: 'Handover', path: prison_staff_caseload_handover_start_path(@prison.code, @staff_id) %>
+          <% end %>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
