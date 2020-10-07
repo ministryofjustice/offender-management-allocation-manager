@@ -13,7 +13,7 @@ feature 'Search for offenders' do
     end
 
     it 'shows update not edit', vcr: { cassette_name: :search_update_edit } do
-      signin_user
+      signin_spo_user
       visit prison_summary_allocated_path('LEI')
 
       expect(page).to have_text('See allocations')
@@ -34,7 +34,7 @@ feature 'Search for offenders' do
     end
 
     it 'shows update not edit', vcr: { cassette_name: :search_update_edit_no_delius } do
-      signin_user
+      signin_spo_user
       visit prison_summary_allocated_path('LEI')
 
       expect(page).to have_text('See allocations')
@@ -48,7 +48,7 @@ feature 'Search for offenders' do
   end
 
   it 'Can search from the dashboard', vcr: { cassette_name: :dashboard_search_feature } do
-    signin_user
+    signin_spo_user
     visit root_path
 
     expect(page).to have_text('Dashboard')
@@ -60,7 +60,7 @@ feature 'Search for offenders' do
   end
 
   it 'Can search from the Allocations summary page', vcr: { cassette_name: :allocated_search_feature } do
-    signin_user
+    signin_spo_user
     visit prison_summary_allocated_path('LEI')
 
     expect(page).to have_text('See allocations')
@@ -72,7 +72,7 @@ feature 'Search for offenders' do
   end
 
   it 'Can search from the Awaiting Allocation summary page', vcr: { cassette_name: :waiting_allocation_search_feature } do
-    signin_user
+    signin_spo_user
     visit prison_summary_unallocated_path('LEI')
 
     expect(page).to have_text('Make allocations')
@@ -84,7 +84,7 @@ feature 'Search for offenders' do
   end
 
   it 'Can search from the Missing Information summary page', vcr: { cassette_name: :missing_info_search_feature } do
-    signin_user
+    signin_spo_user
     visit  prison_summary_pending_path('LEI')
 
     expect(page).to have_text('Make allocations')

@@ -7,7 +7,7 @@ describe AllocationService do
 
   before do
     # needed as create_or_update calls a NOMIS API
-    signin_user
+    signin_spo_user
   end
 
   describe '#allocate_secondary', :queueing do

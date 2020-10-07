@@ -2,7 +2,7 @@ require 'rails_helper'
 
 feature 'View a prisoner profile page' do
   before do
-    signin_user
+    signin_spo_user
   end
 
   context 'without allocation' do

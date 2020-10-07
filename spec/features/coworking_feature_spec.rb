@@ -19,7 +19,7 @@ feature 'Co-working', :versioning do
   end
 
   before(:each) do
-    signin_user
+    signin_spo_user
 
     create(:case_information, nomis_offender_id: nomis_offender_id)
   end

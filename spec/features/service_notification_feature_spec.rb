@@ -2,7 +2,7 @@ require 'rails_helper'
 
 feature 'Service Notification' do
   before do
-    signin_user
+    signin_spo_user
   end
 
   it 'does not display service notification if none exist',

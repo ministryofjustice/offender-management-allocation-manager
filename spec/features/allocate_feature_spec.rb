@@ -21,7 +21,7 @@ feature 'Allocation' do
   }
 
   before do
-    signin_user
+    signin_spo_user
   end
 
   scenario 'accepting a recommended allocation', versioning: true, vcr: { cassette_name: :create_new_allocation_feature } do

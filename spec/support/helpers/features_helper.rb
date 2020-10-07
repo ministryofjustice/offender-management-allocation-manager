@@ -1,11 +1,6 @@
-module FeaturesHelper
-  # Signs in a user which historically has always been an SPO. For backwards
-  # compatability this continues to mock sso for an SPO, but we should move
-  # in future to one of the explicit signin_*_user methods below.
-  def signin_user(name = 'MOIC_POM')
-    signin_spo_user(name)
-  end
+# frozen_string_literal: true
 
+module FeaturesHelper
   def signin_spo_user(name = 'MOIC_POM')
     mock_sso_response(name, ['ROLE_ALLOC_MGR'])
   end

@@ -2,7 +2,7 @@ require 'rails_helper'
 
 feature 'summary summary feature' do
   before do
-    signin_user
+    signin_spo_user
   end
 
   describe 'awaiting summary table' do

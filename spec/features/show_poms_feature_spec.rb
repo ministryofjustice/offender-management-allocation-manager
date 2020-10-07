@@ -4,7 +4,7 @@ feature "get poms list" do
   let!(:offender_missing_sentence_case_info) { create(:case_information, nomis_offender_id: 'G1247VX') }
 
   before do
-    signin_user
+    signin_spo_user
   end
 
   it "shows the page", vcr: { cassette_name: :show_poms_feature_list } do

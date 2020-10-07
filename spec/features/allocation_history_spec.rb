@@ -109,7 +109,7 @@ feature 'Allocation History' do
     hist_allocate_secondary = history[5]
     history6 = history[6]
 
-    signin_user
+    signin_spo_user
     visit prison_allocation_history_path('LEI', nomis_offender_id)
 
     stub_const("TESTS", [
