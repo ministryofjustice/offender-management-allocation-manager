@@ -9,7 +9,7 @@ feature 'Inactive POM' do
     let(:active_pom) { 485_926 }
 
     before do
-      signin_user
+      signin_spo_user
 
       create(
         :allocation,

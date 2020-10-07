@@ -10,7 +10,7 @@ feature "edit a POM's details" do
 
     create(:pom_detail, nomis_staff_id: fulltime_pom_id, working_pattern: 1)
 
-    signin_user
+    signin_spo_user
   end
 
   it "setting unavailable shows selected on re-edit", vcr: { cassette_name: :edit_poms_unavailable_check } do

@@ -5,7 +5,7 @@ feature 'case information feature' do
     # This NOMIS id needs to appear on the first page of 'missing information'
     nomis_offender_id = 'G2911GD'
 
-    signin_user
+    signin_spo_user
     visit prison_summary_pending_path('LEI')
 
     expect(page).to have_content('Add missing information')
@@ -30,7 +30,7 @@ feature 'case information feature' do
 
   it "clicking back link after viewing prisoner's case information, returns back the same paginated page",
      vcr: { cassette_name: :case_information_back_link }, js: true do
-    signin_user
+    signin_spo_user
     visit prison_summary_pending_path('LEI', page: 3)
 
     within ".govuk-table tr:first-child td:nth-child(5)" do
@@ -45,7 +45,7 @@ feature 'case information feature' do
   it 'complains if allocation data is missing', vcr: { cassette_name: :case_information_missing_case_feature } do
     nomis_offender_id = 'G1821VA'
 
-    signin_user
+    signin_spo_user
     visit new_prison_case_information_path('LEI', nomis_offender_id)
     expect(page).to have_current_path new_prison_case_information_path('LEI', nomis_offender_id)
 
@@ -60,7 +60,7 @@ feature 'case information feature' do
   it 'complains if all data is missing', vcr: { cassette_name: :case_information_missing_all_feature } do
     nomis_offender_id = 'G1821VA'
 
-    signin_user
+    signin_spo_user
     visit new_prison_case_information_path('LEI', nomis_offender_id)
     expect(page).to have_current_path new_prison_case_information_path('LEI', nomis_offender_id)
 
@@ -75,7 +75,7 @@ feature 'case information feature' do
   it 'complains if tier data is missing', vcr: { cassette_name: :case_information_missing_tier_feature } do
     nomis_offender_id = 'G1821VA'
 
-    signin_user
+    signin_spo_user
     visit new_prison_case_information_path('LEI', nomis_offender_id)
     expect(page).to have_current_path new_prison_case_information_path('LEI', nomis_offender_id)
 
@@ -89,7 +89,7 @@ feature 'case information feature' do
   it 'allows editing case information for a prisoner', vcr: { cassette_name: :case_information_editing_feature } do
     nomis_offender_id = 'G1821VA'
 
-    signin_user
+    signin_spo_user
     visit new_prison_case_information_path('LEI', nomis_offender_id)
     choose('case_information_welsh_offender_No')
     choose('case_information_case_allocation_NPS')
@@ -115,7 +115,7 @@ feature 'case information feature' do
 
   it 'returns to previously paginated page after saving',
      vcr: { cassette_name: :case_information_return_to_previously_paginated_page } do
-    signin_user
+    signin_spo_user
     visit prison_summary_pending_path('LEI', sort: "last_name desc", page: 3)
 
     within ".govuk-table tr:first-child td:nth-child(5)" do
@@ -135,7 +135,7 @@ feature 'case information feature' do
      vcr: { cassette_name: :case_information_no_update_feature } do
     # When auto-delius is on there should be no update link to modify the case info
     # as it may not exist yet. We run this test with an indeterminate and a determine offender
-    signin_user
+    signin_spo_user
 
     # Indeterminate offender
     nomis_offender_id = 'G0806GQ'

@@ -15,7 +15,7 @@ feature 'delius import scenarios', vcr: { cassette_name: :delius_import_scenario
   end
 
   before do
-    signin_user
+    signin_spo_user
   end
 
   context 'when one delius record' do

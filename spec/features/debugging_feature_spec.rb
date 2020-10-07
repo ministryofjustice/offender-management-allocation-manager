@@ -5,7 +5,7 @@ feature 'Provide debugging information for our team to use' do
 
   context 'when debugging an individual offender' do
     it 'returns information for an unallocated offender', vcr: { cassette_name: :debugging_feature } do
-      signin_user
+      signin_spo_user
       visit prison_debugging_path('LEI')
 
       expect(page).to have_text('Debugging')
@@ -27,7 +27,7 @@ feature 'Provide debugging information for our team to use' do
              nomis_offender_id: nomis_offender_id,
              primary_pom_name: "Rossana Spinka"
              )
-      signin_user
+      signin_spo_user
       visit prison_debugging_path('LEI')
 
       expect(page).to have_text('Debugging')
@@ -50,7 +50,7 @@ feature 'Provide debugging information for our team to use' do
     end
 
     it 'can handle an incorrect offender number', vcr: { cassette_name: :debugging_incorrect_offender_feature } do
-      signin_user
+      signin_spo_user
       visit prison_debugging_path('LEI')
 
       expect(page).to have_text('Debugging')
@@ -61,7 +61,7 @@ feature 'Provide debugging information for our team to use' do
     end
 
     it 'can handle no offender number being entered', vcr: { cassette_name: :debugging_no_offender_feature } do
-      signin_user
+      signin_spo_user
       visit prison_debugging_path('LEI')
 
       expect(page).to have_text('Debugging')
@@ -74,7 +74,7 @@ feature 'Provide debugging information for our team to use' do
 
   context 'when debugging at a prison level', vcr: { cassette_name: :debugging_prison_level } do
     it 'displays a dashboard' do
-      signin_user
+      signin_spo_user
       visit prison_debugging_prison_path('LEI')
 
       expect(page).to have_text("Prison Debugging")

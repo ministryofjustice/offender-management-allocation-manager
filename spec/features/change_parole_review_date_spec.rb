@@ -9,7 +9,7 @@ RSpec.feature "ChangeParoleReviewDates", :versioning, type: :feature do
   let(:yesterday) { Time.zone.yesterday }
 
   before do
-    signin_user
+    signin_spo_user
   end
 
   it 'updates the date',  vcr: { cassette_name: :change_parole_date } do

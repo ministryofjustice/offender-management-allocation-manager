@@ -4,7 +4,7 @@ feature 'Responsibility override', :versioning do
   include ActiveJob::TestHelper
 
   before do
-    signin_user
+    signin_spo_user
   end
 
   let(:offender_id) { 'G8060UF' }

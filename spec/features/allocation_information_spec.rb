@@ -19,7 +19,7 @@ feature "view an offender's allocation information", :versioning do
   let(:offender_no) { "G4273GI" }
 
   before do
-    signin_user
+    signin_spo_user
   end
 
   context 'when offender does not have a key worker assigned' do

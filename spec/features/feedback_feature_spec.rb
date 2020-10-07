@@ -2,7 +2,7 @@ require 'rails_helper'
 
 feature 'feedback' do
   it 'provides a link to the feedback form', vcr: { cassette_name: :feedback_link } do
-    signin_user('MOIC_POM')
+    signin_spo_user('MOIC_POM')
 
     visit '/'
 
