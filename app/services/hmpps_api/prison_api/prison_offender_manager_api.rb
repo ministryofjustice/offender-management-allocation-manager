@@ -17,9 +17,7 @@ module HmppsApi
         key = "pom_list_#{prison}"
 
         data = Rails.cache.fetch(key, expires_in: Rails.configuration.cache_expiry) {
-          client.get(route, extra_headers: paging_options { |result|
-            raise HmppsApi::Client::APIError, 'No data was returned' if result.empty?
-          })
+          client.get(route, extra_headers: paging_options)
         }
 
         api_deserialiser.deserialise_many(HmppsApi::PrisonOffenderManager, data)

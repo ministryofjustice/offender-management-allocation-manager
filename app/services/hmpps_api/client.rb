@@ -5,8 +5,6 @@ require 'typhoeus/adapters/faraday'
 
 module HmppsApi
   class Client
-    APIError = Class.new(StandardError)
-
     def initialize(root)
       @root = root
       @connection = Faraday.new do |faraday|
