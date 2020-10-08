@@ -115,39 +115,5 @@ RSpec.describe Prison, type: :model do
       expect(allocated_offenders.count).to eq 2
       expect(allocated_offenders.map(&:pom_responsibility)).to match_array %w[Responsible Co-Working]
     end
-
-    it "will get show the correct responsibility if one is overridden" do
-      # Find a responsible offender
-      allocated_offenders = prison.allocations_for(staff_id)
-      responsible_pom = allocated_offenders.detect { |offender| offender.pom_responsibility == 'Responsible' }.offender
-
-      # Create a case information record
-      create(:case_information, nomis_offender_id: responsible_pom.offender_no)
-
-      # Override their responsibility
-      create(:responsibility, nomis_offender_id: responsible_pom.offender_no)
-
-      # Confirm that the responsible offender is now supporting
-      allocated_offenders = prison.allocations_for(staff_id)
-      responsible_pom = allocated_offenders.detect { |a| a.offender.offender_no == responsible_pom.offender_no }
-      expect(responsible_pom.pom_responsibility).to eq('Supporting')
-    end
-
-    it "will get show the correct responsibility if one is overridden to probation" do
-      # Find a responsible offender
-      allocated_offenders = prison.allocations_for(staff_id)
-      responsible_pom = allocated_offenders.detect { |offender| offender.pom_responsibility == 'Responsible' }.offender
-
-      # Create a case information record
-      create(:case_information, nomis_offender_id: responsible_pom.offender_no)
-
-      # Override their responsibility
-      create(:responsibility, nomis_offender_id: responsible_pom.offender_no, value: 'Probation')
-
-      # Confirm that the responsible offender is now supporting
-      allocated_offenders = prison.allocations_for(staff_id)
-      responsible_pom = allocated_offenders.detect { |a| a.offender.offender_no == responsible_pom.offender_no }
-      expect(responsible_pom.pom_responsibility).to eq('Supporting')
-    end
   end
 end

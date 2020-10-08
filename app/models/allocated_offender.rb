@@ -23,7 +23,11 @@ class AllocatedOffender
   end
 
   def pom_responsibility
-    @pom_responsibility ||= overridden_responsibility || calculated_responsibility
+    if @allocation.primary_pom_nomis_id == @staff_id
+      @offender.pom_responsibility.to_s
+    else
+      ResponsibilityService::COWORKING
+    end
   end
 
   # check for changes in the last week where the target value
@@ -35,26 +39,5 @@ class AllocatedOffender
       c.key?('primary_pom_nomis_id') && c['primary_pom_nomis_id'][1] == @staff_id ||
       c.key?('secondary_pom_nomis_id') && c['secondary_pom_nomis_id'][1] == @staff_id
     }.any?
-  end
-
-private
-
-  def overridden_responsibility
-    override = Responsibility.find_by(nomis_offender_id: @offender.offender_no)
-    return nil if override.nil?
-
-    if override.value == Responsibility::PRISON
-      ResponsibilityService::RESPONSIBLE.to_s
-    else
-      ResponsibilityService::SUPPORTING.to_s
-    end
-  end
-
-  def calculated_responsibility
-    if @allocation.primary_pom_nomis_id == @staff_id
-      ResponsibilityService.calculate_pom_responsibility(offender).to_s
-    else
-      ResponsibilityService::COWORKING
-    end
   end
 end
