@@ -2,15 +2,15 @@
 
 module FeaturesHelper
   def signin_spo_user(name = 'MOIC_POM')
-    mock_sso_response(name, ['ROLE_ALLOC_MGR'])
+    mock_sso_response(name, [SsoIdentity::SPO_ROLE])
   end
 
   def signin_global_admin_user
-    mock_sso_response('MOIC_POM', ['ROLE_ALLOC_MGR'], PrisonService.prison_codes)
+    mock_sso_response('MOIC_POM', [SsoIdentity::SPO_ROLE, SsoIdentity::ADMIN_ROLE], PrisonService.prison_codes)
   end
 
   def signin_pom_user
-    mock_sso_response('MOIC_POM', ['ROLE_ALLOC_CASE_MGR'])
+    mock_sso_response('MOIC_POM', [SsoIdentity::POM_ROLE])
   end
 
   def mock_sso_response(username, roles, caseloads = %w[LEI RSI])

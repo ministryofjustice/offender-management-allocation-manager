@@ -23,14 +23,14 @@ class ApplicationController < ActionController::Base
     sso_identity.current_user_is_spo?
   end
 
-  def ensure_admin_user
+  def ensure_spo_user
     unless current_user_is_spo?
       redirect_to '/401'
     end
   end
 
-  def ensure_global_admin_user
-    unless sso_identity.is_global_admin?
+  def ensure_admin_user
+    unless sso_identity.current_user_is_admin?
       redirect_to '/401'
     end
   end
