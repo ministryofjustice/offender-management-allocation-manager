@@ -27,7 +27,7 @@ class SsoIdentity
 
   # This role is granted to the service team to give them 'admin' priviledges
   # such as editing teams and changing switch values
-  def is_global_admin?
+  def current_user_is_admin?
     roles.include?(ADMIN_ROLE)
   end
 

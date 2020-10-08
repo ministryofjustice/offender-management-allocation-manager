@@ -23,7 +23,7 @@ module OffenderManagementAllocationClient
     config.active_model.i18n_customize_full_message = true
     # Before filter for Flipflop dashboard. Replace with a lambda or method name
     # defined in ApplicationController to implement access control.
-    config.flipflop.dashboard_access_filter = :ensure_global_admin_user
+    config.flipflop.dashboard_access_filter = :ensure_admin_user
 
     config.load_defaults 6.0
     config.exceptions_app = routes
