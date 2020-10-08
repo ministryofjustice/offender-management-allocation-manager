@@ -1,4 +1,10 @@
+# frozen_string_literal: true
+
 class SsoIdentity
+  POM_ROLE = 'ROLE_ALLOC_CASE_MGR'
+  SPO_ROLE = 'ROLE_ALLOC_MGR'
+  ADMIN_ROLE = 'ROLE_MOIC_ADMIN'
+
   def initialize(session)
     @sso_identity = session[:sso_data]
   end
@@ -16,17 +22,17 @@ class SsoIdentity
   end
 
   def current_user_is_spo?
-    roles.include?('ROLE_ALLOC_MGR')
+    roles.include?(SPO_ROLE)
   end
 
+  # This role is granted to the service team to give them 'admin' priviledges
+  # such as editing teams and changing switch values
   def is_global_admin?
-    # TODO - change this to roles.include?('ROLE_MOIC_ADMIN') (or whatever name is chosen)
-    # once the name has been agreed and the role has been set up in T3/preprod/production
-    current_user_is_spo? && caseloads.size == PrisonService.prison_codes.size
+    roles.include?(ADMIN_ROLE)
   end
 
   def current_user_is_pom?
-    roles.include?('ROLE_ALLOC_CASE_MGR')
+    roles.include?(POM_ROLE)
   end
 
   def default_prison_code
