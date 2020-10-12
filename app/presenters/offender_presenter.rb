@@ -6,7 +6,7 @@ class OffenderPresenter
            :full_name_ordered, :full_name, :main_offence,
            :sentence_start_date, :team, :prison_id,
            :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date,
-           :tariff_date, :responsibility,
+           :tariff_date, :responsibility_override?,
            :date_of_birth, :release_date, :parole_eligibility_date,
            :welsh_offender, :case_allocation, :earliest_release_date,
            :category_code, :conditional_release_date, :automatic_release_date,
@@ -22,10 +22,6 @@ class OffenderPresenter
 
   def pom_responsibility
     @offender.pom_responsibility
-  end
-
-  def responsibility_override?
-    @offender.responsibility.present?
   end
 
   def recommended_pom_type_label

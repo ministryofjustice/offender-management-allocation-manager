@@ -24,15 +24,25 @@ RSpec.describe OffenderPresenter do
 
   describe '#responsibility_override?' do
     it 'returns false when no responsibility found for offender' do
-      subject = described_class.new(OpenStruct.new(immigration_case?: false, nps_case?: false, responsibility: nil))
-
+      # build an offender, by default this does not have any case information or responsibility record
+      offender = build(:offender,  :indeterminate)
+      subject = described_class.new(offender)
       expect(subject.responsibility_override?).to eq(false)
     end
 
     it 'returns true when there is a responsibility found for an offender' do
-      create(:case_information, nomis_offender_id: 'A1234XX')
-      resp = create(:responsibility, nomis_offender_id: 'A1234XX')
-      subject = described_class.new(OpenStruct.new(offender_no: 'A1234XX', immigration_case?: false, nps_case?: false, responsibility: resp))
+      # create case information and responsibility record
+      case_info = create(:case_information, nomis_offender_id: 'A1234XX')
+      create(:responsibility, nomis_offender_id: 'A1234XX')
+
+      # build an offender
+      offender = build(:offender,  :indeterminate, offenderNo: 'A1234XX')
+
+      # load the case information and responsibility record into the offender object
+      offender.load_case_information(case_info)
+
+      # create OffenderPresenter object
+      subject = described_class.new(offender)
 
       expect(subject.responsibility_override?).to eq(true)
     end

@@ -19,7 +19,7 @@ module HmppsApi
 
     attr_reader :crn,
                 :welsh_offender, :parole_review_date,
-                :ldu, :team, :responsibility
+                :ldu, :team
 
     attr_reader :sentence_type
 
@@ -114,6 +114,10 @@ module HmppsApi
       birth_years_ago = now.year - date_of_birth.year
 
       @age ||= birthday_passed ? birth_years_ago : birth_years_ago - 1
+    end
+
+    def responsibility_override?
+      @responsibility.present?
     end
 
     def load_from_json(payload)
