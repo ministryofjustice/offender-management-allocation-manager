@@ -1,4 +1,7 @@
-<%= form_for(@early_assignment, url: prison_prisoner_early_allocations_path(@prison.code, @early_assignment.nomis_offender_id), method: form_method) do |f| %>
+<%= form_for(@early_assignment,
+             url: prison_prisoner_early_allocations_path(@prison.code, @early_assignment.nomis_offender_id),
+             method: form_method,
+             builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |f| %>
   <%= render :partial => "/shared/field_errors", :locals => { form: f, errors: @early_assignment.errors } %>
 
   <h1 class="govuk-heading-xl govuk-!-margin-top-4">Assessment for early allocation to the community probation team</h1>
@@ -35,7 +38,7 @@
 
   <%= render partial: 'yes_no_boolean_field', locals: {
       form: f,
-      heading_text: 'Does this prisoner need to be managed as a Multi-Agency Public Protection (MAPPA) level 3 case?',
+      heading_text: 'Is this prisoner likely to meet criteria for Multi-Agency Public Protection (MAPPA) level 3 management?',
       hint_text: 'If a MAPPA assessment has not taken place, give the most likely answer, or ask for an assessment to be carried out by the community probation team',
       errors: @early_assignment.errors,
       fieldname: :mappa_level_3
@@ -43,7 +46,7 @@
 
   <%= render partial: 'yes_no_boolean_field', locals: {
       form: f,
-      heading_text: 'Is this likely to be a Critical Protection Case (CPPC)?',
+      heading_text: 'Is prisoner likely to meet criteria for a referral for CPPC registration and has an \'in principle\' decision? (see <a href="https://equip-portal.rocstac.com/CtrlWebIsapi.dll/?__id=webDiagram.show&map=0%3A9A63E167DE4B400EA07F81A9271E1944&dgm=4F984B45CBC447B1A304B2FFECABB777">Equip</a> for guidance)',
       hint_text: 'This usually means it is also a Multi-Agency Public Protection (MAPPA) level 3 case. See Equip for more about CPPC cases.',
       errors: @early_assignment.errors,
       fieldname: :cppc_case

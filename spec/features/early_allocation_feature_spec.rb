@@ -57,7 +57,7 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
         scenario 'error case' do
           expect(page).to have_css('.govuk-error-message')
           expect(page).to have_css('#early_allocation_oasys_risk_assessment_date_error')
-          expect(page).to have_css('#early_allocation_high_profile_error')
+          expect(page).to have_css('#early-allocation-high-profile-error')
           within '.govuk-error-summary' do
             expect(page).to have_text 'You must say if this case is \'high profile\''
             click_link 'You must say if this case is \'high profile\''
@@ -115,10 +115,10 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
         context 'with discretionary path' do
           before do
             find('#early_allocation_extremism_separation_false').click
-            find('#early_allocation_high_risk_of_serious_harm_false').click
-            find('#early_allocation_mappa_level_2_false').click
-            find('#early_allocation_pathfinder_process_false').click
-            find('#early_allocation_other_reason_true').click
+            find('#early-allocation-high-risk-of-serious-harm-field').click
+            find('#early-allocation-mappa-level-2-field').click
+            find('#early-allocation-pathfinder-process-field').click
+            find('#early-allocation-other-reason-true-field').click
 
             click_button 'Continue'
             expect(page).not_to have_text 'The community probation team will make a decision'
@@ -166,10 +166,10 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
 
         scenario 'not eligible due to all answers false' do
           find('#early_allocation_extremism_separation_false').click
-          find('#early_allocation_high_risk_of_serious_harm_false').click
-          find('#early_allocation_mappa_level_2_false').click
-          find('#early_allocation_pathfinder_process_false').click
-          find('#early_allocation_other_reason_false').click
+          find('#early-allocation-high-risk-of-serious-harm-field').click
+          find('#early-allocation-mappa-level-2-field').click
+          find('#early-allocation-pathfinder-process-field').click
+          find('#early-allocation-other-reason-field').click
 
           click_button 'Continue'
           expect(page).to have_text 'Not eligible for early allocation'
@@ -219,11 +219,11 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
     fill_in id: 'early_allocation_oasys_risk_assessment_date_mm', with: valid_date.month
     fill_in id: 'early_allocation_oasys_risk_assessment_date_yyyy', with: valid_date.year
 
-    find('#early_allocation_convicted_under_terrorisom_act_2000_true').click
-    find('#early_allocation_high_profile_false').click
-    find('#early_allocation_serious_crime_prevention_order_false').click
-    find('#early_allocation_mappa_level_3_false').click
-    find('#early_allocation_cppc_case_false').click
+    find('#early-allocation-convicted-under-terrorisom-act-2000-true-field').click
+    find('#early-allocation-high-profile-field').click
+    find('#early-allocation-serious-crime-prevention-order-field').click
+    find('#early-allocation-mappa-level-3-field').click
+    find('#early-allocation-cppc-case-field').click
   end
 
   def stage1_stage2_answers
@@ -231,10 +231,10 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
     fill_in id: 'early_allocation_oasys_risk_assessment_date_mm', with: valid_date.month
     fill_in id: 'early_allocation_oasys_risk_assessment_date_yyyy', with: valid_date.year
 
-    find('#early_allocation_convicted_under_terrorisom_act_2000_false').click
-    find('#early_allocation_high_profile_false').click
-    find('#early_allocation_serious_crime_prevention_order_false').click
-    find('#early_allocation_mappa_level_3_false').click
-    find('#early_allocation_cppc_case_false').click
+    find('#early-allocation-convicted-under-terrorisom-act-2000-field').click
+    find('#early-allocation-high-profile-field').click
+    find('#early-allocation-serious-crime-prevention-order-field').click
+    find('#early-allocation-mappa-level-3-field').click
+    find('#early-allocation-cppc-case-field').click
   end
 end

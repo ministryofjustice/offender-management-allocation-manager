@@ -1,4 +1,7 @@
-<%= form_for(@early_assignment, url: prison_prisoner_early_allocations_path(@prison.code, @early_assignment.nomis_offender_id), method: form_method) do |form| %>
+<%= form_for(@early_assignment,
+             url: prison_prisoner_early_allocations_path(@prison.code, @early_assignment.nomis_offender_id),
+             method: form_method,
+             builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |form| %>
   <%= render :partial => "/shared/field_errors", :locals => { form: form, errors: @early_assignment.errors } %>
 
   <h1 class="govuk-heading-xl govuk-!-margin-top-4">Assessment for early allocation to the community probation team</h1>
@@ -29,24 +32,12 @@
           </div>
           <div class="govuk-radios__conditional govuk-radios__conditional--hidden"
                id="show-when-extremism-true">
-            <fieldset class="govuk-fieldset">
-              <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-                <h1 class="govuk-fieldset__heading">Are they due for release in the next 24 months or less?</h1>
-              </legend>
-
-              <%= render partial: 'error', locals: { form: form, errors: @early_assignment.errors, fieldname: :due_for_release_in_less_than_24months }%>
-
-              <div class="govuk-radios">
-                <div class="govuk-radios__item">
-                  <%= form.radio_button(:due_for_release_in_less_than_24months, true, class: "govuk-radios__input") %>
-                  <%= form.label "due_for_release_in_lessthan_24months_true", 'Yes', class: "govuk-label govuk-radios__label" %>
-                </div>
-                <div class="govuk-radios__item">
-                  <%= form.radio_button(:due_for_release_in_less_than_24months, false, class: "govuk-radios__input") %>
-                  <%= form.label "due_for_release_in_lessthan_24months_false", 'No', class: "govuk-label govuk-radios__label" %>
-                </div>
-              </div>
-            </fieldset>
+            <%= render 'yes_no_boolean_field',
+                       form: form,
+                       fieldname: :due_for_release_in_less_than_24months,
+                       heading_text: 'Are they due for release in the next 24 months or less?',
+                       hint_text: ''
+            %>
           </div>
         </div>
         <div class="govuk-radios__item">
