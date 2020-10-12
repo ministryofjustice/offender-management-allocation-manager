@@ -3,6 +3,10 @@ require 'rails_helper'
 RSpec.describe Responsibility, type: :model do
   let(:offender_id) { 'GA1234G' }
 
+  before do
+    create(:case_information, nomis_offender_id: offender_id)
+  end
+
   context 'with other reason' do
     subject { build(:responsibility, nomis_offender_id: offender_id, reason: :other_reason) }
 

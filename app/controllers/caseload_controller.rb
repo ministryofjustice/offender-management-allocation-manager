@@ -46,8 +46,7 @@ private
     }
 
     upcoming_offenders.map { |offender|
-      responsibility = Responsibility.find_by(nomis_offender_id: offender.offender_no)
-      OffenderPresenter.new(offender, responsibility)
+      OffenderPresenter.new(offender)
     }
   end
 

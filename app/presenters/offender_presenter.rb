@@ -6,7 +6,7 @@ class OffenderPresenter
            :full_name_ordered, :full_name, :main_offence,
            :sentence_start_date, :team, :prison_id,
            :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date,
-           :tariff_date,
+           :tariff_date, :responsibility_override?,
            :date_of_birth, :release_date, :parole_eligibility_date,
            :welsh_offender, :case_allocation, :earliest_release_date,
            :category_code, :conditional_release_date, :automatic_release_date,
@@ -16,28 +16,12 @@ class OffenderPresenter
            :licence_expiry_date, :post_recall_release_date,
            :over_18?, :recalled?, :sentenced?, :immigration_case?, :mappa_level, to: :@offender
 
-  def initialize(offender, responsibility)
+  def initialize(offender)
     @offender = offender
-    @responsibility = responsibility
   end
 
   def pom_responsibility
-    # If this presenter was provided with a responsibility object from
-    # a responsibility override, we will return that, falling back on
-    # asking the offender class to calculate it.
-    if @responsibility.present?
-      if @responsibility.value == Responsibility::PRISON
-        ResponsibilityService::RESPONSIBLE
-      else
-        ResponsibilityService::SUPPORTING
-      end
-    else
-      @offender.pom_responsibility
-    end
-  end
-
-  def responsibility_override?
-    @responsibility.present?
+    @offender.pom_responsibility
   end
 
   def recommended_pom_type_label

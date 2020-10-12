@@ -63,6 +63,23 @@ feature 'Responsibility override', :versioning do
         expect(page).to have_current_path(new_prison_allocation_path('LEI', offender_id))
         expect(page).to have_content 'Current case owner Community'
       end
+
+      it 'shows the correct POM recommendations' do
+        override_responsibility_for(offender_id)
+
+        visit new_prison_allocation_path('LEI', offender_id)
+        expect(page).to have_content 'Recommendation: Prison officer POM'
+      end
+
+      it 'shows case owner as Community when overridden' do
+        override_responsibility_for(offender_id)
+
+        visit prison_summary_unallocated_path('LEI')
+
+        within 'tr.govuk-table__row.offender_row_0' do
+          expect(page).to have_content('Community')
+        end
+      end
     end
   end
 
@@ -100,5 +117,17 @@ feature 'Responsibility override', :versioning do
 
       expect(page).to have_content "Responsibility for this case can't be changed"
     end
+  end
+
+  def override_responsibility_for(offender_id)
+    visit new_prison_allocation_path('LEI', offender_id)
+
+    within '.responsibility_change' do
+      click_link 'Change'
+    end
+
+    find('#reason_prob_team').click
+    click_button 'Continue'
+    click_button 'Confirm'
   end
 end

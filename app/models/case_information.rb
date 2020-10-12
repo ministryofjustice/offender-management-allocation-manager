@@ -16,6 +16,12 @@ class CaseInformation < ApplicationRecord
 
   scope :nps, -> { where(case_allocation: NPS) }
 
+  has_one :responsibility,
+          foreign_key: :nomis_offender_id,
+          primary_key: :nomis_offender_id,
+          inverse_of: :case_information,
+          dependent: :destroy
+
   before_validation :set_probation_service
 
   def local_divisional_unit

@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 class Responsibility < ApplicationRecord
+  belongs_to :case_information,
+             primary_key: :nomis_offender_id,
+             foreign_key: :nomis_offender_id,
+             inverse_of: :responsibility
+
   PRISON = 'Prison'
   PROBATION = 'Probation'
 

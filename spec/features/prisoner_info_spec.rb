@@ -44,6 +44,7 @@ feature 'View a prisoner profile page' do
     end
 
     it 'shows an overridden responsibility', vcr: { cassette_name: :show_offender_with_override_spec } do
+      create(:case_information, nomis_offender_id: 'G7998GJ')
       create(:responsibility, nomis_offender_id: 'G7998GJ')
       visit prison_prisoner_path('LEI', 'G7998GJ')
 

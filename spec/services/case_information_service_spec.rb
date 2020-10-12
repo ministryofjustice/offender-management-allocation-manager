@@ -17,6 +17,13 @@ describe CaseInformationService do
     expect(cases[caseinfo.nomis_offender_id]).to be_kind_of(CaseInformation)
   end
 
+  it 'can eager load the responsibility association' do
+    create(:responsibility, nomis_offender_id: caseinfo.nomis_offender_id)
+    cases = described_class.get_case_information([caseinfo.nomis_offender_id])
+
+    expect(cases[caseinfo.nomis_offender_id].association(:responsibility).loaded?).to eq(true)
+  end
+
   it "can delete case information" do
     cases = described_class.get_case_information([caseinfo.nomis_offender_id])
     expect(cases.length).to eq(1)

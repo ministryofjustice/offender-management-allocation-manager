@@ -79,7 +79,13 @@ module HmppsApi
     end
 
     def pom_responsibility
-      @pom_responsibility ||= ResponsibilityService.calculate_pom_responsibility(self)
+      if @responsibility.nil?
+        ResponsibilityService.calculate_pom_responsibility(self)
+      elsif @responsibility.value == Responsibility::PRISON
+        ResponsibilityService::RESPONSIBLE
+      else
+        ResponsibilityService::SUPPORTING
+      end
     end
 
     def sentence_start_date
@@ -108,6 +114,10 @@ module HmppsApi
       birth_years_ago = now.year - date_of_birth.year
 
       @age ||= birthday_passed ? birth_years_ago : birth_years_ago - 1
+    end
+
+    def responsibility_override?
+      @responsibility.present?
     end
 
     def load_from_json(payload)
@@ -150,6 +160,7 @@ module HmppsApi
       @parole_review_date = record.parole_review_date
       @early_allocation = record.latest_early_allocation.present? &&
         (record.latest_early_allocation.eligible? || record.latest_early_allocation.community_decision?)
+      @responsibility = record.responsibility
     end
 
   private
