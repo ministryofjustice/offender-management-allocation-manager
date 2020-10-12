@@ -53,36 +53,72 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
     end
 
     context 'when processing a com name' do
-      let!(:offender_id) { 'A1111A' }
-      let!(:com_name) { 'Bob Smith' }
+      let(:offender_id) { 'A1111A' }
       let!(:d1) {
         create(:delius_data, offender_manager: com_name, team_code: team.shadow_code, team: team.name,
-                             ldu_code: ldu.code, ldu: ldu.name)
+               ldu_code: ldu.code, ldu: ldu.name)
       }
-      let!(:allocation) { create(:allocation, nomis_offender_id: d1.noms_no) }
 
-      it 'does no update if no allocation' do
-        alloc = Allocation.find_by(nomis_offender_id: offender_id)
-        expect(alloc).to be_nil
+      context 'with a normal COM name' do
+        let(:com_name) { 'Bob Smith' }
 
-        expect {
-          described_class.perform_now d1.noms_no
-        }.to change(CaseInformation, :count).by(1)
+        it 'does not update if no allocation' do
+          alloc = Allocation.find_by(nomis_offender_id: offender_id)
+          expect(alloc).to be_nil
 
-        alloc = Allocation.find_by(nomis_offender_id: offender_id)
-        expect(alloc).to be_nil
+          expect {
+            described_class.perform_now d1.noms_no
+          }.to change(CaseInformation, :count).by(1)
+
+          alloc = Allocation.find_by(nomis_offender_id: offender_id)
+          expect(alloc).to be_nil
+        end
+
+        context 'with allocation' do
+          before do
+            create(:allocation, nomis_offender_id: d1.noms_no, com_name: 'Fred Bloigs')
+          end
+
+          let!(:allocation) { Allocation.find_by!(nomis_offender_id: d1.noms_no) }
+
+          it 'updates existing allocation without new version' do
+            expect(allocation.version).to be_nil
+
+            expect {
+              described_class.perform_now d1.noms_no
+            }.to change(CaseInformation, :count).by(1)
+
+            allocation.reload
+            expect(allocation.version).to be_nil
+            expect(allocation.com_name).to eq(com_name)
+          end
+        end
       end
 
-      it 'updates existing allocation without new version' do
-        expect(allocation.version).to be_nil
+      context 'with an unallocated com name' do
+        let(:com_name) { 'Staff, Unallocated' }
 
-        expect {
+        before do
+          create(:allocation, nomis_offender_id: d1.noms_no, com_name: 'Fred Bloigs')
+        end
+
+        it 'maps com_name to nil' do
           described_class.perform_now d1.noms_no
-        }.to change(CaseInformation, :count).by(1)
+          expect(Allocation.find_by(nomis_offender_id: d1.noms_no).com_name).to be_nil
+        end
+      end
 
-        allocation.reload
-        expect(allocation.version).to be_nil
-        expect(allocation.com_name).to eq(com_name)
+      context 'with an inactive com name' do
+        let(:com_name) { 'Staff, Inactive Staff(N07)' }
+
+        before do
+          create(:allocation, nomis_offender_id: d1.noms_no, com_name: 'Fred Bloigs')
+        end
+
+        it 'maps com_name to nil' do
+          described_class.perform_now d1.noms_no
+          expect(Allocation.find_by(nomis_offender_id: d1.noms_no).com_name).to be_nil
+        end
       end
     end
 

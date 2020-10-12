@@ -68,7 +68,14 @@ private
     allocation = Allocation.find_by(nomis_offender_id: delius_record.noms_no)
     return if allocation.blank?
 
-    allocation.update(com_name: delius_record.offender_manager)
+    com_name = if ['Unallocated', 'Inactive'].any? { |pattern| delius_record.offender_manager.include?(pattern) }
+                 nil
+               else
+                 delius_record.offender_manager
+               end
+
+    allocation.assign_attributes(com_name: com_name)
+    allocation.save! if allocation.changed?
   end
 
   def map_delius_to_case_info(delius_record)
