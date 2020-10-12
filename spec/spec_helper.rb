@@ -1,4 +1,22 @@
 require 'simplecov'
+require 'simplecov-lcov'
+
+# use a flag to allow HTML coverage to be the default
+if ENV['UNDERCOVER']
+  # Hopefully this allows both LCOV and HTML formatting
+  class SimpleCov::Formatter::MergedFormatter
+    def format(result)
+      SimpleCov::Formatter::HTMLFormatter.new.format(result)
+      SimpleCov::Formatter::LcovFormatter.new.format(result)
+    end
+  end
+
+  SimpleCov::Formatter::LcovFormatter.config.report_with_single_file = true
+  # for cc-test-reporter after-build action
+  SimpleCov::Formatter::LcovFormatter.config.output_directory = 'coverage'
+  SimpleCov::Formatter::LcovFormatter.config.lcov_file_name = 'lcov.info'
+  SimpleCov.formatter = SimpleCov::Formatter::MergedFormatter
+end
 
 SimpleCov.start 'rails' do
   add_filter 'app/services/hmpps_api/error/'

@@ -57,6 +57,7 @@ group :development, :test do
   gem 'rspec-rails', '~> 4.0.0.beta2'
   gem 'rswag-specs'
   gem 'spring'
+  gem 'undercover'
 end
 
 group :test do
@@ -70,6 +71,9 @@ group :test do
   gem 'selenium-webdriver'
   gem 'shoulda-matchers'
   gem 'simplecov'
+  # we can't use the branch coverage version of simplecov, (due to code climate)
+  # and it seems that simplecov-lcov doesn't correctly depend on the branch coverage version of simplecov
+  gem 'simplecov-lcov', '< 0.8'
   # https://evilmartians.com/chronicles/testprof-a-good-doctor-for-slow-ruby-tests
   gem 'test-prof'
   gem 'timecop'
