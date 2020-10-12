@@ -11,7 +11,7 @@ class OffenderPresenter
            :welsh_offender, :case_allocation, :earliest_release_date,
            :category_code, :conditional_release_date, :automatic_release_date,
            :awaiting_allocation_for, :allocated_pom_name, :allocation_date, :allocated_com_name,
-           :tier, :parole_review_date, :crn, :convicted_status, :convicted?, :ldu,
+           :tier, :parole_review_date, :crn, :convicted?, :ldu,
            :handover_start_date, :responsibility_handover_date, :handover_reason, :prison_arrival_date,
            :licence_expiry_date, :post_recall_release_date,
            :over_18?, :recalled?, :sentenced?, :immigration_case?, :mappa_level, to: :@offender
