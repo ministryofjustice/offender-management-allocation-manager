@@ -1,11 +1,6 @@
 # frozen_string_literal: true
 
 class CaseloadController < PrisonStaffApplicationController
-  breadcrumb -> { 'Your caseload' },
-             -> { prison_staff_caseload_index_path(active_prison_id, staff_id) }
-  breadcrumb -> { 'New cases' },
-             -> { new_prison_staff_caseload_path(active_prison_id, staff_id) }, only: [:new]
-
   def index
     allocations = @pom.allocations
 
