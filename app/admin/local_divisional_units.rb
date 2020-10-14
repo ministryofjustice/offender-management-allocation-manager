@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 ActiveAdmin.register LocalDivisionalUnit, as: 'LDU' do
   # See permitted parameters documentation:
   # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
   #
   # Uncomment all parameters which should be permitted for assignment
   #
-  permit_params :code, :name, :email_address
+  permit_params :code, :name, :email_address, :in_wales
   #
   # or
   #
@@ -20,7 +22,8 @@ ActiveAdmin.register LocalDivisionalUnit, as: 'LDU' do
     id_column
     column :name
     column :code
-    column :email_address
+    column 'In Wales', :in_wales
+    column 'Email Address', :email_address
     column 'Teams' do |ldu|
       ldu.teams.size
     end

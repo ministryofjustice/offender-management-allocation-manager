@@ -22,32 +22,6 @@ RSpec.describe DeliusData, type: :model do
     end
   end
 
-  describe '#welsh_offender?' do
-    context 'when a record is Welsh' do
-      subject {
-        described_class.new(
-          crn: '1',
-          noms_no: 'A1234Z',
-          ldu_code: 'WPT123'
-        )
-      }
-
-      it { is_expected.to be_welsh_offender }
-    end
-
-    context 'when a record is not Welsh' do
-      subject {
-        described_class.new(
-          crn: '1',
-          noms_no: 'A1234Z',
-          ldu_code: 'XPT123'
-        )
-      }
-
-      it { is_expected.not_to be_welsh_offender }
-    end
-  end
-
   describe '#service_provider' do
     context 'when provider code starts with C' do
       subject {

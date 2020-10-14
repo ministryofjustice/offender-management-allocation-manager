@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }, type: :job do
@@ -159,6 +161,29 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
         expect {
           described_class.perform_now d1.noms_no
         }.not_to change(CaseInformation, :count)
+      end
+    end
+
+    describe '#welsh_offender' do
+      let(:case_info) { CaseInformation.last }
+      let(:delius_record) { create(:delius_data, ldu_code: ldu.code, team_code: team.code) }
+
+      context 'with an English LDU' do
+        let(:ldu) { create(:local_divisional_unit, in_wales: false) }
+
+        it 'maps to false' do
+          described_class.perform_now(delius_record.noms_no)
+          expect(case_info.welsh_offender).to eq('No')
+        end
+      end
+
+      context 'with an Welsh LDU' do
+        let(:ldu) { create(:local_divisional_unit, in_wales: true) }
+
+        it 'maps to true' do
+          described_class.perform_now(delius_record.noms_no)
+          expect(case_info.welsh_offender).to eq('Yes')
+        end
       end
     end
 
