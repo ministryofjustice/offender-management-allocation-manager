@@ -20,6 +20,14 @@ FactoryBot.define do
 
   class Elite2POM
     attr_accessor :position, :staffId, :emails, :firstName, :lastName, :positionDescription, :status
+
+    def full_name
+      "#{lastName}, #{firstName}"
+    end
+
+    def staff_id
+      staffId
+    end
   end
 
   factory :pom, class: 'Elite2POM' do
