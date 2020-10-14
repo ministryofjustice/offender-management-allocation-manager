@@ -3,14 +3,6 @@
 class CaseloadController < PrisonsApplicationController
   before_action :ensure_signed_in_pom_is_this_pom, :load_pom
 
-  breadcrumb -> { 'Your caseload' },
-             -> { prison_staff_caseload_index_path(active_prison_id, staff_id) }
-  breadcrumb -> { 'New cases' },
-             -> { new_prison_staff_caseload_path(active_prison_id, staff_id) }, only: [:new]
-  breadcrumb -> { 'Cases close to handover' },
-             -> { prison_staff_caseload_handover_start_path(active_prison_id, staff_id) },
-             only: [:handover_start]
-
   def index
     allocations = @prison.allocations_for(@pom.staff_id)
 
