@@ -33,4 +33,8 @@ module FeaturesHelper
     stub_request(:get, "#{ApiHelper::T3}/staff/#{staff_id}/emails").
       to_return(body: [].to_json)
   end
+
+  def wait_for(maximum_wait_in_seconds = 10)
+    Selenium::WebDriver::Wait.new(timeout: maximum_wait_in_seconds).until { yield }
+  end
 end

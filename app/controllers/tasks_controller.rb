@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class TasksController < PrisonsApplicationController
-  breadcrumb 'Case updates needed', ''
-
   before_action :ensure_pom
   before_action :load_pom
 

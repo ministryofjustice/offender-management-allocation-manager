@@ -14,9 +14,6 @@ feature "get poms list" do
     expect(page).to have_content("Prison Offender Managers")
     expect(page).to have_content("Prison POM")
     expect(page).to have_content("Probation POM")
-
-    expect(page).to have_css('.govuk-breadcrumbs')
-    expect(page).to have_css('.govuk-breadcrumbs__link', count: 2)
   end
 
   it "handles missing sentence data", vcr: { cassette_name: :show_poms_feature_missing_sentence } do
@@ -36,8 +33,6 @@ feature "get poms list" do
     expect(page).to have_css(".govuk-button", count: 1)
     expect(page).to have_content("Pom, Moic")
     expect(page).to have_content("Caseload")
-    expect(page).to have_css('.govuk-breadcrumbs')
-    expect(page).to have_css('.govuk-breadcrumbs__link', count: 3)
   end
 
   it "can sort offenders allocated to a POM", vcr: { cassette_name: :show_poms_feature_view_sorting } do
@@ -62,8 +57,6 @@ feature "get poms list" do
     expect(page).to have_css(".govuk-button", count: 1)
     expect(page).to have_content("Pom, Moic")
     expect(page).to have_content("Caseload")
-    expect(page).to have_css('.govuk-breadcrumbs')
-    expect(page).to have_css('.govuk-breadcrumbs__link', count: 3)
     expect(page).to have_css('.sort-arrow', count: 1)
 
     check_for_order = lambda { |names|
@@ -92,6 +85,5 @@ feature "get poms list" do
     expect(page).to have_content("Edit profile")
     expect(page).to have_content("Working pattern")
     expect(page).to have_content("Status")
-    expect(page).not_to have_css('.govuk-breadcrumbs')
   end
 end

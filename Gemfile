@@ -28,7 +28,6 @@ gem 'sidekiq', '>= 6.1.2'
 gem 'sentry-raven'
 gem 'turbolinks', '~> 5'
 gem 'uglifier', '>= 1.3.0'
-gem 'loaf'
 gem 'typhoeus'
 gem 'redis'
 gem 'fast_underscore', require: false

@@ -3,14 +3,7 @@
 class PomsController < PrisonsApplicationController
   before_action :ensure_spo_user
 
-  # so that breadcrumb has @pom available
   before_action :load_pom_staff_member, only: [:show, :edit, :update]
-
-  breadcrumb 'Prison Offender Managers',
-             -> { prison_poms_path(active_prison_id) }, only: [:index, :show]
-  breadcrumb -> { @pom.full_name },
-             -> { prison_poms_path(active_prison_id, nomis_staff_id) },
-             only: [:show]
 
   def index
     poms = PrisonOffenderManagerService.get_poms_for(active_prison_id)
