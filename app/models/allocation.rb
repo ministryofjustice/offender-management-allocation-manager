@@ -78,8 +78,6 @@ class Allocation < ApplicationRecord
   end
 
   def deallocate_offender(movement_type)
-    self.prison = prison_fix(movement_type) if prison.blank?
-
     self.primary_pom_nomis_id = nil
     self.primary_pom_name = nil
     self.primary_pom_allocated_at = nil
@@ -130,23 +128,6 @@ class Allocation < ApplicationRecord
       alloc.event_trigger = USER
 
       alloc.save!
-    end
-  end
-
-  def prison_fix(movement_type)
-    # In some cases we have old historical data which has no prison set
-    # and this causes an issue should those offenders move or be released.
-    # To handle this we will attempt to set the prison to a valid code
-    # based on the event that has happened.
-    if movement_type == Allocation::OFFENDER_RELEASED
-      movements = HmppsApi::PrisonApi::MovementApi.movements_for(nomis_offender_id)
-      if movements.present?
-        movement = movements.last
-        return movement.from_agency if movement.from_prison?
-      end
-    elsif movement_type == Allocation::OFFENDER_TRANSFERRED
-      offender = OffenderService.get_offender(nomis_offender_id)
-      offender.prison_id
     end
   end
 
