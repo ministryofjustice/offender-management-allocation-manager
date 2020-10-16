@@ -20,7 +20,7 @@ feature 'admin urls' do
 
   let(:ldu) { create(:local_divisional_unit) }
   let!(:new_team) { create(:team, local_divisional_unit: ldu) }
-  let(:admin_urls) { ['/admin', '/flip-flop-admin'] }
+  let(:admin_urls) { ['/admin', '/flip-flop-admin', '/sidekiq'] }
 
   context 'when pom' do
     before do

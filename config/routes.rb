@@ -111,4 +111,12 @@ Rails.application.routes.draw do
   mount Rswag::Api::Engine => '/api-docs'
 
   mount Flipflop::Engine => "/flip-flop-admin"
+
+  # Sidekiq admin interface
+  constraints lambda {|request| SsoIdentity.new(request.session).current_user_is_admin?} do
+    require 'sidekiq/web'
+    mount Sidekiq::Web => '/sidekiq'
+  end
+  # Redirect to 'unauthorized' page if user isn't an admin
+  get '/sidekiq', :to => redirect('/401')
 end
