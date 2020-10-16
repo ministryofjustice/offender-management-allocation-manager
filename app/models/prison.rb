@@ -91,6 +91,7 @@ private
 
         offender.latest_movement = temp_movements[offender.offender_no]
       }
+      HmppsApi::PrisonApi::OffenderApi.add_arrival_dates(offenders)
     end
   end
 end

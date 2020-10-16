@@ -11,6 +11,8 @@ class ResponsibilityService
   SUPPORTING = Responsibility.new 'Supporting', false, 'Community'
   UNKNOWN = Responsibility.new 'Unknown', false, 'Unknown'
   COWORKING = 'Co-Working'
+  # Actual date Mon 19th Oct 2020
+  PRESCOED_CUTOFF_DATE = Date.new(2020, 10, 19).freeze
 
   # We currently don't have access to the date of the parole board decision, which means that we cannot correctly
   # calculate responsibility for NPS indeterminate cases with parole eligibility where the TED is in the past.
@@ -19,7 +21,7 @@ class ResponsibilityService
   def self.calculate_pom_responsibility(offender)
     if offender.immigration_case?
       SUPPORTING
-    elsif open_prison_nps_offender?(offender)
+    elsif open_prison_nps_offender?(offender) && !recent_prescoed_nps_case?(offender)
       SUPPORTING
     elsif offender.recalled?
       SUPPORTING
@@ -32,6 +34,12 @@ class ResponsibilityService
     else
       standard_rules(offender)
     end
+  end
+
+  def self.recent_prescoed_nps_case?(offender)
+    offender.prison_id == PrisonService::PRESCOED_CODE &&
+        offender.prison_arrival_date >= PRESCOED_CUTOFF_DATE &&
+        offender.nps_case? && welsh_offender?(offender)
   end
 
 private

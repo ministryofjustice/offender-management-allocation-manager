@@ -11,6 +11,8 @@ class HandoverDateService
       HandoverData.new nil, nil, 'Recall case - no handover date calculation'
     elsif offender.nps_case? && offender.indeterminate_sentence? && offender.tariff_date.nil?
       HandoverData.new nil, nil, 'No earliest release date'
+    elsif ResponsibilityService.recent_prescoed_nps_case?(offender) && offender.indeterminate_sentence?
+      HandoverData.new offender.prison_arrival_date, prescoed_handover_date(offender), 'Prescoed'
     elsif offender.nps_case? || offender.indeterminate_sentence?
       date, reason = nps_handover_date(offender)
       HandoverData.new nps_start_date(offender), date, reason
@@ -21,6 +23,11 @@ class HandoverDateService
   end
 
 private
+
+  def self.prescoed_handover_date(offender)
+    target_date = [offender.tariff_date, offender.parole_review_date, offender.parole_eligibility_date].compact.min
+    target_date - 8.months
+  end
 
   def self.nps_start_date(offender)
     if offender.early_allocation?
