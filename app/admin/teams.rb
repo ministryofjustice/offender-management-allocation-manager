@@ -4,7 +4,7 @@ ActiveAdmin.register Team do
   #
   # Uncomment all parameters which should be permitted for assignment
   #
-  permit_params :code, :name, :shadow_code, :local_divisional_unit_id
+  permit_params :code, :name, :shadow_code, :local_divisional_unit_id, :in_wales
   #
   # or
   #
