@@ -39,6 +39,8 @@ module ApiHelper
 
     stub_request(:get, "#{T3}/bookings/#{booking_number}/mainOffence").
       to_return(body: {}.to_json)
+
+    stub_movements
   end
 
   def stub_movements(movements = [])
@@ -121,6 +123,8 @@ module ApiHelper
     stub_request(:post, elite2latestmove).with(
       body: offenders.map { |offender| offender.fetch(:offenderNo) }.to_json).
       to_return(body: movements.to_json)
+
+    stub_movements
   end
 
   def stub_multiple_offenders(offenders, bookings)

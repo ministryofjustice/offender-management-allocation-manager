@@ -1,6 +1,67 @@
 require 'rails_helper'
 
 describe HandoverDateService do
+  context 'when prescoed' do
+    subject do
+      handover = described_class.handover(offender)
+      { start_date: handover.start_date,
+        handover_date: handover.handover_date,
+        reason: handover.reason
+      }
+    end
+
+    let(:recent_date) { ResponsibilityService::PRESCOED_CUTOFF_DATE }
+    let(:past_date) { ResponsibilityService::PRESCOED_CUTOFF_DATE - 1.day }
+
+
+    context 'with indeterminate' do
+      let(:offender) {
+        build(:offender_summary, :prescoed, :indeterminate,
+              sentence: build(:sentence_detail, :welsh_policy_sentence, tariffDate: '2022-09-01')).tap { |o|
+          o.prison_arrival_date = arrival_date
+          o.load_case_information(case_info)
+        }
+      }
+
+      context 'when recent' do
+        let(:arrival_date) { recent_date }
+
+        context 'with NPS welsh offender' do
+          let(:case_info) { build(:case_information, :welsh, :nps) }
+
+          it 'starts on arrival date, and hands over 8 months before tariff date' do
+            expect(subject).to eq(start_date: arrival_date, handover_date: Date.new(2022, 1, 1), reason: 'Prescoed')
+          end
+        end
+
+        context 'with CRC welsh offender' do
+          let(:case_info) { build(:case_information, :welsh, :crc) }
+
+          it 'does something' do
+            expect(subject).to eq(start_date: Date.new(2022, 1, 1), handover_date: Date.new(2022, 1, 1), reason: 'NPS Inderminate')
+          end
+        end
+
+        context 'with NPS english offender' do
+          let(:case_info) { build(:case_information, :english, :nps) }
+
+          it 'does something' do
+            expect(subject).to eq(start_date: Date.new(2022, 1, 1), handover_date: Date.new(2022, 1, 1), reason: 'NPS Inderminate')
+          end
+        end
+      end
+
+      context 'with past NPS welsh offender' do
+        let(:arrival_date) { past_date }
+        let(:case_info) { build(:case_information, :welsh, :nps) }
+
+        it 'does something' do
+          expect(subject).to eq(start_date: Date.new(2022, 1, 1), handover_date: Date.new(2022, 1, 1), reason: 'NPS Inderminate')
+        end
+      end
+    end
+  end
+
   describe 'calculating when community start supporting custody' do
     context 'when recalled' do
       let(:offender) { OpenStruct.new(recalled?: true) }

@@ -131,6 +131,8 @@ class PrisonService
     PrisonInfo.new('WYI', 'HMP/YOI Wetherby', :england)
   ].index_by(&:code).freeze
 
+  PRESCOED_CODE = 'UPI'
+
   PRIVATE_ENGLISH_PRISON_CODES = %w[ACI ASI DNI DGI FBI LGI OWI NLI PBI RHI TSI].freeze
 
   ENGLISH_HUB_PRISON_CODES = %w[IWI SLI VEI].freeze
