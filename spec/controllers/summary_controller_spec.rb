@@ -8,8 +8,35 @@ RSpec.describe SummaryController, type: :controller do
   before { stub_sso_data(prison) }
 
   context 'with 4 offenders' do
+    let(:today_plus_10_days) { (Time.zone.today + 10.days).to_s }
+    let(:today_plus_13_weeks) { (Time.zone.today + 13.weeks).to_s }
+
     before do
-      offenders = build_offenders
+      offenders = [
+      build(:nomis_offender,
+            offenderNo: "G7514GW",
+            imprisonmentStatus: "LR",
+            lastName: 'SMITH',
+            sentence: attributes_for(:sentence_detail, sentenceStartDate: "2011-01-20")),
+      build(:nomis_offender, offenderNo: "G1234GY", imprisonmentStatus: "LIFE",
+            lastName: 'Minate-Offender',
+            sentence: attributes_for(:sentence_detail,
+                                     sentenceStartDate: "2009-02-08",
+                                     automaticReleaseDate: "2011-01-28")),
+      build(:nomis_offender, offenderNo: "G1234VV",
+            lastName: 'JONES',
+            sentence: attributes_for(:sentence_detail,
+                                     sentenceStartDate: "2019-02-08",
+                                     automaticReleaseDate: today_plus_13_weeks)),
+      build(:nomis_offender, offenderNo: "G4234GG",
+            imprisonmentStatus: "SENT03",
+            firstName: "Fourth", lastName: "Offender",
+            sentence: attributes_for(:sentence_detail,
+                                     automaticReleaseDate: today_plus_10_days,
+                                     homeDetentionCurfewActualDate: today_plus_10_days,
+                                     sentenceStartDate: "2019-02-08",
+                                     ))
+      ]
       create(:case_information, case_allocation: 'NPS', nomis_offender_id: 'G4234GG')
 
       stub_offenders_for_prison(prison, offenders)
@@ -162,30 +189,41 @@ RSpec.describe SummaryController, type: :controller do
     end
 
     context 'with unallocated offenders' do
-      let(:offenders) { build_offenders }
+      let(:today_plus_13_weeks) { (Time.zone.today + 13.weeks).to_s }
+      let(:today_plus_7_weeks) { (Time.zone.today + 7.weeks).to_s }
+
+      let(:offenders) do
+        [
+
+        build(:nomis_offender, offenderNo: "G7514GW", imprisonmentStatus: "LR"), # custody case
+        build(:nomis_offender, offenderNo: "G1234VV", imprisonmentStatus: "SENT03",
+              sentence: attributes_for(:sentence_detail, conditionalReleaseDate: today_plus_7_weeks)), # community case
+        build(:nomis_offender, offenderNo: "G4234GG", imprisonmentStatus: "SENT03"), # custody case
+        build(:nomis_offender, offenderNo: "G1234GY", imprisonmentStatus: "SENT03",
+              sentence: attributes_for(:sentence_detail, sentenceStartDate: "2019-02-08",
+                                       automaticReleaseDate: today_plus_13_weeks)) # community case
+        ]
+      end
 
       before do
         stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN").
         to_return(body: [].to_json)
-      end
 
-      it 'can sort by case_owner in ascending order' do
         offenders.each do |offender|
           create(:case_information, nomis_offender_id: offender[:offenderNo])
         end
+      end
 
+      it 'can sort by case_owner in ascending order' do
         stub_offenders_for_prison(prison, offenders)
 
         get :unallocated, params: { prison_id: prison, sort: 'case_owner asc' }
+
         expect(assigns(:offenders).first.pom_responsibility.case_owner).to eq('Community')
         expect(assigns(:offenders).last.pom_responsibility.case_owner).to eq('Custody')
       end
 
       it 'can sort by case owner in descending order' do
-        offenders.each do |offender|
-          create(:case_information, nomis_offender_id: offender[:offenderNo])
-        end
-
         stub_offenders_for_prison(prison, offenders)
 
         get :unallocated, params: { prison_id: prison, sort: 'case_owner desc' }
@@ -376,36 +414,5 @@ RSpec.describe SummaryController, type: :controller do
         end
       end
     end
-  end
-
-  def build_offenders
-    today_plus_10_days = (Time.zone.today + 10.days).to_s
-    today_plus_13_weeks = (Time.zone.today + 13.weeks).to_s
-
-    [
-    build(:nomis_offender,
-          offenderNo: "G7514GW",
-          imprisonmentStatus: "LR",
-          lastName: 'SMITH',
-          sentence: attributes_for(:sentence_detail, sentenceStartDate: "2011-01-20")),
-    build(:nomis_offender, offenderNo: "G1234GY", imprisonmentStatus: "LIFE",
-          lastName: 'Minate-Offender',
-          sentence: attributes_for(:sentence_detail,
-                                   sentenceStartDate: "2009-02-08",
-                                   automaticReleaseDate: "2011-01-28")),
-    build(:nomis_offender, offenderNo: "G1234VV",
-          lastName: 'JONES',
-          sentence: attributes_for(:sentence_detail,
-                                   sentenceStartDate: "2019-02-08",
-                                   automaticReleaseDate: today_plus_13_weeks)),
-    build(:nomis_offender, offenderNo: "G4234GG",
-          imprisonmentStatus: "SENT03",
-          firstName: "Fourth", lastName: "Offender",
-          sentence: attributes_for(:sentence_detail,
-                                   automaticReleaseDate: today_plus_10_days,
-                                   homeDetentionCurfewActualDate: today_plus_10_days,
-                                   sentenceStartDate: "2019-02-08",
-                                   ))
-    ]
   end
 end
