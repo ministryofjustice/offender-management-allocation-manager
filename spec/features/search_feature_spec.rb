@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 feature 'Search for offenders' do
+  let(:prison) { 'LEI' }
+
   context 'with stubs' do
     before do
       stub_auth_token
@@ -14,7 +16,6 @@ feature 'Search for offenders' do
     let(:username) { 'MOIC_POM' }
     let(:nomis_staff_id) { 143_876 }
     let(:nomis_offender) { build(:nomis_offender) }
-    let(:prison) { 'LEI' }
     let(:nomis_offender_id) { nomis_offender.fetch(:offenderNo) }
 
     context 'with delius import on' do
