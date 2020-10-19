@@ -6,6 +6,6 @@ class LocalDivisionalUnit < ApplicationRecord
   validates :name, presence: true
   validates :code, presence: true, uniqueness: true, format: { with: Team::TEAM_LDU_CODE_REGEX }
 
-  scope :without_email_address, -> { where(email_address: nil) }
-  scope :with_email_address, -> { where.not(email_address: nil) }
+  scope :without_email_address, -> { where(email_address: nil).or(where(email_address: '')) }
+  scope :with_email_address, -> { where.not(email_address: nil).where.not(email_address: '') }
 end
