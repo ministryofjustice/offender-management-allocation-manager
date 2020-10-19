@@ -9,6 +9,30 @@ RSpec.describe LocalDivisionalUnit, type: :model do
     expect(subject).not_to validate_presence_of :email_address
   }
 
+  context 'with and without emails' do
+    before do
+      create(:local_divisional_unit, email_address: nil)
+      create(:local_divisional_unit, email_address: '')
+      create(:local_divisional_unit, email_address: 'test@example.com')
+    end
+
+    describe '#with_email_address' do
+      let(:expected) { described_class.last }
+
+      it 'returns just the filled-in version' do
+        expect(described_class.with_email_address.to_a).to eq([expected])
+      end
+    end
+
+    describe '#without_email_address' do
+      let(:expected) { described_class.first(2) }
+
+      it 'returns just the filled-in version' do
+        expect(described_class.without_email_address.to_a).to match_array(expected)
+      end
+    end
+  end
+
   describe '#code' do
     let(:ldu) { build(:local_divisional_unit, code: code) }
 
