@@ -4,8 +4,8 @@ require "rails_helper"
 
 feature "view an offender's allocation information", :versioning do
   let!(:probation_officer_nomis_staff_id) { 485_636 }
-  let!(:nomis_offender_id_with_keyworker) { 'G4273GI' }
-  let!(:nomis_offender_id_without_keyworker) { 'G9403UP' }
+  let!(:nomis_offender_id_with_keyworker) { 'G3462VT' }
+  let!(:nomis_offender_id_without_keyworker) { 'G8859UP' }
   let!(:allocated_at_tier) { 'A' }
   let!(:prison) { 'LEI' }
   let!(:recommended_pom_type) { 'probation' }
@@ -40,7 +40,7 @@ feature "view an offender's allocation information", :versioning do
       expect(page).to have_css('h1', text: 'Allocation information')
 
       # Prisoner
-      expect(page).to have_css('.govuk-table__cell', text: 'Albina, Obinins')
+      expect(page).to have_css('.govuk-table__cell', text: "Alfew, Ef'Liaico")
       # Pom
       expect(page).to have_css('.govuk-table__cell', text: 'Duckett, Jenny')
       # Keyworker
@@ -130,7 +130,7 @@ feature "view an offender's allocation information", :versioning do
       expect(page).to have_css('h1', text: 'Allocation information')
 
       # Prisoner
-      expect(page).to have_css('.govuk-table__cell', text: 'Abbella, Ozullirn')
+      expect(page).to have_css('.govuk-table__cell', text: 'Abelia, Boppreophe')
       # Pom
       expect(page).to have_css('.govuk-table__cell', text: 'Duckett, Jenny')
       # Keyworker
@@ -140,7 +140,7 @@ feature "view an offender's allocation information", :versioning do
     it "displays a link to the prisoner's New Nomis profile", vcr: { cassette_name: :show_allocation_information_new_nomis_profile } do
       expect(page).to have_css('.govuk-table__cell', text: 'View NOMIS profile')
       expect(find_link('View NOMIS profile')[:target]).to eq('_blank')
-      expect(find_link('View NOMIS profile')[:href]).to include('offenders/G4273GI/quick-look')
+      expect(find_link('View NOMIS profile')[:href]).to include("offenders/#{nomis_offender_id_with_keyworker}/quick-look")
     end
 
     it 'displays a link to allocate a co-worker', vcr: { cassette_name: :show_allocation_information_display_coworker_link } do
