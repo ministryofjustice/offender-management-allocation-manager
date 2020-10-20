@@ -41,7 +41,7 @@ describe HmppsApi::CommunityApi do
     end
   end
 
-  describe '.delete_pom' do
+  describe '.unset_pom' do
     describe 'when pom name is nil' do
       let(:stub_url) { "#{api_host}/secure/offenders/nomsNumber/#{offender_no}/prisonOffenderManager" }
 
