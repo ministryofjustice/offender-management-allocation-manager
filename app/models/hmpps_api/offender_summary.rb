@@ -14,6 +14,10 @@ module HmppsApi
       (Time.zone.today - prison_arrival_date.to_date).to_i
     end
 
+    def case_owner
+      pom_responsibility.case_owner
+    end
+
     def self.from_json(payload)
       OffenderSummary.new.tap { |obj|
         obj.load_from_json(payload)
