@@ -7,7 +7,6 @@ RSpec.describe PushPomToDeliusJob, :allocation, type: :job, versioning: true do
 
   before do
     stub_auth_token
-    stub_community_set_pom(offender)
     stub_pom(pom)
   end
 

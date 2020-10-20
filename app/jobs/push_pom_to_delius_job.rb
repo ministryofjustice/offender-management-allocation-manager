@@ -4,12 +4,13 @@ class PushPomToDeliusJob < ApplicationJob
   queue_as :default
 
   def perform(allocation)
-    # We can't yet 'unset' the allocated POM in nDelius
     if allocation.primary_pom_nomis_id.nil?
       HmppsApi::CommunityApi.unset_pom(allocation.nomis_offender_id)
 
     else
 
+      # The allocation model has formatted pom names ‘firstname, surname’ that PrisonOffenderManagerService
+      # splits up to allow them to be pushed separately.
       pom_firstname, pom_secondname = PrisonOffenderManagerService.get_pom_name(allocation.primary_pom_nomis_id)
 
       HmppsApi::CommunityApi.set_pom(
