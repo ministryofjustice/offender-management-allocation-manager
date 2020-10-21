@@ -67,7 +67,7 @@ module OffenderManagementAllocationClient
     config.zendesk_enabled =
       [config.zendesk_username, config.zendesk_url, config.zendesk_password].all?
 
-    config.cache_expiry = 1.minutes
+    config.cache_expiry = 1.minute
 
     # overriding the normal wrapping in a div with class 'field-with-errors' seems to be
     # neccesary in this project, otherwise Gov Design system check-boxes and radio buttons
