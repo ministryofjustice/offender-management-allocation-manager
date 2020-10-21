@@ -18,7 +18,7 @@ feature "early allocation", type: :feature do
 
     stub_auth_token
     stub_offenders_for_prison(prison, [nomis_offender])
-    stub_offender(nomis_offender)
+    stub_offender(build(:nomis_prisoner, prisonerNumber: nomis_offender_id))
     stub_request(:get, "#{ApiHelper::T3}/users/#{username}").
       to_return(body: { 'staffId': nomis_staff_id }.to_json)
     stub_pom(pom)

@@ -60,7 +60,7 @@ RSpec.describe TasksController, type: :controller do
     end
 
     it 'can show offenders needing parole review date updates' do
-      stub_offender(build(:nomis_offender, offenderNo: offender_no, imprisonmentStatus: 'LIFE'))
+      stub_offender(build(:nomis_prisoner, prisonerNumber: offender_no))
 
       get :index, params: { prison_id: prison }
 
@@ -82,7 +82,7 @@ RSpec.describe TasksController, type: :controller do
     before do
       test_strategy.switch!(:auto_delius_import, true)
 
-      stub_offender(build(:nomis_offender, offenderNo: offender_no))
+      stub_offender(build(:nomis_prisoner, prisonerNumber: offender_no))
 
       # Ensure only one of our offenders has missing data and that G7514GW (indeterminate) has a PRD
       create(:case_information, nomis_offender_id: offender_no, tier: 'A', mappa_level: 1, team: nil)

@@ -4,7 +4,7 @@ class DebuggingController < PrisonsApplicationController
   def debugging
     nomis_offender_id = id
 
-    prisoner = OffenderService.get_offender(nomis_offender_id)
+    prisoner = OffenderService.get_offender(nomis_offender_id) if nomis_offender_id
 
     if prisoner.present?
       @offender = OffenderPresenter.new(prisoner)

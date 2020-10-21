@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe OffenderPresenter do
@@ -13,9 +15,13 @@ RSpec.describe OffenderPresenter do
     end
 
     context 'when a probation POM' do
+      let(:offender) {
+        build(:offender,  :indeterminate).tap { |o|
+          o.load_case_information(build(:case_information, tier: 'A'))
+        }
+      }
+
       it "can get for a probation owned offender" do
-        offender = build(:offender,  :indeterminate)
-        offender.tier = 'A'
         subject = described_class.new(offender)
         expect(subject.complex_reason_label).to eq('Prisoner assessed as suitable for a prison officer POM despite tiering calculation')
       end

@@ -7,17 +7,14 @@ module ApiHelper
   KEYWORKER_API_HOST = ENV.fetch('KEYWORKER_API_HOST')
 
   def stub_offender(offender)
-    booking_number = 1
-    offender_no = offender.fetch(:offenderNo)
+    booking_number = offender.fetch(:bookingId)
+    offender_no = offender.fetch(:prisonerNumber)
     stub_request(:get, "#{T3}/prisoners/#{offender_no}").
       to_return(body: [offender.except(:sentence, :recall).merge('latestBookingId' => booking_number)].to_json)
 
     stub_request(:post, "#{T3_SEARCH}/prisoner-numbers").with(body: { prisonerNumbers: [offender_no] }).
       to_return(body: [
-        {
-          prisonerNumber: offender_no,
-          recall: offender.fetch(:recall)
-        }
+        offender.merge(prisonerNumber: offender_no)
       ].to_json)
 
     stub_request(:post, "#{T3}/offender-sentences/bookings").
@@ -102,13 +99,13 @@ module ApiHelper
         'Page-Offset' => '0'
       }).to_return(body: offenders.zip(booking_ids).map { |o, booking_id| o.except(:sentence, :recall).merge('bookingId' => booking_id, 'agencyId' => prison) }.to_json)
 
-    stub_request(:post, "#{T3_SEARCH}/prisoner-numbers").with(body: { prisonerNumbers: offenders.map { |offender| offender.fetch(:offenderNo) } }.to_json).
-      to_return(body: offenders.map { |offender|
-                        {
-                          prisonerNumber: offender.fetch(:offenderNo),
-                          recall: offender.fetch(:recall)
-                        }
-                      }.to_json)
+    # stub_request(:post, "#{T3_SEARCH}/prisoner-numbers").with(body: { prisonerNumbers: offenders.map { |offender| offender.fetch(:offenderNo) } }.to_json).
+    #   to_return(body: offenders.map { |offender|
+    #                     {
+    #                       prisonerNumber: offender.fetch(:offenderNo),
+    #                       recall: offender.fetch(:recall)
+    #                     }
+    #                   }.to_json)
 
     bookings = booking_ids.zip(offenders).map do |booking_id, offender|
       {

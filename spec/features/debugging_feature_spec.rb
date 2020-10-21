@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature 'Provide debugging information for our team to use' do
+xfeature 'Provide debugging information for our team to use' do
   let(:nomis_offender_id) { "G1670VU" }
 
   context 'when debugging an individual offender' do

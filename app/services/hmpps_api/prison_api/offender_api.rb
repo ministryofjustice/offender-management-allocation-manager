@@ -40,24 +40,19 @@ module HmppsApi
       end
 
       def self.get_offender(offender_no)
-        # Bad NOMIS numbers mustn't produce invalid URLs
-        url_offender_no = URI.encode_www_form_component(offender_no)
-        route = "/prisoners/#{url_offender_no}"
-        response = Rails.cache.fetch(route,
-                                     expires_in: Rails.configuration.cache_expiry) {
-          client.get(route)
-        }
+        get_offenders([offender_no]).first
+      end
 
-        if response.empty?
-          nil
-        else
-          recall_data = get_recall_flags([url_offender_no])
-          api_deserialiser.deserialise(HmppsApi::Offender,
-                                       response.first.merge(recall_data.fetch(url_offender_no))).tap do |offender|
-            sentence_details = get_bulk_sentence_details([offender.booking_id])
-            offender.sentence = sentence_details.fetch(offender.booking_id)
-            add_arrival_dates([offender])
+      def self.get_offenders(offender_no_list)
+        api_deserialiser.deserialise_many(HmppsApi::Prisoner, get_prisoners(offender_no_list)).tap do |list|
+          booking_ids = list.map(&:booking_id)
+          sentence_details = HmppsApi::PrisonApi::OffenderApi.get_bulk_sentence_details(booking_ids)
+
+          list.each do |offender|
+            offender.sentence = sentence_details[offender.booking_id]
           end
+
+          add_arrival_dates(list)
         end
       end
 
@@ -134,13 +129,17 @@ module HmppsApi
     private
 
       def self.get_recall_flags(offender_nos)
+        search_result = get_prisoners(offender_nos).index_by { |prisoner| prisoner.fetch('prisonerNumber') }
+        offender_nos.index_with { |nomis_id| { 'recall' => search_result.fetch(nomis_id, {}).fetch('recall', false) } }
+      end
+
+      def self.get_prisoners(offender_nos)
         search_route = '/prisoner-numbers'
         search_key = "#{search_route}_#{Digest::SHA256.hexdigest(offender_nos.to_s)}"
-        search_result = Rails.cache.fetch(search_key,
-                                          expires_in: Rails.configuration.cache_expiry) {
-                          search_client.post(search_route, prisonerNumbers: offender_nos)
-                        }.index_by { |prisoner| prisoner.fetch('prisonerNumber') }
-        offender_nos.index_with { |nomis_id| { 'recall' => search_result.fetch(nomis_id, {}).fetch('recall', false) } }
+        Rails.cache.fetch(search_key,
+                          expires_in: Rails.configuration.cache_expiry) {
+          search_client.post(search_route, prisonerNumbers: offender_nos)
+        }
       end
 
       def self.paging_headers(page_size, page_offset)

@@ -52,7 +52,7 @@ context 'when NOMIS is missing information' do
 
     describe 'the prisoner page' do
       before do
-        offender = build(:nomis_offender, offenderNo: offender_no,
+        offender = build(:nomis_prisoner, prisonerNumber: offender_no,
                          sentence: attributes_for(:sentence_detail,
                                                   automaticReleaseDate: Time.zone.today + 3.years,
                                                   conditionalReleaseDate: Time.zone.today + 22.months))

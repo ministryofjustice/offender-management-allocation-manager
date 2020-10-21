@@ -214,7 +214,7 @@ private
       to_return(body: { 'staffId': 1 }.to_json)
     stub_pom_emails(1, [])
 
-    stub_offender(build(:nomis_offender, offenderNo: offender_no,
+    stub_offender(build(:nomis_prisoner, prisonerNumber: offender_no,
                         sentence: attributes_for(:sentence_detail,
                                                  sentenceStartDate: sentence_start_date,
                                                  conditionalReleaseDate: conditional_release_date,

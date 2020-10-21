@@ -25,7 +25,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
   before do
     stub_sso_data(prison)
 
-    stub_offender(offender)
+    stub_offender(build(:nomis_prisoner, prisonerNumber: nomis_offender_id))
     stub_poms(prison, poms)
     stub_offenders_for_prison(prison, [offender])
     create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)

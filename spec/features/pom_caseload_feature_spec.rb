@@ -192,27 +192,34 @@ feature "view POM's caseload" do
     end
   end
 
-  it 'allows a POM to view the prisoner profile page for a specific offender' do
-    stub_auth_token
-    signin_pom_user
-    stub_user staff_id: nomis_staff_id
+  context 'with a specific offender' do
+    before do
+      stub_auth_token
+      signin_pom_user
+      stub_user staff_id: nomis_staff_id
 
-    stub_offender(first_offender)
-    stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/LEI/offender/#{first_offender.fetch(:offenderNo)}").
-      to_return(body: { staffId: 485_572, firstName: "DOM", lastName: "BULL" }.to_json)
-    stub_request(:get, "#{ApiHelper::T3}/staff/#{nomis_staff_id}").
-      to_return(body: { staffId: nomis_staff_id, firstName: "TEST", lastName: "MOIC" }.to_json)
-
-    visit prison_staff_caseload_index_path(prison, nomis_staff_id)
-
-    expected_name = "#{first_offender.fetch(:lastName)}, #{first_offender.fetch(:firstName)}"
-
-    within('.offender_row_0') do
-      expect(page).to have_content(expected_name)
-      click_link expected_name
+      stub_offender(offender)
+      stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/LEI/offender/#{offenderNo}").
+        to_return(body: { staffId: 485_572, firstName: "DOM", lastName: "BULL" }.to_json)
+      stub_request(:get, "#{ApiHelper::T3}/staff/#{nomis_staff_id}").
+        to_return(body: { staffId: nomis_staff_id, firstName: "TEST", lastName: "MOIC" }.to_json)
     end
 
-    expect(page).to have_current_path(prison_prisoner_path(prison, first_offender.fetch(:offenderNo)), ignore_query: true)
+    let(:offenderNo) { first_offender.fetch(:offenderNo) }
+    let(:offender) { build(:nomis_prisoner, prisonerNumber: offenderNo) }
+
+    it 'allows a POM to view the prisoner profile page' do
+      visit prison_staff_caseload_index_path(prison, nomis_staff_id)
+
+      expected_name = "#{first_offender.fetch(:lastName)}, #{first_offender.fetch(:firstName)}"
+
+      within('.offender_row_0') do
+        expect(page).to have_content(expected_name)
+        click_link expected_name
+      end
+
+      expect(page).to have_current_path(prison_prisoner_path(prison, offenderNo), ignore_query: true)
+    end
   end
 
   it 'can sort all cases that have been allocated to a specific POM in the last week', :versioning do

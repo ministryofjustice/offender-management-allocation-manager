@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe HmppsApi::OffenderSummary do
@@ -130,8 +132,10 @@ describe HmppsApi::OffenderSummary do
   end
 
   describe '#age' do
+    subject { build(:offender_summary, dateOfBirth: (Time.zone.today - age).to_s) }
+
     context 'with a date of birth 50 years ago' do
-      before { subject.date_of_birth = 50.years.ago }
+      let(:age) { 50.years }
 
       it 'returns 50' do
         expect(subject.age).to eq(50)
@@ -139,7 +143,7 @@ describe HmppsApi::OffenderSummary do
     end
 
     context 'with a date of birth just under 50 years ago' do
-      before { subject.date_of_birth = 50.years.ago + 1.day }
+      let(:age) { 50.years - 1.day }
 
       it 'returns 49' do
         expect(subject.age).to eq(49)
@@ -147,9 +151,9 @@ describe HmppsApi::OffenderSummary do
     end
 
     context 'with an 18th birthday in a past month' do
-      Timecop.travel('19 Feb 2020') do
-        before { subject.date_of_birth = '5 Jan 2002'.to_date }
+      subject { build(:offender_summary, dateOfBirth: '2002-01-05') }
 
+      Timecop.travel('19 Feb 2020') do
         it 'returns 18' do
           expect(subject.age).to eq(18)
         end
@@ -157,7 +161,7 @@ describe HmppsApi::OffenderSummary do
     end
 
     context 'with no date of birth' do
-      before { subject.date_of_birth = nil }
+      subject { build(:offender_summary, dateOfBirth: nil) }
 
       it 'returns nil' do
         expect(subject.age).to be_nil

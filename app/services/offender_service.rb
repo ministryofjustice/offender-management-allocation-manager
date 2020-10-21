@@ -13,7 +13,7 @@ class OffenderService
         o.sentence = sentence_detail[o.booking_id]
       end
 
-      o.category_code = HmppsApi::PrisonApi::OffenderApi.get_category_code(o.offender_no)
+      # o.category_code = HmppsApi::PrisonApi::OffenderApi.get_category_code(o.offender_no)
       o.main_offence = HmppsApi::PrisonApi::OffenderApi.get_offence(o.booking_id)
     }
   end

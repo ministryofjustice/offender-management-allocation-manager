@@ -20,9 +20,9 @@ RSpec.describe DeliusImportJob, type: :job do
                    G4923UI G9577GE G2350UP G0686GT G5235GT G1955VA G7967UD G7142UL
                    G5497GU G3356GT GCA2H2A]
     offenders.each { |offender|
-      stub_offender(build(:nomis_offender, offenderNo: offender))
+      stub_offender(build(:nomis_prisoner, prisonerNumber: offender))
     }
-    stub_offender(build(:nomis_offender, offenderNo: 'mangled+nomis'))
+    stub_offender(build(:nomis_prisoner, prisonerNumber: 'mangled nomis'))
     stub_auth_token
   end
 

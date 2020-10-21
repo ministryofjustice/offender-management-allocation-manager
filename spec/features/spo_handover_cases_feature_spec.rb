@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
-feature "SPO viewing upcoming handover cases" do
+xfeature "SPO viewing upcoming handover cases" do
   let(:prison) { 'LEI' }
 
   context 'when signed in as an SPO', vcr: { cassette_name: :spo_handover_cases_feature } do

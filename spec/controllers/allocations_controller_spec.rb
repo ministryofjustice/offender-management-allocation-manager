@@ -35,7 +35,7 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
   context 'when user is an SPO' do
     before do
       stub_sso_data(prison)
-      stub_offender(build(:nomis_offender, offenderNo: offender_no))
+      stub_offender(build(:nomis_prisoner, prisonerNumber: offender_no))
     end
 
     describe '#show' do
@@ -207,7 +207,7 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
       let(:offender) { build(:nomis_offender, offenderNo: offender_no) }
 
       before do
-        stub_offender(offender)
+        stub_offender(build(:nomis_prisoner, prisonerNumber: offender_no))
         stub_offenders_for_prison(prison, [offender])
       end
 

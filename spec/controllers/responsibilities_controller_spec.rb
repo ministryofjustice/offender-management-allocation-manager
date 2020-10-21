@@ -13,7 +13,7 @@ RSpec.describe ResponsibilitiesController, type: :controller do
   let(:offender) { CaseInformation.last }
   let(:responsibility) { Responsibility.last }
   let(:prison) { build(:prison) }
-  let(:nomis_offender) { build(:nomis_offender, offenderNo: offender.nomis_offender_id) }
+  let(:nomis_offender) { build(:nomis_prisoner, prisonerNumber: offender.nomis_offender_id) }
   let(:reason) { 'Just because' }
   let(:sso_email_address) { Faker::Internet.email }
 

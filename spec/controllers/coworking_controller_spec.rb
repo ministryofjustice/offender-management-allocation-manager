@@ -9,7 +9,7 @@ RSpec.describe CoworkingController, type: :controller do
 
   before do
     stub_sso_data(prison)
-    stub_offender(offender)
+    stub_offender(build(:nomis_prisoner, prisonerNumber: offender_no, lastName: offender.fetch(:lastName), firstName: offender.fetch(:firstName)))
     stub_poms(prison, [primary_pom, new_secondary_pom])
     stub_offenders_for_prison(prison, [offender])
   end

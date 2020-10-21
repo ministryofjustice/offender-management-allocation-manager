@@ -45,9 +45,8 @@ describe HmppsApi::PrisonApi::OffenderApi do
     describe '#get_offender' do
       subject { described_class.get_offender(offender_no) }
 
-      let(:offender) { build(:nomis_offender, recall: true) }
-      let(:offender_no) { offender.fetch(:offenderNo) }
-
+      let(:offender) { build(:nomis_prisoner, recall: true) }
+      let(:offender_no) { offender.fetch(:prisonerNumber) }
 
       before do
         stub_auth_token
@@ -56,19 +55,8 @@ describe HmppsApi::PrisonApi::OffenderApi do
 
       context 'when offender search succeeds' do
         it "can get a single offender's details including recall flag" do
-          expect(subject).to be_instance_of(HmppsApi::Offender)
+          expect(subject).to be_instance_of(HmppsApi::Prisoner)
           expect(subject.recalled?).to eq(true)
-        end
-      end
-
-      context 'when offender search fails' do
-        before do
-          stub_request(:post, "#{ApiHelper::T3_SEARCH}/prisoner-numbers").with(body: { prisonerNumbers: [offender_no] }).
-            to_return(body: [].to_json)
-        end
-
-        it "defaults the recall flag to false" do
-          expect(subject.recalled?).to eq(false)
         end
       end
     end
