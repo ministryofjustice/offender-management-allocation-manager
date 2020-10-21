@@ -350,15 +350,13 @@ workflows:
               only:
                 - main
                 - preproduction
-                - cache-timeout-1-minute
       - deploy_staging:
           requires:
             - build_and_push_docker_image
           filters:
             branches:
               only:
-                - main
-                - cache-timeout-1-minute
+                main
       - test_staging:
           requires:
             - build_and_push_docker_image
