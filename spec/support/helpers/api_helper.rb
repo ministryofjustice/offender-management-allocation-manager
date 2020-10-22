@@ -7,7 +7,7 @@ module ApiHelper
   KEYWORKER_API_HOST = ENV.fetch('KEYWORKER_API_HOST')
 
   def stub_offender(offender)
-    booking_number = 1
+    booking_number = offender.fetch(:bookingId)
     offender_no = offender.fetch(:offenderNo)
     stub_request(:get, "#{T3}/prisoners/#{offender_no}").
       to_return(body: [offender.except(:sentence, :recall).merge('latestBookingId' => booking_number)].to_json)
