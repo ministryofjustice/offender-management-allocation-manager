@@ -11,7 +11,7 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-one-quarter">
     <p class="govuk-data-value">
-      <%= @summary.allocated.count %>
+      <%= @summary.allocated_total %>
     </p>
     <p class="govuk-data-label">
       Allocated offenders
@@ -20,7 +20,7 @@
 
   <div class="govuk-grid-column-one-quarter">
     <p class="govuk-data-value">
-      <%= @summary.unallocated.count %>
+      <%= @summary.unallocated_total %>
     </p>
     <p class="govuk-data-label">
       Awaiting allocation
@@ -29,7 +29,7 @@
 
   <div class="govuk-grid-column-one-quarter">
     <p class="govuk-data-value">
-      <%=  @summary.pending.count %>
+      <%=  @summary.pending_total %>
     </p>
     <p class="govuk-data-label">
       With missing information
