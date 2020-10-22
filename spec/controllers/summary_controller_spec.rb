@@ -8,36 +8,35 @@ RSpec.describe SummaryController, type: :controller do
   before { stub_sso_data(prison) }
 
   context 'with 4 offenders' do
-    let(:today_plus_10) { (Time.zone.today + 10.days).to_s }
+    let(:today_plus_10_days) { (Time.zone.today + 10.days).to_s }
     let(:today_plus_13_weeks) { (Time.zone.today + 13.weeks).to_s }
 
     before do
       offenders = [
-        build(:nomis_offender,
-              offenderNo: "G7514GW",
-              imprisonmentStatus: "LR",
-              lastName: 'SMITH',
-              sentence: attributes_for(:sentence_detail, sentenceStartDate: "2011-01-20")),
-        build(:nomis_offender, offenderNo: "G1234GY", imprisonmentStatus: "LIFE",
-              lastName: 'Minate-Offender',
-              sentence: attributes_for(:sentence_detail,
-                                       sentenceStartDate: "2009-02-08",
-                                       automaticReleaseDate: "2011-01-28")),
-        build(:nomis_offender, offenderNo: "G1234VV",
-              lastName: 'JONES',
-              sentence: attributes_for(:sentence_detail,
-                                       sentenceStartDate: "2019-02-08",
-                                       automaticReleaseDate: today_plus_13_weeks)),
-        build(:nomis_offender, offenderNo: "G4234GG",
-              imprisonmentStatus: "SENT03",
-              firstName: "Fourth", lastName: "Offender",
-              sentence: attributes_for(:sentence_detail,
-                                       automaticReleaseDate: today_plus_10,
-                                       homeDetentionCurfewActualDate: today_plus_10,
-                                       sentenceStartDate: "2019-02-08",
-              ))
+      build(:nomis_offender,
+            offenderNo: "G7514GW",
+            imprisonmentStatus: "LR",
+            lastName: 'SMITH',
+            sentence: attributes_for(:sentence_detail, sentenceStartDate: "2011-01-20")),
+      build(:nomis_offender, offenderNo: "G1234GY", imprisonmentStatus: "LIFE",
+            lastName: 'Minate-Offender',
+            sentence: attributes_for(:sentence_detail,
+                                     sentenceStartDate: "2009-02-08",
+                                     automaticReleaseDate: "2011-01-28")),
+      build(:nomis_offender, offenderNo: "G1234VV",
+            lastName: 'JONES',
+            sentence: attributes_for(:sentence_detail,
+                                     sentenceStartDate: "2019-02-08",
+                                     automaticReleaseDate: today_plus_13_weeks)),
+      build(:nomis_offender, offenderNo: "G4234GG",
+            imprisonmentStatus: "SENT03",
+            firstName: "Fourth", lastName: "Offender",
+            sentence: attributes_for(:sentence_detail,
+                                     automaticReleaseDate: today_plus_10_days,
+                                     homeDetentionCurfewActualDate: today_plus_10_days,
+                                     sentenceStartDate: "2019-02-08",
+                                     ))
       ]
-
       create(:case_information, case_allocation: 'NPS', nomis_offender_id: 'G4234GG')
 
       stub_offenders_for_prison(prison, offenders)
@@ -165,26 +164,72 @@ RSpec.describe SummaryController, type: :controller do
   end
 
   context 'when sorting' do
-    let(:prison) { 'BXI' }
+    context 'with allocated offenders' do
+      let(:prison) { 'BXI' }
 
-    it 'handles trying to sort by missing field for allocated offenders' do
-      # Allocated offenders do have to have their prison_arrival_date even if they don't use it
-      # because we now need it to calculate the totals.
-      stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN").
+      it 'handles trying to sort by missing field for allocated offenders' do
+        # Allocated offenders do have to have their prison_arrival_date even if they don't use it
+        # because we now need it to calculate the totals.
+        stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN").
         to_return(body: [].to_json)
 
-      # When viewing allocated, cannot sort by awaiting_allocation_for as it is not available and is
-      # meaningless in this context. We do not want to crash if passed a field that is not searchable
-      # within a specific context.
-      offender_id = 'G7514GW'
-      offenders = [build(:nomis_offender, offenderNo: offender_id)]
-      stub_offenders_for_prison(prison, offenders)
+        # When viewing allocated, cannot sort by awaiting_allocation_for as it is not available and is
+        # meaningless in this context. We do not want to crash if passed a field that is not searchable
+        # within a specific context.
+        offender_id = 'G7514GW'
+        offenders = [build(:nomis_offender, offenderNo: offender_id)]
+        stub_offenders_for_prison(prison, offenders)
 
-      create(:case_information, nomis_offender_id: offender_id)
-      create(:allocation, nomis_offender_id: offender_id, primary_pom_nomis_id: 234, prison: prison)
+        create(:case_information, nomis_offender_id: offender_id)
+        create(:allocation, nomis_offender_id: offender_id, primary_pom_nomis_id: 234, prison: prison)
 
-      get :allocated, params: { prison_id: prison, sort: 'awaiting_allocation_for asc' }
-      expect(assigns(:offenders).count).to eq(1)
+        get :allocated, params: { prison_id: prison, sort: 'awaiting_allocation_for asc' }
+        expect(assigns(:offenders).count).to eq(1)
+      end
+    end
+
+    context 'with unallocated offenders' do
+      let(:today_plus_13_weeks) { (Time.zone.today + 13.weeks).to_s }
+      let(:today_plus_7_weeks) { (Time.zone.today + 7.weeks).to_s }
+
+      let(:offenders) do
+        [
+
+        build(:nomis_offender, offenderNo: "G7514GW", imprisonmentStatus: "LR"), # custody case
+        build(:nomis_offender, offenderNo: "G1234VV", imprisonmentStatus: "SENT03",
+              sentence: attributes_for(:sentence_detail, conditionalReleaseDate: today_plus_7_weeks)), # community case
+        build(:nomis_offender, offenderNo: "G4234GG", imprisonmentStatus: "SENT03"), # custody case
+        build(:nomis_offender, offenderNo: "G1234GY", imprisonmentStatus: "SENT03",
+              sentence: attributes_for(:sentence_detail, sentenceStartDate: "2019-02-08",
+                                       automaticReleaseDate: today_plus_13_weeks)) # community case
+        ]
+      end
+
+      before do
+        stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN").
+        to_return(body: [].to_json)
+
+        offenders.each do |offender|
+          create(:case_information, nomis_offender_id: offender[:offenderNo])
+        end
+      end
+
+      it 'can sort by case_owner in ascending order' do
+        stub_offenders_for_prison(prison, offenders)
+
+        get :unallocated, params: { prison_id: prison, sort: 'case_owner asc' }
+
+        expect(assigns(:offenders).first.pom_responsibility.case_owner).to eq('Community')
+        expect(assigns(:offenders).last.pom_responsibility.case_owner).to eq('Custody')
+      end
+
+      it 'can sort by case owner in descending order' do
+        stub_offenders_for_prison(prison, offenders)
+
+        get :unallocated, params: { prison_id: prison, sort: 'case_owner desc' }
+        expect(assigns(:offenders).first.pom_responsibility.case_owner).to eq('Custody')
+        expect(assigns(:offenders).last.pom_responsibility.case_owner).to eq('Community')
+      end
     end
   end
 

@@ -11,11 +11,7 @@ FactoryBot.define do
     # 1 day after policy start in Wales
     sentenceStartDate { '2019-02-05' }
     releaseDate { "2021-01-28" }
-    automaticReleaseDate { "2022-01-28" }
-    postRecallReleaseDate { "2021-01-28" }
     conditionalReleaseDate { "2022-01-28" }
-    actualParoleDate { "2021-01-28" }
-    licenceExpiryDate { "2021-01-28" }
 
     trait :welsh_policy_sentence do
       sentenceStartDate { '2019-02-05' }

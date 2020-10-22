@@ -44,7 +44,12 @@
         </a>
         <%= sort_arrow('earliest_release_date') %>
       </th>
-      <th class="govuk-table__header sorter-false" scope="col">Case owner</th>
+      <th class="govuk-table__header sorter-false" scope="col">
+        <a href="<%= sort_link('case_owner') %>">
+          Case owner
+        </a>
+        <%= sort_arrow('case_owner') %>
+      </th>
       <th class="govuk-table__header sorter-false" scope="col">
         <a href="<%= sort_link('awaiting_allocation_for') %>">
           Waiting

@@ -91,7 +91,7 @@ private
   end
 
   def self.default_sortable_fields
-    [:last_name, :earliest_release_date, :awaiting_allocation_for, :tier]
+    [:last_name, :earliest_release_date, :case_owner, :awaiting_allocation_for, :tier]
   end
 
   def self.add_allocated_poms_and_coms(offenders, active_allocations_hash)

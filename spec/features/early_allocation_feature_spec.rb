@@ -2,21 +2,32 @@
 
 require 'rails_helper'
 
-feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocations } do
+feature "early allocation", type: :feature do
   let(:nomis_staff_id) { 485_926 }
-  # This booking id is the latest one for the offender in T3
-  let(:nomis_offender_id) { 'G4273GI' }
-  let(:booking_id) { 1_153_753 }
   # any date less than 3 months
   let(:valid_date) { Time.zone.today - 2.months }
   let(:prison) { 'LEI' }
+  let(:username) { 'MOIC_POM' }
+  let(:nomis_offender) { build(:nomis_offender) }
+  let(:nomis_offender_id) { nomis_offender.fetch(:offenderNo) }
+  let(:pom) { build(:pom, staffId: nomis_staff_id) }
 
   before do
     create(:case_information, nomis_offender_id: nomis_offender_id)
-    create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id, nomis_booking_id: booking_id)
+    create(:allocation, prison: prison, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
+
+    stub_auth_token
+    stub_offenders_for_prison(prison, [nomis_offender])
+    stub_offender(nomis_offender)
+    stub_request(:get, "#{ApiHelper::T3}/users/#{username}").
+      to_return(body: { 'staffId': nomis_staff_id }.to_json)
+    stub_pom(pom)
+    stub_poms(prison, [pom])
+    stub_pom_emails(nomis_staff_id, [])
+    stub_keyworker(prison, nomis_offender_id, build(:keyworker))
 
     signin_pom_user
-    signin_spo_user
+    # signin_spo_user
 
     visit prison_staff_caseload_index_path(prison, nomis_staff_id)
 
@@ -26,7 +37,7 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
 
   context 'without switch' do
     it 'does not show the section' do
-      click_link 'Abbella, Ozullirn'
+      click_link "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}"
       expect(page).not_to have_content 'Early allocation eligibility'
     end
   end
@@ -44,7 +55,7 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
 
     context 'without existing early allocation' do
       before do
-        click_link 'Abbella, Ozullirn'
+        click_link "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}"
         expect(page).to have_content 'Early allocation eligibility'
         click_link 'Assess eligibility'
       end
@@ -87,7 +98,7 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
         # selecting any one of these as 'Yes' means that we progress to assessment complete (Yes)
         expect(page).to have_text('The community probation team will take responsibility')
         click_link 'Save completed assessment (pdf)'
-        expect(page).to have_current_path('/prisons/LEI/prisoners/G4273GI/early_allocation.pdf')
+        expect(page).to have_current_path("/prisons/#{prison}/prisoners/#{nomis_offender_id}/early_allocation.pdf")
       end
 
       context 'with stage 2 questions' do
@@ -140,7 +151,7 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
 
           scenario 'saving the PDF' do
             click_link 'Save completed assessment (pdf)'
-            expect(page).to have_current_path('/prisons/LEI/prisoners/G4273GI/early_allocation.pdf')
+            expect(page).to have_current_path("/prisons/#{prison}/prisoners/#{nomis_offender_id}/early_allocation.pdf")
           end
 
           scenario 'completing the journey' do
@@ -174,7 +185,7 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
           click_button 'Continue'
           expect(page).to have_text 'Not eligible for early allocation'
           click_link 'Save completed assessment (pdf)'
-          expect(page).to have_current_path('/prisons/LEI/prisoners/G4273GI/early_allocation.pdf')
+          expect(page).to have_current_path("/prisons/#{prison}/prisoners/#{nomis_offender_id}/early_allocation.pdf")
         end
       end
     end
@@ -184,7 +195,7 @@ feature "early allocation", type: :feature, vcr: { cassette_name: :early_allocat
         create(:early_allocation, :discretionary,
                nomis_offender_id: nomis_offender_id,
                community_decision: true)
-        click_link 'Abbella, Ozullirn'
+        click_link "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}"
       end
 
       it 'has a re-assess link' do
