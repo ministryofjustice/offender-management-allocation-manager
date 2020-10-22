@@ -105,6 +105,19 @@ references:
         tar -zxvf geckodriver-v0.23.0-linux64.tar.gz
         sudo mv geckodriver /usr/local/bin/
 
+  install_geckodriver: &install_geckodriver
+    run:
+      name: install geckodriver
+      command: |
+        if [ `which geckodriver` ]
+        then
+           geckodriver --version
+        else
+          wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
+          tar -zxvf geckodriver-v0.24.0-linux64.tar.gz
+          mv geckodriver ~/.local/bin
+        fi
+
   restore_cache: &restore_cache
     restore_cache:
       keys:
@@ -144,6 +157,7 @@ jobs:
           command: |
             sudo apt update && sudo apt install cmake
       - checkout
+      - *install_geckodriver
       - attach_workspace:
           at: ~/repo
       - run:
@@ -151,8 +165,8 @@ jobs:
           command: bundle -v
       - restore_cache:
           keys:
-            - allocation-manager-v2-{{ checksum "Gemfile.lock" }}
-            - allocation-manager-v2-
+            - allocation-manager-v3-{{ checksum "Gemfile.lock" }}
+            - allocation-manager-v3-
       - run:
           name: Install frontend modules
           command: yarn install
@@ -189,7 +203,7 @@ jobs:
               chmod +x ~/.local/bin/cc-test-reporter
             fi
       - save_cache:
-          key: allocation-manager-v2-{{ checksum "Gemfile.lock" }}
+          key: allocation-manager-v3-{{ checksum "Gemfile.lock" }}
           paths:
             - ~/repo/vendor/bundle
             - ~/.local/bin
@@ -225,7 +239,6 @@ jobs:
             bundle exec rake parallel:spec
             cc-test-reporter after-build --coverage-input-type lcov --exit-code $?
           environment:
-            UNDERCOVER: 1
             ALLOCATION_MANAGER_HOST: https://allocation-manager-staging.apps.live-1.cloud-platform.service.justice.gov.uk
             RAILS_ENV: test
             RACK_ENV: test

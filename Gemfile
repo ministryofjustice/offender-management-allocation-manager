@@ -64,7 +64,6 @@ group :test do
   gem 'capybara'
   gem 'database_cleaner'
   gem 'faker'
-  gem 'geckodriver-helper'
   gem 'launchy'
   gem 'rails-controller-testing'
   gem 'ruby-prof', '>= 0.16.0', require: false
@@ -87,6 +86,9 @@ group :development do
   gem 'flamegraph'
   gem 'listen', '>= 3.0.5', '< 3.2'
   gem 'memory_profiler'
+  # prevent warnings from parser as we are using ruby 2.6.3
+  # change this when upgrading ruby version
+  gem 'parser', '< 2.6.4'
   gem 'rack-mini-profiler'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'stackprof'
