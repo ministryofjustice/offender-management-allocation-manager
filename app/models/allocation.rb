@@ -15,7 +15,6 @@ class Allocation < ApplicationRecord
   OFFENDER_TRANSFERRED = 1
   OFFENDER_RELEASED = 2
 
-  before_save :check_push
   after_commit :push_pom_to_community_api
 
   # When adding a new 'event' or 'event trigger'
@@ -163,18 +162,8 @@ private
     PomMailer.offender_deallocated(mail_params).deliver_later
   end
 
-  # The push to PushPomToDeliusJob has to be done in two pieces because it is not possible
-  # to check if the primary_pom_nomis_id has changed once it has been saved into the data base.
-  # Therefore check_push checks for changes and push_pom_to_community_api queues these changes
-  # in the job once they have been saved in the database.
-  def check_push
-    if primary_pom_nomis_id_changed?
-      @do_push = true
-    end
-  end
-
   def push_pom_to_community_api
-    if @do_push
+    if saved_change_to_primary_pom_nomis_id?
       PushPomToDeliusJob.perform_later(self)
     end
   end
