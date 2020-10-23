@@ -24,6 +24,16 @@ class CaseInformation < ApplicationRecord
           inverse_of: :case_information,
           dependent: :destroy
 
+  # This is quite a loose relationship. It exists so that CaseInformation
+  # deletes cascade and tidy up associated CalculatedHandoverDate records.
+  # Ideally CalculatedHandoverDate would belong to a higher-level
+  # Offender model rather than nDelius Case Information
+  has_one :calculated_handover_date,
+          foreign_key: :nomis_offender_id,
+          primary_key: :nomis_offender_id,
+          inverse_of: :case_information,
+          dependent: :destroy
+
   before_validation :set_probation_service
 
   def local_divisional_unit

@@ -41,6 +41,16 @@ ActiveRecord::Schema.define(version: 2020_11_26_123414) do
     t.index ["secondary_pom_nomis_id"], name: "index_allocation_versions_secondary_pom_nomis_id"
   end
 
+  create_table "calculated_handover_dates", force: :cascade do |t|
+    t.date "start_date"
+    t.date "handover_date"
+    t.string "reason", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "nomis_offender_id", null: false
+    t.index ["nomis_offender_id"], name: "index_calculated_handover_dates_on_nomis_offender_id", unique: true
+  end
+
   create_table "case_information", force: :cascade do |t|
     t.string "tier"
     t.string "case_allocation"
@@ -218,4 +228,5 @@ ActiveRecord::Schema.define(version: 2020_11_26_123414) do
     t.index ["case_information_id"], name: "index_victim_liaison_officers_on_case_information_id"
   end
 
+  add_foreign_key "calculated_handover_dates", "case_information", column: "nomis_offender_id", primary_key: "nomis_offender_id", on_update: :cascade, on_delete: :cascade
 end
