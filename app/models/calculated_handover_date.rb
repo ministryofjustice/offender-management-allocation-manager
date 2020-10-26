@@ -12,4 +12,13 @@ class CalculatedHandoverDate < ApplicationRecord
 
   validates :nomis_offender_id, uniqueness: true, presence: true
   validates :reason, presence: true
+
+  def self.recalculate_for(offender)
+    record = self.find_or_initialize_by(nomis_offender_id: offender.offender_no)
+    record.update!(
+      start_date: offender.handover_start_date,
+      handover_date: offender.responsibility_handover_date,
+      reason: offender.handover_reason
+    )
+  end
 end
