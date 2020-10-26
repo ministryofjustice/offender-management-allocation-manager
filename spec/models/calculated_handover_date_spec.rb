@@ -3,6 +3,12 @@ require 'rails_helper'
 RSpec.describe CalculatedHandoverDate, type: :model do
   subject { build(:calculated_handover_date) }
 
+  let(:today) { Time.zone.today }
+
+  before do
+    allow(HmppsApi::CommunityApi).to receive(:set_handover_dates)
+  end
+
   describe 'validation' do
     it { is_expected.to validate_presence_of(:nomis_offender_id) }
     it { is_expected.to validate_uniqueness_of(:nomis_offender_id) }
@@ -78,7 +84,7 @@ RSpec.describe CalculatedHandoverDate, type: :model do
       end
 
       describe 'when the dates have changed' do
-        let(:existing_start_date) { Time.zone.today + 1.week }
+        let(:existing_start_date) { today + 1.week }
         let(:existing_handover_date) { existing_start_date + 7.months }
         let(:existing_reason) { 'CRC Case' }
 
@@ -107,6 +113,49 @@ RSpec.describe CalculatedHandoverDate, type: :model do
           new_updated_at = existing_record.reload.updated_at
           expect(new_updated_at).to eq(old_updated_at)
         end
+      end
+    end
+  end
+
+  describe 'after save' do
+    subject {
+      create(:calculated_handover_date,
+             start_date: today + 1.day,
+             handover_date: today + 3.months,
+             reason: 'CRC Case'
+      )
+    }
+
+    describe 'when the dates have changed' do
+      before do
+        # Change the handover dates
+        subject.assign_attributes(
+          start_date: today + 6.months,
+          handover_date: today + 13.months,
+          reason: 'NPS - MAPPA level unknown'
+        )
+      end
+
+      it 'pushes them to nDelius' do
+        expect(subject.changed?).to be(true)
+        expect(HmppsApi::CommunityApi).to receive(:set_handover_dates).with(
+          offender_no: subject.nomis_offender_id,
+          handover_start_date: subject.start_date,
+          responsibility_handover_date: subject.handover_date
+        )
+        subject.save!
+      end
+    end
+
+    describe "when the dates haven't changed" do
+      before do
+        # Change the reason, but not the dates
+        subject.reason = 'NPS - MAPPA level unknown'
+      end
+
+      it "doesn't push to nDelius" do
+        expect(HmppsApi::CommunityApi).not_to receive(:set_handover_dates)
+        subject.save!
       end
     end
   end
