@@ -84,7 +84,7 @@ group :development do
   gem 'better_errors'
   gem 'binding_of_caller'
   gem 'flamegraph'
-  gem 'listen', '>= 3.0.5', '< 3.2'
+  gem 'listen', '>= 3.0.5', '< 3.3'
   gem 'memory_profiler'
   # prevent warnings from parser as we are using ruby 2.6.3
   # change this when upgrading ruby version
