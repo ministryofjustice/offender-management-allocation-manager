@@ -36,3 +36,4 @@
 # Ignore VIM swap files
 *.swp
 *.swo
+/Brewfile.lock.json
