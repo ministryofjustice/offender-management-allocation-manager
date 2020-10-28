@@ -64,62 +64,36 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
       context 'with a normal COM name' do
         let(:com_name) { 'Bob Smith' }
 
-        it 'does not update if no allocation' do
-          alloc = Allocation.find_by(nomis_offender_id: offender_id)
-          expect(alloc).to be_nil
-
+        it 'shows com name' do
           expect {
             described_class.perform_now d1.noms_no
           }.to change(CaseInformation, :count).by(1)
 
-          alloc = Allocation.find_by(nomis_offender_id: offender_id)
-          expect(alloc).to be_nil
-        end
-
-        context 'with allocation' do
-          before do
-            create(:allocation, nomis_offender_id: d1.noms_no, com_name: 'Fred Bloigs')
-          end
-
-          let!(:allocation) { Allocation.find_by!(nomis_offender_id: d1.noms_no) }
-
-          it 'updates existing allocation without new version' do
-            expect(allocation.version).to be_nil
-
-            expect {
-              described_class.perform_now d1.noms_no
-            }.to change(CaseInformation, :count).by(1)
-
-            allocation.reload
-            expect(allocation.version).to be_nil
-            expect(allocation.com_name).to eq(com_name)
-          end
+          expect(CaseInformation.last.com_name).to eq(com_name)
         end
       end
 
       context 'with an unallocated com name' do
         let(:com_name) { 'Staff, Unallocated' }
 
-        before do
-          create(:allocation, nomis_offender_id: d1.noms_no, com_name: 'Fred Bloigs')
-        end
-
         it 'maps com_name to nil' do
-          described_class.perform_now d1.noms_no
-          expect(Allocation.find_by(nomis_offender_id: d1.noms_no).com_name).to be_nil
+          expect {
+            described_class.perform_now d1.noms_no
+          }.to change(CaseInformation, :count).by(1)
+
+          expect(CaseInformation.last.com_name).to be_nil
         end
       end
 
       context 'with an inactive com name' do
         let(:com_name) { 'Staff, Inactive Staff(N07)' }
 
-        before do
-          create(:allocation, nomis_offender_id: d1.noms_no, com_name: 'Fred Bloigs')
-        end
-
         it 'maps com_name to nil' do
-          described_class.perform_now d1.noms_no
-          expect(Allocation.find_by(nomis_offender_id: d1.noms_no).com_name).to be_nil
+          expect {
+            described_class.perform_now d1.noms_no
+          }.to change(CaseInformation, :count).by(1)
+
+          expect(CaseInformation.last.com_name).to be_nil
         end
       end
     end

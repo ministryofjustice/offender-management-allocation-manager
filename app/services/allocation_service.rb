@@ -45,8 +45,7 @@ class AllocationService
     params_copy = params.merge(
       primary_pom_name: "#{pom_secondname}, #{pom_firstname}",
       created_by_name: "#{user_firstname} #{user_secondname}",
-      primary_pom_allocated_at: DateTime.now.utc,
-      com_name: delius_com_name(params[:nomis_offender_id])
+      primary_pom_allocated_at: DateTime.now.utc
     )
 
     # When we look up the current allocation, we only do this for the current
@@ -120,10 +119,6 @@ class AllocationService
   end
 
 private
-
-  def self.delius_com_name(offender_id)
-    DeliusData.find_by(noms_no: offender_id).try(:offender_manager)
-  end
 
   # Gets the versions in *forward* order - so often we want to reverse
   # this list as we're interested in recent rather than ancient history

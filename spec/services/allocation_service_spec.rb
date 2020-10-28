@@ -190,29 +190,6 @@ describe AllocationService do
     expect(current_pom.grade).to eq("Prison POM")
   end
 
-  it 'can set the correct com_name', versioning: true, vcr: { cassette_name: 'allocation_service_com_name' }  do
-    create(:delius_data, noms_no: nomis_offender_id, offender_manager: 'Bob')
-    create(:case_information, nomis_offender_id: nomis_offender_id)
-
-    params = {
-      nomis_offender_id: nomis_offender_id,
-      prison: 'LEI',
-      allocated_at_tier: 'A',
-      primary_pom_nomis_id: 485_833,
-      primary_pom_allocated_at: DateTime.now.utc,
-      nomis_booking_id: 1,
-      recommended_pom_type: 'probation',
-      event: Allocation::ALLOCATE_PRIMARY_POM,
-      event_trigger: Allocation::USER,
-      created_by_username: 'MOIC_POM'
-    }
-
-    described_class.create_or_update(params)
-
-    alloc = Allocation.find_by(nomis_offender_id: nomis_offender_id)
-    expect(alloc.com_name).to eq('Bob')
-  end
-
   describe '#allocation_history_pom_emails' do
     it 'can retrieve all the POMs email addresses for ', versioning: true, vcr: { cassette_name: :allocation_service_history_spec } do
       previous_primary_pom_nomis_id = 485_637

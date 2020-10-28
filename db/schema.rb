@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_14_082050) do
+ActiveRecord::Schema.define(version: 2020_10_28_105256) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -56,6 +56,7 @@ ActiveRecord::Schema.define(version: 2020_10_14_082050) do
     t.datetime "updated_at"
     t.date "parole_review_date"
     t.string "probation_service"
+    t.string "com_name"
     t.index ["nomis_offender_id"], name: "index_case_information_on_nomis_offender_id", unique: true
     t.index ["team_id"], name: "index_case_information_on_team_id"
   end
