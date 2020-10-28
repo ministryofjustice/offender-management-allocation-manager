@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Allocation < ApplicationRecord
-  has_paper_trail ignore: [:com_name]
+  has_paper_trail
 
   ALLOCATE_PRIMARY_POM = 0
   REALLOCATE_PRIMARY_POM = 1
