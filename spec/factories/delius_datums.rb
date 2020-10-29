@@ -12,6 +12,7 @@ FactoryBot.define do
     crn do
       Faker::Number.number(digits: 8)
     end
+    offender_manager { 'Smith, Bob' }
     # This has to match the T3 record for G4281GV above
     date_of_birth do '11/11/1964' end
 

@@ -68,10 +68,9 @@ feature 'View a prisoner profile page' do
       team = create(:team, name: 'A team', local_divisional_unit: ldu)
       create(:case_information,
              nomis_offender_id: alloc.nomis_offender_id,
-             team: team
+             team: team,
+             com_name: 'Bob Smith'
       )
-
-      alloc.update(com_name: 'Bob Smith')
 
       visit prison_prisoner_path('LEI', 'G7998GJ')
 

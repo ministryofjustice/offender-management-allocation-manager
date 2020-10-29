@@ -62,35 +62,28 @@ private
                                   error_type: error_type(field)
       end
     end
-
-    update_com_name(delius_record)
-  end
-
-  def update_com_name(delius_record)
-    allocation = Allocation.find_by(nomis_offender_id: delius_record.noms_no)
-    return if allocation.blank?
-
-    com_name = if ['Unallocated', 'Inactive'].any? { |pattern| delius_record.offender_manager.include?(pattern) }
-                 nil
-               else
-                 delius_record.offender_manager
-               end
-
-    allocation.assign_attributes(com_name: com_name)
-    allocation.save! if allocation.changed?
   end
 
   def map_delius_to_case_info(delius_record)
     find_case_info(delius_record).tap do |case_info|
       team = map_team(delius_record.team_code)
       case_info.assign_attributes(
+        com_name: map_com_name(delius_record.offender_manager),
         crn: delius_record.crn,
         tier: map_tier(delius_record.tier),
-        team: team,
-        case_allocation: delius_record.service_provider,
-        welsh_offender: map_welsh_offender(delius_record.ldu_code),
-        mappa_level: map_mappa_level(delius_record.mappa, delius_record.mappa_levels)
+      team: team,
+      case_allocation: delius_record.service_provider,
+      welsh_offender: map_welsh_offender(delius_record.ldu_code),
+      mappa_level: map_mappa_level(delius_record.mappa, delius_record.mappa_levels)
       )
+    end
+  end
+
+  def map_com_name(offender_manager)
+    if ['Unallocated', 'Inactive'].any? { |pattern| offender_manager.include?(pattern) }
+      nil
+    else
+      offender_manager
     end
   end
 

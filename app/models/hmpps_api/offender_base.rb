@@ -13,9 +13,9 @@ module HmppsApi
     attr_accessor :category_code, :date_of_birth, :prison_arrival_date
 
     attr_reader :first_name, :last_name, :booking_id,
-                :offender_no
+                :offender_no, :allocated_com_name
 
-    attr_accessor :sentence, :allocated_pom_name, :allocated_com_name, :case_allocation, :mappa_level, :tier
+    attr_accessor :sentence, :allocated_pom_name, :case_allocation, :mappa_level, :tier
 
     attr_reader :crn,
                 :welsh_offender, :parole_review_date,
@@ -161,6 +161,7 @@ module HmppsApi
       @early_allocation = record.latest_early_allocation.present? &&
         (record.latest_early_allocation.eligible? || record.latest_early_allocation.community_decision?)
       @responsibility = record.responsibility
+      @allocated_com_name = record.com_name
     end
 
   private
