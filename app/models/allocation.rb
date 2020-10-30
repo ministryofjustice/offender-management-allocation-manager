@@ -89,32 +89,6 @@ class Allocation < ApplicationRecord
     end
   end
 
-  def deallocate_offender(movement_type)
-    self.primary_pom_nomis_id = nil
-    self.primary_pom_name = nil
-    self.primary_pom_allocated_at = nil
-    self.secondary_pom_nomis_id = nil
-    self.secondary_pom_name = nil
-    self.recommended_pom_type = nil
-    self.event = if movement_type == Allocation::OFFENDER_RELEASED
-                   DEALLOCATE_RELEASED_OFFENDER
-                 else
-                   DEALLOCATE_PRIMARY_POM
-                 end
-    self.event_trigger = movement_type
-
-    # This is triggered when an offender is released, and previously we
-    # were setting their prison to nil to show that the current allocation
-    # object for this offender meant they were unallocated.  However, we use
-    # the absence of any POM ids to show the offender is allocated, and if
-    # we remove the prison, we remove the ability to see where the offender
-    # was released from. So now, we do not blank the prison.
-    #
-    # Perhaps a better event name is `OFFENDER_RELEASED`.
-
-    save!
-  end
-
   # note: this creates an allocation where the co-working POM is set, but the primary
   # one is not. It should still show up in the 'waiting to allocate' bucket.
   # This appears to be safe as allocations only show up for viewing if they have
@@ -149,4 +123,40 @@ class Allocation < ApplicationRecord
             :event,
             :event_trigger,
             :prison, presence: true
+
+  def offender_released
+    deallocate_offender event: Allocation::DEALLOCATE_RELEASED_OFFENDER, event_trigger: Allocation::OFFENDER_RELEASED
+  end
+
+  def offender_transferred
+    deallocate_offender event: Allocation::DEALLOCATE_PRIMARY_POM, event_trigger: Allocation::OFFENDER_TRANSFERRED
+  end
+
+private
+
+  def deallocate_offender event:, event_trigger:
+    primary_pom = PrisonOffenderManagerService.get_pom_at(prison, primary_pom_nomis_id)
+    offender = OffenderService.get_offender(nomis_offender_id)
+    mail_params = {
+        email: primary_pom.email_address,
+        pom_name: primary_pom.first_name,
+        offender_name: offender.full_name,
+        nomis_offender_id: nomis_offender_id,
+        prison_name: PrisonService.name_for(prison),
+        url: Rails.application.routes.default_url_options[:host] +
+            Rails.application.routes.url_helpers.prison_staff_caseload_index_path(prison, primary_pom_nomis_id)
+    }
+    update!(
+      event: event,
+      event_trigger: event_trigger,
+      primary_pom_nomis_id: nil,
+      primary_pom_name: nil,
+      primary_pom_allocated_at: nil,
+      secondary_pom_nomis_id: nil,
+      secondary_pom_name: nil,
+      recommended_pom_type: nil,
+    )
+
+    PomMailer.offender_deallocated(mail_params).deliver_later
+  end
 end

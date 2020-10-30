@@ -127,20 +127,20 @@ RSpec.describe EmailService do
   context 'when offender has been released' do
     let(:staff_id) { '485833' }
     let!(:released_allocation) do
-      x = create(:allocation,
-                 nomis_offender_id: original_allocation.nomis_offender_id,
-                 primary_pom_nomis_id: original_allocation.primary_pom_nomis_id)
-      x.deallocate_offender(Allocation::OFFENDER_RELEASED)
-      x.reload
-      x.update!(primary_pom_nomis_id: reallocation.primary_pom_nomis_id,
-                event: Allocation::REALLOCATE_PRIMARY_POM,
-                event_trigger: Allocation::USER)
-      x.deallocate_offender(Allocation::OFFENDER_RELEASED)
-      x.reload
-      x.update!(primary_pom_nomis_id: original_allocation.primary_pom_nomis_id,
-                event: Allocation::REALLOCATE_PRIMARY_POM,
-                event_trigger: Allocation::USER)
-      x
+      create(:allocation,
+             nomis_offender_id: original_allocation.nomis_offender_id,
+             primary_pom_nomis_id: original_allocation.primary_pom_nomis_id).tap do |x|
+        x.offender_released
+        x.reload
+        x.update!(primary_pom_nomis_id: reallocation.primary_pom_nomis_id,
+                  event: Allocation::REALLOCATE_PRIMARY_POM,
+                  event_trigger: Allocation::USER)
+        x.offender_released
+        x.reload
+        x.update!(primary_pom_nomis_id: original_allocation.primary_pom_nomis_id,
+                  event: Allocation::REALLOCATE_PRIMARY_POM,
+                  event_trigger: Allocation::USER)
+      end
     end
 
     it "Can send a reallocation email", vcr: { cassette_name: :email_service_reallocation_crash } do

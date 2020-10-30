@@ -100,7 +100,7 @@ private
     # When an offender is released, we can no longer rely on their
     # case information (in case they come back one day), and we
     # should de-activate any current allocations.
-    alloc&.deallocate_offender(Allocation::OFFENDER_TRANSFERRED)
+    alloc.offender_transferred if alloc
     true
   end
 
@@ -127,7 +127,6 @@ private
 
     CaseInformation.where(nomis_offender_id: offender_no).destroy_all
     alloc = Allocation.find_by(nomis_offender_id: offender_no)
-    # frozen_string_literal: true
     # We need to check whether the from_agency is from within the prison estate
     # to know whether it is a transfer.  If it isn't then we want to bail and
     # not process the new admission.
@@ -140,6 +139,6 @@ private
     # When an offender is released, we can no longer rely on their
     # case information (in case they come back one day), and we
     # should de-activate any current allocations.
-    alloc&.deallocate_offender(Allocation::OFFENDER_RELEASED)
+    alloc.offender_released if alloc
   end
 end
