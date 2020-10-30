@@ -14,7 +14,7 @@ class HandoverFollowUpJob < ApplicationJob
         allocation = Allocation.where(prison: offender.prison_id).first
         pom = PrisonOffenderManagerService.get_pom_at(offender.prison_id, allocation.primary_pom_nomis_id)
 
-        PomMailer.handover_chase_email(
+        CommunityMailer.handover_chase_email(
           nomis_offender_id: offender.offender_no,
           offender_name: offender.full_name,
           offender_crn: offender.crn,
