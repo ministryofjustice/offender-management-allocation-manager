@@ -49,9 +49,9 @@ module HmppsApi
       @early_allocation
     end
 
-    # Having a 'tier' is an alias for having a case information record
+    # Has a CaseInformation record been loaded for this offender?
     def has_case_information?
-      tier.present?
+      @case_information.present?
     end
 
     def nps_case?
@@ -79,9 +79,9 @@ module HmppsApi
     end
 
     def pom_responsibility
-      if @responsibility.nil?
+      if @responsibility_override.nil?
         ResponsibilityService.calculate_pom_responsibility(self)
-      elsif @responsibility.value == Responsibility::PRISON
+      elsif @responsibility_override.value == Responsibility::PRISON
         ResponsibilityService::RESPONSIBLE
       else
         ResponsibilityService::SUPPORTING
@@ -117,7 +117,7 @@ module HmppsApi
     end
 
     def responsibility_override?
-      @responsibility.present?
+      @responsibility_override.present?
     end
 
     def load_from_json(payload)
@@ -150,6 +150,13 @@ module HmppsApi
     def load_case_information(record)
       return if record.blank?
 
+      # Hold on to the CaseInformation record so we can reference it later
+      @case_information = record
+
+      # This is separate from @case_information so the rest of this class doesn't need to know about the Active Record association
+      @responsibility_override = record.responsibility
+
+      # Populate attributes
       @tier = record.tier
       @case_allocation = record.case_allocation
       @welsh_offender = record.welsh_offender == 'Yes'
@@ -160,7 +167,6 @@ module HmppsApi
       @parole_review_date = record.parole_review_date
       @early_allocation = record.latest_early_allocation.present? &&
         (record.latest_early_allocation.eligible? || record.latest_early_allocation.community_decision?)
-      @responsibility = record.responsibility
       @allocated_com_name = record.com_name
     end
 
