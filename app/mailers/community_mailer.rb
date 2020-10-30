@@ -17,13 +17,14 @@ class CommunityMailer < GovukNotifyRails::Mailer
   end
 
   def handover_chase_email(nomis_offender_id:, offender_name:, offender_crn:, ldu_email:, prison:,
-                           start_date:, responsibility_handover_date:, pom_name:, pom_email:)
+                           sentence_type:, start_date:, responsibility_handover_date:, pom_name:, pom_email:)
     set_template('d7366b11-c93e-48de-824f-cb80a9778e71')
 
     set_personalisation(
       email: ldu_email,
       name: offender_name,
       crn: offender_crn,
+      sentence_type: sentence_type,
       noms_no: nomis_offender_id,
       prison_name: prison,
       start_date: start_date,

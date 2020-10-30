@@ -33,20 +33,8 @@ RSpec.describe HandoverFollowUpJob, type: :job do
     expect { described_class.perform_now(Time.zone.today) }.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
   end
 
-  it "does not queue jobs for offender's who have COM's assigned" do
-    case_info = create(:case_information, nomis_offender_id: determinate_offender.offender_no)
-    create(:allocation, nomis_offender_id: determinate_offender.offender_no, com_name: "Betty White")
-
-    allow(OffenderService).to receive(:get_offender).and_return(determinate_offender)
-    determinate_offender.load_case_information(case_info)
-
-    expect { described_class.perform_now(Time.zone.today) }.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
-  end
-
-  it 'does not queue jobs for offender whose handover dates do not match date specified' do
-    case_info = create(:case_information, nomis_offender_id: determinate_offender.offender_no,
-                       team: build(:team, local_divisional_unit: build(:local_divisional_unit)))
-
+  it 'does not queue jobs for offenders who have a COM assigned' do
+    case_info = create(:case_information, nomis_offender_id: determinate_offender.offender_no, com_name: "Betty White")
     create(:allocation, nomis_offender_id: determinate_offender.offender_no)
 
     allow(OffenderService).to receive(:get_offender).and_return(determinate_offender)
@@ -55,7 +43,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
     expect { described_class.perform_now(Time.zone.today) }.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
   end
 
-  it "does not queue jobs for offender's who do not have handover_start_dates" do
+  it 'does not queue jobs for offenders who do not have a handover_start_date' do
     case_info = create(:case_information, nomis_offender_id: indeterminate_without_ted.offender_no,
                        team: build(:team, local_divisional_unit: build(:local_divisional_unit)))
 
@@ -67,34 +55,64 @@ RSpec.describe HandoverFollowUpJob, type: :job do
     expect { described_class.perform_now(Time.zone.today) }.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
   end
 
-  it 'queues a job when offenders handover date matches date specified' do
-    allow(PrisonOffenderManagerService).to receive(:get_pom_at).and_return(pom)
+  context 'when no COM assigned' do
+    let(:case_info) do
+      create(:case_information, nomis_offender_id: determinate_offender.offender_no,
+                       team: build(:team, local_divisional_unit: build(:local_divisional_unit)))
+    end
 
-    case_info = create(:case_information, nomis_offender_id: determinate_offender.offender_no,
-                         team: build(:team, local_divisional_unit: build(:local_divisional_unit)))
+    before do
+      allow(OffenderService).to receive(:get_offender).and_return(determinate_offender)
+    end
 
-    create(:allocation, nomis_offender_id: determinate_offender.offender_no,
-           primary_pom_nomis_id: pom.staff_id,
-           primary_pom_name: pom.full_name)
+    it 'does not queue jobs for offenders whose are not yet approaching handover' do
+      create(:allocation, nomis_offender_id: determinate_offender.offender_no)
+      determinate_offender.load_case_information(case_info)
 
-    allow(OffenderService).to receive(:get_offender).and_return(determinate_offender)
+      expect { described_class.perform_now(Time.zone.today) }.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
+    end
 
-    determinate_offender.load_case_information(case_info)
-    date_of_handover = determinate_offender.handover_start_date
+    it 'does not queue jobs for offenders when their handover date is overdue by less than a week' do
+      create(:allocation, nomis_offender_id: determinate_offender.offender_no)
+      determinate_offender.load_case_information(case_info)
 
-    expect { described_class.perform_now(date_of_handover) }
+      date_of_handover = determinate_offender.handover_start_date + 5.days
+      expect { described_class.perform_now(date_of_handover) }.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
+    end
+
+    it 'queues jobs when offenders handover date is exactly one week overdue' do
+      allow(PrisonOffenderManagerService).to receive(:get_pom_at).and_return(pom)
+
+      create(:allocation, nomis_offender_id: determinate_offender.offender_no,
+             primary_pom_nomis_id: pom.staff_id,
+             primary_pom_name: pom.full_name)
+
+      determinate_offender.load_case_information(case_info)
+      date_of_handover = determinate_offender.handover_start_date + 1.week
+
+      expect { described_class.perform_now(date_of_handover) }
       .to have_enqueued_job(ActionMailer::MailDeliveryJob)
           .with("CommunityMailer", "handover_chase_email", "deliver_now",
                 args: [{ nomis_offender_id: determinate_offender.offender_no,
-                          offender_name: determinate_offender.full_name,
-                          offender_crn: determinate_offender.crn,
-                          ldu_email: determinate_offender.ldu.email_address,
-                          prison: "HMP Leeds",
-                          start_date: determinate_offender.handover_start_date,
-                          responsibility_handover_date: determinate_offender.responsibility_handover_date,
-                          pom_name: pom.full_name,
-                          pom_email: pom.email_address }]
+                         offender_name: determinate_offender.full_name,
+                         offender_crn: determinate_offender.crn,
+                         ldu_email: determinate_offender.ldu.email_address,
+                         sentence_type: "Determinate",
+                         prison: "HMP Leeds",
+                         start_date: determinate_offender.handover_start_date,
+                         responsibility_handover_date: determinate_offender.responsibility_handover_date,
+                         pom_name: pom.full_name,
+                         pom_email: pom.email_address }]
           )
+    end
+
+    it 'does not queue jobs for offenders when their handover date is overdue by more than a week' do
+      create(:allocation, nomis_offender_id: determinate_offender.offender_no)
+      determinate_offender.load_case_information(case_info)
+
+      date_of_handover = determinate_offender.handover_start_date + 10.days
+      expect { described_class.perform_now(date_of_handover) }.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
+    end
   end
 
   def build_offender(sentence_type:, release_date:, ted:)
