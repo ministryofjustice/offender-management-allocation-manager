@@ -21,15 +21,15 @@ class CommunityMailer < GovukNotifyRails::Mailer
     set_template('d7366b11-c93e-48de-824f-cb80a9778e71')
 
     set_personalisation(
-    email: ldu_email,
-    name: offender_name,
-    crn: offender_crn,
-    noms_no: nomis_offender_id,
-    prison_name: prison,
-    start_date: start_date,
-    responsibility_handover_date: responsibility_handover_date,
-    pom_name: pom_name,
-    pom_email: pom_email
+      email: ldu_email,
+      name: offender_name,
+      crn: offender_crn,
+      noms_no: nomis_offender_id,
+      prison_name: prison,
+      start_date: start_date,
+      responsibility_handover_date: responsibility_handover_date,
+      pom_name: pom_name,
+      pom_email: pom_email
     )
 
     mail(to: ldu_email)
