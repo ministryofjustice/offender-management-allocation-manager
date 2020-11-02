@@ -376,7 +376,6 @@ workflows:
               only:
                 - main
                 - preproduction
-                - handover-cronjob-failing
       - deploy_staging:
           requires:
             - build_and_push_docker_image
@@ -384,7 +383,6 @@ workflows:
             branches:
               only:
                 - main
-                - handover-cronjob-failing
       - test_staging:
           requires:
             - build_and_push_docker_image

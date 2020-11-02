@@ -15,7 +15,7 @@ spec:
           - name: handover-email-job
             image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:testing
             imagePullPolicy: Always
-            command: ['sh', '-c', "bundle exec rake -T && bundle exec rake cronjob:handover_email"]
+            command: ['sh', '-c', "bundle exec rake cronjob:handover_email"]
             envFrom:
               - configMapRef:
                   name: shared-environment
