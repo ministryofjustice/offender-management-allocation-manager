@@ -87,7 +87,12 @@ references:
         if [ "${CIRCLE_BRANCH}" == "main" ]; then
           docker tag app "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:latest"
           docker push "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:latest"
+        else
+          docker tag app "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:testing"
+          docker push "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:testing"
         fi
+        docker tag app "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:testing"
+        docker push "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:testing"
       environment:
         <<: *github_team_name_slug
         REPONAME: offender-management-allocation-manager
@@ -377,7 +382,7 @@ workflows:
           filters:
             branches:
               only:
-                main
+                - main
       - test_staging:
           requires:
             - build_and_push_docker_image
