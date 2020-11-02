@@ -3,14 +3,29 @@ require "rails_helper"
 feature "SPO viewing upcoming handover cases" do
   let(:prison) { 'LEI' }
 
-  context 'when signed in as an SPO', vcr: { cassette_name: :spo_handover_cases_feature } do
-    before do
-      allow_any_instance_of(HmppsApi::OffenderBase).to receive_messages(
-        handover_start_date: handover_start_date,
-        responsibility_handover_date: responsibility_handover_date,
-        tier: 'A'
+  context 'when signed in as an SPO' do
+    let(:offender) { build(:nomis_offender, latestLocationId: prison) }
+    let!(:case_info) { create(:case_information, nomis_offender_id: offender.fetch(:offenderNo)) }
+    let(:handover_dates) {
+      HandoverDateService::HandoverData.new(
+        handover_start_date,
+        responsibility_handover_date,
+        'Stubbed handover date'
       )
+    }
+
+    before do
+      # Stub auth
       signin_spo_user
+      stub_auth_token
+      stub_user(staff_id: 100)
+
+      # Stub an offender in the prison
+      stub_offenders_for_prison(prison, [offender])
+
+      # Stub handover dates for the offender
+      allow(HandoverDateService).to receive(:handover).and_return(handover_dates)
+
       visit prison_summary_handovers_path(prison)
     end
 
