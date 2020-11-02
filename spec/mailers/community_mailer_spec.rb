@@ -24,7 +24,7 @@ RSpec.describe CommunityMailer, type: :mailer do
       }
     end
 
-    let(:mail) { described_class.handover_chase_email(params) }
+    let(:mail) { described_class.urgent_pipeline_to_community(params) }
 
     before do
       offender.load_case_information(case_info)

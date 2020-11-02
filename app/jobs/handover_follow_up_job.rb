@@ -14,7 +14,7 @@ class HandoverFollowUpJob < ApplicationJob
         pom = PrisonOffenderManagerService.get_pom_at(offender.prison_id, allocation.primary_pom_nomis_id)
         offender_type = offender.indeterminate_sentence? ? 'Indeterminate' : 'Determinate'
 
-        CommunityMailer.handover_chase_email(
+        CommunityMailer.urgent_pipeline_to_community(
           nomis_offender_id: offender.offender_no,
           offender_name: offender.full_name,
           offender_crn: offender.crn,

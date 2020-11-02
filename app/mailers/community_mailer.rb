@@ -16,8 +16,8 @@ class CommunityMailer < GovukNotifyRails::Mailer
     mail(to: ldu.email_address)
   end
 
-  def handover_chase_email(nomis_offender_id:, offender_name:, offender_crn:, ldu_email:, prison:,
-                           sentence_type:, start_date:, responsibility_handover_date:, pom_name:, pom_email:)
+  def urgent_pipeline_to_community(nomis_offender_id:, offender_name:, offender_crn:, ldu_email:, prison:,
+                                   sentence_type:, start_date:, responsibility_handover_date:, pom_name:, pom_email:)
     set_template('d7366b11-c93e-48de-824f-cb80a9778e71')
 
     set_personalisation(

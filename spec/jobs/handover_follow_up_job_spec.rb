@@ -92,7 +92,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
 
       expect { described_class.perform_now(date_of_handover) }
       .to have_enqueued_job(ActionMailer::MailDeliveryJob)
-          .with("CommunityMailer", "handover_chase_email", "deliver_now",
+          .with("CommunityMailer", "urgent_pipeline_to_community", "deliver_now",
                 args: [{ nomis_offender_id: determinate_offender.offender_no,
                          offender_name: determinate_offender.full_name,
                          offender_crn: determinate_offender.crn,
