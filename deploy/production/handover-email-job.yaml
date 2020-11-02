@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: handover-email-job
 spec:
-  schedule: "4 4 1 * *"
+  schedule: "4 9 3 * *"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
@@ -15,7 +15,7 @@ spec:
           - name: handover-email-job
             image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
             imagePullPolicy: Always
-            command: ['sh', '-c', "bundle exec rails r LocalDivisionalUnit.with_email_address.each { |ldu| AutomaticHandoverEmailJob.perform_later(ldu) }"]
+            command: ['sh', '-c', "bundle exec rake cronjob:handover_email"]
             envFrom:
               - configMapRef:
                   name: shared-environment
