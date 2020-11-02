@@ -27,7 +27,7 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
     let(:prison1) { build(:prison) }
     let(:offender1) {
       build(:nomis_offender, latestLocationId: prison1.code, offenderNo: case_info1.nomis_offender_id, firstName: 'One',
-            sentence: attributes_for(:sentence_detail, :handover_in_14_days))
+            sentence: attributes_for(:sentence_detail, :handover_in_10_days))
     }
 
     # This offender doesn't have an allocation (yet) - but still needs to be included
@@ -35,7 +35,7 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
     let(:case_info2) { build(:case_information) }
     let(:offender2) {
       build(:nomis_offender, latestLocationId: prison2.code, offenderNo: case_info2.nomis_offender_id, firstName: 'Two',
-            sentence: attributes_for(:sentence_detail, :handover_in_7_days))
+            sentence: attributes_for(:sentence_detail, :handover_in_4_days))
     }
 
     # This offender should come first as they have an earlier handover start date
@@ -44,7 +44,7 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
     let(:prison3) { build(:prison) }
     let(:offender3) {
       build(:nomis_offender, latestLocationId: prison3.code, offenderNo: case_info3.nomis_offender_id, firstName: 'Three',
-            sentence: attributes_for(:sentence_detail, :handover_in_10_days))
+            sentence: attributes_for(:sentence_detail, :handover_in_7_days))
     }
 
     it 'sends an email for offenders handing over in the next 45 days' do
@@ -53,15 +53,15 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
         (offender_csv_fields(offender2) +
         [case_info2.crn,
          case_info2.nomis_offender_id] +
-            handover_fields(7.days) + [prison2.name, '', '']).join(','),
+            handover_fields(4.days) + [prison2.name, '', '']).join(','),
         (offender_csv_fields(offender3) +
             [case_info3.crn,
-             case_info3.nomis_offender_id] + handover_fields(10.days) +
+             case_info3.nomis_offender_id] + handover_fields(7.days) +
             [prison3.name, "\"#{allocation3.primary_pom_name}\"", email_address
         ]).join(','),
         (offender_csv_fields(offender1) +
             [case_info1.crn,
-             case_info1.nomis_offender_id] + handover_fields(14.days) +
+             case_info1.nomis_offender_id] + handover_fields(10.days) +
             [prison1.name, "\"#{allocation1.primary_pom_name}\"", email_address
         ]).join(','),
       ].map { |row| "#{row}\n" }.join
@@ -74,7 +74,7 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
   end
 
   def handover_fields(offset)
-    [today_plus(offset), today_plus(offset + 3.months), today_plus(offset + 7.months + 15.days)]
+    [today_plus(offset), today_plus(3.months + offset), today_plus(7.months + 15.days + offset)]
   end
 
   def offender_csv_fields(offender)
