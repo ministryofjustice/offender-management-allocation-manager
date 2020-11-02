@@ -363,7 +363,7 @@ GEM
       activesupport
       rack (>= 1.1)
       rubocop (>= 0.72.0)
-    rubocop-rspec (1.37.1)
+    rubocop-rspec (1.41.0)
       rubocop (>= 0.68.1)
     ruby-prof (1.4.1)
     ruby-progressbar (1.10.1)
@@ -508,7 +508,7 @@ DEPENDENCIES
   rubocop-govuk
   rubocop-performance
   rubocop-rails
-  rubocop-rspec
+  rubocop-rspec (>= 1.41)
   ruby-prof (>= 0.16.0)
   rubyzip
   sassc-rails

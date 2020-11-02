@@ -14,48 +14,35 @@ RSpec.describe "debugging/debugging", type: :view do
 
   let(:prison) { build(:prison) }
 
-  describe "debugging/debugging.html.erb" do
-    it "displays offender full_name" do
-      assign(:offender, OffenderPresenter.new(offender))
-      assign(:prison, prison)
+  before do
+    assign(:offender, OffenderPresenter.new(offender))
+    assign(:prison, prison)
 
-      render
-      page = Nokogiri::HTML(rendered)
-      full_name = page.css('#prisoner-information').css('#name').first
-      expect(full_name.text).to match(/Dory, John/)
-    end
+    render
   end
 
-  describe "debugging/debugging.html.erb" do
-    it "displays tariff date" do
-      assign(:offender, OffenderPresenter.new(offender))
-      assign(:prison, prison)
+  it "displays offender full_name" do
+    page = Nokogiri::HTML(rendered)
+    full_name = page.css('#prisoner-information').css('#name').first
+    expect(full_name.text).to match(/Dory, John/)
+  end
 
-      render
-      page = Nokogiri::HTML(rendered)
-      tariff_date = page.css('#sentence-information').css('#tariff-date').first
-      expect(tariff_date.text).to match '01/08/2033'
-    end
+  it "displays tariff date" do
+    page = Nokogiri::HTML(rendered)
+    tariff_date = page.css('#sentence-information').css('#tariff-date').first
+    expect(tariff_date.text).to match '01/08/2033'
+  end
 
-    it "displays post recall release date" do
-      assign(:offender, OffenderPresenter.new(offender))
-      assign(:prison, prison)
+  it "displays post recall release date" do
+    page = Nokogiri::HTML(rendered)
+    post_recall_release_date = page.css('#sentence-information').css('#post-recall-release-date').first
+    expect(post_recall_release_date.text).to match '08/11/2028'
+  end
 
-      render
-      page = Nokogiri::HTML(rendered)
-      post_recall_release_date = page.css('#sentence-information').css('#post-recall-release-date').first
-      expect(post_recall_release_date.text).to match '08/11/2028'
-    end
+  it "displays licence end date" do
+    page = Nokogiri::HTML(rendered)
+    licence_expiry_date = page.css('#sentence-information').css('#licence-expiry-date').first
 
-    it "displays licence end date" do
-      assign(:offender, OffenderPresenter.new(offender))
-      assign(:prison, prison)
-
-      render
-      page = Nokogiri::HTML(rendered)
-      licence_expiry_date = page.css('#sentence-information').css('#licence-expiry-date').first
-
-      expect(licence_expiry_date.text).to match '07/10/2025'
-    end
+    expect(licence_expiry_date.text).to match '07/10/2025'
   end
 end
