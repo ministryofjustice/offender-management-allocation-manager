@@ -10,9 +10,10 @@ Rails.application.routes.draw do
   resources :prisons do
     resources :prisons, only: :index
     resources :dashboard, only: :index
+    resources :handovers, only: :index
     resources :staff do
-      resources :caseload, only: %i[ index new]
-      get('/caseload/handover_start' => 'caseload#handover_start', as: 'caseload_handover_start')
+      resources :caseload, only: %i[index new]
+      resources :caseload_handovers, only: %i[index]
     end
 
     resources :prisoners, only: [:show] do
@@ -73,7 +74,6 @@ Rails.application.routes.draw do
     get('/summary/unallocated' => 'summary#unallocated')
     get('/summary/pending' => 'summary#pending')
     get('/summary/new-arrivals' => 'summary#new_arrivals')
-    get('/summary/handovers' => 'summary#handovers')
   end
 
   match "/401", :to => "errors#unauthorized", :via => :all

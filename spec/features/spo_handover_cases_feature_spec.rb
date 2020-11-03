@@ -26,7 +26,7 @@ feature "SPO viewing upcoming handover cases" do
       # Stub handover dates for the offender
       allow(HandoverDateService).to receive(:handover).and_return(handover_dates)
 
-      visit prison_summary_handovers_path(prison)
+      visit prison_handovers_path(prison)
     end
 
     context 'with handovers that start within the next thirty days' do
@@ -68,7 +68,7 @@ feature "SPO viewing upcoming handover cases" do
 
   it 'stops staff without the SPO role from viewing the page', vcr: { cassette_name: :spo_handover_cases_pom } do
     signin_pom_user
-    visit prison_summary_handovers_path(prison)
+    visit prison_handovers_path(prison)
     expect(page).to have_current_path('/401')
   end
 
@@ -104,7 +104,7 @@ feature "SPO viewing upcoming handover cases" do
       end
 
       signin_spo_user
-      visit prison_summary_handovers_path(prison)
+      visit prison_handovers_path(prison)
     end
 
     scenario 'sorts POMs alphabetically' do

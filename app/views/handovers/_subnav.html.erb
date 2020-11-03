@@ -1,0 +1,20 @@
+<nav class="moj-sub-navigation govuk-!-margin-top-0" aria-label="Sub navigation">
+  <ul class="moj-sub-navigation__list">
+    <% if @is_spo %>
+      <li class="moj-sub-navigation__item">
+        <a class="moj-sub-navigation__link" <%= 'aria-current=page' if active == :all_handovers %>
+           href="<%= prison_handovers_path(@prison.code) %>">
+          See all handover cases in <%= @prison.name %> (<%= @summary.handovers_total %>)
+        </a>
+      </li>
+    <% end %>
+    <% if @is_pom %>
+      <li class="moj-sub-navigation__item">
+        <a class="moj-sub-navigation__link" <%= 'aria-current=page' if active == :caseload_handovers %>
+           href="<%= prison_staff_caseload_handovers_path(@prison.code, @staff_id) %>">
+          See handover cases that you are allocated (<%= @pending_handover_count %>)
+        </a>
+      </li>
+    <% end %>
+  </ul>
+</nav>

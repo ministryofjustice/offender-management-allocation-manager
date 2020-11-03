@@ -41,7 +41,7 @@ feature 'summary summary feature' do
     end
 
     it 'displays offenders approaching their handover date', vcr: { cassette_name: :approaching_handover_feature } do
-      visit prison_summary_handovers_path('LEI')
+      visit prison_handovers_path('LEI')
 
       expect(page).to have_css('.moj-sub-navigation__item')
       expect(page).to have_content('Case handover status')

@@ -30,7 +30,7 @@
 
     <li class="moj-sub-navigation__item">
       <a class="moj-sub-navigation__link" <%= 'aria-current=page' if active == :handovers %>
-        href="<%= prison_summary_handovers_path(@prison.code) %>">
+        href="<%= prison_handovers_path(@prison.code) %>">
         See case handover status (<%= @summary.handovers_total %>)
       </a>
     </li>

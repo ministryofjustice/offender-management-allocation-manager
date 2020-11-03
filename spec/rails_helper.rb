@@ -64,6 +64,12 @@ RSpec.configure do |config|
   config.include AuthHelper
   config.include ApiHelper
 
+  config.before(:each, type: :view) do
+    # This is needed for any view test that uses the sort_link and sort_arrow helpers
+    # taken from https://github.com/bootstrap-ruby/rails-bootstrap-navbar/issues/15
+    allow_any_instance_of(ActionController::TestRequest).to receive(:original_url).and_return('')
+  end
+
   config.around(:each, :queueing) do |example|
     ActiveJob::Base.queue_adapter.tap do |adapter|
       ActiveJob::Base.queue_adapter = :test
