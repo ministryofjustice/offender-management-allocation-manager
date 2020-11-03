@@ -25,6 +25,10 @@ FactoryBot.define do
       automaticReleaseDate { "2022-01-28" }
     end
 
+    trait :handover_in_3_days do
+      conditionalReleaseDate { Time.zone.today + 3.days + 7.months + 15.days }
+    end
+
     trait :handover_in_4_days do
       conditionalReleaseDate { Time.zone.today + 4.days + 7.months + 15.days }
     end
@@ -35,6 +39,10 @@ FactoryBot.define do
 
     trait :handover_in_6_days do
       conditionalReleaseDate { Time.zone.today + 6.days + 7.months + 15.days }
+    end
+
+    trait :unsentenced do
+      sentenceStartDate { nil }
     end
   end
 end

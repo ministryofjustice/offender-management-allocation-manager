@@ -28,7 +28,7 @@ module ApiHelper
         {
           offenderNo: offender_no,
           bookingId: booking_number,
-          sentenceDetail: offender.fetch(:sentence)
+          sentenceDetail: offender.fetch(:sentence).reject { |_k, v| v.nil? }
         }].to_json)
 
     stub_request(:post, "#{T3}/offender-assessments/CATEGORY").
