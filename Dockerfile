@@ -38,7 +38,6 @@ RUN \
     libpq-dev \
     netcat \
     nodejs \
-    cmake \
     libjemalloc-dev \
   && timedatectl set-timezone Europe/London || true \
   && gem update bundler --no-document

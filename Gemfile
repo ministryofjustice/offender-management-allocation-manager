@@ -59,7 +59,6 @@ group :development, :test do
   gem 'rspec-rails', '~> 4.0.0.beta2'
   gem 'rswag-specs'
   gem 'spring'
-  gem 'undercover'
 end
 
 group :test do
@@ -94,6 +93,7 @@ group :development do
   gem 'rack-mini-profiler'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'stackprof'
+  gem 'undercover'
 end
 
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
