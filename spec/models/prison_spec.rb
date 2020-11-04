@@ -1,6 +1,21 @@
 require 'rails_helper'
 
 RSpec.describe Prison, type: :model do
+  describe '#active' do
+    before do
+      create(:allocation, prison: p1.code)
+      create(:allocation, prison: p1.code)
+      create(:allocation, prison: p2.code)
+    end
+
+    let(:p1) { build(:prison) }
+    let(:p2) { build(:prison) }
+
+    it 'only lists prisons with allocations' do
+      expect(described_class.active.map(&:code)).to match_array [p1, p2].map(&:code)
+    end
+  end
+
   describe '#offenders' do
     subject { described_class.new("LEI").offenders }
 
