@@ -29,12 +29,12 @@ FactoryBot.define do
       conditionalReleaseDate { Time.zone.today + 4.days + 7.months + 15.days }
     end
 
-    trait :handover_in_10_days do
-      conditionalReleaseDate { Time.zone.today + 10.days + 7.months + 15.days }
+    trait :handover_in_8_days do
+      conditionalReleaseDate { Time.zone.today + 8.days + 7.months + 15.days }
     end
 
-    trait :handover_in_7_days do
-      conditionalReleaseDate { Time.zone.today + 7.days + 7.months + 15.days }
+    trait :handover_in_6_days do
+      conditionalReleaseDate { Time.zone.today + 6.days + 7.months + 15.days }
     end
   end
 end
