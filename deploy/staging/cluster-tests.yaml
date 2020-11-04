@@ -22,4 +22,10 @@ spec:
           env:
             - name: COVERAGE
               value: "0"
+            - name: PROMETHEUS_METRICS
+              value: "off"
+            - name: RAILS_ENV
+              value: 'test'
+            - name: RACK_ENV
+              value: 'test'
       restartPolicy: Never
