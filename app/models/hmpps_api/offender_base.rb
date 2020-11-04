@@ -8,20 +8,15 @@ module HmppsApi
              :post_recall_release_date, :earliest_release_date,
              to: :sentence
 
-    delegate :indeterminate_sentence?, :immigration_case?, to: :@sentence_type
+    delegate :indeterminate_sentence?, :immigration_case?,
+             to: :@sentence_type
 
-    attr_accessor :category_code, :date_of_birth, :prison_arrival_date
+    delegate :tier, :case_allocation, :crn, :mappa_level, :parole_review_date,
+             to: :@case_information, allow_nil: true
 
-    attr_reader :first_name, :last_name, :booking_id,
-                :offender_no, :allocated_com_name
+    attr_accessor :category_code, :date_of_birth, :prison_arrival_date, :sentence, :allocated_pom_name
 
-    attr_accessor :sentence, :allocated_pom_name, :case_allocation, :mappa_level, :tier
-
-    attr_reader :crn,
-                :welsh_offender, :parole_review_date,
-                :ldu, :team
-
-    attr_reader :sentence_type
+    attr_reader :first_name, :last_name, :booking_id, :offender_no, :sentence_type
 
     def convicted?
       @convicted_status == 'Convicted'
@@ -46,7 +41,10 @@ module HmppsApi
     end
 
     def early_allocation?
-      @early_allocation
+      return false if @case_information.blank?
+
+      early_allocation = @case_information.latest_early_allocation
+      early_allocation.present? && (early_allocation.eligible? || early_allocation.community_decision?)
     end
 
     # Has a CaseInformation record been loaded for this offender?
@@ -56,6 +54,24 @@ module HmppsApi
 
     def nps_case?
       case_allocation == 'NPS'
+    end
+
+    def welsh_offender
+      return nil if @case_information.blank?
+
+      @case_information.welsh_offender == 'Yes'
+    end
+
+    def ldu
+      @case_information&.local_divisional_unit
+    end
+
+    def team
+      @case_information&.team&.name
+    end
+
+    def allocated_com_name
+      @case_information&.com_name
     end
 
     def recalled?
@@ -132,7 +148,6 @@ module HmppsApi
       @sentence_type = SentenceType.new(payload['imprisonmentStatus'])
       @category_code = payload['categoryCode']
       @date_of_birth = deserialise_date(payload, 'dateOfBirth')
-      @early_allocation = false
     end
 
     def handover_start_date
@@ -155,19 +170,6 @@ module HmppsApi
 
       # This is separate from @case_information so the rest of this class doesn't need to know about the Active Record association
       @responsibility_override = record.responsibility
-
-      # Populate attributes
-      @tier = record.tier
-      @case_allocation = record.case_allocation
-      @welsh_offender = record.welsh_offender == 'Yes'
-      @crn = record.crn
-      @mappa_level = record.mappa_level
-      @ldu = record.local_divisional_unit
-      @team = record.team.try(:name)
-      @parole_review_date = record.parole_review_date
-      @early_allocation = record.latest_early_allocation.present? &&
-        (record.latest_early_allocation.eligible? || record.latest_early_allocation.community_decision?)
-      @allocated_com_name = record.com_name
     end
 
   private
