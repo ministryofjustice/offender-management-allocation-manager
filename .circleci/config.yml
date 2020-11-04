@@ -275,8 +275,6 @@ jobs:
             kubectl delete job cluster-tests --ignore-not-found
             kubectl apply --record=false -f deploy/staging/cluster-tests.yaml
             echo "Waiting for jobs for a maximum of 10 minutes"
-            FIRST_POD=$(kubectl get pods -o=name | head -n 1)
-            kubectl logs -f $FIRST_POD
             if ! kubectl wait --for=condition=complete -f deploy/staging/cluster-tests.yaml --timeout=600s ; then
               echo "Failed pods:"
               kubectl get pods --field-selector=status.phase=Failed
