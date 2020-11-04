@@ -15,7 +15,8 @@ RSpec.describe OffenderPresenter do
     context 'when a probation POM' do
       it "can get for a probation owned offender" do
         offender = build(:offender,  :indeterminate)
-        offender.tier = 'A'
+        case_info = build(:case_information, tier: 'A')
+        offender.load_case_information(case_info)
         subject = described_class.new(offender)
         expect(subject.complex_reason_label).to eq('Prisoner assessed as suitable for a prison officer POM despite tiering calculation')
       end
