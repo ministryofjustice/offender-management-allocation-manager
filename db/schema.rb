@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_28_113448) do
+ActiveRecord::Schema.define(version: 2020_10_28_160716) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -68,30 +68,6 @@ ActiveRecord::Schema.define(version: 2020_10_28_113448) do
     t.string "prison"
     t.string "name"
     t.string "job_type"
-  end
-
-  create_table "delius_data", force: :cascade do |t|
-    t.string "crn"
-    t.string "pnc_no"
-    t.string "noms_no"
-    t.string "fullname"
-    t.string "tier"
-    t.string "roh_cds"
-    t.string "offender_manager"
-    t.string "org_private_ind"
-    t.string "org"
-    t.string "provider"
-    t.string "provider_code"
-    t.string "ldu"
-    t.string "ldu_code"
-    t.string "team"
-    t.string "team_code"
-    t.string "mappa"
-    t.string "mappa_levels"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "date_of_birth"
-    t.index ["crn"], name: "index_delius_data_on_crn", unique: true
   end
 
   create_table "delius_import_errors", force: :cascade do |t|
@@ -176,16 +152,6 @@ ActiveRecord::Schema.define(version: 2020_10_28_113448) do
     t.index ["code"], name: "index_teams_on_code"
     t.index ["local_divisional_unit_id"], name: "index_teams_on_local_divisional_unit_id"
     t.index ["shadow_code"], name: "index_teams_on_shadow_code"
-  end
-
-  create_table "tier_changes", force: :cascade do |t|
-    t.string "noms_no"
-    t.string "old_tier"
-    t.string "new_tier"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "crn"
-    t.index ["noms_no"], name: "index_tier_changes_on_noms_no"
   end
 
   create_table "versions", force: :cascade do |t|

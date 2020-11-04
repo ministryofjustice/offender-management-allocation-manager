@@ -47,6 +47,8 @@ RUN \
   && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
   && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 
+COPY Gemfile Gemfile.lock package.json yarn.lock ./
+
 RUN \
   set -ex \
   && apt-get update \
@@ -56,9 +58,7 @@ RUN \
     yarn=1.10.1-1 \
   && yarn install
 
-COPY Gemfile Gemfile.lock package.json ./
-
-RUN bundle install --without development test --jobs 2 --retry 3
+RUN bundle install --without development --jobs 2 --retry 3
 
 # build msoffice-crypt and put it on the path
 RUN \

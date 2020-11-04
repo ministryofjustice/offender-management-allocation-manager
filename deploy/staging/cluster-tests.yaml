@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cluster-tests
+  namespace: offender-management-staging
+  labels:
+    app: cluster-tests
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      containers:
+        - name: cluster-tests
+          image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
+          imagePullPolicy: Always
+          command: ['sh', '-c', "bundle exec rspec -t cluster_vpn"]
+          envFrom:
+            - configMapRef:
+                name: shared-environment
+            - secretRef:
+                name: allocation-manager-secrets
+          env:
+            - name: COVERAGE
+              value: "0"
+      restartPolicy: Never

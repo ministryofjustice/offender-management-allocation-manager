@@ -27,24 +27,7 @@ class CaseInformationController < PrisonsApplicationController
   end
 
   def show
-    @delius_data = DeliusData.where(noms_no: nomis_offender_id_from_url)
-
-    @delius_errors = if @delius_data.empty?
-                       [DeliusImportError.new(
-                         nomis_offender_id: nomis_offender_id_from_url,
-                         error_type: DeliusImportError::MISSING_DELIUS_RECORD
-                       )]
-                     else
-                       DeliusImportError.where(
-                         nomis_offender_id: nomis_offender_id_from_url
-                       )
-                     end
-    last_delius = DeliusData.order(:updated_at).last
-    @next_update_date = if last_delius.present?
-                          last_delius.updated_at + 1.day
-                        else
-                          Date.tomorrow
-                        end
+    @delius_errors = DeliusImportError.where(nomis_offender_id: nomis_offender_id_from_url)
   end
 
   def create

@@ -5,18 +5,16 @@ class ProcessDeliusDataJob < ApplicationJob
 
   include ApplicationHelper
 
+  CommunityDeliusData = Struct.new(:noms_no, :tier, :team_code, :crn,
+                                   :service_provider, :ldu_code, :mappa, :mappa_levels, :offender_manager, :unallocated?)
+
   def perform(nomis_offender_id)
-    DeliusData.transaction do
+    ApplicationRecord.transaction do
       logger.info("[DELIUS] Processing delius data for #{nomis_offender_id}")
 
       DeliusImportError.where(nomis_offender_id: nomis_offender_id).destroy_all
-      delius_data = DeliusData.where(noms_no: nomis_offender_id)
-      if delius_data.count > 1
-        DeliusImportError.create! nomis_offender_id: nomis_offender_id,
-                                  error_type: DeliusImportError::DUPLICATE_NOMIS_ID
-      elsif delius_data.count == 1
-        import_data(delius_data.first)
-      end
+
+      import_data(OpenStruct.new(OffenderService.get_community_data(nomis_offender_id)))
     end
   end
 
@@ -29,28 +27,7 @@ private
       return logger.error("[DELIUS] Failed to retrieve NOMIS record #{delius_record.noms_no}")
     end
 
-    return unless offender.convicted?
-
-    # as a compromise, we always import the DeliusData into the case_information record now,
-    # but only disable manual editing for prisons that are actually enabled.
-    if dob_matches?(offender, delius_record)
-      process_record(delius_record)
-    else
-      DeliusImportError.create! nomis_offender_id: delius_record.noms_no,
-                                error_type: DeliusImportError::MISMATCHED_DOB
-    end
-  end
-
-  def dob_matches?(offender, delius_record)
-    delius_record.date_of_birth.present? &&
-      (delius_record.date_of_birth == ('*' * 8) ||
-      offender.date_of_birth == safe_date_parse(delius_record.date_of_birth))
-  end
-
-  def safe_date_parse(dob)
-    Date.parse(dob)
-  rescue ArgumentError
-    nil
+    process_record(delius_record) if offender.convicted?
   end
 
   def process_record(delius_record)
@@ -68,22 +45,14 @@ private
     find_case_info(delius_record).tap do |case_info|
       team = map_team(delius_record.team_code)
       case_info.assign_attributes(
-        com_name: map_com_name(delius_record.offender_manager),
+        com_name: delius_record.offender_manager,
         crn: delius_record.crn,
         tier: map_tier(delius_record.tier),
       team: team,
       case_allocation: delius_record.service_provider,
       welsh_offender: map_welsh_offender(delius_record.ldu_code),
-      mappa_level: map_mappa_level(delius_record.mappa, delius_record.mappa_levels)
+      mappa_level: map_mappa_level(delius_record.mappa_levels)
       )
-    end
-  end
-
-  def map_com_name(offender_manager)
-    if ['Unallocated', 'Inactive'].any? { |pattern| offender_manager.include?(pattern) }
-      nil
-    else
-      offender_manager
     end
   end
 
@@ -101,12 +70,8 @@ private
     }
   end
 
-  def map_mappa_level(delius_mappa, delius_mappa_levels)
-    if delius_mappa == 'N'
-      0
-    elsif delius_mappa == 'Y'
-      delius_mappa_levels.split(',').reject { |ml| ml == 'Nominal' }.map(&:to_i).max
-    end
+  def map_mappa_level(delius_mappa_levels)
+    delius_mappa_levels.empty? ? 0 : delius_mappa_levels.max
   end
 
   def map_welsh_offender(ldu_code)

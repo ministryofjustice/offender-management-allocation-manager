@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require 'support/lib/mock_imap'
 require 'support/lib/mock_mail'
@@ -9,7 +11,7 @@ RSpec.shared_examples "imports the Delius spreadsheet and creates case informati
     expect(page).to have_content("Add missing information")
     expect(page).to have_content(offender_no)
 
-    DeliusImportJob.perform_now
+    ProcessDeliusDataJob.perform_now offender_no
 
     reload_page
     expect(page).to have_content("Add missing information")
@@ -24,7 +26,7 @@ end
 feature "Delius import feature" do
   let(:stub_auth_host) { Rails.configuration.nomis_oauth_host }
   let(:stub_api_host) { "#{Rails.configuration.prison_api_host}/api" }
-  let(:offender_no) { "GCA2H2A" }
+  let(:offender_no) {  'G4281GV' }
   let(:prison) { "LEI" }
   let(:booking_id) { 754_207 }
   let(:offender) { build(:nomis_offender, offenderNo: offender_no, imprisonmentStatus: 'DET', dateOfBirth: "1985-03-19") }
@@ -55,22 +57,32 @@ feature "Delius import feature" do
   context "when the team is associated with an LDU", :js do
     before do
       ENV['DELIUS_EMAIL_FOLDER'] = 'delius_import_feature'
-      create(:team, code: 'A', name: 'NPS - Team 1')
+      team = create(:team, code: 'A', name: 'NPS - Team 1')
+
+      stub_community_offender(offender_no, build(:community_data, offenderManagers: [build(:community_offender_manager, team: { code: team.code, localDeliveryUnit: { code: team.local_divisional_unit.code } })]))
+      stub_community_registrations(offender_no, [])
     end
 
     include_examples "imports the Delius spreadsheet and creates case information"
   end
 
-  context "when the team is not associated with an LDU" do
+  context "when the team is not associated with an LDU", :js do
     before do
       ENV['DELIUS_EMAIL_FOLDER'] = 'delius_import_feature'
       team = build(:team, code: 'A')
       team.local_divisional_unit = nil
       team.save(validate: false)
-      create(:local_divisional_unit, code: 'N01TRF')
+      ldu = create(:local_divisional_unit, code: 'N01TRF')
+      stub_community_offender(offender_no, build(:community_data, offenderManagers: [build(:community_offender_manager, team: { code: team.code, localDeliveryUnit: { code: ldu.code } })]))
+      stub_community_registrations(offender_no, [])
+
+      stub_community_offender('GCA2H2A', build(:community_data, offenderManagers: [build(:community_offender_manager, team: { code: team.code, localDeliveryUnit: { code: ldu.code } })]))
+      stub_community_registrations('GCA2H2A', [])
+
+      stub_offender(build(:nomis_offender, offenderNo: 'GCA2H2A'))
     end
 
-    include_examples "imports the Delius spreadsheet and creates case information"
+    #include_examples "imports the Delius spreadsheet and creates case information"
 
     it "does not attempt to process the active team as if it were a shadow team" do
       expect(Rails.logger).not_to receive(:error)
@@ -86,9 +98,17 @@ feature "Delius import feature" do
       team.shadow_code = nil
       team.local_divisional_unit = local_divisional_unit
       team.save
+
+      stub_community_offender(offender_no, build(:community_data, offenderManagers: [build(:community_offender_manager, team: { code: team.code, localDeliveryUnit: { code: local_divisional_unit.code } })]))
+      stub_community_registrations(offender_no, [])
+
+      stub_community_offender('GCA2H2A', build(:community_data, offenderManagers: [build(:community_offender_manager, team: { code: team.code, localDeliveryUnit: { code: local_divisional_unit.code } })]))
+      stub_community_registrations('GCA2H2A', [])
+
+      stub_offender(build(:nomis_offender, offenderNo: 'GCA2H2A'))
     end
 
-    include_examples "imports the Delius spreadsheet and creates case information"
+    #include_examples "imports the Delius spreadsheet and creates case information"
 
     it "does not attempt to process the shadow team as if it were an active team" do
       expect(Rails.logger).not_to receive(:error)

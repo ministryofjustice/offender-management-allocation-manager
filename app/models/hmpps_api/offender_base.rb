@@ -23,6 +23,8 @@ module HmppsApi
 
     attr_reader :sentence_type
 
+    # This is needed (sadly) because although when querying by prison these are filtered out,
+    # we can query directly (we might have a CaseInformation record) where we don't filter.
     def convicted?
       @convicted_status == 'Convicted'
     end

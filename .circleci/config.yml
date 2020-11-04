@@ -91,8 +91,6 @@ references:
           docker tag app "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:testing"
           docker push "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:testing"
         fi
-        docker tag app "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:testing"
-        docker push "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:testing"
       environment:
         <<: *github_team_name_slug
         REPONAME: offender-management-allocation-manager
@@ -258,13 +256,45 @@ jobs:
       - store_artifacts:
           path: ~/test-results
 
+  cluster_test:
+    <<: *defaults
+    <<: *deploy_container_config
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Kubectl deployment staging setup
+          command: |
+            setup-kube-auth
+            kubectl config use-context staging
+      - deploy:
+          name: Run tests in k8s cluster
+          command: |
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/cluster-tests.yaml
+            kubectl delete job cluster-tests --ignore-not-found
+            kubectl apply --record=false -f deploy/staging/cluster-tests.yaml
+            echo "Waiting for jobs for a maximum of 10 minutes"
+            FIRST_POD=$(kubectl get pods -o=name | head -n 1)
+            kubectl logs -f $FIRST_POD
+            if ! kubectl wait --for=condition=complete -f deploy/staging/cluster-tests.yaml --timeout=600s ; then
+              echo "Failed pods:"
+              kubectl get pods --field-selector=status.phase=Failed
+              FIRST_POD=$(kubectl get pods --field-selector=status.phase=Failed -o=name | head -n 1)
+              echo "Logs for failed pod $FIRST_POD:"
+                kubectl logs $FIRST_POD
+              exit 1
+            fi
+          environment:
+            <<: *github_team_name_slug
+
   build_and_push_docker_image:
     <<: *defaults
     <<: *test_container_config
     steps:
       - checkout
       - attach_workspace:
-          at: ~/repo
+          at: ~/
       - setup_remote_docker:
           docker_layer_caching: true
       - *install_aws_cli
@@ -276,7 +306,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ~/repo
+          at: ~/
       - run:
           name: Kubectl deployment staging setup
           command: |
@@ -370,12 +400,10 @@ workflows:
             - install_dependencies
       - build_and_push_docker_image:
           requires:
-            - test
-          filters:
-            branches:
-              only:
-                - main
-                - preproduction
+            - install_dependencies
+      - cluster_test:
+          requires:
+            - build_and_push_docker_image
       - deploy_staging:
           requires:
             - build_and_push_docker_image

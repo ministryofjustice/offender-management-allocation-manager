@@ -21,20 +21,11 @@ RSpec.describe DeliusImportJob, type: :job do
                    G5497GU G3356GT GCA2H2A]
     offenders.each { |offender|
       stub_offender(build(:nomis_offender, offenderNo: offender))
+      stub_community_offender(offender, build(:community_data))
+      stub_community_registrations(offender, [])
     }
     stub_offender(build(:nomis_offender, offenderNo: 'mangled+nomis'))
     stub_auth_token
-  end
-
-  it 'doesnt crash' do
-    ENV['DELIUS_EMAIL_FOLDER'] = 'delius_import_job'
-    ENV['DELIUS_XLSX_PASSWORD'] = 'secret'
-
-    expect {
-      described_class.perform_now
-    }.to change(DeliusData, :count).by(1)
-    expect(DeliusData.last.crn).to eq('crn code')
-    expect(DeliusData.last.tier).to eq('A1')
   end
 
   context 'when LDU and team names contain ampersands (&)' do
@@ -43,10 +34,11 @@ RSpec.describe DeliusImportJob, type: :job do
       ENV['DELIUS_XLSX_PASSWORD'] = 'secret'
 
       described_class.perform_now
-      imported = DeliusData.first
+      ldu = LocalDivisionalUnit.last.name
+      team = Team.last.name
 
-      expect(imported.ldu).to eq('Norfolk & Suffolk LDU')
-      expect(imported.team).to eq('N&S-Bury St Edmunds')
+      expect(ldu).to eq('Norfolk & Suffolk LDU')
+      expect(team).to eq('N&S-Bury St Edmunds')
     end
   end
 

@@ -29,7 +29,6 @@ class DeliusImportJob < ApplicationJob
 
   def process_decrypted_file(processor)
     update_team_names_and_ldus(processor)
-    upsert_delius_data_records(processor)
   end
 
 private
@@ -131,19 +130,6 @@ private
         )
       end
     end
-  end
-
-  def upsert_delius_data_records(processor)
-    total = 0
-
-    processor.each do |record|
-      if record[:noms_no].present?
-        DeliusDataService.upsert(record)
-        total += 1
-      end
-    end
-
-    Rails.logger.info("[DELIUS] #{total} records attempted upsert")
   end
 
   def shadow_ldu?(ldu_code)

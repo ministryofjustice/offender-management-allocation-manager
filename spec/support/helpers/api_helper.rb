@@ -5,6 +5,7 @@ module ApiHelper
   T3 = "#{Rails.configuration.prison_api_host}/api"
   T3_SEARCH = "#{Rails.configuration.prisoner_search_host}/prisoner-search"
   KEYWORKER_API_HOST = ENV.fetch('KEYWORKER_API_HOST')
+  COMMUNITY_HOST = "#{Rails.configuration.community_api_host}/secure"
 
   def stub_offender(offender)
     booking_number = offender.fetch(:bookingId)
@@ -146,5 +147,15 @@ module ApiHelper
 
   def reload_page
     visit current_path
+  end
+
+  def stub_community_offender(nomis_offender_id, community_data)
+    stub_request(:get, "#{COMMUNITY_HOST}/offenders/nomsNumber/#{nomis_offender_id}/all").
+        to_return(body: community_data.to_json)
+  end
+
+  def stub_community_registrations(nomis_offender_id, registrations)
+    stub_request(:get, "#{COMMUNITY_HOST}/offenders/nomsNumber/#{nomis_offender_id}/registrations").
+        to_return(body: { registrations: registrations }.to_json)
   end
 end

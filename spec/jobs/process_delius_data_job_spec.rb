@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }, type: :job do
+RSpec.describe ProcessDeliusDataJob, type: :job do
   let(:nomis_offender_id) { 'G4281GV' }
   let(:remand_nomis_offender_id) { 'G3716UD' }
   let(:ldu) {  create(:local_divisional_unit) }
@@ -13,60 +13,52 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
 
     before do
       test_strategy.switch!(:auto_delius_import, true)
+      stub_auth_token
     end
 
     after do
       test_strategy.switch!(:auto_delius_import, false)
     end
 
-    context 'when duplicate NOMIS ids exist' do
-      let!(:d1) {
-        create(:delius_data, noms_no: nomis_offender_id, team_code: team.code, team: team.name,
-                             ldu_code: ldu.code, ldu: ldu.name)
-      }
-      let!(:d2) {
-        create(:delius_data, noms_no: nomis_offender_id, team_code: team.code, team: team.name,
-                             ldu_code: ldu.code, ldu: ldu.name)
-      }
-
-      it 'flags up the duplicate IDs' do
-        expect {
-          expect {
-            described_class.perform_now nomis_offender_id
-          }.not_to change(CaseInformation, :count)
-        }.to change(DeliusImportError, :count).by(1)
-
-        expect(DeliusImportError.last(2).map(&:nomis_offender_id)).to match_array [nomis_offender_id]
-        expect(DeliusImportError.last(2).map(&:error_type)).to match_array [DeliusImportError::DUPLICATE_NOMIS_ID]
-      end
-    end
-
     context 'when on the happy path' do
-      let!(:d1) {
-        create(:delius_data, team_code: team.shadow_code, team: team.name,
-                             ldu_code: ldu.code, ldu: ldu.name)
-      }
+      before do
+        stub_offender(build(:nomis_offender, offenderNo: nomis_offender_id))
+        stub_community_offender(nomis_offender_id, build(:community_data, offenderManagers: [build(:community_offender_manager, team: { code: team.code, localDeliveryUnit: { code: ldu.code } })]))
+        stub_community_registrations(nomis_offender_id, [])
+      end
 
       it 'creates case information' do
         expect {
-          described_class.perform_now d1.noms_no
+          described_class.perform_now nomis_offender_id
         }.to change(CaseInformation, :count).by(1)
+
+        expect(CaseInformation.last.attributes.symbolize_keys.except(:created_at, :id, :updated_at))
+            .to eq(case_allocation: "NPS", crn: "X362207", manual_entry: false, mappa_level: 0, nomis_offender_id: "G4281GV", parole_review_date: nil,
+                    probation_service: "England",
+                    welsh_offender: 'No',
+                    team_id: team.id,
+                   com_name: "Jones, Ruth Mary",
+                    tier: "A")
       end
     end
 
     context 'when processing a com name' do
       let(:offender_id) { 'A1111A' }
-      let!(:d1) {
-        create(:delius_data, offender_manager: com_name, team_code: team.shadow_code, team: team.name,
-               ldu_code: ldu.code, ldu: ldu.name)
-      }
+
+      before do
+        stub_offender(build(:nomis_offender, offenderNo: offender_id))
+
+        stub_community_offender(offender_id, build(:community_data, offenderManagers: [build(:community_offender_manager, staff: { unallocated: unallocated, forenames: 'Bob', surname: 'Smith' }, team: { code: team.code, localDeliveryUnit: { code: ldu.code } })]))
+        stub_community_registrations(offender_id, [])
+      end
 
       context 'with a normal COM name' do
-        let(:com_name) { 'Bob Smith' }
+        let(:com_name) { 'Smith, Bob' }
+        let(:unallocated) { false }
 
         it 'shows com name' do
           expect {
-            described_class.perform_now d1.noms_no
+            described_class.perform_now offender_id
           }.to change(CaseInformation, :count).by(1)
 
           expect(CaseInformation.last.com_name).to eq(com_name)
@@ -75,10 +67,11 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
 
       context 'with an unallocated com name' do
         let(:com_name) { 'Staff, Unallocated' }
+        let(:unallocated) { true }
 
         it 'maps com_name to nil' do
           expect {
-            described_class.perform_now d1.noms_no
+            described_class.perform_now offender_id
           }.to change(CaseInformation, :count).by(1)
 
           expect(CaseInformation.last.com_name).to be_nil
@@ -87,10 +80,11 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
 
       context 'with an inactive com name' do
         let(:com_name) { 'Staff, Inactive Staff(N07)' }
+        let(:unallocated) { true }
 
         it 'maps com_name to nil' do
           expect {
-            described_class.perform_now d1.noms_no
+            described_class.perform_now offender_id
           }.to change(CaseInformation, :count).by(1)
 
           expect(CaseInformation.last.com_name).to be_nil
@@ -99,54 +93,62 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
     end
 
     context 'when offender is not convicted' do
-      let!(:d1) {
-        create(:delius_data, noms_no: remand_nomis_offender_id, team_code: team.shadow_code, team: team.name,
-                             ldu_code: ldu.code, ldu: ldu.name)
-      }
+      before do
+        stub_offender(build(:nomis_offender, offenderNo: remand_nomis_offender_id, convictedStatus: 'Remand'))
+        stub_community_offender(remand_nomis_offender_id, build(:community_data, offenderManagers: [build(:community_offender_manager, team: { code: team.code, localDeliveryUnit: { code: ldu.code } })]))
+        stub_community_registrations(remand_nomis_offender_id, [])
+      end
 
       it 'does not case information' do
         expect {
-          described_class.perform_now d1.noms_no
+          described_class.perform_now remand_nomis_offender_id
         }.to change(CaseInformation, :count).by(0)
       end
     end
 
     context 'when tier contains extra characters' do
-      let!(:d1) {
-        create(:delius_data, tier: 'B1', team_code: team.shadow_code, team: team.name,
-                             ldu_code: ldu.code, ldu: ldu.name)
-      }
+      before do
+        stub_offender(build(:nomis_offender, offenderNo: nomis_offender_id))
+        stub_community_offender(nomis_offender_id, build(:community_data, currentTier: 'B1', offenderManagers: [build(:community_offender_manager, team: { code: team.code, localDeliveryUnit: { code: ldu.code } })]))
+        stub_community_registrations(nomis_offender_id, [])
+      end
 
       it 'creates case information' do
         expect {
-          described_class.perform_now d1.noms_no
+          described_class.perform_now nomis_offender_id
         }.to change(CaseInformation, :count).by(1)
         expect(CaseInformation.last.tier).to eq('B')
       end
     end
 
     context 'when tier is invalid' do
-      let!(:d1) {
-        create(:delius_data, tier: 'X', team_code: team.shadow_code, team: team.name,
-                             ldu_code: ldu.code, ldu: ldu.name)
-      }
+      before do
+        stub_offender(build(:nomis_offender, offenderNo: nomis_offender_id))
+        stub_community_offender(nomis_offender_id, build(:community_data, currentTier: 'X', offenderManagers: [build(:community_offender_manager, team: { code: team.code, localDeliveryUnit: { code: ldu.code } })]))
+        stub_community_registrations(nomis_offender_id, [])
+      end
 
       it 'does not creates case information' do
         expect {
-          described_class.perform_now d1.noms_no
+          described_class.perform_now nomis_offender_id
         }.not_to change(CaseInformation, :count)
       end
     end
 
     describe '#welsh_offender' do
       let(:case_info) { CaseInformation.last }
-      let(:delius_record) { create(:delius_data, ldu_code: ldu.code, team_code: team.code) }
+
+      before do
+        stub_offender(build(:nomis_offender, offenderNo: nomis_offender_id))
+        stub_community_offender(nomis_offender_id, build(:community_data, offenderManagers: [build(:community_offender_manager, team: { code: team.code, localDeliveryUnit: { code: ldu.code } })]))
+        stub_community_registrations(nomis_offender_id, [])
+      end
 
       context 'with an English LDU' do
         let(:ldu) { create(:local_divisional_unit, in_wales: false) }
 
         it 'maps to false' do
-          described_class.perform_now(delius_record.noms_no)
+          described_class.perform_now(nomis_offender_id)
           expect(case_info.welsh_offender).to eq('No')
         end
       end
@@ -155,61 +157,65 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
         let(:ldu) { create(:local_divisional_unit, in_wales: true) }
 
         it 'maps to true' do
-          described_class.perform_now(delius_record.noms_no)
+          described_class.perform_now(nomis_offender_id)
           expect(case_info.welsh_offender).to eq('Yes')
         end
       end
     end
 
     describe '#mappa' do
+      before do
+        stub_community_offender(nomis_offender_id, build(:community_data, offenderManagers: [build(:community_offender_manager, team: { code: team.code, localDeliveryUnit: { code: ldu.code } })]))
+      end
+
       context 'without delius mappa' do
-        let!(:d1) {
-          create(:delius_data, mappa: 'N', team_code: team.shadow_code, team: team.name,
-                               ldu_code: ldu.code, ldu: ldu.name)
-        }
+        before do
+          stub_offender(build(:nomis_offender, offenderNo: nomis_offender_id))
+          stub_community_registrations(nomis_offender_id, [])
+        end
 
         it 'creates case information with mappa level 0' do
           expect {
-            described_class.perform_now d1.noms_no
+            described_class.perform_now nomis_offender_id
           }.to change(CaseInformation, :count).by(1)
           expect(CaseInformation.last.mappa_level).to eq(0)
         end
       end
 
       context 'with delius mappa' do
-        let!(:d1) {
-          create(:delius_data, mappa: 'Y', mappa_levels: mappa_levels, team_code: team.shadow_code, team: team.name,
-                               ldu_code: ldu.code, ldu: ldu.name)
-        }
+        before do
+          stub_offender(build(:nomis_offender, offenderNo: nomis_offender_id))
+          stub_community_registrations(nomis_offender_id, mappa_levels.map { |m| build(:community_registration, registerLevel: { code: "M#{m}" }) })
+        end
 
         context 'with delius mappa data is 1' do
-          let(:mappa_levels) { '1' }
+          let(:mappa_levels) { ['1'] }
 
           it 'creates case information with mappa level 1' do
             expect {
-              described_class.perform_now d1.noms_no
+              described_class.perform_now nomis_offender_id
             }.to change(CaseInformation, :count).by(1)
             expect(CaseInformation.last.mappa_level).to eq(1)
           end
         end
 
         context 'with delius mappa data is 1,2' do
-          let(:mappa_levels) { '1,2' }
+          let(:mappa_levels) { ['1', '2'] }
 
           it 'creates case information with mappa level 2' do
             expect {
-              described_class.perform_now d1.noms_no
+              described_class.perform_now nomis_offender_id
             }.to change(CaseInformation, :count).by(1)
             expect(CaseInformation.last.mappa_level).to eq(2)
           end
         end
 
         context 'with delius mappa data is 1,Nominal' do
-          let(:mappa_levels) { '1,Nominal' }
+          let(:mappa_levels) { ['1', 'Nominal'] }
 
           it 'creates case information with mappa level 1' do
             expect {
-              described_class.perform_now d1.noms_no
+              described_class.perform_now nomis_offender_id
             }.to change(CaseInformation, :count).by(1)
             expect(CaseInformation.last.mappa_level).to eq(1)
           end
@@ -217,114 +223,20 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
       end
     end
 
-    context 'when tier is missing' do
-      let!(:d1) {
-        create(:delius_data, tier: nil, team_code: team.shadow_code, team: team.name,
-                             ldu_code: ldu.code, ldu: ldu.name)
-      }
-
-      it 'does not creates case information' do
-        expect {
-          described_class.perform_now d1.noms_no
-        }.not_to change(CaseInformation, :count)
-      end
-    end
-
-    context 'when invalid service provider' do
-      let!(:d1) {
-        create(:delius_data, provider_code: 'X123', team_code: team.shadow_code, team: team.name,
-                             ldu_code: ldu.code, ldu: ldu.name)
-      }
-
-      it 'does not creates case information' do
-        expect {
-          described_class.perform_now d1.noms_no
-        }.not_to change(CaseInformation, :count)
-      end
-    end
-
-    context 'when date contains 8 stars' do
-      let!(:d1) {
-        create(:delius_data, date_of_birth: '*' * 8, team_code: team.shadow_code, team: team.name,
-                             ldu_code: ldu.code, ldu: ldu.name)
-      }
-
-      it 'creates a new case information record' do
-        expect {
-          described_class.perform_now d1.noms_no
-        }.to change(CaseInformation, :count).by(1)
-      end
-    end
-
-    context 'when date invalid' do
-      let!(:d1) {
-        create(:delius_data, date_of_birth: 'ohdearieme', team_code: team.shadow_code, team: team.name,
-                             ldu_code: ldu.code, ldu: ldu.name)
-      }
-
-      it 'creates an error record' do
-        expect {
-          expect {
-            described_class.perform_now d1.noms_no
-          }.not_to change(CaseInformation, :count)
-        }.to change(DeliusImportError, :count).by(1)
-
-        expect(DeliusImportError.last.error_type).to eq(DeliusImportError::MISMATCHED_DOB)
-      end
-    end
-
     context 'when case information already present' do
-      let!(:d1) {
-        create(:delius_data, tier: 'C', team_code: team.shadow_code, team: team.name,
-                             ldu_code: ldu.code, ldu: ldu.name)
-      }
-      let!(:c1) { create(:case_information, tier: 'B', nomis_offender_id: d1.noms_no, crn: d1.crn) }
+      before do
+        stub_offender(build(:nomis_offender, offenderNo: nomis_offender_id))
+        stub_community_offender(nomis_offender_id, build(:community_data, currentTier: 'C', offenderManagers: [build(:community_offender_manager, team: { code: team.code, localDeliveryUnit: { code: ldu.code } })]))
+        stub_community_registrations(nomis_offender_id, [])
+      end
+
+      let!(:c1) { create(:case_information, tier: 'B', nomis_offender_id: nomis_offender_id) }
 
       it 'does not creates case information' do
         expect {
-          described_class.perform_now d1.noms_no
+          described_class.perform_now nomis_offender_id
         }.not_to change(CaseInformation, :count)
         expect(c1.reload.tier).to eq('C')
-      end
-    end
-  end
-
-  context 'without auto_delius_import enabled' do
-    context 'with one prison enabled' do
-      before do
-        ENV['AUTO_DELIUS_IMPORT'] = 'VEN,LEI,HGT'
-      end
-
-      context 'when on the happy path' do
-        let!(:d1) {
-          create(:delius_data, team_code: team.shadow_code, team: team.name,
-                               ldu_code: ldu.code, ldu: ldu.name)
-        }
-
-        it 'creates case information' do
-          expect {
-            described_class.perform_now d1.noms_no
-          }.to change(CaseInformation, :count).by(1)
-        end
-      end
-    end
-
-    context 'with non-enabled prison' do
-      before do
-        ENV['AUTO_DELIUS_IMPORT'] = 'RSI,VEN'
-      end
-
-      context 'when on the happy path' do
-        let!(:d1) {
-          create(:delius_data, team_code: team.shadow_code, team: team.name,
-                               ldu_code: ldu.code, ldu: ldu.name)
-        }
-
-        it 'creates case information' do
-          expect {
-            described_class.perform_now d1.noms_no
-          }.to change(CaseInformation, :count).by(1)
-        end
       end
     end
   end

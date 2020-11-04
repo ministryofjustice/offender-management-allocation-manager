@@ -16,13 +16,6 @@
 
 <h1 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-4">Case information</h1>
 
-<p class="govuk-!-margin-bottom-8">
-  <% if @delius_data.any? %>
-    Case information last updated from nDelius: <%= format_date(@delius_data.last.updated_at) %>
-  <% end %>
-  Next scheduled update: <%= format_date(@next_update_date) %>
-</p>
-
 <div class="govuk-!-margin-top-1">
   <table class="govuk-table">
     <tbody class="govuk-table__body">
@@ -48,7 +41,7 @@
       <tr class="govuk-table__row">
         <td class="govuk-table__cell govuk-!-width-one-half">CRN number</td>
         <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half" id="offender_crn">
-          <%= prisoner_crn_display(@prisoner, @delius_data) %>
+          <%= @prisoner.crn %>
         </td>
       </tr>
       <tr class="govuk-table__row">
