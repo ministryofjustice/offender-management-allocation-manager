@@ -45,5 +45,9 @@ FactoryBot.define do
     trait :crc do
       case_allocation { CaseInformation::CRC }
     end
+
+    trait :with_com do
+      com_name { "#{Faker::Name.last_name}, #{Faker::Name.first_name}" }
+    end
   end
 end
