@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe CaseloadHandoversController, type: :controller do
+RSpec.describe CaseloadHandoversController, :allocation, type: :controller do
   let(:prison) { build(:prison).code }
   let(:staff_id) { 456_987 }
   let(:not_signed_in) { 123_456 }

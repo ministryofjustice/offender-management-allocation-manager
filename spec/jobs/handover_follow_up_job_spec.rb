@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe HandoverFollowUpJob, type: :job do
+RSpec.describe HandoverFollowUpJob, :allocation, type: :job do
   let(:determinate_offender) do
     build_offender(Time.zone.today + 8.months,
                    sentence_type: :determinate,

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe AutomaticHandoverEmailJob, type: :job do
+RSpec.describe AutomaticHandoverEmailJob, :allocation, type: :job do
   let(:active_ldu) { LocalDivisionalUnit.first }
   let(:staff_id) { 123456 }
   let(:email_address) { Faker::Internet.email }
