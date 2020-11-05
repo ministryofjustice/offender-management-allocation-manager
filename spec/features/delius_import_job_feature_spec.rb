@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require 'support/lib/mock_imap'
 require 'support/lib/mock_mail'
@@ -9,7 +11,7 @@ RSpec.shared_examples "imports the Delius spreadsheet and creates case informati
     expect(page).to have_content("Add missing information")
     expect(page).to have_content(offender_no)
 
-    DeliusImportJob.perform_now
+    ProcessDeliusDataJob.perform_now offender_no
 
     reload_page
     expect(page).to have_content("Add missing information")
@@ -28,10 +30,9 @@ end
 feature "Delius import feature", :disable_push_to_delius do
   let(:stub_auth_host) { Rails.configuration.nomis_oauth_host }
   let(:stub_api_host) { "#{Rails.configuration.prison_api_host}/api" }
-  let(:offender_no) { "GCA2H2A" }
+  let(:offender_no) {  'G4281GV' }
   let(:prison) { build(:prison).code }
-  let(:booking_id) { 754_207 }
-  let(:offender) { build(:nomis_offender, offenderNo: offender_no, imprisonmentStatus: 'DET', dateOfBirth: "1985-03-19") }
+  let(:offender) { build(:nomis_offender, offenderNo: offender_no) }
   let(:pom) { build(:pom) }
 
   before do
@@ -43,55 +44,62 @@ feature "Delius import feature", :disable_push_to_delius do
     stub_request(:post, "#{stub_api_host}/movements/offenders?latestOnly=false&movementTypes=TRN").
       with(body: [offender_no].to_json).
         to_return(body: [attributes_for(:movement, offenderNo: offender_no, toAgency: prison)].to_json)
-
-    stub_const("Net::IMAP", MockIMAP)
-
-    stub_const("Mail", MockMailMessage)
-
-    ENV['DELIUS_XLSX_PASSWORD'] = 'secret'
   end
 
-  context "when the team is associated with an LDU", :js do
+  context "when the team is associated with an LDU" do
     before do
-      ENV['DELIUS_EMAIL_FOLDER'] = 'delius_import_feature'
-      create(:team, code: 'A', name: 'NPS - Team 1')
+      team = create(:team)
+
+      stub_community_offender(offender_no, build(:community_data,
+                                                 offenderManagers: [
+                                                     build(:community_offender_manager,
+                                                           team: { code: team.code,
+                                                                   localDeliveryUnit: { code: team.local_divisional_unit.code } })]))
     end
 
     include_examples "imports the Delius spreadsheet and creates case information"
   end
 
-  context "when the team is not associated with an LDU" do
+  context 'when importing an Excel spreadsheet' do
     before do
-      ENV['DELIUS_EMAIL_FOLDER'] = 'delius_import_feature'
-      team = build(:team, code: 'A')
-      team.local_divisional_unit = nil
-      team.save(validate: false)
-      create(:local_divisional_unit, code: 'N01TRF')
+      stub_const("Net::IMAP", MockIMAP)
+      stub_const("Mail", MockMailMessage)
+
+      ENV['DELIUS_EMAIL_FOLDER'] = delius_email_folder
+      ENV['DELIUS_XLSX_PASSWORD'] = 'secret'
     end
 
-    include_examples "imports the Delius spreadsheet and creates case information"
+    context "when the team is not associated with an LDU" do
+      let(:delius_email_folder) {  'delius_import_feature' }
 
-    it "does not attempt to process the active team as if it were a shadow team" do
-      expect(Rails.logger).not_to receive(:error)
-      DeliusImportJob.perform_now
-    end
-  end
+      before do
+        team = build(:team, code: 'A')
+        team.local_divisional_unit = nil
+        team.save(validate: false)
+        create(:local_divisional_unit, code: 'N01TRF')
+      end
 
-  context "when the shadow team is not associated with an active team" do
-    before do
-      ENV['DELIUS_EMAIL_FOLDER'] = 'delius_import_feature_shadow'
-      local_divisional_unit = create(:local_divisional_unit, code: 'LDU1')
-      team = build(:team, code: 'A', name: 'NPS - Team 1')
-      team.shadow_code = nil
-      team.local_divisional_unit = local_divisional_unit
-      team.save
+      it "does not attempt to process the active team as if it were a shadow team" do
+        expect(Rails.logger).not_to receive(:error)
+        DeliusImportJob.perform_now
+      end
     end
 
-    include_examples "imports the Delius spreadsheet and creates case information"
+    context "when the shadow team is not associated with an active team" do
+      let(:delius_email_folder) {  'delius_import_feature_shadow' }
 
-    it "does not attempt to process the shadow team as if it were an active team" do
-      expect(Rails.logger).not_to receive(:error)
-      DeliusImportJob.perform_now
+      before do
+        local_divisional_unit = create(:local_divisional_unit, code: 'LDU1')
+        team = build(:team, code: 'A', name: 'NPS - Team 1')
+        team.shadow_code = nil
+        team.local_divisional_unit = local_divisional_unit
+        team.save!
+      end
+
+      it "does not attempt to process the shadow team as if it were an active team" do
+        expect(Rails.logger).not_to receive(:error)
+        DeliusImportJob.perform_now
+      end
     end
   end
 end
