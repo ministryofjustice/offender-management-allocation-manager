@@ -10,7 +10,7 @@ class SummaryService
     sortable_fields = {
         allocated: [:last_name, :earliest_release_date, :tier],
         new_arrivals: [:last_name, :prison_arrival_date, :earliest_release_date],
-        handovers: [:last_name, :handover_start_date, :responsibility_handover_date, :case_allocation],
+        handovers: [:last_name, :handover_start_date, :responsibility_handover_date, :case_allocation, :allocated_pom_name, :allocated_com_name],
         unallocated: [:last_name, :earliest_release_date, :case_owner, :awaiting_allocation_for, :tier],
         pending: [:last_name, :earliest_release_date, :case_owner, :awaiting_allocation_for, :tier]
     }.fetch(summary_type)

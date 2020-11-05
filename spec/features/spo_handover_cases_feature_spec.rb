@@ -71,4 +71,67 @@ feature "SPO viewing upcoming handover cases" do
     visit prison_summary_handovers_path(prison)
     expect(page).to have_current_path('/401')
   end
+
+  context 'with four offenders' do
+    let(:poms) { ["Dunlop, Abbey", "Brown, Denis", "Albright, Sally", "Carsley, Jo"] }
+    let(:coms) { ["Dabery, Suzzie", "Canne, Sam", "Blackburn, Zoe", "Abbot, Brian"] }
+
+    let(:check_poms) { ["Albright, Sally", "Brown, Denis", "Carsley, Jo", "Dunlop, Abbey"] }
+    let(:check_coms) { ["Abbot, Brian", "Blackburn, Zoe", "Canne, Sam", "Dabery, Suzzie"] }
+
+    before do
+      stub_auth_token
+      stub_user(staff_id: 123_456)
+
+      offenders = [
+          build(:nomis_offender,
+                offenderNo: "A7514GW",
+                sentence: attributes_for(:sentence_detail, :inside_handover_window)),
+          build(:nomis_offender,
+                offenderNo: "B7514GW",
+                sentence: attributes_for(:sentence_detail, :inside_handover_window)),
+          build(:nomis_offender, offenderNo: "C7514GW",
+                sentence: attributes_for(:sentence_detail, :inside_handover_window)),
+          build(:nomis_offender, offenderNo: "D7514GW",
+                sentence: attributes_for(:sentence_detail, :inside_handover_window))
+      ]
+
+      stub_offenders_for_prison(prison, offenders)
+
+      offenders.each_with_index do |offender, i|
+        create(:case_information,  com_name: coms.fetch(i),  nomis_offender_id: offender.fetch(:offenderNo))
+        create(:allocation, primary_pom_name: poms.fetch(i), nomis_offender_id: offender.fetch(:offenderNo), prison: prison)
+      end
+
+      signin_spo_user
+      visit prison_summary_handovers_path(prison)
+    end
+
+    scenario 'sorts POMs alphabetically' do
+      click_link('POM')
+
+      check_poms.each_with_index do |name, index|
+        expect(page).to have_css(".offender_row_#{index}", text: name)
+      end
+
+      click_link('POM')
+      check_poms.reverse.each_with_index do |name, index|
+        expect(page).to have_css(".offender_row_#{index}", text: name)
+      end
+    end
+
+    scenario 'sorts COMs alphabetically' do
+      click_link('COM')
+
+      check_coms.each_with_index do |name, index|
+        expect(page).to have_css(".offender_row_#{index}", text: name)
+      end
+
+      click_link('COM')
+
+      check_coms.reverse.each_with_index do |name, index|
+        expect(page).to have_css(".offender_row_#{index}", text: name)
+      end
+    end
+  end
 end

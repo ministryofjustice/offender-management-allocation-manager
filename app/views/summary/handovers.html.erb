@@ -40,10 +40,16 @@
         <%= sort_arrow('responsibility_handover_date') %>
       </th>
       <th class="govuk-table__header sorter-false" xscope="col">
+        <a href="<%= sort_link('allocated_pom_name') %>">
         POM
+        </a>
+        <%= sort_arrow('allocated_pom_name') %>
       </th>
       <th class="govuk-table__header sorter-false" xscope="col">
+        <a href="<%= sort_link('allocated_com_name') %>">
         COM
+        </a>
+        <%= sort_arrow('allocated_com_name') %>
       </th>
       <th class="govuk-table__header sorter-false" xscope="col">
         <a href="<%= sort_link('case_allocation') %>">
