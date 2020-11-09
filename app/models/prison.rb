@@ -3,6 +3,12 @@
 class Prison
   attr_reader :code
 
+  class << self
+    def active
+      PrisonEmumerator.new Allocation.distinct.pluck(:prison)
+    end
+  end
+
   def initialize(prison_code)
     @code = prison_code
   end
@@ -39,6 +45,18 @@ class Prison
   end
 
 private
+
+  class PrisonEmumerator
+    include Enumerable
+
+    def initialize codes
+      @codes = codes
+    end
+
+    def each
+      @codes.each { |code| yield Prison.new(code) }
+    end
+  end
 
   class OffenderEnumerator
     include Enumerable

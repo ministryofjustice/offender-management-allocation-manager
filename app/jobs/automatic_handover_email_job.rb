@@ -7,12 +7,13 @@ class AutomaticHandoverEmailJob < ApplicationJob
 
   def perform ldu
     today = Time.zone.today
-    active_prison_codes = Allocation.distinct.pluck(:prison)
     ldu_offenders = ldu.teams.map { |team| team.case_information.map(&:nomis_offender_id) }.flatten
                     .map { |offender_id| OffenderService.get_offender(offender_id) }
                     .compact
     # don't send any emails to empty LDUs with no offenders
     if ldu_offenders.any?
+      active_prison_codes = Prison.active.map(&:code)
+
       offenders = ldu_offenders.select { |o|
         active_prison_codes.include?(o.prison_id) &&
             o.sentenced? &&
