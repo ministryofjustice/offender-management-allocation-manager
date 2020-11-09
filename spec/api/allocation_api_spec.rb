@@ -2,11 +2,13 @@
 
 require 'swagger_helper'
 
-# rubocop:disable RSpec/DescribeClass
-# rubocop:disable RSpec/EmptyExampleGroup
 # The DescribeClass cop has been disabled as it is insists that the describe
 # block contain the name of the tested class.  However rswag is using this
 # text as part of the API documentation generated from these tests.
+# rubocop:disable RSpec/DescribeClass
+# rubocop:disable RSpec/EmptyExampleGroup
+# Authorization 'method' needs to be defined for rswag
+# rubocop:disable RSpec/VariableName
 describe 'Allocation API', vcr: { cassette_name: :allocation_api } do
   let!(:private_key) { OpenSSL::PKey::RSA.generate 2048 }
   let!(:public_key) { Base64.strict_encode64(private_key.public_key.to_s) }
@@ -100,5 +102,6 @@ describe 'Allocation API', vcr: { cassette_name: :allocation_api } do
     end
   end
 end
+# rubocop:enable RSpec/VariableName
 # rubocop:enable RSpec/EmptyExampleGroup
 # rubocop:enable RSpec/DescribeClass

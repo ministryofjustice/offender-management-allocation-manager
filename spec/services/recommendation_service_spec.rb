@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe RecommendationService do
-  let(:tierA) {
+  let(:tier_a) {
     build(:offender,
           sentence: HmppsApi::SentenceDetail.new(
             sentence_start_date: Time.zone.today,
@@ -9,7 +9,7 @@ describe RecommendationService do
       o.load_case_information(build(:case_information, tier: 'A'))
     }
   }
-  let(:tierD) {
+  let(:tier_d) {
     build(:offender,
           sentence: HmppsApi::SentenceDetail.new(
             sentence_start_date: Time.zone.today,
@@ -18,7 +18,7 @@ describe RecommendationService do
     }
   }
 
-  let(:tierA_and_immigration_case) {
+  let(:tier_a_and_immigration_case) {
     build(:offender,
           imprisonmentStatus: 'DET', sentence: HmppsApi::SentenceDetail.new).tap { |o|
       o.load_case_information(build(:case_information, tier: 'A'))
@@ -26,14 +26,14 @@ describe RecommendationService do
   }
 
   it "can determine the best type of POM for Tier A" do
-    expect(described_class.recommended_pom_type(tierA)).to eq(described_class::PROBATION_POM)
+    expect(described_class.recommended_pom_type(tier_a)).to eq(described_class::PROBATION_POM)
   end
 
   it "can determine the best type of POM for Tier D" do
-    expect(described_class.recommended_pom_type(tierD)).to eq(described_class::PRISON_POM)
+    expect(described_class.recommended_pom_type(tier_d)).to eq(described_class::PRISON_POM)
   end
 
   it "can determine the best type of POM for an immigration case" do
-    expect(described_class.recommended_pom_type(tierA_and_immigration_case)).to eq(described_class::PRISON_POM)
+    expect(described_class.recommended_pom_type(tier_a_and_immigration_case)).to eq(described_class::PRISON_POM)
   end
 end

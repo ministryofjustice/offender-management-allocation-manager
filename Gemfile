@@ -51,7 +51,7 @@ group :development, :test do
   gem 'factory_bot_rails'
   gem 'parallel_tests'
   gem 'rubocop'
-  gem 'rubocop-rspec'
+  gem 'rubocop-rspec', '>= 1.41'
   gem 'rubocop-performance'
   gem 'rubocop-rails'
   gem 'rubocop-govuk'
