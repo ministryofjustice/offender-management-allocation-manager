@@ -9,12 +9,16 @@ module HmppsApi
       @root = root
       @connection = Faraday.new do |faraday|
         faraday.request :retry, max: 3, interval: 0.05,
-                                interval_randomness: 0.5, backoff_factor: 2,
-                                exceptions: [Faraday::ClientError, 'Timeout::Error']
+                        interval_randomness: 0.5, backoff_factor: 2,
+                        # Note - this might break if we ever use an API that uses a real POST
+                        # rather than the fake GETs used by the Prison API
+                        methods: Faraday::Request::Retry::IDEMPOTENT_METHODS + [:post],
+                        exceptions: [Faraday::ClientError, 'Timeout::Error']
 
         faraday.options.params_encoder = Faraday::FlatParamsEncoder
-        faraday.use Faraday::Response::RaiseError
-        faraday.use Faraday::Request::Instrumentation
+        faraday.request :instrumentation
+        # Response middleware is supposed to be registered after request middleware
+        faraday.response :raise_error
         faraday.adapter :typhoeus
       end
     end
