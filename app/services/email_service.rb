@@ -90,7 +90,7 @@ private
       }
       return nil if previous.blank?
 
-      StaffMember.new(previous.primary_pom_nomis_id)
+      StaffMember.new(Prison.new(previous.prison), previous.primary_pom_nomis_id)
     end
   end
 

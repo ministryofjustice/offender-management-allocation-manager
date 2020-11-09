@@ -34,16 +34,6 @@ class Prison
     OffenderEnumerator.new(@code)
   end
 
-  def allocations_for(staff_id)
-    offender_hash = offenders.index_by(&:offender_no)
-    allocations = Allocation.
-      where(nomis_offender_id: offender_hash.keys).
-      active_pom_allocations(staff_id, @code)
-    allocations.map { |alloc|
-      AllocatedOffender.new(staff_id, alloc, offender_hash.fetch(alloc.nomis_offender_id))
-    }
-  end
-
 private
 
   class PrisonEmumerator

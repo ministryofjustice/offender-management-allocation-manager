@@ -24,13 +24,13 @@ class AllocationsController < PrisonsApplicationController
     allocation = Allocation.find_by!(nomis_offender_id: @prisoner.offender_no)
     @allocation = AllocationPresenter.new(allocation, allocation.versions.last)
 
-    @pom = StaffMember.new(@allocation.primary_pom_nomis_id)
-    redirect_to prison_pom_non_pom_path(@prison.code, @pom.staff_id) unless @pom.pom_at?(@prison.code)
+    @pom = StaffMember.new(@prison, @allocation.primary_pom_nomis_id)
+    redirect_to prison_pom_non_pom_path(@prison.code, @pom.staff_id) unless @pom.has_pom_role?
 
     secondary_pom_nomis_id = @allocation.secondary_pom_nomis_id
     if secondary_pom_nomis_id.present?
-      coworker = StaffMember.new(secondary_pom_nomis_id)
-      if coworker.pom_at?(@prison.code)
+      coworker = StaffMember.new(@prison, secondary_pom_nomis_id)
+      if coworker.has_pom_role?
         @coworker = coworker
       end
     end

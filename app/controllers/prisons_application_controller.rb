@@ -18,7 +18,7 @@ protected
   end
 
   def current_user_is_pom?
-    sso_identity.current_user_is_pom? && pom_at_active_prison?
+    sso_identity.current_user_is_pom? && @current_user.has_pom_role?
   end
 
 private
@@ -37,12 +37,8 @@ private
 
   def load_staff_member
     user = HmppsApi::PrisonApi::UserApi.user_details(current_user)
-    @staff_member = StaffMember.new(user.staff_id)
+    @current_user = StaffMember.new(@prison, user.staff_id)
     @staff_id = user.staff_id
-  end
-
-  def pom_at_active_prison?
-    @staff_member.pom_at?(active_prison_id)
   end
 
   def service_notifications

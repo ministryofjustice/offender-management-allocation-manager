@@ -12,7 +12,7 @@ class CaseloadController < PrisonsApplicationController
              only: [:handover_start]
 
   def index
-    allocations = @prison.allocations_for(@pom.staff_id)
+    allocations = @pom.allocations
 
     @new_cases_count = allocations.count(&:new_case?)
     sorted_allocations = sort_allocations(filter_allocations(allocations))
@@ -24,11 +24,11 @@ class CaseloadController < PrisonsApplicationController
   end
 
   def new
-    @new_cases = sort_allocations(@prison.allocations_for(@pom.staff_id).select(&:new_case?))
+    @new_cases = sort_allocations(@pom.allocations.select(&:new_case?))
   end
 
   def handover_start
-    offenders = pending_handover_offenders @prison.allocations_for(@pom.staff_id).map(&:offender)
+    offenders = pending_handover_offenders @pom.allocations.map(&:offender)
 
     @upcoming_handovers = Kaminari.paginate_array(offenders).page(page)
   end
@@ -82,7 +82,7 @@ private
   end
 
   def load_pom
-    @pom = StaffMember.new(params[:staff_id])
+    @pom = StaffMember.new(@prison, staff_id)
   end
 
   def ensure_signed_in_pom_is_this_pom
