@@ -8,6 +8,10 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
   let(:email_address) { Faker::Internet.email }
 
   before do
+    # Need to freeze the date so that CRDs don't end up 29th of June - substracting 4 months is then
+    # tricky (as 29th Feb doesn't exist) resulting in inconsistent test results(+- 1 day) as the date changes
+    Timecop.travel Date.new(2020, 11, 5)
+
     create(:local_divisional_unit, teams: [
       build(:team, case_information: case_info_records)])
 
@@ -19,6 +23,10 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
     end
 
     stub_pom_emails staff_id, [email_address]
+  end
+
+  after do
+    Timecop.return
   end
 
   context 'with some offenders' do
