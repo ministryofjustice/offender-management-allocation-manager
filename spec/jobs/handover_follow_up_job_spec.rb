@@ -1,17 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe HandoverFollowUpJob, type: :job do
-  include ActiveJob::TestHelper
-
-  let(:pom) do
-    OpenStruct.new  staff_id: 99999,
-                    first_name: "MARY",
-                    last_name: "JAMES",
-                    agency_id: "LEI",
-                    full_name: "JAMES, MARY",
-                    email_address: "mary.james@someprison.gov.uk"
-  end
-
   let(:determinate_offender) do
     build_offender(Time.zone.today + 8.months,
                    sentence_type: :determinate,
@@ -29,7 +18,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
     determinate_offender.load_case_information(case_info)
 
     expect(case_info.team.local_divisional_unit.email_address.present?).to be false
-    expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community).and_call_original
+    expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
     described_class.perform_now(Time.zone.today)
   end
 
@@ -49,7 +38,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
     allow(OffenderService).to receive(:get_offender).and_return(offender)
     offender.load_case_information(case_info)
 
-    expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community).and_call_original
+    expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
     described_class.perform_now(Time.zone.today)
   end
 
@@ -63,7 +52,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
     allow(OffenderService).to receive(:get_offender).and_return(unsentenced_offender)
     unsentenced_offender.load_case_information(case_info)
 
-    expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community).and_call_original
+    expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
     described_class.perform_now(Time.zone.today)
   end
 
@@ -76,7 +65,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
 
     allow(OffenderService).to receive(:get_offender).and_return(nil)
 
-    expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community).and_call_original
+    expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
     expect { described_class.perform_now(Time.zone.today) }.not_to raise_error
   end
 
@@ -87,7 +76,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
     allow(OffenderService).to receive(:get_offender).and_return(determinate_offender)
     determinate_offender.load_case_information(case_info)
 
-    expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community).and_call_original
+    expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
     described_class.perform_now(Time.zone.today)
   end
 
@@ -105,7 +94,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
     allow(OffenderService).to receive(:get_offender).and_return(indeterminate_without_ted)
     indeterminate_without_ted.load_case_information(case_info)
 
-    expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community).and_call_original
+    expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
     described_class.perform_now(Time.zone.today)
   end
 
@@ -123,7 +112,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
       create(:allocation, nomis_offender_id: determinate_offender.offender_no)
       determinate_offender.load_case_information(case_info)
 
-      expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community).and_call_original
+      expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
       described_class.perform_now(Time.zone.today)
     end
 
@@ -132,11 +121,13 @@ RSpec.describe HandoverFollowUpJob, type: :job do
       determinate_offender.load_case_information(case_info)
 
       date_of_handover = determinate_offender.handover_start_date + 5.days
-      expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community).and_call_original
+      expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
       described_class.perform_now(date_of_handover)
     end
 
     it 'sends emails when offenders handover date is exactly one week overdue' do
+      pom = build(:pom)
+
       allow(PrisonOffenderManagerService).to receive(:get_pom_at).and_return(pom)
 
       create(:allocation, nomis_offender_id: determinate_offender.offender_no,
@@ -169,7 +160,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
       determinate_offender.load_case_information(case_info)
 
       date_of_handover = determinate_offender.handover_start_date + 10.days
-      expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community).and_call_original
+      expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
       described_class.perform_now(date_of_handover)
     end
   end
