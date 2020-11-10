@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module FeaturesHelper
-  def signin_spo_user(name = 'MOIC_POM')
-    mock_sso_response(name, [SsoIdentity::SPO_ROLE])
+  def signin_spo_user(name = 'MOIC_POM', caseloads = %w[LEI RSI])
+    mock_sso_response(name, [SsoIdentity::SPO_ROLE], caseloads)
   end
 
   def signin_spo_pom_user(name = 'MOIC_POM')

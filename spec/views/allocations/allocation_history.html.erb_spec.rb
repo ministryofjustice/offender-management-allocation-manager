@@ -50,16 +50,18 @@ RSpec.describe "allocations/history", type: :view do
       assign(:prisoner, build(:offender))
       assign(:pom_emails, {})
       assign(:history, [build(:allocation, :primary),
-                        build(:allocation, :release, updated_at: release_date_and_time)]
-                           .map { |ah| AllocationHistory.new(ah, dummy_version) })
+                        build(:allocation, :release)].
+          map { |ah| AllocationHistory.new(ah, released_version) })
     end
 
+    let(:released_version) { Struct.new(:object_changes).new({ 'updated_at' => [release_date_and_time, release_date_and_time] }.to_yaml) }
     let(:release_date_and_time) { DateTime.new(2019, 8, 19, 11, 28, 0) }
     let(:page) { Nokogiri::HTML(rendered) }
 
-    # Proper test and code fix coming in MO-36
-    it 'doesnt crash' do
+    it 'displays a release label and the release date and time in the allocation history' do
       render
+      expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ["Prisoner released", "Prisoner allocated"]
+      expect(page.css('.moj-timeline__date')).to have_text('19th August 2019 (11:28)')
     end
   end
 end
