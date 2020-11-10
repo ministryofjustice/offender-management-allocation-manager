@@ -6,8 +6,9 @@ class StaffMember
   # maybe this method shouldn't be here?
   attr_reader :staff_id
 
-  def initialize(nomis_staff_id, pom_detail = default_pom_detail(nomis_staff_id))
-    @staff_id = nomis_staff_id.to_i
+  def initialize(prison, staff_id, pom_detail = default_pom_detail(staff_id))
+    @prison = prison
+    @staff_id = staff_id.to_i
     @pom_detail = pom_detail
   end
 
@@ -27,14 +28,14 @@ class StaffMember
     HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(@staff_id).first
   end
 
-  def pom_at?(prison_id)
-    poms_list = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(prison_id)
+  def has_pom_role?
+    poms_list = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(@prison.code)
 
     poms_list.detect { |pom| pom.staff_id == @staff_id }.present?
   end
 
-  def position(prison_id)
-    poms = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(prison_id)
+  def position
+    poms = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(@prison.code)
     this_pom = poms.detect { |pom| pom.staff_id == @staff_id }
     if this_pom.nil?
       'STAFF'
@@ -53,7 +54,36 @@ class StaffMember
     @pom_detail.status
   end
 
+  def allocations
+    @allocations ||= fetch_allocations
+  end
+
+  def pending_handover_offenders
+    one_month_time = Time.zone.today + 30.days
+
+    upcoming_offenders = allocations.map(&:offender).select { |offender|
+      start_date = offender.handover_start_date
+
+      start_date.present? &&
+          start_date.between?(Time.zone.today, one_month_time)
+    }
+
+    upcoming_offenders.map { |offender|
+      OffenderPresenter.new(offender)
+    }
+  end
+
 private
+
+  def fetch_allocations
+    offender_hash = @prison.offenders.index_by(&:offender_no)
+    allocations = Allocation.
+        where(nomis_offender_id: offender_hash.keys).
+        active_pom_allocations(@staff_id, @prison.code)
+    allocations.map { |alloc|
+      AllocatedOffender.new(@staff_id, alloc, offender_hash.fetch(alloc.nomis_offender_id))
+    }
+  end
 
   def default_pom_detail(staff_id)
     @pom_detail = PomDetail.find_or_create_by!(nomis_staff_id: staff_id) { |pom|

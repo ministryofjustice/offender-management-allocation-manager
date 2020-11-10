@@ -42,32 +42,6 @@ RSpec.describe SummaryController, type: :controller do
       stub_offenders_for_prison(prison, offenders)
     end
 
-    describe '#handover' do
-      before do
-        stub_movements
-      end
-
-      context 'when NPS case' do
-        it 'returns cases that are within the thirty day window, but not those that dont have case information' do
-          get :handovers, params: { prison_id: prison }
-          expect(response).to be_successful
-          expect(assigns(:offenders).map(&:offender_no)).to match_array(["G4234GG"])
-        end
-      end
-
-      context 'when CRC case' do
-        before do
-          create(:case_information, case_allocation: 'CRC', nomis_offender_id: 'G1234VV')
-        end
-
-        it 'returns cases that are within the thirty day window' do
-          get :handovers, params: { prison_id: prison }
-          expect(response).to be_successful
-          expect(assigns(:offenders).map(&:offender_no)).to match_array(['G4234GG', "G1234VV"])
-        end
-      end
-    end
-
     context 'without new arrivals' do
       before do
         stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN").

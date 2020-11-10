@@ -92,7 +92,7 @@ context 'when NOMIS is missing information' do
       it 'does not error' do
         create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
 
-        visit prison_staff_caseload_handover_start_path(prison_code, staff_id)
+        visit prison_staff_caseload_handovers_path(prison_code, staff_id)
 
         expect(page).to have_content('All cases for start of handover to the community in the next 30 days')
       end

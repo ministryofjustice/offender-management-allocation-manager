@@ -51,7 +51,7 @@ private
   def last_pom_email(allocation)
     return nil if allocation.blank?
 
-    StaffMember.new(allocation.primary_pom_nomis_id).email_address
+    HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(allocation.primary_pom_nomis_id).first
   end
 
   def ldu_email_address(offender)

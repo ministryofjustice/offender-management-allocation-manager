@@ -4,7 +4,7 @@ class PomsController < PrisonsApplicationController
   before_action :ensure_spo_user
 
   # so that breadcrumb has @pom available
-  before_action :load_pom_staff_member, only: [:show, :edit]
+  before_action :load_pom_staff_member, only: [:show, :edit, :update]
 
   breadcrumb 'Prison Offender Managers',
              -> { prison_poms_path(active_prison_id) }, only: [:index, :show]
@@ -20,7 +20,7 @@ class PomsController < PrisonsApplicationController
   end
 
   def show
-    @allocations = sort_allocations(@prison.allocations_for(@pom.staff_id))
+    @allocations = sort_allocations(@pom.allocations)
   end
 
   # This is for the situation where the user is no longer a POM
@@ -60,7 +60,6 @@ class PomsController < PrisonsApplicationController
       end
       redirect_to prison_pom_path(active_prison_id, id: nomis_staff_id)
     else
-      @pom = StaffMember.new nomis_staff_id, pom_detail
       @errors = pom_detail.errors
       render :edit
     end
@@ -69,7 +68,7 @@ class PomsController < PrisonsApplicationController
 private
 
   def load_pom_staff_member
-    @pom = StaffMember.new nomis_staff_id
+    @pom = StaffMember.new @prison, nomis_staff_id
   end
 
   def working_pattern

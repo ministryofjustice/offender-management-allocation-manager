@@ -2,6 +2,8 @@
   <%= render '/layouts/prison_switcher' %>
 <% end %>
 
+<%= render(:partial => 'handovers/subnav', :locals => {:active => :caseload_handovers}) %>
+
 <% if @pom.blank? %>
   <h2 class="govuk-heading-l">No pending cases </h2>
 <% else %>

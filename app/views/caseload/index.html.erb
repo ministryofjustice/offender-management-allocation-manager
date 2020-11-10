@@ -8,10 +8,10 @@
   %>
 <% end %>
 
-<% if @pom.blank? %>
-  <h2 class="govuk-heading-l">No allocated cases </h2>
+<% if @allocations.empty? %>
+  <h2 class="govuk-heading-l">No allocated cases</h2>
 <% else %>
-  <h2 class="govuk-heading-l">Your caseload (<%= @total_allocation_count  %>)</h2>
+  <h2 class="govuk-heading-l">Your caseload (<%= @total_allocation_count %>)</h2>
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-quarter">
@@ -29,7 +29,7 @@
       <div class="govuk-body">Cases close to handover</div>
       <div class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24 upcoming-handover-count">
         <% if @pending_handover_count > 0 %>
-          <%= link_to "#{@pending_handover_count}", prison_staff_caseload_handover_start_path(@prison.code), class:"govuk-link"%>
+          <%= link_to "#{@pending_handover_count}", prison_staff_caseload_handovers_path(@prison.code, @staff_id), class:"govuk-link"%>
         <% else %>
           0
         <% end %>

@@ -55,14 +55,14 @@ class ResponsibilitiesController < PrisonsApplicationController
 
     allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id_from_url)
 
-    emails = [@staff_member.email_address, @ldu_email_address]
+    emails = [@current_user.email_address, @ldu_email_address]
 
     if @responsibility.valid?
       Responsibility.find_by!(nomis_offender_id: nomis_offender_id_from_url).destroy
       offender = OffenderService.get_offender(nomis_offender_id_from_url)
 
       if allocation && allocation.active?
-        pom_email = StaffMember.new(allocation.primary_pom_nomis_id).email_address
+        pom_email = HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(allocation.primary_pom_nomis_id).first
         emails << pom_email
         ResponsibilityMailer.responsibility_to_custody_with_pom(emails: emails.compact,
                                                                        pom_name: allocation.primary_pom_name,

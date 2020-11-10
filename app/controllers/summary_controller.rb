@@ -37,18 +37,9 @@ class SummaryController < PrisonsApplicationController
     @offenders = Kaminari.paginate_array(@summary.offenders.map { |o| OffenderPresenter.new(o) }).page(page)
   end
 
-  def handovers
-    @summary = create_summary(:handovers)
-    @offenders = Kaminari.paginate_array(@summary.offenders.map { |o| OffenderPresenter.new(o) }).page(page)
-  end
-
 private
 
   def create_summary(summary_type)
     SummaryService.new(summary_type, @prison, params['sort'])
-  end
-
-  def page
-    params.fetch('page', 1).to_i
   end
 end
