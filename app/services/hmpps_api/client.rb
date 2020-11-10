@@ -10,7 +10,6 @@ module HmppsApi
     def initialize(root)
       @root = root
       retry_options = {
-          # increase the default number of retries from 2 to 10 as 3 doesn't seem to be enough
           max: MAX_RETRIES,
           # some useful values as per the Faraday documentation
           # https://lostisland.github.io/faraday/middleware/retry
@@ -21,8 +20,8 @@ module HmppsApi
           backoff_factor: 2,
           # we seem to get 502 and 504 statuses from a gateway this side of
           # the Prison API - so retry if we get one of those.
-          retry_statuses: [502, 504],
-          exceptions: Faraday::Request::Retry::DEFAULT_EXCEPTIONS + [Faraday::ConnectionFailed],
+          #retry_statuses: [502, 504],
+          exceptions: Faraday::Request::Retry::DEFAULT_EXCEPTIONS + [Faraday::ConnectionFailed, Faraday::ServerError],
           # Faraday by default doesn't retry on a POST - even though our POSTs are GETs in disguise.
           methods: Faraday::Request::Retry::IDEMPOTENT_METHODS + [:post],
           #retry_if: ->(_env, _exception) { true },
