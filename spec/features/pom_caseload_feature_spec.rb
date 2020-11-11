@@ -215,7 +215,7 @@ feature "view POM's caseload" do
     expect(page).to have_current_path(prison_prisoner_path(prison, first_offender.fetch(:offenderNo)), ignore_query: true)
   end
 
-  it 'can sort all cases that have been allocated to a specific POM in the last week', :versioning do
+  it 'can sort all cases that have been allocated to a specific POM in the last week' do
     # Sign in as a POM
     signin_pom_user
     stub_user staff_id: nomis_staff_id

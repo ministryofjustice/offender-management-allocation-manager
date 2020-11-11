@@ -108,7 +108,7 @@ RSpec.describe StaffMember, type: :model do
       old_primary_alloc.update!(secondary_pom_nomis_id: other_staff_id)
     end
 
-    it "will get allocations for a POM made within the last 7 days", :versioning do
+    it "will get allocations for a POM made within the last 7 days" do
       allocated_offenders = described_class.new(prison, staff_id).allocations.select(&:new_case?)
       expect(allocated_offenders.count).to eq 2
       expect(allocated_offenders.map(&:pom_responsibility)).to match_array %w[Responsible Co-Working]

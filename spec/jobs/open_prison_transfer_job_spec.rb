@@ -95,7 +95,7 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
     described_class.perform_now(movement_json)
   end
 
-  it 'can use previous allocation details where they exist', versioning: true do
+  it 'can use previous allocation details where they exist' do
     allow(OffenderService).to receive(:get_offender).
       and_return(HmppsApi::Offender.new(offender_no: nomis_offender_id,
                                      prison_id: open_prison_code,

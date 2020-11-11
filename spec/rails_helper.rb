@@ -12,7 +12,6 @@ require 'support/helpers/auth_helper'
 require 'support/helpers/api_helper'
 require 'capybara/rspec'
 require 'webmock/rspec'
-require 'paper_trail/frameworks/rspec'
 
 Capybara.default_max_wait_time = 4
 Capybara.asset_host = 'http://localhost:3000'

@@ -34,7 +34,7 @@ feature 'Allocation History' do
 
   let!(:nomis_offender_id) { 'G4273GI' }
 
-  scenario 'view offender allocation history', versioning: true, vcr: { cassette_name: :offender_allocation_history } do
+  scenario 'view offender allocation history', vcr: { cassette_name: :offender_allocation_history } do
     allocation = create(
       :allocation,
       nomis_offender_id: nomis_offender_id,

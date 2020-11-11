@@ -73,7 +73,7 @@ describe AllocationService do
         create(:case_information, nomis_offender_id: nomis_offender_id)
       end
 
-      it 'can create a new record', versioning: true, vcr: { cassette_name: :allocation_service_create_allocation__spec } do
+      it 'can create a new record', vcr: { cassette_name: :allocation_service_create_allocation__spec } do
         params = {
           nomis_offender_id: nomis_offender_id,
           prison: 'LEI',
@@ -98,7 +98,7 @@ describe AllocationService do
         create(:allocation, nomis_offender_id: nomis_offender_id)
       end
 
-      it 'can update a record and store a version', versioning: true, vcr: { cassette_name: :allocation_service_update_allocation_spec } do
+      it 'can update a record and store a version', vcr: { cassette_name: :allocation_service_update_allocation_spec } do
         update_params = {
           nomis_offender_id: nomis_offender_id,
           allocated_at_tier: 'B',
@@ -142,13 +142,13 @@ describe AllocationService do
   end
 
   describe '#previously_allocated_poms' do
-    it "Can get previous poms for an offender where there are none", versioning: true, vcr: { cassette_name: :allocation_service_previous_allocations_none } do
+    it "Can get previous poms for an offender where there are none", vcr: { cassette_name: :allocation_service_previous_allocations_none } do
       staff_ids = described_class.previously_allocated_poms('GDF7657')
 
       expect(staff_ids).to eq([])
     end
 
-    it "Can get previous poms for an offender where there are some", versioning: true, vcr: { cassette_name: :allocation_service_previous_allocations } do
+    it "Can get previous poms for an offender where there are some", vcr: { cassette_name: :allocation_service_previous_allocations } do
       nomis_offender_id = 'GHF1234'
       previous_primary_pom_nomis_id = 345_567
       updated_primary_pom_nomis_id = 485_926
@@ -170,7 +170,7 @@ describe AllocationService do
     end
   end
 
-  it 'can get the current allocated primary POM', versioning: true, vcr: { cassette_name: 'current_allocated_primary_pom' }  do
+  it 'can get the current allocated primary POM', vcr: { cassette_name: 'current_allocated_primary_pom' }  do
     previous_primary_pom_nomis_id = 485_637
     updated_primary_pom_nomis_id = 485_926
 
@@ -191,7 +191,7 @@ describe AllocationService do
   end
 
   describe '#allocation_history_pom_emails' do
-    it 'can retrieve all the POMs email addresses for ', versioning: true, vcr: { cassette_name: :allocation_service_history_spec } do
+    it 'can retrieve all the POMs email addresses for ', vcr: { cassette_name: :allocation_service_history_spec } do
       previous_primary_pom_nomis_id = 485_637
       updated_primary_pom_nomis_id = 485_926
       secondary_pom_nomis_id = 485_833

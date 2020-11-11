@@ -24,7 +24,7 @@ feature 'Allocation' do
     signin_spo_user
   end
 
-  scenario 'accepting a recommended allocation', versioning: true, vcr: { cassette_name: :create_new_allocation_feature } do
+  scenario 'accepting a recommended allocation', vcr: { cassette_name: :create_new_allocation_feature } do
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
     expect(page).to have_content('Determinate')
@@ -140,7 +140,7 @@ feature 'Allocation' do
     expect(page).to have_content('This reason cannot be more than 175 characters')
   end
 
-  scenario 're-allocating', versioning: true, vcr: { cassette_name: :re_allocate_feature } do
+  scenario 're-allocating', vcr: { cassette_name: :re_allocate_feature } do
     create(
       :allocation,
       nomis_offender_id: nomis_offender_id,
