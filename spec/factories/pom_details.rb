@@ -28,6 +28,10 @@ FactoryBot.define do
     def staff_id
       staffId
     end
+
+    def email_address
+      emails.present? ? emails.first : nil
+    end
   end
 
   factory :pom, class: 'Elite2POM' do
