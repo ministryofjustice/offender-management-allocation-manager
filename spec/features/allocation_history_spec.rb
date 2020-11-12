@@ -162,7 +162,7 @@ feature 'Allocation History' do
       stub_auth_token
       stub_user(username: 'MOIC_POM', staff_id: staff_id)
       stub_offender(nomis_offender)
-      signin_spo_user("MOIC_POM", [prison])
+      signin_spo_user([prison])
       create(:case_information, nomis_offender_id: nomis_offender_id)
       allocation = create(:allocation, :primary, nomis_offender_id: nomis_offender_id, prison: prison)
       allocation.deallocate_offender(Allocation::OFFENDER_RELEASED)
