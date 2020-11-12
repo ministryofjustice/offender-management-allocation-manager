@@ -82,13 +82,13 @@ RSpec.describe EmailService do
   }
 
   context 'when queueing', :queueing do
-    it "Can send an allocation email", vcr: { cassette_name: :email_service_send_allocation_email }, versioning: true  do
+    it "Can send an allocation email", vcr: { cassette_name: :email_service_send_allocation_email }  do
       expect {
         described_class.instance(allocation: allocation, message: "", pom_nomis_id: allocation.primary_pom_nomis_id).send_email
       }.to change(enqueued_jobs, :size).by(1)
     end
 
-    it "Can not crash when a pom has no email", vcr: { cassette_name: :email_service_send_allocation_email }, versioning: true  do
+    it "Can not crash when a pom has no email", vcr: { cassette_name: :email_service_send_allocation_email }  do
       allow(PrisonOffenderManagerService).to receive(:get_pom_emails).and_return([])
 
       expect {
@@ -96,7 +96,7 @@ RSpec.describe EmailService do
       }.to change(enqueued_jobs, :size).by(0)
     end
 
-    it "Can send a reallocation email", vcr: { cassette_name: :email_service_send_deallocation_email }, versioning: true  do
+    it "Can send a reallocation email", vcr: { cassette_name: :email_service_send_deallocation_email }  do
       allow(AllocationService).to receive(:get_versions_for).and_return([original_allocation])
 
       expect {
@@ -105,7 +105,7 @@ RSpec.describe EmailService do
     end
 
     it "Can send a co-working de-allocation email",
-       vcr: { cassette_name: :email_service_send_coworking_deallocation_email }, versioning: true do
+       vcr: { cassette_name: :email_service_send_coworking_deallocation_email } do
       allow(AllocationService).to receive(:get_versions_for).and_return([coworking_allocation])
 
       expect {
@@ -117,7 +117,7 @@ RSpec.describe EmailService do
     end
 
     it "Can not crash when primary pom has no email when deallocating a co-working pom",
-       vcr: { cassette_name: :email_service_send_coworking_deallocation_email_no_pom_email }, versioning: true do
+       vcr: { cassette_name: :email_service_send_coworking_deallocation_email_no_pom_email } do
       allow(PrisonOffenderManagerService).to receive(:get_pom_emails).and_return([])
 
       expect {
@@ -129,7 +129,7 @@ RSpec.describe EmailService do
     end
   end
 
-  context 'when offender has been released', versioning: true do
+  context 'when offender has been released' do
     let(:staff_id) { '485833' }
     let!(:released_allocation) do
       x = create(:allocation,

@@ -57,7 +57,7 @@ RSpec.describe Allocation, type: :model do
     }
 
     describe 'Versions' do
-      it 'creates a version when updating a record', versioning: true do
+      it 'creates a version when updating a record' do
         expect(allocation.versions.count).to be(1)
 
         allocation.update(allocated_at_tier: 'B')
@@ -99,7 +99,7 @@ RSpec.describe Allocation, type: :model do
       end
     end
 
-    describe 'when an offender moves prison', versioning: true, vcr: { cassette_name: :allocation_deallocate_offender }  do
+    describe 'when an offender moves prison', vcr: { cassette_name: :allocation_deallocate_offender }  do
       it 'removes the primary pom details in an Offender\'s allocation' do
         nomis_offender_id = 'G2911GD'
         create(:case_information, nomis_offender_id: nomis_offender_id)
@@ -131,7 +131,7 @@ RSpec.describe Allocation, type: :model do
       end
     end
 
-    describe 'when an offender gets released from prison', versioning: true, vcr: { cassette_name: :allocation_deallocate_offender_released }  do
+    describe 'when an offender gets released from prison', vcr: { cassette_name: :allocation_deallocate_offender_released }  do
       it 'removes the primary pom details in an Offender\'s allocation' do
         nomis_offender_id = 'G2911GD'
         create(:case_information, nomis_offender_id: nomis_offender_id)

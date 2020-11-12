@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe AllocationsController, :versioning, type: :controller do
+RSpec.describe AllocationsController, type: :controller do
   let(:poms) {
     [
       build(:pom, :prison_officer, emails: []),
@@ -155,7 +155,7 @@ RSpec.describe AllocationsController, :versioning, type: :controller do
             )
           end
 
-          it "Can get the allocation history for an offender", versioning: true do
+          it "Can get the allocation history for an offender" do
             get :history, params: { prison_id: prison, nomis_offender_id: offender_no }
             allocation_list = assigns(:history)
 

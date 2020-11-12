@@ -56,7 +56,7 @@ feature 'View a prisoner profile page' do
       expect(page.response_headers['Content-Type']).to eq('image/jpg')
     end
 
-    it "has a link to the allocation history", :versioning, vcr: { cassette_name: :link_to_allocation_history } do
+    it "has a link to the allocation history", vcr: { cassette_name: :link_to_allocation_history } do
       visit prison_prisoner_path('LEI', 'G7998GJ')
       click_link "View"
       expect(page).to have_content('Prisoner allocated')
