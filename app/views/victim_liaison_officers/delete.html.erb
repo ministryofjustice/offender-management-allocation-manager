@@ -1,0 +1,20 @@
+<% content_for :switcher do %>
+  <%= render '/layouts/prison_switcher' %>
+<% end %>
+
+<h2 class="govuk-heading-l">Delete the selected Victim Liaison Officer (VLO) contact?</h2>
+
+<p class="govuk-body">
+Contact details for the VLO <%= @vlo.full_name %> will be removed from the prisoner record.
+</p>
+
+<%= form_for(@vlo,
+             url: prison_prisoner_victim_liaison_officer_path(@prison.code, @vlo.case_information.nomis_offender_id, @vlo.id),
+             method: :delete,
+             builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |f| %>
+
+  <%= f.submit "Confirm", role: "button", draggable: "false", class: "govuk-button" %>
+  <%= link_to 'Cancel', @referrer, class: 'govuk-link cancel-button' %>
+
+<% end %>
+

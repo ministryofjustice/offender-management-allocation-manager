@@ -27,6 +27,12 @@ Rails.application.routes.draw do
 
       # show action produces the most recent assessment - format PDF only
       resource :early_allocation, only: [:show, :edit, :update]
+
+      resources :victim_liaison_officers, only: [:new, :edit, :create, :update, :destroy] do
+        member do
+          get 'delete'
+        end
+      end
     end
 
     resources :allocations, only: %i[ show new create edit update ], param: :nomis_offender_id, path_names: {

@@ -1,0 +1,21 @@
+<%= form_for(vlo,
+             url: form_url,
+             method: form_action,
+             builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |f| %>
+  <%= f.govuk_error_summary %>
+
+  <div class="govuk-form-group">
+    <fieldset class="govuk-fieldset">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+        Victim Liaison Officer
+      </legend>
+    </fieldset>
+  </div>
+
+  <%= f.govuk_text_field :first_name, label: { text: 'First name' } %>
+  <%= f.govuk_text_field :last_name, label: { text: 'Last name' } %>
+  <!-- govuk_email_field seems to have strange popup behaviour - so use plain text field instead-->
+  <%= f.govuk_text_field :email, label: { text: 'Email address' } %>
+
+  <%= f.submit "Submit", role: "button", draggable: "false", class: "govuk-button" %>
+<% end %>

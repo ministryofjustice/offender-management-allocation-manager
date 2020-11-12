@@ -16,7 +16,7 @@ module OffenderHelper
 
   def last_event(allocation)
     event = event_type(allocation.event)
-    event + ' - ' + allocation.updated_at.strftime('%d/%m/%Y')
+    event + ' - ' + allocation.created_at.strftime('%d/%m/%Y')
   end
 
   def event_type(event)

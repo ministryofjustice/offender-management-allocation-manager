@@ -18,37 +18,103 @@ feature 'View a prisoner profile page' do
   end
 
   context 'with an allocation' do
+    before do
+      create(:case_information, nomis_offender_id: 'G7998GJ', victim_liaison_officers: [build(:victim_liaison_officer)])
+    end
+
     let!(:alloc) {
       create(:allocation, nomis_offender_id: 'G7998GJ', primary_pom_nomis_id: '485637', primary_pom_name: 'Pobno, Kath')
     }
 
-    it 'shows the prisoner information', vcr: { cassette_name: :show_offender_spec } do
-      visit prison_prisoner_path('LEI', 'G7998GJ')
+    let(:initial_vlo) { VictimLiaisonOfficer.last }
 
-      expect(page).to have_css('h1', text: 'Ahmonis, Okadonah')
-      expect(page).to have_content('07/07/1968')
-      cat_code = find('h3#category-code').text
-      expect(cat_code).to eq('C')
+    context 'without anything extra', vcr: { cassette_name: :show_offender_spec }  do
+      before do
+        visit prison_prisoner_path('LEI', 'G7998GJ')
+      end
+
+      scenario 'adding a VLO', :js do
+        expect(page).to have_content('First Contact')
+        click_link 'Add new VLO contact'
+        click_link 'Back'
+        click_link 'Add new VLO contact'
+
+        fill_in 'First name', with: 'Jim'
+        # This fails as all fields not filled
+        click_button 'Submit'
+
+        # fill in missing fields and submit
+        fill_in 'Last name', with: 'Smith'
+        fill_in 'Email address', with: 'jim.smith@hotmail.com'
+        click_button 'Submit'
+        expect(page).to have_content('Smith, Jim')
+        expect(page).to have_content('Second Contact')
+
+        # As we had one already, ours is the second contact
+        within '.vlo-row-1' do
+          within '.change-email' do
+            click_link 'Change'
+          end
+        end
+        click_link 'Back'
+        within '.vlo-row-1' do
+          within '.change-email' do
+            click_link 'Change'
+          end
+        end
+
+        # Blank out first name so it fails
+        fill_in 'First name', with: ''
+        click_button 'Submit'
+
+        # Change first name
+        fill_in 'First name', with: 'Mike'
+        click_button 'Submit'
+        expect(page).to have_content('Smith, Mike')
+
+        # delete the contact we added earlier
+        within '.vlo-row-1' do
+          click_link 'Delete Contact'
+        end
+        click_button 'Confirm'
+        # We should come back to the same page, but with our contact deleted
+        expect(page).to have_content(initial_vlo.full_name)
+        expect(page).not_to have_content('Smith, Mike')
+
+        # Let's go and check out the allocation history
+        click_link 'View'
+        expect(page).to have_content('Victim Liaison Officer contact removed')
+        expect(page).to have_content('by Pom, Moic')
+      end
+
+      it 'shows the prisoner information' do
+        expect(page).to have_css('h1', text: 'Ahmonis, Okadonah')
+        expect(page).to have_content('07/07/1968')
+        cat_code = find('h3#category-code').text
+        expect(cat_code).to eq('C')
+      end
+
+      it 'shows the POM name (fetched from NOMIS)' do
+        # check the primary POM name stored in the allocation
+        allocation = Allocation.last
+        expect(allocation.primary_pom_name).to eq('Pobno, Kath')
+
+        # ensure that the POM name displayed is the one actually returned from NOMIS
+        pom_name = find('#primary_pom_name').text
+        expect(pom_name).to eq('Pobee-Norris, Kath')
+      end
     end
 
-    it 'shows the POM name (fetched from NOMIS)', vcr: { cassette_name: :show_offender_pom_spec } do
-      visit prison_prisoner_path('LEI', 'G7998GJ')
+    context 'with an overridden reponsibility' do
+      before do
+        create(:responsibility, nomis_offender_id: 'G7998GJ')
+      end
 
-      # check the primary POM name stored in the allocation
-      allocation = Allocation.last
-      expect(allocation.primary_pom_name).to eq('Pobno, Kath')
+      it 'shows an overridden responsibility', vcr: { cassette_name: :show_offender_with_override_spec } do
+        visit prison_prisoner_path('LEI', 'G7998GJ')
 
-      # ensure that the POM name displayed is the one actually returned from NOMIS
-      pom_name = find('#primary_pom_name').text
-      expect(pom_name).to eq('Pobee-Norris, Kath')
-    end
-
-    it 'shows an overridden responsibility', vcr: { cassette_name: :show_offender_with_override_spec } do
-      create(:case_information, nomis_offender_id: 'G7998GJ')
-      create(:responsibility, nomis_offender_id: 'G7998GJ')
-      visit prison_prisoner_path('LEI', 'G7998GJ')
-
-      expect(page).to have_content('Supporting')
+        expect(page).to have_content('Supporting')
+      end
     end
 
     it 'shows the prisoner image', vcr: { cassette_name: :show_offender_spec_image } do
@@ -61,13 +127,15 @@ feature 'View a prisoner profile page' do
       click_link "View"
       expect(page).to have_content('Prisoner allocated')
     end
+  end
 
+  context 'with community information' do
     it "has community information when present",
        vcr: { cassette_name: :show_offender_community_info_full } do
       ldu = create(:local_divisional_unit, name: 'An LDU', email_address: 'test@example.com')
       team = create(:team, name: 'A team', local_divisional_unit: ldu)
       create(:case_information,
-             nomis_offender_id: alloc.nomis_offender_id,
+             nomis_offender_id: 'G7998GJ',
              team: team,
              com_name: 'Bob Smith'
       )
@@ -85,7 +153,7 @@ feature 'View a prisoner profile page' do
       ldu = create(:local_divisional_unit, name: 'An LDU', email_address: nil)
       team = create(:team, local_divisional_unit: ldu)
       create(:case_information,
-             nomis_offender_id: alloc.nomis_offender_id,
+             nomis_offender_id: 'G7998GJ',
              team: team
       )
 

@@ -11,7 +11,8 @@ module HmppsApi
     delegate :indeterminate_sentence?, :immigration_case?,
              to: :@sentence_type
 
-    delegate :tier, :case_allocation, :crn, :mappa_level, :parole_review_date,
+    delegate :tier, :case_allocation, :crn, :mappa_level,
+             :parole_review_date, :victim_liaison_officers,
              to: :@case_information, allow_nil: true
 
     attr_accessor :category_code, :date_of_birth, :prison_arrival_date, :sentence, :allocated_pom_name

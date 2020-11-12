@@ -41,6 +41,12 @@ gem 'prawn-rails'
 gem 'rswag-api' # api-documentation
 gem 'rswag-ui'  # api-documentation interface
 gem 'sassc-rails'
+# simple validation of email addresses.
+# ministryofjustice/email_address_validation thinks Faker emails don't parse which is annoying,
+# whilst also allowing invalid emails through.
+# https://stackoverflow.com/questions/38611405/email-validation-in-ruby-on-rails
+gem 'valid_email2'
+
 gem 'activeadmin'
 
 group :development, :test do

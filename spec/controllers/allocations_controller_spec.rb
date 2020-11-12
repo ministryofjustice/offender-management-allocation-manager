@@ -71,10 +71,45 @@ RSpec.describe AllocationsController, type: :controller do
     end
 
     describe '#history' do
-      let(:pom_staff_id) { signed_in_pom.staffId }
+      let(:pom_staff_id) { 754732 }
 
       before do
         create(:case_information, nomis_offender_id: offender_no)
+      end
+
+      context 'with a VictimLiasonOfficer' do
+        before do
+          create(:case_information, victim_liaison_officers: [build(:victim_liaison_officer)])
+          create(:allocation, nomis_offender_id: offender)
+          stub_offender(build(:nomis_offender, offenderNo: offender))
+          stub_pom_emails(485926, [])
+        end
+
+        let(:case_info) { CaseInformation.last }
+        let(:offender) { case_info.nomis_offender_id }
+        let(:history) { assigns(:history) }
+        let(:allocation) { Allocation.find_by!(nomis_offender_id: offender) }
+
+        it 'has a VLO create record' do
+          get :history, params: { prison_id: prison, nomis_offender_id: offender }
+          expect(history.map(&:event)).to eq(['create', 'allocate_primary_pom'])
+        end
+
+        context 'with update and delete VLO events' do
+          before do
+            case_info.victim_liaison_officers.first.update!(first_name: 'Bill', last_name: 'Smuggs')
+            case_info.victim_liaison_officers.first.destroy
+            allocation.update!(
+              primary_pom_nomis_id: poms.second.staffId,
+              event: Allocation::REALLOCATE_PRIMARY_POM
+            )
+          end
+
+          it 'has VLO and alloocation data sorted by date' do
+            get :history, params: { prison_id: prison, nomis_offender_id: offender }
+            expect(history.map(&:event)).to eq(['create', 'allocate_primary_pom', 'update', 'destroy', "reallocate_primary_pom"])
+          end
+        end
       end
 
       context 'when DeliusDataJob has updated the COM name' do
@@ -104,7 +139,7 @@ RSpec.describe AllocationsController, type: :controller do
             history = assigns(:history)
             expect(history.size).to eq(2)
             expect(history.first.prison).to eq 'LEI'
-            expect(history.map(&:updated_at).map(&:to_date)).to eq([create_date, yesterday])
+            expect(history.map(&:created_at).map(&:to_date)).to eq([create_date, yesterday])
           end
         end
 
@@ -125,7 +160,7 @@ RSpec.describe AllocationsController, type: :controller do
           it 'shows the correct date on the show page' do
             get :show, params: { prison_id: prison, nomis_offender_id: d1.noms_no }
             alloc = assigns(:allocation)
-            expect(alloc.updated_at.to_date).to eq(create_date)
+            expect(alloc.created_at.to_date).to eq(create_date)
           end
         end
       end

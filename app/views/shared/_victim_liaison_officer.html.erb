@@ -1,0 +1,32 @@
+<table class="govuk-table vlo-row-<%= victim_liaison_officer_counter %>">
+  <tbody class="govuk-table__body">
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-table__header govuk-!-width-one-half" scope="row"><%= t((victim_liaison_officer_counter + 1).ordinalize) %> Contact</td>
+      <td class="govuk-table__cell govuk-table__cell govuk-!-width-one-half">
+        <span class="pull-right">
+          <%= link_to 'Delete Contact', delete_prison_prisoner_victim_liaison_officer_path(@prison.code, @prisoner.offender_no, victim_liaison_officer) %>
+        </span>
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-width-one-half" scope="row">
+        Victim Liaison Officer name
+      </td>
+      <td class="govuk-table__cell govuk-table__cell govuk-!-width-one-half">
+        <%= victim_liaison_officer.full_name %>
+        <span class="pull-right change-name">
+          <%= link_to 'Change', edit_prison_prisoner_victim_liaison_officer_path(@prison.code, @prisoner.offender_no, victim_liaison_officer) %>
+        </span>
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-width-one-half" scope="row">Email address</td>
+      <td class="govuk-table__cell govuk-!-width-one-half">
+        <%= victim_liaison_officer.email %>
+        <span class="pull-right change-email">
+          <%= link_to 'Change', edit_prison_prisoner_victim_liaison_officer_path(@prison.code, @prisoner.offender_no, victim_liaison_officer) %>
+        </span>
+      </td>
+    </tr>
+  </tbody>
+</table>

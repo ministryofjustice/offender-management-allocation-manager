@@ -94,19 +94,16 @@ class AllocationsController < PrisonsApplicationController
 
   def history
     @prisoner = offender(nomis_offender_id_from_url)
-    @history = offender_allocation_history(nomis_offender_id_from_url)
-    # The history is now collected forwards (to incorporate nil prison ids) but as a result
-    # needs to be 'deep reversed' in order to work properly (as AllocationList produces a list of lists)
-    @pom_emails = AllocationService.allocation_history_pom_emails(@history)
+
+    history = Allocation.find_by(nomis_offender_id: nomis_offender_id_from_url).history
+    vlo_history = PaperTrail::Version.
+        where(item_type: 'VictimLiaisonOfficer', nomis_offender_id: nomis_offender_id_from_url).map { |vlo_version| VloHistory.new(vlo_version) }
+    @history = (history + vlo_history).sort_by(&:created_at)
+
+    @pom_emails = AllocationService.allocation_history_pom_emails(history)
   end
 
 private
-
-  def offender_allocation_history(nomis_offender_id)
-    current_allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id)
-
-    current_allocation&.history
-  end
 
   def unavailable_pom_count
     @unavailable_pom_count ||= PrisonOffenderManagerService.unavailable_pom_count(
