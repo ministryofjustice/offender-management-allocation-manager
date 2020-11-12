@@ -30,4 +30,16 @@ module OffenderHelper
       type + 'allocated'
     end
   end
+
+  def approaching_handover_without_com?(offender)
+    return false unless offender.sentenced?
+
+    return false if offender.handover_start_date.nil?
+
+    if offender.handover_start_date <= Time.zone.today + 45.days && offender.allocated_com_name.nil?
+      true
+    else
+      false
+    end
+  end
 end
