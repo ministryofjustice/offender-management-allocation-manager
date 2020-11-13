@@ -83,7 +83,7 @@ private
     # and find the last version with a primary_pom id that is not the same as the
     # allocation. That will be the POM that is notified of a reallocation.
     @previous_pom ||= begin
-      versions = AllocationService.get_versions_for(@allocation)
+      versions = @allocation.get_old_versions
 
       previous = versions.reverse.detect { |version|
         version.primary_pom_nomis_id.present? && version.primary_pom_nomis_id != @allocation.primary_pom_nomis_id
