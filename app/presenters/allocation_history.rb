@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AllocationPresenter
+class AllocationHistory
   delegate :primary_pom_nomis_id, :event, :event_trigger, :secondary_pom_nomis_id, :prison,
            :allocated_at_tier, :nomis_offender_id, :primary_pom_name, :override_reasons, :suitability_detail,
            :override_detail,
@@ -16,5 +16,10 @@ class AllocationPresenter
   # we don't produce the wrong answer
   def updated_at
     YAML.load(@version.object_changes).fetch('updated_at')[1]
+  end
+
+  # render a different partial depending on the type of event
+  def to_partial_path
+    event
   end
 end

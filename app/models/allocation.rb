@@ -85,7 +85,7 @@ class Allocation < ApplicationRecord
   # this list as we're interested in recent rather than ancient history
   def history
     get_old_versions.append(self).zip(versions).map do |alloc, raw_version|
-      AllocationPresenter.new(alloc, raw_version)
+      AllocationHistory.new(alloc, raw_version)
     end
   end
 
