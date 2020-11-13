@@ -109,12 +109,7 @@ private
   def offender_allocation_history(nomis_offender_id)
     current_allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id)
 
-    unless current_allocation.nil?
-      allocs = AllocationService.get_versions_for(current_allocation).append(current_allocation)
-      allocs.zip(current_allocation.versions).map do |alloc, raw_version|
-        AllocationPresenter.new(alloc, raw_version)
-      end
-    end
+    current_allocation&.history
   end
 
   def unavailable_pom_count

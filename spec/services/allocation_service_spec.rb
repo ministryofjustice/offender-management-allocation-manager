@@ -211,21 +211,10 @@ describe AllocationService do
         event: Allocation::ALLOCATE_SECONDARY_POM
       )
 
-      history = offender_allocation_history(nomis_offender_id)
+      history = Allocation.find_by!(nomis_offender_id: nomis_offender_id).history
       emails = described_class.allocation_history_pom_emails(history)
 
       expect(emails.count).to eq(3)
-    end
-  end
-
-  def offender_allocation_history(nomis_offender_id)
-    current_allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id)
-
-    unless current_allocation.nil?
-      allocs = AllocationService.get_versions_for(current_allocation).append(current_allocation)
-      allocs.zip(current_allocation.versions).map do |alloc, raw_version|
-        AllocationPresenter.new(alloc, raw_version)
-      end
     end
   end
 end

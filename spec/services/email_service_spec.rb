@@ -97,7 +97,7 @@ RSpec.describe EmailService do
     end
 
     it "Can send a reallocation email", vcr: { cassette_name: :email_service_send_deallocation_email }  do
-      allow(AllocationService).to receive(:get_versions_for).and_return([original_allocation])
+      allow(reallocation).to receive(:get_old_versions).and_return([original_allocation])
 
       expect {
         described_class.instance(allocation: reallocation, message: "", pom_nomis_id: allocation.primary_pom_nomis_id).send_email
@@ -106,7 +106,7 @@ RSpec.describe EmailService do
 
     it "Can send a co-working de-allocation email",
        vcr: { cassette_name: :email_service_send_coworking_deallocation_email } do
-      allow(AllocationService).to receive(:get_versions_for).and_return([coworking_allocation])
+      allow(original_allocation).to receive(:get_old_versions).and_return([coworking_allocation])
 
       expect {
         described_class.instance(allocation: coworking_deallocation,

@@ -77,6 +77,18 @@ class Allocation < ApplicationRecord
     JSON.parse(self[:override_reasons]) if self[:override_reasons].present?
   end
 
+  def get_old_versions
+    versions.map(&:reify).compact
+  end
+
+  # Gets the versions in *forward* order - so often we want to reverse
+  # this list as we're interested in recent rather than ancient history
+  def history
+    get_old_versions.append(self).zip(versions).map do |alloc, raw_version|
+      AllocationPresenter.new(alloc, raw_version)
+    end
+  end
+
   def deallocate_offender(movement_type)
     self.primary_pom_nomis_id = nil
     self.primary_pom_name = nil
