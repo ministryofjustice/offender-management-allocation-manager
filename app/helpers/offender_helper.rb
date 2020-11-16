@@ -36,10 +36,12 @@ module OffenderHelper
 
     return false if offender.handover_start_date.nil?
 
-    if offender.handover_start_date <= Time.zone.today + 45.days && offender.allocated_com_name.nil?
-      true
-    else
-      false
-    end
+    return false if offender.handover_start_date > Time.zone.today + 45.days
+
+    return false if offender.allocated_com_name.present?
+
+    return true if offender.ldu.try(:email_address).nil?
+
+    false
   end
 end

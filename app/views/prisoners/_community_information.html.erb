@@ -26,9 +26,14 @@
         <%= @prisoner.team.presence || "Unknown"%>
       </td>
     </tr>
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell govuk-!-width-one-half">COM</td>
-      <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
+    <tr class="govuk-table__row ">
+      <% if approaching_handover_without_com?(@prisoner) %>
+        <td class="govuk-table__cell govuk-!-width-one-half govuk-table__cell-error"  id="com-error">
+      <% else %>
+        <td class="govuk-table__cell govuk-!-width-one-half" >
+      <% end %>
+        Community Offender Manager (COM) name</td>
+      <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half <%=' govuk-table__cell-error-value' if approaching_handover_without_com?(@prisoner) %>">
         <%= @prisoner.allocated_com_name.presence || "Unknown" %>
       </td>
     </tr>

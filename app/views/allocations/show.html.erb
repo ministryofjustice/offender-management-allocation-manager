@@ -1,3 +1,7 @@
+<% if approaching_handover_without_com?(@prisoner)%>
+  <%= render partial: 'shared/no_com_alert' %>
+<% end %>
+
 <h1 class="govuk-heading-l govuk-!-margin-bottom-5">Allocation information</h1>
 
 <%= render 'shared/case_type_badge', offender: @prisoner %>

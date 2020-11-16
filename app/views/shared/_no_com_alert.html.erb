@@ -1,0 +1,17 @@
+<div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+  <h2 class="govuk-error-summary__title" id="error-summary-title">
+    You must contact the community probation office
+  </h2>
+  <div class="govuk-error-summary__body">
+    <ul class="govuk-list govuk-error-summary__list">
+      <li id="com_warning"><%= link_to I18n.t('views.handover_alert.no_com', date: format_date(@prisoner.handover_start_date)), "#com-error", data: { turbolinks: false } %></li>
+      <li id="ldu_warning">
+        <% if @prisoner.ldu.try(:name).blank? %>
+          <%= link_to I18n.t('views.handover_alert.no_ldu'), "#com-error", data: { turbolinks: false }  %>
+        <% else %>
+          <%= link_to I18n.t('views.handover_alert.no_email', name: @prisoner.ldu.name), "#com-error", data: { turbolinks: false }  %>
+        <% end %>
+      </li>
+    </ul>
+  </div>
+</div>
