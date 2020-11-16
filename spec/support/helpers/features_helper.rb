@@ -5,6 +5,10 @@ module FeaturesHelper
     mock_sso_response(name, [SsoIdentity::SPO_ROLE])
   end
 
+  def signin_spo_pom_user(name = 'MOIC_POM')
+    mock_sso_response(name, ['ROLE_ALLOC_MGR', 'ROLE_ALLOC_CASE_MGR'])
+  end
+
   def signin_global_admin_user
     mock_sso_response('MOIC_POM', [SsoIdentity::SPO_ROLE, SsoIdentity::ADMIN_ROLE], PrisonService.prison_codes)
   end
@@ -28,5 +32,9 @@ module FeaturesHelper
       to_return(body: { 'staffId': staff_id }.to_json)
     stub_request(:get, "#{ApiHelper::T3}/staff/#{staff_id}/emails").
       to_return(body: [].to_json)
+  end
+
+  def wait_for(maximum_wait_in_seconds = 10)
+    Selenium::WebDriver::Wait.new(timeout: maximum_wait_in_seconds).until { yield }
   end
 end

@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class SearchController < PrisonsApplicationController
-  breadcrumb 'Search', -> { prison_search_path(active_prison_id) }, only: [:search]
-
   def search
     # Users who are not SPOs should not be able to action any of these search results,
     # and instead they should be redirected to the caseload search instead. If a user

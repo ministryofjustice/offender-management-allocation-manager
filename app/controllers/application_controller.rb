@@ -2,7 +2,7 @@
 
 class ApplicationController < ActionController::Base
   helper_method :current_user
-  helper_method :caseloads, :current_user_is_spo?
+  helper_method :caseloads
 
   before_action :set_paper_trail_whodunnit
 

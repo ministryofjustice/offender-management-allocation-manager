@@ -5,10 +5,6 @@ class AllocationsController < PrisonsApplicationController
 
   delegate :update, to: :create
 
-  breadcrumb 'Allocated', -> { prison_summary_allocated_path(active_prison_id) }, only: [:show]
-  breadcrumb -> { offender(nomis_offender_id_from_url).full_name },
-             -> { prison_allocation_path(active_prison_id, nomis_offender_id_from_url) }, only: [:show]
-
   def new
     @prisoner = offender(nomis_offender_id_from_url)
     @previously_allocated_pom_ids =
