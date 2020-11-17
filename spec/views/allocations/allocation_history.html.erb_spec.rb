@@ -44,4 +44,22 @@ RSpec.describe "allocations/history", type: :view do
       expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ["Prisoner allocated", "Prisoner unallocated", "Prisoner allocated"]
     end
   end
+
+  context 'when a prisoner has been released' do
+    before do
+      assign(:prisoner, build(:offender))
+      assign(:pom_emails, {})
+      assign(:history, [build(:allocation, :primary),
+                        build(:allocation, :release, updated_at: release_date_and_time)]
+                           .map { |ah| AllocationHistory.new(ah, dummy_version) })
+    end
+
+    let(:release_date_and_time) { DateTime.new(2019, 8, 19, 11, 28, 0) }
+    let(:page) { Nokogiri::HTML(rendered) }
+
+    # Proper test and code fix coming in MO-36
+    it 'doesnt crash' do
+      render
+    end
+  end
 end
