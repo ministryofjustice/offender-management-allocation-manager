@@ -1,26 +1,36 @@
-<div class="moj-timeline__item">
-  <div class="moj-timeline__header">
-    <h2 class="moj-timeline__title">Prisoner reallocated</h2>
-  </div>
+<!--
+  If we have a 'first' reallocation, (it is size-1 because the list is displayed backwards)
+   then show it as an allocation because it is - incorrect data caused by a defect is too
+   hard to change as it is YAML
+-->
+<% if reallocate_primary_pom_counter == allocations.size - 1 %>
+  <%= render 'allocate_primary_pom', allocations: allocations, allocate_primary_pom: reallocate_primary_pom %>
+<% else %>
+  <div class="moj-timeline__item">
+    <div class="moj-timeline__header">
+      <h2 class="moj-timeline__title">Prisoner reallocated</h2>
+    </div>
 
-  <div class="moj-timeline__description">Prisoner reallocated to <%= pom_name.titleize %>
-      - <%= format_email(@pom_emails[pom_nomis_id]) %>
-    <br/>
-    Tier: <%= allocation.allocated_at_tier %>
-    <% if allocation.override_reasons.present? %>
-      <p class="govuk-body govuk-!-margin-bottom-1"><%= display_override_pom(allocation) %></p>
-      <p class="govuk-body govuk-!-margin-bottom-1">Reason(s):</p>
-      <div id="override-reason-reallocation">
-        <% allocation.override_reasons.each do | reason| %>
-          <%= display_override_details(reason, allocation) %>
-        <% end %>
-      </div>
-    <% end %>
-  </div>
+    <div class="moj-timeline__description">Prisoner reallocated to <%= reallocate_primary_pom.primary_pom_name.titleize %>
+      - <%= format_email(@pom_emails[reallocate_primary_pom.primary_pom_nomis_id]) %>
+      <br/>
+      Tier: <%= reallocate_primary_pom.allocated_at_tier %>
+      <% if reallocate_primary_pom.override_reasons.present? %>
+        <p class="govuk-body govuk-!-margin-bottom-1"><%= display_override_pom(reallocate_primary_pom) %></p>
+        <p class="govuk-body govuk-!-margin-bottom-1">Reason(s):</p>
+        <div id="override-reason-reallocation">
+          <% reallocate_primary_pom.override_reasons.each do | reason| %>
+            <%= display_override_details(reason, reallocate_primary_pom) %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
 
-  <p class="moj-timeline__date"><%= format_date_long(allocation.updated_at) %>
-    <% if allocation.created_by_name.present? %>
-      by <%= allocation.created_by_name.titleize %>
-    <% end %>
-  </p>
-</div>
+    <p class="moj-timeline__date"><%= format_date_long(reallocate_primary_pom.updated_at) %>
+      <% if reallocate_primary_pom.created_by_name.present? %>
+        by <%= reallocate_primary_pom.created_by_name.titleize %>
+      <% end %>
+    </p>
+  </div>
+<% end %>
+
