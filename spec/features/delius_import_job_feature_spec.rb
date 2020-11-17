@@ -28,14 +28,10 @@ feature "Delius import feature" do
   let(:prison) { "LEI" }
   let(:booking_id) { 754_207 }
   let(:offender) { build(:nomis_offender, offenderNo: offender_no, imprisonmentStatus: 'DET', dateOfBirth: "1985-03-19") }
+  let(:pom) { build(:pom) }
 
   before do
-    signin_spo_user
-
-    stub_auth_token
-    stub_request(:get, "#{ApiHelper::T3}/users/MOIC_POM").
-      to_return(body: { 'staffId': 1 }.to_json)
-    stub_pom_emails(1, [])
+    stub_signin_spo(pom)
 
     stub_offender(offender)
 

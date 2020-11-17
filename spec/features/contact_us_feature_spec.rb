@@ -11,7 +11,7 @@ feature 'Getting help' do
   end
 
   it 'shows a pre-filled contact form when a user is signed in', vcr: { cassette_name: :help_logged_in } do
-    signin_spo_user('MOIC_POM')
+    signin_spo_user
     visit '/'
     click_link 'Contact us'
 
