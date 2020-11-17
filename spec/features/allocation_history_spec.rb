@@ -151,4 +151,26 @@ feature 'Allocation History' do
       sort_by!(&:updated_at).
       reverse!
   end
+
+  context 'when prisoner has been released' do
+    let(:nomis_offender) { build(:nomis_offender) }
+    let(:nomis_offender_id) { nomis_offender.fetch(:offenderNo) }
+    let(:prison) { build(:prison).code }
+    let(:staff_id) { 123456 }
+
+    before do
+      stub_auth_token
+      stub_user(username: 'MOIC_POM', staff_id: staff_id)
+      stub_offender(nomis_offender)
+      signin_spo_user("MOIC_POM", [prison])
+      create(:case_information, nomis_offender_id: nomis_offender_id)
+      allocation = create(:allocation, :primary, nomis_offender_id: nomis_offender_id, prison: prison)
+      allocation.deallocate_offender(Allocation::OFFENDER_RELEASED)
+    end
+
+    scenario 'visit allocation history page' do
+      visit prison_allocation_history_path(prison, nomis_offender_id)
+      expect(page).to have_content("Prisoner released")
+    end
+  end
 end
