@@ -8,18 +8,9 @@ class OffenderService
       record = CaseInformation.find_by(nomis_offender_id: offender_no)
       o.load_case_information(record)
 
-      sentence_detail = get_sentence_details([o.booking_id])
-      if sentence_detail.present? && sentence_detail.key?(o.booking_id)
-        o.sentence = sentence_detail[o.booking_id]
-      end
-
       o.category_code = HmppsApi::PrisonApi::OffenderApi.get_category_code(o.offender_no)
       o.main_offence = HmppsApi::PrisonApi::OffenderApi.get_offence(o.booking_id)
     }
-  end
-
-  def self.get_sentence_details(booking_ids)
-    HmppsApi::PrisonApi::OffenderApi.get_bulk_sentence_details(booking_ids)
   end
 
   # Takes a list of OffenderSummary or Offender objects, and returns them with their
