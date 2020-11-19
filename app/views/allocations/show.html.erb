@@ -100,7 +100,7 @@
     <tr class="govuk-table__row" id="responsibility-handover-date-row">
       <td class="govuk-table__cell govuk-!-width-one-half">Responsibility handover</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-        <%= format_date(@prisoner.responsibility_handover_date, replacement: 'Unknown - missing MAPPA info') %>
+        <%= format_date(@prisoner.responsibility_handover_date) %>
         <span class="handover-reason">(<%= @prisoner.handover_reason %>)</span>
       </td>
     </tr>
