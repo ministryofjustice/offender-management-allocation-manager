@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_28_113448) do
+ActiveRecord::Schema.define(version: 2020_11_18_175237) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -33,7 +33,6 @@ ActiveRecord::Schema.define(version: 2020_10_28_113448) do
     t.integer "event_trigger"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "created_by_username"
     t.datetime "primary_pom_allocated_at"
     t.string "recommended_pom_type"
     t.index ["nomis_offender_id"], name: "index_allocations_on_nomis_offender_id"
