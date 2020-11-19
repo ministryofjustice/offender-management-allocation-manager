@@ -4,7 +4,7 @@ context 'when NOMIS is missing information' do
   let(:prison_code) { 'LEI' }
   let(:offender_no) { 'A1' }
   let(:stub_keyworker_host) { Rails.configuration.keyworker_api_host }
-  let(:staff_id) { 111_111 }
+  let(:staff_id) { 123456 }
 
   describe 'when logged in as a POM' do
     before do
@@ -24,7 +24,7 @@ context 'when NOMIS is missing information' do
         to_return(body: stub_poms.to_json)
 
       signin_pom_user
-      stub_user staff_id: staff_id
+      stub_user(username: 'MOIC_POM', staff_id: staff_id)
     end
 
     describe 'the caseload page' do
@@ -100,16 +100,10 @@ context 'when NOMIS is missing information' do
   end
 
   context 'when logged in as an SPO' do
-    before do
-      stub_request(:post, "#{ApiHelper::AUTH_HOST}/auth/oauth/token").
-        with(query: { grant_type: 'client_credentials' }).
-        to_return(body: {}.to_json)
+    let(:pom) { build(:pom) }
 
-      signin_spo_user('example_SPO')
-      stub_request(:get, "#{ApiHelper::T3}/users/example_SPO").
-          to_return(body: { 'staffId': 754_732 }.to_json)
-      stub_request(:get, "#{ApiHelper::T3}/staff/754732/emails").
-          to_return(body: [].to_json)
+    before do
+      stub_signin_spo(pom)
     end
 
     context 'with an NPS offender with an indeterminate sentence, but no release dates' do

@@ -1,12 +1,16 @@
 require 'rails_helper'
 
 RSpec.describe "allocations/history", type: :view do
+  let(:dummy_version) { Struct.new(:object_changes).new({ 'updated_at' => [Time.zone.now, Time.zone.now] }.to_yaml) }
+
   context 'when allocator completes an override against the recommendation (allocation)' do
     before do
       assign(:prisoner, build(:offender))
       assign(:pom_emails, {})
-      assign(:history, [build(:allocation, override_reasons: ["suitability"], suitability_detail: "Too high risk"),
-                        build(:allocation, override_reasons: ["suitability"], event: Allocation::REALLOCATE_PRIMARY_POM, suitability_detail: "Continuity")])
+      assign(:history, [
+          build(:allocation, override_reasons: ["suitability"], suitability_detail: "Too high risk"),
+          build(:allocation, override_reasons: ["suitability"], event: Allocation::REALLOCATE_PRIMARY_POM, suitability_detail: "Continuity")
+      ].map { |ah| AllocationHistory.new(ah, dummy_version) })
     end
 
     let(:page) { Nokogiri::HTML(rendered) }
@@ -24,9 +28,11 @@ RSpec.describe "allocations/history", type: :view do
     before do
       assign(:prisoner, build(:offender))
       assign(:pom_emails, {})
-      assign(:history, [build(:allocation, :primary, prison: prison_one),
-                        build(:allocation, :transfer, prison: prison_one),
-                        build(:allocation, :reallocation, :override, prison: prison_two)])
+      assign(:history, [
+          build(:allocation, :primary, prison: prison_one),
+          build(:allocation, :transfer, prison: prison_one),
+          build(:allocation, :reallocation, :override, prison: prison_two)
+      ].map { |ah| AllocationHistory.new(ah, dummy_version) })
     end
 
     let(:prison_one) { build(:prison).code }
@@ -36,6 +42,26 @@ RSpec.describe "allocations/history", type: :view do
     it 'displays an allocation label in the allocation history' do
       render
       expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ["Prisoner allocated", "Prisoner unallocated", "Prisoner allocated"]
+    end
+  end
+
+  context 'when a prisoner has been released' do
+    before do
+      assign(:prisoner, build(:offender))
+      assign(:pom_emails, {})
+      assign(:history, [build(:allocation, :primary),
+                        build(:allocation, :release)].
+          map { |ah| AllocationHistory.new(ah, released_version) })
+    end
+
+    let(:released_version) { Struct.new(:object_changes).new({ 'updated_at' => [release_date_and_time, release_date_and_time] }.to_yaml) }
+    let(:release_date_and_time) { DateTime.new(2019, 8, 19, 11, 28, 0) }
+    let(:page) { Nokogiri::HTML(rendered) }
+
+    it 'displays a release label and the release date and time in the allocation history' do
+      render
+      expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ["Prisoner released", "Prisoner allocated"]
+      expect(page.css('.moj-timeline__date')).to have_text('19th August 2019 (11:28)')
     end
   end
 end

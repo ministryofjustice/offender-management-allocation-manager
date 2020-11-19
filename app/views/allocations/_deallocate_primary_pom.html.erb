@@ -1,0 +1,19 @@
+<div class="moj-timeline__item">
+  <div class="moj-timeline__header">
+    <h2 class="moj-timeline__title">Prisoner unallocated
+      <% if deallocate_primary_pom.event_trigger == 'offender_transferred' %>
+        (transfer)
+      <% end %>
+    </h2>
+  </div>
+
+  <div class="moj-timeline__description">
+    <% unless deallocate_primary_pom.event_trigger == 'offender_transferred' %>
+      Prisoner unallocated POM
+    <%= allocations[deallocate_primary_pom_counter + 1].primary_pom_name.titleize %> - <%= format_email(@pom_emails[allocations[deallocate_primary_pom_counter + 1].primary_pom_nomis_id]) %>
+    <% end %>
+  </div>
+  <br/>
+&nbsp;
+  <p class="moj-timeline__date"><%= format_date_long(deallocate_primary_pom.updated_at) %></p>
+</div>
