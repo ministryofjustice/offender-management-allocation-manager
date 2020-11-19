@@ -6,10 +6,6 @@ FactoryBot.define do
       'A'
     end
 
-    created_by_username do
-      'MOIC_POM'
-    end
-
     created_by_name do
       "#{Faker::Name.first_name} #{Faker::Name.last_name}"
     end

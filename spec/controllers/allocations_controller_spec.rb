@@ -143,16 +143,13 @@ RSpec.describe AllocationsController, type: :controller do
                                 prison: 'PVI',
                                 recommended_pom_type: 'probation',
                                 event: Allocation::ALLOCATE_PRIMARY_POM,
-                                event_trigger: Allocation::USER,
-                                created_by_username: 'MOIC_POM'
+                                event_trigger: Allocation::USER
             )
             allocation.update!(
               primary_pom_nomis_id: poms.second.staffId,
               prison: 'LEI',
               event: Allocation::REALLOCATE_PRIMARY_POM,
-              event_trigger: Allocation::USER,
-              created_by_username: 'MOIC_POM'
-            )
+              event_trigger: Allocation::USER)
           end
 
           it "Can get the allocation history for an offender" do
