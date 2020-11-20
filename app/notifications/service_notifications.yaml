@@ -36,9 +36,9 @@ notifications:
     end_date: 16/10/2020
     text: 'You can help us improve this service by participating in research and giving us feedback. Sign up to the HMPPS Digital research panel <a href="https://www.surveymonkey.co.uk/r/79MHSJX">here</a>'
   - id: vlo-banner-20-11-2020
-    start_date: 20/11/2020
+    start_date: 23/11/2020
     role:
       - POM
       - SPO
-    end_date: 30/11/2020
+    end_date: 2/12/2020
     text: 'NEW FEATURE: Prison offender managers and Head of offender management delivery will now be able to manually input the victim liaison officers name and contact details. Read more.  <a href="/whats-new">read the release notes to find out more</a>'
