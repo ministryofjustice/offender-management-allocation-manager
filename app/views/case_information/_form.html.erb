@@ -9,9 +9,6 @@
         <legend class="govuk-fieldset__legend--s govuk-!-margin-bottom-2">
           Was this prisoner's last known address in Wales?
         </legend>
-        <p>
-          Only prisoners with a Welsh address will be allocated a responsible<br/> prison or probation POM.
-        </p>
 
         <% if @case_info.errors[:welsh_offender].present? %>
           <span class="govuk-error-message">
