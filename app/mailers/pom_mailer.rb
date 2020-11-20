@@ -151,4 +151,20 @@ class PomMailer < GovukNotifyRails::Mailer
 
     mail(to: params[:previous_pom_email])
   end
+
+  def offender_deallocated(email:,
+                           pom_name:,
+                           offender_name:,
+                           nomis_offender_id:,
+                           prison_name:,
+                           url:)
+    set_template('1df51f52-512d-434b-9088-50eacaa47c59')
+    set_personalisation(pom_name: pom_name,
+                        offender_name: offender_name,
+                        nomis_offender_id: nomis_offender_id,
+                        prison_name: prison_name,
+                        url: url)
+
+    mail(to: email)
+  end
 end

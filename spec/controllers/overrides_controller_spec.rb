@@ -43,8 +43,7 @@ RSpec.describe OverridesController, type: :controller do
 
   context 'with an inactive allocation' do
     before do
-      allocation = create(:allocation, nomis_offender_id: nomis_offender_id)
-      allocation.deallocate_offender(Allocation::OFFENDER_RELEASED)
+      create(:allocation, :release, nomis_offender_id: nomis_offender_id)
     end
 
     it 'redirects to confirm#allocation' do

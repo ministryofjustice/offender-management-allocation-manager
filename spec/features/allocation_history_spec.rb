@@ -156,16 +156,18 @@ feature 'Allocation History' do
     let(:nomis_offender) { build(:nomis_offender) }
     let(:nomis_offender_id) { nomis_offender.fetch(:offenderNo) }
     let(:prison) { build(:prison).code }
-    let(:staff_id) { 123456 }
+    let(:pom) { build(:pom) }
 
     before do
       stub_auth_token
-      stub_user(username: 'MOIC_POM', staff_id: staff_id)
+      stub_user(username: 'MOIC_POM', staff_id: pom.staff_id)
       stub_offender(nomis_offender)
+      stub_offenders_for_prison(prison, [nomis_offender])
       signin_spo_user([prison])
+      stub_poms(prison, [pom])
       create(:case_information, nomis_offender_id: nomis_offender_id)
-      allocation = create(:allocation, :primary, nomis_offender_id: nomis_offender_id, prison: prison)
-      allocation.deallocate_offender(Allocation::OFFENDER_RELEASED)
+      allocation = create(:allocation, :primary, nomis_offender_id: nomis_offender_id, prison: prison, primary_pom_nomis_id: pom.staff_id)
+      allocation.offender_released
     end
 
     scenario 'visit allocation history page' do

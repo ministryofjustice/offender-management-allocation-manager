@@ -96,6 +96,8 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
   end
 
   it 'can use previous allocation details where they exist' do
+    offender = build(:nomis_offender, first_name: 'First', last_name: 'Last')
+    stub_offenders_for_prison(closed_prison_code, [offender])
     allow(OffenderService).to receive(:get_offender).
       and_return(HmppsApi::Offender.new(offender_no: nomis_offender_id,
                                      prison_id: open_prison_code,
@@ -110,10 +112,10 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
 
     # Create an allocation where the offender is allocated, and then deallocate so we can
     # test finding the last pom that was allocated to this offender ....
-    alloc = create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: other_staff_id, prison: 'LEI',
+    alloc = create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: other_staff_id, prison: closed_prison_code,
                                 primary_pom_name: 'Primary POMName')
     alloc.update(primary_pom_nomis_id: nomis_staff_id)
-    alloc.deallocate_offender(Allocation::OFFENDER_TRANSFERRED)
+    alloc.offender_transferred
 
     fakejob = double
     allow(fakejob).to receive(:deliver_later)

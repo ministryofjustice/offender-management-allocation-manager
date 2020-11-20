@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Allocation, type: :model do
   let(:nomis_staff_id) { 456_789 }
-  let(:nomis_offender_id) { 123_456 }
+  let(:nomis_offender_id) { 'A3434LK' }
   let(:another_nomis_offender_id) { 654_321 }
 
   describe '#without_ldu_emails' do
@@ -47,9 +47,13 @@ RSpec.describe Allocation, type: :model do
   end
 
   context 'with allocations' do
+    let(:prison) { build(:prison) }
+    let(:pom) { build(:pom, staffId: nomis_staff_id) }
+
     let!(:allocation) {
       create(
         :allocation,
+        prison: prison.code,
         nomis_offender_id: nomis_offender_id,
         primary_pom_nomis_id: nomis_staff_id,
         override_reasons: "[\"suitability\", \"no_staff\", \"continuity\", \"other\"]"
@@ -71,6 +75,7 @@ RSpec.describe Allocation, type: :model do
       let!(:another_allocaton) {
         create(
           :allocation,
+          prison: allocation.prison,
           nomis_offender_id: another_nomis_offender_id,
           primary_pom_nomis_id: 485_926,
           secondary_pom_nomis_id: nomis_staff_id,
@@ -104,7 +109,6 @@ RSpec.describe Allocation, type: :model do
         nomis_offender_id = 'G2911GD'
         create(:case_information, nomis_offender_id: nomis_offender_id)
 
-        movement_type = Allocation::OFFENDER_TRANSFERRED
         params = {
           nomis_offender_id: nomis_offender_id,
           prison: 'LEI',
@@ -120,7 +124,7 @@ RSpec.describe Allocation, type: :model do
         AllocationService.create_or_update(params)
         alloc = described_class.find_by!(nomis_offender_id: nomis_offender_id)
 
-        alloc.deallocate_offender(movement_type)
+        alloc.offender_transferred
         deallocation = alloc.reload
 
         expect(deallocation.primary_pom_nomis_id).to be_nil
@@ -136,7 +140,6 @@ RSpec.describe Allocation, type: :model do
         nomis_offender_id = 'G2911GD'
         create(:case_information, nomis_offender_id: nomis_offender_id)
 
-        movement_type = Allocation::OFFENDER_RELEASED
         params = {
           nomis_offender_id: nomis_offender_id,
           prison: 'LEI',
@@ -152,7 +155,7 @@ RSpec.describe Allocation, type: :model do
         AllocationService.create_or_update(params)
 
         alloc = described_class.find_by(nomis_offender_id: nomis_offender_id)
-        alloc.deallocate_offender(movement_type)
+        alloc.offender_released
         deallocation = alloc.reload
 
         expect(deallocation.primary_pom_nomis_id).to be_nil
@@ -203,6 +206,7 @@ RSpec.describe Allocation, type: :model do
       let!(:secondary_allocation) {
         create(
           :allocation,
+          prison: allocation.prison,
           nomis_offender_id: nomis_offender_id,
           secondary_pom_nomis_id: nomis_staff_id
         )
@@ -210,6 +214,7 @@ RSpec.describe Allocation, type: :model do
       let!(:another_allocation) {
         create(
           :allocation,
+          prison: allocation.prison,
           nomis_offender_id: nomis_offender_id,
           primary_pom_nomis_id: 27
         )
@@ -224,7 +229,7 @@ RSpec.describe Allocation, type: :model do
       }
 
       it 'returns both primary and secondary allocations' do
-        expect(described_class.active_pom_allocations(nomis_staff_id, 'LEI')).to match_array [secondary_allocation, allocation]
+        expect(described_class.active_pom_allocations(nomis_staff_id, allocation.prison)).to match_array [secondary_allocation, allocation]
       end
     end
   end

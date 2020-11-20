@@ -23,6 +23,9 @@ RSpec.describe MovementsOnDateJob, type: :job do
           directionCode: "IN"
         }].to_json)
 
+    stub_poms('MDI', [build(:pom, staffId: 485926)])
+    stub_offenders_for_prison('MDI', [])
+
     expect(alloc.primary_pom_nomis_id).not_to be_nil
     expect(alloc.secondary_pom_nomis_id).not_to be_nil
 
