@@ -41,4 +41,4 @@ notifications:
       - POM
       - SPO
     end_date: 2/12/2020
-    text: 'NEW FEATURE: Prison offender managers and Head of offender management delivery will now be able to manually input the victim liaison officers name and contact details. Read more.  <a href="/whats-new">read the release notes to find out more</a>'
+    text: 'NEW FEATURE: Prison Offender Managers and Heads of Offender Management Delivery will now be able to manually input the Victim Liaison Officer’s name and contact details.  <a href="/whats-new">Read more</a>'
