@@ -21,28 +21,21 @@ module HistoryHelper
       # Each time a new prison is found in the list, we yield the current prison
       # and all of the allocations we have captured so far to the caller via the passed
       # block.
-      return if @array.empty?
-
-      idx = 0
-      last_idx = @array.count
-
-      loop do
-        prison = @array[idx].prison
-
-        slice_of_this = @array.slice(idx, last_idx - idx)
-        allocations_for_prison = slice_of_this.take_while { |p|
-          # The nil? piece here is impossible to test as we have changed our minds about
-          # nilling out prison in allocation, however in production we still have some
-          # history records in the 'versions' table with a nil prison in them.
-          # These need to be swept up as belonging to the 'current' prison as they are typically de-allocations
-          p.prison == prison || p.prison.nil?
-        }
-
-        yield(prison, allocations_for_prison)
-
-        idx += allocations_for_prison.count
-        break if idx >= last_idx
+      #
+      # This now needs to cope with nils at the start and middle of list - items are 'swept up'
+      # until an actual prison change - as some items may not have an associated prison
+      current_prison = nil
+      allocations_for_prison = []
+      @array.each do |item|
+        if item.prison == current_prison || current_prison.nil?
+          allocations_for_prison << item
+        else
+          yield(current_prison, allocations_for_prison)
+          allocations_for_prison = [item]
+        end
+        current_prison = item.prison
       end
+      yield(current_prison, allocations_for_prison) unless allocations_for_prison.empty?
     end
   end
   #rubocop:enable Rails/HelperInstanceVariable

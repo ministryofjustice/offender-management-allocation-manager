@@ -1,0 +1,12 @@
+<% content_for :switcher do %>
+  <%= render '/layouts/prison_switcher' %>
+<% end %>
+
+<%= render 'shared/backlink', page: @referrer %>
+
+<h2 class="govuk-heading-l">Add Victim Liaison Officer (VLO) contact details</h2>
+
+<%= render 'form',
+           vlo: @vlo,
+           form_action: :post,
+           form_url: prison_prisoner_victim_liaison_officers_path(@prison.code, @vlo.case_information.nomis_offender_id) %>

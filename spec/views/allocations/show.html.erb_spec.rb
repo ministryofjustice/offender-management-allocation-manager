@@ -7,7 +7,7 @@ RSpec.describe "allocations/show", type: :view do
     assign(:prison, build(:prison))
     assign(:pom, build(:pom))
     assign(:prisoner, build(:offender))
-    assign(:allocation, build(:allocation))
+    assign(:allocation, create(:allocation))
     assign(:keyworker, build(:keyworker))
     render
   end

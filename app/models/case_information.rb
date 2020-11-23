@@ -14,6 +14,8 @@ class CaseInformation < ApplicationRecord
            inverse_of: :case_information,
            dependent: :destroy
 
+  has_many :victim_liaison_officers, dependent: :destroy
+
   scope :nps, -> { where(case_allocation: NPS) }
 
   has_one :responsibility,

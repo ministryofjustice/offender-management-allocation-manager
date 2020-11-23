@@ -26,7 +26,7 @@
       <% end %>
     </div>
 
-    <p class="moj-timeline__date"><%= format_date_long(reallocate_primary_pom.updated_at) %>
+    <p class="moj-timeline__date"><%= format_date_long(reallocate_primary_pom.created_at) %>
       <% if reallocate_primary_pom.created_by_name.present? %>
         by <%= reallocate_primary_pom.created_by_name.titleize %>
       <% end %>

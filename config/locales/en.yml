@@ -30,6 +30,16 @@
 # available at https://guides.rubyonrails.org/i18n.html.
 
 en:
+  1st: First
+  2nd: Second
+  3rd: Third
+  4th: Fourth
+  5th: Fifth
+  6th: Sixth
+  7th: Seventh
+  8th: Eighth
+  9th: Ninth
+  10th: Tenth
   activemodel:
     errors:
       models:
@@ -41,6 +51,16 @@ en:
   activerecord:
     errors:
       models:
+        victim_liaison_officer:
+          format: "%{message}"
+          attributes:
+            first_name:
+              blank: Enter a first name
+            last_name:
+              blank: Enter a last name
+            email:
+              blank: Enter an email address in the correct format, like name@example.com
+              invalid: Enter an email address in the correct format, like name@example.com
         case_information:
           attributes:
             parole_review_date:

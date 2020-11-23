@@ -8,7 +8,7 @@
     <br/>
   </div>
 
-  <p class="moj-timeline__date"><%= format_date_long(allocate_secondary_pom.updated_at) %>
+  <p class="moj-timeline__date"><%= format_date_long(allocate_secondary_pom.created_at) %>
     <% if allocate_secondary_pom.created_by_name.present? %>
       by <%= allocate_secondary_pom.created_by_name.titleize %>
     <% end %>
