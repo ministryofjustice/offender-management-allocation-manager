@@ -56,7 +56,7 @@ RSpec.describe OffenderHelper do
       }
 
       expect(offender.sentenced?).to eq(false)
-      expect(helper.approaching_handover_without_com?(offender)).to eq(false)
+      expect(helper.needs_com_but_ldu_is_uncontactable?(offender)).to eq(false)
     end
 
     it 'returns false if offender does not have a handover start date' do
@@ -66,7 +66,7 @@ RSpec.describe OffenderHelper do
                                                   automatic_release_date: nil
       }
 
-      expect(helper.approaching_handover_without_com?(offender)).to eq(false)
+      expect(helper.needs_com_but_ldu_is_uncontactable?(offender)).to eq(false)
     end
 
     it 'returns false if offender has more than 45 days until start of handover' do
@@ -77,7 +77,7 @@ RSpec.describe OffenderHelper do
                                                   release_date: Time.zone.today + 20.months
       }
 
-      expect(helper.approaching_handover_without_com?(offender)).to eq(false)
+      expect(helper.needs_com_but_ldu_is_uncontactable?(offender)).to eq(false)
     end
 
     context 'when offender has 45 days or less until start of handover' do
@@ -89,7 +89,7 @@ RSpec.describe OffenderHelper do
                                                     release_date: Time.zone.today + 20.months
         }
 
-        expect(helper.approaching_handover_without_com?(offender)).to eq(false)
+        expect(helper.needs_com_but_ldu_is_uncontactable?(offender)).to eq(false)
       end
 
       context "when offender has no 'COM'" do
@@ -101,7 +101,7 @@ RSpec.describe OffenderHelper do
                                                       release_date: Time.zone.today + 20.months
           }
 
-          expect(helper.approaching_handover_without_com?(offender)).to eq(false)
+          expect(helper.needs_com_but_ldu_is_uncontactable?(offender)).to eq(false)
         end
 
         it "returns true if offender has no LDU" do
@@ -112,7 +112,7 @@ RSpec.describe OffenderHelper do
                                                       release_date: Time.zone.today + 20.months
           }
 
-          expect(helper.approaching_handover_without_com?(offender)).to eq(true)
+          expect(helper.needs_com_but_ldu_is_uncontactable?(offender)).to eq(true)
         end
 
         it "returns true if offender has an LDU without an email address" do
@@ -124,7 +124,7 @@ RSpec.describe OffenderHelper do
                                                       release_date: Time.zone.today + 20.months
           }
 
-          expect(helper.approaching_handover_without_com?(offender)).to eq(true)
+          expect(helper.needs_com_but_ldu_is_uncontactable?(offender)).to eq(true)
         end
       end
     end

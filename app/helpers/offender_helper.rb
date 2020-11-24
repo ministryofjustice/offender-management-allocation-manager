@@ -31,7 +31,7 @@ module OffenderHelper
     end
   end
 
-  def approaching_handover_without_com?(offender)
+  def needs_com_but_ldu_is_uncontactable?(offender)
     return false unless offender.sentenced?
 
     return false if offender.handover_start_date.nil?

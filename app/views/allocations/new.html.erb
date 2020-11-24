@@ -1,6 +1,6 @@
 <%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
 
-<% if approaching_handover_without_com?(@prisoner)%>
+<% if needs_com_but_ldu_is_uncontactable?(@prisoner)%>
   <%= render partial: 'shared/no_com_alert' %>
 <% end %>
 
