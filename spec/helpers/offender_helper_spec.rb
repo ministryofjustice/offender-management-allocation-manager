@@ -46,4 +46,87 @@ RSpec.describe OffenderHelper do
       expect(helper.case_owner_label(offp)).to eq('Community')
     end
   end
+
+  describe '#approaching_handover_without_com?' do
+    it 'returns false if offender is not sentenced' do
+      offender = build(:offender).tap { |o|
+        o.load_case_information(build(:case_information))
+        o.sentence = HmppsApi::SentenceDetail.new sentence_start_date: Time.zone.today - 20.months,
+                                                  automatic_release_date: Time.zone.today + 20.months
+      }
+
+      expect(offender.sentenced?).to eq(false)
+      expect(helper.needs_com_but_ldu_is_uncontactable?(offender)).to eq(false)
+    end
+
+    it 'returns false if offender does not have a handover start date' do
+      offender = build(:offender, :indeterminate).tap { |o|
+        o.load_case_information(build(:case_information))
+        o.sentence = HmppsApi::SentenceDetail.new sentence_start_date: Time.zone.today + 20.months,
+                                                  automatic_release_date: nil
+      }
+
+      expect(helper.needs_com_but_ldu_is_uncontactable?(offender)).to eq(false)
+    end
+
+    it 'returns false if offender has more than 45 days until start of handover' do
+      offender = build(:offender).tap { |o|
+        o.load_case_information(build(:case_information))
+        o.sentence = HmppsApi::SentenceDetail.new sentence_start_date: Time.zone.today - 20.months,
+                                                  automatic_release_date: Time.zone.today + 20.months,
+                                                  release_date: Time.zone.today + 20.months
+      }
+
+      expect(helper.needs_com_but_ldu_is_uncontactable?(offender)).to eq(false)
+    end
+
+    context 'when offender has 45 days or less until start of handover' do
+      it "returns false if offender has a 'COM'" do
+        offender = build(:offender).tap { |o|
+          o.load_case_information(build(:case_information, com_name: "Betty White"))
+          o.sentence = HmppsApi::SentenceDetail.new sentence_start_date: Time.zone.today - 20.months,
+                                                    automatic_release_date: Time.zone.today + 8.months,
+                                                    release_date: Time.zone.today + 20.months
+        }
+
+        expect(helper.needs_com_but_ldu_is_uncontactable?(offender)).to eq(false)
+      end
+
+      context "when offender has no 'COM'" do
+        it "returns false if offender has an LDU email address" do
+          offender = build(:offender).tap { |o|
+            o.load_case_information(build(:case_information))
+            o.sentence = HmppsApi::SentenceDetail.new sentence_start_date: Time.zone.today - 20.months,
+                                                      automatic_release_date: Time.zone.today + 8.months,
+                                                      release_date: Time.zone.today + 20.months
+          }
+
+          expect(helper.needs_com_but_ldu_is_uncontactable?(offender)).to eq(false)
+        end
+
+        it "returns true if offender has no LDU" do
+          offender = build(:offender).tap { |o|
+            o.load_case_information(build(:case_information, team: nil))
+            o.sentence = HmppsApi::SentenceDetail.new sentence_start_date: Time.zone.today - 20.months,
+                                                      automatic_release_date: Time.zone.today + 8.months,
+                                                      release_date: Time.zone.today + 20.months
+          }
+
+          expect(helper.needs_com_but_ldu_is_uncontactable?(offender)).to eq(true)
+        end
+
+        it "returns true if offender has an LDU without an email address" do
+          offender = build(:offender).tap { |o|
+            o.load_case_information(build(:case_information,
+                                          team: build(:team, local_divisional_unit: build(:local_divisional_unit, email_address: nil))))
+            o.sentence = HmppsApi::SentenceDetail.new sentence_start_date: Time.zone.today - 20.months,
+                                                      automatic_release_date: Time.zone.today + 8.months,
+                                                      release_date: Time.zone.today + 20.months
+          }
+
+          expect(helper.needs_com_but_ldu_is_uncontactable?(offender)).to eq(true)
+        end
+      end
+    end
+  end
 end

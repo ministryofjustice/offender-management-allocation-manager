@@ -1,3 +1,7 @@
+<% if needs_com_but_ldu_is_uncontactable?(@prisoner)%>
+  <%= render partial: 'shared/no_com_alert' %>
+<% end %>
+
 <% @tasks.each do |task| %>
   <%= render partial: 'shared/info_banner', locals: {
     content: task.long_label.html_safe }
