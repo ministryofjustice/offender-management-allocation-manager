@@ -1,6 +1,81 @@
 require 'rails_helper'
 
 describe HmppsApi::Offender do
+  describe '#within_early_allocation_window?' do
+    context 'when ARD > 18 months' do
+      let(:offender) {
+        build(:offender, sentence: build(:sentence_detail,
+                                         conditionalReleaseDate: Time.zone.today + 24.months,
+                                               automaticReleaseDate: Time.zone.today + 19.months
+      ))
+      }
+
+      it 'is not within window' do
+        expect(offender.within_early_allocation_window?).to eq(false)
+      end
+    end
+
+    context 'when ARD < 18 months' do
+      let(:offender) {
+        build(:offender, sentence: build(:sentence_detail,
+                                         conditionalReleaseDate: Time.zone.today + 24.months,
+                                               automaticReleaseDate: Time.zone.today + 17.months))
+      }
+
+      it 'is within window' do
+        expect(offender.within_early_allocation_window?).to eq(true)
+      end
+    end
+
+    context 'when PRD < 18 months' do
+      let(:offender) {
+        build(:offender,
+              sentence: build(:sentence_detail,
+                              conditionalReleaseDate: Time.zone.today + 24.months,
+                              automaticReleaseDate: Time.zone.today + 24.months)).tap { |o|
+          o.load_case_information(build(:case_information, parole_review_date: Time.zone.today + 17.months))
+        }
+      }
+
+      it 'is within window' do
+        expect(offender.within_early_allocation_window?).to eq(true)
+      end
+    end
+
+    context 'when TED < 18 months' do
+      let(:offender) {
+        build(:offender,
+              sentence: build(:sentence_detail,
+                              conditionalReleaseDate: Time.zone.today + 24.months,
+                              tariffDate: Time.zone.today + 17.months,
+                              automaticReleaseDate: Time.zone.today + 24.months)).tap { |o|
+          o.load_case_information(build(:case_information, parole_review_date: Time.zone.today + 24.months))
+        }
+      }
+
+      it 'is within window' do
+        expect(offender.within_early_allocation_window?).to eq(true)
+      end
+    end
+
+    context 'when PED < 18 months' do
+      let(:offender) {
+        build(:offender,
+              sentence: build(:sentence_detail,
+                              conditionalReleaseDate: Time.zone.today + 24.months,
+                              tariffDate: Time.zone.today + 24.months,
+                              paroleEligibilityDate: Time.zone.today + 17.months,
+                              automaticReleaseDate: Time.zone.today + 24.months)).tap { |o|
+          o.load_case_information(build(:case_information, parole_review_date: Time.zone.today + 24.months))
+        }
+      }
+
+      it 'is within window' do
+        expect(offender.within_early_allocation_window?).to eq(true)
+      end
+    end
+  end
+
   describe '#handover_start_date' do
     context 'when in custody' do
       let(:offender) {

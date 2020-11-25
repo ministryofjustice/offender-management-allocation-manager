@@ -91,6 +91,26 @@ CaseInformation.find_or_create_by!(nomis_offender_id: 'G7517GF') do |info|
     info.team_id = team2.id
 end
 
+# 3 Test offenders which have handovers in Dec 2020
+['G1176UT', 'G0228VG', 'G1289UN'].each do |offender_no|
+  CaseInformation.find_or_create_by!(nomis_offender_id: offender_no) do |info|
+    info.assign_attributes(tier: 'B',
+                           case_allocation:'CRC',
+                           welsh_offender: 'Yes',
+                           manual_entry: true,
+                           team: team2)
+  end
+end
+
+# test offender > 18 months before release (20/12/2023)
+CaseInformation.find_or_create_by!(nomis_offender_id: 'G7281UH') do |info|
+  info.assign_attributes(tier: 'B',
+                         case_allocation:'NPS',
+                         welsh_offender: 'Yes',
+                         manual_entry: true,
+                         team: team2)
+end
+
 CaseInformation.find_or_create_by!(nomis_offender_id: 'G3536UF') do |info|
   info.tier = 'A'
   info.case_allocation = 'NPS'
