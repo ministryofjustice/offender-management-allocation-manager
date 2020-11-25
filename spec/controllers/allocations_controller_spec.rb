@@ -114,7 +114,7 @@ RSpec.describe AllocationsController, type: :controller do
         end
       end
 
-      context 'when DeliusDataJob has updated the COM name' do
+      context 'when DeliusDataJob has updated the COM name', :disable_push_to_delius do
         # set DOB to 8 stars so that Delius matching ignores DoB
         let!(:d1) { create(:delius_data, date_of_birth: '*' * 8, offender_manager: 'Mr Todd', noms_no: offender_no) }
         let(:create_time) { 3.days.ago }

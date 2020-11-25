@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 # All these tests can use the same VCR cassette as they all visit the same path
-feature 'delius import scenarios', vcr: { cassette_name: :delius_import_scenarios } do
+feature 'delius import scenarios', :disable_push_to_delius, vcr: { cassette_name: :delius_import_scenarios } do
   let(:ldu) {  create(:local_divisional_unit) }
   let(:team) { create(:team, local_divisional_unit: ldu) }
   let(:test_strategy) { Flipflop::FeatureSet.current.test! }
