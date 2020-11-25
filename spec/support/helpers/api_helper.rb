@@ -139,6 +139,15 @@ module ApiHelper
       to_return(body: bookings.to_json)
   end
 
+  # Stub an 'empty' response from the Prison API, indicating that the offender does not exist in NOMIS
+  # Note: you might have expected a 404 Not Found response when the offender doesn't exist, but
+  #       the actual response is 200 OK with an empty JSON array.
+  #       This stub is faithful to the Prison API docs and real-world behaviour.
+  def stub_non_existent_offender(offender_no)
+    stub_request(:get, "#{T3}/prisoners/#{offender_no}").
+      to_return(body: [].to_json)
+  end
+
   def stub_keyworker(prison_code, offender_id, keyworker)
     stub_request(:get, "#{KEYWORKER_API_HOST}/key-worker/#{prison_code}/offender/#{offender_id}").
       to_return(body: keyworker.to_json)
