@@ -40,6 +40,12 @@ RSpec.configure do |config|
     page.driver.browser.manage.window.resize_to(1280,3072)
   end
 
+  config.before(:each, :disable_push_to_delius) do
+    # Stub the pushing of handover dates to the Community API
+    # Useful when running ProcessDeliusDataJob, which attempts to push to the Community API
+    allow(HmppsApi::CommunityApi).to receive(:set_handover_dates)
+  end
+
   config.before(:each) do
     DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.clean_with(:truncation)

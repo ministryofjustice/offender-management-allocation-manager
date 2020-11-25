@@ -25,7 +25,7 @@ RSpec.shared_examples "imports the Delius spreadsheet and creates case informati
   end
 end
 
-feature "Delius import feature" do
+feature "Delius import feature", :disable_push_to_delius do
   let(:stub_auth_host) { Rails.configuration.nomis_oauth_host }
   let(:stub_api_host) { "#{Rails.configuration.prison_api_host}/api" }
   let(:offender_no) { "GCA2H2A" }

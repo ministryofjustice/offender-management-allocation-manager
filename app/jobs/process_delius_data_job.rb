@@ -34,7 +34,7 @@ private
     # as a compromise, we always import the DeliusData into the case_information record now,
     # but only disable manual editing for prisons that are actually enabled.
     if dob_matches?(offender, delius_record)
-      process_record(delius_record)
+      process_record(offender, delius_record)
     else
       DeliusImportError.create! nomis_offender_id: delius_record.noms_no,
                                 error_type: DeliusImportError::MISMATCHED_DOB
@@ -53,10 +53,16 @@ private
     nil
   end
 
-  def process_record(delius_record)
+  def process_record(offender, delius_record)
     case_information = map_delius_to_case_info(delius_record)
 
-    unless case_information.save
+    if case_information.save
+      # Update the offender object with the new Case Information data
+      offender.load_case_information(case_information)
+
+      # Recalculate the offender's handover dates
+      CalculatedHandoverDate.recalculate_for(offender)
+    else
       case_information.errors.each do |field, _errors|
         DeliusImportError.create! nomis_offender_id: delius_record.noms_no,
                                   error_type: error_type(field)
@@ -69,13 +75,13 @@ private
       team = map_team(delius_record.team_code)
       case_info.assign_attributes(
         manual_entry: false,
-      com_name: map_com_name(delius_record.offender_manager),
-      crn: delius_record.crn,
-      tier: map_tier(delius_record.tier),
-    team: team,
-    case_allocation: delius_record.service_provider,
-    welsh_offender: map_welsh_offender(delius_record.ldu_code),
-    mappa_level: map_mappa_level(delius_record.mappa, delius_record.mappa_levels)
+        com_name: map_com_name(delius_record.offender_manager),
+        crn: delius_record.crn,
+        tier: map_tier(delius_record.tier),
+        team: team,
+        case_allocation: delius_record.service_provider,
+        welsh_offender: map_welsh_offender(delius_record.ldu_code),
+        mappa_level: map_mappa_level(delius_record.mappa, delius_record.mappa_levels)
       )
     end
   end

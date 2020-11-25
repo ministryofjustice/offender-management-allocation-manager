@@ -2,7 +2,8 @@
 
 require 'rails_helper'
 
-RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }, type: :job do
+RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius,
+               vcr: { cassette_name: :process_delius_job }, type: :job do
   let(:nomis_offender_id) { 'G4281GV' }
   let(:remand_nomis_offender_id) { 'G3716UD' }
   let(:ldu) {  create(:local_divisional_unit) }
@@ -285,6 +286,65 @@ RSpec.describe ProcessDeliusDataJob, vcr: { cassette_name: :process_delius_job }
           described_class.perform_now d1.noms_no
         }.not_to change(CaseInformation, :count)
         expect(c1.reload.tier).to eq('C')
+      end
+    end
+
+    describe 'pushing handover dates into nDelius' do
+      let!(:delius_data) {
+        create(:delius_data, tier: 'C', team_code: team.shadow_code, team: team.name,
+               ldu_code: ldu.code, ldu: ldu.name, provider_code: 'NPS')
+      }
+
+      let(:offender) { OffenderService.get_offender(delius_data.noms_no) }
+
+      shared_examples 'recalculate handover dates' do
+        it "recalculates the offender's handover dates, using the new Case Information data" do
+          expect(CalculatedHandoverDate).to receive(:recalculate_for) do |received_offender|
+            expect(received_offender).to be_an_instance_of(HmppsApi::Offender)
+
+            expected_fields = {
+              crn: delius_data.crn,
+              tier: 'C',
+              case_allocation: 'NPS',
+              welsh_offender: false,
+              mappa_level: 0
+            }
+
+            received_fields = {
+              crn: received_offender.crn,
+              tier: received_offender.tier,
+              case_allocation: received_offender.case_allocation,
+              welsh_offender: received_offender.welsh_offender,
+              mappa_level: received_offender.mappa_level
+            }
+
+            expect(received_fields).to eq(expected_fields)
+          end
+          described_class.perform_now delius_data.noms_no
+        end
+      end
+
+      context 'when creating a new Case Information record' do
+        include_examples 'recalculate handover dates'
+      end
+
+      context 'when updating an existing Case Information record' do
+        let!(:case_info) {
+          create(:case_information, tier: 'B', nomis_offender_id: delius_data.noms_no, crn: delius_data.crn)
+        }
+
+        include_examples 'recalculate handover dates'
+      end
+
+      context 'when there were errors saving the record' do
+        before do
+          delius_data.update(team_code: 'Bad team code')
+        end
+
+        it 'does not recalculate handover dates' do
+          expect(CalculatedHandoverDate).not_to receive(:recalculate_for)
+          described_class.perform_now delius_data.noms_no
+        end
       end
     end
   end
