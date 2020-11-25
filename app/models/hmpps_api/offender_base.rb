@@ -173,6 +173,16 @@ module HmppsApi
       @responsibility_override = record.responsibility
     end
 
+    def within_early_allocation_window?
+      [
+          tariff_date,
+          parole_eligibility_date,
+          parole_review_date,
+          automatic_release_date,
+          conditional_release_date
+      ].compact.min <= Time.zone.today + 18.months
+    end
+
   private
 
     def handover

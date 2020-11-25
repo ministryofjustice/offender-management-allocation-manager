@@ -17,7 +17,9 @@ class EarlyAllocationsController < PrisonsApplicationController
     @early_assignment = EarlyAllocation.new early_allocation_params.merge(offender_id_from_url)
     if @early_assignment.save
       if @early_assignment.eligible?
-        AutoEarlyAllocationEmailJob.perform_later(@prison.code, @offender.offender_no, Base64.encode64(pdf_as_string))
+        if @offender.within_early_allocation_window?
+          AutoEarlyAllocationEmailJob.perform_later(@prison.code, @offender.offender_no, Base64.encode64(pdf_as_string))
+        end
         render 'eligible'
       else
         render 'ineligible'
@@ -46,9 +48,11 @@ class EarlyAllocationsController < PrisonsApplicationController
   def discretionary
     @early_assignment = EarlyAllocation.new early_allocation_params.merge(offender_id_from_url)
     if @early_assignment.save
-      CommunityEarlyAllocationEmailJob.perform_later(@prison.code,
-                                                     @offender.offender_no,
-                                                     Base64.encode64(pdf_as_string))
+      if @offender.within_early_allocation_window?
+        CommunityEarlyAllocationEmailJob.perform_later(@prison.code,
+                                                       @offender.offender_no,
+                                                       Base64.encode64(pdf_as_string))
+      end
       render
     else
       render 'stage3'
