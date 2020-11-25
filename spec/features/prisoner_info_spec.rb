@@ -5,7 +5,7 @@ feature 'View a prisoner profile page', :allocation do
     signin_spo_user
   end
 
-  context 'without allocation' do
+  context 'without allocation or case information' do
     it 'doesnt crash', vcr: { cassette_name: :show_unallocated_offender } do
       visit prison_prisoner_path('LEI', 'G7998GJ')
 

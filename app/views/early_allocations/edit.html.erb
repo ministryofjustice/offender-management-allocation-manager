@@ -4,7 +4,7 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 <%= form_for @early_assignment,
-             url: prison_prisoner_early_allocation_path(@prison.code, @early_assignment.nomis_offender_id),
+             url: prison_prisoner_latest_early_allocation_path(@prison.code, @early_assignment.nomis_offender_id),
              method: :put,
              builder: GOVUKDesignSystemFormBuilder::FormBuilder do |form| %>
   <%= form.govuk_error_summary %>

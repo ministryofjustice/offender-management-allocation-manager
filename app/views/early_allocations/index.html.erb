@@ -1,0 +1,40 @@
+<%= back_link %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">Early allocation assessment process</h1>
+    <p class="govuk-body">Use this form to assess whether the community probation team should take responsibility for this case early.</p>
+    <p class="govuk-body">There are three possible outcomes:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>eligible - the community probation team will take responsibility for this case early</li>
+      <li>discretionary - the community probation team will need to make a decision</li>
+      <li>not eligible</li>
+    </ul>
+
+    <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
+      <div class="govuk-accordion__section">
+        <div class="govuk-accordion__section-header">
+          <h2 class="govuk-accordion__section-heading">
+            <span class="govuk-accordion__section-button" id="accordion-default-heading-1">
+              View saved assessments
+            </span>
+          </h2>
+        </div>
+        <div id="accordion-default-content-1" class="govuk-accordion__section-content" aria-labelledby="accordion-default-heading-1">
+          <%= render 'early_allocations_list', early_allocations: @early_allocations, prison_id: @prison.code, prisoner_id: @offender.offender_no %>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="govuk-heading-m">Before you start</h2>
+    <h3 class="govuk-heading-s">Cases with less than 18 months until release</h3>
+    <p class="govuk-body">Eligible and discretionary assessments will be sent to the community probation team.</p>
+    <h3 class="govuk-heading-s">Cases with over 18 months until release</h3>
+    <p class="govuk-body">Assessments will be saved but not sent to the community probation team.</p>
+    <p class="govuk-body">Cases with any eligible or discretionary saved assessments might be eligible for early allocation.</p>
+    <p class="govuk-body">We will remind the allocated POM to make a new assessment 18 months before release. The POM can view saved assessments.</p>
+
+    <%= link_to 'Start new assessment', new_prison_prisoner_early_allocations_path(@prison.code, @offender.offender_no), class: 'govuk-button' %>
+  </div>
+  <%= render(partial: 'prisoner_info_sidebar') %>
+</div>

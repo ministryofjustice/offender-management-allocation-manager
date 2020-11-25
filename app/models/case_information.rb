@@ -13,6 +13,7 @@ class CaseInformation < ApplicationRecord
   belongs_to :local_delivery_unit, optional: true
 
   has_many :early_allocations,
+           -> { order(created_at: :asc) },
            foreign_key: :nomis_offender_id,
            primary_key: :nomis_offender_id,
            inverse_of: :case_information,

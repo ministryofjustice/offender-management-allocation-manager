@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :offender_base, class: 'HmppsApi::Offender' do
     imprisonmentStatus { 'SENT03' }
-    prisonId { 'LEI' }
+    latestLocationId { 'LEI' }
 
     # offender numbers are of the form <letter><4 numbers><2 letters>
     sequence(:offenderNo) do |seq|

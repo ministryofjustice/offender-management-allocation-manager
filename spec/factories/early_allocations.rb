@@ -35,28 +35,14 @@ FactoryBot.define do
     end
 
     trait :discretionary_accepted do
-      cppc_case { false }
-      extremism_separation { false }
-      high_risk_of_serious_harm { false }
-      mappa_level_2 { false }
-      pathfinder_process { false }
-      other_reason { true }
-      reason { 'Just a reason' }
-      approved { true }
+      discretionary
       community_decision { true }
       updated_by_firstname { Faker::Name.first_name }
       updated_by_lastname { Faker::Name.last_name }
     end
 
     trait :discretionary_declined do
-      cppc_case { false }
-      extremism_separation { false }
-      high_risk_of_serious_harm { false }
-      mappa_level_2 { false }
-      pathfinder_process { false }
-      other_reason { true }
-      reason { 'Just a reason' }
-      approved { true }
+      discretionary
       community_decision { false }
       updated_by_firstname { Faker::Name.first_name }
       updated_by_lastname { Faker::Name.last_name }

@@ -24,25 +24,19 @@
         <span class="handover-reason">(<%= @prisoner.handover_reason %>)</span>
       </td>
     </tr>
-    <% if Flipflop.early_allocation? %>
+    <% if Flipflop.early_allocation? && @case_info.present? %>
     <tr id="early_allocation" class="govuk-table__row">
-      <td class="govuk-table__cell">Early allocation eligibility</td>
+      <td class="govuk-table__cell">Early allocation referral</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= early_allocation_status(@early_allocation) %>
-        <span class="pull-right">
-          <% if @early_allocation.present? %>
-            <% if @early_allocation.discretionary? && @early_allocation.community_decision.nil? %>
-              <%= link_to('Update', edit_prison_prisoner_early_allocation_path(@prison.code, @prisoner.offender_no)) %>
-            <% else %>
-              <%= link_to 'Re-assess', new_prison_prisoner_early_allocations_path(@prison.code, @prisoner.offender_no) %>
-            <% end %>
-          <% else %>
-            <%= link_to 'Assess eligibility', new_prison_prisoner_early_allocations_path(@prison.code, @prisoner.offender_no) %>
-          <% end %>
+        <span id="early_allocation_status">
+          <%= early_allocation_status(@case_info.early_allocations, @prisoner) %>
+        </span>
+        <span id="early_allocation_action" class="pull-right">
+          <%= early_allocation_action_link(@case_info.early_allocations, @prisoner, @prison) %>
         </span>
       </td>
     </tr>
-  <% end %>
+    <% end %>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">Last known address in Wales</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">

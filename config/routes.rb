@@ -25,8 +25,11 @@ Rails.application.routes.draw do
         post('discretionary')
       end
 
-      # show action produces the most recent assessment - format PDF only
-      resource :early_allocation, only: [:show, :edit, :update]
+      resources :early_allocations, only: [:index, :show]
+
+      # edit action always updates the most recent assessment
+      # uses `as: :latest_early_allocation` to avoid clashes with `resources :early_allocations` above
+      resource :early_allocation, only: [:edit, :update], as: :latest_early_allocation
 
       resources :victim_liaison_officers, only: [:new, :edit, :create, :update, :destroy] do
         member do

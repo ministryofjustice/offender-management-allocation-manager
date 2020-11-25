@@ -3,47 +3,300 @@
 require 'rails_helper'
 
 RSpec.describe EarlyAllocationHelper, type: :helper do
-  it 'says not assessed for nil' do
-    expect(helper.early_allocation_status(nil)).to eq('Not assessed')
+  let(:early_allocations) { [] }
+  let(:prison) { build(:prison) }
+  let(:offender_sentence) { build(:sentence_detail) }
+  let(:offender) { build(:offender, sentence: offender_sentence) }
+  let(:nomis_offender_id) { offender.offender_no }
+  let(:case_info) { create(:case_information, nomis_offender_id: nomis_offender_id, early_allocations: early_allocations) }
+  let(:offender_presenter) { OffenderPresenter.new(offender) }
+
+  before do
+    offender.load_case_information(case_info)
   end
 
-  context 'when eligible' do
-    subject { build(:early_allocation) }
+  describe '#early_allocation_status' do
+    subject { helper.early_allocation_status(case_info.early_allocations, offender_presenter) }
 
-    it 'says eligible' do
-      expect(helper.early_allocation_status(subject)).to eq('Eligible')
+    context 'with no saved assessment' do
+      let(:early_allocations) { [] }
+
+      it 'reads "Not assessed"' do
+        expect(subject).to eq('Not assessed')
+      end
+    end
+
+    context 'with saved assessments' do
+      context 'when the offender has more than 18 months left to serve' do
+        # The offender is not in the Early Allocation referral window
+        let(:offender_sentence) { build(:sentence_detail, conditionalReleaseDate: Time.zone.today + 19.months) }
+        let(:early_allocations) { build_list(:early_allocation, 1, created_within_referral_window: false) }
+
+        it 'reads "Has saved assessments"' do
+          expect(subject).to eq('Has saved assessments')
+        end
+      end
+
+      context 'when the offender has less than 18 months left to serve (or exactly 18 months)' do
+        # The offender is within the Early Allocation referral window
+        let(:offender_sentence) { build(:sentence_detail, conditionalReleaseDate: Time.zone.today + 17.months) }
+
+        context 'when the latest assessment was completed within the 18 month referral window' do
+          context 'when the outcome was automatically "eligible"' do
+            let(:early_allocations) {
+              build_list(:early_allocation, 1, :eligible, created_within_referral_window: true)
+            }
+
+            it 'reads "Eligible - case handover date has been updated"' do
+              expect(subject).to eq('Eligible - case handover date has been updated')
+            end
+          end
+
+          context 'when the outcome was "discretionary" (so the community need to decide)' do
+            context "when POM hasn't recorded the community decision yet" do
+              let(:early_allocations) {
+                build_list(:early_allocation, 1, :discretionary, created_within_referral_window: true)
+              }
+
+              it 'reads "Discretionary - the community probation team will make a decision"' do
+                expect(subject).to eq('Discretionary - the community probation team will make a decision')
+              end
+            end
+
+            context "when the community accepted the case" do
+              let(:early_allocations) {
+                build_list(:early_allocation, 1, :discretionary_accepted, created_within_referral_window: true)
+              }
+
+              it 'reads "Eligible - case handover date has been updated"' do
+                expect(subject).to eq('Eligible - case handover date has been updated')
+              end
+            end
+
+            context "when the community rejected the case" do
+              let(:early_allocations) {
+                build_list(:early_allocation, 1, :discretionary_declined, created_within_referral_window: true)
+              }
+
+              it 'reads "Has saved assessments"' do
+                expect(subject).to eq('Has saved assessments')
+              end
+            end
+          end
+
+          context 'when the outcome was "not eligible"' do
+            let(:early_allocations) {
+              build_list(:early_allocation, 1, :ineligible, created_within_referral_window: true)
+            }
+
+            it 'reads "Has saved assessments"' do
+              expect(subject).to eq('Has saved assessments')
+            end
+          end
+        end
+
+        context 'when assessments were completed outside of the referral window (but none inside)' do
+          context 'when at least one assessment had an outcome of automatically "eligible"' do
+            let(:early_allocations) {
+              # 1 eligible + 5 ineligible
+              build_list(:early_allocation, 1, :eligible, created_within_referral_window: false) +
+              build_list(:early_allocation, 5, :ineligible, created_within_referral_window: false)
+            }
+
+            it 'reads "New assessment required"' do
+              expect(subject).to eq('New assessment required')
+            end
+          end
+
+          context 'when at least one assessment had an outcome of "discretionary"' do
+            let(:early_allocations) {
+              # 1 discretionary + 5 ineligible
+              build_list(:early_allocation, 1, :discretionary, created_within_referral_window: false) +
+              build_list(:early_allocation, 5, :ineligible, created_within_referral_window: false)
+            }
+
+            it 'reads "New assessment required"' do
+              expect(subject).to eq('New assessment required')
+            end
+          end
+
+          context 'when all assessment outcomes are "not eligible"' do
+            let(:early_allocations) {
+              build_list(:early_allocation, 5, :ineligible, created_within_referral_window: false)
+            }
+
+            it 'reads "Has saved assessments"' do
+              expect(subject).to eq('Has saved assessments')
+            end
+          end
+        end
+      end
     end
   end
 
-  context 'when ineligible' do
-    subject { build(:early_allocation, :ineligible) }
+  describe '#early_allocation_action_link' do
+    shared_examples 'Check and reassess' do
+      it 'reads "Check and reassess"' do
+        expect(text).to eq('Check and reassess')
+      end
 
-    it 'says ineligible' do
-      expect(helper.early_allocation_status(subject)).to eq('Not eligible')
+      it 'links to the Early Allocation start page for the offender' do
+        expect(href).to eq(start_page_path)
+      end
+    end
+
+    subject { helper.early_allocation_action_link(case_info.early_allocations, offender_presenter, prison) }
+
+    let(:link) { Nokogiri::HTML(subject).css('a') }
+    let(:text) { link.text }
+    let(:href) { link.attr('href').to_s }
+
+    let(:start_page_path) { prison_prisoner_early_allocations_path(prison.code, nomis_offender_id) }
+
+    context 'with no saved assessment' do
+      let(:early_allocations) { [] }
+
+      it 'reads "Start assessment"' do
+        expect(text).to eq('Start assessment')
+      end
+
+      it 'links to the Early Allocation start page for the offender' do
+        expect(href).to eq(start_page_path)
+      end
+    end
+
+    context 'with saved assessments' do
+      context 'when the offender has more than 18 months left to serve' do
+        # The offender is not in the Early Allocation referral window
+        let(:offender_sentence) { build(:sentence_detail, conditionalReleaseDate: Time.zone.today + 19.months) }
+        let(:early_allocations) { build_list(:early_allocation, 1, created_within_referral_window: false) }
+
+        include_examples 'Check and reassess'
+      end
+
+      context 'when the offender has less than 18 months left to serve (or exactly 18 months)' do
+        # The offender is within the Early Allocation referral window
+        let(:offender_sentence) { build(:sentence_detail, conditionalReleaseDate: Time.zone.today + 17.months) }
+
+        context 'when the latest assessment was completed within the 18 month referral window' do
+          context 'when the outcome was automatically "eligible"' do
+            let(:early_allocations) {
+              build_list(:early_allocation, 1, :eligible, created_within_referral_window: true)
+            }
+
+            it 'reads "View assessment"' do
+              expect(text).to eq('View assessment')
+            end
+
+            it 'links to the page to view details of the assessment' do
+              view_assessment_path = prison_prisoner_early_allocation_path(prison.code, nomis_offender_id, early_allocations.first.id)
+              expect(href).to eq(view_assessment_path)
+            end
+          end
+
+          context 'when the outcome was "discretionary" (so the community need to decide)' do
+            context "when POM hasn't recorded the community decision yet" do
+              let(:early_allocations) {
+                build_list(:early_allocation, 1, :discretionary, created_within_referral_window: true)
+              }
+
+              it 'reads "Record community decision"' do
+                expect(text).to eq('Record community decision')
+              end
+
+              it 'links to the page to record the community decision' do
+                record_decision_path = edit_prison_prisoner_latest_early_allocation_path(prison.code, nomis_offender_id)
+                expect(href).to eq(record_decision_path)
+              end
+            end
+
+            context "when the community accepted the case" do
+              let(:early_allocations) {
+                build_list(:early_allocation, 1, :discretionary_accepted, created_within_referral_window: true)
+              }
+
+              it 'reads "View assessment"' do
+                expect(text).to eq('View assessment')
+              end
+
+              it 'links to the page to view details of the assessment' do
+                view_assessment_path = prison_prisoner_early_allocation_path(prison.code, nomis_offender_id, early_allocations.first.id)
+                expect(href).to eq(view_assessment_path)
+              end
+            end
+
+            context "when the community rejected the case" do
+              let(:early_allocations) {
+                build_list(:early_allocation, 1, :discretionary_declined, created_within_referral_window: true)
+              }
+
+              include_examples 'Check and reassess'
+            end
+          end
+
+          context 'when the outcome was "not eligible"' do
+            let(:early_allocations) {
+              build_list(:early_allocation, 1, :ineligible, created_within_referral_window: true)
+            }
+
+            include_examples 'Check and reassess'
+          end
+        end
+
+        context 'when the latest assessment was completed outside of the referral window' do
+          let(:early_allocations) {
+            build_list(:early_allocation, 1, created_within_referral_window: false)
+          }
+
+          include_examples 'Check and reassess'
+        end
+      end
     end
   end
 
-  context 'when deferred' do
-    subject { build(:early_allocation, :discretionary) }
+  describe '#early_allocation_outcome' do
+    subject { helper.early_allocation_outcome(early_allocation) }
 
-    it 'says pending when deferred to community' do
-      expect(helper.early_allocation_status(subject)).to eq('Waiting for community decision')
+    let(:early_allocation) { build(:early_allocation) }
+
+    context 'when eligible' do
+      let(:early_allocation) { build(:early_allocation) }
+
+      it 'says "Eligible"' do
+        expect(subject).to eq('Eligible')
+      end
     end
-  end
 
-  context 'when deferred but community said yes' do
-    subject { build(:early_allocation, :discretionary, community_decision: true) }
+    context 'when ineligible' do
+      let(:early_allocation) { build(:early_allocation, :ineligible) }
 
-    it 'says eligible' do
-      expect(helper.early_allocation_status(subject)).to eq('Eligible')
+      it 'says "Not eligible"' do
+        expect(subject).to eq('Not eligible')
+      end
     end
-  end
 
-  context 'when deferred but community said no' do
-    subject { build(:early_allocation, :discretionary, community_decision: false) }
+    context 'when deferred' do
+      let(:early_allocation) { build(:early_allocation, :discretionary) }
 
-    it 'says ineligible' do
-      expect(helper.early_allocation_status(subject)).to eq('Not eligible')
+      it 'says "Waiting for community decision"' do
+        expect(subject).to eq('Waiting for community decision')
+      end
+    end
+
+    context 'when discretionary and community said accepted' do
+      let(:early_allocation) { build(:early_allocation, :discretionary_accepted) }
+
+      it 'says "Eligible"' do
+        expect(subject).to eq('Eligible')
+      end
+    end
+
+    context 'when discretionary and community has rejected' do
+      let(:early_allocation) { build(:early_allocation, :discretionary_declined) }
+
+      it 'says "Not eligible"' do
+        expect(subject).to eq('Not eligible')
+      end
     end
   end
 
