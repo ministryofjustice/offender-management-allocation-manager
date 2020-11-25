@@ -31,11 +31,46 @@ RSpec.describe EarlyAllocation, type: :model do
     expect(build(:early_allocation, :stage2)).to be_valid
   end
 
-  it 'validates presence of 24 month release when extremism seperation is true' do
-    expect(build(:early_allocation, :stage2, extremism_separation: true)).not_to be_valid
+  context 'when extremism seperation is true' do
+    subject {
+      build(:early_allocation, :stage2, extremism_separation: true, due_for_release_in_less_than_24months: twenty_four_flag)
+    }
 
-    expect(build(:early_allocation, :stage2, extremism_separation: true, due_for_release_in_less_than_24months: false)).to be_valid
-    expect(build(:early_allocation, :stage2, extremism_separation: true, due_for_release_in_less_than_24months: true)).to be_valid
+    context 'when not set' do
+      let(:twenty_four_flag) { nil }
+
+      it 'is not valid' do
+        expect(subject).not_to be_valid
+      end
+    end
+
+    context 'when true' do
+      let(:twenty_four_flag) { true }
+
+      it 'is valid' do
+        expect(subject).to be_valid
+      end
+    end
+
+    context 'when false' do
+      let(:twenty_four_flag) { false }
+
+      it 'is valid' do
+        expect(subject).to be_valid
+      end
+    end
+  end
+
+  context 'when extremism seperatikon is not set' do
+    subject {
+      build(:early_allocation, stage2_validation: true)
+    }
+
+    it 'is doesnt validate due_for_release_in_less_than_24months' do
+      expect(subject).not_to be_valid
+      expect(subject.errors.count).to eq(5)
+      expect(subject.errors.messages.count).to eq(5)
+    end
   end
 
   it 'validates stage2 attributes' do
