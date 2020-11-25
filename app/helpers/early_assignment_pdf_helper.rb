@@ -144,7 +144,7 @@ private
     pdf.text "Assessment date #{format_date(early_allocation.updated_at)}", size: 20
 
     pdf.move_down 10
-    pdf.table([['Assessment outcome',  early_allocation_status(early_allocation)]],
+    pdf.table([['Assessment outcome',  early_allocation_outcome(early_allocation)]],
               column_widths: column_widths,
               cell_style: { padding: 15, border_width: 2 }) do
       column(0).style(borders: [:left, :top, :bottom], font_style: :bold)

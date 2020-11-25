@@ -3,6 +3,10 @@
 class EarlyAllocationsController < PrisonsApplicationController
   before_action :load_prisoner
 
+  def index
+    @early_allocations = EarlyAllocation.where(offender_id_from_url).order(created_at: :desc)
+  end
+
   def new
     case_info = CaseInformation.find_by offender_id_from_url
     @early_assignment = case_info.early_allocations.new
@@ -61,7 +65,7 @@ class EarlyAllocationsController < PrisonsApplicationController
   end
 
   def show
-    @early_assignment = EarlyAllocation.where(offender_id_from_url).last
+    @early_assignment = EarlyAllocation.where(id: params[:id]).where(offender_id_from_url).first!
     @referrer = request.referer
 
     respond_to do |format|

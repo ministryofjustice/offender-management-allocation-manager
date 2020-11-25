@@ -16,6 +16,7 @@ class OffenderPresenter
            :handover_start_date, :responsibility_handover_date, :handover_reason, :prison_arrival_date,
            :licence_expiry_date, :post_recall_release_date,
            :victim_liaison_officers, :manual_entry?,
+           :within_early_allocation_window?,
            :over_18?, :recalled?, :sentenced?, :immigration_case?, :mappa_level, to: :@offender
 
   def initialize(offender)

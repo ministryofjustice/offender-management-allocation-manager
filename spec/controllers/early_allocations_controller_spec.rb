@@ -34,29 +34,75 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
   end
 
   context 'with some assessments' do
-    before do
-      create(:case_information, nomis_offender_id: nomis_offender_id, early_allocations: build_list(:early_allocation, 5))
-    end
-
+    let(:case_info) { create(:case_information, nomis_offender_id: nomis_offender_id) }
+    let!(:early_allocations) {
+      # Create 5 Early Allocation records with different creation dates
+      [
+        create(:early_allocation, case_information: case_info, created_at: 1.year.ago),
+        create(:early_allocation, case_information: case_info, created_at: 6.months.ago),
+        create(:early_allocation, case_information: case_info, created_at: 1.month.ago),
+        create(:early_allocation, case_information: case_info, created_at: 1.week.ago),
+        create(:early_allocation, case_information: case_info, created_at: 1.day.ago)
+      ]
+    }
+    let(:release_date) { Time.zone.today + 17.months }
     let(:early_allocation) { assigns(:early_assignment) }
 
-    describe '#show' do
-      let(:release_date) { Time.zone.today + 17.months }
+    before do
+      # Create some Early Allocation assessments for a different offender – to prove we don't show them
+      create(:case_information, early_allocations: build_list(:early_allocation, 5))
+    end
 
-      it 'shows the most recent' do
-        get :show, params: { prison_id: prison, prisoner_id: nomis_offender_id }, format: :pdf
-        expect(early_allocation).to eq(CaseInformation.last.early_allocations.last)
+    describe '#index' do
+      before do
+        get :index, params: { prison_id: prison, prisoner_id: nomis_offender_id }
       end
 
-      it 'shows most recent html' do
-        get :show, params: { prison_id: prison, prisoner_id: nomis_offender_id }, format: :html
-        expect(early_allocation).to eq(CaseInformation.last.early_allocations.last)
+      it 'displays a list of all Early Allocation assessments for the specified offender' do
+        assigned_early_allocations = assigns(:early_allocations)
+        expect(assigned_early_allocations.size).to eq(5)
+        expect(assigned_early_allocations.map(&:nomis_offender_id).uniq).to eq([nomis_offender_id])
+      end
+
+      it 'sorts the Early Allocations in descending date order' do
+        expected_order = early_allocations.map { |ea| ea.created_at.to_date }.sort.reverse
+        actual_order = assigns(:early_allocations).map { |ea| ea.created_at.to_date }
+        expect(actual_order).to eq(expected_order)
+      end
+    end
+
+    describe '#show' do
+      [:html, :pdf].each do |format|
+        describe "format: #{format}" do
+          it 'shows the record specified in :id param' do
+            early_allocations.each do |record|
+              get :show, params: { prison_id: prison, prisoner_id: nomis_offender_id, id: record.id }, format: :html
+              expect(assigns(:early_assignment)).to eq(record)
+            end
+          end
+
+          context 'when the record belongs to a different offender' do
+            it 'raises a "Not Found" error' do
+              somebody_else = create(:early_allocation)
+              expect {
+                get :show, params: { prison_id: prison, prisoner_id: nomis_offender_id, id: somebody_else.id }, format: :html
+              }.to raise_error(ActiveRecord::RecordNotFound)
+            end
+          end
+
+          context 'when a record with that ID does not exist' do
+            it 'raises a "Not Found" error' do
+              id = 48753
+              expect {
+                get :show, params: { prison_id: prison, prisoner_id: nomis_offender_id, id: id }, format: :html
+              }.to raise_error(ActiveRecord::RecordNotFound)
+            end
+          end
+        end
       end
     end
 
     describe '#update' do
-      let(:release_date) { Time.zone.today + 17.months }
-
       it 'updates the updated_by_ fields' do
         put :update, params: { prison_id: prison, prisoner_id: nomis_offender_id }
         expect(early_allocation.updated_by_firstname).to eq(first_pom.firstName)

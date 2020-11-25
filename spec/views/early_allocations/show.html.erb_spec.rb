@@ -30,7 +30,7 @@ RSpec.describe "early_allocations/show", type: :view do
 
     describe 'outcome' do
       context 'when the outcome is eligible' do
-        it 'shows the previous outcome' do
+        it 'shows the outcome' do
           expect(page.css('#outcome-label')).to have_text('Outcome')
           expect(page.css('#outcome')).to have_text('Eligible - the community probation team will take responsibility for this case early')
         end
@@ -57,7 +57,7 @@ RSpec.describe "early_allocations/show", type: :view do
   context 'when eligible and unsent' do
     let(:early_allocation) { create(:early_allocation, :eligible, :unsent) }
 
-    it 'shows the previous outcome' do
+    it 'shows the outcome' do
       expect(page).to have_text('Eligible - assessment not sent to the community probation team')
     end
   end
@@ -65,7 +65,7 @@ RSpec.describe "early_allocations/show", type: :view do
   context 'when not eligible' do
     let(:early_allocation) { create(:early_allocation, :ineligible) }
 
-    it 'shows the previous outcome' do
+    it 'shows the outcome' do
       expect(page).to have_text('Not eligible')
     end
   end
@@ -73,7 +73,7 @@ RSpec.describe "early_allocations/show", type: :view do
   context 'when discretionary - not sent' do
     let(:early_allocation) { create(:early_allocation, :discretionary, :unsent) }
 
-    it 'shows the previous outcome' do
+    it 'shows the outcome' do
       expect(page).to have_text('Discretionary - assessment not sent to the community probation team')
     end
   end
@@ -81,7 +81,7 @@ RSpec.describe "early_allocations/show", type: :view do
   context 'when discretionary - accepted' do
     let(:early_allocation) { create(:early_allocation, :discretionary, community_decision: true) }
 
-    it 'shows the previous outcome' do
+    it 'shows the outcome' do
       expect(page).to have_text('Eligible - the community probation team will take responsibility for this case early')
     end
   end
@@ -89,7 +89,7 @@ RSpec.describe "early_allocations/show", type: :view do
   context 'when discretionary - waiting' do
     let(:early_allocation) { create(:early_allocation, :discretionary) }
 
-    it 'shows the previous outcome' do
+    it 'shows the outcome' do
       expect(page).to have_text('Discretionary - the community probation team will make a decision')
     end
   end

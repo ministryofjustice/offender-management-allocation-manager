@@ -64,8 +64,16 @@ feature "early allocation", :allocation, type: :feature do
     context 'without existing early allocation' do
       before do
         click_link "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}"
-        expect(page).to have_content 'Early allocation eligibility'
-        click_link 'Assess eligibility'
+
+        # Prisoner profile page
+        expect(page).to have_content 'Early allocation referral'
+        click_link 'Start assessment'
+
+        # Early Allocation start page
+        expect(page).to have_content 'Early allocation assessment process'
+        expect(page).to have_content 'This case has no saved assessments.'
+        displays_prisoner_information_in_side_panel
+        click_link 'Start new assessment'
       end
 
       context 'when <= 18 months' do
@@ -97,7 +105,7 @@ feature "early allocation", :allocation, type: :feature do
             stage1_eligible_answers
           end
 
-          scenario 'stage1 happy path', :js do
+          scenario 'stage1 happy path' do
             expect {
               displays_prisoner_information_in_side_panel
               click_button 'Continue'
@@ -106,8 +114,15 @@ feature "early allocation", :allocation, type: :feature do
               expect(page).to have_text('The community probation team will take responsibility')
               expect(page).to have_text('A new handover date will be calculated automatically')
             }.to change(EarlyAllocation, :count).by(1)
+
+            # Early allocation status is updated
             click_link 'Return to prisoner page'
             expect(page).to have_text 'Eligible'
+            expect(page).to have_link 'View assessment'
+
+            # Can view the assessment
+            click_link 'View assessment'
+            expect(page).to have_text 'View previous early allocation assessment'
           end
 
           scenario 'displaying the PDF' do
@@ -116,7 +131,10 @@ feature "early allocation", :allocation, type: :feature do
             # selecting any one of these as 'Yes' means that we progress to assessment complete (Yes)
             expect(page).to have_text('The community probation team will take responsibility')
             click_link 'Save completed assessment (pdf)'
-            expect(page).to have_current_path("/prisons/#{prison}/prisoners/#{nomis_offender_id}/early_allocation.pdf")
+
+            created_id = EarlyAllocation.last.id
+            expected_path = "/prisons/#{prison}/prisoners/#{nomis_offender_id}/early_allocations/#{created_id}.pdf"
+            expect(page).to have_current_path(expected_path)
           end
         end
 
@@ -170,15 +188,18 @@ feature "early allocation", :allocation, type: :feature do
             end
 
             scenario 'saving the PDF' do
-              expect(page).to have_link 'Save completed assessment (pdf)', href: "/prisons/#{prison}/prisoners/#{nomis_offender_id}/early_allocation.pdf"
+              created_id = EarlyAllocation.last.id
+              expected_path = "/prisons/#{prison}/prisoners/#{nomis_offender_id}/early_allocations/#{created_id}.pdf"
+              expect(page).to have_link 'Save completed assessment (pdf)', href: expected_path
             end
 
-            scenario 'completing the journey', :js do
+            scenario 'completing the journey' do
+              # Profile page
               click_link 'Return to prisoner page'
-              expect(page).to have_content 'Waiting for community decision'
-              within '#early_allocation' do
-                click_link 'Update'
-              end
+              expect(page).to have_content 'Discretionary - the community probation team will make a decision'
+              click_link 'Record community decision'
+
+              # 'Record community decision' page
               displays_prisoner_information_in_side_panel
               click_button('Save')
               expect(page).to have_css('.govuk-error-message')
@@ -189,8 +210,14 @@ feature "early allocation", :allocation, type: :feature do
 
               find('label[for=early_allocation_community_decision_true]').click
               click_button('Save')
-              expect(page).to have_text('Re-assess')
-              expect(page).to have_text 'Eligible'
+
+              # Profile page
+              expect(page).to have_text 'Eligible - case handover date has been updated'
+              expect(page).to have_link 'View assessment'
+
+              # View the assessment
+              click_link 'View assessment'
+              expect(page).to have_text 'View previous early allocation assessment'
             end
           end
 
@@ -204,12 +231,15 @@ feature "early allocation", :allocation, type: :feature do
             click_button 'Continue'
             expect(page).to have_text 'Not eligible for early allocation'
             click_link 'Save completed assessment (pdf)'
-            expect(page).to have_current_path("/prisons/#{prison}/prisoners/#{nomis_offender_id}/early_allocation.pdf")
+
+            created_id = EarlyAllocation.last.id
+            expected_path = "/prisons/#{prison}/prisoners/#{nomis_offender_id}/early_allocations/#{created_id}.pdf"
+            expect(page).to have_current_path(expected_path)
           end
         end
       end
 
-      context 'when > 18 months', :js do
+      context 'when > 18 months' do
         let(:release_date) { Time.zone.today + 19.months }
 
         context 'when stage 1 happy path - not sent' do
@@ -224,6 +254,11 @@ feature "early allocation", :allocation, type: :feature do
               expect(page).to have_text('The community probation team will take responsibility for this case early')
               expect(page).to have_text('The assessment has not been sent to the community probation team')
             }.not_to change(EmailHistory, :count)
+
+            # Early allocation status is updated
+            click_link 'Return to prisoner page'
+            expect(page).to have_text 'Has saved assessments'
+            expect(page).to have_link 'Check and reassess'
           end
         end
 
@@ -241,30 +276,91 @@ feature "early allocation", :allocation, type: :feature do
               complete_form
               expect(page).to have_text('The assessment has not been sent to the community probation team')
             }.not_to change(EmailHistory, :count)
+
+            # Early allocation status is updated
+            click_link 'Return to prisoner page'
+            expect(page).to have_text 'Has saved assessments'
+            expect(page).to have_link 'Check and reassess'
           end
         end
       end
     end
 
-    context 'when existing eligible early allocation' do
-      let(:release_date) { Time.zone.today + 17.months }
+    context 'with existing Early Allocation assessments' do
+      context 'when <= 18 months' do
+        let(:release_date) { Time.zone.today + 17.months }
 
-      before do
-        create(:early_allocation, :discretionary,
-               nomis_offender_id: nomis_offender_id,
-               community_decision: true)
-        click_link "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}"
+        context 'when assessment outcome was eligible and was sent to LDU' do
+          before do
+            # Was sent to LDU because created_within_referral_window is true
+            create(:early_allocation,
+                   nomis_offender_id: nomis_offender_id,
+                   created_within_referral_window: true)
+
+            click_link "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}"
+          end
+
+          it 'links to the view page' do
+            click_link 'View assessment'
+            expect(page).to have_text 'View previous early allocation assessment'
+          end
+
+          it 'does not have a re-assess link' do
+            expect(page).not_to have_link 'Check and reassess'
+          end
+        end
+
+        context 'when assessment outcome was not eligible' do
+          before do
+            create(:early_allocation, :ineligible,
+                   nomis_offender_id: nomis_offender_id,
+                   created_within_referral_window: true)
+
+            click_link "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}"
+          end
+
+          it 'has a re-assess link' do
+            expect(page).to have_link 'Check and reassess'
+          end
+        end
       end
 
-      it 'has a re-assess link' do
-        expect(page).to have_link 'Re-assess'
+      context 'when > 18 months' do
+        let(:release_date) { Time.zone.today + 19.months }
+
+        context 'when assessment outcome was eligible' do
+          before do
+            create(:early_allocation,
+                   nomis_offender_id: nomis_offender_id,
+                   created_within_referral_window: false)
+
+            click_link "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}"
+          end
+
+          it 'has a re-assess link' do
+            expect(page).to have_link 'Check and reassess'
+          end
+        end
       end
 
       context 'when reassessing' do
+        let(:release_date) { Time.zone.today + 17.months }
+
         before do
+          create(:early_allocation, :ineligible,
+                 nomis_offender_id: nomis_offender_id,
+                 created_within_referral_window: true)
+
+          click_link "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}"
+
           within '#early_allocation' do
-            click_link 'Re-assess'
+            click_link 'Check and reassess'
           end
+
+          # Early Allocation start page
+          expect(page).not_to have_content 'This case has no saved assessments.'
+          displays_prisoner_information_in_side_panel
+          click_link 'Start new assessment'
         end
 
         it 'creates a new assessment' do
@@ -278,6 +374,64 @@ feature "early allocation", :allocation, type: :feature do
           stage1_stage2_answers
           click_button 'Continue'
           expect(page).not_to have_css('.govuk-error-message')
+        end
+      end
+
+      describe 'Early Allocation start page' do
+        let(:release_date) { Time.zone.today + 19.months }
+
+        before do
+          create(:early_allocation, :ineligible,
+                 created_at: 5.days.ago,
+                 nomis_offender_id: nomis_offender_id,
+                 created_within_referral_window: false)
+
+          create(:early_allocation, :eligible,
+                 created_at: 3.days.ago,
+                 nomis_offender_id: nomis_offender_id,
+                 created_within_referral_window: false)
+
+          create(:early_allocation, :discretionary,
+                 created_at: 1.day.ago,
+                 nomis_offender_id: nomis_offender_id,
+                 created_within_referral_window: false)
+
+          click_link "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}"
+          within '#early_allocation' do
+            click_link 'Check and reassess'
+          end
+        end
+
+        it 'displays a list of previous assessments' do
+          table_rows = page.all('#saved_assessments > tbody > tr')
+
+          expect(page).to have_content 'View saved assessments'
+
+          # Expect 3 rows in the table
+          expect(table_rows.count).to eq(3)
+
+          # 1. Discretionary (most recent)
+          expect(table_rows[0]).to have_content 'Discretionary - assessment not sent to the community probation team'
+
+          # 2. Eligible
+          expect(table_rows[1]).to have_content 'Eligible - assessment not sent to the community probation team'
+
+          # 3. Not eligible (oldest)
+          expect(table_rows[2]).to have_content 'Not eligible'
+        end
+
+        describe 'clicking "View" on a previous assessment' do
+          it 'shows you the chosen assessment' do
+            # Click 'View' on the 2nd row of table (should be an 'eligible' assessment)
+            within '#saved_assessments > tbody > tr:nth-child(2)' do
+              click_link 'View'
+            end
+
+            # We're on the 'View' page
+            expect(page).to have_content 'View previous early allocation assessment'
+            expect(page).to have_content 3.days.ago.strftime('%d/%m/%Y')
+            expect(page).to have_content 'Eligible - assessment not sent to the community probation team'
+          end
         end
       end
     end
