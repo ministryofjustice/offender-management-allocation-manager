@@ -91,8 +91,6 @@ references:
           docker tag app "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:testing"
           docker push "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:testing"
         fi
-        docker tag app "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:testing"
-        docker push "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:testing"
       environment:
         <<: *github_team_name_slug
         REPONAME: offender-management-allocation-manager
@@ -264,7 +262,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ~/repo
+          at: ~/
       - setup_remote_docker:
           docker_layer_caching: true
       - *install_aws_cli
@@ -276,7 +274,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ~/repo
+          at: ~/
       - run:
           name: Kubectl deployment staging setup
           command: |
