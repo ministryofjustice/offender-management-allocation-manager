@@ -89,7 +89,7 @@ private
     [:high_risk_of_serious_harm, :mappa_level_2, :pathfinder_process, :other_reason].each do |field|
       value = early_assignment.public_send(field)
       unless value.nil?
-        info_hash[field] = humanized_bool(field)
+        info_hash[field] = humanized_bool(value)
       end
     end
 
