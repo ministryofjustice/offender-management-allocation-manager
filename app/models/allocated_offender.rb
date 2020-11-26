@@ -26,7 +26,7 @@ class AllocatedOffender
     if @allocation.primary_pom_nomis_id == @staff_id
       @offender.pom_responsibility.to_s
     else
-      ResponsibilityService::COWORKING
+      'Co-Working'
     end
   end
 

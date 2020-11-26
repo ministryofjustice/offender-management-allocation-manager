@@ -10,9 +10,8 @@ describe HandoverDateService do
       }
     end
 
-    let(:recent_date) { ResponsibilityService::PRESCOED_CUTOFF_DATE }
-    let(:past_date) { ResponsibilityService::PRESCOED_CUTOFF_DATE - 1.day }
-
+    let(:recent_date) { HandoverDateService::PRESCOED_CUTOFF_DATE }
+    let(:past_date) { HandoverDateService::PRESCOED_CUTOFF_DATE - 1.day }
 
     context 'with indeterminate' do
       let(:offender) {
@@ -75,18 +74,19 @@ describe HandoverDateService do
       let(:offender) {
         OpenStruct.new indeterminate_sentence?: indeterminate,
                        nps_case?: true,
+                       sentence_start_date: automatic_release_date - 2.years,
                        automatic_release_date: automatic_release_date,
                        tariff_date: tariff_date
       }
 
-      let(:automatic_release_date) { Date.new(2020, 8, 30) }
-      let(:tariff_date) { Date.new(2020, 8, 30) }
+      let(:automatic_release_date) { Date.new(2025, 8, 30) }
+      let(:tariff_date) { Date.new(2025, 8, 30) }
 
       context 'with a determinate sentence' do
         let(:indeterminate) { false }
 
         it 'is 7.5 months before release date' do
-          expect(described_class.handover(offender).start_date).to eq(Date.new(2020, 1, 15))
+          expect(described_class.handover(offender).start_date).to eq(Date.new(2025, 1, 15))
         end
       end
 
@@ -94,7 +94,7 @@ describe HandoverDateService do
         let(:indeterminate) { true }
 
         it 'is 8 months before release date' do
-          expect(described_class.handover(offender).start_date).to eq(Date.new(2019, 12, 30))
+          expect(described_class.handover(offender).start_date).to eq(Date.new(2024, 12, 30))
         end
 
         context 'with no tariff date' do
@@ -389,10 +389,10 @@ describe HandoverDateService do
           let(:indeterminate_sentence) { true }
 
           context 'with tariff date in the future' do
-            let(:tariff_date) { Date.new(2020, 11, 1) }
+            let(:tariff_date) { Date.new(2025, 11, 1) }
 
             it 'is 8 months before tariff date' do
-              expect(result).to eq(Date.new(2020, 3, 1))
+              expect(result).to eq(Date.new(2025, 3, 1))
             end
           end
 
