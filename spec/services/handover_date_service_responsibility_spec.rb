@@ -1,10 +1,10 @@
 require 'rails_helper'
 
-describe ResponsibilityService do
+describe HandoverDateService do
   describe '#calculate_pom_responsibility' do
     context 'when prescoed' do
-      let(:recent_date) { ResponsibilityService::PRESCOED_CUTOFF_DATE }
-      let(:past_date) { ResponsibilityService::PRESCOED_CUTOFF_DATE - 1.day }
+      let(:recent_date) { HandoverDateService::PRESCOED_CUTOFF_DATE }
+      let(:past_date) { HandoverDateService::PRESCOED_CUTOFF_DATE - 1.day }
 
       context 'with recent arrival' do
         let(:arrival_date) { recent_date }
@@ -21,7 +21,7 @@ describe ResponsibilityService do
             let(:case_info) { build(:case_information, :welsh, :nps) }
 
             it 'is responsible' do
-              expect(described_class.calculate_pom_responsibility(offender)).to eq(ResponsibilityService::RESPONSIBLE)
+              expect(described_class.calculate_pom_responsibility(offender)).to eq(HandoverDateService::RESPONSIBLE)
             end
           end
 
@@ -29,7 +29,7 @@ describe ResponsibilityService do
             let(:case_info) { build(:case_information, :welsh, :crc) }
 
             it 'is responsible' do
-              expect(described_class.calculate_pom_responsibility(offender)).to eq(ResponsibilityService::RESPONSIBLE)
+              expect(described_class.calculate_pom_responsibility(offender)).to eq(HandoverDateService::RESPONSIBLE)
             end
           end
         end
@@ -46,7 +46,7 @@ describe ResponsibilityService do
             let(:case_info) { build(:case_information, :english, :nps) }
 
             it 'is supporting' do
-              expect(described_class.calculate_pom_responsibility(offender)).to eq(ResponsibilityService::SUPPORTING)
+              expect(described_class.calculate_pom_responsibility(offender)).to eq(HandoverDateService::SUPPORTING)
             end
           end
         end
@@ -64,7 +64,7 @@ describe ResponsibilityService do
         let(:case_info) { build(:case_information, :welsh, :nps) }
 
         it 'is supporting' do
-          expect(described_class.calculate_pom_responsibility(offender)).to eq(ResponsibilityService::SUPPORTING)
+          expect(described_class.calculate_pom_responsibility(offender)).to eq(HandoverDateService::SUPPORTING)
         end
       end
     end
@@ -77,7 +77,7 @@ describe ResponsibilityService do
       it 'will show the POM as supporting' do
         resp = described_class.calculate_pom_responsibility(offender)
 
-        expect(resp).to eq ResponsibilityService::SUPPORTING
+        expect(resp).to eq HandoverDateService::SUPPORTING
       end
     end
 
@@ -90,7 +90,7 @@ describe ResponsibilityService do
       it 'will show the POM as supporting' do
         resp = described_class.calculate_pom_responsibility(offender)
 
-        expect(resp).to eq ResponsibilityService::SUPPORTING
+        expect(resp).to eq HandoverDateService::SUPPORTING
       end
     end
 
@@ -102,7 +102,7 @@ describe ResponsibilityService do
       it 'will show the case as POM supporting' do
         resp = described_class.calculate_pom_responsibility(offender)
 
-        expect(resp).to eq ResponsibilityService::SUPPORTING
+        expect(resp).to eq HandoverDateService::SUPPORTING
       end
     end
 
@@ -110,6 +110,7 @@ describe ResponsibilityService do
       let(:offender) {
         OpenStruct.new immigration_case?: false,
                        indeterminate_sentence?: false,
+                       nps_case?: true,
                        automatic_release_date: nil,
                        conditional_release_date: nil,
                        home_detention_curfew_eligibility_date: nil,
@@ -120,7 +121,7 @@ describe ResponsibilityService do
       it 'will default to responsible' do
         resp = described_class.calculate_pom_responsibility(offender)
 
-        expect(resp).to eq ResponsibilityService::RESPONSIBLE
+        expect(resp).to eq HandoverDateService::RESPONSIBLE
       end
     end
 
@@ -135,7 +136,7 @@ describe ResponsibilityService do
       it 'is responsible' do
         resp = described_class.calculate_pom_responsibility(offender)
 
-        expect(resp).to eq ResponsibilityService::RESPONSIBLE
+        expect(resp).to eq HandoverDateService::RESPONSIBLE
       end
     end
 
@@ -148,7 +149,7 @@ describe ResponsibilityService do
       }
 
       it 'will default to responsible' do
-        expect(described_class.calculate_pom_responsibility(offender)).to eq ResponsibilityService::RESPONSIBLE
+        expect(described_class.calculate_pom_responsibility(offender)).to eq HandoverDateService::RESPONSIBLE
       end
     end
 
@@ -164,7 +165,7 @@ describe ResponsibilityService do
 
       it 'will calculate the responsibility using NPS rules' do
         resp = described_class.calculate_pom_responsibility(offender)
-        expect(resp).to eq ResponsibilityService::RESPONSIBLE
+        expect(resp).to eq HandoverDateService::RESPONSIBLE
       end
     end
 
@@ -190,7 +191,7 @@ describe ResponsibilityService do
 
           it 'will show the POM as having a supporting role' do
             resp = described_class.calculate_pom_responsibility(offender)
-            expect(resp).to eq ResponsibilityService::SUPPORTING
+            expect(resp).to eq HandoverDateService::SUPPORTING
           end
         end
 
@@ -202,7 +203,7 @@ describe ResponsibilityService do
 
           it 'will show the POM as having a supporting role' do
             resp = described_class.calculate_pom_responsibility(offender)
-            expect(resp).to eq ResponsibilityService::SUPPORTING
+            expect(resp).to eq HandoverDateService::SUPPORTING
           end
         end
 
@@ -214,7 +215,7 @@ describe ResponsibilityService do
 
           it 'will show the POM as having a supporting role' do
             resp = described_class.calculate_pom_responsibility(offender)
-            expect(resp).to eq ResponsibilityService::SUPPORTING
+            expect(resp).to eq HandoverDateService::SUPPORTING
           end
         end
 
@@ -226,7 +227,7 @@ describe ResponsibilityService do
 
           it 'will show the POM as having a responsible role' do
             resp = described_class.calculate_pom_responsibility(offender)
-            expect(resp).to eq ResponsibilityService::RESPONSIBLE
+            expect(resp).to eq HandoverDateService::RESPONSIBLE
           end
         end
 
@@ -238,7 +239,7 @@ describe ResponsibilityService do
 
           it 'will take the earliest date of either the ARD or CRD and show the POM as having a responsible role' do
             resp = described_class.calculate_pom_responsibility(offender)
-            expect(resp).to eq ResponsibilityService::RESPONSIBLE
+            expect(resp).to eq HandoverDateService::RESPONSIBLE
           end
         end
 
@@ -250,7 +251,7 @@ describe ResponsibilityService do
 
           it 'will show the POM as having a responsible role' do
             resp = described_class.calculate_pom_responsibility(offender)
-            expect(resp).to eq ResponsibilityService::RESPONSIBLE
+            expect(resp).to eq HandoverDateService::RESPONSIBLE
           end
         end
       end
@@ -267,7 +268,7 @@ describe ResponsibilityService do
         it 'will show the POM as supporting' do
           resp = described_class.calculate_pom_responsibility(offender)
 
-          expect(resp).to eq ResponsibilityService::SUPPORTING
+          expect(resp).to eq HandoverDateService::SUPPORTING
         end
       end
 
@@ -293,7 +294,7 @@ describe ResponsibilityService do
               it 'is responsible' do
                 resp = described_class.calculate_pom_responsibility(offender)
 
-                expect(resp).to eq ResponsibilityService::RESPONSIBLE
+                expect(resp).to eq HandoverDateService::RESPONSIBLE
               end
             end
 
@@ -304,7 +305,7 @@ describe ResponsibilityService do
               it 'is responsible' do
                 resp = described_class.calculate_pom_responsibility(offender)
 
-                expect(resp).to eq ResponsibilityService::SUPPORTING
+                expect(resp).to eq HandoverDateService::SUPPORTING
               end
             end
 
@@ -314,7 +315,7 @@ describe ResponsibilityService do
 
               it 'will return no responsibility' do
                 expect(described_class.calculate_pom_responsibility(offender)).
-                  to eq ResponsibilityService::UNKNOWN
+                  to eq HandoverDateService::UNKNOWN
               end
             end
           end
@@ -336,7 +337,7 @@ describe ResponsibilityService do
               it 'returns responsible' do
                 resp = described_class.calculate_pom_responsibility(offender)
 
-                expect(resp).to eq ResponsibilityService::RESPONSIBLE
+                expect(resp).to eq HandoverDateService::RESPONSIBLE
               end
             end
 
@@ -346,7 +347,7 @@ describe ResponsibilityService do
               it 'returns supporting' do
                 resp = described_class.calculate_pom_responsibility(offender)
 
-                expect(resp).to eq ResponsibilityService::SUPPORTING
+                expect(resp).to eq HandoverDateService::SUPPORTING
               end
             end
           end
@@ -369,7 +370,7 @@ describe ResponsibilityService do
               it 'returns supporting' do
                 Timecop.travel('20 Dec 2020') do
                   resp = described_class.calculate_pom_responsibility(offender)
-                  expect(resp).to eq ResponsibilityService::SUPPORTING
+                  expect(resp).to eq HandoverDateService::SUPPORTING
                 end
               end
             end
@@ -380,7 +381,7 @@ describe ResponsibilityService do
               it 'returns responsible' do
                 Timecop.travel('20 Sep 2020') do
                   resp = described_class.calculate_pom_responsibility(offender)
-                  expect(resp).to eq ResponsibilityService::RESPONSIBLE
+                  expect(resp).to eq HandoverDateService::RESPONSIBLE
                 end
               end
             end
@@ -391,7 +392,7 @@ describe ResponsibilityService do
               it 'returns supporting' do
                 Timecop.travel('16 Jan 2021') do
                   resp = described_class.calculate_pom_responsibility(offender)
-                  expect(resp).to eq ResponsibilityService::SUPPORTING
+                  expect(resp).to eq HandoverDateService::SUPPORTING
                 end
               end
             end
@@ -401,7 +402,7 @@ describe ResponsibilityService do
 
               it 'will return no responsibility' do
                 expect(described_class.calculate_pom_responsibility(offender)).
-                  to eq ResponsibilityService::UNKNOWN
+                  to eq HandoverDateService::UNKNOWN
               end
             end
           end
@@ -422,7 +423,7 @@ describe ResponsibilityService do
 
               it 'will show the POM as having a responsible role' do
                 resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::RESPONSIBLE
+                expect(resp).to eq HandoverDateService::RESPONSIBLE
               end
             end
 
@@ -431,7 +432,7 @@ describe ResponsibilityService do
 
               it 'will show the POM as having a supporting role' do
                 resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::SUPPORTING
+                expect(resp).to eq HandoverDateService::SUPPORTING
               end
             end
           end
@@ -454,7 +455,7 @@ describe ResponsibilityService do
                   described_class.calculate_pom_responsibility(offender)
                 end
 
-                expect(resp).to eq ResponsibilityService::RESPONSIBLE
+                expect(resp).to eq HandoverDateService::RESPONSIBLE
               end
             end
 
@@ -463,7 +464,7 @@ describe ResponsibilityService do
 
               it 'will show the POM as having a supporting role' do
                 resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::SUPPORTING
+                expect(resp).to eq HandoverDateService::SUPPORTING
               end
             end
           end
@@ -485,7 +486,7 @@ describe ResponsibilityService do
 
               it 'will show the POM as having a responsible role' do
                 resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::RESPONSIBLE
+                expect(resp).to eq HandoverDateService::RESPONSIBLE
               end
             end
 
@@ -495,7 +496,7 @@ describe ResponsibilityService do
 
               it 'will show the POM as having a supporting role' do
                 resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::SUPPORTING
+                expect(resp).to eq HandoverDateService::SUPPORTING
               end
             end
           end
@@ -514,7 +515,7 @@ describe ResponsibilityService do
 
               it 'will show the POM as having a responsible role' do
                 resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::RESPONSIBLE
+                expect(resp).to eq HandoverDateService::RESPONSIBLE
               end
             end
 
@@ -523,7 +524,7 @@ describe ResponsibilityService do
 
               it 'will show the POM as having a supporting role' do
                 resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::SUPPORTING
+                expect(resp).to eq HandoverDateService::SUPPORTING
               end
             end
           end
@@ -542,7 +543,7 @@ describe ResponsibilityService do
 
               it 'will show the POM as having a responsible role' do
                 resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::RESPONSIBLE
+                expect(resp).to eq HandoverDateService::RESPONSIBLE
               end
             end
 
@@ -551,7 +552,7 @@ describe ResponsibilityService do
 
               it 'will show the POM as having a supporting role' do
                 resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::SUPPORTING
+                expect(resp).to eq HandoverDateService::SUPPORTING
               end
             end
           end
@@ -578,7 +579,7 @@ describe ResponsibilityService do
               it 'returns supporting' do
                 Timecop.travel('20 Apr 2020') do
                   resp = described_class.calculate_pom_responsibility(offender)
-                  expect(resp).to eq ResponsibilityService::SUPPORTING
+                  expect(resp).to eq HandoverDateService::SUPPORTING
                 end
               end
             end
@@ -589,7 +590,7 @@ describe ResponsibilityService do
               it 'returns responsible' do
                 Timecop.travel('1 Jan 2020') do
                   resp = described_class.calculate_pom_responsibility(offender)
-                  expect(resp).to eq ResponsibilityService::RESPONSIBLE
+                  expect(resp).to eq HandoverDateService::RESPONSIBLE
                 end
               end
             end
@@ -600,7 +601,7 @@ describe ResponsibilityService do
               it 'returns supporting' do
                 Timecop.travel('1 Apr 2020') do
                   resp = described_class.calculate_pom_responsibility(offender)
-                  expect(resp).to eq ResponsibilityService::SUPPORTING
+                  expect(resp).to eq HandoverDateService::SUPPORTING
                 end
               end
             end
@@ -610,7 +611,7 @@ describe ResponsibilityService do
 
               it 'will return no responsibility' do
                 expect(described_class.calculate_pom_responsibility(offender)).
-                  to eq ResponsibilityService::UNKNOWN
+                  to eq HandoverDateService::UNKNOWN
               end
             end
           end
@@ -630,7 +631,7 @@ describe ResponsibilityService do
 
               it 'will show the POM as having a responsible role' do
                 resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::RESPONSIBLE
+                expect(resp).to eq HandoverDateService::RESPONSIBLE
               end
             end
 
@@ -639,7 +640,7 @@ describe ResponsibilityService do
 
               it 'will show the POM as having a supporting role' do
                 resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::SUPPORTING
+                expect(resp).to eq HandoverDateService::SUPPORTING
               end
             end
           end
@@ -661,7 +662,7 @@ describe ResponsibilityService do
                 it 'will show the POM as having a supporting role' do
                   Timecop.travel('5 May 2020') do
                     resp = described_class.calculate_pom_responsibility(offender)
-                    expect(resp).to eq ResponsibilityService::SUPPORTING
+                    expect(resp).to eq HandoverDateService::SUPPORTING
                   end
                 end
               end
@@ -670,7 +671,7 @@ describe ResponsibilityService do
                 it 'will show the POM as having a responsible role' do
                   Timecop.travel('1 Nov 2019') do
                     resp = described_class.calculate_pom_responsibility(offender)
-                    expect(resp).to eq ResponsibilityService::RESPONSIBLE
+                    expect(resp).to eq HandoverDateService::RESPONSIBLE
                   end
                 end
               end
@@ -682,7 +683,7 @@ describe ResponsibilityService do
               it 'will show the POM as having a supporting role' do
                 Timecop.travel('1 March 2020') do
                   resp = described_class.calculate_pom_responsibility(offender)
-                  expect(resp).to eq ResponsibilityService::SUPPORTING
+                  expect(resp).to eq HandoverDateService::SUPPORTING
                 end
               end
             end
@@ -706,7 +707,7 @@ describe ResponsibilityService do
 
               it 'will show the POM as having a responsible role' do
                 resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::RESPONSIBLE
+                expect(resp).to eq HandoverDateService::RESPONSIBLE
               end
             end
 
@@ -716,7 +717,7 @@ describe ResponsibilityService do
 
               it 'will show the POM as having a supporting role' do
                 resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::SUPPORTING
+                expect(resp).to eq HandoverDateService::SUPPORTING
               end
             end
           end
@@ -736,7 +737,7 @@ describe ResponsibilityService do
 
               it 'will show the POM as having a responsible role' do
                 resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::RESPONSIBLE
+                expect(resp).to eq HandoverDateService::RESPONSIBLE
               end
             end
 
@@ -745,7 +746,7 @@ describe ResponsibilityService do
 
               it 'will show the POM as having a supporting role' do
                 resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::SUPPORTING
+                expect(resp).to eq HandoverDateService::SUPPORTING
               end
             end
           end
@@ -765,7 +766,7 @@ describe ResponsibilityService do
 
               it 'will show the POM as having a responsible role' do
                 resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::RESPONSIBLE
+                expect(resp).to eq HandoverDateService::RESPONSIBLE
               end
             end
 
@@ -774,7 +775,7 @@ describe ResponsibilityService do
 
               it 'will show the POM as having a supporting role' do
                 resp = described_class.calculate_pom_responsibility(offender)
-                expect(resp).to eq ResponsibilityService::SUPPORTING
+                expect(resp).to eq HandoverDateService::SUPPORTING
               end
             end
           end

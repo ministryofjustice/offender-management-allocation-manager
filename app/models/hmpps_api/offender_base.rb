@@ -110,11 +110,11 @@ module HmppsApi
 
     def pom_responsibility
       if @responsibility_override.nil?
-        ResponsibilityService.calculate_pom_responsibility(self)
+        HandoverDateService.handover(self).responsibility
       elsif @responsibility_override.value == Responsibility::PRISON
-        ResponsibilityService::RESPONSIBLE
+        HandoverDateService::RESPONSIBLE
       else
-        ResponsibilityService::SUPPORTING
+        HandoverDateService::SUPPORTING
       end
     end
 

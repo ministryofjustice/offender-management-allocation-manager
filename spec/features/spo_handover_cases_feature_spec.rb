@@ -8,6 +8,7 @@ feature "SPO viewing upcoming handover cases", :allocation do
     let!(:case_info) { create(:case_information, nomis_offender_id: offender.fetch(:offenderNo)) }
     let(:handover_dates) {
       HandoverDateService::HandoverData.new(
+        HandoverDateService::RESPONSIBLE,
         handover_start_date,
         responsibility_handover_date,
         'Stubbed handover date'
