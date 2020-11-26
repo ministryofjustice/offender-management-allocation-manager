@@ -6,6 +6,8 @@ class EarlyAllocation < ApplicationRecord
              foreign_key: :nomis_offender_id,
              inverse_of: :early_allocations
 
+  validates_presence_of :prison, :created_by_firstname, :created_by_lastname
+
   validates :oasys_risk_assessment_date,
             presence: true,
             date: {

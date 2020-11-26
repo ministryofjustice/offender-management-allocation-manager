@@ -85,7 +85,7 @@ RSpec.describe SummaryController, type: :controller do
 
     before do
       stub_poms(prison, poms)
-      stub_signed_in_pom(prison, 1, 'Alice')
+      stub_signed_in_pom(prison, 1)
       stub_request(:get, "#{ApiHelper::T3}/users/").
         to_return(body: { staffId: 1 }.to_json)
     end

@@ -15,12 +15,12 @@ RSpec.describe SearchController, type: :controller do
 
   before do
     stub_poms(prison, poms)
-    stub_signed_in_pom(prison, 1, 'alice')
+    stub_signed_in_pom(prison, 1)
   end
 
   context 'when user is a POM ' do
     before do
-      stub_signed_in_pom(prison, 1, 'alice')
+      stub_signed_in_pom(prison, 1)
     end
 
     it 'user is redirected to caseload' do

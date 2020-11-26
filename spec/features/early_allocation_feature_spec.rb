@@ -125,11 +125,7 @@ feature "early allocation", type: :feature do
 
         context 'with discretionary path' do
           before do
-            find('#early_allocation_extremism_separation_false').click
-            find('#early-allocation-high-risk-of-serious-harm-field').click
-            find('#early-allocation-mappa-level-2-field').click
-            find('#early-allocation-pathfinder-process-field').click
-            find('#early-allocation-other-reason-true-field').click
+            discretionary_stage2_answers
 
             click_button 'Continue'
             expect(page).not_to have_text 'The community probation team will make a decision'
@@ -141,8 +137,8 @@ feature "early allocation", type: :feature do
             expect(page).to have_css('.govuk-error-message')
 
             expect {
-              fill_in id: 'early_allocation_reason', with: 'Just because'
-              find('#early_allocation_approved').click
+              fill_in id: 'early_allocation_reason', with: Faker::Quote.famous_last_words
+              find('label[for=early_allocation_approved]').click
               click_button 'Continue'
             }.to change(EarlyAllocation, :count).by(1)
 
@@ -154,7 +150,7 @@ feature "early allocation", type: :feature do
             expect(page).to have_current_path("/prisons/#{prison}/prisoners/#{nomis_offender_id}/early_allocation.pdf")
           end
 
-          scenario 'completing the journey' do
+          scenario 'completing the journey', :js do
             click_link 'Return to prisoner page'
             expect(page).to have_content 'Waiting for community decision'
             within '#early_allocation' do
@@ -168,7 +164,7 @@ feature "early allocation", type: :feature do
             end
             expect(page).to have_text 'You must say whether the community has accepted this case or not'
 
-            find('#early_allocation_community_decision_true').click
+            find('label[for=early_allocation_community_decision_true]').click
             click_button('Save')
             expect(page).to have_text('Re-assess')
             expect(page).to have_text 'Eligible'
@@ -230,11 +226,11 @@ feature "early allocation", type: :feature do
     fill_in id: 'early_allocation_oasys_risk_assessment_date_mm', with: valid_date.month
     fill_in id: 'early_allocation_oasys_risk_assessment_date_yyyy', with: valid_date.year
 
-    find('#early-allocation-convicted-under-terrorisom-act-2000-true-field').click
-    find('#early-allocation-high-profile-field').click
-    find('#early-allocation-serious-crime-prevention-order-field').click
-    find('#early-allocation-mappa-level-3-field').click
-    find('#early-allocation-cppc-case-field').click
+    find('label[for=early-allocation-convicted-under-terrorisom-act-2000-true-field]').click
+    find('label[for=early-allocation-high-profile-field]').click
+    find('label[for=early-allocation-serious-crime-prevention-order-field]').click
+    find('label[for=early-allocation-mappa-level-3-field]').click
+    find('label[for=early-allocation-cppc-case-field]').click
   end
 
   def stage1_stage2_answers
@@ -242,10 +238,24 @@ feature "early allocation", type: :feature do
     fill_in id: 'early_allocation_oasys_risk_assessment_date_mm', with: valid_date.month
     fill_in id: 'early_allocation_oasys_risk_assessment_date_yyyy', with: valid_date.year
 
-    find('#early-allocation-convicted-under-terrorisom-act-2000-field').click
-    find('#early-allocation-high-profile-field').click
-    find('#early-allocation-serious-crime-prevention-order-field').click
-    find('#early-allocation-mappa-level-3-field').click
-    find('#early-allocation-cppc-case-field').click
+    find("label[for=early-allocation-convicted-under-terrorisom-act-2000-field]").click
+    find('label[for=early-allocation-high-profile-field]').click
+    find('label[for=early-allocation-serious-crime-prevention-order-field]').click
+    find('label[for=early-allocation-mappa-level-3-field]').click
+    find('label[for=early-allocation-cppc-case-field]').click
+  end
+
+  def discretionary_stage2_answers
+    find('label[for=early_allocation_extremism_separation_false]').click
+    find('label[for=early-allocation-high-risk-of-serious-harm-field]').click
+    find('label[for=early-allocation-mappa-level-2-field]').click
+    find('label[for=early-allocation-pathfinder-process-field]').click
+    find('label[for=early-allocation-other-reason-true-field]').click
+  end
+
+  def complete_form
+    fill_in id: 'early_allocation_reason', with: 'Just because'
+    find('label[for=early_allocation_approved]').click
+    click_button 'Continue'
   end
 end

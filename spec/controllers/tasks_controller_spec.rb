@@ -3,7 +3,6 @@ require 'rails_helper'
 RSpec.describe TasksController, type: :controller do
   let(:prison) { build(:prison).code }
   let(:staff_id) { 123 }
-  let(:username) { 'alice' }
   let(:pom) {
     [
       build(:pom,
@@ -16,7 +15,7 @@ RSpec.describe TasksController, type: :controller do
 
   before do
     stub_poms(prison, pom)
-    stub_signed_in_pom(prison, staff_id, username)
+    stub_signed_in_pom(prison, staff_id)
 
     offenders = [build(:nomis_offender, imprisonmentStatus: 'LIFE', offenderNo: 'G7514GW', firstName: "Alice", lastName: "Aliceson"),
                  build(:nomis_offender, offenderNo: 'G1234VV', firstName: "Bob", lastName: "Bibby"),
