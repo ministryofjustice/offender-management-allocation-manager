@@ -106,7 +106,10 @@ private
   end
 
   def community_decision_params
-    params.fetch(:early_allocation, {}).permit(:community_decision).merge(recording_community_decision: true)
+    params.fetch(:early_allocation, {}).permit(:community_decision).
+        merge(recording_community_decision: true).
+        merge(updated_by_firstname: @current_user.first_name,
+              updated_by_lastname: @current_user.last_name)
   end
 
   def early_allocation_params
@@ -120,7 +123,9 @@ private
                  :stage2_validation,
                  :stage3_validation,
                  :reason,
-                 :approved])
+                 :approved]).merge(prison: active_prison_id,
+                                   created_by_firstname: @current_user.first_name,
+                                   created_by_lastname: @current_user.last_name)
   end
 
   def offender_id_from_url

@@ -23,7 +23,8 @@ RSpec.describe EarlyAllocationsController, type: :controller do
   let(:nomis_offender_id) { offender.fetch(:offenderNo) }
 
   before do
-    stub_sso_data(prison)
+    stub_signed_in_pom(prison, first_pom.staffId)
+    stub_pom(first_pom)
 
     stub_offender(offender)
     stub_poms(prison, poms)
@@ -31,35 +32,49 @@ RSpec.describe EarlyAllocationsController, type: :controller do
     create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
   end
 
-  describe '#show' do
+  context 'with some assessments' do
     before do
       create(:case_information, nomis_offender_id: nomis_offender_id, early_allocations: build_list(:early_allocation, 5))
     end
 
-    it 'shows the most recent' do
-      get :show, params: { prison_id: prison, prisoner_id: nomis_offender_id }, format: :pdf
-      expect(assigns(:early_assignment)).to eq(CaseInformation.last.early_allocations.last)
+    let(:early_allocation) { assigns(:early_assignment) }
+
+    describe '#show' do
+      it 'shows the most recent' do
+        get :show, params: { prison_id: prison, prisoner_id: nomis_offender_id }, format: :pdf
+        expect(early_allocation).to eq(CaseInformation.last.early_allocations.last)
+      end
+    end
+
+    describe '#update' do
+      it 'updates the updated_by_ fields' do
+        put :update, params: { prison_id: prison, prisoner_id: nomis_offender_id }
+        expect(early_allocation.updated_by_firstname).to eq(first_pom.firstName)
+        expect(early_allocation.updated_by_lastname).to eq(first_pom.lastName)
+      end
     end
   end
 
-  context 'with not ldu email address' do
-    let(:ldu) { create(:local_divisional_unit, email_address: nil) }
-    let(:team) { create(:team, local_divisional_unit: ldu) }
+  describe '#new' do
+    context 'with not ldu email address' do
+      let(:ldu) { create(:local_divisional_unit, email_address: nil) }
+      let(:team) { create(:team, local_divisional_unit: ldu) }
 
-    before do
-      create(:case_information, nomis_offender_id: nomis_offender_id, team: team)
-      create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
-    end
+      before do
+        create(:case_information, nomis_offender_id: nomis_offender_id, team: team)
+        create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
+      end
 
-    it 'goes to the dead end' do
-      get :new, params: { prison_id: prison,
-                          prisoner_id: nomis_offender_id }
+      it 'goes to the dead end' do
+        get :new, params: { prison_id: prison,
+                            prisoner_id: nomis_offender_id }
 
-      assert_template 'dead_end'
+        assert_template 'dead_end'
+      end
     end
   end
 
-  context 'with a good ldu complete with email address' do
+  describe '#create' do
     before do
       create(:case_information, nomis_offender_id: nomis_offender_id)
       create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
@@ -72,17 +87,20 @@ RSpec.describe EarlyAllocationsController, type: :controller do
           "oasys_risk_assessment_date_yyyy" => valid_date.year
         }
       }
+      let(:early_allocation) { EarlyAllocation.last }
 
-      context 'when any one boolean true' do
-        it 'declares assessment complete and eligible' do
-          s1_boolean_param_names.each do |field|
-            s1_boolean_params[field] = 'true'
+      scenario 'declares assessment complete and eligible when any one boolean true' do
+        s1_boolean_param_names.each do |field|
+          s1_boolean_params[field] = 'true'
 
-            post :create, params: { prison_id: prison,
-                                    prisoner_id: nomis_offender_id,
-                                    early_allocation: date_params.merge(s1_boolean_params) }
-            assert_template('eligible')
-          end
+          post :create, params: { prison_id: prison,
+                                  prisoner_id: nomis_offender_id,
+                                  early_allocation: date_params.merge(s1_boolean_params) }
+          assert_template('eligible')
+
+          expect(early_allocation.prison).to eq(prison)
+          expect(early_allocation.created_by_firstname).to eq(first_pom.firstName)
+          expect(early_allocation.created_by_lastname).to eq(first_pom.lastName)
         end
       end
 

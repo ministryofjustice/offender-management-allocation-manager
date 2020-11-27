@@ -2,6 +2,10 @@ FactoryBot.define do
   # This object lives in 3 states - eligible, ineligible and discretionary(dont know)
   # The default for this factory is to make the object eligible
   factory :early_allocation do
+    prison { 'LEI' }
+    created_by_firstname { Faker::Name.first_name }
+    created_by_lastname { Faker::Name.last_name }
+
     oasys_risk_assessment_date do Time.zone.today - 2.months end
 
     convicted_under_terrorisom_act_2000 do false end

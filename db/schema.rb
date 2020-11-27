@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_19_092144) do
+ActiveRecord::Schema.define(version: 2020_11_26_123414) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -119,6 +119,11 @@ ActiveRecord::Schema.define(version: 2020_11_19_092144) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "community_decision"
+    t.string "prison"
+    t.string "created_by_firstname"
+    t.string "created_by_lastname"
+    t.string "updated_by_firstname"
+    t.string "updated_by_lastname"
   end
 
   create_table "flipflop_features", force: :cascade do |t|
