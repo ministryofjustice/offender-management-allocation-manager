@@ -91,6 +91,7 @@ group :development do
   gem 'better_errors'
   gem 'binding_of_caller'
   gem 'flamegraph'
+  gem 'guard-rspec'
   gem 'listen', '>= 3.0.5', '< 3.3'
   gem 'memory_profiler'
   # prevent warnings from parser as we are using ruby 2.6.3
