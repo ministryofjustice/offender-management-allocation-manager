@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_26_123414) do
+ActiveRecord::Schema.define(version: 2020_11_27_172113) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -119,6 +119,10 @@ ActiveRecord::Schema.define(version: 2020_11_26_123414) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "community_decision"
+    t.boolean "created_within_referral_window", default: false, null: false
+    t.datetime "referred_to_ldu_at"
+    t.string "referred_to_ldu_name"
+    t.string "referred_to_ldu_email"
     t.string "prison"
     t.string "created_by_firstname"
     t.string "created_by_lastname"
