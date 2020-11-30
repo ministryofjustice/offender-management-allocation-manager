@@ -14,7 +14,7 @@ class EarlyAllocationsController < PrisonsApplicationController
   end
 
   def create
-    @early_assignment = EarlyAllocation.new early_allocation_params.merge(offender_id_from_url)
+    @early_assignment = EarlyAllocation.new early_allocation_params.merge(metadata_for_create)
     if @early_assignment.save
       if @early_assignment.eligible?
         if @offender.within_early_allocation_window?
@@ -46,7 +46,7 @@ class EarlyAllocationsController < PrisonsApplicationController
   end
 
   def discretionary
-    @early_assignment = EarlyAllocation.new early_allocation_params.merge(offender_id_from_url)
+    @early_assignment = EarlyAllocation.new early_allocation_params.merge(metadata_for_create)
     if @early_assignment.save
       if @offender.within_early_allocation_window?
         CommunityEarlyAllocationEmailJob.perform_later(@prison.code,
@@ -71,6 +71,23 @@ class EarlyAllocationsController < PrisonsApplicationController
   end
 
 private
+
+  def metadata_for_create
+    metadata = {
+      nomis_offender_id: offender_id_from_url,
+      created_within_referral_window: @offender.within_early_allocation_window?
+    }
+
+    if @offender.within_early_allocation_window?
+      metadata.merge({
+        referred_to_ldu_at: Time.zone.now,
+        referred_to_ldu_name: @offender.ldu.name,
+        referred_to_ldu_email: @offender.ldu.email_address
+      })
+    end
+
+    metadata
+  end
 
   def load_prisoner
     @offender = OffenderService.get_offender(params[:prisoner_id])
