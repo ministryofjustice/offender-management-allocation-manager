@@ -51,7 +51,7 @@ class CoworkingController < PrisonsApplicationController
   def confirm_removal
     @prisoner = offender(coworking_nomis_offender_id_from_url)
 
-    @responsibility_type = ResponsibilityService.calculate_pom_responsibility(@prisoner)
+    @responsibility_type = @prisoner.pom_responsibility
 
     @allocation = Allocation.find_by!(
       nomis_offender_id: coworking_nomis_offender_id_from_url
