@@ -38,7 +38,7 @@ class SummaryService
           @buckets.fetch(:unallocated) << offender
         end
 
-        if approaching_handover?(offender)
+        if offender.approaching_handover?
           @buckets.fetch(:handovers) << offender
         end
       elsif new_arrival?(offender)
@@ -105,22 +105,6 @@ private
       offender.awaiting_allocation_for <= 2
     else
       offender.prison_arrival_date.to_date == Time.zone.today
-    end
-  end
-
-  def approaching_handover?(offender)
-    today = Time.zone.today
-    thirty_days_time = today + 30.days
-
-    start_date = offender.handover_start_date
-    handover_date = offender.responsibility_handover_date
-
-    return false if start_date.nil?
-
-    if start_date.future?
-      start_date.between?(today, thirty_days_time)
-    else
-      today.between?(start_date, handover_date)
     end
   end
 
