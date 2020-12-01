@@ -22,7 +22,6 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
       stub_auth_token
     end
 
-
     describe 'when a pom has been allocated an offender' do
       context 'when an offender is currently serving a sentence' do
         let(:offender) { build(:nomis_offender, agencyId: prison.code,  sentence: attributes_for(:sentence_detail)) }
@@ -42,7 +41,6 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
         let(:offender) { build(:nomis_offender, agencyId: prison.code,  sentence: attributes_for(:sentence_detail, :unsentenced)) }
 
         it 'does not return a poms allocation details' do
-          create(:allocation_history, prison: prison.code, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: primary_pom.staffId, secondary_pom_nomis_id: secondary_pom.staffId)
           get :show, params: { prison_id: prison.code, offender_no: offender.fetch(:offenderNo) }
 
           expect(response).to have_http_status(404)

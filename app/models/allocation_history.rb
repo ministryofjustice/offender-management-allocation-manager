@@ -40,9 +40,6 @@ class AllocationHistory < ApplicationRecord
     offender_released: OFFENDER_RELEASED
   }
 
-  scope :allocations, lambda { |nomis_offender_ids|
-    where(nomis_offender_id: nomis_offender_ids)
-  }
   scope :active_pom_allocations, lambda { |nomis_staff_id, prison|
     secondaries = where(secondary_pom_nomis_id: nomis_staff_id)
 
@@ -116,11 +113,12 @@ class AllocationHistory < ApplicationRecord
     end
   end
 
-  validates :nomis_offender_id,
-            :allocated_at_tier,
+  validates :allocated_at_tier,
             :event,
             :event_trigger,
             :prison, presence: true
+
+  validates :nomis_offender_id, presence: true, uniqueness: true
 
   def deallocate_offender_after_release
     deallocate_offender event: AllocationHistory::DEALLOCATE_RELEASED_OFFENDER, event_trigger: AllocationHistory::OFFENDER_RELEASED if active?
