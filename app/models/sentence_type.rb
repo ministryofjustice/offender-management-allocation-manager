@@ -52,7 +52,11 @@ SENTENCE_TYPES = {
   'SEC90_03' => ['Life - Murder Under 18 CJA03', :determinate, :non_recall],
   'SEC93' => ['Custody For Life - Under 21', :indeterminate, :non_recall],
   'SEC93_03' => ['Custody For Life - Under 21 CJA03', :indeterminate, :non_recall],
+  # 2020 version of SEC93_03
+  'SEC275' => ['Custody For Life Sec 275 2020 Murder U21', :indeterminate, :non_recall],
   'SEC94' => ['Custody Life (18-21 Years Old)', :indeterminate, :non_recall],
+  # 2020 version of SEC94
+  'SEC272' => ['Custody For Life Sec 272 2020 (18-20)', :indeterminate, :non_recall],
   'EXSENT' => ['Extended Sentence CJA91', :determinate, :non_recall],
   'EXSENT03' => ['Extended Sentence CJA03', :determinate, :non_recall],
   'EXSENT08' => ['Extended Sentence CJ&I Act 2008', :determinate, :non_recall],
@@ -71,6 +75,8 @@ SENTENCE_TYPES = {
   'CRIM_CON' => ['Criminal Contempt', :determinate, :non_recall],
   'SEC91' => ['Serious Offence -18 POCCA 2000', :determinate, :non_recall],
   'SEC91_03' => ['Serious Offence -18 CJA03 POCCA 2000', :determinate, :non_recall],
+  # 2020 version of SEC91_03
+  'SEC250' => ['Recall Serious Offence Sec 250 2020 U18', :determinate, :recall],
   'YOI' => ['Detention In Young Offender Institution', :determinate, :non_recall],
   'REFER' => ['DTO_YOI Referal', :determinate, :non_recall],
   'DTO' => ['Detention Training Order', :determinate, :non_recall],
@@ -141,29 +147,55 @@ SENTENCE_TYPES = {
   'LASPO_AR' => ['EDS LASPO Automatic Release', :determinate, :non_recall],
   'LR_LASPO_AR' => ['LR - EDS LASPO Automatic Release', :determinate, :recall],
   'LASPO_DR' => ['EDS LASPO Discretionary Release', :determinate, :non_recall],
+  # 2020 versions of LASPO_DR (4 of)
+  'LR_EDS18' => ['LR - EDS Sec 266 2020 (18-20)', :determinate, :non_recall],
+  'LR_EDS21' => ['LR - EDS Sec 279 2020 (21+)', :determinate, :non_recall],
+  'EDS18' => ['EDS Sec 266 2020 (18-20)', :determinate, :non_recall],
+  'EDS21' => ['EDS Sec 266 2020 (21+)', :determinate, :non_recall],
   'LR_LASPO_DR' => ['LR - EDS LASPO Discretionary Release', :determinate, :recall],
   'FTR_HDC' => ['Fixed Term Recall while on HDC', :determinate, :recall],
   'LR_MLP' => ['Recall to Custody Mandatory Life', :indeterminate, :recall],
   'LR_ALP' => ['Recall from Automatic Life', :indeterminate, :recall],
   'LR_DLP' => ['Recall from Discretionary Life', :indeterminate, :recall],
   'ALP_LASPO' => ['Automatic Life Sec 224A 03', :indeterminate, :non_recall],
+  # 2020 verskions of ALP_LASPO
+  'ALP_CODE18' => ['Automatic Life Sec 273 2020 (18-20)', :indeterminate, :non_recall],
+  'ALP_CODE21' => ['Automatic Life Sec 273 2020 (21+)', :indeterminate, :non_recall],
   'LR_ALP_LASPO' => ['Recall from Automatic Life Sec 224A 03', :indeterminate, :recall],
+  # 2020 versions of LR_ALP_LASPO
+  'LR_ALP_CDE18' => ['Recall Auto. Life Sec 273 2020 (18-20)', :indeterminate, :recall],
+  'LR_ALP_CDE21' => ['Recall Auto. Life Sec 283 2020 (21+)', :indeterminate, :recall],
   'FTR_SCH15' => ['FTR Schedule 15 Offender', :determinate, :recall],
+  # 2020 version of FTR_SCH15
+  'FTRSCH18' => ['FTR Sch 18 2020 Offender', :determinate, :recall],
   'ADIMP_ORA' => ['ORA CJA03 Standard Determinate Sentence', :determinate, :non_recall],
+  # 2020 version of ADIMP_ORA
+  'ADIMP_ORA20' => ['ORA 2020 Standard Determinate Sentence', :determinate, :non_recall],
   'CUR_ORA' => ['ORA Recalled from Curfew Conditions', :determinate, :recall],
   'DTO_ORA' => ['ORA Detention and Training Order', :determinate, :non_recall],
   'FTR_ORA' => ['ORA 28 Day Fixed Term Recall', :determinate, :recall],
   'FTR_HDC_ORA' => ['ORA Fixed Term Recall while on HDC', :determinate, :recall],
   'FTRSCH15_ORA' => ['ORA FTR Schedule 15 Offender', :determinate, :recall],
+  # 2020 version of FTRSCH15_ORA
+  'FTRSCH18_ORA' => ['ORA FTR Sch 18 2020 Offender', :determinate, :recall],
   'HDR_ORA' => ['ORA HDC Recall (not curfew violation)', :determinate, :recall],
   'LR_ORA' => ['ORA Licence Recall', :determinate, :recall],
   'SEC91_03_ORA' => ['ORA Serious Offence -18 CJA03 POCCA 2000', :determinate, :non_recall],
+  # 2020 version of SEC91_03_ORA
+  'SEC250_ORA' => ['ORA Serious Offence Sec 250 2020 U18', :determinate, :non_recall],
   'YOI_ORA' => ['ORA Young Offender Institution', :determinate, :non_recall],
   'BOTUS' => ['ORA Breach Top Up Supervision', :determinate, :non_recall],
   '14FTR_ORA' => ['ORA 14 Day Fixed Term Recall', :determinate, :recall],
   'LR_YOI_ORA' => ['Recall from YOI', :determinate, :recall],
   'LR_SEC91_ORA' => ['Recall Serious Off -18 CJA03 POCCA 2000', :determinate, :recall],
+  'LR_SEC250' => ['Recall Serious Offence Sec 250 2020 (U18)', :determinate, :recall],
   '14FTRHDC_ORA' => ['14 Day Fixed Term Recall from HDC', :determinate, :recall],
   'SEC236A' => ['Section 236A SOPC CJA03', :determinate, :non_recall],
-  'LR_SEC236A' => ['LR - Section 236A SOPC CJA03', :determinate, :recall]
+  # 2020 versions of SEC236A
+  'SOPC18' => ['SOPC Sec 265 2020 (18-20)', :determinate, :non_recall],
+  'SOPC21' => ['SOPC Sec 265 2020 (21+)', :determinate, :non_recall],
+  'LR_SEC236A' => ['LR - Section 236A SOPC CJA03', :determinate, :recall],
+  # 2020 versions of LR_SEC236A
+  'LR_SOPC18' => ['LR - SOPC Sec 265 2020 (18-20)', :determinate, :recall],
+  'LR_SOPC21' => ['LR - SOPC Sec 265 2020 (21+)', :determinate, :recall],
 }.freeze
