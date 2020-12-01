@@ -4,7 +4,7 @@
              builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |form| %>
   <%= form.govuk_error_summary %>
 
-  <h1 class="govuk-heading-xl govuk-!-margin-top-4">Assessment for early allocation to the community probation team</h1>
+  <h1 class="govuk-heading-l govuk-!-margin-top-4">Assessment for early allocation to the community probation team</h1>
 
   <% EarlyAllocation::STAGE1_FIELDS.each do |field| %>
     <%= form.hidden_field(field) %>

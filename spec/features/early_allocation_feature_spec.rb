@@ -8,9 +8,13 @@ feature "early allocation", :allocation, type: :feature do
   let(:valid_date) { Time.zone.today - 2.months }
   let(:prison) { 'LEI' }
   let(:username) { 'MOIC_POM' }
-  let(:nomis_offender) { build(:nomis_offender, sentence: attributes_for(:sentence_detail, conditionalReleaseDate: release_date)) }
+  let(:nomis_offender) { build(:nomis_offender, firstName: first_name, lastName: last_name, dateOfBirth: date_of_birth, offenderNo: nomis_offender_num, sentence: attributes_for(:sentence_detail, conditionalReleaseDate: release_date)) }
   let(:nomis_offender_id) { nomis_offender.fetch(:offenderNo) }
   let(:pom) { build(:pom, staffId: nomis_staff_id) }
+  let(:first_name) { 'John' }
+  let(:last_name) { 'Smith' }
+  let(:date_of_birth) { Date.new(1980, 1, 6).to_s }
+  let(:nomis_offender_num) { 'G456YS3' }
 
   before do
     create(:case_information, nomis_offender_id: nomis_offender_id)
@@ -90,8 +94,9 @@ feature "early allocation", :allocation, type: :feature do
             stage1_eligible_answers
           end
 
-          scenario 'stage1 happy path' do
+          scenario 'stage1 happy path', :js do
             expect {
+              displays_prisoner_information_in_side_panel
               click_button 'Continue'
               expect(page).not_to have_css('.govuk-error-message')
               # selecting any one of these as 'Yes' means that we progress to assessment complete (Yes)
@@ -115,7 +120,7 @@ feature "early allocation", :allocation, type: :feature do
         context 'with stage 2 questions' do
           before do
             stage1_stage2_answers
-
+            displays_prisoner_information_in_side_panel
             click_button 'Continue'
             # make sure that we are displaying stage 2 questions before continuing
             expect(page).to have_text 'Has the prisoner been held in an extremism'
@@ -145,14 +150,13 @@ feature "early allocation", :allocation, type: :feature do
           context 'with discretionary path' do
             before do
               discretionary_stage2_answers
-
               click_button 'Continue'
               expect(page).not_to have_text 'The community probation team will make a decision'
-
-              # Last prompt before end of journey
+              displays_prisoner_information_in_side_panel
+                # Last prompt before end of journey
               expect(page).to have_text 'Why are you referring this case for early allocation to the community?'
               click_button 'Continue'
-              # we need to always tick the 'Head of Offender Management' box and fill in the reasons
+                # we need to always tick the 'Head of Offender Management' box and fill in the reasons
               expect(page).to have_css('.govuk-error-message')
 
               expect {
@@ -163,8 +167,7 @@ feature "early allocation", :allocation, type: :feature do
             end
 
             scenario 'saving the PDF' do
-              click_link 'Save completed assessment (pdf)'
-              expect(page).to have_current_path("/prisons/#{prison}/prisoners/#{nomis_offender_id}/early_allocation.pdf")
+              expect(page).to have_link 'Save completed assessment (pdf)', href: "/prisons/#{prison}/prisoners/#{nomis_offender_id}/early_allocation.pdf"
             end
 
             scenario 'completing the journey', :js do
@@ -173,7 +176,7 @@ feature "early allocation", :allocation, type: :feature do
               within '#early_allocation' do
                 click_link 'Update'
               end
-
+              displays_prisoner_information_in_side_panel
               click_button('Save')
               expect(page).to have_css('.govuk-error-message')
               within '.govuk-error-summary' do
@@ -313,5 +316,12 @@ feature "early allocation", :allocation, type: :feature do
     fill_in id: 'early_allocation_reason', with: Faker::Quote.famous_last_words
     find('label[for=early_allocation_approved]').click
     click_button 'Continue'
+  end
+
+  def displays_prisoner_information_in_side_panel
+    expect(page).to have_text('Prisoner information')
+    expect(page).to have_selector('p#prisoner-name', text: 'Smith, John')
+    expect(page).to have_selector('p#date-of-birth', text: '6/01/1980')
+    expect(page).to have_selector('p#nomis-number', text: 'G456YS3')
   end
 end

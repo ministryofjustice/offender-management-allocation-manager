@@ -1,14 +1,15 @@
 <% content_for :switcher do %>
   <%= render '/layouts/prison_switcher' %>
 <% end %>
-
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
 <%= form_for(@early_assignment,
              url: discretionary_prison_prisoner_early_allocations_path(@prison.code, @early_assignment.nomis_offender_id),
              builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |form| %>
 
   <%= form.govuk_error_summary %>
 
-  <h1 class="govuk-heading-xl govuk-!-margin-top-4">Assessment for early allocation to the community probation team</h1>
+  <h1 class="govuk-heading-l govuk-!-margin-top-4">Assessment for early allocation to the community probation team</h1>
 
   <% (EarlyAllocation::STAGE1_FIELDS + EarlyAllocation::ALL_STAGE2_FIELDS).each do |field| %>
     <%= form.hidden_field(field) unless form.object.public_send(field).nil? %>
@@ -17,7 +18,7 @@
 
   <div class="govuk-form-group">
     <div class="govuk-grid-row">
-      <div class="govuk-grid-column-one-half">
+      <div class="govuk-grid-column-full">
         <fieldset class="govuk-fieldset">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
             <%= form.label(:reason, 'Why are you referring this case for early allocation to the community?', class: 'govuk-label govuk-!-font-weight-bold') %>
@@ -38,4 +39,7 @@
 
   <%= form.submit "Continue", role: "button", draggable: "false", class: "govuk-button" %>
 <% end %>
+  </div>
+  <%= render(partial: 'prisoner_info_sidebar') %>
+</div>
 
