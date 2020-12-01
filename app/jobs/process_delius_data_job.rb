@@ -68,13 +68,14 @@ private
     find_case_info(delius_record).tap do |case_info|
       team = map_team(delius_record.team_code)
       case_info.assign_attributes(
-        com_name: map_com_name(delius_record.offender_manager),
-        crn: delius_record.crn,
-        tier: map_tier(delius_record.tier),
-      team: team,
-      case_allocation: delius_record.service_provider,
-      welsh_offender: map_welsh_offender(delius_record.ldu_code),
-      mappa_level: map_mappa_level(delius_record.mappa, delius_record.mappa_levels)
+        manual_entry: false,
+      com_name: map_com_name(delius_record.offender_manager),
+      crn: delius_record.crn,
+      tier: map_tier(delius_record.tier),
+    team: team,
+    case_allocation: delius_record.service_provider,
+    welsh_offender: map_welsh_offender(delius_record.ldu_code),
+    mappa_level: map_mappa_level(delius_record.mappa, delius_record.mappa_levels)
       )
     end
   end
@@ -96,9 +97,7 @@ private
   def find_case_info(delius_record)
     CaseInformation.find_or_initialize_by(
       nomis_offender_id: delius_record.noms_no
-    ) { |item|
-      item.manual_entry = false
-    }
+    )
   end
 
   def map_mappa_level(delius_mappa, delius_mappa_levels)

@@ -11,7 +11,7 @@ module HmppsApi
     delegate :indeterminate_sentence?, :immigration_case?,
              to: :@sentence_type
 
-    delegate :tier, :case_allocation, :crn, :mappa_level,
+    delegate :tier, :case_allocation, :crn, :mappa_level, :manual_entry?,
              :parole_review_date, :victim_liaison_officers,
              to: :@case_information, allow_nil: true
 

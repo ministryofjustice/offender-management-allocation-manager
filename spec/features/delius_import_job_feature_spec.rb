@@ -18,6 +18,10 @@ RSpec.shared_examples "imports the Delius spreadsheet and creates case informati
     visit prison_summary_unallocated_path(prison)
     expect(page).to have_content("Make allocations")
     expect(page).to have_content(offender_no)
+    click_link 'Allocate'
+    expect(page.find(:css, '#welsh-offender-row')).not_to have_content('Change')
+    expect(page.find(:css, '#service-provider-row')).not_to have_content('Change')
+    expect(page.find(:css, '#tier-row')).not_to have_content('Change')
   end
 end
 
@@ -25,17 +29,16 @@ feature "Delius import feature" do
   let(:stub_auth_host) { Rails.configuration.nomis_oauth_host }
   let(:stub_api_host) { "#{Rails.configuration.prison_api_host}/api" }
   let(:offender_no) { "GCA2H2A" }
-  let(:prison) { "LEI" }
+  let(:prison) { build(:prison).code }
   let(:booking_id) { 754_207 }
   let(:offender) { build(:nomis_offender, offenderNo: offender_no, imprisonmentStatus: 'DET', dateOfBirth: "1985-03-19") }
   let(:pom) { build(:pom) }
 
   before do
-    stub_signin_spo(pom)
-
+    stub_signin_spo(pom, [prison])
+    stub_poms prison, [pom]
     stub_offender(offender)
-
-    stub_offenders_for_prison("LEI", [offender])
+    stub_offenders_for_prison(prison, [offender])
 
     stub_request(:post, "#{stub_api_host}/movements/offenders?latestOnly=false&movementTypes=TRN").
       with(body: [offender_no].to_json).
