@@ -51,3 +51,4 @@ spec:
                       name: elasticache-offender-management-allocation-manager-token-cache-production
                       key: url
           restartPolicy: OnFailure
+          ttlSecondsAfterFinished: 3600

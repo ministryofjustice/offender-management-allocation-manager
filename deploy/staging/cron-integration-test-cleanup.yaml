@@ -45,3 +45,4 @@ spec:
                       name: allocation-rds-instance-output
                       key: postgres_user
           restartPolicy: OnFailure
+          ttlSecondsAfterFinished: 3600
