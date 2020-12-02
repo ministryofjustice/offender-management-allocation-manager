@@ -80,9 +80,9 @@ RSpec.describe EarlyAllocationsController, type: :controller do
 
     context 'when stage 1' do
       let(:date_params) {
-        { "oasys_risk_assessment_date_dd" => valid_date.day,
-          "oasys_risk_assessment_date_mm" => valid_date.month,
-          "oasys_risk_assessment_date_yyyy" => valid_date.year
+        { "oasys_risk_assessment_date(3i)" => valid_date.day,
+          "oasys_risk_assessment_date(2i)" => valid_date.month,
+          "oasys_risk_assessment_date(1i)" => valid_date.year
         }
       }
       let(:early_allocation) { EarlyAllocation.last }

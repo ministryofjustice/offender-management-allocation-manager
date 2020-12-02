@@ -6,14 +6,14 @@ FactoryBot.define do
     created_by_firstname { Faker::Name.first_name }
     created_by_lastname { Faker::Name.last_name }
 
-    oasys_risk_assessment_date do Time.zone.today - 2.months end
+    oasys_risk_assessment_date { Time.zone.today - 2.months }
 
-    convicted_under_terrorisom_act_2000 do false end
-    high_profile do false end
-    serious_crime_prevention_order do false end
-    mappa_level_3 do false end
-    cppc_case do true end
-    stage2_validation do false end
+    convicted_under_terrorisom_act_2000 { false }
+    high_profile { false }
+    serious_crime_prevention_order { false }
+    mappa_level_3 { false }
+    cppc_case { true }
+    stage2_validation { false }
 
     association :case_information
 
