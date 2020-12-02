@@ -62,7 +62,6 @@ RSpec.describe EarlyAllocationsController, type: :controller do
 
       before do
         create(:case_information, nomis_offender_id: nomis_offender_id, team: team)
-        create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
       end
 
       it 'goes to the dead end' do
@@ -77,7 +76,6 @@ RSpec.describe EarlyAllocationsController, type: :controller do
   describe '#create' do
     before do
       create(:case_information, nomis_offender_id: nomis_offender_id)
-      create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
     end
 
     context 'when stage 1' do

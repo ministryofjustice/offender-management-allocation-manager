@@ -35,8 +35,10 @@ RSpec.describe AllocationsController, type: :controller do
   context 'when user is an SPO' do
     before do
       stub_sso_data(prison)
-      stub_offender(build(:nomis_offender, offenderNo: offender_no))
+      stub_offender(offender)
     end
+
+    let(:offender) { build(:nomis_offender, offenderNo: offender_no) }
 
     describe '#show' do
       let(:inactive_pom_staff_id) { 543_453 }
@@ -79,19 +81,19 @@ RSpec.describe AllocationsController, type: :controller do
 
       context 'with a VictimLiasonOfficer' do
         before do
-          create(:case_information, victim_liaison_officers: [build(:victim_liaison_officer)])
-          create(:allocation, nomis_offender_id: offender)
-          stub_offender(build(:nomis_offender, offenderNo: offender))
+          case_info = create(:case_information, victim_liaison_officers: [build(:victim_liaison_officer)])
+          create(:allocation, nomis_offender_id: case_info.nomis_offender_id)
+          stub_offender(build(:nomis_offender, offenderNo: case_info.nomis_offender_id))
           stub_pom_emails(485926, [])
         end
 
         let(:case_info) { CaseInformation.last }
-        let(:offender) { case_info.nomis_offender_id }
+        let(:vlo_offender_no) { case_info.nomis_offender_id }
         let(:history) { assigns(:history) }
-        let(:allocation) { Allocation.find_by!(nomis_offender_id: offender) }
+        let(:allocation) { Allocation.find_by!(nomis_offender_id: vlo_offender_no) }
 
         it 'has a VLO create record' do
-          get :history, params: { prison_id: prison, nomis_offender_id: offender }
+          get :history, params: { prison_id: prison, nomis_offender_id: vlo_offender_no }
           expect(history.map(&:event)).to eq(['create', 'allocate_primary_pom'])
         end
 
@@ -106,7 +108,7 @@ RSpec.describe AllocationsController, type: :controller do
           end
 
           it 'has VLO and alloocation data sorted by date' do
-            get :history, params: { prison_id: prison, nomis_offender_id: offender }
+            get :history, params: { prison_id: prison, nomis_offender_id: vlo_offender_no }
             expect(history.map(&:event)).to eq(['create', 'allocate_primary_pom', 'update', 'destroy', "reallocate_primary_pom"])
           end
         end
@@ -236,14 +238,7 @@ RSpec.describe AllocationsController, type: :controller do
     end
 
     describe '#new' do
-      let(:offender) { build(:nomis_offender, offenderNo: offender_no) }
-
-      before do
-        stub_offender(offender)
-        stub_offenders_for_prison(prison, [offender])
-      end
-
-      context 'with existing allocations' do
+      context 'with previous allocations for this POM' do
         let(:alice) { poms.first }
 
         before do
@@ -258,41 +253,57 @@ RSpec.describe AllocationsController, type: :controller do
 
           offenders = CaseInformation.all.map { |ci| build(:nomis_offender, offenderNo: ci.nomis_offender_id) }
           stub_offenders_for_prison(prison, offenders)
-        end
 
-        it 'serves correct counts' do
+          create(:case_information, nomis_offender_id: offender_no, tier: tier)
+
           get :new, params: { prison_id: prison, nomis_offender_id: offender_no }
           expect(response).to be_successful
+        end
 
-          pom = assigns(:recommended_poms).detect { |c| c.first_name == alice.firstName }
+        context 'when tier D' do
+          let(:tier) { 'D' }
 
-          expect(tier_a: pom.tier_a, tier_b: pom.tier_b, tier_c: pom.tier_c, tier_d: pom.tier_d, no_tier: pom.no_tier, total_cases: pom.total_cases)
-            .to eq(tier_a: 5, tier_b: 4, tier_c: 3, tier_d: 2, no_tier: 1, total_cases: 15)
+          render_views
+
+          it 'serves correct counts' do
+            pom = assigns(:recommended_poms).detect { |c| c.first_name == alice.firstName }
+
+            expect(tier_a: pom.tier_a, tier_b: pom.tier_b, tier_c: pom.tier_c, tier_d: pom.tier_d, no_tier: pom.no_tier, total_cases: pom.total_cases)
+                .to eq(tier_a: 5, tier_b: 4, tier_c: 3, tier_d: 2, no_tier: 1, total_cases: 15)
+          end
+
+          it 'has a nil allocation' do
+            expect(assigns(:allocation)).to be_nil
+            expect(response.body).to have_content 'No history'
+          end
+
+          it 'serves recommended POMs' do
+            expect(assigns(:recommended_poms).map(&:first_name)).to match_array(poms.first(2).map(&:firstName))
+          end
+        end
+
+        context 'when tier A' do
+          let(:tier) { 'A' }
+
+          it 'serves recommended POMs' do
+            expect(assigns(:recommended_poms).map(&:first_name)).to match_array(poms.last(2).map(&:firstName))
+          end
         end
       end
 
-      context 'when tier A offender' do
+      context 'with an allocation' do
         before do
-          create(:case_information, nomis_offender_id: offender_no, tier: 'A')
+          stub_offenders_for_prison(prison, [offender])
+          create(:allocation, nomis_offender_id: offender_no)
         end
 
-        it 'serves recommended POMs' do
+        before do
           get :new, params: { prison_id: prison, nomis_offender_id: offender_no }
           expect(response).to be_successful
-
-          expect(assigns(:recommended_poms).map(&:first_name)).to match_array(poms.last(2).map(&:firstName))
         end
-      end
 
-      context 'when tier D offender' do
-        it 'serves recommended POMs' do
-          create(:case_information, nomis_offender_id: offender_no, tier: 'D')
-
-          get :new, params: { prison_id: prison, nomis_offender_id: offender_no }
-
-          expect(response).to be_successful
-
-          expect(assigns(:recommended_poms).map(&:first_name)).to match_array(poms.first(2).map(&:firstName))
+        it 'displays an allocation link' do
+          expect(assigns(:allocation)).not_to be_nil
         end
       end
     end

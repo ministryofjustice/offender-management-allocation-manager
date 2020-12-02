@@ -188,7 +188,6 @@ RSpec.describe Allocation, type: :model do
       let!(:allocation_no_overrides) {
         create(
           :allocation,
-          nomis_offender_id: nomis_offender_id,
           primary_pom_nomis_id: nomis_staff_id
         )
       }
@@ -207,7 +206,6 @@ RSpec.describe Allocation, type: :model do
         create(
           :allocation,
           prison: allocation.prison,
-          nomis_offender_id: nomis_offender_id,
           secondary_pom_nomis_id: nomis_staff_id
         )
       }
@@ -215,14 +213,12 @@ RSpec.describe Allocation, type: :model do
         create(
           :allocation,
           prison: allocation.prison,
-          nomis_offender_id: nomis_offender_id,
           primary_pom_nomis_id: 27
         )
       }
       let!(:another_prison) {
         create(
           :allocation,
-          nomis_offender_id: nomis_offender_id,
           primary_pom_nomis_id: nomis_staff_id,
           prison: 'RSI'
         )
