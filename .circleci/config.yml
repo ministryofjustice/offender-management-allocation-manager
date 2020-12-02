@@ -286,7 +286,7 @@ jobs:
       - deploy:
           name: Deploy to staging
           command: |
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/cronjob.yaml
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/cron-*.yaml
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/deployment.yaml
             kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
             kubectl apply --record=false -f ./deploy/staging
@@ -328,7 +328,7 @@ jobs:
       - deploy:
           name: Deploy to pre-production
           command: |
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/cronjob.yaml
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/cron-*.yaml
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/deployment.yaml
             kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
             kubectl apply --record=false -f ./deploy/preprod
@@ -352,8 +352,7 @@ jobs:
       - deploy:
           name: Deploy to production
           command: |
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/cronjob.yaml
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/handover-chase-email-job.yaml
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/cron-*.yaml
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/deployment.yaml
             kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
             kubectl apply --record=false -f ./deploy/production
