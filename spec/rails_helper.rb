@@ -10,7 +10,6 @@ require 'support/helpers/jwt_helper'
 require 'support/helpers/features_helper'
 require 'support/helpers/auth_helper'
 require 'support/helpers/api_helper'
-require 'support/helpers/community_api_helper'
 require 'capybara/rspec'
 require 'webmock/rspec'
 
@@ -69,7 +68,6 @@ RSpec.configure do |config|
   config.include FeaturesHelper
   config.include AuthHelper
   config.include ApiHelper
-  config.include CommunityApiHelper
 
   config.before(:each, type: :view) do
     # This is needed for any view test that uses the sort_link and sort_arrow helpers
