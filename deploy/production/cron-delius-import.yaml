@@ -9,6 +9,7 @@ spec:
   failedJobsHistoryLimit: 2
   jobTemplate:
     spec:
+      ttlSecondsAfterFinished: 3600
       template:
         spec:
           containers:
@@ -50,4 +51,3 @@ spec:
                       name: elasticache-offender-management-allocation-manager-token-cache-production
                       key: url
           restartPolicy: OnFailure
-          ttlSecondsAfterFinished: 3600
