@@ -41,7 +41,9 @@ FactoryBot.define do
     status { 'ACTIVE' }
 
     firstName { Faker::Name.first_name }
-    lastName { Faker::Name.last_name }
+    # The POM's last name is titleized as it's passed through StaffMember, e.g. "McDonald" becomes "Mcdonald"
+    # So we also .titleize the last name here to avoid breaking tests
+    lastName { Faker::Name.last_name.titleize }
     positionDescription { Faker::Company.type }
 
     trait :probation_officer do
