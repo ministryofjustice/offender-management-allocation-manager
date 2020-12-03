@@ -6,7 +6,7 @@
   <!--  Just so we alwways submit something in the form -->
   <%= f.hidden_field :nomis_offender_id %>
 
-  <%= render :partial => "/shared/field_errors", :locals => { form: f, errors: @responsibility.errors } %>
+  <%= f.govuk_error_summary %>
 
   <div class="govuk-form-group">
     <fieldset class="govuk-fieldset">

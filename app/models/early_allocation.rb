@@ -16,7 +16,6 @@ class EarlyAllocation < ApplicationRecord
               # validating presence, so stop date validator double-checking
               allow_nil: true
             }
-  acts_as_gov_uk_date :oasys_risk_assessment_date
 
   STAGE1_BOOLEAN_FIELDS = [:convicted_under_terrorisom_act_2000,
                            :high_profile,
@@ -34,7 +33,7 @@ class EarlyAllocation < ApplicationRecord
   STAGE1_FIELDS = [:oasys_risk_assessment_date] + STAGE1_BOOLEAN_FIELDS
 
   def any_stage1_field_errors?
-    STAGE1_FIELDS.map { |f| errors[f].present? }.any?
+    STAGE1_FIELDS.map { |f| errors.include?(f) }.any?
   end
 
   validate :validate_stage1, unless: -> { stage2_validation || stage3_validation || recording_community_decision }
@@ -63,8 +62,7 @@ class EarlyAllocation < ApplicationRecord
     validates(field, inclusion: {
                 in: [true, false],
                 allow_nil: false
-              },
-                     if: -> { stage2_validation })
+              }, if: -> { stage2_validation })
   end
 
   # This field is only prompted for if extremism_separation is true
@@ -73,7 +71,7 @@ class EarlyAllocation < ApplicationRecord
               allow_nil: false }, if: -> { extremism_separation })
 
   def any_stage2_field_errors?
-    ALL_STAGE2_FIELDS.map { |f| errors[f].present? }.any?
+    ALL_STAGE2_FIELDS.map { |f| errors.include?(f) }.any?
   end
 
   validate :validate_stage2, if: -> { stage2_validation  }

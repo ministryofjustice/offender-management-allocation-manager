@@ -27,7 +27,6 @@ feature "early allocation", type: :feature do
     stub_keyworker(prison, nomis_offender_id, build(:keyworker))
 
     signin_pom_user
-    # signin_spo_user
 
     visit prison_staff_caseload_index_path(prison, nomis_staff_id)
 
@@ -67,12 +66,21 @@ feature "early allocation", type: :feature do
 
         scenario 'error case' do
           expect(page).to have_css('.govuk-error-message')
-          expect(page).to have_css('#early_allocation_oasys_risk_assessment_date_error')
           expect(page).to have_css('#early-allocation-high-profile-error')
           within '.govuk-error-summary' do
             expect(page).to have_text 'You must say if this case is \'high profile\''
             click_link 'You must say if this case is \'high profile\''
-            expect(all('li').count).to eq(6)
+            # ensure that page is still intact
+            expect(all('li').map(&:text)).
+                to match_array([
+                                   "Enter the date of the last OASys risk assessment",
+                                   "You must say if they are subject to a Serious Crime Prevention Order",
+                                   "You must say if they were convicted under the Terrorism Act 2000",
+                                   "You must say if this case is 'high profile'",
+                                   "You must say if this is a MAPPA level 3 case",
+                                   "You must say if this will be a CPPC case"
+                               ]
+            )
           end
         end
       end
@@ -119,7 +127,15 @@ feature "early allocation", type: :feature do
           within '.govuk-error-summary' do
             expect(page).to have_text 'You must say if this is a MAPPA level 2 case'
 
-            expect(all('li').count).to eq(5)
+            expect(all('li').map(&:text)).
+                to match_array([
+                          "You must say if this prisoner has been in an extremism separation centre",
+                          "You must say if there is another reason for early allocation",
+                          "You must say whether this prisoner presents a risk of serious harm",
+                          "You must say if this is a MAPPA level 2 case",
+                          "You must say if this prisoner has been identified through the pathfinder process"
+                      ]
+                   )
           end
         end
 
@@ -172,7 +188,7 @@ feature "early allocation", type: :feature do
         end
 
         scenario 'not eligible due to all answers false' do
-          find('#early_allocation_extremism_separation_false').click
+          find('#early-allocation-extremism-separation-field').click
           find('#early-allocation-high-risk-of-serious-harm-field').click
           find('#early-allocation-mappa-level-2-field').click
           find('#early-allocation-pathfinder-process-field').click
@@ -222,9 +238,9 @@ feature "early allocation", type: :feature do
   end
 
   def stage1_eligible_answers
-    fill_in id: 'early_allocation_oasys_risk_assessment_date_dd', with: valid_date.day
-    fill_in id: 'early_allocation_oasys_risk_assessment_date_mm', with: valid_date.month
-    fill_in id: 'early_allocation_oasys_risk_assessment_date_yyyy', with: valid_date.year
+    fill_in id: 'early_allocation_oasys_risk_assessment_date_3i', with: valid_date.day
+    fill_in id: 'early_allocation_oasys_risk_assessment_date_2i', with: valid_date.month
+    fill_in id: 'early_allocation_oasys_risk_assessment_date_1i', with: valid_date.year
 
     find('label[for=early-allocation-convicted-under-terrorisom-act-2000-true-field]').click
     find('label[for=early-allocation-high-profile-field]').click
@@ -234,9 +250,9 @@ feature "early allocation", type: :feature do
   end
 
   def stage1_stage2_answers
-    fill_in id: 'early_allocation_oasys_risk_assessment_date_dd', with: valid_date.day
-    fill_in id: 'early_allocation_oasys_risk_assessment_date_mm', with: valid_date.month
-    fill_in id: 'early_allocation_oasys_risk_assessment_date_yyyy', with: valid_date.year
+    fill_in id: 'early_allocation_oasys_risk_assessment_date_3i', with: valid_date.day
+    fill_in id: 'early_allocation_oasys_risk_assessment_date_2i', with: valid_date.month
+    fill_in id: 'early_allocation_oasys_risk_assessment_date_1i', with: valid_date.year
 
     find("label[for=early-allocation-convicted-under-terrorisom-act-2000-field]").click
     find('label[for=early-allocation-high-profile-field]').click
@@ -246,7 +262,7 @@ feature "early allocation", type: :feature do
   end
 
   def discretionary_stage2_answers
-    find('label[for=early_allocation_extremism_separation_false]').click
+    find('label[for=early-allocation-extremism-separation-field]').click
     find('label[for=early-allocation-high-risk-of-serious-harm-field]').click
     find('label[for=early-allocation-mappa-level-2-field]').click
     find('label[for=early-allocation-pathfinder-process-field]').click

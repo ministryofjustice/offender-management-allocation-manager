@@ -12,6 +12,7 @@ class AllocationsController < PrisonsApplicationController
     @recommended_poms, @not_recommended_poms =
       recommended_and_nonrecommended_poms_for(@prisoner)
     @unavailable_pom_count = unavailable_pom_count
+    @allocation = Allocation.find_by nomis_offender_id: nomis_offender_id_from_url
   end
 
   def show
@@ -34,9 +35,9 @@ class AllocationsController < PrisonsApplicationController
   end
 
   def edit
-    allocation = AllocationService.current_allocation_for(nomis_offender_id_from_url)
+    @allocation = AllocationService.current_allocation_for(nomis_offender_id_from_url)
 
-    unless allocation.present? && allocation.active?
+    unless @allocation.present? && @allocation.active?
       redirect_to new_prison_allocation_path(active_prison_id, nomis_offender_id_from_url)
       return
     end

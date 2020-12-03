@@ -116,10 +116,7 @@ private
     params.require(:early_allocation).
       permit(EarlyAllocation::STAGE1_BOOLEAN_FIELDS +
                 EarlyAllocation::ALL_STAGE2_FIELDS +
-                [:oasys_risk_assessment_date_dd,
-                 :oasys_risk_assessment_date_mm,
-                 :oasys_risk_assessment_date_yyyy,
-                 :oasys_risk_assessment_date,
+                [:oasys_risk_assessment_date,
                  :stage2_validation,
                  :stage3_validation,
                  :reason,
