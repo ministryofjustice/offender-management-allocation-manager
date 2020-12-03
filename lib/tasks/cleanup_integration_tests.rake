@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 namespace :integration_tests do
+  TEST_USERNAME = 'MOIC INTEGRATION-TESTS'
+
   desc 'Clean up allocations created by staging integration tests'
   task clean_up: :environment do
     if defined?(Rails) && Rails.env.development?
@@ -10,11 +12,11 @@ namespace :integration_tests do
     Rails.logger.info 'Deleting integration test data'
 
     ids = Allocation.where(
-      created_by_username: 'MOIC_INTEGRATION_TESTS').
+      created_by_name: TEST_USERNAME).
         pluck(:nomis_offender_id)
     cases = CaseInformation.where(nomis_offender_id: ids)
     cases.destroy_all
 
-    Allocation.where(created_by_username: 'MOIC_INTEGRATION_TESTS').destroy_all
+    Allocation.where(created_by_name: TEST_USERNAME).destroy_all
   end
 end
