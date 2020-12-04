@@ -208,29 +208,33 @@ feature "early allocation", :allocation, type: :feature do
 
         context 'when stage 1 happy path - not sent' do
           before do
-            expect(PomMailer).not_to receive(:auto_early_allocation)
+            expect(EarlyAllocationMailer).not_to receive(:auto_early_allocation)
           end
 
           it 'doesnt send the email' do
-            stage1_eligible_answers
-            click_button 'Continue'
-            expect(page).to have_text('The community probation team will take responsibility for this case early')
-            expect(page).to have_text('The assessment has not been sent to the community probation team')
+            expect {
+              stage1_eligible_answers
+              click_button 'Continue'
+              expect(page).to have_text('The community probation team will take responsibility for this case early')
+              expect(page).to have_text('The assessment has not been sent to the community probation team')
+            }.not_to change(EmailHistory, :count)
           end
         end
 
         context 'with discretionary result' do
           before do
-            expect(PomMailer).not_to receive(:community_early_allocation)
+            expect(EarlyAllocationMailer).not_to receive(:community_early_allocation)
           end
 
           it 'doesnt send the email' do
-            stage1_stage2_answers
-            click_button 'Continue'
-            discretionary_stage2_answers
-            click_button 'Continue'
-            complete_form
-            expect(page).to have_text('The assessment has not been sent to the community probation team')
+            expect {
+              stage1_stage2_answers
+              click_button 'Continue'
+              discretionary_stage2_answers
+              click_button 'Continue'
+              complete_form
+              expect(page).to have_text('The assessment has not been sent to the community probation team')
+            }.not_to change(EmailHistory, :count)
           end
         end
       end

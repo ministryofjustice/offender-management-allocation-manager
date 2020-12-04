@@ -20,11 +20,10 @@ feature 'View a prisoner profile page', :allocation do
   context 'with an allocation' do
     before do
       create(:case_information, nomis_offender_id: 'G7998GJ', victim_liaison_officers: [build(:victim_liaison_officer)])
+      create(:allocation, nomis_offender_id: 'G7998GJ', primary_pom_nomis_id: '485637', primary_pom_name: 'Pobno, Kath')
     end
 
-    let!(:alloc) {
-      create(:allocation, nomis_offender_id: 'G7998GJ', primary_pom_nomis_id: '485637', primary_pom_name: 'Pobno, Kath')
-    }
+    let(:alloc) { Allocation.last }
 
     let(:initial_vlo) { VictimLiaisonOfficer.last }
 
@@ -56,6 +55,7 @@ feature 'View a prisoner profile page', :allocation do
             click_link 'Change'
           end
         end
+        find('.govuk-back-link')
         click_link 'Back'
         within '.vlo-row-1' do
           within '.change-email' do

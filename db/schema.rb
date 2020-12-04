@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_26_123414) do
+ActiveRecord::Schema.define(version: 2020_11_27_172113) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -134,6 +134,15 @@ ActiveRecord::Schema.define(version: 2020_11_26_123414) do
     t.string "created_by_lastname"
     t.string "updated_by_firstname"
     t.string "updated_by_lastname"
+    t.boolean "created_within_referral_window", default: false, null: false
+  end
+
+  create_table "email_histories", force: :cascade do |t|
+    t.string "prison", null: false
+    t.string "nomis_offender_id", null: false
+    t.string "name", null: false
+    t.string "email", null: false
+    t.string "event", null: false
   end
 
   create_table "flipflop_features", force: :cascade do |t|

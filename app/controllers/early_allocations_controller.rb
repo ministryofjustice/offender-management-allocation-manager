@@ -125,6 +125,7 @@ private
                  :stage3_validation,
                  :reason,
                  :approved]).merge(prison: active_prison_id,
+                                   created_within_referral_window: @offender.within_early_allocation_window?,
                                    created_by_firstname: @current_user.first_name,
                                    created_by_lastname: @current_user.last_name)
   end
