@@ -100,6 +100,8 @@ class AllocationsController < PrisonsApplicationController
     vlo_history = PaperTrail::Version.
         where(item_type: 'VictimLiaisonOfficer', nomis_offender_id: nomis_offender_id_from_url).map { |vlo_version| VloHistory.new(vlo_version) }
     @history = (allocation.history + vlo_history).sort_by(&:created_at)
+    @early_allocations = CaseInformation.find_by!(nomis_offender_id: nomis_offender_id_from_url).early_allocations
+    @email_histories = EmailHistory.where(nomis_offender_id: nomis_offender_id_from_url)
 
     @pom_emails = AllocationService.allocation_history_pom_emails(allocation)
   end

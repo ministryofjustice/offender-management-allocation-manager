@@ -102,15 +102,16 @@ private
 
   def load_prisoner
     @offender = OffenderService.get_offender(params[:prisoner_id])
-    @allocation = Allocation.find_by!(offender_id_from_url)
-    @pom = PrisonOffenderManagerService.get_pom_at(@prison.code, @allocation.primary_pom_nomis_id)
   end
 
   def pdf_as_string
+    allocation = Allocation.find_by!(offender_id_from_url)
+    pom = PrisonOffenderManagerService.get_pom_at(@prison.code, allocation.primary_pom_nomis_id)
+
     view_context.render_early_alloc_pdf(early_allocation: @early_allocation,
                                         offender: @offender,
-                                        pom: @pom,
-                                        allocation: @allocation).render
+                                        pom: pom,
+                                        allocation: allocation).render
   end
 
   def community_decision_params
