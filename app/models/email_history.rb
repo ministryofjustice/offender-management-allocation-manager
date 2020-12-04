@@ -12,4 +12,8 @@ class EmailHistory < ApplicationRecord
                                       SUITABLE_FOR_EARLY_ALLOCATION], allow_nil: false }
   validates :prison, inclusion: { in: PrisonService.prison_codes, allow_nil: false }
   validates :email, presence: true, 'valid_email_2/email': true
+
+  def to_partial_path
+    "email_#{event}"
+  end
 end

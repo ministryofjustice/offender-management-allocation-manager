@@ -1,0 +1,25 @@
+<div class="moj-timeline__item">
+  <div class="moj-timeline__header">
+    <h2 class="moj-timeline__title">Early allocation assessment form completed</h2>
+  </div>
+
+  <p class="moj-timeline__date"><%= format_date_long(ea_discretionary.created_at) %>
+    by <%= ea_discretionary.created_by_name.titleize %>
+  </p>
+
+  <div class="moj-timeline__description">
+    <p>
+      Assessment outcome is discretionary.
+    </p>
+    <p>
+      The community probation team will need to make a decision.
+    </p>
+    <p>
+      <%= link_to 'View saved assessment', prison_prisoner_early_allocation_path(
+        prison_id: @prison.code,
+        prisoner_id: ea_discretionary.nomis_offender_id,
+        id: ea_discretionary.id
+      ) %>
+    </p>
+  </div>
+</div>

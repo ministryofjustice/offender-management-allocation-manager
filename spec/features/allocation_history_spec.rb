@@ -82,10 +82,20 @@ feature 'Allocation History', :allocation do
 
       Timecop.travel(Time.zone.now - 4.days) do
         create(:early_allocation, case_information: ci, prison: 'PVI', nomis_offender_id: nomis_offender_id)
+        create :email_history, nomis_offender_id: nomis_offender_id,
+               name: ci.team.local_divisional_unit.name,
+               email: ci.team.local_divisional_unit.email_address,
+                             event: EmailHistory::AUTO_EARLY_ALLOCATION,
+                             prison: 'PVI'
       end
 
       Timecop.travel(Time.zone.now - 3.days) do
         create(:early_allocation, :discretionary, case_information: ci, prison: 'PVI', nomis_offender_id: nomis_offender_id)
+        create :email_history, nomis_offender_id: nomis_offender_id,
+               name: ci.team.local_divisional_unit.name,
+               email: ci.team.local_divisional_unit.email_address,
+                             event: EmailHistory::DISCRETIONARY_EARLY_ALLOCATION,
+                             prison: 'PVI'
       end
 
       Timecop.travel(Time.zone.now - 2.days) do
@@ -98,6 +108,8 @@ feature 'Allocation History', :allocation do
       Timecop.travel(transfer_date) do
         allocation.offender_transferred
       end
+
+      visit prison_allocation_history_path('LEI', nomis_offender_id)
     end
 
     let(:deallocate_date) { Time.zone.now - 6.days }
@@ -112,8 +124,6 @@ feature 'Allocation History', :allocation do
       history2 = history[2]
       hist_allocate_secondary = history[5]
       history6 = history[6]
-
-      visit prison_allocation_history_path('LEI', nomis_offender_id)
 
       [
           ['h1', "Abbella, Ozullirn"],
@@ -142,6 +152,28 @@ feature 'Allocation History', :allocation do
       ].each do |key, val|
         expect(page).to have_css(key, text: val)
       end
+    end
+
+    it 'links to previous Early Allocation assessments' do
+      # The 6th history item is an 'eligible' early allocation assessment
+      eligible_assessment = page.find('.moj-timeline > .moj-timeline__item:nth-child(6)')
+
+      within eligible_assessment do
+        expect(page).to have_css('.moj-timeline__title', text: 'Early allocation assessment form completed')
+        expect(page).to have_link('View saved assessment')
+        click_link 'View saved assessment'
+      end
+
+      # Assert that we're on the correct 'view' page
+      target_early_allocation = EarlyAllocation.where(nomis_offender_id: nomis_offender_id).find(&:eligible?)
+      view_assessment_page = prison_prisoner_early_allocation_path('LEI', nomis_offender_id, target_early_allocation.id)
+      expect(page).to have_current_path(view_assessment_page)
+      expect(page).to have_content('Eligible')
+
+      # Back link takes us back
+      click_link 'Back'
+      case_history_page = prison_allocation_history_path('LEI', nomis_offender_id)
+      expect(page).to have_current_path(case_history_page)
     end
   end
 
