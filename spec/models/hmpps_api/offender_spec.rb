@@ -223,7 +223,7 @@ describe HmppsApi::Offender do
         end
 
         context 'when ineligible for early allocation' do
-          let!(:early_allocation) { create(:early_allocation, :ineligible, :skip_validate, case_information: case_info) }
+          let!(:early_allocation) { create(:early_allocation, :ineligible, case_information: case_info) }
 
           it { is_expected.to be(false) }
         end

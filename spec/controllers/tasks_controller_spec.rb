@@ -123,8 +123,8 @@ RSpec.describe TasksController, :allocation, type: :controller do
         create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id, prison: prison)
       end
 
-      create(:early_allocation, :discretionary, :skip_validate, nomis_offender_id: test_offender_no)
-      create(:early_allocation, :stage2, :skip_validate, nomis_offender_id: test_offender_no)
+      create(:early_allocation, :discretionary, nomis_offender_id: test_offender_no)
+      create(:early_allocation, :stage2, nomis_offender_id: test_offender_no)
 
       get :index, params: { prison_id: prison }
 
@@ -155,8 +155,8 @@ RSpec.describe TasksController, :allocation, type: :controller do
 
     it 'can show multiple types at once' do
       # One offender should have a pending early allocation
-      create(:early_allocation, :discretionary, :skip_validate, nomis_offender_id: test_offender_no)
-      create(:early_allocation, :stage2, :skip_validate, nomis_offender_id: test_offender_no)
+      create(:early_allocation, :discretionary, nomis_offender_id: test_offender_no)
+      create(:early_allocation, :stage2, nomis_offender_id: test_offender_no)
 
       get :index, params: { prison_id: prison }
 
@@ -168,11 +168,11 @@ RSpec.describe TasksController, :allocation, type: :controller do
 
     it 'can sort the results' do
       # Two offenders should have a pending early allocation
-      create(:early_allocation, :discretionary, :skip_validate, nomis_offender_id: 'G1234AB')
-      create(:early_allocation, :stage2, :skip_validate, nomis_offender_id: 'G1234AB')
+      create(:early_allocation, :discretionary, nomis_offender_id: 'G1234AB')
+      create(:early_allocation, :stage2, nomis_offender_id: 'G1234AB')
 
-      create(:early_allocation, :discretionary, :skip_validate, nomis_offender_id: 'G1234GG')
-      create(:early_allocation, :stage2, :skip_validate, nomis_offender_id: 'G1234GG')
+      create(:early_allocation, :discretionary, nomis_offender_id: 'G1234GG')
+      create(:early_allocation, :stage2, nomis_offender_id: 'G1234GG')
 
       get :index, params: { prison_id: prison, sort: 'offender_name asc' }
       expect(response).to be_successful
