@@ -109,6 +109,10 @@ class EarlyAllocation < ApplicationRecord
     !eligible? && !ineligible?
   end
 
+  def awaiting_community_decision?
+    created_within_referral_window? && discretionary? && community_decision.nil?
+  end
+
 private
 
   def stage1_eligible?

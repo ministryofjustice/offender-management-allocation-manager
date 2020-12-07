@@ -23,13 +23,13 @@ class PomTasks
     tasks = [
       parole_review_date_task(offender),
       missing_info_task(offender)
-    ]
+    ].compact
 
-    if early_allocations.key?(offender.offender_no)
+    if early_allocations.include?(offender.offender_no)
       tasks << early_allocation_update_task(offender)
     end
 
-    tasks.compact
+    tasks
   end
 
   def parole_review_date_task(offender)
@@ -76,14 +76,11 @@ class PomTasks
 
   def get_early_allocations(offender_nos)
     # For the provided offender numbers, determines whether they have an outstanding
-    # early allocation and then adds them to a hash for quick lookup.  If a specific
-    # offender does have an outstanding early allocation their offender number will
-    # appear as a key (with a boolean value). We do this because hash lookup is
-    # significantly faster than array/list lookup.
-    EarlyAllocation.where(nomis_offender_id: offender_nos).map { |early_allocation|
-      if early_allocation.discretionary? && early_allocation.community_decision.nil?
-        [early_allocation.nomis_offender_id, true]
-      end
-    }.compact.to_h
+    # early allocation and then adds them to a set for quick lookup.
+    Set.new(CaseInformation.where(nomis_offender_id: offender_nos)
+        .map(&:latest_early_allocation)
+        .compact
+        .select(&:awaiting_community_decision?)
+        .map(&:nomis_offender_id))
   end
 end
