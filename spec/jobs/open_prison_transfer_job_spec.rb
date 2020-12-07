@@ -30,6 +30,7 @@ RSpec.describe OpenPrisonTransferJob, :allocation, type: :job do
   before do
     stub_auth_token
     stub_poms(closed_prison_code, poms)
+    stub_pom poms.first
   end
 
   it 'does not send an email if offender_no not found on Nomis' do

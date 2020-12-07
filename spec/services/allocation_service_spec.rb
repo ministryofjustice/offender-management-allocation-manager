@@ -211,8 +211,8 @@ describe AllocationService, :allocation do
         event: Allocation::ALLOCATE_SECONDARY_POM
       )
 
-      history = Allocation.find_by!(nomis_offender_id: nomis_offender_id).history
-      emails = described_class.allocation_history_pom_emails(history)
+      alloc = Allocation.find_by!(nomis_offender_id: nomis_offender_id)
+      emails = described_class.allocation_history_pom_emails(alloc)
 
       expect(emails.count).to eq(3)
     end

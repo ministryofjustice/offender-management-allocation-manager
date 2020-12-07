@@ -14,6 +14,7 @@ FactoryBot.define do
     mappa_level_3 { false }
     cppc_case { true }
     stage2_validation { false }
+    created_within_referral_window { true }
 
     association :case_information
 
@@ -24,9 +25,37 @@ FactoryBot.define do
       mappa_level_2 do false end
       pathfinder_process do false end
       other_reason do true end
-      reason do 'Just a reason' end
-      approved do true end
+      reason { 'Just a reason' }
+      approved { true }
       stage3_validation { true }
+    end
+
+    trait :discretionary_accepted do
+      cppc_case { false }
+      extremism_separation { false }
+      high_risk_of_serious_harm { false }
+      mappa_level_2 { false }
+      pathfinder_process { false }
+      other_reason { true }
+      reason { 'Just a reason' }
+      approved { true }
+      community_decision { true }
+      updated_by_firstname { Faker::Name.first_name }
+      updated_by_lastname { Faker::Name.last_name }
+    end
+
+    trait :discretionary_declined do
+      cppc_case { false }
+      extremism_separation { false }
+      high_risk_of_serious_harm { false }
+      mappa_level_2 { false }
+      pathfinder_process { false }
+      other_reason { true }
+      reason { 'Just a reason' }
+      approved { true }
+      community_decision { false }
+      updated_by_firstname { Faker::Name.first_name }
+      updated_by_lastname { Faker::Name.last_name }
     end
 
     trait :ineligible do
@@ -37,6 +66,10 @@ FactoryBot.define do
       pathfinder_process { false }
       other_reason { false }
       stage2_validation { true }
+    end
+
+    trait :unsent do
+      created_within_referral_window { false }
     end
 
     trait :stage2 do

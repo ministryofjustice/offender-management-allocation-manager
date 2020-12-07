@@ -41,7 +41,7 @@ RSpec.describe HistoryHelper do
 
   context 'with 1, 2, 1' do
     it 'can group the allocations correctly' do
-      list = HistoryHelper::AllocationList.new([current_allocation, middle_allocation1, middle_allocation2, old_allocation])
+      list = AllocationList.new([current_allocation, middle_allocation1, middle_allocation2, old_allocation])
 
       expect(list.map { |prison, allocations| [prison, allocations.count] }).to eq [["LEI", 1], ["PVI", 2], ["LEI", 1]]
     end
@@ -49,7 +49,7 @@ RSpec.describe HistoryHelper do
 
   context 'with nil prison at the start of the list' do
     it 'copes' do
-      list = HistoryHelper::AllocationList.new([nil_allocation, current_allocation, middle_allocation1, middle_allocation2])
+      list = AllocationList.new([nil_allocation, current_allocation, middle_allocation1, middle_allocation2])
 
       expect(list.map { |prison, allocations| [prison, allocations.count] }).to eq [["LEI", 2], ["PVI", 2]]
     end

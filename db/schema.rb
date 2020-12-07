@@ -120,6 +120,8 @@ ActiveRecord::Schema.define(version: 2020_12_08_130833) do
     t.string "name", null: false
     t.string "email", null: false
     t.string "event", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "flipflop_features", force: :cascade do |t|

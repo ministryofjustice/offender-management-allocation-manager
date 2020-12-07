@@ -31,6 +31,7 @@ class EarlyAllocationsController < PrisonsApplicationController
   end
 
   # record a community decision (changing 'maybe' into a yes or a no)
+  # can only be performed on the last early allocation record
   def edit
     @early_assignment = EarlyAllocation.where(offender_id_from_url).last
   end
