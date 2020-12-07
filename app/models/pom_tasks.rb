@@ -23,13 +23,13 @@ class PomTasks
     tasks = [
       parole_review_date_task(offender),
       missing_info_task(offender)
-    ]
+    ].compact
 
     if early_allocations.include?(offender.offender_no)
       tasks << early_allocation_update_task(offender)
     end
 
-    tasks.compact
+    tasks
   end
 
   def parole_review_date_task(offender)
