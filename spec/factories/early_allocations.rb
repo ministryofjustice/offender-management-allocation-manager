@@ -18,11 +18,9 @@ FactoryBot.define do
     association :case_information
 
     trait :discretionary do
-      cppc_case do false end
-      extremism_separation do
-        false
-      end
-      high_risk_of_serious_harm do false end
+      cppc_case { false }
+      extremism_separation { false }
+      high_risk_of_serious_harm { false }
       mappa_level_2 do false end
       pathfinder_process do false end
       other_reason do true end
@@ -32,14 +30,13 @@ FactoryBot.define do
     end
 
     trait :ineligible do
-      cppc_case do false end
-      extremism_separation do
-        false
-      end
-      high_risk_of_serious_harm do false end
-      mappa_level_2 do false end
-      pathfinder_process do false end
+      cppc_case { false }
+      extremism_separation { false }
+      high_risk_of_serious_harm { false }
+      mappa_level_2 { false }
+      pathfinder_process { false }
       other_reason { false }
+      stage2_validation { true }
     end
 
     trait :stage2 do
@@ -53,10 +50,6 @@ FactoryBot.define do
       mappa_level_2 do false end
       pathfinder_process do false end
       other_reason { false }
-    end
-
-    trait :skip_validate do
-      to_create { |instance| instance.save(validate: false) }
     end
   end
 end
