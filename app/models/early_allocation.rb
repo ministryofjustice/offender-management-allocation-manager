@@ -1,12 +1,16 @@
 # frozen_string_literal: true
 
 class EarlyAllocation < ApplicationRecord
+  before_validation :record_outcome
+
   belongs_to :case_information,
              primary_key: :nomis_offender_id,
              foreign_key: :nomis_offender_id,
              inverse_of: :early_allocations
 
   validates_presence_of :prison, :created_by_firstname, :created_by_lastname
+
+  validates_inclusion_of :outcome, in: %w(eligible ineligible discretionary)
 
   validates :oasys_risk_assessment_date,
             presence: true,
@@ -116,5 +120,12 @@ private
 
   def all_stage2_false?
     STAGE2_PLAIN_BOOLEAN_FIELDS.map(&method(:public_send)).none?
+  end
+
+  def record_outcome
+    return self.outcome = 'eligible' if eligible?
+    return self.outcome = 'ineligible' if ineligible?
+
+    self.outcome = 'discretionary' if discretionary?
   end
 end
