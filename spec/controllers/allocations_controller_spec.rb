@@ -114,17 +114,19 @@ RSpec.describe AllocationsController, :allocation, type: :controller do
         end
       end
 
-      context 'when DeliusDataJob has updated the COM name', :disable_push_to_delius do
-        # set DOB to 8 stars so that Delius matching ignores DoB
-        let!(:d1) { create(:delius_data, date_of_birth: '*' * 8, offender_manager: 'Mr Todd', noms_no: offender_no) }
+      context 'when COM name has been updated by nDelius', :disable_push_to_delius do
         let(:create_time) { 3.days.ago }
         let(:create_date) { create_time.to_date }
         let(:yesterday) { 1.day.ago.to_date }
 
+        before do
+          stub_community_offender(offender_no, build(:community_data))
+        end
+
         context 'when create, delius, update' do
           before do
             x = create(:allocation, primary_pom_nomis_id: poms.first.staffId, allocated_at_tier: 'C',
-                       nomis_offender_id: d1.noms_no,
+                       nomis_offender_id: offender_no,
                        created_at: create_time,
                        updated_at: create_time)
             Timecop.travel 2.days.ago do
@@ -136,8 +138,10 @@ RSpec.describe AllocationsController, :allocation, type: :controller do
             end
           end
 
+          # This is now an impossible scenario due to moving the COM name to CaseInformation
+          # but we need to keep this test for now as we might have historical broken data
           it 'doesnt mess up the allocation history updated_at because we surface the value' do
-            get :history, params: { prison_id: prison, nomis_offender_id: d1.noms_no }
+            get :history, params: { prison_id: prison, nomis_offender_id: offender_no }
             history = assigns(:history)
             expect(history.size).to eq(2)
             expect(history.first.prison).to eq 'LEI'
@@ -148,7 +152,7 @@ RSpec.describe AllocationsController, :allocation, type: :controller do
         context 'when delius updated' do
           before do
             create(:allocation, primary_pom_nomis_id: 1, allocated_at_tier: 'C',
-                   nomis_offender_id: d1.noms_no,
+                   nomis_offender_id: offender_no,
                    created_at: create_time,
                    updated_at: create_time)
             Timecop.travel 2.days.ago do
@@ -160,7 +164,7 @@ RSpec.describe AllocationsController, :allocation, type: :controller do
           end
 
           it 'shows the correct date on the show page' do
-            get :show, params: { prison_id: prison, nomis_offender_id: d1.noms_no }
+            get :show, params: { prison_id: prison, nomis_offender_id: offender_no }
             alloc = assigns(:allocation)
             expect(alloc.created_at.to_date).to eq(create_date)
           end

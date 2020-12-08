@@ -3,14 +3,6 @@ module CaseInformationHelper
     ERROR_MESSAGES.fetch(error_type)
   end
 
-  def prisoner_crn_display(prisoner, delius_data)
-    if delius_data.size > 1
-      delius_data.map(&:crn).map { |c| h(c) }.join('<br/>').html_safe
-    else
-      prisoner.crn
-    end
-  end
-
 private
 
   ERROR_MESSAGES = {

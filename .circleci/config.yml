@@ -287,6 +287,7 @@ jobs:
           name: Deploy to staging
           command: |
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/cron-*.yaml
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/community-api-import.yaml
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/deployment.yaml
             kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
             kubectl apply --record=false -f ./deploy/staging
@@ -329,6 +330,7 @@ jobs:
           name: Deploy to pre-production
           command: |
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/cron-*.yaml
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/community-api-import.yaml
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/deployment.yaml
             kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
             kubectl apply --record=false -f ./deploy/preprod

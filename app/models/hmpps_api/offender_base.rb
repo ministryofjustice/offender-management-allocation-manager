@@ -12,13 +12,15 @@ module HmppsApi
              to: :@sentence_type
 
     delegate :tier, :case_allocation, :crn, :mappa_level, :manual_entry?,
-             :parole_review_date, :victim_liaison_officers,
+             :parole_review_date, :victim_liaison_officers, :updated_at,
              to: :@case_information, allow_nil: true
 
     attr_accessor :category_code, :date_of_birth, :prison_arrival_date, :sentence, :allocated_pom_name
 
     attr_reader :first_name, :last_name, :booking_id, :offender_no, :sentence_type
 
+    # This is needed (sadly) because although when querying by prison these are filtered out,
+    # we can query directly (we might have a CaseInformation record) where we don't filter.
     def convicted?
       @convicted_status == 'Convicted'
     end
