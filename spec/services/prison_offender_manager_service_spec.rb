@@ -10,20 +10,14 @@ describe PrisonOffenderManagerService do
 
   context 'when using T3 and VCR' do
     describe '#get_pom_name' do
-      it "can get staff names",
-         vcr: { cassette_name: :pom_service_staff_name } do
-        fname, lname = described_class.get_pom_name(staff_id)
-        expect(fname).to eq('ANDRIEN')
-        expect(lname).to eq('RICKETTS')
+      it "can get staff names", vcr: { cassette_name: :pom_service_staff_name } do
+        expect(described_class.get_pom_name(staff_id)). to eq ['ANDRIEN', 'RICKETTS']
       end
     end
 
     describe '#get_user_name' do
-      it "can get user names",
-         vcr: { cassette_name: :pom_service_user_name } do
-        fname, lname = described_class.get_user_name('RJONES')
-        expect(fname).to eq('ROSS')
-        expect(lname).to eq('JONES')
+      it "can get user names", vcr: { cassette_name: :pom_service_user_name } do
+        expect(described_class.get_user_name('RJONES')).to eq ['Ross', 'Jones']
       end
     end
 
@@ -34,8 +28,7 @@ describe PrisonOffenderManagerService do
 
       let(:moic_integration_tests) { subject.detect { |x| x.first_name == 'MOIC' } }
 
-      it "can get a list of POMs",
-         vcr: { cassette_name: :pom_service_get_poms_list } do
+      it "can get a list of POMs", vcr: { cassette_name: :pom_service_get_poms_list } do
         expect(subject).to be_kind_of(Enumerable)
         expect(subject.count { |pom| pom.status == 'active' }).to eq(subject.count)
         expect(moic_integration_tests.probation_officer?).to eq(true)
