@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class EarlyAllocation < ApplicationRecord
-  before_validation :record_outcome
+  before_save :record_outcome
 
   belongs_to :case_information,
              primary_key: :nomis_offender_id,
@@ -9,8 +9,6 @@ class EarlyAllocation < ApplicationRecord
              inverse_of: :early_allocations
 
   validates_presence_of :prison, :created_by_firstname, :created_by_lastname
-
-  validates_inclusion_of :outcome, in: %w(eligible ineligible discretionary)
 
   validates :oasys_risk_assessment_date,
             presence: true,
@@ -126,6 +124,6 @@ private
     return self.outcome = 'eligible' if eligible?
     return self.outcome = 'ineligible' if ineligible?
 
-    self.outcome = 'discretionary' if discretionary?
+    self.outcome = 'discretionary'
   end
 end

@@ -14,7 +14,6 @@ FactoryBot.define do
     mappa_level_3 { false }
     cppc_case { true }
     stage2_validation { false }
-    outcome { 'eligible' }
 
     association :case_information
 
@@ -28,7 +27,6 @@ FactoryBot.define do
       reason do 'Just a reason' end
       approved do true end
       stage3_validation { true }
-      outcome { 'discretionary' }
     end
 
     trait :ineligible do
@@ -39,7 +37,6 @@ FactoryBot.define do
       pathfinder_process { false }
       other_reason { false }
       stage2_validation { true }
-      outcome { 'ineligible' }
     end
 
     trait :stage2 do
