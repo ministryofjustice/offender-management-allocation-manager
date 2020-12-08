@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class EarlyAllocation < ApplicationRecord
+  before_save :record_outcome
+
   belongs_to :case_information,
              primary_key: :nomis_offender_id,
              foreign_key: :nomis_offender_id,
@@ -116,5 +118,12 @@ private
 
   def all_stage2_false?
     STAGE2_PLAIN_BOOLEAN_FIELDS.map(&method(:public_send)).none?
+  end
+
+  def record_outcome
+    return self.outcome = 'eligible' if eligible?
+    return self.outcome = 'ineligible' if ineligible?
+
+    self.outcome = 'discretionary'
   end
 end
