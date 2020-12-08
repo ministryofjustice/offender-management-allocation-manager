@@ -137,8 +137,8 @@ RSpec.describe EarlyAllocation, type: :model do
       create(:early_allocation, :discretionary, created_within_referral_window: true)
       create(:early_allocation, created_within_referral_window: true)
 
-      expect(described_class.suitable_offenders_pre_referral_window).to match_array([discretionary_outside_referral.nomis_offender_id,
-                                                                                     eligible_outside_referral.nomis_offender_id])
+      expect(described_class.suitable_offenders_pre_referral_window).to match_array([discretionary_outside_referral,
+                                                                                     eligible_outside_referral])
     end
   end
 end

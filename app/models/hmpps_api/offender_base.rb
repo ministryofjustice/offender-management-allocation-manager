@@ -46,8 +46,11 @@ module HmppsApi
     def early_allocation?
       return false if @case_information.blank?
 
-      early_allocation = @case_information.latest_early_allocation
-      early_allocation.present? && early_allocation.created_within_referral_window? && (early_allocation.eligible? || early_allocation.community_decision?)
+      early_allocation.present?
+    end
+
+    def needs_early_allocation_notify?
+      has_case_information? && within_early_allocation_window? && @case_information.early_allocations.suitable_offenders_pre_referral_window.any?
     end
 
     # Has a CaseInformation record been loaded for this offender?
@@ -221,6 +224,11 @@ module HmppsApi
                     else
                       HandoverDateService::NO_HANDOVER_DATE
                     end
+    end
+
+    def early_allocation
+      allocation = @case_information&.latest_early_allocation
+      allocation if allocation.present? && (allocation.created_within_referral_window? && allocation.eligible? || allocation.community_decision?)
     end
   end
 end

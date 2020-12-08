@@ -5,6 +5,7 @@ class OffenderPresenter
            :indeterminate_sentence?, :describe_sentence,
            :full_name_ordered, :full_name, :main_offence,
            :sentence_start_date, :team_name, :prison_id,
+           :needs_early_allocation_notify?,
            :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date,
            :tariff_date, :responsibility_override?,
            :date_of_birth, :release_date, :parole_eligibility_date,

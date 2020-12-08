@@ -22,7 +22,7 @@ class EarlyAllocation < ApplicationRecord
   # nomis_offender_ids of offenders who have assessments completed before 18 months prior to their release date, where
   # the assessment outcomes are 'discretionary' or 'eligible'
   scope :suitable_offenders_pre_referral_window, -> {
-    where(created_within_referral_window: false).where.not(outcome: 'ineligible').pluck(:nomis_offender_id).uniq
+    where(created_within_referral_window: false).where.not(outcome: 'ineligible')
   }
 
   STAGE1_BOOLEAN_FIELDS = [:convicted_under_terrorisom_act_2000,
