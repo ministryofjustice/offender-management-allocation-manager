@@ -1,26 +1,26 @@
 module EarlyAssignmentPdfHelper
-  def render_early_alloc_pdf(early_assignment:, offender:, allocation:, pom:)
+  def render_early_alloc_pdf(early_allocation:, offender:, allocation:, pom:)
     # prawn_document can only be called in an actual view context.
     Prawn::Document.new do |pdf|
       setup_font(pdf)
 
-      add_document_header(pdf, early_assignment)
+      add_document_header(pdf, early_allocation)
       add_prisoner_info(pdf, offender)
       add_offence_info(pdf, offender)
       add_prison_info(pdf, offender, allocation, pom)
 
       pdf.start_new_page
-      add_document_header(pdf, early_assignment)
-      add_assessment_info(pdf, early_assignment)
+      add_document_header(pdf, early_allocation)
+      add_assessment_info(pdf, early_allocation)
 
       # 3rd page - only used for discretionary cases
-      if early_assignment.discretionary?
+      if early_allocation.discretionary?
         pdf.start_new_page
-        add_document_header(pdf, early_assignment)
+        add_document_header(pdf, early_allocation)
 
         extra_detail = {
-          reason: early_assignment.reason,
-          approved: humanized_bool(early_assignment.approved)
+          reason: early_allocation.reason,
+          approved: humanized_bool(early_allocation.approved)
         }
 
         pdf_table pdf, nil, extra_detail
@@ -30,10 +30,10 @@ module EarlyAssignmentPdfHelper
     end
   end
 
-  def extremism_text_for(early_assignment)
-    yesno_text = humanized_bool(early_assignment.extremism_separation)
-    if early_assignment.extremism_separation?
-      if early_assignment.due_for_release_in_less_than_24months?
+  def extremism_text_for(early_allocation)
+    yesno_text = humanized_bool(early_allocation.extremism_separation)
+    if early_allocation.extremism_separation?
+      if early_allocation.due_for_release_in_less_than_24months?
         "#{yesno_text} - due for release in less than 24 months"
       else
         "#{yesno_text} - not due for release until more than 24 months"
@@ -71,23 +71,23 @@ private
     approved: 'Approval from the Head of Offender Management Delivery'
   }.freeze
 
-  def add_assessment_info(pdf, early_assignment)
+  def add_assessment_info(pdf, early_allocation)
     info_hash = {}
     [:oasys_risk_assessment_date].each do |field|
-      info_hash[field] = format_date(early_assignment.public_send(field))
+      info_hash[field] = format_date(early_allocation.public_send(field))
     end
     [:convicted_under_terrorisom_act_2000, :high_profile, :serious_crime_prevention_order,
      :mappa_level_3, :cppc_case].each do |field|
-      info_hash[field] = humanized_bool(early_assignment.public_send(field))
+      info_hash[field] = humanized_bool(early_allocation.public_send(field))
     end
 
     # With booleans, #nil? is not the opposite of #present?
-    unless early_assignment.extremism_separation.nil?
-      info_hash[:extremism_separation] = extremism_text_for(early_assignment)
+    unless early_allocation.extremism_separation.nil?
+      info_hash[:extremism_separation] = extremism_text_for(early_allocation)
     end
 
     [:high_risk_of_serious_harm, :mappa_level_2, :pathfinder_process, :other_reason].each do |field|
-      value = early_assignment.public_send(field)
+      value = early_allocation.public_send(field)
       unless value.nil?
         info_hash[field] = humanized_bool(value)
       end

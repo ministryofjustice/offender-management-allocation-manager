@@ -3,8 +3,8 @@
 <% end %>
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-<%= form_for @early_assignment,
-             url: prison_prisoner_latest_early_allocation_path(@prison.code, @early_assignment.nomis_offender_id),
+<%= form_for @early_allocation,
+             url: prison_prisoner_latest_early_allocation_path(@prison.code, @early_allocation.nomis_offender_id),
              method: :put,
              builder: GOVUKDesignSystemFormBuilder::FormBuilder do |form| %>
   <%= form.govuk_error_summary %>
@@ -14,7 +14,7 @@
   <%= render partial: "community_decision_field", locals: { form: form,
                                                  heading_text: "What decision did the community probation team make?",
                                                  hint_text: "",
-                                                 errors: @early_assignment.errors,
+                                                 errors: @early_allocation.errors,
                                                  fieldname: :community_decision} %>
   <%= form.submit 'Save', role: "button", draggable: "false", class: "govuk-button" %>
 <% end %>

@@ -21,9 +21,9 @@
           </thead>
           <tbody class="govuk-table__body">
           <tr class="govuk-table__row">
-            <td id="assessment-date" class="govuk-table__cell"><%= format_date(@early_assignment.assessment_date) %></td>
-            <td id="outcome" class="govuk-table__cell"><%= early_allocation_long_outcome(@early_assignment) %></td>
-            <td id="pom-name" class="govuk-table__cell"><%= pom_full_name(@early_assignment) %></td>
+            <td id="assessment-date" class="govuk-table__cell"><%= format_date(@early_allocation.assessment_date) %></td>
+            <td id="outcome" class="govuk-table__cell"><%= early_allocation_long_outcome(@early_allocation) %></td>
+            <td id="pom-name" class="govuk-table__cell"><%= pom_full_name(@early_allocation) %></td>
           </tr>
           </tbody>
         </table>
@@ -36,11 +36,11 @@
             </dt>
 
             <dd class="govuk-summary-list__value">
-              <%= format_date(@early_assignment.oasys_risk_assessment_date) %>
+              <%= format_date(@early_allocation.oasys_risk_assessment_date) %>
             </dd>
           </div>
           <% EarlyAllocationHelper::DESCRIPTIONS.each do |field_name, description| %>
-            <% field = @early_assignment.public_send(field_name) %>
+            <% field = @early_allocation.public_send(field_name) %>
             <% if field.in? [true, false] %>
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">
@@ -53,14 +53,14 @@
               </div>
             <% end %>
           <% end %>
-          <% if @early_assignment.discretionary? %>
+          <% if @early_allocation.discretionary? %>
             <div class="govuk-summary-list__row">
               <dt class="govuk-summary-list__key">
                 Approval from the Head of Offender Management Delivery
               </dt>
 
               <dd class="govuk-summary-list__value">
-                <%= humanized_bool(@early_assignment.approved) %>
+                <%= humanized_bool(@early_allocation.approved) %>
               </dd>
             </div>
             <div class="govuk-summary-list__row">
@@ -69,7 +69,7 @@
               </dt>
 
               <dd class="govuk-summary-list__value">
-                <%= @early_assignment.reason %>
+                <%= @early_allocation.reason %>
               </dd>
             </div>
           <% end %>

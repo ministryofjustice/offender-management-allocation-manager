@@ -100,12 +100,12 @@ feature "early allocation", :allocation, type: :feature do
           end
         end
 
-        context 'when doing stage1 happy path' do
+        context 'when doing eligible happy path' do
           before do
-            stage1_eligible_answers
+            eligible_eligible_answers
           end
 
-          scenario 'stage1 happy path' do
+          scenario 'eligible happy path' do
             expect {
               displays_prisoner_information_in_side_panel
               click_button 'Continue'
@@ -140,7 +140,7 @@ feature "early allocation", :allocation, type: :feature do
 
         context 'with stage 2 questions' do
           before do
-            stage1_stage2_answers
+            eligible_discretionary_answers
             displays_prisoner_information_in_side_panel
             click_button 'Continue'
             # make sure that we are displaying stage 2 questions before continuing
@@ -154,8 +154,6 @@ feature "early allocation", :allocation, type: :feature do
             expect(page).to have_css('.govuk-error-summary')
 
             within '.govuk-error-summary' do
-              expect(page).to have_text 'You must say if this is a MAPPA level 2 case'
-
               expect(all('li').map(&:text)).
                 to match_array([
                           "You must say if this prisoner has been in an extremism separation centre",
@@ -170,7 +168,7 @@ feature "early allocation", :allocation, type: :feature do
 
           context 'with discretionary path' do
             before do
-              discretionary_stage2_answers
+              discretionary_discretionary_answers
               click_button 'Continue'
               expect(page).not_to have_text 'The community probation team will make a decision'
               displays_prisoner_information_in_side_panel
@@ -179,6 +177,14 @@ feature "early allocation", :allocation, type: :feature do
               click_button 'Continue'
                 # we need to always tick the 'Head of Offender Management' box and fill in the reasons
               expect(page).to have_css('.govuk-error-message')
+              within '.govuk-error-summary' do
+                expect(all('li').map(&:text)).
+                    to match_array([
+                                       "You must give a reason for referring this case",
+                                       "You must say if this referral has been approved",
+                                   ]
+                       )
+              end
 
               expect {
                 complete_form
@@ -249,7 +255,7 @@ feature "early allocation", :allocation, type: :feature do
 
           it 'doesnt send the email' do
             expect {
-              stage1_eligible_answers
+              eligible_eligible_answers
               click_button 'Continue'
               expect(page).to have_text('The community probation team will take responsibility for this case early')
               expect(page).to have_text('The assessment has not been sent to the community probation team')
@@ -269,9 +275,9 @@ feature "early allocation", :allocation, type: :feature do
 
           it 'doesnt send the email' do
             expect {
-              stage1_stage2_answers
+              eligible_discretionary_answers
               click_button 'Continue'
-              discretionary_stage2_answers
+              discretionary_discretionary_answers
               click_button 'Continue'
               complete_form
               expect(page).to have_text('The assessment has not been sent to the community probation team')
@@ -365,13 +371,13 @@ feature "early allocation", :allocation, type: :feature do
 
         it 'creates a new assessment' do
           expect {
-            stage1_eligible_answers
+            eligible_eligible_answers
             click_button 'Continue'
           }.to change(EarlyAllocation, :count).by(1)
         end
 
-        it 'can do stage2' do
-          stage1_stage2_answers
+        it 'can do discretionary' do
+          eligible_discretionary_answers
           click_button 'Continue'
           expect(page).not_to have_css('.govuk-error-message')
         end
@@ -437,7 +443,7 @@ feature "early allocation", :allocation, type: :feature do
     end
   end
 
-  def stage1_eligible_answers
+  def eligible_eligible_answers
     fill_in id: 'early_allocation_oasys_risk_assessment_date_3i', with: valid_date.day
     fill_in id: 'early_allocation_oasys_risk_assessment_date_2i', with: valid_date.month
     fill_in id: 'early_allocation_oasys_risk_assessment_date_1i', with: valid_date.year
@@ -449,7 +455,7 @@ feature "early allocation", :allocation, type: :feature do
     find('label[for=early-allocation-cppc-case-field]').click
   end
 
-  def stage1_stage2_answers
+  def eligible_discretionary_answers
     fill_in id: 'early_allocation_oasys_risk_assessment_date_3i', with: valid_date.day
     fill_in id: 'early_allocation_oasys_risk_assessment_date_2i', with: valid_date.month
     fill_in id: 'early_allocation_oasys_risk_assessment_date_1i', with: valid_date.year
@@ -461,7 +467,7 @@ feature "early allocation", :allocation, type: :feature do
     find('label[for=early-allocation-cppc-case-field]').click
   end
 
-  def discretionary_stage2_answers
+  def discretionary_discretionary_answers
     find('label[for=early-allocation-extremism-separation-field]').click
     find('label[for=early-allocation-high-risk-of-serious-harm-field]').click
     find('label[for=early-allocation-mappa-level-2-field]').click
