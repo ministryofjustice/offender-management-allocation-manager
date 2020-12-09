@@ -1,5 +1,9 @@
 <% content_for :switcher do %>
   <%= render '/layouts/prison_switcher' %>
 <% end %>
-
-<%= render 'stage2', form_method: :post %>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+  <%= render 'stage2', form_method: :post %>
+  </div>
+  <%= render(partial: 'prisoner_info_sidebar') %>
+</div>
