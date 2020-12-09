@@ -21,11 +21,13 @@ Rails.application.routes.draw do
         get('image' => 'prisoners#image', as: 'image')
       end
 
-      resource :early_allocations, only: [:new, :create] do
-        post('discretionary')
+      resources :early_allocations, only: [:new, :index, :show] do
+        collection do
+          post 'eligible'
+          post 'discretionary'
+          post 'confirm_with_reason'
+        end
       end
-
-      resources :early_allocations, only: [:index, :show]
 
       # edit action always updates the most recent assessment
       # uses `as: :latest_early_allocation` to avoid clashes with `resources :early_allocations` above

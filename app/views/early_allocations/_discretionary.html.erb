@@ -1,15 +1,15 @@
-<%= form_for(@early_assignment,
-             url: prison_prisoner_early_allocations_path(@prison.code, @early_assignment.nomis_offender_id),
+<%= form_for(@early_allocation,
+             as: :early_allocation,
+             url: discretionary_prison_prisoner_early_allocations_path(@prison.code, @early_allocation.nomis_offender_id),
              method: form_method,
              builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |form| %>
   <%= form.govuk_error_summary %>
 
   <h1 class="govuk-heading-l govuk-!-margin-top-4">Assessment for early allocation to the community probation team</h1>
 
-  <% EarlyAllocation::STAGE1_FIELDS.each do |field| %>
+  <% EarlyAllocation::ELIGIBLE_FIELDS.each do |field| %>
     <%= form.hidden_field(field) %>
   <% end %>
-  <%= form.hidden_field(:stage2_validation, value: true) %>
 
   <%= form.govuk_radio_buttons_fieldset :extremism_separation,
                                         hint: { text: 'Extremism separation centres contain prisoners involved in planning terrorism or considered to pose a risk to national security.' },

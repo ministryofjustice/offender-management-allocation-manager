@@ -7,7 +7,7 @@ RSpec.describe "early_allocations/show", type: :view do
     assign(:case_information, build(:case_information))
     assign(:offender, build(:offender, sentence: attributes_for(:sentence_detail)))
 
-    assign(:early_assignment, early_allocation)
+    assign(:early_allocation, early_allocation)
     assign(:referrer, referrer)
     render
   end

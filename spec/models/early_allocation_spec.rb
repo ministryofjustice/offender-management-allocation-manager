@@ -8,7 +8,7 @@ RSpec.describe EarlyAllocation, type: :model do
   end
 
   context 'when oasys date more than 2 years adrift' do
-    let(:ea) { build(:early_allocation, oasys_risk_assessment_date: Time.zone.today - 3.years) }
+    let(:ea) { build(:early_allocation_eligible_form, oasys_risk_assessment_date: Time.zone.today - 3.years) }
 
     it 'validates' do
       expect(ea).not_to be_valid
@@ -17,7 +17,7 @@ RSpec.describe EarlyAllocation, type: :model do
   end
 
   context 'when in the future' do
-    let(:ea) { build(:early_allocation, oasys_risk_assessment_date: Time.zone.today + 3.years) }
+    let(:ea) { build(:early_allocation_eligible_form, oasys_risk_assessment_date: Time.zone.today + 3.years) }
 
     it 'validates' do
       expect(ea).not_to be_valid
@@ -25,15 +25,15 @@ RSpec.describe EarlyAllocation, type: :model do
     end
   end
 
-  it 'validates stage2 fields when stage1 is complete' do
-    expect(build(:early_allocation, stage2_validation: true)).not_to be_valid
+  it 'validates discretionary fields when eligible is complete' do
+    expect(build(:early_allocation_discretionary_form)).not_to be_valid
 
-    expect(build(:early_allocation, :stage2)).to be_valid
+    expect(build(:early_allocation_discretionary_form, :discretionary)).to be_valid
   end
 
   context 'when extremism seperation is true' do
     subject {
-      build(:early_allocation, :stage2, extremism_separation: true, due_for_release_in_less_than_24months: twenty_four_flag)
+      build(:early_allocation_discretionary_form, :discretionary, extremism_separation: true, due_for_release_in_less_than_24months: twenty_four_flag)
     }
 
     context 'when not set' do
@@ -61,9 +61,9 @@ RSpec.describe EarlyAllocation, type: :model do
     end
   end
 
-  context 'when extremism seperatikon is not set' do
+  context 'when extremism seperation is not set' do
     subject {
-      build(:early_allocation, stage2_validation: true)
+      build(:early_allocation_discretionary_form)
     }
 
     it 'is doesnt validate due_for_release_in_less_than_24months' do
@@ -73,16 +73,16 @@ RSpec.describe EarlyAllocation, type: :model do
     end
   end
 
-  it 'validates stage2 attributes' do
-    expect(build(:early_allocation, :stage2)).to be_valid
+  it 'validates discretionary attributes' do
+    expect(build(:early_allocation, :discretionary)).to be_valid
   end
 
   describe '#eligible?' do
-    it 'is not eligible (actually unsure) if all of the stage1 booleans are false' do
+    it 'is not eligible (actually unsure) if all of the eligible booleans are false' do
       expect(build(:early_allocation, :discretionary).eligible?).to eq(false)
     end
 
-    it 'is eligible if any stage1 boolean is true' do
+    it 'is eligible if any eligible boolean is true' do
       expect(build(:early_allocation, convicted_under_terrorisom_act_2000: true).eligible?).to eq(true)
     end
   end
@@ -91,7 +91,7 @@ RSpec.describe EarlyAllocation, type: :model do
     context 'when eligible (default)' do
       subject { build(:early_allocation).ineligible? }
 
-      it 'is not ineligible (actually unsure) if all of the stage1 booleans are false' do
+      it 'is not ineligible (actually unsure) if all of the eligible booleans are false' do
         expect(subject).to eq(false)
       end
     end

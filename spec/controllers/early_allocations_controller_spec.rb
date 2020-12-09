@@ -77,7 +77,7 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
           it 'shows the record specified in :id param' do
             early_allocations.each do |record|
               get :show, params: { prison_id: prison, prisoner_id: nomis_offender_id, id: record.id }, format: :html
-              expect(assigns(:early_assignment)).to eq(record)
+              expect(assigns(:early_allocation)).to eq(record)
             end
           end
 
@@ -103,6 +103,8 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
     end
 
     describe '#update' do
+      let(:early_allocation) { assigns(:early_allocation) }
+
       it 'updates the updated_by_ fields' do
         put :update, params: { prison_id: prison, prisoner_id: nomis_offender_id }
         expect(early_allocation.updated_by_firstname).to eq(first_pom.firstName)
@@ -137,7 +139,7 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
     end
 
     context 'when stage 1' do
-      let(:stage1_params) {
+      let(:eligible_params) {
         { "oasys_risk_assessment_date(3i)" => valid_date.day,
           "oasys_risk_assessment_date(2i)" => valid_date.month,
           "oasys_risk_assessment_date(1i)" => valid_date.year
@@ -149,10 +151,10 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
         let(:release_date) { Time.zone.today + 19.months }
 
         it 'stores false in created_within_referral_window' do
-          post :create, params: { prison_id: prison,
+          post :eligible, params: { prison_id: prison,
                                   prisoner_id: nomis_offender_id,
-                                  early_allocation: stage1_params.merge(high_profile: true) }
-          assert_template('eligible')
+                                  early_allocation: eligible_params.merge(high_profile: true) }
+          assert_template('landing_eligible')
           expect(early_allocation.created_within_referral_window).to eq(false)
         end
       end
@@ -164,11 +166,11 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
           scenario 'declares assessment complete and eligible' do
             s1_boolean_param_names.each do |field|
               expect {
-                post :create, params: { prison_id: prison,
+                post :eligible, params: { prison_id: prison,
                                         prisoner_id: nomis_offender_id,
-                                        early_allocation: stage1_params.merge(field => true) }
+                                        early_allocation: eligible_params.merge(field => true) }
               }.to change(EmailHistory, :count).by(1)
-              assert_template('eligible')
+              assert_template('landing_eligible')
 
               expect(early_allocation.prison).to eq(prison)
               expect(early_allocation.created_by_firstname).to eq(first_pom.firstName)
@@ -181,10 +183,10 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
         context 'when no booleans true' do
           render_views
           it 'renders the second screen of questions' do
-            post :create, params: { prison_id: prison,
+            post :eligible, params: { prison_id: prison,
                                     prisoner_id: nomis_offender_id,
-                                    early_allocation: stage1_params }
-            assert_template('stage2')
+                                    early_allocation: eligible_params }
+            assert_template('discretionary')
             expect(response.body).to include('Extremism separation centres')
           end
         end
@@ -205,17 +207,16 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
       let(:s2_boolean_params) { s2_boolean_param_names.index_with { |_p| 'false' }.to_h }
 
       it 'is ineligible if <24 months is false but extremism_separation is true' do
-        post :create, params: {
+        post :discretionary, params: {
           prison_id: prison,
           prisoner_id: nomis_offender_id,
           early_allocation: {
             oasys_risk_assessment_date: valid_date,
-            extremism_separation: true,
-            stage2_validation: true
+            extremism_separation: true
           }.merge(s1_boolean_params).merge(s2_boolean_params)
         }
 
-        assert_template 'ineligible'
+        assert_template 'landing_ineligible'
       end
     end
   end
