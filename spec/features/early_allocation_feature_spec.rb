@@ -11,6 +11,7 @@ feature "early allocation", :allocation, type: :feature do
   let(:nomis_offender) { build(:nomis_offender, firstName: first_name, lastName: last_name, dateOfBirth: date_of_birth, offenderNo: nomis_offender_num, sentence: attributes_for(:sentence_detail, conditionalReleaseDate: release_date)) }
   let(:nomis_offender_id) { nomis_offender.fetch(:offenderNo) }
   let(:pom) { build(:pom, staffId: nomis_staff_id) }
+  let(:test_strategy) { Flipflop::FeatureSet.current.test! }
   let(:first_name) { 'John' }
   let(:last_name) { 'Smith' }
   let(:date_of_birth) { Date.new(1980, 1, 6).to_s }
@@ -38,8 +39,12 @@ feature "early allocation", :allocation, type: :feature do
     expect(page).to have_content("Showing 1 - 1 of 1 results")
   end
 
-  context 'without switch' do
+  context 'with switch set false' do
     let(:release_date) { Time.zone.today }
+
+    before do
+      test_strategy.switch!(:early_allocation, false)
+    end
 
     it 'does not show the section' do
       click_link "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}"
@@ -48,8 +53,6 @@ feature "early allocation", :allocation, type: :feature do
   end
 
   context 'with switch' do
-    let(:test_strategy) { Flipflop::FeatureSet.current.test! }
-
     before do
       test_strategy.switch!(:early_allocation, true)
     end

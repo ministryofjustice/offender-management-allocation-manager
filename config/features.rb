@@ -6,6 +6,6 @@ Flipflop.configure do
           default: false,
           description: 'Load case information via nDelius, disable manual editing'
   feature :early_allocation,
-          default: false,
+          default: true,
           description: 'Early Allocation to probation team'
 end
