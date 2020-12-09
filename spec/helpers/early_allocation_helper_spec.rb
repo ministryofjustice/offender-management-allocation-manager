@@ -46,4 +46,62 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
       expect(helper.early_allocation_status(subject)).to eq('Not eligible')
     end
   end
+
+  describe '#early_allocation_long_outcome' do
+    context 'when eligible and unsent' do
+      let(:early_allocation) { build(:early_allocation, :eligible, :unsent) }
+
+      it 'works' do
+        expect(helper.early_allocation_long_outcome(early_allocation)).to eq('Eligible - assessment not sent to the community probation team')
+      end
+    end
+
+    context 'when eligible and sent' do
+      let(:early_allocation) { build(:early_allocation, :eligible) }
+
+      it 'works' do
+        expect(helper.early_allocation_long_outcome(early_allocation)).to eq('Eligible - the community probation team will take responsibility for this case early')
+      end
+    end
+
+    context 'when not eligible' do
+      let(:early_allocation) { build(:early_allocation, :ineligible) }
+
+      it 'works' do
+        expect(helper.early_allocation_long_outcome(early_allocation)).to eq('Not eligible')
+      end
+    end
+
+    context 'when discretionary - not sent' do
+      let(:early_allocation) { build(:early_allocation, :discretionary, :unsent) }
+
+      it 'works' do
+        expect(helper.early_allocation_long_outcome(early_allocation)).to eq('Discretionary - assessment not sent to the community probation team')
+      end
+    end
+
+    context 'when discretionary - sent' do
+      let(:early_allocation) { build(:early_allocation, :discretionary) }
+
+      it 'works' do
+        expect(helper.early_allocation_long_outcome(early_allocation)).to eq('Discretionary - the community probation team will make a decision')
+      end
+    end
+
+    context 'when discretionary - accepted' do
+      let(:early_allocation) { build(:early_allocation, :discretionary, community_decision: true) }
+
+      it 'works' do
+        expect(helper.early_allocation_long_outcome(early_allocation)).to eq('Eligible - the community probation team will take responsibility for this case early')
+      end
+    end
+
+    context 'when discretionary - rejected' do
+      let(:early_allocation) { build(:early_allocation, :discretionary, community_decision: false) }
+
+      it 'works' do
+        expect(helper.early_allocation_long_outcome(early_allocation)).to eq('Not eligible')
+      end
+    end
+  end
 end

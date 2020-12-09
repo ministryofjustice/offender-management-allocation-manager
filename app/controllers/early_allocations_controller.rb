@@ -62,12 +62,14 @@ class EarlyAllocationsController < PrisonsApplicationController
 
   def show
     @early_assignment = EarlyAllocation.where(offender_id_from_url).last
+    @referrer = request.referer
 
     respond_to do |format|
       format.pdf {
         # disposition 'attachment' is the default for send_data
         send_data pdf_as_string
       }
+      format.html
     end
   end
 

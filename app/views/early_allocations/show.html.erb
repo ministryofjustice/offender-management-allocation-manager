@@ -1,0 +1,82 @@
+<div class="govuk-width-container">
+
+  <%= render :partial => "/shared/backlink", :locals => { :page => @referrer || root_path } %>
+
+  <main class="govuk-main-wrapper " id="main-content" role="main">
+    <dl class="govuk-grid-row">
+
+
+      <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">View previous early allocation assessment</h1>
+
+        <h2 class="govuk-heading-m">Summary</h2>
+
+        <table class="govuk-table">
+          <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th id="assessment-date-label" scope="col" class="govuk-table__header app-custom-class">Assessment date</th>
+            <th id="outcome-label" scope="col" class="govuk-table__header app-custom-class">Outcome</th>
+            <th id="pom-name-label" scope="col" class="govuk-table__header app-custom-class">POM name</th>
+          </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+          <tr class="govuk-table__row">
+            <td id="assessment-date" class="govuk-table__cell"><%= format_date(@early_assignment.assessment_date) %></td>
+            <td id="outcome" class="govuk-table__cell"><%= early_allocation_long_outcome(@early_assignment) %></td>
+            <td id="pom-name" class="govuk-table__cell"><%= pom_full_name(@early_assignment) %></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <h2 class="govuk-heading-m">Assessment details</h2>
+        <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Date of last OASys risk assessment
+            </dt>
+
+            <dd class="govuk-summary-list__value">
+              <%= format_date(@early_assignment.oasys_risk_assessment_date) %>
+            </dd>
+          </div>
+          <% EarlyAllocationHelper::DESCRIPTIONS.each do |field_name, description| %>
+            <% field = @early_assignment.public_send(field_name) %>
+            <% if field.in? [true, false] %>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  <%= description %>
+                </dt>
+
+                <dd class="govuk-summary-list__value">
+                  <%= humanized_bool(field) %>
+                </dd>
+              </div>
+            <% end %>
+          <% end %>
+          <% if @early_assignment.discretionary? %>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Approval from the Head of Offender Management Delivery
+              </dt>
+
+              <dd class="govuk-summary-list__value">
+                <%= humanized_bool(@early_assignment.approved) %>
+              </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Detail about why this case needs to be referred early
+              </dt>
+
+              <dd class="govuk-summary-list__value">
+                <%= @early_assignment.reason %>
+              </dd>
+            </div>
+          <% end %>
+        </dl>
+      </div>
+      <%= render(partial: 'prisoner_info_sidebar') %>
+    </dl>
+  </main>
+</div>
+
