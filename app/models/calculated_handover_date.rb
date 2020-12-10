@@ -27,8 +27,12 @@ class CalculatedHandoverDate < ApplicationRecord
 private
 
   def push_to_delius
-    # Only push if the dates have changed
+    # Don't push if the dates haven't changed
     return unless saved_change_to_start_date? || saved_change_to_handover_date?
+
+    # Don't push if the CaseInformation record is a manual entry (meaning it didn't match against nDelius)
+    # This avoids 404 Not Found errors for offenders who don't exist in nDelius (they could be Scottish, etc.)
+    return if case_information.manual_entry
 
     HmppsApi::CommunityApi.set_handover_dates(
       offender_no: nomis_offender_id,
