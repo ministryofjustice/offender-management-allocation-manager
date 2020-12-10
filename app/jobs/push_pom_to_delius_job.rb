@@ -3,6 +3,9 @@
 class PushPomToDeliusJob < ApplicationJob
   queue_as :default
 
+  # Not much point retrying a 404 error
+  discard_on Faraday::ResourceNotFound
+
   def perform(allocation)
     if allocation.primary_pom_nomis_id.nil?
       HmppsApi::CommunityApi.unset_pom(allocation.nomis_offender_id)
