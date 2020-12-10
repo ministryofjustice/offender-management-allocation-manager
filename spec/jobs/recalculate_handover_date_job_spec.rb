@@ -11,7 +11,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
   context "when the offender exists in both NOMIS and nDelius (happy path)" do
     before do
       stub_offender(nomis_offender)
-      create(:case_information, nomis_offender_id: offender_no, case_allocation: 'NPS')
+      create(:case_information, nomis_offender_id: offender_no, case_allocation: 'NPS', manual_entry: false)
     end
 
     it "recalculates the offender's handover dates" do

@@ -122,38 +122,54 @@ RSpec.describe CalculatedHandoverDate, type: :model do
       create(:calculated_handover_date,
              start_date: today + 1.day,
              handover_date: today + 3.months,
-             reason: 'CRC Case'
+             reason: 'CRC Case',
+             case_information: case_info
       )
     }
 
-    describe 'when the dates have changed' do
-      before do
-        # Change the handover dates
-        subject.assign_attributes(
-          start_date: today + 6.months,
-          handover_date: today + 13.months,
-          reason: 'NPS - MAPPA level unknown'
-        )
+    context 'when the associated CaseInformation record was sourced from nDelius' do
+      # manual_entry false means the record came from nDelius
+      let(:case_info) { create(:case_information, manual_entry: false) }
+
+      context 'when the dates have changed' do
+        before do
+          # Change the handover dates
+          subject.assign_attributes(
+            start_date: today + 6.months,
+            handover_date: today + 13.months,
+            reason: 'NPS - MAPPA level unknown'
+          )
+        end
+
+        it 'pushes them to nDelius' do
+          expect(subject.changed?).to be(true)
+          expect(HmppsApi::CommunityApi).to receive(:set_handover_dates).with(
+            offender_no: subject.nomis_offender_id,
+            handover_start_date: subject.start_date,
+            responsibility_handover_date: subject.handover_date
+          )
+          subject.save!
+        end
       end
 
-      it 'pushes them to nDelius' do
-        expect(subject.changed?).to be(true)
-        expect(HmppsApi::CommunityApi).to receive(:set_handover_dates).with(
-          offender_no: subject.nomis_offender_id,
-          handover_start_date: subject.start_date,
-          responsibility_handover_date: subject.handover_date
-        )
-        subject.save!
+      context "when the dates haven't changed" do
+        before do
+          # Change the reason, but not the dates
+          subject.reason = 'NPS - MAPPA level unknown'
+        end
+
+        it "doesn't push to nDelius" do
+          expect(HmppsApi::CommunityApi).not_to receive(:set_handover_dates)
+          subject.save!
+        end
       end
     end
 
-    describe "when the dates haven't changed" do
-      before do
-        # Change the reason, but not the dates
-        subject.reason = 'NPS - MAPPA level unknown'
-      end
+    context 'when the associated CaseInformation record was a manual entry' do
+      # manual_entry true means the record did not match against nDelius
+      let(:case_info) { create(:case_information, manual_entry: true) }
 
-      it "doesn't push to nDelius" do
+      it "doesn't attempt to push to nDelius (to avoid a 404 Not Found error)" do
         expect(HmppsApi::CommunityApi).not_to receive(:set_handover_dates)
         subject.save!
       end
