@@ -130,10 +130,28 @@ describe HandoverDateService do
     end
 
     context 'with early allocation' do
-      let(:offender) { OpenStruct.new(nps_case?: true, early_allocation?: true, conditional_release_date: Date.new(2021, 6, 2)) }
+      let(:offender) {
+        build(:offender,
+              sentence: build(:sentence_detail,
+                              conditionalReleaseDate: Date.new(2021, 6, 2))).tap { |o|
+          o.load_case_information(case_info)
+        }
+      }
 
-      it 'will be 18 months before CRD' do
-        expect(described_class.handover(offender).start_date).to eq(Date.new(2019, 12, 2))
+      context 'when inside referral window' do
+        let(:case_info) { build(:case_information, early_allocations: [build(:early_allocation, created_within_referral_window: true)]) }
+
+        it 'will be 18 months before CRD' do
+          expect(described_class.handover(offender).start_date).to eq(Date.new(2019, 12, 2))
+        end
+      end
+
+      context 'when outside referral window' do
+        let(:case_info) { build(:case_information, early_allocations: [build(:early_allocation, created_within_referral_window: false)]) }
+
+        it 'will be unaffected' do
+          expect(described_class.handover(offender).start_date).to eq(Date.new(2020, 10, 18))
+        end
       end
     end
   end

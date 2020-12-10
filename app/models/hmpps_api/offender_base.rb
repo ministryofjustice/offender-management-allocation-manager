@@ -47,7 +47,7 @@ module HmppsApi
       return false if @case_information.blank?
 
       early_allocation = @case_information.latest_early_allocation
-      early_allocation.present? && (early_allocation.eligible? || early_allocation.community_decision?)
+      early_allocation.present? && early_allocation.created_within_referral_window? && (early_allocation.eligible? || early_allocation.community_decision?)
     end
 
     # Has a CaseInformation record been loaded for this offender?
