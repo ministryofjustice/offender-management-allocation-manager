@@ -168,7 +168,7 @@ describe MovementService, :allocation do
         expect_any_instance_of(PomMailer)
             .to receive(:offender_deallocated)
                     .with(email: "pom@digital.justice.gov.uk",
-                          pom_name: "MOIC",
+                          pom_name: "Moic",
                           offender_name: "Abbella, Ozullirn",
                           nomis_offender_id: valid_release.offender_no,
                           prison_name: 'HMP Leeds',

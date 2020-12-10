@@ -96,12 +96,12 @@ class AllocationsController < PrisonsApplicationController
   def history
     @prisoner = offender(nomis_offender_id_from_url)
 
-    history = Allocation.find_by(nomis_offender_id: nomis_offender_id_from_url).history
+    allocation = Allocation.find_by!(nomis_offender_id: nomis_offender_id_from_url)
     vlo_history = PaperTrail::Version.
         where(item_type: 'VictimLiaisonOfficer', nomis_offender_id: nomis_offender_id_from_url).map { |vlo_version| VloHistory.new(vlo_version) }
-    @history = (history + vlo_history).sort_by(&:created_at)
+    @history = (allocation.history + vlo_history).sort_by(&:created_at)
 
-    @pom_emails = AllocationService.allocation_history_pom_emails(history)
+    @pom_emails = AllocationService.allocation_history_pom_emails(allocation)
   end
 
 private

@@ -87,7 +87,8 @@ class AllocationService
     allocation.get_old_versions.map(&:primary_pom_nomis_id)
   end
 
-  def self.allocation_history_pom_emails(history)
+  def self.allocation_history_pom_emails(allocation)
+    history = allocation.get_old_versions.append(allocation)
     pom_ids = history.map { |h| [h.primary_pom_nomis_id, h.secondary_pom_nomis_id] }.flatten.compact.uniq
 
     pom_ids.index_with { |pom_id| PrisonOffenderManagerService.get_pom_emails(pom_id).first }

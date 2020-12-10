@@ -35,6 +35,7 @@ feature 'View a prisoner profile page', :allocation do
       scenario 'adding a VLO', :js do
         expect(page).to have_content('First Contact')
         click_link 'Add new VLO contact'
+        find('.govuk-back-link')
         click_link 'Back'
         click_link 'Add new VLO contact'
 
