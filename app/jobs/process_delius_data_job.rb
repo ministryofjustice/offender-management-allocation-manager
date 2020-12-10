@@ -27,22 +27,21 @@ private
       return logger.error("[DELIUS] Failed to retrieve NOMIS record #{delius_record.noms_no}")
     end
 
-    process_record(offender, delius_record) if offender.convicted?
+    process_record(delius_record) if offender.convicted?
   end
 
-  def process_record(offender, delius_record)
+  def process_record(delius_record)
     case_information = map_delius_to_case_info(delius_record)
 
-    if case_information.save
-      # Update the offender object with the new Case Information data
-      offender.load_case_information(case_information)
-
-      # Recalculate the offender's handover dates
-      CalculatedHandoverDate.recalculate_for(offender)
-    else
-      case_information.errors.each do |field, _errors|
-        DeliusImportError.create! nomis_offender_id: delius_record.noms_no,
-                                  error_type: error_type(field)
+    if case_information.changed?
+      if case_information.save
+        # Recalculate the offender's handover dates
+        RecalculateHandoverDateJob.perform_later(delius_record.noms_no)
+      else
+        case_information.errors.each do |field, _errors|
+          DeliusImportError.create! nomis_offender_id: delius_record.noms_no,
+                                    error_type: error_type(field)
+        end
       end
     end
   end

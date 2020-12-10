@@ -296,6 +296,12 @@ RSpec.describe ProcessDeliusDataJob, :allocation, :disable_push_to_delius, type:
         }
 
         include_examples 'recalculate handover dates'
+
+        it 'does not re-calculate if CaseInformation is unchanged' do
+          described_class.perform_now offender_no
+          expect(CalculatedHandoverDate).not_to receive(:recalculate_for)
+          described_class.perform_now offender_no
+        end
       end
     end
   end
