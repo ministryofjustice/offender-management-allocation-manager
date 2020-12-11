@@ -147,11 +147,13 @@ SENTENCE_TYPES = {
   'LASPO_AR' => ['EDS LASPO Automatic Release', :determinate],
   'LR_LASPO_AR' => ['LR - EDS LASPO Automatic Release', :determinate],
   'LASPO_DR' => ['EDS LASPO Discretionary Release', :determinate],
-  # 2020 versions of LASPO_DR (4 of)
+  # 2020 versions of LASPO_DR (6 of)
   'LR_EDS18' => ['LR - EDS Sec 266 2020 (18-20)', :determinate],
   'LR_EDS21' => ['LR - EDS Sec 279 2020 (21+)', :determinate],
+  'LR_EDSU18' => ['LR - EDS Sec 254 2020 (U18)', :determinate],
   'EDS18' => ['EDS Sec 266 2020 (18-20)', :determinate],
   'EDS21' => ['EDS Sec 266 2020 (21+)', :determinate],
+  'EDSU18' => ['EDS Sec 254 2020 (U18)', :determinate],
   'LR_LASPO_DR' => ['LR - EDS LASPO Discretionary Release', :determinate],
   'FTR_HDC' => ['Fixed Term Recall while on HDC', :determinate],
   'LR_MLP' => ['Recall to Custody Mandatory Life', :indeterminate],
