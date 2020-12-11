@@ -8,7 +8,7 @@ module HmppsApi
       def self.staff_detail(staff_id)
         route = "/staff/#{staff_id}"
         data = client.get(route)
-        api_deserialiser.deserialise(HmppsApi::StaffDetails, data)
+        HmppsApi::StaffDetails.from_json(data)
       end
 
       def self.list(prison)

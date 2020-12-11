@@ -41,8 +41,7 @@ module HmppsApi
           nil
         else
           recall_data = get_recall_flags([url_offender_no])
-          api_deserialiser.deserialise(HmppsApi::Offender,
-                                       response.first.merge(recall_data.fetch(url_offender_no))).tap do |offender|
+          HmppsApi::Offender.from_json(response.first.merge(recall_data.fetch(url_offender_no))).tap do |offender|
             sentence_details = get_bulk_sentence_details([offender.booking_id])
             offender.sentence = sentence_details.fetch(offender.booking_id)
             add_arrival_dates([offender])
@@ -72,16 +71,18 @@ module HmppsApi
         route = '/offender-sentences/bookings'
         data = client.post(route, booking_ids, cache: true)
 
-        data.each_with_object({}) { |record, hash|
-          next unless record.key?('bookingId')
+        #booking_ids = data.map { |record| record.fetch('bookingId') }
+        #sentences = data.map { |record| record['sentenceDetail'] }
+        #details = api_deserialiser.deserialise_many(HmppsApi::SentenceDetail, sentences)
+        #
+        #booking_ids.zip(details).map { |id, detail| [id, detail] }.to_h
 
-          oid = record['bookingId']
-
-          hash[oid] = api_deserialiser.deserialise(
-            HmppsApi::SentenceDetail, record['sentenceDetail']
-          )
-          hash
-        }
+        data.map do |record|
+          [
+              record.fetch('bookingId'),
+              HmppsApi::SentenceDetail.from_json(record['sentenceDetail'])
+          ]
+        end.to_h
       end
 
       def self.get_image(booking_id)

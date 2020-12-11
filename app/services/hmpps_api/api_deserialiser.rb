@@ -9,13 +9,5 @@ module HmppsApi
         }
       end
     end
-
-    def deserialise(memory_model_class, payload)
-      # Ask the class to deserialize the payload into an instance if it knows how to,
-      # otherwise will rely on the `public_send` process.
-      if memory_model_class.respond_to?(:from_json)
-        memory_model_class.from_json(payload)
-      end
-    end
   end
 end
