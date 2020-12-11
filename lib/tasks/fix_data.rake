@@ -14,7 +14,7 @@ namespace :fix_data do
         next
       end
 
-      AllocationValidation.new.fixup(prison)
+      AllocationValidation.fixup(prison)
     }
   end
 end

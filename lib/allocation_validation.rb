@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class AllocationValidation
-  def fixup(prison)
+  def self.fixup(prison)
     # Looks for offenders who have an allocation at this prison
     # who are allocated incorrectly because of a release or a transfer.
     #
@@ -23,7 +23,7 @@ class AllocationValidation
       offender = OffenderService.get_offender(allocation.nomis_offender_id)
       if offender.nil?
         puts "Can't find offender #{allocation.nomis_offender_id} - probably merged, deallocating"
-        allocation.deallocate_offender('offender_released')
+        allocation.offender_released
         next
       end
 
@@ -32,7 +32,7 @@ class AllocationValidation
         # be allocated to anybody We will de-allocate the offender so they can
         # be re-allocated against a new offense.
         puts "#{offender.offender_no} is not sentenced - deallocating"
-        allocation.deallocate_offender('offender_released')
+        allocation.offender_released
         next
       end
 
@@ -42,13 +42,13 @@ class AllocationValidation
       # If the offender is out, deallocate as a release
       if offender.prison_id == 'OUT'
         puts "#{offender.offender_no} appears to have been released - deallocating"
-        allocation.deallocate_offender('offender_released')
+        allocation.offender_released
         next
       end
 
       # The offender is at a different prison so deallocate as a transfer
       puts "#{offender.offender_no} (allocated) appears to have been transferred to #{offender.prison_id} - deallocating"
-      allocation.deallocate_offender('offender_transferred')
+      allocation.offender_transferred
     }
   end
 
