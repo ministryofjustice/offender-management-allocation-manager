@@ -6,7 +6,7 @@ class SuitableForEarlyAllocationEmailJob < ApplicationJob
   EQUIP_URL = 'https://equip-portal.rocstac.com/CtrlWebIsapi.dll/?__id=webDiagram.show&map=0%3A9A63E167DE4B400EA07F81A9271E1944&dgm=4F984B45CBC447B1A304B2FFECABB777'
 
   def perform
-    offenders = EarlyAllocation.where(created_within_referral_window: false).where.not(outcome: 'ineligible').pluck(:nomis_offender_id).uniq
+    offenders = EarlyAllocation.suitable_offenders_pre_referral_window
 
     offenders.each do |offender_no|
       allocation = Allocation.where(nomis_offender_id: offender_no).first
@@ -18,10 +18,16 @@ class SuitableForEarlyAllocationEmailJob < ApplicationJob
         EarlyAllocationMailer.review_early_allocation(
           email: pom.email_address,
           prisoner_name: prisoner.full_name,
-          start_page_link: Rails.application.routes.url_helpers.prison_prisoner_early_allocations_path(
+          start_page_link: Rails.application.routes.url_helpers.prison_prisoner_early_allocations_url(
             prison_id: prisoner.prison_id,
             prisoner_id: prisoner.offender_no),
           equip_guidance_link: EQUIP_URL).deliver_now
+
+        EmailHistory.create! nomis_offender_id: prisoner.offender_no,
+                             name: pom.full_name,
+                             email: pom.email_address,
+                             event: EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION,
+                             prison: prisoner.prison_id
       end
     end
   end
