@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: early-allocation-suitability-email-job
 spec:
-  schedule: "55 11 11 12 *"
+  schedule: "55 11 14 12 *"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
@@ -13,7 +13,7 @@ spec:
         spec:
           containers:
             - name: early-allocation-suitability-email-job
-              image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:testing
+              image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
               imagePullPolicy: Always
               command: ['sh', '-c', "bundle exec rake early_allocation_suitability_email:process"]
               envFrom:
