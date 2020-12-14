@@ -18,9 +18,16 @@ feature 'admin urls', :allocation do
   #   end
   # end
 
+  let(:prison_code) { build(:prison).code }
   let(:ldu) { create(:local_divisional_unit) }
   let!(:new_team) { create(:team, local_divisional_unit: ldu) }
-  let(:admin_urls) { ['/admin', '/flip-flop-admin', '/sidekiq'] }
+  let(:admin_urls) {
+    [
+    '/admin', '/flip-flop-admin', '/sidekiq',
+    "/prisons/#{prison_code}/debugging",
+    "/prisons/#{prison_code}/debugging/prison"
+  ]
+  }
 
   context 'when pom' do
     before do
@@ -51,8 +58,17 @@ feature 'admin urls', :allocation do
   end
 
   context 'when a global admin' do
+    let(:username) { 'MOIC_POM' }
+    let(:staff_id) { 754_732 }
+
     before do
       signin_global_admin_user
+      stub_auth_token
+      stub_request(:get, "#{ApiHelper::T3}/users/#{username}").
+        to_return(body: { 'staffId': staff_id }.to_json)
+      stub_pom_emails staff_id, []
+      stub_offenders_for_prison(prison_code, [])
+
       ci = create(:case_information, team: nil)
       create(:allocation, nomis_offender_id: ci.nomis_offender_id)
     end

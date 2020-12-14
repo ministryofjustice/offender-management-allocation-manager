@@ -15,10 +15,10 @@ module AuthHelper
       }.to_json)
   end
 
-  def stub_sso_data(prison, username: 'user', role: 'ROLE_ALLOC_MGR', emails: [])
+  def stub_sso_data(prison, username: 'user', roles: [SsoIdentity::SPO_ROLE], emails: [])
     allow(HmppsApi::Oauth::TokenService).to receive(:valid_token).and_return(ACCESS_TOKEN)
     session[:sso_data] = { 'expiry' => Time.zone.now + 1.day,
-                           'roles' => [role],
+                           'roles' => roles,
                            'caseloads' => [prison],
                            'username' => username }
     stub_request(:get, "#{ApiHelper::T3}/users/#{username}").

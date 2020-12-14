@@ -74,7 +74,7 @@ module ApiHelper
 
   def stub_signed_in_pom(prison, staff_id, username = 'alice')
     stub_auth_token
-    stub_sso_data(prison, username: username, role: 'ROLE_ALLOC_CASE_MGR')
+    stub_sso_data(prison, username: username, roles: [SsoIdentity::POM_ROLE])
     stub_request(:get, "#{T3}/users/#{username}").
       to_return(body: { 'staffId': staff_id }.to_json)
   end
