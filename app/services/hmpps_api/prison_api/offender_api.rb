@@ -27,7 +27,7 @@ module HmppsApi
           offender.merge!(recall_data.fetch(offender.fetch('offenderNo')))
         end
 
-        offenders = api_deserialiser.deserialise_many(HmppsApi::OffenderSummary, data)
+        offenders = data.map { |d| HmppsApi::OffenderSummary.from_json(d) }
         ApiPaginatedResponse.new(total_pages, offenders)
       end
 

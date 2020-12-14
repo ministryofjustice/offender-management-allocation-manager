@@ -14,7 +14,7 @@ module HmppsApi
       def self.list(prison)
         route = "/staff/roles/#{prison}/role/POM"
         data = client.get(route, extra_headers: paging_options)
-        api_deserialiser.deserialise_many(HmppsApi::PrisonOffenderManager, data)
+        data.map { |d| HmppsApi::PrisonOffenderManager.from_json(d) }
       end
 
       def self.fetch_email_addresses(nomis_staff_id)
