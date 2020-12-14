@@ -71,12 +71,6 @@ module HmppsApi
         route = '/offender-sentences/bookings'
         data = client.post(route, booking_ids, cache: true)
 
-        #booking_ids = data.map { |record| record.fetch('bookingId') }
-        #sentences = data.map { |record| record['sentenceDetail'] }
-        #details = api_deserialiser.deserialise_many(HmppsApi::SentenceDetail, sentences)
-        #
-        #booking_ids.zip(details).map { |id, detail| [id, detail] }.to_h
-
         data.map do |record|
           [
               record.fetch('bookingId'),

@@ -44,7 +44,7 @@ private
 
   class OffenderEnumerator
     include Enumerable
-    FETCH_SIZE = 200 # How many records to fetch from nomis at a time
+    FETCH_SIZE = 300 # How many records to fetch from nomis at a time
 
     def initialize(prison)
       @prison = prison
@@ -80,7 +80,7 @@ private
       sentence_details = HmppsApi::PrisonApi::OffenderApi.get_bulk_sentence_details(booking_ids)
 
       nomis_ids = offenders.map(&:offender_no)
-      mapped_tiers = CaseInformationService.get_case_information(nomis_ids)
+      case_info = CaseInformationService.get_case_information(nomis_ids)
 
       temp_movements = HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for(nomis_ids)
 
@@ -88,8 +88,7 @@ private
         sentencing = sentence_details[offender.booking_id]
         offender.sentence = sentencing if sentencing.present?
 
-        case_info_record = mapped_tiers[offender.offender_no]
-        offender.load_case_information(case_info_record)
+        offender.load_case_information(case_info[offender.offender_no])
 
         offender.latest_movement = temp_movements[offender.offender_no]
       }
