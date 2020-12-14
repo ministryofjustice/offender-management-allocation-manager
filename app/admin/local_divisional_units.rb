@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-ActiveAdmin.register LocalDivisionalUnit, as: 'LDU' do
+ActiveAdmin.register LocalDivisionalUnit, as: 'Deprecated old LDU' do
   # See permitted parameters documentation:
   # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
   #

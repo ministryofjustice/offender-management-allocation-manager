@@ -108,9 +108,26 @@ feature 'admin urls', :allocation do
       end
     end
 
+    context 'with local delivery units', :js do
+      before do
+        visit('/admin/local_delivery_units')
+      end
+
+      it 'can create one' do
+        expect {
+          click_link 'New Localdeliveryunit'
+          fill_in 'Code', with: Faker::Alphanumeric.alphanumeric(number: 4)
+          fill_in 'Name', with: Faker::Lorem.sentence
+          fill_in 'Email address', with: Faker::Internet.email
+          select 'England'
+          click_button 'Create Local delivery unit'
+        }.to change(LocalDeliveryUnit, :count).by(1)
+      end
+    end
+
     context 'with local divisional units' do
       before do
-        visit('/admin/ldus')
+        visit('/admin/deprecatedold_ldus')
       end
 
       it "displays the list of LDU's" do
