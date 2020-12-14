@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: early-allocation-suitability-email-job
 spec:
-  schedule: "55 11 14 12 *"
+  schedule: "55 11 15 12 *"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3

@@ -13,34 +13,27 @@ class SuitableForEarlyAllocationEmailJob < ApplicationJob
       next if allocation.nil?
 
       prisoner = OffenderService.get_offender(offender_no)
-      if !prisoner.nil? && eligible_today?(prisoner)
-        pom = PrisonOffenderManagerService.get_pom_at(prisoner.prison_id, allocation.primary_pom_nomis_id)
-        EarlyAllocationMailer.review_early_allocation(
-          email: pom.email_address,
-          prisoner_name: prisoner.full_name,
-          start_page_link: Rails.application.routes.url_helpers.prison_prisoner_early_allocations_url(
-            prison_id: prisoner.prison_id,
-            prisoner_id: prisoner.offender_no),
-          equip_guidance_link: EQUIP_URL).deliver_now
+      if !prisoner.nil? && prisoner.within_early_allocation_window?
 
-        EmailHistory.create! nomis_offender_id: prisoner.offender_no,
-                             name: pom.full_name,
-                             email: pom.email_address,
-                             event: EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION,
-                             prison: prisoner.prison_id
+        already_emailed = EmailHistory.where(nomis_offender_id: offender_no, event: EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION)
+
+        if already_emailed.empty?
+          pom = PrisonOffenderManagerService.get_pom_at(prisoner.prison_id, allocation.primary_pom_nomis_id)
+          EarlyAllocationMailer.review_early_allocation(
+            email: pom.email_address,
+            prisoner_name: prisoner.full_name,
+            start_page_link: Rails.application.routes.url_helpers.prison_prisoner_early_allocations_url(
+              prison_id: prisoner.prison_id,
+              prisoner_id: prisoner.offender_no),
+            equip_guidance_link: EQUIP_URL).deliver_now
+
+          EmailHistory.create! nomis_offender_id: prisoner.offender_no,
+                               name: pom.full_name,
+                               email: pom.email_address,
+                               event: EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION,
+                               prison: prisoner.prison_id
+        end
       end
     end
-  end
-
-private
-
-  def eligible_today?(offender)
-    [
-      offender.tariff_date,
-      offender.parole_eligibility_date,
-      offender.parole_review_date,
-      offender.automatic_release_date,
-      offender.conditional_release_date
-    ].compact.min == Time.zone.today + 18.months
   end
 end
