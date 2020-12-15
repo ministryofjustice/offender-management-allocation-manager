@@ -32,9 +32,9 @@ module HmppsApi
       response.body
     end
 
-    def get(route, queryparams: {}, extra_headers: {})
+    def get(route, queryparams: {}, extra_headers: {}, cache: true)
       response = request(
-        :get, route, queryparams: queryparams, extra_headers: extra_headers
+        :get, route, queryparams: queryparams, extra_headers: extra_headers, cache: cache
       )
 
       # Elite2 can return a 204 to mean empty results, and we don't know if
@@ -53,9 +53,9 @@ module HmppsApi
       data
     end
 
-    def post(route, body, queryparams: {}, extra_headers: {})
+    def post(route, body, queryparams: {}, extra_headers: {}, cache: false)
       response = request(
-        :post, route, queryparams: queryparams, extra_headers: extra_headers, body: body
+        :post, route, queryparams: queryparams, extra_headers: extra_headers, body: body, cache: cache
       )
 
       JSON.parse(response.body)
@@ -77,7 +77,20 @@ module HmppsApi
 
   private
 
-    def request(method, route, queryparams: {}, extra_headers: {}, body: nil)
+    def request(method, route, queryparams: {}, extra_headers: {}, body: nil, cache: false)
+      if cache
+        # Cache the request
+        key = cache_key(method, route, queryparams: queryparams, extra_headers: extra_headers, body: body)
+        Rails.cache.fetch(key, expires_in: Rails.configuration.cache_expiry) do
+          send_request(method, route, queryparams: queryparams, extra_headers: extra_headers, body: body)
+        end
+      else
+        # Don't cache the request
+        send_request(method, route, queryparams: queryparams, extra_headers: extra_headers, body: body)
+      end
+    end
+
+    def send_request(method, route, queryparams:, extra_headers:, body:)
       @connection.send(method) do |req|
         req.url(@root + route)
         req.headers['Authorization'] = "Bearer #{token.access_token}"
@@ -86,6 +99,16 @@ module HmppsApi
         req.params.update(queryparams)
         req.body = body.to_json unless body.nil?
       end
+    end
+
+    def cache_key(method, route, queryparams:, extra_headers:, body:)
+      # An array of everything that makes this request unique
+      request_parameters = [@root, method, route, queryparams, extra_headers, body]
+
+      # Create a SHA256 hash which uniquely identifies this request
+      fingerprint = Digest::SHA256.hexdigest(request_parameters.to_json)
+
+      "hmpps_api_request_#{fingerprint}"
     end
 
     def token
