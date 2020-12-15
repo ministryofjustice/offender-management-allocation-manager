@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 class DebuggingController < PrisonsApplicationController
+  before_action :ensure_admin_user
+
   def debugging
     nomis_offender_id = id
 
-    prisoner = OffenderService.get_offender(nomis_offender_id)
+    prisoner = OffenderService.get_offender(nomis_offender_id) if nomis_offender_id.present?
 
     if prisoner.present?
       @offender = OffenderPresenter.new(prisoner)
@@ -56,10 +58,4 @@ private
   def id
     params[:offender_no].present? ? params[:offender_no].strip : params[:offender_no]
   end
-
-  # def offender(offender_no)
-  #   return nil if offender_no.blank?
-  #
-  #   OffenderService.get_offender(offender_no)
-  # end
 end

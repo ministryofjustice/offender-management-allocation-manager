@@ -7,7 +7,7 @@ RSpec.describe DebuggingController, :allocation, type: :controller do
   let(:prison_id) { prison.code }
 
   before do
-    stub_sso_data(prison_id)
+    stub_sso_data(prison_id, roles: [SsoIdentity::SPO_ROLE, SsoIdentity::ADMIN_ROLE])
   end
 
   context 'when debugging at a prison level' do
