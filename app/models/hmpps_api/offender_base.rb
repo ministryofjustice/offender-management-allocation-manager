@@ -65,12 +65,20 @@ module HmppsApi
       @case_information.welsh_offender == 'Yes'
     end
 
-    def ldu
-      @case_information&.local_divisional_unit
+    def ldu_name
+      @case_information&.local_divisional_unit&.name
     end
 
-    def team
+    def ldu_email_address
+      @case_information&.local_divisional_unit&.email_address
+    end
+
+    def team_name
       @case_information&.team&.name
+    end
+
+    def delius_matched?
+      @case_information&.manual_entry == false
     end
 
     def allocated_com_name

@@ -168,7 +168,7 @@ describe HmppsApi::Offender do
 
       include_examples 'expect fields to be', nil, [
         :tier, :case_allocation, :mappa_level, :parole_review_date,
-        :welsh_offender, :ldu, :team, :allocated_com_name
+        :welsh_offender, :ldu_name, :team_name, :allocated_com_name, :ldu_email_address
       ]
 
       include_examples 'expect fields to be', false, [
@@ -235,14 +235,20 @@ describe HmppsApi::Offender do
         end
       end
 
-      describe '#ldu' do
-        let(:field) { :ldu }
+      describe '#ldu_name' do
+        let(:field) { :ldu_name }
 
-        it { is_expected.to be(case_info.team.local_divisional_unit) }
+        it { is_expected.to be(case_info.team.local_divisional_unit.name) }
       end
 
-      describe '#team' do
-        let(:field) { :team }
+      describe '#ldu_email_address' do
+        let(:field) { :ldu_email_address }
+
+        it { is_expected.to be(case_info.team.local_divisional_unit.email_address) }
+      end
+
+      describe '#team_name' do
+        let(:field) { :team_name }
 
         it { is_expected.to be(case_info.team.name) }
       end

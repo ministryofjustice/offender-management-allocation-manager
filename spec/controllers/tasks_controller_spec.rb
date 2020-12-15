@@ -84,16 +84,16 @@ RSpec.describe TasksController, :allocation, type: :controller do
       stub_offender(build(:nomis_offender, offenderNo: offender_no))
 
       # Ensure only one of our offenders has missing data and that G7514GW (indeterminate) has a PRD
-      create(:case_information, nomis_offender_id: offender_no, tier: 'A', mappa_level: 1, team: nil)
+      create(:case_information, nomis_offender_id: offender_no, tier: 'A', manual_entry: true)
       create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id, prison: prison)
 
-      create(:case_information,  nomis_offender_id: 'G1234AB', tier: 'A', mappa_level: 1)
+      create(:case_information,  nomis_offender_id: 'G1234AB', tier: 'A', manual_entry: false)
       create(:allocation, nomis_offender_id: 'G1234AB', primary_pom_nomis_id: staff_id, prison: prison)
 
-      create(:case_information, nomis_offender_id: 'G1234GG', tier: 'A', mappa_level: 1)
+      create(:case_information, nomis_offender_id: 'G1234GG', tier: 'A', manual_entry: false)
       create(:allocation, nomis_offender_id: 'G1234GG', primary_pom_nomis_id: staff_id, prison: prison)
 
-      create(:case_information,  nomis_offender_id: 'G7514GW', tier: 'A', mappa_level: 1, parole_review_date: next_week)
+      create(:case_information,  nomis_offender_id: 'G7514GW', tier: 'A', manual_entry: false, parole_review_date: next_week)
       create(:allocation, nomis_offender_id: 'G7514GW', primary_pom_nomis_id: staff_id, prison: prison)
     end
 
