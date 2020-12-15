@@ -13,13 +13,7 @@ module HmppsApi
 
       def self.list(prison)
         route = "/staff/roles/#{prison}/role/POM"
-
-        key = "pom_list_#{prison}"
-
-        data = Rails.cache.fetch(key, expires_in: Rails.configuration.cache_expiry) {
-          client.get(route, extra_headers: paging_options)
-        }
-
+        data = client.get(route, extra_headers: paging_options)
         api_deserialiser.deserialise_many(HmppsApi::PrisonOffenderManager, data)
       end
 
