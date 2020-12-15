@@ -54,12 +54,19 @@ private
         com_name: delius_record.offender_manager,
         crn: delius_record.crn,
         tier: map_tier(delius_record.tier),
+        local_delivery_unit: map_ldu(delius_record.ldu_code),
         team: team,
+        team_name: team&.name,
         case_allocation: delius_record.service_provider,
         welsh_offender: map_welsh_offender(delius_record.ldu_code),
         mappa_level: map_mappa_level(delius_record.mappa_levels)
       )
     end
+  end
+
+  # map the LDU regardless of enabled switch, but only expose it from offender when enabled
+  def map_ldu(ldu_code)
+    LocalDeliveryUnit.find_by(code: ldu_code)
   end
 
   def map_team(team_code)

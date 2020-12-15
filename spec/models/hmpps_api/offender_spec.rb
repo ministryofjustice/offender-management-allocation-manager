@@ -240,13 +240,35 @@ describe HmppsApi::Offender do
       describe '#ldu_name' do
         let(:field) { :ldu_name }
 
-        it { is_expected.to be(case_info.team.local_divisional_unit.name) }
+        context 'when there is a new LDU mapping' do
+          let(:ldu) { create(:local_delivery_unit) }
+          let(:case_info) { create(:case_information, local_delivery_unit: ldu) }
+
+          it { is_expected.to be(ldu.name) }
+        end
+
+        context 'without a new LDU mapping' do
+          let(:case_info) { create(:case_information) }
+
+          it { is_expected.to be(case_info.team.local_divisional_unit.name) }
+        end
       end
 
       describe '#ldu_email_address' do
         let(:field) { :ldu_email_address }
 
-        it { is_expected.to be(case_info.team.local_divisional_unit.email_address) }
+        context 'when there is a new LDU mapping' do
+          let(:ldu) { create(:local_delivery_unit) }
+          let(:case_info) { create(:case_information, local_delivery_unit: ldu) }
+
+          it { is_expected.to be(ldu.email_address) }
+        end
+
+        context 'without a new LDU mapping' do
+          let(:case_info) { create(:case_information) }
+
+          it { is_expected.to be(case_info.team.local_divisional_unit.email_address) }
+        end
       end
 
       describe '#team_name' do

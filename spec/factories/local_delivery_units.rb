@@ -5,7 +5,11 @@ FactoryBot.define do
     sequence(:code) { |seq| "LDU#{seq}" }
     name { "MyString" }
     email_address { Faker::Internet.email }
-    enabled { false }
+    enabled { true }
     country { 'England' }
+
+    trait :disabled do
+      enabled { false }
+    end
   end
 end
