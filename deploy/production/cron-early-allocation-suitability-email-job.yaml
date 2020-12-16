@@ -3,12 +3,13 @@ kind: CronJob
 metadata:
   name: early-allocation-suitability-email-job
 spec:
-  schedule: "55 11 17 12 *"
+  schedule: "30 4 * * *"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
+      ttlSecondsAfterFinished: 3600
       template:
         spec:
           containers:
@@ -47,6 +48,6 @@ spec:
                 - name: REDIS_URL
                   valueFrom:
                     secretKeyRef:
-                      name: elasticache-offender-management-allocation-manager-token-cache-staging
+                      name: elasticache-offender-management-allocation-manager-token-cache-production
                       key: url
           restartPolicy: OnFailure
