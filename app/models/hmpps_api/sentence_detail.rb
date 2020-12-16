@@ -94,13 +94,13 @@ module HmppsApi
 
     # This has a test, but shouldn't be public - no-one uses it apart from the test
     def nomis_post_recall_release_date
-      parse_nomis_post_recall_release_override_date.presence || parse_nomis_post_recall_release_date
+      parsed_nomis_post_recall_release_override_date.presence || parsed_nomis_post_recall_release_date
     end
 
-    private
+  private
 
     def nomis_automatic_release_date
-      @automatic_release_date ||= deserialise_date(@payload, 'automaticReleaseDate')
+      @nomis_automatic_release_date ||= deserialise_date(@payload, 'automaticReleaseDate')
     end
 
     def automatic_release_override_date
@@ -108,19 +108,19 @@ module HmppsApi
     end
 
     def nomis_conditional_release_date
-      @conditional_release_date ||= deserialise_date(@payload, 'conditionalReleaseDate')
+      @nomis_conditional_release_date ||= deserialise_date(@payload, 'conditionalReleaseDate')
     end
 
     def conditional_release_override_date
       @conditional_release_override_date ||= deserialise_date(@payload, 'conditionalReleaseOverrideDate')
     end
 
-    def parse_nomis_post_recall_release_override_date
-      @nomis_post_recall_release_override_date ||= deserialise_date(@payload, 'postRecallReleaseOverrideDate')
+    def parsed_nomis_post_recall_release_override_date
+      @parsed_nomis_post_recall_release_override_date ||= deserialise_date(@payload, 'postRecallReleaseOverrideDate')
     end
 
-    def parse_nomis_post_recall_release_date
-      @nomis_post_recall_release_date ||= deserialise_date(@payload, 'postRecallReleaseDate')
+    def parsed_nomis_post_recall_release_date
+      @parsed_nomis_post_recall_release_date ||= deserialise_date(@payload, 'postRecallReleaseDate')
     end
   end
 end
