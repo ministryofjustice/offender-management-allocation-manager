@@ -44,10 +44,10 @@ private
 
   class OffenderEnumerator
     include Enumerable
-    # How many records to fetch from nomis at a time
-    # optimum value for this is unknown - bigger sounds good, but doesn't seem
-    # to make much of an impact. Smaller is clearly bad as it results in multiple
-    # round-trips to eveything - initial API, plus CaseInformation plus temp_movements + arrival dates
+    # How many records to fetch from nomis at a time.
+    # Optimum value for this is unknown - bigger sounds good, but doesn't seem to make much of an impact.
+    # Smaller is clearly bad as it results in multiple round-trips to everything -
+    # initial API, plus CaseInformation plus temp_movements + arrival dates
     FETCH_SIZE = 200
 
     def initialize(prison)
