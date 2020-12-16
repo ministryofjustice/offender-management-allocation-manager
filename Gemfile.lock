@@ -263,7 +263,7 @@ GEM
     parallel (1.19.2)
     parallel_tests (3.1.0)
       parallel
-    parser (2.6.3.0)
+    parser (2.6.5.0)
       ast (~> 2.4.0)
     pdf-core (0.7.0)
     pg (1.2.3)
@@ -517,7 +517,7 @@ DEPENDENCIES
   omniauth-oauth2
   paper_trail
   parallel_tests
-  parser (< 2.6.4)
+  parser (< 2.7)
   pg
   prawn-rails
   prometheus_exporter
@@ -561,7 +561,7 @@ DEPENDENCIES
   zendesk_api
 
 RUBY VERSION
-   ruby 2.6.3p62
+   ruby 2.6.6p146
 
 BUNDLED WITH
    1.17.3
