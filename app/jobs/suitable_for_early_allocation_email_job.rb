@@ -5,34 +5,34 @@ class SuitableForEarlyAllocationEmailJob < ApplicationJob
 
   EQUIP_URL = 'https://equip-portal.rocstac.com/CtrlWebIsapi.dll/?__id=webDiagram.show&map=0%3A9A63E167DE4B400EA07F81A9271E1944&dgm=4F984B45CBC447B1A304B2FFECABB777'
 
-  def perform
-    offenders = EarlyAllocation.suitable_offenders_pre_referral_window
+  def perform(offender_no)
+    allocation = Allocation.where(nomis_offender_id: offender_no).first
+    return if allocation.nil?
 
-    offenders.each do |offender_no|
-      allocation = Allocation.where(nomis_offender_id: offender_no).first
-      next if allocation.nil?
+    prisoner = OffenderService.get_offender(offender_no)
 
-      prisoner = OffenderService.get_offender(offender_no)
-      if !prisoner.nil? && prisoner.within_early_allocation_window?
+    if !prisoner.nil? && prisoner.within_early_allocation_window?
 
-        already_emailed = EmailHistory.where(nomis_offender_id: offender_no, event: EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION)
+      already_emailed = EmailHistory.where(
+        nomis_offender_id: offender_no,
+        event: EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION).where('created_at > ?', prisoner.sentence_start_date)
 
-        if already_emailed.empty?
-          pom = PrisonOffenderManagerService.get_pom_at(prisoner.prison_id, allocation.primary_pom_nomis_id)
-          EarlyAllocationMailer.review_early_allocation(
-            email: pom.email_address,
-            prisoner_name: prisoner.full_name,
-            start_page_link: Rails.application.routes.url_helpers.prison_prisoner_early_allocations_url(
-              prison_id: prisoner.prison_id,
-              prisoner_id: prisoner.offender_no),
-            equip_guidance_link: EQUIP_URL).deliver_now
+      if already_emailed.empty?
 
-          EmailHistory.create! nomis_offender_id: prisoner.offender_no,
-                               name: pom.full_name,
-                               email: pom.email_address,
-                               event: EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION,
-                               prison: prisoner.prison_id
-        end
+        pom = PrisonOffenderManagerService.get_pom_at(prisoner.prison_id, allocation.primary_pom_nomis_id)
+        EarlyAllocationMailer.review_early_allocation(
+          email: pom.email_address,
+          prisoner_name: prisoner.full_name,
+          start_page_link: Rails.application.routes.url_helpers.prison_prisoner_early_allocations_url(
+            prison_id: prisoner.prison_id,
+            prisoner_id: prisoner.offender_no),
+          equip_guidance_link: EQUIP_URL).deliver_now
+
+        EmailHistory.create! nomis_offender_id: prisoner.offender_no,
+                             name: pom.full_name,
+                             email: pom.email_address,
+                             event: EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION,
+                             prison: prisoner.prison_id
       end
     end
   end
