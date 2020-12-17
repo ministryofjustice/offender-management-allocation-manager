@@ -8,7 +8,7 @@ class SummaryService
     # :pending, or :new_arrivals or :handovers. The other types will return totals, and do not contain
     # any data.
     sortable_fields = {
-        allocated: [:last_name, :earliest_release_date, :tier],
+        allocated: [:last_name, :earliest_release_date, :tier, :allocation_date],
         new_arrivals: [:last_name, :prison_arrival_date, :earliest_release_date],
         handovers: [:last_name, :handover_start_date, :responsibility_handover_date, :case_allocation, :allocated_pom_name, :allocated_com_name],
         unallocated: [:last_name, :earliest_release_date, :case_owner, :awaiting_allocation_for, :tier],
