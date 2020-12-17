@@ -128,6 +128,11 @@ feature 'View a prisoner profile page', :allocation do
       click_link "View"
       expect(page).to have_content('Prisoner allocated')
     end
+
+    it 'displays the non-disclosable badge on the VLO table', vcr: { cassette_name: :vlo_non_disclosable_badge } do
+      visit prison_prisoner_path('LEI', 'G7998GJ')
+      expect(page).to have_css('#non-disclosable-badge', text: 'Non-Disclosable')
+    end
   end
 
   context 'with community information' do
