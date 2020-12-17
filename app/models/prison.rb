@@ -48,7 +48,7 @@ private
     # Optimum value for this is unknown - bigger sounds good, but doesn't seem to make much of an impact.
     # Smaller is clearly bad as it results in multiple round-trips to everything -
     # initial API, plus CaseInformation plus temp_movements + arrival dates
-    FETCH_SIZE = 200
+    FETCH_SIZE = 1000
 
     def initialize(prison)
       @prison = prison
