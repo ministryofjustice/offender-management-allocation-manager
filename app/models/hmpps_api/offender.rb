@@ -23,6 +23,8 @@ module HmppsApi
       }
     end
 
+    # This must only reference fields that are present in
+    # https://https://api-dev.prison.service.justice.gov.uk/swagger-ui.html#//prisoners/getPrisonersOffenderNo
     def load_from_json(payload)
       @booking_id = payload['latestBookingId']&.to_i
       @prison_id = payload['latestLocationId']

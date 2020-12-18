@@ -15,7 +15,7 @@ describe HmppsApi::OffenderSummary do
 
       context 'with just the sentence expiry date' do
         before do
-          subject.sentence = HmppsApi::SentenceDetail.new(sentence_expiry_date: today_plus1)
+          subject.sentence = HmppsApi::SentenceDetail.new.tap { |s| s.sentence_expiry_date = today_plus1 }
         end
 
         it 'uses the SED' do
@@ -25,10 +25,12 @@ describe HmppsApi::OffenderSummary do
 
       context 'with many dates' do
         before do
-          subject.sentence = HmppsApi::SentenceDetail.new(sentence_expiry_date: sentence_expiry_date,
-                                                       licence_expiry_date: licence_expiry_date,
-                                                       nomis_post_recall_release_date: post_recall_release_date,
-                                                       actual_parole_date: actual_parole_date)
+          subject.sentence = HmppsApi::SentenceDetail.from_json(
+            'licenceExpiryDate' => licence_expiry_date.to_s,
+            'postRecallReleaseDate' => post_recall_release_date.to_s,
+            'actualParoleDate' => actual_parole_date.to_s).tap { |detail|
+            detail.sentence_expiry_date = sentence_expiry_date
+          }
         end
 
         context 'with future dates' do
@@ -77,10 +79,10 @@ describe HmppsApi::OffenderSummary do
 
     context 'with sentence detail with dates' do
       before do
-        subject.sentence = HmppsApi::SentenceDetail.new(
-          sentence_start_date: Date.new(2005, 2, 3),
-          parole_eligibility_date: parole_eligibility_date,
-          conditional_release_date: conditional_release_date)
+        subject.sentence = HmppsApi::SentenceDetail.from_json(
+          'sentenceStartDate' => Date.new(2005, 2, 3).to_s,
+          'paroleEligibilityDate' => parole_eligibility_date.to_s,
+          'conditionalReleaseDate' => conditional_release_date.to_s)
       end
 
       context 'when comprised of dates in the past and the future' do
@@ -110,9 +112,9 @@ describe HmppsApi::OffenderSummary do
   describe '#sentenced?' do
     context 'with sentence detail with a release date' do
       before do
-        subject.sentence = HmppsApi::SentenceDetail.new(
-          sentence_start_date: Date.new(2005, 2, 3),
-          release_date: Time.zone.today)
+        subject.sentence = HmppsApi::SentenceDetail.from_json(
+          'sentenceStartDate' => Date.new(2005, 2, 3).to_s,
+          'releaseDate' => Time.zone.today.to_s)
       end
 
       it 'marks the offender as sentenced' do

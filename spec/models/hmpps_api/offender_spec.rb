@@ -80,8 +80,8 @@ describe HmppsApi::Offender do
     context 'when in custody' do
       let(:offender) {
         build(:offender).tap { |o|
-          o.sentence = HmppsApi::SentenceDetail.new(automatic_release_date: Time.zone.today + 1.year,
-                                                 sentence_start_date: Time.zone.today)
+          o.sentence = HmppsApi::SentenceDetail.from_json('automaticReleaseDate' => (Time.zone.today + 1.year).to_s,
+                                                           'sentenceStartDate' => Time.zone.today.to_s)
           o.load_case_information(build(:case_information, case_allocation: 'NPS', mappa_level: 0))
         }
       }
