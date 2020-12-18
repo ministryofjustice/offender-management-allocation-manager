@@ -66,12 +66,10 @@ module HmppsApi
     end
 
     def self.from_json(payload)
-      SentenceDetail.new.tap { |obj|
-        obj.load_from_json(payload)
-      }
+      SentenceDetail.new(payload)
     end
 
-    def load_from_json(payload)
+    def initialize(payload)
       @parole_eligibility_date = deserialise_date(payload, 'paroleEligibilityDate')
       @release_date = deserialise_date(payload, 'releaseDate')
       @sentence_start_date = deserialise_date(payload, 'sentenceStartDate')
