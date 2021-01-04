@@ -187,6 +187,22 @@ module HmppsApi
       @responsibility_override = record.responsibility
     end
 
+    def approaching_handover?
+      today = Time.zone.today
+      thirty_days_time = today + 30.days
+
+      start_date = handover_start_date
+      handover_date = responsibility_handover_date
+
+      return false if start_date.nil?
+
+      if start_date.future?
+        start_date.between?(today, thirty_days_time)
+      else
+        today.between?(start_date, handover_date)
+      end
+    end
+
     def within_early_allocation_window?
       [
           tariff_date,
