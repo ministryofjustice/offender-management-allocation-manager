@@ -23,7 +23,7 @@ describe Bucket do
     b << OpenStruct.new(last_name: "M")
     expect(b.count).to be(3)
 
-    b.sort_bucket!(:last_name)
+    b.sort_bucket!(:last_name, :asc)
     expect(b.map(&:last_name)).to eq(['A', 'M', 'Z'])
   end
 
@@ -70,7 +70,7 @@ describe Bucket do
       last_name: "A",
       earliest_release_date: Date.new(2000, 1, 1)
     )
-    b.sort_bucket!(:earliest_release_date)
+    b.sort_bucket!(:earliest_release_date, :asc)
     expect(b.map(&:earliest_release_date)).to eq([nil, Date.new(2000, 1, 1)])
 
     b.sort_bucket!(:earliest_release_date, :desc)
