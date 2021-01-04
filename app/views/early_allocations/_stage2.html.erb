@@ -12,7 +12,7 @@
   <%= form.hidden_field(:stage2_validation, value: true) %>
 
   <%= form.govuk_radio_buttons_fieldset :extremism_separation,
-                                        hint_text: 'Extremism separation centres contain prisoners involved in planning terrorism or considered to pose a risk to national security.',
+                                        hint: { text: 'Extremism separation centres contain prisoners involved in planning terrorism or considered to pose a risk to national security.' },
                                         legend: { size: 's',
                                                   text: 'Has the prisoner been held in an extremism seperation centre?' } do %>
     <%= form.govuk_radio_button :extremism_separation, true, label: { text: 'Yes' }, link_errors: true do %>

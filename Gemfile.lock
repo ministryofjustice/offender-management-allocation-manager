@@ -143,7 +143,7 @@ GEM
       activesupport (>= 4.2.0)
     gov_uk_date_fields (4.1.0)
       rails (>= 5.0.7.2)
-    govuk_design_system_formbuilder (1.2.9)
+    govuk_design_system_formbuilder (2.1.4)
       actionview (>= 5.2)
       activemodel (>= 5.2)
       activesupport (>= 5.2)
@@ -500,7 +500,7 @@ DEPENDENCIES
   flamegraph
   flipflop
   gov_uk_date_fields
-  govuk_design_system_formbuilder
+  govuk_design_system_formbuilder (~> 2.0)
   govuk_notify_rails
   guard-rspec
   hashdiff (>= 1.0.0.beta1, < 2.0.0)
