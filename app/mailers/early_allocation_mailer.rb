@@ -22,4 +22,12 @@ class EarlyAllocationMailer < GovukNotifyRails::Mailer
 
     mail(to: email)
   end
+
+  def review_early_allocation(email:, prisoner_name:, start_page_link:, equip_guidance_link:)
+    set_template('502e057c-a875-4653-9b33-63dcfd33e582')
+    set_personalisation(prisoner_name: prisoner_name,
+                        start_page_link: start_page_link,
+                        equip_guidance_link: equip_guidance_link)
+    mail(to: email)
+  end
 end
