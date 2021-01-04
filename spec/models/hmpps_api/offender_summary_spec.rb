@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe HmppsApi::OffenderSummary do
   describe '#earliest_release_date' do
     context 'with blank sentence detail' do
-      before { subject.sentence = HmppsApi::SentenceDetail.new }
+      before { subject.sentence = HmppsApi::SentenceDetail.from_json({}) }
 
       it 'responds with no earliest release date' do
         expect(subject.earliest_release_date).to be_nil
@@ -15,7 +17,7 @@ describe HmppsApi::OffenderSummary do
 
       context 'with just the sentence expiry date' do
         before do
-          subject.sentence = HmppsApi::SentenceDetail.new.tap { |s| s.sentence_expiry_date = today_plus1 }
+          subject.sentence = HmppsApi::SentenceDetail.from_json({}).tap { |s| s.sentence_expiry_date = today_plus1 }
         end
 
         it 'uses the SED' do
@@ -123,7 +125,7 @@ describe HmppsApi::OffenderSummary do
     end
 
     context 'with blank sentence detail' do
-      before { subject.sentence = HmppsApi::SentenceDetail.new }
+      before { subject.sentence = HmppsApi::SentenceDetail.from_json({}) }
 
       it 'marks the offender as not sentenced' do
         expect(subject.sentenced?).to be false
