@@ -50,6 +50,14 @@ class SummaryService
 
     add_allocated_poms_and_coms(@buckets[summary_type], active_allocations_hash)
 
+    default_sort_params =
+      { allocated: [nil, nil],
+        unallocated: [:sentence_start_date, :asc],
+        pending: [:sentence_start_date, :asc],
+        new_arrivals: [:sentence_start_date, :asc],
+        handovers: [:handover_start_date, :asc]
+      }.fetch(summary_type)
+
     @sort_params = if sort_params
                      parts = sort_params.split.map { |s| s.downcase.to_sym }
 
@@ -91,15 +99,6 @@ class SummaryService
   end
 
 private
-
-  def default_sort_params
-    { allocated: [nil, nil],
-        unallocated: [:sentence_start_date, :asc],
-        pending: [:sentence_start_date, :asc],
-        new_arrivals: [:sentence_start_date, :asc],
-        handovers: [:handover_start_date, :asc]
-    }.fetch(@summary_type)
-  end
 
   def new_arrival?(offender)
     if Time.zone.today.monday?
