@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe HmppsApi::Offender do
@@ -6,8 +8,8 @@ describe HmppsApi::Offender do
       let(:offender) {
         build(:offender, sentence: build(:sentence_detail,
                                          conditionalReleaseDate: Time.zone.today + 24.months,
-                                               automaticReleaseDate: Time.zone.today + 19.months
-      ))
+                                         automaticReleaseDate: Time.zone.today + 19.months
+        ))
       }
 
       it 'is not within window' do
@@ -19,7 +21,7 @@ describe HmppsApi::Offender do
       let(:offender) {
         build(:offender, sentence: build(:sentence_detail,
                                          conditionalReleaseDate: Time.zone.today + 24.months,
-                                               automaticReleaseDate: Time.zone.today + 17.months))
+                                         automaticReleaseDate: Time.zone.today + 17.months))
       }
 
       it 'is within window' do
@@ -81,7 +83,7 @@ describe HmppsApi::Offender do
       let(:offender) {
         build(:offender).tap { |o|
           o.sentence = HmppsApi::SentenceDetail.from_json('automaticReleaseDate' => (Time.zone.today + 1.year).to_s,
-                                                           'sentenceStartDate' => Time.zone.today.to_s)
+                                                          'sentenceStartDate' => Time.zone.today.to_s)
           o.load_case_information(build(:case_information, case_allocation: 'NPS', mappa_level: 0))
         }
       }
@@ -94,7 +96,7 @@ describe HmppsApi::Offender do
     context 'when COM responsible already' do
       let(:offender) {
         build(:offender).tap { |o|
-          o.sentence = HmppsApi::SentenceDetail.new
+          o.sentence = build(:sentence_detail, conditionalReleaseDate: Time.zone.today + 1.week)
           o.load_case_information(build(:case_information))
         }
       }
@@ -167,12 +169,12 @@ describe HmppsApi::Offender do
       end
 
       include_examples 'expect fields to be', nil, [
-        :tier, :case_allocation, :mappa_level, :parole_review_date,
-        :welsh_offender, :ldu_name, :team_name, :allocated_com_name, :ldu_email_address
+          :tier, :case_allocation, :mappa_level, :parole_review_date,
+          :welsh_offender, :ldu_name, :team_name, :allocated_com_name, :ldu_email_address
       ]
 
       include_examples 'expect fields to be', false, [
-        :has_case_information?, :early_allocation?
+          :has_case_information?, :early_allocation?
       ]
     end
 
