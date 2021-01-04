@@ -77,9 +77,7 @@ class PomTasks
   def get_early_allocations(offender_nos)
     # For the provided offender numbers, determines whether they have an outstanding
     # early allocation and then adds them to a set for quick lookup.
-    eas = EarlyAllocation.where(nomis_offender_id: offender_nos).select { |early_allocation|
-      early_allocation.awaiting_community_decision?
-    }.map(&:nomis_offender_id)
+    eas = EarlyAllocation.where(nomis_offender_id: offender_nos).select(&:awaiting_community_decision?).map(&:nomis_offender_id)
     Set.new(eas)
   end
 end
