@@ -25,7 +25,7 @@ class PomTasks
       missing_info_task(offender)
     ]
 
-    if early_allocations.key?(offender.offender_no)
+    if early_allocations.include?(offender.offender_no)
       tasks << early_allocation_update_task(offender)
     end
 
@@ -51,7 +51,7 @@ class PomTasks
 
     # Offender had their delius data manually added and as a result are missing
     # new key fields.
-    if offender.mappa_level.blank? || offender.ldu.blank?
+    unless offender.delius_matched?
       PomTaskPresenter.new.tap { |presenter|
         presenter.offender_name = offender.full_name
         presenter.offender_number = offender.offender_no
@@ -76,14 +76,10 @@ class PomTasks
 
   def get_early_allocations(offender_nos)
     # For the provided offender numbers, determines whether they have an outstanding
-    # early allocation and then adds them to a hash for quick lookup.  If a specific
-    # offender does have an outstanding early allocation their offender number will
-    # appear as a key (with a boolean value). We do this because hash lookup is
-    # significantly faster than array/list lookup.
-    EarlyAllocation.where(nomis_offender_id: offender_nos).map { |early_allocation|
-      if early_allocation.discretionary? && early_allocation.community_decision.nil?
-        [early_allocation.nomis_offender_id, true]
-      end
-    }.compact.to_h
+    # early allocation and then adds them to a set for quick lookup.
+    eas = EarlyAllocation.where(nomis_offender_id: offender_nos).select { |early_allocation|
+      early_allocation.discretionary? && early_allocation.community_decision.nil?
+    }.map(&:nomis_offender_id)
+    Set.new(eas)
   end
 end

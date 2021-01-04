@@ -40,7 +40,7 @@ module OffenderHelper
 
     return false if offender.allocated_com_name.present?
 
-    return true if offender.ldu.try(:email_address).nil?
+    return true if offender.ldu_email_address.nil?
 
     false
   end
