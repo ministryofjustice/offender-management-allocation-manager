@@ -149,10 +149,10 @@ describe HmppsApi::OffenderSummary do
     end
 
     context 'with an 18th birthday in a past month' do
-      Timecop.travel('19 Feb 2020') do
-        before { subject.date_of_birth = '5 Jan 2002'.to_date }
+      before { subject.date_of_birth = '5 Jan 2001'.to_date }
 
-        it 'returns 18' do
+      it 'returns 18' do
+        Timecop.travel('19 Feb 2019') do
           expect(subject.age).to eq(18)
         end
       end
