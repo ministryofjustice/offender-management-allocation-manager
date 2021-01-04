@@ -3,17 +3,17 @@ require 'rails_helper'
 describe RecommendationService do
   let(:tier_a) {
     build(:offender,
-          sentence: HmppsApi::SentenceDetail.new(
-            sentence_start_date: Time.zone.today,
-            automatic_release_date: Time.zone.today + 15.months)).tap { |o|
+          sentence: HmppsApi::SentenceDetail.from_json(
+            'sentenceStartDate' => Time.zone.today.to_s,
+            'automaticReleaseRate' => (Time.zone.today + 15.months).to_s)).tap { |o|
       o.load_case_information(build(:case_information, tier: 'A'))
     }
   }
   let(:tier_d) {
     build(:offender,
-          sentence: HmppsApi::SentenceDetail.new(
-            sentence_start_date: Time.zone.today,
-            automatic_release_date: Time.zone.today + 10.months)).tap { |o|
+          sentence: HmppsApi::SentenceDetail.from_json(
+            'sentenceStartDate' => Time.zone.today.to_s,
+            'automaticReleaseDate' => (Time.zone.today + 10.months).to_s)).tap { |o|
       o.load_case_information(build(:case_information, tier: 'D'))
     }
   }

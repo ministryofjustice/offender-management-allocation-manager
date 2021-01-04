@@ -59,14 +59,7 @@ class StaffMember
   end
 
   def pending_handover_offenders
-    one_month_time = Time.zone.today + 30.days
-
-    upcoming_offenders = allocations.map(&:offender).select { |offender|
-      start_date = offender.handover_start_date
-
-      start_date.present? &&
-          start_date.between?(Time.zone.today, one_month_time)
-    }
+    upcoming_offenders = allocations.map(&:offender).select(&:approaching_handover?)
 
     upcoming_offenders.map { |offender|
       OffenderPresenter.new(offender)

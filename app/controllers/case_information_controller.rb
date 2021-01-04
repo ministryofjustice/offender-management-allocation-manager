@@ -3,6 +3,8 @@
 class CaseInformationController < PrisonsApplicationController
   before_action :set_case_info, only: [:edit, :show]
   before_action :set_prisoner_from_url, only: [:new, :edit, :edit_prd, :update_prd, :show]
+  before_action :set_referrer
+  before_action :store_referrer_in_session, only: [:edit_prd]
 
   def new
     @case_info = CaseInformation.new(
@@ -20,7 +22,7 @@ class CaseInformationController < PrisonsApplicationController
   def update_prd
     @case_info = ParoleReviewDateForm.new nomis_offender_id: nomis_offender_id_from_url
     if @case_info.update(parole_review_date_params)
-      redirect_to new_prison_allocation_path(active_prison_id, @case_info.nomis_offender_id)
+      redirect_to referrer
     else
       render 'edit_prd'
     end

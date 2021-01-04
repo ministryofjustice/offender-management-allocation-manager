@@ -45,6 +45,28 @@ RSpec.describe HandoversController, type: :controller do
         stub_movements
       end
 
+      describe 'sorting', :allocation do
+        before do
+          create(:case_information, :with_com, case_allocation: 'CRC', nomis_offender_id: 'G1234VV')
+          create(:allocation, nomis_offender_id: 'G1234VV', primary_pom_nomis_id: pom.staffId)
+          stub_pom(pom)
+        end
+
+        let(:pom) { build(:pom) }
+
+        it 'sorts by COM' do
+          get :index, params: { prison_id: prison, sort: 'allocated_com_name asc' }
+          expect(response).to be_successful
+          expect(assigns(:offenders).map(&:offender_no)).to eq(["G4234GG", 'G1234VV'])
+        end
+
+        it 'sorts by POM' do
+          get :index, params: { prison_id: prison, sort: 'allocated_pom_name asc' }
+          expect(response).to be_successful
+          expect(assigns(:offenders).map(&:offender_no)).to eq(['G1234VV', "G4234GG"])
+        end
+      end
+
       context 'when NPS case' do
         it 'returns cases that are within the thirty day window, but not those that dont have case information' do
           get :index, params: { prison_id: prison }

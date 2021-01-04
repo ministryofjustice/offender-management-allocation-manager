@@ -15,7 +15,7 @@ RSpec.describe CommunityMailer, type: :mailer do
       offender_name: offender.full_name,
       offender_crn: offender.crn,
       sentence_type: 'Determinate',
-      ldu_email: offender.ldu.email_address,
+      ldu_email: offender.ldu_email_address,
       prison: PrisonService.name_for('LEI'),
       start_date: 'Mon, 13 June 2024',
       responsibility_handover_date: 'Wed, 15 Aug 2024',
@@ -35,7 +35,7 @@ RSpec.describe CommunityMailer, type: :mailer do
     end
 
     it 'sets the To address of the email using the provided user' do
-      expect(mail.to).to eq([offender.ldu.email_address])
+      expect(mail.to).to eq([offender.ldu_email_address])
     end
 
     it 'personalises the email for handover' do

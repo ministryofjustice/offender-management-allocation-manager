@@ -13,7 +13,8 @@ RSpec.feature "ChangeParoleReviewDates", :allocation, type: :feature do
   end
 
   it 'updates the date',  vcr: { cassette_name: :change_parole_date } do
-    visit prison_allocation_path('LEI', nomis_offender_id)
+    path = prison_allocation_path('LEI', nomis_offender_id)
+    visit path
 
     click_link 'Update'
 
@@ -24,6 +25,7 @@ RSpec.feature "ChangeParoleReviewDates", :allocation, type: :feature do
     click_button 'Update'
 
     expect(case_info.reload.parole_review_date).to eq(Date.new(year, 5, 13))
+    expect(page).to have_current_path(path)
   end
 
   it 'bounces properly', vcr: { cassette_name: :change_parole_date_bounce } do

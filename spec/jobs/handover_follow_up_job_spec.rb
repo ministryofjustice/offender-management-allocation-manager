@@ -143,7 +143,7 @@ RSpec.describe HandoverFollowUpJob, :allocation, type: :job do
             nomis_offender_id: determinate_offender.offender_no,
             offender_name: determinate_offender.full_name,
             offender_crn: determinate_offender.crn,
-            ldu_email: determinate_offender.ldu.email_address,
+            ldu_email: determinate_offender.ldu_email_address,
             sentence_type: "Determinate",
             prison: "HMP Leeds",
             start_date: determinate_offender.handover_start_date,

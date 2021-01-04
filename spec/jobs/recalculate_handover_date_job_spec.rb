@@ -60,4 +60,61 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       described_class.perform_now(offender_no)
     end
   end
+
+  context 'when the Prison API returns an error' do
+    let(:api_host) { Rails.configuration.prison_api_host }
+    let(:stub_url) { "#{api_host}/api/prisoners/#{offender_no}" }
+    let(:status) { 502 }
+
+    before do
+      stub_offender(nomis_offender)
+      create(:case_information, nomis_offender_id: offender_no, case_allocation: 'NPS', manual_entry: false)
+
+      # Stub HTTP requests to the Prison API
+      stub_request(:any, stub_url).to_return(status: status)
+    end
+
+    it 'raises an exception so the job will go into the retry queue' do
+      expect {
+        described_class.perform_now(offender_no)
+      }.to raise_error(Faraday::ClientError)
+    end
+  end
+
+  context 'when the Community API returns an error' do
+    let(:api_host) { Rails.configuration.community_api_host }
+    let(:stub_base_url) { "#{api_host}/secure/offenders/nomsNumber/#{offender_no}/custody/keyDates" }
+    let(:start_date_url) { "#{stub_base_url}/#{HmppsApi::CommunityApi::KeyDate::HANDOVER_START_DATE}" }
+    let(:handover_date_url) { "#{stub_base_url}/#{HmppsApi::CommunityApi::KeyDate::RESPONSIBILITY_HANDOVER_DATE}" }
+    let(:status) { nil }
+
+    before do
+      stub_offender(nomis_offender)
+      create(:case_information, nomis_offender_id: offender_no, case_allocation: 'NPS', manual_entry: false)
+
+      # Stub HTTP requests to the Community API
+      stub_request(:any, start_date_url).to_return(status: status)
+      stub_request(:any, handover_date_url).to_return(status: status)
+    end
+
+    describe 'HTTP 400: offender has multiple active custodial events' do
+      let(:status) { 400 }
+
+      it 'rescues the error to stop the job going into the retry queue' do
+        expect {
+          described_class.perform_now(offender_no)
+        }.not_to raise_error
+      end
+    end
+
+    describe 'HTTP 409: multiple offenders with the same NOMIS ID exist in nDelius' do
+      let(:status) { 409 }
+
+      it 'rescues the error to stop the job going into the retry queue' do
+        expect {
+          described_class.perform_now(offender_no)
+        }.not_to raise_error
+      end
+    end
+  end
 end
