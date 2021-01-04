@@ -128,4 +128,17 @@ RSpec.describe EarlyAllocation, type: :model do
       end
     end
   end
+
+  describe '#suitable_offenders_pre_referral_window' do
+    it 'selects only those assessments that are NOT ineligible and were created before the referral window' do
+      discretionary_outside_referral = create(:early_allocation, :discretionary, outcome: 'discretionary', created_within_referral_window: false)
+      eligible_outside_referral = create(:early_allocation, created_within_referral_window: false)
+      create(:early_allocation, :ineligible)
+      create(:early_allocation, :discretionary, created_within_referral_window: true)
+      create(:early_allocation, created_within_referral_window: true)
+
+      expect(described_class.suitable_offenders_pre_referral_window).to match_array([discretionary_outside_referral.nomis_offender_id,
+                                                                                     eligible_outside_referral.nomis_offender_id])
+    end
+  end
 end
