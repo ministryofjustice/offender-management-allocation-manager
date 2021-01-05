@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) do |repo| "https://github.com/#{repo}.git" end
 
-ruby '2.6.3'
+ruby '2.6.6'
 
 gem 'bootsnap', '>= 1.1.0', require: false
 gem 'coffee-rails', '~> 5.0'
@@ -94,9 +94,9 @@ group :development do
   gem 'guard-rspec'
   gem 'listen', '>= 3.0.5', '< 3.3'
   gem 'memory_profiler'
-  # prevent warnings from parser as we are using ruby 2.6.3
+  # prevent warnings from parser as we are using ruby 2.6
   # change this when upgrading ruby version
-  gem 'parser', '< 2.6.4'
+  gem 'parser', '< 2.7'
   gem 'rack-mini-profiler'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'stackprof'
