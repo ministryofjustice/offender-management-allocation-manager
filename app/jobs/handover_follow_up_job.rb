@@ -3,7 +3,8 @@ class HandoverFollowUpJob < ApplicationJob
 
   def perform(date)
     ldus = LocalDivisionalUnit.with_email_address
-    active_prison_codes = Prison.active.map(&:code)
+    active_prisons = Prison.active
+    active_prison_codes = active_prisons.map(&:code)
 
     ldus.each do |ldu|
       offenders = ldu.teams.map { |team| team.case_information.where(com_name: nil).map(&:nomis_offender_id) }.flatten
@@ -15,7 +16,13 @@ class HandoverFollowUpJob < ApplicationJob
 
       offenders.each do |offender|
         allocation = Allocation.where(nomis_offender_id: offender.offender_no).first
-        pom = PrisonOffenderManagerService.get_pom_at(offender.prison_id, allocation.primary_pom_nomis_id)
+
+        pom = if allocation.nil?
+                nil
+              else
+                PrisonOffenderManagerService.get_pom_at(offender.prison_id, allocation.primary_pom_nomis_id)
+              end
+
         offender_type = offender.indeterminate_sentence? ? 'Indeterminate' : 'Determinate'
 
         CommunityMailer.urgent_pipeline_to_community(
@@ -27,8 +34,8 @@ class HandoverFollowUpJob < ApplicationJob
           prison: PrisonService.name_for(offender.prison_id),
           start_date: offender.handover_start_date,
           responsibility_handover_date: offender.responsibility_handover_date,
-          pom_name: pom.full_name,
-          pom_email: pom.email_address
+          pom_name: pom.nil? ? 'This offender does not have an allocated POM' : pom.full_name,
+          pom_email: pom.nil? ? '' : pom.email_address
         ).deliver_now
       end
     end
