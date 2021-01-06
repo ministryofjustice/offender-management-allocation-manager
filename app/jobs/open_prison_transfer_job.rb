@@ -18,7 +18,7 @@ class OpenPrisonTransferJob < ApplicationJob
     return unless PrisonService.open_prison?(offender.prison_id)
 
     Rails.logger.info("[MOVEMENT] Processing move to open prison for #{offender.offender_no}")
-    send_email(offender, movement) if ldu_email_address(offender).present?
+    send_email(offender, movement) if offender.ldu_email_address.present?
   end
 
 private
@@ -33,7 +33,7 @@ private
       responsible_pom_email: last_pom_email(alloc) || 'N/A',
       prison_name: PrisonService.name_for(movement.to_agency),
       previous_prison_name: PrisonService.name_for(movement.from_agency),
-      email: ldu_email_address(offender)
+      email: offender.ldu_email_address
     ).deliver_later
   end
 
@@ -52,9 +52,5 @@ private
     return nil if allocation.blank?
 
     HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(allocation.primary_pom_nomis_id).first
-  end
-
-  def ldu_email_address(offender)
-    offender.ldu.try(:email_address)
   end
 end

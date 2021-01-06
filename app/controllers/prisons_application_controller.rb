@@ -54,4 +54,16 @@ private
   def page
     params.fetch('page', 1).to_i
   end
+
+  def set_referrer
+    @referrer = referrer
+  end
+
+  def referrer
+    session[:referrer] || request.referer
+  end
+
+  def store_referrer_in_session
+    session[:referrer] = request.referer
+  end
 end

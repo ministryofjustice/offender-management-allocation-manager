@@ -39,12 +39,10 @@ module HmppsApi
           }
       }
 
-      # We don't use a cache here because we're not 'getting' data, but 'pushing' it
       self.client.put(route, body)
 
       # So long as the API call didn't error, return true
       # The API response body isn't useful to us
-      #
       true
     end
 
@@ -57,7 +55,6 @@ module HmppsApi
 
       # So long as the API call didn't error, return true
       # The API response body isn't useful to us
-
       true
     end
 

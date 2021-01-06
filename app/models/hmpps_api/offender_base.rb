@@ -65,12 +65,20 @@ module HmppsApi
       @case_information.welsh_offender == 'Yes'
     end
 
-    def ldu
-      @case_information&.local_divisional_unit
+    def ldu_name
+      @case_information&.local_divisional_unit&.name
     end
 
-    def team
+    def ldu_email_address
+      @case_information&.local_divisional_unit&.email_address
+    end
+
+    def team_name
       @case_information&.team&.name
+    end
+
+    def delius_matched?
+      @case_information&.manual_entry == false
     end
 
     def allocated_com_name
@@ -139,6 +147,10 @@ module HmppsApi
       @responsibility_override.present?
     end
 
+    # This list must only contain fields that are both supplied by
+    # https://api-dev.prison.service.justice.gov.uk/swagger-ui.html#//prisoners/getPrisonersOffenderNo
+    # and also by
+    # https://api-dev.prison.service.justice.gov.uk/swagger-ui.html#//locations/getOffendersAtLocationDescription
     def load_from_json(payload)
       # It is expected that this method will be called by the subclass which
       # will have been given a payload at the class level, and will call this
@@ -173,6 +185,22 @@ module HmppsApi
 
       # This is separate from @case_information so the rest of this class doesn't need to know about the Active Record association
       @responsibility_override = record.responsibility
+    end
+
+    def approaching_handover?
+      today = Time.zone.today
+      thirty_days_time = today + 30.days
+
+      start_date = handover_start_date
+      handover_date = responsibility_handover_date
+
+      return false if start_date.nil?
+
+      if start_date.future?
+        start_date.between?(today, thirty_days_time)
+      else
+        today.between?(start_date, handover_date)
+      end
     end
 
     def within_early_allocation_window?

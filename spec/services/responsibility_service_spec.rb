@@ -124,6 +124,21 @@ describe ResponsibilityService do
       end
     end
 
+    context 'when indeterminate with dates in the past' do
+      let(:offender) {
+        OpenStruct.new indeterminate_sentence?: true,
+                       recalled?: false,
+                       tariff_date: Time.zone.today - 1.year,
+                       sentenced?: true
+      }
+
+      it 'is responsible' do
+        resp = described_class.calculate_pom_responsibility(offender)
+
+        expect(resp).to eq ResponsibilityService::RESPONSIBLE
+      end
+    end
+
     context 'when indeterminate with no tariff date' do
       let(:offender) {
         OpenStruct.new immigration_case?: false,

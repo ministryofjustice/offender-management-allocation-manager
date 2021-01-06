@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 feature 'summary summary feature' do
@@ -26,11 +28,40 @@ feature 'summary summary feature' do
       expect(page).to have_content('Add missing information')
     end
 
-    it 'displays offenders already allocated', vcr: { cassette_name: :allocated_offenders_feature } do
-      visit prison_summary_allocated_path('LEI')
+    context 'with allocations', :allocation do
+      let(:first) { 'G7806VO' }
+      let(:last) { 'G3462VT' }
 
-      expect(page).to have_css('.moj-sub-navigation__item')
-      expect(page).to have_content('See allocations')
+      before do
+        Timecop.travel Date.new(2019, 6, 20) do
+          create(:case_information, nomis_offender_id: first)
+          create(:allocation, nomis_offender_id: first)
+        end
+        Timecop.travel Date.new(2019, 6, 30) do
+          create(:case_information, nomis_offender_id: last)
+          create(:allocation, nomis_offender_id: last)
+        end
+      end
+
+      it 'displays offenders already allocated', vcr: { cassette_name: :allocated_offenders_feature } do
+        visit prison_summary_allocated_path('LEI')
+
+        expect(page).to have_css('.moj-sub-navigation__item')
+        expect(page).to have_content('See allocations')
+
+        # forward sort
+        click_link 'Allocation date'
+        # The 'hint' contains the offender id
+        expect(all('.govuk-hint').map(&:text)).to eq [first, last]
+
+        # reverse sort
+        click_link 'Allocation date'
+        expect(all('.govuk-hint').map(&:text)).to eq [last, first]
+
+        # forward sort
+        click_link 'Allocation date'
+        expect(all('.govuk-hint').map(&:text)).to eq [first, last]
+      end
     end
 
     it 'displays offenders just arrived allocated', vcr: { cassette_name: :new_offenders_feature } do

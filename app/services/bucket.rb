@@ -16,15 +16,25 @@ class Bucket
     @items << item
   end
 
-  def sort_bucket!(field, direction = :asc)
+  def sort_bucket!(field, direction)
     return unless @valid_sort_fields.include?(field)
 
-    if field == :earliest_release_date
-      @items.sort_by! { |e| e.public_send(field) || Date.new(1) }
-    else
-      @items.sort_by!(&field)
+    @items.sort! do |x, y|
+      if direction == :asc
+        a = x.public_send(field)
+        b = y.public_send(field)
+      else
+        b = x.public_send(field)
+        a = y.public_send(field)
+      end
+      # ensure that nil values sort low, but other values sort by comparison
+      if a.present? && b.present?
+        a <=> b
+      elsif a.nil?
+        -1
+      else
+        1
+      end
     end
-
-    @items.reverse! if direction == :desc
   end
 end

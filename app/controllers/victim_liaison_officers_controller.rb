@@ -52,18 +52,6 @@ class VictimLiaisonOfficersController < PrisonsApplicationController
 
 private
 
-  def set_referrer
-    @referrer = referrer
-  end
-
-  def referrer
-    session[:referrer] || request.referer
-  end
-
-  def store_referrer_in_session
-    session[:referrer] = request.referer
-  end
-
   def find_vlo
     @vlo = VictimLiaisonOfficer.find params[:id]
   end

@@ -24,6 +24,8 @@ module HmppsApi
       }
     end
 
+    # This list must only contain values that are returned by
+    # https://api-dev.prison.service.justice.gov.uk/swagger-ui.html#//locations/getOffendersAtLocationDescription
     def load_from_json(payload)
       @booking_id = payload.fetch('bookingId').to_i
       @prison_id = payload.fetch('agencyId')
