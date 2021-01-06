@@ -138,9 +138,9 @@ feature "view an offender's allocation information", :allocation do
     end
 
     it "displays a link to the prisoner's New Nomis profile", vcr: { cassette_name: :show_allocation_information_new_nomis_profile } do
-      expect(page).to have_css('.govuk-table__cell', text: 'View NOMIS profile')
-      expect(find_link('View NOMIS profile')[:target]).to eq('_blank')
-      expect(find_link('View NOMIS profile')[:href]).to include("offenders/#{nomis_offender_id_with_keyworker}/quick-look")
+      expect(page).to have_css('.govuk-table__cell', text: 'View DPS Profile')
+      expect(find_link('View DPS Profile')[:target]).to eq('_blank')
+      expect(find_link('View DPS Profile')[:href]).to include("offenders/#{nomis_offender_id_with_keyworker}/quick-look")
     end
 
     it 'displays a link to allocate a co-worker', vcr: { cassette_name: :show_allocation_information_display_coworker_link } do
