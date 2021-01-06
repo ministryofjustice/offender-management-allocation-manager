@@ -23,7 +23,7 @@ class HandoverFollowUpJob < ApplicationJob
           offender_name: offender.full_name,
           offender_crn: offender.crn,
           sentence_type: offender_type,
-          ldu_email: offender.ldu.email_address,
+          ldu_email: offender.ldu_email_address,
           prison: PrisonService.name_for(offender.prison_id),
           start_date: offender.handover_start_date,
           responsibility_handover_date: offender.responsibility_handover_date,

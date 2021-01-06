@@ -38,7 +38,6 @@ RSpec.describe TasksController, :allocation, type: :controller do
     end
   end
 
-
   context 'when showing parole review date pom tasks' do
     let(:offender_no) { 'G7514GW' }
 
@@ -84,16 +83,16 @@ RSpec.describe TasksController, :allocation, type: :controller do
       stub_offender(build(:nomis_offender, offenderNo: offender_no))
 
       # Ensure only one of our offenders has missing data and that G7514GW (indeterminate) has a PRD
-      create(:case_information, nomis_offender_id: offender_no, tier: 'A', mappa_level: 1, team: nil)
+      create(:case_information, nomis_offender_id: offender_no, tier: 'A', manual_entry: true)
       create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id, prison: prison)
 
-      create(:case_information,  nomis_offender_id: 'G1234AB', tier: 'A', mappa_level: 1)
+      create(:case_information,  nomis_offender_id: 'G1234AB', tier: 'A', manual_entry: false)
       create(:allocation, nomis_offender_id: 'G1234AB', primary_pom_nomis_id: staff_id, prison: prison)
 
-      create(:case_information, nomis_offender_id: 'G1234GG', tier: 'A', mappa_level: 1)
+      create(:case_information, nomis_offender_id: 'G1234GG', tier: 'A', manual_entry: false)
       create(:allocation, nomis_offender_id: 'G1234GG', primary_pom_nomis_id: staff_id, prison: prison)
 
-      create(:case_information,  nomis_offender_id: 'G7514GW', tier: 'A', mappa_level: 1, parole_review_date: next_week)
+      create(:case_information,  nomis_offender_id: 'G7514GW', tier: 'A', manual_entry: false, parole_review_date: next_week)
       create(:allocation, nomis_offender_id: 'G7514GW', primary_pom_nomis_id: staff_id, prison: prison)
     end
 
@@ -124,16 +123,13 @@ RSpec.describe TasksController, :allocation, type: :controller do
       end
 
       create(:early_allocation, :discretionary, nomis_offender_id: test_offender_no)
-      create(:early_allocation, :stage2, nomis_offender_id: test_offender_no)
 
       get :index, params: { prison_id: prison }
 
       expect(response).to be_successful
 
       pomtasks = assigns(:pomtasks)
-      expect(pomtasks.count).to eq(1)
-      expect(pomtasks.first.offender_number).to eq(test_offender_no)
-      expect(pomtasks.first.action_label).to eq('Early allocation decision')
+      expect(pomtasks.map { |pt| { num: pt.offender_number, label: pt.action_label } }).to eq([{ num: test_offender_no, label: 'Early allocation decision' }])
     end
   end
 
@@ -156,7 +152,6 @@ RSpec.describe TasksController, :allocation, type: :controller do
     it 'can show multiple types at once' do
       # One offender should have a pending early allocation
       create(:early_allocation, :discretionary, nomis_offender_id: test_offender_no)
-      create(:early_allocation, :stage2, nomis_offender_id: test_offender_no)
 
       get :index, params: { prison_id: prison }
 
@@ -169,22 +164,19 @@ RSpec.describe TasksController, :allocation, type: :controller do
     it 'can sort the results' do
       # Two offenders should have a pending early allocation
       create(:early_allocation, :discretionary, nomis_offender_id: 'G1234AB')
-      create(:early_allocation, :stage2, nomis_offender_id: 'G1234AB')
-
       create(:early_allocation, :discretionary, nomis_offender_id: 'G1234GG')
-      create(:early_allocation, :stage2, nomis_offender_id: 'G1234GG')
+      # This 'task' doesn't show up as it was created before the referral window of <18 months before release
+      create(:early_allocation, :discretionary, created_within_referral_window: false, nomis_offender_id: 'G7514GW')
 
       get :index, params: { prison_id: prison, sort: 'offender_name asc' }
       expect(response).to be_successful
       pomtasks = assigns(:pomtasks)
-      expect(pomtasks[0].offender_name).to eq('Aliceson, Alice')
-      expect(pomtasks[2].offender_name).to eq('Davidson, David')
+      expect(pomtasks.map(&:offender_name)).to eq(['Aliceson, Alice', "Caroleson, Carole", 'Davidson, David'])
 
       get :index, params: { prison_id: prison, sort: 'offender_name desc' }
       expect(response).to be_successful
       pomtasks = assigns(:pomtasks)
-      expect(pomtasks[0].offender_name).to eq('Davidson, David')
-      expect(pomtasks[2].offender_name).to eq('Aliceson, Alice')
+      expect(pomtasks.map(&:offender_name)).to eq(['Davidson, David', "Caroleson, Carole", 'Aliceson, Alice'])
     end
   end
 end

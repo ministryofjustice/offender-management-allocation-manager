@@ -19,14 +19,20 @@ RSpec.describe SearchHelper do
       expect(text).to eq('<a href="/prisons/LEI/allocations/A/new">Allocate</a>')
     end
 
-    it "will change to view if there is an allocation" do
-      offender = HmppsApi::Offender.new(
-        offender_no: 'A',
-        allocated_pom_name: 'Bob'
-      ).tap { |o| o.load_case_information(build(:case_information, tier: 'A')) }
+    context 'with an allocation' do
+      let(:case_info) { build(:case_information, tier: 'A') }
 
-      text, _link = cta_for_offender('LEI', offender)
-      expect(text).to eq('<a href="/prisons/LEI/allocations/A">View</a>')
+      it "will change to view" do
+        offender = HmppsApi::Offender.new(
+          offender_no: 'G1234FX'
+        ).tap { |o|
+          o.allocated_pom_name = 'Bob'
+          o.load_case_information(case_info)
+        }
+
+        text, _link = cta_for_offender('LEI', offender)
+        expect(text).to eq('<a href="/prisons/LEI/allocations/G1234FX">View</a>')
+      end
     end
   end
 end

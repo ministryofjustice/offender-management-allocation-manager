@@ -35,7 +35,7 @@ RSpec.describe "shared/no_com_alert", type: :view do
                       href: "#com-error")
 
       expect(page.css('#ldu_warning'))
-        .to have_link(I18n.t('views.handover_alert.no_email', name: offender.ldu.name), href: "#com-error")
+        .to have_link(I18n.t('views.handover_alert.no_email', name: offender.ldu_name), href: "#com-error")
     end
   end
 

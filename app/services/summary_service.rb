@@ -8,7 +8,7 @@ class SummaryService
     # :pending, or :new_arrivals or :handovers. The other types will return totals, and do not contain
     # any data.
     sortable_fields = {
-        allocated: [:last_name, :earliest_release_date, :tier],
+        allocated: [:last_name, :earliest_release_date, :tier, :allocation_date],
         new_arrivals: [:last_name, :prison_arrival_date, :earliest_release_date],
         handovers: [:last_name, :handover_start_date, :responsibility_handover_date, :case_allocation, :allocated_pom_name, :allocated_com_name],
         unallocated: [:last_name, :earliest_release_date, :case_owner, :awaiting_allocation_for, :tier],
@@ -38,7 +38,7 @@ class SummaryService
           @buckets.fetch(:unallocated) << offender
         end
 
-        if approaching_handover?(offender)
+        if offender.approaching_handover?
           @buckets.fetch(:handovers) << offender
         end
       elsif new_arrival?(offender)
@@ -49,6 +49,14 @@ class SummaryService
     end
 
     add_allocated_poms_and_coms(@buckets[summary_type], active_allocations_hash)
+
+    default_sort_params =
+      { allocated: [nil, nil],
+        unallocated: [:sentence_start_date, :asc],
+        pending: [:sentence_start_date, :asc],
+        new_arrivals: [:sentence_start_date, :asc],
+        handovers: [:handover_start_date, :asc]
+      }.fetch(summary_type)
 
     @sort_params = if sort_params
                      parts = sort_params.split.map { |s| s.downcase.to_sym }
@@ -92,36 +100,11 @@ class SummaryService
 
 private
 
-  def default_sort_params
-    { allocated: [nil, nil],
-        unallocated: [:sentence_start_date, :asc],
-        pending: [:sentence_start_date, :asc],
-        new_arrivals: [:sentence_start_date, :asc],
-        handovers: [:handover_start_date, :asc]
-    }.fetch(@summary_type)
-  end
-
   def new_arrival?(offender)
     if Time.zone.today.monday?
       offender.awaiting_allocation_for <= 2
     else
       offender.prison_arrival_date.to_date == Time.zone.today
-    end
-  end
-
-  def approaching_handover?(offender)
-    today = Time.zone.today
-    thirty_days_time = today + 30.days
-
-    start_date = offender.handover_start_date
-    handover_date = offender.responsibility_handover_date
-
-    return false if start_date.nil?
-
-    if start_date.future?
-      start_date.between?(today, thirty_days_time)
-    else
-      today.between?(start_date, handover_date)
     end
   end
 

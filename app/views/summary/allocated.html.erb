@@ -32,7 +32,12 @@
         <%= sort_arrow('earliest_release_date') %>
       </th>
       <th class="govuk-table__header" scope="col">POM</th>
-      <th class="govuk-table__header" scope="col">Allocation date</th>
+      <th class="govuk-table__header sorter-false" scope="col">
+        <a href="<%= sort_link('allocation_date') %>">
+          Allocation date
+        </a>
+        <%= sort_arrow('allocation_date') %>
+      </th>
       <th class="govuk-table__header sorter-false" scope="col">Action</th>
     </tr>
     </thead>

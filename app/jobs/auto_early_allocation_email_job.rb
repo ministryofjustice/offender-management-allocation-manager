@@ -8,14 +8,14 @@ class AutoEarlyAllocationEmailJob < ApplicationJob
   def perform(prison, offender_no, encoded_pdf)
     offender = OffenderService.get_offender(offender_no)
     pdf = Base64.decode64 encoded_pdf
-    EarlyAllocationMailer.auto_early_allocation(email: offender.ldu.email_address,
+    EarlyAllocationMailer.auto_early_allocation(email: offender.ldu_email_address,
                                     prisoner_name: offender.full_name,
                                     prisoner_number: offender.offender_no,
                                     prison_name: PrisonService.name_for(prison),
                                     pdf: pdf).deliver_now
     EmailHistory.create! nomis_offender_id: offender.offender_no,
-                         name: offender.ldu.name,
-                         email: offender.ldu.email_address,
+                         name: offender.ldu_name,
+                         email: offender.ldu_email_address,
                          event: EmailHistory::AUTO_EARLY_ALLOCATION,
                          prison: prison
   end

@@ -6,10 +6,10 @@
     <ul class="govuk-list govuk-error-summary__list">
       <li id="com_warning"><%= link_to I18n.t('views.handover_alert.no_com', date: format_date(@prisoner.handover_start_date)), "#com-error", data: { turbolinks: false } %></li>
       <li id="ldu_warning">
-        <% if @prisoner.ldu.try(:name).blank? %>
+        <% if @prisoner.ldu_name.blank? %>
           <%= link_to I18n.t('views.handover_alert.no_ldu'), "#com-error", data: { turbolinks: false }  %>
         <% else %>
-          <%= link_to I18n.t('views.handover_alert.no_email', name: @prisoner.ldu.name), "#com-error", data: { turbolinks: false }  %>
+          <%= link_to I18n.t('views.handover_alert.no_email', name: @prisoner.ldu_name), "#com-error", data: { turbolinks: false }  %>
         <% end %>
       </li>
     </ul>
