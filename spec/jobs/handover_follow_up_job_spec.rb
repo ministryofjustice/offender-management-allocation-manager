@@ -125,36 +125,6 @@ RSpec.describe HandoverFollowUpJob, :allocation, type: :job do
       described_class.perform_now(date_of_handover)
     end
 
-    it 'sends emails when offenders handover date is exactly one week overdue' do
-      pom = build(:pom)
-
-      allow(PrisonOffenderManagerService).to receive(:get_pom_at).and_return(pom)
-
-      create(:allocation, nomis_offender_id: determinate_offender.offender_no,
-             primary_pom_nomis_id: pom.staff_id,
-             primary_pom_name: pom.full_name)
-
-      determinate_offender.load_case_information(case_info)
-      date_of_handover = determinate_offender.handover_start_date + 1.week
-
-      expect_any_instance_of(CommunityMailer)
-      .to receive(:urgent_pipeline_to_community)
-          .with(
-            nomis_offender_id: determinate_offender.offender_no,
-            offender_name: determinate_offender.full_name,
-            offender_crn: determinate_offender.crn,
-            ldu_email: determinate_offender.ldu_email_address,
-            sentence_type: "Determinate",
-            prison: "HMP Leeds",
-            start_date: determinate_offender.handover_start_date,
-            responsibility_handover_date: determinate_offender.responsibility_handover_date,
-            pom_name: pom.full_name,
-            pom_email: pom.email_address
-          ).and_call_original
-
-      described_class.perform_now(date_of_handover)
-    end
-
     it 'does not send emails for offenders when their handover date is overdue by more than a week' do
       create(:allocation, nomis_offender_id: determinate_offender.offender_no)
       determinate_offender.load_case_information(case_info)
@@ -162,6 +132,63 @@ RSpec.describe HandoverFollowUpJob, :allocation, type: :job do
       date_of_handover = determinate_offender.handover_start_date + 10.days
       expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
       described_class.perform_now(date_of_handover)
+    end
+
+    context 'when handover date is exactly one week overdue' do
+      let(:date_of_handover) { determinate_offender.handover_start_date + 1.week }
+
+      it 'sends emails for unallocated offenders' do
+        prison_code = Prison.new("LEI")
+        allow(Prison).to receive(:active).and_return([prison_code])
+        allow(PrisonOffenderManagerService).to receive(:get_pom_at).and_return(nil)
+
+        determinate_offender.load_case_information(case_info)
+
+        expect_any_instance_of(CommunityMailer)
+        .to receive(:urgent_pipeline_to_community)
+            .with(
+              nomis_offender_id: determinate_offender.offender_no,
+              offender_name: determinate_offender.full_name,
+              offender_crn: determinate_offender.crn,
+              ldu_email: determinate_offender.ldu_email_address,
+              sentence_type: "Determinate",
+              prison: "HMP Leeds",
+              start_date: determinate_offender.handover_start_date,
+              responsibility_handover_date: determinate_offender.responsibility_handover_date,
+              pom_name: "This offender does not have an allocated POM",
+              pom_email: ""
+              ).and_call_original
+
+        described_class.perform_now(date_of_handover)
+      end
+
+      it 'sends emails for allocated offenders' do
+        pom = build(:pom)
+        allow(PrisonOffenderManagerService).to receive(:get_pom_at).and_return(pom)
+
+        create(:allocation, nomis_offender_id: determinate_offender.offender_no,
+               primary_pom_nomis_id: pom.staff_id,
+               primary_pom_name: pom.full_name)
+
+        determinate_offender.load_case_information(case_info)
+
+        expect_any_instance_of(CommunityMailer)
+        .to receive(:urgent_pipeline_to_community)
+            .with(
+              nomis_offender_id: determinate_offender.offender_no,
+              offender_name: determinate_offender.full_name,
+              offender_crn: determinate_offender.crn,
+              ldu_email: determinate_offender.ldu_email_address,
+              sentence_type: "Determinate",
+              prison: "HMP Leeds",
+              start_date: determinate_offender.handover_start_date,
+              responsibility_handover_date: determinate_offender.responsibility_handover_date,
+              pom_name: pom.full_name,
+              pom_email: pom.email_address
+              ).and_call_original
+
+        described_class.perform_now(date_of_handover)
+      end
     end
   end
 
