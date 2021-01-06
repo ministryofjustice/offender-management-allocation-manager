@@ -73,6 +73,8 @@ GEM
       activesupport (>= 3.0.0, < 6.1)
       ruby2_keywords (>= 0.0.2, < 1.0)
     ast (2.4.1)
+    auto_strip_attributes (2.6.0)
+      activerecord (>= 4.0)
     better_errors (2.8.3)
       coderay (>= 1.0.0)
       erubi (>= 1.0.0)
@@ -485,6 +487,7 @@ PLATFORMS
 
 DEPENDENCIES
   activeadmin
+  auto_strip_attributes
   better_errors
   binding_of_caller
   bootsnap (>= 1.1.0)

@@ -134,7 +134,7 @@ ActiveRecord::Schema.define(version: 2020_12_14_130556) do
   create_table "local_delivery_units", force: :cascade do |t|
     t.string "code", null: false
     t.string "name", null: false
-    t.string "email", null: false
+    t.string "email_address", null: false
     t.string "country", null: false
     t.boolean "enabled", null: false
     t.datetime "created_at", precision: 6, null: false

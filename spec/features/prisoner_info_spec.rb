@@ -59,6 +59,7 @@ feature 'View a prisoner profile page', :allocation do
         end
         find('.govuk-back-link')
         click_link 'Back'
+        find '.vlo-row-1' # wait for page to re-load
         within '.vlo-row-1' do
           within '.change-email' do
             click_link 'Change'
