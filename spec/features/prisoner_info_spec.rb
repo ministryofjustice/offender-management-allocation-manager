@@ -17,6 +17,29 @@ feature 'View a prisoner profile page', :allocation do
     end
   end
 
+  context 'with an existing early allocation',  vcr: { cassette_name: :early_allocation_banner } do
+    before do
+      create(:case_information, nomis_offender_id: 'G7998GJ', early_allocations: [build(:early_allocation, created_within_referral_window: within_window)])
+      visit prison_prisoner_path('LEI', 'G7998GJ')
+    end
+
+    context 'with an old early allocation' do
+      let(:within_window) { false }
+
+      it 'shows a notification', :js do
+        expect(page).to have_text('Ahmonis, Okadonah might be eligible for early allocation to the community probation team')
+      end
+    end
+
+    context 'with an new early allocation' do
+      let(:within_window) { true }
+
+      it 'does not show a notification', :js do
+        expect(page).not_to have_text('eligible for early allocation to the community probation team')
+      end
+    end
+  end
+
   context 'with an allocation' do
     before do
       create(:case_information, nomis_offender_id: 'G7998GJ', victim_liaison_officers: [build(:victim_liaison_officer)])
@@ -137,40 +160,47 @@ feature 'View a prisoner profile page', :allocation do
     end
   end
 
-  context 'with community information' do
-    it "has community information when present",
-       vcr: { cassette_name: :show_offender_community_info_full } do
-      ldu = create(:local_divisional_unit, name: 'An LDU', email_address: 'test@example.com')
-      team = create(:team, name: 'A team', local_divisional_unit: ldu)
-      create(:case_information,
-             nomis_offender_id: 'G7998GJ',
-             team: team,
-             com_name: 'Bob Smith'
-      )
+  describe 'community information' do
+    context 'with an email address' do
+      let(:ldu) { create(:local_divisional_unit, name: 'An LDU', email_address: 'test@example.com') }
+      let(:team) { create(:team, name: 'A team', local_divisional_unit: ldu) }
 
-      visit prison_prisoner_path('LEI', 'G7998GJ')
+      before do
+        create(:case_information,
+               nomis_offender_id: 'G7998GJ',
+               team: team,
+               com_name: 'Bob Smith'
+        )
+      end
 
-      expect(page).to have_content(ldu.name)
-      expect(page).to have_content(ldu.email_address)
-      expect(page).to have_content(team.name)
-      expect(page).to have_content('Bob Smith')
+      it "has community information", vcr: { cassette_name: :show_offender_community_info_full } do
+        visit prison_prisoner_path('LEI', 'G7998GJ')
+
+        expect(page).to have_content(ldu.name)
+        expect(page).to have_content(ldu.email_address)
+        expect(page).to have_content(team.name)
+        expect(page).to have_content('Bob Smith')
+      end
     end
 
-    it "has some community information when present",
-       vcr: { cassette_name: :show_offender_community_info_partial } do
-      ldu = create(:local_divisional_unit, name: 'An LDU', email_address: nil)
-      team = create(:team, local_divisional_unit: ldu)
-      create(:case_information,
-             nomis_offender_id: 'G7998GJ',
-             team: team
-      )
+    context 'without email address or com name' do
+      before do
+        ldu = create(:local_divisional_unit, name: 'An LDU', email_address: nil)
+        team = create(:team, local_divisional_unit: ldu)
+        create(:case_information,
+               nomis_offender_id: 'G7998GJ',
+               team: team
+        )
+      end
 
-      visit prison_prisoner_path('LEI', 'G7998GJ')
+      it "has some community information when present", :js, vcr: { cassette_name: :show_offender_community_info_partial } do
+        visit prison_prisoner_path('LEI', 'G7998GJ')
 
-      expect(page).not_to have_content('Bob Smith')
-      # Expect an Unknown for LDU Email and Team
-      within '#community_information' do
-        expect(page).to have_content('Unknown', count: 2)
+        expect(page).not_to have_content('Bob Smith')
+        # Expect an Unknown for LDU Email and Team
+        within '#community_information' do
+          expect(page).to have_content('Unknown', count: 2)
+        end
       end
     end
   end

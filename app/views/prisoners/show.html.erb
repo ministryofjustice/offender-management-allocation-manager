@@ -8,6 +8,14 @@
   %>
 <% end %>
 
+<% if @prisoner.needs_early_allocation_notify? %>
+  <% content_for :info_banner do %>
+    <%= @prisoner.full_name %> might be eligible for early allocation to the community probation team.
+    You must now <%= link_to 'check and carry out a new assessment', new_prison_prisoner_early_allocations_path(@prison.code, @prisoner.offender_no), class: 'govuk-link' %>
+  <% end %>
+  <%= render '/layouts/info_banner' %>
+<% end %>
+
 <div class="govuk-grid-row govuk-!-margin-bottom-5">
   <div class="govuk-grid-column-one-quarter">
     <img src="<%= prison_prisoner_image_path(@prison.code, @prisoner.offender_no, format: :jpg) %>" alt="Prisoner photo will be here" width="95%">
