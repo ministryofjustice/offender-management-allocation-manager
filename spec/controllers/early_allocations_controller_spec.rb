@@ -47,6 +47,11 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
         get :show, params: { prison_id: prison, prisoner_id: nomis_offender_id }, format: :pdf
         expect(early_allocation).to eq(CaseInformation.last.early_allocations.last)
       end
+
+      it 'shows most recent html' do
+        get :show, params: { prison_id: prison, prisoner_id: nomis_offender_id }, format: :html
+        expect(early_allocation).to eq(CaseInformation.last.early_allocations.last)
+      end
     end
 
     describe '#update' do

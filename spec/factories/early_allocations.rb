@@ -18,6 +18,10 @@ FactoryBot.define do
 
     association :case_information
 
+    trait :eligible do
+      # Does nothing - eligible is the default outcome of early-allocation
+    end
+
     trait :discretionary do
       cppc_case { false }
       extremism_separation { false }
@@ -83,6 +87,10 @@ FactoryBot.define do
       mappa_level_2 do false end
       pathfinder_process do false end
       other_reason { false }
+    end
+
+    trait :unsent do
+      created_within_referral_window { false }
     end
   end
 end
