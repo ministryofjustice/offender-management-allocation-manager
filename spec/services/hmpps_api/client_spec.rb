@@ -32,7 +32,7 @@ describe HmppsApi::Client do
     end
   end
 
-  xdescribe 'when a HTTP error response is received' do
+  describe 'when a HTTP error response is received' do
     let(:status) { nil }
     let(:route) { '/api/endpoint' }
 
@@ -69,7 +69,7 @@ describe HmppsApi::Client do
     end
   end
 
-  xdescribe 'when the request times out' do
+  describe 'when the request times out' do
     let(:route) { '/api/endpoint' }
 
     before do
