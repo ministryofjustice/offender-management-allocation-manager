@@ -6,7 +6,7 @@ ruby '2.6.6'
 gem 'auto_strip_attributes'
 gem 'bootsnap', '>= 1.1.0', require: false
 gem 'coffee-rails', '~> 5.0'
-gem 'faraday'
+gem 'faraday', '~> 1.0'
 gem 'govuk_notify_rails'
 # we need the extra is_csv parameter available in 5.2 and above
 gem 'notifications-ruby-client', '>= 5.2'
