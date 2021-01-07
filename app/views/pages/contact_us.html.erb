@@ -34,7 +34,7 @@
 
       <%= form_tag(contact_us_path, method: :post, id: "help_form") do %>
         <div class="<%= field_error(@contact.errors, :name) %>">
-          <%= label_tag "Full name", "Full name", class: 'govuk-label' %>
+          <%= label_tag "name", "Full name", class: 'govuk-label' %>
           <% if @contact.errors[:name].present? %>
                   <span class="govuk-error-message">
                     <%= @contact.errors[:name].first %>
@@ -52,7 +52,7 @@
           <%= email_field_tag("email_address", @contact.email_address, id: "email_address", class: "govuk-input") %>
         </div>
         <div class="<%= field_error(@contact.errors, :job_type) %>">
-          <%= label_tag "Your job role", "Your job role", class: 'govuk-label' %>
+          <%= label_tag "job_type", "Your job role", class: 'govuk-label' %>
           <% if @contact.errors[:job_type].present? %>
                   <span class="govuk-error-message">
                     <%= @contact.errors[:job_type].first %>
@@ -70,7 +70,7 @@
           <%= text_field_tag("prison", @contact.prison, id: "prison", class: "govuk-input") %>
         </div>
         <div class="<%= field_error(@contact.errors, :message) %>">
-          <%= label_tag "Describe what you need help with", "Describe what you need help with", class: 'govuk-label' %>
+          <%= label_tag "message", "Describe what you need help with", class: 'govuk-label' %>
           <% if @contact.errors[:message].present? %>
                   <span class="govuk-error-message">
                     <%= @contact.errors[:message].first %>
