@@ -21,7 +21,7 @@
             <div class="govuk-form-group">
               <div class="govuk-radios__item">
                 <%= radio_button_tag("edit_pom[description]", "FT", @pom.working_pattern.to_s == '1.0', id: "working_pattern-ft", class: "govuk-radios__input") %>
-                <%= label_tag "edit_pom[description]", "Full time", class: "govuk-label govuk-radios__label" %>
+                <%= label_tag "working_pattern-ft", "Full time", class: "govuk-label govuk-radios__label" %>
               </div>
               <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                 <div class="govuk-radios__item">
@@ -34,7 +34,7 @@
                   <% 9.downto(1).each do |value| %>
                     <div class="govuk-radios__item">
                       <%= radio_button_tag("edit_pom[working_pattern]", "0.#{value}", @pom.working_pattern.to_s == "0.#{value}", id: "working_pattern-#{value}", class: "govuk-radios__input") %>
-                      <%= label_tag "edit_pom[working_pattern]", "Part time 0.#{value} - #{working_pattern_to_days(value)}", class: "govuk-label govuk-radios__label" %>
+                      <%= label_tag "working_pattern-#{value}", "Part time 0.#{value} - #{working_pattern_to_days(value)}", class: "govuk-label govuk-radios__label" %>
                     </div>
                   <% end %>
                 </div>
@@ -54,7 +54,7 @@
           <div class="govuk-radios" data-module="govuk-radios">
             <div class="govuk-radios__item">
               <%= radio_button_tag("edit_pom[status]", "active", @pom.status == 'active', id: "status-1", class: "govuk-radios__input") %>
-              <%= label_tag "edit_pom[status]", "Active", class: "govuk-label govuk-radios__label" %>
+              <%= label_tag "status-1", "Active", class: "govuk-label govuk-radios__label" %>
             </div>
             <div class="govuk-radios__item">
               <input class="govuk-radios__input" id="status-conditional-2" name="edit_pom[status]" type="radio" value="unavailable" data-aria-controls="status-2" <%= 'checked' if @pom.status == 'unavailable'%>>
