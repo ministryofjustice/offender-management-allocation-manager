@@ -44,6 +44,7 @@ module OffenderManagementAllocationClient
         )
       end
 
+    # Sentry environment set with SENTRY_CURRENT_ENV
     config.sentry_dsn = ENV['SENTRY_DSN']&.strip
     config.keyworker_api_host = ENV['KEYWORKER_API_HOST']&.strip
     config.community_api_host = ENV['COMMUNITY_API_HOST']&.strip

@@ -55,7 +55,14 @@ Bundler/OrderedGems:
   Enabled: false
 
 Metrics/BlockLength:
-  Max: 38
+  # This is only 2 more than the default, and the transgressor just proves that rubocop can't count.
+  Max: 27
+  Exclude:
+    - 'config/environments/*'
+    - 'Guardfile'
+    - 'app/admin/*'
+    - 'lib/tasks/*'
+    - 'spec/**/*'
 
 RSpec/ExampleLength:
   Max: 95

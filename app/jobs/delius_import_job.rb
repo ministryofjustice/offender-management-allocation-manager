@@ -105,8 +105,8 @@ private
     begin
       yield record
     rescue StandardError => e
-      Raven.extra_context([:team_code, :team].index_with { |field| record.fetch(field) })
-      Raven::capture_exception(e)
+      Sentry.set_extras([:team_code, :team, :ldu_code].index_with { |field| record.fetch(field) })
+      Sentry.capture_exception(e)
     end
   end
 
