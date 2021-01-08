@@ -69,11 +69,11 @@ module HmppsApi
     end
 
     def ldu_name
-      @case_information&.local_divisional_unit&.name
+      ldu&.name
     end
 
     def ldu_email_address
-      @case_information&.local_divisional_unit&.email_address
+      ldu&.email_address
     end
 
     def team_name
@@ -217,6 +217,17 @@ module HmppsApi
     end
 
   private
+
+    # Take either the new LocalDeliveryUnit (if available and enabled) and
+    # fall back to the old local_divisional_unit if not. This should all go away
+    # in Feb 2021 after the PDU changes have been rolled out in nDelius
+    def ldu
+      if @case_information&.local_delivery_unit&.enabled?
+        @case_information.local_delivery_unit
+      else
+        @case_information&.local_divisional_unit
+      end
+    end
 
     def handover
       @handover ||= if pom_responsibility.custody?

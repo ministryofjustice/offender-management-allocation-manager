@@ -6,7 +6,11 @@ class CaseInformation < ApplicationRecord
   NPS = 'NPS'
   CRC = 'CRC'
 
+  #  Old mapping - will be going away in Feb 2021
   belongs_to :team, optional: true, counter_cache: :case_information_count
+
+  # new mapping - don't need team data any more, only team_name for display purposes
+  belongs_to :local_delivery_unit, optional: true
 
   has_many :early_allocations,
            foreign_key: :nomis_offender_id,

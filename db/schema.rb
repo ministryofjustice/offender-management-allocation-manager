@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_14_130556) do
+ActiveRecord::Schema.define(version: 2020_12_15_133824) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -65,6 +65,9 @@ ActiveRecord::Schema.define(version: 2020_12_14_130556) do
     t.date "parole_review_date"
     t.string "probation_service"
     t.string "com_name"
+    t.string "team_name"
+    t.bigint "local_delivery_unit_id"
+    t.index ["local_delivery_unit_id"], name: "index_case_information_on_local_delivery_unit_id"
     t.index ["nomis_offender_id"], name: "index_case_information_on_nomis_offender_id", unique: true
     t.index ["team_id"], name: "index_case_information_on_team_id"
   end
