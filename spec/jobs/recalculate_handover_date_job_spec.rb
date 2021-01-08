@@ -77,7 +77,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     it 'raises an exception so the job will go into the retry queue' do
       expect {
         described_class.perform_now(offender_no)
-      }.to raise_error(Faraday::ClientError)
+      }.to raise_error(Faraday::Error)
     end
   end
 

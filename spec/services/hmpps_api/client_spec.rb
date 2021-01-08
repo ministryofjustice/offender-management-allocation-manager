@@ -62,9 +62,9 @@ describe HmppsApi::Client do
     describe 'a 5xx error' do
       let(:status) { 500 }
 
-      it 'raises a Faraday::ClientError error' do
+      it 'raises the correct error' do
         expect { client.get(route) }.
-          to raise_error(Faraday::ClientError, "the server responded with status #{status}")
+          to raise_error(Faraday::ServerError, "the server responded with status #{status}")
       end
     end
   end
