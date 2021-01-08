@@ -344,6 +344,7 @@ workflows:
               only:
                 - main
                 - preproduction
+                - mo215-upgrade-sentry
       - deploy_staging:
           requires:
             - rubocop
@@ -353,6 +354,7 @@ workflows:
             branches:
               only:
                 - main
+                - mo215-upgrade-sentry
       - test_staging:
           requires:
             - deploy_staging
