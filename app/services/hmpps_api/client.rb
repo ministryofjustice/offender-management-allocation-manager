@@ -13,7 +13,7 @@ module HmppsApi
                         # Note - this might break if we ever use an API that uses a real POST
                         # rather than the fake GETs used by the Prison API
                         methods: Faraday::Request::Retry::IDEMPOTENT_METHODS + [:post],
-                        exceptions: [Faraday::ClientError, 'Timeout::Error']
+                        exceptions: [Faraday::ServerError, 'Timeout::Error']
 
         faraday.options.params_encoder = Faraday::FlatParamsEncoder
         faraday.request :instrumentation
