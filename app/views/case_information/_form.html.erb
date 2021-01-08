@@ -86,7 +86,10 @@
     </fieldset>
   </div>
 
-  <%= submit_tag save_text, role: "button", draggable: "false", class: "govuk-button govuk govuk-!-margin-top-4" %>
+  <% buttons.each do  |button| %>
+    <%= submit_tag button.fetch(:text), role: "button", draggable: "false", class: "govuk-button govuk-!-margin-top-4 #{button.fetch(:class)}" %>
+
+  <% end %>
 
 <% end %>
 
