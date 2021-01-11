@@ -19,7 +19,7 @@ Sentry.init do |config|
     #Rails.application.config.filter_parameters.each do |field|
     #  event[field] = nil
     #end
-    puts "event", event, 'filter', Rails.application.config.filter_parameters
+    puts "event", event.inspect, 'filter', Rails.application.config.filter_parameters.inspect
     event
   }
 end
