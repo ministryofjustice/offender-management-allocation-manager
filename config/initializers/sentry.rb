@@ -17,7 +17,7 @@ Sentry.init do |config|
   sanitize_fields = Rails.application.config.filter_parameters
   config.before_send = lambda do |event|
     sanitize_fields.each do |field|
-      event.remove(field)
+      event[field] = nil
     end
     event
   end
