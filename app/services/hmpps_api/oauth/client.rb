@@ -7,7 +7,9 @@ module HmppsApi
 
       def initialize(host)
         @host = host
-        @connection = Faraday.new
+        @connection = Faraday.new do |faraday|
+          faraday.response :raise_error
+        end
       end
 
       def post(route)
