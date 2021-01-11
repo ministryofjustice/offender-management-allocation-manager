@@ -16,10 +16,12 @@ Sentry.init do |config|
   # Filter out sensitive fields from sentry logs
   config.before_send = lambda { |event, _hint|
     #event.reject! { |key| Rails.application.config.filter_parameters.include?(key) }
-    #Rails.application.config.filter_parameters.each do |field|
-    #  event[field] = nil
-    #end
-    puts "event", event.inspect, 'filter', Rails.application.config.filter_parameters.inspect
+    binding.pry
+    Rails.application.config.filter_parameters.each do |field|
+      puts 'field', field, 'value', event[field]
+      event[field] = nil if event[field].present?
+    end
+    #puts "event", event.inspect, 'filter', Rails.application.config.filter_parameters.inspect
     event
   }
 end
