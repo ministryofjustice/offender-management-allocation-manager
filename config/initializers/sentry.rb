@@ -14,9 +14,8 @@ Sentry.init do |config|
   end
 
   # Filter out sensitive fields from sentry logs
-  sanitize_fields = Rails.application.config.filter_parameters
   config.before_send = lambda do |event|
-    sanitize_fields.each do |field|
+    Rails.application.config.filter_parameters.each do |field|
       event[field] = nil
     end
     event
