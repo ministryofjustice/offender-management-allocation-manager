@@ -66,7 +66,7 @@ private
   def self.responsibility_override(offender)
     if offender.open_prison_nps_offender? && !offender.recent_prescoed_case?
       SUPPORTING
-    elsif determinate_with_no_release_dates?(offender)
+    elsif offender.determinate_with_no_release_dates?
       RESPONSIBLE
     elsif offender.indeterminate_sentence? && (offender.tariff_date.nil? ||
         offender.tariff_date < Time.zone.today)
@@ -181,82 +181,56 @@ private
     offender.conditional_release_date - 15.months
   end
 
-  class NpsResponsibilityRules
-    def initialize(offender:, policy_start_date:, handover_date:, cutoff_date:)
-      @offender = offender
-      @policy_start_date = policy_start_date
-      @handover_date = handover_date
-      @cutoff_date = cutoff_date
-    end
-
-    def responsibility
-      if @offender.new_case? @policy_start_date
-        policy_rules
-      else
-        prepolicy_rules
-      end
-    end
-
-  private
-
-    def prepolicy_rules
-      if @offender.release_date >= @cutoff_date && handover_date_in_future?
-        RESPONSIBLE
-      else
-        SUPPORTING
-      end
-    end
-
-    def policy_rules
-      # we can't calculate responsibility if sentence_start_date is empty, so return UNKNOWN rather than a page error
-      return UNKNOWN if @offender.sentence_start_date.blank?
-
-      if @offender.expected_time_in_custody_gt_10_months? && handover_date_in_future?
-        RESPONSIBLE
-      else
-        SUPPORTING
-      end
-    end
-
-    def handover_date_in_future?
-      @handover_date > Time.zone.today
+  def self.nps_responsibility_rules(offender:, policy_start_date:, handover_date:, cutoff_date:)
+    if offender.new_case? policy_start_date
+      nps_policy_rules offender: offender, handover_date: handover_date
+    else
+      nps_prepolicy_rules offender: offender, handover_date: handover_date, cutoff_date: cutoff_date
     end
   end
 
-  class WelshNpsResponsibiltyRules < NpsResponsibilityRules
-    WELSH_POLICY_START_DATE = DateTime.new(2019, 2, 4).utc.to_date.freeze
-    WELSH_CUTOFF_DATE = '4 May 2020'.to_date.freeze
-
-    def initialize offender, handover_date
-      super offender: offender, policy_start_date: WELSH_POLICY_START_DATE, handover_date: handover_date, cutoff_date: WELSH_CUTOFF_DATE
+  def self.nps_prepolicy_rules offender:, handover_date:, cutoff_date:
+    if offender.release_date >= cutoff_date && handover_date > Time.zone.today
+      RESPONSIBLE
+    else
+      SUPPORTING
     end
   end
+
+  def self.nps_policy_rules offender:, handover_date:
+    # we can't calculate responsibility if sentence_start_date is empty, so return UNKNOWN rather than a page error
+    return UNKNOWN if offender.sentence_start_date.blank?
+
+    if offender.expected_time_in_custody_gt_10_months? && handover_date > Time.zone.today
+      RESPONSIBLE
+    else
+      SUPPORTING
+    end
+  end
+
+  WELSH_POLICY_START_DATE = DateTime.new(2019, 2, 4).utc.to_date.freeze
+  WELSH_CUTOFF_DATE = '4 May 2020'.to_date.freeze
 
   ENGLISH_POLICY_START_DATE = DateTime.new(2019, 10, 1).utc.to_date
-
-  class EnglishHubPrivateNpsRules < NpsResponsibilityRules
-    ENGLISH_PRIVATE_CUTOFF = '1 Jun 2021'.to_date.freeze
-
-    def initialize offender, handover_date
-      super offender: offender, policy_start_date: ENGLISH_POLICY_START_DATE, handover_date: handover_date, cutoff_date: ENGLISH_PRIVATE_CUTOFF
-    end
-  end
-
-  class EnglishPublicNpsRules < NpsResponsibilityRules
-    ENGLISH_PUBLIC_CUTOFF = '15 Feb 2021'.to_date.freeze
-
-    def initialize offender, handover_date
-      super offender: offender, policy_start_date: ENGLISH_POLICY_START_DATE, handover_date: handover_date, cutoff_date: ENGLISH_PUBLIC_CUTOFF
-    end
-  end
+  ENGLISH_PRIVATE_CUTOFF = '1 Jun 2021'.to_date.freeze
+  ENGLISH_PUBLIC_CUTOFF = '15 Feb 2021'.to_date.freeze
 
   def self.nps_responsibility(offender, handover_date)
     if offender.welsh_offender?
-      WelshNpsResponsibiltyRules.new(offender, handover_date).responsibility
+      nps_responsibility_rules(offender: offender,
+                               policy_start_date: WELSH_POLICY_START_DATE,
+                               handover_date: handover_date,
+                               cutoff_date: WELSH_CUTOFF_DATE)
     elsif offender.hub_or_private?
-      EnglishHubPrivateNpsRules.new(offender, handover_date).responsibility
+      nps_responsibility_rules(offender: offender,
+                               policy_start_date: ENGLISH_POLICY_START_DATE,
+                               handover_date: handover_date,
+                               cutoff_date: ENGLISH_PRIVATE_CUTOFF)
     else
-      EnglishPublicNpsRules.new(offender, handover_date).responsibility
+      nps_responsibility_rules(offender: offender,
+                               policy_start_date: ENGLISH_POLICY_START_DATE,
+                               handover_date: handover_date,
+                               cutoff_date: ENGLISH_PUBLIC_CUTOFF)
     end
   end
 
@@ -277,14 +251,6 @@ private
     end
   end
 
-  def self.determinate_with_no_release_dates?(offender)
-    offender.indeterminate_sentence? == false &&
-        offender.automatic_release_date.nil? &&
-        offender.conditional_release_date.nil? &&
-        offender.parole_eligibility_date.nil? &&
-        offender.home_detention_curfew_eligibility_date.nil?
-  end
-
   class OffenderWrapper
     delegate :recalled?, :immigration_case?, :nps_case?, :indeterminate_sentence?, :tariff_date,
              :early_allocation?, :mappa_level, :prison_arrival_date, :sentence_start_date,
@@ -294,6 +260,14 @@ private
 
     def initialize(offender)
       @offender = offender
+    end
+
+    def determinate_with_no_release_dates?
+      @offender.indeterminate_sentence? == false &&
+        @offender.automatic_release_date.nil? &&
+        @offender.conditional_release_date.nil? &&
+        @offender.parole_eligibility_date.nil? &&
+        @offender.home_detention_curfew_eligibility_date.nil?
     end
 
     def new_case? policy_start_date
