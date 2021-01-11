@@ -13,10 +13,10 @@ Sentry.init do |config|
   end
 
   # Filter out sensitive fields from sentry logs
-  #config.before_send = lambda do |event|
+  config.before_send = lambda do |event|
   #  Rails.application.config.filter_parameters.each do |field|
   #    event[field] = nil
   #  end
-  #  event
-  #end
+    event
+  end
 end
