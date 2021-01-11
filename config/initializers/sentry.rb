@@ -1,7 +1,6 @@
 sentry_dsn = Rails.configuration.sentry_dsn
 Sentry.init do |config|
   config.send_default_pii = true
-  config.release = `git branch --show-current`
   config.breadcrumbs_logger = [:active_support_logger]
   if sentry_dsn
     config.dsn = sentry_dsn
