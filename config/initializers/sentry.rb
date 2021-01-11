@@ -1,6 +1,7 @@
 sentry_dsn = Rails.configuration.sentry_dsn
 Sentry.init do |config|
   config.send_default_pii = true
+  config.logger = Rails.logger
   config.breadcrumbs_logger = [:active_support_logger]
   if sentry_dsn
     config.dsn = sentry_dsn
@@ -13,10 +14,8 @@ Sentry.init do |config|
   end
 
   # Filter out sensitive fields from sentry logs
-  config.before_send = lambda do |event|
+  config.before_send = lambda { |event, _hint| event }
   #  Rails.application.config.filter_parameters.each do |field|
   #    event[field] = nil
   #  end
-    event
-  end
 end
