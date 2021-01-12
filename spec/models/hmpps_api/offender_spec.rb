@@ -4,6 +4,19 @@ require 'rails_helper'
 
 describe HmppsApi::Offender do
   describe '#within_early_allocation_window?' do
+    context 'with no dates' do
+      let(:offender) {
+        build(:offender, sentence: build(:sentence_detail,
+                                         conditionalReleaseDate: nil,
+                                         automaticReleaseDate: nil
+        ))
+      }
+
+      it 'is not within window' do
+        expect(offender.within_early_allocation_window?).to eq(false)
+      end
+    end
+
     context 'when ARD > 18 months' do
       let(:offender) {
         build(:offender, sentence: build(:sentence_detail,

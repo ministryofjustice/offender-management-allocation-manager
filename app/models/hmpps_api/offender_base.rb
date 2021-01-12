@@ -207,13 +207,14 @@ module HmppsApi
     end
 
     def within_early_allocation_window?
-      [
+      earliest_date = [
           tariff_date,
           parole_eligibility_date,
           parole_review_date,
           automatic_release_date,
           conditional_release_date
-      ].compact.min <= Time.zone.today + 18.months
+      ].compact.min
+      earliest_date.present? && earliest_date <= Time.zone.today + 18.months
     end
 
   private
