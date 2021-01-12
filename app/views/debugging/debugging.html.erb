@@ -103,19 +103,19 @@
         <%= humanized_bool(@offender.responsibility_override?) %>
       </td>
     </tr>
-    <tr class="govuk-table__row">
+    <tr class="govuk-table__row" id="handover-start-date">
       <td class="govuk-table__cell govuk-!-width-one-half">Handover start date</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
         <%= format_date(@offender.handover_start_date, replacement: 'N/A') %>
       </td>
     </tr>
-    <tr class="govuk-table__row">
+    <tr class="govuk-table__row" id="responsibility-handover-date">
       <td class="govuk-table__cell govuk-!-width-one-half">Responsibility handover date</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
         <%= format_date(@offender.responsibility_handover_date, replacement: 'N/A') %>
       </td>
     </tr>
-    <tr class="govuk-table__row">
+    <tr class="govuk-table__row" id="handover-reason">
       <td class="govuk-table__cell govuk-!-width-one-half">Reason for handover dates</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
         <%= @offender.handover_reason %>
