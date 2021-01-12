@@ -35,7 +35,7 @@ feature 'Allocation History', :allocation do
   let(:ci) { create(:case_information, nomis_offender_id: 'G4273GI') }
   let(:nomis_offender_id) { ci.nomis_offender_id }
 
-  context 'when offender allocation history', :js, vcr: { cassette_name: :offender_allocation_history } do
+  context 'when offender allocation history', vcr: { cassette_name: :offender_allocation_history } do
     before do
       signin_spo_user
 
@@ -121,22 +121,22 @@ feature 'Allocation History', :allocation do
           ['.moj-timeline__title', "Prisoner unallocated (transfer)"],
           ['.moj-timeline__date', formatted_transfer_date.to_s],
           ['.moj-timeline__title', "Prisoner reallocated"],
-          ['.moj-timeline__description', "Prisoner reallocated to #{history1.primary_pom_name.titleize} - (email address not found)\nTier: #{history1.allocated_at_tier}"],
+          ['.moj-timeline__description', "Prisoner reallocated to #{history1.primary_pom_name.titleize} - (email address not found) Tier: #{history1.allocated_at_tier}"],
           ['.moj-timeline__date', formatted_date_for(history1).to_s],
           ['.moj-timeline__title', "Prisoner allocated"],
-          ['.moj-timeline__description', "Prisoner allocated to #{history2.primary_pom_name.titleize} - #{prison_pom[:email]}\nTier: #{history2.allocated_at_tier}"],
+          ['.moj-timeline__description', "Prisoner allocated to #{history2.primary_pom_name.titleize} - #{prison_pom[:email]} Tier: #{history2.allocated_at_tier}"],
           ['.moj-timeline__date', formatted_date_for(history2).to_s],
-          ['.moj-timeline__description', "Prisoner allocated to #{hist_allocate_secondary.secondary_pom_name.titleize} - #{probation_pom[:email]}\nTier: #{hist_allocate_secondary.allocated_at_tier}"],
+          ['.moj-timeline__description', "Prisoner allocated to #{hist_allocate_secondary.secondary_pom_name.titleize} - #{probation_pom[:email]} Tier: #{hist_allocate_secondary.allocated_at_tier}"],
           ['.moj-timeline__date', "#{formatted_date_for(hist_allocate_secondary)} by #{hist_allocate_secondary.created_by_name.titleize}"],
           ['.govuk-heading-m', "HMP Leeds"],
           ['.moj-timeline__title', "Prisoner unallocated"],
           ['.moj-timeline__title', "Co-working unallocated"],
           ['.moj-timeline__date', formatted_deallocate_date.to_s],
           ['.moj-timeline__title', "Prisoner reallocated"],
-          ['.moj-timeline__description', "Prisoner reallocated to #{history6.primary_pom_name.titleize} - #{probation_pom_2[:email]}\nTier: #{history6.allocated_at_tier}"],
+          ['.moj-timeline__description', "Prisoner reallocated to #{history6.primary_pom_name.titleize} - #{probation_pom_2[:email]} Tier: #{history6.allocated_at_tier}"],
           ['.moj-timeline__date', "#{formatted_date_for(history6)} by #{history6.created_by_name.titleize}"],
           ['.moj-timeline__title', "Prisoner allocated"],
-          ['.moj-timeline__description', "Prisoner allocated to #{history.last.primary_pom_name.titleize} - #{probation_pom[:email]}\nTier: #{history.last.allocated_at_tier}"],
+          ['.moj-timeline__description', "Prisoner allocated to #{history.last.primary_pom_name.titleize} - #{probation_pom[:email]} Tier: #{history.last.allocated_at_tier}"],
           ['.moj-timeline__description', "Probation POM allocated instead of recommended Prison POM", "Reason(s):", "- Prisoner assessed as suitable for a prison POM despite tiering calculation", "Too high risk"],
           ['.moj-timeline__date', "#{formatted_date_for(history.last)} by #{history.last.created_by_name.titleize}"]
       ].each do |key, val|
