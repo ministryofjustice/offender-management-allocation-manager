@@ -197,6 +197,10 @@ module HmppsApi
       earliest_date.present? && earliest_date <= Time.zone.today + 18.months
     end
 
+    def needs_com_and_ldu_is_uncontactable?
+      needs_com? && sentenced? && allocated_com_name.blank? && ldu_email_address.blank?
+    end
+
     def inside_omic_policy?
       over_18? &&
         (sentenced? || immigration_case?) &&
@@ -204,6 +208,10 @@ module HmppsApi
     end
 
   private
+
+    def needs_com?
+      handover.community.responsible? || handover.community.supporting?
+    end
 
     def age
       return nil if date_of_birth.blank?

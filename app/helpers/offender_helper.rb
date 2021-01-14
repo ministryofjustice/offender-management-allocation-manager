@@ -42,18 +42,4 @@ module OffenderHelper
       type + 'allocated'
     end
   end
-
-  def needs_com_but_ldu_is_uncontactable?(offender)
-    return false unless offender.sentenced?
-
-    return false if offender.handover_start_date.nil?
-
-    return false if offender.handover_start_date > Time.zone.today + 45.days
-
-    return false if offender.allocated_com_name.present?
-
-    return true if offender.ldu_email_address.nil?
-
-    false
-  end
 end

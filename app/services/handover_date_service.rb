@@ -5,7 +5,7 @@ class HandoverDateService
 
   RESPONSIBLE = Responsibility.new true, false
   SUPPORTING = Responsibility.new false, true
-  UNKNOWN = Responsibility.new false, false
+  NOT_INVOLVED = Responsibility.new false, false
 
   # Actual date Mon 19th Oct 2020
   PRESCOED_CUTOFF_DATE = Date.new(2020, 10, 19).freeze
@@ -15,10 +15,6 @@ class HandoverDateService
   # if COM responsible, then handover dates all empty
   NO_HANDOVER_DATE = HandoverData.new SUPPORTING, RESPONSIBLE, nil, nil, 'COM Responsibility'
 
-  def self.calculate_pom_responsibility(offender)
-    handover(offender).custody
-  end
-
   def self.handover(raw_offender)
     offender = OffenderWrapper.new(raw_offender)
 
@@ -27,7 +23,7 @@ class HandoverDateService
     elsif offender.immigration_case?
       HandoverData.new SUPPORTING, RESPONSIBLE, nil, nil, 'Immigration Case'
     elsif offender.nps_case? && offender.indeterminate_sentence? && (offender.tariff_date.nil? || offender.tariff_date < Time.zone.today)
-      HandoverData.new RESPONSIBLE, UNKNOWN, nil, nil, 'No earliest release date'
+      HandoverData.new RESPONSIBLE, NOT_INVOLVED, nil, nil, 'Indeterminate with no earliest release date'
     elsif offender.recent_prescoed_case? && offender.indeterminate_sentence? && offender.nps_case?
       handover_date = prescoed_handover_date(offender)
       HandoverData.new SUPPORTING, RESPONSIBLE, offender.prison_arrival_date, handover_date, 'Prescoed'
@@ -44,8 +40,8 @@ class HandoverDateService
         else
           HandoverData.new SUPPORTING, RESPONSIBLE, start_date, handover_date, reason
         end
-      when UNKNOWN
-        HandoverData.new UNKNOWN, UNKNOWN, nil, nil, 'NPS Case - missing dates'
+      when NOT_INVOLVED
+        HandoverData.new NOT_INVOLVED, NOT_INVOLVED, nil, nil, 'NPS Case - missing dates'
       when RESPONSIBLE
         HandoverData.new RESPONSIBLE, com_responsibility(start_date, handover_date), start_date, handover_date, reason
       else
@@ -53,12 +49,12 @@ class HandoverDateService
       end
     else
       responsibility = crc_responsibility(offender)
-      if responsibility == UNKNOWN
-        HandoverData.new UNKNOWN, UNKNOWN, nil, nil, 'CRC Case - missing dates'
+      if responsibility == NOT_INVOLVED
+        HandoverData.new NOT_INVOLVED, NOT_INVOLVED, nil, nil, 'CRC Case - missing dates'
       else
         crc_date = crc_handover_date(offender)
         if responsibility == RESPONSIBLE
-          HandoverData.new RESPONSIBLE, UNKNOWN, crc_date, crc_date, 'CRC Case'
+          HandoverData.new RESPONSIBLE, NOT_INVOLVED, crc_date, crc_date, 'CRC Case'
         else
           HandoverData.new SUPPORTING, RESPONSIBLE, crc_date, crc_date, 'CRC Case'
         end
@@ -72,7 +68,7 @@ private
     if start_date.present? && handover_date.present? && Time.zone.today.between?(start_date, handover_date)
       SUPPORTING
     else
-      UNKNOWN
+      NOT_INVOLVED
     end
   end
 
@@ -89,7 +85,7 @@ private
         offender.tariff_date < Time.zone.today)
       RESPONSIBLE
     elsif offender.release_date.blank?
-      UNKNOWN
+      NOT_INVOLVED
     end
   end
 
@@ -210,8 +206,8 @@ private
   end
 
   def self.nps_policy_rules offender:, handover_date:
-    # we can't calculate responsibility if sentence_start_date is empty, so return UNKNOWN rather than a page error
-    return UNKNOWN if offender.sentence_start_date.blank?
+    # we can't calculate responsibility if sentence_start_date is empty, so return NOT_INVOLVED rather than a page error
+    return NOT_INVOLVED if offender.sentence_start_date.blank?
 
     if offender.expected_time_in_custody_gt_10_months? && handover_date > Time.zone.today
       RESPONSIBLE
@@ -254,7 +250,7 @@ private
            offender.conditional_release_date,
            offender.home_detention_curfew_eligibility_date].compact.min
 
-    return UNKNOWN if earliest_release_date.nil?
+    return NOT_INVOLVED if earliest_release_date.nil?
 
     if earliest_release_date > DateTime.now.utc.to_date + 12.weeks
       RESPONSIBLE

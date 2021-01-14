@@ -27,13 +27,13 @@
       </td>
     </tr>
     <tr class="govuk-table__row ">
-      <% if needs_com_but_ldu_is_uncontactable?(@prisoner) %>
+      <% if @prisoner.needs_com_and_ldu_is_uncontactable? %>
         <td class="govuk-table__cell govuk-!-width-one-half govuk-table__cell-error"  id="com-error">
       <% else %>
         <td class="govuk-table__cell govuk-!-width-one-half" >
       <% end %>
         Community Offender Manager (COM) name</td>
-      <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half <%=' govuk-table__cell-error-value' if needs_com_but_ldu_is_uncontactable?(@prisoner) %>">
+      <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half <%=' govuk-table__cell-error-value' if @prisoner.needs_com_and_ldu_is_uncontactable? %>">
         <%= @prisoner.allocated_com_name.presence || "Unknown" %>
       </td>
     </tr>
