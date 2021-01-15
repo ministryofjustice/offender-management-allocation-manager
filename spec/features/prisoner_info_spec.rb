@@ -68,7 +68,8 @@ feature 'View a prisoner profile page', :allocation do
 
         # fill in missing fields and submit
         fill_in 'Last name', with: 'Smith'
-        fill_in 'Email address', with: 'jim.smith@hotmail.com'
+        # email has leading and trailing whitespaces, that are removed before validation
+        fill_in 'Email address', with: ' jim.smith@hotmail.com '
         click_button 'Submit'
         find '.vlo-row-1' # wait for page to load
         expect(page).to have_content('Smith, Jim')
@@ -201,6 +202,40 @@ feature 'View a prisoner profile page', :allocation do
         within '#community_information' do
           expect(page).to have_content('Unknown', count: 2)
         end
+      end
+    end
+  end
+
+  context 'when offender does not have a sentence start date',
+          vcr: { cassette_name: :no_sentence_start_date_for_offender } do
+    let(:non_sentenced_offender) do
+      build(:offender, offenderNo: 'G7998GJ',
+            imprisonmentStatus: 'SEC90',
+            sentence: build(:sentence_detail,
+                            releaseDate: 3.years.from_now.iso8601,
+                            sentenceStartDate: nil))
+    end
+
+    before do
+      allow(OffenderService).to receive(:get_offender).and_return(non_sentenced_offender)
+    end
+
+    it 'shows the page without crashing' do
+      case_info = create(:case_information, case_allocation: CaseInformation::NPS, nomis_offender_id: 'G7998GJ')
+      non_sentenced_offender.load_case_information(case_info)
+
+      visit prison_prisoner_path('LEI', 'G7998GJ')
+
+      within '#handover-start-date' do
+        expect(page).to have_content('N/A')
+      end
+
+      within '#responsibility-handover' do
+        expect(page).to have_content('N/A')
+      end
+
+      within '#sentence-start-date' do
+        expect(page).to have_content('N/A')
       end
     end
   end

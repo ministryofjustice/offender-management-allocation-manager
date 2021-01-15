@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class VictimLiaisonOfficer < ApplicationRecord
+  auto_strip_attributes :email
   # Other version fields (user_first_name and user_last_name) filled in by controller
   has_paper_trail meta: { nomis_offender_id: :nomis_id_for_paper_trail }
 
