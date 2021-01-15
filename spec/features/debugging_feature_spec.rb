@@ -70,6 +70,44 @@ feature 'Provide debugging information for our team to use', :allocation do
 
       expect(page).to have_content("No offender was found, please check the offender number and try again")
     end
+
+    context 'when offender does not have a sentence start date',
+            vcr: { cassette_name: :debugging_no_sentence_start_date_for_offender_feature } do
+      let(:non_sentenced_offender) do
+        build(:offender, offenderNo: nomis_offender_id,
+              imprisonmentStatus: 'SEC90',
+              sentence: build(:sentence_detail,
+                              releaseDate: 3.years.from_now.iso8601,
+                              sentenceStartDate: nil))
+      end
+
+      before do
+        allow(OffenderService).to receive(:get_offender).and_return(non_sentenced_offender)
+      end
+
+      it 'shows the page without crashing' do
+        case_info = create(:case_information, case_allocation: CaseInformation::NPS, nomis_offender_id: nomis_offender_id)
+        non_sentenced_offender.load_case_information(case_info)
+
+        visit prison_debugging_path('LEI')
+
+        expect(page).to have_text('Debugging')
+        fill_in 'offender_no', with: nomis_offender_id
+        click_on('search-button')
+
+        within '#sentenced' do
+          expect(page).to have_content('No')
+        end
+
+        within '#handover-start-date' do
+          expect(page).to have_content('N/A')
+        end
+
+        within '#responsibility-handover-date' do
+          expect(page).to have_content('N/A')
+        end
+      end
+    end
   end
 
   context 'when debugging at a prison level', vcr: { cassette_name: :debugging_prison_level } do

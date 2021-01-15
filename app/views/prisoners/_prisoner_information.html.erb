@@ -10,17 +10,17 @@
         <%= case_owner_label(@prisoner) %>
       </td>
     </tr>
-    <tr class="govuk-table__row">
+    <tr class="govuk-table__row" id="handover-start-date">
       <td class="govuk-table__cell govuk-!-width-one-half">Handover start date</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-        <%= format_date(@prisoner.handover_start_date) %>
+        <%= format_date(@prisoner.handover_start_date, replacement: 'N/A') %>
         <span class="handover-reason">(<%= @prisoner.handover_reason %>)</span>
       </td>
     </tr>
-    <tr class="govuk-table__row">
+    <tr class="govuk-table__row" id="responsibility-handover">
       <td class="govuk-table__cell govuk-!-width-one-half">Responsibility handover</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-        <%= format_date(@prisoner.responsibility_handover_date) %>
+        <%= format_date(@prisoner.responsibility_handover_date, replacement: 'N/A') %>
         <span class="handover-reason">(<%= @prisoner.handover_reason %>)</span>
       </td>
     </tr>

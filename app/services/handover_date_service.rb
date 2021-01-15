@@ -208,6 +208,9 @@ private
     end
 
     def policy_rules
+      # we can't calculate responsibility if sentence_start_date is empty, so return UNKNOWN rather than a page error
+      return UNKNOWN if @offender.sentence_start_date.blank?
+
       if @offender.expected_time_in_custody_gt_10_months? && handover_date_in_future?
         RESPONSIBLE
       else
@@ -284,7 +287,7 @@ private
 
   class OffenderWrapper
     delegate :recalled?, :immigration_case?, :nps_case?, :indeterminate_sentence?, :tariff_date,
-             :early_allocation?, :mappa_level, :prison_arrival_date,
+             :early_allocation?, :mappa_level, :prison_arrival_date, :sentence_start_date,
              :parole_eligibility_date, :conditional_release_date, :automatic_release_date,
              :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date, :parole_review_date,
              to: :@offender

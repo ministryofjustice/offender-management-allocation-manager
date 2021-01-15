@@ -205,4 +205,38 @@ feature 'View a prisoner profile page', :allocation do
       end
     end
   end
+
+  context 'when offender does not have a sentence start date',
+          vcr: { cassette_name: :no_sentence_start_date_for_offender } do
+    let(:non_sentenced_offender) do
+      build(:offender, offenderNo: 'G7998GJ',
+            imprisonmentStatus: 'SEC90',
+            sentence: build(:sentence_detail,
+                            releaseDate: 3.years.from_now.iso8601,
+                            sentenceStartDate: nil))
+    end
+
+    before do
+      allow(OffenderService).to receive(:get_offender).and_return(non_sentenced_offender)
+    end
+
+    it 'shows the page without crashing' do
+      case_info = create(:case_information, case_allocation: CaseInformation::NPS, nomis_offender_id: 'G7998GJ')
+      non_sentenced_offender.load_case_information(case_info)
+
+      visit prison_prisoner_path('LEI', 'G7998GJ')
+
+      within '#handover-start-date' do
+        expect(page).to have_content('N/A')
+      end
+
+      within '#responsibility-handover' do
+        expect(page).to have_content('N/A')
+      end
+
+      within '#sentence-start-date' do
+        expect(page).to have_content('N/A')
+      end
+    end
+  end
 end

@@ -14,7 +14,7 @@
           <%= sentence_type_label(@prisoner) %>
       </td>
     </tr>
-    <tr class="govuk-table__row">
+    <tr class="govuk-table__row" id="sentence-start-date">
       <td class="govuk-table__cell">Sentence start date</td>
       <td class="govuk-table__cell table_cell__left_align">
         <%= format_date(@prisoner.sentence_start_date, replacement: 'N/A') %>
