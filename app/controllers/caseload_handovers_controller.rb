@@ -2,12 +2,18 @@
 
 class CaseloadHandoversController < PrisonStaffApplicationController
   def index
-    offenders = @pom.pending_handover_offenders
+    bucket = Bucket.new([:last_name, :handover_start_date, :responsibility_handover_date,
+                         :pom_responsibility, :allocated_com_name, :case_allocation])
+    @pom.pending_handover_offenders.each { |o| bucket << o }
+    if params['sort']
+      sort_params = params['sort'].split.map { |s| s.downcase.to_sym }
+      bucket.sort_bucket!(sort_params[0], sort_params[1] || :asc)
+    else
+      bucket.sort_bucket!(:last_name, :asc)
+    end
 
-    @upcoming_handovers = Kaminari.paginate_array(offenders).page(page)
-    @pending_handover_count = @upcoming_handovers.count
-    @summary = SummaryService.new(:handovers, @prison)
+    @offenders = Kaminari.paginate_array(bucket.to_a).page(page)
+    @pending_handover_count = bucket.count
+    @prison_total_handovers = SummaryService.new(:handovers, @prison).handovers_total
   end
-
-private
 end

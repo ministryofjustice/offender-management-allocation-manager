@@ -1,7 +1,8 @@
 require "rails_helper"
 
-feature "SPO viewing upcoming handover cases" do
+feature "viewing upcoming handovers" do
   let(:prison) { 'LEI' }
+  let(:user) { build(:pom) }
 
   context 'when signed in as an SPO' do
     let(:offender) { build(:nomis_offender, latestLocationId: prison) }
@@ -19,7 +20,7 @@ feature "SPO viewing upcoming handover cases" do
       # Stub auth
       signin_spo_user
       stub_auth_token
-      stub_user(staff_id: 100)
+      stub_user(staff_id: user.staff_id)
 
       # Stub an offender in the prison
       stub_offenders_for_prison(prison, [offender])
@@ -67,71 +68,106 @@ feature "SPO viewing upcoming handover cases" do
     end
   end
 
-  it 'stops staff without the SPO role from viewing the page', vcr: { cassette_name: :spo_handover_cases_pom } do
-    signin_pom_user
-    visit prison_handovers_path(prison)
-    expect(page).to have_current_path('/401')
-  end
-
   context 'with four offenders' do
-    let(:poms) { ["Dunlop, Abbey", "Brown, Denis", "Albright, Sally", "Carsley, Jo"] }
+    let(:pom_names) { ["Dunlop, Abbey", "Brown, Denis", "Albright, Sally", "Carsley, Jo"] }
     let(:coms) { ["Dabery, Suzzie", "Canne, Sam", "Blackburn, Zoe", "Abbot, Brian"] }
 
     let(:check_poms) { ["Albright, Sally", "Brown, Denis", "Carsley, Jo", "Dunlop, Abbey"] }
     let(:check_coms) { ["Abbot, Brian", "Blackburn, Zoe", "Canne, Sam", "Dabery, Suzzie"] }
+    let(:check_dates) { ["Abbot, Brian", "Canne, Sam", "Blackburn, Zoe", "Dabery, Suzzie"] }
 
     before do
       stub_auth_token
-      stub_user(staff_id: 123_456)
+      stub_user(staff_id: user.staff_id)
 
       offenders = [
           build(:nomis_offender,
                 offenderNo: "A7514GW",
-                sentence: attributes_for(:sentence_detail, :inside_handover_window)),
+                sentence: attributes_for(:sentence_detail, :handover_in_8_days)),
           build(:nomis_offender,
                 offenderNo: "B7514GW",
-                sentence: attributes_for(:sentence_detail, :inside_handover_window)),
+                sentence: attributes_for(:sentence_detail, :handover_in_4_days)),
           build(:nomis_offender, offenderNo: "C7514GW",
-                sentence: attributes_for(:sentence_detail, :inside_handover_window)),
+                sentence: attributes_for(:sentence_detail, :handover_in_6_days)),
           build(:nomis_offender, offenderNo: "D7514GW",
-                sentence: attributes_for(:sentence_detail, :inside_handover_window))
+                sentence: attributes_for(:sentence_detail, :handover_in_3_days))
       ]
 
       stub_offenders_for_prison(prison, offenders)
 
       offenders.each_with_index do |offender, i|
         create(:case_information,  com_name: coms.fetch(i),  nomis_offender_id: offender.fetch(:offenderNo))
-        create(:allocation, primary_pom_name: poms.fetch(i), nomis_offender_id: offender.fetch(:offenderNo), prison: prison)
-      end
-
-      signin_spo_user
-      visit prison_handovers_path(prison)
-    end
-
-    scenario 'sorts POMs alphabetically' do
-      click_link('POM')
-
-      check_poms.each_with_index do |name, index|
-        expect(page).to have_css(".offender_row_#{index}", text: name)
-      end
-
-      click_link('POM')
-      check_poms.reverse.each_with_index do |name, index|
-        expect(page).to have_css(".offender_row_#{index}", text: name)
+        create(:allocation, primary_pom_nomis_id: user.staff_id, primary_pom_name: pom_names.fetch(i), nomis_offender_id: offender.fetch(:offenderNo), prison: prison)
       end
     end
 
-    scenario 'sorts COMs alphabetically' do
-      click_link('COM')
-
-      check_coms.each_with_index do |name, index|
-        expect(page).to have_css(".offender_row_#{index}", text: name)
+    context 'without the SPO role' do
+      before do
+        signin_pom_user
+        stub_poms(prison, [user])
       end
 
-      click_link('COM')
+      it 'stops staff without the SPO role from viewing the SPO page' do
+        visit prison_handovers_path(prison)
+        expect(page).to have_current_path('/401')
+      end
 
-      check_coms.reverse.each_with_index do |name, index|
-        expect(page).to have_css(".offender_row_#{index}", text: name)
+      it 'can load the POM handovers page', :js do
+        visit prison_staff_caseload_handovers_path(prison, user.staff_id)
+
+        click_link('Handover start date')
+        check_dates.each_with_index do |name, index|
+          expect(page).to have_css(".offender_row_#{index}", text: name)
+        end
+
+        click_link('Handover start date')
+        check_dates.reverse.each_with_index do |name, index|
+          expect(page).to have_css(".offender_row_#{index}", text: name)
+        end
+
+        click_link('Responsibility changes')
+        check_dates.each_with_index do |name, index|
+          expect(page).to have_css(".offender_row_#{index}", text: name)
+        end
+
+        click_link('Responsibility changes')
+        check_dates.reverse.each_with_index do |name, index|
+          expect(page).to have_css(".offender_row_#{index}", text: name)
+        end
+      end
+    end
+
+    context 'with the SPO role' do
+      before do
+        signin_spo_user
+        visit prison_handovers_path(prison)
+      end
+
+      scenario 'sorts POMs alphabetically' do
+        click_link('POM')
+
+        check_poms.each_with_index do |name, index|
+          expect(page).to have_css(".offender_row_#{index}", text: name)
+        end
+
+        click_link('POM')
+        check_poms.reverse.each_with_index do |name, index|
+          expect(page).to have_css(".offender_row_#{index}", text: name)
+        end
+      end
+
+      scenario 'sorts COMs alphabetically' do
+        click_link('COM')
+
+        check_coms.each_with_index do |name, index|
+          expect(page).to have_css(".offender_row_#{index}", text: name)
+        end
+
+        click_link('COM')
+
+        check_coms.reverse.each_with_index do |name, index|
+          expect(page).to have_css(".offender_row_#{index}", text: name)
+        end
       end
     end
   end

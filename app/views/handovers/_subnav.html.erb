@@ -4,7 +4,7 @@
       <li class="moj-sub-navigation__item">
         <a class="moj-sub-navigation__link" <%= 'aria-current=page' if active == :all_handovers %>
            href="<%= prison_handovers_path(@prison.code) %>">
-          See all handover cases in <%= @prison.name %> (<%= @summary.handovers_total %>)
+          See all handover cases in <%= @prison.name %> (<%= prison_total_handovers %>)
         </a>
       </li>
     <% end %>
@@ -12,7 +12,7 @@
       <li class="moj-sub-navigation__item">
         <a class="moj-sub-navigation__link" <%= 'aria-current=page' if active == :caseload_handovers %>
            href="<%= prison_staff_caseload_handovers_path(@prison.code, @staff_id) %>">
-          See handover cases that you are allocated (<%= @pending_handover_count %>)
+          See handover cases that you are allocated (<%= pending_handover_count %>)
         </a>
       </li>
     <% end %>
