@@ -1,5 +1,6 @@
-<%= form_for(@early_assignment,
-             url: prison_prisoner_early_allocations_path(@prison.code, @early_assignment.nomis_offender_id),
+<%= form_for(@early_allocation,
+             as: :early_allocation,
+             url: eligible_prison_prisoner_early_allocations_path(@prison.code, @early_allocation.nomis_offender_id),
              method: form_method,
              builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |f| %>
   <%= f.govuk_error_summary %>

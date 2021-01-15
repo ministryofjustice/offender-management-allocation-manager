@@ -9,7 +9,7 @@ class EarlyAllocationsController < PrisonsApplicationController
 
   def new
     case_info = CaseInformation.find_by offender_id_from_url
-    @early_assignment = case_info.early_allocations.new
+    @early_allocation = EarlyAllocationEligibleForm.new offender_id_from_url
     if case_info.local_divisional_unit.try(:email_address)
       render
     else
@@ -17,55 +17,76 @@ class EarlyAllocationsController < PrisonsApplicationController
     end
   end
 
-  def create
-    @early_assignment = EarlyAllocation.new early_allocation_params.merge(offender_id_from_url)
-    if @early_assignment.save
-      if @early_assignment.eligible?
+  def eligible
+    form_params = eligible_params.merge(offender_id_from_url)
+    form = EarlyAllocationEligibleForm.new form_params
+    if form.valid?
+      @early_allocation = EarlyAllocation.new form_params.merge(default_params)
+      if @early_allocation.eligible?
+        @early_allocation.save!
         if @offender.within_early_allocation_window?
           AutoEarlyAllocationEmailJob.perform_later(@prison.code, @offender.offender_no, Base64.encode64(pdf_as_string))
         end
-        render 'eligible'
+        render 'landing_eligible'
       else
-        render 'ineligible'
+        @early_allocation = EarlyAllocationDiscretionaryForm.new form_params
+        render 'discretionary'
       end
     else
-      @early_assignment.errors.delete(:stage2_validation)
-      render create_error_page
+      @early_allocation = form
+      render 'new'
+    end
+  end
+
+  def discretionary
+    form_params = discretionary_params.merge(offender_id_from_url)
+    form = EarlyAllocationDiscretionaryForm.new form_params
+    if form.valid?
+      @early_allocation = EarlyAllocation.new form_params.merge(default_params)
+      if @early_allocation.discretionary?
+        render 'confirm_with_reason'
+      else
+        @early_allocation.save!
+        render 'landing_ineligible'
+      end
+    else
+      @early_allocation = form
+      render 'discretionary'
+    end
+  end
+
+  def confirm_with_reason
+    @early_allocation = EarlyAllocation.new early_allocation_params.merge(offender_id_from_url)
+    if @early_allocation.save
+      if @offender.within_early_allocation_window?
+        CommunityEarlyAllocationEmailJob.perform_later(@prison.code,
+                                                       @offender.offender_no,
+                                                       Base64.encode64(pdf_as_string))
+      end
+      render 'landing_discretionary'
+    else
+      render
     end
   end
 
   # record a community decision (changing 'maybe' into a yes or a no)
   # can only be performed on the last early allocation record
   def edit
-    @early_assignment = EarlyAllocation.where(offender_id_from_url).last
+    @early_allocation = EarlyAllocation.where(offender_id_from_url).last
   end
 
   def update
-    @early_assignment = EarlyAllocation.where(offender_id_from_url).last
+    @early_allocation = EarlyAllocation.where(offender_id_from_url).last
 
-    if @early_assignment.update(community_decision_params)
-      redirect_to prison_prisoner_path(@prison.code, @early_assignment.nomis_offender_id)
+    if @early_allocation.update(community_decision_params)
+      redirect_to prison_prisoner_path(@prison.code, @early_allocation.nomis_offender_id)
     else
       render 'edit'
     end
   end
 
-  def discretionary
-    @early_assignment = EarlyAllocation.new early_allocation_params.merge(offender_id_from_url)
-    if @early_assignment.save
-      if @offender.within_early_allocation_window?
-        CommunityEarlyAllocationEmailJob.perform_later(@prison.code,
-                                                       @offender.offender_no,
-                                                       Base64.encode64(pdf_as_string))
-      end
-      render
-    else
-      render 'stage3'
-    end
-  end
-
   def show
-    @early_assignment = EarlyAllocation.where(id: params[:id]).where(offender_id_from_url).first!
+    @early_allocation = EarlyAllocation.where(id: params[:id]).where(offender_id_from_url).first!
     @referrer = request.referer
 
     respond_to do |format|
@@ -86,55 +107,43 @@ private
   end
 
   def pdf_as_string
-    view_context.render_early_alloc_pdf(early_assignment: @early_assignment,
+    view_context.render_early_alloc_pdf(early_allocation: @early_allocation,
                                         offender: @offender,
                                         pom: @pom,
                                         allocation: @allocation).render
   end
 
-  def create_error_page
-    if !@early_assignment.stage2_validation?
-      stage1_error_page
-    else
-      stage2_error_page
-    end
-  end
-
-  def stage1_error_page
-    if @early_assignment.any_stage1_field_errors?
-      'new'
-    else
-      'stage2'
-    end
-  end
-
-  def stage2_error_page
-    if @early_assignment.any_stage2_field_errors?
-      'stage2'
-    else
-      'stage3'
-    end
-  end
-
   def community_decision_params
     params.fetch(:early_allocation, {}).permit(:community_decision).
-        merge(recording_community_decision: true).
         merge(updated_by_firstname: @current_user.first_name,
               updated_by_lastname: @current_user.last_name)
   end
 
+  def eligible_params
+    params.require(:early_allocation).
+      permit(EarlyAllocation::ELIGIBLE_BOOLEAN_FIELDS +
+                [:oasys_risk_assessment_date])
+  end
+
+  def discretionary_params
+    params.require(:early_allocation).
+      permit(EarlyAllocation::ELIGIBLE_FIELDS + EarlyAllocation::ALL_DISCRETIONARY_FIELDS)
+  end
+
   def early_allocation_params
     params.require(:early_allocation).
-      permit(EarlyAllocation::STAGE1_BOOLEAN_FIELDS +
-                EarlyAllocation::ALL_STAGE2_FIELDS +
+      permit(EarlyAllocation::ELIGIBLE_BOOLEAN_FIELDS +
+                EarlyAllocation::ALL_DISCRETIONARY_FIELDS +
                 [:oasys_risk_assessment_date,
-                 :stage2_validation,
-                 :stage3_validation,
                  :reason,
-                 :approved]).merge(prison: active_prison_id,
-                                   created_within_referral_window: @offender.within_early_allocation_window?,
-                                   created_by_firstname: @current_user.first_name,
-                                   created_by_lastname: @current_user.last_name)
+                 :approved]).merge(default_params)
+  end
+
+  def default_params
+    { prison: active_prison_id,
+        created_within_referral_window: @offender.within_early_allocation_window?,
+        created_by_firstname: @current_user.first_name,
+        created_by_lastname: @current_user.last_name }
   end
 
   def offender_id_from_url

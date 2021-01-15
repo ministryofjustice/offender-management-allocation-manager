@@ -68,7 +68,8 @@ feature 'View a prisoner profile page', :allocation do
 
         # fill in missing fields and submit
         fill_in 'Last name', with: 'Smith'
-        fill_in 'Email address', with: 'jim.smith@hotmail.com'
+        # email has leading and trailing whitespaces, that are removed before validation
+        fill_in 'Email address', with: ' jim.smith@hotmail.com '
         click_button 'Submit'
         find '.vlo-row-1' # wait for page to load
         expect(page).to have_content('Smith, Jim')
