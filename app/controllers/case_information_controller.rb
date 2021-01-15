@@ -42,18 +42,14 @@ class CaseInformationController < PrisonsApplicationController
     )
 
     if @case_info.valid?
-      if params.fetch(:commit) == 'Save'
-        redirect_to prison_summary_pending_path(active_prison_id,
-                                                sort: params[:sort],
-                                                page: params[:page]
-                    )
-      else
-        redirect_to new_prison_allocation_path(active_prison_id,  @case_info.nomis_offender_id)
-      end
-    else
-      @prisoner = prisoner(case_information_params[:nomis_offender_id])
-      render :new
+      return redirect_to prison_summary_pending_path(active_prison_id,
+                                                     sort: params[:sort],
+                                                     page: params[:page]
+                         )
     end
+
+    @prisoner = prisoner(case_information_params[:nomis_offender_id])
+    render :new
   end
 
   def update

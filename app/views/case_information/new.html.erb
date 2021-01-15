@@ -13,5 +13,4 @@
 <%= render :partial => "form", :locals => {
       :action => prison_case_information_index_path(@prison.code),
       :method => :post,
-      :buttons => [{class: '', text: 'Save'}, {class: 'govuk-button--secondary govuk-!-margin-left-4', text: 'Save and allocate' }]
-} %>
+      :save_text => "Save" } %>
