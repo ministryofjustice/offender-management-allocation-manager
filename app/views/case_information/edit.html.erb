@@ -11,5 +11,4 @@
 <%= render :partial => "form", :locals => {
       :action => prison_case_information_path(@prison.code),
       :method => :put,
-      :buttons => [{class:'' , text: 'Update'}]
-} %>
+      :save_text => "Update" } %>
