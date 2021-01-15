@@ -79,6 +79,13 @@ module ApiHelper
       to_return(body: { 'staffId': staff_id }.to_json)
   end
 
+  def stub_signed_in_spo_pom(prison, staff_id, username = 'alice')
+    stub_auth_token
+    stub_sso_data(prison, username: username, roles: [SsoIdentity::POM_ROLE, SsoIdentity::SPO_ROLE])
+    stub_request(:get, "#{T3}/users/#{username}").
+        to_return(body: { 'staffId': staff_id }.to_json)
+  end
+
   def stub_offenders_for_prison(prison, offenders, movements = [])
     # Stub the call to get_offenders_for_prison. Takes a list of offender hashes (in nomis camelCase format) and
     # a list of bookings (same key format). It it your responsibility to make sure they contain the data you want

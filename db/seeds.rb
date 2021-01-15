@@ -129,6 +129,17 @@ end
   end
 end
 
+# Test offenders which have handovers in Feb 2021
+['G2407UH', 'G5884GU'].each do |offender_no|
+  CaseInformation.find_or_create_by!(nomis_offender_id: offender_no) do |info|
+    info.assign_attributes(tier: 'B',
+                           case_allocation:'NPS',
+                           welsh_offender: 'Yes',
+                           manual_entry: true,
+                           team: team2)
+  end
+end
+
 # test offender > 18 months before release (20/12/2023)
 CaseInformation.find_or_create_by!(nomis_offender_id: 'G7281UH') do |info|
   info.assign_attributes(tier: 'B',

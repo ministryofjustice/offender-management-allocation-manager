@@ -18,19 +18,19 @@ module FeaturesHelper
         to_return(body: pom.emails.to_json)
   end
 
-  def signin_spo_pom_user(name = 'MOIC_POM')
-    mock_sso_response(name, ['ROLE_ALLOC_MGR', 'ROLE_ALLOC_CASE_MGR'])
+  def signin_spo_pom_user(prisons = %w[LEI RSI], name = 'MOIC_POM')
+    mock_sso_response(name, [SsoIdentity::SPO_ROLE, SsoIdentity::POM_ROLE], prisons)
   end
 
   def signin_global_admin_user
     mock_sso_response('MOIC_POM', [SsoIdentity::SPO_ROLE, SsoIdentity::ADMIN_ROLE], PrisonService.prison_codes)
   end
 
-  def signin_pom_user
-    mock_sso_response('MOIC_POM', [SsoIdentity::POM_ROLE])
+  def signin_pom_user prisons = %w[LEI RSI]
+    mock_sso_response('MOIC_POM', [SsoIdentity::POM_ROLE], prisons)
   end
 
-  def mock_sso_response(username, roles, prisons = %w[LEI RSI])
+  def mock_sso_response(username, roles, prisons)
     hmpps_sso_response = {
       'info' => double('user_info', username: username, active_caseload: prisons.first, caseloads: prisons, roles: roles),
       'credentials' => double('credentials', expires_at: Time.zone.local(2030, 1, 1).to_i,
