@@ -7,7 +7,9 @@ FactoryBot.define do
     end
 
     created_by_name do
-      "#{Faker::Name.first_name} #{Faker::Name.last_name}"
+      # The last name is titleized after it's received from the API, e.g. "McDonald" becomes "Mcdonald"
+      # So we also .titleize the last name here to avoid breaking tests
+      "#{Faker::Name.first_name} #{Faker::Name.last_name.titleize}"
     end
 
     event do
@@ -33,7 +35,9 @@ FactoryBot.define do
     end
 
     primary_pom_name do
-      "#{Faker::Name.last_name}, #{Faker::Name.first_name}"
+      # The last name is titleized after it's received from the API, e.g. "McDonald" becomes "Mcdonald"
+      # So we also .titleize the last name here to avoid breaking tests
+      "#{Faker::Name.last_name.titleize}, #{Faker::Name.first_name}"
     end
 
     primary_pom_allocated_at do
@@ -52,7 +56,9 @@ FactoryBot.define do
       event {Allocation::ALLOCATE_PRIMARY_POM}
       event_trigger { Allocation::USER }
       primary_pom_nomis_id { 123_456}
-      primary_pom_name {"#{Faker::Name.last_name}, #{Faker::Name.first_name}"}
+      # The last name is titleized after it's received from the API, e.g. "McDonald" becomes "Mcdonald"
+      # So we also .titleize the last name here to avoid breaking tests
+      primary_pom_name {"#{Faker::Name.last_name.titleize}, #{Faker::Name.first_name}"}
       secondary_pom_nomis_id { nil }
       secondary_pom_name { nil }
     end
@@ -79,7 +85,9 @@ FactoryBot.define do
       event {Allocation::REALLOCATE_PRIMARY_POM}
       event_trigger { Allocation::USER }
       primary_pom_nomis_id { 123_456}
-      primary_pom_name {"#{Faker::Name.last_name}, #{Faker::Name.first_name}"}
+      # The last name is titleized after it's received from the API, e.g. "McDonald" becomes "Mcdonald"
+      # So we also .titleize the last name here to avoid breaking tests
+      primary_pom_name {"#{Faker::Name.last_name.titleize}, #{Faker::Name.first_name}"}
       secondary_pom_nomis_id { nil }
       secondary_pom_name { nil }
     end
