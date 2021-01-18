@@ -216,7 +216,17 @@ jobs:
             - repo/vendor/bundle
             - repo/node_modules/
             - .local/bin
-
+  rubocop:
+    <<: *defaults
+    <<: *test_container_config
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - run: bundle check --path vendor/bundle || bundle install --path vendor/bundle
+      - run:
+          name: Rubocop
+          command: bundle exec rubocop
   test:
     <<: *defaults
     <<: *test_container_config
@@ -224,10 +234,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/
-      - run: bundle --path vendor/bundle
-      - run:
-          name: Rubocop
-          command: bundle exec rubocop
+      - run: bundle check --path vendor/bundle || bundle install --path vendor/bundle
       - run:
           name: Security analysis
           command: bundle exec brakeman -o ~/test-results/brakeman/brakeman.json -o ~/test-results/brakeman/brakeman.html
@@ -363,9 +370,12 @@ workflows:
   build_and_test:
     jobs:
       - install_dependencies
-      - test:
+      - rubocop:
           requires:
             - install_dependencies
+      - test:
+          requires:
+            - rubocop
       - build_and_push_docker_image:
           requires:
             - test
