@@ -37,3 +37,6 @@
 *.swp
 *.swo
 /Brewfile.lock.json
+
+# Ignore ruby-gemset (local isolated environments for dependencies)
+.ruby-gemset

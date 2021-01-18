@@ -1,0 +1,18 @@
+<div class="moj-timeline__item">
+  <div class="moj-timeline__header">
+    <h2 class="moj-timeline__title">Early allocation assessment form sent</h2>
+  </div>
+
+  <p class="moj-timeline__date"><%= format_date_long(email_auto_early_allocation.created_at) %>
+    email sent automatically
+  </p>
+
+  <div class="moj-timeline__description">
+    <p>
+      The LDU for <%= email_auto_early_allocation.name %> - <%=  format_email(email_auto_early_allocation.email) %> - was sent a copy of the eligible early allocation assessment and new handover dates.
+    </p>
+    <p>
+      The allocated POM was copied into this email.
+    </p>
+  </div>
+</div>

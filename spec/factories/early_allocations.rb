@@ -59,6 +59,10 @@ FactoryBot.define do
       created_within_referral_window { false }
     end
 
+    trait :unsent do
+      created_within_referral_window { false }
+    end
+
     trait :discretionary do
       extremism_separation { false }
       high_risk_of_serious_harm do false end
