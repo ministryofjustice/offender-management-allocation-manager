@@ -14,7 +14,9 @@ FactoryBot.define do
     end
 
     name do
-      "#{Faker::Name.first_name} #{Faker::Name.last_name}"
+      # The last name is titleized after it's received from the API, e.g. "McDonald" becomes "Mcdonald"
+      # So we also .titleize the last name here to avoid breaking tests
+      "#{Faker::Name.first_name} #{Faker::Name.last_name.titleize}"
     end
 
     email do
