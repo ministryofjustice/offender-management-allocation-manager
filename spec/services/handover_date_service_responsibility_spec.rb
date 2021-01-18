@@ -321,6 +321,14 @@ describe HandoverDateService do
           end
 
           context 'when the prison is private' do
+            before do
+              Timecop.travel Date.new(2021, 1, 1)
+            end
+
+            after do
+              Timecop.return
+            end
+
             let(:offender) {
               OpenStruct.new  prison_id: 'TSI',
                               nps_case?: true,
