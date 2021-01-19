@@ -790,5 +790,49 @@ describe HandoverDateService do
         end
       end
     end
+
+    context 'when home detention curfew eligibility date is before the start of handover' do
+      let(:offender) {
+        OpenStruct.new nps_case?: nps_case,
+                       indeterminate_sentence?: indeterminate,
+                       recalled?: false,
+                       release_date: Time.zone.today + 3.years,
+                       automatic_release_date: ard,
+                       home_detention_curfew_eligibility_date: Time.zone.today - 1.month,
+                       tariff_date: ted,
+                       sentence_start_date: Time.zone.today - 2.months,
+                       sentenced?: true
+      }
+
+      context 'with a NPS case' do
+        let(:indeterminate) { false }
+        let(:ard) { Time.zone.today + 3.years }
+        let(:nps_case) { true }
+        let(:ted) { nil }
+
+        it 'will show the same date for responsibility handover and handover start date' do
+          handover_service = described_class.handover(offender)
+
+          expect(handover_service.responsibility).to eq HandoverDateService::RESPONSIBLE
+          expect(handover_service.handover_date).not_to eq(offender.home_detention_curfew_eligibility_date)
+          expect(handover_service.handover_date).to eq(handover_service.start_date)
+        end
+      end
+
+      context 'with an indeterminate case' do
+        let(:indeterminate) { true }
+        let(:nps_case) { false }
+        let(:ard) { nil }
+        let(:ted) { Time.zone.today + 12.months }
+
+        it 'will show the same date for responsibility handover and handover start date' do
+          handover_service = described_class.handover(offender)
+
+          expect(handover_service.responsibility).to eq HandoverDateService::RESPONSIBLE
+          expect(handover_service.handover_date).not_to eq(offender.home_detention_curfew_eligibility_date)
+          expect(handover_service.handover_date).to eq(handover_service.start_date)
+        end
+      end
+    end
   end
 end

@@ -39,7 +39,9 @@ class HandoverDateService
       responsibility = responsibility_override(offender)
       if responsibility.nil?
         handover_date, reason = nps_handover_date(offender)
-        HandoverData.new nps_responsibility(offender, handover_date), nps_start_date(offender), handover_date, reason
+        start_date = nps_start_date(offender)
+        handover_date = start_date if start_date > handover_date
+        HandoverData.new nps_responsibility(offender, handover_date), start_date, handover_date, reason
       elsif responsibility == UNKNOWN
         HandoverData.new UNKNOWN, nil, nil, 'NPS Case - missing dates'
       else
