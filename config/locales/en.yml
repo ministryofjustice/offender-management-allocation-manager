@@ -49,13 +49,16 @@ en:
           attributes:
             reason_text:
               blank: You must say why you are changing responsibility for this case
-        early_allocation_eligible_form:
+        early_allocation_date_form:
           format: "%{message}"
           attributes:
             oasys_risk_assessment_date:
               blank: Enter the date of the last OASys risk assessment
               after: This date must be in the last 3 months
               before: This must not be a date in the future
+        early_allocation_eligible_form:
+          format: "%{message}"
+          attributes:
             # These attributes are all 'inclusion' because booleans are validated in: [true false] otherwise No isn't accepted
             convicted_under_terrorisom_act_2000:
               inclusion: You must say if they were convicted under the Terrorism Act 2000
