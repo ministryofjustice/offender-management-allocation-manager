@@ -86,6 +86,10 @@ FactoryBot.define do
     nomis_offender_id { 'T9999FC' }
   end
 
+  factory :early_allocation_date_form do
+    nomis_offender_id { 'T9999FC' }
+  end
+
   factory :early_allocation_discretionary_form do
     nomis_offender_id { 'T9999FC' }
 
