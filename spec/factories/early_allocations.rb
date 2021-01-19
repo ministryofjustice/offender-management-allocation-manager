@@ -4,7 +4,9 @@ FactoryBot.define do
   factory :early_allocation do
     prison { 'LEI' }
     created_by_firstname { Faker::Name.first_name }
-    created_by_lastname { Faker::Name.last_name }
+    # The last name is titleized after it's received from the API, e.g. "McDonald" becomes "Mcdonald"
+    # So we also .titleize the last name here to avoid breaking tests
+    created_by_lastname { Faker::Name.last_name.titleize }
 
     oasys_risk_assessment_date { Time.zone.today - 2.months }
 
@@ -36,14 +38,18 @@ FactoryBot.define do
       discretionary
       community_decision { true }
       updated_by_firstname { Faker::Name.first_name }
-      updated_by_lastname { Faker::Name.last_name }
+      # The last name is titleized after it's received from the API, e.g. "McDonald" becomes "Mcdonald"
+      # So we also .titleize the last name here to avoid breaking tests
+      updated_by_lastname { Faker::Name.last_name.titleize }
     end
 
     trait :discretionary_declined do
       discretionary
       community_decision { false }
       updated_by_firstname { Faker::Name.first_name }
-      updated_by_lastname { Faker::Name.last_name }
+      # The last name is titleized after it's received from the API, e.g. "McDonald" becomes "Mcdonald"
+      # So we also .titleize the last name here to avoid breaking tests
+      updated_by_lastname { Faker::Name.last_name.titleize }
     end
 
     trait :ineligible do
