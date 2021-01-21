@@ -17,7 +17,6 @@ class PrisonersController < PrisonsApplicationController
       @secondary_pom_name = helpers.fetch_pom_name(@allocation.secondary_pom_nomis_id).titleize
     end
 
-    @pom_responsibility = @prisoner.pom_responsibility
     @keyworker = HmppsApi::KeyworkerApi.get_keyworker(
       active_prison_id, @prisoner.offender_no
     )

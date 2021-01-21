@@ -808,7 +808,7 @@ describe HandoverDateService do
         it 'will show the same date for responsibility handover and handover start date' do
           handover_service = described_class.handover(offender)
 
-          expect(handover_service.responsibility).to eq HandoverDateService::RESPONSIBLE
+          expect(handover_service.custody.responsible?).to eq true
           expect(handover_service.handover_date).not_to eq(offender.home_detention_curfew_eligibility_date)
           expect(handover_service.handover_date).to eq(handover_service.start_date)
         end
@@ -823,7 +823,7 @@ describe HandoverDateService do
         it 'will show the same date for responsibility handover and handover start date' do
           handover_service = described_class.handover(offender)
 
-          expect(handover_service.responsibility).to eq HandoverDateService::RESPONSIBLE
+          expect(handover_service.custody.responsible?).to eq true
           expect(handover_service.handover_date).not_to eq(offender.home_detention_curfew_eligibility_date)
           expect(handover_service.handover_date).to eq(handover_service.start_date)
         end

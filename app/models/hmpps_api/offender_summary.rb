@@ -15,7 +15,11 @@ module HmppsApi
     end
 
     def case_owner
-      pom_responsibility.case_owner
+      if pom_responsibility.responsible?
+        'Custody'
+      else
+        'Community'
+      end
     end
 
     def self.from_json(payload)

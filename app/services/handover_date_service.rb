@@ -1,65 +1,80 @@
 # frozen_string_literal: true
 
 class HandoverDateService
-  Responsibility = Struct.new(:description, :custody?, :case_owner) do
-    def to_s
-      description
-    end
-  end
+  Responsibility = Struct.new(:responsible?, :supporting?)
 
-  RESPONSIBLE = Responsibility.new 'Responsible', true, 'Custody'
-  SUPPORTING = Responsibility.new 'Supporting', false, 'Community'
-  UNKNOWN = Responsibility.new 'Unknown', false, 'Unknown'
+  RESPONSIBLE = Responsibility.new true, false
+  SUPPORTING = Responsibility.new false, true
+  UNKNOWN = Responsibility.new false, false
 
   # Actual date Mon 19th Oct 2020
   PRESCOED_CUTOFF_DATE = Date.new(2020, 10, 19).freeze
 
-  HandoverData = Struct.new :responsibility, :start_date, :handover_date, :reason
+  HandoverData = Struct.new :custody, :community, :start_date, :handover_date, :reason
 
   # if COM responsible, then handover dates all empty
-  NO_HANDOVER_DATE = HandoverData.new SUPPORTING, nil, nil, 'COM Responsibility'
+  NO_HANDOVER_DATE = HandoverData.new SUPPORTING, RESPONSIBLE, nil, nil, 'COM Responsibility'
 
   def self.calculate_pom_responsibility(offender)
-    handover(offender).responsibility
+    handover(offender).custody
   end
 
   def self.handover(raw_offender)
     offender = OffenderWrapper.new(raw_offender)
 
     if offender.recalled?
-      HandoverData.new SUPPORTING, nil, nil, 'Recall case'
+      HandoverData.new SUPPORTING, RESPONSIBLE, nil, nil, 'Recall case'
     elsif offender.immigration_case?
-      HandoverData.new SUPPORTING, nil, nil, 'Immigration Case'
+      HandoverData.new SUPPORTING, RESPONSIBLE, nil, nil, 'Immigration Case'
     elsif offender.nps_case? && offender.indeterminate_sentence? && (offender.tariff_date.nil? || offender.tariff_date < Time.zone.today)
-      HandoverData.new RESPONSIBLE, nil, nil, 'No earliest release date'
+      HandoverData.new RESPONSIBLE, UNKNOWN, nil, nil, 'No earliest release date'
     elsif offender.recent_prescoed_case? && offender.indeterminate_sentence? && offender.nps_case?
       handover_date = prescoed_handover_date(offender)
-      HandoverData.new SUPPORTING, offender.prison_arrival_date, handover_date, 'Prescoed'
+      HandoverData.new SUPPORTING, RESPONSIBLE, offender.prison_arrival_date, handover_date, 'Prescoed'
     elsif offender.nps_case? || offender.indeterminate_sentence?
-      responsibility = responsibility_override(offender)
-      if responsibility.nil?
-        handover_date, reason = nps_handover_date(offender)
-        start_date = nps_start_date(offender)
-        handover_date = start_date if start_date > handover_date
-        HandoverData.new nps_responsibility(offender, handover_date), start_date, handover_date, reason
-      elsif responsibility == UNKNOWN
-        HandoverData.new UNKNOWN, nil, nil, 'NPS Case - missing dates'
+      handover_date, reason = nps_handover_date(offender)
+      start_date = nps_start_date(offender)
+      handover_date = start_date if start_date.present? && start_date > handover_date
+
+      case responsibility_override(offender)
+      when nil
+        pom_responsible = nps_responsibility(offender, handover_date)
+        if pom_responsible == RESPONSIBLE
+          HandoverData.new RESPONSIBLE, com_responsibility(start_date, handover_date), start_date, handover_date, reason
+        else
+          HandoverData.new SUPPORTING, RESPONSIBLE, start_date, handover_date, reason
+        end
+      when UNKNOWN
+        HandoverData.new UNKNOWN, UNKNOWN, nil, nil, 'NPS Case - missing dates'
+      when RESPONSIBLE
+        HandoverData.new RESPONSIBLE, com_responsibility(start_date, handover_date), start_date, handover_date, reason
       else
-        handover_date, reason = nps_handover_date(offender)
-        HandoverData.new responsibility, nps_start_date(offender), handover_date, reason
+        HandoverData.new SUPPORTING, RESPONSIBLE, start_date, handover_date, reason
       end
     else
       responsibility = crc_responsibility(offender)
       if responsibility == UNKNOWN
-        HandoverData.new UNKNOWN, nil, nil, 'CRC Case - missing dates'
+        HandoverData.new UNKNOWN, UNKNOWN, nil, nil, 'CRC Case - missing dates'
       else
         crc_date = crc_handover_date(offender)
-        HandoverData.new responsibility, crc_date, crc_date, 'CRC Case'
+        if responsibility == RESPONSIBLE
+          HandoverData.new RESPONSIBLE, UNKNOWN, crc_date, crc_date, 'CRC Case'
+        else
+          HandoverData.new SUPPORTING, RESPONSIBLE, crc_date, crc_date, 'CRC Case'
+        end
       end
     end
   end
 
 private
+
+  def self.com_responsibility(start_date, handover_date)
+    if start_date.present? && handover_date.present? && Time.zone.today.between?(start_date, handover_date)
+      SUPPORTING
+    else
+      UNKNOWN
+    end
+  end
 
   # We currently don't have access to the date of the parole board decision, which means that we cannot correctly
   # calculate responsibility for NPS indeterminate cases with parole eligibility where the TED is in the past.

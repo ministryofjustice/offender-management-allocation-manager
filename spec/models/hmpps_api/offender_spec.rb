@@ -126,9 +126,8 @@ describe HmppsApi::Offender do
 
       it 'calculates the responsibility based on the offenders sentence' do
         responsibility = offender.pom_responsibility
-        expect(responsibility.case_owner).to eq('Custody')
-        expect(responsibility.custody?).to eq(true)
-        expect(responsibility.description).to eq('Responsible')
+        expect(responsibility.responsible?).to eq(true)
+        expect(responsibility.supporting?).to eq(false)
       end
     end
 
@@ -146,9 +145,8 @@ describe HmppsApi::Offender do
         offender.load_case_information(case_info)
 
         responsibility = offender.pom_responsibility
-        expect(responsibility.case_owner).to eq('Community')
-        expect(responsibility.custody?).to eq(false)
-        expect(responsibility.description).to eq('Supporting')
+        expect(responsibility.responsible?).to eq(false)
+        expect(responsibility.supporting?).to eq(true)
       end
 
       it "returns Responsible when Responsibility.value is 'Prison'" do
@@ -158,9 +156,8 @@ describe HmppsApi::Offender do
         offender.load_case_information(case_info)
 
         responsibility = offender.pom_responsibility
-        expect(responsibility.case_owner).to eq('Custody')
-        expect(responsibility.custody?).to eq(true)
-        expect(responsibility.description).to eq('Responsible')
+        expect(responsibility.supporting?).to eq(false)
+        expect(responsibility.responsible?).to eq(true)
       end
     end
   end

@@ -7,11 +7,23 @@ module OffenderHelper
   end
 
   def pom_responsibility_label(offender)
-    offender.pom_responsibility.to_s
+    if offender.pom_responsibility.responsible?
+      'Responsible'
+    elsif offender.pom_responsibility.supporting?
+      'Supporting'
+    else
+      'Unknown'
+    end
   end
 
   def case_owner_label(offender)
-    offender.pom_responsibility.case_owner
+    if offender.pom_responsibility.responsible?
+      'Custody'
+    elsif offender.pom_responsibility.supporting?
+      'Community'
+    else
+      'Unknown'
+    end
   end
 
   def last_event(allocation)

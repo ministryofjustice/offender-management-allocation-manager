@@ -10,6 +10,7 @@ feature "viewing upcoming handovers" do
     let(:handover_dates) {
       HandoverDateService::HandoverData.new(
         HandoverDateService::RESPONSIBLE,
+        HandoverDateService::UNKNOWN,
         handover_start_date,
         responsibility_handover_date,
         'Stubbed handover date'
