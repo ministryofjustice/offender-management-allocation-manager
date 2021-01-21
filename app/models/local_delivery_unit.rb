@@ -12,4 +12,8 @@ class LocalDeliveryUnit < ApplicationRecord
   validates :code, presence: true, uniqueness: true, format: { with: CODE_REGEX }
   validates :name, presence: true
   validates :email_address,  presence: true, 'valid_email_2/email': true
+
+  scope :enabled, -> { where(enabled: true) }
+
+  has_many :case_information, dependent: :restrict_with_exception
 end

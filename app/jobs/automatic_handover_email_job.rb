@@ -7,9 +7,8 @@ class AutomaticHandoverEmailJob < ApplicationJob
 
   def perform ldu
     today = Time.zone.today
-    ldu_offenders = ldu.teams.map { |team| team.case_information.map(&:nomis_offender_id) }.flatten
-                    .map { |offender_id| OffenderService.get_offender(offender_id) }
-                    .compact
+    ldu_offenders = get_ldu_offenders(ldu)
+
     # don't send any emails to empty LDUs with no offenders
     if ldu_offenders.any?
       active_prison_codes = Prison.active.map(&:code)
@@ -41,10 +40,25 @@ class AutomaticHandoverEmailJob < ApplicationJob
           end
         end
         # deliver_now - this is all we are doing, so we want the whole job to repeat if it fails
-        CommunityMailer.pipeline_to_community(ldu: ldu, csv_data: csv_data).deliver_now
+        CommunityMailer.pipeline_to_community(ldu_name: ldu.name, ldu_email: ldu.email_address, csv_data: csv_data).deliver_now
       else
-        CommunityMailer.pipeline_to_community_no_handovers(ldu).deliver_now
+        CommunityMailer.pipeline_to_community_no_handovers(ldu_name: ldu.name, ldu_email: ldu.email_address).deliver_now
       end
     end
+  end
+
+private
+
+  def get_ldu_offenders(ldu)
+    offender_ids = if ldu.is_a?(LocalDeliveryUnit)
+                     # This is a new LDU record
+                     ldu.case_information.map(&:nomis_offender_id)
+                   else
+                     # This is an old LDU record
+                     # TODO: remove old LDUs after LDU/PDU switchover has happened (Feb 2021)
+                     ldu.teams.map { |team| team.case_information.map(&:nomis_offender_id) }.flatten
+                   end
+
+    offender_ids.map { |offender_id| OffenderService.get_offender(offender_id) }.compact
   end
 end

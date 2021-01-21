@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe CommunityMailer, type: :mailer do
-  describe 'handover_chase_email' do
+  describe '#urgent_pipeline_to_community' do
     let(:offender) { build(:offender, latestLocationId: 'LEI') }
 
     let(:case_info) do
@@ -51,6 +51,42 @@ RSpec.describe CommunityMailer, type: :mailer do
             pom_name: params[:pom_name],
             pom_email: params[:pom_email]
          )
+    end
+  end
+
+  describe '#pipeline_to_community' do
+    subject { described_class.pipeline_to_community(params) }
+
+    let(:ldu) { build(:local_delivery_unit) }
+
+    let(:params) {
+      {
+        ldu_name: ldu.name,
+        ldu_email: ldu.email_address,
+        csv_data: "Comma, Separated, Values"
+      }
+    }
+
+    it 'sends to the LDU email address' do
+      expect(subject.to).to eq([ldu.email_address])
+    end
+
+    it 'sets the LDU name' do
+      expect(subject.govuk_notify_personalisation).to include(ldu_name: ldu.name)
+    end
+  end
+
+  describe '#pipeline_to_community_no_handovers' do
+    subject { described_class.pipeline_to_community_no_handovers(ldu_name: ldu.name, ldu_email: ldu.email_address) }
+
+    let(:ldu) { build(:local_delivery_unit) }
+
+    it 'sends to the LDU email address' do
+      expect(subject.to).to eq([ldu.email_address])
+    end
+
+    it 'sets the LDU name' do
+      expect(subject.govuk_notify_personalisation).to include(ldu_name: ldu.name)
     end
   end
 end
