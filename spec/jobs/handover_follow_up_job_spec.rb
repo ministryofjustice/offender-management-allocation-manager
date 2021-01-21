@@ -8,19 +8,7 @@ RSpec.describe HandoverFollowUpJob, :allocation, type: :job do
                    ted: nil)
   end
 
-  it "does not send emails for LDU's without email addresses" do
-    case_info = create(:case_information, nomis_offender_id: determinate_offender.offender_no,
-                       team: build(:team, local_divisional_unit: build(:local_divisional_unit, email_address: nil)))
-
-    create(:allocation, nomis_offender_id: determinate_offender.offender_no)
-
-    allow(OffenderService).to receive(:get_offender).and_return(determinate_offender)
-    determinate_offender.load_case_information(case_info)
-
-    expect(case_info.team.local_divisional_unit.email_address.present?).to be false
-    expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
-    described_class.perform_now(Time.zone.today)
-  end
+  let(:ldu) { create(:local_divisional_unit) }
 
   it 'does not send emails for offenders who are not in an active prison' do
     release_date = Time.zone.today + 8.months
@@ -31,7 +19,7 @@ RSpec.describe HandoverFollowUpJob, :allocation, type: :job do
                               ted: nil)
 
     case_info = create(:case_information, nomis_offender_id: offender.offender_no,
-                       team: build(:team, local_divisional_unit: build(:local_divisional_unit)))
+                       team: build(:team, local_divisional_unit: ldu))
 
     create(:allocation, nomis_offender_id: offender.offender_no)
 
@@ -39,13 +27,13 @@ RSpec.describe HandoverFollowUpJob, :allocation, type: :job do
     offender.load_case_information(case_info)
 
     expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
-    described_class.perform_now(Time.zone.today)
+    described_class.perform_now(ldu)
   end
 
   it 'does not send emails for un-sentenced offenders' do
     unsentenced_offender = build_offender(sentence_type: :determinate, ard_crd_release: nil, ted: nil)
     case_info = create(:case_information, nomis_offender_id: unsentenced_offender.offender_no,
-                       team: build(:team, local_divisional_unit: build(:local_divisional_unit)))
+                       team: build(:team, local_divisional_unit: ldu))
 
     create(:allocation, nomis_offender_id: unsentenced_offender.offender_no)
 
@@ -53,20 +41,20 @@ RSpec.describe HandoverFollowUpJob, :allocation, type: :job do
     unsentenced_offender.load_case_information(case_info)
 
     expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
-    described_class.perform_now(Time.zone.today)
+    described_class.perform_now(ldu)
   end
 
   it 'does not send emails for offenders that do not exist' do
     offender = build_offender(sentence_type: :determinate, ard_crd_release: nil, ted: nil)
     create(:case_information, nomis_offender_id: offender.offender_no,
-                       team: build(:team, local_divisional_unit: build(:local_divisional_unit)))
+                       team: build(:team, local_divisional_unit: ldu))
 
     create(:allocation, nomis_offender_id: offender.offender_no)
 
     allow(OffenderService).to receive(:get_offender).and_return(nil)
 
     expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
-    expect { described_class.perform_now(Time.zone.today) }.not_to raise_error
+    expect { described_class.perform_now(ldu) }.not_to raise_error
   end
 
   it 'does not send emails for offenders who have a COM assigned' do
@@ -77,7 +65,7 @@ RSpec.describe HandoverFollowUpJob, :allocation, type: :job do
     determinate_offender.load_case_information(case_info)
 
     expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
-    described_class.perform_now(Time.zone.today)
+    described_class.perform_now(ldu)
   end
 
   it 'does not send emails for offenders who do not have a handover_start_date' do
@@ -87,7 +75,7 @@ RSpec.describe HandoverFollowUpJob, :allocation, type: :job do
                                                ted: nil)
 
     case_info = create(:case_information, nomis_offender_id: indeterminate_without_ted.offender_no,
-                       team: build(:team, local_divisional_unit: build(:local_divisional_unit)))
+                       team: build(:team, local_divisional_unit: ldu))
 
     create(:allocation, nomis_offender_id: indeterminate_without_ted.offender_no)
 
@@ -95,13 +83,13 @@ RSpec.describe HandoverFollowUpJob, :allocation, type: :job do
     indeterminate_without_ted.load_case_information(case_info)
 
     expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
-    described_class.perform_now(Time.zone.today)
+    described_class.perform_now(ldu)
   end
 
   context 'when no COM assigned' do
     let(:case_info) do
       create(:case_information, nomis_offender_id: determinate_offender.offender_no,
-                       team: build(:team, local_divisional_unit: build(:local_divisional_unit)))
+                       team: build(:team, local_divisional_unit: ldu))
     end
 
     before do
@@ -113,29 +101,35 @@ RSpec.describe HandoverFollowUpJob, :allocation, type: :job do
       determinate_offender.load_case_information(case_info)
 
       expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
-      described_class.perform_now(Time.zone.today)
+      described_class.perform_now(ldu)
     end
 
     it 'does not send emails for offenders when their handover date is overdue by less than a week' do
       create(:allocation, nomis_offender_id: determinate_offender.offender_no)
       determinate_offender.load_case_information(case_info)
 
-      date_of_handover = determinate_offender.handover_start_date + 5.days
       expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
-      described_class.perform_now(date_of_handover)
+
+      today = determinate_offender.handover_start_date + 5.days
+      Timecop.travel today do
+        described_class.perform_now(ldu)
+      end
     end
 
     it 'does not send emails for offenders when their handover date is overdue by more than a week' do
       create(:allocation, nomis_offender_id: determinate_offender.offender_no)
       determinate_offender.load_case_information(case_info)
 
-      date_of_handover = determinate_offender.handover_start_date + 10.days
       expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
-      described_class.perform_now(date_of_handover)
+
+      today = determinate_offender.handover_start_date + 10.days
+      Timecop.travel today do
+        described_class.perform_now(ldu)
+      end
     end
 
     context 'when handover date is exactly one week overdue' do
-      let(:date_of_handover) { determinate_offender.handover_start_date + 1.week }
+      let(:today) { determinate_offender.handover_start_date + 1.week }
 
       it 'sends emails for unallocated offenders' do
         prison_code = Prison.new("LEI")
@@ -159,7 +153,9 @@ RSpec.describe HandoverFollowUpJob, :allocation, type: :job do
               pom_email: ""
               ).and_call_original
 
-        described_class.perform_now(date_of_handover)
+        Timecop.travel today do
+          described_class.perform_now(ldu)
+        end
       end
 
       it 'sends emails for allocated offenders' do
@@ -187,7 +183,9 @@ RSpec.describe HandoverFollowUpJob, :allocation, type: :job do
               pom_email: pom.email_address
               ).and_call_original
 
-        described_class.perform_now(date_of_handover)
+        Timecop.travel today do
+          described_class.perform_now(ldu)
+        end
       end
     end
   end
