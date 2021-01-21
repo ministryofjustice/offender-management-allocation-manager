@@ -63,6 +63,17 @@ FactoryBot.define do
       secondary_pom_name { nil }
     end
 
+    trait :co_working do
+      event {Allocation:: ALLOCATE_SECONDARY_POM}
+      event_trigger { Allocation::USER }
+      primary_pom_nomis_id {345_456}
+      # The last name is titleized after it's received from the API, e.g. "McDonald" becomes "Mcdonald"
+      # So we also .titleize the last name here to avoid breaking tests
+      primary_pom_name {"#{Faker::Name.last_name.titleize}, #{Faker::Name.first_name}"}
+      secondary_pom_nomis_id {234_567}
+      secondary_pom_name {"#{Faker::Name.last_name.titleize}, #{Faker::Name.first_name}"}
+    end
+
     trait :release do
       event { Allocation::DEALLOCATE_RELEASED_OFFENDER }
       event_trigger {Allocation::OFFENDER_RELEASED}

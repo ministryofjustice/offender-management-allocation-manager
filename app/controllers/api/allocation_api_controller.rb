@@ -4,7 +4,9 @@ module Api
   class AllocationApiController < Api::ApiController
     def show
       render_404('Not ready for allocation') && return if allocation.nil?
-      render_404('Not allocated') && return if allocation.primary_pom_nomis_id.nil?
+
+      offender = OffenderService.get_offender(offender_number)
+      render_404('Not allocated') && return unless allocation.active? && offender.inside_omic_policy?
 
       render json: allocation_as_json
     end
