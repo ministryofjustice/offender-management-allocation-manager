@@ -25,7 +25,7 @@ SimpleCov.start 'rails' do
 
   # Try to set this to current coverage levels so that it never goes down after a PR
   # 20 lines uncovered at 99.41% coverage
-  minimum_coverage 99.41
+  minimum_coverage 99.46
   # sometimes coverage drops between branches - don't fail in these cases
   maximum_coverage_drop 0.5
 
