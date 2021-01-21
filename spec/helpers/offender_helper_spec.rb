@@ -25,6 +25,32 @@ RSpec.describe OffenderHelper do
     end
   end
 
+  describe '#pom_responsibility_label' do
+    context 'when responsible' do
+      let(:offender) { build(:offender) }
+
+      it 'shows responsible' do
+        expect(helper.pom_responsibility_label(offender)).to eq('Responsible')
+      end
+    end
+
+    context 'when supporting' do
+      let(:offender) { build(:offender, :determinate_recall) }
+
+      it 'shows supporting' do
+        expect(helper.pom_responsibility_label(offender)).to eq('Supporting')
+      end
+    end
+
+    context 'when unknown' do
+      let(:offender) { build(:offender, sentence: build(:sentence_detail, :unsentenced, conditionalReleaseDate: nil)) }
+
+      it 'shows unknown' do
+        expect(helper.pom_responsibility_label(offender)).to eq('Unknown')
+      end
+    end
+  end
+
   describe 'generates labels for case owner ' do
     it 'can show Custody for Prison' do
       off = build(:offender).tap { |o|
@@ -44,6 +70,14 @@ RSpec.describe OffenderHelper do
       offp = OffenderPresenter.new(off)
 
       expect(helper.case_owner_label(offp)).to eq('Community')
+    end
+
+    context 'when unknown' do
+      let(:offender) { build(:offender, sentence: build(:sentence_detail, :unsentenced, conditionalReleaseDate: nil)) }
+
+      it 'can show Unknown' do
+        expect(helper.case_owner_label(offender)).to eq('Unknown')
+      end
     end
   end
 

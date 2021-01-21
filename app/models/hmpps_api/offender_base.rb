@@ -106,7 +106,7 @@ module HmppsApi
 
     def pom_responsibility
       if @responsibility_override.nil?
-        HandoverDateService.handover(self).responsibility
+        HandoverDateService.handover(self).custody
       elsif @responsibility_override.value == Responsibility::PRISON
         HandoverDateService::RESPONSIBLE
       else
@@ -237,7 +237,7 @@ module HmppsApi
     end
 
     def handover
-      @handover ||= if pom_responsibility.custody?
+      @handover ||= if pom_responsibility.responsible?
                       HandoverDateService.handover(self)
                     else
                       HandoverDateService::NO_HANDOVER_DATE

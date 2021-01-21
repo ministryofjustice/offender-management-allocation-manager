@@ -193,16 +193,16 @@ RSpec.describe SummaryController, :allocation, type: :controller do
 
         get :unallocated, params: { prison_id: prison, sort: 'case_owner asc' }
 
-        expect(assigns(:offenders).first.pom_responsibility.case_owner).to eq('Community')
-        expect(assigns(:offenders).last.pom_responsibility.case_owner).to eq('Custody')
+        expect(assigns(:offenders).first.pom_responsibility.supporting?).to eq(true)
+        expect(assigns(:offenders).last.pom_responsibility.responsible?).to eq(true)
       end
 
       it 'can sort by case owner in descending order' do
         stub_offenders_for_prison(prison, offenders)
 
         get :unallocated, params: { prison_id: prison, sort: 'case_owner desc' }
-        expect(assigns(:offenders).first.pom_responsibility.case_owner).to eq('Custody')
-        expect(assigns(:offenders).last.pom_responsibility.case_owner).to eq('Community')
+        expect(assigns(:offenders).first.pom_responsibility.responsible?).to eq(true)
+        expect(assigns(:offenders).last.pom_responsibility.supporting?).to eq(true)
       end
     end
   end

@@ -24,7 +24,7 @@ class AllocatedOffender
 
   def pom_responsibility
     if @allocation.primary_pom_nomis_id == @staff_id
-      @offender.pom_responsibility.to_s
+      @offender.pom_responsibility.responsible? ? 'Responsible' : 'Supporting'
     else
       'Co-Working'
     end
