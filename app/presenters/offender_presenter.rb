@@ -6,6 +6,7 @@ class OffenderPresenter
            :full_name_ordered, :full_name, :main_offence,
            :sentence_start_date, :team_name, :prison_id,
            :needs_early_allocation_notify?,
+           :welsh_offender_in_prescoed_needs_com?,
            :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date,
            :tariff_date, :responsibility_override?,
            :date_of_birth, :release_date, :parole_eligibility_date,
