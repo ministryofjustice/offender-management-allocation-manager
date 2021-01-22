@@ -132,4 +132,90 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
 
     described_class.perform_now(movement_json)
   end
+
+  context "when a Welsh offender is transferred to Prescoed open prison" do
+    let(:prescoed) { 'UPI' }
+
+    let(:movement_json) do
+      {
+        offender_no: nomis_offender_id,
+        from_agency: closed_prison_code,
+        to_agency: prescoed,
+        movement_type: "TRN",
+        direction_code: "IN"
+      }.to_json
+    end
+
+    context 'with an indeterminate offender' do
+      it 'sends an email to the LDU' do
+        offender = build(:nomis_offender, imprisonmentStatus: 'LIFE', first_name: 'First', last_name: 'Last', sentence_type: :indeterminate)
+        stub_offenders_for_prison(closed_prison_code, [offender])
+
+        allow(OffenderService).to receive(:get_offender).
+        and_return(HmppsApi::Offender.new(offender_no: nomis_offender_id,
+                                          prison_id: prescoed,
+                                          first_name: 'First',
+                                          last_name: 'Last',
+                                          sentence_type: SentenceType.new("LIFE")
+        ).tap { |o|
+          o.load_case_information(build(:case_information, :welsh, crn: 'A123j787DD',
+                                        case_allocation: 'NPS',
+                                        team: build(:team,
+                                                    local_divisional_unit: build(:local_divisional_unit, name: 'ldu12', email_address: 'ldu@ldu12.gov.uk'))))
+        })
+
+        alloc = create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: other_staff_id,
+               prison: closed_prison_code, primary_pom_name: 'Primary POMName')
+
+        alloc.update(primary_pom_nomis_id: nomis_staff_id)
+        alloc.offender_transferred
+
+        fakejob = double
+        allow(fakejob).to receive(:deliver_later)
+
+        # this correctly skips the 'send email' method and goes to 'prescoed send mail' but this method hasn't been created yet
+        expect(CommunityMailer).to receive(:omic_open_prison_community_allocation).with(hash_including(
+                                                                                          nomis_offender_id: nomis_offender_id,
+                                                                                          prisoner_name: 'Last, First',
+                                                                                          crn: 'A123j787DD',
+                                                                                          ldu_email: 'ldu@ldu12.gov.uk',
+                                                                                          prison: 'HMP/YOI Prescoed',
+                                                                                          pom_name: 'Primary POMName',
+                                                                                          pom_email: 'pom@localhost.local'
+                                                                                        )).and_return(fakejob)
+
+        expect { described_class.perform_now(movement_json) }.to change(EmailHistory, :count).by(1)
+      end
+    end
+
+    context "with a determinate offender" do
+      it 'does not send an email to the LDU' do
+        offender = build(:nomis_offender, imprisonmentStatus: 'SENT03', first_name: 'First', last_name: 'Last', sentence_type: :determinate)
+        stub_offenders_for_prison(closed_prison_code, [offender])
+
+        allow(OffenderService).to receive(:get_offender).
+        and_return(HmppsApi::Offender.new(offender_no: nomis_offender_id,
+                                          prison_id: prescoed,
+                                          first_name: 'First',
+                                          last_name: 'Last',
+                                          sentence_type: SentenceType.new("SENT03")
+        ).tap { |o|
+          o.load_case_information(build(:case_information, :welsh,
+                                        case_allocation: 'NPS',
+                                        team: build(:team,
+                                                    local_divisional_unit:  LocalDivisionalUnit.new.tap { |l| l.email_address = 'ldu@local.local' })))
+        })
+
+        alloc = create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: other_staff_id,
+                       prison: closed_prison_code, primary_pom_name: 'Primary POMName')
+
+        alloc.update(primary_pom_nomis_id: nomis_staff_id)
+        alloc.offender_transferred
+
+        expect { described_class.perform_now(movement_json) }.to change(EmailHistory, :count).by(0)
+        expect_any_instance_of(PomMailer).not_to receive(:responsibility_override_open_prison)
+        expect_any_instance_of(CommunityMailer).not_to receive(:omic_open_prison_community_allocation)
+      end
+    end
+  end
 end

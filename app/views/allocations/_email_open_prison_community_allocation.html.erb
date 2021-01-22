@@ -1,0 +1,15 @@
+<div class="moj-timeline__item">
+  <div class="moj-timeline__header">
+    <h2 class="moj-timeline__title">Offender transferred to an open prison</h2>
+  </div>
+
+  <p class="moj-timeline__date"><%= format_date_long(email_open_prison_community_allocation.created_at) %>
+    email sent automatically
+  </p>
+
+  <div class="moj-timeline__description">
+    <p>
+      The LDU for <%= email_open_prison_community_allocation.name %> - <%=  format_email(email_open_prison_community_allocation.email) %> - was sent an email asking them to appoint a Responsible COM.
+    </p>
+  </div>
+</div>
