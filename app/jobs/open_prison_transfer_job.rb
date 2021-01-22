@@ -18,7 +18,22 @@ class OpenPrisonTransferJob < ApplicationJob
     return unless PrisonService.open_prison?(offender.prison_id)
 
     Rails.logger.info("[MOVEMENT] Processing move to open prison for #{offender.offender_no}")
-    send_email(offender, movement) if offender.ldu_email_address.present?
+
+    return if offender.ldu_email_address.blank?
+
+    if offender.prison_id == PrisonService::PRESCOED_CODE && offender.welsh_offender
+      return unless offender.indeterminate_sentence?
+
+      send_email_open_prison_allocation(offender, movement)
+
+      EmailHistory.create! nomis_offender_id: offender.offender_no, name: offender.ldu_name,
+                           email: offender.ldu_email_address,
+                           event: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION,
+                           prison: offender.prison_id
+
+    else
+      send_email(offender, movement)
+    end
   end
 
 private
@@ -34,6 +49,20 @@ private
       prison_name: PrisonService.name_for(movement.to_agency),
       previous_prison_name: PrisonService.name_for(movement.from_agency),
       email: offender.ldu_email_address
+    ).deliver_later
+  end
+
+  def send_email_open_prison_allocation(offender, movement)
+    alloc = last_allocation(offender)
+
+    CommunityMailer.omic_open_prison_community_allocation(
+      prisoner_name: offender.full_name,
+      nomis_offender_id: offender.offender_no,
+      crn: offender.crn,
+      pom_name: alloc.try(:primary_pom_name) || 'N/A',
+      pom_email: last_pom_email(alloc) || 'N/A',
+      prison: PrisonService.name_for(movement.to_agency),
+      ldu_email: offender.ldu_email_address
     ).deliver_later
   end
 
