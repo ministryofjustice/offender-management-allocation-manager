@@ -14,13 +14,17 @@ class HandoverFollowUpJob < ApplicationJob
                   }
 
     offenders.each do |offender|
-      allocation = Allocation.where(nomis_offender_id: offender.offender_no).first
+      allocation = Allocation.find_by(nomis_offender_id: offender.offender_no)
 
-      pom = if allocation.nil?
-              nil
-            else
-              PrisonOffenderManagerService.get_pom_at(offender.prison_id, allocation.primary_pom_nomis_id)
-            end
+      if allocation.present? && allocation.active?
+        pom = PrisonOffenderManagerService.get_pom_at(offender.prison_id, allocation.primary_pom_nomis_id)
+        pom_name = pom.full_name
+        pom_email = pom.email_address
+      else
+        # There is no POM allocated
+        pom_name = 'This offender does not have an allocated POM'
+        pom_email = ''
+      end
 
       offender_type = offender.indeterminate_sentence? ? 'Indeterminate' : 'Determinate'
 
@@ -33,8 +37,8 @@ class HandoverFollowUpJob < ApplicationJob
         prison: PrisonService.name_for(offender.prison_id),
         start_date: offender.handover_start_date,
         responsibility_handover_date: offender.responsibility_handover_date,
-        pom_name: pom.nil? ? 'This offender does not have an allocated POM' : pom.full_name,
-        pom_email: pom.nil? ? '' : pom.email_address
+        pom_name: pom_name,
+        pom_email: pom_email
       ).deliver_now
     end
   end
