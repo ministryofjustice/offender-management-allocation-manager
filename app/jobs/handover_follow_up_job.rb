@@ -3,13 +3,11 @@ class HandoverFollowUpJob < ApplicationJob
 
   def perform(ldu)
     today = Time.zone.today
-    active_prisons = Prison.active
-    active_prison_codes = active_prisons.map(&:code)
+    active_prison_codes = Prison.active.map(&:code)
 
-    offenders = ldu.teams.map { |team| team.case_information.where(com_name: nil).map(&:nomis_offender_id) }.flatten
-                .map { |off_id| OffenderService.get_offender(off_id) }
+    offenders = get_ldu_offenders(ldu)
                   .select { |o|
-                    !o.nil? && o.sentenced? && o.handover_start_date.present? &&
+                    o.sentenced? && o.handover_start_date.present? &&
                       active_prison_codes.include?(o.prison_id) && o.handover_start_date == today - 1.week
                   }
 
@@ -41,5 +39,22 @@ class HandoverFollowUpJob < ApplicationJob
         pom_email: pom_email
       ).deliver_now
     end
+  end
+
+private
+
+  def get_ldu_offenders(ldu)
+    offender_ids = if ldu.is_a?(LocalDeliveryUnit)
+                     # This is a new LDU record
+                     ldu.case_information.where(com_name: nil).map(&:nomis_offender_id)
+                   else
+                     # This is an old LDU record
+                     # TODO: remove old LDUs after LDU/PDU switchover has happened (Feb 2021)
+                     ldu.teams.map { |team|
+                       team.case_information.where(com_name: nil).map(&:nomis_offender_id)
+                     }.flatten
+                   end
+
+    offender_ids.map { |offender_id| OffenderService.get_offender(offender_id) }.compact
   end
 end
