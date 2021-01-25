@@ -1,197 +1,199 @@
 require 'rails_helper'
 
 RSpec.describe HandoverFollowUpJob, :allocation, type: :job do
-  let(:determinate_offender) do
+  let!(:ldu) { create(:local_divisional_unit, teams: [build(:team, case_information: [case_info])]) }
+
+  let(:offender) do
     build_offender(Time.zone.today + 8.months,
                    sentence_type: :determinate,
                    ard_crd_release: Time.zone.today + 8.months,
                    ted: nil)
   end
 
-  let(:ldu) { create(:local_divisional_unit) }
+  let(:offender_no) { offender.offender_no }
 
-  it 'does not send emails for offenders who are not in an active prison' do
-    release_date = Time.zone.today + 8.months
-    offender = build_offender(release_date,
-                              'AGI',
-                              sentence_type: :determinate,
-                              ard_crd_release: release_date,
-                              ted: nil)
+  let(:pom) { build(:pom) }
 
-    case_info = create(:case_information, nomis_offender_id: offender.offender_no,
-                       team: build(:team, local_divisional_unit: ldu))
+  # This prison is active because we give it an allocation in the `before` test setup block
+  let(:active_prison) { build(:prison) }
 
-    create(:allocation, nomis_offender_id: offender.offender_no)
+  # This prison is inactive because we don't give it any allocations
+  let(:inactive_prison) { build(:prison) }
+
+  let!(:case_info) { create(:case_information, nomis_offender_id: offender_no) }
+  let!(:allocation) {
+    create(:allocation,
+           prison: active_prison.code,
+           nomis_offender_id: offender_no,
+           primary_pom_nomis_id: pom.staff_id,
+           primary_pom_name: pom.full_name)
+  }
+
+  let(:today) { Time.zone.today }
+
+  before do
+    Timecop.travel today
+
+    allow(PrisonOffenderManagerService).to receive(:get_pom_at).and_return(pom)
 
     allow(OffenderService).to receive(:get_offender).and_return(offender)
-    offender.load_case_information(case_info)
+    offender.load_case_information(case_info) unless offender.nil?
 
-    expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
-    described_class.perform_now(ldu)
+    # Create an unrelated allocation so that active_prison counts as active
+    create(:allocation, prison: active_prison.code)
   end
 
-  it 'does not send emails for un-sentenced offenders' do
-    unsentenced_offender = build_offender(sentence_type: :determinate, ard_crd_release: nil, ted: nil)
-    case_info = create(:case_information, nomis_offender_id: unsentenced_offender.offender_no,
-                       team: build(:team, local_divisional_unit: ldu))
-
-    create(:allocation, nomis_offender_id: unsentenced_offender.offender_no)
-
-    allow(OffenderService).to receive(:get_offender).and_return(unsentenced_offender)
-    unsentenced_offender.load_case_information(case_info)
-
-    expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
-    described_class.perform_now(ldu)
+  after do
+    Timecop.return
   end
 
-  it 'does not send emails for offenders that do not exist' do
-    offender = build_offender(sentence_type: :determinate, ard_crd_release: nil, ted: nil)
-    create(:case_information, nomis_offender_id: offender.offender_no,
-                       team: build(:team, local_divisional_unit: ldu))
+  context 'when the offender does not exist in NOMIS' do
+    let(:offender) { nil }
+    let(:offender_no) {
+      # Use offender factory to give a 'realistic' offender number
+      build(:offender).offender_no
+    }
 
-    create(:allocation, nomis_offender_id: offender.offender_no)
-
-    allow(OffenderService).to receive(:get_offender).and_return(nil)
-
-    expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
-    expect { described_class.perform_now(ldu) }.not_to raise_error
-  end
-
-  it 'does not send emails for offenders who have a COM assigned' do
-    case_info = create(:case_information, nomis_offender_id: determinate_offender.offender_no, com_name: "Betty White")
-    create(:allocation, nomis_offender_id: determinate_offender.offender_no)
-
-    allow(OffenderService).to receive(:get_offender).and_return(determinate_offender)
-    determinate_offender.load_case_information(case_info)
-
-    expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
-    described_class.perform_now(ldu)
-  end
-
-  it 'does not send emails for offenders who do not have a handover_start_date' do
-    indeterminate_without_ted = build_offender(Time.zone.today + 10.months,
-                                               sentence_type: :indeterminate,
-                                               ard_crd_release: nil,
-                                               ted: nil)
-
-    case_info = create(:case_information, nomis_offender_id: indeterminate_without_ted.offender_no,
-                       team: build(:team, local_divisional_unit: ldu))
-
-    create(:allocation, nomis_offender_id: indeterminate_without_ted.offender_no)
-
-    allow(OffenderService).to receive(:get_offender).and_return(indeterminate_without_ted)
-    indeterminate_without_ted.load_case_information(case_info)
-
-    expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
-    described_class.perform_now(ldu)
-  end
-
-  context 'when no COM assigned' do
-    let(:case_info) do
-      create(:case_information, nomis_offender_id: determinate_offender.offender_no,
-                       team: build(:team, local_divisional_unit: ldu))
-    end
-
-    before do
-      allow(OffenderService).to receive(:get_offender).and_return(determinate_offender)
-    end
-
-    it 'does not send emails for offenders whose are not yet approaching handover' do
-      create(:allocation, nomis_offender_id: determinate_offender.offender_no)
-      determinate_offender.load_case_information(case_info)
-
+    it 'does not send email' do
       expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
-      described_class.perform_now(ldu)
+      expect { described_class.perform_now(ldu) }.not_to raise_error
     end
+  end
 
-    it 'does not send emails for offenders when their handover date is overdue by less than a week' do
-      create(:allocation, nomis_offender_id: determinate_offender.offender_no)
-      determinate_offender.load_case_information(case_info)
+  context 'when the offender exists in NOMIS' do
+    let(:today) { offender.handover_start_date + 1.week }
 
-      expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
+    context 'when the offender is not in an active prison' do
+      let(:release_date) { Time.zone.today + 8.months }
+      let(:offender) {
+        build_offender(release_date,
+                       prison: inactive_prison,
+                       sentence_type: :determinate,
+                       ard_crd_release: release_date,
+                       ted: nil)
+      }
 
-      today = determinate_offender.handover_start_date + 5.days
-      Timecop.travel today do
+      it 'does not send email' do
+        expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
         described_class.perform_now(ldu)
       end
     end
 
-    it 'does not send emails for offenders when their handover date is overdue by more than a week' do
-      create(:allocation, nomis_offender_id: determinate_offender.offender_no)
-      determinate_offender.load_case_information(case_info)
+    context 'when the offender is un-sentenced' do
+      let(:offender) {
+        build_offender(sentence_type: :determinate, ard_crd_release: nil, ted: nil)
+      }
+      let(:today) { Time.zone.today }
 
-      expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
-
-      today = determinate_offender.handover_start_date + 10.days
-      Timecop.travel today do
+      it 'does not send email' do
+        expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
         described_class.perform_now(ldu)
       end
     end
 
-    context 'when handover date is exactly one week overdue' do
-      let(:today) { determinate_offender.handover_start_date + 1.week }
+    context 'when the offender already has a COM allocated' do
+      let(:case_info) { create(:case_information, :with_com, nomis_offender_id: offender_no) }
 
-      it 'sends emails for unallocated offenders' do
-        prison_code = Prison.new("LEI")
-        allow(Prison).to receive(:active).and_return([prison_code])
-        allow(PrisonOffenderManagerService).to receive(:get_pom_at).and_return(nil)
+      it 'does not send email' do
+        expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
+        described_class.perform_now(ldu)
+      end
+    end
 
-        determinate_offender.load_case_information(case_info)
+    context 'when the offender does not have a handover_start_date' do
+      let(:offender) {
+        build_offender(Time.zone.today + 10.months,
+                       sentence_type: :indeterminate,
+                       ard_crd_release: nil,
+                       ted: nil)
+      }
+      let(:today) { Time.zone.today }
 
-        expect_any_instance_of(CommunityMailer)
-        .to receive(:urgent_pipeline_to_community)
-            .with(
-              nomis_offender_id: determinate_offender.offender_no,
-              offender_name: determinate_offender.full_name,
-              offender_crn: determinate_offender.crn,
-              ldu_email: determinate_offender.ldu_email_address,
-              sentence_type: "Determinate",
-              prison: "HMP Leeds",
-              start_date: determinate_offender.handover_start_date,
-              responsibility_handover_date: determinate_offender.responsibility_handover_date,
-              pom_name: "This offender does not have an allocated POM",
-              pom_email: ""
-              ).and_call_original
+      it 'does not send email' do
+        expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
+        described_class.perform_now(ldu)
+      end
+    end
 
-        Timecop.travel today do
+    context 'when start of handover is in the future' do
+      let(:today) { offender.handover_start_date - 1.day }
+
+      it 'does not send email' do
+        expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
+        described_class.perform_now(ldu)
+      end
+    end
+
+    context 'when handover started less than 1 week ago' do
+      let(:today) { offender.handover_start_date + 6.days }
+
+      it 'does not send email' do
+        expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
+        described_class.perform_now(ldu)
+      end
+    end
+
+    context 'when handover started more than 1 week ago' do
+      let(:today) { offender.handover_start_date + 8.days }
+
+      it 'does not send email' do
+        expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
+        described_class.perform_now(ldu)
+      end
+    end
+
+    context 'when handover started exactly 1 week ago' do
+      let(:today) { offender.handover_start_date + 1.week }
+
+      context 'when the offender does not have a POM allocated' do
+        let!(:allocation) { create(:allocation, :release, nomis_offender_id: offender_no) }
+
+        it 'emails the LDU' do
+          expect_any_instance_of(CommunityMailer)
+            .to receive(:urgent_pipeline_to_community)
+                  .with(
+                    nomis_offender_id: offender_no,
+                    offender_name: offender.full_name,
+                    offender_crn: offender.crn,
+                    ldu_email: offender.ldu_email_address,
+                    sentence_type: "Determinate",
+                    prison: active_prison.name,
+                    start_date: offender.handover_start_date,
+                    responsibility_handover_date: offender.responsibility_handover_date,
+                    pom_name: "This offender does not have an allocated POM",
+                    pom_email: ""
+                  ).and_call_original
+
           described_class.perform_now(ldu)
         end
       end
 
-      it 'sends emails for allocated offenders' do
-        pom = build(:pom)
-        allow(PrisonOffenderManagerService).to receive(:get_pom_at).and_return(pom)
+      context 'when the offender has a POM allocated' do
+        it 'emails the LDU' do
+          expect_any_instance_of(CommunityMailer)
+            .to receive(:urgent_pipeline_to_community)
+                  .with(
+                    nomis_offender_id: offender_no,
+                    offender_name: offender.full_name,
+                    offender_crn: offender.crn,
+                    ldu_email: offender.ldu_email_address,
+                    sentence_type: "Determinate",
+                    prison: active_prison.name,
+                    start_date: offender.handover_start_date,
+                    responsibility_handover_date: offender.responsibility_handover_date,
+                    pom_name: pom.full_name,
+                    pom_email: pom.email_address
+                  ).and_call_original
 
-        create(:allocation, nomis_offender_id: determinate_offender.offender_no,
-               primary_pom_nomis_id: pom.staff_id,
-               primary_pom_name: pom.full_name)
-
-        determinate_offender.load_case_information(case_info)
-
-        expect_any_instance_of(CommunityMailer)
-        .to receive(:urgent_pipeline_to_community)
-            .with(
-              nomis_offender_id: determinate_offender.offender_no,
-              offender_name: determinate_offender.full_name,
-              offender_crn: determinate_offender.crn,
-              ldu_email: determinate_offender.ldu_email_address,
-              sentence_type: "Determinate",
-              prison: "HMP Leeds",
-              start_date: determinate_offender.handover_start_date,
-              responsibility_handover_date: determinate_offender.responsibility_handover_date,
-              pom_name: pom.full_name,
-              pom_email: pom.email_address
-              ).and_call_original
-
-        Timecop.travel today do
           described_class.perform_now(ldu)
         end
       end
     end
   end
 
-  def build_offender(release_date = nil, prison = 'LEI', sentence_type:, ard_crd_release:, ted:)
-    build(:offender, sentence_type, latestLocationId: prison,
+  def build_offender(release_date = nil, prison: nil, sentence_type:, ard_crd_release:, ted:)
+    prison = prison || active_prison
+    build(:offender, sentence_type, latestLocationId: prison.code,
           sentence: build(:sentence_detail,
                           sentenceStartDate: Time.zone.today - 11.months,
                           conditionalReleaseDate: ard_crd_release,
