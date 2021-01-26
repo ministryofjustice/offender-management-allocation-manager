@@ -53,7 +53,7 @@ class CaseInformation < ApplicationRecord
   validates :manual_entry, inclusion: { in: [true, false], allow_nil: false }
   validates :nomis_offender_id, presence: true, uniqueness: true
 
-  validates :team, presence: true, unless: -> { manual_entry }
+  validates :team, presence: true, unless: -> { manual_entry || local_delivery_unit.present? }
 
   validates :welsh_offender, inclusion: {
     in: %w[Yes No],
