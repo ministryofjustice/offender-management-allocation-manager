@@ -108,3 +108,8 @@ Shoulda::Matchers.configure do |config|
     with.library :rails
   end
 end
+
+# Set the locale for Faker gem to en-GB
+# The en-GB locale gives us UK counties (used by the LocalDeliveryUnit factory)
+# See all the things we gain here: https://github.com/faker-ruby/faker/blob/master/lib/locales/en-GB.yml
+Faker::Config.locale = 'en-GB'
