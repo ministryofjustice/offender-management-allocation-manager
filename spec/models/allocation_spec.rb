@@ -6,34 +6,43 @@ RSpec.describe Allocation, type: :model do
   let(:another_nomis_offender_id) { 654_321 }
 
   describe '#without_ldu_emails', :allocation do
-    before do
-      crcci1 = create(:case_information, case_allocation: 'CRC', team: nil)
-      create(:allocation, nomis_offender_id: crcci1.nomis_offender_id)
-
-      blank_team = create(:team, local_divisional_unit: build(:local_divisional_unit, email_address: nil))
-      crc_ci2 = create(:case_information, case_allocation: 'CRC', team: blank_team)
-      create(:allocation, nomis_offender_id: crc_ci2.nomis_offender_id)
-    end
-
-    let!(:c1) {
-      ci1 = create(:case_information, team: nil)
-      create(:allocation, nomis_offender_id: ci1.nomis_offender_id)
+    # CRC offender with no team
+    let!(:crc_without_team) {
+      case_info = create(:case_information, case_allocation: 'CRC', team: nil)
+      create(:allocation, nomis_offender_id: case_info.nomis_offender_id)
     }
-    let!(:c2) {
+
+    # CRC offender with a team/LDU with no email address
+    let!(:crc_without_email) {
+      blank_team = create(:team, local_divisional_unit: build(:local_divisional_unit, email_address: nil))
+      case_info = create(:case_information, case_allocation: 'CRC', team: blank_team)
+      create(:allocation, nomis_offender_id: case_info.nomis_offender_id)
+    }
+
+    # NPS offender with no team
+    let!(:nps_without_team) {
+      case_info = create(:case_information, team: nil)
+      create(:allocation, nomis_offender_id: case_info.nomis_offender_id)
+    }
+
+    # NPS offender with a team/LDU with no email address
+    let!(:nps_without_email) {
       ldu = create(:local_divisional_unit, email_address: nil)
       team = create(:team, local_divisional_unit: ldu)
-      ci2 = create(:case_information, team: team)
-      create(:allocation, nomis_offender_id: ci2.nomis_offender_id)
+      case_info = create(:case_information, team: team)
+      create(:allocation, nomis_offender_id: case_info.nomis_offender_id)
     }
-    let!(:c3) {
+
+    # NPS offender with a team/LDU that has an email address
+    let!(:nps_with_email) {
       ldu = create(:local_divisional_unit, email_address: 'someone@example.com')
       team = create(:team, local_divisional_unit: ldu)
-      ci3 = create(:case_information, team: team)
-      create(:allocation, nomis_offender_id: ci3.nomis_offender_id)
+      case_info = create(:case_information, team: team)
+      create(:allocation, nomis_offender_id: case_info.nomis_offender_id)
     }
 
     it 'picks up NPS allocations without emails' do
-      expect(described_class.without_ldu_emails).to match_array([c1, c2])
+      expect(described_class.without_ldu_emails).to match_array([nps_without_team, nps_without_email])
     end
   end
 
