@@ -33,6 +33,32 @@ PomDetail.find_or_create_by!(
   working_pattern: 1
 )
 
+LocalDeliveryUnit.find_or_create_by!(
+  code: 'WELDU',
+  name: 'Welsh LDU',
+  email_address: 'WalesNPS@example.com',
+  country: 'Wales',
+  enabled: true
+)
+
+LocalDeliveryUnit.find_or_create_by!(
+  code: 'ENLDU',
+  name: 'English LDU',
+  email_address: 'EnglishNPS@example.com',
+  country: 'England',
+  enabled: true
+)
+
+LocalDeliveryUnit.find_or_create_by!(
+  code: "OTHERLDU",
+  name: "English LDU 2",
+  email_address: 'AnotherEnglishNPS@example.com',
+  country: 'England',
+  enabled: true
+)
+
+# Create 'old' LDUs
+# TODO: Remove after PDU/LDU switchover in Feb 2021
 ldu1 = LocalDivisionalUnit.find_or_create_by!(
     code: "WELDU",
     name: "Welsh LDU",
@@ -72,6 +98,7 @@ team3 = Team.find_or_create_by!(
     local_divisional_unit: ldu3
 )
 
+# TODO: Change these CaseInformation records to use 'new' LDUs once the 'old' are removed
 # The offenders below are those with release dates a few years in the future and can therefore use the
 # responsibility override workflow
 
