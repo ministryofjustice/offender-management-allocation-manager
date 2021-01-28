@@ -42,7 +42,9 @@ FactoryBot.define do
       imprisonmentStatus {'LR_EPP'}
       recall { true }
     end
-
+    trait :civil_sentence do
+      imprisonmentStatus {'CIVIL'}
+    end
   end
 
   factory :offender, parent: :offender_base, class: 'HmppsApi::Offender' do

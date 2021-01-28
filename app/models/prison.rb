@@ -18,13 +18,7 @@ class Prison
   end
 
   def offenders
-    OffenderEnumerator.new(@code).select do |offender|
-      next if offender.age.blank?
-
-      offender.age >= 18 &&
-        (offender.sentenced? || offender.immigration_case?) &&
-        offender.criminal_sentence?
-    end
+    OffenderEnumerator.new(@code).select(&:inside_omic_policy?)
   end
 
   def unfiltered_offenders
