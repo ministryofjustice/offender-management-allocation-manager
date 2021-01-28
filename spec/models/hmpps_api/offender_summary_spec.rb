@@ -3,6 +3,72 @@
 require 'rails_helper'
 
 describe HmppsApi::OffenderSummary do
+  describe '#inside_omic_policy?' do
+    let(:over_18) { (Time.zone.today - 18.years).to_s }
+    let(:immigration_detainee) { 'DET' }
+
+    context 'when it meets the requirements' do
+      context 'when all requirements are present: immigration case, over 18, sentence, criminal sentence' do
+        let(:offender) { build(:offender,  imprisonmentStatus: immigration_detainee, dateOfBirth: over_18, convictedStatus: 'Convicted', sentence: build(:sentence_detail, sentenceStartDate: '2019-02-05')) }
+
+        it 'is in omic policy' do
+          expect(offender.inside_omic_policy?).to eq(true)
+        end
+      end
+
+      context 'when they have no sentence' do
+        let(:offender) { build(:offender, imprisonmentStatus: immigration_detainee, dateOfBirth: over_18, convictedStatus: 'Convicted', sentence: build(:sentence_detail, :unsentenced)) }
+
+        it 'is in omic policy' do
+          expect(offender.inside_omic_policy?).to eq(true)
+        end
+      end
+
+      context 'when they have no immigration case' do
+        let(:offender) { build(:offender, dateOfBirth: over_18, convictedStatus: 'Convicted', sentence: build(:sentence_detail, sentenceStartDate: '2019-02-05')) }
+
+        it 'is in omic policy' do
+          expect(offender.inside_omic_policy?).to eq(true)
+        end
+      end
+    end
+
+    context 'when the requirements arent met:' do
+      context 'when they are under 18' do
+        let(:under_18) { (Time.zone.today - 17.years).to_s }
+        let(:offender) { build(:offender, imprisonmentStatus: immigration_detainee, dateOfBirth: under_18, convictedStatus: 'Convicted') }
+
+        it 'is not in omic policy' do
+          expect(offender.inside_omic_policy?).to eq(false)
+        end
+      end
+
+      context 'when have no immigration case and no sentence' do
+        let(:offender) { build(:offender, dateOfBirth: over_18, convictedStatus: 'Convicted', sentence: build(:sentence_detail, :unsentenced)) }
+
+        it 'is not in omic policy' do
+          expect(offender.inside_omic_policy?).to eq(false)
+        end
+      end
+
+      context 'when they do not have a criminal sentence (and are not an immigration case)' do
+        let(:offender) { build(:offender, :civil_sentence, dateOfBirth: over_18, convictedStatus: 'Convicted', sentence: build(:sentence_detail, sentenceStartDate: '2019-02-05')) }
+
+        it 'is not in omic policy' do
+          expect(offender.inside_omic_policy?).to eq(false)
+        end
+      end
+
+      context 'when they are not convicted?' do
+        let(:offender) { build(:offender,  imprisonmentStatus: immigration_detainee, dateOfBirth: over_18, convictedStatus: false, sentence: build(:sentence_detail, sentenceStartDate: '2019-02-05')) }
+
+        it 'is not in omic policy' do
+          expect(offender.inside_omic_policy?).to eq(false)
+        end
+      end
+    end
+  end
+
   describe '#earliest_release_date' do
     context 'with blank sentence detail' do
       before { subject.sentence = HmppsApi::SentenceDetail.from_json({}) }
@@ -133,38 +199,30 @@ describe HmppsApi::OffenderSummary do
     end
   end
 
-  describe '#age' do
+  describe '#over_18?' do
     context 'with a date of birth 50 years ago' do
-      before { subject.date_of_birth = 50.years.ago }
+      before { subject.date_of_birth = 18.years.ago }
 
-      it 'returns 50' do
-        expect(subject.age).to eq(50)
+      it 'returns true' do
+        expect(subject.over_18?).to eq(true)
       end
     end
 
     context 'with a date of birth just under 50 years ago' do
-      before { subject.date_of_birth = 50.years.ago + 1.day }
+      before { subject.date_of_birth = 18.years.ago + 1.day }
 
-      it 'returns 49' do
-        expect(subject.age).to eq(49)
+      it 'returns false' do
+        expect(subject.over_18?).to eq(false)
       end
     end
 
     context 'with an 18th birthday in a past month' do
       before { subject.date_of_birth = '5 Jan 2001'.to_date }
 
-      it 'returns 18' do
+      it 'returns true' do
         Timecop.travel('19 Feb 2019') do
-          expect(subject.age).to eq(18)
+          expect(subject.over_18?).to eq(true)
         end
-      end
-    end
-
-    context 'with no date of birth' do
-      before { subject.date_of_birth = nil }
-
-      it 'returns nil' do
-        expect(subject.age).to be_nil
       end
     end
   end
