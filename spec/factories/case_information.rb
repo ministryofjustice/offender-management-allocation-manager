@@ -49,5 +49,9 @@ FactoryBot.define do
     trait :with_com do
       com_name { "#{Faker::Name.last_name}, #{Faker::Name.first_name}" }
     end
+
+    trait :with_prd do
+      parole_review_date {Time.zone.today + 8.months}
+    end
   end
 end

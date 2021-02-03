@@ -81,7 +81,8 @@ RSpec.describe "allocations/new", type: :view do
     let(:offender_no) { 'G7514GW' }
     let(:case_information) { build(:case_information,  nomis_offender_id: offender_no) }
     let(:offender) {
-      offender = build(:offender, :indeterminate, offenderNo: offender_no)
+      offender = build(:offender, :indeterminate, offenderNo: offender_no,
+       sentence: build(:sentence_detail, tariffDate: nil))
       offender.load_case_information(case_information)
       offender
     }
