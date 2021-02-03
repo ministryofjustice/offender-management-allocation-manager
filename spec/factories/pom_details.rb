@@ -20,9 +20,18 @@ FactoryBot.define do
 
   class Elite2POM
     attr_accessor :position, :staffId, :emails, :firstName, :lastName, :positionDescription, :status
+    attr_writer :agencyId
+
+    def first_name
+      firstName
+    end
+
+    def last_name
+      lastName
+    end
 
     def full_name
-      "#{lastName}, #{firstName}"
+      "#{last_name}, #{first_name}".titleize
     end
 
     def staff_id

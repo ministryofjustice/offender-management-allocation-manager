@@ -7,9 +7,11 @@ class PomsController < PrisonsApplicationController
 
   def index
     poms = PrisonOffenderManagerService.get_poms_for(active_prison_id)
-    @active_poms, @inactive_poms = poms.partition { |pom|
+    active_poms, inactive_poms = poms.partition { |pom|
       %w[active unavailable].include? pom.status
     }
+    @active_poms = active_poms.map { |p| PomPresenter.new(p) }
+    @inactive_poms = inactive_poms.map { |p| PomPresenter.new(p) }
   end
 
   def show
