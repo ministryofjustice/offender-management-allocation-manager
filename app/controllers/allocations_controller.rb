@@ -9,8 +9,10 @@ class AllocationsController < PrisonsApplicationController
     @prisoner = offender(nomis_offender_id_from_url)
     @previously_allocated_pom_ids =
       AllocationService.previously_allocated_poms(nomis_offender_id_from_url)
-    @recommended_poms, @not_recommended_poms =
+    recommended_poms, not_recommended_poms =
       recommended_and_nonrecommended_poms_for(@prisoner)
+    @recommended_poms = recommended_poms.map { |p| PomPresenter.new(p) }
+    @not_recommended_poms = not_recommended_poms.map { |p| PomPresenter.new(p) }
     @unavailable_pom_count = unavailable_pom_count
     @allocation = Allocation.find_by nomis_offender_id: nomis_offender_id_from_url
     @case_info = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: nomis_offender_id_from_url)
@@ -49,8 +51,10 @@ class AllocationsController < PrisonsApplicationController
     @prisoner = offender(nomis_offender_id_from_url)
     @previously_allocated_pom_ids =
       AllocationService.previously_allocated_poms(nomis_offender_id_from_url)
-    @recommended_poms, @not_recommended_poms =
+    recommended_poms, not_recommended_poms =
       recommended_and_nonrecommended_poms_for(@prisoner)
+    @recommended_poms = recommended_poms.map { |p| PomPresenter.new(p) }
+    @not_recommended_poms = not_recommended_poms.map { |p| PomPresenter.new(p) }
     @unavailable_pom_count = unavailable_pom_count
 
     @current_pom = current_pom_for(nomis_offender_id_from_url)
@@ -85,7 +89,7 @@ class AllocationsController < PrisonsApplicationController
 
     if AllocationService.create_or_update(allocation)
       flash[:notice] =
-        "#{offender.full_name_ordered} has been allocated to #{pom.full_name_ordered} (#{pom.grade})"
+        "#{offender.full_name_ordered} has been allocated to #{view_context.full_name_ordered(pom)} (#{view_context.grade(pom)})"
     else
       flash[:alert] =
         "#{offender.full_name_ordered} has not been allocated  - please try again"

@@ -5,6 +5,7 @@
 class StaffMember
   # maybe this method shouldn't be here?
   attr_reader :staff_id
+  delegate :position_description, to: :pom
 
   def initialize(prison, staff_id, pom_detail = default_pom_detail(staff_id))
     @prison = prison
@@ -25,25 +26,23 @@ class StaffMember
   end
 
   def email_address
-    HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(@staff_id).first
+    @email_address ||= HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(@staff_id).first
   end
 
   def has_pom_role?
-    poms_list = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(@prison.code)
-
-    poms_list.detect { |pom| pom.staff_id == @staff_id }.present?
+    pom.present?
   end
 
   def position
-    poms = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(@prison.code)
-    this_pom = poms.detect { |pom| pom.staff_id == @staff_id }
-    if this_pom.nil?
-      'STAFF'
-    elsif this_pom.prison_officer?
-      RecommendationService::PRISON_POM
+    if pom.present?
+      pom.position
     else
-      RecommendationService::PROBATION_POM
+      'STAFF'
     end
+  end
+
+  def agency_id
+    @prison.code
   end
 
   def working_pattern
@@ -63,6 +62,15 @@ class StaffMember
   end
 
 private
+
+  def pom
+    @pom ||= fetch_pom
+  end
+
+  def fetch_pom
+    poms = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(@prison.code)
+    poms.detect { |pom| pom.staff_id == @staff_id }
+  end
 
   def fetch_allocations
     offender_hash = @prison.offenders.index_by(&:offender_no)

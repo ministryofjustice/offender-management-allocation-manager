@@ -84,7 +84,7 @@ RSpec.describe EmailService do
     end
 
     it "Can not crash when a pom has no email", vcr: { cassette_name: :email_service_send_allocation_email }  do
-      allow(PrisonOffenderManagerService).to receive(:get_pom_emails).and_return([])
+      allow(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:fetch_email_addresses).and_return([])
 
       expect {
         described_class.instance(allocation: allocation, message: "", pom_nomis_id: allocation.primary_pom_nomis_id).send_email
@@ -113,7 +113,7 @@ RSpec.describe EmailService do
 
     it "Can not crash when primary pom has no email when deallocating a co-working pom",
        vcr: { cassette_name: :email_service_send_coworking_deallocation_email_no_pom_email } do
-      allow(PrisonOffenderManagerService).to receive(:get_pom_emails).and_return([])
+      allow(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:fetch_email_addresses).and_return([])
 
       expect {
         described_class.instance(allocation: coworking_deallocation,

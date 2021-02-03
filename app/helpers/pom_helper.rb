@@ -23,6 +23,18 @@ module PomHelper
     ][pattern]
   end
 
+  def full_name(pom)
+    "#{pom.last_name}, #{pom.first_name}".titleize
+  end
+
+  def full_name_ordered(pom)
+    "#{pom.first_name} #{pom.last_name}".titleize
+  end
+
+  def grade(pom)
+    "#{pom.position_description.split(' ').first} POM"
+  end
+
   def fetch_pom_name(staff_id)
     pom_firstname, pom_secondname =
       PrisonOffenderManagerService.get_pom_name(staff_id)

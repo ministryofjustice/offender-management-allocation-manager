@@ -1,5 +1,6 @@
 class HandoverFollowUpJob < ApplicationJob
   queue_as :default
+  include PomHelper
 
   def perform(ldu)
     today = Time.zone.today
@@ -16,7 +17,7 @@ class HandoverFollowUpJob < ApplicationJob
 
       if allocation.present? && allocation.active?
         pom = PrisonOffenderManagerService.get_pom_at(offender.prison_id, allocation.primary_pom_nomis_id)
-        pom_name = pom.full_name
+        pom_name = full_name(pom)
         pom_email = pom.email_address
       else
         # There is no POM allocated

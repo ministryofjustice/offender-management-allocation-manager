@@ -186,8 +186,9 @@ describe AllocationService do
 
     current_pom = described_class.current_pom_for(nomis_offender_id, 'LEI')
 
-    expect(current_pom.full_name).to eq("Pom, Moic")
-    expect(current_pom.grade).to eq("Prison POM")
+    expect(current_pom.first_name).to eq("Moic")
+    expect(current_pom.last_name).to eq("Pom")
+    expect(current_pom.position_description).to eq("Prison Officer")
   end
 
   describe '#allocation_history_pom_emails' do
