@@ -17,7 +17,8 @@ module HmppsApi
     def initialize(api_payload, search_payload, latest_temp_movement:)
       @booking_id = api_payload['latestBookingId']&.to_i
       @prison_id = api_payload['latestLocationId']
-
+      @reception_date = deserialise_date(api_payload, 'receptionDate')
+      @cell_location = api_payload['internalLocation']
       super(api_payload, search_payload, latest_temp_movement: latest_temp_movement)
     end
   end

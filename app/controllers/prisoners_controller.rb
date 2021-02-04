@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
 class PrisonersController < PrisonsApplicationController
-  before_action :load_offender, only: [:show]
-
   def show
-    @prisoner = @offender
+    @prisoner = OffenderService.get_offender(params[:id])
     @tasks = PomTasks.new.for_offender(@prisoner)
     @allocation = Allocation.find_by(nomis_offender_id: @prisoner.offender_no)
 
@@ -21,7 +19,7 @@ class PrisonersController < PrisonsApplicationController
       active_prison_id, @prisoner.offender_no
     )
 
-    @case_info = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: id_for_show_action)
+    @case_info = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: params[:id])
     @emails_sent_to_ldu = EmailHistory.sent_within_current_sentence(@prisoner, EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION)
   end
 
@@ -31,15 +29,5 @@ class PrisonersController < PrisonsApplicationController
 
     response.headers['Expires'] = 6.months.from_now.httpdate
     send_data image_data, type: 'image/jpg', disposition: 'inline'
-  end
-
-private
-
-  def id_for_show_action
-    params[:id]
-  end
-
-  def load_offender
-    @offender = OffenderService.get_offender(id_for_show_action)
   end
 end

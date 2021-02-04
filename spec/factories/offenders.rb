@@ -5,6 +5,14 @@ FactoryBot.define do
     imprisonmentStatus { 'SENT03' }
     latestLocationId { 'LEI' }
 
+    # cell location is the format <1 letter>-<1 number>-<3 numbers> e.g 'E-4-014'
+    internalLocation {
+      block = Faker::Alphanumeric.alpha(number: 1).upcase
+      num = Faker::Number.non_zero_digit
+      numbers = Faker::Number.leading_zero_number(digits: 3)
+      "#{block}-#{num}-#{numbers}"
+    }
+
     # offender numbers are of the form <letter><4 numbers><2 letters>
     sequence(:offenderNo) do |seq|
       number = seq / 26 + 1000
@@ -12,6 +20,7 @@ FactoryBot.define do
       # This and case_information should produce different values to avoid clashes
       "T#{number}O#{letter}"
     end
+
     sequence(:bookingId) { |x| x + 700_000 }
     convictedStatus { 'Convicted' }
     dateOfBirth { Date.new(1990, 12, 6).to_s }
@@ -66,6 +75,14 @@ FactoryBot.define do
 
     imprisonmentStatus { 'SENT03' }
     agencyId { 'LEI' }
+
+    # cell location is the format <1 letter>-<1 number>-<3 numbers> e.g 'E-4-014'
+    internalLocation {
+      block = Faker::Alphanumeric.alpha(number: 1).upcase
+      num = Faker::Number.non_zero_digit
+      numbers = Faker::Number.leading_zero_number(digits: 3)
+      "#{block}-#{num}-#{numbers}"
+    }
 
     # offender numbers are of the form <letter><4 numbers><2 letters>
     sequence(:offenderNo) do |seq|
