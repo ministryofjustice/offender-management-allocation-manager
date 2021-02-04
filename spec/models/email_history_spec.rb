@@ -3,19 +3,49 @@ require 'rails_helper'
 RSpec.describe EmailHistory, type: :model do
   let(:offender_id) { 'A3434LK' }
 
-  describe '#welsh_open_prescoed' do
-    before do
-      create(:email_history, :welsh_prescoed_transfer, prison: PrisonService::PRESCOED_CODE, nomis_offender_id: offender_id, name: 'LDU Number 1', created_at: Time.zone.today - 14.months)
-      create(:email_history, :welsh_prescoed_transfer, prison: PrisonService::PRESCOED_CODE, nomis_offender_id: offender_id, name: 'LDU Number 1', created_at: Time.zone.today - 3.months)
-      create(:email_history, :auto_early_allocation, prison: 'LEI', nomis_offender_id: offender_id, name: 'LDU Number 3', created_at: Time.zone.today)
-    end
+  describe '.sent_within_current_sentence' do
+    subject { described_class.sent_within_current_sentence(offender, event) }
 
-    it 'returns all records relating to the event: WELSH_TRANSFER_TO_PRESCOED in descending order' do
-      email_history = described_class.welsh_open_prescoed(offender_id)
-      expect(email_history.count).to eq(2)
-      expect(email_history.first.event).to eq(EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION)
-      expect(email_history.last.event).to eq(EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION)
-      expect(email_history.first.created_at).to be > email_history.last.created_at
+    let(:offender) { build(:offender, sentence: build(:sentence_detail, sentenceStartDate: 7.days.ago)) }
+    let(:some_other_offender) { build(:offender) }
+
+    let(:event) { EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION }
+    let(:some_other_event) { EmailHistory::AUTO_EARLY_ALLOCATION }
+
+    # An old email sent before the offender's current sentence
+    let!(:old_email) {
+      create(:email_history,
+             nomis_offender_id: offender.offender_no,
+             event: event,
+             created_at: 1.year.ago)
+    }
+
+    # An email sent within the offender's current sentence
+    let!(:recent_email) {
+      create(:email_history,
+             nomis_offender_id: offender.offender_no,
+             event: event,
+             created_at: 5.days.ago)
+    }
+
+    # A recent email but for a different event
+    let!(:recent_email_different_event) {
+      create(:email_history,
+             nomis_offender_id: offender.offender_no,
+             event: some_other_event,
+             created_at: 5.days.ago)
+    }
+
+    # A recent email sent for a different offender
+    let!(:recent_email_different_offender) {
+      create(:email_history,
+             nomis_offender_id: some_other_offender.offender_no,
+             event: event,
+             created_at: 5.days.ago)
+    }
+
+    it "returns emails for the specified event, sent within the offender's current sentence" do
+      expect(subject).to eq([recent_email])
     end
   end
 end
