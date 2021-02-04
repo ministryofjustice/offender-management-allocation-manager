@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe EmailService, :allocation do
+RSpec.describe EmailService do
   include ActiveJob::TestHelper
 
   before do

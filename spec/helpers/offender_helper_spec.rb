@@ -7,7 +7,7 @@ RSpec.describe OffenderHelper do
     end
   end
 
-  describe '#event_type', :allocation do
+  describe '#event_type' do
     let(:nomis_staff_id) { 456_789 }
     let(:nomis_offender_id) { 123_456 }
 

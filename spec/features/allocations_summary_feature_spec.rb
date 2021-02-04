@@ -28,7 +28,7 @@ feature 'summary summary feature' do
       expect(page).to have_content('Add missing information')
     end
 
-    context 'with allocations', :allocation do
+    context 'with allocations' do
       let(:first) { 'G7806VO' }
       let(:last) { 'G3462VT' }
 

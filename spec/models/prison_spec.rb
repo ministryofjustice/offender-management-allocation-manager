@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Prison, type: :model do
-  describe '#active', :allocation do
+  describe '#active' do
     before do
       create(:allocation, prison: p1.code)
       create(:allocation, prison: p1.code)

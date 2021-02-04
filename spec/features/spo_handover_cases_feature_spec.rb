@@ -1,6 +1,6 @@
 require "rails_helper"
 
-feature "SPO viewing upcoming handover cases", :allocation do
+feature "SPO viewing upcoming handover cases" do
   let(:prison) { 'LEI' }
 
   context 'when signed in as an SPO' do

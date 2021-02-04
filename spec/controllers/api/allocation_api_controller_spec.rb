@@ -3,9 +3,6 @@ require 'rails_helper'
 RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
   describe '#show' do
     let(:rsa_private) { OpenSSL::PKey::RSA.generate 2048 }
-    let(:stub_url) { "#{api_host}/secure/offenders/nomsNumber/#{offender.fetch(:offenderNo)}/prisonOffenderManager" }
-    let(:api_host) { Rails.configuration.community_api_host }
-
     let(:prison) { build(:prison) }
     let!(:co_working_allocation) {
       create(:allocation, :co_working, primary_pom_nomis_id: primary_pom.staff_id,

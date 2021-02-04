@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-context 'when NOMIS is missing information', :allocation do
+context 'when NOMIS is missing information' do
   let(:prison_code) { 'LEI' }
   let(:offender_no) { 'A1' }
   let(:stub_keyworker_host) { Rails.configuration.keyworker_api_host }

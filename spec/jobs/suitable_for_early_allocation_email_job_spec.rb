@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe SuitableForEarlyAllocationEmailJob, :allocation, type: :job do
+RSpec.describe SuitableForEarlyAllocationEmailJob, type: :job do
   let(:pom) { build(:pom) }
 
   let(:offender) do
