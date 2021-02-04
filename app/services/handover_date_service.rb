@@ -10,23 +10,37 @@ class HandoverDateService
   # Actual date Mon 19th Oct 2020
   PRESCOED_CUTOFF_DATE = Date.new(2020, 10, 19).freeze
 
-  HandoverData = Struct.new :custody, :community, :start_date, :handover_date, :reason
+  HandoverData = Struct.new :custody, :community, :start_date, :handover_date, :reason, keyword_init: true
 
   # if COM responsible, then handover dates all empty
-  NO_HANDOVER_DATE = HandoverData.new SUPPORTING, RESPONSIBLE, nil, nil, 'COM Responsibility'
+  NO_HANDOVER_DATE = HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
+                                      start_date: nil, handover_date: nil,
+                                      reason: 'COM Responsibility'
 
   def self.handover(raw_offender)
     offender = OffenderWrapper.new(raw_offender)
 
     if offender.recalled?
-      HandoverData.new SUPPORTING, RESPONSIBLE, nil, nil, 'Recall case'
+      HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
+                       start_date: nil, handover_date: nil,
+                       reason: 'Recall case'
+
     elsif offender.immigration_case?
-      HandoverData.new SUPPORTING, RESPONSIBLE, nil, nil, 'Immigration Case'
+      HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
+                       start_date: nil, handover_date: nil,
+                       reason: 'Immigration Case'
+
     elsif offender.nps_case? && offender.indeterminate_sentence? && (offender.tariff_date.nil? || offender.tariff_date < Time.zone.today)
-      HandoverData.new RESPONSIBLE, NOT_INVOLVED, nil, nil, 'Indeterminate with no earliest release date'
+      HandoverData.new custody: RESPONSIBLE, community: NOT_INVOLVED,
+                       start_date: nil, handover_date: nil,
+                       reason: 'Indeterminate with no earliest release date'
+
     elsif offender.recent_prescoed_case? && offender.indeterminate_sentence? && offender.nps_case?
       handover_date = prescoed_handover_date(offender)
-      HandoverData.new SUPPORTING, RESPONSIBLE, offender.prison_arrival_date, handover_date, 'Prescoed'
+      HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
+                       start_date: offender.prison_arrival_date, handover_date: handover_date,
+                       reason: 'Prescoed'
+
     elsif offender.nps_case? || offender.indeterminate_sentence?
       handover_date, reason = nps_handover_date(offender)
       start_date = nps_start_date(offender)
@@ -36,27 +50,44 @@ class HandoverDateService
       when nil
         pom_responsible = nps_responsibility(offender, handover_date)
         if pom_responsible == RESPONSIBLE
-          HandoverData.new RESPONSIBLE, com_responsibility(start_date, handover_date), start_date, handover_date, reason
+          HandoverData.new custody: RESPONSIBLE, community: com_responsibility(start_date, handover_date),
+                           start_date: start_date, handover_date: handover_date,
+                           reason: reason
         else
-          HandoverData.new SUPPORTING, RESPONSIBLE, start_date, handover_date, reason
+          HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
+                           start_date: start_date, handover_date: handover_date,
+                           reason: reason
         end
       when NOT_INVOLVED
-        HandoverData.new NOT_INVOLVED, NOT_INVOLVED, nil, nil, 'NPS Case - missing dates'
+        HandoverData.new custody: NOT_INVOLVED, community: NOT_INVOLVED,
+                         start_date: nil, handover_date: nil,
+                         reason: 'NPS Case - missing dates'
       when RESPONSIBLE
-        HandoverData.new RESPONSIBLE, com_responsibility(start_date, handover_date), start_date, handover_date, reason
+        HandoverData.new custody: RESPONSIBLE, community: com_responsibility(start_date, handover_date),
+                         start_date: start_date, handover_date: handover_date,
+                         reason: reason
       else
-        HandoverData.new SUPPORTING, RESPONSIBLE, start_date, handover_date, reason
+        HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
+                         start_date: start_date, handover_date: handover_date,
+                         reason: reason
       end
+
     else
       responsibility = crc_responsibility(offender)
       if responsibility == NOT_INVOLVED
-        HandoverData.new NOT_INVOLVED, NOT_INVOLVED, nil, nil, 'CRC Case - missing dates'
+        HandoverData.new custody: NOT_INVOLVED, community: NOT_INVOLVED,
+                         start_date: nil, handover_date: nil,
+                         reason: 'CRC Case - missing dates'
       else
         crc_date = crc_handover_date(offender)
         if responsibility == RESPONSIBLE
-          HandoverData.new RESPONSIBLE, NOT_INVOLVED, crc_date, crc_date, 'CRC Case'
+          HandoverData.new custody: RESPONSIBLE, community: NOT_INVOLVED,
+                           start_date: crc_date, handover_date: crc_date,
+                           reason: 'CRC Case'
         else
-          HandoverData.new SUPPORTING, RESPONSIBLE, crc_date, crc_date, 'CRC Case'
+          HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
+                           start_date: crc_date, handover_date: crc_date,
+                           reason: 'CRC Case'
         end
       end
     end
