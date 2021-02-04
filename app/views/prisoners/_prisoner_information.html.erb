@@ -49,5 +49,11 @@
         <%= service_provider_label(@prisoner.case_allocation) %>
       </td>
     </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-width-one-half">Location</td>
+      <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
+        <%= prisoner_location(@prisoner) %>
+      </td>
+    </tr>
   </tbody>
 </table>

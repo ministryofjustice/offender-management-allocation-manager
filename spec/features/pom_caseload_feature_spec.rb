@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 feature "view POM's caseload" do
@@ -36,21 +38,40 @@ feature "view POM's caseload" do
     offender_map.excluding(nil_release_date_offender).map { |k, v| [k, v] }.sort_by { |_k, v| v }.map { |k, _v| k }
   }
   let(:offenders) {
+    ids_without_cells = %w(G6653UC G8563UA)
     offender_map.merge(nomis_offender_id => 1_153_753).
       map { |nomis_id, booking_id|
-      build(:nomis_offender,
-            offenderNo: nomis_id,
-            sentence: attributes_for(:sentence_detail,
-                                     automaticReleaseDate: "2031-01-22",
-                                     conditionalReleaseDate: "2031-01-24",
-                                     tariffDate: (nomis_id == nil_release_date_offender) ? nil : Time.zone.today + booking_id.days))
+      if ids_without_cells.include? nomis_id
+        # generate 2 offenders without a cell location
+        build(:nomis_offender, internalLocation: nil,
+              offenderNo: nomis_id,
+              sentence: attributes_for(:sentence_detail,
+                                       automaticReleaseDate: "2031-01-22",
+                                       conditionalReleaseDate: "2031-01-24",
+                                       tariffDate: (nomis_id == nil_release_date_offender) ? nil : Time.zone.today + booking_id.days))
+      else
+        build(:nomis_offender,
+              offenderNo: nomis_id,
+              sentence: attributes_for(:sentence_detail,
+                                       automaticReleaseDate: "2031-01-22",
+                                       conditionalReleaseDate: "2031-01-24",
+                                       tariffDate: (nomis_id == nil_release_date_offender) ? nil : Time.zone.today + booking_id.days))
+      end
     }
+  }
+  let(:missing_cells) {
+    offenders.find_all { |x| x[:internalLocation] == nil }
   }
   let(:sorted_offenders) {
     offenders.sort_by { |o| o.fetch(:lastName) }
   }
   let(:first_offender) { sorted_offenders.first }
-  let(:moved_offender) { sorted_offenders.fourth }
+  let(:moved_offenders) { [sorted_offenders.fourth, sorted_offenders.fifth] }
+
+  let(:sorted_locations) do
+    removed_list = [moved_offenders.first, moved_offenders.last, missing_cells.first, missing_cells.last]
+    offenders.reject { |x| removed_list.include? x }.sort_by { |o| o.fetch(:internalLocation) }
+  end
 
   # create 21 allocations for prisoners named A-K so that we can verify that default sorted paging works
   before do
@@ -66,7 +87,8 @@ feature "view POM's caseload" do
     stub_auth_token
     stub_poms(prison, poms)
     stub_offenders_for_prison(prison, offenders, [
-      attributes_for(:movement, :rotl, offenderNo: moved_offender.fetch(:offenderNo))
+      attributes_for(:movement, :rotl, offenderNo: moved_offenders.first.fetch(:offenderNo)),
+      attributes_for(:movement, :rotl, offenderNo: moved_offenders.last.fetch(:offenderNo))
     ])
 
     offender_map.each do |nomis_offender_id, nomis_booking_id|
@@ -125,11 +147,20 @@ feature "view POM's caseload" do
       end
     end
 
-    it 'can be sorted by location/move date' do
-      click_link 'Location'
+    it 'can be sorted by cell location' do
+      # Rotl's offenders are grouped when sorted by cell location. If sorted in ascending order they appear
+      # at the top otherwise they are grouped at the bottom
+
+      # ascending order
       click_link 'Location'
       within ".offender_row_0" do
-        expect(page).to have_content(moved_offender.fetch(:lastName))
+        expect(page).to have_content(moved_offenders.last[:lastName])
+      end
+
+      # descending order
+      click_link 'Location'
+      within ".offender_row_0" do
+        expect(page).to have_content(sorted_locations.last[:lastName])
       end
     end
 

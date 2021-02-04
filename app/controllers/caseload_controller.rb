@@ -22,7 +22,30 @@ class CaseloadController < PrisonStaffApplicationController
 private
 
   def sort_allocations(allocations)
-    sort_collection(allocations, default_sort: :last_name)
+    field, direction = sort_params(default_sort: :last_name)
+
+    if field == :cell_location
+      cell_location_sort(allocations, direction)
+    else
+      sort_with_public_send allocations, field, direction
+    end
+  end
+
+  def cell_location_sort(allocations, direction)
+    allocations = allocations.sort do |a, b|
+      if a.latest_temp_movement_date.nil? && b.latest_temp_movement_date.nil?
+        compare_via_public_send :cell_location, :asc, a, b
+      elsif a.latest_temp_movement_date.nil? && b.latest_temp_movement_date.present?
+        1
+      elsif a.latest_temp_movement_date.present? && b.latest_temp_movement_date.nil?
+        -1
+      else
+        a.latest_temp_movement_date <=> b.latest_temp_movement_date
+      end
+    end
+
+    allocations.reverse! if direction == :desc
+    allocations
   end
 
   def filter_allocations(allocations)
