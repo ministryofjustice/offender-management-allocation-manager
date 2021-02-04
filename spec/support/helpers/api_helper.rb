@@ -58,6 +58,7 @@ module ApiHelper
         }).
       to_return(body: poms.to_json)
     poms.each do |pom|
+      stub_pom(pom)
       stub_pom_emails(pom.staffId, pom.emails)
     end
   end
