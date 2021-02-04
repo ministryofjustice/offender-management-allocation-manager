@@ -9,7 +9,7 @@ require 'swagger_helper'
 # rubocop:disable RSpec/EmptyExampleGroup
 # Authorization 'method' needs to be defined for rswag
 # rubocop:disable RSpec/VariableName
-describe 'Allocation API', :allocation, vcr: { cassette_name: :allocation_api } do
+describe 'Allocation API', vcr: { cassette_name: :allocation_api } do
   let!(:private_key) { OpenSSL::PKey::RSA.generate 2048 }
   let!(:public_key) { Base64.strict_encode64(private_key.public_key.to_s) }
   let!(:payload) {

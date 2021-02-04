@@ -95,9 +95,10 @@ RSpec.configure do |config|
     WebMock.disable_net_connect!(allow_localhost: true)
   end
 
-  # This is to prevent test from having to mock this callback due
-  # to an after_save call back in Allocation.
-  config.before(:each, :allocation) do
+  # This is to prevent most tests from having to mock this callback due
+  # to an after_save call back in Allocation. Enable by setting
+  # the push_pom_to_delius tag in your tests
+  config.before(:each, type: lambda { |_v, m| m[:push_pom_to_delius] != true } ) do
     allow(PushPomToDeliusJob).to receive(:perform_later)
   end
 end

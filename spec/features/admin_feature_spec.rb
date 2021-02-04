@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature 'admin urls', :allocation do
+feature 'admin urls' do
   # This works as expected (i.e. it sends the user to login)
   # but doesn't work in test-land for some unknown reason
   # context 'without login' do

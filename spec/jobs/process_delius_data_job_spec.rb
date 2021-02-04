@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe ProcessDeliusDataJob, :allocation, :disable_push_to_delius, type: :job do
+RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
   let(:nomis_offender_id) { 'G4281GV' }
   let(:remand_nomis_offender_id) { 'G3716UD' }
   let(:ldu) {  create(:local_divisional_unit) }

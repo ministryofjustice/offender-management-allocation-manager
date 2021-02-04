@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature 'Allocation History', :allocation do
+feature 'Allocation History' do
   let!(:probation_pom) do
     {
       primary_pom_nomis_id: 485_926,

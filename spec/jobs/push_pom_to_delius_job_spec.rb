@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe PushPomToDeliusJob, :allocation, type: :job, versioning: true do
+RSpec.describe PushPomToDeliusJob, type: :job, versioning: true do
   let(:offender) { build(:nomis_offender) }
   let(:offender_no) { offender.fetch(:offenderNo) }
   let(:pom) { build(:pom) }
