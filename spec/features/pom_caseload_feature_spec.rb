@@ -52,6 +52,10 @@ feature "view POM's caseload" do
   let(:first_offender) { sorted_offenders.first }
   let(:moved_offender) { sorted_offenders.fourth }
 
+  let(:sorted_locations) {
+    offenders.sort_by { |o| o.fetch(:internalLocation) }
+  }
+
   # create 21 allocations for prisoners named A-K so that we can verify that default sorted paging works
   before do
     poms =
@@ -125,11 +129,17 @@ feature "view POM's caseload" do
       end
     end
 
-    it 'can be sorted by location/move date' do
-      click_link 'Location'
+    it 'can be sorted by location' do
+      # ascending order
       click_link 'Location'
       within ".offender_row_0" do
-        expect(page).to have_content(moved_offender.fetch(:lastName))
+        expect(page).to have_content(sorted_locations.first[:lastName])
+      end
+
+      # descending order
+      click_link 'Location'
+      within ".offender_row_0" do
+        expect(page).to have_content(sorted_locations.last[:lastName])
       end
     end
 

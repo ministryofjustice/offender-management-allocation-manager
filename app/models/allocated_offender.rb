@@ -6,7 +6,7 @@
 #
 class AllocatedOffender
   delegate :last_name, :full_name, :earliest_release_date, :approaching_handover?,
-           :sentence_start_date, :tier, to: :@offender
+           :sentence_start_date, :tier, :cell_location, to: :@offender
   delegate :updated_at, :nomis_offender_id, :primary_pom_allocated_at, :prison,
            to: :@allocation
 

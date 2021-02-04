@@ -29,7 +29,7 @@ module HmppsApi
       @booking_id = payload['latestBookingId']&.to_i
       @prison_id = payload['latestLocationId']
       @reception_date = deserialise_date(payload, 'receptionDate')
-
+      @cell_location = payload['internalLocation']
       super(payload)
     end
   end

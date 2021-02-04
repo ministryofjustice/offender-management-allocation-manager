@@ -17,7 +17,7 @@ module HmppsApi
 
     attr_accessor :category_code, :date_of_birth, :prison_arrival_date, :sentence, :allocated_pom_name
 
-    attr_reader :first_name, :last_name, :booking_id, :offender_no, :sentence_type
+    attr_reader :first_name, :last_name, :booking_id, :offender_no, :sentence_type, :cell_location
 
     # This is needed (sadly) because although when querying by prison these are filtered out,
     # we can query directly (we might have a CaseInformation record) where we don't filter.

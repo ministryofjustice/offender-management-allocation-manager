@@ -34,7 +34,7 @@ module HmppsApi
       @booking_id = payload.fetch('bookingId').to_i
       @prison_id = payload.fetch('agencyId')
       @facial_image_id = payload['facialImageId']&.to_i
-
+      @cell_location = payload['assignedLivingUnitDesc']
       super(payload)
     end
   end
