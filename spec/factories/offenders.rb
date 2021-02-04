@@ -31,16 +31,20 @@ FactoryBot.define do
     end
     trait :indeterminate do
       imprisonmentStatus {'LIFE'}
+      sentence {build :sentence_detail, :indeterminate}
     end
     trait :indeterminate_recall do
       imprisonmentStatus {'LR_LIFE'}
       recall { true }
+      sentence {build :sentence_detail, :indeterminate}
     end
     trait :determinate_recall do
       imprisonmentStatus {'LR_EPP'}
       recall { true }
     end
-
+    trait :civil_sentence do
+      imprisonmentStatus {'CIVIL'}
+    end
   end
 
   factory :offender, parent: :offender_base, class: 'HmppsApi::Offender' do

@@ -277,14 +277,23 @@ describe HandoverDateService do
           let(:sentence_start_date) { Date.parse('15-09-2019') }
 
           context 'when the prison is a hub' do
+            before do
+              # Need to freeze time so prisoner isn't handed over
+              Timecop.travel Date.parse('15-01-2020')
+            end
+
+            after do
+              Timecop.return
+            end
+
             let(:offender) {
-              OpenStruct.new  prison_id: 'VEI',
-                              nps_case?: true,
-                              welsh_offender: false,
-                              sentence_start_date: sentence_start_date,
-                              automatic_release_date: ard,
-                              conditional_release_date: crd,
-                              sentenced?: true
+              build(:offender, prison_id: 'VEI',
+                    sentence: build(:sentence_detail,
+                                    sentenceStartDate: sentence_start_date,
+                                    automaticReleaseDate: ard,
+                                    conditionalReleaseDate: crd)).tap { |o|
+                o.load_case_information(build(:case_information, :english))
+              }
             }
 
             context 'with over 20 months left to serve' do
@@ -292,30 +301,16 @@ describe HandoverDateService do
               let(:crd)   { sentence_start_date + 22.months }
 
               it 'is responsible' do
-                resp = described_class.calculate_pom_responsibility(offender)
-
-                expect(resp).to eq HandoverDateService::RESPONSIBLE
+                expect(described_class.calculate_pom_responsibility(offender)).to eq HandoverDateService::RESPONSIBLE
               end
             end
 
             context 'with less than 20 months left to serve' do
               let(:ard)   { sentence_start_date + 11.months }
-              let(:crd)   { sentence_start_date + 10.months }
+              let(:crd)   { sentence_start_date + 19.months }
 
-              it 'is responsible' do
-                resp = described_class.calculate_pom_responsibility(offender)
-
-                expect(resp).to eq HandoverDateService::SUPPORTING
-              end
-            end
-
-            context 'when the CRD and ARD are missing' do
-              let(:ard) { nil }
-              let(:crd) { nil }
-
-              it 'will return no responsibility' do
-                expect(described_class.calculate_pom_responsibility(offender)).
-                  to eq HandoverDateService::UNKNOWN
+              it 'is supporting' do
+                expect(described_class.calculate_pom_responsibility(offender)).to eq HandoverDateService::SUPPORTING
               end
             end
           end

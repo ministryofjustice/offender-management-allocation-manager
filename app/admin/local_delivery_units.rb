@@ -15,4 +15,8 @@ ActiveAdmin.register LocalDeliveryUnit do
     end
     actions
   end
+
+  # Filter fields
+  preserve_default_filters!
+  remove_filter :case_information
 end

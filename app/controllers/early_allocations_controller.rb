@@ -8,9 +8,8 @@ class EarlyAllocationsController < PrisonsApplicationController
   end
 
   def new
-    case_info = CaseInformation.find_by offender_id_from_url
     @early_allocation = EarlyAllocationEligibleForm.new offender_id_from_url
-    if case_info.local_divisional_unit.try(:email_address)
+    if @offender.ldu_email_address.present?
       render
     else
       render 'dead_end'

@@ -436,6 +436,7 @@ describe HandoverDateService do
           "early_allocation?" => early_allocation,
           "indeterminate_sentence?" => indeterminate_sentence,
           parole_eligibility_date: parole_eligibility_date,
+          parole_review_date: nil,
           tariff_date: tariff_date
         )
       )
@@ -527,6 +528,19 @@ describe HandoverDateService do
           end
         end
       end
+    end
+  end
+
+  context 'with an NPS and indeterminate case with a PRD' do
+    let(:case_info) { build(:case_information, :with_prd, :nps) }
+    let(:offender) {
+      build(:offender, :indeterminate, sentence: build(:sentence_detail, :indeterminate, tariffDate: case_info.parole_review_date + 1.month)).tap {  |offender|
+        offender.load_case_information(case_info)
+      }
+    }
+
+    it 'displays the handover date (which is 8 months prior to PRD) ' do
+      expect(described_class.handover(offender).handover_date).to eq(case_info.parole_review_date - 8.months)
     end
   end
 end

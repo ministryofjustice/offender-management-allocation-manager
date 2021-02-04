@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
 class ResponsibilitiesController < PrisonsApplicationController
+  before_action :load_offender_from_url, only: [:new, :confirm_removal, :destroy]
+  before_action :load_offender_from_responsibility_params, only: [:confirm, :create]
+
   def new
-    if ldu_email_address(nomis_offender_id_from_url).present?
+    if @offender.ldu_email_address.present?
       @responsibility = Responsibility.new nomis_offender_id: nomis_offender_id_from_url
     else
       render 'error'
@@ -12,7 +15,7 @@ class ResponsibilitiesController < PrisonsApplicationController
   def confirm
     @responsibility = Responsibility.new responsibility_params
     if @responsibility.valid?
-      @ldu_email_address = ldu_email_address(@responsibility.nomis_offender_id)
+      @ldu_email_address = @offender.ldu_email_address
     else
       render 'new'
     end
@@ -23,14 +26,14 @@ class ResponsibilitiesController < PrisonsApplicationController
 
     me = HmppsApi::PrisonApi::UserApi.user_details(current_user).email_address.try(:first)
 
-    emails = [me, ldu_email_address(@responsibility.nomis_offender_id)].compact
+    emails = [me, @offender.ldu_email_address].compact
 
     # GovUk notify can only deliver to 1 address at a time.
     emails.each do |email|
       PomMailer.responsibility_override(
         message: params[:message],
         prisoner_number: @responsibility.nomis_offender_id,
-        prisoner_name: OffenderService.get_offender(@responsibility.nomis_offender_id).full_name,
+        prisoner_name: @offender.full_name,
         prison_name: PrisonService.name_for(@prison.code),
         email: email
       ).deliver_later
@@ -46,12 +49,12 @@ class ResponsibilitiesController < PrisonsApplicationController
 
   def confirm_removal
     @responsibility = RemoveResponsibilityForm.new nomis_offender_id: nomis_offender_id_from_url
-    @ldu_email_address = ldu_email_address(nomis_offender_id_from_url)
+    @ldu_email_address = @offender.ldu_email_address
   end
 
   def destroy
     @responsibility = RemoveResponsibilityForm.new(responsibility_params)
-    @ldu_email_address = ldu_email_address(nomis_offender_id_from_url)
+    @ldu_email_address = @offender.ldu_email_address
 
     allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id_from_url)
 
@@ -59,7 +62,6 @@ class ResponsibilitiesController < PrisonsApplicationController
 
     if @responsibility.valid?
       Responsibility.find_by!(nomis_offender_id: nomis_offender_id_from_url).destroy
-      offender = OffenderService.get_offender(nomis_offender_id_from_url)
 
       if allocation && allocation.active?
         pom_email = HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(allocation.primary_pom_nomis_id).first
@@ -67,13 +69,13 @@ class ResponsibilitiesController < PrisonsApplicationController
         ResponsibilityMailer.responsibility_to_custody_with_pom(emails: emails.compact,
                                                                        pom_name: allocation.primary_pom_name,
                                                                        pom_email: pom_email,
-                                                                       prisoner_name: offender.full_name,
+                                                                       prisoner_name: @offender.full_name,
                                                                        prisoner_number: nomis_offender_id_from_url,
                                                                        prison_name: @prison.name,
                                                                        notes: @responsibility.reason_text).deliver_later
       else
         ResponsibilityMailer.responsibility_to_custody(emails: emails.compact,
-                                                       prisoner_name: offender.full_name,
+                                                       prisoner_name: @offender.full_name,
                                                        prisoner_number: nomis_offender_id_from_url,
                                                        prison_name: @prison.name,
                                                        notes: @responsibility.reason_text).deliver_later
@@ -91,11 +93,13 @@ private
     params.fetch(:nomis_offender_id)
   end
 
-  def ldu_email_address(nomis_offender_id)
-    @ldu_email_address ||= CaseInformation.
-      find_by(nomis_offender_id: nomis_offender_id).
-      try(:local_divisional_unit).
-      try(:email_address)
+  def load_offender_from_url
+    @offender = OffenderService.get_offender(nomis_offender_id_from_url)
+  end
+
+  def load_offender_from_responsibility_params
+    offender_id = responsibility_params.fetch(:nomis_offender_id)
+    @offender = OffenderService.get_offender(offender_id)
   end
 
   def responsibility_params

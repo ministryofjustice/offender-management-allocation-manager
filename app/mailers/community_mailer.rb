@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 
 class CommunityMailer < GovukNotifyRails::Mailer
-  def pipeline_to_community(ldu:, csv_data:)
+  def pipeline_to_community(ldu_name:, ldu_email:, csv_data:)
     set_template('6e2f7565-a0e3-4fd7-b814-ee9dd5148924')
-    set_personalisation(ldu_name: ldu.name,
+    set_personalisation(ldu_name: ldu_name,
                         link_to_document: Notifications.prepare_upload(StringIO.new(csv_data), true))
 
-    mail(to: ldu.email_address)
+    mail(to: ldu_email)
   end
 
-  def pipeline_to_community_no_handovers(ldu)
+  def pipeline_to_community_no_handovers(ldu_name:, ldu_email:)
     set_template('bac3628c-aabe-4043-af11-147467720e04')
-    set_personalisation(ldu_name: ldu.name)
+    set_personalisation(ldu_name: ldu_name)
 
-    mail(to: ldu.email_address)
+    mail(to: ldu_email)
   end
 
   def urgent_pipeline_to_community(nomis_offender_id:, offender_name:, offender_crn:, ldu_email:, prison:,

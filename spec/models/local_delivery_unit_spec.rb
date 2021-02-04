@@ -25,4 +25,13 @@ RSpec.describe LocalDeliveryUnit, type: :model do
       expect(subject).to validate_inclusion_of(:country).in_array(['England', "Wales"])
     end
   end
+
+  describe '"enabled" scope' do
+    let!(:enabled_ldus) { create_list(:local_delivery_unit, 5) }
+    let!(:disabled_ldus) { create_list(:local_delivery_unit, 5, :disabled) }
+
+    it 'only retrieves enabled LDUs' do
+      expect(described_class.enabled).to eq(enabled_ldus)
+    end
+  end
 end

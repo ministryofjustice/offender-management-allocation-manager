@@ -45,7 +45,7 @@ private
 
   def filtered_offenders
     @unfiltered_offenders.group_by { |offender|
-      if offender.age < 18
+      if !offender.over_18?
         :under18
       elsif offender.civil_sentence?
         :civil

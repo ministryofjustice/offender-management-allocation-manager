@@ -4,18 +4,20 @@ require 'rails_helper'
 
 RSpec.describe ResponsibilitiesController, type: :controller do
   before do
-    offender = create(:case_information)
+    offender = create(:case_information, team: nil, local_delivery_unit: build(:local_delivery_unit))
     create(:responsibility, nomis_offender_id: offender.nomis_offender_id)
 
     stub_sso_data(prison.code, emails: [sso_email_address])
   end
 
-  let(:offender) { CaseInformation.last }
+  let(:case_info) { CaseInformation.last }
+  let(:offender_no) { case_info.nomis_offender_id }
   let(:responsibility) { Responsibility.last }
   let(:prison) { build(:prison) }
-  let(:nomis_offender) { build(:nomis_offender, offenderNo: offender.nomis_offender_id) }
+  let(:nomis_offender) { build(:nomis_offender, offenderNo: offender_no) }
   let(:reason) { 'Just because' }
   let(:sso_email_address) { Faker::Internet.email }
+  let(:offender) { OffenderService.get_offender(offender_no) }
 
   describe '#destroy' do
     before do
@@ -25,9 +27,9 @@ RSpec.describe ResponsibilitiesController, type: :controller do
     context 'without an allocation' do
       it 'destroys and sends an email to the LDU and the SPO' do
         allow_any_instance_of(ResponsibilityMailer).to receive(:responsibility_to_custody).with(
-          emails: [sso_email_address, offender.local_divisional_unit.email_address],
+          emails: [sso_email_address, offender.ldu_email_address],
           prisoner_name: "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}",
-          prisoner_number: offender.nomis_offender_id,
+          prisoner_number: offender_no,
           prison_name: prison.name,
           notes: reason
         ).and_call_original
@@ -54,9 +56,9 @@ RSpec.describe ResponsibilitiesController, type: :controller do
 
       it 'copies in the POM' do
         allow_any_instance_of(ResponsibilityMailer).to receive(:responsibility_to_custody_with_pom).with(
-          emails: [sso_email_address, offender.local_divisional_unit.email_address, pom.emails.first],
+          emails: [sso_email_address, offender.ldu_email_address, pom.emails.first],
           prisoner_name: "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}",
-          prisoner_number: offender.nomis_offender_id,
+          prisoner_number: offender_no,
           prison_name: prison.name,
           pom_name: allocation.primary_pom_name,
           pom_email: pom.emails.first,
