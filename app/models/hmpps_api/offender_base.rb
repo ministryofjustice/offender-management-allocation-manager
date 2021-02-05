@@ -92,10 +92,6 @@ module HmppsApi
       @recall_flag
     end
 
-    def criminal_sentence?
-      @sentence_type.civil? == false
-    end
-
     def civil_sentence?
       @sentence_type.civil?
     end
@@ -130,22 +126,6 @@ module HmppsApi
       "#{first_name} #{last_name}".titleize
     end
 
-    def age
-      return nil if date_of_birth.blank?
-
-      now = Time.zone.now
-
-      if now.month == date_of_birth.month
-        birthday_passed = now.day >= date_of_birth.day
-      elsif now.month > date_of_birth.month
-        birthday_passed = true
-      end
-
-      birth_years_ago = now.year - date_of_birth.year
-
-      @age ||= birthday_passed ? birth_years_ago : birth_years_ago - 1
-    end
-
     def responsibility_override?
       @responsibility_override.present?
     end
@@ -165,7 +145,7 @@ module HmppsApi
       @recall_flag = payload.fetch('recall')
       @sentence_type = SentenceType.new(payload['imprisonmentStatus'])
       @category_code = payload['categoryCode']
-      @date_of_birth = deserialise_date(payload, 'dateOfBirth')
+      @date_of_birth = Date.parse(payload.fetch('dateOfBirth'))
     end
 
     def handover_start_date
@@ -217,7 +197,33 @@ module HmppsApi
       earliest_date.present? && earliest_date <= Time.zone.today + 18.months
     end
 
+    def inside_omic_policy?
+      over_18? &&
+        (sentenced? || immigration_case?) &&
+        criminal_sentence? && convicted?
+    end
+
   private
+
+    def age
+      return nil if date_of_birth.blank?
+
+      now = Time.zone.now
+
+      if now.month == date_of_birth.month
+        birthday_passed = now.day >= date_of_birth.day
+      elsif now.month > date_of_birth.month
+        birthday_passed = true
+      end
+
+      birth_years_ago = now.year - date_of_birth.year
+
+      @age ||= birthday_passed ? birth_years_ago : birth_years_ago - 1
+    end
+
+    def criminal_sentence?
+      @sentence_type.civil? == false
+    end
 
     # Take either the new LocalDeliveryUnit (if available and enabled) and
     # fall back to the old local_divisional_unit if not. This should all go away

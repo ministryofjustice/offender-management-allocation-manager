@@ -48,6 +48,14 @@ RSpec.describe Allocation, type: :model do
       create(:allocation, nomis_offender_id: case_info.nomis_offender_id)
     }
 
+    # NPS offender with a new LocalDeliveryUnit and a Team/LDU with no email address
+    let!(:nps_with_new_ldu_and_bad_team) {
+      ldu = create(:local_delivery_unit)
+      team = create(:team, local_divisional_unit: build(:local_divisional_unit, email_address: nil))
+      case_info = create(:case_information, team: team, local_delivery_unit: ldu)
+      create(:allocation, nomis_offender_id: case_info.nomis_offender_id)
+    }
+
     it 'picks up NPS allocations without emails' do
       expect(described_class.without_ldu_emails).to match_array([nps_without_team, nps_without_email])
     end

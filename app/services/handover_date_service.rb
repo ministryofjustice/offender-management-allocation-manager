@@ -87,7 +87,7 @@ private
     if offender.early_allocation?
       early_allocation_handover_start_date(offender)
     elsif offender.indeterminate_sentence?
-      indeterminate_sentence_handover_start_date(offender)
+      indeterminate_responsibility_date(offender)
     else
       determinate_sentence_handover_start_date(offender)
     end
@@ -97,12 +97,6 @@ private
     return nil if offender.conditional_release_date.nil?
 
     offender.conditional_release_date - 18.months
-  end
-
-  def self.indeterminate_sentence_handover_start_date(offender)
-    return nil if offender.tariff_date.nil?
-
-    offender.tariff_date - 8.months
   end
 
   def self.determinate_sentence_handover_start_date(offender)
@@ -150,6 +144,7 @@ private
   # the parole board decision which currently is not available to us.
   def self.indeterminate_responsibility_date(offender)
     [
+      offender.parole_review_date,
       offender.parole_eligibility_date,
       offender.tariff_date
     ].compact.map { |date| date - 8.months }.min
