@@ -35,7 +35,7 @@ FactoryBot.define do
       event { EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION }
     end
 
-    trait :welsh_prescoed_transfer do
+    trait :open_prison_community_allocation do
       event { EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION }
     end
   end

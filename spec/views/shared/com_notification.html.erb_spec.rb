@@ -21,7 +21,7 @@ RSpec.describe "shared/com_notification", type: :view do
     end
 
     let(:email_history) do
-      create(:email_history, :welsh_prescoed_transfer, prison: prescod_id, nomis_offender_id: offender.offender_no, name: 'LDU Number 1')
+      create(:email_history, :open_prison_community_allocation, prison: prescod_id, nomis_offender_id: offender.offender_no, name: 'LDU Number 1')
     end
 
     before do
