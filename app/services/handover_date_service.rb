@@ -30,11 +30,6 @@ class HandoverDateService
                        start_date: nil, handover_date: nil,
                        reason: 'Immigration Case'
 
-    elsif offender.nps_case? && offender.indeterminate_sentence? && (offender.tariff_date.nil? || offender.tariff_date < Time.zone.today)
-      HandoverData.new custody: RESPONSIBLE, community: NOT_INVOLVED,
-                       start_date: nil, handover_date: nil,
-                       reason: 'Indeterminate with no earliest release date'
-
     elsif offender.recent_prescoed_case? && offender.indeterminate_sentence? && offender.nps_case?
       handover_date = prescoed_handover_date(offender)
       HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
