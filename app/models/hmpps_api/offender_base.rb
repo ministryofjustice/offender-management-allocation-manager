@@ -54,9 +54,9 @@ module HmppsApi
     end
 
     def welsh_offender_in_prescoed_needs_com?
-      return false unless prison_id == PrisonService::PRESCOED_CODE && allocated_com_name.blank?
-
-      EmailHistory.welsh_open_prescoed(offender_no) && email_sent_within_offender_sentence?(EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION)
+      prison_id == PrisonService::PRESCOED_CODE &&
+        allocated_com_name.blank? &&
+        EmailHistory.sent_within_current_sentence(self, EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION).any?
     end
 
     # Has a CaseInformation record been loaded for this offender?
@@ -261,12 +261,6 @@ module HmppsApi
     def early_allocation
       allocation = @case_information&.latest_early_allocation
       allocation if allocation.present? && (allocation.created_within_referral_window? && allocation.eligible? || allocation.community_decision?)
-    end
-
-    def email_sent_within_offender_sentence?(event)
-      EmailHistory.where(
-        nomis_offender_id: offender_no,
-        event: event).where('created_at > ?', prisoner.sentence_start_date)
     end
   end
 end

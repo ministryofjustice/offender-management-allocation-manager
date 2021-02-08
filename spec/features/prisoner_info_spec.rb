@@ -245,7 +245,7 @@ feature 'View a prisoner profile page' do
       create(:case_information, :welsh, nomis_offender_id: offender_id, case_allocation: 'NPS', parole_review_date: Time.zone.today + 1.year)
       create(:allocation, nomis_offender_id: offender_id, primary_pom_nomis_id: nomis_staff_id, prison: PrisonService::PRESCOED_CODE, primary_pom_name: 'Pobno, Kath')
 
-      email = create(:email_history, :welsh_prescoed_transfer, prison: PrisonService::PRESCOED_CODE, nomis_offender_id: offender_id, name: 'LDU Number 1')
+      email = create(:email_history, :open_prison_community_allocation, prison: PrisonService::PRESCOED_CODE, nomis_offender_id: offender_id, name: 'LDU Number 1')
 
       # we do not have access to PRESCOED in Dev or Staging environments,
       # so we are forcing the method "welsh_offender_in_prescoed_needs_com?" to return true

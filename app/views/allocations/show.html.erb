@@ -3,7 +3,7 @@
 <% end %>
 
 <% if @prisoner.welsh_offender_in_prescoed_needs_com? %>
-  <%= render partial: 'shared/com_notification', locals: { email: EmailHistory.welsh_open_prescoed(@prisoner.offender_no).first } %>
+  <%= render partial: 'shared/com_notification', locals: { email: EmailHistory.sent_within_current_sentence(@prisoner, EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION).first } %>
 <% end %>
 
 <h1 class="govuk-heading-l govuk-!-margin-bottom-5">Allocation information</h1>
