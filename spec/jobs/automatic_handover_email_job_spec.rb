@@ -35,14 +35,14 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
       let!(:allocation1) { create(:allocation, prison: prison1.code, nomis_offender_id: case_info1.nomis_offender_id, primary_pom_nomis_id: staff_id) }
       let(:offender1) {
         build(:nomis_offender, latestLocationId: prison1.code, offenderNo: case_info1.nomis_offender_id, firstName: 'One',
-              sentence: attributes_for(:sentence_detail, :handover_in_8_days))
+              sentence: attributes_for(:sentence_detail, :handover_in_8_days, conditionalReleaseDate: Time.zone.today + 23.days + 8.months))
       }
 
       # This offender doesn't have an allocation (yet) - but still needs to be included
       let(:case_info2) { build(:case_information) }
       let(:offender2) {
         build(:nomis_offender, latestLocationId: prison1.code, offenderNo: case_info2.nomis_offender_id, firstName: 'Two',
-              sentence: attributes_for(:sentence_detail, :handover_in_4_days))
+              sentence: attributes_for(:sentence_detail, :handover_in_4_days, conditionalReleaseDate: Time.zone.today + 19.days + 8.months))
       }
 
       # This offender should come first as they have an earlier handover start date
@@ -51,14 +51,14 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
       let!(:allocation3) { create(:allocation, prison: prison3.code, nomis_offender_id: case_info3.nomis_offender_id, primary_pom_nomis_id: staff_id) }
       let(:offender3) {
         build(:nomis_offender, latestLocationId: prison3.code, offenderNo: case_info3.nomis_offender_id, firstName: 'Three',
-              sentence: attributes_for(:sentence_detail, :handover_in_6_days))
+              sentence: attributes_for(:sentence_detail, :handover_in_6_days, conditionalReleaseDate: Time.zone.today + 21.days + 8.months))
       }
 
       # This offender is unsentenced and so should be excluded
       let(:case_info4) { build(:case_information) }
       let(:offender4) {
         build(:nomis_offender, latestLocationId: prison3.code, offenderNo: case_info4.nomis_offender_id, firstName: 'Four',
-              sentence: attributes_for(:sentence_detail, :unsentenced, :handover_in_6_days))
+              sentence: attributes_for(:sentence_detail, :unsentenced, :handover_in_6_days, conditionalReleaseDate: Time.zone.today + 21.days + 8.months))
       }
 
       # This offender isn't in NOMIS and so should be excluded
@@ -70,7 +70,7 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
       let!(:allocation6) { create(:allocation, :release, prison: prison6.code, nomis_offender_id: case_info6.nomis_offender_id) }
       let(:offender6) {
         build(:nomis_offender, latestLocationId: prison6.code, offenderNo: case_info6.nomis_offender_id, firstName: 'Six',
-              sentence: attributes_for(:sentence_detail, :handover_in_3_days))
+              sentence: attributes_for(:sentence_detail, :handover_in_3_days, conditionalReleaseDate: Time.zone.today + 18.days + 8.months))
       }
 
       # This offender is in an inactive prison (one with no allocations at all) so should be excluded
@@ -78,7 +78,7 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
       let(:case_info7) { build(:case_information) }
       let(:offender7) {
         build(:nomis_offender, latestLocationId: prison7.code, offenderNo: case_info7.nomis_offender_id, firstName: 'Seven',
-              sentence: attributes_for(:sentence_detail, :handover_in_4_days))
+              sentence: attributes_for(:sentence_detail, :handover_in_4_days, conditionalReleaseDate: Time.zone.today + 19.days + 8.months))
       }
 
       before do
@@ -120,7 +120,7 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
     end
 
     def handover_fields(offset)
-      [today_plus(offset), today_plus(3.months + offset), today_plus(7.months + 15.days + offset)]
+      [today_plus(offset), today_plus(offset), today_plus(8.months + offset)]
     end
 
     def offender_csv_fields(offender)
@@ -152,7 +152,7 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
       let!(:allocation1) { create(:allocation, prison: prison1.code, nomis_offender_id: case_info1.nomis_offender_id, primary_pom_nomis_id: staff_id) }
       let(:offender1) {
         build(:nomis_offender, latestLocationId: prison1.code, offenderNo: case_info1.nomis_offender_id, firstName: 'One',
-              sentence: attributes_for(:sentence_detail, :handover_in_46_days))
+              sentence: attributes_for(:sentence_detail, :handover_in_46_days, conditionalReleaseDate: Time.zone.today + 61.days + 8.months))
       }
 
       it 'sends the no data email' do

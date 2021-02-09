@@ -25,24 +25,26 @@ FactoryBot.define do
       automaticReleaseDate { "2022-01-28" }
     end
 
+    # We use PED here (assuming determinate) so that we don't suffer
+    # the 15.days / half-month problem is places where we don't care
     trait :handover_in_3_days do
-      conditionalReleaseDate { Time.zone.today + 18.days + 7.months }
+      paroleEligibilityDate { Time.zone.today + 8.months + 3.days }
     end
 
     trait :handover_in_4_days do
-      conditionalReleaseDate { Time.zone.today + 19.days + 7.months }
+      paroleEligibilityDate { Time.zone.today + 8.months + 4.days }
     end
 
     trait :handover_in_8_days do
-      conditionalReleaseDate { Time.zone.today + 23.days + 7.months }
+      paroleEligibilityDate { Time.zone.today + 8.months + 8.days }
     end
 
     trait :handover_in_6_days do
-      conditionalReleaseDate { Time.zone.today + 21.days + 7.months }
+      paroleEligibilityDate { Time.zone.today + 8.months + 6.days }
     end
 
     trait :handover_in_46_days do
-      conditionalReleaseDate { Time.zone.today + 61.days + 7.months }
+      paroleEligibilityDate { Time.zone.today + 8.months + 46.days }
     end
 
     trait :unsentenced do
