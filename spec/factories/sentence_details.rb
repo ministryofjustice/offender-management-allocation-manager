@@ -26,23 +26,23 @@ FactoryBot.define do
     end
 
     trait :handover_in_3_days do
-      conditionalReleaseDate { Time.zone.today + 3.days + 7.months + 15.days }
+      conditionalReleaseDate { Time.zone.today + 18.days + 7.months }
     end
 
     trait :handover_in_4_days do
-      conditionalReleaseDate { Time.zone.today + 4.days + 7.months + 15.days }
+      conditionalReleaseDate { Time.zone.today + 19.days + 7.months }
     end
 
     trait :handover_in_8_days do
-      conditionalReleaseDate { Time.zone.today + 8.days + 7.months + 15.days }
+      conditionalReleaseDate { Time.zone.today + 23.days + 7.months }
     end
 
     trait :handover_in_6_days do
-      conditionalReleaseDate { Time.zone.today + 6.days + 7.months + 15.days }
+      conditionalReleaseDate { Time.zone.today + 21.days + 7.months }
     end
 
     trait :handover_in_46_days do
-      conditionalReleaseDate { Time.zone.today + 46.days + 7.months + 15.days }
+      conditionalReleaseDate { Time.zone.today + 61.days + 7.months }
     end
 
     trait :unsentenced do
