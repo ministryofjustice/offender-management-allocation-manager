@@ -34,7 +34,7 @@ RSpec.describe "shared/com_notification", type: :view do
       expect(page.css('#error-summary-title')).to have_content(I18n.t('views.com_notification.title'))
 
       expect(page.css('#com_warning'))
-      .to have_link(I18n.t('views.com_notification.responsible_com_needed'), href: "#com-error")
+      .to have_link(I18n.t('views.com_notification.com_needed'), href: "#com-error")
 
       expect(page.css('#ldu_warning'))
       .to have_link(I18n.t('views.com_notification.ldu_contacted', date: format_date(email_history.created_at)), href: "#com-error")

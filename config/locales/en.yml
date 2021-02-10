@@ -128,8 +128,8 @@ en:
       no_email: "An automatic email could not be sent to %{name} because the LDU email address is missing. You need need to find an alternative way of contacting them."
     com_notification:
       title: "You may need to contact the community probation office"
-      responsible_com_needed: "A responsible Community Offender Manager (COM) must be allocated to this case."
-      ldu_contacted: "The LDU was emailed to request the allocation of a responsible COM on %{date}."
+      com_needed: "A Community Offender Manager (COM) must be allocated to support this case."
+      ldu_contacted: "The LDU was emailed to request the allocation of a supporting COM on %{date}."
   helpers:
     fieldset:
       case_information:
