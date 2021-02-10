@@ -3,28 +3,28 @@
     <li class="moj-sub-navigation__item">
       <a class="moj-sub-navigation__link" <%= 'aria-current=page' if active == :allocated %>
       href="<%= allocated_prison_prisoners_path(@prison.code) %>">
-        See allocations (<%= @summary.allocated_total %>)
+        See allocations (<%= allocated_count %>)
       </a>
     </li>
 
     <li class="moj-sub-navigation__item">
       <a class="moj-sub-navigation__link" <%= 'aria-current=page' if active == :unallocated %>
       href="<%= unallocated_prison_prisoners_path(@prison.code) %>">
-        Make allocations (<%= @summary.unallocated_total %>)
+        Make allocations (<%= unallocated_count %>)
       </a>
     </li>
 
     <li class="moj-sub-navigation__item">
-      <a class="moj-sub-navigation__link" <%= 'aria-current=page' if active == :pending %>
-      href="<%= pending_prison_prisoners_path(@prison.code) %>">
-        Add missing information (<%= @summary.pending_total %>)
+      <a class="moj-sub-navigation__link" <%= 'aria-current=page' if active == :missing_information %>
+      href="<%= missing_information_prison_prisoners_path(@prison.code) %>">
+        Add missing information (<%= missing_info_count %>)
       </a>
     </li>
 
     <li class="moj-sub-navigation__item">
       <a class="moj-sub-navigation__link" <%= 'aria-current=page' if active == :new_arrivals %>
       href="<%= new_arrivals_prison_prisoners_path(@prison.code) %>">
-        Newly arrived (<%= @summary.new_arrivals_total %>)
+        Newly arrived (<%= new_arrivals_count %>)
       </a>
     </li>
   </ul>
