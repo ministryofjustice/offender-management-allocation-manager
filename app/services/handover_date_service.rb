@@ -41,8 +41,31 @@ class HandoverDateService
       start_date = nps_start_date(offender)
       handover_date = start_date if start_date.present? && start_date > handover_date
 
-      case responsibility_override(offender)
-      when nil
+      if offender.open_prison_nps_offender? && !offender.recent_prescoed_case?
+        HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
+                         start_date: start_date, handover_date: handover_date,
+                         reason: reason
+
+      elsif offender.determinate_with_no_release_dates?
+        HandoverData.new custody: RESPONSIBLE, community: com_responsibility(start_date, handover_date),
+                         start_date: start_date, handover_date: handover_date,
+                         reason: reason
+
+      elsif offender.indeterminate_sentence? && (offender.tariff_date.nil? || offender.tariff_date.past?)
+        # We currently don't have access to the date of the parole board decision, which means that we cannot correctly
+        # calculate responsibility for NPS indeterminate cases with parole eligibility where the TED is in the past.
+        # A decision has been made to display a notice so staff can check whether they need to override their case or not;
+        # this is until we get access to this data.
+        HandoverData.new custody: RESPONSIBLE, community: com_responsibility(start_date, handover_date),
+                         start_date: start_date, handover_date: handover_date,
+                         reason: reason
+
+      elsif offender.release_date.blank?
+        HandoverData.new custody: NOT_INVOLVED, community: NOT_INVOLVED,
+                         start_date: nil, handover_date: nil,
+                         reason: 'NPS Case - missing dates'
+
+      else
         pom_responsible = nps_responsibility(offender, handover_date)
         if pom_responsible == RESPONSIBLE
           HandoverData.new custody: RESPONSIBLE, community: com_responsibility(start_date, handover_date),
@@ -53,20 +76,7 @@ class HandoverDateService
                            start_date: start_date, handover_date: handover_date,
                            reason: reason
         end
-      when NOT_INVOLVED
-        HandoverData.new custody: NOT_INVOLVED, community: NOT_INVOLVED,
-                         start_date: nil, handover_date: nil,
-                         reason: 'NPS Case - missing dates'
-      when RESPONSIBLE
-        HandoverData.new custody: RESPONSIBLE, community: com_responsibility(start_date, handover_date),
-                         start_date: start_date, handover_date: handover_date,
-                         reason: reason
-      else
-        HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
-                         start_date: start_date, handover_date: handover_date,
-                         reason: reason
       end
-
     else
       responsibility = crc_responsibility(offender)
       if responsibility == NOT_INVOLVED
@@ -94,23 +104,6 @@ private
     if start_date.present? && handover_date.present? && Time.zone.today.between?(start_date, handover_date)
       SUPPORTING
     else
-      NOT_INVOLVED
-    end
-  end
-
-  # We currently don't have access to the date of the parole board decision, which means that we cannot correctly
-  # calculate responsibility for NPS indeterminate cases with parole eligibility where the TED is in the past.
-  # A decision has been made to display a notice so staff can check whether they need to override their case or not;
-  # this is until we get access to this data.
-  def self.responsibility_override(offender)
-    if offender.open_prison_nps_offender? && !offender.recent_prescoed_case?
-      SUPPORTING
-    elsif offender.determinate_with_no_release_dates?
-      RESPONSIBLE
-    elsif offender.indeterminate_sentence? && (offender.tariff_date.nil? ||
-        offender.tariff_date < Time.zone.today)
-      RESPONSIBLE
-    elsif offender.release_date.blank?
       NOT_INVOLVED
     end
   end
