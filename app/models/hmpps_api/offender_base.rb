@@ -25,6 +25,12 @@ module HmppsApi
       @convicted_status == 'Convicted'
     end
 
+    # :nocov:
+    def complexity_level
+      @complexity_level ||= ComplexityMicroService.get_complexity(offender_no)
+    end
+    # :nocov:
+
     def sentenced?
       # A prisoner will have had a sentence calculation and for our purposes
       # this means that they will either have a:

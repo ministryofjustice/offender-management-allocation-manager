@@ -1,9 +1,39 @@
 require 'rails_helper'
 
 RSpec.describe PrisonService do
+  describe '#womens_prison?' do
+    subject { described_class::womens_prison?(PrisonService::WOMENS_PRISON_CODES.first) }
+
+    context 'with womens_estate switch on' do
+      let(:test_strategy) { Flipflop::FeatureSet.current.test! }
+
+      before do
+        test_strategy.switch!(:womens_estate, true)
+      end
+
+      after do
+        test_strategy.switch!(:womens_estate, false)
+      end
+
+      it 'will admit to being a womens prison' do
+        expect(subject).to eq(true)
+      end
+    end
+
+    context 'with womens_estate switch off' do
+      it 'will not have any womens prisons' do
+        expect(subject).to eq(false)
+      end
+    end
+  end
+
   it "Get the name of a prison from the code" do
     name = described_class.name_for('LEI')
     expect(name).to eq('HMP Leeds')
+  end
+
+  it 'can find all womens prisons' do
+    expect(described_class::WOMENS_PRISON_CODES.size).to eq(12)
   end
 
   it "can return all the prison codes" do

@@ -19,6 +19,14 @@ Rails.application.routes.draw do
 
     resources :prisoners, only: [:show] do
       collection do
+        constraints lambda {
+            |request| PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id))
+        } do
+          get 'allocated' => 'female_prisoners#allocated'
+          get 'unallocated' => 'female_prisoners#unallocated'
+          get 'pending' => 'female_prisoners#pending'
+          get 'new_arrivals' => 'female_prisoners#new_arrivals'
+        end
         get 'summary' => 'summary#index'
         get 'allocated' => 'summary#allocated'
         get 'unallocated' => 'summary#unallocated'
