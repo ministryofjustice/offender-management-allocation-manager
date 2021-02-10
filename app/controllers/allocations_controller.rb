@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class AllocationsController < PrisonsApplicationController
-  before_action :ensure_spo_user
+  before_action :ensure_spo_user, except: :history
 
   delegate :update, to: :create
 

@@ -13,10 +13,12 @@ RSpec.describe AllocationsController, :allocation, type: :controller do
   }
   let(:pom_without_emails) { poms.first }
   let(:prison) { build(:prison).code }
-  let(:offender_no) { build(:offender).offender_no }
+  let(:offender) { build(:nomis_offender) }
+  let(:offender_no) { offender.fetch(:offenderNo) }
 
   before do
     stub_poms(prison, poms)
+    stub_offender(offender)
   end
 
   context 'when user is a POM' do
@@ -30,23 +32,26 @@ RSpec.describe AllocationsController, :allocation, type: :controller do
       get :show, params: { prison_id: prison, nomis_offender_id: offender_no }
       expect(response).to redirect_to('/401')
     end
+
+    it 'allows access to the Case History page' do
+      create(:case_information, nomis_offender_id: offender_no)
+      create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: poms.last.staffId)
+      get :history, params: { prison_id: prison, nomis_offender_id: offender_no }
+      expect(response).to have_http_status(:ok)
+    end
   end
 
   context 'when user is an SPO' do
     before do
       stub_sso_data(prison)
-      stub_offender(offender)
     end
-
-    let(:offender) { build(:nomis_offender, offenderNo: offender_no) }
 
     describe '#show' do
       let(:inactive_pom_staff_id) { 543_453 }
 
       before do
         create(:case_information, nomis_offender_id: offender_no)
-        stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/#{prison}/offender/#{offender_no}").
-          to_return(body: { staffId: 123_456 }.to_json)
+        stub_keyworker(prison, offender_no, staffId: 123_456)
       end
 
       context 'when POM has left' do
