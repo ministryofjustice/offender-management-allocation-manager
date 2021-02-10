@@ -22,6 +22,7 @@ class PrisonersController < PrisonsApplicationController
     )
 
     @case_info = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: id_for_show_action)
+    @open_prison_email = EmailHistory.sent_within_current_sentence(@prisoner, EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION).first
   end
 
   def image

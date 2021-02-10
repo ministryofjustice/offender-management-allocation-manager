@@ -254,7 +254,7 @@ feature 'View a prisoner profile page' do
       visit prison_prisoner_path("LEI", offender_id)
 
       expect(page).to have_content(I18n.t("views.com_notification.title"))
-      expect(page).to have_content(I18n.t("views.com_notification.responsible_com_needed"))
+      expect(page).to have_content(I18n.t("views.com_notification.com_needed"))
       expect(page).to have_content(I18n.t("views.com_notification.ldu_contacted", date: email.created_at.strftime('%d/%m/%Y')))
     end
   end

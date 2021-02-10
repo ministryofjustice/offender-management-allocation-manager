@@ -41,14 +41,14 @@ feature 'Allocation History' do
         allocation = create(
           :allocation,
           nomis_offender_id: nomis_offender_id,
-          primary_pom_nomis_id: probation_pom[:primary_pom_nomis_id],
-          primary_pom_name: probation_pom[:primary_pom_name],
-          recommended_pom_type: 'prison',
-          override_reasons: ["suitability"],
-          suitability_detail: "Too high risk",
-          created_at: Time.zone.now - 10.days,
-          updated_at: Time.zone.now - 10.days,
-          primary_pom_allocated_at: Time.zone.now - 12.days
+            primary_pom_nomis_id: probation_pom[:primary_pom_nomis_id],
+            primary_pom_name: probation_pom[:primary_pom_name],
+            recommended_pom_type: 'prison',
+            override_reasons: ["suitability"],
+            suitability_detail: "Too high risk",
+            created_at: Time.zone.now - 10.days,
+            updated_at: Time.zone.now - 10.days,
+            primary_pom_allocated_at: Time.zone.now - 12.days
         )
         allocation.update!(event: Allocation::REALLOCATE_PRIMARY_POM,
                            primary_pom_nomis_id: probation_pom_2[:primary_pom_nomis_id],
@@ -120,52 +120,52 @@ feature 'Allocation History' do
         visit prison_allocation_history_path('LEI', nomis_offender_id)
       end
 
-    let(:deallocate_date) { Time.zone.now - 6.days }
-    let(:formatted_deallocate_date) { deallocate_date.strftime("#{deallocate_date.day.ordinalize} %B %Y") }
-    let(:transfer_date) { Time.zone.now - 1.day }
-    let(:formatted_transfer_date) { transfer_date.strftime("#{transfer_date.day.ordinalize} %B %Y") + " (" + transfer_date.strftime("%R") + ")" }
-    let(:allocation) { Allocation.last }
-    let(:history) { allocation.get_old_versions.append(allocation).sort_by!(&:updated_at).reverse! }
+      let(:deallocate_date) { Time.zone.now - 6.days }
+      let(:formatted_deallocate_date) { deallocate_date.strftime("#{deallocate_date.day.ordinalize} %B %Y") }
+      let(:transfer_date) { Time.zone.now - 1.day }
+      let(:formatted_transfer_date) { transfer_date.strftime("#{transfer_date.day.ordinalize} %B %Y") + " (" + transfer_date.strftime("%R") + ")" }
+      let(:allocation) { Allocation.last }
+      let(:history) { allocation.get_old_versions.append(allocation).sort_by!(&:updated_at).reverse! }
 
-    it 'shows the case history' do
-      history1 = history[1]
-      history2 = history[2]
-      hist_allocate_secondary = history[5]
-      history6 = history[6]
-      prescoed_transfer = EmailHistory.where(nomis_offender_id: nomis_offender_id, event: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION).first
+      it 'shows the case history' do
+        history1 = history[1]
+        history2 = history[2]
+        hist_allocate_secondary = history[5]
+        history6 = history[6]
+        prescoed_transfer = EmailHistory.where(nomis_offender_id: nomis_offender_id, event: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION).first
 
-      [
-        ['h1', "Abbella, Ozullirn"],
-        ['.govuk-heading-m', "HMP Pentonville"],
-        ['.moj-timeline__title', "Prisoner unallocated (transfer)"],
-        ['.moj-timeline__date', formatted_transfer_date.to_s],
-        ['.moj-timeline__title', "Prisoner reallocated"],
-        ['.moj-timeline__description', "Prisoner reallocated to #{history1.primary_pom_name.titleize} - (email address not found) Tier: #{history1.allocated_at_tier}"],
-        ['.moj-timeline__date', formatted_date_for(history1).to_s],
-        ['.moj-timeline__title', "Prisoner allocated"],
-        ['.moj-timeline__description', "Prisoner allocated to #{history2.primary_pom_name.titleize} - #{prison_pom[:email]} Tier: #{history2.allocated_at_tier}"],
-        ['.moj-timeline__date', formatted_date_for(history2).to_s],
-        ['.moj-timeline__description', "Prisoner allocated to #{hist_allocate_secondary.secondary_pom_name.titleize} - #{probation_pom[:email]} Tier: #{hist_allocate_secondary.allocated_at_tier}"],
-        ['.moj-timeline__date', "#{formatted_date_for(hist_allocate_secondary)} by #{hist_allocate_secondary.created_by_name.titleize}"],
-        ['.govuk-heading-m', "HMP Leeds"],
-        ['.moj-timeline__title', "Prisoner unallocated"],
-        ['.moj-timeline__title', "Co-working unallocated"],
-        ['.moj-timeline__date', formatted_deallocate_date.to_s],
-        ['.moj-timeline__title', "Prisoner reallocated"],
-        ['.moj-timeline__description', "Prisoner reallocated to #{history6.primary_pom_name.titleize} - #{probation_pom_2[:email]} Tier: #{history6.allocated_at_tier}"],
-        ['.moj-timeline__date', "#{formatted_date_for(history6)} by #{history6.created_by_name.titleize}"],
-        ['.moj-timeline__title', "Prisoner allocated"],
-        ['.moj-timeline__description', "Prisoner allocated to #{history.last.primary_pom_name.titleize} - #{probation_pom[:email]} Tier: #{history.last.allocated_at_tier}"],
-        ['.moj-timeline__description', "Probation POM allocated instead of recommended Prison POM", "Reason(s):", "- Prisoner assessed as suitable for a prison POM despite tiering calculation", "Too high risk"],
-        ['.moj-timeline__date', "#{formatted_date_for(history.last)} by #{history.last.created_by_name.titleize}"],
-        ['.govuk-heading-m', "HMP/YOI Prescoed"],
-        ['.moj-timeline__title', "Offender transferred to an open prison"],
-        ['.moj-timeline__date', "#{prescoed_transfer.created_at.strftime("#{prescoed_transfer.created_at.day.ordinalize} %B %Y")} (#{prescoed_transfer.created_at.strftime('%R')}) email sent automatically"],
-        ['.moj-timeline__description', "The LDU for #{prescoed_transfer.name} - #{prescoed_transfer.email} - was sent an email asking them to appoint a Responsible COM."]
-      ].each do |key, val|
-        expect(page).to have_css(key, text: val)
+        [
+          ['h1', "Abbella, Ozullirn"],
+          ['.govuk-heading-m', "HMP Pentonville"],
+          ['.moj-timeline__title', "Prisoner unallocated (transfer)"],
+          ['.moj-timeline__date', formatted_transfer_date.to_s],
+          ['.moj-timeline__title', "Prisoner reallocated"],
+          ['.moj-timeline__description', "Prisoner reallocated to #{history1.primary_pom_name.titleize} - (email address not found) Tier: #{history1.allocated_at_tier}"],
+          ['.moj-timeline__date', formatted_date_for(history1).to_s],
+          ['.moj-timeline__title', "Prisoner allocated"],
+          ['.moj-timeline__description', "Prisoner allocated to #{history2.primary_pom_name.titleize} - #{prison_pom[:email]} Tier: #{history2.allocated_at_tier}"],
+          ['.moj-timeline__date', formatted_date_for(history2).to_s],
+          ['.moj-timeline__description', "Prisoner allocated to #{hist_allocate_secondary.secondary_pom_name.titleize} - #{probation_pom[:email]} Tier: #{hist_allocate_secondary.allocated_at_tier}"],
+          ['.moj-timeline__date', "#{formatted_date_for(hist_allocate_secondary)} by #{hist_allocate_secondary.created_by_name.titleize}"],
+          ['.govuk-heading-m', "HMP Leeds"],
+          ['.moj-timeline__title', "Prisoner unallocated"],
+          ['.moj-timeline__title', "Co-working unallocated"],
+          ['.moj-timeline__date', formatted_deallocate_date.to_s],
+          ['.moj-timeline__title', "Prisoner reallocated"],
+          ['.moj-timeline__description', "Prisoner reallocated to #{history6.primary_pom_name.titleize} - #{probation_pom_2[:email]} Tier: #{history6.allocated_at_tier}"],
+          ['.moj-timeline__date', "#{formatted_date_for(history6)} by #{history6.created_by_name.titleize}"],
+          ['.moj-timeline__title', "Prisoner allocated"],
+          ['.moj-timeline__description', "Prisoner allocated to #{history.last.primary_pom_name.titleize} - #{probation_pom[:email]} Tier: #{history.last.allocated_at_tier}"],
+          ['.moj-timeline__description', "Probation POM allocated instead of recommended Prison POM", "Reason(s):", "- Prisoner assessed as suitable for a prison POM despite tiering calculation", "Too high risk"],
+          ['.moj-timeline__date', "#{formatted_date_for(history.last)} by #{history.last.created_by_name.titleize}"],
+          ['.govuk-heading-m', "HMP/YOI Prescoed"],
+          ['.moj-timeline__title', "Offender transferred to an open prison"],
+          ['.moj-timeline__date', "#{prescoed_transfer.created_at.strftime("#{prescoed_transfer.created_at.day.ordinalize} %B %Y")} (#{prescoed_transfer.created_at.strftime('%R')}) email sent automatically"],
+          ['.moj-timeline__description', "The LDU for #{prescoed_transfer.name} - #{prescoed_transfer.email} - was sent an email asking them to appoint a Supporting COM."]
+        ].each do |key, val|
+          expect(page).to have_css(key, text: val)
+        end
       end
-    end
 
       it 'links to previous Early Allocation assessments' do
         # The 6th history item is an 'eligible' early allocation assessment

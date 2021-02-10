@@ -4,7 +4,7 @@
   </h2>
   <div class="govuk-error-summary__body">
     <ul class="govuk-list govuk-error-summary__list">
-      <li id="com_warning"><%= link_to I18n.t('views.com_notification.responsible_com_needed'), "#com-error", data: { turbolinks: false } %></li>
+      <li id="com_warning"><%= link_to I18n.t('views.com_notification.com_needed'), "#com-error", data: { turbolinks: false } %></li>
       <li id="ldu_warning"><%= link_to I18n.t('views.com_notification.ldu_contacted', date: format_date(email.created_at)), "#com-error", data: { turbolinks: false }  %></li>
     </ul>
   </div>
