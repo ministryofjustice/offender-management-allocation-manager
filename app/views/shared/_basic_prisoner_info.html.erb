@@ -1,4 +1,4 @@
-<%= render 'shared/case_type_badge', offender: @prisoner %>
+<%= render 'shared/case_type_badge', offender: prisoner, early_allocations: case_info.early_allocations %>
 
 <div class="govuk-!-margin-top-1">
   <table class="govuk-table">
@@ -9,17 +9,17 @@
     </tr>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">Name</td>
-      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half"><%= @prisoner.full_name %></td>
+      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half"><%= prisoner.full_name %></td>
     </tr>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">Date of birth</td>
-      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half"><%= format_date(@prisoner.date_of_birth) %></td>
+      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half"><%= format_date(prisoner.date_of_birth) %></td>
     </tr>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Prisoner number</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= @prisoner.offender_no %>
-        <%= link_to 'View DPS Profile', digital_prison_service_profile_path(@prisoner.offender_no), class: "govuk-link pull-right", target: "_blank" %>
+        <%= prisoner.offender_no %>
+        <%= link_to 'View DPS Profile', digital_prison_service_profile_path(prisoner.offender_no), class: "govuk-link pull-right", target: "_blank" %>
     </tr>
     </tbody>
   </table>
