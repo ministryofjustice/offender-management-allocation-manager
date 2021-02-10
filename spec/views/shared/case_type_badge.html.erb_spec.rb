@@ -14,6 +14,7 @@ RSpec.describe "allocations/new", type: :view do
     assign(:not_recommended_poms, [])
     assign(:unavailable_pom_count, 0)
     assign(:prisoner, OffenderPresenter.new(offender))
+    assign(:case_info, build(:case_information))
     render
   end
 

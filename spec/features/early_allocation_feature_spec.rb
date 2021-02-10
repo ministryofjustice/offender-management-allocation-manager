@@ -167,6 +167,8 @@ feature "early allocation", type: :feature do
           end
 
           context 'with discretionary path' do
+            let(:early_allocation_badge) { page.find('#early-allocation-badge') }
+
             before do
               discretionary_discretionary_answers
               click_button 'Continue'
@@ -218,6 +220,7 @@ feature "early allocation", type: :feature do
               click_button('Save')
 
               # Profile page
+              expect(early_allocation_badge.text).to include 'EARLY ALLOCATION APPROVED'
               expect(page).to have_text 'Eligible - case handover date has been updated'
               expect(page).to have_link 'View assessment'
 
@@ -228,11 +231,11 @@ feature "early allocation", type: :feature do
           end
 
           scenario 'not eligible due to all answers false' do
-            find('#early-allocation-extremism-separation-field').click
-            find('#early-allocation-high-risk-of-serious-harm-field').click
-            find('#early-allocation-mappa-level-2-field').click
-            find('#early-allocation-pathfinder-process-field').click
-            find('#early-allocation-other-reason-field').click
+            find('label[for=early-allocation-extremism-separation-field]').click
+            find('label[for=early-allocation-high-risk-of-serious-harm-field]').click
+            find('label[for=early-allocation-mappa-level-2-field]').click
+            find('label[for=early-allocation-pathfinder-process-field]').click
+            find('label[for=early-allocation-other-reason-field]').click
 
             click_button 'Continue'
             expect(page).to have_text 'Not eligible for early allocation'

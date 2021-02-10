@@ -10,6 +10,7 @@ RSpec.describe "allocations/new", type: :view do
     assign(:recommended_poms, [])
     assign(:not_recommended_poms, [])
     assign(:unavailable_pom_count, 0)
+    assign(:case_info, build(:case_information))
     render
   end
 
