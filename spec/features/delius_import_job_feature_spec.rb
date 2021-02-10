@@ -7,7 +7,7 @@ require 'delius_import_job'
 
 RSpec.shared_examples "imports the Delius spreadsheet and creates case information" do
   it "imports the Delius spreadsheet and creates case information" do
-    visit pending_prison_prisoners_path(prison)
+    visit missing_information_prison_prisoners_path(prison)
     expect(page).to have_content("Add missing information")
     expect(page).to have_content(offender_no)
 

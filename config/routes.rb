@@ -24,13 +24,13 @@ Rails.application.routes.draw do
         } do
           get 'allocated' => 'female_prisoners#allocated'
           get 'unallocated' => 'female_prisoners#unallocated'
-          get 'pending' => 'female_prisoners#pending'
+          get 'missing_information' => 'female_prisoners#missing_information'
           get 'new_arrivals' => 'female_prisoners#new_arrivals'
         end
         get 'summary' => 'summary#index'
         get 'allocated' => 'summary#allocated'
         get 'unallocated' => 'summary#unallocated'
-        get 'pending' => 'summary#pending'
+        get 'missing_information' => 'summary#missing_information'
         get 'new_arrivals' => 'summary#new_arrivals'
       end
 
