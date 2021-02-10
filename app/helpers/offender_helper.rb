@@ -7,11 +7,23 @@ module OffenderHelper
   end
 
   def pom_responsibility_label(offender)
-    offender.pom_responsibility.to_s
+    if offender.pom_responsibility.responsible?
+      'Responsible'
+    elsif offender.pom_responsibility.supporting?
+      'Supporting'
+    else
+      'Unknown'
+    end
   end
 
   def case_owner_label(offender)
-    offender.pom_responsibility.case_owner
+    if offender.pom_responsibility.responsible?
+      'Custody'
+    elsif offender.pom_responsibility.supporting?
+      'Community'
+    else
+      'Unknown'
+    end
   end
 
   def last_event(allocation)
@@ -29,19 +41,5 @@ module OffenderHelper
     elsif event.include? 'allocate'
       type + 'allocated'
     end
-  end
-
-  def needs_com_but_ldu_is_uncontactable?(offender)
-    return false unless offender.sentenced?
-
-    return false if offender.handover_start_date.nil?
-
-    return false if offender.handover_start_date > Time.zone.today + 45.days
-
-    return false if offender.allocated_com_name.present?
-
-    return true if offender.ldu_email_address.nil?
-
-    false
   end
 end

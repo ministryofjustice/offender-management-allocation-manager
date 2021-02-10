@@ -2,7 +2,7 @@
 
 <p class="govuk-body">
   You are removing co-working POM <%= @allocation.secondary_pom_name %> who was working with <%= @prisoner.full_name %>.
-  The <%= @responsibility_type %> POM is <%= @allocation.primary_pom_name %>.
+  The <%= pom_responsibility_label(@prisoner) %> POM is <%= @allocation.primary_pom_name %>.
 </p>
 
 <p class="govuk-body">We will send a confirmation email to <%= @primary_pom.email_address %></p>

@@ -18,8 +18,8 @@
       </div>
       <div class="pull-right">
         <%= select_tag 'role',
-                       options_for_select([HandoverDateService::RESPONSIBLE.to_s,
-                                           HandoverDateService::SUPPORTING.to_s,
+                       options_for_select(['Responsible',
+                                           'Supporting',
                                            'Co-Working']),
                        include_blank: 'All', class: 'govuk-select' %>
         <input id="search-button" type="submit" class="govuk-button pull-right" value="Search"/>
