@@ -3,7 +3,7 @@
 # This is needed as a job as the (binary) PDF has to be
 # done with deliver_now
 class AutoEarlyAllocationEmailJob < ApplicationJob
-  queue_as :mailer
+  queue_as :mailers
 
   def perform(prison, offender_no, encoded_pdf)
     offender = OffenderService.get_offender(offender_no)
