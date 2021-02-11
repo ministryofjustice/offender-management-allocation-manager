@@ -4,7 +4,9 @@ RSpec.describe "prisoners/show", type: :view do
   describe 'early allocation badges' do
     let(:prison) { build(:prison) }
     let(:page) { Nokogiri::HTML(rendered) }
-    let(:early_allocation_badge) { page.css('#early-allocation-badge').first }
+    let(:early_allocation_css) { page.css('#early-allocation-badge') }
+    let(:early_allocation_badge) { early_allocation_css.first }
+    let(:badge_count) { early_allocation_css.size }
     let(:offender) { build(:offender, sentence: sentence).tap { |offender| offender.load_case_information(case_info) } }
 
     before do
@@ -24,8 +26,9 @@ RSpec.describe "prisoners/show", type: :view do
         let(:sentence) { build(:sentence_detail, :outside_early_allocation_window) }
 
         it 'displays a badge text EARLY ALLOCATION NOTES' do
+          expect(badge_count).to eq(1)
           expect(early_allocation_badge.attributes['class'].value).to include 'moj-badge--blue'
-          expect(early_allocation_badge.text).to include 'EARLY ALLOCATION NOTES'
+          expect(early_allocation_badge.text).to eq 'EARLY ALLOCATION NOTES'
         end
       end
 
@@ -37,8 +40,9 @@ RSpec.describe "prisoners/show", type: :view do
           let(:early_allocation) { build(:early_allocation, :discretionary_declined) }
 
           it 'displays badge text EARLY ALLOCATION NOTES' do
+            expect(badge_count).to eq(1)
             expect(early_allocation_badge.attributes['class'].value).to include 'moj-badge--blue'
-            expect(early_allocation_badge.text).to include 'EARLY ALLOCATION NOTES'
+            expect(early_allocation_badge.text).to eq 'EARLY ALLOCATION NOTES'
           end
         end
 
@@ -46,8 +50,9 @@ RSpec.describe "prisoners/show", type: :view do
           let(:early_allocation) { build(:early_allocation, :discretionary) }
 
           it 'displays badge text EARLY ALLOCATION ACTIVE' do
+            expect(badge_count).to eq(1)
             expect(early_allocation_badge.attributes['class'].value).to include 'moj-badge--blue'
-            expect(early_allocation_badge.text).to include 'EARLY ALLOCATION ACTIVE'
+            expect(early_allocation_badge.text).to eq 'EARLY ALLOCATION ACTIVE'
           end
         end
 
@@ -55,6 +60,7 @@ RSpec.describe "prisoners/show", type: :view do
           let(:early_allocation) { build(:early_allocation, :discretionary_accepted) }
 
           it 'displays badge text EARLY ALLOCATION APPROVED' do
+            expect(badge_count).to eq(1)
             expect(early_allocation_badge.attributes['class'].value).to include 'moj-badge--blue'
             expect(early_allocation_badge.text).to eq 'EARLY ALLOCATION APPROVED'
           end
@@ -65,7 +71,7 @@ RSpec.describe "prisoners/show", type: :view do
 
           it 'displays badge text EARLY ALLOCATION APPROVED' do
             expect(early_allocation_badge.attributes['class'].value).to include 'moj-badge--blue'
-            expect(early_allocation_badge.text).to include 'EARLY ALLOCATION APPROVED'
+            expect(early_allocation_badge.text).to eq 'EARLY ALLOCATION APPROVED'
           end
         end
       end
