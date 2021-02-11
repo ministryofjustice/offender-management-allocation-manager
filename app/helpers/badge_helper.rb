@@ -34,6 +34,6 @@ module BadgeHelper
   end
 
   def early_allocation_approved?(early_allocations)
-    early_allocations.any? && early_allocations.last.community_decision_eligible_or_automatically_eligible?
+    early_allocations.any? && early_allocations.last.created_within_referral_window? && early_allocations.last.community_decision_eligible_or_automatically_eligible?
   end
 end
