@@ -105,9 +105,11 @@ private
   end
 
   def self.early_allocation_handover_start_date(offender)
-    return nil if offender.conditional_release_date.nil?
+    offender.release_date - 18.months
+  end
 
-    offender.conditional_release_date - 18.months
+  def self.early_allocation_handover_date(offender)
+    offender.release_date - 15.months
   end
 
   def self.determinate_sentence_handover_start_date(offender)
@@ -134,10 +136,8 @@ private
 
   def self.nps_handover_date(offender)
     if offender.early_allocation?
-      return [early_allocation_handover_date(offender), 'NPS Early Allocation']
-    end
-
-    if offender.indeterminate_sentence?
+      [early_allocation_handover_date(offender), 'NPS Early Allocation']
+    elsif offender.indeterminate_sentence?
       [indeterminate_responsibility_date(offender), 'NPS Inderminate']
     elsif offender.parole_eligibility_date.present?
       [offender.parole_eligibility_date - 8.months, 'NPS Determinate Parole Case']
@@ -183,10 +183,6 @@ private
 
       [earliest_date, offender.home_detention_curfew_eligibility_date].compact.min
     end
-  end
-
-  def self.early_allocation_handover_date(offender)
-    offender.conditional_release_date - 15.months
   end
 
   def self.nps_responsibility_rules(offender:, policy_start_date:, handover_date:, cutoff_date:)
