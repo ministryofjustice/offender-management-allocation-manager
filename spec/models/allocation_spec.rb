@@ -5,7 +5,7 @@ RSpec.describe Allocation, type: :model do
   let(:nomis_offender_id) { 'A3434LK' }
   let(:another_nomis_offender_id) { 654_321 }
 
-  describe '#without_ldu_emails', :allocation do
+  describe '#without_ldu_emails' do
     # CRC offender with no team
     let!(:crc_without_team) {
       case_info = create(:case_information, case_allocation: 'CRC', team: nil)
@@ -70,7 +70,7 @@ RSpec.describe Allocation, type: :model do
     it { is_expected.to validate_presence_of(:event_trigger) }
   end
 
-  context 'with allocations', :allocation do
+  context 'with allocations' do
     let(:prison) { build(:prison) }
     let(:pom) { build(:pom, staffId: nomis_staff_id) }
 
@@ -194,7 +194,7 @@ RSpec.describe Allocation, type: :model do
       end
     end
 
-    describe '#active?', :allocation do
+    describe '#active?' do
       it 'return true if an Allocation has been assigned a Primary POM' do
         alloc = AllocationService.current_allocation_for(nomis_offender_id)
         expect(alloc.active?).to be(true)
@@ -208,7 +208,7 @@ RSpec.describe Allocation, type: :model do
       end
     end
 
-    describe '#override_reasons', :allocation do
+    describe '#override_reasons' do
       let!(:allocation_no_overrides) {
         create(
           :allocation,
@@ -225,7 +225,7 @@ RSpec.describe Allocation, type: :model do
       end
     end
 
-    describe '#active_pom_allocations', :allocation do
+    describe '#active_pom_allocations' do
       let!(:secondary_allocation) {
         create(
           :allocation,
@@ -254,7 +254,7 @@ RSpec.describe Allocation, type: :model do
     end
   end
 
-  describe 'automate pushing the primary pom to ndelius' do
+  describe 'automate pushing the primary pom to ndelius', :push_pom_to_delius do
     let(:prison) { build(:prison).code }
 
     context 'when a new allocation is created and a POM is set' do
@@ -262,7 +262,6 @@ RSpec.describe Allocation, type: :model do
         expect(PrisonOffenderManagerService).to receive(:get_pom_name).with(nomis_staff_id).and_return ['Bill', 'Jones']
         expect(HmppsApi::CommunityApi).to receive(:set_pom).with offender_no: nomis_offender_id, prison: prison, forename: 'Bill', surname: 'Jones'
       end
-
 
       it 'pushes the POM name to Ndelius'do
         create(:allocation, :primary, nomis_offender_id: nomis_offender_id, prison: prison, primary_pom_nomis_id: nomis_staff_id)

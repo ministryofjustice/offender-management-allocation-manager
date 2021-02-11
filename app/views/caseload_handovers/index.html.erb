@@ -2,7 +2,9 @@
   <%= render '/layouts/prison_switcher' %>
 <% end %>
 
-<%= render(:partial => 'handovers/subnav', :locals => {:active => :caseload_handovers}) %>
+<%= render(:partial => 'handovers/subnav', :locals => {:active => :caseload_handovers,
+                                                       prison_total_handovers: @prison_total_handovers,
+                                                       pending_handover_count: @pending_handover_count}) %>
 
 <% if @pom.blank? %>
   <h2 class="govuk-heading-l">No pending cases </h2>
@@ -14,24 +16,72 @@
   <table class="govuk-table responsive tablesorter">
     <thead class="govuk-table__head">
     <tr class="govuk-table__row">
-      <th class="govuk-table__header" scope="col">Prisoner name</th>
-      <th class="govuk-table__header" scope="col">Prisoner number</th>
-      <th class="govuk-table__header" scope="col">Handover<br/>start date</th>
-      <th class="govuk-table__header" scope="col">Responsibility<br/>handover</th>
-      <th class="govuk-table__header" scope="col">Earliest release<br/>date</th>
-      <th class="govuk-table__header" scope="col">Role</th>
-      <th class="govuk-table__header" scope="col">Action</th>
+      <th class="govuk-table__header" scope="col">
+        <a href="<%= sort_link('last_name') %>">
+          Prisoner
+        </a>
+        <%= sort_arrow('last_name') %>
+      </th>
+      <th class="govuk-table__header sorter-false" xscope="col">
+        <a href="<%= sort_link('handover_start_date') %>">
+          Handover start date
+        </a>
+        <%= sort_arrow('handover_start_date') %>
+      </th>
+      <th class="govuk-table__header sorter-false" xscope="col">
+        <a href="<%= sort_link('responsibility_handover_date') %>">
+          Responsibility changes
+        </a>
+        <%= sort_arrow('responsibility_handover_date') %>
+      </th>
+      <th class="govuk-table__header sorter-false" xscope="col">
+        <a href="<%= sort_link('pom_responsibility') %>">
+          POM Role
+        </a>
+        <%= sort_arrow('pom_responsibility') %>
+      </th>
+      <th class="govuk-table__header sorter-false" xscope="col">
+        <a href="<%= sort_link('allocated_com_name') %>">
+          COM
+        </a>
+        <%= sort_arrow('allocated_com_name') %>
+      </th>
+      <th class="govuk-table__header sorter-false" xscope="col">
+        <a href="<%= sort_link('case_allocation') %>">
+          Service provider
+        </a>
+        <%= sort_arrow('case_allocation') %>
+      </th>
+      <th class="govuk-table__header sorter-false" xscope="col">
+        Action
+      </th>
     </tr>
     </thead>
     <tbody class="govuk-table__body">
-    <% @upcoming_handovers.each_with_index do |offender, i| %>
+    <% @offenders.each_with_index do |offender, i| %>
       <tr class="govuk-table__row offender_row_<%= i %>">
-        <td aria-label="Prisoner name" class="govuk-table__cell "><%= offender.full_name %></td>
-        <td aria-label="Prisoner number" class="govuk-table__cell "><%= offender.offender_no %></td>
-        <td aria-label="Handover start date" class="govuk-table__cell "><%= format_date(offender.handover_start_date) %></td>
-        <td aria-label="Responsibility handover" class="govuk-table__cell "><%= format_date(offender.responsibility_handover_date) %></td>
-        <td aria-label="Earliest release date" class="govuk-table__cell "><%= format_date(offender.earliest_release_date, replacement: "Unknown") %></td>
-        <td aria-label="Role" class="govuk-table__cell "><%= offender.pom_responsibility %></td>
+        <td aria-label="Prisoner name" class="govuk-table__cell ">
+          <%= offender.full_name %>
+          <br/>
+          <span class='govuk-hint govuk-!-margin-bottom-0'>
+            <%= offender.offender_no %>
+          </span>
+        </td>
+        <td aria-label="Handover start date" class="govuk-table__cell">
+          <%= format_date(offender.handover_start_date, replacement: "Unknown") %>
+        </td>
+        <td aria-label="Responsibility changes" class="govuk-table__cell">
+          <%= format_date(offender.responsibility_handover_date, replacement: "Unknown") %>
+        </td>
+        <td aria-label="POM Role" class="govuk-table__cell">
+          <%= pom_responsibility_label(offender) %>
+        </td>
+        <td aria-label="COM" class="govuk-table__cell">
+          <%= offender.allocated_com_name || "Not allocated" %>
+        </td>
+        <td aria-label="Service provider" class="govuk-table__cell">
+          <%= offender.case_allocation %>
+        </td>
         <td aria-label="Action" class="govuk-table__cell ">
           <%= link_to('View', prison_prisoner_path(@prison.code, offender.offender_no), class: "govuk-link" ) %>
         </td>

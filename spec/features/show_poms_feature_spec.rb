@@ -16,7 +16,7 @@ feature "get poms list" do
     expect(page).to have_content("Probation POM")
   end
 
-  it "handles missing sentence data", :allocation, vcr: { cassette_name: :show_poms_feature_missing_sentence } do
+  it "handles missing sentence data", vcr: { cassette_name: :show_poms_feature_missing_sentence } do
     visit prison_confirm_allocation_path('LEI', offender_missing_sentence_case_info.nomis_offender_id, 485_926)
     click_button 'Complete allocation'
 
@@ -35,7 +35,7 @@ feature "get poms list" do
     expect(page).to have_content("Caseload")
   end
 
-  it "can sort offenders allocated to a POM", :allocation,  vcr: { cassette_name: :show_poms_feature_view_sorting } do
+  it "can sort offenders allocated to a POM", vcr: { cassette_name: :show_poms_feature_view_sorting } do
     [['G7806VO', 754_207], ['G2911GD', 1_175_317]].each do |offender_id, booking|
       create(:case_information, nomis_offender_id: offender_id)
       AllocationService.create_or_update(

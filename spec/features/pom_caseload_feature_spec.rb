@@ -1,6 +1,6 @@
 require "rails_helper"
 
-feature "view POM's caseload", :allocation do
+feature "view POM's caseload" do
   let(:nomis_staff_id) { 485_926 }
   let(:nomis_offender_id) { 'G4273GI' }
   let(:tomorrow) { Date.tomorrow }
@@ -9,27 +9,31 @@ feature "view POM's caseload", :allocation do
 
   let(:offender_map) {
     {
-      'G7266VD' => 1_073_602,
-      'G8563UA' => 1_020_605,
-      'G6068GV' => 1_030_841,
-      'G0572VU' => 861_029,
-      'G8668GF' => 1_106_348,
-      'G9465UP' => 1_186_259,
-      'G9372GQ' => 752_833,
-      'G1618UI' => 1_161_236,
-      'G4328GK' => 1_055_341,
-      'G4143VX' => 1_083_858,
-      'G8180UO' => 1_172_076,
-      'G8909GV' => 877_782,
-      'G8339GD' => 260_708,
-      'G1992GH' => 1_179_167,
-      'G1986GG' => 1_165_890,
-      'G6262GI' => 961_997,
-      'G6653UC' => 1_009_990,
-      'G5992GA' => 928_042,
-      'G4706UP' => 1_180_800,
-      'G9344UG' => 841_994
+      'G7266VD' => 1_073,
+      'G8563UA' => 1_020,
+      'G6068GV' => 1_030,
+      'G0572VU' => 861,
+      'G8668GF' => 1_106,
+      'G9465UP' => 1_186,
+      'G9372GQ' => 752,
+      'G1618UI' => 1_161,
+      'G4328GK' => 1_055,
+      'G4143VX' => 1_083,
+      'G8180UO' => 1_172,
+      'G8909GV' => 877,
+      'G8339GD' => 260,
+      'G1992GH' => 1_179,
+      'G1986GG' => 1_165,
+      'G6262GI' => 961,
+      'G6653UC' => 1_009,
+      'G5992GA' => 928,
+      'G4706UP' => 1_180,
+      'G9344UG' => 841
     }
+  }
+  let(:nil_release_date_offender) { 'G9372GQ' }
+  let(:offender_ids_by_release_date) {
+    offender_map.excluding(nil_release_date_offender).map { |k, v| [k, v] }.sort_by { |_k, v| v }.map { |k, _v| k }
   }
   let(:offenders) {
     offender_map.merge(nomis_offender_id => 1_153_753).
@@ -39,7 +43,7 @@ feature "view POM's caseload", :allocation do
             sentence: attributes_for(:sentence_detail,
                                      automaticReleaseDate: "2031-01-22",
                                      conditionalReleaseDate: "2031-01-24",
-                                     tariffDate: Time.zone.today + booking_id.minutes))
+                                     tariffDate: (nomis_id == nil_release_date_offender) ? nil : Time.zone.today + booking_id.days))
     }
   }
   let(:sorted_offenders) {
@@ -109,13 +113,12 @@ feature "view POM's caseload", :allocation do
       end
     end
 
-    it 'can be sorted by earliest release date' do
+    it 'can be sorted by earliest release date', :js do
       page.all('th')[3].find('a').click
 
-      bookings_by_release_date = offenders.sort_by { |o| o.fetch(:sentence).fetch(:tariffDate) }
-      [6, 7].each do |row_index|
+      (6..7).each do |row_index|
         within ".offender_row_#{row_index}" do
-          offender = offenders.detect { |o| o.fetch(:offenderNo) == bookings_by_release_date[row_index].fetch(:offenderNo) }
+          offender = offenders.detect { |o| o.fetch(:offenderNo) == offender_ids_by_release_date[row_index] }
           name = "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}"
           expect(page).to have_content(name)
         end

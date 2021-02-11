@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature 'View a prisoner profile page', :allocation do
+feature 'View a prisoner profile page' do
   before do
     signin_spo_user
   end
@@ -17,7 +17,7 @@ feature 'View a prisoner profile page', :allocation do
     end
   end
 
-  context 'with an existing early allocation',  vcr: { cassette_name: :early_allocation_banner } do
+  context 'with an existing early allocation', vcr: { cassette_name: :early_allocation_banner } do
     before do
       create(:case_information, nomis_offender_id: 'G7998GJ', early_allocations: [build(:early_allocation, created_within_referral_window: within_window)])
       visit prison_prisoner_path('LEI', 'G7998GJ')
@@ -40,14 +40,13 @@ feature 'View a prisoner profile page', :allocation do
     end
   end
 
-  context 'with an allocation' do
+  context 'with an allocation', :allocation do
     before do
       create(:case_information, nomis_offender_id: 'G7998GJ', victim_liaison_officers: [build(:victim_liaison_officer)])
       create(:allocation, nomis_offender_id: 'G7998GJ', primary_pom_nomis_id: '485637', primary_pom_name: 'Pobno, Kath')
     end
 
-    let(:alloc) { Allocation.last }
-
+    let(:allocation) { Allocation.last }
     let(:initial_vlo) { VictimLiaisonOfficer.last }
 
     context 'without anything extra', vcr: { cassette_name: :show_offender_spec }  do
@@ -123,12 +122,27 @@ feature 'View a prisoner profile page', :allocation do
 
       it 'shows the POM name (fetched from NOMIS)' do
         # check the primary POM name stored in the allocation
-        allocation = Allocation.last
         expect(allocation.primary_pom_name).to eq('Pobno, Kath')
 
         # ensure that the POM name displayed is the one actually returned from NOMIS
         pom_name = find('#primary_pom_name').text
         expect(pom_name).to eq('Pobee-Norris, Kath')
+      end
+
+      it 'shows the prisoner image', vcr: { cassette_name: :show_offender_spec_image } do
+        visit prison_prisoner_image_path('LEI', 'G7998GJ', format: :jpg)
+        expect(page.response_headers['Content-Type']).to eq('image/jpg')
+      end
+
+      it "has a link to the allocation history", vcr: { cassette_name: :link_to_allocation_history } do
+        visit prison_prisoner_path('LEI', 'G7998GJ')
+        click_link "View"
+        expect(page).to have_content('Prisoner allocated')
+      end
+
+      it 'displays the non-disclosable badge on the VLO table', vcr: { cassette_name: :vlo_non_disclosable_badge } do
+        visit prison_prisoner_path('LEI', 'G7998GJ')
+        expect(page).to have_css('#non-disclosable-badge', text: 'Non-Disclosable')
       end
     end
 
@@ -142,22 +156,6 @@ feature 'View a prisoner profile page', :allocation do
 
         expect(page).to have_content('Supporting')
       end
-    end
-
-    it 'shows the prisoner image', vcr: { cassette_name: :show_offender_spec_image } do
-      visit prison_prisoner_image_path('LEI', 'G7998GJ', format: :jpg)
-      expect(page.response_headers['Content-Type']).to eq('image/jpg')
-    end
-
-    it "has a link to the allocation history", vcr: { cassette_name: :link_to_allocation_history } do
-      visit prison_prisoner_path('LEI', 'G7998GJ')
-      click_link "View"
-      expect(page).to have_content('Prisoner allocated')
-    end
-
-    it 'displays the non-disclosable badge on the VLO table', vcr: { cassette_name: :vlo_non_disclosable_badge } do
-      visit prison_prisoner_path('LEI', 'G7998GJ')
-      expect(page).to have_css('#non-disclosable-badge', text: 'Non-Disclosable')
     end
   end
 
@@ -192,12 +190,11 @@ feature 'View a prisoner profile page', :allocation do
                nomis_offender_id: 'G7998GJ',
                team: team
         )
+
+        visit prison_prisoner_path('LEI', 'G7998GJ')
       end
 
-      it "has some community information when present", :js, vcr: { cassette_name: :show_offender_community_info_partial } do
-        visit prison_prisoner_path('LEI', 'G7998GJ')
-
-        expect(page).not_to have_content('Bob Smith')
+      it "displays team and LDU as unknown", :js, vcr: { cassette_name: :show_offender_community_info_partial } do
         # Expect an Unknown for LDU Email and Team
         within '#community_information' do
           expect(page).to have_content('Unknown', count: 2)

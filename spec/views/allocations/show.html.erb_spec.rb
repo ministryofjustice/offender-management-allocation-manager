@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe "allocations/show", :allocation, type: :view do
+RSpec.describe "allocations/show", type: :view do
   before do
     assign(:prison, build(:prison))
     assign(:pom, build(:pom))

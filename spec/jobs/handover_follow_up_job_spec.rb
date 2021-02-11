@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe HandoverFollowUpJob, :allocation, type: :job do
+RSpec.describe HandoverFollowUpJob, type: :job do
   shared_context 'with expected behaviour' do
     let(:offender) do
       build_offender(Time.zone.today + 8.months,

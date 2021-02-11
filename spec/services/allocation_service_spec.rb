@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe AllocationService, :allocation do
+describe AllocationService do
   include ActiveJob::TestHelper
 
   let(:nomis_offender_id) { 'G4273GI' }

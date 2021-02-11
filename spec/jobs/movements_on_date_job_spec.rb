@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe MovementsOnDateJob, :allocation, type: :job do
+RSpec.describe MovementsOnDateJob, type: :job do
   let(:nomis_offender_id) { 'G3462VT' }
   let!(:alloc) { create(:allocation, nomis_offender_id: nomis_offender_id, secondary_pom_nomis_id: 123_435, prison: 'MDI') }
 

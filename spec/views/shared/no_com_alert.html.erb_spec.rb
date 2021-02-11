@@ -4,13 +4,9 @@ RSpec.describe "shared/no_com_alert", type: :view do
   let(:page) { Nokogiri::HTML(rendered) }
 
   let(:offender) do
-    build(:offender, :determinate, latestLocationId: 'LEI', offenderNo: 'G8060UF',
+    build(:offender, :determinate,
           sentence: build(:sentence_detail,
-                          sentenceStartDate: Time.zone.today - 11.months,
-                          conditionalReleaseDate: Time.zone.today + 8.months,
-                          automaticReleaseDate: Time.zone.today + 8.months,
-                          releaseDate: Time.zone.today + 8.months,
-                          tariffDate: nil))
+                          :inside_handover_window))
   end
 
   before do
