@@ -1,4 +1,4 @@
-<% if needs_com_but_ldu_is_uncontactable?(@prisoner)%>
+<% if @prisoner.needs_com_and_ldu_is_uncontactable? %>
   <%= render partial: 'shared/no_com_alert' %>
 <% end %>
 
@@ -27,7 +27,7 @@
       </div>
     </div>
     <div class="case-type-badge">
-      <%= render 'shared/case_type_badge', offender: @prisoner %>
+      <%= render 'shared/case_type_badge', offender: @prisoner, early_allocations: @case_info.nil? ? [] : @case_info.early_allocations %>
     </div>
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-third">

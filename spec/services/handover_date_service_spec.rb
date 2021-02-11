@@ -4,12 +4,14 @@ describe HandoverDateService do
   context 'when prescoed' do
     subject do
       handover = described_class.handover(offender)
-      { start_date: handover.start_date,
-        handover_date: handover.handover_date,
-        reason: handover.reason
+      {
+          start_date: handover.start_date,
+          handover_date: handover.handover_date,
+          reason: handover.reason
       }
     end
 
+    let(:com_support) { described_class.handover(offender).community.supporting? }
     let(:recent_date) { HandoverDateService::PRESCOED_CUTOFF_DATE }
     let(:past_date) { HandoverDateService::PRESCOED_CUTOFF_DATE - 1.day }
 
@@ -31,21 +33,33 @@ describe HandoverDateService do
           it 'starts on arrival date, and hands over 8 months before tariff date' do
             expect(subject).to eq(start_date: arrival_date, handover_date: Date.new(2022, 1, 1), reason: 'Prescoed')
           end
+
+          it 'is com responsible' do
+            expect(described_class.handover(offender).community.responsible?).to eq(true)
+          end
         end
 
         context 'with CRC welsh offender' do
           let(:case_info) { build(:case_information, :welsh, :crc) }
 
-          it 'does something' do
+          it 'has a normal start date' do
             expect(subject).to eq(start_date: Date.new(2022, 1, 1), handover_date: Date.new(2022, 1, 1), reason: 'NPS Inderminate')
+          end
+
+          it 'is not com supporting' do
+            expect(com_support).to eq(false)
           end
         end
 
         context 'with NPS english offender' do
           let(:case_info) { build(:case_information, :english, :nps) }
 
-          it 'does something' do
+          it 'has a normal start date' do
             expect(subject).to eq(start_date: Date.new(2022, 1, 1), handover_date: Date.new(2022, 1, 1), reason: 'NPS Inderminate')
+          end
+
+          it 'is not com supporting' do
+            expect(com_support).to eq(false)
           end
         end
       end
@@ -54,19 +68,53 @@ describe HandoverDateService do
         let(:arrival_date) { past_date }
         let(:case_info) { build(:case_information, :welsh, :nps) }
 
-        it 'does something' do
+        it 'has a normal start date' do
           expect(subject).to eq(start_date: Date.new(2022, 1, 1), handover_date: Date.new(2022, 1, 1), reason: 'NPS Inderminate')
+        end
+
+        it 'is not com supporting' do
+          expect(com_support).to eq(false)
+        end
+      end
+    end
+
+    context 'with determinate recent' do
+      let(:offender) {
+        build(:offender_summary, :prescoed, :determinate,
+              sentence: build(:sentence_detail, :welsh_policy_sentence, tariffDate: '2022-09-01')).tap { |o|
+          o.prison_arrival_date = recent_date
+          o.load_case_information(case_info)
+        }
+      }
+
+      let(:case_info) { build(:case_information, :welsh, :nps) }
+
+      it 'has a normal start date' do
+        expect(subject).to eq(start_date: Date.new(2021, 6, 13), handover_date: Date.new(2021, 9, 13), reason: 'NPS - MAPPA level unknown')
+      end
+
+      it 'is not com supporting when before start date' do
+        Timecop.travel Date.new(2021, 6, 12) do
+          expect(com_support).to eq(false)
         end
       end
     end
   end
 
   describe 'calculating when community start supporting custody' do
+    subject do
+      x = described_class.handover(offender)
+      {
+          start_date: x.start_date,
+          handover_date: x.handover_date
+      }
+    end
+
     context 'when recalled' do
       let(:offender) { OpenStruct.new(recalled?: true) }
 
       it 'is not calculated' do
-        expect(described_class.handover(offender).start_date).to be_nil
+        expect(subject).to eq(start_date: nil, handover_date: nil)
       end
     end
 
@@ -86,7 +134,35 @@ describe HandoverDateService do
         let(:indeterminate) { false }
 
         it 'is 7.5 months before release date' do
-          expect(described_class.handover(offender).start_date).to eq(Date.new(2025, 1, 15))
+          expect(subject).to eq(start_date: Date.new(2025, 1, 15), handover_date: Date.new(2025, 4, 15))
+        end
+
+        describe 'com_supporting?' do
+          subject { described_class.handover(offender).community.supporting? }
+
+          context 'when before start' do
+            it 'is false' do
+              Timecop.travel Date.new(2025, 1, 14) do
+                expect(subject).to eq(false)
+              end
+            end
+          end
+
+          context 'when after end' do
+            it 'is false' do
+              Timecop.travel Date.new(2025, 4, 16) do
+                expect(subject).to eq(false)
+              end
+            end
+          end
+
+          context 'when between dates' do
+            it 'is true' do
+              Timecop.travel Date.new(2025, 3, 16) do
+                expect(subject).to eq(true)
+              end
+            end
+          end
         end
       end
 
@@ -102,6 +178,10 @@ describe HandoverDateService do
 
           it 'is not set' do
             expect(described_class.handover(offender).start_date).to be_nil
+          end
+
+          it 'is not community supporting' do
+            expect(described_class.handover(offender).community.supporting?).to eq(false)
           end
         end
       end
@@ -130,45 +210,116 @@ describe HandoverDateService do
     end
 
     context 'with early allocation' do
-      let(:offender) {
-        build(:offender,
-              sentence: build(:sentence_detail,
-                              conditionalReleaseDate: Date.new(2021, 6, 2))).tap { |o|
-          o.load_case_information(case_info)
+      let(:crd) { Date.new(2021, 6, 2) }
+
+      context 'when outside referral window' do
+        let(:offender) {
+          build(:offender, :determinate,
+                sentence: build(:sentence_detail, :english_policy_sentence,
+                                automaticReleaseDate: ard,
+                                conditionalReleaseDate: crd)).tap { |o|
+            o.load_case_information(case_info)
+          }
         }
-      }
+        let(:case_info) { build(:case_information, early_allocations: [build(:early_allocation, created_within_referral_window: false)]) }
+        let(:ard) { nil }
 
-      context 'when inside referral window' do
-        let(:case_info) { build(:case_information, early_allocations: [build(:early_allocation, created_within_referral_window: true)]) }
-
-        it 'will be 18 months before CRD' do
-          expect(described_class.handover(offender).start_date).to eq(Date.new(2019, 12, 2))
+        it 'will be unaffected' do
+          expect(subject).to eq(start_date: Date.new(2020, 10, 18), handover_date: Date.new(2021, 1, 18))
         end
       end
 
-      context 'when outside referral window' do
-        let(:case_info) { build(:case_information, early_allocations: [build(:early_allocation, created_within_referral_window: false)]) }
+      context 'when indeterminate' do
+        let(:ted) { Date.new(2022, 7, 3) }
 
-        it 'will be unaffected' do
-          expect(described_class.handover(offender).start_date).to eq(Date.new(2020, 10, 18))
+        let(:offender) {
+          build(:offender, :indeterminate,
+                sentence: build(:sentence_detail, :indeterminate,
+                                paroleEligibilityDate: ped,
+                                tariffDate: ted)).tap { |o|
+            o.load_case_information(case_info)
+          }
+        }
+        let(:case_info) { build(:case_information, early_allocations: [build(:early_allocation, created_within_referral_window: true)]) }
+
+        context 'without PED' do
+          let(:ped) { nil }
+
+          it 'will be 15/18 months before TED' do
+            expect(subject).to eq(start_date: Date.new(2021, 1, 3), handover_date: Date.new(2021, 4, 3))
+          end
+        end
+
+        context 'with earlier PED' do
+          let(:ped) { Date.new(2022, 7, 2)  }
+
+          it 'will be 15/18 months before PED' do
+            expect(subject).to eq(start_date: Date.new(2021, 1, 2), handover_date: Date.new(2021, 4, 2))
+          end
+        end
+      end
+
+      context 'when determinate' do
+        let(:offender) {
+          build(:offender, :determinate,
+                sentence: build(:sentence_detail, :english_policy_sentence,
+                                automaticReleaseDate: ard,
+                                conditionalReleaseDate: crd)).tap { |o|
+            o.load_case_information(case_info)
+          }
+        }
+
+        context 'when inside referral window' do
+          let(:case_info) { build(:case_information, early_allocations: [build(:early_allocation, created_within_referral_window: true)]) }
+
+          context 'without ARD' do
+            let(:ard) { nil }
+
+            it 'will be 15/18 months before CRD' do
+              expect(subject).to eq(start_date: Date.new(2019, 12, 2), handover_date: Date.new(2020, 3, 2))
+            end
+          end
+
+          context 'with earlier ARD' do
+            let(:ard) { Date.new(2021, 6, 1) }
+
+            it 'will be 15/18 months before ARD' do
+              expect(subject).to eq(start_date: Date.new(2019, 12, 1), handover_date: Date.new(2020, 3, 1))
+            end
+          end
+        end
+
+        context 'when outside referral window' do
+          let(:case_info) { build(:case_information, early_allocations: [build(:early_allocation, created_within_referral_window: false)]) }
+          let(:ard) { nil }
+
+          it 'will be unaffected' do
+            expect(subject).to eq(start_date: Date.new(2020, 10, 18), handover_date: Date.new(2021, 1, 18))
+          end
         end
       end
     end
   end
 
-  describe 'calculating when responsibilty switches from custody to community' do
+  describe 'handover dates' do
     let(:result) { described_class.handover(offender).handover_date }
+    let(:trait) {
+      if indeterminate_sentence
+        recall? ? :indeterminate_recall : :indeterminate
+      else
+        recall? ? :determinate_recall : :determinate
+      end
+    }
 
     let(:offender) do
-      # these are both non-recall scenarios
-      build(:offender, indeterminate_sentence ? :indeterminate : :determinate,
+      build(:offender, trait,
             sentence: build(:sentence_detail,
-                            automaticReleaseDate: automatic_release_date&.to_s,
-                            conditionalReleaseDate: conditional_release_date&.to_s,
-                            paroleEligibilityDate: parole_date&.to_s,
-                            homeDetentionCurfewActualDate: home_detention_curfew_actual_date&.to_s,
-                            homeDetentionCurfewEligibilityDate: home_detention_curfew_eligibility_date&.to_s,
-                            tariffDate: tariff_date&.to_s)).
+                            automaticReleaseDate: automatic_release_date,
+                            conditionalReleaseDate: conditional_release_date,
+                            paroleEligibilityDate: parole_date,
+                            homeDetentionCurfewActualDate: home_detention_curfew_actual_date,
+                            homeDetentionCurfewEligibilityDate: home_detention_curfew_eligibility_date,
+                            tariffDate: tariff_date)).
           tap { |o| o.load_case_information(case_info) }
     end
 
@@ -179,8 +330,9 @@ describe HandoverDateService do
     let(:parole_date) { nil }
     let(:mappa_level) { nil }
     let(:tariff_date) { nil }
-    let(:indeterminate_sentence) { nil }
+    let(:indeterminate_sentence) { false }
     let(:early_allocation) { nil }
+    let(:recall?) { false }
 
     context 'when CRC' do
       let(:case_info) { build(:case_information, :crc) }
@@ -405,23 +557,10 @@ describe HandoverDateService do
           end
         end
       end
-
-      context 'with early_allocation' do
-        let(:case_info) { build(:case_information, :nps, mappa_level: mappa_level, early_allocations: [build(:early_allocation)]) }
-
-        context 'when CRD earliest' do
-          let(:conditional_release_date) { Date.new(2019, 7, 1) }
-
-          it 'is 15 months before CRD' do
-            expect(result).to eq(Date.new(2018, 4, 1))
-          end
-        end
-      end
     end
   end
 
   describe '#nps_start_date' do
-    let(:early_allocation) { false }
     let(:indeterminate_sentence) { false }
     let(:conditional_release_date) { nil }
     let(:parole_eligibility_date) { nil }
@@ -433,31 +572,13 @@ describe HandoverDateService do
         double(
           automatic_release_date: automatic_release_date,
           conditional_release_date: conditional_release_date,
-          "early_allocation?" => early_allocation,
+          "early_allocation?" => false,
           "indeterminate_sentence?" => indeterminate_sentence,
           parole_eligibility_date: parole_eligibility_date,
           parole_review_date: nil,
           tariff_date: tariff_date
         )
       )
-    end
-
-    context 'when the case is early allocation' do
-      let(:early_allocation) { true }
-
-      context 'with a conditional release date' do
-        let(:conditional_release_date) { '1 Jan 2020'.to_date }
-
-        it 'returns 18 months before that date' do
-          expect(result).to eq(conditional_release_date - 18.months)
-        end
-      end
-
-      context 'without a conditional release date' do
-        it 'returns nil' do
-          expect(result).to be_nil
-        end
-      end
     end
 
     context 'with an indeterminate sentence' do

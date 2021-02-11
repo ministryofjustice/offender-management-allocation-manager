@@ -106,7 +106,7 @@ module HmppsApi
 
     def pom_responsibility
       if @responsibility_override.nil?
-        HandoverDateService.handover(self).responsibility
+        HandoverDateService.handover(self).custody
       elsif @responsibility_override.value == Responsibility::PRISON
         HandoverDateService::RESPONSIBLE
       else
@@ -197,6 +197,10 @@ module HmppsApi
       earliest_date.present? && earliest_date <= Time.zone.today + 18.months
     end
 
+    def needs_com_and_ldu_is_uncontactable?
+      needs_com? && sentenced? && allocated_com_name.blank? && ldu_email_address.blank?
+    end
+
     def inside_omic_policy?
       over_18? &&
         (sentenced? || immigration_case?) &&
@@ -204,6 +208,10 @@ module HmppsApi
     end
 
   private
+
+    def needs_com?
+      handover.community.responsible? || handover.community.supporting?
+    end
 
     def age
       return nil if date_of_birth.blank?
@@ -237,7 +245,7 @@ module HmppsApi
     end
 
     def handover
-      @handover ||= if pom_responsibility.custody?
+      @handover ||= if pom_responsibility.responsible?
                       HandoverDateService.handover(self)
                     else
                       HandoverDateService::NO_HANDOVER_DATE

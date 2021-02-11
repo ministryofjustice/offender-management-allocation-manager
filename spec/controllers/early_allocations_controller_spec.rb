@@ -138,11 +138,9 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
       create(:case_information, nomis_offender_id: nomis_offender_id)
     end
 
-    context 'when stage 1' do
+    context 'when on eligible screen' do
       let(:eligible_params) {
-        { "oasys_risk_assessment_date(3i)" => valid_date.day,
-          "oasys_risk_assessment_date(2i)" => valid_date.month,
-          "oasys_risk_assessment_date(1i)" => valid_date.year
+        { "oasys_risk_assessment_date" => valid_date,
         }.merge(s1_boolean_params)
       }
       let(:early_allocation) { EarlyAllocation.last }

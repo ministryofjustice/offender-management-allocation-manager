@@ -1,12 +1,12 @@
 <%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
 
-<% if needs_com_but_ldu_is_uncontactable?(@prisoner)%>
+<% if @prisoner.needs_com_and_ldu_is_uncontactable? %>
   <%= render partial: 'shared/no_com_alert' %>
 <% end %>
 
 <h1 class="govuk-heading-l govuk-!-margin-bottom-5">Allocate a Prison Offender Manager</h1>
 
-<%= render 'shared/basic_prisoner_info' %>
+<%= render 'shared/basic_prisoner_info', case_info: @case_info, prisoner: @prisoner %>
 
 <%= render partial: 'shared/offence_info', locals: { editable_prd: true }  %>
 

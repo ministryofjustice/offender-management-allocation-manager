@@ -74,7 +74,7 @@ private
   end
 
   def current_responsibility
-    @offender.pom_responsibility.to_s.downcase
+    @offender.pom_responsibility.responsible? ? 'responsible' : 'supporting'
   end
 
   def previous_pom

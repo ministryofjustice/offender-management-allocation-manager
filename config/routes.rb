@@ -23,6 +23,7 @@ Rails.application.routes.draw do
 
       resources :early_allocations, only: [:new, :index, :show] do
         collection do
+          post 'oasys_date'
           post 'eligible'
           post 'discretionary'
           post 'confirm_with_reason'

@@ -19,6 +19,7 @@ class CoworkingController < PrisonsApplicationController
 
     @prison_poms = @active_poms.select(&:prison_officer?)
     @probation_poms = @active_poms.select(&:probation_officer?)
+    @case_info = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: nomis_offender_id_from_url)
   end
 
   def confirm
@@ -50,8 +51,6 @@ class CoworkingController < PrisonsApplicationController
 
   def confirm_removal
     @prisoner = offender(coworking_nomis_offender_id_from_url)
-
-    @responsibility_type = @prisoner.pom_responsibility
 
     @allocation = Allocation.find_by!(
       nomis_offender_id: coworking_nomis_offender_id_from_url

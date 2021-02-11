@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class AllocationsController < PrisonsApplicationController
-  before_action :ensure_spo_user
+  before_action :ensure_spo_user, except: :history
 
   delegate :update, to: :create
 
@@ -13,6 +13,7 @@ class AllocationsController < PrisonsApplicationController
       recommended_and_nonrecommended_poms_for(@prisoner)
     @unavailable_pom_count = unavailable_pom_count
     @allocation = Allocation.find_by nomis_offender_id: nomis_offender_id_from_url
+    @case_info = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: nomis_offender_id_from_url)
   end
 
   def show
@@ -32,6 +33,7 @@ class AllocationsController < PrisonsApplicationController
       end
     end
     @keyworker = HmppsApi::KeyworkerApi.get_keyworker(active_prison_id, @prisoner.offender_no)
+    @case_info = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: nomis_offender_id_from_url)
   end
 
   def edit
@@ -50,6 +52,7 @@ class AllocationsController < PrisonsApplicationController
     @unavailable_pom_count = unavailable_pom_count
 
     @current_pom = current_pom_for(nomis_offender_id_from_url)
+    @case_info = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: nomis_offender_id_from_url)
   end
 
   def confirm

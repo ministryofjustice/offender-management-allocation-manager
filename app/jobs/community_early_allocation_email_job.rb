@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class CommunityEarlyAllocationEmailJob < ApplicationJob
-  queue_as :mailer
+  queue_as :mailers
 
   def perform(prison, offender_no, encoded_pdf)
     offender = OffenderService.get_offender(offender_no)
