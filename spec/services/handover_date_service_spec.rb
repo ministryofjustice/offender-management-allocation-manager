@@ -210,27 +210,92 @@ describe HandoverDateService do
     end
 
     context 'with early allocation' do
-      let(:offender) {
-        build(:offender,
-              sentence: build(:sentence_detail,
-                              conditionalReleaseDate: Date.new(2021, 6, 2))).tap { |o|
-          o.load_case_information(case_info)
+      let(:crd) { Date.new(2021, 6, 2) }
+
+      context 'when outside referral window' do
+        let(:offender) {
+          build(:offender, :determinate,
+                sentence: build(:sentence_detail, :english_policy_sentence,
+                                automaticReleaseDate: ard,
+                                conditionalReleaseDate: crd)).tap { |o|
+            o.load_case_information(case_info)
+          }
         }
-      }
+        let(:case_info) { build(:case_information, early_allocations: [build(:early_allocation, created_within_referral_window: false)]) }
+        let(:ard) { nil }
 
-      context 'when inside referral window' do
-        let(:case_info) { build(:case_information, early_allocations: [build(:early_allocation, created_within_referral_window: true)]) }
-
-        it 'will be 18 months before CRD' do
-          expect(described_class.handover(offender).start_date).to eq(Date.new(2019, 12, 2))
+        it 'will be unaffected' do
+          expect(subject).to eq(start_date: Date.new(2020, 10, 18), handover_date: Date.new(2021, 1, 18))
         end
       end
 
-      context 'when outside referral window' do
-        let(:case_info) { build(:case_information, early_allocations: [build(:early_allocation, created_within_referral_window: false)]) }
+      context 'when indeterminate' do
+        let(:ted) { Date.new(2022, 7, 3) }
 
-        it 'will be unaffected' do
-          expect(described_class.handover(offender).start_date).to eq(Date.new(2020, 10, 18))
+        let(:offender) {
+          build(:offender, :indeterminate,
+                sentence: build(:sentence_detail, :indeterminate,
+                                paroleEligibilityDate: ped,
+                                tariffDate: ted)).tap { |o|
+            o.load_case_information(case_info)
+          }
+        }
+        let(:case_info) { build(:case_information, early_allocations: [build(:early_allocation, created_within_referral_window: true)]) }
+
+        context 'without PED' do
+          let(:ped) { nil }
+
+          it 'will be 15/18 months before TED' do
+            expect(subject).to eq(start_date: Date.new(2021, 1, 3), handover_date: Date.new(2021, 4, 3))
+          end
+        end
+
+        context 'with earlier PED' do
+          let(:ped) { Date.new(2022, 7, 2)  }
+
+          it 'will be 15/18 months before PED' do
+            expect(subject).to eq(start_date: Date.new(2021, 1, 2), handover_date: Date.new(2021, 4, 2))
+          end
+        end
+      end
+
+      context 'when determinate' do
+        let(:offender) {
+          build(:offender, :determinate,
+                sentence: build(:sentence_detail, :english_policy_sentence,
+                                automaticReleaseDate: ard,
+                                conditionalReleaseDate: crd)).tap { |o|
+            o.load_case_information(case_info)
+          }
+        }
+
+        context 'when inside referral window' do
+          let(:case_info) { build(:case_information, early_allocations: [build(:early_allocation, created_within_referral_window: true)]) }
+
+          context 'without ARD' do
+            let(:ard) { nil }
+
+            it 'will be 15/18 months before CRD' do
+              expect(subject).to eq(start_date: Date.new(2019, 12, 2), handover_date: Date.new(2020, 3, 2))
+            end
+          end
+
+          context 'with earlier ARD' do
+            let(:ard) { Date.new(2021, 6, 1) }
+
+            it 'will be 15/18 months before ARD' do
+              expect(subject).to eq(start_date: Date.new(2019, 12, 1), handover_date: Date.new(2020, 3, 1))
+            end
+          end
+        end
+
+        context 'when outside referral window' do
+          let(:case_info) { build(:case_information, early_allocations: [build(:early_allocation, created_within_referral_window: false)]) }
+          let(:ard) { nil }
+
+          it 'will be unaffected' do
+            expect(subject).to eq(start_date: Date.new(2020, 10, 18), handover_date: Date.new(2021, 1, 18))
+          end
         end
       end
     end
@@ -492,23 +557,10 @@ describe HandoverDateService do
           end
         end
       end
-
-      context 'with early_allocation' do
-        let(:case_info) { build(:case_information, :nps, mappa_level: mappa_level, early_allocations: [build(:early_allocation)]) }
-
-        context 'when CRD earliest' do
-          let(:conditional_release_date) { Date.new(2019, 7, 1) }
-
-          it 'is 15 months before CRD' do
-            expect(result).to eq(Date.new(2018, 4, 1))
-          end
-        end
-      end
     end
   end
 
   describe '#nps_start_date' do
-    let(:early_allocation) { false }
     let(:indeterminate_sentence) { false }
     let(:conditional_release_date) { nil }
     let(:parole_eligibility_date) { nil }
@@ -520,31 +572,13 @@ describe HandoverDateService do
         double(
           automatic_release_date: automatic_release_date,
           conditional_release_date: conditional_release_date,
-          "early_allocation?" => early_allocation,
+          "early_allocation?" => false,
           "indeterminate_sentence?" => indeterminate_sentence,
           parole_eligibility_date: parole_eligibility_date,
           parole_review_date: nil,
           tariff_date: tariff_date
         )
       )
-    end
-
-    context 'when the case is early allocation' do
-      let(:early_allocation) { true }
-
-      context 'with a conditional release date' do
-        let(:conditional_release_date) { '1 Jan 2020'.to_date }
-
-        it 'returns 18 months before that date' do
-          expect(result).to eq(conditional_release_date - 18.months)
-        end
-      end
-
-      context 'without a conditional release date' do
-        it 'returns nil' do
-          expect(result).to be_nil
-        end
-      end
     end
 
     context 'with an indeterminate sentence' do
