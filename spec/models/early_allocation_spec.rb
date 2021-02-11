@@ -7,8 +7,16 @@ RSpec.describe EarlyAllocation, type: :model do
     expect(build(:early_allocation)).to be_valid
   end
 
-  context 'when oasys date more than 2 years adrift' do
-    let(:ea) { build(:early_allocation_eligible_form, oasys_risk_assessment_date: Time.zone.today - 3.years) }
+  context 'when oasys date 3 months in the past' do
+    let(:ea) { build(:early_allocation_date_form, oasys_risk_assessment_date: Time.zone.today - 3.months + 1.day) }
+
+    it 'is valid' do
+      expect(ea).to be_valid
+    end
+  end
+
+  context 'when oasys date more than 3 months in the past' do
+    let(:ea) { build(:early_allocation_date_form, oasys_risk_assessment_date: Time.zone.today - 3.months) }
 
     it 'validates' do
       expect(ea).not_to be_valid
@@ -16,8 +24,8 @@ RSpec.describe EarlyAllocation, type: :model do
     end
   end
 
-  context 'when in the future' do
-    let(:ea) { build(:early_allocation_eligible_form, oasys_risk_assessment_date: Time.zone.today + 3.years) }
+  context 'when oasys date is in the future' do
+    let(:ea) { build(:early_allocation_date_form, oasys_risk_assessment_date: Time.zone.today + 1.day) }
 
     it 'validates' do
       expect(ea).not_to be_valid
