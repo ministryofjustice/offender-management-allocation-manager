@@ -24,7 +24,7 @@ feature 'case information feature' do
 
       it 'allows spo to save case information and then returns to add missing info page' do
         click_button 'Save'
-        expect(page).to have_current_path(prison_summary_pending_path(prison.code), ignore_query: true)
+        expect(page).to have_current_path(pending_prison_prisoners_path(prison.code), ignore_query: true)
       end
 
       it 'allows spo to redirect to allocation page after adding missing information' do
@@ -57,7 +57,7 @@ feature 'case information feature' do
       # # This NOMIS id needs to appear on the first page of 'missing information'
       nomis_offender_id = 'G2911GD'
 
-      visit prison_summary_pending_path('LEI')
+      visit pending_prison_prisoners_path('LEI')
 
       expect(page).to have_content('Add missing information')
       within "#edit_#{nomis_offender_id}" do
@@ -73,14 +73,14 @@ feature 'case information feature' do
       expect(CaseInformation.first.nomis_offender_id).to eq(nomis_offender_id)
       expect(CaseInformation.first.tier).to eq('A')
       expect(CaseInformation.first.case_allocation).to eq('NPS')
-      expect(current_url).to have_content "/prisons/LEI/summary/pending"
+      expect(current_url).to have_content pending_prison_prisoners_path('LEI')
 
       expect(page).to have_css('.offender_row_0', count: 1)
     end
 
     it "clicking back link after viewing prisoner's case information, returns back the same paginated page",
        vcr: { cassette_name: :case_information_back_link }, js: true do
-      visit prison_summary_pending_path('LEI', page: 3)
+      visit pending_prison_prisoners_path('LEI', page: 3)
 
       within ".govuk-table tr:first-child td:nth-child(5)" do
         click_link 'Edit'
@@ -161,7 +161,7 @@ feature 'case information feature' do
 
     it 'returns to previously paginated page after saving',
        vcr: { cassette_name: :case_information_return_to_previously_paginated_page } do
-      visit prison_summary_pending_path('LEI', sort: "last_name desc", page: 3)
+      visit pending_prison_prisoners_path('LEI', sort: "last_name desc", page: 3)
 
       within ".govuk-table tr:first-child td:nth-child(5)" do
         click_link 'Edit'
@@ -173,7 +173,7 @@ feature 'case information feature' do
       find('label[for=case_information_tier_A]').click
       click_button 'Save'
 
-      expect(current_url).to have_content("/prisons/LEI/summary/pending?page=3&sort=last_name+desc")
+      expect(current_url).to have_content(pending_prison_prisoners_path('LEI') + "?page=3&sort=last_name+desc")
     end
 
     it 'does not show update link on view only case info',

@@ -33,7 +33,7 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
 
     it 'allocates' do
       post :create, params: { prison_id: prison, coworking_allocations: { nomis_offender_id: offender_no, nomis_staff_id: new_secondary_pom.staffId } }
-      expect(response).to redirect_to(prison_summary_unallocated_path(prison))
+      expect(response).to redirect_to(unallocated_prison_prisoners_path(prison))
       expect(Allocation.find_by(nomis_offender_id: offender_no).secondary_pom_nomis_id).to eq(new_secondary_pom.staffId)
     end
   end

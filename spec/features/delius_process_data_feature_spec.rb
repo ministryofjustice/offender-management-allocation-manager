@@ -61,7 +61,7 @@ feature 'delius import scenarios', :disable_push_to_delius do
       end
 
       it 'displays the correct error message' do
-        visit prison_summary_pending_path('LEI')
+        visit pending_prison_prisoners_path('LEI')
         within "#edit_#{offender_no}" do
           click_link 'Update'
         end

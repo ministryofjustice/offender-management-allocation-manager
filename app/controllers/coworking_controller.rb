@@ -45,7 +45,7 @@ class CoworkingController < PrisonsApplicationController
       created_by_username: current_user,
       message: allocation_params[:message]
     )
-    redirect_to prison_summary_unallocated_path(active_prison_id),
+    redirect_to unallocated_prison_prisoners_path(active_prison_id),
                 notice: "#{offender.full_name_ordered} has been allocated to #{pom.full_name_ordered} (#{pom.grade})"
   end
 
