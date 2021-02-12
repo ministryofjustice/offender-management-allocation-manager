@@ -246,17 +246,19 @@ describe HandoverDateService do
 
         context 'without PED' do
           let(:ped) { nil }
+          let(:ted15) { ted - 15.months }
 
           it 'will be 15 months before TED' do
-            expect(subject).to eq(start_date: Date.new(2021, 4, 3), handover_date: Date.new(2021, 4, 3))
+            expect(subject).to eq(start_date: ted15, handover_date: ted15)
           end
         end
 
         context 'with earlier PED' do
           let(:ped) { Date.new(2022, 7, 2)  }
+          let(:ped15) { ped - 15.months }
 
           it 'will be 15 months before PED' do
-            expect(subject).to eq(start_date: Date.new(2021, 4, 2), handover_date: Date.new(2021, 4, 2))
+            expect(subject).to eq(start_date: ped15, handover_date: ped15)
           end
         end
       end
