@@ -4,7 +4,7 @@ class SummaryController < PrisonsApplicationController
   before_action :ensure_spo_user
 
   def index
-    redirect_to prison_summary_allocated_path(active_prison_id)
+    redirect_to allocated_prison_prisoners_path(active_prison_id)
   end
 
   def allocated

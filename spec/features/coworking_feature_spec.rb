@@ -93,7 +93,7 @@ feature 'Co-working' do
 
       click_button 'Complete allocation'
 
-      expect(page).to have_current_path('/prisons/LEI/summary/unallocated')
+      expect(page).to have_current_path(unallocated_prison_prisoners_path('LEI'))
 
       allocation.reload
       expect(allocation.secondary_pom_nomis_id).to eq(secondary_pom[:staff_id])
@@ -196,7 +196,7 @@ feature 'Co-working' do
       end
       click_button 'Complete allocation'
       expect(allocation.reload.secondary_pom_nomis_id).to eq(485758)
-      expect(page).to have_current_path(prison_summary_unallocated_path('LEI'), ignore_query: true)
+      expect(page).to have_current_path(unallocated_prison_prisoners_path('LEI'), ignore_query: true)
     end
   end
 end

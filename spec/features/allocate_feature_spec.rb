@@ -40,7 +40,7 @@ feature 'Allocation' do
 
     click_button 'Complete allocation'
 
-    expect(current_url).to have_content(prison_summary_unallocated_path('LEI'))
+    expect(current_url).to have_content(unallocated_prison_prisoners_path('LEI'))
     expect(page).to have_css('.notification', text: "#{offender_name} has been allocated to Moic Integration-Tests (Probation POM)")
   end
 
@@ -67,7 +67,7 @@ feature 'Allocation' do
     expect(current_url).to have_content(prison_confirm_allocation_path('LEI', nomis_offender_id, override_nomis_staff_id))
     click_button 'Complete allocation'
 
-    expect(current_url).to have_content(prison_summary_unallocated_path('LEI'))
+    expect(current_url).to have_content(unallocated_prison_prisoners_path('LEI'))
 
     expect(page).to have_css('.notification', text: "#{offender_name} has been allocated to Amit Muthu (Prison POM)")
     expect(Override.count).to eq(0)
@@ -148,7 +148,7 @@ feature 'Allocation' do
       recommended_pom_type: 'probation'
     )
 
-    visit prison_summary_allocated_path('LEI')
+    visit allocated_prison_prisoners_path('LEI')
 
     within('.allocated_offender_row_0') do
       click_link 'View'
@@ -187,7 +187,7 @@ feature 'Allocation' do
 
     click_button 'Complete allocation'
 
-    expect(current_url).to have_content(prison_summary_unallocated_path('LEI'))
+    expect(current_url).to have_content(unallocated_prison_prisoners_path('LEI'))
 
     expect(page).to have_css(
       '.alert',

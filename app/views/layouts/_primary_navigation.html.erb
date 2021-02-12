@@ -5,7 +5,7 @@
         <ul class="moj-primary-navigation__list">
           <%= render 'layouts/nav_link', text: 'Home', path: prison_dashboard_index_path(@prison.code) %>
           <% if @is_spo %>
-            <%= render 'layouts/controller_nav_link', text: 'Allocations', path: prison_summary_unallocated_path(@prison.code), controllers: ['allocations', 'summary'] %>
+            <%= render 'layouts/controller_nav_link', text: 'Allocations', path: unallocated_prison_prisoners_path(@prison.code), controllers: ['allocations', 'summary'] %>
           <% end %>
           <% if @is_pom %>
             <%= render 'layouts/controller_nav_link', text: 'Caseload', path: prison_staff_caseload_index_path(@prison.code, @staff_id), controllers: ['caseload', 'prisoners', 'tasks'] %>

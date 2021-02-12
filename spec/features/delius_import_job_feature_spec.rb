@@ -7,7 +7,7 @@ require 'delius_import_job'
 
 RSpec.shared_examples "imports the Delius spreadsheet and creates case information" do
   it "imports the Delius spreadsheet and creates case information" do
-    visit prison_summary_pending_path(prison)
+    visit pending_prison_prisoners_path(prison)
     expect(page).to have_content("Add missing information")
     expect(page).to have_content(offender_no)
 
@@ -17,7 +17,7 @@ RSpec.shared_examples "imports the Delius spreadsheet and creates case informati
     expect(page).to have_content("Add missing information")
     expect(page).not_to have_content(offender_no)
 
-    visit prison_summary_unallocated_path(prison)
+    visit unallocated_prison_prisoners_path(prison)
     expect(page).to have_content("Make allocations")
     expect(page).to have_content(offender_no)
     click_link 'Allocate'
