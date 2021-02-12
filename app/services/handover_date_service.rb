@@ -96,16 +96,12 @@ private
 
   def self.nps_start_date(offender)
     if offender.early_allocation?
-      early_allocation_handover_start_date(offender)
+      early_allocation_handover_date(offender)
     elsif offender.indeterminate_sentence?
       indeterminate_responsibility_date(offender)
     else
       determinate_sentence_handover_start_date(offender)
     end
-  end
-
-  def self.early_allocation_handover_start_date(offender)
-    offender.release_date - 18.months
   end
 
   def self.early_allocation_handover_date(offender)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe HandoverDateService do
@@ -245,16 +247,16 @@ describe HandoverDateService do
         context 'without PED' do
           let(:ped) { nil }
 
-          it 'will be 15/18 months before TED' do
-            expect(subject).to eq(start_date: Date.new(2021, 1, 3), handover_date: Date.new(2021, 4, 3))
+          it 'will be 15 months before TED' do
+            expect(subject).to eq(start_date: Date.new(2021, 4, 3), handover_date: Date.new(2021, 4, 3))
           end
         end
 
         context 'with earlier PED' do
           let(:ped) { Date.new(2022, 7, 2)  }
 
-          it 'will be 15/18 months before PED' do
-            expect(subject).to eq(start_date: Date.new(2021, 1, 2), handover_date: Date.new(2021, 4, 2))
+          it 'will be 15 months before PED' do
+            expect(subject).to eq(start_date: Date.new(2021, 4, 2), handover_date: Date.new(2021, 4, 2))
           end
         end
       end
@@ -275,16 +277,16 @@ describe HandoverDateService do
           context 'without ARD' do
             let(:ard) { nil }
 
-            it 'will be 15/18 months before CRD' do
-              expect(subject).to eq(start_date: Date.new(2019, 12, 2), handover_date: Date.new(2020, 3, 2))
+            it 'will be 15 months before CRD' do
+              expect(subject).to eq(start_date: Date.new(2020, 3, 2), handover_date: Date.new(2020, 3, 2))
             end
           end
 
           context 'with earlier ARD' do
             let(:ard) { Date.new(2021, 6, 1) }
 
-            it 'will be 15/18 months before ARD' do
-              expect(subject).to eq(start_date: Date.new(2019, 12, 1), handover_date: Date.new(2020, 3, 1))
+            it 'will be 15 months before ARD' do
+              expect(subject).to eq(start_date: Date.new(2020, 3, 1), handover_date: Date.new(2020, 3, 1))
             end
           end
         end
