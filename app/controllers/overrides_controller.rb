@@ -29,34 +29,36 @@ class OverridesController < PrisonsApplicationController
     @prisoner = offender(@override.nomis_offender_id)
     @pom = PrisonOffenderManagerService.get_pom_at(active_prison_id, @override.nomis_staff_id)
 
-    if step != wizard_steps.last
-      @override.assign_attributes override_params
-      if @override.valid?
+    @override.assign_attributes override_params
+    if @override.valid?
+      # render tyhe next step, except at the end when we do the action
+      if step != wizard_steps.last
         redirect_to next_wizard_path
       else
-        render_wizard
+        allocation = {
+            primary_pom_nomis_id: @override.nomis_staff_id,
+            nomis_offender_id: @override.nomis_offender_id,
+            nomis_booking_id: @prisoner.booking_id,
+            event: :allocate_primary_pom,
+            event_trigger: :user,
+            created_by_username: current_user,
+            allocated_at_tier: @prisoner.tier,
+            recommended_pom_type: (@prisoner.recommended_pom_type == RecommendationService::PRISON_POM) ? 'prison' : 'probation',
+            prison: active_prison_id,
+            override_reasons: @override.override_reasons,
+            suitability_detail: @override.suitability_detail,
+            override_detail: @override.more_detail,
+            message: allocation_params[:message]
+        }
+
+        AllocationService.create_or_update(allocation)
+        flash[:notice] = "#{@prisoner.full_name_ordered} has been allocated to #{@pom.full_name_ordered} (#{@pom.grade})"
+
+        redirect_to prison_summary_unallocated_path(active_prison_id, page: params[:page], sort: params[:sort])
       end
     else
-      allocation = {
-          primary_pom_nomis_id: @override.nomis_staff_id,
-          nomis_offender_id: @override.nomis_offender_id,
-          nomis_booking_id: @prisoner.booking_id,
-          event: :allocate_primary_pom,
-          event_trigger: :user,
-          created_by_username: current_user,
-          allocated_at_tier: @prisoner.tier,
-          recommended_pom_type: (@prisoner.recommended_pom_type == RecommendationService::PRISON_POM) ? 'prison' : 'probation',
-          prison: active_prison_id,
-          override_reasons: @override.override_reasons,
-          suitability_detail: @override.suitability_detail,
-          override_detail: @override.more_detail,
-          message: allocation_params[:message]
-      }
-
-      AllocationService.create_or_update(allocation)
-      flash[:notice] = "#{@prisoner.full_name_ordered} has been allocated to #{@pom.full_name_ordered} (#{@pom.grade})"
-
-      redirect_to prison_summary_unallocated_path(active_prison_id, page: params[:page], sort: params[:sort])
+      # render current page on validation failure
+      render_wizard
     end
   end
 
