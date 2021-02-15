@@ -32,10 +32,23 @@ class HandoverDateService
 
     elsif offender.recent_prescoed_case? && offender.indeterminate_sentence? && offender.nps_case?
       handover_date = prescoed_handover_date(offender)
-      HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
+      if handover_date.future?
+        pom = RESPONSIBLE
+        com = SUPPORTING
+      else
+        pom = SUPPORTING
+        com = RESPONSIBLE
+      end
+      HandoverData.new custody: pom, community: com,
                        start_date: offender.prison_arrival_date, handover_date: handover_date,
                        reason: 'Prescoed'
 
+    # Indeterminate offenders should only ever be NPS
+    # There is no such thing as a CRC indeterminate offender
+    # So in theory, it should be safe to assume that indeterminate offenders are NPS
+    # But in practice, there are some indeterminate offenders who are incorrectly recorded as CRC cases
+    # (likely due to HOMDs choosing CRC just to 'get past' the missing information screen when the offender isn't in nDelius)
+    # By using || here, we effectively ignore their CRC designation and treat them an NPS offender
     elsif offender.nps_case? || offender.indeterminate_sentence?
       handover_date, reason = nps_handover_date(offender)
       start_date = nps_start_date(offender)
@@ -43,7 +56,7 @@ class HandoverDateService
 
       if offender.open_prison_nps_offender? && !offender.recent_prescoed_case?
         HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
-                         start_date: start_date, handover_date: handover_date,
+                         start_date: nil, handover_date: nil,
                          reason: reason
 
       elsif offender.determinate_with_no_release_dates?
