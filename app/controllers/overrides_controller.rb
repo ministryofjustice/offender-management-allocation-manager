@@ -11,13 +11,13 @@ class OverridesController < PrisonsApplicationController
     #
     #@override = Override.new
     session[:allocation_override] = Override.new nomis_staff_id: params.fetch(:nomis_staff_id),
-                                      nomis_offender_id: params.fetch(:nomis_offender_id)
+                                                 nomis_offender_id: params.fetch(:nomis_offender_id)
 
     redirect_to wizard_path(steps.first)
   end
 
   def show
-    @override = Override.new session[:allocation_override]
+    @override = Override.new session[:allocation_override].except('errors', 'validation_context')
     @pom = PrisonOffenderManagerService.get_pom_at(active_prison_id, @override.nomis_staff_id)
     @prisoner = offender(@override.nomis_offender_id)
 
@@ -25,7 +25,7 @@ class OverridesController < PrisonsApplicationController
   end
 
   def update
-    @override = Override.new session[:allocation_override]
+    @override = Override.new session[:allocation_override].except('errors', 'validation_context')
     @prisoner = offender(@override.nomis_offender_id)
     @pom = PrisonOffenderManagerService.get_pom_at(active_prison_id, @override.nomis_staff_id)
 
@@ -33,6 +33,7 @@ class OverridesController < PrisonsApplicationController
     if @override.valid?
       # render tyhe next step, except at the end when we do the action
       if step != wizard_steps.last
+        session[:allocation_override] = @override
         redirect_to next_wizard_path
       else
         allocation = {
@@ -54,6 +55,7 @@ class OverridesController < PrisonsApplicationController
         AllocationService.create_or_update(allocation)
         flash[:notice] = "#{@prisoner.full_name_ordered} has been allocated to #{@pom.full_name_ordered} (#{@pom.grade})"
 
+        session.delete :allocation_override
         redirect_to prison_summary_unallocated_path(active_prison_id, page: params[:page], sort: params[:sort])
       end
     else
@@ -85,7 +87,7 @@ private
   end
 
   def override_params
-    params.require(:override).permit(
+    params.fetch(:override, {}).permit(
       :nomis_offender_id,
       :nomis_staff_id,
       :more_detail,
