@@ -480,7 +480,8 @@ describe HandoverDateService do
           "indeterminate_sentence?" => indeterminate_sentence,
           parole_eligibility_date: parole_eligibility_date,
           parole_review_date: nil,
-          tariff_date: tariff_date
+          tariff_date: tariff_date,
+          "recent_prescoed_case?" => false
         )
       )
     end
