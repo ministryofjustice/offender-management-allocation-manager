@@ -120,9 +120,22 @@ module HmppsApi
       if @responsibility_override.nil?
         HandoverDateService.handover(self).custody
       elsif @responsibility_override.value == Responsibility::PRISON
+        # Overrides to prison aren't actually possible in the UI
         HandoverDateService::RESPONSIBLE
       else
         HandoverDateService::SUPPORTING
+      end
+    end
+
+    def com_responsibility
+      if @responsibility_override.nil?
+        HandoverDateService.handover(self).community
+      elsif @responsibility_override.value == Responsibility::PRISON
+        # Overrides to prison aren't actually possible in the UI
+        # If they were, we'd somehow need to decide whether COM is supporting or not involved
+        HandoverDateService::SUPPORTING
+      else
+        HandoverDateService::RESPONSIBLE
       end
     end
 
