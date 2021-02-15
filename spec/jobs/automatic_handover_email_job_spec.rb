@@ -80,34 +80,35 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
         build(:nomis_offender, latestLocationId: prison7.code, offenderNo: case_info7.nomis_offender_id, firstName: 'Seven',
               sentence: attributes_for(:sentence_detail, :handover_in_4_days, conditionalReleaseDate: Time.zone.today + 19.days + 8.months))
       }
+      let(:expected_csv) {
+        [
+            AutomaticHandoverEmailJob::HEADERS.join(','),
+            (offender_csv_fields(offender6) +
+                [case_info6.crn,
+                 case_info6.nomis_offender_id] +
+                handover_fields(3.days) + [prison6.name, '', '', '']).join(','),
+            (offender_csv_fields(offender2) +
+                [case_info2.crn,
+                 case_info2.nomis_offender_id] +
+                handover_fields(4.days) + [prison1.name, '', '', '']).join(','),
+            (offender_csv_fields(offender3) +
+                [case_info3.crn,
+                 case_info3.nomis_offender_id] + handover_fields(6.days) +
+                [prison3.name, "\"#{allocation3.primary_pom_name}\"", email_address, ''
+                ]).join(','),
+            (offender_csv_fields(offender1) +
+                [case_info1.crn,
+                 case_info1.nomis_offender_id] + handover_fields(8.days) +
+                [prison1.name, "\"#{allocation1.primary_pom_name}\"", email_address, case_info1.com_name
+                ]).join(','),
+        ].map { |row| "#{row}\n" }.join
+      }
 
       before do
         expect(OffenderService).to receive(:get_offender).with(case_info5.nomis_offender_id).and_return(nil)
       end
 
       it 'sends an email for offenders handing over in the next 45 days' do
-        expected_csv = [
-          AutomaticHandoverEmailJob::HEADERS.join(','),
-          (offender_csv_fields(offender6) +
-            [case_info6.crn,
-             case_info6.nomis_offender_id] +
-            handover_fields(3.days) + [prison6.name, '', '']).join(','),
-          (offender_csv_fields(offender2) +
-            [case_info2.crn,
-             case_info2.nomis_offender_id] +
-            handover_fields(4.days) + [prison1.name, '', '']).join(','),
-          (offender_csv_fields(offender3) +
-            [case_info3.crn,
-             case_info3.nomis_offender_id] + handover_fields(6.days) +
-            [prison3.name, "\"#{allocation3.primary_pom_name}\"", email_address
-            ]).join(','),
-          (offender_csv_fields(offender1) +
-            [case_info1.crn,
-             case_info1.nomis_offender_id] + handover_fields(8.days) +
-            [prison1.name, "\"#{allocation1.primary_pom_name}\"", email_address
-            ]).join(','),
-        ].map { |row| "#{row}\n" }.join
-
         expect_any_instance_of(CommunityMailer)
           .to receive(:pipeline_to_community)
                 .with(
@@ -148,7 +149,7 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
       let(:offenders) { [offender1] }
 
       let(:prison1) { build(:prison) }
-      let(:case_info1) { build(:case_information) }
+      let(:case_info1) { build(:case_information, :with_com) }
       let!(:allocation1) { create(:allocation, prison: prison1.code, nomis_offender_id: case_info1.nomis_offender_id, primary_pom_nomis_id: staff_id) }
       let(:offender1) {
         build(:nomis_offender, latestLocationId: prison1.code, offenderNo: case_info1.nomis_offender_id, firstName: 'One',
