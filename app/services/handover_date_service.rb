@@ -30,19 +30,6 @@ class HandoverDateService
                        start_date: nil, handover_date: nil,
                        reason: 'Immigration Case'
 
-    elsif offender.recent_prescoed_case? && offender.indeterminate_sentence? && offender.nps_case?
-      handover_date = prescoed_handover_date(offender)
-      if handover_date.future?
-        pom = RESPONSIBLE
-        com = SUPPORTING
-      else
-        pom = SUPPORTING
-        com = RESPONSIBLE
-      end
-      HandoverData.new custody: pom, community: com,
-                       start_date: offender.prison_arrival_date, handover_date: handover_date,
-                       reason: 'Prescoed'
-
     # Indeterminate offenders should only ever be NPS
     # There is no such thing as a CRC indeterminate offender
     # So in theory, it should be safe to assume that indeterminate offenders are NPS
@@ -54,7 +41,8 @@ class HandoverDateService
       start_date = nps_start_date(offender)
       handover_date = start_date if start_date.present? && start_date > handover_date
 
-      if offender.open_prison_nps_offender? && !offender.recent_prescoed_case?
+      if offender.in_open_prison? && !offender.recent_prescoed_case?
+        # Offender is in open prison under pre-OMIC rules – COM is always responsible
         HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
                          start_date: nil, handover_date: nil,
                          reason: reason
@@ -91,6 +79,7 @@ class HandoverDateService
         end
       end
     else
+      # CRC case
       responsibility = crc_responsibility(offender)
       if responsibility == NOT_INVOLVED
         HandoverData.new custody: NOT_INVOLVED, community: NOT_INVOLVED,
@@ -121,13 +110,10 @@ private
     end
   end
 
-  def self.prescoed_handover_date(offender)
-    target_date = [offender.tariff_date, offender.parole_review_date, offender.parole_eligibility_date].compact.min
-    target_date - 8.months
-  end
-
   def self.nps_start_date(offender)
-    if offender.early_allocation?
+    if offender.recent_prescoed_case? && offender.indeterminate_sentence?
+      offender.prison_arrival_date
+    elsif offender.early_allocation?
       early_allocation_handover_date(offender)
     elsif offender.indeterminate_sentence?
       indeterminate_responsibility_date(offender)
@@ -338,8 +324,8 @@ private
       @offender.welsh_offender == true
     end
 
-    def open_prison_nps_offender?
-      PrisonService.open_prison?(@offender.prison_id) && @offender.nps_case?
+    def in_open_prison?
+      PrisonService.open_prison?(@offender.prison_id)
     end
   end
 end
