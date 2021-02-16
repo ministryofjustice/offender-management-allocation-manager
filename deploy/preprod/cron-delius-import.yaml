@@ -1,9 +1,12 @@
+# This cron job is no longer used because we're using the Community API import.
+# It's pending deletion as part of MO-298, but for now it's been suspended.
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: offender-manager-delius-import
 spec:
   schedule: "15 21 * * 1-5"
+  suspend: true
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 2
   failedJobsHistoryLimit: 2
