@@ -37,14 +37,14 @@ RSpec.describe CaseloadController, :allocation, type: :controller do
         attributes_for(:movement,
                        :rotl,
                        offenderNo: offenders.first.fetch(:offenderNo),
-                       createDateTime: today.to_s),
+                       movementDate: today.to_s),
         attributes_for(:movement,
                        :rotl,
                        offenderNo: offenders.last.fetch(:offenderNo),
-                       createDateTime: yesterday.to_s),
+                       movementDate: yesterday.to_s),
         attributes_for(:movement,
                        offenderNo: offenders.last.fetch(:offenderNo),
-                       createDateTime: today.to_s)
+                       movementDate: today.to_s)
       ]
 
       stub_offenders_for_prison(prison, offenders, movements)

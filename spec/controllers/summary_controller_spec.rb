@@ -46,8 +46,8 @@ RSpec.describe SummaryController, :allocation, type: :controller do
       before do
         stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN").
           with(body: %w[G7514GW G1234GY G1234VV G4234GG].to_json).
-          to_return(body: [attributes_for(:movement, offenderNo: 'G7514GW', toAgency: prison, createDateTime: Date.new(2018, 10, 1).to_s),
-                           attributes_for(:movement, offenderNo: 'G1234VV', toAgency: prison, createDateTime: Date.new(2018, 9, 1).to_s)].to_json)
+          to_return(body: [attributes_for(:movement, offenderNo: 'G7514GW', toAgency: prison, movementDate: Date.new(2018, 10, 1).to_s),
+                           attributes_for(:movement, offenderNo: 'G1234VV', toAgency: prison, movementDate: Date.new(2018, 9, 1).to_s)].to_json)
       end
 
       it 'gets pending records' do
@@ -109,7 +109,7 @@ RSpec.describe SummaryController, :allocation, type: :controller do
       stub_offenders_for_prison(prison, offenders)
       stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN").
         with(body: moves.to_json).
-        to_return(body: moves.map { |offender_no| attributes_for(:movement, offenderNo: offender_no, toAgency: prison, createDateTime: Date.new(2018, 10, 1).to_s) }.to_json)
+        to_return(body: moves.map { |offender_no| attributes_for(:movement, offenderNo: offender_no, toAgency: prison, movementDate: Date.new(2018, 10, 1).to_s) }.to_json)
     end
 
     it 'gets page 1 by default' do
@@ -350,7 +350,7 @@ RSpec.describe SummaryController, :allocation, type: :controller do
           attributes_for(:movement,
                          offenderNo: 'A1111AA',
                          toAgency: prison,
-                         createDateTime: 'Tue 14 Jan 2020 17:00')
+                         movementDate: '14-01-2020')
         ]
       end
 

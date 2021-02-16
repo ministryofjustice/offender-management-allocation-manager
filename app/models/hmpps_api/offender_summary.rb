@@ -11,7 +11,7 @@ module HmppsApi
     attr_reader :prison_id, :facial_image_id
 
     def awaiting_allocation_for
-      (Time.zone.today - prison_arrival_date.to_date).to_i
+      (Time.zone.today - prison_arrival_date).to_i
     end
 
     def case_owner
