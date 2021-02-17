@@ -21,7 +21,7 @@ RSpec.describe "shared/no_com_alert", type: :view do
 
     before do
       offender.load_case_information(case_info)
-      assign(:prisoner, OffenderPresenter.new(offender))
+      assign(:prisoner, offender)
       render partial: 'shared/no_com_alert'
     end
 
@@ -42,7 +42,7 @@ RSpec.describe "shared/no_com_alert", type: :view do
 
     before do
       offender.load_case_information(case_info)
-      assign(:prisoner, OffenderPresenter.new(offender))
+      assign(:prisoner, offender)
       render partial: 'shared/no_com_alert'
     end
 

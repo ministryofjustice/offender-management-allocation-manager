@@ -23,7 +23,7 @@ class OverridesController < PrisonsApplicationController
 private
 
   def offender(nomis_offender_id)
-    OffenderPresenter.new(OffenderService.get_offender(nomis_offender_id))
+    OffenderService.get_offender(nomis_offender_id)
   end
 
   def redirect_on_success

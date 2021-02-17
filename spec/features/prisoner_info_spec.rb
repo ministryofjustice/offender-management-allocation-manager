@@ -250,7 +250,7 @@ feature 'View a prisoner profile page' do
       # we do not have access to PRESCOED in Dev or Staging environments,
       # so we are forcing the method "welsh_offender_in_prescoed_needs_com?" to return true
       # so we can mimic what the user will see
-      allow_any_instance_of(OffenderPresenter).to receive(:welsh_offender_in_prescoed_needs_com?).and_return(true)
+      allow_any_instance_of(HmppsApi::Offender).to receive(:welsh_offender_in_prescoed_needs_com?).and_return(true)
       visit prison_prisoner_path("LEI", offender_id)
 
       expect(page).to have_content(I18n.t("views.com_notification.title"))
