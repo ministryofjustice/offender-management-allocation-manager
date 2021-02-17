@@ -26,7 +26,7 @@ RSpec.describe "shared/com_notification", type: :view do
 
     before do
       offender.load_case_information(case_info)
-      assign(:prisoner, OffenderPresenter.new(offender))
+      assign(:prisoner, offender)
       render partial: 'shared/com_notification', locals: { email: email_history }
     end
 

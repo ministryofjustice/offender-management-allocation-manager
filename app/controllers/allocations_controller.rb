@@ -128,7 +128,7 @@ private
       created_by_username: current_user,
       nomis_booking_id: offender.booking_id,
       allocated_at_tier: offender.tier,
-      recommended_pom_type: (offender.recommended_pom_type == RecommendationService::PRISON_POM) ? 'prison' : 'probation',
+      recommended_pom_type: (RecommendationService.recommended_pom_type(offender) == RecommendationService::PRISON_POM) ? 'prison' : 'probation',
       prison: active_prison_id,
       override_reasons: override_reasons,
       suitability_detail: suitability_detail,
@@ -138,7 +138,7 @@ private
   end
 
   def offender(nomis_offender_id)
-    OffenderPresenter.new(OffenderService.get_offender(nomis_offender_id))
+    OffenderService.get_offender(nomis_offender_id)
   end
 
   def pom
@@ -175,7 +175,7 @@ private
     # Returns a pair of lists where the first element contains the
     # POMs from the `poms` parameter that are recommended for the
     # `offender`
-    recommended_type = offender.recommended_pom_type
+    recommended_type = RecommendationService.recommended_pom_type(offender)
     poms.partition { |pom|
       if recommended_type == RecommendationService::PRISON_POM
         pom.prison_officer?

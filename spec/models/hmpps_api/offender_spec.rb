@@ -3,6 +3,28 @@
 require 'rails_helper'
 
 describe HmppsApi::Offender do
+  describe '#responsibility_override?' do
+    it 'returns false when no responsibility found for offender' do
+      # build an offender, by default this does not have any case information or responsibility record
+      subject = build(:offender, :indeterminate)
+      expect(subject.responsibility_override?).to eq(false)
+    end
+
+    it 'returns true when there is a responsibility found for an offender' do
+      # create case information and responsibility record
+      case_info = create(:case_information, nomis_offender_id: 'A1234XX')
+      create(:responsibility, nomis_offender_id: 'A1234XX')
+
+      # build an offender
+      offender = build(:offender, :indeterminate, offenderNo: 'A1234XX')
+
+      # load the case information and responsibility record into the offender object
+      offender.load_case_information(case_info)
+
+      expect(offender.responsibility_override?).to eq(true)
+    end
+  end
+
   describe '#within_early_allocation_window?' do
     context 'with no dates' do
       let(:offender) {
