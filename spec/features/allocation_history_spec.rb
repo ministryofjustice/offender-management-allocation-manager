@@ -41,14 +41,14 @@ feature 'Allocation History' do
         allocation = create(
           :allocation,
           nomis_offender_id: nomis_offender_id,
-            primary_pom_nomis_id: probation_pom[:primary_pom_nomis_id],
-            primary_pom_name: probation_pom[:primary_pom_name],
-            recommended_pom_type: 'prison',
-            override_reasons: ["suitability"],
-            suitability_detail: "Too high risk",
-            created_at: Time.zone.now - 10.days,
-            updated_at: Time.zone.now - 10.days,
-            primary_pom_allocated_at: Time.zone.now - 12.days
+          primary_pom_nomis_id: probation_pom[:primary_pom_nomis_id],
+          primary_pom_name: probation_pom[:primary_pom_name],
+          recommended_pom_type: 'prison',
+          override_reasons: ["suitability"],
+          suitability_detail: "Too high risk",
+          created_at: Time.zone.now - 10.days,
+          updated_at: Time.zone.now - 10.days,
+          primary_pom_allocated_at: Time.zone.now - 12.days
         )
         allocation.update!(event: Allocation::REALLOCATE_PRIMARY_POM,
                            primary_pom_nomis_id: probation_pom_2[:primary_pom_nomis_id],
