@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   get '/signout', to: 'sessions#destroy'
 
   resources :prisons, only: [] do
+    # Prison switcher - starting from an existing prison
     resources :prisons, only: :index
 
     resources :dashboard, only: :index
@@ -18,6 +19,9 @@ Rails.application.routes.draw do
     end
 
     resources :prisoners, only: [:show] do
+      resource :female_missing_info, only: [:new, :show, :update] do
+      end
+
       collection do
         constraints lambda {
             |request| PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id))
