@@ -44,6 +44,11 @@ en:
   activemodel:
     errors:
       models:
+        complexity_form:
+          format: "%{message}"
+          attributes:
+            complexity_level:
+              blank: You must choose a complexity level
         responsibility:
           format: "%{message}"
           attributes:

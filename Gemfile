@@ -36,7 +36,6 @@ gem 'flipflop'
 gem 'hashdiff', ['>= 1.0.0.beta1', '< 2.0.0']
 gem 'rubyzip'
 gem 'turnout'
-gem 'zendesk_api'
 gem 'kaminari' # pagination
 gem 'prawn-rails'
 gem 'rswag-api' # api-documentation
@@ -47,6 +46,8 @@ gem 'sassc-rails'
 # whilst also allowing invalid emails through.
 # https://stackoverflow.com/questions/38611405/email-validation-in-ruby-on-rails
 gem 'valid_email2'
+gem 'wicked'
+gem 'zendesk_api'
 
 gem 'activeadmin'
 
