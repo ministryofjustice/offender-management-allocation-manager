@@ -236,4 +236,26 @@ feature 'View a prisoner profile page' do
       end
     end
   end
+
+  context 'when welsh offender transfers from closed prison to Prescoed', vcr: { cassette_name: :open_prison_welsh_prescoed_notification } do
+    let(:offender_id) { 'G4251GW' }
+    let(:nomis_staff_id) { 485_637 }
+
+    it 'displays an email notification if offender is indeterminate without a COM' do
+      create(:case_information, :welsh, nomis_offender_id: offender_id, case_allocation: 'NPS', parole_review_date: Time.zone.today + 1.year)
+      create(:allocation, nomis_offender_id: offender_id, primary_pom_nomis_id: nomis_staff_id, prison: PrisonService::PRESCOED_CODE, primary_pom_name: 'Pobno, Kath')
+
+      email = create(:email_history, :open_prison_community_allocation, prison: PrisonService::PRESCOED_CODE, nomis_offender_id: offender_id, name: 'LDU Number 1')
+
+      # we do not have access to PRESCOED in Dev or Staging environments,
+      # so we are forcing the method "welsh_offender_in_prescoed_needs_com?" to return true
+      # so we can mimic what the user will see
+      allow_any_instance_of(OffenderPresenter).to receive(:welsh_offender_in_prescoed_needs_com?).and_return(true)
+      visit prison_prisoner_path("LEI", offender_id)
+
+      expect(page).to have_content(I18n.t("views.com_notification.title"))
+      expect(page).to have_content(I18n.t("views.com_notification.com_needed"))
+      expect(page).to have_content(I18n.t("views.com_notification.ldu_contacted", date: email.created_at.strftime('%d/%m/%Y')))
+    end
+  end
 end

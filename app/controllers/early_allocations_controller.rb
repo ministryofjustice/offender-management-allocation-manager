@@ -8,11 +8,23 @@ class EarlyAllocationsController < PrisonsApplicationController
   end
 
   def new
-    @early_allocation = EarlyAllocationEligibleForm.new offender_id_from_url
+    @early_allocation = EarlyAllocationDateForm.new offender_id_from_url
     if @offender.ldu_email_address.present?
       render
     else
       render 'dead_end'
+    end
+  end
+
+  def oasys_date
+    form_params = oasys_date_params.merge(offender_id_from_url)
+    form = EarlyAllocationDateForm.new form_params
+    if form.valid?
+      @early_allocation = EarlyAllocation.new form_params.merge(default_params)
+      render 'eligible'
+    else
+      @early_allocation = form
+      render 'new'
     end
   end
 
@@ -33,7 +45,7 @@ class EarlyAllocationsController < PrisonsApplicationController
       end
     else
       @early_allocation = form
-      render 'new'
+      render 'eligible'
     end
   end
 
@@ -123,6 +135,10 @@ private
     params.require(:early_allocation).
       permit(EarlyAllocation::ELIGIBLE_BOOLEAN_FIELDS +
                 [:oasys_risk_assessment_date])
+  end
+
+  def oasys_date_params
+    params.fetch(:early_allocation, {}).permit(:oasys_risk_assessment_date)
   end
 
   def discretionary_params

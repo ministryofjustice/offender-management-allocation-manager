@@ -8,14 +8,11 @@ feature "early allocation", type: :feature do
   let(:valid_date) { Time.zone.today - 2.months }
   let(:prison) { 'LEI' }
   let(:username) { 'MOIC_POM' }
-  let(:nomis_offender) { build(:nomis_offender, firstName: first_name, lastName: last_name, dateOfBirth: date_of_birth, offenderNo: nomis_offender_num, sentence: attributes_for(:sentence_detail, conditionalReleaseDate: release_date)) }
+  let(:nomis_offender) { build(:nomis_offender, dateOfBirth: date_of_birth, sentence: attributes_for(:sentence_detail, conditionalReleaseDate: release_date)) }
   let(:nomis_offender_id) { nomis_offender.fetch(:offenderNo) }
   let(:pom) { build(:pom, staffId: nomis_staff_id) }
-  let(:test_strategy) { Flipflop::FeatureSet.current.test! }
-  let(:first_name) { 'John' }
-  let(:last_name) { 'Smith' }
   let(:date_of_birth) { Date.new(1980, 1, 6).to_s }
-  let(:nomis_offender_num) { 'G456YS3' }
+  let(:offender_name) { "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}" }
 
   before do
     create(:case_information, nomis_offender_id: nomis_offender_id)
@@ -40,30 +37,28 @@ feature "early allocation", type: :feature do
   end
 
   context 'with switch set false' do
+    let(:test_strategy) { Flipflop::FeatureSet.current.test! }
     let(:release_date) { Time.zone.today }
 
     before do
       test_strategy.switch!(:early_allocation, false)
     end
 
+    after do
+      test_strategy.switch!(:early_allocation, true)
+    end
+
     it 'does not show the section' do
-      click_link "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}"
+      click_link offender_name
       expect(page).not_to have_content 'Early allocation eligibility'
     end
   end
 
+  # switch is on by default
   context 'with switch' do
-    before do
-      test_strategy.switch!(:early_allocation, true)
-    end
-
-    after do
-      test_strategy.switch!(:early_allocation, false)
-    end
-
     context 'without existing early allocation' do
       before do
-        click_link "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}"
+        click_link offender_name
 
         # Prisoner profile page
         expect(page).to have_content 'Early allocation referral'
@@ -71,7 +66,7 @@ feature "early allocation", type: :feature do
 
         # Early Allocation start page
         expect(page).to have_content 'Early allocation assessment process'
-        expect(page).to have_content 'This case has no saved assessments.'
+        #expect(page).to have_content 'This case has no saved assessments.'
         displays_prisoner_information_in_side_panel
         click_link 'Start new assessment'
       end
@@ -79,7 +74,20 @@ feature "early allocation", type: :feature do
       context 'when <= 18 months' do
         let(:release_date) { Time.zone.today + 17.months }
 
-        scenario 'when an immediate error occurs' do
+        scenario 'when first page with just date' do
+          click_button 'Continue'
+          expect(page).to have_css('.govuk-error-message')
+          within '.govuk-error-summary' do
+            expect(all('li').map(&:text))
+                .to match_array([
+                                    "Enter the date of the last OASys risk assessment",
+                                ])
+          end
+        end
+
+        scenario 'when an immediate error occurs on the second page', :js do
+          fill_in_date_form
+
           click_button 'Continue'
           expect(page).to have_css('.govuk-error-message')
           expect(page).to have_css('#early-allocation-high-profile-error')
@@ -89,7 +97,6 @@ feature "early allocation", type: :feature do
             # ensure that page is still intact
             expect(all('li').map(&:text)).
                 to match_array([
-                                   "Enter the date of the last OASys risk assessment",
                                    "You must say if they are subject to a Serious Crime Prevention Order",
                                    "You must say if they were convicted under the Terrorism Act 2000",
                                    "You must say if this case is 'high profile'",
@@ -306,7 +313,7 @@ feature "early allocation", type: :feature do
                    nomis_offender_id: nomis_offender_id,
                    created_within_referral_window: true)
 
-            click_link "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}"
+            click_link offender_name
           end
 
           it 'links to the view page' do
@@ -325,7 +332,7 @@ feature "early allocation", type: :feature do
                    nomis_offender_id: nomis_offender_id,
                    created_within_referral_window: true)
 
-            click_link "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}"
+            click_link offender_name
           end
 
           it 'has a re-assess link' do
@@ -343,7 +350,7 @@ feature "early allocation", type: :feature do
                    nomis_offender_id: nomis_offender_id,
                    created_within_referral_window: false)
 
-            click_link "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}"
+            click_link offender_name
           end
 
           it 'has a re-assess link' do
@@ -360,7 +367,7 @@ feature "early allocation", type: :feature do
                  nomis_offender_id: nomis_offender_id,
                  created_within_referral_window: true)
 
-          click_link "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}"
+          click_link offender_name
 
           within '#early_allocation' do
             click_link 'Check and reassess'
@@ -405,7 +412,7 @@ feature "early allocation", type: :feature do
                  nomis_offender_id: nomis_offender_id,
                  created_within_referral_window: false)
 
-          click_link "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}"
+          click_link offender_name
           within '#early_allocation' do
             click_link 'Check and reassess'
           end
@@ -446,10 +453,16 @@ feature "early allocation", type: :feature do
     end
   end
 
-  def eligible_eligible_answers
+  def fill_in_date_form
     fill_in id: 'early_allocation_oasys_risk_assessment_date_3i', with: valid_date.day
     fill_in id: 'early_allocation_oasys_risk_assessment_date_2i', with: valid_date.month
     fill_in id: 'early_allocation_oasys_risk_assessment_date_1i', with: valid_date.year
+
+    click_button 'Continue'
+  end
+
+  def eligible_eligible_answers
+    fill_in_date_form
 
     find('label[for=early-allocation-convicted-under-terrorisom-act-2000-true-field]').click
     find('label[for=early-allocation-high-profile-field]').click
@@ -459,9 +472,7 @@ feature "early allocation", type: :feature do
   end
 
   def eligible_discretionary_answers
-    fill_in id: 'early_allocation_oasys_risk_assessment_date_3i', with: valid_date.day
-    fill_in id: 'early_allocation_oasys_risk_assessment_date_2i', with: valid_date.month
-    fill_in id: 'early_allocation_oasys_risk_assessment_date_1i', with: valid_date.year
+    fill_in_date_form
 
     find("label[for=early-allocation-convicted-under-terrorisom-act-2000-field]").click
     find('label[for=early-allocation-high-profile-field]').click
@@ -486,8 +497,8 @@ feature "early allocation", type: :feature do
 
   def displays_prisoner_information_in_side_panel
     expect(page).to have_text('Prisoner information')
-    expect(page).to have_selector('p#prisoner-name', text: 'Smith, John')
+    expect(page).to have_selector('p#prisoner-name', text: offender_name)
     expect(page).to have_selector('p#date-of-birth', text: '6/01/1980')
-    expect(page).to have_selector('p#nomis-number', text: 'G456YS3')
+    expect(page).to have_selector('p#nomis-number', text: nomis_offender_id)
   end
 end

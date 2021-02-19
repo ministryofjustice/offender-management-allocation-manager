@@ -108,6 +108,15 @@ feature 'Allocation History' do
           allocation.offender_transferred
         end
 
+        Timecop.travel(Time.zone.now - 3.weeks) do
+          # create Email History for welsh offender transferring to Prescoed open prison
+          create :email_history, nomis_offender_id: nomis_offender_id,
+                 name: 'Pontypool LDU',
+                 email: 'pontypool-ldu@digital.justice.gov.uk',
+                 event: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION,
+                 prison: PrisonService::PRESCOED_CODE
+        end
+
         visit prison_allocation_history_path('LEI', nomis_offender_id)
       end
 
@@ -123,6 +132,7 @@ feature 'Allocation History' do
         history2 = history[2]
         hist_allocate_secondary = history[5]
         history6 = history[6]
+        prescoed_transfer = EmailHistory.where(nomis_offender_id: nomis_offender_id, event: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION).first
 
         [
           ['h1', "Abbella, Ozullirn"],
@@ -147,7 +157,11 @@ feature 'Allocation History' do
           ['.moj-timeline__title', "Prisoner allocated"],
           ['.moj-timeline__description', "Prisoner allocated to #{history.last.primary_pom_name.titleize} - #{probation_pom[:email]} Tier: #{history.last.allocated_at_tier}"],
           ['.moj-timeline__description', "Probation POM allocated instead of recommended Prison POM", "Reason(s):", "- Prisoner assessed as suitable for a prison POM despite tiering calculation", "Too high risk"],
-          ['.moj-timeline__date', "#{formatted_date_for(history.last)} by #{history.last.created_by_name.titleize}"]
+          ['.moj-timeline__date', "#{formatted_date_for(history.last)} by #{history.last.created_by_name.titleize}"],
+          ['.govuk-heading-m', "HMP/YOI Prescoed"],
+          ['.moj-timeline__title', "Offender transferred to an open prison"],
+          ['.moj-timeline__date', "#{prescoed_transfer.created_at.strftime("#{prescoed_transfer.created_at.day.ordinalize} %B %Y")} (#{prescoed_transfer.created_at.strftime('%R')}) email sent automatically"],
+          ['.moj-timeline__description', "The LDU for #{prescoed_transfer.name} - #{prescoed_transfer.email} - was sent an email asking them to appoint a Supporting COM."]
         ].each do |key, val|
           expect(page).to have_css(key, text: val)
         end

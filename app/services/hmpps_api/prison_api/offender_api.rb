@@ -110,7 +110,7 @@ module HmppsApi
           arrival = movements.fetch(offender.offender_no, []).reverse.detect { |movement|
             movement.to_agency == offender.prison_id
           }
-          offender.prison_arrival_date = [offender.sentence_start_date, arrival&.create_date_time].compact.max
+          offender.prison_arrival_date = [offender.sentence_start_date, arrival&.movement_date].compact.max
         end
       end
 

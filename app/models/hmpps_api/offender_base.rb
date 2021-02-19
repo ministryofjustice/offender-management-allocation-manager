@@ -53,6 +53,12 @@ module HmppsApi
       has_case_information? && within_early_allocation_window? && @case_information.early_allocations.suitable_offenders_pre_referral_window.any?
     end
 
+    def welsh_offender_in_prescoed_needs_com?
+      prison_id == PrisonService::PRESCOED_CODE &&
+        allocated_com_name.blank? &&
+        EmailHistory.sent_within_current_sentence(self, EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION).any?
+    end
+
     # Has a CaseInformation record been loaded for this offender?
     def has_case_information?
       @case_information.present?

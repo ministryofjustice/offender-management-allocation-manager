@@ -2,6 +2,10 @@
   <%= render partial: 'shared/no_com_alert' %>
 <% end %>
 
+<% if @prisoner.welsh_offender_in_prescoed_needs_com? %>
+  <%= render partial: 'shared/com_notification', locals: { email: @open_prison_email } %>
+<% end %>
+
 <h1 class="govuk-heading-l govuk-!-margin-bottom-5">Allocation information</h1>
 
 <%= render 'shared/case_type_badge', offender: @prisoner, early_allocations: @case_info.early_allocations %>

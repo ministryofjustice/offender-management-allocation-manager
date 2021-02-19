@@ -14,6 +14,7 @@ class AllocationsController < PrisonsApplicationController
     @unavailable_pom_count = unavailable_pom_count
     @allocation = Allocation.find_by nomis_offender_id: nomis_offender_id_from_url
     @case_info = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: nomis_offender_id_from_url)
+    @open_prison_email = EmailHistory.sent_within_current_sentence(@prisoner, EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION).first
   end
 
   def show
@@ -34,6 +35,7 @@ class AllocationsController < PrisonsApplicationController
     end
     @keyworker = HmppsApi::KeyworkerApi.get_keyworker(active_prison_id, @prisoner.offender_no)
     @case_info = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: nomis_offender_id_from_url)
+    @open_prison_email = EmailHistory.sent_within_current_sentence(@prisoner, EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION).first
   end
 
   def edit
@@ -90,9 +92,9 @@ class AllocationsController < PrisonsApplicationController
     end
 
     if allocation[:event] == 'allocate_primary_pom'
-      redirect_to prison_summary_unallocated_path(active_prison_id, page: params[:page], sort: params[:sort])
+      redirect_to unallocated_prison_prisoners_path(active_prison_id, page: params[:page], sort: params[:sort])
     else
-      redirect_to prison_summary_allocated_path(active_prison_id, page: params[:page], sort: params[:sort])
+      redirect_to allocated_prison_prisoners_path(active_prison_id, page: params[:page], sort: params[:sort])
     end
   end
 

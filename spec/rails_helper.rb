@@ -10,6 +10,7 @@ require 'support/helpers/jwt_helper'
 require 'support/helpers/features_helper'
 require 'support/helpers/auth_helper'
 require 'support/helpers/api_helper'
+require 'support/matchers/responsibility_matchers'
 require 'capybara/rspec'
 require 'webmock/rspec'
 

@@ -9,12 +9,12 @@ feature 'summary summary feature' do
 
   describe 'awaiting summary table' do
     it 'redirects correctly', vcr: { cassette_name: :redirect_summary_index_feature } do
-      visit prison_summary_path('LEI')
-      expect(page).to have_current_path prison_summary_allocated_path('LEI')
+      visit summary_prison_prisoners_path('LEI')
+      expect(page).to have_current_path allocated_prison_prisoners_path('LEI')
     end
 
     it 'displays offenders awaiting information', vcr: { cassette_name: :awaiting_information_feature } do
-      visit prison_summary_pending_path('LEI')
+      visit pending_prison_prisoners_path('LEI')
 
       expect(page).to have_css('.moj-sub-navigation__item')
       expect(page).to have_content('Add missing information')
@@ -22,7 +22,7 @@ feature 'summary summary feature' do
     end
 
     it 'displays offenders pending allocation', vcr: { cassette_name: :awaiting_allocation_feature } do
-      visit prison_summary_unallocated_path('LEI')
+      visit unallocated_prison_prisoners_path('LEI')
 
       expect(page).to have_css('.moj-sub-navigation__item')
       expect(page).to have_content('Add missing information')
@@ -44,7 +44,7 @@ feature 'summary summary feature' do
       end
 
       it 'displays offenders already allocated', vcr: { cassette_name: :allocated_offenders_feature } do
-        visit prison_summary_allocated_path('LEI')
+        visit allocated_prison_prisoners_path('LEI')
 
         expect(page).to have_css('.moj-sub-navigation__item')
         expect(page).to have_content('See allocations')
@@ -65,7 +65,7 @@ feature 'summary summary feature' do
     end
 
     it 'displays offenders just arrived allocated', vcr: { cassette_name: :new_offenders_feature } do
-      visit prison_summary_new_arrivals_path('LEI')
+      visit new_arrivals_prison_prisoners_path('LEI')
 
       expect(page).to have_css('.moj-sub-navigation__item')
       expect(page).to have_content('Newly arrived')

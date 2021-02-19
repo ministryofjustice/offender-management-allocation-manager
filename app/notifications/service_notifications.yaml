@@ -28,17 +28,13 @@
 
 ---
 notifications:
-  - id: panel-signup-2-10-2020
-    start_date: 02/10/2020
+  - id: early-allocations-release
+    start_date: 11/02/2021
+    end_date: 21/02/2021 # 10 days
     role:
       - POM
       - SPO
-    end_date: 16/10/2020
-    text: 'You can help us improve this service by participating in research and giving us feedback. Sign up to the HMPPS Digital research panel <a href="https://www.surveymonkey.co.uk/r/79MHSJX">here</a>'
-  - id: vlo-banner-20-11-2020
-    start_date: 23/11/2020
-    role:
-      - POM
-      - SPO
-    end_date: 2/12/2020
-    text: 'NEW FEATURE: Prison Offender Managers and Heads of Offender Management Delivery will now be able to manually input the Victim Liaison Officer’s name and contact details.  <a href="/whats-new">Read more</a>'
+    text: >-
+      <span class="moj-badge moj-badge--blue govuk-!-margin-right-2">NEW FEATURE</span>
+      Early allocation assessment and referral now available!
+      <a href="/whats-new">Read more…</a>

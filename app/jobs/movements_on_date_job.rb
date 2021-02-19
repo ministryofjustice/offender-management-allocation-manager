@@ -6,13 +6,7 @@ class MovementsOnDateJob < ApplicationJob
 
     Rails.logger.info("[MOVEMENT] Getting movements for #{yesterday}")
 
-    movements = MovementService.movements_on(
-      yesterday,
-      type_filters: [
-        HmppsApi::MovementType::ADMISSION,
-        HmppsApi::MovementType::RELEASE
-      ]
-    )
+    movements = MovementService.movements_on(yesterday)
 
     Rails.logger.info("[MOVEMENT] Found #{movements.count} movements for #{yesterday}")
 

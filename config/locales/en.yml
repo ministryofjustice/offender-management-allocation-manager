@@ -49,13 +49,16 @@ en:
           attributes:
             reason_text:
               blank: You must say why you are changing responsibility for this case
-        early_allocation_eligible_form:
+        early_allocation_date_form:
           format: "%{message}"
           attributes:
             oasys_risk_assessment_date:
               blank: Enter the date of the last OASys risk assessment
               after: This date must be in the last 3 months
               before: This must not be a date in the future
+        early_allocation_eligible_form:
+          format: "%{message}"
+          attributes:
             # These attributes are all 'inclusion' because booleans are validated in: [true false] otherwise No isn't accepted
             convicted_under_terrorisom_act_2000:
               inclusion: You must say if they were convicted under the Terrorism Act 2000
@@ -123,6 +126,10 @@ en:
       no_com: "A Community Offender Manager (COM) must be allocated to support this case from %{date}."
       no_ldu: An automatic email could not be sent to the LDU. You need to find an alternative way of contacting them.
       no_email: "An automatic email could not be sent to %{name} because the LDU email address is missing. You need need to find an alternative way of contacting them."
+    com_notification:
+      title: "You may need to contact the community probation office"
+      com_needed: "A Community Offender Manager (COM) must be allocated to support this case."
+      ldu_contacted: "The LDU was emailed to request the allocation of a supporting COM on %{date}."
   helpers:
     fieldset:
       case_information:

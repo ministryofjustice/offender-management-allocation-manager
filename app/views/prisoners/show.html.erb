@@ -2,6 +2,10 @@
   <%= render partial: 'shared/no_com_alert' %>
 <% end %>
 
+<% if @prisoner.welsh_offender_in_prescoed_needs_com? %>
+  <%= render partial: 'shared/com_notification', locals: { email: @open_prison_email } %>
+<% end %>
+
 <% @tasks.each do |task| %>
   <%= render partial: 'shared/info_banner', locals: {
     content: task.long_label.html_safe }

@@ -1,8 +1,6 @@
 class EarlyAllocationDiscretionaryForm
   include ActiveModel::Model
   include ActiveModel::Attributes
-  # ActiveRecord version needed to consume the multi-parameter date field
-  include ActiveRecord::AttributeAssignment
 
   attribute :nomis_offender_id, :string
 

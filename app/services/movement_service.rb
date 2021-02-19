@@ -5,22 +5,8 @@ class MovementService
   RELEASE_MOVEMENT_CODE = 'OUT'
   IMMIGRATION_MOVEMENT_CODES = %w[IMM MHI].freeze
 
-  def self.movements_on(date, direction_filters: [], type_filters: [])
-    movements = HmppsApi::PrisonApi::MovementApi.movements_on_date(date)
-
-    if direction_filters.any?
-      movements = movements.select { |m|
-        direction_filters.include?(m.direction_code)
-      }
-    end
-
-    if type_filters.any?
-      movements = movements.select { |m|
-        type_filters.include?(m.movement_type)
-      }
-    end
-
-    movements
+  def self.movements_on(date)
+    HmppsApi::PrisonApi::MovementApi.movements_on_date(date)
   end
 
   def self.process_movement(movement)
@@ -45,7 +31,7 @@ class MovementService
 private
 
   def self.process_transfer(transfer)
-    return false unless transfer.direction_code == ADMISSION_MOVEMENT_CODE
+    return false unless transfer.in?
 
     Rails.logger.info("[MOVEMENT] Processing transfer for #{transfer.offender_no}")
 

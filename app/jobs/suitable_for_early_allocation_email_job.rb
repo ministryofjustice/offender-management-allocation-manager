@@ -13,9 +13,7 @@ class SuitableForEarlyAllocationEmailJob < ApplicationJob
 
     if !prisoner.nil? && prisoner.within_early_allocation_window?
 
-      already_emailed = EmailHistory.where(
-        nomis_offender_id: offender_no,
-        event: EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION).where('created_at > ?', prisoner.sentence_start_date)
+      already_emailed = EmailHistory.sent_within_current_sentence(prisoner,  EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION)
 
       if already_emailed.empty?
 

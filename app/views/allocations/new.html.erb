@@ -4,6 +4,10 @@
   <%= render partial: 'shared/no_com_alert' %>
 <% end %>
 
+<% if @prisoner.welsh_offender_in_prescoed_needs_com? %>
+  <%= render partial: 'shared/com_notification', locals: { email: @open_prison_email } %>
+<% end %>
+
 <h1 class="govuk-heading-l govuk-!-margin-bottom-5">Allocate a Prison Offender Manager</h1>
 
 <%= render 'shared/basic_prisoner_info', case_info: @case_info, prisoner: @prisoner %>

@@ -8,9 +8,12 @@ module HmppsApi
       def self.movements_on_date(date)
         route = '/movements'
 
+        # the 'fromDateTime' field in the API is the 'earliest creation date' of a movement
+        # obviously we have no idea how early this might be, so set it to last year so that they
+        # are hopefully all caught.
         data = client.get(route, queryparams: {
                                movementDate: date.strftime('%F'),
-                               fromDateTime: (date - 1.day).strftime('%FT%R')
+                               fromDateTime: (date - 1.year).strftime('%FT%R')
                              })
         data.map { |movement|
           api_deserialiser.deserialise(HmppsApi::Movement, movement)
@@ -23,7 +26,7 @@ module HmppsApi
         data = client.post(route, [offender_no],
                            queryparams: { latestOnly: false, movementTypes: %w[ADM TRN REL] },
                            cache: true)
-        data.sort_by { |k| k['createDateTime'] }.map { |movement|
+        data.sort_by { |k| k['movementDate'] }.map { |movement|
           api_deserialiser.deserialise(HmppsApi::Movement, movement)
         }
       end
@@ -40,7 +43,7 @@ module HmppsApi
                      .group_by { |x| x['offenderNo'] }.values
 
         movements = data.map { |d|
-          d.sort_by { |k| k['createDateTime'] }.map { |movement|
+          d.sort_by { |k| k['movementDate'] }.map { |movement|
             api_deserialiser.deserialise(HmppsApi::Movement, movement)
           }
         }
@@ -63,7 +66,7 @@ module HmppsApi
         # This reduces the data to the most recent per offender
         # (one array rather than an array of arrays)
         movements = data.map { |d|
-          movement = d.max_by { |k| k['createDateTime'] }
+          movement = d.max_by { |k| k['movementDate'] }
           api_deserialiser.deserialise(HmppsApi::Movement, movement)
         }
         # filter out non-temp movements - so if the last movement was
