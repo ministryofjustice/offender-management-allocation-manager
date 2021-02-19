@@ -1,21 +1,10 @@
 # frozen_string_literal: true
 
 module HmppsApi
-  class MovementDirection
-    IN = 'IN'
-    OUT = 'OUT'
-  end
-
   class Movement
     include Deserialisable
 
-    attr_accessor :offender_no, :create_date_time,
-                  :from_agency, :from_agency_description,
-                  :to_agency, :to_agency_description,
-                  :from_city, :to_city,
-                  :movement_type, :movement_type_description,
-                  :direction_code, :movement_time,
-                  :movement_reason, :comment_text
+    attr_reader :movement_type, :movement_date, :from_agency, :to_agency, :offender_no
 
     def initialize(fields = {})
       # Allow this object to be reconstituted from a hash, we can't use
@@ -25,37 +14,38 @@ module HmppsApi
     end
 
     def from_prison?
-      PrisonService::PRISONS.include?(from_agency)
+      PrisonService::PRISONS.include?(@from_agency)
     end
 
     def to_prison?
-      PrisonService::PRISONS.include?(to_agency)
+      PrisonService::PRISONS.include?(@to_agency)
     end
 
     def temporary?
-      movement_type == HmppsApi::MovementType::TEMPORARY
+      @movement_type == HmppsApi::MovementType::TEMPORARY
     end
 
     def out?
-      direction_code == MovementDirection::OUT
+      @direction_code == MovementDirection::OUT
+    end
+
+    def in?
+      @direction_code == MovementDirection::IN
+    end
+
+    def load_from_json(payload)
+      @offender_no = payload.fetch('offenderNo')
+      @from_agency = payload['fromAgency']
+      @to_agency = payload['toAgency']
+      @movement_type = payload.fetch('movementType')
+      @direction_code = payload.fetch('directionCode')
+      @movement_time = payload['movementTime']
+      @movement_date = deserialise_date(payload, 'movementDate')
     end
 
     def self.from_json(payload)
       Movement.new.tap { |obj|
-        obj.offender_no = payload.fetch('offenderNo')
-        obj.create_date_time = deserialise_date_and_time(payload, 'createDateTime')
-        obj.from_agency = payload['fromAgency']
-        obj.from_agency_description = payload['fromAgencyDescription']
-        obj.to_agency = payload['toAgency']
-        obj.to_agency_description = payload['toAgencyDescription']
-        obj.from_city = payload['fromCity']
-        obj.to_city = payload['toCity']
-        obj.movement_type = payload.fetch('movementType')
-        obj.movement_type_description = payload['movementTypeDescription']
-        obj.direction_code = payload.fetch('directionCode')
-        obj.movement_time = payload['movementTime']
-        obj.movement_reason = payload['movementReason']
-        obj.comment_text = payload['commentText']
+        obj.load_from_json(payload)
       }
     end
   end

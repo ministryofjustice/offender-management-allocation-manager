@@ -295,7 +295,7 @@
     <tr class="govuk-table__row" id="movement_date">
       <td class="govuk-table__cell">Movement date</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= format_date(@movements.create_date_time) %>
+        <%= format_date(@movements.movement_date) %>
       </td>
     </tr>
     <tr class="govuk-table__row" id="from-agency">
@@ -313,7 +313,7 @@
     <tr class="govuk-table__row" id="movement-direction">
       <td class="govuk-table__cell govuk-!-width-one-half">Movement direction</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-        <%= @movements.direction_code.titleize %>
+        <%= @movements.in? ? 'In' : 'Out' %>
       </td>
     </tr>
     <tr class="govuk-table__row" id="movement-type">
