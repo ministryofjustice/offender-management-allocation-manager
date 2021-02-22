@@ -50,4 +50,9 @@ module FeaturesHelper
   def wait_for(maximum_wait_in_seconds = 10)
     Selenium::WebDriver::Wait.new(timeout: maximum_wait_in_seconds).until { yield }
   end
+
+  def wait_for_new_page_to_load
+    wait_for { page.has_css?('.turbolinks-progress-bar', visible: true) }
+    wait_for { page.has_no_css?('.turbolinks-progress-bar') }
+  end
 end

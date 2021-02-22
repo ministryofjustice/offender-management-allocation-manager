@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature 'Navigation' do
+feature 'Navigation', :js do
   let(:prison) { build(:prison, code: 'LEI') }
   let(:link_css) { '.moj-primary-navigation__link' }
   let(:nav_links) { all(link_css) }
@@ -115,6 +115,7 @@ feature 'Navigation' do
     link = all(link_css)[index]
     new_page_url = link.native.attribute('href').to_s
     link.click
+    wait_for_new_page_to_load
     # current_path doesn't include the hostname - new_page_url does
     wait_for { new_page_url.ends_with?(current_path) }
     sleep delay
@@ -126,13 +127,7 @@ feature 'Navigation' do
     new_page_url = link.native.attribute('href')
     link.click
     # current_path doesn't include the hostname or the params - new_page_url does
+    wait_for_new_page_to_load
     wait_for { new_page_url.include?(current_path) }
-    sleep delay
-    # wait_for_turbolinks
-  end
-
-  def wait_for_turbolinks
-    has_css?('.turbolinks-progress-bar', visible: true)
-    has_no_css?('.turbolinks-progress-bar')
   end
 end
