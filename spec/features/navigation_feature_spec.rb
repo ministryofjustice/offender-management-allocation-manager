@@ -122,7 +122,7 @@ feature 'Navigation', :js do
     all(link_css)[index]
   end
 
-  def click_link_and_wait(text, delay: 2)
+  def click_link_and_wait(text, _delay: 2)
     link = find(:link, text)
     new_page_url = link.native.attribute('href')
     link.click
