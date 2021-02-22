@@ -43,7 +43,11 @@ RSpec.describe OffenderHelper do
     end
 
     context 'when unknown' do
-      let(:offender) { build(:offender, sentence: build(:sentence_detail, :unsentenced, conditionalReleaseDate: nil)) }
+      let(:offender) {
+        build(:offender, sentence: build(:sentence_detail, :unsentenced)).tap { |o|
+          o.load_case_information(build(:case_information))
+        }
+      }
 
       it 'shows unknown' do
         expect(helper.pom_responsibility_label(offender)).to eq('Unknown')
@@ -71,7 +75,11 @@ RSpec.describe OffenderHelper do
     end
 
     context 'when unknown' do
-      let(:offender) { build(:offender, sentence: build(:sentence_detail, :unsentenced, conditionalReleaseDate: nil)) }
+      let(:offender) {
+        build(:offender, sentence: build(:sentence_detail, :unsentenced)).tap { |o|
+          o.load_case_information(build(:case_information))
+        }
+      }
 
       it 'can show Unknown' do
         expect(helper.case_owner_label(offender)).to eq('Unknown')

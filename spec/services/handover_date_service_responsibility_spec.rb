@@ -245,9 +245,9 @@ describe HandoverDateService do
     context 'when NPS case' do
       context 'when an open prison' do
         let(:offender) {
-          OpenStruct.new prison_id: 'HDI',
-                         nps_case?: true,
-                         sentenced?: true
+          build(:offender, latestLocationId: 'HDI').tap { |o|
+            o.load_case_information(build(:case_information, :nps))
+          }
         }
 
         it 'will show the POM as supporting' do
@@ -379,9 +379,9 @@ describe HandoverDateService do
             context 'when the release dates are missing' do
               let(:ard) { nil }
 
-              it 'will return no responsibility' do
+              it 'will return responsible as the offenders release is not calculatable' do
                 expect(subject).
-                  to eq HandoverDateService::NOT_INVOLVED
+                  to eq HandoverDateService::RESPONSIBLE
               end
             end
           end
@@ -574,9 +574,9 @@ describe HandoverDateService do
             context 'when the CRD and ARD are missing' do
               let(:ard) { nil }
 
-              it 'will return no responsibility' do
+              it 'will return responsibile as offender release date is not calculable' do
                 expect(subject).
-                  to eq HandoverDateService::NOT_INVOLVED
+                  to eq HandoverDateService::RESPONSIBLE
               end
             end
           end

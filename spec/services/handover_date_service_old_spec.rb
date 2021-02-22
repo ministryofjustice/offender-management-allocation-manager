@@ -99,15 +99,15 @@ describe HandoverDateService do
 
     context 'when incorrect service provider entered for indeterminate offender' do
       let(:offender) {
-        OpenStruct.new indeterminate_sentence?: true,
-                       nps_case?: false,
-                       tariff_date: tariff_date
+        build(:offender, :indeterminate, sentence: build(:sentence_detail, tariffDate: tariff_date)).tap { |o|
+          o.load_case_information(build(:case_information, :crc))
+        }
       }
 
-      let(:tariff_date) { Date.new(2020, 8, 30) }
+      let(:tariff_date) { Date.new(2030, 8, 30) }
 
       it 'is 8 months before release date' do
-        expect(described_class.handover(offender).start_date).to eq(Date.new(2019, 12, 30))
+        expect(described_class.handover(offender).start_date).to eq(Date.new(2029, 12, 30))
       end
     end
 
@@ -133,6 +133,7 @@ describe HandoverDateService do
 
       context 'when indeterminate' do
         let(:ted) { Date.new(2022, 7, 3) }
+        let(:ted15) { ted - 15.months }
 
         let(:offender) {
           build(:offender, :indeterminate,
@@ -146,7 +147,6 @@ describe HandoverDateService do
 
         context 'without PED' do
           let(:ped) { nil }
-          let(:ted15) { ted - 15.months }
 
           it 'will be 15 months before TED' do
             expect(subject).to eq(start_date: ted15, handover_date: ted15)
@@ -155,10 +155,9 @@ describe HandoverDateService do
 
         context 'with earlier PED' do
           let(:ped) { Date.new(2022, 7, 2)  }
-          let(:ped15) { ped - 15.months }
 
-          it 'will be 15 months before PED' do
-            expect(subject).to eq(start_date: ped15, handover_date: ped15)
+          it 'will still be 15 months before TED' do
+            expect(subject).to eq(start_date: ted15, handover_date: ted15)
           end
         end
       end
@@ -407,8 +406,8 @@ describe HandoverDateService do
                 let(:conditional_release_date) { nil }
                 let(:automatic_release_date) { nil }
 
-                it 'returns today' do
-                  expect(result).to eq(Time.zone.today)
+                it 'returns nil' do
+                  expect(result).to be_nil
                 end
               end
             end
@@ -433,8 +432,8 @@ describe HandoverDateService do
                 let(:conditional_release_date) { nil }
                 let(:automatic_release_date) { nil }
 
-                it 'returns today' do
-                  expect(result).to eq(Time.zone.today)
+                it 'returns nil' do
+                  expect(result).to be_nil
                 end
               end
             end
@@ -480,7 +479,7 @@ describe HandoverDateService do
           "indeterminate_sentence?" => indeterminate_sentence,
           parole_eligibility_date: parole_eligibility_date,
           parole_review_date: nil,
-          tariff_date: tariff_date,
+          release_date: tariff_date,
           "recent_prescoed_case?" => false
         )
       )
@@ -490,16 +489,10 @@ describe HandoverDateService do
       let(:indeterminate_sentence) { true }
 
       context 'with a tariff date' do
-        let(:tariff_date) { '1 Jan 2020'.to_date }
+        let(:tariff_date) { '1 Jan 2030'.to_date }
 
         it 'returns 8 months before that date' do
           expect(result).to eq(tariff_date - 8.months)
-        end
-      end
-
-      context 'without a tariff date' do
-        it 'returns nil' do
-          expect(result).to be_nil
         end
       end
     end
@@ -557,10 +550,12 @@ describe HandoverDateService do
     end
   end
 
-  context 'with an NPS and indeterminate case with a PRD' do
+  context 'with an NPS and indeterminate case with a PRD and no TED' do
     let(:case_info) { build(:case_information, :with_prd, :nps) }
     let(:offender) {
-      build(:offender, :indeterminate, sentence: build(:sentence_detail, :indeterminate, tariffDate: case_info.parole_review_date + 1.month)).tap {  |offender|
+      build(:offender, :indeterminate, sentence: build(:sentence_detail,
+                                                       :indeterminate,
+                                                       tariffDate: nil)).tap {  |offender|
         offender.load_case_information(case_info)
       }
     }
