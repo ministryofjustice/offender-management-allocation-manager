@@ -24,7 +24,7 @@
         <span class="handover-reason">(<%= @prisoner.handover_reason %>)</span>
       </td>
     </tr>
-    <% if Flipflop.early_allocation? && @case_info.present? %>
+    <% if Flipflop.early_allocation? && @case_info.present? && @case_info.nps? %>
     <tr id="early_allocation" class="govuk-table__row">
       <td class="govuk-table__cell">Early allocation referral</td>
       <td class="govuk-table__cell table_cell__left_align">

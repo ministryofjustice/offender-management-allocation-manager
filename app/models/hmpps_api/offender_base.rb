@@ -65,7 +65,7 @@ module HmppsApi
     end
 
     def nps_case?
-      case_allocation == 'NPS'
+      @case_information&.nps?
     end
 
     def welsh_offender
