@@ -41,6 +41,10 @@ class CaseInformation < ApplicationRecord
 
   before_validation :set_probation_service
 
+  def nps?
+    case_allocation == NPS
+  end
+
   def local_divisional_unit
     team.try(:local_divisional_unit)
   end
