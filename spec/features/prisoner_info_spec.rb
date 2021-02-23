@@ -54,7 +54,7 @@ feature 'View a prisoner profile page' do
         visit prison_prisoner_path('LEI', 'G7998GJ')
       end
 
-      scenario 'adding a VLO', :js do
+      scenario 'adding a VLO' do
         expect(page).to have_content('First Contact')
         click_link 'Add new VLO contact'
         find('.govuk-back-link')
