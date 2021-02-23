@@ -30,6 +30,13 @@ class HandoverDateService
                        start_date: nil, handover_date: nil,
                        reason: 'Immigration Case'
 
+    # Guard against indeterminate offenders without a TED in the future
+    # TODO: This would be better as a generic guard clause to catch anyone (determinate or indeterminate) without the required dates
+    elsif offender.nps_case? && offender.indeterminate_sentence? && (offender.tariff_date.nil? || offender.tariff_date < Time.zone.today)
+      HandoverData.new custody: RESPONSIBLE, community: NOT_INVOLVED,
+                       start_date: nil, handover_date: nil,
+                       reason: 'Indeterminate with no earliest release date'
+
     # Indeterminate offenders should only ever be NPS
     # There is no such thing as a CRC indeterminate offender
     # So in theory, it should be safe to assume that indeterminate offenders are NPS

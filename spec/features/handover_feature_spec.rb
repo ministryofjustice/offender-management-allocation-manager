@@ -76,14 +76,14 @@ feature "viewing upcoming handovers" do
       offenders = [
           build(:nomis_offender,
                 offenderNo: "A7514GW",
-                sentence: attributes_for(:sentence_detail, :handover_in_8_days)),
+                sentence: attributes_for(:sentence_detail, :handover_in_28_days)),
           build(:nomis_offender,
                 offenderNo: "B7514GW",
-                sentence: attributes_for(:sentence_detail, :handover_in_4_days)),
+                sentence: attributes_for(:sentence_detail, :handover_in_14_days)),
           build(:nomis_offender, offenderNo: "C7514GW",
-                sentence: attributes_for(:sentence_detail, :handover_in_6_days)),
+                sentence: attributes_for(:sentence_detail, :handover_in_21_days)),
           build(:nomis_offender, offenderNo: "D7514GW",
-                sentence: attributes_for(:sentence_detail, :handover_in_3_days))
+                sentence: attributes_for(:sentence_detail, :handover_in_6_days))
       ]
 
       stub_offenders_for_prison(prison, offenders)

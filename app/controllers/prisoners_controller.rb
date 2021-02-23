@@ -4,7 +4,7 @@ class PrisonersController < PrisonsApplicationController
   before_action :load_offender, only: [:show]
 
   def show
-    @prisoner = OffenderPresenter.new(@offender)
+    @prisoner = @offender
     @tasks = PomTasks.new.for_offender(@prisoner)
     @allocation = Allocation.find_by(nomis_offender_id: @prisoner.offender_no)
 

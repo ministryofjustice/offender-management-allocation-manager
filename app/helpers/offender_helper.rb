@@ -42,4 +42,28 @@ module OffenderHelper
       type + 'allocated'
     end
   end
+
+  def recommended_pom_type_label offender
+    if RecommendationService.recommended_pom_type(offender) == RecommendationService::PRISON_POM
+      'Prison officer'
+    else
+      'Probation officer'
+    end
+  end
+
+  def non_recommended_pom_type_label offender
+    if RecommendationService.recommended_pom_type(offender) == RecommendationService::PRISON_POM
+      'Probation officer'
+    else
+      'Prison officer'
+    end
+  end
+
+  def complex_reason_label offender
+    if RecommendationService.recommended_pom_type(offender) == RecommendationService::PRISON_POM
+      'Prisoner assessed as not suitable for a prison officer POM'
+    else
+      'Prisoner assessed as suitable for a prison officer POM despite tiering calculation'
+    end
+  end
 end
