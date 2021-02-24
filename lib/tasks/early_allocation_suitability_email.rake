@@ -8,7 +8,7 @@ namespace :early_allocation_suitability_email do
     offenders = EarlyAllocation.suitable_offenders_pre_referral_window.pluck(:nomis_offender_id).uniq
 
     offenders.each do |offender|
-      SuitableForEarlyAllocationEmailJob(offender).perform_later
+      SuitableForEarlyAllocationEmailJob.perform_later(offender)
     end
   end
 end
