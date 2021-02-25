@@ -64,7 +64,7 @@ FactoryBot.define do
     end
 
     trait :inside_handover_window do
-      conditionalReleaseDate { Time.zone.today + 7.days + 7.months + 15.days }
+      conditionalReleaseDate { Time.zone.today + 7.days + 7.months }
     end
 
     trait :indeterminate do

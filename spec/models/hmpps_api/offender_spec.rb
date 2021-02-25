@@ -361,84 +361,39 @@ describe HmppsApi::Offender do
     end
   end
 
-  describe '#needs_com_and_ldu_is_uncontactable?' do
-    context 'when unsentenced' do
-      let(:offender) {
-        build(:offender).tap { |o|
-          o.load_case_information(build(:case_information))
-          o.sentence = build(:sentence_detail, :unsentenced)
-        }
+  describe '#needs_a_com?' do
+    subject { offender.needs_a_com? }
+
+    let(:offender) {
+      build(:offender, sentence: sentence).tap { |o|
+        o.load_case_information(case_info)
       }
+    }
+
+    let(:case_info) { build(:case_information) }
+
+    context 'when the Community is not involved yet' do
+      let(:sentence) { build(:sentence_detail, :handover_in_8_days) }
 
       it 'returns false' do
-        expect(offender.sentenced?).to eq(false)
-        expect(offender.needs_com_and_ldu_is_uncontactable?).to eq(false)
+        expect(subject).to be(false)
       end
     end
 
-    it 'returns false if offender does not have a handover start date' do
-      offender = build(:offender, :indeterminate).tap { |o|
-        o.load_case_information(build(:case_information))
-        o.sentence = build(:sentence_detail, sentenceStartDate: Time.zone.today + 20.months)
-      }
+    context 'when the Community is involved' do
+      let(:sentence) { build(:sentence_detail, conditionalReleaseDate: Time.zone.today + 7.months) }
 
-      expect(offender.needs_com_and_ldu_is_uncontactable?).to eq(false)
-    end
+      context 'when a COM is already allocated' do
+        let(:case_info) { build(:case_information, :with_com) }
 
-    it 'returns false if offender is outside handover window' do
-      offender = build(:offender).tap { |o|
-        o.load_case_information(build(:case_information))
-        o.sentence = build(:sentence_detail,
-                           sentenceStartDate: Time.zone.today - 20.months,
-                           automaticReleaseDate: (Time.zone.today + 20.months),
-                           releaseDate: (Time.zone.today + 20.months))
-      }
-
-      expect(offender.needs_com_and_ldu_is_uncontactable?).to eq(false)
-    end
-
-    context 'when offender is inside handover_start to responsibility_handover' do
-      let(:offender) {
-        build(:offender).tap { |o|
-          o.load_case_information(case_info)
-          o.sentence = build(:sentence_detail,
-                             sentenceStartDate: (Time.zone.today - 20.months),
-                             automaticReleaseDate: (Time.zone.today + 7.months),
-                             releaseDate: (Time.zone.today + 20.months))
-        }
-      }
-
-      context "when offender has a 'COM'" do
-        let(:case_info) { build(:case_information, com_name: "Betty White") }
-
-        it "returns false" do
-          expect(offender.needs_com_and_ldu_is_uncontactable?).to eq(false)
+        it 'returns false' do
+          expect(subject).to be(false)
         end
       end
 
-      context "when offender has no 'COM' but has an LDU email address" do
-        let(:case_info) { build(:case_information) }
-
-        it "returns false" do
-          expect(offender.needs_com_and_ldu_is_uncontactable?).to eq(false)
-        end
-      end
-
-      context 'when offender really has no LDU' do
-        let(:case_info) { build(:case_information, team: nil) }
-
+      context 'when a COM has not been allocated yet' do
         it 'returns true' do
-          expect(offender.needs_com_and_ldu_is_uncontactable?).to eq(true)
-        end
-      end
-
-      context 'when offender has LDU but no email address' do
-        let(:case_info) {
-          build(:case_information, team: build(:team, local_divisional_unit: build(:local_divisional_unit, email_address: nil)))
-        }
-
-        it 'returns true' do
-          expect(offender.needs_com_and_ldu_is_uncontactable?).to eq(true)
+          expect(subject).to be(true)
         end
       end
     end
