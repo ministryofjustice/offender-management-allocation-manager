@@ -8,7 +8,7 @@
             <%= render 'layouts/controller_nav_link', text: 'Allocations', path: unallocated_prison_prisoners_path(@prison.code), controllers: ['allocations', 'summary'] %>
           <% end %>
           <% if @is_pom %>
-            <%= render 'layouts/controller_nav_link', text: 'Caseload', path: prison_staff_caseload_index_path(@prison.code, @staff_id), controllers: ['caseload', 'prisoners', 'tasks'] %>
+            <%= render 'layouts/controller_nav_link', text: 'Caseload', path: prison_staff_caseload_path(@prison.code, @staff_id), controllers: ['caseload', 'prisoners', 'tasks'] %>
           <% end %>
           <% if @is_spo %>
             <%= render 'layouts/controller_nav_link', text: 'Handover', path: prison_handovers_path(@prison.code), controllers: ['handovers', 'caseload_handovers'] %>

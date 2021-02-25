@@ -147,7 +147,7 @@ private
         nomis_offender_id: nomis_offender_id,
         prison_name: PrisonService.name_for(prison),
         url: Rails.application.routes.default_url_options[:host] +
-            Rails.application.routes.url_helpers.prison_staff_caseload_index_path(prison, primary_pom_nomis_id)
+            Rails.application.routes.url_helpers.prison_staff_caseload_path(prison, primary_pom_nomis_id)
     }
     update!(
       event: event,

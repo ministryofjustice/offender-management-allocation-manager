@@ -2,8 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe CaseloadController, :allocation, type: :controller do
-  let(:prison) { build(:prison).code }
+RSpec.describe CaseloadController, type: :controller do
   let(:staff_id) { 456_987 }
   let(:not_signed_in) { 123_456 }
   let(:poms) {
@@ -21,8 +20,8 @@ RSpec.describe CaseloadController, :allocation, type: :controller do
   let(:pom) { poms.first }
 
   before do
-    stub_poms(prison, poms)
-    stub_signed_in_pom(prison, pom.staffId, 'alice')
+    stub_poms(prison.code, poms)
+    stub_signed_in_pom(prison.code, pom.staffId, 'alice')
   end
 
   context 'with 3 offenders' do
@@ -47,75 +46,108 @@ RSpec.describe CaseloadController, :allocation, type: :controller do
                        movementDate: today.to_s)
       ]
 
-      stub_offenders_for_prison(prison, offenders, movements)
+      stub_offenders_for_prison(prison.code, offenders, movements)
 
       # Need to create history records because AllocatedOffender#new_case? doesn't cope otherwise
       offenders.each do |offender|
-        alloc = create(:allocation, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: pom.staffId, prison: prison)
+        alloc = create(:allocation, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: pom.staffId, prison: prison.code)
         alloc.update!(primary_pom_nomis_id: pom.staffId,
                       event: Allocation::REALLOCATE_PRIMARY_POM,
                       event_trigger: Allocation::USER)
       end
     end
 
-    describe '#index' do
-      context 'when user is an SPO' do
-        before do
-          stub_sso_data(prison)
-        end
-
-        it 'is allowed' do
-          get :index, params: { prison_id: prison, staff_id: staff_id }
-          expect(response).to be_successful
-        end
+    context 'when a womens prison' do
+      before do
+        stub_sso_data(prison.code)
       end
 
-      context 'when user is a different POM to the one signed in' do
-        before do
-          stub_signed_in_pom(prison, staff_id, 'alice')
-        end
-
-        it 'cant see the caseload' do
-          get :index, params: { prison_id: prison, staff_id: not_signed_in }
-          expect(response).to redirect_to('/401')
-        end
-      end
-
-      context 'when user is the signed in POM' do
-        before do
-          stub_signed_in_pom(prison, staff_id, 'alice')
-        end
-
-        let(:allocations) { assigns(:allocations).index_by(&:nomis_offender_id) }
+      describe '#index' do
+        let(:prison) { build(:womens_prison) }
+        let(:complexities) { ['high', 'medium', 'low'].cycle.take(offenders.size) }
 
         before do
-          get :index, params: { prison_id: prison, staff_id: staff_id }
+          offenders.each_with_index do |offender, index|
+            allow(ComplexityMicroService).to receive(:get_complexity).with(offender.fetch(:offenderNo)).and_return(complexities[index])
+          end
         end
 
-        it 'is allowed' do
+        it 'can sort by complexity' do
+          get :index, params: { prison_id: prison.code, staff_id: staff_id, sort: 'complexity_level_number asc' }
           expect(response).to be_successful
+          expect(assigns(:allocations).map(&:complexity_level)).to eq ['low', 'medium', 'high']
         end
 
-        it 'returns the caseload' do
-          expect(assigns(:allocations).map(&:nomis_offender_id)).to match_array(offenders.map { |o| o.fetch(:offenderNo) })
-        end
-
-        it 'returns ROTL information' do
-          expect(offenders.map { |o| allocations.fetch(o.fetch(:offenderNo)).latest_temp_movement_date }).to eq [today, nil, nil]
+        it 'can sort by complexity desc' do
+          get :index, params: { prison_id: prison.code, staff_id: staff_id, sort: 'complexity_level_number desc' }
+          expect(response).to be_successful
+          expect(assigns(:allocations).map(&:complexity_level)).to eq ['high', 'medium', 'low']
         end
       end
     end
 
-    describe '#new' do
-      before do
-        stub_sso_data(prison)
+    context 'when a mens prison' do
+      let(:prison) { build(:prison) }
+
+      describe '#index' do
+        context 'when user is an SPO' do
+          before do
+            stub_sso_data(prison.code)
+          end
+
+          it 'is allowed' do
+            get :index, params: { prison_id: prison.code, staff_id: staff_id }
+            expect(response).to be_successful
+          end
+        end
+
+        context 'when user is a different POM to the one signed in' do
+          before do
+            stub_signed_in_pom(prison.code, staff_id, 'alice')
+          end
+
+          it 'cant see the caseload' do
+            get :index, params: { prison_id: prison.code, staff_id: not_signed_in }
+            expect(response).to redirect_to('/401')
+          end
+        end
+
+        context 'when user is the signed in POM' do
+          before do
+            stub_signed_in_pom(prison.code, staff_id, 'alice')
+          end
+
+          let(:allocations) { assigns(:allocations).index_by(&:nomis_offender_id) }
+
+          before do
+            get :index, params: { prison_id: prison.code, staff_id: staff_id }
+          end
+
+          it 'is allowed' do
+            expect(response).to be_successful
+          end
+
+          it 'returns the caseload' do
+            expect(assigns(:allocations).map(&:nomis_offender_id)).to match_array(offenders.map { |o| o.fetch(:offenderNo) })
+          end
+
+          it 'returns ROTL information' do
+            expect(offenders.map { |o| allocations.fetch(o.fetch(:offenderNo)).latest_temp_movement_date }).to eq [today, nil, nil]
+          end
+        end
       end
 
-      it 'returns the caseload' do
-        get :new, params: { prison_id: prison, staff_id: staff_id }
-        expect(response).to be_successful
+      describe '#new_cases' do
+        before do
+          stub_sso_data(prison.code)
+        end
 
-        expect(assigns(:new_cases).map(&:nomis_offender_id)).to match_array(offenders.map { |o| o.fetch(:offenderNo) })
+        it 'returns the caseload' do
+          get :new_cases, params: { prison_id: prison.code, staff_id: staff_id }
+          expect(response).to be_successful
+
+          expect(assigns(:new_cases).map(&:nomis_offender_id)).to match_array(offenders.map { |o| o.fetch(:offenderNo) })
+        end
       end
     end
   end

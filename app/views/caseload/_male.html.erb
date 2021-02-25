@@ -1,0 +1,18 @@
+<tr class="govuk-table__row offender_row_<%= male_counter %>">
+  <td aria-label="Prisoner name" class="govuk-table__cell">
+    <%= link_to(highlight(male.full_name, @q), prison_prisoner_path(@prison.code, male.nomis_offender_id), class: "govuk-link" ) %>
+    <br/>
+    <span class='govuk-hint govuk-!-margin-bottom-0'>
+      <%= highlight(male.nomis_offender_id, @q) %>
+    </span>
+  </td>
+  <td aria-label="Location" class="govuk-table__cell">
+    <%= male.latest_movement_date.nil? ? PrisonService.name_for(male.prison) : "Temporary absence (out #{format_date(male.latest_movement_date)})" %>
+  </td>
+  <td aria-label="Tier" class="govuk-table__cell tier">
+    <%= male.tier %>
+  </td>
+  <td aria-label="Earliest release date" class="govuk-table__cell "><%= format_date(male.earliest_release_date, replacement: "Unknown") %></td>
+  <td aria-label="Allocation date" class="govuk-table__cell "><%= format_date(male.primary_pom_allocated_at) %></td>
+  <td aria-label="Role" class="govuk-table__cell "><%= male.pom_responsibility %></td>
+</tr>

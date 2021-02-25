@@ -40,12 +40,12 @@ RSpec.describe StaffMember, type: :model do
     end
 
     it 'can get tasks within a caseload' do
-      tasks = PomTasks.new.for_offenders(allocations.map(&:offender))
+      tasks = PomTasks.new.for_offenders(allocations)
       expect(tasks.count).to eq(1)
     end
 
     it "will hide invalid allocations" do
-      released_offender = allocations.detect { |ao| ao.offender.offender_no == 'G9999GG' }
+      released_offender = allocations.detect { |ao| ao.offender_no == 'G9999GG' }
       expect(released_offender).to be_nil
     end
   end
