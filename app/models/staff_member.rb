@@ -58,7 +58,7 @@ class StaffMember
   end
 
   def pending_handover_offenders
-    allocations.map(&:offender).select(&:approaching_handover?)
+    allocations.select(&:approaching_handover?)
   end
 
 private

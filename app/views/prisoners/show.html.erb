@@ -27,7 +27,7 @@
       </div>
     </div>
     <div class="case-type-badge">
-      <%= render 'shared/case_type_badge', offender: @prisoner, early_allocations: @case_info.nil? ? [] : @case_info.early_allocations %>
+      <%= render 'shared/badges', offender: @prisoner, early_allocations: @case_info.nil? ? [] : @case_info.early_allocations %>
     </div>
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-third">
@@ -66,7 +66,6 @@
     </div>
   </div>
 </div>
-
 
 <%= render 'prisoner_information'%>
 <%= render partial: 'shared/offence_info', locals: { editable_prd: true}  %>

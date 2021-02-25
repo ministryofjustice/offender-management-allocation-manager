@@ -14,7 +14,8 @@ Rails.application.routes.draw do
     resources :dashboard, only: :index
     resources :handovers, only: :index
     resources :staff do
-      resources :caseload, only: %i[index new]
+      get 'caseload' => 'caseload#index'
+      get 'new_cases' => 'caseload#new_cases'
       resources :caseload_handovers, only: %i[index]
     end
 
@@ -31,11 +32,15 @@ Rails.application.routes.draw do
           get 'missing_information' => 'female_prisoners#missing_information'
           get 'new_arrivals' => 'female_prisoners#new_arrivals'
         end
-        get 'summary' => 'summary#index'
-        get 'allocated' => 'summary#allocated'
-        get 'unallocated' => 'summary#unallocated'
-        get 'missing_information' => 'summary#missing_information'
-        get 'new_arrivals' => 'summary#new_arrivals'
+        constraints lambda {
+          |request| !PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id))
+        } do
+          get 'summary' => 'summary#index'
+          get 'allocated' => 'summary#allocated'
+          get 'unallocated' => 'summary#unallocated'
+          get 'missing_information' => 'summary#missing_information'
+          get 'new_arrivals' => 'summary#new_arrivals'
+        end
       end
 
       scope :format => true, :constraints => { :format => 'jpg' } do

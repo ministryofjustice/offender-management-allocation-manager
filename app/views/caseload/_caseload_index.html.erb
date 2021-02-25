@@ -1,0 +1,60 @@
+<% content_for :switcher do %>
+  <%= render '/layouts/prison_switcher' %>
+<% end %>
+
+<% if @pending_task_count > 0 %>
+  <%= render partial: 'shared/info_banner', locals: {
+      content: "#{@pending_task_count} case updates are needed. <a href='#{prison_tasks_path(@prison.code)}'>Check now</a>".html_safe }
+  %>
+<% end %>
+
+<% if @allocations.empty? %>
+  <h2 class="govuk-heading-l">No allocated cases</h2>
+<% else %>
+  <h2 class="govuk-heading-l">Your caseload (<%= @allocations.total_count %>)</h2>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-quarter">
+      <div class="govuk-body">New cases</div>
+      <div class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24 new-cases-count">
+        <%= link_to_if @new_cases_count > 0, "#{@new_cases_count}", prison_staff_new_cases_path(@prison.code, @staff_id), class:"govuk-link"%>
+      </div>
+    </div>
+
+    <div class="govuk-grid-column-one-quarter">
+      <div class="govuk-body">Cases close to handover</div>
+      <div class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24 upcoming-handover-count">
+        <%= link_to_if @pending_handover_count > 0, "#{@pending_handover_count}", prison_staff_caseload_handovers_path(@prison.code, @staff_id), class:"govuk-link"%>
+      </div>
+    </div>
+
+    <div class="govuk-grid-column-one-quarter">
+      <div class="govuk-body">Working pattern</div>
+      <div class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24"><%= working_pattern_name(@pom.working_pattern) %></div>
+    </div>
+    <div class="govuk-grid-column-one-quarter">
+      <div class="govuk-body">Status</div>
+      <div class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24"><%= @pom.status.capitalize %></div>
+    </div>
+  </div>
+
+  <div class="govuk-!-margin-bottom-6 govuk-!-margin-top-6">
+    <%= render "poms/search_box" %>
+  </div>
+
+  <%= render partial: 'shared/pagination', locals: {data: @allocations } %>
+
+  <table class="govuk-table responsive tablesorter">
+    <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <%= render header_partial %>
+      </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+      <%= render collection: @allocations, partial: collection_partial %>
+    </tbody>
+  </table>
+
+  <%= render partial: 'shared/pagination', locals: {data: @allocations } %>
+
+<% end %>

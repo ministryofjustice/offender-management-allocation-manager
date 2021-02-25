@@ -1,11 +1,18 @@
-
-
 <span id="prisoner-case-type" class="moj-badge moj-badge--<%=badge_colour(offender) %>"><%=badge_text(offender)%></span>
 <%= render('shared/recall_badge') if offender.recalled? %>
 <%= render('shared/parole_badge') if badge_for_parole?(offender) %>
 <% if early_allocation_approved?(early_allocations) %>
-<%=  render('shared/early_allocation_approved_badge') %>
+  <%=  render('shared/early_allocation_approved_badge') %>
 <% else %>
   <%= render('shared/early_allocation_notes_badge') if early_allocation_notes?(offender, early_allocations)%>
   <%= render('shared/early_allocation_active_badge') if early_allocation_active?(early_allocations) %>
+<% end %>
+<% if @prison.womens? %>
+  <% if offender.complexity_level == 'high' %>
+    <%= render('shared/complexity_badge', complexity_badge_text: 'HIGH COMPLEXITY') %>
+  <% elsif offender.complexity_level == 'medium' %>
+    <%= render('shared/complexity_badge', complexity_badge_text: 'MEDIUM COMPLEXITY') %>
+  <% elsif offender.complexity_level == 'low' %>
+    <%= render('shared/complexity_badge', complexity_badge_text: 'LOW COMPLEXITY') %>
+  <% end %>
 <% end %>
