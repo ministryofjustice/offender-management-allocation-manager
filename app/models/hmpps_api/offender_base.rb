@@ -59,12 +59,6 @@ module HmppsApi
       has_case_information? && within_early_allocation_window? && @case_information.early_allocations.suitable_offenders_pre_referral_window.any?
     end
 
-    def welsh_offender_in_prescoed_needs_com?
-      prison_id == PrisonService::PRESCOED_CODE &&
-        allocated_com_name.blank? &&
-        EmailHistory.sent_within_current_sentence(self, EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION).any?
-    end
-
     # Has a CaseInformation record been loaded for this offender?
     def has_case_information?
       @case_information.present?
@@ -222,8 +216,9 @@ module HmppsApi
       earliest_date.present? && earliest_date <= Time.zone.today + 18.months
     end
 
-    def needs_com_and_ldu_is_uncontactable?
-      needs_com? && sentenced? && allocated_com_name.blank? && ldu_email_address.blank?
+    def needs_a_com?
+      (com_responsibility.responsible? || com_responsibility.supporting?) &&
+        allocated_com_name.blank?
     end
 
     def inside_omic_policy?
@@ -233,10 +228,6 @@ module HmppsApi
     end
 
   private
-
-    def needs_com?
-      handover.community.responsible? || handover.community.supporting?
-    end
 
     def age
       return nil if date_of_birth.blank?
