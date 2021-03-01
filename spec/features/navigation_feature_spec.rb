@@ -103,7 +103,7 @@ feature 'Navigation' do
 
         it 'highlights the section' do
           click_menu_and_wait(link_css, index, delay: 3)
-          click_link_and_wait 'Allocate', delay: 7
+          click_link_and_wait 'Allocate', delay: 10
           new_link = all(link_css)[index]
           expect(new_link['aria-current']).to eq('page')
         end
