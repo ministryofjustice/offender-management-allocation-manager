@@ -35,8 +35,9 @@ class PomMailer < GovukNotifyRails::Mailer
   def responsibility_override_open_prison(
     prisoner_name:,
     prisoner_number:,
-    responsible_pom_name:,
-    responsible_pom_email:,
+    prisoner_crn:,
+    previous_pom_name:,
+    previous_pom_email:,
     prison_name:,
     previous_prison_name:,
     email:
@@ -44,8 +45,9 @@ class PomMailer < GovukNotifyRails::Mailer
     set_template('e517ddc9-5854-462e-b9a1-f67c97ad5b63')
     set_personalisation(prisoner_name: prisoner_name,
                         prisoner_number: prisoner_number,
-                        responsible_pom_name: responsible_pom_name,
-                        responsible_pom_email: responsible_pom_email,
+                        prisoner_crn: prisoner_crn,
+                        previous_pom_name: previous_pom_name,
+                        previous_pom_email: previous_pom_email,
                         prison_name: prison_name,
                         previous_prison_name: previous_prison_name)
     mail(to: email)

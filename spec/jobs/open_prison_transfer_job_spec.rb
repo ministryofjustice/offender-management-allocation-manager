@@ -118,8 +118,9 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
                                .with(hash_including(
                                        prisoner_number: nomis_offender_id,
                                        prisoner_name: offender.full_name,
-                                       responsible_pom_name: 'N/A',
-                                       responsible_pom_email: 'N/A',
+                                       prisoner_crn: offender.crn,
+                                       previous_pom_name: 'N/A',
+                                       previous_pom_email: 'N/A',
                                        prison_name: open_prison_name,
                                        previous_prison_name: closed_prison_name
                                      )).and_call_original
@@ -152,8 +153,9 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
                                .with(hash_including(
                                        prisoner_number: nomis_offender_id,
                                        prisoner_name: offender.full_name,
-                                       responsible_pom_name: 'Primary POMName',
-                                       responsible_pom_email: 'pom@localhost.local',
+                                       prisoner_crn: offender.crn,
+                                       previous_pom_name: 'Primary POMName',
+                                       previous_pom_email: 'pom@localhost.local',
                                        prison_name: open_prison_name,
                                        previous_prison_name: closed_prison_name
                                      )).and_call_original
@@ -189,13 +191,11 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
         it 'asks the LDU to allocate a Supporting COM' do
           expect(CommunityMailer).to receive(:omic_open_prison_community_allocation)
                                        .with(hash_including(
-                                               nomis_offender_id: nomis_offender_id,
+                                               prisoner_number: nomis_offender_id,
                                                prisoner_name: offender.full_name,
-                                               crn: case_info.crn,
+                                               prisoner_crn: case_info.crn,
                                                ldu_email: offender.ldu_email_address,
-                                               prison: open_prison_name,
-                                               pom_name: 'Primary POMName',
-                                               pom_email: 'pom@localhost.local'
+                                               prison_name: open_prison_name,
                                              )).and_call_original
 
           expect { described_class.perform_now(movement_json) }.to change(EmailHistory, :count).by(1)
@@ -249,62 +249,23 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
     context 'when the offender is NPS Indeterminate' do
       let(:nomis_offender) { indeterminate_nomis_offender }
 
-      context 'when there is no previous allocation' do
-        let!(:case_info) {
-          create(:case_information, :nps, nomis_offender_id: nomis_offender_id,
-                 local_delivery_unit: build(:local_delivery_unit)
-          )
-        }
+      let!(:case_info) {
+        create(:case_information, :nps, nomis_offender_id: nomis_offender_id,
+               local_delivery_unit: build(:local_delivery_unit)
+        )
+      }
 
-        it 'asks the LDU to allocate a Supporting COM' do
-          expect(CommunityMailer).to receive(:omic_open_prison_community_allocation)
-                                       .with(hash_including(
-                                               nomis_offender_id: nomis_offender_id,
-                                               prisoner_name: offender.full_name,
-                                               crn: case_info.crn,
-                                               ldu_email: offender.ldu_email_address,
-                                               prison: open_prison_name,
-                                               pom_name: 'N/A',
-                                               pom_email: 'N/A'
-                                             )).and_call_original
+      it 'asks the LDU to allocate a Supporting COM' do
+        expect(CommunityMailer).to receive(:omic_open_prison_community_allocation)
+                                     .with(hash_including(
+                                             prisoner_number: nomis_offender_id,
+                                             prisoner_name: offender.full_name,
+                                             prisoner_crn: case_info.crn,
+                                             ldu_email: offender.ldu_email_address,
+                                             prison_name: open_prison_name,
+                                           )).and_call_original
 
-          expect { described_class.perform_now(movement_json) }.to change(EmailHistory, :count).by(1)
-        end
-      end
-
-      context 'when there is a previous allocation' do
-        let!(:case_info) {
-          create(:case_information, :nps, nomis_offender_id: nomis_offender_id,
-                 local_delivery_unit: build(:local_delivery_unit)
-          )
-        }
-
-        # Create an allocation where the offender is allocated, and then deallocate so we can
-        # test finding the last pom that was allocated to this offender ....
-        let!(:allocation) {
-          create(:allocation, nomis_offender_id: nomis_offender_id,
-                 primary_pom_nomis_id: other_staff_id, primary_pom_name: 'Primary POMName',
-                 prison: closed_prison_code
-          ).tap { |alloc|
-            alloc.update(primary_pom_nomis_id: nomis_staff_id)
-            alloc.offender_transferred
-          }
-        }
-
-        it 'includes previous POM details in the email' do
-          expect(CommunityMailer).to receive(:omic_open_prison_community_allocation)
-                                       .with(hash_including(
-                                               nomis_offender_id: nomis_offender_id,
-                                               prisoner_name: offender.full_name,
-                                               crn: case_info.crn,
-                                               ldu_email: offender.ldu_email_address,
-                                               prison: open_prison_name,
-                                               pom_name: 'Primary POMName',
-                                               pom_email: 'pom@localhost.local'
-                                             )).and_call_original
-
-          expect { described_class.perform_now(movement_json) }.to change(EmailHistory, :count).by(1)
-        end
+        expect { described_class.perform_now(movement_json) }.to change(EmailHistory, :count).by(1)
       end
     end
   end
