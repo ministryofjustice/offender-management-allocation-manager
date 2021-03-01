@@ -5,8 +5,8 @@ describe HandoverDateService do
     subject { described_class.handover(offender).custody }
 
     context 'when prescoed' do
-      let(:recent_date) { HandoverDateService::PRESCOED_CUTOFF_DATE }
-      let(:past_date) { HandoverDateService::PRESCOED_CUTOFF_DATE - 1.day }
+      let(:recent_date) { HandoverDateService::PRESCOED_POLICY_START_DATE }
+      let(:past_date) { HandoverDateService::PRESCOED_POLICY_START_DATE - 1.day }
 
       context 'with recent arrival' do
         let(:arrival_date) { recent_date }
@@ -243,18 +243,6 @@ describe HandoverDateService do
     end
 
     context 'when NPS case' do
-      context 'when an open prison' do
-        let(:offender) {
-          build(:offender, latestLocationId: 'HDI').tap { |o|
-            o.load_case_information(build(:case_information, :nps))
-          }
-        }
-
-        it 'will show the POM as supporting' do
-          expect(subject).to eq HandoverDateService::SUPPORTING
-        end
-      end
-
       context 'when an English offender' do
         context 'when sentenced before policy start date' do
           let(:sentence_start_date) { Date.parse('15-09-2019') }

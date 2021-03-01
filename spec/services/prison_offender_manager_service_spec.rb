@@ -111,6 +111,8 @@ describe PrisonOffenderManagerService do
       before do
         stub_poms('WSI', [dave, alice, billy, charles, eric])
         stub_offenders_for_prison('WSI', [offender])
+        stub_pom(alice)
+        stub_pom(billy)
       end
 
       it 'removes duplicate staff ids, keeping the valid position' do

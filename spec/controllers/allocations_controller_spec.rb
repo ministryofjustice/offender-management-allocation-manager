@@ -303,6 +303,7 @@ RSpec.describe AllocationsController, :allocation, type: :controller do
       context 'with an allocation' do
         before do
           stub_offenders_for_prison(prison, [offender])
+          create(:case_information, nomis_offender_id: offender_no)
           create(:allocation, nomis_offender_id: offender_no)
         end
 

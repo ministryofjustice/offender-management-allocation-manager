@@ -10,7 +10,7 @@ feature 'Responsibility override' do
   let(:offender_id) { 'G8060UF' }
   let(:pom_id) { 485_926 }
 
-  context 'when overriding responsibility', :queueing, vcr: { cassette_name: :override_responsibility } do
+  context 'when overriding responsibility', vcr: { cassette_name: :override_responsibility } do
     before do
       ldu = create(:local_divisional_unit, email_address: 'ldu@test.com')
       team = create(:team, local_divisional_unit: ldu)

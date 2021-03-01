@@ -50,6 +50,8 @@ module ApiHelper
   end
 
   def stub_poms(prison, poms)
+    poms.each { |pom| pom.agencyId = prison }
+
     stub_request(:get, "#{T3}/staff/roles/#{prison}/role/POM").
       with(
         headers: {
@@ -109,7 +111,11 @@ module ApiHelper
       headers: {
         'Page-Limit' => '200',
         'Page-Offset' => '0'
-      }).to_return(body: offenders.zip(booking_ids).map { |o, booking_id| o.except(:sentence, :recall).merge('bookingId' => booking_id, 'agencyId' => prison) }.to_json)
+      })
+      .to_return(body: offenders.zip(booking_ids).map { |o, booking_id|
+                         o.except(:sentence, :recall)
+                           .merge('bookingId' => booking_id, 'agencyId' => prison)
+                       }                       .to_json)
 
     stub_request(:post, "#{T3_SEARCH}/prisoner-numbers").with(body: { prisonerNumbers: offenders.map { |offender| offender.fetch(:offenderNo) } }.to_json).
       to_return(body: offenders.map { |offender|

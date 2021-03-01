@@ -13,9 +13,11 @@ class CoworkingController < PrisonsApplicationController
       pom.staff_id == @current_pom.staff_id
     }
 
-    @active_poms, @unavailable_poms = poms.partition { |pom|
+    active_poms, unavailable_poms = poms.partition { |pom|
       %w[active unavailable].include? pom.status
     }
+    @active_poms = active_poms.map { |p| PomPresenter.new(p) }
+    @unavailable_poms = unavailable_poms.map { |p| PomPresenter.new(p) }
 
     @prison_poms = @active_poms.select(&:prison_officer?)
     @probation_poms = @active_poms.select(&:probation_officer?)
@@ -46,7 +48,7 @@ class CoworkingController < PrisonsApplicationController
       message: allocation_params[:message]
     )
     redirect_to unallocated_prison_prisoners_path(active_prison_id),
-                notice: "#{offender.full_name_ordered} has been allocated to #{pom.full_name_ordered} (#{pom.grade})"
+                notice: "#{offender.full_name_ordered} has been allocated to #{view_context.full_name_ordered(pom)} (#{view_context.grade(pom)})"
   end
 
   def confirm_removal

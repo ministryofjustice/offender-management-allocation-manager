@@ -5,29 +5,16 @@ class PrisonOffenderManagerService
   def self.get_poms_for(prison)
     # This API call doesn't do what it says on the tin. It can return duplicate
     # staff_ids in the situation where someone has more than one role.
-    poms = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(prison)
+    poms = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(prison).
+      select { |pom| pom.prison_officer? || pom.probation_officer? }.uniq(&:staff_id)
+
     pom_details = PomDetail.where(nomis_staff_id: poms.map(&:staff_id))
-    offender_numbers = Prison.new(prison).offenders.map(&:offender_no)
 
-    poms.map { |pom|
+    poms.each { |pom|
       detail = get_pom_detail(pom_details, pom.staff_id.to_i)
-
-      allocations = Allocation.active_pom_allocations(detail.nomis_staff_id, prison).
-        where(nomis_offender_id: offender_numbers).
-        map(&:nomis_offender_id)
-      allocation_counts = CaseInformation.where(nomis_offender_id: allocations).
-        group_by(&:tier)
-
-      pom.tier_a = allocation_counts.fetch('A', []).size
-      pom.tier_b = allocation_counts.fetch('B', []).size
-      pom.tier_c = allocation_counts.fetch('C', []).size
-      pom.tier_d = allocation_counts.fetch('D', []).size
-      pom.no_tier = allocation_counts.fetch('N/A', []).size
       pom.status = detail.status
       pom.working_pattern = detail.working_pattern
-
-      pom
-    }.select { |pom| pom.prison_officer? || pom.probation_officer? }.uniq(&:staff_id)
+    }
   end
 
   def self.get_pom_at(prison_id, nomis_staff_id)
@@ -41,8 +28,7 @@ class PrisonOffenderManagerService
       raise StandardError, "Failed to find POM ##{nomis_staff_id} at #{prison_id} - list is #{pom_staff_ids}"
     end
 
-    pom.emails = get_pom_emails(pom.staff_id)
-    pom
+    StaffMember.new(Prison.new(prison_id), pom.staff_id)
   end
 
   def self.get_pom_emails(nomis_staff_id)
