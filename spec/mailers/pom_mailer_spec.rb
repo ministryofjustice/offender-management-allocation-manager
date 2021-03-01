@@ -136,8 +136,9 @@ RSpec.describe PomMailer, type: :mailer do
       {
         prisoner_name: 'Prisoner, A',
         prisoner_number: 'A1234AA',
-        responsible_pom_name: 'POM, Responsible',
-        responsible_pom_email: 'responsible_pom@localhost.local',
+        prisoner_crn: '1234CRN',
+        previous_pom_name: 'POM, Responsible',
+        previous_pom_email: 'responsible_pom@localhost.local',
         prison_name: 'HMP Current',
         previous_prison_name: 'HMP Previous',
         email: 'testuser@localhost.local'
@@ -160,8 +161,9 @@ RSpec.describe PomMailer, type: :mailer do
         to eq(
           prisoner_name: params[:prisoner_name],
           prisoner_number: params[:prisoner_number],
-          responsible_pom_name: params[:responsible_pom_name],
-          responsible_pom_email: params[:responsible_pom_email],
+          prisoner_crn: params[:prisoner_crn],
+          previous_pom_name: params[:previous_pom_name],
+          previous_pom_email: params[:previous_pom_email],
           prison_name: params[:prison_name],
           previous_prison_name: params[:previous_prison_name]
         )

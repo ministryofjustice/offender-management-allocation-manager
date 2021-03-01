@@ -43,8 +43,9 @@ private
     PomMailer.responsibility_override_open_prison(
       prisoner_name: offender.full_name,
       prisoner_number: offender.offender_no,
-      responsible_pom_name: alloc.try(:primary_pom_name) || 'N/A',
-      responsible_pom_email: last_pom_email(alloc) || 'N/A',
+      prisoner_crn: offender.crn,
+      previous_pom_name: alloc.try(:primary_pom_name) || 'N/A',
+      previous_pom_email: last_pom_email(alloc) || 'N/A',
       prison_name: PrisonService.name_for(movement.to_agency),
       previous_prison_name: PrisonService.name_for(movement.from_agency),
       email: offender.ldu_email_address
@@ -52,15 +53,11 @@ private
   end
 
   def send_email_open_prison_allocation(offender, movement)
-    alloc = last_allocation(offender)
-
     CommunityMailer.omic_open_prison_community_allocation(
       prisoner_name: offender.full_name,
-      nomis_offender_id: offender.offender_no,
-      crn: offender.crn,
-      pom_name: alloc.try(:primary_pom_name) || 'N/A',
-      pom_email: last_pom_email(alloc) || 'N/A',
-      prison: PrisonService.name_for(movement.to_agency),
+      prisoner_number: offender.offender_no,
+      prisoner_crn: offender.crn,
+      prison_name: PrisonService.name_for(movement.to_agency),
       ldu_email: offender.ldu_email_address
     ).deliver_later
 

@@ -99,13 +99,11 @@ RSpec.describe CommunityMailer, type: :mailer do
 
     let(:params) do
       {
-      nomis_offender_id: offender.offender_no,
-      prisoner_name: offender.full_name,
-      crn: offender.crn,
-      ldu_email: offender.ldu_email_address,
-      prison: PrisonService.name_for(PrisonService::PRESCOED_CODE),
-      pom_name: "Johnson, Michael",
-      pom_email: "michael.johnson@pom.gov.uk"
+        prisoner_number: offender.offender_no,
+        prisoner_name: offender.full_name,
+        prisoner_crn: offender.crn,
+        ldu_email: offender.ldu_email_address,
+        prison_name: PrisonService.name_for(PrisonService::PRESCOED_CODE)
       }
     end
 
@@ -125,13 +123,10 @@ RSpec.describe CommunityMailer, type: :mailer do
 
     it 'personalises the email for handover' do
       expect(mail.govuk_notify_personalisation).
-      to eq(email: params[:ldu_email],
-            prisoner_name: params[:prisoner_name],
-            crn_number: params[:crn],
-            prisoner_number: params[:nomis_offender_id],
-            prison_name: params[:prison],
-            responsible_pom_name: params[:pom_name],
-            responsible_pom_email: params[:pom_email]
+      to eq(prisoner_name: params[:prisoner_name],
+            prisoner_number: params[:prisoner_number],
+            prisoner_crn: params[:prisoner_crn],
+            prison_name: params[:prison_name]
          )
     end
   end
