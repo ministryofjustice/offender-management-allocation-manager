@@ -31,7 +31,7 @@ feature 'Search for offenders' do
 
       it 'shows update not edit' do
         signin_spo_user
-        visit prison_summary_allocated_path(prison)
+        visit allocated_prison_prisoners_path(prison)
 
         expect(page).to have_text('See allocations')
         fill_in 'q', with: nomis_offender_id
@@ -52,7 +52,7 @@ feature 'Search for offenders' do
 
       it 'shows update not edit' do
         signin_spo_user
-        visit prison_summary_allocated_path(prison)
+        visit allocated_prison_prisoners_path(prison)
 
         expect(page).to have_text('See allocations')
         fill_in 'q', with: nomis_offender_id
@@ -79,7 +79,7 @@ feature 'Search for offenders' do
 
   it 'Can search from the Allocations summary page', vcr: { cassette_name: :allocated_search_feature } do
     signin_spo_user
-    visit prison_summary_allocated_path(prison)
+    visit allocated_prison_prisoners_path(prison)
 
     expect(page).to have_text('See allocations')
     fill_in 'q', with: 'Fra'
@@ -91,7 +91,7 @@ feature 'Search for offenders' do
 
   it 'Can search from the Awaiting Allocation summary page', vcr: { cassette_name: :waiting_allocation_search_feature } do
     signin_spo_user
-    visit prison_summary_unallocated_path(prison)
+    visit unallocated_prison_prisoners_path(prison)
 
     expect(page).to have_text('Make allocations')
     fill_in 'q', with: 'Tre'
@@ -103,7 +103,7 @@ feature 'Search for offenders' do
 
   it 'Can search from the Missing Information summary page', vcr: { cassette_name: :missing_info_search_feature } do
     signin_spo_user
-    visit  prison_summary_pending_path(prison)
+    visit  pending_prison_prisoners_path(prison)
 
     expect(page).to have_text('Make allocations')
     fill_in 'q', with: 'Ste'

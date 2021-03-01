@@ -5,11 +5,12 @@ require 'rails_helper'
 RSpec.describe "allocations/new", type: :view do
   before do
     assign(:prison, build(:prison))
-    assign(:prisoner, OffenderPresenter.new(build(:offender)))
+    assign(:prisoner, build(:offender))
     assign(:previously_allocated_pom_ids, [])
     assign(:recommended_poms, [])
     assign(:not_recommended_poms, [])
     assign(:unavailable_pom_count, 0)
+    assign(:case_info, build(:case_information))
     render
   end
 

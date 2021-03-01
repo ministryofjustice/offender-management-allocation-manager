@@ -7,8 +7,9 @@ Rails.application.routes.draw do
   get '/auth/:provider/callback', to: 'sessions#create'
   get '/signout', to: 'sessions#destroy'
 
-  resources :prisons do
+  resources :prisons, only: [] do
     resources :prisons, only: :index
+
     resources :dashboard, only: :index
     resources :handovers, only: :index
     resources :staff do
@@ -17,12 +18,21 @@ Rails.application.routes.draw do
     end
 
     resources :prisoners, only: [:show] do
+      collection do
+        get 'summary' => 'summary#index'
+        get 'allocated' => 'summary#allocated'
+        get 'unallocated' => 'summary#unallocated'
+        get 'pending' => 'summary#pending'
+        get 'new_arrivals' => 'summary#new_arrivals'
+      end
+
       scope :format => true, :constraints => { :format => 'jpg' } do
         get('image' => 'prisoners#image', as: 'image')
       end
 
       resources :early_allocations, only: [:new, :index, :show] do
         collection do
+          post 'oasys_date'
           post 'eligible'
           post 'discretionary'
           post 'confirm_with_reason'
@@ -79,12 +89,6 @@ Rails.application.routes.draw do
     get('/debugging' => 'debugging#debugging')
     get('/debugging/prison' => 'debugging#prison_info')
     get('/search' => 'search#search')
-
-    get('/summary' => 'summary#index')
-    get('/summary/allocated' => 'summary#allocated')
-    get('/summary/unallocated' => 'summary#unallocated')
-    get('/summary/pending' => 'summary#pending')
-    get('/summary/new-arrivals' => 'summary#new_arrivals')
   end
 
   match "/401", :to => "errors#unauthorized", :via => :all

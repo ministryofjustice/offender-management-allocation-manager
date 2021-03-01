@@ -13,64 +13,6 @@ describe MovementService, type: :feature do
     expect(movements.first).to be_kind_of(HmppsApi::Movement)
   end
 
-  it "can filter transfer type results",
-     vcr: { cassette_name: :movement_service_filter_type_spec }  do
-    movements = described_class.movements_on(
-      Date.iso8601('2019-02-20'),
-      type_filters: [HmppsApi::MovementType::TRANSFER]
-    )
-    expect(movements).to be_kind_of(Array)
-    expect(movements.length).to eq(0)
-  end
-
-  it "can filter admissions",
-     vcr: { cassette_name: :movement_service_filter_adm_spec }  do
-    movements = described_class.movements_on(
-      Date.iso8601('2019-03-12'),
-      type_filters: [HmppsApi::MovementType::ADMISSION]
-    )
-    expect(movements).to be_kind_of(Array)
-    expect(movements.length).to eq(1)
-    expect(movements.first).to be_kind_of(HmppsApi::Movement)
-    expect(movements.first.movement_type).to eq(HmppsApi::MovementType::ADMISSION)
-  end
-
-  it "can filter release type results",
-     vcr: { cassette_name: :movement_service_filter_release_spec }  do
-    movements = described_class.movements_on(
-      Date.iso8601('2019-02-20'),
-      type_filters: [HmppsApi::MovementType::RELEASE]
-    )
-    expect(movements).to be_kind_of(Array)
-    expect(movements.length).to eq(2)
-    expect(movements.first).to be_kind_of(HmppsApi::Movement)
-    expect(movements.first.movement_type).to eq(HmppsApi::MovementType::RELEASE)
-  end
-
-  it "can filter results by direction IN",
-     vcr: { cassette_name: :movement_service_filter_direction_in_spec }  do
-    movements = described_class.movements_on(
-      Date.iso8601('2019-03-12'),
-      direction_filters: [HmppsApi::MovementDirection::IN]
-    )
-    expect(movements).to be_kind_of(Array)
-    expect(movements.length).to eq(1)
-    expect(movements.first).to be_kind_of(HmppsApi::Movement)
-    expect(movements.first.direction_code).to eq(HmppsApi::MovementDirection::IN)
-  end
-
-  it "can filter results by direction OUT",
-     vcr: { cassette_name: :movement_service_filter_direction_out_spec }  do
-    movements = described_class.movements_on(
-      Date.iso8601('2019-02-20'),
-      direction_filters: [HmppsApi::MovementDirection::OUT]
-    )
-    expect(movements).to be_kind_of(Array)
-    expect(movements.length).to eq(2)
-    expect(movements.first).to be_kind_of(HmppsApi::Movement)
-    expect(movements.first.direction_code).to eq(HmppsApi::MovementDirection::OUT)
-  end
-
   it "can ignore movements OUT",
      vcr: { cassette_name: :movement_service_ignore_out_spec }  do
     processed = described_class.process_movement(transfer_out)
@@ -209,7 +151,7 @@ describe MovementService, type: :feature do
     let(:allocation) { Allocation.find_by(nomis_offender_id: 'G4273GI') }
 
     let(:immigration_movement) do
-      build(:movement, offenderNo: 'G4273GI', directionCode: direction_code, createDateTime: Date.new(2020, 1, 6).to_s,
+      build(:movement, offenderNo: 'G4273GI', directionCode: direction_code, movementDate: Date.new(2020, 1, 6).to_s,
                        movementType: movement_type, fromAgency: from_agency, toAgency: to_agency)
     end
 

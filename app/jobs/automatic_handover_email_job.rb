@@ -2,7 +2,7 @@
 
 class AutomaticHandoverEmailJob < ApplicationJob
   queue_as :default
-  HEADERS = ['Prisoner', 'CRN', 'Prisoner number', 'Handover start date', 'Responsibility handover', 'Release/Parole Date', 'Prison', 'Current POM', 'POM email'].freeze
+  HEADERS = ['Prisoner', 'CRN', 'Prisoner number', 'Handover start date', 'Responsibility handover', 'Release/Parole Date', 'Prison', 'Current POM', 'POM email', 'COM'].freeze
   # Turns out that between? is inclusive at both ends, so a 45-day gap needs a 44-day threshold
   SEND_THRESHOLD = 44.days.freeze
 
@@ -36,7 +36,8 @@ class AutomaticHandoverEmailJob < ApplicationJob
                     [offender.conditional_release_date, offender.parole_eligibility_date, offender.tariff_date].compact.min,
                     PrisonService.name_for(offender.prison_id),
                     allocation&.primary_pom_name,
-                    allocation&.active? ? PrisonOffenderManagerService.get_pom_emails(allocation.primary_pom_nomis_id).first : nil
+                    allocation&.active? ? PrisonOffenderManagerService.get_pom_emails(allocation.primary_pom_nomis_id).first : nil,
+                    offender.allocated_com_name
                 ]
           end
         end

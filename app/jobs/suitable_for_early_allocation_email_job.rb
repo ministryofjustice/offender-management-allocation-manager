@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class SuitableForEarlyAllocationEmailJob < ApplicationJob
-  queue_as :mailer
+  queue_as :mailers
 
   EQUIP_URL = 'https://equip-portal.rocstac.com/CtrlWebIsapi.dll/?__id=webDiagram.show&map=0%3A9A63E167DE4B400EA07F81A9271E1944&dgm=4F984B45CBC447B1A304B2FFECABB777'
 
@@ -13,9 +13,7 @@ class SuitableForEarlyAllocationEmailJob < ApplicationJob
 
     if !prisoner.nil? && prisoner.within_early_allocation_window?
 
-      already_emailed = EmailHistory.where(
-        nomis_offender_id: offender_no,
-        event: EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION).where('created_at > ?', prisoner.sentence_start_date)
+      already_emailed = EmailHistory.sent_within_current_sentence(prisoner,  EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION)
 
       if already_emailed.empty?
 

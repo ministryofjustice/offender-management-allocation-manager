@@ -15,7 +15,7 @@ RSpec.describe "debugging/debugging", type: :view do
   let(:prison) { build(:prison) }
 
   before do
-    assign(:offender, OffenderPresenter.new(offender))
+    assign(:offender, offender)
     assign(:prison, prison)
 
     render

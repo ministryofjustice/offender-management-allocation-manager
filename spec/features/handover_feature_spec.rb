@@ -7,15 +7,6 @@ feature "viewing upcoming handovers" do
   context 'when signed in as an SPO' do
     let(:offender) { build(:nomis_offender, latestLocationId: prison) }
     let!(:case_info) { create(:case_information, nomis_offender_id: offender.fetch(:offenderNo)) }
-    let(:handover_dates) {
-      HandoverDateService::HandoverData.new(
-        HandoverDateService::RESPONSIBLE,
-        HandoverDateService::NOT_INVOLVED,
-        handover_start_date,
-        responsibility_handover_date,
-        'Stubbed handover date'
-      )
-    }
 
     before do
       # Stub auth
@@ -27,7 +18,8 @@ feature "viewing upcoming handovers" do
       stub_offenders_for_prison(prison, [offender])
 
       # Stub handover dates for the offender
-      allow(HandoverDateService).to receive(:handover).and_return(handover_dates)
+      allow_any_instance_of(HmppsApi::OffenderBase).to receive(:handover_start_date).and_return(handover_start_date)
+      allow_any_instance_of(HmppsApi::OffenderBase).to receive(:responsibility_handover_date).and_return(responsibility_handover_date)
 
       visit prison_handovers_path(prison)
     end
@@ -84,14 +76,14 @@ feature "viewing upcoming handovers" do
       offenders = [
           build(:nomis_offender,
                 offenderNo: "A7514GW",
-                sentence: attributes_for(:sentence_detail, :handover_in_8_days)),
+                sentence: attributes_for(:sentence_detail, :handover_in_28_days)),
           build(:nomis_offender,
                 offenderNo: "B7514GW",
-                sentence: attributes_for(:sentence_detail, :handover_in_4_days)),
+                sentence: attributes_for(:sentence_detail, :handover_in_14_days)),
           build(:nomis_offender, offenderNo: "C7514GW",
-                sentence: attributes_for(:sentence_detail, :handover_in_6_days)),
+                sentence: attributes_for(:sentence_detail, :handover_in_21_days)),
           build(:nomis_offender, offenderNo: "D7514GW",
-                sentence: attributes_for(:sentence_detail, :handover_in_3_days))
+                sentence: attributes_for(:sentence_detail, :handover_in_6_days))
       ]
 
       stub_offenders_for_prison(prison, offenders)

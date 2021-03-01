@@ -13,6 +13,8 @@ class AllocationsController < PrisonsApplicationController
       recommended_and_nonrecommended_poms_for(@prisoner)
     @unavailable_pom_count = unavailable_pom_count
     @allocation = Allocation.find_by nomis_offender_id: nomis_offender_id_from_url
+    @case_info = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: nomis_offender_id_from_url)
+    @open_prison_email = EmailHistory.sent_within_current_sentence(@prisoner, EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION).first
   end
 
   def show
@@ -32,6 +34,8 @@ class AllocationsController < PrisonsApplicationController
       end
     end
     @keyworker = HmppsApi::KeyworkerApi.get_keyworker(active_prison_id, @prisoner.offender_no)
+    @case_info = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: nomis_offender_id_from_url)
+    @open_prison_email = EmailHistory.sent_within_current_sentence(@prisoner, EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION).first
   end
 
   def edit
@@ -50,6 +54,7 @@ class AllocationsController < PrisonsApplicationController
     @unavailable_pom_count = unavailable_pom_count
 
     @current_pom = current_pom_for(nomis_offender_id_from_url)
+    @case_info = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: nomis_offender_id_from_url)
   end
 
   def confirm
@@ -87,9 +92,9 @@ class AllocationsController < PrisonsApplicationController
     end
 
     if allocation[:event] == 'allocate_primary_pom'
-      redirect_to prison_summary_unallocated_path(active_prison_id, page: params[:page], sort: params[:sort])
+      redirect_to unallocated_prison_prisoners_path(active_prison_id, page: params[:page], sort: params[:sort])
     else
-      redirect_to prison_summary_allocated_path(active_prison_id, page: params[:page], sort: params[:sort])
+      redirect_to allocated_prison_prisoners_path(active_prison_id, page: params[:page], sort: params[:sort])
     end
   end
 
@@ -123,7 +128,7 @@ private
       created_by_username: current_user,
       nomis_booking_id: offender.booking_id,
       allocated_at_tier: offender.tier,
-      recommended_pom_type: (offender.recommended_pom_type == RecommendationService::PRISON_POM) ? 'prison' : 'probation',
+      recommended_pom_type: (RecommendationService.recommended_pom_type(offender) == RecommendationService::PRISON_POM) ? 'prison' : 'probation',
       prison: active_prison_id,
       override_reasons: override_reasons,
       suitability_detail: suitability_detail,
@@ -133,7 +138,7 @@ private
   end
 
   def offender(nomis_offender_id)
-    OffenderPresenter.new(OffenderService.get_offender(nomis_offender_id))
+    OffenderService.get_offender(nomis_offender_id)
   end
 
   def pom
@@ -170,7 +175,7 @@ private
     # Returns a pair of lists where the first element contains the
     # POMs from the `poms` parameter that are recommended for the
     # `offender`
-    recommended_type = offender.recommended_pom_type
+    recommended_type = RecommendationService.recommended_pom_type(offender)
     poms.partition { |pom|
       if recommended_type == RecommendationService::PRISON_POM
         pom.prison_officer?

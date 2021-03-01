@@ -32,31 +32,4 @@ class OffenderService
         mappa_levels: mappa_registrations.map { |r| r.dig(:registerLevel, :code).last.to_i }
     }
   end
-
-  # Takes a list of OffenderSummary or Offender objects, and returns them with their
-  # allocated POM name set in :allocated_pom_name.
-  # This is now only used by the SearchController.
-  def self.set_allocated_pom_name(offenders, prison_id)
-    pom_names = PrisonOffenderManagerService.get_pom_names(prison_id)
-    nomis_offender_ids = offenders.map(&:offender_no)
-    offender_to_staff_hash = Allocation.
-      where(nomis_offender_id: nomis_offender_ids).
-      map { |a|
-        [
-          a.nomis_offender_id,
-          {
-            pom_name: pom_names[a.primary_pom_nomis_id],
-            allocation_date: (a.primary_pom_allocated_at || a.updated_at)&.to_date
-          }
-        ]
-      }.to_h
-
-    offenders.each do |offender|
-      if offender_to_staff_hash.key?(offender.offender_no)
-        offender.allocated_pom_name = offender_to_staff_hash[offender.offender_no][:pom_name]
-        offender.allocation_date = offender_to_staff_hash[offender.offender_no][:allocation_date]
-      end
-    end
-    offenders
-  end
 end

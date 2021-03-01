@@ -10,55 +10,76 @@ class HandoverDateService
   # Actual date Mon 19th Oct 2020
   PRESCOED_CUTOFF_DATE = Date.new(2020, 10, 19).freeze
 
-  HandoverData = Struct.new :custody, :community, :start_date, :handover_date, :reason
+  HandoverData = Struct.new :custody, :community, :start_date, :handover_date, :reason, keyword_init: true
 
   # if COM responsible, then handover dates all empty
-  NO_HANDOVER_DATE = HandoverData.new SUPPORTING, RESPONSIBLE, nil, nil, 'COM Responsibility'
+  NO_HANDOVER_DATE = HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
+                                      start_date: nil, handover_date: nil,
+                                      reason: 'COM Responsibility'
 
   def self.handover(raw_offender)
     offender = OffenderWrapper.new(raw_offender)
 
     if offender.recalled?
-      HandoverData.new SUPPORTING, RESPONSIBLE, nil, nil, 'Recall case'
+      HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
+                       start_date: nil, handover_date: nil,
+                       reason: 'Recall case'
+
     elsif offender.immigration_case?
-      HandoverData.new SUPPORTING, RESPONSIBLE, nil, nil, 'Immigration Case'
-    elsif offender.nps_case? && offender.indeterminate_sentence? && (offender.tariff_date.nil? || offender.tariff_date < Time.zone.today)
-      HandoverData.new RESPONSIBLE, NOT_INVOLVED, nil, nil, 'Indeterminate with no earliest release date'
-    elsif offender.recent_prescoed_case? && offender.indeterminate_sentence? && offender.nps_case?
-      handover_date = prescoed_handover_date(offender)
-      HandoverData.new SUPPORTING, RESPONSIBLE, offender.prison_arrival_date, handover_date, 'Prescoed'
+      HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
+                       start_date: nil, handover_date: nil,
+                       reason: 'Immigration Case'
+
+    elsif offender.release_date.blank?
+      HandoverData.new custody: RESPONSIBLE, community: NOT_INVOLVED,
+                       start_date: nil, handover_date: nil,
+                       reason: 'Release Date Unknown'
+
+    # Indeterminate offenders should only ever be NPS
+    # There is no such thing as a CRC indeterminate offender
+    # So in theory, it should be safe to assume that indeterminate offenders are NPS
+    # But in practice, there are some indeterminate offenders who are incorrectly recorded as CRC cases
+    # (likely due to HOMDs choosing CRC just to 'get past' the missing information screen when the offender isn't in nDelius)
+    # By using || here, we effectively ignore their CRC designation and treat them an NPS offender
     elsif offender.nps_case? || offender.indeterminate_sentence?
       handover_date, reason = nps_handover_date(offender)
       start_date = nps_start_date(offender)
       handover_date = start_date if start_date.present? && start_date > handover_date
 
-      case responsibility_override(offender)
-      when nil
-        pom_responsible = nps_responsibility(offender, handover_date)
-        if pom_responsible == RESPONSIBLE
-          HandoverData.new RESPONSIBLE, com_responsibility(start_date, handover_date), start_date, handover_date, reason
-        else
-          HandoverData.new SUPPORTING, RESPONSIBLE, start_date, handover_date, reason
-        end
-      when NOT_INVOLVED
-        HandoverData.new NOT_INVOLVED, NOT_INVOLVED, nil, nil, 'NPS Case - missing dates'
-      when RESPONSIBLE
-        HandoverData.new RESPONSIBLE, com_responsibility(start_date, handover_date), start_date, handover_date, reason
+      if offender.in_open_prison? && !offender.recent_prescoed_case?
+        # Offender is in open prison under pre-OMIC rules – COM is always responsible
+        HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
+                         start_date: nil, handover_date: nil,
+                         reason: reason
       else
-        HandoverData.new SUPPORTING, RESPONSIBLE, start_date, handover_date, reason
+        case nps_responsibility(offender, handover_date)
+        when RESPONSIBLE
+          HandoverData.new custody: RESPONSIBLE, community: com_responsibility(start_date, handover_date),
+                           start_date: start_date, handover_date: handover_date,
+                           reason: reason
+        when SUPPORTING
+          HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
+                           start_date: start_date, handover_date: handover_date,
+                           reason: reason
+        else
+          HandoverData.new custody: NOT_INVOLVED, community: NOT_INVOLVED,
+                           start_date: nil, handover_date: nil,
+                           reason: 'Unsentenced'
+        end
       end
     else
-      responsibility = crc_responsibility(offender)
-      if responsibility == NOT_INVOLVED
-        HandoverData.new NOT_INVOLVED, NOT_INVOLVED, nil, nil, 'CRC Case - missing dates'
+      # CRC case
+      crc_date = offender.release_date - 12.weeks
+      if crc_date.future?
+        pom = RESPONSIBLE
+        com = NOT_INVOLVED
       else
-        crc_date = crc_handover_date(offender)
-        if responsibility == RESPONSIBLE
-          HandoverData.new RESPONSIBLE, NOT_INVOLVED, crc_date, crc_date, 'CRC Case'
-        else
-          HandoverData.new SUPPORTING, RESPONSIBLE, crc_date, crc_date, 'CRC Case'
-        end
+        pom = SUPPORTING
+        com = RESPONSIBLE
       end
+      HandoverData.new custody: pom, community: com,
+                         start_date: crc_date, handover_date: crc_date,
+                         reason: 'CRC Case'
     end
   end
 
@@ -72,31 +93,11 @@ private
     end
   end
 
-  # We currently don't have access to the date of the parole board decision, which means that we cannot correctly
-  # calculate responsibility for NPS indeterminate cases with parole eligibility where the TED is in the past.
-  # A decision has been made to display a notice so staff can check whether they need to override their case or not;
-  # this is until we get access to this data.
-  def self.responsibility_override(offender)
-    if offender.open_prison_nps_offender? && !offender.recent_prescoed_case?
-      SUPPORTING
-    elsif offender.determinate_with_no_release_dates?
-      RESPONSIBLE
-    elsif offender.indeterminate_sentence? && (offender.tariff_date.nil? ||
-        offender.tariff_date < Time.zone.today)
-      RESPONSIBLE
-    elsif offender.release_date.blank?
-      NOT_INVOLVED
-    end
-  end
-
-  def self.prescoed_handover_date(offender)
-    target_date = [offender.tariff_date, offender.parole_review_date, offender.parole_eligibility_date].compact.min
-    target_date - 8.months
-  end
-
   def self.nps_start_date(offender)
-    if offender.early_allocation?
-      early_allocation_handover_start_date(offender)
+    if offender.recent_prescoed_case? && offender.indeterminate_sentence?
+      offender.prison_arrival_date
+    elsif offender.early_allocation?
+      early_allocation_handover_date(offender)
     elsif offender.indeterminate_sentence?
       indeterminate_responsibility_date(offender)
     else
@@ -104,10 +105,8 @@ private
     end
   end
 
-  def self.early_allocation_handover_start_date(offender)
-    return nil if offender.conditional_release_date.nil?
-
-    offender.conditional_release_date - 18.months
+  def self.early_allocation_handover_date(offender)
+    offender.release_date - 15.months
   end
 
   def self.determinate_sentence_handover_start_date(offender)
@@ -123,21 +122,10 @@ private
     end
   end
 
-  def self.crc_handover_date(offender)
-    date = offender.home_detention_curfew_actual_date.presence ||
-      offender.home_detention_curfew_eligibility_date.presence ||
-             [offender.conditional_release_date,
-              offender.automatic_release_date
-             ].compact.min
-    date - 12.weeks if date
-  end
-
   def self.nps_handover_date(offender)
     if offender.early_allocation?
-      return [early_allocation_handover_date(offender), 'NPS Early Allocation']
-    end
-
-    if offender.indeterminate_sentence?
+      [early_allocation_handover_date(offender), 'NPS Early Allocation']
+    elsif offender.indeterminate_sentence?
       [indeterminate_responsibility_date(offender), 'NPS Inderminate']
     elsif offender.parole_eligibility_date.present?
       [offender.parole_eligibility_date - 8.months, 'NPS Determinate Parole Case']
@@ -150,15 +138,8 @@ private
     end
   end
 
-  # We can not calculate the handover date for NPS Indeterminate
-  # with parole cases where the TED is in the past as we need
-  # the parole board decision which currently is not available to us.
   def self.indeterminate_responsibility_date(offender)
-    [
-      offender.parole_review_date,
-      offender.parole_eligibility_date,
-      offender.tariff_date
-    ].compact.map { |date| date - 8.months }.min
+    offender.release_date - 8.months
   end
 
   def self.mappa_23_responsibility_date(offender)
@@ -183,10 +164,6 @@ private
 
       [earliest_date, offender.home_detention_curfew_eligibility_date].compact.min
     end
-  end
-
-  def self.early_allocation_handover_date(offender)
-    offender.conditional_release_date - 15.months
   end
 
   def self.nps_responsibility_rules(offender:, policy_start_date:, handover_date:, cutoff_date:)
@@ -242,40 +219,15 @@ private
     end
   end
 
-  def self.crc_responsibility(offender)
-    # CRC can look at HDC date, NPS is not supposed to
-    earliest_release_date =
-      offender.home_detention_curfew_actual_date.presence ||
-          [offender.automatic_release_date,
-           offender.conditional_release_date,
-           offender.home_detention_curfew_eligibility_date].compact.min
-
-    return NOT_INVOLVED if earliest_release_date.nil?
-
-    if earliest_release_date > DateTime.now.utc.to_date + 12.weeks
-      RESPONSIBLE
-    else
-      SUPPORTING
-    end
-  end
-
   class OffenderWrapper
-    delegate :recalled?, :immigration_case?, :nps_case?, :indeterminate_sentence?, :tariff_date,
+    delegate :recalled?, :immigration_case?, :nps_case?, :indeterminate_sentence?,
              :early_allocation?, :mappa_level, :prison_arrival_date, :sentence_start_date,
              :parole_eligibility_date, :conditional_release_date, :automatic_release_date,
-             :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date, :parole_review_date,
+             :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date,
              to: :@offender
 
     def initialize(offender)
       @offender = offender
-    end
-
-    def determinate_with_no_release_dates?
-      @offender.indeterminate_sentence? == false &&
-        @offender.automatic_release_date.nil? &&
-        @offender.conditional_release_date.nil? &&
-        @offender.parole_eligibility_date.nil? &&
-        @offender.home_detention_curfew_eligibility_date.nil?
     end
 
     def new_case? policy_start_date
@@ -290,12 +242,28 @@ private
       release_date > @offender.sentence_start_date + 10.months
     end
 
+    # We can not calculate the handover date for NPS Indeterminate
+    # with parole cases where the TED is in the past as we need
+    # the parole board decision which currently is not available to us.
     def release_date
       if @offender.indeterminate_sentence?
-        @offender.parole_eligibility_date || @offender.tariff_date
-      else
+        if @offender.tariff_date.present? && @offender.tariff_date.future?
+          @offender.tariff_date
+        else
+          [
+            @offender.parole_review_date,
+            @offender.parole_eligibility_date
+          ].compact.reject(&:past?).min
+        end
+      elsif @offender.nps_case?
         possible_dates = [@offender.conditional_release_date, @offender.automatic_release_date]
         @offender.parole_eligibility_date || possible_dates.compact.min
+      else
+        # CRC can look at HDC date, NPS is not supposed to
+        @offender.home_detention_curfew_actual_date.presence ||
+          [@offender.automatic_release_date,
+           @offender.conditional_release_date,
+           @offender.home_detention_curfew_eligibility_date].compact.min
       end
     end
 
@@ -314,8 +282,8 @@ private
       @offender.welsh_offender == true
     end
 
-    def open_prison_nps_offender?
-      PrisonService.open_prison?(@offender.prison_id) && @offender.nps_case?
+    def in_open_prison?
+      PrisonService.open_prison?(@offender.prison_id)
     end
   end
 end

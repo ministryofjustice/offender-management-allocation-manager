@@ -4,28 +4,28 @@ class SummaryController < PrisonsApplicationController
   before_action :ensure_spo_user
 
   def index
-    redirect_to prison_summary_allocated_path(active_prison_id)
+    redirect_to allocated_prison_prisoners_path(active_prison_id)
   end
 
   def allocated
     @summary = create_summary(:allocated)
 
-    @offenders = Kaminari.paginate_array(@summary.offenders.map { |o| OffenderPresenter.new(o) }).page(page)
+    @offenders = Kaminari.paginate_array(@summary.offenders.to_a).page(page)
   end
 
   def unallocated
     @summary = create_summary(:unallocated)
-    @offenders = Kaminari.paginate_array(@summary.offenders.map { |o| OffenderPresenter.new(o) }).page(page)
+    @offenders = Kaminari.paginate_array(@summary.offenders.to_a).page(page)
   end
 
   def pending
     @summary = create_summary(:pending)
-    @offenders = Kaminari.paginate_array(@summary.offenders.map { |o| OffenderPresenter.new(o) }).page(page)
+    @offenders = Kaminari.paginate_array(@summary.offenders.to_a).page(page)
   end
 
   def new_arrivals
     @summary = create_summary(:new_arrivals)
-    @offenders = Kaminari.paginate_array(@summary.offenders.map { |o| OffenderPresenter.new(o) }).page(page)
+    @offenders = Kaminari.paginate_array(@summary.offenders.to_a).page(page)
   end
 
 private

@@ -74,7 +74,7 @@ feature 'Responsibility override' do
       it 'shows case owner as Community when overridden' do
         override_responsibility_for(offender_id)
 
-        visit prison_summary_unallocated_path('LEI')
+        visit unallocated_prison_prisoners_path('LEI')
 
         within 'tr.govuk-table__row.offender_row_0' do
           expect(page).to have_content('Community')

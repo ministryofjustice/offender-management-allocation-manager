@@ -24,8 +24,8 @@ describe HmppsApi::PrisonApi::MovementApi do
 
     it 'sort movements (oldest first) for a specific_offender' do
       allow_any_instance_of(HmppsApi::Client).to receive(:post).and_return([
-        attributes_for(:movement, offenderNo: '2', createDateTime: '2017-03-09T15:50:52.676892').stringify_keys,
-        attributes_for(:movement, offenderNo: '1', createDateTime: '2015-01-01T15:50:52.676892').stringify_keys
+        attributes_for(:movement, offenderNo: '2', movementDate: '2017-03-09').stringify_keys,
+        attributes_for(:movement, offenderNo: '1', movementDate: '2015-01-01').stringify_keys
       ])
 
       movements = described_class.movements_for('A5019DY')

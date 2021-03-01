@@ -4,7 +4,7 @@ class PrisonersController < PrisonsApplicationController
   before_action :load_offender, only: [:show]
 
   def show
-    @prisoner = OffenderPresenter.new(@offender)
+    @prisoner = @offender
     @tasks = PomTasks.new.for_offender(@prisoner)
     @allocation = Allocation.find_by(nomis_offender_id: @prisoner.offender_no)
 
@@ -22,6 +22,7 @@ class PrisonersController < PrisonsApplicationController
     )
 
     @case_info = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: id_for_show_action)
+    @open_prison_email = EmailHistory.sent_within_current_sentence(@prisoner, EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION).first
   end
 
   def image

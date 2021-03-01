@@ -24,7 +24,7 @@ RSpec.describe "prisoners/community_information", type: :view do
     end
 
     before do
-      assign(:prisoner, OffenderPresenter.new(offender))
+      assign(:prisoner, offender)
       render partial: 'prisoners/community_information'
     end
 
@@ -41,7 +41,7 @@ RSpec.describe "prisoners/community_information", type: :view do
     end
 
     before do
-      assign(:prisoner, OffenderPresenter.new(offender))
+      assign(:prisoner, offender)
       render partial: 'prisoners/community_information'
     end
 
