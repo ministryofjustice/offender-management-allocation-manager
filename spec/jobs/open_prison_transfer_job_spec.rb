@@ -114,7 +114,7 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
       }
 
       it 'asks the LDU to allocate a Responsible COM' do
-        expect(PomMailer).to receive(:responsibility_override_open_prison)
+        expect(CommunityMailer).to receive(:open_prison_prepolicy_responsible_com_needed)
                                .with(hash_including(
                                        prisoner_number: nomis_offender_id,
                                        prisoner_name: offender.full_name,
@@ -149,7 +149,7 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
       }
 
       it 'includes previous POM details in the email' do
-        expect(PomMailer).to receive(:responsibility_override_open_prison)
+        expect(CommunityMailer).to receive(:open_prison_prepolicy_responsible_com_needed)
                                .with(hash_including(
                                        prisoner_number: nomis_offender_id,
                                        prisoner_name: offender.full_name,
@@ -189,7 +189,7 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
         let(:nomis_offender) { indeterminate_nomis_offender }
 
         it 'asks the LDU to allocate a Supporting COM' do
-          expect(CommunityMailer).to receive(:omic_open_prison_community_allocation)
+          expect(CommunityMailer).to receive(:open_prison_supporting_com_needed)
                                        .with(hash_including(
                                                prisoner_number: nomis_offender_id,
                                                prisoner_name: offender.full_name,
@@ -204,8 +204,8 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
 
       context "with a determinate offender" do
         it 'does not send an email to the LDU' do
-          expect_any_instance_of(PomMailer).not_to receive(:responsibility_override_open_prison)
-          expect_any_instance_of(CommunityMailer).not_to receive(:omic_open_prison_community_allocation)
+          expect_any_instance_of(CommunityMailer).not_to receive(:open_prison_prepolicy_responsible_com_needed)
+          expect_any_instance_of(CommunityMailer).not_to receive(:open_prison_supporting_com_needed)
           expect { described_class.perform_now(movement_json) }.to change(EmailHistory, :count).by(0)
         end
       end
@@ -256,7 +256,7 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
       }
 
       it 'asks the LDU to allocate a Supporting COM' do
-        expect(CommunityMailer).to receive(:omic_open_prison_community_allocation)
+        expect(CommunityMailer).to receive(:open_prison_supporting_com_needed)
                                      .with(hash_including(
                                              prisoner_number: nomis_offender_id,
                                              prisoner_name: offender.full_name,

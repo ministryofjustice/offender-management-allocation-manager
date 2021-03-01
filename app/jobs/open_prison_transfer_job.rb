@@ -22,13 +22,13 @@ class OpenPrisonTransferJob < ApplicationJob
       # Assumption: COM is responsible, so we are following pre-policy rules
       #   (i.e. OMIC rules don't apply in this open prison yet)
       # Action: Email the LDU asking for a Responsible COM to be allocated because OMIC rules don't apply.
-      send_email(offender, movement)
+      send_email_prepolicy(offender, movement)
 
     elsif offender.com_responsibility.supporting?
       # Assumption: OMIC rules apply in this prison and the offender's sentence is indeterminate,
       # therefore a COM is needed from the moment they move into the prison.
       # Action: Email the LDU asking for a Supporting COM to be allocated, as per OMIC rules.
-      send_email_open_prison_allocation(offender, movement)
+      send_email_supporting_com_needed(offender, movement)
     end
     # Else assumption: OMIC rules apply in this prison, but the offender doesn't need a COM yet.
     # This will apply to determinate offenders, because they don't need a COM immediately.
@@ -37,10 +37,10 @@ class OpenPrisonTransferJob < ApplicationJob
 
 private
 
-  def send_email(offender, movement)
+  def send_email_prepolicy(offender, movement)
     alloc = last_allocation(offender)
 
-    PomMailer.responsibility_override_open_prison(
+    CommunityMailer.open_prison_prepolicy_responsible_com_needed(
       prisoner_name: offender.full_name,
       prisoner_number: offender.offender_no,
       prisoner_crn: offender.crn,
@@ -52,8 +52,8 @@ private
     ).deliver_later
   end
 
-  def send_email_open_prison_allocation(offender, movement)
-    CommunityMailer.omic_open_prison_community_allocation(
+  def send_email_supporting_com_needed(offender, movement)
+    CommunityMailer.open_prison_supporting_com_needed(
       prisoner_name: offender.full_name,
       prisoner_number: offender.offender_no,
       prisoner_crn: offender.crn,

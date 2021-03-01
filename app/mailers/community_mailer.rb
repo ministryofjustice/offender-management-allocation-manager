@@ -36,7 +36,7 @@ class CommunityMailer < GovukNotifyRails::Mailer
     mail(to: ldu_email)
   end
 
-  def omic_open_prison_community_allocation(prisoner_name:, prisoner_number:, prisoner_crn:, prison_name:, ldu_email:)
+  def open_prison_supporting_com_needed(prisoner_name:, prisoner_number:, prisoner_crn:, prison_name:, ldu_email:)
     set_template('51eea8d1-6c73-4b86-bac0-f74ad5573b43')
 
     set_personalisation(
@@ -47,5 +47,26 @@ class CommunityMailer < GovukNotifyRails::Mailer
     )
 
     mail(to: ldu_email)
+  end
+
+  def open_prison_prepolicy_responsible_com_needed(
+    prisoner_name:,
+    prisoner_number:,
+    prisoner_crn:,
+    previous_pom_name:,
+    previous_pom_email:,
+    prison_name:,
+    previous_prison_name:,
+    email:
+  )
+    set_template('e517ddc9-5854-462e-b9a1-f67c97ad5b63')
+    set_personalisation(prisoner_name: prisoner_name,
+                        prisoner_number: prisoner_number,
+                        prisoner_crn: prisoner_crn,
+                        previous_pom_name: previous_pom_name,
+                        previous_pom_email: previous_pom_email,
+                        prison_name: prison_name,
+                        previous_prison_name: previous_prison_name)
+    mail(to: email)
   end
 end
