@@ -470,18 +470,21 @@ describe HandoverDateService do
     let(:tariff_date) { nil }
     let(:automatic_release_date) { nil }
 
+    let(:offender) {
+      build(:offender,
+            imprisonmentStatus: indeterminate_sentence ? 'LIFE' : 'SEC90',
+            sentence: build(:sentence_detail,
+                            automaticReleaseDate: automatic_release_date,
+                            conditionalReleaseDate: conditional_release_date,
+                            paroleEligibilityDate: parole_eligibility_date,
+                            tariffDate: tariff_date
+            )
+      )
+    }
+
     let(:result) do
       described_class.nps_start_date(
-        double(
-          automatic_release_date: automatic_release_date,
-          conditional_release_date: conditional_release_date,
-          "early_allocation?" => false,
-          "indeterminate_sentence?" => indeterminate_sentence,
-          parole_eligibility_date: parole_eligibility_date,
-          parole_review_date: nil,
-          release_date: tariff_date,
-          "recent_prescoed_case?" => false
-        )
+        HandoverDateService::OffenderWrapper.new(offender)
       )
     end
 

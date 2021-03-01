@@ -7,8 +7,11 @@ class HandoverDateService
   SUPPORTING = Responsibility.new false, true
   NOT_INVOLVED = Responsibility.new false, false
 
-  # Actual date Mon 19th Oct 2020
-  PRESCOED_CUTOFF_DATE = Date.new(2020, 10, 19).freeze
+  # OMIC open prison rules initially piloted in HMP Prescoed for Welsh offenders entering from 19/10/2020
+  PRESCOED_POLICY_START_DATE = '19/10/2020'.to_date
+
+  # OMIC open prison rules apply to the rest of the open estate from 31/03/2021
+  OPEN_PRISON_POLICY_START_DATE = '31/03/2021'.to_date
 
   HandoverData = Struct.new :custody, :community, :start_date, :handover_date, :reason, keyword_init: true
 
@@ -46,7 +49,7 @@ class HandoverDateService
       start_date = nps_start_date(offender)
       handover_date = start_date if start_date.present? && start_date > handover_date
 
-      if offender.in_open_prison? && !offender.recent_prescoed_case?
+      if offender.in_open_prison? && !offender.open_prison_rules_apply?
         # Offender is in open prison under pre-OMIC rules – COM is always responsible
         HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
                          start_date: nil, handover_date: nil,
@@ -94,7 +97,7 @@ private
   end
 
   def self.nps_start_date(offender)
-    if offender.recent_prescoed_case? && offender.indeterminate_sentence?
+    if offender.open_prison_rules_apply? && offender.indeterminate_sentence?
       offender.prison_arrival_date
     elsif offender.early_allocation?
       early_allocation_handover_date(offender)
@@ -267,10 +270,17 @@ private
       end
     end
 
-    def recent_prescoed_case?
-      @offender.prison_id == PrisonService::PRESCOED_CODE &&
-          @offender.prison_arrival_date >= PRESCOED_CUTOFF_DATE &&
+    def open_prison_rules_apply?
+      (
+        # Offender falls into the HMP Prescoed open prison pilot
+        @offender.prison_id == PrisonService::PRESCOED_CODE &&
+          @offender.prison_arrival_date >= PRESCOED_POLICY_START_DATE &&
           welsh_offender?
+      ) ||
+      (
+        # Open prison rules apply because offender arrived after the open prison policy general start date
+        in_open_prison? && @offender.prison_arrival_date >= OPEN_PRISON_POLICY_START_DATE
+      )
     end
 
     def hub_or_private?

@@ -6,7 +6,7 @@ module HmppsApi
 
     attr_accessor :main_offence
 
-    attr_reader :reception_date, :prison_id
+    attr_reader :prison_id
 
     def initialize(fields = {})
       # Allow this object to be reconstituted from a hash, we can't use
@@ -28,7 +28,6 @@ module HmppsApi
     def load_from_json(payload)
       @booking_id = payload['latestBookingId']&.to_i
       @prison_id = payload['latestLocationId']
-      @reception_date = deserialise_date(payload, 'receptionDate')
 
       super(payload)
     end
