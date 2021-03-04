@@ -10,7 +10,7 @@ module HmppsApi
       end
 
       def valid_token
-        set_new_token if token.expired?
+        set_new_token if token.needs_refresh?
         token
       end
 
