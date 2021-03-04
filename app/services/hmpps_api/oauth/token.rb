@@ -25,9 +25,9 @@ module HmppsApi
         @expiry_time = Time.zone.now + @expires_in.to_i.seconds
       end
 
-      def expired?
-        # consider token expired if it has less than 10 seconds to go
-        @expiry_time - Time.zone.now < 10
+      def needs_refresh?
+        # we need to refresh the token just before expiry as it might expire on its way to the API
+        @expiry_time - Time.zone.now < 20
       end
 
       def valid_token_with_scope?(scope)
