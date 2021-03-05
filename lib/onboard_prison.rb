@@ -22,7 +22,8 @@ class OnboardPrison
       end
 
       # Create a CaseInformation .....
-      CaseInformation.find_or_create_by(
+      case_info = CaseInformation.find_or_initialize_by(nomis_offender_id: offender_id) { |ci| ci.prisoner = Prisoner.new }
+      case_info.update!(
         nomis_offender_id: offender_id,
         welsh_offender: record[:welsh_offender] ? 'Yes' : 'No',
         tier: record[:tier],
