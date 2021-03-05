@@ -38,7 +38,8 @@ class CaseInformationController < PrisonsApplicationController
       tier: case_information_params[:tier],
       probation_service: case_information_params[:probation_service],
       case_allocation: case_information_params[:case_allocation],
-      manual_entry: true
+      manual_entry: true,
+      prisoner: Prisoner.new
     )
 
     if @case_info.valid?

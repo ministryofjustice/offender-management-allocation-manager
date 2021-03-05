@@ -36,7 +36,7 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
           described_class.perform_now nomis_offender_id
         }.to change(CaseInformation, :count).by(1)
 
-        expect(case_info.attributes.symbolize_keys.except(:created_at, :id, :updated_at, :parole_review_date, :welsh_offender))
+        expect(case_info.attributes.symbolize_keys.except(:created_at, :id, :updated_at, :parole_review_date, :prisoner_id, :welsh_offender))
             .to eq(case_allocation: "NPS", crn: "X362207", manual_entry: false, mappa_level: 0,
                    nomis_offender_id: "G4281GV",
                    probation_service: "England",

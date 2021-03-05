@@ -8,6 +8,7 @@ class CaseInformation < ApplicationRecord
 
   #  Old mapping - will be going away in Feb 2021
   belongs_to :team, optional: true, counter_cache: :case_information_count
+  belongs_to :prisoner
 
   # new mapping - don't need team data any more, only team_name for display purposes
   belongs_to :local_delivery_unit, optional: true

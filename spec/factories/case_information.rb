@@ -2,6 +2,8 @@ require 'faker'
 
 FactoryBot.define do
   factory :case_information do
+    association :prisoner
+
     tier do
       'A'
     end

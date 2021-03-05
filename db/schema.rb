@@ -66,8 +66,10 @@ ActiveRecord::Schema.define(version: 2021_03_31_115125) do
     t.string "com_name"
     t.string "team_name"
     t.bigint "local_delivery_unit_id"
+    t.bigint "prisoner_id"
     t.index ["local_delivery_unit_id"], name: "index_case_information_on_local_delivery_unit_id"
     t.index ["nomis_offender_id"], name: "index_case_information_on_nomis_offender_id", unique: true
+    t.index ["prisoner_id"], name: "index_case_information_on_prisoner_id"
     t.index ["team_id"], name: "index_case_information_on_team_id"
   end
 
@@ -169,6 +171,11 @@ ActiveRecord::Schema.define(version: 2021_03_31_115125) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["nomis_staff_id"], name: "index_pom_details_on_nomis_staff_id", unique: true
+  end
+
+  create_table "prisoners", force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "responsibilities", force: :cascade do |t|

@@ -77,7 +77,7 @@ private
     @missing_info = if step == :complexity_level
                       ComplexityForm.new session[:complexity].except(*IGNORED_ERROR_KEYS)
                     else
-                      CaseInformation.new session[:case_info].except(*IGNORED_ERROR_KEYS)
+                      CaseInformation.new(session[:case_info].except(*IGNORED_ERROR_KEYS)).tap { |ci| ci.prisoner = Prisoner.new }
                     end
   end
 

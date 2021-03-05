@@ -14,7 +14,7 @@ class OnboardPrison
   end
 
   def complete_missing_info
-    @offender_ids.each { |offender_id|
+    @offender_ids.each do |offender_id|
       record = @delius_records[offender_id]
       if record.nil?
         @delius_missing += 1
@@ -22,16 +22,17 @@ class OnboardPrison
       end
 
       # Create a CaseInformation .....
-      CaseInformation.find_or_create_by(nomis_offender_id: offender_id) do |ci|
-        ci.tier = record[:tier]
-        ci.case_allocation = record[:provider_cd]
-        ci.crn = record[:crn]
-        ci.probation_service = record[:welsh_offender] ? 'England' : 'Wales'
-        ci.manual_entry = true
-      end
+      case_info = CaseInformation.find_or_initialize_by(nomis_offender_id: offender_id) { |ci| ci.prisoner = Prisoner.new }
+      case_info.update!(
+        tier: record[:tier],
+        case_allocation: record[:provider_cd],
+        crn: record[:crn],
+        probation_service: record[:welsh_offender] ? 'England' : 'Wales',
+        manual_entry: true
+      )
 
       @additions += 1
-    }
+    end
   end
 
 private
