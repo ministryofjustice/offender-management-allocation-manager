@@ -6,12 +6,17 @@ A service for allocating Prisoners to Prisoner Offender Managers (POMs).
 
 ## Technical Information
 
-This is a Ruby on Rails application that exposes an interface for Prison staff
-to manage the allocation of POMs to Prisoners.
+This Ruby on Rails application enables prison staff to manage the allocation of POMs to prisoners.
 
-[![auto-updating container diagram](https://static.structurizr.com/workspace/56937/diagrams/omic-container.png)](https://structurizr.com/share/56937/diagrams#omic-container)
+### API Specification
 
-👆 edit in [hmpps-architecture-as-code](https://github.com/ministryofjustice/hmpps-architecture-as-code/blob/9990e7fbb3aa545208d2ebc40104f6f3d5a9813d/src/main/kotlin/model/OffenderManagementInCustody.kt)
+[![API docs](https://img.shields.io/badge/API_docs-view-85EA2D.svg?logo=swagger)](https://allocation-manager-staging.apps.live-1.cloud-platform.service.justice.gov.uk/api-docs/index.html)
+
+### Architecture - Context View
+
+[![auto-updating container diagram](https://static.structurizr.com/workspace/56937/diagrams/manage-POM-cases-container.png)](https://structurizr.com/share/56937/diagrams#manage-POM-cases-container)
+
+👆 edit in [hmpps-architecture-as-code](https://github.com/ministryofjustice/hmpps-architecture-as-code/blob/9990e7fbb3aa545208d2ebc40104f6f3d5a9813d/src/main/kotlin/model/manage-pom-cases.kt)
 
 ### Dependencies
 
@@ -108,4 +113,4 @@ Extra variables not required locally
 
 ## Licence
 
-[MIT Licence (MIT)](LICENCE)
+[MIT Licence (MIT)](https://opensource.org/licenses/MIT)
