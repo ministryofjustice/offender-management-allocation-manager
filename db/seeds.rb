@@ -127,7 +127,7 @@ end
                            case_allocation:'CRC',
                            welsh_offender: 'Yes',
                            manual_entry: true,
-                           info: Prisoner.new,
+                           prisoner: Prisoner.new,
                            team: team2)
   end
 end
@@ -139,7 +139,7 @@ end
                            case_allocation:'NPS',
                            welsh_offender: 'Yes',
                            manual_entry: true,
-                           info: Prisoner.new,
+                           prisoner: Prisoner.new,
                            team: team2)
   end
 end
@@ -150,7 +150,7 @@ CaseInformation.find_or_create_by!(nomis_offender_id: 'G7281UH') do |info|
                          case_allocation:'NPS',
                          welsh_offender: 'Yes',
                          manual_entry: true,
-                         info: Prisoner.new,
+                         prisoner: Prisoner.new,
                          team: team2)
 end
 
