@@ -108,6 +108,7 @@ CaseInformation.find_or_create_by!(nomis_offender_id: 'G7658UL') do |info|
     info.welsh_offender = 'Yes'
     info.manual_entry =  true
     info.team_id = team1.id
+  info.prisoner = Prisoner.new
 end
 
 CaseInformation.find_or_create_by!(nomis_offender_id: 'G7517GF') do |info|
@@ -116,6 +117,7 @@ CaseInformation.find_or_create_by!(nomis_offender_id: 'G7517GF') do |info|
     info.welsh_offender = 'Yes'
     info.manual_entry = true
     info.team_id = team2.id
+  info.prisoner = Prisoner.new
 end
 
 # 3 Test offenders which have handovers in Dec 2020
@@ -125,6 +127,7 @@ end
                            case_allocation:'CRC',
                            welsh_offender: 'Yes',
                            manual_entry: true,
+                           info: Prisoner.new,
                            team: team2)
   end
 end
@@ -136,6 +139,7 @@ end
                            case_allocation:'NPS',
                            welsh_offender: 'Yes',
                            manual_entry: true,
+                           info: Prisoner.new,
                            team: team2)
   end
 end
@@ -146,6 +150,7 @@ CaseInformation.find_or_create_by!(nomis_offender_id: 'G7281UH') do |info|
                          case_allocation:'NPS',
                          welsh_offender: 'Yes',
                          manual_entry: true,
+                         info: Prisoner.new,
                          team: team2)
 end
 
@@ -155,6 +160,7 @@ CaseInformation.find_or_create_by!(nomis_offender_id: 'G3536UF') do |info|
   info.welsh_offender = 'No'
   info.manual_entry = true
   info.team_id = team2.id
+  info.prisoner = Prisoner.new
 end
 
 CaseInformation.find_or_create_by!(nomis_offender_id: 'G2260UO') do |info|
@@ -163,4 +169,5 @@ CaseInformation.find_or_create_by!(nomis_offender_id: 'G2260UO') do |info|
   info.welsh_offender = 'No'
   info.manual_entry = true
   info.team_id = team3.id
+  info.prisoner = Prisoner.new
 end
