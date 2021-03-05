@@ -1,0 +1,70 @@
+/**
+ * Case mix key
+ */
+.case-mix-key {
+  margin: 0;
+
+  ul {
+    @extend .govuk-list;
+  }
+
+  li {
+    display: inline;
+    margin-right: 20px;
+  }
+
+  .case-mix-key__swatch {
+    border-radius: 2px;
+    margin-right: 10px;
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: 0.2em;
+  }
+}
+
+/**
+ * Case mix bar
+ */
+.case-mix-bar {
+  display: grid;
+  grid-template-columns: var(--columns);
+  height: 30px;
+  margin: 0;
+
+  > dt {
+    overflow: hidden;
+    font-size: 0;
+  }
+
+  > dd {
+    @include govuk-font(16);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/**
+ * Tier colours
+ */
+.case-mix__tier-a {
+  background: govuk-colour("dark-blue");
+  color: white;
+}
+.case-mix__tier-b {
+  background: govuk-colour("light-blue");
+}
+.case-mix__tier-c {
+  background: govuk-colour("pink");
+  color: white;
+}
+.case-mix__tier-d {
+  background: govuk-colour("light-pink");
+}
+.case-mix__tier-na {
+  background: govuk-colour("mid-grey");
+}
