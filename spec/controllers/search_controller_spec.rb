@@ -58,7 +58,7 @@ RSpec.describe SearchController, type: :controller do
         PomDetail.create!(nomis_staff_id: nomis_staff_id, working_pattern: 1.0, status: 'active')
 
         create(:allocation,
-               nomis_offender_id: offenders.first.fetch(:offenderNo),
+               case_information: build(:case_information, nomis_offender_id: offenders.first.fetch(:offenderNo)),
                primary_pom_allocated_at: allocated_date,
                primary_pom_nomis_id: nomis_staff_id)
       end

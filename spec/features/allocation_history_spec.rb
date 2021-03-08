@@ -36,11 +36,13 @@ feature 'Allocation History' do
   let(:nomis_offender_id) { ci.nomis_offender_id }
 
   describe 'offender allocation history', vcr: { cassette_name: :offender_allocation_history } do
-    shared_context 'when on the allocation history page' do
+    before { signin_spo_user }
+
+    context 'when on the allocation history page' do
       before do
         allocation = create(
           :allocation,
-          nomis_offender_id: nomis_offender_id,
+          case_information: ci,
           primary_pom_nomis_id: probation_pom[:primary_pom_nomis_id],
           primary_pom_name: probation_pom[:primary_pom_name],
           recommended_pom_type: 'prison',
@@ -67,16 +69,19 @@ feature 'Allocation History' do
                            recommended_pom_type: nil,
                            updated_at: Time.zone.now - 7.days
         )
+        # release offender - allocation will vanish
         Timecop.travel(deallocate_date) do
-          allocation.offender_transferred
+          # allocation.offender_transferred
+          MovementService.process_movement build(:movement, :out, offenderNo: allocation.nomis_offender_id)
         end
         Timecop.travel(Time.zone.now - 5.days) do
-          allocation.update!(event: Allocation::ALLOCATE_PRIMARY_POM,
-                             prison: 'PVI',
-                             primary_pom_nomis_id: prison_pom[:primary_pom_nomis_id],
-                             primary_pom_name: prison_pom[:primary_pom_name],
-                             recommended_pom_type: 'prison',
-                             created_by_name: nil)
+          allocation = create(:allocation,
+                              event: Allocation::ALLOCATE_PRIMARY_POM,
+                              case_information: build(:case_information, nomis_offender_id: nomis_offender_id),
+                              prison: 'PVI',
+                              primary_pom_nomis_id: prison_pom[:primary_pom_nomis_id],
+                              primary_pom_name: prison_pom[:primary_pom_name],
+                              recommended_pom_type: 'prison')
         end
 
         Timecop.travel(Time.zone.now - 4.days) do
@@ -108,7 +113,7 @@ feature 'Allocation History' do
           allocation.offender_transferred
         end
 
-        Timecop.travel(Time.zone.now - 3.weeks) do
+        Timecop.travel(Time.zone.now - 1.day) do
           # create Email History for welsh offender transferring to Prescoed open prison
           create :email_history, nomis_offender_id: nomis_offender_id,
                  name: 'Pontypool LDU',
@@ -125,12 +130,21 @@ feature 'Allocation History' do
       let(:formatted_transfer_date) { transfer_date.strftime("#{transfer_date.day.ordinalize} %B %Y") + " (" + transfer_date.strftime("%R") + ")" }
       let(:allocation) { Allocation.last }
       let(:history) { allocation.get_old_versions.append(allocation).sort_by!(&:updated_at).reverse! }
+      let(:created_by_name) { allocation.get_old_versions.first.created_by_name }
+      let(:last_history) { allocation.get_old_versions.first }
 
       it 'shows the case history' do
         history1 = history[1]
         history2 = history[2]
-        hist_allocate_secondary = history[5]
-        history6 = history[6]
+        hist_allocate_secondary = Allocation.new secondary_pom_name: probation_pom[:primary_pom_name],
+                                                 updated_at: Time.zone.now - 8.days,
+                                                 created_by_name: created_by_name
+
+        history6 = Allocation.new primary_pom_name: probation_pom_2[:primary_pom_name],
+                                  updated_at: Time.zone.now - 10.days,
+                                  created_by_name: created_by_name,
+                                  allocated_at_tier: 'A'
+
         prescoed_transfer = EmailHistory.where(nomis_offender_id: nomis_offender_id, event: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION).first
 
         [
@@ -154,9 +168,9 @@ feature 'Allocation History' do
           ['.moj-timeline__description', "Prisoner reallocated to #{history6.primary_pom_name.titleize} - #{probation_pom_2[:email]} Tier: #{history6.allocated_at_tier}"],
           ['.moj-timeline__date', "#{formatted_date_for(history6)} by #{history6.created_by_name.titleize}"],
           ['.moj-timeline__title', "Prisoner allocated"],
-          ['.moj-timeline__description', "Prisoner allocated to #{history.last.primary_pom_name.titleize} - #{probation_pom[:email]} Tier: #{history.last.allocated_at_tier}"],
+          ['.moj-timeline__description', "Prisoner allocated to #{last_history.primary_pom_name.titleize} - #{probation_pom[:email]} Tier: #{last_history.allocated_at_tier}"],
           ['.moj-timeline__description', "Probation POM allocated instead of recommended Prison POM", "Reason(s):", "- Prisoner assessed as suitable for a prison POM despite tiering calculation", "Too high risk"],
-          ['.moj-timeline__date', "#{formatted_date_for(history.last)} by #{history.last.created_by_name.titleize}"],
+          ['.moj-timeline__date', "#{formatted_date_for(last_history)} by #{last_history.created_by_name.titleize}"],
           ['.govuk-heading-m', "HMP/YOI Prescoed"],
           ['.moj-timeline__title', "Offender transferred to an open prison"],
           ['.moj-timeline__date', "#{prescoed_transfer.created_at.strftime("#{prescoed_transfer.created_at.day.ordinalize} %B %Y")} (#{prescoed_transfer.created_at.strftime('%R')}) email sent automatically"],
@@ -166,8 +180,8 @@ feature 'Allocation History' do
       end
 
       it 'links to previous Early Allocation assessments' do
-        # The 6th history item is an 'eligible' early allocation assessment
-        eligible_assessment = page.find('.moj-timeline > .moj-timeline__item:nth-child(6)')
+        # The 5th history item is an 'eligible' early allocation assessment
+        eligible_assessment = page.find('.moj-timeline > .moj-timeline__item:nth-child(5)')
 
         within eligible_assessment do
           expect(page).to have_css('.moj-timeline__title', text: 'Early allocation assessment form completed')
@@ -186,18 +200,6 @@ feature 'Allocation History' do
         case_history_page = prison_allocation_history_path('LEI', nomis_offender_id)
         expect(page).to have_current_path(case_history_page)
       end
-    end
-
-    context 'when logged in as an SPO' do
-      before { signin_spo_user }
-
-      include_context 'when on the allocation history page'
-    end
-
-    context 'when logged in as a POM' do
-      before { signin_pom_user }
-
-      include_context 'when on the allocation history page'
     end
   end
 

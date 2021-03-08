@@ -12,6 +12,8 @@ class CaseInformation < ApplicationRecord
   # new mapping - don't need team data any more, only team_name for display purposes
   belongs_to :local_delivery_unit, optional: true
 
+  has_one :allocation, foreign_key: :nomis_offender_id, primary_key: :nomis_offender_id, dependent: :destroy, inverse_of: :case_information
+
   has_many :early_allocations,
            -> { order(created_at: :asc) },
            foreign_key: :nomis_offender_id,

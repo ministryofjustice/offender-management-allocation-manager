@@ -23,7 +23,7 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
       stub_pom_emails(user.staffId, [])
 
       create(:allocation, prison: prison,
-             nomis_offender_id: offender_no,
+             case_information: build(:case_information, nomis_offender_id: offender_no),
              primary_pom_nomis_id: primary_pom.staffId,
              secondary_pom_nomis_id: secondary_pom.staffId)
     end
@@ -40,7 +40,8 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
 
   describe '#destroy' do
     before do
-      create(:allocation, prison: prison, nomis_offender_id: offender_no,
+      create(:allocation, prison: prison,
+             case_information: build(:case_information, nomis_offender_id: offender_no),
              primary_pom_nomis_id: primary_pom.staffId,
              secondary_pom_nomis_id: new_secondary_pom.staffId,
              secondary_pom_name: secondary_pom_name)

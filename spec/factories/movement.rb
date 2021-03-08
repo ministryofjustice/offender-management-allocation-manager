@@ -11,6 +11,7 @@ FactoryBot.define do
 
     trait :out do
       directionCode { 'OUT' }
+      toAgency { MovementService::RELEASE_MOVEMENT_CODE }
       movementType { 'REL' }
     end
 

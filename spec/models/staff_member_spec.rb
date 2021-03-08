@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe StaffMember, type: :model do
@@ -29,7 +31,7 @@ RSpec.describe StaffMember, type: :model do
     before do
       # # Allocate all of the offenders to this POM
       offenders.each do |offender|
-        create(:allocation, nomis_offender_id: offender.offender_no, primary_pom_nomis_id: staff_id)
+        create(:allocation, case_information: build(:case_information, nomis_offender_id: offender.offender_no), primary_pom_nomis_id: staff_id)
       end
     end
 
@@ -58,7 +60,7 @@ RSpec.describe StaffMember, type: :model do
         create(
           :allocation,
           primary_pom_nomis_id: staff_id,
-          nomis_offender_id: 'G7514GW',
+          case_information: build(:case_information, nomis_offender_id: 'G7514GW'),
           nomis_booking_id: 1_153_753
         )
       end
@@ -69,7 +71,7 @@ RSpec.describe StaffMember, type: :model do
         create(
           :allocation,
           primary_pom_nomis_id: other_staff_id,
-          nomis_offender_id: 'G1234VV',
+          case_information: build(:case_information, nomis_offender_id: 'G1234VV'),
           nomis_booking_id: 971_856
         ).tap { |item|
           item.update!(secondary_pom_nomis_id: staff_id)
@@ -81,7 +83,7 @@ RSpec.describe StaffMember, type: :model do
       create(
         :allocation,
         primary_pom_nomis_id: staff_id,
-        nomis_offender_id: 'G1234AB',
+        case_information: build(:case_information, nomis_offender_id: 'G1234AB'),
         nomis_booking_id: 76_908
       )
     }
@@ -90,7 +92,7 @@ RSpec.describe StaffMember, type: :model do
       create(
         :allocation,
         primary_pom_nomis_id: other_staff_id,
-        nomis_offender_id: 'G1234GG',
+        case_information: build(:case_information, nomis_offender_id: 'G1234GG'),
         nomis_booking_id: 31_777,
         secondary_pom_nomis_id: staff_id
       ).tap { |item|

@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe MovementsOnDateJob, type: :job do
   let(:nomis_offender_id) { 'G3462VT' }
-  let!(:alloc) { create(:allocation, nomis_offender_id: nomis_offender_id, secondary_pom_nomis_id: 123_435, prison: 'MDI') }
+  let!(:alloc) { create(:allocation, case_information: build(:case_information, nomis_offender_id: nomis_offender_id), secondary_pom_nomis_id: 123_435, prison: 'MDI') }
 
   before do
     stub_auth_token

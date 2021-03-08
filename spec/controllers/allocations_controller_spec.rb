@@ -34,8 +34,8 @@ RSpec.describe AllocationsController, :allocation, type: :controller do
     end
 
     it 'allows access to the Case History page' do
-      create(:case_information, nomis_offender_id: offender_no)
-      create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: poms.last.staffId)
+      case_info = create(:case_information, nomis_offender_id: offender_no)
+      create(:allocation, case_information: case_info, primary_pom_nomis_id: poms.last.staffId)
       get :history, params: { prison_id: prison, nomis_offender_id: offender_no }
       expect(response).to have_http_status(:ok)
     end
@@ -48,15 +48,15 @@ RSpec.describe AllocationsController, :allocation, type: :controller do
 
     describe '#show' do
       let(:inactive_pom_staff_id) { 543_453 }
+      let!(:case_info) { create(:case_information, nomis_offender_id: offender_no) }
 
       before do
-        create(:case_information, nomis_offender_id: offender_no)
         stub_keyworker(prison, offender_no, staffId: 123_456)
       end
 
       context 'when POM has left' do
         before do
-          create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: inactive_pom_staff_id)
+          create(:allocation, case_information: case_info, primary_pom_nomis_id: inactive_pom_staff_id)
         end
 
         it 'redirects to the inactive POM page' do
@@ -87,7 +87,7 @@ RSpec.describe AllocationsController, :allocation, type: :controller do
       context 'with a VictimLiasonOfficer' do
         before do
           case_info = create(:case_information, victim_liaison_officers: [build(:victim_liaison_officer)])
-          create(:allocation, nomis_offender_id: case_info.nomis_offender_id)
+          create(:allocation, case_information: case_info)
           stub_offender(build(:nomis_offender, offenderNo: case_info.nomis_offender_id))
           stub_pom_emails(485926, [])
         end

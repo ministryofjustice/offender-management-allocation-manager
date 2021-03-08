@@ -13,7 +13,7 @@ feature 'Inactive POM' do
 
       create(
         :allocation,
-        nomis_offender_id: nomis_offender_id,
+        case_information: build(:case_information, nomis_offender_id: nomis_offender_id),
         primary_pom_nomis_id: inactive_pom,
         secondary_pom_nomis_id: active_pom
       )

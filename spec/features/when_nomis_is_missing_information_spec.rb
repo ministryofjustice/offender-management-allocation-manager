@@ -38,8 +38,9 @@ context 'when NOMIS is missing information' do
 
           stub_offenders_for_prison(prison_code, stub_offenders)
 
-          create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
-          create(:case_information, nomis_offender_id: offender_no, case_allocation: 'NPS')
+          create(:allocation,
+                 case_information: build(:case_information, nomis_offender_id: offender_no, case_allocation: 'NPS'),
+                 primary_pom_nomis_id: staff_id)
         end
 
         it 'does not error' do
@@ -68,8 +69,7 @@ context 'when NOMIS is missing information' do
 
         stub_offender(offender)
 
-        create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
-        create(:case_information, nomis_offender_id: offender_no, case_allocation: 'NPS')
+        create(:allocation, case_information: build(:case_information, nomis_offender_id: offender_no, case_allocation: 'NPS'), primary_pom_nomis_id: staff_id)
       end
 
       it 'does not error' do
@@ -90,7 +90,7 @@ context 'when NOMIS is missing information' do
       end
 
       it 'does not error' do
-        create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
+        create(:allocation, case_information: build(:case_information, nomis_offender_id: offender_no), primary_pom_nomis_id: staff_id)
 
         visit prison_staff_caseload_handovers_path(prison_code, staff_id)
 
@@ -137,13 +137,12 @@ context 'when NOMIS is missing information' do
         stub_request(:get, "#{stub_keyworker_host}/key-worker/#{prison_code}/offender/#{offender_no}").
           to_return(body: {}.to_json)
 
-        create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
-        create(
+        create(:allocation, case_information: build(
           :case_information,
           nomis_offender_id: offender_no,
           case_allocation: 'NPS',
           welsh_offender: welsh
-        )
+        ), primary_pom_nomis_id: staff_id)
       end
 
       describe 'the pom details page' do
