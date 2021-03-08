@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe AllocationService do
@@ -10,7 +12,7 @@ describe AllocationService do
     signin_spo_user
   end
 
-  describe '#allocate_secondary', :queueing do
+  describe '#allocate_secondary' do
     let(:moic_test_id) { 485_758 }
     let(:ross_id) { 485_926 }
     let(:primary_pom_id) { ross_id }
@@ -19,7 +21,7 @@ describe AllocationService do
 
     let!(:allocation) {
       create(:allocation,
-             nomis_offender_id: nomis_offender_id,
+             case_information: build(:case_information, nomis_offender_id: nomis_offender_id),
              primary_pom_nomis_id: primary_pom_id,
              primary_pom_name: 'Pom, Moic')
     }
@@ -95,7 +97,7 @@ describe AllocationService do
 
     context 'when one already exists' do
       before do
-        create(:allocation, nomis_offender_id: nomis_offender_id)
+        create(:allocation, case_information: build(:case_information, nomis_offender_id: nomis_offender_id))
       end
 
       it 'can update a record and store a version', vcr: { cassette_name: 'prison_api/allocation_service_update_allocation_spec' } do
@@ -124,13 +126,13 @@ describe AllocationService do
 
       create(
         :allocation,
-        nomis_offender_id: first_offender_id,
+        case_information: build(:case_information, nomis_offender_id: first_offender_id),
         prison: leeds_prison
       )
 
       create(
         :allocation,
-        nomis_offender_id: second_offender_id,
+        case_information: build(:case_information, nomis_offender_id: second_offender_id),
         prison: 'USK'
       )
 
@@ -155,7 +157,7 @@ describe AllocationService do
 
       allocation = create(
         :allocation,
-        nomis_offender_id: nomis_offender_id,
+        case_information: build(:case_information, nomis_offender_id: nomis_offender_id),
         primary_pom_nomis_id: previous_primary_pom_nomis_id)
 
       allocation.update!(
@@ -176,7 +178,7 @@ describe AllocationService do
 
     allocation = create(
       :allocation,
-      nomis_offender_id: nomis_offender_id,
+      case_information: build(:case_information, nomis_offender_id: nomis_offender_id),
       primary_pom_nomis_id: previous_primary_pom_nomis_id)
 
     allocation.update!(
@@ -199,7 +201,7 @@ describe AllocationService do
 
       allocation = create(
         :allocation,
-        nomis_offender_id: nomis_offender_id,
+        case_information: build(:case_information, nomis_offender_id: nomis_offender_id),
         primary_pom_nomis_id: previous_primary_pom_nomis_id)
 
       allocation.update!(

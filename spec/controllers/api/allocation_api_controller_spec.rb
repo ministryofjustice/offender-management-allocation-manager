@@ -6,7 +6,8 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
     let(:prison) { build(:prison) }
     let!(:co_working_allocation) {
       create(:allocation, :co_working, primary_pom_nomis_id: primary_pom.staff_id,
-                                          secondary_pom_nomis_id: secondary_pom.staff_id, nomis_offender_id: offender.fetch(:offenderNo))
+                                          secondary_pom_nomis_id: secondary_pom.staff_id,
+             case_information: build(:case_information, nomis_offender_id: offender.fetch(:offenderNo)))
     }
     let(:primary_pom) { build(:pom) }
     let(:secondary_pom) { build(:pom) }

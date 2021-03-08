@@ -79,7 +79,7 @@ feature 'Allocation History' do
             :allocation,
             prison: first_prison.code,
             event: Allocation::ALLOCATE_PRIMARY_POM,
-            nomis_offender_id: nomis_offender_id,
+            case_information: ci,
             primary_pom_nomis_id: probation_pom[:primary_pom_nomis_id],
             primary_pom_name: probation_pom[:primary_pom_name],
             recommended_pom_type: 'prison',
@@ -110,6 +110,7 @@ feature 'Allocation History' do
         current_date += 1.day
         deallocate_date = current_date
         # release offender (properly)
+        # release offender - allocation will vanish
         Timecop.travel(deallocate_date) do
           # allocation.offender_transferred
           MovementService.process_movement build(:movement, :out, offenderNo: allocation.nomis_offender_id)
@@ -121,12 +122,13 @@ feature 'Allocation History' do
           # and re-find allocation record as it has been updated
           create(:case_information, nomis_offender_id: nomis_offender_id, local_delivery_unit: pontypool_ldu)
           allocation = Allocation.find_by!(nomis_offender_id: nomis_offender_id)
-          allocation.update!(event: Allocation::ALLOCATE_PRIMARY_POM,
-                             prison: second_prison.code,
-                             primary_pom_nomis_id: prison_pom[:primary_pom_nomis_id],
-                             primary_pom_name: prison_pom[:primary_pom_name],
-                             recommended_pom_type: 'prison',
-                             created_by_name: nil)
+          allocation = create(:allocation,
+                              event: Allocation::ALLOCATE_PRIMARY_POM,
+                              case_information: build(:case_information, nomis_offender_id: nomis_offender_id),
+                              prison: second_prison.code,
+                              primary_pom_nomis_id: prison_pom[:primary_pom_nomis_id],
+                              primary_pom_name: prison_pom[:primary_pom_name],
+                              recommended_pom_type: 'prison')
         end
 
         current_date += 1.day
@@ -359,8 +361,8 @@ feature 'Allocation History' do
       end
 
       it 'links to previous Early Allocation assessments' do
-        # The 6th history item is an 'eligible' early allocation assessment
-        eligible_assessment = page.find('.moj-timeline > .moj-timeline__item:nth-child(6)')
+        # The 5th history item is an 'eligible' early allocation assessment
+        eligible_assessment = page.find('.moj-timeline > .moj-timeline__item:nth-child(5)')
 
         within eligible_assessment do
           expect(page).to have_css('.moj-timeline__title', text: 'Early allocation assessment form completed')

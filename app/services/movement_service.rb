@@ -110,7 +110,6 @@ private
   def self.release_offender(offender_no)
     Rails.logger.info("[MOVEMENT] Processing release for #{offender_no}")
 
-    CaseInformation.where(nomis_offender_id: offender_no).destroy_all
     alloc = Allocation.find_by(nomis_offender_id: offender_no)
     # We need to check whether the from_agency is from within the prison estate
     # to know whether it is a transfer.  If it isn't then we want to bail and
@@ -125,5 +124,8 @@ private
     # case information (in case they come back one day), and we
     # should de-activate any current allocations.
     alloc.deallocate_offender_after_release if alloc
+
+    # allocations belong to CaseInformation, so this has to come after the offender_released call
+    CaseInformation.where(nomis_offender_id: offender_no).destroy_all
   end
 end

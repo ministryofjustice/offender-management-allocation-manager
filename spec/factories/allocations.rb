@@ -1,7 +1,11 @@
+# frozen_string_literal: true
+
 require 'faker'
 
 FactoryBot.define do
   factory :allocation do
+    association :case_information
+
     allocated_at_tier do
       'A'
     end
@@ -24,9 +28,9 @@ FactoryBot.define do
       Faker::Number.number(digits: 7)
     end
 
-    nomis_offender_id do
-      Faker::Alphanumeric.alpha(number: 10)
-    end
+    # nomis_offender_id do
+    #   Faker::Alphanumeric.alpha(number: 10)
+    # end
 
     primary_pom_nomis_id do
       485_926

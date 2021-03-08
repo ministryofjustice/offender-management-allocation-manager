@@ -8,8 +8,11 @@ feature "add missing details page" do
     stub_signin_spo(pom, [prison.code, 'SDI'])
     stub_offenders_for_prison(prison.code, offenders)
 
-    create(:allocation, primary_pom_allocated_at: one_day_ago,  nomis_offender_id: allocated_offender_one.fetch(:offenderNo), prison: prison.code)
-    create(:allocation, primary_pom_allocated_at: two_days_ago, nomis_offender_id: allocated_offender_two.fetch(:offenderNo), prison: prison.code)
+    info_one = create(:case_information, nomis_offender_id: allocated_offender_one.fetch(:offenderNo))
+    info_two = create(:case_information, nomis_offender_id: allocated_offender_two.fetch(:offenderNo))
+
+    create(:allocation, primary_pom_allocated_at: one_day_ago,  case_information: info_one, prison: prison.code)
+    create(:allocation, primary_pom_allocated_at: two_days_ago, case_information: info_two, prison: prison.code)
     create(:case_information, nomis_offender_id: offender_ready_to_allocate.fetch(:offenderNo))
 
     test_strategy.switch!(:womens_estate, true)

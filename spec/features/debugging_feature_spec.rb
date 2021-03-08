@@ -27,7 +27,7 @@ feature 'Provide debugging information for our team to use' do
 
     it 'returns information for an allocated offender', vcr: { cassette_name: 'prison_api/debugging_allocated_offender_feature' } do
       create(:allocation,
-             nomis_offender_id: nomis_offender_id,
+             case_information: build(:case_information, nomis_offender_id: nomis_offender_id),
              primary_pom_name: "Rossana Spinka"
              )
       visit prison_debugging_path('LEI')

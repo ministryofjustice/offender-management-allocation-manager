@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Allocation, type: :model do
@@ -8,52 +10,45 @@ RSpec.describe Allocation, type: :model do
   describe '#without_ldu_emails' do
     # CRC offender with no team
     let!(:crc_without_team) {
-      case_info = create(:case_information, case_allocation: 'CRC', team: nil)
-      create(:allocation, nomis_offender_id: case_info.nomis_offender_id)
+      create(:case_information, case_allocation: 'CRC', team: nil, allocation: build(:allocation))
     }
 
     # CRC offender with a team/LDU with no email address
     let!(:crc_without_email) {
       blank_team = create(:team, local_divisional_unit: build(:local_divisional_unit, email_address: nil))
-      case_info = create(:case_information, case_allocation: 'CRC', team: blank_team)
-      create(:allocation, nomis_offender_id: case_info.nomis_offender_id)
+      create(:case_information, case_allocation: 'CRC', team: blank_team, allocation: build(:allocation))
     }
 
     # NPS offender with no team
     let!(:nps_without_team) {
-      case_info = create(:case_information, team: nil)
-      create(:allocation, nomis_offender_id: case_info.nomis_offender_id)
+      create(:case_information, team: nil, allocation: build(:allocation)).allocation
     }
 
     # NPS offender with a team/LDU with no email address
     let!(:nps_without_email) {
       ldu = create(:local_divisional_unit, email_address: nil)
       team = create(:team, local_divisional_unit: ldu)
-      case_info = create(:case_information, team: team)
-      create(:allocation, nomis_offender_id: case_info.nomis_offender_id)
+      create(:case_information, team: team, allocation: build(:allocation)).allocation
     }
 
     # NPS offender with a team/LDU that has an email address
     let!(:nps_with_email) {
       ldu = create(:local_divisional_unit, email_address: 'someone@example.com')
       team = create(:team, local_divisional_unit: ldu)
-      case_info = create(:case_information, team: team)
-      create(:allocation, nomis_offender_id: case_info.nomis_offender_id)
+      create(:case_information, team: team, allocation: build(:allocation)).allocation
     }
 
     # NPS offender with a new LocalDeliveryUnit, but no Team
     let!(:nps_with_new_ldu) {
       ldu = create(:local_delivery_unit)
-      case_info = create(:case_information, team: nil, local_delivery_unit: ldu)
-      create(:allocation, nomis_offender_id: case_info.nomis_offender_id)
+      create(:case_information, team: nil, local_delivery_unit: ldu, allocation: build(:allocation)).allocation
     }
 
     # NPS offender with a new LocalDeliveryUnit and a Team/LDU with no email address
     let!(:nps_with_new_ldu_and_bad_team) {
       ldu = create(:local_delivery_unit)
       team = create(:team, local_divisional_unit: build(:local_divisional_unit, email_address: nil))
-      case_info = create(:case_information, team: team, local_delivery_unit: ldu)
-      create(:allocation, nomis_offender_id: case_info.nomis_offender_id)
+      create(:case_information, team: team, local_delivery_unit: ldu, allocation: build(:allocation)).allocation
     }
 
     it 'picks up NPS allocations without emails' do
@@ -78,7 +73,6 @@ RSpec.describe Allocation, type: :model do
       create(
         :allocation,
         prison: prison.code,
-        nomis_offender_id: nomis_offender_id,
         primary_pom_nomis_id: nomis_staff_id,
         override_reasons: "[\"suitability\", \"no_staff\", \"continuity\", \"other\"]"
       )
@@ -100,7 +94,6 @@ RSpec.describe Allocation, type: :model do
         create(
           :allocation,
           prison: allocation.prison,
-          nomis_offender_id: another_nomis_offender_id,
           primary_pom_nomis_id: 485_926,
           secondary_pom_nomis_id: nomis_staff_id,
           override_reasons: "[\"suitability\", \"no_staff\", \"continuity\", \"other\"]"
@@ -110,7 +103,7 @@ RSpec.describe Allocation, type: :model do
       it 'removes them as the primary pom\'s from all allocations' do
         described_class.deallocate_primary_pom(nomis_staff_id, allocation.prison)
 
-        deallocation = described_class.find_by!(nomis_offender_id: nomis_offender_id)
+        deallocation = described_class.find_by!(nomis_offender_id: allocation.nomis_offender_id)
 
         expect(deallocation.primary_pom_nomis_id).to be_nil
         expect(deallocation.primary_pom_name).to be_nil
@@ -121,7 +114,7 @@ RSpec.describe Allocation, type: :model do
       it 'removes them as the secondary pom from all allocations' do
         described_class.deallocate_secondary_pom(nomis_staff_id, allocation.prison)
 
-        deallocation = described_class.find_by(nomis_offender_id: another_nomis_offender_id)
+        deallocation = described_class.find_by(nomis_offender_id: another_allocaton.nomis_offender_id)
 
         expect(deallocation.secondary_pom_nomis_id).to be_nil
         expect(deallocation.secondary_pom_name).to be_nil
@@ -196,13 +189,13 @@ RSpec.describe Allocation, type: :model do
 
     describe '#active?' do
       it 'return true if an Allocation has been assigned a Primary POM' do
-        alloc = AllocationService.current_allocation_for(nomis_offender_id)
+        alloc = AllocationService.current_allocation_for(allocation.nomis_offender_id)
         expect(alloc.active?).to be(true)
       end
 
       it 'return false if an Allocation has not been assigned a Primary POM' do
         described_class.deallocate_primary_pom(nomis_staff_id, allocation.prison)
-        alloc = AllocationService.current_allocation_for(nomis_offender_id)
+        alloc = AllocationService.current_allocation_for(allocation.nomis_offender_id)
 
         expect(alloc.active?).to be(false)
       end
@@ -263,8 +256,11 @@ RSpec.describe Allocation, type: :model do
         expect(HmppsApi::CommunityApi).to receive(:set_pom).with offender_no: nomis_offender_id, prison: prison, forename: 'Bill', surname: 'Jones'
       end
 
-      it 'pushes the POM name to Ndelius'do
-        create(:allocation, :primary, nomis_offender_id: nomis_offender_id, prison: prison, primary_pom_nomis_id: nomis_staff_id)
+      it 'pushes the POM name to Ndelius' do
+        case_info = create(:case_information, nomis_offender_id: nomis_offender_id)
+        create(:allocation, :primary,
+               case_information: case_info,
+               prison: prison, primary_pom_nomis_id: nomis_staff_id)
       end
     end
 
@@ -272,7 +268,8 @@ RSpec.describe Allocation, type: :model do
       before do
         expect(PrisonOffenderManagerService).to receive(:get_pom_name).with(nomis_staff_id).and_return ['Bill', 'Jones']
         expect(HmppsApi::CommunityApi).to receive(:set_pom).with offender_no: nomis_offender_id, prison: prison, forename: 'Bill', surname: 'Jones'
-        create(:allocation, :primary, nomis_offender_id: nomis_offender_id, prison: prison, primary_pom_nomis_id: nomis_staff_id)
+        case_info = create(:case_information, nomis_offender_id: nomis_offender_id)
+        create(:allocation, :primary, case_information: case_info, prison: prison, primary_pom_nomis_id: nomis_staff_id)
       end
 
       let(:allocation) { described_class.last }

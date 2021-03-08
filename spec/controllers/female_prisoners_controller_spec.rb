@@ -19,8 +19,10 @@ RSpec.describe FemalePrisonersController, type: :controller do
       create(:case_information, nomis_offender_id: offender_with_case_info_but_no_complexity_level.fetch(:offenderNo))
       create(:case_information, nomis_offender_id: offender_with_complexity_level_and_case_info.fetch(:offenderNo))
 
-      create(:allocation, nomis_offender_id: allocated_offender_one.fetch(:offenderNo), prison: prison.code)
-      create(:allocation, nomis_offender_id: allocated_offender_two.fetch(:offenderNo), prison: prison.code)
+      info_one = create(:case_information, nomis_offender_id: allocated_offender_one.fetch(:offenderNo))
+      info_two = create(:case_information, nomis_offender_id: allocated_offender_two.fetch(:offenderNo))
+      create(:allocation, case_information: info_one, prison: prison.code)
+      create(:allocation, case_information: info_two, prison: prison.code)
     end
 
     let(:offender_with_case_info_but_no_complexity_level) { build(:nomis_offender, complexityLevel: nil) }
@@ -229,10 +231,14 @@ RSpec.describe FemalePrisonersController, type: :controller do
 
     describe 'allocated' do
       before do
-        create(:allocation, primary_pom_name: pom_one.full_name,  nomis_offender_id: offender_a.fetch(:offenderNo), prison: prison.code)
-        create(:allocation, primary_pom_name: pom_two.full_name,  nomis_offender_id: offender_b.fetch(:offenderNo), prison: prison.code)
-        create(:allocation, primary_pom_name: pom_three.full_name, nomis_offender_id: offender_c.fetch(:offenderNo), prison: prison.code)
-        create(:allocation, primary_pom_name: pom_four.full_name,  nomis_offender_id: offender_d.fetch(:offenderNo), prison: prison.code)
+        info_a = create(:case_information, nomis_offender_id: offender_a.fetch(:offenderNo))
+        info_b = create(:case_information, nomis_offender_id: offender_b.fetch(:offenderNo))
+        info_c = create(:case_information, nomis_offender_id: offender_c.fetch(:offenderNo))
+        info_d = create(:case_information, nomis_offender_id: offender_d.fetch(:offenderNo))
+        create(:allocation, primary_pom_name: pom_one.full_name,  case_information: info_a, prison: prison.code)
+        create(:allocation, primary_pom_name: pom_two.full_name,  case_information: info_b, prison: prison.code)
+        create(:allocation, primary_pom_name: pom_three.full_name, case_information: info_c, prison: prison.code)
+        create(:allocation, primary_pom_name: pom_four.full_name,  case_information: info_d, prison: prison.code)
       end
 
       let(:offenders) { [offender_c, offender_a, offender_b, offender_d] }

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Allocation < ApplicationRecord
-  has_paper_trail
+  has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
 
   ALLOCATE_PRIMARY_POM = 0
   REALLOCATE_PRIMARY_POM = 1
@@ -37,6 +37,8 @@ class Allocation < ApplicationRecord
     offender_transferred: OFFENDER_TRANSFERRED,
     offender_released: OFFENDER_RELEASED
   }
+
+  belongs_to :case_information, primary_key: :nomis_offender_id, foreign_key: :nomis_offender_id, inverse_of: :allocation
 
   scope :allocations, lambda { |nomis_offender_ids|
     where(nomis_offender_id: nomis_offender_ids)
@@ -81,13 +83,13 @@ class Allocation < ApplicationRecord
   end
 
   def get_old_versions
-    versions.map(&:reify).compact
+    papertrail_versions.map(&:reify).compact
   end
 
   # Gets the versions in *forward* order - so often we want to reverse
   # this list as we're interested in recent rather than ancient history
   def history
-    get_old_versions.append(self).zip(versions).map do |alloc, raw_version|
+    get_old_versions.append(self).zip(papertrail_versions).map do |alloc, raw_version|
       AllocationHistory.new(alloc, raw_version)
     end
   end
@@ -135,6 +137,21 @@ class Allocation < ApplicationRecord
     deallocate_offender event: Allocation::DEALLOCATE_PRIMARY_POM, event_trigger: Allocation::OFFENDER_TRANSFERRED if active?
   end
 
+  def last_version
+    papertrail_versions.last
+  end
+
+  # check for changes in the last week where the target value
+  # (item[1] in the array) is our staff_id
+  def new_case_for(staff_id)
+    papertrail_versions.where('created_at >= ?', 7.days.ago).map { |c|
+      YAML.load(c.object_changes)
+    }.select { |c|
+      c.key?('primary_pom_nomis_id') && c['primary_pom_nomis_id'][1] == staff_id ||
+        c.key?('secondary_pom_nomis_id') && c['secondary_pom_nomis_id'][1] == staff_id
+    }.any?
+  end
+
 private
 
   def deallocate_offender event:, event_trigger:
@@ -167,5 +184,9 @@ private
     if saved_change_to_primary_pom_nomis_id?
       PushPomToDeliusJob.perform_later(self)
     end
+  end
+
+  def papertrail_versions
+    PaperTrail::Version.where(item_type: 'Allocation', nomis_offender_id: nomis_offender_id).where.not(event: 'destroy').order(:created_at)
   end
 end

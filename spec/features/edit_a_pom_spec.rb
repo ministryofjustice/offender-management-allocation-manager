@@ -66,7 +66,7 @@ feature "edit a POM's details" do
       # create an allocation with the POM as the primary POM
       create(
         :allocation,
-        nomis_offender_id: 'G7806VO',
+        case_information: build(:case_information, nomis_offender_id: 'G7806VO'),
         primary_pom_nomis_id: 485_926,
         prison: 'LEI'
       )
@@ -74,7 +74,7 @@ feature "edit a POM's details" do
       # create an allocation with the POM as the co-working POM
       create(
         :allocation,
-        nomis_offender_id: 'G1670VU',
+        case_information: build(:case_information, nomis_offender_id: 'G1670VU'),
         primary_pom_nomis_id: 485_833,
         secondary_pom_nomis_id: 485_926,
         prison: 'LEI'

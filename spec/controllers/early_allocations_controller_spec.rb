@@ -20,6 +20,7 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
   }
 
   let(:offender) { build(:nomis_offender, sentence: attributes_for(:sentence_detail, conditionalReleaseDate: release_date)) }
+  let(:offender2) { build(:nomis_offender) }
 
   let(:nomis_offender_id) { offender.fetch(:offenderNo) }
 
@@ -28,13 +29,14 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
     stub_pom(first_pom)
 
     stub_offender(offender)
+    stub_offender(offender2)
     stub_poms(prison, poms)
-    stub_offenders_for_prison(prison, [offender])
-    create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
+    stub_offenders_for_prison(prison, [offender, offender2])
+    create(:allocation, case_information: build(:case_information, nomis_offender_id: nomis_offender_id), primary_pom_nomis_id: nomis_staff_id)
   end
 
   context 'with some assessments' do
-    let(:case_info) { create(:case_information, nomis_offender_id: nomis_offender_id) }
+    let(:case_info) { Allocation.last.case_information }
     let!(:early_allocations) {
       # Create 5 Early Allocation records with different creation dates
       [
@@ -121,12 +123,12 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
       let(:team) { create(:team, local_divisional_unit: ldu) }
 
       before do
-        create(:case_information, nomis_offender_id: nomis_offender_id, team: team)
+        create(:case_information, nomis_offender_id: offender2.fetch(:offenderNo), team: team)
       end
 
       it 'goes to the dead end' do
         get :new, params: { prison_id: prison,
-                            prisoner_id: nomis_offender_id }
+                            prisoner_id: offender2.fetch(:offenderNo) }
 
         assert_template 'dead_end'
       end
@@ -134,10 +136,6 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
   end
 
   describe '#create' do
-    before do
-      create(:case_information, nomis_offender_id: nomis_offender_id)
-    end
-
     context 'when on eligible screen' do
       let(:eligible_params) {
         { "oasys_risk_assessment_date" => valid_date,
