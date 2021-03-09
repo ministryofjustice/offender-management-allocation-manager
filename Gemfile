@@ -70,7 +70,7 @@ end
 
 group :test do
   gem 'capybara'
-  gem 'database_cleaner'
+  gem 'database_cleaner-active_record'
   gem 'faker'
   gem 'launchy'
   gem 'rails-controller-testing'
