@@ -61,7 +61,6 @@ private
     @new_arrivals_count = new_arrivals.size
     @allocated_count = allocated.size
 
-    # order, direction = sort_params(:last_name)
     bucket = {
       unallocated: unallocated,
       missing_information: missing_info,
