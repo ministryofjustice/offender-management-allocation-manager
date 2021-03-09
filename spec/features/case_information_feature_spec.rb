@@ -73,9 +73,7 @@ feature 'case information feature' do
       expect(CaseInformation.first.nomis_offender_id).to eq(nomis_offender_id)
       expect(CaseInformation.first.tier).to eq('A')
       expect(CaseInformation.first.case_allocation).to eq('NPS')
-      expect(current_url).to have_content missing_information_prison_prisoners_path('LEI')
-      wait_for { current_url.include?(pending_prison_prisoners_path('LEI')) }
-
+      wait_for { current_url.include?(missing_information_prison_prisoners_path('LEI')) }
       expect(page).to have_css('.offender_row_0', count: 1)
     end
 
@@ -87,7 +85,6 @@ feature 'case information feature' do
         click_link 'Edit'
       end
       expect(page).to have_selector('h1', text: 'Case information')
-
       click_link 'Back'
       find('#awaiting-information')
       expect(page).to have_selector('h1', text: 'Add missing information')
