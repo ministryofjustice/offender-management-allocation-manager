@@ -172,6 +172,9 @@ GEM
       guard (~> 2.1)
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
+    guard-rubocop (1.4.0)
+      guard (~> 2.0)
+      rubocop (< 2.0)
     has_scope (0.7.2)
       actionpack (>= 4.1)
       activesupport (>= 4.1)
@@ -514,6 +517,7 @@ DEPENDENCIES
   govuk_design_system_formbuilder (~> 2.1)
   govuk_notify_rails
   guard-rspec
+  guard-rubocop
   hashdiff (>= 1.0.0.beta1, < 2.0.0)
   jbuilder (~> 2.10)
   jwt
