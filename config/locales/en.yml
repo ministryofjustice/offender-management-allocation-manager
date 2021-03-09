@@ -122,14 +122,13 @@ en:
       previous: "&lsaquo; Previous"
       next: "Next &rsaquo;"
       truncate: "&hellip;"
-    handover_alert:
-      no_com: "A Community Offender Manager (COM) must be allocated to support this case from %{date}."
-      no_ldu: An automatic email could not be sent to the LDU. You need to find an alternative way of contacting them.
-      no_email: "An automatic email could not be sent to %{name} because the LDU email address is missing. You need need to find an alternative way of contacting them."
-    com_notification:
-      title: "You may need to contact the community probation office"
-      com_needed: "A Community Offender Manager (COM) must be allocated to support this case."
-      ldu_contacted: "The LDU was emailed to request the allocation of a supporting COM on %{date}."
+    notifications:
+      offender_needs_a_com:
+        maybe_contact_ldu: "You may need to contact the community probation office"
+        must_contact_ldu: "You must contact the community probation office"
+        com_needed: "A Community Offender Manager (COM) must be allocated to this case."
+        ldu_emailed: "We automatically emailed the LDU asking them to allocate a COM on %{date}."
+        ldu_uncontactable: "We can’t automatically contact the LDU because their details are missing. You need to find an alternative way of contacting them."
   helpers:
     fieldset:
       case_information:

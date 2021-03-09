@@ -237,25 +237,80 @@ feature 'View a prisoner profile page' do
     end
   end
 
-  context 'when welsh offender transfers from closed prison to Prescoed', vcr: { cassette_name: :open_prison_welsh_prescoed_notification } do
-    let(:offender_id) { 'G4251GW' }
-    let(:nomis_staff_id) { 485_637 }
+  context "when the offender needs a COM but one isn't allocated" do
+    let!(:case_info) {
+      create(:case_information,
+             nomis_offender_id: nomis_offender_id,
+             local_delivery_unit: build(:local_delivery_unit),
+             team: nil
+      )
+    }
 
-    it 'displays an email notification if offender is indeterminate without a COM' do
-      create(:case_information, :welsh, nomis_offender_id: offender_id, case_allocation: 'NPS', parole_review_date: Time.zone.today + 1.year)
-      create(:allocation, nomis_offender_id: offender_id, primary_pom_nomis_id: nomis_staff_id, prison: PrisonService::PRESCOED_CODE, primary_pom_name: 'Pobno, Kath')
+    let(:nomis_offender) {
+      build(:nomis_offender, sentence: attributes_for(:sentence_detail, :inside_handover_window))
+    }
 
-      email = create(:email_history, :open_prison_community_allocation, prison: PrisonService::PRESCOED_CODE, nomis_offender_id: offender_id, name: 'LDU Number 1')
+    let(:prison) { 'LEI' }
+    let(:nomis_offender_id) { nomis_offender.fetch(:offenderNo) }
 
-      # we do not have access to PRESCOED in Dev or Staging environments,
-      # so we are forcing the method "welsh_offender_in_prescoed_needs_com?" to return true
-      # so we can mimic what the user will see
-      allow_any_instance_of(HmppsApi::Offender).to receive(:welsh_offender_in_prescoed_needs_com?).and_return(true)
-      visit prison_prisoner_path("LEI", offender_id)
+    before do
+      stub_auth_token
+      stub_user(staff_id: 1234)
+      stub_keyworker(prison, nomis_offender_id, build(:keyworker))
+      stub_offender(nomis_offender)
+    end
 
-      expect(page).to have_content(I18n.t("views.com_notification.title"))
-      expect(page).to have_content(I18n.t("views.com_notification.com_needed"))
-      expect(page).to have_content(I18n.t("views.com_notification.ldu_contacted", date: email.created_at.strftime('%d/%m/%Y')))
+    it 'shows an error message at the top of the page' do
+      visit prison_prisoner_path(prison, nomis_offender_id)
+      within '.govuk-error-summary' do
+        expect(page).to have_content 'A Community Offender Manager (COM) must be allocated to this case'
+      end
+    end
+
+    it 'highlights the "COM name" table row in red' do
+      visit prison_prisoner_path(prison, nomis_offender_id)
+      expect(page).to have_css('#com-name.govuk-table__cell-error')
+    end
+
+    describe 'clicking on the warning message', :js do
+      it 'jumps the user down to the "COM name" table row' do
+        visit prison_prisoner_path(prison, nomis_offender_id)
+        click_link 'A Community Offender Manager (COM) must be allocated to this case'
+        expect(current_url).to end_with('#com-name')
+      end
+    end
+
+    context 'when the LDU has already been emailed automatically' do
+      let(:date_sent) { 2.days.ago }
+
+      let!(:email_history) {
+        create(:email_history, :open_prison_community_allocation,
+               nomis_offender_id: nomis_offender_id,
+               created_at: date_sent
+        )
+      }
+
+      it 'says that an email has been sent' do
+        visit prison_prisoner_path(prison, nomis_offender_id)
+        within '.govuk-error-summary' do
+          reload_page
+          date = date_sent.strftime('%d/%m/%Y')
+          expect(page).to have_content "We automatically emailed the LDU asking them to allocate a COM on #{date}"
+        end
+      end
+    end
+
+    describe 'after a COM has been allocated (pulled in via nDelius/Community API)' do
+      before do
+        case_info.update!(com_name: "#{Faker::Name.last_name}, #{Faker::Name.first_name}")
+      end
+
+      it 'does not show' do
+        visit prison_prisoner_path(prison, nomis_offender_id)
+        expect(page).not_to have_css('.govuk-error-summary')
+        expect(page).not_to have_content('A Community Offender Manager (COM) must be allocated to this case')
+        expect(page).not_to have_css('#com-name.govuk-table__cell-error')
+      end
     end
   end
 end

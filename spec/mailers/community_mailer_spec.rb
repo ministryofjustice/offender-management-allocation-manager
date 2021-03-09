@@ -90,7 +90,7 @@ RSpec.describe CommunityMailer, type: :mailer do
     end
   end
 
-  describe 'allocation to community when transferred to OMIC open prison' do
+  describe '#open_prison_supporting_com_needed' do
     let(:offender) { build(:offender, latestLocationId: PrisonService::PRESCOED_CODE, sentence_type: :indeterminate) }
     let(:case_info) do
       create(:case_information, :welsh, nomis_offender_id: offender.offender_no,
@@ -99,17 +99,15 @@ RSpec.describe CommunityMailer, type: :mailer do
 
     let(:params) do
       {
-      nomis_offender_id: offender.offender_no,
-      prisoner_name: offender.full_name,
-      crn: offender.crn,
-      ldu_email: offender.ldu_email_address,
-      prison: PrisonService.name_for(PrisonService::PRESCOED_CODE),
-      pom_name: "Johnson, Michael",
-      pom_email: "michael.johnson@pom.gov.uk"
+        prisoner_number: offender.offender_no,
+        prisoner_name: offender.full_name,
+        prisoner_crn: offender.crn,
+        ldu_email: offender.ldu_email_address,
+        prison_name: PrisonService.name_for(PrisonService::PRESCOED_CODE)
       }
     end
 
-    let(:mail) { described_class.omic_open_prison_community_allocation(params) }
+    let(:mail) { described_class.open_prison_supporting_com_needed(params) }
 
     before do
       offender.load_case_information(case_info)
@@ -125,14 +123,49 @@ RSpec.describe CommunityMailer, type: :mailer do
 
     it 'personalises the email for handover' do
       expect(mail.govuk_notify_personalisation).
-      to eq(email: params[:ldu_email],
-            prisoner_name: params[:prisoner_name],
-            crn_number: params[:crn],
-            prisoner_number: params[:nomis_offender_id],
-            prison_name: params[:prison],
-            responsible_pom_name: params[:pom_name],
-            responsible_pom_email: params[:pom_email]
+      to eq(prisoner_name: params[:prisoner_name],
+            prisoner_number: params[:prisoner_number],
+            prisoner_crn: params[:prisoner_crn],
+            prison_name: params[:prison_name]
          )
+    end
+  end
+
+  describe '#open_prison_responsible_com_needed' do
+    let(:params) do
+      {
+        prisoner_name: 'Prisoner, A',
+        prisoner_number: 'A1234AA',
+        prisoner_crn: '1234CRN',
+        previous_pom_name: 'POM, Responsible',
+        previous_pom_email: 'responsible_pom@localhost.local',
+        prison_name: 'HMP Current',
+        previous_prison_name: 'HMP Previous',
+        email: 'testuser@localhost.local'
+      }
+    end
+
+    let(:mail) { described_class.open_prison_prepolicy_responsible_com_needed(params) }
+
+    it 'sets the template' do
+      expect(mail.govuk_notify_template).
+        to eq 'e517ddc9-5854-462e-b9a1-f67c97ad5b63'
+    end
+
+    it 'sets the To address of the email using the provided user' do
+      expect(mail.to).to eq(["testuser@localhost.local"])
+    end
+
+    it 'personalises the email' do
+      expect(mail.govuk_notify_personalisation).
+        to eq(prisoner_name: params[:prisoner_name],
+              prisoner_number: params[:prisoner_number],
+              prisoner_crn: params[:prisoner_crn],
+              previous_pom_name: params[:previous_pom_name],
+              previous_pom_email: params[:previous_pom_email],
+              prison_name: params[:prison_name],
+              previous_prison_name: params[:previous_prison_name]
+           )
     end
   end
 end

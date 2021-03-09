@@ -143,43 +143,86 @@ describe HmppsApi::Offender do
   end
 
   describe '#pom_responsibility' do
-    context 'when a Responsibility record does not exist' do
-      let(:offender) { build(:offender, :indeterminate, latestLocationId: 'LEI') }
+    subject { offender.pom_responsibility }
 
-      it 'calculates the responsibility based on the offenders sentence' do
-        responsibility = offender.pom_responsibility
-        expect(responsibility.responsible?).to eq(true)
-        expect(responsibility.supporting?).to eq(false)
+    let(:offender) { build(:offender, :indeterminate, latestLocationId: 'LEI') }
+
+    context 'when the responsibility has not been overridden' do
+      it "calculates the responsibility based on the offender's sentence" do
+        # POM is responsible because TED is 1 year away
+        expect(subject).to be_responsible
       end
     end
 
-    context 'when a Responsibility record exists' do
-      let(:offender) { build(:offender, :indeterminate, latestLocationId: 'LEI') }
-
-      it "returns Supporting when Responsibility.value is 'Probation'" do
+    context 'when the responsibility has been overridden' do
+      before do
         case_info = create(:case_information, nomis_offender_id: offender.offender_no, case_allocation: 'NPS', mappa_level: 0)
-        create(:responsibility, nomis_offender_id: offender.offender_no, value: 'Probation')
 
-        # Offender is not a typical model where we can 'reload' when the record has changed.
-        # Using load_case_information will load the case information record and responsibility (if it exists)
-        # This method is not explicitly called in pom_responsibility method as the Offender model gets created
-        # everytime it is request, so the case information will be automatically loaded.
+        # Responsibility overrides exist as 'Responsibility' records
+        create(:responsibility, nomis_offender_id: offender.offender_no, value: override_to)
+
+        # Load the case info record on to the offender object
         offender.load_case_information(case_info)
-
-        responsibility = offender.pom_responsibility
-        expect(responsibility.responsible?).to eq(false)
-        expect(responsibility.supporting?).to eq(true)
       end
 
-      it "returns Responsible when Responsibility.value is 'Prison'" do
+      context 'when overridden to the community' do
+        let(:override_to) { 'Probation' }
+
+        it "is supporting" do
+          expect(subject).to be_supporting
+        end
+      end
+
+      context 'when overridden to custody' do
+        # Overrides to custody aren't actually possible in the UI, so this scenario should never occur naturally in the real world
+        let(:override_to) { 'Prison' }
+
+        it "is responsible" do
+          expect(subject).to be_responsible
+        end
+      end
+    end
+  end
+
+  describe '#com_responsibility' do
+    subject { offender.com_responsibility }
+
+    let(:offender) { build(:offender, :indeterminate, latestLocationId: 'LEI') }
+
+    context 'when the responsibility has not been overridden' do
+      it "calculates the responsibility based on the offender's sentence" do
+        # Offender's TED is 1 year away, so a COM isn't needed yet
+        expect(subject).not_to be_involved
+      end
+    end
+
+    context 'when the responsibility has been overridden' do
+      before do
         case_info = create(:case_information, nomis_offender_id: offender.offender_no, case_allocation: 'NPS', mappa_level: 0)
-        create(:responsibility, nomis_offender_id: offender.offender_no, value: 'Prison')
 
+        # Responsibility overrides exist as 'Responsibility' records
+        create(:responsibility, nomis_offender_id: offender.offender_no, value: override_to)
+
+        # Load the case info record on to the offender object
         offender.load_case_information(case_info)
+      end
 
-        responsibility = offender.pom_responsibility
-        expect(responsibility.supporting?).to eq(false)
-        expect(responsibility.responsible?).to eq(true)
+      context 'when overridden to the community' do
+        let(:override_to) { 'Probation' }
+
+        it "is responsible" do
+          expect(subject).to be_responsible
+        end
+      end
+
+      context 'when overridden to custody' do
+        # Overrides to custody aren't actually possible in the UI, so this scenario should never occur naturally in the real world
+        # One of the things to decide if/when implementing this is: what will COM responsibility be? Supporting or not involved?
+        let(:override_to) { 'Prison' }
+
+        it "is supporting" do
+          expect(subject).to be_supporting
+        end
       end
     end
   end
@@ -318,84 +361,39 @@ describe HmppsApi::Offender do
     end
   end
 
-  describe '#needs_com_and_ldu_is_uncontactable?' do
-    context 'when unsentenced' do
-      let(:offender) {
-        build(:offender).tap { |o|
-          o.load_case_information(build(:case_information))
-          o.sentence = build(:sentence_detail, :unsentenced)
-        }
+  describe '#needs_a_com?' do
+    subject { offender.needs_a_com? }
+
+    let(:offender) {
+      build(:offender, sentence: sentence).tap { |o|
+        o.load_case_information(case_info)
       }
+    }
+
+    let(:case_info) { build(:case_information) }
+
+    context 'when the Community is not involved yet' do
+      let(:sentence) { build(:sentence_detail, :handover_in_8_days) }
 
       it 'returns false' do
-        expect(offender.sentenced?).to eq(false)
-        expect(offender.needs_com_and_ldu_is_uncontactable?).to eq(false)
+        expect(subject).to be(false)
       end
     end
 
-    it 'returns false if offender does not have a handover start date' do
-      offender = build(:offender, :indeterminate).tap { |o|
-        o.load_case_information(build(:case_information))
-        o.sentence = build(:sentence_detail, sentenceStartDate: Time.zone.today + 20.months)
-      }
+    context 'when the Community is involved' do
+      let(:sentence) { build(:sentence_detail, conditionalReleaseDate: Time.zone.today + 7.months) }
 
-      expect(offender.needs_com_and_ldu_is_uncontactable?).to eq(false)
-    end
+      context 'when a COM is already allocated' do
+        let(:case_info) { build(:case_information, :with_com) }
 
-    it 'returns false if offender is outside handover window' do
-      offender = build(:offender).tap { |o|
-        o.load_case_information(build(:case_information))
-        o.sentence = build(:sentence_detail,
-                           sentenceStartDate: Time.zone.today - 20.months,
-                           automaticReleaseDate: (Time.zone.today + 20.months),
-                           releaseDate: (Time.zone.today + 20.months))
-      }
-
-      expect(offender.needs_com_and_ldu_is_uncontactable?).to eq(false)
-    end
-
-    context 'when offender is inside handover_start to responsibility_handover' do
-      let(:offender) {
-        build(:offender).tap { |o|
-          o.load_case_information(case_info)
-          o.sentence = build(:sentence_detail,
-                             sentenceStartDate: (Time.zone.today - 20.months),
-                             automaticReleaseDate: (Time.zone.today + 7.months),
-                             releaseDate: (Time.zone.today + 20.months))
-        }
-      }
-
-      context "when offender has a 'COM'" do
-        let(:case_info) { build(:case_information, com_name: "Betty White") }
-
-        it "returns false" do
-          expect(offender.needs_com_and_ldu_is_uncontactable?).to eq(false)
+        it 'returns false' do
+          expect(subject).to be(false)
         end
       end
 
-      context "when offender has no 'COM' but has an LDU email address" do
-        let(:case_info) { build(:case_information) }
-
-        it "returns false" do
-          expect(offender.needs_com_and_ldu_is_uncontactable?).to eq(false)
-        end
-      end
-
-      context 'when offender really has no LDU' do
-        let(:case_info) { build(:case_information, team: nil) }
-
+      context 'when a COM has not been allocated yet' do
         it 'returns true' do
-          expect(offender.needs_com_and_ldu_is_uncontactable?).to eq(true)
-        end
-      end
-
-      context 'when offender has LDU but no email address' do
-        let(:case_info) {
-          build(:case_information, team: build(:team, local_divisional_unit: build(:local_divisional_unit, email_address: nil)))
-        }
-
-        it 'returns true' do
-          expect(offender.needs_com_and_ldu_is_uncontactable?).to eq(true)
+          expect(subject).to be(true)
         end
       end
     end
