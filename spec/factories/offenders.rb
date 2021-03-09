@@ -83,6 +83,11 @@ FactoryBot.define do
       attributes_for :sentence_detail
     end
 
+    trait :indeterminate do
+      imprisonmentStatus {'LIFE'}
+      sentence { attributes_for(:sentence_detail, :indeterminate) }
+    end
+
     sequence(:bookingId) { |c| c + 100_000 }
   end
 end
