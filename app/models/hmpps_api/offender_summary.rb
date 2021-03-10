@@ -4,8 +4,6 @@ module HmppsApi
   class OffenderSummary < OffenderBase
     include Deserialisable
 
-    attr_accessor :latest_movement
-
     attr_accessor :allocation_date
 
     attr_reader :prison_id, :facial_image_id
@@ -22,20 +20,18 @@ module HmppsApi
       end
     end
 
-    def self.from_json(payload)
-      OffenderSummary.new.tap { |obj|
-        obj.load_from_json(payload)
-      }
+    def self.from_json(payload, recall_flag:, latest_temp_movement:)
+      OffenderSummary.new(payload, recall_flag: recall_flag, latest_temp_movement: latest_temp_movement)
     end
 
     # This list must only contain values that are returned by
     # https://api-dev.prison.service.justice.gov.uk/swagger-ui.html#//locations/getOffendersAtLocationDescription
-    def load_from_json(payload)
+    def initialize(payload, recall_flag:, latest_temp_movement:)
       @booking_id = payload.fetch('bookingId').to_i
       @prison_id = payload.fetch('agencyId')
       @facial_image_id = payload['facialImageId']&.to_i
 
-      super(payload)
+      super(payload, recall_flag: recall_flag, latest_temp_movement: latest_temp_movement)
     end
   end
 end

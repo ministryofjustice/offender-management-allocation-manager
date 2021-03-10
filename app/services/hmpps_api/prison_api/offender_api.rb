@@ -22,12 +22,16 @@ module HmppsApi
           total_pages = (total_records / page_size.to_f).ceil
         }
 
-        recall_data = get_recall_flags(data.map { |o| o.fetch('offenderNo') })
-        data.each do |offender|
-          offender.merge!(recall_data.fetch(offender.fetch('offenderNo')))
-        end
+        offender_nos = data.map { |o| o.fetch('offenderNo') }
+        recall_data = get_recall_flags(offender_nos)
+        temp_movements = HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for(offender_nos)
 
-        offenders = api_deserialiser.deserialise_many(HmppsApi::OffenderSummary, data)
+        offenders = data.map do |payload|
+          offender_no = payload.fetch('offenderNo')
+          HmppsApi::OffenderSummary.from_json(payload,
+                                              recall_flag: recall_data.fetch(offender_no).fetch('recall'),
+                                              latest_temp_movement: temp_movements[offender_no])
+        end
         ApiPaginatedResponse.new(total_pages, offenders)
       end
 
@@ -41,8 +45,10 @@ module HmppsApi
           nil
         else
           recall_data = get_recall_flags([url_offender_no])
-          api_deserialiser.deserialise(HmppsApi::Offender,
-                                       response.first.merge(recall_data.fetch(url_offender_no))).tap do |offender|
+          temp_movements = HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for([url_offender_no])
+          HmppsApi::Offender.from_json(response.first,
+                                       recall_flag: recall_data.fetch(url_offender_no).fetch('recall'),
+                                       latest_temp_movement: temp_movements[url_offender_no]).tap do |offender|
             sentence_details = get_bulk_sentence_details([offender.booking_id])
             offender.sentence = sentence_details.fetch(offender.booking_id)
             add_arrival_dates([offender])
