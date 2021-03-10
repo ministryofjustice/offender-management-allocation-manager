@@ -91,13 +91,6 @@ feature 'Help' do
 
       expect(page).to have_css('h1', text: title)
       expect(page).to have_css('.govuk-inset-text', text: inset_text[:LSA])
-      expect(page).to have_link('https://digital.prison.service.justice.gov.uk')
-
-      images = %w[hmpps_login_image nomis_login_image admin_util_image search_staff_image staff_member_image staff_roles_image add_staff_image choose_role_image]
-
-      images.each do |image|
-        expect(page).to have_xpath("//img[contains(@src,'assets/#{image}')]")
-      end
     end
 
     scenario 'help getting set up step_3 page', vcr: { cassette_name: :help_getting_set_up_step_3 } do
