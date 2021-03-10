@@ -1,0 +1,22 @@
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">
+      New complexity of need level
+    </h1>
+    <p>You have updated the complexity of need level for <%=@prisoner.first_name %> <%=@prisoner.last_name%> to:</p>
+    <p id='complexity-level-update', class="govuk-body govuk-!-font-size-24 govuk-body govuk-!-font-weight-bold"><%=@complexity.level.titleize %></p>
+    <h2 class="govuk-heading-m">
+      Next steps
+    </h2>
+    <ul class="govuk-list govuk-list--bullet">
+      <%=display_complexity_change_info(previous_complexity_level: @previous_complexity_level, updated_complexity_level: @complexity.level) %>
+    </ul>
+    <p>
+      <a class="govuk-link" <%= link_to 'Return to prisoner page', prison_allocation_path(
+      :prison_id => @prison.code,
+      nomis_offender_id: @prisoner.offender_no) %>
+      </a>
+    </p>
+  </div>
+</div>
