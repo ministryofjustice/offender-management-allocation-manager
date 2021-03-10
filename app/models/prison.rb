@@ -13,6 +13,10 @@ class Prison
     @code = prison_code
   end
 
+  def womens?
+    PrisonService::womens_prison?(@code)
+  end
+
   def name
     PrisonService.name_for(@code)
   end

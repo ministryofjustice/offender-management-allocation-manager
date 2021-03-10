@@ -16,6 +16,34 @@ RSpec.describe Prison, type: :model do
     end
   end
 
+  describe '#womens?' do
+    let(:test_strategy) { Flipflop::FeatureSet.current.test! }
+
+    before do
+      test_strategy.switch!(:womens_estate, true)
+    end
+
+    after do
+      test_strategy.switch!(:womens_estate, false)
+    end
+
+    context 'with a male prison' do
+      let(:prison) { build(:prison) }
+
+      it 'is false' do
+        expect(prison.womens?).to eq(false)
+      end
+    end
+
+    context 'with a female prison' do
+      let(:prison) { build(:womens_prison) }
+
+      it 'is true' do
+        expect(prison.womens?).to eq(true)
+      end
+    end
+  end
+
   describe '#offenders' do
     subject { described_class.new("LEI").offenders }
 
