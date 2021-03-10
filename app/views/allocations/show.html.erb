@@ -1,3 +1,4 @@
+
 <% if @prisoner.needs_a_com? %>
   <%= render partial: 'shared/notifications/offender_needs_a_com', locals: {offender: @prisoner, email_history: @emails_sent_to_ldu} %>
 <% end %>
@@ -40,6 +41,11 @@
         <% end %>
       </td>
     </tr>
+
+    <% if @prison.womens? %>
+      <%= render partial: 'female_complexity_level' %>
+    <% end %>
+
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">Current responsibility</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half responsibility_change">
@@ -49,6 +55,7 @@
         <% end %>
       </td>
     </tr>
+
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Last known address in Wales</td>
       <td class="govuk-table__cell table_cell__left_align">

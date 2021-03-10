@@ -153,7 +153,6 @@ feature 'Allocation' do
     within('.allocated_offender_row_0') do
       click_link 'View'
     end
-
     expect(current_url).to have_content(prison_allocation_path('LEI', nomis_offender_id))
     expect(page).to have_link(nil, href: "/prisons/LEI/poms/485735")
     expect(page).to have_css('.table_cell__left_align', text: 'Jara Duncan, Laura')

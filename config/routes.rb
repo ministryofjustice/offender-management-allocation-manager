@@ -60,6 +60,8 @@ Rails.application.routes.draw do
       # uses `as: :latest_early_allocation` to avoid clashes with `resources :early_allocations` above
       resource :early_allocation, only: [:edit, :update], as: :latest_early_allocation
 
+      resource :complexity_level, only: [:edit, :update]
+
       resources :victim_liaison_officers, only: [:new, :edit, :create, :update, :destroy] do
         member do
           get 'delete'
