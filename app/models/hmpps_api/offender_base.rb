@@ -17,7 +17,7 @@ module HmppsApi
 
     attr_accessor :category_code, :date_of_birth, :prison_arrival_date, :sentence, :allocated_pom_name
 
-    attr_reader :first_name, :last_name, :booking_id, :offender_no, :sentence_type
+    attr_reader :first_name, :last_name, :booking_id, :offender_no, :sentence_type, :latest_temp_movement
 
     # This is needed (sadly) because although when querying by prison these are filtered out,
     # we can query directly (we might have a CaseInformation record) where we don't filter.
@@ -153,7 +153,7 @@ module HmppsApi
     # https://api-dev.prison.service.justice.gov.uk/swagger-ui.html#//prisoners/getPrisonersOffenderNo
     # and also by
     # https://api-dev.prison.service.justice.gov.uk/swagger-ui.html#//locations/getOffendersAtLocationDescription
-    def load_from_json(payload)
+    def initialize(payload, recall_flag:, latest_temp_movement:)
       # It is expected that this method will be called by the subclass which
       # will have been given a payload at the class level, and will call this
       # method from it's own internal from_json
@@ -161,10 +161,11 @@ module HmppsApi
       @last_name = payload.fetch('lastName')
       @offender_no = payload.fetch('offenderNo')
       @convicted_status = payload['convictedStatus']
-      @recall_flag = payload.fetch('recall')
+      @recall_flag = recall_flag
       @sentence_type = SentenceType.new(payload['imprisonmentStatus'])
       @category_code = payload['categoryCode']
       @date_of_birth = Date.parse(payload.fetch('dateOfBirth'))
+      @latest_temp_movement = latest_temp_movement
     end
 
     def handover_start_date

@@ -18,8 +18,8 @@ class AllocatedOffender
     @offender = offender
   end
 
-  def latest_movement_date
-    @offender.latest_movement&.movement_date
+  def latest_temp_movement_date
+    @offender.latest_temp_movement&.movement_date
   end
 
   def pom_responsibility
