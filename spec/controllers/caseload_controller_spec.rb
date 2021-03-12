@@ -101,7 +101,7 @@ RSpec.describe CaseloadController, :allocation, type: :controller do
         end
 
         it 'returns ROTL information' do
-          expect(offenders.map { |o| allocations.fetch(o.fetch(:offenderNo)).latest_movement_date }).to eq [today, nil, nil]
+          expect(offenders.map { |o| allocations.fetch(o.fetch(:offenderNo)).latest_temp_movement_date }).to eq [today, nil, nil]
         end
       end
     end
