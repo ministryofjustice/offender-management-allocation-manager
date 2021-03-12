@@ -6,7 +6,13 @@
   <%= render "search/search_box" %>
 </div>
 
-<%= render(:partial => 'summary_subnav', :locals => {:active => :pending}) %>
+
+<%= render(:partial => 'shared/summary_subnav', :locals => {:active => :missing_information,
+                                                            :unallocated_count => @unallocated_count,
+                                                            :missing_info_count => @missing_info_count,
+                                                            :allocated_count => @allocated_count,
+                                                            :new_arrivals_count => @new_arrivals_count
+}) %>
 
 <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Add missing information</h1>
 
