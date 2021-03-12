@@ -107,7 +107,6 @@ feature "viewing upcoming handovers" do
 
       it 'can load the POM handovers page', :js do
         visit prison_staff_caseload_handovers_path(prison, user.staff_id)
-
         click_link('Handover start date')
         check_dates.each_with_index do |name, index|
           expect(page).to have_css(".offender_row_#{index}", text: name)

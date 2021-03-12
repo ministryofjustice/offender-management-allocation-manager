@@ -48,7 +48,6 @@ describe HmppsApi::PrisonApi::OffenderApi do
       let(:offender) { build(:nomis_offender, recall: true) }
       let(:offender_no) { offender.fetch(:offenderNo) }
 
-
       before do
         stub_auth_token
         stub_offender(offender)
