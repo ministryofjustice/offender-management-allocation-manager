@@ -153,18 +153,18 @@ module HmppsApi
     # https://api-dev.prison.service.justice.gov.uk/swagger-ui.html#//prisoners/getPrisonersOffenderNo
     # and also by
     # https://api-dev.prison.service.justice.gov.uk/swagger-ui.html#//locations/getOffendersAtLocationDescription
-    def initialize(payload, recall_flag:, latest_temp_movement:)
+    def initialize(api_payload, search_payload, latest_temp_movement:)
       # It is expected that this method will be called by the subclass which
       # will have been given a payload at the class level, and will call this
       # method from it's own internal from_json
-      @first_name = payload.fetch('firstName')
-      @last_name = payload.fetch('lastName')
-      @offender_no = payload.fetch('offenderNo')
-      @convicted_status = payload['convictedStatus']
-      @recall_flag = recall_flag
-      @sentence_type = SentenceType.new(payload['imprisonmentStatus'])
-      @category_code = payload['categoryCode']
-      @date_of_birth = Date.parse(payload.fetch('dateOfBirth'))
+      @first_name = api_payload.fetch('firstName')
+      @last_name = api_payload.fetch('lastName')
+      @offender_no = api_payload.fetch('offenderNo')
+      @convicted_status = api_payload['convictedStatus']
+      @recall_flag = search_payload.fetch('recall', false)
+      @sentence_type = SentenceType.new(api_payload['imprisonmentStatus'])
+      @category_code = api_payload['categoryCode']
+      @date_of_birth = Date.parse(api_payload.fetch('dateOfBirth'))
       @latest_temp_movement = latest_temp_movement
     end
 
