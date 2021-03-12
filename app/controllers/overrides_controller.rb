@@ -44,7 +44,7 @@ class OverridesController < PrisonsApplicationController
             event_trigger: :user,
             created_by_username: current_user,
             allocated_at_tier: @prisoner.tier,
-            recommended_pom_type: (@prisoner.recommended_pom_type == RecommendationService::PRISON_POM) ? 'prison' : 'probation',
+            recommended_pom_type: (RecommendationService.recommended_pom_type(@prisoner) == RecommendationService::PRISON_POM) ? 'prison' : 'probation',
             prison: active_prison_id,
             override_reasons: @override.override_reasons,
             suitability_detail: @override.suitability_detail,
@@ -53,10 +53,10 @@ class OverridesController < PrisonsApplicationController
         }
 
         AllocationService.create_or_update(allocation)
-        flash[:notice] = "#{@prisoner.full_name_ordered} has been allocated to #{@pom.full_name_ordered} (#{@pom.grade})"
+        flash[:notice] = "#{view_context.full_name_ordered(@prisoner)} has been allocated to #{view_context.full_name_ordered(@pom)} (#{view_context.grade(@pom)})"
 
         session.delete :allocation_override
-        redirect_to prison_summary_unallocated_path(active_prison_id, page: params[:page], sort: params[:sort])
+        redirect_to unallocated_prison_prisoners_path(active_prison_id, page: params[:page], sort: params[:sort])
       end
     else
       # render current page on validation failure
