@@ -14,7 +14,7 @@ feature 'summary summary feature' do
     end
 
     it 'displays offenders awaiting information', vcr: { cassette_name: :awaiting_information_feature } do
-      visit pending_prison_prisoners_path('LEI')
+      visit missing_information_prison_prisoners_path('LEI')
 
       expect(page).to have_css('.moj-sub-navigation__item')
       expect(page).to have_content('Add missing information')
@@ -45,10 +45,8 @@ feature 'summary summary feature' do
 
       it 'displays offenders already allocated', vcr: { cassette_name: :allocated_offenders_feature } do
         visit allocated_prison_prisoners_path('LEI')
-
         expect(page).to have_css('.moj-sub-navigation__item')
         expect(page).to have_content('See allocations')
-
         # forward sort
         click_link 'Allocation date'
         # The 'hint' contains the offender id
