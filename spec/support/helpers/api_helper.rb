@@ -19,7 +19,8 @@ module ApiHelper
       to_return(body: [
         {
           prisonerNumber: offender_no,
-          recall: offender.fetch(:recall)
+          recall: offender.fetch(:recall),
+          cellLocation: offender.fetch(:internalLocation)
         }
       ].to_json)
 
@@ -123,11 +124,13 @@ module ApiHelper
                                                            'assignedLivingUnitDesc' => o[:internalLocation])
                          }                         .to_json)
 
-    stub_request(:post, "#{T3_SEARCH}/prisoner-numbers").with(body: { prisonerNumbers: offenders.map { |offender| offender.fetch(:offenderNo) } }.to_json).
+    stub_request(:post, "#{T3_SEARCH}/prisoner-numbers").
+      with(body: { prisonerNumbers: offenders.map { |offender| offender.fetch(:offenderNo) } }.to_json).
       to_return(body: offenders.map { |offender|
                         {
                           prisonerNumber: offender.fetch(:offenderNo),
-                          recall: offender.fetch(:recall)
+                          recall: offender.fetch(:recall),
+                          cellLocation: offender.fetch(:internalLocation)
                         }
                       }.to_json)
 
