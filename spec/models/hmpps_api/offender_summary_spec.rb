@@ -3,6 +3,10 @@
 require 'rails_helper'
 
 describe HmppsApi::OffenderSummary do
+  subject {
+    build(:offender_summary)
+  }
+
   describe '#inside_omic_policy?' do
     let(:over_18) { (Time.zone.today - 18.years).to_s }
     let(:immigration_detainee) { 'DET' }

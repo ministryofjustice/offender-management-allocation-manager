@@ -48,7 +48,13 @@ FactoryBot.define do
   end
 
   factory :offender, parent: :offender_base, class: 'HmppsApi::Offender' do
-    initialize_with { HmppsApi::Offender.from_json(attributes.stringify_keys).tap { |offender| offender.sentence = attributes.fetch(:sentence)} }
+    initialize_with do
+      HmppsApi::Offender.from_json(attributes.stringify_keys,
+                                   recall_flag: attributes.fetch(:recall),
+                                   latest_temp_movement: nil).tap { |offender|
+        offender.sentence = attributes.fetch(:sentence)
+      }
+    end
 
     trait :prescoed do
       latestLocationId { PrisonService::PRESCOED_CODE }

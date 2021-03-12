@@ -62,10 +62,10 @@
         <%= sort_arrow('last_name') %>
       </th>
       <th class="govuk-table__header" scope="col">
-        <a href="<%= sort_link('latest_movement_date') %>">
+        <a href="<%= sort_link('latest_temp_movement_date') %>">
           Location
         </a>
-        <%= sort_arrow('latest_movement_date') %>
+        <%= sort_arrow('latest_temp_movement_date') %>
       </th>
       <th class="govuk-table__header" scope="col">
         <a href="<%= sort_link('tier') %>">
@@ -104,7 +104,7 @@
           </span>
         </td>
         <td aria-label="Location" class="govuk-table__cell">
-          <%= offender.latest_movement_date.nil? ? PrisonService.name_for(offender.prison) : "Temporary absence (out #{format_date(offender.latest_movement_date)})" %>
+          <%= offender.latest_temp_movement_date.nil? ? PrisonService.name_for(offender.prison) : "Temporary absence (out #{format_date(offender.latest_temp_movement_date)})" %>
         </td>
         <td aria-label="Tier" class="govuk-table__cell tier">
           <%= offender.tier %>

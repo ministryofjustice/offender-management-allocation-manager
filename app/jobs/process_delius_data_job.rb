@@ -5,6 +5,8 @@ class ProcessDeliusDataJob < ApplicationJob
 
   # Not much point retrying a 404 error
   discard_on Faraday::ResourceNotFound
+  # nDelius API fails like this when trying to read a duplicate - so don't retry here either
+  discard_on Faraday::ServerError
 
   include ApplicationHelper
 
