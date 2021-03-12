@@ -170,6 +170,7 @@ module HmppsApi
       @category_code = api_payload['categoryCode']
       @date_of_birth = Date.parse(api_payload.fetch('dateOfBirth'))
       @latest_temp_movement = latest_temp_movement
+      @cell_location = search_payload['cellLocation']
     end
 
     def handover_start_date
