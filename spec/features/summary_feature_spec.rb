@@ -12,6 +12,13 @@ feature 'male prisoners summary navigation tabs' do
 
     create(:allocation, primary_pom_allocated_at: one_day_ago,  nomis_offender_id: allocated_offender_one.fetch(:offenderNo), prison: prison.code)
     create(:allocation, primary_pom_allocated_at: two_days_ago, nomis_offender_id: allocated_offender_two.fetch(:offenderNo), prison: prison.code)
+
+    # This test fails on a Monday, so always run it on a Friday
+    Timecop.travel Date.new(2021, 3, 12)
+  end
+
+  after do
+    Timecop.return
   end
 
   let(:pom) { build(:pom) }

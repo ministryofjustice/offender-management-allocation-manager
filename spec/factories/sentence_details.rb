@@ -19,6 +19,10 @@ FactoryBot.define do
       automaticReleaseDate { "2022-01-28" }
     end
 
+    trait :welsh_open_policy do
+      sentenceStartDate { '2020-10-20' }
+    end
+
     trait :english_policy_sentence do
       sentenceStartDate { '2019-10-05' }
       conditionalReleaseDate { "2022-01-28" }

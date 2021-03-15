@@ -5,7 +5,7 @@ feature "viewing upcoming handovers" do
   let(:user) { build(:pom) }
 
   context 'when signed in as an SPO' do
-    let(:offender) { build(:nomis_offender, latestLocationId: prison) }
+    let(:offender) { build(:nomis_offender, agencyId: prison) }
     let!(:case_info) { create(:case_information, nomis_offender_id: offender.fetch(:offenderNo)) }
 
     before do
