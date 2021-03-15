@@ -26,11 +26,17 @@ module HmppsApi
         search_data = get_search_payload(offender_nos)
         temp_movements = HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for(offender_nos)
 
+        booking_ids = data.map { |o| o.fetch('bookingId') }
+        sentence_details = HmppsApi::PrisonApi::OffenderApi.get_bulk_sentence_details(booking_ids)
+
         offenders = data.map do |payload|
           offender_no = payload.fetch('offenderNo')
           HmppsApi::OffenderSummary.from_json(payload,
                                               search_data.fetch(offender_no, {}),
-                                              latest_temp_movement: temp_movements[offender_no])
+                                              latest_temp_movement: temp_movements[offender_no]).tap { |offender|
+            sentencing = sentence_details[offender.booking_id]
+            offender.sentence = sentencing if sentencing.present?
+          }
         end
         ApiPaginatedResponse.new(total_pages, offenders)
       end
