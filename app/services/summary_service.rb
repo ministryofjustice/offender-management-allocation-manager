@@ -101,11 +101,7 @@ class SummaryService
 private
 
   def new_arrival?(offender)
-    if Time.zone.today.monday?
-      offender.awaiting_allocation_for <= 2
-    else
-      offender.prison_arrival_date == Time.zone.today
-    end
+    offender.prison_arrival_date == Time.zone.today
   end
 
   def add_allocated_poms_and_coms(offenders, active_allocations_hash)

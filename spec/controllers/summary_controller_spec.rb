@@ -306,33 +306,6 @@ RSpec.describe SummaryController, :allocation, type: :controller do
           end
         end
       end
-
-      context 'when today is Monday' do
-        let(:today) { 'Mon 14 Jan 2019'.to_date }
-
-        it 'shows three new arrivals' do
-          Timecop.travel(today) do
-            get :new_arrivals, params: { prison_id: prison }
-            expect(assigns(:offenders).count).to eq 3
-          end
-        end
-
-        it 'includes arrivals from Saturday' do
-          Timecop.travel(today) do
-            get :new_arrivals, params: { prison_id: prison }
-            summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
-            expect(summary_offenders.keys).to include('C1111CC')
-          end
-        end
-
-        it 'excludes arrivals from Friday last week' do
-          Timecop.travel(today) do
-            get :new_arrivals, params: { prison_id: prison }
-            summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
-            expect(summary_offenders.keys).not_to include('D1111DD')
-          end
-        end
-      end
     end
 
     context 'with a movement arriving on Monday, 5pm' do
