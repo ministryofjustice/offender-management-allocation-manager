@@ -23,7 +23,7 @@ class AllocationValidation
       offender = OffenderService.get_offender(allocation.nomis_offender_id)
       if offender.nil?
         puts "Can't find offender #{allocation.nomis_offender_id} - probably merged, deallocating"
-        allocation.offender_released
+        allocation.deallocate_offender_after_release
         next
       end
 
@@ -32,7 +32,7 @@ class AllocationValidation
         # be allocated to anybody We will de-allocate the offender so they can
         # be re-allocated against a new offense.
         puts "#{offender.offender_no} is not sentenced - deallocating"
-        allocation.offender_released
+        allocation.deallocate_offender_after_release
         next
       end
 
@@ -42,13 +42,13 @@ class AllocationValidation
       # If the offender is out, deallocate as a release
       if offender.prison_id == 'OUT'
         puts "#{offender.offender_no} appears to have been released - deallocating"
-        allocation.offender_released
+        allocation.deallocate_offender_after_release
         next
       end
 
       # The offender is at a different prison so deallocate as a transfer
       puts "#{offender.offender_no} (allocated) appears to have been transferred to #{offender.prison_id} - deallocating"
-      allocation.offender_transferred
+      allocation.dealloate_offender_after_transfer
     }
   end
 

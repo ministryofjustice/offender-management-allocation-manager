@@ -144,7 +144,7 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
                prison: closed_prison_code
         ).tap { |alloc|
           alloc.update(primary_pom_nomis_id: nomis_staff_id)
-          alloc.offender_transferred
+          alloc.dealloate_offender_after_transfer
         }
       }
 
@@ -181,7 +181,7 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
                prison: closed_prison_code
         ).tap { |alloc|
           alloc.update(primary_pom_nomis_id: nomis_staff_id)
-          alloc.offender_transferred
+          alloc.dealloate_offender_after_transfer
         }
       }
 

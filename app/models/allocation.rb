@@ -127,12 +127,12 @@ class Allocation < ApplicationRecord
             :event_trigger,
             :prison, presence: true
 
-  def offender_released
-    deallocate_offender event: Allocation::DEALLOCATE_RELEASED_OFFENDER, event_trigger: Allocation::OFFENDER_RELEASED
+  def deallocate_offender_after_release
+    deallocate_offender event: Allocation::DEALLOCATE_RELEASED_OFFENDER, event_trigger: Allocation::OFFENDER_RELEASED if active?
   end
 
-  def offender_transferred
-    deallocate_offender event: Allocation::DEALLOCATE_PRIMARY_POM, event_trigger: Allocation::OFFENDER_TRANSFERRED
+  def dealloate_offender_after_transfer
+    deallocate_offender event: Allocation::DEALLOCATE_PRIMARY_POM, event_trigger: Allocation::OFFENDER_TRANSFERRED if active?
   end
 
 private

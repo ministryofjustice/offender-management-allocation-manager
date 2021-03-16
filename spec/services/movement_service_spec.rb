@@ -74,6 +74,15 @@ describe MovementService, type: :feature do
       expect(processed).to be true
     end
 
+    it "can do an open prison transfer with an inactive allocation",
+       vcr: { cassette_name: :movement_service_transfer_to_open_spec }  do
+      open_prison_transfer = build(:movement, offenderNo: 'G4273GI', toAgency: 'HDI')
+
+      existing_allocation.deallocate_offender_after_release
+      processed = described_class.process_movement(open_prison_transfer)
+      expect(processed).to be true
+    end
+
     it "can process a movement with no 'to' agency",
        vcr: { cassette_name: :movement_service_admission_in_spec }  do
       processed = described_class.process_movement(admission)

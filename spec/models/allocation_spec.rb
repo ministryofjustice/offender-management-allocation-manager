@@ -148,7 +148,7 @@ RSpec.describe Allocation, type: :model do
         AllocationService.create_or_update(params)
         alloc = described_class.find_by!(nomis_offender_id: nomis_offender_id)
 
-        alloc.offender_transferred
+        alloc.dealloate_offender_after_transfer
         deallocation = alloc.reload
 
         expect(deallocation.primary_pom_nomis_id).to be_nil
@@ -179,7 +179,7 @@ RSpec.describe Allocation, type: :model do
         AllocationService.create_or_update(params)
 
         alloc = described_class.find_by(nomis_offender_id: nomis_offender_id)
-        alloc.offender_released
+        alloc.deallocate_offender_after_release
         deallocation = alloc.reload
 
         expect(deallocation.primary_pom_nomis_id).to be_nil
