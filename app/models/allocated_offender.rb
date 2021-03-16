@@ -24,10 +24,6 @@ class AllocatedOffender
     COMPLEXITIES.fetch(complexity_level)
   end
 
-  def latest_movement_date
-    @offender.latest_movement&.movement_date
-  end
-
   def pom_responsibility
     if @allocation.primary_pom_nomis_id == @staff_id
       @offender.pom_responsibility.responsible? ? 'Responsible' : 'Supporting'
