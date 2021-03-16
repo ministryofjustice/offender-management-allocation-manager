@@ -196,15 +196,19 @@ feature 'Allocation History' do
 
         # 1st Prison - Prescoed. This only contains the transfer to open conditions
         within '.govuk-grid-row:nth-of-type(1)' do
+          expect(page).to have_css('.govuk-heading-m', text: "HMP/YOI Prescoed")
+
+          expect(all('.moj-timeline__item').size).to eq(1)
           prescoed_transfer = EmailHistory.where(nomis_offender_id: nomis_offender_id, event: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION).first
 
-          [
-            ['.govuk-heading-m', "HMP/YOI Prescoed"],
-            ['.moj-timeline__title', "Offender transferred to an open prison"],
-            ['.moj-timeline__date', "#{prescoed_transfer.created_at.strftime("#{prescoed_transfer.created_at.day.ordinalize} %B %Y")} (#{prescoed_transfer.created_at.strftime('%R')}) email sent automatically"],
-            ['.moj-timeline__description', "The LDU for #{prescoed_transfer.name} - #{prescoed_transfer.email} - was sent an email asking them to appoint a Supporting COM."]
-          ].each do |key, val|
-            expect(page).to have_css(key, text: val)
+          within '.moj-timeline__item:nth-of-type(1)' do
+            [
+              ['.moj-timeline__title', "Offender transferred to an open prison"],
+              ['.moj-timeline__date', "#{prescoed_transfer.created_at.strftime("#{prescoed_transfer.created_at.day.ordinalize} %B %Y")} (#{prescoed_transfer.created_at.strftime('%R')}) email sent automatically"],
+              ['.moj-timeline__description', "The LDU for #{prescoed_transfer.name} - #{prescoed_transfer.email} - was sent an email asking them to appoint a Supporting COM."]
+            ].each do |key, val|
+              expect(page).to have_css(key, text: val)
+            end
           end
         end
 
@@ -331,16 +335,18 @@ feature 'Allocation History' do
               expect(page).to have_css(key, text: val)
             end
           end
-        end
 
-        [
-          ['.moj-timeline__title', "Prisoner unallocated"],
-          ['.moj-timeline__title', "Prisoner allocated"],
-          # ['.moj-timeline__description', "Prisoner allocated to #{last_history.primary_pom_name.titleize} - #{probation_pom[:email]} Tier: #{last_history.allocated_at_tier}"],
-          # ['.moj-timeline__description', "Probation POM allocated instead of recommended Prison POM", "Reason(s):", "- Prisoner assessed as suitable for a prison POM despite tiering calculation", "Too high risk"],
-          ['.moj-timeline__date', "#{formatted_date_for(last_history)} by #{last_history.created_by_name.titleize}"],
-        ].each do |key, val|
-          expect(page).to have_css(key, text: val)
+          within '.moj-timeline__item:nth-of-type(5)' do
+            [
+              ['.moj-timeline__description', [
+                "Prisoner allocated to #{last_history.primary_pom_name.titleize} - #{probation_pom[:email]}\n",
+                "Tier: #{last_history.allocated_at_tier}"
+              ].join],
+              ['.moj-timeline__date', "#{formatted_date_for(last_history)} by #{last_history.created_by_name.titleize}"],
+            ].each do |key, val|
+              expect(page).to have_css(key, text: val)
+            end
+          end
         end
       end
 
