@@ -41,8 +41,6 @@ class CaseInformation < ApplicationRecord
 
   scope :nps, -> { where(case_allocation: 'NPS') }
 
-  before_validation :set_probation_service
-
   def nps?
     case_allocation == NPS
   end

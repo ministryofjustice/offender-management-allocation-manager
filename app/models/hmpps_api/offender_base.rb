@@ -75,7 +75,7 @@ module HmppsApi
     def welsh_offender
       return nil if @case_information.blank?
 
-      @case_information.welsh_offender == 'Yes'
+      @case_information.welsh?
     end
 
     def ldu_name

@@ -17,7 +17,7 @@ feature 'case information feature' do
     context 'when add missing information the first time (create journey)' do
       before do
         visit new_prison_case_information_path(prison.code, offender.fetch(:offenderNo))
-        find('label[for=case_information_welsh_offender_No]').click
+        find('label[for=case_information_probation_service_England]').click
         find('label[for=case_information_case_allocation_NPS]').click
         find('label[for=case_information_tier_A]').click
       end

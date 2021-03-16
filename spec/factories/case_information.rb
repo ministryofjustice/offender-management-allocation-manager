@@ -35,8 +35,6 @@ FactoryBot.define do
       team { nil }
     end
 
-    crn { Faker::Alphanumeric.alpha(number: 10) }
-
     trait :welsh do
       probation_service { 'Wales' }
     end
