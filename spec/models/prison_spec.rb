@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Prison, type: :model do
@@ -13,6 +15,34 @@ RSpec.describe Prison, type: :model do
 
     it 'only lists prisons with allocations' do
       expect(described_class.active.map(&:code)).to match_array [p1, p2].map(&:code)
+    end
+  end
+
+  describe '#womens?' do
+    let(:test_strategy) { Flipflop::FeatureSet.current.test! }
+
+    before do
+      test_strategy.switch!(:womens_estate, true)
+    end
+
+    after do
+      test_strategy.switch!(:womens_estate, false)
+    end
+
+    context 'with a male prison' do
+      let(:prison) { build(:prison) }
+
+      it 'is false' do
+        expect(prison.womens?).to eq(false)
+      end
+    end
+
+    context 'with a female prison' do
+      let(:prison) { build(:womens_prison) }
+
+      it 'is true' do
+        expect(prison.womens?).to eq(true)
+      end
     end
   end
 

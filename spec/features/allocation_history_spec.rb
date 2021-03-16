@@ -116,7 +116,6 @@ feature 'Allocation History' do
                  event: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION,
                  prison: PrisonService::PRESCOED_CODE
         end
-
         visit prison_allocation_history_path('LEI', nomis_offender_id)
       end
 
@@ -161,8 +160,7 @@ feature 'Allocation History' do
           ['.govuk-heading-m', "HMP/YOI Prescoed"],
           ['.moj-timeline__title', "Offender transferred to an open prison"],
           ['.moj-timeline__date', "#{prescoed_transfer.created_at.strftime("#{prescoed_transfer.created_at.day.ordinalize} %B %Y")} (#{prescoed_transfer.created_at.strftime('%R')}) email sent automatically"],
-          ['.moj-timeline__description', "The LDU for #{prescoed_transfer.name} - #{prescoed_transfer.email} - was sent an email asking them to appoint a Supporting COM."]
-        ].each do |key, val|
+          ['.moj-timeline__description', "The LDU for #{prescoed_transfer.name} - #{prescoed_transfer.email} - was sent an email asking them to appoint a Supporting COM."]].each do |key, val|
           expect(page).to have_css(key, text: val)
         end
       end

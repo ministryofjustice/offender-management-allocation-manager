@@ -8,21 +8,21 @@ class SummaryService
     # :pending, or :new_arrivals or :handovers. The other types will return totals, and do not contain
     # any data.
     sortable_fields = {
-        allocated: [:last_name, :earliest_release_date, :tier, :allocation_date],
-        new_arrivals: [:last_name, :prison_arrival_date, :earliest_release_date],
-        handovers: [:last_name, :handover_start_date, :responsibility_handover_date, :case_allocation, :allocated_pom_name, :allocated_com_name],
-        unallocated: [:last_name, :earliest_release_date, :case_owner, :awaiting_allocation_for, :tier],
-        pending: [:last_name, :earliest_release_date, :case_owner, :awaiting_allocation_for, :tier]
+      allocated: [:last_name, :earliest_release_date, :tier, :allocation_date],
+      new_arrivals: [:last_name, :prison_arrival_date, :earliest_release_date],
+      handovers: [:last_name, :handover_start_date, :responsibility_handover_date, :case_allocation, :allocated_pom_name, :allocated_com_name],
+      unallocated: [:last_name, :earliest_release_date, :case_owner, :awaiting_allocation_for, :tier],
+      missing_information: [:last_name, :earliest_release_date, :case_owner, :awaiting_allocation_for, :tier]
     }.fetch(summary_type)
 
     # We want to store the total number of each item so we can show totals for
     # each type of record.
     @buckets = {
-        allocated: [],
-        unallocated: [],
-        pending: [],
-        new_arrivals: [],
-        handovers: []
+      allocated: [],
+      unallocated: [],
+      missing_information: [],
+      new_arrivals: [],
+      handovers: []
     }.merge(summary_type => Bucket.new(sortable_fields))
 
     offenders = prison.offenders
@@ -44,7 +44,7 @@ class SummaryService
       elsif new_arrival?(offender)
         @buckets.fetch(:new_arrivals) << offender
       else
-        @buckets.fetch(:pending) << offender
+        @buckets.fetch(:missing_information) << offender
       end
     end
 
@@ -53,7 +53,7 @@ class SummaryService
     default_sort_params =
       { allocated: [nil, nil],
         unallocated: [:sentence_start_date, :asc],
-        pending: [:sentence_start_date, :asc],
+        missing_information: [:sentence_start_date, :asc],
         new_arrivals: [:sentence_start_date, :asc],
         handovers: [:handover_start_date, :asc]
       }.fetch(summary_type)
@@ -87,7 +87,7 @@ class SummaryService
   end
 
   def pending_total
-    @buckets.fetch(:pending).count
+    @buckets.fetch(:missing_information).count
   end
 
   def new_arrivals_total
@@ -101,11 +101,7 @@ class SummaryService
 private
 
   def new_arrival?(offender)
-    if Time.zone.today.monday?
-      offender.awaiting_allocation_for <= 2
-    else
-      offender.prison_arrival_date == Time.zone.today
-    end
+    offender.prison_arrival_date == Time.zone.today
   end
 
   def add_allocated_poms_and_coms(offenders, active_allocations_hash)

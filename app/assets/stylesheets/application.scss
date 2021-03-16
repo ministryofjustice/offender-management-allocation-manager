@@ -66,3 +66,9 @@ a:visited {
   border-top-width: 10px;
   padding-top: 10px;
 }
+
+// Stop images from being wider than their parent container
+img {
+  max-width: 100%;
+  height: auto;
+}

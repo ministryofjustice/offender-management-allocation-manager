@@ -22,12 +22,22 @@ module HmppsApi
           total_pages = (total_records / page_size.to_f).ceil
         }
 
-        recall_data = get_recall_flags(data.map { |o| o.fetch('offenderNo') })
-        data.each do |offender|
-          offender.merge!(recall_data.fetch(offender.fetch('offenderNo')))
-        end
+        offender_nos = data.map { |o| o.fetch('offenderNo') }
+        search_data = get_search_payload(offender_nos)
+        temp_movements = HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for(offender_nos)
 
-        offenders = api_deserialiser.deserialise_many(HmppsApi::OffenderSummary, data)
+        booking_ids = data.map { |o| o.fetch('bookingId') }
+        sentence_details = HmppsApi::PrisonApi::OffenderApi.get_bulk_sentence_details(booking_ids)
+
+        offenders = data.map do |payload|
+          offender_no = payload.fetch('offenderNo')
+          HmppsApi::OffenderSummary.from_json(payload,
+                                              search_data.fetch(offender_no, {}),
+                                              latest_temp_movement: temp_movements[offender_no]).tap { |offender|
+            sentencing = sentence_details[offender.booking_id]
+            offender.sentence = sentencing if sentencing.present?
+          }
+        end
         ApiPaginatedResponse.new(total_pages, offenders)
       end
 
@@ -40,9 +50,11 @@ module HmppsApi
         if response.empty?
           nil
         else
-          recall_data = get_recall_flags([url_offender_no])
-          api_deserialiser.deserialise(HmppsApi::Offender,
-                                       response.first.merge(recall_data.fetch(url_offender_no))).tap do |offender|
+          search_data = get_search_payload([url_offender_no])
+          temp_movements = HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for([url_offender_no])
+          HmppsApi::Offender.from_json(response.first,
+                                       search_data.fetch(url_offender_no, {}),
+                                       latest_temp_movement: temp_movements[url_offender_no]).tap do |offender|
             sentence_details = get_bulk_sentence_details([offender.booking_id])
             offender.sentence = sentence_details.fetch(offender.booking_id)
             add_arrival_dates([offender])
@@ -116,11 +128,10 @@ module HmppsApi
 
     private
 
-      def self.get_recall_flags(offender_nos)
+      def self.get_search_payload(offender_nos)
         search_route = '/prisoner-numbers'
-        search_result = search_client.post(search_route, { prisonerNumbers: offender_nos }, cache: true)
+        search_client.post(search_route, { prisonerNumbers: offender_nos }, cache: true)
                                      .index_by { |prisoner| prisoner.fetch('prisonerNumber') }
-        offender_nos.index_with { |nomis_id| { 'recall' => search_result.fetch(nomis_id, {}).fetch('recall', false) } }
       end
 
       def self.paging_headers(page_size, page_offset)

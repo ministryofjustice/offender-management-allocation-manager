@@ -17,7 +17,11 @@ module HmppsApi
 
     attr_accessor :category_code, :date_of_birth, :prison_arrival_date, :sentence, :allocated_pom_name
 
-    attr_reader :first_name, :last_name, :booking_id, :offender_no, :sentence_type
+    attr_reader :first_name, :last_name, :booking_id, :offender_no, :sentence_type, :cell_location
+
+    def latest_temp_movement_date
+      @latest_temp_movement&.movement_date
+    end
 
     # This is needed (sadly) because although when querying by prison these are filtered out,
     # we can query directly (we might have a CaseInformation record) where we don't filter.
@@ -153,18 +157,20 @@ module HmppsApi
     # https://api-dev.prison.service.justice.gov.uk/swagger-ui.html#//prisoners/getPrisonersOffenderNo
     # and also by
     # https://api-dev.prison.service.justice.gov.uk/swagger-ui.html#//locations/getOffendersAtLocationDescription
-    def load_from_json(payload)
+    def initialize(api_payload, search_payload, latest_temp_movement:)
       # It is expected that this method will be called by the subclass which
       # will have been given a payload at the class level, and will call this
       # method from it's own internal from_json
-      @first_name = payload.fetch('firstName')
-      @last_name = payload.fetch('lastName')
-      @offender_no = payload.fetch('offenderNo')
-      @convicted_status = payload['convictedStatus']
-      @recall_flag = payload.fetch('recall')
-      @sentence_type = SentenceType.new(payload['imprisonmentStatus'])
-      @category_code = payload['categoryCode']
-      @date_of_birth = Date.parse(payload.fetch('dateOfBirth'))
+      @first_name = api_payload.fetch('firstName')
+      @last_name = api_payload.fetch('lastName')
+      @offender_no = api_payload.fetch('offenderNo')
+      @convicted_status = api_payload['convictedStatus']
+      @recall_flag = search_payload.fetch('recall', false)
+      @sentence_type = SentenceType.new(api_payload['imprisonmentStatus'])
+      @category_code = api_payload['categoryCode']
+      @date_of_birth = Date.parse(api_payload.fetch('dateOfBirth'))
+      @latest_temp_movement = latest_temp_movement
+      @cell_location = search_payload['cellLocation']
     end
 
     def handover_start_date

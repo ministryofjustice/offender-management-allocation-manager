@@ -9,46 +9,43 @@
   <div class="govuk-body">
 
     <p>
-      All SPOs, OMU case admin staff and POMs need to have the right roles
-      assigned to them in order to access the allocations service.
+      All HOMDs/HoOMUs, OMU case admin staff and POMs need to have the right roles assigned to them in order to access the allocations service.
     </p>
 
-    <p>Sign in to Digital Prison Services using this URL:
-      <%= link_to("https://digital.prison.service.justice.gov.uk", "https://digital.prison.service.justice.gov.uk") %>
+    <p>Sign in to Digital Prison Services using your Desktop Icon and LSA Credentials:
+      <%= image_tag("help_step2/dps_desktop_icon.png", width: 79, height: 95, style: "vertical-align: middle", alt: "Desktop icon for Digital Prison Services") %>
     </p>
 
-    <p><%=image_tag("hmpps_login_image.png") %></p>
+    <p><%=image_tag("help_step2/hmpps_login_image.png") %></p>
 
     <ul class="govuk-list--bullet">
       <li>
-        <div>Select ‘Admin and utilities’</div><br>
-        <div><%=image_tag("nomis_login_image.png") %></div><br>
+        <div>Select ‘Manage User Accounts’</div><br>
+        <div><%=image_tag("help_step2/dps_select_service.png", width: 999, height: 430) %></div><br>
       </li>
       <li>
-        <div>Select ‘Manage access roles’</div><br>
-        <div><%=image_tag("admin_util_image.png") %></div><br>
+        <div>Select ‘Search for DPS User’</div><br>
+        <div><%=image_tag("help_step2/manage_user_accounts.png", width: 392, height: 288) %></div><br>
       </li>
       <li>
         <div>Search for the staff member you want to set up by entering their user ID</div><br>
-        <div><%=image_tag("search_staff_image.png") %></div><br>
+        <div><%=image_tag("help_step2/search_dps_user.png", width: 840, height: 411) %></div><br>
       </li>
       <li>
-        <div>When you have found the staff member, click ‘Edit’</div><br>
-        <div><%=image_tag("staff_member_image.png") %></div><br>
+        <div>When you have found the staff member, click on their Name</div><br>
+        <div><%=image_tag("help_step2/user_search_results.png", width: 1226, height: 352) %></div><br>
       </li>
       <li>
-        <div>Click ‘Add role’</div><br>
-        <div><%=image_tag("staff_roles_image.png") %></div><br>
+        <div>Click ‘Add Another Role’</div><br>
+        <div><%=image_tag("help_step2/user_roles.png", width: 552, height: 396) %></div><br>
       </li>
       <li>
-        <div>Click the ‘Choose new role’ to see a list of available user roles</div><br>
-        <div><%=image_tag("add_staff_image.png") %><%= image_tag("choose_role_image.png") %></div><br>
+        <div>Select the relevant checkboxes before clicking confirm.</div><br>
+        <div><%=image_tag("help_step2/select_roles.png", width: 328, height: 625) %></div><br>
+        <p>HOMDs and Case Admins need to have the ‘Allocation manager’ role added.</p>
+        <p>Prison Offender Managers need to have the ‘Allocation case manager’ role added.</p>
       </li>
     </ul>
-
-    <p>Senior Probation Officers and Case Admins need to have the ‘Allocation manager’ role added</p>
-
-    <p>Prison Offender Managers need to have the ‘Allocation case manager’ role added</p>
 
     <%= render :partial => "next_link", locals: { url: help_step3_path, next_page_title: 'Set up POMs in NOMIS'} %>
   </div>

@@ -50,8 +50,8 @@ RSpec.describe SummaryController, :allocation, type: :controller do
                            attributes_for(:movement, offenderNo: 'G1234VV', toAgency: prison, movementDate: Date.new(2018, 9, 1).to_s)].to_json)
       end
 
-      it 'gets pending records' do
-        get :pending, params: { prison_id: prison }
+      it 'gets missing_information records' do
+        get :missing_information, params: { prison_id: prison }
         # Expecting offender (2) to use sentenceStartDate as it is newer than last arrival date in prison
         off = assigns(:offenders).map { |o| [o.offender_no, Time.zone.today - o.awaiting_allocation_for] }.to_h
         expect(off).to eq("G1234GY" => Date.new(2009, 2, 8),
@@ -60,12 +60,12 @@ RSpec.describe SummaryController, :allocation, type: :controller do
       end
 
       it 'sorts ascending by default' do
-        get :pending, params: { prison_id: prison, sort: 'last_name' } # Default direction is asc.
+        get :missing_information, params: { prison_id: prison, sort: 'last_name' } # Default direction is asc.
         expect(assigns(:offenders).map(&:last_name)).to eq(%w[JONES Minate-Offender SMITH])
       end
 
       it 'sorts descending' do
-        get :pending, params: { prison_id: prison, sort: 'last_name desc' }
+        get :missing_information, params: { prison_id: prison, sort: 'last_name desc' }
 
         expect(assigns(:offenders).map(&:last_name)).to eq(%w[SMITH Minate-Offender JONES])
       end
@@ -91,7 +91,7 @@ RSpec.describe SummaryController, :allocation, type: :controller do
     end
 
     it 'is not visible' do
-      get :pending, params: { prison_id: prison }
+      get :missing_information, params: { prison_id: prison }
       expect(response).to redirect_to('/401')
     end
   end
@@ -113,7 +113,7 @@ RSpec.describe SummaryController, :allocation, type: :controller do
     end
 
     it 'gets page 1 by default' do
-      get :pending, params: { prison_id: prison }
+      get :missing_information, params: { prison_id: prison }
 
       expect(summary_offenders.size).to eq(50)
       expect(summary_offenders.current_page).to eq(1)
@@ -121,7 +121,7 @@ RSpec.describe SummaryController, :allocation, type: :controller do
     end
 
     it 'gets page 2' do
-      get :pending, params: { prison_id: prison, page: 2 }
+      get :missing_information, params: { prison_id: prison, page: 2 }
 
       expect(summary_offenders.size).to eq(50)
       expect(summary_offenders.current_page).to eq(2)
@@ -129,7 +129,7 @@ RSpec.describe SummaryController, :allocation, type: :controller do
     end
 
     it 'gets page 3' do
-      get :pending, params: { prison_id: prison, page: 3 }
+      get :missing_information, params: { prison_id: prison, page: 3 }
 
       expect(summary_offenders.size).to eq(20)
       expect(summary_offenders.current_page).to eq(3)
@@ -286,9 +286,9 @@ RSpec.describe SummaryController, :allocation, type: :controller do
           end
         end
 
-        it 'includes yesterday arrivals in pending instead' do
+        it 'includes yesterday arrivals in missing_information instead' do
           Timecop.travel(today) do
-            get :pending, params: { prison_id: prison }
+            get :missing_information, params: { prison_id: prison }
             summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
             expect(summary_offenders.keys).to include('B1111BB')
           end
@@ -303,33 +303,6 @@ RSpec.describe SummaryController, :allocation, type: :controller do
               summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
               expect(summary_offenders.keys).not_to include('A1111AA')
             end
-          end
-        end
-      end
-
-      context 'when today is Monday' do
-        let(:today) { 'Mon 14 Jan 2019'.to_date }
-
-        it 'shows three new arrivals' do
-          Timecop.travel(today) do
-            get :new_arrivals, params: { prison_id: prison }
-            expect(assigns(:offenders).count).to eq 3
-          end
-        end
-
-        it 'includes arrivals from Saturday' do
-          Timecop.travel(today) do
-            get :new_arrivals, params: { prison_id: prison }
-            summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
-            expect(summary_offenders.keys).to include('C1111CC')
-          end
-        end
-
-        it 'excludes arrivals from Friday last week' do
-          Timecop.travel(today) do
-            get :new_arrivals, params: { prison_id: prison }
-            summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
-            expect(summary_offenders.keys).not_to include('D1111DD')
           end
         end
       end
@@ -379,7 +352,7 @@ RSpec.describe SummaryController, :allocation, type: :controller do
 
         it 'shows that offender as arriving one day ago' do
           Timecop.travel(today) do
-            get :pending, params: { prison_id: prison }
+            get :missing_information, params: { prison_id: prison }
 
             summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
 

@@ -13,6 +13,10 @@ class Prison
     @code = prison_code
   end
 
+  def womens?
+    PrisonService::womens_prison?(@code)
+  end
+
   def name
     PrisonService.name_for(@code)
   end
@@ -76,22 +80,12 @@ private
   private
 
     def enrich_offenders(offenders)
-      booking_ids = offenders.map(&:booking_id)
-      sentence_details = HmppsApi::PrisonApi::OffenderApi.get_bulk_sentence_details(booking_ids)
-
       nomis_ids = offenders.map(&:offender_no)
       mapped_tiers = CaseInformationService.get_case_information(nomis_ids)
 
-      temp_movements = HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for(nomis_ids)
-
       offenders.each { |offender|
-        sentencing = sentence_details[offender.booking_id]
-        offender.sentence = sentencing if sentencing.present?
-
         case_info_record = mapped_tiers[offender.offender_no]
         offender.load_case_information(case_info_record)
-
-        offender.latest_movement = temp_movements[offender.offender_no]
       }
       HmppsApi::PrisonApi::OffenderApi.add_arrival_dates(offenders)
     end

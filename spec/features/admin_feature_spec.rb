@@ -108,7 +108,7 @@ feature 'admin urls' do
       end
     end
 
-    context 'with local delivery units', :js do
+    context 'with local delivery units' do
       before do
         visit('/admin/local_delivery_units')
       end

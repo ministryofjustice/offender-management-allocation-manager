@@ -103,7 +103,7 @@ feature 'Search for offenders' do
 
   it 'Can search from the Missing Information summary page', vcr: { cassette_name: :missing_info_search_feature } do
     signin_spo_user
-    visit  pending_prison_prisoners_path(prison)
+    visit  missing_information_prison_prisoners_path(prison)
 
     expect(page).to have_text('Make allocations')
     fill_in 'q', with: 'Ste'

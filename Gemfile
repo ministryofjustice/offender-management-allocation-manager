@@ -70,7 +70,7 @@ end
 
 group :test do
   gem 'capybara'
-  gem 'database_cleaner'
+  gem 'database_cleaner-active_record'
   gem 'faker'
   gem 'launchy'
   gem 'rails-controller-testing'
@@ -80,7 +80,7 @@ group :test do
   gem 'simplecov'
   # we can't use the branch coverage version of simplecov, (due to code climate)
   # and it seems that simplecov-lcov doesn't correctly depend on the branch coverage version of simplecov
-  gem 'simplecov-lcov', '< 0.8'
+  gem 'simplecov-lcov', '< 0.9'
   # https://evilmartians.com/chronicles/testprof-a-good-doctor-for-slow-ruby-tests
   gem 'test-prof'
   gem 'timecop'
@@ -93,6 +93,7 @@ group :development do
   gem 'binding_of_caller'
   gem 'flamegraph'
   gem 'guard-rspec'
+  gem 'guard-rubocop'
   gem 'listen', '>= 3.0.5', '< 3.3'
   gem 'memory_profiler'
   # prevent warnings from parser as we are using ruby 2.6
