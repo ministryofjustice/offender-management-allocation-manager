@@ -115,7 +115,7 @@ feature "view POM's caseload" do
       test_strategy.switch!(:womens_estate, true)
 
       offenders.each_with_index do |offender, index|
-        allow(ComplexityMicroService).to receive(:get_complexity).with(offender.fetch(:offenderNo)).and_return(complexities[index])
+        allow(HmppsApi::ComplexityApi).to receive(:get_complexity).with(offender.fetch(:offenderNo)).and_return(complexities[index])
       end
       visit prison_staff_caseload_path(prison.code, nomis_staff_id)
     end

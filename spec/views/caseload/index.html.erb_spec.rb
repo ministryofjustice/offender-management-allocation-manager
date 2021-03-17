@@ -47,9 +47,6 @@ RSpec.describe "caseload/index", type: :view do
       before do
         test_strategy.switch!(:womens_estate, true)
 
-        offenders.each do |offender|
-          expect(ComplexityMicroService).to receive(:get_complexity).with(offender.nomis_offender_id).and_return('medium')
-        end
         render
       end
 

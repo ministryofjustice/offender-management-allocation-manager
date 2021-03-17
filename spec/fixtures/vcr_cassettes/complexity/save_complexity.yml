@@ -1,0 +1,107 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://complexity-of-need-staging.hmpps.service.justice.gov.uk/v1/complexity-of-need/offender-no/S0005FT
+    body:
+      encoding: UTF-8
+      string: '{"level":"high","sourceUser":"SDICKS_GEN","notes":"Happy Feet"}'
+    headers:
+      User-Agent:
+      - Faraday v1.3.0
+      Authorization:
+      - authorisation_header
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message:
+    headers:
+      Date:
+      - Mon, 22 Mar 2021 14:00:33 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      ETag:
+      - W/"8d1e331cbb8423f63a2b1da3ede2dd9f"
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      X-Request-Id:
+      - bf72fd4350b7aa387403c3a3553067f4
+      X-Runtime:
+      - '0.124677'
+      Strict-Transport-Security:
+      - max-age=15724800; includeSubDomains
+    body:
+      encoding: UTF-8
+      string: '{"offenderNo":"S0005FT","level":"high","createdTimeStamp":"2021-03-22T14:00:33.220Z","sourceUser":"SDICKS_GEN","sourceSystem":"hardcoded-oauth-client-id","notes":"Happy
+        Feet"}'
+  recorded_at: Mon, 22 Mar 2021 14:00:33 GMT
+- request:
+    method: get
+    uri: https://complexity-of-need-staging.hmpps.service.justice.gov.uk/v1/complexity-of-need/offender-no/S0005FT
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.3.0
+      Authorization:
+      - authorisation_header
+  response:
+    status:
+      code: 200
+      message:
+    headers:
+      Date:
+      - Mon, 22 Mar 2021 14:00:33 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      ETag:
+      - W/"8d1e331cbb8423f63a2b1da3ede2dd9f"
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      X-Request-Id:
+      - 4462437899ef29b45fa412aaeb436c99
+      X-Runtime:
+      - '0.012989'
+      Strict-Transport-Security:
+      - max-age=15724800; includeSubDomains
+    body:
+      encoding: UTF-8
+      string: '{"offenderNo":"S0005FT","level":"high","createdTimeStamp":"2021-03-22T14:00:33.220Z","sourceUser":"SDICKS_GEN","sourceSystem":"hardcoded-oauth-client-id","notes":"Happy
+        Feet"}'
+  recorded_at: Mon, 22 Mar 2021 14:00:33 GMT
+recorded_with: VCR 6.0.0

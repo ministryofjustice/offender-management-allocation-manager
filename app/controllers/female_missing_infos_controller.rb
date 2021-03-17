@@ -14,7 +14,7 @@ class FemaleMissingInfosController < PrisonsApplicationController
     session[:complexity] = ComplexityForm.new nomis_offender_id: params.fetch(:prisoner_id)
     session[:case_info] = CaseInformation.new nomis_offender_id: params.fetch(:prisoner_id),
                                               manual_entry: true
-    if ComplexityMicroService.get_complexity(params.fetch(:prisoner_id))
+    if HmppsApi::ComplexityApi.get_complexity(params.fetch(:prisoner_id))
       redirect_to wizard_path :delius_information
     else
       redirect_to wizard_path(steps.first)
@@ -32,7 +32,7 @@ class FemaleMissingInfosController < PrisonsApplicationController
 
     if @missing_info.valid?
       if step == :complexity_level
-        ComplexityMicroService.save @missing_info.nomis_offender_id, level: @missing_info.complexity_level, username: current_user, reason: nil
+        HmppsApi::ComplexityApi.save @missing_info.nomis_offender_id, level: @missing_info.complexity_level, username: current_user, reason: nil
         if has_case_information?
           complete_journey
         else

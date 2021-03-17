@@ -105,7 +105,7 @@ feature "viewing upcoming handovers" do
         expect(page).to have_current_path('/401')
       end
 
-      it 'can load the POM handovers page', :js do
+      it 'can load the POM handovers page' do
         visit prison_staff_caseload_handovers_path(prison, user.staff_id)
         click_link('Handover start date')
         check_dates.each_with_index do |name, index|

@@ -10,7 +10,6 @@ feature "add missing details page" do
 
     create(:allocation, primary_pom_allocated_at: one_day_ago,  nomis_offender_id: allocated_offender_one.fetch(:offenderNo), prison: prison.code)
     create(:allocation, primary_pom_allocated_at: two_days_ago, nomis_offender_id: allocated_offender_two.fetch(:offenderNo), prison: prison.code)
-    allow(ComplexityMicroService).to receive(:get_complexity).with(offender_ready_to_allocate.fetch(:offenderNo)).and_return('medium')
     create(:case_information, nomis_offender_id: offender_ready_to_allocate.fetch(:offenderNo))
 
     test_strategy.switch!(:womens_estate, true)
@@ -20,12 +19,10 @@ feature "add missing details page" do
     test_strategy.switch!(:womens_estate, false)
   end
 
-
   let(:test_strategy) { Flipflop::FeatureSet.current.test! }
 
   let(:pom) { build(:pom) }
-  let(:womens_prison) { 'PFI' }
-  let(:prison) { build :prison, code: womens_prison }
+  let(:prison) { build :womens_prison }
 
   let(:one_day_ago) { Time.zone.today - 1.day }
   let(:two_days_ago) { Time.zone.today - 2.days }
@@ -36,10 +33,8 @@ feature "add missing details page" do
   let(:offender_with_missing_info_three) { build(:nomis_offender, sentence: attributes_for(:sentence_detail, sentenceStartDate: two_days_ago), lastName: 'Carsley') }
   let(:allocated_offender_one) { build(:nomis_offender) }
   let(:allocated_offender_two) { build(:nomis_offender) }
-  let(:offender_ready_to_allocate) { build(:nomis_offender) }
-  let(:newly_arrived_offender) { build(:nomis_offender, sentence: attributes_for(:sentence_detail, sentenceStartDate: today)) }
-
-  let(:today) { Time.zone.today }
+  let(:offender_ready_to_allocate) { build(:nomis_offender, complexityLevel: 'medium') }
+  let(:newly_arrived_offender) { build(:nomis_offender, sentence: attributes_for(:sentence_detail, sentenceStartDate: Time.zone.today)) }
 
   let(:offenders) {
     [offender_with_missing_info_one,
@@ -51,7 +46,6 @@ feature "add missing details page" do
      newly_arrived_offender
     ]
   }
-
 
   describe 'missing information page' do
     before do

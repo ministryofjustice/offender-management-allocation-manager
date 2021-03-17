@@ -160,7 +160,7 @@ feature "view an offender's allocation information" do
         end
       end
 
-      it 'displays a link to the allocation history', vcr: { cassette_name: 'prison_api/show_allocation_information_history_link' } do
+      it 'displays a link to the allocation history' do
         table_row = page.find(:css, 'tr.govuk-table__row', text: 'Allocation history')
 
         within table_row do
@@ -169,13 +169,13 @@ feature "view an offender's allocation information" do
         end
       end
 
-      context 'without auto_delius_import enabled', vcr: { cassette_name: 'prison_api/allocation_auto_delius_off' } do
+      context 'without auto_delius_import enabled' do
         it 'displays change links' do
           expect(page).to have_content 'Change'
         end
       end
 
-      context 'with auto_delius_import enabled', vcr: { cassette_name: 'prison_api/allocation_auto_delius_on' } do
+      context 'with auto_delius_import enabled' do
         let(:test_strategy) { Flipflop::FeatureSet.current.test! }
 
         before do

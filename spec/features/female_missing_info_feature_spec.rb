@@ -5,9 +5,10 @@ require "rails_helper"
 feature "womens missing info journey" do
   let(:test_strategy) { Flipflop::FeatureSet.current.test! }
   let(:prison) { build(:womens_prison) }
-  let(:offender) { build(:nomis_offender) }
+  let(:offender) { build(:nomis_offender, agencyId: prison.code, complexityLevel: complexity) }
   let(:prisoner_id) { offender.fetch(:offenderNo) }
   let(:user) { build(:pom) }
+  let(:username) { 'MOIC_POM' }
 
   before do
     stub_signin_spo user, [prison.code]
@@ -21,9 +22,10 @@ feature "womens missing info journey" do
   end
 
   context 'without any data' do
+    let(:complexity) { nil }
+
     before do
-      allow(ComplexityMicroService).to receive(:get_complexity).with(prisoner_id).and_return(nil)
-      expect(ComplexityMicroService).to receive(:save).with(prisoner_id, level: 'low', username: 'MOIC_POM', reason: nil)
+      expect(HmppsApi::ComplexityApi).to receive(:save).with(prisoner_id, level: 'low', username: username, reason: nil)
     end
 
     it 'has a happy path' do
@@ -77,10 +79,11 @@ feature "womens missing info journey" do
   end
 
   context 'when case information is present' do
+    let(:complexity) { nil }
+
     before do
-      allow(ComplexityMicroService).to receive(:get_complexity).with(prisoner_id).and_return(nil)
       create(:case_information, nomis_offender_id: prisoner_id)
-      expect(ComplexityMicroService).to receive(:save).with(prisoner_id, level: 'medium', username: 'MOIC_POM', reason: nil)
+      expect(HmppsApi::ComplexityApi).to receive(:save).with(prisoner_id, level: 'medium', username: username, reason: nil)
 
       visit missing_information_prison_prisoners_path prison.code
       click_link 'Add missing details'
@@ -100,9 +103,7 @@ feature "womens missing info journey" do
   end
 
   context 'when complexity level is present' do
-    before do
-      allow(ComplexityMicroService).to receive(:get_complexity).with(prisoner_id).and_return('medium')
-    end
+    let(:complexity) { 'medium' }
 
     it 'will skip collecting complexity' do
       visit missing_information_prison_prisoners_path prison.code

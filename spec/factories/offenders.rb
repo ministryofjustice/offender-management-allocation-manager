@@ -34,6 +34,8 @@ FactoryBot.define do
 
     sentence { association :sentence_detail }
 
+    complexityLevel { 'medium' }
+
     trait :determinate do
       imprisonmentStatus {'SEC90'}
     end
@@ -57,9 +59,10 @@ FactoryBot.define do
 
   factory :offender, parent: :offender_base, class: 'HmppsApi::Offender' do
     initialize_with do
-      HmppsApi::Offender.from_json(attributes.stringify_keys,
-                                   attributes.stringify_keys,
-                                   latest_temp_movement: nil).tap { |offender|
+      HmppsApi::Offender.new(attributes.stringify_keys,
+                             attributes.stringify_keys,
+                             latest_temp_movement: nil,
+                             complexity_level: attributes.fetch(:complexityLevel)).tap { |offender|
         offender.sentence = attributes.fetch(:sentence)
       }
     end
@@ -106,6 +109,8 @@ FactoryBot.define do
     sentence do
       attributes_for :sentence_detail
     end
+
+    complexityLevel { 'medium' }
 
     trait :indeterminate do
       imprisonmentStatus {'LIFE'}

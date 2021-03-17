@@ -1,0 +1,107 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://complexity-of-need-staging.hmpps.service.justice.gov.uk/v1/complexity-of-need/multiple/offender-no
+    body:
+      encoding: UTF-8
+      string: '[["G0276VC","T0000FT"]]'
+    headers:
+      User-Agent:
+      - Faraday v1.3.0
+      Authorization:
+      - authorisation_header
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message:
+    headers:
+      Date:
+      - Mon, 22 Mar 2021 14:00:33 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      ETag:
+      - W/"1c21177a461d62be7a85feeb3e3b1cef"
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      X-Request-Id:
+      - a3c76be0c0e0e7e729bf20a7921f4c79
+      X-Runtime:
+      - '0.007087'
+      Strict-Transport-Security:
+      - max-age=15724800; includeSubDomains
+    body:
+      encoding: UTF-8
+      string: '[{"offenderNo":"G0276VC","level":"high","createdTimeStamp":"2021-03-11T11:05:10.493Z","sourceSystem":"testing"},{"offenderNo":"T0000FT","level":"high","createdTimeStamp":"2021-03-17T20:54:55.902Z","sourceSystem":"hardcoded-oauth-client-id"}]'
+  recorded_at: Mon, 22 Mar 2021 14:00:33 GMT
+- request:
+    method: post
+    uri: https://complexity-of-need-staging.hmpps.service.justice.gov.uk/v1/complexity-of-need/multiple/offender-no
+    body:
+      encoding: UTF-8
+      string: '[["G0276VC","T0000FT","X00887XX"]]'
+    headers:
+      User-Agent:
+      - Faraday v1.3.0
+      Authorization:
+      - authorisation_header
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message:
+    headers:
+      Date:
+      - Mon, 22 Mar 2021 14:00:33 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      ETag:
+      - W/"1c21177a461d62be7a85feeb3e3b1cef"
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      X-Request-Id:
+      - 8cec4f176827bb840f4c18be91cfc662
+      X-Runtime:
+      - '0.009454'
+      Strict-Transport-Security:
+      - max-age=15724800; includeSubDomains
+    body:
+      encoding: UTF-8
+      string: '[{"offenderNo":"G0276VC","level":"high","createdTimeStamp":"2021-03-11T11:05:10.493Z","sourceSystem":"testing"},{"offenderNo":"T0000FT","level":"high","createdTimeStamp":"2021-03-17T20:54:55.902Z","sourceSystem":"hardcoded-oauth-client-id"}]'
+  recorded_at: Mon, 22 Mar 2021 14:00:33 GMT
+recorded_with: VCR 6.0.0
