@@ -17,6 +17,7 @@ feature 'male prisoners summary navigation tabs' do
   let(:pom) { build(:pom) }
   let(:prison) { build :prison }
 
+  let(:today) { Time.zone.today }
   let(:one_day_ago) { Time.zone.today - 1.day }
   let(:two_days_ago) { Time.zone.today - 2.days }
   let(:three_days_ago) { Time.zone.today - 3.days }
@@ -29,8 +30,6 @@ feature 'male prisoners summary navigation tabs' do
   let(:offender_ready_to_allocate) { build(:nomis_offender) }
   let(:newly_arrived_offender) { build(:nomis_offender, sentence: attributes_for(:sentence_detail, sentenceStartDate: today)) }
 
-  let(:today) { Time.zone.today }
-
   let(:offenders) {
     [offender_with_missing_info_one,
      offender_with_missing_info_two,
@@ -42,8 +41,13 @@ feature 'male prisoners summary navigation tabs' do
     ]
   }
 
+  let(:active_tab) {
+    page.find('.moj-sub-navigation a[aria-current=page]').text
+  }
+
   it 'shows allocated offenders' do
     visit allocated_prison_prisoners_path(prison.code)
+    expect(active_tab).to eq('See allocations (2)')
     expect(page).to have_content('See allocations (2)')
     expect(page).to have_content('Make allocations (1)')
     expect(page).to have_content('Add missing information (3)')
@@ -52,6 +56,7 @@ feature 'male prisoners summary navigation tabs' do
 
   it 'shows unallocated offenders' do
     visit unallocated_prison_prisoners_path(prison.code)
+    expect(active_tab).to eq('Make allocations (1)')
     expect(page).to have_content('See allocations (2)')
     expect(page).to have_content('Make allocations (1)')
     expect(page).to have_content('Add missing information (3)')
@@ -60,6 +65,7 @@ feature 'male prisoners summary navigation tabs' do
 
   it 'shows newly arrived offenders' do
     visit new_arrivals_prison_prisoners_path(prison.code)
+    expect(active_tab).to eq('Newly arrived (1)')
     expect(page).to have_content('See allocations (2)')
     expect(page).to have_content('Make allocations (1)')
     expect(page).to have_content('Add missing information (3)')
@@ -68,6 +74,7 @@ feature 'male prisoners summary navigation tabs' do
 
   it 'shows offenders with missing information' do
     visit missing_information_prison_prisoners_path(prison.code)
+    expect(active_tab).to eq('Add missing information (3)')
     expect(page).to have_content('See allocations (2)')
     expect(page).to have_content('Make allocations (1)')
     expect(page).to have_content('Add missing information (3)')

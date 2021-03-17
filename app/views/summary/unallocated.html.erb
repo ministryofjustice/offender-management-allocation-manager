@@ -18,7 +18,7 @@
   <%= render "search/search_box" %>
 </div>
 
-<%= render(:partial => 'shared/summary_subnav', :locals => {:active => :allocated,
+<%= render(:partial => 'shared/summary_subnav', :locals => {:active => :unallocated,
                                                             :unallocated_count => @unallocated_count,
                                                             :missing_info_count => @missing_info_count,
                                                             :allocated_count => @allocated_count,
@@ -43,7 +43,7 @@
         </a>
         <%= sort_arrow('last_name') %>
       </th>
-      <th class="govuk-table__header sorter-false" xscope="col">
+      <th class="govuk-table__header sorter-false" scope="col">
         <a href="<%= sort_link('earliest_release_date') %>">
           Earliest release<br/>date
         </a>
