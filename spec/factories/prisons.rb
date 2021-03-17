@@ -7,7 +7,7 @@ FactoryBot.define do
       PrisonService::WOMENS_PRISON_CODES.include?(x)
   }
   class Elite2Prison
-    delegate :code, :name, :womens?, to: :@prison
+    delegate :offenders, :code, :name, :womens?, to: :@prison
 
     def code=(code)
       @prison = Prison.new code

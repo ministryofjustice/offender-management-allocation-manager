@@ -5,7 +5,8 @@
 class StaffMember
   # maybe this method shouldn't be here?
   attr_reader :staff_id
-  delegate :position_description, to: :pom
+  delegate :position_description, :probation_officer?, to: :pom
+  delegate :working_pattern, :status, to: :@pom_detail
 
   def initialize(prison, staff_id, pom_detail = default_pom_detail(staff_id))
     @prison = prison
@@ -33,6 +34,10 @@ class StaffMember
     pom.present?
   end
 
+  def active?
+    status == 'active'
+  end
+
   def position
     if pom.present?
       pom.position
@@ -45,20 +50,32 @@ class StaffMember
     @prison.code
   end
 
-  def working_pattern
-    @pom_detail.working_pattern
-  end
-
-  def status
-    @pom_detail.status
-  end
-
   def allocations
     @allocations ||= fetch_allocations
   end
 
   def pending_handover_offenders
     allocations.select(&:approaching_handover?)
+  end
+
+  def tier_a
+    allocations.count { |a| a.tier == 'A' }
+  end
+
+  def tier_b
+    allocations.count { |a| a.tier == 'B' }
+  end
+
+  def tier_c
+    allocations.count { |a| a.tier == 'C' }
+  end
+
+  def tier_d
+    allocations.count { |a| a.tier == 'D' }
+  end
+
+  def no_tier
+    allocations.count { |a| a.tier == 'N/A' }
   end
 
 private
