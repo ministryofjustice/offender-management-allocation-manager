@@ -14,7 +14,7 @@ class HandoverDateService
   OPEN_PRISON_POLICY_START_DATE = '31/03/2021'.to_date
 
   # OMIC apply to the womens' estate from 30/04/2021
-  WOMENS_POLICY_START_DATE = '30/04/2021'.to_date
+  WOMENS_POLICY_START_DATE = Date.parse(ENV.fetch('WOMENS_POLICY_START_DATE', '30/04/2021'))
 
   HandoverData = Struct.new :custody, :community, :start_date, :handover_date, :reason, keyword_init: true
 
