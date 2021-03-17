@@ -3,10 +3,11 @@
 class ProcessDeliusDataJob < ApplicationJob
   queue_as :default
 
-  # Not much point retrying a 404 error
+  # HTTP 404 Not Found: Not much point retrying a missing offender
   discard_on Faraday::ResourceNotFound
-  # nDelius API fails like this when trying to read a duplicate - so don't retry here either
-  discard_on Faraday::ServerError
+
+  # HTTP 409 Conflict: nDelius API fails like this when trying to read a duplicate offender - so don't retry here either
+  discard_on Faraday::ConflictError
 
   include ApplicationHelper
 
