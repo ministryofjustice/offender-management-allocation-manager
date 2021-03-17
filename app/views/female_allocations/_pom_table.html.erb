@@ -1,0 +1,19 @@
+<%= case_mix_key %>
+<table class="govuk-table responsive app-table--zebra">
+  <thead class="govuk-table__head">
+  <tr class="govuk-table__row">
+    <th class="govuk-table__header" scope="col">POM</th>
+    <th class="govuk-table__header" scope="col">Working pattern</th>
+    <th class="govuk-table__header govuk-!-width-one-quarter" scope="col">Case mix by tier</th>
+    <th class="govuk-table__header govuk-table__header--numeric" scope="col">High<br>complexity<br>cases</th>
+    <th class="govuk-table__header govuk-table__header--numeric" scope="col">Allocations in <br> past 7 days</th>
+    <th scope="col" class="govuk-table__header govuk-table__header--numeric">Total cases</th>
+    <th class="govuk-table__header" scope="col">Action</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% poms.each do |pom| %>
+    <%= render 'pom_table_row', pom: pom, nomis_offender_id: nomis_offender_id %>
+  <% end %>
+  </tbody>
+</table>

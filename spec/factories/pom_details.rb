@@ -16,6 +16,10 @@ FactoryBot.define do
     trait :unavailable do
       status { 'unavailable' }
     end
+
+    trait :part_time do
+      working_pattern { 0.5 }
+    end
   end
 
   class Elite2POM

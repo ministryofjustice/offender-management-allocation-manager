@@ -24,6 +24,10 @@ class AllocatedOffender
     COMPLEXITIES.fetch(complexity_level)
   end
 
+  def high_complexity?
+    complexity_level == 'high'
+  end
+
   def pom_responsibility
     if @allocation.primary_pom_nomis_id == @staff_id
       @offender.pom_responsibility.responsible? ? 'Responsible' : 'Supporting'
