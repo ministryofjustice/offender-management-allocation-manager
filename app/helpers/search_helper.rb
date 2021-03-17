@@ -24,7 +24,7 @@ module SearchHelper
     if offender.allocated_pom_name.blank?
       return link_to(
         'Allocate',
-        new_prison_prisoner_allocation_path(prison, prisoner_id: offender_id)
+        prison_prisoner_staff_index_path(prison, prisoner_id: offender_id)
       )
     end
 

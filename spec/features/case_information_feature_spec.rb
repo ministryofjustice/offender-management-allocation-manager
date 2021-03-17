@@ -33,7 +33,7 @@ feature 'case information feature' do
           click_button 'Save and allocate'
         }.to change(CaseInformation, :count).by 1
 
-        expect(page).to have_current_path new_prison_prisoner_allocation_path(prison.code, offender.fetch(:offenderNo))
+        expect(page).to have_current_path prison_prisoner_staff_index_path(prison.code, offender.fetch(:offenderNo))
       end
     end
 
@@ -154,7 +154,7 @@ feature 'case information feature' do
       expect(CaseInformation.first.tier).to eq('A')
       expect(CaseInformation.first.case_allocation).to eq('CRC')
 
-      expect(page).to have_current_path new_prison_prisoner_allocation_path('LEI', nomis_offender_id)
+      expect(page).to have_current_path prison_prisoner_staff_index_path('LEI', nomis_offender_id)
       expect(page).to have_content('CRC')
     end
 

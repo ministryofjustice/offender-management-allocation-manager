@@ -265,7 +265,7 @@ RSpec.describe AllocationsController, :allocation, type: :controller do
 
           create(:case_information, nomis_offender_id: offender_no, tier: tier)
 
-          get :new, params: { prison_id: prison, prisoner_id: offender_no }
+          get :index, params: { prison_id: prison, prisoner_id: offender_no }
           expect(response).to be_successful
         end
 
@@ -308,7 +308,7 @@ RSpec.describe AllocationsController, :allocation, type: :controller do
         end
 
         before do
-          get :new, params: { prison_id: prison, prisoner_id: offender_no }
+          get :index, params: { prison_id: prison, prisoner_id: offender_no }
           expect(response).to be_successful
         end
 
