@@ -27,7 +27,7 @@ RSpec.describe SearchController, type: :controller do
 
     it 'user is redirected to caseload' do
       get :search, params: { prison_id: prison, q: 'Cal' }
-      expect(response).to redirect_to(prison_staff_caseload_index_path(prison, nomis_staff_id, q: 'Cal'))
+      expect(response).to redirect_to(prison_staff_caseload_path(prison, nomis_staff_id, q: 'Cal'))
     end
   end
 

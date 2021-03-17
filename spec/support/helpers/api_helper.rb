@@ -149,6 +149,8 @@ module ApiHelper
       to_return(body: movements.to_json)
 
     stub_movements
+
+    offenders.each { |o| stub_offender(o) }
   end
 
   def stub_multiple_offenders(offenders, bookings)

@@ -8,16 +8,21 @@ Rails.application.routes.draw do
   get '/signout', to: 'sessions#destroy'
 
   resources :prisons, only: [] do
+    # Prison switcher - starting from an existing prison
     resources :prisons, only: :index
 
     resources :dashboard, only: :index
     resources :handovers, only: :index
     resources :staff do
-      resources :caseload, only: %i[index new]
+      get 'caseload' => 'caseload#index'
+      get 'new_cases' => 'caseload#new_cases'
       resources :caseload_handovers, only: %i[index]
     end
 
     resources :prisoners, only: [:show] do
+      resource :female_missing_info, only: [:new, :show, :update] do
+      end
+
       collection do
         constraints lambda {
             |request| PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id))
@@ -27,11 +32,15 @@ Rails.application.routes.draw do
           get 'missing_information' => 'female_prisoners#missing_information'
           get 'new_arrivals' => 'female_prisoners#new_arrivals'
         end
-        get 'summary' => 'summary#index'
-        get 'allocated' => 'summary#allocated'
-        get 'unallocated' => 'summary#unallocated'
-        get 'missing_information' => 'summary#missing_information'
-        get 'new_arrivals' => 'summary#new_arrivals'
+        constraints lambda {
+          |request| !PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id))
+        } do
+          get 'summary' => 'summary#index'
+          get 'allocated' => 'summary#allocated'
+          get 'unallocated' => 'summary#unallocated'
+          get 'missing_information' => 'summary#missing_information'
+          get 'new_arrivals' => 'summary#new_arrivals'
+        end
       end
 
       scope :format => true, :constraints => { :format => 'jpg' } do

@@ -43,7 +43,7 @@ context 'when NOMIS is missing information' do
         end
 
         it 'does not error' do
-          visit prison_staff_caseload_index_path(prison_code, staff_id)
+          visit prison_staff_caseload_path(prison_code, staff_id)
 
           expect(page).to have_content('Showing 1 - 1 of 1 results')
         end

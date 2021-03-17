@@ -130,12 +130,12 @@ RSpec.describe EmailService do
       create(:allocation,
              nomis_offender_id: original_allocation.nomis_offender_id,
              primary_pom_nomis_id: original_allocation.primary_pom_nomis_id).tap do |x|
-        x.offender_released
+        x.deallocate_offender_after_release
         x.reload
         x.update!(primary_pom_nomis_id: reallocation.primary_pom_nomis_id,
                   event: Allocation::REALLOCATE_PRIMARY_POM,
                   event_trigger: Allocation::USER)
-        x.offender_released
+        x.deallocate_offender_after_release
         x.reload
         x.update!(primary_pom_nomis_id: original_allocation.primary_pom_nomis_id,
                   event: Allocation::REALLOCATE_PRIMARY_POM,

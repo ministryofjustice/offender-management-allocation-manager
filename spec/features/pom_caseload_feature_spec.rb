@@ -7,8 +7,6 @@ feature "view POM's caseload" do
   let(:nomis_offender_id) { 'G4273GI' }
   let(:tomorrow) { Date.tomorrow }
 
-  let(:prison) { 'LEI' }
-
   let(:offender_map) {
     {
       'G7266VD' => 1_073,
@@ -39,7 +37,7 @@ feature "view POM's caseload" do
   }
   let(:offenders) {
     ids_without_cells = %w(G6653UC G8563UA)
-    offender_map.merge(nomis_offender_id => 1_153_753).
+    offender_map.merge(nomis_offender_id => 1_153).
       map { |nomis_id, booking_id|
       if ids_without_cells.include? nomis_id
         # generate 2 offenders without a cell location
@@ -85,32 +83,60 @@ feature "view POM's caseload" do
       ]
 
     stub_auth_token
-    stub_poms(prison, poms)
-    stub_offenders_for_prison(prison, offenders, [
+    stub_poms(prison.code, poms)
+    signin_pom_user [prison.code]
+    stub_offenders_for_prison(prison.code, offenders, [
       attributes_for(:movement, :rotl, offenderNo: moved_offenders.first.fetch(:offenderNo)),
       attributes_for(:movement, :rotl, offenderNo: moved_offenders.last.fetch(:offenderNo))
     ])
 
     offender_map.each do |nomis_offender_id, nomis_booking_id|
       create(:case_information, nomis_offender_id: nomis_offender_id)
-      create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id, nomis_booking_id: nomis_booking_id)
+      create(:allocation, prison: prison.code, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id, nomis_booking_id: nomis_booking_id)
     end
     create(:case_information, nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPS', welsh_offender: 'Yes')
-    create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id, nomis_booking_id: 1_153_753)
+    create(:allocation, prison: prison.code, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id, nomis_booking_id: 1_153)
 
     offenders.last(15).each do |o|
       create(:responsibility, nomis_offender_id: o.fetch(:offenderNo), value: Responsibility::PROBATION)
     end
 
     allow_any_instance_of(HmppsApi::OffenderBase).to receive(:handover_start_date).and_return(tomorrow)
+
+    stub_user staff_id: nomis_staff_id
   end
 
-  context 'when paginating' do
-    before do
-      signin_pom_user
-      stub_user staff_id: nomis_staff_id
+  context 'when in a womens prison' do
+    let(:prison) { build(:womens_prison) }
+    let(:complexities) { ['high', 'medium', 'low'].cycle.take(offenders.size) }
+    let(:test_strategy) { Flipflop::FeatureSet.current.test! }
 
-      visit prison_staff_caseload_index_path('LEI', nomis_staff_id)
+    before do
+      test_strategy.switch!(:womens_estate, true)
+
+      offenders.each_with_index do |offender, index|
+        allow(ComplexityMicroService).to receive(:get_complexity).with(offender.fetch(:offenderNo)).and_return(complexities[index])
+      end
+      visit prison_staff_caseload_path(prison.code, nomis_staff_id)
+    end
+
+    after do
+      test_strategy.switch!(:womens_estate, false)
+    end
+
+    it 'can sort by complexity' do
+      click_link 'Complexity level'
+      expect(page).to have_current_path("/prisons/#{prison.code}/staff/#{nomis_staff_id}/caseload?sort=complexity_level_number+asc")
+      click_link 'Complexity level'
+      expect(page).to have_current_path("/prisons/#{prison.code}/staff/#{nomis_staff_id}/caseload?sort=complexity_level_number+desc")
+    end
+  end
+
+  context 'when in a mens prison' do
+    let(:prison) { build(:prison) }
+
+    before do
+      visit prison_staff_caseload_path(prison.code, nomis_staff_id)
     end
 
     it 'displays paginated cases for a specific POM' do
@@ -201,15 +227,6 @@ feature "view POM's caseload" do
       click_on 'Search'
       expect(page).to have_content('Showing 1 - 6 of 6 results')
     end
-  end
-
-  context 'when looking at handover start' do
-    before {
-      signin_pom_user
-      stub_user staff_id: nomis_staff_id
-
-      visit prison_staff_caseload_index_path('LEI', nomis_staff_id)
-    }
 
     it 'shows the number of upcoming handovers' do
       within('.upcoming-handover-count') do
@@ -224,56 +241,54 @@ feature "view POM's caseload" do
 
       expect(page).to have_css('tbody tr.govuk-table__row', count: 21)
     end
-  end
 
-  it 'allows a POM to view the prisoner profile page for a specific offender' do
-    stub_auth_token
-    signin_pom_user
-    stub_user staff_id: nomis_staff_id
+    context 'when clicking through the offender link' do
+      it 'shows the new page' do
+        stub_user staff_id: nomis_staff_id
 
-    stub_offender(first_offender)
-    stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/LEI/offender/#{first_offender.fetch(:offenderNo)}").
-      to_return(body: { staffId: 485_572, firstName: "DOM", lastName: "BULL" }.to_json)
-    stub_request(:get, "#{ApiHelper::T3}/staff/#{nomis_staff_id}").
-      to_return(body: { staffId: nomis_staff_id, firstName: "TEST", lastName: "MOIC" }.to_json)
+        stub_offender(first_offender)
+        stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/#{prison.code}/offender/#{first_offender.fetch(:offenderNo)}").
+          to_return(body: { staffId: 485_572, firstName: "DOM", lastName: "BULL" }.to_json)
+        stub_request(:get, "#{ApiHelper::T3}/staff/#{nomis_staff_id}").
+          to_return(body: { staffId: nomis_staff_id, firstName: "TEST", lastName: "MOIC" }.to_json)
 
-    visit prison_staff_caseload_index_path(prison, nomis_staff_id)
+        visit prison_staff_caseload_path(prison.code, nomis_staff_id)
 
-    expected_name = "#{first_offender.fetch(:lastName)}, #{first_offender.fetch(:firstName)}"
+        expected_name = "#{first_offender.fetch(:lastName)}, #{first_offender.fetch(:firstName)}"
 
-    within('.offender_row_0') do
-      expect(page).to have_content(expected_name)
-      click_link expected_name
+        within('.offender_row_0') do
+          expect(page).to have_content(expected_name)
+          click_link expected_name
+        end
+
+        expect(page).to have_current_path(prison_prisoner_path(prison.code, first_offender.fetch(:offenderNo)), ignore_query: true)
+      end
     end
 
-    expect(page).to have_current_path(prison_prisoner_path(prison, first_offender.fetch(:offenderNo)), ignore_query: true)
-  end
+    it 'can sort all cases that have been allocated to a specific POM in the last week' do
+      stub_user staff_id: nomis_staff_id
 
-  it 'can sort all cases that have been allocated to a specific POM in the last week' do
-    # Sign in as a POM
-    signin_pom_user
-    stub_user staff_id: nomis_staff_id
+      visit  prison_staff_caseload_path(prison.code, nomis_staff_id)
+      within('.new-cases-count') do
+        click_link('1')
+      end
 
-    visit  prison_staff_caseload_index_path('LEI', nomis_staff_id)
-    within('.new-cases-count') do
-      click_link('1')
-    end
+      expect(page).to have_content("New cases")
 
-    expect(page).to have_content("New cases")
+      expected_name = "#{first_offender.fetch(:lastName)}, #{first_offender.fetch(:firstName)}"
 
-    expected_name = "#{first_offender.fetch(:lastName)}, #{first_offender.fetch(:firstName)}"
+      # The first name...
+      within('.offender_row_0') do
+        expect(find('.prisoner-name').text).to eq(expected_name)
+      end
 
-    # The first name...
-    within('.offender_row_0') do
-      expect(find('.prisoner-name').text).to eq(expected_name)
-    end
+      # After sorting ...
+      click_link('Prisoner name')
 
-    # After sorting ...
-    click_link('Prisoner name')
-
-    # Should be the last name
-    within('.offender_row_20') do
-      expect(find('.prisoner-name').text).to eq(expected_name)
+      # Should be the last name
+      within('.offender_row_20') do
+        expect(find('.prisoner-name').text).to eq(expected_name)
+      end
     end
   end
 end

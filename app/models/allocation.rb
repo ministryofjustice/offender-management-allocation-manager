@@ -127,12 +127,12 @@ class Allocation < ApplicationRecord
             :event_trigger,
             :prison, presence: true
 
-  def offender_released
-    deallocate_offender event: Allocation::DEALLOCATE_RELEASED_OFFENDER, event_trigger: Allocation::OFFENDER_RELEASED
+  def deallocate_offender_after_release
+    deallocate_offender event: Allocation::DEALLOCATE_RELEASED_OFFENDER, event_trigger: Allocation::OFFENDER_RELEASED if active?
   end
 
-  def offender_transferred
-    deallocate_offender event: Allocation::DEALLOCATE_PRIMARY_POM, event_trigger: Allocation::OFFENDER_TRANSFERRED
+  def dealloate_offender_after_transfer
+    deallocate_offender event: Allocation::DEALLOCATE_PRIMARY_POM, event_trigger: Allocation::OFFENDER_TRANSFERRED if active?
   end
 
 private
@@ -147,7 +147,7 @@ private
         nomis_offender_id: nomis_offender_id,
         prison_name: PrisonService.name_for(prison),
         url: Rails.application.routes.default_url_options[:host] +
-            Rails.application.routes.url_helpers.prison_staff_caseload_index_path(prison, primary_pom_nomis_id)
+            Rails.application.routes.url_helpers.prison_staff_caseload_path(prison, primary_pom_nomis_id)
     }
     update!(
       event: event,

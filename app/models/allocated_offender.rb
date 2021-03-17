@@ -6,16 +6,22 @@
 #
 class AllocatedOffender
   delegate :last_name, :full_name, :earliest_release_date, :approaching_handover?,
-           :sentence_start_date, :tier, :cell_location, :latest_temp_movement_date, to: :@offender
+           :indeterminate_sentence?, :prison_id, :parole_review_date, :delius_matched?,
+           :handover_start_date, :responsibility_handover_date, :allocated_com_name, :case_allocation,
+           :complexity_level, :offender_no, :sentence_start_date, :tier, :cell_location, :latest_temp_movement_date, to: :@offender
   delegate :updated_at, :nomis_offender_id, :primary_pom_allocated_at, :prison,
            to: :@allocation
 
-  attr_reader :offender
+  COMPLEXITIES = { 'high' => 3, 'medium' => 2, 'low' => 1 }.freeze
 
   def initialize(staff_id, allocation, offender)
     @staff_id = staff_id
     @allocation = allocation
     @offender = offender
+  end
+
+  def complexity_level_number
+    COMPLEXITIES.fetch(complexity_level)
   end
 
   def pom_responsibility
