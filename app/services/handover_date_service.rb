@@ -13,6 +13,9 @@ class HandoverDateService
   # OMIC open prison rules apply to the rest of the open estate from 31/03/2021
   OPEN_PRISON_POLICY_START_DATE = '31/03/2021'.to_date
 
+  # OMIC apply to the womens' estate from 30/04/2021
+  WOMENS_POLICY_START_DATE = '30/04/2021'.to_date
+
   HandoverData = Struct.new :custody, :community, :start_date, :handover_date, :reason, keyword_init: true
 
   # if COM responsible, then handover dates all empty
@@ -45,16 +48,16 @@ class HandoverDateService
     # (likely due to HOMDs choosing CRC just to 'get past' the missing information screen when the offender isn't in nDelius)
     # By using || here, we effectively ignore their CRC designation and treat them an NPS offender
     elsif offender.nps_case? || offender.indeterminate_sentence?
-      handover_date, reason = nps_handover_date(offender)
-      start_date = nps_start_date(offender)
-      handover_date = start_date if start_date.present? && start_date > handover_date
-
-      if offender.in_open_prison? && !offender.open_prison_rules_apply?
+      if offender.in_open_conditions? && !offender.open_prison_rules_apply?
         # Offender is in open prison under pre-OMIC rules – COM is always responsible
         HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
                          start_date: nil, handover_date: nil,
-                         reason: reason
+                         reason: 'Open Prison pre-OMIC Rules'
       else
+        handover_date, reason = nps_handover_date(offender)
+        start_date = nps_start_date(offender)
+        handover_date = start_date if start_date.present? && start_date > handover_date
+
         case nps_responsibility(offender, handover_date)
         when RESPONSIBLE
           HandoverData.new custody: RESPONSIBLE, community: com_responsibility(start_date, handover_date),
@@ -203,8 +206,15 @@ private
   ENGLISH_PRIVATE_CUTOFF = '1 Jun 2021'.to_date.freeze
   ENGLISH_PUBLIC_CUTOFF = '15 Feb 2021'.to_date.freeze
 
+  WOMENS_CUTOFF_DATE = '30/9/2022'.to_date
+
   def self.nps_responsibility(offender, handover_date)
-    if offender.welsh_offender?
+    if offender.in_womens_prison?
+      nps_responsibility_rules(offender: offender,
+                               policy_start_date: WOMENS_POLICY_START_DATE,
+                               handover_date: handover_date,
+                               cutoff_date: WOMENS_CUTOFF_DATE)
+    elsif offender.welsh_offender?
       nps_responsibility_rules(offender: offender,
                                policy_start_date: WELSH_POLICY_START_DATE,
                                handover_date: handover_date,
@@ -235,7 +245,7 @@ private
 
     def new_case? policy_start_date
       if @offender.sentenced?
-        @offender.sentence_start_date > policy_start_date
+        @offender.sentence_start_date >= policy_start_date
       else
         true
       end
@@ -279,8 +289,15 @@ private
       ) ||
       (
         # Open prison rules apply because offender arrived after the open prison policy general start date
-        in_open_prison? && @offender.prison_arrival_date >= OPEN_PRISON_POLICY_START_DATE
+        in_male_open_prison? && @offender.prison_arrival_date >= OPEN_PRISON_POLICY_START_DATE
+      ) ||
+      (
+        in_womens_prison? && @offender.category_code == 'T'
       )
+    end
+
+    def in_womens_prison?
+      PrisonService.womens_prison?(@offender.prison_id)
     end
 
     def hub_or_private?
@@ -292,8 +309,12 @@ private
       @offender.welsh_offender == true
     end
 
-    def in_open_prison?
+    def in_male_open_prison?
       PrisonService.open_prison?(@offender.prison_id)
+    end
+
+    def in_open_conditions?
+      PrisonService.open_prison?(@offender.prison_id) || (PrisonService.womens_prison?(@offender.prison_id) && @offender.category_code == 'T')
     end
   end
 end
