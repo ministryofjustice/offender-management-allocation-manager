@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
-  CLOSED_PRISON_CODES = PrisonService.prison_codes.reject { |x|
+  CLOSED_MALE_PRISON_CODES = PrisonService.prison_codes.reject { |x|
     PrisonService::OPEN_PRISON_CODES.include?(x) ||
       PrisonService::ENGLISH_HUB_PRISON_CODES.include?(x) ||
       PrisonService::WOMENS_PRISON_CODES.include?(x)
@@ -13,9 +15,9 @@ FactoryBot.define do
   end
 
   factory :prison, class: 'Elite2Prison' do
-    # rotate around every closed prison - open prisons have different rules
+    # rotate around every male closed prison - open and womens prisons have different rules
     sequence(:code) do |c|
-      CLOSED_PRISON_CODES[c % CLOSED_PRISON_CODES.size]
+      CLOSED_MALE_PRISON_CODES[c % CLOSED_MALE_PRISON_CODES.size]
     end
   end
 

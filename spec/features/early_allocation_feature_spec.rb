@@ -96,7 +96,7 @@ feature "early allocation", type: :feature do
           end
         end
 
-        scenario 'when an immediate error occurs on the second page', :js do
+        scenario 'when an immediate error occurs on the second page' do
           fill_in_date_form
 
           click_button 'Continue'

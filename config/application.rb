@@ -46,12 +46,15 @@ module OffenderManagementAllocationClient
 
     # Sentry environment set with SENTRY_CURRENT_ENV
     config.sentry_dsn = ENV['SENTRY_DSN']&.strip
+
     config.keyworker_api_host = ENV['KEYWORKER_API_HOST']&.strip
     config.community_api_host = ENV['COMMUNITY_API_HOST']&.strip
     config.digital_prison_service_host = ENV['DIGITAL_PRISON_SERVICE_HOST']&.strip
     config.nomis_oauth_host = ENV['NOMIS_OAUTH_HOST']&.strip
     config.prison_api_host = ENV['PRISON_API_HOST']&.strip
     config.prisoner_search_host = ENV['PRISONER_SEARCH_HOST']&.strip
+    config.complexity_api_host = ENV['COMPLEXITY_API_HOST']&.strip
+
     config.nomis_oauth_client_id = ENV['NOMIS_OAUTH_CLIENT_ID']&.strip
     config.nomis_oauth_client_secret = ENV['NOMIS_OAUTH_CLIENT_SECRET']&.strip
     config.nomis_oauth_public_key = ENV['NOMIS_OAUTH_PUBLIC_KEY']&.strip

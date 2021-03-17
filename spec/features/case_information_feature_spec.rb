@@ -1,16 +1,17 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 feature 'case information feature' do
   context 'when doing an allocate and save' do
-    let(:offender) { build(:nomis_offender) }
     let(:prison) { build(:prison) }
+    let(:offender) { build(:nomis_offender, agencyId: prison.code) }
     let(:spo) { build(:pom) }
 
     before do
       stub_signin_spo(spo, [prison.code])
       stub_auth_token
       stub_offenders_for_prison(prison.code, [offender])
-      stub_offender(offender)
       stub_poms(prison.code, [spo])
     end
 

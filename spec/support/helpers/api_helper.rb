@@ -13,8 +13,11 @@ module ApiHelper
     booking_number = offender.fetch(:bookingId)
     offender_no = offender.fetch(:offenderNo)
     stub_request(:get, "#{T3}/prisoners/#{offender_no}").
-      to_return(body: [offender.except(:sentence, :recall).merge('latestBookingId' => booking_number,
-                                                                 'latestLocationId' => offender.fetch(:agencyId))].to_json)
+      to_return(body: [
+        offender.except(:sentence, :recall, :agencyId).merge(
+          'latestBookingId' => booking_number,
+          'latestLocationId' => offender.fetch(:agencyId))
+      ].to_json)
 
     stub_request(:post, "#{T3_SEARCH}/prisoner-numbers").with(body: { prisonerNumbers: [offender_no] }).
       to_return(body: [
@@ -50,6 +53,9 @@ module ApiHelper
     stub_request(:post, T3_LATEST_MOVE_URL).with(
       body: [offender_no].to_json).
       to_return(body: [].to_json)
+
+    stub_request(:get, "#{Rails.configuration.complexity_api_host}/v1/complexity-of-need/offender-no/#{offender_no}").
+      to_return(body: { level: offender.fetch(:complexityLevel) }.to_json)
   end
 
   def stub_movements(movements = [])
@@ -119,14 +125,15 @@ module ApiHelper
         'Page-Offset' => '0'
       }).to_return(body: offenders.zip(booking_ids)
                            .map { |o, booking_id|
-                           o.except(:sentence, :recall)
+                           o.except(:sentence, :recall, :agencyId)
                                                     .merge('bookingId' => booking_id,
                                                            'agencyId' => prison,
                                                            'assignedLivingUnitDesc' => o[:internalLocation])
                          }                         .to_json)
 
+    offender_nos = offenders.map { |offender| offender.fetch(:offenderNo) }
     stub_request(:post, "#{T3_SEARCH}/prisoner-numbers").
-      with(body: { prisonerNumbers: offenders.map { |offender| offender.fetch(:offenderNo) } }.to_json).
+      with(body: { prisonerNumbers: offender_nos }.to_json).
       to_return(body: offenders.map { |offender|
                         {
                           prisonerNumber: offender.fetch(:offenderNo),
@@ -146,10 +153,14 @@ module ApiHelper
       to_return(body: bookings.to_json)
 
     stub_request(:post, T3_LATEST_MOVE_URL).with(
-      body: offenders.map { |offender| offender.fetch(:offenderNo) }.to_json).
+      body: offender_nos.to_json).
       to_return(body: movements.to_json)
 
     stub_movements
+
+    allow(HmppsApi::ComplexityApi).to receive(:get_complexities).with(offender_nos).and_return(
+      offenders.map { |offender| [offender.fetch(:offenderNo), offender.fetch(:complexityLevel)] }.to_h
+    )
 
     offenders.each { |o| stub_offender(o) }
   end

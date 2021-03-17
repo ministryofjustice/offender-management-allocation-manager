@@ -28,7 +28,13 @@ RSpec.describe CaseloadController, type: :controller do
     let(:today) { Time.zone.today }
     let(:yesterday) { Time.zone.today - 1.day }
 
-    let(:offenders) { build_list(:nomis_offender, 3).sort_by { |x| x.fetch(:lastName) } }
+    let(:offenders) {
+      [
+      build(:nomis_offender, complexityLevel: 'high'),
+      build(:nomis_offender, complexityLevel: 'medium'),
+      build(:nomis_offender, complexityLevel: 'low')
+    ].sort_by { |x| x.fetch(:lastName) }
+    }
 
     before do
       # we need 3 data points - 1 in, 1 out on ROTL, 1 out on ROTL and returned.
@@ -60,17 +66,16 @@ RSpec.describe CaseloadController, type: :controller do
     context 'when a womens prison' do
       before do
         stub_sso_data(prison.code)
+        test_strategy.switch!(:womens_estate, true)
+      end
+
+      after do
+        test_strategy.switch!(:womens_estate, false)
       end
 
       describe '#index' do
         let(:prison) { build(:womens_prison) }
-        let(:complexities) { ['high', 'medium', 'low'].cycle.take(offenders.size) }
-
-        before do
-          offenders.each_with_index do |offender, index|
-            allow(ComplexityMicroService).to receive(:get_complexity).with(offender.fetch(:offenderNo)).and_return(complexities[index])
-          end
-        end
+        let(:test_strategy) { Flipflop::FeatureSet.current.test! }
 
         it 'can sort by complexity' do
           get :index, params: { prison_id: prison.code, staff_id: staff_id, sort: 'complexity_level_number asc' }

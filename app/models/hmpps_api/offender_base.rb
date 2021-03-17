@@ -17,7 +17,7 @@ module HmppsApi
 
     attr_accessor :category_code, :date_of_birth, :prison_arrival_date, :sentence, :allocated_pom_name
 
-    attr_reader :first_name, :last_name, :booking_id, :offender_no, :sentence_type, :cell_location
+    attr_reader :first_name, :last_name, :booking_id, :offender_no, :sentence_type, :cell_location, :complexity_level
 
     def latest_temp_movement_date
       @latest_temp_movement&.movement_date
@@ -28,12 +28,6 @@ module HmppsApi
     def convicted?
       @convicted_status == 'Convicted'
     end
-
-    # :nocov:
-    def complexity_level
-      @complexity_level ||= ComplexityMicroService.get_complexity(offender_no)
-    end
-    # :nocov:
 
     def sentenced?
       # A prisoner will have had a sentence calculation and for our purposes
@@ -157,7 +151,7 @@ module HmppsApi
     # https://api-dev.prison.service.justice.gov.uk/swagger-ui.html#//prisoners/getPrisonersOffenderNo
     # and also by
     # https://api-dev.prison.service.justice.gov.uk/swagger-ui.html#//locations/getOffendersAtLocationDescription
-    def initialize(api_payload, search_payload, latest_temp_movement:)
+    def initialize(api_payload, search_payload, latest_temp_movement:, complexity_level:)
       # It is expected that this method will be called by the subclass which
       # will have been given a payload at the class level, and will call this
       # method from it's own internal from_json
@@ -171,6 +165,7 @@ module HmppsApi
       @date_of_birth = Date.parse(api_payload.fetch('dateOfBirth'))
       @latest_temp_movement = latest_temp_movement
       @cell_location = search_payload['cellLocation']
+      @complexity_level = complexity_level
     end
 
     def handover_start_date

@@ -29,11 +29,17 @@ module HmppsApi
         booking_ids = data.map { |o| o.fetch('bookingId') }
         sentence_details = HmppsApi::PrisonApi::OffenderApi.get_bulk_sentence_details(booking_ids)
 
+        complexities = if PrisonService::womens_prison?(prison)
+                         HmppsApi::ComplexityApi.get_complexities offender_nos
+                       else
+                         {}
+                       end
         offenders = data.map do |payload|
           offender_no = payload.fetch('offenderNo')
-          HmppsApi::OffenderSummary.from_json(payload,
-                                              search_data.fetch(offender_no, {}),
-                                              latest_temp_movement: temp_movements[offender_no]).tap { |offender|
+          HmppsApi::OffenderSummary.new(payload,
+                                        search_data.fetch(offender_no, {}),
+                                        latest_temp_movement: temp_movements[offender_no],
+                                        complexity_level: complexities[offender_no]).tap { |offender|
             sentencing = sentence_details[offender.booking_id]
             offender.sentence = sentencing if sentencing.present?
           }
@@ -41,20 +47,25 @@ module HmppsApi
         ApiPaginatedResponse.new(total_pages, offenders)
       end
 
-      def self.get_offender(offender_no)
+      def self.get_offender(raw_offender_no)
         # Bad NOMIS numbers mustn't produce invalid URLs
-        url_offender_no = URI.encode_www_form_component(offender_no)
-        route = "/prisoners/#{url_offender_no}"
-        response = client.get(route)
+        offender_no = URI.encode_www_form_component(raw_offender_no)
+        route = "/prisoners/#{offender_no}"
+        api_response = client.get(route).first
 
-        if response.empty?
+        if api_response.nil?
           nil
         else
-          search_data = get_search_payload([url_offender_no])
-          temp_movements = HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for([url_offender_no])
-          HmppsApi::Offender.from_json(response.first,
-                                       search_data.fetch(url_offender_no, {}),
-                                       latest_temp_movement: temp_movements[url_offender_no]).tap do |offender|
+          search_data = get_search_payload([offender_no])
+          temp_movements = HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for([offender_no])
+          complexity_level = if PrisonService::womens_prison?(api_response.fetch('latestLocationId'))
+                               HmppsApi::ComplexityApi.get_complexity(offender_no)
+                             end
+          prisoner = HmppsApi::Offender.new api_response,
+                                            search_data.fetch(offender_no, {}),
+                                            latest_temp_movement: temp_movements[offender_no],
+                                            complexity_level: complexity_level
+          prisoner.tap do |offender|
             sentence_details = get_bulk_sentence_details([offender.booking_id])
             offender.sentence = sentence_details.fetch(offender.booking_id)
             add_arrival_dates([offender])

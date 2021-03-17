@@ -114,6 +114,10 @@ RSpec.describe Prison, type: :model do
               body: offenders.map { |o| o.fetch(:offenderNo) }.to_json,
             ).
             to_return(body: [].to_json)
+
+        allow(HmppsApi::ComplexityApi).to receive(:get_complexities).with(offender_nos).and_return(
+          offenders.map { |offender| [offender.fetch(:offenderNo), offender.fetch(:complexityLevel)] }.to_h
+        )
       end
 
       it 'returns falses when missing' do
@@ -158,6 +162,9 @@ RSpec.describe Prison, type: :model do
               body: offenders.map { |o| o.fetch(:offenderNo) }.to_json,
                 ).
             to_return(body: [].to_json)
+        allow(HmppsApi::ComplexityApi).to receive(:get_complexities).with(offender_nos).and_return(
+          offenders.map { |offender| [offender.fetch(:offenderNo), offender.fetch(:complexityLevel)] }.to_h
+        )
       end
 
       it 'fetches one page only' do

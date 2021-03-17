@@ -6,7 +6,7 @@ RSpec.describe "prisoners/show", type: :view do
   describe 'complexity badges' do
     let(:prison) { build(:womens_prison) }
     let(:page) { Nokogiri::HTML(rendered) }
-    let(:offender) { build(:offender).tap { |offender| offender.load_case_information(case_info) } }
+    let(:offender) { build(:offender, complexityLevel: complexity).tap { |offender| offender.load_case_information(case_info) } }
     let(:case_info) { create(:case_information) }
     let(:test_strategy) { Flipflop::FeatureSet.current.test! }
 
@@ -17,7 +17,6 @@ RSpec.describe "prisoners/show", type: :view do
       assign(:tasks, [])
       assign(:keyworker, build(:keyworker))
       assign(:case_info, case_info)
-      expect(ComplexityMicroService).to receive(:get_complexity).and_return complexity
       render
     end
 

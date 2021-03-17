@@ -1,8 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe FemalePrisonersController, type: :controller do
-  let(:womens_prison) { 'PFI' }
-  let(:prison) { build :prison, code: womens_prison }
+  let(:prison) { build :womens_prison }
   let(:test_strategy) { Flipflop::FeatureSet.current.test! }
 
   before do
@@ -17,11 +16,6 @@ RSpec.describe FemalePrisonersController, type: :controller do
 
   describe 'buckets' do
     before do
-      allow(ComplexityMicroService).to receive(:get_complexity).with(offender_with_complexity_level_but_no_case_info.fetch(:offenderNo)).and_return('medium')
-      allow(ComplexityMicroService).to receive(:get_complexity).with(offender_with_case_info_but_no_complexity_level.fetch(:offenderNo)).and_return(nil)
-      allow(ComplexityMicroService).to receive(:get_complexity).with(offender_with_complexity_level_and_case_info.fetch(:offenderNo)).and_return('medium')
-      allow(ComplexityMicroService).to receive(:get_complexity).with(offender_arrived_today_with_no_complexity_or_case_info.fetch(:offenderNo)).and_return(nil)
-
       create(:case_information, nomis_offender_id: offender_with_case_info_but_no_complexity_level.fetch(:offenderNo))
       create(:case_information, nomis_offender_id: offender_with_complexity_level_and_case_info.fetch(:offenderNo))
 
@@ -29,18 +23,19 @@ RSpec.describe FemalePrisonersController, type: :controller do
       create(:allocation, nomis_offender_id: allocated_offender_two.fetch(:offenderNo), prison: prison.code)
     end
 
-
-    let(:offender_with_case_info_but_no_complexity_level) { build(:nomis_offender) }
-    let(:offender_with_no_case_info_and_no_complexity_level) { build(:nomis_offender) }
-    let(:offender_with_complexity_level_but_no_case_info) { build(:nomis_offender) }
-    let(:offender_with_complexity_level_and_case_info) { build(:nomis_offender) }
+    let(:offender_with_case_info_but_no_complexity_level) { build(:nomis_offender, complexityLevel: nil) }
+    let(:offender_with_no_case_info_and_no_complexity_level) { build(:nomis_offender, complexityLevel: nil) }
+    let(:offender_with_complexity_level_but_no_case_info) { build(:nomis_offender, complexityLevel: 'medium') }
+    let(:offender_with_complexity_level_and_case_info) { build(:nomis_offender, complexityLevel: 'medium') }
     let(:allocated_offender_one) { build(:nomis_offender) }
     let(:allocated_offender_two) { build(:nomis_offender) }
 
     # new arrival - it's new and haven't matched with delius yet.
     let(:today) { Time.zone.today }
 
-    let(:offender_arrived_today_with_no_complexity_or_case_info) { build(:nomis_offender, sentence: attributes_for(:sentence_detail, sentenceStartDate: today)) }
+    let(:offender_arrived_today_with_no_complexity_or_case_info) {
+      build(:nomis_offender, sentence: attributes_for(:sentence_detail, sentenceStartDate: today), complexityLevel: nil)
+    }
 
     let(:offenders) {
       [offender_with_case_info_but_no_complexity_level,
@@ -52,8 +47,15 @@ RSpec.describe FemalePrisonersController, type: :controller do
        offender_arrived_today_with_no_complexity_or_case_info
         ]
     }
-    let(:missing_info_offenders) { [offender_with_case_info_but_no_complexity_level, offender_with_complexity_level_but_no_case_info, offender_with_no_case_info_and_no_complexity_level] }
-    let(:allocated_offenders) { [allocated_offender_one, allocated_offender_two] }
+    let(:missing_info_offenders) {
+      [offender_with_case_info_but_no_complexity_level,
+       offender_with_complexity_level_but_no_case_info,
+       offender_with_no_case_info_and_no_complexity_level]
+    }
+    let(:allocated_offenders) {
+      [allocated_offender_one,
+       allocated_offender_two]
+    }
     let(:unallocated_offenders) { [offender_with_complexity_level_and_case_info] }
     let(:new_arrival_offenders) { [offender_arrived_today_with_no_complexity_or_case_info] }
 
@@ -112,20 +114,32 @@ RSpec.describe FemalePrisonersController, type: :controller do
     let(:offenders_awaiting_allocation_ascending_order) { [offender_b, offender_c, offender_a, offender_d] }
 
     let(:offender_a) {
-      build(:nomis_offender, sentence: attributes_for(:sentence_detail, sentenceStartDate: three_days_ago,
-                                                                       conditionalReleaseDate: release_date_four), offenderNo: 'T1000OA', lastName: 'Austin')
+      build(:nomis_offender,
+            sentence: attributes_for(:sentence_detail,
+                                     sentenceStartDate: three_days_ago,
+                                     conditionalReleaseDate: release_date_four),
+            lastName: 'Austin')
     }
     let(:offender_b) {
-      build(:nomis_offender, sentence: attributes_for(:sentence_detail, sentenceStartDate: one_day_ago,
-                                                                       conditionalReleaseDate: release_date_three),  offenderNo: 'T1000OB', lastName: 'Blackburn')
+      build(:nomis_offender,
+            sentence: attributes_for(:sentence_detail,
+                                     sentenceStartDate: one_day_ago,
+                                     conditionalReleaseDate: release_date_three),
+            lastName: 'Blackburn')
     }
     let(:offender_c) {
-      build(:nomis_offender, sentence: attributes_for(:sentence_detail, sentenceStartDate: two_days_ago,
-                                                                       conditionalReleaseDate: nil),  offenderNo: 'T1000OC', lastName: 'Carsley')
+      build(:nomis_offender,
+            sentence: attributes_for(:sentence_detail,
+                                     sentenceStartDate: two_days_ago,
+                                     conditionalReleaseDate: nil),
+            lastName: 'Carsley')
     }
     let(:offender_d) {
-      build(:nomis_offender, sentence: attributes_for(:sentence_detail, sentenceStartDate: four_days_ago,
-                                                                       conditionalReleaseDate: release_date_two),  offenderNo: 'T1000OD',  lastName: 'Darrel')
+      build(:nomis_offender,
+            sentence: attributes_for(:sentence_detail,
+                                     sentenceStartDate: four_days_ago,
+                                     conditionalReleaseDate: release_date_two),
+            lastName: 'Darrel')
     }
 
     describe 'missing_information' do
@@ -153,10 +167,10 @@ RSpec.describe FemalePrisonersController, type: :controller do
         create(:case_information, tier: 'B', nomis_offender_id: offender_c.fetch(:offenderNo))
         create(:case_information, tier: 'A', nomis_offender_id: offender_d.fetch(:offenderNo))
 
-        allow(ComplexityMicroService).to receive(:get_complexity).with(offender_a.fetch(:offenderNo)).and_return('medium')
-        allow(ComplexityMicroService).to receive(:get_complexity).with(offender_b.fetch(:offenderNo)).and_return('low')
-        allow(ComplexityMicroService).to receive(:get_complexity).with(offender_c.fetch(:offenderNo)).and_return('medium')
-        allow(ComplexityMicroService).to receive(:get_complexity).with(offender_d.fetch(:offenderNo)).and_return('high')
+        allow(HmppsApi::ComplexityApi).to receive(:get_complexity).with(offender_a.fetch(:offenderNo)).and_return('medium')
+        allow(HmppsApi::ComplexityApi).to receive(:get_complexity).with(offender_b.fetch(:offenderNo)).and_return('low')
+        allow(HmppsApi::ComplexityApi).to receive(:get_complexity).with(offender_c.fetch(:offenderNo)).and_return('medium')
+        allow(HmppsApi::ComplexityApi).to receive(:get_complexity).with(offender_d.fetch(:offenderNo)).and_return('high')
 
         create(:responsibility, nomis_offender_id: offender_c.fetch(:offenderNo), value: Responsibility::PROBATION)
         create(:responsibility, nomis_offender_id: offender_d.fetch(:offenderNo), value: Responsibility::PROBATION)
