@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "allocations/new", type: :view do
+RSpec.describe "allocations/index", type: :view do
   let(:prison) { build(:prison) }
   let(:page) { Nokogiri::HTML(rendered) }
   let(:case_type_badge) { page.css('#prisoner-case-type') }

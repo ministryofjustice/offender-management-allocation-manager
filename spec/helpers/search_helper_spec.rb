@@ -19,7 +19,7 @@ RSpec.describe SearchHelper do
         }
       }
       let(:expected_link) {
-        link_to 'Allocate', new_prison_prisoner_allocation_path('LEI', prisoner_id: offender.offender_no)
+        link_to 'Allocate', prison_prisoner_staff_index_path('LEI', prisoner_id: offender.offender_no)
       }
 
       it "will change to allocate if there is no allocation" do

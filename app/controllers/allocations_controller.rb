@@ -5,7 +5,7 @@ class AllocationsController < PrisonsApplicationController
 
   delegate :update, to: :create
 
-  def new
+  def index
     offender_id = params.require(:prisoner_id)
     @prisoner = offender(offender_id)
     @previously_allocated_pom_ids =
@@ -45,7 +45,7 @@ class AllocationsController < PrisonsApplicationController
     @allocation = AllocationService.current_allocation_for(nomis_offender_id_from_url)
 
     unless @allocation.present? && @allocation.active?
-      redirect_to new_prison_prisoner_allocation_path(active_prison_id, nomis_offender_id_from_url)
+      redirect_to prison_prisoner_staff_index_path(active_prison_id, nomis_offender_id_from_url)
       return
     end
 

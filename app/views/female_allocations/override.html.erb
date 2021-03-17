@@ -1,0 +1,39 @@
+<%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <%= form_for(@override,
+                 url: wizard_path,
+                 builder: GOVUKDesignSystemFormBuilder::FormBuilder,
+                 method: :put) do |form| %>
+
+      <h1 class="govuk-heading-xl govuk-!-margin-top-4">
+        <% if RecommendationService.recommended_pom_type(@prisoner) == RecommendationService::PROBATION_POM %>
+          Why are you allocating a prison officer POM?
+        <% else %>
+          Why are you allocating a probation officer POM?
+        <% end %>
+      </h1>
+
+      <%= form.govuk_error_summary %>
+
+      <!-- have to set multiple: false here to prevent govuk_check_boxes_fieldset adding an empty checkbox -->
+      <%= form.govuk_check_boxes_fieldset :override_reasons, multiple: false, legend: { text: 'Choose all that apply:', size: 's' } do %>
+        <%= form.govuk_check_box :override_reasons, :suitability, label: { text: complex_reason_label(@prisoner), link_errors: true } do %>
+          <%= form.govuk_text_area :suitability_detail,
+                                   label: { text: 'Enter your reason for this decision'},
+                                   rows: 3 %>
+        <% end %>
+        <%= form.govuk_check_box :override_reasons, :no_staff, label: { text: "No available #{recommended_pom_type_label(@prisoner).downcase} POMs" } %>
+        <%= form.govuk_check_box :override_reasons, :continuity, label: { text: "This POM has worked with the prisoner before" } %>
+        <%= form.govuk_check_box :override_reasons, :other, label: { text: "Other reason" } do %>
+          <%= form.govuk_text_area :more_detail,
+                                   label: { text: 'Please provide detail here'},
+                                   rows: 3 %>
+        <% end %>
+      <% end %>
+
+      <%= form.submit "Continue", role: "button", draggable: "false", class: "govuk-button" %>
+    <% end %>
+  </div>
+</div>
