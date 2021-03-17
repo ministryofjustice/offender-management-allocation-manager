@@ -4,7 +4,7 @@
 
 <h1 class="govuk-heading-l govuk-!-margin-bottom-5">Allocation information</h1>
 
-<%= render 'shared/case_type_badge', offender: @prisoner, early_allocations: @case_info.early_allocations %>
+<%= render 'shared/badges', offender: @prisoner, early_allocations: @case_info.early_allocations %>
 
 <div class="govuk-!-margin-top-1">
   <table class="govuk-table">
@@ -49,17 +49,6 @@
         <% end %>
       </td>
     </tr>
-<!--    <tr class="govuk-table__row">-->
-<!--      <td class="govuk-table__cell govuk-!-width-one-half">Early assessment eligibility</td>-->
-<!--      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">-->
-        <%#= CODE NEEDED %>
-<!--      </td>-->
-    <!--    <tr class="govuk-table__row">-->
-    <!--      <td class="govuk-table__cell govuk-!-width-one-half">COM responsibility handover deadline</td>-->
-    <!--      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">-->
-    <%#= CODE NEEDED %>
-    <!--      </td>-->
-<!--    </tr>-->
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Last known address in Wales</td>
       <td class="govuk-table__cell table_cell__left_align">

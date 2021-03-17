@@ -9,13 +9,12 @@ class CaseloadController < PrisonStaffApplicationController
     @new_cases_count = allocations.count(&:new_case?)
     sorted_allocations = sort_allocations(filter_allocations(allocations))
     @allocations = Kaminari.paginate_array(sorted_allocations).page(page)
-    @total_allocation_count = sorted_allocations.count
 
     @pending_handover_count = @pom.pending_handover_offenders.count
-    @pending_task_count = PomTasks.new.for_offenders(allocations.map(&:offender)).count
+    @pending_task_count = PomTasks.new.for_offenders(allocations).count
   end
 
-  def new
+  def new_cases
     @new_cases = sort_allocations(@pom.allocations.select(&:new_case?))
   end
 

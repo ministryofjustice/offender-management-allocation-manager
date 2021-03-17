@@ -68,7 +68,7 @@ feature 'Allocation History' do
                            updated_at: Time.zone.now - 7.days
         )
         Timecop.travel(deallocate_date) do
-          allocation.offender_transferred
+          allocation.dealloate_offender_after_transfer
         end
         Timecop.travel(Time.zone.now - 5.days) do
           allocation.update!(event: Allocation::ALLOCATE_PRIMARY_POM,
@@ -105,7 +105,7 @@ feature 'Allocation History' do
         end
 
         Timecop.travel(transfer_date) do
-          allocation.offender_transferred
+          allocation.dealloate_offender_after_transfer
         end
 
         Timecop.travel(Time.zone.now - 3.weeks) do
@@ -221,7 +221,7 @@ feature 'Allocation History' do
       stub_pom pom
       create(:case_information, nomis_offender_id: nomis_offender_id)
       allocation = create(:allocation, :primary, nomis_offender_id: nomis_offender_id, prison: prison, primary_pom_nomis_id: pom.staff_id)
-      allocation.offender_released
+      allocation.deallocate_offender_after_release
     end
 
     scenario 'visit allocation history page' do

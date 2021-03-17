@@ -31,7 +31,7 @@ feature "early allocation", type: :feature do
 
     signin_pom_user
 
-    visit prison_staff_caseload_index_path(prison, nomis_staff_id)
+    visit prison_staff_caseload_path(prison, nomis_staff_id)
 
     # assert that our setup created a caseload record
     expect(page).to have_content("Showing 1 - 1 of 1 results")
