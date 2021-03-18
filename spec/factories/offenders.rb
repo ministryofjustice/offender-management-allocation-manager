@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :offender_base, class: 'HmppsApi::Offender' do
+  factory :offender_base, class: 'HmppsApi::OffenderBase' do
     imprisonmentStatus { 'SENT03' }
-    latestLocationId { 'LEI' }
 
     # cell location is the format <1 letter>-<1 number>-<3 numbers> e.g 'E-4-014'
     internalLocation {
@@ -64,6 +63,8 @@ FactoryBot.define do
         offender.sentence = attributes.fetch(:sentence)
       }
     end
+
+    latestLocationId { 'LEI' }
 
     trait :prescoed do
       latestLocationId { PrisonService::PRESCOED_CODE }
