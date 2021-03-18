@@ -32,7 +32,7 @@ class FemaleMissingInfosController < PrisonsApplicationController
 
     if @missing_info.valid?
       if step == :complexity_level
-        ComplexityMicroService.save @missing_info.nomis_offender_id, @missing_info.complexity_level
+        ComplexityMicroService.save @missing_info.nomis_offender_id, level: @missing_info.complexity_level, username: current_user, reason: nil
         if has_case_information?
           complete_journey
         else

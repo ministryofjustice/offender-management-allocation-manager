@@ -7,8 +7,8 @@ class ComplexityMicroService
       raise NotImplementedError, 'ComplexityMicroService#get_complexity'
     end
 
-    def save offender_no, value
-      raise NotImplementedError "ComplexityMicroService#save for #{offender_no} value #{value}"
+    def save offender_no, level:, username:, reason:
+      raise NotImplementedError "ComplexityMicroService#save for #{offender_no} Lev #{level} user #{username} reason #{reason}"
     end
   end
 end

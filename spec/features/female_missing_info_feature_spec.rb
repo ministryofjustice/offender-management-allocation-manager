@@ -23,7 +23,7 @@ feature "womens missing info journey" do
   context 'without any data' do
     before do
       allow(ComplexityMicroService).to receive(:get_complexity).with(prisoner_id).and_return(nil)
-      expect(ComplexityMicroService).to receive(:save).with(prisoner_id, 'low')
+      expect(ComplexityMicroService).to receive(:save).with(prisoner_id, level: 'low', username: 'MOIC_POM', reason: nil)
     end
 
     it 'has a happy path' do
@@ -80,7 +80,7 @@ feature "womens missing info journey" do
     before do
       allow(ComplexityMicroService).to receive(:get_complexity).with(prisoner_id).and_return(nil)
       create(:case_information, nomis_offender_id: prisoner_id)
-      expect(ComplexityMicroService).to receive(:save).with(prisoner_id, 'medium')
+      expect(ComplexityMicroService).to receive(:save).with(prisoner_id, level: 'medium', username: 'MOIC_POM', reason: nil)
 
       visit missing_information_prison_prisoners_path prison.code
       click_link 'Add missing details'
