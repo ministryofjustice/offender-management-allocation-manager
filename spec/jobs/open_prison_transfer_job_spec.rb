@@ -6,12 +6,12 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
   let(:nomis_offender_id) { 'G3462VT' }
   let(:determinate_nomis_offender) {
     build(:nomis_offender, offenderNo: nomis_offender_id,
-          latestLocationId: open_prison_code,
+          agencyId: open_prison_code,
           sentence: attributes_for(:sentence_detail, :handover_in_8_days))
   }
   let(:indeterminate_nomis_offender) {
     build(:nomis_offender, :indeterminate, offenderNo: nomis_offender_id,
-          latestLocationId: open_prison_code)
+          agencyId: open_prison_code)
   }
   # Default to a Determinate offender – change by setting this to `indeterminate_nomis_offender`
   let(:nomis_offender) { determinate_nomis_offender }
