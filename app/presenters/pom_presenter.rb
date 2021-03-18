@@ -1,39 +1,49 @@
 # frozen_string_literal: true
 
 class PomPresenter
-  delegate :working_pattern, :status, :probation_officer?, :prison_officer?, :staff_id, :first_name, :last_name, to: :@pom
+  delegate :working_pattern, :status, :probation_officer?, :prison_officer?, :staff_id,
+           :first_name, :last_name, :position_description, to: :@pom
 
   def initialize(pom)
     @pom = pom
-    offender_numbers = Prison.new(pom.agency_id).offenders.map(&:offender_no)
-    allocations = Allocation.active_pom_allocations(pom.staff_id, pom.agency_id).
-      where(nomis_offender_id: offender_numbers).
-      map(&:nomis_offender_id)
-    @allocation_counts = CaseInformation.where(nomis_offender_id: allocations).
-        group_by(&:tier)
+    @pom_allocated_offenders = pom_allocated_offenders
   end
 
   def tier_a
-    @allocation_counts.fetch('A', []).size
+    @pom_allocated_offenders.count { |o| o.tier == 'A' }
   end
 
   def tier_b
-    @allocation_counts.fetch('B', []).size
+    @pom_allocated_offenders.count { |o| o.tier == 'B' }
   end
 
   def tier_c
-    @allocation_counts.fetch('C', []).size
+    @pom_allocated_offenders.count { |o| o.tier == 'C' }
   end
 
   def tier_d
-    @allocation_counts.fetch('D', []).size
+    @pom_allocated_offenders.count { |o| o.tier == 'D' }
   end
 
   def no_tier
-    @allocation_counts.fetch('N/A', []).size
+    @pom_allocated_offenders.count { |o| o.tier == 'N/A' }
   end
 
   def total_cases
-    [tier_a, tier_b, tier_c, tier_d, no_tier].sum
+    @pom_allocated_offenders.count
+  end
+
+  def high_complexity_count
+    @pom_allocated_offenders.count { |o| o.complexity_level == 'high' }
+  end
+
+private
+
+  def pom_allocated_offenders
+    offenders_in_prison = Prison.new(@pom.agency_id).offenders
+    allocated_offender_ids = Allocation.active_pom_allocations(@pom.staff_id, @pom.agency_id).
+    where(nomis_offender_id: offenders_in_prison.map(&:offender_no)).pluck(:nomis_offender_id)
+
+    offenders_in_prison.select { |o| allocated_offender_ids.include?(o.offender_no) }
   end
 end

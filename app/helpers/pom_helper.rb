@@ -40,4 +40,9 @@ module PomHelper
       PrisonOffenderManagerService.get_pom_name(staff_id)
     "#{pom_secondname}, #{pom_firstname}"
   end
+
+  def status(pom)
+    # we are now displaying 'Available', instead of 'Active' which is stored in the database
+    pom.status == 'active' ? 'available' : pom.status
+  end
 end
