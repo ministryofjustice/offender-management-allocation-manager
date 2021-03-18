@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 feature 'feedback' do
-  it 'provides a link to the feedback form', vcr: { cassette_name: :feedback_link } do
+  it 'provides a link to the feedback form', vcr: { cassette_name: 'prison_api/feedback_link' } do
     signin_spo_user
 
     visit '/'

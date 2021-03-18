@@ -34,7 +34,7 @@ feature "view an offender's allocation information" do
     end
 
     it "displays 'Data not available'",
-       vcr: { cassette_name: :show_allocation_information_keyworker_not_assigned } do
+       vcr: { cassette_name: 'prison_api/show_allocation_information_keyworker_not_assigned' } do
       visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_without_keyworker)
 
       expect(page).to have_css('h1', text: 'Allocation information')
@@ -160,7 +160,7 @@ feature "view an offender's allocation information" do
         end
       end
 
-      it 'displays a link to the allocation history', vcr: { cassette_name: :show_allocation_information_history_link } do
+      it 'displays a link to the allocation history', vcr: { cassette_name: 'prison_api/show_allocation_information_history_link' } do
         table_row = page.find(:css, 'tr.govuk-table__row', text: 'Allocation history')
 
         within table_row do
@@ -169,13 +169,13 @@ feature "view an offender's allocation information" do
         end
       end
 
-      context 'without auto_delius_import enabled', vcr: { cassette_name: :allocation_auto_delius_off } do
+      context 'without auto_delius_import enabled', vcr: { cassette_name: 'prison_api/allocation_auto_delius_off' } do
         it 'displays change links' do
           expect(page).to have_content 'Change'
         end
       end
 
-      context 'with auto_delius_import enabled', vcr: { cassette_name: :allocation_auto_delius_on } do
+      context 'with auto_delius_import enabled', vcr: { cassette_name: 'prison_api/allocation_auto_delius_on' } do
         let(:test_strategy) { Flipflop::FeatureSet.current.test! }
 
         before do
@@ -199,7 +199,7 @@ feature "view an offender's allocation information" do
         visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_with_keyworker)
       end
 
-      it 'displays the name of the allocated co-worker', vcr: { cassette_name: :show_allocation_information_display_coworker_name } do
+      it 'displays the name of the allocated co-worker', vcr: { cassette_name: 'prison_api/show_allocation_information_display_coworker_name' } do
         allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id_with_keyworker)
 
         allocation.update!(event: Allocation::ALLOCATE_SECONDARY_POM,

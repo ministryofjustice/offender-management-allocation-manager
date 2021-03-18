@@ -10,13 +10,13 @@ describe PrisonOffenderManagerService do
 
   context 'when using T3 and VCR' do
     describe '#get_pom_name' do
-      it "can get staff names", vcr: { cassette_name: :pom_service_staff_name } do
+      it "can get staff names", vcr: { cassette_name: 'prison_api/pom_service_staff_name' } do
         expect(described_class.get_pom_name(staff_id)). to eq ['ANDRIEN', 'RICKETTS']
       end
     end
 
     describe '#get_user_name' do
-      it "can get user names", vcr: { cassette_name: :pom_service_user_name } do
+      it "can get user names", vcr: { cassette_name: 'prison_api/pom_service_user_name' } do
         expect(described_class.get_user_name('RJONES')).to eq ['Ross', 'Jones']
       end
     end
@@ -28,7 +28,7 @@ describe PrisonOffenderManagerService do
 
       let(:moic_integration_tests) { subject.detect { |x| x.first_name == 'MOIC' } }
 
-      it "can get a list of POMs", vcr: { cassette_name: :pom_service_get_poms_list } do
+      it "can get a list of POMs", vcr: { cassette_name: 'prison_api/pom_service_get_poms_list' } do
         expect(subject).to be_kind_of(Enumerable)
         expect(subject.count { |pom| pom.status == 'active' }).to eq(subject.count)
         expect(moic_integration_tests.probation_officer?).to eq(true)
@@ -37,7 +37,7 @@ describe PrisonOffenderManagerService do
 
     describe '#get_pom_names' do
       it "can get the names for POMs when given IDs",
-         vcr: { cassette_name: :pom_service_get_poms_by_ids } do
+         vcr: { cassette_name: 'prison_api/pom_service_get_poms_by_ids' } do
         names = described_class.get_pom_names('LEI')
         expect(names).to be_kind_of(Hash)
         expect(names.count).to be > 10
@@ -46,13 +46,13 @@ describe PrisonOffenderManagerService do
 
     describe '#get_pom_at' do
       it "can fetch a single POM for a prison",
-         vcr: { cassette_name: :pom_service_get_pom_ok } do
+         vcr: { cassette_name: 'prison_api/pom_service_get_pom_ok' } do
         pom = described_class.get_pom_at('LEI', staff_id)
         expect(pom).not_to be nil
       end
 
       it "raises an exception when fetching a pom if they are not a POM",
-         vcr: { cassette_name: :pom_service_get_pom_none } do
+         vcr: { cassette_name: 'prison_api/pom_service_get_pom_none' } do
         expect {
           described_class.get_pom_at('CFI', 1234)
         }.to raise_exception(StandardError)

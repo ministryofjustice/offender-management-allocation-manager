@@ -7,7 +7,7 @@ feature "get poms list" do
     signin_spo_user
   end
 
-  it "shows the page", vcr: { cassette_name: :show_poms_feature_list } do
+  it "shows the page", vcr: { cassette_name: 'prison_api/show_poms_feature_list' } do
     visit prison_poms_path('LEI')
 
     expect(page).to have_css(".govuk-table", count: 4)
@@ -16,7 +16,7 @@ feature "get poms list" do
     expect(page).to have_content("Probation POM")
   end
 
-  it "handles missing sentence data", vcr: { cassette_name: :show_poms_feature_missing_sentence } do
+  it "handles missing sentence data", vcr: { cassette_name: 'prison_api/show_poms_feature_missing_sentence' } do
     visit prison_confirm_allocation_path('LEI', offender_missing_sentence_case_info.nomis_offender_id, 485_926)
     click_button 'Complete allocation'
 
@@ -27,7 +27,7 @@ feature "get poms list" do
     expect(page).to have_content(offender_missing_sentence_case_info.nomis_offender_id)
   end
 
-  it "allows viewing a POM", vcr: { cassette_name: :show_poms_feature_view } do
+  it "allows viewing a POM", vcr: { cassette_name: 'prison_api/show_poms_feature_view' } do
     visit "/prisons/LEI/poms/485926"
 
     expect(page).to have_css(".govuk-button", count: 1)
@@ -35,7 +35,7 @@ feature "get poms list" do
     expect(page).to have_content("Caseload")
   end
 
-  it "can sort offenders allocated to a POM", vcr: { cassette_name: :show_poms_feature_view_sorting } do
+  it "can sort offenders allocated to a POM", vcr: { cassette_name: 'prison_api/show_poms_feature_view_sorting' } do
     [['G7806VO', 754_207], ['G2911GD', 1_175_317]].each do |offender_id, booking|
       create(:case_information, nomis_offender_id: offender_id)
       AllocationService.create_or_update(
@@ -77,7 +77,7 @@ feature "get poms list" do
     check_for_order.call(['Ahmonis, Imanjah', 'Abdoria, Ongmetain'])
   end
 
-  it "allows editing a POM", vcr: { cassette_name: :show_poms_feature_edit } do
+  it "allows editing a POM", vcr: { cassette_name: 'prison_api/show_poms_feature_edit' } do
     visit "/prisons/LEI/poms/485926/edit"
 
     expect(page).to have_css(".govuk-button", count: 1)

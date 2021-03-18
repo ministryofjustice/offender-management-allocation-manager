@@ -65,7 +65,7 @@ feature 'Search for offenders' do
     end
   end
 
-  it 'Can search from the dashboard', vcr: { cassette_name: :dashboard_search_feature } do
+  it 'Can search from the dashboard', vcr: { cassette_name: 'prison_api/dashboard_search_feature' } do
     signin_spo_user
     visit root_path
 
@@ -77,7 +77,7 @@ feature 'Search for offenders' do
     expect(page).to have_css('tbody tr', count: 6)
   end
 
-  it 'Can search from the Allocations summary page', vcr: { cassette_name: :allocated_search_feature } do
+  it 'Can search from the Allocations summary page', vcr: { cassette_name: 'prison_api/allocated_search_feature' } do
     signin_spo_user
     visit allocated_prison_prisoners_path(prison)
 
@@ -89,7 +89,7 @@ feature 'Search for offenders' do
     expect(page).to have_css('tbody tr', count: 9)
   end
 
-  it 'Can search from the Awaiting Allocation summary page', vcr: { cassette_name: :waiting_allocation_search_feature } do
+  it 'Can search from the Awaiting Allocation summary page', vcr: { cassette_name: 'prison_api/waiting_allocation_search_feature' } do
     signin_spo_user
     visit unallocated_prison_prisoners_path(prison)
 
@@ -101,7 +101,7 @@ feature 'Search for offenders' do
     expect(page).to have_css('tbody tr', count: 1)
   end
 
-  it 'Can search from the Missing Information summary page', vcr: { cassette_name: :missing_info_search_feature } do
+  it 'Can search from the Missing Information summary page', vcr: { cassette_name: 'prison_api/missing_info_search_feature' } do
     signin_spo_user
     visit  missing_information_prison_prisoners_path(prison)
 

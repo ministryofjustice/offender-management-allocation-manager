@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe OffenderService, type: :feature do
   describe '#get_offender' do
-    it "gets a single offender", vcr: { cassette_name: :offender_service_single_offender_spec } do
+    it "gets a single offender", vcr: { cassette_name: 'prison_api/offender_service_single_offender_spec' } do
       nomis_offender_id = 'G4273GI'
 
       create(:case_information, nomis_offender_id: nomis_offender_id, tier: 'C', case_allocation: 'CRC', welsh_offender: 'Yes')
@@ -15,7 +15,7 @@ describe OffenderService, type: :feature do
       expect(offender.case_allocation).to eq 'CRC'
     end
 
-    it "returns nil if offender record not found", vcr: { cassette_name: :offender_service_single_offender_not_found_spec } do
+    it "returns nil if offender record not found", vcr: { cassette_name: 'prison_api/offender_service_single_offender_not_found_spec' } do
       nomis_offender_id = 'AAA121212CV4G4GGVV'
 
       offender = described_class.get_offender(nomis_offender_id)
@@ -38,7 +38,7 @@ describe OffenderService, type: :feature do
                   offender_manager: nil,
                   service_provider: "NPS",
                   team_code: "N07UAT",
-                  tier: "A")
+                  tier: "A-2")
       end
     end
 

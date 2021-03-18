@@ -128,7 +128,7 @@ RSpec.describe Allocation, type: :model do
       end
     end
 
-    describe 'when an offender moves prison', :allocation, vcr: { cassette_name: :allocation_deallocate_offender }  do
+    describe 'when an offender moves prison', :allocation, vcr: { cassette_name: 'prison_api/allocation_deallocate_offender' }  do
       it 'removes the primary pom details in an Offender\'s allocation' do
         nomis_offender_id = 'G2911GD'
         create(:case_information, nomis_offender_id: nomis_offender_id)
@@ -159,7 +159,7 @@ RSpec.describe Allocation, type: :model do
       end
     end
 
-    describe 'when an offender gets released from prison', :allocation, vcr: { cassette_name: :allocation_deallocate_offender_released }  do
+    describe 'when an offender gets released from prison', :allocation, vcr: { cassette_name: 'prison_api/allocation_deallocate_offender_released' }  do
       it 'removes the primary pom details in an Offender\'s allocation' do
         nomis_offender_id = 'G2911GD'
         create(:case_information, nomis_offender_id: nomis_offender_id)

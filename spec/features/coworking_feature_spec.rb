@@ -35,7 +35,7 @@ feature 'Co-working' do
       )
     }
 
-    scenario 'show allocate a co-working POM page', vcr: { cassette_name: :show_allocate_coworking_page } do
+    scenario 'show allocate a co-working POM page', vcr: { cassette_name: 'prison_api/show_allocate_coworking_page' } do
       visit new_prison_coworking_path('LEI', nomis_offender_id)
 
       expect(page).to have_link 'Back', href: prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id)
@@ -61,7 +61,7 @@ feature 'Co-working' do
       expect(page).not_to have_content('unavailable POM')
     end
 
-    scenario 'show correct unavailable message', vcr: { cassette_name: :show_coworking_unavailable } do
+    scenario 'show correct unavailable message', vcr: { cassette_name: 'prison_api/show_coworking_unavailable' } do
       inactive_poms = [485_758, 485_833]
       inactive_texts = ['There is 1 unavailable POM for new allocation',
                         'There are 2 unavailable POMs for new allocation']
@@ -77,7 +77,7 @@ feature 'Co-working' do
       end
     end
 
-    scenario 'show confirm co-working POM allocation page', vcr: { cassette_name: :show_confirm_coworking_page } do
+    scenario 'show confirm co-working POM allocation page', vcr: { cassette_name: 'prison_api/show_confirm_coworking_page' } do
       visit prison_confirm_coworking_allocation_path(
         'LEI',
         nomis_offender_id, prison_pom[:staff_id], secondary_pom[:staff_id]
@@ -132,7 +132,7 @@ feature 'Co-working' do
       expect(page).to have_content "We will send a confirmation email to #{prison_pom[:email]}"
     end
 
-    scenario 'cancel removal of a co-working POM', vcr: { cassette_name: :coworking_pom_cancel } do
+    scenario 'cancel removal of a co-working POM', vcr: { cassette_name: 'prison_api/coworking_pom_cancel' } do
       visit prison_allocation_path('LEI', nomis_offender_id)
 
       within '#co-working-pom' do
@@ -145,7 +145,7 @@ feature 'Co-working' do
       expect(page).to have_current_path(prison_allocation_path('LEI', nomis_offender_id))
     end
 
-    scenario 'removing a co-working POM', vcr: { cassette_name: :coworking_pom_remove } do
+    scenario 'removing a co-working POM', vcr: { cassette_name: 'prison_api/coworking_pom_remove' } do
       visit prison_allocation_path('LEI', nomis_offender_id)
 
       within '#co-working-pom' do
@@ -185,7 +185,7 @@ feature 'Co-working' do
       )
     }
 
-    scenario 'allocating', vcr: { cassette_name: :coworking_with_another_pom } do
+    scenario 'allocating', vcr: { cassette_name: 'prison_api/coworking_with_another_pom' } do
       expect(allocation.secondary_pom_nomis_id).to eq(123456)
       visit prison_allocation_path('LEI', nomis_offender_id)
 

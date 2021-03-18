@@ -115,7 +115,7 @@ RSpec.describe StaffMember, type: :model do
     end
   end
 
-  describe '#full_name', vcr: { cassette_name: :staff_member_things } do
+  describe '#full_name', vcr: { cassette_name: 'prison_api/staff_member_things' } do
     let(:pom) { described_class.new(build(:prison), 485_846) }
 
     it 'gets the full name' do

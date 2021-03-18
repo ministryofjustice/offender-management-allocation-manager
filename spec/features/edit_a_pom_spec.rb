@@ -13,7 +13,7 @@ feature "edit a POM's details" do
     signin_spo_user
   end
 
-  it "setting unavailable shows selected on re-edit", vcr: { cassette_name: :edit_poms_unavailable_check } do
+  it "setting unavailable shows selected on re-edit", vcr: { cassette_name: 'prison_api/edit_poms_unavailable_check' } do
     visit edit_prison_pom_path('LEI', nomis_staff_id)
     expect(page).to have_css('h1', text: 'Edit profile')
 
@@ -27,7 +27,7 @@ feature "edit a POM's details" do
     expect(page).to have_field('status-conditional-2', checked: true)
   end
 
-  it "validates a POM when missing data", vcr: { cassette_name: :edit_poms_missing_check } do
+  it "validates a POM when missing data", vcr: { cassette_name: 'prison_api/edit_poms_missing_check' } do
     visit edit_prison_pom_path('LEI', fulltime_pom_id)
     expect(page).to have_css('h1', text: 'Edit profile')
 
@@ -42,7 +42,7 @@ feature "edit a POM's details" do
     expect(page).to have_content('Select number of days worked')
   end
 
-  it "makes an inactive POM active", vcr: { cassette_name: :edit_poms_activate_pom_feature } do
+  it "makes an inactive POM active", vcr: { cassette_name: 'prison_api/edit_poms_activate_pom_feature' } do
     visit "/prisons/LEI/poms#inactive"
     within('.probation_pom_row_0') do
       click_link 'View'
@@ -81,7 +81,7 @@ feature "edit a POM's details" do
           )
     end
 
-    it "de-allocates all a POM's cases", vcr: { cassette_name: :edit_poms_deactivate_pom_feature } do
+    it "de-allocates all a POM's cases", vcr: { cassette_name: 'prison_api/edit_poms_deactivate_pom_feature' } do
       visit "/prisons/LEI/poms/485926"
       click_link "Edit profile"
 

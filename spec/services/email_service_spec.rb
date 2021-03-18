@@ -77,13 +77,13 @@ RSpec.describe EmailService do
   }
 
   context 'when queueing', :queueing do
-    it "Can send an allocation email", vcr: { cassette_name: :email_service_send_allocation_email }  do
+    it "Can send an allocation email", vcr: { cassette_name: 'prison_api/email_service_send_allocation_email' }  do
       expect {
         described_class.instance(allocation: allocation, message: "", pom_nomis_id: allocation.primary_pom_nomis_id).send_email
       }.to change(enqueued_jobs, :size).by(1)
     end
 
-    it "Can not crash when a pom has no email", vcr: { cassette_name: :email_service_send_allocation_email }  do
+    it "Can not crash when a pom has no email", vcr: { cassette_name: 'prison_api/email_service_send_allocation_email' }  do
       allow(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:fetch_email_addresses).and_return([])
 
       expect {
@@ -91,7 +91,7 @@ RSpec.describe EmailService do
       }.to change(enqueued_jobs, :size).by(0)
     end
 
-    it "Can send a reallocation email", vcr: { cassette_name: :email_service_send_deallocation_email }  do
+    it "Can send a reallocation email", vcr: { cassette_name: 'prison_api/email_service_send_deallocation_email' }  do
       allow(reallocation).to receive(:get_old_versions).and_return([original_allocation])
 
       expect {
@@ -100,7 +100,7 @@ RSpec.describe EmailService do
     end
 
     it "Can send a co-working de-allocation email",
-       vcr: { cassette_name: :email_service_send_coworking_deallocation_email } do
+       vcr: { cassette_name: 'prison_api/email_service_send_coworking_deallocation_email' } do
       allow(original_allocation).to receive(:get_old_versions).and_return([coworking_allocation])
 
       expect {
@@ -112,7 +112,7 @@ RSpec.describe EmailService do
     end
 
     it "Can not crash when primary pom has no email when deallocating a co-working pom",
-       vcr: { cassette_name: :email_service_send_coworking_deallocation_email_no_pom_email } do
+       vcr: { cassette_name: 'prison_api/email_service_send_coworking_deallocation_email_no_pom_email' } do
       allow(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:fetch_email_addresses).and_return([])
 
       expect {
@@ -143,7 +143,7 @@ RSpec.describe EmailService do
       end
     end
 
-    it "Can send a reallocation email", vcr: { cassette_name: :email_service_reallocation_crash } do
+    it "Can send a reallocation email", vcr: { cassette_name: 'prison_api/email_service_reallocation_crash' } do
       expect(PomMailer).to receive(:deallocation_email).with(
         previous_pom_name: 'Leigh',
         responsibility: 'supporting',

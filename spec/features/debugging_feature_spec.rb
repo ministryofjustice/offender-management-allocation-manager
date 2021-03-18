@@ -8,7 +8,7 @@ feature 'Provide debugging information for our team to use' do
   end
 
   context 'when debugging an individual offender' do
-    it 'returns information for an unallocated offender', vcr: { cassette_name: :debugging_feature } do
+    it 'returns information for an unallocated offender', vcr: { cassette_name: 'prison_api/debugging_feature' } do
       visit prison_debugging_path('LEI')
 
       expect(page).to have_text('Debugging')
@@ -25,7 +25,7 @@ feature 'Provide debugging information for our team to use' do
       end
     end
 
-    it 'returns information for an allocated offender', vcr: { cassette_name: :debugging_allocated_offender_feature } do
+    it 'returns information for an allocated offender', vcr: { cassette_name: 'prison_api/debugging_allocated_offender_feature' } do
       create(:allocation,
              nomis_offender_id: nomis_offender_id,
              primary_pom_name: "Rossana Spinka"
@@ -51,7 +51,7 @@ feature 'Provide debugging information for our team to use' do
       end
     end
 
-    it 'can handle an incorrect offender number', vcr: { cassette_name: :debugging_incorrect_offender_feature } do
+    it 'can handle an incorrect offender number', vcr: { cassette_name: 'prison_api/debugging_incorrect_offender_feature' } do
       visit prison_debugging_path('LEI')
 
       expect(page).to have_text('Debugging')
@@ -61,7 +61,7 @@ feature 'Provide debugging information for our team to use' do
       expect(page).to have_content("No offender was found, please check the offender number and try again")
     end
 
-    it 'can handle no offender number being entered', vcr: { cassette_name: :debugging_no_offender_feature } do
+    it 'can handle no offender number being entered', vcr: { cassette_name: 'prison_api/debugging_no_offender_feature' } do
       visit prison_debugging_path('LEI')
 
       expect(page).to have_text('Debugging')
@@ -72,7 +72,7 @@ feature 'Provide debugging information for our team to use' do
     end
 
     context 'when offender does not have a sentence start date',
-            vcr: { cassette_name: :debugging_no_sentence_start_date_for_offender_feature } do
+            vcr: { cassette_name: 'prison_api/debugging_no_sentence_start_date_for_offender_feature' } do
       let(:non_sentenced_offender) do
         build(:offender, offenderNo: nomis_offender_id,
               imprisonmentStatus: 'SEC90',
@@ -110,7 +110,7 @@ feature 'Provide debugging information for our team to use' do
     end
   end
 
-  context 'when debugging at a prison level', vcr: { cassette_name: :debugging_prison_level } do
+  context 'when debugging at a prison level', vcr: { cassette_name: 'prison_api/debugging_prison_level' } do
     it 'displays a dashboard' do
       visit prison_debugging_prison_path('LEI')
 

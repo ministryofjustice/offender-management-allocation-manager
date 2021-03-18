@@ -10,7 +10,7 @@ feature 'Getting help' do
     expect(page).to have_button('Submit')
   end
 
-  it 'shows a pre-filled contact form when a user is signed in', vcr: { cassette_name: :help_logged_in } do
+  it 'shows a pre-filled contact form when a user is signed in', vcr: { cassette_name: 'prison_api/help_logged_in' } do
     signin_spo_user
     visit '/'
     click_link 'Contact us'

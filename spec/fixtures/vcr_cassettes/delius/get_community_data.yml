@@ -1,0 +1,107 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://community-api.test.delius.probation.hmpps.dsd.io/secure/offenders/nomsNumber/G0239GU/all
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.3.0
+      Authorization:
+      - authorisation_header
+  response:
+    status:
+      code: 200
+      message:
+    headers:
+      Date:
+      - Thu, 18 Mar 2021 08:52:29 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Request-Context:
+      - appId=cid-v1:0d5d6f09-1d07-47f5-9d3a-f9f473544e78
+      X-Content-Type-Options:
+      - nosniff
+      X-XSS-Protection:
+      - 1; mode=block
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Pragma:
+      - no-cache
+      Expires:
+      - '0'
+      X-Frame-Options:
+      - DENY
+      vary:
+      - accept-encoding
+    body:
+      encoding: UTF-8
+      string: '{"offenderId":2500423770,"firstName":"Izgyneing","surname":"Claytael","dateOfBirth":"1980-01-01","gender":"Male","otherIds":{"crn":"X362207","nomsNumber":"G0239GU"},"contactDetails":{},"offenderProfile":{"offenderLanguages":{},"previousConviction":{}},"offenderManagers":[{"trustOfficer":{"forenames":"Unallocated
+        Staff(N07)","surname":"Staff"},"staff":{"code":"N07UATU","forenames":"Unallocated
+        Staff(N07)","surname":"Staff","unallocated":true},"partitionArea":"National
+        Data","softDeleted":false,"team":{"code":"N07UAT","description":"Unallocated
+        Team(N07)","localDeliveryUnit":{"code":"N07NPSA","description":"N07 Division"},"district":{"code":"N07NPSA","description":"N07
+        Division"},"borough":{"code":"N07100","description":"N07 Cluster 1"}},"probationArea":{"code":"N07","description":"NPS
+        London","nps":true},"fromDate":"1900-01-01","active":true,"allocationReason":{"code":"IN1","description":"Initial
+        Allocation"}}],"softDeleted":false,"currentDisposal":"1","partitionArea":"National
+        Data","currentRestriction":false,"restrictionMessage":"This is a restricted
+        offender record. Please contact a system administrator","currentExclusion":false,"exclusionMessage":"You
+        are excluded from viewing this offender record. Please contact a system administrator","currentTier":"A-2","activeProbationManagedSentence":true}'
+  recorded_at: Thu, 18 Mar 2021 08:52:29 GMT
+- request:
+    method: get
+    uri: https://community-api.test.delius.probation.hmpps.dsd.io/secure/offenders/nomsNumber/G0239GU/registrations
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.3.0
+      Authorization:
+      - authorisation_header
+  response:
+    status:
+      code: 200
+      message:
+    headers:
+      Date:
+      - Thu, 18 Mar 2021 08:52:29 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Request-Context:
+      - appId=cid-v1:0d5d6f09-1d07-47f5-9d3a-f9f473544e78
+      X-Content-Type-Options:
+      - nosniff
+      X-XSS-Protection:
+      - 1; mode=block
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Pragma:
+      - no-cache
+      Expires:
+      - '0'
+      X-Frame-Options:
+      - DENY
+      vary:
+      - accept-encoding
+    body:
+      encoding: UTF-8
+      string: '{"registrations":[{"registrationId":2500128258,"offenderId":2500423770,"register":{"code":"5","description":"Public
+        Protection"},"type":{"code":"MAPP","description":"MAPPA"},"riskColour":"Red","startDate":"2020-10-30","nextReviewDate":"2021-01-30","reviewPeriodMonths":3,"notes":"Please
+        Note - Category 3 offenders require multi-agency management at Level 2 or
+        3 and should not be recorded at Level 1.","registeringTeam":{"code":"N07UAT","description":"Unallocated
+        Team(N07)"},"registeringOfficer":{"code":"N07A003","forenames":"Unallocate","surname":"Unallocate","unallocated":false},"registeringProbationArea":{"code":"N07","description":"NPS
+        London"},"registerLevel":{"code":"M2","description":"MAPPA Level 2"},"registerCategory":{"code":"M2","description":"MAPPA
+        Cat 2"},"warnUser":false,"active":true,"numberOfPreviousDeregistrations":0}]}'
+  recorded_at: Thu, 18 Mar 2021 08:52:29 GMT
+recorded_with: VCR 6.0.0

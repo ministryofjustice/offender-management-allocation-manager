@@ -6,7 +6,7 @@ feature 'Service Notification' do
   end
 
   it 'does not display service notification if none exist',
-     vcr: { cassette_name: :service_notifications_none_exist } do
+     vcr: { cassette_name: 'prison_api/service_notifications_none_exist' } do
     allow(ServiceNotificationsService).to receive(:notifications).and_return([])
 
     visit root_path
@@ -30,14 +30,14 @@ feature 'Service Notification' do
     end
 
     it 'does not display service notifications on static pages',
-       vcr: { cassette_name: :service_notifications_static_pages } do
+       vcr: { cassette_name: 'prison_api/service_notifications_static_pages' } do
       visit "/404"
 
       expect(page).not_to have_css('.service_banner')
     end
 
     it 'displays service notifications on dynamic pages',
-       vcr: { cassette_name: :service_notifications_dynamic_pages } do
+       vcr: { cassette_name: 'prison_api/service_notifications_dynamic_pages' } do
       visit root_path
 
       expect(page).to have_css('.service_banner')
@@ -46,7 +46,7 @@ feature 'Service Notification' do
 
     context 'when user clicks on close button', js: true do
       it 'permanently hides the notification',
-         vcr: { cassette_name: :service_notifications_close_button } do
+         vcr: { cassette_name: 'prison_api/service_notifications_close_button' } do
         visit root_path
 
         expect(page).to have_css('.service_banner')
