@@ -28,10 +28,11 @@
 
 # Ignore IDEs
 .idea/
+*.iml
 .vscode/
 
-# Ignore VCR cassettes
-/spec/fixtures/vcr_cassettes
+# Ignore Prison API / NOMIS VCR cassettes
+/spec/fixtures/vcr_cassettes/prison_api
 
 # Ignore VIM swap files
 *.swp

@@ -24,7 +24,7 @@ feature 'Allocation' do
     signin_spo_user
   end
 
-  scenario 'accepting a recommended allocation', vcr: { cassette_name: :create_new_allocation_feature } do
+  scenario 'accepting a recommended allocation', vcr: { cassette_name: 'prison_api/create_new_allocation_feature' } do
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
     expect(page).to have_content('Determinate')
@@ -44,7 +44,7 @@ feature 'Allocation' do
     expect(page).to have_css('.notification', text: "#{offender_name} has been allocated to Moic Integration-Tests (Probation POM)")
   end
 
-  scenario 'overriding an allocation', vcr: { cassette_name: :override_allocation_feature_ok } do
+  scenario 'overriding an allocation', vcr: { cassette_name: 'prison_api/override_allocation_feature_ok' } do
     # This is Amit's staff_id - he is top of the Prison POM list
     override_nomis_staff_id = 485_787
 
@@ -73,7 +73,7 @@ feature 'Allocation' do
     expect(Override.count).to eq(0)
   end
 
-  scenario 'overriding an allocation can validate missing reasons', vcr: { cassette_name: :override_allocation_feature_validate_reasons } do
+  scenario 'overriding an allocation can validate missing reasons', vcr: { cassette_name: 'prison_api/override_allocation_feature_validate_reasons' } do
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
     find('.govuk-details__summary-text').click
@@ -89,7 +89,7 @@ feature 'Allocation' do
     expect(Override.count).to eq(0)
   end
 
-  scenario 'overriding an allocation can validate missing Other detail', vcr: { cassette_name: :override_allocation_feature_validate_other } do
+  scenario 'overriding an allocation can validate missing Other detail', vcr: { cassette_name: 'prison_api/override_allocation_feature_validate_other' } do
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
     find('.govuk-details__summary-text').click
@@ -106,7 +106,7 @@ feature 'Allocation' do
     expect(Override.count).to eq(0)
   end
 
-  scenario 'overriding an allocation can validate missing suitability detail', vcr: { cassette_name: :override_suitability_allocation_feature } do
+  scenario 'overriding an allocation can validate missing suitability detail', vcr: { cassette_name: 'prison_api/override_suitability_allocation_feature' } do
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
     find('.govuk-details__summary-text').click
@@ -123,7 +123,7 @@ feature 'Allocation' do
     expect(Override.count).to eq(0)
   end
 
-  scenario 'overriding an allocation can validate the reason text area character limit', vcr: { cassette_name: :override_allocation__character_count_feature } do
+  scenario 'overriding an allocation can validate the reason text area character limit', vcr: { cassette_name: 'prison_api/override_allocation__character_count_feature' } do
     visit new_prison_allocation_path('LEI', nomis_offender_id)
 
     find('.govuk-details__summary-text').click
@@ -140,7 +140,7 @@ feature 'Allocation' do
     expect(page).to have_content('This reason cannot be more than 175 characters')
   end
 
-  scenario 're-allocating', vcr: { cassette_name: :re_allocate_feature } do
+  scenario 're-allocating', vcr: { cassette_name: 'prison_api/re_allocate_feature' } do
     create(
       :allocation,
       nomis_offender_id: nomis_offender_id,
@@ -176,7 +176,7 @@ feature 'Allocation' do
     expect(Allocation.find_by(nomis_offender_id: nomis_offender_id).event).to eq("reallocate_primary_pom")
   end
 
-  scenario 'allocation fails', vcr: { cassette_name: :allocation_fails_feature } do
+  scenario 'allocation fails', vcr: { cassette_name: 'prison_api/allocation_fails_feature' } do
     expect(AllocationService).to receive(:create_or_update).and_return(false)
 
     visit new_prison_allocation_path('LEI', nomis_offender_id)
@@ -195,7 +195,7 @@ feature 'Allocation' do
     )
   end
 
-  scenario 'cannot reallocate a non-allocated offender', vcr: { cassette_name: :allocation_attempt_bad_reallocate } do
+  scenario 'cannot reallocate a non-allocated offender', vcr: { cassette_name: 'prison_api/allocation_attempt_bad_reallocate' } do
     visit edit_prison_allocation_path('LEI', never_allocated_offender)
     expect(page).to have_current_path new_prison_allocation_path('LEI', never_allocated_offender)
   end
@@ -205,7 +205,7 @@ feature 'Allocation' do
       create(:responsibility, nomis_offender_id: never_allocated_offender)
     end
 
-    scenario 'removing a community override', vcr: { cassette_name: :allocation_remove_community_override } do
+    scenario 'removing a community override', vcr: { cassette_name: 'prison_api/allocation_remove_community_override' } do
       visit prison_dashboard_index_path('LEI')
 
       click_link 'Make new allocations'

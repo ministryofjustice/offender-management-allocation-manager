@@ -10,7 +10,7 @@ feature 'Responsibility override' do
   let(:offender_id) { 'G8060UF' }
   let(:pom_id) { 485_926 }
 
-  context 'when overriding responsibility', vcr: { cassette_name: :override_responsibility } do
+  context 'when overriding responsibility', vcr: { cassette_name: 'prison_api/override_responsibility' } do
     before do
       ldu = create(:local_divisional_unit, email_address: 'ldu@test.com')
       team = create(:team, local_divisional_unit: ldu)
@@ -83,7 +83,7 @@ feature 'Responsibility override' do
     end
   end
 
-  context "when override isn't possible due to email address is nil", vcr: { cassette_name: :cant_override_responsibility_nil_email } do
+  context "when override isn't possible due to email address is nil", vcr: { cassette_name: 'prison_api/cant_override_responsibility_nil_email' } do
     before do
       ldu = create(:local_divisional_unit, email_address: nil)
       team = create(:team, local_divisional_unit: ldu)
@@ -101,7 +101,7 @@ feature 'Responsibility override' do
     end
   end
 
-  context "when override isn't possible due to email address is an empty string", vcr: { cassette_name: :cant_override_responsibility_blank_email } do
+  context "when override isn't possible due to email address is an empty string", vcr: { cassette_name: 'prison_api/cant_override_responsibility_blank_email' } do
     before do
       ldu = create(:local_divisional_unit, email_address: "")
       team = create(:team, local_divisional_unit: ldu)

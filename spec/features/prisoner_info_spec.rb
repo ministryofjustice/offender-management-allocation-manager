@@ -6,7 +6,7 @@ feature 'View a prisoner profile page' do
   end
 
   context 'without allocation or case information' do
-    it 'doesnt crash', vcr: { cassette_name: :show_unallocated_offender } do
+    it 'doesnt crash', vcr: { cassette_name: 'prison_api/show_unallocated_offender' } do
       visit prison_prisoner_path('LEI', 'G7998GJ')
 
       expect(page).to have_css('h1', text: 'Ahmonis, Okadonah')
@@ -17,7 +17,7 @@ feature 'View a prisoner profile page' do
     end
   end
 
-  context 'with an existing early allocation', vcr: { cassette_name: :early_allocation_banner } do
+  context 'with an existing early allocation', vcr: { cassette_name: 'prison_api/early_allocation_banner' } do
     before do
       create(:case_information, nomis_offender_id: 'G7998GJ', early_allocations: [build(:early_allocation, created_within_referral_window: within_window)])
       visit prison_prisoner_path('LEI', 'G7998GJ')
@@ -49,7 +49,7 @@ feature 'View a prisoner profile page' do
     let(:allocation) { Allocation.last }
     let(:initial_vlo) { VictimLiaisonOfficer.last }
 
-    context 'without anything extra', vcr: { cassette_name: :show_offender_spec }  do
+    context 'without anything extra', vcr: { cassette_name: 'prison_api/show_offender_spec' }  do
       before do
         visit prison_prisoner_path('LEI', 'G7998GJ')
       end
@@ -129,18 +129,18 @@ feature 'View a prisoner profile page' do
         expect(pom_name).to eq('Pobee-Norris, Kath')
       end
 
-      it 'shows the prisoner image', vcr: { cassette_name: :show_offender_spec_image } do
+      it 'shows the prisoner image', vcr: { cassette_name: 'prison_api/show_offender_spec_image' } do
         visit prison_prisoner_image_path('LEI', 'G7998GJ', format: :jpg)
         expect(page.response_headers['Content-Type']).to eq('image/jpg')
       end
 
-      it "has a link to the allocation history", vcr: { cassette_name: :link_to_allocation_history } do
+      it "has a link to the allocation history", vcr: { cassette_name: 'prison_api/link_to_allocation_history' } do
         visit prison_prisoner_path('LEI', 'G7998GJ')
         click_link "View"
         expect(page).to have_content('Prisoner allocated')
       end
 
-      it 'displays the non-disclosable badge on the VLO table', vcr: { cassette_name: :vlo_non_disclosable_badge } do
+      it 'displays the non-disclosable badge on the VLO table', vcr: { cassette_name: 'prison_api/vlo_non_disclosable_badge' } do
         visit prison_prisoner_path('LEI', 'G7998GJ')
         expect(page).to have_css('#non-disclosable-badge', text: 'Non-Disclosable')
       end
@@ -151,7 +151,7 @@ feature 'View a prisoner profile page' do
         create(:responsibility, nomis_offender_id: 'G7998GJ')
       end
 
-      it 'shows an overridden responsibility', vcr: { cassette_name: :show_offender_with_override_spec } do
+      it 'shows an overridden responsibility', vcr: { cassette_name: 'prison_api/show_offender_with_override_spec' } do
         visit prison_prisoner_path('LEI', 'G7998GJ')
 
         expect(page).to have_content('Supporting')
@@ -172,7 +172,7 @@ feature 'View a prisoner profile page' do
         )
       end
 
-      it "has community information", vcr: { cassette_name: :show_offender_community_info_full } do
+      it "has community information", vcr: { cassette_name: 'prison_api/show_offender_community_info_full' } do
         visit prison_prisoner_path('LEI', 'G7998GJ')
 
         expect(page).to have_content(ldu.name)
@@ -194,7 +194,7 @@ feature 'View a prisoner profile page' do
         visit prison_prisoner_path('LEI', 'G7998GJ')
       end
 
-      it "displays team and LDU as unknown", :js, vcr: { cassette_name: :show_offender_community_info_partial } do
+      it "displays team and LDU as unknown", :js, vcr: { cassette_name: 'prison_api/show_offender_community_info_partial' } do
         # Expect an Unknown for LDU Email and Team
         within '#community_information' do
           expect(page).to have_content('Unknown', count: 2)
@@ -204,7 +204,7 @@ feature 'View a prisoner profile page' do
   end
 
   context 'when offender does not have a sentence start date',
-          vcr: { cassette_name: :no_sentence_start_date_for_offender } do
+          vcr: { cassette_name: 'prison_api/no_sentence_start_date_for_offender' } do
     let(:non_sentenced_offender) do
       build(:offender, offenderNo: 'G7998GJ',
             imprisonmentStatus: 'SEC90',

@@ -2,7 +2,7 @@ require 'rails_helper'
 
 feature 'Help' do
   context 'when accessing help page' do
-    it 'provides a link to the help pages', vcr: { cassette_name: :help_link } do
+    it 'provides a link to the help pages', vcr: { cassette_name: 'prison_api/help_link' } do
       signin_spo_user
 
       visit '/'
@@ -11,7 +11,7 @@ feature 'Help' do
   end
 
   context 'when visiting help page' do
-    it 'has links to help topics', vcr: { cassette_name: :help_page } do
+    it 'has links to help topics', vcr: { cassette_name: 'prison_api/help_page' } do
       visit '/help'
 
       help_topics = [
@@ -38,7 +38,7 @@ feature 'Help' do
       visit '/help_step0'
     end
 
-    scenario 'getting set up pages', vcr: { cassette_name: :help_getting_set_up_pages } do
+    scenario 'getting set up pages', vcr: { cassette_name: 'prison_api/help_getting_set_up_pages' } do
       help_links = [
           ['List everyone using the service', 'help_step1'],
           ['Set up access in Digital Prison Services', 'help_step2'],
@@ -71,7 +71,7 @@ feature 'Help' do
       end
     end
 
-    scenario 'help getting set up step_1 page', vcr: { cassette_name: :help_getting_set_up_step_1 } do
+    scenario 'help getting set up step_1 page', vcr: { cassette_name: 'prison_api/help_getting_set_up_step_1' } do
       title = 'List everyone using the service'
 
       click_link(title)
@@ -84,7 +84,7 @@ feature 'Help' do
       expect(page).to have_link('Task 2: Set up access in Digital Prison Services', href: 'help_step2')
     end
 
-    scenario 'help getting set up step_2 page', vcr: { cassette_name: :help_getting_set_up_step_2 } do
+    scenario 'help getting set up step_2 page', vcr: { cassette_name: 'prison_api/help_getting_set_up_step_2' } do
       title = 'Set up access in Digital Prison Services'
 
       click_link(title)
@@ -93,7 +93,7 @@ feature 'Help' do
       expect(page).to have_css('.govuk-inset-text', text: inset_text[:LSA])
     end
 
-    scenario 'help getting set up step_3 page', vcr: { cassette_name: :help_getting_set_up_step_3 } do
+    scenario 'help getting set up step_3 page', vcr: { cassette_name: 'prison_api/help_getting_set_up_step_3' } do
       title = 'Set up POMs in NOMIS'
 
       click_link(title)
@@ -110,7 +110,7 @@ feature 'Help' do
       end
     end
 
-    scenario 'help getting set up step_4 page', vcr: { cassette_name: :help_getting_set_up_step_4 } do
+    scenario 'help getting set up step_4 page', vcr: { cassette_name: 'prison_api/help_getting_set_up_step_4' } do
       title = 'Update POM profiles'
 
       click_link(title)
@@ -121,7 +121,7 @@ feature 'Help' do
       expect(page).to have_link('https://moic.service.justice.gov.uk')
     end
 
-    scenario 'help getting set up step_5 page', vcr: { cassette_name: :help_getting_set_up_step_5 } do
+    scenario 'help getting set up step_5 page', vcr: { cassette_name: 'prison_api/help_getting_set_up_step_5' } do
       title = 'Update prisoner information'
 
       click_link(title)
@@ -133,7 +133,7 @@ feature 'Help' do
       expect(page).to have_link('Home', href: '/')
     end
 
-    scenario 'help getting set up step_6 page', vcr: { cassette_name: :help_getting_set_up_step_6 } do
+    scenario 'help getting set up step_6 page', vcr: { cassette_name: 'prison_api/help_getting_set_up_step_6' } do
       title = 'Start making allocations'
 
       click_link(title)
@@ -149,12 +149,12 @@ feature 'Help' do
       visit update_case_information_path
     end
 
-    scenario 'help updating case information overview', vcr: { cassette_name: :help_update_case_info_overview } do
+    scenario 'help updating case information overview', vcr: { cassette_name: 'prison_api/help_update_case_info_overview' } do
       expect(page).to have_css('h1', text: 'Overview')
       expect(page).to have_link('Updating nDelius', href: updating_ndelius_path)
     end
 
-    scenario 'help updating nDelius', vcr: { cassette_name: :help_update_ndelius } do
+    scenario 'help updating nDelius', vcr: { cassette_name: 'prison_api/help_update_ndelius' } do
       title = 'Updating nDelius'
 
       click_link(title)
@@ -172,7 +172,7 @@ feature 'Help' do
       visit missing_cases_path
     end
 
-    scenario 'help when no POM allocation needed', vcr: { cassette_name: :help_missing_case_no_pom_allocation } do
+    scenario 'help when no POM allocation needed', vcr: { cassette_name: 'prison_api/help_missing_case_no_pom_allocation' } do
       expect(page).to have_link('Repatriated cases', href: repatriated_path)
       expect(page).to have_link('Scottish and Northern Irish prisoners', href: scottish_northern_irish_path)
       expect(page).to have_css('h1', text: 'No POM allocation needed')
@@ -180,7 +180,7 @@ feature 'Help' do
       expect(page).to have_link('Contact us', href: contact_us_path)
     end
 
-    scenario 'help with repatriated cases', vcr: { cassette_name: :help_with_repatriated_cases } do
+    scenario 'help with repatriated cases', vcr: { cassette_name: 'prison_api/help_with_repatriated_cases' } do
       title = 'Repatriated cases'
 
       click_link(title)
@@ -189,7 +189,7 @@ feature 'Help' do
       expect(page).to have_css('h1', text: title)
     end
 
-    scenario 'help with scottish/irish prisoners', vcr: { cassette_name: :help_with_scottish_irish } do
+    scenario 'help with scottish/irish prisoners', vcr: { cassette_name: 'prison_api/help_with_scottish_irish' } do
       title = 'Scottish and Northern Irish prisoners'
 
       click_link(title)

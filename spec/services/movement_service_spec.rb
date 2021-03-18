@@ -6,7 +6,7 @@ describe MovementService, type: :feature do
   let(:transfer_out) { build(:movement, offenderNo: 'G4273GI', directionCode: 'OUT', movementType: 'TRN')   }
 
   it "can get recent movements",
-     vcr: { cassette_name: :movement_service_recent_spec }  do
+     vcr: { cassette_name: 'prison_api/movement_service_recent_spec' }  do
     movements = described_class.movements_on(Date.iso8601('2019-02-20'))
     expect(movements).to be_kind_of(Array)
     expect(movements.length).to eq(2)
@@ -14,19 +14,19 @@ describe MovementService, type: :feature do
   end
 
   it "can ignore movements OUT",
-     vcr: { cassette_name: :movement_service_ignore_out_spec }  do
+     vcr: { cassette_name: 'prison_api/movement_service_ignore_out_spec' }  do
     processed = described_class.process_movement(transfer_out)
     expect(processed).to be false
   end
 
   it "can ignore new offenders arriving at prison when from_agency is outside the prison estate",
-     vcr: { cassette_name: :movement_service_ignore_new__from_court_spec }  do
+     vcr: { cassette_name: 'prison_api/movement_service_ignore_new__from_court_spec' }  do
     processed = described_class.process_movement(new_offender_court)
     expect(processed).to be false
   end
 
   it "can ignore new offenders arriving at prison when from_agency is nil",
-     vcr: { cassette_name: :movement_service_ignore_new_from_nil_spec }  do
+     vcr: { cassette_name: 'prison_api/movement_service_ignore_new_from_nil_spec' }  do
     processed = described_class.process_movement(new_offender_nil)
     expect(processed).to be false
   end
@@ -40,7 +40,7 @@ describe MovementService, type: :feature do
     let(:existing_alloc_transfer) { build(:movement, offenderNo: 'G4273GI', fromAgency: 'PRI', toAgency: 'LEI')   }
 
     it "can process transfers were offender already allocated at new prison",
-       vcr: { cassette_name: :movement_service_transfer_in_existing_spec }  do
+       vcr: { cassette_name: 'prison_api/movement_service_transfer_in_existing_spec' }  do
       expect(existing_allocation.prison).to eq('LEI')
       processed = described_class.process_movement(existing_alloc_transfer)
       expect(processed).to be false
@@ -51,7 +51,7 @@ describe MovementService, type: :feature do
       let(:updated_allocation) { existing_allocation.reload }
 
       it "can process transfer movements IN",
-         vcr: { cassette_name: :movement_service_transfer_in_spec }  do
+         vcr: { cassette_name: 'prison_api/movement_service_transfer_in_spec' }  do
         expect(described_class.process_movement(transfer_adm)).to eq(true)
 
         expect(updated_allocation.event).to eq 'deallocate_primary_pom'
@@ -61,13 +61,13 @@ describe MovementService, type: :feature do
     end
 
     it "can process a movement with invalid 'to' agency",
-       vcr: { cassette_name: :movement_service_transfer_in_spec }  do
+       vcr: { cassette_name: 'prison_api/movement_service_transfer_in_spec' }  do
       processed = described_class.process_movement(transfer_adm_no_to_agency)
       expect(processed).to be false
     end
 
     it "can starts an open prison transfer",
-       vcr: { cassette_name: :movement_service_transfer_to_open_spec }  do
+       vcr: { cassette_name: 'prison_api/movement_service_transfer_to_open_spec' }  do
       open_prison_transfer = build(:movement, offenderNo: 'G4273GI', toAgency: 'HDI')
 
       processed = described_class.process_movement(open_prison_transfer)
@@ -75,7 +75,7 @@ describe MovementService, type: :feature do
     end
 
     it "can do an open prison transfer with an inactive allocation",
-       vcr: { cassette_name: :movement_service_transfer_to_open_spec }  do
+       vcr: { cassette_name: 'prison_api/movement_service_transfer_to_open_spec' }  do
       open_prison_transfer = build(:movement, offenderNo: 'G4273GI', toAgency: 'HDI')
 
       existing_allocation.dealloate_offender_after_transfer
@@ -84,13 +84,13 @@ describe MovementService, type: :feature do
     end
 
     it "can process a movement with no 'to' agency",
-       vcr: { cassette_name: :movement_service_admission_in_spec }  do
+       vcr: { cassette_name: 'prison_api/movement_service_admission_in_spec' }  do
       processed = described_class.process_movement(admission)
       expect(processed).to be false
     end
 
     it "will not process offenders on remand",
-       vcr: { cassette_name: :movement_service_transfer_in__not_convicted_spec }  do
+       vcr: { cassette_name: 'prison_api/movement_service_transfer_in__not_convicted_spec' }  do
       # Originally we did not want to process non-convicted offenders, so offenders on remand
       # who were moved were not de-allocated (as they should never have been allocated).  This
       # optimisation has come back to bite us as it is entirely possible someone who is allocated
@@ -101,7 +101,7 @@ describe MovementService, type: :feature do
     end
 
     it "will ignore an unknown movement type",
-       vcr: { cassette_name: :movement_service_unknown_spec }  do
+       vcr: { cassette_name: 'prison_api/movement_service_unknown_spec' }  do
       unknown_movement_type = build(:movement, offenderNo: 'G4273GI', movementType: 'TMP')
       processed = described_class.process_movement(unknown_movement_type)
       expect(processed).to be false
@@ -127,7 +127,7 @@ describe MovementService, type: :feature do
                     .and_call_original
       end
 
-      it "can process release movements", vcr: { cassette_name: :movement_service_process_release_spec }  do
+      it "can process release movements", vcr: { cassette_name: 'prison_api/movement_service_process_release_spec' }  do
         processed = described_class.process_movement(valid_release)
         updated_allocation = Allocation.find_by(nomis_offender_id: valid_release.offender_no)
 
@@ -138,7 +138,7 @@ describe MovementService, type: :feature do
       end
 
       it "can do an open prison release with an inactive allocation",
-         vcr: { cassette_name: :movement_service_process_release_spec }  do
+         vcr: { cassette_name: 'prison_api/movement_service_process_release_spec' }  do
         allocation.deallocate_offender_after_release
         processed = described_class.process_movement(valid_release)
 
@@ -150,7 +150,7 @@ describe MovementService, type: :feature do
       let(:invalid_release1) { build(:movement, offenderNo: 'G4273GI', directionCode: 'OUT', movementType: 'REL', toAgency: 'LEI')   }
       let(:invalid_release2) { build(:movement, offenderNo: 'G4273GI', directionCode: 'OUT', movementType: 'REL', fromAgency: 'COURT')   }
 
-      it "can ignore invalid release movements", vcr: { cassette_name: :movement_service_process_release_invalid_spec }  do
+      it "can ignore invalid release movements", vcr: { cassette_name: 'prison_api/movement_service_process_release_invalid_spec' }  do
         processed = described_class.process_movement(invalid_release1)
         expect(processed).to be false
 
@@ -183,7 +183,7 @@ describe MovementService, type: :feature do
           let(:direction_code) { 'IN' }
 
           it 'does not process movement',
-             vcr: { cassette_name: :immigration_transfer_from_MHI_to_prison_not_successful } do
+             vcr: { cassette_name: 'prison_api/immigration_transfer_from_MHI_to_prison_not_successful' } do
             processed = described_class.process_movement(immigration_movement)
             expect(processed).to be false
           end
@@ -196,7 +196,7 @@ describe MovementService, type: :feature do
           let(:direction_code) { 'IN' }
 
           it 'can process release movement for offender',
-             vcr: { cassette_name: :immigration_transfer_from_MHI_to_IMM_successful } do
+             vcr: { cassette_name: 'prison_api/immigration_transfer_from_MHI_to_IMM_successful' } do
             processed = described_class.process_movement(immigration_movement)
 
             expect(CaseInformationService.get_case_information([immigration_movement.offender_no])).to be_empty
@@ -212,7 +212,7 @@ describe MovementService, type: :feature do
           let(:direction_code) { 'IN' }
 
           it 'can process release movement for offender',
-             vcr: { cassette_name: :immigration_transfer_from_prison_to_IMM_successful } do
+             vcr: { cassette_name: 'prison_api/immigration_transfer_from_prison_to_IMM_successful' } do
             processed = described_class.process_movement(immigration_movement)
 
             expect(CaseInformationService.get_case_information([immigration_movement.offender_no])).to be_empty
@@ -230,7 +230,7 @@ describe MovementService, type: :feature do
           let(:direction_code) { 'IN' }
 
           it 'does not process movement',
-             vcr: { cassette_name: :immigration_transfer_from_IMM_to_prison_not_successful } do
+             vcr: { cassette_name: 'prison_api/immigration_transfer_from_IMM_to_prison_not_successful' } do
             processed = described_class.process_movement(immigration_movement)
             expect(processed).to be false
           end
@@ -243,7 +243,7 @@ describe MovementService, type: :feature do
           let(:direction_code) { 'IN' }
 
           it 'can process release movement for offender',
-             vcr: { cassette_name: :immigration_transfer_from_IMM_to_MHI_successful } do
+             vcr: { cassette_name: 'prison_api/immigration_transfer_from_IMM_to_MHI_successful' } do
             processed = described_class.process_movement(immigration_movement)
 
             expect(CaseInformationService.get_case_information([immigration_movement.offender_no])).to be_empty
@@ -263,7 +263,7 @@ describe MovementService, type: :feature do
           let(:direction_code) { 'OUT' }
 
           it 'can release movement',
-             vcr: { cassette_name: :immigration_release_from_MHI_to_OUT_successful } do
+             vcr: { cassette_name: 'prison_api/immigration_release_from_MHI_to_OUT_successful' } do
             processed = described_class.process_movement(immigration_movement)
 
             expect(CaseInformationService.get_case_information([immigration_movement.offender_no])).to be_empty
@@ -279,7 +279,7 @@ describe MovementService, type: :feature do
           let(:direction_code) { 'OUT' }
 
           it 'can release movement',
-             vcr: { cassette_name: :immigration_release_from_IMM_to_OUT_successful } do
+             vcr: { cassette_name: 'prison_api/immigration_release_from_IMM_to_OUT_successful' } do
             processed = described_class.process_movement(immigration_movement)
 
             expect(CaseInformationService.get_case_information([immigration_movement.offender_no])).to be_empty

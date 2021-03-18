@@ -35,7 +35,7 @@ feature 'Allocation History' do
   let(:ci) { create(:case_information, nomis_offender_id: 'G4273GI') }
   let(:nomis_offender_id) { ci.nomis_offender_id }
 
-  describe 'offender allocation history', vcr: { cassette_name: :offender_allocation_history } do
+  describe 'offender allocation history', vcr: { cassette_name: 'prison_api/offender_allocation_history' } do
     shared_context 'when on the allocation history page' do
       before do
         allocation = create(

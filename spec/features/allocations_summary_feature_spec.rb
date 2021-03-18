@@ -8,12 +8,12 @@ feature 'summary summary feature' do
   end
 
   describe 'awaiting summary table' do
-    it 'redirects correctly', vcr: { cassette_name: :redirect_summary_index_feature } do
+    it 'redirects correctly', vcr: { cassette_name: 'prison_api/redirect_summary_index_feature' } do
       visit summary_prison_prisoners_path('LEI')
       expect(page).to have_current_path allocated_prison_prisoners_path('LEI')
     end
 
-    it 'displays offenders awaiting information', vcr: { cassette_name: :awaiting_information_feature } do
+    it 'displays offenders awaiting information', vcr: { cassette_name: 'prison_api/awaiting_information_feature' } do
       visit missing_information_prison_prisoners_path('LEI')
 
       expect(page).to have_css('.moj-sub-navigation__item')
@@ -21,7 +21,7 @@ feature 'summary summary feature' do
       expect(page).to have_css('.pagination ul.links li', count: 16)
     end
 
-    it 'displays offenders pending allocation', vcr: { cassette_name: :awaiting_allocation_feature } do
+    it 'displays offenders pending allocation', vcr: { cassette_name: 'prison_api/awaiting_allocation_feature' } do
       visit unallocated_prison_prisoners_path('LEI')
 
       expect(page).to have_css('.moj-sub-navigation__item')
@@ -43,7 +43,7 @@ feature 'summary summary feature' do
         end
       end
 
-      it 'displays offenders already allocated', vcr: { cassette_name: :allocated_offenders_feature } do
+      it 'displays offenders already allocated', vcr: { cassette_name: 'prison_api/allocated_offenders_feature' } do
         visit allocated_prison_prisoners_path('LEI')
         expect(page).to have_css('.moj-sub-navigation__item')
         expect(page).to have_content('See allocations')
@@ -62,14 +62,14 @@ feature 'summary summary feature' do
       end
     end
 
-    it 'displays offenders just arrived allocated', vcr: { cassette_name: :new_offenders_feature } do
+    it 'displays offenders just arrived allocated', vcr: { cassette_name: 'prison_api/new_offenders_feature' } do
       visit new_arrivals_prison_prisoners_path('LEI')
 
       expect(page).to have_css('.moj-sub-navigation__item')
       expect(page).to have_content('Newly arrived')
     end
 
-    it 'displays offenders approaching their handover date', vcr: { cassette_name: :approaching_handover_feature } do
+    it 'displays offenders approaching their handover date', vcr: { cassette_name: 'prison_api/approaching_handover_feature' } do
       visit prison_handovers_path('LEI')
 
       expect(page).to have_css('.moj-sub-navigation__item')

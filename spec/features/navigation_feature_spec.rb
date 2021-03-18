@@ -7,7 +7,7 @@ feature 'Navigation' do
 
   # This is a legitimate VCR test - we really don't care how/if the various
   # APIs are called in this test
-  describe 'navigation menus', vcr: { cassette_name: :navigation_menus } do
+  describe 'navigation menus', vcr: { cassette_name: 'prison_api/navigation_menus' } do
     context 'with an SPO user' do
       before do
         signin_spo_user
@@ -50,7 +50,7 @@ feature 'Navigation' do
     end
   end
 
-  context 'with a POM/SPO user', vcr: { cassette_name: :navigation_pom_spo_things } do
+  context 'with a POM/SPO user', vcr: { cassette_name: 'prison_api/navigation_pom_spo_things' } do
     before do
       signin_spo_pom_user
       visit prison_dashboard_index_path(prison.code)
