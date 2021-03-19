@@ -28,13 +28,12 @@
 
 ---
 notifications:
-  - id: early-allocations-release
-    start_date: 11/02/2021
-    end_date: 21/02/2021 # 10 days
+  - id: user-research-request-03-2021
+    start_date: 19/03/2021
+    end_date: 02/04/2021
     role:
       - POM
       - SPO
-    text: >-
-      <span class="moj-badge moj-badge--blue govuk-!-margin-right-2">NEW FEATURE</span>
-      Early allocation assessment and referral now available!
-      <a href="/whats-new">Read more…</a>
+    text: >
+      You can help us improve this service by participating in research and giving us feedback.
+      Sign up to the HMPPS Digital research panel <a href="https://www.surveymonkey.co.uk/r/LZY7DG3">here</a>
