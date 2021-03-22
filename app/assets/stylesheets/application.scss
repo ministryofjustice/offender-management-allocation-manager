@@ -9,14 +9,25 @@
  * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
  * files in this directory. Styles in this file should be added after the last require_* statement.
  * It is generally better to create a new file per style scope.
- *
- *= require_tree .
- *= stub "active_admin"
- *= require_self
  */
 
-@import "tables";
+// Import GOV.UK Design System first
+@import "gov_uk";
+
+// Then application specific components
+@import "case_type_badge";
+@import "hmpps_header";
+@import "notification";
+@import "pages";
 @import "pagination";
+@import "prison_switcher";
+@import "prisoner";
+@import "search";
+@import "service_banner";
+@import "sorting";
+@import "tables";
+@import "timeline";
+@import "vlo_information";
 
 a:visited {
     color: #005ea5;
@@ -63,7 +74,6 @@ a:visited {
 
 .sidebar-panel {
   border-top: 10px solid #1d70b8;
-  border-top-width: 10px;
   padding-top: 10px;
 }
 

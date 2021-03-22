@@ -4,12 +4,12 @@
   }
 
   table.responsive tr {
-    border-bottom: 2px solid govuk-colour("grey-2");
+    border-bottom: 2px solid govuk-colour("mid-grey");
     display: block;
   }
 
   table.responsive td {
-    border-bottom: 1px solid govuk-colour("grey-2");
+    border-bottom: 1px solid govuk-colour("mid-grey");
     display: block;
     text-align: right;
     &:last-child {
