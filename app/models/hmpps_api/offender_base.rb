@@ -228,6 +228,11 @@ module HmppsApi
         criminal_sentence? && convicted?
     end
 
+    def category_label
+      category_list = HmppsApi::PrisonApi::OffenderApi.get_category_labels
+      category_list.fetch(@category_code, 'N/A')
+    end
+
   private
 
     def age
