@@ -30,6 +30,7 @@
 .case-mix-bar {
   display: grid;
   grid-template-columns: var(--columns);
+  column-gap: 1px;
   height: 30px;
   margin: 0;
 
