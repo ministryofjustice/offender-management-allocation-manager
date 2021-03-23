@@ -1,0 +1,12 @@
+<% # Use the Case Mix helper method `case_mix_key` to render this partial %>
+<figure class="case-mix-key">
+  <figcaption class="govuk-heading-s">Case mix by tier</figcaption>
+  <ul>
+    <% tiers.each do |tier| %>
+      <li>
+        <span class="case-mix-key__swatch case-mix__tier-<%= tier %>"></span>
+        <%= tier_label(tier) %>
+      </li>
+    <% end %>
+  </ul>
+</figure>

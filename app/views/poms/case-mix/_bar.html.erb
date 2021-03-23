@@ -1,0 +1,9 @@
+<% # Use the Case Mix helper method `case_mix_bar(pom)` to render this partial %>
+<% if tiers.present? %>
+  <dl class="case-mix-bar" style="--columns: <%= css_columns %>;">
+    <% tiers.each do |tier, count| %>
+      <dt><%= tier_label(tier) %></dt>
+      <dd title="<%= tier_label(tier) %>" class="case-mix__tier-<%= tier %>"><%= count %></dd>
+    <% end %>
+  </dl>
+<% end %>
