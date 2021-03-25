@@ -28,10 +28,6 @@ FactoryBot.define do
       Faker::Number.number(digits: 7)
     end
 
-    # nomis_offender_id do
-    #   Faker::Alphanumeric.alpha(number: 10)
-    # end
-
     primary_pom_nomis_id do
       485_926
       # using fake POM numbers tends to cause crashes
