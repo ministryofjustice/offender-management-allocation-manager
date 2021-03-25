@@ -6,16 +6,17 @@ class AllocationsController < PrisonsApplicationController
   delegate :update, to: :create
 
   def new
-    @prisoner = offender(nomis_offender_id_from_url)
+    offender_id = params.require(:prisoner_id)
+    @prisoner = offender(offender_id)
     @previously_allocated_pom_ids =
-      AllocationService.previously_allocated_poms(nomis_offender_id_from_url)
+      AllocationService.previously_allocated_poms(offender_id)
     recommended_poms, not_recommended_poms =
       recommended_and_nonrecommended_poms_for(@prisoner)
     @recommended_poms = recommended_poms.map { |p| PomPresenter.new(p) }
     @not_recommended_poms = not_recommended_poms.map { |p| PomPresenter.new(p) }
     @unavailable_pom_count = unavailable_pom_count
-    @allocation = Allocation.find_by nomis_offender_id: nomis_offender_id_from_url
-    @case_info = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: nomis_offender_id_from_url)
+    @allocation = Allocation.find_by nomis_offender_id: offender_id
+    @case_info = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: offender_id)
     @emails_sent_to_ldu = EmailHistory.sent_within_current_sentence(@prisoner, EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION)
   end
 
@@ -44,7 +45,7 @@ class AllocationsController < PrisonsApplicationController
     @allocation = AllocationService.current_allocation_for(nomis_offender_id_from_url)
 
     unless @allocation.present? && @allocation.active?
-      redirect_to new_prison_allocation_path(active_prison_id, nomis_offender_id_from_url)
+      redirect_to new_prison_prisoner_allocation_path(active_prison_id, nomis_offender_id_from_url)
       return
     end
 
@@ -166,7 +167,7 @@ private
   end
 
   def recommended_and_nonrecommended_poms_for(offender)
-    allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id_from_url)
+    allocation = Allocation.find_by(nomis_offender_id: offender.offender_no)
     # don't allow primary to be the same as the co-working POM
     poms = PrisonOffenderManagerService.get_poms_for(active_prison_id).select { |pom|
       pom.status == 'active' && pom.staff_id != allocation.try(:secondary_pom_nomis_id)

@@ -43,7 +43,7 @@ class ResponsibilitiesController < PrisonsApplicationController
     if allocation.try(:active?)
       redirect_to prison_allocation_path(@prison.code, @responsibility.nomis_offender_id)
     else
-      redirect_to new_prison_allocation_path(@prison.code, @responsibility.nomis_offender_id)
+      redirect_to new_prison_prisoner_allocation_path(@prison.code, @responsibility.nomis_offender_id)
     end
   end
 
@@ -81,7 +81,7 @@ class ResponsibilitiesController < PrisonsApplicationController
                                                        notes: @responsibility.reason_text).deliver_later
       end
 
-      redirect_to new_prison_allocation_path(@prison.code, nomis_offender_id_from_url)
+      redirect_to new_prison_prisoner_allocation_path(@prison.code, nomis_offender_id_from_url)
     else
       render :confirm_removal
     end

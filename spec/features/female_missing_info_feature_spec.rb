@@ -98,7 +98,7 @@ feature "womens missing info journey" do
 
     it 'can save and allocate' do
       click_button 'Save and Allocate'
-      expect(page).to have_current_path(new_prison_allocation_path(prison.code, prisoner_id))
+      expect(page).to have_current_path(new_prison_prisoner_allocation_path(prison.code, prisoner_id))
     end
   end
 

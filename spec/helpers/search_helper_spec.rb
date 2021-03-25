@@ -18,10 +18,12 @@ RSpec.describe SearchHelper do
           o.load_case_information(build(:case_information, tier: 'A'))
         }
       }
+      let(:expected_link) {
+        link_to 'Allocate', new_prison_prisoner_allocation_path('LEI', prisoner_id: offender.offender_no)
+      }
 
       it "will change to allocate if there is no allocation" do
-        text, _link = cta_for_offender('LEI', offender)
-        expect(text).to eq("<a href=\"/prisons/LEI/allocations/#{offender.offender_no}/new\">Allocate</a>")
+        expect(cta_for_offender('LEI', offender)).to eq(expected_link)
       end
     end
 

@@ -1,9 +1,9 @@
 FactoryBot.define do
   factory :pom_detail do
-    status do 'active' end
-    working_pattern do 1 end
-    # add 1 to prevent a nomis_staff_id of zero
-    sequence(:nomis_staff_id) do |x| x + 1 end
+    status { 'active' }
+    working_pattern { 1 }
+    # don't want a nomis_staff_id of zero
+    sequence(:nomis_staff_id) { |x| x + 1000 }
 
     trait :inactive do
       status { 'inactive' }
@@ -45,7 +45,7 @@ FactoryBot.define do
 
   factory :pom, class: 'Elite2POM' do
     position { 'PRO' }
-    sequence(:emails) { |x| ["staff#{x}@justice.gov.uk"]  }
+    emails { [Faker::Internet.email] }
     sequence(:staffId) { |x| x + 1000  }
     status { 'ACTIVE' }
 
