@@ -89,7 +89,9 @@ class Allocation < ApplicationRecord
   # Gets the versions in *forward* order - so often we want to reverse
   # this list as we're interested in recent rather than ancient history
   def history
-    get_old_versions.append(self).zip(papertrail_versions).map do |alloc, raw_version|
+    # ignore 1st entry, as initial create will reify to nil
+    # we have to keep the :destroy event and filter the next 'create' as it contains the last (often release) event information
+    papertrail_versions[1..].map(&:reify).append(self).zip(papertrail_versions).reject { |a, _v| a.nil? }.map do |alloc, raw_version|
       AllocationHistory.new(alloc, raw_version)
     end
   end
@@ -187,6 +189,6 @@ private
   end
 
   def papertrail_versions
-    PaperTrail::Version.where(item_type: 'Allocation', nomis_offender_id: nomis_offender_id).where.not(event: 'destroy').order(:created_at)
+    PaperTrail::Version.where(item_type: 'Allocation', nomis_offender_id: nomis_offender_id).order(:created_at)
   end
 end
