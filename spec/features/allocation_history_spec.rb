@@ -119,12 +119,10 @@ feature 'Allocation History' do
         current_date += 1.day
         Timecop.travel(current_date) do
           # offender got released - so have to re-create case information record
-          # and re-find allocation record as it has been updated
-          create(:case_information, nomis_offender_id: nomis_offender_id, local_delivery_unit: pontypool_ldu)
-          allocation = Allocation.find_by!(nomis_offender_id: nomis_offender_id)
+          # and allocation record as it has been updated
           allocation = create(:allocation,
                               event: Allocation::ALLOCATE_PRIMARY_POM,
-                              case_information: build(:case_information, nomis_offender_id: nomis_offender_id),
+                              case_information: build(:case_information, nomis_offender_id: nomis_offender_id, local_delivery_unit: pontypool_ldu),
                               prison: second_prison.code,
                               primary_pom_nomis_id: prison_pom[:primary_pom_nomis_id],
                               primary_pom_name: prison_pom[:primary_pom_name],
