@@ -499,7 +499,14 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  actionmailer (~> 6.0)
+  actionpack (~> 6.0)
+  actionview (~> 6.0)
   activeadmin
+  activejob (~> 6.0)
+  activemodel (~> 6.0)
+  activerecord (~> 6.0)
+  activesupport (~> 6.0)
   auto_strip_attributes
   better_errors
   binding_of_caller
@@ -542,8 +549,8 @@ DEPENDENCIES
   prometheus_exporter
   puma (~> 4.3)
   rack-mini-profiler
-  rails (~> 6.0)
   rails-controller-testing
+  railties (~> 6.0)
   redis
   rspec-rails (~> 4.0.0.beta2)
   rswag-api
