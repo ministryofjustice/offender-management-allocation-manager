@@ -5,7 +5,7 @@ class FemaleMissingInfosController < PrisonsApplicationController
 
   before_action :load_missing_info, except: :new
 
-  # We have to ignore these 2 keys when loading attributes
+  # We have to ignore these 2 keys whilst loading attributes
   IGNORED_ERROR_KEYS = ['errors', 'validation_context'].freeze
 
   steps :complexity_level, :delius_information
@@ -59,7 +59,7 @@ private
     if params.fetch(:commit) == 'Update'
       redirect_to missing_information_prison_prisoners_path(@prison.code)
     else
-      redirect_to new_prison_allocation_path(active_prison_id,  @missing_info.nomis_offender_id)
+      redirect_to new_prison_prisoner_allocation_path(active_prison_id,  @missing_info.nomis_offender_id)
     end
   end
 

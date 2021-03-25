@@ -47,7 +47,7 @@ feature 'Responsibility override' do
 
     context 'without allocation' do
       it 'overrides' do
-        visit new_prison_allocation_path('LEI', offender_id)
+        visit new_prison_prisoner_allocation_path('LEI', offender_id)
 
         within '.responsibility_change' do
           click_link 'Change'
@@ -60,14 +60,14 @@ feature 'Responsibility override' do
           click_button 'Confirm'
         }.to change(enqueued_jobs, :count).by(2)
 
-        expect(page).to have_current_path(new_prison_allocation_path('LEI', offender_id))
+        expect(page).to have_current_path(new_prison_prisoner_allocation_path('LEI', offender_id))
         expect(page).to have_content 'Current case owner Community'
       end
 
       it 'shows the correct POM recommendations' do
         override_responsibility_for(offender_id)
 
-        visit new_prison_allocation_path('LEI', offender_id)
+        visit new_prison_prisoner_allocation_path('LEI', offender_id)
         expect(page).to have_content 'Recommendation: Prison officer POM'
       end
 
@@ -91,7 +91,7 @@ feature 'Responsibility override' do
     end
 
     it 'doesnt override' do
-      visit new_prison_allocation_path('LEI', offender_id)
+      visit new_prison_prisoner_allocation_path('LEI', offender_id)
 
       within '.responsibility_change' do
         click_link 'Change'
@@ -109,7 +109,7 @@ feature 'Responsibility override' do
     end
 
     it 'doesnt allow an override to take place' do
-      visit new_prison_allocation_path('LEI', offender_id)
+      visit new_prison_prisoner_allocation_path('LEI', offender_id)
 
       within '.responsibility_change' do
         click_link 'Change'
@@ -120,7 +120,7 @@ feature 'Responsibility override' do
   end
 
   def override_responsibility_for(offender_id)
-    visit new_prison_allocation_path('LEI', offender_id)
+    visit new_prison_prisoner_allocation_path('LEI', offender_id)
 
     within '.responsibility_change' do
       click_link 'Change'

@@ -24,7 +24,7 @@
       <%= hidden_field_tag("sort", params[:sort]) %>
       <%= hidden_field_tag("page", params[:page]) %>
       <%= submit_tag "Complete allocation", role: "button", draggable: "false", class: "govuk-button" %>
-      <a class="govuk-link cancel-button" href="<%= new_prison_allocation_path(@prison.code, @prisoner.offender_no) %>">Cancel</a>
+      <a class="govuk-link cancel-button" href="<%= new_prison_prisoner_allocation_path(@prison.code, @prisoner.offender_no) %>">Cancel</a>
     <% end %>
   </div>
 

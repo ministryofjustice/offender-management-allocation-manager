@@ -48,7 +48,7 @@ class CaseInformationController < PrisonsApplicationController
                                                               page: params[:page]
                     )
       else
-        redirect_to new_prison_allocation_path(active_prison_id,  @case_info.nomis_offender_id)
+        redirect_to new_prison_prisoner_allocation_path(active_prison_id,  @case_info.nomis_offender_id)
       end
     else
       @prisoner = prisoner(case_information_params[:nomis_offender_id])
@@ -63,7 +63,7 @@ class CaseInformationController < PrisonsApplicationController
     @prisoner = prisoner(case_information_params[:nomis_offender_id])
     # Nothing here can fail due to radio buttons being unselectable
     @case_info.update!(case_information_params.merge(manual_entry: true))
-    redirect_to new_prison_allocation_path(active_prison_id, @case_info.nomis_offender_id)
+    redirect_to new_prison_prisoner_allocation_path(active_prison_id, @case_info.nomis_offender_id)
   end
 
 private

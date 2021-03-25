@@ -65,14 +65,22 @@ Rails.application.routes.draw do
           get 'delete'
         end
       end
+
+      resources :allocations, only: %i[new], controller: 'allocations'
     end
 
-    resources :allocations, only: %i[ show new create edit update ], param: :nomis_offender_id, path_names: {
-        new: ':nomis_offender_id/new',
-    }
+    # TODO: re-work all these 'allocation' routes in the light of the Women's implementation
+    resources :allocations, only: %i[ show create edit update ], param: :nomis_offender_id
     get('/allocations/:nomis_offender_id/history' => 'allocations#history', as: 'allocation_history')
     get('/allocations/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocations#confirm', as: 'confirm_allocation')
     get('/reallocations/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocations#confirm_reallocation', as: 'confirm_reallocation')
+    resources :coworking, only: [:new, :create, :destroy], param: :nomis_offender_id, path_names: {
+      new: ':nomis_offender_id/new',
+    } do
+      get('confirm_coworking_removal' => 'coworking#confirm_removal', as: 'confirm_removal')
+    end
+    get('/coworking/confirm/:nomis_offender_id/:primary_pom_id/:secondary_pom_id' => 'coworking#confirm', as: 'confirm_coworking_allocation')
+    resource :overrides,  only: %i[ new create ], path_names: { new: 'new/:nomis_offender_id/:nomis_staff_id'}
 
     resources :case_information, only: %i[new create edit update show], param: :nomis_offender_id, controller: 'case_information', path_names: {
         new: 'new/:nomis_offender_id',
@@ -81,14 +89,6 @@ Rails.application.routes.draw do
       put('update_prd' => 'case_information#update_prd', as: 'update_prd', on: :member)
     end
 
-    resources :coworking, only: [:new, :create, :destroy], param: :nomis_offender_id, path_names: {
-        new: ':nomis_offender_id/new',
-    } do
-      get('confirm_coworking_removal' => 'coworking#confirm_removal', as: 'confirm_removal')
-    end
-    get('/coworking/confirm/:nomis_offender_id/:primary_pom_id/:secondary_pom_id' => 'coworking#confirm', as: 'confirm_coworking_allocation')
-
-    resource :overrides,  only: %i[ new create ], path_names: { new: 'new/:nomis_offender_id/:nomis_staff_id'}
     resources :poms, only: %i[ index show edit update ], param: :nomis_staff_id
     get '/poms/:nomis_staff_id/non_pom' => 'poms#show_non_pom', as: 'pom_non_pom'
 
