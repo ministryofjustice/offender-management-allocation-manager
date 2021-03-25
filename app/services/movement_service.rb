@@ -35,13 +35,6 @@ private
 
     Rails.logger.info("[MOVEMENT] Processing transfer for #{transfer.offender_no}")
 
-    if PrisonService.open_prison?(transfer.to_agency)
-      # There are special rules for responsibility when offenders
-      # move to open prisons so we will trigger this job to send
-      # an email to the LDU
-      OpenPrisonTransferJob.perform_later(transfer.to_json)
-    end
-
     # Remove the case information and deallocate offender
     # when the movement is from immigration or a detention centre
     # and is not going back to a prison OR
@@ -73,7 +66,6 @@ private
 
     alloc = Allocation.find_by(nomis_offender_id: transfer.offender_no)
 
-    # frozen_string_literal: true
     # We need to check whether the from_agency is from within the prison estate
     # to know whether it is a transfer.  If it isn't then we want to bail and
     # not process the new admission.
@@ -86,7 +78,14 @@ private
     # When an offender is released, we can no longer rely on their
     # case information (in case they come back one day), and we
     # should de-activate any current allocations.
-    alloc.dealloate_offender_after_transfer if alloc
+    alloc.dealloate_offender_after_transfer if alloc&.active?
+
+    if PrisonService.open_prison?(transfer.to_agency)
+      # There are special rules for responsibility when offenders
+      # move to open prisons so we will trigger this job to send
+      # an email to the LDU
+      OpenPrisonTransferJob.perform_later(transfer.to_json)
+    end
     true
   end
 

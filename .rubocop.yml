@@ -65,7 +65,7 @@ Metrics/BlockLength:
     - 'spec/**/*'
 
 RSpec/ExampleLength:
-  Max: 95
+  Max: 150
 
 RSpec/HookArgument:
   Enabled: false
@@ -80,7 +80,7 @@ RSpec/MessageSpies:
   Enabled: false
 
 RSpec/MultipleExpectations:
-  Max: 13
+  Max: 20
 
 RSpec/NamedSubject:
   Enabled: false
