@@ -43,10 +43,10 @@ the hook should prevent you from committing.
 
 ### Running the application
 
-1. Install Postgres
+1. Install project dependencies using Homebrew
 
 ```sh
-$ brew install postgres
+$ brew bundle
 ```
 
 2. Install gems locally
