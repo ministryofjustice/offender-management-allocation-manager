@@ -1,0 +1,31 @@
+<h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Add complexity level</h1>
+
+<p class="govuk-body">
+  This information can be found within 'NOMIS MIS reporting'. In the folder '085 - OASys & BCS' click on 'Female Complexity Report'.
+</p>
+<p class="govuk-body">
+  If the individual is not listed in the report you will need to complete a manual assessment.
+  See EQUIP guidance on how to manually reassess a person's complexity of need.
+</p>
+
+<%= form_for(@missing_info,
+             url: wizard_path,
+             method: :put,
+             builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |form| %>
+  <%= form.govuk_error_summary %>
+
+  <%= form.govuk_collection_radio_buttons(
+          :complexity_level,
+          [OpenStruct.new(name: 'High', value: 'high'),
+           OpenStruct.new(name: 'Medium', value: 'medium'),
+           OpenStruct.new(name: 'Low', value: 'low')],
+          :value,
+          :name,
+          legend: nil
+      ) %>
+  <%= form.submit "Update", role: "button", draggable: "false", class: "govuk-button" %>
+  <% if @secondary_button %>
+    <%= form.submit "Save and Allocate", role: "button", draggable: "false", class: "govuk-button govuk-button--secondary govuk-!-margin-left-4" %>
+  <% end %>
+<% end %>
+

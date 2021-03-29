@@ -72,6 +72,8 @@ private
   end
 
   def load_missing_info
+    @prisoner = OffenderService.get_offender params.fetch(:prisoner_id)
+
     @missing_info = if step == :complexity_level
                       ComplexityForm.new session[:complexity].except(*IGNORED_ERROR_KEYS)
                     else
