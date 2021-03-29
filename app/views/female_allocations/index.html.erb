@@ -16,11 +16,8 @@
     <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
     <strong class="govuk-warning-text__text">
       <span class="govuk-warning-text__assistive">Warning</span>
-      <% @previous_poms.each_with_index do |pom, index| %>
-        <%= 'and' unless index.zero? %>
-        <strong><%= pom.first_name %> <%= pom.last_name %></strong>
-      <% end %>
-      have previously been allocated to this case.
+      <% previous_as_sentence = @previous_poms.map { |p| "#{p.first_name} #{p.last_name}" }.to_sentence %>
+      <%= previous_as_sentence %> <%= @previous_poms.size > 1 ? 'have' : 'has' %> previously been allocated to this case.
       <%= link_to 'View case activity', prison_allocation_history_path(@prison.code, @prisoner.offender_no) %> for more information.
     </strong>
   </div>
@@ -33,18 +30,18 @@
 
 <div id="recommended_poms">
   <% if RecommendationService::recommended_pom_type(@prisoner) == RecommendationService::PROBATION_POM %>
-    <%= render 'pom_table', poms: @probation_poms.select(&:active?), allocate_link: 'recommended_link', nomis_offender_id: @prisoner.offender_no %>
+    <%= render 'pom_table', poms: @probation_poms.select(&:active?), nomis_offender_id: @prisoner.offender_no %>
   <% else %>
-    <%= render 'pom_table', poms: @prison_poms.select(&:active?), allocate_link: 'recommended_link', nomis_offender_id: @prisoner.offender_no %>
+    <%= render 'pom_table', poms: @prison_poms.select(&:active?), nomis_offender_id: @prisoner.offender_no %>
   <% end %>
 </div>
 
 <div class="govuk-accordion" data-module="govuk-accordion">
   <% accordion_body_1 = capture do %>
     <% if RecommendationService::recommended_pom_type(@prisoner) == RecommendationService::PROBATION_POM %>
-      <%= render 'pom_table', poms: @prison_poms.select(&:active?), allocate_link: 'override_link', nomis_offender_id: @prisoner.offender_no %>
+      <%= render 'pom_table', poms: @prison_poms.select(&:active?), nomis_offender_id: @prisoner.offender_no %>
     <% else %>
-      <%= render 'pom_table', poms: @probation_poms.select(&:active?), allocate_link: 'override_link', nomis_offender_id: @prisoner.offender_no %>
+      <%= render 'pom_table', poms: @probation_poms.select(&:active?), nomis_offender_id: @prisoner.offender_no %>
     <% end %>
   <% end %>
   <%= render 'shared/accordion_section',

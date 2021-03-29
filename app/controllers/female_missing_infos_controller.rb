@@ -59,7 +59,7 @@ private
     if params.fetch(:commit) == 'Update'
       redirect_to missing_information_prison_prisoners_path(@prison.code)
     else
-      redirect_to new_prison_prisoner_allocation_path(active_prison_id,  @missing_info.nomis_offender_id)
+      redirect_to prison_prisoner_staff_index_path(active_prison_id,  @missing_info.nomis_offender_id)
     end
   end
 

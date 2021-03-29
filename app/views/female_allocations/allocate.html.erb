@@ -4,9 +4,9 @@
 
   <div class="govuk-grid-column-two-thirds">
     <%= form_for(@allocation,
-                 url: confirm_female_allocation_prison_prisoner_allocation_path(@prison.code, @prisoner.offender_no, @pom.staff_id),
+                 url: wizard_path,
                  builder: GOVUKDesignSystemFormBuilder::FormBuilder,
-                 method: :post) do |form| %>
+                 method: :put) do |form| %>
       <h1 class="govuk-heading-xl govuk-!-margin-top-4">Confirm allocation</h1>
       <p class="govuk-body">You are allocating <%= "#{@prisoner.first_name} #{@prisoner.last_name}".titleize %> to <%= "#{@pom.first_name} #{@pom.last_name}".titleize %>.</p>
       <% if @pom.email_address.blank? %>
@@ -23,7 +23,7 @@
       </div>
 
       <%= form.submit "Complete allocation", role: "button", draggable: "false", class: "govuk-button" %>
-      <a class="govuk-link cancel-button" href="<%= new_prison_prisoner_allocation_path(@prison.code, @prisoner.offender_no) %>">Cancel</a>
+      <a class="govuk-link cancel-button" href="<%= prison_prisoner_staff_index_path(@prison.code, @prisoner.offender_no) %>">Cancel</a>
     <% end %>
   </div>
 

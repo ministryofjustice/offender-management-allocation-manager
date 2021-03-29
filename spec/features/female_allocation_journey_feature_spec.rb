@@ -40,14 +40,13 @@ feature "womens allocation journey" do
 
     visit unallocated_prison_prisoners_path prison.code
     click_link 'Allocate'
-    # visit new_prison_prisoner_allocation_path(prison.code, nomis_offender_id)
   end
 
   after do
     test_strategy.switch!(:womens_estate, false)
   end
 
-  scenario 'accepting recommendation' do
+  scenario 'accepting recommendation', :js do
     within '#recommended_poms' do
       # allocate to the second person in the list
       within 'tr:nth-of-type(2)' do

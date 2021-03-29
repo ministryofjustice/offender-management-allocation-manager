@@ -15,7 +15,7 @@ RSpec.describe FemaleAllocationsController, type: :controller do
     stub_sso_data(prison.code)
   end
 
-  describe '#new' do
+  describe '#index' do
     before do
       create(:case_information, nomis_offender_id: prisoner_id)
       a = create(:allocation, nomis_offender_id: prisoner_id, primary_pom_nomis_id: pom.staff_id)
@@ -23,7 +23,7 @@ RSpec.describe FemaleAllocationsController, type: :controller do
     end
 
     it 'retrives old POMs' do
-      get :new, params: { prison_id: prison.code, prisoner_id: prisoner_id }
+      get :index, params: { prison_id: prison.code, prisoner_id: prisoner_id, staff_id: pom.staff_id }
       expect(assigns(:previous_poms).map(&:staff_id)).to eq [pom.staff_id]
     end
   end

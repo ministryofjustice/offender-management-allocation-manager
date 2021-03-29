@@ -69,28 +69,19 @@ Rails.application.routes.draw do
       constraints lambda {
         |request| PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id))
       } do
-        resources :allocations, only: %i[new], controller: 'female_allocations' do
-          member do
-            get 'allocate' => 'female_allocations#allocate', as: 'female_allocation'
-            post 'confirm' => 'female_allocations#confirm', as: 'confirm_female_allocation'
-
-            get 'override' => 'female_allocations#override', as: 'override_female'
-            post 'override' => 'female_allocations#save_override', as: 'save_override_female'
-          end
+        resources :staff, only: :index, controller: 'female_allocations' do
+          resources :allocations, only: %i[new show update], controller: 'female_allocations'
         end
       end
       constraints lambda {
         |request| !PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id))
       } do
-        resources :allocations, only: %i[new], controller: 'allocations'
+        resources :staff, only: %i[index], controller: 'allocations'
       end
     end
 
     # TODO: re-work all these 'allocation' routes in the light of the Women's implementation
-    # resources :allocations, only: %i[ show new create edit update ], param: :nomis_offender_id, path_names: {
-    #     new: ':nomis_offender_id/new',
-    # }
-    resources :allocations, only: %i[ show create edit update ], param: :nomis_offender_id
+    resources :allocations, only: %i[show create edit update], param: :nomis_offender_id
 
     get('/allocations/:nomis_offender_id/history' => 'allocations#history', as: 'allocation_history')
     get('/allocations/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocations#confirm', as: 'confirm_allocation')

@@ -5,7 +5,7 @@
 class StaffMember
   # maybe this method shouldn't be here?
   attr_reader :staff_id
-  delegate :position_description, :probation_officer?, to: :pom
+  delegate :position_description, :probation_officer?, :prison_officer?, to: :pom
   delegate :working_pattern, :status, to: :@pom_detail
 
   def initialize(prison, staff_id, pom_detail = default_pom_detail(staff_id))
