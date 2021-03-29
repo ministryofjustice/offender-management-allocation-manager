@@ -198,4 +198,20 @@ module ApiHelper
     stub_request(:get, "#{COMMUNITY_HOST}/offenders/nomsNumber/#{nomis_offender_id}/registrations").
         to_return(body: { registrations: registrations }.to_json)
   end
+
+  def stub_category_label
+    categories = [
+      { code: 'A', description: 'Cat A' },
+      { code: 'B', description: 'Cat B' },
+      { code: 'C', description: 'Cat C' },
+      { code: 'D', description: 'Cat D' },
+      { code: 'Q', description: 'Fem Restricted' },
+      { code: 'R', description: 'Fem Closed' },
+      { code: 'S', description: 'Fem Semi' },
+      { code: 'T', description: 'Fem Open' }
+    ]
+
+    stub_request(:get, "#{T3}/reference-domains/domains/SUP_LVL_TYPE").
+    to_return(body: categories.to_json)
+  end
 end

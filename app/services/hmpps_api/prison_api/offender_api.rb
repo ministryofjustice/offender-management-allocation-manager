@@ -89,6 +89,12 @@ module HmppsApi
         data.first['classificationCode']
       end
 
+      def self.get_category_labels
+        route = '/reference-domains/domains/SUP_LVL_TYPE'
+        data = client.get(route, extra_headers: { 'Page-Limit': '1000' })
+        data.map { |c| [c.fetch('code'), c.fetch('description')] }.to_h
+      end
+
       def self.get_bulk_sentence_details(booking_ids)
         return {} if booking_ids.empty?
 

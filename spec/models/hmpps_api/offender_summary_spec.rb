@@ -181,6 +181,27 @@ describe HmppsApi::OffenderSummary do
     end
   end
 
+  describe '#category_label' do
+    context 'with a category code' do
+      let(:offender) { build(:offender, convictedStatus: 'Convicted', sentence: build(:sentence_detail, :unsentenced)) }
+
+      before do
+        stub_auth_token
+        stub_category_label
+      end
+
+      it "can return the men's category description" do
+        subject.category_code = 'A'
+        expect(subject.category_label).to eq 'Cat A'
+      end
+
+      it "can return the women's category description" do
+        subject.category_code = 'T'
+        expect(subject.category_label).to eq 'Fem Open'
+      end
+    end
+  end
+
   describe '#sentenced?' do
     context 'with sentence detail with a release date' do
       before do
