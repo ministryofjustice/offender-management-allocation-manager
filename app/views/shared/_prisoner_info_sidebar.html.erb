@@ -1,0 +1,16 @@
+<div class="govuk-grid-column-one-third">
+  <aside class="sidebar-panel" role="complementary">
+    <nav role="navigation" aria-labelledby="subsection-title">
+      <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+      <h2 class="govuk-heading-m" id="subsection-title">
+        Prisoner information
+      </h2>
+      <ul class="govuk-list govuk-!-font-size-16">
+        <li>
+          <p class="govuk-body" id="prisoner-name">Name: <%= prisoner.full_name %></p>
+          <p class="govuk-body" id="date-of-birth">Date of birth: <%= format_date(prisoner.date_of_birth)%></p>
+          <p class="govuk-body" id="nomis-number">NOMIS number: <%= prisoner.offender_no %></p>
+        </li></ul>
+    </nav>
+  </aside>
+</div>
