@@ -2,10 +2,9 @@
 
 require "rails_helper"
 
-feature "add missing details page" do
+feature "female prison index page" do
   before do
-    signin_spo_user([prison.code, 'SDI'])
-    stub_signin_spo(pom, [prison.code, 'SDI'])
+    stub_signin_spo(pom, [prison.code])
     stub_offenders_for_prison(prison.code, offenders)
 
     create(:allocation, primary_pom_allocated_at: one_day_ago,  nomis_offender_id: allocated_offender_one.fetch(:offenderNo), prison: prison.code)
