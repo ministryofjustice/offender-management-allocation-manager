@@ -1,0 +1,17 @@
+<div class="moj-timeline__item">
+  <div class="moj-timeline__header">
+    <h2 class="moj-timeline__title">Complexity of need level updated</h2>
+  </div>
+  <div class="moj-timeline__description">
+    Changed from: <%= change_complexity.previous_level %> to <%= change_complexity.level %>
+    <p class="govuk-body govuk-!-margin-bottom-1">
+      Reason(s) for the change: <%= change_complexity.reasons %>
+    </p>
+  </div>
+  <p class="moj-timeline__date">
+    <%= format_date_long(change_complexity.created_at) %>
+    <% if change_complexity.created_by_name.present? %>
+      by <%= change_complexity.created_by_name.titleize %>
+    <% end %>
+  </p>
+</div>
