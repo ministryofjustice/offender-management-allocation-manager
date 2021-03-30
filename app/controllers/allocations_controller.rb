@@ -109,7 +109,18 @@ class AllocationsController < PrisonsApplicationController
     allocation = Allocation.find_by!(nomis_offender_id: nomis_offender_id_from_url)
     vlo_history = PaperTrail::Version.
         where(item_type: 'VictimLiaisonOfficer', nomis_offender_id: nomis_offender_id_from_url).map { |vlo_version| VloHistory.new(vlo_version) }
-    @history = (allocation.history + vlo_history).sort_by(&:created_at)
+    complexity_history = if @prison.womens?
+                           hists = HmppsApi::ComplexityApi.get_history(nomis_offender_id_from_url)
+                           if hists.any?
+                             [ComplexityNewHistory.new(hists.first)] +
+                               hists.each_cons(2).map { |hpair|
+                                 ComplexityChangeHistory.new(hpair.first, hpair.second)
+                               }
+                           end
+                         end
+    complexity_history = [] if complexity_history.nil?
+
+    @history = (allocation.history + vlo_history + complexity_history).sort_by(&:created_at)
     @early_allocations = CaseInformation.find_by!(nomis_offender_id: nomis_offender_id_from_url).early_allocations
     @email_histories = EmailHistory.where(nomis_offender_id: nomis_offender_id_from_url)
 

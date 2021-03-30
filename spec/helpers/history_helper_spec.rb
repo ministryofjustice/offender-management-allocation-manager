@@ -54,4 +54,12 @@ RSpec.describe HistoryHelper do
       expect(list.map { |prison, allocations| [prison, allocations.count] }).to eq [["LEI", 2], ["PVI", 2]]
     end
   end
+
+  context 'with nil prison at end of list' do
+    it 'sweeps item into current prison' do
+      list = AllocationList.new([middle_allocation1, middle_allocation2, nil_allocation])
+
+      expect(list.map { |prison, allocations| [prison, allocations.count] }).to eq [["PVI", 3]]
+    end
+  end
 end
