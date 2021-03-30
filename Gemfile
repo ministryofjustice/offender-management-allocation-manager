@@ -99,7 +99,7 @@ group :development do
   gem 'memory_profiler'
   # prevent warnings from parser as we are using ruby 2.6
   # change this when upgrading ruby version
-  gem 'parser', '< 2.7'
+  gem 'parser', '< 3.1'
   gem 'rack-mini-profiler'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'stackprof'
