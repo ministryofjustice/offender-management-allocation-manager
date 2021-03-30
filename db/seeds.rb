@@ -103,19 +103,19 @@ team3 = Team.find_or_create_by!(
 # responsibility override workflow
 
 CaseInformation.find_or_create_by!(nomis_offender_id: 'G7658UL') do |info|
-    info.tier = 'A'
-    info.case_allocation = 'NPS'
-    info.welsh_offender = 'Yes'
-    info.manual_entry =  true
-    info.team_id = team1.id
+  info.tier = 'A'
+  info.case_allocation = 'NPS'
+  info.manual_entry =  true
+  info.team_id = team1.id
+  info.probation_service = "Wales"
 end
 
 CaseInformation.find_or_create_by!(nomis_offender_id: 'G7517GF') do |info|
   info.tier = 'B'
-    info.case_allocation = 'NPS'
-    info.welsh_offender = 'Yes'
-    info.manual_entry = true
-    info.team_id = team2.id
+  info.case_allocation = 'NPS'
+  info.manual_entry = true
+  info.team_id = team2.id
+  info.probation_service = "Wales"
 end
 
 # 3 Test offenders which have handovers in Dec 2020
@@ -123,7 +123,7 @@ end
   CaseInformation.find_or_create_by!(nomis_offender_id: offender_no) do |info|
     info.assign_attributes(tier: 'B',
                            case_allocation:'CRC',
-                           welsh_offender: 'Yes',
+                           probation_service: 'Wales',
                            manual_entry: true,
                            team: team2)
   end
@@ -134,7 +134,7 @@ end
   CaseInformation.find_or_create_by!(nomis_offender_id: offender_no) do |info|
     info.assign_attributes(tier: 'B',
                            case_allocation:'NPS',
-                           welsh_offender: 'Yes',
+                           probation_service: 'Wales',
                            manual_entry: true,
                            team: team2)
   end
@@ -144,7 +144,7 @@ end
 CaseInformation.find_or_create_by!(nomis_offender_id: 'G7281UH') do |info|
   info.assign_attributes(tier: 'B',
                          case_allocation:'NPS',
-                         welsh_offender: 'Yes',
+                         probation_service: 'Wales',
                          manual_entry: true,
                          team: team2)
 end
@@ -152,15 +152,15 @@ end
 CaseInformation.find_or_create_by!(nomis_offender_id: 'G3536UF') do |info|
   info.tier = 'A'
   info.case_allocation = 'NPS'
-  info.welsh_offender = 'No'
   info.manual_entry = true
   info.team_id = team2.id
+  info.probation_service = "England"
 end
 
 CaseInformation.find_or_create_by!(nomis_offender_id: 'G2260UO') do |info|
   info.tier = 'B'
   info.case_allocation = 'NPS'
-  info.welsh_offender = 'No'
   info.manual_entry = true
   info.team_id = team3.id
+  info.probation_service = "England"
 end

@@ -51,12 +51,10 @@ feature "womens missing info journey" do
                 "Select yes if the prisoner’s last known address was in Wales",
                 "Select the prisoner’s tier",
                 "Select the service provider for this case",
-                # Yes this is a defect - we validate both Probation Service and Welshness
-                "is not included in the list"
               ])
         end
 
-        find('label[for=case-information-welsh-offender-no-field]').click
+        find('label[for=case-information-probation-service-england-field]').click
         click_button 'Update'
         # defect goes away once we fill in welshness correctly
         within '.govuk-error-summary' do
@@ -114,7 +112,7 @@ feature "womens missing info journey" do
       visit missing_information_prison_prisoners_path prison.code
       click_link 'Add missing details'
 
-      find('label[for=case-information-welsh-offender-no-field]').click
+      find('label[for=case-information-probation-service-england-field]').click
       find('label[for=case-information-case-allocation-nps-field]').click
       find('label[for=case-information-tier-a-field]').click
       click_button 'Update'

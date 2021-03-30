@@ -85,7 +85,7 @@ private
     if step == :complexity_level
       params.fetch(:complexity_form, {}).permit(:complexity_level)
     else
-      params.fetch(:case_information, {}).permit(:case_allocation, :welsh_offender, :tier)
+      params.fetch(:case_information, {}).permit(:case_allocation, :probation_service, :tier)
     end
   end
 end

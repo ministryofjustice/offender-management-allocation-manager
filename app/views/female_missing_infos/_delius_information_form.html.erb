@@ -7,10 +7,10 @@
   <%= form.govuk_error_summary %>
 
   <%= form.govuk_collection_radio_buttons(
-          :welsh_offender,
-          [OpenStruct.new(name: 'Yes'),
-           OpenStruct.new(name: 'No')],
-          :name,
+          :probation_service,
+          [OpenStruct.new(value: 'Wales', name: 'Yes'),
+           OpenStruct.new(value: 'England', name: 'No')],
+          :value,
           :name,
           legend: { text: "Was this prisoner's last known address in Wales?" }
       )
