@@ -36,11 +36,10 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
           described_class.perform_now nomis_offender_id
         }.to change(CaseInformation, :count).by(1)
 
-        expect(case_info.attributes.symbolize_keys.except(:created_at, :id, :updated_at, :parole_review_date))
+        expect(case_info.attributes.symbolize_keys.except(:created_at, :id, :updated_at, :parole_review_date, :welsh_offender))
             .to eq(case_allocation: "NPS", crn: "X362207", manual_entry: false, mappa_level: 0,
                    nomis_offender_id: "G4281GV",
                    probation_service: "England",
-                   welsh_offender: 'No',
                    local_delivery_unit_id: nil,
                    team_id: team.id,
                    team_name: team.name,
@@ -138,7 +137,7 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
       end
     end
 
-    describe '#welsh_offender' do
+    describe '#probation_service' do
       before do
         stub_offender(build(:nomis_offender, offenderNo: nomis_offender_id))
         stub_community_offender(nomis_offender_id, build(:community_data, offenderManagers: [build(:community_offender_manager, team: { code: team.code, localDeliveryUnit: { code: ldu.code } })]))
@@ -149,7 +148,7 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
 
         it 'maps to false' do
           described_class.perform_now(nomis_offender_id)
-          expect(case_info.welsh_offender).to eq('No')
+          expect(case_info.probation_service).to eq('England')
         end
       end
 
@@ -158,7 +157,7 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
 
         it 'maps to true' do
           described_class.perform_now(nomis_offender_id)
-          expect(case_info.welsh_offender).to eq('Yes')
+          expect(case_info.probation_service).to eq('Wales')
         end
       end
     end

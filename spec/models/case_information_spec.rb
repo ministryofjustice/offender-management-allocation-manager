@@ -104,4 +104,23 @@ RSpec.describe CaseInformation, type: :model do
       expect(build(:case_information, manual_entry: nil)).not_to be_valid
     end
   end
+
+  context 'when probation service' do
+    subject {
+      build(:case_information, probation_service: nil)
+    }
+
+    it 'gives the correct validation error message' do
+      expect(subject).not_to be_valid
+      expect(subject.errors.messages).
+        to eq(probation_service: ["Select yes if the prisoner’s last known address was in Wales"])
+    end
+
+    it 'allows England, Wales' do
+      ['England', 'Wales'].each do |service|
+        subject.probation_service = service
+        expect(subject).to be_valid
+      end
+    end
+  end
 end

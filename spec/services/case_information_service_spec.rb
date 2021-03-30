@@ -6,7 +6,7 @@ describe CaseInformationService do
            nomis_offender_id: 'X1000XX',
            tier: 'A',
            case_allocation: 'NPS',
-           welsh_offender: 'Yes'
+           probation_service: 'Wales'
     )
   }
 

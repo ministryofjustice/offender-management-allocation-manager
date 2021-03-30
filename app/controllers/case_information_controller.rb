@@ -36,7 +36,7 @@ class CaseInformationController < PrisonsApplicationController
     @case_info = CaseInformation.create(
       nomis_offender_id: case_information_params[:nomis_offender_id],
       tier: case_information_params[:tier],
-      welsh_offender: case_information_params[:welsh_offender],
+      probation_service: case_information_params[:probation_service],
       case_allocation: case_information_params[:case_allocation],
       manual_entry: true
     )
@@ -88,7 +88,7 @@ private
 
   def case_information_params
     params.require(:case_information).
-      permit(:nomis_offender_id, :tier, :case_allocation, :welsh_offender,
+      permit(:nomis_offender_id, :tier, :case_allocation, :probation_service,
              :parole_review_date_dd, :parole_review_date_mm, :parole_review_date_yyyy)
   end
 

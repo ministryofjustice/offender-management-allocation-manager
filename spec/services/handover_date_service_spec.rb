@@ -54,7 +54,7 @@ describe HandoverDateService do
     }
 
     context 'when NPS' do
-      let(:case_info) { build(:case_information, :nps, welsh_offender: welsh? ? 'Yes' : 'No') }
+      let(:case_info) { build(:case_information, :nps, probation_service: welsh? ? 'Wales' : 'England') }
 
       it 'handover starts 7.5 months before CRD/ARD' do
         expect(start_date).to eq(crd - (7.months + 15.days))
@@ -276,7 +276,7 @@ describe HandoverDateService do
     end
 
     context 'when CRC' do
-      let(:case_info) { build(:case_information, :crc, welsh_offender: welsh? ? 'Yes' : 'No') }
+      let(:case_info) { build(:case_information, :crc, probation_service: welsh? ? 'Wales' : 'England') }
 
       it 'handover starts 12 weeks before CRD/ARD' do
         expect(start_date).to eq(crd - 12.weeks)
@@ -386,7 +386,7 @@ describe HandoverDateService do
   context 'when indeterminate' do
     context 'with tariff date in the future' do
       let(:tariff_date) { Date.parse('01/09/2022') }
-      let(:case_info) { build(:case_information, :nps, welsh_offender: welsh? ? 'Yes' : 'No') }
+      let(:case_info) { build(:case_information, :nps, probation_service: welsh? ? 'Wales' : 'England') }
       let(:offender) {
         build(:offender, :indeterminate,
               latestLocationId: prison,

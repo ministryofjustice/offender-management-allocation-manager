@@ -277,14 +277,14 @@ describe HmppsApi::Offender do
       describe '#welsh_offender' do
         let(:field) { :welsh_offender }
 
-        context 'when the welsh_offender field is "Yes"' do
-          let(:case_info) { create(:case_information, welsh_offender: 'Yes') }
+        context 'with a welsh_offender' do
+          let(:case_info) { create(:case_information, probation_service: 'Wales') }
 
           it { is_expected.to be(true) }
         end
 
-        context 'when the welsh_offender field is "No"' do
-          let(:case_info) { create(:case_information, welsh_offender: 'No') }
+        context 'with and english offender' do
+          let(:case_info) { create(:case_information, probation_service: 'England') }
 
           it { is_expected.to be(false) }
         end

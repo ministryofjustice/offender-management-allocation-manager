@@ -1,9 +1,5 @@
 <%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
 
-<% if @case_info.errors.count > 0 %>
-  <%= render :partial => "/shared/validation_errors", :locals => { :errors => @case_info.errors } %>
-<% end %>
-
 <h1 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-4">Case information</h1>
 <h2 class="govuk-heading-m"><%= @prisoner.full_name %> - <%= @prisoner.offender_no %></h2>
 <p class="govuk-!-margin-bottom-8">You can find this information in NDelius.</p>
