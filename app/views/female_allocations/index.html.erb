@@ -1,0 +1,78 @@
+<%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
+
+<% if @prisoner.needs_a_com? %>
+  <%= render partial: 'shared/notifications/offender_needs_a_com', locals: {offender: @prisoner, email_history: @emails_sent_to_ldu} %>
+<% end %>
+
+<h1 class="govuk-heading-l govuk-!-margin-bottom-5">Allocate a POM</h1>
+
+<div class="govuk-inset-text">
+  For this case we recommend that you allocate a <b><%= recommended_pom_type_label(@prisoner) %> POM</b>.<br/>
+  This takes into account <%= @prisoner.first_name %> <%= @prisoner.last_name %>'s current tier and time left to serve.
+</div>
+
+<% if @previous_poms.any? %>
+  <div class="govuk-warning-text">
+    <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+    <strong class="govuk-warning-text__text">
+      <span class="govuk-warning-text__assistive">Warning</span>
+      <% previous_as_sentence = @previous_poms.map { |p| "#{p.first_name} #{p.last_name}" }.to_sentence %>
+      <%= previous_as_sentence %> <%= @previous_poms.size > 1 ? 'have' : 'has' %> previously been allocated to this case.
+      <%= link_to 'View case activity', prison_allocation_history_path(@prison.code, @prisoner.offender_no) %> for more information.
+    </strong>
+  </div>
+<% end %>
+
+<hr class="govuk-section-break govuk-section-break--l govuk-section-break--invisible" />
+
+<h2 class="govuk-heading-m">Available <%= recommended_pom_type_label(@prisoner) %> POMs</h2>
+<p class="govuk-body">There are currently <%= @probation_poms.count %> <%= recommended_pom_type_label(@prisoner) %> POMs available.</p>
+
+<div id="recommended_poms">
+  <% if RecommendationService::recommended_pom_type(@prisoner) == RecommendationService::PROBATION_POM %>
+    <%= render 'pom_table', poms: @probation_poms.select(&:active?), nomis_offender_id: @prisoner.offender_no %>
+  <% else %>
+    <%= render 'pom_table', poms: @prison_poms.select(&:active?), nomis_offender_id: @prisoner.offender_no %>
+  <% end %>
+</div>
+
+<div class="govuk-accordion" data-module="govuk-accordion">
+  <% accordion_body_1 = capture do %>
+    <% if RecommendationService::recommended_pom_type(@prisoner) == RecommendationService::PROBATION_POM %>
+      <%= render 'pom_table', poms: @prison_poms.select(&:active?), nomis_offender_id: @prisoner.offender_no %>
+    <% else %>
+      <%= render 'pom_table', poms: @probation_poms.select(&:active?), nomis_offender_id: @prisoner.offender_no %>
+    <% end %>
+  <% end %>
+  <%= render 'shared/accordion_section',
+             id: 'accordion-1',
+             title: "Full List of available #{non_recommended_pom_type_label(@prisoner)} POMs",
+             body: "You will need to provide a valid reason for overridding the recommended #{recommended_pom_type_label(@prisoner)} POMs.",
+             content: accordion_body_1 %>
+  <% accordion_body_2 = capture do %>
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th class="govuk-table__header">POM</th>
+          <th class="govuk-table__header">POM level</th>
+          <th class="govuk-table__header">Total cases</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+      <% (@prison_poms + @probation_poms).reject(&:active?).each do |pom| %>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell"><%= pom.first_name %> <%= pom.last_name %></td>
+          <td class="govuk-table__cell"><%= grade(pom) %></td>
+          <td class="govuk-table__cell"><%= pom.allocations.count %></td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  <% end %>
+  <%= render 'shared/accordion_section',
+             id: 'accordion-2',
+             title: "POMs currently unavailable for new allocations",
+             body: "There are #{(@prison_poms + @probation_poms).reject(&:active?).count} POMs unavailable.",
+             content: accordion_body_2 %>
+</div>
+

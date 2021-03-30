@@ -66,11 +66,25 @@ Rails.application.routes.draw do
         end
       end
 
-      resources :allocations, only: %i[new], controller: 'allocations'
+      constraints lambda {
+        # Women's allocation routes
+        |request| PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id))
+      } do
+        resources :staff, only: :index, controller: 'female_allocations' do
+          resources :allocations, only: %i[new show update], controller: 'female_allocations'
+        end
+      end
+      constraints lambda {
+        # Men's initial allocation route (entry point) - has to be same as women's
+        |request| !PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id))
+      } do
+        resources :staff, only: %i[index], controller: 'allocations'
+      end
     end
 
     # TODO: re-work all these 'allocation' routes in the light of the Women's implementation
-    resources :allocations, only: %i[ show create edit update ], param: :nomis_offender_id
+    # Note that 'new' was removed from this list and moved into initial Men's route above
+    resources :allocations, only: %i[show create edit update], param: :nomis_offender_id
     get('/allocations/:nomis_offender_id/history' => 'allocations#history', as: 'allocation_history')
     get('/allocations/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocations#confirm', as: 'confirm_allocation')
     get('/reallocations/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocations#confirm_reallocation', as: 'confirm_reallocation')

@@ -38,7 +38,7 @@ RSpec.describe PrisonService do
 
   it "can return all the prison codes" do
     codes = described_class.prison_codes
-    expect(codes.count).to eq(125)
+    expect(codes.count).to eq(123)
   end
 
   it "will return nil for an unknown code" do

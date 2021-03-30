@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe "allocations/new", type: :view do
+RSpec.describe "allocations/index", type: :view do
   before do
     assign(:prison, build(:prison))
     assign(:prisoner, build(:offender))
