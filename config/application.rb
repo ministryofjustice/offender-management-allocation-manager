@@ -73,6 +73,8 @@ module OffenderManagementAllocationClient
 
     config.cache_expiry = (ENV['CACHE_TIMEOUT']&.strip || 60.minutes).to_i
 
+    config.time_zone = 'London'
+
     # overriding the normal wrapping in a div with class 'field-with-errors' seems to be
     # neccesary in this project, otherwise Gov Design system check-boxes and radio buttons
     # don't 'check' visibly to the user even though they pass all the tests.
