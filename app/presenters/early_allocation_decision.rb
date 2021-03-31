@@ -18,6 +18,12 @@ class EarlyAllocationDecision
   end
 
   def to_partial_path
+    "case_history/#{partial_name}"
+  end
+
+private
+
+  def partial_name
     if @early_allocation.community_decision?
       'ea_decision_eligible'
     else
