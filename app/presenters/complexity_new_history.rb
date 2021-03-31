@@ -4,7 +4,7 @@ class ComplexityNewHistory
   end
 
   def created_at
-    @history.fetch(:createdTimeStamp)
+    @history.fetch(:createdTimeStamp).getlocal
   end
 
   def level
