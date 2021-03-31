@@ -20,10 +20,6 @@ FactoryBot.define do
       Allocation::USER
     end
 
-    nomis_booking_id do
-      Faker::Number.number(digits: 7)
-    end
-
     nomis_offender_id do
       Faker::Alphanumeric.alpha(number: 10)
     end

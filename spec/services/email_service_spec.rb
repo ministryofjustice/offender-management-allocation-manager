@@ -11,7 +11,6 @@ RSpec.describe EmailService do
     Allocation.new.tap do |a|
       a.primary_pom_nomis_id = 485_833
       a.nomis_offender_id = 'G2911GD'
-      a.nomis_booking_id = 0
       a.allocated_at_tier = 'A'
       a.prison = 'LEI'
     end
@@ -21,7 +20,6 @@ RSpec.describe EmailService do
     Allocation.new.tap { |a|
       a.primary_pom_nomis_id = 485_766
       a.nomis_offender_id = 'G2911GD'
-      a.nomis_booking_id = 0
       a.allocated_at_tier = 'A'
       a.prison = 'LEI'
       a.event = Allocation::REALLOCATE_PRIMARY_POM
@@ -34,7 +32,6 @@ RSpec.describe EmailService do
     Allocation.new.tap { |a|
       a.primary_pom_nomis_id = 485_833
       a.nomis_offender_id = 'G2911GD'
-      a.nomis_booking_id = 0
       a.allocated_at_tier = 'A'
       a.prison = 'LEI'
       a.event = Allocation::ALLOCATE_PRIMARY_POM
@@ -47,7 +44,6 @@ RSpec.describe EmailService do
       a.primary_pom_nomis_id = 485_833
       a.primary_pom_name = "Ricketts, Andrien"
       a.nomis_offender_id = 'G2911GD'
-      a.nomis_booking_id = 0
       a.secondary_pom_nomis_id = 485_926
       a.secondary_pom_name = "Pom, Moic"
       a.allocated_at_tier = 'A'
@@ -62,7 +58,6 @@ RSpec.describe EmailService do
       a.primary_pom_nomis_id = 485_833
       a.primary_pom_name = "Ricketts, Andrien"
       a.nomis_offender_id = 'G2911GD'
-      a.nomis_booking_id = 0
       a.secondary_pom_nomis_id = nil
       a.secondary_pom_name = nil
       a.allocated_at_tier = 'A'

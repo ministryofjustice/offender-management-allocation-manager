@@ -63,7 +63,6 @@ RSpec.describe Allocation, type: :model do
 
   describe 'Validations' do
     it { is_expected.to validate_presence_of(:nomis_offender_id) }
-    it { is_expected.to validate_presence_of(:nomis_booking_id) }
     it { is_expected.to validate_presence_of(:prison) }
     it { is_expected.to validate_presence_of(:allocated_at_tier) }
     it { is_expected.to validate_presence_of(:event) }
@@ -139,7 +138,6 @@ RSpec.describe Allocation, type: :model do
           allocated_at_tier: 'A',
           primary_pom_nomis_id: 485_833,
           primary_pom_allocated_at: DateTime.now.utc,
-          nomis_booking_id: 1,
           recommended_pom_type: 'probation',
           event: Allocation::ALLOCATE_PRIMARY_POM,
           created_by_username: 'MOIC_POM',
@@ -170,7 +168,6 @@ RSpec.describe Allocation, type: :model do
           allocated_at_tier: 'A',
           primary_pom_nomis_id: 485_833,
           primary_pom_allocated_at: DateTime.now.utc,
-          nomis_booking_id: 1,
           recommended_pom_type: 'probation',
           event: Allocation::ALLOCATE_PRIMARY_POM,
           event_trigger: Allocation::USER,

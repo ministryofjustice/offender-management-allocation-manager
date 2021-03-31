@@ -121,7 +121,6 @@ class Allocation < ApplicationRecord
   end
 
   validates :nomis_offender_id,
-            :nomis_booking_id,
             :allocated_at_tier,
             :event,
             :event_trigger,

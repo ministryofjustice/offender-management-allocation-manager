@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_15_133824) do
+ActiveRecord::Schema.define(version: 2021_03_31_115125) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -28,7 +28,6 @@ ActiveRecord::Schema.define(version: 2020_12_15_133824) do
     t.string "created_by_name"
     t.integer "primary_pom_nomis_id"
     t.integer "secondary_pom_nomis_id"
-    t.integer "nomis_booking_id"
     t.integer "event"
     t.integer "event_trigger"
     t.datetime "created_at", null: false

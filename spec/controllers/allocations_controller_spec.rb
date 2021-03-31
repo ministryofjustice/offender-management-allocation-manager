@@ -183,7 +183,6 @@ RSpec.describe AllocationsController, :allocation, type: :controller do
           before do
             allocation = create(:allocation,
                                 nomis_offender_id: offender_no,
-                                nomis_booking_id: 1,
                                 primary_pom_nomis_id: poms.first.staffId,
                                 allocated_at_tier: 'A',
                                 prison: 'PVI',

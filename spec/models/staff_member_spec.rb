@@ -58,8 +58,7 @@ RSpec.describe StaffMember, type: :model do
         create(
           :allocation,
           primary_pom_nomis_id: staff_id,
-          nomis_offender_id: 'G7514GW',
-          nomis_booking_id: 1_153_753
+          nomis_offender_id: 'G7514GW'
         )
       end
     }
@@ -70,7 +69,6 @@ RSpec.describe StaffMember, type: :model do
           :allocation,
           primary_pom_nomis_id: other_staff_id,
           nomis_offender_id: 'G1234VV',
-          nomis_booking_id: 971_856
         ).tap { |item|
           item.update!(secondary_pom_nomis_id: staff_id)
         }
@@ -82,7 +80,6 @@ RSpec.describe StaffMember, type: :model do
         :allocation,
         primary_pom_nomis_id: staff_id,
         nomis_offender_id: 'G1234AB',
-        nomis_booking_id: 76_908
       )
     }
 
@@ -91,7 +88,6 @@ RSpec.describe StaffMember, type: :model do
         :allocation,
         primary_pom_nomis_id: other_staff_id,
         nomis_offender_id: 'G1234GG',
-        nomis_booking_id: 31_777,
         secondary_pom_nomis_id: staff_id
       ).tap { |item|
         item.update!(secondary_pom_nomis_id: staff_id)

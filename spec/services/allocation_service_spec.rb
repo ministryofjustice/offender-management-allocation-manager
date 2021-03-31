@@ -80,7 +80,6 @@ describe AllocationService do
           allocated_at_tier: 'A',
           primary_pom_nomis_id: 485_833,
           primary_pom_allocated_at: DateTime.now.utc,
-          nomis_booking_id: 1,
           recommended_pom_type: 'probation',
           event: Allocation::ALLOCATE_PRIMARY_POM,
           event_trigger: Allocation::USER,
