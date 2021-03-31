@@ -10,12 +10,15 @@ RSpec.describe "female_allocations/index", type: :view do
 
     assign(:prison, prison)
     assign(:previous_poms, poms.map { |p| StaffMember.new(prison, p.staff_id) })
-    assign(:prisoner, build(:offender))
+    assign(:prisoner, offender)
+    assign(:case_info, case_info)
     assign(:probation_poms, poms.map { |p| StaffMember.new(prison, p.staff_id) })
     assign(:prison_poms, [])
     render
   end
 
+  let(:case_info) { build(:case_information) }
+  let(:offender) { build(:offender, offenderNo: case_info.nomis_offender_id).tap { |o| o.load_case_information(case_info) } }
   let(:prison) { build(:prison) }
   let(:pom) { build(:pom) }
   let(:page) { Nokogiri::HTML(rendered) }
