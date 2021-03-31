@@ -1,11 +1,11 @@
-<h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Add complexity level</h1>
+<h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Add complexity of need level</h1>
 
 <p class="govuk-body">
   This information can be found within 'NOMIS MIS reporting'. In the folder '085 - OASys & BCS' click on 'Female Complexity Report'.
 </p>
 <p class="govuk-body">
   If the individual is not listed in the report you will need to complete a manual assessment.
-  See EQUIP guidance on how to manually reassess a person's complexity of need.
+  See guidance on <%= link_to "how to manually assess a person's complexity of need",asset_path("docs/complexity-of-need/assessment-guidance.pdf", skip_pipeline: true), target: "_blank"%>. Download the manual <%= link_to "assessment form",  asset_path("docs/complexity-of-need/assessment-template.pdf",  skip_pipeline: true), target: "_blank"%>.
 </p>
 
 <%= form_for(@missing_info,
