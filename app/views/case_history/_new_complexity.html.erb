@@ -6,7 +6,7 @@
     Level: <%= new_complexity.level %>
     <p class="moj-timeline__date"><%= format_date_long(new_complexity.created_at) %>
       <% if new_complexity.created_by_name.present? %>
-        by <%= new_complexity.created_by_name.titleize %>
+        by <%= new_complexity.created_by_name %>
       <% end %>
     </p>
   </div>

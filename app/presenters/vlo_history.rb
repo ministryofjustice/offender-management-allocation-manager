@@ -8,7 +8,7 @@ class VloHistory
   end
 
   def to_partial_path
-    "vlo_#{event}"
+    "case_history/vlo_#{event}"
   end
 
   def created_by_name

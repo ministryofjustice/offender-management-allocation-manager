@@ -13,9 +13,9 @@ class EarlyAllocationHistory
 
   def to_partial_path
     if @early_allocation.created_within_referral_window?
-      partial_within_window
+      "case_history/#{partial_within_window}"
     else
-      partial_outside_window
+      "case_history/#{partial_outside_window}"
     end
   end
 

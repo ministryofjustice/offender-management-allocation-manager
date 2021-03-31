@@ -23,7 +23,7 @@ class ComplexityNewHistory
     username = @history[:sourceUser]
     if username
       user = HmppsApi::PrisonApi::UserApi.user_details(username)
-      "#{user.last_name}, #{user.first_name}"
+      "#{user.last_name}, #{user.first_name}".titleize
     end
   end
 end

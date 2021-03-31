@@ -11,7 +11,7 @@
   <p class="moj-timeline__date">
     <%= format_date_long(change_complexity.created_at) %>
     <% if change_complexity.created_by_name.present? %>
-      by <%= change_complexity.created_by_name.titleize %>
+      by <%= change_complexity.created_by_name %>
     <% end %>
   </p>
 </div>

@@ -20,6 +20,6 @@ class EmailHistory < ApplicationRecord
   end
 
   def to_partial_path
-    "email_#{event}"
+    "case_history/email_#{event}"
   end
 end

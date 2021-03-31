@@ -22,6 +22,6 @@ class AllocationHistory
 
   # render a different partial depending on the type of event
   def to_partial_path
-    event
+    "case_history/#{event}"
   end
 end
