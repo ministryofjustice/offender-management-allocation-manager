@@ -36,11 +36,10 @@ feature "get poms list" do
   end
 
   it "can sort offenders allocated to a POM", vcr: { cassette_name: 'prison_api/show_poms_feature_view_sorting' } do
-    [['G7806VO', 754_207], ['G2911GD', 1_175_317]].each do |offender_id, booking|
+    [['G7806VO', 754_207], ['G2911GD', 1_175_317]].each do |offender_id, _booking|
       create(:case_information, nomis_offender_id: offender_id)
       AllocationService.create_or_update(
         nomis_offender_id: offender_id,
-        nomis_booking_id: booking,
         prison: 'LEI',
         allocated_at_tier: 'A',
         created_by_username: 'MOIC_POM',

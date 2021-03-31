@@ -65,7 +65,6 @@ class FemaleAllocationsController < PrisonsApplicationController
           event: event,
           event_trigger: :user,
           created_by_username: current_user,
-          nomis_booking_id: @prisoner.booking_id,
           allocated_at_tier: @prisoner.tier,
           recommended_pom_type: (RecommendationService.recommended_pom_type(@prisoner) == RecommendationService::PRISON_POM) ? 'prison' : 'probation',
           prison: active_prison_id,

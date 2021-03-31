@@ -142,7 +142,6 @@ private
       event: allocation_params[:event],
       event_trigger: allocation_params[:event_trigger],
       created_by_username: current_user,
-      nomis_booking_id: offender.booking_id,
       allocated_at_tier: offender.tier,
       recommended_pom_type: (RecommendationService.recommended_pom_type(offender) == RecommendationService::PRISON_POM) ? 'prison' : 'probation',
       prison: active_prison_id,

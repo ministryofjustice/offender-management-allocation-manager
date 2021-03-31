@@ -60,7 +60,7 @@ feature "womens allocation journey" do
       fill_in 'allocation-form-message-field', with: message_text
       click_button 'Complete allocation'
       a = Allocation.find_by!(nomis_offender_id: nomis_offender_id)
-      expect(a.attributes.symbolize_keys.except(:created_at, :updated_at, :id, :nomis_booking_id, :primary_pom_allocated_at)).
+      expect(a.attributes.symbolize_keys.except(:created_at, :updated_at, :id, :primary_pom_allocated_at)).
         to eq(message: message_text,
               allocated_at_tier: "A",
               created_by_name: " ",
@@ -104,7 +104,7 @@ feature "womens allocation journey" do
       click_button 'Complete allocation'
 
       a = Allocation.find_by!(nomis_offender_id: nomis_offender_id)
-      expect(a.attributes.symbolize_keys.except(:created_at, :updated_at, :id, :nomis_booking_id, :primary_pom_allocated_at)).
+      expect(a.attributes.symbolize_keys.except(:created_at, :updated_at, :id, :primary_pom_allocated_at)).
         to eq(message: message_text,
               allocated_at_tier: "A",
               created_by_name: " ",
@@ -151,7 +151,7 @@ feature "womens allocation journey" do
       fill_in 'allocation-form-message-field', with: message_text
       click_button 'Complete allocation'
 
-      expect(allocation.attributes.symbolize_keys.except(:created_at, :updated_at, :id, :nomis_booking_id, :primary_pom_allocated_at)).
+      expect(allocation.attributes.symbolize_keys.except(:created_at, :updated_at, :id, :primary_pom_allocated_at)).
         to eq(message: message_text,
               allocated_at_tier: "B",
               created_by_name: " ",

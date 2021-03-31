@@ -90,12 +90,12 @@ feature "view POM's caseload" do
       attributes_for(:movement, :rotl, offenderNo: moved_offenders.last.fetch(:offenderNo))
     ])
 
-    offender_map.each do |nomis_offender_id, nomis_booking_id|
+    offender_map.each do |nomis_offender_id, _nomis_booking_id|
       create(:case_information, nomis_offender_id: nomis_offender_id)
-      create(:allocation, prison: prison.code, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id, nomis_booking_id: nomis_booking_id)
+      create(:allocation, prison: prison.code, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
     end
     create(:case_information, nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPS', welsh_offender: 'Yes')
-    create(:allocation, prison: prison.code, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id, nomis_booking_id: 1_153)
+    create(:allocation, prison: prison.code, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
 
     offenders.last(15).each do |o|
       create(:responsibility, nomis_offender_id: o.fetch(:offenderNo), value: Responsibility::PROBATION)
