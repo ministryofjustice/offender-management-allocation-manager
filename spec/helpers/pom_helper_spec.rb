@@ -12,4 +12,21 @@ RSpec.describe PomHelper do
       expect(fetch_pom_name(485_926)).to eq('POM, MOIC')
     end
   end
+
+  describe 'status' do
+    it "renames 'active' status to available" do
+      pom = build(:pom, staffId: 2005,  status: 'active')
+      expect(status(pom)).to eq('available')
+    end
+
+    it "does not rename 'inactive' status" do
+      pom = build(:pom, staffId: 2005,  status: 'inactive')
+      expect(status(pom)).to eq('inactive')
+    end
+
+    it "does not rename 'unavailable' status" do
+      pom = build(:pom, staffId: 2005,  status: 'unavailable')
+      expect(status(pom)).to eq('unavailable')
+    end
+  end
 end
