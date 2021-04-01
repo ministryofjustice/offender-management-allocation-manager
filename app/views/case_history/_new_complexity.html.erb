@@ -1,0 +1,13 @@
+<div class="moj-timeline__item">
+  <div class="moj-timeline__header">
+    <h2 class="moj-timeline__title">Complexity of need level added</h2>
+  </div>
+  <div class="moj-timeline__description">
+    Level: <%= new_complexity.level %>
+    <p class="moj-timeline__date"><%= format_date_long(new_complexity.created_at) %>
+      <% if new_complexity.created_by_name.present? %>
+        by <%= new_complexity.created_by_name %>
+      <% end %>
+    </p>
+  </div>
+</div>

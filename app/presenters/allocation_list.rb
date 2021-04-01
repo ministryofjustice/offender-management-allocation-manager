@@ -17,18 +17,19 @@ class AllocationList
     # and all of the allocations we have captured so far to the caller via the passed
     # block.
     #
-    # This now needs to cope with nils at the start and middle of list - items are 'swept up'
+    # This now needs to cope with nils anywhere in the list - items are 'swept up'
     # until an actual prison change - as some items may not have an associated prison
     current_prison = nil
     allocations_for_prison = []
-    @array.each do |item|
-      if item.prison == current_prison || current_prison.nil?
-        allocations_for_prison << item
+    @array.each do |history_entry|
+      if history_entry.prison == current_prison || current_prison.nil? || history_entry.prison.nil?
+        allocations_for_prison << history_entry
+        current_prison = history_entry.prison if current_prison.nil?
       else
         yield(current_prison, allocations_for_prison)
-        allocations_for_prison = [item]
+        allocations_for_prison = [history_entry]
+        current_prison = history_entry.prison
       end
-      current_prison = item.prison
     end
     yield(current_prison, allocations_for_prison) unless allocations_for_prison.empty?
   end
