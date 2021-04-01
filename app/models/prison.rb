@@ -7,6 +7,10 @@ class Prison
     def active
       PrisonEmumerator.new Allocation.distinct.pluck(:prison)
     end
+
+    def all
+      PrisonEmumerator.new PrisonService.prison_codes
+    end
   end
 
   def initialize(prison_code)

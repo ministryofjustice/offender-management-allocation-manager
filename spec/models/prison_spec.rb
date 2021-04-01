@@ -18,6 +18,19 @@ RSpec.describe Prison, type: :model do
     end
   end
 
+  describe '#all' do
+    let(:p1) { build(:prison) }
+    let(:p2) { build(:womens_prison) }
+
+    it 'includes all male prisons' do
+      expect(described_class.all.map(&:code)).to include(p1.code)
+    end
+
+    it 'includes all womens prisons' do
+      expect(described_class.all.map(&:code)).to include(p2.code)
+    end
+  end
+
   describe '#womens?' do
     let(:test_strategy) { Flipflop::FeatureSet.current.test! }
 
