@@ -1,0 +1,10 @@
+<% description = capture do %>
+  <p>
+    The community probation team declined the early allocation referral.
+  </p>
+<% end %>
+<%= render 'case_history/case_history',
+           title: 'Early allocation decision recorded',
+           description: description,
+           object: decision_ineligible
+%>

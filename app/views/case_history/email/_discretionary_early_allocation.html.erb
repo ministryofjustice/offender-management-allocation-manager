@@ -1,0 +1,13 @@
+<% description = capture do %>
+  <p>
+    The LDU for <%= discretionary_early_allocation.name %> - <%=  format_email(discretionary_early_allocation.email) %> - was sent a copy of the discretionary early allocation assessment.
+  </p>
+  <p>
+    The allocated POM was copied into this email.
+  </p>
+<% end %>
+<%= render 'case_history/email_history',
+           title: 'Early allocation decision requested',
+           description: description,
+           object: discretionary_early_allocation
+%>

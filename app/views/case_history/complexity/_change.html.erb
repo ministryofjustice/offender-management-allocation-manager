@@ -1,0 +1,10 @@
+<% description = capture do %>
+  Changed from: <%= change.previous_level %> to <%= change.level %>
+  <p class="govuk-body govuk-!-margin-bottom-1">
+    Reason(s) for the change: <%= change.reasons %>
+  </p>
+<% end %>
+<%= render 'case_history/case_history',
+           title: 'Complexity of need level updated',
+           description: description,
+           object: change %>
