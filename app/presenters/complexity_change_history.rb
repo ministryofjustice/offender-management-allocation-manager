@@ -13,6 +13,6 @@ class ComplexityChangeHistory
   end
 
   def to_partial_path
-    'case_history/change_complexity'
+    'case_history/complexity/change'
   end
 end

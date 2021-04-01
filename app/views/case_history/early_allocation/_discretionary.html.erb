@@ -1,0 +1,21 @@
+<% description = capture do %>
+  <p>
+    Assessment outcome is discretionary.
+  </p>
+  <p>
+    The community probation team will need to make a decision.
+  </p>
+  <p>
+    <%= link_to 'View saved assessment', prison_prisoner_early_allocation_path(
+        prison_id: @prison.code,
+        prisoner_id: discretionary.nomis_offender_id,
+        id: discretionary.id
+    ) %>
+  </p>
+<% end %>
+<%= render 'case_history/case_history',
+           title: 'Early allocation assessment form completed',
+           description: description,
+           object: discretionary
+%>
+

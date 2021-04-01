@@ -13,9 +13,9 @@ class EarlyAllocationHistory
 
   def to_partial_path
     if @early_allocation.created_within_referral_window?
-      "case_history/#{partial_within_window}"
+      "case_history/early_allocation/#{partial_within_window}"
     else
-      "case_history/#{partial_outside_window}"
+      "case_history/early_allocation/#{partial_outside_window}"
     end
   end
 
@@ -23,21 +23,21 @@ private
 
   def partial_within_window
     if @early_allocation.community_decision.in?([true, false]) || @early_allocation.discretionary?
-      'ea_discretionary'
+      'discretionary'
     elsif @early_allocation.eligible?
-      'ea_eligible'
+      'eligible'
     else
-      'ea_not_eligible'
+      'not_eligible'
     end
   end
 
   def partial_outside_window
     if @early_allocation.eligible?
-      'ea_unsent_eligible'
+      'unsent_eligible'
     elsif @early_allocation.discretionary?
-      'ea_unsent_discretionary'
+      'unsent_discretionary'
     else
-      'ea_not_eligible'
+      'not_eligible'
     end
   end
 end
