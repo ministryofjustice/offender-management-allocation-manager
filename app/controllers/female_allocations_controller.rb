@@ -18,6 +18,7 @@ class FemaleAllocationsController < PrisonsApplicationController
                        end
     poms = PrisonOffenderManagerService.get_poms_for(active_prison_id).index_by(&:staff_id)
     @previous_poms = previous_pom_ids.map { |staff_id| poms[staff_id] }.compact
+    @current_pom = PrisonOffenderManagerService.get_pom_at(active_prison_id, previous_allocation.primary_pom_nomis_id) if previous_allocation&.primary_pom_nomis_id
   end
 
   def new
@@ -51,12 +52,17 @@ class FemaleAllocationsController < PrisonsApplicationController
       end
     else
       override = Override.new session[:female_allocation_override]
+      event = if Allocation.find_by(prison: @prison.code, nomis_offender_id: nomis_offender_id_from_url)&.active?
+                :reallocate_primary_pom
+              else
+                :allocate_primary_pom
+              end
 
       allocation_attributes =
         {
           primary_pom_nomis_id: staff_id,
           nomis_offender_id: nomis_offender_id_from_url,
-          event: :allocate_primary_pom,
+          event: event,
           event_trigger: :user,
           created_by_username: current_user,
           nomis_booking_id: @prisoner.booking_id,

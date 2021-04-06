@@ -108,7 +108,12 @@
       <td class="govuk-table__cell govuk-!-width-one-half">POM</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
         <%= link_to @pom.full_name, prison_pom_path(@prison.code, @pom.staff_id), class: "govuk-link" %>
-        <%= link_to 'Reallocate', edit_prison_allocation_path(@prison.code, @prisoner.offender_no, sort: params[:sort], page: params[:page]), class: "govuk-link pull-right" %>
+        <!-- Yes this is a bit of a hack - TODO: take this out when the male allocation journey joins up with the female one -->
+        <% if @prison.womens? %>
+          <%= link_to 'Reallocate', prison_prisoner_staff_index_path(@prison.code, @prisoner.offender_no), class: "govuk-link pull-right" %>
+        <% else %>
+          <%= link_to 'Reallocate', edit_prison_allocation_path(@prison.code, @prisoner.offender_no, sort: params[:sort], page: params[:page]), class: "govuk-link pull-right" %>
+        <% end %>
       </td>
     </tr>
     <tr class="govuk-table__row" id="co-working-pom">
