@@ -1,0 +1,21 @@
+<% description = capture do %>
+  <p>
+    Assessment outcome: eligible.
+  </p>
+  <p>
+    The case handover date has been updated. The community probation team will allocate a COM to take responsibility for this case early.
+  </p>
+  <p>
+    <%= link_to 'View saved assessment', prison_prisoner_early_allocation_path(
+        prison_id: @prison.code,
+        prisoner_id: eligible.nomis_offender_id,
+        id: eligible.id
+    ) %>
+  </p>
+<% end %>
+<%= render 'case_history/case_history',
+           title: 'Early allocation assessment form completed',
+           description: description,
+           object: eligible
+%>
+

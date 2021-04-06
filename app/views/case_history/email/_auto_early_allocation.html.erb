@@ -1,0 +1,12 @@
+<% description = capture do %>
+  <p>
+    The LDU for <%= auto_early_allocation.name %> - <%=  format_email(auto_early_allocation.email) %> - was sent a copy of the eligible early allocation assessment and new handover dates.
+  </p>
+  <p>
+    The allocated POM was copied into this email.
+  </p>
+<% end %>
+<%= render 'case_history/email_history',
+           title: 'Early allocation assessment form sent',
+           description: description,
+           object: auto_early_allocation %>
