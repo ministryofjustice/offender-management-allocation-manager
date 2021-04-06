@@ -1,0 +1,16 @@
+<% if deallocate_secondary_pom.event_trigger == 'offender_transferred' %>
+  <%= render 'case_history/case_history',
+             title: 'Co-working unallocated (transfer)',
+             description: '',
+             object: deallocate_secondary_pom
+  %>
+<% else %>
+  <% description = capture do %>
+    Prisoner unallocated co-working POM
+    <%= allocations[deallocate_secondary_pom_counter + 1].secondary_pom_name.titleize %> - <%= format_email(@pom_emails[allocations[deallocate_secondary_pom_counter + 1].secondary_pom_nomis_id]) %>
+  <% end %>
+  <%= render 'case_history/case_history',
+             title: 'Co-working unallocated',
+             description: description,
+             object: deallocate_secondary_pom %>
+<% end %>

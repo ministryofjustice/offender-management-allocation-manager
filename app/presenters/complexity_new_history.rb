@@ -16,14 +16,14 @@ class ComplexityNewHistory
   end
 
   def to_partial_path
-    'case_history/new_complexity'
+    'case_history/complexity/new'
   end
 
   def created_by_name
     username = @history[:sourceUser]
     if username
       user = HmppsApi::PrisonApi::UserApi.user_details(username)
-      "#{user.last_name}, #{user.first_name}".titleize
+      "#{user.last_name}, #{user.first_name}"
     end
   end
 end
