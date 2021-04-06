@@ -117,6 +117,12 @@ FactoryBot.define do
       sentence { attributes_for(:sentence_detail, :indeterminate) }
     end
 
+    # the default release date and conditional release date will force the offender to be POM supporting and requiring a COM
+    # this trait makes sure the determinate offender has a release date long into the future
+    trait :determinate_release_in_three_years do
+      sentence { attributes_for(:sentence_detail, releaseDate: Time.zone.today + 3.years, conditionalReleaseDate: Time.zone.today + 3.years) }
+    end
+
     sequence(:bookingId) { |c| c + 100_000 }
   end
 end

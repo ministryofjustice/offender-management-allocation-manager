@@ -56,6 +56,7 @@
       <%= link_to 'Change', edit_prison_case_information_path(@prison.code, @prisoner.offender_no), class: 'govuk-link pull-right' if @prisoner.manual_entry? %>
     </td>
   </tr>
+  <% if @prison.womens? %>
   <tr class="govuk-table__row" id="complexity-level-row">
     <td class="govuk-table__cell">Complexity of need level</td>
     <td class="govuk-table__cell table_cell__left_align">
@@ -63,6 +64,7 @@
       <%= link_to 'Change', edit_prison_prisoner_complexity_level_path(@prison.code, @prisoner.offender_no), class: 'govuk-link pull-right' if @prisoner.manual_entry? %>
     </td>
   </tr>
+  <% end %>
   <tr class="govuk-table__row">
     <td class="govuk-table__cell">Allocation history</td>
     <td class="govuk-table__cell table_cell__left_align">

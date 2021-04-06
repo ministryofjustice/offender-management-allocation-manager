@@ -5,8 +5,8 @@ require "rails_helper"
 feature "womens allocation journey" do
   let(:test_strategy) { Flipflop::FeatureSet.current.test! }
   let(:prison) { build(:womens_prison) }
-  let(:offenders) { build_list(:nomis_offender, 5, agencyId: prison.code, complexityLevel: 'high') }
-  let(:offender) { build(:nomis_offender) }
+  let(:offenders) { build_list(:nomis_offender, 5, agencyId: 'BZI', complexityLevel: 'high') }
+  let(:offender) { build(:nomis_offender, :determinate_release_in_three_years, agencyId: 'BZI') }
   let(:nomis_offender_id) { offender.fetch(:offenderNo) }
   let(:user) { build(:pom) }
   let(:probation_pom) { build(:pom, :probation_officer) }
@@ -168,5 +168,9 @@ feature "womens allocation journey" do
               secondary_pom_nomis_id: nil,
               suitability_detail: nil)
     end
+  end
+
+  scenario 'change complexity of need', :js do
+  #  todo: need to test clicking on changing the complexity and the back button to return to 'new allocation'
   end
 end
