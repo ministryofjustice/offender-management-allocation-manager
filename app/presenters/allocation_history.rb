@@ -16,8 +16,10 @@ class AllocationHistory
   # we don't produce the wrong answer
   # This is now 'created_at' to reflect that this is the 'created time' of the history record
   # and the 'updated_at' does not exist (because history records cannot be modified)
+  # The diff is of course stored in UTC, so we have to convert to local time
+  # manually as we've bypassed the library code in this instance
   def created_at
-    YAML.load(@version.object_changes).fetch('updated_at')[1]
+    YAML.load(@version.object_changes).fetch('updated_at').second.getlocal
   end
 
   # render a different partial depending on the type of event

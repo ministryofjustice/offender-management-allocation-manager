@@ -6,7 +6,9 @@ feature 'Case history with complexity level' do
   before do
     test_strategy.switch!(:womens_estate, true)
 
-    allow(HmppsApi::ComplexityApi).to receive(:get_history).with(offender_no).and_return(history)
+    stub_request(:get, "https://complexity-of-need-staging.hmpps.service.justice.gov.uk/v1/complexity-of-need/offender-no/#{offender_no}/history").
+      to_return(body: history.to_json)
+
     stub_signin_spo logged_in_user, [prison_code]
     stub_offenders_for_prison prison_code, [offender]
     stub_poms prison_code, [pom]
@@ -28,8 +30,11 @@ feature 'Case history with complexity level' do
 
   let(:test_strategy) { Flipflop::FeatureSet.current.test! }
   let(:now) { Time.zone.now }
-  let(:complexity_add_time) { now - 1.hour }
-  let(:complexity_change_time) { now + 1.hour }
+  # we're expecting the Complexity Service to return times in UTC
+  let(:now_from_history_service) { now.utc }
+  let(:complexity_add_time) { now_from_history_service - 1.hour }
+  let(:complexity_change_time) { now_from_history_service + 1.hour }
+
   let(:username) { 'user' }
   let(:logged_in_user) { build(:pom) }
   let(:pom) { build(:pom) }
@@ -44,7 +49,7 @@ feature 'Case history with complexity level' do
   context 'with 1 history record' do
     let(:history) {
       [{ level: 'high',
-         createdTimeStamp: complexity_add_time,
+         createdTimeStamp: complexity_add_time.to_s,
          sourceUser: username }]
     }
 
@@ -68,7 +73,7 @@ feature 'Case history with complexity level' do
               "Prisoner allocated to #{pom_name.titleize} - #{pom.emails.first}\n",
               "Tier: #{case_info.tier}"
             ].join],
-            ['.moj-timeline__date', "#{formatted_date_for(now)} by #{created_by_name.titleize}"],
+            ['.moj-timeline__date', "#{formatted_date_for(now.getlocal)} by #{created_by_name.titleize}"],
           ].each do |key, val|
             expect(page).to have_css(key, text: val)
           end
@@ -82,7 +87,7 @@ feature 'Case history with complexity level' do
           [
             ['.moj-timeline__title', 'Complexity of need level added'],
             ['.moj-timeline__description', 'Level: High'],
-            ['.moj-timeline__date', "#{formatted_date_for(complexity_add_time)} by #{pom_name.titleize}"],
+            ['.moj-timeline__date', "#{formatted_date_for(complexity_add_time.getlocal)} by #{pom_name.titleize}"],
           ].each do |key, val|
             expect(page).to have_css(key, text: val)
           end
@@ -94,14 +99,14 @@ feature 'Case history with complexity level' do
   context 'with 2 history records' do
     let(:history) {
       [{ level: 'high',
-         createdTimeStamp: complexity_add_time,
+         createdTimeStamp: complexity_add_time.to_s,
          sourceUser: username },
        { level: 'medium',
-         createdTimeStamp: complexity_change_time,
+         createdTimeStamp: complexity_change_time.to_s,
          notes: reason,
          sourceUser: username }]
     }
-    let(:reason) { 'There really must have been a reason' }
+    let(:reason) { Faker::ChuckNorris.fact }
 
     it 'has 1 prison section' do
       expect(all('.govuk-grid-row').size).to eq(1)
@@ -122,7 +127,7 @@ feature 'Case history with complexity level' do
             'Changed from: High to Medium',
             "Reason(s) for the change: #{reason}"
           ].join("\n"))
-          expect(page).to have_css('.moj-timeline__date', text: "#{formatted_date_for(complexity_change_time)} by #{pom_name.titleize}")
+          expect(page).to have_css('.moj-timeline__date', text: "#{formatted_date_for(complexity_change_time.getlocal)} by #{pom_name.titleize}")
         end
       end
     end

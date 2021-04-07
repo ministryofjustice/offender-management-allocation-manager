@@ -50,6 +50,14 @@ feature 'Allocation History' do
   let(:second_prison) { build(:prison, code: 'PVI') }
   let(:open_prison) { build(:prison, code: PrisonService::PRESCOED_CODE) }
 
+  before do
+    Timecop.travel DateTime.new 2021, 2, 28, 11, 25, 34
+  end
+
+  after do
+    Timecop.return
+  end
+
   describe 'offender allocation history' do
     before {
       stub_auth_token
@@ -205,15 +213,15 @@ feature 'Allocation History' do
         end
       end
 
-      it 'has a Pentonville section', :js do
-        # 2nd Prison - Pentonville. This contains 7 events
-        history1 = history[1]
-        history2 = history[2]
-
+      it 'has a Pentonville section with 7 items' do
         within '.govuk-grid-row:nth-of-type(2)' do
           expect(page).to have_css('.govuk-heading-m', text: "HMP Pentonville")
           expect(all('.moj-timeline__item').size).to eq(7)
+        end
+      end
 
+      it 'has the transfer at the top of the list' do
+        within '.govuk-grid-row:nth-of-type(2)' do
           within '.moj-timeline__item:nth-of-type(1)' do
             [
               ['.moj-timeline__title', "Prisoner unallocated (transfer)"],
@@ -222,7 +230,15 @@ feature 'Allocation History' do
               expect(page).to have_css(key, text: val)
             end
           end
+        end
+      end
 
+      it 'has a Pentonville section', :js do
+        # 2nd Prison - Pentonville. This contains 7 events
+        history1 = history[1]
+        history2 = history[2]
+
+        within '.govuk-grid-row:nth-of-type(2)' do
           within '.moj-timeline__item:nth-of-type(2)' do
             [
               ['.moj-timeline__title', "Prisoner reallocated"],

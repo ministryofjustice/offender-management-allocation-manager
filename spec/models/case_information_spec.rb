@@ -46,7 +46,7 @@ RSpec.describe CaseInformation, type: :model do
       end
 
       it 'sorts by date created (ascending)' do
-        retrieved_dates = case_info.early_allocations.map(&:created_at)
+        retrieved_dates = case_info.early_allocations.map(&:created_at).map(&:to_date)
         expect(retrieved_dates).to eq(creation_dates.sort)
       end
     end
