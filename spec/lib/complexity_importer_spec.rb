@@ -2,30 +2,43 @@ require 'rails_helper'
 require 'complexity_importer'
 
 describe ComplexityImporter do
-  let(:complexity_data) {
+  # Example CSV file
+  # Note:
+  # - All values are in title case - whereas the API expects them downcased
+  # - Some values are "Unassessed" - these should be skipped
+  let(:example_csv) {
+    <<~CSV
+      NOMS No,Complexity Score Band
+      T1234RF,High
+      Y5643IH,Medium
+      G9876AL,Low
+      O5678TW,Unassessed
+    CSV
+  }
+
+  # Expect these levels to be sent to the API
+  # offender no => complexity level
+  let(:expected_api_calls) {
     {
       'T1234RF' => 'high',
-      'Y5643IH' => 'low'
+      'Y5643IH' => 'medium',
+      'G9876AL' => 'low',
     }
-  }
-  let(:headers) {  { 'NOMS No' => 'Complexity Score Band' } }
-
-  let(:rows) {
-    headers.merge(complexity_data).map { |num, level| [num, level] }.map { |row| row.join(',') }.join("\n")
   }
 
   before do
     stub_auth_token
 
-    complexity_data.each do |num, level|
-      stub_request(:post, "https://complexity-of-need-staging.hmpps.service.justice.gov.uk/v1/complexity-of-need/offender-no/#{num}").
+    expected_api_calls.each do |offender_no, level|
+      endpoint = "/v1/complexity-of-need/offender-no/#{offender_no}"
+      stub_request(:post, Rails.configuration.complexity_api_host + endpoint).
         with(
           body: "{\"level\":\"#{level}\",\"sourceUser\":null,\"notes\":null}",
-        ).to_return(body: {}.to_json)
+          ).to_return(body: {}.to_json)
     end
   end
 
   it 'loads data' do
-    described_class.import(rows)
+    described_class.import(example_csv)
   end
 end
