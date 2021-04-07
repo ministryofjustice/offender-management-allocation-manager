@@ -1,0 +1,29 @@
+<!--
+  If we have a 'first' reallocation, (it is size-1 because the list is displayed backwards)
+   then show it as an allocation because it is - incorrect data caused by a defect is too
+   hard to change as it is YAML
+-->
+<% if reallocate_primary_pom_counter == allocations.size - 1 %>
+  <%= render 'case_history/allocation/allocate_primary_pom', allocations: allocations, allocate_primary_pom: reallocate_primary_pom %>
+<% else %>
+  <% description = capture do %>
+    Prisoner reallocated to <%= reallocate_primary_pom.primary_pom_name.titleize %>
+    - <%= format_email(@pom_emails[reallocate_primary_pom.primary_pom_nomis_id]) %>
+    <br/>
+    Tier: <%= reallocate_primary_pom.allocated_at_tier %>
+    <% if reallocate_primary_pom.override_reasons.present? %>
+      <p class="govuk-body govuk-!-margin-bottom-1"><%= display_override_pom(reallocate_primary_pom) %></p>
+      <p class="govuk-body govuk-!-margin-bottom-1">Reason(s):</p>
+      <div id="override-reason-reallocation">
+        <% reallocate_primary_pom.override_reasons.each do | reason| %>
+          <%= display_override_details(reason, reallocate_primary_pom) %>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+  <%= render 'case_history/case_history',
+             title: 'Prisoner reallocated',
+             description: description,
+             object: reallocate_primary_pom %>
+<% end %>
+

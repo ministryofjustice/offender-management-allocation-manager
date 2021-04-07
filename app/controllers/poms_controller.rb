@@ -10,8 +10,16 @@ class PomsController < PrisonsApplicationController
     active_poms, inactive_poms = poms.partition { |pom|
       %w[active unavailable].include? pom.status
     }
-    @active_poms = active_poms.map { |p| PomPresenter.new(p) }
-    @inactive_poms = inactive_poms.map { |p| PomPresenter.new(p) }
+
+    if @prison.womens?
+      # poms are split into groups - 1) probation 2) prison & are sorted by last name
+      @active_probation_poms = active_poms.sort_by(&:last_name).select(&:probation_officer?).map { |po| PomPresenter.new(po) }
+      @active_prison_poms = active_poms.sort_by(&:last_name).select(&:prison_officer?).map { |po| PomPresenter.new(po) }
+      @inactive_poms = inactive_poms.sort_by(&:last_name).map { |p| PomPresenter.new(p) }
+    else
+      @active_poms = active_poms.map { |p| PomPresenter.new(p) }
+      @inactive_poms = inactive_poms.map { |p| PomPresenter.new(p) }
+    end
   end
 
   def show

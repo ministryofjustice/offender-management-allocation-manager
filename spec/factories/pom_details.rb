@@ -38,6 +38,10 @@ FactoryBot.define do
       "#{last_name}, #{first_name}".titleize
     end
 
+    def full_name_ordered
+      "#{first_name} #{last_name}".titleize
+    end
+
     def staff_id
       staffId
     end
