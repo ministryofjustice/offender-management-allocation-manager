@@ -169,8 +169,4 @@ feature "womens allocation journey" do
               suitability_detail: nil)
     end
   end
-
-  scenario 'change complexity of need', :js do
-  #  todo: need to test clicking on changing the complexity and the back button to return to 'new allocation'
-  end
 end

@@ -13,10 +13,9 @@
       <%=display_complexity_change_info(previous_complexity_level: @previous_complexity_level, updated_complexity_level: @complexity.level) %>
     </ul>
     <p>
-      <a class="govuk-link" <%= link_to 'Return to prisoner page', prison_allocation_path(
+      <%= link_to 'Return to prisoner page', prison_allocation_path(
       :prison_id => @prison.code,
-      nomis_offender_id: @prisoner.offender_no) %>
-      </a>
+      nomis_offender_id: @prisoner.offender_no), class: "govuk-link" %>
     </p>
   </div>
 </div>
