@@ -288,27 +288,7 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
 
     shared_examples 'recalculate handover dates' do
       it "recalculates the offender's handover dates, using the new Case Information data" do
-        expect(CalculatedHandoverDate).to receive(:recalculate_for) do |received_offender|
-          expect(received_offender).to be_an_instance_of(HmppsApi::Offender)
-
-          expected_fields = {
-            crn: crn,
-            tier: 'C',
-            case_allocation: 'NPS',
-            welsh_offender: false,
-            mappa_level: 0
-          }
-
-          received_fields = {
-            crn: received_offender.crn,
-            tier: received_offender.tier,
-            case_allocation: received_offender.case_allocation,
-            welsh_offender: received_offender.welsh_offender,
-            mappa_level: received_offender.mappa_level
-          }
-
-          expect(received_fields).to eq(expected_fields)
-        end
+        expect(RecalculateHandoverDateJob).to receive(:perform_later).with(offender_no)
         described_class.perform_now offender_no
       end
     end
@@ -326,7 +306,7 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
 
       it 'does not re-calculate if CaseInformation is unchanged' do
         described_class.perform_now offender_no
-        expect(CalculatedHandoverDate).not_to receive(:recalculate_for)
+        expect(RecalculateHandoverDateJob).not_to receive(:perform_later)
         described_class.perform_now offender_no
       end
     end

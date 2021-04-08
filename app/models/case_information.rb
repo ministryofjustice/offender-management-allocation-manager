@@ -39,6 +39,12 @@ class CaseInformation < ApplicationRecord
           inverse_of: :case_information,
           dependent: :destroy
 
+  has_many :email_histories,
+           foreign_key: :nomis_offender_id,
+           primary_key: :nomis_offender_id,
+           inverse_of: :case_information,
+           dependent: :destroy
+
   before_validation :set_probation_service
 
   def nps?

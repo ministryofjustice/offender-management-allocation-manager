@@ -6,7 +6,13 @@ class EmailHistory < ApplicationRecord
   SUITABLE_FOR_EARLY_ALLOCATION = 'suitable_for_early_allocation'
   OPEN_PRISON_COMMUNITY_ALLOCATION = 'open_prison_community_allocation'
 
-  validates_presence_of :name, :nomis_offender_id
+  belongs_to :case_information,
+             primary_key: :nomis_offender_id,
+             foreign_key: :nomis_offender_id,
+             inverse_of: :email_histories
+
+  # name is the name of the person/LDU being emailed
+  validates_presence_of :name
 
   validates :event, inclusion: { in: [AUTO_EARLY_ALLOCATION,
                                       DISCRETIONARY_EARLY_ALLOCATION,
