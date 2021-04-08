@@ -62,6 +62,8 @@ Rails.application.routes.draw do
 
       resource :complexity_level, only: [:edit, :update]
 
+      resource :complexity_level_allocation, only: [:edit, :update]
+
       resources :victim_liaison_officers, only: [:new, :edit, :create, :update, :destroy] do
         member do
           get 'delete'

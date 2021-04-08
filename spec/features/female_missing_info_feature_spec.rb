@@ -97,6 +97,11 @@ feature "womens missing info journey" do
     end
 
     it 'can save and allocate' do
+      # Need to update the mocked offender with the updated complexity level to mimic the selection from the
+      # complexity level radio buttons
+      offender[:complexityLevel] = 'medium'
+      stub_offender(offender)
+
       click_button 'Save and Allocate'
       expect(page).to have_current_path(prison_prisoner_staff_index_path(prison.code, prisoner_id))
     end
