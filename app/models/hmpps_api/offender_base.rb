@@ -174,7 +174,7 @@ module HmppsApi
     end
 
     def handover_reason
-      handover.reason
+      handover.reason_text
     end
 
     def responsibility_handover_date
@@ -251,15 +251,8 @@ module HmppsApi
       @sentence.criminal_sentence?
     end
 
-    # Take either the new LocalDeliveryUnit (if available and enabled) and
-    # fall back to the old local_divisional_unit if not. This should all go away
-    # in Feb 2021 after the PDU changes have been rolled out in nDelius
     def ldu
-      if @case_information&.local_delivery_unit&.enabled?
-        @case_information.local_delivery_unit
-      else
-        @case_information&.local_divisional_unit
-      end
+      @case_information&.ldu
     end
 
     def handover

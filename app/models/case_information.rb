@@ -55,6 +55,17 @@ class CaseInformation < ApplicationRecord
     team.try(:local_divisional_unit)
   end
 
+  # Take either the new LocalDeliveryUnit (if available and enabled) and
+  # fall back to the old local_divisional_unit if not. This should all go away
+  # in Feb 2021 after the PDU changes have been rolled out in nDelius
+  def ldu
+    if local_delivery_unit&.enabled?
+      local_delivery_unit
+    else
+      local_divisional_unit
+    end
+  end
+
   # We only normally show/edit the most recent early allocation
   def latest_early_allocation
     early_allocations.last

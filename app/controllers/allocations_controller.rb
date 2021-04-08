@@ -122,7 +122,7 @@ class AllocationsController < PrisonsApplicationController
 
     @history = (allocation.history + vlo_history + complexity_history).sort_by(&:created_at)
     @early_allocations = CaseInformation.find_by!(nomis_offender_id: nomis_offender_id_from_url).early_allocations
-    @email_histories = EmailHistory.where(nomis_offender_id: nomis_offender_id_from_url)
+    @email_histories = EmailHistory.in_offender_timeline.where(nomis_offender_id: nomis_offender_id_from_url)
 
     @pom_emails = AllocationService.allocation_history_pom_emails(allocation)
   end

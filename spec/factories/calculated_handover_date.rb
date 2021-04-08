@@ -10,9 +10,9 @@ FactoryBot.define do
 
     reason {
       # Randomly select a valid reason
-      ['NPS Inderminate',
-       'NPS - MAPPA level unknown',
-       'CRC Case'].sample
+      [:nps_indeterminate,
+       :nps_mappa_unknown,
+       :crc_case].sample
     }
   end
 end

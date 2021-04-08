@@ -80,6 +80,88 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     end
   end
 
+  context 'when offender has less than 10 months left to serve' do
+    let(:nomis_offender) {
+      build(:nomis_offender,
+            agencyId: prison.code,
+            sentence: attributes_for(:sentence_detail, :less_than_10_months_to_serve))
+    }
+
+    before do
+      stub_offender(nomis_offender)
+      # we don't care about setting handover dates in Delius for this test
+      allow(HmppsApi::CommunityApi).to receive(:set_handover_dates)
+    end
+
+    context 'when there is no COM assigned' do
+      context 'without an LDU' do
+        before do
+          create(:case_information, :nps, team: nil, nomis_offender_id: offender_no)
+        end
+
+        it 'does not send an email' do
+          expect(CommunityMailer).not_to receive(:assign_com_less_than_10_months)
+          described_class.perform_now(offender_no)
+        end
+      end
+
+      context 'when there is an LDU' do
+        let(:ldu) { build(:local_delivery_unit) }
+        let!(:case_info) { create(:case_information, :nps, local_delivery_unit: ldu, nomis_offender_id: offender_no) }
+        let(:one_day_later) { today + 1.day }
+        let(:two_days_later) { today + 2.days }
+
+        before do
+          # because we are inlining jobs and calling original, this method gets called twice
+          expect(CommunityMailer).to receive(:assign_com_less_than_10_months).at_least(:twice).with(
+            email: ldu.email_address,
+            prisoner_name: "#{nomis_offender.fetch(:firstName)} #{nomis_offender.fetch(:lastName)}",
+            prisoner_number: offender_no,
+            crn_number: case_info.crn,
+            prison_name: PrisonService.name_for(nomis_offender.fetch(:agencyId))
+          ).and_call_original
+        end
+
+        it 'sends an email and records the fact' do
+          expect {
+            described_class.perform_now(offender_no)
+          }.to change(EmailHistory, :count).by(1)
+        end
+
+        it 'nags the LDU 48 hours later' do
+          expect {
+            described_class.perform_now(offender_no)
+          }.to change(EmailHistory, :count).by(1)
+
+          Timecop.travel one_day_later do
+            expect {
+              described_class.perform_now(offender_no)
+            }.not_to change(EmailHistory, :count)
+          end
+
+          Timecop.travel two_days_later do
+            expect {
+              described_class.perform_now(offender_no)
+            }.to change(EmailHistory, :count).by(1)
+          end
+        end
+      end
+    end
+
+    context 'when a COM is assigned' do
+      let(:ldu) { build(:local_delivery_unit) }
+
+      before do
+        create(:case_information, :nps, :with_com, local_delivery_unit: ldu, nomis_offender_id: offender_no)
+      end
+
+      it 'does not send an email' do
+        expect(CommunityMailer).not_to receive(:assign_com_less_than_10_months)
+        described_class.perform_now(offender_no)
+      end
+    end
+  end
+
   describe 're-calculation' do
     let!(:case_info) { create(:case_information, :nps, nomis_offender_id: offender_no) }
     let(:offender) { OffenderService.get_offender(offender_no) }
@@ -100,7 +182,37 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
         expect(record.start_date).to eq(offender.handover_start_date)
         expect(record.handover_date).to eq(offender.responsibility_handover_date)
-        expect(record.reason).to eq(offender.handover_reason)
+        expect(record.reason_text).to eq(offender.handover_reason)
+        expect(record.responsibility).to eq(CalculatedHandoverDate::CUSTODY_ONLY)
+      end
+
+      context 'with a COM responsible case' do
+        let(:nomis_offender) {
+          build(:nomis_offender,
+                agencyId: prison.code,
+                sentence: attributes_for(:sentence_detail, :less_than_10_months_to_serve))
+        }
+
+        it 'records responsibility' do
+          described_class.perform_now(offender_no)
+          expect(record.responsibility).to eq(CalculatedHandoverDate::COMMUNITY_RESPONSIBLE)
+        end
+      end
+
+      context 'with a COM supporting case' do
+        let(:nomis_offender) {
+          build(:nomis_offender,
+                agencyId: prison.code,
+                sentence: attributes_for(:sentence_detail, :inside_handover_window))
+        }
+
+        before do
+          described_class.perform_now(offender_no)
+        end
+
+        it 'has POM responsibility with COM supporting' do
+          expect(record.responsibility).to eq(CalculatedHandoverDate::CUSTODY_WITH_COM)
+        end
       end
     end
 
@@ -108,6 +220,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       let(:nomis_offender) { build(:nomis_offender) }
       let!(:existing_record) {
         create(:calculated_handover_date,
+               responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
                case_information: case_info,
                start_date: existing_start_date,
                handover_date: existing_handover_date,
@@ -118,7 +231,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       describe 'when the dates have changed' do
         let(:existing_start_date) { today + 1.week }
         let(:existing_handover_date) { existing_start_date + 7.months }
-        let(:existing_reason) { 'CRC Case' }
+        let(:existing_reason) { :crc_case }
 
         it 'updates the existing record' do
           described_class.perform_now(offender_no)
@@ -126,14 +239,14 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
           existing_record.reload
           expect(existing_record.start_date).to eq(offender.handover_start_date)
           expect(existing_record.handover_date).to eq(offender.responsibility_handover_date)
-          expect(existing_record.reason).to eq(offender.handover_reason)
+          expect(existing_record.reason_text).to eq(offender.handover_reason)
         end
       end
 
       describe "when the dates haven't changed" do
         let(:existing_start_date) { offender.handover_start_date }
         let(:existing_handover_date) { offender.responsibility_handover_date }
-        let(:existing_reason) { offender.handover_reason }
+        let(:existing_reason) { HandoverDateService.handover(offender).reason }
 
         it "does nothing" do
           old_updated_at = existing_record.updated_at
