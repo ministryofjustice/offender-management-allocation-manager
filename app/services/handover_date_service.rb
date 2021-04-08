@@ -16,12 +16,43 @@ class HandoverDateService
   # OMIC apply to the womens' estate from 30/04/2021
   WOMENS_POLICY_START_DATE = Date.parse(ENV.fetch('WOMENS_POLICY_START_DATE', '30/04/2021'))
 
-  HandoverData = Struct.new :custody, :community, :start_date, :handover_date, :reason, keyword_init: true
+  class HandoverData
+    REASONS = {
+      com_responsibility: 'COM Responsibility',
+      recall_case: 'Recall case',
+      immigration_case: 'Immigration Case',
+      release_date_unknown: 'Release Date Unknown',
+      open_prison_pre_omic_rules: 'Open Prison pre-OMIC Rules',
+      unsentenced: 'Unsentenced',
+      crc_case: 'CRC Case',
+      nps_early_allocation: 'NPS Early Allocation',
+      nps_indeterminate: 'NPS Inderminate',
+      nps_determinate_parole_case: 'NPS Determinate Parole Case',
+      nps_mappa_unknown: 'NPS - MAPPA level unknown',
+      nps_determinate_mappa_1_n: 'NPS Determinate Mappa 1/N',
+      nps_determinate_mappa_2_3: 'NPS Determinate Mappa 2/3',
+      less_than_10_months_left_to_serve: 'Less than 10 months left to serve'
+    }.freeze
+
+    attr_reader :custody, :community, :start_date, :handover_date
+
+    def initialize custody:, community:, start_date:, handover_date:, reason:
+      @custody = custody
+      @community = community
+      @start_date = start_date
+      @handover_date = handover_date
+      @reason = reason
+    end
+
+    def reason
+      REASONS.fetch(@reason, "Unknown handover reason #{@reason}")
+    end
+  end
 
   # if COM responsible, then handover dates all empty
   NO_HANDOVER_DATE = HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
                                       start_date: nil, handover_date: nil,
-                                      reason: 'COM Responsibility'
+                                      reason: :com_responsibility
 
   def self.handover(raw_offender)
     offender = OffenderWrapper.new(raw_offender)
@@ -29,17 +60,17 @@ class HandoverDateService
     if offender.recalled?
       HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
                        start_date: nil, handover_date: nil,
-                       reason: 'Recall case'
+                       reason: :recall_case
 
     elsif offender.immigration_case?
       HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
                        start_date: nil, handover_date: nil,
-                       reason: 'Immigration Case'
+                       reason: :immigration_case
 
     elsif offender.release_date.blank?
       HandoverData.new custody: RESPONSIBLE, community: NOT_INVOLVED,
                        start_date: nil, handover_date: nil,
-                       reason: 'Release Date Unknown'
+                       reason: :release_date_unknown
 
     # Indeterminate offenders should only ever be NPS
     # There is no such thing as a CRC indeterminate offender
@@ -52,25 +83,42 @@ class HandoverDateService
         # Offender is in open prison under pre-OMIC rules – COM is always responsible
         HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
                          start_date: nil, handover_date: nil,
-                         reason: 'Open Prison pre-OMIC Rules'
+                         reason: :open_prison_pre_omic_rules
       else
         handover_date, reason = nps_handover_date(offender)
         start_date = nps_start_date(offender)
         handover_date = start_date if start_date.present? && start_date > handover_date
 
-        case nps_responsibility(offender, handover_date)
-        when RESPONSIBLE
+        if offender.policy_case?
+          # we can't calculate responsibility if sentence_start_date is empty, so return NOT_INVOLVED rather than a page error
+          if offender.sentence_start_date.blank?
+            HandoverData.new custody: NOT_INVOLVED, community: NOT_INVOLVED,
+                             start_date: nil, handover_date: nil,
+                             reason: :unsentenced
+          elsif offender.expected_time_in_custody_gt_10_months?
+            if handover_date > Time.zone.today
+              HandoverData.new custody: RESPONSIBLE, community: com_responsibility(start_date, handover_date),
+                               start_date: start_date, handover_date: handover_date,
+                               reason: reason
+            else
+              HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
+                               start_date: start_date, handover_date: handover_date,
+                               reason: reason
+            end
+          else
+            HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
+                             start_date: nil, handover_date: nil,
+                             reason: :less_than_10_months_left_to_serve
+          end
+        # pre-policy can only be responsible or supporting
+        elsif offender.nps_prepolicy_responsibility(handover_date) == RESPONSIBLE
           HandoverData.new custody: RESPONSIBLE, community: com_responsibility(start_date, handover_date),
                            start_date: start_date, handover_date: handover_date,
                            reason: reason
-        when SUPPORTING
+        else
           HandoverData.new custody: SUPPORTING, community: RESPONSIBLE,
                            start_date: start_date, handover_date: handover_date,
                            reason: reason
-        else
-          HandoverData.new custody: NOT_INVOLVED, community: NOT_INVOLVED,
-                           start_date: nil, handover_date: nil,
-                           reason: 'Unsentenced'
         end
       end
     else
@@ -85,7 +133,7 @@ class HandoverDateService
       end
       HandoverData.new custody: pom, community: com,
                          start_date: crc_date, handover_date: crc_date,
-                         reason: 'CRC Case'
+                         reason: :crc_case
     end
   end
 
@@ -130,17 +178,17 @@ private
 
   def self.nps_handover_date(offender)
     if offender.early_allocation?
-      [early_allocation_handover_date(offender), 'NPS Early Allocation']
+      [early_allocation_handover_date(offender), :nps_early_allocation]
     elsif offender.indeterminate_sentence?
-      [indeterminate_responsibility_date(offender), 'NPS Inderminate']
+      [indeterminate_responsibility_date(offender), :nps_indeterminate]
     elsif offender.parole_eligibility_date.present?
-      [offender.parole_eligibility_date - 8.months, 'NPS Determinate Parole Case']
+      [offender.parole_eligibility_date - 8.months, :nps_determinate_parole_case]
     elsif offender.mappa_level.blank?
-      [mappa1_responsibility_date(offender), 'NPS - MAPPA level unknown']
+      [mappa1_responsibility_date(offender), :nps_mappa_unknown]
     elsif offender.mappa_level.in? [1, 0]
-      [mappa1_responsibility_date(offender), 'NPS Determinate Mappa 1/N']
+      [mappa1_responsibility_date(offender), :nps_determinate_mappa_1_n]
     else
-      [mappa_23_responsibility_date(offender), 'NPS Determinate Mappa 2/3']
+      [mappa_23_responsibility_date(offender), :nps_determinate_mappa_2_3]
     end
   end
 
@@ -172,33 +220,6 @@ private
     end
   end
 
-  def self.nps_responsibility_rules(offender:, policy_start_date:, handover_date:, cutoff_date:)
-    if offender.new_case? policy_start_date
-      nps_policy_rules offender: offender, handover_date: handover_date
-    else
-      nps_prepolicy_rules offender: offender, handover_date: handover_date, cutoff_date: cutoff_date
-    end
-  end
-
-  def self.nps_prepolicy_rules offender:, handover_date:, cutoff_date:
-    if offender.release_date >= cutoff_date && handover_date > Time.zone.today
-      RESPONSIBLE
-    else
-      SUPPORTING
-    end
-  end
-
-  def self.nps_policy_rules offender:, handover_date:
-    # we can't calculate responsibility if sentence_start_date is empty, so return NOT_INVOLVED rather than a page error
-    return NOT_INVOLVED if offender.sentence_start_date.blank?
-
-    if offender.expected_time_in_custody_gt_10_months? && handover_date > Time.zone.today
-      RESPONSIBLE
-    else
-      SUPPORTING
-    end
-  end
-
   WELSH_POLICY_START_DATE = DateTime.new(2019, 2, 4).utc.to_date.freeze
   WELSH_CUTOFF_DATE = '4 May 2020'.to_date.freeze
 
@@ -207,30 +228,6 @@ private
   ENGLISH_PUBLIC_CUTOFF = '15 Feb 2021'.to_date.freeze
 
   WOMENS_CUTOFF_DATE = '30/9/2022'.to_date
-
-  def self.nps_responsibility(offender, handover_date)
-    if offender.in_womens_prison?
-      nps_responsibility_rules(offender: offender,
-                               policy_start_date: WOMENS_POLICY_START_DATE,
-                               handover_date: handover_date,
-                               cutoff_date: WOMENS_CUTOFF_DATE)
-    elsif offender.welsh_offender?
-      nps_responsibility_rules(offender: offender,
-                               policy_start_date: WELSH_POLICY_START_DATE,
-                               handover_date: handover_date,
-                               cutoff_date: WELSH_CUTOFF_DATE)
-    elsif offender.hub_or_private?
-      nps_responsibility_rules(offender: offender,
-                               policy_start_date: ENGLISH_POLICY_START_DATE,
-                               handover_date: handover_date,
-                               cutoff_date: ENGLISH_PRIVATE_CUTOFF)
-    else
-      nps_responsibility_rules(offender: offender,
-                               policy_start_date: ENGLISH_POLICY_START_DATE,
-                               handover_date: handover_date,
-                               cutoff_date: ENGLISH_PUBLIC_CUTOFF)
-    end
-  end
 
   class OffenderWrapper
     delegate :recalled?, :immigration_case?, :nps_case?, :indeterminate_sentence?,
@@ -243,16 +240,26 @@ private
       @offender = offender
     end
 
-    def new_case? policy_start_date
-      if @offender.sentenced?
-        @offender.sentence_start_date >= policy_start_date
+    def policy_case?
+      if in_womens_prison?
+        new_case? WOMENS_POLICY_START_DATE
+      elsif welsh_offender?
+        new_case? WELSH_POLICY_START_DATE
       else
-        true
+        new_case? ENGLISH_POLICY_START_DATE
       end
     end
 
-    def expected_time_in_custody_gt_10_months?
-      release_date > @offender.sentence_start_date + 10.months
+    def nps_prepolicy_responsibility handover_date
+      if in_womens_prison?
+        nps_prepolicy_rules handover_date: handover_date, cutoff_date: WOMENS_CUTOFF_DATE
+      elsif welsh_offender?
+        nps_prepolicy_rules handover_date: handover_date, cutoff_date: WELSH_CUTOFF_DATE
+      elsif hub_or_private?
+        nps_prepolicy_rules handover_date: handover_date, cutoff_date: ENGLISH_PRIVATE_CUTOFF
+      else
+        nps_prepolicy_rules handover_date: handover_date, cutoff_date: ENGLISH_PUBLIC_CUTOFF
+      end
     end
 
     # We can not calculate the handover date for NPS Indeterminate
@@ -315,6 +322,28 @@ private
 
     def in_open_conditions?
       PrisonService.open_prison?(@offender.prison_id) || (PrisonService.womens_prison?(@offender.prison_id) && @offender.category_code == 'T')
+    end
+
+    def nps_prepolicy_rules handover_date:, cutoff_date:
+      if release_date >= cutoff_date && handover_date > Time.zone.today
+        RESPONSIBLE
+      else
+        SUPPORTING
+      end
+    end
+
+    def expected_time_in_custody_gt_10_months?
+      release_date > @offender.sentence_start_date + 10.months
+    end
+
+  private
+
+    def new_case? policy_start_date
+      if @offender.sentenced?
+        @offender.sentence_start_date >= policy_start_date
+      else
+        true
+      end
     end
   end
 end
