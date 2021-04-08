@@ -1,8 +1,11 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe RecalculateHandoverDateJob, type: :job do
-  let(:nomis_offender) { build(:nomis_offender) }
   let(:offender_no) { nomis_offender.fetch(:offenderNo) }
+  let(:today) { Time.zone.now }
+  let(:prison) { build(:prison) }
 
   before do
     stub_auth_token
@@ -14,14 +17,9 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       create(:case_information, nomis_offender_id: offender_no, case_allocation: 'NPS', manual_entry: false)
     end
 
-    it "recalculates the offender's handover dates" do
-      expect(CalculatedHandoverDate).to receive(:recalculate_for) do |received_offender|
-        expect(received_offender.offender_no).to eq(offender_no)
-      end
-      described_class.perform_now(offender_no)
-    end
+    let(:nomis_offender) { build(:nomis_offender) }
 
-    it "pushes them to the Community API" do
+    it "recalculates the offender's handover dates and pushes them to the Community API" do
       offender = OffenderService.get_offender(offender_no)
 
       expect(HmppsApi::CommunityApi).to receive(:set_handover_dates).
@@ -39,8 +37,9 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       stub_non_existent_offender(offender_no)
     end
 
+    let(:nomis_offender) { build(:nomis_offender) }
+
     it 'does nothing' do
-      expect(CalculatedHandoverDate).not_to receive(:recalculate_for)
       expect(HmppsApi::CommunityApi).not_to receive(:set_handover_dates)
       described_class.perform_now(offender_no)
     end
@@ -55,13 +54,13 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     end
 
     it 'does nothing' do
-      expect(CalculatedHandoverDate).not_to receive(:recalculate_for)
       expect(HmppsApi::CommunityApi).not_to receive(:set_handover_dates)
       described_class.perform_now(offender_no)
     end
   end
 
   context 'when the Prison API returns an error' do
+    let(:nomis_offender) { build(:nomis_offender) }
     let(:api_host) { Rails.configuration.prison_api_host }
     let(:stub_url) { "#{api_host}/api/prisoners/#{offender_no}" }
     let(:status) { 502 }
@@ -82,6 +81,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
   end
 
   context 'when the Community API returns an error' do
+    let(:nomis_offender) { build(:nomis_offender) }
     let(:api_host) { Rails.configuration.community_api_host }
     let(:stub_base_url) { "#{api_host}/secure/offenders/nomsNumber/#{offender_no}/custody/keyDates" }
     let(:start_date_url) { "#{stub_base_url}/#{HmppsApi::CommunityApi::KeyDate::HANDOVER_START_DATE}" }
@@ -108,12 +108,82 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     end
 
     describe 'HTTP 409: multiple offenders with the same NOMIS ID exist in nDelius' do
+      let(:nomis_offender) { build(:nomis_offender) }
       let(:status) { 409 }
 
       it 'rescues the error to stop the job going into the retry queue' do
         expect {
           described_class.perform_now(offender_no)
         }.not_to raise_error
+      end
+    end
+  end
+
+  describe 're-calculation' do
+    let!(:case_info) { create(:case_information, :nps, nomis_offender_id: offender_no) }
+    let(:offender) { OffenderService.get_offender(offender_no) }
+
+    before do
+      stub_offender(nomis_offender)
+      allow(HmppsApi::CommunityApi).to receive(:set_handover_dates)
+    end
+
+    context "when calculated handover dates don't exist yet for the offender" do
+      let(:record) { case_info.calculated_handover_date }
+      let(:nomis_offender) { build(:nomis_offender) }
+
+      it 'creates a new record' do
+        expect {
+          described_class.perform_now(offender_no)
+        }.to change(CalculatedHandoverDate, :count).by(1)
+
+        expect(record.start_date).to eq(offender.handover_start_date)
+        expect(record.handover_date).to eq(offender.responsibility_handover_date)
+        expect(record.reason).to eq(offender.handover_reason)
+      end
+    end
+
+    context 'when calculated handover dates already exist for the offender' do
+      let(:nomis_offender) { build(:nomis_offender) }
+      let!(:existing_record) {
+        create(:calculated_handover_date,
+               case_information: case_info,
+               start_date: existing_start_date,
+               handover_date: existing_handover_date,
+               reason: existing_reason
+        )
+      }
+
+      describe 'when the dates have changed' do
+        let(:existing_start_date) { today + 1.week }
+        let(:existing_handover_date) { existing_start_date + 7.months }
+        let(:existing_reason) { 'CRC Case' }
+
+        it 'updates the existing record' do
+          described_class.perform_now(offender_no)
+
+          existing_record.reload
+          expect(existing_record.start_date).to eq(offender.handover_start_date)
+          expect(existing_record.handover_date).to eq(offender.responsibility_handover_date)
+          expect(existing_record.reason).to eq(offender.handover_reason)
+        end
+      end
+
+      describe "when the dates haven't changed" do
+        let(:existing_start_date) { offender.handover_start_date }
+        let(:existing_handover_date) { offender.responsibility_handover_date }
+        let(:existing_reason) { offender.handover_reason }
+
+        it "does nothing" do
+          old_updated_at = existing_record.updated_at
+
+          travel_to(Time.zone.now + 15.minutes) do
+            described_class.perform_now(offender_no)
+          end
+
+          new_updated_at = existing_record.reload.updated_at
+          expect(new_updated_at).to eq(old_updated_at)
+        end
       end
     end
   end
