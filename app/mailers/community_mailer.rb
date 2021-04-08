@@ -69,4 +69,14 @@ class CommunityMailer < GovukNotifyRails::Mailer
                         previous_prison_name: previous_prison_name)
     mail(to: email)
   end
+
+  def assign_com_less_than_10_months email:, prisoner_name:, prisoner_number:, crn_number:, prison_name:
+    set_template('6cae6890-6a5a-4ceb-82bd-43c8b43fc639')
+
+    set_personalisation(prisoner_number: prisoner_number,
+                        prison_name: prison_name,
+                        crn_number: crn_number,
+                        prisoner_name: prisoner_name)
+    mail(to: email)
+  end
 end
