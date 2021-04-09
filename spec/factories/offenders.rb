@@ -77,6 +77,7 @@ FactoryBot.define do
   factory :nomis_offender, class: Hash do
     initialize_with { attributes }
 
+    currentlyInPrison { 'Y' }
     imprisonmentStatus { 'SENT03' }
     agencyId { 'LEI' }
 
