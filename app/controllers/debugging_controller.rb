@@ -22,9 +22,9 @@ class DebuggingController < PrisonsApplicationController
 
     @summary = create_summary
     @filtered_offenders_count = [
-      @summary.allocated_total,
-      @summary.unallocated_total,
-      @summary.pending_total
+      @summary.allocated.count,
+      @summary.unallocated.count,
+      @summary.pending.count
     ].sum
 
     @unfiltered_offenders_count = unfiltered_offenders.count

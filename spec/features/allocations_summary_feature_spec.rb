@@ -8,11 +8,6 @@ feature 'summary summary feature' do
   end
 
   describe 'awaiting summary table' do
-    it 'redirects correctly', vcr: { cassette_name: 'prison_api/redirect_summary_index_feature' } do
-      visit summary_prison_prisoners_path('LEI')
-      expect(page).to have_current_path allocated_prison_prisoners_path('LEI')
-    end
-
     it 'displays offenders awaiting information', vcr: { cassette_name: 'prison_api/awaiting_information_feature' } do
       visit missing_information_prison_prisoners_path('LEI')
 

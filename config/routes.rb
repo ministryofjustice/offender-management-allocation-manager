@@ -20,6 +20,20 @@ Rails.application.routes.draw do
     end
 
     resources :prisoners, only: [:show] do
+      constraints lambda {
+        |request| !PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id))
+      } do
+        get 'new_missing_info' => 'case_information#new'
+      end
+
+      constraints lambda {
+        |request| PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id))
+      } do
+        get 'new_missing_info' => 'female_missing_infos#new'
+        resource :female_missing_info, only: [:show, :update] do
+        end
+      end
+
       resource :female_missing_info, only: [:new, :show, :update] do
       end
 
@@ -31,15 +45,16 @@ Rails.application.routes.draw do
           get 'unallocated' => 'female_prisoners#unallocated'
           get 'missing_information' => 'female_prisoners#missing_information'
           get 'new_arrivals' => 'female_prisoners#new_arrivals'
+          get 'search' => 'female_prisoners#search'
         end
         constraints lambda {
           |request| !PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id))
         } do
-          get 'summary' => 'summary#index'
           get 'allocated' => 'summary#allocated'
           get 'unallocated' => 'summary#unallocated'
           get 'missing_information' => 'summary#missing_information'
           get 'new_arrivals' => 'summary#new_arrivals'
+          get 'search' => 'summary#search'
         end
       end
 
@@ -123,7 +138,6 @@ Rails.application.routes.draw do
 
     get('/debugging' => 'debugging#debugging')
     get('/debugging/prison' => 'debugging#prison_info')
-    get('/search' => 'search#search')
   end
 
   match "/401", :to => "errors#unauthorized", :via => :all

@@ -38,9 +38,17 @@
         <td aria-label="Date of birth" class="govuk-table__cell"><%= format_date(offender.date_of_birth) %></td>
         <td aria-label="Tier" class="govuk-table__cell"><%= offender.tier || '-' %></td>
         <td aria-label="POM" class="govuk-table__cell"><%= offender.allocated_pom_name || '-' %></td>
-        <td aria-label="Action" class="govuk-table__cell "><%=
-          cta_for_offender(@prison.code, offender)
-        %></td>
+        <td aria-label="Action" class="govuk-table__cell">
+          <% if @missing_info.map(&:offender_no).include?(offender.offender_no) %>
+            <%= link_to "Add missing details", prison_prisoner_new_missing_info_path(@prison.code, offender.offender_no) %>
+          <% elsif @unallocated.map(&:offender_no).include?(offender.offender_no) %>
+            <%= link_to 'Allocate', prison_prisoner_staff_index_path(@prison.code, offender.offender_no) %>
+          <% elsif @new_arrivals.map(&:offender_no).include?(offender.offender_no) %>
+            Wait
+          <% else %>
+            <%= link_to('View', prison_allocation_path(prison, nomis_offender_id: offender.offender_no)) %>
+          <% end %>
+        </td>
       </tr>
     <% end %>
     </tbody>

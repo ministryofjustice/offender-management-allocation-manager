@@ -2,16 +2,6 @@ require 'rails_helper'
 
 RSpec.describe SearchHelper do
   describe 'the CTA' do
-    context 'with no tier' do
-      let(:offender) { build(:offender) }
-
-      it "will change to edit if there is no tier" do
-        offender = build(:offender)
-        text, _link = cta_for_offender('LEI', offender)
-        expect(text).to eq("<a href=\"/prisons/LEI/case_information/new/#{offender.offender_no}\">Edit</a>")
-      end
-    end
-
     context 'with no allocation' do
       let(:offender) {
         build(:offender).tap { |o|

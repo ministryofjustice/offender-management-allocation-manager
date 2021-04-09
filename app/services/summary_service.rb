@@ -78,20 +78,20 @@ class SummaryService
     offenders_bucket
   end
 
-  def unallocated_total
-    @buckets.fetch(:unallocated).count
+  def unallocated
+    @buckets.fetch(:unallocated)
   end
 
-  def allocated_total
-    @buckets.fetch(:allocated).count
+  def allocated
+    @buckets.fetch(:allocated)
   end
 
-  def pending_total
-    @buckets.fetch(:missing_information).count
+  def pending
+    @buckets.fetch(:missing_information)
   end
 
-  def new_arrivals_total
-    @buckets.fetch(:new_arrivals).count
+  def new_arrivals
+    @buckets.fetch(:new_arrivals)
   end
 
   def handovers_total

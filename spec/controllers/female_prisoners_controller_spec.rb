@@ -91,10 +91,10 @@ RSpec.describe FemalePrisonersController, type: :controller do
     end
 
     def check_bucket_counts
-      expect(assigns(:missing_info_count)).to eq(3)
-      expect(assigns(:allocated_count)).to eq(2)
-      expect(assigns(:unallocated_count)).to eq(1)
-      expect(assigns(:new_arrivals_count)).to eq(1)
+      expect(assigns(:missing_info).size).to eq(3)
+      expect(assigns(:allocated).size).to eq(2)
+      expect(assigns(:unallocated).size).to eq(1)
+      expect(assigns(:new_arrivals).size).to eq(1)
     end
   end
 

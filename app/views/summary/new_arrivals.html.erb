@@ -7,10 +7,10 @@
 </div>
 
 <%= render(:partial => 'shared/summary_subnav', :locals => {:active => :new_arrivals,
-                                                            :unallocated_count => @unallocated_count,
-                                                            :missing_info_count => @missing_info_count,
-                                                            :allocated_count => @allocated_count,
-                                                            :new_arrivals_count => @new_arrivals_count
+                                                            :unallocated_count => @unallocated.count,
+                                                            :missing_info_count => @missing_info.count,
+                                                            :allocated_count => @allocated.count,
+                                                            :new_arrivals_count => @new_arrivals.count
 
 }) %>
 
