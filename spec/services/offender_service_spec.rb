@@ -34,6 +34,26 @@ describe OffenderService, type: :feature do
         expect(described_class.get_offender(offender.fetch(:offenderNo))).not_to be_nil
       end
     end
+
+    context 'when offender is in an unknown prison' do
+      # MHI - Morton Hall immigration centre
+      let(:offender) { build(:nomis_offender, agencyId: 'MHI') }
+      let(:test_strategy) { Flipflop::FeatureSet.current.test! }
+
+      before do
+        stub_auth_token
+        stub_offender(offender)
+        test_strategy.switch!(:womens_estate, true)
+      end
+
+      after do
+        test_strategy.switch!(:womens_estate, false)
+      end
+
+      it 'returns the offender' do
+        expect(described_class.get_offender(offender.fetch(:offenderNo))).not_to be_nil
+      end
+    end
   end
 
   describe '#get_community_data' do
