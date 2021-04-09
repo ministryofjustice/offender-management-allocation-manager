@@ -156,7 +156,9 @@ class PrisonService
   # as everything should be calling this to decide what to do.
   def self.womens_prison?(code)
     if Flipflop.womens_estate?
-      PRISONS[code].gender == :female
+      # There are still some locations we don't know about e.g. immigration detention centres
+      # so this check has to allow PRISONS[code] to be nil
+      PRISONS[code]&.gender == :female
     else
       false
     end
