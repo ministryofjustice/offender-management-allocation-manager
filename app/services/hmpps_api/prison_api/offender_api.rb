@@ -58,7 +58,7 @@ module HmppsApi
         else
           search_data = get_search_payload([offender_no])
           temp_movements = HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for([offender_no])
-          complexity_level = if PrisonService::womens_prison?(api_response.fetch('latestLocationId'))
+          complexity_level = if api_response.fetch('currentlyInPrison') == 'Y' && PrisonService::womens_prison?(api_response.fetch('latestLocationId'))
                                HmppsApi::ComplexityApi.get_complexity(offender_no)
                              end
           prisoner = HmppsApi::Offender.new api_response,

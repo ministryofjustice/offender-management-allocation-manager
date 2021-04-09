@@ -21,6 +21,19 @@ describe OffenderService, type: :feature do
       offender = described_class.get_offender(nomis_offender_id)
       expect(offender).to be_nil
     end
+
+    context 'when offender is not in prison' do
+      let(:offender) { build(:nomis_offender, currentlyInPrison: 'N', agencyId: 'OUT') }
+
+      before do
+        stub_auth_token
+        stub_offender(offender)
+      end
+
+      it 'returns the offender' do
+        expect(described_class.get_offender(offender.fetch(:offenderNo))).not_to be_nil
+      end
+    end
   end
 
   describe '#get_community_data' do
