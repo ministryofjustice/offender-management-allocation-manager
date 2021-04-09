@@ -8,10 +8,10 @@
 
 
 <%= render(:partial => 'shared/summary_subnav', :locals => {:active => :missing_information,
-                                                            :unallocated_count => @unallocated_count,
-                                                            :missing_info_count => @missing_info_count,
-                                                            :allocated_count => @allocated_count,
-                                                            :new_arrivals_count => @new_arrivals_count
+                                                            :unallocated_count => @unallocated.count,
+                                                            :missing_info_count => @missing_info.count,
+                                                            :allocated_count => @allocated.count,
+                                                            :new_arrivals_count => @new_arrivals.count
 }) %>
 
 <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Add missing information</h1>
@@ -74,7 +74,7 @@
           <% if auto_delius_import_enabled?(@prison.code) %>
             <%= link_to "Update", prison_case_information_path(@prison.code, offender.offender_no) %>
           <% else %>
-            <%= link_to "Edit", new_prison_case_information_path(@prison.code, offender.offender_no, sort: params[:sort], page: params[:page] || 1) %></td>
+            <%= link_to "Edit", new_prison_case_information_path(@prison.code, offender.offender_no, sort: params[:sort], page: params[:page] || 1) %>
           <% end %>
         </td>
       </tr>

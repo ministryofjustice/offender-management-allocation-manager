@@ -1,6 +1,5 @@
-
 <div class="search-box govuk-grid-row">
-  <%= form_tag(prison_search_path(@prison.code), method: :get, id: "search_form") do %>
+  <%= form_tag(search_prison_prisoners_path(@prison.code), method: :get, id: "search_form") do %>
     <div class="govuk-form-group" style="display: inline;" >
       <label class="govuk-label" for="q">
         Enter a prisoner name or number

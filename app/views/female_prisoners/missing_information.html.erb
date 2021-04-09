@@ -10,14 +10,14 @@
 </div>
 
 <%= render(:partial => 'shared/summary_subnav', :locals => {:active => :missing_information,
-                                                          :unallocated_count => @unallocated_count,
-                                                          :missing_info_count => @missing_info_count,
-                                                          :allocated_count => @allocated_count,
-                                                          :new_arrivals_count => @new_arrivals_count
+                                                          :unallocated_count => @unallocated.count,
+                                                          :missing_info_count => @missing_info.count,
+                                                          :allocated_count => @allocated.count,
+                                                          :new_arrivals_count => @new_arrivals.count
                                                           }) %>
 
 <h1 class="govuk-heading-l">Add missing details</h1>
-<p id="number-of-cases">You need to add missing details to <%=@missing_info_count%> cases so they can be allocated to a POM.</p>
+<p id="number-of-cases">You need to add missing details to <%= @missing_info.count %> cases so they can be allocated to a POM.</p>
 
 <section id="awaiting-information">
   <%= render(
@@ -56,7 +56,7 @@
         </td>
         <td aria-label="Waiting" class="govuk-table__cell"><%= offender.awaiting_allocation_for %> days</td>
         <td aria-label="Action" class="govuk-table__cell" id="<%= "edit_#{offender.offender_no}" %>">
-            <%= link_to "Add missing details", new_prison_prisoner_female_missing_info_path(@prison.code, offender.offender_no) %>
+          <%= link_to "Add missing details", prison_prisoner_new_missing_info_path(@prison.code, offender.offender_no) %>
         </td>
       </tr>
     <% end %>

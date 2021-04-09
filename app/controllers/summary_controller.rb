@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-class SummaryController < PrisonsApplicationController
+class SummaryController < PrisonersController
   before_action :ensure_spo_user
 
-  def index
-    redirect_to allocated_prison_prisoners_path(active_prison_id)
-  end
+  before_action :set_search_summary_data, only: :search
 
   def allocated
     summary = create_summary(:allocated)
@@ -27,13 +25,27 @@ class SummaryController < PrisonsApplicationController
     set_data(summary)
   end
 
+  def search
+    super
+  end
+
 private
 
+  def set_search_summary_data
+    # pick an abrbitrary summary type
+    # Populate fields required for search.html.erb
+    set_buckets_from_summary create_summary(:new_arrivals)
+  end
+
+  def set_buckets_from_summary(summary)
+    @allocated = summary.allocated
+    @unallocated = summary.unallocated
+    @missing_info = summary.pending
+    @new_arrivals = summary.new_arrivals
+  end
+
   def set_data(summary)
-    @allocated_count = summary.allocated_total
-    @unallocated_count = summary.unallocated_total
-    @missing_info_count = summary.pending_total
-    @new_arrivals_count = summary.new_arrivals_total
+    set_buckets_from_summary summary
 
     @offenders = Kaminari.paginate_array(summary.offenders.to_a).page(page)
   end

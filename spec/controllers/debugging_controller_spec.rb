@@ -38,9 +38,9 @@ RSpec.describe DebuggingController, :allocation, type: :controller do
       expect(filtered_offenders[:unsentenced].count).to eq(1)
 
       summary = assigns(:summary)
-      expect(summary.allocated_total).to eq(0)
-      expect(summary.unallocated_total).to eq(0)
-      expect(summary.pending_total).to eq(1)
+      expect(summary.allocated.count).to eq(0)
+      expect(summary.unallocated.count).to eq(0)
+      expect(summary.pending.count).to eq(1)
     end
   end
 

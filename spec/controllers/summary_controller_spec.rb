@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe SummaryController, :allocation, type: :controller do
+RSpec.describe SummaryController, type: :controller do
   let(:prison) { build(:prison).code }
 
   before { stub_sso_data(prison) }
@@ -357,6 +357,92 @@ RSpec.describe SummaryController, :allocation, type: :controller do
             summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
 
             expect(summary_offenders).to include('A1111AA' => 1)
+          end
+        end
+      end
+    end
+  end
+
+  describe '#search' do
+    let(:nomis_staff_id) { 485_926 }
+
+    let(:poms) {
+      [
+        build(:pom,
+              firstName: 'Alice',
+              lastName: 'Ward',
+              position: RecommendationService::PRISON_POM,
+              staffId: nomis_staff_id
+        )
+      ]
+    }
+
+    before do
+      stub_poms(prison, poms)
+      stub_signed_in_pom(prison, nomis_staff_id)
+    end
+
+    context 'when user is an SPO ' do
+      before do
+        stub_sso_data(prison)
+      end
+
+      it 'can search' do
+        offenders = build_list(:nomis_offender, 1)
+        stub_offenders_for_prison(prison, offenders)
+
+        get :search, params: { prison_id: prison, q: 'Cal' }
+        expect(response.status).to eq(200)
+        expect(response).to be_successful
+
+        expect(assigns(:q)).to eq('Cal')
+        expect(assigns(:offenders).size).to eq(0)
+      end
+
+      context "with 3 offenders", :allocation do
+        let(:first_offender) { build(:nomis_offender, firstName: 'Alice', lastName: 'Bloggs') }
+        let(:first_offender_no) { first_offender.fetch(:offenderNo) }
+        let(:offenders) { build_list(:nomis_offender, 2, lastName: 'Bloggs') }
+        let(:updated_offenders) { assigns(:offenders) }
+        # This offender is the one with an allocation - created below
+        let(:alloc_offender) { updated_offenders.detect { |o| o.offender_no == first_offender_no } }
+
+        before do
+          stub_offenders_for_prison(prison, [first_offender] + offenders)
+          PomDetail.create!(nomis_staff_id: nomis_staff_id, working_pattern: 1.0, status: 'active')
+
+          create(:allocation,
+                 nomis_offender_id: first_offender_no,
+                 primary_pom_allocated_at: allocated_date,
+                 primary_pom_nomis_id: nomis_staff_id)
+        end
+
+        context "with a date" do
+          let(:allocated_date) { DateTime.now.utc }
+
+          it 'gets the POM names for allocated offenders' do
+            get :search, params: { prison_id: prison, q: 'Blog' }
+
+            expect(updated_offenders.count).to eq(3)
+            expect(alloc_offender.allocated_pom_name).to eq('Ward, Alice')
+            expect(alloc_offender.allocation_date).to be_kind_of(Date)
+          end
+
+          it 'can find all the Alices' do
+            get :search, params: { prison_id: prison, q: 'Alice' }
+
+            expect(updated_offenders.count).to eq(1)
+          end
+        end
+
+        context "when 'primary_pom_allocated_at' date is nil" do
+          let(:allocated_date) { DateTime.now.utc }
+
+          it "uses 'updated_at' date when 'primary_pom_allocated_at' date is nil" do
+            get :search, params: { prison_id: prison, q: 'Blog' }
+
+            expect(alloc_offender.allocated_pom_name).to eq('Ward, Alice')
+            expect(alloc_offender.allocation_date).to be_kind_of(Date)
           end
         end
       end

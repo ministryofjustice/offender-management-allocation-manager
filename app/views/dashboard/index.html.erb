@@ -11,7 +11,12 @@
 <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Dashboard</h1>
 
 <div class="govuk-!-margin-bottom-4">
-  <%= render "search/search_box" %>
+  <!-- SPO users can do full search, POM users can only search their caseload -->
+  <% if @is_spo %>
+    <%= render "search/search_box" %>
+  <% else %>
+    <%= render "poms/search_box" %>
+  <% end %>
 </div>
 
 <% if @is_spo %>
