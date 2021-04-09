@@ -1,7 +1,9 @@
-<tr class="govuk-table__row">
-  <td class="govuk-table__cell">Complexity of need level</td>
-  <td id=complexity-level class="govuk-table__cell table_cell__left_align">
-    <%= @prisoner.complexity_level.capitalize %>
-      <a class="govuk-link pull-right" href="<%= edit_prison_prisoner_complexity_level_path(@prison.code, @prisoner.offender_no) %>">Change</a>
-  </td>
-</tr>
+<% if @prison.womens? %>
+  <tr class="govuk-table__row" id="complexity-level-row">
+    <td class="govuk-table__cell">Complexity of need level</td>
+    <td id=complexity-level class="govuk-table__cell table_cell__left_align">
+      <%= @prisoner.complexity_level.capitalize %>
+      <%= link_to 'Change', url, class: 'govuk-link pull-right' %>
+    </td>
+  </tr>
+<% end %>
