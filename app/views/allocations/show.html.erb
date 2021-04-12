@@ -42,9 +42,7 @@
       </td>
     </tr>
 
-    <% if @prison.womens? %>
-      <%= render partial: 'female_complexity_level' %>
-    <% end %>
+    <%= render 'female_complexity_level', url: edit_prison_prisoner_complexity_level_path(@prison.code, @prisoner.offender_no) %>
 
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">Current responsibility</td>

@@ -6,6 +6,8 @@ module HmppsApi
       extend PrisonApiClient
 
       def self.user_details(username)
+        raise ArgumentError, 'PrisonApiClient#user_details(blank)' if username.blank?
+
         route = "/users/#{username}"
         response = client.get(route)
 
