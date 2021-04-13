@@ -1,6 +1,16 @@
 require 'rails_helper'
 
 describe HmppsApi::PrisonApi::PrisonOffenderManagerApi do
+  it 'gets staff detail', vcr: { cassette_name: 'prison_api/pom_get_staff_detail' } do
+    list = described_class.list('LEI')
+    response = described_class.staff_detail list.first.staff_id
+
+    expect(response.staff_id).to eq(485636)
+    expect(response.first_name).to eq("JENNY")
+    expect(response.last_name).to eq("DUCKETT")
+    expect(response.status).to eq("ACTIVE")
+  end
+
   it 'can get an Array of Prison Offender Managers (POMs)',
      vcr: { cassette_name: 'prison_api/pom_api_list_spec'  } do
     response = described_class.list('LEI')

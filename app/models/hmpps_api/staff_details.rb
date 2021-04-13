@@ -2,22 +2,18 @@
 
 module HmppsApi
   class StaffDetails
-    include Deserialisable
+    attr_reader :staff_id,
+                :first_name,
+                :last_name,
+                :status,
+                :thumbnail_id
 
-    attr_accessor :staff_id,
-                  :first_name,
-                  :last_name,
-                  :status,
-                  :thumbnail_id
-
-    def self.from_json(payload)
-      StaffDetails.new.tap { |obj|
-        obj.staff_id = payload['staffId']
-        obj.first_name = payload['firstName']
-        obj.last_name = payload['lastName']
-        obj.status = payload['status']
-        obj.thumbnail_id = payload['thumbnailId']
-      }
+    def initialize(payload)
+      @staff_id = payload['staffId']
+      @first_name = payload['firstName']
+      @last_name = payload['lastName']
+      @status = payload['status']
+      @thumbnail_id = payload['thumbnailId']
     end
   end
 end
