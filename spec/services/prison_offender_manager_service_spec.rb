@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe PrisonOffenderManagerService do
   let(:other_staff_id) { 485_637 }
-  let(:staff_id) { 485_833 }
+  let(:staff_id) { 485758 }
 
   before(:each) {
     PomDetail.create(nomis_staff_id: 485_637, working_pattern: 1.0, status: 'inactive')
@@ -11,7 +13,7 @@ describe PrisonOffenderManagerService do
   context 'when using T3 and VCR' do
     describe '#get_pom_name' do
       it "can get staff names", vcr: { cassette_name: 'prison_api/pom_service_staff_name' } do
-        expect(described_class.get_pom_name(staff_id)). to eq ['ANDRIEN', 'RICKETTS']
+        expect(described_class.get_pom_name(staff_id)). to eq ["MOIC", "INTEGRATION-TESTS"]
       end
     end
 
