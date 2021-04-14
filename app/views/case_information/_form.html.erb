@@ -1,94 +1,42 @@
-
-<%= form_tag(action, method: method, id: "case_info_form") do %>
-    <%= hidden_field_tag("case_information[nomis_offender_id]", @prisoner.offender_no) %>
+<%= form_for(@case_info,
+             url: action,
+             builder: GOVUKDesignSystemFormBuilder::FormBuilder,
+             method: method) do |form| %>
+  <%= form.govuk_error_summary %>
+    <%= form.hidden_field(:nomis_offender_id) %>
     <%= hidden_field_tag("sort", params[:sort])%>
     <%= hidden_field_tag("page", params[:page]) %>
 
-    <div class="govuk-form-group <% if @case_info.errors[:welsh_offender].present? %>govuk-form-group--error<% end %>">
-      <fieldset class="govuk-fieldset">
-        <legend class="govuk-fieldset__legend--s govuk-!-margin-bottom-2">
-          Was this prisoner's last known address in Wales?
-        </legend>
+    <%= form.govuk_collection_radio_buttons(
+          :probation_service,
+          [OpenStruct.new(name: 'Yes', value: 'Wales'), OpenStruct.new(name: 'No', value: 'England')],
+          :value,
+          :name,
+          legend: { text: "Was this prisoner's last known address in Wales?" }
+      ) %>
 
-        <% if @case_info.errors[:welsh_offender].present? %>
-          <span class="govuk-error-message">
-            <%= @case_info.errors[:welsh_offender].first %>
-          </span>
-        <% end %>
+  <%= form.govuk_collection_radio_buttons(
+          :case_allocation,
+          [OpenStruct.new(name: 'National Probation Service (NPS)', value: 'NPS'),
+           OpenStruct.new(name: 'Community Rehabilitation Company (CRC)', value: 'CRC')],
+          :value,
+          :name,
+          legend: { text: "Who is the service provider for this case?" }
+      ) %>
 
-        <div class="govuk-radios">
-          <div class="govuk-radios__item">
-            <%= radio_button_tag("case_information[welsh_offender]", 'Yes', @case_info.welsh_offender == 'Yes', class: "govuk-radios__input") %>
-            <%= label_tag "case_information_welsh_offender_Yes", 'Yes', class: "govuk-label govuk-radios__label" %>
-          </div>
-          <div class="govuk-radios__item">
-            <%= radio_button_tag("case_information[welsh_offender]", 'No', @case_info.welsh_offender == 'No', class: "govuk-radios__input") %>
-            <%= label_tag "case_information_welsh_offender_No", "No", class: "govuk-label govuk-radios__label" %>
-          </div>
-        </div>
-      </fieldset>
-    </div>
-
-    <div class="govuk-!-margin-top-8 govuk-form-group <% if @case_info.errors[:case_allocation].present? %>govuk-form-group--error<% end %>">
-      <fieldset class="govuk-fieldset">
-        <legend class="govuk-fieldset__legend--s govuk-!-margin-bottom-4">
-            Who is the service provider for this case?
-        </legend>
-        <% if @case_info.errors[:case_allocation].present? %>
-          <span class="govuk-error-message">
-            <%= @case_info.errors[:case_allocation].first %>
-          </span>
-        <% end %>
-
-        <div class="govuk-radios">
-          <div class="govuk-radios__item">
-            <%= radio_button_tag("case_information[case_allocation]", "NPS", @case_info.case_allocation == 'NPS', class: "govuk-radios__input") %>
-            <%= label_tag "case_information_case_allocation_NPS", "National Probation Service (NPS)", class: "govuk-label govuk-radios__label" %>
-          </div>
-          <div class="govuk-radios__item">
-            <%= radio_button_tag("case_information[case_allocation]", "CRC", @case_info.case_allocation == 'CRC', class: "govuk-radios__input") %>
-            <%= label_tag "case_information_case_allocation_CRC", "Community Rehabilitation Company (CRC)", class: "govuk-label govuk-radios__label" %>
-          </div>
-        </div>
-      </fieldset>
-    </div>
-
-  <div class="govuk-!-margin-top-8 govuk-form-group <% if @case_info.errors[:tier].present? %>govuk-form-group--error<% end %>">
-    <fieldset class="govuk-fieldset">
-      <legend class="govuk-fieldset__legend--s  govuk-!-margin-bottom-4">
-        What tier has the prisoner been assigned to?
-      </legend>
-
-      <% if @case_info.errors[:tier].present? %>
-        <span class="govuk-error-message">
-          <%= @case_info.errors[:tier].first %>
-        </span>
-      <% end %>
-
-      <div class="govuk-radios">
-        <div class="govuk-radios__item">
-          <%= radio_button_tag("case_information[tier]", "A", @case_info[:tier] == 'A', class: "govuk-radios__input") %>
-          <%= label_tag "case_information_tier_A", "A", class: "govuk-label govuk-radios__label" %>
-        </div>
-        <div class="govuk-radios__item">
-          <%= radio_button_tag("case_information[tier]", "B", @case_info[:tier] == 'B', class: "govuk-radios__input") %>
-          <%= label_tag "case_information_tier_B", "B", class: "govuk-label govuk-radios__label" %>
-        </div>
-        <div class="govuk-radios__item">
-          <%= radio_button_tag("case_information[tier]", "C", @case_info[:tier] == 'C', class: "govuk-radios__input") %>
-          <%= label_tag "case_information_tier_C", "C", class: "govuk-label govuk-radios__label" %>
-        </div>
-        <div class="govuk-radios__item">
-          <%= radio_button_tag("case_information[tier]", "D", @case_info[:tier] == 'D', class: "govuk-radios__input") %>
-          <%= label_tag "case_information_tier_D", "D", class: "govuk-label govuk-radios__label" %>
-        </div>
-      </div>
-    </fieldset>
-  </div>
+  <%= form.govuk_collection_radio_buttons(
+          :tier,
+          [OpenStruct.new(name: 'A', value: 'A'),
+           OpenStruct.new(name: 'B', value: 'B'),
+           OpenStruct.new(name: 'C', value: 'C'),
+           OpenStruct.new(name: 'D', value: 'D')],
+          :value,
+          :name,
+          legend: { text: "What tier has the prisoner been assigned to?" }
+      ) %>
 
   <% buttons.each do  |button| %>
-    <%= submit_tag button.fetch(:text), role: "button", draggable: "false", class: "govuk-button govuk-!-margin-top-4 #{button.fetch(:class)}" %>
-
+    <%= form.submit button.fetch(:text), role: "button", draggable: "false", class: "govuk-button govuk-!-margin-top-4 #{button.fetch(:class)}" %>
   <% end %>
 
 <% end %>

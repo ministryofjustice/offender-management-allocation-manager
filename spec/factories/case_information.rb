@@ -6,10 +6,6 @@ FactoryBot.define do
       'A'
     end
 
-    welsh_offender do
-      'Yes'
-    end
-
     case_allocation do
       CaseInformation::NPS
     end
@@ -30,12 +26,14 @@ FactoryBot.define do
 
     crn { Faker::Alphanumeric.alpha(number: 10) }
 
+    probation_service { 'Wales' }
+
     trait :welsh do
-      welsh_offender { 'Yes' }
+      probation_service { 'Wales' }
     end
 
     trait :english do
-      welsh_offender { 'No' }
+      probation_service { 'England' }
     end
 
     trait :nps do

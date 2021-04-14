@@ -18,9 +18,9 @@ feature 'case information feature' do
     context 'when add missing information the first time (create journey)' do
       before do
         visit new_prison_case_information_path(prison.code, offender.fetch(:offenderNo))
-        find('label[for=case_information_welsh_offender_No]').click
-        find('label[for=case_information_case_allocation_NPS]').click
-        find('label[for=case_information_tier_A]').click
+        find('label[for=case-information-probation-service-england-field]').click
+        find('label[for=case-information-case-allocation-nps-field]').click
+        find('label[for=case-information-tier-a-field]').click
       end
 
       it 'allows spo to save case information and then returns to add missing info page' do
@@ -65,9 +65,9 @@ feature 'case information feature' do
         click_link 'Edit'
       end
 
-      find('label[for=case_information_welsh_offender_No]').click
-      find('label[for=case_information_case_allocation_NPS]').click
-      find('label[for=case_information_tier_A]').click
+      find('label[for=case-information-probation-service-england-field]').click
+      find('label[for=case-information-case-allocation-nps-field]').click
+      find('label[for=case-information-tier-a-field]').click
       click_button 'Save'
 
       expect(CaseInformation.count).to eq(1)
@@ -97,7 +97,7 @@ feature 'case information feature' do
       visit new_prison_case_information_path('LEI', nomis_offender_id)
       expect(page).to have_current_path new_prison_case_information_path('LEI', nomis_offender_id)
 
-      find('label[for=case_information_tier_A]').click
+      find('label[for=case-information-tier-a-field]').click
       click_button 'Save'
 
       expect(CaseInformation.count).to eq(0)
@@ -125,7 +125,7 @@ feature 'case information feature' do
       visit new_prison_case_information_path('LEI', nomis_offender_id)
       expect(page).to have_current_path new_prison_case_information_path('LEI', nomis_offender_id)
 
-      find('label[for=case_information_case_allocation_NPS]').click
+      find('label[for=case-information-case-allocation-nps-field]').click
       click_button 'Save'
 
       expect(CaseInformation.count).to eq(0)
@@ -136,17 +136,17 @@ feature 'case information feature' do
       nomis_offender_id = 'G1821VA'
 
       visit new_prison_case_information_path('LEI', nomis_offender_id)
-      find('label[for=case_information_welsh_offender_No]').click
-      find('label[for=case_information_case_allocation_NPS]').click
-      find('label[for=case_information_tier_A]').click
+      find('label[for=case-information-probation-service-england-field]').click
+      find('label[for=case-information-case-allocation-nps-field]').click
+      find('label[for=case-information-tier-a-field]').click
       click_button 'Save'
 
       visit edit_prison_case_information_path('LEI', nomis_offender_id)
 
       expect(page).to have_content('Case information')
       expect(page).to have_content('G1821VA')
-      find('label[for=case_information_welsh_offender_No]').click
-      find('label[for=case_information_case_allocation_CRC]').click
+      find('label[for=case-information-probation-service-england-field]').click
+      find('label[for=case-information-case-allocation-crc-field]').click
       click_button 'Update'
 
       expect(CaseInformation.count).to eq(1)
@@ -167,9 +167,9 @@ feature 'case information feature' do
       end
       expect(page).to have_selector('h1', text: 'Case information')
 
-      find('label[for=case_information_welsh_offender_No]').click
-      find('label[for=case_information_case_allocation_NPS]').click
-      find('label[for=case_information_tier_A]').click
+      find('label[for=case-information-probation-service-england-field]').click
+      find('label[for=case-information-case-allocation-nps-field]').click
+      find('label[for=case-information-tier-a-field]').click
       click_button 'Save'
 
       expect(current_url).to have_content(missing_information_prison_prisoners_path('LEI') + "?page=3&sort=last_name+desc")

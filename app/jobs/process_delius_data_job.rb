@@ -61,7 +61,7 @@ private
         team: team,
         team_name: team&.name,
         case_allocation: delius_record.service_provider,
-        welsh_offender: map_welsh_offender(delius_record.ldu_code),
+        probation_service: map_probation_service(delius_record.ldu_code),
         mappa_level: map_mappa_level(delius_record.mappa_levels)
       )
     end
@@ -88,8 +88,8 @@ private
     delius_mappa_levels.empty? ? 0 : delius_mappa_levels.max
   end
 
-  def map_welsh_offender(ldu_code)
-    LocalDivisionalUnit.find_by(code: ldu_code)&.in_wales? ? 'Yes' : 'No'
+  def map_probation_service(ldu_code)
+    LocalDivisionalUnit.find_by(code: ldu_code)&.in_wales? ? 'Wales' : 'England'
   end
 
   def map_tier(tier)
