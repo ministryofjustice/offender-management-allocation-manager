@@ -71,12 +71,21 @@ describe AllocationService do
     context 'without an existing' do
       before do
         create(:case_information, nomis_offender_id: nomis_offender_id)
+        stub_auth_token
+        stub_request(:get, "#{ApiHelper::T3}/users/MOIC_POM").
+          to_return(body: { staffId: 1, firstName: "MOIC", lastName: 'POM' }.to_json)
+        stub_pom_emails 1, []
+        stub_offender(build(:nomis_offender, offenderNo: nomis_offender_id))
+        stub_poms prison_code, [pom]
       end
 
-      it 'can create a new record', vcr: { cassette_name: 'prison_api/allocation_service_create_allocation__spec' } do
+      let(:prison_code) { build(:prison).code }
+      let(:pom) { build(:pom, staffId: 485_833) }
+
+      it 'can create a new record' do
         params = {
           nomis_offender_id: nomis_offender_id,
-          prison: 'LEI',
+          prison: prison_code,
           allocated_at_tier: 'A',
           primary_pom_nomis_id: 485_833,
           primary_pom_allocated_at: DateTime.now.utc,
