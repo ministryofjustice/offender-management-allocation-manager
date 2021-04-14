@@ -8,7 +8,7 @@ class FemalePrisonersController < PrisonsApplicationController
     active_allocations_hash = AllocationService.active_allocations(all_offenders.map(&:offender_no), @prison.code)
     allocated_offenders = load_offenders :allocated, all_offenders, active_allocations_hash
 
-    offenders = allocated_offenders.map { |offender| OffenderWithPomName.new(offender, active_allocations_hash.fetch(offender.offender_no)) }
+    offenders = allocated_offenders.map { |offender| OffenderWithAllocationPresenter.new(offender, active_allocations_hash.fetch(offender.offender_no)) }
     @offenders = Kaminari.paginate_array(offenders).page(page)
     render 'summary/allocated'
   end

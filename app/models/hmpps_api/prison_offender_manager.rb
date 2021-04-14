@@ -2,8 +2,6 @@
 
 module HmppsApi
   class PrisonOffenderManager
-    include Deserialisable
-
     attr_reader :staff_id, :first_name, :last_name, :position,
                 :agency_id, :position_description
 
