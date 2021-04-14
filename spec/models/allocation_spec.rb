@@ -128,14 +128,26 @@ RSpec.describe Allocation, type: :model do
       end
     end
 
-    describe 'when an offender moves prison', :allocation, vcr: { cassette_name: 'prison_api/allocation_deallocate_offender' }  do
+    describe 'when an offender moves prison'  do
+      before do
+        stub_auth_token
+        stub_poms(prison_code, poms)
+
+        stub_spo_user build(:pom, firstName: "MOIC", lastName: 'POM')
+        stub_offender(offender)
+      end
+
+      let(:nomis_offender_id) { 'G2911GD' }
+      let(:prison_code) { build(:prison).code }
+      let(:poms) { [build(:pom, staffId: 485_833)] }
+      let(:offender) { build(:nomis_offender, offenderNo: nomis_offender_id) }
+
       it 'removes the primary pom details in an Offender\'s allocation' do
-        nomis_offender_id = 'G2911GD'
         create(:case_information, nomis_offender_id: nomis_offender_id)
 
         params = {
           nomis_offender_id: nomis_offender_id,
-          prison: 'LEI',
+          prison: prison_code,
           allocated_at_tier: 'A',
           primary_pom_nomis_id: 485_833,
           primary_pom_allocated_at: DateTime.now.utc,
@@ -157,16 +169,13 @@ RSpec.describe Allocation, type: :model do
         expect(deallocation.recommended_pom_type).to be_nil
         expect(deallocation.event_trigger).to eq 'offender_transferred'
       end
-    end
 
-    describe 'when an offender gets released from prison', :allocation, vcr: { cassette_name: 'prison_api/allocation_deallocate_offender_released' }  do
-      it 'removes the primary pom details in an Offender\'s allocation' do
-        nomis_offender_id = 'G2911GD'
+      it 'when an offender is released from prison removes the primary pom details in an Offender\'s allocation' do
         create(:case_information, nomis_offender_id: nomis_offender_id)
 
         params = {
           nomis_offender_id: nomis_offender_id,
-          prison: 'LEI',
+          prison: prison_code,
           allocated_at_tier: 'A',
           primary_pom_nomis_id: 485_833,
           primary_pom_allocated_at: DateTime.now.utc,
@@ -190,7 +199,7 @@ RSpec.describe Allocation, type: :model do
 
         # We expect the offender's prison to be left intact and not removed. This will
         # allow us to track which institution an offender was released from.
-        expect(deallocation.prison).to eq 'LEI'
+        expect(deallocation.prison).to eq prison_code
       end
     end
 
