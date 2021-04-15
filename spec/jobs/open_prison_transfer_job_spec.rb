@@ -229,7 +229,8 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
         described_class.perform_now(movement_json)
         email_job = enqueued_jobs.first
         expect(email_job).to be_nil
-        expect(offender.com_responsibility).not_to be_involved
+        expect(offender.com_responsible?).to eq(false)
+        expect(offender.com_supporting?).to eq(false)
       end
     end
 
@@ -244,7 +245,8 @@ RSpec.describe OpenPrisonTransferJob, type: :job do
         described_class.perform_now(movement_json)
         email_job = enqueued_jobs.first
         expect(email_job).to be_nil
-        expect(offender.com_responsibility).not_to be_involved
+        expect(offender.com_responsible?).to eq(false)
+        expect(offender.com_supporting?).to eq(false)
       end
     end
 

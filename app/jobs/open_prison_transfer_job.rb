@@ -18,13 +18,13 @@ class OpenPrisonTransferJob < ApplicationJob
 
     Rails.logger.info("[MOVEMENT] Processing move to open prison for #{offender.offender_no}")
 
-    if offender.com_responsibility.responsible?
+    if offender.com_responsible?
       # Assumption: COM is responsible, so we are following pre-policy rules
       #   (i.e. OMIC rules don't apply in this open prison yet)
       # Action: Email the LDU asking for a Responsible COM to be allocated because OMIC rules don't apply.
       send_email_prepolicy(offender, movement)
 
-    elsif offender.com_responsibility.supporting?
+    elsif offender.com_supporting?
       # Assumption: OMIC rules apply in this prison and the offender's sentence is indeterminate,
       # therefore a COM is needed from the moment they move into the prison.
       # Action: Email the LDU asking for a Supporting COM to be allocated, as per OMIC rules.

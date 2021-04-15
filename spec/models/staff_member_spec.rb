@@ -7,16 +7,16 @@ RSpec.describe StaffMember, type: :model do
   let(:offenders) {
     [
       OpenStruct.new(offender_no: 'G7514GW', prison_id: prison, convicted?: true, sentenced?: true,
-                     indeterminate_sentence?: true, nps_case?: true, pom_responsibility: HandoverDateService::SUPPORTING,
+                     indeterminate_sentence?: true, nps_case?: true, pom_supporting?: true,
                      sentence_start_date: Time.zone.today - 1.month, conditional_release_date: Time.zone.today + 12.months),
       OpenStruct.new(offender_no: 'G1234VV', prison_id: prison, convicted?: true, sentenced?: true,
-                     nps_case?: true, pom_responsibility: HandoverDateService::RESPONSIBLE, sentence_start_date: Time.zone.today - 1.month,
+                     nps_case?: true, pom_responsible?: true, sentence_start_date: Time.zone.today - 1.month,
                      conditional_release_date: Time.zone.today + 12.months),
       OpenStruct.new(offender_no: 'G1234AB', prison_id: prison, convicted?: true, sentenced?: true,
-                     nps_case?: true, pom_responsibility: HandoverDateService::RESPONSIBLE, sentence_start_date: Time.zone.today - 10.months,
+                     nps_case?: true, pom_responsible?: true, sentence_start_date: Time.zone.today - 10.months,
                      conditional_release_date: Time.zone.today + 2.years),
       OpenStruct.new(offender_no: 'G1234GG', prison_id: prison, convicted?: true, sentenced?: true,
-                     nps_case?: true, pom_responsibility: HandoverDateService::RESPONSIBLE, sentence_start_date: Time.zone.today - 10.months,
+                     nps_case?: true, pom_responsible?: true, sentence_start_date: Time.zone.today - 10.months,
                      conditional_release_date: Time.zone.today + 2.years)
     ]
   }
