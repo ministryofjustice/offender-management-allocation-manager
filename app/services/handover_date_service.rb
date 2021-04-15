@@ -34,7 +34,7 @@ class HandoverDateService
       less_than_10_months_left_to_serve: 'Less than 10 months left to serve'
     }.freeze
 
-    attr_reader :custody, :community, :start_date, :handover_date
+    attr_reader :start_date, :handover_date
 
     def initialize custody:, community:, start_date:, handover_date:, reason:
       @custody = custody
@@ -42,6 +42,22 @@ class HandoverDateService
       @start_date = start_date
       @handover_date = handover_date
       @reason = reason
+    end
+
+    def custody_responsible?
+      @custody.responsible?
+    end
+
+    def custody_supporting?
+      @custody.supporting?
+    end
+
+    def community_responsible?
+      @community.responsible?
+    end
+
+    def community_supporting?
+      @community.supporting?
     end
 
     def reason

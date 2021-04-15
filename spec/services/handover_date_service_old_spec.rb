@@ -40,7 +40,7 @@ describe HandoverDateService do
         end
 
         describe 'com_supporting?' do
-          subject { described_class.handover(offender).community.supporting? }
+          subject { described_class.handover(offender).community_supporting? }
 
           context 'when before start' do
             it 'is false' do
@@ -83,7 +83,7 @@ describe HandoverDateService do
           end
 
           it 'is not community supporting' do
-            expect(described_class.handover(offender).community.supporting?).to eq(false)
+            expect(described_class.handover(offender).community_supporting?).to eq(false)
           end
         end
       end

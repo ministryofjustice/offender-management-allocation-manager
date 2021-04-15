@@ -74,7 +74,7 @@ private
   end
 
   def current_responsibility
-    @offender.pom_responsibility.responsible? ? 'responsible' : 'supporting'
+    @offender.pom_responsible? ? 'responsible' : 'supporting'
   end
 
   def previous_pom

@@ -7,9 +7,9 @@ module OffenderHelper
   end
 
   def pom_responsibility_label(offender)
-    if offender.pom_responsibility.responsible?
+    if offender.pom_responsible?
       'Responsible'
-    elsif offender.pom_responsibility.supporting?
+    elsif offender.pom_supporting?
       'Supporting'
     else
       'Unknown'
@@ -17,9 +17,9 @@ module OffenderHelper
   end
 
   def case_owner_label(offender)
-    if offender.pom_responsibility.responsible?
+    if offender.pom_responsible?
       'Custody'
-    elsif offender.pom_responsibility.supporting?
+    elsif offender.pom_supporting?
       'Community'
     else
       'Unknown'

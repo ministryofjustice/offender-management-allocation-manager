@@ -108,26 +108,37 @@ module HmppsApi
       age >= 18
     end
 
-    def pom_responsibility
+    def pom_responsible?
       if @responsibility_override.nil?
-        HandoverDateService.handover(self).custody
-      elsif @responsibility_override.value == Responsibility::PRISON
-        # Overrides to prison aren't actually possible in the UI
-        HandoverDateService::RESPONSIBLE
+        HandoverDateService.handover(self).custody_responsible?
       else
-        HandoverDateService::SUPPORTING
+        @responsibility_override.value == Responsibility::PRISON
       end
     end
 
-    def com_responsibility
+    def pom_supporting?
       if @responsibility_override.nil?
-        HandoverDateService.handover(self).community
-      elsif @responsibility_override.value == Responsibility::PRISON
+        HandoverDateService.handover(self).custody_supporting?
+      else
+        @responsibility_override.value == Responsibility::PROBATION
+      end
+    end
+
+    def com_responsible?
+      if @responsibility_override.nil?
+        HandoverDateService.handover(self).community_responsible?
+      else
+        @responsibility_override.value == Responsibility::PROBATION
+      end
+    end
+
+    def com_supporting?
+      if @responsibility_override.nil?
+        HandoverDateService.handover(self).community_supporting?
+      else
         # Overrides to prison aren't actually possible in the UI
         # If they were, we'd somehow need to decide whether COM is supporting or not involved
-        HandoverDateService::SUPPORTING
-      else
-        HandoverDateService::RESPONSIBLE
+        @responsibility_override.value == Responsibility::PRISON
       end
     end
 
@@ -218,7 +229,7 @@ module HmppsApi
     end
 
     def needs_a_com?
-      (com_responsibility.responsible? || com_responsibility.supporting?) &&
+      (com_responsible? || com_supporting?) &&
         allocated_com_name.blank?
     end
 
@@ -267,7 +278,7 @@ module HmppsApi
     end
 
     def handover
-      @handover ||= if pom_responsibility.responsible?
+      @handover ||= if pom_responsible?
                       HandoverDateService.handover(self)
                     else
                       HandoverDateService::NO_HANDOVER_DATE

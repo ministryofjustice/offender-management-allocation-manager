@@ -5,9 +5,10 @@ require 'rails_helper'
 describe HandoverDateService do
   subject { described_class.handover(offender) }
 
+
   let(:test_strategy) { Flipflop::FeatureSet.current.test! }
-  let(:pom) { subject.custody }
-  let(:com) { subject.community }
+  let(:pom) { HandoverDateService::Responsibility.new subject.custody_responsible?, subject.custody_supporting?  }
+  let(:com) { HandoverDateService::Responsibility.new subject.community_responsible?, subject.community_supporting? }
   let(:start_date) { subject.start_date }
   let(:handover_date) { subject.handover_date }
   let(:reason) { subject.reason }

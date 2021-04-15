@@ -13,7 +13,7 @@ module HmppsApi
     end
 
     def case_owner
-      if pom_responsibility.responsible?
+      if pom_responsible?
         'Custody'
       else
         'Community'

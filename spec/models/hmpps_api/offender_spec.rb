@@ -143,7 +143,7 @@ describe HmppsApi::Offender do
   end
 
   describe '#pom_responsibility' do
-    subject { offender.pom_responsibility }
+    subject { HandoverDateService::Responsibility.new offender.pom_responsible?, offender.pom_supporting? }
 
     let(:offender) { build(:offender, :indeterminate, latestLocationId: 'LEI') }
 
@@ -185,7 +185,7 @@ describe HmppsApi::Offender do
   end
 
   describe '#com_responsibility' do
-    subject { offender.com_responsibility }
+    subject { HandoverDateService::Responsibility.new offender.com_responsible?, offender.com_supporting? }
 
     let(:offender) { build(:offender, :indeterminate, latestLocationId: 'LEI') }
 
