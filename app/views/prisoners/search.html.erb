@@ -46,7 +46,7 @@
           <% elsif @new_arrivals.map(&:offender_no).include?(offender.offender_no) %>
             Wait
           <% else %>
-            <%= link_to('View', prison_allocation_path(prison, nomis_offender_id: offender.offender_no)) %>
+            <%= link_to('View', prison_allocation_path(@prison.code, nomis_offender_id: offender.offender_no)) %>
           <% end %>
         </td>
       </tr>
