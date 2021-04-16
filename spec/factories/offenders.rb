@@ -2,8 +2,6 @@
 
 FactoryBot.define do
   factory :offender_base, class: 'HmppsApi::OffenderBase' do
-    imprisonmentStatus { 'SENT03' }
-
     # cell location is the format <1 letter>-<1 number>-<3 numbers> e.g 'E-4-014'
     internalLocation {
       block = Faker::Alphanumeric.alpha(number: 1).upcase
@@ -36,25 +34,6 @@ FactoryBot.define do
 
     complexityLevel { 'medium' }
 
-    trait :determinate do
-      imprisonmentStatus {'SEC90'}
-    end
-    trait :indeterminate do
-      imprisonmentStatus {'LIFE'}
-      sentence {build :sentence_detail, :indeterminate}
-    end
-    trait :indeterminate_recall do
-      imprisonmentStatus {'LR_LIFE'}
-      recall { true }
-      sentence {build :sentence_detail, :indeterminate}
-    end
-    trait :determinate_recall do
-      imprisonmentStatus {'LR_EPP'}
-      recall { true }
-    end
-    trait :civil_sentence do
-      imprisonmentStatus {'CIVIL'}
-    end
   end
 
   factory :offender, parent: :offender_base, class: 'HmppsApi::Offender' do

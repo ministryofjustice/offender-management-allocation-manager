@@ -4,8 +4,9 @@ RSpec.describe SuitableForEarlyAllocationEmailJob, type: :job do
   let(:pom) { build(:pom) }
 
   let(:offender) do
-    build(:offender, :determinate, latestLocationId: 'LEI',
+    build(:offender, latestLocationId: 'LEI',
           sentence: build(:sentence_detail,
+                          :determinate,
                           sentenceStartDate: Time.zone.today - 10.months,
                           conditionalReleaseDate: release_date,
                           automaticReleaseDate: release_date,

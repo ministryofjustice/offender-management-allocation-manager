@@ -209,8 +209,9 @@ private
 
   def build_offender(release_date = nil, prison: nil, sentence_type:, ard_crd_release:, ted:)
     prison = prison || active_prison
-    build(:offender, sentence_type, latestLocationId: prison.code,
+    build(:offender, latestLocationId: prison.code,
           sentence: build(:sentence_detail,
+                          sentence_type,
                           sentenceStartDate: Time.zone.today - 11.months,
                           conditionalReleaseDate: ard_crd_release,
                           automaticReleaseDate: ard_crd_release,

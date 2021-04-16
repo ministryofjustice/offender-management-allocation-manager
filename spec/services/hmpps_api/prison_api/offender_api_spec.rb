@@ -36,8 +36,7 @@ describe HmppsApi::PrisonApi::OffenderApi do
       expect(response).to be_instance_of(Hash)
 
       records = response.values
-      expect(records.first).to be_instance_of(HmppsApi::SentenceDetail)
-      expect(records.first.conditional_release_date).to eq(Date.new(2020, 3, 16))
+      expect(records.first.fetch('conditionalReleaseDate')).to eq(Date.new(2020, 3, 16).to_s)
     end
   end
 

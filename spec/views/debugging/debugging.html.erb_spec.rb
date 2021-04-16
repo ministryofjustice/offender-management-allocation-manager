@@ -3,12 +3,12 @@ require 'rails_helper'
 RSpec.describe "debugging/debugging", type: :view do
   let(:offender) do
     build(:offender, firstName: 'John', lastName: 'Dory').tap { |offender|
-      offender.sentence = HmppsApi::SentenceDetail.from_json(
-        'sentenceStartDate' => Time.zone.today.to_s,
-        'automaticReleaseDate' => (Time.zone.today + 10.months).to_s,
-        'tariffDate' => Date.new(2033, 8, 1).to_s,
-        'postRecallReleaseDate' => Date.new(2028, 11, 8).to_s,
-        'licenceExpiryDate' => Date.new(2025, 10, 7).to_s)
+      offender.sentence = build(:sentence_detail,
+                                sentenceStartDate: Time.zone.today,
+                                automaticReleaseDate: Time.zone.today + 10.months,
+                                tariffDate: Date.new(2033, 8, 1),
+                                postRecallReleaseDate: Date.new(2028, 11, 8),
+                                licenceExpiryDate: Date.new(2025, 10, 7))
     }
   end
 

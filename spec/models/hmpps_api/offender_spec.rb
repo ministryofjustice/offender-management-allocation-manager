@@ -6,7 +6,7 @@ describe HmppsApi::Offender do
   describe '#responsibility_override?' do
     it 'returns false when no responsibility found for offender' do
       # build an offender, by default this does not have any case information or responsibility record
-      subject = build(:offender, :indeterminate)
+      subject = build(:offender, sentence: build(:sentence_detail, :indeterminate))
       expect(subject.responsibility_override?).to eq(false)
     end
 
@@ -16,7 +16,7 @@ describe HmppsApi::Offender do
       create(:responsibility, nomis_offender_id: 'A1234XX')
 
       # build an offender
-      offender = build(:offender, :indeterminate, offenderNo: 'A1234XX')
+      offender = build(:offender, sentence: build(:sentence_detail, :indeterminate), offenderNo: 'A1234XX')
 
       # load the case information and responsibility record into the offender object
       offender.load_case_information(case_info)
@@ -117,8 +117,10 @@ describe HmppsApi::Offender do
     context 'when in custody' do
       let(:offender) {
         build(:offender).tap { |o|
-          o.sentence = HmppsApi::SentenceDetail.from_json('automaticReleaseDate' => (Time.zone.today + 1.year).to_s,
-                                                          'sentenceStartDate' => Time.zone.today.to_s)
+          o.sentence = build(:sentence_detail,
+                             conditionalReleaseDate: nil,
+                             automaticReleaseDate: Time.zone.today + 1.year,
+                             sentenceStartDate: Time.zone.today)
           o.load_case_information(build(:case_information, case_allocation: 'NPS', mappa_level: 0))
         }
       }
@@ -145,7 +147,7 @@ describe HmppsApi::Offender do
   describe '#pom_responsibility' do
     subject { HandoverDateService::Responsibility.new offender.pom_responsible?, offender.pom_supporting? }
 
-    let(:offender) { build(:offender, :indeterminate, latestLocationId: 'LEI') }
+    let(:offender) { build(:offender, sentence: build(:sentence_detail, :indeterminate), latestLocationId: 'LEI') }
 
     context 'when the responsibility has not been overridden' do
       it "calculates the responsibility based on the offender's sentence" do
@@ -187,7 +189,7 @@ describe HmppsApi::Offender do
   describe '#com_responsibility' do
     subject { HandoverDateService::Responsibility.new offender.com_responsible?, offender.com_supporting? }
 
-    let(:offender) { build(:offender, :indeterminate, latestLocationId: 'LEI') }
+    let(:offender) { build(:offender, sentence: build(:sentence_detail, :indeterminate), latestLocationId: 'LEI') }
 
     context 'when the responsibility has not been overridden' do
       it "calculates the responsibility based on the offender's sentence" do

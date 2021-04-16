@@ -4,14 +4,25 @@ FactoryBot.define do
   factory :sentence_detail, class: 'HmppsApi::SentenceDetail' do
     initialize_with do
       # remove nils (as it confuses HmppsApi::SentenceDetail) and convert dates to strings (just in case test forgets)
-      values_hash = attributes.reject { |_k, v| v.nil? }.map { |k, v| [k.to_s, v.to_s] }.to_h
-      HmppsApi::SentenceDetail.from_json(values_hash)
+      values_hash = attributes.except(:imprisonmentStatus).reject { |_k, v| v.nil? }.map { |k, v| [k.to_s, v.to_s] }.to_h
+      HmppsApi::SentenceDetail.new(values_hash,
+                                   imprisonment_status: attributes.fetch(:imprisonmentStatus),
+                                   recall_flag: attributes.fetch(:recall) )
     end
+
+    imprisonmentStatus { 'SEC90' }
+    recall { false }
 
     # 1 day after policy start in Wales
     sentenceStartDate { '2019-02-05' }
     releaseDate { "2021-01-28" }
     conditionalReleaseDate { "2022-01-28" }
+
+    trait :blank do
+      sentenceStartDate { nil }
+      releaseDate { nil }
+      conditionalReleaseDate { nil }
+    end
 
     trait :welsh_policy_sentence do
       sentenceStartDate { '2019-02-05' }
@@ -72,11 +83,34 @@ FactoryBot.define do
     end
 
     trait :indeterminate do
+      imprisonmentStatus { 'LIFE' }
       tariffDate { Time.zone.today + 1.year}
      end
 
     trait :outside_early_allocation_window do
       conditionalReleaseDate { Time.zone.today + 19.months }
+    end
+
+    trait :determinate do
+      imprisonmentStatus {'SEC90'}
+    end
+
+    trait :indeterminate do
+      imprisonmentStatus {'LIFE'}
+    end
+
+    trait :indeterminate_recall do
+      imprisonmentStatus {'LR_LIFE'}
+      recall { true }
+    end
+
+    trait :determinate_recall do
+      imprisonmentStatus {'LR_EPP'}
+      recall { true }
+    end
+
+    trait :civil_sentence do
+      imprisonmentStatus {'CIVIL'}
     end
   end
 end

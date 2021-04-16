@@ -21,7 +21,11 @@ class SentenceType
     @duration_type == INDETERMINATE
   end
 
-  def civil?
+  def criminal_sentence?
+    !civil_sentence?
+  end
+
+  def civil_sentence?
     %w[
       CIVIL
       CIVIL_CON
