@@ -6,10 +6,8 @@ module HmppsApi
              :parole_eligibility_date, :tariff_date,
              :automatic_release_date, :licence_expiry_date,
              :post_recall_release_date, :earliest_release_date,
+             :indeterminate_sentence?, :immigration_case?, :civil_sentence?, :describe_sentence,
              to: :sentence
-
-    delegate :indeterminate_sentence?, :immigration_case?,
-             to: :@sentence_type
 
     delegate :tier, :case_allocation, :crn, :mappa_level, :manual_entry?,
              :parole_review_date, :victim_liaison_officers, :updated_at,
@@ -44,7 +42,7 @@ module HmppsApi
         sentence.parole_eligibility_date.present? ||
         sentence.home_detention_curfew_eligibility_date.present? ||
         sentence.tariff_date.present? ||
-        @sentence_type.indeterminate_sentence?
+        sentence.indeterminate_sentence?
     end
 
     def early_allocation?
@@ -93,15 +91,7 @@ module HmppsApi
     end
 
     def recalled?
-      @recall_flag
-    end
-
-    def civil_sentence?
-      @sentence_type.civil?
-    end
-
-    def describe_sentence
-      "#{@sentence_type.code} - #{@sentence_type.description}"
+      @sentence.recall
     end
 
     def over_18?
@@ -170,8 +160,6 @@ module HmppsApi
       @last_name = api_payload.fetch('lastName')
       @offender_no = api_payload.fetch('offenderNo')
       @convicted_status = api_payload['convictedStatus']
-      @recall_flag = search_payload.fetch('recall', false)
-      @sentence_type = SentenceType.new(api_payload['imprisonmentStatus'])
       @category_code = api_payload['categoryCode']
       @date_of_birth = Date.parse(api_payload.fetch('dateOfBirth'))
       @latest_temp_movement = latest_temp_movement
@@ -263,7 +251,7 @@ module HmppsApi
     end
 
     def criminal_sentence?
-      @sentence_type.civil? == false
+      @sentence.criminal_sentence?
     end
 
     # Take either the new LocalDeliveryUnit (if available and enabled) and

@@ -41,7 +41,11 @@ module HmppsApi
                                         latest_temp_movement: temp_movements[offender_no],
                                         complexity_level: complexities[offender_no]).tap { |offender|
             sentencing = sentence_details[offender.booking_id]
-            offender.sentence = sentencing if sentencing.present?
+            if sentencing.present?
+              offender.sentence = HmppsApi::SentenceDetail.new sentencing,
+                                                               imprisonment_status: payload.fetch('imprisonmentStatus'),
+                                                               recall_flag: search_data.fetch(offender_no, {}).fetch('recall', false)
+            end
           }
         end
         ApiPaginatedResponse.new(total_pages, offenders)
@@ -67,7 +71,11 @@ module HmppsApi
                                             complexity_level: complexity_level
           prisoner.tap do |offender|
             sentence_details = get_bulk_sentence_details([offender.booking_id])
-            offender.sentence = sentence_details.fetch(offender.booking_id)
+            sentence = HmppsApi::SentenceDetail.new sentence_details.fetch(offender.booking_id),
+                                                    imprisonment_status: api_response.fetch('imprisonmentStatus'),
+                                                    recall_flag: search_data.fetch(offender_no, {}).fetch('recall', false)
+
+            offender.sentence = sentence
             add_arrival_dates([offender])
           end
         end
@@ -106,9 +114,7 @@ module HmppsApi
 
           oid = record['bookingId']
 
-          hash[oid] = api_deserialiser.deserialise(
-            HmppsApi::SentenceDetail, record['sentenceDetail']
-          )
+          hash[oid] = record.fetch('sentenceDetail')
           hash
         }
       end

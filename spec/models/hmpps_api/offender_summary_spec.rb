@@ -21,7 +21,11 @@ describe HmppsApi::OffenderSummary do
       end
 
       context 'when they have no sentence' do
-        let(:offender) { build(:offender, imprisonmentStatus: immigration_detainee, dateOfBirth: over_18, convictedStatus: 'Convicted', sentence: build(:sentence_detail, :unsentenced)) }
+        let(:offender) {
+          build(:offender,
+                dateOfBirth: over_18, convictedStatus: 'Convicted',
+                        sentence: build(:sentence_detail, :unsentenced, imprisonmentStatus: immigration_detainee))
+        }
 
         it 'is in omic policy' do
           expect(offender.inside_omic_policy?).to eq(true)
@@ -40,7 +44,11 @@ describe HmppsApi::OffenderSummary do
     context 'when the requirements arent met:' do
       context 'when they are under 18' do
         let(:under_18) { (Time.zone.today - 17.years).to_s }
-        let(:offender) { build(:offender, imprisonmentStatus: immigration_detainee, dateOfBirth: under_18, convictedStatus: 'Convicted') }
+        let(:offender) {
+          build(:offender,
+                sentence: build(:sentence_detail, imprisonmentStatus: immigration_detainee),
+                        dateOfBirth: under_18, convictedStatus: 'Convicted')
+        }
 
         it 'is not in omic policy' do
           expect(offender.inside_omic_policy?).to eq(false)
@@ -56,7 +64,10 @@ describe HmppsApi::OffenderSummary do
       end
 
       context 'when they do not have a criminal sentence (and are not an immigration case)' do
-        let(:offender) { build(:offender, :civil_sentence, dateOfBirth: over_18, convictedStatus: 'Convicted', sentence: build(:sentence_detail, sentenceStartDate: '2019-02-05')) }
+        let(:offender) {
+          build(:offender, dateOfBirth: over_18, convictedStatus: 'Convicted',
+                               sentence: build(:sentence_detail, :civil_sentence, sentenceStartDate: '2019-02-05'))
+        }
 
         it 'is not in omic policy' do
           expect(offender.inside_omic_policy?).to eq(false)
@@ -64,7 +75,10 @@ describe HmppsApi::OffenderSummary do
       end
 
       context 'when they are not convicted?' do
-        let(:offender) { build(:offender,  imprisonmentStatus: immigration_detainee, dateOfBirth: over_18, convictedStatus: false, sentence: build(:sentence_detail, sentenceStartDate: '2019-02-05')) }
+        let(:offender) {
+          build(:offender,  dateOfBirth: over_18, convictedStatus: false,
+                               sentence: build(:sentence_detail, imprisonmentStatus: immigration_detainee, sentenceStartDate: '2019-02-05'))
+        }
 
         it 'is not in omic policy' do
           expect(offender.inside_omic_policy?).to eq(false)
@@ -75,7 +89,7 @@ describe HmppsApi::OffenderSummary do
 
   describe '#earliest_release_date' do
     context 'with blank sentence detail' do
-      before { subject.sentence = HmppsApi::SentenceDetail.from_json({}) }
+      before { subject.sentence = build(:sentence_detail, :blank) }
 
       it 'responds with no earliest release date' do
         expect(subject.earliest_release_date).to be_nil
@@ -87,7 +101,7 @@ describe HmppsApi::OffenderSummary do
 
       context 'with just the sentence expiry date' do
         before do
-          subject.sentence = HmppsApi::SentenceDetail.from_json({}).tap { |s| s.sentence_expiry_date = today_plus1 }
+          subject.sentence = build(:sentence_detail, :blank).tap { |s| s.sentence_expiry_date = today_plus1 }
         end
 
         it 'uses the SED' do
@@ -97,10 +111,11 @@ describe HmppsApi::OffenderSummary do
 
       context 'with many dates' do
         before do
-          subject.sentence = HmppsApi::SentenceDetail.from_json(
-            'licenceExpiryDate' => licence_expiry_date.to_s,
-            'postRecallReleaseDate' => post_recall_release_date.to_s,
-            'actualParoleDate' => actual_parole_date.to_s).tap { |detail|
+          subject.sentence = build(:sentence_detail,
+                                   :blank,
+                                   licenceExpiryDate: licence_expiry_date,
+                                   postRecallReleaseDate: post_recall_release_date,
+                                   actualParoleDate: actual_parole_date).tap { |detail|
             detail.sentence_expiry_date = sentence_expiry_date
           }
         end
@@ -151,10 +166,10 @@ describe HmppsApi::OffenderSummary do
 
     context 'with sentence detail with dates' do
       before do
-        subject.sentence = HmppsApi::SentenceDetail.from_json(
-          'sentenceStartDate' => Date.new(2005, 2, 3).to_s,
-          'paroleEligibilityDate' => parole_eligibility_date.to_s,
-          'conditionalReleaseDate' => conditional_release_date.to_s)
+        subject.sentence = build(:sentence_detail,
+                                 sentenceStartDate: Date.new(2005, 2, 3),
+                                 paroleEligibilityDate: parole_eligibility_date,
+                                 conditionalReleaseDate: conditional_release_date)
       end
 
       context 'when comprised of dates in the past and the future' do
@@ -205,9 +220,9 @@ describe HmppsApi::OffenderSummary do
   describe '#sentenced?' do
     context 'with sentence detail with a release date' do
       before do
-        subject.sentence = HmppsApi::SentenceDetail.from_json(
-          'sentenceStartDate' => Date.new(2005, 2, 3).to_s,
-          'releaseDate' => Time.zone.today.to_s)
+        subject.sentence = build(:sentence_detail,
+                                 sentenceStartDate: Date.new(2005, 2, 3),
+                                 releaseDate: Time.zone.today)
       end
 
       it 'marks the offender as sentenced' do
@@ -216,7 +231,7 @@ describe HmppsApi::OffenderSummary do
     end
 
     context 'with blank sentence detail' do
-      before { subject.sentence = HmppsApi::SentenceDetail.from_json({}) }
+      before { subject.sentence = build(:sentence_detail, :blank) }
 
       it 'marks the offender as not sentenced' do
         expect(subject.sentenced?).to be false
@@ -254,7 +269,7 @@ describe HmppsApi::OffenderSummary do
 
   describe '#recalled' do
     context 'when recall flag set' do
-      let(:offender) { build(:offender, recall: true) }
+      let(:offender) { build(:offender, sentence: build(:sentence_detail, recall: true)) }
 
       it 'is true' do
         expect(offender.recalled?).to eq(true)

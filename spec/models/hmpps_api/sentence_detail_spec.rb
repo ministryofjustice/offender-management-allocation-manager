@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 describe HmppsApi::SentenceDetail, model: true do
@@ -7,7 +9,9 @@ describe HmppsApi::SentenceDetail, model: true do
   describe "#automatic_release_date" do
     context "when override present" do
       subject {
-        described_class.from_json 'automaticRelease_date' => date.to_s, 'automaticReleaseOverrideDate' => override.to_s
+        build :sentence_detail,
+              automaticReleaseDate: date.to_s,
+              automaticReleaseOverrideDate: override.to_s
       }
 
       it "overrides" do
@@ -17,7 +21,7 @@ describe HmppsApi::SentenceDetail, model: true do
 
     context "without override" do
       subject {
-        described_class.from_json('automaticReleaseDate' => date.to_s)
+        build :sentence_detail, automaticReleaseDate: date
       }
 
       it "uses original" do
@@ -29,7 +33,9 @@ describe HmppsApi::SentenceDetail, model: true do
   describe "#conditional_release_date" do
     context "when override present" do
       subject {
-        described_class.from_json 'conditionalReleaseDate' => date.to_s, 'conditionalReleaseOverrideDate' => override.to_s
+        build :sentence_detail,
+              conditionalReleaseDate: date,
+              conditionalReleaseOverrideDate: override
       }
 
       it "overrides" do
@@ -39,7 +45,7 @@ describe HmppsApi::SentenceDetail, model: true do
 
     context "without override" do
       subject {
-        described_class.from_json('conditionalReleaseDate' => date.to_s)
+        build :sentence_detail, conditionalReleaseDate: date.to_s
       }
 
       it "uses original" do
@@ -51,7 +57,9 @@ describe HmppsApi::SentenceDetail, model: true do
   describe "#nomis_post_recall_release_date" do
     context "when override present" do
       subject do
-        described_class.from_json('postRecallReleaseDate' => date.to_s, 'postRecallReleaseOverrideDate' => override.to_s)
+        build :sentence_detail,
+              postRecallReleaseDate: date.to_s,
+              postRecallReleaseOverrideDate: override.to_s
       end
 
       it "overrides" do
@@ -61,7 +69,7 @@ describe HmppsApi::SentenceDetail, model: true do
 
     context "without override" do
       subject do
-        described_class.from_json('postRecallReleaseDate' => date.to_s)
+        build :sentence_detail, postRecallReleaseDate: date.to_s
       end
 
       it "uses original" do
@@ -72,20 +80,14 @@ describe HmppsApi::SentenceDetail, model: true do
 
   describe "#post_recall_release_date" do
     subject {
-      if actual_parole_date.nil?
-        described_class.from_json 'automaticReleaseDate' => date.to_s,
-                                  'automaticReleaseOverrideDate' => override.to_s
-      else
-        described_class.from_json 'automaticReleaseDate' => date.to_s,
-                                  'automaticReleaseOverrideDate' => override.to_s,
-                                  'actualParoleDate' => actual_parole_date.to_s
-      end
+      build :sentence_detail, automaticReleaseDate: date,
+            automaticReleaseOverrideDate: override,
+            actualParoleDate: actual_parole_date
     }
 
     let(:earliest_date) { Date.new(2019, 1, 2) }
     let(:latest_date) { Date.new(2019, 5, 4) }
     let(:no_date) { nil }
-
 
     before do
       allow(subject).to receive(:nomis_post_recall_release_date).and_return(nomis_post_recall_release_date)

@@ -45,9 +45,9 @@ describe HandoverDateService do
     let(:today) { Date.parse('01/01/2021') }
     let(:crd) { Date.parse('01/09/2022') }
     let(:offender) {
-      build(:offender, :determinate,
+      build(:offender,
             latestLocationId: prison,
-            sentence: build(:sentence_detail, sentenceStartDate: sentence_start_date, conditionalReleaseDate: crd)
+            sentence: build(:sentence_detail, :determinate, sentenceStartDate: sentence_start_date, conditionalReleaseDate: crd)
       ).tap { |o|
         o.load_case_information(case_info)
         o.prison_arrival_date = arrival_date
@@ -389,10 +389,10 @@ describe HandoverDateService do
       let(:tariff_date) { Date.parse('01/09/2022') }
       let(:case_info) { build(:case_information, :nps, probation_service: welsh? ? 'Wales' : 'England') }
       let(:offender) {
-        build(:offender, :indeterminate,
+        build(:offender,
               latestLocationId: prison,
               categoryCode: category,
-              sentence: build(:sentence_detail, tariffDate: tariff_date, sentenceStartDate: sentence_start_date)
+              sentence: build(:sentence_detail, :indeterminate, tariffDate: tariff_date, sentenceStartDate: sentence_start_date)
         ).tap { |o|
           o.load_case_information(case_info)
           o.prison_arrival_date = arrival_date

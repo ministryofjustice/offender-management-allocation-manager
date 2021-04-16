@@ -25,7 +25,7 @@ RSpec.describe AllocatedOffender, type: :model do
     end
 
     it 'will calculate responsibility if there is no override' do
-      indeterminate_offender = build(:offender,  :indeterminate, offenderNo: 'G7514GW', latestLocationId: 'WEI')
+      indeterminate_offender = build(:offender, sentence: build(:sentence_detail, :indeterminate), offenderNo: 'G7514GW', latestLocationId: 'WEI')
       ao = described_class.new(staff_id, primary_allocation, indeterminate_offender)
       expect(ao.pom_responsibility).to eq('Responsible')
 

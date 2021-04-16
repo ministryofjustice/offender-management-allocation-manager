@@ -18,8 +18,8 @@ RSpec.describe SentenceType, type: :model do
   end
 
   it 'knows what a civil sentence is' do
-    expect(described_class.new('CIVIL').civil?).to be true
-    expect(described_class.new('IPP').civil?).to be false
+    expect(described_class.new('CIVIL').civil_sentence?).to be true
+    expect(described_class.new('IPP').civil_sentence?).to be false
   end
 
   it "can determine determinate sentences" do
