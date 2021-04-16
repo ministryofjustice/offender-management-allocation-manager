@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 feature 'Search for offenders' do
@@ -15,16 +17,23 @@ feature 'Search for offenders' do
     expect(page).to have_css('tbody tr', count: 6)
   end
 
-  it 'Can search from the Allocations summary page', vcr: { cassette_name: 'prison_api/allocated_search_feature' } do
-    signin_spo_user
-    visit allocated_prison_prisoners_path(prison)
+  context 'when on the Allocations summary page' do
+    before do
+      create(:case_information, nomis_offender_id: 'G5359UP')
+      create(:allocation, nomis_offender_id: 'G5359UP')
+    end
 
-    expect(page).to have_text('See allocations')
-    fill_in 'q', with: 'Fra'
-    click_on('search-button')
+    it 'Can search from the Allocations summary page', :js, vcr: { cassette_name: 'prison_api/allocated_search_feature' } do
+      signin_spo_user
+      visit allocated_prison_prisoners_path(prison)
 
-    expect(page).to have_current_path(search_prison_prisoners_path(prison), ignore_query: true)
-    expect(page).to have_css('tbody tr', count: 9)
+      expect(page).to have_text('See allocations')
+      fill_in 'q', with: 'Fra'
+      click_on('search-button')
+
+      expect(page).to have_current_path(search_prison_prisoners_path(prison), ignore_query: true)
+      expect(page).to have_css('tbody tr', count: 9)
+    end
   end
 
   it 'Can search from the Awaiting Allocation summary page', vcr: { cassette_name: 'prison_api/waiting_allocation_search_feature' } do
