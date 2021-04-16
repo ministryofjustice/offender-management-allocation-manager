@@ -50,4 +50,17 @@ module FeaturesHelper
   def wait_for(maximum_wait_in_seconds = 10)
     Selenium::WebDriver::Wait.new(timeout: maximum_wait_in_seconds).until { yield }
   end
+
+  def execute_in_new_tab
+    current_tab = page.current_window
+    new_tab = page.open_new_window
+
+    switch_to_window(new_tab)
+
+    yield
+
+    switch_to_window(current_tab)
+
+    new_tab.close
+  end
 end
