@@ -1,7 +1,0 @@
-<section class="govuk-tabs__panel" id="inactive">
-  <h2 class="govuk-heading-m">Probation POM</h2>
-  <%= render :partial => "poms_table", locals: { :poms => @inactive_poms.select(&:probation_officer?), pom_type: 'probation' } %>
-
-  <h2 class="govuk-heading-m">Prison POM</h2>
-  <%= render :partial => "poms_table", locals: { :poms => @inactive_poms.select(&:prison_officer?), pom_type: 'prison' } %>
-</section>

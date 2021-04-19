@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe AllocationsController, :allocation, type: :controller do
+RSpec.describe AllocationsController, type: :controller do
   let(:poms) {
     [
       build(:pom, :prison_officer, emails: []),
@@ -276,7 +276,12 @@ RSpec.describe AllocationsController, :allocation, type: :controller do
           it 'serves correct counts' do
             pom = assigns(:recommended_poms).detect { |c| c.first_name == alice.firstName }
 
-            expect(tier_a: pom.tier_a, tier_b: pom.tier_b, tier_c: pom.tier_c, tier_d: pom.tier_d, no_tier: pom.no_tier, total_cases: pom.total_cases)
+            expect(tier_a: pom.allocations.count { |a| a.tier == 'A' },
+                   tier_b: pom.allocations.count { |a| a.tier == 'B' },
+                   tier_c: pom.allocations.count { |a| a.tier == 'C' },
+                   tier_d: pom.allocations.count { |a| a.tier == 'D' },
+                   no_tier: pom.allocations.count { |a| a.tier == 'N/A' },
+                   total_cases: pom.allocations.count)
                 .to eq(tier_a: 5, tier_b: 4, tier_c: 3, tier_d: 2, no_tier: 1, total_cases: 15)
           end
 

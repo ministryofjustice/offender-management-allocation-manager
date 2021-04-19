@@ -9,6 +9,7 @@ feature 'Allocation' do
 
   let!(:probation_officer_pom_detail) {
     PomDetail.create!(
+      prison_code: 'LEI',
       nomis_staff_id: probation_officer_nomis_staff_id,
       working_pattern: 1.0,
       status: 'Active'

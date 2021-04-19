@@ -10,10 +10,8 @@ class AllocationsController < PrisonsApplicationController
     @prisoner = offender(offender_id)
     @previously_allocated_pom_ids =
       AllocationService.previously_allocated_poms(offender_id)
-    recommended_poms, not_recommended_poms =
+    @recommended_poms, @not_recommended_poms =
       recommended_and_nonrecommended_poms_for(@prisoner)
-    @recommended_poms = recommended_poms.map { |p| PomPresenter.new(p) }
-    @not_recommended_poms = not_recommended_poms.map { |p| PomPresenter.new(p) }
     @unavailable_pom_count = unavailable_pom_count
     @allocation = Allocation.find_by nomis_offender_id: offender_id
     @case_info = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: offender_id)
@@ -52,10 +50,8 @@ class AllocationsController < PrisonsApplicationController
     @prisoner = offender(nomis_offender_id_from_url)
     @previously_allocated_pom_ids =
       AllocationService.previously_allocated_poms(nomis_offender_id_from_url)
-    recommended_poms, not_recommended_poms =
+    @recommended_poms, @not_recommended_poms =
       recommended_and_nonrecommended_poms_for(@prisoner)
-    @recommended_poms = recommended_poms.map { |p| PomPresenter.new(p) }
-    @not_recommended_poms = not_recommended_poms.map { |p| PomPresenter.new(p) }
     @unavailable_pom_count = unavailable_pom_count
 
     @current_pom = current_pom_for(nomis_offender_id_from_url)

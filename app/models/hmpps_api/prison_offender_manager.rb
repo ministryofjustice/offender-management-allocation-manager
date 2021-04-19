@@ -28,6 +28,10 @@ module HmppsApi
       "#{last_name}, #{first_name}".titleize
     end
 
+    def email_address
+      @email_address ||= HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(@staff_id).first
+    end
+
     def self.from_json(payload)
       PrisonOffenderManager.new(payload)
     end

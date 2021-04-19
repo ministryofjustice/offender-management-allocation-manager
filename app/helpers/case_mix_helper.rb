@@ -9,11 +9,11 @@ module CaseMixHelper
 
   def case_mix_bar(pom)
     tiers = {
-      a: pom.tier_a,
-      b: pom.tier_b,
-      c: pom.tier_c,
-      d: pom.tier_d,
-      na: pom.no_tier,
+      a: pom.allocations.count { |a| a.tier == 'A' },
+      b: pom.allocations.count { |a| a.tier == 'B' },
+      c: pom.allocations.count { |a| a.tier == 'C' },
+      d: pom.allocations.count { |a| a.tier == 'D' },
+      na: pom.allocations.count { |a| a.tier == 'N/A' },
     }.reject { |_tier, count| count.zero? } # filter out zero-count tiers
 
     css_columns = tiers.values.map { |count|

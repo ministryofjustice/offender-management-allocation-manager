@@ -39,4 +39,16 @@ module PomHelper
     # we are now displaying 'Available', instead of 'Active' which is stored in the database
     pom.status == 'active' ? 'available' : pom.status
   end
+
+  def active_probation_poms(poms)
+    poms.select { |pom| %w[active unavailable].include?(pom.status) && pom.probation_officer? }
+  end
+
+  def active_prison_poms(poms)
+    poms.select { |pom| %w[active unavailable].include?(pom.status) && pom.prison_officer? }
+  end
+
+  def inactive_poms(poms)
+    poms.reject { |pom| %w[active unavailable].include? pom.status }
+  end
 end

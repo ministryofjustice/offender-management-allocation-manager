@@ -66,4 +66,24 @@ module OffenderHelper
       'Prisoner assessed as suitable for a prison officer POM despite tiering calculation'
     end
   end
+
+  def tier_a_case_count offenders
+    offenders.count { |a| a.tier == 'A' }
+  end
+
+  def tier_b_case_count offenders
+    offenders.count { |a| a.tier == 'B' }
+  end
+
+  def tier_c_case_count offenders
+    offenders.count { |a| a.tier == 'C' }
+  end
+
+  def tier_d_case_count offenders
+    offenders.count { |a| a.tier == 'D' }
+  end
+
+  def no_tier_case_count offenders
+    offenders.count { |a| a.tier == 'N/A' }
+  end
 end

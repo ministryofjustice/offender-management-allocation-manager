@@ -1,5 +1,6 @@
 # Jay Heal
 PomDetail.find_or_create_by!(
+           prison_code: 'LEI',
   nomis_staff_id: 485_833,
   status: 'active',
   working_pattern: 1
@@ -7,6 +8,7 @@ PomDetail.find_or_create_by!(
 
 # Moic POM
 PomDetail.find_or_create_by!(
+  prison_code: 'LEI',
   nomis_staff_id: 485_926,
   status: 'active',
   working_pattern: 0.2
@@ -14,6 +16,7 @@ PomDetail.find_or_create_by!(
 
 # Dom Bull
 PomDetail.find_or_create_by!(
+  prison_code: 'LEI',
   nomis_staff_id: 485_572,
   status: 'active',
   working_pattern: 1
@@ -21,6 +24,7 @@ PomDetail.find_or_create_by!(
 
 # Kath Pobee-Norris
 PomDetail.find_or_create_by!(
+  prison_code: 'LEI',
   nomis_staff_id: 485_637,
   status: 'active',
   working_pattern: 0.4
@@ -28,6 +32,7 @@ PomDetail.find_or_create_by!(
 
 # Andrien Ricketts
 PomDetail.find_or_create_by!(
+  prison_code: 'LEI',
   nomis_staff_id: 485_833,
   status: 'active',
   working_pattern: 1

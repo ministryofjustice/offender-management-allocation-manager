@@ -46,36 +46,8 @@ class StaffMember
     end
   end
 
-  def agency_id
-    @prison.code
-  end
-
   def allocations
     @allocations ||= fetch_allocations
-  end
-
-  def pending_handover_offenders
-    allocations.select(&:approaching_handover?)
-  end
-
-  def tier_a
-    allocations.count { |a| a.tier == 'A' }
-  end
-
-  def tier_b
-    allocations.count { |a| a.tier == 'B' }
-  end
-
-  def tier_c
-    allocations.count { |a| a.tier == 'C' }
-  end
-
-  def tier_d
-    allocations.count { |a| a.tier == 'D' }
-  end
-
-  def no_tier
-    allocations.count { |a| a.tier == 'N/A' }
   end
 
 private
@@ -101,7 +73,7 @@ private
 
   # Attempt to forward-populate the PomDetail table for new records
   def default_pom_detail(prison_code, staff_id)
-    @pom_detail = PomDetail.find_or_create_by!(nomis_staff_id: staff_id) { |pom|
+    @pom_detail = PomDetail.find_or_create_by!(prison_code: prison_code, nomis_staff_id: staff_id) { |pom|
       pom.prison_code = prison_code
       pom.working_pattern = 0.0
       pom.status = 'active'
