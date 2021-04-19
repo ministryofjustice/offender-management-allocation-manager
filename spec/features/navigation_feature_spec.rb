@@ -65,9 +65,7 @@ feature 'Navigation' do
 
       it 'highlights the section' do
         all(link_css)[index].click
-        within '.probation_pom_row_0' do
-          click_link 'View'
-        end
+        click_link 'Moic Integration-Tests'
         new_link = all(link_css)[index]
         expect(new_link['aria-current']).to eq('page')
         click_link 'Edit profile'

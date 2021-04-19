@@ -17,7 +17,7 @@ feature 'Inactive POM' do
         primary_pom_nomis_id: inactive_pom,
         secondary_pom_nomis_id: active_pom
       )
-      create(:pom_detail, nomis_staff_id: inactive_pom)
+      create(:pom_detail, prison_code: prison, nomis_staff_id: inactive_pom)
       visit prison_allocation_path(prison, nomis_offender_id)
       expect(page).to have_text("This Prison Offender Manager does not appear to be active")
     end

@@ -6,20 +6,7 @@ class PomsController < PrisonsApplicationController
   before_action :load_pom_staff_member, only: [:show, :edit, :update]
 
   def index
-    poms = PrisonOffenderManagerService.get_poms_for(active_prison_id)
-    active_poms, inactive_poms = poms.partition { |pom|
-      %w[active unavailable].include? pom.status
-    }
-
-    if @prison.womens?
-      # poms are split into groups - 1) probation 2) prison & are sorted by last name
-      @active_probation_poms = active_poms.sort_by(&:last_name).select(&:probation_officer?).map { |po| PomPresenter.new(po) }
-      @active_prison_poms = active_poms.sort_by(&:last_name).select(&:prison_officer?).map { |po| PomPresenter.new(po) }
-      @inactive_poms = inactive_poms.sort_by(&:last_name).map { |p| PomPresenter.new(p) }
-    else
-      @active_poms = active_poms.map { |p| PomPresenter.new(p) }
-      @inactive_poms = inactive_poms.map { |p| PomPresenter.new(p) }
-    end
+    @poms = PrisonOffenderManagerService.get_poms_for(active_prison_id).sort_by(&:last_name)
   end
 
   def show

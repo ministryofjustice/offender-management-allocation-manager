@@ -1,9 +1,41 @@
 <% content_for :switcher do %>
   <%= render '/layouts/prison_switcher' %>
 <% end %>
+<h1 class="govuk-heading-l">Manage your staff</h1>
 
-<% if @prison.womens? %>
-  <%= render 'female_index' %>
-<% else %>
-  <%= render 'male_index' %>
-<% end %>
+<div class="govuk-tabs" data-module="govuk-tabs">
+  <h2 class="govuk-tabs__title">Manage your staff</h2>
+
+  <ul class="govuk-tabs__list" role='tablist'>
+    <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
+      <a class="govuk-tabs__tab" href="#active_probation_poms">
+        Active Probation officer POMs (<%= active_probation_poms(@poms).count %>)
+      </a>
+    </li>
+    <li class="govuk-tabs__list-item">
+      <a class="govuk-tabs__tab" href="#active_prison_poms">
+        Active Prison officer POMs (<%= active_prison_poms(@poms).count %>)
+      </a>
+    </li>
+    <li class="govuk-tabs__list-item">
+      <a class="govuk-tabs__tab" href="#inactive_poms">
+        Inactive staff (<%= inactive_poms(@poms).count %>)
+      </a>
+    </li>
+  </ul>
+
+  <section class="govuk-tabs__panel" id="active_probation_poms">
+    <h2 class="govuk-heading-m">Active Probation officer POMs</h2>
+    <%= render "poms_table", pom_type: 'probation', poms: active_probation_poms(@poms) %>
+  </section>
+
+  <section class="govuk-tabs__panel" id="active_prison_poms">
+    <h2 class="govuk-heading-m">Active Prison officer POMs</h2>
+    <%= render "poms_table", pom_type: 'prison', poms: active_prison_poms(@poms) %>
+  </section>
+
+  <section class="govuk-tabs__panel" id="inactive_poms">
+    <h2 class="govuk-heading-m">Inactive staff</h2>
+    <%= render "inactive_poms", poms: inactive_poms(@poms) %>
+  </section>
+</div>

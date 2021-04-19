@@ -409,7 +409,7 @@ RSpec.describe SummaryController, type: :controller do
 
         before do
           stub_offenders_for_prison(prison, [first_offender] + offenders)
-          PomDetail.create!(nomis_staff_id: nomis_staff_id, working_pattern: 1.0, status: 'active')
+          PomDetail.create!(prison_code: prison, nomis_staff_id: nomis_staff_id, working_pattern: 1.0, status: 'active')
 
           create(:allocation,
                  nomis_offender_id: first_offender_no,

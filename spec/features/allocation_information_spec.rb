@@ -12,6 +12,7 @@ feature "view an offender's allocation information" do
   let!(:pom_detail) {
     PomDetail.create!(
       nomis_staff_id: probation_officer_nomis_staff_id,
+      prison_code: prison,
       working_pattern: 1.0,
       status: 'Active'
     )

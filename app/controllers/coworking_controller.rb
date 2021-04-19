@@ -13,11 +13,9 @@ class CoworkingController < PrisonsApplicationController
       pom.staff_id == @current_pom.staff_id
     }
 
-    active_poms, unavailable_poms = poms.partition { |pom|
+    @active_poms, @unavailable_poms = poms.partition { |pom|
       %w[active unavailable].include? pom.status
     }
-    @active_poms = active_poms.map { |p| PomPresenter.new(p) }
-    @unavailable_poms = unavailable_poms.map { |p| PomPresenter.new(p) }
 
     @prison_poms = @active_poms.select(&:prison_officer?)
     @probation_poms = @active_poms.select(&:probation_officer?)

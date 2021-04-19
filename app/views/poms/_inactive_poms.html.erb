@@ -11,7 +11,7 @@
       <tr class="govuk-table__row pom_row_<%= i %>">
         <td aria-label="POM" class="govuk-table__cell "><%= link_to full_name_ordered(pom), prison_pom_path(@prison.code, nomis_staff_id: pom.staff_id) %></td>
         <td aria-label="POM type" class="govuk-table__cell "><%= grade(pom) %></td>
-        <td aria-label="Total cases" class="govuk-table__cell govuk-!-font-weight-bold"><%= pom.total_cases %></td>
+        <td aria-label="Total cases" class="govuk-table__cell govuk-!-font-weight-bold"><%= pom.allocations.count %></td>
       </tr>
     <% end %>
   </tbody>

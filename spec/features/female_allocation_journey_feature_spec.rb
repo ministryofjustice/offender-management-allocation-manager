@@ -19,9 +19,9 @@ feature "womens allocation journey" do
   before do
     test_strategy.switch!(:womens_estate, true)
 
-    create(:pom_detail, :inactive, nomis_staff_id: inactive_prison_pom.staff_id)
-    create(:pom_detail, :part_time, nomis_staff_id: probation_pom.staff_id)
-    create(:pom_detail, nomis_staff_id: probation_pom2.staff_id)
+    create(:pom_detail, :inactive, prison_code: prison.code, nomis_staff_id: inactive_prison_pom.staff_id)
+    create(:pom_detail, :part_time, prison_code: prison.code, nomis_staff_id: probation_pom.staff_id)
+    create(:pom_detail, prison_code: prison.code, nomis_staff_id: probation_pom2.staff_id)
 
     stub_signin_spo user, [prison.code]
     stub_poms(prison.code, [probation_pom, probation_pom2, prison_pom, inactive_prison_pom])

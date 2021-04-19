@@ -10,10 +10,11 @@ feature "get poms list" do
   it "shows the page", vcr: { cassette_name: 'prison_api/show_poms_feature_list' } do
     visit prison_poms_path('LEI')
 
-    expect(page).to have_css(".govuk-table", count: 4)
-    expect(page).to have_content("Prison Offender Managers")
-    expect(page).to have_content("Prison POM")
-    expect(page).to have_content("Probation POM")
+    # shows 3 tabs - probation, prison and inactive
+    expect(page).to have_css(".govuk-tabs__list-item", count: 3)
+    expect(page).to have_content("Active Probation officer POMs")
+    expect(page).to have_content("Active Prison officer POMs")
+    expect(page).to have_content("Inactive staff")
   end
 
   it "handles missing sentence data", vcr: { cassette_name: 'prison_api/show_poms_feature_missing_sentence' } do
