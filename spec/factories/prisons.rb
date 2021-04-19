@@ -19,6 +19,12 @@ FactoryBot.define do
     sequence(:code) do |c|
       CLOSED_MALE_PRISON_CODES[c % CLOSED_MALE_PRISON_CODES.size]
     end
+
+    trait :open do
+      sequence(:code) do |c|
+        PrisonService::OPEN_PRISON_CODES[c % PrisonService::OPEN_PRISON_CODES.size]
+      end
+    end
   end
 
   factory :womens_prison, parent: :prison do
