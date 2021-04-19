@@ -10,9 +10,17 @@ FactoryBot.define do
 
     reason {
       # Randomly select a valid reason
-      [:nps_indeterminate,
-       :nps_mappa_unknown,
-       :crc_case].sample
+      CalculatedHandoverDate::REASONS.keys.sample
+    }
+
+    responsibility {
+      # Randomly select a valid responsibility
+      [
+        CalculatedHandoverDate::CUSTODY_ONLY,
+        CalculatedHandoverDate::CUSTODY_WITH_COM,
+        CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+        CalculatedHandoverDate::UNKNOWN
+      ].sample
     }
   end
 end

@@ -86,7 +86,7 @@ FactoryBot.define do
     trait :indeterminate do
       indeterminateSentence { true }
       tariffDate { Time.zone.today + 1.year}
-     end
+    end
 
     trait :outside_early_allocation_window do
       conditionalReleaseDate { Time.zone.today + 19.months }

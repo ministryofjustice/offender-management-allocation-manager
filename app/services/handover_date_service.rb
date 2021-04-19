@@ -164,7 +164,8 @@ private
     if offender.early_allocation?
       [early_allocation_handover_date(offender), :nps_early_allocation]
     elsif offender.indeterminate_sentence?
-      [indeterminate_responsibility_date(offender), :nps_indeterminate]
+      reason = offender.in_open_conditions? ? :nps_indeterminate_open : :nps_indeterminate
+      [indeterminate_responsibility_date(offender), reason]
     elsif offender.parole_eligibility_date.present?
       [offender.parole_eligibility_date - 8.months, :nps_determinate_parole_case]
     elsif offender.mappa_level.blank?

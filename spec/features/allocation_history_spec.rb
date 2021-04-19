@@ -41,6 +41,11 @@ feature 'Allocation History' do
           agencyId: open_prison.code,
             sentence: attributes_for(:sentence_detail, :indeterminate, :welsh_open_policy))
   }
+  let(:nomis_pentonville_offender) {
+    build(:nomis_offender, :indeterminate, offenderNo: nomis_offender.fetch(:offenderNo),
+          agencyId: second_prison.code,
+            sentence: attributes_for(:sentence_detail, :indeterminate, :welsh_open_policy))
+  }
   let(:pontypool_ldu) {
     create(:local_delivery_unit, name: 'Pontypool LDU', email_address: 'pontypool-ldu@digital.justice.gov.uk')
   }
@@ -62,7 +67,6 @@ feature 'Allocation History' do
     before {
       stub_auth_token
       stub_offenders_for_prison(open_prison.code, [nomis_offender])
-      stub_offender(nomis_offender)
       stub_signin_spo spo, [open_prison.code]
 
       stub_pom build(:pom, staffId: probation_pom_2.fetch(:primary_pom_nomis_id))
@@ -163,13 +167,19 @@ feature 'Allocation History' do
                              primary_pom_nomis_id: pom_without_email[:primary_pom_nomis_id],
                              primary_pom_name: pom_without_email[:primary_pom_name],
                              recommended_pom_type: 'probation')
+          # Puy the offender in Pentonville to calculate handover dates
+          # then put them back so that the transfer looks like it works
+          stub_offender(nomis_pentonville_offender)
+          RecalculateHandoverDateJob.perform_now nomis_offender_id
+          stub_offender(nomis_offender)
         end
 
         current_date += 1.day
         expect(current_date).to eq(transfer_date)
         Timecop.travel(transfer_date) do
           # create Email History for welsh offender transferring to Prescoed open prison by moving the prisoner
-          MovementService.process_transfer build(:movement, :transfer, offenderNo: nomis_offender_id, toAgency: PrisonService::PRESCOED_CODE)
+          MovementService.process_transfer build(:movement, :transfer, offenderNo: nomis_offender_id, toAgency: open_prison.code)
+          RecalculateHandoverDateJob.perform_now nomis_offender_id
         end
         visit prison_allocation_history_path(open_prison.code, nomis_offender_id)
       end
