@@ -137,7 +137,7 @@ class Allocation < ApplicationRecord
 private
 
   def deallocate_offender event:, event_trigger:
-    primary_pom = StaffMember.new prison, primary_pom_nomis_id
+    primary_pom = StaffMember.new Prison.new(prison), primary_pom_nomis_id
     offender = OffenderService.get_offender(nomis_offender_id)
     mail_params = {
         email: primary_pom.email_address,
