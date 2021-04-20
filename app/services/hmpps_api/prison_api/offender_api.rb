@@ -75,7 +75,6 @@ module HmppsApi
             sentence = HmppsApi::SentenceDetail.new sentence_details.fetch(offender.booking_id),
                                                     search_payload
 
-
             offender.sentence = sentence
             add_arrival_dates([offender])
           end
