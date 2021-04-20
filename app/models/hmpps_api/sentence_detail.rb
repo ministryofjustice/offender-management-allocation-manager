@@ -14,7 +14,7 @@ module HmppsApi
                 :actual_parole_date,
                 :recall
 
-    delegate :criminal_sentence?, :immigration_case?, :indeterminate_sentence?, :civil_sentence?, to: :@sentence_type
+    delegate :criminal_sentence?, :immigration_case?, :civil_sentence?, to: :@sentence_type
 
     # Note - this is hiding a defect - we never get sentence_expiry_date from NOMIS (but maybe we should?)
     attr_accessor :sentence_expiry_date
@@ -97,10 +97,16 @@ module HmppsApi
 
       @sentence_type = SentenceType.new search_payload.fetch('imprisonmentStatus', 'UNK_SENT')
       @recall = search_payload.fetch('recall', false)
+      @indeterminate_sentence = search_payload['indeterminateSentence']
+      @description = search_payload.fetch('imprisonmentStatusDescription', 'Unknown Sentenced')
+    end
+
+    def indeterminate_sentence?
+      @indeterminate_sentence
     end
 
     def describe_sentence
-      "#{@sentence_type.code} - #{@sentence_type.description}"
+      "#{@sentence_type.code} - #{@description}"
     end
   end
 end
