@@ -36,9 +36,8 @@ module PomHelper
   end
 
   def fetch_pom_name(staff_id)
-    pom_firstname, pom_secondname =
-      PrisonOffenderManagerService.get_pom_name(staff_id)
-    "#{pom_secondname}, #{pom_firstname}"
+    staff = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(staff_id)
+    "#{staff.last_name}, #{staff.first_name}"
   end
 
   def status(pom)

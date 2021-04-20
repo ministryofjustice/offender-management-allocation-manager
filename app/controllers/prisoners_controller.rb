@@ -64,8 +64,12 @@ private
   # Takes a list of OffenderSummary or Offender objects, and returns them with their
   # allocated POM name set in :allocated_pom_name.
   def set_allocated_pom_names(offenders, prison_id)
-    pom_names = PrisonOffenderManagerService.get_pom_names(prison_id)
+    pom_names = PrisonOffenderManagerService.get_poms_for(prison_id).each_with_object({}) { |p, hsh|
+      hsh[p.staff_id] = p.full_name
+    }
+
     nomis_offender_ids = offenders.map(&:offender_no)
+
     offender_to_staff_hash = Allocation.
       where(nomis_offender_id: nomis_offender_ids).
       map { |a|

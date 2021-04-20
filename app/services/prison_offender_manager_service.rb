@@ -31,41 +31,6 @@ class PrisonOffenderManagerService
     StaffMember.new(Prison.new(prison_id), pom.staff_id)
   end
 
-  def self.get_pom_emails(nomis_staff_id)
-    HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(nomis_staff_id)
-  end
-
-  def self.get_pom_names(prison)
-    poms_list = get_poms_for(prison)
-    poms_list.each_with_object({}) { |p, hsh|
-      hsh[p.staff_id] = p.full_name
-    }
-  end
-
-  def self.get_pom_name(nomis_staff_id)
-    staff = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(nomis_staff_id)
-    [staff.first_name, staff.last_name]
-  end
-
-  def self.get_user_name(username)
-    user = HmppsApi::PrisonApi::UserApi.user_details(username)
-    [user.first_name, user.last_name]
-  end
-
-  def self.unavailable_pom_count(prison)
-    poms = get_poms_for(prison).reject { |pom|
-      pom.status == 'active'
-    }
-    poms.count
-  end
-
-  def self.get_signed_in_pom_details(current_user, prison)
-    user = HmppsApi::PrisonApi::UserApi.user_details(current_user)
-
-    poms_list = get_poms_for(prison)
-    poms_list.find { |p| p.staff_id.to_i == user.staff_id.to_i }
-  end
-
 private
 
   # Attempt to forward-populate the PomDetail table for new records
