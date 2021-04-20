@@ -130,9 +130,7 @@ class AllocationsController < PrisonsApplicationController
 private
 
   def unavailable_pom_count
-    @unavailable_pom_count ||= PrisonOffenderManagerService.unavailable_pom_count(
-      active_prison_id
-    )
+    PrisonOffenderManagerService.get_poms_for(active_prison_id).count { |pom| pom.status != 'active' }
   end
 
   def allocation_attributes(offender)

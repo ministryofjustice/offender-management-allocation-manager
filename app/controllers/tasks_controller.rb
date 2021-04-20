@@ -28,10 +28,10 @@ private
   end
 
   def load_pom
-    @pom = PrisonOffenderManagerService.get_signed_in_pom_details(
-      current_user,
-      active_prison_id
-    )
+    user = HmppsApi::PrisonApi::UserApi.user_details(current_user)
+    poms_list = PrisonOffenderManagerService.get_poms_for(active_prison_id)
+
+    @pom = poms_list.find { |p| p.staff_id.to_i == user.staff_id.to_i }
   end
 
   def page

@@ -14,13 +14,13 @@ class PushPomToDeliusJob < ApplicationJob
 
       # The allocation model has formatted pom names ‘firstname, surname’ that PrisonOffenderManagerService
       # splits up to allow them to be pushed separately.
-      pom_firstname, pom_secondname = PrisonOffenderManagerService.get_pom_name(allocation.primary_pom_nomis_id)
+      staff = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(allocation.primary_pom_nomis_id)
 
       HmppsApi::CommunityApi.set_pom(
         offender_no: allocation.nomis_offender_id,
         prison: allocation.prison,
-        forename: pom_firstname,
-        surname: pom_secondname
+        forename: staff.first_name,
+        surname: staff.last_name
       )
     end
   end

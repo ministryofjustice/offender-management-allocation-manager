@@ -265,7 +265,7 @@ RSpec.describe Allocation, type: :model do
 
     context 'when a new allocation is created and a POM is set' do
       before do
-        expect(PrisonOffenderManagerService).to receive(:get_pom_name).with(nomis_staff_id).and_return ['Bill', 'Jones']
+        expect(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:staff_detail).with(nomis_staff_id).and_return build(:pom, firstName: 'Bill', lastName: 'Jones')
         expect(HmppsApi::CommunityApi).to receive(:set_pom).with offender_no: nomis_offender_id, prison: prison, forename: 'Bill', surname: 'Jones'
       end
 
@@ -276,7 +276,7 @@ RSpec.describe Allocation, type: :model do
 
     context 'with an existing allocation' do
       before do
-        expect(PrisonOffenderManagerService).to receive(:get_pom_name).with(nomis_staff_id).and_return ['Bill', 'Jones']
+        expect(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:staff_detail).with(nomis_staff_id).and_return build(:pom, firstName: 'Bill', lastName: 'Jones')
         expect(HmppsApi::CommunityApi).to receive(:set_pom).with offender_no: nomis_offender_id, prison: prison, forename: 'Bill', surname: 'Jones'
         create(:allocation, :primary, nomis_offender_id: nomis_offender_id, prison: prison, primary_pom_nomis_id: nomis_staff_id)
       end
@@ -301,7 +301,7 @@ RSpec.describe Allocation, type: :model do
 
       describe 're-allocated POM ' do
         before do
-          expect(PrisonOffenderManagerService).to receive(:get_pom_name).with(updated_nomis_staff_id).and_return ['Sally', 'Albright']
+          expect(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:staff_detail).with(updated_nomis_staff_id).and_return build(:pom, firstName: 'Sally', lastName: 'Albright')
           expect(HmppsApi::CommunityApi).to receive(:set_pom).with offender_no: nomis_offender_id, prison: prison, forename: 'Sally', surname: 'Albright'
         end
 

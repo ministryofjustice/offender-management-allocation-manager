@@ -11,16 +11,14 @@ class AllocationService
       nomis_offender_id: nomis_offender_id
     )
 
-    pom_firstname, _pom_secondname =
-      PrisonOffenderManagerService.get_pom_name(alloc_version.primary_pom_nomis_id)
-    coworking_pom_firstname, coworking_pom_secondname =
-      PrisonOffenderManagerService.get_pom_name(secondary_pom_nomis_id)
-    user_firstname, user_secondname =
-      PrisonOffenderManagerService.get_user_name(created_by_username)
+    primary_pom = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(alloc_version.primary_pom_nomis_id)
+    coworking_pom = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(secondary_pom_nomis_id)
+
+    created_by_user = HmppsApi::PrisonApi::UserApi.user_details(created_by_username)
 
     alloc_version.update!(
-      secondary_pom_name: "#{coworking_pom_secondname}, #{coworking_pom_firstname}",
-      created_by_name: "#{user_firstname} #{user_secondname}",
+      secondary_pom_name: "#{coworking_pom.last_name}, #{coworking_pom.first_name}",
+      created_by_name: "#{created_by_user.first_name} #{created_by_user.last_name}",
       secondary_pom_nomis_id: secondary_pom_nomis_id,
       event: Allocation::ALLOCATE_SECONDARY_POM,
       event_trigger: Allocation::USER
@@ -28,22 +26,20 @@ class AllocationService
 
     EmailService.instance(allocation: alloc_version, message: message,
                           pom_nomis_id: alloc_version.primary_pom_nomis_id).
-      send_coworking_primary_email(pom_firstname, alloc_version.secondary_pom_name)
+      send_coworking_primary_email(primary_pom.first_name, alloc_version.secondary_pom_name)
 
     EmailService.instance(allocation: alloc_version, message: message,
                           pom_nomis_id: secondary_pom_nomis_id).
-      send_secondary_email(coworking_pom_firstname)
+      send_secondary_email(coworking_pom.first_name)
   end
 
   def self.create_or_update(params)
-    pom_firstname, pom_secondname =
-      PrisonOffenderManagerService.get_pom_name(params[:primary_pom_nomis_id])
-    user_firstname, user_secondname =
-      PrisonOffenderManagerService.get_user_name(params[:created_by_username])
+    primary_pom = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(params[:primary_pom_nomis_id])
+    created_by_user = HmppsApi::PrisonApi::UserApi.user_details(params[:created_by_username])
 
     params_copy = params.except(:created_by_username).merge(
-      primary_pom_name: "#{pom_secondname}, #{pom_firstname}",
-      created_by_name: "#{user_firstname} #{user_secondname}",
+      primary_pom_name: "#{primary_pom.last_name}, #{primary_pom.first_name}",
+      created_by_name: "#{created_by_user.first_name} #{created_by_user.last_name}",
       primary_pom_allocated_at: DateTime.now.utc
     )
 
@@ -91,7 +87,7 @@ class AllocationService
     history = allocation.get_old_versions.append(allocation)
     pom_ids = history.map { |h| [h.primary_pom_nomis_id, h.secondary_pom_nomis_id] }.flatten.compact.uniq
 
-    pom_ids.index_with { |pom_id| PrisonOffenderManagerService.get_pom_emails(pom_id).first }
+    pom_ids.index_with { |pom_id| HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(pom_id).first }
   end
 
   def self.create_override(params)
