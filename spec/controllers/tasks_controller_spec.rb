@@ -17,7 +17,7 @@ RSpec.describe TasksController, :allocation, type: :controller do
     stub_poms(prison, pom)
     stub_signed_in_pom(prison, staff_id)
 
-    offenders = [build(:nomis_offender, imprisonmentStatus: 'LIFE', offenderNo: 'G7514GW', firstName: "Alice", lastName: "Aliceson"),
+    offenders = [build(:nomis_offender, :indeterminate, offenderNo: 'G7514GW', firstName: "Alice", lastName: "Aliceson"),
                  build(:nomis_offender, offenderNo: 'G1234VV', firstName: "Bob", lastName: "Bibby"),
                  build(:nomis_offender, offenderNo: 'G1234AB', firstName: "Carole", lastName: "Caroleson"),
                  build(:nomis_offender, offenderNo: 'G1234GG', firstName: "David", lastName: "Davidson")
@@ -58,7 +58,7 @@ RSpec.describe TasksController, :allocation, type: :controller do
     end
 
     it 'can show offenders needing parole review date updates' do
-      stub_offender(build(:nomis_offender, offenderNo: offender_no, imprisonmentStatus: 'LIFE'))
+      stub_offender(build(:nomis_offender, :indeterminate, offenderNo: offender_no))
 
       get :index, params: { prison_id: prison }
 

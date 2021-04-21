@@ -472,14 +472,21 @@ describe HandoverDateService do
 
     let(:offender) {
       build(:offender,
-            sentence: build(:sentence_detail,
-                            imprisonmentStatus: indeterminate_sentence ? 'LIFE' : 'SEC90',
-                            automaticReleaseDate: automatic_release_date,
-                            conditionalReleaseDate: conditional_release_date,
-                            paroleEligibilityDate: parole_eligibility_date,
-                            tariffDate: tariff_date
+            sentence: if indeterminate_sentence
+                        build(:sentence_detail,
+                              :indeterminate,
+                              paroleEligibilityDate: parole_eligibility_date,
+                              tariffDate: tariff_date
+                        )
+                      else
+                        build(:sentence_detail,
+                              :determinate,
+                              automaticReleaseDate: automatic_release_date,
+                              conditionalReleaseDate: conditional_release_date,
+                              paroleEligibilityDate: parole_eligibility_date
+                        )
+                      end
             )
-      )
     }
 
     let(:result) do
