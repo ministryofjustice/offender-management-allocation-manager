@@ -91,7 +91,11 @@ RSpec.describe Prison, type: :model do
     end
 
     context 'when the search API misses someone' do
-      let(:offenders) { [build(:nomis_offender, recall: true), build(:nomis_offender, recall: false), build(:nomis_offender, recall: true)] }
+      let(:offenders) {
+        [build(:nomis_offender, recall: true),
+         build(:nomis_offender, recall: false),
+         build(:nomis_offender, recall: true)]
+      }
       let(:offender_nos) { offenders.map { |o| o.fetch(:offenderNo) } }
 
       before do
@@ -111,7 +115,7 @@ RSpec.describe Prison, type: :model do
           to_return(body: offenders.first(2).map { |o|
             { prisonerNumber: o.fetch(:offenderNo),
               recall: o.fetch(:recall) }
-          }                          .to_json)
+          }.to_json)
 
         stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=true&movementTypes=TAP").
           with(body: offender_nos.to_json).
@@ -124,7 +128,7 @@ RSpec.describe Prison, type: :model do
 
         stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN").
             with(
-              body: offenders.map { |o| o.fetch(:offenderNo) }.to_json,
+              body: offenders.first(2).map { |o| o.fetch(:offenderNo) }.to_json,
             ).
             to_return(body: [].to_json)
 
@@ -133,8 +137,8 @@ RSpec.describe Prison, type: :model do
         )
       end
 
-      it 'returns falses when missing' do
-        expect(subject.map(&:recalled?)).to eq([true, false, false])
+      it 'skips the missing offender record' do
+        expect(subject.map(&:offender_no)).to eq(offender_nos.first(2))
       end
     end
 

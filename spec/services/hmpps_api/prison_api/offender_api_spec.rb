@@ -65,8 +65,8 @@ describe HmppsApi::PrisonApi::OffenderApi do
             to_return(body: [].to_json)
         end
 
-        it "defaults the recall flag to false" do
-          expect(subject.recalled?).to eq(false)
+        it "fails the search" do
+          expect(subject).to be_nil
         end
       end
     end
