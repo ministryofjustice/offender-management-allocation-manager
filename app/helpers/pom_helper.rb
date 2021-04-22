@@ -35,11 +35,6 @@ module PomHelper
     "#{pom.position_description.split(' ').first} POM"
   end
 
-  def fetch_pom_name(staff_id)
-    staff = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(staff_id)
-    "#{staff.last_name}, #{staff.first_name}"
-  end
-
   def status(pom)
     # we are now displaying 'Available', instead of 'Active' which is stored in the database
     pom.status == 'active' ? 'available' : pom.status

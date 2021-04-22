@@ -23,7 +23,7 @@ module Api
     def primary_pom_details
       {
         staff_id: @allocation.primary_pom_nomis_id,
-        name: helpers.fetch_pom_name(@allocation.primary_pom_nomis_id)
+        name: PrisonOffenderManagerService.fetch_pom_name(@allocation.primary_pom_nomis_id)
       }
     end
 
@@ -32,7 +32,7 @@ module Api
 
       {
         staff_id: @allocation.secondary_pom_nomis_id,
-        name: helpers.fetch_pom_name(@allocation.secondary_pom_nomis_id)
+        name: PrisonOffenderManagerService.fetch_pom_name(@allocation.secondary_pom_nomis_id)
       }
     end
 
