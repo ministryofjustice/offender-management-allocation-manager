@@ -31,6 +31,13 @@ class PrisonOffenderManagerService
     StaffMember.new(Prison.new(prison_id), pom.staff_id)
   end
 
+  class << self
+    def fetch_pom_name(staff_id)
+      staff = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(staff_id)
+      "#{staff.last_name}, #{staff.first_name}"
+    end
+  end
+
 private
 
   # Attempt to forward-populate the PomDetail table for new records

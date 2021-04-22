@@ -15,12 +15,12 @@ class PrisonersController < PrisonsApplicationController
     @allocation = Allocation.find_by(nomis_offender_id: @prisoner.offender_no)
 
     if @allocation.present?
-      @primary_pom_name = helpers.fetch_pom_name(@allocation.primary_pom_nomis_id).
+      @primary_pom_name = PrisonOffenderManagerService.fetch_pom_name(@allocation.primary_pom_nomis_id).
           titleize
     end
 
     if @allocation.present? && @allocation.secondary_pom_name.present?
-      @secondary_pom_name = helpers.fetch_pom_name(@allocation.secondary_pom_nomis_id).titleize
+      @secondary_pom_name = PrisonOffenderManagerService.fetch_pom_name(@allocation.secondary_pom_nomis_id).titleize
     end
 
     @keyworker = HmppsApi::KeyworkerApi.get_keyworker(

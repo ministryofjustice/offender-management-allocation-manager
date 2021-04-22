@@ -7,12 +7,6 @@ RSpec.describe PomHelper do
     end
   end
 
-  describe 'fetch_pom_name', vcr: { cassette_name: 'prison_api/pom_helper_fetch_pom_name' } do
-    it 'fetches the POM name from NOMIS' do
-      expect(fetch_pom_name(485_926)).to eq('POM, MOIC')
-    end
-  end
-
   describe 'status' do
     it "renames 'active' status to available" do
       pom = build(:pom, staffId: 2005,  status: 'active')
