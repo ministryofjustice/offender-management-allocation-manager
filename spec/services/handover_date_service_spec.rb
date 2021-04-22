@@ -20,7 +20,7 @@ describe HandoverDateService do
   let(:prescoed_policy_start_date) { Date.new(2020, 10, 19) } # 19th October 2020
   let(:open_policy_start_date) { Date.new(2021, 3, 31) } # 31st March 2021
   let(:womens_policy_start_date) { Date.parse('30th April 2021') }
-  let(:category) { 'C' }
+  let(:category) { build(:offender_category, :cat_c) }
 
   # Set the current date by changing the value of `today`
   let(:today) { Time.zone.today }
@@ -391,7 +391,7 @@ describe HandoverDateService do
       let(:offender) {
         build(:offender,
               latestLocationId: prison,
-              categoryCode: category,
+              category: category,
               sentence: build(:sentence_detail, :indeterminate, tariffDate: tariff_date, sentenceStartDate: sentence_start_date)
         ).tap { |o|
           o.load_case_information(case_info)
@@ -510,7 +510,7 @@ describe HandoverDateService do
           end
 
           context 'when transferred to open conditions (Cat T)' do
-            let(:category) { 'T' }
+            let(:category) { build(:offender_category, :female_open) }
 
             it 'follows pre-policy rules' do
               expect(pom).to be_supporting
@@ -531,7 +531,7 @@ describe HandoverDateService do
           end
 
           context 'when transferred to open conditions (Cat T)' do
-            let(:category) { 'T' }
+            let(:category) { build(:offender_category, :female_open) }
 
             it 'invokes open prison rules and COM is supporting' do
               expect(com).to be_supporting

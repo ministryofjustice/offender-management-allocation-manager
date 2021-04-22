@@ -13,7 +13,9 @@ module HmppsApi
              :parole_review_date, :victim_liaison_officers, :updated_at,
              to: :@case_information, allow_nil: true
 
-    attr_accessor :category_code, :date_of_birth, :prison_arrival_date, :sentence, :allocated_pom_name
+    delegate :code, :label, :active_since, to: :@category, prefix: :category, allow_nil: true
+
+    attr_accessor :date_of_birth, :prison_arrival_date, :sentence, :allocated_pom_name
 
     attr_reader :first_name, :last_name, :booking_id, :offender_no, :sentence_type, :cell_location, :complexity_level
 
@@ -152,7 +154,7 @@ module HmppsApi
     # https://api-dev.prison.service.justice.gov.uk/swagger-ui.html#//prisoners/getPrisonersOffenderNo
     # and also by
     # https://api-dev.prison.service.justice.gov.uk/swagger-ui.html#//locations/getOffendersAtLocationDescription
-    def initialize(api_payload, search_payload, latest_temp_movement:, complexity_level:)
+    def initialize(api_payload, search_payload, category:, latest_temp_movement:, complexity_level:)
       # It is expected that this method will be called by the subclass which
       # will have been given a payload at the class level, and will call this
       # method from it's own internal from_json
@@ -160,11 +162,11 @@ module HmppsApi
       @last_name = api_payload.fetch('lastName')
       @offender_no = api_payload.fetch('offenderNo')
       @convicted_status = api_payload['convictedStatus']
-      @category_code = api_payload['categoryCode']
       @date_of_birth = Date.parse(api_payload.fetch('dateOfBirth'))
       @latest_temp_movement = latest_temp_movement
       @cell_location = search_payload['cellLocation']
       @complexity_level = complexity_level
+      @category = category
     end
 
     def handover_start_date
@@ -225,11 +227,6 @@ module HmppsApi
       over_18? &&
         (sentenced? || immigration_case?) &&
         criminal_sentence? && convicted?
-    end
-
-    def category_label
-      category_list = HmppsApi::PrisonApi::OffenderApi.get_category_labels
-      category_list.fetch(@category_code, 'N/A')
     end
 
   private

@@ -8,7 +8,7 @@ module HmppsApi
       def self.list(prison, page = 0, page_size: 20)
         route = "/locations/description/#{prison}/inmates"
 
-        queryparams = { 'convictedStatus' => 'Convicted', 'returnCategory' => true }
+        queryparams = { 'convictedStatus' => 'Convicted' }
 
         page_offset = page * page_size
         hdrs = paging_headers(page_size, page_offset)
@@ -25,6 +25,7 @@ module HmppsApi
         offender_nos = data.map { |o| o.fetch('offenderNo') }
         search_data = get_search_payload(offender_nos)
         temp_movements = HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for(offender_nos)
+        offender_categories = get_offender_categories(offender_nos)
 
         booking_ids = data.map { |o| o.fetch('bookingId') }
         sentence_details = HmppsApi::PrisonApi::OffenderApi.get_bulk_sentence_details(booking_ids)
@@ -40,6 +41,7 @@ module HmppsApi
           search_payload = search_data.fetch(offender_no)
           HmppsApi::OffenderSummary.new(payload,
                                         search_payload,
+                                        category: offender_categories[offender_no],
                                         latest_temp_movement: temp_movements[offender_no],
                                         complexity_level: complexities[offender_no]).tap { |offender|
             sentencing = sentence_details[offender.booking_id]
@@ -63,11 +65,13 @@ module HmppsApi
           nil
         else
           temp_movements = HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for([offender_no])
+          offender_categories = get_offender_categories([offender_no])
           complexity_level = if api_response.fetch('currentlyInPrison') == 'Y' && PrisonService::womens_prison?(api_response.fetch('latestLocationId'))
                                HmppsApi::ComplexityApi.get_complexity(offender_no)
                              end
           prisoner = HmppsApi::Offender.new api_response,
                                             search_payload,
+                                            category: offender_categories[offender_no],
                                             latest_temp_movement: temp_movements[offender_no],
                                             complexity_level: complexity_level
           prisoner.tap do |offender|
@@ -98,10 +102,23 @@ module HmppsApi
         data.first['classificationCode']
       end
 
-      def self.get_category_labels
-        route = '/reference-domains/domains/SUP_LVL_TYPE'
-        data = client.get(route, extra_headers: { 'Page-Limit': '1000' })
-        data.map { |c| [c.fetch('code'), c.fetch('description')] }.to_h
+      def self.get_offender_categories(offender_nos)
+        # This route is CASE SENSITIVE
+        # We call the Prison API endpoint /api/offender-assessments/{assessmentCode} with "CATEGORY"
+        # We **DO NOT** call the endpoint /api/offender-assessments/category
+        # These endpoints do different things and we want to use the first one,
+        # hence the use of uppercase "CATEGORY" here.
+        route = '/offender-assessments/CATEGORY'
+
+        # I think these might actually be the default options on this endpoint, but it's better to be explicit & safe
+        # latestOnly and mostRecentlyOnly are subtly different – we need both to be true
+        # activeOnly ensures we don't see any category assessments which haven't yet been approved
+        queryparams = { 'latestOnly' => true, 'activeOnly' => true, 'mostRecentOnly' => true }
+
+        client.post(route, offender_nos, queryparams: queryparams, cache: true)
+              .map { |assessment|
+                [assessment.fetch('offenderNo'), HmppsApi::OffenderCategory.new(assessment)]
+              }.to_h
       end
 
       def self.get_bulk_sentence_details(booking_ids)

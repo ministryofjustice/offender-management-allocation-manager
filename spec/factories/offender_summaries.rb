@@ -5,6 +5,7 @@ FactoryBot.define do
     initialize_with do
       HmppsApi::OffenderSummary.new(attributes.stringify_keys,
                                     attributes.stringify_keys,
+                                    category: attributes.fetch(:category),
                                     latest_temp_movement: nil,
                                     complexity_level: attributes.fetch(:complexityLevel)).tap { |offender|
         offender.sentence = attributes.fetch(:sentence)}
