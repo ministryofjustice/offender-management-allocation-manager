@@ -5,9 +5,8 @@ FactoryBot.define do
     initialize_with do
       # remove nils (as it confuses HmppsApi::SentenceDetail) and convert dates to strings (just in case test forgets)
       values_hash = attributes.except(:imprisonmentStatus).reject { |_k, v| v.nil? }.map { |k, v| [k.to_s, v.to_s] }.to_h
-      HmppsApi::SentenceDetail.new(values_hash,
-                                   imprisonment_status: attributes.fetch(:imprisonmentStatus),
-                                   recall_flag: attributes.fetch(:recall) )
+      HmppsApi::SentenceDetail.new values_hash,
+                                   attributes.stringify_keys
     end
 
     imprisonmentStatus { 'SEC90' }
