@@ -100,7 +100,7 @@ RSpec.describe Prison, type: :model do
 
       before do
         stub_auth_token
-        stub_request(:get, "#{ApiHelper::T3}/locations/description/LEI/inmates?convictedStatus=Convicted&returnCategory=true").
+        stub_request(:get, "#{ApiHelper::T3}/locations/description/LEI/inmates?convictedStatus=Convicted").
           with(
             headers: {
               'Page-Limit' => '200',
@@ -135,6 +135,8 @@ RSpec.describe Prison, type: :model do
         allow(HmppsApi::ComplexityApi).to receive(:get_complexities).with(offender_nos).and_return(
           offenders.map { |offender| [offender.fetch(:offenderNo), offender.fetch(:complexityLevel)] }.to_h
         )
+
+        stub_offender_categories(offenders)
       end
 
       it 'skips the missing offender record' do
@@ -148,7 +150,7 @@ RSpec.describe Prison, type: :model do
 
       before do
         stub_auth_token
-        stub_request(:get, "#{ApiHelper::T3}/locations/description/LEI/inmates?convictedStatus=Convicted&returnCategory=true").
+        stub_request(:get, "#{ApiHelper::T3}/locations/description/LEI/inmates?convictedStatus=Convicted").
           with(
             headers: {
               'Page-Limit' => '200',
@@ -182,6 +184,8 @@ RSpec.describe Prison, type: :model do
         allow(HmppsApi::ComplexityApi).to receive(:get_complexities).with(offender_nos).and_return(
           offenders.map { |offender| [offender.fetch(:offenderNo), offender.fetch(:complexityLevel)] }.to_h
         )
+
+        stub_offender_categories(offenders)
       end
 
       it 'fetches one page only' do
