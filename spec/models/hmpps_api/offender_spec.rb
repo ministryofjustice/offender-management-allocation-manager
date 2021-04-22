@@ -400,4 +400,52 @@ describe HmppsApi::Offender do
       end
     end
   end
+
+  describe 'offender category' do
+    subject { build(:offender, category: category) }
+
+    context 'with a male offender (Cat B)' do
+      let(:category) { build(:offender_category, :cat_b) }
+
+      it 'knows the category code' do
+        expect(subject.category_code).to eq('B')
+      end
+
+      it 'knows the category label' do
+        expect(subject.category_label).to eq('Cat B')
+      end
+
+      it 'knows when the category became active for this offender' do
+        expect(subject.category_active_since).to be_a(Date)
+      end
+    end
+
+    context 'with a female offender (Female Open)' do
+      let(:category) { build(:offender_category, :female_open) }
+
+      it 'knows the category code' do
+        expect(subject.category_code).to eq('T')
+      end
+
+      it 'knows the category label' do
+        expect(subject.category_label).to eq('Female Open')
+      end
+
+      it 'knows when the category became active for this offender' do
+        expect(subject.category_active_since).to be_a(Date)
+      end
+    end
+
+    # This is a legitimate state for an offender to be in
+    # They could be in the prison, but a categorisation assessment hasn't been completed yet
+    context "when the offender doesn't have a category" do
+      let(:category) { nil }
+
+      it 'returns nil' do
+        expect(subject.category_code).to be_nil
+        expect(subject.category_label).to be_nil
+        expect(subject.category_active_since).to be_nil
+      end
+    end
+  end
 end

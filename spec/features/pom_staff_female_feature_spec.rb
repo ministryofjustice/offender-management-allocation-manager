@@ -10,13 +10,15 @@ feature "female estate POMs list" do
 
   let(:nomis_offender) {
     build(:nomis_offender,
-          agencyId: female_prison, complexityLevel: 'high', categoryCode: 'T',
+          agencyId: female_prison, complexityLevel: 'high',
+          category: attributes_for(:offender_category, :female_closed),
           sentence: attributes_for(:sentence_detail))
   }
 
   let(:offenders_in_prison) {
     build_list(:nomis_offender, 14,
-               agencyId: female_prison, categoryCode: 'T',
+               agencyId: female_prison,
+               category: attributes_for(:offender_category, :female_closed),
                sentence: attributes_for(:sentence_detail))
   }
 

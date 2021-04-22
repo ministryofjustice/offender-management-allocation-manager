@@ -27,7 +27,7 @@ FactoryBot.define do
     # also ensure uniqueness as duplicate last names can cause issues
     # in tests, as ruby sort isn't stable by default
     sequence(:lastName) { |c| "#{Faker::Name.last_name.titleize}_#{c}" }
-    categoryCode { 'C' }
+    category { build(:offender_category, :cat_c) }
     recall {  false }
 
     sentence { association :sentence_detail }
@@ -40,6 +40,7 @@ FactoryBot.define do
     initialize_with do
       HmppsApi::Offender.new(attributes.stringify_keys,
                              attributes.stringify_keys,
+                             category: attributes.fetch(:category),
                              latest_temp_movement: nil,
                              complexity_level: attributes.fetch(:complexityLevel)).tap { |offender|
         offender.sentence = attributes.fetch(:sentence)
@@ -83,7 +84,7 @@ FactoryBot.define do
     # also ensure uniqueness as duplicate last names can cause issues
     # in tests, as ruby sort isn't stable by default
     sequence(:lastName) { |c| "#{Faker::Name.last_name.titleize}_#{c}" }
-    categoryCode { 'C' }
+    category { attributes_for(:offender_category, :cat_c) }
     recall { false }
 
     sentence do

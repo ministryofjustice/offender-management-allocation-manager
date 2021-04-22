@@ -166,18 +166,4 @@ describe HmppsApi::PrisonApi::OffenderApi do
       expect(bytes[-2, 2]).to eq(jpeg_end_sentinel)
     end
   end
-
-  describe 'Fetching category descriptions' do
-    before do
-      stub_auth_token
-      stub_category_label
-    end
-
-    it 'returns a hash of category codes and descriptions' do
-      response = described_class.get_category_labels
-      expect(response).to be_a(Hash)
-      expect(response['A']).to eq 'Cat A'
-      expect(response['T']).to eq 'Fem Open'
-    end
-  end
 end

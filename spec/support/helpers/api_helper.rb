@@ -40,11 +40,7 @@ module ApiHelper
           sentenceDetail: offender.fetch(:sentence).reject { |_k, v| v.nil? }
         }].to_json)
 
-    stub_request(:post, "#{T3}/offender-assessments/CATEGORY").
-      with(
-        body: [offender_no].to_json
-      ).
-      to_return(body: {}.to_json)
+    stub_offender_categories([offender])
 
     stub_request(:get, "#{T3}/bookings/#{booking_number}/mainOffence").
       to_return(body: {}.to_json)
@@ -108,7 +104,7 @@ module ApiHelper
     # Stub the call to get_offenders_for_prison. Takes a list of offender hashes (in nomis camelCase format) and
     # a list of bookings (same key format). It it your responsibility to make sure they contain the data you want
     # and if you provide a booking, that the id matches between the offender and booking hashes.
-    elite2listapi = "#{T3}/locations/description/#{prison}/inmates?convictedStatus=Convicted&returnCategory=true"
+    elite2listapi = "#{T3}/locations/description/#{prison}/inmates?convictedStatus=Convicted"
 
     # Stub the call that will get the total number of records
     stub_request(:get, elite2listapi).to_return(
@@ -158,6 +154,8 @@ module ApiHelper
       body: offender_nos.to_json).
       to_return(body: movements.to_json)
 
+    stub_offender_categories(offenders)
+
     stub_movements
 
     allow(HmppsApi::ComplexityApi).to receive(:get_complexities).with(offender_nos).and_return(
@@ -174,6 +172,17 @@ module ApiHelper
 
     stub_request(:post, T3_BOOKINGS_URL).
       to_return(body: bookings.to_json)
+  end
+
+  def stub_offender_categories(offenders)
+    offender_nos = offenders.map { |offender| offender.fetch(:offenderNo) }
+    categories = offenders.map { |offender| offender.fetch(:category).merge(offenderNo: offender.fetch(:offenderNo)) }
+
+    stub_request(:post, "#{T3}/offender-assessments/CATEGORY?activeOnly=true&latestOnly=true&mostRecentOnly=true").
+      with(
+        body: offender_nos.to_json
+      ).
+      to_return(body: categories.to_json)
   end
 
   # Stub an 'empty' response from the Prison API, indicating that the offender does not exist in NOMIS
@@ -199,21 +208,5 @@ module ApiHelper
         to_return(body: community_data.to_json)
     stub_request(:get, "#{COMMUNITY_HOST}/offenders/nomsNumber/#{nomis_offender_id}/registrations").
         to_return(body: { registrations: registrations }.to_json)
-  end
-
-  def stub_category_label
-    categories = [
-      { code: 'A', description: 'Cat A' },
-      { code: 'B', description: 'Cat B' },
-      { code: 'C', description: 'Cat C' },
-      { code: 'D', description: 'Cat D' },
-      { code: 'Q', description: 'Fem Restricted' },
-      { code: 'R', description: 'Fem Closed' },
-      { code: 'S', description: 'Fem Semi' },
-      { code: 'T', description: 'Fem Open' }
-    ]
-
-    stub_request(:get, "#{T3}/reference-domains/domains/SUP_LVL_TYPE").
-    to_return(body: categories.to_json)
   end
 end
