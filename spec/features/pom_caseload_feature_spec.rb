@@ -161,10 +161,11 @@ feature "view POM's caseload" do
       end
     end
 
-    it 'can be sorted by earliest release date', :js do
+    it 'can be sorted by earliest release date' do
       page.all('th')[3].find('a').click
 
-      (6..7).each do |row_index|
+      # pick out a few rows, and make sure they are in order by release date
+      (2..7).each do |row_index|
         within ".offender_row_#{row_index}" do
           offender = offenders.detect { |o| o.fetch(:offenderNo) == offender_ids_by_release_date[row_index] }
           name = "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}"
