@@ -5,7 +5,6 @@ require 'rails_helper'
 describe HandoverDateService do
   subject { described_class.handover(offender) }
 
-
   let(:test_strategy) { Flipflop::FeatureSet.current.test! }
   let(:pom) { HandoverDateService::Responsibility.new subject.custody_responsible?, subject.custody_supporting?  }
   let(:com) { HandoverDateService::Responsibility.new subject.community_responsible?, subject.community_supporting? }
@@ -531,10 +530,19 @@ describe HandoverDateService do
           end
 
           context 'when transferred to open conditions (Cat T)' do
-            let(:category) { build(:offender_category, :female_open) }
+            let(:category) { build(:offender_category, :female_open, approvalDate: 3.days.ago) }
 
             it 'invokes open prison rules and COM is supporting' do
               expect(com).to be_supporting
+              expect(pom).to be_responsible
+            end
+
+            it 'handover starts the day their category changed to "female open"' do
+              expect(start_date).to eq(offender.category_active_since)
+            end
+
+            it 'handover happens 8 months before TED/PED/PRD' do
+              expect(handover_date).to eq(tariff_date - 8.months)
             end
           end
         end

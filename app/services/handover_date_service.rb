@@ -165,7 +165,13 @@ private
 
   def self.nps_start_date(offender)
     if offender.open_prison_rules_apply? && offender.indeterminate_sentence?
-      offender.prison_arrival_date
+      if offender.in_womens_prison?
+        # Women's estate: the day the offender's category changed to "open"
+        offender.category_active_since
+      else
+        # Men's estate: the day the offender arrived in the open prison
+        offender.prison_arrival_date
+      end
     elsif offender.early_allocation?
       early_allocation_handover_date(offender)
     elsif offender.indeterminate_sentence?
@@ -250,6 +256,7 @@ private
              :early_allocation?, :mappa_level, :prison_arrival_date, :sentence_start_date,
              :parole_eligibility_date, :conditional_release_date, :automatic_release_date,
              :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date,
+             :category_active_since,
              to: :@offender
 
     def initialize(offender)
