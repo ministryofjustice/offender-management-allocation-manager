@@ -28,9 +28,9 @@
       <td class="govuk-table__cell govuk-!-width-one-half">Date of birth</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half"><%= format_date(@prisoner.date_of_birth) %></td>
     </tr>
-    <tr class="govuk-table__row">
+    <tr class="govuk-table__row" id="offender-category">
       <td class="govuk-table__cell govuk-!-width-one-half">Category</td>
-      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">Cat <%= @prisoner.category_code %></td>
+      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half"><%= @prisoner.category_label %></td>
     </tr>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Tiering calculation</td>
