@@ -3,8 +3,7 @@
 require 'rails_helper'
 
 feature 'delius import scenarios', :disable_push_to_delius do
-  let(:ldu) {  create(:local_divisional_unit) }
-  let(:team) { create(:team, local_divisional_unit: ldu) }
+  let(:ldu) {  create(:local_delivery_unit) }
   let(:test_strategy) { Flipflop::FeatureSet.current.test! }
 
   before do
@@ -27,7 +26,11 @@ feature 'delius import scenarios', :disable_push_to_delius do
 
     context 'with all data' do
       before do
-        stub_community_offender(offender_no, build(:community_data, otherIds: { crn: crn }, offenderManagers: [build(:community_offender_manager, team: { code: team.code, localDeliveryUnit: { code: ldu.code } })]))
+        stub_community_offender(offender_no,
+                                build(:community_data,
+                                      otherIds: { crn: crn },
+                                      offenderManagers: [build(:community_offender_manager,
+                                                               team: { code: 'XYX', localDeliveryUnit: { code: ldu.code } })]))
 
         stub_offender(build(:nomis_offender, offenderNo: offender_no))
       end
@@ -50,9 +53,11 @@ feature 'delius import scenarios', :disable_push_to_delius do
       let(:offender) { build(:nomis_offender, offenderNo: offender_no) }
 
       before do
-        stub_community_offender(offender_no, build(:community_data, currentTier: 'XX', offenderManagers: [build(:community_offender_manager, team: { code: team.code, localDeliveryUnit: { code: ldu.code } })]))
+        stub_community_offender(offender_no, build(:community_data,
+                                                   currentTier: 'XX',
+                                                   offenderManagers: [build(:community_offender_manager,
+                                                                            team: { code: 'XYX', localDeliveryUnit: { code: ldu.code } })]))
 
-        stub_offender(offender)
         stub_offenders_for_prison('LEI', [offender])
       end
 

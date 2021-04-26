@@ -145,8 +145,8 @@ feature 'Allocation History' do
         Timecop.travel(current_date) do
           create(:early_allocation, case_information: ci, prison: second_prison.code, nomis_offender_id: nomis_offender_id)
           create :email_history, nomis_offender_id: nomis_offender_id,
-                 name: ci.team.local_divisional_unit.name,
-                 email: ci.team.local_divisional_unit.email_address,
+                 name: ci.local_delivery_unit.name,
+                 email: ci.local_delivery_unit.email_address,
                  event: EmailHistory::AUTO_EARLY_ALLOCATION,
                  prison: second_prison.code
         end
@@ -155,8 +155,8 @@ feature 'Allocation History' do
         Timecop.travel(current_date) do
           create(:early_allocation, :discretionary, case_information: ci, prison: second_prison.code, nomis_offender_id: nomis_offender_id)
           create :email_history, nomis_offender_id: nomis_offender_id,
-                 name: ci.team.local_divisional_unit.name,
-                 email: ci.team.local_divisional_unit.email_address,
+                 name: ci.local_delivery_unit.name,
+                 email: ci.local_delivery_unit.email_address,
                  event: EmailHistory::DISCRETIONARY_EARLY_ALLOCATION,
                  prison: second_prison.code
         end

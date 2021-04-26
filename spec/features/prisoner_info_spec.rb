@@ -161,13 +161,14 @@ feature 'View a prisoner profile page' do
 
   describe 'community information' do
     context 'with an email address' do
-      let(:ldu) { create(:local_divisional_unit, name: 'An LDU', email_address: 'test@example.com') }
-      let(:team) { create(:team, name: 'A team', local_divisional_unit: ldu) }
+      let(:ldu) { create(:local_delivery_unit, name: 'An LDU', email_address: 'test@example.com') }
+      let(:team_name) { 'A Nice team' }
 
       before do
         create(:case_information,
                nomis_offender_id: 'G7998GJ',
-               team: team,
+               local_delivery_unit: ldu,
+               team_name: team_name,
                com_name: 'Bob Smith'
         )
       end
@@ -177,18 +178,15 @@ feature 'View a prisoner profile page' do
 
         expect(page).to have_content(ldu.name)
         expect(page).to have_content(ldu.email_address)
-        expect(page).to have_content(team.name)
+        expect(page).to have_content(team_name)
         expect(page).to have_content('Bob Smith')
       end
     end
 
     context 'without email address or com name' do
       before do
-        ldu = create(:local_divisional_unit, name: 'An LDU', email_address: nil)
-        team = create(:team, local_divisional_unit: ldu)
         create(:case_information,
                nomis_offender_id: 'G7998GJ',
-               team: team
         )
 
         visit prison_prisoner_path('LEI', 'G7998GJ')
@@ -241,8 +239,7 @@ feature 'View a prisoner profile page' do
     let!(:case_info) {
       create(:case_information,
              nomis_offender_id: nomis_offender_id,
-             local_delivery_unit: build(:local_delivery_unit),
-             team: nil
+             local_delivery_unit: build(:local_delivery_unit)
       )
     }
 

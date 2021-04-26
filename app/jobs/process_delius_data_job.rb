@@ -51,15 +51,13 @@ private
 
   def map_delius_to_case_info(delius_record)
     find_case_info(delius_record).tap do |case_info|
-      team = map_team(delius_record.team_code)
       case_info.assign_attributes(
         manual_entry: false,
         com_name: delius_record.offender_manager,
         crn: delius_record.crn,
         tier: map_tier(delius_record.tier),
         local_delivery_unit: map_ldu(delius_record.ldu_code),
-        team: team,
-        team_name: team&.name,
+        team_name: delius_record.team_name,
         case_allocation: delius_record.service_provider,
         probation_service: map_probation_service(delius_record.ldu_code),
         mappa_level: map_mappa_level(delius_record.mappa_levels)
@@ -70,12 +68,6 @@ private
   # map the LDU regardless of enabled switch, but only expose it from offender when enabled
   def map_ldu(ldu_code)
     LocalDeliveryUnit.find_by(code: ldu_code)
-  end
-
-  def map_team(team_code)
-    team = Team.find_by(shadow_code: team_code) || Team.find_by(code: team_code)
-    # don't map a team if it doesn't have an LDU
-    team if team&.local_divisional_unit.present?
   end
 
   def find_case_info(delius_record)
@@ -89,7 +81,7 @@ private
   end
 
   def map_probation_service(ldu_code)
-    LocalDivisionalUnit.find_by(code: ldu_code)&.in_wales? ? 'Wales' : 'England'
+    LocalDeliveryUnit.find_by(code: ldu_code)&.country || 'England'
   end
 
   def map_tier(tier)

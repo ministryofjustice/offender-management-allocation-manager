@@ -317,41 +317,41 @@ describe HmppsApi::Offender do
       describe '#ldu_name' do
         let(:field) { :ldu_name }
 
-        context 'when there is a new LDU mapping' do
+        context 'with a local delivery unit' do
           let(:ldu) { create(:local_delivery_unit) }
           let(:case_info) { create(:case_information, local_delivery_unit: ldu) }
 
           it { is_expected.to be(ldu.name) }
         end
 
-        context 'without a new LDU mapping' do
-          let(:case_info) { create(:case_information) }
+        context 'without a local delivery unit' do
+          let(:case_info) { create(:case_information, local_delivery_unit: nil) }
 
-          it { is_expected.to be(case_info.team.local_divisional_unit.name) }
+          it { is_expected.to be_nil }
         end
       end
 
       describe '#ldu_email_address' do
         let(:field) { :ldu_email_address }
 
-        context 'when there is a new LDU mapping' do
+        context 'with a local delivery unit' do
           let(:ldu) { create(:local_delivery_unit) }
           let(:case_info) { create(:case_information, local_delivery_unit: ldu) }
 
           it { is_expected.to be(ldu.email_address) }
         end
 
-        context 'without a new LDU mapping' do
-          let(:case_info) { create(:case_information) }
+        context 'without a local delivery unit' do
+          let(:case_info) { create(:case_information, local_delivery_unit: nil) }
 
-          it { is_expected.to be(case_info.team.local_divisional_unit.email_address) }
+          it { is_expected.to be_nil }
         end
       end
 
       describe '#team_name' do
         let(:field) { :team_name }
 
-        it { is_expected.to be(case_info.team.name) }
+        it { is_expected.to be(case_info.team_name) }
       end
 
       describe '#allocated_com_name' do

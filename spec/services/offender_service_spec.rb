@@ -70,7 +70,7 @@ describe OffenderService, type: :feature do
                   noms_no: nomis_offender_id,
                   offender_manager: nil,
                   service_provider: "NPS",
-                  team_code: "N07UAT",
+                  team_name: "Unallocated Team(N07)",
                   tier: "A-2")
       end
     end
@@ -147,7 +147,9 @@ describe OffenderService, type: :feature do
                                         otherIds: { crn: 'X5657657' },
                                         offenderManagers: [
                                             {
-                                                team: { code: 'N07GHGF', localDeliveryUnit: { code: 'LDU123' } },
+                                                team: { code: 'N07GHGF',
+                                                        description: 'Thing',
+                                                        localDeliveryUnit: { code: 'LDU123' } },
                                                 probationArea: { nps: true },
                                                 active: true,
                                                 staff: { unallocated: true } }
@@ -159,7 +161,9 @@ describe OffenderService, type: :feature do
 
           it 'gets some data' do
             expect(described_class.get_community_data(nomis_offender_id))
-                .to eq(noms_no: nomis_offender_id, tier: 'A', crn: 'X5657657', offender_manager: nil, service_provider: 'NPS', mappa_levels: [], team_code: 'N07GHGF', ldu_code: 'LDU123')
+                .to eq(noms_no: nomis_offender_id, tier: 'A', crn: 'X5657657',
+                       offender_manager: nil, service_provider: 'NPS', mappa_levels: [],
+                       team_name: 'Thing', ldu_code: 'LDU123')
           end
         end
 

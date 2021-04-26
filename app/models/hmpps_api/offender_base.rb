@@ -10,7 +10,7 @@ module HmppsApi
              to: :sentence
 
     delegate :tier, :case_allocation, :crn, :mappa_level, :manual_entry?,
-             :parole_review_date, :victim_liaison_officers, :updated_at,
+             :parole_review_date, :victim_liaison_officers, :updated_at, :team_name,
              to: :@case_information, allow_nil: true
 
     delegate :code, :label, :active_since, to: :@category, prefix: :category, allow_nil: true
@@ -78,10 +78,6 @@ module HmppsApi
 
     def ldu_email_address
       ldu&.email_address
-    end
-
-    def team_name
-      @case_information&.team&.name
     end
 
     def delius_matched?

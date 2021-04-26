@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_29_144703) do
+ActiveRecord::Schema.define(version: 2021_05_12_103739) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -58,7 +58,6 @@ ActiveRecord::Schema.define(version: 2021_04_29_144703) do
     t.string "crn"
     t.integer "mappa_level"
     t.boolean "manual_entry", null: false
-    t.bigint "team_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.date "parole_review_date"
@@ -68,7 +67,6 @@ ActiveRecord::Schema.define(version: 2021_04_29_144703) do
     t.bigint "local_delivery_unit_id"
     t.index ["local_delivery_unit_id"], name: "index_case_information_on_local_delivery_unit_id"
     t.index ["nomis_offender_id"], name: "index_case_information_on_nomis_offender_id", unique: true
-    t.index ["team_id"], name: "index_case_information_on_team_id"
   end
 
   create_table "contact_submissions", force: :cascade do |t|
@@ -144,16 +142,6 @@ ActiveRecord::Schema.define(version: 2021_04_29_144703) do
     t.index ["code"], name: "index_local_delivery_units_on_code", unique: true
   end
 
-  create_table "local_divisional_units", force: :cascade do |t|
-    t.string "code"
-    t.string "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "email_address"
-    t.boolean "in_wales", default: false
-    t.index ["code"], name: "index_local_divisional_units_on_code", unique: true
-  end
-
   create_table "overrides", force: :cascade do |t|
     t.integer "nomis_staff_id"
     t.string "nomis_offender_id"
@@ -179,19 +167,6 @@ ActiveRecord::Schema.define(version: 2021_04_29_144703) do
     t.string "value", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-  end
-
-  create_table "teams", force: :cascade do |t|
-    t.string "code"
-    t.string "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "shadow_code"
-    t.bigint "local_divisional_unit_id"
-    t.integer "case_information_count", default: 0, null: false
-    t.index ["code"], name: "index_teams_on_code"
-    t.index ["local_divisional_unit_id"], name: "index_teams_on_local_divisional_unit_id"
-    t.index ["shadow_code"], name: "index_teams_on_shadow_code"
   end
 
   create_table "versions", force: :cascade do |t|

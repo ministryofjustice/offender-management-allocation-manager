@@ -22,7 +22,7 @@ FactoryBot.define do
       "T#{number}C#{letter}"
     end
 
-    association :team, code: '1234', name: 'A nice team'
+    association :local_delivery_unit
 
     crn { Faker::Alphanumeric.alpha(number: 10) }
 
