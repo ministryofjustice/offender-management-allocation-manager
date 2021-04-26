@@ -45,17 +45,8 @@ class HandoverFollowUpJob < ApplicationJob
 private
 
   def get_ldu_offenders(ldu)
-    offender_ids = if ldu.is_a?(LocalDeliveryUnit)
-                     # This is a new LDU record
-                     ldu.case_information.where(com_name: nil).map(&:nomis_offender_id)
-                   else
-                     # This is an old LDU record
-                     # TODO: remove old LDUs after LDU/PDU switchover has happened (Feb 2021)
-                     ldu.teams.map { |team|
-                       team.case_information.where(com_name: nil).map(&:nomis_offender_id)
-                     }.flatten
-                   end
-
-    offender_ids.map { |offender_id| OffenderService.get_offender(offender_id) }.compact
+    ldu.case_information.where(com_name: nil).map(&:nomis_offender_id).map do |offender_id|
+      OffenderService.get_offender(offender_id)
+    end.compact
   end
 end

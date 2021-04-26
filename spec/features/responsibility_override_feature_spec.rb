@@ -12,9 +12,7 @@ feature 'Responsibility override' do
 
   context 'when overriding responsibility', vcr: { cassette_name: 'prison_api/override_responsibility' } do
     before do
-      ldu = create(:local_divisional_unit, email_address: 'ldu@test.com')
-      team = create(:team, local_divisional_unit: ldu)
-      create(:case_information, nomis_offender_id: offender_id, team: team)
+      create(:case_information, nomis_offender_id: offender_id)
     end
 
     context 'with an allocation' do
@@ -85,30 +83,10 @@ feature 'Responsibility override' do
 
   context "when override isn't possible due to email address is nil", vcr: { cassette_name: 'prison_api/cant_override_responsibility_nil_email' } do
     before do
-      ldu = create(:local_divisional_unit, email_address: nil)
-      team = create(:team, local_divisional_unit: ldu)
-      create(:case_information, nomis_offender_id: offender_id, team: team)
+      create(:case_information, nomis_offender_id: offender_id, local_delivery_unit: nil)
     end
 
     it 'doesnt override' do
-      visit prison_prisoner_staff_index_path('LEI', offender_id)
-
-      within '.responsibility_change' do
-        click_link 'Change'
-      end
-
-      expect(page).to have_content "Responsibility for this case can't be changed"
-    end
-  end
-
-  context "when override isn't possible due to email address is an empty string", vcr: { cassette_name: 'prison_api/cant_override_responsibility_blank_email' } do
-    before do
-      ldu = create(:local_divisional_unit, email_address: "")
-      team = create(:team, local_divisional_unit: ldu)
-      create(:case_information, nomis_offender_id: offender_id, team: team)
-    end
-
-    it 'doesnt allow an override to take place' do
       visit prison_prisoner_staff_index_path('LEI', offender_id)
 
       within '.responsibility_change' do

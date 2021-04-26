@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe ResponsibilitiesController, type: :controller do
   before do
-    offender = create(:case_information, team: nil, local_delivery_unit: build(:local_delivery_unit))
+    offender = create(:case_information, local_delivery_unit: build(:local_delivery_unit))
     create(:responsibility, nomis_offender_id: offender.nomis_offender_id)
 
     stub_sso_data(prison.code, emails: [sso_email_address])

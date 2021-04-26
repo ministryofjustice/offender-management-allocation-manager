@@ -98,10 +98,6 @@ Extra variables not required locally
 
 | Env var  | Description  |
 |---|---|
-| DELIUS_EMAIL_USERNAME | Username for nDelius GMail import |
-| DELIUS_EMAIL_PASSWORD | Password for nDelius GMail import |
-| DELIUS_EMAIL_FOLDER | Folder where nDelius imports are delivered |
-| DELIUS_XLSX_PASSWORD | Password for encrypted nDelius spreahsheet |
 | DIGITAL_PRISON_SERVICE_HOST | The host where New NOMIS is hosted |
 | NOMIS_OAUTH_AUTHORISATION | Oauth authorisation string (base64 encoded) |
 | SENTRY_DSN | The URL of a sentry installation. If no installation is available, then this should be present but an empty string ( "" )|
