@@ -35,7 +35,7 @@ RSpec.describe HandoversController, type: :controller do
                                          sentenceStartDate: "2019-02-08",
                                          ))
       ]
-      create(:case_information, case_allocation: 'NPS', nomis_offender_id: 'G4234GG')
+      create(:case_information, case_allocation: 'NPS', offender: build(:offender, nomis_offender_id: 'G4234GG'))
 
       stub_offenders_for_prison(prison, offenders)
     end
@@ -47,7 +47,7 @@ RSpec.describe HandoversController, type: :controller do
 
       describe 'sorting', :allocation do
         before do
-          create(:case_information, :with_com, case_allocation: 'CRC', nomis_offender_id: 'G1234VV')
+          create(:case_information, :with_com, case_allocation: 'CRC', offender: build(:offender, nomis_offender_id: 'G1234VV'))
           create(:allocation, nomis_offender_id: 'G1234VV', primary_pom_nomis_id: pom.staffId)
           stub_pom(pom)
         end
@@ -77,7 +77,7 @@ RSpec.describe HandoversController, type: :controller do
 
       context 'when CRC case' do
         before do
-          create(:case_information, case_allocation: 'CRC', nomis_offender_id: 'G1234VV')
+          create(:case_information, case_allocation: 'CRC', offender: build(:offender, nomis_offender_id: 'G1234VV'))
         end
 
         it 'returns cases that are within the thirty day window' do

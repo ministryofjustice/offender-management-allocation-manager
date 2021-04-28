@@ -40,7 +40,7 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
           described_class.perform_now nomis_offender_id
         }.to change(CaseInformation, :count).by(1)
 
-        expect(case_info.attributes.symbolize_keys.except(:created_at, :id, :updated_at, :parole_review_date, :welsh_offender))
+        expect(case_info.attributes.symbolize_keys.except(:created_at, :id, :updated_at, :parole_review_date, :prisoner_id, :welsh_offender))
             .to eq(case_allocation: "NPS", crn: "X362207", manual_entry: false, mappa_level: 0,
                    nomis_offender_id: "G4281GV",
                    probation_service: "England",
@@ -296,7 +296,7 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
                                                                                           localDeliveryUnit: { code: ldu.code } })]))
       end
 
-      let!(:c1) { create(:case_information, tier: 'B', nomis_offender_id: nomis_offender_id) }
+      let!(:c1) { create(:case_information, tier: 'B', offender: build(:offender, nomis_offender_id: nomis_offender_id)) }
 
       it 'does not creates case information' do
         expect {
@@ -339,7 +339,7 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
 
     context 'when updating an existing Case Information record' do
       let!(:case_info) {
-        create(:case_information, tier: 'B', nomis_offender_id: offender_no, crn: crn)
+        create(:case_information, tier: 'B', offender: build(:offender, nomis_offender_id: offender_no), crn: crn)
       }
 
       include_examples 'recalculate handover dates'

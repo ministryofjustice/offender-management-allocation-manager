@@ -53,7 +53,7 @@ RSpec.describe CaseInformation, type: :model do
   end
 
   context 'with mappa level' do
-    subject { build(:case_information, nomis_offender_id: '123456') }
+    subject { build(:case_information) }
 
     it 'allows 0, 1, 2, 3 and nil' do
       [0, 1, 2, 3, nil].each do |level|

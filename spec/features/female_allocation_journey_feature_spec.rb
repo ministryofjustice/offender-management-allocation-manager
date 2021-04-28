@@ -24,7 +24,7 @@ feature "womens allocation journey" do
     stub_poms(prison.code, [probation_pom, probation_pom2, prison_pom, inactive_prison_pom])
     stub_offenders_for_prison(prison.code, offenders + [offender])
 
-    create(:case_information, nomis_offender_id: nomis_offender_id)
+    create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
     alloc = create(:allocation, prison: prison.code, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: probation_pom.staff_id)
     alloc.deallocate_offender_after_release
     alloc.update! primary_pom_nomis_id: prison_pom.staff_id
@@ -35,7 +35,7 @@ feature "womens allocation journey" do
     before do
       # allocate some offenders to the POM so they have a case mix that looks pretty
       offenders.each_with_index do |o, index|
-        ci = create(:case_information, tier: tiers[index], nomis_offender_id: o.fetch(:offenderNo))
+        ci = create(:case_information, tier: tiers[index], offender: build(:offender, nomis_offender_id: o.fetch(:offenderNo)))
         create(:allocation, prison: prison.code, nomis_offender_id: ci.nomis_offender_id, primary_pom_nomis_id: probation_pom.staff_id)
       end
 
@@ -123,7 +123,7 @@ feature "womens allocation journey" do
     before do
       stub_keyworker prison.code, offender_id, build(:keyworker)
 
-      create(:case_information, tier: 'B', nomis_offender_id: offender_id)
+      create(:case_information, tier: 'B', offender: build(:offender, nomis_offender_id: offender_id))
       create(:allocation, nomis_offender_id: offender_id, prison: prison.code, primary_pom_nomis_id: probation_pom.staff_id)
 
       visit allocated_prison_prisoners_path prison.code

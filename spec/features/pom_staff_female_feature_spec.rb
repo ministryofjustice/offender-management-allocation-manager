@@ -27,16 +27,16 @@ feature "female estate POMs list" do
     stub_offenders_for_prison(female_prison, offenders_in_prison << nomis_offender)
     stub_poms(female_prison, poms)
 
-    create(:case_information, nomis_offender_id: nomis_offender[:offenderNo], case_allocation: 'NPS')
+    create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender[:offenderNo]), case_allocation: 'NPS')
     create(:allocation, nomis_offender_id: nomis_offender[:offenderNo], primary_pom_nomis_id: poms.first.staffId, prison: female_prison)
 
     %w[A B C].each_with_index do |tier, index|
-      create(:case_information, tier: tier, nomis_offender_id: offenders_in_prison[index][:offenderNo], case_allocation: 'NPS')
+      create(:case_information, tier: tier, offender: build(:offender, nomis_offender_id: offenders_in_prison[index][:offenderNo]), case_allocation: 'NPS')
       create(:allocation, nomis_offender_id: offenders_in_prison[index][:offenderNo], primary_pom_nomis_id: poms.first.staffId, prison: female_prison)
     end
 
     %w[D N/A].each_with_index do |tier, index|
-      create(:case_information, tier: tier, nomis_offender_id: offenders_in_prison[index + 4][:offenderNo], case_allocation: 'NPS')
+      create(:case_information, tier: tier, offender: build(:offender, nomis_offender_id: offenders_in_prison[index + 4][:offenderNo]), case_allocation: 'NPS')
       create(:allocation, nomis_offender_id: offenders_in_prison[index + 4][:offenderNo], primary_pom_nomis_id: poms.last.staffId, prison: female_prison)
     end
 

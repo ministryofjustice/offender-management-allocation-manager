@@ -109,7 +109,7 @@ describe MovementService, type: :feature do
   end
 
   describe "processing an offender release" do
-    let!(:case_info) { create(:case_information, nomis_offender_id: 'G4273GI') }
+    let!(:case_info) { create(:case_information, offender: build(:offender, nomis_offender_id: 'G4273GI')) }
     let!(:allocation) { create(:allocation, nomis_offender_id: 'G4273GI') }
 
     context 'with a valid release movement' do
@@ -131,7 +131,7 @@ describe MovementService, type: :feature do
         processed = described_class.process_movement(valid_release)
         updated_allocation = Allocation.find_by(nomis_offender_id: valid_release.offender_no)
 
-        expect(CaseInformationService.get_case_information([valid_release.offender_no])).to be_empty
+        expect(CaseInformation.where(nomis_offender_id: valid_release.offender_no)).to be_empty
         expect(updated_allocation.event_trigger).to eq 'offender_released'
         expect(updated_allocation.prison).to eq 'LEI'
         expect(processed).to be true
@@ -199,7 +199,7 @@ describe MovementService, type: :feature do
              vcr: { cassette_name: 'prison_api/immigration_transfer_from_MHI_to_IMM_successful' } do
             processed = described_class.process_movement(immigration_movement)
 
-            expect(CaseInformationService.get_case_information([immigration_movement.offender_no])).to be_empty
+            expect(CaseInformation.where(nomis_offender_id: immigration_movement.offender_no)).to be_empty
             expect(allocation.event_trigger).to eq 'offender_released'
             expect(processed).to be true
           end
@@ -215,7 +215,7 @@ describe MovementService, type: :feature do
              vcr: { cassette_name: 'prison_api/immigration_transfer_from_prison_to_IMM_successful' } do
             processed = described_class.process_movement(immigration_movement)
 
-            expect(CaseInformationService.get_case_information([immigration_movement.offender_no])).to be_empty
+            expect(CaseInformation.where(nomis_offender_id: immigration_movement.offender_no)).to be_empty
             expect(allocation.event_trigger).to eq 'offender_released'
             expect(processed).to be true
           end
@@ -246,7 +246,7 @@ describe MovementService, type: :feature do
              vcr: { cassette_name: 'prison_api/immigration_transfer_from_IMM_to_MHI_successful' } do
             processed = described_class.process_movement(immigration_movement)
 
-            expect(CaseInformationService.get_case_information([immigration_movement.offender_no])).to be_empty
+            expect(CaseInformation.where(nomis_offender_id: immigration_movement.offender_no)).to be_empty
             expect(allocation.event_trigger).to eq 'offender_released'
             expect(processed).to be true
           end
@@ -266,7 +266,7 @@ describe MovementService, type: :feature do
              vcr: { cassette_name: 'prison_api/immigration_release_from_MHI_to_OUT_successful' } do
             processed = described_class.process_movement(immigration_movement)
 
-            expect(CaseInformationService.get_case_information([immigration_movement.offender_no])).to be_empty
+            expect(CaseInformation.where(nomis_offender_id: immigration_movement.offender_no)).to be_empty
             expect(allocation.event_trigger).to eq 'offender_released'
             expect(processed).to be true
           end
@@ -282,7 +282,7 @@ describe MovementService, type: :feature do
              vcr: { cassette_name: 'prison_api/immigration_release_from_IMM_to_OUT_successful' } do
             processed = described_class.process_movement(immigration_movement)
 
-            expect(CaseInformationService.get_case_information([immigration_movement.offender_no])).to be_empty
+            expect(CaseInformation.where(nomis_offender_id: immigration_movement.offender_no)).to be_empty
             expect(allocation.event_trigger).to eq 'offender_released'
             expect(processed).to be true
           end

@@ -3,7 +3,7 @@ require 'rails_helper'
 describe HmppsApi::PrisonApi::OffenderApi do
   describe 'List of offenders' do
     it "can get a list of offenders",
-       vcr: { cassette_name: 'prison_api/offender_api_offender_list' } do
+       vcr: { cassette_name: 'prison_api/offender_hmpps_api_offender_list' } do
       response = described_class.list('LEI')
 
       expect(response.data).not_to be_nil
@@ -20,7 +20,7 @@ describe HmppsApi::PrisonApi::OffenderApi do
     end
 
     it "returns category codes",
-       vcr: { cassette_name: 'prison_api/offender_api_offender_category_list' } do
+       vcr: { cassette_name: 'prison_api/offender_hmpps_api_offender_category_list' } do
       response = described_class.list('LEI')
       expect(response.data.first.category_code).not_to be_nil
     end

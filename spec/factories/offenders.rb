@@ -42,4 +42,14 @@ FactoryBot.define do
 
     sequence(:bookingId) { |c| c + 100_000 }
   end
+
+  factory :offender do
+    # offender numbers are of the form <letter><4 numbers><2 letters>
+    sequence(:nomis_offender_id) do |seq|
+      number = seq / 26 + 1000
+      letter = ('A'..'Z').to_a[seq % 26]
+      # This and the offender should produce different values to avoid clashes
+      "P#{number}P#{letter}"
+    end
+  end
 end

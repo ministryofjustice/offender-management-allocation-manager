@@ -76,7 +76,8 @@ private
     @missing_info = if step == :complexity_level
                       ComplexityForm.new(session[complexity_session_key])
                     else
-                      CaseInformation.new(session[case_info_session_key])
+                      prisoner = Offender.find_by! nomis_offender_id: params.fetch(:prisoner_id)
+                      prisoner.build_case_information(session[case_info_session_key].merge(manual_entry: true))
                     end
   end
 

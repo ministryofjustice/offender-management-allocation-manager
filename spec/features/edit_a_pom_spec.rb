@@ -8,7 +8,7 @@ feature "edit a POM's details" do
   let(:nomis_offender_id) { 'G4273GI' }
 
   before do
-    create(:case_information, nomis_offender_id: nomis_offender_id)
+    create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
 
     create(:pom_detail, prison_code: 'LEI', nomis_staff_id: fulltime_pom_id, working_pattern: 1)
 

@@ -4,7 +4,7 @@ RSpec.describe Responsibility, type: :model do
   let(:offender_id) { 'GA1234G' }
 
   before do
-    create(:case_information, nomis_offender_id: offender_id)
+    create(:case_information, offender: build(:offender, nomis_offender_id: offender_id))
   end
 
   context 'with other reason' do

@@ -1,15 +1,14 @@
 # frozen_string_literal: true
 
 class CaseInformationController < PrisonsApplicationController
-  before_action :set_case_info, only: [:edit, :show]
   before_action :set_prisoner_from_url, only: [:new, :edit, :edit_prd, :update_prd, :show]
+  before_action :set_case_info, only: [:edit, :show]
+
   before_action :set_referrer
   before_action :store_referrer_in_session, only: [:edit_prd]
 
   def new
-    @case_info = CaseInformation.new(
-      nomis_offender_id: nomis_offender_id_from_url
-    )
+    @case_info = Offender.find_by!(nomis_offender_id: nomis_offender_id_from_url).build_case_information
   end
 
   def edit; end
@@ -34,7 +33,8 @@ class CaseInformationController < PrisonsApplicationController
   end
 
   def create
-    @case_info = CaseInformation.create(
+    prisoner = Offender.find_by! nomis_offender_id: case_information_params[:nomis_offender_id]
+    @case_info = prisoner.build_case_information(
       nomis_offender_id: case_information_params[:nomis_offender_id],
       tier: case_information_params[:tier],
       probation_service: case_information_params[:probation_service],
@@ -42,7 +42,7 @@ class CaseInformationController < PrisonsApplicationController
       manual_entry: true
     )
 
-    if @case_info.valid?
+    if @case_info.save
       if params.fetch(:commit) == 'Save'
         redirect_to missing_information_prison_prisoners_path(active_prison_id,
                                                               sort: params[:sort],
@@ -58,9 +58,7 @@ class CaseInformationController < PrisonsApplicationController
   end
 
   def update
-    @case_info = CaseInformation.find_by(
-      nomis_offender_id: case_information_params[:nomis_offender_id]
-    )
+    @case_info = Offender.find_by!(nomis_offender_id: case_information_params[:nomis_offender_id]).case_information
     @prisoner = prisoner(case_information_params[:nomis_offender_id])
     # Nothing here can fail due to radio buttons being unselectable
     @case_info.update!(case_information_params.merge(manual_entry: true))
@@ -74,9 +72,8 @@ private
   end
 
   def set_case_info
-    @case_info = CaseInformation.find_by(
-      nomis_offender_id: nomis_offender_id_from_url
-    )
+    prisoner = Offender.find_by!(nomis_offender_id: nomis_offender_id_from_url)
+    @case_info = prisoner.case_information || prisoner.build_case_information
   end
 
   def prisoner(nomis_id)

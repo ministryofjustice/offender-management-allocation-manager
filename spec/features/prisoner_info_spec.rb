@@ -21,7 +21,7 @@ feature 'View a prisoner profile page' do
 
   context 'with an existing early allocation', vcr: { cassette_name: 'prison_api/early_allocation_banner' } do
     before do
-      create(:case_information, nomis_offender_id: 'G7998GJ', early_allocations: [build(:early_allocation, created_within_referral_window: within_window)])
+      create(:case_information, offender: build(:offender, nomis_offender_id: 'G7998GJ'), early_allocations: [build(:early_allocation, created_within_referral_window: within_window)])
       visit prison_prisoner_path(prison, 'G7998GJ')
     end
 
@@ -44,7 +44,7 @@ feature 'View a prisoner profile page' do
 
   context 'with an allocation', :allocation do
     before do
-      create(:case_information, nomis_offender_id: 'G7998GJ', victim_liaison_officers: [build(:victim_liaison_officer)])
+      create(:case_information, offender: build(:offender, nomis_offender_id: 'G7998GJ'), victim_liaison_officers: [build(:victim_liaison_officer)])
       create(:allocation, :co_working, prison: prison, nomis_offender_id: 'G7998GJ', primary_pom_nomis_id: '485637', primary_pom_name: 'Pobno, Kath')
     end
 
@@ -168,7 +168,7 @@ feature 'View a prisoner profile page' do
 
       before do
         create(:case_information,
-               nomis_offender_id: 'G7998GJ',
+               offender: build(:offender, nomis_offender_id: 'G7998GJ'),
                local_delivery_unit: ldu,
                team_name: team_name,
                com_name: 'Bob Smith'
@@ -188,7 +188,7 @@ feature 'View a prisoner profile page' do
     context 'without email address or com name' do
       before do
         create(:case_information,
-               nomis_offender_id: 'G7998GJ',
+               offender: build(:offender, nomis_offender_id: 'G7998GJ'),
         )
 
         visit prison_prisoner_path(prison, 'G7998GJ')
@@ -218,7 +218,7 @@ feature 'View a prisoner profile page' do
     end
 
     it 'shows the page without crashing' do
-      case_info = create(:case_information, case_allocation: CaseInformation::NPS, nomis_offender_id: 'G7998GJ')
+      case_info = create(:case_information, case_allocation: CaseInformation::NPS, offender: build(:offender, nomis_offender_id: 'G7998GJ'))
       non_sentenced_offender.load_case_information(case_info)
 
       visit prison_prisoner_path(prison, 'G7998GJ')
@@ -240,7 +240,7 @@ feature 'View a prisoner profile page' do
   context "when the offender needs a COM but one isn't allocated" do
     let!(:case_info) {
       create(:case_information,
-             nomis_offender_id: nomis_offender_id,
+             offender: build(:offender, nomis_offender_id: nomis_offender_id),
              local_delivery_unit: build(:local_delivery_unit)
       )
     }

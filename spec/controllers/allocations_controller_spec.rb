@@ -34,7 +34,7 @@ RSpec.describe AllocationsController, type: :controller do
     end
 
     it 'allows access to the Case History page' do
-      create(:case_information, nomis_offender_id: offender_no)
+      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
       create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: poms.last.staffId)
       get :history, params: { prison_id: prison, nomis_offender_id: offender_no }
       expect(response).to have_http_status(:ok)
@@ -50,7 +50,7 @@ RSpec.describe AllocationsController, type: :controller do
       let(:inactive_pom_staff_id) { 543_453 }
 
       before do
-        create(:case_information, nomis_offender_id: offender_no)
+        create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
         stub_keyworker(prison, offender_no, staffId: 123_456)
       end
 
@@ -81,7 +81,7 @@ RSpec.describe AllocationsController, type: :controller do
       let(:pom_staff_id) { 754732 }
 
       before do
-        create(:case_information, nomis_offender_id: offender_no)
+        create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
       end
 
       context 'with a VictimLiasonOfficer' do
@@ -262,8 +262,7 @@ RSpec.describe AllocationsController, type: :controller do
           offenders = CaseInformation.all.map { |ci| build(:nomis_offender, offenderNo: ci.nomis_offender_id) }
           stub_offenders_for_prison(prison, offenders)
 
-          create(:case_information, nomis_offender_id: offender_no, tier: tier)
-
+          create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), tier: tier)
           get :index, params: { prison_id: prison, prisoner_id: offender_no }
           expect(response).to be_successful
         end
@@ -307,7 +306,7 @@ RSpec.describe AllocationsController, type: :controller do
       context 'with an allocation' do
         before do
           stub_offenders_for_prison(prison, [offender])
-          create(:case_information, nomis_offender_id: offender_no)
+          create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
           create(:allocation, nomis_offender_id: offender_no)
         end
 

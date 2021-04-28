@@ -9,7 +9,7 @@ class FemaleAllocationsController < PrisonsApplicationController
   steps :override, :allocate
 
   def index
-    @case_info = CaseInformation.find_by!(nomis_offender_id: nomis_offender_id_from_url)
+    @case_info = Offender.find_by!(nomis_offender_id: nomis_offender_id_from_url).case_information
     previous_allocation = Allocation.find_by nomis_offender_id: nomis_offender_id_from_url
     previous_pom_ids = if previous_allocation
                          previous_allocation.previously_allocated_poms

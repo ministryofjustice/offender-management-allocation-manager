@@ -34,7 +34,7 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
   end
 
   context 'with some assessments' do
-    let(:case_info) { create(:case_information, nomis_offender_id: nomis_offender_id) }
+    let(:case_info) { create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id)) }
     let!(:early_allocations) {
       # Create 5 Early Allocation records with different creation dates
       [
@@ -118,7 +118,7 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
 
     context 'with no ldu email address' do
       before do
-        create(:case_information, nomis_offender_id: nomis_offender_id, local_delivery_unit: nil)
+        create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id), local_delivery_unit: nil)
       end
 
       it 'goes to the dead end' do
@@ -132,7 +132,7 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
 
   describe '#create' do
     before do
-      create(:case_information, nomis_offender_id: nomis_offender_id)
+      create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
     end
 
     context 'when on eligible screen' do

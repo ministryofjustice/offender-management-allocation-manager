@@ -72,9 +72,8 @@ private
   end
 
   def find_case_info(delius_record)
-    CaseInformation.find_or_initialize_by(
-      nomis_offender_id: delius_record.noms_no
-    )
+    prisoner = Offender.find_by!(nomis_offender_id: delius_record.noms_no)
+    prisoner.case_information || prisoner.build_case_information
   end
 
   def map_mappa_level(delius_mappa_levels)

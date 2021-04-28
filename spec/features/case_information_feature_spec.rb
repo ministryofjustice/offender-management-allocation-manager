@@ -39,7 +39,7 @@ feature 'case information feature' do
 
     context 'when updating missing information (edit journey)' do
       before do
-        create(:case_information, nomis_offender_id: offender.fetch(:offenderNo))
+        create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:offenderNo)))
       end
 
       it 'no longer displays the save and allocate button', :js do

@@ -2,6 +2,8 @@ require 'faker'
 
 FactoryBot.define do
   factory :case_information do
+    association :offender
+
     tier do
       'A'
     end
@@ -12,14 +14,6 @@ FactoryBot.define do
 
     manual_entry do
       true
-    end
-
-    # offender numbers are of the form <letter><4 numbers><2 letters>
-    sequence(:nomis_offender_id) do |seq|
-      number = seq / 26 + 1000
-      letter = ('A'..'Z').to_a[seq % 26]
-      # This and the offender should produce different values to avoid clashes
-      "T#{number}C#{letter}"
     end
 
     association :local_delivery_unit

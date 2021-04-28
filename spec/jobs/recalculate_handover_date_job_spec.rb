@@ -15,7 +15,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
   context "when the offender exists in both NOMIS and nDelius (happy path)" do
     before do
       stub_offender(nomis_offender)
-      create(:case_information, nomis_offender_id: offender_no, case_allocation: 'NPS', manual_entry: false)
+      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), case_allocation: 'NPS', manual_entry: false)
     end
 
     let(:nomis_offender) { build(:nomis_offender) }
@@ -51,7 +51,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
     before do
       stub_offender(nomis_offender)
-      create(:case_information, nomis_offender_id: offender_no, case_allocation: 'NPS')
+      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), case_allocation: 'NPS')
     end
 
     it 'does nothing' do
@@ -68,7 +68,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
     before do
       stub_offender(nomis_offender)
-      create(:case_information, nomis_offender_id: offender_no, case_allocation: 'NPS', manual_entry: false)
+      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), case_allocation: 'NPS', manual_entry: false)
 
       # Stub HTTP requests to the Prison API
       stub_request(:any, stub_url).to_return(status: status)
@@ -97,7 +97,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     context 'when there is no COM assigned' do
       context 'without an LDU' do
         before do
-          create(:case_information, :nps, local_delivery_unit: nil, nomis_offender_id: offender_no)
+          create(:case_information, :nps, local_delivery_unit: nil, offender: build(:offender, nomis_offender_id: offender_no))
         end
 
         it 'does not send an email' do
@@ -108,7 +108,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
       context 'when there is an LDU' do
         let(:ldu) { build(:local_delivery_unit) }
-        let!(:case_info) { create(:case_information, :nps, local_delivery_unit: ldu, nomis_offender_id: offender_no) }
+        let!(:case_info) { create(:case_information, :nps, local_delivery_unit: ldu, offender: build(:offender, nomis_offender_id: offender_no)) }
         let(:one_day_later) { today + 1.day }
         let(:two_days_later) { today + 2.days }
 
@@ -153,7 +153,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       let(:ldu) { build(:local_delivery_unit) }
 
       before do
-        create(:case_information, :nps, :with_com, local_delivery_unit: ldu, nomis_offender_id: offender_no)
+        create(:case_information, :nps, :with_com, local_delivery_unit: ldu, offender: build(:offender, nomis_offender_id: offender_no))
       end
 
       it 'does not send an email' do
@@ -164,7 +164,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
   end
 
   describe 're-calculation' do
-    let!(:case_info) { create(:case_information, :nps, nomis_offender_id: offender_no) }
+    let!(:case_info) { create(:case_information, :nps, offender: build(:offender, nomis_offender_id: offender_no)) }
     let(:offender) { OffenderService.get_offender(offender_no) }
 
     before do
@@ -274,7 +274,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     }
 
     let!(:case_information) {
-      create(:case_information, nomis_offender_id: offender_no,
+      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no),
                                      case_allocation: 'NPS', manual_entry: false)
     }
 
@@ -343,7 +343,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
     context 'when the LDU email address is unknown' do
       let!(:case_information) {
-        create(:case_information, nomis_offender_id: offender_no,
+        create(:case_information, offender: build(:offender, nomis_offender_id: offender_no),
                local_delivery_unit: nil,
                case_allocation: 'NPS', manual_entry: true)
       }
@@ -356,7 +356,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
     context 'when a COM is already allocated' do
       let!(:case_information) {
-        create(:case_information, :with_com, nomis_offender_id: offender_no,
+        create(:case_information, :with_com, offender: build(:offender, nomis_offender_id: offender_no),
                case_allocation: 'NPS', manual_entry: false)
       }
 

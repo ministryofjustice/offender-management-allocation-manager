@@ -78,7 +78,7 @@ feature "womens missing info journey" do
     let(:complexity) { nil }
 
     before do
-      create(:case_information, nomis_offender_id: prisoner_id)
+      create(:case_information, offender: build(:offender, nomis_offender_id: prisoner_id))
       expect(HmppsApi::ComplexityApi).to receive(:save).with(prisoner_id, level: 'medium', username: username, reason: nil)
 
       visit missing_information_prison_prisoners_path prison.code

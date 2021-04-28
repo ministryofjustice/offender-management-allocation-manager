@@ -10,7 +10,7 @@ RSpec.describe ComplexityLevelsController, type: :controller do
 
   before do
     create(:allocation, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: pom.staff_id,  prison: womens_prison.code)
-    create(:case_information, nomis_offender_id: offender_no)
+    create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
 
     stub_offenders_for_prison(womens_prison.code, offenders)
     stub_sso_data(womens_prison.code)

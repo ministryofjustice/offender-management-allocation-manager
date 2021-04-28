@@ -114,15 +114,29 @@ private
 
   private
 
-    def enrich_offenders(offenders)
-      nomis_ids = offenders.map(&:offender_no)
-      mapped_tiers = CaseInformationService.get_case_information(nomis_ids)
+    def enrich_offenders(offender_list)
+      nomis_ids = offender_list.map(&:offender_no)
+      offenders = Offender.
+        includes(case_information: [:responsibility, :early_allocations, :local_delivery_unit]).
+        where(nomis_offender_id: nomis_ids)
 
-      offenders.each { |offender|
+      if offenders.count != nomis_ids.count
+        # Create Offender records for (presumably new) prisoners who don't have one yet
+        nomis_ids.reject { |nomis_id| offenders.detect { |offender| offender.nomis_offender_id == nomis_id } }.each do |new_id|
+          Offender.create! nomis_offender_id: new_id
+        end
+      end
+
+      mapped_tiers = offenders.
+        map(&:case_information).
+        compact.
+        index_by(&:nomis_offender_id)
+
+      offender_list.each { |offender|
         case_info_record = mapped_tiers[offender.offender_no]
         offender.load_case_information(case_info_record)
       }
-      HmppsApi::PrisonApi::OffenderApi.add_arrival_dates(offenders)
+      HmppsApi::PrisonApi::OffenderApi.add_arrival_dates(offender_list)
     end
   end
 end

@@ -38,7 +38,7 @@ feature 'Co-working' do
     stub_signin_spo poms.last, [prison.code]
     stub_keyworker prison.code, 'G4273GI', build(:keyworker)
 
-    create(:case_information, nomis_offender_id: nomis_offender_id)
+    create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
   end
 
   context 'with just a primary POM allocated' do
