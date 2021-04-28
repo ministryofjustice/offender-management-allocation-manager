@@ -86,7 +86,7 @@ feature 'Provide debugging information for our team to use' do
       end
 
       it 'shows the page without crashing' do
-        case_info = create(:case_information, case_allocation: CaseInformation::NPS, nomis_offender_id: nomis_offender_id)
+        case_info = create(:case_information, case_allocation: CaseInformation::NPS, offender: build(:offender, nomis_offender_id: nomis_offender_id))
         non_sentenced_offender.load_case_information(case_info)
 
         visit prison_debugging_path('LEI')

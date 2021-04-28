@@ -70,7 +70,7 @@ describe AllocationService do
   describe '#create_or_update' do
     context 'without an existing' do
       before do
-        create(:case_information, nomis_offender_id: nomis_offender_id)
+        create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
         stub_auth_token
         stub_request(:get, "#{ApiHelper::T3}/users/MOIC_POM").
           to_return(body: { staffId: 1, firstName: "MOIC", lastName: 'POM' }.to_json)

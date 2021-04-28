@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_25_134556) do
+ActiveRecord::Schema.define(version: 2021_05_25_140412) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -141,6 +141,11 @@ ActiveRecord::Schema.define(version: 2021_05_25_134556) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["code"], name: "index_local_delivery_units_on_code", unique: true
+  end
+
+  create_table "offenders", primary_key: "nomis_offender_id", id: :string, force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "overrides", force: :cascade do |t|

@@ -12,7 +12,7 @@ feature 'Responsibility override' do
 
   context 'when overriding responsibility', vcr: { cassette_name: 'prison_api/override_responsibility' } do
     before do
-      create(:case_information, nomis_offender_id: offender_id)
+      create(:case_information, offender: build(:offender, nomis_offender_id: offender_id))
     end
 
     context 'with an allocation' do
@@ -83,7 +83,7 @@ feature 'Responsibility override' do
 
   context "when override isn't possible due to email address is nil", vcr: { cassette_name: 'prison_api/cant_override_responsibility_nil_email' } do
     before do
-      create(:case_information, nomis_offender_id: offender_id, local_delivery_unit: nil)
+      create(:case_information, offender: build(:offender, nomis_offender_id: offender_id), local_delivery_unit: nil)
     end
 
     it 'doesnt override' do

@@ -19,7 +19,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
     # This prison is inactive because we don't give it any allocations
     let(:inactive_prison) { create(:prison) }
 
-    let(:case_info) { build(:case_information, nomis_offender_id: offender_no) }
+    let(:case_info) { build(:case_information, offender: build(:offender, nomis_offender_id: offender_no)) }
 
     let!(:allocation) {
       create(:allocation,
@@ -92,7 +92,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
       end
 
       context 'when the offender already has a COM allocated' do
-        let(:case_info) { create(:case_information, :with_com, nomis_offender_id: offender_no) }
+        let(:case_info) { create(:case_information, :with_com, offender: build(:offender, nomis_offender_id: offender_no)) }
 
         it 'does not send email' do
           expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)

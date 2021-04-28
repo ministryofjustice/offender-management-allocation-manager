@@ -93,10 +93,10 @@ feature "view POM's caseload" do
     ])
 
     offender_map.each do |nomis_offender_id, _nomis_booking_id|
-      create(:case_information, nomis_offender_id: nomis_offender_id)
+      create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
       create(:allocation, prison: prison.code, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
     end
-    create(:case_information, nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPS', probation_service: 'Wales')
+    create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id), tier: 'A', case_allocation: 'NPS', probation_service: 'Wales')
     coworking = create(:allocation, prison: prison.code, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: other_pom.staff_id)
     coworking.update!(secondary_pom_nomis_id: nomis_staff_id, event: Allocation::ALLOCATE_SECONDARY_POM)
 

@@ -61,6 +61,6 @@ private
   end
 
   def load_case_information
-    @case_information = CaseInformation.find_by!(nomis_offender_id: params[:prisoner_id])
+    @case_information = Offender.find_by!(nomis_offender_id: params[:prisoner_id]).case_information
   end
 end

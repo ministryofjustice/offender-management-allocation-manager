@@ -76,7 +76,7 @@ feature 'Navigation' do
 
     context 'with a browser', :js do
       before do
-        create(:case_information, nomis_offender_id: offender_no)
+        create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
         create(:allocation, prison: prison.code, primary_pom_nomis_id: moic_pom_staff_id, nomis_offender_id: offender_no)
       end
 
@@ -84,7 +84,7 @@ feature 'Navigation' do
         let(:index) { 2 }
 
         it 'highlights the section' do
-          click_menu_and_wait(link_css, index, delay: 2)
+          click_menu_and_wait(link_css, index, delay: 5)
           expect(page).to have_content offender_name
           click_link_and_wait offender_name
           new_link = all(link_css)[index]
@@ -96,7 +96,7 @@ feature 'Navigation' do
         let(:index) { 1 }
 
         before do
-          create(:case_information, nomis_offender_id: 'G8668GF')
+          create(:case_information, offender: build(:offender, nomis_offender_id: 'G8668GF'))
         end
 
         it 'highlights the section' do

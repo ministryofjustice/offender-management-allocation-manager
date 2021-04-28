@@ -1,7 +1,7 @@
 require "rails_helper"
 
 feature "get poms list" do
-  let!(:offender_missing_sentence_case_info) { create(:case_information, nomis_offender_id: 'G1247VX') }
+  let!(:offender_missing_sentence_case_info) { create(:case_information, offender: build(:offender, nomis_offender_id: 'G1247VX')) }
 
   before do
     signin_spo_user
@@ -38,7 +38,7 @@ feature "get poms list" do
 
   it "can sort offenders allocated to a POM", vcr: { cassette_name: 'prison_api/show_poms_feature_view_sorting' } do
     [['G7806VO', 754_207], ['G2911GD', 1_175_317]].each do |offender_id, _booking|
-      create(:case_information, nomis_offender_id: offender_id)
+      create(:case_information, offender: build(:offender, nomis_offender_id: offender_id))
       AllocationService.create_or_update(
         nomis_offender_id: offender_id,
         prison: 'LEI',

@@ -25,7 +25,7 @@ feature "view an offender's allocation information" do
 
   context 'when offender does not have a key worker assigned' do
     before do
-      create(:case_information, nomis_offender_id: nomis_offender_id_without_keyworker)
+      create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id_without_keyworker))
       create(
         :allocation,
         nomis_offender_id: nomis_offender_id_without_keyworker,
@@ -52,7 +52,7 @@ feature "view an offender's allocation information" do
   context 'when an NPS, Determinate, English  offender has a key worker assigned' do
     context 'when the offender has over 10 months left to serve' do
       before do
-        create(:case_information, nomis_offender_id: offender_no, case_allocation: 'NPS', probation_service: 'England', tier: 'A')
+        create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), case_allocation: 'NPS', probation_service: 'England', tier: 'A')
         create(
           :allocation,
           nomis_offender_id: offender_no,
@@ -84,7 +84,7 @@ feature "view an offender's allocation information" do
 
     context 'when the offender has less than 10 months left to serve' do
       before do
-        create(:case_information, nomis_offender_id: offender_no)
+        create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
         create(
           :allocation,
           nomis_offender_id: offender_no,
@@ -114,7 +114,7 @@ feature "view an offender's allocation information" do
 
   context 'when Offender has a key worker assigned' do
     before do
-      create(:case_information, nomis_offender_id: nomis_offender_id_with_keyworker)
+      create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id_with_keyworker))
       create(
         :allocation,
         nomis_offender_id: nomis_offender_id_with_keyworker,

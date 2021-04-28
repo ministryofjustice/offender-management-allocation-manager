@@ -6,7 +6,7 @@ feature "viewing upcoming handovers" do
 
   context 'when signed in as an SPO' do
     let(:offender) { build(:nomis_offender, agencyId: prison) }
-    let!(:case_info) { create(:case_information, nomis_offender_id: offender.fetch(:offenderNo)) }
+    let!(:case_info) { create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:offenderNo))) }
 
     before do
       # Stub auth
@@ -89,7 +89,7 @@ feature "viewing upcoming handovers" do
       stub_offenders_for_prison(prison, offenders)
 
       offenders.each_with_index do |offender, i|
-        create(:case_information,  com_name: coms.fetch(i),  nomis_offender_id: offender.fetch(:offenderNo))
+        create(:case_information, com_name: coms.fetch(i), offender: build(:offender, nomis_offender_id: offender.fetch(:offenderNo)))
         create(:allocation, primary_pom_nomis_id: user.staff_id, primary_pom_name: pom_names.fetch(i), nomis_offender_id: offender.fetch(:offenderNo), prison: prison)
       end
     end

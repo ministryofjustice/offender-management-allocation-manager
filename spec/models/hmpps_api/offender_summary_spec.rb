@@ -12,7 +12,7 @@ describe HmppsApi::Offender do
 
     it 'returns true when there is a responsibility found for an offender' do
       # create case information and responsibility record
-      case_info = create(:case_information, nomis_offender_id: 'A1234XX')
+      case_info = create(:case_information, offender: build(:offender, nomis_offender_id: 'A1234XX'))
       create(:responsibility, nomis_offender_id: 'A1234XX')
 
       # build an offender
@@ -158,7 +158,7 @@ describe HmppsApi::Offender do
 
     context 'when the responsibility has been overridden' do
       before do
-        case_info = create(:case_information, nomis_offender_id: offender.offender_no, case_allocation: 'NPS', mappa_level: 0)
+        case_info = create(:case_information, offender: build(:offender, nomis_offender_id: offender.offender_no), case_allocation: 'NPS', mappa_level: 0)
 
         # Responsibility overrides exist as 'Responsibility' records
         create(:responsibility, nomis_offender_id: offender.offender_no, value: override_to)
@@ -200,7 +200,7 @@ describe HmppsApi::Offender do
 
     context 'when the responsibility has been overridden' do
       before do
-        case_info = create(:case_information, nomis_offender_id: offender.offender_no, case_allocation: 'NPS', mappa_level: 0)
+        case_info = create(:case_information, offender: build(:offender, nomis_offender_id: offender.offender_no), case_allocation: 'NPS', mappa_level: 0)
 
         # Responsibility overrides exist as 'Responsibility' records
         create(:responsibility, nomis_offender_id: offender.offender_no, value: override_to)

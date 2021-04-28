@@ -5,8 +5,8 @@ class OffenderService
     HmppsApi::PrisonApi::OffenderApi.get_offender(offender_no).tap { |o|
       next false if o.nil?
 
-      record = CaseInformation.find_by(nomis_offender_id: offender_no)
-      o.load_case_information(record)
+      offender = Offender.find_or_create_by!(nomis_offender_id: offender_no)
+      o.load_case_information(offender.case_information)
 
       o.load_main_offence
     }

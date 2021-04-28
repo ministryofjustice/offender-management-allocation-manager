@@ -18,7 +18,7 @@ feature 'email history' do
       stub_poms(prison.code, [user])
       stub_keyworker prison.code, offender_no, build(:keyworker)
 
-      create(:case_information, nomis_offender_id: offender_no)
+      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
       create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: user.staff_id, prison: prison.code)
       # we don't care about setting handover dates in Delius for this test
       allow(HmppsApi::CommunityApi).to receive(:set_handover_dates)

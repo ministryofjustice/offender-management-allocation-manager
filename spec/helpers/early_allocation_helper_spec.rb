@@ -8,7 +8,7 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
   let(:offender_sentence) { build(:sentence_detail) }
   let(:offender) { build(:hmpps_api_offender, sentence: offender_sentence) }
   let(:nomis_offender_id) { offender.offender_no }
-  let(:case_info) { create(:case_information, nomis_offender_id: nomis_offender_id, early_allocations: early_allocations) }
+  let(:case_info) { create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id), early_allocations: early_allocations) }
 
   before do
     offender.load_case_information(case_info)

@@ -6,18 +6,10 @@ RSpec.describe StaffMember, type: :model do
   let(:user) { described_class.new(prison, staff_id) }
   let(:offenders) {
     [
-      build(:nomis_offender, offenderNo: 'G7514GW', prison_id: prison, convicted?: true, sentenced?: true,
-                     indeterminate_sentence?: true, nps_case?: true, pom_supporting?: true,
-                     sentence_start_date: Time.zone.today - 1.month, conditional_release_date: Time.zone.today + 12.months),
-      build(:nomis_offender, offenderNo: 'G1234VV', prison_id: prison, convicted?: true, sentenced?: true,
-                     nps_case?: true, pom_responsible?: true, sentence_start_date: Time.zone.today - 1.month,
-                     conditional_release_date: Time.zone.today + 12.months),
-      build(:nomis_offender, offenderNo: 'G1234AB', prison_id: prison, convicted?: true, sentenced?: true,
-               nps_case?: true, pom_responsible?: true, sentence_start_date: Time.zone.today - 10.months,
-               conditional_release_date: Time.zone.today + 2.years),
-      build(:nomis_offender, offenderNo: 'G1234GG', prison_id: prison, convicted?: true, sentenced?: true,
-         nps_case?: true, pom_responsible?: true, sentence_start_date: Time.zone.today - 10.months,
-         conditional_release_date: Time.zone.today + 2.years)
+      build(:nomis_offender, offenderNo: 'G7514GW', prison_id: prison),
+      build(:nomis_offender, offenderNo: 'G1234VV', prison_id: prison),
+      build(:nomis_offender, offenderNo: 'G1234AB', prison_id: prison),
+      build(:nomis_offender, offenderNo: 'G1234GG', prison_id: prison)
     ]
   }
 
@@ -25,7 +17,7 @@ RSpec.describe StaffMember, type: :model do
     stub_auth_token
     stub_offenders_for_prison(prison.code, offenders)
     offenders.each do |offender|
-      create(:case_information, nomis_offender_id: offender.fetch(:offenderNo))
+      create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:offenderNo)))
     end
   end
 

@@ -11,12 +11,12 @@ RSpec.describe PrisonersController, type: :controller do
 
     describe 'buckets' do
       before do
-        create(:case_information, nomis_offender_id: offender_with_case_info_but_no_complexity_level.fetch(:offenderNo))
-        create(:case_information, nomis_offender_id: offender_with_complexity_level_and_case_info.fetch(:offenderNo))
+        create(:case_information, offender: build(:offender, nomis_offender_id: offender_with_case_info_but_no_complexity_level.fetch(:offenderNo)))
+        create(:case_information, offender: build(:offender, nomis_offender_id: offender_with_complexity_level_and_case_info.fetch(:offenderNo)))
 
-        create(:case_information, nomis_offender_id: allocated_offender_one.fetch(:offenderNo))
+        create(:case_information, offender: build(:offender, nomis_offender_id: allocated_offender_one.fetch(:offenderNo)))
         create(:allocation, nomis_offender_id: allocated_offender_one.fetch(:offenderNo), prison: prison.code)
-        create(:case_information, nomis_offender_id: allocated_offender_two.fetch(:offenderNo))
+        create(:case_information, offender: build(:offender, nomis_offender_id: allocated_offender_two.fetch(:offenderNo)))
         create(:allocation, nomis_offender_id: allocated_offender_two.fetch(:offenderNo), prison: prison.code)
       end
 
@@ -159,10 +159,10 @@ RSpec.describe PrisonersController, type: :controller do
 
       describe 'unallocated' do
         before do
-          create(:case_information, tier: 'D', nomis_offender_id: offender_a.fetch(:offenderNo))
-          create(:case_information, tier: 'C', nomis_offender_id: offender_b.fetch(:offenderNo))
-          create(:case_information, tier: 'B', nomis_offender_id: offender_c.fetch(:offenderNo))
-          create(:case_information, tier: 'A', nomis_offender_id: offender_d.fetch(:offenderNo))
+          create(:case_information, tier: 'D', offender: build(:offender, nomis_offender_id: offender_a.fetch(:offenderNo)))
+          create(:case_information, tier: 'C', offender: build(:offender, nomis_offender_id: offender_b.fetch(:offenderNo)))
+          create(:case_information, tier: 'B', offender: build(:offender, nomis_offender_id: offender_c.fetch(:offenderNo)))
+          create(:case_information, tier: 'A', offender: build(:offender, nomis_offender_id: offender_d.fetch(:offenderNo)))
 
           allow(HmppsApi::ComplexityApi).to receive(:get_complexity).with(offender_a.fetch(:offenderNo)).and_return('medium')
           allow(HmppsApi::ComplexityApi).to receive(:get_complexity).with(offender_b.fetch(:offenderNo)).and_return('low')
@@ -226,13 +226,13 @@ RSpec.describe PrisonersController, type: :controller do
 
       describe 'allocated' do
         before do
-          create(:case_information, nomis_offender_id: offender_a.fetch(:offenderNo))
+          create(:case_information, offender: build(:offender, nomis_offender_id: offender_a.fetch(:offenderNo)))
           create(:allocation, primary_pom_name: pom_one.full_name,  nomis_offender_id: offender_a.fetch(:offenderNo), prison: prison.code)
-          create(:case_information, nomis_offender_id: offender_b.fetch(:offenderNo))
+          create(:case_information, offender: build(:offender, nomis_offender_id: offender_b.fetch(:offenderNo)))
           create(:allocation, primary_pom_name: pom_two.full_name,  nomis_offender_id: offender_b.fetch(:offenderNo), prison: prison.code)
-          create(:case_information, nomis_offender_id: offender_c.fetch(:offenderNo))
+          create(:case_information, offender: build(:offender, nomis_offender_id: offender_c.fetch(:offenderNo)))
           create(:allocation, primary_pom_name: pom_three.full_name, nomis_offender_id: offender_c.fetch(:offenderNo), prison: prison.code)
-          create(:case_information, nomis_offender_id: offender_d.fetch(:offenderNo))
+          create(:case_information, offender: build(:offender, nomis_offender_id: offender_d.fetch(:offenderNo)))
           create(:allocation, primary_pom_name: pom_four.full_name,  nomis_offender_id: offender_d.fetch(:offenderNo), prison: prison.code)
         end
 
@@ -303,7 +303,7 @@ RSpec.describe PrisonersController, type: :controller do
                                          sentenceStartDate: "2019-02-08",
                                          ))
         ]
-        create(:case_information, case_allocation: 'NPS', nomis_offender_id: 'G4234GG')
+        create(:case_information, case_allocation: 'NPS', offender: build(:offender, nomis_offender_id: 'G4234GG'))
 
         stub_offenders_for_prison(prison, offenders)
       end
@@ -420,7 +420,7 @@ RSpec.describe PrisonersController, type: :controller do
           offenders = [build(:nomis_offender, offenderNo: offender_id)]
           stub_offenders_for_prison(prison, offenders)
 
-          create(:case_information, nomis_offender_id: offender_id)
+          create(:case_information, offender: build(:offender, nomis_offender_id: offender_id))
           create(:allocation, nomis_offender_id: offender_id, primary_pom_nomis_id: 234, prison: prison)
 
           get :allocated, params: { prison_id: prison, sort: 'awaiting_allocation_for asc' }
@@ -450,7 +450,7 @@ RSpec.describe PrisonersController, type: :controller do
             to_return(body: [].to_json)
 
           offenders.each do |offender|
-            create(:case_information, nomis_offender_id: offender[:offenderNo])
+            create(:case_information, offender: build(:offender, nomis_offender_id: offender[:offenderNo]))
           end
         end
 
@@ -562,7 +562,7 @@ RSpec.describe PrisonersController, type: :controller do
 
           context 'with case information' do
             it 'does not show in new arrivals' do
-              create(:case_information, nomis_offender_id: 'A1111AA')
+              create(:case_information, offender: build(:offender, nomis_offender_id: 'A1111AA'))
 
               Timecop.travel(today) do
                 get :new_arrivals, params: { prison_id: prison }
@@ -677,7 +677,7 @@ RSpec.describe PrisonersController, type: :controller do
             stub_offenders_for_prison(prison, [first_offender] + offenders)
             PomDetail.create!(prison_code: prison, nomis_staff_id: nomis_staff_id, working_pattern: 1.0, status: 'active')
 
-            ([first_offender] + offenders).each { |o| create(:case_information, nomis_offender_id: o.fetch(:offenderNo)) }
+            ([first_offender] + offenders).each { |o| create(:case_information, offender: build(:offender, nomis_offender_id: o.fetch(:offenderNo))) }
             create(:allocation,
                    prison: prison,
                    nomis_offender_id: first_offender_no,

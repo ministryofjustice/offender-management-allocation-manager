@@ -6,6 +6,8 @@ class CaseInformation < ApplicationRecord
   NPS = 'NPS'
   CRC = 'CRC'
 
+  belongs_to :offender, primary_key: :nomis_offender_id, foreign_key: :nomis_offender_id, inverse_of: :case_information
+
   belongs_to :local_delivery_unit, optional: true
 
   has_many :early_allocations,

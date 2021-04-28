@@ -60,10 +60,16 @@ RSpec.describe Prison, type: :model do
       before do
         stub_auth_token
         stub_offenders_for_prison('LEI', offenders)
+        create(:offender, nomis_offender_id: offenders.first.fetch(:offenderNo))
       end
 
       it 'populates the recall flag' do
         expect(subject.map(&:recalled?)).to eq [true, true]
+      end
+
+      it 'creates the missing offender object' do
+        expect(subject.count).to eq(2)
+        expect(Offender.count).to eq(2)
       end
     end
 

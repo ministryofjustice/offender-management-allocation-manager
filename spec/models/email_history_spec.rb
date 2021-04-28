@@ -12,7 +12,7 @@ RSpec.describe EmailHistory, type: :model do
     let(:event) { EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION }
     let(:some_other_event) { EmailHistory::AUTO_EARLY_ALLOCATION }
 
-    let(:case_info) { create(:case_information, nomis_offender_id: offender.offender_no) }
+    let(:case_info) { create(:case_information, offender: build(:offender, nomis_offender_id: offender.offender_no)) }
 
     # An old email sent before the offender's current sentence
     let!(:old_email) {

@@ -107,7 +107,7 @@ RSpec.describe Allocation, type: :model do
       let(:offender) { build(:nomis_offender, offenderNo: nomis_offender_id) }
 
       it 'removes the primary pom details in an Offender\'s allocation' do
-        create(:case_information, nomis_offender_id: nomis_offender_id)
+        create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
 
         params = {
           nomis_offender_id: nomis_offender_id,
@@ -134,7 +134,7 @@ RSpec.describe Allocation, type: :model do
       end
 
       it 'when an offender is released from prison removes the primary pom details in an Offender\'s allocation' do
-        create(:case_information, nomis_offender_id: nomis_offender_id)
+        create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
 
         params = {
           nomis_offender_id: nomis_offender_id,

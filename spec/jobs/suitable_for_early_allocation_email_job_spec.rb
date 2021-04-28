@@ -15,7 +15,7 @@ RSpec.describe SuitableForEarlyAllocationEmailJob, type: :job do
   end
 
   before do
-    create(:case_information, nomis_offender_id: offender.offender_no)
+    create(:case_information, offender: build(:offender, nomis_offender_id: offender.offender_no))
     allow(OffenderService).to receive(:get_offender).and_return(offender)
   end
 

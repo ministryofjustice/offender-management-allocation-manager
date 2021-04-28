@@ -32,11 +32,11 @@ feature 'summary summary feature' do
 
       before do
         Timecop.travel Date.new(2019, 6, 20) do
-          create(:case_information, nomis_offender_id: first)
+          create(:case_information, offender: build(:offender, nomis_offender_id: first))
           create(:allocation, nomis_offender_id: first)
         end
         Timecop.travel Date.new(2019, 6, 30) do
-          create(:case_information, nomis_offender_id: last)
+          create(:case_information, offender: build(:offender, nomis_offender_id: last))
           create(:allocation, nomis_offender_id: last)
         end
       end

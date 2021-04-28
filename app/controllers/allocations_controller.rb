@@ -14,7 +14,8 @@ class AllocationsController < PrisonsApplicationController
     @allocation = Allocation.find_by nomis_offender_id: offender_id
     @previously_allocated_pom_ids =
       @allocation.present? ? @allocation.previously_allocated_poms : []
-    @case_info = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: offender_id)
+    offender = Offender.includes(case_information: :early_allocations).find_by(nomis_offender_id: offender_id)
+    @case_info = offender.case_information if offender.present?
     @emails_sent_to_ldu = EmailHistory.sent_within_current_sentence(@prisoner, EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION)
   end
 
@@ -35,7 +36,8 @@ class AllocationsController < PrisonsApplicationController
       end
     end
     @keyworker = HmppsApi::KeyworkerApi.get_keyworker(active_prison_id, @prisoner.offender_no)
-    @case_info = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: nomis_offender_id_from_url)
+    prisoner = Offender.includes(case_information: :early_allocations).find_by(nomis_offender_id: nomis_offender_id_from_url)
+    @case_info = prisoner.case_information if prisoner.present?
     @emails_sent_to_ldu = EmailHistory.sent_within_current_sentence(@prisoner, EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION)
   end
 
@@ -54,7 +56,7 @@ class AllocationsController < PrisonsApplicationController
     @unavailable_pom_count = unavailable_pom_count
 
     @current_pom = current_pom_for(nomis_offender_id_from_url)
-    @case_info = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: nomis_offender_id_from_url)
+    @case_info = Offender.includes(case_information: :early_allocations).find_by!(nomis_offender_id: nomis_offender_id_from_url).case_information
   end
 
   def confirm
@@ -116,7 +118,7 @@ class AllocationsController < PrisonsApplicationController
     complexity_history = [] if complexity_history.nil?
 
     @history = (allocation_history(allocation) + vlo_history + complexity_history).sort_by(&:created_at)
-    @early_allocations = CaseInformation.find_by!(nomis_offender_id: nomis_offender_id_from_url).early_allocations
+    @early_allocations = Offender.includes(case_information: :early_allocations).find_by!(nomis_offender_id: nomis_offender_id_from_url).case_information.early_allocations
     @email_histories = EmailHistory.in_offender_timeline.where(nomis_offender_id: nomis_offender_id_from_url)
 
     @pom_emails = AllocationService.allocation_history_pom_emails(allocation)

@@ -49,7 +49,7 @@ feature 'Case History' do
   let(:pontypool_ldu) {
     create(:local_delivery_unit, name: 'Pontypool LDU', email_address: 'pontypool-ldu@digital.justice.gov.uk')
   }
-  let(:ci) { create(:case_information, nomis_offender_id: nomis_offender.fetch(:offenderNo), local_delivery_unit: pontypool_ldu) }
+  let(:ci) { create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender.fetch(:offenderNo)), local_delivery_unit: pontypool_ldu) }
   let(:nomis_offender_id) { ci.nomis_offender_id }
   let!(:first_prison) { create(:prison) }
   let!(:second_prison) { create(:prison) }
@@ -428,7 +428,7 @@ feature 'Case History' do
     let(:prison) { create(:prison).code }
     let(:pom) { build(:pom) }
     let!(:case_info) {
-      create(:case_information, nomis_offender_id: nomis_offender_id)
+      create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
     }
     let!(:allocation) {
       create(:allocation, :primary, nomis_offender_id: nomis_offender_id, prison: prison,

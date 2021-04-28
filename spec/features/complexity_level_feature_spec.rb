@@ -12,7 +12,7 @@ feature 'complexity level feature' do
 
   before do
     create(:allocation, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: pom.staff_id,  prison: womens_prison.code)
-    create(:case_information, nomis_offender_id: offender.fetch(:offenderNo))
+    create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:offenderNo)))
 
     stub_offenders_for_prison(womens_prison.code, offenders)
     stub_signin_spo(spo, [womens_prison.code])

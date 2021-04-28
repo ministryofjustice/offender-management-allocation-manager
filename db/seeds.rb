@@ -49,66 +49,70 @@ ldu3 = LocalDeliveryUnit.find_or_create_by!(
 # The offenders below are those with release dates a few years in the future and can therefore use the
 # responsibility override workflow
 
-CaseInformation.find_or_create_by!(nomis_offender_id: 'G7658UL') do |info|
-  info.tier = 'A'
-  info.case_allocation = 'NPS'
-  info.manual_entry =  true
-  info.local_delivery_unit = ldu1
-  info.probation_service = "Wales"
+Offender.find_or_create_by!(nomis_offender_id: 'G7658UL') do |p|
+  p.build_case_information(
+    tier: 'A',
+    case_allocation: 'NPS',
+    manual_entry: true,
+    local_delivery_unit:ldu1,
+    probation_service: "Wales")
 end
 
-CaseInformation.find_or_create_by!(nomis_offender_id: 'G7517GF') do |info|
-  info.tier = 'B'
-  info.case_allocation = 'NPS'
-  info.manual_entry = true
-  info.local_delivery_unit = ldu2
-  info.probation_service = "Wales"
+Offender.find_or_create_by!(nomis_offender_id: 'G7517GF') do |p|
+  p.build_case_information(
+    tier: 'B',
+    case_allocation: 'NPS',
+    manual_entry:true,
+    local_delivery_unit:ldu2,
+    probation_service: "Wales")
 end
 
 # 3 Test offenders which have handovers in Dec 2020
 ['G1176UT', 'G0228VG', 'G1289UN'].each do |offender_no|
-  CaseInformation.find_or_create_by!(nomis_offender_id: offender_no) do |info|
-    info.assign_attributes(tier: 'B',
-                           case_allocation:'CRC',
-                           probation_service: 'Wales',
-                           manual_entry: true,
-                           local_delivery_unit: ldu2)
+  Offender.find_or_create_by!(nomis_offender_id: offender_no) do |p|
+    p.build_case_information(tier: 'B',
+                              case_allocation:'CRC',
+                              probation_service: 'Wales',
+                              manual_entry: true,
+                              local_delivery_unit: ldu2)
   end
 end
 
 # Test offenders which have handovers in Feb 2021
 ['G2407UH', 'G5884GU'].each do |offender_no|
-  CaseInformation.find_or_create_by!(nomis_offender_id: offender_no) do |info|
-    info.assign_attributes(tier: 'B',
-                           case_allocation:'NPS',
-                           probation_service: 'Wales',
-                           manual_entry: true,
-                           local_delivery_unit: ldu2)
+  Offender.find_or_create_by!(nomis_offender_id: offender_no) do |p|
+    p.build_case_information(tier: 'B',
+                              case_allocation:'NPS',
+                              probation_service: 'Wales',
+                              manual_entry: true,
+                              local_delivery_unit: ldu2)
   end
 end
 
 # test offender > 18 months before release (20/12/2023)
-CaseInformation.find_or_create_by!(nomis_offender_id: 'G7281UH') do |info|
-  info.assign_attributes(tier: 'B',
-                         case_allocation:'NPS',
-                         probation_service: 'Wales',
-                         manual_entry: true,
-                         local_delivery_unit: ldu2)
+Offender.find_or_create_by!(nomis_offender_id: 'G7281UH') do |p|
+  p.build_case_information(tier: 'B',
+                            case_allocation:'NPS',
+                            probation_service: 'Wales',
+                            manual_entry: true,
+                            local_delivery_unit: ldu2)
 end
 
-CaseInformation.find_or_create_by!(nomis_offender_id: 'G3536UF') do |info|
-  info.tier = 'A'
-  info.case_allocation = 'NPS'
-  info.manual_entry = true
-  info.local_delivery_unit = ldu2
-  info.probation_service = "England"
+Offender.find_or_create_by!(nomis_offender_id: 'G3536UF') do |p|
+  p.build_case_information(
+    tier:'A',
+    case_allocation: 'NPS',
+    manual_entry: true,
+    local_delivery_unit: ldu2,
+    probation_service: "England")
 end
 
-CaseInformation.find_or_create_by!(nomis_offender_id: 'G2260UO') do |info|
-  info.tier = 'B'
-  info.case_allocation = 'NPS'
-  info.manual_entry = true
-  info.local_delivery_unit = ldu3
-  info.probation_service = "England"
+Offender.find_or_create_by!(nomis_offender_id: 'G2260UO') do |p|
+  p.build_case_information(
+    tier: 'B',
+    case_allocation: 'NPS',
+    manual_entry: true,
+    local_delivery_unit: ldu3,
+    probation_service: "England")
 end
 
