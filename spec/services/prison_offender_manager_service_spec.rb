@@ -35,7 +35,7 @@ describe PrisonOffenderManagerService do
       it "raises an exception when fetching a pom if they are not a POM",
          vcr: { cassette_name: 'prison_api/pom_service_get_pom_none' } do
         expect {
-          described_class.get_pom_at('CFI', 1234)
+          described_class.get_pom_at(prison.code, 1234)
         }.to raise_exception(StandardError)
       end
     end

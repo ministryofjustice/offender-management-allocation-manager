@@ -15,5 +15,9 @@ module HmppsApi
       @status = payload['status']
       @thumbnail_id = payload['thumbnailId']
     end
+
+    def email_address
+      HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(@staff_id).first
+    end
   end
 end

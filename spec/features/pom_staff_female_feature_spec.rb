@@ -1,7 +1,7 @@
 require "rails_helper"
 
 feature "female estate POMs list" do
-  let(:female_prison) { 'LNI' }
+  let!(:female_prison) { create(:womens_prison).code }
   let(:staff_id) { 123456 }
   let(:spo) { build(:pom) }
   let(:probation_poms) { build_list(:pom, 5, :probation_officer) }

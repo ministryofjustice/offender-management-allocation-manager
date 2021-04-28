@@ -6,7 +6,7 @@ feature "early allocation", type: :feature do
   let(:nomis_staff_id) { 485_926 }
   # any date less than 3 months
   let(:valid_date) { Time.zone.today - 2.months }
-  let(:prison) { 'LEI' }
+  let!(:prison) { create(:prison).code }
   let(:username) { 'MOIC_POM' }
   let(:nomis_offender) { build(:nomis_offender, dateOfBirth: date_of_birth, sentence: attributes_for(:sentence_detail, conditionalReleaseDate: release_date)) }
   let(:nomis_offender_id) { nomis_offender.fetch(:offenderNo) }
@@ -29,7 +29,7 @@ feature "early allocation", type: :feature do
     stub_pom_emails(nomis_staff_id, [])
     stub_keyworker(prison, nomis_offender_id, build(:keyworker))
 
-    signin_pom_user
+    signin_pom_user([prison])
 
     visit prison_staff_caseload_path(prison, nomis_staff_id)
 

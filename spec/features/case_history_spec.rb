@@ -51,9 +51,9 @@ feature 'Case History' do
   }
   let(:ci) { create(:case_information, nomis_offender_id: nomis_offender.fetch(:offenderNo), local_delivery_unit: pontypool_ldu) }
   let(:nomis_offender_id) { ci.nomis_offender_id }
-  let(:first_prison) { build(:prison, code: 'LEI') }
-  let(:second_prison) { build(:prison, code: 'PVI') }
-  let(:open_prison) { build(:prison, code: PrisonService::PRESCOED_CODE) }
+  let!(:first_prison) { create(:prison) }
+  let!(:second_prison) { create(:prison) }
+  let!(:open_prison) { create(:prison, code: PrisonService::PRESCOED_CODE) }
 
   before do
     Timecop.travel DateTime.new 2021, 2, 28, 11, 25, 34
@@ -227,7 +227,7 @@ feature 'Case History' do
 
       it 'has a Pentonville section with 7 items' do
         within '.govuk-grid-row:nth-of-type(2)' do
-          expect(page).to have_css('.govuk-heading-m', text: "HMP Pentonville")
+          expect(page).to have_css('.govuk-heading-m', text: second_prison.name)
           expect(all('.moj-timeline__item').size).to eq(7)
         end
       end
@@ -325,7 +325,7 @@ feature 'Case History' do
                                   allocated_at_tier: 'A'
 
         within '.govuk-grid-row:nth-of-type(3)' do
-          expect(page).to have_css('.govuk-heading-m', text: "HMP Leeds")
+          expect(page).to have_css('.govuk-heading-m', text: first_prison.name)
           expect(all('.moj-timeline__item').size).to eq(5)
 
           within '.moj-timeline__item:nth-of-type(1)' do
@@ -425,7 +425,7 @@ feature 'Case History' do
 
     let(:nomis_offender) { build(:nomis_offender) }
     let(:nomis_offender_id) { nomis_offender.fetch(:offenderNo) }
-    let(:prison) { build(:prison).code }
+    let(:prison) { create(:prison).code }
     let(:pom) { build(:pom) }
     let!(:case_info) {
       create(:case_information, nomis_offender_id: nomis_offender_id)

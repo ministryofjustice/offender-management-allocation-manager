@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "allocations/index", type: :view do
-  let(:prison) { build(:prison) }
+  let(:prison) { create(:prison) }
   let(:page) { Nokogiri::HTML(rendered) }
   let(:case_type_badge) { page.css('#prisoner-case-type') }
   let(:recall_badge) { page.css('#recall-badge') }

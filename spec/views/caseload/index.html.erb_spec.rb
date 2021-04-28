@@ -29,7 +29,7 @@ RSpec.describe "caseload/index", type: :view do
         render
       end
 
-      let(:prison) { build(:prison) }
+      let(:prison) { create(:prison) }
 
       it 'displays caseload' do
         expect(page).to have_content 'Your caseload'
@@ -41,7 +41,7 @@ RSpec.describe "caseload/index", type: :view do
     end
 
     context 'with a female prison' do
-      let(:prison) { build(:womens_prison) }
+      let(:prison) { create(:womens_prison) }
 
       before do
         render
@@ -64,7 +64,7 @@ RSpec.describe "caseload/index", type: :view do
     end
 
     let(:offenders) { [] }
-    let(:prison) { build(:prison) }
+    let(:prison) { create(:prison) }
 
     it 'displays an empty page' do
       expect(page).to have_content 'No allocated cases'

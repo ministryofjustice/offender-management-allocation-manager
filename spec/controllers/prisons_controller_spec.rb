@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe PrisonsController, type: :controller do
   describe '#index' do
-    let(:prison) { 'LEI' }
+    let(:prison) { create(:prison).code }
 
     context 'when caseloads is not empty' do
       before do

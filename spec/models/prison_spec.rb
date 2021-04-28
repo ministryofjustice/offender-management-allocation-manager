@@ -10,30 +10,17 @@ RSpec.describe Prison, type: :model do
       create(:allocation, prison: p2.code)
     end
 
-    let(:p1) { build(:prison) }
-    let(:p2) { build(:prison) }
+    let(:p1) { create(:prison) }
+    let(:p2) { create(:prison) }
 
     it 'only lists prisons with allocations' do
       expect(described_class.active.map(&:code)).to match_array [p1, p2].map(&:code)
     end
   end
 
-  describe '#all' do
-    let(:p1) { build(:prison) }
-    let(:p2) { build(:womens_prison) }
-
-    it 'includes all male prisons' do
-      expect(described_class.all.map(&:code)).to include(p1.code)
-    end
-
-    it 'includes all womens prisons' do
-      expect(described_class.all.map(&:code)).to include(p2.code)
-    end
-  end
-
   describe '#womens?' do
     context 'with a male prison' do
-      let(:prison) { build(:prison) }
+      let(:prison) { create(:prison) }
 
       it 'is false' do
         expect(prison.womens?).to eq(false)
@@ -41,7 +28,7 @@ RSpec.describe Prison, type: :model do
     end
 
     context 'with a female prison' do
-      let(:prison) { build(:womens_prison) }
+      let(:prison) { create(:womens_prison) }
 
       it 'is true' do
         expect(prison.womens?).to eq(true)
@@ -50,7 +37,7 @@ RSpec.describe Prison, type: :model do
   end
 
   describe '#offenders' do
-    subject { described_class.new("LEI").offenders }
+    subject { described_class.find_by!(code: 'LEI').offenders }
 
     it "get first page of offenders for a specific prison",
        vcr: { cassette_name: 'prison_api/offender_service_offenders_by_prison_first_page_spec' } do
@@ -180,6 +167,44 @@ RSpec.describe Prison, type: :model do
 
       it 'fetches one page only' do
         expect(subject.count).to eq(200)
+      end
+    end
+
+    describe 'Validations' do
+      subject {
+        described_class.new(prison_type: 'mens_open',
+                            code: 'ACI',
+                            name: 'HMP Altcourse')
+      }
+
+      it "is not valid without a prison_type" do
+        subject.prison_type = nil
+        expect(subject).to be_invalid
+      end
+
+      it "is not valid without a code" do
+        subject.code = nil
+        expect(subject).to be_invalid
+      end
+
+      it 's code must be unique' do
+        described_class.create(prison_type: 'mens_open',
+                               code: 'ACI',
+                               name: 'HMP Altcourse')
+
+        expect(subject).to be_invalid
+      end
+
+      it 's name must be unique' do
+        described_class.create(prison_type: 'mens_open',
+                               code: 'AGI',
+                               name: 'HMP Altcourse')
+
+        expect(subject).to be_invalid
+      end
+
+      it "is valid when all values are present" do
+        expect(subject).to be_valid
       end
     end
   end

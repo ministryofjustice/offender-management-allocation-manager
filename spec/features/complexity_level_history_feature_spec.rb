@@ -32,7 +32,7 @@ feature 'Case history with complexity level' do
   let(:logged_in_user) { build(:pom) }
   let(:pom) { build(:pom) }
   let(:pom_name) { "#{pom.last_name}, #{pom.first_name}" }
-  let(:prison) { build(:womens_prison) }
+  let(:prison) { create(:womens_prison) }
   let(:prison_code) { prison.code }
   let(:case_info) { create(:case_information) }
   let(:offender_no) { case_info.nomis_offender_id }

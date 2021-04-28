@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe PomsController, type: :controller do
-  let(:prison) { build(:prison) }
+  let(:prison) { create(:prison) }
   let(:a_offenders) { build_list(:nomis_offender, 2) }
   let(:b_offenders) { build_list(:nomis_offender, 4) }
   let(:c_offenders) { build_list(:nomis_offender, 3) }

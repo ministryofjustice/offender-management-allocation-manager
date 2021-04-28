@@ -5,7 +5,7 @@ RSpec.describe OverridesController, :allocation, type: :controller do
     stub_sso_data(prison)
   end
 
-  let(:prison) { 'WEI' }
+  let(:prison) { create(:prison, code: 'WEI').code }
   let(:nomis_staff_id) { 'A12345' }
   let(:nomis_offender_id) { 'B44455' }
 

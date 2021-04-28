@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe DebuggingController, type: :controller do
-  let(:prison) { build(:prison) }
+  let(:prison) { create(:prison) }
   let(:prison_id) { prison.code }
 
   before do

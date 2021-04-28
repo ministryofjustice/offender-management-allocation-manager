@@ -18,7 +18,7 @@ feature 'admin urls' do
   #   end
   # end
 
-  let(:prison_code) { build(:prison).code }
+  let(:prison_code) { create(:prison).code }
   let(:admin_urls) {
     [
     '/admin', '/flip-flop-admin', '/sidekiq',
@@ -84,7 +84,7 @@ feature 'admin urls' do
 
     it 'displays the dashboard' do
       ci = create(:case_information)
-      create(:allocation, nomis_offender_id: ci.nomis_offender_id)
+      create(:allocation, prison: prison_code, nomis_offender_id: ci.nomis_offender_id)
 
       visit('/admin')
       expect(page).to have_http_status(:success)

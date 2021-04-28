@@ -13,7 +13,7 @@ class CommunityEarlyAllocationEmailJob < ApplicationJob
                                          prisoner_number: offender.offender_no,
                                          pom_name: allocation.primary_pom_name,
                                          pom_email: pom.email_address,
-                                         prison_name: PrisonService.name_for(prison),
+                                         prison_name: Prison.find(prison).name,
                                          pdf: pdf).deliver_now
     EmailHistory.create! nomis_offender_id: offender.offender_no,
                          name: offender.ldu_name,

@@ -33,7 +33,7 @@ class HandoverFollowUpJob < ApplicationJob
         offender_crn: offender.crn,
         sentence_type: offender_type,
         ldu_email: offender.ldu_email_address,
-        prison: PrisonService.name_for(offender.prison_id),
+        prison: Prison.find(offender.prison_id).name,
         start_date: offender.handover_start_date,
         responsibility_handover_date: offender.responsibility_handover_date,
         pom_name: pom_name,

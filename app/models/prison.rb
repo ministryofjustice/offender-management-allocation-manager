@@ -1,43 +1,28 @@
-# frozen_string_literal: true
+class Prison < ApplicationRecord
+  validates :prison_type, presence: true
+  validates :code, :name, presence: true, uniqueness: true
 
-class Prison
-  attr_reader :code
+  enum prison_type: { womens: 'womens', mens_open: 'mens_open', mens_closed: 'mens_closed' }
 
   class << self
     def active
-      PrisonEmumerator.new Allocation.distinct.pluck(:prison)
+      Prison.where(code: Allocation.distinct.pluck(:prison))
     end
-
-    def all
-      PrisonEmumerator.new PrisonService.prison_codes
-    end
-  end
-
-  def initialize(prison_code)
-    @code = prison_code
-  end
-
-  def womens?
-    PrisonService::womens_prison?(@code)
-  end
-
-  def name
-    PrisonService.name_for(@code)
   end
 
   def offenders
-    OffenderEnumerator.new(@code).select(&:inside_omic_policy?)
+    OffenderEnumerator.new(code).select(&:inside_omic_policy?)
   end
 
   def unfiltered_offenders
     # Returns all offenders at the provided prison, and does not
     # filter out under 18s or non-sentenced offenders in the same way
     # that get_offenders_for_prison does.
-    OffenderEnumerator.new(@code)
+    OffenderEnumerator.new(code)
   end
 
   def allocations
-    @allocations ||= Allocation.active_allocations_for_prison(@code).where(nomis_offender_id: offenders.map(&:offender_no))
+    @allocations ||= Allocation.active_allocations_for_prison(code).where(nomis_offender_id: offenders.map(&:offender_no))
   end
 
   Summary = Struct.new :allocated, :unallocated, :new_arrivals, :missing_info, keyword_init: true
@@ -70,18 +55,6 @@ class Prison
   end
 
 private
-
-  class PrisonEmumerator
-    include Enumerable
-
-    def initialize codes
-      @codes = codes
-    end
-
-    def each
-      @codes.each { |code| yield Prison.new(code) }
-    end
-  end
 
   class OffenderEnumerator
     include Enumerable

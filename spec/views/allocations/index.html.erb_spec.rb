@@ -7,7 +7,7 @@ RSpec.describe "allocations/index", type: :view do
   let(:offender) { build(:offender) }
 
   before do
-    assign(:prison, build(:prison))
+    assign(:prison, create(:prison))
     assign(:prisoner, offender)
     assign(:previously_allocated_pom_ids, [])
     assign(:recommended_poms, [])

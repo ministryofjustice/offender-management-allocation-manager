@@ -15,7 +15,7 @@ feature "female prison index page" do
   end
 
   let(:pom) { build(:pom) }
-  let(:prison) { build :womens_prison }
+  let(:prison) { create :womens_prison }
 
   let(:one_day_ago) { Time.zone.today - 1.day }
   let(:two_days_ago) { Time.zone.today - 2.days }

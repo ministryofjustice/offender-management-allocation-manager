@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe RecalculateHandoverDateJob, type: :job do
   let(:offender_no) { nomis_offender.fetch(:offenderNo) }
   let(:today) { Time.zone.now }
-  let(:prison) { build(:prison) }
+  let(:prison) { create(:prison) }
   let(:test_strategy) { Flipflop::FeatureSet.current.test! }
 
   before do

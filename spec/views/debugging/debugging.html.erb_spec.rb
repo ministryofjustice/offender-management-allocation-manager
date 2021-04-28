@@ -12,7 +12,7 @@ RSpec.describe "debugging/debugging", type: :view do
     }
   end
 
-  let(:prison) { build(:prison) }
+  let(:prison) { create(:prison) }
 
   let(:page) { Nokogiri::HTML(rendered) }
 

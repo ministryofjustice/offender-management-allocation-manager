@@ -14,10 +14,10 @@ RSpec.describe HandoverFollowUpJob, type: :job do
     let(:pom) { build(:pom) }
 
     # This prison is active because we give it an allocation in the `before` test setup block
-    let(:active_prison) { build(:prison) }
+    let(:active_prison) { create(:prison) }
 
     # This prison is inactive because we don't give it any allocations
-    let(:inactive_prison) { build(:prison) }
+    let(:inactive_prison) { create(:prison) }
 
     let(:case_info) { build(:case_information, nomis_offender_id: offender_no) }
 

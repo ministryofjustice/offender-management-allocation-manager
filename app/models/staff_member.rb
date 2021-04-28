@@ -4,7 +4,7 @@
 # and do something interesting if they are not a POM at a specific prison.
 class StaffMember
   # maybe this method shouldn't be here?
-  attr_reader :staff_id
+  attr_reader :staff_id, :prison
   delegate :position_description, :probation_officer?, :prison_officer?, to: :pom
   delegate :working_pattern, :status, to: :@pom_detail
 

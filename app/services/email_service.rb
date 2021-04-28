@@ -89,7 +89,7 @@ private
       }
       return nil if previous.blank?
 
-      StaffMember.new(Prison.new(previous.prison), previous.primary_pom_nomis_id)
+      HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(previous.primary_pom_nomis_id)
     end
   end
 
@@ -105,7 +105,7 @@ private
       new_pom_name: @pom.full_name,
       offender_name: @offender.full_name,
       offender_no: @offender.offender_no,
-      prison: PrisonService.name_for(@pom.agency_id),
+      prison: Prison.find(@pom.agency_id).name,
       url: url
     ).deliver_later
   end

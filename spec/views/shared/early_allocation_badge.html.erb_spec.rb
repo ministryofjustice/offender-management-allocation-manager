@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "prisoners/show", type: :view do
   describe 'early allocation badges' do
-    let(:prison) { build(:prison) }
+    let(:prison) { create(:prison) }
     let(:page) { Nokogiri::HTML(rendered) }
     let(:early_allocation_css) { page.css('#early-allocation-badge') }
     let(:early_allocation_badge) { early_allocation_css.first }

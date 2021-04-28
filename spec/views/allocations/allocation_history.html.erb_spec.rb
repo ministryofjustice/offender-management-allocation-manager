@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe "allocations/history", type: :view do
   let(:dummy_version) { Struct.new(:object_changes).new({ 'updated_at' => [now, now] }.to_yaml) }
   let(:page) { Nokogiri::HTML(rendered) }
-  let(:prison) { build(:prison) }
+  let(:prison) { create(:prison) }
   let(:offender) { build(:offender) }
   let(:now) { Time.zone.now }
 
@@ -213,8 +213,8 @@ RSpec.describe "allocations/history", type: :view do
         ])
       end
 
-      let(:prison_one) { build(:prison).code }
-      let(:prison_two) { build(:prison).code }
+      let(:prison_one) { create(:prison).code }
+      let(:prison_two) { create(:prison).code }
 
       it 'displays an allocation label in the allocation history' do
         render

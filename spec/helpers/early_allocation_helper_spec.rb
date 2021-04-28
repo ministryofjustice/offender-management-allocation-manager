@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe EarlyAllocationHelper, type: :helper do
   let(:early_allocations) { [] }
-  let(:prison) { build(:prison) }
+  let(:prison) { create(:prison) }
   let(:offender_sentence) { build(:sentence_detail) }
   let(:offender) { build(:offender, sentence: offender_sentence) }
   let(:nomis_offender_id) { offender.offender_no }

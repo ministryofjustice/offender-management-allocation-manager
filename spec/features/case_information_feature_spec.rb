@@ -4,7 +4,7 @@ require 'rails_helper'
 
 feature 'case information feature' do
   context 'when doing an allocate and save' do
-    let(:prison) { build(:prison) }
+    let(:prison) { create(:prison) }
     let(:offender) { build(:nomis_offender, agencyId: prison.code) }
     let(:spo) { build(:pom) }
 

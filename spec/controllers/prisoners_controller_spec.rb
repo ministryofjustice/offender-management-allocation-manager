@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe PrisonersController, type: :controller do
   context 'with a womens prison' do
-    let(:prison) { build :womens_prison }
+    let(:prison) { create(:womens_prison) }
 
     before do
       stub_offenders_for_prison(prison.code, offenders)
@@ -269,7 +269,7 @@ RSpec.describe PrisonersController, type: :controller do
   end
 
   context 'with a mens prison' do
-    let(:prison) { build(:prison).code }
+    let(:prison) { create(:prison).code }
 
     before { stub_sso_data(prison) }
 
@@ -405,7 +405,7 @@ RSpec.describe PrisonersController, type: :controller do
 
     context 'when sorting' do
       context 'with allocated offenders' do
-        let(:prison) { 'BXI' }
+        let(:prison) { create(:prison, code: 'BXI').code }
 
         it 'handles trying to sort by missing field for allocated offenders' do
           # Allocated offenders do have to have their prison_arrival_date even if they don't use it

@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe FemaleAllocationsController, type: :controller do
-  let(:prison) { build(:womens_prison) }
+  let(:prison) { create(:womens_prison) }
   let(:pom) { build(:pom) }
   let(:offender) { build(:nomis_offender) }
   let(:prisoner_id) { offender.fetch(:offenderNo) }
@@ -18,7 +18,7 @@ RSpec.describe FemaleAllocationsController, type: :controller do
   describe '#index' do
     before do
       create(:case_information, nomis_offender_id: prisoner_id)
-      a = create(:allocation, nomis_offender_id: prisoner_id, primary_pom_nomis_id: pom.staff_id)
+      a = create(:allocation, prison: prison.code, nomis_offender_id: prisoner_id, primary_pom_nomis_id: pom.staff_id)
       a.deallocate_offender_after_release
     end
 

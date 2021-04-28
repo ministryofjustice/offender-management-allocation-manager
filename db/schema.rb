@@ -161,6 +161,14 @@ ActiveRecord::Schema.define(version: 2021_05_21_122123) do
     t.index ["nomis_staff_id", "prison_code"], name: "index_pom_details_on_nomis_staff_id_and_prison_code", unique: true
   end
 
+  create_table "prisons", primary_key: "code", id: :string, force: :cascade do |t|
+    t.string "prison_type", null: false
+    t.string "name", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["name"], name: "index_prisons_on_name", unique: true
+  end
+
   create_table "responsibilities", force: :cascade do |t|
     t.string "nomis_offender_id", null: false
     t.integer "reason", null: false

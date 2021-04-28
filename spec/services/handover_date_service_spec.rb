@@ -15,7 +15,7 @@ describe HandoverDateService do
   let(:closed_prison) { 'LEI' } # HMP Leeds
   let(:prescoed_prison) { PrisonService::PRESCOED_CODE } # HMP Prescoed
   let(:open_prison) { 'HVI' } # HMP Haverigg
-  let(:womens_prison) { build(:womens_prison).code }
+  let(:womens_prison) { create(:womens_prison).code }
   let(:prescoed_policy_start_date) { Date.new(2020, 10, 19) } # 19th October 2020
   let(:open_policy_start_date) { Date.new(2021, 3, 31) } # 31st March 2021
   let(:womens_policy_start_date) { Date.parse('30th April 2021') }

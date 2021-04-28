@@ -66,7 +66,7 @@ RSpec.describe EmailService do
   let(:andrien) { build(:pom, staffId: 485_833) }
   let(:leigh) { build(:pom, staffId: 485_766) }
   let(:offender) { build(:nomis_offender, agencyId: prison_code, offenderNo: 'G2911GD') }
-  let(:prison) { build(:prison) }
+  let(:prison) { create(:prison) }
   let(:prison_code) { prison.code }
   let(:offender_name) { "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}" }
 

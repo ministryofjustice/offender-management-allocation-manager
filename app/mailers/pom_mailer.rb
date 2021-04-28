@@ -88,7 +88,7 @@ class PomMailer < GovukNotifyRails::Mailer
     set_template('651da525-7564-4f04-85ff-b0343fb7c47d')
     set_personalisation(
       email_subject: 'New Allocation',
-      prison: PrisonService.name_for(prison)
+      prison: Prison.find(prison).name
     )
 
     mail(to: ENV['SUPPORT_EMAIL'])

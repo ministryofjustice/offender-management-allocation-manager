@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe HandoversController, type: :controller do
-  let(:prison) { build(:prison).code }
+  let(:prison) { create(:prison).code }
 
   before { stub_sso_data(prison) }
 

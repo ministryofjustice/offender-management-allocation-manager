@@ -7,13 +7,14 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
   let!(:alloc) { create(:allocation, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: 485_926) }
   let(:year) { Time.zone.today.year + 1 }
   let(:yesterday) { Time.zone.yesterday }
+  let!(:prison) { 'LEI' }
 
   before do
     signin_spo_user
   end
 
   it 'updates the date',  vcr: { cassette_name: 'prison_api/change_parole_date' } do
-    path = prison_allocation_path('LEI', nomis_offender_id)
+    path = prison_allocation_path(prison, nomis_offender_id)
     visit path
 
     click_link 'Update'
@@ -29,7 +30,7 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
   end
 
   it 'bounces properly', vcr: { cassette_name: 'prison_api/change_parole_date_bounce' } do
-    visit prison_allocation_path('LEI', nomis_offender_id)
+    visit prison_allocation_path(prison, nomis_offender_id)
 
     click_link 'Update'
 
