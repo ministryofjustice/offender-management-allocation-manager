@@ -8,8 +8,7 @@ class PagesController < ApplicationController
       @user = HmppsApi::PrisonApi::UserApi.user_details(current_user)
       @contact = ContactSubmission.new(email_address: @user.email_address.first,
                                        name: @user.full_name_ordered,
-                                       prison: PrisonService.name_for(
-                                         @user.active_case_load_id)
+                                       prison: Prison.find(@user.active_case_load_id).name
       )
     else
       @contact = ContactSubmission.new

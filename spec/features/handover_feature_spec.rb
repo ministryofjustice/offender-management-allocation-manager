@@ -1,7 +1,7 @@
 require "rails_helper"
 
 feature "viewing upcoming handovers" do
-  let(:prison) { 'LEI' }
+  let!(:prison) { create(:prison).code }
   let(:user) { build(:pom) }
 
   context 'when signed in as an SPO' do
@@ -10,7 +10,7 @@ feature "viewing upcoming handovers" do
 
     before do
       # Stub auth
-      signin_spo_user
+      signin_spo_user([prison])
       stub_auth_token
       stub_user(staff_id: user.staff_id)
 
@@ -96,7 +96,7 @@ feature "viewing upcoming handovers" do
 
     context 'without the SPO role' do
       before do
-        signin_pom_user
+        signin_pom_user([prison])
         stub_poms(prison, [user])
       end
 
@@ -131,7 +131,7 @@ feature "viewing upcoming handovers" do
 
     context 'with the SPO role' do
       before do
-        signin_spo_user
+        signin_spo_user([prison])
         visit prison_handovers_path(prison)
       end
 

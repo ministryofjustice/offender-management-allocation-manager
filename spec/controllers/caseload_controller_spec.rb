@@ -69,7 +69,7 @@ RSpec.describe CaseloadController, type: :controller do
       end
 
       describe '#index' do
-        let(:prison) { build(:womens_prison) }
+        let(:prison) { create(:womens_prison) }
 
         it 'can sort by complexity' do
           get :index, params: { prison_id: prison.code, staff_id: staff_id, sort: 'complexity_level_number asc' }
@@ -86,7 +86,7 @@ RSpec.describe CaseloadController, type: :controller do
     end
 
     context 'when a mens prison' do
-      let(:prison) { build(:prison) }
+      let(:prison) { create(:prison) }
 
       describe '#index' do
         context 'when user is an SPO' do

@@ -1,9 +1,11 @@
 require 'rails_helper'
 
 feature 'Help' do
+  let!(:prison) { create(:prison) }
+
   context 'when accessing help page' do
     it 'provides a link to the help pages', vcr: { cassette_name: 'prison_api/help_link' } do
-      signin_spo_user
+      signin_spo_user([prison.code])
 
       visit '/'
       expect(page).to have_link('Help', href: '/help')

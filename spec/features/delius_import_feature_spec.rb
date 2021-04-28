@@ -4,7 +4,7 @@ require 'rails_helper'
 
 feature "Delius import feature", :disable_push_to_delius do
   let(:offender_no) {  offender.fetch(:offenderNo) }
-  let(:prison) { build(:prison).code }
+  let(:prison) { create(:prison).code }
   let(:offender) { build(:nomis_offender) }
   let(:pom) { build(:pom) }
 

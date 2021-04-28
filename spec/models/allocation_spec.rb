@@ -35,7 +35,7 @@ RSpec.describe Allocation, type: :model do
   end
 
   context 'with allocations' do
-    let(:prison) { build(:prison) }
+    let(:prison) { create(:prison) }
     let(:pom) { build(:pom, staffId: nomis_staff_id) }
 
     let!(:allocation) {
@@ -102,7 +102,7 @@ RSpec.describe Allocation, type: :model do
       end
 
       let(:nomis_offender_id) { 'G2911GD' }
-      let(:prison_code) { build(:prison).code }
+      let(:prison_code) { create(:prison).code }
       let(:poms) { [build(:pom, staffId: 485_833)] }
       let(:offender) { build(:nomis_offender, offenderNo: nomis_offender_id) }
 
@@ -249,7 +249,7 @@ RSpec.describe Allocation, type: :model do
   end
 
   describe 'automate pushing the primary pom to ndelius', :push_pom_to_delius do
-    let(:prison) { build(:prison).code }
+    let(:prison) { create(:prison).code }
 
     context 'when a new allocation is created and a POM is set' do
       before do

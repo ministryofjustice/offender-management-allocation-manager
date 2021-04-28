@@ -94,6 +94,11 @@ RSpec.configure do |config|
   # in VCR mode, allow HTTP connections to T3, but then
   # reset back to default afterwards
   config.around(:each, :vcr) do |example|
+    # VCR tests expect HMP Leeds prison to exist
+    unless Prison.where(code: 'LEI').exists?
+      create(:prison, code:'LEI')
+    end
+
     WebMock.allow_net_connect!
     example.run
     WebMock.disable_net_connect!(allow_localhost: true)

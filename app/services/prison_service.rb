@@ -126,6 +126,21 @@ class PrisonService
     PrisonInfo.new('WYI', 'HMP/YOI Wetherby', :england, :male)
   ].index_by(&:code).freeze
 
+  # Coverage is not used in real code only used in rake task import:prison
+  #:nocov:
+  def self.prison_type(prison)
+    if prison.gender == :male
+      if OPEN_PRISON_CODES.include?(prison.code)
+        'mens_open'
+      else
+        'mens_closed'
+      end
+    else
+      'womens'
+    end
+  end
+  #:nocov:
+
   PRESCOED_CODE = 'UPI'
 
   PRIVATE_ENGLISH_PRISON_CODES = %w[ACI ASI DNI DGI FBI LGI OWI NLI PBI RHI TSI].freeze
@@ -136,6 +151,8 @@ class PrisonService
 
   WOMENS_PRISON_CODES = PRISONS.values.select { |p| p.gender == :female }.map(&:code).freeze
 
+  # This method is needed for email history.
+  # Once allocation history/audit log has been refactored this won't be needed
   def self.prison_codes
     PRISONS.keys
   end
@@ -160,20 +177,8 @@ class PrisonService
     PRISONS[code]&.gender == :female
   end
 
+  # Deprecated because we have a proper model. Use @prison.name instead
   def self.name_for(code)
     PRISONS[code]&.name
-  end
-
-  def self.country_for(code)
-    PRISONS[code]&.country
-  end
-
-  def self.exists?(code)
-    PRISONS.key? code
-  end
-
-  def self.prisons_from_list(codelist)
-    prisons = codelist.index_with { |code| PRISONS[code]&.name }
-    prisons.compact.sort_by { |_code, prison| prison }.to_h
   end
 end

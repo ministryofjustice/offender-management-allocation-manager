@@ -12,7 +12,7 @@ RSpec.describe AllocationsController, type: :controller do
     ]
   }
   let(:pom_without_emails) { poms.first }
-  let(:prison) { build(:prison).code }
+  let(:prison) { create(:prison).code }
   let(:offender) { build(:nomis_offender) }
   let(:offender_no) { offender.fetch(:offenderNo) }
 

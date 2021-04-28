@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe StaffMember, type: :model do
-  let(:prison) { Prison.new('LEI') }
+  let(:prison) { Prison.new(code: 'LEI') }
   let(:staff_id) { 123 }
   let(:user) { described_class.new(prison, staff_id) }
   let(:offenders) {
@@ -112,7 +112,7 @@ RSpec.describe StaffMember, type: :model do
   end
 
   describe '#full_name', vcr: { cassette_name: 'prison_api/staff_member_things' } do
-    let(:pom) { described_class.new(build(:prison), 485_846) }
+    let(:pom) { described_class.new(create(:prison), 485_846) }
 
     it 'gets the full name' do
       expect(pom.full_name).to eq('Dicks, Stephen')

@@ -18,7 +18,7 @@ class DebuggingController < PrisonsApplicationController
   end
 
   def prison_info
-    @prison_title = PrisonService.name_for(active_prison_id)
+    @prison_title = @prison.name
 
     @summary = @prison.summary
     @filtered_offenders_count = [

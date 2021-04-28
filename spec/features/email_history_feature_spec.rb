@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 feature 'email history' do
-  let(:prison) { build(:prison) }
+  let(:prison) { create(:prison) }
   let(:user) { build(:pom) }
 
   context 'when offender has less than 10 months left to serve' do
@@ -28,7 +28,7 @@ feature 'email history' do
         RecalculateHandoverDateJob.perform_now(offender_no)
       }.to change(EmailHistory, :count).by(1)
 
-      stub_signin_spo user, [prison.code]
+      stub_signin_spo(user, [prison.code])
     end
 
     it 'does not display recalculate history records' do

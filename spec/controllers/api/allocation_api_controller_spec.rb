@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
   describe '#show' do
     let(:rsa_private) { OpenSSL::PKey::RSA.generate 2048 }
-    let(:prison) { build(:prison) }
+    let(:prison) { create(:prison) }
     let!(:co_working_allocation) {
       create(:allocation, :co_working, primary_pom_nomis_id: primary_pom.staff_id,
                                           secondary_pom_nomis_id: secondary_pom.staff_id, nomis_offender_id: offender.fetch(:offenderNo))
@@ -42,7 +42,7 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
         let(:offender) { build(:nomis_offender, agencyId: prison.code,  sentence: attributes_for(:sentence_detail, :unsentenced)) }
 
         it 'does not return a poms allocation details' do
-          create(:allocation, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: primary_pom.staffId, secondary_pom_nomis_id: secondary_pom.staffId)
+          create(:allocation, prison: prison.code, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: primary_pom.staffId, secondary_pom_nomis_id: secondary_pom.staffId)
           get :show, params: { prison_id: prison.code, offender_no: offender.fetch(:offenderNo) }
 
           expect(response).to have_http_status(404)

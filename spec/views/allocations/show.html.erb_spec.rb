@@ -7,7 +7,7 @@ RSpec.describe "allocations/show", type: :view do
   let(:offender) { build(:offender) }
 
   before do
-    assign(:prison, build(:prison))
+    assign(:prison, create(:prison))
     assign(:pom, build(:pom))
     assign(:prisoner, offender)
     assign(:allocation, create(:allocation))

@@ -19,7 +19,7 @@ feature 'Co-working' do
       email: 'ommiicc@digital.justice.gov.uk'
     }
   end
-  let(:prison) { build(:prison) }
+  let(:prison) { create(:prison) }
   let(:poms) {
     [
       build(:pom, staffId: 485_926, firstName: 'MOIC', lastName: 'POM', emails: ['pom@digital.justice.gov.uk']),

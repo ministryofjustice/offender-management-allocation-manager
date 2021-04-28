@@ -29,14 +29,14 @@ private
   end
 
   def check_prison_access
-    unless PrisonService.exists?(active_prison_id)
+    unless Prison.exists?(code: active_prison_id)
       redirect_to('/401')
       return
     end
 
     return redirect_to('/401') if caseloads.nil? || !caseloads.include?(active_prison_id)
 
-    @prison = Prison.new(active_prison_id)
+    @prison = Prison.find(active_prison_id)
     @caseloads = caseloads
   end
 

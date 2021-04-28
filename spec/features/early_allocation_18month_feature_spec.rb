@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 feature 'early allocation when crossing 18 month threshold' do
-  let(:prison) { build(:prison) }
+  let(:prison) { create(:prison) }
   let(:user) { build(:pom) }
 
   context 'when early allocation prisoner transitions from > 18 months to < 18 months from release' do

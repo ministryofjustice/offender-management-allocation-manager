@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe ComplexityLevelsController, type: :controller do
   let(:offender) { build(:nomis_offender, complexityLevel: 'medium', agencyId: womens_prison.code, firstName: 'Sally', lastName: 'Albright') }
-  let(:womens_prison) { build(:womens_prison) }
+  let(:womens_prison) { create(:womens_prison) }
   let(:offenders) { [offender] }
   let(:pom) { build(:pom) }
   let(:spo) { build(:pom) }

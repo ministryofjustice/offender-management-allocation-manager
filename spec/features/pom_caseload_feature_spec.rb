@@ -107,7 +107,7 @@ feature "view POM's caseload" do
   end
 
   context 'when in a womens prison' do
-    let(:prison) { build(:womens_prison) }
+    let(:prison) { create(:womens_prison) }
     let(:complexities) { ['high', 'medium', 'low'].cycle.take(offenders.size) }
 
     before do
@@ -126,7 +126,7 @@ feature "view POM's caseload" do
   end
 
   context 'when in a mens prison' do
-    let(:prison) { build(:prison) }
+    let(:prison) { create(:prison) }
 
     before do
       visit prison_staff_caseload_path(prison.code, nomis_staff_id)

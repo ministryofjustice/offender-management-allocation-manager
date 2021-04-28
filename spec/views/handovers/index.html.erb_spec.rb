@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe "handovers/index", type: :view do
   before do
-    assign(:prison, build(:prison))
+    assign(:prison, create(:prison))
     assign(:staff_id, pom.staff_id)
     assign(:summary, double(handovers_total: 0))
     assign(:offenders,

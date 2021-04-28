@@ -15,7 +15,7 @@ feature 'male prisoners summary navigation tabs' do
   end
 
   let(:pom) { build(:pom) }
-  let(:prison) { build :prison }
+  let(:prison) { create(:prison) }
 
   let(:today) { Time.zone.today }
   let(:one_day_ago) { Time.zone.today - 1.day }

@@ -1,42 +1,25 @@
-# Jay Heal
-PomDetail.find_or_create_by!(
-           prison_code: 'LEI',
-  nomis_staff_id: 485_833,
-  status: 'active',
-  working_pattern: 1
-)
+# This mock/test data (prisons + LDUs) is for developers only - so that they have data to fall back on if they run db:reset
+# It should not be run in production only in development environment and Heroku
 
-# Moic POM
-PomDetail.find_or_create_by!(
-  prison_code: 'LEI',
-  nomis_staff_id: 485_926,
-  status: 'active',
-  working_pattern: 0.2
-)
+Prison.find_or_create_by!(
+  prison_type: 'womens',
+  code: 'BZI',
+  name: 'HMP Bronzefield',
 
-# Dom Bull
-PomDetail.find_or_create_by!(
-  prison_code: 'LEI',
-  nomis_staff_id: 485_572,
-  status: 'active',
-  working_pattern: 1
-)
+                          )
+Prison.find_or_create_by!(
+  prison_type: 'mens_closed',
+  code: 'LEI',
+  name: 'HMP Leeds',
 
-# Kath Pobee-Norris
-PomDetail.find_or_create_by!(
-  prison_code: 'LEI',
-  nomis_staff_id: 485_637,
-  status: 'active',
-  working_pattern: 0.4
-)
+  )
 
-# Andrien Ricketts
-PomDetail.find_or_create_by!(
-  prison_code: 'LEI',
-  nomis_staff_id: 485_833,
-  status: 'active',
-  working_pattern: 1
-)
+Prison.find_or_create_by!(
+  prison_type: 'mens_open',
+  code: 'HDI',
+  name: 'HMP/YOI Hatfield',
+
+  )
 
 ldu1 = LocalDeliveryUnit.find_or_create_by!(
   code: 'WELDU',
@@ -128,3 +111,4 @@ CaseInformation.find_or_create_by!(nomis_offender_id: 'G2260UO') do |info|
   info.local_delivery_unit = ldu3
   info.probation_service = "England"
 end
+

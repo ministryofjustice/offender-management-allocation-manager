@@ -16,7 +16,7 @@ RSpec.describe CommunityMailer, type: :mailer do
       offender_crn: offender.crn,
       sentence_type: 'Determinate',
       ldu_email: offender.ldu_email_address,
-      prison: PrisonService.name_for('LEI'),
+      prison: Faker.name,
       start_date: 'Mon, 13 June 2024',
       responsibility_handover_date: 'Wed, 15 Aug 2024',
       pom_name: "Richards, Ursula",
@@ -103,7 +103,7 @@ RSpec.describe CommunityMailer, type: :mailer do
         prisoner_name: offender.full_name,
         prisoner_crn: offender.crn,
         ldu_email: offender.ldu_email_address,
-        prison_name: PrisonService.name_for(PrisonService::PRESCOED_CODE)
+        prison_name: Faker.name
       }
     end
 

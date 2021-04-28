@@ -34,7 +34,7 @@ class ResponsibilitiesController < PrisonsApplicationController
         message: params[:message],
         prisoner_number: @responsibility.nomis_offender_id,
         prisoner_name: @offender.full_name,
-        prison_name: PrisonService.name_for(@prison.code),
+        prison_name: @prison.name,
         email: email
       ).deliver_later
     end

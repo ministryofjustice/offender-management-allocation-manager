@@ -9,7 +9,7 @@ namespace :fix_data do
 
     prisons.each { |prison|
       puts "Attempting to process #{prison}"
-      if PrisonService.name_for(prison).nil?
+      if Prison.find_by(code: prison).nil?
         puts "Unable to find prison #{prison}"
         next
       end

@@ -79,7 +79,7 @@ describe AllocationService do
         stub_poms prison_code, [pom]
       end
 
-      let(:prison_code) { build(:prison).code }
+      let(:prison_code) { create(:prison).code }
       let(:pom) { build(:pom, staffId: 485_833) }
 
       it 'can create a new record' do

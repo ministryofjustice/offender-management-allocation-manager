@@ -28,7 +28,7 @@ feature 'Search for offenders' do
   end
 
   context "with female prison" do
-    let(:prison) { build(:womens_prison) }
+    let(:prison) { create(:womens_prison) }
     let(:prison_code) { prison.code }
     let(:offenders) { build_list(:nomis_offender, 5, agencyId: prison.code, complexityLevel: 'high') }
     let(:pom) { build(:pom) }

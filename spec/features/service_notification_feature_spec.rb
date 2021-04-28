@@ -1,8 +1,10 @@
 require 'rails_helper'
 
 feature 'Service Notification' do
+  let!(:prison) { create(:prison) }
+
   before do
-    signin_spo_user
+    signin_spo_user([prison.code])
   end
 
   it 'does not display service notification if none exist',

@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe DashboardController, type: :controller do
-  let(:prison) { build(:prison).code }
+  let(:prison) { create(:prison).code }
   let(:poms) {
     [
       build(:pom,

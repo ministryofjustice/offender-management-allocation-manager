@@ -8,7 +8,7 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
   let(:s1_boolean_param_names) { [:convicted_under_terrorisom_act_2000, :high_profile, :serious_crime_prevention_order, :mappa_level_3, :cppc_case] }
   let(:s1_boolean_params) { s1_boolean_param_names.index_with { 'false' } }
 
-  let(:prison) { build(:prison).code }
+  let!(:prison) { create(:prison).code }
   let(:first_pom) { build(:pom) }
   let(:nomis_staff_id) { first_pom.staffId }
 

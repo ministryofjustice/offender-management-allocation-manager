@@ -5,7 +5,7 @@
 <% allocation_list(@history, @early_allocations, @email_histories).each do |prison, case_histories| %>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column">
-      <h2 class="govuk-heading-m"><%= prison_title(prison) %></h2>
+      <h2 class="govuk-heading-m"><%= PrisonService.name_for(prison) %></h2>
       <div class="moj-timeline">
         <%= render case_histories %>
       </div>

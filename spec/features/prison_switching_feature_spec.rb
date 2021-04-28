@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 feature 'Switching prisons' do
+  before do
+    create(:prison, code: 'RSI')
+  end
+
   it 'Shows the switcher if the user has more than one prison',
      vcr: { cassette_name: 'prison_api/prison_switching_feature_many_prisons_spec' } do
     signin_spo_user(['LEI', 'RSI'])

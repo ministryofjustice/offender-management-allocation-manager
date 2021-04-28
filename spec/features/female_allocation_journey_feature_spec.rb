@@ -3,7 +3,7 @@
 require "rails_helper"
 
 feature "womens allocation journey" do
-  let(:prison) { build(:womens_prison) }
+  let(:prison) { create(:womens_prison) }
   let(:offenders) { build_list(:nomis_offender, 5, agencyId: 'BZI', complexityLevel: 'high') }
   let(:offender) { build(:nomis_offender, :determinate_release_in_three_years, agencyId: 'BZI') }
   let(:nomis_offender_id) { offender.fetch(:offenderNo) }

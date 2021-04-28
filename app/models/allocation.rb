@@ -125,14 +125,14 @@ class Allocation < ApplicationRecord
 private
 
   def deallocate_offender event:, event_trigger:
-    primary_pom = StaffMember.new Prison.new(prison), primary_pom_nomis_id
+    primary_pom = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(primary_pom_nomis_id)
     offender = OffenderService.get_offender(nomis_offender_id)
     mail_params = {
         email: primary_pom.email_address,
-        pom_name: primary_pom.first_name,
+        pom_name: primary_pom.first_name.titleize,
         offender_name: offender.full_name,
         nomis_offender_id: nomis_offender_id,
-        prison_name: PrisonService.name_for(prison),
+        prison_name: Prison.find(prison).name,
         url: Rails.application.routes.default_url_options[:host] +
             Rails.application.routes.url_helpers.prison_staff_caseload_path(prison, primary_pom_nomis_id)
     }

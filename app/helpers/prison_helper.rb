@@ -5,10 +5,6 @@ module PrisonHelper
     caseloads.present? && caseloads.count > 1
   end
 
-  def prison_title(prison)
-    PrisonService.name_for(prison)
-  end
-
   def prison_switcher_path(prison, path)
     # They may be no referrer - go to dashboard
     if path.present? && path != '/'

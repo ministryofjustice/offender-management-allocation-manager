@@ -8,8 +8,10 @@ feature 'summary summary feature' do
   end
 
   describe 'awaiting summary table' do
+    let(:prison) { 'LEI' }
+
     it 'displays offenders awaiting information', vcr: { cassette_name: 'prison_api/awaiting_information_feature' } do
-      visit missing_information_prison_prisoners_path('LEI')
+      visit missing_information_prison_prisoners_path(prison)
 
       expect(page).to have_css('.moj-sub-navigation__item')
       expect(page).to have_content('Add missing information')
@@ -17,7 +19,7 @@ feature 'summary summary feature' do
     end
 
     it 'displays offenders pending allocation', vcr: { cassette_name: 'prison_api/awaiting_allocation_feature' } do
-      visit unallocated_prison_prisoners_path('LEI')
+      visit unallocated_prison_prisoners_path(prison)
 
       expect(page).to have_css('.moj-sub-navigation__item')
       expect(page).to have_content('Add missing information')
@@ -26,6 +28,7 @@ feature 'summary summary feature' do
     context 'with allocations' do
       let(:first) { 'G7806VO' }
       let(:last) { 'G3462VT' }
+      let(:prison) { 'LEI' }
 
       before do
         Timecop.travel Date.new(2019, 6, 20) do
@@ -39,7 +42,7 @@ feature 'summary summary feature' do
       end
 
       it 'displays offenders already allocated', vcr: { cassette_name: 'prison_api/allocated_offenders_feature' } do
-        visit allocated_prison_prisoners_path('LEI')
+        visit allocated_prison_prisoners_path(prison)
         expect(page).to have_css('.moj-sub-navigation__item')
         expect(page).to have_content('See allocations')
         # forward sort
@@ -58,14 +61,14 @@ feature 'summary summary feature' do
     end
 
     it 'displays offenders just arrived allocated', vcr: { cassette_name: 'prison_api/new_offenders_feature' } do
-      visit new_arrivals_prison_prisoners_path('LEI')
+      visit new_arrivals_prison_prisoners_path(prison)
 
       expect(page).to have_css('.moj-sub-navigation__item')
       expect(page).to have_content('Newly arrived')
     end
 
     it 'displays offenders approaching their handover date', vcr: { cassette_name: 'prison_api/approaching_handover_feature' } do
-      visit prison_handovers_path('LEI')
+      visit prison_handovers_path(prison)
 
       expect(page).to have_css('.moj-sub-navigation__item')
       expect(page).to have_content('Case handover status')
