@@ -45,8 +45,6 @@ class CaseInformation < ApplicationRecord
            inverse_of: :case_information,
            dependent: :destroy
 
-  before_validation :set_welsh_offender
-
   def nps?
     case_allocation == NPS
   end
@@ -95,10 +93,4 @@ class CaseInformation < ApplicationRecord
     allow_nil: false,
     message: 'Select yes if the prisoner’s last known address was in Wales'
   }
-
-private
-
-  def set_welsh_offender
-    self.welsh_offender = (probation_service == 'Wales') ? 'Yes' : 'No'
-  end
 end
