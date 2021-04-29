@@ -2,12 +2,12 @@
 
 <h1 class="govuk-heading-l"><%= @prisoner.full_name %></h1>
 
-<% allocation_list(@history, @early_allocations, @email_histories).each do |prison, allocations| %>
+<% allocation_list(@history, @early_allocations, @email_histories).each do |prison, case_histories| %>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column">
       <h2 class="govuk-heading-m"><%= prison_title(prison) %></h2>
       <div class="moj-timeline">
-        <%= render allocations, allocations: allocations %>
+        <%= render case_histories %>
       </div>
     </div>
   </div>

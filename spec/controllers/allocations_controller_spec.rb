@@ -201,7 +201,7 @@ RSpec.describe AllocationsController, type: :controller do
             get :history, params: { prison_id: prison, nomis_offender_id: offender_no }
             allocation_list = assigns(:history)
 
-            expect(allocation_list.map { |item| [item.prison, item.event] }).to eq([['PVI', 'allocate_primary_pom'], ['LEI', 'reallocate_primary_pom']])
+            expect(allocation_list.map { |item| [item.prison, item.event] }).to eq([['PVI', 'allocate_primary_pom'], ['LEI', 'allocate_primary_pom']])
           end
         end
       end

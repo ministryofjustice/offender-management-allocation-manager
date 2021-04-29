@@ -149,35 +149,6 @@ describe AllocationService do
     end
   end
 
-  describe '#previously_allocated_poms' do
-    it "Can get previous poms for an offender where there are none", vcr: { cassette_name: 'prison_api/allocation_service_previous_allocations_none' } do
-      staff_ids = described_class.previously_allocated_poms('GDF7657')
-
-      expect(staff_ids).to eq([])
-    end
-
-    it "Can get previous poms for an offender where there are some", vcr: { cassette_name: 'prison_api/allocation_service_previous_allocations' } do
-      nomis_offender_id = 'GHF1234'
-      previous_primary_pom_nomis_id = 345_567
-      updated_primary_pom_nomis_id = 485_926
-
-      allocation = create(
-        :allocation,
-        nomis_offender_id: nomis_offender_id,
-        primary_pom_nomis_id: previous_primary_pom_nomis_id)
-
-      allocation.update!(
-        primary_pom_nomis_id: updated_primary_pom_nomis_id,
-        event: Allocation::REALLOCATE_PRIMARY_POM
-      )
-
-      staff_ids = described_class.previously_allocated_poms(nomis_offender_id)
-
-      expect(staff_ids.count).to eq(1)
-      expect(staff_ids.first).to eq(previous_primary_pom_nomis_id)
-    end
-  end
-
   it 'can get the current allocated primary POM', vcr: { cassette_name: 'prison_api/current_allocated_primary_pom' }  do
     previous_primary_pom_nomis_id = 485_637
     updated_primary_pom_nomis_id = 485_926

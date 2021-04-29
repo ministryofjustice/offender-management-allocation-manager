@@ -12,7 +12,7 @@ class FemaleAllocationsController < PrisonsApplicationController
     @case_info = CaseInformation.find_by!(nomis_offender_id: nomis_offender_id_from_url)
     previous_allocation = Allocation.find_by nomis_offender_id: nomis_offender_id_from_url
     previous_pom_ids = if previous_allocation
-                         previous_allocation.history.map { |h| [h.primary_pom_nomis_id, h.secondary_pom_nomis_id] }.flatten.compact.uniq
+                         previous_allocation.previously_allocated_poms
                        else
                          []
                        end
