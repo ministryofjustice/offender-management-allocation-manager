@@ -258,6 +258,29 @@ RSpec.describe Allocation, type: :model do
         expect(described_class.active_pom_allocations(nomis_staff_id, allocation.prison)).to match_array [secondary_allocation, allocation]
       end
     end
+
+    describe '#previously_allocated_poms' do
+      it "Can get previous poms for an offender where there are some" do
+        nomis_offender_id = 'GHF1234'
+        previous_primary_pom_nomis_id = 345_567
+        updated_primary_pom_nomis_id = 485_926
+
+        allocation = create(
+          :allocation,
+          nomis_offender_id: nomis_offender_id,
+          primary_pom_nomis_id: previous_primary_pom_nomis_id)
+
+        allocation.update!(
+          primary_pom_nomis_id: updated_primary_pom_nomis_id,
+          event: Allocation::REALLOCATE_PRIMARY_POM
+        )
+
+        staff_ids = allocation.previously_allocated_poms
+
+        expect(staff_ids.count).to eq(1)
+        expect(staff_ids.first).to eq(previous_primary_pom_nomis_id)
+      end
+    end
   end
 
   describe 'automate pushing the primary pom to ndelius', :push_pom_to_delius do

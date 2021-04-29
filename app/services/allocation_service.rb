@@ -75,14 +75,6 @@ class AllocationService
     }
   end
 
-  def self.previously_allocated_poms(nomis_offender_id)
-    allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id)
-
-    return [] if allocation.nil?
-
-    allocation.get_old_versions.map(&:primary_pom_nomis_id)
-  end
-
   def self.allocation_history_pom_emails(allocation)
     history = allocation.get_old_versions.append(allocation)
     pom_ids = history.map { |h| [h.primary_pom_nomis_id, h.secondary_pom_nomis_id] }.flatten.compact.uniq

@@ -176,10 +176,16 @@ RSpec.describe "allocations/history", type: :view do
 
     context 'when allocator completes an override against the recommendation (allocation)' do
       before do
-        assign(:history, [
+        old_versions =
+          [
             build(:allocation, override_reasons: ["suitability"], suitability_detail: "Too high risk"),
             build(:allocation, override_reasons: ["suitability"], event: Allocation::REALLOCATE_PRIMARY_POM, suitability_detail: "Continuity")
-        ].map { |ah| AllocationHistory.new(ah, dummy_version) })
+          ]
+
+        assign(:history, [
+          CaseHistory.new(nil, old_versions[0], dummy_version),
+          CaseHistory.new(old_versions[0], old_versions[1], dummy_version),
+        ])
       end
 
       it 'shows a reason why in the allocation history' do
@@ -193,11 +199,18 @@ RSpec.describe "allocations/history", type: :view do
     # cannot easily be altered so to get around this it has been modified at the view level.
     context 'when a prisoner has moved to another prison' do
       before do
-        assign(:history, [
+        old_versions =
+          [
             build(:allocation, :primary, prison: prison_one),
             build(:allocation, :transfer, prison: prison_one),
             build(:allocation, :reallocation, :override, prison: prison_two)
-        ].map { |ah| AllocationHistory.new(ah, dummy_version) })
+          ]
+
+        assign(:history, [
+          CaseHistory.new(nil, old_versions[0], dummy_version),
+          CaseHistory.new(old_versions[0], old_versions[1], dummy_version),
+          CaseHistory.new(old_versions[1], old_versions[2], dummy_version),
+        ])
       end
 
       let(:prison_one) { build(:prison).code }
@@ -213,7 +226,7 @@ RSpec.describe "allocations/history", type: :view do
       before do
         assign(:history, [build(:allocation, :primary),
                           build(:allocation, :release)].
-            map { |ah| AllocationHistory.new(ah, released_version) })
+            map { |ah| CaseHistory.new(nil, ah, released_version) })
       end
 
       let(:released_version) { Struct.new(:object_changes).new({ 'updated_at' => [release_date_and_time, release_date_and_time] }.to_yaml) }

@@ -84,12 +84,8 @@ class Allocation < ApplicationRecord
     versions.map(&:reify).compact
   end
 
-  # Gets the versions in *forward* order - so often we want to reverse
-  # this list as we're interested in recent rather than ancient history
-  def history
-    get_old_versions.append(self).zip(versions).map do |alloc, raw_version|
-      AllocationHistory.new(alloc, raw_version)
-    end
+  def previously_allocated_poms
+    get_old_versions.map { |h| [h.primary_pom_nomis_id, h.secondary_pom_nomis_id] }.flatten.compact.uniq
   end
 
   # note: this creates an allocation where the co-working POM is set, but the primary

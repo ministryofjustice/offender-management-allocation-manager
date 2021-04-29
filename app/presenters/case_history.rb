@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
-class AllocationHistory
-  delegate :primary_pom_nomis_id, :event, :event_trigger, :secondary_pom_nomis_id, :prison,
+class CaseHistory
+  delegate :primary_pom_nomis_id, :event_trigger, :secondary_pom_nomis_id, :prison,
            :allocated_at_tier, :nomis_offender_id, :primary_pom_name, :override_reasons, :suitability_detail,
            :override_detail,
            :created_by_name, :recommended_pom_type, :secondary_pom_name, to: :@allocation
 
-  def initialize(allocation, version)
+  def initialize(prev_allocation, allocation, version)
+    @previous_allocation = prev_allocation
     @allocation = allocation
     @version = version
   end
@@ -20,6 +21,32 @@ class AllocationHistory
   # manually as we've bypassed the library code in this instance
   def created_at
     YAML.load(@version.object_changes).fetch('updated_at').second.getlocal
+  end
+
+  # If we have a 'first' reallocation for a prison then show it as an allocation because it is -
+  # the incorrect data caused by a defect is too hard to change as it is YAML
+  def event
+    if @allocation.event == 'reallocate_primary_pom' && @previous_allocation.prison != @allocation.prison
+      'allocate_primary_pom'
+    else
+      @allocation.event
+    end
+  end
+
+  def previous_primary_pom_id
+    @previous_allocation.primary_pom_nomis_id
+  end
+
+  def previous_primary_pom_name
+    @previous_allocation.primary_pom_name
+  end
+
+  def previous_secondary_pom_id
+    @previous_allocation.secondary_pom_nomis_id
+  end
+
+  def previous_secondary_pom_name
+    @previous_allocation.secondary_pom_name
   end
 
   # render a different partial depending on the type of event

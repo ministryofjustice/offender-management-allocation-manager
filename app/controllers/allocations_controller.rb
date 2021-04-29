@@ -8,12 +8,12 @@ class AllocationsController < PrisonsApplicationController
   def index
     offender_id = params.require(:prisoner_id)
     @prisoner = offender(offender_id)
-    @previously_allocated_pom_ids =
-      AllocationService.previously_allocated_poms(offender_id)
     @recommended_poms, @not_recommended_poms =
       recommended_and_nonrecommended_poms_for(@prisoner)
     @unavailable_pom_count = unavailable_pom_count
     @allocation = Allocation.find_by nomis_offender_id: offender_id
+    @previously_allocated_pom_ids =
+      @allocation.present? ? @allocation.previously_allocated_poms : []
     @case_info = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: offender_id)
     @emails_sent_to_ldu = EmailHistory.sent_within_current_sentence(@prisoner, EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION)
   end
@@ -22,7 +22,7 @@ class AllocationsController < PrisonsApplicationController
     @prisoner = offender(nomis_offender_id_from_url)
 
     allocation = Allocation.find_by!(nomis_offender_id: @prisoner.offender_no)
-    @allocation = AllocationHistory.new(allocation, allocation.versions.last)
+    @allocation = CaseHistory.new(allocation.get_old_versions.last, allocation, allocation.versions.last)
 
     @pom = StaffMember.new(@prison, @allocation.primary_pom_nomis_id)
     redirect_to prison_pom_non_pom_path(@prison.code, @pom.staff_id) unless @pom.has_pom_role?
@@ -48,8 +48,7 @@ class AllocationsController < PrisonsApplicationController
     end
 
     @prisoner = offender(nomis_offender_id_from_url)
-    @previously_allocated_pom_ids =
-      AllocationService.previously_allocated_poms(nomis_offender_id_from_url)
+    @previously_allocated_pom_ids = @allocation.previously_allocated_poms
     @recommended_poms, @not_recommended_poms =
       recommended_and_nonrecommended_poms_for(@prisoner)
     @unavailable_pom_count = unavailable_pom_count
@@ -116,7 +115,7 @@ class AllocationsController < PrisonsApplicationController
                          end
     complexity_history = [] if complexity_history.nil?
 
-    @history = (allocation.history + vlo_history + complexity_history).sort_by(&:created_at)
+    @history = (allocation_history(allocation) + vlo_history + complexity_history).sort_by(&:created_at)
     @early_allocations = CaseInformation.find_by!(nomis_offender_id: nomis_offender_id_from_url).early_allocations
     @email_histories = EmailHistory.in_offender_timeline.where(nomis_offender_id: nomis_offender_id_from_url)
 
@@ -124,6 +123,19 @@ class AllocationsController < PrisonsApplicationController
   end
 
 private
+
+  # Gets the versions in *forward* order - so often we want to reverse
+  # this list as we're interested in recent rather than ancient history
+  def allocation_history allocation
+    version_pairs = allocation.get_old_versions.append(allocation).zip(allocation.versions)
+
+    # make CaseHistory records which contain the previous and current allocation history
+    # records - so that deallocation can look at the old version to work out the POM name and ID
+    [CaseHistory.new(nil, version_pairs.first.first, version_pairs.first.second)] +
+      version_pairs.each_cons(2).map do |prev_pair, curr_pair|
+        CaseHistory.new(prev_pair.first, curr_pair.first, curr_pair.second)
+      end
+  end
 
   def unavailable_pom_count
     PrisonOffenderManagerService.get_poms_for(active_prison_id).count { |pom| pom.status != 'active' }

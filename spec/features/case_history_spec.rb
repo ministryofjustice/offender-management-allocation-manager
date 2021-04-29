@@ -57,6 +57,7 @@ feature 'Allocation History' do
 
   before do
     Timecop.travel DateTime.new 2021, 2, 28, 11, 25, 34
+    stub_auth_token
   end
 
   after do
@@ -65,7 +66,6 @@ feature 'Allocation History' do
 
   describe 'offender allocation history' do
     before {
-      stub_auth_token
       stub_offenders_for_prison(open_prison.code, [nomis_offender])
       stub_signin_spo spo, [open_prison.code]
 
@@ -412,28 +412,57 @@ feature 'Allocation History' do
     history.updated_at.strftime("#{history.updated_at.day.ordinalize} %B %Y") + " (" + history.updated_at.strftime("%R") + ")"
   end
 
-  context 'when prisoner has been released' do
-    let(:nomis_offender) { build(:nomis_offender) }
-    let(:nomis_offender_id) { nomis_offender.fetch(:offenderNo) }
-    let(:prison) { build(:prison).code }
-    let(:pom) { build(:pom) }
-
+  context 'with a simple case' do
     before do
-      stub_auth_token
       stub_user(username: 'MOIC_POM', staff_id: pom.staff_id)
-      stub_offender(nomis_offender)
       stub_offenders_for_prison(prison, [nomis_offender])
       signin_spo_user([prison])
       stub_poms(prison, [pom])
       stub_pom pom
-      create(:case_information, nomis_offender_id: nomis_offender_id)
-      allocation = create(:allocation, :primary, nomis_offender_id: nomis_offender_id, prison: prison, primary_pom_nomis_id: pom.staff_id)
-      allocation.deallocate_offender_after_release
     end
 
-    scenario 'visit allocation history page' do
-      visit prison_allocation_history_path(prison, nomis_offender_id)
-      expect(page).to have_content("Prisoner released")
+    let(:nomis_offender) { build(:nomis_offender) }
+    let(:nomis_offender_id) { nomis_offender.fetch(:offenderNo) }
+    let(:prison) { build(:prison).code }
+    let(:pom) { build(:pom) }
+    let!(:case_info) {
+      create(:case_information, nomis_offender_id: nomis_offender_id)
+    }
+    let!(:allocation) {
+      create(:allocation, :primary, nomis_offender_id: nomis_offender_id, prison: prison,
+             primary_pom_nomis_id: pom.staff_id)
+    }
+
+    context 'when prisoner has been released' do
+      before do
+        allocation.deallocate_offender_after_release
+      end
+
+      it 'displays the allocation data' do
+        visit prison_allocation_history_path(prison, nomis_offender_id)
+        expect(page).to have_content("Prisoner released")
+      end
+    end
+
+    context 'when VLO happens between allocation and de-allocation' do
+      let(:tomorrow) { Time.zone.tomorrow }
+      let(:day_after) { tomorrow + 1.day }
+
+      before do
+        Timecop.travel tomorrow do
+          create(:victim_liaison_officer, case_information: case_info)
+        end
+        Timecop.travel day_after
+        Allocation.deallocate_primary_pom pom.staff_id, prison
+      end
+
+      after do
+        Timecop.return
+      end
+
+      it 'displays all the data and doesnt crash' do
+        visit prison_allocation_history_path(prison, nomis_offender_id)
+      end
     end
   end
 end
