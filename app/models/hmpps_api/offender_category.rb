@@ -15,7 +15,12 @@ module HmppsApi
 
       # Date the offender's category assessment was approved
       # This denotes the date it became 'active' as the offender's category
-      @active_since = payload.fetch('approvalDate').to_date
+      # fallback to the assessmentDate if the approvalDate is absent
+      @active_since = if payload.key? 'approvalDate'
+                        payload.fetch('approvalDate').to_date
+                      else
+                        payload.fetch('assessmentDate').to_date
+                      end
     end
   end
 end
