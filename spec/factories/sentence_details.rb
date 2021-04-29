@@ -109,6 +109,11 @@ FactoryBot.define do
     trait :civil_sentence do
       imprisonmentStatus {'CIVIL'}
     end
+
+    trait :less_than_10_months_to_serve do
+      sentenceStartDate { Time.zone.today - 2.months }
+      conditionalReleaseDate { Time.zone.today + 7.months }
+    end
   end
 end
 

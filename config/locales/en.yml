@@ -44,6 +44,11 @@ en:
   activemodel:
     errors:
       models:
+        parole_review_date_form:
+          format: "%{message}"
+          attributes:
+            parole_review_date:
+              after: "Parole review date must be after %{date}"
         complexity_form:
           format: "%{message}"
           attributes:
@@ -104,10 +109,6 @@ en:
             email:
               blank: Enter an email address in the correct format, like name@example.com
               invalid: Enter an email address in the correct format, like name@example.com
-        case_information:
-          attributes:
-            parole_review_date:
-              after: "Parole review date must be after %{date}"
         early_allocation:
           # This is a Rails 6 feature (to customise messages per-model)
           format: "%{message}"

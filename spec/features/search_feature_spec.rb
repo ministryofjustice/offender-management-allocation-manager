@@ -23,7 +23,7 @@ feature 'Search for offenders' do
       create(:allocation, nomis_offender_id: 'G5359UP')
     end
 
-    it 'Can search from the Allocations summary page', :js, vcr: { cassette_name: 'prison_api/allocated_search_feature' } do
+    it 'Can search from the Allocations summary page', vcr: { cassette_name: 'prison_api/allocated_search_feature' } do
       signin_spo_user
       visit allocated_prison_prisoners_path(prison)
 

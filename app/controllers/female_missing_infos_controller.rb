@@ -11,8 +11,8 @@ class FemaleMissingInfosController < PrisonsApplicationController
   steps :complexity_level, :delius_information
 
   def new
-    session[:complexity] = ComplexityForm.new nomis_offender_id: params.fetch(:prisoner_id)
-    session[:case_info] = CaseInformation.new nomis_offender_id: params.fetch(:prisoner_id),
+    session[complexity_session_key] = ComplexityForm.new nomis_offender_id: params.fetch(:prisoner_id)
+    session[case_info_session_key] = CaseInformation.new nomis_offender_id: params.fetch(:prisoner_id),
                                               manual_entry: true
     if HmppsApi::ComplexityApi.get_complexity(params.fetch(:prisoner_id))
       redirect_to wizard_path :delius_information
@@ -54,8 +54,8 @@ private
   end
 
   def complete_journey
-    session.delete :case_info
-    session.delete :complexity
+    session.delete case_info_session_key
+    session.delete complexity_session_key
     if params.fetch(:commit) == 'Update'
       redirect_to missing_information_prison_prisoners_path(@prison.code)
     else
@@ -65,9 +65,9 @@ private
 
   def save_session
     if step == :complexity_level
-      session[:complexity] = @missing_info
+      session[complexity_session_key] = @missing_info
     else
-      session[:case_info] = @missing_info
+      session[case_info_session_key] = @missing_info
     end
   end
 
@@ -75,9 +75,9 @@ private
     @prisoner = OffenderService.get_offender params.fetch(:prisoner_id)
 
     @missing_info = if step == :complexity_level
-                      ComplexityForm.new session[:complexity].except(*IGNORED_ERROR_KEYS)
+                      ComplexityForm.new session[complexity_session_key].except(*IGNORED_ERROR_KEYS)
                     else
-                      CaseInformation.new session[:case_info].except(*IGNORED_ERROR_KEYS)
+                      CaseInformation.new session[case_info_session_key].except(*IGNORED_ERROR_KEYS)
                     end
   end
 
@@ -87,5 +87,13 @@ private
     else
       params.fetch(:case_information, {}).permit(:case_allocation, :probation_service, :tier)
     end
+  end
+
+  def complexity_session_key
+    'complexity_' + params.fetch(:prisoner_id)
+  end
+
+  def case_info_session_key
+    'case_info_' + params.fetch(:prisoner_id)
   end
 end

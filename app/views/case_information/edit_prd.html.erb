@@ -1,11 +1,17 @@
-<%= render :partial => "/shared/backlink", :locals => { :page => prison_prisoner_staff_index_path(@prison.code, @case_info.nomis_offender_id) } %>
+<%= render :partial => "/shared/backlink", :locals => { :page => prison_prisoner_staff_index_path(@prison.code, @prisoner.offender_no) } %>
 
 <h2 class="govuk-heading-m"><%= @prisoner.full_name %> - <%= @prisoner.offender_no %></h2>
 
-<%= form_for(@case_info, url: update_prd_prison_case_information_path(@prison.code, @prisoner.offender_no), method: :put, id: "case_info_form") do |f| %>
+<%= form_for(@case_info,
+             url: update_prd_prison_case_information_path(@prison.code, @prisoner.offender_no),
+             method: :put,
+             builder: GOVUKDesignSystemFormBuilder::FormBuilder,
+             id: "case_info_form") do |f| %>
+  <%= f.govuk_error_summary %>
+
   <div class="govuk-form-group">
     <!-- Change text in en.yml -->
-    <%= f.gov_uk_date_field :parole_review_date, page_heading: false %>
+    <%= f.govuk_date_field :parole_review_date %>
   </div>
 
   <%= submit_tag "Update", role: "button", draggable: "false", class: "govuk-button govuk govuk-!-margin-top-4" %>
