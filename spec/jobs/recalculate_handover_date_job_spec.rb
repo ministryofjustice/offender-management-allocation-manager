@@ -6,6 +6,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
   let(:offender_no) { nomis_offender.fetch(:offenderNo) }
   let(:today) { Time.zone.now }
   let(:prison) { build(:prison) }
+  let(:test_strategy) { Flipflop::FeatureSet.current.test! }
 
   before do
     stub_auth_token
@@ -258,6 +259,114 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
           new_updated_at = existing_record.reload.updated_at
           expect(new_updated_at).to eq(old_updated_at)
         end
+      end
+    end
+  end
+
+  context 'when an indeterminate offender has moved into open conditions' do
+    let(:nomis_offender) {
+      build(:nomis_offender, :indeterminate,
+            agencyId: prison.code,
+                category: category,
+                sentence: attributes_for(:sentence_detail,
+                                         :indeterminate,
+                                         sentenceStartDate: sentence_start_date))
+    }
+
+    let!(:case_information) {
+      create(:case_information, nomis_offender_id: offender_no,
+                                     case_allocation: 'NPS', manual_entry: false)
+    }
+
+    let(:movement) {
+      attributes_for(:movement,
+                     toAgency: prison.code,
+                         offenderNo: offender_no,
+                         movementDate: movement_date.to_s)
+    }
+
+    let(:offender) { OffenderService.get_offender(offender_no) }
+    let(:sentence_start_date) { policy_start_date }
+    let(:movement_date) { policy_start_date + 1.week }
+
+    # Default: male offender
+    let(:prison) { build(:prison, :open) }
+    let(:category) { attributes_for(:offender_category, :cat_d) }
+    let(:policy_start_date) { HandoverDateService::OPEN_PRISON_POLICY_START_DATE }
+
+    before do
+      stub_offender(nomis_offender)
+      stub_movements([movement])
+      allow(HmppsApi::CommunityApi).to receive(:set_handover_dates)
+
+      # Create an 'old' handover date, which will then be updated given the 'new' open conditions
+      create(:calculated_handover_date, case_information: case_information,
+             responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
+             reason: :nps_indeterminate)
+    end
+
+    context 'when in a male prison' do
+      it 'emails the LDU to notify them that a COM is now needed' do
+        expect(CommunityMailer).to receive(:open_prison_supporting_com_needed)
+                                     .with(hash_including(
+                                             prisoner_number: offender_no,
+                                             prisoner_name: offender.full_name,
+                                             prisoner_crn: case_information.crn,
+                                             ldu_email: offender.ldu_email_address,
+                                             prison_name: prison.name,
+                                             ))
+                                     .and_return OpenStruct.new(deliver_later: true)
+
+        expect { described_class.perform_now(offender_no) }.to change(EmailHistory, :count).by(1)
+      end
+    end
+
+    context 'when in a female prison' do
+      let(:prison) { build(:womens_prison) }
+      let(:category) { attributes_for(:offender_category, :female_open) }
+      let(:policy_start_date) { HandoverDateService::WOMENS_POLICY_START_DATE }
+
+      before { test_strategy.switch!(:womens_estate, true) }
+
+      after { test_strategy.switch!(:womens_estate, false) }
+
+      it 'emails the LDU to notify them that a COM is now needed' do
+        expect(CommunityMailer).to receive(:open_prison_supporting_com_needed)
+                                     .with(hash_including(
+                                             prisoner_number: offender_no,
+                                             prisoner_name: offender.full_name,
+                                             prisoner_crn: case_information.crn,
+                                             ldu_email: offender.ldu_email_address,
+                                             prison_name: prison.name,
+                                             ))
+                                     .and_return OpenStruct.new(deliver_later: true)
+
+        expect { described_class.perform_now(offender_no) }.to change(EmailHistory, :count).by(1)
+      end
+    end
+
+    context 'when the LDU email address is unknown' do
+      let!(:case_information) {
+        create(:case_information, nomis_offender_id: offender_no,
+               team: nil,
+               case_allocation: 'NPS', manual_entry: true)
+      }
+
+      it 'does not send an email' do
+        expect(CommunityMailer).not_to receive(:open_prison_supporting_com_needed)
+        expect { described_class.perform_now(offender_no) }.not_to change(EmailHistory, :count)
+      end
+    end
+
+    context 'when a COM is already allocated' do
+      let!(:case_information) {
+        create(:case_information, :with_com, nomis_offender_id: offender_no,
+               case_allocation: 'NPS', manual_entry: false)
+      }
+
+      it 'does not send an email' do
+        expect(CommunityMailer).not_to receive(:open_prison_supporting_com_needed)
+        expect { described_class.perform_now(offender_no) }.not_to change(EmailHistory, :count)
       end
     end
   end
