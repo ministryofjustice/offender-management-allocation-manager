@@ -2,11 +2,16 @@
 
 FactoryBot.define do
   factory :offender_category, class: HmppsApi::OffenderCategory do
-    initialize_with { HmppsApi::OffenderCategory.new(attributes.stringify_keys) }
+    initialize_with { HmppsApi::OffenderCategory.new(attributes.reject { |_k, v| v.nil? }.stringify_keys) }
 
     classificationCode { 'A' }
     classification { 'Cat A' }
     approvalDate { 3.days.ago }
+
+    trait :without_approval_date do
+      approvalDate { nil }
+      assessmentDate { 5.days.ago }
+    end
 
     # Men's categories
 
