@@ -49,27 +49,6 @@ class CommunityMailer < GovukNotifyRails::Mailer
     mail(to: ldu_email)
   end
 
-  def open_prison_prepolicy_responsible_com_needed(
-    prisoner_name:,
-    prisoner_number:,
-    prisoner_crn:,
-    previous_pom_name:,
-    previous_pom_email:,
-    prison_name:,
-    previous_prison_name:,
-    email:
-  )
-    set_template('e517ddc9-5854-462e-b9a1-f67c97ad5b63')
-    set_personalisation(prisoner_name: prisoner_name,
-                        prisoner_number: prisoner_number,
-                        prisoner_crn: prisoner_crn,
-                        previous_pom_name: previous_pom_name,
-                        previous_pom_email: previous_pom_email,
-                        prison_name: prison_name,
-                        previous_prison_name: previous_prison_name)
-    mail(to: email)
-  end
-
   def assign_com_less_than_10_months email:, prisoner_name:, prisoner_number:, crn_number:, prison_name:
     set_template('6cae6890-6a5a-4ceb-82bd-43c8b43fc639')
 

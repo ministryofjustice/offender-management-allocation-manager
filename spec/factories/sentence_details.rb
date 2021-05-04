@@ -10,6 +10,8 @@ FactoryBot.define do
     end
 
     imprisonmentStatus { 'SEC90' }
+    imprisonmentStatusDescription { 'Did a really bad thing' }
+    indeterminateSentence { false }
     recall { false }
 
     # 1 day after policy start in Wales
@@ -82,29 +84,25 @@ FactoryBot.define do
     end
 
     trait :indeterminate do
-      imprisonmentStatus { 'LIFE' }
+      indeterminateSentence { true }
       tariffDate { Time.zone.today + 1.year}
-     end
+    end
 
     trait :outside_early_allocation_window do
       conditionalReleaseDate { Time.zone.today + 19.months }
     end
 
     trait :determinate do
-      imprisonmentStatus {'SEC90'}
-    end
-
-    trait :indeterminate do
-      imprisonmentStatus {'LIFE'}
+      indeterminateSentence { false }
     end
 
     trait :indeterminate_recall do
-      imprisonmentStatus {'LR_LIFE'}
+      indeterminateSentence { true }
       recall { true }
     end
 
     trait :determinate_recall do
-      imprisonmentStatus {'LR_EPP'}
+      indeterminateSentence { false }
       recall { true }
     end
 
