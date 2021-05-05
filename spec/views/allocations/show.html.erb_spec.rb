@@ -45,5 +45,15 @@ RSpec.describe "allocations/show", type: :view do
         expect(value).to eq('Female Open')
       end
     end
+
+    context 'when category is unknown' do
+      # This happens when an offender's category assessment hasn't been completed yet
+      let(:offender) { build(:offender, category: nil) }
+
+      it 'shows "Unknown"' do
+        expect(key).to eq('Category')
+        expect(value).to eq('Unknown')
+      end
+    end
   end
 end

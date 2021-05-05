@@ -75,5 +75,14 @@ RSpec.describe "prisoners/show", type: :view do
         expect(subject).to eq('Female Closed')
       end
     end
+
+    context 'when category is unknown' do
+      # This happens when an offender's category assessment hasn't been completed yet
+      let(:offender) { build(:offender, category: nil) }
+
+      it 'shows "Unknown"' do
+        expect(subject).to eq('Unknown')
+      end
+    end
   end
 end
