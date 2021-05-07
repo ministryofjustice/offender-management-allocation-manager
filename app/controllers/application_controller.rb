@@ -48,6 +48,16 @@ class ApplicationController < ActionController::Base
     redirect_to '/401'
   end
 
+  # Store an object's attributes to the session
+  # Use this method to safely serialize ActiveRecord objects (or those with an #attributes method).
+  # ActiveRecord objects can later be re-hydrated by calling MyModel.new() with attributes loaded from the session.
+  # This works around inconsistencies between writing objects to different Rails session stores (e.g. cookie vs cache).
+  # Underlying principle: Never store complex objects in the session – they won't always re-hydrate as you expect.
+  # Instead, only store JSON-safe primitives (i.e. Hash, Array, String, Number, Boolean, Nil) and re-hydrate them yourself.
+  def save_to_session(key, record)
+    session[key] = record.attributes
+  end
+
 private
 
   def sso_identity

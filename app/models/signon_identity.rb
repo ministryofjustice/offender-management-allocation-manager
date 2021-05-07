@@ -17,7 +17,7 @@ class SignonIdentity
     @roles = omniauth_data.fetch('info').roles
   end
 
-  def to_session
+  def attributes
     {
       username: @username,
       active_caseload: @active_caseload,

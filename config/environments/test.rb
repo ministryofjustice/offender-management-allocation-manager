@@ -59,5 +59,13 @@ Rails.application.configure do
   # config.action_view.raise_on_missing_translations = true
   Rails.application.routes.default_url_options[:host] = 'http://localhost:3000'
 
-  config.cache_store = :null_store
+  # It seems that the default cookie store behaves very subtly different to the cache store
+  # (the cookie store implicitly serializes objects, where the cache store doesn't)
+  # Since cache store is used in production, tests should really be running against the same session store
+  # to replicate a production-like environment (especially important for feature tests)
+  config.session_store :cache_store, key: 'manage_pom_cases_session'
+
+  # ...which means we also need to use a proper cache store, rather than the default null store
+  # To avoid leaking global state between tests, we clear this cache after every spec in rails_helper.rb
+  config.cache_store = :memory_store, { size: 64.megabytes }
 end
