@@ -95,9 +95,4 @@ private
   def case_info_session_key
     'case_info_' + params.fetch(:prisoner_id)
   end
-
-  def save_to_session(key, record)
-    # Store the ActiveRecord object's attributes
-    session[key] = record.attributes
-  end
 end
