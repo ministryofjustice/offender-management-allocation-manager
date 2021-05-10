@@ -61,6 +61,10 @@ RSpec.configure do |config|
 
   config.after(:each) do
     DatabaseCleaner.clean
+
+    # Clear the Rails cache between each test to isolate tests
+    # We need to use a proper cache store to support the cache-backed session store
+    Rails.cache.clear
   end
 
   config.include ActiveSupport::Testing::TimeHelpers

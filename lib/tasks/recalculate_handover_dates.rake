@@ -4,14 +4,14 @@ desc 'Recalculate handover dates for all known offenders, and push changes into 
 task recalculate_handover_dates: :environment do |_task|
   Rails.logger = Logger.new(STDOUT)
 
-  count = CaseInformation.count
+  Rails.logger.info('Queueing RecalculateHandoverDateJob for all offenders')
 
-  Rails.logger.info("Queueing jobs for #{count} offenders")
-
-  CaseInformation.find_each.with_index do |case_info, index|
-    RecalculateHandoverDateJob.perform_later(case_info.nomis_offender_id)
-    Rails.logger.info("[#{index + 1}/#{count}] Queued #{case_info.nomis_offender_id}")
+  Prison.all.each do |prison|
+    prison.offenders.each do |offender|
+      RecalculateHandoverDateJob.perform_later(offender.nomis_offender_id)
+      Rails.logger.info("RecalculateHandoverDateJob #{prison.name} Queued #{offender.nomis_offender_id}")
+    end
   end
 
-  Rails.logger.info('Done')
+  Rails.logger.info('RecalculateHandoverDateJob all done')
 end
