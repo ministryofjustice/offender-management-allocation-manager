@@ -12,7 +12,7 @@ feature 'View a prisoner profile page' do
       expect(page).to have_css('h1', text: 'Ahmonis, Okadonah')
       expect(page).to have_content('07/07/1968')
       cat_code = find('h3#category-code').text
-      expect(cat_code).to eq('C')
+      expect(cat_code).to eq('Cat C')
       expect(page).to have_css('#prisoner-case-type', text: 'Determinate')
     end
   end
@@ -117,7 +117,7 @@ feature 'View a prisoner profile page' do
         expect(page).to have_css('h1', text: 'Ahmonis, Okadonah')
         expect(page).to have_content('07/07/1968')
         cat_code = find('h3#category-code').text
-        expect(cat_code).to eq('C')
+        expect(cat_code).to eq('Cat C')
       end
 
       it 'shows the POM name (fetched from NOMIS)' do

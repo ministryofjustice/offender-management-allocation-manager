@@ -136,7 +136,13 @@
     </tr>
     <tr class="govuk-table__row" id="category">
       <td class="govuk-table__cell govuk-!-width-one-half">Category</td>
-      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">Cat <%= @offender.category_code %></td>
+      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
+        <% if @offender.category_code %>
+          <%= @offender.category_label %> (<%= @offender.category_code %>) (since <%= format_date(@offender.category_active_since) %>)
+        <% else %>
+          Unknown
+        <% end %>
+      </td>
     </tr>
     <tr class="govuk-table__row" id="imprisonment-status">
       <td class="govuk-table__cell govuk-!-width-one-half">Imprisonment status</td>
