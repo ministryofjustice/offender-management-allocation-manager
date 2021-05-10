@@ -6,7 +6,7 @@ updates:
     interval: monthly
     time: "03:00"
     timezone: Europe/London
-  open-pull-requests-limit: 10
+  open-pull-requests-limit: 5
   ignore:
   - dependency-name: parser
     versions:
