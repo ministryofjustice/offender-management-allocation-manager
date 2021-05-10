@@ -5,7 +5,7 @@ RSpec.describe SessionsController, type: :controller do
     { 'username' => 'Staff_one' }
   end
 
-  let(:signon_identity) { double(SignonIdentity, to_session: sso_data) }
+  let(:signon_identity) { double(SignonIdentity, attributes: sso_data) }
 
   describe '#create' do
     subject(:create) { get :create, params: { provider: 'hmpps_sso' } }

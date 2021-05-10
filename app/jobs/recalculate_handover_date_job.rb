@@ -26,11 +26,18 @@ private
     )
     if handover.community_responsible? &&
       handover.reason.to_sym == :less_than_10_months_left_to_serve &&
-      case_info.ldu.present? &&
-      case_info.com_name.nil?
+      offender.ldu_email_address.present? &&
+      offender.allocated_com_name.blank?
       # need to chase if we haven't chased recently
       last_chaser = case_info.email_histories.where(event: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION).last
       if last_chaser.nil? || last_chaser.created_at < 2.days.ago
+        # create the history first so that the validations will help with hard failures due to coding errors
+        # rather than waiting for the mailer to object
+        case_info.email_histories.create! prison: offender.prison_id,
+                                          name: case_info.ldu.name,
+                                          email: case_info.ldu.email_address,
+                                          event: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION
+        # This is queued so that soft failures don't kill the whole job
         CommunityMailer.assign_com_less_than_10_months(
           email: case_info.ldu.email_address,
           crn_number: case_info.crn,
@@ -38,10 +45,6 @@ private
           prisoner_name: "#{offender.first_name} #{offender.last_name}",
           prisoner_number: offender.offender_no
         ).deliver_later
-        case_info.email_histories.create! prison: offender.prison_id,
-                                          name: case_info.ldu.name,
-                                          email: case_info.ldu.email_address,
-                                          event: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION
       end
     end
 
@@ -72,6 +75,10 @@ private
 
       # Offender has moved to Open Prison conditions and now needs a supporting COM
       # Note: this covers both Male and Female offenders
+      case_info.email_histories.create! name: offender.ldu_name,
+                                        email: offender.ldu_email_address,
+                                        event: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION,
+                                        prison: offender.prison_id
       CommunityMailer.open_prison_supporting_com_needed(
         prisoner_name: offender.full_name,
         prisoner_number: offender.offender_no,
@@ -79,11 +86,6 @@ private
         prison_name: PrisonService.name_for(offender.prison_id),
         ldu_email: offender.ldu_email_address
       ).deliver_later
-
-      case_info.email_histories.create! name: offender.ldu_name,
-                           email: offender.ldu_email_address,
-                           event: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION,
-                           prison: offender.prison_id
     end
   end
 end

@@ -84,7 +84,7 @@ private
   end
 
   def nomis_offender_id_from_url
-    params.require(:nomis_offender_id)
+    params.require(:prisoner_id)
   end
 
   def case_information_params

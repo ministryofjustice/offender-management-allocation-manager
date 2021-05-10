@@ -25,7 +25,7 @@ describe SignonIdentity, model: true do
     expect(ident).to be_nil
   end
 
-  it 'creates session data' do
+  it 'can be serialized with #attributes' do
     session = {
       username: 'MOIC_POM',
       active_caseload: 'LEI',
@@ -34,6 +34,6 @@ describe SignonIdentity, model: true do
       roles: ['ROLE_ALLOC_MGR']
     }
 
-    expect(signon_identity.to_session).to eq(session)
+    expect(signon_identity.attributes).to eq(session)
   end
 end
