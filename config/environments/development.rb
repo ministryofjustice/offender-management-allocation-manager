@@ -26,6 +26,9 @@ Rails.application.configure do
     config.public_file_server.headers = {
       'Cache-Control' => "public, max-age=#{2.days.to_i}"
     }
+
+    # Store sessions in the cache (as is done in production)
+    config.session_store :cache_store, key: 'manage_pom_cases_session'
   else
     config.action_controller.perform_caching = false
 

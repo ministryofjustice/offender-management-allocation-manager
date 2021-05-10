@@ -23,20 +23,23 @@ class FemaleAllocationsController < PrisonsApplicationController
 
   def new
     pom = StaffMember.new(@prison, staff_id)
+
+    # Create an empty override, which will be populated if needed
+    save_to_session :female_allocation_override, Override.new
+
     # If the recommendation is different to the allocation, then go the full journey via override, otherwise jump straight to allocation
     if RecommendationService::recommended_pom_type(@prisoner) == RecommendationService::PRISON_POM && pom.probation_officer? ||
       RecommendationService::recommended_pom_type(@prisoner) == RecommendationService::PROBATION_POM && pom.prison_officer?
       redirect_to wizard_path(steps.first)
     else
-      # create an empty override for the simple case
-      session[:female_allocation_override] = Override.new
+      # Override isn't needed – go straight to the allocate step
       redirect_to wizard_path(:allocate)
     end
   end
 
   def show
     @pom = StaffMember.new(@prison, staff_id)
-    @override = Override.new nomis_staff_id: staff_id, nomis_offender_id: nomis_offender_id_from_url
+    @override = Override.new session[:female_allocation_override]
     @allocation = AllocationForm.new
     render_wizard
   end
@@ -45,7 +48,7 @@ class FemaleAllocationsController < PrisonsApplicationController
     if step == :override
       @override = Override.new override_params.merge(nomis_staff_id: staff_id, nomis_offender_id: nomis_offender_id_from_url)
       if @override.valid?
-        session[:female_allocation_override] = @override
+        save_to_session :female_allocation_override, @override
         redirect_to next_wizard_path
       else
         render_wizard
