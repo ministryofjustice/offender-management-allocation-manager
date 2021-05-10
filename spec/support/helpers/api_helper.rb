@@ -180,7 +180,8 @@ module ApiHelper
 
   def stub_offender_categories(offenders)
     offender_nos = offenders.map { |offender| offender.fetch(:offenderNo) }
-    categories = offenders.map { |offender| offender.fetch(:category).merge(offenderNo: offender.fetch(:offenderNo)) }
+    categories = offenders.reject { |offender| offender[:category].nil? }
+                   .map { |offender| offender.fetch(:category).merge(offenderNo: offender.fetch(:offenderNo)) }
 
     stub_request(:post, "#{T3}/offender-assessments/CATEGORY?activeOnly=true&latestOnly=true&mostRecentOnly=true").
       with(
