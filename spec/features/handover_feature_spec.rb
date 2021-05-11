@@ -18,8 +18,8 @@ feature "viewing upcoming handovers" do
       stub_offenders_for_prison(prison, [offender])
 
       # Stub handover dates for the offender
-      allow_any_instance_of(HmppsApi::OffenderBase).to receive(:handover_start_date).and_return(handover_start_date)
-      allow_any_instance_of(HmppsApi::OffenderBase).to receive(:responsibility_handover_date).and_return(responsibility_handover_date)
+      allow_any_instance_of(HmppsApi::Offender).to receive(:handover_start_date).and_return(handover_start_date)
+      allow_any_instance_of(HmppsApi::Offender).to receive(:responsibility_handover_date).and_return(responsibility_handover_date)
 
       visit prison_handovers_path(prison)
     end

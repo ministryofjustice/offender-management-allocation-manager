@@ -8,7 +8,7 @@ describe OffenderService, type: :feature do
       create(:case_information, nomis_offender_id: nomis_offender_id, tier: 'C', case_allocation: 'CRC', probation_service: 'Wales')
       offender = described_class.get_offender(nomis_offender_id)
 
-      expect(offender).to be_kind_of(HmppsApi::OffenderBase)
+      expect(offender).to be_kind_of(HmppsApi::Offender)
       expect(offender.tier).to eq 'C'
       expect(offender.sentence.conditional_release_date).to eq(Date.new(2020, 3, 16))
       expect(offender.main_offence).to eq 'Section 18 - wounding with intent to resist / prevent arrest'

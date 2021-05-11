@@ -1,7 +1,25 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :offender_base, class: 'HmppsApi::OffenderBase' do
+  factory :offender, class: 'HmppsApi::Offender' do
+    initialize_with do
+      HmppsApi::Offender.new(attributes.stringify_keys,
+                             attributes.stringify_keys,
+                             booking_id: attributes[:latestBookingId]&.to_i,
+                             prison_id: attributes[:latestLocationId],
+                             category: attributes.fetch(:category),
+                             latest_temp_movement: nil,
+                             complexity_level: attributes.fetch(:complexityLevel)).tap { |offender|
+        offender.sentence = attributes.fetch(:sentence)
+      }
+    end
+
+    latestLocationId { 'LEI' }
+
+    trait :prescoed do
+      latestLocationId { PrisonService::PRESCOED_CODE }
+    end
+
     # cell location is the format <1 letter>-<1 number>-<3 numbers> e.g 'E-4-014'
     internalLocation {
       block = Faker::Alphanumeric.alpha(number: 1).upcase
@@ -33,25 +51,6 @@ FactoryBot.define do
     sentence { association :sentence_detail }
 
     complexityLevel { 'medium' }
-
-  end
-
-  factory :offender, parent: :offender_base, class: 'HmppsApi::Offender' do
-    initialize_with do
-      HmppsApi::Offender.new(attributes.stringify_keys,
-                             attributes.stringify_keys,
-                             category: attributes.fetch(:category),
-                             latest_temp_movement: nil,
-                             complexity_level: attributes.fetch(:complexityLevel)).tap { |offender|
-        offender.sentence = attributes.fetch(:sentence)
-      }
-    end
-
-    latestLocationId { 'LEI' }
-
-    trait :prescoed do
-      latestLocationId { PrisonService::PRESCOED_CODE }
-    end
   end
 
   factory :nomis_offender, class: Hash do

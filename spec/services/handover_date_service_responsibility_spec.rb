@@ -41,7 +41,7 @@ describe HandoverDateService do
 
         context 'when english' do
           let(:offender) {
-            build(:offender_summary, :prescoed, sentence: build(:sentence_detail, :english_policy_sentence)).tap { |o|
+            build(:offender, :prescoed, sentence: build(:sentence_detail, :english_policy_sentence)).tap { |o|
               o.prison_arrival_date = arrival_date
               o.load_case_information(case_info)
             }

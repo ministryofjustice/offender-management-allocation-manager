@@ -8,7 +8,7 @@ class OffenderService
       record = CaseInformation.find_by(nomis_offender_id: offender_no)
       o.load_case_information(record)
 
-      o.main_offence = HmppsApi::PrisonApi::OffenderApi.get_offence(o.booking_id)
+      o.load_main_offence
     }
   end
 

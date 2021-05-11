@@ -36,15 +36,18 @@ module HmppsApi
                          {}
                        end
         # need to ignore any offenders who don't show up in the search API
-        offenders = data.select { |p| search_data.key? p.fetch('offenderNo') }.map do |payload|
-          offender_no = payload.fetch('offenderNo')
+        offenders = data.select { |p| search_data.key? p.fetch('offenderNo') }.map do |api_payload|
+          offender_no = api_payload.fetch('offenderNo')
           search_payload = search_data.fetch(offender_no)
-          HmppsApi::OffenderSummary.new(payload,
-                                        search_payload,
-                                        category: offender_categories[offender_no],
-                                        latest_temp_movement: temp_movements[offender_no],
-                                        complexity_level: complexities[offender_no]).tap { |offender|
-            sentencing = sentence_details[offender.booking_id]
+          booking_id = api_payload.fetch('bookingId').to_i
+          HmppsApi::Offender.new(api_payload,
+                                 search_payload,
+                                 booking_id: booking_id,
+                                 prison_id: api_payload.fetch('agencyId'),
+                                 category: offender_categories[offender_no],
+                                 latest_temp_movement: temp_movements[offender_no],
+                                 complexity_level: complexities[offender_no]).tap { |offender|
+            sentencing = sentence_details[booking_id]
             if sentencing.present?
               offender.sentence = HmppsApi::SentenceDetail.new sentencing,
                                                                search_payload
@@ -58,25 +61,29 @@ module HmppsApi
         # Bad NOMIS numbers mustn't produce invalid URLs
         offender_no = URI.encode_www_form_component(raw_offender_no)
         route = "/prisoners/#{offender_no}"
-        api_response = client.get(route).first
-        search_payload = get_search_payload([offender_no])[offender_no] unless api_response.nil?
+        api_payload = client.get(route).first
+        search_payload = get_search_payload([offender_no])[offender_no] unless api_payload.nil?
 
-        if api_response.nil? || search_payload.nil?
+        if api_payload.nil? || search_payload.nil?
           nil
         else
           temp_movements = HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for([offender_no])
           offender_categories = get_offender_categories([offender_no])
-          complexity_level = if api_response.fetch('currentlyInPrison') == 'Y' && PrisonService::womens_prison?(api_response.fetch('latestLocationId'))
+          complexity_level = if api_payload.fetch('currentlyInPrison') == 'Y' && PrisonService::womens_prison?(api_payload.fetch('latestLocationId'))
                                HmppsApi::ComplexityApi.get_complexity(offender_no)
                              end
-          prisoner = HmppsApi::Offender.new api_response,
+          booking_id = api_payload['latestBookingId']&.to_i
+          prisoner = HmppsApi::Offender.new api_payload,
                                             search_payload,
                                             category: offender_categories[offender_no],
                                             latest_temp_movement: temp_movements[offender_no],
-                                            complexity_level: complexity_level
+                                            complexity_level: complexity_level,
+                                            booking_id: booking_id,
+                                            prison_id: api_payload['latestLocationId']
+
           prisoner.tap do |offender|
-            sentence_details = get_bulk_sentence_details([offender.booking_id])
-            sentence = HmppsApi::SentenceDetail.new sentence_details.fetch(offender.booking_id),
+            sentence_details = get_bulk_sentence_details([booking_id])
+            sentence = HmppsApi::SentenceDetail.new sentence_details.fetch(booking_id),
                                                     search_payload
 
             offender.sentence = sentence
