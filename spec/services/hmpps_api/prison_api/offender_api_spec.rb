@@ -8,7 +8,7 @@ describe HmppsApi::PrisonApi::OffenderApi do
 
       expect(response.data).not_to be_nil
       expect(response.data).to be_instance_of(Array)
-      expect(response.data).to all(be_an HmppsApi::OffenderSummary)
+      expect(response.data).to all(be_an HmppsApi::Offender)
     end
 
     it "can get an offence description for a booking id",

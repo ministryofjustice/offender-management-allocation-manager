@@ -3,448 +3,263 @@
 require 'rails_helper'
 
 describe HmppsApi::Offender do
-  describe '#responsibility_override?' do
-    it 'returns false when no responsibility found for offender' do
-      # build an offender, by default this does not have any case information or responsibility record
-      subject = build(:offender, sentence: build(:sentence_detail, :indeterminate))
-      expect(subject.responsibility_override?).to eq(false)
-    end
+  subject {
+    build(:offender)
+  }
 
-    it 'returns true when there is a responsibility found for an offender' do
-      # create case information and responsibility record
-      case_info = create(:case_information, nomis_offender_id: 'A1234XX')
-      create(:responsibility, nomis_offender_id: 'A1234XX')
+  describe '#inside_omic_policy?' do
+    let(:over_18) { (Time.zone.today - 18.years).to_s }
+    let(:immigration_detainee) { 'DET' }
 
-      # build an offender
-      offender = build(:offender, sentence: build(:sentence_detail, :indeterminate), offenderNo: 'A1234XX')
+    context 'when it meets the requirements' do
+      context 'when all requirements are present: immigration case, over 18, sentence, criminal sentence' do
+        let(:offender) { build(:offender,  imprisonmentStatus: immigration_detainee, dateOfBirth: over_18, convictedStatus: 'Convicted', sentence: build(:sentence_detail, sentenceStartDate: '2019-02-05')) }
 
-      # load the case information and responsibility record into the offender object
-      offender.load_case_information(case_info)
-
-      expect(offender.responsibility_override?).to eq(true)
-    end
-  end
-
-  describe '#within_early_allocation_window?' do
-    context 'with no dates' do
-      let(:offender) {
-        build(:offender, sentence: build(:sentence_detail,
-                                         conditionalReleaseDate: nil,
-                                         automaticReleaseDate: nil
-        ))
-      }
-
-      it 'is not within window' do
-        expect(offender.within_early_allocation_window?).to eq(false)
-      end
-    end
-
-    context 'when ARD > 18 months' do
-      let(:offender) {
-        build(:offender, sentence: build(:sentence_detail,
-                                         conditionalReleaseDate: Time.zone.today + 24.months,
-                                         automaticReleaseDate: Time.zone.today + 19.months
-        ))
-      }
-
-      it 'is not within window' do
-        expect(offender.within_early_allocation_window?).to eq(false)
-      end
-    end
-
-    context 'when ARD < 18 months' do
-      let(:offender) {
-        build(:offender, sentence: build(:sentence_detail,
-                                         conditionalReleaseDate: Time.zone.today + 24.months,
-                                         automaticReleaseDate: Time.zone.today + 17.months))
-      }
-
-      it 'is within window' do
-        expect(offender.within_early_allocation_window?).to eq(true)
-      end
-    end
-
-    context 'when PRD < 18 months' do
-      let(:offender) {
-        build(:offender,
-              sentence: build(:sentence_detail,
-                              conditionalReleaseDate: Time.zone.today + 24.months,
-                              automaticReleaseDate: Time.zone.today + 24.months)).tap { |o|
-          o.load_case_information(build(:case_information, parole_review_date: Time.zone.today + 17.months))
-        }
-      }
-
-      it 'is within window' do
-        expect(offender.within_early_allocation_window?).to eq(true)
-      end
-    end
-
-    context 'when TED < 18 months' do
-      let(:offender) {
-        build(:offender,
-              sentence: build(:sentence_detail,
-                              conditionalReleaseDate: Time.zone.today + 24.months,
-                              tariffDate: Time.zone.today + 17.months,
-                              automaticReleaseDate: Time.zone.today + 24.months)).tap { |o|
-          o.load_case_information(build(:case_information, parole_review_date: Time.zone.today + 24.months))
-        }
-      }
-
-      it 'is within window' do
-        expect(offender.within_early_allocation_window?).to eq(true)
-      end
-    end
-
-    context 'when PED < 18 months' do
-      let(:offender) {
-        build(:offender,
-              sentence: build(:sentence_detail,
-                              conditionalReleaseDate: Time.zone.today + 24.months,
-                              tariffDate: Time.zone.today + 24.months,
-                              paroleEligibilityDate: Time.zone.today + 17.months,
-                              automaticReleaseDate: Time.zone.today + 24.months)).tap { |o|
-          o.load_case_information(build(:case_information, parole_review_date: Time.zone.today + 24.months))
-        }
-      }
-
-      it 'is within window' do
-        expect(offender.within_early_allocation_window?).to eq(true)
-      end
-    end
-  end
-
-  describe '#handover_start_date' do
-    context 'when in custody' do
-      let(:offender) {
-        build(:offender).tap { |o|
-          o.sentence = build(:sentence_detail,
-                             conditionalReleaseDate: nil,
-                             automaticReleaseDate: Time.zone.today + 1.year,
-                             sentenceStartDate: Time.zone.today)
-          o.load_case_information(build(:case_information, case_allocation: 'NPS', mappa_level: 0))
-        }
-      }
-
-      it 'has a value' do
-        expect(offender.handover_start_date).not_to eq(nil)
-      end
-    end
-
-    context 'when COM responsible already' do
-      let(:offender) {
-        build(:offender).tap { |o|
-          o.sentence = build(:sentence_detail, conditionalReleaseDate: Time.zone.today + 1.week)
-          o.load_case_information(build(:case_information))
-        }
-      }
-
-      it 'doesnt has a value' do
-        expect(offender.handover_start_date).to eq(nil)
-      end
-    end
-  end
-
-  describe '#pom_responsibility' do
-    subject { HandoverDateService::Responsibility.new offender.pom_responsible?, offender.pom_supporting? }
-
-    let(:offender) { build(:offender, sentence: build(:sentence_detail, :indeterminate), latestLocationId: 'LEI') }
-
-    context 'when the responsibility has not been overridden' do
-      it "calculates the responsibility based on the offender's sentence" do
-        # POM is responsible because TED is 1 year away
-        expect(subject).to be_responsible
-      end
-    end
-
-    context 'when the responsibility has been overridden' do
-      before do
-        case_info = create(:case_information, nomis_offender_id: offender.offender_no, case_allocation: 'NPS', mappa_level: 0)
-
-        # Responsibility overrides exist as 'Responsibility' records
-        create(:responsibility, nomis_offender_id: offender.offender_no, value: override_to)
-
-        # Load the case info record on to the offender object
-        offender.load_case_information(case_info)
-      end
-
-      context 'when overridden to the community' do
-        let(:override_to) { 'Probation' }
-
-        it "is supporting" do
-          expect(subject).to be_supporting
+        it 'is in omic policy' do
+          expect(offender.inside_omic_policy?).to eq(true)
         end
       end
 
-      context 'when overridden to custody' do
-        # Overrides to custody aren't actually possible in the UI, so this scenario should never occur naturally in the real world
-        let(:override_to) { 'Prison' }
+      context 'when they have no sentence' do
+        let(:offender) {
+          build(:offender,
+                dateOfBirth: over_18, convictedStatus: 'Convicted',
+                        sentence: build(:sentence_detail, :unsentenced, imprisonmentStatus: immigration_detainee))
+        }
 
-        it "is responsible" do
-          expect(subject).to be_responsible
+        it 'is in omic policy' do
+          expect(offender.inside_omic_policy?).to eq(true)
+        end
+      end
+
+      context 'when they have no immigration case' do
+        let(:offender) { build(:offender, dateOfBirth: over_18, convictedStatus: 'Convicted', sentence: build(:sentence_detail, sentenceStartDate: '2019-02-05')) }
+
+        it 'is in omic policy' do
+          expect(offender.inside_omic_policy?).to eq(true)
+        end
+      end
+    end
+
+    context 'when the requirements arent met:' do
+      context 'when they are under 18' do
+        let(:under_18) { (Time.zone.today - 17.years).to_s }
+        let(:offender) {
+          build(:offender,
+                sentence: build(:sentence_detail, imprisonmentStatus: immigration_detainee),
+                        dateOfBirth: under_18, convictedStatus: 'Convicted')
+        }
+
+        it 'is not in omic policy' do
+          expect(offender.inside_omic_policy?).to eq(false)
+        end
+      end
+
+      context 'when have no immigration case and no sentence' do
+        let(:offender) { build(:offender, dateOfBirth: over_18, convictedStatus: 'Convicted', sentence: build(:sentence_detail, :unsentenced)) }
+
+        it 'is not in omic policy' do
+          expect(offender.inside_omic_policy?).to eq(false)
+        end
+      end
+
+      context 'when they do not have a criminal sentence (and are not an immigration case)' do
+        let(:offender) {
+          build(:offender, dateOfBirth: over_18, convictedStatus: 'Convicted',
+                               sentence: build(:sentence_detail, :civil_sentence, sentenceStartDate: '2019-02-05'))
+        }
+
+        it 'is not in omic policy' do
+          expect(offender.inside_omic_policy?).to eq(false)
+        end
+      end
+
+      context 'when they are not convicted?' do
+        let(:offender) {
+          build(:offender,  dateOfBirth: over_18, convictedStatus: false,
+                               sentence: build(:sentence_detail, imprisonmentStatus: immigration_detainee, sentenceStartDate: '2019-02-05'))
+        }
+
+        it 'is not in omic policy' do
+          expect(offender.inside_omic_policy?).to eq(false)
         end
       end
     end
   end
 
-  describe '#com_responsibility' do
-    subject { HandoverDateService::Responsibility.new offender.com_responsible?, offender.com_supporting? }
+  describe '#earliest_release_date' do
+    context 'with blank sentence detail' do
+      before { subject.sentence = build(:sentence_detail, :blank) }
 
-    let(:offender) { build(:offender, sentence: build(:sentence_detail, :indeterminate), latestLocationId: 'LEI') }
-
-    context 'when the responsibility has not been overridden' do
-      it "calculates the responsibility based on the offender's sentence" do
-        # Offender's TED is 1 year away, so a COM isn't needed yet
-        expect(subject).not_to be_involved
+      it 'responds with no earliest release date' do
+        expect(subject.earliest_release_date).to be_nil
       end
     end
 
-    context 'when the responsibility has been overridden' do
-      before do
-        case_info = create(:case_information, nomis_offender_id: offender.offender_no, case_allocation: 'NPS', mappa_level: 0)
+    context 'when main dates are missing' do
+      let(:today_plus1) { Time.zone.today + 1.day }
 
-        # Responsibility overrides exist as 'Responsibility' records
-        create(:responsibility, nomis_offender_id: offender.offender_no, value: override_to)
+      context 'with just the sentence expiry date' do
+        before do
+          subject.sentence = build(:sentence_detail, :blank).tap { |s| s.sentence_expiry_date = today_plus1 }
+        end
 
-        # Load the case info record on to the offender object
-        offender.load_case_information(case_info)
-      end
-
-      context 'when overridden to the community' do
-        let(:override_to) { 'Probation' }
-
-        it "is responsible" do
-          expect(subject).to be_responsible
+        it 'uses the SED' do
+          expect(subject.earliest_release_date).to eq(today_plus1)
         end
       end
 
-      context 'when overridden to custody' do
-        # Overrides to custody aren't actually possible in the UI, so this scenario should never occur naturally in the real world
-        # One of the things to decide if/when implementing this is: what will COM responsibility be? Supporting or not involved?
-        let(:override_to) { 'Prison' }
-
-        it "is supporting" do
-          expect(subject).to be_supporting
+      context 'with many dates' do
+        before do
+          subject.sentence = build(:sentence_detail,
+                                   :blank,
+                                   licenceExpiryDate: licence_expiry_date,
+                                   postRecallReleaseDate: post_recall_release_date,
+                                   actualParoleDate: actual_parole_date).tap { |detail|
+            detail.sentence_expiry_date = sentence_expiry_date
+          }
         end
-      end
-    end
-  end
 
-  describe 'fields that come from CaseInformation' do
-    context 'when no CaseInformation has been loaded' do
-      subject { offender.public_send(field) }
+        context 'with future dates' do
+          let(:licence_expiry_date) { Time.zone.today + 2.days }
+          let(:sentence_expiry_date) { Time.zone.today + 3.days }
+          let(:post_recall_release_date) { Time.zone.today + 4.days }
+          let(:actual_parole_date) { Time.zone.today + 5.days }
 
-      let(:offender) { build(:offender) }
+          context 'with licence date nearest' do
+            let(:licence_expiry_date) { today_plus1 }
 
-      shared_examples 'expect fields to be' do |value, fields|
-        fields.each do |field|
-          describe "##{field}" do
-            let(:field) { field }
+            it 'uses the licence expiry date' do
+              expect(subject.earliest_release_date).to eq(licence_expiry_date)
+            end
+          end
 
-            it { is_expected.to be(value) }
+          context 'with post_recall_release_date nearest' do
+            let(:post_recall_release_date) { today_plus1 }
+
+            it 'uses the post_recall_release_date' do
+              expect(subject.earliest_release_date).to eq(post_recall_release_date)
+            end
+          end
+
+          context 'with actual_parole_date nearest' do
+            let(:actual_parole_date) { today_plus1 }
+
+            it 'uses the actual_parole_date' do
+              expect(subject.earliest_release_date).to eq(actual_parole_date)
+            end
+          end
+        end
+
+        context 'with all dates in the past' do
+          let(:sentence_expiry_date) { Time.zone.today - 2.days }
+          let(:licence_expiry_date) { Time.zone.today - 3.days }
+          let(:post_recall_release_date) { Time.zone.today - 4.days }
+          let(:actual_parole_date) { Time.zone.today - 5.days }
+
+          it 'uses the closest to today' do
+            expect(subject.earliest_release_date).to eq(sentence_expiry_date)
           end
         end
       end
-
-      include_examples 'expect fields to be', nil, [
-          :tier, :case_allocation, :mappa_level, :parole_review_date,
-          :welsh_offender, :ldu_name, :team_name, :allocated_com_name, :ldu_email_address
-      ]
-
-      include_examples 'expect fields to be', false, [
-          :has_case_information?, :early_allocation?
-      ]
     end
 
-    context 'when a CaseInformation record has been loaded' do
-      subject { offender.public_send(field) }
-
-      let(:case_info) { create(:case_information) }
-      let(:offender) { build(:offender).tap { |o| o.load_case_information(case_info) } }
-
-      describe '#has_case_information?' do
-        let(:field) { :has_case_information? }
-
-        it { is_expected.to be(true) }
+    context 'with sentence detail with dates' do
+      before do
+        subject.sentence = build(:sentence_detail,
+                                 sentenceStartDate: Date.new(2005, 2, 3),
+                                 paroleEligibilityDate: parole_eligibility_date,
+                                 conditionalReleaseDate: conditional_release_date)
       end
 
-      delegated_fields = [:tier, :case_allocation, :mappa_level, :parole_review_date]
-      delegated_fields.each do |delegated_field|
-        describe "##{delegated_field}" do
-          let(:field) { delegated_field }
+      context 'when comprised of dates in the past and the future' do
+        let(:parole_eligibility_date) { Date.new(2009, 1, 1) }
+        let(:automatic_release_date) { Time.zone.today }
+        let(:conditional_release_date) { Time.zone.today + 3.days }
 
-          it { is_expected.to be(case_info.public_send(delegated_field)) }
-        end
-      end
-
-      describe '#welsh_offender' do
-        let(:field) { :welsh_offender }
-
-        context 'with a welsh_offender' do
-          let(:case_info) { create(:case_information, probation_service: 'Wales') }
-
-          it { is_expected.to be(true) }
-        end
-
-        context 'with and english offender' do
-          let(:case_info) { create(:case_information, probation_service: 'England') }
-
-          it { is_expected.to be(false) }
+        it 'will display the earliest of the dates in the future' do
+          expect(subject.earliest_release_date).
+              to eq(conditional_release_date)
         end
       end
 
-      describe '#early_allocation?' do
-        let(:field) { :early_allocation? }
+      context 'when comprised solely of dates in the past' do
+        let(:parole_eligibility_date) { Date.new(2009, 1, 1) }
+        let(:automatic_release_date) { Date.new(2009, 1, 11) }
+        let(:conditional_release_date) { Date.new(2009, 1, 21) }
 
-        context 'when eligible for early allocation' do
-          let!(:early_allocation) { create(:early_allocation, case_information: case_info) }
-
-          it { is_expected.to be(true) }
+        it 'will display the most recent of the dates in the past' do
+          expect(subject.earliest_release_date).
+              to eq(conditional_release_date)
         end
-
-        context 'when ineligible for early allocation' do
-          let!(:early_allocation) { create(:early_allocation, :ineligible, case_information: case_info) }
-
-          it { is_expected.to be(false) }
-        end
-
-        context 'when discretionary but the community have accepted' do
-          let!(:early_allocation) { create(:early_allocation, :discretionary, community_decision: true, case_information: case_info) }
-
-          it { is_expected.to be(true) }
-        end
-      end
-
-      describe '#ldu_name' do
-        let(:field) { :ldu_name }
-
-        context 'with a local delivery unit' do
-          let(:ldu) { create(:local_delivery_unit) }
-          let(:case_info) { create(:case_information, local_delivery_unit: ldu) }
-
-          it { is_expected.to be(ldu.name) }
-        end
-
-        context 'without a local delivery unit' do
-          let(:case_info) { create(:case_information, local_delivery_unit: nil) }
-
-          it { is_expected.to be_nil }
-        end
-      end
-
-      describe '#ldu_email_address' do
-        let(:field) { :ldu_email_address }
-
-        context 'with a local delivery unit' do
-          let(:ldu) { create(:local_delivery_unit) }
-          let(:case_info) { create(:case_information, local_delivery_unit: ldu) }
-
-          it { is_expected.to be(ldu.email_address) }
-        end
-
-        context 'without a local delivery unit' do
-          let(:case_info) { create(:case_information, local_delivery_unit: nil) }
-
-          it { is_expected.to be_nil }
-        end
-      end
-
-      describe '#team_name' do
-        let(:field) { :team_name }
-
-        it { is_expected.to be(case_info.team_name) }
-      end
-
-      describe '#allocated_com_name' do
-        let(:case_info) { create(:case_information, :with_com) }
-        let(:field) { :allocated_com_name }
-
-        it { is_expected.to be(case_info.com_name) }
       end
     end
   end
 
-  describe '#needs_a_com?' do
-    subject { offender.needs_a_com? }
+  describe '#sentenced?' do
+    context 'with sentence detail with a release date' do
+      before do
+        subject.sentence = build(:sentence_detail,
+                                 sentenceStartDate: Date.new(2005, 2, 3),
+                                 releaseDate: Time.zone.today)
+      end
 
-    let(:offender) {
-      build(:offender, sentence: sentence).tap { |o|
-        o.load_case_information(case_info)
-      }
-    }
+      it 'marks the offender as sentenced' do
+        expect(subject.sentenced?).to be true
+      end
+    end
 
-    let(:case_info) { build(:case_information) }
+    context 'with blank sentence detail' do
+      before { subject.sentence = build(:sentence_detail, :blank) }
 
-    context 'when the Community is not involved yet' do
-      let(:sentence) { build(:sentence_detail, :handover_in_8_days) }
+      it 'marks the offender as not sentenced' do
+        expect(subject.sentenced?).to be false
+      end
+    end
+  end
+
+  describe '#over_18?' do
+    context 'with a date of birth 50 years ago' do
+      before { subject.date_of_birth = 18.years.ago }
+
+      it 'returns true' do
+        expect(subject.over_18?).to eq(true)
+      end
+    end
+
+    context 'with a date of birth just under 50 years ago' do
+      before { subject.date_of_birth = 18.years.ago + 1.day }
 
       it 'returns false' do
-        expect(subject).to be(false)
+        expect(subject.over_18?).to eq(false)
       end
     end
 
-    context 'when the Community is involved' do
-      let(:sentence) { build(:sentence_detail, conditionalReleaseDate: Time.zone.today + 7.months) }
+    context 'with an 18th birthday in a past month' do
+      before { subject.date_of_birth = '5 Jan 2001'.to_date }
 
-      context 'when a COM is already allocated' do
-        let(:case_info) { build(:case_information, :with_com) }
-
-        it 'returns false' do
-          expect(subject).to be(false)
-        end
-      end
-
-      context 'when a COM has not been allocated yet' do
-        it 'returns true' do
-          expect(subject).to be(true)
+      it 'returns true' do
+        Timecop.travel('19 Feb 2019') do
+          expect(subject.over_18?).to eq(true)
         end
       end
     end
   end
 
-  describe 'offender category' do
-    subject { build(:offender, category: category) }
+  describe '#recalled' do
+    context 'when recall flag set' do
+      let(:offender) { build(:offender, sentence: build(:sentence_detail, recall: true)) }
 
-    context 'with a male offender (Cat B)' do
-      let(:category) { build(:offender_category, :cat_b) }
-
-      it 'knows the category code' do
-        expect(subject.category_code).to eq('B')
-      end
-
-      it 'knows the category label' do
-        expect(subject.category_label).to eq('Cat B')
-      end
-
-      it 'knows when the category became active for this offender' do
-        expect(subject.category_active_since).to be_a(Date)
+      it 'is true' do
+        expect(offender.recalled?).to eq(true)
       end
     end
 
-    context 'with a female offender (Female Open)' do
-      let(:category) { build(:offender_category, :female_open) }
+    context 'when recall flag unset' do
+      let(:offender) { build(:offender, recall: false) }
 
-      it 'knows the category code' do
-        expect(subject.category_code).to eq('T')
-      end
-
-      it 'knows the category label' do
-        expect(subject.category_label).to eq('Female Open')
-      end
-
-      it 'knows when the category became active for this offender' do
-        expect(subject.category_active_since).to be_a(Date)
-      end
-    end
-
-    # This is a legitimate state for an offender to be in
-    # They could be in the prison, but a categorisation assessment hasn't been completed yet
-    context "when the offender doesn't have a category" do
-      let(:category) { nil }
-
-      it 'returns nil' do
-        expect(subject.category_code).to be_nil
-        expect(subject.category_label).to be_nil
-        expect(subject.category_active_since).to be_nil
+      it 'is false' do
+        expect(offender.recalled?).to eq(false)
       end
     end
   end
