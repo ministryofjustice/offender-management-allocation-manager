@@ -79,13 +79,6 @@ private
     # case information (in case they come back one day), and we
     # should de-activate any current allocations.
     alloc.dealloate_offender_after_transfer if alloc&.active?
-
-    if PrisonService.open_prison?(transfer.to_agency)
-      # There are special rules for responsibility when offenders
-      # move to open prisons so we will trigger this job to send
-      # an email to the LDU
-      OpenPrisonTransferJob.perform_later(transfer.to_json)
-    end
     true
   end
 

@@ -10,7 +10,7 @@ describe HandoverDateService do
   let(:com) { HandoverDateService::Responsibility.new subject.community_responsible?, subject.community_supporting? }
   let(:start_date) { subject.start_date }
   let(:handover_date) { subject.handover_date }
-  let(:reason) { subject.reason }
+  let(:reason) { subject.reason_text }
 
   let(:closed_prison) { 'LEI' } # HMP Leeds
   let(:prescoed_prison) { PrisonService::PRESCOED_CODE } # HMP Prescoed
@@ -406,6 +406,10 @@ describe HandoverDateService do
         expect(handover_date).to eq(tariff_date - 8.months)
       end
 
+      it 'gives reason "NPS Indeterminate"' do
+        expect(reason).to eq("NPS Indeterminate")
+      end
+
       describe 'before handover date' do
         let(:today) { tariff_date - (8.months + 1.day) }
 
@@ -529,6 +533,10 @@ describe HandoverDateService do
             expect(com).not_to be_involved
           end
 
+          it 'gives reason "NPS Indeterminate"' do
+            expect(reason).to eq("NPS Indeterminate")
+          end
+
           context 'when transferred to open conditions (Cat T)' do
             let(:category) { build(:offender_category, :female_open, approvalDate: 3.days.ago) }
 
@@ -543,6 +551,10 @@ describe HandoverDateService do
 
             it 'handover happens 8 months before TED/PED/PRD' do
               expect(handover_date).to eq(tariff_date - 8.months)
+            end
+
+            it 'gives reason "NPS Indeterminate - Open conditions"' do
+              expect(reason).to eq("NPS Indeterminate - Open conditions")
             end
           end
         end
@@ -571,6 +583,10 @@ describe HandoverDateService do
 
           it 'handover happens 8 months before TED/PED/PRD' do
             expect(handover_date).to eq(tariff_date - 8.months)
+          end
+
+          it 'gives reason "NPS Indeterminate - Open conditions"' do
+            expect(reason).to eq("NPS Indeterminate - Open conditions")
           end
 
           describe 'before handover date' do

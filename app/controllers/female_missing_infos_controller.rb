@@ -5,15 +5,13 @@ class FemaleMissingInfosController < PrisonsApplicationController
 
   before_action :load_missing_info, except: :new
 
-  # We have to ignore these 2 keys whilst loading attributes
-  IGNORED_ERROR_KEYS = ['errors', 'validation_context'].freeze
-
   steps :complexity_level, :delius_information
 
   def new
-    session[complexity_session_key] = ComplexityForm.new nomis_offender_id: params.fetch(:prisoner_id)
-    session[case_info_session_key] = CaseInformation.new nomis_offender_id: params.fetch(:prisoner_id),
-                                              manual_entry: true
+    # Create blank records and store them in the session to begin the journey
+    save_to_session complexity_session_key, ComplexityForm.new(nomis_offender_id: params.fetch(:prisoner_id))
+    save_to_session case_info_session_key, CaseInformation.new(nomis_offender_id: params.fetch(:prisoner_id), manual_entry: true)
+
     if HmppsApi::ComplexityApi.get_complexity(params.fetch(:prisoner_id))
       redirect_to wizard_path :delius_information
     else
@@ -65,19 +63,20 @@ private
 
   def save_session
     if step == :complexity_level
-      session[complexity_session_key] = @missing_info
+      save_to_session(complexity_session_key, @missing_info)
     else
-      session[case_info_session_key] = @missing_info
+      save_to_session(case_info_session_key, @missing_info)
     end
   end
 
   def load_missing_info
     @prisoner = OffenderService.get_offender params.fetch(:prisoner_id)
 
+    # Initialise a new model object using the attributes stored in the session
     @missing_info = if step == :complexity_level
-                      ComplexityForm.new session[complexity_session_key].except(*IGNORED_ERROR_KEYS)
+                      ComplexityForm.new(session[complexity_session_key])
                     else
-                      CaseInformation.new session[case_info_session_key].except(*IGNORED_ERROR_KEYS)
+                      CaseInformation.new(session[case_info_session_key])
                     end
   end
 

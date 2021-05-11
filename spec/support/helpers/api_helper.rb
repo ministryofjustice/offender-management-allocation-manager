@@ -25,6 +25,8 @@ module ApiHelper
           prisonerNumber: offender_no,
           recall: offender.fetch(:recall),
           imprisonmentStatus: offender.fetch(:sentence).fetch(:imprisonmentStatus),
+          indeterminateSentence: offender.fetch(:sentence).fetch(:indeterminateSentence),
+          imprisonmentStatusDescription: offender.fetch(:sentence).fetch(:imprisonmentStatusDescription),
           cellLocation: offender.fetch(:internalLocation)
         }
       ].to_json)
@@ -136,6 +138,8 @@ module ApiHelper
                           prisonerNumber: offender.fetch(:offenderNo),
                           recall: offender.fetch(:recall),
                           imprisonmentStatus: offender.fetch(:sentence).fetch(:imprisonmentStatus),
+                          indeterminateSentence: offender.fetch(:sentence).fetch(:indeterminateSentence),
+                          imprisonmentStatusDescription: offender.fetch(:sentence).fetch(:imprisonmentStatusDescription),
                           cellLocation: offender.fetch(:internalLocation)
                         }
                       }.to_json)
@@ -176,7 +180,8 @@ module ApiHelper
 
   def stub_offender_categories(offenders)
     offender_nos = offenders.map { |offender| offender.fetch(:offenderNo) }
-    categories = offenders.map { |offender| offender.fetch(:category).merge(offenderNo: offender.fetch(:offenderNo)) }
+    categories = offenders.reject { |offender| offender[:category].nil? }
+                   .map { |offender| offender.fetch(:category).merge(offenderNo: offender.fetch(:offenderNo)) }
 
     stub_request(:post, "#{T3}/offender-assessments/CATEGORY?activeOnly=true&latestOnly=true&mostRecentOnly=true").
       with(

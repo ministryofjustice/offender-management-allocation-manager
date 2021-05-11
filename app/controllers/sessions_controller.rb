@@ -5,7 +5,7 @@ class SessionsController < ApplicationController
     identity = SignonIdentity.from_omniauth(request.env['omniauth.auth'])
 
     if identity
-      session[:sso_data] = identity.to_session
+      save_to_session(:sso_data, identity)
       redirect_to session.delete(:redirect_path) || root_url
     else
       redirect_to root_url

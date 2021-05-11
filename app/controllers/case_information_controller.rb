@@ -16,12 +16,13 @@ class CaseInformationController < PrisonsApplicationController
 
   # Just edit the parole_review_date field
   def edit_prd
-    @case_info = ParoleReviewDateForm.new nomis_offender_id: nomis_offender_id_from_url
+    @case_info = ParoleReviewDateForm.new
   end
 
   def update_prd
-    @case_info = ParoleReviewDateForm.new nomis_offender_id: nomis_offender_id_from_url
-    if @case_info.update(parole_review_date_params)
+    @case_info = ParoleReviewDateForm.new parole_review_date_params
+    if @case_info.valid?
+      CaseInformation.find_by!(nomis_offender_id: nomis_offender_id_from_url).update!(parole_review_date: @case_info.parole_review_date)
       redirect_to referrer
     else
       render 'edit_prd'
@@ -83,17 +84,16 @@ private
   end
 
   def nomis_offender_id_from_url
-    params.require(:nomis_offender_id)
+    params.require(:prisoner_id)
   end
 
   def case_information_params
     params.require(:case_information).
-      permit(:nomis_offender_id, :tier, :case_allocation, :probation_service,
-             :parole_review_date_dd, :parole_review_date_mm, :parole_review_date_yyyy)
+      permit(:nomis_offender_id, :tier, :case_allocation, :probation_service)
   end
 
   def parole_review_date_params
     params.require(:parole_review_date_form).
-      permit(:parole_review_date_dd, :parole_review_date_mm, :parole_review_date_yyyy)
+      permit(:parole_review_date)
   end
 end

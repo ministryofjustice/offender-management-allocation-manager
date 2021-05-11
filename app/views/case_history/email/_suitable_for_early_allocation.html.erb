@@ -1,0 +1,15 @@
+<% description = capture do %>
+  <p>
+    The COM might need to take responsibility for this case early.
+    Previous early allocation assessment forms told us this.
+    The POM must now check and carry out a new assessment for this case.
+    Eligible and discretionary early allocation assessment forms will be sent to the community probation team.
+
+    <%= link_to 'Check and carry out a new assessment',
+                new_prison_prisoner_early_allocation_path(@prison.code, suitable_for_early_allocation.nomis_offender_id) %>
+  </p>
+<% end %>
+<%= render 'case_history/email_history',
+           title: 'Reminder sent to POM for early allocation re-assessment',
+           description: description,
+           object: suitable_for_early_allocation %>

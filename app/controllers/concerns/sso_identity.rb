@@ -6,7 +6,10 @@ class SsoIdentity
   ADMIN_ROLE = 'ROLE_MOIC_ADMIN'
 
   def initialize(session)
-    @sso_identity = session[:sso_data]
+    # Symbolize keys to avoid differences between different session storage adapters.
+    # Cookie-backed sessions seem to return keys as strings, whereas cache-backed sessions
+    # seem to return keys as symbols.
+    @sso_identity = session[:sso_data]&.symbolize_keys
   end
 
   def absent?
@@ -18,7 +21,7 @@ class SsoIdentity
   end
 
   def current_user
-    @sso_identity['username'] if @sso_identity.present?
+    @sso_identity[:username] if @sso_identity.present?
   end
 
   def current_user_is_spo?
@@ -36,14 +39,14 @@ class SsoIdentity
   end
 
   def default_prison_code
-    @sso_identity['active_caseload'] if @sso_identity.present?
+    @sso_identity[:active_caseload] if @sso_identity.present?
   end
 
   def caseloads
     if @sso_identity.blank?
       []
     else
-      @sso_identity.fetch('caseloads').reject { |c| c.casecmp('NWEB') == 0 }
+      @sso_identity.fetch(:caseloads).reject { |c| c.casecmp('NWEB') == 0 }
     end
   end
 
@@ -52,14 +55,14 @@ class SsoIdentity
   end
 
   def session_expired?
-    Time.current > Time.zone.at(@sso_identity['expiry'])
+    Time.current > Time.zone.at(@sso_identity.fetch(:expiry))
   end
 
 private
 
   def roles
     @roles ||= if @sso_identity.present?
-                 @sso_identity['roles']
+                 @sso_identity[:roles]
                else
                  []
                end

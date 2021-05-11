@@ -3,60 +3,98 @@
 require 'rails_helper'
 
 feature 'Search for offenders' do
-  let(:prison) { 'LEI' }
-
-  it 'Can search from the dashboard', vcr: { cassette_name: 'prison_api/dashboard_search_feature' } do
-    signin_spo_user
-    visit root_path
-
-    expect(page).to have_text('Dashboard')
-    fill_in 'q', with: 'Cal'
-    click_on('search-button')
-
-    expect(page).to have_current_path(search_prison_prisoners_path(prison), ignore_query: true)
-    expect(page).to have_css('tbody tr', count: 6)
+  before do
+    signin_spo_user [prison_code]
   end
 
-  context 'when on the Allocations summary page' do
+  context 'when male prison' do
+    let(:prison_code) { 'LEI' }
+
+    it 'Can search from the dashboard', vcr: { cassette_name: 'prison_api/dashboard_search_feature' } do
+      visit root_path
+
+      expect(page).to have_text('Dashboard')
+      fill_in 'q', with: 'Cal'
+      click_on('search-button')
+
+      expect(page).to have_current_path(search_prison_prisoners_path(prison_code), ignore_query: true)
+      expect(page).to have_css('tbody tr', count: 6)
+
+      # Just check that link can be clicked on without crashing
+      within '.allocated_offender_row_0' do
+        click_link 'Add missing details'
+      end
+    end
+  end
+
+  context "with female prison" do
+    let(:test_strategy) { Flipflop::FeatureSet.current.test! }
+    let(:prison) { build(:womens_prison) }
+    let(:prison_code) { prison.code }
+    let(:offenders) { build_list(:nomis_offender, 5, agencyId: prison.code, complexityLevel: 'high') }
+    let(:pom) { build(:pom) }
+
+    before do
+      test_strategy.switch!(:womens_estate, true)
+      stub_auth_token
+      stub_offenders_for_prison(prison_code, offenders)
+      stub_spo_user pom
+      stub_poms prison_code, [pom]
+    end
+
+    after do
+      test_strategy.switch!(:womens_estate, false)
+    end
+
+    it 'has a valid missing info link' do
+      visit search_prison_prisoners_path(prison_code)
+
+      # Just check that link can be clicked on without crashing
+      within '.allocated_offender_row_0' do
+        click_link 'Add missing details'
+      end
+    end
+  end
+
+  context 'with a single allocation' do
     before do
       create(:case_information, nomis_offender_id: 'G5359UP')
       create(:allocation, nomis_offender_id: 'G5359UP')
     end
 
-    it 'Can search from the Allocations summary page', :js, vcr: { cassette_name: 'prison_api/allocated_search_feature' } do
-      signin_spo_user
-      visit allocated_prison_prisoners_path(prison)
+    let(:prison_code) { 'LEI' }
+
+    it 'Can search from the Allocations summary page', vcr: { cassette_name: 'prison_api/allocated_search_feature' } do
+      visit allocated_prison_prisoners_path(prison_code)
 
       expect(page).to have_text('See allocations')
       fill_in 'q', with: 'Fra'
       click_on('search-button')
 
-      expect(page).to have_current_path(search_prison_prisoners_path(prison), ignore_query: true)
+      expect(page).to have_current_path(search_prison_prisoners_path(prison_code), ignore_query: true)
       expect(page).to have_css('tbody tr', count: 9)
     end
-  end
 
-  it 'Can search from the Awaiting Allocation summary page', vcr: { cassette_name: 'prison_api/waiting_allocation_search_feature' } do
-    signin_spo_user
-    visit unallocated_prison_prisoners_path(prison)
+    it 'Can search from the Awaiting Allocation summary page', vcr: { cassette_name: 'prison_api/waiting_allocation_search_feature' } do
+      visit unallocated_prison_prisoners_path(prison_code)
 
-    expect(page).to have_text('Make allocations')
-    fill_in 'q', with: 'Tre'
-    click_on('search-button')
+      expect(page).to have_text('Make allocations')
+      fill_in 'q', with: 'Tre'
+      click_on('search-button')
 
-    expect(page).to have_current_path(search_prison_prisoners_path(prison), ignore_query: true)
-    expect(page).to have_css('tbody tr', count: 1)
-  end
+      expect(page).to have_current_path(search_prison_prisoners_path(prison_code), ignore_query: true)
+      expect(page).to have_css('tbody tr', count: 1)
+    end
 
-  it 'Can search from the Missing Information summary page', vcr: { cassette_name: 'prison_api/missing_info_search_feature' } do
-    signin_spo_user
-    visit  missing_information_prison_prisoners_path(prison)
+    it 'Can search from the Missing Information summary page', vcr: { cassette_name: 'prison_api/missing_info_search_feature' } do
+      visit  missing_information_prison_prisoners_path(prison_code)
 
-    expect(page).to have_text('Make allocations')
-    fill_in 'q', with: 'Ste'
-    click_on('search-button')
+      expect(page).to have_text('Make allocations')
+      fill_in 'q', with: 'Ste'
+      click_on('search-button')
 
-    expect(page).to have_current_path(search_prison_prisoners_path(prison), ignore_query: true)
-    expect(page).to have_css('tbody tr', count: 4)
+      expect(page).to have_current_path(search_prison_prisoners_path(prison_code), ignore_query: true)
+      expect(page).to have_css('tbody tr', count: 4)
+    end
   end
 end

@@ -18,9 +18,9 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
 
     click_link 'Update'
 
-    fill_in 'parole_review_date_form_parole_review_date_dd', with: 13
-    fill_in 'parole_review_date_form_parole_review_date_mm', with: 5
-    fill_in 'parole_review_date_form_parole_review_date_yyyy', with: year
+    fill_in id: 'parole_review_date_form_parole_review_date_3i', with: 13
+    fill_in id: 'parole_review_date_form_parole_review_date_2i', with: 5
+    fill_in id: 'parole_review_date_form_parole_review_date_1i', with: year
 
     click_button 'Update'
 
@@ -33,8 +33,9 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
 
     click_link 'Update'
 
-    fill_in 'parole_review_date_form_parole_review_date_dd', with: 13
-    fill_in 'parole_review_date_form_parole_review_date_mm', with: 5
+    fill_in id: 'parole_review_date_form_parole_review_date_3i', with: 13
+    fill_in id: 'parole_review_date_form_parole_review_date_2i', with: 5
+    fill_in id: 'parole_review_date_form_parole_review_date_1i', with: 1997
 
     click_button 'Update'
 
