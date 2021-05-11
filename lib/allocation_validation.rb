@@ -14,7 +14,7 @@ class AllocationValidation
     #
 
     # Get all active allocations for this prison
-    allocations = active_allocations_for_prison(prison)
+    allocations = Allocation.active_allocations_for_prison(prison)
 
     puts "Processing #{allocations.count} items"
 
@@ -50,9 +50,5 @@ class AllocationValidation
       puts "#{offender.offender_no} (allocated) appears to have been transferred to #{offender.prison_id} - deallocating"
       allocation.dealloate_offender_after_transfer
     }
-  end
-
-  def active_allocations_for_prison(prison)
-    Allocation.where.not(primary_pom_nomis_id: nil).where(prison: prison)
   end
 end

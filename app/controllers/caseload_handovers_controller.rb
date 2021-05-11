@@ -8,6 +8,6 @@ class CaseloadHandoversController < PrisonStaffApplicationController
 
     @offenders = Kaminari.paginate_array(collection).page(page)
     @pending_handover_count = collection.count
-    @prison_total_handovers = SummaryService.new(:handovers, @prison).handovers_total
+    @prison_total_handovers = @prison.offenders.count(&:approaching_handover?)
   end
 end

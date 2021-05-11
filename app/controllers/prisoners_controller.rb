@@ -1,6 +1,28 @@
 # frozen_string_literal: true
 
 class PrisonersController < PrisonsApplicationController
+  include Sorting
+
+  before_action :ensure_spo_user, except: [:show, :image]
+
+  before_action :load_all_offenders, only: [:allocated, :missing_information, :unallocated, :new_arrivals, :search]
+
+  def allocated
+    load_summary :allocated
+  end
+
+  def missing_information
+    load_summary :missing_information
+  end
+
+  def unallocated
+    load_summary :unallocated
+  end
+
+  def new_arrivals
+    load_summary :new_arrivals
+  end
+
   def search
     @q = search_term
     offenders = SearchService.search_for_offenders(@q, @prison.offenders)
@@ -41,15 +63,33 @@ class PrisonersController < PrisonsApplicationController
 
 private
 
-  def get_slice_for_page(offenders)
-    slice = Kaminari.paginate_array(offenders).page(page)
+  def load_all_offenders
+    @missing_info = @prison.summary.missing_info
+    @unallocated = @prison.summary.unallocated
+    @new_arrivals = @prison.summary.new_arrivals
+    @allocated = @prison.summary.allocated.map do |offender|
+      OffenderWithAllocationPresenter.new(offender, @prison.allocations.detect { |a| a.nomis_offender_id == offender.offender_no })
+    end
+  end
 
-    # At this point offenders contains ALL of the offenders at the prison that
-    # match the search term, slice is the current page worth of offenders.
-    # We will only show PAGE_SIZE at a time, so there is no need
-    # to get the allocated POM name for offenders, we will just get them
-    # for the much smaller slice.
-    set_allocated_pom_names(slice, active_prison_id)
+  def load_summary summary_type
+    bucket = {
+      unallocated: @unallocated,
+      missing_information: @missing_info,
+      new_arrivals: @new_arrivals,
+      allocated: @allocated
+    }.fetch(summary_type)
+
+    offenders = sort_collection(bucket, default_sort: :last_name)
+
+    @offenders = Kaminari.paginate_array(offenders).page(page)
+  end
+
+  def get_slice_for_page(offender_list)
+    offenders = offender_list.map do |offender|
+      OffenderWithAllocationPresenter.new(offender, @prison.allocations.detect { |a| a.nomis_offender_id == offender.offender_no })
+    end
+    Kaminari.paginate_array(offenders).page(page)
   end
 
   def page
@@ -59,35 +99,5 @@ private
   def search_term
     # defaults to an empty string if the key 'q' can't be found
     params.fetch('q', '').strip
-  end
-
-  # Takes a list of OffenderSummary or Offender objects, and returns them with their
-  # allocated POM name set in :allocated_pom_name.
-  def set_allocated_pom_names(offenders, prison_id)
-    pom_names = PrisonOffenderManagerService.get_poms_for(prison_id).each_with_object({}) { |p, hsh|
-      hsh[p.staff_id] = p.full_name
-    }
-
-    nomis_offender_ids = offenders.map(&:offender_no)
-
-    offender_to_staff_hash = Allocation.
-      where(nomis_offender_id: nomis_offender_ids).
-      map { |a|
-        [
-          a.nomis_offender_id,
-          {
-            pom_name: pom_names[a.primary_pom_nomis_id],
-            allocation_date: (a.primary_pom_allocated_at || a.updated_at)&.to_date
-          }
-        ]
-      }.to_h
-
-    offenders.each do |offender|
-      if offender_to_staff_hash.key?(offender.offender_no)
-        offender.allocated_pom_name = offender_to_staff_hash[offender.offender_no][:pom_name]
-        offender.allocation_date = offender_to_staff_hash[offender.offender_no][:allocation_date]
-      end
-    end
-    offenders
   end
 end

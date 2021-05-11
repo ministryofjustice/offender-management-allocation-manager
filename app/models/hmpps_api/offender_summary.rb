@@ -4,8 +4,6 @@ module HmppsApi
   class OffenderSummary < OffenderBase
     include Deserialisable
 
-    attr_accessor :allocation_date
-
     attr_reader :prison_id, :facial_image_id
 
     def awaiting_allocation_for

@@ -54,20 +54,11 @@
           </span>
         </td>
 
-        <!-- Todo: REFACTOR THIS SECTION TO USE PRESENTERS -->
         <td aria-label="Service provider" class="govuk-table__cell ">
-          <% if offender.case_allocation %>
-            <%= offender.case_allocation %>
-          <% else %>
-            Not provided
-          <% end %>
+          <%= offender.case_allocation.presence || 'Not provided' %>
         </td>
         <td aria-label="Tier" class="govuk-table__cell ">
-          <% if offender.tier %>
-            <%= offender.tier %>
-          <% else %>
-            Not provided
-          <% end %>
+          <%= offender.tier.presence || 'Not provided' %>
         </td>
         <td aria-label="Waiting" class="govuk-table__cell"><%= offender.awaiting_allocation_for %> days</td>
         <td aria-label="Action" class="govuk-table__cell" id="<%= "edit_#{offender.offender_no}" %>">

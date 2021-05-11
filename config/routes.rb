@@ -38,24 +38,11 @@ Rails.application.routes.draw do
       end
 
       collection do
-        constraints lambda {
-            |request| PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id))
-        } do
-          get 'allocated' => 'female_prisoners#allocated'
-          get 'unallocated' => 'female_prisoners#unallocated'
-          get 'missing_information' => 'female_prisoners#missing_information'
-          get 'new_arrivals' => 'female_prisoners#new_arrivals'
-          get 'search' => 'female_prisoners#search'
-        end
-        constraints lambda {
-          |request| !PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id))
-        } do
-          get 'allocated' => 'summary#allocated'
-          get 'unallocated' => 'summary#unallocated'
-          get 'missing_information' => 'summary#missing_information'
-          get 'new_arrivals' => 'summary#new_arrivals'
-          get 'search' => 'summary#search'
-        end
+        get 'allocated'
+        get 'unallocated'
+        get 'missing_information'
+        get 'new_arrivals'
+        get 'search'
       end
 
       scope :format => true, :constraints => { :format => 'jpg' } do

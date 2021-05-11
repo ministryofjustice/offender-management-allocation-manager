@@ -36,6 +36,39 @@ class Prison
     OffenderEnumerator.new(@code)
   end
 
+  def allocations
+    @allocations ||= Allocation.active_allocations_for_prison(@code).where(nomis_offender_id: offenders.map(&:offender_no))
+  end
+
+  Summary = Struct.new :allocated, :unallocated, :new_arrivals, :missing_info, keyword_init: true
+
+  def summary
+    @summary ||= begin
+      summary = offenders.group_by do |offender|
+        allocatable = if womens?
+                        offender.has_case_information? && offender.complexity_level.present?
+                      else
+                        offender.has_case_information?
+                      end
+        if allocatable
+          if allocations.detect { |a| a.nomis_offender_id == offender.offender_no }
+            :allocated
+          else
+            :unallocated
+          end
+        elsif offender.prison_arrival_date.to_date == Time.zone.today
+          :new_arrival
+        else
+          :missing_info
+        end
+      end
+      Summary.new allocated: summary.fetch(:allocated, []),
+                  unallocated: summary.fetch(:unallocated, []),
+                  new_arrivals: summary.fetch(:new_arrival, []),
+                  missing_info: summary.fetch(:missing_info, [])
+    end
+  end
+
 private
 
   class PrisonEmumerator

@@ -15,7 +15,7 @@ module HmppsApi
 
     delegate :code, :label, :active_since, to: :@category, prefix: :category, allow_nil: true
 
-    attr_accessor :date_of_birth, :prison_arrival_date, :sentence, :allocated_pom_name
+    attr_accessor :date_of_birth, :prison_arrival_date, :sentence
 
     attr_reader :first_name, :last_name, :booking_id, :offender_no, :sentence_type, :cell_location, :complexity_level
 
@@ -188,6 +188,9 @@ module HmppsApi
     end
 
     def approaching_handover?
+      # we can't calculate handover without case info as we don't know NPS/CRC
+      return false if @case_information.blank?
+
       today = Time.zone.today
       thirty_days_time = today + 30.days
 
