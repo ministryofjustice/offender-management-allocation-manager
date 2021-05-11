@@ -3,17 +3,11 @@
 class CoworkingController < PrisonsApplicationController
   def new
     @prisoner = offender(nomis_offender_id_from_url)
-    @current_pom = AllocationService.current_pom_for(
-      nomis_offender_id_from_url,
-      active_prison_id
-    )
+    current_pom_id = Allocation.find_by!(nomis_offender_id: nomis_offender_id_from_url).primary_pom_nomis_id
+    poms = PrisonOffenderManagerService.get_poms_for(active_prison_id)
+    @current_pom = poms.detect { |pom| pom.staff_id == current_pom_id }
 
-    # get_pom and get_poms return different data - so have to compare theit staff_ids.
-    poms = PrisonOffenderManagerService.get_poms_for(active_prison_id).reject { |pom|
-      pom.staff_id == @current_pom.staff_id
-    }
-
-    @active_poms, @unavailable_poms = poms.partition { |pom|
+    @active_poms, @unavailable_poms = poms.reject { |p| p.staff_id == current_pom_id }.partition { |pom|
       %w[active unavailable].include? pom.status
     }
 

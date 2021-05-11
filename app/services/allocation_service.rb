@@ -69,12 +69,6 @@ class AllocationService
     alloc_version
   end
 
-  def self.active_allocations(nomis_offender_ids, prison)
-    Allocation.active(nomis_offender_ids, prison).index_by { |a|
-      a[:nomis_offender_id]
-    }
-  end
-
   def self.allocation_history_pom_emails(allocation)
     history = allocation.get_old_versions.append(allocation)
     pom_ids = history.map { |h| [h.primary_pom_nomis_id, h.secondary_pom_nomis_id] }.flatten.compact.uniq
@@ -96,13 +90,6 @@ class AllocationService
 
   def self.current_allocation_for(nomis_offender_id)
     Allocation.allocations(nomis_offender_id).last
-  end
-
-  def self.current_pom_for(nomis_offender_id, prison_id)
-    current_allocation = active_allocations(nomis_offender_id, prison_id)
-    nomis_staff_id = current_allocation[nomis_offender_id].primary_pom_nomis_id
-
-    PrisonOffenderManagerService.get_pom_at(prison_id, nomis_staff_id)
   end
 
 private

@@ -124,52 +124,6 @@ describe AllocationService do
     end
   end
 
-  describe '#allocations' do
-    it "Can get allocations by prison", vcr: { cassette_name: 'prison_api/allocation_service_get_allocations_by_prison' } do
-      first_offender_id = 'JSHD000NN'
-      second_offender_id = 'SDHH87GD'
-      leeds_prison = 'LEI'
-
-      create(
-        :allocation,
-        nomis_offender_id: first_offender_id,
-        prison: leeds_prison
-      )
-
-      create(
-        :allocation,
-        nomis_offender_id: second_offender_id,
-        prison: 'USK'
-      )
-
-      allocations = described_class.active_allocations([first_offender_id, second_offender_id], leeds_prison)
-
-      expect(allocations.keys.count).to be(1)
-      expect(allocations.keys.first).to eq(first_offender_id)
-    end
-  end
-
-  it 'can get the current allocated primary POM', vcr: { cassette_name: 'prison_api/current_allocated_primary_pom' }  do
-    previous_primary_pom_nomis_id = 485_637
-    updated_primary_pom_nomis_id = 485_926
-
-    allocation = create(
-      :allocation,
-      nomis_offender_id: nomis_offender_id,
-      primary_pom_nomis_id: previous_primary_pom_nomis_id)
-
-    allocation.update!(
-      primary_pom_nomis_id: updated_primary_pom_nomis_id,
-      event: Allocation::REALLOCATE_PRIMARY_POM
-    )
-
-    current_pom = described_class.current_pom_for(nomis_offender_id, 'LEI')
-
-    expect(current_pom.first_name).to eq("MOIC")
-    expect(current_pom.last_name).to eq("POM")
-    expect(current_pom.position_description).to eq("Prison Officer")
-  end
-
   describe '#allocation_history_pom_emails' do
     it 'can retrieve all the POMs email addresses for ', vcr: { cassette_name: 'prison_api/allocation_service_history_spec' } do
       previous_primary_pom_nomis_id = 485_637

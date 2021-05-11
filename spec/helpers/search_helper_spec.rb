@@ -4,9 +4,10 @@ RSpec.describe SearchHelper do
   describe 'the CTA' do
     context 'with no allocation' do
       let(:offender) {
-        build(:offender).tap { |o|
+        x = build(:offender).tap { |o|
           o.load_case_information(build(:case_information, tier: 'A'))
         }
+        OffenderWithAllocationPresenter.new(x, nil)
       }
       let(:expected_link) {
         link_to 'Allocate', prison_prisoner_staff_index_path('LEI', prisoner_id: offender.offender_no)
@@ -20,10 +21,10 @@ RSpec.describe SearchHelper do
     context 'with an allocation' do
       let(:case_info) { build(:case_information, tier: 'A') }
       let(:offender) {
-        build(:offender, offenderNo: case_info.nomis_offender_id).tap { |o|
-          o.allocated_pom_name = 'Bob'
+        x = build(:offender, offenderNo: case_info.nomis_offender_id).tap { |o|
           o.load_case_information(case_info)
         }
+        OffenderWithAllocationPresenter.new(x, build(:allocation))
       }
 
       it "will change to view" do

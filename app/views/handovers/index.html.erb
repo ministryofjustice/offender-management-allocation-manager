@@ -3,7 +3,7 @@
 <% end %>
 
 <%= render(:partial => 'subnav', :locals => {:active => :all_handovers,
-                                             prison_total_handovers: @summary.handovers_total,
+                                             prison_total_handovers: @offenders.total_count,
                                              pending_handover_count: @pending_handover_count}) %>
 
 <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Case handover status</h1>

@@ -137,29 +137,18 @@ feature "viewing upcoming handovers" do
 
       scenario 'sorts POMs alphabetically' do
         click_link('POM')
-
-        check_poms.each_with_index do |name, index|
-          expect(page).to have_css(".offender_row_#{index}", text: name)
-        end
+        expect(all('td[aria-label=POM]').map(&:text)).to eq(check_poms)
 
         click_link('POM')
-        check_poms.reverse.each_with_index do |name, index|
-          expect(page).to have_css(".offender_row_#{index}", text: name)
-        end
+        expect(all('td[aria-label=POM]').map(&:text)).to eq(check_poms.reverse)
       end
 
       scenario 'sorts COMs alphabetically' do
         click_link('COM')
-
-        check_coms.each_with_index do |name, index|
-          expect(page).to have_css(".offender_row_#{index}", text: name)
-        end
+        expect(all('td[aria-label=COM]').map(&:text)).to eq(check_coms)
 
         click_link('COM')
-
-        check_coms.reverse.each_with_index do |name, index|
-          expect(page).to have_css(".offender_row_#{index}", text: name)
-        end
+        expect(all('td[aria-label=COM]').map(&:text)).to eq(check_coms.reverse)
       end
     end
   end

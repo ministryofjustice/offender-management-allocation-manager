@@ -3,7 +3,9 @@
 # This class is another attenpt to merge a 'prisoner' with an 'allocation'
 # despite the fact that this should be really easy in theory
 class OffenderWithAllocationPresenter
-  delegate :offender_no, :full_name, :earliest_release_date,  to: :@offender
+  delegate :offender_no, :full_name, :last_name, :earliest_release_date, :allocated_com_name,
+           :case_allocation, :date_of_birth, :tier,
+           :handover_start_date, :responsibility_handover_date, to: :@offender
 
   def initialize(offender, allocation)
     @offender = offender
@@ -15,10 +17,14 @@ class OffenderWithAllocationPresenter
   # allocation the other way round i.e. first last rather than last,first - and hence we have unexecutable
   # code which we can (technically) never remove
   def allocated_pom_name
-    @allocation.primary_pom_name.titleize
+    if @allocation
+      @allocation.primary_pom_name.titleize
+    end
   end
 
   def allocation_date
-    (@allocation.primary_pom_allocated_at || @allocation.updated_at)&.to_date
+    if @allocation
+      (@allocation.primary_pom_allocated_at || @allocation.updated_at)&.to_date
+    end
   end
 end

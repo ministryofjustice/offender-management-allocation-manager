@@ -11,36 +11,41 @@ RSpec.describe DebuggingController, type: :controller do
   end
 
   context 'when debugging at a prison level' do
-    it 'can show debugging information for an entire prison' do
-      stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN").
-        to_return(body: [].to_json)
-
-      offenders = [
+    let(:offenders) {
+      [
+        build(:nomis_offender),
         build(:nomis_offender),
         build(:nomis_offender, dateOfBirth: Time.zone.today - 15.years),
         build(:nomis_offender, sentence: attributes_for(:sentence_detail, releaseDate: nil,
-                     paroleEligibilityDate: nil, homeDetentionCurfewEligibilityDate: nil, tariffDate: nil))
+                                                        paroleEligibilityDate: nil, homeDetentionCurfewEligibilityDate: nil, tariffDate: nil))
       ]
+    }
+
+    before do
+      stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN").
+        to_return(body: [].to_json)
 
       stub_offenders_for_prison(prison_id, offenders)
 
+      create(:case_information, nomis_offender_id: offenders.first.fetch(:offenderNo))
+
+      create(:case_information, nomis_offender_id: offenders.second.fetch(:offenderNo))
+      create(:allocation, prison: prison_id, nomis_offender_id: offenders.second.fetch(:offenderNo))
+    end
+
+    it 'can show debugging information for an entire prison' do
       get :prison_info, params: { prison_id: prison_id }
       expect(response.status).to eq(200)
       expect(response).to be_successful
 
       expect(assigns(:prison_title)).to eq(prison.name)
-      expect(assigns(:filtered_offenders_count)).to eq(1)
-      expect(assigns(:unfiltered_offenders_count)).to eq(3)
+      expect(assigns(:filtered_offenders_count)).to eq(2)
+      expect(assigns(:unfiltered_offenders_count)).to eq(4)
 
       filtered_offenders = assigns(:filtered)
       expect(filtered_offenders[:under18].count).to eq(1)
-      expect(filtered_offenders[:under18].first.first_name).to eq(offenders.second.fetch(:firstName))
+      expect(filtered_offenders[:under18].first.first_name).to eq(offenders.third.fetch(:firstName))
       expect(filtered_offenders[:unsentenced].count).to eq(1)
-
-      summary = assigns(:summary)
-      expect(summary.allocated.count).to eq(0)
-      expect(summary.unallocated.count).to eq(0)
-      expect(summary.pending.count).to eq(1)
     end
   end
 
