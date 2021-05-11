@@ -10,7 +10,7 @@ gem 'faraday', '~> 1.0'
 gem 'govuk_notify_rails'
 # we need the extra is_csv parameter available in 5.2 and above
 gem 'notifications-ruby-client', '>= 5.2'
-gem 'govuk_design_system_formbuilder', '~> 2.1'
+gem 'govuk_design_system_formbuilder', '~> 2.5'
 gem 'date_validator'
 gem 'jbuilder', '~> 2.11'
 gem 'jwt'
