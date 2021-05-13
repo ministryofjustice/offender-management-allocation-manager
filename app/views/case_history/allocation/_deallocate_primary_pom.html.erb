@@ -8,7 +8,7 @@
   <% description = capture do %>
     <% unless deallocate_primary_pom.event_trigger == 'offender_transferred' %>
       Prisoner unallocated POM
-      <%= allocations[deallocate_primary_pom_counter + 1].primary_pom_name.titleize %> - <%= format_email(@pom_emails[allocations[deallocate_primary_pom_counter + 1].primary_pom_nomis_id]) %>
+      <%= deallocate_primary_pom.previous_primary_pom_name.titleize %> - <%= format_email(@pom_emails[deallocate_primary_pom.previous_primary_pom_id]) %>
     <% end %>
   <% end %>
   <%= render 'case_history/case_history',
