@@ -1,7 +1,7 @@
 <% if deallocate_primary_pom.event_trigger == 'offender_transferred' %>
   <%= render 'case_history/case_history',
-             title: 'Prisoner unallocated (transfer)',
-             description: '',
+             title: 'Prisoner unallocated',
+             description: 'Prisoner transferred',
              object: deallocate_primary_pom
   %>
 <% else %>

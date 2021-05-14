@@ -234,7 +234,7 @@ RSpec.describe "allocations/history", type: :view do
 
       it 'displays a release label and the release date and time in the allocation history' do
         render
-        expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ["Prisoner released", "Prisoner allocated"]
+        expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ["Prisoner unallocated", "Prisoner allocated"]
         expect(page.css('.moj-timeline__date')).to have_text('19th November 2019 (11:28)')
       end
     end

@@ -4,10 +4,7 @@
   </div>
 
   <p class="moj-timeline__date">
-    <%= format_date_long(object.created_at) %>
-    <% if object.created_by_name.present? %>
-      by <%= object.created_by_name.titleize %>
-    <% end %>
+    <%= format_date_long(object.created_at) %> by <%= object.created_by_name.present? ? object.created_by_name.titleize : 'System Admin' %>
   </p>
 
   <div class="moj-timeline__description">
