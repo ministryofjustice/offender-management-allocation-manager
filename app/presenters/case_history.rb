@@ -4,7 +4,7 @@ class CaseHistory
   delegate :primary_pom_nomis_id, :event_trigger, :secondary_pom_nomis_id, :prison,
            :allocated_at_tier, :nomis_offender_id, :primary_pom_name, :override_reasons, :suitability_detail,
            :override_detail,
-           :created_by_name, :recommended_pom_type, :secondary_pom_name, to: :@allocation
+           :recommended_pom_type, :secondary_pom_name, to: :@allocation
 
   def initialize(prev_allocation, allocation, version)
     @previous_allocation = prev_allocation
@@ -30,6 +30,13 @@ class CaseHistory
       'allocate_primary_pom'
     else
       @allocation.event
+    end
+  end
+
+  # don't allow auto-deallocations to say that a person did it
+  def created_by_name
+    if @allocation.event_trigger == 'user'
+      @allocation.created_by_name
     end
   end
 

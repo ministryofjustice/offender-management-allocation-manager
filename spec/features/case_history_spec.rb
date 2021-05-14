@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'Allocation History' do
+feature 'Case History' do
   let(:probation_pom) do
     {
       primary_pom_nomis_id: 485_926,
@@ -91,6 +91,7 @@ feature 'Allocation History' do
             :allocation,
             prison: first_prison.code,
             event: Allocation::ALLOCATE_PRIMARY_POM,
+            event_trigger: Allocation::USER,
             nomis_offender_id: nomis_offender_id,
             primary_pom_nomis_id: probation_pom[:primary_pom_nomis_id],
             primary_pom_name: probation_pom[:primary_pom_name],
@@ -103,6 +104,7 @@ feature 'Allocation History' do
         current_date += 1.day
         Timecop.travel current_date do
           allocation.update!(event: Allocation::REALLOCATE_PRIMARY_POM,
+                             event_trigger: Allocation::USER,
                              primary_pom_nomis_id: probation_pom_2[:primary_pom_nomis_id],
                              primary_pom_name: probation_pom_2[:primary_pom_name],
                              recommended_pom_type: 'probation')
@@ -134,11 +136,11 @@ feature 'Allocation History' do
           create(:case_information, nomis_offender_id: nomis_offender_id, local_delivery_unit: pontypool_ldu)
           allocation = Allocation.find_by!(nomis_offender_id: nomis_offender_id)
           allocation.update!(event: Allocation::ALLOCATE_PRIMARY_POM,
+                             event_trigger: Allocation::USER,
                              prison: second_prison.code,
                              primary_pom_nomis_id: prison_pom[:primary_pom_nomis_id],
                              primary_pom_name: prison_pom[:primary_pom_name],
-                             recommended_pom_type: 'prison',
-                             created_by_name: nil)
+                             recommended_pom_type: 'prison')
         end
 
         current_date += 1.day
@@ -186,7 +188,7 @@ feature 'Allocation History' do
 
       let(:today) { Time.zone.now } # try not to call Time.zone.now too often, to avoid 1-minute drifts
       let(:deallocate_date) { today - 6.days }
-      let(:formatted_deallocate_date) { deallocate_date.strftime("#{deallocate_date.day.ordinalize} %B %Y") }
+      let(:formatted_deallocate_date) { deallocate_date.strftime("#{deallocate_date.day.ordinalize} %B %Y (%R)") }
       let(:transfer_date) { today - 1.day }
       let(:formatted_transfer_date) { transfer_date.strftime("#{transfer_date.day.ordinalize} %B %Y") + " (" + transfer_date.strftime("%R") + ")" }
       let(:allocation) { Allocation.last }
@@ -234,7 +236,7 @@ feature 'Allocation History' do
         within '.govuk-grid-row:nth-of-type(2)' do
           within '.moj-timeline__item:nth-of-type(1)' do
             [
-              ['.moj-timeline__title', "Prisoner unallocated (transfer)"],
+              ['.moj-timeline__title', "Prisoner unallocated"],
               ['.moj-timeline__date', formatted_transfer_date.to_s],
             ].each do |key, val|
               expect(page).to have_css(key, text: val)
@@ -328,8 +330,8 @@ feature 'Allocation History' do
 
           within '.moj-timeline__item:nth-of-type(1)' do
             [
-              ['.moj-timeline__title', "Prisoner released"],
-              ['.moj-timeline__date', formatted_deallocate_date.to_s],
+              ['.moj-timeline__title', "Prisoner unallocated"],
+              ['.moj-timeline__date', "#{formatted_deallocate_date} by System Admin"],
             ].each do |key, val|
               expect(page).to have_css(key, text: val)
             end
@@ -432,17 +434,6 @@ feature 'Allocation History' do
       create(:allocation, :primary, nomis_offender_id: nomis_offender_id, prison: prison,
              primary_pom_nomis_id: pom.staff_id)
     }
-
-    context 'when prisoner has been released' do
-      before do
-        allocation.deallocate_offender_after_release
-      end
-
-      it 'displays the allocation data' do
-        visit prison_allocation_history_path(prison, nomis_offender_id)
-        expect(page).to have_content("Prisoner released")
-      end
-    end
 
     context 'when VLO happens between allocation and de-allocation' do
       let(:tomorrow) { Time.zone.tomorrow }
