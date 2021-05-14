@@ -107,5 +107,7 @@ Rails.application.configure do
     # Store user sessions in the Redis cache
     # This avoids the 4KB limit of cookie-backed sessions, which has affected users in production
     config.session_store :cache_store, key: 'manage_pom_cases_session'
+
+    config.community_api_host = ENV['COMMUNITY_API_HOST']&.strip
   end
 end
