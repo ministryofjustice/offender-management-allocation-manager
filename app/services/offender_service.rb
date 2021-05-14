@@ -26,7 +26,7 @@ class OffenderService
         crn: community_info.dig(:otherIds, :crn),
         service_provider: com.dig(:probationArea, :nps) ? 'NPS' : 'CRC',
         offender_manager: com.dig(:staff, :unallocated) ? nil : "#{com.dig(:staff, :surname)}, #{com.dig(:staff, :forenames)}",
-        team_code: com.dig(:team, :code),
+        team_name: com.dig(:team, :description),
         ldu_code: com.dig(:team, :localDeliveryUnit, :code),
         mappa_levels: mappa_registrations.map { |r| r.dig(:registerLevel, :code).last.to_i }
     }

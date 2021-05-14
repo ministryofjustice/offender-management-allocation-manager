@@ -97,7 +97,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     context 'when there is no COM assigned' do
       context 'without an LDU' do
         before do
-          create(:case_information, :nps, team: nil, nomis_offender_id: offender_no)
+          create(:case_information, :nps, local_delivery_unit: nil, nomis_offender_id: offender_no)
         end
 
         it 'does not send an email' do
@@ -348,7 +348,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     context 'when the LDU email address is unknown' do
       let!(:case_information) {
         create(:case_information, nomis_offender_id: offender_no,
-               team: nil,
+               local_delivery_unit: nil,
                case_allocation: 'NPS', manual_entry: true)
       }
 

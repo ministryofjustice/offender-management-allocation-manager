@@ -192,13 +192,6 @@ RSpec.describe HandoverFollowUpJob, type: :job do
     end
   end
 
-  # TODO: remove old LDUs after LDU/PDU switchover has happened (Feb 2021)
-  context 'when given a LocalDivisionalUnit (old LDU model)' do
-    let!(:ldu) { create(:local_divisional_unit, teams: [build(:team, case_information: [case_info])]) }
-
-    include_context 'with expected behaviour'
-  end
-
   context 'when given a LocalDeliveryUnit' do
     let!(:ldu) { create(:local_delivery_unit, case_information: [case_info]) }
 

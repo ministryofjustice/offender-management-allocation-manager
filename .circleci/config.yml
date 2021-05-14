@@ -180,24 +180,6 @@ jobs:
           name: Ensure Local Bin Drectory exists
           command: mkdir -p ~/.local/bin
       - run:
-          name: Setup MSOffice Crypt
-          command: |
-            if [ `which msoffice-crypt` ]
-            then
-              echo "msoffice-crypt cached ok"
-            else
-              mkdir ./build
-              cd ./build
-              git clone https://github.com/herumi/cybozulib
-              git clone https://github.com/herumi/msoffice
-              cd msoffice
-              make -j RELEASE=1
-              mv ./bin/msoffice-crypt.exe ~/.local/bin/msoffice-crypt
-              chmod +x ~/.local/bin/msoffice-crypt
-              cd ../..
-              rm -rf build
-            fi
-      - run:
           name: Download Code Climate
           command: |
             if [ `which cc-test-reporter` ]

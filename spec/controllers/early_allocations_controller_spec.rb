@@ -117,11 +117,8 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
     let(:release_date) { Time.zone.today + 17.months }
 
     context 'with no ldu email address' do
-      let(:ldu) { create(:local_divisional_unit, email_address: nil) }
-      let(:team) { create(:team, local_divisional_unit: ldu) }
-
       before do
-        create(:case_information, nomis_offender_id: nomis_offender_id, team: team)
+        create(:case_information, nomis_offender_id: nomis_offender_id, local_delivery_unit: nil)
       end
 
       it 'goes to the dead end' do

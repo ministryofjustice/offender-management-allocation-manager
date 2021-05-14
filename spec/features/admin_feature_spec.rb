@@ -19,8 +19,6 @@ feature 'admin urls' do
   # end
 
   let(:prison_code) { build(:prison).code }
-  let(:ldu) { create(:local_divisional_unit) }
-  let!(:new_team) { create(:team, local_divisional_unit: ldu) }
   let(:admin_urls) {
     [
     '/admin', '/flip-flop-admin', '/sidekiq',
@@ -28,6 +26,8 @@ feature 'admin urls' do
     "/prisons/#{prison_code}/debugging/prison"
   ]
   }
+  let(:username) { 'MOIC_POM' }
+  let(:staff_id) { 754_732 }
 
   context 'when pom' do
     before do
@@ -46,6 +46,10 @@ feature 'admin urls' do
   context 'when SPO' do
     before do
       signin_spo_user
+      stub_auth_token
+      stub_request(:get, "#{ApiHelper::T3}/users/#{username}").
+        to_return(body: { 'staffId': staff_id }.to_json)
+      stub_pom_emails staff_id, []
     end
 
     it 'is unauthorised' do
@@ -58,9 +62,6 @@ feature 'admin urls' do
   end
 
   context 'when a global admin' do
-    let(:username) { 'MOIC_POM' }
-    let(:staff_id) { 754_732 }
-
     before do
       signin_global_admin_user
       stub_auth_token
@@ -69,7 +70,7 @@ feature 'admin urls' do
       stub_pom_emails staff_id, []
       stub_offenders_for_prison(prison_code, [])
 
-      ci = create(:case_information, team: nil)
+      ci = create(:case_information)
       create(:allocation, nomis_offender_id: ci.nomis_offender_id)
     end
 
@@ -82,30 +83,11 @@ feature 'admin urls' do
     end
 
     it 'displays the dashboard' do
-      ci = create(:case_information, team: nil)
+      ci = create(:case_information)
       create(:allocation, nomis_offender_id: ci.nomis_offender_id)
 
       visit('/admin')
       expect(page).to have_http_status(:success)
-    end
-
-    context 'with teams' do
-      before do
-        visit('/admin/teams')
-      end
-
-      it 'displays the list of teams' do
-        expect(page).to have_http_status(:success)
-        expect(page).to have_content(new_team.name.to_s)
-      end
-
-      it 'can delete a team' do
-        within("#team_#{new_team.id}") do
-          click_link("Delete")
-        end
-
-        expect(page).to have_content('Team was successfully destroyed')
-      end
     end
 
     context 'with local delivery units' do
@@ -122,21 +104,6 @@ feature 'admin urls' do
           select 'England'
           click_button 'Create Local delivery unit'
         }.to change(LocalDeliveryUnit, :count).by(1)
-      end
-    end
-
-    context 'with local divisional units' do
-      before do
-        visit('/admin/deprecatedold_ldus')
-      end
-
-      it "displays the list of LDU's" do
-        expect(page).to have_http_status(:success)
-        expect(page).to have_content(ldu.name.to_s)
-      end
-
-      it 'can delete an ldu' do
-        expect(page).to have_link('Delete')
       end
     end
   end
