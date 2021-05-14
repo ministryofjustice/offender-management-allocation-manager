@@ -16,6 +16,7 @@ namespace :community_api do
 
       offender_count = prison.offenders.each do |offender|
         ProcessDeliusDataJob.perform_later offender.offender_no
+        Rails.logger.info("#{prison_log_prefix} Queued job for offender #{offender.offender_no}")
       end.count
 
       Rails.logger.info("#{prison_log_prefix} Queued jobs for #{offender_count} offenders")
