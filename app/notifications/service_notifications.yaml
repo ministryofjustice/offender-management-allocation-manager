@@ -28,12 +28,12 @@
 
 ---
 notifications:
-  - id: user-research-request-03-2021
-    start_date: 19/03/2021
-    end_date: 02/04/2021
+  - id: user-research-request-05-2021
+    start_date: 14/05/2021
+    end_date: 01/06/2021
     role:
       - POM
       - SPO
     text: >
       You can help us improve this service by participating in research and giving us feedback.
-      Sign up to the HMPPS Digital research panel <a href="https://www.surveymonkey.co.uk/r/LZY7DG3">here</a>
+      Sign up to the HMPPS Digital research panel <a href="https://www.smartsurvey.co.uk/s/SCREENERALL/">here</a>
