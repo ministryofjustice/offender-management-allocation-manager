@@ -33,7 +33,23 @@ class AllocationService
       send_secondary_email(coworking_pom.first_name)
   end
 
+  def self.allocate(case_info:, pom_detail:, allocation_type:)
+    # Destroy existing allocation (if one exists)
+    case_info.new_allocations.where(allocation_type: allocation_type).destroy_all
+
+    # Create the new allocation
+    case_info.new_allocations.create!(allocation_type: allocation_type, pom_detail: pom_detail)
+  end
+
   def self.create_or_update(params)
+    # Forward-populate the new allocations table
+    self.allocate(
+      case_info: CaseInformation.find_by(nomis_offender_id: params.fetch(:nomis_offender_id)),
+      pom_detail: PomDetail.find_by(prison_code: params.fetch(:prison), nomis_staff_id: params.fetch(:primary_pom_nomis_id)),
+      allocation_type: :primary # this method is only used for primary allocations
+    )
+
+    # Then create an 'old' allocation
     primary_pom = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(params[:primary_pom_nomis_id])
     created_by_user = HmppsApi::PrisonApi::UserApi.user_details(params[:created_by_username])
 
@@ -59,6 +75,8 @@ class AllocationService
     else
       alloc_version.update!(params_copy)
     end
+
+
 
     EmailService.instance(allocation: alloc_version,
                           message: params[:message],
