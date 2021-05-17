@@ -92,7 +92,7 @@ private
     {
       tier: DeliusImportError::INVALID_TIER,
       case_allocation: DeliusImportError::INVALID_CASE_ALLOCATION,
-      local_divisional_unit: DeliusImportError::MISSING_LDU,
+      local_delivery_unit: DeliusImportError::MISSING_LDU,
       team: DeliusImportError::MISSING_TEAM
     }.fetch(field)
   end

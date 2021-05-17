@@ -22,7 +22,7 @@ private
       the case information has not yet been updated. This prisoner needs to be
       matched with an nDelius record before you can allocate.',
     DeliusImportError::MISSING_LDU => 'nDelius record with matching prisoner number
-       but no local divisional unit (LDU) information found. You need to update nDelius
+       but no local delivery unit (LDU) information found. You need to update nDelius
        with the LDU before you can allocate.',
     DeliusImportError::MISSING_TEAM => 'nDelius record found with matching prisoner
        number but no community team information found. You need to update nDelius with the

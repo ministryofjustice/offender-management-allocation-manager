@@ -4,14 +4,12 @@ ActiveAdmin.register_page 'Dashboard' do
   menu priority: 1, label: proc { I18n.t('active_admin.dashboard') }
 
   content title: proc { I18n.t('active_admin.dashboard') } do
-    panel 'Offenders w/o LDU EMail Addresses' do
+    panel 'Offenders w/o LDU Email Addresses' do
       allocations = Allocation.without_ldu_emails
-      case_infos_hash = CaseInformationService.get_case_information(allocations.map(&:nomis_offender_id))
       para "Total: #{allocations.count}"
       ul do
         allocations.each do |allocation|
-          ldu_code = case_infos_hash.fetch(allocation.nomis_offender_id).team.try(:local_divisional_unit).try(:code)
-          li "Prison #{allocation.prison} Offender #{allocation.nomis_offender_id} LDU Code #{ldu_code}"
+          li "Prison #{allocation.prison} Offender #{allocation.nomis_offender_id}"
         end
       end
     end
