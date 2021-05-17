@@ -6,10 +6,6 @@ class CaseInformation < ApplicationRecord
   NPS = 'NPS'
   CRC = 'CRC'
 
-  #  Old mapping - will be going away in Feb 2021
-  belongs_to :team, optional: true, counter_cache: :case_information_count
-
-  # new mapping - don't need team data any more, only team_name for display purposes
   belongs_to :local_delivery_unit, optional: true
 
   has_many :early_allocations,
@@ -49,18 +45,10 @@ class CaseInformation < ApplicationRecord
     case_allocation == NPS
   end
 
-  def local_divisional_unit
-    team.try(:local_divisional_unit)
-  end
-
-  # Take either the new LocalDeliveryUnit (if available and enabled) and
-  # fall back to the old local_divisional_unit if not. This should all go away
-  # in Feb 2021 after the PDU changes have been rolled out in nDelius
+  # Only return the LDU if it's enabled
   def ldu
     if local_delivery_unit&.enabled?
       local_delivery_unit
-    else
-      local_divisional_unit
     end
   end
 
@@ -72,7 +60,7 @@ class CaseInformation < ApplicationRecord
   validates :manual_entry, inclusion: { in: [true, false], allow_nil: false }
   validates :nomis_offender_id, presence: true, uniqueness: true
 
-  validates :team, presence: true, unless: -> { manual_entry || local_delivery_unit.present? }
+  validates :local_delivery_unit, presence: true, unless: -> { manual_entry }
 
   # Don't think this is as simple as allowing nil. In the specific case of Scot/NI
   # prisoners it makes sense to have N/A (as this is genuine) but not otherwise
