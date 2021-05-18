@@ -6,7 +6,6 @@ RSpec.describe ComplexityLevelsController, type: :controller do
   let(:offenders) { [offender] }
   let(:pom) { build(:pom) }
   let(:spo) { build(:pom) }
-  let(:test_strategy) { Flipflop::FeatureSet.current.test! }
   let(:offender_no) { offender.fetch(:offenderNo) }
 
   before do
@@ -17,11 +16,6 @@ RSpec.describe ComplexityLevelsController, type: :controller do
     stub_sso_data(womens_prison.code)
     stub_poms(womens_prison.code, [pom, spo])
     stub_keyworker(womens_prison.code, offender.fetch(:offenderNo), build(:keyworker))
-    test_strategy.switch!(:womens_estate, true)
-  end
-
-  after do
-    test_strategy.switch!(:womens_estate, false)
   end
 
   describe '#edit' do

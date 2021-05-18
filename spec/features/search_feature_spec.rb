@@ -28,22 +28,16 @@ feature 'Search for offenders' do
   end
 
   context "with female prison" do
-    let(:test_strategy) { Flipflop::FeatureSet.current.test! }
     let(:prison) { build(:womens_prison) }
     let(:prison_code) { prison.code }
     let(:offenders) { build_list(:nomis_offender, 5, agencyId: prison.code, complexityLevel: 'high') }
     let(:pom) { build(:pom) }
 
     before do
-      test_strategy.switch!(:womens_estate, true)
       stub_auth_token
       stub_offenders_for_prison(prison_code, offenders)
       stub_spo_user pom
       stub_poms prison_code, [pom]
-    end
-
-    after do
-      test_strategy.switch!(:womens_estate, false)
     end
 
     it 'has a valid missing info link' do

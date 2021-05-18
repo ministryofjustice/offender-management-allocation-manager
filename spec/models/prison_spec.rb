@@ -32,16 +32,6 @@ RSpec.describe Prison, type: :model do
   end
 
   describe '#womens?' do
-    let(:test_strategy) { Flipflop::FeatureSet.current.test! }
-
-    before do
-      test_strategy.switch!(:womens_estate, true)
-    end
-
-    after do
-      test_strategy.switch!(:womens_estate, false)
-    end
-
     context 'with a male prison' do
       let(:prison) { build(:prison) }
 

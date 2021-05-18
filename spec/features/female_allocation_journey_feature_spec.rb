@@ -3,7 +3,6 @@
 require "rails_helper"
 
 feature "womens allocation journey" do
-  let(:test_strategy) { Flipflop::FeatureSet.current.test! }
   let(:prison) { build(:womens_prison) }
   let(:offenders) { build_list(:nomis_offender, 5, agencyId: 'BZI', complexityLevel: 'high') }
   let(:offender) { build(:nomis_offender, :determinate_release_in_three_years, agencyId: 'BZI') }
@@ -17,8 +16,6 @@ feature "womens allocation journey" do
   let(:tiers) { ['A', 'B', 'C', 'D', 'N/A'].cycle.take(offenders.size) }
 
   before do
-    test_strategy.switch!(:womens_estate, true)
-
     create(:pom_detail, :inactive, prison_code: prison.code, nomis_staff_id: inactive_prison_pom.staff_id)
     create(:pom_detail, :part_time, prison_code: prison.code, nomis_staff_id: probation_pom.staff_id)
     create(:pom_detail, prison_code: prison.code, nomis_staff_id: probation_pom2.staff_id)
@@ -32,10 +29,6 @@ feature "womens allocation journey" do
     alloc.deallocate_offender_after_release
     alloc.update! primary_pom_nomis_id: prison_pom.staff_id
     alloc.deallocate_offender_after_release
-  end
-
-  after do
-    test_strategy.switch!(:womens_estate, false)
   end
 
   context 'without an existing allocation' do

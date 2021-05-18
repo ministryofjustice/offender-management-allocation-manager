@@ -4,26 +4,8 @@ RSpec.describe PrisonService do
   describe '#womens_prison?' do
     subject { described_class::womens_prison?(PrisonService::WOMENS_PRISON_CODES.first) }
 
-    context 'with womens_estate switch on' do
-      let(:test_strategy) { Flipflop::FeatureSet.current.test! }
-
-      before do
-        test_strategy.switch!(:womens_estate, true)
-      end
-
-      after do
-        test_strategy.switch!(:womens_estate, false)
-      end
-
-      it 'will admit to being a womens prison' do
-        expect(subject).to eq(true)
-      end
-    end
-
-    context 'with womens_estate switch off' do
-      it 'will not have any womens prisons' do
-        expect(subject).to eq(false)
-      end
+    it 'will admit to being a womens prison' do
+      expect(subject).to eq(true)
     end
   end
 

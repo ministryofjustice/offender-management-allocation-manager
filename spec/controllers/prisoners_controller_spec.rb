@@ -3,16 +3,10 @@ require 'rails_helper'
 RSpec.describe PrisonersController, type: :controller do
   context 'with a womens prison' do
     let(:prison) { build :womens_prison }
-    let(:test_strategy) { Flipflop::FeatureSet.current.test! }
 
     before do
       stub_offenders_for_prison(prison.code, offenders)
       stub_sso_data(prison.code)
-      test_strategy.switch!(:womens_estate, true)
-    end
-
-    after do
-      test_strategy.switch!(:womens_estate, false)
     end
 
     describe 'buckets' do

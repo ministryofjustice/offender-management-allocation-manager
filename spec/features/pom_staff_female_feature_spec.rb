@@ -22,11 +22,7 @@ feature "female estate POMs list" do
                sentence: attributes_for(:sentence_detail))
   }
 
-  let(:test_strategy) { Flipflop::FeatureSet.current.test! }
-
   before do
-    test_strategy.switch!(:womens_estate, true)
-
     stub_signin_spo spo, [female_prison]
     stub_offenders_for_prison(female_prison, offenders_in_prison << nomis_offender)
     stub_poms(female_prison, poms)
@@ -45,10 +41,6 @@ feature "female estate POMs list" do
     end
 
     visit prison_poms_path(female_prison)
-  end
-
-  after do
-    test_strategy.switch!(:womens_estate, false)
   end
 
   it 'shows the POM staff page' do

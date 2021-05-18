@@ -8,7 +8,4 @@ Flipflop.configure do
   feature :early_allocation,
           default: true,
           description: 'Early Allocation to probation team'
-  feature :womens_estate,
-          default: false,
-          description: 'Womens Estate with mandatory complexity level'
 end

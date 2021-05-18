@@ -12,15 +12,7 @@ feature "female prison index page" do
     create(:case_information, nomis_offender_id: allocated_offender_two.fetch(:offenderNo))
     create(:allocation, primary_pom_allocated_at: two_days_ago, nomis_offender_id: allocated_offender_two.fetch(:offenderNo), prison: prison.code)
     create(:case_information, nomis_offender_id: offender_ready_to_allocate.fetch(:offenderNo))
-
-    test_strategy.switch!(:womens_estate, true)
   end
-
-  after do
-    test_strategy.switch!(:womens_estate, false)
-  end
-
-  let(:test_strategy) { Flipflop::FeatureSet.current.test! }
 
   let(:pom) { build(:pom) }
   let(:prison) { build :womens_prison }

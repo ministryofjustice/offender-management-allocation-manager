@@ -18,11 +18,6 @@ feature 'complexity level feature' do
     stub_signin_spo(spo, [womens_prison.code])
     stub_poms(womens_prison.code, [pom, spo])
     stub_keyworker(womens_prison.code, offender.fetch(:offenderNo), build(:keyworker))
-    test_strategy.switch!(:womens_estate, true)
-  end
-
-  after do
-    test_strategy.switch!(:womens_estate, false)
   end
 
   context 'when on prisoner profile page' do

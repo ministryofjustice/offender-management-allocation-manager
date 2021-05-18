@@ -43,11 +43,6 @@ describe OffenderService, type: :feature do
       before do
         stub_auth_token
         stub_offender(offender)
-        test_strategy.switch!(:womens_estate, true)
-      end
-
-      after do
-        test_strategy.switch!(:womens_estate, false)
       end
 
       it 'returns the offender' do

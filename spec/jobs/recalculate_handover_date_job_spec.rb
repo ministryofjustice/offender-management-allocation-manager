@@ -326,10 +326,6 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       let(:category) { attributes_for(:offender_category, :female_open) }
       let(:policy_start_date) { HandoverDateService::WOMENS_POLICY_START_DATE }
 
-      before { test_strategy.switch!(:womens_estate, true) }
-
-      after { test_strategy.switch!(:womens_estate, false) }
-
       it 'emails the LDU to notify them that a COM is now needed' do
         expect(CommunityMailer).to receive(:open_prison_supporting_com_needed)
                                      .with(hash_including(

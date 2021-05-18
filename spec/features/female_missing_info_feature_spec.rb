@@ -3,7 +3,6 @@
 require "rails_helper"
 
 feature "womens missing info journey" do
-  let(:test_strategy) { Flipflop::FeatureSet.current.test! }
   let(:prison) { build(:womens_prison) }
   let(:offenders) { build_list(:nomis_offender, 2, agencyId: prison.code, complexityLevel: complexity) }
   let(:offender) { offenders.first }
@@ -16,11 +15,6 @@ feature "womens missing info journey" do
     stub_signin_spo user, [prison.code]
     stub_poms(prison.code, [user])
     stub_offenders_for_prison(prison.code, offenders)
-    test_strategy.switch!(:womens_estate, true)
-  end
-
-  after do
-    test_strategy.switch!(:womens_estate, false)
   end
 
   context 'without any data' do

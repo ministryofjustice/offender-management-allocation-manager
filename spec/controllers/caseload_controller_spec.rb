@@ -66,16 +66,10 @@ RSpec.describe CaseloadController, type: :controller do
     context 'when a womens prison' do
       before do
         stub_sso_data(prison.code)
-        test_strategy.switch!(:womens_estate, true)
-      end
-
-      after do
-        test_strategy.switch!(:womens_estate, false)
       end
 
       describe '#index' do
         let(:prison) { build(:womens_prison) }
-        let(:test_strategy) { Flipflop::FeatureSet.current.test! }
 
         it 'can sort by complexity' do
           get :index, params: { prison_id: prison.code, staff_id: staff_id, sort: 'complexity_level_number asc' }
