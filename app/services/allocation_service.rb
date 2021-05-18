@@ -4,9 +4,18 @@ class AllocationService
   def self.allocate_secondary(
     nomis_offender_id:,
     secondary_pom_nomis_id:,
+    pom_detail:,
     created_by_username:,
     message:
   )
+    # Forward-populate the new allocations table
+    self.allocate(
+      case_info: CaseInformation.find_by(nomis_offender_id: nomis_offender_id),
+      pom_detail: pom_detail,
+      allocation_type: :coworking # this method is only used for coworking allocations
+    )
+
+    # Then update the 'old' allocations table
     alloc_version = Allocation.find_by!(
       nomis_offender_id: nomis_offender_id
     )
@@ -39,6 +48,11 @@ class AllocationService
 
     # Create the new allocation
     case_info.new_allocations.create!(allocation_type: allocation_type, pom_detail: pom_detail)
+  end
+
+  def self.deallocate(case_info:, allocation_type:)
+    # Destroy existing allocation (if one exists)
+    case_info.new_allocations.where(allocation_type: allocation_type).destroy_all
   end
 
   def self.create_or_update(params)
