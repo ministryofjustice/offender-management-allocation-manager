@@ -109,19 +109,12 @@ feature "view POM's caseload" do
   context 'when in a womens prison' do
     let(:prison) { build(:womens_prison) }
     let(:complexities) { ['high', 'medium', 'low'].cycle.take(offenders.size) }
-    let(:test_strategy) { Flipflop::FeatureSet.current.test! }
 
     before do
-      test_strategy.switch!(:womens_estate, true)
-
       offenders.each_with_index do |offender, index|
         allow(HmppsApi::ComplexityApi).to receive(:get_complexity).with(offender.fetch(:offenderNo)).and_return(complexities[index])
       end
       visit prison_staff_caseload_path(prison.code, nomis_staff_id)
-    end
-
-    after do
-      test_strategy.switch!(:womens_estate, false)
     end
 
     it 'can sort by complexity' do

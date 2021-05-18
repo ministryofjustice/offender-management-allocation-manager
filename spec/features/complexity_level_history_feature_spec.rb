@@ -4,8 +4,6 @@ require 'rails_helper'
 
 feature 'Case history with complexity level' do
   before do
-    test_strategy.switch!(:womens_estate, true)
-
     stub_request(:get, "https://complexity-of-need-staging.hmpps.service.justice.gov.uk/v1/complexity-of-need/offender-no/#{offender_no}/history").
       to_return(body: history.to_json)
 
@@ -24,11 +22,6 @@ feature 'Case history with complexity level' do
     visit prison_allocation_history_path(prison_code, offender_no)
   end
 
-  after do
-    test_strategy.switch!(:womens_estate, false)
-  end
-
-  let(:test_strategy) { Flipflop::FeatureSet.current.test! }
   let(:now) { Time.zone.now }
   # we're expecting the Complexity Service to return times in UTC
   let(:now_from_history_service) { now.utc }

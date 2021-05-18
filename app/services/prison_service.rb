@@ -155,13 +155,9 @@ class PrisonService
   # This should be the only place that hits the womens_estate flag,
   # as everything should be calling this to decide what to do.
   def self.womens_prison?(code)
-    if Flipflop.womens_estate?
-      # There are still some locations we don't know about e.g. immigration detention centres
-      # so this check has to allow PRISONS[code] to be nil
-      PRISONS[code]&.gender == :female
-    else
-      false
-    end
+    # There are still some locations we don't know about e.g. immigration detention centres
+    # so this check has to allow PRISONS[code] to be nil
+    PRISONS[code]&.gender == :female
   end
 
   def self.name_for(code)

@@ -22,12 +22,7 @@ RSpec.describe "prisoners/show", type: :view do
     let(:test_strategy) { Flipflop::FeatureSet.current.test! }
 
     before do
-      test_strategy.switch!(:womens_estate, true)
       render
-    end
-
-    after do
-      test_strategy.switch!(:womens_estate, false)
     end
 
     context 'with low complexity' do

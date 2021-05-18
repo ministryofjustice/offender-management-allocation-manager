@@ -32,12 +32,10 @@ describe HandoverDateService do
 
   before do
     Timecop.travel(today)
-    test_strategy.switch!(:womens_estate, true)
   end
 
   after do
     Timecop.return
-    test_strategy.switch!(:womens_estate, false)
   end
 
   context 'when determinate' do

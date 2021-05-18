@@ -41,17 +41,10 @@ RSpec.describe "caseload/index", type: :view do
     end
 
     context 'with a female prison' do
-      let(:test_strategy) { Flipflop::FeatureSet.current.test! }
       let(:prison) { build(:womens_prison) }
 
       before do
-        test_strategy.switch!(:womens_estate, true)
-
         render
-      end
-
-      after do
-        test_strategy.switch!(:womens_estate, false)
       end
 
       it 'displays caseload' do
