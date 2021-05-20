@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class CaseHistory
-  delegate :primary_pom_nomis_id, :event_trigger, :secondary_pom_nomis_id, :prison,
+  delegate :primary_pom_nomis_id, :event_trigger, :secondary_pom_nomis_id,
            :allocated_at_tier, :nomis_offender_id, :primary_pom_name, :override_reasons, :suitability_detail,
            :override_detail,
            :recommended_pom_type, :secondary_pom_name, to: :@allocation
@@ -40,16 +40,27 @@ class CaseHistory
     end
   end
 
-  def previous_primary_pom_id
-    @previous_allocation.primary_pom_nomis_id
+  # TODO - this isn't great fetching emails in the view/presenter layer. However this is better than what came
+  # before (which was to expose the id and let the view work it out via a hash of emails collected using the API)
+  # Hopefully soon the model will answer these questions properly
+  def primary_pom_email
+    @primary_pom_email ||= HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(@allocation.primary_pom_nomis_id).first
+  end
+
+  def secondary_pom_email
+    @secondary_pom_email ||= HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(@allocation.secondary_pom_nomis_id).first
+  end
+
+  def previous_primary_pom_email
+    @previous_primary_pom_email ||= HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(@previous_allocation.primary_pom_nomis_id).first
+  end
+
+  def previous_secondary_pom_email
+    @previous_secondary_pom_email ||= HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(@previous_allocation.secondary_pom_nomis_id).first
   end
 
   def previous_primary_pom_name
     @previous_allocation.primary_pom_name
-  end
-
-  def previous_secondary_pom_id
-    @previous_allocation.secondary_pom_nomis_id
   end
 
   def previous_secondary_pom_name

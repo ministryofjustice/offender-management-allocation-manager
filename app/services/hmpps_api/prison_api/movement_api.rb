@@ -5,6 +5,9 @@ module HmppsApi
     class MovementApi
       extend PrisonApiClient
 
+      ADMISSION_TYPES = [HmppsApi::MovementType::ADMISSION,
+                         HmppsApi::MovementType::TRANSFER].freeze
+
       def self.movements_on_date(date)
         route = '/movements'
 
@@ -20,25 +23,25 @@ module HmppsApi
         }
       end
 
-      def self.movements_for(offender_no)
+      # This is only called by allocation history and debugging (to find the last movement)
+      def self.movements_for(offender_no, movement_types = ADMISSION_TYPES)
         route = '/movements/offenders'
 
         data = client.post(route, [offender_no],
-                           queryparams: { latestOnly: false, movementTypes: %w[ADM TRN REL] },
+                           queryparams: { latestOnly: false, allBookings: true, movementTypes: movement_types },
                            cache: true)
-        data.sort_by { |k| k['movementDate'] }.map { |movement|
+        movements = data.sort_by { |k| k.fetch('movementDate') + k.fetch('movementTime') }.map { |movement|
           api_deserialiser.deserialise(HmppsApi::Movement, movement)
         }
+        PrisonTimeline.new movements
       end
 
       def self.admissions_for(offender_nos)
         # admissions need to include transfers from one place to another
         route = '/movements/offenders'
-        types = [HmppsApi::MovementType::ADMISSION,
-                 HmppsApi::MovementType::TRANSFER].freeze
 
         data = client.post(route, offender_nos,
-                           queryparams: { latestOnly: false, movementTypes: types },
+                           queryparams: { latestOnly: false, movementTypes: ADMISSION_TYPES },
                            cache: true)
                      .group_by { |x| x['offenderNo'] }.values
 

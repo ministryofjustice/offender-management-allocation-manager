@@ -1,8 +1,10 @@
 FactoryBot.define do
   factory :movement, class: 'HmppsApi::Movement' do
     initialize_with do
-      HmppsApi::Movement.from_json(attributes.stringify_keys)
+      HmppsApi::Movement.from_json(attributes.stringify_keys.map { |k, v| [k, v.to_s] }.to_h)
     end
+
+    offenderNo { 'G6543GH' }
 
     trait :rotl do
       movementType { 'TAP' }
@@ -10,11 +12,14 @@ FactoryBot.define do
     end
 
     trait :transfer do
-      directionCode { 'IN' }
       movementType { 'TRN' }
     end
 
     trait :out do
+      directionCode { 'OUT' }
+    end
+
+    trait :release do
       directionCode { 'OUT' }
       toAgency { MovementService::RELEASE_MOVEMENT_CODE }
       movementType { 'REL' }
@@ -26,8 +31,10 @@ FactoryBot.define do
 
     # This should be far enough in the past so that the offender isn't considered a 'new arrival' by default
     sequence(:movementDate) do |seq|
-      (Time.zone.today - 1.year - seq.days).to_s
+      ((Time.zone.today - 5.years) + seq.days)
     end
+
+    movementTime { '04:45:00' }
 
     toAgency do
       'SWI'

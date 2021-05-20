@@ -13,13 +13,12 @@ RSpec.describe MovementsOnDateJob, type: :job do
     allow(OffenderService).to receive(:get_offender).and_return(build(:hmpps_api_offender))
 
     stub_request(:get, "#{ApiHelper::T3}/movements?fromDateTime=2018-06-30T00:00&movementDate=2019-06-30").
-      to_return(body: [
-        { offenderNo: nomis_offender_id,
-          fromAgency: "MDI",
-          toAgency: "WEI",
-          movementType: "ADM",
-          directionCode: "IN"
-        }].to_json)
+      to_return(body: [attributes_for(:movement,
+                                      offenderNo: nomis_offender_id,
+         fromAgency: "MDI",
+         toAgency: "WEI",
+         movementType: "ADM",
+         directionCode: "IN")].to_json)
 
     pom = build(:pom, staffId: 485926)
     stub_poms('MDI', [pom])

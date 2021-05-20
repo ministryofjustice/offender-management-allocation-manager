@@ -60,6 +60,14 @@ module ApiHelper
   def stub_movements(movements = [])
     stub_request(:post, "#{T3}/movements/offenders?movementTypes=ADM&movementTypes=TRN&latestOnly=false").
       to_return(body: movements.to_json)
+    stub_request(:post, "#{T3}/movements/offenders?movementTypes=REL&latestOnly=false").
+      to_return(body: movements.to_json)
+  end
+
+  def stub_movements_for offender_no, movements, movement_types: ['ADM', 'TRN']
+    stub_request(:post, "#{T3}/movements/offenders?#{movement_types.map { |t| "movementTypes=#{t}" }.join('&')}&latestOnly=false&allBookings=true").
+      with(body: [offender_no].to_json).
+      to_return(body: movements.to_json)
   end
 
   def stub_poms(prison, poms)

@@ -54,9 +54,21 @@ feature 'Case History' do
   let!(:first_prison) { create(:prison) }
   let!(:second_prison) { create(:prison) }
   let!(:open_prison) { create(:prison, code: PrisonService::PRESCOED_CODE) }
+  let(:offender_movements) {
+    [
+    attributes_for(:movement, toAgency: first_prison.code, movementDate: first_arrival_date - 1.day),
+    attributes_for(:movement, toAgency: second_prison.code, movementDate: readmission_date),
+    attributes_for(:movement, toAgency: open_prison.code, movementDate: transfer_date),
+  ]
+  }
+  let(:today) { Time.zone.now } # try not to call Time.zone.now too often, to avoid 1-minute drifts
+  let(:first_arrival_date) { today - 20.days }
+  let(:deallocate_date) { today - 14.days }
+  let(:readmission_date) { today - 10.days }
+  let(:transfer_date) { today - 5.days }
 
   before do
-    Timecop.travel DateTime.new 2021, 2, 28, 11, 25, 34
+    Timecop.travel DateTime.new 2021, 2, 28, 11, 25, 35
     stub_auth_token
   end
 
@@ -66,7 +78,7 @@ feature 'Case History' do
 
   describe 'offender allocation history' do
     before {
-      stub_offenders_for_prison(open_prison.code, [nomis_offender])
+      stub_offenders_for_prison(open_prison.code, [nomis_offender], offender_movements)
       stub_signin_spo spo, [open_prison.code]
 
       stub_pom build(:pom, staffId: probation_pom_2.fetch(:primary_pom_nomis_id))
@@ -85,7 +97,7 @@ feature 'Case History' do
     context 'when on the allocation history page' do
       before do
         # create a plausible timeline involving 3 prisons over a period of several days
-        current_date = today - 10.days
+        current_date = first_arrival_date
         allocation = Timecop.travel current_date do
           create(
             :allocation_history,
@@ -121,15 +133,12 @@ feature 'Case History' do
                              secondary_pom_nomis_id: nil,
                              secondary_pom_name: nil)
         end
-        current_date += 1.day
-        deallocate_date = current_date
         # release offender (properly)
         Timecop.travel(deallocate_date) do
-          # allocation.offender_transferred
-          MovementService.process_movement build(:movement, :out, offenderNo: allocation.nomis_offender_id)
+          MovementService.process_movement build(:movement, :release, offenderNo: allocation.nomis_offender_id)
         end
         # Now the offender is admitted to Pentonville having been released from Leeds earlier
-        current_date += 1.day
+        current_date = readmission_date
         Timecop.travel(current_date) do
           # offender got released - so have to re-create case information record
           # and re-find allocation record as it has been updated
@@ -155,7 +164,8 @@ feature 'Case History' do
 
         current_date += 1.day
         Timecop.travel(current_date) do
-          create(:early_allocation, :discretionary, case_information: ci, prison: second_prison.code, nomis_offender_id: nomis_offender_id)
+          create(:early_allocation, :discretionary,
+                 case_information: ci, prison: second_prison.code, nomis_offender_id: nomis_offender_id)
           create :email_history, nomis_offender_id: nomis_offender_id,
                  name: ci.local_delivery_unit.name,
                  email: ci.local_delivery_unit.email_address,
@@ -174,10 +184,9 @@ feature 'Case History' do
           stub_offender(nomis_pentonville_offender)
           RecalculateHandoverDateJob.perform_now nomis_offender_id
           stub_offender(nomis_offender)
+          stub_movements_for(nomis_offender_id, offender_movements)
         end
 
-        current_date += 1.day
-        expect(current_date).to eq(transfer_date)
         Timecop.travel(transfer_date) do
           # create Email History for welsh offender transferring to Prescoed open prison by moving the prisoner
           MovementService.process_transfer build(:movement, :transfer, offenderNo: nomis_offender_id, toAgency: open_prison.code)
@@ -186,10 +195,7 @@ feature 'Case History' do
         visit prison_allocation_history_path(open_prison.code, nomis_offender_id)
       end
 
-      let(:today) { Time.zone.now } # try not to call Time.zone.now too often, to avoid 1-minute drifts
-      let(:deallocate_date) { today - 6.days }
       let(:formatted_deallocate_date) { deallocate_date.strftime("#{deallocate_date.day.ordinalize} %B %Y (%R)") }
-      let(:transfer_date) { today - 1.day }
       let(:formatted_transfer_date) { transfer_date.strftime("#{transfer_date.day.ordinalize} %B %Y") + " (" + transfer_date.strftime("%R") + ")" }
       let(:allocation) { AllocationHistory.last }
       let(:history) { allocation.get_old_versions.append(allocation).sort_by!(&:updated_at).reverse! }
@@ -210,7 +216,7 @@ feature 'Case History' do
         within '.govuk-grid-row:nth-of-type(1)' do
           expect(page).to have_css('.govuk-heading-m', text: "HMP/YOI Prescoed")
 
-          expect(all('.moj-timeline__item').size).to eq(1)
+          expect(all('.moj-timeline__item').size).to eq(2)
           prescoed_transfer = EmailHistory.where(nomis_offender_id: nomis_offender_id, event: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION).first
 
           within '.moj-timeline__item:nth-of-type(1)' do
@@ -225,16 +231,9 @@ feature 'Case History' do
         end
       end
 
-      it 'has a Pentonville section with 7 items' do
-        within '.govuk-grid-row:nth-of-type(2)' do
-          expect(page).to have_css('.govuk-heading-m', text: second_prison.name)
-          expect(all('.moj-timeline__item').size).to eq(7)
-        end
-      end
-
-      it 'has the transfer at the top of the list' do
-        within '.govuk-grid-row:nth-of-type(2)' do
-          within '.moj-timeline__item:nth-of-type(1)' do
+      it 'has the transfer at the bottom of Presceod list' do
+        within '.govuk-grid-row:nth-of-type(1)' do
+          within '.moj-timeline__item:nth-of-type(2)' do
             [
               ['.moj-timeline__title', "Prisoner unallocated"],
               ['.moj-timeline__date', formatted_transfer_date.to_s],
@@ -245,13 +244,20 @@ feature 'Case History' do
         end
       end
 
+      it 'has a Pentonville section with 6 items' do
+        within '.govuk-grid-row:nth-of-type(2)' do
+          expect(page).to have_css('.govuk-heading-m', text: second_prison.name)
+          expect(all('.moj-timeline__item').size).to eq(6)
+        end
+      end
+
       it 'has a Pentonville section', :js do
-        # 2nd Prison - Pentonville. This contains 7 events
+        # 2nd Prison - Pentonville. This contains 6 events
         history1 = history[1]
         history2 = history[2]
 
         within '.govuk-grid-row:nth-of-type(2)' do
-          within '.moj-timeline__item:nth-of-type(2)' do
+          within '.moj-timeline__item:nth-of-type(1)' do
             [
               ['.moj-timeline__title', "Prisoner reallocated"],
               ['.moj-timeline__description', [
@@ -269,7 +275,7 @@ feature 'Case History' do
             end
           end
 
-          within '.moj-timeline__item:nth-of-type(3)' do
+          within '.moj-timeline__item:nth-of-type(2)' do
             [
               ['.moj-timeline__header', "Early allocation decision requested"],
             ].each do |key, val|
@@ -277,7 +283,7 @@ feature 'Case History' do
             end
           end
 
-          within '.moj-timeline__item:nth-of-type(4)' do
+          within '.moj-timeline__item:nth-of-type(3)' do
             [
               ['.moj-timeline__header', "Early allocation assessment form completed"],
             ].each do |key, val|
@@ -285,7 +291,7 @@ feature 'Case History' do
             end
           end
 
-          within '.moj-timeline__item:nth-of-type(5)' do
+          within '.moj-timeline__item:nth-of-type(4)' do
             [
               ['.moj-timeline__header', "Early allocation assessment form sent"],
             ].each do |key, val|
@@ -293,7 +299,7 @@ feature 'Case History' do
             end
           end
 
-          within '.moj-timeline__item:nth-of-type(6)' do
+          within '.moj-timeline__item:nth-of-type(5)' do
             [
               ['.moj-timeline__header', "Early allocation assessment form completed"],
             ].each do |key, val|
@@ -301,7 +307,7 @@ feature 'Case History' do
             end
           end
 
-          within '.moj-timeline__item:nth-of-type(7)' do
+          within '.moj-timeline__item:nth-of-type(6)' do
             [
               ['.moj-timeline__title', "Prisoner allocated"],
               ['.moj-timeline__description', ["Prisoner allocated to #{history2.primary_pom_name.titleize} - #{prison_pom[:email]}\n",
@@ -316,11 +322,11 @@ feature 'Case History' do
 
       it 'shows the case history', :js do
         hist_allocate_secondary = AllocationHistory.new secondary_pom_name: probation_pom[:primary_pom_name],
-                                                 updated_at: today - 8.days,
+                                                 updated_at: first_arrival_date + 2.days,
                                                  created_by_name: created_by_name
 
         history6 = AllocationHistory.new primary_pom_name: probation_pom_2[:primary_pom_name],
-                                  updated_at: today - 9.days,
+                                  updated_at: first_arrival_date + 1.day,
                                   created_by_name: created_by_name,
                                   allocated_at_tier: 'A'
 
@@ -387,8 +393,10 @@ feature 'Case History' do
       end
 
       it 'links to previous Early Allocation assessments' do
-        # The 6th history item is an 'eligible' early allocation assessment
-        eligible_assessment = page.find('.moj-timeline > .moj-timeline__item:nth-child(6)')
+        # The 5th history item is an 'eligible' early allocation assessment
+        eligible_assessment = within '.govuk-grid-row:nth-of-type(2)' do
+          page.find('.moj-timeline > .moj-timeline__item:nth-child(5)')
+        end
 
         within eligible_assessment do
           expect(page).to have_css('.moj-timeline__title', text: 'Early allocation assessment form completed')
@@ -418,6 +426,7 @@ feature 'Case History' do
     before do
       stub_user(username: 'MOIC_POM', staff_id: pom.staff_id)
       stub_offenders_for_prison(prison, [nomis_offender])
+      stub_movements_for nomis_offender.fetch(:offenderNo), offender_movements
       signin_spo_user([prison])
       stub_poms(prison, [pom])
       stub_pom pom
@@ -434,6 +443,19 @@ feature 'Case History' do
       create(:allocation_history, :primary, nomis_offender_id: nomis_offender_id, prison: prison,
              primary_pom_nomis_id: pom.staff_id)
     }
+
+    context 'with a discretionary accepted early allocation' do
+      before do
+        create(:early_allocation, :discretionary_accepted,
+               updated_by_firstname: 'Fred', updated_by_lastname: 'Bloggs',
+               case_information: case_info, prison: second_prison.code, nomis_offender_id: nomis_offender_id)
+      end
+
+      it 'displays 3 sections - allocation plus 2 early allocation records' do
+        visit prison_allocation_history_path(prison, nomis_offender_id)
+        expect(all('.moj-timeline__item').size).to eq(3)
+      end
+    end
 
     context 'when VLO happens between allocation and de-allocation' do
       let(:tomorrow) { Time.zone.tomorrow }

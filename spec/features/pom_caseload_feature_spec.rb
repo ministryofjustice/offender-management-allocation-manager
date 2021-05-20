@@ -88,8 +88,8 @@ feature "view POM's caseload" do
     stub_poms(prison.code, poms)
     signin_pom_user [prison.code]
     stub_offenders_for_prison(prison.code, offenders, [
-      attributes_for(:movement, :rotl, offenderNo: moved_offenders.first.fetch(:offenderNo)),
-      attributes_for(:movement, :rotl, offenderNo: moved_offenders.last.fetch(:offenderNo))
+      attributes_for(:movement, :rotl, movementDate: Time.zone.today - 1.month, offenderNo: moved_offenders.first.fetch(:offenderNo)),
+      attributes_for(:movement, :rotl, movementDate: Time.zone.today - 1.year, offenderNo: moved_offenders.last.fetch(:offenderNo))
     ])
 
     offender_map.each do |nomis_offender_id, _nomis_booking_id|

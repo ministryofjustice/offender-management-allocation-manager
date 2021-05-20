@@ -12,36 +12,29 @@ describe HmppsApi::PrisonApi::MovementApi do
     end
   end
 
-  describe 'Movements for single offenders' do
-    it 'can get movements for a specific_offender',
-       vcr: { cassette_name: 'prison_api/movement_api_for_offender' } do
-      movements = described_class.movements_for('A5019DY')
+  it 'can get movements for a specific_offender',
+     vcr: { cassette_name: 'prison_api/movement_api_for_offender' } do
+    timeline = described_class.movements_for('A5019DY')
+    expect(timeline.prison_episode(Date.new 2019, 1, 23).prison_code).to eq('DTI')
+  end
 
-      expect(movements).to be_kind_of(Array)
-      expect(movements.length).to eq(2)
-      expect(movements).to all be_kind_of(HmppsApi::Movement)
-    end
+  describe 'Movements for single offenders' do
+    let(:prison) { build(:prison) }
 
     it 'sort movements (oldest first) for a specific_offender' do
       allow_any_instance_of(HmppsApi::Client).to receive(:post).and_return([
-        attributes_for(:movement, offenderNo: '2', movementDate: '2017-03-09').stringify_keys,
-        attributes_for(:movement, offenderNo: '1', movementDate: '2015-01-01').stringify_keys
+        attributes_for(:movement, offenderNo: '2', toAgency: build(:prison).code, movementDate: '2017-03-09').stringify_keys,
+        attributes_for(:movement, offenderNo: '1', toAgency: prison.code, movementDate: '2015-01-01').stringify_keys
       ])
 
-      movements = described_class.movements_for('A5019DY')
-
-      expect(movements).to be_kind_of(Array)
-      expect(movements.length).to eq(2)
-      expect(movements.first.offender_no).to eq('1')
+      timeline = described_class.movements_for('A5019DY')
+      expect(timeline.prison_episode(Date.new 2016, 1, 23).prison_code).to eq(prison.code)
     end
 
     it 'can return multiple movements for a specific offender',
        vcr: { cassette_name: 'prison_api/movement_api_multiple_movements' } do
-      movements = described_class.movements_for('G1670VU')
-
-      expect(movements).to be_kind_of(Array)
-      expect(movements.length).to eq(7)
-      expect(movements).to all be_kind_of(HmppsApi::Movement)
+      timeline = described_class.movements_for('G1670VU')
+      expect(timeline.prison_episode(Date.new 2017, 1, 23).prison_code).to eq('DNI')
     end
   end
 end
