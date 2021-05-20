@@ -96,6 +96,7 @@ class AllocationsController < PrisonsApplicationController
 
   def history
     @prisoner = offender(nomis_offender_id_from_url)
+    @timeline = HmppsApi::PrisonApi::MovementApi.movements_for nomis_offender_id_from_url
 
     allocation = AllocationHistory.find_by!(nomis_offender_id: nomis_offender_id_from_url)
     vlo_history = PaperTrail::Version.
@@ -110,12 +111,18 @@ class AllocationsController < PrisonsApplicationController
                            end
                          end
     complexity_history = [] if complexity_history.nil?
+    email_history = EmailHistory.in_offender_timeline.where(nomis_offender_id: nomis_offender_id_from_url)
+    early_allocations = Offender.includes(case_information: :early_allocations).find_by!(nomis_offender_id: nomis_offender_id_from_url).case_information.early_allocations
 
-    @history = (allocation_history(allocation) + vlo_history + complexity_history).sort_by(&:created_at)
-    @early_allocations = Offender.includes(case_information: :early_allocations).find_by!(nomis_offender_id: nomis_offender_id_from_url).case_information.early_allocations
-    @email_histories = EmailHistory.in_offender_timeline.where(nomis_offender_id: nomis_offender_id_from_url)
+    ea_history = early_allocations.map do |ea|
+      if ea.updated_by_firstname.present?
+        [EarlyAllocationHistory.new(ea), EarlyAllocationDecision.new(ea)]
+      else
+        [EarlyAllocationHistory.new(ea)]
+      end
+    end.flatten
 
-    @pom_emails = AllocationService.allocation_history_pom_emails(allocation)
+    @history = (allocation_history(allocation) + vlo_history + complexity_history + email_history + ea_history).sort_by(&:created_at)
   end
 
 private

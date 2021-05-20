@@ -15,6 +15,8 @@ feature 'email history' do
     before do
       stub_auth_token
       stub_offenders_for_prison(prison.code, [nomis_offender])
+      stub_movements_for nomis_offender.fetch(:offenderNo), attributes_for_list(:movement, 1, toAgency: prison.code)
+
       stub_poms(prison.code, [user])
       stub_keyworker prison.code, offender_no, build(:keyworker)
 

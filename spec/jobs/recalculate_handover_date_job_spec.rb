@@ -296,7 +296,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
     before do
       stub_offender(nomis_offender)
-      stub_movements([movement])
+      stub_movements_for(offender_no, [movement])
       allow(HmppsApi::CommunityApi).to receive(:set_handover_dates)
 
       # Create an 'old' handover date, which will then be updated given the 'new' open conditions

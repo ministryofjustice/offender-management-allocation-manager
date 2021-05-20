@@ -10,13 +10,15 @@ RSpec.describe "allocations/history", type: :view do
   before do
     assign(:prison, prison)
     assign(:prisoner, offender)
-    assign(:pom_emails, {})
-    assign(:early_allocations, early_allocations)
+    assign(:history, history + early_allocations.map { |ea| EarlyAllocationHistory.new(ea) })
+    assign(:timeline, build(:hmpps_api_prison_timeline, movements: build_list(:movement, 1)))
+    stub_auth_token
+    stub_pom_emails 123456, []
+    stub_pom_emails 485926, []
   end
 
   context 'with early allocations' do
     before do
-      assign(:history, [])
       assign(:email_histories, [])
 
       render
@@ -30,6 +32,8 @@ RSpec.describe "allocations/history", type: :view do
         expect(view_link['href']).to eq(expected_href)
       end
     end
+
+    let(:history) { [] }
 
     context 'with an ineligible early allocation' do
       let(:ea) { create(:early_allocation, :ineligible, created_at: DateTime.new(2019, 11, 19, 11, 28, 0)) }
@@ -129,7 +133,8 @@ RSpec.describe "allocations/history", type: :view do
 
     context 'when community accept the case' do
       let(:ea) { create(:early_allocation, :discretionary_accepted, created_at: DateTime.new(2019, 11, 19, 11, 28, 0), updated_at: DateTime.new(2019, 11, 21, 11, 35, 0)) }
-      let(:early_allocations) { [ea] }
+      let(:early_allocations) { [] }
+      let(:history) { [EarlyAllocationHistory.new(ea), EarlyAllocationDecision.new(ea)] }
 
       it 'shows a single record' do
         expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ['Early allocation decision recorded', "Early allocation assessment form completed"]
@@ -149,7 +154,8 @@ RSpec.describe "allocations/history", type: :view do
 
     context 'when community reject the case' do
       let(:ea) { create(:early_allocation, :discretionary_declined, created_at: DateTime.new(2019, 11, 19, 11, 28, 0), updated_at: DateTime.new(2019, 11, 21, 11, 35, 0)) }
-      let(:early_allocations) { [ea] }
+      let(:early_allocations) { [] }
+      let(:history) { [EarlyAllocationHistory.new(ea), EarlyAllocationDecision.new(ea)] }
 
       it 'shows a single record' do
         expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ['Early allocation decision recorded', "Early allocation assessment form completed",]
@@ -175,17 +181,17 @@ RSpec.describe "allocations/history", type: :view do
     end
 
     context 'when allocator completes an override against the recommendation (allocation)' do
-      before do
+      let(:history) do
         old_versions =
           [
             build(:allocation_history, override_reasons: ["suitability"], suitability_detail: "Too high risk"),
             build(:allocation_history, override_reasons: ["suitability"], event: AllocationHistory::REALLOCATE_PRIMARY_POM, suitability_detail: "Continuity")
           ]
 
-        assign(:history, [
+        [
           CaseHistory.new(nil, old_versions[0], dummy_version),
           CaseHistory.new(old_versions[0], old_versions[1], dummy_version),
-        ])
+        ]
       end
 
       it 'shows a reason why in the allocation history' do
@@ -198,7 +204,7 @@ RSpec.describe "allocations/history", type: :view do
     # Their is a fix in this view to display incorrect data correctly due to a bug created in the Override Controller. Unfortunately this bad data
     # cannot easily be altered so to get around this it has been modified at the view level.
     context 'when a prisoner has moved to another prison' do
-      before do
+      let(:history) do
         old_versions =
           [
             build(:allocation_history, :primary, prison: prison_one),
@@ -206,11 +212,11 @@ RSpec.describe "allocations/history", type: :view do
             build(:allocation_history, :reallocation, :override, prison: prison_two)
           ]
 
-        assign(:history, [
+        [
           CaseHistory.new(nil, old_versions[0], dummy_version),
           CaseHistory.new(old_versions[0], old_versions[1], dummy_version),
           CaseHistory.new(old_versions[1], old_versions[2], dummy_version),
-        ])
+        ]
       end
 
       let(:prison_one) { create(:prison).code }
@@ -223,11 +229,11 @@ RSpec.describe "allocations/history", type: :view do
     end
 
     context 'when a prisoner has been released' do
-      before do
-        assign(:history, [build(:allocation_history, :primary),
-                          build(:allocation_history, :release)].
-            map { |ah| CaseHistory.new(nil, ah, released_version) })
-      end
+      let(:history) {
+        [build(:allocation_history, :primary),
+         build(:allocation_history, :release)].
+          map { |ah| CaseHistory.new(nil, ah, released_version) }
+      }
 
       let(:released_version) { Struct.new(:object_changes).new({ 'updated_at' => [release_date_and_time, release_date_and_time] }.to_yaml) }
       let(:release_date_and_time) { DateTime.new(2019, 11, 19, 11, 28, 0) }

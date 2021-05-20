@@ -4,7 +4,7 @@ module HmppsApi
   class Movement
     include Deserialisable
 
-    attr_reader :movement_type, :movement_date, :from_agency, :to_agency, :offender_no
+    attr_reader :movement_type, :from_agency, :to_agency, :offender_no
 
     def initialize(fields = {})
       # Allow this object to be reconstituted from a hash, we can't use
@@ -25,6 +25,10 @@ module HmppsApi
       @movement_type == HmppsApi::MovementType::TEMPORARY
     end
 
+    def transfer?
+      @movement_type == HmppsApi::MovementType::TRANSFER
+    end
+
     def out?
       @direction_code == MovementDirection::OUT
     end
@@ -39,8 +43,17 @@ module HmppsApi
       @to_agency = payload['toAgency']
       @movement_type = payload.fetch('movementType')
       @direction_code = payload.fetch('directionCode')
-      @movement_time = payload['movementTime']
-      @movement_date = deserialise_date(payload, 'movementDate')
+      @movement_time = payload.fetch('movementTime')
+      @movement_date = payload.fetch('movementDate')
+    end
+
+    def movement_date
+      Date.parse @movement_date
+    end
+
+    # date and time from the API should be in Zulu time
+    def happened_at
+      DateTime.parse "#{@movement_date} #{@movement_time}"
     end
 
     def self.from_json(payload)

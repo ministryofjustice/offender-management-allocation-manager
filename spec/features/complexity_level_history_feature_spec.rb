@@ -9,6 +9,7 @@ feature 'Case history with complexity level' do
 
     stub_signin_spo logged_in_user, [prison_code]
     stub_offenders_for_prison prison_code, [offender]
+    stub_movements_for offender.fetch(:offenderNo), attributes_for_list(:movement, 1, toAgency: prison_code)
     stub_poms prison_code, [pom]
 
     stub_request(:get, "#{ApiHelper::T3}/users/user").

@@ -19,6 +19,7 @@ RSpec.describe AllocationsController, type: :controller do
   before do
     stub_poms(prison, poms)
     stub_offender(offender)
+    stub_movements_for offender_no, [attributes_for(:movement)]
   end
 
   context 'when user is a POM' do
@@ -33,7 +34,7 @@ RSpec.describe AllocationsController, type: :controller do
       expect(response).to redirect_to('/401')
     end
 
-    it 'allows access to the Case History page' do
+    it 'allows access for anyone in the POMs caseload' do
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
       create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: poms.last.staffId)
       get :history, params: { prison_id: prison, nomis_offender_id: offender_no }
@@ -89,6 +90,7 @@ RSpec.describe AllocationsController, type: :controller do
           case_info = create(:case_information, victim_liaison_officers: [build(:victim_liaison_officer)])
           create(:allocation_history, nomis_offender_id: case_info.nomis_offender_id)
           stub_offender(build(:nomis_offender, offenderNo: case_info.nomis_offender_id))
+          stub_movements_for case_info.nomis_offender_id, [attributes_for(:movement)]
           stub_pom_emails(485926, [])
         end
 
@@ -149,12 +151,11 @@ RSpec.describe AllocationsController, type: :controller do
             get :history, params: { prison_id: prison, nomis_offender_id: offender_no }
             history = assigns(:history)
             expect(history.size).to eq(2)
-            expect(history.first.prison).to eq 'LEI'
             expect(history.map(&:created_at).map(&:to_date)).to eq([create_date, yesterday])
           end
         end
 
-        context 'when delius updated' do
+        context 'when delius is updated' do
           before do
             create(:allocation_history, primary_pom_nomis_id: 1, allocated_at_tier: 'C',
                    nomis_offender_id: offender_no,
@@ -197,50 +198,12 @@ RSpec.describe AllocationsController, type: :controller do
               event_trigger: AllocationHistory::USER)
           end
 
-          it "Can get the allocation history for an offender" do
+          it "get the allocation history for an offender" do
             get :history, params: { prison_id: prison, nomis_offender_id: offender_no }
             allocation_list = assigns(:history)
 
-            expect(allocation_list.map { |item| [item.prison, item.event] }).to eq([['PVI', 'allocate_primary_pom'], ['LEI', 'allocate_primary_pom']])
+            expect(allocation_list.map(&:event)).to eq(['allocate_primary_pom', 'allocate_primary_pom'])
           end
-        end
-      end
-
-      context 'with a different allocation' do
-        it "can get email addresses of POM's who have been allocated to an offender given the allocation history" do
-          previous_primary_pom = poms.last
-          updated_primary_pom = poms.second
-          primary_pom_without_email_id = pom_without_emails.staffId
-
-          allocation = create(
-            :allocation_history,
-            nomis_offender_id: offender_no,
-            prison: prison,
-            override_reasons: ['other'],
-            primary_pom_nomis_id: previous_primary_pom.staffId)
-
-          allocation.update!(
-            primary_pom_nomis_id: updated_primary_pom.staffId,
-            event: AllocationHistory::REALLOCATE_PRIMARY_POM
-          )
-
-          allocation.update!(
-            primary_pom_nomis_id: primary_pom_without_email_id,
-            event: AllocationHistory::REALLOCATE_PRIMARY_POM
-          )
-
-          allocation.update!(
-            primary_pom_nomis_id: updated_primary_pom.staffId,
-            event: AllocationHistory::REALLOCATE_PRIMARY_POM
-          )
-
-          get :history, params: { prison_id: prison, nomis_offender_id: offender_no }
-          pom_emails = assigns(:pom_emails)
-
-          expect(pom_emails).to eq(primary_pom_without_email_id => nil,
-                                   updated_primary_pom.staffId => updated_primary_pom.emails.first,
-                                   previous_primary_pom.staffId => previous_primary_pom.emails.first
-                                )
         end
       end
     end
@@ -260,7 +223,7 @@ RSpec.describe AllocationsController, type: :controller do
           create(:allocation_history, prison: prison, nomis_offender_id: info.nomis_offender_id, primary_pom_nomis_id: alice.staffId)
 
           offenders = CaseInformation.all.map { |ci| build(:nomis_offender, offenderNo: ci.nomis_offender_id) }
-          stub_offenders_for_prison(prison, offenders)
+          stub_offenders_for_prison(prison, offenders, [attributes_for(:movement)])
 
           create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), tier: tier)
           get :index, params: { prison_id: prison, prisoner_id: offender_no }

@@ -5,10 +5,6 @@ class EarlyAllocationDecision
     @early_allocation = early_allocation
   end
 
-  def prison
-    @early_allocation.prison
-  end
-
   def created_at
     @early_allocation.updated_at
   end

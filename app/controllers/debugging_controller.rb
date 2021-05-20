@@ -13,7 +13,7 @@ class DebuggingController < PrisonsApplicationController
 
       @allocation = AllocationHistory.find_by(nomis_offender_id: @offender.offender_no)
       @movements =
-        HmppsApi::PrisonApi::MovementApi.movements_for(@offender.offender_no).last
+        HmppsApi::PrisonApi::MovementApi.movements_for(@offender.offender_no, %w[ADM TRN REL]).last_movement
     end
   end
 

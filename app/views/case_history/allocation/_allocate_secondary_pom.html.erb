@@ -1,6 +1,6 @@
 <% description = capture do %>
   Prisoner allocated to <%= allocate_secondary_pom.secondary_pom_name.titleize %>
-  - <%= format_email(@pom_emails[allocate_secondary_pom.secondary_pom_nomis_id]) %>
+  - <%= format_email(allocate_secondary_pom.secondary_pom_email) %>
 <% end %>
 <%= render 'case_history/case_history',
            title: 'Co-working allocation',
