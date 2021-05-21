@@ -45,6 +45,7 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
                    nomis_offender_id: "G4281GV",
                    probation_service: "England",
                    local_delivery_unit_id: ldu.id,
+                   ldu_code: ldu.code,
                    team_name: team_name,
                    com_name: "Jones, Ruth Mary",
                    tier: "A")
@@ -190,14 +191,18 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
                                                          offenderManagers: [build(:community_offender_manager,
                                                                                   team: { code: 'XYX',
                                                                                           localDeliveryUnit: { code: ldu_code } })]))
+        described_class.perform_now(nomis_offender_id)
       end
 
       context 'when the LDU code exists in our lookup table' do
         let(:ldu_code) { ldu.code }
 
         it 'associates it with that LDU' do
-          described_class.perform_now(nomis_offender_id)
           expect(case_info.local_delivery_unit).to eq ldu
+        end
+
+        it 'records the LDU code' do
+          expect(case_info.ldu_code).to eq ldu_code
         end
       end
 
@@ -205,8 +210,11 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
         let(:ldu_code) { 'ABC123' }
 
         it 'imports the record, but without an LDU association' do
-          described_class.perform_now(nomis_offender_id)
           expect(case_info.local_delivery_unit).to be_nil
+        end
+
+        it 'records the LDU code' do
+          expect(case_info.ldu_code).to eq ldu_code
         end
       end
     end
