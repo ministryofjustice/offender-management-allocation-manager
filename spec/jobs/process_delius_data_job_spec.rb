@@ -183,21 +183,30 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
       end
     end
 
-    describe '#local_delivery_unit' do
+    describe 'Local Delivery Unit' do
       before do
         stub_offender(build(:nomis_offender, offenderNo: nomis_offender_id))
         stub_community_offender(nomis_offender_id, build(:community_data,
                                                          offenderManagers: [build(:community_offender_manager,
                                                                                   team: { code: 'XYX',
-                                                                                          localDeliveryUnit: { code: ldu.code } })]))
+                                                                                          localDeliveryUnit: { code: ldu_code } })]))
       end
 
-      context 'with an existing new shiny LDU' do
-        let(:local_delivery_unit) { LocalDeliveryUnit.last }
+      context 'when the LDU code exists in our lookup table' do
+        let(:ldu_code) { ldu.code }
 
-        it 'maps to the new one' do
+        it 'associates it with that LDU' do
           described_class.perform_now(nomis_offender_id)
-          expect(case_info.local_delivery_unit).to eq local_delivery_unit
+          expect(case_info.local_delivery_unit).to eq ldu
+        end
+      end
+
+      context 'when the LDU code is not in our lookup table' do
+        let(:ldu_code) { 'ABC123' }
+
+        it 'imports the record, but without an LDU association' do
+          described_class.perform_now(nomis_offender_id)
+          expect(case_info.local_delivery_unit).to be_nil
         end
       end
     end

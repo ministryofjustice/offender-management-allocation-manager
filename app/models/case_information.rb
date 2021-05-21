@@ -60,8 +60,6 @@ class CaseInformation < ApplicationRecord
   validates :manual_entry, inclusion: { in: [true, false], allow_nil: false }
   validates :nomis_offender_id, presence: true, uniqueness: true
 
-  validates :local_delivery_unit, presence: true, unless: -> { manual_entry }
-
   # Don't think this is as simple as allowing nil. In the specific case of Scot/NI
   # prisoners it makes sense to have N/A (as this is genuine) but not otherwise
   validates :tier, inclusion: { in: %w[A B C D N/A], message: 'Select the prisoner’s tier' }
