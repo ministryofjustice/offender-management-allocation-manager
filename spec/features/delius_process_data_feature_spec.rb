@@ -76,27 +76,5 @@ feature 'delius import scenarios', :disable_push_to_delius do
         end
       end
     end
-
-    context 'with non-existent team' do
-      let(:offender_no) { 'G2911GD' }
-      let(:offender) { build(:nomis_offender, offenderNo: offender_no) }
-
-      before do
-        stub_community_offender(offender_no, build(:community_data))
-
-        stub_offender(offender)
-      end
-
-      before do
-        ProcessDeliusDataJob.perform_now offender_no
-      end
-
-      it 'displays the correct error message' do
-        visit prison_case_information_path('LEI', offender_no)
-        within '.govuk-error-summary' do
-          expect(page).to have_content 'no local delivery unit (LDU) information found'
-        end
-      end
-    end
   end
 end

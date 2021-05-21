@@ -57,6 +57,7 @@ private
         crn: delius_record.crn,
         tier: map_tier(delius_record.tier),
         local_delivery_unit: map_ldu(delius_record.ldu_code),
+        ldu_code: delius_record.ldu_code,
         team_name: delius_record.team_name,
         case_allocation: delius_record.service_provider,
         probation_service: map_probation_service(delius_record.ldu_code),
