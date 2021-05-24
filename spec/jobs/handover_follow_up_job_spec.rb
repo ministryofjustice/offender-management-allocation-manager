@@ -51,7 +51,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
       let(:offender) { nil }
       let(:offender_no) {
         # Use offender factory to give a 'realistic' offender number
-        build(:offender).offender_no
+        build(:hmpps_api_offender).offender_no
       }
 
       it 'does not send email' do
@@ -202,7 +202,7 @@ private
 
   def build_offender(release_date = nil, prison: nil, sentence_type:, ard_crd_release:, ted:)
     prison = prison || active_prison
-    build(:offender, latestLocationId: prison.code,
+    build(:hmpps_api_offender, latestLocationId: prison.code,
           sentence: build(:sentence_detail,
                           sentence_type,
                           sentenceStartDate: Time.zone.today - 11.months,

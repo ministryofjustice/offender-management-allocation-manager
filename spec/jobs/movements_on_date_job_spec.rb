@@ -10,7 +10,7 @@ RSpec.describe MovementsOnDateJob, type: :job do
   end
 
   it 'deallocates' do
-    allow(OffenderService).to receive(:get_offender).and_return(build(:offender))
+    allow(OffenderService).to receive(:get_offender).and_return(build(:hmpps_api_offender))
 
     stub_request(:get, "#{ApiHelper::T3}/movements?fromDateTime=2018-06-30T00:00&movementDate=2019-06-30").
       to_return(body: [

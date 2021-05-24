@@ -18,7 +18,7 @@ RSpec.describe "prisoners/show", type: :view do
 
   describe 'complexity badges' do
     let(:prison) { build(:womens_prison) }
-    let(:offender) { build(:offender, complexityLevel: complexity) }
+    let(:offender) { build(:hmpps_api_offender, complexityLevel: complexity) }
     let(:test_strategy) { Flipflop::FeatureSet.current.test! }
 
     before do
@@ -56,7 +56,7 @@ RSpec.describe "prisoners/show", type: :view do
     before { render }
 
     context "with a male category" do
-      let(:offender) { build(:offender, category: build(:offender_category, :cat_a)) }
+      let(:offender) { build(:hmpps_api_offender, category: build(:offender_category, :cat_a)) }
 
       it 'shows the category label' do
         expect(subject).to eq('Cat A')
@@ -64,7 +64,7 @@ RSpec.describe "prisoners/show", type: :view do
     end
 
     context "with a female category" do
-      let(:offender) { build(:offender, category: build(:offender_category, :female_closed)) }
+      let(:offender) { build(:hmpps_api_offender, category: build(:offender_category, :female_closed)) }
 
       it 'shows the category label' do
         expect(subject).to eq('Female Closed')
@@ -73,7 +73,7 @@ RSpec.describe "prisoners/show", type: :view do
 
     context 'when category is unknown' do
       # This happens when an offender's category assessment hasn't been completed yet
-      let(:offender) { build(:offender, category: nil) }
+      let(:offender) { build(:hmpps_api_offender, category: nil) }
 
       it 'shows "Unknown"' do
         expect(subject).to eq('Unknown')

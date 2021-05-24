@@ -4,7 +4,7 @@ RSpec.describe SearchHelper do
   describe 'the CTA' do
     context 'with no allocation' do
       let(:offender) {
-        x = build(:offender).tap { |o|
+        x = build(:hmpps_api_offender).tap { |o|
           o.load_case_information(build(:case_information, tier: 'A'))
         }
         OffenderWithAllocationPresenter.new(x, nil)
@@ -21,7 +21,7 @@ RSpec.describe SearchHelper do
     context 'with an allocation' do
       let(:case_info) { build(:case_information, tier: 'A') }
       let(:offender) {
-        x = build(:offender, offenderNo: case_info.nomis_offender_id).tap { |o|
+        x = build(:hmpps_api_offender, offenderNo: case_info.nomis_offender_id).tap { |o|
           o.load_case_information(case_info)
         }
         OffenderWithAllocationPresenter.new(x, build(:allocation))

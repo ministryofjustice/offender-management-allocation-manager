@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "debugging/debugging", type: :view do
   let(:offender) do
-    build(:offender, firstName: 'John', lastName: 'Dory').tap { |offender|
+    build(:hmpps_api_offender, firstName: 'John', lastName: 'Dory').tap { |offender|
       offender.sentence = build(:sentence_detail,
                                 sentenceStartDate: Time.zone.today,
                                 automaticReleaseDate: Time.zone.today + 10.months,
@@ -49,7 +49,7 @@ RSpec.describe "debugging/debugging", type: :view do
     let(:value) { page.css('#category > td:nth-child(2)').text.strip }
 
     context 'when the offender has a category' do
-      let(:offender) { build(:offender, category: build(:offender_category, :female_open, approvalDate: '17/06/2021'.to_date)) }
+      let(:offender) { build(:hmpps_api_offender, category: build(:offender_category, :female_open, approvalDate: '17/06/2021'.to_date)) }
 
       it 'shows category details' do
         expect(key).to eq('Category')
@@ -59,7 +59,7 @@ RSpec.describe "debugging/debugging", type: :view do
 
     context 'when category is unknown' do
       # This happens when an offender's category assessment hasn't been completed yet
-      let(:offender) { build(:offender, category: nil) }
+      let(:offender) { build(:hmpps_api_offender, category: nil) }
 
       it 'shows "Unknown"' do
         expect(key).to eq('Category')
