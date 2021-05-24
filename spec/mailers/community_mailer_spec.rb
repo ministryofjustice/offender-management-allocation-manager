@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe CommunityMailer, type: :mailer do
   describe '#urgent_pipeline_to_community' do
-    let(:offender) { build(:offender, latestLocationId: 'LEI') }
+    let(:offender) { build(:hmpps_api_offender, latestLocationId: 'LEI') }
 
     let(:case_info) do
       create(:case_information, nomis_offender_id: offender.offender_no,
@@ -91,7 +91,7 @@ RSpec.describe CommunityMailer, type: :mailer do
   end
 
   describe '#open_prison_supporting_com_needed' do
-    let(:offender) { build(:offender, latestLocationId: PrisonService::PRESCOED_CODE, sentence_type: :indeterminate) }
+    let(:offender) { build(:hmpps_api_offender, latestLocationId: PrisonService::PRESCOED_CODE, sentence_type: :indeterminate) }
     let(:case_info) do
       create(:case_information, :welsh, nomis_offender_id: offender.offender_no,
              responsibility: build(:responsibility, nomis_offender_id: offender.offender_no))

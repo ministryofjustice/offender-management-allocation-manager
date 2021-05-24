@@ -74,7 +74,7 @@ feature 'Provide debugging information for our team to use' do
     context 'when offender does not have a sentence start date',
             vcr: { cassette_name: 'prison_api/debugging_no_sentence_start_date_for_offender_feature' } do
       let(:non_sentenced_offender) do
-        build(:offender, offenderNo: nomis_offender_id,
+        build(:hmpps_api_offender, offenderNo: nomis_offender_id,
               imprisonmentStatus: 'SEC90',
               sentence: build(:sentence_detail,
                               releaseDate: 3.years.from_now.iso8601,

@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "early_allocations/early_allocations_list", type: :view do
   let(:page) { Nokogiri::HTML(rendered) }
-  let(:offender) { build(:offender) }
+  let(:offender) { build(:hmpps_api_offender) }
 
   before do
     render partial: 'early_allocations/early_allocations_list', locals: {

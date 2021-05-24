@@ -4,7 +4,7 @@ RSpec.describe "allocations/history", type: :view do
   let(:dummy_version) { Struct.new(:object_changes).new({ 'updated_at' => [now, now] }.to_yaml) }
   let(:page) { Nokogiri::HTML(rendered) }
   let(:prison) { create(:prison) }
-  let(:offender) { build(:offender) }
+  let(:offender) { build(:hmpps_api_offender) }
   let(:now) { Time.zone.now }
 
   before do

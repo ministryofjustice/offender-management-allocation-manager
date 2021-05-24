@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe "allocations/index", type: :view do
   let(:page) { Nokogiri::HTML(rendered) }
-  let(:offender) { build(:offender) }
+  let(:offender) { build(:hmpps_api_offender) }
 
   before do
     assign(:prison, create(:prison))
@@ -30,7 +30,7 @@ RSpec.describe "allocations/index", type: :view do
     let(:value) { page.css('#offender-category > td:nth-child(2)').text }
 
     context 'when a male offender category' do
-      let(:offender) { build(:offender, category: build(:offender_category, :cat_d)) }
+      let(:offender) { build(:hmpps_api_offender, category: build(:offender_category, :cat_d)) }
 
       it 'shows the category label' do
         expect(key).to eq('Category')
@@ -39,7 +39,7 @@ RSpec.describe "allocations/index", type: :view do
     end
 
     context 'when a female offender category' do
-      let(:offender) { build(:offender, category: build(:offender_category, :female_open)) }
+      let(:offender) { build(:hmpps_api_offender, category: build(:offender_category, :female_open)) }
 
       it 'shows the category label' do
         expect(key).to eq('Category')
@@ -49,7 +49,7 @@ RSpec.describe "allocations/index", type: :view do
 
     context 'when category is unknown' do
       # This happens when an offender's category assessment hasn't been completed yet
-      let(:offender) { build(:offender, category: nil) }
+      let(:offender) { build(:hmpps_api_offender, category: nil) }
 
       it 'shows "Unknown"' do
         expect(key).to eq('Category')

@@ -18,7 +18,7 @@ RSpec.describe "female_allocations/index", type: :view do
   end
 
   let(:case_info) { build(:case_information) }
-  let(:offender) { build(:offender, offenderNo: case_info.nomis_offender_id).tap { |o| o.load_case_information(case_info) } }
+  let(:offender) { build(:hmpps_api_offender, offenderNo: case_info.nomis_offender_id).tap { |o| o.load_case_information(case_info) } }
   let(:prison) { create(:prison) }
   let(:pom) { build(:pom) }
   let(:page) { Nokogiri::HTML(rendered) }

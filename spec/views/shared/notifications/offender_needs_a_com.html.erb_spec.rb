@@ -11,7 +11,7 @@ RSpec.describe "shared/notifications/offender_needs_a_com", type: :view do
   let(:email_history) { [] }
 
   let(:offender) {
-    build(:offender, sentence: build(:sentence_detail, :determinate, :inside_handover_window)).tap { |o|
+    build(:hmpps_api_offender, sentence: build(:sentence_detail, :determinate, :inside_handover_window)).tap { |o|
       o.load_case_information(case_info)
     }
   }

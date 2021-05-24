@@ -99,7 +99,7 @@ describe HandoverDateService do
 
     context 'when incorrect service provider entered for indeterminate offender' do
       let(:offender) {
-        build(:offender, sentence: build(:sentence_detail, :indeterminate, tariffDate: tariff_date)).tap { |o|
+        build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate, tariffDate: tariff_date)).tap { |o|
           o.load_case_information(build(:case_information, :crc))
         }
       }
@@ -116,7 +116,7 @@ describe HandoverDateService do
 
       context 'when outside referral window' do
         let(:offender) {
-          build(:offender,
+          build(:hmpps_api_offender,
                 sentence: build(:sentence_detail, :determinate, :english_policy_sentence,
                                 automaticReleaseDate: ard,
                                 conditionalReleaseDate: crd)).tap { |o|
@@ -136,7 +136,7 @@ describe HandoverDateService do
         let(:ted15) { ted - 15.months }
 
         let(:offender) {
-          build(:offender,
+          build(:hmpps_api_offender,
                 sentence: build(:sentence_detail, :indeterminate,
                                 paroleEligibilityDate: ped,
                                 tariffDate: ted)).tap { |o|
@@ -164,7 +164,7 @@ describe HandoverDateService do
 
       context 'when determinate' do
         let(:offender) {
-          build(:offender,
+          build(:hmpps_api_offender,
                 sentence: build(:sentence_detail, :determinate, :english_policy_sentence,
                                 automaticReleaseDate: ard,
                                 conditionalReleaseDate: crd)).tap { |o|
@@ -215,7 +215,7 @@ describe HandoverDateService do
     }
 
     let(:offender) do
-      build(:offender,
+      build(:hmpps_api_offender,
             sentence: build(:sentence_detail, sentence_type_trait,
                             automaticReleaseDate: automatic_release_date,
                             conditionalReleaseDate: conditional_release_date,
@@ -471,7 +471,7 @@ describe HandoverDateService do
     let(:automatic_release_date) { nil }
 
     let(:offender) {
-      build(:offender,
+      build(:hmpps_api_offender,
             sentence: if indeterminate_sentence
                         build(:sentence_detail,
                               :indeterminate,
@@ -563,9 +563,9 @@ describe HandoverDateService do
   context 'with an NPS and indeterminate case with a PRD and no TED' do
     let(:case_info) { build(:case_information, :with_prd, :nps) }
     let(:offender) {
-      build(:offender, sentence: build(:sentence_detail,
-                                       :indeterminate,
-                                       tariffDate: nil)).tap {  |offender|
+      build(:hmpps_api_offender, sentence: build(:sentence_detail,
+                                                 :indeterminate,
+                                                 tariffDate: nil)).tap {  |offender|
         offender.load_case_information(case_info)
       }
     }

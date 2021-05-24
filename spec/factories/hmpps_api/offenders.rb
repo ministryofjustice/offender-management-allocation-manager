@@ -1,12 +1,22 @@
-# frozen_string_literal: true
-
 FactoryBot.define do
-  factory :nomis_offender, class: Hash do
-    initialize_with { attributes }
+  factory :hmpps_api_offender, class: 'HmppsApi::Offender' do
+    initialize_with do
+      HmppsApi::Offender.new(attributes.stringify_keys,
+                             attributes.stringify_keys,
+                             booking_id: attributes[:latestBookingId]&.to_i,
+                             prison_id: attributes[:latestLocationId],
+                             category: attributes.fetch(:category),
+                             latest_temp_movement: nil,
+                             complexity_level: attributes.fetch(:complexityLevel)).tap { |offender|
+        offender.sentence = attributes.fetch(:sentence)
+      }
+    end
 
-    currentlyInPrison { 'Y' }
-    imprisonmentStatus { 'SENT03' }
-    agencyId { 'LEI' }
+    latestLocationId { 'LEI' }
+
+    trait :prescoed do
+      latestLocationId { PrisonService::PRESCOED_CODE }
+    end
 
     # cell location is the format <1 letter>-<1 number>-<3 numbers> e.g 'E-4-014'
     internalLocation {
@@ -23,6 +33,8 @@ FactoryBot.define do
       # This and case_information should produce different values to avoid clashes
       "T#{number}O#{letter}"
     end
+
+    sequence(:bookingId) { |x| x + 700_000 }
     convictedStatus { 'Convicted' }
     dateOfBirth { Date.new(1990, 12, 6).to_s }
     firstName { Faker::Name.first_name }
@@ -31,15 +43,11 @@ FactoryBot.define do
     # also ensure uniqueness as duplicate last names can cause issues
     # in tests, as ruby sort isn't stable by default
     sequence(:lastName) { |c| "#{Faker::Name.last_name.titleize}_#{c}" }
-    category { attributes_for(:offender_category, :cat_c) }
-    recall { false }
+    category { build(:offender_category, :cat_c) }
+    recall {  false }
 
-    sentence do
-      attributes_for :sentence_detail
-    end
+    sentence { association :sentence_detail }
 
     complexityLevel { 'medium' }
-
-    sequence(:bookingId) { |c| c + 100_000 }
   end
 end

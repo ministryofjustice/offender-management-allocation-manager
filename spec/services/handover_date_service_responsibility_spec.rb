@@ -16,7 +16,7 @@ describe HandoverDateService do
 
         context 'when welsh' do
           let(:offender) {
-            build(:offender, :prescoed, sentence: build(:sentence_detail, :welsh_policy_sentence)).tap { |o|
+            build(:hmpps_api_offender, :prescoed, sentence: build(:sentence_detail, :welsh_policy_sentence)).tap { |o|
               o.prison_arrival_date = arrival_date
               o.load_case_information(case_info)
             }
@@ -41,7 +41,7 @@ describe HandoverDateService do
 
         context 'when english' do
           let(:offender) {
-            build(:offender, :prescoed, sentence: build(:sentence_detail, :english_policy_sentence)).tap { |o|
+            build(:hmpps_api_offender, :prescoed, sentence: build(:sentence_detail, :english_policy_sentence)).tap { |o|
               o.prison_arrival_date = arrival_date
               o.load_case_information(case_info)
             }
@@ -59,7 +59,7 @@ describe HandoverDateService do
 
       context 'with past NPS welsh offender' do
         let(:offender) {
-          build(:offender, :prescoed, sentence: build(:sentence_detail, :welsh_policy_sentence)).tap { |o|
+          build(:hmpps_api_offender, :prescoed, sentence: build(:sentence_detail, :welsh_policy_sentence)).tap { |o|
             o.prison_arrival_date = arrival_date
             o.load_case_information(case_info)
           }
@@ -261,7 +261,7 @@ describe HandoverDateService do
             end
 
             let(:offender) {
-              build(:offender, prison_id: 'VEI',
+              build(:hmpps_api_offender, prison_id: 'VEI',
                     sentence: build(:sentence_detail,
                                     sentenceStartDate: sentence_start_date,
                                     automaticReleaseDate: ard,

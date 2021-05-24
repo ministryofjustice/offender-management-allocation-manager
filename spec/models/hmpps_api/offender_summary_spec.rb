@@ -6,7 +6,7 @@ describe HmppsApi::Offender do
   describe '#responsibility_override?' do
     it 'returns false when no responsibility found for offender' do
       # build an offender, by default this does not have any case information or responsibility record
-      subject = build(:offender, sentence: build(:sentence_detail, :indeterminate))
+      subject = build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate))
       expect(subject.responsibility_override?).to eq(false)
     end
 
@@ -16,7 +16,7 @@ describe HmppsApi::Offender do
       create(:responsibility, nomis_offender_id: 'A1234XX')
 
       # build an offender
-      offender = build(:offender, sentence: build(:sentence_detail, :indeterminate), offenderNo: 'A1234XX')
+      offender = build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate), offenderNo: 'A1234XX')
 
       # load the case information and responsibility record into the offender object
       offender.load_case_information(case_info)
@@ -28,9 +28,9 @@ describe HmppsApi::Offender do
   describe '#within_early_allocation_window?' do
     context 'with no dates' do
       let(:offender) {
-        build(:offender, sentence: build(:sentence_detail,
-                                         conditionalReleaseDate: nil,
-                                         automaticReleaseDate: nil
+        build(:hmpps_api_offender, sentence: build(:sentence_detail,
+                                                   conditionalReleaseDate: nil,
+                                                   automaticReleaseDate: nil
         ))
       }
 
@@ -41,9 +41,9 @@ describe HmppsApi::Offender do
 
     context 'when ARD > 18 months' do
       let(:offender) {
-        build(:offender, sentence: build(:sentence_detail,
-                                         conditionalReleaseDate: Time.zone.today + 24.months,
-                                         automaticReleaseDate: Time.zone.today + 19.months
+        build(:hmpps_api_offender, sentence: build(:sentence_detail,
+                                                   conditionalReleaseDate: Time.zone.today + 24.months,
+                                                   automaticReleaseDate: Time.zone.today + 19.months
         ))
       }
 
@@ -54,9 +54,9 @@ describe HmppsApi::Offender do
 
     context 'when ARD < 18 months' do
       let(:offender) {
-        build(:offender, sentence: build(:sentence_detail,
-                                         conditionalReleaseDate: Time.zone.today + 24.months,
-                                         automaticReleaseDate: Time.zone.today + 17.months))
+        build(:hmpps_api_offender, sentence: build(:sentence_detail,
+                                                   conditionalReleaseDate: Time.zone.today + 24.months,
+                                                   automaticReleaseDate: Time.zone.today + 17.months))
       }
 
       it 'is within window' do
@@ -66,7 +66,7 @@ describe HmppsApi::Offender do
 
     context 'when PRD < 18 months' do
       let(:offender) {
-        build(:offender,
+        build(:hmpps_api_offender,
               sentence: build(:sentence_detail,
                               conditionalReleaseDate: Time.zone.today + 24.months,
                               automaticReleaseDate: Time.zone.today + 24.months)).tap { |o|
@@ -81,7 +81,7 @@ describe HmppsApi::Offender do
 
     context 'when TED < 18 months' do
       let(:offender) {
-        build(:offender,
+        build(:hmpps_api_offender,
               sentence: build(:sentence_detail,
                               conditionalReleaseDate: Time.zone.today + 24.months,
                               tariffDate: Time.zone.today + 17.months,
@@ -97,7 +97,7 @@ describe HmppsApi::Offender do
 
     context 'when PED < 18 months' do
       let(:offender) {
-        build(:offender,
+        build(:hmpps_api_offender,
               sentence: build(:sentence_detail,
                               conditionalReleaseDate: Time.zone.today + 24.months,
                               tariffDate: Time.zone.today + 24.months,
@@ -116,7 +116,7 @@ describe HmppsApi::Offender do
   describe '#handover_start_date' do
     context 'when in custody' do
       let(:offender) {
-        build(:offender).tap { |o|
+        build(:hmpps_api_offender).tap { |o|
           o.sentence = build(:sentence_detail,
                              conditionalReleaseDate: nil,
                              automaticReleaseDate: Time.zone.today + 1.year,
@@ -132,7 +132,7 @@ describe HmppsApi::Offender do
 
     context 'when COM responsible already' do
       let(:offender) {
-        build(:offender).tap { |o|
+        build(:hmpps_api_offender).tap { |o|
           o.sentence = build(:sentence_detail, conditionalReleaseDate: Time.zone.today + 1.week)
           o.load_case_information(build(:case_information))
         }
@@ -147,7 +147,7 @@ describe HmppsApi::Offender do
   describe '#pom_responsibility' do
     subject { HandoverDateService::Responsibility.new offender.pom_responsible?, offender.pom_supporting? }
 
-    let(:offender) { build(:offender, sentence: build(:sentence_detail, :indeterminate), latestLocationId: 'LEI') }
+    let(:offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate), latestLocationId: 'LEI') }
 
     context 'when the responsibility has not been overridden' do
       it "calculates the responsibility based on the offender's sentence" do
@@ -189,7 +189,7 @@ describe HmppsApi::Offender do
   describe '#com_responsibility' do
     subject { HandoverDateService::Responsibility.new offender.com_responsible?, offender.com_supporting? }
 
-    let(:offender) { build(:offender, sentence: build(:sentence_detail, :indeterminate), latestLocationId: 'LEI') }
+    let(:offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate), latestLocationId: 'LEI') }
 
     context 'when the responsibility has not been overridden' do
       it "calculates the responsibility based on the offender's sentence" do
@@ -233,7 +233,7 @@ describe HmppsApi::Offender do
     context 'when no CaseInformation has been loaded' do
       subject { offender.public_send(field) }
 
-      let(:offender) { build(:offender) }
+      let(:offender) { build(:hmpps_api_offender) }
 
       shared_examples 'expect fields to be' do |value, fields|
         fields.each do |field|
@@ -259,7 +259,7 @@ describe HmppsApi::Offender do
       subject { offender.public_send(field) }
 
       let(:case_info) { create(:case_information) }
-      let(:offender) { build(:offender).tap { |o| o.load_case_information(case_info) } }
+      let(:offender) { build(:hmpps_api_offender).tap { |o| o.load_case_information(case_info) } }
 
       describe '#has_case_information?' do
         let(:field) { :has_case_information? }
@@ -367,7 +367,7 @@ describe HmppsApi::Offender do
     subject { offender.needs_a_com? }
 
     let(:offender) {
-      build(:offender, sentence: sentence).tap { |o|
+      build(:hmpps_api_offender, sentence: sentence).tap { |o|
         o.load_case_information(case_info)
       }
     }
@@ -402,7 +402,7 @@ describe HmppsApi::Offender do
   end
 
   describe 'offender category' do
-    subject { build(:offender, category: category) }
+    subject { build(:hmpps_api_offender, category: category) }
 
     context 'with a male offender (Cat B)' do
       let(:category) { build(:offender_category, :cat_b) }

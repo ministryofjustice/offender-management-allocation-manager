@@ -4,7 +4,7 @@ require 'rails_helper'
 
 describe HmppsApi::Offender do
   subject {
-    build(:offender)
+    build(:hmpps_api_offender)
   }
 
   describe '#inside_omic_policy?' do
@@ -13,7 +13,7 @@ describe HmppsApi::Offender do
 
     context 'when it meets the requirements' do
       context 'when all requirements are present: immigration case, over 18, sentence, criminal sentence' do
-        let(:offender) { build(:offender,  imprisonmentStatus: immigration_detainee, dateOfBirth: over_18, convictedStatus: 'Convicted', sentence: build(:sentence_detail, sentenceStartDate: '2019-02-05')) }
+        let(:offender) { build(:hmpps_api_offender,  imprisonmentStatus: immigration_detainee, dateOfBirth: over_18, convictedStatus: 'Convicted', sentence: build(:sentence_detail, sentenceStartDate: '2019-02-05')) }
 
         it 'is in omic policy' do
           expect(offender.inside_omic_policy?).to eq(true)
@@ -22,7 +22,7 @@ describe HmppsApi::Offender do
 
       context 'when they have no sentence' do
         let(:offender) {
-          build(:offender,
+          build(:hmpps_api_offender,
                 dateOfBirth: over_18, convictedStatus: 'Convicted',
                         sentence: build(:sentence_detail, :unsentenced, imprisonmentStatus: immigration_detainee))
         }
@@ -33,7 +33,7 @@ describe HmppsApi::Offender do
       end
 
       context 'when they have no immigration case' do
-        let(:offender) { build(:offender, dateOfBirth: over_18, convictedStatus: 'Convicted', sentence: build(:sentence_detail, sentenceStartDate: '2019-02-05')) }
+        let(:offender) { build(:hmpps_api_offender, dateOfBirth: over_18, convictedStatus: 'Convicted', sentence: build(:sentence_detail, sentenceStartDate: '2019-02-05')) }
 
         it 'is in omic policy' do
           expect(offender.inside_omic_policy?).to eq(true)
@@ -45,7 +45,7 @@ describe HmppsApi::Offender do
       context 'when they are under 18' do
         let(:under_18) { (Time.zone.today - 17.years).to_s }
         let(:offender) {
-          build(:offender,
+          build(:hmpps_api_offender,
                 sentence: build(:sentence_detail, imprisonmentStatus: immigration_detainee),
                         dateOfBirth: under_18, convictedStatus: 'Convicted')
         }
@@ -56,7 +56,7 @@ describe HmppsApi::Offender do
       end
 
       context 'when have no immigration case and no sentence' do
-        let(:offender) { build(:offender, dateOfBirth: over_18, convictedStatus: 'Convicted', sentence: build(:sentence_detail, :unsentenced)) }
+        let(:offender) { build(:hmpps_api_offender, dateOfBirth: over_18, convictedStatus: 'Convicted', sentence: build(:sentence_detail, :unsentenced)) }
 
         it 'is not in omic policy' do
           expect(offender.inside_omic_policy?).to eq(false)
@@ -65,7 +65,7 @@ describe HmppsApi::Offender do
 
       context 'when they do not have a criminal sentence (and are not an immigration case)' do
         let(:offender) {
-          build(:offender, dateOfBirth: over_18, convictedStatus: 'Convicted',
+          build(:hmpps_api_offender, dateOfBirth: over_18, convictedStatus: 'Convicted',
                                sentence: build(:sentence_detail, :civil_sentence, sentenceStartDate: '2019-02-05'))
         }
 
@@ -76,7 +76,7 @@ describe HmppsApi::Offender do
 
       context 'when they are not convicted?' do
         let(:offender) {
-          build(:offender,  dateOfBirth: over_18, convictedStatus: false,
+          build(:hmpps_api_offender,  dateOfBirth: over_18, convictedStatus: false,
                                sentence: build(:sentence_detail, imprisonmentStatus: immigration_detainee, sentenceStartDate: '2019-02-05'))
         }
 
@@ -220,7 +220,7 @@ describe HmppsApi::Offender do
 
   describe '#over_18?' do
     subject {
-      build(:offender, dateOfBirth: dob.to_s)
+      build(:hmpps_api_offender, dateOfBirth: dob.to_s)
     }
 
     context 'with a date of birth 18 years ago' do
@@ -252,7 +252,7 @@ describe HmppsApi::Offender do
 
   describe '#recalled' do
     context 'when recall flag set' do
-      let(:offender) { build(:offender, sentence: build(:sentence_detail, recall: true)) }
+      let(:offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, recall: true)) }
 
       it 'is true' do
         expect(offender.recalled?).to eq(true)
@@ -260,7 +260,7 @@ describe HmppsApi::Offender do
     end
 
     context 'when recall flag unset' do
-      let(:offender) { build(:offender, recall: false) }
+      let(:offender) { build(:hmpps_api_offender, recall: false) }
 
       it 'is false' do
         expect(offender.recalled?).to eq(false)

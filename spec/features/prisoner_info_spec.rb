@@ -206,7 +206,7 @@ feature 'View a prisoner profile page' do
   context 'when offender does not have a sentence start date',
           vcr: { cassette_name: 'prison_api/no_sentence_start_date_for_offender' } do
     let(:non_sentenced_offender) do
-      build(:offender, offenderNo: 'G7998GJ',
+      build(:hmpps_api_offender, offenderNo: 'G7998GJ',
             imprisonmentStatus: 'SEC90',
             sentence: build(:sentence_detail,
                             releaseDate: 3.years.from_now.iso8601,
