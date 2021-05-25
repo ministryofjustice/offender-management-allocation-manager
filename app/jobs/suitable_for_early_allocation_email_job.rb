@@ -16,8 +16,8 @@ class SuitableForEarlyAllocationEmailJob < ApplicationJob
       already_emailed = EmailHistory.sent_within_current_sentence(prisoner,  EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION)
 
       if already_emailed.empty?
-
-        pom = PrisonOffenderManagerService.get_pom_at(prisoner.prison_id, allocation.primary_pom_nomis_id)
+        prison = Prison.find(prisoner.prison_id)
+        pom = prison.get_single_pom(allocation.primary_pom_nomis_id)
         EarlyAllocationMailer.review_early_allocation(
           email: pom.email_address,
           prisoner_name: prisoner.full_name,

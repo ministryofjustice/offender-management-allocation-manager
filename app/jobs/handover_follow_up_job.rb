@@ -16,7 +16,8 @@ class HandoverFollowUpJob < ApplicationJob
       allocation = Allocation.find_by(nomis_offender_id: offender.offender_no)
 
       if allocation.present? && allocation.active?
-        pom = PrisonOffenderManagerService.get_pom_at(offender.prison_id, allocation.primary_pom_nomis_id)
+        prison = Prison.find(offender.prison_id)
+        pom = prison.get_single_pom(allocation.primary_pom_nomis_id)
         pom_name = full_name(pom)
         pom_email = pom.email_address
       else

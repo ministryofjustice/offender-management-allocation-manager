@@ -16,9 +16,9 @@ class FemaleAllocationsController < PrisonsApplicationController
                        else
                          []
                        end
-    poms = PrisonOffenderManagerService.get_poms_for(active_prison_id).index_by(&:staff_id)
+    poms = @prison.get_list_of_poms.index_by(&:staff_id)
     @previous_poms = previous_pom_ids.map { |staff_id| poms[staff_id] }.compact
-    @current_pom = PrisonOffenderManagerService.get_pom_at(active_prison_id, previous_allocation.primary_pom_nomis_id) if previous_allocation&.primary_pom_nomis_id
+    @current_pom = @prison.get_single_pom(previous_allocation.primary_pom_nomis_id) if previous_allocation&.primary_pom_nomis_id
   end
 
   def new
@@ -99,7 +99,7 @@ private
   end
 
   def load_pom_types
-    poms = PrisonOffenderManagerService.get_poms_for(active_prison_id).map { |pom| StaffMember.new(@prison, pom.staff_id) }
+    poms = @prison.get_list_of_poms.map { |pom| StaffMember.new(@prison, pom.staff_id) }
     @probation_poms, @prison_poms = poms.partition(&:probation_officer?)
   end
 

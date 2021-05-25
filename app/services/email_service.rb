@@ -10,10 +10,7 @@ class EmailService
     @allocation = allocation
 
     @offender = OffenderService.get_offender(@allocation[:nomis_offender_id])
-    @pom = PrisonOffenderManagerService.get_pom_at(
-      @allocation.prison,
-      pom_nomis_id
-    )
+    @pom = Prison.find(@allocation.prison).get_single_pom(pom_nomis_id)
   end
 
   def send_email

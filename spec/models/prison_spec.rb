@@ -213,5 +213,17 @@ RSpec.describe Prison, type: :model do
         expect(subject).to be_valid
       end
     end
+
+    describe 'Associations with PomDetail' do
+      let!(:prison) { create(:prison) }
+
+      before do
+        create_list(:pom_detail, 5, prison: prison)
+      end
+
+      it 'has many pom details' do
+        expect(described_class.find(prison.code).pom_details.size).to be(5)
+      end
+    end
   end
 end

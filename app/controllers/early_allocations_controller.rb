@@ -36,7 +36,7 @@ class EarlyAllocationsController < PrisonsApplicationController
       if @early_allocation.eligible?
         @early_allocation.save!
         if @offender.within_early_allocation_window?
-          AutoEarlyAllocationEmailJob.perform_later(@prison.code, @offender.offender_no, Base64.encode64(pdf_as_string))
+          AutoEarlyAllocationEmailJob.perform_later(@prison, @offender.offender_no, Base64.encode64(pdf_as_string))
         end
         render 'landing_eligible'
       else
@@ -70,7 +70,7 @@ class EarlyAllocationsController < PrisonsApplicationController
     @early_allocation = EarlyAllocation.new early_allocation_params.merge(offender_id_from_url)
     if @early_allocation.save
       if @offender.within_early_allocation_window?
-        CommunityEarlyAllocationEmailJob.perform_later(@prison.code,
+        CommunityEarlyAllocationEmailJob.perform_later(@prison,
                                                        @offender.offender_no,
                                                        Base64.encode64(pdf_as_string))
       end
@@ -117,7 +117,7 @@ private
 
   def pdf_as_string
     allocation = Allocation.find_by!(offender_id_from_url)
-    pom = PrisonOffenderManagerService.get_pom_at(@prison.code, allocation.primary_pom_nomis_id)
+    pom = @prison.get_single_pom(allocation.primary_pom_nomis_id)
 
     view_context.render_early_alloc_pdf(early_allocation: @early_allocation,
                                         offender: @offender,

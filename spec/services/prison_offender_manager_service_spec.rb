@@ -11,9 +11,11 @@ describe PrisonOffenderManagerService do
   }
 
   context 'when using T3 and VCR' do
-    describe '#get_poms_for' do
+    let(:prison)  { Prison.find('LEI') }
+
+    describe '#get_list_of_poms' do
       subject {
-        described_class.get_poms_for('LEI')
+        prison.get_list_of_poms
       }
 
       let(:moic_integration_tests) { subject.detect { |x| x.first_name == 'MOIC' } }
@@ -25,18 +27,18 @@ describe PrisonOffenderManagerService do
       end
     end
 
-    describe '#get_pom_at' do
+    describe '#get_single_pom' do
       it "can fetch a single POM for a prison",
          vcr: { cassette_name: 'prison_api/pom_service_get_pom_ok' } do
-        pom = described_class.get_pom_at('LEI', staff_id)
+        pom = prison.get_single_pom(staff_id)
         expect(pom).not_to be nil
       end
 
       it "raises an exception when fetching a pom if they are not a POM",
          vcr: { cassette_name: 'prison_api/pom_service_get_pom_none' } do
         expect {
-          described_class.get_pom_at(prison.code, 1234)
-        }.to raise_exception(StandardError)
+          prison.get_single_pom(1234)
+        }.to raise_exception(StandardError, /^Failed to find POM/)
       end
     end
 
@@ -52,7 +54,9 @@ describe PrisonOffenderManagerService do
       stub_auth_token
     end
 
-    describe '#get_poms_for' do
+    describe '#get_list_of_poms' do
+      let!(:prison)  { create(:prison) }
+
       let(:alice) {
         build(:pom,
               firstName: 'Alice',
@@ -96,18 +100,18 @@ describe PrisonOffenderManagerService do
       let(:offender) { build(:nomis_offender) }
 
       before do
-        stub_poms('WSI', [dave, alice, billy, charles, eric])
-        stub_offenders_for_prison('WSI', [offender])
+        stub_poms(prison.code, [dave, alice, billy, charles, eric])
+        stub_offenders_for_prison(prison.code, [offender])
         stub_pom(alice)
         stub_pom(billy)
       end
 
       it 'removes duplicate staff ids, keeping the valid position' do
-        expect(described_class.get_poms_for('WSI').map(&:first_name)).to eq([alice, billy].map(&:firstName))
+        expect(prison.get_list_of_poms.map(&:first_name)).to eq([alice, billy].map(&:firstName))
       end
     end
 
-    describe '#get_pom_at' do
+    describe '#get_single_pom' do
       context 'when pom not existing at a prison' do
         before do
           stub_auth_token
@@ -134,7 +138,7 @@ describe PrisonOffenderManagerService do
 
         it "raises" do
           expect {
-            described_class.get_pom_at('LEI', 1234)
+            described_class.get_single_pom(1234)
           }.to raise_exception(StandardError)
         end
       end

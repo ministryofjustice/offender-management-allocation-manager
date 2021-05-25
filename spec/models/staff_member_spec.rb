@@ -1,15 +1,15 @@
 require 'rails_helper'
 
 RSpec.describe StaffMember, type: :model do
-  let(:prison) { build(:prison, code: 'LEI') }
+  let(:prison) { create(:prison) }
   let(:staff_id) { 123 }
   let(:user) { described_class.new(prison, staff_id) }
   let(:offenders) {
     [
-      build(:nomis_offender, offenderNo: 'G7514GW', prison_id: prison),
-      build(:nomis_offender, offenderNo: 'G1234VV', prison_id: prison),
-      build(:nomis_offender, offenderNo: 'G1234AB', prison_id: prison),
-      build(:nomis_offender, offenderNo: 'G1234GG', prison_id: prison)
+      build(:nomis_offender, offenderNo: 'G7514GW', prison_id: prison.code),
+      build(:nomis_offender, offenderNo: 'G1234VV', prison_id: prison.code),
+      build(:nomis_offender, offenderNo: 'G1234AB', prison_id: prison.code),
+      build(:nomis_offender, offenderNo: 'G1234GG', prison_id: prison.code)
     ]
   }
 
@@ -25,7 +25,7 @@ RSpec.describe StaffMember, type: :model do
     before do
       # # Allocate all of the offenders to this POM
       offenders.each do |offender|
-        create(:allocation, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: staff_id)
+        create(:allocation, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: staff_id, prison: prison.code)
       end
     end
 
@@ -49,7 +49,8 @@ RSpec.describe StaffMember, type: :model do
         create(
           :allocation,
           primary_pom_nomis_id: staff_id,
-          nomis_offender_id: 'G7514GW'
+          nomis_offender_id: 'G7514GW',
+          prison: prison.code
         )
       end
     }
@@ -60,6 +61,7 @@ RSpec.describe StaffMember, type: :model do
           :allocation,
           primary_pom_nomis_id: other_staff_id,
           nomis_offender_id: 'G1234VV',
+          prison: prison.code
         ).tap { |item|
           item.update!(secondary_pom_nomis_id: staff_id)
         }
@@ -71,6 +73,7 @@ RSpec.describe StaffMember, type: :model do
         :allocation,
         primary_pom_nomis_id: staff_id,
         nomis_offender_id: 'G1234AB',
+        prison: prison.code
       )
     }
 
@@ -79,7 +82,8 @@ RSpec.describe StaffMember, type: :model do
         :allocation,
         primary_pom_nomis_id: other_staff_id,
         nomis_offender_id: 'G1234GG',
-        secondary_pom_nomis_id: staff_id
+        secondary_pom_nomis_id: staff_id,
+        prison: prison.code
       ).tap { |item|
         item.update!(secondary_pom_nomis_id: staff_id)
       }

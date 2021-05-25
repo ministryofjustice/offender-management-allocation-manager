@@ -4,7 +4,7 @@ class CoworkingController < PrisonsApplicationController
   def new
     @prisoner = offender(nomis_offender_id_from_url)
     current_pom_id = Allocation.find_by!(nomis_offender_id: nomis_offender_id_from_url).primary_pom_nomis_id
-    poms = PrisonOffenderManagerService.get_poms_for(active_prison_id)
+    poms = @prison.get_list_of_poms
     @current_pom = poms.detect { |pom| pom.staff_id == current_pom_id }
 
     @active_poms, @unavailable_poms = poms.reject { |p| p.staff_id == current_pom_id }.partition { |pom|
@@ -18,20 +18,13 @@ class CoworkingController < PrisonsApplicationController
 
   def confirm
     @prisoner = offender(nomis_offender_id_from_url)
-    @primary_pom = PrisonOffenderManagerService.get_pom_at(
-      active_prison_id, primary_pom_id_from_url
-    )
-    @secondary_pom = PrisonOffenderManagerService.get_pom_at(
-      active_prison_id, secondary_pom_id_from_url
-    )
+    @primary_pom = @prison.get_single_pom(primary_pom_id_from_url)
+    @secondary_pom = @prison.get_single_pom(secondary_pom_id_from_url)
   end
 
   def create
     offender = offender(allocation_params[:nomis_offender_id])
-    pom = PrisonOffenderManagerService.get_pom_at(
-      active_prison_id,
-      allocation_params[:nomis_staff_id]
-    )
+    pom = @prison.get_single_pom(allocation_params[:nomis_staff_id])
 
     AllocationService.allocate_secondary(
       nomis_offender_id: allocation_params[:nomis_offender_id],
@@ -49,8 +42,7 @@ class CoworkingController < PrisonsApplicationController
     @allocation = Allocation.find_by!(
       nomis_offender_id: coworking_nomis_offender_id_from_url
     )
-    @primary_pom = PrisonOffenderManagerService.get_pom_at(
-      active_prison_id, @allocation.primary_pom_nomis_id
+    @primary_pom = @prison.get_single_pom(@allocation.primary_pom_nomis_id
     )
   end
 

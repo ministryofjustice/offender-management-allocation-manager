@@ -8,7 +8,7 @@ class StaffMember
   delegate :position_description, :probation_officer?, :prison_officer?, to: :pom
   delegate :working_pattern, :status, to: :@pom_detail
 
-  def initialize(prison, staff_id, pom_detail = default_pom_detail(prison.code, staff_id))
+  def initialize(prison, staff_id, pom_detail = default_pom_detail(prison, staff_id))
     @prison = prison
     @staff_id = staff_id.to_i
     @pom_detail = pom_detail
@@ -68,12 +68,8 @@ private
   end
 
   # Attempt to forward-populate the PomDetail table for new records
-  def default_pom_detail(prison_code, staff_id)
-    @pom_detail = PomDetail.find_or_create_by!(prison_code: prison_code, nomis_staff_id: staff_id) { |pom|
-      pom.prison_code = prison_code
-      pom.working_pattern = 0.0
-      pom.status = 'active'
-    }
+  def default_pom_detail(prison, staff_id)
+    prison.pom_details.find_by(nomis_staff_id: staff_id) || prison.pom_details.create!(working_pattern: 0.0, status: 'active', nomis_staff_id: staff_id)
   end
 
   def staff_detail
