@@ -34,7 +34,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
     before do
       Timecop.travel today
 
-      allow(PrisonOffenderManagerService).to receive(:get_pom_at).and_return(pom)
+      allow_any_instance_of(Prison).to receive(:get_single_pom).and_return(pom)
 
       allow(OffenderService).to receive(:get_offender).and_return(offender)
       offender.load_case_information(case_info) unless offender.nil?

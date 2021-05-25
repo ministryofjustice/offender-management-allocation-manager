@@ -6,7 +6,7 @@ class PomsController < PrisonStaffApplicationController
   before_action :load_pom_staff_member, only: [:show, :edit, :update]
 
   def index
-    @poms = PrisonOffenderManagerService.get_poms_for(active_prison_id).sort_by(&:last_name)
+    @poms = @prison.get_list_of_poms.sort_by(&:last_name)
   end
 
   def show

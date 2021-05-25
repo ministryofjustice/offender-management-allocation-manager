@@ -2,9 +2,10 @@ require 'rails_helper'
 
 RSpec.describe SuitableForEarlyAllocationEmailJob, type: :job do
   let(:pom) { build(:pom) }
+  let!(:prison) { create(:prison) }
 
   let(:offender) do
-    build(:hmpps_api_offender, latestLocationId: 'LEI',
+    build(:hmpps_api_offender, latestLocationId: prison.code,
           sentence: build(:sentence_detail,
                           :determinate,
                           sentenceStartDate: Time.zone.today - 10.months,
@@ -78,7 +79,7 @@ RSpec.describe SuitableForEarlyAllocationEmailJob, type: :job do
 
       context 'when offender has 18 months or less of sentence remaining' do
         before do
-          allow(PrisonOffenderManagerService).to receive(:get_pom_at).and_return(pom)
+          allow_any_instance_of(Prison).to receive(:get_single_pom).and_return(pom)
         end
 
         context 'when no previous Early Allocation reminder email sent for this offender' do

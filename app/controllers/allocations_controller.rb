@@ -61,20 +61,14 @@ class AllocationsController < PrisonsApplicationController
 
   def confirm
     @prisoner = offender(nomis_offender_id_from_url)
-    @pom = PrisonOffenderManagerService.get_pom_at(
-      active_prison_id,
-      nomis_staff_id_from_url
-    )
+    @pom = @prison.get_single_pom(nomis_staff_id_from_url)
     @event = :allocate_primary_pom
     @event_trigger = :user
   end
 
   def confirm_reallocation
     @prisoner = offender(nomis_offender_id_from_url)
-    @pom = PrisonOffenderManagerService.get_pom_at(
-      active_prison_id,
-      nomis_staff_id_from_url
-    )
+    @pom = @prison.get_single_pom(nomis_staff_id_from_url)
     @event = :reallocate_primary_pom
     @event_trigger = :user
   end
@@ -140,7 +134,7 @@ private
   end
 
   def unavailable_pom_count
-    PrisonOffenderManagerService.get_poms_for(active_prison_id).count { |pom| pom.status != 'active' }
+    @prison.get_list_of_poms.count { |pom| pom.status != 'active' }
   end
 
   def allocation_attributes(offender)
@@ -165,10 +159,7 @@ private
   end
 
   def pom
-    @pom ||= PrisonOffenderManagerService.get_pom_at(
-      active_prison_id,
-      allocation_params[:nomis_staff_id]
-    )
+    @pom ||= @prison.get_single_pom(allocation_params[:nomis_staff_id])
   end
 
   def override
@@ -180,13 +171,13 @@ private
   def current_pom_for(nomis_offender_id)
     nomis_staff_id = Allocation.find_by!(nomis_offender_id: nomis_offender_id).primary_pom_nomis_id
 
-    PrisonOffenderManagerService.get_pom_at(active_prison_id, nomis_staff_id)
+    @prison.get_single_pom(nomis_staff_id)
   end
 
   def recommended_and_nonrecommended_poms_for(offender)
     allocation = Allocation.find_by(nomis_offender_id: offender.offender_no)
     # don't allow primary to be the same as the co-working POM
-    poms = PrisonOffenderManagerService.get_poms_for(active_prison_id).select { |pom|
+    poms = @prison.get_list_of_poms.select { |pom|
       pom.status == 'active' && pom.staff_id != allocation.try(:secondary_pom_nomis_id)
     }
 

@@ -6,7 +6,8 @@ class PomDetail < ApplicationRecord
   validates :working_pattern, presence: {
     message: 'Select number of days worked'
   }
-  validates_presence_of :prison_code
+
+  belongs_to :prison, foreign_key: :prison_code, primary_key: :code, inverse_of: :pom_details
 
   def allocations
     @allocations ||= begin

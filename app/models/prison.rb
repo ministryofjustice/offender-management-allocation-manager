@@ -1,8 +1,33 @@
 class Prison < ApplicationRecord
   validates :prison_type, presence: true
   validates :code, :name, presence: true, uniqueness: true
+  has_many :pom_details, dependent: :destroy, foreign_key: :prison_code, inverse_of: :prison
 
   enum prison_type: { womens: 'womens', mens_open: 'mens_open', mens_closed: 'mens_closed' }
+
+  def get_list_of_poms
+    # This API call doesn't do what it says on the tin. It can return duplicate
+    # staff_ids in the situation where someone has more than one role.
+    poms = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(code).
+      select { |pom| pom.prison_officer? || pom.probation_officer? }.uniq(&:staff_id)
+
+    details = pom_details.where(nomis_staff_id: poms.map(&:staff_id))
+
+    poms.map { |pom| PomWrapper.new(pom, get_pom_detail(details,  pom.staff_id.to_i)) }
+  end
+
+  def get_single_pom(nomis_staff_id)
+    raise ArgumentError, 'Prison#get_single_pom(nil)' if nomis_staff_id.nil?
+
+    poms_list = get_list_of_poms
+    pom = poms_list.find { |p| p.staff_id == nomis_staff_id.to_i }
+    if pom.blank?
+      pom_staff_ids = poms_list.map(&:staff_id)
+      raise StandardError, "Failed to find POM ##{nomis_staff_id} at #{code} - list is #{pom_staff_ids}"
+    end
+
+    pom
+  end
 
   class << self
     def active
@@ -81,6 +106,14 @@ private
     end
   end
 
+  def get_pom_detail(details, nomis_staff_id)
+    details.detect { |pd| pd.nomis_staff_id == nomis_staff_id } ||
+      PomDetail.find_or_create_by!(prison_code: code, nomis_staff_id: nomis_staff_id) do |pom|
+        pom.working_pattern = 0.0
+        pom.status = 'active'
+      end
+  end
+
   class OffenderEnumerator
     include Enumerable
     FETCH_SIZE = 200 # How many records to fetch from nomis at a time
@@ -111,8 +144,6 @@ private
         offenders.each { |offender| yield offender }
       end
     end
-
-  private
 
     def enrich_offenders(offender_list)
       nomis_ids = offender_list.map(&:offender_no)
