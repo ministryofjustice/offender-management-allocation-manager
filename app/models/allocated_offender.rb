@@ -5,7 +5,7 @@
 # e.g. when fetching allocations
 #
 class AllocatedOffender
-  delegate :last_name, :full_name, :earliest_release_date, :approaching_handover?,
+  delegate :last_name, :full_name, :earliest_release_date, :approaching_handover?, :tariff_date,
            :indeterminate_sentence?, :prison_id, :parole_review_date, :delius_matched?,
            :handover_start_date, :responsibility_handover_date, :allocated_com_name, :case_allocation,
            :complexity_level, :offender_no, :sentence_start_date, :tier, :cell_location, :latest_temp_movement_date, to: :@offender

@@ -33,16 +33,14 @@ class PomTasks
   end
 
   def parole_review_date_task(offender)
-    # Offender is indeterminate and their parole review date is old or missing
-    return unless offender.indeterminate_sentence?
-
-    if offender.parole_review_date.blank? || offender.parole_review_date < Time.zone.today
-      PomTaskPresenter.new.tap { |presenter|
-        presenter.offender_name = offender.full_name
-        presenter.offender_number = offender.offender_no
-        presenter.action_label = 'Parole review date'
-        presenter.long_label = 'Parole review date must be updated so handover dates can be calculated.'
-      }
+    # Offender is indeterminate and their PRD is old or missing and their TED has expired
+    if offender.indeterminate_sentence? &&
+      (offender.tariff_date.blank? || offender.tariff_date < Time.zone.today) &&
+      (offender.parole_review_date.blank? || offender.parole_review_date < Time.zone.today)
+      PomTaskPresenter.new offender_name: offender.full_name,
+                           offender_number: offender.offender_no,
+                           action_label: 'Parole review date',
+                           long_label: 'Parole review date must be updated so handover dates can be calculated.'
     end
   end
 
@@ -52,26 +50,23 @@ class PomTasks
     # Offender had their delius data manually added and as a result are missing
     # new key fields.
     unless offender.delius_matched?
-      PomTaskPresenter.new.tap { |presenter|
-        presenter.offender_name = offender.full_name
-        presenter.offender_number = offender.offender_no
-        presenter.action_label = 'nDelius case matching'
-        presenter.long_label = 'This prisoner must be linked to an nDelius record so '\
+      PomTaskPresenter.new offender_name: offender.full_name,
+        offender_number: offender.offender_no,
+        action_label: 'nDelius case matching',
+        long_label: 'This prisoner must be linked to an nDelius record so '\
           'community probation details are available. '\
           'See <a href="/update_case_information">how to update case information</a>'
-      }
+
     end
   end
 
   def early_allocation_update_task(offender)
     # An early allocation request has been made but is pending a response from
     # the community, and therefore needs updating.
-    PomTaskPresenter.new.tap { |presenter|
-      presenter.offender_name = offender.full_name
-      presenter.offender_number = offender.offender_no
-      presenter.action_label = 'Early allocation decision'
-      presenter.long_label = 'The community probation team’s decision about early allocation must be recorded.'
-    }
+    PomTaskPresenter.new offender_name: offender.full_name,
+      offender_number: offender.offender_no,
+      action_label: 'Early allocation decision',
+      long_label: 'The community probation team’s decision about early allocation must be recorded.'
   end
 
   def get_early_allocations(offender_nos)
