@@ -265,7 +265,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
   context 'when an indeterminate offender has moved into open conditions' do
     let(:nomis_offender) {
-      build(:nomis_offender, :indeterminate,
+      build(:nomis_offender,
             agencyId: prison.code,
                 category: category,
                 sentence: attributes_for(:sentence_detail,
