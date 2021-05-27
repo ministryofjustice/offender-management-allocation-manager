@@ -37,12 +37,12 @@ feature 'Case History' do
   let(:spo) { build(:pom) }
 
   let(:nomis_offender) {
-    build(:nomis_offender, :indeterminate,
+    build(:nomis_offender,
           agencyId: open_prison.code,
             sentence: attributes_for(:sentence_detail, :indeterminate, :welsh_open_policy))
   }
   let(:nomis_pentonville_offender) {
-    build(:nomis_offender, :indeterminate, offenderNo: nomis_offender.fetch(:offenderNo),
+    build(:nomis_offender, offenderNo: nomis_offender.fetch(:offenderNo),
           agencyId: second_prison.code,
             sentence: attributes_for(:sentence_detail, :indeterminate, :welsh_open_policy))
   }

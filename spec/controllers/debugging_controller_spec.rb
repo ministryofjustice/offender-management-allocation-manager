@@ -55,7 +55,7 @@ RSpec.describe DebuggingController, type: :controller do
     let(:primary_pom_name) { 'Jenae Sporer' }
 
     it 'can show debugging information for a specific offender' do
-      stub_offender(build(:nomis_offender, :indeterminate, offenderNo: offender_no))
+      stub_offender(build(:nomis_offender, sentence: attributes_for(:sentence_detail, :indeterminate), offenderNo: offender_no))
 
       stub_request(:post, "#{ApiHelper::T3}/movements/offenders?movementTypes=ADM&movementTypes=TRN&movementTypes=REL&latestOnly=false").
         with(

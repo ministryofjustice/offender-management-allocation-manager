@@ -4,8 +4,8 @@ require "rails_helper"
 
 feature "womens allocation journey" do
   let(:prison) { create(:womens_prison) }
-  let(:offenders) { build_list(:nomis_offender, 5, agencyId: 'BZI', complexityLevel: 'high') }
-  let(:offender) { build(:nomis_offender, :determinate_release_in_three_years, agencyId: 'BZI') }
+  let(:offenders) { build_list(:nomis_offender, 5, agencyId: prison.code, complexityLevel: 'high') }
+  let(:offender) { build(:nomis_offender, sentence: attributes_for(:sentence_detail, :determinate_release_in_three_years), agencyId: prison.code) }
   let(:nomis_offender_id) { offender.fetch(:offenderNo) }
   let(:user) { build(:pom) }
   let(:probation_pom) { build(:pom, :probation_officer) }
