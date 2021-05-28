@@ -25,7 +25,7 @@ class PrisonersController < PrisonsApplicationController
 
   def search
     @q = search_term
-    offenders = SearchService.search_for_offenders(@q, @prison.offenders)
+    offenders = SearchService.search_for_offenders(@q, @prison.all_policy_offenders)
     @offenders = get_slice_for_page(offenders)
 
     MetricsService.instance.increment_search_count
@@ -64,10 +64,10 @@ class PrisonersController < PrisonsApplicationController
 private
 
   def load_all_offenders
-    @missing_info = @prison.summary.missing_info
-    @unallocated = @prison.summary.unallocated
-    @new_arrivals = @prison.summary.new_arrivals
-    @allocated = @prison.summary.allocated.map do |offender|
+    @missing_info = @prison.missing_info
+    @unallocated = @prison.unallocated
+    @new_arrivals = @prison.new_arrivals
+    @allocated = @prison.allocated.map do |offender|
       OffenderWithAllocationPresenter.new(offender, @prison.allocations.detect { |a| a.nomis_offender_id == offender.offender_no })
     end
   end

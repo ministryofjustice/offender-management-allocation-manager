@@ -122,6 +122,17 @@ class Allocation < ApplicationRecord
     deallocate_offender event: Allocation::DEALLOCATE_PRIMARY_POM, event_trigger: Allocation::OFFENDER_TRANSFERRED if active?
   end
 
+  # check for changes in the last week where the target value
+  # (item[1] in the array) is our staff_id
+  def new_case_for? staff_id
+    versions.where('created_at >= ?', 7.days.ago).map { |c|
+      YAML.load(c.object_changes)
+    }.select { |c|
+      c.key?('primary_pom_nomis_id') && c['primary_pom_nomis_id'][1] == staff_id ||
+        c.key?('secondary_pom_nomis_id') && c['secondary_pom_nomis_id'][1] == staff_id
+    }.any?
+  end
+
 private
 
   def deallocate_offender event:, event_trigger:

@@ -74,7 +74,7 @@
           <%= format_date(offender.responsibility_handover_date, replacement: "Unknown") %>
         </td>
         <td aria-label="POM Role" class="govuk-table__cell">
-          <%= offender.pom_responsibility %>
+          <%= pom_responsibility_label offender %>
         </td>
         <td aria-label="COM" class="govuk-table__cell">
           <%= offender.allocated_com_name || "Not allocated" %>

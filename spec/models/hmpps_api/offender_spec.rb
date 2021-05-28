@@ -219,16 +219,20 @@ describe HmppsApi::Offender do
   end
 
   describe '#over_18?' do
-    context 'with a date of birth 50 years ago' do
-      before { subject.date_of_birth = 18.years.ago }
+    subject {
+      build(:offender, dateOfBirth: dob.to_s)
+    }
+
+    context 'with a date of birth 18 years ago' do
+      let(:dob) { 18.years.ago }
 
       it 'returns true' do
         expect(subject.over_18?).to eq(true)
       end
     end
 
-    context 'with a date of birth just under 50 years ago' do
-      before { subject.date_of_birth = 18.years.ago + 1.day }
+    context 'with a date of birth just under 18 years ago' do
+      let(:dob) { 18.years.ago + 1.day }
 
       it 'returns false' do
         expect(subject.over_18?).to eq(false)
@@ -236,7 +240,7 @@ describe HmppsApi::Offender do
     end
 
     context 'with an 18th birthday in a past month' do
-      before { subject.date_of_birth = '5 Jan 2001'.to_date }
+      let(:dob) { '5 Jan 2001'.to_date }
 
       it 'returns true' do
         Timecop.travel('19 Feb 2019') do

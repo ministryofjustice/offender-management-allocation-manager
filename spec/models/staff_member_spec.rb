@@ -1,35 +1,39 @@
 require 'rails_helper'
 
 RSpec.describe StaffMember, type: :model do
-  let(:prison) { Prison.new(code: 'LEI') }
+  let(:prison) { build(:prison, code: 'LEI') }
   let(:staff_id) { 123 }
   let(:user) { described_class.new(prison, staff_id) }
   let(:offenders) {
     [
-      OpenStruct.new(offender_no: 'G7514GW', prison_id: prison, convicted?: true, sentenced?: true,
+      build(:nomis_offender, offenderNo: 'G7514GW', prison_id: prison, convicted?: true, sentenced?: true,
                      indeterminate_sentence?: true, nps_case?: true, pom_supporting?: true,
                      sentence_start_date: Time.zone.today - 1.month, conditional_release_date: Time.zone.today + 12.months),
-      OpenStruct.new(offender_no: 'G1234VV', prison_id: prison, convicted?: true, sentenced?: true,
+      build(:nomis_offender, offenderNo: 'G1234VV', prison_id: prison, convicted?: true, sentenced?: true,
                      nps_case?: true, pom_responsible?: true, sentence_start_date: Time.zone.today - 1.month,
                      conditional_release_date: Time.zone.today + 12.months),
-      OpenStruct.new(offender_no: 'G1234AB', prison_id: prison, convicted?: true, sentenced?: true,
-                     nps_case?: true, pom_responsible?: true, sentence_start_date: Time.zone.today - 10.months,
-                     conditional_release_date: Time.zone.today + 2.years),
-      OpenStruct.new(offender_no: 'G1234GG', prison_id: prison, convicted?: true, sentenced?: true,
-                     nps_case?: true, pom_responsible?: true, sentence_start_date: Time.zone.today - 10.months,
-                     conditional_release_date: Time.zone.today + 2.years)
+      build(:nomis_offender, offenderNo: 'G1234AB', prison_id: prison, convicted?: true, sentenced?: true,
+               nps_case?: true, pom_responsible?: true, sentence_start_date: Time.zone.today - 10.months,
+               conditional_release_date: Time.zone.today + 2.years),
+      build(:nomis_offender, offenderNo: 'G1234GG', prison_id: prison, convicted?: true, sentenced?: true,
+         nps_case?: true, pom_responsible?: true, sentence_start_date: Time.zone.today - 10.months,
+         conditional_release_date: Time.zone.today + 2.years)
     ]
   }
 
   before do
-    allow(prison).to receive(:offenders).and_return(offenders)
+    stub_auth_token
+    stub_offenders_for_prison(prison.code, offenders)
+    offenders.each do |offender|
+      create(:case_information, nomis_offender_id: offender.fetch(:offenderNo))
+    end
   end
 
   context 'when checking allocations' do
     before do
       # # Allocate all of the offenders to this POM
       offenders.each do |offender|
-        create(:allocation, nomis_offender_id: offender.offender_no, primary_pom_nomis_id: staff_id)
+        create(:allocation, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: staff_id)
       end
     end
 
@@ -37,11 +41,6 @@ RSpec.describe StaffMember, type: :model do
 
     it 'can get the allocations for the POM at a specific prison' do
       expect(allocations.count).to eq(4)
-    end
-
-    it 'can get tasks within a caseload' do
-      tasks = PomTasks.new.for_offenders(allocations)
-      expect(tasks.count).to eq(1)
     end
 
     it "will hide invalid allocations" do
@@ -106,16 +105,7 @@ RSpec.describe StaffMember, type: :model do
 
     it "will get allocations for a POM made within the last 7 days" do
       allocated_offenders = described_class.new(prison, staff_id).allocations.select(&:new_case?)
-      expect(allocated_offenders.count).to eq 2
-      expect(allocated_offenders.map(&:pom_responsibility)).to match_array %w[Responsible Co-Working]
-    end
-  end
-
-  describe '#full_name', vcr: { cassette_name: 'prison_api/staff_member_things' } do
-    let(:pom) { described_class.new(create(:prison), 485_846) }
-
-    it 'gets the full name' do
-      expect(pom.full_name).to eq('Dicks, Stephen')
+      expect(allocated_offenders.map(&:nomis_offender_id)).to match_array ["G1234AB", "G1234GG"]
     end
   end
 end

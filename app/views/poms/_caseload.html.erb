@@ -1,4 +1,3 @@
-
 <table class="govuk-table responsive tablesorter">
   <thead class="govuk-table__head">
     <tr class="govuk-table__row">
@@ -43,12 +42,12 @@
   <tbody class="govuk-table__body">
     <% allocations.each_with_index do |allocation, i| %>
     <tr class="govuk-table__row pom_cases_row_<%= i %>">
-      <td aria-label="Prisoner name" class="govuk-table__cell "><%= allocation.full_name %></td>
-      <td aria-label="Prisoner number" class="govuk-table__cell "><%= allocation.nomis_offender_id %></td>
-      <td aria-label="Earliest release date" class="govuk-table__cell "><%= format_date(allocation.earliest_release_date) %></td>
-      <td aria-label="Tier" class="govuk-table__cell "><%= allocation.tier %></td>
-      <td aria-label="Allocation date" class="govuk-table__cell "><%= format_date(allocation.primary_pom_allocated_at) %></td>
-      <td aria-label="Role" class="govuk-table__cell "><%= allocation.pom_responsibility %></td>
+      <td aria-label="Prisoner name" class="govuk-table__cell"><%= allocation.full_name %></td>
+      <td aria-label="Prisoner number" class="govuk-table__cell"><%= allocation.offender_no %></td>
+      <td aria-label="Earliest release date" class="govuk-table__cell"><%= format_date(allocation.earliest_release_date) %></td>
+      <td aria-label="Tier" class="govuk-table__cell"><%= allocation.tier %></td>
+      <td aria-label="Allocation date" class="govuk-table__cell"><%= format_date(allocation.primary_pom_allocated_at) %></td>
+      <td aria-label="Role" class="govuk-table__cell"><%= pom_responsibility_label(allocation) %></td>
     </tr>
     <% end %>
   </tbody>

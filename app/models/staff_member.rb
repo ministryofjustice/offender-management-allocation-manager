@@ -47,7 +47,7 @@ class StaffMember
   end
 
   def allocations
-    @allocations ||= fetch_allocations
+    @allocations ||= @prison.allocated.select { |a| a.for_staff_id? @staff_id }
   end
 
 private
@@ -59,16 +59,6 @@ private
   def fetch_pom
     poms = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(@prison.code)
     poms.detect { |pom| pom.staff_id == @staff_id }
-  end
-
-  def fetch_allocations
-    offender_hash = @prison.offenders.index_by(&:offender_no)
-    allocations = Allocation.
-        where(nomis_offender_id: offender_hash.keys).
-        active_pom_allocations(@staff_id, @prison.code)
-    allocations.map { |alloc|
-      AllocatedOffender.new(@staff_id, alloc, offender_hash.fetch(alloc.nomis_offender_id))
-    }
   end
 
   # Attempt to forward-populate the PomDetail table for new records

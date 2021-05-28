@@ -16,5 +16,5 @@
     <%= female.complexity_level.titleize %>
   </td>
   <td aria-label="Earliest release date" class="govuk-table__cell "><%= format_date(female.earliest_release_date, replacement: "Unknown") %></td>
-  <td aria-label="Role" class="govuk-table__cell "><%= female.pom_responsibility %></td>
+  <td aria-label="Role" class="govuk-table__cell "><%= pom_responsibility_label female %></td>
 </tr>
