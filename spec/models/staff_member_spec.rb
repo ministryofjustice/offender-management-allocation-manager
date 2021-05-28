@@ -106,8 +106,7 @@ RSpec.describe StaffMember, type: :model do
 
     it "will get allocations for a POM made within the last 7 days" do
       allocated_offenders = described_class.new(prison, staff_id).allocations.select(&:new_case?)
-      expect(allocated_offenders.count).to eq 2
-      expect(allocated_offenders.map(&:pom_responsibility)).to match_array %w[Responsible Co-Working]
+      expect(allocated_offenders.map(&:nomis_offender_id)).to match_array ["G1234AB", "G1234GG"]
     end
   end
 
