@@ -20,11 +20,10 @@ class DebuggingController < PrisonsApplicationController
   def prison_info
     @prison_title = @prison.name
 
-    @summary = @prison.summary
     @filtered_offenders_count = [
-      @summary.allocated.count,
-      @summary.unallocated.count,
-      @summary.missing_info.count
+      @prison.allocated.count,
+      @prison.unallocated.count,
+      @prison.missing_info.count
     ].sum
 
     @unfiltered_offenders_count = unfiltered_offenders.count

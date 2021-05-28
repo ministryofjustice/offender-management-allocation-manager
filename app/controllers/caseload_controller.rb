@@ -55,7 +55,7 @@ private
     end
     if params['role'].present?
       allocations = allocations.select { |a|
-        a.pom_responsibility == params['role']
+        view_context.pom_responsibility_label(a) == params['role']
       }
     end
     allocations

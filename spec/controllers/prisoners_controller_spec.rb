@@ -677,6 +677,7 @@ RSpec.describe PrisonersController, type: :controller do
             stub_offenders_for_prison(prison, [first_offender] + offenders)
             PomDetail.create!(prison_code: prison, nomis_staff_id: nomis_staff_id, working_pattern: 1.0, status: 'active')
 
+            ([first_offender] + offenders).each { |o| create(:case_information, nomis_offender_id: o.fetch(:offenderNo)) }
             create(:allocation,
                    prison: prison,
                    nomis_offender_id: first_offender_no,

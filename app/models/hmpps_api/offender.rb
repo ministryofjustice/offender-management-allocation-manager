@@ -33,9 +33,9 @@ module HmppsApi
 
     delegate :code, :label, :active_since, to: :@category, prefix: :category, allow_nil: true
 
-    attr_accessor :date_of_birth, :prison_arrival_date, :sentence
+    attr_accessor :prison_arrival_date, :sentence
 
-    attr_reader :first_name, :last_name, :prison_id, :offender_no, :cell_location, :complexity_level
+    attr_reader :first_name, :last_name, :prison_id, :offender_no, :cell_location, :complexity_level, :date_of_birth
 
     # This list must only contain fields that are both supplied by
     # https://api-dev.prison.service.justice.gov.uk/swagger-ui.html#//prisoners/getPrisonersOffenderNo

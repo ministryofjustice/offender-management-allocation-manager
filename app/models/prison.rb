@@ -11,50 +11,79 @@ class Prison < ApplicationRecord
   end
 
   def offenders
+    allocated + unallocated
+  end
+
+  def all_policy_offenders
     OffenderEnumerator.new(code).select(&:inside_omic_policy?)
   end
 
   def unfiltered_offenders
     # Returns all offenders at the provided prison, and does not
-    # filter out under 18s or non-sentenced offenders in the same way
-    # that get_offenders_for_prison does.
+    # filter out under 18s or non-sentenced offenders
     OffenderEnumerator.new(code)
   end
 
   def allocations
-    @allocations ||= Allocation.active_allocations_for_prison(code).where(nomis_offender_id: offenders.map(&:offender_no))
+    @allocations ||= Allocation.active_allocations_for_prison(code).where(nomis_offender_id: all_policy_offenders.map(&:offender_no))
   end
 
-  Summary = Struct.new :allocated, :unallocated, :new_arrivals, :missing_info, keyword_init: true
+  def allocated
+    summary.allocated
+  end
 
-  def summary
-    @summary ||= begin
-      summary = offenders.group_by do |offender|
-        allocatable = if womens?
-                        offender.has_case_information? && offender.complexity_level.present?
-                      else
-                        offender.has_case_information?
-                      end
-        if allocatable
-          if allocations.detect { |a| a.nomis_offender_id == offender.offender_no }
-            :allocated
-          else
-            :unallocated
-          end
-        elsif offender.prison_arrival_date.to_date == Time.zone.today
-          :new_arrival
-        else
-          :missing_info
-        end
-      end
-      Summary.new allocated: summary.fetch(:allocated, []),
-                  unallocated: summary.fetch(:unallocated, []),
-                  new_arrivals: summary.fetch(:new_arrival, []),
-                  missing_info: summary.fetch(:missing_info, [])
-    end
+  def unallocated
+    summary.unallocated
+  end
+
+  def new_arrivals
+    summary.new_arrivals
+  end
+
+  def missing_info
+    summary.missing_info
   end
 
 private
+
+  Summary = Struct.new :allocated, :unallocated, :new_arrivals, :missing_info, :outside_omic_policy, keyword_init: true
+
+  def summary
+    alloc_hash = allocations.index_by(&:nomis_offender_id)
+    @summary ||= begin
+      summary = unfiltered_offenders.group_by do |offender|
+        if offender.inside_omic_policy?
+          allocatable = if womens?
+                          offender.has_case_information? && offender.complexity_level.present?
+                        else
+                          offender.has_case_information?
+                        end
+          if allocatable
+            if alloc_hash.key? offender.offender_no
+              :allocated
+            else
+              :unallocated
+            end
+          elsif offender.prison_arrival_date.to_date == Time.zone.today
+            :new_arrival
+          else
+            :missing_info
+          end
+        else
+          :outside_omic_policy
+        end
+      end
+      allocated = summary.fetch(:allocated, []).map do |o|
+        a = alloc_hash.fetch(o.offender_no)
+        AllocatedOffender.new(a.primary_pom_nomis_id, a, o)
+      end
+      Summary.new allocated: allocated,
+                  unallocated: summary.fetch(:unallocated, []),
+                  new_arrivals: summary.fetch(:new_arrival, []),
+                  missing_info: summary.fetch(:missing_info, []),
+                  outside_omic_policy: summary.fetch(:outside_omic_policy, [])
+    end
+  end
 
   class OffenderEnumerator
     include Enumerable
