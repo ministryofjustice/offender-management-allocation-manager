@@ -15,41 +15,6 @@ RSpec.describe CaseInformation, type: :model do
 
     it { is_expected.to have_one(:responsibility).dependent(:destroy) }
     it { is_expected.to have_one(:calculated_handover_date).dependent(:destroy) }
-    it { is_expected.to have_many(:early_allocations).dependent(:destroy) }
-  end
-
-  describe '#early_allocations' do
-    context 'when not setup' do
-      it 'is empty' do
-        expect(case_info.early_allocations).to be_empty
-      end
-    end
-
-    context 'with Early Allocation assessments' do
-      let!(:early_allocation) { create(:early_allocation, nomis_offender_id: case_info.nomis_offender_id) }
-      let!(:early_allocation2) { create(:early_allocation, nomis_offender_id: case_info.nomis_offender_id) }
-
-      it 'has some entries' do
-        expect(case_info.early_allocations).to eq([early_allocation, early_allocation2])
-      end
-    end
-
-    describe 'sort order' do
-      let(:creation_dates) { [1.year.ago, 1.day.ago, 1.month.ago].map(&:to_date) }
-
-      before do
-        # Deliberately create records out of order so we can assert that we order them correctly
-        # This is unlikely to happen in real life because we use numeric primary keys – but it helps for this test
-        creation_dates.each do |date|
-          create(:early_allocation, nomis_offender_id: case_info.nomis_offender_id, created_at: date)
-        end
-      end
-
-      it 'sorts by date created (ascending)' do
-        retrieved_dates = case_info.early_allocations.map(&:created_at).map(&:to_date)
-        expect(retrieved_dates).to eq(creation_dates.sort)
-      end
-    end
   end
 
   context 'with mappa level' do

@@ -17,7 +17,7 @@ FactoryBot.define do
     cppc_case { true }
     created_within_referral_window { true }
 
-    association :case_information
+    association :offender
 
     trait :eligible do
       # Does nothing - eligible is the default outcome of early-allocation

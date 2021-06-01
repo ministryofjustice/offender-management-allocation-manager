@@ -13,7 +13,6 @@ RSpec.describe "prisoners/show", type: :view do
     assign(:prisoner, offender)
     assign(:tasks, [])
     assign(:keyworker, build(:keyworker))
-    assign(:case_info, case_info)
   end
 
   describe 'complexity badges' do

@@ -39,6 +39,6 @@
   <%= form.submit "Continue", role: "button", draggable: "false", class: "govuk-button" %>
 <% end %>
   </div>
-  <%= render(partial: 'prisoner_info_sidebar') %>
+  <%= render 'prisoner_info_sidebar', offender: @prisoner %>
 </div>
 

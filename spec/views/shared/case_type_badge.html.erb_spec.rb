@@ -17,7 +17,6 @@ RSpec.describe "allocation_staff/index", type: :view do
     assign(:prison_poms, [])
     assign(:unavailable_pom_count, 0)
     assign(:prisoner, offender)
-    assign(:case_info, case_info)
     render
   end
 

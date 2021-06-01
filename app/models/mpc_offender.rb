@@ -95,11 +95,7 @@ class MpcOffender
   end
 
   def early_allocations
-    if @probation_record
-      @probation_record.early_allocations.where('created_at::date >= ?', sentence_start_date)
-    else
-      []
-    end
+    @offender.early_allocations.where('created_at::date >= ?', sentence_start_date)
   end
 
   def needs_early_allocation_notify?

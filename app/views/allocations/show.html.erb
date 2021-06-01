@@ -1,11 +1,10 @@
-
 <% if @prisoner.needs_a_com? %>
   <%= render partial: 'shared/notifications/offender_needs_a_com', locals: {offender: @prisoner, email_history: @emails_sent_to_ldu} %>
 <% end %>
 
 <h1 class="govuk-heading-l govuk-!-margin-bottom-5">Allocation information</h1>
 
-<%= render 'shared/badges', offender: @prisoner, early_allocations: @case_info.early_allocations %>
+<%= render 'shared/badges', offender: @prisoner %>
 
 <div class="govuk-!-margin-top-1">
   <table class="govuk-table">

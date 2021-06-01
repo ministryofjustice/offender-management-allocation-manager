@@ -154,7 +154,7 @@ feature 'Case History' do
 
         current_date += 1.day
         Timecop.travel(current_date) do
-          create(:early_allocation, case_information: ci, prison: second_prison.code, nomis_offender_id: nomis_offender_id)
+          create(:early_allocation, offender: ci.offender, prison: second_prison.code, nomis_offender_id: nomis_offender_id)
           create :email_history, nomis_offender_id: nomis_offender_id,
                  name: ci.local_delivery_unit.name,
                  email: ci.local_delivery_unit.email_address,
@@ -165,7 +165,7 @@ feature 'Case History' do
         current_date += 1.day
         Timecop.travel(current_date) do
           create(:early_allocation, :discretionary,
-                 case_information: ci, prison: second_prison.code, nomis_offender_id: nomis_offender_id)
+                 offender: ci.offender, prison: second_prison.code, nomis_offender_id: nomis_offender_id)
           create :email_history, nomis_offender_id: nomis_offender_id,
                  name: ci.local_delivery_unit.name,
                  email: ci.local_delivery_unit.email_address,
@@ -447,7 +447,7 @@ feature 'Case History' do
       before do
         create(:early_allocation, :discretionary_accepted,
                updated_by_firstname: 'Fred', updated_by_lastname: 'Bloggs',
-               case_information: case_info, prison: second_prison.code, nomis_offender_id: nomis_offender_id)
+               offender: case_info.offender, prison: second_prison.code, nomis_offender_id: nomis_offender_id)
       end
 
       it 'displays 3 sections - allocation plus 2 early allocation records' do

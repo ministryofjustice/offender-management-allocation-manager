@@ -9,6 +9,6 @@
   </p>
     <%= render 'eligible', form_method: :post %>
   </div>
-    <%= render(partial: 'prisoner_info_sidebar') %>
+  <%= render 'prisoner_info_sidebar', offender: @prisoner %>
 </div>
 

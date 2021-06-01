@@ -159,8 +159,8 @@ RSpec.describe EarlyAllocation, type: :model do
     let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
     let(:case_info) {
-      create(:case_information,
-             early_allocations: [build(:early_allocation, :eligible, created_at: assessment_date)])
+      create(:case_information, offender: build(:offender,
+                                                early_allocations: [build(:early_allocation, :eligible, created_at: assessment_date)]))
     }
 
 

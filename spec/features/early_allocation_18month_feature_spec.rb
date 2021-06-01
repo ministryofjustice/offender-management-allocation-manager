@@ -17,9 +17,9 @@ feature 'early allocation when crossing 18 month threshold' do
       stub_poms(prison.code, [user])
       stub_keyworker prison.code, offender_no, build(:keyworker)
 
-      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no),
+      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no,
              early_allocations: [build(:early_allocation, prison: prison.code,
-                                       created_within_referral_window: false)])
+                                       created_within_referral_window: false)]))
       create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: user.staff_id, prison: prison.code)
 
       expect {

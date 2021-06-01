@@ -6,7 +6,7 @@
   <div class="govuk-grid-column-two-thirds">
     <div class="govuk-panel govuk-panel--confirmation">
       <h1 class="govuk-panel__title">
-        <% if @offender.within_early_allocation_window? %>
+        <% if @prisoner.within_early_allocation_window? %>
           Assessment complete
         <% else %>
           Assessment saved
@@ -18,7 +18,7 @@
     </div>
     <h2 class="govuk-heading-m">What happens next</h2>
 
-    <% if @offender.within_early_allocation_window? %>
+    <% if @prisoner.within_early_allocation_window? %>
       <p class="govuk-body">
         You should receive an email with a decision from the
         community probation team about this case.

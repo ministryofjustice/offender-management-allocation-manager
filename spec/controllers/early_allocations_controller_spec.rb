@@ -38,11 +38,11 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
     let!(:early_allocations) {
       # Create 5 Early Allocation records with different creation dates
       [
-        create(:early_allocation, case_information: case_info, created_at: 1.year.ago),
-        create(:early_allocation, case_information: case_info, created_at: 6.months.ago),
-        create(:early_allocation, case_information: case_info, created_at: 1.month.ago),
-        create(:early_allocation, case_information: case_info, created_at: 1.week.ago),
-        create(:early_allocation, case_information: case_info, created_at: 1.day.ago)
+        create(:early_allocation, offender: case_info.offender, created_at: 1.year.ago),
+        create(:early_allocation, offender: case_info.offender, created_at: 6.months.ago),
+        create(:early_allocation, offender: case_info.offender, created_at: 1.month.ago),
+        create(:early_allocation, offender: case_info.offender, created_at: 1.week.ago),
+        create(:early_allocation, offender: case_info.offender, created_at: 1.day.ago)
       ]
     }
     let(:release_date) { Time.zone.today + 17.months }
@@ -50,7 +50,7 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
 
     before do
       # Create some Early Allocation assessments for a different offender – to prove we don't show them
-      create(:case_information, early_allocations: build_list(:early_allocation, 5))
+      create(:offender, early_allocations: build_list(:early_allocation, 5))
     end
 
     describe '#index' do

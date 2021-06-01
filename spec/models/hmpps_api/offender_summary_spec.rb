@@ -297,19 +297,19 @@ describe HmppsApi::Offender do
         let(:field) { :early_allocation? }
 
         context 'when eligible for early allocation' do
-          let!(:early_allocation) { create(:early_allocation, case_information: case_info) }
+          let!(:early_allocation) { create(:early_allocation, offender: case_info.offender) }
 
           it { is_expected.to be(true) }
         end
 
         context 'when ineligible for early allocation' do
-          let!(:early_allocation) { create(:early_allocation, :ineligible, case_information: case_info) }
+          let!(:early_allocation) { create(:early_allocation, :ineligible, offender: case_info.offender) }
 
           it { is_expected.to be(false) }
         end
 
         context 'when discretionary but the community have accepted' do
-          let!(:early_allocation) { create(:early_allocation, :discretionary, community_decision: true, case_information: case_info) }
+          let!(:early_allocation) { create(:early_allocation, :discretionary, community_decision: true, offender: case_info.offender) }
 
           it { is_expected.to be(true) }
         end

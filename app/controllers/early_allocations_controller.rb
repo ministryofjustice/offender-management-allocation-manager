@@ -9,7 +9,7 @@ class EarlyAllocationsController < PrisonsApplicationController
 
   def new
     @early_allocation = EarlyAllocationDateForm.new offender_id_from_url
-    if @offender.ldu_email_address.present?
+    if @prisoner.ldu_email_address.present?
       render
     else
       render 'dead_end'
@@ -35,8 +35,8 @@ class EarlyAllocationsController < PrisonsApplicationController
       @early_allocation = EarlyAllocation.new form_params.merge(default_params)
       if @early_allocation.eligible?
         @early_allocation.save!
-        if @offender.within_early_allocation_window?
-          AutoEarlyAllocationEmailJob.perform_later(@prison, @offender.offender_no, Base64.encode64(pdf_as_string))
+        if @prisoner.within_early_allocation_window?
+          AutoEarlyAllocationEmailJob.perform_later(@prison, @prisoner.offender_no, Base64.encode64(pdf_as_string))
         end
         render 'landing_eligible'
       else
@@ -69,9 +69,9 @@ class EarlyAllocationsController < PrisonsApplicationController
   def confirm_with_reason
     @early_allocation = EarlyAllocation.new early_allocation_params.merge(offender_id_from_url)
     if @early_allocation.save
-      if @offender.within_early_allocation_window?
+      if @prisoner.within_early_allocation_window?
         CommunityEarlyAllocationEmailJob.perform_later(@prison,
-                                                       @offender.offender_no,
+                                                       @prisoner.offender_no,
                                                        Base64.encode64(pdf_as_string))
       end
       render 'landing_discretionary'
@@ -83,11 +83,11 @@ class EarlyAllocationsController < PrisonsApplicationController
   # record a community decision (changing 'maybe' into a yes or a no)
   # can only be performed on the last early allocation record
   def edit
-    @early_allocation = EarlyAllocation.where(offender_id_from_url).last
+    @early_allocation = @prisoner.early_allocations.last
   end
 
   def update
-    @early_allocation = EarlyAllocation.where(offender_id_from_url).last
+    @early_allocation = @prisoner.early_allocations.last
 
     if @early_allocation.update(community_decision_params)
       redirect_to prison_prisoner_path(@prison.code, @early_allocation.nomis_offender_id)
@@ -112,7 +112,7 @@ class EarlyAllocationsController < PrisonsApplicationController
 private
 
   def load_prisoner
-    @offender = OffenderService.get_offender(params[:prisoner_id])
+    @prisoner = OffenderService.get_offender(params[:prisoner_id])
   end
 
   def pdf_as_string
@@ -120,7 +120,7 @@ private
     pom = @prison.get_single_pom(allocation.primary_pom_nomis_id)
 
     view_context.render_early_alloc_pdf(early_allocation: @early_allocation,
-                                        offender: @offender,
+                                        offender: @prisoner,
                                         pom: pom,
                                         allocation: allocation).render
   end
@@ -157,7 +157,7 @@ private
 
   def default_params
     { prison: active_prison_id,
-        created_within_referral_window: @offender.within_early_allocation_window?,
+        created_within_referral_window: @prisoner.within_early_allocation_window?,
         created_by_firstname: @current_user.first_name,
         created_by_lastname: @current_user.last_name }
   end
