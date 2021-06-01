@@ -60,6 +60,19 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     end
   end
 
+  context "when the offender doesn't have a CaseInformation record" do
+    before do
+      stub_offender(nomis_offender)
+    end
+
+    let(:nomis_offender) { build(:nomis_offender) }
+
+    it 'does nothing' do
+      expect(HmppsApi::CommunityApi).not_to receive(:set_handover_dates)
+      expect { described_class.perform_now(offender_no) }.not_to change(CalculatedHandoverDate, :count)
+    end
+  end
+
   context 'when the Prison API returns an error' do
     let(:nomis_offender) { build(:nomis_offender) }
     let(:api_host) { Rails.configuration.prison_api_host }

@@ -5,7 +5,7 @@ class RecalculateHandoverDateJob < ApplicationJob
 
   def perform(nomis_offender_id)
     offender = OffenderService.get_offender(nomis_offender_id)
-    if offender&.inside_omic_policy?
+    if offender&.inside_omic_policy? && offender&.has_case_information?
       # Recalculate handover dates, which will trigger a push to the Community API after_save
       recalculate_dates_for(offender)
     end
