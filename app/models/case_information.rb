@@ -11,13 +11,6 @@ class CaseInformation < ApplicationRecord
   belongs_to :local_delivery_unit, -> { enabled }, optional: true, inverse_of: :case_information
   delegate :name, :email_address, to: :local_delivery_unit, prefix: :ldu, allow_nil: true
 
-  has_many :early_allocations,
-           -> { order(created_at: :asc) },
-           foreign_key: :nomis_offender_id,
-           primary_key: :nomis_offender_id,
-           inverse_of: :case_information,
-           dependent: :destroy
-
   has_many :victim_liaison_officers, dependent: :destroy
 
   scope :nps, -> { where(case_allocation: NPS) }

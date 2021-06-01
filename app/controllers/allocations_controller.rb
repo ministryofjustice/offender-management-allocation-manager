@@ -19,8 +19,6 @@ class AllocationsController < PrisonsApplicationController
       end
     end
     @keyworker = HmppsApi::KeyworkerApi.get_keyworker(active_prison_id, @prisoner.offender_no)
-    prisoner = Offender.includes(case_information: :early_allocations).find_by(nomis_offender_id: nomis_offender_id_from_url)
-    @case_info = prisoner.case_information if prisoner.present?
     @emails_sent_to_ldu = EmailHistory.sent_within_current_sentence(@prisoner, EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION)
   end
 
@@ -42,7 +40,7 @@ class AllocationsController < PrisonsApplicationController
                          end
     complexity_history = [] if complexity_history.nil?
     email_history = EmailHistory.in_offender_timeline.where(nomis_offender_id: nomis_offender_id_from_url)
-    early_allocations = Offender.includes(case_information: :early_allocations).find_by!(nomis_offender_id: nomis_offender_id_from_url).case_information.early_allocations
+    early_allocations = Offender.includes(:early_allocations).find_by!(nomis_offender_id: nomis_offender_id_from_url).early_allocations
 
     ea_history = early_allocations.map do |ea|
       if ea.updated_by_firstname.present?

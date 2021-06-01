@@ -24,8 +24,8 @@ feature 'early allocation badges' do
     stub_offender nomis_offender
 
     create(:case_information,
-           offender: build(:offender, nomis_offender_id: offender_no),
-           early_allocations: [early_allocation])
+           offender: build(:offender, nomis_offender_id: offender_no,
+           early_allocations: [early_allocation]))
     visit prison_prisoner_path(prison.code, offender_no)
   end
 

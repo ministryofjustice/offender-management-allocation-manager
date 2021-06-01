@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe "early_allocations/show", type: :view do
   before do
     assign(:case_information, build(:case_information))
-    assign(:offender, build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail)))
+    assign(:prisoner, build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail)))
 
     assign(:early_allocation, early_allocation)
     assign(:referrer, referrer)

@@ -15,12 +15,11 @@ RSpec.describe "prisoners/show", type: :view do
       assign(:prisoner, offender)
       assign(:tasks, [])
       assign(:keyworker, build(:keyworker))
-      assign(:case_info, case_info)
       render
     end
 
     context 'with early allocation' do
-      let(:case_info) { create(:case_information, early_allocations: [early_allocation]) }
+      let(:case_info) { create(:case_information, offender: build(:offender, early_allocations: [early_allocation])) }
 
       context 'when unsent' do
         let(:early_allocation) { build(:early_allocation, :pre_window) }

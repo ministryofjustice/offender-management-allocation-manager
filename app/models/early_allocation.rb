@@ -3,7 +3,7 @@
 class EarlyAllocation < ApplicationRecord
   before_save :record_outcome
 
-  belongs_to :case_information,
+  belongs_to :offender,
              primary_key: :nomis_offender_id,
              foreign_key: :nomis_offender_id,
              inverse_of: :early_allocations

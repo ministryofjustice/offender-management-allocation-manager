@@ -84,7 +84,7 @@ feature "early allocation", type: :feature do
       context 'when <= 18 months' do
         let(:release_date) { Time.zone.today + 17.months }
 
-        scenario 'when first page with just date' do
+        scenario 'when first page with just date', :js do
           click_button 'Continue'
           expect(page).to have_css('.govuk-error-message')
           within '.govuk-error-summary' do

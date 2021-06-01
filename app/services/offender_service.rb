@@ -48,7 +48,7 @@ class OffenderService
       def enrich_offenders(offender_list)
         nomis_ids = offender_list.map(&:offender_no)
         offenders = Offender.
-          includes(case_information: [:responsibility, :early_allocations, :local_delivery_unit]).
+          includes(:early_allocations, case_information: [:responsibility, :local_delivery_unit]).
           where(nomis_offender_id: nomis_ids)
 
         if offenders.count != nomis_ids.count

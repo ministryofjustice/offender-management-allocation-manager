@@ -22,8 +22,8 @@ feature 'View a prisoner profile page' do
   context 'with an existing early allocation', vcr: { cassette_name: 'prison_api/early_allocation_banner' } do
     before do
       create(:case_information, parole_review_date: Time.zone.today + 1.year,
-             offender: build(:offender, nomis_offender_id: 'G7266VD'),
-             early_allocations: [build(:early_allocation, created_within_referral_window: within_window)])
+             offender: build(:offender, nomis_offender_id: 'G7266VD',
+             early_allocations: [build(:early_allocation, created_within_referral_window: within_window)]))
       visit prison_prisoner_path(prison.code, 'G7266VD')
     end
 
