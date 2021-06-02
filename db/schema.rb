@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_03_122414) do
+ActiveRecord::Schema.define(version: 2021_06_04_153151) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -141,6 +141,19 @@ ActiveRecord::Schema.define(version: 2021_06_03_122414) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["code"], name: "index_local_delivery_units_on_code", unique: true
+  end
+
+  create_table "offender_events", force: :cascade do |t|
+    t.string "nomis_offender_id", null: false
+    t.string "type", null: false
+    t.datetime "happened_at", null: false
+    t.string "triggered_by", null: false
+    t.string "triggered_by_nomis_username"
+    t.jsonb "metadata"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["nomis_offender_id"], name: "index_offender_events_on_nomis_offender_id"
+    t.index ["type"], name: "index_offender_events_on_type"
   end
 
   create_table "offenders", primary_key: "nomis_offender_id", id: :string, force: :cascade do |t|
