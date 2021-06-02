@@ -14,7 +14,7 @@ namespace :community_api do
       prison_log_prefix = "[#{prison_index + 1}/#{prison_count}]"
       Rails.logger.info("#{prison_log_prefix} Getting offenders for prison #{prison.name} (#{prison.code})")
 
-      offender_count = prison.offenders.each do |offender|
+      offender_count = prison.all_policy_offenders.each do |offender|
         ProcessDeliusDataJob.perform_later offender.offender_no
         Rails.logger.info("#{prison_log_prefix} Queued job for offender #{offender.offender_no}")
       end.count
