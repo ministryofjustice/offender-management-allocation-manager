@@ -6,6 +6,7 @@ feature "view POM's caseload" do
   let(:nomis_staff_id) { 485_926 }
   let(:nomis_offender_id) { 'G4273GI' }
   let(:tomorrow) { Date.tomorrow }
+  let(:other_pom) { build(:pom) }
 
   let(:offender_map) {
     {
@@ -79,7 +80,8 @@ feature "view POM's caseload" do
               firstName: 'Alice',
               position: RecommendationService::PRISON_POM,
               staffId: nomis_staff_id
-        )
+        ),
+        other_pom
       ]
 
     stub_auth_token
@@ -95,7 +97,8 @@ feature "view POM's caseload" do
       create(:allocation, prison: prison.code, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
     end
     create(:case_information, nomis_offender_id: nomis_offender_id, tier: 'A', case_allocation: 'NPS', probation_service: 'Wales')
-    create(:allocation, prison: prison.code, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
+    coworking = create(:allocation, prison: prison.code, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: other_pom.staff_id)
+    coworking.update!(secondary_pom_nomis_id: nomis_staff_id, event: Allocation::ALLOCATE_SECONDARY_POM)
 
     offenders.last(15).each do |o|
       create(:responsibility, nomis_offender_id: o.fetch(:offenderNo), value: Responsibility::PROBATION)
@@ -167,6 +170,13 @@ feature "view POM's caseload" do
       end
     end
 
+    it 'can be sorted by responsibility' do
+      click_link 'Role'
+      expect(all('td[aria-label=Role]').map(&:text).uniq).to eq(['Co-Working', 'Responsible', 'Supporting'])
+      click_link 'Role'
+      expect(all('td[aria-label=Role]').map(&:text).uniq).to eq(['Supporting', 'Responsible', 'Co-Working'])
+    end
+
     it 'can be sorted by cell location' do
       # Rotl's offenders are grouped when sorted by cell location. If sorted in ascending order they appear
       # at the top otherwise they are grouped at the bottom
@@ -207,7 +217,7 @@ feature "view POM's caseload" do
     it 'can be searched by supporting role' do
       select 'Supporting', from: 'role'
       click_on 'Search'
-      expect(page).to have_content('Showing 1 - 15 of 15 results')
+      expect(page).to have_content('Showing 1 - 14 of 14 results')
     end
 
     it 'shows the tier' do
