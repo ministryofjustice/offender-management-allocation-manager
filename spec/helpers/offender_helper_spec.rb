@@ -50,7 +50,7 @@ RSpec.describe OffenderHelper do
       }
 
       it 'shows unknown' do
-        expect(helper.pom_responsibility_label(offender)).to eq('Unknown')
+        expect(helper.pom_responsibility_label(offender)).to eq('Co-Working')
       end
     end
   end

@@ -73,11 +73,7 @@ private
           :outside_omic_policy
         end
       end
-      allocated = summary.fetch(:allocated, []).map do |o|
-        a = alloc_hash.fetch(o.offender_no)
-        AllocatedOffender.new(a.primary_pom_nomis_id, a, o)
-      end
-      Summary.new allocated: allocated,
+      Summary.new allocated: summary.fetch(:allocated, []),
                   unallocated: summary.fetch(:unallocated, []),
                   new_arrivals: summary.fetch(:new_arrival, []),
                   missing_info: summary.fetch(:missing_info, []),

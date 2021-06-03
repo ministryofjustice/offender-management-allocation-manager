@@ -49,6 +49,12 @@ class Allocation < ApplicationRecord
 
   scope  :active_allocations_for_prison, lambda { |prison| where.not(primary_pom_nomis_id: nil).where(prison: prison) }
 
+  scope :for_pom, lambda { |nomis_staff_id|
+    secondaries = where(secondary_pom_nomis_id: nomis_staff_id)
+
+    where(primary_pom_nomis_id: nomis_staff_id).or(secondaries)
+  }
+
   validate do |av|
     if av.primary_pom_nomis_id.present? &&
       av.primary_pom_nomis_id == av.secondary_pom_nomis_id

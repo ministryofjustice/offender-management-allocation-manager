@@ -23,6 +23,12 @@ private
 
     if field == :cell_location
       cell_location_sort(allocations, direction)
+    elsif field == :pom_responsibility
+      if direction == :asc
+        allocations.sort_by { |a| view_context.pom_responsibility_label(a) }
+      else
+        allocations.sort { |a, b| view_context.pom_responsibility_label(b) <=> view_context.pom_responsibility_label(a) }
+      end
     else
       sort_with_public_send allocations, field, direction
     end
