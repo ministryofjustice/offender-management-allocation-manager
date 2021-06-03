@@ -7,7 +7,7 @@ class EmailHistory < ApplicationRecord
   OPEN_PRISON_COMMUNITY_ALLOCATION = 'open_prison_community_allocation'
   IMMEDIATE_COMMUNITY_ALLOCATION = 'immediate_community_allocation'
 
-  belongs_to :case_information,
+  belongs_to :offender,
              primary_key: :nomis_offender_id,
              foreign_key: :nomis_offender_id,
              inverse_of: :email_histories
