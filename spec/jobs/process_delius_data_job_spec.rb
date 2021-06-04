@@ -53,7 +53,7 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
     end
 
     context 'when processing a com name' do
-      let(:offender_id) { 'A1111A' }
+      let(:offender_id) { 'A1111AA' }
 
       before do
         stub_offender(build(:nomis_offender, offenderNo: offender_id))
