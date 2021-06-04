@@ -5,7 +5,8 @@ class OffenderService
     HmppsApi::PrisonApi::OffenderApi.get_offender(offender_no).tap { |o|
       next false if o.nil?
 
-      offender = Offender.find_or_create_by!(nomis_offender_id: offender_no)
+      # use find_or_create_by! here for performance, but might still have be a small race condition
+      offender = Offender.find_or_create_by!(nomis_offender_id: o.offender_no)
       o.load_case_information(offender.case_information)
 
       o.load_main_offence
