@@ -24,16 +24,12 @@ class CalculatedHandoverDate < ApplicationRecord
     less_than_10_months_left_to_serve: 'Less than 10 months left to serve'
   }.stringify_keys.freeze
 
-  # This is quite a loose relationship. It exists so that CaseInformation
-  # deletes cascade and tidy up associated HandoverDate records.
-  # Ideally HandoverDate would belong to a higher-level
-  # Offender model rather than nDelius Case Information
-  belongs_to :case_information,
+  belongs_to :offender,
              primary_key: :nomis_offender_id,
              foreign_key: :nomis_offender_id,
              inverse_of: :calculated_handover_date
 
-  validates :nomis_offender_id, uniqueness: true, presence: true
+  validates :nomis_offender_id, uniqueness: true
 
   validates :responsibility, inclusion: { in: [CUSTODY_ONLY, CUSTODY_WITH_COM, COMMUNITY_RESPONSIBLE, UNKNOWN], nil: false }
   validates :reason, inclusion: { in: REASONS.keys, nil: false }

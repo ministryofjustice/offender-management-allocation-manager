@@ -214,5 +214,4 @@ ActiveRecord::Schema.define(version: 2021_06_18_083355) do
     t.index ["case_information_id"], name: "index_victim_liaison_officers_on_case_information_id"
   end
 
-  add_foreign_key "calculated_handover_dates", "case_information", column: "nomis_offender_id", primary_key: "nomis_offender_id", on_update: :cascade, on_delete: :cascade
 end

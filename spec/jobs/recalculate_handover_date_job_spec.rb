@@ -173,7 +173,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     end
 
     context "when calculated handover dates don't exist yet for the offender" do
-      let(:record) { case_info.calculated_handover_date }
+      let(:record) { case_info.offender.calculated_handover_date }
       let(:nomis_offender) { build(:nomis_offender, agencyId: prison.code) }
 
       it 'creates a new record' do
@@ -222,7 +222,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       let!(:existing_record) {
         create(:calculated_handover_date,
                responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
-               case_information: case_info,
+               offender: case_info.offender,
                start_date: existing_start_date,
                handover_date: existing_handover_date,
                reason: existing_reason
@@ -300,7 +300,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       allow(HmppsApi::CommunityApi).to receive(:set_handover_dates)
 
       # Create an 'old' handover date, which will then be updated given the 'new' open conditions
-      create(:calculated_handover_date, case_information: case_information,
+      create(:calculated_handover_date, offender: case_information.offender,
              responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
              reason: :nps_indeterminate)
     end

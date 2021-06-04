@@ -10,15 +10,14 @@ RSpec.describe CalculatedHandoverDate, type: :model do
   end
 
   describe 'validation' do
-    it { is_expected.to validate_presence_of(:nomis_offender_id) }
     it { is_expected.to validate_uniqueness_of(:nomis_offender_id) }
   end
 
-  it { is_expected.to belong_to(:case_information) }
+  it { is_expected.to belong_to(:offender) }
 
   context 'with nil handover dates' do
-    let(:case_info) {
-      build(:case_information,
+    let(:offender) {
+      build(:offender,
             calculated_handover_date: build(:calculated_handover_date,
                                             responsibility: com_responsibility.responsibility,
                                             start_date: com_responsibility.start_date,
@@ -26,7 +25,7 @@ RSpec.describe CalculatedHandoverDate, type: :model do
                                             reason: com_responsibility.reason))
     }
     let(:com_responsibility) { HandoverDateService::NO_HANDOVER_DATE }
-    let(:record) { case_info.calculated_handover_date }
+    let(:record) { offender.calculated_handover_date }
 
     it 'allows nil handover dates' do
       expect(record).to be_valid
@@ -39,7 +38,7 @@ RSpec.describe CalculatedHandoverDate, type: :model do
   describe "when nomis_offender_id is set but an associated case information record doesn't exist" do
     subject {
       build(:calculated_handover_date,
-            case_information: nil,
+            offender: nil,
             nomis_offender_id: "A1234BC"
       )
     }

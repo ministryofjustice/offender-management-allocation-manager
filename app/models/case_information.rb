@@ -15,16 +15,6 @@ class CaseInformation < ApplicationRecord
 
   scope :nps, -> { where(case_allocation: NPS) }
 
-  # This is quite a loose relationship. It exists so that CaseInformation
-  # deletes cascade and tidy up associated CalculatedHandoverDate records.
-  # Ideally CalculatedHandoverDate would belong to a higher-level
-  # Offender model rather than nDelius Case Information
-  has_one :calculated_handover_date,
-          foreign_key: :nomis_offender_id,
-          primary_key: :nomis_offender_id,
-          inverse_of: :case_information,
-          dependent: :destroy
-
   def nps_case?
     case_allocation == NPS
   end
