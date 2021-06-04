@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Responsibility < ApplicationRecord
-  belongs_to :case_information,
+  belongs_to :offender,
              primary_key: :nomis_offender_id,
              foreign_key: :nomis_offender_id,
              inverse_of: :responsibility

@@ -13,7 +13,6 @@ RSpec.describe CaseInformation, type: :model do
   describe 'associations' do
     subject { build(:case_information) }
 
-    it { is_expected.to have_one(:responsibility).dependent(:destroy) }
     it { is_expected.to have_one(:calculated_handover_date).dependent(:destroy) }
   end
 
