@@ -16,9 +16,9 @@ private
   def recalculate_dates_for(nomis_offender)
     # we have to go direct to handover data to avoid being blocked when COM is responsible
     handover = HandoverDateService.handover(nomis_offender)
-    offender = Offender.find_by!(nomis_offender_id: nomis_offender.offender_no)
-    case_info = offender.case_information
-    record = case_info.calculated_handover_date.presence || case_info.build_calculated_handover_date
+    db_offender = Offender.find_by! nomis_offender_id: nomis_offender.offender_no
+    case_info = db_offender.case_information
+    record = db_offender.calculated_handover_date.presence || db_offender.build_calculated_handover_date
     record.assign_attributes(
       responsibility: handover.responsibility,
       start_date: handover.start_date,
@@ -30,11 +30,11 @@ private
       nomis_offender.ldu_email_address.present? &&
       nomis_offender.allocated_com_name.blank?
       # need to chase if we haven't chased recently
-      last_chaser = offender.email_histories.where(event: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION).last
+      last_chaser = db_offender.email_histories.where(event: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION).last
       if last_chaser.nil? || last_chaser.created_at < 2.days.ago
         # create the history first so that the validations will help with hard failures due to coding errors
         # rather than waiting for the mailer to object
-        offender.email_histories.create! prison: nomis_offender.prison_id,
+        db_offender.email_histories.create! prison: nomis_offender.prison_id,
                                           name: case_info.ldu_name,
                                           email: case_info.ldu_email_address,
                                           event: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION
@@ -55,7 +55,7 @@ private
     # This avoids 404 Not Found errors for offenders who don't exist in nDelius (they could be Scottish, etc.)
     push_to_delius record unless case_info.manual_entry?
 
-    request_supporting_com record, offender, nomis_offender
+    request_supporting_com record, db_offender, nomis_offender
   end
 
   def push_to_delius record

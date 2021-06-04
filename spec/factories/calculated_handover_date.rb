@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :calculated_handover_date do
-    association :case_information
+    association :offender
 
     start_date { Faker::Date.forward }
 

@@ -10,12 +10,6 @@ RSpec.describe CaseInformation, type: :model do
     expect(case_info.updated_at).not_to eq(case_info.created_at)
   end
 
-  describe 'associations' do
-    subject { build(:case_information) }
-
-    it { is_expected.to have_one(:calculated_handover_date).dependent(:destroy) }
-  end
-
   context 'with mappa level' do
     subject { build(:case_information) }
 
