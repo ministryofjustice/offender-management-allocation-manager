@@ -2,7 +2,7 @@ require 'rails_helper'
 
 context 'when NOMIS is missing information' do
   let(:prison_code) { create(:prison).code }
-  let(:offender_no) { 'A1' }
+  let(:offender_no) { build(:offender).nomis_offender_id }
   let(:stub_keyworker_host) { Rails.configuration.keyworker_api_host }
   let(:staff_id) { 123456 }
 
