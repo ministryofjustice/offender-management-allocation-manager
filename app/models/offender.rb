@@ -18,4 +18,10 @@ class Offender < ApplicationRecord
            primary_key: :nomis_offender_id,
            inverse_of: :offender,
            dependent: :destroy
+
+  has_one :responsibility,
+          foreign_key: :nomis_offender_id,
+          primary_key: :nomis_offender_id,
+          inverse_of: :offender,
+          dependent: :destroy
 end

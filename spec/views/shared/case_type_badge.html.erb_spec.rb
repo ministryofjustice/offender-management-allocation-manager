@@ -66,7 +66,7 @@ RSpec.describe "allocation_staff/index", type: :view do
 
   context "when there is a parole review date" do
     let(:offender_no) { 'G7514GW' }
-    let(:case_info) { build(:case_information,  offender: build(:offender, nomis_offender_id: offender_no), parole_review_date: Date.new(2019, 0o1, 3).to_s) }
+    let(:case_info) { build(:case_information, offender: build(:offender, nomis_offender_id: offender_no), parole_review_date: Date.new(2019, 0o1, 3).to_s) }
     let(:api_offender) {
       build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate), offenderNo: offender_no)
     }

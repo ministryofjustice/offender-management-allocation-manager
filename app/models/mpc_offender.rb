@@ -43,36 +43,36 @@ class MpcOffender
   end
 
   def pom_responsible?
-    if @probation_record.responsibility.nil?
+    if @offender.responsibility.nil?
       HandoverDateService.handover(self).custody_responsible?
     else
-      @probation_record.responsibility.value == Responsibility::PRISON
+      @offender.responsibility.value == Responsibility::PRISON
     end
   end
 
   def pom_supporting?
-    if @probation_record.responsibility.nil?
+    if @offender.responsibility.nil?
       HandoverDateService.handover(self).custody_supporting?
     else
-      @probation_record.responsibility.value == Responsibility::PROBATION
+      @offender.responsibility.value == Responsibility::PROBATION
     end
   end
 
   def com_responsible?
-    if @probation_record.responsibility.nil?
+    if @offender.responsibility.nil?
       HandoverDateService.handover(self).community_responsible?
     else
-      @probation_record.responsibility.value == Responsibility::PROBATION
+      @offender.responsibility.value == Responsibility::PROBATION
     end
   end
 
   def com_supporting?
-    if @probation_record.responsibility.nil?
+    if @offender.responsibility.nil?
       HandoverDateService.handover(self).community_supporting?
     else
       # Overrides to prison aren't actually possible in the UI
       # If they were, we'd somehow need to decide whether COM is supporting or not involved
-      @probation_record.responsibility.value == Responsibility::PRISON
+      @offender.responsibility.value == Responsibility::PRISON
     end
   end
 
@@ -81,7 +81,7 @@ class MpcOffender
   end
 
   def responsibility_override?
-    @probation_record.responsibility.present?
+    @offender.responsibility.present?
   end
 
   # Early allocation methods
