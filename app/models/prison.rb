@@ -123,7 +123,8 @@ private
       if offenders.count != nomis_ids.count
         # Create Offender records for (presumably new) prisoners who don't have one yet
         nomis_ids.reject { |nomis_id| offenders.detect { |offender| offender.nomis_offender_id == nomis_id } }.each do |new_id|
-          Offender.create! nomis_offender_id: new_id
+          new_offender = Offender.find_or_create_by! nomis_offender_id: new_id
+          offenders = offenders + [new_offender]
         end
       end
 
