@@ -5,7 +5,7 @@ feature 'Allocation' do
   let!(:prison_officer_nomis_staff_id) { 485_926 }
   let!(:nomis_offender_id) { 'G7266VD' }
   let(:offender_name) { 'Omistius Annole' }
-  let!(:never_allocated_offender) { 'G1670VU' }
+  let!(:never_allocated_offender) { 'G9403UP' }
 
   let!(:probation_officer_pom_detail) {
     PomDetail.create!(

@@ -14,7 +14,7 @@ require 'support/matchers/responsibility_matchers'
 require 'capybara/rspec'
 require 'webmock/rspec'
 
-Capybara.default_max_wait_time = 4
+Capybara.default_max_wait_time = 10
 Capybara.asset_host = 'http://localhost:3000'
 
 begin
