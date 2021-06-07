@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_18_083355) do
+ActiveRecord::Schema.define(version: 2021_07_08_094108) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -60,7 +60,6 @@ ActiveRecord::Schema.define(version: 2021_06_18_083355) do
     t.boolean "manual_entry", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.date "parole_review_date"
     t.string "probation_service"
     t.string "com_name"
     t.string "team_name"
@@ -157,6 +156,12 @@ ActiveRecord::Schema.define(version: 2021_06_18_083355) do
   end
 
   create_table "offenders", primary_key: "nomis_offender_id", id: :string, force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "parole_records", primary_key: "nomis_offender_id", id: :string, force: :cascade do |t|
+    t.date "parole_review_date", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end

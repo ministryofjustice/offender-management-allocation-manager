@@ -97,7 +97,8 @@ RSpec.describe TasksController, :allocation, type: :controller do
       create(:case_information, offender: build(:offender, nomis_offender_id: 'G1234GG'), tier: 'A', manual_entry: false)
       create(:allocation_history, nomis_offender_id: 'G1234GG', primary_pom_nomis_id: staff_id, prison: prison)
 
-      create(:case_information, offender: build(:offender, nomis_offender_id: 'G7514GW'), tier: 'A', manual_entry: false, parole_review_date: next_week)
+      create(:case_information, tier: 'A', manual_entry: false,
+             offender: build(:offender, nomis_offender_id: 'G7514GW', parole_record: build(:parole_record, parole_review_date: next_week)))
       create(:allocation_history, nomis_offender_id: 'G7514GW', primary_pom_nomis_id: staff_id, prison: prison)
     end
 
@@ -123,7 +124,8 @@ RSpec.describe TasksController, :allocation, type: :controller do
 
     it 'can show offenders needing early allocation decision updates' do
       offender_nos.each do |offender_no|
-        create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), tier: 'A', mappa_level: 1, parole_review_date: next_week)
+        create(:case_information, tier: 'A', mappa_level: 1,
+               offender: build(:offender, nomis_offender_id: offender_no, parole_record: build(:parole_record, parole_review_date: next_week)))
         create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id, prison: prison)
       end
 
@@ -144,10 +146,12 @@ RSpec.describe TasksController, :allocation, type: :controller do
 
     before do
       # One offender (G1234VV) should have missing case info and one should have no PRD
-      create(:case_information, offender: build(:offender, nomis_offender_id: 'G1234AB'), tier: 'A', mappa_level: 1, parole_review_date: next_week)
+      create(:case_information, tier: 'A', mappa_level: 1,
+             offender: build(:offender, nomis_offender_id: 'G1234AB', parole_record: build(:parole_record, parole_review_date: next_week)))
       create(:allocation_history, nomis_offender_id: 'G1234AB', primary_pom_nomis_id: staff_id, prison: prison)
 
-      create(:case_information, offender: build(:offender, nomis_offender_id: 'G1234GG'), tier: 'A', mappa_level: 1, parole_review_date: next_week)
+      create(:case_information, tier: 'A', mappa_level: 1,
+             offender: build(:offender, nomis_offender_id: 'G1234GG', parole_record: build(:parole_record, parole_review_date: next_week)))
       create(:allocation_history, nomis_offender_id: 'G1234GG', primary_pom_nomis_id: staff_id, prison: prison)
 
       create(:case_information, offender: build(:offender, nomis_offender_id: 'G7514GW'), tier: 'A', mappa_level: 1)

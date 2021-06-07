@@ -13,7 +13,7 @@ class MpcOffender
            :first_name, :last_name, :full_name_ordered, :full_name,
            :inside_omic_policy?, :offender_no, :prison_id, to: :@prison_record
 
-  delegate :crn, :case_allocation, :parole_review_date, :manual_entry?, :nps_case?,
+  delegate :crn, :case_allocation, :manual_entry?, :nps_case?,
            :tier, :victim_liaison_officers, :early_allocations, :delius_matched?,
            :mappa_level, :welsh_offender, to: :probation_record
 
@@ -147,6 +147,10 @@ class MpcOffender
     else
       today.between?(start_date, handover_date)
     end
+  end
+
+  def parole_review_date
+    @offender.parole_record.parole_review_date if @offender.parole_record.present?
   end
 
 private

@@ -25,7 +25,7 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
 
     click_button 'Update'
 
-    expect(case_info.reload.parole_review_date).to eq(Date.new(year, 5, 13))
+    expect(case_info.offender.parole_record.parole_review_date).to eq(Date.new(year, 5, 13))
     expect(page).to have_current_path(path)
   end
 
@@ -41,6 +41,6 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
     click_button 'Update'
 
     expect(page).to have_content("Parole review date must be after #{yesterday}")
-    expect(case_info.reload.parole_review_date).to be_nil
+    expect(case_info.offender.parole_record).to be_nil
   end
 end

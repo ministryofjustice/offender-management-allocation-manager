@@ -2,7 +2,7 @@
 
 <h2 class="govuk-heading-m"><%= @prisoner.full_name %> - <%= @prisoner.offender_no %></h2>
 
-<%= form_for(@case_info,
+<%= form_for(@parole_form,
              url: update_prd_prison_case_information_path(@prison.code, @prisoner.offender_no),
              method: :put,
              builder: GOVUKDesignSystemFormBuilder::FormBuilder,
