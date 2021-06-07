@@ -3,6 +3,8 @@
 # This class is inherited by all controllers under the /prisons route
 # so that they have @prison and active_prison_id available
 class PrisonsApplicationController < ApplicationController
+  include Sorting
+
   before_action :authenticate_user, :check_prison_access, :load_staff_member, :service_notifications, :load_roles
 
 protected
