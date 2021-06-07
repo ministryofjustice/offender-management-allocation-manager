@@ -32,6 +32,20 @@ RSpec.describe Allocation, type: :model do
     it { is_expected.to validate_presence_of(:allocated_at_tier) }
     it { is_expected.to validate_presence_of(:event) }
     it { is_expected.to validate_presence_of(:event_trigger) }
+
+    context 'when the same POM is Primary and Secondary' do
+      let(:allocation) { build(:allocation, prison: create(:prison).code, nomis_offender_id: nomis_offender_id) }
+
+      before do
+        allocation.primary_pom_nomis_id = nomis_staff_id
+        allocation.secondary_pom_nomis_id = nomis_staff_id
+      end
+
+      it 'is invalid' do
+        expect(allocation).not_to be_valid
+        expect(allocation.errors[:primary_pom_nomis_id]).to eq ['Primary POM cannot be the same as co-working POM']
+      end
+    end
   end
 
   context 'with allocations' do
