@@ -15,13 +15,15 @@ class CaseInformationController < PrisonsApplicationController
 
   # Just edit the parole_review_date field
   def edit_prd
-    @case_info = ParoleReviewDateForm.new
+    @parole_form = ParoleReviewDateForm.new
   end
 
   def update_prd
-    @case_info = ParoleReviewDateForm.new parole_review_date_params
-    if @case_info.valid?
-      CaseInformation.find_by!(nomis_offender_id: nomis_offender_id_from_url).update!(parole_review_date: @case_info.parole_review_date)
+    @parole_form = ParoleReviewDateForm.new parole_review_date_params
+    if @parole_form.valid?
+      ParoleRecord.find_or_create_by!(nomis_offender_id: nomis_offender_id_from_url) do |parole|
+        parole.update(parole_review_date: @parole_form.parole_review_date)
+      end
       redirect_to referrer
     else
       render 'edit_prd'

@@ -33,8 +33,7 @@ describe HmppsApi::Offender do
       let(:api_offender) {
         build(:hmpps_api_offender, sentence: build(:sentence_detail,
                                                    conditionalReleaseDate: nil,
-                                                   automaticReleaseDate: nil
-        ))
+                                                   automaticReleaseDate: nil))
       }
       let(:case_info) { build(:case_information) }
       let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
@@ -46,8 +45,7 @@ describe HmppsApi::Offender do
 
     context 'when ARD > 18 months' do
       let(:api_offender) {
-        build(:hmpps_api_offender, sentence: build(:sentence_detail,
-                                                   conditionalReleaseDate: Time.zone.today + 24.months,
+        build(:hmpps_api_offender, sentence: build(:sentence_detail, :blank,
                                                    automaticReleaseDate: Time.zone.today + 19.months
         ))
       }
@@ -61,8 +59,7 @@ describe HmppsApi::Offender do
 
     context 'when ARD < 18 months' do
       let(:api_offender) {
-        build(:hmpps_api_offender, sentence: build(:sentence_detail,
-                                                   conditionalReleaseDate: Time.zone.today + 24.months,
+        build(:hmpps_api_offender, sentence: build(:sentence_detail, :blank,
                                                    automaticReleaseDate: Time.zone.today + 17.months))
       }
       let(:case_info) { build(:case_information) }
@@ -74,7 +71,10 @@ describe HmppsApi::Offender do
     end
 
     context 'when PRD < 18 months' do
-      let(:case_info) { build(:case_information, parole_review_date: Time.zone.today + 17.months) }
+      let(:case_info) {
+        build(:case_information, offender: build(:offender,
+                                                 parole_record: build(:parole_record, parole_review_date: Time.zone.today + 17.months)))
+      }
       let(:api_offender) {
         build(:hmpps_api_offender,
               sentence: build(:sentence_detail,
@@ -89,7 +89,10 @@ describe HmppsApi::Offender do
     end
 
     context 'when TED < 18 months' do
-      let(:case_info) { build(:case_information, parole_review_date: Time.zone.today + 24.months) }
+      let(:case_info) {
+        build(:case_information, offender: build(:offender,
+                                                 parole_record: build(:parole_record, parole_review_date: Time.zone.today + 24.months)))
+      }
       let(:api_offender) {
         build(:hmpps_api_offender,
               sentence: build(:sentence_detail,
@@ -105,7 +108,10 @@ describe HmppsApi::Offender do
     end
 
     context 'when PED < 18 months' do
-      let(:case_info) { build(:case_information, parole_review_date: Time.zone.today + 24.months) }
+      let(:case_info) {
+        build(:case_information, offender: build(:offender,
+                                                 parole_record: build(:parole_record, parole_review_date: Time.zone.today + 24.months)))
+      }
       let(:api_offender) {
         build(:hmpps_api_offender,
               sentence: build(:sentence_detail,
@@ -268,7 +274,7 @@ describe HmppsApi::Offender do
       let(:api_offender) { build(:hmpps_api_offender) }
       let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
-      delegated_fields = [:tier, :case_allocation, :mappa_level, :parole_review_date]
+      delegated_fields = [:tier, :case_allocation, :mappa_level]
       delegated_fields.each do |delegated_field|
         describe "##{delegated_field}" do
           let(:field) { delegated_field }
