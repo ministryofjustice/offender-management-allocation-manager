@@ -8,7 +8,7 @@ describe HmppsApi::PrisonApi::MovementApi do
 
       expect(movements).to be_kind_of(Array)
       expect(movements.length).to eq(2)
-      expect(movements.first).to be_kind_of(HmppsApi::Movement)
+      expect(movements).to all be_kind_of(HmppsApi::Movement)
     end
   end
 
@@ -19,7 +19,7 @@ describe HmppsApi::PrisonApi::MovementApi do
 
       expect(movements).to be_kind_of(Array)
       expect(movements.length).to eq(2)
-      expect(movements.first).to be_kind_of(HmppsApi::Movement)
+      expect(movements).to all be_kind_of(HmppsApi::Movement)
     end
 
     it 'sort movements (oldest first) for a specific_offender' do
@@ -40,8 +40,8 @@ describe HmppsApi::PrisonApi::MovementApi do
       movements = described_class.movements_for('G1670VU')
 
       expect(movements).to be_kind_of(Array)
-      expect(movements.length).to eq(5)
-      expect(movements.first).to be_kind_of(HmppsApi::Movement)
+      expect(movements.length).to eq(7)
+      expect(movements).to all be_kind_of(HmppsApi::Movement)
     end
   end
 end

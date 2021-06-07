@@ -47,7 +47,7 @@ feature 'Provide debugging information for our team to use' do
       movement_table_row = page.find(:css, 'tr.govuk-table__row#movement_date', text: 'Movement date')
 
       within movement_table_row do
-        expect(page).to have_content('Movement date 20/07/2018')
+        expect(page).to have_content('Movement date 07/06/2021')
       end
     end
 
