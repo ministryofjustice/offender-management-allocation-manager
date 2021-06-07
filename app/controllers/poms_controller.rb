@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class PomsController < PrisonsApplicationController
+class PomsController < PrisonStaffApplicationController
   before_action :ensure_spo_user
 
   before_action :load_pom_staff_member, only: [:show, :edit, :update]
@@ -17,21 +17,6 @@ class PomsController < PrisonsApplicationController
   # the user will probably mark this POM inactive
   def show_non_pom
     @nomis_staff_id = nomis_staff_id
-  end
-
-  def sort_allocations(allocations)
-    if params['sort'].present?
-      sort_field, sort_direction = params['sort'].split.map(&:to_sym)
-    else
-      sort_field = :last_name
-      sort_direction = :asc
-    end
-
-    # cope with nil values by sorting using to_s - only dates and strings in these fields
-    allocations = allocations.sort_by { |sentence| sentence.public_send(sort_field).to_s }
-    allocations.reverse! if sort_direction == :desc
-
-    allocations
   end
 
   def edit

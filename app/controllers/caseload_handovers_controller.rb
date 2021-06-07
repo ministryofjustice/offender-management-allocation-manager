@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class CaseloadHandoversController < PrisonStaffApplicationController
-  include Sorting
+  before_action :ensure_signed_in_pom_is_this_pom, :load_pom
 
   def index
     collection = sort_collection(@pom.allocations.select(&:approaching_handover?), default_sort: :last_name)

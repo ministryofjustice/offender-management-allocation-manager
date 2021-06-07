@@ -36,45 +36,56 @@ feature "get poms list" do
     expect(page).to have_content("Caseload")
   end
 
-  it "can sort offenders allocated to a POM", vcr: { cassette_name: 'prison_api/show_poms_feature_view_sorting' } do
-    [['G7806VO', 754_207], ['G2911GD', 1_175_317]].each do |offender_id, _booking|
-      create(:case_information, offender: build(:offender, nomis_offender_id: offender_id))
-      AllocationService.create_or_update(
-        nomis_offender_id: offender_id,
-        prison: 'LEI',
-        allocated_at_tier: 'A',
-        created_by_username: 'MOIC_POM',
-        primary_pom_nomis_id: 485_926,
-        primary_pom_allocated_at: DateTime.now.utc,
-        recommended_pom_type: 'prison',
-        event: Allocation::ALLOCATE_PRIMARY_POM,
-        event_trigger: Allocation::USER
-      )
+  describe 'sorting', vcr: { cassette_name: 'prison_api/show_poms_feature_view_sorting' } do
+    before do
+      ['G7806VO', 'G2911GD'].each do |offender_id|
+        create(:case_information, offender: build(:offender, nomis_offender_id: offender_id))
+        create(:allocation, prison: 'LEI', nomis_offender_id: offender_id, primary_pom_nomis_id: 485_926)
+      end
     end
 
-    visit "/prisons/LEI/poms/485926"
+    it 'can sort' do
+      visit "/prisons/LEI/poms/485926"
 
-    expect(page).to have_css(".govuk-button", count: 1)
-    expect(page).to have_content("Pom, Moic")
-    expect(page).to have_content("Caseload")
-    expect(page).to have_css('.sort-arrow', count: 1)
+      expect(page).to have_css(".govuk-button", count: 1)
+      expect(page).to have_content("Pom, Moic")
+      expect(page).to have_content("Caseload")
+      expect(page).to have_css('.sort-arrow', count: 1)
 
-    check_for_order = lambda { |names|
-      row0 = page.find(:css, '.pom_cases_row_0')
-      row1 = page.find(:css, '.pom_cases_row_1')
+      check_for_order = lambda { |names|
+        row0 = page.find(:css, '.pom_cases_row_0')
+        row1 = page.find(:css, '.pom_cases_row_1')
 
-      within row0 do
-        expect(page).to have_content(names[0])
+        within row0 do
+          expect(page).to have_content(names[0])
+        end
+
+        within row1 do
+          expect(page).to have_content(names[1])
+        end
+      }
+
+      check_for_order.call(['Abdoria, Ongmetain', 'Ahmonis, Imanjah'])
+      click_link('Prisoner name')
+      check_for_order.call(['Ahmonis, Imanjah', 'Abdoria, Ongmetain'])
+    end
+
+    describe 'sorting by role' do
+      before do
+        secondary = create :case_information, offender: build(:offender, nomis_offender_id: 'G4328GK')
+        create(:allocation, prison: 'LEI', nomis_offender_id: secondary.nomis_offender_id,
+               primary_pom_nomis_id: 123456, secondary_pom_nomis_id: 485_926)
+
+        visit "/prisons/LEI/poms/485926"
       end
 
-      within row1 do
-        expect(page).to have_content(names[1])
+      it 'can sort' do
+        click_link 'Role'
+        expect(all('td[aria-label=Role]').map(&:text).uniq).to eq(['Co-Working', 'Supporting'])
+        click_link 'Role'
+        expect(all('td[aria-label=Role]').map(&:text).uniq).to eq(['Supporting', 'Co-Working'])
       end
-    }
-
-    check_for_order.call(['Abdoria, Ongmetain', 'Ahmonis, Imanjah'])
-    click_link('Prisoner name')
-    check_for_order.call(['Ahmonis, Imanjah', 'Abdoria, Ongmetain'])
+    end
   end
 
   it "allows editing a POM", vcr: { cassette_name: 'prison_api/show_poms_feature_edit' } do
