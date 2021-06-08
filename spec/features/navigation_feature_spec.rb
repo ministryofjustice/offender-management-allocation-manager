@@ -77,7 +77,7 @@ feature 'Navigation' do
     context 'with a browser', :js do
       before do
         create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
-        create(:allocation, prison: prison.code, primary_pom_nomis_id: moic_pom_staff_id, nomis_offender_id: offender_no)
+        create(:allocation_history, prison: prison.code, primary_pom_nomis_id: moic_pom_staff_id, nomis_offender_id: offender_no)
       end
 
       describe 'caseload section' do

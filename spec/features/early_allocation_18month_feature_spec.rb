@@ -19,7 +19,7 @@ feature 'early allocation when crossing 18 month threshold' do
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no),
              early_allocations: [build(:early_allocation, prison: prison.code,
                                        created_within_referral_window: false)])
-      create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: user.staff_id, prison: prison.code)
+      create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: user.staff_id, prison: prison.code)
 
       expect {
         offender_ids = EarlyAllocation.suitable_offenders_pre_referral_window.pluck(:nomis_offender_id).uniq

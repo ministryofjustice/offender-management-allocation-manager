@@ -8,9 +8,9 @@ feature "female prison index page" do
     stub_offenders_for_prison(prison.code, offenders)
 
     create(:case_information, offender: build(:offender, nomis_offender_id: allocated_offender_one.fetch(:offenderNo)))
-    create(:allocation, primary_pom_allocated_at: one_day_ago,  nomis_offender_id: allocated_offender_one.fetch(:offenderNo), prison: prison.code)
+    create(:allocation_history, primary_pom_allocated_at: one_day_ago,  nomis_offender_id: allocated_offender_one.fetch(:offenderNo), prison: prison.code)
     create(:case_information, offender: build(:offender, nomis_offender_id: allocated_offender_two.fetch(:offenderNo)))
-    create(:allocation, primary_pom_allocated_at: two_days_ago, nomis_offender_id: allocated_offender_two.fetch(:offenderNo), prison: prison.code)
+    create(:allocation_history, primary_pom_allocated_at: two_days_ago, nomis_offender_id: allocated_offender_two.fetch(:offenderNo), prison: prison.code)
     create(:case_information, offender: build(:offender, nomis_offender_id: offender_ready_to_allocate.fetch(:offenderNo)))
   end
 

@@ -5,9 +5,9 @@ require 'rails_helper'
 RSpec.describe Prison, type: :model do
   describe '#active' do
     before do
-      create(:allocation, prison: p1.code)
-      create(:allocation, prison: p1.code)
-      create(:allocation, prison: p2.code)
+      create(:allocation_history, prison: p1.code)
+      create(:allocation_history, prison: p1.code)
+      create(:allocation_history, prison: p2.code)
     end
 
     let(:p1) { create(:prison) }

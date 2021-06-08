@@ -22,7 +22,7 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
         to_return(body: { 'firstName' => 'bill' }.to_json)
       stub_pom_emails(user.staffId, [])
 
-      create(:allocation, prison: prison,
+      create(:allocation_history, prison: prison,
              nomis_offender_id: offender_no,
              primary_pom_nomis_id: primary_pom.staffId,
              secondary_pom_nomis_id: secondary_pom.staffId)
@@ -34,19 +34,19 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
     it 'allocates' do
       post :create, params: { prison_id: prison, coworking_allocations: { nomis_offender_id: offender_no, nomis_staff_id: new_secondary_pom.staffId } }
       expect(response).to redirect_to(unallocated_prison_prisoners_path(prison))
-      expect(Allocation.find_by(nomis_offender_id: offender_no).secondary_pom_nomis_id).to eq(new_secondary_pom.staffId)
+      expect(AllocationHistory.find_by(nomis_offender_id: offender_no).secondary_pom_nomis_id).to eq(new_secondary_pom.staffId)
     end
   end
 
   describe '#destroy' do
     before do
-      create(:allocation, prison: prison, nomis_offender_id: offender_no,
+      create(:allocation_history, prison: prison, nomis_offender_id: offender_no,
              primary_pom_nomis_id: primary_pom.staffId,
              secondary_pom_nomis_id: new_secondary_pom.staffId,
              secondary_pom_name: secondary_pom_name)
     end
 
-    let(:allocation) { Allocation.last }
+    let(:allocation) { AllocationHistory.last }
     let(:secondary_pom_name) { 'Bloggs, Fred' }
 
     it 'sends a deallocation_email' do

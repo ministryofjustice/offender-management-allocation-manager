@@ -24,7 +24,7 @@ RSpec.describe SearchHelper do
         x = build(:hmpps_api_offender, offenderNo: case_info.nomis_offender_id).tap { |o|
           o.load_case_information(case_info)
         }
-        OffenderWithAllocationPresenter.new(x, build(:allocation))
+        OffenderWithAllocationPresenter.new(x, build(:allocation_history))
       }
 
       it "will change to view" do

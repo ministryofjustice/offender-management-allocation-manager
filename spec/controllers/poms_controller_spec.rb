@@ -21,10 +21,10 @@ RSpec.describe PomsController, type: :controller do
       build(:pom, staffId: unavailable.nomis_staff_id)
     ])
     a1 = create(:case_information, tier: 'A', offender: build(:offender, nomis_offender_id: a_offenders.first.fetch(:offenderNo)))
-    create(:allocation, nomis_offender_id: a1.nomis_offender_id, primary_pom_nomis_id: active.nomis_staff_id, prison: prison.code)
+    create(:allocation_history, nomis_offender_id: a1.nomis_offender_id, primary_pom_nomis_id: active.nomis_staff_id, prison: prison.code)
 
     a2 = create(:case_information, tier: 'A', offender: build(:offender, nomis_offender_id: a_offenders.last.fetch(:offenderNo)))
-    create(:allocation, nomis_offender_id: a2.nomis_offender_id, primary_pom_nomis_id: inactive.nomis_staff_id, secondary_pom_nomis_id: active.nomis_staff_id, prison: prison.code)
+    create(:allocation_history, nomis_offender_id: a2.nomis_offender_id, primary_pom_nomis_id: inactive.nomis_staff_id, secondary_pom_nomis_id: active.nomis_staff_id, prison: prison.code)
 
     {
       'B': b_offenders,
@@ -34,7 +34,7 @@ RSpec.describe PomsController, type: :controller do
     }.each do |tier, offenders|
       offenders.map { |o| o.fetch(:offenderNo) }.each do |offender_no|
         create(:case_information, tier: tier.to_s, offender: build(:offender, nomis_offender_id: offender_no))
-        create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: active.nomis_staff_id, prison: prison.code)
+        create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: active.nomis_staff_id, prison: prison.code)
       end
     end
   end
@@ -45,7 +45,7 @@ RSpec.describe PomsController, type: :controller do
     before do
       # This guy doesn't turn up in Prison#offenders, and hence doesn't show up on caseload or stats
       missing_offender = create(:case_information)
-      create(:allocation, nomis_offender_id: missing_offender.nomis_offender_id, primary_pom_nomis_id: active_staff_id, prison: prison.code)
+      create(:allocation_history, nomis_offender_id: missing_offender.nomis_offender_id, primary_pom_nomis_id: active_staff_id, prison: prison.code)
 
       stub_request(:get, "#{ApiHelper::T3}/staff/#{active_staff_id}").
         to_return(body: { staffId: active_staff_id, lastName: 'LastName', firstName: 'FirstName' }.to_json)

@@ -36,7 +36,7 @@ describe MovementService, type: :feature do
     let(:transfer_in) { build(:movement, offenderNo: 'G4273GI', directionCode: 'IN', movementType: 'ADM', fromAgency: 'VEI', toAgency: 'CFI')   }
     let(:admission) { build(:movement, offenderNo: 'G4273GI', toAgency: 'LEI', fromAgency: 'COURT')   }
 
-    let!(:existing_allocation) { create(:allocation, nomis_offender_id: 'G4273GI', prison: 'LEI')   }
+    let!(:existing_allocation) { create(:allocation_history, nomis_offender_id: 'G4273GI', prison: 'LEI')   }
     let(:existing_alloc_transfer) { build(:movement, offenderNo: 'G4273GI', fromAgency: 'PRI', toAgency: 'LEI')   }
 
     it "can process transfers were offender already allocated at new prison",
@@ -110,7 +110,7 @@ describe MovementService, type: :feature do
 
   describe "processing an offender release" do
     let!(:case_info) { create(:case_information, offender: build(:offender, nomis_offender_id: 'G4273GI')) }
-    let!(:allocation) { create(:allocation, nomis_offender_id: 'G4273GI') }
+    let!(:allocation) { create(:allocation_history, nomis_offender_id: 'G4273GI') }
 
     context 'with a valid release movement' do
       let(:valid_release) { build(:movement, offenderNo: 'G4273GI', directionCode: 'OUT', movementType: 'REL', toAgency: 'OUT', fromAgency: 'BAI')   }
@@ -129,7 +129,7 @@ describe MovementService, type: :feature do
 
       it "can process release movements", vcr: { cassette_name: 'prison_api/movement_service_process_release_spec' }  do
         processed = described_class.process_movement(valid_release)
-        updated_allocation = Allocation.find_by(nomis_offender_id: valid_release.offender_no)
+        updated_allocation = AllocationHistory.find_by(nomis_offender_id: valid_release.offender_no)
 
         expect(CaseInformation.where(nomis_offender_id: valid_release.offender_no)).to be_empty
         expect(updated_allocation.event_trigger).to eq 'offender_released'
@@ -162,10 +162,10 @@ describe MovementService, type: :feature do
 
   describe "processing offenders moved to/from immigration estates" do
     before do
-      create(:allocation, nomis_offender_id: 'G4273GI')
+      create(:allocation_history, nomis_offender_id: 'G4273GI')
     end
 
-    let(:allocation) { Allocation.find_by(nomis_offender_id: 'G4273GI') }
+    let(:allocation) { AllocationHistory.find_by(nomis_offender_id: 'G4273GI') }
 
     let(:immigration_movement) do
       build(:movement, offenderNo: 'G4273GI', directionCode: direction_code, movementDate: Date.new(2020, 1, 6).to_s,

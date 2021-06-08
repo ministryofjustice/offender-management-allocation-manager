@@ -34,7 +34,7 @@ RSpec.describe SuitableForEarlyAllocationEmailJob, type: :job do
 
   context 'when offender is allocated to a POM' do
     before do
-      create(:allocation, nomis_offender_id: offender.offender_no, primary_pom_nomis_id: pom.staff_id, primary_pom_name: pom.full_name)
+      create(:allocation_history, nomis_offender_id: offender.offender_no, primary_pom_nomis_id: pom.staff_id, primary_pom_name: pom.full_name)
     end
 
     context 'when form created outside of the referral window (more than 18 months to release)' do

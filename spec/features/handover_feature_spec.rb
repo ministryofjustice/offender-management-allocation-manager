@@ -90,7 +90,7 @@ feature "viewing upcoming handovers" do
 
       offenders.each_with_index do |offender, i|
         create(:case_information, com_name: coms.fetch(i), offender: build(:offender, nomis_offender_id: offender.fetch(:offenderNo)))
-        create(:allocation, primary_pom_nomis_id: user.staff_id, primary_pom_name: pom_names.fetch(i), nomis_offender_id: offender.fetch(:offenderNo), prison: prison)
+        create(:allocation_history, primary_pom_nomis_id: user.staff_id, primary_pom_name: pom_names.fetch(i), nomis_offender_id: offender.fetch(:offenderNo), prison: prison)
       end
     end
 

@@ -25,7 +25,7 @@ feature "womens allocation journey" do
     stub_offenders_for_prison(prison.code, offenders + [offender])
 
     create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
-    alloc = create(:allocation, prison: prison.code, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: probation_pom.staff_id)
+    alloc = create(:allocation_history, prison: prison.code, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: probation_pom.staff_id)
     alloc.deallocate_offender_after_release
     alloc.update! primary_pom_nomis_id: prison_pom.staff_id
     alloc.deallocate_offender_after_release
@@ -36,7 +36,7 @@ feature "womens allocation journey" do
       # allocate some offenders to the POM so they have a case mix that looks pretty
       offenders.each_with_index do |o, index|
         ci = create(:case_information, tier: tiers[index], offender: build(:offender, nomis_offender_id: o.fetch(:offenderNo)))
-        create(:allocation, prison: prison.code, nomis_offender_id: ci.nomis_offender_id, primary_pom_nomis_id: probation_pom.staff_id)
+        create(:allocation_history, prison: prison.code, nomis_offender_id: ci.nomis_offender_id, primary_pom_nomis_id: probation_pom.staff_id)
       end
 
       visit unallocated_prison_prisoners_path prison.code
@@ -52,7 +52,7 @@ feature "womens allocation journey" do
       end
       fill_in 'allocation-form-message-field', with: message_text
       click_button 'Complete allocation'
-      a = Allocation.find_by!(nomis_offender_id: nomis_offender_id)
+      a = AllocationHistory.find_by!(nomis_offender_id: nomis_offender_id)
       expect(a.attributes.symbolize_keys.except(:created_at, :updated_at, :id, :primary_pom_allocated_at)).
         to eq(message: message_text,
               allocated_at_tier: "A",
@@ -96,7 +96,7 @@ feature "womens allocation journey" do
       fill_in 'allocation-form-message-field', with: message_text
       click_button 'Complete allocation'
 
-      a = Allocation.find_by!(nomis_offender_id: nomis_offender_id)
+      a = AllocationHistory.find_by!(nomis_offender_id: nomis_offender_id)
       expect(a.attributes.symbolize_keys.except(:created_at, :updated_at, :id, :primary_pom_allocated_at)).
         to eq(message: message_text,
               allocated_at_tier: "A",
@@ -118,13 +118,13 @@ feature "womens allocation journey" do
 
   context 'with an existing allocation' do
     let(:offender_id) { offenders.first.fetch(:offenderNo) }
-    let(:allocation) { Allocation.find_by!(nomis_offender_id: offender_id) }
+    let(:allocation) { AllocationHistory.find_by!(nomis_offender_id: offender_id) }
 
     before do
       stub_keyworker prison.code, offender_id, build(:keyworker)
 
       create(:case_information, tier: 'B', offender: build(:offender, nomis_offender_id: offender_id))
-      create(:allocation, nomis_offender_id: offender_id, prison: prison.code, primary_pom_nomis_id: probation_pom.staff_id)
+      create(:allocation_history, nomis_offender_id: offender_id, prison: prison.code, primary_pom_nomis_id: probation_pom.staff_id)
 
       visit allocated_prison_prisoners_path prison.code
       sleep 1

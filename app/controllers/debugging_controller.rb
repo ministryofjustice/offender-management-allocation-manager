@@ -11,7 +11,7 @@ class DebuggingController < PrisonsApplicationController
     if prisoner.present?
       @offender = prisoner
 
-      @allocation = Allocation.find_by(nomis_offender_id: @offender.offender_no)
+      @allocation = AllocationHistory.find_by(nomis_offender_id: @offender.offender_no)
       @movements =
         HmppsApi::PrisonApi::MovementApi.movements_for(@offender.offender_no).last
     end

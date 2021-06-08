@@ -20,7 +20,7 @@ RSpec.describe "caseload/index", type: :view do
   context 'with a caseload' do
     let(:offenders) {
       build_list(:hmpps_api_offender, 1).map do |o|
-        AllocatedOffender.new(staff_id, build(:allocation, nomis_offender_id: o.offender_no), o)
+        AllocatedOffender.new(staff_id, build(:allocation_history, nomis_offender_id: o.offender_no), o)
       end
     }
 

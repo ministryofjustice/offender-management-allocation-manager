@@ -83,7 +83,7 @@ feature "edit a POM's details" do
     before do
       # create an allocation with the POM as the primary POM
       create(
-        :allocation,
+        :allocation_history,
         nomis_offender_id: 'G7806VO',
         primary_pom_nomis_id: 485_926,
         prison: 'LEI'
@@ -91,7 +91,7 @@ feature "edit a POM's details" do
 
       # create an allocation with the POM as the co-working POM
       create(
-        :allocation,
+        :allocation_history,
         nomis_offender_id: 'G1670VU',
         primary_pom_nomis_id: 485_833,
         secondary_pom_nomis_id: 485_926,
@@ -104,7 +104,7 @@ feature "edit a POM's details" do
       click_link "Edit profile"
 
       expect(page).to have_content("Moic Pom")
-      expect(Allocation.count).to eq 2
+      expect(AllocationHistory.count).to eq 2
 
       choose('working_pattern-2')
       choose('Inactive')

@@ -35,7 +35,7 @@ RSpec.describe AllocationsController, type: :controller do
 
     it 'allows access to the Case History page' do
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
-      create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: poms.last.staffId)
+      create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: poms.last.staffId)
       get :history, params: { prison_id: prison, nomis_offender_id: offender_no }
       expect(response).to have_http_status(:ok)
     end
@@ -56,7 +56,7 @@ RSpec.describe AllocationsController, type: :controller do
 
       context 'when POM has left' do
         before do
-          create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: inactive_pom_staff_id)
+          create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: inactive_pom_staff_id)
         end
 
         it 'redirects to the inactive POM page' do
@@ -67,7 +67,7 @@ RSpec.describe AllocationsController, type: :controller do
 
       context 'with an inactive co-worker' do
         before do
-          create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: poms.first.staffId, secondary_pom_nomis_id: inactive_pom_staff_id)
+          create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: poms.first.staffId, secondary_pom_nomis_id: inactive_pom_staff_id)
         end
 
         it 'shows the page' do
@@ -87,7 +87,7 @@ RSpec.describe AllocationsController, type: :controller do
       context 'with a VictimLiasonOfficer' do
         before do
           case_info = create(:case_information, victim_liaison_officers: [build(:victim_liaison_officer)])
-          create(:allocation, nomis_offender_id: case_info.nomis_offender_id)
+          create(:allocation_history, nomis_offender_id: case_info.nomis_offender_id)
           stub_offender(build(:nomis_offender, offenderNo: case_info.nomis_offender_id))
           stub_pom_emails(485926, [])
         end
@@ -95,7 +95,7 @@ RSpec.describe AllocationsController, type: :controller do
         let(:case_info) { CaseInformation.last }
         let(:vlo_offender_no) { case_info.nomis_offender_id }
         let(:history) { assigns(:history) }
-        let(:allocation) { Allocation.find_by!(nomis_offender_id: vlo_offender_no) }
+        let(:allocation) { AllocationHistory.find_by!(nomis_offender_id: vlo_offender_no) }
 
         it 'has a VLO create record' do
           get :history, params: { prison_id: prison, nomis_offender_id: vlo_offender_no }
@@ -108,7 +108,7 @@ RSpec.describe AllocationsController, type: :controller do
             case_info.victim_liaison_officers.first.destroy
             allocation.update!(
               primary_pom_nomis_id: poms.second.staffId,
-              event: Allocation::REALLOCATE_PRIMARY_POM
+              event: AllocationHistory::REALLOCATE_PRIMARY_POM
             )
           end
 
@@ -130,7 +130,7 @@ RSpec.describe AllocationsController, type: :controller do
 
         context 'when create, delius, update' do
           before do
-            x = create(:allocation, primary_pom_nomis_id: poms.first.staffId, allocated_at_tier: 'C',
+            x = create(:allocation_history, primary_pom_nomis_id: poms.first.staffId, allocated_at_tier: 'C',
                        nomis_offender_id: offender_no,
                        created_at: create_time,
                        updated_at: create_time)
@@ -156,7 +156,7 @@ RSpec.describe AllocationsController, type: :controller do
 
         context 'when delius updated' do
           before do
-            create(:allocation, primary_pom_nomis_id: 1, allocated_at_tier: 'C',
+            create(:allocation_history, primary_pom_nomis_id: 1, allocated_at_tier: 'C',
                    nomis_offender_id: offender_no,
                    created_at: create_time,
                    updated_at: create_time)
@@ -181,20 +181,20 @@ RSpec.describe AllocationsController, type: :controller do
 
         context 'with an allocation' do
           before do
-            allocation = create(:allocation,
+            allocation = create(:allocation_history,
                                 nomis_offender_id: offender_no,
                                 primary_pom_nomis_id: poms.first.staffId,
                                 allocated_at_tier: 'A',
                                 prison: 'PVI',
                                 recommended_pom_type: 'probation',
-                                event: Allocation::ALLOCATE_PRIMARY_POM,
-                                event_trigger: Allocation::USER
+                                event: AllocationHistory::ALLOCATE_PRIMARY_POM,
+                                event_trigger: AllocationHistory::USER
             )
             allocation.update!(
               primary_pom_nomis_id: poms.second.staffId,
               prison: 'LEI',
-              event: Allocation::REALLOCATE_PRIMARY_POM,
-              event_trigger: Allocation::USER)
+              event: AllocationHistory::REALLOCATE_PRIMARY_POM,
+              event_trigger: AllocationHistory::USER)
           end
 
           it "Can get the allocation history for an offender" do
@@ -213,7 +213,7 @@ RSpec.describe AllocationsController, type: :controller do
           primary_pom_without_email_id = pom_without_emails.staffId
 
           allocation = create(
-            :allocation,
+            :allocation_history,
             nomis_offender_id: offender_no,
             prison: prison,
             override_reasons: ['other'],
@@ -221,17 +221,17 @@ RSpec.describe AllocationsController, type: :controller do
 
           allocation.update!(
             primary_pom_nomis_id: updated_primary_pom.staffId,
-            event: Allocation::REALLOCATE_PRIMARY_POM
+            event: AllocationHistory::REALLOCATE_PRIMARY_POM
           )
 
           allocation.update!(
             primary_pom_nomis_id: primary_pom_without_email_id,
-            event: Allocation::REALLOCATE_PRIMARY_POM
+            event: AllocationHistory::REALLOCATE_PRIMARY_POM
           )
 
           allocation.update!(
             primary_pom_nomis_id: updated_primary_pom.staffId,
-            event: Allocation::REALLOCATE_PRIMARY_POM
+            event: AllocationHistory::REALLOCATE_PRIMARY_POM
           )
 
           get :history, params: { prison_id: prison, nomis_offender_id: offender_no }
@@ -253,11 +253,11 @@ RSpec.describe AllocationsController, type: :controller do
           { a: 5, b: 4, c: 3, d: 2 }.each do |tier, quantity|
             0.upto(quantity - 1) do
               info = create(:case_information, tier: tier.to_s.upcase)
-              create(:allocation, prison: prison, nomis_offender_id: info.nomis_offender_id, primary_pom_nomis_id: alice.staffId)
+              create(:allocation_history, prison: prison, nomis_offender_id: info.nomis_offender_id, primary_pom_nomis_id: alice.staffId)
             end
           end
           info = create(:case_information, tier: 'N/A')
-          create(:allocation, prison: prison, nomis_offender_id: info.nomis_offender_id, primary_pom_nomis_id: alice.staffId)
+          create(:allocation_history, prison: prison, nomis_offender_id: info.nomis_offender_id, primary_pom_nomis_id: alice.staffId)
 
           offenders = CaseInformation.all.map { |ci| build(:nomis_offender, offenderNo: ci.nomis_offender_id) }
           stub_offenders_for_prison(prison, offenders)
@@ -307,7 +307,7 @@ RSpec.describe AllocationsController, type: :controller do
         before do
           stub_offenders_for_prison(prison, [offender])
           create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
-          create(:allocation, nomis_offender_id: offender_no)
+          create(:allocation_history, nomis_offender_id: offender_no)
         end
 
         before do

@@ -45,10 +45,10 @@ feature 'View a prisoner profile page' do
   context 'with an allocation', :allocation do
     before do
       create(:case_information, offender: build(:offender, nomis_offender_id: 'G7998GJ'), victim_liaison_officers: [build(:victim_liaison_officer)])
-      create(:allocation, :co_working, prison: prison, nomis_offender_id: 'G7998GJ', primary_pom_nomis_id: '485637', primary_pom_name: 'Pobno, Kath')
+      create(:allocation_history, :co_working, prison: prison, nomis_offender_id: 'G7998GJ', primary_pom_nomis_id: '485637', primary_pom_name: 'Pobno, Kath')
     end
 
-    let(:allocation) { Allocation.last }
+    let(:allocation) { AllocationHistory.last }
     let(:initial_vlo) { VictimLiaisonOfficer.last }
 
     context 'without anything extra', vcr: { cassette_name: 'prison_api/show_offender_spec' }  do

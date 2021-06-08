@@ -51,7 +51,7 @@ private
 
     # We only want to deallocate the offender if they have not already been
     # allocated at their new prison
-    if Allocation.where(
+    if AllocationHistory.where(
       nomis_offender_id: transfer.offender_no,
       prison: transfer.to_agency
     ).count > 0
@@ -64,7 +64,7 @@ private
 
     Rails.logger.info("[MOVEMENT] De-allocating #{transfer.offender_no}")
 
-    alloc = Allocation.find_by(nomis_offender_id: transfer.offender_no)
+    alloc = AllocationHistory.find_by(nomis_offender_id: transfer.offender_no)
 
     # We need to check whether the from_agency is from within the prison estate
     # to know whether it is a transfer.  If it isn't then we want to bail and
@@ -104,7 +104,7 @@ private
     Rails.logger.info("[MOVEMENT] Processing release for #{offender_no}")
 
     CaseInformation.where(nomis_offender_id: offender_no).destroy_all
-    alloc = Allocation.find_by(nomis_offender_id: offender_no)
+    alloc = AllocationHistory.find_by(nomis_offender_id: offender_no)
     # We need to check whether the from_agency is from within the prison estate
     # to know whether it is a transfer.  If it isn't then we want to bail and
     # not process the new admission.

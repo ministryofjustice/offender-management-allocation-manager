@@ -13,7 +13,7 @@ class HandoverFollowUpJob < ApplicationJob
                   }
 
     offenders.each do |offender|
-      allocation = Allocation.find_by(nomis_offender_id: offender.offender_no)
+      allocation = AllocationHistory.find_by(nomis_offender_id: offender.offender_no)
 
       if allocation.present? && allocation.active?
         prison = Prison.find(offender.prison_id)

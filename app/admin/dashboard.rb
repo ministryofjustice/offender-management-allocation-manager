@@ -5,7 +5,7 @@ ActiveAdmin.register_page 'Dashboard' do
 
   content title: proc { I18n.t('active_admin.dashboard') } do
     panel 'Offenders w/o LDU Email Addresses' do
-      allocations = Allocation.without_ldu_emails
+      allocations = AllocationHistory.without_ldu_emails
       case_infos_hash = CaseInformation.where(nomis_offender_id: allocations.select(:nomis_offender_id)).index_by(&:nomis_offender_id)
       para "Total: #{allocations.count}"
       table_for(allocations, style: 'max-width: 350px') do

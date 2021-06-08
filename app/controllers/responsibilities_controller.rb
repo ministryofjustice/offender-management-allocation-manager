@@ -39,7 +39,7 @@ class ResponsibilitiesController < PrisonsApplicationController
       ).deliver_later
     end
 
-    allocation = Allocation.find_by(nomis_offender_id: @responsibility.nomis_offender_id, prison: @prison.code)
+    allocation = AllocationHistory.find_by(nomis_offender_id: @responsibility.nomis_offender_id, prison: @prison.code)
     if allocation.try(:active?)
       redirect_to prison_allocation_path(@prison.code, @responsibility.nomis_offender_id)
     else
@@ -56,7 +56,7 @@ class ResponsibilitiesController < PrisonsApplicationController
     @responsibility = RemoveResponsibilityForm.new(responsibility_params)
     @ldu_email_address = @offender.ldu_email_address
 
-    allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id_from_url)
+    allocation = AllocationHistory.find_by(nomis_offender_id: nomis_offender_id_from_url)
 
     emails = [@current_user.email_address, @ldu_email_address]
 

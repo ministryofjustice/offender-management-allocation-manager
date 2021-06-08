@@ -40,7 +40,7 @@ feature "get poms list" do
     before do
       ['G7806VO', 'G2911GD'].each do |offender_id|
         create(:case_information, offender: build(:offender, nomis_offender_id: offender_id))
-        create(:allocation, prison: 'LEI', nomis_offender_id: offender_id, primary_pom_nomis_id: 485_926)
+        create(:allocation_history, prison: 'LEI', nomis_offender_id: offender_id, primary_pom_nomis_id: 485_926)
       end
     end
 
@@ -73,7 +73,7 @@ feature "get poms list" do
     describe 'sorting by role' do
       before do
         secondary = create :case_information, offender: build(:offender, nomis_offender_id: 'G4328GK')
-        create(:allocation, prison: 'LEI', nomis_offender_id: secondary.nomis_offender_id,
+        create(:allocation_history, prison: 'LEI', nomis_offender_id: secondary.nomis_offender_id,
                primary_pom_nomis_id: 123456, secondary_pom_nomis_id: 485_926)
 
         visit "/prisons/LEI/poms/485926"

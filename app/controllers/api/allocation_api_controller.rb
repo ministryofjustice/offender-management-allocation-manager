@@ -37,7 +37,7 @@ module Api
     end
 
     def allocation
-      @allocation ||= Allocation.find_by(nomis_offender_id: offender_number)
+      @allocation ||= AllocationHistory.find_by(nomis_offender_id: offender_number)
     end
 
     def offender_number
