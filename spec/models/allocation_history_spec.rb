@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Allocation, type: :model do
+RSpec.describe AllocationHistory, type: :model do
   let(:nomis_staff_id) { 456_789 }
   let(:nomis_offender_id) { 'A3434LK' }
   let(:another_nomis_offender_id) { 654_321 }
@@ -8,17 +8,17 @@ RSpec.describe Allocation, type: :model do
   describe '#without_ldu_emails' do
     let!(:crc_without_email) {
       case_info = create(:case_information, case_allocation: 'CRC', local_delivery_unit: nil)
-      create(:allocation, nomis_offender_id: case_info.nomis_offender_id)
+      create(:allocation_history, nomis_offender_id: case_info.nomis_offender_id)
     }
 
     let!(:nps_without_email) {
       case_info = create(:case_information, local_delivery_unit: nil)
-      create(:allocation, nomis_offender_id: case_info.nomis_offender_id)
+      create(:allocation_history, nomis_offender_id: case_info.nomis_offender_id)
     }
 
     let!(:nps_with_email) {
       case_info = create(:case_information)
-      create(:allocation, nomis_offender_id: case_info.nomis_offender_id)
+      create(:allocation_history, nomis_offender_id: case_info.nomis_offender_id)
     }
 
     it 'picks up NPS allocations without emails' do
@@ -34,7 +34,7 @@ RSpec.describe Allocation, type: :model do
     it { is_expected.to validate_presence_of(:event_trigger) }
 
     context 'when the same POM is Primary and Secondary' do
-      let(:allocation) { build(:allocation, prison: create(:prison).code, nomis_offender_id: nomis_offender_id) }
+      let(:allocation) { build(:allocation_history, prison: create(:prison).code, nomis_offender_id: nomis_offender_id) }
 
       before do
         allocation.primary_pom_nomis_id = nomis_staff_id
@@ -54,7 +54,7 @@ RSpec.describe Allocation, type: :model do
 
     let!(:allocation) {
       create(
-        :allocation,
+        :allocation_history,
         prison: prison.code,
         nomis_offender_id: nomis_offender_id,
         primary_pom_nomis_id: nomis_staff_id,
@@ -76,7 +76,7 @@ RSpec.describe Allocation, type: :model do
     describe 'when a POM is inactive' do
       let!(:another_allocaton) {
         create(
-          :allocation,
+          :allocation_history,
           prison: allocation.prison,
           nomis_offender_id: another_nomis_offender_id,
           primary_pom_nomis_id: 485_926,
@@ -130,9 +130,9 @@ RSpec.describe Allocation, type: :model do
           primary_pom_nomis_id: 485_833,
           primary_pom_allocated_at: DateTime.now.utc,
           recommended_pom_type: 'probation',
-          event: Allocation::ALLOCATE_PRIMARY_POM,
+          event: AllocationHistory::ALLOCATE_PRIMARY_POM,
           created_by_username: 'MOIC_POM',
-          event_trigger: Allocation::USER
+          event_trigger: AllocationHistory::USER
         }
         AllocationService.create_or_update(params)
         alloc = described_class.find_by!(nomis_offender_id: nomis_offender_id)
@@ -157,8 +157,8 @@ RSpec.describe Allocation, type: :model do
           primary_pom_nomis_id: 485_833,
           primary_pom_allocated_at: DateTime.now.utc,
           recommended_pom_type: 'probation',
-          event: Allocation::ALLOCATE_PRIMARY_POM,
-          event_trigger: Allocation::USER,
+          event: AllocationHistory::ALLOCATE_PRIMARY_POM,
+          event_trigger: AllocationHistory::USER,
           created_by_username: 'MOIC_POM'
         }
         AllocationService.create_or_update(params)
@@ -196,7 +196,7 @@ RSpec.describe Allocation, type: :model do
     describe '#override_reasons' do
       let!(:allocation_no_overrides) {
         create(
-          :allocation,
+          :allocation_history,
           primary_pom_nomis_id: nomis_staff_id
         )
       }
@@ -213,23 +213,23 @@ RSpec.describe Allocation, type: :model do
     describe '#active_pom_allocations' do
       let!(:secondary_allocation) {
         create(
-          :allocation,
+          :allocation_history,
           prison: allocation.prison,
           secondary_pom_nomis_id: nomis_staff_id
         )
       }
       let!(:another_allocation) {
         create(
-          :allocation,
+          :allocation_history,
           prison: allocation.prison,
           primary_pom_nomis_id: 27
         )
       }
       let!(:another_prison) {
         create(
-          :allocation,
+          :allocation_history,
           primary_pom_nomis_id: nomis_staff_id,
-          prison: 'RSI'
+          prison: create(:prison).code
         )
       }
 
@@ -245,13 +245,13 @@ RSpec.describe Allocation, type: :model do
         updated_primary_pom_nomis_id = 485_926
 
         allocation = create(
-          :allocation,
+          :allocation_history,
           nomis_offender_id: nomis_offender_id,
           primary_pom_nomis_id: previous_primary_pom_nomis_id)
 
         allocation.update!(
           primary_pom_nomis_id: updated_primary_pom_nomis_id,
-          event: Allocation::REALLOCATE_PRIMARY_POM
+          event: AllocationHistory::REALLOCATE_PRIMARY_POM
         )
 
         staff_ids = allocation.previously_allocated_poms
@@ -272,7 +272,7 @@ RSpec.describe Allocation, type: :model do
       end
 
       it 'pushes the POM name to Ndelius'do
-        create(:allocation, :primary, nomis_offender_id: nomis_offender_id, prison: prison, primary_pom_nomis_id: nomis_staff_id)
+        create(:allocation_history, :primary, nomis_offender_id: nomis_offender_id, prison: prison, primary_pom_nomis_id: nomis_staff_id)
       end
     end
 
@@ -280,7 +280,7 @@ RSpec.describe Allocation, type: :model do
       before do
         expect(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:staff_detail).with(nomis_staff_id).and_return build(:pom, firstName: 'Bill', lastName: 'Jones')
         expect(HmppsApi::CommunityApi).to receive(:set_pom).with offender_no: nomis_offender_id, prison: prison, forename: 'Bill', surname: 'Jones'
-        create(:allocation, :primary, nomis_offender_id: nomis_offender_id, prison: prison, primary_pom_nomis_id: nomis_staff_id)
+        create(:allocation_history, :primary, nomis_offender_id: nomis_offender_id, prison: prison, primary_pom_nomis_id: nomis_staff_id)
       end
 
       let(:allocation) { described_class.last }

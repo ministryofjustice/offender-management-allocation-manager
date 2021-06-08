@@ -17,7 +17,7 @@ feature 'Responsibility override' do
 
     context 'with an allocation' do
       before do
-        create(:allocation, primary_pom_nomis_id: pom_id, nomis_offender_id: offender_id)
+        create(:allocation_history, primary_pom_nomis_id: pom_id, nomis_offender_id: offender_id)
       end
 
       it 'overrides' do

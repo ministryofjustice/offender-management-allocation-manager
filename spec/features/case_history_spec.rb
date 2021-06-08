@@ -88,10 +88,10 @@ feature 'Case History' do
         current_date = today - 10.days
         allocation = Timecop.travel current_date do
           create(
-            :allocation,
+            :allocation_history,
             prison: first_prison.code,
-            event: Allocation::ALLOCATE_PRIMARY_POM,
-            event_trigger: Allocation::USER,
+            event: AllocationHistory::ALLOCATE_PRIMARY_POM,
+            event_trigger: AllocationHistory::USER,
             nomis_offender_id: nomis_offender_id,
             primary_pom_nomis_id: probation_pom[:primary_pom_nomis_id],
             primary_pom_name: probation_pom[:primary_pom_name],
@@ -103,21 +103,21 @@ feature 'Case History' do
         end
         current_date += 1.day
         Timecop.travel current_date do
-          allocation.update!(event: Allocation::REALLOCATE_PRIMARY_POM,
-                             event_trigger: Allocation::USER,
+          allocation.update!(event: AllocationHistory::REALLOCATE_PRIMARY_POM,
+                             event_trigger: AllocationHistory::USER,
                              primary_pom_nomis_id: probation_pom_2[:primary_pom_nomis_id],
                              primary_pom_name: probation_pom_2[:primary_pom_name],
                              recommended_pom_type: 'probation')
         end
         current_date += 1.day
         Timecop.travel current_date do
-          allocation.update!(event: Allocation::ALLOCATE_SECONDARY_POM,
+          allocation.update!(event: AllocationHistory::ALLOCATE_SECONDARY_POM,
                              secondary_pom_nomis_id: probation_pom[:primary_pom_nomis_id],
                              secondary_pom_name: probation_pom[:primary_pom_name])
         end
         current_date += 1.day
         Timecop.travel current_date do
-          allocation.update!(event: Allocation::DEALLOCATE_SECONDARY_POM,
+          allocation.update!(event: AllocationHistory::DEALLOCATE_SECONDARY_POM,
                              secondary_pom_nomis_id: nil,
                              secondary_pom_name: nil)
         end
@@ -134,9 +134,9 @@ feature 'Case History' do
           # offender got released - so have to re-create case information record
           # and re-find allocation record as it has been updated
           create(:case_information, nomis_offender_id: nomis_offender_id, local_delivery_unit: pontypool_ldu)
-          allocation = Allocation.find_by!(nomis_offender_id: nomis_offender_id)
-          allocation.update!(event: Allocation::ALLOCATE_PRIMARY_POM,
-                             event_trigger: Allocation::USER,
+          allocation = AllocationHistory.find_by!(nomis_offender_id: nomis_offender_id)
+          allocation.update!(event: AllocationHistory::ALLOCATE_PRIMARY_POM,
+                             event_trigger: AllocationHistory::USER,
                              prison: second_prison.code,
                              primary_pom_nomis_id: prison_pom[:primary_pom_nomis_id],
                              primary_pom_name: prison_pom[:primary_pom_name],
@@ -165,7 +165,7 @@ feature 'Case History' do
 
         current_date += 1.day
         Timecop.travel(current_date) do
-          allocation.update!(event: Allocation::REALLOCATE_PRIMARY_POM,
+          allocation.update!(event: AllocationHistory::REALLOCATE_PRIMARY_POM,
                              primary_pom_nomis_id: pom_without_email[:primary_pom_nomis_id],
                              primary_pom_name: pom_without_email[:primary_pom_name],
                              recommended_pom_type: 'probation')
@@ -191,7 +191,7 @@ feature 'Case History' do
       let(:formatted_deallocate_date) { deallocate_date.strftime("#{deallocate_date.day.ordinalize} %B %Y (%R)") }
       let(:transfer_date) { today - 1.day }
       let(:formatted_transfer_date) { transfer_date.strftime("#{transfer_date.day.ordinalize} %B %Y") + " (" + transfer_date.strftime("%R") + ")" }
-      let(:allocation) { Allocation.last }
+      let(:allocation) { AllocationHistory.last }
       let(:history) { allocation.get_old_versions.append(allocation).sort_by!(&:updated_at).reverse! }
       let(:created_by_name) { allocation.get_old_versions.first.created_by_name }
       let(:last_history) { allocation.get_old_versions.first }
@@ -315,11 +315,11 @@ feature 'Case History' do
       end
 
       it 'shows the case history', :js do
-        hist_allocate_secondary = Allocation.new secondary_pom_name: probation_pom[:primary_pom_name],
+        hist_allocate_secondary = AllocationHistory.new secondary_pom_name: probation_pom[:primary_pom_name],
                                                  updated_at: today - 8.days,
                                                  created_by_name: created_by_name
 
-        history6 = Allocation.new primary_pom_name: probation_pom_2[:primary_pom_name],
+        history6 = AllocationHistory.new primary_pom_name: probation_pom_2[:primary_pom_name],
                                   updated_at: today - 9.days,
                                   created_by_name: created_by_name,
                                   allocated_at_tier: 'A'
@@ -431,7 +431,7 @@ feature 'Case History' do
       create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
     }
     let!(:allocation) {
-      create(:allocation, :primary, nomis_offender_id: nomis_offender_id, prison: prison,
+      create(:allocation_history, :primary, nomis_offender_id: nomis_offender_id, prison: prison,
              primary_pom_nomis_id: pom.staff_id)
     }
 
@@ -444,7 +444,7 @@ feature 'Case History' do
           create(:victim_liaison_officer, case_information: case_info)
         end
         Timecop.travel day_after
-        Allocation.deallocate_primary_pom pom.staff_id, prison
+        AllocationHistory.deallocate_primary_pom pom.staff_id, prison
       end
 
       after do

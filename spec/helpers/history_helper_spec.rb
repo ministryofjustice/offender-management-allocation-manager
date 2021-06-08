@@ -3,38 +3,38 @@ require 'rails_helper'
 RSpec.describe HistoryHelper do
   let(:current_allocation) {
     build_stubbed(
-      :allocation,
+      :allocation_history,
       prison: 'LEI'
     )
   }
 
   let(:middle_allocation1) {
     build_stubbed(
-      :allocation,
+      :allocation_history,
       prison: 'PVI'
     )
   }
 
   let(:middle_allocation2) {
     build_stubbed(
-      :allocation,
+      :allocation_history,
       prison: 'PVI'
     )
   }
 
   let(:old_allocation) {
     build_stubbed(
-      :allocation,
+      :allocation_history,
       primary_pom_allocated_at: DateTime.now.utc - 4.days,
       prison: 'LEI',
-      event: Allocation::REALLOCATE_PRIMARY_POM,
-      event_trigger: Allocation::USER
+      event: AllocationHistory::REALLOCATE_PRIMARY_POM,
+      event_trigger: AllocationHistory::USER
     )
   }
 
   let(:nil_allocation) {
     build_stubbed(
-      :allocation,
+      :allocation_history,
       prison: nil
     )
   }

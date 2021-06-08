@@ -105,7 +105,7 @@ RSpec.configure do |config|
   end
 
   # This is to prevent most tests from having to mock this callback due
-  # to an after_save call back in Allocation. Enable by setting
+  # to an after_save call back in AllocationHistory.Enable by setting
   # the push_pom_to_delius tag in your tests
   config.before(:each, type: lambda { |_v, m| m[:push_pom_to_delius] != true } ) do
     allow(PushPomToDeliusJob).to receive(:perform_later)

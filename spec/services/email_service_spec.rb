@@ -4,7 +4,7 @@ RSpec.describe EmailService do
   include ActiveJob::TestHelper
 
   let(:allocation) {
-    Allocation.new.tap do |a|
+    AllocationHistory.new.tap do |a|
       a.primary_pom_nomis_id = 485_833
       a.nomis_offender_id = 'G2911GD'
       a.allocated_at_tier = 'A'
@@ -13,30 +13,30 @@ RSpec.describe EmailService do
   }
 
   let(:reallocation) {
-    Allocation.new.tap { |a|
+    AllocationHistory.new.tap { |a|
       a.primary_pom_nomis_id = 485_766
       a.nomis_offender_id = 'G2911GD'
       a.allocated_at_tier = 'A'
       a.prison = prison_code
-      a.event = Allocation::REALLOCATE_PRIMARY_POM
-      a.event_trigger = Allocation::USER
+      a.event = AllocationHistory::REALLOCATE_PRIMARY_POM
+      a.event_trigger = AllocationHistory::USER
     }
   }
 
   let(:original_allocation) {
     # The original allocation before the reallocation
-    Allocation.new.tap { |a|
+    AllocationHistory.new.tap { |a|
       a.primary_pom_nomis_id = 485_833
       a.nomis_offender_id = 'G2911GD'
       a.allocated_at_tier = 'A'
       a.prison = prison_code
-      a.event = Allocation::ALLOCATE_PRIMARY_POM
-      a.event_trigger = Allocation::USER
+      a.event = AllocationHistory::ALLOCATE_PRIMARY_POM
+      a.event_trigger = AllocationHistory::USER
     }
   }
 
   let(:coworking_allocation) do
-    Allocation.new.tap { |a|
+    AllocationHistory.new.tap { |a|
       a.primary_pom_nomis_id = 485_833
       a.primary_pom_name = "Ricketts, Andrien"
       a.nomis_offender_id = 'G2911GD'
@@ -44,13 +44,13 @@ RSpec.describe EmailService do
       a.secondary_pom_name = "Pom, Moic"
       a.allocated_at_tier = 'A'
       a.prison = prison_code
-      a.event = Allocation::ALLOCATE_SECONDARY_POM
-      a.event_trigger = Allocation::USER
+      a.event = AllocationHistory::ALLOCATE_SECONDARY_POM
+      a.event_trigger = AllocationHistory::USER
     }
   end
 
   let(:coworking_deallocation) do
-    Allocation.new.tap { |a|
+    AllocationHistory.new.tap { |a|
       a.primary_pom_nomis_id = 485_833
       a.primary_pom_name = "Ricketts, Andrien"
       a.nomis_offender_id = 'G2911GD'
@@ -58,8 +58,8 @@ RSpec.describe EmailService do
       a.secondary_pom_name = nil
       a.allocated_at_tier = 'A'
       a.prison = prison_code
-      a.event = Allocation::DEALLOCATE_SECONDARY_POM
-      a.event_trigger = Allocation::USER
+      a.event = AllocationHistory::DEALLOCATE_SECONDARY_POM
+      a.event_trigger = AllocationHistory::USER
     }
   end
 
@@ -127,20 +127,20 @@ RSpec.describe EmailService do
   context 'when offender has been released' do
     let(:staff_id) { '485833' }
     let!(:released_allocation) do
-      create(:allocation,
+      create(:allocation_history,
              prison: prison_code,
              nomis_offender_id: original_allocation.nomis_offender_id,
              primary_pom_nomis_id: original_allocation.primary_pom_nomis_id).tap do |x|
         x.deallocate_offender_after_release
         x.reload
         x.update!(primary_pom_nomis_id: reallocation.primary_pom_nomis_id,
-                  event: Allocation::REALLOCATE_PRIMARY_POM,
-                  event_trigger: Allocation::USER)
+                  event: AllocationHistory::REALLOCATE_PRIMARY_POM,
+                  event_trigger: AllocationHistory::USER)
         x.deallocate_offender_after_release
         x.reload
         x.update!(primary_pom_nomis_id: original_allocation.primary_pom_nomis_id,
-                  event: Allocation::REALLOCATE_PRIMARY_POM,
-                  event_trigger: Allocation::USER)
+                  event: AllocationHistory::REALLOCATE_PRIMARY_POM,
+                  event_trigger: AllocationHistory::USER)
       end
     end
 

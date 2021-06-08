@@ -1,7 +1,7 @@
 require 'faker'
 
 FactoryBot.define do
-  factory :allocation do
+  factory :allocation_history do
     allocated_at_tier do
       'A'
     end
@@ -13,11 +13,11 @@ FactoryBot.define do
     end
 
     event do
-      Allocation::ALLOCATE_PRIMARY_POM
+      AllocationHistory::ALLOCATE_PRIMARY_POM
     end
 
     event_trigger do
-      Allocation::USER
+      AllocationHistory::USER
     end
 
     nomis_offender_id do
@@ -49,8 +49,8 @@ FactoryBot.define do
     end
 
     trait :primary do
-      event {Allocation::ALLOCATE_PRIMARY_POM}
-      event_trigger { Allocation::USER }
+      event {AllocationHistory::ALLOCATE_PRIMARY_POM}
+      event_trigger { AllocationHistory::USER }
       primary_pom_nomis_id { 123_456}
       # The last name is titleized after it's received from the API, e.g. "McDonald" becomes "Mcdonald"
       # So we also .titleize the last name here to avoid breaking tests
@@ -60,8 +60,8 @@ FactoryBot.define do
     end
 
     trait :co_working do
-      event {Allocation:: ALLOCATE_SECONDARY_POM}
-      event_trigger { Allocation::USER }
+      event {AllocationHistory::ALLOCATE_SECONDARY_POM}
+      event_trigger { AllocationHistory::USER }
       primary_pom_nomis_id { 485_637 }
       # The last name is titleized after it's received from the API, e.g. "McDonald" becomes "Mcdonald"
       # So we also .titleize the last name here to avoid breaking tests
@@ -71,8 +71,8 @@ FactoryBot.define do
     end
 
     trait :release do
-      event { Allocation::DEALLOCATE_RELEASED_OFFENDER }
-      event_trigger {Allocation::OFFENDER_RELEASED}
+      event { AllocationHistory::DEALLOCATE_RELEASED_OFFENDER }
+      event_trigger {AllocationHistory::OFFENDER_RELEASED}
       primary_pom_nomis_id { nil}
       primary_pom_name { nil }
       secondary_pom_nomis_id { nil }
@@ -80,8 +80,8 @@ FactoryBot.define do
     end
 
     trait :transfer do
-      event { Allocation::DEALLOCATE_PRIMARY_POM }
-      event_trigger {Allocation::OFFENDER_RELEASED}
+      event { AllocationHistory::DEALLOCATE_PRIMARY_POM }
+      event_trigger {AllocationHistory::OFFENDER_RELEASED}
       primary_pom_nomis_id { nil}
       primary_pom_name { nil }
       secondary_pom_nomis_id { nil }
@@ -89,8 +89,8 @@ FactoryBot.define do
     end
 
     trait :reallocation do
-      event {Allocation::REALLOCATE_PRIMARY_POM}
-      event_trigger { Allocation::USER }
+      event {AllocationHistory::REALLOCATE_PRIMARY_POM}
+      event_trigger { AllocationHistory::USER }
       primary_pom_nomis_id { 123_456}
       # The last name is titleized after it's received from the API, e.g. "McDonald" becomes "Mcdonald"
       # So we also .titleize the last name here to avoid breaking tests

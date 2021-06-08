@@ -18,7 +18,7 @@ RSpec.describe FemaleAllocationsController, type: :controller do
   describe '#index' do
     before do
       create(:case_information, offender: build(:offender, nomis_offender_id: prisoner_id))
-      a = create(:allocation, prison: prison.code, nomis_offender_id: prisoner_id, primary_pom_nomis_id: pom.staff_id)
+      a = create(:allocation_history, prison: prison.code, nomis_offender_id: prisoner_id, primary_pom_nomis_id: pom.staff_id)
       a.deallocate_offender_after_release
     end
 

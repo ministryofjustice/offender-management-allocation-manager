@@ -25,7 +25,7 @@ RSpec.describe StaffMember, type: :model do
     before do
       # # Allocate all of the offenders to this POM
       offenders.each do |offender|
-        create(:allocation, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: staff_id, prison: prison.code)
+        create(:allocation_history, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: staff_id, prison: prison.code)
       end
     end
 
@@ -47,7 +47,7 @@ RSpec.describe StaffMember, type: :model do
     let(:old_primary_alloc) {
       Timecop.travel(old) do
         create(
-          :allocation,
+          :allocation_history,
           primary_pom_nomis_id: staff_id,
           nomis_offender_id: 'G7514GW',
           prison: prison.code
@@ -58,7 +58,7 @@ RSpec.describe StaffMember, type: :model do
     let(:old_secondary_alloc) {
       Timecop.travel(old) do
         create(
-          :allocation,
+          :allocation_history,
           primary_pom_nomis_id: other_staff_id,
           nomis_offender_id: 'G1234VV',
           prison: prison.code
@@ -70,7 +70,7 @@ RSpec.describe StaffMember, type: :model do
 
     let(:primary_alloc) {
       create(
-        :allocation,
+        :allocation_history,
         primary_pom_nomis_id: staff_id,
         nomis_offender_id: 'G1234AB',
         prison: prison.code
@@ -79,7 +79,7 @@ RSpec.describe StaffMember, type: :model do
 
     let(:secondary_alloc) {
       create(
-        :allocation,
+        :allocation_history,
         primary_pom_nomis_id: other_staff_id,
         nomis_offender_id: 'G1234GG',
         secondary_pom_nomis_id: staff_id,

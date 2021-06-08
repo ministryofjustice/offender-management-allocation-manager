@@ -31,7 +31,7 @@ class Prison < ApplicationRecord
 
   class << self
     def active
-      Prison.where(code: Allocation.distinct.pluck(:prison))
+      Prison.where(code: AllocationHistory.distinct.pluck(:prison))
     end
   end
 
@@ -50,7 +50,7 @@ class Prison < ApplicationRecord
   end
 
   def allocations
-    @allocations ||= Allocation.active_allocations_for_prison(code).where(nomis_offender_id: all_policy_offenders.map(&:offender_no))
+    @allocations ||= AllocationHistory.active_allocations_for_prison(code).where(nomis_offender_id: all_policy_offenders.map(&:offender_no))
   end
 
   def allocated

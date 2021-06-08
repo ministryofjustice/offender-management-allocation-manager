@@ -17,7 +17,7 @@ feature "early allocation", type: :feature do
 
   before do
     create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id), case_allocation: case_alloc)
-    create(:allocation, prison: prison, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
+    create(:allocation_history, prison: prison, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
 
     stub_auth_token
     stub_offenders_for_prison(prison, [nomis_offender])

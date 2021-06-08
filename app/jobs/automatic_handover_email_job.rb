@@ -21,7 +21,7 @@ class AutomaticHandoverEmailJob < ApplicationJob
       }
                       .sort_by(&:handover_start_date)
       if offenders.any?
-        allocations = Allocation.where(nomis_offender_id: offenders.map(&:offender_no)).index_by(&:nomis_offender_id)
+        allocations = AllocationHistory.where(nomis_offender_id: offenders.map(&:offender_no)).index_by(&:nomis_offender_id)
         csv_data = CSV.generate do |csv|
           csv << HEADERS
           offenders.each do |offender|

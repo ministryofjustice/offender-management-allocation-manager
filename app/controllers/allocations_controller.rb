@@ -11,7 +11,7 @@ class AllocationsController < PrisonsApplicationController
     @recommended_poms, @not_recommended_poms =
       recommended_and_nonrecommended_poms_for(@prisoner)
     @unavailable_pom_count = unavailable_pom_count
-    @allocation = Allocation.find_by nomis_offender_id: offender_id
+    @allocation = AllocationHistory.find_by nomis_offender_id: offender_id
     @previously_allocated_pom_ids =
       @allocation.present? ? @allocation.previously_allocated_poms : []
     offender = Offender.includes(case_information: :early_allocations).find_by(nomis_offender_id: offender_id)
@@ -22,7 +22,7 @@ class AllocationsController < PrisonsApplicationController
   def show
     @prisoner = offender(nomis_offender_id_from_url)
 
-    allocation = Allocation.find_by!(nomis_offender_id: @prisoner.offender_no)
+    allocation = AllocationHistory.find_by!(nomis_offender_id: @prisoner.offender_no)
     @allocation = CaseHistory.new(allocation.get_old_versions.last, allocation, allocation.versions.last)
 
     @pom = StaffMember.new(@prison, @allocation.primary_pom_nomis_id)
@@ -97,7 +97,7 @@ class AllocationsController < PrisonsApplicationController
   def history
     @prisoner = offender(nomis_offender_id_from_url)
 
-    allocation = Allocation.find_by!(nomis_offender_id: nomis_offender_id_from_url)
+    allocation = AllocationHistory.find_by!(nomis_offender_id: nomis_offender_id_from_url)
     vlo_history = PaperTrail::Version.
         where(item_type: 'VictimLiaisonOfficer', nomis_offender_id: nomis_offender_id_from_url).map { |vlo_version| VloHistory.new(vlo_version) }
     complexity_history = if @prison.womens?
@@ -169,13 +169,13 @@ private
   end
 
   def current_pom_for(nomis_offender_id)
-    nomis_staff_id = Allocation.find_by!(nomis_offender_id: nomis_offender_id).primary_pom_nomis_id
+    nomis_staff_id = AllocationHistory.find_by!(nomis_offender_id: nomis_offender_id).primary_pom_nomis_id
 
     @prison.get_single_pom(nomis_staff_id)
   end
 
   def recommended_and_nonrecommended_poms_for(offender)
-    allocation = Allocation.find_by(nomis_offender_id: offender.offender_no)
+    allocation = AllocationHistory.find_by(nomis_offender_id: offender.offender_no)
     # don't allow primary to be the same as the co-working POM
     poms = @prison.get_list_of_poms.select { |pom|
       pom.status == 'active' && pom.staff_id != allocation.try(:secondary_pom_nomis_id)

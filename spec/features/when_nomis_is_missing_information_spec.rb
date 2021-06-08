@@ -38,7 +38,7 @@ context 'when NOMIS is missing information' do
 
           stub_offenders_for_prison(prison_code, stub_offenders)
 
-          create(:allocation, prison: prison_code,  nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
+          create(:allocation_history, prison: prison_code,  nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
           create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), case_allocation: 'NPS')
         end
 
@@ -68,7 +68,7 @@ context 'when NOMIS is missing information' do
 
         stub_offender(offender)
 
-        create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
+        create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
         create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), case_allocation: 'NPS')
       end
 
@@ -90,7 +90,7 @@ context 'when NOMIS is missing information' do
       end
 
       it 'does not error' do
-        create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
+        create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
 
         visit prison_staff_caseload_handovers_path(prison_code, staff_id)
 
@@ -137,7 +137,7 @@ context 'when NOMIS is missing information' do
         stub_request(:get, "#{stub_keyworker_host}/key-worker/#{prison_code}/offender/#{offender_no}").
           to_return(body: {}.to_json)
 
-        create(:allocation, prison: prison_code, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
+        create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
         create(
           :case_information,
           offender: build(:offender, nomis_offender_id: offender_no),

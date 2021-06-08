@@ -48,7 +48,7 @@ RSpec.describe HandoversController, type: :controller do
       describe 'sorting', :allocation do
         before do
           create(:case_information, :with_com, case_allocation: 'CRC', offender: build(:offender, nomis_offender_id: 'G1234VV'))
-          create(:allocation, nomis_offender_id: 'G1234VV', primary_pom_nomis_id: pom.staffId)
+          create(:allocation_history, nomis_offender_id: 'G1234VV', primary_pom_nomis_id: pom.staffId)
           stub_pom(pom)
         end
 

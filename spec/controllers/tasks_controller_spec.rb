@@ -45,16 +45,16 @@ RSpec.describe TasksController, :allocation, type: :controller do
       # Allocate all of the offenders to this POM
       # Make sure that we don't generate missing nDelius data by mistake
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), tier: 'A')
-      create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id, prison: prison)
+      create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id, prison: prison)
 
       create(:case_information, offender: build(:offender, nomis_offender_id: 'G1234VV'), tier: 'A', mappa_level: 1)
-      create(:allocation, nomis_offender_id: 'G1234VV', primary_pom_nomis_id: staff_id, prison: prison)
+      create(:allocation_history, nomis_offender_id: 'G1234VV', primary_pom_nomis_id: staff_id, prison: prison)
 
       create(:case_information, offender: build(:offender, nomis_offender_id: 'G1234AB'), tier: 'A', mappa_level: 1)
-      create(:allocation, nomis_offender_id: 'G1234AB', primary_pom_nomis_id: staff_id, prison: prison)
+      create(:allocation_history, nomis_offender_id: 'G1234AB', primary_pom_nomis_id: staff_id, prison: prison)
 
       create(:case_information, offender: build(:offender, nomis_offender_id: 'G1234GG'), tier: 'A', mappa_level: 1)
-      create(:allocation, nomis_offender_id: 'G1234GG', primary_pom_nomis_id: staff_id, prison: prison)
+      create(:allocation_history, nomis_offender_id: 'G1234GG', primary_pom_nomis_id: staff_id, prison: prison)
     end
 
     it 'can show offenders needing parole review date updates' do
@@ -84,16 +84,16 @@ RSpec.describe TasksController, :allocation, type: :controller do
 
       # Ensure only one of our offenders has missing data and that G7514GW (indeterminate) has a PRD
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), tier: 'A', manual_entry: true)
-      create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id, prison: prison)
+      create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id, prison: prison)
 
       create(:case_information, offender: build(:offender, nomis_offender_id: 'G1234AB'), tier: 'A', manual_entry: false)
-      create(:allocation, nomis_offender_id: 'G1234AB', primary_pom_nomis_id: staff_id, prison: prison)
+      create(:allocation_history, nomis_offender_id: 'G1234AB', primary_pom_nomis_id: staff_id, prison: prison)
 
       create(:case_information, offender: build(:offender, nomis_offender_id: 'G1234GG'), tier: 'A', manual_entry: false)
-      create(:allocation, nomis_offender_id: 'G1234GG', primary_pom_nomis_id: staff_id, prison: prison)
+      create(:allocation_history, nomis_offender_id: 'G1234GG', primary_pom_nomis_id: staff_id, prison: prison)
 
       create(:case_information, offender: build(:offender, nomis_offender_id: 'G7514GW'), tier: 'A', manual_entry: false, parole_review_date: next_week)
-      create(:allocation, nomis_offender_id: 'G7514GW', primary_pom_nomis_id: staff_id, prison: prison)
+      create(:allocation_history, nomis_offender_id: 'G7514GW', primary_pom_nomis_id: staff_id, prison: prison)
     end
 
     after do
@@ -119,7 +119,7 @@ RSpec.describe TasksController, :allocation, type: :controller do
     it 'can show offenders needing early allocation decision updates' do
       offender_nos.each do |offender_no|
         create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), tier: 'A', mappa_level: 1, parole_review_date: next_week)
-        create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id, prison: prison)
+        create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id, prison: prison)
       end
 
       create(:early_allocation, :discretionary, nomis_offender_id: test_offender_no)
@@ -140,13 +140,13 @@ RSpec.describe TasksController, :allocation, type: :controller do
     before do
       # One offender (G1234VV) should have missing case info and one should have no PRD
       create(:case_information, offender: build(:offender, nomis_offender_id: 'G1234AB'), tier: 'A', mappa_level: 1, parole_review_date: next_week)
-      create(:allocation, nomis_offender_id: 'G1234AB', primary_pom_nomis_id: staff_id, prison: prison)
+      create(:allocation_history, nomis_offender_id: 'G1234AB', primary_pom_nomis_id: staff_id, prison: prison)
 
       create(:case_information, offender: build(:offender, nomis_offender_id: 'G1234GG'), tier: 'A', mappa_level: 1, parole_review_date: next_week)
-      create(:allocation, nomis_offender_id: 'G1234GG', primary_pom_nomis_id: staff_id, prison: prison)
+      create(:allocation_history, nomis_offender_id: 'G1234GG', primary_pom_nomis_id: staff_id, prison: prison)
 
       create(:case_information, offender: build(:offender, nomis_offender_id: 'G7514GW'), tier: 'A', mappa_level: 1)
-      create(:allocation, nomis_offender_id: 'G7514GW', primary_pom_nomis_id: staff_id, prison: prison)
+      create(:allocation_history, nomis_offender_id: 'G7514GW', primary_pom_nomis_id: staff_id, prison: prison)
     end
 
     it 'can show multiple types at once' do
