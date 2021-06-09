@@ -74,8 +74,8 @@ private
   Summary = Struct.new :allocated, :unallocated, :new_arrivals, :missing_info, :outside_omic_policy, keyword_init: true
 
   def summary
-    alloc_hash = allocations.index_by(&:nomis_offender_id)
     @summary ||= begin
+      alloc_hash = allocations.index_by(&:nomis_offender_id)
       summary = unfiltered_offenders.group_by do |offender|
         if offender.inside_omic_policy?
           allocatable = if womens?
