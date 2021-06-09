@@ -24,7 +24,7 @@ class PomsController < PrisonStaffApplicationController
   end
 
   def update
-    pom_detail = PomDetail.find_by(nomis_staff_id: nomis_staff_id)
+    pom_detail = @prison.pom_details.find_by!(nomis_staff_id: nomis_staff_id)
     pom_detail.working_pattern = working_pattern
     pom_detail.status = edit_pom_params[:status] || pom.status
 

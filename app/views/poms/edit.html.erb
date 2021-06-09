@@ -53,21 +53,21 @@
           </legend>
           <div class="govuk-radios" data-module="govuk-radios">
             <div class="govuk-radios__item">
-              <%= radio_button_tag("edit_pom[status]", "active", @pom.status == 'active', id: "status-1", class: "govuk-radios__input") %>
-              <%= label_tag "status-1", "Active", class: "govuk-label govuk-radios__label" %>
+              <%= radio_button_tag("edit_pom[status]", "active", @pom.status == 'active', id: "status-active", class: "govuk-radios__input") %>
+              <%= label_tag "status-active", "Active", class: "govuk-label govuk-radios__label" %>
             </div>
             <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="status-conditional-2" name="edit_pom[status]" type="radio" value="unavailable" data-aria-controls="status-2" <%= 'checked' if @pom.status == 'unavailable'%>>
+              <input class="govuk-radios__input" id="status-conditional-unavailable" name="edit_pom[status]" type="radio" value="unavailable" data-aria-controls="status-2" <%= 'checked' if @pom.status == 'unavailable'%>>
               <label class="govuk-label govuk-radios__label"
-                     for="status-conditional-2">Active but unavailable for new cases</label>
+                     for="status-conditional-unavailable">Active but unavailable for new cases</label>
             </div>
             <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="status-2">
               <h4 class="govuk-heading-s">To allocate to this POM you will need to change their status to active.</h4>
             </div>
             <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="status-conditional-3" name="edit_pom[status]" type="radio" value="inactive" data-aria-controls="status-3"  <%= 'checked' if @pom.status == 'inactive'%>>
+              <input class="govuk-radios__input" id="status-conditional-inactive" name="edit_pom[status]" type="radio" value="inactive" data-aria-controls="status-3"  <%= 'checked' if @pom.status == 'inactive'%>>
               <label class="govuk-label govuk-radios__label"
-                     for="status-conditional-3">Inactive</label>
+                     for="status-conditional-inactive">Inactive</label>
             </div>
             <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="status-3">
               <div class="govuk-warning-text">
