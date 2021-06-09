@@ -6,6 +6,7 @@ feature "edit a POM's details" do
   let(:nomis_staff_id) { 485_637 }
   let(:fulltime_pom_id) { 485_833 }
   let(:nomis_offender_id) { 'G4273GI' }
+  let(:pom) { build(:pom) }
 
   before do
     create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
@@ -26,7 +27,7 @@ feature "edit a POM's details" do
     visit edit_prison_pom_path('LEI', nomis_staff_id)
     expect(page).to have_css('h1', text: 'Edit profile')
 
-    expect(page).to have_field('status-conditional-2', checked: true)
+    expect(page).to have_field('status-conditional-unavailable', checked: true)
   end
 
   it "validates a POM when missing data", vcr: { cassette_name: 'prison_api/edit_poms_missing_check' } do
@@ -44,22 +45,38 @@ feature "edit a POM's details" do
     expect(page).to have_content('Select number of days worked')
   end
 
-  it "makes an inactive POM active", vcr: { cassette_name: 'prison_api/edit_poms_activate_pom_feature' } do
-    # This doesn't do what it appears to - the URL is wrong so we're not editing an inactive POM... :-(
-    visit "/prisons/LEI/poms#inactive"
-    click_link 'Moic Integration-Tests'
+  describe "making an inactive POM active", :js, vcr: { cassette_name: 'prison_api/edit_poms_activate_pom_feature' } do
+    let(:prison) { Prison.find('LEI') }
+    let(:other_prison) { create(:prison) }
+    let(:moic_integration_tests_staff_id) { 485_758 }
 
-    click_link "Edit profile"
+    before do
+      # create 2 inactive POM details records (to make POM inactive) - there was a bug that found the first(and wrong) one
+      create(:pom_detail, :inactive, prison: other_prison, nomis_staff_id: moic_integration_tests_staff_id)
+      create(:pom_detail, :inactive, prison: prison, nomis_staff_id: moic_integration_tests_staff_id)
+    end
 
-    expect(page).to have_css('h1', text: 'Edit profile')
+    it 'makes the pom have a status of active' do
+      visit "/prisons/LEI/poms"
+      click_link "Inactive staff (1)"
+      click_link 'Moic Integration-Tests'
 
-    find('label[for=working_pattern-5]').click
-    find('label[for=status-1]').click
+      click_link "Edit profile"
 
-    click_button('Save')
+      expect(page).to have_css('h1', text: 'Edit profile')
 
-    expect(page).to have_content('0.5')
-    expect(page).to have_content('Active')
+      find('label[for=status-active]').click
+      find('label[for=part-time-conditional-1]').click
+      find('label[for=working_pattern-5]').click
+
+      click_button('Save')
+
+      expect(prison.pom_details.find_by(nomis_staff_id: moic_integration_tests_staff_id).status).to eq('active')
+      expect(other_prison.pom_details.find_by(nomis_staff_id: moic_integration_tests_staff_id).status).to eq('inactive')
+
+      expect(page).to have_content('0.5')
+      expect(page).to have_content('Active')
+    end
   end
 
   context 'when a POM is made inactive' do
