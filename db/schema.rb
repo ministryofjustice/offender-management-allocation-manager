@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_18_083355) do
+ActiveRecord::Schema.define(version: 2021_07_07_160258) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -38,6 +38,16 @@ ActiveRecord::Schema.define(version: 2021_06_18_083355) do
     t.index ["primary_pom_nomis_id"], name: "index_allocation_history_on_primary_pom_nomis_id"
     t.index ["prison"], name: "index_allocation_history_on_prison"
     t.index ["secondary_pom_nomis_id"], name: "index_allocation_versions_secondary_pom_nomis_id"
+  end
+
+  create_table "allocations", force: :cascade do |t|
+    t.string "nomis_offender_id", null: false
+    t.bigint "pom_detail_id", null: false
+    t.string "allocation_type", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["nomis_offender_id", "allocation_type"], name: "index_allocations_on_nomis_offender_id_and_allocation_type", unique: true
+    t.index ["pom_detail_id"], name: "index_allocations_on_pom_detail_id"
   end
 
   create_table "calculated_handover_dates", force: :cascade do |t|
