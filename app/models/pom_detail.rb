@@ -7,6 +7,9 @@ class PomDetail < ApplicationRecord
     message: 'Select number of days worked'
   }
 
+  has_many :allocations, inverse_of: :pom_detail
+  has_many :offender, through: :allocations
+
   belongs_to :prison, foreign_key: :prison_code, inverse_of: :pom_details
 
   def allocations

@@ -12,4 +12,7 @@ class Offender < ApplicationRecord
            primary_key: :nomis_offender_id,
            inverse_of: :offender,
            dependent: :destroy
+
+  has_many :allocations, inverse_of: :offender
+  has_many :pom_details, through: :allocations
 end

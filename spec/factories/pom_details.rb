@@ -5,6 +5,8 @@ FactoryBot.define do
     # don't want a nomis_staff_id of zero
     sequence(:nomis_staff_id) { |x| x + 1000 }
 
+    association :prison
+
     trait :inactive do
       status { 'inactive' }
     end
