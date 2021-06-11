@@ -4,15 +4,15 @@ require 'rails_helper'
 
 feature "Delius import feature", :disable_push_to_delius do
   let(:offender_no) {  offender.fetch(:offenderNo) }
-  let(:prison) { create(:prison).code }
-  let(:offender) { build(:nomis_offender) }
+  let(:prison_code) { create(:prison).code }
+  let(:offender) { build(:nomis_offender, agencyId: prison_code) }
   let(:offender_name) { offender.fetch(:lastName) + ', ' + offender.fetch(:firstName) }
   let(:pom) { build(:pom) }
 
   before do
-    stub_signin_spo(pom, [prison])
-    stub_poms prison, [pom]
-    stub_offenders_for_prison(prison, [offender])
+    stub_signin_spo(pom, [prison_code])
+    stub_poms prison_code, [pom]
+    stub_offenders_for_prison(prison_code, [offender])
   end
 
   context "when the LDU is known" do
@@ -27,7 +27,7 @@ feature "Delius import feature", :disable_push_to_delius do
     end
 
     it "imports from Delius and creates case information" do
-      visit missing_information_prison_prisoners_path(prison)
+      visit missing_information_prison_prisoners_path(prison_code)
       expect(page).to have_content("Add missing information")
       expect(page).to have_content(offender_no)
 
@@ -37,7 +37,7 @@ feature "Delius import feature", :disable_push_to_delius do
       expect(page).to have_content("Add missing information")
       expect(page).not_to have_content(offender_no)
 
-      visit unallocated_prison_prisoners_path(prison)
+      visit unallocated_prison_prisoners_path(prison_code)
       expect(page).to have_content("Make allocations")
       expect(page).to have_content(offender_no)
       click_link offender_name

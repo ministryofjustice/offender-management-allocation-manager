@@ -58,7 +58,7 @@ feature 'View a prisoner profile page' do
         visit prison_prisoner_path(prison.code, 'G7266VD')
       end
 
-      scenario 'adding a VLO' do
+      scenario 'adding a VLO', :js do
         expect(page).to have_content('First Contact')
         click_link 'Add new VLO contact'
         find('.govuk-back-link')
@@ -207,24 +207,25 @@ feature 'View a prisoner profile page' do
 
   context 'when offender does not have a sentence start date',
           vcr: { cassette_name: 'prison_api/no_sentence_start_date_for_offender' } do
-    let(:non_sentenced_offender) do
+    let(:api_non_sentenced_offender) do
       build(:hmpps_api_offender,
             agencyId: prison.code,
-            offenderNo: 'G7998GJ',
+            offenderNo: 'G7266VD',
             imprisonmentStatus: 'SEC90',
             sentence: build(:sentence_detail,
                             releaseDate: 3.years.from_now.iso8601,
                             sentenceStartDate: nil))
     end
+    let(:case_info) { create(:case_information, case_allocation: CaseInformation::NPS, offender: build(:offender, nomis_offender_id: 'G7998GJ')) }
+    let(:non_sentenced_offender) {
+      build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_non_sentenced_offender)
+    }
 
     before do
       allow(OffenderService).to receive(:get_offender).and_return(non_sentenced_offender)
     end
 
     it 'shows the page without crashing' do
-      case_info = create(:case_information, :nps, offender: build(:offender, nomis_offender_id: 'G7998GJ'))
-      non_sentenced_offender.load_case_information(case_info)
-
       visit prison_prisoner_path(prison.code, 'G7998GJ')
 
       within '#handover-start-date' do

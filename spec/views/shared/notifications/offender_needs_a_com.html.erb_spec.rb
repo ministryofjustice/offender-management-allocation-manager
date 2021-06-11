@@ -9,11 +9,11 @@ RSpec.describe "shared/notifications/offender_needs_a_com", type: :view do
   let(:case_info) { build(:case_information, :nps, local_delivery_unit: ldu, manual_entry: ldu.nil?) }
   let(:ldu) { build(:local_delivery_unit) }
   let(:email_history) { [] }
+  let(:prison) { build(:prison) }
 
-  let(:offender) {
-    build(:hmpps_api_offender, sentence: build(:sentence_detail, :determinate, :inside_handover_window)).tap { |o|
-      o.load_case_information(case_info)
-    }
+  let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
+  let(:api_offender) {
+    build(:hmpps_api_offender, sentence: build(:sentence_detail, :determinate, :inside_handover_window))
   }
 
   before do

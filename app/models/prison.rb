@@ -40,13 +40,13 @@ class Prison < ApplicationRecord
   end
 
   def all_policy_offenders
-    OffenderEnumerator.new(code).select(&:inside_omic_policy?)
+    OffenderService.get_offenders_for_prison(self).select(&:inside_omic_policy?)
   end
 
   def unfiltered_offenders
     # Returns all offenders at the provided prison, and does not
     # filter out under 18s or non-sentenced offenders
-    OffenderEnumerator.new(code)
+    OffenderService.get_offenders_for_prison(self)
   end
 
   def allocations
@@ -79,9 +79,9 @@ private
       summary = unfiltered_offenders.group_by do |offender|
         if offender.inside_omic_policy?
           allocatable = if womens?
-                          offender.has_case_information? && offender.complexity_level.present?
+                          offender.probation_record.present? && offender.complexity_level.present?
                         else
-                          offender.has_case_information?
+                          offender.probation_record.present?
                         end
           if allocatable
             if alloc_hash.key? offender.offender_no
@@ -112,64 +112,5 @@ private
         pom.working_pattern = 0.0
         pom.status = 'active'
       end
-  end
-
-  class OffenderEnumerator
-    include Enumerable
-    FETCH_SIZE = 200 # How many records to fetch from nomis at a time
-
-    def initialize(prison)
-      @prison = prison
-    end
-
-    def each
-      first_page = HmppsApi::PrisonApi::OffenderApi.list(
-        @prison,
-        0,
-        page_size: FETCH_SIZE
-      )
-      offenders = first_page.data
-      enrich_offenders(offenders)
-      offenders.each { |offender| yield offender }
-
-      1.upto(first_page.total_pages - 1).each do |page_number|
-        offenders = HmppsApi::PrisonApi::OffenderApi.list(
-          @prison,
-          page_number,
-          page_size: FETCH_SIZE
-        ).data
-
-        enrich_offenders(offenders)
-
-        offenders.each { |offender| yield offender }
-      end
-    end
-
-    def enrich_offenders(offender_list)
-      nomis_ids = offender_list.map(&:offender_no)
-      offenders = Offender.
-        includes(case_information: [:responsibility, :early_allocations, :local_delivery_unit]).
-        where(nomis_offender_id: nomis_ids)
-
-      if offenders.count != nomis_ids.count
-        # Create Offender records for (presumably new) prisoners who don't have one yet
-        nomis_ids.reject { |nomis_id| offenders.detect { |offender| offender.nomis_offender_id == nomis_id } }.each do |new_id|
-          # use create_or_find_by! to prevent race conditions
-          new_offender = Offender.create_or_find_by! nomis_offender_id: new_id
-          offenders = offenders + [new_offender]
-        end
-      end
-
-      mapped_tiers = offenders.
-        map(&:case_information).
-        compact.
-        index_by(&:nomis_offender_id)
-
-      offender_list.each { |offender|
-        case_info_record = mapped_tiers[offender.offender_no]
-        offender.load_case_information(case_info_record)
-      }
-      HmppsApi::PrisonApi::OffenderApi.add_arrival_dates(offender_list)
-    end
   end
 end

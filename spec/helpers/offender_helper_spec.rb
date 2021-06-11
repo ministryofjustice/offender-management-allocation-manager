@@ -2,6 +2,9 @@ require 'rails_helper'
 
 RSpec.describe OffenderHelper do
   let(:prison) { build(:prison) }
+  let(:offender) {
+    build(:mpc_offender, prison: prison, prison_record: api_offender, offender: build(:case_information).offender)
+  }
 
   describe 'Digital Prison Services profile path' do
     it "formats the link to an offender's profile page within the Digital Prison Services" do
@@ -30,7 +33,7 @@ RSpec.describe OffenderHelper do
 
   describe '#pom_responsibility_label' do
     context 'when responsible' do
-      let(:offender) { build(:hmpps_api_offender) }
+      let(:api_offender) { build(:hmpps_api_offender) }
 
       it 'shows responsible' do
         expect(helper.pom_responsibility_label(offender)).to eq('Responsible')
@@ -38,7 +41,7 @@ RSpec.describe OffenderHelper do
     end
 
     context 'when supporting' do
-      let(:offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :determinate_recall)) }
+      let(:api_offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :determinate_recall)) }
 
       it 'shows supporting' do
         expect(helper.pom_responsibility_label(offender)).to eq('Supporting')
@@ -46,10 +49,8 @@ RSpec.describe OffenderHelper do
     end
 
     context 'when unknown' do
-      let(:offender) {
-        build(:hmpps_api_offender, sentence: build(:sentence_detail, :unsentenced)).tap { |o|
-          o.load_case_information(build(:case_information))
-        }
+      let(:api_offender) {
+        build(:hmpps_api_offender, sentence: build(:sentence_detail, :unsentenced))
       }
 
       it 'shows unknown' do
@@ -59,30 +60,35 @@ RSpec.describe OffenderHelper do
   end
 
   describe 'generates labels for case owner ' do
-    it 'can show Custody for Prison' do
-      off = build(:hmpps_api_offender).tap { |o|
-        o.load_case_information(build(:case_information))
-        o.sentence = build(:sentence_detail,
-                           sentenceStartDate: Time.zone.today - 20.months,
-                           automaticReleaseDate: Time.zone.today + 20.months)
+    context 'when Prison' do
+      let(:api_offender) {
+        build(:hmpps_api_offender).tap { |o|
+          o.sentence = build(:sentence_detail,
+                             sentenceStartDate: Time.zone.today - 20.months,
+                             automaticReleaseDate: Time.zone.today + 20.months)
+        }
       }
 
-      expect(helper.case_owner_label(off)).to eq('Custody')
+      it 'shows custody' do
+        expect(helper.case_owner_label(offender)).to eq('Custody')
+      end
     end
 
-    it 'can show Community for Probation' do
-      off = build(:hmpps_api_offender).tap { |o|
-        o.sentence = build(:sentence_detail, automaticReleaseDate: Time.zone.today)
+    context 'when Probation' do
+      let(:api_offender) {
+        build(:hmpps_api_offender).tap { |o|
+          o.sentence = build(:sentence_detail, automaticReleaseDate: Time.zone.today)
+        }
       }
 
-      expect(helper.case_owner_label(off)).to eq('Community')
+      it 'shows community' do
+        expect(helper.case_owner_label(offender)).to eq('Community')
+      end
     end
 
     context 'when unknown' do
-      let(:offender) {
-        build(:hmpps_api_offender, sentence: build(:sentence_detail, :unsentenced)).tap { |o|
-          o.load_case_information(build(:case_information))
-        }
+      let(:api_offender) {
+        build(:hmpps_api_offender, sentence: build(:sentence_detail, :unsentenced))
       }
 
       it 'can show Unknown' do
@@ -119,10 +125,12 @@ RSpec.describe OffenderHelper do
     end
 
     context 'when a probation POM' do
+      let(:api_offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate)) }
+      let(:offender) {
+        build(:mpc_offender, prison: prison, prison_record: api_offender, offender: build(:case_information, tier: 'A').offender)
+      }
+
       it "can get for a probation owned offender" do
-        offender = build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate))
-        case_info = build(:case_information, tier: 'A')
-        offender.load_case_information(case_info)
         expect(helper.complex_reason_label(offender)).to eq('Prisoner assessed as suitable for a prison officer POM despite tiering calculation')
       end
     end

@@ -285,7 +285,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
                          movementDate: movement_date.to_s)
     }
 
-    let(:offender) { OffenderService.get_offender(offender_no) }
+    let(:offender) { build(:nomis_offender, agencyId: prison.code, offenderNo: offender_no) }
     let(:sentence_start_date) { policy_start_date }
     let(:movement_date) { policy_start_date + 1.week }
 
@@ -310,9 +310,9 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
         expect(CommunityMailer).to receive(:open_prison_supporting_com_needed)
                                      .with(hash_including(
                                              prisoner_number: offender_no,
-                                             prisoner_name: offender.full_name,
+                                             # prisoner_name: "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}",
                                              prisoner_crn: case_information.crn,
-                                             ldu_email: offender.ldu_email_address,
+                                             ldu_email: case_information.ldu_email_address,
                                              prison_name: prison.name,
                                              ))
                                      .and_return OpenStruct.new(deliver_later: true)
@@ -329,11 +329,11 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       it 'emails the LDU to notify them that a COM is now needed' do
         expect(CommunityMailer).to receive(:open_prison_supporting_com_needed)
                                      .with(hash_including(
-                                             prisoner_number: offender_no,
-                                             prisoner_name: offender.full_name,
-                                             prisoner_crn: case_information.crn,
-                                             ldu_email: offender.ldu_email_address,
-                                             prison_name: prison.name,
+                                             # prisoner_number: offender_no,
+                                             # prisoner_name: "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}",
+                                       prisoner_crn: case_information.crn,
+                                       ldu_email: case_information.ldu_email_address,
+                                       prison_name: prison.name,
                                              ))
                                      .and_return OpenStruct.new(deliver_later: true)
 

@@ -6,6 +6,7 @@ feature 'Provide debugging information for our team to use' do
 
   before do
     signin_global_admin_user
+    create(:prison, code: 'MDI')
   end
 
   context 'when debugging an individual offender' do
@@ -75,22 +76,23 @@ feature 'Provide debugging information for our team to use' do
 
     context 'when offender does not have a sentence start date',
             vcr: { cassette_name: 'prison_api/debugging_no_sentence_start_date_for_offender_feature' } do
-      let(:non_sentenced_offender) do
+      let(:api_non_sentenced_offender) do
         build(:hmpps_api_offender, offenderNo: nomis_offender_id,
               imprisonmentStatus: 'SEC90',
               sentence: build(:sentence_detail,
                               releaseDate: 3.years.from_now.iso8601,
                               sentenceStartDate: nil))
       end
+      let(:case_info) { create(:case_information, case_allocation: CaseInformation::NPS, offender: build(:offender, nomis_offender_id: nomis_offender_id)) }
+      let(:non_sentenced_offender) {
+        build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_non_sentenced_offender)
+      }
 
       before do
         allow(OffenderService).to receive(:get_offender).and_return(non_sentenced_offender)
       end
 
       it 'shows the page without crashing' do
-        case_info = create(:case_information, case_allocation: CaseInformation::NPS, offender: build(:offender, nomis_offender_id: nomis_offender_id))
-        non_sentenced_offender.load_case_information(case_info)
-
         visit prison_debugging_path('LEI')
 
         expect(page).to have_text('Debugging')

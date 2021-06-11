@@ -5,31 +5,28 @@ require 'rails_helper'
 describe HandoverDateService do
   subject { described_class.handover(offender) }
 
+  let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
   let(:test_strategy) { Flipflop::FeatureSet.current.test! }
   let(:pom) { HandoverDateService::Responsibility.new subject.custody_responsible?, subject.custody_supporting?  }
   let(:com) { HandoverDateService::Responsibility.new subject.community_responsible?, subject.community_supporting? }
   let(:start_date) { subject.start_date }
   let(:handover_date) { subject.handover_date }
   let(:reason) { subject.reason_text }
-
-  let(:closed_prison) { 'LEI' } # HMP Leeds
-  let(:prescoed_prison) { PrisonService::PRESCOED_CODE } # HMP Prescoed
-  let(:open_prison) { 'HVI' } # HMP Haverigg
+  let(:closed_prison) { 'LEI' }
+  let(:prescoed_prison) { PrisonService::PRESCOED_CODE }
+  let(:open_prison) { 'HVI' }
   let(:womens_prison) { create(:womens_prison).code }
-  let(:prescoed_policy_start_date) { Date.new(2020, 10, 19) } # 19th October 2020
-  let(:open_policy_start_date) { Date.new(2021, 3, 31) } # 31st March 2021
+  let(:prescoed_policy_start_date) { Date.new(2020, 10, 19) }
+  let(:open_policy_start_date) { Date.new(2021, 3, 31) }
   let(:womens_policy_start_date) { Date.parse('30th April 2021') }
   let(:category) { build(:offender_category, :cat_c) }
-
-  # Set the current date by changing the value of `today`
   let(:today) { Time.zone.today }
-
   let(:arrival_date) { today }
   let(:welsh?) { false }
   let(:prison) { closed_prison }
-  # Default sentence start if not provided
   let(:sentence_start_date) { build(:sentence_detail).sentence_start_date }
 
+  # Set the current date by changing the value of `today`
   before do
     Timecop.travel(today)
   end
@@ -41,12 +38,11 @@ describe HandoverDateService do
   context 'when determinate' do
     let(:today) { Date.parse('01/01/2021') }
     let(:crd) { Date.parse('01/09/2022') }
-    let(:offender) {
+    let(:api_offender) {
       build(:hmpps_api_offender,
             latestLocationId: prison,
             sentence: build(:sentence_detail, :determinate, sentenceStartDate: sentence_start_date, conditionalReleaseDate: crd)
       ).tap { |o|
-        o.load_case_information(case_info)
         o.prison_arrival_date = arrival_date
       }
     }
@@ -385,13 +381,12 @@ describe HandoverDateService do
     context 'with tariff date in the future' do
       let(:tariff_date) { Date.parse('01/09/2022') }
       let(:case_info) { build(:case_information, :nps, probation_service: welsh? ? 'Wales' : 'England') }
-      let(:offender) {
+      let(:api_offender) {
         build(:hmpps_api_offender,
               latestLocationId: prison,
               category: category,
               sentence: build(:sentence_detail, :indeterminate, tariffDate: tariff_date, sentenceStartDate: sentence_start_date)
         ).tap { |o|
-          o.load_case_information(case_info)
           o.prison_arrival_date = arrival_date
         }
       }

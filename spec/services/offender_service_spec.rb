@@ -3,15 +3,14 @@ require 'rails_helper'
 describe OffenderService, type: :feature do
   describe '#get_offender' do
     it "gets a single offender", vcr: { cassette_name: 'prison_api/offender_service_single_offender_spec' } do
-      nomis_offender_id = 'G4273GI'
+      nomis_offender_id = 'G7266VD'
 
       create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id), tier: 'C', case_allocation: 'CRC', probation_service: 'Wales')
       offender = described_class.get_offender(nomis_offender_id)
 
-      expect(offender).to be_kind_of(HmppsApi::Offender)
       expect(offender.tier).to eq 'C'
-      expect(offender.sentence.conditional_release_date).to eq(Date.new(2020, 3, 16))
-      expect(offender.main_offence).to eq 'Section 18 - wounding with intent to resist / prevent arrest'
+      expect(offender.conditional_release_date).to eq(Date.new(2040, 1, 27))
+      expect(offender.main_offence).to eq 'Robbery'
       expect(offender.case_allocation).to eq 'CRC'
     end
 
@@ -30,8 +29,8 @@ describe OffenderService, type: :feature do
         stub_offender(offender)
       end
 
-      it 'returns the offender' do
-        expect(described_class.get_offender(offender.fetch(:offenderNo))).not_to be_nil
+      it 'returns nil as the offender is outside of our service' do
+        expect(described_class.get_offender(offender.fetch(:offenderNo))).to be_nil
       end
     end
 
@@ -45,8 +44,8 @@ describe OffenderService, type: :feature do
         stub_offender(offender)
       end
 
-      it 'returns the offender' do
-        expect(described_class.get_offender(offender.fetch(:offenderNo))).not_to be_nil
+      it 'returns nil as the offender cannot be handled' do
+        expect(described_class.get_offender(offender.fetch(:offenderNo))).to be_nil
       end
     end
   end

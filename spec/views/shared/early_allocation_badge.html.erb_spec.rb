@@ -7,7 +7,8 @@ RSpec.describe "prisoners/show", type: :view do
     let(:early_allocation_css) { page.css('#early-allocation-badge') }
     let(:early_allocation_badge) { early_allocation_css.first }
     let(:badge_count) { early_allocation_css.size }
-    let(:offender) { build(:hmpps_api_offender, sentence: sentence).tap { |offender| offender.load_case_information(case_info) } }
+    let(:api_offender) { build(:hmpps_api_offender, sentence: sentence) }
+    let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
     before do
       assign(:prison, prison)

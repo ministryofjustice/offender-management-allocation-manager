@@ -1,6 +1,9 @@
 require 'rails_helper'
 
 describe HandoverDateService do
+  let(:prison) { build(:prison) }
+  let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
+
   describe '#calculate_pom_responsibility' do
     subject {
       HandoverDateService::Responsibility.new described_class.handover(offender).custody_responsible?,
@@ -15,10 +18,9 @@ describe HandoverDateService do
         let(:arrival_date) { recent_date }
 
         context 'when welsh' do
-          let(:offender) {
+          let(:api_offender) {
             build(:hmpps_api_offender, :prescoed, sentence: build(:sentence_detail, :welsh_policy_sentence)).tap { |o|
               o.prison_arrival_date = arrival_date
-              o.load_case_information(case_info)
             }
           }
 
@@ -40,10 +42,9 @@ describe HandoverDateService do
         end
 
         context 'when english' do
-          let(:offender) {
+          let(:api_offender) {
             build(:hmpps_api_offender, :prescoed, sentence: build(:sentence_detail, :english_policy_sentence)).tap { |o|
               o.prison_arrival_date = arrival_date
-              o.load_case_information(case_info)
             }
           }
 
@@ -58,10 +59,9 @@ describe HandoverDateService do
       end
 
       context 'with past NPS welsh offender' do
-        let(:offender) {
+        let(:api_offender) {
           build(:hmpps_api_offender, :prescoed, sentence: build(:sentence_detail, :welsh_policy_sentence)).tap { |o|
             o.prison_arrival_date = arrival_date
-            o.load_case_information(case_info)
           }
         }
 
@@ -260,14 +260,13 @@ describe HandoverDateService do
               Timecop.return
             end
 
-            let(:offender) {
+            let(:case_info) { build(:case_information, :english) }
+            let(:api_offender) {
               build(:hmpps_api_offender, prison_id: 'VEI',
                     sentence: build(:sentence_detail,
                                     sentenceStartDate: sentence_start_date,
                                     automaticReleaseDate: ard,
-                                    conditionalReleaseDate: crd)).tap { |o|
-                o.load_case_information(build(:case_information, :english))
-              }
+                                    conditionalReleaseDate: crd))
             }
 
             context 'with over 20 months left to serve' do

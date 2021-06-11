@@ -88,4 +88,8 @@ module OffenderHelper
     offenders.count { |a| a.tier == 'N/A' }
   end
   # :nocov:
+
+  def probation_field offender, field
+    offender.public_send field if offender.probation_record.present?
+  end
 end

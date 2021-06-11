@@ -8,7 +8,7 @@ feature "early allocation", type: :feature do
   let(:valid_date) { Time.zone.today - 2.months }
   let!(:prison) { create(:prison).code }
   let(:username) { 'MOIC_POM' }
-  let(:nomis_offender) { build(:nomis_offender, dateOfBirth: date_of_birth, sentence: attributes_for(:sentence_detail, conditionalReleaseDate: release_date)) }
+  let(:nomis_offender) { build(:nomis_offender, agencyId: prison, dateOfBirth: date_of_birth, sentence: attributes_for(:sentence_detail, conditionalReleaseDate: release_date)) }
   let(:nomis_offender_id) { nomis_offender.fetch(:offenderNo) }
   let(:pom) { build(:pom, staffId: nomis_staff_id) }
   let(:date_of_birth) { Date.new(1980, 1, 6).to_s }
@@ -21,7 +21,6 @@ feature "early allocation", type: :feature do
 
     stub_auth_token
     stub_offenders_for_prison(prison, [nomis_offender])
-    stub_offender(nomis_offender)
     stub_request(:get, "#{ApiHelper::T3}/users/#{username}").
       to_return(body: { 'staffId': nomis_staff_id }.to_json)
     stub_pom(pom)

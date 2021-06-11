@@ -60,27 +60,19 @@
     <tr class="govuk-table__row" id="tier">
       <td class="govuk-table__cell">Tiering calculation</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <% if @offender.tier %>
-          <%= @offender.tier %>
-        <% else %>
-          Not provided
-        <% end %>
+        <%= probation_field(@offender, :tier) || 'Not provided' %>
       </td>
     </tr>
     <tr class="govuk-table__row" id=service-provider">
       <td class="govuk-table__cell">Service provider</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <% if @offender.case_allocation %>
-          <%= service_provider_label(@offender.case_allocation) %>
-        <% else %>
-          Not provided
-        <% end %>
+        <%= service_provider_label(probation_field(@offender, :case_allocation)) || 'Not provided' %>
       </td>
     </tr>
     <tr class="govuk-table__row" id="welsh_offender">
       <td class="govuk-table__cell">Last known address in Wales</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= humanized_bool(@offender.welsh_offender) %>
+        <%= humanized_bool(@offender.welsh_offender) if @offender.probation_record.present? %>
       </td>
     </tr>
     </tbody>
@@ -95,30 +87,30 @@
     <tr class="govuk-table__row" id="responsibility">
       <td class="govuk-table__cell govuk-!-width-one-half">Current responsibility</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-        <%= case_owner_label(@offender) %>
+        <%= case_owner_label(@offender) if @offender.probation_record.present? %>
       </td>
     <tr class="govuk-table__row" id="responsibility-override">
       <td class="govuk-table__cell govuk-!-width-one-half">Responsibility overridden?</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-        <%= humanized_bool(@offender.responsibility_override?) %>
+        <%= humanized_bool(@offender.responsibility_override?) if @offender.probation_record.present? %>
       </td>
     </tr>
     <tr class="govuk-table__row" id="handover-start-date">
       <td class="govuk-table__cell govuk-!-width-one-half">Handover start date</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-        <%= format_date(@offender.handover_start_date, replacement: 'N/A') %>
+        <%= format_date(probation_field(@offender, :handover_start_date), replacement: 'N/A') %>
       </td>
     </tr>
     <tr class="govuk-table__row" id="responsibility-handover-date">
       <td class="govuk-table__cell govuk-!-width-one-half">Responsibility handover date</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-        <%= format_date(@offender.responsibility_handover_date, replacement: 'N/A') %>
+        <%= format_date(probation_field(@offender, :responsibility_handover_date), replacement: 'N/A') %>
       </td>
     </tr>
     <tr class="govuk-table__row" id="handover-reason">
       <td class="govuk-table__cell govuk-!-width-one-half">Reason for handover dates</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-        <%= @offender.handover_reason %>
+        <%= probation_field(@offender, :handover_reason) %>
       </td>
     </tr>
     </tbody>
@@ -222,13 +214,13 @@
     <tr class="govuk-table__row" id="pom-role">
       <td class="govuk-table__cell">POM role</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= pom_responsibility_label(@offender) %>
+        <%= pom_responsibility_label(@offender) if @offender.probation_record.present? %>
       </td>
     </tr>
     <tr class="govuk-table__row" id="pom">
       <td class="govuk-table__cell govuk-!-width-one-half">POM</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-        <%= @allocation.primary_pom_name.titleize%>
+        <%= @allocation.primary_pom_name.titleize %>
       </td>
     </tr>
     <tr class="govuk-table__row" id="co-working-pom">
@@ -264,7 +256,7 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Local divisional unit (LDU)</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= @offender.ldu_name || "Unknown"%>
+        <%= @offender.ldu_name || "Unknown" %>
       </td>
     </tr>
     <tr class="govuk-table__row">
@@ -280,13 +272,13 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Team</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= @offender.team_name.presence || "Unknown"%>
+        <%= @offender.team_name || "Unknown" %>
       </td>
     </tr>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">COM</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-        <%= @offender.allocated_com_name.presence || "Unknown" %>
+        <%= probation_field(@offender, :allocated_com_name) || "Unknown" %>
       </td>
     </tr>
     </tbody>

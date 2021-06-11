@@ -6,13 +6,10 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
   let(:early_allocations) { [] }
   let(:prison) { create(:prison) }
   let(:offender_sentence) { build(:sentence_detail) }
-  let(:offender) { build(:hmpps_api_offender, sentence: offender_sentence) }
-  let(:nomis_offender_id) { offender.offender_no }
-  let(:case_info) { create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id), early_allocations: early_allocations) }
-
-  before do
-    offender.load_case_information(case_info)
-  end
+  let(:api_offender) { build(:hmpps_api_offender, sentence: offender_sentence) }
+  let(:nomis_offender_id) { api_offender.offender_no }
+  let!(:case_info) { create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id), early_allocations: early_allocations) }
+  let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
   describe '#early_allocation_status' do
     subject { helper.early_allocation_status(case_info.early_allocations, offender) }
