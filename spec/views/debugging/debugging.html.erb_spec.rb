@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "debugging/debugging", type: :view do
-  let(:offender) do
+  let(:api_offender) do
     build(:hmpps_api_offender, firstName: 'John', lastName: 'Dory').tap { |offender|
       offender.sentence = build(:sentence_detail,
                                 sentenceStartDate: Time.zone.today,
@@ -11,6 +11,7 @@ RSpec.describe "debugging/debugging", type: :view do
                                 licenceExpiryDate: Date.new(2025, 10, 7))
     }
   end
+  let(:offender) { build(:mpc_offender, prison: prison, prison_record: api_offender, offender: build(:offender)) }
 
   let(:prison) { create(:prison) }
 
@@ -49,7 +50,7 @@ RSpec.describe "debugging/debugging", type: :view do
     let(:value) { page.css('#category > td:nth-child(2)').text.strip }
 
     context 'when the offender has a category' do
-      let(:offender) { build(:hmpps_api_offender, category: build(:offender_category, :female_open, approvalDate: '17/06/2021'.to_date)) }
+      let(:api_offender) { build(:hmpps_api_offender, category: build(:offender_category, :female_open, approvalDate: '17/06/2021'.to_date)) }
 
       it 'shows category details' do
         expect(key).to eq('Category')
@@ -59,7 +60,7 @@ RSpec.describe "debugging/debugging", type: :view do
 
     context 'when category is unknown' do
       # This happens when an offender's category assessment hasn't been completed yet
-      let(:offender) { build(:hmpps_api_offender, category: nil) }
+      let(:api_offender) { build(:hmpps_api_offender, category: nil) }
 
       it 'shows "Unknown"' do
         expect(key).to eq('Category')

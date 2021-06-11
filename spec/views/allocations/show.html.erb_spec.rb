@@ -3,12 +3,15 @@
 require 'rails_helper'
 
 RSpec.describe "allocations/show", type: :view do
+  let(:prison) { build(:prison) }
   let(:page) { Nokogiri::HTML(rendered) }
   let(:next_year) { (Time.zone.today + 1.year).year }
-  let(:offender) {
+  let(:api_offender) {
     build(:hmpps_api_offender,
           sentence: build(:sentence_detail, conditionalReleaseDate: Date.new(next_year + 1, 1, 28)))
   }
+  let(:case_info) { build(:case_information, :crc) }
+  let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
   before do
     assign(:prison, create(:prison))
@@ -16,7 +19,7 @@ RSpec.describe "allocations/show", type: :view do
     assign(:prisoner, offender)
     assign(:allocation, create(:allocation_history, prison: build(:prison).code))
     assign(:keyworker, build(:keyworker))
-    assign(:case_info, build(:case_information))
+    assign(:case_info, case_info)
     render
   end
 
@@ -33,7 +36,7 @@ RSpec.describe "allocations/show", type: :view do
     let(:value) { page.css('#offender-category > td:nth-child(2)').text }
 
     context 'when a male offender category' do
-      let(:offender) { build(:hmpps_api_offender, category: build(:offender_category, :cat_d)) }
+      let(:api_offender) { build(:hmpps_api_offender, category: build(:offender_category, :cat_d)) }
 
       it 'shows the category label' do
         expect(key).to eq('Category')
@@ -42,7 +45,7 @@ RSpec.describe "allocations/show", type: :view do
     end
 
     context 'when a female offender category' do
-      let(:offender) { build(:hmpps_api_offender, category: build(:offender_category, :female_open)) }
+      let(:api_offender) { build(:hmpps_api_offender, category: build(:offender_category, :female_open)) }
 
       it 'shows the category label' do
         expect(key).to eq('Category')
@@ -52,7 +55,7 @@ RSpec.describe "allocations/show", type: :view do
 
     context 'when category is unknown' do
       # This happens when an offender's category assessment hasn't been completed yet
-      let(:offender) { build(:hmpps_api_offender, category: nil) }
+      let(:api_offender) { build(:hmpps_api_offender, category: nil) }
 
       it 'shows "Unknown"' do
         expect(key).to eq('Category')

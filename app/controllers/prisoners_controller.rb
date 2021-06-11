@@ -49,7 +49,6 @@ class PrisonersController < PrisonsApplicationController
       active_prison_id, @prisoner.offender_no
     )
 
-    @case_info = CaseInformation.includes(:early_allocations).find_by(nomis_offender_id: params[:id])
     @emails_sent_to_ldu = EmailHistory.sent_within_current_sentence(@prisoner, EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION)
   end
 

@@ -7,32 +7,32 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">Current responsibility</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-        <%= case_owner_label(@prisoner) %>
+        <%= case_owner_label(@prisoner) if @prisoner.probation_record.present? %>
       </td>
     </tr>
     <tr class="govuk-table__row" id="handover-start-date">
       <td class="govuk-table__cell govuk-!-width-one-half">Handover start date</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-        <%= format_date(@prisoner.handover_start_date, replacement: 'N/A') %>
-        <span class="handover-reason">(<%= @prisoner.handover_reason %>)</span>
+        <%= format_date(probation_field(@prisoner, :handover_start_date), replacement: 'N/A') %>
+        <span class="handover-reason">(<%= probation_field(@prisoner, :handover_reason) %>)</span>
       </td>
     </tr>
     <tr class="govuk-table__row" id="responsibility-handover">
       <td class="govuk-table__cell govuk-!-width-one-half">Responsibility handover</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-        <%= format_date(@prisoner.responsibility_handover_date, replacement: 'N/A') %>
-        <span class="handover-reason">(<%= @prisoner.handover_reason %>)</span>
+        <%= format_date(probation_field(@prisoner, :responsibility_handover_date), replacement: 'N/A') %>
+        <span class="handover-reason">(<%= probation_field(@prisoner, :handover_reason) %>)</span>
       </td>
     </tr>
-    <% if Flipflop.early_allocation? && @case_info.present? && @case_info.nps? %>
+    <% if Flipflop.early_allocation? && @prisoner.probation_record.present? && @prisoner.nps_case? %>
     <tr id="early_allocation" class="govuk-table__row">
       <td class="govuk-table__cell">Early allocation referral</td>
       <td class="govuk-table__cell table_cell__left_align">
         <span id="early_allocation_status">
-          <%= early_allocation_status(@case_info.early_allocations, @prisoner) %>
+          <%= early_allocation_status(@prisoner.early_allocations, @prisoner) %>
         </span>
         <span id="early_allocation_action" class="pull-right">
-          <%= early_allocation_action_link(@case_info.early_allocations, @prisoner, @prison) %>
+          <%= early_allocation_action_link(@prisoner.early_allocations, @prisoner, @prison) %>
         </span>
       </td>
     </tr>
@@ -40,13 +40,13 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">Last known address in Wales</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-        <%= humanized_bool(@prisoner.welsh_offender) %>
+        <%= humanized_bool(@prisoner.welsh_offender) if @prisoner.probation_record.present? %>
       </td>
     </tr>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">Service provider</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-        <%= service_provider_label(@prisoner.case_allocation) %>
+        <%= service_provider_label(probation_field(@prisoner, :case_allocation)) %>
       </td>
     </tr>
     <tr class="govuk-table__row">

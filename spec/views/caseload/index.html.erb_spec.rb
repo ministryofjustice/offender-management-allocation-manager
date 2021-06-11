@@ -18,17 +18,13 @@ RSpec.describe "caseload/index", type: :view do
   let(:page) { Nokogiri::HTML(rendered) }
 
   context 'with a caseload' do
-    let(:offender_objects) {
-      [
-        build(:hmpps_api_offender).tap do |o|
-          o.load_case_information(build(:case_information))
-        end
-      ]
-    }
+    let(:api_offender) { build(:hmpps_api_offender) }
+    let(:case_info) { build(:case_information) }
+    let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
     let(:offenders) {
-      offender_objects.map do |o|
-        AllocatedOffender.new(staff_id, build(:allocation_history, nomis_offender_id: o.offender_no, primary_pom_allocated_at: DateTime.now.utc), o)
+      [offender].map do |o|
+        AllocatedOffender.new(staff_id, build(:allocation_history, nomis_offender_id: o.offender_no), o)
       end
     }
 

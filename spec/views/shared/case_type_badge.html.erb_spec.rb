@@ -7,6 +7,8 @@ RSpec.describe "allocation_staff/index", type: :view do
   let(:recall_badge) { page.css('#recall-badge') }
   let(:parole_badge) { page.css('#parole-badge') }
   let(:parole_review_date) { page.css('#parole-review-date') }
+  let(:case_info) { build(:case_information) }
+  let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
   before do
     assign(:prison, prison)
@@ -15,12 +17,12 @@ RSpec.describe "allocation_staff/index", type: :view do
     assign(:prison_poms, [])
     assign(:unavailable_pom_count, 0)
     assign(:prisoner, offender)
-    assign(:case_info, build(:case_information))
+    assign(:case_info, case_info)
     render
   end
 
   context "when indeterminate" do
-    let(:offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate)) }
+    let(:api_offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate)) }
 
     it "displays an indeterminate case type badge" do
       assert_you_have_an_indeterminate_badge
@@ -28,7 +30,7 @@ RSpec.describe "allocation_staff/index", type: :view do
   end
 
   context "when determinate" do
-    let(:offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :determinate)) }
+    let(:api_offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :determinate)) }
 
     it "displays an determinate case type badge" do
       assert_you_have_a_determinate_badge
@@ -36,7 +38,7 @@ RSpec.describe "allocation_staff/index", type: :view do
   end
 
   context "when recall" do
-    let(:offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate_recall)) }
+    let(:api_offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate_recall)) }
 
     it "displays a recall case type badge and a indeterminate badge" do
       expect(case_type_badge.first.attributes['class'].value).to include 'moj-badge--purple'
@@ -46,7 +48,7 @@ RSpec.describe "allocation_staff/index", type: :view do
   end
 
   context "when parole eligibility(PED)" do
-    let(:offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate, paroleEligibilityDate: Time.zone.today.to_s)) }
+    let(:api_offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate, paroleEligibilityDate: Time.zone.today.to_s)) }
 
     it "displays an parole eligibility case type badge" do
       assert_you_have_a_parole_eligibility_badge
@@ -55,7 +57,7 @@ RSpec.describe "allocation_staff/index", type: :view do
   end
 
   context "when parole eligibility(TED)" do
-    let(:offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :determinate, tariffDate: Time.zone.today.to_s)) }
+    let(:api_offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :determinate, tariffDate: Time.zone.today.to_s)) }
 
     it "displays an parole eligibility case type badge and determinate badge" do
       assert_you_have_a_parole_eligibility_badge
@@ -65,11 +67,9 @@ RSpec.describe "allocation_staff/index", type: :view do
 
   context "when there is a parole review date" do
     let(:offender_no) { 'G7514GW' }
-    let(:case_information) { build(:case_information,  nomis_offender_id: offender_no, parole_review_date: Date.new(2019, 0o1, 3).to_s) }
-    let(:offender) {
-      offender = build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate), offenderNo: offender_no)
-      offender.load_case_information(case_information)
-      offender
+    let(:case_info) { build(:case_information,  offender: build(:offender, nomis_offender_id: offender_no), parole_review_date: Date.new(2019, 0o1, 3).to_s) }
+    let(:api_offender) {
+      build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate), offenderNo: offender_no)
     }
 
     it "displays an parole eligibility case type badge" do
@@ -81,12 +81,10 @@ RSpec.describe "allocation_staff/index", type: :view do
 
   context 'when parole eligibility (both TED and PRD) and parole review date are nil' do
     let(:offender_no) { 'G7514GW' }
-    let(:case_information) { build(:case_information,  nomis_offender_id: offender_no) }
-    let(:offender) {
-      offender = build(:hmpps_api_offender, offenderNo: offender_no,
+    let(:case_info) { build(:case_information, offender: build(:offender, nomis_offender_id: offender_no)) }
+    let(:api_offender) {
+      build(:hmpps_api_offender, offenderNo: offender_no,
        sentence: build(:sentence_detail, :indeterminate, tariffDate: nil))
-      offender.load_case_information(case_information)
-      offender
     }
 
     it 'does not display the badge' do
@@ -99,7 +97,7 @@ RSpec.describe "allocation_staff/index", type: :view do
   end
 
   context "when indeterminate, a recall case and parole eligibility(PED)" do
-    let(:offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate_recall, paroleEligibilityDate: Time.zone.today.to_s)) }
+    let(:api_offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate_recall, paroleEligibilityDate: Time.zone.today.to_s)) }
 
     it "displays an indeterminate, parole eligibility and recall case type badges" do
       assert_you_have_an_indeterminate_badge
@@ -109,7 +107,7 @@ RSpec.describe "allocation_staff/index", type: :view do
   end
 
   context "when determinate, a recall case and parole eligibility(PED)" do
-    let(:offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :determinate_recall, paroleEligibilityDate: Time.zone.today)) }
+    let(:api_offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :determinate_recall, paroleEligibilityDate: Time.zone.today)) }
 
     it "displays an determinate, parole eligibility and recall case type badges" do
       assert_you_have_a_determinate_badge

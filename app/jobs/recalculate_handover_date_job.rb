@@ -34,12 +34,12 @@ private
         # create the history first so that the validations will help with hard failures due to coding errors
         # rather than waiting for the mailer to object
         case_info.email_histories.create! prison: offender.prison_id,
-                                          name: case_info.ldu.name,
-                                          email: case_info.ldu.email_address,
+                                          name: case_info.ldu_name,
+                                          email: case_info.ldu_email_address,
                                           event: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION
         # This is queued so that soft failures don't kill the whole job
         CommunityMailer.assign_com_less_than_10_months(
-          email: case_info.ldu.email_address,
+          email: case_info.ldu_email_address,
           crn_number: case_info.crn,
           prison_name: PrisonService.name_for(offender.prison_id),
           prisoner_name: "#{offender.first_name} #{offender.last_name}",

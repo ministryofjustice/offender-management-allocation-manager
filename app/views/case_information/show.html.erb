@@ -17,8 +17,8 @@
 <h1 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-4">Case information</h1>
 
 <p class="govuk-!-margin-bottom-8">
-  <% if @prisoner.has_case_information? %>
-    Case information last updated from nDelius: <%= format_date(@prisoner.updated_at) %>
+  <% if @prisoner.probation_record.present? %>
+    Case information last updated from nDelius: <%= format_date(@prisoner.probation_record.updated_at) %>
   <% end %>
   Next scheduled update: <%= format_date(Date.tomorrow) %>
 </p>
@@ -48,19 +48,19 @@
       <tr class="govuk-table__row">
         <td class="govuk-table__cell govuk-!-width-one-half">CRN number</td>
         <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half" id="offender_crn">
-          <%= @prisoner.crn %>
+          <%= probation_field(@prisoner, :crn) %>
         </td>
       </tr>
       <tr class="govuk-table__row">
         <td class="govuk-table__cell govuk-!-width-one-half">Service provider</td>
         <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-          <%= service_provider_label(@prisoner.case_allocation) || 'Not found' %>
+          <%= service_provider_label(probation_field(@prisoner, :case_allocation)) || 'Not found' %>
         </td>
       </tr>
       <tr class="govuk-table__row">
         <td class="govuk-table__cell govuk-!-width-one-half">Tier calculation</td>
         <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-          <%= @prisoner.tier || 'Not found' %>
+          <%= probation_field(@prisoner, :tier) || 'Not found' %>
         </td>
       </tr>
     </tbody>
@@ -74,11 +74,11 @@
       </tr>
       <tr class="govuk-table__row">
         <td class="govuk-table__cell govuk-!-width-one-half">Local Divisional Unit (LDU)</td>
-        <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half"><%= @prisoner.ldu_name %></td>
+        <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half"><%= probation_field(@prisoner, :ldu_name) %></td>
       </tr>
       <tr class="govuk-table__row">
         <td class="govuk-table__cell govuk-!-width-one-half">Team</td>
-        <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half"><%= @prisoner.team_name %></td>
+        <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half"><%= probation_field(@prisoner, :team_name) %></td>
       </tr>
     </tbody>
   </table>

@@ -5,7 +5,7 @@ require 'rails_helper'
 feature 'delius import scenarios', :disable_push_to_delius do
   let(:ldu) {  create(:local_delivery_unit) }
   let(:test_strategy) { Flipflop::FeatureSet.current.test! }
-  let(:prison) { create(:prison).code }
+  let(:prison_code) { create(:prison).code }
 
   before do
     test_strategy.switch!(:auto_delius_import, true)
@@ -16,7 +16,7 @@ feature 'delius import scenarios', :disable_push_to_delius do
   end
 
   before do
-    signin_spo_user([prison])
+    signin_spo_user([prison_code])
     stub_auth_token
     stub_user(staff_id: 123456)
   end
@@ -33,7 +33,7 @@ feature 'delius import scenarios', :disable_push_to_delius do
                                       offenderManagers: [build(:community_offender_manager,
                                                                team: { code: 'XYX', localDeliveryUnit: { code: ldu.code } })]))
 
-        stub_offender(build(:nomis_offender, offenderNo: offender_no))
+        stub_offender(build(:nomis_offender, agencyId: prison_code, offenderNo: offender_no))
       end
 
       before do
@@ -41,7 +41,7 @@ feature 'delius import scenarios', :disable_push_to_delius do
       end
 
       it 'displays without error messages' do
-        visit prison_case_information_path(prison, offender_no)
+        visit prison_case_information_path(prison_code, offender_no)
         expect(page).not_to have_css('.govuk-error-summary')
         within '#offender_crn' do
           expect(page).to have_content crn
@@ -51,7 +51,7 @@ feature 'delius import scenarios', :disable_push_to_delius do
 
     context 'without tier' do
       let(:offender_no) { 'G2911GD' }
-      let(:offender) { build(:nomis_offender, offenderNo: offender_no) }
+      let(:offender) { build(:nomis_offender, agencyId: prison_code, offenderNo: offender_no) }
 
       before do
         stub_community_offender(offender_no, build(:community_data,
@@ -59,7 +59,7 @@ feature 'delius import scenarios', :disable_push_to_delius do
                                                    offenderManagers: [build(:community_offender_manager,
                                                                             team: { code: 'XYX', localDeliveryUnit: { code: ldu.code } })]))
 
-        stub_offenders_for_prison(prison, [offender])
+        stub_offenders_for_prison(prison_code, [offender])
       end
 
       before do
@@ -67,7 +67,7 @@ feature 'delius import scenarios', :disable_push_to_delius do
       end
 
       it 'displays the correct error message' do
-        visit missing_information_prison_prisoners_path(prison)
+        visit missing_information_prison_prisoners_path(prison_code)
         within "#edit_#{offender_no}" do
           click_link 'Update'
         end

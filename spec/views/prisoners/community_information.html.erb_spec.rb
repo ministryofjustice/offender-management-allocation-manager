@@ -2,15 +2,16 @@ require 'rails_helper'
 
 RSpec.describe "prisoners/community_information", type: :view do
   let(:page) { Nokogiri::HTML(rendered) }
+  let(:prison) { build(:prison) }
 
   let(:case_info) { build(:case_information) }
 
-  let(:offender) {
+  let(:api_offender) {
     build(:hmpps_api_offender).tap { |o|
-      o.load_case_information(case_info)
       o.sentence = build(:sentence_detail, :inside_handover_window)
     }
   }
+  let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
   before do
     assign(:prisoner, offender)

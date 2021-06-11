@@ -3,11 +3,12 @@ require 'rails_helper'
 RSpec.describe "shared/offence_info", type: :view do
   let(:page) { Nokogiri::HTML(rendered) }
   let(:prison) { build(:prison) }
-  let(:offender) {
+  let(:api_offender) {
     build(:hmpps_api_offender,
           prison_id: prison.code,
             sentence: build(:sentence_detail, :indeterminate, tariffDate: ted, paroleEligibilityDate: ped))
   }
+  let(:offender) { build(:mpc_offender, prison: prison, prison_record: api_offender, offender: build(:offender)) }
 
   before do
     assign(:prison, prison)

@@ -151,12 +151,12 @@ RSpec.describe EarlyAllocation, type: :model do
   end
 
   describe '#early_allocation?' do
-    let(:offender) {
+    let(:prison) { build(:prison) }
+    let(:api_offender) {
       build(:hmpps_api_offender,
-            sentence: build(:sentence_detail, sentenceStartDate: Time.zone.today - 1.week)).tap { |offender|
-        offender.load_case_information(case_info)
-      }
+            sentence: build(:sentence_detail, sentenceStartDate: Time.zone.today - 1.week))
     }
+    let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
     let(:case_info) {
       create(:case_information,

@@ -1,6 +1,6 @@
 <%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
 
-<h1 class="govuk-heading-l"><%= @prisoner.full_name %></h1>
+<h1 class="govuk-heading-l"><%= full_name @prisoner %></h1>
 
 <!-- @history is forward-sorted - having converted to a hash key -> list we need to convert back to a list, reverse and also reverse the list itself  -->
 <% prison_episodes(@timeline, @history).each do |episode, case_histories| %>

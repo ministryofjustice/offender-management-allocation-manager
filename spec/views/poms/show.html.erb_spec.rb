@@ -46,13 +46,14 @@ RSpec.describe "poms/show", type: :view do
                updated_at: Time.zone.today - 8.days, primary_pom_allocated_at: Time.zone.today - 8.days)
       ]
     }
+    let(:api_one) { build(:hmpps_api_offender, sentence: build(:sentence_detail, releaseDate: Time.zone.today + 2.weeks)) }
+    let(:api_two) { build(:hmpps_api_offender, sentence: build(:sentence_detail, releaseDate: Time.zone.today + 5.weeks)) }
+    let(:api_three) { build(:hmpps_api_offender, sentence: build(:sentence_detail, releaseDate: Time.zone.today + 8.weeks)) }
+    let(:api_four) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate)) }
     let(:offenders) {
-      [
-        build(:hmpps_api_offender, sentence: build(:sentence_detail, releaseDate: Time.zone.today + 2.weeks)),
-        build(:hmpps_api_offender, sentence: build(:sentence_detail, releaseDate: Time.zone.today + 5.weeks)),
-        build(:hmpps_api_offender, sentence: build(:sentence_detail, releaseDate: Time.zone.today + 8.weeks)),
-        build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate))
-      ].map { |offender| offender.tap { |o| o.load_case_information(build(:case_information)) } }
+      [api_one, api_two, api_three, api_four].map { |api_offender|
+        build(:mpc_offender, prison_record: api_offender, offender: build(:case_information).offender, prison: prison)
+      }
     }
     let(:tabname) { 'overview' }
 
@@ -75,7 +76,8 @@ RSpec.describe "poms/show", type: :view do
 
   context 'when on the caseload tab' do
     let(:case_info) { create(:case_information) }
-    let(:offender) { build(:hmpps_api_offender, offenderNo: case_info.nomis_offender_id).tap { |o| o.load_case_information(case_info) } }
+    let(:api_offender) { build(:hmpps_api_offender, offenderNo: case_info.nomis_offender_id) }
+    let(:offender) { build(:mpc_offender, prison_record: api_offender, offender: case_info.offender, prison: prison) }
     let(:allocations) { [build(:allocation_history, nomis_offender_id: case_info.nomis_offender_id)] }
 
     let(:first_offender_row) {

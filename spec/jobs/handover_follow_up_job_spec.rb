@@ -2,22 +2,20 @@ require 'rails_helper'
 
 RSpec.describe HandoverFollowUpJob, type: :job do
   shared_context 'with expected behaviour' do
-    let(:offender) do
-      build_offender(Time.zone.today + 8.months,
-                     sentence_type: :determinate,
-                     ard_crd_release: Time.zone.today + 8.months,
-                     ted: nil)
+    let(:offender) { build(:mpc_offender, prison: active_prison, offender: case_info.offender, prison_record: api_offender) }
+    let(:api_offender) do
+      build_api_offender(Time.zone.today + 8.months,
+                         sentence_type: :determinate,
+                         ard_crd_release: Time.zone.today + 8.months,
+                         ted: nil)
     end
 
-    let(:offender_no) { offender.offender_no }
+    let(:offender_no) { api_offender.offender_no }
 
     let(:pom) { build(:pom) }
 
     # This prison is active because we give it an allocation in the `before` test setup block
     let(:active_prison) { create(:prison) }
-
-    # This prison is inactive because we don't give it any allocations
-    let(:inactive_prison) { create(:prison) }
 
     let(:case_info) { build(:case_information, offender: build(:offender, nomis_offender_id: offender_no)) }
 
@@ -37,7 +35,6 @@ RSpec.describe HandoverFollowUpJob, type: :job do
       allow_any_instance_of(Prison).to receive(:get_single_pom).and_return(pom)
 
       allow(OffenderService).to receive(:get_offender).and_return(offender)
-      offender.load_case_information(case_info) unless offender.nil?
 
       # Create an unrelated allocation so that active_prison counts as active
       create(:allocation_history, prison: active_prison.code)
@@ -61,27 +58,9 @@ RSpec.describe HandoverFollowUpJob, type: :job do
     end
 
     context 'when the offender exists in NOMIS' do
-      let(:today) { offender.handover_start_date + 1.week }
-
-      context 'when the offender is not in an active prison' do
-        let(:release_date) { Time.zone.today + 8.months }
-        let(:offender) {
-          build_offender(release_date,
-                         prison: inactive_prison,
-                         sentence_type: :determinate,
-                         ard_crd_release: release_date,
-                         ted: nil)
-        }
-
-        it 'does not send email' do
-          expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
-          described_class.perform_now(ldu)
-        end
-      end
-
       context 'when the offender is un-sentenced' do
-        let(:offender) {
-          build_offender(sentence_type: :determinate, ard_crd_release: nil, ted: nil)
+        let(:api_offender) {
+          build_api_offender(sentence_type: :determinate, ard_crd_release: nil, ted: nil)
         }
         let(:today) { Time.zone.today }
 
@@ -92,6 +71,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
       end
 
       context 'when the offender already has a COM allocated' do
+        let(:today) { offender.handover_start_date + 1.week }
         let(:case_info) {
           create(:case_information, :with_com,
                  offender: build(:offender, nomis_offender_id: offender_no))
@@ -104,11 +84,11 @@ RSpec.describe HandoverFollowUpJob, type: :job do
       end
 
       context 'when the offender does not have a handover_start_date' do
-        let(:offender) {
-          build_offender(Time.zone.today + 10.months,
-                         sentence_type: :indeterminate,
-                         ard_crd_release: nil,
-                         ted: nil)
+        let(:api_offender) {
+          build_api_offender(Time.zone.today + 10.months,
+                             sentence_type: :indeterminate,
+                             ard_crd_release: nil,
+                             ted: nil)
         }
         let(:today) { Time.zone.today }
 
@@ -203,7 +183,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
 
 private
 
-  def build_offender(release_date = nil, prison: nil, sentence_type:, ard_crd_release:, ted:)
+  def build_api_offender(release_date = nil, prison: nil, sentence_type:, ard_crd_release:, ted:)
     prison = prison || active_prison
     build(:hmpps_api_offender, latestLocationId: prison.code,
           sentence: build(:sentence_detail,

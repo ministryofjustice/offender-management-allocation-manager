@@ -7,7 +7,7 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">POM role</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-        <%= pom_responsibility_label(@prisoner) %>
+        <%= pom_responsibility_label(@prisoner) if @prisoner.probation_record.present? %>
       </td>
     </tr>
     <%= render 'allocation_info', allocation: @allocation if @allocation.present? %>

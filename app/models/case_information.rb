@@ -6,9 +6,10 @@ class CaseInformation < ApplicationRecord
   NPS = 'NPS'
   CRC = 'CRC'
 
-  belongs_to :offender, primary_key: :nomis_offender_id, foreign_key: :nomis_offender_id, inverse_of: :case_information
+  belongs_to :offender, foreign_key: :nomis_offender_id, inverse_of: :case_information
 
-  belongs_to :local_delivery_unit, optional: true
+  belongs_to :local_delivery_unit, -> { enabled }, optional: true, inverse_of: :case_information
+  delegate :name, :email_address, to: :local_delivery_unit, prefix: :ldu, allow_nil: true
 
   has_many :early_allocations,
            -> { order(created_at: :asc) },
@@ -43,15 +44,16 @@ class CaseInformation < ApplicationRecord
            inverse_of: :case_information,
            dependent: :destroy
 
-  def nps?
+  def nps_case?
     case_allocation == NPS
   end
 
-  # Only return the LDU if it's enabled
-  def ldu
-    if local_delivery_unit&.enabled?
-      local_delivery_unit
-    end
+  def welsh_offender
+    probation_service == 'Wales'
+  end
+
+  def delius_matched?
+    manual_entry == false
   end
 
   validates :manual_entry, inclusion: { in: [true, false], allow_nil: false }

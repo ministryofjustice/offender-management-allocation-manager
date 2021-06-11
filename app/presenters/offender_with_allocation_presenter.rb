@@ -4,7 +4,7 @@
 # despite the fact that this should be really easy in theory
 class OffenderWithAllocationPresenter
   delegate :offender_no, :full_name, :last_name, :earliest_release_date, :allocated_com_name,
-           :case_allocation, :date_of_birth, :tier,
+           :case_allocation, :date_of_birth, :tier, :probation_record,
            :handover_start_date, :responsibility_handover_date, to: :@offender
 
   def initialize(offender, allocation)

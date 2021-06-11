@@ -7,7 +7,7 @@ class PomDetail < ApplicationRecord
     message: 'Select number of days worked'
   }
 
-  belongs_to :prison, foreign_key: :prison_code, primary_key: :code, inverse_of: :pom_details
+  belongs_to :prison, foreign_key: :prison_code, inverse_of: :pom_details
 
   def allocations
     @allocations ||= begin

@@ -1,12 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe SearchHelper do
+  let(:prison) { build(:prison) }
+
   describe 'the CTA' do
     context 'with no allocation' do
+      let(:api_offender) { build(:hmpps_api_offender) }
       let(:offender) {
-        x = build(:hmpps_api_offender).tap { |o|
-          o.load_case_information(build(:case_information, tier: 'A'))
-        }
+        x = build(:mpc_offender, prison: prison, offender: build(:case_information, tier: 'A').offender, prison_record: api_offender)
         OffenderWithAllocationPresenter.new(x, nil)
       }
       let(:expected_link) {
@@ -20,10 +21,9 @@ RSpec.describe SearchHelper do
 
     context 'with an allocation' do
       let(:case_info) { build(:case_information, tier: 'A') }
+      let(:api_offender) { build(:hmpps_api_offender) }
       let(:offender) {
-        x = build(:hmpps_api_offender, offenderNo: case_info.nomis_offender_id).tap { |o|
-          o.load_case_information(case_info)
-        }
+        x = build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender)
         OffenderWithAllocationPresenter.new(x, build(:allocation_history))
       }
 

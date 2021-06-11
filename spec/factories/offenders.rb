@@ -40,4 +40,11 @@ FactoryBot.define do
   factory :offender do
     nomis_offender_id
   end
+
+  factory :mpc_offender do
+    initialize_with { MpcOffender.new(prison: attributes.fetch(:prison),
+                                      offender: attributes.fetch(:offender),
+                                      prison_record: attributes.fetch(:prison_record)) }
+
+  end
 end

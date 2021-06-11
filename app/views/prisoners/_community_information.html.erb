@@ -7,13 +7,13 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Local divisional unit (LDU)</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= @prisoner.ldu_name || "Unknown"%>
+        <%= probation_field(@prisoner, :ldu_name) || "Unknown" %>
       </td>
     </tr>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Local divisional unit (LDU) email address</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <% if @prisoner.ldu_email_address.present? %>
+        <% if probation_field(@prisoner, :ldu_email_address).present? %>
           <%= mail_to(@prisoner.ldu_email_address, @prisoner.ldu_email_address) %>
         <% else %>
           Unknown
@@ -23,7 +23,7 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">Team</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= @prisoner.team_name.presence || "Unknown"%>
+        <%= probation_field(@prisoner, :team_name) || "Unknown"%>
       </td>
     </tr>
     <tr class="govuk-table__row ">
@@ -31,7 +31,7 @@
         Community Offender Manager (COM) name
       </td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half <%= 'govuk-table__cell-error-value' if @prisoner.needs_a_com? %>">
-        <%= @prisoner.allocated_com_name.presence || "Unknown" %>
+        <%= probation_field(@prisoner, :allocated_com_name) || "Unknown" %>
       </td>
     </tr>
   </tbody>

@@ -10,14 +10,6 @@ module HmppsApi
       (Time.zone.today - prison_arrival_date).to_i
     end
 
-    def case_owner
-      if pom_responsible?
-        'Custody'
-      else
-        'Community'
-      end
-    end
-
     delegate :home_detention_curfew_eligibility_date,
              :home_detention_curfew_actual_date,
              :conditional_release_date, :release_date,
@@ -26,10 +18,6 @@ module HmppsApi
              :post_recall_release_date, :earliest_release_date,
              :indeterminate_sentence?, :immigration_case?, :civil_sentence?, :describe_sentence,
              to: :sentence
-
-    delegate :tier, :case_allocation, :crn, :mappa_level, :manual_entry?,
-             :parole_review_date, :victim_liaison_officers, :updated_at, :team_name,
-             to: :@case_information, allow_nil: true
 
     delegate :code, :label, :active_since, to: :@category, prefix: :category, allow_nil: true
 
@@ -57,16 +45,6 @@ module HmppsApi
 
       @booking_id = booking_id
       @prison_id = prison_id
-    end
-
-    def load_case_information(record)
-      return if record.blank?
-
-      # Hold on to the CaseInformation record so we can reference it later
-      @case_information = record
-
-      # This is separate from @case_information so the rest of this class doesn't need to know about the Active Record association
-      @responsibility_override = record.responsibility
     end
 
     def load_main_offence
@@ -105,87 +83,12 @@ module HmppsApi
         sentence.indeterminate_sentence?
     end
 
-    def early_allocation?
-      return false if @case_information.blank?
-
-      latest_early_allocation.present?
-    end
-
-    def needs_early_allocation_notify?
-      has_case_information? && within_early_allocation_window? && @case_information.early_allocations.suitable_offenders_pre_referral_window.any?
-    end
-
-    # Has a CaseInformation record been loaded for this offender?
-    def has_case_information?
-      @case_information.present?
-    end
-
-    def nps_case?
-      @case_information&.nps?
-    end
-
-    def welsh_offender
-      return nil if @case_information.blank?
-
-      @case_information.probation_service == 'Wales'
-    end
-
-    def ldu_name
-      ldu&.name
-    end
-
-    def ldu_email_address
-      ldu&.email_address
-    end
-
-    def delius_matched?
-      @case_information&.manual_entry == false
-    end
-
-    def allocated_com_name
-      @case_information&.com_name
-    end
-
     def recalled?
       @sentence.recall
     end
 
     def over_18?
       age >= 18
-    end
-
-    def pom_responsible?
-      if @responsibility_override.nil?
-        HandoverDateService.handover(self).custody_responsible?
-      else
-        @responsibility_override.value == Responsibility::PRISON
-      end
-    end
-
-    def pom_supporting?
-      if @responsibility_override.nil?
-        HandoverDateService.handover(self).custody_supporting?
-      else
-        @responsibility_override.value == Responsibility::PROBATION
-      end
-    end
-
-    def com_responsible?
-      if @responsibility_override.nil?
-        HandoverDateService.handover(self).community_responsible?
-      else
-        @responsibility_override.value == Responsibility::PROBATION
-      end
-    end
-
-    def com_supporting?
-      if @responsibility_override.nil?
-        HandoverDateService.handover(self).community_supporting?
-      else
-        # Overrides to prison aren't actually possible in the UI
-        # If they were, we'd somehow need to decide whether COM is supporting or not involved
-        @responsibility_override.value == Responsibility::PRISON
-      end
     end
 
     def sentence_start_date
@@ -200,70 +103,10 @@ module HmppsApi
       "#{first_name} #{last_name}".titleize
     end
 
-    def responsibility_override?
-      @responsibility_override.present?
-    end
-
-    def handover_start_date
-      handover.start_date
-    end
-
-    def handover_reason
-      handover.reason_text
-    end
-
-    def responsibility_handover_date
-      handover.handover_date
-    end
-
-    def approaching_handover?
-      # we can't calculate handover without case info as we don't know NPS/CRC
-      return false if @case_information.blank?
-
-      today = Time.zone.today
-      thirty_days_time = today + 30.days
-
-      start_date = handover_start_date
-      handover_date = responsibility_handover_date
-
-      return false if start_date.nil?
-
-      if start_date.future?
-        start_date.between?(today, thirty_days_time)
-      else
-        today.between?(start_date, handover_date)
-      end
-    end
-
-    def within_early_allocation_window?
-      earliest_date = [
-          tariff_date,
-          parole_eligibility_date,
-          parole_review_date,
-          automatic_release_date,
-          conditional_release_date
-      ].compact.min
-      earliest_date.present? && earliest_date <= Time.zone.today + 18.months
-    end
-
-    def needs_a_com?
-      (com_responsible? || com_supporting?) &&
-        allocated_com_name.blank?
-    end
-
     def inside_omic_policy?
       over_18? &&
         (sentenced? || immigration_case?) &&
         criminal_sentence? && convicted?
-    end
-
-    def latest_early_allocation
-      allocation = early_allocations&.last
-      allocation if allocation.present? && allocation.created_within_referral_window? && (allocation.eligible? || allocation.community_decision?)
-    end
-
-    def early_allocations
-      @case_information.early_allocations.where('created_at::date >= ?', sentence_start_date) unless @case_information.nil?
     end
 
   private
@@ -286,18 +129,6 @@ module HmppsApi
 
     def criminal_sentence?
       @sentence.criminal_sentence?
-    end
-
-    def ldu
-      @case_information&.ldu
-    end
-
-    def handover
-      @handover ||= if pom_responsible?
-                      HandoverDateService.handover(self)
-                    else
-                      HandoverDateService::NO_HANDOVER_DATE
-                    end
     end
   end
 end
