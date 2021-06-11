@@ -123,3 +123,17 @@ end
 # The en-GB locale gives us UK counties (used by the LocalDeliveryUnit factory)
 # See all the things we gain here: https://github.com/faker-ruby/faker/blob/master/lib/locales/en-GB.yml
 Faker::Config.locale = 'en-GB'
+
+# Define a global sequence for generating NOMIS Offender IDs
+# NOMIS offender IDs follow the format: <letter><4 numbers><2 letters> (all uppercase)
+FactoryBot.define do
+  sequence :nomis_offender_id do |seq|
+    index = seq - 1 # because seq starts at 1, not 0
+    number = "%04d" % (index / 26) # zero-pad to 4 digits, e.g. 0001
+    letter = ('A'..'Z').to_a[index % 26]
+
+    # Start with "T" to indicate that this is a "test" offender ID
+    # In the real world, offender IDs don't begin with "T"
+    "T#{number}A#{letter}"
+  end
+end

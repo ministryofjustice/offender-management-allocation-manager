@@ -83,15 +83,15 @@ FactoryBot.define do
   end
 
   factory :early_allocation_eligible_form do
-    nomis_offender_id { 'T9999FC' }
+    nomis_offender_id
   end
 
   factory :early_allocation_date_form do
-    nomis_offender_id { 'T9999FC' }
+    nomis_offender_id
   end
 
   factory :early_allocation_discretionary_form do
-    nomis_offender_id { 'T9999FC' }
+    nomis_offender_id
 
     oasys_risk_assessment_date { Time.zone.today - 2.months }
     convicted_under_terrorisom_act_2000 { false }
