@@ -20,9 +20,7 @@ FactoryBot.define do
       AllocationHistory::USER
     end
 
-    nomis_offender_id do
-      Faker::Alphanumeric.alpha(number: 10)
-    end
+    nomis_offender_id
 
     primary_pom_nomis_id do
       485_926

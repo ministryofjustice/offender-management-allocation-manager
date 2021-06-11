@@ -6,12 +6,7 @@ FactoryBot.define do
       'LEI'
     end
 
-    sequence(:nomis_offender_id) do |seq|
-      number = seq / 26 + 1000
-      letter = ('A'..'Z').to_a[seq % 26]
-      # This and the offender should produce different values to avoid clashes
-      "T#{number}C#{letter}"
-    end
+    nomis_offender_id
 
     name do
       # The last name is titleized after it's received from the API, e.g. "McDonald" becomes "Mcdonald"
