@@ -22,6 +22,7 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
         to_return(body: { 'firstName' => 'bill' }.to_json)
       stub_pom_emails(user.staffId, [])
 
+      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
       create(:allocation_history, prison: prison,
              nomis_offender_id: offender_no,
              primary_pom_nomis_id: primary_pom.staffId,

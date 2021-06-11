@@ -45,25 +45,32 @@ RSpec.describe HandoversController, type: :controller do
         stub_movements
       end
 
-      describe 'sorting', :allocation do
+      describe 'with sorting' do
         before do
           create(:case_information, :with_com, case_allocation: 'CRC', offender: build(:offender, nomis_offender_id: 'G1234VV'))
-          create(:allocation_history, nomis_offender_id: 'G1234VV', primary_pom_nomis_id: pom.staffId)
+          create(:allocation_history, prison: prison, nomis_offender_id: 'G1234VV', primary_pom_nomis_id: pom.staffId)
           stub_pom(pom)
+
+          get :index, params: { prison_id: prison, sort: sort }
+          expect(response).to be_successful
         end
 
         let(:pom) { build(:pom) }
 
-        it 'sorts by COM' do
-          get :index, params: { prison_id: prison, sort: 'allocated_com_name asc' }
-          expect(response).to be_successful
-          expect(assigns(:offenders).map(&:offender_no)).to eq(["G4234GG", 'G1234VV'])
+        context 'when sorting by COM' do
+          let(:sort) { 'allocated_com_name asc' }
+
+          it 'sorts' do
+            expect(assigns(:offenders).map(&:offender_no)).to eq(["G4234GG", 'G1234VV'])
+          end
         end
 
-        it 'sorts by POM' do
-          get :index, params: { prison_id: prison, sort: 'allocated_pom_name asc' }
-          expect(response).to be_successful
-          expect(assigns(:offenders).map(&:offender_no)).to eq(['G1234VV', "G4234GG"])
+        context 'when sorting by POM' do
+          let(:sort) { 'allocated_pom_name desc' }
+
+          it 'sorts' do
+            expect(assigns(:offenders).map(&:offender_no)).to eq(['G1234VV', "G4234GG"])
+          end
         end
       end
 

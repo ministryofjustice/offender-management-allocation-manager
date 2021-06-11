@@ -52,7 +52,7 @@ describe 'Allocation API', vcr: { cassette_name: 'prison_api/allocation_api' } d
                },
                required: %w[primary_pom secondary_pom]
 
-        let(:offender_no) { 'G4273GI' }
+        let(:offender_no) { 'G7266VD' }
         let!(:allocation) {
           create(:allocation_history, nomis_offender_id: offender_no, primary_pom_name: 'OLD_NAME, MOIC')
         }
