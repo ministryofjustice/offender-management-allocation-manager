@@ -16,8 +16,8 @@ FactoryBot.define do
 
     # 1 day after policy start in Wales
     sentenceStartDate { '2019-02-05' }
-    releaseDate { "2021-01-28" }
-    conditionalReleaseDate { "2022-01-28" }
+    releaseDate { Time.zone.today + 2.years }
+    conditionalReleaseDate { Time.zone.today + 1.year }
 
     trait :blank do
       sentenceStartDate { nil }

@@ -37,7 +37,7 @@ RSpec.describe Prison, type: :model do
   end
 
   describe '#unfiltered_offenders' do
-    subject { described_class.find_by!(code: 'LEI').unfiltered_offenders }
+    subject { described_class.new(code: 'LEI').unfiltered_offenders }
 
     it "get first page of offenders for a specific prison",
        vcr: { cassette_name: 'prison_api/offender_service_offenders_by_prison_first_page_spec' } do
