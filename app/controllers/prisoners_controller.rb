@@ -34,7 +34,7 @@ class PrisonersController < PrisonsApplicationController
   def show
     @prisoner = OffenderService.get_offender(params[:id])
     @tasks = PomTasks.new.for_offender(@prisoner)
-    @allocation = Allocation.find_by(nomis_offender_id: @prisoner.offender_no)
+    @allocation = AllocationHistory.find_by(nomis_offender_id: @prisoner.offender_no)
 
     if @allocation.present?
       @primary_pom_name = PrisonOffenderManagerService.fetch_pom_name(@allocation.primary_pom_nomis_id).

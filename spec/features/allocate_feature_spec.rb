@@ -143,7 +143,7 @@ feature 'Allocation' do
 
   scenario 're-allocating', vcr: { cassette_name: 'prison_api/re_allocate_feature' } do
     create(
-      :allocation,
+      :allocation_history,
       nomis_offender_id: nomis_offender_id,
       primary_pom_nomis_id: 485_735,
       recommended_pom_type: 'probation'
@@ -173,7 +173,7 @@ feature 'Allocation' do
 
     click_button 'Complete allocation'
 
-    expect(Allocation.find_by(nomis_offender_id: nomis_offender_id).event).to eq("reallocate_primary_pom")
+    expect(AllocationHistory.find_by(nomis_offender_id: nomis_offender_id).event).to eq("reallocate_primary_pom")
   end
 
   scenario 'allocation fails', vcr: { cassette_name: 'prison_api/allocation_fails_feature' } do

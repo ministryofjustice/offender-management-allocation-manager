@@ -7,7 +7,7 @@ class AutoEarlyAllocationEmailJob < ApplicationJob
 
   def perform(prison, offender_no, encoded_pdf)
     offender = OffenderService.get_offender(offender_no)
-    allocation = Allocation.find_by!(nomis_offender_id: offender_no)
+    allocation = AllocationHistory.find_by!(nomis_offender_id: offender_no)
     pom = prison.get_single_pom(allocation.primary_pom_nomis_id)
     pdf = Base64.decode64 encoded_pdf
     EarlyAllocationMailer.auto_early_allocation(email: offender.ldu_email_address,

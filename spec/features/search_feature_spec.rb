@@ -53,7 +53,7 @@ feature 'Search for offenders' do
   context 'with a single allocation' do
     before do
       create(:case_information, offender: build(:offender, nomis_offender_id: 'G5359UP'))
-      create(:allocation, nomis_offender_id: 'G5359UP')
+      create(:allocation_history, nomis_offender_id: 'G5359UP')
     end
 
     let(:prison_code) { 'LEI' }

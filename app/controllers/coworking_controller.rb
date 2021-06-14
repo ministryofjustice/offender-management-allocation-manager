@@ -3,7 +3,7 @@
 class CoworkingController < PrisonsApplicationController
   def new
     @prisoner = offender(nomis_offender_id_from_url)
-    current_pom_id = Allocation.find_by!(nomis_offender_id: nomis_offender_id_from_url).primary_pom_nomis_id
+    current_pom_id = AllocationHistory.find_by!(nomis_offender_id: nomis_offender_id_from_url).primary_pom_nomis_id
     poms = @prison.get_list_of_poms
     @current_pom = poms.detect { |pom| pom.staff_id == current_pom_id }
 
@@ -39,7 +39,7 @@ class CoworkingController < PrisonsApplicationController
   def confirm_removal
     @prisoner = offender(coworking_nomis_offender_id_from_url)
 
-    @allocation = Allocation.find_by!(
+    @allocation = AllocationHistory.find_by!(
       nomis_offender_id: coworking_nomis_offender_id_from_url
     )
     @primary_pom = @prison.get_single_pom(@allocation.primary_pom_nomis_id
@@ -47,7 +47,7 @@ class CoworkingController < PrisonsApplicationController
   end
 
   def destroy
-    @allocation = Allocation.find_by!(
+    @allocation = AllocationHistory.find_by!(
       nomis_offender_id: nomis_offender_id_from_url
     )
 
@@ -56,8 +56,8 @@ class CoworkingController < PrisonsApplicationController
     @allocation.update!(
       secondary_pom_name: nil,
       secondary_pom_nomis_id: nil,
-      event: Allocation::DEALLOCATE_SECONDARY_POM,
-      event_trigger: Allocation::USER
+      event: AllocationHistory::DEALLOCATE_SECONDARY_POM,
+      event_trigger: AllocationHistory::USER
     )
 
     # stop double-bounces from sending invalid emails.

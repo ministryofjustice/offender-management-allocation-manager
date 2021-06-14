@@ -178,8 +178,8 @@ RSpec.describe "allocations/history", type: :view do
       before do
         old_versions =
           [
-            build(:allocation, override_reasons: ["suitability"], suitability_detail: "Too high risk"),
-            build(:allocation, override_reasons: ["suitability"], event: Allocation::REALLOCATE_PRIMARY_POM, suitability_detail: "Continuity")
+            build(:allocation_history, override_reasons: ["suitability"], suitability_detail: "Too high risk"),
+            build(:allocation_history, override_reasons: ["suitability"], event: AllocationHistory::REALLOCATE_PRIMARY_POM, suitability_detail: "Continuity")
           ]
 
         assign(:history, [
@@ -201,9 +201,9 @@ RSpec.describe "allocations/history", type: :view do
       before do
         old_versions =
           [
-            build(:allocation, :primary, prison: prison_one),
-            build(:allocation, :transfer, prison: prison_one),
-            build(:allocation, :reallocation, :override, prison: prison_two)
+            build(:allocation_history, :primary, prison: prison_one),
+            build(:allocation_history, :transfer, prison: prison_one),
+            build(:allocation_history, :reallocation, :override, prison: prison_two)
           ]
 
         assign(:history, [
@@ -224,8 +224,8 @@ RSpec.describe "allocations/history", type: :view do
 
     context 'when a prisoner has been released' do
       before do
-        assign(:history, [build(:allocation, :primary),
-                          build(:allocation, :release)].
+        assign(:history, [build(:allocation_history, :primary),
+                          build(:allocation_history, :release)].
             map { |ah| CaseHistory.new(nil, ah, released_version) })
       end
 

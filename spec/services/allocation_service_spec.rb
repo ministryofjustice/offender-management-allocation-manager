@@ -18,7 +18,7 @@ describe AllocationService do
     let(:message) { 'Additional text' }
 
     let!(:allocation) {
-      create(:allocation,
+      create(:allocation_history,
              nomis_offender_id: nomis_offender_id,
              primary_pom_nomis_id: primary_pom_id,
              primary_pom_name: 'Pom, Moic')
@@ -90,20 +90,20 @@ describe AllocationService do
           primary_pom_nomis_id: 485_833,
           primary_pom_allocated_at: DateTime.now.utc,
           recommended_pom_type: 'probation',
-          event: Allocation::ALLOCATE_PRIMARY_POM,
-          event_trigger: Allocation::USER,
+          event: AllocationHistory::ALLOCATE_PRIMARY_POM,
+          event_trigger: AllocationHistory::USER,
           created_by_username: 'MOIC_POM'
         }
 
         expect {
           described_class.create_or_update(params)
-        }.to change(Allocation, :count).by(1)
+        }.to change(AllocationHistory, :count).by(1)
       end
     end
 
     context 'when one already exists' do
       before do
-        create(:allocation, nomis_offender_id: nomis_offender_id)
+        create(:allocation_history, nomis_offender_id: nomis_offender_id)
       end
 
       it 'can update a record and store a version', vcr: { cassette_name: 'prison_api/allocation_service_update_allocation_spec' } do
@@ -111,15 +111,15 @@ describe AllocationService do
           nomis_offender_id: nomis_offender_id,
           allocated_at_tier: 'B',
           primary_pom_nomis_id: 485_926,
-          event: Allocation::REALLOCATE_PRIMARY_POM,
+          event: AllocationHistory::REALLOCATE_PRIMARY_POM,
           created_by_username: 'MOIC_POM'
         }
 
         expect {
           expect {
             described_class.create_or_update(update_params)
-          }.not_to change(Allocation, :count)
-        }.to change { Allocation.find_by(nomis_offender_id: nomis_offender_id).versions.count }.by(1)
+          }.not_to change(AllocationHistory, :count)
+        }.to change { AllocationHistory.find_by(nomis_offender_id: nomis_offender_id).versions.count }.by(1)
       end
     end
   end
@@ -131,21 +131,21 @@ describe AllocationService do
       secondary_pom_nomis_id = 485_833
 
       allocation = create(
-        :allocation,
+        :allocation_history,
         nomis_offender_id: nomis_offender_id,
         primary_pom_nomis_id: previous_primary_pom_nomis_id)
 
       allocation.update!(
         primary_pom_nomis_id: updated_primary_pom_nomis_id,
-        event: Allocation::REALLOCATE_PRIMARY_POM
+        event: AllocationHistory::REALLOCATE_PRIMARY_POM
       )
 
       allocation.update!(
         secondary_pom_nomis_id: secondary_pom_nomis_id,
-        event: Allocation::ALLOCATE_SECONDARY_POM
+        event: AllocationHistory::ALLOCATE_SECONDARY_POM
       )
 
-      alloc = Allocation.find_by!(nomis_offender_id: nomis_offender_id)
+      alloc = AllocationHistory.find_by!(nomis_offender_id: nomis_offender_id)
       emails = described_class.allocation_history_pom_emails(alloc)
 
       expect(emails.count).to eq(3)

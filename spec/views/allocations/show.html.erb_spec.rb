@@ -4,13 +4,17 @@ require 'rails_helper'
 
 RSpec.describe "allocations/show", type: :view do
   let(:page) { Nokogiri::HTML(rendered) }
-  let(:offender) { build(:hmpps_api_offender) }
+  let(:next_year) { (Time.zone.today + 1.year).year }
+  let(:offender) {
+    build(:hmpps_api_offender,
+          sentence: build(:sentence_detail, conditionalReleaseDate: Date.new(next_year + 1, 1, 28)))
+  }
 
   before do
     assign(:prison, create(:prison))
     assign(:pom, build(:pom))
     assign(:prisoner, offender)
-    assign(:allocation, create(:allocation))
+    assign(:allocation, create(:allocation_history))
     assign(:keyworker, build(:keyworker))
     assign(:case_info, build(:case_information))
     render
@@ -18,10 +22,10 @@ RSpec.describe "allocations/show", type: :view do
 
   it 'shows handover dates' do
     expect(page.css('#handover-start-date-row')).to have_text('Handover start date')
-    expect(page.css('#handover-start-date-row')).to have_text('05/11/2021')
+    expect(page.css('#handover-start-date-row')).to have_text("05/11/#{next_year}")
 
     expect(page.css('#responsibility-handover-date-row')).to have_text('Responsibility handover')
-    expect(page.css('#responsibility-handover-date-row')).to have_text('05/11/2021')
+    expect(page.css('#responsibility-handover-date-row')).to have_text("05/11/#{next_year}")
   end
 
   describe 'category label' do

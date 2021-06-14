@@ -16,13 +16,7 @@ FactoryBot.define do
       "#{block}-#{num}-#{numbers}"
     }
 
-    # offender numbers are of the form <letter><4 numbers><2 letters>
-    sequence(:offenderNo) do |seq|
-      number = seq / 26 + 1000
-      letter = ('A'..'Z').to_a[seq % 26]
-      # This and case_information should produce different values to avoid clashes
-      "T#{number}O#{letter}"
-    end
+    offenderNo { generate :nomis_offender_id }
     convictedStatus { 'Convicted' }
     dateOfBirth { Date.new(1990, 12, 6).to_s }
     firstName { Faker::Name.first_name }
@@ -44,12 +38,6 @@ FactoryBot.define do
   end
 
   factory :offender do
-    # offender numbers are of the form <letter><4 numbers><2 letters>
-    sequence(:nomis_offender_id) do |seq|
-      number = seq / 26 + 1000
-      letter = ('A'..'Z').to_a[seq % 26]
-      # This and the offender should produce different values to avoid clashes
-      "P#{number}P#{letter}"
-    end
+    nomis_offender_id
   end
 end

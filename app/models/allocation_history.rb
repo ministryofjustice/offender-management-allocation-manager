@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-class Allocation < ApplicationRecord
+class AllocationHistory < ApplicationRecord
+  self.table_name = 'allocation_history'
+
   has_paper_trail
 
   ALLOCATE_PRIMARY_POM = 0
@@ -67,7 +69,7 @@ class Allocation < ApplicationRecord
   def self.without_ldu_emails
     blank_ldu_cases = CaseInformation.where(local_delivery_unit: nil)
     offenders = blank_ldu_cases.nps.pluck(:nomis_offender_id)
-    Allocation.where(nomis_offender_id: offenders)
+    AllocationHistory.where(nomis_offender_id: offenders)
   end
 
   def active?
@@ -121,11 +123,11 @@ class Allocation < ApplicationRecord
             :prison, presence: true
 
   def deallocate_offender_after_release
-    deallocate_offender event: Allocation::DEALLOCATE_RELEASED_OFFENDER, event_trigger: Allocation::OFFENDER_RELEASED if active?
+    deallocate_offender event: AllocationHistory::DEALLOCATE_RELEASED_OFFENDER, event_trigger: AllocationHistory::OFFENDER_RELEASED if active?
   end
 
   def dealloate_offender_after_transfer
-    deallocate_offender event: Allocation::DEALLOCATE_PRIMARY_POM, event_trigger: Allocation::OFFENDER_TRANSFERRED if active?
+    deallocate_offender event: AllocationHistory::DEALLOCATE_PRIMARY_POM, event_trigger: AllocationHistory::OFFENDER_TRANSFERRED if active?
   end
 
   # check for changes in the last week where the target value

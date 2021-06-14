@@ -47,12 +47,12 @@ RSpec.describe ResponsibilitiesController, type: :controller do
 
     context 'with an allocation', :allocation do
       before do
-        create(:allocation, nomis_offender_id: responsibility.nomis_offender_id, primary_pom_nomis_id: pom.staffId)
+        create(:allocation_history, nomis_offender_id: responsibility.nomis_offender_id, primary_pom_nomis_id: pom.staffId)
         stub_poms(prison.code, [pom])
       end
 
       let(:pom) { build(:pom) }
-      let(:allocation) { Allocation.last }
+      let(:allocation) { AllocationHistory.last }
 
       it 'copies in the POM' do
         allow_any_instance_of(ResponsibilityMailer).to receive(:responsibility_to_custody_with_pom).with(

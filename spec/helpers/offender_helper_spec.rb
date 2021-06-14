@@ -13,7 +13,7 @@ RSpec.describe OffenderHelper do
 
     let!(:allocation) {
       create(
-        :allocation,
+        :allocation_history,
         nomis_offender_id: nomis_offender_id,
         primary_pom_nomis_id: nomis_staff_id,
         event: 'allocate_primary_pom'

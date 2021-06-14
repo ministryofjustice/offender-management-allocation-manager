@@ -22,7 +22,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
     let(:case_info) { build(:case_information, offender: build(:offender, nomis_offender_id: offender_no)) }
 
     let!(:allocation) {
-      create(:allocation,
+      create(:allocation_history,
              prison: active_prison.code,
              nomis_offender_id: offender_no,
              primary_pom_nomis_id: pom.staff_id,
@@ -40,7 +40,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
       offender.load_case_information(case_info) unless offender.nil?
 
       # Create an unrelated allocation so that active_prison counts as active
-      create(:allocation, prison: active_prison.code)
+      create(:allocation_history, prison: active_prison.code)
     end
 
     after do
@@ -146,7 +146,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
         let(:today) { offender.handover_start_date + 1.week }
 
         context 'when the offender does not have a POM allocated' do
-          let!(:allocation) { create(:allocation, :release, nomis_offender_id: offender_no) }
+          let!(:allocation) { create(:allocation_history, :release, nomis_offender_id: offender_no) }
 
           it 'emails the LDU' do
             expect_any_instance_of(CommunityMailer)

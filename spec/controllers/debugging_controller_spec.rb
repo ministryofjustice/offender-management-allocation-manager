@@ -30,7 +30,7 @@ RSpec.describe DebuggingController, type: :controller do
       create(:case_information, offender: build(:offender, nomis_offender_id: offenders.first.fetch(:offenderNo)))
 
       create(:case_information, offender: build(:offender, nomis_offender_id: offenders.second.fetch(:offenderNo)))
-      create(:allocation, prison: prison_id, nomis_offender_id: offenders.second.fetch(:offenderNo))
+      create(:allocation_history, prison: prison_id, nomis_offender_id: offenders.second.fetch(:offenderNo))
     end
 
     it 'can show debugging information for an entire prison' do
@@ -67,7 +67,7 @@ RSpec.describe DebuggingController, type: :controller do
                                         directionCode: "IN" }].to_json)
 
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
-      create(:allocation, nomis_offender_id: offender_no, primary_pom_nomis_id: pom_staff_id, primary_pom_name: primary_pom_name)
+      create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: pom_staff_id, primary_pom_name: primary_pom_name)
 
       get :debugging, params: { prison_id: prison_id, offender_no: offender_no }
 

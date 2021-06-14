@@ -14,7 +14,7 @@ feature 'Case history with complexity level' do
     stub_request(:get, "#{ApiHelper::T3}/users/user").
       to_return(body: { staffId: pom.staff_id, firstName: pom.first_name, lastName: pom.last_name }.to_json)
 
-    create(:allocation, prison: prison_code, nomis_offender_id: offender_no,
+    create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no,
            allocated_at_tier: case_info.tier,
            created_by_name: created_by_name,
            primary_pom_nomis_id: pom.staff_id, primary_pom_name: pom_name)

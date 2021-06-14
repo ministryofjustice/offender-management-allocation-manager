@@ -27,7 +27,7 @@ feature "view an offender's allocation information" do
     before do
       create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id_without_keyworker))
       create(
-        :allocation,
+        :allocation_history,
         nomis_offender_id: nomis_offender_id_without_keyworker,
         primary_pom_nomis_id: probation_officer_nomis_staff_id,
         prison: prison
@@ -54,7 +54,7 @@ feature "view an offender's allocation information" do
       before do
         create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), case_allocation: 'NPS', probation_service: 'England', tier: 'A')
         create(
-          :allocation,
+          :allocation_history,
           nomis_offender_id: offender_no,
           primary_pom_nomis_id: probation_officer_nomis_staff_id,
           prison: prison,
@@ -86,7 +86,7 @@ feature "view an offender's allocation information" do
       before do
         create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
         create(
-          :allocation,
+          :allocation_history,
           nomis_offender_id: offender_no,
           primary_pom_nomis_id: probation_officer_nomis_staff_id,
           prison: prison,
@@ -116,7 +116,7 @@ feature "view an offender's allocation information" do
     before do
       create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id_with_keyworker))
       create(
-        :allocation,
+        :allocation_history,
         nomis_offender_id: nomis_offender_id_with_keyworker,
         primary_pom_nomis_id: probation_officer_nomis_staff_id,
         prison: prison,
@@ -201,9 +201,9 @@ feature "view an offender's allocation information" do
       end
 
       it 'displays the name of the allocated co-worker', vcr: { cassette_name: 'prison_api/show_allocation_information_display_coworker_name' } do
-        allocation = Allocation.find_by(nomis_offender_id: nomis_offender_id_with_keyworker)
+        allocation = AllocationHistory.find_by(nomis_offender_id: nomis_offender_id_with_keyworker)
 
-        allocation.update!(event: Allocation::ALLOCATE_SECONDARY_POM,
+        allocation.update!(event: AllocationHistory::ALLOCATE_SECONDARY_POM,
                            secondary_pom_nomis_id: 485_926,
                            secondary_pom_name: "Pom, Moic")
 

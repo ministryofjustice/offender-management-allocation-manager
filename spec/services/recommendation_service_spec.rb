@@ -32,15 +32,15 @@ describe RecommendationService do
   end
 
   context 'when tier A immigration case' do
-    let(:tier_a_and_immigration_case) {
+    let(:immigration_case) {
       build(:hmpps_api_offender,
-            imprisonmentStatus: 'DET', sentence: build(:sentence_detail, sentenceStartDate: Time.zone.today)).tap { |o|
+            sentence: build(:sentence_detail, imprisonmentStatus: 'DET', sentenceStartDate: Time.zone.today)).tap { |o|
         o.load_case_information(build(:case_information, tier: 'A'))
       }
     }
 
     it "can determine the best type of POM for an immigration case" do
-      expect(described_class.recommended_pom_type(tier_a_and_immigration_case)).to eq(described_class::PRISON_POM)
+      expect(described_class.recommended_pom_type(immigration_case)).to eq(described_class::PRISON_POM)
     end
   end
 end

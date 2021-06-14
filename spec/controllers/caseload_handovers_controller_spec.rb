@@ -31,10 +31,10 @@ RSpec.describe CaseloadHandoversController, :allocation, type: :controller do
       stub_offenders_for_prison(prison, [offender, handover_offender])
 
       create(:case_information, case_allocation: case_allocation, offender: build(:offender, nomis_offender_id: offender.fetch(:offenderNo)))
-      create(:allocation, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: pom.staffId, prison: prison)
+      create(:allocation_history, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: pom.staffId, prison: prison)
 
       create(:case_information, case_allocation: case_allocation, offender: build(:offender, nomis_offender_id: handover_offender.fetch(:offenderNo)))
-      create(:allocation, nomis_offender_id: handover_offender.fetch(:offenderNo), primary_pom_nomis_id: pom.staffId, prison: prison)
+      create(:allocation_history, nomis_offender_id: handover_offender.fetch(:offenderNo), primary_pom_nomis_id: pom.staffId, prison: prison)
     end
 
     context 'with POM role' do

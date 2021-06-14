@@ -26,7 +26,7 @@ feature 'Provide debugging information for our team to use' do
     end
 
     it 'returns information for an allocated offender', vcr: { cassette_name: 'prison_api/debugging_allocated_offender_feature' } do
-      create(:allocation,
+      create(:allocation_history,
              nomis_offender_id: nomis_offender_id,
              primary_pom_name: "Rossana Spinka"
              )

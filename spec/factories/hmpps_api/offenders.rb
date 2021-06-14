@@ -26,14 +26,7 @@ FactoryBot.define do
       "#{block}-#{num}-#{numbers}"
     }
 
-    # offender numbers are of the form <letter><4 numbers><2 letters>
-    sequence(:offenderNo) do |seq|
-      number = seq / 26 + 1000
-      letter = ('A'..'Z').to_a[seq % 26]
-      # This and case_information should produce different values to avoid clashes
-      "T#{number}O#{letter}"
-    end
-
+    offenderNo { generate :nomis_offender_id }
     sequence(:bookingId) { |x| x + 700_000 }
     convictedStatus { 'Convicted' }
     dateOfBirth { Date.new(1990, 12, 6).to_s }
