@@ -61,11 +61,7 @@ FactoryBot.define do
       other_reason { false }
     end
 
-    trait :unsent do
-      created_within_referral_window { false }
-    end
-
-    trait :unsent do
+    trait :pre_window do
       created_within_referral_window { false }
     end
 
@@ -75,10 +71,6 @@ FactoryBot.define do
       mappa_level_2 do false end
       pathfinder_process do false end
       other_reason { false }
-    end
-
-    trait :unsent do
-      created_within_referral_window { false }
     end
   end
 

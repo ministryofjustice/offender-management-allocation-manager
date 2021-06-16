@@ -123,7 +123,7 @@ describe HandoverDateService do
             o.load_case_information(case_info)
           }
         }
-        let(:case_info) { build(:case_information, early_allocations: [build(:early_allocation, created_within_referral_window: false)]) }
+        let(:case_info) { create(:case_information, early_allocations: [build(:early_allocation, created_within_referral_window: false)]) }
         let(:ard) { nil }
 
         it 'will be unaffected' do
@@ -143,7 +143,7 @@ describe HandoverDateService do
             o.load_case_information(case_info)
           }
         }
-        let(:case_info) { build(:case_information, early_allocations: [build(:early_allocation, created_within_referral_window: true)]) }
+        let(:case_info) { create(:case_information, early_allocations: [build(:early_allocation, created_within_referral_window: true)]) }
 
         context 'without PED' do
           let(:ped) { nil }
@@ -173,7 +173,7 @@ describe HandoverDateService do
         }
 
         context 'when inside referral window' do
-          let(:case_info) { build(:case_information, early_allocations: [build(:early_allocation, created_within_referral_window: true)]) }
+          let(:case_info) { create(:case_information, early_allocations: [build(:early_allocation, created_within_referral_window: true)]) }
 
           context 'without ARD' do
             let(:ard) { nil }
@@ -193,7 +193,7 @@ describe HandoverDateService do
         end
 
         context 'when outside referral window' do
-          let(:case_info) { build(:case_information, early_allocations: [build(:early_allocation, created_within_referral_window: false)]) }
+          let(:case_info) { create(:case_information, early_allocations: [build(:early_allocation, created_within_referral_window: false)]) }
           let(:ard) { nil }
 
           it 'will be unaffected' do

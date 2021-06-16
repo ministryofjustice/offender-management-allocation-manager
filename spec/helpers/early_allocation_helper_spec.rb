@@ -301,7 +301,7 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
 
   describe '#early_allocation_long_outcome' do
     context 'when eligible and unsent' do
-      let(:early_allocation) { build(:early_allocation, :eligible, :unsent) }
+      let(:early_allocation) { build(:early_allocation, :eligible, :pre_window) }
 
       it 'works' do
         expect(helper.early_allocation_long_outcome(early_allocation)).to eq('Eligible - assessment not sent to the community probation team')
@@ -325,7 +325,7 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
     end
 
     context 'when discretionary - not sent' do
-      let(:early_allocation) { build(:early_allocation, :discretionary, :unsent) }
+      let(:early_allocation) { build(:early_allocation, :discretionary, :pre_window) }
 
       it 'works' do
         expect(helper.early_allocation_long_outcome(early_allocation)).to eq('Discretionary - assessment not sent to the community probation team')

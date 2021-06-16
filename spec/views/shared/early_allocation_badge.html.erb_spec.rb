@@ -22,7 +22,7 @@ RSpec.describe "prisoners/show", type: :view do
       let(:case_info) { create(:case_information, early_allocations: [early_allocation]) }
 
       context 'when unsent' do
-        let(:early_allocation) { build(:early_allocation, :unsent) }
+        let(:early_allocation) { build(:early_allocation, :pre_window) }
         let(:sentence) { build(:sentence_detail, :outside_early_allocation_window) }
 
         it 'displays a badge text EARLY ALLOCATION NOTES' do
