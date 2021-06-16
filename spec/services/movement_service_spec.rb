@@ -32,12 +32,12 @@ describe MovementService, type: :feature do
   end
 
   describe "processing an offender transfer" do
-    let(:transfer_adm_no_to_agency) { build(:movement, offenderNo: 'G4273GI', toAgency: 'COURT')   }
-    let(:transfer_in) { build(:movement, offenderNo: 'G4273GI', directionCode: 'IN', movementType: 'ADM', fromAgency: 'VEI', toAgency: 'CFI')   }
-    let(:admission) { build(:movement, offenderNo: 'G4273GI', toAgency: 'LEI', fromAgency: 'COURT')   }
+    let(:transfer_adm_no_to_agency) { build(:movement, offenderNo: 'G7266VD', toAgency: 'COURT')   }
+    let(:transfer_in) { build(:movement, offenderNo: 'G7266VD', directionCode: 'IN', movementType: 'ADM', fromAgency: 'VEI', toAgency: 'CFI')   }
+    let(:admission) { build(:movement, offenderNo: 'G7266VD', toAgency: 'LEI', fromAgency: 'COURT')   }
 
-    let!(:existing_allocation) { create(:allocation_history, nomis_offender_id: 'G4273GI', prison: 'LEI')   }
-    let(:existing_alloc_transfer) { build(:movement, offenderNo: 'G4273GI', fromAgency: 'PRI', toAgency: 'LEI')   }
+    let!(:existing_allocation) { create(:allocation_history, nomis_offender_id: 'G7266VD', prison: 'LEI')   }
+    let(:existing_alloc_transfer) { build(:movement, offenderNo: 'G7266VD', fromAgency: 'PRI', toAgency: 'LEI')   }
 
     it "can process transfers were offender already allocated at new prison",
        vcr: { cassette_name: 'prison_api/movement_service_transfer_in_existing_spec' }  do
@@ -47,7 +47,7 @@ describe MovementService, type: :feature do
     end
 
     context 'when processing an admission' do
-      let(:transfer_adm) { build(:movement, offenderNo: 'G4273GI', fromAgency: 'PRI', toAgency: 'PVI')   }
+      let(:transfer_adm) { build(:movement, offenderNo: 'G7266VD', fromAgency: 'PRI', toAgency: 'PVI')   }
       let(:updated_allocation) { existing_allocation.reload }
 
       it "can process transfer movements IN",
@@ -68,7 +68,7 @@ describe MovementService, type: :feature do
 
     it "can starts an open prison transfer",
        vcr: { cassette_name: 'prison_api/movement_service_transfer_to_open_spec' }  do
-      open_prison_transfer = build(:movement, offenderNo: 'G4273GI', toAgency: 'HDI')
+      open_prison_transfer = build(:movement, offenderNo: 'G7266VD', toAgency: 'HDI')
 
       processed = described_class.process_movement(open_prison_transfer)
       expect(processed).to be true
@@ -76,7 +76,7 @@ describe MovementService, type: :feature do
 
     it "can do an open prison transfer with an inactive allocation",
        vcr: { cassette_name: 'prison_api/movement_service_transfer_to_open_spec' }  do
-      open_prison_transfer = build(:movement, offenderNo: 'G4273GI', toAgency: 'HDI')
+      open_prison_transfer = build(:movement, offenderNo: 'G7266VD', toAgency: 'HDI')
 
       existing_allocation.dealloate_offender_after_transfer
       processed = described_class.process_movement(open_prison_transfer)
@@ -109,18 +109,18 @@ describe MovementService, type: :feature do
   end
 
   describe "processing an offender release" do
-    let!(:case_info) { create(:case_information, offender: build(:offender, nomis_offender_id: 'G4273GI')) }
-    let!(:allocation) { create(:allocation_history, nomis_offender_id: 'G4273GI') }
+    let!(:case_info) { create(:case_information, offender: build(:offender, nomis_offender_id: 'G7266VD')) }
+    let!(:allocation) { create(:allocation_history, prison: 'LEI', nomis_offender_id: 'G7266VD') }
 
     context 'with a valid release movement' do
-      let(:valid_release) { build(:movement, offenderNo: 'G4273GI', directionCode: 'OUT', movementType: 'REL', toAgency: 'OUT', fromAgency: 'BAI')   }
+      let(:valid_release) { build(:movement, offenderNo: 'G7266VD', directionCode: 'OUT', movementType: 'REL', toAgency: 'OUT', fromAgency: 'BAI')   }
 
       before do
         expect_any_instance_of(PomMailer)
             .to receive(:offender_deallocated)
                     .with(email: "pom@digital.justice.gov.uk",
                           pom_name: "Moic",
-                          offender_name: "Abbella, Ozullirn",
+                          offender_name: "Annole, Omistius",
                           nomis_offender_id: valid_release.offender_no,
                           prison_name: 'HMP Leeds',
                           url: "http://localhost:3000/prisons/LEI/staff/485926/caseload")
@@ -147,8 +147,8 @@ describe MovementService, type: :feature do
     end
 
     context 'with invalid release movements' do
-      let(:invalid_release1) { build(:movement, offenderNo: 'G4273GI', directionCode: 'OUT', movementType: 'REL', toAgency: 'LEI')   }
-      let(:invalid_release2) { build(:movement, offenderNo: 'G4273GI', directionCode: 'OUT', movementType: 'REL', fromAgency: 'COURT')   }
+      let(:invalid_release1) { build(:movement, offenderNo: 'G7266VD', directionCode: 'OUT', movementType: 'REL', toAgency: 'LEI')   }
+      let(:invalid_release2) { build(:movement, offenderNo: 'G7266VD', directionCode: 'OUT', movementType: 'REL', fromAgency: 'COURT')   }
 
       it "can ignore invalid release movements", vcr: { cassette_name: 'prison_api/movement_service_process_release_invalid_spec' }  do
         processed = described_class.process_movement(invalid_release1)
@@ -162,18 +162,18 @@ describe MovementService, type: :feature do
 
   describe "processing offenders moved to/from immigration estates" do
     before do
-      create(:allocation_history, nomis_offender_id: 'G4273GI')
+      create(:allocation_history, prison: 'LEI', nomis_offender_id: 'G7266VD')
     end
 
-    let(:allocation) { AllocationHistory.find_by(nomis_offender_id: 'G4273GI') }
+    let(:allocation) { AllocationHistory.find_by(nomis_offender_id: 'G7266VD') }
 
     let(:immigration_movement) do
-      build(:movement, offenderNo: 'G4273GI', directionCode: direction_code, movementDate: Date.new(2020, 1, 6).to_s,
+      build(:movement, offenderNo: 'G7266VD', directionCode: direction_code, movementDate: Date.new(2020, 1, 6).to_s,
                        movementType: movement_type, fromAgency: from_agency, toAgency: to_agency)
     end
 
     context 'when movement is a transfer' do
-      let(:case_info) { create(:case_information, nomis_offender_id: 'G4273GI') }
+      let(:case_info) { create(:case_information, nomis_offender_id: 'G7266VD') }
 
       context 'when the from_agency is MHI' do
         context 'with the offender going into a prison estate' do

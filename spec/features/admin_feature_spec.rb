@@ -71,7 +71,7 @@ feature 'admin urls' do
       stub_offenders_for_prison(prison_code, [])
 
       ci = create(:case_information)
-      create(:allocation_history, nomis_offender_id: ci.nomis_offender_id)
+      create(:allocation_history, prison: prison_code, nomis_offender_id: ci.nomis_offender_id)
     end
 
     it 'is ok' do

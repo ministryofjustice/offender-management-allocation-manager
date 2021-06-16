@@ -54,7 +54,7 @@ describe 'Allocation API', vcr: { cassette_name: 'prison_api/allocation_api' } d
 
         let(:offender_no) { 'G7266VD' }
         let!(:allocation) {
-          create(:allocation_history, nomis_offender_id: offender_no, primary_pom_name: 'OLD_NAME, MOIC')
+          create(:allocation_history, prison: 'LEI', nomis_offender_id: offender_no, primary_pom_name: 'OLD_NAME, MOIC')
         }
         let(:Authorization) { "Bearer #{token}" }
 

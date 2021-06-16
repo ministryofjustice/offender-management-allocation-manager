@@ -92,7 +92,10 @@ RSpec.describe HandoverFollowUpJob, type: :job do
       end
 
       context 'when the offender already has a COM allocated' do
-        let(:case_info) { create(:case_information, :with_com, offender: build(:offender, nomis_offender_id: offender_no)) }
+        let(:case_info) {
+          create(:case_information, :with_com,
+                 offender: build(:offender, nomis_offender_id: offender_no))
+        }
 
         it 'does not send email' do
           expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
@@ -146,7 +149,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
         let(:today) { offender.handover_start_date + 1.week }
 
         context 'when the offender does not have a POM allocated' do
-          let!(:allocation) { create(:allocation_history, :release, nomis_offender_id: offender_no) }
+          let!(:allocation) { create(:allocation_history, :release, prison: active_prison.code, nomis_offender_id: offender_no) }
 
           it 'emails the LDU' do
             expect_any_instance_of(CommunityMailer)

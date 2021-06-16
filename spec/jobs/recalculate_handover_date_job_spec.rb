@@ -18,7 +18,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), case_allocation: 'NPS', manual_entry: false)
     end
 
-    let(:nomis_offender) { build(:nomis_offender) }
+    let(:nomis_offender) { build(:nomis_offender, agencyId: prison.code) }
 
     it "recalculates the offender's handover dates and pushes them to the Community API" do
       offender = OffenderService.get_offender(offender_no)
@@ -38,7 +38,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       stub_non_existent_offender(offender_no)
     end
 
-    let(:nomis_offender) { build(:nomis_offender) }
+    let(:nomis_offender) { build(:nomis_offender, agencyId: prison.code) }
 
     it 'does nothing' do
       expect(HmppsApi::CommunityApi).not_to receive(:set_handover_dates)
@@ -47,7 +47,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
   end
 
   context "when the offender doesn't have a sentence in NOMIS" do
-    let(:nomis_offender) { build(:nomis_offender, sentence: attributes_for(:sentence_detail, :unsentenced)) }
+    let(:nomis_offender) { build(:nomis_offender, agencyId: prison.code, sentence: attributes_for(:sentence_detail, :unsentenced)) }
 
     before do
       stub_offender(nomis_offender)
@@ -174,7 +174,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
     context "when calculated handover dates don't exist yet for the offender" do
       let(:record) { case_info.calculated_handover_date }
-      let(:nomis_offender) { build(:nomis_offender) }
+      let(:nomis_offender) { build(:nomis_offender, agencyId: prison.code) }
 
       it 'creates a new record' do
         expect {
@@ -218,7 +218,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     end
 
     context 'when calculated handover dates already exist for the offender' do
-      let(:nomis_offender) { build(:nomis_offender) }
+      let(:nomis_offender) { build(:nomis_offender, agencyId: prison.code) }
       let!(:existing_record) {
         create(:calculated_handover_date,
                responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
@@ -290,7 +290,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     let(:movement_date) { policy_start_date + 1.week }
 
     # Default: male offender
-    let(:prison) { build(:prison, :open) }
+    let(:prison) { create(:prison, :open) }
     let(:category) { attributes_for(:offender_category, :cat_d) }
     let(:policy_start_date) { HandoverDateService::OPEN_PRISON_POLICY_START_DATE }
 
@@ -322,7 +322,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     end
 
     context 'when in a female prison' do
-      let(:prison) { build(:womens_prison) }
+      let(:prison) { create(:womens_prison) }
       let(:category) { attributes_for(:offender_category, :female_open) }
       let(:policy_start_date) { HandoverDateService::WOMENS_POLICY_START_DATE }
 

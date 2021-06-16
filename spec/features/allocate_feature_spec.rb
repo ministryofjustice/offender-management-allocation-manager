@@ -144,6 +144,7 @@ feature 'Allocation' do
   scenario 're-allocating', vcr: { cassette_name: 'prison_api/re_allocate_feature' } do
     create(
       :allocation_history,
+      prison: 'LEI',
       nomis_offender_id: nomis_offender_id,
       primary_pom_nomis_id: 485_735,
       recommended_pom_type: 'probation'

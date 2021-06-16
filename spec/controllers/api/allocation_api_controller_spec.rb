@@ -5,7 +5,7 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
     let(:rsa_private) { OpenSSL::PKey::RSA.generate 2048 }
     let(:prison) { create(:prison) }
     let!(:co_working_allocation) {
-      create(:allocation_history, :co_working, primary_pom_nomis_id: primary_pom.staff_id,
+      create(:allocation_history, :co_working, prison: prison.code, primary_pom_nomis_id: primary_pom.staff_id,
                                           secondary_pom_nomis_id: secondary_pom.staff_id, nomis_offender_id: offender.fetch(:offenderNo))
     }
     let(:primary_pom) { build(:pom) }

@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe CoworkingController, :allocation, type: :controller do
   let(:prison) { create(:prison).code }
   let(:primary_pom) { build(:pom) }
-  let(:offender) { build(:nomis_offender) }
+  let(:offender) { build(:nomis_offender, agencyId: prison) }
   let(:offender_no) { offender.fetch(:offenderNo) }
   let(:new_secondary_pom) { build(:pom) }
 

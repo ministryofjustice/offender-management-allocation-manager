@@ -34,7 +34,7 @@ RSpec.describe OverridesController, :allocation, type: :controller do
 
   context 'with an allocation' do
     it 'redirects to confirm#reallocation' do
-      create(:allocation_history, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
+      create(:allocation_history, prison: prison, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
       post :create, params: params.merge(override_params)
 
       expect(response).to redirect_to prison_confirm_reallocation_path(prison, nomis_offender_id, nomis_staff_id)
@@ -43,7 +43,7 @@ RSpec.describe OverridesController, :allocation, type: :controller do
 
   context 'with an inactive allocation' do
     before do
-      create(:allocation_history, :release, nomis_offender_id: nomis_offender_id)
+      create(:allocation_history, :release, prison: prison, nomis_offender_id: nomis_offender_id)
     end
 
     it 'redirects to confirm#allocation' do

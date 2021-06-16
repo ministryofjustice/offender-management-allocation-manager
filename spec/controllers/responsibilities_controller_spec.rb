@@ -14,7 +14,7 @@ RSpec.describe ResponsibilitiesController, type: :controller do
   let(:offender_no) { case_info.nomis_offender_id }
   let(:responsibility) { Responsibility.last }
   let(:prison) { create(:prison) }
-  let(:nomis_offender) { build(:nomis_offender, offenderNo: offender_no) }
+  let(:nomis_offender) { build(:nomis_offender, agencyId: prison.code, offenderNo: offender_no) }
   let(:reason) { 'Just because' }
   let(:sso_email_address) { Faker::Internet.email }
   let(:offender) { OffenderService.get_offender(offender_no) }
@@ -45,9 +45,9 @@ RSpec.describe ResponsibilitiesController, type: :controller do
       end
     end
 
-    context 'with an allocation', :allocation do
+    context 'with an allocation' do
       before do
-        create(:allocation_history, nomis_offender_id: responsibility.nomis_offender_id, primary_pom_nomis_id: pom.staffId)
+        create(:allocation_history, prison: prison.code, nomis_offender_id: responsibility.nomis_offender_id, primary_pom_nomis_id: pom.staffId)
         stub_poms(prison.code, [pom])
       end
 

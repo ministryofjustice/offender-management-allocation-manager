@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe OffenderHelper do
+  let(:prison) { build(:prison) }
+
   describe 'Digital Prison Services profile path' do
     it "formats the link to an offender's profile page within the Digital Prison Services" do
       expect(digital_prison_service_profile_path('AB1234A')).to eq("#{Rails.configuration.digital_prison_service_host}/offenders/AB1234A/quick-look")
@@ -14,6 +16,7 @@ RSpec.describe OffenderHelper do
     let!(:allocation) {
       create(
         :allocation_history,
+        prison: prison.code,
         nomis_offender_id: nomis_offender_id,
         primary_pom_nomis_id: nomis_staff_id,
         event: 'allocate_primary_pom'
