@@ -37,7 +37,7 @@ feature 'Case history with complexity level' do
   let(:prison_code) { prison.code }
   let(:case_info) { create(:case_information) }
   let(:offender_no) { case_info.nomis_offender_id }
-  let(:offender) { build(:nomis_offender, offenderNo: offender_no) }
+  let(:offender) { build(:nomis_offender, agencyId: prison_code, offenderNo: offender_no) }
   let(:created_by_name) { "#{logged_in_user.last_name}, #{logged_in_user.first_name}" }
 
   context 'with 1 history record' do

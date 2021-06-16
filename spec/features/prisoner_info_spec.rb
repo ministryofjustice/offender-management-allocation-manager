@@ -2,34 +2,36 @@ require 'rails_helper'
 
 feature 'View a prisoner profile page' do
   before do
-    signin_spo_user([prison])
+    signin_spo_user([prison.code])
   end
 
-  let(:prison) { 'LEI' }
+  let(:prison) { build(:prison, code: 'LEI') }
 
   context 'without allocation or case information' do
     it 'doesnt crash', vcr: { cassette_name: 'prison_api/show_unallocated_offender' } do
-      visit prison_prisoner_path(prison, 'G7998GJ')
+      visit prison_prisoner_path(prison.code, 'G7266VD')
 
-      expect(page).to have_css('h1', text: 'Ahmonis, Okadonah')
-      expect(page).to have_content('07/07/1968')
+      expect(page).to have_css('h1', text: 'Annole, Omistius')
+      expect(page).to have_content('26/09/1994')
       cat_code = find('h3#category-code').text
-      expect(cat_code).to eq('Cat C')
+      expect(cat_code).to eq('Cat B')
       expect(page).to have_css('#prisoner-case-type', text: 'Determinate')
     end
   end
 
   context 'with an existing early allocation', vcr: { cassette_name: 'prison_api/early_allocation_banner' } do
     before do
-      create(:case_information, offender: build(:offender, nomis_offender_id: 'G7998GJ'), early_allocations: [build(:early_allocation, created_within_referral_window: within_window)])
-      visit prison_prisoner_path(prison, 'G7998GJ')
+      create(:case_information, parole_review_date: Time.zone.today + 1.year,
+             offender: build(:offender, nomis_offender_id: 'G7266VD'),
+             early_allocations: [build(:early_allocation, created_within_referral_window: within_window)])
+      visit prison_prisoner_path(prison.code, 'G7266VD')
     end
 
     context 'with an old early allocation' do
       let(:within_window) { false }
 
       it 'shows a notification', :js do
-        expect(page).to have_text('Ahmonis, Okadonah might be eligible for early allocation to the community probation team')
+        expect(page).to have_text('Annole, Omistius might be eligible for early allocation to the community probation team')
       end
     end
 
@@ -44,8 +46,8 @@ feature 'View a prisoner profile page' do
 
   context 'with an allocation', :allocation do
     before do
-      create(:case_information, offender: build(:offender, nomis_offender_id: 'G7998GJ'), victim_liaison_officers: [build(:victim_liaison_officer)])
-      create(:allocation_history, :co_working, prison: prison, nomis_offender_id: 'G7998GJ', primary_pom_nomis_id: '485637', primary_pom_name: 'Pobno, Kath')
+      create(:case_information, offender: build(:offender, nomis_offender_id: 'G7266VD'), victim_liaison_officers: [build(:victim_liaison_officer)])
+      create(:allocation_history, :co_working, prison: prison.code, nomis_offender_id: 'G7266VD', primary_pom_nomis_id: '485637', primary_pom_name: 'Pobno, Kath')
     end
 
     let(:allocation) { AllocationHistory.last }
@@ -53,7 +55,7 @@ feature 'View a prisoner profile page' do
 
     context 'without anything extra', vcr: { cassette_name: 'prison_api/show_offender_spec' }  do
       before do
-        visit prison_prisoner_path(prison, 'G7998GJ')
+        visit prison_prisoner_path(prison.code, 'G7266VD')
       end
 
       scenario 'adding a VLO' do
@@ -116,10 +118,10 @@ feature 'View a prisoner profile page' do
       end
 
       it 'shows the prisoner information' do
-        expect(page).to have_css('h1', text: 'Ahmonis, Okadonah')
-        expect(page).to have_content('07/07/1968')
+        expect(page).to have_css('h1', text: 'Annole, Omistius')
+        expect(page).to have_content('26/09/1994')
         cat_code = find('h3#category-code').text
-        expect(cat_code).to eq('Cat C')
+        expect(cat_code).to eq('Cat B')
       end
 
       it 'shows the POM name (fetched from NOMIS)' do
@@ -132,29 +134,29 @@ feature 'View a prisoner profile page' do
       end
 
       it 'shows the prisoner image', vcr: { cassette_name: 'prison_api/show_offender_spec_image' } do
-        visit prison_prisoner_image_path(prison, 'G7998GJ', format: :jpg)
+        visit prison_prisoner_image_path(prison.code, 'G7266VD', format: :jpg)
         expect(page.response_headers['Content-Type']).to eq('image/jpg')
       end
 
       it "has a link to the allocation history", vcr: { cassette_name: 'prison_api/link_to_allocation_history' } do
-        visit prison_prisoner_path(prison, 'G7998GJ')
+        visit prison_prisoner_path(prison.code, 'G7266VD')
         click_link "View"
         expect(page).to have_content('Prisoner allocated')
       end
 
       it 'displays the non-disclosable badge on the VLO table', vcr: { cassette_name: 'prison_api/vlo_non_disclosable_badge' } do
-        visit prison_prisoner_path(prison, 'G7998GJ')
+        visit prison_prisoner_path(prison.code, 'G7266VD')
         expect(page).to have_css('#non-disclosable-badge', text: 'Non-Disclosable')
       end
     end
 
     context 'with an overridden reponsibility' do
       before do
-        create(:responsibility, nomis_offender_id: 'G7998GJ')
+        create(:responsibility, nomis_offender_id: 'G7266VD')
       end
 
       it 'shows an overridden responsibility', vcr: { cassette_name: 'prison_api/show_offender_with_override_spec' } do
-        visit prison_prisoner_path(prison, 'G7998GJ')
+        visit prison_prisoner_path(prison.code, 'G7266VD')
 
         expect(page).to have_content('Supporting')
       end
@@ -168,7 +170,7 @@ feature 'View a prisoner profile page' do
 
       before do
         create(:case_information,
-               offender: build(:offender, nomis_offender_id: 'G7998GJ'),
+               offender: build(:offender, nomis_offender_id: 'G7266VD'),
                local_delivery_unit: ldu,
                team_name: team_name,
                com_name: 'Bob Smith'
@@ -176,7 +178,7 @@ feature 'View a prisoner profile page' do
       end
 
       it "has community information", vcr: { cassette_name: 'prison_api/show_offender_community_info_full' } do
-        visit prison_prisoner_path(prison, 'G7998GJ')
+        visit prison_prisoner_path(prison.code, 'G7266VD')
 
         expect(page).to have_content(ldu.name)
         expect(page).to have_content(ldu.email_address)
@@ -188,10 +190,10 @@ feature 'View a prisoner profile page' do
     context 'without email address or com name' do
       before do
         create(:case_information,
-               offender: build(:offender, nomis_offender_id: 'G7998GJ'),
+               offender: build(:offender, nomis_offender_id: 'G7266VD'),
         )
 
-        visit prison_prisoner_path(prison, 'G7998GJ')
+        visit prison_prisoner_path(prison.code, 'G7266VD')
       end
 
       it "displays team and LDU as unknown", :js, vcr: { cassette_name: 'prison_api/show_offender_community_info_partial' } do
@@ -206,7 +208,9 @@ feature 'View a prisoner profile page' do
   context 'when offender does not have a sentence start date',
           vcr: { cassette_name: 'prison_api/no_sentence_start_date_for_offender' } do
     let(:non_sentenced_offender) do
-      build(:hmpps_api_offender, offenderNo: 'G7998GJ',
+      build(:hmpps_api_offender,
+            agencyId: prison.code,
+            offenderNo: 'G7998GJ',
             imprisonmentStatus: 'SEC90',
             sentence: build(:sentence_detail,
                             releaseDate: 3.years.from_now.iso8601,
@@ -218,10 +222,10 @@ feature 'View a prisoner profile page' do
     end
 
     it 'shows the page without crashing' do
-      case_info = create(:case_information, case_allocation: CaseInformation::NPS, offender: build(:offender, nomis_offender_id: 'G7998GJ'))
+      case_info = create(:case_information, :nps, offender: build(:offender, nomis_offender_id: 'G7998GJ'))
       non_sentenced_offender.load_case_information(case_info)
 
-      visit prison_prisoner_path(prison, 'G7998GJ')
+      visit prison_prisoner_path(prison.code, 'G7998GJ')
 
       within '#handover-start-date' do
         expect(page).to have_content('N/A')
@@ -246,34 +250,34 @@ feature 'View a prisoner profile page' do
     }
 
     let(:nomis_offender) {
-      build(:nomis_offender, sentence: attributes_for(:sentence_detail, :inside_handover_window))
+      build(:nomis_offender, agencyId: prison.code, sentence: attributes_for(:sentence_detail, :inside_handover_window))
     }
 
     let(:nomis_offender_id) { nomis_offender.fetch(:offenderNo) }
-    let!(:prison) { create(:prison).code }
+    let!(:prison) { create(:prison) }
 
     before do
       stub_auth_token
       stub_user(staff_id: 1234)
-      stub_keyworker(prison, nomis_offender_id, build(:keyworker))
+      stub_keyworker(prison.code, nomis_offender_id, build(:keyworker))
       stub_offender(nomis_offender)
     end
 
     it 'shows an error message at the top of the page' do
-      visit prison_prisoner_path(prison, nomis_offender_id)
+      visit prison_prisoner_path(prison.code, nomis_offender_id)
       within '.govuk-error-summary' do
         expect(page).to have_content 'A Community Offender Manager (COM) must be allocated to this case'
       end
     end
 
     it 'highlights the "COM name" table row in red' do
-      visit prison_prisoner_path(prison, nomis_offender_id)
+      visit prison_prisoner_path(prison.code, nomis_offender_id)
       expect(page).to have_css('#com-name.govuk-table__cell-error')
     end
 
     describe 'clicking on the warning message', :js do
       it 'jumps the user down to the "COM name" table row' do
-        visit prison_prisoner_path(prison, nomis_offender_id)
+        visit prison_prisoner_path(prison.code, nomis_offender_id)
         click_link 'A Community Offender Manager (COM) must be allocated to this case'
         expect(current_url).to end_with('#com-name')
       end
@@ -290,7 +294,7 @@ feature 'View a prisoner profile page' do
       }
 
       it 'says that an email has been sent' do
-        visit prison_prisoner_path(prison, nomis_offender_id)
+        visit prison_prisoner_path(prison.code, nomis_offender_id)
         within '.govuk-error-summary' do
           reload_page
           date = date_sent.strftime('%d/%m/%Y')
@@ -305,7 +309,7 @@ feature 'View a prisoner profile page' do
       end
 
       it 'does not show' do
-        visit prison_prisoner_path(prison, nomis_offender_id)
+        visit prison_prisoner_path(prison.code, nomis_offender_id)
         expect(page).not_to have_css('.govuk-error-summary')
         expect(page).not_to have_content('A Community Offender Manager (COM) must be allocated to this case')
         expect(page).not_to have_css('#com-name.govuk-table__cell-error')

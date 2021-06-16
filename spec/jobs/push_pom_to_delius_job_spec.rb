@@ -13,6 +13,7 @@ RSpec.describe PushPomToDeliusJob, type: :job, versioning: true do
   describe 'when a Primary POM is allocated' do
     let!(:allocation) {
       create(:allocation_history,
+             prison: build(:prison).code,
              nomis_offender_id: offender_no,
              primary_pom_nomis_id: pom.staffId
       )
@@ -36,6 +37,7 @@ RSpec.describe PushPomToDeliusJob, type: :job, versioning: true do
   describe 'when a Primary POM is de-allocated' do
     let!(:allocation) {
       create(:allocation_history, :transfer,
+             prison:  build(:prison).code,
              nomis_offender_id: offender_no
       )
     }

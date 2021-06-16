@@ -52,7 +52,7 @@ context 'when NOMIS is missing information' do
 
     describe 'the prisoner page' do
       before do
-        offender = build(:nomis_offender, offenderNo: offender_no,
+        offender = build(:nomis_offender, agencyId: prison_code, offenderNo: offender_no,
                          sentence: attributes_for(:sentence_detail,
                                                   automaticReleaseDate: Time.zone.today + 3.years,
                                                   conditionalReleaseDate: Time.zone.today + 22.months))
@@ -68,7 +68,7 @@ context 'when NOMIS is missing information' do
 
         stub_offender(offender)
 
-        create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
+        create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
         create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), case_allocation: 'NPS')
       end
 
@@ -90,7 +90,7 @@ context 'when NOMIS is missing information' do
       end
 
       it 'does not error' do
-        create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
+        create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
 
         visit prison_staff_caseload_handovers_path(prison_code, staff_id)
 

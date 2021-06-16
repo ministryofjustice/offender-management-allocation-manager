@@ -3,7 +3,7 @@ require 'rails_helper'
 describe AllocationService do
   include ActiveJob::TestHelper
 
-  let(:nomis_offender_id) { 'G4273GI' }
+  let(:nomis_offender_id) { 'G7266VD' }
 
   before do
     # needed as create_or_update calls a NOMIS API
@@ -20,6 +20,7 @@ describe AllocationService do
     let!(:allocation) {
       create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
       create(:allocation_history,
+             prison: 'LEI',
              nomis_offender_id: nomis_offender_id,
              primary_pom_nomis_id: primary_pom_id,
              primary_pom_name: 'Pom, Moic')
@@ -45,7 +46,7 @@ describe AllocationService do
         to match(
           hash_including(
             "message" => message,
-            "offender_name" => "Abbella, Ozullirn",
+            "offender_name" => "Annole, Omistius",
             "nomis_offender_id" => nomis_offender_id,
             "pom_email" => "pom@digital.justice.gov.uk",
             "pom_name" => "Moic",
@@ -58,9 +59,9 @@ describe AllocationService do
           hash_including(
             "message" => message,
             "pom_name" => "Moic",
-            "offender_name" => "Abbella, Ozullirn",
+            "offender_name" => "Annole, Omistius",
             "nomis_offender_id" => nomis_offender_id,
-            "responsibility" => "supporting",
+            "responsibility" => "responsible",
             "responsible_pom_name" => 'Pom, Moic',
             "pom_email" => "ommiicc@digital.justice.gov.uk",
             "url" => "http://localhost:3000/prisons/LEI/staff/#{secondary_pom_id}/caseload"
@@ -76,7 +77,7 @@ describe AllocationService do
         stub_request(:get, "#{ApiHelper::T3}/users/MOIC_POM").
           to_return(body: { staffId: 1, firstName: "MOIC", lastName: 'POM' }.to_json)
         stub_pom_emails 1, []
-        stub_offender(build(:nomis_offender, offenderNo: nomis_offender_id))
+        stub_offender(build(:nomis_offender, agencyId: prison_code, offenderNo: nomis_offender_id))
         stub_poms prison_code, [pom]
       end
 
@@ -105,7 +106,7 @@ describe AllocationService do
     context 'when one already exists' do
       before do
         create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
-        create(:allocation_history, nomis_offender_id: nomis_offender_id)
+        create(:allocation_history, prison: 'LEI', nomis_offender_id: nomis_offender_id)
       end
 
       it 'can update a record and store a version', vcr: { cassette_name: 'prison_api/allocation_service_update_allocation_spec' } do
@@ -134,6 +135,7 @@ describe AllocationService do
 
       allocation = create(
         :allocation_history,
+        prison: build(:prison).code,
         nomis_offender_id: nomis_offender_id,
         primary_pom_nomis_id: previous_primary_pom_nomis_id)
 

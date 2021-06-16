@@ -38,10 +38,6 @@ FactoryBot.define do
       DateTime.now.utc
     end
 
-    prison do
-      'LEI'
-    end
-
     updated_at do
       DateTime.now.utc
     end

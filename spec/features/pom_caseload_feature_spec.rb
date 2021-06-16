@@ -43,6 +43,7 @@ feature "view POM's caseload" do
       if ids_without_cells.include? nomis_id
         # generate 2 offenders without a cell location
         build(:nomis_offender, internalLocation: nil,
+              agencyId: prison.code,
               offenderNo: nomis_id,
               sentence: attributes_for(:sentence_detail,
                                        automaticReleaseDate: "2031-01-22",
@@ -50,6 +51,7 @@ feature "view POM's caseload" do
                                        tariffDate: (nomis_id == nil_release_date_offender) ? nil : Time.zone.today + booking_id.days))
       else
         build(:nomis_offender,
+              agencyId: prison.code,
               offenderNo: nomis_id,
               sentence: attributes_for(:sentence_detail,
                                        automaticReleaseDate: "2031-01-22",

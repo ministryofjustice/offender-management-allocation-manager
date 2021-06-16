@@ -19,7 +19,7 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
     ]
   }
 
-  let(:offender) { build(:nomis_offender, sentence: attributes_for(:sentence_detail, conditionalReleaseDate: release_date)) }
+  let(:offender) { build(:nomis_offender, agencyId: prison, sentence: attributes_for(:sentence_detail, conditionalReleaseDate: release_date)) }
 
   let(:nomis_offender_id) { offender.fetch(:offenderNo) }
 
@@ -30,7 +30,7 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
     stub_offender(offender)
     stub_poms(prison, poms)
     stub_offenders_for_prison(prison, [offender])
-    create(:allocation_history, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
+    create(:allocation_history, prison: prison, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
   end
 
   context 'with some assessments' do

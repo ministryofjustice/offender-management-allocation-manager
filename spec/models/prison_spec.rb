@@ -44,14 +44,12 @@ RSpec.describe Prison, type: :model do
       offender_array = subject.first(9)
       expect(offender_array).to be_kind_of(Array)
       expect(offender_array.length).to eq(9)
-      expect(offender_array.first).to be_kind_of(HmppsApi::Offender)
     end
 
     it "get last page of offenders for a specific prison", vcr: { cassette_name: 'prison_api/offender_service_offenders_by_prison_last_page_spec' } do
       offender_array = subject.to_a
       expect(offender_array).to be_kind_of(Array)
       expect(offender_array.length).to be > 800
-      expect(offender_array.first).to be_kind_of(HmppsApi::Offender)
     end
 
     context 'when recall flag set' do

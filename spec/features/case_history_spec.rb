@@ -425,22 +425,21 @@ feature 'Case History' do
   context 'with a simple case' do
     before do
       stub_user(username: 'MOIC_POM', staff_id: pom.staff_id)
-      stub_offenders_for_prison(prison, [nomis_offender])
+      stub_offenders_for_prison(open_prison.code, [nomis_offender])
       stub_movements_for nomis_offender.fetch(:offenderNo), offender_movements
-      signin_spo_user([prison])
-      stub_poms(prison, [pom])
+      signin_spo_user([open_prison.code])
+      stub_poms(open_prison.code, [pom])
       stub_pom pom
     end
 
-    let(:nomis_offender) { build(:nomis_offender) }
+    let(:nomis_offender) { build(:nomis_offender, agencyId: open_prison.code) }
     let(:nomis_offender_id) { nomis_offender.fetch(:offenderNo) }
-    let(:prison) { create(:prison).code }
     let(:pom) { build(:pom) }
     let!(:case_info) {
       create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
     }
     let!(:allocation) {
-      create(:allocation_history, :primary, nomis_offender_id: nomis_offender_id, prison: prison,
+      create(:allocation_history, :primary, nomis_offender_id: nomis_offender_id, prison: first_prison.code,
              primary_pom_nomis_id: pom.staff_id)
     }
 
@@ -452,7 +451,7 @@ feature 'Case History' do
       end
 
       it 'displays 3 sections - allocation plus 2 early allocation records' do
-        visit prison_allocation_history_path(prison, nomis_offender_id)
+        visit prison_allocation_history_path(open_prison.code, nomis_offender_id)
         expect(all('.moj-timeline__item').size).to eq(3)
       end
     end
@@ -466,7 +465,7 @@ feature 'Case History' do
           create(:victim_liaison_officer, case_information: case_info)
         end
         Timecop.travel day_after
-        AllocationHistory.deallocate_primary_pom pom.staff_id, prison
+        AllocationHistory.deallocate_primary_pom pom.staff_id, open_prison.code
       end
 
       after do
@@ -474,7 +473,7 @@ feature 'Case History' do
       end
 
       it 'displays all the data and doesnt crash' do
-        visit prison_allocation_history_path(prison, nomis_offender_id)
+        visit prison_allocation_history_path(open_prison.code, nomis_offender_id)
       end
     end
   end

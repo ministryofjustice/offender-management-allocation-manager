@@ -8,17 +8,17 @@ RSpec.describe AllocationHistory, type: :model do
   describe '#without_ldu_emails' do
     let!(:crc_without_email) {
       case_info = create(:case_information, case_allocation: 'CRC', local_delivery_unit: nil)
-      create(:allocation_history, nomis_offender_id: case_info.nomis_offender_id)
+      create(:allocation_history, prison: build(:prison).code, nomis_offender_id: case_info.nomis_offender_id)
     }
 
     let!(:nps_without_email) {
       case_info = create(:case_information, local_delivery_unit: nil)
-      create(:allocation_history, nomis_offender_id: case_info.nomis_offender_id)
+      create(:allocation_history, prison: build(:prison).code, nomis_offender_id: case_info.nomis_offender_id)
     }
 
     let!(:nps_with_email) {
       case_info = create(:case_information)
-      create(:allocation_history, nomis_offender_id: case_info.nomis_offender_id)
+      create(:allocation_history, prison: build(:prison).code, nomis_offender_id: case_info.nomis_offender_id)
     }
 
     it 'picks up NPS allocations without emails' do
@@ -118,7 +118,7 @@ RSpec.describe AllocationHistory, type: :model do
       let(:nomis_offender_id) { 'G2911GD' }
       let(:prison_code) { create(:prison).code }
       let(:poms) { [build(:pom, staffId: 485_833)] }
-      let(:offender) { build(:nomis_offender, offenderNo: nomis_offender_id) }
+      let(:offender) { build(:nomis_offender, agencyId: prison_code, offenderNo: nomis_offender_id) }
 
       it 'removes the primary pom details in an Offender\'s allocation' do
         create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
@@ -197,6 +197,7 @@ RSpec.describe AllocationHistory, type: :model do
       let!(:allocation_no_overrides) {
         create(
           :allocation_history,
+          prison: build(:prison).code,
           primary_pom_nomis_id: nomis_staff_id
         )
       }
@@ -246,6 +247,7 @@ RSpec.describe AllocationHistory, type: :model do
 
         allocation = create(
           :allocation_history,
+          prison: build(:prison).code,
           nomis_offender_id: nomis_offender_id,
           primary_pom_nomis_id: previous_primary_pom_nomis_id)
 
@@ -263,24 +265,24 @@ RSpec.describe AllocationHistory, type: :model do
   end
 
   describe 'automate pushing the primary pom to ndelius', :push_pom_to_delius do
-    let(:prison) { create(:prison).code }
+    let(:prison_code) { create(:prison).code }
 
     context 'when a new allocation is created and a POM is set' do
       before do
         expect(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:staff_detail).with(nomis_staff_id).and_return build(:pom, firstName: 'Bill', lastName: 'Jones')
-        expect(HmppsApi::CommunityApi).to receive(:set_pom).with offender_no: nomis_offender_id, prison: prison, forename: 'Bill', surname: 'Jones'
+        expect(HmppsApi::CommunityApi).to receive(:set_pom).with offender_no: nomis_offender_id, prison: prison_code, forename: 'Bill', surname: 'Jones'
       end
 
       it 'pushes the POM name to Ndelius'do
-        create(:allocation_history, :primary, nomis_offender_id: nomis_offender_id, prison: prison, primary_pom_nomis_id: nomis_staff_id)
+        create(:allocation_history, :primary, nomis_offender_id: nomis_offender_id, prison: prison_code, primary_pom_nomis_id: nomis_staff_id)
       end
     end
 
     context 'with an existing allocation' do
       before do
         expect(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:staff_detail).with(nomis_staff_id).and_return build(:pom, firstName: 'Bill', lastName: 'Jones')
-        expect(HmppsApi::CommunityApi).to receive(:set_pom).with offender_no: nomis_offender_id, prison: prison, forename: 'Bill', surname: 'Jones'
-        create(:allocation_history, :primary, nomis_offender_id: nomis_offender_id, prison: prison, primary_pom_nomis_id: nomis_staff_id)
+        expect(HmppsApi::CommunityApi).to receive(:set_pom).with offender_no: nomis_offender_id, prison: prison_code, forename: 'Bill', surname: 'Jones'
+        create(:allocation_history, :primary, nomis_offender_id: nomis_offender_id, prison: prison_code, primary_pom_nomis_id: nomis_staff_id)
       end
 
       let(:allocation) { described_class.last }
@@ -304,7 +306,7 @@ RSpec.describe AllocationHistory, type: :model do
       describe 're-allocated POM ' do
         before do
           expect(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:staff_detail).with(updated_nomis_staff_id).and_return build(:pom, firstName: 'Sally', lastName: 'Albright')
-          expect(HmppsApi::CommunityApi).to receive(:set_pom).with offender_no: nomis_offender_id, prison: prison, forename: 'Sally', surname: 'Albright'
+          expect(HmppsApi::CommunityApi).to receive(:set_pom).with offender_no: nomis_offender_id, prison: prison_code, forename: 'Sally', surname: 'Albright'
         end
 
         let(:updated_nomis_staff_id) { 146890 }

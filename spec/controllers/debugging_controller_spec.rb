@@ -13,10 +13,10 @@ RSpec.describe DebuggingController, type: :controller do
   context 'when debugging at a prison level' do
     let(:offenders) {
       [
-        build(:nomis_offender),
-        build(:nomis_offender),
-        build(:nomis_offender, dateOfBirth: Time.zone.today - 15.years),
-        build(:nomis_offender, sentence: attributes_for(:sentence_detail, releaseDate: nil,
+        build(:nomis_offender, agencyId: prison.code),
+        build(:nomis_offender, agencyId: prison.code),
+        build(:nomis_offender, agencyId: prison.code, dateOfBirth: Time.zone.today - 15.years),
+        build(:nomis_offender, agencyId: prison.code, sentence: attributes_for(:sentence_detail, releaseDate: nil,
                                                         paroleEligibilityDate: nil, homeDetentionCurfewEligibilityDate: nil, tariffDate: nil))
       ]
     }
@@ -55,7 +55,7 @@ RSpec.describe DebuggingController, type: :controller do
     let(:primary_pom_name) { 'Jenae Sporer' }
 
     it 'can show debugging information for a specific offender' do
-      stub_offender(build(:nomis_offender, sentence: attributes_for(:sentence_detail, :indeterminate), offenderNo: offender_no))
+      stub_offender(build(:nomis_offender, agencyId: prison.code, sentence: attributes_for(:sentence_detail, :indeterminate), offenderNo: offender_no))
 
       stub_movements_for offender_no, [attributes_for(:movement, offenderNo: offender_no,
                                        fromAgency: "LEI",
@@ -64,7 +64,7 @@ RSpec.describe DebuggingController, type: :controller do
                                        directionCode: "IN")], movement_types: ['ADM', 'TRN', 'REL']
 
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
-      create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: pom_staff_id, primary_pom_name: primary_pom_name)
+      create(:allocation_history, prison: prison.code, nomis_offender_id: offender_no, primary_pom_nomis_id: pom_staff_id, primary_pom_name: primary_pom_name)
 
       get :debugging, params: { prison_id: prison_id, offender_no: offender_no }
 

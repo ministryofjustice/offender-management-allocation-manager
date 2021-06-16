@@ -2,6 +2,7 @@ require 'rails_helper'
 
 feature 'Provide debugging information for our team to use' do
   let(:nomis_offender_id) { "G1670VU" }
+  let(:prison) { Prison.find 'LEI' }
 
   before do
     signin_global_admin_user
@@ -27,6 +28,7 @@ feature 'Provide debugging information for our team to use' do
 
     it 'returns information for an allocated offender', vcr: { cassette_name: 'prison_api/debugging_allocated_offender_feature' } do
       create(:allocation_history,
+             prison: 'LEI',
              nomis_offender_id: nomis_offender_id,
              primary_pom_name: "Rossana Spinka"
              )
