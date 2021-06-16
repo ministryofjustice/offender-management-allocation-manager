@@ -29,11 +29,11 @@ module BadgeHelper
     end
   end
 
-  def early_allocation_active?(early_allocations)
-    early_allocations.any? && early_allocations.last.awaiting_community_decision?
+  def early_allocation_active?(offender, early_allocations)
+    early_allocations.any? && early_allocations.last.assessment_date.after?(offender.sentence_start_date) && early_allocations.last.awaiting_community_decision?
   end
 
-  def early_allocation_approved?(early_allocations)
-    early_allocations.any? && early_allocations.last.created_within_referral_window? && early_allocations.last.community_decision_eligible_or_automatically_eligible?
+  def early_allocation_approved?(offender)
+    offender.latest_early_allocation&.created_within_referral_window? && offender.latest_early_allocation&.community_decision_eligible_or_automatically_eligible?
   end
 end
