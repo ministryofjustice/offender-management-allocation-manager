@@ -51,7 +51,7 @@ RSpec.describe "allocations/history", type: :view do
     end
 
     context 'with an eligible unsent early alloc' do
-      let(:ea) { create(:early_allocation, :unsent, created_at: DateTime.new(2019, 11, 19, 11, 28, 0)) }
+      let(:ea) { create(:early_allocation, :pre_window, created_at: DateTime.new(2019, 11, 19, 11, 28, 0)) }
       let(:early_allocations) { [ea] }
 
       it 'shows a single record' do
@@ -68,7 +68,7 @@ RSpec.describe "allocations/history", type: :view do
     end
 
     context 'with an ineligible unsent early alloc' do
-      let(:ea) { create(:early_allocation, :unsent, :ineligible, created_at: DateTime.new(2019, 11, 19, 11, 28, 0)) }
+      let(:ea) { create(:early_allocation, :pre_window, :ineligible, created_at: DateTime.new(2019, 11, 19, 11, 28, 0)) }
       let(:early_allocations) { [ea] }
 
       it 'shows a single record' do
@@ -83,7 +83,7 @@ RSpec.describe "allocations/history", type: :view do
     end
 
     context 'with a discretionary unsent early alloc' do
-      let(:ea) { create(:early_allocation, :unsent, :discretionary, created_at: DateTime.new(2019, 11, 19, 11, 28, 0)) }
+      let(:ea) { create(:early_allocation, :pre_window, :discretionary, created_at: DateTime.new(2019, 11, 19, 11, 28, 0)) }
       let(:early_allocations) { [ea] }
 
       it 'shows a single record' do

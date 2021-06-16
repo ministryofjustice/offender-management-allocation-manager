@@ -54,11 +54,6 @@ class CaseInformation < ApplicationRecord
     end
   end
 
-  # We only normally show/edit the most recent early allocation
-  def latest_early_allocation
-    early_allocations.last
-  end
-
   validates :manual_entry, inclusion: { in: [true, false], allow_nil: false }
   validates :nomis_offender_id, presence: true, uniqueness: true
 

@@ -19,7 +19,7 @@ RSpec.describe EarlyAllocationsController, :allocation, type: :controller do
     ]
   }
 
-  let(:offender) { build(:nomis_offender, agencyId: prison, sentence: attributes_for(:sentence_detail, conditionalReleaseDate: release_date)) }
+  let(:offender) { build(:nomis_offender, agencyId: prison, sentence: attributes_for(:sentence_detail, sentenceStartDate: Time.zone.today - 9.months,  conditionalReleaseDate: release_date)) }
 
   let(:nomis_offender_id) { offender.fetch(:offenderNo) }
 

@@ -55,7 +55,7 @@ RSpec.describe "early_allocations/show", type: :view do
   end
 
   context 'when eligible and unsent' do
-    let(:early_allocation) { create(:early_allocation, :eligible, :unsent) }
+    let(:early_allocation) { create(:early_allocation, :eligible, :pre_window) }
 
     it 'shows the outcome' do
       expect(page).to have_text('Eligible - assessment not sent to the community probation team')
@@ -71,7 +71,7 @@ RSpec.describe "early_allocations/show", type: :view do
   end
 
   context 'when discretionary - not sent' do
-    let(:early_allocation) { create(:early_allocation, :discretionary, :unsent) }
+    let(:early_allocation) { create(:early_allocation, :discretionary, :pre_window) }
 
     it 'shows the outcome' do
       expect(page).to have_text('Discretionary - assessment not sent to the community probation team')

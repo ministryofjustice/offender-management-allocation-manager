@@ -149,4 +149,35 @@ RSpec.describe EarlyAllocation, type: :model do
                                                                                      eligible_outside_referral])
     end
   end
+
+  describe '#early_allocation?' do
+    let(:offender) {
+      build(:hmpps_api_offender,
+            sentence: build(:sentence_detail, sentenceStartDate: Time.zone.today - 1.week)).tap { |offender|
+        offender.load_case_information(case_info)
+      }
+    }
+
+    let(:case_info) {
+      create(:case_information,
+             early_allocations: [build(:early_allocation, :eligible, created_at: assessment_date)])
+    }
+
+
+    context 'when early allocations comes before the current sentence start date' do
+      let(:assessment_date) { Time.zone.today - 2.weeks }
+
+      it 'ignores them' do
+        expect(offender.early_allocation?).to eq(false)
+      end
+    end
+
+    context 'when early allocations come after the current sentence start date' do
+      let(:assessment_date) { Time.zone.today }
+
+      it 'doesnt ignores them' do
+        expect(offender.early_allocation?).to eq(true)
+      end
+    end
+  end
 end

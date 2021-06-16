@@ -108,7 +108,7 @@ module HmppsApi
     def early_allocation?
       return false if @case_information.blank?
 
-      early_allocation.present?
+      latest_early_allocation.present?
     end
 
     def needs_early_allocation_notify?
@@ -257,6 +257,15 @@ module HmppsApi
         criminal_sentence? && convicted?
     end
 
+    def latest_early_allocation
+      allocation = early_allocations&.last
+      allocation if allocation.present? && allocation.created_within_referral_window? && (allocation.eligible? || allocation.community_decision?)
+    end
+
+    def early_allocations
+      @case_information.early_allocations.where('created_at::date >= ?', sentence_start_date) unless @case_information.nil?
+    end
+
   private
 
     def age
@@ -289,11 +298,6 @@ module HmppsApi
                     else
                       HandoverDateService::NO_HANDOVER_DATE
                     end
-    end
-
-    def early_allocation
-      allocation = @case_information&.latest_early_allocation
-      allocation if allocation.present? && (allocation.created_within_referral_window? && allocation.eligible? || allocation.community_decision?)
     end
   end
 end
