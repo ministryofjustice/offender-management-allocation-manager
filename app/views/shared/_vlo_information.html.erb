@@ -1,4 +1,4 @@
-<table class="govuk-table">
+<table class="govuk-table no-bottom-padding">
   <tbody class="govuk-table__body">
     <tr class="govuk-table__row">
       <td class="govuk-table__header govuk-!-width-one-half" scope="row">Victim Liaison Officer (VLO)
@@ -8,13 +8,12 @@
     </tr>
     <tr>
       <td class="govuk-!-width-full">
-        <%= render collection: @prisoner.victim_liaison_officers, partial: 'shared/victim_liaison_officer' %>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <%= link_to 'Add new VLO contact', new_prison_prisoner_victim_liaison_officer_path(@prison.code, @prisoner.offender_no), class: 'govuk-link govuk-!-margin-top-2' %>
+        <%= render collection: victim_liaison_officers, partial: 'shared/victim_liaison_officer' %>
       </td>
     </tr>
   </tbody>
 </table>
+<div class="govuk-body vlo-spacing">
+  <%= link_to 'Add new VLO contact', new_prison_prisoner_victim_liaison_officer_path(prison_code, offender_no), class: 'govuk-link' %>
+</div>
+

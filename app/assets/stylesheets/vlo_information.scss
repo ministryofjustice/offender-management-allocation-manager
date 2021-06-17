@@ -1,3 +1,14 @@
 #non-disclosable-badge {
   margin-left: 10px;
 }
+
+.vlo-spacing {
+  margin-bottom: 60px;
+  margin-top: 0px;
+}
+
+// Override govuk-table settings to allow 'Add VLO Contact' to nestle below table nicely
+.no-bottom-padding {
+  padding-bottom: 0;
+  margin-bottom: 0;
+}

@@ -71,4 +71,4 @@
 <%= render partial: 'shared/offence_info', locals: { editable_prd: true}  %>
 <%= render 'prison_allocation' %>
 <%= render 'community_information' %>
-<%= render 'shared/vlo_information' %>
+<%= render 'shared/vlo_information', victim_liaison_officers: @prisoner.victim_liaison_officers, offender_no: @prisoner.offender_no, prison_code: @prison.code %>
