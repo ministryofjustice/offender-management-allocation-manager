@@ -17,8 +17,8 @@
 
   <%= form.govuk_collection_radio_buttons(
           :case_allocation,
-          [OpenStruct.new(name: 'National Probation Service (NPS)', value: 'NPS'),
-           OpenStruct.new(name: 'Community Rehabilitation Company (CRC)', value: 'CRC')],
+          [OpenStruct.new(name: t(:nps), value: 'NPS'),
+           OpenStruct.new(name: t(:crc), value: 'CRC')],
           :value,
           :name,
           legend: { text: "Who is the service provider for this case?" }
