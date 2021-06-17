@@ -68,7 +68,7 @@ class CoworkingController < PrisonsApplicationController
       ).send_cowork_deallocation_email(secondary_pom_name)
     end
 
-    redirect_to prison_allocation_path(active_prison_id, nomis_offender_id_from_url)
+    redirect_to prison_prisoner_allocation_path(active_prison_id, nomis_offender_id_from_url)
   end
 
 private

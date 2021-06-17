@@ -30,12 +30,10 @@ Rails.application.routes.draw do
         |request| PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id))
       } do
         get 'new_missing_info' => 'female_missing_infos#new'
-        resource :female_missing_info, only: [:show, :update] do
-        end
+        resource :female_missing_info, only: [:show, :update]
       end
 
-      resource :female_missing_info, only: [:new, :show, :update] do
-      end
+      resource :female_missing_info, only: [:new, :show, :update]
 
       collection do
         get 'allocated'
@@ -72,35 +70,23 @@ Rails.application.routes.draw do
         end
       end
 
-      constraints lambda {
-        # Women's allocation routes
-        |request| PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id))
-      } do
-        resources :staff, only: :index, controller: 'female_allocations' do
-          resources :allocations, only: %i[new show update], controller: 'female_allocations'
-        end
+      resources :staff, only: %i[index], controller: 'allocation_staff' do
+        resources :build_allocations, only: %i[new show update], controller: 'build_allocations'
       end
-      constraints lambda {
-        # Men's initial allocation route (entry point) - has to be same as women's
-        |request| !PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id))
-      } do
-        resources :staff, only: %i[index], controller: 'allocations'
+
+      resource :allocation, only: %i[show] do
+        member do
+          get 'history'
+        end
       end
     end
 
-    # TODO: re-work all these 'allocation' routes in the light of the Women's implementation
-    # Note that 'new' was removed from this list and moved into initial Men's route above
-    resources :allocations, only: %i[show create edit update], param: :nomis_offender_id
-    get('/allocations/:nomis_offender_id/history' => 'allocations#history', as: 'allocation_history')
-    get('/allocations/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocations#confirm', as: 'confirm_allocation')
-    get('/reallocations/confirm/:nomis_offender_id/:nomis_staff_id' => 'allocations#confirm_reallocation', as: 'confirm_reallocation')
     resources :coworking, only: [:new, :create, :destroy], param: :nomis_offender_id, path_names: {
       new: ':nomis_offender_id/new',
     } do
       get('confirm_coworking_removal' => 'coworking#confirm_removal', as: 'confirm_removal')
     end
     get('/coworking/confirm/:nomis_offender_id/:primary_pom_id/:secondary_pom_id' => 'coworking#confirm', as: 'confirm_coworking_allocation')
-    resource :overrides,  only: %i[ new create ], path_names: { new: 'new/:nomis_offender_id/:nomis_staff_id'}
 
     resources :case_information, only: %i[new create edit update show], param: :prisoner_id, controller: 'case_information', path_names: {
         new: 'new/:prisoner_id',

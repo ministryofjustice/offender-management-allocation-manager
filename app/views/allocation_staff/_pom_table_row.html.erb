@@ -11,6 +11,6 @@
   <td aria-label="recent allocations" class="govuk-table__cell govuk-table__cell--numeric"><%= pom.allocations.count(&:new_case?) %></td>
   <td aria-label="Total cases" class="govuk-table__cell govuk-table__cell--numeric govuk-!-font-weight-bold"><%= pom.allocations.count %></td>
   <td aria-label="Allocate" class="govuk-table__cell">
-    <%= link_to 'Allocate', new_prison_prisoner_staff_allocation_path(@prison.code, nomis_offender_id, pom.staff_id) %>
+    <%= link_to 'Allocate', new_prison_prisoner_staff_build_allocation_path(@prison.code, nomis_offender_id, pom.staff_id) %>
   </td>
 </tr>

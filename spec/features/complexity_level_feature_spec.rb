@@ -25,7 +25,7 @@ feature 'complexity level feature' do
       expect(HmppsApi::ComplexityApi).to receive(:save).with(offender.fetch(:offenderNo), level: 'low', username: "MOIC_POM", reason: 'bla bla bla')
 
       # Journey starts on prisoner profile page. It should display the existing complexity level and a change link.
-      visit  prison_allocation_path(nomis_offender_id: offender.fetch(:offenderNo), prison_id: womens_prison.code)
+      visit prison_prisoner_allocation_path(prisoner_id: offender.fetch(:offenderNo), prison_id: womens_prison.code)
 
       expect(page).to have_text('Complexity of need level')
       expect(page).to have_css('#complexity-level', text: 'High')
@@ -64,13 +64,13 @@ feature 'complexity level feature' do
 
       click_on('Return to prisoner page')
 
-      expect(page).to have_current_path(prison_allocation_path(nomis_offender_id: offender.fetch(:offenderNo), prison_id: womens_prison.code), ignore_query: true)
+      expect(page).to have_current_path(prison_prisoner_allocation_path(prisoner_id: offender.fetch(:offenderNo), prison_id: womens_prison.code), ignore_query: true)
       expect(page).to have_css('#complexity-level', text: 'Low')
       expect(page).to have_css('#complexity-badge', text: 'LOW COMPLEXITY')
     end
 
     it 'can click back link to return to the prisoner profile page' do
-      visit  prison_allocation_path(nomis_offender_id: offender.fetch(:offenderNo), prison_id: womens_prison.code)
+      visit prison_prisoner_allocation_path(prisoner_id: offender.fetch(:offenderNo), prison_id: womens_prison.code)
       within(:css, "td#complexity-level") do
         click_link('Change')
       end
@@ -79,7 +79,7 @@ feature 'complexity level feature' do
       expect(page).to have_text 'Update complexity of need level'
 
       click_link('Back')
-      expect(page).to have_current_path(prison_allocation_path(nomis_offender_id: offender.fetch(:offenderNo), prison_id: womens_prison.code))
+      expect(page).to have_current_path(prison_prisoner_allocation_path(prisoner_id: offender.fetch(:offenderNo), prison_id: womens_prison.code))
     end
   end
 

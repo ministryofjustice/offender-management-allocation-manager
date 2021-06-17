@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_04_153151) do
+ActiveRecord::Schema.define(version: 2021_06_18_083355) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -159,14 +159,6 @@ ActiveRecord::Schema.define(version: 2021_06_04_153151) do
   create_table "offenders", primary_key: "nomis_offender_id", id: :string, force: :cascade do |t|
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-  end
-
-  create_table "overrides", force: :cascade do |t|
-    t.integer "nomis_staff_id"
-    t.string "nomis_offender_id"
-    t.string "override_reasons"
-    t.string "more_detail"
-    t.string "suitability_detail"
   end
 
   create_table "pom_details", force: :cascade do |t|

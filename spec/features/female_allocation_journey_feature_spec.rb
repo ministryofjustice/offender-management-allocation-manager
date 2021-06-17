@@ -8,8 +8,9 @@ feature "womens allocation journey" do
   let(:offender) { build(:nomis_offender, sentence: attributes_for(:sentence_detail, :determinate_release_in_three_years), agencyId: prison.code) }
   let(:nomis_offender_id) { offender.fetch(:offenderNo) }
   let(:user) { build(:pom) }
-  let(:probation_pom) { build(:pom, :probation_officer) }
-  let(:probation_pom2) { build(:pom, :probation_officer) }
+  let(:probation_pom) { build(:pom, :probation_officer, lastName: 'Jones') }
+  # This has to be alphabetically after probation_pom so it turns up in the right place on the screen
+  let(:probation_pom2) { build(:pom, :probation_officer, lastName: 'Smith') }
   let(:inactive_prison_pom) { build(:pom, :prison_officer) }
   let(:prison_pom) { build(:pom, :prison_officer) }
   let(:message_text) { Faker::Lorem.sentence }
@@ -72,11 +73,11 @@ feature "womens allocation journey" do
     end
 
     scenario 'rejecting recommendation' do
-      find('#accordion-1-heading').click
+      find('#non-recommended-accordion-section-heading').click
       find('#accordion-2-heading').click
 
       # Choose the one non-recommended POM
-      within '#accordion-1' do
+      within '#non-recommended-accordion-section' do
         click_link 'Allocate'
       end
       # Try to just hit 'Continue' - it should bounce with a nice error
@@ -90,7 +91,7 @@ feature "womens allocation journey" do
       end
 
       # now fill it in properly and continue
-      find('label[for=override-override-reasons-continuity-field]').click
+      find('label[for=override-form-override-reasons-continuity-field]').click
       click_button 'Continue'
 
       fill_in 'allocation-form-message-field', with: message_text

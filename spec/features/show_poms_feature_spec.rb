@@ -18,7 +18,17 @@ feature "get poms list" do
   end
 
   it "handles missing sentence data", vcr: { cassette_name: 'prison_api/show_poms_feature_missing_sentence' } do
-    visit prison_confirm_allocation_path('LEI', offender_missing_sentence_case_info.nomis_offender_id, 485_926)
+    visit prison_prisoner_staff_index_path('LEI', offender_missing_sentence_case_info.nomis_offender_id)
+
+    # Moic POM is 8th in the list
+    within '#recommended_poms' do
+      within 'tbody > tr:nth-child(8)' do
+        click_link 'Allocate'
+      end
+    end
+
+    expect(page).to have_css('p', text: "You are allocating Aianilan Albina to Moic Pom")
+
     click_button 'Complete allocation'
 
     visit prison_pom_path('LEI', 485_926)

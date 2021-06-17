@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
-class Override < ApplicationRecord
-  validates :nomis_staff_id, presence: {
-    message: 'NOMIS Staff ID is required'
-  }
-  validates :nomis_offender_id, presence: {
-    message: 'NOMIS Offender ID is required'
-  }
+class OverrideForm
+  include ActiveModel::Model
+  include ActiveModel::Attributes
+
+  attribute :override_reasons, :string
+  attribute :more_detail, :string
+  attribute :suitability_detail, :string
+
   validates :override_reasons, presence: {
     message: 'Select one or more reasons for not accepting the recommendation'
   }

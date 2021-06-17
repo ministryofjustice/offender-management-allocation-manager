@@ -64,8 +64,6 @@ class AllocationService
                           message: params[:message],
                           pom_nomis_id: params[:primary_pom_nomis_id]).send_email
 
-    delete_overrides(params[:primary_pom_nomis_id], params[:nomis_offender_id])
-
     alloc_version
   end
 
@@ -76,28 +74,7 @@ class AllocationService
     pom_ids.index_with { |pom_id| HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(pom_id).first }
   end
 
-  def self.create_override(params)
-    Override.find_or_create_by(
-      nomis_staff_id: params[:nomis_staff_id],
-      nomis_offender_id: params[:nomis_offender_id]
-    ).tap { |o|
-      o.override_reasons = params[:override_reasons]
-      o.suitability_detail = params[:suitability_detail]
-      o.more_detail = params[:more_detail]
-      o.save
-    }
-  end
-
   def self.current_allocation_for(nomis_offender_id)
     AllocationHistory.allocations(nomis_offender_id).last
-  end
-
-private
-
-  def self.delete_overrides(nomis_staff_id, nomis_offender_id)
-    Override.where(
-      nomis_staff_id: nomis_staff_id,
-      nomis_offender_id: nomis_offender_id).
-    destroy_all
   end
 end

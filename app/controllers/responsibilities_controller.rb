@@ -41,7 +41,7 @@ class ResponsibilitiesController < PrisonsApplicationController
 
     allocation = AllocationHistory.find_by(nomis_offender_id: @responsibility.nomis_offender_id, prison: @prison.code)
     if allocation.try(:active?)
-      redirect_to prison_allocation_path(@prison.code, @responsibility.nomis_offender_id)
+      redirect_to prison_prisoner_allocation_path(@prison.code, @responsibility.nomis_offender_id)
     else
       redirect_to prison_prisoner_staff_index_path(@prison.code, @responsibility.nomis_offender_id)
     end

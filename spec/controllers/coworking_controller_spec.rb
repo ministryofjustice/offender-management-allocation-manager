@@ -66,7 +66,7 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
         and_return(fakejob)
 
       delete :destroy, params: { prison_id: prison, nomis_offender_id: allocation.nomis_offender_id }
-      expect(response).to redirect_to(prison_allocation_path(prison, allocation.nomis_offender_id))
+      expect(response).to redirect_to(prison_prisoner_allocation_path(prison, allocation.nomis_offender_id))
     end
   end
 end

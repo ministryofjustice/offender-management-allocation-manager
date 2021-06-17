@@ -56,7 +56,7 @@ feature 'Co-working' do
     scenario 'show allocate a co-working POM page' do
       visit new_prison_coworking_path(prison.code, nomis_offender_id)
 
-      expect(page).to have_link 'Back', href: prison_allocation_path(prison.code, nomis_offender_id: nomis_offender_id)
+      expect(page).to have_link 'Back', href: prison_prisoner_allocation_path(prison.code, prisoner_id: nomis_offender_id)
       expect(page).to have_link('Allocate')
       expect(page).to have_css('h1', text: 'Allocate a co-working Prison Offender Manager')
       expect(page).to have_css('.govuk-table', count: 4)
@@ -117,7 +117,7 @@ feature 'Co-working' do
       expect(allocation.secondary_pom_nomis_id).to eq(secondary_pom[:staff_id])
       expect(allocation.secondary_pom_name).to eq("INTEGRATION-TESTS, MOIC")
 
-      visit prison_allocation_path(prison.code, nomis_offender_id)
+      visit prison_prisoner_allocation_path(prison.code, nomis_offender_id)
       within '#co-working-pom' do
         expect(page).to have_content 'Remove'
         expect(page).to have_content 'Integration-Tests, Moic'
@@ -140,7 +140,7 @@ feature 'Co-working' do
     }
 
     before(:each) do
-      visit prison_allocation_path(prison.code, nomis_offender_id)
+      visit prison_prisoner_allocation_path(prison.code, nomis_offender_id)
 
       within '#co-working-pom' do
         click_link 'Remove'
@@ -152,7 +152,7 @@ feature 'Co-working' do
     end
 
     scenario 'cancel removal of a co-working POM' do
-      visit prison_allocation_path(prison.code, nomis_offender_id)
+      visit prison_prisoner_allocation_path(prison.code, nomis_offender_id)
 
       within '#co-working-pom' do
         click_link 'Remove'
@@ -161,11 +161,11 @@ feature 'Co-working' do
       expect(page).to have_current_path("/prisons/#{prison.code}/coworking/G4273GI/confirm_coworking_removal")
       click_link 'Cancel'
 
-      expect(page).to have_current_path(prison_allocation_path(prison.code, nomis_offender_id))
+      expect(page).to have_current_path(prison_prisoner_allocation_path(prison.code, nomis_offender_id))
     end
 
     scenario 'removing a co-working POM' do
-      visit prison_allocation_path(prison.code, nomis_offender_id)
+      visit prison_prisoner_allocation_path(prison.code, nomis_offender_id)
 
       within '#co-working-pom' do
         click_link 'Remove'
@@ -174,7 +174,7 @@ feature 'Co-working' do
       expect(page).to have_current_path("/prisons/#{prison.code}/coworking/G4273GI/confirm_coworking_removal")
 
       click_button 'Confirm'
-      expect(page).to have_current_path("/prisons/#{prison.code}/allocations/G4273GI")
+      expect(page).to have_current_path(prison_prisoner_allocation_path(prison.code, 'G4273GI'))
 
       expect(page).to have_link 'Allocate'
       within '#co-working-pom' do
@@ -207,7 +207,7 @@ feature 'Co-working' do
 
     scenario 'allocating' do
       expect(allocation.secondary_pom_nomis_id).to eq(123456)
-      visit prison_allocation_path(prison.code, nomis_offender_id)
+      visit prison_prisoner_allocation_path(prison.code, nomis_offender_id)
 
       click_link 'Allocate'
 

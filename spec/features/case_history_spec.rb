@@ -192,7 +192,7 @@ feature 'Case History' do
           MovementService.process_transfer build(:movement, :transfer, offenderNo: nomis_offender_id, toAgency: open_prison.code)
           RecalculateHandoverDateJob.perform_now nomis_offender_id
         end
-        visit prison_allocation_history_path(open_prison.code, nomis_offender_id)
+        visit history_prison_prisoner_allocation_path(open_prison.code, nomis_offender_id)
       end
 
       let(:formatted_deallocate_date) { deallocate_date.strftime("#{deallocate_date.day.ordinalize} %B %Y (%R)") }
@@ -412,7 +412,7 @@ feature 'Case History' do
 
         # Back link takes us back
         click_link 'Back'
-        case_history_page = prison_allocation_history_path(open_prison.code, nomis_offender_id)
+        case_history_page = history_prison_prisoner_allocation_path(open_prison.code, nomis_offender_id)
         expect(page).to have_current_path(case_history_page)
       end
     end
@@ -451,7 +451,7 @@ feature 'Case History' do
       end
 
       it 'displays 3 sections - allocation plus 2 early allocation records' do
-        visit prison_allocation_history_path(open_prison.code, nomis_offender_id)
+        visit history_prison_prisoner_allocation_path(open_prison.code, nomis_offender_id)
         expect(all('.moj-timeline__item').size).to eq(3)
       end
     end
@@ -473,7 +473,7 @@ feature 'Case History' do
       end
 
       it 'displays all the data and doesnt crash' do
-        visit prison_allocation_history_path(open_prison.code, nomis_offender_id)
+        visit history_prison_prisoner_allocation_path(open_prison.code, nomis_offender_id)
       end
     end
   end

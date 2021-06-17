@@ -50,7 +50,7 @@ RSpec.describe ComplexityLevelsController, type: :controller do
 
       it 'saves the complexity level and redirects to the prisoner profile page' do
         post :update,  params: { complexity: { level: 'medium', reason: 'Just because' }, prison_id: womens_prison.code, prisoner_id: offender_no }
-        expect(response).to redirect_to(prison_allocation_path(nomis_offender_id: offender_no, prison_id: womens_prison.code))
+        expect(response).to redirect_to(prison_prisoner_allocation_path(nomis_offender_id: offender_no, prison_id: womens_prison.code))
       end
     end
   end
