@@ -11,8 +11,8 @@
     Allocate a POM
   <% end %>
 </h1>
-<hr class="govuk-section-break govuk-section-break--l"/>
-<h2 class="govuk-heading-l govuk-!-margin-bottom-5">Review Case Details</h2>
+<hr class="govuk-section-break govuk-section-break--visible">
+<h2 class="govuk-heading-m govuk-!-margin-top-5 govuk-!-margin-bottom-5">Review case details</h2>
 
 <%= render 'shared/basic_prisoner_info', case_info: @case_info, prisoner: @prisoner %>
 
@@ -25,9 +25,9 @@
 <%= render 'allocations/case_information' %>
 
 <%= render 'prisoners/community_information' %>
-<%= render 'shared/vlo_information' %>
+<%= render 'shared/vlo_information', victim_liaison_officers: @prisoner.victim_liaison_officers, offender_no: @prisoner.offender_no, prison_code: @prison.code %>
 
-<hr class="govuk-section-break govuk-section-break--l"/>
+<hr class="govuk-section-break govuk-section-break--l">
 
 <h2 class="govuk-heading-l govuk-!-margin-bottom-5">
   Recommendation: <%= recommended_pom_type_label(@prisoner) %> POM
@@ -35,7 +35,7 @@
 <p class="govuk-body">This recommendation takes into account
   <%= @prisoner.first_name %> <%= @prisoner.last_name %>'s current tier and time left to serve.
 </p>
-<hr class="govuk-section-break govuk-section-break--l"/>
+<hr class="govuk-section-break govuk-section-break--visible">
 
 <% if @previous_poms.any? %>
   <div class="govuk-warning-text">
