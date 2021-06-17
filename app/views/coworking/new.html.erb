@@ -1,4 +1,4 @@
-<%= render :partial => "/shared/backlink", :locals => { :page => prison_allocation_path(@prison.code, nomis_offender_id: @prisoner.offender_no) } %>
+<%= render :partial => "/shared/backlink", :locals => { :page => prison_prisoner_allocation_path(@prison.code, prisoner_id: @prisoner.offender_no) } %>
 
 <h1 class="govuk-heading-l govuk-!-margin-bottom-5">Allocate a co-working Prison Offender Manager</h1>
 

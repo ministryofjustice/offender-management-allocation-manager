@@ -22,10 +22,6 @@ module ApplicationHelper
     }.fetch(level)
   end
 
-  def override_reason_contains(override, val)
-    override.override_reasons.present? && override.override_reasons.include?(val)
-  end
-
   def service_provider_label(provider)
     {
       'CRC' => 'Community Rehabilitation Company (CRC)',

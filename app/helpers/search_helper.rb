@@ -12,7 +12,7 @@ module SearchHelper
     else
       link_to(
         'View',
-        prison_allocation_path(prison, nomis_offender_id: offender_id)
+        prison_prisoner_allocation_path(prison, prisoner_id: offender_id)
       )
     end
   end

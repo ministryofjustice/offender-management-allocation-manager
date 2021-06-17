@@ -2,26 +2,9 @@
 
 class AllocationsController < PrisonsApplicationController
   before_action :ensure_spo_user, except: :history
-
-  delegate :update, to: :create
-
-  def index
-    offender_id = params.require(:prisoner_id)
-    @prisoner = offender(offender_id)
-    @recommended_poms, @not_recommended_poms =
-      recommended_and_nonrecommended_poms_for(@prisoner)
-    @unavailable_pom_count = unavailable_pom_count
-    @allocation = AllocationHistory.find_by nomis_offender_id: offender_id
-    @previously_allocated_pom_ids =
-      @allocation.present? ? @allocation.previously_allocated_poms : []
-    offender = Offender.includes(case_information: :early_allocations).find_by(nomis_offender_id: offender_id)
-    @case_info = offender.case_information if offender.present?
-    @emails_sent_to_ldu = EmailHistory.sent_within_current_sentence(@prisoner, EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION)
-  end
+  before_action :load_prisoner
 
   def show
-    @prisoner = offender(nomis_offender_id_from_url)
-
     allocation = AllocationHistory.find_by!(nomis_offender_id: @prisoner.offender_no)
     @allocation = CaseHistory.new(allocation.get_old_versions.last, allocation, allocation.versions.last)
 
@@ -39,59 +22,6 @@ class AllocationsController < PrisonsApplicationController
     prisoner = Offender.includes(case_information: :early_allocations).find_by(nomis_offender_id: nomis_offender_id_from_url)
     @case_info = prisoner.case_information if prisoner.present?
     @emails_sent_to_ldu = EmailHistory.sent_within_current_sentence(@prisoner, EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION)
-  end
-
-  def edit
-    @allocation = AllocationService.current_allocation_for(nomis_offender_id_from_url)
-
-    unless @allocation.present? && @allocation.active?
-      redirect_to prison_prisoner_staff_index_path(active_prison_id, nomis_offender_id_from_url)
-      return
-    end
-
-    @prisoner = offender(nomis_offender_id_from_url)
-    @previously_allocated_pom_ids = @allocation.previously_allocated_poms
-    @recommended_poms, @not_recommended_poms =
-      recommended_and_nonrecommended_poms_for(@prisoner)
-    @unavailable_pom_count = unavailable_pom_count
-
-    @current_pom = current_pom_for(nomis_offender_id_from_url)
-    @case_info = Offender.includes(case_information: :early_allocations).find_by!(nomis_offender_id: nomis_offender_id_from_url).case_information
-  end
-
-  def confirm
-    @prisoner = offender(nomis_offender_id_from_url)
-    @pom = @prison.get_single_pom(nomis_staff_id_from_url)
-    @event = :allocate_primary_pom
-    @event_trigger = :user
-  end
-
-  def confirm_reallocation
-    @prisoner = offender(nomis_offender_id_from_url)
-    @pom = @prison.get_single_pom(nomis_staff_id_from_url)
-    @event = :reallocate_primary_pom
-    @event_trigger = :user
-  end
-
-  # Note #update is delegated to #create
-  def create
-    offender = offender(allocation_params[:nomis_offender_id])
-    @override = override
-    allocation = allocation_attributes(offender)
-
-    if AllocationService.create_or_update(allocation)
-      flash[:notice] =
-        "#{offender.full_name_ordered} has been allocated to #{view_context.full_name_ordered(pom)} (#{view_context.grade(pom)})"
-    else
-      flash[:alert] =
-        "#{offender.full_name_ordered} has not been allocated  - please try again"
-    end
-
-    if allocation[:event] == 'allocate_primary_pom'
-      redirect_to unallocated_prison_prisoners_path(active_prison_id, page: params[:page], sort: params[:sort])
-    else
-      redirect_to allocated_prison_prisoners_path(active_prison_id, page: params[:page], sort: params[:sort])
-    end
   end
 
   def history
@@ -140,98 +70,15 @@ private
       end
   end
 
-  def unavailable_pom_count
-    @prison.get_list_of_poms.count { |pom| pom.status != 'active' }
-  end
-
-  def allocation_attributes(offender)
-    {
-      primary_pom_nomis_id: allocation_params[:nomis_staff_id].to_i,
-      nomis_offender_id: allocation_params[:nomis_offender_id],
-      event: allocation_params[:event],
-      event_trigger: allocation_params[:event_trigger],
-      created_by_username: current_user,
-      allocated_at_tier: offender.tier,
-      recommended_pom_type: (RecommendationService.recommended_pom_type(offender) == RecommendationService::PRISON_POM) ? 'prison' : 'probation',
-      prison: active_prison_id,
-      override_reasons: override_reasons,
-      suitability_detail: suitability_detail,
-      override_detail: override_detail,
-      message: allocation_params[:message]
-    }
-  end
-
   def offender(nomis_offender_id)
     OffenderService.get_offender(nomis_offender_id)
   end
 
-  def pom
-    @pom ||= @prison.get_single_pom(allocation_params[:nomis_staff_id])
-  end
-
-  def override
-    Override.where(
-      nomis_offender_id: allocation_params[:nomis_offender_id]).
-      where(nomis_staff_id: allocation_params[:nomis_staff_id]).last
-  end
-
-  def current_pom_for(nomis_offender_id)
-    nomis_staff_id = AllocationHistory.find_by!(nomis_offender_id: nomis_offender_id).primary_pom_nomis_id
-
-    @prison.get_single_pom(nomis_staff_id)
-  end
-
-  def recommended_and_nonrecommended_poms_for(offender)
-    allocation = AllocationHistory.find_by(nomis_offender_id: offender.offender_no)
-    # don't allow primary to be the same as the co-working POM
-    poms = @prison.get_list_of_poms.select { |pom|
-      pom.status == 'active' && pom.staff_id != allocation.try(:secondary_pom_nomis_id)
-    }
-
-    recommended_poms(offender, poms)
-  end
-
-  def recommended_poms(offender, poms)
-    # Returns a pair of lists where the first element contains the
-    # POMs from the `poms` parameter that are recommended for the
-    # `offender`
-    recommended_type = RecommendationService.recommended_pom_type(offender)
-    poms.partition { |pom|
-      if recommended_type == RecommendationService::PRISON_POM
-        pom.prison_officer?
-      else
-        pom.probation_officer?
-      end
-    }
-  end
-
   def nomis_offender_id_from_url
-    params.require(:nomis_offender_id)
+    params.require(:prisoner_id)
   end
 
-  def nomis_staff_id_from_url
-    params.require(:nomis_staff_id)
-  end
-
-  def allocation_params
-    params.require(:allocations).permit(
-      :nomis_staff_id,
-      :nomis_offender_id,
-      :message,
-      :event,
-      :event_trigger
-    )
-  end
-
-  def override_reasons
-    @override[:override_reasons] if @override.present?
-  end
-
-  def override_detail
-    @override[:more_detail] if @override.present?
-  end
-
-  def suitability_detail
-    @override[:suitability_detail] if @override.present?
+  def load_prisoner
+    @prisoner = OffenderService.get_offender(nomis_offender_id_from_url)
   end
 end

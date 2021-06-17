@@ -14,7 +14,7 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
   end
 
   it 'updates the date',  vcr: { cassette_name: 'prison_api/change_parole_date' } do
-    path = prison_allocation_path(prison, nomis_offender_id)
+    path = prison_prisoner_allocation_path(prison, nomis_offender_id)
     visit path
 
     click_link 'Update'
@@ -30,7 +30,7 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
   end
 
   it 'bounces properly', vcr: { cassette_name: 'prison_api/change_parole_date_bounce' } do
-    visit prison_allocation_path(prison, nomis_offender_id)
+    visit prison_prisoner_allocation_path(prison, nomis_offender_id)
 
     click_link 'Update'
 

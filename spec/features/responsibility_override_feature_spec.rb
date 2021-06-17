@@ -21,7 +21,7 @@ feature 'Responsibility override' do
       end
 
       it 'overrides' do
-        visit prison_allocation_path('LEI', offender_id)
+        visit prison_prisoner_allocation_path('LEI', offender_id)
 
         within '.responsibility_change' do
           click_link 'Change'
@@ -39,7 +39,7 @@ feature 'Responsibility override' do
         }.to change(enqueued_jobs, :count).by(2)
 
         expect(page).to have_content 'Current responsibility Community'
-        expect(page).to have_current_path(prison_allocation_path('LEI', offender_id))
+        expect(page).to have_current_path(prison_prisoner_allocation_path('LEI', offender_id))
       end
     end
 

@@ -29,7 +29,7 @@ RSpec.describe SearchHelper do
 
       it "will change to view" do
         text, _link = cta_for_offender('LEI', offender)
-        expect(text).to eq("<a href=\"/prisons/LEI/allocations/#{offender.offender_no}\">View</a>")
+        expect(text).to eq(link_to 'View', prison_prisoner_allocation_path('LEI', offender.offender_no))
       end
     end
   end

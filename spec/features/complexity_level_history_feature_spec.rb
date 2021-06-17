@@ -20,7 +20,7 @@ feature 'Case history with complexity level' do
            created_by_name: created_by_name,
            primary_pom_nomis_id: pom.staff_id, primary_pom_name: pom_name)
 
-    visit prison_allocation_history_path(prison_code, offender_no)
+    visit history_prison_prisoner_allocation_path(prison_code, offender_no)
   end
 
   let(:now) { Time.zone.now }

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "allocations/index", type: :view do
+RSpec.describe "allocation_staff/index", type: :view do
   let(:prison) { create(:prison) }
   let(:page) { Nokogiri::HTML(rendered) }
   let(:case_type_badge) { page.css('#prisoner-case-type') }
@@ -10,8 +10,9 @@ RSpec.describe "allocations/index", type: :view do
 
   before do
     assign(:prison, prison)
-    assign(:recommended_poms, [])
-    assign(:not_recommended_poms, [])
+    assign(:previous_poms, [])
+    assign(:probation_poms, [])
+    assign(:prison_poms, [])
     assign(:unavailable_pom_count, 0)
     assign(:prisoner, offender)
     assign(:case_info, build(:case_information))

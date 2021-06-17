@@ -36,7 +36,7 @@ feature "view an offender's allocation information" do
 
     it "displays 'Data not available'",
        vcr: { cassette_name: 'prison_api/show_allocation_information_keyworker_not_assigned' } do
-      visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_without_keyworker)
+      visit prison_prisoner_allocation_path('LEI', prisoner_id: nomis_offender_id_without_keyworker)
 
       expect(page).to have_css('h1', text: 'Allocation information')
 
@@ -66,7 +66,7 @@ feature "view an offender's allocation information" do
                                                   automatic_release_date: (Time.zone.today + 7.months),
                                                   hdced: (Time.zone.today + 7.months))
 
-        visit prison_allocation_path('LEI', nomis_offender_id: offender_no)
+        visit prison_prisoner_allocation_path('LEI', prisoner_id: offender_no)
       end
 
       it "displays a POM as responsible" do
@@ -99,7 +99,7 @@ feature "view an offender's allocation information" do
                                                   automatic_release_date: "2020-06-02",
                                                   hdced: "2020-06-02")
 
-        visit prison_allocation_path('LEI', nomis_offender_id: offender_no)
+        visit prison_prisoner_allocation_path('LEI', prisoner_id: offender_no)
       end
 
       it "displays a POM as supporting if the offender has less than 10 months left to serve" do
@@ -131,7 +131,7 @@ feature "view an offender's allocation information" do
                                                   conditional_release_date: "2020-06-02",
                                                   automatic_release_date: "2020-06-02",
                                                   hdced: "2020-06-02")
-        visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_with_keyworker)
+        visit prison_prisoner_allocation_path('LEI', prisoner_id: nomis_offender_id_with_keyworker)
       end
 
       let(:offender_no) { nomis_offender_id_with_keyworker }
@@ -188,7 +188,7 @@ feature "view an offender's allocation information" do
         end
 
         it 'does not display change links' do
-          visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_with_keyworker)
+          visit prison_prisoner_allocation_path('LEI', prisoner_id: nomis_offender_id_with_keyworker)
 
           expect(page).not_to have_content 'Change'
         end
@@ -197,7 +197,7 @@ feature "view an offender's allocation information" do
 
     context 'with VCR' do
       before do
-        visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_with_keyworker)
+        visit prison_prisoner_allocation_path('LEI', prisoner_id: nomis_offender_id_with_keyworker)
       end
 
       it 'displays the name of the allocated co-worker', vcr: { cassette_name: 'prison_api/show_allocation_information_display_coworker_name' } do
@@ -207,7 +207,7 @@ feature "view an offender's allocation information" do
                            secondary_pom_nomis_id: 485_926,
                            secondary_pom_name: "Pom, Moic")
 
-        visit prison_allocation_path('LEI', nomis_offender_id: nomis_offender_id_with_keyworker)
+        visit prison_prisoner_allocation_path('LEI', prisoner_id: nomis_offender_id_with_keyworker)
 
         table_row = page.find(:css, 'tr.govuk-table__row#co-working-pom', text: 'Co-working POM')
 

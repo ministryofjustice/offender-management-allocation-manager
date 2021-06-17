@@ -33,7 +33,7 @@ feature 'early allocation when crossing 18 month threshold' do
     end
 
     it 'does some funky history record stuff' do
-      visit prison_allocation_history_path prison.code, offender_no
+      visit history_prison_prisoner_allocation_path prison.code, offender_no
       # expect only 1 prison record
       expect(all('.govuk-grid-row').size).to eq(1)
       # and expect 3 timeline items (the allocation itself, plus 2 emails)

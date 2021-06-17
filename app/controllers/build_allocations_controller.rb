@@ -1,31 +1,18 @@
 # frozen_string_literal: true
 
-class FemaleAllocationsController < PrisonsApplicationController
-  before_action :load_pom_types, only: :index
+class BuildAllocationsController < PrisonsApplicationController
+  before_action :ensure_spo_user
   before_action :load_prisoner
 
   include Wicked::Wizard
 
   steps :override, :allocate
 
-  def index
-    @case_info = Offender.find_by!(nomis_offender_id: nomis_offender_id_from_url).case_information
-    previous_allocation = AllocationHistory.find_by nomis_offender_id: nomis_offender_id_from_url
-    previous_pom_ids = if previous_allocation
-                         previous_allocation.previously_allocated_poms
-                       else
-                         []
-                       end
-    poms = @prison.get_list_of_poms.index_by(&:staff_id)
-    @previous_poms = previous_pom_ids.map { |staff_id| poms[staff_id] }.compact
-    @current_pom = @prison.get_single_pom(previous_allocation.primary_pom_nomis_id) if previous_allocation&.primary_pom_nomis_id
-  end
-
   def new
     pom = StaffMember.new(@prison, staff_id)
 
     # Create an empty override, which will be populated if needed
-    save_to_session :female_allocation_override, Override.new
+    save_to_session :female_allocation_override, OverrideForm.new
 
     # If the recommendation is different to the allocation, then go the full journey via override, otherwise jump straight to allocation
     if RecommendationService::recommended_pom_type(@prisoner) == RecommendationService::PRISON_POM && pom.probation_officer? ||
@@ -39,14 +26,14 @@ class FemaleAllocationsController < PrisonsApplicationController
 
   def show
     @pom = StaffMember.new(@prison, staff_id)
-    @override = Override.new session[:female_allocation_override]
+    @override = OverrideForm.new session[:female_allocation_override]
     @allocation = AllocationForm.new
     render_wizard
   end
 
   def update
     if step == :override
-      @override = Override.new override_params.merge(nomis_staff_id: staff_id, nomis_offender_id: nomis_offender_id_from_url)
+      @override = OverrideForm.new override_params
       if @override.valid?
         save_to_session :female_allocation_override, @override
         redirect_to next_wizard_path
@@ -54,7 +41,7 @@ class FemaleAllocationsController < PrisonsApplicationController
         render_wizard
       end
     else
-      override = Override.new session[:female_allocation_override]
+      override = OverrideForm.new session[:female_allocation_override]
       event = if AllocationHistory.find_by(prison: @prison.code, nomis_offender_id: nomis_offender_id_from_url)&.active?
                 :reallocate_primary_pom
               else
@@ -79,6 +66,9 @@ class FemaleAllocationsController < PrisonsApplicationController
 
       AllocationService.create_or_update(allocation_attributes)
       session.delete :female_allocation_override
+      pom = StaffMember.new(@prison, staff_id)
+      flash[:notice] =
+        "#{@prisoner.full_name_ordered} has been allocated to #{view_context.full_name_ordered(pom)} (#{view_context.grade(pom)})"
 
       redirect_to unallocated_prison_prisoners_path(active_prison_id)
     end
@@ -87,7 +77,7 @@ class FemaleAllocationsController < PrisonsApplicationController
 private
 
   def override_params
-    params.require(:override).permit(
+    params.require(:override_form).permit(
       :more_detail,
       :suitability_detail,
       override_reasons: []
@@ -96,11 +86,6 @@ private
 
   def allocation_params
     params.require(:allocation_form).permit(:message)
-  end
-
-  def load_pom_types
-    poms = @prison.get_list_of_poms.map { |pom| StaffMember.new(@prison, pom.staff_id) }
-    @probation_poms, @prison_poms = poms.partition(&:probation_officer?)
   end
 
   def load_prisoner

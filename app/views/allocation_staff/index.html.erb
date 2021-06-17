@@ -44,7 +44,7 @@
       <span class="govuk-warning-text__assistive">Warning</span>
       <% previous_as_sentence = @previous_poms.map { |p| "#{p.first_name} #{p.last_name}" }.to_sentence %>
       <%= previous_as_sentence %> <%= @previous_poms.size > 1 ? 'have' : 'has' %> previously been allocated to this case.
-      <%= link_to 'View case activity', prison_allocation_history_path(@prison.code, @prisoner.offender_no) %> for more information.
+      <%= link_to 'View case activity', history_prison_prisoner_allocation_path(@prison.code, @prisoner.offender_no) %> for more information.
     </strong>
   </div>
 <% end %>
@@ -54,9 +54,9 @@
 <h2 class="govuk-heading-m">Available <%= recommended_pom_type_label(@prisoner) %> POMs</h2>
 <%
   poms_count = if (RecommendationService::recommended_pom_type(@prisoner) == RecommendationService::PROBATION_POM)
-                  @probation_poms.count(&:active?)
+                 @probation_poms.count(&:active?)
                else
-                  @prison_poms.count(&:active?)
+                 @prison_poms.count(&:active?)
                end
 %>
 <p class="govuk-body">There are currently <%= poms_count %> <%= recommended_pom_type_label(@prisoner) %> POMs available.</p>
@@ -78,18 +78,18 @@
     <% end %>
   <% end %>
   <%= render 'shared/accordion_section',
-             id: 'accordion-1',
+             id: 'non-recommended-accordion-section',
              title: "Full List of available #{non_recommended_pom_type_label(@prisoner)} POMs",
              body: "You will need to provide a valid reason for overridding the recommended #{recommended_pom_type_label(@prisoner)} POMs.",
              content: accordion_body_1 %>
   <% accordion_body_2 = capture do %>
     <table class="govuk-table">
       <thead class="govuk-table__head">
-        <tr class="govuk-table__row">
-          <th class="govuk-table__header">POM</th>
-          <th class="govuk-table__header">POM level</th>
-          <th class="govuk-table__header">Total cases</th>
-        </tr>
+      <tr class="govuk-table__row">
+        <th class="govuk-table__header">POM</th>
+        <th class="govuk-table__header">POM level</th>
+        <th class="govuk-table__header">Total cases</th>
+      </tr>
       </thead>
       <tbody class="govuk-table__body">
       <% (@prison_poms + @probation_poms).reject(&:active?).each do |pom| %>

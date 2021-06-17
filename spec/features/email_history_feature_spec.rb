@@ -34,7 +34,7 @@ feature 'email history' do
     end
 
     it 'does not display recalculate history records' do
-      visit prison_allocation_history_path prison.code, offender_no
+      visit history_prison_prisoner_allocation_path prison.code, offender_no
       # expect only 1 prison record
       expect(all('.govuk-grid-row').size).to eq(1)
       # and expect only 1 timeline item (the allocation itself)
