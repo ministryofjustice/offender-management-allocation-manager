@@ -41,6 +41,9 @@ en:
   9th: Ninth
   10th: Tenth
 
+  nps: NPS (Legacy)
+  crc: CRC (Legacy)
+
   activemodel:
     errors:
       models:
