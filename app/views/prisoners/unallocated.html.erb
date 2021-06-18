@@ -25,7 +25,8 @@
                                                             :new_arrivals_count => @new_arrivals.count
 }) %>
 
-<h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Make allocations</h1>
+<h1 class="govuk-heading-l govuk-!-margin-bottom-4">Make new allocations</h1>
+<p>There are currently <%= @unallocated.count %> cases waiting to be allocated to a POM.</p>
 
 <section id="awaiting-allocation">
   <%= render(
