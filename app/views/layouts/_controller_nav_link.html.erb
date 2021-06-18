@@ -1,5 +1,5 @@
 <li class="moj-primary-navigation__item">
-  <% if current_page?(path) || controllers.any? { |c| c == controller_name } %>
+  <% if current_page?(path) || controllers.any? { |name, actions| name == controller_name.to_sym && (actions.empty? || actions.include?(action_name.to_sym)) } %>
     <%= link_to text, path, class: "moj-primary-navigation__link", aria: { current: "page" } %>
   <% else %>
     <%= link_to text, path, class: "moj-primary-navigation__link" %>

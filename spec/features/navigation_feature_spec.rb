@@ -74,7 +74,7 @@ feature 'Navigation' do
       end
     end
 
-    context 'with a browser', :js do
+    context 'with an allocation', :js do
       before do
         create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
         create(:allocation_history, prison: prison.code, primary_pom_nomis_id: moic_pom_staff_id, nomis_offender_id: offender_no)
