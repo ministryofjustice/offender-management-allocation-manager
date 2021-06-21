@@ -15,7 +15,7 @@
       <% if email_history.present? %>
         <li id="ldu_warning">
           <%=
-            date_sent = email_history.map(&:created_at).max
+            date_sent = email_history.map(&:created_at).max.to_date
             link_to I18n.t('views.notifications.offender_needs_a_com.ldu_emailed', date: format_date(date_sent)), "#com-name", data: { turbolinks: false }
           %>
         </li>

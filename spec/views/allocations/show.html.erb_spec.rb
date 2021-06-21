@@ -22,10 +22,10 @@ RSpec.describe "allocations/show", type: :view do
 
   it 'shows handover dates' do
     expect(page.css('#handover-start-date-row')).to have_text('Handover start date')
-    expect(page.css('#handover-start-date-row')).to have_text("05/11/#{next_year}")
+    expect(page.css('#handover-start-date-row')).to have_text("05 Nov #{next_year}")
 
     expect(page.css('#responsibility-handover-date-row')).to have_text('Responsibility handover')
-    expect(page.css('#responsibility-handover-date-row')).to have_text("05/11/#{next_year}")
+    expect(page.css('#responsibility-handover-date-row')).to have_text("05 Nov #{next_year}")
   end
 
   describe 'category label' do

@@ -456,7 +456,7 @@ feature "early allocation", type: :feature do
 
             # We're on the 'View' page
             expect(page).to have_content 'View previous early allocation assessment'
-            expect(page).to have_content 3.days.ago.strftime('%d/%m/%Y')
+            expect(page).to have_content 3.days.ago.to_date.to_s(:rfc822)
             expect(page).to have_content 'Eligible - assessment not sent to the community probation team'
           end
         end
@@ -509,7 +509,7 @@ feature "early allocation", type: :feature do
   def displays_prisoner_information_in_side_panel
     expect(page).to have_text('Prisoner information')
     expect(page).to have_selector('p#prisoner-name', text: offender_name)
-    expect(page).to have_selector('p#date-of-birth', text: '6/01/1980')
+    expect(page).to have_selector('p#date-of-birth', text: '06 Jan 1980')
     expect(page).to have_selector('p#nomis-number', text: nomis_offender_id)
   end
 end

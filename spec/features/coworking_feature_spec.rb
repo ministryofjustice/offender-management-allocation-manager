@@ -63,7 +63,7 @@ feature 'Co-working' do
 
       co_working_content = [
         "Prisoner Name #{prisoner_name}",
-        'Date of birth 15/08/1980',
+        'Date of birth 15 Aug 1980',
         'Prisoner number G4273GI',
         'Current POM Name',
         'Grade',

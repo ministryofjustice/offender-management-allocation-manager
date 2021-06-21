@@ -73,7 +73,7 @@ RSpec.describe "allocations/index", type: :view do
 
     it "displays an parole eligibility case type badge" do
       assert_you_have_an_indeterminate_badge
-      expect(parole_review_date.text).to include '03/01/2019'
+      expect(parole_review_date.text).to include '03 Jan 2019'
       assert_you_have_a_parole_eligibility_badge
     end
   end

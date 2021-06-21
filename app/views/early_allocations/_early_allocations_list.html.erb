@@ -11,7 +11,7 @@
     <tbody class="govuk-table__body">
     <% early_allocations.each do |early_allocation| %>
       <tr class="govuk-table__row">
-        <td class="govuk-table__cell"><%= format_date(early_allocation.created_at) %></td>
+        <td class="govuk-table__cell"><%= format_date(early_allocation.created_at.to_date) %></td>
         <td class="govuk-table__cell"><%= early_allocation_long_outcome(early_allocation) %></td>
         <td class="govuk-table__cell"><%= pom_full_name(early_allocation) %></td>
         <td class="govuk-table__cell">
