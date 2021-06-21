@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: community-api-import
 spec:
-  schedule: "15 21 * * *"
+  schedule: "00 06 * * *"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 2
