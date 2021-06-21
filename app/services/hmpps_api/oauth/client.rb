@@ -8,6 +8,12 @@ module HmppsApi
       def initialize(host)
         @host = host
         @connection = Faraday.new do |faraday|
+          faraday.request :retry, max: 3, interval: 0.05,
+                          interval_randomness: 0.5, backoff_factor: 2,
+                          # We appear to get occasional transient 500 errors
+                          # that no-one is prepared to fix - so retry them
+                          retry_statuses: [500]
+
           faraday.response :raise_error
         end
       end

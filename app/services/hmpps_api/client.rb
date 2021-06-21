@@ -5,15 +5,17 @@ require 'typhoeus/adapters/faraday'
 
 module HmppsApi
   class Client
-    def initialize(root)
+    def initialize(root, extra_retry_methods: [])
       @root = root
       @connection = Faraday.new do |faraday|
         faraday.request :retry, max: 3, interval: 0.05,
                         interval_randomness: 0.5, backoff_factor: 2,
-                        # Note - this might break if we ever use an API that uses a real POST
-                        # rather than the fake GETs used by the Prison API
-                        methods: Faraday::Request::Retry::IDEMPOTENT_METHODS + [:post],
-                        exceptions: [Faraday::ServerError, 'Timeout::Error']
+                        # We appear to get occasional transient 500 errors
+                        # that no-one is prepared to fix - so retry them
+                        retry_statuses: [500],
+                        methods: Faraday::Request::Retry::IDEMPOTENT_METHODS + extra_retry_methods,
+                        # we get Faraday::ConnectionFailed (error in HTTP2 Framing Layer) sometimes
+                        exceptions: Faraday::Request::Retry::DEFAULT_EXCEPTIONS + [Faraday::ConnectionFailed]
 
         faraday.options.params_encoder = Faraday::FlatParamsEncoder
         faraday.request :instrumentation
