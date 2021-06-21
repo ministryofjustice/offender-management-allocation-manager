@@ -3,7 +3,7 @@
 class PomMailer < GovukNotifyRails::Mailer
   def new_allocation_email(params = {})
     message_detail = "Additional information: #{params[:message]}" if params[:message].present?
-    set_template('9679ea4c-1495-4fa6-a00b-630de715e315')
+    set_template('9fbba261-45c7-4f99-aaf2-46570c6eac73')
     set_personalisation(
       email_subject: 'New OMIC allocation',
       pom_name: params[:pom_name],

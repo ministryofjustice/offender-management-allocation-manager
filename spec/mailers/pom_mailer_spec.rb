@@ -16,11 +16,6 @@ RSpec.describe PomMailer, type: :mailer do
 
     let(:mail) { described_class.new_allocation_email(params) }
 
-    it 'sets the template' do
-      expect(mail.govuk_notify_template).
-          to eq '9679ea4c-1495-4fa6-a00b-630de715e315'
-    end
-
     it 'sets the To address of the email using the provided user' do
       expect(mail.to).to eq(["something@example.com"])
     end

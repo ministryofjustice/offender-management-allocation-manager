@@ -81,7 +81,7 @@ RSpec.describe EmailService do
   context 'when queueing', :queueing do
     it "Can send an allocation email"  do
       expect {
-        described_class.instance(allocation: allocation, message: "", pom_nomis_id: allocation.primary_pom_nomis_id).send_email
+        described_class.send_email(allocation: allocation, message: "", pom_nomis_id: allocation.primary_pom_nomis_id)
       }.to change(enqueued_jobs, :size).by(1)
     end
 
@@ -89,7 +89,7 @@ RSpec.describe EmailService do
       allow(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:fetch_email_addresses).and_return([])
 
       expect {
-        described_class.instance(allocation: allocation, message: "", pom_nomis_id: allocation.primary_pom_nomis_id).send_email
+        described_class.send_email(allocation: allocation, message: "", pom_nomis_id: allocation.primary_pom_nomis_id)
       }.to change(enqueued_jobs, :size).by(0)
     end
 
@@ -97,7 +97,7 @@ RSpec.describe EmailService do
       allow(reallocation).to receive(:get_old_versions).and_return([original_allocation])
 
       expect {
-        described_class.instance(allocation: reallocation, message: "", pom_nomis_id: allocation.primary_pom_nomis_id).send_email
+        described_class.send_email(allocation: reallocation, message: "", pom_nomis_id: allocation.primary_pom_nomis_id)
       }.to change(enqueued_jobs, :size).by(2)
     end
 
@@ -105,10 +105,7 @@ RSpec.describe EmailService do
       allow(original_allocation).to receive(:get_old_versions).and_return([coworking_allocation])
 
       expect {
-        described_class.instance(allocation: coworking_deallocation,
-                                 message: "",
-                                 pom_nomis_id: coworking_deallocation.primary_pom_nomis_id
-        ).send_cowork_deallocation_email(coworking_allocation.secondary_pom_name)
+        described_class.send_cowork_deallocation_email(allocation: coworking_deallocation, pom_nomis_id: coworking_deallocation.primary_pom_nomis_id, secondary_pom_name: coworking_allocation.secondary_pom_name)
       }.to change(enqueued_jobs, :size).by(1)
     end
 
@@ -116,10 +113,9 @@ RSpec.describe EmailService do
       allow(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:fetch_email_addresses).and_return([])
 
       expect {
-        described_class.instance(allocation: coworking_deallocation,
-                                 message: "",
-                                 pom_nomis_id: coworking_deallocation.primary_pom_nomis_id
-        ).send_cowork_deallocation_email(coworking_allocation.secondary_pom_name)
+        described_class.send_cowork_deallocation_email(allocation: coworking_deallocation,
+                                                       pom_nomis_id: coworking_deallocation.primary_pom_nomis_id,
+                                                       secondary_pom_name: coworking_allocation.secondary_pom_name)
       }.to change(enqueued_jobs, :size).by(0)
     end
   end
@@ -163,12 +159,11 @@ RSpec.describe EmailService do
         offender_name: offender_name,
         offender_no: "G2911GD",
         message: '',
-        url: "http://localhost:3000/prisons/#{prison_code}/staff/#{staff_id}/caseload"
+        url: "http://localhost:3000/prisons/#{prison_code}/prisoners/#{original_allocation.nomis_offender_id}/allocation"
       ).and_return OpenStruct.new(deliver_later: true)
 
       described_class.
-        instance(allocation: released_allocation, message: "", pom_nomis_id: released_allocation.primary_pom_nomis_id).
-        send_email
+        send_email(allocation: released_allocation, message: "", pom_nomis_id: released_allocation.primary_pom_nomis_id)
     end
   end
 end
