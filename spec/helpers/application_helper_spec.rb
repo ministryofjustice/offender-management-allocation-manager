@@ -2,10 +2,6 @@ require 'rails_helper'
 
 RSpec.describe ApplicationHelper do
   describe 'formatting date strings' do
-    it "will parse dates into strings" do
-      expect(format_date_string('1973-02-21')).to eq('21/02/1973')
-    end
-
     it 'displays a date object into a specific string format' do
       date = '2019-07-9T08:54:07'.to_datetime
       expect(format_date_long(date)).to eq('9th July 2019 (08:54)')

@@ -30,18 +30,18 @@ RSpec.describe "debugging/debugging", type: :view do
 
   it "displays tariff date" do
     tariff_date = page.css('#sentence-information').css('#tariff-date').first
-    expect(tariff_date.text).to match '01/08/2033'
+    expect(tariff_date.text).to match '01 Aug 2033'
   end
 
   it "displays post recall release date" do
     post_recall_release_date = page.css('#sentence-information').css('#post-recall-release-date').first
-    expect(post_recall_release_date.text).to match '08/11/2028'
+    expect(post_recall_release_date.text).to match '08 Nov 2028'
   end
 
   it "displays licence end date" do
     licence_expiry_date = page.css('#sentence-information').css('#licence-expiry-date').first
 
-    expect(licence_expiry_date.text).to match '07/10/2025'
+    expect(licence_expiry_date.text).to match '07 Oct 2025'
   end
 
   describe 'category label' do
@@ -53,7 +53,7 @@ RSpec.describe "debugging/debugging", type: :view do
 
       it 'shows category details' do
         expect(key).to eq('Category')
-        expect(value).to eq('Female Open (T) (since 17/06/2021)')
+        expect(value).to eq('Female Open (T) (since 17 Jun 2021)')
       end
     end
 

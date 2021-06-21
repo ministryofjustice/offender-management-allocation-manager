@@ -2,15 +2,11 @@
 
 module ApplicationHelper
   def format_date(date_obj, replacement: '')
-    return replacement if date_obj.nil?
-
-    date_obj.strftime('%d/%m/%Y')
-  end
-
-  def format_date_string(date_string)
-    return '' if date_string.empty?
-
-    Date.parse(date_string).strftime('%d/%m/%Y')
+    if date_obj
+      date_obj.to_s(:rfc822)
+    else
+      replacement
+    end
   end
 
   def format_date_long(date_obj)

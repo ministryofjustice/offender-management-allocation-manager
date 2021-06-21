@@ -20,7 +20,7 @@ RSpec.describe "early_allocations/show", type: :view do
 
     it 'shows the previous assessment date' do
       expect(page.css('#assessment-date-label')).to have_text('Assessment date')
-      expect(page.css('#assessment-date')).to have_text('05/11/2021')
+      expect(page.css('#assessment-date')).to have_text('05 Nov 2021')
     end
 
     it 'shows the previous POM who made the assessment' do
