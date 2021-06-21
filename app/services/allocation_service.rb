@@ -11,7 +11,6 @@ class AllocationService
       nomis_offender_id: nomis_offender_id
     )
 
-    primary_pom = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(alloc_version.primary_pom_nomis_id)
     coworking_pom = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(secondary_pom_nomis_id)
 
     created_by_user = HmppsApi::PrisonApi::UserApi.user_details(created_by_username)
@@ -24,13 +23,10 @@ class AllocationService
       event_trigger: AllocationHistory::USER
     )
 
-    EmailService.instance(allocation: alloc_version, message: message,
-                          pom_nomis_id: alloc_version.primary_pom_nomis_id).
-      send_coworking_primary_email(primary_pom.first_name, alloc_version.secondary_pom_name)
+    EmailService.send_coworking_primary_email(allocation: alloc_version, message: message)
 
-    EmailService.instance(allocation: alloc_version, message: message,
-                          pom_nomis_id: secondary_pom_nomis_id).
-      send_secondary_email(coworking_pom.first_name)
+    EmailService.send_secondary_email(allocation: alloc_version, message: message,
+                          pom_nomis_id: secondary_pom_nomis_id, pom_firstname: coworking_pom.first_name)
   end
 
   def self.create_or_update(params)
@@ -60,9 +56,9 @@ class AllocationService
       alloc_version.update!(params_copy)
     end
 
-    EmailService.instance(allocation: alloc_version,
+    EmailService.send_email(allocation: alloc_version,
                           message: params[:message],
-                          pom_nomis_id: params[:primary_pom_nomis_id]).send_email
+                          pom_nomis_id: params[:primary_pom_nomis_id])
 
     alloc_version
   end
