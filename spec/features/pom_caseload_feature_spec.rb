@@ -174,9 +174,9 @@ feature "view POM's caseload" do
 
     it 'can be sorted by responsibility' do
       click_link 'Role'
-      expect(all('td[aria-label=Role]').map(&:text).uniq).to eq(['Co-Working', 'Responsible', 'Supporting'])
+      expect(all('td[aria-label=Role]').map(&:text).uniq).to eq(['Co-working', 'Responsible', 'Supporting'])
       click_link 'Role'
-      expect(all('td[aria-label=Role]').map(&:text).uniq).to eq(['Supporting', 'Responsible', 'Co-Working'])
+      expect(all('td[aria-label=Role]').map(&:text).uniq).to eq(['Supporting', 'Responsible', 'Co-working'])
     end
 
     it 'can be sorted by cell location' do

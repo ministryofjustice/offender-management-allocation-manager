@@ -1,28 +1,31 @@
-<h1 class="govuk-heading-xl"><%= @pom.full_name %></h1>
-<h2 class="govuk-heading-m"><%= @pom.email_address %></h2>
+<%= back_link %>
+<h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
+  <span class="govuk-caption-xl">
+    <%= pom_level_long(@pom.position) %>
+  </span>
+  <%= full_name_ordered(@pom) %>
+</h1>
+<nav class="moj-sub-navigation" aria-label="Sub navigation">
+  <ul class="moj-sub-navigation__list">
+    <li class="moj-sub-navigation__item">
+      <% if params[:tab] == 'caseload' %>
+        <%= link_to 'Overview', prison_show_pom_tab_path(@prison.code, @pom.staff_id, :overview), class: 'moj-sub-navigation__link' %>
+      <% else %>
+        <%= link_to 'Overview', prison_show_pom_tab_path(@prison.code, @pom.staff_id, :overview), class: 'moj-sub-navigation__link', aria: { current: "page" } %>
+      <% end %>
+    </li>
+    <li class="moj-sub-navigation__item">
+      <% if params[:tab] == 'caseload' %>
+        <%= link_to 'Caseload', prison_show_pom_tab_path(@prison.code, @pom.staff_id, :caseload), class: 'moj-sub-navigation__link', aria: { current: "page" } %>
+      <% else %>
+        <%= link_to 'Caseload', prison_show_pom_tab_path(@prison.code, @pom.staff_id, :caseload), class: 'moj-sub-navigation__link' %>
+      <% end %>
+    </li>
+  </ul>
+</nav>
 
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-one-quarter">
-    <div class="govuk-body">POM level</div>
-    <div class="govuk-body govuk-!-font-weight-bold"><%= pom_level(@pom.position) %></div>
-  </div>
-  <div class="govuk-grid-column-one-quarter">
-    <div class="govuk-body">Working pattern</div>
-    <div class="govuk-body govuk-!-font-weight-bold"><%= format_working_pattern(@pom.working_pattern) %></div>
-  </div>
-  <div class="govuk-grid-column-one-quarter">
-    <div class="govuk-body">Status</div>
-    <div class="govuk-body govuk-!-font-weight-bold"><%= @pom.status.capitalize %></div>
-  </div>
-</div>
-
-<%= link_to("Edit profile", edit_prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id), class: "govuk-button") %>
-
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-one-quarter">
-    <h2 class="govuk-heading-l">Caseload</h2>
-  </div>
-  <div class="govuk-grid-column-full">
-    <%= render 'caseload', allocations: @allocations %>
-  </div>
-</div>
+<% if params[:tab] == 'caseload' %>
+  <%= render 'caseload_tab' %>
+<% else %>
+  <%= render 'overview_tab' %>
+<% end %>

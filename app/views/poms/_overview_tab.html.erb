@@ -1,0 +1,62 @@
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h2 class="govuk-heading-l">Current workload</h2>
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-third">
+        <div class="card card-total">
+          <%= link_to 'caseload' do %>
+            <span class="card-heading"><%= @pom.allocations.count %></span>
+            <p>total cases</p>
+          <% end %>
+        </div>
+      </div>
+      <div class="govuk-grid-column-one-third">
+        <div class="card card-total">
+          <span class="card-heading"><%= @pom.allocations.count(&:approaching_handover?) %></span>
+          <p>handover cases</p>
+        </div>
+      </div>
+    </div>
+    <hr/>
+    <h2 class="govuk-heading-l govuk-!-margin-bottom-4">
+      Availability
+    </h2>
+    <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+      <%= render 'govuk_summary_list_row',
+                 key: 'Working pattern',
+                 value: format_working_pattern(@pom.working_pattern),
+                 actions: link_to('Change', edit_prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id), class: 'govuk-link pull-right')
+      %>
+      <%= render 'govuk_summary_list_row',
+                 key: 'Status',
+                 value: full_status(@pom),
+                 actions: link_to('Change', edit_prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id), class: 'govuk-link pull-right')
+      %>
+      <!-- Yes this code is technically wrong, as we can't actually tell when the last (co-working) case was allocated to this POM
+           Once we have sorted out the allocations into 2 separate types, this problem will just go away so it's not worth fixing until then -->
+      <%= render 'govuk_summary_list_row',
+                 key: 'Last case allocated',
+                 value: format_date(@pom.allocations.max_by(&:primary_pom_allocated_at)&.primary_pom_allocated_at&.to_date),
+                 actions: ''
+      %>
+      <%= render 'govuk_summary_list_row',
+                 key: 'Number of allocations in past 7 days',
+                 value: @pom.allocations.count(&:new_case?),
+                 actions: ''
+      %>
+      <%= render 'govuk_summary_list_row',
+                 key: 'Cases due to be released in next 4 weeks',
+                 value: @pom.allocations.count { |a| a.release_date <= Time.zone.today + 4.weeks },
+                 actions: ''
+      %>
+    </dl>
+  </div>
+  <div class="govuk-grid-column-one-third">
+    <h3 class="govuk-heading-m">Case mix by tier</h3>
+    <%= case_mix_bar_by_tiers(@pom) %>
+    <%= case_mix_vertical_by_tiers(@pom) %>
+    <h3 class="govuk-heading-m">Case mix by POM role</h3>
+    <%= case_mix_bar_by_role(@pom) %>
+    <%= case_mix_vertical_by_role(@pom) %>
+  </div>
+</div>

@@ -12,7 +12,7 @@ module OffenderHelper
     elsif offender.pom_supporting?
       'Supporting'
     else
-      'Co-Working'
+      'Co-working'
     end
   end
 

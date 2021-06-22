@@ -8,11 +8,6 @@
     @extend .govuk-list;
   }
 
-  li {
-    display: inline;
-    margin-right: 20px;
-  }
-
   .case-mix-key__swatch {
     border-radius: 2px;
     margin-right: 10px;
@@ -21,6 +16,13 @@
     display: inline-block;
     vertical-align: middle;
     margin-bottom: 0.2em;
+  }
+}
+
+.case-mix-horizontal {
+  li {
+    display: inline;
+    margin-right: 20px;
   }
 }
 
@@ -52,20 +54,31 @@
 /**
  * Tier colours
  */
-.case-mix__tier-a {
+.case-mix__tier_a {
   background: govuk-colour("dark-blue");
   color: white;
 }
-.case-mix__tier-b {
+.case-mix__tier_b {
   background: govuk-colour("light-blue");
 }
-.case-mix__tier-c {
+.case-mix__tier_c {
   background: govuk-colour("pink");
   color: white;
 }
-.case-mix__tier-d {
+.case-mix__tier_d {
   background: govuk-colour("light-pink");
 }
-.case-mix__tier-na {
+.case-mix__tier_na {
+  background: govuk-colour("mid-grey");
+}
+.case-mix__responsible {
+  background: govuk-colour("dark-blue");
+  color: white;
+}
+.case-mix__supporting {
+  background: govuk-colour("light-pink");
+  color: white;
+}
+.case-mix__coworking {
   background: govuk-colour("mid-grey");
 }

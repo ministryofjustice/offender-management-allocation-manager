@@ -32,6 +32,7 @@ feature "get poms list" do
     click_button 'Complete allocation'
 
     visit prison_pom_path('LEI', 485_926)
+    click_link 'Caseload'
 
     expect(page).to have_css(".pom_cases_row_0", count: 1)
     expect(page).not_to have_css(".pom_cases_row_1")
@@ -41,8 +42,7 @@ feature "get poms list" do
   it "allows viewing a POM", vcr: { cassette_name: 'prison_api/show_poms_feature_view' } do
     visit "/prisons/LEI/poms/485926"
 
-    expect(page).to have_css(".govuk-button", count: 1)
-    expect(page).to have_content("Pom, Moic")
+    expect(page).to have_content("Moic Pom")
     expect(page).to have_content("Caseload")
   end
 
@@ -57,8 +57,8 @@ feature "get poms list" do
     it 'can sort' do
       visit "/prisons/LEI/poms/485926"
 
-      expect(page).to have_css(".govuk-button", count: 1)
-      expect(page).to have_content("Pom, Moic")
+      expect(page).to have_content("Moic Pom")
+      click_link 'Caseload'
       expect(page).to have_content("Caseload")
       expect(page).to have_css('.sort-arrow', count: 1)
 
@@ -76,7 +76,7 @@ feature "get poms list" do
       }
 
       check_for_order.call(['Abdoria, Ongmetain', 'Ahmonis, Imanjah'])
-      click_link('Prisoner name')
+      click_link('Case')
       check_for_order.call(['Ahmonis, Imanjah', 'Abdoria, Ongmetain'])
     end
 
@@ -87,13 +87,14 @@ feature "get poms list" do
                primary_pom_nomis_id: 123456, secondary_pom_nomis_id: 485_926)
 
         visit "/prisons/LEI/poms/485926"
+        click_link 'Caseload'
       end
 
       it 'can sort' do
         click_link 'Role'
-        expect(all('td[aria-label=Role]').map(&:text).uniq).to eq(['Co-Working', 'Supporting'])
+        expect(all('td[aria-label=Role]').map(&:text).uniq).to eq(['Co-working', 'Supporting'])
         click_link 'Role'
-        expect(all('td[aria-label=Role]').map(&:text).uniq).to eq(['Supporting', 'Co-Working'])
+        expect(all('td[aria-label=Role]').map(&:text).uniq).to eq(['Supporting', 'Co-working'])
       end
     end
   end

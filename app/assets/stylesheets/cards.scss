@@ -1,0 +1,24 @@
+.card-heading {
+  font-size: 48px;
+  line-height: 1;
+  display: block;
+  margin-bottom: 0.2rem;
+  font-weight: 700;
+}
+
+.card {
+  font-family: "GDS Transport", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.14286;
+  text-decoration: none;
+  color: #0b0c0c;
+  display: block;
+  margin: 10px 0;
+  padding: 15px 20px;
+  background-color: #fff;
+  border: 1px solid #0b0c0c;
+  max-width: 960px;
+}

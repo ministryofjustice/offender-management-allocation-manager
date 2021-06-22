@@ -61,7 +61,7 @@ RSpec.describe "caseload/index", type: :view do
                   offenders.first.tier,
                   offenders.first.earliest_release_date.to_s(:rfc822),
                   Time.zone.today.to_s(:rfc822),
-                  "Co-Working"
+                  "Co-working"
                 ]
       end
     end

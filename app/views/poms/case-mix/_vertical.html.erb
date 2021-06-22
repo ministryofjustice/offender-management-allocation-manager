@@ -1,0 +1,11 @@
+<% # Use the Case Mix helper method `case_mix_vertical` to render this partial %>
+<figure class="case-mix-key govuk-!-margin-top-3">
+  <ul>
+    <% tiers.each do |tier, count| %>
+      <li>
+        <span class="case-mix-key__swatch case-mix__<%= tier %>"></span>
+        <%= labels.fetch(tier) %>: <%= count %>
+      </li>
+    <% end %>
+  </ul>
+</figure>
