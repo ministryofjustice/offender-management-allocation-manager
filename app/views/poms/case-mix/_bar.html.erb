@@ -2,8 +2,8 @@
 <% if tiers.present? %>
   <dl class="case-mix-bar" style="--columns: <%= css_columns %>;">
     <% tiers.each do |tier, count| %>
-      <dt><%= tier_label(tier) %></dt>
-      <dd title="<%= tier_label(tier) %>" class="case-mix__tier-<%= tier %>"><%= count %></dd>
+      <dt><%= labels.fetch(tier) %></dt>
+      <dd title="<%= labels.fetch(tier) %>" class="case-mix__<%= tier %>"><%= count %></dd>
     <% end %>
   </dl>
 <% end %>

@@ -96,6 +96,9 @@ Rails.application.routes.draw do
     end
 
     resources :poms, only: %i[ index show edit update ], param: :nomis_staff_id
+    # routes to show the 2 tabs on PomsController#show
+    get "poms/:nomis_staff_id/tabs/:tab", to: "poms#show", as: :show_pom_tab
+
     get '/poms/:nomis_staff_id/non_pom' => 'poms#show_non_pom', as: 'pom_non_pom'
 
     resources :tasks, only: %i[ index ]

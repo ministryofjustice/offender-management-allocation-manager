@@ -147,7 +147,10 @@ context 'when NOMIS is missing information' do
       end
 
       describe 'the pom details page' do
-        before { visit prison_pom_path(prison_code, staff_id) }
+        before {
+          visit prison_pom_path(prison_code, staff_id)
+          click_link 'Caseload'
+        }
 
         context 'with a welsh offender' do
           let(:welsh) { 'Yes' }

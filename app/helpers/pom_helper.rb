@@ -5,7 +5,7 @@ module PomHelper
     if pattern == 1.0
       'Full time'
     else
-      "Part time - #{pattern}"
+      "Part time – #{pattern}"
     end
   end
 
@@ -38,6 +38,14 @@ module PomHelper
   def status(pom)
     # we are now displaying 'Available', instead of 'Active' which is stored in the database
     pom.status == 'active' ? 'available' : pom.status
+  end
+
+  def full_status(pom)
+    {
+      active: 'Active: available for new allocations',
+      inactive: 'Inactive',
+      unavailable: 'Unavailable for new allocations'
+    }.fetch(pom.status.to_sym)
   end
 
   def active_probation_poms(poms)

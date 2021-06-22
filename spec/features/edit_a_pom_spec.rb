@@ -61,7 +61,9 @@ feature "edit a POM's details" do
       click_link "Inactive staff (1)"
       click_link 'Moic Integration-Tests'
 
-      click_link "Edit profile"
+      within first('.govuk-summary-list__row') do
+        click_link "Change"
+      end
 
       expect(page).to have_css('h1', text: 'Edit profile')
 
@@ -101,7 +103,9 @@ feature "edit a POM's details" do
 
     it "de-allocates all a POM's cases", vcr: { cassette_name: 'prison_api/edit_poms_deactivate_pom_feature' } do
       visit "/prisons/LEI/poms/485926"
-      click_link "Edit profile"
+      within first('.govuk-summary-list__row') do
+        click_link "Change"
+      end
 
       expect(page).to have_content("Moic Pom")
       expect(AllocationHistory.count).to eq 2
@@ -110,7 +114,7 @@ feature "edit a POM's details" do
       choose('Inactive')
       click_button('Save')
 
-      expect(page).to have_content("Pom, Moic")
+      expect(page).to have_content("Moic Pom")
       expect(page).to have_css('.pom_cases_row_0', count: 0)
     end
   end

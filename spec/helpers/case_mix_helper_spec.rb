@@ -13,11 +13,11 @@ RSpec.describe CaseMixHelper, type: :helper do
       expect(page.css('.govuk-heading-s').text.strip).to eq 'Case mix by tier'
 
       tiers = [
-        { label: 'Tier A', swatch_class: 'case-mix__tier-a' },
-        { label: 'Tier B', swatch_class: 'case-mix__tier-b' },
-        { label: 'Tier C', swatch_class: 'case-mix__tier-c' },
-        { label: 'Tier D', swatch_class: 'case-mix__tier-d' },
-        { label: 'Tier N/A', swatch_class: 'case-mix__tier-na' },
+        { label: 'Tier A', swatch_class: 'case-mix__tier_a' },
+        { label: 'Tier B', swatch_class: 'case-mix__tier_b' },
+        { label: 'Tier C', swatch_class: 'case-mix__tier_c' },
+        { label: 'Tier D', swatch_class: 'case-mix__tier_d' },
+        { label: 'Tier N/A', swatch_class: 'case-mix__tier_na' },
       ]
 
       tiers.each_with_index do |tier, index|
@@ -30,7 +30,7 @@ RSpec.describe CaseMixHelper, type: :helper do
   end
 
   describe '#case_mix_bar' do
-    subject { helper.case_mix_bar(pom) }
+    subject { helper.case_mix_bar_by_tiers(pom) }
 
     let(:case_mix_bar) { page.css('.case-mix-bar') }
 
@@ -65,11 +65,11 @@ RSpec.describe CaseMixHelper, type: :helper do
       expect(case_mix_bar).to be_present
 
       tiers = [
-        { label: 'Tier A', bar_class: 'case-mix__tier-a', count: tier_a_count },
-        { label: 'Tier B', bar_class: 'case-mix__tier-b', count: tier_b_count },
-        { label: 'Tier C', bar_class: 'case-mix__tier-c', count: tier_c_count },
-        { label: 'Tier D', bar_class: 'case-mix__tier-d', count: tier_d_count },
-        { label: 'Tier N/A', bar_class: 'case-mix__tier-na', count: tier_na_count },
+        { label: 'Tier A', bar_class: 'case-mix__tier_a', count: tier_a_count },
+        { label: 'Tier B', bar_class: 'case-mix__tier_b', count: tier_b_count },
+        { label: 'Tier C', bar_class: 'case-mix__tier_c', count: tier_c_count },
+        { label: 'Tier D', bar_class: 'case-mix__tier_d', count: tier_d_count },
+        { label: 'Tier N/A', bar_class: 'case-mix__tier_na', count: tier_na_count },
       ]
 
       expect_rendered_tiers(tiers)
@@ -89,9 +89,9 @@ RSpec.describe CaseMixHelper, type: :helper do
         expect(page.text).not_to include 'Tier D'
 
         tiers = [
-          { label: 'Tier A', bar_class: 'case-mix__tier-a', count: tier_a_count },
-          { label: 'Tier B', bar_class: 'case-mix__tier-b', count: tier_b_count },
-          { label: 'Tier N/A', bar_class: 'case-mix__tier-na', count: tier_na_count },
+          { label: 'Tier A', bar_class: 'case-mix__tier_a', count: tier_a_count },
+          { label: 'Tier B', bar_class: 'case-mix__tier_b', count: tier_b_count },
+          { label: 'Tier N/A', bar_class: 'case-mix__tier_na', count: tier_na_count },
         ]
 
         expect_rendered_tiers(tiers)

@@ -22,6 +22,14 @@ module ApplicationHelper
     }.fetch(level)
   end
 
+  def pom_level_long(level)
+    {
+      'PO' => 'Probation Officer POM',
+      'PRO' => 'Prison Officer POM',
+      'STAFF' => 'N/A'
+    }.fetch(level)
+  end
+
   def service_provider_label(provider)
     {
       'CRC' => 'Community Rehabilitation Company (CRC)',

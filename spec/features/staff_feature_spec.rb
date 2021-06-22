@@ -65,9 +65,9 @@ feature "female estate POMs list" do
 
     within pom_row do
       within ".case-mix-bar" do
-        expect(page).to have_css(".case-mix__tier-a", text: '2')
-        expect(page).to have_css(".case-mix__tier-b", text: '1')
-        expect(page).to have_css(".case-mix__tier-c", text: '1')
+        expect(page).to have_css(".case-mix__tier_a", text: '2')
+        expect(page).to have_css(".case-mix__tier_b", text: '1')
+        expect(page).to have_css(".case-mix__tier_c", text: '1')
       end
       expect(page).to have_css('td[aria-label="High complexity cases"]', text: '1')
       expect(page).to have_css('td[aria-label="Total cases"]', text: '4')
@@ -81,8 +81,8 @@ feature "female estate POMs list" do
 
     within pom_row do
       within ".case-mix-bar" do
-        expect(page).to have_css(".case-mix__tier-d", text: '1')
-        expect(page).to have_css(".case-mix__tier-na", text: '1')
+        expect(page).to have_css(".case-mix__tier_d", text: '1')
+        expect(page).to have_css(".case-mix__tier_na", text: '1')
       end
       expect(page).to have_css('td[aria-label="High complexity cases"]', text: '0')
       expect(page).to have_css('td[aria-label="Total cases"]', text: '2')
@@ -103,11 +103,10 @@ feature "female estate POMs list" do
       first('td.govuk-table__cell > a').click
     end
 
-    expect(page).to have_css(".govuk-button", count: 1)
-    expect(page).to have_content('POM level')
     expect(page).to have_content('Working pattern')
     expect(page).to have_content('Status')
 
+    click_link 'Caseload'
     # click on first prisoner name
     first('td.govuk-table__cell > a').click
   end

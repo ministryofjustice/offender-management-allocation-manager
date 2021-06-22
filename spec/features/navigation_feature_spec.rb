@@ -68,7 +68,11 @@ feature 'Navigation' do
         click_link 'Moic Integration-Tests'
         new_link = all(link_css)[index]
         expect(new_link['aria-current']).to eq('page')
-        click_link 'Edit profile'
+
+        # go into edit the POM profile page
+        within first('.govuk-summary-list__row') do
+          click_link "Change"
+        end
         new_link = all(link_css)[index]
         expect(new_link['aria-current']).to eq('page')
       end

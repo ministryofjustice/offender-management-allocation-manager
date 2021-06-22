@@ -26,7 +26,9 @@ feature 'Inactive POM' do
     it 'will deallocate the caseload'do
       click_link("Set this POM's status to inactive")
 
-      click_link("Edit profile")
+      within first('.govuk-summary-list__row') do
+        click_link "Change"
+      end
       choose("Inactive")
       click_button("Save")
 
