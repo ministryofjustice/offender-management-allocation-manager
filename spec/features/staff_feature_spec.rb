@@ -4,7 +4,13 @@ feature "female estate POMs list" do
   let!(:female_prison) { create(:womens_prison).code }
   let(:staff_id) { 123456 }
   let(:spo) { build(:pom) }
-  let(:probation_poms) { build_list(:pom, 5, :probation_officer) }
+  let(:probation_poms) {
+    [
+    # Need deterministic POM order by surname
+    build(:pom, :probation_officer, lastName: 'Smith'),
+    build(:pom, :probation_officer, lastName: 'Watkins')
+  ]
+  }
   let(:prison_poms) { build_list(:pom, 8, :prison_officer, status: 'inactive') }
   let(:poms) { probation_poms + prison_poms }
 
@@ -26,6 +32,10 @@ feature "female estate POMs list" do
     stub_signin_spo spo, [female_prison]
     stub_offenders_for_prison(female_prison, offenders_in_prison << nomis_offender)
     stub_poms(female_prison, poms)
+
+    offenders_in_prison.map { |o| o.fetch(:offenderNo) }.each { |nomis_id|
+      stub_keyworker female_prison, nomis_id, build(:keyworker)
+    }
 
     create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender[:offenderNo]), case_allocation: 'NPS')
     create(:allocation_history, nomis_offender_id: nomis_offender[:offenderNo], primary_pom_nomis_id: poms.first.staffId, prison: female_prison)
@@ -88,7 +98,7 @@ feature "female estate POMs list" do
   end
 
   it 'can view a POM' do
-    # click on the first offender
+    # click on the first POM
     within "#active_probation_poms" do
       first('td.govuk-table__cell > a').click
     end
@@ -97,5 +107,8 @@ feature "female estate POMs list" do
     expect(page).to have_content('POM level')
     expect(page).to have_content('Working pattern')
     expect(page).to have_content('Status')
+
+    # click on first prisoner name
+    first('td.govuk-table__cell > a').click
   end
 end
