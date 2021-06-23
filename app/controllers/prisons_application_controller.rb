@@ -62,7 +62,7 @@ private
   end
 
   def referrer
-    session[:referrer] || request.referer
+    session[:referrer] || request.referer || root_path
   end
 
   def store_referrer_in_session

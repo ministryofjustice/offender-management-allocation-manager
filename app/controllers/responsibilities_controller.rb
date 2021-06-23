@@ -3,8 +3,10 @@
 class ResponsibilitiesController < PrisonsApplicationController
   before_action :load_offender_from_url, only: [:new, :confirm_removal, :destroy]
   before_action :load_offender_from_responsibility_params, only: [:confirm, :create]
+  before_action :store_referrer_in_session, only: [:new, :confirm_removal]
 
   def new
+    @referrer = referrer
     if @offender.ldu_email_address.present?
       @responsibility = Responsibility.new nomis_offender_id: nomis_offender_id_from_url
     else
@@ -39,12 +41,7 @@ class ResponsibilitiesController < PrisonsApplicationController
       ).deliver_later
     end
 
-    allocation = AllocationHistory.find_by(nomis_offender_id: @responsibility.nomis_offender_id, prison: @prison.code)
-    if allocation.try(:active?)
-      redirect_to prison_prisoner_allocation_path(@prison.code, @responsibility.nomis_offender_id)
-    else
-      redirect_to prison_prisoner_staff_index_path(@prison.code, @responsibility.nomis_offender_id)
-    end
+    redirect_to referrer
   end
 
   def confirm_removal
@@ -63,16 +60,16 @@ class ResponsibilitiesController < PrisonsApplicationController
     if @responsibility.valid?
       Responsibility.find_by!(nomis_offender_id: nomis_offender_id_from_url).destroy
 
-      if allocation && allocation.active?
+      if allocation&.active?
         pom_email = HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(allocation.primary_pom_nomis_id).first
         emails << pom_email
         ResponsibilityMailer.responsibility_to_custody_with_pom(emails: emails.compact,
-                                                                       pom_name: allocation.primary_pom_name,
-                                                                       pom_email: pom_email,
-                                                                       prisoner_name: @offender.full_name,
-                                                                       prisoner_number: nomis_offender_id_from_url,
-                                                                       prison_name: @prison.name,
-                                                                       notes: @responsibility.reason_text).deliver_later
+                                                                pom_name: allocation.primary_pom_name,
+                                                                pom_email: pom_email,
+                                                                prisoner_name: @offender.full_name,
+                                                                prisoner_number: nomis_offender_id_from_url,
+                                                                prison_name: @prison.name,
+                                                                notes: @responsibility.reason_text).deliver_later
       else
         ResponsibilityMailer.responsibility_to_custody(emails: emails.compact,
                                                        prisoner_name: @offender.full_name,
@@ -80,8 +77,7 @@ class ResponsibilitiesController < PrisonsApplicationController
                                                        prison_name: @prison.name,
                                                        notes: @responsibility.reason_text).deliver_later
       end
-
-      redirect_to prison_prisoner_staff_index_path(@prison.code, nomis_offender_id_from_url)
+      redirect_to referrer
     else
       render :confirm_removal
     end

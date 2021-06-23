@@ -3,7 +3,7 @@
 <%= form_for(@responsibility, url: prison_responsibility_path(@prison.code, @responsibility.nomis_offender_id),
              method: :delete,
              builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |f| %>
-  <!--  Just so we alwways submit something in the form -->
+  <!--  Just so we always submit something in the form -->
   <%= f.hidden_field :nomis_offender_id %>
 
   <%= f.govuk_error_summary %>
@@ -31,7 +31,7 @@
 
   <div class="govuk-form-group">
     <button type="submit" class="govuk-button">Confirm</button>
-    <%= link_to 'Cancel', prison_prisoner_staff_index_path(@prison.code, @responsibility.nomis_offender_id), class: 'govuk-link cancel-button' %>
+    <%= link_to 'Cancel', prison_prisoner_allocation_path(@prison.code, @responsibility.nomis_offender_id), class: 'govuk-link cancel-button' %>
   </div>
 
 <% end %>
