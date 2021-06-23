@@ -34,7 +34,7 @@
 
   <div class="govuk-form-group">
     <button type="submit" class="govuk-button">Confirm</button>
-    <%= link_to 'Cancel', prison_prisoner_staff_index_path(@prison.code, @responsibility.nomis_offender_id), class: 'govuk-link cancel-button' %>
+    <%= link_to 'Cancel', prison_prisoner_allocation_path(@prison.code, @responsibility.nomis_offender_id), class: 'govuk-link cancel-button' %>
   </div>
 
 <% end %>

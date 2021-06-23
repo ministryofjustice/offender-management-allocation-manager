@@ -31,7 +31,7 @@ feature 'Responsibility override' do
         click_button 'Continue'
 
         expect(page).to have_content 'Select a reason for overriding the responsibility'
-        find('#reason_recall').click
+        find('label[for=responsibility-reason-prisoner-has-been-recalled-field]').click
         click_button 'Continue'
 
         expect {
@@ -51,7 +51,7 @@ feature 'Responsibility override' do
           click_link 'Change'
         end
 
-        find('#reason_prob_team').click
+        find('label[for=responsibility-reason-community-team-to-work-with-offender-field]').click
         click_button 'Continue'
 
         expect {
@@ -104,7 +104,7 @@ feature 'Responsibility override' do
       click_link 'Change'
     end
 
-    find('#reason_prob_team').click
+    find('label[for=responsibility-reason-community-team-to-work-with-offender-field]').click
     click_button 'Continue'
     click_button 'Confirm'
   end
