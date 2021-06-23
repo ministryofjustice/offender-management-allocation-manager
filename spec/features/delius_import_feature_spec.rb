@@ -6,6 +6,7 @@ feature "Delius import feature", :disable_push_to_delius do
   let(:offender_no) {  offender.fetch(:offenderNo) }
   let(:prison) { create(:prison).code }
   let(:offender) { build(:nomis_offender) }
+  let(:offender_name) { offender.fetch(:lastName) + ', ' + offender.fetch(:firstName) }
   let(:pom) { build(:pom) }
 
   before do
@@ -39,7 +40,7 @@ feature "Delius import feature", :disable_push_to_delius do
       visit unallocated_prison_prisoners_path(prison)
       expect(page).to have_content("Make allocations")
       expect(page).to have_content(offender_no)
-      click_link 'Allocate'
+      click_link offender_name
       expect(page.find(:css, '#welsh-offender-row')).not_to have_content('Change')
       expect(page.find(:css, '#service-provider-row')).not_to have_content('Change')
       expect(page.find(:css, '#tier-row')).not_to have_content('Change')

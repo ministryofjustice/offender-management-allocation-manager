@@ -40,7 +40,7 @@
     <tr class="govuk-table__row">
       <th class="govuk-table__header" scope="col">
         <a href="<%= sort_link('last_name') %>">
-          Prisoner
+          Case
         </a>
         <%= sort_arrow('last_name') %>
       </th>
@@ -58,18 +58,17 @@
       </th>
       <th class="govuk-table__header sorter-false" scope="col">
         <a href="<%= sort_link('awaiting_allocation_for') %>">
-          Waiting
+          Days waiting for allocation
         </a>
         <%= sort_arrow('awaiting_allocation_for') %>
       </th>
-      <th class="govuk-table__header sorter-false" scope="col">Action</th>
     </tr>
     </thead>
     <tbody class="govuk-table__body">
     <% @offenders.each_with_index do |offender, i| %>
       <tr class="govuk-table__row offender_row_<%= i %>">
         <td aria-label="Prisoner name" class="govuk-table__cell ">
-          <%= offender.full_name %>
+          <%= link_to offender.full_name, prison_prisoner_staff_index_path(@prison.code, offender.offender_no) %>
           <br/>
           <span class='govuk-hint govuk-!-margin-bottom-0'>
             <%= offender.offender_no %>
@@ -84,9 +83,6 @@
         </td>
         <td aria-label="Awaiting allocation for" class="govuk-table__cell">
           <%= offender.awaiting_allocation_for %> days
-        </td>
-        <td aria-label="Action" class="govuk-table__cell ">
-          <%= link_to 'Allocate', prison_prisoner_staff_index_path(@prison.code, offender.offender_no) %>
         </td>
       </tr>
     <% end %>
