@@ -18,9 +18,17 @@ RSpec.describe "caseload/index", type: :view do
   let(:page) { Nokogiri::HTML(rendered) }
 
   context 'with a caseload' do
+    let(:offender_objects) {
+      [
+        build(:hmpps_api_offender).tap do |o|
+          o.load_case_information(build(:case_information))
+        end
+      ]
+    }
+
     let(:offenders) {
-      build_list(:hmpps_api_offender, 1).map do |o|
-        AllocatedOffender.new(staff_id, build(:allocation_history, nomis_offender_id: o.offender_no), o)
+      offender_objects.map do |o|
+        AllocatedOffender.new(staff_id, build(:allocation_history, nomis_offender_id: o.offender_no, primary_pom_allocated_at: DateTime.now.utc), o)
       end
     }
 
@@ -30,6 +38,12 @@ RSpec.describe "caseload/index", type: :view do
       end
 
       let(:prison) { create(:prison) }
+      let(:first_offender_row) {
+        row = page.css('td').map(&:text).map(&:strip)
+        # The first column is offender name and number underneath each other - just grab the non-blank data
+        split_col_zero = row.first.split("\n").map(&:strip).reject(&:empty?)
+        [split_col_zero] + row[1..]
+      }
 
       it 'displays caseload' do
         expect(page).to have_content 'Your caseload'
@@ -37,6 +51,18 @@ RSpec.describe "caseload/index", type: :view do
 
       it 'displays correct headers' do
         expect(page.css('th a').map(&:text).map(&:strip)).to eq(["Prisoner name", "Location", "Tier", "Earliest release date", "Allocationdate", "Role"])
+      end
+
+      it 'displays correct data' do
+        expect(first_offender_row).
+          to eq [
+                  [offenders.first.full_name, offenders.first.offender_no],
+                  "N/A",
+                  offenders.first.tier,
+                  offenders.first.earliest_release_date.to_s(:rfc822),
+                  Time.zone.today.to_s(:rfc822),
+                  "Co-Working"
+                ]
       end
     end
 
