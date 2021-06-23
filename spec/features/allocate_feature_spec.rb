@@ -6,6 +6,7 @@ feature 'Allocation' do
   let!(:nomis_offender_id) { 'G7266VD' }
   let(:offender_name) { 'Omistius Annole' }
   let!(:never_allocated_offender) { 'G9403UP' }
+  let!(:unallocated_offender_name) { 'Albina, Obinins' }
 
   let!(:probation_officer_pom_detail) {
     PomDetail.create!(
@@ -185,11 +186,10 @@ feature 'Allocation' do
 
     scenario 'removing a community override', vcr: { cassette_name: 'prison_api/allocation_remove_community_override' } do
       visit prison_dashboard_index_path('LEI')
-
       click_link 'Make new allocations'
       find '.offender_row_0'
       within '.offender_row_0' do
-        click_link 'Allocate'
+        click_link unallocated_offender_name
       end
 
       find '.responsibility_change'

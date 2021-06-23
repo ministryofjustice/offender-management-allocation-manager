@@ -6,6 +6,7 @@ feature "womens allocation journey" do
   let(:prison) { create(:womens_prison) }
   let(:offenders) { build_list(:nomis_offender, 5, agencyId: prison.code, complexityLevel: 'high') }
   let(:offender) { build(:nomis_offender, sentence: attributes_for(:sentence_detail, :determinate_release_in_three_years), agencyId: prison.code) }
+  let(:offender_name) { offender.fetch(:lastName) + ', ' + offender.fetch(:firstName) }
   let(:nomis_offender_id) { offender.fetch(:offenderNo) }
   let(:user) { build(:pom) }
   let(:probation_pom) { build(:pom, :probation_officer, lastName: 'Jones') }
@@ -41,7 +42,7 @@ feature "womens allocation journey" do
       end
 
       visit unallocated_prison_prisoners_path prison.code
-      click_link 'Allocate'
+      click_link offender_name
     end
 
     scenario 'accepting recommendation' do
