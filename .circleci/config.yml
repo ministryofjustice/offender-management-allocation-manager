@@ -359,17 +359,20 @@ workflows:
             - install_dependencies
       - test:
           requires:
-            - rubocop
+            - install_dependencies
       - build_and_push_docker_image:
           requires:
-            - test
+            - install_dependencies
           filters:
             branches:
               only:
                 - main
                 - preproduction
+                - parallel-deployment
       - deploy_staging:
           requires:
+            - rubocop
+            - test
             - build_and_push_docker_image
           filters:
             branches:
