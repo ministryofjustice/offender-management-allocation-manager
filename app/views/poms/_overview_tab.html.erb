@@ -4,7 +4,7 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-third">
         <div class="card card-total">
-          <%= link_to 'caseload' do %>
+          <%= link_to prison_show_pom_tab_path(@prison.code, @pom.staff_id, :caseload) do %>
             <span class="card-heading"><%= @pom.allocations.count %></span>
             <p>total cases</p>
           <% end %>

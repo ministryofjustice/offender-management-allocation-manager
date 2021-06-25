@@ -1,7 +1,7 @@
 require "rails_helper"
 
 feature "get poms list" do
-  let!(:offender_missing_sentence_case_info) { create(:case_information, offender: build(:offender, nomis_offender_id: 'G1247VX')) }
+  let(:offender_missing_sentence_case_info) { create(:case_information, offender: build(:offender, nomis_offender_id: 'G1247VX')) }
 
   before do
     signin_spo_user
@@ -39,11 +39,16 @@ feature "get poms list" do
     expect(page).to have_content(offender_missing_sentence_case_info.nomis_offender_id)
   end
 
-  it "allows viewing a POM", vcr: { cassette_name: 'prison_api/show_poms_feature_view' } do
-    visit "/prisons/LEI/poms/485926"
+  it "allows viewing a POM", :js, vcr: { cassette_name: 'prison_api/show_poms_feature_view' } do
+    visit prison_pom_path('LEI', 485_926)
 
     expect(page).to have_content("Moic Pom")
     expect(page).to have_content("Caseload")
+
+    # click through the 'Total cases' link and make sure we arrive
+    expect(page).not_to have_content 'Allocation date'
+    first('.card-heading').click
+    expect(page).to have_content 'Allocation date'
   end
 
   describe 'sorting', vcr: { cassette_name: 'prison_api/show_poms_feature_view_sorting' } do
