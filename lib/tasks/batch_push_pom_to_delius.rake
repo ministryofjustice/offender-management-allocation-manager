@@ -3,7 +3,7 @@ namespace :batch_push_pom_to_delius do
   task populate_delius: :environment do
     Rails.logger = Logger.new(STDOUT)
 
-    records = Allocation.where.not(primary_pom_nomis_id: nil)
+    records = AllocationHistory.where.not(primary_pom_nomis_id: nil)
 
     count = records.count
 
