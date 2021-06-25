@@ -9,7 +9,8 @@ RSpec.describe "poms/show", type: :view do
   let(:offenders) {
     [build(:nomis_offender, sentence: attributes_for(:sentence_detail, releaseDate: Time.zone.today + 2.weeks)),
      build(:nomis_offender, sentence: attributes_for(:sentence_detail, releaseDate: Time.zone.today + 5.weeks)),
-     build(:nomis_offender, sentence: attributes_for(:sentence_detail, releaseDate: Time.zone.today + 8.weeks))]
+     build(:nomis_offender, sentence: attributes_for(:sentence_detail, releaseDate: Time.zone.today + 8.weeks)),
+     build(:nomis_offender, sentence: attributes_for(:sentence_detail, :indeterminate))]
   }
   let(:offender_nos) { offenders.map  { |o| o.fetch(:offenderNo) } }
   let(:summary_rows) { page.css('.govuk-summary-list__row') }
@@ -31,6 +32,11 @@ RSpec.describe "poms/show", type: :view do
 
     create(:case_information, offender: build(:offender, nomis_offender_id: offender_nos.third))
     create(:allocation_history, prison: prison.code, nomis_offender_id: offender_nos.third, primary_pom_nomis_id: pom.staff_id,
+           updated_at: Time.zone.today - 8.days, primary_pom_allocated_at: Time.zone.today - 8.days)
+
+    # add an allocation for an indeterminate with no release date
+    create(:case_information, offender: build(:offender, nomis_offender_id: offender_nos.fourth))
+    create(:allocation_history, prison: prison.code, nomis_offender_id: offender_nos.fourth, primary_pom_nomis_id: pom.staff_id,
            updated_at: Time.zone.today - 8.days, primary_pom_allocated_at: Time.zone.today - 8.days)
 
     render

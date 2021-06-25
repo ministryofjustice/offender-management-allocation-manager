@@ -85,6 +85,7 @@ FactoryBot.define do
 
     trait :indeterminate do
       indeterminateSentence { true }
+      releaseDate { nil }
       tariffDate { Time.zone.today + 1.year}
     end
 
