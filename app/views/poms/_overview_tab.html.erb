@@ -46,7 +46,7 @@
       %>
       <%= render 'govuk_summary_list_row',
                  key: 'Cases due to be released in next 4 weeks',
-                 value: @pom.allocations.count { |a| a.release_date <= Time.zone.today + 4.weeks },
+                 value: @pom.allocations.count { |a| a.release_date.present? && a.release_date <= Time.zone.today + 4.weeks },
                  actions: ''
       %>
     </dl>
