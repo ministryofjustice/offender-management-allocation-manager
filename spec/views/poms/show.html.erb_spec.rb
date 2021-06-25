@@ -6,43 +6,56 @@ RSpec.describe "poms/show", type: :view do
   let(:page) { Nokogiri::HTML(rendered) }
   let(:prison) { create(:prison) }
   let(:pom) { build(:pom) }
-  let(:offenders) {
-    [build(:nomis_offender, sentence: attributes_for(:sentence_detail, releaseDate: Time.zone.today + 2.weeks)),
-     build(:nomis_offender, sentence: attributes_for(:sentence_detail, releaseDate: Time.zone.today + 5.weeks)),
-     build(:nomis_offender, sentence: attributes_for(:sentence_detail, releaseDate: Time.zone.today + 8.weeks)),
-     build(:nomis_offender, sentence: attributes_for(:sentence_detail, :indeterminate))]
-  }
-  let(:offender_nos) { offenders.map  { |o| o.fetch(:offenderNo) } }
+  let(:offender_nos) { offenders.map(&:offender_no) }
   let(:summary_rows) { page.css('.govuk-summary-list__row') }
   let(:two_days_ago) { Time.zone.today - 2.days }
 
   before do
     stub_auth_token
     stub_poms prison.code, [pom]
-    stub_offenders_for_prison prison.code, offenders
+
     assign :prison, prison
     assign :pom, StaffMember.new(prison, pom.staff_id)
+    assign :tab, tabname
 
-    create(:case_information, offender: build(:offender, nomis_offender_id: offender_nos.first))
-    create(:allocation_history, prison: prison.code, nomis_offender_id: offender_nos.first, primary_pom_nomis_id: pom.staff_id, primary_pom_allocated_at: Time.zone.today - 3.days)
-
-    create(:case_information, offender: build(:offender, nomis_offender_id: offender_nos.second))
-    # Yes this line doesn't make sense. But the code cannot (easily/at all) work out the allocation date for co-working - so let's not try that hard until allocation data is fixed
-    create(:allocation_history, prison: prison.code, nomis_offender_id: offender_nos.second, secondary_pom_nomis_id: pom.staff_id, primary_pom_allocated_at: two_days_ago)
-
-    create(:case_information, offender: build(:offender, nomis_offender_id: offender_nos.third))
-    create(:allocation_history, prison: prison.code, nomis_offender_id: offender_nos.third, primary_pom_nomis_id: pom.staff_id,
-           updated_at: Time.zone.today - 8.days, primary_pom_allocated_at: Time.zone.today - 8.days)
-
-    # add an allocation for an indeterminate with no release date
-    create(:case_information, offender: build(:offender, nomis_offender_id: offender_nos.fourth))
-    create(:allocation_history, prison: prison.code, nomis_offender_id: offender_nos.fourth, primary_pom_nomis_id: pom.staff_id,
-           updated_at: Time.zone.today - 8.days, primary_pom_allocated_at: Time.zone.today - 8.days)
+    assign(:allocations, offenders.zip(allocations).map { |offender, allocation|
+      AllocatedOffender.new(pom.staff_id,
+                            allocation,
+                            offender)
+    })
 
     render
   end
 
   context 'when on the overview tab' do
+    let!(:allocations) {
+      [
+        create(:allocation_history, prison: prison.code, nomis_offender_id: offender_nos.first,
+               primary_pom_nomis_id: pom.staff_id, primary_pom_allocated_at: Time.zone.today - 3.days),
+      # Yes this line doesn't make sense. But the code cannot (easily/at all) work out the allocation date for co-working - so let's not try that hard until allocation data is fixed
+        create(:allocation_history, prison: prison.code, nomis_offender_id: offender_nos.second,
+               secondary_pom_nomis_id: pom.staff_id, primary_pom_allocated_at: two_days_ago),
+
+        create(:allocation_history, prison: prison.code, nomis_offender_id: offender_nos.third,
+               primary_pom_nomis_id: pom.staff_id,
+               updated_at: Time.zone.today - 8.days, primary_pom_allocated_at: Time.zone.today - 8.days),
+
+      # add an allocation for an indeterminate with no release date
+        create(:allocation_history, prison: prison.code, nomis_offender_id: offender_nos.fourth,
+               primary_pom_nomis_id: pom.staff_id,
+               updated_at: Time.zone.today - 8.days, primary_pom_allocated_at: Time.zone.today - 8.days)
+      ]
+    }
+    let(:offenders) {
+      [
+        build(:hmpps_api_offender, sentence: build(:sentence_detail, releaseDate: Time.zone.today + 2.weeks)),
+        build(:hmpps_api_offender, sentence: build(:sentence_detail, releaseDate: Time.zone.today + 5.weeks)),
+        build(:hmpps_api_offender, sentence: build(:sentence_detail, releaseDate: Time.zone.today + 8.weeks)),
+        build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate))
+      ].map { |offender| offender.tap { |o| o.load_case_information(build(:case_information)) } }
+    }
+    let(:tabname) { 'overview' }
+
     it 'shows working pattern' do
       expect(summary_rows.first).to have_content('Working pattern')
     end
@@ -57,6 +70,37 @@ RSpec.describe "poms/show", type: :view do
 
     it 'shows releases due in next 4 weeks' do
       expect(summary_rows[4]).to have_content(1)
+    end
+  end
+
+  context 'when on the caseload tab' do
+    let(:case_info) { create(:case_information) }
+    let(:offender) { build(:hmpps_api_offender, offenderNo: case_info.nomis_offender_id).tap { |o| o.load_case_information(case_info) } }
+    let(:allocations) { [build(:allocation_history, nomis_offender_id: case_info.nomis_offender_id)] }
+
+    let(:first_offender_row) {
+      row = page.css('td').map(&:text).map(&:strip)
+      # The first column is offender name and number underneath each other - just grab the non-blank data
+      split_col_zero = row.first.split("\n").map(&:strip).reject(&:empty?)
+      [split_col_zero] + row[1..]
+    }
+    let(:tabname) { 'caseload' }
+    let(:offenders) { [offender] }
+
+    it 'displays correct headers' do
+      expect(page.css('th a').map(&:text).map(&:strip)).to eq(["Case", "Location", "Tier", "Earliest release date", "Allocationdate", "Role"])
+    end
+
+    it 'displays correct data' do
+      expect(first_offender_row).
+        to eq [
+                [offender.full_name, case_info.nomis_offender_id],
+                "N/A",
+                case_info.tier,
+                offender.earliest_release_date.to_s(:rfc822),
+                Time.zone.today.to_s(:rfc822),
+                "Co-working"
+              ]
     end
   end
 end

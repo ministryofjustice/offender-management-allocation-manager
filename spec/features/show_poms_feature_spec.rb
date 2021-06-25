@@ -34,8 +34,8 @@ feature "get poms list" do
     visit prison_pom_path('LEI', 485_926)
     click_link 'Caseload'
 
-    expect(page).to have_css(".pom_cases_row_0", count: 1)
-    expect(page).not_to have_css(".pom_cases_row_1")
+    expect(page).to have_css(".offender_row_0", count: 1)
+    expect(page).not_to have_css(".offender_row_1")
     expect(page).to have_content(offender_missing_sentence_case_info.nomis_offender_id)
   end
 
@@ -46,9 +46,9 @@ feature "get poms list" do
     expect(page).to have_content("Caseload")
 
     # click through the 'Total cases' link and make sure we arrive
-    expect(page).not_to have_content 'Allocation date'
+    expect(page).not_to have_content "Allocation\ndate"
     first('.card-heading').click
-    expect(page).to have_content 'Allocation date'
+    expect(page).to have_content "Allocation\ndate"
   end
 
   describe 'sorting', vcr: { cassette_name: 'prison_api/show_poms_feature_view_sorting' } do
@@ -68,8 +68,8 @@ feature "get poms list" do
       expect(page).to have_css('.sort-arrow', count: 1)
 
       check_for_order = lambda { |names|
-        row0 = page.find(:css, '.pom_cases_row_0')
-        row1 = page.find(:css, '.pom_cases_row_1')
+        row0 = page.find(:css, '.offender_row_0')
+        row1 = page.find(:css, '.offender_row_1')
 
         within row0 do
           expect(page).to have_content(names[0])

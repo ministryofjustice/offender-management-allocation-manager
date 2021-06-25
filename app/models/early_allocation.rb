@@ -72,7 +72,7 @@ class EarlyAllocation < ApplicationRecord
   end
 
   def assessment_date
-    created_at
+    created_at.to_date
   end
 
 private

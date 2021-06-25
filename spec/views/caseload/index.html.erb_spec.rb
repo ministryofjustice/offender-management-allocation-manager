@@ -50,7 +50,7 @@ RSpec.describe "caseload/index", type: :view do
       end
 
       it 'displays correct headers' do
-        expect(page.css('th a').map(&:text).map(&:strip)).to eq(["Prisoner name", "Location", "Tier", "Earliest release date", "Allocationdate", "Role"])
+        expect(page.css('th a').map(&:text).map(&:strip)).to eq(["Case", "Location", "Tier", "Earliest release date", "Allocationdate", "Role"])
       end
 
       it 'displays correct data' do

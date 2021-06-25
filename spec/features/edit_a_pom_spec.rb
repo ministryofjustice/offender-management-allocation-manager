@@ -115,7 +115,7 @@ feature "edit a POM's details" do
       click_button('Save')
 
       expect(page).to have_content("Moic Pom")
-      expect(page).to have_css('.pom_cases_row_0', count: 0)
+      expect(page).to have_css('.offender_row_0', count: 0)
     end
   end
 end
