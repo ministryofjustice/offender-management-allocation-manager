@@ -14,7 +14,7 @@ class AllocationValidation
     #
 
     # Get all active allocations for this prison
-    allocations = Allocation.active_allocations_for_prison(prison)
+    allocations = AllocationHistory.active_allocations_for_prison(prison)
 
     puts "Processing #{allocations.count} items"
 
