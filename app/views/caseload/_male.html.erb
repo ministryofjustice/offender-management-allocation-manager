@@ -1,6 +1,8 @@
 <tr class="govuk-table__row offender_row_<%= male_counter %>">
   <td aria-label="Prisoner name" class="govuk-table__cell">
-    <%= link_to(highlight(male.full_name, @q), prison_prisoner_path(@prison.code, male.nomis_offender_id), class: "govuk-link" ) %>
+    <span class="prisoner-name">
+      <%= link_to(highlight(male.full_name, @q), prison_prisoner_path(@prison.code, male.nomis_offender_id), class: "govuk-link" ) %>
+    </span>
     <br/>
     <span class='govuk-hint govuk-!-margin-bottom-0'>
       <%= highlight(male.nomis_offender_id, @q) %>

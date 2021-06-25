@@ -3,6 +3,10 @@
     <h2 class="govuk-heading-l">Caseload</h2>
   </div>
   <div class="govuk-grid-column-full">
-    <%= render 'caseload', allocations: @allocations %>
+    <% if @prison.womens? %>
+      <%= render 'caseload/caseload_table', header_partial: 'caseload/female_headers', collection_partial: 'caseload/female', collection: @allocations %>
+    <% else %>
+      <%= render 'caseload/caseload_table', header_partial: 'caseload/male_headers', collection_partial: 'caseload/male', collection: @allocations %>
+    <% end %>
   </div>
 </div>

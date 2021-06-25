@@ -150,7 +150,7 @@ feature "view POM's caseload" do
     end
 
     it 'can be reverse sorted by name' do
-      click_link 'Prisoner name'
+      click_link 'Case'
       sorted_offenders.last(20).reverse.each_with_index do |offender, index|
         name = "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}"
         within ".offender_row_#{index}" do
@@ -289,7 +289,7 @@ feature "view POM's caseload" do
       end
 
       # After sorting ...
-      click_link('Prisoner name')
+      click_link('Case')
 
       # Should be the last name
       within('.offender_row_20') do

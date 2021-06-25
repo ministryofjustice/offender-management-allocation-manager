@@ -30,17 +30,16 @@ RSpec.describe CaseMixHelper, type: :helper do
   end
 
   describe '#case_mix_bar' do
-    subject { helper.case_mix_bar_by_tiers(pom) }
+    subject { helper.case_mix_bar_by_tiers(allocations) }
 
     let(:case_mix_bar) { page.css('.case-mix-bar') }
 
-    let(:pom) {
-      double(allocations: 1.upto(tier_a_count).map { |_i| double(tier: 'A') } +
+    let(:allocations) {
+      1.upto(tier_a_count).map { |_i| double(tier: 'A') } +
                           1.upto(tier_b_count).map { |_i| double(tier: 'B') } +
                           1.upto(tier_c_count).map { |_i| double(tier: 'C') } +
                           1.upto(tier_d_count).map { |_i| double(tier: 'D') } +
                           1.upto(tier_na_count).map { |_i| double(tier: 'N/A') }
-                      )
     }
 
     # Randomise tier counts

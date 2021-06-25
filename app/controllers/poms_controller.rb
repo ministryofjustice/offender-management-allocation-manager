@@ -10,6 +10,7 @@ class PomsController < PrisonStaffApplicationController
   end
 
   def show
+    @tab = params[:tab] || 'overview'
     @allocations = sort_allocations(@pom.allocations)
   end
 
