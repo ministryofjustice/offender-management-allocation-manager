@@ -100,7 +100,10 @@ class MpcOffender
 
   def needs_early_allocation_notify?
     # The probation_record.present? check is needed as one of the dates is PRD which is currently inside case_information
-    @probation_record.present? && within_early_allocation_window? && early_allocations.suitable_offenders_pre_referral_window.any?
+    @probation_record.present? &&
+      within_early_allocation_window? &&
+      early_allocations.active_pre_referral_window.any? &&
+      early_allocations.post_referral_window.empty?
   end
 
   def within_early_allocation_window?

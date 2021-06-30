@@ -7,6 +7,8 @@ describe HmppsApi::Offender do
     build(:hmpps_api_offender)
   }
 
+  let(:prison) { build(:prison) }
+
   describe '#inside_omic_policy?' do
     let(:over_18) { (Time.zone.today - 18.years).to_s }
     let(:immigration_detainee) { 'DET' }
@@ -264,6 +266,42 @@ describe HmppsApi::Offender do
 
       it 'is false' do
         expect(offender.recalled?).to eq(false)
+      end
+    end
+  end
+
+  describe '#needs_early_allocation_notify?' do
+    let(:release_date) { Time.zone.today + 15.months }
+    let(:offender) { build(:mpc_offender, prison_record: api_offender, offender: case_info.offender, prison: prison) }
+
+    context 'with active early allocations outside window' do
+      let(:case_info) {
+        create(:case_information, offender: build(:offender,
+                                                  early_allocations: [build(:early_allocation, :pre_window)]))
+      }
+
+      let(:api_offender) {
+        build(:hmpps_api_offender, sentence: build(:sentence_detail, conditionalReleaseDate: release_date))
+      }
+
+      it 'is true' do
+        expect(offender.needs_early_allocation_notify?).to eq(true)
+      end
+    end
+
+    context 'when another allocation has been started' do
+      let(:case_info) {
+        create(:case_information, offender: build(:offender,
+                                                  early_allocations: [build(:early_allocation, :pre_window),
+                                                                      build(:early_allocation)]))
+      }
+
+      let(:api_offender) {
+        build(:hmpps_api_offender, sentence: build(:sentence_detail, conditionalReleaseDate: release_date))
+      }
+
+      it 'is false' do
+        expect(offender.needs_early_allocation_notify?).to eq(false)
       end
     end
   end

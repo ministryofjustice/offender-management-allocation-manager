@@ -10,11 +10,13 @@ class EarlyAllocation < ApplicationRecord
 
   validates_presence_of :prison, :created_by_firstname, :created_by_lastname
 
-  # nomis_offender_ids of offenders who have assessments completed before 18 months prior to their release date, where
+  # assessments completed before 18 months prior to their release date, where
   # the assessment outcomes are 'discretionary' or 'eligible'
-  scope :suitable_offenders_pre_referral_window, -> {
+  scope :active_pre_referral_window, -> {
     where(created_within_referral_window: false).where.not(outcome: 'ineligible')
   }
+
+  scope :post_referral_window, -> { where(created_within_referral_window: true) }
 
   ELIGIBLE_BOOLEAN_FIELDS = [:convicted_under_terrorisom_act_2000,
                              :high_profile,
