@@ -23,7 +23,7 @@ feature 'early allocation when crossing 18 month threshold' do
       create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: user.staff_id, prison: prison.code)
 
       expect {
-        offender_ids = EarlyAllocation.suitable_offenders_pre_referral_window.pluck(:nomis_offender_id).uniq
+        offender_ids = EarlyAllocation.active_pre_referral_window.pluck(:nomis_offender_id).uniq
         offender_ids.each do |offender_no|
           SuitableForEarlyAllocationEmailJob.perform_now(offender_no)
         end
