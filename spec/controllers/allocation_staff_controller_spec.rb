@@ -28,9 +28,22 @@ RSpec.describe AllocationStaffController, type: :controller do
     end
 
     describe '#index' do
-      context 'with previous allocations for this POM' do
-        let(:alice) { poms.first }
+      let(:alice) { poms.first }
 
+      context 'with an allocation from a previous prison' do
+        before do
+          create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
+          create(:allocation_history, prison: build(:prison).code, nomis_offender_id: offender_no)
+        end
+
+        it 'makes a nil current POM' do
+          get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
+          expect(response).to be_successful
+          expect(assigns(:current_pom)).to be_nil
+        end
+      end
+
+      context 'with previous allocations for this POM' do
         before do
           { a: 5, b: 4, c: 3, d: 2 }.each do |tier, quantity|
             0.upto(quantity - 1) do

@@ -7,7 +7,7 @@ class AllocationStaffController < PrisonsApplicationController
 
   def index
     @case_info = Offender.find_by!(nomis_offender_id: prisoner_id_from_url).case_information
-    @allocation = AllocationHistory.find_by nomis_offender_id: prisoner_id_from_url
+    @allocation = AllocationHistory.find_by prison: @prison.code, nomis_offender_id: prisoner_id_from_url
     previous_pom_ids = if @allocation
                          @allocation.previously_allocated_poms
                        else
@@ -15,7 +15,7 @@ class AllocationStaffController < PrisonsApplicationController
                        end
     poms = @prison.get_list_of_poms.index_by(&:staff_id)
     @previous_poms = previous_pom_ids.map { |staff_id| poms[staff_id] }.compact
-    @current_pom = @prison.get_single_pom(@allocation.primary_pom_nomis_id) if @allocation&.primary_pom_nomis_id
+    @current_pom = poms[@allocation.primary_pom_nomis_id] if @allocation&.primary_pom_nomis_id
   end
 
 private
