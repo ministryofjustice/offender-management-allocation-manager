@@ -12,7 +12,8 @@ module HmppsApi
                           interval_randomness: 0.5, backoff_factor: 2,
                           # We appear to get occasional transient 500 errors
                           # that no-one is prepared to fix - so retry them
-                          retry_statuses: [500]
+                          retry_statuses: [500],
+                          methods: Faraday::Request::Retry::IDEMPOTENT_METHODS + [:post]
 
           faraday.response :raise_error
         end
