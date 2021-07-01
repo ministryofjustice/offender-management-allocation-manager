@@ -80,7 +80,7 @@ feature 'Navigation' do
 
     context 'with an allocation', :js do
       before do
-        create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
+        create(:case_information, offender: Offender.find(offender_no))
         create(:allocation_history, prison: prison.code, primary_pom_nomis_id: moic_pom_staff_id, nomis_offender_id: offender_no)
       end
 
@@ -102,7 +102,7 @@ feature 'Navigation' do
         let(:offender_name) { 'Albina, Obinins' }
 
         before do
-          create(:case_information, offender: build(:offender, nomis_offender_id: offender_id))
+          create(:case_information, offender: Offender.find(offender_id))
         end
 
         it 'highlights the section' do
