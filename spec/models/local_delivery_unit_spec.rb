@@ -31,7 +31,7 @@ RSpec.describe LocalDeliveryUnit, type: :model do
     let!(:disabled_ldus) { create_list(:local_delivery_unit, 5, :disabled) }
 
     it 'only retrieves enabled LDUs' do
-      expect(described_class.enabled).to eq(enabled_ldus)
+      expect(described_class.enabled).to match_array(enabled_ldus)
     end
   end
 end
