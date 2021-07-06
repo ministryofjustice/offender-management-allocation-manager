@@ -28,7 +28,7 @@ RSpec.describe DashboardController, type: :controller do
 
       it 'shows me only Manage case tasks' do
         get :index, params: { prison_id: prison }
-        expect(response).to render_template("index")
+        expect(response).to render_template("pom_dashboard")
 
         expect(assigns(:is_pom)).to be true
         expect(assigns(:is_spo)).to be false
@@ -58,7 +58,7 @@ RSpec.describe DashboardController, type: :controller do
 
       it 'shows me only SPO tasks' do
         get :index, params: { prison_id: prison }
-        expect(response).to render_template("index")
+        expect(response).to render_template("spo_dashboard")
 
         expect(assigns(:is_pom)).to be false
         expect(assigns(:is_spo)).to be true
