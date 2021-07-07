@@ -10,9 +10,8 @@ module HmppsApi
       @connection = Faraday.new do |faraday|
         faraday.request :retry, max: 3, interval: 0.05,
                         interval_randomness: 0.5, backoff_factor: 2,
-                        # We appear to get occasional transient 500 errors
-                        # that no-one is prepared to fix - so retry them
-                        retry_statuses: [500],
+                        # We appear to get occasional transient 5xx errors, so retry them
+                        retry_statuses: [500, 502],
                         methods: Faraday::Request::Retry::IDEMPOTENT_METHODS + extra_retry_methods,
                         # we get Faraday::ConnectionFailed (error in HTTP2 Framing Layer) sometimes
                         exceptions: Faraday::Request::Retry::DEFAULT_EXCEPTIONS + [Faraday::ConnectionFailed]
