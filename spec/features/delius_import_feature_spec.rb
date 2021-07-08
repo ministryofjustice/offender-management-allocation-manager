@@ -28,17 +28,17 @@ feature "Delius import feature", :disable_push_to_delius do
 
     it "imports from Delius and creates case information" do
       visit missing_information_prison_prisoners_path(prison_code)
-      expect(page).to have_content("Add missing information")
+      expect(page).to have_content("Add missing details")
       expect(page).to have_content(offender_no)
 
       ProcessDeliusDataJob.perform_now offender_no
 
       reload_page
-      expect(page).to have_content("Add missing information")
+      expect(page).to have_content("Add missing details")
       expect(page).not_to have_content(offender_no)
 
       visit unallocated_prison_prisoners_path(prison_code)
-      expect(page).to have_content("Make allocations")
+      expect(page).to have_content("Make new allocations")
       expect(page).to have_content(offender_no)
       click_link offender_name
       expect(page.find(:css, '#welsh-offender-row')).not_to have_content('Change')

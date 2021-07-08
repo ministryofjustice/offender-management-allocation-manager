@@ -14,7 +14,8 @@
                                                             :new_arrivals_count => @new_arrivals.count
 }) %>
 
-<h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Add missing information</h1>
+<h1 class="govuk-heading-l govuk-!-margin-bottom-4">Add missing details</h1>
+<p>You need to add missing details to <%=@missing_info.count %> cases so they can be allocated to a POM.</p>
 
 <section id="awaiting-information">
   <%= render(
@@ -28,15 +29,13 @@
     <tr class="govuk-table__row">
       <th class="govuk-table__header" scope="col">
         <a href="<%= sort_link('last_name') %>">
-          Prisoner
+          Case
         </a>
         <%= sort_arrow('last_name') %>
       </th>
-      <th class="govuk-table__header" scope="col">Service provider</th>
-      <th class="govuk-table__header" scope="col">Tier</th>
       <th class="govuk-table__header" scope="col">
         <a href="<%= sort_link('awaiting_allocation_for') %>">
-          Waiting
+          Days waiting for allocation
         </a>
         <%= sort_arrow('awaiting_allocation_for') %>
       </th>
@@ -53,19 +52,12 @@
             <%= offender.offender_no %>
           </span>
         </td>
-
-        <td aria-label="Service provider" class="govuk-table__cell ">
-          <%= probation_field(offender, :case_allocation) || 'Not provided' %>
-        </td>
-        <td aria-label="Tier" class="govuk-table__cell ">
-          <%= probation_field(offender, :tier) || 'Not provided' %>
-        </td>
-        <td aria-label="Waiting" class="govuk-table__cell"><%= offender.awaiting_allocation_for %> days</td>
+        <td aria-label="Waiting" class="govuk-table__cell"><%= offender.awaiting_allocation_for %></td>
         <td aria-label="Action" class="govuk-table__cell" id="<%= "edit_#{offender.offender_no}" %>">
           <% if auto_delius_import_enabled?(@prison.code) %>
-            <%= link_to "Update", prison_case_information_path(@prison.code, offender.offender_no) %>
+            <%= link_to "Update missing details", prison_case_information_path(@prison.code, offender.offender_no) %>
           <% else %>
-            <%= link_to "Edit", new_prison_case_information_path(@prison.code, offender.offender_no, sort: params[:sort], page: params[:page] || 1) %>
+            <%= link_to "Add missing details", new_prison_case_information_path(@prison.code, offender.offender_no, sort: params[:sort], page: params[:page] || 1) %>
           <% end %>
         </td>
       </tr>

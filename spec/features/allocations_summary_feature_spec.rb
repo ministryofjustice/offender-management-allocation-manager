@@ -14,7 +14,7 @@ feature 'summary summary feature' do
       visit missing_information_prison_prisoners_path(prison)
 
       expect(page).to have_css('.moj-sub-navigation__item')
-      expect(page).to have_content('Add missing information')
+      expect(page).to have_content('Add missing details')
       expect(page).to have_css('.pagination ul.links li', count: 16)
     end
 
@@ -22,7 +22,7 @@ feature 'summary summary feature' do
       visit unallocated_prison_prisoners_path(prison)
 
       expect(page).to have_css('.moj-sub-navigation__item')
-      expect(page).to have_content('Add missing information')
+      expect(page).to have_content('Add missing details')
     end
 
     context 'with allocations' do
