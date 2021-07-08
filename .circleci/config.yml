@@ -400,6 +400,8 @@ workflows:
               only: main
       - deploy_preprod:
           requires:
+            - rubocop
+            - test
             - build_and_push_docker_image
           filters:
             branches:
