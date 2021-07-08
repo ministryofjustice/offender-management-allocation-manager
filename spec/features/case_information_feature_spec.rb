@@ -15,7 +15,7 @@ feature 'case information feature' do
       stub_poms(prison.code, [spo])
     end
 
-    context 'when add missing information the first time (create journey)' do
+    context 'when add missing details the first time (create journey)' do
       before do
         visit new_prison_case_information_path(prison.code, offender.fetch(:offenderNo))
         find('label[for=case-information-probation-service-england-field]').click
@@ -60,9 +60,9 @@ feature 'case information feature' do
 
       visit missing_information_prison_prisoners_path('LEI')
 
-      expect(page).to have_content('Add missing information')
+      expect(page).to have_content('Add missing details')
       within "#edit_#{nomis_offender_id}" do
-        click_link 'Edit'
+        click_link 'Add missing details'
       end
 
       find('label[for=case-information-probation-service-england-field]').click
@@ -81,14 +81,13 @@ feature 'case information feature' do
     it "clicking back link after viewing prisoner's case information, returns back the same paginated page",
        vcr: { cassette_name: 'prison_api/case_information_back_link' }, js: true do
       visit missing_information_prison_prisoners_path('LEI', page: 3)
-
-      within ".govuk-table tr:first-child td:nth-child(5)" do
-        click_link 'Edit'
+      within ".govuk-table tr:first-child td:nth-child(3)" do
+        click_link 'Add missing details'
       end
       expect(page).to have_selector('h1', text: 'Case information')
       click_link 'Back'
       find('#awaiting-information')
-      expect(page).to have_selector('h1', text: 'Add missing information')
+      expect(page).to have_selector('h1', text: 'Add missing details')
     end
 
     it 'complains if allocation data is missing', vcr: { cassette_name: 'prison_api/case_information_missing_case_feature' } do
@@ -162,8 +161,8 @@ feature 'case information feature' do
        vcr: { cassette_name: 'prison_api/case_information_return_to_previously_paginated_page' } do
       visit missing_information_prison_prisoners_path('LEI', sort: "last_name desc", page: 3)
 
-      within ".govuk-table tr:first-child td:nth-child(5)" do
-        click_link 'Edit'
+      within ".govuk-table tr:first-child td:nth-child(3)" do
+        click_link 'Add missing details'
       end
       expect(page).to have_selector('h1', text: 'Case information')
 
