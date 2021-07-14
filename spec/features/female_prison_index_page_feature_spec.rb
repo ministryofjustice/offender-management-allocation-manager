@@ -40,14 +40,14 @@ feature "female prison index page" do
     ]
   }
 
-  describe 'missing information page' do
+  describe 'missing details page' do
     before do
       visit missing_information_prison_prisoners_path(prison.code)
     end
 
     it 'displays offenders with missing details' do
       expect(page).to have_css('.moj-sub-navigation__item')
-      expect(page).to have_content('Add missing information')
+      expect(page).to have_content('Add missing details')
       expect(page).to have_text("You need to add missing details to 3 cases so they can be allocated to a POM")
     end
 
@@ -83,7 +83,7 @@ feature "female prison index page" do
     end
 
     it 'shows unallocated offenders' do
-      click_link('Make allocations (1)')
+      click_link('Make new allocations (1)')
       expect(page).to have_css("h1", text: "Make new allocations")
       expect(page).to have_css("p", text: "There are currently 1 cases waiting to be allocated to a POM.")
     end
@@ -94,7 +94,7 @@ feature "female prison index page" do
     end
 
     it 'shows offenders with missing information' do
-      click_link('Add missing information (3)')
+      click_link('Add missing details (3)')
       expect(page).to have_css("h1", text: "Add missing details")
     end
   end
