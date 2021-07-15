@@ -50,6 +50,9 @@ feature 'case information feature' do
   end
 
   context 'with vcr' do
+    let(:staff_id) { 485_833 }
+    let(:poms) { [build(:pom, staffId: staff_id)] }
+
     before do
       signin_spo_user
     end
@@ -129,32 +132,6 @@ feature 'case information feature' do
 
       expect(CaseInformation.count).to eq(0)
       expect(page).to have_content("Select the prisoner’s tier")
-    end
-
-    it 'allows editing case information for a prisoner', vcr: { cassette_name: 'prison_api/case_information_editing_feature' } do
-      nomis_offender_id = 'G1821VA'
-
-      visit new_prison_case_information_path('LEI', nomis_offender_id)
-      find('label[for=case-information-probation-service-england-field]').click
-      find('label[for=case-information-case-allocation-nps-field]').click
-      find('label[for=case-information-tier-a-field]').click
-      click_button 'Save'
-
-      visit edit_prison_case_information_path('LEI', nomis_offender_id)
-
-      expect(page).to have_content('Case information')
-      expect(page).to have_content('G1821VA')
-      find('label[for=case-information-probation-service-england-field]').click
-      find('label[for=case-information-case-allocation-crc-field]').click
-      click_button 'Update'
-
-      expect(CaseInformation.count).to eq(1)
-      expect(CaseInformation.first.nomis_offender_id).to eq(nomis_offender_id)
-      expect(CaseInformation.first.tier).to eq('A')
-      expect(CaseInformation.first.case_allocation).to eq('CRC')
-
-      expect(page).to have_current_path prison_prisoner_staff_index_path('LEI', nomis_offender_id)
-      expect(page).to have_content('CRC')
     end
 
     it 'returns to previously paginated page after saving',

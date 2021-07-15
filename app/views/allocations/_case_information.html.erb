@@ -55,7 +55,7 @@
   </tr>
   <tr class="govuk-table__row" id="tier-row">
     <td class="govuk-table__cell">Tiering calculation</td>
-    <td class="govuk-table__cell table_cell__left_align">
+    <td id="tier" class="govuk-table__cell table_cell__left_align">
     Tier <%= @prisoner.tier %>
       <%= link_to 'Change', edit_prison_case_information_path(@prison.code, @prisoner.offender_no), class: 'govuk-link pull-right' if @prisoner.manual_entry? %>
     </td>
