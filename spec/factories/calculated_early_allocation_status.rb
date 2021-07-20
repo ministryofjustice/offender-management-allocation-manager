@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :calculated_early_allocation_status do
-    nomis_offender_id { "MyString" }
+    association :offender
     eligible { false }
   end
 end
