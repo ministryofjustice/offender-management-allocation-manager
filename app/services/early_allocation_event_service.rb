@@ -3,7 +3,7 @@
 class EarlyAllocationEventService
   class << self
     def send_early_allocation early_allocation_status
-      sns_topic.publish(
+      sns_topic&.publish(
         message: {
           offenderNo: early_allocation_status.nomis_offender_id,
           eligibilityStatus: early_allocation_status.eligible,
@@ -34,8 +34,15 @@ class EarlyAllocationEventService
     # storing the topic like this will make it used across threads. Hopefully it's thread-safe
     # :nocov:
     def sns_topic
-      @sns_topic ||= Aws::SNS::Resource.new(region: 'eu-west-2')
-                       .topic(ENV.fetch('DOMAIN_EVENTS_TOPIC_ARN'))
+      @sns_topic ||= begin
+                       if sns_topic_arn.present?
+                         Aws::SNS::Resource.new(region: 'eu-west-2').topic(sns_topic_arn)
+                       end
+                     end
+    end
+
+    def sns_topic_arn
+      ENV['DOMAIN_EVENTS_TOPIC_ARN']
     end
     # :nocov:
   end
