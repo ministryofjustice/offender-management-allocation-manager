@@ -9,16 +9,19 @@ class Offender < ApplicationRecord
   has_many :early_allocations,
            -> { order(created_at: :asc) },
            foreign_key: :nomis_offender_id,
+           primary_key: :nomis_offender_id,
            inverse_of: :offender,
            dependent: :destroy
 
   has_many :email_histories,
            foreign_key: :nomis_offender_id,
+           primary_key: :nomis_offender_id,
            inverse_of: :offender,
            dependent: :destroy
 
   has_one :responsibility,
           foreign_key: :nomis_offender_id,
+          primary_key: :nomis_offender_id,
           inverse_of: :offender,
           dependent: :destroy
 
@@ -28,12 +31,11 @@ class Offender < ApplicationRecord
   # Offender model rather than nDelius Case Information
   has_one :calculated_handover_date,
           foreign_key: :nomis_offender_id,
+          primary_key: :nomis_offender_id,
           inverse_of: :offender,
           dependent: :destroy
 
   has_one :parole_record, foreign_key: :nomis_offender_id, inverse_of: :offender, dependent: :destroy
-
-  has_one :calculated_early_allocation_status, foreign_key: :nomis_offender_id, inverse_of: :offender, dependent: :destroy
 
   has_many :victim_liaison_officers, foreign_key: :nomis_offender_id, inverse_of: :offender, dependent: :destroy
 end
