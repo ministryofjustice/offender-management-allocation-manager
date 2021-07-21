@@ -77,9 +77,24 @@ spec:
                   key: postgres_user
             - name: REDIS_URL
               valueFrom:
-               secretKeyRef:
-                 name: elasticache-offender-management-allocation-manager-token-cache-staging
-                 key: url
+                secretKeyRef:
+                  name: elasticache-offender-management-allocation-manager-token-cache-staging
+                  key: url
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: hmpps-domain-events-topic
+                  key: access_key_id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: hmpps-domain-events-topic
+                  key: secret_access_key
+            - name: DOMAIN_EVENTS_TOPIC_ARN
+              valueFrom:
+                secretKeyRef:
+                  name: hmpps-domain-events-topic
+                  key: topic_arn
         - name: allocation-manager-sidekiq
           image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
           imagePullPolicy: Always
@@ -117,6 +132,21 @@ spec:
                 secretKeyRef:
                   name: elasticache-offender-management-allocation-manager-token-cache-staging
                   key: url
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: hmpps-domain-events-topic
+                  key: access_key_id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: hmpps-domain-events-topic
+                  key: secret_access_key
+            - name: DOMAIN_EVENTS_TOPIC_ARN
+              valueFrom:
+                secretKeyRef:
+                  name: hmpps-domain-events-topic
+                  key: topic_arn
         - name: allocation-manager-metrics
           image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
           imagePullPolicy: Always
