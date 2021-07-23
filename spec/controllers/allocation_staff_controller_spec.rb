@@ -30,19 +30,6 @@ RSpec.describe AllocationStaffController, type: :controller do
     describe '#index' do
       let(:alice) { poms.first }
 
-      context 'with an allocation from a previous prison' do
-        before do
-          create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
-          create(:allocation_history, prison: build(:prison).code, nomis_offender_id: offender_no)
-        end
-
-        it 'makes a nil current POM' do
-          get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
-          expect(response).to be_successful
-          expect(assigns(:current_pom)).to be_nil
-        end
-      end
-
       context 'with previous allocations for this POM' do
         before do
           { a: 5, b: 4, c: 3, d: 2 }.each do |tier, quantity|
@@ -98,17 +85,20 @@ RSpec.describe AllocationStaffController, type: :controller do
         end
       end
 
-      context 'with an allocation' do
+      context 'when the offender has been allocated before' do
+        let!(:allocation) {
+          create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no, primary_pom_nomis_id: poms.last.staff_id)
+        }
+
         before do
           stub_offenders_for_prison(prison_code, [offender])
           create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
-          create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no, primary_pom_nomis_id: poms.last.staff_id)
         end
 
-        it 'sets allocation so that last_event can be displayed' do
+        it 'sets @allocation so that last_event can be displayed' do
           get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
           expect(response).to be_successful
-          expect(assigns(:allocation)).not_to be_nil
+          expect(assigns(:allocation)).to eq(allocation)
         end
 
         context 'when deallocated' do
@@ -120,6 +110,53 @@ RSpec.describe AllocationStaffController, type: :controller do
             get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
             expect(response).to be_successful
             expect(assigns(:previous_poms).map(&:staff_id)).to eq [poms.last.staff_id]
+          end
+        end
+      end
+
+      context 'when newly transferred from a different prison' do
+        let(:previous_prison_code) { create(:prison).code }
+
+        let(:previous_pom) { build(:pom, :probation_officer) }
+
+        let!(:allocation) {
+          # Allocate a POM in the previous prison
+          create(:allocation_history, prison: previous_prison_code, nomis_offender_id: offender_no, primary_pom_nomis_id: previous_pom.staff_id)
+        }
+
+        before do
+          # Stub previous POM in the old prison
+          stub_poms(previous_prison_code, [previous_pom])
+
+          # Stub offender in the new prison
+          stub_offenders_for_prison(prison_code, [offender])
+          create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
+        end
+
+        context 'when they were automatically deallocated from the last prison (expected behaviour)' do
+          before do
+            # Deallocate the POM in the previous prison (i.e. offender has been transferred to this prison)
+            allocation.dealloate_offender_after_transfer
+          end
+
+          it 'sets @allocation so that last_event can be displayed' do
+            get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
+            expect(response).to be_successful
+            expect(assigns(:allocation)).to eq(allocation)
+          end
+        end
+
+        context "when they weren't deallocated from the last prison (a known bug)" do
+          it 'sets @allocation so that last_event can be displayed' do
+            get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
+            expect(response).to be_successful
+            expect(assigns(:allocation)).to eq(allocation)
+          end
+
+          it 'makes a nil current POM' do
+            get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
+            expect(response).to be_successful
+            expect(assigns(:current_pom)).to be_nil
           end
         end
       end
