@@ -7,7 +7,7 @@ class AllocationStaffController < PrisonsApplicationController
 
   def index
     @case_info = Offender.find_by!(nomis_offender_id: prisoner_id_from_url).case_information
-    @allocation = AllocationHistory.find_by prison: @prison.code, nomis_offender_id: prisoner_id_from_url
+    @allocation = AllocationHistory.find_by nomis_offender_id: prisoner_id_from_url
     previous_pom_ids = if @allocation
                          @allocation.previously_allocated_poms
                        else
