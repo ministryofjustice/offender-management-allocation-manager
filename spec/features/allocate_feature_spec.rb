@@ -32,9 +32,8 @@ feature 'Allocation' do
     expect(page).to have_content('Determinate')
 
     within '#recommended_poms' do
-      # 6th POM in the list is Moic Integration-Tests
-      within 'tbody > tr:nth-child(6)' do
-        expect(all('td[aria-label="POM name"]').map(&:text).first).to eq('Moic Integration-Tests')
+      # Allocate to the POM called "Moic Integration-Tests"
+      within page.find(:css, 'tr', text: 'Moic Integration-Tests') do
         click_link 'Allocate'
       end
     end
