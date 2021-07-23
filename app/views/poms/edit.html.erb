@@ -85,7 +85,7 @@
 
     <div class="govuk-form-group">
       <button type="submit" class="govuk-button">Save</button>
-      <a href="<%= prison_poms_path(@prison.code, nomis_staff_id: @pom.staff_id) %>" class="govuk-link">Cancel</a>
+      <a class="govuk-link cancel-button" href="<%= prison_poms_path(@prison.code, nomis_staff_id: @pom.staff_id) %>">Cancel</a>
     </div>
 
     </form>
