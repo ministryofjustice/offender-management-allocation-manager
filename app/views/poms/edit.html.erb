@@ -1,4 +1,4 @@
-<%= render :partial => "/shared/backlink", :locals => {:page => prison_poms_path(@prison.code, id: @pom.staff_id)} %>
+<%= render :partial => "/shared/backlink", :locals => {:page => @referrer} %>
 
 <div>
   <%= form_tag prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id), method: :put, id: "edit_pom_form" do %>
@@ -85,7 +85,7 @@
 
     <div class="govuk-form-group">
       <button type="submit" class="govuk-button">Save</button>
-      <a class="govuk-link cancel-button" href="<%= prison_poms_path(@prison.code, nomis_staff_id: @pom.staff_id) %>">Cancel</a>
+      <%= link_to 'Cancel', @referrer, class: 'govuk-link cancel-button' %>
     </div>
 
     </form>

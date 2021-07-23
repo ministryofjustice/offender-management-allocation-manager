@@ -4,6 +4,8 @@ class PomsController < PrisonStaffApplicationController
   before_action :ensure_spo_user
 
   before_action :load_pom_staff_member, only: [:show, :edit, :update]
+  before_action :store_referrer_in_session, only: [:edit]
+  before_action :set_referrer
 
   def index
     @poms = @prison.get_list_of_poms.sort_by(&:last_name)
