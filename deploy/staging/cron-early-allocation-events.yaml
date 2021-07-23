@@ -47,7 +47,22 @@ spec:
                 - name: REDIS_URL
                   valueFrom:
                     secretKeyRef:
-                      name: elasticache-offender-management-allocation-manager-token-cache-production
+                      name: elasticache-offender-management-allocation-manager-token-cache-staging
                       key: url
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: hmpps-domain-events-topic
+                      key: access_key_id
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: hmpps-domain-events-topic
+                      key: secret_access_key
+                - name: DOMAIN_EVENTS_TOPIC_ARN
+                  valueFrom:
+                    secretKeyRef:
+                      name: hmpps-domain-events-topic
+                      key: topic_arn
           restartPolicy: OnFailure
 
