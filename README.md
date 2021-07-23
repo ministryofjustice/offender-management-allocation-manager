@@ -12,6 +12,10 @@ This Ruby on Rails application enables prison staff to manage the allocation of 
 
 [![API docs](https://img.shields.io/badge/API_docs-view-85EA2D.svg?logo=swagger)](https://allocation-manager-staging.apps.live-1.cloud-platform.service.justice.gov.uk/api-docs/index.html)
 
+### Posted Event Specification
+
+Posted event Specification [![Event docs](https://img.shields.io/badge/Event_docs-view-85EA2D.svg)](https://playground.asyncapi.io/?url=https://raw.githubusercontent.com/ministryofjustice/offender-management-allocation-manager/main/EarlyAllocationStatus.yml)
+
 ### Architecture - Context View
 
 [![auto-updating container diagram](https://static.structurizr.com/workspace/56937/diagrams/manage-POM-cases-container.png)](https://structurizr.com/share/56937/diagrams#manage-POM-cases-container)
