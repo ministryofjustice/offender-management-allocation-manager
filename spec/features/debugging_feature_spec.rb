@@ -16,14 +16,8 @@ feature 'Provide debugging information for our team to use' do
       fill_in 'offender_no', with: nomis_offender_id
       click_on('search-button')
 
-      expect(page).to have_css('tbody tr', count: 41)
+      expect(page).to have_css('tbody tr', count: 40)
       expect(page).to have_content("Not currently allocated")
-
-      table_row = page.find(:css, 'tr.govuk-table__row#convicted', text: 'Convicted?')
-
-      within table_row do
-        expect(page).to have_content('Yes')
-      end
     end
 
     it 'returns information for an allocated offender', vcr: { cassette_name: 'prison_api/debugging_allocated_offender_feature' } do
@@ -38,7 +32,7 @@ feature 'Provide debugging information for our team to use' do
       fill_in 'offender_no', with: nomis_offender_id
       click_on('search-button')
 
-      expect(page).to have_css('tbody tr', count: 46)
+      expect(page).to have_css('tbody tr', count: 45)
 
       pom_table_row = page.find(:css, 'tr.govuk-table__row#pom', text: 'POM')
 
@@ -76,11 +70,9 @@ feature 'Provide debugging information for our team to use' do
     context 'when offender does not have a sentence start date',
             vcr: { cassette_name: 'prison_api/debugging_no_sentence_start_date_for_offender_feature' } do
       let(:api_non_sentenced_offender) do
-        build(:hmpps_api_offender, offenderNo: nomis_offender_id,
-              imprisonmentStatus: 'SEC90',
-              sentence: build(:sentence_detail,
-                              releaseDate: 3.years.from_now.iso8601,
-                              sentenceStartDate: nil))
+        build(:hmpps_api_offender,
+              prisonerNumber: nomis_offender_id,
+              sentence: attributes_for(:sentence_detail, :unsentenced))
       end
       let(:case_info) { create(:case_information, case_allocation: CaseInformation::NPS, offender: build(:offender, nomis_offender_id: nomis_offender_id)) }
       let(:non_sentenced_offender) {

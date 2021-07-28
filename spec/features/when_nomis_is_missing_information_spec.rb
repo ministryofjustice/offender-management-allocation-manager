@@ -30,7 +30,7 @@ context 'when NOMIS is missing information' do
     describe 'the caseload page' do
       context 'with an NPS offender with a determinate sentence, but no release dates' do
         before do
-          stub_offenders = [build(:nomis_offender, offenderNo: offender_no,
+          stub_offenders = [build(:nomis_offender, prisonerNumber: offender_no,
                                   imprisonmentStatus: 'SEC91',
                                   sentence: attributes_for(:sentence_detail,
                                                            releaseDate: 30.years.from_now.iso8601,
@@ -52,7 +52,7 @@ context 'when NOMIS is missing information' do
 
     describe 'the prisoner page' do
       before do
-        offender = build(:nomis_offender, agencyId: prison_code, offenderNo: offender_no,
+        offender = build(:nomis_offender, prisonId: prison_code, prisonerNumber: offender_no,
                          sentence: attributes_for(:sentence_detail,
                                                   automaticReleaseDate: Time.zone.today + 3.years,
                                                   conditionalReleaseDate: Time.zone.today + 22.months))
@@ -84,7 +84,7 @@ context 'when NOMIS is missing information' do
 
     describe 'the handover start page' do
       before do
-        stub_offenders = [build(:nomis_offender, offenderNo: offender_no)]
+        stub_offenders = [build(:nomis_offender, prisonerNumber: offender_no)]
 
         stub_offenders_for_prison(prison_code, stub_offenders)
       end
@@ -110,7 +110,7 @@ context 'when NOMIS is missing information' do
       let(:booking_id) { 4 }
 
       before do
-        stub_offender = build(:nomis_offender, offenderNo: offender_no)
+        stub_offender = build(:nomis_offender, prisonerNumber: offender_no)
 
         stub_offenders_for_prison(prison_code, [stub_offender])
 

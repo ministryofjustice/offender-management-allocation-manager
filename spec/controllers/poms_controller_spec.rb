@@ -20,10 +20,10 @@ RSpec.describe PomsController, type: :controller do
       build(:pom, staffId: active.nomis_staff_id),
       build(:pom, staffId: unavailable.nomis_staff_id)
     ])
-    a1 = create(:case_information, tier: 'A', offender: build(:offender, nomis_offender_id: a_offenders.first.fetch(:offenderNo)))
+    a1 = create(:case_information, tier: 'A', offender: build(:offender, nomis_offender_id: a_offenders.first.fetch(:prisonerNumber)))
     create(:allocation_history, nomis_offender_id: a1.nomis_offender_id, primary_pom_nomis_id: active.nomis_staff_id, prison: prison.code)
 
-    a2 = create(:case_information, tier: 'A', offender: build(:offender, nomis_offender_id: a_offenders.last.fetch(:offenderNo)))
+    a2 = create(:case_information, tier: 'A', offender: build(:offender, nomis_offender_id: a_offenders.last.fetch(:prisonerNumber)))
     create(:allocation_history, nomis_offender_id: a2.nomis_offender_id, primary_pom_nomis_id: inactive.nomis_staff_id, secondary_pom_nomis_id: active.nomis_staff_id, prison: prison.code)
 
     {
@@ -32,7 +32,7 @@ RSpec.describe PomsController, type: :controller do
       'D': d_offenders,
       'N/A': na_offenders
     }.each do |tier, offenders|
-      offenders.map { |o| o.fetch(:offenderNo) }.each do |offender_no|
+      offenders.map { |o| o.fetch(:prisonerNumber) }.each do |offender_no|
         create(:case_information, tier: tier.to_s, offender: build(:offender, nomis_offender_id: offender_no))
         create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: active.nomis_staff_id, prison: prison.code)
       end

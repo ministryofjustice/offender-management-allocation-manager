@@ -13,8 +13,8 @@ RSpec.describe AllocationStaffController, type: :controller do
   }
   let(:pom_without_emails) { poms.first }
   let(:prison_code) { create(:prison).code }
-  let(:offender) { build(:nomis_offender, agencyId: prison_code) }
-  let(:offender_no) { offender.fetch(:offenderNo) }
+  let(:offender) { build(:nomis_offender, prisonId: prison_code) }
+  let(:offender_no) { offender.fetch(:prisonerNumber) }
 
   before do
     stub_poms(prison_code, poms)
@@ -41,7 +41,7 @@ RSpec.describe AllocationStaffController, type: :controller do
           info = create(:case_information, tier: 'N/A')
           create(:allocation_history, prison: prison_code, nomis_offender_id: info.nomis_offender_id, primary_pom_nomis_id: alice.staffId)
 
-          offenders = CaseInformation.all.map { |ci| build(:nomis_offender, offenderNo: ci.nomis_offender_id) }
+          offenders = CaseInformation.all.map { |ci| build(:nomis_offender, prisonerNumber: ci.nomis_offender_id) }
           stub_offenders_for_prison(prison_code, offenders, [attributes_for(:movement)])
 
           create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), tier: tier)

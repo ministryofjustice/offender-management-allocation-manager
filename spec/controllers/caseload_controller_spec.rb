@@ -30,10 +30,10 @@ RSpec.describe CaseloadController, type: :controller do
 
     let(:offenders) {
       [
-      build(:nomis_offender, complexityLevel: 'high'),
-      build(:nomis_offender, complexityLevel: 'medium'),
-      build(:nomis_offender, complexityLevel: 'low')
-    ].sort_by { |x| x.fetch(:lastName) }
+        build(:nomis_offender, :rotl, complexityLevel: 'high'),
+        build(:nomis_offender, complexityLevel: 'medium'),
+        build(:nomis_offender, complexityLevel: 'low')
+      ]
     }
 
     before do
@@ -41,14 +41,14 @@ RSpec.describe CaseloadController, type: :controller do
       movements = [
         attributes_for(:movement,
                        :rotl,
-                       offenderNo: offenders.first.fetch(:offenderNo),
+                       offenderNo: offenders.first.fetch(:prisonerNumber),
                        movementDate: today.to_s),
         attributes_for(:movement,
                        :rotl,
-                       offenderNo: offenders.last.fetch(:offenderNo),
+                       offenderNo: offenders.last.fetch(:prisonerNumber),
                        movementDate: yesterday.to_s),
         attributes_for(:movement,
-                       offenderNo: offenders.last.fetch(:offenderNo),
+                       offenderNo: offenders.last.fetch(:prisonerNumber),
                        movementDate: today.to_s)
       ]
 
@@ -56,8 +56,8 @@ RSpec.describe CaseloadController, type: :controller do
 
       # Need to create history records because AllocatedOffender#new_case? doesn't cope otherwise
       offenders.each do |offender|
-        create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:offenderNo)))
-        alloc = create(:allocation_history, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: pom.staffId, prison: prison.code)
+        create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
+        alloc = create(:allocation_history, nomis_offender_id: offender.fetch(:prisonerNumber), primary_pom_nomis_id: pom.staffId, prison: prison.code)
         alloc.update!(primary_pom_nomis_id: pom.staffId,
                       event: AllocationHistory::REALLOCATE_PRIMARY_POM,
                       event_trigger: AllocationHistory::USER)
@@ -128,11 +128,11 @@ RSpec.describe CaseloadController, type: :controller do
           end
 
           it 'returns the caseload' do
-            expect(assigns(:allocations).map(&:nomis_offender_id)).to match_array(offenders.map { |o| o.fetch(:offenderNo) })
+            expect(assigns(:allocations).map(&:nomis_offender_id)).to match_array(offenders.map { |o| o.fetch(:prisonerNumber) })
           end
 
           it 'returns ROTL information' do
-            expect(offenders.map { |o| allocations.fetch(o.fetch(:offenderNo)).latest_temp_movement_date }).to eq [today, nil, nil]
+            expect(offenders.map { |o| allocations.fetch(o.fetch(:prisonerNumber)).latest_temp_movement_date }).to eq [today, nil, nil]
           end
         end
       end
@@ -146,7 +146,7 @@ RSpec.describe CaseloadController, type: :controller do
           get :new_cases, params: { prison_id: prison.code, staff_id: staff_id }
           expect(response).to be_successful
 
-          expect(assigns(:new_cases).map(&:nomis_offender_id)).to match_array(offenders.map { |o| o.fetch(:offenderNo) })
+          expect(assigns(:new_cases).map(&:nomis_offender_id)).to match_array(offenders.map { |o| o.fetch(:prisonerNumber) })
         end
       end
     end

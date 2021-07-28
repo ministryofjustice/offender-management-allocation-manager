@@ -38,28 +38,28 @@ feature 'Case History' do
 
   let(:nomis_offender) {
     build(:nomis_offender,
-          agencyId: open_prison.code,
-            sentence: attributes_for(:sentence_detail, :indeterminate, :welsh_open_policy))
+          prisonId: open_prison.code,
+          sentence: attributes_for(:sentence_detail, :indeterminate, :welsh_open_policy))
   }
   let(:nomis_pentonville_offender) {
-    build(:nomis_offender, offenderNo: nomis_offender.fetch(:offenderNo),
-          agencyId: second_prison.code,
-            sentence: attributes_for(:sentence_detail, :indeterminate, :welsh_open_policy))
+    build(:nomis_offender, prisonerNumber: nomis_offender.fetch(:prisonerNumber),
+          prisonId: second_prison.code,
+          sentence: attributes_for(:sentence_detail, :indeterminate, :welsh_open_policy))
   }
   let(:pontypool_ldu) {
     create(:local_delivery_unit, name: 'Pontypool LDU', email_address: 'pontypool-ldu@digital.justice.gov.uk')
   }
-  let(:ci) { create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender.fetch(:offenderNo)), local_delivery_unit: pontypool_ldu) }
+  let(:ci) { create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender.fetch(:prisonerNumber)), local_delivery_unit: pontypool_ldu) }
   let(:nomis_offender_id) { ci.nomis_offender_id }
   let!(:first_prison) { create(:prison) }
   let!(:second_prison) { create(:prison) }
   let!(:open_prison) { create(:prison, code: PrisonService::PRESCOED_CODE) }
   let(:offender_movements) {
     [
-    attributes_for(:movement, toAgency: first_prison.code, movementDate: first_arrival_date - 1.day),
-    attributes_for(:movement, toAgency: second_prison.code, movementDate: readmission_date),
-    attributes_for(:movement, toAgency: open_prison.code, movementDate: transfer_date),
-  ]
+      attributes_for(:movement, toAgency: first_prison.code, movementDate: first_arrival_date - 1.day),
+      attributes_for(:movement, toAgency: second_prison.code, movementDate: readmission_date),
+      attributes_for(:movement, toAgency: open_prison.code, movementDate: transfer_date),
+    ]
   }
   let(:today) { Time.zone.now } # try not to call Time.zone.now too often, to avoid 1-minute drifts
   let(:first_arrival_date) { today - 20.days }
@@ -322,13 +322,13 @@ feature 'Case History' do
 
       it 'shows the case history', :js do
         hist_allocate_secondary = AllocationHistory.new secondary_pom_name: probation_pom[:primary_pom_name],
-                                                 updated_at: first_arrival_date + 2.days,
-                                                 created_by_name: created_by_name
+                                                        updated_at: first_arrival_date + 2.days,
+                                                        created_by_name: created_by_name
 
         history6 = AllocationHistory.new primary_pom_name: probation_pom_2[:primary_pom_name],
-                                  updated_at: first_arrival_date + 1.day,
-                                  created_by_name: created_by_name,
-                                  allocated_at_tier: 'A'
+                                         updated_at: first_arrival_date + 1.day,
+                                         created_by_name: created_by_name,
+                                         allocated_at_tier: 'A'
 
         within '.govuk-grid-row:nth-of-type(3)' do
           expect(page).to have_css('.govuk-heading-m', text: first_prison.name)
@@ -426,14 +426,14 @@ feature 'Case History' do
     before do
       stub_user(username: 'MOIC_POM', staff_id: pom.staff_id)
       stub_offenders_for_prison(open_prison.code, [nomis_offender])
-      stub_movements_for nomis_offender.fetch(:offenderNo), offender_movements
+      stub_movements_for nomis_offender.fetch(:prisonerNumber), offender_movements
       signin_spo_user([open_prison.code])
       stub_poms(open_prison.code, [pom])
       stub_pom pom
     end
 
-    let(:nomis_offender) { build(:nomis_offender, agencyId: open_prison.code) }
-    let(:nomis_offender_id) { nomis_offender.fetch(:offenderNo) }
+    let(:nomis_offender) { build(:nomis_offender, prisonId: open_prison.code) }
+    let(:nomis_offender_id) { nomis_offender.fetch(:prisonerNumber) }
     let(:pom) { build(:pom) }
     let!(:case_info) {
       create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))

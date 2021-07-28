@@ -3,10 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe RecalculateHandoverDateJob, type: :job do
-  let(:offender_no) { nomis_offender.fetch(:offenderNo) }
+  let(:offender_no) { nomis_offender.fetch(:prisonerNumber) }
   let(:today) { Time.zone.now }
   let(:prison) { create(:prison) }
-  let(:test_strategy) { Flipflop::FeatureSet.current.test! }
 
   before do
     stub_auth_token
@@ -18,7 +17,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), case_allocation: 'NPS', manual_entry: false)
     end
 
-    let(:nomis_offender) { build(:nomis_offender, agencyId: prison.code) }
+    let(:nomis_offender) { build(:nomis_offender, prisonId: prison.code) }
 
     it "recalculates the offender's handover dates and pushes them to the Community API" do
       offender = OffenderService.get_offender(offender_no)
@@ -38,7 +37,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       stub_non_existent_offender(offender_no)
     end
 
-    let(:nomis_offender) { build(:nomis_offender, agencyId: prison.code) }
+    let(:nomis_offender) { build(:nomis_offender, prisonId: prison.code) }
 
     it 'does nothing' do
       expect(HmppsApi::CommunityApi).not_to receive(:set_handover_dates)
@@ -47,7 +46,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
   end
 
   context "when the offender doesn't have a sentence in NOMIS" do
-    let(:nomis_offender) { build(:nomis_offender, agencyId: prison.code, sentence: attributes_for(:sentence_detail, :unsentenced)) }
+    let(:nomis_offender) { build(:nomis_offender, prisonId: prison.code, sentence: attributes_for(:sentence_detail, :unsentenced)) }
 
     before do
       stub_offender(nomis_offender)
@@ -60,31 +59,10 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     end
   end
 
-  context 'when the Prison API returns an error' do
-    let(:nomis_offender) { build(:nomis_offender) }
-    let(:api_host) { Rails.configuration.prison_api_host }
-    let(:stub_url) { "#{api_host}/api/prisoners/#{offender_no}" }
-    let(:status) { 502 }
-
-    before do
-      stub_offender(nomis_offender)
-      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), case_allocation: 'NPS', manual_entry: false)
-
-      # Stub HTTP requests to the Prison API
-      stub_request(:any, stub_url).to_return(status: status)
-    end
-
-    it 'raises an exception so the job will go into the retry queue' do
-      expect {
-        described_class.perform_now(offender_no)
-      }.to raise_error(Faraday::Error)
-    end
-  end
-
   context 'when offender has less than 10 months left to serve' do
     let(:nomis_offender) {
       build(:nomis_offender,
-            agencyId: prison.code,
+            prisonId: prison.code,
             sentence: attributes_for(:sentence_detail, :less_than_10_months_to_serve))
     }
 
@@ -119,7 +97,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
             prisoner_name: "#{nomis_offender.fetch(:firstName)} #{nomis_offender.fetch(:lastName)}",
             prisoner_number: offender_no,
             crn_number: case_info.crn,
-            prison_name: PrisonService.name_for(nomis_offender.fetch(:agencyId))
+            prison_name: PrisonService.name_for(nomis_offender.fetch(:prisonId))
           ).and_call_original
         end
 
@@ -174,7 +152,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
     context "when calculated handover dates don't exist yet for the offender" do
       let(:record) { case_info.offender.calculated_handover_date }
-      let(:nomis_offender) { build(:nomis_offender, agencyId: prison.code) }
+      let(:nomis_offender) { build(:nomis_offender, prisonId: prison.code) }
 
       it 'creates a new record' do
         expect {
@@ -190,7 +168,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       context 'with a COM responsible case' do
         let(:nomis_offender) {
           build(:nomis_offender,
-                agencyId: prison.code,
+                prisonId: prison.code,
                 sentence: attributes_for(:sentence_detail, :less_than_10_months_to_serve))
         }
 
@@ -203,7 +181,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       context 'with a COM supporting case' do
         let(:nomis_offender) {
           build(:nomis_offender,
-                agencyId: prison.code,
+                prisonId: prison.code,
                 sentence: attributes_for(:sentence_detail, :inside_handover_window))
         }
 
@@ -218,7 +196,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     end
 
     context 'when calculated handover dates already exist for the offender' do
-      let(:nomis_offender) { build(:nomis_offender, agencyId: prison.code) }
+      let(:nomis_offender) { build(:nomis_offender, prisonId: prison.code) }
       let!(:existing_record) {
         create(:calculated_handover_date,
                responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
@@ -266,7 +244,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
   context 'when an indeterminate offender has moved into open conditions' do
     let(:nomis_offender) {
       build(:nomis_offender,
-            agencyId: prison.code,
+            prisonId: prison.code,
                 category: category,
                 sentence: attributes_for(:sentence_detail,
                                          :indeterminate,
@@ -285,7 +263,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
                          movementDate: movement_date.to_s)
     }
 
-    let(:offender) { build(:nomis_offender, agencyId: prison.code, offenderNo: offender_no) }
+    let(:offender) { build(:nomis_offender, prisonId: prison.code, prisonerNumber: offender_no) }
     let(:sentence_start_date) { policy_start_date }
     let(:movement_date) { policy_start_date + 1.week }
 

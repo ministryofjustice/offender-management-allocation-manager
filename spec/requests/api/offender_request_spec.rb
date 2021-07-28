@@ -11,7 +11,7 @@ RSpec.describe "OffenderApis", type: :request do
     let!(:db_offender) { create(:offender, early_allocations: early_allocations) }
     let!(:case_info) { create(:case_information, offender: db_offender) }
     let(:offender) {
-      build(:nomis_offender, offenderNo: offender_no, agencyId: prison.code,
+      build(:nomis_offender, prisonerNumber: offender_no, prisonId: prison.code,
                            sentence: attributes_for(:sentence_detail, licenceExpiryDate: sentence_end_date))
     }
     let(:offender_no) { db_offender.nomis_offender_id }

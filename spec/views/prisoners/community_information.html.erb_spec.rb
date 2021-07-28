@@ -7,9 +7,7 @@ RSpec.describe "prisoners/community_information", type: :view do
   let(:case_info) { build(:case_information) }
 
   let(:api_offender) {
-    build(:hmpps_api_offender).tap { |o|
-      o.sentence = build(:sentence_detail, :inside_handover_window)
-    }
+    build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :inside_handover_window))
   }
   let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 

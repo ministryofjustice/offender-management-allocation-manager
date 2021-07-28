@@ -2,14 +2,14 @@ require 'rails_helper'
 
 RSpec.describe "debugging/debugging", type: :view do
   let(:api_offender) do
-    build(:hmpps_api_offender, firstName: 'John', lastName: 'Dory').tap { |offender|
-      offender.sentence = build(:sentence_detail,
-                                sentenceStartDate: Time.zone.today,
-                                automaticReleaseDate: Time.zone.today + 10.months,
-                                tariffDate: Date.new(2033, 8, 1),
-                                postRecallReleaseDate: Date.new(2028, 11, 8),
-                                licenceExpiryDate: Date.new(2025, 10, 7))
-    }
+    build(:hmpps_api_offender,
+          firstName: 'John', lastName: 'Dory',
+          sentence: attributes_for(:sentence_detail,
+                                   sentenceStartDate: Time.zone.today,
+                                   automaticReleaseDate: Time.zone.today + 10.months,
+                                   tariffDate: Date.new(2033, 8, 1),
+                                   postRecallReleaseDate: Date.new(2028, 11, 8),
+                                   licenceExpiryDate: Date.new(2025, 10, 7)))
   end
   let(:offender) { build(:mpc_offender, prison: prison, prison_record: api_offender, offender: build(:offender)) }
 

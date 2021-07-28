@@ -6,7 +6,7 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
     let(:prison) { create(:prison) }
     let!(:co_working_allocation) {
       create(:allocation_history, :co_working, prison: prison.code, primary_pom_nomis_id: primary_pom.staff_id,
-                                          secondary_pom_nomis_id: secondary_pom.staff_id, nomis_offender_id: offender.fetch(:offenderNo))
+                                          secondary_pom_nomis_id: secondary_pom.staff_id, nomis_offender_id: offender.fetch(:prisonerNumber))
     }
     let(:primary_pom) { build(:pom) }
     let(:secondary_pom) { build(:pom) }
@@ -24,10 +24,10 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
 
     describe 'when a pom has been allocated an offender' do
       context 'when an offender is currently serving a sentence' do
-        let(:offender) { build(:nomis_offender, agencyId: prison.code,  sentence: attributes_for(:sentence_detail)) }
+        let(:offender) { build(:nomis_offender, prisonId: prison.code,  sentence: attributes_for(:sentence_detail)) }
 
         it 'returns pom allocation details' do
-          get :show, params: { prison_id: prison.code, offender_no: offender.fetch(:offenderNo) }
+          get :show, params: { prison_id: prison.code, offender_no: offender.fetch(:prisonerNumber) }
 
           expect(response).to have_http_status(200)
           expect(JSON.parse(response.body)).to eq("primary_pom" => { "name" => primary_pom.full_name.to_s, "staff_id" => primary_pom.staff_id },
@@ -38,10 +38,10 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
       context 'when an offender has finished their sentence' do
         # currently an offender is not able to be unallocated from a pom. As a result the the pom remains on the DPS
         # quick look screen once an offenders sentence has finished. This is a quick fix to stop this happening.
-        let(:offender) { build(:nomis_offender, agencyId: prison.code,  sentence: attributes_for(:sentence_detail, :unsentenced)) }
+        let(:offender) { build(:nomis_offender, prisonId: prison.code,  sentence: attributes_for(:sentence_detail, :unsentenced)) }
 
         it 'does not return a poms allocation details' do
-          get :show, params: { prison_id: prison.code, offender_no: offender.fetch(:offenderNo) }
+          get :show, params: { prison_id: prison.code, offender_no: offender.fetch(:prisonerNumber) }
 
           expect(response).to have_http_status(404)
           expect(JSON.parse(response.body)).to eq("message" => "Not allocated", "status" => "error")

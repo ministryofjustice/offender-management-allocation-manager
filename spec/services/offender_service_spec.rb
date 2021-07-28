@@ -22,7 +22,7 @@ describe OffenderService, type: :feature do
     end
 
     context 'when offender is not in prison' do
-      let(:offender) { build(:nomis_offender, currentlyInPrison: 'N', agencyId: 'OUT') }
+      let(:offender) { build(:nomis_offender, inOutStatus: 'OUT', prisonId: 'OUT') }
 
       before do
         stub_auth_token
@@ -30,14 +30,13 @@ describe OffenderService, type: :feature do
       end
 
       it 'returns nil as the offender is outside of our service' do
-        expect(described_class.get_offender(offender.fetch(:offenderNo))).to be_nil
+        expect(described_class.get_offender(offender.fetch(:prisonerNumber))).to be_nil
       end
     end
 
     context 'when offender is in an unknown prison' do
       # MHI - Morton Hall immigration centre
-      let(:offender) { build(:nomis_offender, agencyId: 'MHI') }
-      let(:test_strategy) { Flipflop::FeatureSet.current.test! }
+      let(:offender) { build(:nomis_offender, prisonId: 'MHI') }
 
       before do
         stub_auth_token
@@ -45,7 +44,7 @@ describe OffenderService, type: :feature do
       end
 
       it 'returns nil as the offender cannot be handled' do
-        expect(described_class.get_offender(offender.fetch(:offenderNo))).to be_nil
+        expect(described_class.get_offender(offender.fetch(:prisonerNumber))).to be_nil
       end
     end
   end

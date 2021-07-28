@@ -18,7 +18,6 @@ RSpec.describe "prisoners/show", type: :view do
   describe 'complexity badges' do
     let(:prison) { build(:womens_prison) }
     let(:api_offender) { build(:hmpps_api_offender, complexityLevel: complexity) }
-    let(:test_strategy) { Flipflop::FeatureSet.current.test! }
 
     before do
       render

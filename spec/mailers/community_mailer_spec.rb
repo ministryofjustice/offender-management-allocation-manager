@@ -5,7 +5,7 @@ RSpec.describe CommunityMailer, type: :mailer do
   let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
   describe '#urgent_pipeline_to_community' do
-    let(:api_offender) { build(:hmpps_api_offender, latestLocationId: 'LEI') }
+    let(:api_offender) { build(:hmpps_api_offender, prisonId: 'LEI') }
 
     let(:case_info) do
       create(:case_information, offender: build(:offender, nomis_offender_id: api_offender.offender_no,
@@ -90,7 +90,7 @@ RSpec.describe CommunityMailer, type: :mailer do
   end
 
   describe '#open_prison_supporting_com_needed' do
-    let(:api_offender) { build(:hmpps_api_offender, latestLocationId: PrisonService::PRESCOED_CODE, sentence_type: :indeterminate) }
+    let(:api_offender) { build(:hmpps_api_offender, prisonId: PrisonService::PRESCOED_CODE, sentence_type: :indeterminate) }
     let(:case_info) do
       create(:case_information, :welsh, offender: build(:offender, nomis_offender_id: api_offender.offender_no,
              responsibility: build(:responsibility, nomis_offender_id: api_offender.offender_no)))

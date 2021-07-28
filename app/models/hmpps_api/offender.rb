@@ -2,8 +2,6 @@
 
 module HmppsApi
   class Offender
-    attr_reader :main_offence
-
     def awaiting_allocation_for
       (Time.zone.today - prison_arrival_date).to_i
     end
@@ -19,34 +17,24 @@ module HmppsApi
 
     delegate :code, :label, :active_since, to: :@category, prefix: :category, allow_nil: true
 
-    attr_accessor :prison_arrival_date, :sentence
+    attr_accessor :prison_arrival_date
 
-    attr_reader :first_name, :last_name, :prison_id, :offender_no, :cell_location, :complexity_level, :date_of_birth
+    attr_reader :first_name, :last_name, :prison_id, :offender_no, :cell_location, :complexity_level,
+                :date_of_birth, :sentence, :main_offence
 
-    # This list must only contain fields that are both supplied by
-    # https://api-dev.prison.service.justice.gov.uk/swagger-ui.html#//prisoners/getPrisonersOffenderNo
-    # and also by
-    # https://api-dev.prison.service.justice.gov.uk/swagger-ui.html#//locations/getOffendersAtLocationDescription
-    def initialize(api_payload, search_payload, category:, latest_temp_movement:, complexity_level:, booking_id:, prison_id:)
-      # It is expected that this method will be called by the subclass which
-      # will have been given a payload at the class level, and will call this
-      # method from it's own internal from_json
-      @first_name = api_payload.fetch('firstName')
-      @last_name = api_payload.fetch('lastName')
-      @offender_no = api_payload.fetch('offenderNo')
-      @convicted_status = api_payload['convictedStatus']
-      @date_of_birth = api_payload.fetch('dateOfBirth').to_date
+    def initialize(offender:, category:, latest_temp_movement:, complexity_level:)
+      @first_name = offender.fetch('firstName')
+      @last_name = offender.fetch('lastName')
+      @offender_no = offender.fetch('prisonerNumber')
+      @date_of_birth = offender.fetch('dateOfBirth').to_date
       @latest_temp_movement = latest_temp_movement
-      @cell_location = search_payload['cellLocation']
+      @cell_location = offender['cellLocation']
+      @main_offence = offender['mostSeriousOffence']
       @complexity_level = complexity_level
       @category = category
-
-      @booking_id = booking_id
-      @prison_id = prison_id
-    end
-
-    def load_main_offence
-      @main_offence = HmppsApi::PrisonApi::OffenderApi.get_offence(@booking_id)
+      @sentence = HmppsApi::SentenceDetail.new(offender)
+      @booking_id = offender.fetch('bookingId').to_i
+      @prison_id = offender.fetch('prisonId')
     end
 
     def get_image
@@ -55,12 +43,6 @@ module HmppsApi
 
     def latest_temp_movement_date
       @latest_temp_movement&.movement_date
-    end
-
-    # This is needed (sadly) because although when querying by prison these are filtered out,
-    # we can query directly (we might have a CaseInformation record) where we don't filter.
-    def convicted?
-      @convicted_status == 'Convicted'
     end
 
     def sentenced?
@@ -104,7 +86,7 @@ module HmppsApi
     def inside_omic_policy?
       over_18? &&
         (sentenced? || immigration_case?) &&
-        criminal_sentence? && convicted?
+        criminal_sentence?
     end
 
   private

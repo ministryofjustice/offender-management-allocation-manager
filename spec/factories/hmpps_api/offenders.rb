@@ -1,34 +1,36 @@
 FactoryBot.define do
   factory :hmpps_api_offender, class: 'HmppsApi::Offender' do
     initialize_with do
-      HmppsApi::Offender.new(attributes.stringify_keys,
-                             attributes.stringify_keys,
-                             booking_id: attributes[:latestBookingId]&.to_i,
-                             prison_id: attributes[:latestLocationId],
+      # run attributes through JSON for a more realistic payload
+      values_hash = JSON.parse(attributes.to_json)
+
+      # merge SentenceDetails into the main Offender object (Prison Search API returns it all in one)
+      sentence = values_hash.extract!('sentence').fetch('sentence')
+      values_hash.merge!(sentence)
+
+      HmppsApi::Offender.new(offender: values_hash,
                              category: attributes.fetch(:category),
                              latest_temp_movement: nil,
-                             complexity_level: attributes.fetch(:complexityLevel)).tap { |offender|
-        offender.sentence = attributes.fetch(:sentence)
-      }
+                             complexity_level: attributes.fetch(:complexityLevel))
     end
 
-    latestLocationId { 'LEI' }
+    prisonId { 'LEI' }
 
     trait :prescoed do
-      latestLocationId { PrisonService::PRESCOED_CODE }
+      prisonId { PrisonService::PRESCOED_CODE }
     end
 
     # cell location is the format <1 letter>-<1 number>-<3 numbers> e.g 'E-4-014'
-    internalLocation {
+    cellLocation {
       block = Faker::Alphanumeric.alpha(number: 1).upcase
       num = Faker::Number.non_zero_digit
       numbers = Faker::Number.leading_zero_number(digits: 3)
       "#{block}-#{num}-#{numbers}"
     }
 
-    offenderNo { generate :nomis_offender_id }
+    prisonerNumber { generate :nomis_offender_id }
     sequence(:bookingId) { |x| x + 700_000 }
-    convictedStatus { 'Convicted' }
+    legalStatus { 'SENTENCED' }
     dateOfBirth { Date.new(1990, 12, 6).to_s }
     firstName { Faker::Name.first_name }
     # We have some issues with corrupting the display
@@ -39,7 +41,7 @@ FactoryBot.define do
     category { build(:offender_category, :cat_c) }
     recall {  false }
 
-    sentence { association :sentence_detail }
+    sentence { attributes_for :sentence_detail }
 
     complexityLevel { 'medium' }
   end

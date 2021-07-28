@@ -5,8 +5,8 @@ RSpec.describe "shared/offence_info", type: :view do
   let(:prison) { build(:prison) }
   let(:api_offender) {
     build(:hmpps_api_offender,
-          prison_id: prison.code,
-            sentence: build(:sentence_detail, :indeterminate, tariffDate: ted, paroleEligibilityDate: ped))
+          prisonId: prison.code,
+          sentence: attributes_for(:sentence_detail, :indeterminate, tariffDate: ted, paroleEligibilityDate: ped))
   }
   let(:offender) { build(:mpc_offender, prison: prison, prison_record: api_offender, offender: build(:offender)) }
 
@@ -17,10 +17,10 @@ RSpec.describe "shared/offence_info", type: :view do
   end
 
   context 'with a past TED' do
-    let(:ted) { Time.zone.today - 2 .days }
+    let(:ted) { Time.zone.today - 2.days }
 
     context 'when a TED and PED are both in the past' do
-      let(:ped) { Time.zone.today - 2 .days }
+      let(:ped) { Time.zone.today - 2.days }
 
       it 'shows the PRD update link' do
         expect(page.css('#parole-review-date')).to have_content 'Update'
@@ -36,7 +36,7 @@ RSpec.describe "shared/offence_info", type: :view do
     end
 
     context 'when PED is in the future' do
-      let(:ped) { Time.zone.today + 2 .days }
+      let(:ped) { Time.zone.today + 2.days }
 
       it 'does not show the PRD update link' do
         expect(page.css('#parole-review-date')).not_to have_content 'Update'
@@ -45,7 +45,7 @@ RSpec.describe "shared/offence_info", type: :view do
   end
 
   context 'with a past PED' do
-    let(:ped) { Time.zone.today - 2 .days }
+    let(:ped) { Time.zone.today - 2.days }
 
     context 'when a TED is missing' do
       let(:ted) { nil }
@@ -56,7 +56,7 @@ RSpec.describe "shared/offence_info", type: :view do
     end
 
     context 'when a TED is in the future' do
-      let(:ted) { Time.zone.today + 2 .days }
+      let(:ted) { Time.zone.today + 2.days }
 
       it 'does not show the PRD update link' do
         expect(page.css('#parole-review-date')).not_to have_content 'Update'

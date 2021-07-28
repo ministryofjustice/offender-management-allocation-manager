@@ -100,4 +100,8 @@ module FeaturesHelper
   def current_page_number
     page.find('.pagination .current.page', match: :first).text.to_i
   end
+
+  def reload_page
+    visit current_path
+  end
 end

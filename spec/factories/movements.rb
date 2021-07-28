@@ -6,6 +6,7 @@ FactoryBot.define do
 
     offenderNo { 'G6543GH' }
 
+    # Use in conjunction with the :rotl trait on :nomis_offender
     trait :rotl do
       movementType { 'TAP' }
       directionCode  { 'OUT' }

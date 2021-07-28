@@ -15,11 +15,11 @@ RSpec.describe TasksController, :allocation, type: :controller do
   let(:next_week) { Time.zone.today + 7.days }
   let(:tariff_end_date) { Time.zone.today - 3.days }
   let(:offenders) {
-    [build(:nomis_offender, offenderNo: 'G7514GW', firstName: "Alice", lastName: "Aliceson",
+    [build(:nomis_offender, prisonerNumber: 'G7514GW', firstName: "Alice", lastName: "Aliceson",
            sentence: attributes_for(:sentence_detail, :indeterminate, tariffDate: tariff_end_date)),
-     build(:nomis_offender, offenderNo: 'G1234VV', firstName: "Bob", lastName: "Bibby"),
-     build(:nomis_offender, offenderNo: 'G1234AB', firstName: "Carole", lastName: "Caroleson"),
-     build(:nomis_offender, offenderNo: 'G1234GG', firstName: "David", lastName: "Davidson")
+     build(:nomis_offender, prisonerNumber: 'G1234VV', firstName: "Bob", lastName: "Bibby"),
+     build(:nomis_offender, prisonerNumber: 'G1234AB', firstName: "Carole", lastName: "Caroleson"),
+     build(:nomis_offender, prisonerNumber: 'G1234GG', firstName: "David", lastName: "Davidson")
     ]
   }
 
@@ -49,8 +49,8 @@ RSpec.describe TasksController, :allocation, type: :controller do
       # Allocate all of the offenders to this POM
       # Make sure that we don't generate missing nDelius data by mistake
       offenders.each do |offender|
-        create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:offenderNo)), tier: 'A')
-        create(:allocation_history, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: staff_id, prison: prison)
+        create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)), tier: 'A')
+        create(:allocation_history, nomis_offender_id: offender.fetch(:prisonerNumber), primary_pom_nomis_id: staff_id, prison: prison)
       end
       get :index, params: { prison_id: prison }
 

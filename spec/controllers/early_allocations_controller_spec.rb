@@ -19,9 +19,9 @@ RSpec.describe EarlyAllocationsController, type: :controller do
     ]
   }
 
-  let(:offender) { build(:nomis_offender, agencyId: prison, sentence: attributes_for(:sentence_detail, sentenceStartDate: Time.zone.today - 9.months,  conditionalReleaseDate: release_date)) }
+  let(:offender) { build(:nomis_offender, prisonId: prison, sentence: attributes_for(:sentence_detail, sentenceStartDate: Time.zone.today - 9.months,  conditionalReleaseDate: release_date)) }
 
-  let(:nomis_offender_id) { offender.fetch(:offenderNo) }
+  let(:nomis_offender_id) { offender.fetch(:prisonerNumber) }
 
   before do
     stub_signed_in_pom(prison, first_pom.staffId)

@@ -8,7 +8,7 @@ RSpec.describe "allocations/show", type: :view do
   let(:next_year) { (Time.zone.today + 1.year).year }
   let(:api_offender) {
     build(:hmpps_api_offender,
-          sentence: build(:sentence_detail, conditionalReleaseDate: Date.new(next_year + 1, 1, 28)))
+          sentence: attributes_for(:sentence_detail, conditionalReleaseDate: Date.new(next_year + 1, 1, 28)))
   }
   let(:case_info) { build(:case_information, :crc) }
   let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }

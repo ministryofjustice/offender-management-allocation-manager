@@ -120,7 +120,7 @@ RSpec.describe AllocationHistory, type: :model do
       let(:nomis_offender_id) { 'G2911GD' }
       let(:prison_code) { create(:prison).code }
       let(:poms) { [build(:pom, staffId: 485_833)] }
-      let(:offender) { build(:nomis_offender, agencyId: prison_code, offenderNo: nomis_offender_id) }
+      let(:offender) { build(:nomis_offender, prisonId: prison_code, prisonerNumber: nomis_offender_id) }
 
       it 'removes the primary pom details in an Offender\'s allocation' do
         create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))

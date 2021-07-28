@@ -66,7 +66,7 @@ module HmppsApi
       future_dates.any? ? future_dates.min.to_date : past_dates.max.try(:to_date)
     end
 
-    def initialize(payload, search_payload)
+    def initialize(payload)
       @actual_parole_date = payload['actualParoleDate']&.to_date
       @automatic_release_date = payload['automaticReleaseDate']&.to_date
       @automatic_release_override_date = payload['automaticReleaseOverrideDate']&.to_date
@@ -82,10 +82,10 @@ module HmppsApi
       @sentence_start_date = payload['sentenceStartDate']&.to_date
       @tariff_date = payload['tariffDate']&.to_date
 
-      @sentence_type = SentenceType.new search_payload.fetch('imprisonmentStatus', 'UNK_SENT')
-      @recall = search_payload.fetch('recall', false)
-      @indeterminate_sentence = search_payload['indeterminateSentence']
-      @description = search_payload.fetch('imprisonmentStatusDescription', 'Unknown Sentenced')
+      @sentence_type = SentenceType.new payload.fetch('imprisonmentStatus', 'UNK_SENT')
+      @recall = payload.fetch('recall', false)
+      @indeterminate_sentence = payload['indeterminateSentence']
+      @description = payload.fetch('imprisonmentStatusDescription', 'Unknown Sentenced')
     end
 
     def indeterminate_sentence?

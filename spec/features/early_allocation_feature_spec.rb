@@ -8,8 +8,8 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
   let(:valid_date) { Time.zone.today - 2.months }
   let!(:prison) { create(:prison).code }
   let(:username) { 'MOIC_POM' }
-  let(:nomis_offender) { build(:nomis_offender, agencyId: prison, dateOfBirth: date_of_birth, sentence: attributes_for(:sentence_detail, conditionalReleaseDate: release_date)) }
-  let(:nomis_offender_id) { nomis_offender.fetch(:offenderNo) }
+  let(:nomis_offender) { build(:nomis_offender, prisonId: prison, dateOfBirth: date_of_birth, sentence: attributes_for(:sentence_detail, conditionalReleaseDate: release_date)) }
+  let(:nomis_offender_id) { nomis_offender.fetch(:prisonerNumber) }
   let(:pom) { build(:pom, staffId: nomis_staff_id) }
   let(:date_of_birth) { Date.new(1980, 1, 6).to_s }
   let(:offender_name) { "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}" }

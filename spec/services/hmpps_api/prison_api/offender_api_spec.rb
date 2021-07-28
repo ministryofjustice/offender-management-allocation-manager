@@ -2,41 +2,92 @@ require 'rails_helper'
 
 describe HmppsApi::PrisonApi::OffenderApi do
   describe 'List of offenders' do
-    it "can get a list of offenders",
-       vcr: { cassette_name: 'prison_api/offender_hmpps_api_offender_list' } do
-      response = described_class.list('LEI')
+    describe 'using VCR', vcr: { cassette_name: 'prison_api/offender_hmpps_api_offender_list' } do
+      subject { described_class.get_offenders_in_prison('LEI') }
 
-      expect(response.data).not_to be_nil
-      expect(response.data).to be_instance_of(Array)
-      expect(response.data).to all(be_an HmppsApi::Offender)
+      it "can get a list of offenders" do
+        expect(subject).not_to be_nil
+        expect(subject).to be_instance_of(Array)
+        expect(subject).to all(be_an HmppsApi::Offender)
+      end
+
+      it "returns category info" do
+        # Find an offender with a category
+        offender_with_category = subject.detect { |o| o.category_code.present? }
+        expect(offender_with_category).not_to be_nil
+        expect(offender_with_category.category_label).not_to be_nil
+        expect(offender_with_category.category_active_since).to be_a(Date)
+      end
     end
 
-    it "can get an offence description for a booking id",
-       vcr: { cassette_name: 'prison_api/offender_api_get_offence_ok' } do
-      booking_id = '1153753'
-      response = described_class.get_offence(booking_id)
-      expect(response).to be_instance_of(String)
-      expect(response).to eq 'Section 18 - wounding with intent to resist / prevent arrest'
+    context 'with offenders who are on remand or unsentenced' do
+      subject { described_class.get_offenders_in_prison(prison) }
+
+      let(:prison) { create(:prison).code }
+
+      # These offenders should be allowed in because of their legal status
+      let(:accepted_offenders) {
+        [
+          build(:nomis_offender, legalStatus: 'IMMIGRATION_DETAINEE'),
+          build(:nomis_offender, legalStatus: 'INDETERMINATE_SENTENCE'),
+          build(:nomis_offender, legalStatus: 'RECALL'),
+          build(:nomis_offender, legalStatus: 'SENTENCED'),
+        ]
+      }
+
+      # These offenders should be filtered out because of their legal status
+      let(:rejected_offenders) {
+        [
+          build(:nomis_offender, legalStatus: 'CIVIL_PRISONER'),
+          build(:nomis_offender, legalStatus: 'CONVICTED_UNSENTENCED'),
+          build(:nomis_offender, legalStatus: 'DEAD'),
+          build(:nomis_offender, legalStatus: 'OTHER'),
+          build(:nomis_offender, legalStatus: 'REMAND'),
+          build(:nomis_offender, legalStatus: 'UNKNOWN'),
+        ]
+      }
+
+      let(:offenders) {
+        (accepted_offenders + rejected_offenders).shuffle
+      }
+
+      before do
+        stub_auth_token
+        stub_offenders_for_prison(prison, offenders)
+      end
+
+      it 'filters them out' do
+        expect(subject.count).to eq(accepted_offenders.count)
+        expect(subject.map(&:offender_no)).to match_array(accepted_offenders.map { |o| o[:prisonerNumber] })
+      end
     end
 
-    it "returns category codes",
-       vcr: { cassette_name: 'prison_api/offender_hmpps_api_offender_category_list' } do
-      response = described_class.list('LEI')
-      expect(response.data.first.category_code).not_to be_nil
-    end
-  end
+    context 'when some offenders are temporarily out on ROTL' do
+      subject { described_class.get_offenders_in_prison(prison) }
 
-  describe 'Bulk operations' do
-    it 'can get bulk sentence details',
-       vcr: { cassette_name: 'prison_api/offender_api_bulk_sentence_details' } do
-      booking_ids = [1_153_753]
+      let(:prison) { create(:prison).code }
+      let(:in_offenders) { build_list(:nomis_offender, 3, prisonId: prison) }
+      let(:out_offenders) { build_list(:nomis_offender, 2, :rotl, prisonId: prison) }
+      let(:rotl_movements) {
+        out_offenders.map { |o|
+          attributes_for(:movement, :rotl, offenderNo: o[:prisonerNumber])
+        }
+      }
 
-      response = described_class.get_bulk_sentence_details(booking_ids)
+      before do
+        stub_auth_token
+        stub_offenders_for_prison(prison, in_offenders + out_offenders, rotl_movements)
+      end
 
-      expect(response).to be_instance_of(Hash)
-
-      records = response.values
-      expect(records.first.fetch('conditionalReleaseDate')).to eq(Date.new(2020, 3, 16).to_s)
+      it 'loads the ROTL movement details' do
+        expect(subject.count).to eq(5)
+        rotls = subject.select { |o| o.latest_temp_movement_date.present? }
+        expect(rotls.count).to eq(out_offenders.count)
+        rotls.each do |offender|
+          expect(offender.latest_temp_movement_date)
+            .to eq rotl_movements.detect { |m| m[:offenderNo] == offender.offender_no }[:movementDate]
+        end
+      end
     end
   end
 
@@ -44,38 +95,107 @@ describe HmppsApi::PrisonApi::OffenderApi do
     describe '#get_offender' do
       subject { described_class.get_offender(offender_no) }
 
-      let(:offender) { build(:nomis_offender, recall: true) }
-      let(:offender_no) { offender.fetch(:offenderNo) }
+      let(:offender) { build(:nomis_offender, sentence: attributes_for(:sentence_detail, recall: true)) }
+      let(:offender_no) { offender.fetch(:prisonerNumber) }
 
       before do
         stub_auth_token
-        stub_offender(offender)
       end
 
-      context 'when offender search succeeds' do
+      context "when offender exists" do
+        before do
+          stub_offender(offender)
+        end
+
         it "can get a single offender's details including recall flag" do
           expect(subject).to be_instance_of(HmppsApi::Offender)
           expect(subject.recalled?).to eq(true)
         end
       end
 
-      context 'when offender search fails' do
+      context "when offender doesn't exist" do
         before do
-          stub_request(:post, "#{ApiHelper::T3_SEARCH}/prisoner-numbers").with(body: { prisonerNumbers: [offender_no] }).
-            to_return(body: [].to_json)
+          stub_non_existent_offender(offender_no)
         end
 
         it "fails the search" do
           expect(subject).to be_nil
         end
       end
+
+      context 'when some offenders are temporarily out on ROTL' do
+        let(:offender) { build(:nomis_offender, :rotl) }
+        let(:rotl_movement) { attributes_for(:movement, :rotl, offenderNo: offender[:prisonerNumber]) }
+
+        before do
+          stub_offender(offender)
+          stub_movements([rotl_movement])
+        end
+
+        it 'loads the ROTL movement details' do
+          expect(subject.latest_temp_movement_date).to eq rotl_movement.fetch(:movementDate)
+        end
+      end
     end
 
-    it 'can get category codes',
+    context 'when offender is on remand or unsentenced' do
+      # These offenders should be allowed in because of their legal status
+      let(:accepted_offenders) {
+        [
+          build(:nomis_offender, legalStatus: 'IMMIGRATION_DETAINEE'),
+          build(:nomis_offender, legalStatus: 'INDETERMINATE_SENTENCE'),
+          build(:nomis_offender, legalStatus: 'RECALL'),
+          build(:nomis_offender, legalStatus: 'SENTENCED'),
+        ]
+      }
+
+      # These offenders should be filtered out because of their legal status
+      let(:rejected_offenders) {
+        [
+          build(:nomis_offender, legalStatus: 'CIVIL_PRISONER'),
+          build(:nomis_offender, legalStatus: 'CONVICTED_UNSENTENCED'),
+          build(:nomis_offender, legalStatus: 'DEAD'),
+          build(:nomis_offender, legalStatus: 'OTHER'),
+          build(:nomis_offender, legalStatus: 'REMAND'),
+          build(:nomis_offender, legalStatus: 'UNKNOWN'),
+        ]
+      }
+
+      let(:offenders) {
+        (accepted_offenders + rejected_offenders).shuffle
+      }
+
+      before do
+        stub_auth_token
+        offenders.each { |o| stub_offender(o) }
+      end
+
+      it 'returns nil' do
+        get_rejected_offenders = rejected_offenders.map { |o| described_class.get_offender(o[:prisonerNumber]) }
+        get_accepted_offenders = accepted_offenders.map { |o| described_class.get_offender(o[:prisonerNumber]) }
+
+        expect(get_rejected_offenders).to all be_nil
+        expect(get_accepted_offenders).to all be_a(HmppsApi::Offender)
+      end
+
+      context 'with ignore_legal_status: true' do
+        it "returns offenders who would usually be filtered out" do
+          get_rejected_offenders = rejected_offenders.map { |o| described_class.get_offender(o[:prisonerNumber], ignore_legal_status: true) }
+          get_accepted_offenders = accepted_offenders.map { |o| described_class.get_offender(o[:prisonerNumber], ignore_legal_status: true) }
+
+          expect(get_rejected_offenders).to all be_a(HmppsApi::Offender)
+          expect(get_accepted_offenders).to all be_a(HmppsApi::Offender)
+        end
+      end
+    end
+
+    it 'can get category info',
        vcr: { cassette_name: 'prison_api/offender_api_cat_code_spec' } do
       noms_id = 'G4273GI'
-      response = described_class.get_category_code(noms_id)
-      expect(response).to eq('C')
+      response = described_class.get_offender(noms_id)
+      expect(response.category_code).to eq('C')
+      expect(response.category_label).to eq('Cat C')
+      expect(response.category_active_since).to eq('20/01/2017'.to_date)
     end
 
     it 'returns nil if unable to find prisoner',

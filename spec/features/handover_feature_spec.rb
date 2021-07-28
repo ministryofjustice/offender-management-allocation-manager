@@ -5,8 +5,8 @@ feature "viewing upcoming handovers" do
   let(:user) { build(:pom) }
 
   context 'when signed in as an SPO' do
-    let(:offender) { build(:nomis_offender, agencyId: prison) }
-    let!(:case_info) { create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:offenderNo))) }
+    let(:offender) { build(:nomis_offender, prisonId: prison) }
+    let!(:case_info) { create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber))) }
 
     before do
       # Stub auth
@@ -75,22 +75,22 @@ feature "viewing upcoming handovers" do
 
       offenders = [
           build(:nomis_offender,
-                offenderNo: "A7514GW",
+                prisonerNumber: "A7514GW",
                 sentence: attributes_for(:sentence_detail, :handover_in_28_days)),
           build(:nomis_offender,
-                offenderNo: "B7514GW",
+                prisonerNumber: "B7514GW",
                 sentence: attributes_for(:sentence_detail, :handover_in_14_days)),
-          build(:nomis_offender, offenderNo: "C7514GW",
+          build(:nomis_offender, prisonerNumber: "C7514GW",
                 sentence: attributes_for(:sentence_detail, :handover_in_21_days)),
-          build(:nomis_offender, offenderNo: "D7514GW",
+          build(:nomis_offender, prisonerNumber: "D7514GW",
                 sentence: attributes_for(:sentence_detail, :handover_in_6_days))
       ]
 
       stub_offenders_for_prison(prison, offenders)
 
       offenders.each_with_index do |offender, i|
-        create(:case_information, com_name: coms.fetch(i), offender: build(:offender, nomis_offender_id: offender.fetch(:offenderNo)))
-        create(:allocation_history, primary_pom_nomis_id: user.staff_id, primary_pom_name: pom_names.fetch(i), nomis_offender_id: offender.fetch(:offenderNo), prison: prison)
+        create(:case_information, com_name: coms.fetch(i), offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
+        create(:allocation_history, primary_pom_nomis_id: user.staff_id, primary_pom_name: pom_names.fetch(i), nomis_offender_id: offender.fetch(:prisonerNumber), prison: prison)
       end
     end
 

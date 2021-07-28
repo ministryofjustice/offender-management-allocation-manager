@@ -11,13 +11,13 @@ RSpec.describe PrisonersController, type: :controller do
 
     describe 'buckets' do
       before do
-        create(:case_information, offender: build(:offender, nomis_offender_id: offender_with_case_info_but_no_complexity_level.fetch(:offenderNo)))
-        create(:case_information, offender: build(:offender, nomis_offender_id: offender_with_complexity_level_and_case_info.fetch(:offenderNo)))
+        create(:case_information, offender: build(:offender, nomis_offender_id: offender_with_case_info_but_no_complexity_level.fetch(:prisonerNumber)))
+        create(:case_information, offender: build(:offender, nomis_offender_id: offender_with_complexity_level_and_case_info.fetch(:prisonerNumber)))
 
-        create(:case_information, offender: build(:offender, nomis_offender_id: allocated_offender_one.fetch(:offenderNo)))
-        create(:allocation_history, nomis_offender_id: allocated_offender_one.fetch(:offenderNo), prison: prison.code)
-        create(:case_information, offender: build(:offender, nomis_offender_id: allocated_offender_two.fetch(:offenderNo)))
-        create(:allocation_history, nomis_offender_id: allocated_offender_two.fetch(:offenderNo), prison: prison.code)
+        create(:case_information, offender: build(:offender, nomis_offender_id: allocated_offender_one.fetch(:prisonerNumber)))
+        create(:allocation_history, nomis_offender_id: allocated_offender_one.fetch(:prisonerNumber), prison: prison.code)
+        create(:case_information, offender: build(:offender, nomis_offender_id: allocated_offender_two.fetch(:prisonerNumber)))
+        create(:allocation_history, nomis_offender_id: allocated_offender_two.fetch(:prisonerNumber), prison: prison.code)
       end
 
       let(:offender_with_case_info_but_no_complexity_level) { build(:nomis_offender, complexityLevel: nil) }
@@ -59,7 +59,7 @@ RSpec.describe PrisonersController, type: :controller do
       it 'gives you the total count for each bucket and the offenders in the missing info bucket' do
         get :missing_information, params: { prison_id: prison.code }
         expect(response).to be_successful
-        expect(assigns(:offenders).map(&:offender_no)).to match_array(missing_info_offenders.map { |o| o.fetch(:offenderNo) })
+        expect(assigns(:offenders).map(&:offender_no)).to match_array(missing_info_offenders.map { |o| o.fetch(:prisonerNumber) })
         check_bucket_counts
       end
 
@@ -67,7 +67,7 @@ RSpec.describe PrisonersController, type: :controller do
         get :allocated, params: { prison_id: prison.code }
         expect(response).to be_successful
 
-        expect(assigns(:offenders).map(&:offender_no)).to match_array(allocated_offenders.map { |o| o.fetch(:offenderNo) })
+        expect(assigns(:offenders).map(&:offender_no)).to match_array(allocated_offenders.map { |o| o.fetch(:prisonerNumber) })
         check_bucket_counts
       end
 
@@ -75,7 +75,7 @@ RSpec.describe PrisonersController, type: :controller do
         get :unallocated, params: { prison_id: prison.code }
         expect(response).to be_successful
 
-        expect(assigns(:offenders).map(&:offender_no)).to match_array(unallocated_offenders.map { |o| o.fetch(:offenderNo) })
+        expect(assigns(:offenders).map(&:offender_no)).to match_array(unallocated_offenders.map { |o| o.fetch(:prisonerNumber) })
         check_bucket_counts
       end
 
@@ -83,7 +83,7 @@ RSpec.describe PrisonersController, type: :controller do
         get :new_arrivals, params: { prison_id: prison.code }
         expect(response).to be_successful
 
-        expect(assigns(:offenders).map(&:offender_no)).to match_array(new_arrival_offenders.map { |o| o.fetch(:offenderNo) })
+        expect(assigns(:offenders).map(&:offender_no)).to match_array(new_arrival_offenders.map { |o| o.fetch(:prisonerNumber) })
         check_bucket_counts
       end
 
@@ -159,20 +159,20 @@ RSpec.describe PrisonersController, type: :controller do
 
       describe 'unallocated' do
         before do
-          create(:case_information, tier: 'D', offender: build(:offender, nomis_offender_id: offender_a.fetch(:offenderNo)))
-          create(:case_information, tier: 'C', offender: build(:offender, nomis_offender_id: offender_b.fetch(:offenderNo)))
-          create(:case_information, tier: 'B', offender: build(:offender, nomis_offender_id: offender_c.fetch(:offenderNo)))
-          create(:case_information, tier: 'A', offender: build(:offender, nomis_offender_id: offender_d.fetch(:offenderNo)))
+          create(:case_information, tier: 'D', offender: build(:offender, nomis_offender_id: offender_a.fetch(:prisonerNumber)))
+          create(:case_information, tier: 'C', offender: build(:offender, nomis_offender_id: offender_b.fetch(:prisonerNumber)))
+          create(:case_information, tier: 'B', offender: build(:offender, nomis_offender_id: offender_c.fetch(:prisonerNumber)))
+          create(:case_information, tier: 'A', offender: build(:offender, nomis_offender_id: offender_d.fetch(:prisonerNumber)))
 
-          allow(HmppsApi::ComplexityApi).to receive(:get_complexity).with(offender_a.fetch(:offenderNo)).and_return('medium')
-          allow(HmppsApi::ComplexityApi).to receive(:get_complexity).with(offender_b.fetch(:offenderNo)).and_return('low')
-          allow(HmppsApi::ComplexityApi).to receive(:get_complexity).with(offender_c.fetch(:offenderNo)).and_return('medium')
-          allow(HmppsApi::ComplexityApi).to receive(:get_complexity).with(offender_d.fetch(:offenderNo)).and_return('high')
+          allow(HmppsApi::ComplexityApi).to receive(:get_complexity).with(offender_a.fetch(:prisonerNumber)).and_return('medium')
+          allow(HmppsApi::ComplexityApi).to receive(:get_complexity).with(offender_b.fetch(:prisonerNumber)).and_return('low')
+          allow(HmppsApi::ComplexityApi).to receive(:get_complexity).with(offender_c.fetch(:prisonerNumber)).and_return('medium')
+          allow(HmppsApi::ComplexityApi).to receive(:get_complexity).with(offender_d.fetch(:prisonerNumber)).and_return('high')
 
-          create(:responsibility, nomis_offender_id: offender_c.fetch(:offenderNo), value: Responsibility::PROBATION)
-          create(:responsibility, nomis_offender_id: offender_d.fetch(:offenderNo), value: Responsibility::PROBATION)
-          create(:responsibility, nomis_offender_id: offender_a.fetch(:offenderNo), value: Responsibility::PRISON)
-          create(:responsibility, nomis_offender_id: offender_b.fetch(:offenderNo), value: Responsibility::PRISON)
+          create(:responsibility, nomis_offender_id: offender_c.fetch(:prisonerNumber), value: Responsibility::PROBATION)
+          create(:responsibility, nomis_offender_id: offender_d.fetch(:prisonerNumber), value: Responsibility::PROBATION)
+          create(:responsibility, nomis_offender_id: offender_a.fetch(:prisonerNumber), value: Responsibility::PRISON)
+          create(:responsibility, nomis_offender_id: offender_b.fetch(:prisonerNumber), value: Responsibility::PRISON)
         end
 
         let(:offenders_earliest_release_date_ascending_order) { [offender_c, offender_d, offender_b, offender_a] }
@@ -226,14 +226,14 @@ RSpec.describe PrisonersController, type: :controller do
 
       describe 'allocated' do
         before do
-          create(:case_information, offender: build(:offender, nomis_offender_id: offender_a.fetch(:offenderNo)))
-          create(:allocation_history, primary_pom_name: pom_one.full_name,  nomis_offender_id: offender_a.fetch(:offenderNo), prison: prison.code)
-          create(:case_information, offender: build(:offender, nomis_offender_id: offender_b.fetch(:offenderNo)))
-          create(:allocation_history, primary_pom_name: pom_two.full_name,  nomis_offender_id: offender_b.fetch(:offenderNo), prison: prison.code)
-          create(:case_information, offender: build(:offender, nomis_offender_id: offender_c.fetch(:offenderNo)))
-          create(:allocation_history, primary_pom_name: pom_three.full_name, nomis_offender_id: offender_c.fetch(:offenderNo), prison: prison.code)
-          create(:case_information, offender: build(:offender, nomis_offender_id: offender_d.fetch(:offenderNo)))
-          create(:allocation_history, primary_pom_name: pom_four.full_name,  nomis_offender_id: offender_d.fetch(:offenderNo), prison: prison.code)
+          create(:case_information, offender: build(:offender, nomis_offender_id: offender_a.fetch(:prisonerNumber)))
+          create(:allocation_history, primary_pom_name: pom_one.full_name,  nomis_offender_id: offender_a.fetch(:prisonerNumber), prison: prison.code)
+          create(:case_information, offender: build(:offender, nomis_offender_id: offender_b.fetch(:prisonerNumber)))
+          create(:allocation_history, primary_pom_name: pom_two.full_name,  nomis_offender_id: offender_b.fetch(:prisonerNumber), prison: prison.code)
+          create(:case_information, offender: build(:offender, nomis_offender_id: offender_c.fetch(:prisonerNumber)))
+          create(:allocation_history, primary_pom_name: pom_three.full_name, nomis_offender_id: offender_c.fetch(:prisonerNumber), prison: prison.code)
+          create(:case_information, offender: build(:offender, nomis_offender_id: offender_d.fetch(:prisonerNumber)))
+          create(:allocation_history, primary_pom_name: pom_four.full_name,  nomis_offender_id: offender_d.fetch(:prisonerNumber), prison: prison.code)
         end
 
         let(:offenders) { [offender_c, offender_a, offender_b, offender_d] }
@@ -258,12 +258,12 @@ RSpec.describe PrisonersController, type: :controller do
 
       def assert_sort_ascending(action, expected_result, sort_by)
         get action, params: { prison_id: prison.code, sort: sort_by } # Default direction is asc.
-        expect(assigns(:offenders).map(&:offender_no)).to eq(expected_result.map { |o| o.fetch(:offenderNo) })
+        expect(assigns(:offenders).map(&:offender_no)).to eq(expected_result.map { |o| o.fetch(:prisonerNumber) })
       end
 
       def assert_sort_descending(action, expected_result, sort_by)
         get action, params: { prison_id: prison.code, sort: sort_by } # Default direction is asc.
-        expect(assigns(:offenders).map(&:offender_no)).to eq(expected_result.reverse.map { |o| o.fetch(:offenderNo) })
+        expect(assigns(:offenders).map(&:offender_no)).to eq(expected_result.reverse.map { |o| o.fetch(:prisonerNumber) })
       end
     end
   end
@@ -280,21 +280,21 @@ RSpec.describe PrisonersController, type: :controller do
       before do
         offenders = [
           build(:nomis_offender,
-                offenderNo: "G7514GW",
+                prisonerNumber: "G7514GW",
                 imprisonmentStatus: "LR",
                 lastName: 'SMITH',
                 sentence: attributes_for(:sentence_detail, sentenceStartDate: "2011-01-20")),
-          build(:nomis_offender, offenderNo: "G1234GY", imprisonmentStatus: "LIFE",
+          build(:nomis_offender, prisonerNumber: "G1234GY", imprisonmentStatus: "LIFE",
                 lastName: 'Minate-Offender',
                 sentence: attributes_for(:sentence_detail,
                                          sentenceStartDate: "2009-02-08",
                                          automaticReleaseDate: "2011-01-28")),
-          build(:nomis_offender, offenderNo: "G1234VV",
+          build(:nomis_offender, prisonerNumber: "G1234VV",
                 lastName: 'JONES',
                 sentence: attributes_for(:sentence_detail,
                                          sentenceStartDate: "2019-02-08",
                                          automaticReleaseDate: today_plus_13_weeks)),
-          build(:nomis_offender, offenderNo: "G4234GG",
+          build(:nomis_offender, prisonerNumber: "G4234GG",
                 imprisonmentStatus: "SENT03",
                 firstName: "Fourth", lastName: "Offender",
                 sentence: attributes_for(:sentence_detail,
@@ -365,7 +365,7 @@ RSpec.describe PrisonersController, type: :controller do
     context 'with enough offenders to page' do
       let(:offenders) { build_list(:nomis_offender, 120) }
       let(:moves) {
-        offenders.map { |o| o.fetch(:offenderNo) }
+        offenders.map { |o| o.fetch(:prisonerNumber) }
       }
       let(:summary_offenders) { assigns(:offenders) }
 
@@ -417,7 +417,7 @@ RSpec.describe PrisonersController, type: :controller do
           # meaningless in this context. We do not want to crash if passed a field that is not searchable
           # within a specific context.
           offender_id = 'G7514GW'
-          offenders = [build(:nomis_offender, offenderNo: offender_id)]
+          offenders = [build(:nomis_offender, prisonerNumber: offender_id)]
           stub_offenders_for_prison(prison, offenders)
 
           create(:case_information, offender: build(:offender, nomis_offender_id: offender_id))
@@ -435,11 +435,11 @@ RSpec.describe PrisonersController, type: :controller do
         let(:offenders) do
           [
 
-            build(:nomis_offender, offenderNo: "G7514GW", imprisonmentStatus: "LR"), # custody case
-            build(:nomis_offender, offenderNo: "G1234VV", imprisonmentStatus: "SENT03",
+            build(:nomis_offender, prisonerNumber: "G7514GW", imprisonmentStatus: "LR"), # custody case
+            build(:nomis_offender, prisonerNumber: "G1234VV", imprisonmentStatus: "SENT03",
                   sentence: attributes_for(:sentence_detail, conditionalReleaseDate: today_plus_7_weeks)), # community case
-            build(:nomis_offender, offenderNo: "G4234GG", imprisonmentStatus: "SENT03"), # custody case
-            build(:nomis_offender, offenderNo: "G1234GY", imprisonmentStatus: "SENT03",
+            build(:nomis_offender, prisonerNumber: "G4234GG", imprisonmentStatus: "SENT03"), # custody case
+            build(:nomis_offender, prisonerNumber: "G1234GY", imprisonmentStatus: "SENT03",
                   sentence: attributes_for(:sentence_detail, sentenceStartDate: "2019-02-08",
                                            automaticReleaseDate: today_plus_13_weeks)) # community case
           ]
@@ -450,7 +450,7 @@ RSpec.describe PrisonersController, type: :controller do
             to_return(body: [].to_json)
 
           offenders.each do |offender|
-            create(:case_information, offender: build(:offender, nomis_offender_id: offender[:offenderNo]))
+            create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
           end
         end
 
@@ -477,7 +477,7 @@ RSpec.describe PrisonersController, type: :controller do
       before do
         inmates = offenders.map { |offender|
           build(:nomis_offender,
-                offenderNo: offender[:nomis_id],
+                prisonerNumber: offender[:nomis_id],
                 sentence: attributes_for(:sentence_detail,
                                          sentenceStartDate: offender.fetch(:sentence_start_date).strftime('%F')))
         }
@@ -667,7 +667,7 @@ RSpec.describe PrisonersController, type: :controller do
 
         context "with 3 offenders", :allocation do
           let(:first_offender) { build(:nomis_offender, firstName: 'Alice', lastName: 'Bloggs') }
-          let(:first_offender_no) { first_offender.fetch(:offenderNo) }
+          let(:first_offender_no) { first_offender.fetch(:prisonerNumber) }
           let(:offenders) { build_list(:nomis_offender, 2, lastName: 'Bloggs') }
           let(:updated_offenders) { assigns(:offenders) }
           # This offender is the one with an allocation - created below
@@ -677,7 +677,7 @@ RSpec.describe PrisonersController, type: :controller do
             stub_offenders_for_prison(prison, [first_offender] + offenders)
             PomDetail.create!(prison_code: prison, nomis_staff_id: nomis_staff_id, working_pattern: 1.0, status: 'active')
 
-            ([first_offender] + offenders).each { |o| create(:case_information, offender: build(:offender, nomis_offender_id: o.fetch(:offenderNo))) }
+            ([first_offender] + offenders).each { |o| create(:case_information, offender: build(:offender, nomis_offender_id: o.fetch(:prisonerNumber))) }
             create(:allocation_history,
                    prison: prison,
                    nomis_offender_id: first_offender_no,

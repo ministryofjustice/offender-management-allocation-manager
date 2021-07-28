@@ -5,7 +5,7 @@ require 'rails_helper'
 feature 'case information feature' do
   context 'when doing an allocate and save' do
     let(:prison) { create(:prison) }
-    let(:offender) { build(:nomis_offender, agencyId: prison.code) }
+    let(:offender) { build(:nomis_offender, prisonId: prison.code) }
     let(:spo) { build(:pom) }
 
     before do
@@ -17,7 +17,7 @@ feature 'case information feature' do
 
     context 'when add missing details the first time (create journey)' do
       before do
-        visit new_prison_case_information_path(prison.code, offender.fetch(:offenderNo))
+        visit new_prison_case_information_path(prison.code, offender.fetch(:prisonerNumber))
         find('label[for=case-information-probation-service-england-field]').click
         find('label[for=case-information-case-allocation-nps-field]').click
         find('label[for=case-information-tier-a-field]').click
@@ -33,17 +33,17 @@ feature 'case information feature' do
           click_button 'Save and allocate'
         }.to change(CaseInformation, :count).by 1
 
-        expect(page).to have_current_path prison_prisoner_staff_index_path(prison.code, offender.fetch(:offenderNo))
+        expect(page).to have_current_path prison_prisoner_staff_index_path(prison.code, offender.fetch(:prisonerNumber))
       end
     end
 
     context 'when updating missing information (edit journey)' do
       before do
-        create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:offenderNo)))
+        create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
       end
 
       it 'no longer displays the save and allocate button', :js do
-        visit edit_prison_case_information_path(prison.code, offender.fetch(:offenderNo))
+        visit edit_prison_case_information_path(prison.code, offender.fetch(:prisonerNumber))
         expect(page).to have_no_button('Save and allocate')
       end
     end
