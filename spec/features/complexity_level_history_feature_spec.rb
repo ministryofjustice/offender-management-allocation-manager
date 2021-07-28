@@ -9,7 +9,7 @@ feature 'Case history with complexity level' do
 
     stub_signin_spo logged_in_user, [prison_code]
     stub_offenders_for_prison prison_code, [offender]
-    stub_movements_for offender.fetch(:offenderNo), attributes_for_list(:movement, 1, toAgency: prison_code)
+    stub_movements_for offender.fetch(:prisonerNumber), attributes_for_list(:movement, 1, toAgency: prison_code)
     stub_poms prison_code, [pom]
 
     stub_request(:get, "#{ApiHelper::T3}/users/user").
@@ -37,7 +37,7 @@ feature 'Case history with complexity level' do
   let(:prison_code) { prison.code }
   let(:case_info) { create(:case_information) }
   let(:offender_no) { case_info.nomis_offender_id }
-  let(:offender) { build(:nomis_offender, agencyId: prison_code, offenderNo: offender_no) }
+  let(:offender) { build(:nomis_offender, prisonId: prison_code, prisonerNumber: offender_no) }
   let(:created_by_name) { "#{logged_in_user.last_name}, #{logged_in_user.first_name}" }
 
   context 'with 1 history record' do

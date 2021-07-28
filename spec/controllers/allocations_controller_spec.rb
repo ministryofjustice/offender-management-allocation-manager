@@ -13,8 +13,8 @@ RSpec.describe AllocationsController, type: :controller do
   }
   let(:pom_without_emails) { poms.first }
   let(:prison_code) { create(:prison).code }
-  let(:offender) { build(:nomis_offender, agencyId: prison_code) }
-  let(:offender_no) { offender.fetch(:offenderNo) }
+  let(:offender) { build(:nomis_offender, prisonId: prison_code) }
+  let(:offender_no) { offender.fetch(:prisonerNumber) }
 
   before do
     stub_poms(prison_code, poms)
@@ -124,7 +124,7 @@ RSpec.describe AllocationsController, type: :controller do
         before do
           case_info = create(:case_information, offender: build(:offender, victim_liaison_officers: [build(:victim_liaison_officer)]))
           create(:allocation_history, prison: prison_code, nomis_offender_id: case_info.nomis_offender_id)
-          stub_offender(build(:nomis_offender, offenderNo: case_info.nomis_offender_id))
+          stub_offender(build(:nomis_offender, prisonerNumber: case_info.nomis_offender_id))
           stub_movements_for case_info.nomis_offender_id, [attributes_for(:movement)]
           stub_pom_emails(485926, [])
         end

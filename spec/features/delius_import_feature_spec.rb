@@ -3,9 +3,9 @@
 require 'rails_helper'
 
 feature "Delius import feature", :disable_push_to_delius do
-  let(:offender_no) {  offender.fetch(:offenderNo) }
+  let(:offender_no) {  offender.fetch(:prisonerNumber) }
   let(:prison_code) { create(:prison).code }
-  let(:offender) { build(:nomis_offender, agencyId: prison_code) }
+  let(:offender) { build(:nomis_offender, prisonId: prison_code) }
   let(:offender_name) { offender.fetch(:lastName) + ', ' + offender.fetch(:firstName) }
   let(:pom) { build(:pom) }
 

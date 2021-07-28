@@ -23,7 +23,7 @@ RSpec.describe "prisoners/show", type: :view do
 
       context 'when unsent' do
         let(:early_allocation) { build(:early_allocation, :pre_window) }
-        let(:sentence) { build(:sentence_detail, :outside_early_allocation_window) }
+        let(:sentence) { attributes_for(:sentence_detail, :outside_early_allocation_window) }
 
         it 'displays a badge text EARLY ALLOCATION NOTES' do
           expect(badge_count).to eq(1)
@@ -34,7 +34,7 @@ RSpec.describe "prisoners/show", type: :view do
 
       context 'when submitted' do
         # default sentence is inside EA 18 month window
-        let(:sentence) { build(:sentence_detail) }
+        let(:sentence) { attributes_for(:sentence_detail) }
 
         context 'when rejected' do
           let(:early_allocation) { build(:early_allocation, :discretionary_declined) }
@@ -79,7 +79,7 @@ RSpec.describe "prisoners/show", type: :view do
 
     context 'without an early allocation' do
       let(:case_info) { build(:case_information) }
-      let(:sentence) { build(:sentence_detail) }
+      let(:sentence) { attributes_for(:sentence_detail) }
 
       it 'has no badge' do
         expect(early_allocation_badge).to be_nil

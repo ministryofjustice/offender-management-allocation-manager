@@ -19,7 +19,7 @@ describe HandoverDateService do
 
         context 'when welsh' do
           let(:api_offender) {
-            build(:hmpps_api_offender, :prescoed, sentence: build(:sentence_detail, :welsh_policy_sentence)).tap { |o|
+            build(:hmpps_api_offender, :prescoed, sentence: attributes_for(:sentence_detail, :welsh_policy_sentence)).tap { |o|
               o.prison_arrival_date = arrival_date
             }
           }
@@ -43,7 +43,7 @@ describe HandoverDateService do
 
         context 'when english' do
           let(:api_offender) {
-            build(:hmpps_api_offender, :prescoed, sentence: build(:sentence_detail, :english_policy_sentence)).tap { |o|
+            build(:hmpps_api_offender, :prescoed, sentence: attributes_for(:sentence_detail, :english_policy_sentence)).tap { |o|
               o.prison_arrival_date = arrival_date
             }
           }
@@ -60,7 +60,7 @@ describe HandoverDateService do
 
       context 'with past NPS welsh offender' do
         let(:api_offender) {
-          build(:hmpps_api_offender, :prescoed, sentence: build(:sentence_detail, :welsh_policy_sentence)).tap { |o|
+          build(:hmpps_api_offender, :prescoed, sentence: attributes_for(:sentence_detail, :welsh_policy_sentence)).tap { |o|
             o.prison_arrival_date = arrival_date
           }
         }
@@ -267,10 +267,10 @@ describe HandoverDateService do
             let(:case_info) { build(:case_information, :english) }
             let(:api_offender) {
               build(:hmpps_api_offender, prison_id: 'VEI',
-                    sentence: build(:sentence_detail,
-                                    sentenceStartDate: sentence_start_date,
-                                    automaticReleaseDate: ard,
-                                    conditionalReleaseDate: crd))
+                    sentence: attributes_for(:sentence_detail,
+                                             sentenceStartDate: sentence_start_date,
+                                             automaticReleaseDate: ard,
+                                             conditionalReleaseDate: crd))
             }
 
             context 'with over 20 months left to serve' do

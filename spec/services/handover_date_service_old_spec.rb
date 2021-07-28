@@ -97,7 +97,7 @@ describe HandoverDateService do
       let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
       let(:api_offender) {
-        build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate, tariffDate: tariff_date))
+        build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :indeterminate, tariffDate: tariff_date))
       }
 
       let(:tariff_date) { Date.new(2030, 8, 30) }
@@ -114,9 +114,9 @@ describe HandoverDateService do
       context 'when outside referral window' do
         let(:api_offender) {
           build(:hmpps_api_offender,
-                sentence: build(:sentence_detail, :determinate, :english_policy_sentence,
-                                automaticReleaseDate: ard,
-                                conditionalReleaseDate: crd))
+                sentence: attributes_for(:sentence_detail, :determinate, :english_policy_sentence,
+                                         automaticReleaseDate: ard,
+                                         conditionalReleaseDate: crd))
         }
         let(:case_info) {
           create(:case_information,
@@ -136,9 +136,9 @@ describe HandoverDateService do
 
         let(:api_offender) {
           build(:hmpps_api_offender,
-                sentence: build(:sentence_detail, :indeterminate,
-                                paroleEligibilityDate: ped,
-                                tariffDate: ted))
+                sentence: attributes_for(:sentence_detail, :indeterminate,
+                                         paroleEligibilityDate: ped,
+                                         tariffDate: ted))
         }
         let(:case_info) {
           create(:case_information,
@@ -166,9 +166,9 @@ describe HandoverDateService do
       context 'when determinate' do
         let(:api_offender) {
           build(:hmpps_api_offender,
-                sentence: build(:sentence_detail, :determinate, :english_policy_sentence,
-                                automaticReleaseDate: ard,
-                                conditionalReleaseDate: crd))
+                sentence: attributes_for(:sentence_detail, :determinate, :english_policy_sentence,
+                                         automaticReleaseDate: ard,
+                                         conditionalReleaseDate: crd))
         }
 
         context 'when inside referral window' do
@@ -224,13 +224,13 @@ describe HandoverDateService do
     let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
     let(:api_offender) do
       build(:hmpps_api_offender,
-            sentence: build(:sentence_detail, sentence_type_trait,
-                            automaticReleaseDate: automatic_release_date,
-                            conditionalReleaseDate: conditional_release_date,
-                            paroleEligibilityDate: parole_date,
-                            homeDetentionCurfewActualDate: home_detention_curfew_actual_date,
-                            homeDetentionCurfewEligibilityDate: home_detention_curfew_eligibility_date,
-                            tariffDate: tariff_date))
+            sentence: attributes_for(:sentence_detail, sentence_type_trait,
+                                     automaticReleaseDate: automatic_release_date,
+                                     conditionalReleaseDate: conditional_release_date,
+                                     paroleEligibilityDate: parole_date,
+                                     homeDetentionCurfewActualDate: home_detention_curfew_actual_date,
+                                     homeDetentionCurfewEligibilityDate: home_detention_curfew_eligibility_date,
+                                     tariffDate: tariff_date))
     end
 
     let(:automatic_release_date) { nil }
@@ -482,17 +482,17 @@ describe HandoverDateService do
     let(:api_offender) {
       build(:hmpps_api_offender,
             sentence: if indeterminate_sentence
-                        build(:sentence_detail,
-                              :indeterminate,
-                              paroleEligibilityDate: parole_eligibility_date,
-                              tariffDate: tariff_date
+                        attributes_for(:sentence_detail,
+                                       :indeterminate,
+                                       paroleEligibilityDate: parole_eligibility_date,
+                                       tariffDate: tariff_date
                         )
                       else
-                        build(:sentence_detail,
-                              :determinate,
-                              automaticReleaseDate: automatic_release_date,
-                              conditionalReleaseDate: conditional_release_date,
-                              paroleEligibilityDate: parole_eligibility_date
+                        attributes_for(:sentence_detail,
+                                       :determinate,
+                                       automaticReleaseDate: automatic_release_date,
+                                       conditionalReleaseDate: conditional_release_date,
+                                       paroleEligibilityDate: parole_eligibility_date
                         )
                       end
             )
@@ -573,9 +573,9 @@ describe HandoverDateService do
     let(:case_info) { build(:case_information, :nps, offender: build(:offender, parole_record: build(:parole_record))) }
     let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
     let(:api_offender) {
-      build(:hmpps_api_offender, sentence: build(:sentence_detail,
-                                                 :indeterminate,
-                                                 tariffDate: nil))
+      build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail,
+                                                          :indeterminate,
+                                                          tariffDate: nil))
     }
 
     it 'displays the handover date (which is 8 months prior to PRD) ' do

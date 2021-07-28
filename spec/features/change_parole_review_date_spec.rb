@@ -4,11 +4,11 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
   let(:prison) { create(:prison) }
   let(:tariff_date) { Time.zone.today + 1.year }
   let(:existing_prd) { nil }
-  let(:nomis_offender_id) { nomis_offender.fetch(:offenderNo) }
+  let(:nomis_offender_id) { nomis_offender.fetch(:prisonerNumber) }
 
   # Stub API response to represent an offender in NOMIS
   let(:nomis_offender) {
-    build(:nomis_offender, agencyId: prison.code,
+    build(:nomis_offender, prisonId: prison.code,
           sentence: attributes_for(:sentence_detail, :indeterminate, tariffDate: tariff_date)
     )
   }

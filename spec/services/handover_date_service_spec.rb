@@ -39,8 +39,8 @@ describe HandoverDateService do
     let(:crd) { Date.parse('01/09/2022') }
     let(:api_offender) {
       build(:hmpps_api_offender,
-            latestLocationId: prison,
-            sentence: build(:sentence_detail, :determinate, sentenceStartDate: sentence_start_date, conditionalReleaseDate: crd)
+            prisonId: prison,
+            sentence: attributes_for(:sentence_detail, :determinate, sentenceStartDate: sentence_start_date, conditionalReleaseDate: crd)
       ).tap { |o|
         o.prison_arrival_date = arrival_date
       }
@@ -384,9 +384,9 @@ describe HandoverDateService do
       let(:case_info) { build(:case_information, :nps, probation_service: welsh? ? 'Wales' : 'England') }
       let(:api_offender) {
         build(:hmpps_api_offender,
-              latestLocationId: prison,
+              prisonId: prison,
               category: category,
-              sentence: build(:sentence_detail, :indeterminate, tariffDate: tariff_date, sentenceStartDate: sentence_start_date)
+              sentence: attributes_for(:sentence_detail, :indeterminate, tariffDate: tariff_date, sentenceStartDate: sentence_start_date)
         ).tap { |o|
           o.prison_arrival_date = arrival_date
         }
@@ -614,8 +614,8 @@ describe HandoverDateService do
   describe 'OMIC policy date boundaries' do
     let(:api_offender) {
       build(:hmpps_api_offender,
-            latestLocationId: prison,
-            sentence: build(:sentence_detail, :determinate, sentenceStartDate: sentence_start_date, conditionalReleaseDate: crd),
+            prisonId: prison,
+            sentence: attributes_for(:sentence_detail, :determinate, sentenceStartDate: sentence_start_date, conditionalReleaseDate: crd),
             category: offender_category
       ).tap { |o|
         o.prison_arrival_date = arrival_date
@@ -812,8 +812,8 @@ describe HandoverDateService do
   context 'when offender is outside OMIC policy' do
     let(:api_offender) {
       build(:hmpps_api_offender,
-            latestLocationId: prison,
-            sentence: build(:sentence_detail, :civil_sentence)
+            prisonId: prison,
+            sentence: attributes_for(:sentence_detail, :civil_sentence)
       )
     }
 

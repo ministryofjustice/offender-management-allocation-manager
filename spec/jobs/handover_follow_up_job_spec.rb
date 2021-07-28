@@ -185,13 +185,13 @@ private
 
   def build_api_offender(release_date = nil, prison: nil, sentence_type:, ard_crd_release:, ted:)
     prison = prison || active_prison
-    build(:hmpps_api_offender, latestLocationId: prison.code,
-          sentence: build(:sentence_detail,
-                          sentence_type,
-                          sentenceStartDate: Time.zone.today - 11.months,
-                          conditionalReleaseDate: ard_crd_release,
-                          automaticReleaseDate: ard_crd_release,
-                          releaseDate: release_date,
-                          tariffDate: ted))
+    build(:hmpps_api_offender, prisonId: prison.code,
+          sentence: attributes_for(:sentence_detail,
+                                   sentence_type,
+                                   sentenceStartDate: Time.zone.today - 11.months,
+                                   conditionalReleaseDate: ard_crd_release,
+                                   automaticReleaseDate: ard_crd_release,
+                                   releaseDate: release_date,
+                                   tariffDate: ted))
   end
 end

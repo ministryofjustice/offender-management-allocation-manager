@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe MovementsOnDateJob, type: :job do
-  let(:nomis_offender_id) { nomis_offender.fetch(:offenderNo) }
-  let(:nomis_offender) { build(:nomis_offender, agencyId: to_prison_code) }
+  let(:nomis_offender_id) { nomis_offender.fetch(:prisonerNumber) }
+  let(:nomis_offender) { build(:nomis_offender, prisonId: to_prison_code) }
   let(:case_info) { create(:case_information) }
   let!(:offender_record) { create(:offender, nomis_offender_id: nomis_offender_id, case_information: case_info) }
   let(:today) { Time.zone.today }

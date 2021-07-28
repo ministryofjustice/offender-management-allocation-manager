@@ -6,63 +6,30 @@ class OffenderService
       # use find_or_create_by here for performance, but might still have be a small race condition
       # This isn't find_or_create_by! because our offender_no might be invalid - we want to return nil rather than crash
       offender = Offender.find_or_create_by(nomis_offender_id: offender_no)
-      if offender
-        api_offender = HmppsApi::PrisonApi::OffenderApi.get_offender(offender_no)
-        if api_offender
-          api_offender.load_main_offence
-          prison = Prison.find_by(code: api_offender.prison_id)
-          # ignore offenders in prisons that we don't know about
-          MpcOffender.new prison: prison, offender: offender, prison_record: api_offender if prison
-        end
+      api_offender = HmppsApi::PrisonApi::OffenderApi.get_offender(offender_no)
+      prison = Prison.find_by(code: api_offender&.prison_id)
+
+      if [offender, api_offender, prison].all?(&:present?)
+        MpcOffender.new(
+          prison: prison,
+          offender: offender,
+          prison_record: api_offender
+        )
       end
     end
 
     def get_offenders_for_prison(prison)
-      OffenderEnumerator.new(prison)
-    end
+      api_offenders = HmppsApi::PrisonApi::OffenderApi.get_offenders_in_prison(prison.code)
+                                                      .index_by(&:offender_no)
 
-    class OffenderEnumerator
-      include Enumerable
-      FETCH_SIZE = 200 # How many records to fetch from nomis at a time
+      offenders = find_or_create_offenders(api_offenders.keys)
 
-      def initialize(prison)
-        @prison = prison
-      end
-
-      def each
-        first_page = HmppsApi::PrisonApi::OffenderApi.list(@prison.code, 0, page_size: FETCH_SIZE)
-        offenders = first_page.data
-        enrich_offenders(offenders).each { |offender| yield offender }
-
-        1.upto(first_page.total_pages - 1).each do |page_number|
-          offenders = HmppsApi::PrisonApi::OffenderApi.list(
-            @prison.code,
-            page_number,
-            page_size: FETCH_SIZE
-          ).data
-
-          enrich_offenders(offenders).each { |offender| yield offender }
-        end
-      end
-
-      def enrich_offenders(offender_list)
-        nomis_ids = offender_list.map(&:offender_no)
-        offenders = Offender.
-          includes(:early_allocations, :responsibility, case_information: [:local_delivery_unit]).
-          where(nomis_offender_id: nomis_ids)
-
-        if offenders.count != nomis_ids.count
-          # Create Offender records for (presumably new) prisoners who don't have one yet
-          nomis_ids.reject { |nomis_id| offenders.detect { |offender| offender.nomis_offender_id == nomis_id } }.each do |new_id|
-            # use create_or_find_by! to prevent race conditions
-            new_offender = Offender.create_or_find_by! nomis_offender_id: new_id
-            offenders = offenders + [new_offender]
-          end
-        end
-
-        HmppsApi::PrisonApi::OffenderApi.add_arrival_dates(offender_list)
-        nomis_offenders_hash = offender_list.index_by(&:offender_no)
-        offenders.map { |offender| MpcOffender.new(prison: @prison, offender: offender, prison_record: nomis_offenders_hash.fetch(offender.nomis_offender_id)) }
+      offenders.map do |offender|
+        MpcOffender.new(
+          prison: prison,
+          offender: offender,
+          prison_record: api_offenders.fetch(offender.nomis_offender_id)
+        )
       end
     end
 
@@ -92,6 +59,26 @@ class OffenderService
           ldu_code: com.dig(:team, :localDeliveryUnit, :code),
           mappa_levels: mappa_registrations.map { |r| r.dig(:registerLevel, :code).last.to_i }
         }
+    end
+
+  private
+
+    def find_or_create_offenders(nomis_ids)
+      offenders = Offender.
+        includes(:early_allocations, :responsibility, case_information: [:local_delivery_unit]).
+        where(nomis_offender_id: nomis_ids)
+
+      if offenders.count != nomis_ids.count
+        # Create Offender records for (presumably new) prisoners who don't have one yet
+        existing_ids = offenders.map(&:nomis_offender_id)
+        (nomis_ids - existing_ids).each do |new_id|
+          # use create_or_find_by! to prevent race conditions
+          new_offender = Offender.create_or_find_by! nomis_offender_id: new_id
+          offenders = offenders + [new_offender]
+        end
+      end
+
+      offenders
     end
   end
 end

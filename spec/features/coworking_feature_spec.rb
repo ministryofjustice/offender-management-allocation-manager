@@ -27,7 +27,7 @@ feature 'Co-working' do
       build(:pom, staffId: 485_833)
   ]
   }
-  let(:offender) { build(:nomis_offender, agencyId: prison.code, offenderNo: 'G4273GI', dateOfBirth: '15/08/1980') }
+  let(:offender) { build(:nomis_offender, prisonId: prison.code, prisonerNumber: 'G4273GI', dateOfBirth: '15/08/1980') }
   let(:prisoner_name) { "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}" }
   let(:prisoner_name_forwards) { "#{offender.fetch(:firstName)} #{offender.fetch(:lastName)}" }
 

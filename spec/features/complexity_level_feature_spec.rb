@@ -1,30 +1,30 @@
 require 'rails_helper'
 
 feature 'complexity level feature' do
-  let(:offender) { build(:nomis_offender, complexityLevel: 'high', agencyId: womens_prison.code, firstName: 'Sally', lastName: 'Albright') }
+  let(:offender) { build(:nomis_offender, complexityLevel: 'high', prisonId: womens_prison.code, firstName: 'Sally', lastName: 'Albright') }
   let(:womens_prison) { create(:womens_prison) }
   let(:offenders) { [offender] }
   let(:pom) { build(:pom) }
   let(:spo) { build(:pom) }
-  let(:offender_no) { offender.fetch(:offenderNo) }
+  let(:offender_no) { offender.fetch(:prisonerNumber) }
 
 
   before do
-    create(:allocation_history, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: pom.staff_id,  prison: womens_prison.code)
-    create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:offenderNo)))
+    create(:allocation_history, nomis_offender_id: offender.fetch(:prisonerNumber), primary_pom_nomis_id: pom.staff_id,  prison: womens_prison.code)
+    create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
 
     stub_offenders_for_prison(womens_prison.code, offenders)
     stub_signin_spo(spo, [womens_prison.code])
     stub_poms(womens_prison.code, [pom, spo])
-    stub_keyworker(womens_prison.code, offender.fetch(:offenderNo), build(:keyworker))
+    stub_keyworker(womens_prison.code, offender.fetch(:prisonerNumber), build(:keyworker))
   end
 
   context 'when on allocation information page' do
     it 'can update the complexity level journey' do
-      expect(HmppsApi::ComplexityApi).to receive(:save).with(offender.fetch(:offenderNo), level: 'low', username: "MOIC_POM", reason: 'bla bla bla')
+      expect(HmppsApi::ComplexityApi).to receive(:save).with(offender.fetch(:prisonerNumber), level: 'low', username: "MOIC_POM", reason: 'bla bla bla')
 
       # Journey starts on prisoner profile page. It should display the existing complexity level and a change link.
-      visit prison_prisoner_allocation_path(prisoner_id: offender.fetch(:offenderNo), prison_id: womens_prison.code)
+      visit prison_prisoner_allocation_path(prisoner_id: offender.fetch(:prisonerNumber), prison_id: womens_prison.code)
 
       expect(page).to have_text('Complexity of need level')
       expect(page).to have_css('#complexity-level', text: 'High')
@@ -63,13 +63,13 @@ feature 'complexity level feature' do
 
       click_on('Return to prisoner page')
 
-      expect(page).to have_current_path(prison_prisoner_allocation_path(prisoner_id: offender.fetch(:offenderNo), prison_id: womens_prison.code), ignore_query: true)
+      expect(page).to have_current_path(prison_prisoner_allocation_path(prisoner_id: offender.fetch(:prisonerNumber), prison_id: womens_prison.code), ignore_query: true)
       expect(page).to have_css('#complexity-level', text: 'Low')
       expect(page).to have_css('#complexity-badge', text: 'LOW COMPLEXITY')
     end
 
     it 'can click back link to return to the prisoner profile page' do
-      visit prison_prisoner_allocation_path(prisoner_id: offender.fetch(:offenderNo), prison_id: womens_prison.code)
+      visit prison_prisoner_allocation_path(prisoner_id: offender.fetch(:prisonerNumber), prison_id: womens_prison.code)
       within(:css, "td#complexity-level") do
         click_link('Change')
       end
@@ -78,7 +78,7 @@ feature 'complexity level feature' do
       expect(page).to have_text 'Update complexity of need level'
 
       click_link('Back')
-      expect(page).to have_current_path(prison_prisoner_allocation_path(prisoner_id: offender.fetch(:offenderNo), prison_id: womens_prison.code))
+      expect(page).to have_current_path(prison_prisoner_allocation_path(prisoner_id: offender.fetch(:prisonerNumber), prison_id: womens_prison.code))
     end
   end
 
@@ -98,7 +98,7 @@ feature 'complexity level feature' do
       end
 
       it 'can update the complexity level' do
-        expect(HmppsApi::ComplexityApi).to receive(:save).with(offender.fetch(:offenderNo), level: 'low', username: "MOIC_POM", reason: 'bla bla bla')
+        expect(HmppsApi::ComplexityApi).to receive(:save).with(offender.fetch(:prisonerNumber), level: 'low', username: "MOIC_POM", reason: 'bla bla bla')
 
         visit prison_prisoner_staff_index_path(womens_prison.code, offender_no)
 

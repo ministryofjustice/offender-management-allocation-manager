@@ -5,107 +5,82 @@ module HmppsApi
     class OffenderApi
       extend PrisonApiClient
 
-      def self.list(prison, page = 0, page_size: 20)
-        route = "/locations/description/#{prison}/inmates"
+      # Only allow offenders into the service if their legal status is in this list
+      # Used to filter out offenders who are on remand, civil prisoners, unsentenced, etc.
+      ALLOWED_LEGAL_STATUSES = %w[SENTENCED INDETERMINATE_SENTENCE RECALL IMMIGRATION_DETAINEE].freeze
 
-        queryparams = { 'convictedStatus' => 'Convicted' }
+      def self.get_offenders_in_prison(prison)
+        # Get offenders from the Prisoner Offender Search API - and filter out those with unwanted legal statuses
+        offenders = get_search_api_offenders_in_prison(prison).select { |o| ALLOWED_LEGAL_STATUSES.include?(o['legalStatus']) }
 
-        page_offset = page * page_size
-        hdrs = paging_headers(page_size, page_offset)
+        return [] if offenders.empty?
 
-        total_pages = nil
-        data = client.get(
-          route, queryparams: queryparams, extra_headers: hdrs
-        ) { |_json, response|
-          # Get the 'Total-Records' response header to calculate how many pages there are
-          total_records = response.headers['Total-Records'].to_i
-          total_pages = (total_records / page_size.to_f).ceil
-        }
-
-        offender_nos = data.map { |o| o.fetch('offenderNo') }
-        search_data = get_search_payload(offender_nos)
-        temp_movements = HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for(offender_nos)
+        # Get additional data from other APIs
+        offender_nos = offenders.map { |o| o.fetch('prisonerNumber') }
         offender_categories = get_offender_categories(offender_nos)
-
-        booking_ids = data.map { |o| o.fetch('bookingId') }
-        sentence_details = HmppsApi::PrisonApi::OffenderApi.get_bulk_sentence_details(booking_ids)
-
-        complexities = if PrisonService::womens_prison?(prison)
-                         HmppsApi::ComplexityApi.get_complexities offender_nos
+        complexities = if Prison.womens.exists?(prison)
+                         HmppsApi::ComplexityApi.get_complexities(offender_nos)
                        else
                          {}
                        end
-        # need to ignore any offenders who don't show up in the search API
-        offenders = data.select { |p| search_data.key? p.fetch('offenderNo') }.map do |api_payload|
-          offender_no = api_payload.fetch('offenderNo')
-          search_payload = search_data.fetch(offender_no)
-          booking_id = api_payload.fetch('bookingId').to_i
-          HmppsApi::Offender.new(api_payload,
-                                 search_payload,
-                                 booking_id: booking_id,
-                                 prison_id: api_payload.fetch('agencyId'),
-                                 category: offender_categories[offender_no],
-                                 latest_temp_movement: temp_movements[offender_no],
-                                 complexity_level: complexities[offender_no]).tap { |offender|
-            sentencing = sentence_details[booking_id]
-            if sentencing.present?
-              offender.sentence = HmppsApi::SentenceDetail.new sentencing,
-                                                               search_payload
-            end
-          }
-        end
-        ApiPaginatedResponse.new(total_pages, offenders)
-      end
 
-      def self.get_offender(raw_offender_no)
-        # Bad NOMIS numbers mustn't produce invalid URLs
-        offender_no = URI.encode_www_form_component(raw_offender_no)
-        route = "/prisoners/#{offender_no}"
-        api_payload = client.get(route).first
-        search_payload = get_search_payload([offender_no])[offender_no] unless api_payload.nil?
+        # Get movement details only for those offenders who are temporarily out of prison (TAP/ROTL)
+        temp_out_offenders = offenders.select { |o| temp_out_of_prison?(o) }.map { |o| o.fetch('prisonerNumber') }
+        temp_movements = if temp_out_offenders.any?
+                           HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for(temp_out_offenders)
+                         else
+                           {}
+                         end
 
-        if api_payload.nil? || search_payload.nil?
-          nil
-        else
-          temp_movements = HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for([offender_no])
-          offender_categories = get_offender_categories([offender_no])
-          complexity_level = if api_payload.fetch('currentlyInPrison') == 'Y' && PrisonService::womens_prison?(api_payload.fetch('latestLocationId'))
-                               HmppsApi::ComplexityApi.get_complexity(offender_no)
-                             end
-          booking_id = api_payload['latestBookingId']&.to_i
-          prisoner = HmppsApi::Offender.new api_payload,
-                                            search_payload,
-                                            category: offender_categories[offender_no],
-                                            latest_temp_movement: temp_movements[offender_no],
-                                            complexity_level: complexity_level,
-                                            booking_id: booking_id,
-                                            prison_id: api_payload['latestLocationId']
+        # Create Offender objects
+        offenders.map { |offender|
+          offender_no = offender.fetch('prisonerNumber')
 
-          prisoner.tap do |offender|
-            sentence_details = get_bulk_sentence_details([booking_id])
-            sentence = HmppsApi::SentenceDetail.new sentence_details.fetch(booking_id),
-                                                    search_payload
-
-            offender.sentence = sentence
-            add_arrival_dates([offender])
-          end
+          HmppsApi::Offender.new(
+            offender: offender,
+            category: offender_categories[offender_no],
+            latest_temp_movement: temp_movements[offender_no],
+            complexity_level: complexities[offender_no]
+          )
+        }.tap do |offenders_array|
+          add_arrival_dates(offenders_array)
         end
       end
 
-      def self.get_offence(booking_id)
-        route = "/bookings/#{booking_id}/mainOffence"
-        data = client.get(route)
-        return '' if data.empty?
+      # Get a single offender
+      #
+      # Returns nil if the offender's legal status is not in the list ALLOWED_LEGAL_STATUSES
+      # To ignore the ALLOWED_LEGAL_STATUSES list and return the offender anyway, set `ignore_legal_status` to true.
+      # Warning: when you ignore the offender's legal status, you could potentially receive an offender who wouldn't
+      # normally appear within the service. This should only be done under certain circumstances –
+      # e.g. when deallocating an offender who has since left the service due to a change in legal status
+      def self.get_offender(raw_offender_no, ignore_legal_status: false)
+        # Get offender from the Prisoner Offender Search API
+        offender = get_search_api_offenders([raw_offender_no]).first
 
-        data.first['offenceDescription']
-      end
+        return nil unless offender.present? &&
+          (ALLOWED_LEGAL_STATUSES.include?(offender['legalStatus']) || ignore_legal_status)
 
-      def self.get_category_code(offender_no)
-        route = '/offender-assessments/CATEGORY'
-        data = client.post(route, [offender_no], cache: true)
-        return '' if data.empty?
+        offender_no = offender.fetch('prisonerNumber')
+        prison_id = offender['prisonId']
 
-        data.first['classificationCode']
+        # Get additional data from other APIs
+        offender_categories = get_offender_categories([offender_no])
+        complexity_level = if Prison.womens.exists?(prison_id)
+                             HmppsApi::ComplexityApi.get_complexity(offender_no)
+                           end
+        temp_movement = if temp_out_of_prison?(offender)
+                          HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for([offender_no])[offender_no]
+                        end
+
+        HmppsApi::Offender.new(
+          offender: offender,
+          category: offender_categories[offender_no],
+          latest_temp_movement: temp_movement,
+          complexity_level: complexity_level
+        ).tap do |o|
+          add_arrival_dates([o])
+        end
       end
 
       def self.get_offender_categories(offender_nos)
@@ -125,22 +100,6 @@ module HmppsApi
               .map { |assessment|
                 [assessment.fetch('offenderNo'), HmppsApi::OffenderCategory.new(assessment)]
               }.to_h
-      end
-
-      def self.get_bulk_sentence_details(booking_ids)
-        return {} if booking_ids.empty?
-
-        route = '/offender-sentences/bookings'
-        data = client.post(route, booking_ids, cache: true)
-
-        data.each_with_object({}) { |record, hash|
-          next unless record.key?('bookingId')
-
-          oid = record['bookingId']
-
-          hash[oid] = record.fetch('sentenceDetail')
-          hash
-        }
       end
 
       def self.get_image(booking_id)
@@ -175,21 +134,28 @@ module HmppsApi
 
     private
 
-      def self.get_search_payload(offender_nos)
-        search_route = '/prisoner-numbers'
-        search_client.post(search_route, { prisonerNumbers: offender_nos }, cache: true)
-                                     .index_by { |prisoner| prisoner.fetch('prisonerNumber') }
+      def self.get_search_api_offenders_in_prison(prison_code)
+        route = "/prisoner-search/prison/#{prison_code}"
+
+        # Pagination was found to be faulty on this API endpoint (see Jira ticket DT-2719)
+        # So here we bypass pagination by asking for 10,000 results per page.
+        # There are only ever up to ~2000 offenders per prison, and this API seems happy to return them all at once.
+        # This endpoint also requires a "Content-Type: application/json" header even though it's a GET request with no body.
+        search_client.get(route, queryparams: { page: 0, size: 10_000 }, extra_headers: { 'Content-Type': 'application/json' })
+                     .fetch('content')
       end
 
-      def self.paging_headers(page_size, page_offset)
-        {
-          'Page-Limit' => page_size.to_s,
-          'Page-Offset' => page_offset.to_s
-        }
+      def self.get_search_api_offenders(offender_nos)
+        search_route = '/prisoner-search/prisoner-numbers'
+        search_client.post(search_route, { prisonerNumbers: offender_nos }, cache: true)
       end
 
       def self.default_image
         File.read(Rails.root.join('app/assets/images/default_profile_image.jpg'))
+      end
+
+      def self.temp_out_of_prison?(offender)
+        offender['inOutStatus'] == 'OUT' && offender['lastMovementTypeCode'] == HmppsApi::MovementType::TEMPORARY
       end
     end
   end

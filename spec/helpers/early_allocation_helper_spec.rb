@@ -25,7 +25,7 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
     context 'with saved assessments' do
       context 'when the offender has more than 18 months left to serve' do
         # The offender is not in the Early Allocation referral window
-        let(:offender_sentence) { build(:sentence_detail, conditionalReleaseDate: Time.zone.today + 19.months) }
+        let(:offender_sentence) { attributes_for(:sentence_detail, conditionalReleaseDate: Time.zone.today + 19.months) }
         let(:early_allocations) { build_list(:early_allocation, 1, created_within_referral_window: false) }
 
         it 'reads "Has saved assessments"' do
@@ -35,7 +35,7 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
 
       context 'when the offender has less than 18 months left to serve (or exactly 18 months)' do
         # The offender is within the Early Allocation referral window
-        let(:offender_sentence) { build(:sentence_detail, conditionalReleaseDate: Time.zone.today + 17.months) }
+        let(:offender_sentence) { attributes_for(:sentence_detail, conditionalReleaseDate: Time.zone.today + 17.months) }
 
         context 'when the latest assessment was completed within the 18 month referral window' do
           context 'when the outcome was automatically "eligible"' do
@@ -164,7 +164,7 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
     context 'with saved assessments' do
       context 'when the offender has more than 18 months left to serve' do
         # The offender is not in the Early Allocation referral window
-        let(:offender_sentence) { build(:sentence_detail, conditionalReleaseDate: Time.zone.today + 19.months) }
+        let(:offender_sentence) { attributes_for(:sentence_detail, conditionalReleaseDate: Time.zone.today + 19.months) }
         let(:early_allocations) { build_list(:early_allocation, 1, created_within_referral_window: false) }
 
         include_examples 'Check and reassess'
@@ -172,7 +172,7 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
 
       context 'when the offender has less than 18 months left to serve (or exactly 18 months)' do
         # The offender is within the Early Allocation referral window
-        let(:offender_sentence) { build(:sentence_detail, conditionalReleaseDate: Time.zone.today + 17.months) }
+        let(:offender_sentence) { attributes_for(:sentence_detail, conditionalReleaseDate: Time.zone.today + 17.months) }
 
         context 'when the latest assessment was completed within the 18 month referral window' do
           context 'when the outcome was automatically "eligible"' do

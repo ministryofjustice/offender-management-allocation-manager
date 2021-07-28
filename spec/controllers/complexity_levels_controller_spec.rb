@@ -1,21 +1,21 @@
 require 'rails_helper'
 
 RSpec.describe ComplexityLevelsController, type: :controller do
-  let(:offender) { build(:nomis_offender, complexityLevel: 'medium', agencyId: womens_prison.code, firstName: 'Sally', lastName: 'Albright') }
+  let(:offender) { build(:nomis_offender, complexityLevel: 'medium', prisonId: womens_prison.code, firstName: 'Sally', lastName: 'Albright') }
   let(:womens_prison) { create(:womens_prison) }
   let(:offenders) { [offender] }
   let(:pom) { build(:pom) }
   let(:spo) { build(:pom) }
-  let(:offender_no) { offender.fetch(:offenderNo) }
+  let(:offender_no) { offender.fetch(:prisonerNumber) }
 
   before do
-    create(:allocation_history, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: pom.staff_id,  prison: womens_prison.code)
+    create(:allocation_history, nomis_offender_id: offender.fetch(:prisonerNumber), primary_pom_nomis_id: pom.staff_id,  prison: womens_prison.code)
     create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
 
     stub_offenders_for_prison(womens_prison.code, offenders)
     stub_sso_data(womens_prison.code)
     stub_poms(womens_prison.code, [pom, spo])
-    stub_keyworker(womens_prison.code, offender.fetch(:offenderNo), build(:keyworker))
+    stub_keyworker(womens_prison.code, offender.fetch(:prisonerNumber), build(:keyworker))
   end
 
   describe '#edit' do
@@ -28,7 +28,7 @@ RSpec.describe ComplexityLevelsController, type: :controller do
 
   describe '#update' do
     before do
-      expect(HmppsApi::ComplexityApi).to receive(:save).with(offender.fetch(:offenderNo), level: updated_complexity_level, username: 'user', reason: 'Just because')
+      expect(HmppsApi::ComplexityApi).to receive(:save).with(offender.fetch(:prisonerNumber), level: updated_complexity_level, username: 'user', reason: 'Just because')
     end
 
     context 'when complexity level increases from medium to high' do

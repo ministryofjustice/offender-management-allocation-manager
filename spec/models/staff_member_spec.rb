@@ -6,10 +6,10 @@ RSpec.describe StaffMember, type: :model do
   let(:user) { described_class.new(prison, staff_id) }
   let(:offenders) {
     [
-      build(:nomis_offender, offenderNo: 'G7514GW', prison_id: prison.code),
-      build(:nomis_offender, offenderNo: 'G1234VV', prison_id: prison.code),
-      build(:nomis_offender, offenderNo: 'G1234AB', prison_id: prison.code),
-      build(:nomis_offender, offenderNo: 'G1234GG', prison_id: prison.code)
+      build(:nomis_offender, prisonerNumber: 'G7514GW', prisonId: prison.code),
+      build(:nomis_offender, prisonerNumber: 'G1234VV', prisonId: prison.code),
+      build(:nomis_offender, prisonerNumber: 'G1234AB', prisonId: prison.code),
+      build(:nomis_offender, prisonerNumber: 'G1234GG', prisonId: prison.code)
     ]
   }
 
@@ -17,7 +17,7 @@ RSpec.describe StaffMember, type: :model do
     stub_auth_token
     stub_offenders_for_prison(prison.code, offenders)
     offenders.each do |offender|
-      create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:offenderNo)))
+      create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
     end
   end
 
@@ -25,7 +25,7 @@ RSpec.describe StaffMember, type: :model do
     before do
       # # Allocate all of the offenders to this POM
       offenders.each do |offender|
-        create(:allocation_history, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: staff_id, prison: prison.code)
+        create(:allocation_history, nomis_offender_id: offender.fetch(:prisonerNumber), primary_pom_nomis_id: staff_id, prison: prison.code)
       end
     end
 

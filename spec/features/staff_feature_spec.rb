@@ -16,14 +16,14 @@ feature "female estate POMs list" do
 
   let(:nomis_offender) {
     build(:nomis_offender,
-          agencyId: female_prison, complexityLevel: 'high',
+          prisonId: female_prison, complexityLevel: 'high',
           category: attributes_for(:offender_category, :female_closed),
           sentence: attributes_for(:sentence_detail))
   }
 
   let(:offenders_in_prison) {
     build_list(:nomis_offender, 14,
-               agencyId: female_prison,
+               prisonId: female_prison,
                category: attributes_for(:offender_category, :female_closed),
                sentence: attributes_for(:sentence_detail))
   }
@@ -33,21 +33,21 @@ feature "female estate POMs list" do
     stub_offenders_for_prison(female_prison, offenders_in_prison << nomis_offender)
     stub_poms(female_prison, poms)
 
-    offenders_in_prison.map { |o| o.fetch(:offenderNo) }.each { |nomis_id|
+    offenders_in_prison.map { |o| o.fetch(:prisonerNumber) }.each { |nomis_id|
       stub_keyworker female_prison, nomis_id, build(:keyworker)
     }
 
-    create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender[:offenderNo]), case_allocation: 'NPS')
-    create(:allocation_history, nomis_offender_id: nomis_offender[:offenderNo], primary_pom_nomis_id: poms.first.staffId, prison: female_prison)
+    create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender[:prisonerNumber]), case_allocation: 'NPS')
+    create(:allocation_history, nomis_offender_id: nomis_offender[:prisonerNumber], primary_pom_nomis_id: poms.first.staffId, prison: female_prison)
 
     %w[A B C].each_with_index do |tier, index|
-      create(:case_information, tier: tier, offender: build(:offender, nomis_offender_id: offenders_in_prison[index][:offenderNo]), case_allocation: 'NPS')
-      create(:allocation_history, nomis_offender_id: offenders_in_prison[index][:offenderNo], primary_pom_nomis_id: poms.first.staffId, prison: female_prison)
+      create(:case_information, tier: tier, offender: build(:offender, nomis_offender_id: offenders_in_prison[index][:prisonerNumber]), case_allocation: 'NPS')
+      create(:allocation_history, nomis_offender_id: offenders_in_prison[index][:prisonerNumber], primary_pom_nomis_id: poms.first.staffId, prison: female_prison)
     end
 
     %w[D N/A].each_with_index do |tier, index|
-      create(:case_information, tier: tier, offender: build(:offender, nomis_offender_id: offenders_in_prison[index + 4][:offenderNo]), case_allocation: 'NPS')
-      create(:allocation_history, nomis_offender_id: offenders_in_prison[index + 4][:offenderNo], primary_pom_nomis_id: poms.last.staffId, prison: female_prison)
+      create(:case_information, tier: tier, offender: build(:offender, nomis_offender_id: offenders_in_prison[index + 4][:prisonerNumber]), case_allocation: 'NPS')
+      create(:allocation_history, nomis_offender_id: offenders_in_prison[index + 4][:prisonerNumber], primary_pom_nomis_id: poms.last.staffId, prison: female_prison)
     end
 
     visit prison_poms_path(female_prison)

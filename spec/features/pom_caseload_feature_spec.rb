@@ -42,17 +42,17 @@ feature "view POM's caseload" do
       map { |nomis_id, booking_id|
       if ids_without_cells.include? nomis_id
         # generate 2 offenders without a cell location
-        build(:nomis_offender, internalLocation: nil,
-              agencyId: prison.code,
-              offenderNo: nomis_id,
+        build(:nomis_offender, cellLocation: nil,
+              prisonId: prison.code,
+              prisonerNumber: nomis_id,
               sentence: attributes_for(:sentence_detail,
                                        automaticReleaseDate: "2031-01-22",
                                        conditionalReleaseDate: "2031-01-24",
                                        tariffDate: (nomis_id == nil_release_date_offender) ? nil : Time.zone.today + booking_id.days))
       else
         build(:nomis_offender,
-              agencyId: prison.code,
-              offenderNo: nomis_id,
+              prisonId: prison.code,
+              prisonerNumber: nomis_id,
               sentence: attributes_for(:sentence_detail,
                                        automaticReleaseDate: "2031-01-22",
                                        conditionalReleaseDate: "2031-01-24",
@@ -61,7 +61,7 @@ feature "view POM's caseload" do
     }
   }
   let(:missing_cells) {
-    offenders.find_all { |x| x[:internalLocation] == nil }
+    offenders.find_all { |x| x[:cellLocation] == nil }
   }
   let(:sorted_offenders) {
     offenders.sort_by { |o| o.fetch(:lastName) }
@@ -71,7 +71,7 @@ feature "view POM's caseload" do
 
   let(:sorted_locations) do
     removed_list = [moved_offenders.first, moved_offenders.last, missing_cells.first, missing_cells.last]
-    offenders.reject { |x| removed_list.include? x }.sort_by { |o| o.fetch(:internalLocation) }
+    offenders.reject { |x| removed_list.include? x }.sort_by { |o| o.fetch(:cellLocation) }
   end
 
   # create 21 allocations for prisoners named A-K so that we can verify that default sorted paging works
@@ -89,9 +89,15 @@ feature "view POM's caseload" do
     stub_auth_token
     stub_poms(prison.code, poms)
     signin_pom_user [prison.code]
+
+    # Add attributes to moved_offenders to make them ROTLs - needed in conjunction with the ROTL movements
+    moved_offenders.each { |o|
+      o.merge!(inOutStatus: 'OUT', lastMovementTypeCode: 'TAP')
+    }
+
     stub_offenders_for_prison(prison.code, offenders, [
-      attributes_for(:movement, :rotl, movementDate: Time.zone.today - 1.month, offenderNo: moved_offenders.first.fetch(:offenderNo)),
-      attributes_for(:movement, :rotl, movementDate: Time.zone.today - 1.year, offenderNo: moved_offenders.last.fetch(:offenderNo))
+      attributes_for(:movement, :rotl, movementDate: Time.zone.today - 1.month, offenderNo: moved_offenders.first.fetch(:prisonerNumber)),
+      attributes_for(:movement, :rotl, movementDate: Time.zone.today - 1.year, offenderNo: moved_offenders.last.fetch(:prisonerNumber))
     ])
 
     offender_map.each do |nomis_offender_id, _nomis_booking_id|
@@ -103,7 +109,7 @@ feature "view POM's caseload" do
     coworking.update!(secondary_pom_nomis_id: nomis_staff_id, event: AllocationHistory::ALLOCATE_SECONDARY_POM)
 
     offenders.last(15).each do |o|
-      create(:responsibility, nomis_offender_id: o.fetch(:offenderNo), value: Responsibility::PROBATION)
+      create(:responsibility, nomis_offender_id: o.fetch(:prisonerNumber), value: Responsibility::PROBATION)
     end
 
     allow_any_instance_of(MpcOffender).to receive(:handover_start_date).and_return(tomorrow)
@@ -117,7 +123,7 @@ feature "view POM's caseload" do
 
     before do
       offenders.each_with_index do |offender, index|
-        allow(HmppsApi::ComplexityApi).to receive(:get_complexity).with(offender.fetch(:offenderNo)).and_return(complexities[index])
+        allow(HmppsApi::ComplexityApi).to receive(:get_complexity).with(offender.fetch(:prisonerNumber)).and_return(complexities[index])
       end
       visit prison_staff_caseload_path(prison.code, nomis_staff_id)
     end
@@ -165,7 +171,7 @@ feature "view POM's caseload" do
       # pick out a few rows, and make sure they are in order by release date
       (2..7).each do |row_index|
         within ".offender_row_#{row_index}" do
-          offender = offenders.detect { |o| o.fetch(:offenderNo) == offender_ids_by_release_date[row_index] }
+          offender = offenders.detect { |o| o.fetch(:prisonerNumber) == offender_ids_by_release_date[row_index] }
           name = "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}"
           expect(page).to have_content(name)
         end
@@ -209,7 +215,7 @@ feature "view POM's caseload" do
       fill_in 'q', with: '8180U'
       click_on 'Search'
       expect(page).to have_content('Showing 1 - 1 of 1 results')
-      offender = offenders.detect { |o| o.fetch(:offenderNo) == 'G8180UO' }
+      offender = offenders.detect { |o| o.fetch(:prisonerNumber) == 'G8180UO' }
       name = "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}"
       within '.offender_row_0' do
         expect(page).to have_content(name)
@@ -253,7 +259,7 @@ feature "view POM's caseload" do
         stub_user staff_id: nomis_staff_id
 
         stub_offender(first_offender)
-        stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/#{prison.code}/offender/#{first_offender.fetch(:offenderNo)}").
+        stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/#{prison.code}/offender/#{first_offender.fetch(:prisonerNumber)}").
           to_return(body: { staffId: 485_572, firstName: "DOM", lastName: "BULL" }.to_json)
         stub_request(:get, "#{ApiHelper::T3}/staff/#{nomis_staff_id}").
           to_return(body: { staffId: nomis_staff_id, firstName: "TEST", lastName: "MOIC" }.to_json)
@@ -267,7 +273,7 @@ feature "view POM's caseload" do
           click_link expected_name
         end
 
-        expect(page).to have_current_path(prison_prisoner_path(prison.code, first_offender.fetch(:offenderNo)), ignore_query: true)
+        expect(page).to have_current_path(prison_prisoner_path(prison.code, first_offender.fetch(:prisonerNumber)), ignore_query: true)
       end
     end
 

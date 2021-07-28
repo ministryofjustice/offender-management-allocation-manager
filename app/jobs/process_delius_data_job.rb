@@ -30,7 +30,7 @@ private
       return logger.error("[DELIUS] Failed to retrieve NOMIS record #{delius_record.noms_no}")
     end
 
-    process_record(delius_record) if offender.convicted?
+    process_record(delius_record) if offender.inside_omic_policy?
   end
 
   def process_record(delius_record)

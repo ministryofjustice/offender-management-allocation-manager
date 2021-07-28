@@ -154,7 +154,7 @@ RSpec.describe EarlyAllocation, type: :model do
     let(:prison) { build(:prison) }
     let(:api_offender) {
       build(:hmpps_api_offender,
-            sentence: build(:sentence_detail, sentenceStartDate: Time.zone.today - 1.week))
+            sentence: attributes_for(:sentence_detail, sentenceStartDate: Time.zone.today - 1.week))
     }
     let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 

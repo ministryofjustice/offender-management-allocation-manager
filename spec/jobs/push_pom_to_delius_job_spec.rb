@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe PushPomToDeliusJob, type: :job, versioning: true do
   let(:offender) { build(:nomis_offender) }
-  let(:offender_no) { offender.fetch(:offenderNo) }
+  let(:offender_no) { offender.fetch(:prisonerNumber) }
   let(:pom) { build(:pom) }
 
   before do

@@ -3,7 +3,7 @@
 module ApiHelper
   AUTH_HOST = Rails.configuration.nomis_oauth_host
   T3 = "#{Rails.configuration.prison_api_host}/api"
-  T3_SEARCH = "#{Rails.configuration.prisoner_search_host}/prisoner-search"
+  T3_SEARCH = Rails.configuration.prisoner_search_host
   KEYWORKER_API_HOST = ENV.fetch('KEYWORKER_API_HOST')
   COMMUNITY_HOST = "#{Rails.configuration.community_api_host}/secure"
   T3_LATEST_MOVE_URL = "#{T3}/movements/offenders?latestOnly=true&movementTypes=TAP"
@@ -11,48 +11,23 @@ module ApiHelper
   ASSESSMENT_API_HOST = Rails.configuration.assessment_api_host
 
   def stub_offender(offender)
-    booking_number = offender.fetch(:bookingId)
-    offender_no = offender.fetch(:offenderNo)
-    stub_request(:get, "#{T3}/prisoners/#{offender_no}").
-      to_return(body: [
-        offender.except(:sentence, :recall, :agencyId).merge(
-          'latestBookingId' => booking_number,
-          'latestLocationId' => offender.fetch(:agencyId))
-      ].to_json)
+    offender_no = offender.fetch(:prisonerNumber)
 
-    stub_request(:post, "#{T3_SEARCH}/prisoner-numbers").with(body: { prisonerNumbers: [offender_no] }).
-      to_return(body: [
-        {
-          prisonerNumber: offender_no,
-          recall: offender.fetch(:recall),
-          imprisonmentStatus: offender.fetch(:sentence).fetch(:imprisonmentStatus),
-          indeterminateSentence: offender.fetch(:sentence).fetch(:indeterminateSentence),
-          imprisonmentStatusDescription: offender.fetch(:sentence).fetch(:imprisonmentStatusDescription),
-          cellLocation: offender.fetch(:internalLocation)
-        }
-      ].to_json)
+    # Prison Search API
+    stub_request(:post, "#{T3_SEARCH}/prisoner-search/prisoner-numbers")
+      .with(body: { prisonerNumbers: [offender_no] }.to_json)
+      .to_return(body: [search_api_response(offender)].to_json)
 
-    stub_request(:post, "#{T3}/offender-sentences/bookings").
-      with(
-        body: [booking_number].to_json
-      ).
-      to_return(body: [
-        {
-          offenderNo: offender_no,
-          bookingId: booking_number,
-          sentenceDetail: offender.fetch(:sentence).reject { |_k, v| v.nil? }
-        }].to_json)
+    # This endpoint is only used by HmppsApi::PrisonApi::OffenderApi.get_image
+    # to get the "facialImageId" field for an offender.
+    # Return an empty response so it falls back to the default offender photo.
+    stub_request(:post, "#{T3}/offender-sentences/bookings")
+      .with(body: [offender.fetch(:bookingId)].to_json)
+      .to_return(body: [{}].to_json)
 
     stub_offender_categories([offender])
 
-    stub_request(:get, "#{T3}/bookings/#{booking_number}/mainOffence").
-      to_return(body: {}.to_json)
-
     stub_movements
-
-    stub_request(:post, T3_LATEST_MOVE_URL).with(
-      body: [offender_no].to_json).
-      to_return(body: [].to_json)
 
     stub_request(:get, "#{Rails.configuration.complexity_api_host}/v1/complexity-of-need/offender-no/#{offender_no}").
       to_return(body: { level: offender.fetch(:complexityLevel) }.to_json)
@@ -64,6 +39,8 @@ module ApiHelper
     stub_request(:post, "#{T3}/movements/offenders?movementTypes=ADM&movementTypes=TRN&latestOnly=false").
       to_return(body: movements.to_json)
     stub_request(:post, "#{T3}/movements/offenders?movementTypes=REL&latestOnly=false").
+      to_return(body: movements.to_json)
+    stub_request(:post, T3_LATEST_MOVE_URL).
       to_return(body: movements.to_json)
   end
 
@@ -114,75 +91,30 @@ module ApiHelper
   end
 
   def stub_offenders_for_prison(prison, offenders, movements = [])
-    # Stub the call to get_offenders_for_prison. Takes a list of offender hashes (in nomis camelCase format) and
-    # a list of bookings (same key format). It it your responsibility to make sure they contain the data you want
-    # and if you provide a booking, that the id matches between the offender and booking hashes.
-    elite2listapi = "#{T3}/locations/description/#{prison}/inmates?convictedStatus=Convicted"
+    # Put all offenders in the specified prison
+    offenders.each { |offender| offender[:prisonId] = prison }
 
-    # Stub the call that will get the total number of records
-    stub_request(:get, elite2listapi).to_return(
-      body: {}.to_json,
-      headers: { 'Total-Records' => offenders.count.to_s }
-    )
+    # Prison Search API
+    stub_request(:get, "#{T3_SEARCH}/prisoner-search/prison/#{prison}").with(query: hash_including(:page, :size))
+      .to_return(body: {
+        content: offenders.map { |o| search_api_response(o) }
+      }.to_json)
 
-    # make up a set of booking ids
-    booking_ids = 1.upto(offenders.size)
+    # Remove offenders with unwanted legal statuses – the following APIs are only called/stubbed for filtered offender IDs
+    filtered_offenders = offenders.select { |o| HmppsApi::PrisonApi::OffenderApi::ALLOWED_LEGAL_STATUSES.include?(o.fetch(:legalStatus)) }
+    stub_offender_categories(filtered_offenders)
+    allow(HmppsApi::ComplexityApi).to receive(:get_complexities)
+                                        .with(filtered_offenders.map { |o| o.fetch(:prisonerNumber) })
+                                        .and_return(filtered_offenders.map { |o| [o.fetch(:prisonerNumber), o.fetch(:complexityLevel)] }.to_h)
 
-    # Return the actual offenders from the call to /locations/description/PRISON/inmates
-    stub_request(:get, elite2listapi).with(
-      headers: {
-        'Page-Limit' => '200',
-        'Page-Offset' => '0'
-      }).to_return(body: offenders.zip(booking_ids)
-                           .map { |o, booking_id|
-                           o.except(:sentence, :recall, :agencyId)
-                                                    .merge('bookingId' => booking_id,
-                                                           'agencyId' => prison,
-                                                           'assignedLivingUnitDesc' => o[:internalLocation])
-                         }                         .to_json)
+    filtered_offenders.each { |o| stub_offender(o) }
 
-    offender_nos = offenders.map { |offender| offender.fetch(:offenderNo) }
-    stub_request(:post, "#{T3_SEARCH}/prisoner-numbers").
-      with(body: { prisonerNumbers: offender_nos }.to_json).
-      to_return(body: offenders.map { |offender|
-                        {
-                          prisonerNumber: offender.fetch(:offenderNo),
-                          recall: offender.fetch(:recall),
-                          imprisonmentStatus: offender.fetch(:sentence).fetch(:imprisonmentStatus),
-                          indeterminateSentence: offender.fetch(:sentence).fetch(:indeterminateSentence),
-                          imprisonmentStatusDescription: offender.fetch(:sentence).fetch(:imprisonmentStatusDescription),
-                          cellLocation: offender.fetch(:internalLocation)
-                        }
-                      }.to_json)
-
-    bookings = booking_ids.zip(offenders).map do |booking_id, offender|
-      {
-          'bookingId' => booking_id,
-          'sentenceDetail' => offender.fetch(:sentence).reject { |_k, v| v.nil? }
-      }
-    end
-
-    stub_request(:post, T3_BOOKINGS_URL).with(body: booking_ids.to_json).
-      to_return(body: bookings.to_json)
-
-    stub_request(:post, T3_LATEST_MOVE_URL).with(
-      body: offender_nos.to_json).
-      to_return(body: movements.to_json)
-
-    stub_offender_categories(offenders)
-
-    stub_movements
-
-    allow(HmppsApi::ComplexityApi).to receive(:get_complexities).with(offender_nos).and_return(
-      offenders.map { |offender| [offender.fetch(:offenderNo), offender.fetch(:complexityLevel)] }.to_h
-    )
-
-    offenders.each { |o| stub_offender(o) }
+    stub_movements(movements)
   end
 
   def stub_oasys_assessments(offender_no)
     stub_request(:get, "#{ASSESSMENT_API_HOST}/offenders/nomisId/#{offender_no}/assessments/summary?assessmentStatus=COMPLETE&assessmentType=LAYER_3").
-    to_return(body: [].to_json)
+      to_return(body: [].to_json)
   end
 
   def stub_multiple_offenders(offenders, bookings)
@@ -195,33 +127,27 @@ module ApiHelper
   end
 
   def stub_offender_categories(offenders)
-    offender_nos = offenders.map { |offender| offender.fetch(:offenderNo) }
+    offender_nos = offenders.map { |offender| offender.fetch(:prisonerNumber) }
     categories = offenders.reject { |offender| offender[:category].nil? }
-                   .map { |offender| offender.fetch(:category).merge(offenderNo: offender.fetch(:offenderNo)) }
+                          .map { |offender|
+                            offender.fetch(:category).merge(offenderNo: offender.fetch(:prisonerNumber))
+                          }
 
-    stub_request(:post, "#{T3}/offender-assessments/CATEGORY?activeOnly=true&latestOnly=true&mostRecentOnly=true").
-      with(
-        body: offender_nos.to_json
-      ).
-      to_return(body: categories.to_json)
+    stub_request(:post, "#{T3}/offender-assessments/CATEGORY?activeOnly=true&latestOnly=true&mostRecentOnly=true")
+      .with(body: offender_nos.to_json)
+      .to_return(body: categories.to_json)
   end
 
-  # Stub an 'empty' response from the Prison API, indicating that the offender does not exist in NOMIS
-  # Note: you might have expected a 404 Not Found response when the offender doesn't exist, but
-  #       the actual response is 200 OK with an empty JSON array.
-  #       This stub is faithful to the Prison API docs and real-world behaviour.
+  # Stub an 'empty' response from the Prison Search API, indicating that the offender does not exist in NOMIS
   def stub_non_existent_offender(offender_no)
-    stub_request(:get, "#{T3}/prisoners/#{offender_no}").
-      to_return(body: [].to_json)
+    stub_request(:post, "#{T3_SEARCH}/prisoner-search/prisoner-numbers")
+      .with(body: { prisonerNumbers: [offender_no] }.to_json)
+      .to_return(body: [].to_json)
   end
 
   def stub_keyworker(prison_code, offender_id, keyworker)
     stub_request(:get, "#{KEYWORKER_API_HOST}/key-worker/#{prison_code}/offender/#{offender_id}").
       to_return(body: keyworker.to_json)
-  end
-
-  def reload_page
-    visit current_path
   end
 
   def stub_community_offender(nomis_offender_id, community_data, registrations = [])
@@ -236,5 +162,11 @@ module ApiHelper
   def stub_resourcing_404 nomis_offender_id
     stub_request(:get, "#{COMMUNITY_HOST}/offenders/nomsNumber/#{nomis_offender_id}/risk/resourcing/latest").
       to_return(status: 404)
+  end
+
+private
+
+  def search_api_response(offender)
+    offender.except(:complexityLevel, :category)
   end
 end
