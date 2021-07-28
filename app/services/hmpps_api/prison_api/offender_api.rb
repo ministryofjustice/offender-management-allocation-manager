@@ -69,17 +69,19 @@ module HmppsApi
         else
           temp_movements = HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for([offender_no])
           offender_categories = get_offender_categories([offender_no])
-          complexity_level = if api_payload.fetch('currentlyInPrison') == 'Y' && PrisonService::womens_prison?(api_payload.fetch('latestLocationId'))
+          # If the offender is a restricted patient, use the "supporting prison" (because that's where their POM will be)
+          prison_id = search_payload['restrictedPatient'] ? search_payload['supportingPrisonId'] : search_payload['prisonId']
+          complexity_level = if Prison.womens.exists?(prison_id)
                                HmppsApi::ComplexityApi.get_complexity(offender_no)
                              end
-          booking_id = api_payload['latestBookingId']&.to_i
+          booking_id = search_payload['bookingId']&.to_i
           prisoner = HmppsApi::Offender.new api_payload,
                                             search_payload,
                                             category: offender_categories[offender_no],
                                             latest_temp_movement: temp_movements[offender_no],
                                             complexity_level: complexity_level,
                                             booking_id: booking_id,
-                                            prison_id: api_payload['latestLocationId']
+                                            prison_id: prison_id
 
           prisoner.tap do |offender|
             sentence_details = get_bulk_sentence_details([booking_id])

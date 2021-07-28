@@ -31,11 +31,11 @@ module HmppsApi
       # It is expected that this method will be called by the subclass which
       # will have been given a payload at the class level, and will call this
       # method from it's own internal from_json
-      @first_name = api_payload.fetch('firstName')
-      @last_name = api_payload.fetch('lastName')
-      @offender_no = api_payload.fetch('offenderNo')
+      @first_name = search_payload.fetch('firstName')
+      @last_name = search_payload.fetch('lastName')
+      @offender_no = search_payload.fetch('prisonerNumber')
       @convicted_status = api_payload['convictedStatus']
-      @date_of_birth = api_payload.fetch('dateOfBirth').to_date
+      @date_of_birth = search_payload.fetch('dateOfBirth').to_date
       @latest_temp_movement = latest_temp_movement
       @cell_location = search_payload['cellLocation']
       @complexity_level = complexity_level
