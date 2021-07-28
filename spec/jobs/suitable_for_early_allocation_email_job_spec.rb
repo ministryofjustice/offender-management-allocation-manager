@@ -5,14 +5,14 @@ RSpec.describe SuitableForEarlyAllocationEmailJob, type: :job do
   let!(:prison) { create(:prison) }
 
   let(:api_offender) do
-    build(:hmpps_api_offender, latestLocationId: prison.code,
-          sentence: build(:sentence_detail,
-                          :determinate,
-                          sentenceStartDate: Time.zone.today - 10.months,
-                          conditionalReleaseDate: release_date,
-                          automaticReleaseDate: release_date,
-                          releaseDate: release_date,
-                          tariffDate: nil))
+    build(:hmpps_api_offender, prisonId: prison.code,
+          sentence: attributes_for(:sentence_detail,
+                                   :determinate,
+                                   sentenceStartDate: Time.zone.today - 10.months,
+                                   conditionalReleaseDate: release_date,
+                                   automaticReleaseDate: release_date,
+                                   releaseDate: release_date,
+                                   tariffDate: nil))
   end
 
   before do

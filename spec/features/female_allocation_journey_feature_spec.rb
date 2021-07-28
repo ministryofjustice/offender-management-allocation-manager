@@ -4,10 +4,10 @@ require "rails_helper"
 
 feature "womens allocation journey" do
   let(:prison) { create(:womens_prison) }
-  let(:offenders) { build_list(:nomis_offender, 5, agencyId: prison.code, complexityLevel: 'high') }
-  let(:offender) { build(:nomis_offender, sentence: attributes_for(:sentence_detail, :determinate_release_in_three_years), agencyId: prison.code) }
+  let(:offenders) { build_list(:nomis_offender, 5, prisonId: prison.code, complexityLevel: 'high') }
+  let(:offender) { build(:nomis_offender, sentence: attributes_for(:sentence_detail, :determinate_release_in_three_years), prisonId: prison.code) }
   let(:offender_name) { offender.fetch(:lastName) + ', ' + offender.fetch(:firstName) }
-  let(:nomis_offender_id) { offender.fetch(:offenderNo) }
+  let(:nomis_offender_id) { offender.fetch(:prisonerNumber) }
   let(:user) { build(:pom) }
   let(:probation_pom) { build(:pom, :probation_officer, lastName: 'Jones') }
   # This has to be alphabetically after probation_pom so it turns up in the right place on the screen
@@ -37,7 +37,7 @@ feature "womens allocation journey" do
     before do
       # allocate some offenders to the POM so they have a case mix that looks pretty
       offenders.each_with_index do |o, index|
-        ci = create(:case_information, tier: tiers[index], offender: build(:offender, nomis_offender_id: o.fetch(:offenderNo)))
+        ci = create(:case_information, tier: tiers[index], offender: build(:offender, nomis_offender_id: o.fetch(:prisonerNumber)))
         create(:allocation_history, prison: prison.code, nomis_offender_id: ci.nomis_offender_id, primary_pom_nomis_id: probation_pom.staff_id)
       end
 
@@ -119,7 +119,7 @@ feature "womens allocation journey" do
   end
 
   context 'with an existing allocation' do
-    let(:offender_id) { offenders.first.fetch(:offenderNo) }
+    let(:offender_id) { offenders.first.fetch(:prisonerNumber) }
     let(:allocation) { AllocationHistory.find_by!(nomis_offender_id: offender_id) }
 
     before do

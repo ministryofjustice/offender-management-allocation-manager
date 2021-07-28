@@ -7,7 +7,7 @@ describe HmppsApi::Offender do
 
   describe '#responsibility_override?' do
     context 'when no responsibility found for offender' do
-      let(:api_offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate)) }
+      let(:api_offender) { build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :indeterminate)) }
 
       it 'returns false' do
         subject = build(:mpc_offender, prison: prison, offender: build(:case_information).offender, prison_record: api_offender)
@@ -21,7 +21,7 @@ describe HmppsApi::Offender do
       create(:responsibility, nomis_offender_id: 'A1234XX')
 
       # build an offender
-      api_offender = build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate), offenderNo: 'A1234XX')
+      api_offender = build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :indeterminate), prisonerNumber: 'A1234XX')
       offender = build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender)
 
       expect(offender.responsibility_override?).to eq(true)
@@ -31,9 +31,9 @@ describe HmppsApi::Offender do
   describe '#within_early_allocation_window?' do
     context 'with no dates' do
       let(:api_offender) {
-        build(:hmpps_api_offender, sentence: build(:sentence_detail,
-                                                   conditionalReleaseDate: nil,
-                                                   automaticReleaseDate: nil))
+        build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail,
+                                                            conditionalReleaseDate: nil,
+                                                            automaticReleaseDate: nil))
       }
       let(:case_info) { build(:case_information) }
       let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
@@ -45,8 +45,8 @@ describe HmppsApi::Offender do
 
     context 'when ARD > 18 months' do
       let(:api_offender) {
-        build(:hmpps_api_offender, sentence: build(:sentence_detail, :blank,
-                                                   automaticReleaseDate: Time.zone.today + 19.months
+        build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :blank,
+                                                            automaticReleaseDate: Time.zone.today + 19.months
         ))
       }
       let(:case_info) { build(:case_information) }
@@ -59,8 +59,8 @@ describe HmppsApi::Offender do
 
     context 'when ARD < 18 months' do
       let(:api_offender) {
-        build(:hmpps_api_offender, sentence: build(:sentence_detail, :blank,
-                                                   automaticReleaseDate: Time.zone.today + 17.months))
+        build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :blank,
+                                                            automaticReleaseDate: Time.zone.today + 17.months))
       }
       let(:case_info) { build(:case_information) }
       let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
@@ -77,9 +77,9 @@ describe HmppsApi::Offender do
       }
       let(:api_offender) {
         build(:hmpps_api_offender,
-              sentence: build(:sentence_detail,
-                              conditionalReleaseDate: Time.zone.today + 24.months,
-                              automaticReleaseDate: Time.zone.today + 24.months))
+              sentence: attributes_for(:sentence_detail,
+                                       conditionalReleaseDate: Time.zone.today + 24.months,
+                                       automaticReleaseDate: Time.zone.today + 24.months))
       }
       let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
@@ -95,10 +95,10 @@ describe HmppsApi::Offender do
       }
       let(:api_offender) {
         build(:hmpps_api_offender,
-              sentence: build(:sentence_detail,
-                              conditionalReleaseDate: Time.zone.today + 24.months,
-                              tariffDate: Time.zone.today + 17.months,
-                              automaticReleaseDate: Time.zone.today + 24.months))
+              sentence: attributes_for(:sentence_detail,
+                                       conditionalReleaseDate: Time.zone.today + 24.months,
+                                       tariffDate: Time.zone.today + 17.months,
+                                       automaticReleaseDate: Time.zone.today + 24.months))
       }
       let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
@@ -114,11 +114,11 @@ describe HmppsApi::Offender do
       }
       let(:api_offender) {
         build(:hmpps_api_offender,
-              sentence: build(:sentence_detail,
-                              conditionalReleaseDate: Time.zone.today + 24.months,
-                              tariffDate: Time.zone.today + 24.months,
-                              paroleEligibilityDate: Time.zone.today + 17.months,
-                              automaticReleaseDate: Time.zone.today + 24.months))
+              sentence: attributes_for(:sentence_detail,
+                                       conditionalReleaseDate: Time.zone.today + 24.months,
+                                       tariffDate: Time.zone.today + 24.months,
+                                       paroleEligibilityDate: Time.zone.today + 17.months,
+                                       automaticReleaseDate: Time.zone.today + 24.months))
       }
       let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
@@ -131,12 +131,10 @@ describe HmppsApi::Offender do
   describe '#handover_start_date' do
     context 'when in custody' do
       let(:api_offender) {
-        build(:hmpps_api_offender).tap { |o|
-          o.sentence = build(:sentence_detail,
-                             conditionalReleaseDate: nil,
-                             automaticReleaseDate: Time.zone.today + 1.year,
-                             sentenceStartDate: Time.zone.today)
-        }
+        build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail,
+                                                            conditionalReleaseDate: nil,
+                                                            automaticReleaseDate: Time.zone.today + 1.year,
+                                                            sentenceStartDate: Time.zone.today))
       }
       let(:case_info) { build(:case_information, case_allocation: 'NPS', mappa_level: 0) }
       let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
@@ -148,9 +146,7 @@ describe HmppsApi::Offender do
 
     context 'when COM responsible already' do
       let(:api_offender) {
-        build(:hmpps_api_offender).tap { |o|
-          o.sentence = build(:sentence_detail, conditionalReleaseDate: Time.zone.today + 1.week)
-        }
+        build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, conditionalReleaseDate: Time.zone.today + 1.week))
       }
       let(:case_info) { build(:case_information) }
       let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
@@ -164,7 +160,7 @@ describe HmppsApi::Offender do
   describe '#pom_responsibility' do
     subject { OffenderManagerResponsibility.new offender.pom_responsible?, offender.pom_supporting? }
 
-    let(:api_offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate), latestLocationId: 'LEI') }
+    let(:api_offender) { build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :indeterminate), prisonId: 'LEI') }
 
     context 'when the responsibility has not been overridden' do
       let(:case_info) { build(:case_information) }
@@ -208,7 +204,7 @@ describe HmppsApi::Offender do
   describe '#com_responsibility' do
     subject { OffenderManagerResponsibility.new offender.com_responsible?, offender.com_supporting? }
 
-    let(:api_offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate), latestLocationId: 'LEI') }
+    let(:api_offender) { build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :indeterminate), prisonId: 'LEI') }
 
     context 'when the responsibility has not been overridden' do
       let(:case_info) { build(:case_information) }
@@ -250,123 +246,104 @@ describe HmppsApi::Offender do
   end
 
   describe 'fields that come from CaseInformation' do
-    context 'when no CaseInformation has been loaded' do
-      subject { offender.public_send(field) }
+    subject { offender.public_send(field) }
 
-      let(:api_offender) { build(:hmpps_api_offender) }
-      let(:offender) { build(:mpc_offender, prison: prison, offender: build(:offender), prison_record: api_offender) }
+    let(:case_info) { create(:case_information) }
+    let(:api_offender) { build(:hmpps_api_offender) }
+    let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
-      shared_examples 'expect fields to be' do |value, fields|
-        fields.each do |field|
-          describe "##{field}" do
-            let(:field) { field }
+    delegated_fields = [:tier, :case_allocation, :mappa_level]
+    delegated_fields.each do |delegated_field|
+      describe "##{delegated_field}" do
+        let(:field) { delegated_field }
 
-            it { is_expected.to be(value) }
-          end
-        end
+        it { is_expected.to be(case_info.public_send(delegated_field)) }
       end
     end
 
-    context 'when a CaseInformation record has been loaded' do
-      subject { offender.public_send(field) }
+    describe '#welsh_offender' do
+      let(:field) { :welsh_offender }
 
-      let(:case_info) { create(:case_information) }
-      let(:api_offender) { build(:hmpps_api_offender) }
-      let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
+      context 'with a welsh_offender' do
+        let(:case_info) { create(:case_information, probation_service: 'Wales') }
 
-      delegated_fields = [:tier, :case_allocation, :mappa_level]
-      delegated_fields.each do |delegated_field|
-        describe "##{delegated_field}" do
-          let(:field) { delegated_field }
-
-          it { is_expected.to be(case_info.public_send(delegated_field)) }
-        end
+        it { is_expected.to be(true) }
       end
 
-      describe '#welsh_offender' do
-        let(:field) { :welsh_offender }
+      context 'with and english offender' do
+        let(:case_info) { create(:case_information, probation_service: 'England') }
 
-        context 'with a welsh_offender' do
-          let(:case_info) { create(:case_information, probation_service: 'Wales') }
+        it { is_expected.to be(false) }
+      end
+    end
 
-          it { is_expected.to be(true) }
-        end
+    describe '#early_allocation?' do
+      let(:field) { :early_allocation? }
 
-        context 'with and english offender' do
-          let(:case_info) { create(:case_information, probation_service: 'England') }
+      context 'when eligible for early allocation' do
+        let!(:early_allocation) { create(:early_allocation, offender: case_info.offender) }
 
-          it { is_expected.to be(false) }
-        end
+        it { is_expected.to be(true) }
       end
 
-      describe '#early_allocation?' do
-        let(:field) { :early_allocation? }
+      context 'when ineligible for early allocation' do
+        let!(:early_allocation) { create(:early_allocation, :ineligible, offender: case_info.offender) }
 
-        context 'when eligible for early allocation' do
-          let!(:early_allocation) { create(:early_allocation, offender: case_info.offender) }
-
-          it { is_expected.to be(true) }
-        end
-
-        context 'when ineligible for early allocation' do
-          let!(:early_allocation) { create(:early_allocation, :ineligible, offender: case_info.offender) }
-
-          it { is_expected.to be(false) }
-        end
-
-        context 'when discretionary but the community have accepted' do
-          let!(:early_allocation) { create(:early_allocation, :discretionary, community_decision: true, offender: case_info.offender) }
-
-          it { is_expected.to be(true) }
-        end
+        it { is_expected.to be(false) }
       end
 
-      describe '#ldu_name' do
-        let(:field) { :ldu_name }
+      context 'when discretionary but the community have accepted' do
+        let!(:early_allocation) { create(:early_allocation, :discretionary, community_decision: true, offender: case_info.offender) }
 
-        context 'with a local delivery unit' do
-          let(:ldu) { create(:local_delivery_unit) }
-          let(:case_info) { create(:case_information, local_delivery_unit: ldu) }
+        it { is_expected.to be(true) }
+      end
+    end
 
-          it { is_expected.to be(ldu.name) }
-        end
+    describe '#ldu_name' do
+      let(:field) { :ldu_name }
 
-        context 'without a local delivery unit' do
-          let(:case_info) { create(:case_information, local_delivery_unit: nil) }
+      context 'with a local delivery unit' do
+        let(:ldu) { create(:local_delivery_unit) }
+        let(:case_info) { create(:case_information, local_delivery_unit: ldu) }
 
-          it { is_expected.to be_nil }
-        end
+        it { is_expected.to be(ldu.name) }
       end
 
-      describe '#ldu_email_address' do
-        let(:field) { :ldu_email_address }
+      context 'without a local delivery unit' do
+        let(:case_info) { create(:case_information, local_delivery_unit: nil) }
 
-        context 'with a local delivery unit' do
-          let(:ldu) { create(:local_delivery_unit) }
-          let(:case_info) { create(:case_information, local_delivery_unit: ldu) }
+        it { is_expected.to be_nil }
+      end
+    end
 
-          it { is_expected.to be(ldu.email_address) }
-        end
+    describe '#ldu_email_address' do
+      let(:field) { :ldu_email_address }
 
-        context 'without a local delivery unit' do
-          let(:case_info) { create(:case_information, local_delivery_unit: nil) }
+      context 'with a local delivery unit' do
+        let(:ldu) { create(:local_delivery_unit) }
+        let(:case_info) { create(:case_information, local_delivery_unit: ldu) }
 
-          it { is_expected.to be_nil }
-        end
+        it { is_expected.to be(ldu.email_address) }
       end
 
-      describe '#team_name' do
-        let(:field) { :team_name }
+      context 'without a local delivery unit' do
+        let(:case_info) { create(:case_information, local_delivery_unit: nil) }
 
-        it { is_expected.to be(case_info.team_name) }
+        it { is_expected.to be_nil }
       end
+    end
 
-      describe '#allocated_com_name' do
-        let(:case_info) { create(:case_information, :with_com) }
-        let(:field) { :allocated_com_name }
+    describe '#team_name' do
+      let(:field) { :team_name }
 
-        it { is_expected.to be(case_info.com_name) }
-      end
+      it { is_expected.to be(case_info.team_name) }
+    end
+
+    describe '#allocated_com_name' do
+      let(:case_info) { create(:case_information, :with_com) }
+      let(:field) { :allocated_com_name }
+
+      it { is_expected.to be(case_info.com_name) }
     end
   end
 
@@ -381,7 +358,7 @@ describe HmppsApi::Offender do
     let(:case_info) { build(:case_information) }
 
     context 'when the Community is not involved yet' do
-      let(:sentence) { build(:sentence_detail, :handover_in_8_days) }
+      let(:sentence) { attributes_for(:sentence_detail, :handover_in_8_days) }
 
       it 'returns false' do
         expect(subject).to be(false)
@@ -389,7 +366,7 @@ describe HmppsApi::Offender do
     end
 
     context 'when the Community is involved' do
-      let(:sentence) { build(:sentence_detail, conditionalReleaseDate: Time.zone.today + 7.months) }
+      let(:sentence) { attributes_for(:sentence_detail, conditionalReleaseDate: Time.zone.today + 7.months) }
 
       context 'when a COM is already allocated' do
         let(:case_info) { build(:case_information, :with_com) }

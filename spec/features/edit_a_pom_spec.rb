@@ -12,7 +12,7 @@ feature "edit a POM's details" do
         build(:pom, :probation_officer)
       ]
     }
-    let(:offenders) { build_list(:nomis_offender, 2, agencyId: prison.code) }
+    let(:offenders) { build_list(:nomis_offender, 2, prisonId: prison.code) }
 
     before do
       stub_pom(spo)

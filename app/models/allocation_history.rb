@@ -146,8 +146,9 @@ private
 
     # If the offender has been released from prison, OffenderService.get_offender will return nil (due to "OUT" being an unrecognised Prison)
     # So instead we'll call the Prison API directly to get just the Prison record of the offender. We don't need a full MpcOffender object.
+    # We'll also ignore the offender's legal status, in case they're now on remand / unsentenced / now serving a civil sentence.
     # We only need the offender's name, so this is enough for us.
-    offender = HmppsApi::PrisonApi::OffenderApi.get_offender(nomis_offender_id)
+    offender = HmppsApi::PrisonApi::OffenderApi.get_offender(nomis_offender_id, ignore_legal_status: true)
 
     mail_params = {
         email: primary_pom.email_address,

@@ -3,10 +3,9 @@
 FactoryBot.define do
   factory :sentence_detail, class: 'HmppsApi::SentenceDetail' do
     initialize_with do
-      # remove nils (as it confuses HmppsApi::SentenceDetail) and convert dates to strings (just in case test forgets)
-      values_hash = attributes.except(:imprisonmentStatus).reject { |_k, v| v.nil? }.map { |k, v| [k.to_s, v.to_s] }.to_h
-      HmppsApi::SentenceDetail.new values_hash,
-                                   attributes.stringify_keys
+      # run attributes through JSON for a more realistic payload
+      values_hash = JSON.parse(attributes.to_json)
+      HmppsApi::SentenceDetail.new values_hash
     end
 
     imprisonmentStatus { 'SEC90' }

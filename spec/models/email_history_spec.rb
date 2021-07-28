@@ -6,7 +6,7 @@ RSpec.describe EmailHistory, type: :model do
   describe '.sent_within_current_sentence' do
     subject { described_class.sent_within_current_sentence(nomis_offender, event) }
 
-    let(:nomis_offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, sentenceStartDate: 7.days.ago)) }
+    let(:nomis_offender) { build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, sentenceStartDate: 7.days.ago)) }
     let(:some_other_offender) { build(:hmpps_api_offender) }
 
     let(:event) { EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION }

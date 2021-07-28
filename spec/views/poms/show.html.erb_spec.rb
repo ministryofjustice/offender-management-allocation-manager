@@ -46,10 +46,10 @@ RSpec.describe "poms/show", type: :view do
                updated_at: Time.zone.today - 8.days, primary_pom_allocated_at: Time.zone.today - 8.days)
       ]
     }
-    let(:api_one) { build(:hmpps_api_offender, sentence: build(:sentence_detail, releaseDate: Time.zone.today + 2.weeks)) }
-    let(:api_two) { build(:hmpps_api_offender, sentence: build(:sentence_detail, releaseDate: Time.zone.today + 5.weeks)) }
-    let(:api_three) { build(:hmpps_api_offender, sentence: build(:sentence_detail, releaseDate: Time.zone.today + 8.weeks)) }
-    let(:api_four) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate)) }
+    let(:api_one) { build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, releaseDate: Time.zone.today + 2.weeks)) }
+    let(:api_two) { build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, releaseDate: Time.zone.today + 5.weeks)) }
+    let(:api_three) { build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, releaseDate: Time.zone.today + 8.weeks)) }
+    let(:api_four) { build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :indeterminate)) }
     let(:offenders) {
       [api_one, api_two, api_three, api_four].map { |api_offender|
         build(:mpc_offender, prison_record: api_offender, offender: build(:case_information).offender, prison: prison)
@@ -76,7 +76,7 @@ RSpec.describe "poms/show", type: :view do
 
   context 'when on the caseload tab' do
     let(:case_info) { create(:case_information) }
-    let(:api_offender) { build(:hmpps_api_offender, offenderNo: case_info.nomis_offender_id) }
+    let(:api_offender) { build(:hmpps_api_offender, prisonerNumber: case_info.nomis_offender_id) }
     let(:offender) { build(:mpc_offender, prison_record: api_offender, offender: case_info.offender, prison: prison) }
     let(:allocations) { [build(:allocation_history, nomis_offender_id: case_info.nomis_offender_id, secondary_pom_nomis_id: pom.staff_id)] }
 
@@ -97,7 +97,7 @@ RSpec.describe "poms/show", type: :view do
       expect(first_offender_row).
         to eq [
                 [offender.full_name, case_info.nomis_offender_id],
-                "N/A",
+                offender.cell_location,
                 case_info.tier,
                 offender.earliest_release_date.to_s(:rfc822),
                 Time.zone.today.to_s(:rfc822),

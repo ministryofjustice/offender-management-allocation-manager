@@ -7,15 +7,15 @@ feature 'email history' do
   context 'when offender has less than 10 months left to serve' do
     let(:nomis_offender) {
       build(:nomis_offender,
-            agencyId: prison.code,
+            prisonId: prison.code,
             sentence: attributes_for(:sentence_detail, :less_than_10_months_to_serve))
     }
-    let(:offender_no) { nomis_offender.fetch(:offenderNo) }
+    let(:offender_no) { nomis_offender.fetch(:prisonerNumber) }
 
     before do
       stub_auth_token
       stub_offenders_for_prison(prison.code, [nomis_offender])
-      stub_movements_for nomis_offender.fetch(:offenderNo), attributes_for_list(:movement, 1, toAgency: prison.code)
+      stub_movements_for nomis_offender.fetch(:prisonerNumber), attributes_for_list(:movement, 1, toAgency: prison.code)
 
       stub_poms(prison.code, [user])
       stub_keyworker prison.code, offender_no, build(:keyworker)

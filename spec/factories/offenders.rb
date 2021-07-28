@@ -2,22 +2,26 @@
 
 FactoryBot.define do
   factory :nomis_offender, class: Hash do
-    initialize_with { attributes }
+    initialize_with {
+      # convert values to JSON primitives (e.g. Date to String)
+      attrs = JSON.parse(attributes.to_json).deep_symbolize_keys
+      attrs.except(:sentence).merge(attrs.fetch(:sentence, {}))
+    }
 
-    currentlyInPrison { 'Y' }
+    inOutStatus { 'IN' }
     imprisonmentStatus { 'SENT03' }
-    agencyId { 'LEI' }
+    prisonId { 'LEI' }
 
     # cell location is the format <1 letter>-<1 number>-<3 numbers> e.g 'E-4-014'
-    internalLocation {
+    cellLocation {
       block = Faker::Alphanumeric.alpha(number: 1).upcase
       num = Faker::Number.non_zero_digit
       numbers = Faker::Number.leading_zero_number(digits: 3)
       "#{block}-#{num}-#{numbers}"
     }
 
-    offenderNo { generate :nomis_offender_id }
-    convictedStatus { 'Convicted' }
+    prisonerNumber { generate :nomis_offender_id }
+    legalStatus { 'SENTENCED' }
     dateOfBirth { Date.new(1990, 12, 6).to_s }
     firstName { Faker::Name.first_name }
     # We have some issues with corrupting the display
@@ -26,7 +30,6 @@ FactoryBot.define do
     # in tests, as ruby sort isn't stable by default
     sequence(:lastName) { |c| "#{Faker::Name.last_name.titleize}_#{c}" }
     category { attributes_for(:offender_category, :cat_c) }
-    recall { false }
 
     sentence do
       attributes_for :sentence_detail
@@ -35,6 +38,12 @@ FactoryBot.define do
     complexityLevel { 'medium' }
 
     sequence(:bookingId) { |c| c + 100_000 }
+
+    # Use in conjunction with the :rotl trait on :movement
+    trait :rotl do
+      inOutStatus { 'OUT' }
+      lastMovementTypeCode { 'TAP' }
+    end
   end
 
   factory :offender do

@@ -1,18 +1,18 @@
 require 'rails_helper'
 
 RSpec.feature "Update case information", type: :feature do
-  let(:offender) { build(:nomis_offender, complexityLevel: 'high', agencyId: prison.code) }
+  let(:offender) { build(:nomis_offender, complexityLevel: 'high', prisonId: prison.code) }
   let(:offenders) { [offender] }
   let(:pom) { build(:pom) }
   let(:spo) { build(:pom) }
   let(:prison) { create(:prison) }
-  let(:offender_no) { offender.fetch(:offenderNo) }
+  let(:offender_no) { offender.fetch(:prisonerNumber) }
 
   before do
     stub_offenders_for_prison(prison.code, offenders)
     stub_signin_spo(spo, [prison.code])
     stub_poms(prison.code, [pom, spo])
-    stub_keyworker(prison.code, offender.fetch(:offenderNo), build(:keyworker))
+    stub_keyworker(prison.code, offender.fetch(:prisonerNumber), build(:keyworker))
   end
 
   context 'when there is a new allocation' do

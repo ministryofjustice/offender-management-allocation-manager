@@ -7,13 +7,13 @@ feature 'early allocation when crossing 18 month threshold' do
   let(:user) { build(:pom) }
 
   context 'when early allocation prisoner transitions from > 18 months to < 18 months from release' do
-    let(:nomis_offender) { build(:nomis_offender, agencyId: prison.code) }
-    let(:offender_no) { nomis_offender.fetch(:offenderNo) }
+    let(:nomis_offender) { build(:nomis_offender, prisonId: prison.code) }
+    let(:offender_no) { nomis_offender.fetch(:prisonerNumber) }
 
     before do
       stub_auth_token
       stub_offenders_for_prison(prison.code, [nomis_offender])
-      stub_movements_for nomis_offender.fetch(:offenderNo), attributes_for_list(:movement, 1, toAgency: prison.code)
+      stub_movements_for nomis_offender.fetch(:prisonerNumber), attributes_for_list(:movement, 1, toAgency: prison.code)
       stub_poms(prison.code, [user])
       stub_keyworker prison.code, offender_no, build(:keyworker)
 

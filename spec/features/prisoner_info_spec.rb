@@ -210,12 +210,12 @@ feature 'View a prisoner profile page' do
           vcr: { cassette_name: 'prison_api/no_sentence_start_date_for_offender' } do
     let(:api_non_sentenced_offender) do
       build(:hmpps_api_offender,
-            agencyId: prison.code,
-            offenderNo: 'G7266VD',
+            prisonId: prison.code,
+            prisonerNumber: 'G7266VD',
             imprisonmentStatus: 'SEC90',
-            sentence: build(:sentence_detail,
-                            releaseDate: 3.years.from_now.iso8601,
-                            sentenceStartDate: nil))
+            sentence: attributes_for(:sentence_detail,
+                                     releaseDate: 3.years.from_now.iso8601,
+                                     sentenceStartDate: nil))
     end
     let(:case_info) { create(:case_information, case_allocation: CaseInformation::NPS, offender: build(:offender, nomis_offender_id: 'G7998GJ')) }
     let(:non_sentenced_offender) {
@@ -241,10 +241,10 @@ feature 'View a prisoner profile page' do
     }
 
     let(:nomis_offender) {
-      build(:nomis_offender, agencyId: prison.code, sentence: attributes_for(:sentence_detail, :inside_handover_window))
+      build(:nomis_offender, prisonId: prison.code, sentence: attributes_for(:sentence_detail, :inside_handover_window))
     }
 
-    let(:nomis_offender_id) { nomis_offender.fetch(:offenderNo) }
+    let(:nomis_offender_id) { nomis_offender.fetch(:prisonerNumber) }
     let!(:prison) { create(:prison) }
 
     before do

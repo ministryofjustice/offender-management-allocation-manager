@@ -30,11 +30,11 @@ RSpec.describe CaseloadHandoversController, :allocation, type: :controller do
     before do
       stub_offenders_for_prison(prison, [offender, handover_offender])
 
-      create(:case_information, case_allocation: case_allocation, offender: build(:offender, nomis_offender_id: offender.fetch(:offenderNo)))
-      create(:allocation_history, nomis_offender_id: offender.fetch(:offenderNo), primary_pom_nomis_id: pom.staffId, prison: prison)
+      create(:case_information, case_allocation: case_allocation, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
+      create(:allocation_history, nomis_offender_id: offender.fetch(:prisonerNumber), primary_pom_nomis_id: pom.staffId, prison: prison)
 
-      create(:case_information, case_allocation: case_allocation, offender: build(:offender, nomis_offender_id: handover_offender.fetch(:offenderNo)))
-      create(:allocation_history, nomis_offender_id: handover_offender.fetch(:offenderNo), primary_pom_nomis_id: pom.staffId, prison: prison)
+      create(:case_information, case_allocation: case_allocation, offender: build(:offender, nomis_offender_id: handover_offender.fetch(:prisonerNumber)))
+      create(:allocation_history, nomis_offender_id: handover_offender.fetch(:prisonerNumber), primary_pom_nomis_id: pom.staffId, prison: prison)
     end
 
     context 'with POM role' do
@@ -45,7 +45,7 @@ RSpec.describe CaseloadHandoversController, :allocation, type: :controller do
       it 'retrieves just offenders due for handover' do
         get :index, params: { prison_id: prison, staff_id: staff_id }
         expect(response).to be_successful
-        expect(assigns(:offenders).map(&:offender_no)).to match_array([offender.fetch(:offenderNo)])
+        expect(assigns(:offenders).map(&:offender_no)).to match_array([offender.fetch(:prisonerNumber)])
       end
     end
 
@@ -60,7 +60,7 @@ RSpec.describe CaseloadHandoversController, :allocation, type: :controller do
         get :index, params: { prison_id: prison, staff_id: staff_id }
         expect(response).to have_http_status(200)
         expect(response).to be_successful
-        expect(assigns(:offenders).map(&:offender_no)).to match_array([offender.fetch(:offenderNo)])
+        expect(assigns(:offenders).map(&:offender_no)).to match_array([offender.fetch(:prisonerNumber)])
       end
     end
   end

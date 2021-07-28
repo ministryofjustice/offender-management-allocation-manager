@@ -77,7 +77,7 @@ describe AllocationService do
         stub_request(:get, "#{ApiHelper::T3}/users/MOIC_POM").
           to_return(body: { staffId: 1, firstName: "MOIC", lastName: 'POM' }.to_json)
         stub_pom_emails 1, []
-        stub_offender(build(:nomis_offender, agencyId: prison_code, offenderNo: nomis_offender_id))
+        stub_offender(build(:nomis_offender, prisonId: prison_code, prisonerNumber: nomis_offender_id))
         stub_poms prison_code, [pom]
       end
 

@@ -4,10 +4,10 @@ require "rails_helper"
 
 feature "womens missing info journey" do
   let(:prison) { create(:womens_prison) }
-  let(:offenders) { build_list(:nomis_offender, 2, agencyId: prison.code, complexityLevel: complexity) }
+  let(:offenders) { build_list(:nomis_offender, 2, prisonId: prison.code, complexityLevel: complexity) }
   let(:offender) { offenders.first }
-  let(:prisoner_id) { offender.fetch(:offenderNo) }
-  let(:second_prisoner_id) { offenders.last.fetch(:offenderNo) }
+  let(:prisoner_id) { offender.fetch(:prisonerNumber) }
+  let(:second_prisoner_id) { offenders.last.fetch(:prisonerNumber) }
   let(:user) { build(:pom) }
   let(:username) { 'MOIC_POM' }
 

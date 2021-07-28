@@ -16,7 +16,7 @@ module HmppsApi
       def search_client
         host = Rails.configuration.prisoner_search_host
         # Prison Search API uses POSTs as fake GETs so its ok to retry them
-        HmppsApi::Client.new(host + '/prisoner-search', extra_retry_methods: [:post])
+        HmppsApi::Client.new(host, extra_retry_methods: [:post])
       end
 
       def api_deserialiser

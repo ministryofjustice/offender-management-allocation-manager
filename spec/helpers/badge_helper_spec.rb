@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe BadgeHelper, type: :helper do
   context 'when determinate' do
-    let(:offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :determinate)) }
+    let(:offender) { build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :determinate)) }
 
     it 'is blue' do
       expect(helper.badge_colour(offender)).to eq 'blue'
@@ -16,7 +16,7 @@ RSpec.describe BadgeHelper, type: :helper do
   end
 
   context 'when indeterminate' do
-    let(:offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate)) }
+    let(:offender) { build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :indeterminate)) }
 
     it 'is purple' do
       expect(helper.badge_colour(offender)).to eq 'purple'

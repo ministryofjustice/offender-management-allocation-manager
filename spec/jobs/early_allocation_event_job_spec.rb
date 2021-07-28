@@ -6,7 +6,7 @@ RSpec.describe EarlyAllocationEventJob, type: :job do
 
   context 'when the offender exists in NOMIS' do
     before do
-      stub_offender(build(:nomis_offender, offenderNo: offender.nomis_offender_id, agencyId: prison.code))
+      stub_offender(build(:nomis_offender, prisonerNumber: offender.nomis_offender_id, prisonId: prison.code))
       expect(EarlyAllocationEventService).to receive(:send_early_allocation)
     end
 

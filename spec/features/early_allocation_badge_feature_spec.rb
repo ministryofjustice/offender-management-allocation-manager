@@ -5,12 +5,12 @@ require 'rails_helper'
 feature 'early allocation badges' do
   let(:prison) { create(:prison) }
   let(:nomis_offender) {
-    build(:nomis_offender, agencyId: prison.code,
-                               sentence: attributes_for(:sentence_detail,
-                                                        conditionalReleaseDate: release_date,
-                                                        sentenceStartDate: sentence_start))
+    build(:nomis_offender, prisonId: prison.code,
+          sentence: attributes_for(:sentence_detail,
+                                   conditionalReleaseDate: release_date,
+                                   sentenceStartDate: sentence_start))
   }
-  let(:offender_no) { nomis_offender.fetch(:offenderNo) }
+  let(:offender_no) { nomis_offender.fetch(:prisonerNumber) }
   let(:notes_badge) { 'EARLY ALLOCATION ASSESSMENT SAVED' }
   let(:active_badge) { 'EARLY ALLOCATION DECISION PENDING' }
   let(:approved_badge) { 'EARLY ALLOCATION ELIGIBLE' }
@@ -25,7 +25,7 @@ feature 'early allocation badges' do
 
     create(:case_information,
            offender: build(:offender, nomis_offender_id: offender_no,
-           early_allocations: [early_allocation]))
+                           early_allocations: [early_allocation]))
     visit prison_prisoner_path(prison.code, offender_no)
   end
 

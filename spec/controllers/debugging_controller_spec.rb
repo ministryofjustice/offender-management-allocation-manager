@@ -16,7 +16,7 @@ RSpec.describe DebuggingController, type: :controller do
     let(:primary_pom_name) { 'Jenae Sporer' }
 
     it 'can show debugging information for a specific offender' do
-      stub_offender(build(:nomis_offender, agencyId: prison.code, sentence: attributes_for(:sentence_detail, :indeterminate), offenderNo: offender_no))
+      stub_offender(build(:nomis_offender, prisonId: prison.code, sentence: attributes_for(:sentence_detail, :indeterminate), prisonerNumber: offender_no))
 
       stub_movements_for offender_no, [attributes_for(:movement, offenderNo: offender_no,
                                        fromAgency: "LEI",

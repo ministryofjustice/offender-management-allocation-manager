@@ -83,7 +83,7 @@ RSpec.describe DashboardController, type: :controller do
           # create offenders with case_information so that they display as un-allocated
           before do
             offenders.each do |offender|
-              create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:offenderNo)))
+              create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
             end
           end
 
@@ -121,7 +121,7 @@ RSpec.describe DashboardController, type: :controller do
 
           before do
             offenders.each do |offender|
-              create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:offenderNo)))
+              create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
             end
           end
 
@@ -159,21 +159,19 @@ RSpec.describe DashboardController, type: :controller do
         end
 
         context 'when the count is 0' do
-          context 'when the count is 0' do
-            # creates no offenders
-            let(:offenders) { build_list(:nomis_offender, 0) }
+          # creates no offenders
+          let(:offenders) { build_list(:nomis_offender, 0) }
 
-            it 'displays the number of cases that have missing details' do
+          it 'displays the number of cases that have missing details' do
+            get :index, params: { prison_id: prison }
+            expect(assigns(:missing_details_cases_count)).to eq 0
+          end
+
+          context 'with render views' do
+            render_views
+            it 'displays the number of cases that having missing details' do
               get :index, params: { prison_id: prison }
-              expect(assigns(:missing_details_cases_count)).to eq 0
-            end
-
-            context 'with render views' do
-              render_views
-              it 'displays the number of cases that having missing details' do
-                get :index, params: { prison_id: prison }
-                expect(response.body).to include 'None of your cases are missing information right now.'
-              end
+              expect(response.body).to include 'None of your cases are missing information right now.'
             end
           end
         end

@@ -41,7 +41,7 @@ RSpec.describe OffenderHelper do
     end
 
     context 'when supporting' do
-      let(:api_offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :determinate_recall)) }
+      let(:api_offender) { build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :determinate_recall)) }
 
       it 'shows supporting' do
         expect(helper.pom_responsibility_label(offender)).to eq('Supporting')
@@ -52,11 +52,9 @@ RSpec.describe OffenderHelper do
   describe 'generates labels for case owner ' do
     context 'when Prison' do
       let(:api_offender) {
-        build(:hmpps_api_offender).tap { |o|
-          o.sentence = build(:sentence_detail,
-                             sentenceStartDate: Time.zone.today - 20.months,
-                             automaticReleaseDate: Time.zone.today + 20.months)
-        }
+        build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail,
+                                                            sentenceStartDate: Time.zone.today - 20.months,
+                                                            automaticReleaseDate: Time.zone.today + 20.months))
       }
 
       it 'shows custody' do
@@ -66,9 +64,7 @@ RSpec.describe OffenderHelper do
 
     context 'when Probation' do
       let(:api_offender) {
-        build(:hmpps_api_offender).tap { |o|
-          o.sentence = build(:sentence_detail, automaticReleaseDate: Time.zone.today)
-        }
+        build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, automaticReleaseDate: Time.zone.today))
       }
 
       it 'shows community' do
@@ -105,7 +101,7 @@ RSpec.describe OffenderHelper do
     end
 
     context 'when a probation POM' do
-      let(:api_offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :indeterminate)) }
+      let(:api_offender) { build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :indeterminate)) }
       let(:offender) {
         build(:mpc_offender, prison: prison, prison_record: api_offender, offender: build(:case_information, tier: 'A').offender)
       }

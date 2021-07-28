@@ -30,7 +30,7 @@ feature 'Search for offenders' do
   context "with female prison" do
     let(:prison) { create(:womens_prison) }
     let(:prison_code) { prison.code }
-    let(:offenders) { build_list(:nomis_offender, 5, agencyId: prison.code, complexityLevel: 'high') }
+    let(:offenders) { build_list(:nomis_offender, 5, prisonId: prison.code, complexityLevel: 'high') }
     let(:pom) { build(:pom) }
 
     before do
