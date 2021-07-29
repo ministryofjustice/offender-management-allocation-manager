@@ -16,6 +16,13 @@ spec:
               image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
               imagePullPolicy: Always
               command: ['sh', '-c', "bundle exec rake community_api:import"]
+              resources:
+                limits:
+                  memory: "1500Mi"
+                  cpu: "1000m"
+                requests:
+                  memory: "500Mi"
+                  cpu: "100m"
               envFrom:
                 - configMapRef:
                     name: shared-environment
