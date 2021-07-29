@@ -107,7 +107,7 @@ spec:
               memory: "500Mi"
               cpu: "100m"
           envFrom:
-              - configMapRef:
+            - configMapRef:
                 name: shared-environment
             - secretRef:
                 name: allocation-manager-secrets
