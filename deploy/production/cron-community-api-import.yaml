@@ -16,6 +16,13 @@ spec:
               image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
               imagePullPolicy: Always
               command: ['sh', '-c', "bundle exec rake community_api:import"]
+              resources:
+                limits:
+                  memory: "1500Mi"
+                  cpu: "1000m"
+                requests:
+                  memory: "500Mi"
+                  cpu: "100m"
               envFrom:
                 - configMapRef:
                     name: shared-environment
@@ -49,5 +56,20 @@ spec:
                     secretKeyRef:
                       name: elasticache-offender-management-allocation-manager-token-cache-production
                       key: url
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: hmpps-domain-events-topic
+                      key: access_key_id
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: hmpps-domain-events-topic
+                      key: secret_access_key
+                - name: DOMAIN_EVENTS_TOPIC_ARN
+                  valueFrom:
+                    secretKeyRef:
+                      name: hmpps-domain-events-topic
+                      key: topic_arn
           restartPolicy: OnFailure
 
