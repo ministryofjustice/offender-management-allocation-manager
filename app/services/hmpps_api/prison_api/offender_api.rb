@@ -5,6 +5,12 @@ module HmppsApi
     class OffenderApi
       extend PrisonApiClient
 
+      def self.new_list(prison)
+        # Do some stuff
+
+        # Return an Enumerator...?
+      end
+
       def self.list(prison, page = 0, page_size: 20)
         route = "/locations/description/#{prison}/inmates"
 
@@ -55,6 +61,179 @@ module HmppsApi
           }
         end
         ApiPaginatedResponse.new(total_pages, offenders)
+      end
+
+      def self.list_from_prison(prison_code)
+        route = "/locations/description/#{prison_code}/inmates"
+        queryparams = { 'convictedStatus' => 'Convicted' }
+
+        fetch_data = lambda { |page:, size:|
+          page_offset = page * size
+          hdrs = paging_headers(size, page_offset)
+
+          client.get(
+            route, queryparams: queryparams, extra_headers: hdrs
+          ) { |json, response|
+            # Work out if this is the last page
+            # Push it to the JSON array response, so we can grab it in the Enumerator (hacky but it works)
+            total_records = response.headers['Total-Records'].to_i
+            page_offset = response.headers['Page-Offset'].to_i
+            page_limit = response.headers['Page-Limit'].to_i
+
+            last_page = total_records <= (page_offset + page_limit)
+            json << last_page
+          }
+        }
+
+        Enumerator.new do |yielder|
+          page = 0
+
+          loop do
+            results = fetch_data.call(page: page, size: 200)
+
+            # The last element of the array will be a boolean telling us whether we're on the last page
+            last_page = results.pop
+
+            results.map { |offender| yielder << offender }
+
+            if last_page
+              # We're on the last page of results – stop iteration
+              raise StopIteration
+            else
+              # Increment the page number for the next iteration
+              page += 1
+            end
+          end
+        end
+      end
+
+      def self.list_from_search(prison_code)
+        route = "/prisoner-search/prison/#{prison_code}"
+
+        fetch_data = lambda { |page:, size:|
+          # This API call requires a "Content-Type: application/json" header even though it's a GET request with no body
+          search_client.get(route, queryparams: { page: page, size: size }, extra_headers: {'Content-Type': 'application/json'})
+        }
+
+        make_offenders = lambda { |search_offenders|
+          offender_ids = search_offenders.map { |o| o.fetch('prisonerNumber') }
+          prison_offenders = get_multiple_offenders(offender_ids).to_a.each_with_object({}) do |offender, hash|
+            offender_id = offender.fetch('offenderNo')
+            hash[offender_id] = offender
+          end
+          offender_categories = get_offender_categories(offender_ids)
+
+          search_offenders.map do |search_offender|
+            offender_id = search_offender.fetch('prisonerNumber')
+            prison_offender = prison_offenders[offender_id]
+            category = offender_categories[offender_id]
+
+            return nil if prison_offender.blank? || category.blank?
+
+
+          end
+        }
+
+        Enumerator.new do |yielder|
+          page = 0
+
+          loop do
+            results = fetch_data.call(page: page, size: 200)
+
+            results.fetch('content')
+                   .reject { |offender| %w[REMAND UNKNOWN].include?(offender.fetch('legalStatus')) }
+                   .map { |offender| yielder << offender }
+
+            if results.fetch('last') == true
+              # We're on the last page of results – stop iteration
+              raise StopIteration
+            else
+              # Increment the page number for the next iteration
+              page += 1
+            end
+          end
+        end
+      end
+
+      def self.list_restricted_patients(prison_code)
+        route = '/restricted-patient-search/match-restricted-patients'
+        request_body = { supportingPrisonIds: [prison_code] }
+
+        fetch_data = lambda { |page:, size:|
+          # This POST is a GET in disguise, so it's safe to cache
+          search_client.post(route, request_body, queryparams: { page: page, size: size }, cache: true)
+        }
+
+        Enumerator.new do |yielder|
+          page = 0
+
+          loop do
+            results = fetch_data.call(page: page, size: 200)
+
+            results.fetch('content')
+                   .reject { |offender| %w[REMAND UNKNOWN].include?(offender.fetch('legalStatus')) }
+                   .map { |offender| yielder << offender }
+
+            if results.fetch('last') == true
+              # We're on the last page of results – stop iteration
+              raise StopIteration
+            else
+              # Increment the page number for the next iteration
+              page += 1
+            end
+          end
+        end
+      end
+
+      # offender_nos = %w[A5081DY G0056VW G0162GG G0259UG G0594UC G0634UK G0745GW G1039VD G1148GU G1462GK G1681GT G1850VC G2348UE G2703UQ G2747UI G3045GO G3185GG G3391UH G3554VD G3912UW G4132VH G4545UV G4780GF G4790GD G4992VN G5010UC G5254GW G5662VR G6089GH G6158VX G6280VV G6378VW G6390GW G6523GW G7276VD G7283VI G7351GO G7850GC G8085GN G8328VW G8337GK G8424GW G8545UF G8961UQ G9205VV G9212VE G9260GN G9501GX G9701UJ G9739VA]
+      # offender_nos = Prison.all.limit(5).map {|p| p.all_policy_offenders.map(&:offender_no) }.flatten
+      # HmppsApi::PrisonApi::OffenderApi.get_multiple_offenders(offender_nos).count
+      def self.get_multiple_offenders(offender_nos, page_size = 200)
+        route = "/prisoners"
+        request_body = { offenderNos: offender_nos }
+
+        # The API only accepts up to 1000 offender IDs at once
+        # Consider chunking these requests...?
+        # Or will we not use them this way in practice? Maybe not. KISS.
+
+        fetch_data = lambda { |page:, size:|
+          page_offset = page * size
+          hdrs = paging_headers(size, page_offset)
+
+          client.post(
+            route, request_body, extra_headers: hdrs
+          ) { |json, response|
+            # Work out if this is the last page
+            # Push it to the JSON array response, so we can grab it in the Enumerator (hacky but it works)
+            total_records = response.headers['Total-Records'].to_i
+            page_offset = response.headers['Page-Offset'].to_i
+            page_limit = response.headers['Page-Limit'].to_i
+
+            last_page = total_records <= (page_offset + page_limit)
+            json << last_page
+          }
+        }
+
+        Enumerator.new do |yielder|
+          page = 0
+
+          loop do
+            results = fetch_data.call(page: page, size: page_size)
+
+            # The last element of the array will be a boolean telling us whether we're on the last page
+            last_page = results.pop
+
+            results.map { |offender| yielder << offender }
+
+            if last_page
+              # We're on the last page of results – stop iteration
+              raise StopIteration
+            else
+              # Increment the page number for the next iteration
+              page += 1
+            end
+          end
+        end
       end
 
       def self.get_offender(raw_offender_no)
@@ -178,7 +357,7 @@ module HmppsApi
     private
 
       def self.get_search_payload(offender_nos)
-        search_route = '/prisoner-numbers'
+        search_route = '/prisoner-search/prisoner-numbers'
         search_client.post(search_route, { prisonerNumbers: offender_nos }, cache: true)
                                      .index_by { |prisoner| prisoner.fetch('prisonerNumber') }
       end

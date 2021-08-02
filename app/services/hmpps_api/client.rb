@@ -59,7 +59,13 @@ module HmppsApi
         :post, route, queryparams: queryparams, extra_headers: extra_headers, body: body, cache: cache
       )
 
-      JSON.parse(response.body)
+      data = JSON.parse(response.body)
+
+      if block_given?
+        yield data, response
+      end
+
+      data
     end
 
     def put(route, body, queryparams: {}, extra_headers: {})
