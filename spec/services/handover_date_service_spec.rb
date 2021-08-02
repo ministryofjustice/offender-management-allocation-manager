@@ -109,7 +109,7 @@ describe HandoverDateService do
         context 'when entering before the policy start date' do
           let(:sentence_start_date) { womens_policy_start_date - 1.day }
 
-          context 'with release on or after 30/9/2022' do
+          context 'with release on or after the cutoff date 30/9/2022' do
             let(:crd) { Date.parse('30/09/2022') }
 
             it 'follows policy rules' do
@@ -117,12 +117,14 @@ describe HandoverDateService do
             end
           end
 
-          context 'with release before 30/9/2022' do
+          context 'with release before the cutoff date 30/9/2022' do
             let(:crd) { Date.parse('29/09/2022') }
 
             it 'follows pre-policy rules' do
               expect(pom).to be_supporting
               expect(com).to be_responsible
+              expect(start_date).to be_nil
+              expect(handover_date).to be_nil
             end
           end
         end

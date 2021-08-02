@@ -96,8 +96,8 @@ class HandoverDateService
           end
         else
           CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
-                           start_date: start_date, handover_date: handover_date,
-                           reason: reason
+                           start_date: nil, handover_date: nil,
+                           reason: :pre_cutoff_com_responsibility
         end
       end
     else
