@@ -6,7 +6,6 @@ describe HandoverDateService do
   subject { described_class.handover(offender) }
 
   let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
-  let(:test_strategy) { Flipflop::FeatureSet.current.test! }
   let(:pom) { HandoverDateService::Responsibility.new subject.custody_responsible?, subject.custody_supporting?  }
   let(:com) { HandoverDateService::Responsibility.new subject.community_responsible?, subject.community_supporting? }
   let(:start_date) { subject.start_date }
@@ -24,7 +23,7 @@ describe HandoverDateService do
   let(:arrival_date) { today }
   let(:welsh?) { false }
   let(:prison) { closed_prison }
-  let(:sentence_start_date) { build(:sentence_detail).sentence_start_date }
+  let(:sentence_start_date) { build(:sentence_detail, :english_policy_sentence).sentence_start_date }
 
   # Set the current date by changing the value of `today`
   before do

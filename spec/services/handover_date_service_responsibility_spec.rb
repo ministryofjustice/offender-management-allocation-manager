@@ -76,7 +76,8 @@ describe HandoverDateService do
 
     context 'when an immigration offender' do
       let(:offender) {
-        OpenStruct.new immigration_case?: true
+        OpenStruct.new immigration_case?: true,
+                       inside_omic_policy?: true
       }
 
       it 'will show the POM as supporting' do
@@ -87,7 +88,8 @@ describe HandoverDateService do
     context 'when an offender has been recalled' do
       let(:offender) {
         OpenStruct.new recalled?: true,
-                       automatic_release_date: Time.zone.today
+                       automatic_release_date: Time.zone.today,
+                       inside_omic_policy?: true
       }
 
       it 'will show the POM as supporting' do
@@ -97,7 +99,8 @@ describe HandoverDateService do
 
     context 'when an offender has been recalled & does not have any relevant release dates' do
       let(:offender) {
-        OpenStruct.new recalled?: true
+        OpenStruct.new recalled?: true,
+                       inside_omic_policy?: true
       }
 
       it 'will show the case as POM supporting' do
@@ -114,7 +117,7 @@ describe HandoverDateService do
                        conditional_release_date: nil,
                        home_detention_curfew_eligibility_date: nil,
                        parole_eligibility_date: nil,
-                       sentenced?: true
+                       inside_omic_policy?: true
       }
 
       it 'will default to responsible' do
@@ -127,7 +130,7 @@ describe HandoverDateService do
         OpenStruct.new indeterminate_sentence?: true,
                        recalled?: false,
                        tariff_date: Time.zone.today - 1.year,
-                       sentenced?: true
+                       inside_omic_policy?: true
       }
 
       it 'is responsible' do
@@ -140,7 +143,7 @@ describe HandoverDateService do
         OpenStruct.new immigration_case?: false,
                        indeterminate_sentence?: true,
                        tariff_date: nil,
-                       sentenced?: true
+                       inside_omic_policy?: true
       }
 
       it 'will default to responsible' do
@@ -155,7 +158,7 @@ describe HandoverDateService do
                         indeterminate_sentence?: true,
                         sentence_start_date: Time.zone.today,
                         tariff_date: Time.zone.today + 24.months,
-                        sentenced?: true
+                        inside_omic_policy?: true
       }
 
       it 'will calculate the responsibility using NPS rules' do
@@ -174,7 +177,8 @@ describe HandoverDateService do
                           automatic_release_date: ard,
                           conditional_release_date: crd,
                           home_detention_curfew_actual_date: hdcad,
-                          home_detention_curfew_eligibility_date: hdced
+                          home_detention_curfew_eligibility_date: hdced,
+                          inside_omic_policy?: true
         }
 
         context 'with less than 12 weeks left to serve with home_detention_curfew_eligibility_date' do
@@ -304,7 +308,7 @@ describe HandoverDateService do
                               sentence_start_date: sentence_start_date,
                               automatic_release_date: ard,
                               conditional_release_date: nil,
-                              sentenced?: true
+                              inside_omic_policy?: true
             }
 
             context 'with expected release on the cutoff date' do
@@ -332,7 +336,7 @@ describe HandoverDateService do
                 sentence_start_date: sentence_start_date,
                 automatic_release_date: ard,
                 conditional_release_date: nil,
-                sentenced?: true
+                inside_omic_policy?: true
               )
             }
 
@@ -384,7 +388,7 @@ describe HandoverDateService do
                               indeterminate_sentence?: false,
                               sentence_start_date: sentence_start_date,
                               parole_eligibility_date: ped,
-                              sentenced?: true
+                              inside_omic_policy?: true
             }
 
             context 'with more than 17 months left to serve' do
@@ -411,7 +415,7 @@ describe HandoverDateService do
                               indeterminate_sentence?: true,
                               sentence_start_date: sentence_start_date,
                               tariff_date: ted,
-                              sentenced?: true
+                              inside_omic_policy?: true
             }
 
             context 'with more than 17 months left to serve and handover in future' do
@@ -441,7 +445,8 @@ describe HandoverDateService do
                               welsh_offender: false,
                               sentence_start_date: Time.zone.today,
                               automatic_release_date: ard,
-                              conditional_release_date: crd
+                              conditional_release_date: crd,
+                              inside_omic_policy?: true
             }
 
             context 'with more than 10 months left to serve' do
@@ -469,7 +474,8 @@ describe HandoverDateService do
                               welsh_offender: false,
                               indeterminate_sentence?: false,
                               sentence_start_date: Time.zone.today,
-                              parole_eligibility_date: ped
+                              parole_eligibility_date: ped,
+                              inside_omic_policy?: true
             }
 
             context 'with more than 10 months left to service' do
@@ -495,7 +501,8 @@ describe HandoverDateService do
                               welsh_offender: false,
                               indeterminate_sentence?: true,
                               sentence_start_date: Time.zone.today,
-                              tariff_date: ted
+                              tariff_date: ted,
+                              inside_omic_policy?: true
             }
 
             context 'with more than 10 months left to serve' do
@@ -528,7 +535,7 @@ describe HandoverDateService do
                               sentence_start_date: sentence_start_date,
                               automatic_release_date: ard,
                               conditional_release_date: nil,
-                              sentenced?: true
+                              inside_omic_policy?: true
             }
 
             context 'when release date greater than cutoff date and within the handover window' do
@@ -578,7 +585,7 @@ describe HandoverDateService do
                               indeterminate_sentence?: false,
                               sentence_start_date: Time.zone.today,
                               parole_eligibility_date: ped,
-                              sentenced?: true
+                              inside_omic_policy?: true
             }
 
             context 'with more than 10 months left to serve' do
@@ -605,7 +612,7 @@ describe HandoverDateService do
                               indeterminate_sentence?: true,
                               sentence_start_date: sentence_start_date,
                               tariff_date: ted,
-                              sentenced?: true
+                              inside_omic_policy?: true
             }
 
             context 'with more than 15 months left to serve' do
@@ -648,7 +655,7 @@ describe HandoverDateService do
                               sentence_start_date: Time.zone.today,
                               automatic_release_date: ard,
                               conditional_release_date: crd,
-                              sentenced?: true
+                              inside_omic_policy?: true
             }
 
             context 'with more than 10 months left to serve' do
@@ -677,7 +684,7 @@ describe HandoverDateService do
                               indeterminate_sentence?: false,
                               sentence_start_date: Time.zone.today,
                               parole_eligibility_date: ped,
-                              sentenced?: true
+                              inside_omic_policy?: true
             }
 
             context 'with more than 10 months left to service' do
@@ -704,7 +711,7 @@ describe HandoverDateService do
                               indeterminate_sentence?: true,
                               sentence_start_date: Time.zone.today,
                               tariff_date: ted,
-                              sentenced?: true
+                              inside_omic_policy?: true
             }
 
             context 'with more than 10 months left to serve' do
@@ -737,7 +744,7 @@ describe HandoverDateService do
                        home_detention_curfew_eligibility_date: Time.zone.today - 1.month,
                        tariff_date: ted,
                        sentence_start_date: Time.zone.today - 2.months,
-                       sentenced?: true
+                       inside_omic_policy?: true
       }
 
       context 'with a NPS case' do
