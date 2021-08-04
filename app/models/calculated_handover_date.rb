@@ -11,8 +11,6 @@ class CalculatedHandoverDate < ApplicationRecord
     recall_case: 'Recall case',
     immigration_case: 'Immigration Case',
     release_date_unknown: 'Release Date Unknown',
-    open_prison_pre_omic_rules: 'Open Prison pre-OMIC Rules',
-    unsentenced: 'Unsentenced',
     crc_case: 'CRC Case',
     nps_early_allocation: 'NPS Early Allocation',
     nps_indeterminate: 'NPS Indeterminate',
@@ -21,7 +19,9 @@ class CalculatedHandoverDate < ApplicationRecord
     nps_mappa_unknown: 'NPS - MAPPA level unknown',
     nps_determinate_mappa_1_n: 'NPS Determinate Mappa 1/N',
     nps_determinate_mappa_2_3: 'NPS Determinate Mappa 2/3',
-    less_than_10_months_left_to_serve: 'Less than 10 months left to serve'
+    less_than_10_months_left_to_serve: 'Less than 10 months left to serve',
+    pre_omic_rules: 'Pre-OMIC rules',
+    not_inside_omic_policy: 'Not inside OMIC policy',
   }.stringify_keys.freeze
 
   belongs_to :offender,

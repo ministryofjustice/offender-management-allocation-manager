@@ -18,110 +18,77 @@ class HandoverDateService
 
   # if COM responsible, then handover dates all empty
   NO_HANDOVER_DATE = CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
-                                      start_date: nil, handover_date: nil,
-                                      reason: :com_responsibility
+                                                start_date: nil, handover_date: nil,
+                                                reason: :com_responsibility
 
   def self.handover(raw_offender)
     offender = OffenderWrapper.new(raw_offender)
 
-    if offender.recalled?
+    if !offender.inside_omic_policy?
       CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
-                       start_date: nil, handover_date: nil,
-                       reason: :recall_case
+                                 start_date: nil, handover_date: nil,
+                                 reason: :not_inside_omic_policy
+
+    elsif offender.recalled?
+      CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+                                 start_date: nil, handover_date: nil,
+                                 reason: :recall_case
 
     elsif offender.immigration_case?
       CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
-                       start_date: nil, handover_date: nil,
-                       reason: :immigration_case
+                                 start_date: nil, handover_date: nil,
+                                 reason: :immigration_case
 
     elsif offender.release_date.blank?
       CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
-                       start_date: nil, handover_date: nil,
-                       reason: :release_date_unknown
+                                 start_date: nil, handover_date: nil,
+                                 reason: :release_date_unknown
 
-    # Indeterminate offenders should only ever be NPS
-    # There is no such thing as a CRC indeterminate offender
-    # So in theory, it should be safe to assume that indeterminate offenders are NPS
-    # But in practice, there are some indeterminate offenders who are incorrectly recorded as CRC cases
-    # (likely due to HOMDs choosing CRC just to 'get past' the missing information screen when the offender isn't in nDelius)
-    # By using || here, we effectively ignore their CRC designation and treat them an NPS offender
-    elsif offender.nps_case? || offender.indeterminate_sentence?
-      if offender.in_open_conditions? && !offender.open_prison_rules_apply?
-        # Offender is in open prison under pre-OMIC rules – COM is always responsible
-        CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
-                         start_date: nil, handover_date: nil,
-                         reason: :open_prison_pre_omic_rules
-      else
-        handover_date, reason = nps_handover_date(offender)
-        start_date = nps_start_date(offender)
-        handover_date = start_date if start_date.present? && start_date > handover_date
+    elsif offender.crc_case?
+      # CRC cases don't have a 'handover window' – the 'start date' and 'handover date' are always the same
+      handover_date = offender.release_date - 12.weeks
+      CalculatedHandoverDate.new responsibility: responsibility(handover_date, handover_date),
+                                 start_date: handover_date, handover_date: handover_date,
+                                 reason: :crc_case
 
-        if offender.policy_case?
-          # we can't calculate responsibility if sentence_start_date is empty, so return NOT_INVOLVED rather than a page error
-          if offender.sentence_start_date.blank?
-            CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::UNKNOWN,
-                             start_date: nil, handover_date: nil,
-                             reason: :unsentenced
-          elsif offender.expected_time_in_custody_gt_10_months?
-            if handover_date > Time.zone.today
-              if com_responsibility(start_date, handover_date) == SUPPORTING
-                CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::CUSTODY_WITH_COM,
+    elsif !offender.expected_time_in_custody_gt_10_months?
+      # COM is always responsible if the expected time in custody is less than 10 months
+      CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+                                 start_date: nil, handover_date: nil,
+                                 reason: :less_than_10_months_left_to_serve
+
+    elsif offender.policy_case?
+      # Offender is NPS Determinate or Indeterminate
+      handover_date, reason = nps_handover_date(offender)
+      start_date = nps_start_date(offender)
+      handover_date = start_date if start_date.present? && start_date > handover_date
+
+      CalculatedHandoverDate.new responsibility: responsibility(start_date, handover_date),
                                  start_date: start_date, handover_date: handover_date,
                                  reason: reason
-              else
-                CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
-                                 start_date: start_date, handover_date: handover_date,
-                                 reason: reason
-              end
-            else
-              CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
-                               start_date: start_date, handover_date: handover_date,
-                               reason: reason
-            end
-          else
-            CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
-                             start_date: nil, handover_date: nil,
-                             reason: :less_than_10_months_left_to_serve
-          end
-        # pre-policy can only be responsible or supporting
-        elsif offender.nps_prepolicy_responsibility(handover_date) == RESPONSIBLE
-          if com_responsibility(start_date, handover_date) == SUPPORTING
-            CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::CUSTODY_WITH_COM,
-                             start_date: start_date, handover_date: handover_date,
-                             reason: reason
-          else
-            CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
-                             start_date: start_date, handover_date: handover_date,
-                             reason: reason
-          end
-        else
-          CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
-                           start_date: nil, handover_date: nil,
-                           reason: :pre_cutoff_com_responsibility
-        end
-      end
     else
-      # CRC case
-      crc_date = offender.release_date - 12.weeks
-      if crc_date.future?
-        CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
-                         start_date: crc_date, handover_date: crc_date,
-                         reason: :crc_case
-      else
-        CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
-                         start_date: crc_date, handover_date: crc_date,
-                         reason: :crc_case
-      end
+      # This is a pre-OMIC policy case
+      # e.g. they were sentenced before the OMIC policy start date and will be released before the cutoff date,
+      #      or they entered an Open prison before OMIC rules applied there
+      # COM is always responsible and there are no handover dates
+      CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+                                 start_date: nil, handover_date: nil,
+                                 reason: :pre_omic_rules
     end
   end
 
 private
 
-  def self.com_responsibility(start_date, handover_date)
-    if start_date.present? && handover_date.present? && Time.zone.today.between?(start_date, handover_date)
-      SUPPORTING
+  def self.responsibility(start_date, handover_date)
+    if start_date&.future? && handover_date&.future?
+      # POM responsible, no COM needed
+      CalculatedHandoverDate::CUSTODY_ONLY
+    elsif handover_date&.future?
+      # POM responsible, COM supporting
+      CalculatedHandoverDate::CUSTODY_WITH_COM
     else
-      NOT_INVOLVED
+      # POM supporting, COM responsible
+      CalculatedHandoverDate::COMMUNITY_RESPONSIBLE
     end
   end
 
@@ -215,36 +182,39 @@ private
   WOMENS_CUTOFF_DATE = '30/9/2022'.to_date
 
   class OffenderWrapper
-    delegate :recalled?, :immigration_case?, :nps_case?, :indeterminate_sentence?,
-             :early_allocation?, :mappa_level, :prison_arrival_date, :sentence_start_date,
+    delegate :recalled?, :immigration_case?, :indeterminate_sentence?,
+             :early_allocation?, :mappa_level, :prison_arrival_date, :category_active_since,
              :parole_eligibility_date, :conditional_release_date, :automatic_release_date,
              :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date,
-             :category_active_since,
+             :inside_omic_policy?,
              to: :@offender
 
     def initialize(offender)
       @offender = offender
     end
 
-    def policy_case?
-      if in_womens_prison?
-        new_case? WOMENS_POLICY_START_DATE
-      elsif welsh_offender?
-        new_case? WELSH_POLICY_START_DATE
-      else
-        new_case? ENGLISH_POLICY_START_DATE
-      end
+    # CRC cases can only have determinate sentences
+    # There is no such thing as a CRC indeterminate offender
+    # So in theory, it should be safe to assume that indeterminate offenders are NPS
+    # But in practice, there are some indeterminate offenders who are incorrectly recorded as CRC cases
+    # (likely due to HOMDs choosing CRC just to 'get past' the missing information screen when the offender isn't in nDelius)
+    def crc_case?
+      !@offender.nps_case? && !@offender.indeterminate_sentence?
     end
 
-    def nps_prepolicy_responsibility handover_date
-      if in_womens_prison?
-        nps_prepolicy_rules handover_date: handover_date, cutoff_date: WOMENS_CUTOFF_DATE
-      elsif welsh_offender?
-        nps_prepolicy_rules handover_date: handover_date, cutoff_date: WELSH_CUTOFF_DATE
-      elsif hub_or_private?
-        nps_prepolicy_rules handover_date: handover_date, cutoff_date: ENGLISH_PRIVATE_CUTOFF
+    def policy_case?
+      sentenced_after_policy_started = @offender.sentence_start_date >= policy_start_date
+
+      if in_open_conditions?
+        # Open prison
+        # OMIC policy launched in open prisons a while after closed prisons
+        # There are specific rules to decide if open prison rules apply
+        sentenced_after_policy_started && open_prison_rules_apply?
       else
-        nps_prepolicy_rules handover_date: handover_date, cutoff_date: ENGLISH_PUBLIC_CUTOFF
+        # Closed prison
+        # Offender must have been sentenced after the OMIC policy start date,
+        # or have a release date which is on/after the 'cutoff' date.
+        sentenced_after_policy_started || (release_date >= policy_cutoff_date)
       end
     end
 
@@ -285,37 +255,19 @@ private
         in_male_open_prison? && @offender.prison_arrival_date >= OPEN_PRISON_POLICY_START_DATE
       ) ||
       (
+        # Open policy launched before Women's prisons – so no need to check for a 'women's open policy start date'
         in_womens_prison? && @offender.category_code == 'T'
       )
     end
 
     def in_womens_prison?
+      # TODO: We should be able to use @offender.prison.womens? (much nicer!), but first we'll need to replace use of
+      #       OpenStruct objects in the tests with proper MpcOffender objects
       PrisonService.womens_prison?(@offender.prison_id)
     end
 
-    def hub_or_private?
-      PrisonService.english_hub_prison?(@offender.prison_id) ||
-          PrisonService.english_private_prison?(@offender.prison_id)
-    end
-
-    def welsh_offender?
-      @offender.welsh_offender == true
-    end
-
-    def in_male_open_prison?
-      PrisonService.open_prison?(@offender.prison_id)
-    end
-
     def in_open_conditions?
-      PrisonService.open_prison?(@offender.prison_id) || (PrisonService.womens_prison?(@offender.prison_id) && @offender.category_code == 'T')
-    end
-
-    def nps_prepolicy_rules handover_date:, cutoff_date:
-      if release_date >= cutoff_date && handover_date > Time.zone.today
-        RESPONSIBLE
-      else
-        SUPPORTING
-      end
+      in_male_open_prison? || (in_womens_prison? && @offender.category_code == 'T')
     end
 
     def expected_time_in_custody_gt_10_months?
@@ -324,11 +276,40 @@ private
 
   private
 
-    def new_case? policy_start_date
-      if @offender.sentenced?
-        @offender.sentence_start_date >= policy_start_date
+    def in_male_open_prison?
+      # TODO: We should be able to use @offender.prison.mens_open? (much nicer!), but first we'll need to replace use of
+      #       OpenStruct objects in the tests with proper MpcOffender objects
+      PrisonService.open_prison?(@offender.prison_id)
+    end
+
+    def hub_or_private?
+      PrisonService.english_hub_prison?(@offender.prison_id) ||
+        PrisonService.english_private_prison?(@offender.prison_id)
+    end
+
+    def welsh_offender?
+      @offender.welsh_offender == true
+    end
+
+    def policy_start_date
+      if in_womens_prison?
+        WOMENS_POLICY_START_DATE
+      elsif welsh_offender?
+        WELSH_POLICY_START_DATE
       else
-        true
+        ENGLISH_POLICY_START_DATE
+      end
+    end
+
+    def policy_cutoff_date
+      if in_womens_prison?
+        WOMENS_CUTOFF_DATE
+      elsif welsh_offender?
+        WELSH_CUTOFF_DATE
+      elsif hub_or_private?
+        ENGLISH_PRIVATE_CUTOFF
+      else
+        ENGLISH_PUBLIC_CUTOFF
       end
     end
   end

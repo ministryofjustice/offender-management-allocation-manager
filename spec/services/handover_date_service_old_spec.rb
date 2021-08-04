@@ -28,7 +28,8 @@ describe HandoverDateService do
                        nps_case?: true,
                        sentence_start_date: automatic_release_date - 2.years,
                        automatic_release_date: automatic_release_date,
-                       tariff_date: tariff_date
+                       tariff_date: tariff_date,
+                       inside_omic_policy?: true
       }
 
       let(:automatic_release_date) { Date.new(2025, 8, 30) }
