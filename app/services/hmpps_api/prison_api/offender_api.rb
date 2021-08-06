@@ -5,12 +5,61 @@ module HmppsApi
     class OffenderApi
       extend PrisonApiClient
 
-      def self.new_list(prison)
-        # Do some stuff
+      PAGE_FETCH_SIZE = 200  # How many records to fetch at a time from paginated API endpoints
 
-        # Return an Enumerator...?
+      # HmppsApi::PrisonApi::OffenderApi.new_list('LEI')
+      def self.new_list(prison)
+        # Get offenders from the Prisoner Offender Search API
+        search_offenders = list_from_search(prison)
+        offender_nos = search_offenders.map { |o| o.fetch('prisonerNumber') }
+
+        # Get additional data from other APIs
+        prison_offenders = get_multiple_offenders(offender_nos).index_by { |o| o.fetch('offenderNo') }
+        temp_movements = HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for(offender_nos)
+        offender_categories = get_offender_categories(offender_nos)
+
+        # booking_ids = search_offenders.map { |o| o.fetch('bookingId') }
+        # sentence_details = HmppsApi::PrisonApi::OffenderApi.get_bulk_sentence_details(booking_ids)
+
+        complexities = if PrisonService::womens_prison?(prison)
+                         HmppsApi::ComplexityApi.get_complexities(offender_nos)
+                       else
+                         {}
+                       end
+
+        # Filter out offenders which don't exist in both the Search API and Prison API responses
+        search_offenders = search_offenders.select { |o| prison_offenders.key? o.fetch('prisonerNumber') }
+
+        # Create Offender objects
+        search_offenders.map do |search_offender|
+          offender_no = search_offender.fetch('prisonerNumber')
+          prison_offender = prison_offenders.fetch(offender_no)
+          booking_id = search_offender.fetch('bookingId').to_i
+          # sentence = sentence_details[booking_id]
+
+          # byebug if sentence['sentenceStartDate'].present?
+
+          # If the offender is a restricted patient, use the "supporting prison" (because that's where their POM will be)
+          prison_id = search_offender['restrictedPatient'] ? search_offender['supportingPrisonId'] : search_offender['prisonId']
+
+          HmppsApi::Offender.new(
+            prison_offender,
+            search_offender,
+            booking_id: booking_id,
+            prison_id: prison_id,
+            category: offender_categories[offender_no],
+            latest_temp_movement: temp_movements[offender_no],
+            complexity_level: complexities[offender_no]
+          ).tap { |offender|
+            # if sentence.present?
+            #   offender.sentence = HmppsApi::SentenceDetail.new(sentence, search_offender)
+            # end
+            offender.sentence = HmppsApi::SentenceDetail.new(search_offender, search_offender)
+          }
+        end
       end
 
+      # HmppsApi::PrisonApi::OffenderApi.list('LEI')
       def self.list(prison, page = 0, page_size: 20)
         route = "/locations/description/#{prison}/inmates"
 
@@ -115,30 +164,11 @@ module HmppsApi
           search_client.get(route, queryparams: { page: page, size: size }, extra_headers: {'Content-Type': 'application/json'})
         }
 
-        make_offenders = lambda { |search_offenders|
-          offender_ids = search_offenders.map { |o| o.fetch('prisonerNumber') }
-          prison_offenders = get_multiple_offenders(offender_ids).to_a.each_with_object({}) do |offender, hash|
-            offender_id = offender.fetch('offenderNo')
-            hash[offender_id] = offender
-          end
-          offender_categories = get_offender_categories(offender_ids)
-
-          search_offenders.map do |search_offender|
-            offender_id = search_offender.fetch('prisonerNumber')
-            prison_offender = prison_offenders[offender_id]
-            category = offender_categories[offender_id]
-
-            return nil if prison_offender.blank? || category.blank?
-
-
-          end
-        }
-
         Enumerator.new do |yielder|
           page = 0
 
           loop do
-            results = fetch_data.call(page: page, size: 200)
+            results = fetch_data.call(page: page, size: PAGE_FETCH_SIZE)
 
             results.fetch('content')
                    .reject { |offender| %w[REMAND UNKNOWN].include?(offender.fetch('legalStatus')) }
@@ -168,7 +198,7 @@ module HmppsApi
           page = 0
 
           loop do
-            results = fetch_data.call(page: page, size: 200)
+            results = fetch_data.call(page: page, size: PAGE_FETCH_SIZE)
 
             results.fetch('content')
                    .reject { |offender| %w[REMAND UNKNOWN].include?(offender.fetch('legalStatus')) }
@@ -185,23 +215,16 @@ module HmppsApi
         end
       end
 
-      # offender_nos = %w[A5081DY G0056VW G0162GG G0259UG G0594UC G0634UK G0745GW G1039VD G1148GU G1462GK G1681GT G1850VC G2348UE G2703UQ G2747UI G3045GO G3185GG G3391UH G3554VD G3912UW G4132VH G4545UV G4780GF G4790GD G4992VN G5010UC G5254GW G5662VR G6089GH G6158VX G6280VV G6378VW G6390GW G6523GW G7276VD G7283VI G7351GO G7850GC G8085GN G8328VW G8337GK G8424GW G8545UF G8961UQ G9205VV G9212VE G9260GN G9501GX G9701UJ G9739VA]
-      # offender_nos = Prison.all.limit(5).map {|p| p.all_policy_offenders.map(&:offender_no) }.flatten
-      # HmppsApi::PrisonApi::OffenderApi.get_multiple_offenders(offender_nos).count
-      def self.get_multiple_offenders(offender_nos, page_size = 200)
+      def self.get_multiple_offenders(offender_nos)
         route = "/prisoners"
         request_body = { offenderNos: offender_nos }
-
-        # The API only accepts up to 1000 offender IDs at once
-        # Consider chunking these requests...?
-        # Or will we not use them this way in practice? Maybe not. KISS.
 
         fetch_data = lambda { |page:, size:|
           page_offset = page * size
           hdrs = paging_headers(size, page_offset)
 
           client.post(
-            route, request_body, extra_headers: hdrs
+            route, request_body, extra_headers: hdrs, cache: true
           ) { |json, response|
             # Work out if this is the last page
             # Push it to the JSON array response, so we can grab it in the Enumerator (hacky but it works)
@@ -218,7 +241,7 @@ module HmppsApi
           page = 0
 
           loop do
-            results = fetch_data.call(page: page, size: page_size)
+            results = fetch_data.call(page: page, size: PAGE_FETCH_SIZE)
 
             # The last element of the array will be a boolean telling us whether we're on the last page
             last_page = results.pop
