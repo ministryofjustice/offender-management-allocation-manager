@@ -21,9 +21,8 @@ class CaseInformationController < PrisonsApplicationController
   def update_prd
     @parole_form = ParoleReviewDateForm.new parole_review_date_params
     if @parole_form.valid?
-      ParoleRecord.find_or_create_by!(nomis_offender_id: nomis_offender_id_from_url) do |parole|
-        parole.update(parole_review_date: @parole_form.parole_review_date)
-      end
+      ParoleRecord.find_or_initialize_by(nomis_offender_id: nomis_offender_id_from_url)
+                  .update!(parole_review_date: @parole_form.parole_review_date)
       redirect_to referrer
     else
       render 'edit_prd'
