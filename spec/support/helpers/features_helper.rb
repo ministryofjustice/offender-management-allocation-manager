@@ -63,4 +63,28 @@ module FeaturesHelper
 
     new_tab.close
   end
+
+  # Helpers for key/value tables
+  # (e.g. those used on prisoner profile pages)
+  #
+  # For example, with a table like this:
+  #   | Offender number | A1234BC    |
+  #   | Tier            | B [Change] |
+  #
+  # You can update the tier using:
+  #   td_for_row('Tier').click_link('Change')
+  # Or expect it to have a link using:
+  #   expect(td_for_row('Tier')).to have_link('Change')
+  #
+  # You can get the offender number using:
+  #   value_for_row('Offender number')
+  # Or expect a value using:
+  #   expect(value_for_row('Offender number')).to eq('A1234BC')
+  def td_for_row(label)
+    page.find('td', text: label).sibling('td')
+  end
+
+  def value_for_row(row_label)
+    td_for_row(row_label).text
+  end
 end
