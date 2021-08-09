@@ -7,5 +7,7 @@ class ParoleReviewDateForm
 
   attribute :parole_review_date, :date
 
-  validates :parole_review_date, date: { after: proc { Date.yesterday }, allow_nil: true }
+  validates :parole_review_date,
+            date: { after: proc { Date.yesterday }, allow_blank: true },
+            presence: true
 end

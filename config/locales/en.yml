@@ -51,7 +51,8 @@ en:
           format: "%{message}"
           attributes:
             parole_review_date:
-              after: "Parole review date must be after %{date}"
+              after: The new parole review date must be in the future
+              blank: Enter a new parole review date
         complexity_form:
           format: "%{message}"
           attributes:
