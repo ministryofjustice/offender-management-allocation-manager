@@ -1,14 +1,15 @@
 require 'rails_helper'
 
 feature 'Service Notification' do
-  let!(:prison) { create(:prison) }
+  let(:prison) { create(:prison) }
+  let(:user) { build(:pom) }
 
   before do
-    signin_spo_user([prison.code])
+    stub_signin_spo(user, [prison.code])
+    stub_offenders_for_prison(prison.code, [])
   end
 
-  it 'does not display service notification if none exist',
-     vcr: { cassette_name: 'prison_api/service_notifications_none_exist' } do
+  it 'does not display service notification if none exist' do
     allow(ServiceNotificationsService).to receive(:notifications).and_return([])
 
     visit root_path
@@ -31,15 +32,13 @@ feature 'Service Notification' do
       allow(ServiceNotificationsService).to receive(:notifications).and_return(messages)
     end
 
-    it 'does not display service notifications on static pages',
-       vcr: { cassette_name: 'prison_api/service_notifications_static_pages' } do
+    it 'does not display service notifications on static pages' do
       visit "/404"
 
       expect(page).not_to have_css('.service_banner')
     end
 
-    it 'displays service notifications on dynamic pages',
-       vcr: { cassette_name: 'prison_api/service_notifications_dynamic_pages' } do
+    it 'displays service notifications on dynamic pages' do
       visit root_path
 
       expect(page).to have_css('.service_banner')
@@ -47,8 +46,7 @@ feature 'Service Notification' do
     end
 
     context 'when user clicks on close button', js: true do
-      it 'permanently hides the notification',
-         vcr: { cassette_name: 'prison_api/service_notifications_close_button' } do
+      it 'permanently hides the notification' do
         visit root_path
 
         expect(page).to have_css('.service_banner')
