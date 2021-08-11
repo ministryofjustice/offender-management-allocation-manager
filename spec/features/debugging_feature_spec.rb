@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 feature 'Provide debugging information for our team to use' do
-  let(:nomis_offender_id) { "G1670VU" }
+  let(:nomis_offender_id) { "G3182GG" }
   let(:prison) { Prison.find 'LEI' }
 
   before do
@@ -50,7 +50,7 @@ feature 'Provide debugging information for our team to use' do
       movement_table_row = page.find(:css, 'tr.govuk-table__row#movement_date', text: 'Movement date')
 
       within movement_table_row do
-        expect(page).to have_content('Movement date 07 Jun 2021')
+        expect(page).to have_content('Movement date 29 Mar 2017')
       end
     end
 
