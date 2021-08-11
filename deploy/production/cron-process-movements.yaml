@@ -4,7 +4,7 @@ metadata:
   name: offender-manager-process-movements
 spec:
   schedule: "0 2 * * *"
-  concurrencyPolicy: Forbid
+  concurrencyPolicy: Replace
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 1
   jobTemplate:

@@ -4,7 +4,7 @@ metadata:
   name: offender-manager-integration-test-cleanup
 spec:
   schedule: "0 0 * * *"
-  concurrencyPolicy: Forbid
+  concurrencyPolicy: Replace
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 1
   jobTemplate:
