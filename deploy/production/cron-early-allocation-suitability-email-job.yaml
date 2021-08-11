@@ -4,7 +4,7 @@ metadata:
   name: early-allocation-suitability-email-job
 spec:
   schedule: "30 4 * * *"
-  concurrencyPolicy: Forbid
+  concurrencyPolicy: Replace
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
   jobTemplate:

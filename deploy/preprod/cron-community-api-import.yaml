@@ -4,7 +4,7 @@ metadata:
   name: community-api-import
 spec:
   schedule: "00 06 * * *"
-  concurrencyPolicy: Forbid
+  concurrencyPolicy: Replace
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 2
   jobTemplate:
