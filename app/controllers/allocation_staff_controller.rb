@@ -4,6 +4,8 @@ class AllocationStaffController < PrisonsApplicationController
   before_action :ensure_spo_user
   before_action :load_pom_types
   before_action :load_prisoner_via_prisoner_id
+  before_action :store_referrer_in_session, only: [:index]
+  before_action :set_referrer
 
   def index
     @case_info = Offender.find_by!(nomis_offender_id: prisoner_id_from_url).case_information

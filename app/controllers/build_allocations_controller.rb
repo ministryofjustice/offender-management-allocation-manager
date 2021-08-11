@@ -3,6 +3,7 @@
 class BuildAllocationsController < PrisonsApplicationController
   before_action :ensure_spo_user
   before_action :load_prisoner
+  before_action :set_referrer
 
   include Wicked::Wizard
 
@@ -70,7 +71,7 @@ class BuildAllocationsController < PrisonsApplicationController
       flash[:notice] =
         "#{@prisoner.full_name_ordered} has been allocated to #{view_context.full_name_ordered(pom)} (#{view_context.grade(pom)})"
 
-      redirect_to unallocated_prison_prisoners_path(active_prison_id)
+      redirect_to @referrer
     end
   end
 
