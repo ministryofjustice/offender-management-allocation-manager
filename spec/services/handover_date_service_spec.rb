@@ -610,4 +610,19 @@ describe HandoverDateService do
       end
     end
   end
+
+  context 'when offender is outside OMIC policy' do
+    let(:api_offender) {
+      build(:hmpps_api_offender,
+            latestLocationId: prison,
+            sentence: build(:sentence_detail, :civil_sentence)
+      )
+    }
+
+    let(:case_info) { build(:case_information) }
+
+    it 'raises an error' do
+      expect { subject }.to raise_error(RuntimeError, "Offender #{offender.offender_no} falls outside of OMIC policy - cannot calculate handover dates")
+    end
+  end
 end

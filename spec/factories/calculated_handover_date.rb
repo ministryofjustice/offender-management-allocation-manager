@@ -18,8 +18,7 @@ FactoryBot.define do
       [
         CalculatedHandoverDate::CUSTODY_ONLY,
         CalculatedHandoverDate::CUSTODY_WITH_COM,
-        CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
-        CalculatedHandoverDate::UNKNOWN
+        CalculatedHandoverDate::COMMUNITY_RESPONSIBLE
       ].sample
     }
   end

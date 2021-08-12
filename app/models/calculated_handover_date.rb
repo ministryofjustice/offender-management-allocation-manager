@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class CalculatedHandoverDate < ApplicationRecord
-  UNKNOWN = 'Unknown'
   CUSTODY_ONLY = 'CustodyOnly'
   CUSTODY_WITH_COM = 'CustodyWithCom'
   COMMUNITY_RESPONSIBLE = 'Community'
@@ -21,7 +20,6 @@ class CalculatedHandoverDate < ApplicationRecord
     nps_determinate_mappa_2_3: 'NPS Determinate Mappa 2/3',
     less_than_10_months_left_to_serve: 'Less than 10 months left to serve',
     pre_omic_rules: 'Pre-OMIC rules',
-    not_inside_omic_policy: 'Not inside OMIC policy',
   }.stringify_keys.freeze
 
   belongs_to :offender,
@@ -31,7 +29,7 @@ class CalculatedHandoverDate < ApplicationRecord
 
   validates :nomis_offender_id, uniqueness: true
 
-  validates :responsibility, inclusion: { in: [CUSTODY_ONLY, CUSTODY_WITH_COM, COMMUNITY_RESPONSIBLE, UNKNOWN], nil: false }
+  validates :responsibility, inclusion: { in: [CUSTODY_ONLY, CUSTODY_WITH_COM, COMMUNITY_RESPONSIBLE], nil: false }
   validates :reason, inclusion: { in: REASONS.keys, nil: false }
 
   def custody_responsible?

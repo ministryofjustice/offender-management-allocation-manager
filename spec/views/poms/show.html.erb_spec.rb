@@ -78,7 +78,7 @@ RSpec.describe "poms/show", type: :view do
     let(:case_info) { create(:case_information) }
     let(:api_offender) { build(:hmpps_api_offender, offenderNo: case_info.nomis_offender_id) }
     let(:offender) { build(:mpc_offender, prison_record: api_offender, offender: case_info.offender, prison: prison) }
-    let(:allocations) { [build(:allocation_history, nomis_offender_id: case_info.nomis_offender_id)] }
+    let(:allocations) { [build(:allocation_history, nomis_offender_id: case_info.nomis_offender_id, secondary_pom_nomis_id: pom.staff_id)] }
 
     let(:first_offender_row) {
       row = page.css('td').map(&:text).map(&:strip)

@@ -33,6 +33,9 @@ class PrisonersController < PrisonsApplicationController
 
   def show
     @prisoner = OffenderService.get_offender(params[:id])
+
+    return render 'show_outside_omic_policy' unless @prisoner.inside_omic_policy?
+
     @tasks = PomTasks.new.for_offender(@prisoner)
     @allocation = AllocationHistory.find_by(nomis_offender_id: @prisoner.offender_no)
 

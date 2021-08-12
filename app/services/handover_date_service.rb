@@ -22,14 +22,13 @@ class HandoverDateService
                                                 reason: :com_responsibility
 
   def self.handover(raw_offender)
+    unless raw_offender.inside_omic_policy?
+      raise "Offender #{raw_offender.offender_no} falls outside of OMIC policy - cannot calculate handover dates"
+    end
+
     offender = OffenderWrapper.new(raw_offender)
 
-    if !offender.inside_omic_policy?
-      CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
-                                 start_date: nil, handover_date: nil,
-                                 reason: :not_inside_omic_policy
-
-    elsif offender.recalled?
+    if offender.recalled?
       CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
                                  start_date: nil, handover_date: nil,
                                  reason: :recall_case
@@ -186,7 +185,6 @@ private
              :early_allocation?, :mappa_level, :prison_arrival_date, :category_active_since,
              :parole_eligibility_date, :conditional_release_date, :automatic_release_date,
              :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date,
-             :inside_omic_policy?,
              to: :@offender
 
     def initialize(offender)

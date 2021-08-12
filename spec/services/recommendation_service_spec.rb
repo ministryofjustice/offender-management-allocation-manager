@@ -4,12 +4,7 @@ describe RecommendationService do
   let(:prison) { build(:prison) }
 
   context 'when tier A' do
-    let(:api_offender) {
-      build(:hmpps_api_offender,
-            sentence: build(:sentence_detail, :blank,
-                            sentenceStartDate: Time.zone.today,
-                            automaticReleaseRate: Time.zone.today + 15.months))
-    }
+    let(:api_offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :determinate_release_in_three_years)) }
     let(:case_info) { build(:case_information, tier: 'A') }
     let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
@@ -19,12 +14,7 @@ describe RecommendationService do
   end
 
   context 'when tier D' do
-    let(:api_offender) {
-      build(:hmpps_api_offender,
-            sentence: build(:sentence_detail,
-                            sentenceStartDate: Time.zone.today,
-                            automaticReleaseDate: Time.zone.today + 10.months))
-    }
+    let(:api_offender) { build(:hmpps_api_offender, sentence: build(:sentence_detail, :determinate_release_in_three_years)) }
     let(:case_info) { build(:case_information, tier: 'D') }
     let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
