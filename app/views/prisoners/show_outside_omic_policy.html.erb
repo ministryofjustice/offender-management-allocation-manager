@@ -1,0 +1,9 @@
+<div class="govuk-error-summary">
+  <h2 class="govuk-error-summary__title">
+    Outside OMIC policy
+  </h2>
+  <div class="govuk-error-summary__body">
+    <p><%= @prisoner.full_name_ordered %> cannot be displayed because they don't fall under OMIC policy.</p>
+    <p>This could be because they are in prison on remand, are serving a civil sentence, or are under 18 years of age.</p>
+  </div>
+</div>

@@ -103,13 +103,7 @@ feature 'Provide debugging information for our team to use' do
           expect(page).to have_content('No')
         end
 
-        within '#handover-start-date' do
-          expect(page).to have_content('N/A')
-        end
-
-        within '#responsibility-handover-date' do
-          expect(page).to have_content('N/A')
-        end
+        expect(page).to have_content 'OMIC policy does not apply to this offender'
       end
     end
   end

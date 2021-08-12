@@ -11,7 +11,7 @@ module OffenderHelper
       'Responsible'
     elsif offender.pom_supporting?
       'Supporting'
-    else
+    elsif offender.coworking?
       'Co-working'
     end
   end
@@ -19,10 +19,8 @@ module OffenderHelper
   def case_owner_label(offender)
     if offender.pom_responsible?
       'Custody'
-    elsif offender.pom_supporting?
+    elsif offender.com_responsible?
       'Community'
-    else
-      'Unknown'
     end
   end
 

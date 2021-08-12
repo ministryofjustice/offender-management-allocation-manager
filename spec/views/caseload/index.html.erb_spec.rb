@@ -21,10 +21,11 @@ RSpec.describe "caseload/index", type: :view do
     let(:api_offender) { build(:hmpps_api_offender) }
     let(:case_info) { build(:case_information) }
     let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
+    let(:allocation) { build(:allocation_history, nomis_offender_id: offender.offender_no, secondary_pom_nomis_id: staff_id) }
 
     let(:offenders) {
       [offender].map do |o|
-        AllocatedOffender.new(staff_id, build(:allocation_history, nomis_offender_id: o.offender_no), o)
+        AllocatedOffender.new(staff_id, allocation, o)
       end
     }
 

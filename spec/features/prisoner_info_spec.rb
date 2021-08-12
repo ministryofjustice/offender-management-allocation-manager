@@ -226,20 +226,9 @@ feature 'View a prisoner profile page' do
       allow(OffenderService).to receive(:get_offender).and_return(non_sentenced_offender)
     end
 
-    it 'shows the page without crashing' do
+    it 'explains that the offender is not in the service' do
       visit prison_prisoner_path(prison.code, 'G7998GJ')
-
-      within '#handover-start-date' do
-        expect(page).to have_content('N/A')
-      end
-
-      within '#responsibility-handover' do
-        expect(page).to have_content('N/A')
-      end
-
-      within '#sentence-start-date' do
-        expect(page).to have_content('N/A')
-      end
+      expect(page).to have_css('h2', text: 'Outside OMIC policy')
     end
   end
 

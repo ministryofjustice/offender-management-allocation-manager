@@ -80,39 +80,47 @@
 
   <table class="govuk-table">
     <tbody class="govuk-table__body">
-    <tr class="govuk-table__row">
-      <td class="govuk-table__header govuk-!-width-one-half" scope="row">Responsibility & handover information</td>
-      <td class="govuk-table__cell govuk-!-width-one-half"></td>
-    </tr>
-    <tr class="govuk-table__row" id="responsibility">
-      <td class="govuk-table__cell govuk-!-width-one-half">Current responsibility</td>
-      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-        <%= case_owner_label(@offender) if @offender.probation_record.present? %>
-      </td>
-    <tr class="govuk-table__row" id="responsibility-override">
-      <td class="govuk-table__cell govuk-!-width-one-half">Responsibility overridden?</td>
-      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-        <%= humanized_bool(@offender.responsibility_override?) if @offender.probation_record.present? %>
-      </td>
-    </tr>
-    <tr class="govuk-table__row" id="handover-start-date">
-      <td class="govuk-table__cell govuk-!-width-one-half">Handover start date</td>
-      <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-        <%= format_date(probation_field(@offender, :handover_start_date), replacement: 'N/A') %>
-      </td>
-    </tr>
-    <tr class="govuk-table__row" id="responsibility-handover-date">
-      <td class="govuk-table__cell govuk-!-width-one-half">Responsibility handover date</td>
-      <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-        <%= format_date(probation_field(@offender, :responsibility_handover_date), replacement: 'N/A') %>
-      </td>
-    </tr>
-    <tr class="govuk-table__row" id="handover-reason">
-      <td class="govuk-table__cell govuk-!-width-one-half">Reason for handover dates</td>
-      <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-        <%= probation_field(@offender, :handover_reason) %>
-      </td>
-    </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__header govuk-!-width-one-half" scope="row">Responsibility & handover information</td>
+        <td class="govuk-table__cell govuk-!-width-one-half"></td>
+      </tr>
+      <% if @offender.inside_omic_policy? %>
+        <tr class="govuk-table__row" id="responsibility">
+          <td class="govuk-table__cell govuk-!-width-one-half">Current responsibility</td>
+          <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
+            <%= case_owner_label(@offender) if @offender.probation_record.present? %>
+          </td>
+        <tr class="govuk-table__row" id="responsibility-override">
+          <td class="govuk-table__cell govuk-!-width-one-half">Responsibility overridden?</td>
+          <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
+            <%= humanized_bool(@offender.responsibility_override?) if @offender.probation_record.present? %>
+          </td>
+        </tr>
+        <tr class="govuk-table__row" id="handover-start-date">
+          <td class="govuk-table__cell govuk-!-width-one-half">Handover start date</td>
+          <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
+            <%= format_date(probation_field(@offender, :handover_start_date), replacement: 'N/A') %>
+          </td>
+        </tr>
+        <tr class="govuk-table__row" id="responsibility-handover-date">
+          <td class="govuk-table__cell govuk-!-width-one-half">Responsibility handover date</td>
+          <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
+            <%= format_date(probation_field(@offender, :responsibility_handover_date), replacement: 'N/A') %>
+          </td>
+        </tr>
+        <tr class="govuk-table__row" id="handover-reason">
+          <td class="govuk-table__cell govuk-!-width-one-half">Reason for handover dates</td>
+          <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
+            <%= probation_field(@offender, :handover_reason) %>
+          </td>
+        </tr>
+      <% else %>
+        <tr class="govuk-table__row" id="outside-omic-policy">
+          <td class="govuk-table__cell" colspan="2">
+            OMIC policy does not apply to this offender
+          </td>
+        </tr>
+      <% end %>
     </tbody>
   </table>
 

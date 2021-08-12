@@ -47,16 +47,6 @@ RSpec.describe OffenderHelper do
         expect(helper.pom_responsibility_label(offender)).to eq('Supporting')
       end
     end
-
-    context 'when unknown' do
-      let(:api_offender) {
-        build(:hmpps_api_offender, sentence: build(:sentence_detail, :unsentenced))
-      }
-
-      it 'shows unknown' do
-        expect(helper.pom_responsibility_label(offender)).to eq('Co-working')
-      end
-    end
   end
 
   describe 'generates labels for case owner ' do
@@ -83,16 +73,6 @@ RSpec.describe OffenderHelper do
 
       it 'shows community' do
         expect(helper.case_owner_label(offender)).to eq('Community')
-      end
-    end
-
-    context 'when unknown' do
-      let(:api_offender) {
-        build(:hmpps_api_offender, sentence: build(:sentence_detail, :unsentenced))
-      }
-
-      it 'can show Unknown' do
-        expect(helper.case_owner_label(offender)).to eq('Unknown')
       end
     end
   end

@@ -15,7 +15,7 @@ describe HandoverDateService do
     end
 
     context 'when recalled' do
-      let(:offender) { OpenStruct.new(recalled?: true) }
+      let(:offender) { OpenStruct.new(recalled?: true, inside_omic_policy?: true) }
 
       it 'is not calculated' do
         expect(subject).to eq(start_date: nil, handover_date: nil)
@@ -89,14 +89,6 @@ describe HandoverDateService do
             expect(described_class.handover(offender).community_supporting?).to eq(false)
           end
         end
-      end
-    end
-
-    context 'when CRC' do
-      let(:offender) { OpenStruct.new(nps_case?: false) }
-
-      it 'is not set' do
-        expect(described_class.handover(offender).start_date).to be_nil
       end
     end
 
