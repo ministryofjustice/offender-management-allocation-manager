@@ -5,10 +5,10 @@ describe HandoverDateService do
   let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
   describe '#calculate_pom_responsibility' do
-    subject {
-      HandoverDateService::Responsibility.new described_class.handover(offender).custody_responsible?,
-                                              described_class.handover(offender).custody_supporting?
-    }
+    subject { described_class.handover(offender) }
+
+    let(:pom) { OffenderManagerResponsibility.new subject.custody_responsible?, subject.custody_supporting?  }
+    let(:com) { OffenderManagerResponsibility.new subject.community_responsible?, subject.community_supporting? }
 
     context 'when prescoed' do
       let(:recent_date) { HandoverDateService::PRESCOED_POLICY_START_DATE }
@@ -28,7 +28,7 @@ describe HandoverDateService do
             let(:case_info) { build(:case_information, :welsh, :nps) }
 
             it 'is responsible' do
-              expect(subject).to eq(HandoverDateService::RESPONSIBLE)
+              expect(pom).to be_responsible
             end
           end
 
@@ -36,7 +36,7 @@ describe HandoverDateService do
             let(:case_info) { build(:case_information, :welsh, :crc) }
 
             it 'is responsible' do
-              expect(subject).to eq(HandoverDateService::RESPONSIBLE)
+              expect(pom).to be_responsible
             end
           end
         end
@@ -52,7 +52,7 @@ describe HandoverDateService do
             let(:case_info) { build(:case_information, :english, :nps) }
 
             it 'is supporting' do
-              expect(subject).to eq(HandoverDateService::SUPPORTING)
+              expect(pom).to be_supporting
             end
           end
         end
@@ -69,7 +69,7 @@ describe HandoverDateService do
         let(:case_info) { build(:case_information, :welsh, :nps) }
 
         it 'is supporting' do
-          expect(subject).to eq(HandoverDateService::SUPPORTING)
+          expect(pom).to be_supporting
         end
       end
     end
@@ -81,7 +81,7 @@ describe HandoverDateService do
       }
 
       it 'will show the POM as supporting' do
-        expect(subject).to eq HandoverDateService::SUPPORTING
+        expect(pom).to be_supporting
       end
     end
 
@@ -93,7 +93,7 @@ describe HandoverDateService do
       }
 
       it 'will show the POM as supporting' do
-        expect(subject).to eq HandoverDateService::SUPPORTING
+        expect(pom).to be_supporting
       end
     end
 
@@ -104,7 +104,7 @@ describe HandoverDateService do
       }
 
       it 'will show the case as POM supporting' do
-        expect(subject).to eq HandoverDateService::SUPPORTING
+        expect(pom).to be_supporting
       end
     end
 
@@ -121,7 +121,7 @@ describe HandoverDateService do
       }
 
       it 'will default to responsible' do
-        expect(subject).to eq HandoverDateService::RESPONSIBLE
+        expect(pom).to be_responsible
       end
     end
 
@@ -134,7 +134,7 @@ describe HandoverDateService do
       }
 
       it 'is responsible' do
-        expect(subject).to eq HandoverDateService::RESPONSIBLE
+        expect(pom).to be_responsible
       end
     end
 
@@ -147,7 +147,7 @@ describe HandoverDateService do
       }
 
       it 'will default to responsible' do
-        expect(subject).to eq HandoverDateService::RESPONSIBLE
+        expect(pom).to be_responsible
       end
     end
 
@@ -162,7 +162,7 @@ describe HandoverDateService do
       }
 
       it 'will calculate the responsibility using NPS rules' do
-        expect(subject).to eq HandoverDateService::RESPONSIBLE
+        expect(pom).to be_responsible
       end
     end
 
@@ -188,7 +188,7 @@ describe HandoverDateService do
           let(:hdced) { Time.zone.today + 10.weeks }
 
           it 'will show the POM as having a supporting role' do
-            expect(subject).to eq HandoverDateService::SUPPORTING
+            expect(pom).to be_supporting
           end
         end
 
@@ -199,7 +199,7 @@ describe HandoverDateService do
           let(:hdced) { nil }
 
           it 'will show the POM as having a supporting role' do
-            expect(subject).to eq HandoverDateService::SUPPORTING
+            expect(pom).to be_supporting
           end
         end
 
@@ -210,7 +210,7 @@ describe HandoverDateService do
           let(:hdced) { Time.zone.today + 14.weeks }
 
           it 'will show the POM as having a supporting role' do
-            expect(subject).to eq HandoverDateService::SUPPORTING
+            expect(pom).to be_supporting
           end
         end
 
@@ -221,7 +221,7 @@ describe HandoverDateService do
           let(:hdced) { Time.zone.today + 15.weeks }
 
           it 'will show the POM as having a responsible role' do
-            expect(subject).to eq HandoverDateService::RESPONSIBLE
+            expect(pom).to be_responsible
           end
         end
 
@@ -232,7 +232,7 @@ describe HandoverDateService do
           let(:hdced) { nil }
 
           it 'will take the earliest date of either the ARD or CRD and show the POM as having a responsible role' do
-            expect(subject).to eq HandoverDateService::RESPONSIBLE
+            expect(pom).to be_responsible
           end
         end
 
@@ -243,7 +243,7 @@ describe HandoverDateService do
           let(:hdced) { nil }
 
           it 'will show the POM as having a responsible role' do
-            expect(subject).to eq HandoverDateService::RESPONSIBLE
+            expect(pom).to be_responsible
           end
         end
       end
@@ -278,7 +278,7 @@ describe HandoverDateService do
               let(:crd)   { sentence_start_date + 22.months }
 
               it 'is responsible' do
-                expect(subject).to eq HandoverDateService::RESPONSIBLE
+                expect(pom).to be_responsible
               end
             end
 
@@ -287,7 +287,7 @@ describe HandoverDateService do
               let(:crd)   { sentence_start_date + 19.months }
 
               it 'is supporting' do
-                expect(subject).to eq HandoverDateService::SUPPORTING
+                expect(pom).to be_supporting
               end
             end
           end
@@ -315,7 +315,7 @@ describe HandoverDateService do
               let(:ard) { '1 June 2021'.to_date }
 
               it 'returns responsible' do
-                expect(subject).to eq HandoverDateService::RESPONSIBLE
+                expect(pom).to be_responsible
               end
             end
 
@@ -323,7 +323,7 @@ describe HandoverDateService do
               let(:ard) { '31 May 2021'.to_date }
 
               it 'returns supporting' do
-                expect(subject).to eq HandoverDateService::SUPPORTING
+                expect(pom).to be_supporting
               end
             end
           end
@@ -345,7 +345,7 @@ describe HandoverDateService do
 
               it 'returns supporting' do
                 Timecop.travel('20 Dec 2020') do
-                  expect(subject).to eq HandoverDateService::SUPPORTING
+                  expect(pom).to be_supporting
                 end
               end
             end
@@ -355,7 +355,7 @@ describe HandoverDateService do
 
               it 'returns responsible' do
                 Timecop.travel('20 Sep 2020') do
-                  expect(subject).to eq HandoverDateService::RESPONSIBLE
+                  expect(pom).to be_responsible
                 end
               end
             end
@@ -365,7 +365,7 @@ describe HandoverDateService do
 
               it 'returns supporting' do
                 Timecop.travel('16 Jan 2021') do
-                  expect(subject).to eq HandoverDateService::SUPPORTING
+                  expect(pom).to be_supporting
                 end
               end
             end
@@ -374,8 +374,8 @@ describe HandoverDateService do
               let(:ard) { nil }
 
               it 'will return responsible as the offenders release is not calculatable' do
-                expect(subject).
-                  to eq HandoverDateService::RESPONSIBLE
+                expect(pom).
+                  to be_responsible
               end
             end
           end
@@ -395,7 +395,7 @@ describe HandoverDateService do
               let(:ped) { sentence_start_date + 19.months }
 
               it 'will show the POM as having a responsible role' do
-                expect(subject).to eq HandoverDateService::RESPONSIBLE
+                expect(pom).to be_responsible
               end
             end
 
@@ -403,7 +403,7 @@ describe HandoverDateService do
               let(:ped) { sentence_start_date + 6.months }
 
               it 'will show the POM as having a supporting role' do
-                expect(subject).to eq HandoverDateService::SUPPORTING
+                expect(pom).to be_supporting
               end
             end
           end
@@ -423,7 +423,7 @@ describe HandoverDateService do
 
               it 'will show the POM as having a responsible role' do
                 Timecop.travel Date.new(2020, 6, 1) do
-                  expect(subject).to eq HandoverDateService::RESPONSIBLE
+                  expect(pom).to be_responsible
                 end
               end
             end
@@ -432,7 +432,7 @@ describe HandoverDateService do
               let(:ted) { Time.zone.today + 4.months }
 
               it 'will show the POM as having a supporting role' do
-                expect(subject).to eq HandoverDateService::SUPPORTING
+                expect(pom).to be_supporting
               end
             end
           end
@@ -454,7 +454,7 @@ describe HandoverDateService do
               let(:crd)   { Time.zone.today + 15.months }
 
               it 'will show the POM as having a responsible role' do
-                expect(subject).to eq HandoverDateService::RESPONSIBLE
+                expect(pom).to be_responsible
               end
             end
 
@@ -463,7 +463,7 @@ describe HandoverDateService do
               let(:crd)   { Time.zone.today + 7.months }
 
               it 'will show the POM as having a supporting role' do
-                expect(subject).to eq HandoverDateService::SUPPORTING
+                expect(pom).to be_supporting
               end
             end
           end
@@ -482,7 +482,7 @@ describe HandoverDateService do
               let(:ped) { Time.zone.today + 12.months }
 
               it 'will show the POM as having a responsible role' do
-                expect(subject).to eq HandoverDateService::RESPONSIBLE
+                expect(pom).to be_responsible
               end
             end
 
@@ -490,7 +490,7 @@ describe HandoverDateService do
               let(:ped) { Time.zone.today + 6.months }
 
               it 'will show the POM as having a supporting role' do
-                expect(subject).to eq HandoverDateService::SUPPORTING
+                expect(pom).to be_supporting
               end
             end
           end
@@ -509,7 +509,7 @@ describe HandoverDateService do
               let(:ted) { Time.zone.today + 14.months }
 
               it 'will show the POM as having a responsible role' do
-                expect(subject).to eq HandoverDateService::RESPONSIBLE
+                expect(pom).to be_responsible
               end
             end
 
@@ -517,7 +517,7 @@ describe HandoverDateService do
               let(:ted) { Time.zone.today + 4.months }
 
               it 'will show the POM as having a supporting role' do
-                expect(subject).to eq HandoverDateService::SUPPORTING
+                expect(pom).to be_supporting
               end
             end
           end
@@ -543,7 +543,7 @@ describe HandoverDateService do
 
               it 'returns supporting' do
                 Timecop.travel('20 Apr 2020') do
-                  expect(subject).to eq HandoverDateService::SUPPORTING
+                  expect(pom).to be_supporting
                 end
               end
             end
@@ -553,7 +553,7 @@ describe HandoverDateService do
 
               it 'returns responsible' do
                 Timecop.travel('1 Jan 2020') do
-                  expect(subject).to eq HandoverDateService::RESPONSIBLE
+                  expect(pom).to be_responsible
                 end
               end
             end
@@ -563,7 +563,7 @@ describe HandoverDateService do
 
               it 'returns supporting' do
                 Timecop.travel('1 Apr 2020') do
-                  expect(subject).to eq HandoverDateService::SUPPORTING
+                  expect(pom).to be_supporting
                 end
               end
             end
@@ -572,8 +572,8 @@ describe HandoverDateService do
               let(:ard) { nil }
 
               it 'will return responsibile as offender release date is not calculable' do
-                expect(subject).
-                  to eq HandoverDateService::RESPONSIBLE
+                expect(pom).
+                  to be_responsible
               end
             end
           end
@@ -592,7 +592,7 @@ describe HandoverDateService do
               let(:ped) { Time.zone.today + 12.months }
 
               it 'will show the POM as having a responsible role' do
-                expect(subject).to eq HandoverDateService::RESPONSIBLE
+                expect(pom).to be_responsible
               end
             end
 
@@ -600,7 +600,7 @@ describe HandoverDateService do
               let(:ped) { Time.zone.today + 6.months }
 
               it 'will show the POM as having a supporting role' do
-                expect(subject).to eq HandoverDateService::SUPPORTING
+                expect(pom).to be_supporting
               end
             end
           end
@@ -621,7 +621,7 @@ describe HandoverDateService do
               context 'when within the handover window' do
                 it 'will show the POM as having a supporting role' do
                   Timecop.travel('5 May 2020') do
-                    expect(subject).to eq HandoverDateService::SUPPORTING
+                    expect(pom).to be_supporting
                   end
                 end
               end
@@ -629,7 +629,7 @@ describe HandoverDateService do
               context 'when outside the handover window' do
                 it 'will show the POM as having a responsible role' do
                   Timecop.travel('1 Nov 2019') do
-                    expect(subject).to eq HandoverDateService::RESPONSIBLE
+                    expect(pom).to be_responsible
                   end
                 end
               end
@@ -640,7 +640,7 @@ describe HandoverDateService do
 
               it 'will show the POM as having a supporting role' do
                 Timecop.travel('1 March 2020') do
-                  expect(subject).to eq HandoverDateService::SUPPORTING
+                  expect(pom).to be_supporting
                 end
               end
             end
@@ -663,7 +663,7 @@ describe HandoverDateService do
               let(:crd)   { Time.zone.today + 15.months }
 
               it 'will show the POM as having a responsible role' do
-                expect(subject).to eq HandoverDateService::RESPONSIBLE
+                expect(pom).to be_responsible
               end
             end
 
@@ -672,7 +672,7 @@ describe HandoverDateService do
               let(:crd)   { Time.zone.today + 7.months }
 
               it 'will show the POM as having a supporting role' do
-                expect(subject).to eq HandoverDateService::SUPPORTING
+                expect(pom).to be_supporting
               end
             end
           end
@@ -691,7 +691,7 @@ describe HandoverDateService do
               let(:ped) { Time.zone.today + 12.months }
 
               it 'will show the POM as having a responsible role' do
-                expect(subject).to eq HandoverDateService::RESPONSIBLE
+                expect(pom).to be_responsible
               end
             end
 
@@ -699,7 +699,7 @@ describe HandoverDateService do
               let(:ped) { Time.zone.today + 6.months }
 
               it 'will show the POM as having a supporting role' do
-                expect(subject).to eq HandoverDateService::SUPPORTING
+                expect(pom).to be_supporting
               end
             end
           end
@@ -718,7 +718,7 @@ describe HandoverDateService do
               let(:ted) { Time.zone.today + 14.months }
 
               it 'will show the POM as having a responsible role' do
-                expect(subject).to eq HandoverDateService::RESPONSIBLE
+                expect(pom).to be_responsible
               end
             end
 
@@ -726,7 +726,7 @@ describe HandoverDateService do
               let(:ted) { Time.zone.today + 4.months }
 
               it 'will show the POM as having a supporting role' do
-                expect(subject).to eq HandoverDateService::SUPPORTING
+                expect(pom).to be_supporting
               end
             end
           end
