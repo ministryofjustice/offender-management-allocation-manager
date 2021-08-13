@@ -6,8 +6,8 @@ describe HandoverDateService do
   subject { described_class.handover(offender) }
 
   let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
-  let(:pom) { HandoverDateService::Responsibility.new subject.custody_responsible?, subject.custody_supporting?  }
-  let(:com) { HandoverDateService::Responsibility.new subject.community_responsible?, subject.community_supporting? }
+  let(:pom) { OffenderManagerResponsibility.new subject.custody_responsible?, subject.custody_supporting?  }
+  let(:com) { OffenderManagerResponsibility.new subject.community_responsible?, subject.community_supporting? }
   let(:start_date) { subject.start_date }
   let(:handover_date) { subject.handover_date }
   let(:reason) { subject.reason_text }

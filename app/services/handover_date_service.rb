@@ -1,12 +1,6 @@
 # frozen_string_literal: true
 
 class HandoverDateService
-  Responsibility = Struct.new(:responsible?, :supporting?)
-
-  RESPONSIBLE = Responsibility.new true, false
-  SUPPORTING = Responsibility.new false, true
-  NOT_INVOLVED = Responsibility.new false, false
-
   # OMIC open prison rules initially piloted in HMP Prescoed for Welsh offenders entering from 19/10/2020
   PRESCOED_POLICY_START_DATE = '19/10/2020'.to_date
 
