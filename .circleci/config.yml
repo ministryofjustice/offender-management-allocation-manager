@@ -13,7 +13,7 @@ references:
   test_container_config: &test_container_config
     resource_class: medium
     docker:
-      - image: circleci/ruby:2.6.6-node-browsers
+      - image: cimg/ruby:2.6.6-browsers
         environment:
           RAILS_ENV: test
           PGHOST: 127.0.0.1
@@ -57,14 +57,6 @@ references:
         /usr/libexec/gpg-preset-passphrase --preset --passphrase $GPG_PASSPHRASE $GPG_KEY_KEYGRIP_ID
         git-crypt unlock
 
-  install_aws_cli: &install_aws_cli
-    run:
-      name: Set up aws
-      command: |
-        sudo apt-get update
-        sudo apt-get --assume-yes install python3-pip
-        sudo pip3 install awscli
-
   build_docker_image: &build_docker_image
     run:
       name: Build allocation-manager docker image
@@ -82,103 +74,74 @@ references:
     run:
       name: Push allocation-manager docker image
       command: |
-        login="$(aws ecr get-login --region eu-west-2 --no-include-email)"
-        ${login}
+        aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin "$ECR_ENDPOINT"
         docker tag app "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:${CIRCLE_SHA1}"
         docker push "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:${CIRCLE_SHA1}"
         if [ "${CIRCLE_BRANCH}" == "main" ]; then
           docker tag app "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:latest"
           docker push "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:latest"
-        else
-          docker tag app "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:testing"
-          docker push "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:testing"
         fi
       environment:
         <<: *github_team_name_slug
         REPONAME: offender-management-allocation-manager
 
-  install_firefox_and_geckodriver: &install_firefox_and_geckodriver
-    run:
-      name: install firefox and geckodriver
-      command: |
-        wget -L "https://ftp.mozilla.org/pub/firefox/releases/65.0/linux-x86_64/en-US/firefox-65.0.tar.bz2" -O "firefox-65.0.tar.bz2"
-        tar xjf "firefox-65.0.tar.bz2"
-        sudo rm -rf /opt/firefox
-        sudo mv firefox /opt/
-        sudo ln -sf /opt/firefox/firefox /usr/bin/firefox
-        wget https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-linux64.tar.gz
-        tar -zxvf geckodriver-v0.23.0-linux64.tar.gz
-        sudo mv geckodriver /usr/local/bin/
-
-  install_geckodriver: &install_geckodriver
-    run:
-      name: install geckodriver
-      command: |
-        if [ `which geckodriver` ]
-        then
-           geckodriver --version
-        else
-          wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
-          tar -zxvf geckodriver-v0.24.0-linux64.tar.gz
-          mv geckodriver ~/.local/bin
-        fi
-
-  restore_cache: &restore_cache
-    restore_cache:
-      keys:
-        - integration-tests-v2-{{ checksum "Gemfile.lock" }}
-        - integration-tests-v2-
-
-  install_gems: &install_gems
-    run:
-      name: Clone and install gems
-      command: |
-        git clone git@github.com:ministryofjustice/offender-management-integration-tests.git
-        cd offender-management-integration-tests
-        bundle check --path vendor/bundle || bundle install --path vendor/bundle
-
-  save_cache: &save_cache
-    save_cache:
-      key: integration-tests-v2-{{ checksum "Gemfile.lock" }}
-      paths:
-        - ~/staging/vendor/bundle
-
-  store_test_results: &store_test_results
-    store_test_results:
-      path: ./offender-management-integration-tests/screenshots
-
-  store_artifacts: &store_artifacts
-    store_artifacts:
-      path: ./offender-management-integration-tests/screenshots
-
 version: 2.1
+
+orbs:
+  browser-tools: circleci/browser-tools@1.1.3
+  aws-cli: circleci/aws-cli@2.0.3
+
+commands:
+  install_firefox:
+    description: Install Firefox and Geckodriver
+    steps:
+      - run:
+          name: Ensure local bin directory exists
+          command: mkdir -p ~/.local/bin
+      - run:
+          # Firefox needs to be available from /usr/local/bin or else the Orb will re-install it
+          name: Restore Firefox installation from cache (if in cache)
+          command: |
+            if [ -e ~/.local/bin/firefox ]
+            then
+              sudo cp -P ~/.local/bin/firefox /usr/local/bin/firefox
+            fi
+      - browser-tools/install-firefox:
+          install-dir: /home/circleci/.local/bin
+      - run:
+          # Copy the Firefox symlink back into ~/.local/bin so it can be persisted to the cache
+          name: Put Firefox installation into the local bin directory
+          command: cp -P /usr/local/bin/firefox ~/.local/bin/firefox
+      - browser-tools/install-geckodriver:
+          install-dir: /home/circleci/.local/bin
+
 jobs:
   install_dependencies:
     <<: *defaults
     <<: *test_container_config
     steps:
-      - run:
-          name: Install CMake
-          command: |
-            sudo apt update && sudo apt install cmake
       - checkout
-      - *install_geckodriver
       - attach_workspace:
-          at: ~/repo
+          at: ~/
+      - restore_cache:
+          key: allocation-manager-{{ checksum "Gemfile.lock" }}-v2 # increment v number to bust cache
       - run:
           name: Which bundler?
           command: bundle -v
-      - restore_cache:
-          keys:
-            - allocation-manager-v3-{{ checksum "Gemfile.lock" }}
-            - allocation-manager-v3-
       - run:
           name: Install frontend modules
           command: yarn install
-      - run: bundle check --path vendor/bundle || bundle install --path vendor/bundle
       - run:
-          name: Ensure Local Bin Drectory exists
-          command: mkdir -p ~/.local/bin
+          name: Install ruby gems
+          command: |
+            bundle config set path 'vendor/bundle'
+            bundle check || {
+              # Install CMake - required to install undercover gem
+              sudo apt update && sudo apt install cmake
+              # Install missing gems
+              bundle install
+            }
+      - install_firefox
       - run:
           name: Download Code Climate
           command: |
@@ -190,16 +153,18 @@ jobs:
               chmod +x ~/.local/bin/cc-test-reporter
             fi
       - save_cache:
-          key: allocation-manager-v3-{{ checksum "Gemfile.lock" }}
+          key: allocation-manager-{{ checksum "Gemfile.lock" }}-v2 # increment v number to bust cache
           paths:
             - ~/repo/vendor/bundle
+            - ~/repo/node_modules
             - ~/.local/bin
       - persist_to_workspace:
           root: ~/
           paths:
             - repo/vendor/bundle
-            - repo/node_modules/
+            - repo/node_modules
             - .local/bin
+            - .bundle/config
   rubocop:
     <<: *defaults
     <<: *test_container_config
@@ -207,7 +172,6 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/
-      - run: bundle check --path vendor/bundle || bundle install --path vendor/bundle
       - run:
           name: Rubocop
           command: bundle exec rubocop
@@ -218,7 +182,6 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/
-      - run: bundle check --path vendor/bundle || bundle install --path vendor/bundle
       - run:
           name: Security analysis
           command: bundle exec brakeman -o ~/test-results/brakeman/brakeman.json -o ~/test-results/brakeman/brakeman.html
@@ -256,7 +219,7 @@ jobs:
           at: ~/
       - setup_remote_docker:
           docker_layer_caching: true
-      - *install_aws_cli
+      - aws-cli/install
       - *build_docker_image
       - *push_docker_image
 
@@ -286,28 +249,40 @@ jobs:
 
   test_staging:
     <<: *test_container_config
-    working_directory: ~/staging
+    working_directory: ~/integration-tests
     steps:
-      - checkout
-      - *restore_cache
-      - *install_gems
-      - *save_cache
       - run:
-          name: run integration tests
+          name: Clone integration tests repo
+          command: git clone https://github.com/ministryofjustice/offender-management-integration-tests.git .
+      - restore_cache:
+          key: integration-tests-{{ checksum "Gemfile.lock" }}-v2 # increment v number to bust cache
+      - run:
+          name: Install ruby gems
           command: |
-            cd offender-management-integration-tests
-            VCR=1 bundle exec rspec spec/integration --no-color --format documentation --format RspecJunitFormatter -o screenshots/rspec.xml
+            bundle config set path 'vendor/bundle'
+            bundle check || bundle install
+      - install_firefox
+      - save_cache:
+          key: integration-tests-{{ checksum "Gemfile.lock" }}-v2 # increment v number to bust cache
+          paths:
+            - ~/integration-tests/vendor/bundle
+            - ~/.local/bin
+      - run:
+          name: Run integration tests
+          command: bundle exec rspec spec/integration --no-color --format documentation --format RspecJunitFormatter -o screenshots/rspec.xml
           environment:
             STAGING_START_PAGE: https://allocation-manager-staging.apps.live-1.cloud-platform.service.justice.gov.uk
-      - *store_test_results
-      - *store_artifacts
+      - store_test_results:
+          path: screenshots
+      - store_artifacts:
+          path: screenshots
 
   deploy_preprod:
     <<: *deploy_container_config
     steps:
       - checkout
       - attach_workspace:
-          at: ~/repo
+          at: ~/
       - run:
           name: Kubectl deployment preproduction setup
           command: |
@@ -331,7 +306,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ~/repo
+          at: ~/
       - run:
           name: Kubectl deployment production setup
           command: |
@@ -368,7 +343,6 @@ workflows:
               only:
                 - main
                 - preproduction
-                - parallel-deployment
       - deploy_staging:
           requires:
             - rubocop
@@ -380,7 +354,6 @@ workflows:
                 - main
       - test_staging:
           requires:
-            - build_and_push_docker_image
             - deploy_staging
           filters:
             branches:
