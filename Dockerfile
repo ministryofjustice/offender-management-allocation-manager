@@ -58,7 +58,7 @@ RUN \
 
 COPY Gemfile Gemfile.lock package.json ./
 
-RUN bundle install --without development test --jobs 2 --retry 3
+RUN bundle config set --local without 'development test' && bundle install --jobs 2 --retry 3
 
 COPY . /app
 
