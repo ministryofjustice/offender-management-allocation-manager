@@ -87,4 +87,17 @@ module FeaturesHelper
   def value_for_row(row_label)
     td_for_row(row_label).text
   end
+
+  # Get the <tr> containing the specified text
+  # Useful when used with "within" to scope subsequent actions:
+  #   within row_containing 'Name of a POM' do
+  #     click_link 'Allocate'
+  #   end
+  def row_containing(text)
+    page.find('tr', text: text)
+  end
+
+  def current_page_number
+    page.find('.pagination .current.page', match: :first).text.to_i
+  end
 end

@@ -26,14 +26,14 @@ feature 'Allocation' do
     signin_spo_user
   end
 
-  scenario 'accepting a recommended allocation', vcr: { cassette_name: 'prison_api/create_new_allocation_feature' } do
+  scenario 'accepting the recommended POM type', vcr: { cassette_name: 'prison_api/create_new_allocation_feature' } do
     visit prison_prisoner_staff_index_path('LEI', nomis_offender_id)
 
     expect(page).to have_content('Determinate')
 
+    # Allocate to the Probation POM called "Moic Integration-Tests"
     within '#recommended_poms' do
-      # Allocate to the POM called "Moic Integration-Tests"
-      within page.find(:css, 'tr', text: 'Moic Integration-Tests') do
+      within row_containing 'Moic Integration-Tests' do
         click_link 'Allocate'
       end
     end
@@ -47,13 +47,13 @@ feature 'Allocation' do
     expect(page).to have_css('.notification', text: "#{offender_name} has been allocated to Moic Integration-Tests (Probation POM)")
   end
 
-  scenario 'overriding an allocation', vcr: { cassette_name: 'prison_api/override_allocation_feature_ok' } do
+  scenario 'overriding the recommended POM type', vcr: { cassette_name: 'prison_api/override_allocation_feature_ok' } do
     visit prison_prisoner_staff_index_path('LEI', nomis_offender_id)
     find('#non-recommended-accordion-section-heading').click
 
-    # Amit is 6th on the non-recommended list
+    # Allocate to the Prison POM called "Moic Pom"
     within '#non-recommended-accordion-section' do
-      within 'tbody > tr:nth-child(6)' do
+      within row_containing 'Moic Pom' do
         click_link 'Allocate'
       end
     end
@@ -67,7 +67,7 @@ feature 'Allocation' do
 
     click_button 'Complete allocation'
     expect(current_url).to have_content(unallocated_prison_prisoners_path('LEI'))
-    expect(page).to have_css('.notification', text: "#{offender_name} has been allocated to Amit Muthu (Prison POM)")
+    expect(page).to have_css('.notification', text: "#{offender_name} has been allocated to Moic Pom (Prison POM)")
   end
 
   scenario 'overriding an allocation can validate missing reasons', vcr: { cassette_name: 'prison_api/override_allocation_feature_validate_reasons' } do
@@ -92,7 +92,6 @@ feature 'Allocation' do
 
     find('#non-recommended-accordion-section-heading').click
 
-    # Amit is 6th on the non-recommended list
     within '#non-recommended-accordion-section' do
       within 'tbody > tr:nth-child(1)' do
         click_link 'Allocate'

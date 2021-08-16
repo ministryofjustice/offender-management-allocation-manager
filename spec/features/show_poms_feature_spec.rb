@@ -3,6 +3,9 @@ require "rails_helper"
 feature "get poms list" do
   let(:offender_missing_sentence_case_info) { create(:case_information, offender: build(:offender, nomis_offender_id: 'G1247VX')) }
 
+  # NOMIS Staff ID of the POM called "Moic Pom"
+  let(:moic_pom_id) { 485_926 }
+
   before do
     signin_spo_user
   end
@@ -17,12 +20,14 @@ feature "get poms list" do
     expect(page).to have_content("Inactive staff")
   end
 
+  # This example is a bit misleading. From what I can tell, this offender (G1247VX) _does_ have a valid sentence.
+  # If they were missing the required sentence data, they shouldn't be available in the service.
+  # Therefore, I'm not entirely sure what the intention is behind this test aside from showing that allocations are displayed on the POM's caseload.
   it "handles missing sentence data", vcr: { cassette_name: 'prison_api/show_poms_feature_missing_sentence' } do
     visit prison_prisoner_staff_index_path('LEI', offender_missing_sentence_case_info.nomis_offender_id)
 
-    # Moic POM is 8th in the list
     within '#recommended_poms' do
-      within 'tbody > tr:nth-child(8)' do
+      within row_containing 'Moic Pom' do
         click_link 'Allocate'
       end
     end
@@ -31,7 +36,7 @@ feature "get poms list" do
 
     click_button 'Complete allocation'
 
-    visit prison_pom_path('LEI', 485_926)
+    visit prison_pom_path('LEI', moic_pom_id)
     click_link 'Caseload'
 
     expect(page).to have_css(".offender_row_0", count: 1)
@@ -40,7 +45,7 @@ feature "get poms list" do
   end
 
   it "allows viewing a POM", :js, vcr: { cassette_name: 'prison_api/show_poms_feature_view' } do
-    visit prison_pom_path('LEI', 485_926)
+    visit prison_pom_path('LEI', moic_pom_id)
 
     expect(page).to have_content("Moic Pom")
     expect(page).to have_content("Caseload")
@@ -55,12 +60,12 @@ feature "get poms list" do
     before do
       ['G7806VO', 'G2911GD'].each do |offender_id|
         create(:case_information, offender: build(:offender, nomis_offender_id: offender_id))
-        create(:allocation_history, prison: 'LEI', nomis_offender_id: offender_id, primary_pom_nomis_id: 485_926)
+        create(:allocation_history, prison: 'LEI', nomis_offender_id: offender_id, primary_pom_nomis_id: moic_pom_id)
       end
     end
 
     it 'can sort' do
-      visit "/prisons/LEI/poms/485926"
+      visit "/prisons/LEI/poms/#{moic_pom_id}"
 
       expect(page).to have_content("Moic Pom")
       click_link 'Caseload'
@@ -89,9 +94,9 @@ feature "get poms list" do
       before do
         secondary = create :case_information, offender: build(:offender, nomis_offender_id: 'G4328GK')
         create(:allocation_history, prison: 'LEI', nomis_offender_id: secondary.nomis_offender_id,
-               primary_pom_nomis_id: 123456, secondary_pom_nomis_id: 485_926)
+               primary_pom_nomis_id: 123456, secondary_pom_nomis_id: moic_pom_id)
 
-        visit "/prisons/LEI/poms/485926"
+        visit "/prisons/LEI/poms/#{moic_pom_id}"
         click_link 'Caseload'
       end
 
@@ -105,7 +110,7 @@ feature "get poms list" do
   end
 
   it "allows editing a POM", vcr: { cassette_name: 'prison_api/show_poms_feature_edit' } do
-    visit "/prisons/LEI/poms/485926/edit"
+    visit "/prisons/LEI/poms/#{moic_pom_id}/edit"
 
     expect(page).to have_css(".govuk-button", count: 1)
     expect(page).to have_css(".govuk-radios__item", count: 14)

@@ -84,6 +84,7 @@ feature 'case information feature' do
     it "clicking back link after viewing prisoner's case information, returns back the same paginated page",
        vcr: { cassette_name: 'prison_api/case_information_back_link' }, js: true do
       visit missing_information_prison_prisoners_path('LEI', page: 3)
+      expect(current_page_number).to eq(3)
       within ".govuk-table tr:first-child td:nth-child(3)" do
         click_link 'Add missing details'
       end
@@ -91,6 +92,7 @@ feature 'case information feature' do
       click_link 'Back'
       find('#awaiting-information')
       expect(page).to have_selector('h1', text: 'Add missing details')
+      expect(current_page_number).to eq(3)
     end
 
     it 'complains if allocation data is missing', vcr: { cassette_name: 'prison_api/case_information_missing_case_feature' } do
@@ -137,6 +139,7 @@ feature 'case information feature' do
     it 'returns to previously paginated page after saving',
        vcr: { cassette_name: 'prison_api/case_information_return_to_previously_paginated_page' } do
       visit missing_information_prison_prisoners_path('LEI', sort: "last_name desc", page: 3)
+      expect(current_page_number).to eq(3)
 
       within ".govuk-table tr:first-child td:nth-child(3)" do
         click_link 'Add missing details'
@@ -149,6 +152,7 @@ feature 'case information feature' do
       click_button 'Save'
 
       expect(current_url).to have_content(missing_information_prison_prisoners_path('LEI') + "?page=3&sort=last_name+desc")
+      expect(current_page_number).to eq(3)
     end
 
     it 'does not show update link on view only case info',
