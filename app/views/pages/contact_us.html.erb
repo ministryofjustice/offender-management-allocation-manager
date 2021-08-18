@@ -20,7 +20,7 @@
   </div>
 </div>
 
-<div class="govuk-grid-row dashboard-row">
+<div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <% if @contact.errors.count > 0 %>
       <%= render :partial => "/shared/validation_errors", :locals => { :errors => @contact.errors } %>
