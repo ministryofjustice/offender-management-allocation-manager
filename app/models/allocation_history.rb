@@ -143,7 +143,12 @@ private
 
   def deallocate_offender event:, event_trigger:
     primary_pom = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(primary_pom_nomis_id)
-    offender = OffenderService.get_offender(nomis_offender_id)
+
+    # If the offender has been released from prison, OffenderService.get_offender will return nil (due to "OUT" being an unrecognised Prison)
+    # So instead we'll call the Prison API directly to get just the Prison record of the offender. We don't need a full MpcOffender object.
+    # We only need the offender's name, so this is enough for us.
+    offender = HmppsApi::PrisonApi::OffenderApi.get_offender(nomis_offender_id)
+
     mail_params = {
         email: primary_pom.email_address,
         pom_name: primary_pom.first_name.titleize,
