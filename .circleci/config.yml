@@ -98,20 +98,21 @@ commands:
       - run:
           name: Ensure local bin directory exists
           command: mkdir -p ~/.local/bin
-      - run:
-          # Firefox needs to be available from /usr/local/bin or else the Orb will re-install it
-          name: Restore Firefox installation from cache (if in cache)
-          command: |
-            if [ -e ~/.local/bin/firefox ]
-            then
-              sudo cp -P ~/.local/bin/firefox /usr/local/bin/firefox
-            fi
       - browser-tools/install-firefox:
           install-dir: /home/circleci/.local/bin
       - run:
-          # Copy the Firefox symlink back into ~/.local/bin so it can be persisted to the cache
-          name: Put Firefox installation into the local bin directory
-          command: cp -P /usr/local/bin/firefox ~/.local/bin/firefox
+          name: Firefox post-install tasks
+          command: |
+            # If a new Firefox binary was installed
+            if [ -e /usr/local/bin/firefox ]; then
+              # Move Firefox symlink to the local bin (so it gets persisted to cache)
+              sudo mv /usr/local/bin/firefox ~/.local/bin/firefox
+              # Change ownership of Firefox (since this is the circleci user's bin directory)
+              sudo chown -hR circleci:circleci ~/.local/bin/firefox*
+            fi
+
+            # Remove old Firefox installations (all but the most recent)
+            ls -trd ~/.local/bin/firefox-* | head -n -1 | xargs --no-run-if-empty rm -r
       - browser-tools/install-geckodriver:
           install-dir: /home/circleci/.local/bin
 
@@ -124,7 +125,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - restore_cache:
-          key: allocation-manager-{{ checksum "Gemfile.lock" }}-v2 # increment v number to bust cache
+          key: allocation-manager-{{ checksum "Gemfile.lock" }}-v4 # increment v number to bust cache
       - run:
           name: Which bundler?
           command: bundle -v
@@ -153,7 +154,7 @@ jobs:
               chmod +x ~/.local/bin/cc-test-reporter
             fi
       - save_cache:
-          key: allocation-manager-{{ checksum "Gemfile.lock" }}-v2 # increment v number to bust cache
+          key: allocation-manager-{{ checksum "Gemfile.lock" }}-v4 # increment v number to bust cache
           paths:
             - ~/repo/vendor/bundle
             - ~/repo/node_modules
@@ -255,7 +256,7 @@ jobs:
           name: Clone integration tests repo
           command: git clone https://github.com/ministryofjustice/offender-management-integration-tests.git .
       - restore_cache:
-          key: integration-tests-{{ checksum "Gemfile.lock" }}-v2 # increment v number to bust cache
+          key: integration-tests-{{ checksum "Gemfile.lock" }}-v4 # increment v number to bust cache
       - run:
           name: Install ruby gems
           command: |
@@ -263,7 +264,7 @@ jobs:
             bundle check || bundle install
       - install_firefox
       - save_cache:
-          key: integration-tests-{{ checksum "Gemfile.lock" }}-v2 # increment v number to bust cache
+          key: integration-tests-{{ checksum "Gemfile.lock" }}-v4 # increment v number to bust cache
           paths:
             - ~/integration-tests/vendor/bundle
             - ~/.local/bin
