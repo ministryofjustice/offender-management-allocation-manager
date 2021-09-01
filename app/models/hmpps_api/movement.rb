@@ -2,8 +2,6 @@
 
 module HmppsApi
   class Movement
-    include Deserialisable
-
     attr_reader :movement_type, :from_agency, :to_agency, :offender_no
 
     def initialize(fields = {})

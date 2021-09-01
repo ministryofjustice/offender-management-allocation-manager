@@ -2,8 +2,6 @@
 
 module HmppsApi
   class UserDetails
-    include Deserialisable
-
     attr_accessor :account_status,
                   :active,
                   :active_case_load_id,

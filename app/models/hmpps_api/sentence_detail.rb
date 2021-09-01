@@ -2,17 +2,15 @@
 
 module HmppsApi
   class SentenceDetail
-    include Deserialisable
-
-    attr_reader :home_detention_curfew_eligibility_date,
+    attr_reader :actual_parole_date,
                 :home_detention_curfew_actual_date,
-                :parole_eligibility_date,
-                :release_date,
+                :home_detention_curfew_eligibility_date,
                 :licence_expiry_date,
+                :parole_eligibility_date,
+                :recall,
+                :release_date,
                 :sentence_start_date,
-                :tariff_date,
-                :actual_parole_date,
-                :recall
+                :tariff_date
 
     delegate :criminal_sentence?, :immigration_case?, :civil_sentence?, to: :@sentence_type
 
@@ -69,31 +67,20 @@ module HmppsApi
     end
 
     def initialize(payload, search_payload)
-      @parole_eligibility_date = deserialise_date(payload, 'paroleEligibilityDate')
-      @release_date = deserialise_date(payload, 'releaseDate')
-      @sentence_start_date = deserialise_date(payload, 'sentenceStartDate')
-      @tariff_date = deserialise_date(payload, 'tariffDate')
-      @automatic_release_date = deserialise_date(payload, 'automaticReleaseDate')
-      @nomis_post_recall_release_date = deserialise_date(payload, 'postRecallReleaseDate')
-      @nomis_post_recall_release_override_date = deserialise_date(payload, 'postRecallReleaseOverrideDate')
-
-      @conditional_release_date = deserialise_date(
-        payload, 'conditionalReleaseDate'
-      )
-      @automatic_release_override_date = deserialise_date(
-        payload, 'automaticReleaseOverrideDate'
-      )
-      @home_detention_curfew_eligibility_date = deserialise_date(
-        payload, 'homeDetentionCurfewEligibilityDate'
-      )
-      @home_detention_curfew_actual_date = deserialise_date(
-        payload, 'homeDetentionCurfewActualDate'
-      )
-      @conditional_release_override_date = deserialise_date(
-        payload, 'conditionalReleaseOverrideDate'
-      )
-      @actual_parole_date = deserialise_date(payload, 'actualParoleDate')
-      @licence_expiry_date = deserialise_date(payload, 'licenceExpiryDate')
+      @actual_parole_date = payload['actualParoleDate']&.to_date
+      @automatic_release_date = payload['automaticReleaseDate']&.to_date
+      @automatic_release_override_date = payload['automaticReleaseOverrideDate']&.to_date
+      @conditional_release_date = payload['conditionalReleaseDate']&.to_date
+      @conditional_release_override_date = payload['conditionalReleaseOverrideDate']&.to_date
+      @home_detention_curfew_actual_date = payload['homeDetentionCurfewActualDate']&.to_date
+      @home_detention_curfew_eligibility_date = payload['homeDetentionCurfewEligibilityDate']&.to_date
+      @licence_expiry_date = payload['licenceExpiryDate']&.to_date
+      @nomis_post_recall_release_date = payload['postRecallReleaseDate']&.to_date
+      @nomis_post_recall_release_override_date = payload['postRecallReleaseOverrideDate']&.to_date
+      @parole_eligibility_date = payload['paroleEligibilityDate']&.to_date
+      @release_date = payload['releaseDate']&.to_date
+      @sentence_start_date = payload['sentenceStartDate']&.to_date
+      @tariff_date = payload['tariffDate']&.to_date
 
       @sentence_type = SentenceType.new search_payload.fetch('imprisonmentStatus', 'UNK_SENT')
       @recall = search_payload.fetch('recall', false)
