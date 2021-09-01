@@ -2,8 +2,6 @@
 
 module HmppsApi
   class Offender
-    include Deserialisable
-
     attr_reader :main_offence
 
     def awaiting_allocation_for
@@ -37,7 +35,7 @@ module HmppsApi
       @last_name = api_payload.fetch('lastName')
       @offender_no = api_payload.fetch('offenderNo')
       @convicted_status = api_payload['convictedStatus']
-      @date_of_birth = Date.parse(api_payload.fetch('dateOfBirth'))
+      @date_of_birth = api_payload.fetch('dateOfBirth').to_date
       @latest_temp_movement = latest_temp_movement
       @cell_location = search_payload['cellLocation']
       @complexity_level = complexity_level

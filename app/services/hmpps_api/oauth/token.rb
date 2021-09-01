@@ -5,8 +5,6 @@ require 'base64'
 module HmppsApi
   module Oauth
     class Token
-      include Deserialisable
-
       attr_writer :expires_in,
                   :internal_user,
                   :token_type,

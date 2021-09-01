@@ -2,8 +2,6 @@
 
 module HmppsApi
   class KeyworkerDetails
-    include Deserialisable
-
     attr_accessor :staff_id, :first_name, :last_name
 
     def self.from_json(json)

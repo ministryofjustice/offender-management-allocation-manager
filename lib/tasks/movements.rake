@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rake'
-require_relative '../../app//models/concerns/deserialisable.rb'
 require_relative '../../app/models/hmpps_api/movement.rb'
 
 namespace :movements do
