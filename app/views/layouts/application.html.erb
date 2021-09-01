@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html class="govuk-template js flexbox">
   <head>
+    <%= render 'layouts/google_tag_manager_head' %>
     <title>Manage Offenders in Custody</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <%= render 'layouts/analytics' %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
   </head>
 
   <body class="govuk-template__body js-enabled">
+    <%= render 'layouts/google_tag_manager_body' %>
     <%= render '/layouts/header' %>
     <%= render 'layouts/primary_navigation' %>
     <%= render '/layouts/phase_banner' %>
