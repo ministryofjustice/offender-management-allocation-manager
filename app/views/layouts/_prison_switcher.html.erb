@@ -1,9 +1,9 @@
 <% if show_prison_switcher?(@caseloads) %>
   <div class="govuk-phase-banner govuk-width-container app-site-
-  width-container govuk-!-padding-bottom-0 prison-switcher">
-      <h2 class="govuk-heading-m govuk-!-margin-0 govuk-!-padding-0">
-        <%= @prison.name %>
+  width-container govuk-!-padding-bottom-3 govuk-!-padding-top-3 prison-switcher">
+      <h2 class="govuk-heading-m govuk-!-margin-0 govuk-!-padding-0 govuk-!-font-size-19">
+        <%=@prison.name%>
       </h2>
-      <a href="<%= prison_prisons_path(@prison.code) %>">Switch prison</a>
+      <a class="govuk-!-font-size-19" href="<%= prison_prisons_path(@prison.code) %>">Change your location</a>
   </div>
 <% end %>

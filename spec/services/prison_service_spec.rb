@@ -11,7 +11,7 @@ RSpec.describe PrisonService do
 
   it "Get the name of a prison from the code" do
     name = described_class.name_for('LEI')
-    expect(name).to eq('HMP Leeds')
+    expect(name).to eq('Leeds (HMP)')
   end
 
   it 'can find all womens prisons' do

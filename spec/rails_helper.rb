@@ -99,7 +99,7 @@ RSpec.configure do |config|
   # in VCR mode, allow HTTP connections to T3, but then
   # reset back to default afterwards
   config.around(:each, :vcr) do |example|
-    # VCR tests expect HMP Leeds prison to exist
+    # VCR tests expect Leeds (HMP) prison to exist
     unless Prison.where(code: 'LEI').exists?
       create(:prison, code:'LEI')
     end

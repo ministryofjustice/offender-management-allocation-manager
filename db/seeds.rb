@@ -10,7 +10,7 @@ Prison.find_or_create_by!(
 Prison.find_or_create_by!(
   prison_type: 'mens_closed',
   code: 'LEI',
-  name: 'HMP Leeds',
+  name: 'Leeds (HMP)',
 
   )
 
