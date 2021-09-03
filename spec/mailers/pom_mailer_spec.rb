@@ -60,7 +60,7 @@ RSpec.describe PomMailer, type: :mailer do
         offender_name: "Marks, Simon",
         offender_no: "GE4595D",
         url: "http:://example.com",
-        prison: "HMP Leeds"
+        prison: "Leeds (HMP)"
       }
     end
 

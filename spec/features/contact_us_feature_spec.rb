@@ -15,7 +15,7 @@ feature 'Getting help' do
     visit '/'
     click_link 'Contact us'
 
-    expect(page.find("#prison").value).to eq('HMP Leeds')
+    expect(page.find("#prison").value).to eq('Leeds (HMP)')
     expect(page.find("#name").value).to eq('Moic Pom')
 
     expect(page).to have_button('Submit')

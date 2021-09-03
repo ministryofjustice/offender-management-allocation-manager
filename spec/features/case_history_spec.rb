@@ -214,7 +214,7 @@ feature 'Case History' do
       it 'has a section for Prescoed transfer to open conditions' do
         # 1st Prison - Prescoed. This only contains the transfer to open conditions
         within '.govuk-grid-row:nth-of-type(1)' do
-          expect(page).to have_css('.govuk-heading-m', text: "HMP/YOI Prescoed")
+          expect(page).to have_css('.govuk-heading-m', text: "Prescoed (HMP/YOI)")
 
           expect(all('.moj-timeline__item').size).to eq(2)
           prescoed_transfer = EmailHistory.where(nomis_offender_id: nomis_offender_id, event: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION).first

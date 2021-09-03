@@ -12,9 +12,5 @@ feature 'feedback' do
     within footer do
       expect(page).to have_link('Feedback', href: feedback_link)
     end
-
-    within '.govuk-phase-banner__text' do
-      expect(page).to have_link('feedback', href: feedback_link)
-    end
   end
 end

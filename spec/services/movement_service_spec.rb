@@ -122,7 +122,7 @@ describe MovementService, type: :feature do
                           pom_name: "Moic",
                           offender_name: "Annole, Omistius",
                           nomis_offender_id: valid_release.offender_no,
-                          prison_name: 'HMP Leeds',
+                          prison_name: 'Leeds (HMP)',
                           url: "http://localhost:3000/prisons/LEI/staff/485926/caseload")
                     .and_call_original
       end
