@@ -1,11 +1,6 @@
-function createFunctionWithTimeout(callback, opt_timeout) {
-    var called = false;
-    function fn() {
-      if (!called) {
-        called = true;
-        callback();
-      }
-    }
-    setTimeout(fn, opt_timeout || 1000);
-    return fn;
-  }
+/**
+ * Allow Google Tag Manager to track Turbolinks page views by pushing a custom event into the Data Layer.
+ */
+document.addEventListener("turbolinks:load", function() {
+    dataLayer.push({ "event": "turbolinks:load" });
+});
