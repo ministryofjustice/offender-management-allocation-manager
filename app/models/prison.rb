@@ -39,14 +39,14 @@ class Prison < ApplicationRecord
     allocated + unallocated
   end
 
-  def all_policy_offenders
-    OffenderService.get_offenders_for_prison(self).select(&:inside_omic_policy?)
-  end
-
   def unfiltered_offenders
     # Returns all offenders at the provided prison, and does not
     # filter out under 18s or non-sentenced offenders
-    OffenderService.get_offenders_for_prison(self)
+    @unfiltered_offenders || OffenderService.get_offenders_in_prison(self)
+  end
+
+  def all_policy_offenders
+    unfiltered_offenders.select(&:inside_omic_policy?)
   end
 
   def allocations
