@@ -18,7 +18,7 @@ class OffenderService
       end
     end
 
-    def get_offenders_for_prison(prison)
+    def get_offenders_in_prison(prison)
       api_offenders = HmppsApi::PrisonApi::OffenderApi.get_offenders_in_prison(prison.code)
                                                       .index_by(&:offender_no)
 
