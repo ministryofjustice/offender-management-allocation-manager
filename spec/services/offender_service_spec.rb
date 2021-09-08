@@ -76,37 +76,54 @@ describe OffenderService, type: :feature do
 
       context 'without MAPPA data' do
         describe '#service_provider' do
-          context 'when NPS' do
-            before do
-              stub_community_offender(nomis_offender_id,
-                                      build(:community_data, :nps))
-            end
+          subject { described_class.get_community_data(nomis_offender_id).fetch(:service_provider) }
 
-            it 'gets NPS' do
-              expect(described_class.get_community_data(nomis_offender_id).fetch(:service_provider)).to eq('NPS')
+          before do
+            stub_community_offender(nomis_offender_id, community_data)
+          end
+
+          context 'when enhancedResourcing is true' do
+            let(:community_data) { build(:community_data, enhancedResourcing: true) }
+
+            it 'is NPS' do
+              expect(subject).to eq('NPS')
+            end
+          end
+
+          context 'when enhancedResourcing is false' do
+            let(:community_data) { build(:community_data, enhancedResourcing: false) }
+
+            it 'is CRC' do
+              expect(subject).to eq('CRC')
             end
           end
 
           context 'when not found' do
+            # this means that the offender hasn't had a CAS assessment yet
+            let(:community_data) { build(:community_data) }
+
             before do
-              stub_community_offender(nomis_offender_id,
-                                      build(:community_data, :nps))
               stub_resourcing_404 nomis_offender_id
             end
 
-            it 'gets NPS' do
-              expect(described_class.get_community_data(nomis_offender_id).fetch(:service_provider)).to eq('NPS')
+            it 'defaults to NPS' do
+              expect(subject).to eq('NPS')
             end
           end
 
-          context 'when CRC' do
+          context 'when enhancedResourcing field is missing' do
+            # this typically means that the offender has a draft CAS assessment which hasn't been completed yet
+            # and is therefore in a "Not Assessed" state
+            let(:community_data) { build(:community_data) }
+
             before do
+              # enhancedResourcing field is missing
               stub_community_offender(nomis_offender_id,
-                                      build(:community_data, :crc))
+                                      build(:community_data))
             end
 
-            it 'gets CRC' do
-              expect(described_class.get_community_data(nomis_offender_id).fetch(:service_provider)).to eq('CRC')
+            it 'defaults to NPS' do
+              expect(subject).to eq('NPS')
             end
           end
         end

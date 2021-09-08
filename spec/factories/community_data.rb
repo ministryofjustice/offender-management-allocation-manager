@@ -10,8 +10,6 @@ FactoryBot.define do
 
     offenderManagers { [ build(:community_offender_manager) ] }
 
-    enhancedResourcing { true }
-
     trait :crc do
       enhancedResourcing { false }
     end
