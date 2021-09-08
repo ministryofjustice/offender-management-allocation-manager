@@ -222,7 +222,7 @@ module ApiHelper
     stub_request(:get, "#{COMMUNITY_HOST}/offenders/nomsNumber/#{nomis_offender_id}/registrations").
         to_return(body: { registrations: registrations }.to_json)
     stub_request(:get, "#{COMMUNITY_HOST}/offenders/nomsNumber/#{nomis_offender_id}/risk/resourcing/latest").
-        to_return(body: { enhancedResourcing: community_data.fetch(:enhancedResourcing) }.to_json)
+        to_return(body: community_data.slice(:enhancedResourcing).to_json)
   end
 
   def stub_resourcing_404 nomis_offender_id
