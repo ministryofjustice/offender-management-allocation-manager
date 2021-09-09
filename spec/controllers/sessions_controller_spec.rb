@@ -70,7 +70,7 @@ RSpec.describe SessionsController, type: :controller do
         "#{nomis_oauth_host}/auth/logout?client_id=#{client_id}&redirect_uri=#{CGI.escape(allocation_manager_host)}"
 
       allow(Rails.configuration).to receive(:nomis_oauth_host).and_return(nomis_oauth_host)
-      allow(Rails.configuration).to receive(:nomis_oauth_client_id).and_return(client_id)
+      allow(Rails.configuration).to receive(:hmpps_oauth_client_id).and_return(client_id)
       allow(Rails.configuration).to receive(:allocation_manager_host).and_return(allocation_manager_host)
 
       expect(delete :destroy).to redirect_to(nomis_oauth_sign_out_url)

@@ -16,7 +16,7 @@ describe HmppsApi::Oauth::Client do
         with(
           headers: {
             'Authorization': 'Basic ' + Base64.urlsafe_encode64(
-              "#{Rails.configuration.nomis_oauth_client_id}:#{Rails.configuration.nomis_oauth_client_secret}"
+              "#{Rails.configuration.hmpps_api_client_id}:#{Rails.configuration.hmpps_api_client_secret}"
             )
           }
       )

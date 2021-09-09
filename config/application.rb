@@ -55,8 +55,11 @@ module OffenderManagementAllocationClient
     config.prisoner_search_host = ENV['PRISONER_SEARCH_HOST']&.strip
     config.complexity_api_host = ENV['COMPLEXITY_API_HOST']&.strip
 
-    config.nomis_oauth_client_id = ENV['NOMIS_OAUTH_CLIENT_ID']&.strip
-    config.nomis_oauth_client_secret = ENV['NOMIS_OAUTH_CLIENT_SECRET']&.strip
+    config.hmpps_oauth_client_id = ENV['HMPPS_OAUTH_CLIENT_ID']&.strip
+    config.hmpps_oauth_client_secret = ENV['HMPPS_OAUTH_CLIENT_SECRET']&.strip
+    config.hmpps_api_client_id = ENV['HMPPS_API_CLIENT_ID']&.strip
+    config.hmpps_api_client_secret = ENV['HMPPS_API_CLIENT_SECRET']&.strip
+
     config.nomis_oauth_public_key = ENV['NOMIS_OAUTH_PUBLIC_KEY']&.strip
     config.collect_prometheus_metrics = ENV['PROMETHEUS_METRICS']&.strip == 'on'
     config.support_email = ENV['SUPPORT_EMAIL']&.strip

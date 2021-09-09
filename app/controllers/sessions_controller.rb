@@ -23,7 +23,7 @@ private
     url = URI.parse("#{Rails.configuration.nomis_oauth_host}/auth/logout")
     url.query = {
       redirect_uri: Rails.configuration.allocation_manager_host,
-      client_id: Rails.configuration.nomis_oauth_client_id
+      client_id: Rails.configuration.hmpps_oauth_client_id
     }.to_query
 
     url.to_s

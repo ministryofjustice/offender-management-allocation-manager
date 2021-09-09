@@ -20,7 +20,7 @@ module OmniAuth
 
       #:nocov:
       def build_access_token
-        options.token_params[:headers] = { 'Authorization' => authorisation }
+        options.token_params[:headers] = { 'Authorization' => user_login_authorisation }
         super
       end
       #:nocov:
