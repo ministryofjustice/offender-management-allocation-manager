@@ -1,11 +1,11 @@
 require 'hmpps_sso'
 
-sso_client_secret = Rails.configuration.nomis_oauth_client_secret
-sso_client_id = Rails.configuration.nomis_oauth_client_id
+sso_client_secret = Rails.configuration.hmpps_oauth_client_secret
+sso_client_id = Rails.configuration.hmpps_oauth_client_id
 sso_host = Rails.configuration.nomis_oauth_host
 
 unless sso_client_secret && sso_client_id && sso_host
-  STDOUT.puts '[WARN] NOMIS_OAUTH_CLIENT_ID, SECRET or HOST not configured'
+  STDOUT.puts '[WARN] HMPPS_OAUTH_CLIENT_ID, SECRET or HOST not configured'
 end
 
 Rails.application.config.middleware.use OmniAuth::Builder do

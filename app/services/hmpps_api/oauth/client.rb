@@ -28,7 +28,7 @@ module HmppsApi
         response = @connection.send(method) { |req|
           url = URI.join(@host, route).to_s
           req.url(url)
-          req.headers['Authorization'] = authorisation
+          req.headers['Authorization'] = api_authorisation
         }
 
         JSON.parse(response.body)

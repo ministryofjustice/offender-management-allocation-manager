@@ -93,8 +93,9 @@ Required
 | Env var  | Description  |
 |---|---|
 | KEYWORKER_API_HOST | The host where the keyworker API is hosted |
-| NOMIS_OAUTH_CLIENT_ID | The client ID of the application in OAUTH |
-| NOMIS_OAUTH_HOST  |  This is the full URL of the OAUTH host where access is granted to read from the relevant APIs |
+| HMPPS_OAUTH_CLIENT_ID | The client ID of the application in OAUTH |
+| NOMIS_OAUTH_HOST  |  This is the full URL of the OAUTH host where access is granted to users using the service |
+| HMPPS_API_CLIENT_ID | This is the full URL of the API host where access is granted to read from the relevant APIs |
 | NOMIS_OAUTH_PUBLIC_KEY  | This is the base64 encoded public key for decoding Tokens provided by the OAUTH server |
 | PROMETHEUS_METRICS | If set to 'on' then will enable the generation of prometheus metrics |
 
