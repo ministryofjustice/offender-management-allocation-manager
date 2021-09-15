@@ -27,8 +27,6 @@ FactoryBot.define do
 
     trait :welsh_policy_sentence do
       sentenceStartDate { '2019-02-05' }
-      conditionalReleaseDate { "2022-01-28" }
-      automaticReleaseDate { "2022-01-28" }
     end
 
     trait :welsh_open_policy do
