@@ -54,6 +54,7 @@ module OffenderManagementAllocationClient
     config.prison_api_host = ENV['PRISON_API_HOST']&.strip
     config.prisoner_search_host = ENV['PRISONER_SEARCH_HOST']&.strip
     config.complexity_api_host = ENV['COMPLEXITY_API_HOST']&.strip
+    config.assessment_api_host = ENV['ASSESSMENT_API_HOST']&.strip
 
     config.hmpps_oauth_client_id = ENV['HMPPS_OAUTH_CLIENT_ID']&.strip
     config.hmpps_oauth_client_secret = ENV['HMPPS_OAUTH_CLIENT_SECRET']&.strip

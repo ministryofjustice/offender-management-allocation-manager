@@ -8,6 +8,7 @@ module ApiHelper
   COMMUNITY_HOST = "#{Rails.configuration.community_api_host}/secure"
   T3_LATEST_MOVE_URL = "#{T3}/movements/offenders?latestOnly=true&movementTypes=TAP"
   T3_BOOKINGS_URL = "#{T3}/offender-sentences/bookings"
+  ASSESSMENT_API_HOST = Rails.configuration.assessment_api_host
 
   def stub_offender(offender)
     booking_number = offender.fetch(:bookingId)
