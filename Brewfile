@@ -9,11 +9,14 @@
 # required by Rails Active Record
 brew 'postgres'
 
-# required by gem 'undercover'
+# required to install gem 'undercover'
 brew 'cmake'
 
-# required by Capybara to drive tests in Firefox
+# required by Capybara to drive feature tests in Firefox
 brew 'geckodriver'
 
 # required by gem 'mimemagic' v0.3.9
 brew 'shared-mime-info'
+
+# required by bin/copy-prod-db-to-preprod.sh
+brew 'jq'

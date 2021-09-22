@@ -1,4 +1,5 @@
-#! /bin/bash
+#!/bin/bash
+set -e
 
 # Copy MOIC prod database to preprod
 
@@ -7,9 +8,9 @@
 
 # Dependencies:
 # kubectl must be installed and authenticated to MOJ Cloud Platform
-# yq must be installed – brew install yq
+# jq must be installed – brew install jq
 command -v kubectl >/dev/null 2>&1 || { echo >&2 "kubectl not found. Please install and configure it for MOJ Cloud Platform."; exit 1; }
-command -v yq >/dev/null 2>&1 || { echo >&2 "yq not found. Please install with: brew install yq"; exit 1; }
+command -v jq >/dev/null 2>&1 || { echo >&2 "jq not found. Please install with: brew install jq"; exit 1; }
 
 # Explain what this script will do and ask for confirmation to continue
 echo "This script will copy the MOIC production database into pre-production."
@@ -32,14 +33,14 @@ DB_SECRET_NAME="allocation-rds-instance-output"
 PROD_KUBE_NAMESPACE="offender-management-production"
 PREPROD_KUBE_NAMESPACE="offender-management-preprod"
 
-# Helper to read keys from the base64-encoded YAML Kubernetes Secrets
+# Helper method to get the value of a key from Kubernetes Secrets
 function read_secret_field() {
-  echo "$1" | yq r - "data.$2" | base64 --decode
+  echo "$1" | jq -r ".data.$2 | @base64d"
 }
 
 # Source: Production
 # Get database credentials from the Kubenetes Secret
-PROD_SECRET=$(kubectl get secret $DB_SECRET_NAME -o yaml -n $PROD_KUBE_NAMESPACE)
+PROD_SECRET=$(kubectl get secret $DB_SECRET_NAME -o json -n $PROD_KUBE_NAMESPACE)
 SOURCE_DB=$(read_secret_field "$PROD_SECRET" "postgres_name")
 SOURCE_PASS=$(read_secret_field "$PROD_SECRET" "postgres_password")
 SOURCE_USER=$(read_secret_field "$PROD_SECRET" "postgres_user")
@@ -47,7 +48,7 @@ SOURCE_HOST=$(read_secret_field "$PROD_SECRET" "postgres_host")
 
 # Target: Pre-production
 # Get database credentials from the Kubenetes Secret
-PREPROD_SECRET=$(kubectl get secret $DB_SECRET_NAME -o yaml -n $PREPROD_KUBE_NAMESPACE)
+PREPROD_SECRET=$(kubectl get secret $DB_SECRET_NAME -o json -n $PREPROD_KUBE_NAMESPACE)
 TARGET_DB=$(read_secret_field "$PREPROD_SECRET" "postgres_name")
 TARGET_PASS=$(read_secret_field "$PREPROD_SECRET" "postgres_password")
 TARGET_USER=$(read_secret_field "$PREPROD_SECRET" "postgres_user")
