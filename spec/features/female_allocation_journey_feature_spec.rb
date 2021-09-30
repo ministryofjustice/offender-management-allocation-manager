@@ -125,7 +125,7 @@ feature "womens allocation journey" do
     before do
       stub_keyworker prison.code, offender_id, build(:keyworker)
 
-      create(:case_information, tier: 'B', offender: build(:offender, nomis_offender_id: offender_id))
+      create(:case_information, tier: 'C', offender: build(:offender, nomis_offender_id: offender_id))
       create(:allocation_history, nomis_offender_id: offender_id, prison: prison.code, primary_pom_nomis_id: probation_pom.staff_id)
 
       visit allocated_prison_prisoners_path prison.code
@@ -148,7 +148,7 @@ feature "womens allocation journey" do
 
       expect(allocation.attributes.symbolize_keys.except(:created_at, :updated_at, :id, :primary_pom_allocated_at)).
         to eq(message: message_text,
-              allocated_at_tier: "B",
+              allocated_at_tier: "C",
               created_by_name: " ",
               event: 'reallocate_primary_pom',
               event_trigger: "user",
