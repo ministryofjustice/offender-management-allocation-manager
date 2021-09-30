@@ -14,7 +14,7 @@ class MpcOffender
            :inside_omic_policy?, :offender_no, :prison_id, to: :@prison_record
 
   delegate :crn, :case_allocation, :manual_entry?, :nps_case?,
-           :tier, :delius_matched?,
+           :tier,
            :mappa_level, :welsh_offender, to: :probation_record
 
   delegate :victim_liaison_officers, to: :@offender

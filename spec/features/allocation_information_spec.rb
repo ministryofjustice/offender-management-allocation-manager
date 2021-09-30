@@ -7,12 +7,12 @@ feature "view an offender's allocation information" do
   let!(:nomis_offender_id_with_keyworker) { 'G3462VT' }
   let!(:nomis_offender_id_without_keyworker) { 'G8859UP' }
   let!(:allocated_at_tier) { 'A' }
-  let!(:prison) { 'LEI' }
+  let!(:prison) { create(:prison) }
   let!(:recommended_pom_type) { 'probation' }
   let!(:pom_detail) {
     PomDetail.create!(
       nomis_staff_id: probation_officer_nomis_staff_id,
-      prison_code: prison,
+      prison_code: prison.code,
       working_pattern: 1.0,
       status: 'Active'
     )
@@ -167,30 +167,6 @@ feature "view an offender's allocation information" do
         within table_row do
           expect(page).to have_link('View')
           expect(page).to have_content("POM allocated - #{Time.zone.now.strftime('%d/%m/%Y')}")
-        end
-      end
-
-      context 'without auto_delius_import enabled' do
-        it 'displays change links' do
-          expect(page).to have_content 'Change'
-        end
-      end
-
-      context 'with auto_delius_import enabled' do
-        let(:test_strategy) { Flipflop::FeatureSet.current.test! }
-
-        before do
-          test_strategy.switch!(:auto_delius_import, true)
-        end
-
-        after do
-          test_strategy.switch!(:auto_delius_import, false)
-        end
-
-        it 'does not display change links' do
-          visit prison_prisoner_allocation_path('LEI', prisoner_id: nomis_offender_id_with_keyworker)
-
-          expect(page).not_to have_content 'Change'
         end
       end
     end

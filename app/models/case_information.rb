@@ -21,10 +21,6 @@ class CaseInformation < ApplicationRecord
     probation_service == 'Wales'
   end
 
-  def delius_matched?
-    manual_entry == false
-  end
-
   validates :manual_entry, inclusion: { in: [true, false], allow_nil: false }
   validates :nomis_offender_id, presence: true, uniqueness: true
 
