@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) do |repo| "https://github.com/#{repo}.git" end
 
-ruby '2.6.6'
+ruby '2.6.8'
 
 gem 'auto_strip_attributes'
 # Need AWS SNS SDK for publishing events to HMPPS_DOMAIN_EVENTS
