@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 class PomTasks
-  # Just for auto_delius_import_enabled
-  include ApplicationHelper
-
   def for_offenders(offenders)
     # For each AllocatedOffender we want to find out if the offender
     # requires any changes to it. This may return multiple tasks for the
@@ -21,8 +18,7 @@ class PomTasks
     end
 
     tasks = [
-      parole_review_date_task(offender),
-      missing_info_task(offender)
+      parole_review_date_task(offender)
     ].compact
 
     if early_allocations.include?(offender.offender_no)
@@ -41,22 +37,6 @@ class PomTasks
                            offender_number: offender.offender_no,
                            action_label: 'Parole review date',
                            long_label: 'Parole review date must be updated so handover dates can be calculated.'
-    end
-  end
-
-  def missing_info_task(offender)
-    return unless auto_delius_import_enabled?(offender.prison_id)
-
-    # Offender had their delius data manually added and as a result are missing
-    # new key fields.
-    unless offender.delius_matched?
-      PomTaskPresenter.new offender_name: offender.full_name,
-        offender_number: offender.offender_no,
-        action_label: 'nDelius case matching',
-        long_label: 'This prisoner must be linked to an nDelius record so '\
-          'community probation details are available. '\
-          'See <a href="/update_case_information">how to update case information</a>'
-
     end
   end
 

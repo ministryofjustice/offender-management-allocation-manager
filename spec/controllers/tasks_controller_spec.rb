@@ -78,46 +78,6 @@ RSpec.describe TasksController, :allocation, type: :controller do
     end
   end
 
-  context 'when showing ndelius update pom tasks' do
-    let(:test_strategy) { Flipflop::FeatureSet.current.test! }
-    let(:offender_no) { 'G1234VV' }
-
-    before do
-      test_strategy.switch!(:auto_delius_import, true)
-
-      stub_offender(build(:nomis_offender, offenderNo: offender_no))
-
-      # Ensure only one of our offenders has missing data and that G7514GW (indeterminate) has a PRD
-      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), tier: 'A', manual_entry: true)
-      create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id, prison: prison)
-
-      create(:case_information, offender: build(:offender, nomis_offender_id: 'G1234AB'), tier: 'A', manual_entry: false)
-      create(:allocation_history, nomis_offender_id: 'G1234AB', primary_pom_nomis_id: staff_id, prison: prison)
-
-      create(:case_information, offender: build(:offender, nomis_offender_id: 'G1234GG'), tier: 'A', manual_entry: false)
-      create(:allocation_history, nomis_offender_id: 'G1234GG', primary_pom_nomis_id: staff_id, prison: prison)
-
-      create(:case_information, tier: 'A', manual_entry: false,
-             offender: build(:offender, nomis_offender_id: 'G7514GW', parole_record: build(:parole_record, parole_review_date: next_week)))
-      create(:allocation_history, nomis_offender_id: 'G7514GW', primary_pom_nomis_id: staff_id, prison: prison)
-    end
-
-    after do
-      test_strategy.switch!(:auto_delius_import, false)
-    end
-
-    it 'can show offenders needing nDelius updates' do
-      get :index, params: { prison_id: prison }
-
-      expect(response).to be_successful
-
-      pomtasks = assigns(:pomtasks)
-      expect(pomtasks.count).to eq(1)
-      expect(pomtasks.first.offender_number).to eq(offender_no)
-      expect(pomtasks.first.action_label).to eq('nDelius case matching')
-    end
-  end
-
   context 'when showing early allocation decisions required' do
     let(:offender_nos) { %w[G1234AB G1234GG G7514GW G1234VV] }
     let(:test_offender_no) { 'G1234AB' }

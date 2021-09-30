@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class CaseInformationController < PrisonsApplicationController
-  before_action :set_prisoner_from_url, only: [:new, :edit, :edit_prd, :update_prd, :show]
-  before_action :set_case_info, only: [:edit, :show]
+  before_action :set_prisoner_from_url, only: [:new, :edit, :edit_prd, :update_prd]
+  before_action :set_case_info, only: [:edit]
 
   before_action :set_referrer
   before_action :store_referrer_in_session, only: [:edit_prd, :edit]
@@ -27,10 +27,6 @@ class CaseInformationController < PrisonsApplicationController
     else
       render 'edit_prd'
     end
-  end
-
-  def show
-    @delius_errors = DeliusImportError.where(nomis_offender_id: nomis_offender_id_from_url)
   end
 
   def create
