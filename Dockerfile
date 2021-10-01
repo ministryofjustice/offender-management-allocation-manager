@@ -1,4 +1,4 @@
-FROM ruby:2.6.6-buster
+FROM ruby:2.6.8-slim-bullseye
 
 RUN \
   set -ex \
@@ -9,7 +9,8 @@ RUN \
     locales \
   && sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen \
   && dpkg-reconfigure --frontend=noninteractive locales \
-  && update-locale LANG=en_GB.UTF-8
+  && update-locale LANG=en_GB.UTF-8 \
+  && apt-get clean
 
 ENV \
   LANG=en_GB.UTF-8 \
@@ -30,35 +31,28 @@ WORKDIR /app
 
 RUN \
   set -ex \
-  && apt-get install \
+  && apt-get update && apt-get install \
     -y \
     --no-install-recommends \
-    apt-transport-https \
+    curl \
     build-essential \
     libpq-dev \
-    netcat \
-    nodejs \
     libjemalloc-dev \
   && timedatectl set-timezone Europe/London || true \
-  && gem update bundler --no-document
+  && gem update bundler --no-document \
+  && apt-get clean
 
-RUN \
-  set -ex \
-  && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-  && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+# Install Node.js and Yarn
+RUN (curl -fsSL https://deb.nodesource.com/setup_16.x | bash -) \
+    && apt-get install -y nodejs \
+    && npm --global install yarn \
+    && apt-get clean
 
-RUN \
-  set -ex \
-  && apt-get update \
-  && apt-get install \
-    -y \
-    --no-install-recommends \
-    yarn=1.10.1-1 \
-  && yarn install
-
+# Install Ruby and Node dependencies
 COPY Gemfile Gemfile.lock package.json ./
-
-RUN bundle config set --local without 'development test' && bundle install --jobs 2 --retry 3
+RUN yarn install \
+    && bundle config set --local without 'development test' \
+    && bundle install --jobs 2 --retry 3
 
 COPY . /app
 
