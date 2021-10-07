@@ -24,7 +24,7 @@
         <span class="handover-reason">(<%= probation_field(@prisoner, :handover_reason) %>)</span>
       </td>
     </tr>
-    <% if Flipflop.early_allocation? && @prisoner.probation_record.present? && @prisoner.nps_case? %>
+    <% if @prisoner.probation_record.present? && @prisoner.nps_case? %>
     <tr id="early_allocation" class="govuk-table__row">
       <td class="govuk-table__cell">Early allocation referral</td>
       <td class="govuk-table__cell table_cell__left_align">

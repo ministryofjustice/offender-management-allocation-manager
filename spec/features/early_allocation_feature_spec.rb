@@ -36,25 +36,6 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
     expect(page).to have_content("Showing 1 - 1 of 1 results")
   end
 
-  context 'with switch set false' do
-    let(:test_strategy) { Flipflop::FeatureSet.current.test! }
-    let(:release_date) { Time.zone.today }
-
-    before do
-      test_strategy.switch!(:early_allocation, false)
-    end
-
-    after do
-      test_strategy.switch!(:early_allocation, true)
-    end
-
-    it 'does not show the section' do
-      click_link offender_name
-      expect(page).not_to have_content 'Early allocation eligibility'
-    end
-  end
-
-  # switch is on by default
   context 'with switch' do
     context 'when CRC' do
       let(:case_alloc) { CaseInformation::CRC }
