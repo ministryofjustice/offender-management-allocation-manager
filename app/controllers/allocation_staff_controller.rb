@@ -18,6 +18,7 @@ class AllocationStaffController < PrisonsApplicationController
     poms = @prison.get_list_of_poms.index_by(&:staff_id)
     @previous_poms = previous_pom_ids.map { |staff_id| poms[staff_id] }.compact
     @current_pom = poms[@allocation.primary_pom_nomis_id] if @allocation&.primary_pom_nomis_id
+    @oasys_assessment = HmppsApi::AssessmentApi.get_latest_oasys_date(@prisoner.offender_no)
   end
 
 private

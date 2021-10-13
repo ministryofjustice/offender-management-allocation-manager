@@ -17,4 +17,5 @@ data:
   ZENDESK_USERNAME: "moic+zendesk@digital.justice.gov.uk"
   ZENDESK_URL: "https://ministryofjustice.zendesk.com/api/v2"
   LD_PRELOAD: "/usr/lib/x86_64-linux-gnu/libjemalloc.so"
+  ASSESSMENT_API_HOST: "https://offender-dev.aks-dev-1.studio-hosting.service.justice.gov.uk"
 

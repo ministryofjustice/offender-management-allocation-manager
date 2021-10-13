@@ -160,6 +160,41 @@ RSpec.describe AllocationStaffController, type: :controller do
           end
         end
       end
+
+      context 'when displaying the last OASys assessment' do
+        let(:page) { Nokogiri::HTML(response.body) }
+
+        before do
+          create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
+          stub_offenders_for_prison(prison_code, [offender])
+          expect(HmppsApi::AssessmentApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(completed_date)
+
+          get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
+          expect(page.css('#oasys-date')).to have_text('Last OASys completed')
+        end
+
+        context 'when an offender has a previous assessments' do
+          let(:completed_date) { '2021-06-02'.to_date }
+
+          render_views
+
+          it 'displays the latest one' do
+            expect(assigns(:oasys_assessment)).to eq(completed_date)
+            expect(page.css('#oasys-date')).to have_text("02 Jun 2021")
+          end
+        end
+
+        context 'when an offender has no assessments' do
+          let(:completed_date) { nil }
+
+          render_views
+
+          it 'displays a reason for no date being present' do
+            expect(assigns(:oasys_assessment)).to eq(nil)
+            expect(page.css('#oasys-date')).to have_text('This prisoner has not had an OASys assessment.')
+          end
+        end
+      end
     end
   end
 end
