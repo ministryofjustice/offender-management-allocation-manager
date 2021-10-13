@@ -6,7 +6,6 @@ feature 'Provide debugging information for our team to use' do
 
   before do
     signin_global_admin_user
-    create(:prison, code: 'MDI')
   end
 
   context 'when debugging an individual offender' do
@@ -105,16 +104,6 @@ feature 'Provide debugging information for our team to use' do
 
         expect(page).to have_content 'OMIC policy does not apply to this offender'
       end
-    end
-  end
-
-  context 'when debugging at a prison level', vcr: { cassette_name: 'prison_api/debugging_prison_level' } do
-    it 'displays a dashboard' do
-      visit prison_debugging_prison_path('LEI')
-
-      expect(page).to have_text("Prison Debugging")
-      expect(page).to have_css('tbody tr', minimum: 220)
-      expect(page).to have_css('.govuk-data-label', text: 'With missing information')
     end
   end
 end

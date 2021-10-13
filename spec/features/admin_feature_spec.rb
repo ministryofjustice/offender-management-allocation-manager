@@ -23,7 +23,6 @@ feature 'admin urls' do
     [
     '/admin', '/flip-flop-admin', '/sidekiq',
     "/prisons/#{prison_code}/debugging",
-    "/prisons/#{prison_code}/debugging/prison"
   ]
   }
   let(:username) { 'MOIC_POM' }
