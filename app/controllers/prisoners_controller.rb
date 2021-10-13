@@ -38,6 +38,7 @@ class PrisonersController < PrisonsApplicationController
 
     @tasks = PomTasks.new.for_offender(@prisoner)
     @allocation = AllocationHistory.find_by(nomis_offender_id: @prisoner.offender_no)
+    @oasys_assessment = HmppsApi::AssessmentApi.get_latest_oasys_date(@prisoner.offender_no)
 
     if @allocation.present?
       @primary_pom_name = PrisonOffenderManagerService.fetch_pom_name(@allocation.primary_pom_nomis_id).

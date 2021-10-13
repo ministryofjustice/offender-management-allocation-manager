@@ -55,5 +55,11 @@
         <%= prisoner_location(@prisoner) %>
       </td>
     </tr>
+    <tr id="oasys-date" class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-width-one-half">Last OASys completed</td>
+      <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
+        <%= format_date(@oasys_assessment, replacement: 'This prisoner has not had an OASys assessment') %>
+      </td>
+    </tr>
   </tbody>
 </table>

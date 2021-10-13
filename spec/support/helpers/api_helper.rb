@@ -56,6 +56,8 @@ module ApiHelper
 
     stub_request(:get, "#{Rails.configuration.complexity_api_host}/v1/complexity-of-need/offender-no/#{offender_no}").
       to_return(body: { level: offender.fetch(:complexityLevel) }.to_json)
+
+    stub_oasys_assessments(offender_no)
   end
 
   def stub_movements(movements = [])
@@ -176,6 +178,11 @@ module ApiHelper
     )
 
     offenders.each { |o| stub_offender(o) }
+  end
+
+  def stub_oasys_assessments(offender_no)
+    stub_request(:get, "#{ASSESSMENT_API_HOST}/offenders/nomisId/#{offender_no}/assessments/summary?assessmentStatus=COMPLETE&assessmentType=LAYER_3").
+    to_return(body: [].to_json)
   end
 
   def stub_multiple_offenders(offenders, bookings)
