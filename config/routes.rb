@@ -113,7 +113,6 @@ Rails.application.routes.draw do
     end
 
     get('/debugging' => 'debugging#debugging')
-    get('/debugging/prison' => 'debugging#prison_info')
   end
 
   match "/401", :to => "errors#unauthorized", :via => :all
