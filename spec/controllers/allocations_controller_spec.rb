@@ -86,7 +86,7 @@ RSpec.describe AllocationsController, type: :controller do
           create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no,  primary_pom_nomis_id: active_pom.staff_id)
 
           get :show, params: { prison_id: prison_code, prisoner_id: offender_no }
-          expect(page.css('#oasys-date')).to have_text('Last OASys completed')
+          expect(page.css('#oasys-date')).to have_text('Last completed layer 3 OASys')
         end
 
         context 'when an offender has a previous assessments' do
@@ -107,7 +107,7 @@ RSpec.describe AllocationsController, type: :controller do
 
           it 'displays a reason for no date being present' do
             expect(assigns(:oasys_assessment)).to eq(nil)
-            expect(page.css('#oasys-date')).to have_text 'This prisoner has not had an OASys assessment.'
+            expect(page.css('#oasys-date')).to have_text 'This prisoner has not had a layer 3 OASys assessment.'
           end
         end
       end
