@@ -194,19 +194,20 @@ private
       !@offender.nps_case? && !@offender.indeterminate_sentence?
     end
 
+    # Work out if OMIC policy rules apply to this case
     def policy_case?
       sentenced_after_policy_started = @offender.sentence_start_date >= policy_start_date
+      release_after_cutoff = release_date >= policy_cutoff_date
+
+      # Offenders must have been sentenced on/after the OMIC policy start date,
+      # or have a release date which is on/after the 'cutoff' date.
+      within_policy_dates = (sentenced_after_policy_started || release_after_cutoff)
 
       if in_open_conditions?
-        # Open prison
-        # OMIC policy launched in open prisons a while after closed prisons
-        # There are specific rules to decide if open prison rules apply
-        sentenced_after_policy_started && open_prison_rules_apply?
+        # There are additional rules to decide if OMIC open prison rules apply
+        within_policy_dates && open_prison_rules_apply?
       else
-        # Closed prison
-        # Offender must have been sentenced after the OMIC policy start date,
-        # or have a release date which is on/after the 'cutoff' date.
-        sentenced_after_policy_started || (release_date >= policy_cutoff_date)
+        within_policy_dates
       end
     end
 
