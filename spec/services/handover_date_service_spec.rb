@@ -611,6 +611,204 @@ describe HandoverDateService do
     end
   end
 
+  describe 'OMIC policy date boundaries' do
+    let(:api_offender) {
+      build(:hmpps_api_offender,
+            latestLocationId: prison,
+            sentence: build(:sentence_detail, :determinate, sentenceStartDate: sentence_start_date, conditionalReleaseDate: crd),
+            category: offender_category
+      ).tap { |o|
+        o.prison_arrival_date = arrival_date
+      }
+    }
+
+    let(:offender_category) { build(:offender_category, :cat_c) }
+
+    let(:case_info) { build(:case_information, :english) }
+
+    shared_examples 'pre-policy rules' do
+      it 'is COM responsible' do
+        expect(com).to be_responsible
+        expect(pom).to be_supporting
+      end
+
+      it 'has no handover dates' do
+        expect(start_date).to be_nil
+        expect(handover_date).to be_nil
+      end
+
+      it 'has the expected reason' do
+        expect(reason).to eq('Pre-OMIC rules')
+      end
+    end
+
+    shared_examples 'OMIC policy rules' do
+      it 'is POM responsible' do
+        expect(pom).to be_responsible
+        expect(com).not_to be_involved # until the handover start date
+      end
+
+      it 'has handover dates in the future' do
+        expect(start_date).to be_future
+        expect(handover_date).to be_future
+      end
+
+      it 'has the expected reason' do
+        # The offender is stubbed as NPS without a MAPPA level
+        expect(reason).to eq('NPS - MAPPA level unknown')
+      end
+    end
+
+    context 'when sentenced before policy start and released before policy cutoff' do
+      # Sentenced 1 day before policy start date
+      let(:sentence_start_date) { HandoverDateService::ENGLISH_POLICY_START_DATE - 1.day } # 30 Sep 2019
+
+      # Released 1 day before policy cutoff date
+      let(:crd) { HandoverDateService::ENGLISH_PUBLIC_CUTOFF - 1.day } # 14 Feb 2021
+
+      context 'when in a mens closed prison' do
+        let(:prison) { closed_prison }
+
+        it_behaves_like 'pre-policy rules'
+      end
+
+      context 'when in a mens open prison' do
+        let(:prison) { open_prison }
+
+        it_behaves_like 'pre-policy rules'
+      end
+
+      context 'when in a womens prison' do
+        let(:prison) { womens_prison }
+
+        # Sentenced 1 day before policy start date
+        let(:sentence_start_date) { HandoverDateService::WOMENS_POLICY_START_DATE - 1.day } # 29 April 2021
+
+        # Released 1 day before policy cutoff date
+        let(:crd) { HandoverDateService::WOMENS_CUTOFF_DATE - 1.day } # 29 Sep 2022
+
+        context 'when in closed conditions' do
+          let(:offender_category) { build(:offender_category, :female_closed) }
+
+          it_behaves_like 'pre-policy rules'
+        end
+
+        context 'when in open conditions' do
+          let(:offender_category) { build(:offender_category, :female_open) }
+
+          it_behaves_like 'pre-policy rules'
+        end
+      end
+    end
+
+    context 'when sentenced before policy start but released on/after policy cutoff' do
+      # Sentenced 1 day before policy start date
+      let(:sentence_start_date) { HandoverDateService::ENGLISH_POLICY_START_DATE - 1.day } # 30 Sep 2019
+
+      # Released on/after the policy cutoff date
+      let(:crd) { HandoverDateService::ENGLISH_PUBLIC_CUTOFF } # 15 Feb 2021
+
+      # Set today's date to early on in the sentence (before the start of handover)
+      let(:today) { sentence_start_date + 1.week }
+
+      context 'when in a mens closed prison' do
+        let(:prison) { closed_prison }
+
+        it_behaves_like 'OMIC policy rules'
+      end
+
+      context 'when in a mens open prison' do
+        let(:prison) { open_prison }
+
+        context 'when arrived before open policy launched' do
+          let(:arrival_date) { HandoverDateService::OPEN_PRISON_POLICY_START_DATE - 1.day }
+
+          it_behaves_like 'pre-policy rules'
+        end
+
+        context 'when arrived after open policy launched' do
+          let(:arrival_date) { HandoverDateService::OPEN_PRISON_POLICY_START_DATE + 1.day }
+
+          it_behaves_like 'OMIC policy rules'
+        end
+      end
+
+      context 'when in a womens prison' do
+        let(:prison) { womens_prison }
+
+        # Sentenced 1 day before policy start date
+        let(:sentence_start_date) { HandoverDateService::WOMENS_POLICY_START_DATE - 1.day } # 29 Apr 2021
+
+        # Released on/after the policy cutoff date
+        let(:crd) { HandoverDateService::WOMENS_CUTOFF_DATE } # 30 Sep 2022
+
+        context 'when in closed conditions' do
+          let(:offender_category) { build(:offender_category, :female_closed) }
+
+          it_behaves_like 'OMIC policy rules'
+        end
+
+        context 'when in open conditions' do
+          let(:offender_category) { build(:offender_category, :female_open) }
+
+          it_behaves_like 'OMIC policy rules'
+        end
+      end
+    end
+
+    context 'when sentenced after policy start date' do
+      # Sentenced on/after policy start date
+      let(:sentence_start_date) { HandoverDateService::ENGLISH_POLICY_START_DATE } # 1 Oct 2019
+
+      # A release date some time in the future
+      let(:crd) { 3.years.from_now }
+
+      # Set today's date to early on in the sentence (before the start of handover)
+      let(:today) { sentence_start_date + 1.week }
+
+      context 'when in a mens closed prison' do
+        let(:prison) { closed_prison }
+
+        it_behaves_like 'OMIC policy rules'
+      end
+
+      context 'when in a mens open prison' do
+        let(:prison) { open_prison }
+
+        context 'when arrived before open policy launched' do
+          let(:arrival_date) { HandoverDateService::OPEN_PRISON_POLICY_START_DATE - 1.day }
+
+          it_behaves_like 'pre-policy rules'
+        end
+
+        context 'when arrived after open policy launched' do
+          let(:arrival_date) { HandoverDateService::OPEN_PRISON_POLICY_START_DATE + 1.day }
+
+          it_behaves_like 'OMIC policy rules'
+        end
+      end
+
+      context 'when in a womens prison' do
+        let(:prison) { womens_prison }
+
+        # Sentenced on/after policy start date
+        let(:sentence_start_date) { HandoverDateService::WOMENS_POLICY_START_DATE } # 30 Apr 2021
+
+        context 'when in closed conditions' do
+          let(:offender_category) { build(:offender_category, :female_closed) }
+
+          it_behaves_like 'OMIC policy rules'
+        end
+
+        context 'when in open conditions' do
+          let(:offender_category) { build(:offender_category, :female_open) }
+
+          it_behaves_like 'OMIC policy rules'
+        end
+      end
+    end
+  end
+
   context 'when offender is outside OMIC policy' do
     let(:api_offender) {
       build(:hmpps_api_offender,
