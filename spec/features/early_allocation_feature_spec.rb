@@ -56,7 +56,7 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
         click_link 'Start assessment'
 
         # Early Allocation start page
-        expect(page).to have_content 'Early allocation assessment process'
+        expect(page).to have_content 'Early allocation assessment'
         #expect(page).to have_content 'This case has no saved assessments.'
         displays_prisoner_information_in_side_panel
         click_link 'Start new assessment'
