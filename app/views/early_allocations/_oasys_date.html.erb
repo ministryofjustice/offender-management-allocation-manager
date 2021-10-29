@@ -5,19 +5,16 @@
              builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |f| %>
   <%= f.govuk_error_summary %>
 
-  <h1 class="govuk-heading-l govuk-!-margin-top-4">Assessment for early allocation to the community probation team</h1>
+  <h1 class="govuk-heading-l govuk-!-margin-top-4">When did this prisoner last have an OASys assessment?</h1>
 
   <p class="govuk-body">
-    Some cases will be referred to the community automatically. Others need the
-    agreement of both the Head of Offender Management Delivery and the
-    community probation team. This assessment will help you determine what
-    kind of community referral you need to make.
+    This must have been in the last 3 months to continue the assessment.
   </p>
 
   <%= f.govuk_date_field(:oasys_risk_assessment_date,
                          legend: {
                              size: 's',
-                             text: 'When was the last OASys risk assessment?'
+                             text: ''
                          }) %>
 
   <%= f.submit "Continue", role: "button", draggable: "false", class: "govuk-button" %>

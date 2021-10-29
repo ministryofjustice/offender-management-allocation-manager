@@ -2,15 +2,15 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h1 class="govuk-heading-l">Early allocation assessment process</h1>
+    <h1 class="govuk-heading-l">Early allocation assessment</h1>
     <p class="govuk-body">Use this form to assess whether the community probation team should take responsibility for this case early.</p>
-    <p class="govuk-body">There are three possible outcomes:</p>
+    <p class="govuk-body">The outcome of the assessment will be either:</p>
     <ul class="govuk-list govuk-list--bullet">
-      <li>eligible - the community probation team will take responsibility for this case early</li>
-      <li>discretionary - the community probation team will need to make a decision</li>
+      <li>mandatory - the community probation team must take responsibility for this case early</li>
+      <li>discretionary - the community probation team will decide whether to approve or decline the early allocation</li>
       <li>not eligible</li>
     </ul>
-
+  <p class="govuk-body">If the outcome is discretionary, you will need your HOMD’s approval before the assessment is sent to the community probation team.</p>
     <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
       <div class="govuk-accordion__section">
         <div class="govuk-accordion__section-header">
@@ -28,11 +28,11 @@
 
     <h2 class="govuk-heading-m">Before you start</h2>
     <h3 class="govuk-heading-s">Cases with less than 18 months until release</h3>
-    <p class="govuk-body">Eligible and discretionary assessments will be sent to the community probation team.</p>
+    <p class="govuk-body">Mandatory and discretionary assessments will be sent to the community probation team.</p>
     <h3 class="govuk-heading-s">Cases with over 18 months until release</h3>
     <p class="govuk-body">Assessments will be saved but not sent to the community probation team.</p>
-    <p class="govuk-body">Cases with any eligible or discretionary saved assessments might be eligible for early allocation.</p>
-    <p class="govuk-body">We will remind the allocated POM to make a new assessment 18 months before release. The POM can view saved assessments.</p>
+    <p class="govuk-body">Cases with any mandatory or discretionary saved assessments might be eligible for early allocation.</p>
+    <p class="govuk-body">We will remind the allocated POM to complete a new assessment 18 months before release. The POM can view saved assessments.</p>
 
     <%= link_to 'Start new assessment', new_prison_prisoner_early_allocation_path(@prison.code, @prisoner.offender_no), class: 'govuk-button' %>
   </div>

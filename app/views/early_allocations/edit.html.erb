@@ -9,10 +9,10 @@
              builder: GOVUKDesignSystemFormBuilder::FormBuilder do |form| %>
   <%= form.govuk_error_summary %>
 
-  <h1 class="govuk-heading-l govuk-!-margin-top-4">Record a decision from the community probation team about early allocation</h1>
+  <h1 class="govuk-heading-l govuk-!-margin-top-4">What was the outcome of this prisoner’s early allocation referral?</h1>
 
   <%= render partial: "community_decision_field", locals: { form: form,
-                                                 heading_text: "What decision did the community probation team make?",
+                                                 heading_text: "",
                                                  hint_text: "",
                                                  errors: @early_allocation.errors,
                                                  fieldname: :community_decision} %>
