@@ -17,6 +17,8 @@ module HmppsApi
       # it returns nil if an offender can't be found
     rescue Faraday::ResourceNotFound # 404 Not Found error
       nil
+    rescue Faraday::ConflictError # 409 Duplicate record found on oasys. Needs merging oasys to process correctly
+      Faraday::ConflictError
     end
   end
 end
