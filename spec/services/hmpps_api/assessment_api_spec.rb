@@ -71,5 +71,18 @@ describe HmppsApi::AssessmentApi do
         expect(described_class.get_latest_oasys_date(offender_no)).to eq(nil)
       end
     end
+
+    context 'when the offender is duplicated in oasys (status 409)' do
+      before do
+        stub_request(:get, stub_url).to_return(status: 409, body: {
+          "status": 409,
+          "developerMessage": "Offender duplicate found for NOMIS, A1857ER"
+        }.to_json)
+      end
+
+      it 'returns 409 constant' do
+        expect(described_class.get_latest_oasys_date(offender_no)).to eq(Faraday::ConflictError)
+      end
+    end
   end
 end

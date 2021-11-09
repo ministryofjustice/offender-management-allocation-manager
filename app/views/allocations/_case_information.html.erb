@@ -24,7 +24,11 @@
   <tr id="oasys-date" class="govuk-table__row">
     <td class="govuk-table__cell">Last completed layer 3 OASys</td>
     <td class="govuk-table__cell table_cell__left_align">
+      <% if @oasys_assessment == Faraday::ConflictError %>
+        This prisoner has a duplicate oasys record. Please merge the records to obtain a valid assessment.
+      <% else %>
       <%= format_date(@oasys_assessment, replacement: 'This prisoner has not had a layer 3 OASys assessment.') %>
+      <% end %>
     </td>
   </tr>
   <tr class="govuk-table__row" id="handover-start-date-row">
