@@ -34,5 +34,6 @@ private
 
   def load_prisoner_via_prisoner_id
     @prisoner = OffenderService.get_offender(prisoner_id_from_url)
+    redirect_to('/404') if @prisoner.nil?
   end
 end
