@@ -34,6 +34,8 @@ class PrisonersController < PrisonsApplicationController
   def show
     @prisoner = OffenderService.get_offender(params[:id])
 
+    return redirect_to '/404' if @prisoner.nil?
+
     return render 'show_outside_omic_policy' unless @prisoner.inside_omic_policy?
 
     @tasks = PomTasks.new.for_offender(@prisoner)

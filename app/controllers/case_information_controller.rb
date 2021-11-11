@@ -8,7 +8,10 @@ class CaseInformationController < PrisonsApplicationController
   before_action :store_referrer_in_session, only: [:edit_prd, :edit]
 
   def new
-    @case_info = Offender.find_by!(nomis_offender_id: nomis_offender_id_from_url).build_case_information
+    offender = Offender.find_by(nomis_offender_id: nomis_offender_id_from_url)
+    return redirect_to('/404') if offender.nil?
+
+    @case_info = offender.build_case_information
   end
 
   def edit; end
