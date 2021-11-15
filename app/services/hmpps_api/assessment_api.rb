@@ -7,18 +7,22 @@ module HmppsApi
 
     def self.get_latest_oasys_date(offender_no)
       safe_offender_no = URI.encode_www_form_component(offender_no)
-      route = "/offenders/nomisId/#{safe_offender_no}/assessments/summary?assessmentType=LAYER_3&assessmentStatus=COMPLETE"
+      route = "/offenders/nomisId/#{safe_offender_no}/assessments/summary?assessmentStatus=COMPLETE"
 
-      all_assessments = self.client.get(route)
+      assessment = self.client.get(route).max_by { |a| [a.fetch('assessmentType'), a.fetch('completed')] }
 
-      # it returns the latest assessment date or nil if there are none
-      all_assessments.map { |assessment| assessment.fetch('completed').to_date }.max
+      unless assessment.nil?
+        {
+          assessment_type: assessment.fetch('assessmentType'),
+          completed: assessment.fetch('completed').to_date
+        }
+      end
 
       # it returns nil if an offender can't be found
     rescue Faraday::ResourceNotFound # 404 Not Found error
       nil
     rescue Faraday::ConflictError # 409 Duplicate record found on oasys. Needs merging oasys to process correctly
-      Faraday::ConflictError
+      { assessment_type: Faraday::ConflictError, completed: nil }
     end
   end
 end
