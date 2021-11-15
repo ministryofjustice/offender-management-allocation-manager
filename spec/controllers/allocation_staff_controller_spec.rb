@@ -167,31 +167,56 @@ RSpec.describe AllocationStaffController, type: :controller do
         before do
           create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
           stub_offenders_for_prison(prison_code, [offender])
-          expect(HmppsApi::AssessmentApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(completed_date)
-
-          get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
-          expect(page.css('#oasys-date')).to have_text('Last completed layer 3 OASys')
         end
 
-        context 'when an offender has a previous assessments' do
+        context 'when an offender has a previous LAYER_3 assessment' do
           let(:completed_date) { '2021-06-02'.to_date }
+
+          before do
+            expect(HmppsApi::AssessmentApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_3', completed: completed_date)
+            get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
+            expect(page.css('#oasys-date')).to have_text('Last completed OASys')
+          end
 
           render_views
 
           it 'displays the latest one' do
-            expect(assigns(:oasys_assessment)).to eq(completed_date)
-            expect(page.css('#oasys-date')).to have_text("02 Jun 2021")
+            expect(assigns(:oasys_assessment)).to eq(assessment_type: 'LAYER_3', completed: completed_date)
+            expect(page.css('#oasys-date')).to have_text("Layer 3 – 02 Jun 2021")
+          end
+        end
+
+        context 'when an offender has a previous LAYER_1 assessment' do
+          let(:completed_date) { '2021-06-02'.to_date }
+
+          before do
+            expect(HmppsApi::AssessmentApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_1', completed: completed_date)
+            get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
+            expect(page.css('#oasys-date')).to have_text('Last completed OASys')
+          end
+
+          render_views
+
+          it 'displays the latest one' do
+            expect(assigns(:oasys_assessment)).to eq(assessment_type: 'LAYER_1', completed: completed_date)
+            expect(page.css('#oasys-date')).to have_text("Layer 1 – 02 Jun 2021")
           end
         end
 
         context 'when an offender has no assessments' do
           let(:completed_date) { nil }
 
+          before do
+            expect(HmppsApi::AssessmentApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(nil)
+            get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
+            expect(page.css('#oasys-date')).to have_text('Last completed OASys')
+          end
+
           render_views
 
           it 'displays a reason for no date being present' do
             expect(assigns(:oasys_assessment)).to eq(nil)
-            expect(page.css('#oasys-date')).to have_text('This prisoner has not had a layer 3 OASys assessment.')
+            expect(page.css('#oasys-date')).to have_text('No OASys information for this prisoner')
           end
         end
       end

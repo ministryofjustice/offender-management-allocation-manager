@@ -113,7 +113,7 @@ module ApiHelper
   end
 
   def stub_oasys_assessments(offender_no)
-    stub_request(:get, "#{ASSESSMENT_API_HOST}/offenders/nomisId/#{offender_no}/assessments/summary?assessmentStatus=COMPLETE&assessmentType=LAYER_3").
+    stub_request(:get, "#{ASSESSMENT_API_HOST}/offenders/nomisId/#{offender_no}/assessments/summary?assessmentStatus=COMPLETE").
       to_return(body: [].to_json)
   end
 
