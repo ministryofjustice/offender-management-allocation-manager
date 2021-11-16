@@ -1,8 +1,6 @@
 module HmppsApi
   class AssessmentApi
-
     VALID_ASSESSMENT_TYPES = %w[LAYER_1 LAYER_3].freeze
-
     def self.client
       host = Rails.configuration.assessment_api_host
       HmppsApi::Client.new(host)
