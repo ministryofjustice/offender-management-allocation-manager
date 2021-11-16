@@ -58,9 +58,10 @@ describe HmppsApi::AssessmentApi do
 
     context 'when there are multiple completed OASys assessments' do
       let(:old_layer_3_assessments) { build_list(:assessment_api_response, 5, refAssessmentVersionCode: 'LAYER_3', assessmentType: 'LAYER_3') }
+      let(:old_layer_2_assessments) { build_list(:assessment_api_response, 5, refAssessmentVersionCode: 'LAYER_2', assessmentType: 'LAYER_2') }
       let(:old_layer_1_assessments) { build_list(:assessment_api_response, 5, refAssessmentVersionCode: 'LAYER_1', assessmentType: 'LAYER_1') }
       let(:latest_assessment) { build(:assessment_api_response, completed: Time.zone.now) }
-      let(:all_assessments) { (old_layer_3_assessments + old_layer_1_assessments + [latest_assessment]).shuffle }
+      let(:all_assessments) { (old_layer_3_assessments + old_layer_2_assessments + old_layer_1_assessments + [latest_assessment]).shuffle }
 
       before do
         stub_request(:get, stub_url).to_return(status: 200, body: all_assessments.to_json)
@@ -68,6 +69,21 @@ describe HmppsApi::AssessmentApi do
 
       it 'returns the most recently completed assessment' do
         expect(described_class.get_latest_oasys_date(offender_no)).to match(assessment_type: "LAYER_3", completed: Time.zone.today)
+      end
+    end
+
+    context 'when there are multiple completed but invalid OASys assessments to ignore' do
+      let(:old_layer_3_assessments) { build_list(:assessment_api_response, 5, refAssessmentVersionCode: 'LAYER_5', assessmentType: 'LAYER_5') }
+      let(:old_layer_2_assessments) { build_list(:assessment_api_response, 5, refAssessmentVersionCode: 'LAYER_2', assessmentType: 'LAYER_2') }
+      let(:old_layer_1_assessments) { build_list(:assessment_api_response, 5, refAssessmentVersionCode: 'LAYER_4', assessmentType: 'LAYER_4') }
+      let(:all_assessments) { (old_layer_3_assessments + old_layer_2_assessments + old_layer_1_assessments).shuffle }
+
+      before do
+        stub_request(:get, stub_url).to_return(status: 200, body: all_assessments.to_json)
+      end
+
+      it 'returns nil' do
+        expect(described_class.get_latest_oasys_date(offender_no)).to eq(nil)
       end
     end
 

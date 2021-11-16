@@ -1,5 +1,8 @@
 module HmppsApi
   class AssessmentApi
+
+    VALID_ASSESSMENT_TYPES = %w[LAYER_1 LAYER_3].freeze
+
     def self.client
       host = Rails.configuration.assessment_api_host
       HmppsApi::Client.new(host)
@@ -9,7 +12,8 @@ module HmppsApi
       safe_offender_no = URI.encode_www_form_component(offender_no)
       route = "/offenders/nomisId/#{safe_offender_no}/assessments/summary?assessmentStatus=COMPLETE"
 
-      assessment = self.client.get(route).max_by { |a| [a.fetch('assessmentType'), a.fetch('completed')] }
+      assessment = self.client.get(route).select { |a| a.fetch('assessmentType', nil).in? VALID_ASSESSMENT_TYPES }
+                       .max_by { |a| [a.fetch('assessmentType'), a.fetch('completed')] }
 
       unless assessment.nil?
         {
