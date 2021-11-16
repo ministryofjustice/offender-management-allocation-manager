@@ -82,7 +82,6 @@ feature 'Help' do
       expect(page).to have_css('.govuk-inset-text', text: inset_text[:SPO_HoOMU])
       expect(page).to have_link('spreadsheet template')
       expect(page).to have_xpath("//img[contains(@src,'assets/spreadsheet_image')]")
-      expect(page).to have_link('moic@digital.justice.gov.uk')
       expect(page).to have_link('Task 2: Set up access in Digital Prison Services', href: 'help_step2')
     end
 
