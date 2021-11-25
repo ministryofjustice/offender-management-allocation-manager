@@ -2,8 +2,12 @@
 
 module CaseloadHelper
   def prisoner_location(offender)
-    cell = offender.cell_location.presence || 'N/A'
+    location = offender.location.presence || (offender.restricted_patient? ? 'unknown' : 'N/A')
 
-    offender.latest_temp_movement_date.blank? ? cell : "Temporary absence (out #{format_date(offender.latest_temp_movement_date)})"
+    if offender.restricted_patient?
+      return "This person is being held under the Mental Health Act at #{location}"
+    end
+
+    offender.latest_temp_movement_date.blank? ? location : "Temporary absence (out #{format_date(offender.latest_temp_movement_date)})"
   end
 end
