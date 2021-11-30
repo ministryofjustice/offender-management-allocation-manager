@@ -94,7 +94,11 @@ private
       return true
     end
 
-    return false unless release.from_prison?
+    hospital_agencies = HmppsApi::PrisonApi::AgenciesApi.agency_ids_by_type(
+      HmppsApi::PrisonApi::AgenciesApi::HOSPITAL_AGENCY_TYPE
+    )
+
+    return false unless release.from_prison? || hospital_agencies.include?(release.from_agency)
 
     release_offender(release.offender_no)
     true
