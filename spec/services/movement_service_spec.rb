@@ -112,22 +112,33 @@ describe MovementService, type: :feature do
     let!(:case_info) { create(:case_information, offender: build(:offender, nomis_offender_id: 'G7266VD')) }
     let!(:allocation) { create(:allocation_history, prison: 'LEI', nomis_offender_id: 'G7266VD') }
 
-    context 'with a valid release movement' do
-      let(:valid_release) { build(:movement, offenderNo: 'G7266VD', directionCode: 'OUT', movementType: 'REL', toAgency: 'OUT', fromAgency: 'BAI')   }
+    def pom_tester(valid_release)
+      expect_any_instance_of(PomMailer)
+        .to receive(:offender_deallocated)
+              .with(email: "pom@digital.justice.gov.uk",
+                    pom_name: "Moic",
+                    offender_name: "Annole, Omistius",
+                    nomis_offender_id: valid_release.offender_no,
+                    prison_name: 'Leeds (HMP)',
+                    url: "http://localhost:3000/prisons/LEI/staff/485926/caseload")
+    end
 
-      before do
-        expect_any_instance_of(PomMailer)
-            .to receive(:offender_deallocated)
-                    .with(email: "pom@digital.justice.gov.uk",
-                          pom_name: "Moic",
-                          offender_name: "Annole, Omistius",
-                          nomis_offender_id: valid_release.offender_no,
-                          prison_name: 'Leeds (HMP)',
-                          url: "http://localhost:3000/prisons/LEI/staff/485926/caseload")
-                    .and_call_original
+    context 'with a valid release movement' do
+      it "can process prison release movements", vcr: { cassette_name: 'prison_api/movement_service_process_release_spec' }  do
+        valid_release = build(:movement, offenderNo: 'G7266VD', directionCode: 'OUT', movementType: 'REL', toAgency: 'OUT', fromAgency: 'BAI')
+        pom_tester(valid_release)
+        processed = described_class.process_movement(valid_release)
+        updated_allocation = AllocationHistory.find_by(nomis_offender_id: valid_release.offender_no)
+
+        expect(CaseInformation.where(nomis_offender_id: valid_release.offender_no)).to be_empty
+        expect(updated_allocation.event_trigger).to eq 'offender_released'
+        expect(updated_allocation.prison).to eq 'LEI'
+        expect(processed).to be true
       end
 
-      it "can process release movements", vcr: { cassette_name: 'prison_api/movement_service_process_release_spec' }  do
+      it "can process hospital restricted patient release movements", vcr: { cassette_name: 'prison_api/movement_service_process_release_spec' }  do
+        valid_release = build(:movement, offenderNo: 'G7266VD', directionCode: 'OUT', movementType: 'REL', toAgency: 'OUT', fromAgency: 'BASDON')
+        pom_tester(valid_release)
         processed = described_class.process_movement(valid_release)
         updated_allocation = AllocationHistory.find_by(nomis_offender_id: valid_release.offender_no)
 
@@ -139,6 +150,8 @@ describe MovementService, type: :feature do
 
       it "can do an open prison release with an inactive allocation",
          vcr: { cassette_name: 'prison_api/movement_service_process_release_spec' }  do
+        valid_release = build(:movement, offenderNo: 'G7266VD', directionCode: 'OUT', movementType: 'REL', toAgency: 'OUT', fromAgency: 'BAI')
+        pom_tester(valid_release)
         allocation.deallocate_offender_after_release
         processed = described_class.process_movement(valid_release)
 
@@ -149,12 +162,16 @@ describe MovementService, type: :feature do
     context 'with invalid release movements' do
       let(:invalid_release1) { build(:movement, offenderNo: 'G7266VD', directionCode: 'OUT', movementType: 'REL', toAgency: 'LEI')   }
       let(:invalid_release2) { build(:movement, offenderNo: 'G7266VD', directionCode: 'OUT', movementType: 'REL', fromAgency: 'COURT')   }
+      let(:invalid_release3) { build(:movement, offenderNo: 'G7266VD', directionCode: 'OUT', movementType: 'REL', fromAgency: 'BASDON')   }
 
       it "can ignore invalid release movements", vcr: { cassette_name: 'prison_api/movement_service_process_release_invalid_spec' }  do
         processed = described_class.process_movement(invalid_release1)
         expect(processed).to be false
 
         processed = described_class.process_movement(invalid_release2)
+        expect(processed).to be false
+
+        processed = described_class.process_movement(invalid_release3)
         expect(processed).to be false
       end
     end
