@@ -2,7 +2,7 @@
 
 module CaseloadHelper
   def prisoner_location(offender)
-    location = offender.location.presence || (offender.restricted_patient? ? 'unknown' : 'N/A')
+    location = offender.location.presence || (offender.restricted_patient? ? 'Unknown' : 'N/A')
 
     if offender.restricted_patient?
       return "This person is being held under the Mental Health Act at #{location}"
