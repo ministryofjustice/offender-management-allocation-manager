@@ -92,6 +92,8 @@ feature 'Case History' do
 
       stub_pom build(:pom, staffId: prison_pom.fetch(:primary_pom_nomis_id))
       stub_pom_emails(prison_pom.fetch(:primary_pom_nomis_id), [prison_pom.fetch(:email)])
+
+      stub_agencies(HmppsApi::PrisonApi::AgenciesApi::HOSPITAL_AGENCY_TYPE)
     }
 
     context 'when on the allocation history page' do
