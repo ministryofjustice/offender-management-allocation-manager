@@ -22,7 +22,7 @@ RSpec.describe DebuggingController, type: :controller do
                                        fromAgency: "LEI",
                                        toAgency: prison_id,
                                        movementType: "TRN",
-                                       directionCode: "IN")], movement_types: ['ADM', 'TRN', 'REL']
+                                       directionCode: "IN")], movement_types: %w[ADM TRN REL]
 
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
       create(:allocation_history, prison: prison.code, nomis_offender_id: offender_no, primary_pom_nomis_id: pom_staff_id, primary_pom_name: primary_pom_name)
