@@ -5,7 +5,7 @@ module HmppsApi
       HOSPITAL_AGENCY_TYPE = 'HSHOSP'.freeze
       def self.agencies_by_type(type)
         route = "/agencies/type/#{type}"
-        data = client.get(route)
+        data = client.get(route, cache: true)
         data.map { |agency|
           { agency_type: agency['agencyId'], description: agency['description'], active: (!!agency['active']) }
         }
@@ -13,7 +13,7 @@ module HmppsApi
 
       def self.agency_ids_by_type(type)
         route = "/agencies/type/#{type}"
-        data = client.get(route)
+        data = client.get(route, cache: true)
         data.map { |agency| agency['agencyId'] }
       end
     end
