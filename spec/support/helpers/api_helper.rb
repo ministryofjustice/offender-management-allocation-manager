@@ -164,6 +164,11 @@ module ApiHelper
       to_return(status: 404)
   end
 
+  def stub_agencies(type)
+    stub_request(:get, "https://api-dev.prison.service.justice.gov.uk/api/agencies/type/#{type}").
+      to_return(body: [{ 'agencyId' => 'HOS1', 'description' => 'Hospital One', 'active' => 1 }].to_json)
+  end
+
 private
 
   def search_api_response(offender)
