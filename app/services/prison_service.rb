@@ -123,7 +123,8 @@ class PrisonService
     PrisonInfo.new('WSI', 'Wormwood Scrubs (HMP)', :england, :male),
     PrisonInfo.new('WTI', 'Whatton (HMP)', :england, :male),
     PrisonInfo.new('WWI', 'Wandsworth (HMP)', :england, :male),
-    PrisonInfo.new('WYI', 'Wetherby (HMP/YOI)', :england, :male)
+    PrisonInfo.new('WYI', 'Wetherby (HMP/YOI)', :england, :male),
+    PrisonInfo.new('MHI', 'Morton Hall (HMP)', :england, :male)
   ].index_by(&:code).freeze
 
   # Coverage is not used in real code only used in rake task import:prison
