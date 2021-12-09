@@ -3,7 +3,7 @@
 class MovementService
   ADMISSION_MOVEMENT_CODE = 'IN'
   RELEASE_MOVEMENT_CODE = 'OUT'
-  IMMIGRATION_MOVEMENT_CODES = %w[IMM MHI].freeze
+  IMMIGRATION_MOVEMENT_CODES = %w[IMM].freeze
 
   def self.movements_on(date)
     HmppsApi::PrisonApi::MovementApi.movements_on_date(date)

@@ -175,53 +175,6 @@ describe MovementService, type: :feature do
     context 'when movement is a transfer' do
       let(:case_info) { create(:case_information, nomis_offender_id: 'G7266VD') }
 
-      context 'when the from_agency is MHI' do
-        context 'with the offender going into a prison estate' do
-          let(:from_agency) { 'MHI' }
-          let(:to_agency) { 'PVI' }
-          let(:movement_type) { 'ADM' }
-          let(:direction_code) { 'IN' }
-
-          it 'does not process movement',
-             vcr: { cassette_name: 'prison_api/immigration_transfer_from_MHI_to_prison_not_successful' } do
-            processed = described_class.process_movement(immigration_movement)
-            expect(processed).to be false
-          end
-        end
-
-        context 'with the offender moving OUT of the prison estate' do
-          let(:from_agency) { 'MHI' }
-          let(:to_agency) { 'IMM' }
-          let(:movement_type) { 'TRN' }
-          let(:direction_code) { 'IN' }
-
-          it 'can process release movement for offender',
-             vcr: { cassette_name: 'prison_api/immigration_transfer_from_MHI_to_IMM_successful' } do
-            processed = described_class.process_movement(immigration_movement)
-
-            expect(CaseInformation.where(nomis_offender_id: immigration_movement.offender_no)).to be_empty
-            expect(allocation.event_trigger).to eq 'offender_released'
-            expect(processed).to be true
-          end
-        end
-
-        context 'with the offender moving from a prison to MHI or IMM' do
-          let(:from_agency) { 'LEI' }
-          let(:to_agency) { 'MHI' }
-          let(:movement_type) { 'ADM' }
-          let(:direction_code) { 'IN' }
-
-          it 'can process release movement for offender',
-             vcr: { cassette_name: 'prison_api/immigration_transfer_from_prison_to_IMM_successful' } do
-            processed = described_class.process_movement(immigration_movement)
-
-            expect(CaseInformation.where(nomis_offender_id: immigration_movement.offender_no)).to be_empty
-            expect(allocation.event_trigger).to eq 'offender_released'
-            expect(processed).to be true
-          end
-        end
-      end
-
       context 'when the from_agency is IMM' do
         context 'with the offender going into a prison estate' do
           let(:from_agency) { 'IMM' }
@@ -233,22 +186,6 @@ describe MovementService, type: :feature do
              vcr: { cassette_name: 'prison_api/immigration_transfer_from_IMM_to_prison_not_successful' } do
             processed = described_class.process_movement(immigration_movement)
             expect(processed).to be false
-          end
-        end
-
-        context 'when the offender is moving OUT of the prison estate' do
-          let(:from_agency) { 'IMM' }
-          let(:to_agency) { 'MHI' }
-          let(:movement_type) { 'ADM' }
-          let(:direction_code) { 'IN' }
-
-          it 'can process release movement for offender',
-             vcr: { cassette_name: 'prison_api/immigration_transfer_from_IMM_to_MHI_successful' } do
-            processed = described_class.process_movement(immigration_movement)
-
-            expect(CaseInformation.where(nomis_offender_id: immigration_movement.offender_no)).to be_empty
-            expect(allocation.event_trigger).to eq 'offender_released'
-            expect(processed).to be true
           end
         end
       end
