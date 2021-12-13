@@ -67,7 +67,7 @@
       <td class="govuk-table__cell">Last completed OASys</td>
       <td class="govuk-table__cell table_cell__left_align">
         <% if @oasys_assessment.nil? %>
-          No OASys information for this prisoner
+          No OASys information
           <%  %>
         <% elsif @oasys_assessment.fetch(:assessment_type) == Faraday::ConflictError %>
           This prisoner has more than one OASys record linked to their prison number. Merge these records or delete
