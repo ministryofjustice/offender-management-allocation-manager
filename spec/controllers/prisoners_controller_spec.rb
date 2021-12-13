@@ -779,7 +779,7 @@ RSpec.describe PrisonersController, type: :controller do
 
         it 'displays a reason for no date being present' do
           expect(assigns(:oasys_assessment)).to eq(nil)
-          expect(page.css('#oasys-date')).to have_text 'No OASys information for this prisoner'
+          expect(page.css('#oasys-date')).to have_text 'No OASys information'
         end
       end
     end
