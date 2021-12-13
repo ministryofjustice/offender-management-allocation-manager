@@ -45,6 +45,12 @@
         <%= sort_arrow('last_name') %>
       </th>
       <th class="govuk-table__header sorter-false" scope="col">
+        <a href="<%= sort_link('location') %>">
+          Location
+        </a>
+        <%= sort_arrow('location') %>
+      </th>
+      <th class="govuk-table__header sorter-false" scope="col">
         <a href="<%= sort_link('earliest_release_date') %>">
           Earliest release<br/>date
         </a>
@@ -75,6 +81,9 @@
           </span>
         </td>
 
+        <td aria-label="Location for" class="govuk-table__cell">
+          <%= prisoner_location(offender, true) %>
+        </td>
         <td aria-label="Earliest release<br/>date" class="govuk-table__cell">
           <%= format_date(offender.earliest_release_date, replacement: 'Unknown') %>
         </td>

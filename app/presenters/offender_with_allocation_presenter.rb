@@ -3,9 +3,9 @@
 # This class is another attenpt to merge a 'prisoner' with an 'allocation'
 # despite the fact that this should be really easy in theory
 class OffenderWithAllocationPresenter
-  delegate :offender_no, :full_name, :last_name, :earliest_release_date, :allocated_com_name,
+  delegate :offender_no, :full_name, :last_name, :earliest_release_date, :latest_temp_movement_date, :allocated_com_name,
            :case_allocation, :date_of_birth, :tier, :probation_record,
-           :handover_start_date, :responsibility_handover_date, to: :@offender
+           :handover_start_date, :restricted_patient?, :location, :responsibility_handover_date, to: :@offender
 
   def initialize(offender, allocation)
     @offender = offender
