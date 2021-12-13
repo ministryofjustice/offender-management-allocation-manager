@@ -25,9 +25,14 @@ RSpec.describe CaseloadHelper do
         expect(helper.prisoner_location(offender)).to eq "This person is being held under the Mental Health Act at Unknown"
       end
 
-      it 'displays hospital location for restricted patient' do
+      it 'displays full hospital location for restricted patient' do
         offender = OpenStruct.new(offender_no: 'G4706UP', latest_temp_movement_date: nil, location: "Heartlands", restricted_patient?: true)
         expect(helper.prisoner_location(offender)).to eq "This person is being held under the Mental Health Act at Heartlands"
+      end
+
+      it 'displays hospital location only for restricted patient' do
+        offender = OpenStruct.new(offender_no: 'G4706UP', latest_temp_movement_date: nil, location: "Heartlands", restricted_patient?: true)
+        expect(helper.prisoner_location(offender, true)).to eq "Heartlands"
       end
     end
   end
