@@ -8,10 +8,10 @@ class MpcOffender
            :tariff_date, :post_recall_release_date, :licence_expiry_date,
            :home_detention_curfew_actual_date, :home_detention_curfew_eligibility_date,
            :prison_arrival_date, :earliest_release_date, :latest_temp_movement_date, :release_date,
-           :date_of_birth, :main_offence, :awaiting_allocation_for, :cell_location,
+           :date_of_birth, :main_offence, :awaiting_allocation_for, :location,
            :category_label, :complexity_level, :category_code, :category_active_since,
            :first_name, :last_name, :full_name_ordered, :full_name,
-           :inside_omic_policy?, :offender_no, :prison_id, to: :@prison_record
+           :inside_omic_policy?, :offender_no, :prison_id, :restricted_patient?, to: :@prison_record
 
   delegate :crn, :case_allocation, :manual_entry?, :nps_case?,
            :tier,

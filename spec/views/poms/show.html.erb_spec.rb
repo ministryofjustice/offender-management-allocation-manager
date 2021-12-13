@@ -97,7 +97,7 @@ RSpec.describe "poms/show", type: :view do
       expect(first_offender_row).
         to eq [
                 [offender.full_name, case_info.nomis_offender_id],
-                offender.cell_location,
+                offender.location,
                 case_info.tier,
                 offender.earliest_release_date.to_s(:rfc822),
                 Time.zone.today.to_s(:rfc822),
