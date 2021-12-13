@@ -5,7 +5,7 @@ class PrisonsController < PrisonsApplicationController
 
   def index
     @next = referer
-    @prisons = Prison.where(code: caseloads)
+    @prisons = Prison.where(code: caseloads).sort_by(&:name)
   end
 
 private
