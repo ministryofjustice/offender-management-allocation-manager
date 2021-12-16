@@ -18,6 +18,8 @@ FactoryBot.define do
                              complexity_level: attributes.fetch(:complexityLevel))
     end
 
+    prisonId { 'LEI' }
+
     trait :prescoed do
       prisonId { PrisonService::PRESCOED_CODE }
     end
