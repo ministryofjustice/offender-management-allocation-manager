@@ -35,7 +35,7 @@ module HmppsApi
       @category = category
       @sentence = HmppsApi::SentenceDetail.new(offender)
       @booking_id = offender.fetch('bookingId').to_i
-      @prison_id = offender.fetch('prisonId')
+      @prison_id = restricted_patient ? offender.fetch('supportingPrisonId') : offender.fetch('prisonId')
       @restricted_patient = restricted_patient
     end
 

@@ -309,7 +309,7 @@ describe HmppsApi::Offender do
       let(:offender_location) { 'Hazelwood Hospital' }
       let(:offender) {
         build(
-          :hmpps_api_offender, restrictedPatient: true, dischargedHospitalDescription: offender_location,
+          :hmpps_api_offender, prisonId: 'OUT', supportingPrisonId: 'LEI', restrictedPatient: true, dischargedHospitalDescription: offender_location,
           cellLocation: nil, imprisonmentStatus: immigration_detainee, dateOfBirth: over_18, legalStatus: 'IMMIGRATION_DETAINEE',
           sentence: attributes_for(:sentence_detail, sentenceStartDate: '2019-02-05')
         )
@@ -321,6 +321,10 @@ describe HmppsApi::Offender do
 
       it "returns hospital location" do
         expect(offender.location).to eq(offender_location)
+      end
+
+      it "returns correct prison code using " do
+        expect(offender.prison_id).to eq('LEI')
       end
     end
 
