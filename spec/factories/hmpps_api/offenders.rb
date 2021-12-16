@@ -4,6 +4,10 @@ FactoryBot.define do
       # run attributes through JSON for a more realistic payload
       values_hash = JSON.parse(attributes.to_json)
 
+      unless values_hash.member?(:prisonId)
+        values_hash['prisonId'] = 'LEI'
+      end
+
       # merge SentenceDetails into the main Offender object (Prison Search API returns it all in one)
       sentence = values_hash.extract!('sentence').fetch('sentence')
       values_hash.merge!(sentence)
@@ -13,8 +17,6 @@ FactoryBot.define do
                              latest_temp_movement: nil,
                              complexity_level: attributes.fetch(:complexityLevel))
     end
-
-    prisonId { 'LEI' }
 
     trait :prescoed do
       prisonId { PrisonService::PRESCOED_CODE }
