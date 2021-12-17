@@ -10,10 +10,11 @@ module ApiHelper
   T3_BOOKINGS_URL = "#{T3}/offender-sentences/bookings"
   ASSESSMENT_API_HOST = Rails.configuration.assessment_api_host
 
+  def stub_nil_offender
+    stub_request(:post, "#{T3_SEARCH}/prisoner-search/prisoner-numbers").to_return(body: [].to_json).with(query: { 'include-restricted-patients': true })
+  end
+
   def stub_offender(offender)
-    if offender.nil?
-      # return stub_request(:post, "#{T3_SEARCH}/prisoner-search/prisoner-numbers").to_return(body: [].to_json).with(query: { 'include-restricted-patients': true })
-    end
 
     offender_no = offender.fetch(:prisonerNumber)
 

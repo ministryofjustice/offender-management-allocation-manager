@@ -54,7 +54,7 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
         let(:offender) { build(:nomis_offender, prisonId: prison.code,  sentence: attributes_for(:sentence_detail)) }
 
         it 'does not return a poms allocation details' do
-          stub_offender(nil)
+          stub_nil_offender
           get :show, params: { prison_id: prison.code, offender_no: offender.fetch(:prisonerNumber) }
 
           expect(response).to have_http_status(404)
