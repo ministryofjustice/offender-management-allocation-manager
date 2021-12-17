@@ -9,7 +9,7 @@ module Api
 
       if offender.nil? || !allocation.active? || !offender.inside_omic_policy?
         return render_404('Not allocated')
-       end
+      end
 
       render json: allocation_as_json
     end
