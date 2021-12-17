@@ -146,7 +146,7 @@ module HmppsApi
 
       def self.get_search_api_offenders(offender_nos)
         search_route = '/prisoner-search/prisoner-numbers'
-        search_client.post(search_route,{ prisonerNumbers: offender_nos }, queryparams: { 'include-restricted-patients': true }, cache: true)
+        search_client.post(search_route, { prisonerNumbers: offender_nos }, queryparams: { 'include-restricted-patients': true }, cache: true)
       end
 
       def self.default_image
