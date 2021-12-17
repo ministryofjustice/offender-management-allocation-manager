@@ -15,7 +15,6 @@ module ApiHelper
   end
 
   def stub_offender(offender)
-
     offender_no = offender.fetch(:prisonerNumber)
 
     # Prison Search API
