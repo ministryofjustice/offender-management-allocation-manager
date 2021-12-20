@@ -49,7 +49,7 @@ feature 'Provide debugging information for our team to use' do
       oasys_assessment_row = page.find(:css, 'tr.govuk-table__row#oasys-date')
 
       within oasys_assessment_row do
-        expect(page).to have_content('No OASys information for this prisoner')
+        expect(page).to have_content('No OASys information')
       end
     end
 

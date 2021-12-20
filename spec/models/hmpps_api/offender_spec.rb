@@ -15,7 +15,7 @@ describe HmppsApi::Offender do
 
     context 'when it meets the requirements' do
       context 'when all requirements are present: immigration case, over 18, sentence, criminal sentence' do
-        let(:offender) { build(:hmpps_api_offender,  imprisonmentStatus: immigration_detainee, dateOfBirth: over_18, legalStatus: 'IMMIGRATION_DETAINEE', sentence: attributes_for(:sentence_detail, sentenceStartDate: '2019-02-05')) }
+        let(:offender) { build(:hmpps_api_offender, imprisonmentStatus: immigration_detainee, dateOfBirth: over_18, legalStatus: 'IMMIGRATION_DETAINEE', sentence: attributes_for(:sentence_detail, sentenceStartDate: '2019-02-05')) }
 
         it 'is in omic policy' do
           expect(offender.inside_omic_policy?).to eq(true)
@@ -26,7 +26,7 @@ describe HmppsApi::Offender do
         let(:offender) {
           build(:hmpps_api_offender,
                 dateOfBirth: over_18, legalStatus: 'IMMIGRATION_DETAINEE',
-                        sentence: attributes_for(:sentence_detail, :unsentenced, imprisonmentStatus: immigration_detainee))
+                sentence: attributes_for(:sentence_detail, :unsentenced, imprisonmentStatus: immigration_detainee))
         }
 
         it 'is in omic policy' do
@@ -35,7 +35,10 @@ describe HmppsApi::Offender do
       end
 
       context 'when they have no immigration case' do
-        let(:offender) { build(:hmpps_api_offender, dateOfBirth: over_18, legalStatus: 'SENTENCED', sentence: attributes_for(:sentence_detail, sentenceStartDate: '2019-02-05')) }
+        let(:offender) {
+          build(:hmpps_api_offender, dateOfBirth: over_18, legalStatus: 'SENTENCED',
+                         sentence: attributes_for(:sentence_detail, sentenceStartDate: '2019-02-05'))
+        }
 
         it 'is in omic policy' do
           expect(offender.inside_omic_policy?).to eq(true)
@@ -49,7 +52,7 @@ describe HmppsApi::Offender do
         let(:offender) {
           build(:hmpps_api_offender,
                 sentence: attributes_for(:sentence_detail, imprisonmentStatus: immigration_detainee),
-                        dateOfBirth: under_18, legalStatus: 'IMMIGRATION_DETAINEE')
+                dateOfBirth: under_18, legalStatus: 'IMMIGRATION_DETAINEE')
         }
 
         it 'is not in omic policy' do
@@ -68,7 +71,7 @@ describe HmppsApi::Offender do
       context 'when they do not have a criminal sentence (and are not an immigration case)' do
         let(:offender) {
           build(:hmpps_api_offender, dateOfBirth: over_18, legalStatus: 'CIVIL_PRISONER',
-                               sentence: attributes_for(:sentence_detail, :civil_sentence, sentenceStartDate: '2019-02-05'))
+                sentence: attributes_for(:sentence_detail, :civil_sentence, sentenceStartDate: '2019-02-05'))
         }
 
         it 'is not in omic policy' do
@@ -174,7 +177,7 @@ describe HmppsApi::Offender do
 
         it 'will display the earliest of the dates in the future' do
           expect(subject.earliest_release_date).
-              to eq(conditional_release_date)
+            to eq(conditional_release_date)
         end
       end
 
@@ -185,7 +188,7 @@ describe HmppsApi::Offender do
 
         it 'will display the most recent of the dates in the past' do
           expect(subject.earliest_release_date).
-              to eq(conditional_release_date)
+            to eq(conditional_release_date)
         end
       end
     end
@@ -295,6 +298,54 @@ describe HmppsApi::Offender do
 
       it 'is false' do
         expect(offender.needs_early_allocation_notify?).to eq(false)
+      end
+    end
+  end
+
+  describe 'Restricted Patients status is returned true with hospital location or false with cell location' do
+    context 'when Offender is a restricted patient' do
+      let(:over_18) { (Time.zone.today - 18.years).to_s }
+      let(:immigration_detainee) { 'DET' }
+      let(:offender_location) { 'Hazelwood Hospital' }
+      let(:offender) {
+        build(
+          :hmpps_api_offender, prisonId: 'OUT', supportingPrisonId: 'LEI', restrictedPatient: true, dischargedHospitalDescription: offender_location,
+          cellLocation: nil, imprisonmentStatus: immigration_detainee, dateOfBirth: over_18, legalStatus: 'IMMIGRATION_DETAINEE',
+          sentence: attributes_for(:sentence_detail, sentenceStartDate: '2019-02-05')
+        )
+      }
+
+      it "#restrictedPatient? returns true" do
+        expect(offender.restricted_patient?).to eq(true)
+      end
+
+      it "returns hospital location" do
+        expect(offender.location).to eq(offender_location)
+      end
+
+      it "returns correct prison code using " do
+        expect(offender.prison_id).to eq('LEI')
+      end
+    end
+
+    context 'when Offender is a NOT a restricted patient' do
+      let(:over_18) { (Time.zone.today - 18.years).to_s }
+      let(:immigration_detainee) { 'DET' }
+      let(:offender_location) { 'B4-45' }
+      let(:offender) {
+        build(
+          :hmpps_api_offender, restrictedPatient: false, dischargedHospitalDescription: nil,
+          cellLocation: offender_location, imprisonmentStatus: immigration_detainee, dateOfBirth: over_18, legalStatus: 'IMMIGRATION_DETAINEE',
+          sentence: attributes_for(:sentence_detail, sentenceStartDate: '2019-02-05')
+        )
+      }
+
+      it "#restrictedPatient? returns false" do
+        expect(offender.restricted_patient?).to eq(false)
+      end
+
+      it "returns cell location" do
+        expect(offender.location).to eq(offender_location)
       end
     end
   end

@@ -1,4 +1,4 @@
-<span id="prisoner-case-type" class="moj-badge moj-badge--<%=badge_colour(offender) %>"><%=badge_text(offender)%></span>
+<span id="prisoner-case-type" class="moj-badge moj-badge--<%= badge_colour(offender) %>"><%= badge_text(offender) %></span>
 <%= render('shared/badges/recall_badge') if offender.recalled? %>
 <%= render('shared/badges/parole_badge') if badge_for_parole?(offender) %>
 
@@ -7,6 +7,9 @@
   <span id="early-allocation-badge" class="moj-badge moj-badge--blue">
     EARLY ALLOCATION <%= EarlyAllocationHelper::EARLY_ALLOCATION_STATUSES.fetch(status) %>
   </span>
+<% end %>
+<% if offender.restricted_patient? %>
+  <%= render('shared/badges/restricted_patient_badge') %>
 <% end %>
 <% if @prison.womens? %>
   <% if offender.complexity_level == 'high' %>

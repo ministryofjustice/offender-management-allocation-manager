@@ -20,7 +20,7 @@ private
   def sort_allocations(allocations)
     field, direction = sort_params(default_sort: :last_name)
 
-    if field == :cell_location
+    if field == :location
       cell_location_sort(allocations, direction)
     elsif field == :pom_responsibility
       if direction == :asc
@@ -36,7 +36,7 @@ private
   def cell_location_sort(allocations, direction)
     allocations = allocations.sort do |a, b|
       if a.latest_temp_movement_date.nil? && b.latest_temp_movement_date.nil?
-        compare_via_public_send :cell_location, :asc, a, b
+        compare_via_public_send :location, :asc, a, b
       elsif a.latest_temp_movement_date.nil? && b.latest_temp_movement_date.present?
         1
       elsif a.latest_temp_movement_date.present? && b.latest_temp_movement_date.nil?

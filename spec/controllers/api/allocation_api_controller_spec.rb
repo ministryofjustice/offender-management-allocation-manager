@@ -47,6 +47,20 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
           expect(JSON.parse(response.body)).to eq("message" => "Not allocated", "status" => "error")
         end
       end
+
+      context 'when an offender is no longer returned from prison API but has case information' do
+        # if an offender has case information but is not being returned from the prison API as a valid
+        # inmate, return the expected 404 status code
+        let(:offender) { build(:nomis_offender, prisonId: prison.code,  sentence: attributes_for(:sentence_detail)) }
+
+        it 'does not return a poms allocation details' do
+          stub_nil_offender
+          get :show, params: { prison_id: prison.code, offender_no: offender.fetch(:prisonerNumber) }
+
+          expect(response).to have_http_status(404)
+          expect(JSON.parse(response.body)).to eq("message" => "Not allocated", "status" => "error")
+        end
+      end
     end
   end
 

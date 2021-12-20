@@ -6,7 +6,10 @@ module Api
       render_404('Not ready for allocation') && return if allocation.nil?
 
       offender = OffenderService.get_offender(offender_number)
-      render_404('Not allocated') && return unless allocation.active? && offender.inside_omic_policy?
+
+      if offender.nil? || !allocation.active? || !offender.inside_omic_policy?
+        return render_404('Not allocated')
+      end
 
       render json: allocation_as_json
     end

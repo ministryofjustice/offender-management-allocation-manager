@@ -62,11 +62,10 @@ module HmppsApi
           (ALLOWED_LEGAL_STATUSES.include?(offender['legalStatus']) || ignore_legal_status)
 
         offender_no = offender.fetch('prisonerNumber')
-        prison_id = offender['prisonId']
 
         # Get additional data from other APIs
         offender_categories = get_offender_categories([offender_no])
-        complexity_level = if Prison.womens.exists?(prison_id)
+        complexity_level = if Prison.womens.exists?(offender['prisonId'])
                              HmppsApi::ComplexityApi.get_complexity(offender_no)
                            end
         temp_movement = if temp_out_of_prison?(offender)
@@ -141,13 +140,13 @@ module HmppsApi
         # So here we bypass pagination by asking for 10,000 results per page.
         # There are only ever up to ~2000 offenders per prison, and this API seems happy to return them all at once.
         # This endpoint also requires a "Content-Type: application/json" header even though it's a GET request with no body.
-        search_client.get(route, queryparams: { page: 0, size: 10_000 }, extra_headers: { 'Content-Type': 'application/json' })
+        search_client.get(route, queryparams: { page: 0, size: 10_000, 'include-restricted-patients': true }, extra_headers: { 'Content-Type': 'application/json' })
                      .fetch('content')
       end
 
       def self.get_search_api_offenders(offender_nos)
         search_route = '/prisoner-search/prisoner-numbers'
-        search_client.post(search_route, { prisonerNumbers: offender_nos }, cache: true)
+        search_client.post(search_route, { prisonerNumbers: offender_nos }, queryparams: { 'include-restricted-patients': true }, cache: true)
       end
 
       def self.default_image

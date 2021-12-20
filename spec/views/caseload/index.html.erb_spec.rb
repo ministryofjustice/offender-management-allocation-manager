@@ -54,7 +54,7 @@ RSpec.describe "caseload/index", type: :view do
         expect(first_offender_row).
           to eq [
                   [offenders.first.full_name, offenders.first.offender_no],
-                  offenders.first.cell_location,
+                  offenders.first.location,
                   offenders.first.tier,
                   offenders.first.earliest_release_date.to_s(:rfc822),
                   Time.zone.today.to_s(:rfc822),

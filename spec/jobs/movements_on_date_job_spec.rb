@@ -30,6 +30,9 @@ RSpec.describe MovementsOnDateJob, type: :job do
 
     # Expect POM to be emailed about the deallocation
     expect(PomMailer).to receive(:offender_deallocated).with(mail_params).and_return(double(deliver_later: nil))
+
+    # Stub hospital agencies
+    stub_agencies(HmppsApi::PrisonApi::AgenciesApi::HOSPITAL_AGENCY_TYPE)
   end
 
   context 'when the offender has been released from prison' do

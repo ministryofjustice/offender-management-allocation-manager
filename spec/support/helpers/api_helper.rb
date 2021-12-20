@@ -10,12 +10,16 @@ module ApiHelper
   T3_BOOKINGS_URL = "#{T3}/offender-sentences/bookings"
   ASSESSMENT_API_HOST = Rails.configuration.assessment_api_host
 
+  def stub_nil_offender
+    stub_request(:post, "#{T3_SEARCH}/prisoner-search/prisoner-numbers").to_return(body: [].to_json).with(query: { 'include-restricted-patients': true })
+  end
+
   def stub_offender(offender)
     offender_no = offender.fetch(:prisonerNumber)
 
     # Prison Search API
     stub_request(:post, "#{T3_SEARCH}/prisoner-search/prisoner-numbers")
-      .with(body: { prisonerNumbers: [offender_no] }.to_json)
+      .with(body: { prisonerNumbers: [offender_no] }.to_json, query: { 'include-restricted-patients': true })
       .to_return(body: [search_api_response(offender)].to_json)
 
     # This endpoint is only used by HmppsApi::PrisonApi::OffenderApi.get_image
@@ -95,7 +99,7 @@ module ApiHelper
     offenders.each { |offender| offender[:prisonId] = prison }
 
     # Prison Search API
-    stub_request(:get, "#{T3_SEARCH}/prisoner-search/prison/#{prison}").with(query: hash_including(:page, :size))
+    stub_request(:get, "#{T3_SEARCH}/prisoner-search/prison/#{prison}").with(query: hash_including(:page, :size, 'include-restricted-patients'))
       .to_return(body: {
         content: offenders.map { |o| search_api_response(o) }
       }.to_json)
@@ -141,7 +145,7 @@ module ApiHelper
   # Stub an 'empty' response from the Prison Search API, indicating that the offender does not exist in NOMIS
   def stub_non_existent_offender(offender_no)
     stub_request(:post, "#{T3_SEARCH}/prisoner-search/prisoner-numbers")
-      .with(body: { prisonerNumbers: [offender_no] }.to_json)
+      .with(body: { prisonerNumbers: [offender_no] }.to_json, query: { 'include-restricted-patients': true })
       .to_return(body: [].to_json)
   end
 
@@ -162,6 +166,11 @@ module ApiHelper
   def stub_resourcing_404 nomis_offender_id
     stub_request(:get, "#{COMMUNITY_HOST}/offenders/nomsNumber/#{nomis_offender_id}/risk/resourcing/latest").
       to_return(status: 404)
+  end
+
+  def stub_agencies(type)
+    stub_request(:get, "https://api-dev.prison.service.justice.gov.uk/api/agencies/type/#{type}").
+      to_return(body: [{ 'agencyId' => 'HOS1', 'description' => 'Hospital One', 'active' => 1 }].to_json)
   end
 
 private
