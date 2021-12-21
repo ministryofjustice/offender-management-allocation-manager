@@ -18,7 +18,7 @@ feature 'Search for offenders' do
       click_on('search-button')
 
       expect(page).to have_current_path(search_prison_prisoners_path(prison_code), ignore_query: true)
-      expect(page).to have_css('tbody tr', count: 6)
+      expect(page).to have_css('tbody tr', count: 5)
 
       # Just check that link can be clicked on without crashing
       within '.allocated_offender_row_0' do
