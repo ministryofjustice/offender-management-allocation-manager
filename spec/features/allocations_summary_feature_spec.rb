@@ -27,7 +27,7 @@ feature 'summary summary feature' do
 
     context 'with allocations' do
       let(:first) { 'G7806VO' }
-      let(:last) { 'G3462VT' }
+      let(:last) { 'G2987UP' }
       let(:prison) { 'LEI' }
 
       before do
