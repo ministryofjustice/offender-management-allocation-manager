@@ -3,6 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
+  include MutexHelper
   let(:nomis_offender_id) { 'G4281GV' }
   let(:remand_nomis_offender_id) { 'G3716UD' }
   let(:ldu) {  create(:local_delivery_unit) }
@@ -272,7 +273,7 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
 
     let!(:c1) { create(:case_information, tier: 'B', offender: build(:offender, nomis_offender_id: nomis_offender_id)) }
 
-    it 'does not creates case information' do
+    it 'does not create case information' do
       expect {
         described_class.perform_now nomis_offender_id
       }.not_to change(CaseInformation, :count)
@@ -308,6 +309,12 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
 
     context 'when creating a new Case Information record' do
       include_examples 'recalculate handover dates'
+
+      it "clears mutex flag when handover date is recalculated" do
+        create_lock(described_class::JOB_NAME, offender_no)
+        described_class.perform_now offender_no
+        expect(lock_exists(described_class::JOB_NAME, offender_no)).to be(false)
+      end
     end
 
     context 'when updating an existing Case Information record' do
@@ -320,6 +327,14 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
       it 'does not re-calculate if CaseInformation is unchanged' do
         described_class.perform_now offender_no
         expect(RecalculateHandoverDateJob).not_to receive(:perform_later)
+        expect(PushHandoverDatesToDeliusJob).not_to receive(:perform_later)
+      end
+
+      it "pushes case information if previous push failed" do
+        described_class.perform_now offender_no
+        create_lock(described_class::JOB_NAME, offender_no)
+        expect(RecalculateHandoverDateJob).not_to receive(:perform_later).with(offender_no)
+        expect(PushHandoverDatesToDeliusJob).to receive(:perform_later).with(instance_of(CalculatedHandoverDate))
         described_class.perform_now offender_no
       end
     end

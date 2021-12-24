@@ -10,6 +10,9 @@ class ProcessDeliusDataJob < ApplicationJob
   discard_on Faraday::ConflictError
 
   include ApplicationHelper
+  include MutexHelper
+
+  JOB_NAME = 'process_delius_data_job'
 
   def perform(nomis_offender_id)
     ApplicationRecord.transaction do
@@ -35,8 +38,17 @@ private
 
   def process_record(delius_record)
     case_information = map_delius_to_case_info(delius_record)
+    # if the previous handover date failed to update on Delius, retry now, regardless of the case being updated
+    if !case_information.changed? && lock_exists(ProcessDeliusDataJob::JOB_NAME, delius_record.noms_no)
+      offender = Offender.find_by! nomis_offender_id: delius_record.noms_no
+      return PushHandoverDatesToDeliusJob.perform_later(offender.calculated_handover_date)
+    end
 
     if case_information.changed?
+      # clear failed handover flag if the case information has changed since the last attempt
+      # the handover date may no longer be valid
+      remove_lock(ProcessDeliusDataJob::JOB_NAME, delius_record.noms_no) if lock_exists(ProcessDeliusDataJob::JOB_NAME, delius_record.noms_no)
+
       if case_information.save
         # Recalculate the offender's handover dates
         RecalculateHandoverDateJob.perform_later(delius_record.noms_no)
