@@ -149,7 +149,7 @@ en:
       one_page:
         display_entries:
           zero: ""
-          one: "Showing 1 - 1 of 1 results"
-          other: "Showing 1 - %{count} of %{count} results"
+          one: "Showing 1 to 1 of 1 results"
+          other: "Showing 1 to %{count} of %{count} results"
       more_pages:
-        display_entries: "Showing %{first}&nbsp;-&nbsp;%{last} of %{total} results"
+        display_entries: "Showing %{first}&nbsp;to&nbsp;%{last} of %{total} results"

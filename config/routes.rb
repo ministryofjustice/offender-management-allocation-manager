@@ -16,6 +16,10 @@ Rails.application.routes.draw do
     resources :staff do
       get 'caseload' => 'caseload#index'
       get 'new_cases' => 'caseload#new_cases'
+      get 'caseload/cases' => 'caseload#cases'
+      get 'caseload/updates_required' => 'caseload#updates_required'
+      get 'caseload/summary' => 'caseload_global#summary'
+      get 'caseload/global' => 'caseload_global#index'
       resources :caseload_handovers, only: %i[index]
     end
 

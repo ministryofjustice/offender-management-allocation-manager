@@ -1,0 +1,44 @@
+<%= render partial: 'layouts/caseload' %>
+<h2 class="govuk-heading-l">
+  All allocation in this prison
+</h2>
+<div class="govuk-form-group">
+  <fieldset class="govuk-fieldset" aria-describedby="caseload-filter-hint">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+      <h3 class="govuk-heading-m" style="margin-bottom: -5px;">
+        Choose which cases you want to see
+      </h3>
+    </legend>
+    <div class="govuk-radios govuk-radios--inline govuk-radios govuk-radios--small">
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input" name="caseload-filter" type="radio" <%= 'checked' if @filter == 'all' %>>
+        <label class="govuk-label govuk-radios__label" for="changed-name">
+          <%= link_to "All allocations in this prison (#{@summary.fetch(:all_prison_cases)})", prison_staff_caseload_global_path(f: 'all') %>
+        </label>
+      </div>
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input" name="caseload-filter" type="radio" <%= 'checked' if @filter == 'recent_allocations' %>>
+        <label class="govuk-label govuk-radios__label" for="changed-name">
+          <%= link_to "Allocated in last 7 days (#{@summary.fetch(:last_seven_days)})", prison_staff_caseload_global_path(f: 'recent_allocations') %>
+        </label>
+      </div>
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input" name="caseload-filter" type="radio" <%= 'checked' if @filter == 'upcoming_releases' %>>
+        <label class="govuk-label govuk-radios__label" for="changed-name">
+          <%= link_to "Releases in next 4 weeks (#{@summary.fetch(:release_next_four_weeks)})", prison_staff_caseload_global_path(f: 'upcoming_releases') %>
+        </label>
+      </div>
+    </div>
+  </fieldset>
+</div>
+
+<% unless @allocations.empty? %>
+  <%=  render partial: 'shared/pagination', locals: {data: @allocations }  %>
+<% end %>
+
+<%= render 'caseload_table', header_partial: 'caseload_headers', collection_partial: 'caseload', collection: @allocations %>
+
+<% unless @allocations.empty? %>
+  <%=  render partial: 'shared/pagination', locals: {data: @allocations }  %>
+<% end %>
+
