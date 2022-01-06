@@ -3,13 +3,38 @@
 class CaseloadController < PrisonStaffApplicationController
   before_action :ensure_signed_in_pom_is_this_pom, :load_pom
 
-  def index
-    @new_cases_count = @pom.allocations.count(&:new_case?)
-    sorted_allocations = sort_allocations(filter_allocations(@pom.allocations))
-    @allocations = Kaminari.paginate_array(sorted_allocations).page(page)
+  before_action do
+    @filter = params['f'].presence || 'all'
 
-    @pending_handover_count = @pom.allocations.count(&:approaching_handover?)
-    @pending_task_count = PomTasks.new.for_offenders(@pom.allocations).count
+    @summary = {
+      all_prison_cases: @prison.allocations.all.count,
+      new_cases_count: @pom.allocations.count(&:new_case?),
+      total_cases: @pom.allocations.count,
+      last_seven_days: @pom.allocations.count { |a| a.primary_pom_allocated_at.to_date >= 7.days.ago },
+      release_next_four_weeks: @pom.allocations.count { |a|
+        a.earliest_release_date.to_date >= 4.weeks.after && Date.current.beginning_of_day > a.earliest_release_date.to_date
+      },
+      pending_handover_count: @pom.allocations.count(&:approaching_handover?),
+      pending_task_count: PomTasks.new.for_offenders(@pom.allocations).count
+    }
+  end
+
+  def cases
+    data = case @filter
+           when 'recent_allocations'
+             filter_allocations(@pom.allocations).filter { |a|
+               a.primary_pom_allocated_at.to_date >= 7.days.ago
+             }
+           when 'upcoming_releases'
+             filter_allocations(@pom.allocations).filter { |a|
+               a.earliest_release_date.to_date >= 4.weeks.after &&
+                 Date.current.beginning_of_day > a.earliest_release_date.to_date
+             }
+           else
+             filter_allocations(@pom.allocations)
+           end
+
+    @allocations = Kaminari.paginate_array(sort_allocations(data)).page(page)
   end
 
   def new_cases

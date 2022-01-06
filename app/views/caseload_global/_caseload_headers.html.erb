@@ -5,8 +5,14 @@
   <%= sort_arrow('last_name') %>
 </th>
 <th class="govuk-table__header" scope="col">
+  <a href="<%= sort_link('POM') %>">
+    POM
+  </a>
+  <%= sort_arrow('POM') %>
+</th>
+<th class="govuk-table__header" scope="col">
   <a href="<%= sort_link('pom_responsibility') %>">
-    Role
+    POM role
   </a>
   <%= sort_arrow('pom_responsibility') %>
 </th>
@@ -34,4 +40,3 @@
   </a>
   <%= sort_arrow('primary_pom_allocated_at') %>
 </th>
-

@@ -1,54 +1,109 @@
-<% content_for :switcher do %>
-  <%= render '/layouts/prison_switcher' %>
-<% end %>
-
-<% if @pending_task_count > 0 %>
-  <%= render partial: 'shared/info_banner', locals: {
-      content: "#{@pending_task_count} case updates are needed. <a href='#{prison_tasks_path(@prison.code)}'>Check now</a>".html_safe }
-  %>
-<% end %>
-
-<% if @allocations.empty? %>
-  <h2 class="govuk-heading-l">No allocated cases</h2>
-<% else %>
-  <h2 class="govuk-heading-l">Your caseload (<%= @allocations.total_count %>)</h2>
-
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-one-quarter">
-      <div class="govuk-body">New cases</div>
-      <div class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24 new-cases-count">
-        <%= link_to_if @new_cases_count > 0, "#{@new_cases_count}", prison_staff_new_cases_path(@prison.code, @staff_id), class:"govuk-link"%>
+<%= render partial: 'layouts/caseload' %>
+<h2 class="govuk-heading-l">
+  Overview
+</h2>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h3 class="govuk-heading-m govuk-!-margin-top-2">Current workload</h3>
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-third">
+        <div class="card card-total">
+          <%= link_to prison_staff_caseload_path(f: 'all'), class: 'govuk-link--no-visited-state' do %>
+            <span class="card__heading--large"><%= @summary.fetch(:total_cases) %></span>
+            <p>total cases</p>
+          <% end %>
+        </div>
+      </div>
+      <div class="govuk-grid-column-one-third">
+        <div class="card card-total">
+          <%= link_to prison_staff_caseload_handovers_path, class: 'govuk-link--no-visited-state' do %>
+            <span class="card__heading--large"><%= @summary.fetch(:pending_handover_count) %></span>
+            <p>handovers in progress</p>
+          <% end %>
+        </div>
       </div>
     </div>
-
-    <div class="govuk-grid-column-one-quarter">
-      <div class="govuk-body">Cases close to handover</div>
-      <div class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24 upcoming-handover-count">
-        <%= link_to_if @pending_handover_count > 0, "#{@pending_handover_count}", prison_staff_caseload_handovers_path(@prison.code, @staff_id), class:"govuk-link"%>
+    <h3 class="govuk-heading-m govuk-!-margin-top-8">Allocations summary</h3>
+    <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Last case allocated
+        </dt>
+        <dd class="govuk-summary-list__value">
+          15 Aug 2021
+        </dd>
+        <dd class="govuk-summary-list__actions">
+        </dd>
       </div>
-    </div>
-
-    <div class="govuk-grid-column-one-quarter">
-      <div class="govuk-body">Working pattern</div>
-      <div class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24"><%= working_pattern_name(@pom.working_pattern) %></div>
-    </div>
-    <div class="govuk-grid-column-one-quarter">
-      <div class="govuk-body">Status</div>
-      <div class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24"><%= @pom.status.capitalize %></div>
-    </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Allocations in last 7 days
+        </dt>
+        <dd class="govuk-summary-list__value">
+          <%= @summary.fetch(:last_seven_days) %>
+        </dd>
+        <dd class="govuk-summary-list__actions">
+          <%= link_to "view",
+                      { controller: :caseload, action: :cases, f: 'recent_allocations' },
+                      class: "moj-sub-navigation__link govuk-link--no-visited-state" %>
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Releases in next 4 weeks
+        </dt>
+        <dd class="govuk-summary-list__value">
+          <%= @summary.fetch(:release_next_four_weeks) %>
+        </dd>
+        <dd class="govuk-summary-list__actions">
+          <%= link_to "view",
+                      { controller: :caseload, action: :cases, f: 'upcoming_releases' },
+                      class: "moj-sub-navigation__link govuk-link--no-visited-state" %>
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Working pattern
+        </dt>
+        <dd class="govuk-summary-list__value">
+          <%= format_working_pattern(@pom.working_pattern) %>
+        </dd>
+        <dd class="govuk-summary-list__actions">
+          <!--<a class="govuk-link" href="#">
+            Edit<span class="govuk-visually-hidden"> name</span>
+          </a>-->
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Status
+        </dt>
+        <dd class="govuk-summary-list__value">
+          <%= @pom.status %>
+        </dd>
+        <dd class="govuk-summary-list__actions">
+          <!--<a class="govuk-link" href="#">
+            Edit<span class="govuk-visually-hidden"> name</span>
+          </a>-->
+        </dd>
+      </div>
+    </dl>
   </div>
+  <div class="govuk-grid-column-one-third govuk-!-margin-top-4">
+    <h3 class="govuk-heading-m">
+      Case mix by tier
+    </h3>
 
-  <div class="govuk-!-margin-bottom-6 govuk-!-margin-top-6">
-    <%= render "poms/search_box" %>
+    <%= case_mix_bar_by_role(@pom.allocations) %>
+    <%= case_mix_vertical_by_tiers(@pom.allocations) %>
+
+    <h3 class="govuk-heading-m govuk-!-margin-top-6">
+      Case mix by role
+    </h3>
+
+    <%= case_mix_bar_by_role(@pom.allocations) %>
+    <%= case_mix_vertical_by_role(@pom.allocations) %>
   </div>
+</div>
 
-  <%= render partial: 'shared/pagination', locals: {data: @allocations } %>
 
-  <% if @prison.womens? %>
-    <%= render 'caseload_table', header_partial: 'female_headers', collection_partial: 'female', collection: @allocations %>
-  <% else %>
-    <%= render 'caseload_table', header_partial: 'male_headers', collection_partial: 'male', collection: @allocations %>
-  <% end %>
-
-  <%= render partial: 'shared/pagination', locals: {data: @allocations } %>
-<% end %>
