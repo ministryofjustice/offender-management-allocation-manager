@@ -125,14 +125,14 @@ feature "view POM's caseload" do
       offenders.each_with_index do |offender, index|
         allow(HmppsApi::ComplexityApi).to receive(:get_complexity).with(offender.fetch(:prisonerNumber)).and_return(complexities[index])
       end
-      visit prison_staff_caseload_path(prison.code, nomis_staff_id)
+      visit prison_staff_caseload_cases_path(prison.code, nomis_staff_id)
     end
 
     it 'can sort by complexity' do
       click_link 'Complexity level'
-      expect(page).to have_current_path("/prisons/#{prison.code}/staff/#{nomis_staff_id}/caseload?sort=complexity_level_number+asc")
+      expect(page).to have_current_path("/prisons/#{prison.code}/staff/#{nomis_staff_id}/caseload/cases?sort=complexity_level_number+asc")
       click_link 'Complexity level'
-      expect(page).to have_current_path("/prisons/#{prison.code}/staff/#{nomis_staff_id}/caseload?sort=complexity_level_number+desc")
+      expect(page).to have_current_path("/prisons/#{prison.code}/staff/#{nomis_staff_id}/caseload/cases?sort=complexity_level_number+desc")
     end
   end
 
@@ -140,12 +140,13 @@ feature "view POM's caseload" do
     let(:prison) { create(:prison) }
 
     before do
-      visit prison_staff_caseload_path(prison.code, nomis_staff_id)
+      visit prison_staff_caseload_cases_path(prison.code, nomis_staff_id)
     end
 
     it 'displays paginated cases for a specific POM' do
-      expect(page).to have_content("Showing 1 - 21 of 21 results")
-      expect(page).to have_content("Your caseload (21)")
+      expect(page).to have_content("Showing 1 to 21 of 21 results")
+      expect(page).to have_content("Your cases")
+      expect(page).to have_content("All your cases")
       sorted_offenders.first(20).each_with_index do |offender, index|
         name = "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}"
 
@@ -264,7 +265,7 @@ feature "view POM's caseload" do
         stub_request(:get, "#{ApiHelper::T3}/staff/#{nomis_staff_id}")
           .to_return(body: { staffId: nomis_staff_id, firstName: "TEST", lastName: "MOIC" }.to_json)
 
-        visit prison_staff_caseload_path(prison.code, nomis_staff_id)
+        visit prison_staff_caseload_cases_path(prison.code, nomis_staff_id)
 
         expected_name = "#{first_offender.fetch(:lastName)}, #{first_offender.fetch(:firstName)}"
 
@@ -286,6 +287,7 @@ feature "view POM's caseload" do
       end
 
       expect(page).to have_content("New cases")
+      visit prison_staff_caseload_cases_path(prison.code, nomis_staff_id) + '?f=recent_allocations'
 
       expected_name = "#{first_offender.fetch(:lastName)}, #{first_offender.fetch(:firstName)}"
 

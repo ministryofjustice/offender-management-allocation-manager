@@ -89,6 +89,7 @@ feature 'Navigation' do
 
         it 'highlights the section' do
           click_menu_and_wait(link_css, index, delay: 5)
+          click_link_and_wait 'Your cases (1)'
           expect(page).to have_content offender_name
           click_link_and_wait offender_name
           new_link = all(link_css)[index]

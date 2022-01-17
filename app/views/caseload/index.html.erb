@@ -1,108 +1,121 @@
-<%= render partial: 'layouts/caseload' %>
+<%= render 'layouts/caseload' %>
 <h2 class="govuk-heading-l">
   Overview
 </h2>
 <div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
+  <div class="govuk-grid-column-full">
     <h3 class="govuk-heading-m govuk-!-margin-top-2">Current workload</h3>
     <div class="govuk-grid-row">
-      <div class="govuk-grid-column-one-third">
-        <div class="card card-total">
-          <%= link_to prison_staff_caseload_path(f: 'all'), class: 'govuk-link--no-visited-state' do %>
-            <span class="card__heading--large"><%= @summary.fetch(:total_cases) %></span>
-            <p>total cases</p>
-          <% end %>
+      <div class="govuk-grid-column-two-thirds">
+
+        <div class="govuk-grid-row">
+
+          <div class="govuk-grid-column-one-half">
+            <div class="card card-total">
+              <%= link_to 'caseload', {controller: 'caseload', action: 'cases'}, class: 'govuk-link--no-visited-state' do %>
+                <span class="card__heading--large"><%= @summary.fetch(:total_cases) %></span>
+                <p>total cases</p>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="govuk-grid-column-one-half">
+            <div class="card card-total">
+              <%= link_to prison_staff_caseload_handovers_path, class: 'govuk-link--no-visited-state' do %>
+                <span class="card__heading--large"><%= @summary.fetch(:pending_handover_count) %></span>
+                <p>handovers in progress</p>
+              <% end %>
+            </div>
+          </div>
+
         </div>
+
+        <div class="govuk-grid-column-row">
+          <h3 class="govuk-heading-m govuk-!-margin-top-8">Allocations summary</h3>
+          <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Last case allocated
+              </dt>
+              <dd class="govuk-summary-list__value">
+                15 Aug 2021
+              </dd>
+              <dd class="govuk-summary-list__actions">
+              </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Allocations in last 7 days
+              </dt>
+              <dd class="govuk-summary-list__value">
+                <%= @summary.fetch(:last_seven_days) %>
+              </dd>
+              <dd class="govuk-summary-list__actions">
+                <%= link_to "view",
+                            { controller: :caseload, action: :cases, f: 'recent_allocations' },
+                            class: "moj-sub-navigation__link govuk-link--no-visited-state" %>
+              </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Releases in next 4 weeks
+              </dt>
+              <dd class="govuk-summary-list__value">
+                <%= @summary.fetch(:release_next_four_weeks) %>
+              </dd>
+              <dd class="govuk-summary-list__actions">
+                <%= link_to "view",
+                            { controller: :caseload, action: :cases, f: 'upcoming_releases' },
+                            class: "moj-sub-navigation__link govuk-link--no-visited-state" %>
+              </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Working pattern
+              </dt>
+              <dd class="govuk-summary-list__value">
+                <%= format_working_pattern(@pom.working_pattern) %>
+              </dd>
+              <dd class="govuk-summary-list__actions">
+                <!--<a class="govuk-link" href="#">
+                  Edit<span class="govuk-visually-hidden"> name</span>
+                </a>-->
+              </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                Status
+              </dt>
+              <dd class="govuk-summary-list__value">
+                <%= @pom.status %>
+              </dd>
+              <dd class="govuk-summary-list__actions">
+                <!--<a class="govuk-link" href="#">
+                  Edit<span class="govuk-visually-hidden"> name</span>
+                </a>-->
+              </dd>
+            </div>
+          </dl>
+        </div>
+
       </div>
+
       <div class="govuk-grid-column-one-third">
-        <div class="card card-total">
-          <%= link_to prison_staff_caseload_handovers_path, class: 'govuk-link--no-visited-state' do %>
-            <span class="card__heading--large"><%= @summary.fetch(:pending_handover_count) %></span>
-            <p>handovers in progress</p>
-          <% end %>
-        </div>
+        <h3 class="govuk-heading-m">
+          Case mix by tier
+        </h3>
+
+        <%= case_mix_bar_by_tiers(@pom.allocations) %>
+        <%= case_mix_vertical_by_tiers(@pom.allocations) %>
+
+        <h3 class="govuk-heading-m govuk-!-margin-top-6">
+          Case mix by role
+        </h3>
+
+        <%= case_mix_bar_by_role(@pom.allocations) %>
+        <%= case_mix_vertical_by_role(@pom.allocations) %>
       </div>
     </div>
-    <h3 class="govuk-heading-m govuk-!-margin-top-8">Allocations summary</h3>
-    <dl class="govuk-summary-list govuk-!-margin-bottom-9">
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">
-          Last case allocated
-        </dt>
-        <dd class="govuk-summary-list__value">
-          15 Aug 2021
-        </dd>
-        <dd class="govuk-summary-list__actions">
-        </dd>
-      </div>
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">
-          Allocations in last 7 days
-        </dt>
-        <dd class="govuk-summary-list__value">
-          <%= @summary.fetch(:last_seven_days) %>
-        </dd>
-        <dd class="govuk-summary-list__actions">
-          <%= link_to "view",
-                      { controller: :caseload, action: :cases, f: 'recent_allocations' },
-                      class: "moj-sub-navigation__link govuk-link--no-visited-state" %>
-        </dd>
-      </div>
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">
-          Releases in next 4 weeks
-        </dt>
-        <dd class="govuk-summary-list__value">
-          <%= @summary.fetch(:release_next_four_weeks) %>
-        </dd>
-        <dd class="govuk-summary-list__actions">
-          <%= link_to "view",
-                      { controller: :caseload, action: :cases, f: 'upcoming_releases' },
-                      class: "moj-sub-navigation__link govuk-link--no-visited-state" %>
-        </dd>
-      </div>
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">
-          Working pattern
-        </dt>
-        <dd class="govuk-summary-list__value">
-          <%= format_working_pattern(@pom.working_pattern) %>
-        </dd>
-        <dd class="govuk-summary-list__actions">
-          <!--<a class="govuk-link" href="#">
-            Edit<span class="govuk-visually-hidden"> name</span>
-          </a>-->
-        </dd>
-      </div>
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">
-          Status
-        </dt>
-        <dd class="govuk-summary-list__value">
-          <%= @pom.status %>
-        </dd>
-        <dd class="govuk-summary-list__actions">
-          <!--<a class="govuk-link" href="#">
-            Edit<span class="govuk-visually-hidden"> name</span>
-          </a>-->
-        </dd>
-      </div>
-    </dl>
-  </div>
-  <div class="govuk-grid-column-one-third govuk-!-margin-top-4">
-    <h3 class="govuk-heading-m">
-      Case mix by tier
-    </h3>
-
-    <%= case_mix_bar_by_role(@pom.allocations) %>
-    <%= case_mix_vertical_by_tiers(@pom.allocations) %>
-
-    <h3 class="govuk-heading-m govuk-!-margin-top-6">
-      Case mix by role
-    </h3>
-
-    <%= case_mix_bar_by_role(@pom.allocations) %>
-    <%= case_mix_vertical_by_role(@pom.allocations) %>
   </div>
 </div>
 

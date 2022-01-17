@@ -1,0 +1,11 @@
+<%= render :partial => 'layouts/caseload' %>
+<h2 class="govuk-heading-l">
+  Case updates needed
+</h2>
+
+<%= render partial: 'shared/pagination', locals: { data: @pom_tasks } %>
+<%= render 'caseload_table', header_partial: 'updates_required_headers', collection_partial: 'updates_required', collection: @pom_tasks %>
+<%= render partial: 'shared/pagination', locals: { data: @pom_tasks } %>
+<% if @pom_tasks.empty? %>
+  <p class="govuk-body">No updates needed</p>
+<% end %>

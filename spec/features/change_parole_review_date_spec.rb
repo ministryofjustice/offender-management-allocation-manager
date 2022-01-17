@@ -144,6 +144,7 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
       # Navigate to the prisoner profile page
       visit prison_dashboard_index_path(prison.code)
       click_link 'See your caseload'
+      click_link 'Your cases (1)'
       page.find('[aria-label="Prisoner name"] a').click
     end
 

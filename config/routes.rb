@@ -14,13 +14,19 @@ Rails.application.routes.draw do
     resources :dashboard, only: :index
     resources :handovers, only: :index
     resources :staff do
+      resources :caseload_handovers, only: %i[index]
+      #resources :caseload do
+      #  get 'new_cases'
+      #  get 'cases' => 'caseload#new_cases'
+      #  get 'updates_required'
+      #end
+
+
       get 'caseload' => 'caseload#index'
       get 'new_cases' => 'caseload#new_cases'
       get 'caseload/cases' => 'caseload#cases'
       get 'caseload/updates_required' => 'caseload#updates_required'
-      get 'caseload/summary' => 'caseload_global#summary'
       get 'caseload/global' => 'caseload_global#index'
-      resources :caseload_handovers, only: %i[index]
     end
 
     resources :prisoners, only: [:show] do

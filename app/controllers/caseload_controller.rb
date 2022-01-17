@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
 class CaseloadController < PrisonStaffApplicationController
-  before_action :ensure_signed_in_pom_is_this_pom, :load_pom
+  before_action :ensure_signed_in_pom_is_this_pom, :load_pom, :load_summary
 
-  before_action do
+  def load_summary
     @filter = params['f'].presence || 'all'
-
     @summary = {
       all_prison_cases: @prison.allocations.all.count,
       new_cases_count: @pom.allocations.count(&:new_case?),
@@ -39,6 +38,11 @@ class CaseloadController < PrisonStaffApplicationController
 
   def new_cases
     @new_cases = sort_allocations(@pom.allocations.select(&:new_case?))
+  end
+
+  def updates_required
+    sorted_tasks = PomTasks.new.for_offenders(@current_user.allocations)
+    @pom_tasks = Kaminari.paginate_array(sorted_tasks).page(page)
   end
 
 private
