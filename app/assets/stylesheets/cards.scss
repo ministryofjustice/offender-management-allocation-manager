@@ -1,11 +1,11 @@
 
 .card {
-  margin-bottom: 40px;
+  margin: 10px 0;
   background: #fff;
   border: 1px solid #d9dadb;
   position: relative;
-  width: 100%;
-  padding: 25px
+  padding: 15px 20px;
+  font-weight: 400;
 }
 
 .card__heading {
@@ -15,6 +15,7 @@
   &--large {
     @extend .card__heading;
     font-size: 48px;
+    font-weight: 700;
   }
 }
 

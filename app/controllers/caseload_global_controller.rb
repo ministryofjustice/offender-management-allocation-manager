@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class CaseloadGlobalController < CaseloadController
-  before_action :ensure_signed_in_pom_is_this_pom, :load_pom
-
   def index
     @allocated = @prison.allocated.map do |offender|
       OffenderWithAllocationPresenter.new(offender, @prison.allocations.detect { |a| a.nomis_offender_id == offender.offender_no })
@@ -38,5 +36,17 @@ class CaseloadGlobalController < CaseloadController
            end
 
     @allocations = Kaminari.paginate_array(sort_allocations(data)).page(page)
+  end
+
+private
+
+  def filter_allocations(allocations)
+    if params['q'].present?
+      query = params['q'].upcase
+      allocations = allocations.select { |a|
+        a.full_name.upcase.include?(query) || a.offender_no.include?(query)
+      }
+    end
+    allocations
   end
 end

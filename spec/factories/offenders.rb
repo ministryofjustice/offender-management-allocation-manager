@@ -46,6 +46,8 @@ FactoryBot.define do
       inOutStatus { 'OUT' }
       lastMovementTypeCode { 'TAP' }
     end
+
+    created {Date.new }
   end
 
   factory :offender do

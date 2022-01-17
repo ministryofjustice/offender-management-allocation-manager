@@ -30,10 +30,10 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
 
     signin_pom_user([prison])
 
-    visit prison_staff_caseload_path(prison, nomis_staff_id)
+    visit prison_staff_caseload_cases_path(prison, nomis_staff_id)
 
     # assert that our setup created a caseload record
-    expect(page).to have_content("Showing 1 - 1 of 1 results")
+    expect(page.text).to match(/Showing 1 to 1 of 1 results/)
   end
 
   context 'with switch' do

@@ -90,7 +90,7 @@ RSpec.describe "poms/show", type: :view do
     let(:offenders) { [offender] }
 
     it 'displays correct headers' do
-      expect(page.css('th a').map(&:text).map(&:strip)).to eq(["Case", "Location", "Tier", "Earliest release date", "Allocationdate", "Role"])
+      expect(page.css('th a').map(&:text).map(&:strip)).to eq(["Case", "Role", "Location", "Earliest release date", "Tier", "Allocationdate"])
     end
 
     it 'displays correct data' do
@@ -101,7 +101,6 @@ RSpec.describe "poms/show", type: :view do
           case_info.tier,
           offender.earliest_release_date.to_s(:rfc822),
           Time.zone.today.to_s(:rfc822),
-          "Co-working"
         ]
     end
   end
