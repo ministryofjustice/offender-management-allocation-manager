@@ -26,8 +26,8 @@ class CaseloadController < PrisonStaffApplicationController
              }
            when 'upcoming_releases'
              filter_allocations(@pom.allocations).filter { |a|
-               a.earliest_release_date.to_date >= 4.weeks.after &&
-                 Date.current.beginning_of_day > a.earliest_release_date.to_date
+               a.earliest_release_date.to_date <= 4.weeks.after &&
+                 Date.current.beginning_of_day < a.earliest_release_date.to_date
              }
            else
              filter_allocations(@pom.allocations)

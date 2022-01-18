@@ -28,8 +28,8 @@ class CaseloadGlobalController < CaseloadController
              }
            when 'upcoming_releases'
              filter_allocations(@allocated).filter { |a|
-               a.earliest_release_date.to_date >= 4.weeks.after &&
-                 Date.current.beginning_of_day > a.earliest_release_date.to_date
+               a.earliest_release_date.to_date <= 4.weeks.after &&
+                 Date.current.beginning_of_day < a.earliest_release_date.to_date
              }
            else
              filter_allocations(@allocated)

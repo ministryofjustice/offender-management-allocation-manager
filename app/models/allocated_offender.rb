@@ -22,7 +22,7 @@ class AllocatedOffender
 
   # this is required for sorting only
   def complexity_level_number
-    COMPLEXITIES.fetch(complexity_level)
+    ComplexityLevelHelper::COMPLEXITIES.fetch(complexity_level)
   end
 
   def high_complexity?

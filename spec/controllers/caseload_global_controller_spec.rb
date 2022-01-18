@@ -2,10 +2,11 @@
 
 require 'rails_helper'
 
-RSpec.describe CaseloadController, type: :controller do
+RSpec.describe CaseloadGlobalController, type: :controller do
   let(:staff_id) { 456_987 }
+  let(:other_staff_id) { 767_584 }
   let(:not_signed_in) { 123_456 }
-  let(:poms) do
+  let(:poms) {
     [
       build(:pom,
             firstName: 'Alice',
@@ -14,9 +15,13 @@ RSpec.describe CaseloadController, type: :controller do
       build(:pom,
             firstName: 'John',
             staffId: not_signed_in,
+            position: RecommendationService::PRISON_POM),
+      build(:pom,
+            firstName: 'Helen',
+            staffId: other_staff_id,
             position: RecommendationService::PRISON_POM)
     ]
-  end
+  }
   let(:pom) { poms.first }
 
   before do
@@ -28,14 +33,17 @@ RSpec.describe CaseloadController, type: :controller do
     let(:today) { Time.zone.today }
     let(:yesterday) { Time.zone.today - 1.day }
 
-    let(:offenders) do
+    let(:offenders) {
       [
-        build(:nomis_offender, :rotl, complexityLevel: 'high', created: 1.day.ago),
+        build(:nomis_offender, :rotl, complexityLevel: 'high', created: 1.day.ago,
+              sentence: attributes_for(:sentence_detail, automaticReleaseDate: Time.zone.today + 1.week)),
         build(:nomis_offender, complexityLevel: 'medium', created: 1.month.ago),
-        build(:nomis_offender, complexityLevel: 'low', created: 2.months.ago,
-              sentence: attributes_for(:sentence_detail, automaticReleaseDate: Time.zone.today + 1.week))
+        build(:nomis_offender, complexityLevel: 'low', created: 2.months.ago),
+        build(:nomis_offender, complexityLevel: 'low', created: 2.months.ago),
+        build(:nomis_offender, complexityLevel: 'medium', created: 1.month.ago),
+        build(:nomis_offender, :rotl, complexityLevel: 'high', created: 1.day.ago),
       ]
-    end
+    }
 
     before do
       # we need 3 data points - 1 in, 1 out on ROTL, 1 out on ROTL and returned.
@@ -56,10 +64,13 @@ RSpec.describe CaseloadController, type: :controller do
       stub_offenders_for_prison(prison.code, offenders, movements)
 
       # Need to create history records because AllocatedOffender#new_case? doesn't cope otherwise
-      offenders.each do |offender|
+      # include every other offender with another POM
+      offenders.each.with_index(1) do |offender, index|
         create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
-        alloc = create(:allocation_history, primary_pom_allocated_at: offender.fetch(:created), nomis_offender_id: offender.fetch(:prisonerNumber), primary_pom_nomis_id: pom.staffId, prison: prison.code)
-        alloc.update!(primary_pom_nomis_id: pom.staffId,
+        alloc = create(:allocation_history, primary_pom_allocated_at: offender.fetch(:created),
+                       nomis_offender_id: offender.fetch(:prisonerNumber),
+                       primary_pom_nomis_id: pom.staffId, prison: prison.code)
+        alloc.update!(primary_pom_nomis_id: index % 2 ? pom.staffId : other_staff_id,
                       event: AllocationHistory::REALLOCATE_PRIMARY_POM,
                       event_trigger: AllocationHistory::USER)
       end
@@ -74,15 +85,15 @@ RSpec.describe CaseloadController, type: :controller do
         let(:prison) { create(:womens_prison) }
 
         it 'can sort by complexity' do
-          get :cases, params: { f: 'all', prison_id: prison.code, staff_id: staff_id, sort: 'complexity_level_number asc' }
+          get :index, params: { f: 'all', prison_id: prison.code, staff_id: staff_id, sort: 'complexity_level_number asc' }
           expect(response).to be_successful
-          expect(assigns(:allocations).map(&:complexity_level)).to eq ['low', 'medium', 'high']
+          expect(assigns(:allocations).map(&:complexity_level)).to eq %w[low low medium medium high high]
         end
 
         it 'can sort by complexity desc' do
-          get :cases, params: { f: 'all', prison_id: prison.code, staff_id: staff_id, sort: 'complexity_level_number desc' }
+          get :index, params: { f: 'all', prison_id: prison.code, staff_id: staff_id, sort: 'complexity_level_number desc' }
           expect(response).to be_successful
-          expect(assigns(:allocations).map(&:complexity_level)).to eq ['high', 'medium', 'low']
+          expect(assigns(:allocations).map(&:complexity_level)).to eq %w[high high medium medium low low]
         end
       end
     end
@@ -108,7 +119,7 @@ RSpec.describe CaseloadController, type: :controller do
           end
 
           it 'cant see the caseload' do
-            get :cases, params: { f: 'all', prison_id: prison.code, staff_id: not_signed_in }
+            get :index, params: { f: 'all', prison_id: prison.code, staff_id: not_signed_in }
             expect(response).to redirect_to('/401')
           end
         end
@@ -118,56 +129,32 @@ RSpec.describe CaseloadController, type: :controller do
             stub_signed_in_pom(prison.code, staff_id, 'alice')
           end
 
-          let(:allocations) { assigns(:allocations).index_by(&:nomis_offender_id) }
+          let(:allocations) { assigns(:allocations).index_by(&:offender_no) }
 
           it 'is allowed' do
-            get :cases, params: { f: 'all', prison_id: prison.code, staff_id: staff_id }
+            get :index, params: { f: 'all', prison_id: prison.code, staff_id: staff_id }
             expect(response).to be_successful
           end
 
-          it 'returns the caseload' do
-            get :cases, params: { f: 'all', prison_id: prison.code, staff_id: staff_id }
-            expect(assigns(:allocations).map(&:nomis_offender_id)).to match_array(offenders.map { |o| o.fetch(:prisonerNumber) })
+          it 'returns all caseloads for prison' do
+            get :index, params: { f: 'all', prison_id: prison.code, staff_id: staff_id }
+            expect(assigns(:allocations).map(&:offender_no)).to match_array(offenders.map { |o| o.fetch(:prisonerNumber) })
           end
 
-          it 'returns the caseload with recent allocations' do
-            get :cases, params: { f: 'recent_allocations', prison_id: prison.code, staff_id: staff_id }
-            expect(assigns(:allocations).map(&:nomis_offender_id)).to match_array(offenders.first.fetch(:prisonerNumber))
+          it 'returns all caseloads for prison with recent allocations' do
+            get :index, params: { f: 'recent_allocations', prison_id: prison.code, staff_id: staff_id }
+            expect(assigns(:allocations).map(&:offender_no)).to match_array([offenders.first.fetch(:prisonerNumber), offenders.last.fetch(:prisonerNumber)])
           end
 
-          it 'returns the caseload with upcoming releases' do
-            get :cases, params: { f: 'upcoming_releases', prison_id: prison.code, staff_id: staff_id }
-            expect(assigns(:allocations).map(&:nomis_offender_id)).to match_array(offenders.last.fetch(:prisonerNumber))
+          it 'returns all caseloads for prison with upcoming releases' do
+            get :index, params: { f: 'upcoming_releases', prison_id: prison.code, staff_id: staff_id }
+            expect(assigns(:allocations).map(&:offender_no)).to match_array([offenders.first.fetch(:prisonerNumber)])
           end
 
           it 'returns ROTL information' do
-            get :cases, params: { f: 'all', prison_id: prison.code, staff_id: staff_id }
-            expect(offenders.map { |o| allocations.fetch(o.fetch(:prisonerNumber)).latest_temp_movement_date }).to eq [today, nil, nil]
+            get :index, params: { f: 'all', prison_id: prison.code, staff_id: staff_id }
+            expect(offenders.map { |o| allocations.fetch(o.fetch(:prisonerNumber)).latest_temp_movement_date }).to eq [today, nil, nil, nil, nil, nil]
           end
-        end
-      end
-
-      describe '#updates_required' do
-        before do
-          stub_sso_data(prison.code)
-        end
-
-        it 'returns cases with outstanding tasks' do
-          get :updates_required, params: { prison_id: prison.code, staff_id: staff_id }
-          expect(response).to be_successful
-        end
-      end
-
-      describe '#new_cases' do
-        before do
-          stub_sso_data(prison.code)
-        end
-
-        it 'returns the caseload' do
-          get :new_cases, params: { prison_id: prison.code, staff_id: staff_id }
-          expect(response).to be_successful
-
-          expect(assigns(:new_cases).map(&:nomis_offender_id)).to match_array(offenders.map { |o| o.fetch(:prisonerNumber) })
         end
       end
     end

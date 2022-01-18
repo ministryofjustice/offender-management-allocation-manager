@@ -4,7 +4,7 @@
 # despite the fact that this should be really easy in theory
 class OffenderWithAllocationPresenter
   delegate :offender_no, :full_name, :last_name, :earliest_release_date, :latest_temp_movement_date, :allocated_com_name,
-           :case_allocation, :date_of_birth, :tier, :probation_record, :handover_start_date, :restricted_patient?,
+           :case_allocation, :complexity_level, :date_of_birth, :tier, :probation_record, :handover_start_date, :restricted_patient?,
            :location, :responsibility_handover_date, :pom_responsible?, :pom_supporting?, :coworking?, to: :@offender
 
   def initialize(offender, allocation)
@@ -26,5 +26,14 @@ class OffenderWithAllocationPresenter
     if @allocation
       (@allocation.primary_pom_allocated_at || @allocation.updated_at)&.to_date
     end
+  end
+
+  # this is required for sorting only
+  def complexity_level_number
+    ComplexityLevelHelper::COMPLEXITIES.fetch(complexity_level)
+  end
+
+  def high_complexity?
+    complexity_level == 'high'
   end
 end
