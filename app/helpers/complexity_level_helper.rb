@@ -10,9 +10,4 @@ module ComplexityLevelHelper
       render partial: 'complexity_levels/complexity_level_change_medium_low'
     end
   end
-
-  # this is required for sorting only
-  def complexity_level_number level
-    COMPLEXITIES.fetch(level)
-  end
 end
