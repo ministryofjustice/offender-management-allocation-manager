@@ -32,24 +32,6 @@ RSpec.describe ApplicationHelper do
     end
   end
 
-  describe 'displays POM level' do
-    let(:po) { 'PO' }
-    let(:pom) { 'PRO' }
-    let(:staff) { 'STAFF' }
-
-    it 'returns Probation Officer' do
-      expect(pom_level(po)).to eq('Probation POM')
-    end
-
-    it 'returns Prison Officer' do
-      expect(pom_level(pom)).to eq('Prison POM')
-    end
-
-    it 'returns Staff member' do
-      expect(pom_level(staff)).to eq('N/A')
-    end
-  end
-
   describe 'displays long POM level' do
     let(:po) { 'PO' }
     let(:pom) { 'PRO' }
@@ -65,6 +47,34 @@ RSpec.describe ApplicationHelper do
 
     it 'returns long Staff member' do
       expect(pom_level_long(staff)).to eq('N/A')
+    end
+  end
+
+  describe 'displays correct shortened POM level' do
+    it 'show PO level' do
+      expect(pom_level('PO')).to eq('Probation POM')
+    end
+
+    it 'shows POM level' do
+      expect(pom_level('PRO')).to eq('Prison POM')
+    end
+
+    it 'shows staff fallback label' do
+      expect(pom_level('STAFF')).to eq('N/A')
+    end
+  end
+
+  describe 'displays correct POM level' do
+    it 'show PO level' do
+      expect(pom_level_long('PO')).to eq('Probation Officer POM')
+    end
+
+    it 'shows POM level' do
+      expect(pom_level_long('PRO')).to eq('Prison Officer POM')
+    end
+
+    it 'shows staff fallback label' do
+      expect(pom_level_long('STAFF')).to eq('N/A')
     end
   end
 end
