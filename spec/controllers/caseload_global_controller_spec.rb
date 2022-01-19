@@ -113,6 +113,14 @@ RSpec.describe CaseloadGlobalController, type: :controller do
           end
         end
 
+        describe 'can search by name' do
+          it 'can search by name' do
+            get :index, params: { f: 'all', prison_id: prison.code, staff_id: staff_id, q: offenders.first.fetch(:prisonerNumber) }
+            expect(response).to be_successful
+            expect(assigns(:allocations).map(&:offender_no)).to match_array([offenders.first.fetch(:prisonerNumber)])
+          end
+        end
+
         context 'when user is a different POM to the one signed in' do
           before do
             stub_signed_in_pom(prison.code, staff_id, 'alice')
