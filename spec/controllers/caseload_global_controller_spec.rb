@@ -95,6 +95,18 @@ RSpec.describe CaseloadGlobalController, type: :controller do
           expect(response).to be_successful
           expect(assigns(:allocations).map(&:complexity_level)).to eq %w[high high medium medium low low]
         end
+
+        it 'indicates offender is high complexity' do
+          get :index, params: { f: 'all', prison_id: prison.code, staff_id: staff_id, sort: 'complexity_level_number desc' }
+          expect(response).to be_successful
+          expect(assigns(:allocations).first.high_complexity?).to eq true
+        end
+
+        it 'indicates offender is not high complexity' do
+          get :index, params: { f: 'all', prison_id: prison.code, staff_id: staff_id, sort: 'complexity_level_number desc' }
+          expect(response).to be_successful
+          expect(assigns(:allocations).last.high_complexity?).to eq false
+        end
       end
     end
 
