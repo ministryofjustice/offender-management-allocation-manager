@@ -58,19 +58,19 @@ RSpec.describe "poms/show", type: :view do
     let(:tabname) { 'overview' }
 
     it 'shows working pattern' do
-      expect(summary_rows.first).to have_content('Working pattern')
+      expect(summary_rows[3]).to have_content('Working pattern')
     end
 
     it 'shows last case allocated date' do
-      expect(summary_rows[2]).to have_content(two_days_ago.to_s(:rfc822))
+      expect(summary_rows.first).to have_content(two_days_ago.to_s(:rfc822))
     end
 
     it 'shows allocations in last 7 days' do
-      expect(summary_rows[3]).to have_content(2)
+      expect(summary_rows[1]).to have_content(2)
     end
 
     it 'shows releases due in next 4 weeks' do
-      expect(summary_rows[4]).to have_content(1)
+      expect(summary_rows[2]).to have_content(1)
     end
   end
 

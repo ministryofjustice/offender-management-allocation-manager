@@ -52,7 +52,7 @@ feature "get poms list" do
 
     # click through the 'Total cases' link and make sure we arrive
     expect(page).not_to have_content "Allocation\ndate"
-    first('.card-heading').click
+    first('.card__heading--large').click
     expect(page).to have_content "Allocation\ndate"
   end
 
