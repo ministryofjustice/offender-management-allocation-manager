@@ -12,7 +12,7 @@
 
           <div class="govuk-grid-column-one-half">
             <div class="card card-total">
-              <%= link_to 'caseload', {controller: 'caseload', action: 'cases'}, class: 'govuk-link--no-visited-state' do %>
+              <%= link_to prison_staff_caseload_cases_path, class: 'govuk-link--no-visited-state' do %>
                 <span class="card__heading--large"><%= @summary.fetch(:total_cases) %></span>
                 <p>total cases</p>
               <% end %>

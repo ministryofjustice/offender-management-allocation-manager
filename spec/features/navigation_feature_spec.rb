@@ -70,7 +70,7 @@ feature 'Navigation' do
         expect(new_link['aria-current']).to eq('page')
 
         # go into edit the POM profile page
-        within first('.govuk-summary-list__row') do
+        within first('.govuk-summary-list__row:nth-child(4)') do
           click_link "Change"
         end
         new_link = all(link_css)[index]
