@@ -5,6 +5,8 @@ metadata:
   namespace: offender-management-preprod
   annotations:
     kubernetes.io/ingress.class: "nginx"
+    external-dns.alpha.kubernetes.io/set-identifier: offender-management-preprod-blue
+    external-dns.alpha.kubernetes.io/aws-weight: "100"
     nginx.ingress.kubernetes.io/whitelist-source-range: >
       35.178.209.113/32,
       3.8.51.207/32,

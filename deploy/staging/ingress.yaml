@@ -5,6 +5,8 @@ metadata:
   namespace: offender-management-staging
   annotations:
     kubernetes.io/ingress.class: "nginx"
+    external-dns.alpha.kubernetes.io/set-identifier: offender-management-staging-blue
+    external-dns.alpha.kubernetes.io/aws-weight: "100"
 spec:
   tls:
   - hosts:
