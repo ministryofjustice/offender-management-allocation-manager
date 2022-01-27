@@ -8,7 +8,7 @@ references:
   deploy_container_config: &deploy_container_config
     resource_class: small
     docker:
-      - image: ${ECR_ENDPOINT}/cloud-platform/tools:circleci
+      - image: ministryofjustice/cloud-platform-tools
 
   test_container_config: &test_container_config
     resource_class: medium
@@ -235,8 +235,13 @@ jobs:
       - run:
           name: Kubectl deployment staging setup
           command: |
-            setup-kube-auth
-            kubectl config use-context staging
+            echo -n ${KUBE_ENV_STAGING_CACERT} | base64 -d > ./live_1_ca.crt
+            kubectl config set-cluster ${CLUSTER_NAME_LIVE_1} --certificate-authority=./live_1_ca.crt --server=https://api.${CLUSTER_NAME_LIVE_1}
+            kubectl config set-credentials circleci --token=${KUBE_ENV_STAGING_TOKEN}
+            kubectl config set-context ${CLUSTER_NAME_LIVE_1} --cluster=${CLUSTER_NAME_LIVE_1} --user=circleci --namespace=${KUBE_ENV_STAGING_NAMESPACE}
+            kubectl config use-context ${CLUSTER_NAME_LIVE_1}
+            kubectl config current-context
+            kubectl --namespace=${KUBE_ENV_STAGING_NAMESPACE} get pods
       - *install_gpg
       - *configure_gpg
       - *decrypt_secrets
@@ -289,8 +294,13 @@ jobs:
       - run:
           name: Kubectl deployment preproduction setup
           command: |
-            setup-kube-auth
-            kubectl config use-context preprod
+            echo -n ${KUBE_ENV_PREPROD_CACERT} | base64 -d > ./live_1_ca.crt
+            kubectl config set-cluster ${CLUSTER_NAME_LIVE_1} --certificate-authority=./live_1_ca.crt --server=https://api.${CLUSTER_NAME_LIVE_1}
+            kubectl config set-credentials circleci --token=${KUBE_ENV_PREPROD_TOKEN}
+            kubectl config set-context ${CLUSTER_NAME_LIVE_1} --cluster=${CLUSTER_NAME_LIVE_1} --user=circleci --namespace=${KUBE_ENV_PREPROD_NAMESPACE}
+            kubectl config use-context ${CLUSTER_NAME_LIVE_1}
+            kubectl config current-context
+            kubectl --namespace=${KUBE_ENV_PREPROD_NAMESPACE} get pods
       - *install_gpg
       - *configure_gpg
       - *decrypt_secrets
@@ -313,8 +323,13 @@ jobs:
       - run:
           name: Kubectl deployment production setup
           command: |
-            setup-kube-auth
-            kubectl config use-context production
+            echo -n ${KUBE_ENV_PRODUCTION_CACERT} | base64 -d > ./live_1_ca.crt
+            kubectl config set-cluster ${CLUSTER_NAME_LIVE_1} --certificate-authority=./live_1_ca.crt --server=https://api.${CLUSTER_NAME_LIVE_1}
+            kubectl config set-credentials circleci --token=${KUBE_ENV_PRODUCTION_TOKEN}
+            kubectl config set-context ${CLUSTER_NAME_LIVE_1} --cluster=${CLUSTER_NAME_LIVE_1} --user=circleci --namespace=${KUBE_ENV_PRODUCTION_NAMESPACE}
+            kubectl config use-context ${CLUSTER_NAME_LIVE_1}
+            kubectl config current-context
+            kubectl --namespace=${KUBE_ENV_PRODUCTION_NAMESPACE} get pods
       - *install_gpg
       - *configure_gpg
       - *decrypt_secrets
