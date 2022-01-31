@@ -84,6 +84,11 @@ RSpec.describe "poms/show", type: :view do
       row = page.css('td').map(&:text).map(&:strip)
       # The first column is offender name and number underneath each other - just grab the non-blank data
       split_col_zero = row.first.split("\n").map(&:strip).reject(&:empty?)
+      # remove new lines and repeating whitespace
+      row.each do |r|
+        r.delete!("\n")
+        r.squeeze!(" ")
+      end
       [split_col_zero] + row[1..]
     end
     let(:tabname) { 'caseload' }
@@ -97,9 +102,10 @@ RSpec.describe "poms/show", type: :view do
       expect(first_offender_row)
         .to eq [
           [offender.full_name, case_info.nomis_offender_id],
+          "Co-working",
           offender.location,
+          "#{offender.earliest_release[:type]}: #{offender.earliest_release[:date]}".to_s(:rfc822),
           case_info.tier,
-          offender.earliest_release_date.to_s(:rfc822),
           Time.zone.today.to_s(:rfc822),
         ]
     end
