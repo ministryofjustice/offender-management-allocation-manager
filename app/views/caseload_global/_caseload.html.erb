@@ -13,7 +13,14 @@
   <td aria-label="Location" class="govuk-table__cell">
     <%= prisoner_location(caseload, true) %>
   </td>
-  <td aria-label="Earliest release date" class="govuk-table__cell "><%= format_date(caseload.earliest_release_date, replacement: "Unknown") %></td>
+  <% if @prison.womens? %>
+    <td aria-label="Complexity Level" class="govuk-table__cell">
+      <%= caseload.complexity_level.titleize %>
+    </td>
+  <% end %>
+  <td aria-label="Earliest release date" class="govuk-table__cell ">
+    <%= caseload.earliest_release[:type] %>: <br/>
+    <%= format_date(caseload.earliest_release[:date], replacement: "Unknown") %></td>
   <td aria-label="Tier" class="govuk-table__cell tier">
     <strong><%= caseload.tier %></strong>
   </td>

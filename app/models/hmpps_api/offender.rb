@@ -11,7 +11,7 @@ module HmppsApi
              :conditional_release_date, :release_date,
              :parole_eligibility_date, :tariff_date,
              :automatic_release_date, :licence_expiry_date,
-             :post_recall_release_date, :earliest_release_date,
+             :post_recall_release_date, :earliest_release_date, :earliest_release,
              :indeterminate_sentence?, :immigration_case?, :civil_sentence?, :describe_sentence,
              to: :sentence
 

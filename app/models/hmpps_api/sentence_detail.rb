@@ -66,6 +66,31 @@ module HmppsApi
       future_dates.any? ? future_dates.min.to_date : past_dates.max.try(:to_date)
     end
 
+    def earliest_release
+      release_dates = [
+        { type: 'CRD', date: conditional_release_date },
+        { type: 'ARD', date: automatic_release_date },
+        { type: 'HDCED', date: home_detention_curfew_eligibility_date },
+        { type: 'HDCEA', date: home_detention_curfew_actual_date },
+        { type: 'PED', date: parole_eligibility_date },
+        { type: 'TED', date: tariff_date }
+      ].filter { |v| !v[:date].nil? }
+
+      if release_dates.empty?
+        release_dates = [
+          { type: 'SED', date: sentence_expiry_date },
+          { type: 'LED', date: licence_expiry_date },
+          { type: 'PRRD', date: post_recall_release_date },
+          { type: 'APD', date: actual_parole_date }
+        ].filter { |v| !v[:date].nil? }
+      end
+
+      past_dates, future_dates = release_dates.partition { |d| d.fetch(:date) < Time.zone.today }
+      return future_dates.min_by(1) { |r| r.fetch(:date).to_date }.first if future_dates.any?
+
+      past_dates.max_by(1) { |r| r.fetch(:date).to_date }.first
+    end
+
     def initialize(payload)
       @actual_parole_date = payload['actualParoleDate']&.to_date
       @automatic_release_date = payload['automaticReleaseDate']&.to_date

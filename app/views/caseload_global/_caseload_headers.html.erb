@@ -22,6 +22,14 @@
   </a>
   <%= sort_arrow('location') %>
 </th>
+<% if @prison.womens? %>
+<th class="govuk-table__header" scope="col">
+  <a href="<%= sort_link('complexity_level_number') %>">
+    Complexity level
+  </a>
+  <%= sort_arrow('complexity_level_number') %>
+</th>
+<% end %>
 <th class="govuk-table__header" scope="col">
   <a href="<%= sort_link('earliest_release_date') %>">
     Earliest release<br/> date
