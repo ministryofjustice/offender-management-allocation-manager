@@ -255,6 +255,35 @@ jobs:
           environment:
             <<: *github_team_name_slug
 
+  deploy_staging_live_cluster:
+    <<: *deploy_container_config
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Kubectl deployment live staging setup
+          command: |
+            echo -n ${CLUSTER_CERT_LIVE} | base64 -d > ./live_ca.crt
+            kubectl config set-cluster ${CLUSTER_NAME_LIVE} --certificate-authority=./live_ca.crt --server=https://${CLUSTER_NAME_LIVE}
+            kubectl config set-credentials circleci --token=${KUBE_ENV_STAGING_TOKEN}
+            kubectl config set-context ${CLUSTER_NAME_LIVE} --cluster=${CLUSTER_NAME_LIVE} --user=circleci --namespace=${KUBE_ENV_STAGING_NAMESPACE}
+            kubectl config use-context ${CLUSTER_NAME_LIVE}
+            kubectl config current-context
+            kubectl --namespace=${KUBE_ENV_STAGING_NAMESPACE} get pods
+      - *install_gpg
+      - *configure_gpg
+      - *decrypt_secrets
+      - deploy:
+          name: Deploy to live staging
+          command: |
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ /deploy-live-cluster/staging/cron-*.yaml
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ /deploy-live-cluster/staging/deployment.yaml
+            kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
+            kubectl apply --record=false -f ./deploy-live-cluster/staging
+          environment:
+            <<: *github_team_name_slug
+
   test_staging:
     <<: *test_container_config
     working_directory: ~/integration-tests
@@ -362,6 +391,15 @@ workflows:
                 - main
                 - preproduction
       - deploy_staging:
+          requires:
+            - rubocop
+            - test
+            - build_and_push_docker_image
+          filters:
+            branches:
+              only:
+                - main
+      - deploy_staging_live_cluster:
           requires:
             - rubocop
             - test

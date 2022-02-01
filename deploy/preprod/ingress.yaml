@@ -72,6 +72,9 @@ spec:
   tls:
   - hosts:
     - allocation-manager-preprod.apps.live-1.cloud-platform.service.justice.gov.uk
+  - hosts:
+    - preprod.moic.service.justice.gov.uk
+    secretName: allocation-manager-hostname
   rules:
   - host: allocation-manager-preprod.apps.live-1.cloud-platform.service.justice.gov.uk
     http:
@@ -80,5 +83,11 @@ spec:
         backend:
           serviceName: allocation-manager
           servicePort: 3000
-
+  - host: preprod.moic.service.justice.gov.uk
+    http:
+      paths:
+        - path: /
+          backend:
+            serviceName: allocation-manager
+            servicePort: 3000
 
