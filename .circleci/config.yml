@@ -277,6 +277,7 @@ jobs:
       - deploy:
           name: Deploy to live staging
           command: |
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy-live-cluster/staging/cron-*.yaml
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy-live-cluster/staging/deployment.yaml
             kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
             kubectl apply --record=false -f ./deploy-live-cluster/staging
