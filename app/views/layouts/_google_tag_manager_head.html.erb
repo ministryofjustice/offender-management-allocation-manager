@@ -1,4 +1,10 @@
 <!-- Google Tag Manager -->
+<% if @current_user.present? %>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    dataLayer.push({"userId": "<%= @current_user.staff_id %>"});
+</script>
+<% end %>
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
         new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
