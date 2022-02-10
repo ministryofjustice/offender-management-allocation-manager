@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: allocation-manager
+  namespace: offender-management-staging
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    external-dns.alpha.kubernetes.io/set-identifier: allocation-manager-offender-management-staging-green
+    external-dns.alpha.kubernetes.io/aws-weight: "100"
+spec:
+  tls:
+    - hosts:
+        - allocation-manager-staging.apps.live.cloud-platform.service.justice.gov.uk
+    - hosts:
+        - dev.moic.service.justice.gov.uk
+      secretName: allocation-manager-hostname
+  rules:
+    - host: allocation-manager-staging.apps.live.cloud-platform.service.justice.gov.uk
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: allocation-manager
+              servicePort: 3000
+    - host: dev.moic.service.justice.gov.uk
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: allocation-manager
+              servicePort: 3000

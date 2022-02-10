@@ -5,17 +5,17 @@ metadata:
   namespace: offender-management-staging
   annotations:
     kubernetes.io/ingress.class: "nginx"
-    external-dns.alpha.kubernetes.io/set-identifier: allocation-manager-offender-management-staging-green
-    external-dns.alpha.kubernetes.io/aws-weight: "50"
+    external-dns.alpha.kubernetes.io/set-identifier: allocation-manager-offender-management-staging-blue
+    external-dns.alpha.kubernetes.io/aws-weight: "0"
 spec:
   tls:
   - hosts:
-    - allocation-manager-staging.apps.live.cloud-platform.service.justice.gov.uk
+    - allocation-manager-staging.apps.live-1.cloud-platform.service.justice.gov.uk
   - hosts:
     - dev.moic.service.justice.gov.uk
     secretName: allocation-manager-hostname
   rules:
-  - host: allocation-manager-staging.apps.live.cloud-platform.service.justice.gov.uk
+  - host: allocation-manager-staging.apps.live-1.cloud-platform.service.justice.gov.uk
     http:
       paths:
       - path: /
