@@ -252,6 +252,7 @@ jobs:
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/deployment.yaml
             kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
             kubectl apply --record=false -f ./deploy/staging
+            kubectl apply --record=false -f ./deploy/staging/ingress/ingress-live-1.yaml
           environment:
             <<: *github_team_name_slug
 
@@ -266,7 +267,7 @@ jobs:
           command: |
             echo -n ${CLUSTER_CERT_LIVE} | base64 -d > ./live_ca.crt
             kubectl config set-cluster ${CLUSTER_NAME_LIVE} --certificate-authority=./live_ca.crt --server=https://${CLUSTER_NAME_LIVE}
-            kubectl config set-credentials circleci --token=${TOKEN_LIVE}
+            kubectl config set-credentials circleci --token=${TOKEN_LIVE_STAGING}
             kubectl config set-context ${CLUSTER_NAME_LIVE} --cluster=${CLUSTER_NAME_LIVE} --user=circleci --namespace=${KUBE_ENV_STAGING_NAMESPACE}
             kubectl config use-context ${CLUSTER_NAME_LIVE}
             kubectl config current-context
@@ -277,10 +278,11 @@ jobs:
       - deploy:
           name: Deploy to live staging
           command: |
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy-live-cluster/staging/cron-*.yaml
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy-live-cluster/staging/deployment.yaml
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/cron-*.yaml
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/deployment.yaml
             kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
-            kubectl apply --record=false -f ./deploy-live-cluster/staging
+            kubectl apply --record=false -f ./deploy/staging
+            kubectl apply --record=false -f ./deploy/staging/ingress/ingress.yaml
           environment:
             <<: *github_team_name_slug
 
@@ -336,10 +338,42 @@ jobs:
       - deploy:
           name: Deploy to pre-production
           command: |
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/cron-*.yaml
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/cron/cron-*.yaml
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/deployment.yaml
             kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
             kubectl apply --record=false -f ./deploy/preprod
+            kubectl apply --record=false -f ./deploy/preprod/ingress/ingress-live-1.yaml
+          environment:
+            <<: *github_team_name_slug
+
+  deploy_preprod_live_cluster:
+    <<: *deploy_container_config
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Kubectl deployment to live cluster preproduction setup
+          command: |
+            echo -n ${CLUSTER_CERT_LIVE} | base64 -d > ./live_ca.crt
+            kubectl config set-cluster ${CLUSTER_NAME_LIVE} --certificate-authority=./live_ca.crt --server=https://${CLUSTER_NAME_LIVE}
+            kubectl config set-credentials circleci --token=${TOKEN_LIVE_PREPROD}
+            kubectl config set-context ${CLUSTER_NAME_LIVE} --cluster=${CLUSTER_NAME_LIVE} --user=circleci --namespace=${KUBE_ENV_PREPROD_NAMESPACE}
+            kubectl config use-context ${CLUSTER_NAME_LIVE}
+            kubectl config current-context
+            kubectl --namespace=${KUBE_ENV_PREPROD_NAMESPACE} get pods
+      - *install_gpg
+      - *configure_gpg
+      - *decrypt_secrets
+      - deploy:
+          name: Deploy to live cluster pre-production
+          command: |
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/cron/cron-*.yaml
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/deployment.yaml
+            kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
+            kubectl apply --record=false -f ./deploy/preprod
+            kubectl apply --record=false -f ./deploy/preprod/cron
+            kubectl apply --record=false -f ./deploy/preprod/ingress/ingress.yaml
           environment:
             <<: *github_team_name_slug
 
@@ -365,10 +399,12 @@ jobs:
       - deploy:
           name: Deploy to production
           command: |
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/cron-*.yaml
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/cron/cron-*.yaml
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/deployment.yaml
             kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
             kubectl apply --record=false -f ./deploy/production
+            kubectl apply --record=false -f ./deploy/production/cron
+            kubectl apply --record=false -f ./deploy/production/ingress/ingress-live-1.yaml
           environment:
             <<: *github_team_name_slug
 
@@ -429,6 +465,14 @@ workflows:
             branches:
               only: main
       - deploy_preprod:
+          requires:
+            - rubocop
+            - test
+            - build_and_push_docker_image
+          filters:
+            branches:
+              only: preproduction
+      - deploy_preprod_live_cluster:
           requires:
             - rubocop
             - test
