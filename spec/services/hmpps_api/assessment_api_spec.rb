@@ -122,5 +122,18 @@ describe HmppsApi::AssessmentApi do
         expect(described_class.get_latest_oasys_date(offender_no)).to match(assessment_type: Faraday::ConflictError, completed: nil)
       end
     end
+
+    context 'when assessment API is down (status 500 -) show unavailable message' do
+      before do
+        stub_request(:get, stub_url).to_return(status: 503, body: {
+          "status": 503,
+          "developerMessage": "Offender duplicate found for NOMIS, A1857ER"
+        }.to_json)
+      end
+
+      it 'returns 5xx error code' do
+        expect(described_class.get_latest_oasys_date(offender_no)).to match(assessment_type: Faraday::ServerError, completed: nil)
+      end
+    end
   end
 end

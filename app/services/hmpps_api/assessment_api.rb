@@ -25,6 +25,8 @@ module HmppsApi
       nil
     rescue Faraday::ConflictError # 409 Duplicate record found on oasys. Needs merging oasys to process correctly
       { assessment_type: Faraday::ConflictError, completed: nil }
+    rescue Faraday::ServerError
+      { assessment_type: Faraday::ServerError, completed: nil }
     end
   end
 end
