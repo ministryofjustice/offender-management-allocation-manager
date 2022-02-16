@@ -32,8 +32,7 @@ RSpec.describe CaseloadController, type: :controller do
       [
         build(:nomis_offender, :rotl, complexityLevel: 'high', created: 1.day.ago),
         build(:nomis_offender, complexityLevel: 'medium', created: 1.month.ago),
-        build(:nomis_offender, complexityLevel: 'low', created: 2.months.ago,
-              sentence: attributes_for(:sentence_detail, automaticReleaseDate: Time.zone.today + 1.week))
+        build(:nomis_offender, complexityLevel: 'low', created: 2.months.ago)
       ]
     end
 
@@ -133,11 +132,6 @@ RSpec.describe CaseloadController, type: :controller do
           it 'returns the caseload with recent allocations' do
             get :cases, params: { f: 'recent_allocations', prison_id: prison.code, staff_id: staff_id }
             expect(assigns(:allocations).map(&:nomis_offender_id)).to match_array(offenders.first.fetch(:prisonerNumber))
-          end
-
-          it 'returns the caseload with upcoming releases' do
-            get :cases, params: { f: 'upcoming_releases', prison_id: prison.code, staff_id: staff_id }
-            expect(assigns(:allocations).map(&:nomis_offender_id)).to match_array(offenders.last.fetch(:prisonerNumber))
           end
 
           it 'returns ROTL information' do

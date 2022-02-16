@@ -12,9 +12,9 @@
 
           <div class="govuk-grid-column-one-half">
             <div class="card card-total">
-              <%= link_to prison_staff_caseload_cases_path, class: 'govuk-link--no-visited-state' do %>
+              <%= link_to 'caseload', {controller: 'caseload', action: 'cases'}, class: 'govuk-link--no-visited-state' do %>
                 <span class="card__heading--large"><%= @summary.fetch(:total_cases) %></span>
-                <p><%= link_to 'total cases', prison_staff_caseload_cases_path, class: 'govuk-link--no-visited-state' %></p>
+                <p>total cases</p>
               <% end %>
             </div>
           </div>
@@ -23,7 +23,7 @@
             <div class="card card-total">
               <%= link_to prison_staff_caseload_handovers_path, class: 'govuk-link--no-visited-state' do %>
                 <span class="card__heading--large"><%= @summary.fetch(:pending_handover_count) %></span>
-                <p><%= link_to 'handovers in progress', prison_staff_caseload_handovers_path, class: 'govuk-link--no-visited-state' %></p>
+                <p>handovers in progress</p>
               <% end %>
             </div>
           </div>
@@ -51,9 +51,9 @@
                 <%= @summary.fetch(:last_seven_days) %>
               </dd>
               <dd class="govuk-summary-list__actions">
-                <%= link_to "View",
+                <%= link_to "view",
                             { controller: :caseload, action: :cases, f: 'recent_allocations' },
-                            class: "govuk-link--no-visited-state" %>
+                            class: "moj-sub-navigation__link govuk-link--no-visited-state" %>
               </dd>
             </div>
             <div class="govuk-summary-list__row">
@@ -64,9 +64,9 @@
                 <%= @summary.fetch(:release_next_four_weeks) %>
               </dd>
               <dd class="govuk-summary-list__actions">
-                <%= link_to "View",
+                <%= link_to "view",
                             { controller: :caseload, action: :cases, f: 'upcoming_releases' },
-                            class: "govuk-link--no-visited-state" %>
+                            class: "moj-sub-navigation__link govuk-link--no-visited-state" %>
               </dd>
             </div>
             <div class="govuk-summary-list__row">
@@ -87,7 +87,7 @@
                 Status
               </dt>
               <dd class="govuk-summary-list__value">
-                <%= full_status(@pom) %>
+                <%= @pom.status %>
               </dd>
               <dd class="govuk-summary-list__actions">
                 <!--<a class="govuk-link" href="#">
