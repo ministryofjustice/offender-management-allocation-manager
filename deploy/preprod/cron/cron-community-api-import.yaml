@@ -9,6 +9,7 @@ spec:
   failedJobsHistoryLimit: 2
   jobTemplate:
     spec:
+      ttlSecondsAfterFinished: 3600
       template:
         spec:
           containers:
