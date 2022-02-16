@@ -33,7 +33,7 @@
 </div>
 
 <%= render partial: 'shared/pagination', locals: { data: @allocations } %>
-<br/>
+
 <% if @prison.womens? %>
   <%= render 'caseload_table', header_partial: 'female_headers', collection_partial: 'female', collection: @allocations %>
 <% else %>
@@ -43,15 +43,5 @@
 <%= render partial: 'shared/pagination', locals: { data: @allocations } %>
 
 <% if @allocations.empty? %>
-  <p class="govuk-body">
-    <%= case params.fetch('f', nil)
-        when 'recent_allocations'
-          'No cases allocated in last 7 days'
-        when 'upcoming_releases'
-          'No releases in next 4 weeks'
-        else
-          'No cases allocated'
-        end %>
-  </p>
+  <p class="govuk-body">No cases allocated</p>
 <% end %>
-
