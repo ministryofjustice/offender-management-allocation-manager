@@ -9,9 +9,9 @@ spec:
   failedJobsHistoryLimit: 2
   jobTemplate:
     spec:
+      ttlSecondsAfterFinished: 3600
       template:
         spec:
-          ttlSecondsAfterFinished: 3600
           containers:
             - name: early-allocation-events
               image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
