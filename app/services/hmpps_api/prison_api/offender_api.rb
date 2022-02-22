@@ -12,7 +12,7 @@ module HmppsApi
       def self.get_offenders_in_prison(prison)
         # Get offenders from the Prisoner Offender Search API - and filter out those with unwanted legal statuses
         offenders = get_search_api_offenders_in_prison(prison).select { |o|
-          ALLOWED_LEGAL_STATUSES.include?(o['legalStatus']) || o['restrictPatient'] == true
+          ALLOWED_LEGAL_STATUSES.include?(o['legalStatus']) || o['restrictedPatient'] == true
         }
 
         return [] if offenders.empty?
@@ -59,9 +59,13 @@ module HmppsApi
       def self.get_offender(raw_offender_no, ignore_legal_status: false)
         # Get offender from the Prisoner Offender Search API
         offender = get_search_api_offenders([raw_offender_no]).first
-
-        return nil unless offender.present? &&
-          (ALLOWED_LEGAL_STATUSES.include?(offender['legalStatus']) || ignore_legal_status)
+        # ignore legal status if override flag is present, or offender is a Restricted Patient
+        # MPC should always show Restricted Patients, since they must have been sentenced before being sent to
+        # a hospital
+        return nil unless offender.present? && (
+            ALLOWED_LEGAL_STATUSES.include?(offender['legalStatus']) ||
+            (ignore_legal_status || offender['restrictedPatient' == true])
+        )
 
         offender_no = offender.fetch('prisonerNumber')
 

@@ -32,6 +32,7 @@ describe HmppsApi::PrisonApi::OffenderApi do
           build(:nomis_offender, legalStatus: 'INDETERMINATE_SENTENCE'),
           build(:nomis_offender, legalStatus: 'RECALL'),
           build(:nomis_offender, legalStatus: 'SENTENCED'),
+          build(:nomis_offender, legalStatus: 'SENTENCED', restrictedPatient: true, supportingPrisonId: :prison),
         ]
       }
 
