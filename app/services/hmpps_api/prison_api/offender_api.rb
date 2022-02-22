@@ -11,7 +11,9 @@ module HmppsApi
 
       def self.get_offenders_in_prison(prison)
         # Get offenders from the Prisoner Offender Search API - and filter out those with unwanted legal statuses
-        offenders = get_search_api_offenders_in_prison(prison).select { |o| ALLOWED_LEGAL_STATUSES.include?(o['legalStatus']) }
+        offenders = get_search_api_offenders_in_prison(prison).select { |o|
+          ALLOWED_LEGAL_STATUSES.include?(o['legalStatus']) || o['restrictPatient'] == true
+        }
 
         return [] if offenders.empty?
 

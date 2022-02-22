@@ -105,7 +105,10 @@ module ApiHelper
       }.to_json)
 
     # Remove offenders with unwanted legal statuses – the following APIs are only called/stubbed for filtered offender IDs
-    filtered_offenders = offenders.select { |o| HmppsApi::PrisonApi::OffenderApi::ALLOWED_LEGAL_STATUSES.include?(o.fetch(:legalStatus)) }
+    filtered_offenders = offenders.select { |o|
+      HmppsApi::PrisonApi::OffenderApi::ALLOWED_LEGAL_STATUSES.include?(o.fetch(:legalStatus)) || o.fetch(:restrictedPatient) == true
+    }
+
     stub_offender_categories(filtered_offenders)
     allow(HmppsApi::ComplexityApi).to receive(:get_complexities)
                                         .with(filtered_offenders.map { |o| o.fetch(:prisonerNumber) })
