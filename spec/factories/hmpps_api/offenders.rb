@@ -15,6 +15,8 @@ FactoryBot.define do
     end
 
     prisonId { 'LEI' }
+    supportingPrisonId { 'LEI' }
+    restrictedPatient { false }
 
     trait :prescoed do
       prisonId { PrisonService::PRESCOED_CODE }

@@ -11,6 +11,8 @@ FactoryBot.define do
     inOutStatus { 'IN' }
     imprisonmentStatus { 'SENT03' }
     prisonId { 'LEI' }
+    supportingPrisonId { 'LEI' }
+    restrictedPatient { false }
 
     # cell location is the format <1 letter>-<1 number>-<3 numbers> e.g 'E-4-014'
     cellLocation {
