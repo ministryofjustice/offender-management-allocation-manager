@@ -63,11 +63,14 @@ module HmppsApi
 
         offender_no = offender.fetch('prisonerNumber')
 
-        # Get additional data from other APIs
-        offender_categories = get_offender_categories([offender_no])
-        complexity_level = if Prison.womens.exists?(offender['prisonId'])
+        # Restricted Patients use supportingPrisonId, since the offender is currently in hospital
+        prison_id = offender.fetch('restrictedPatient') == true ? offender.fetch('supportingPrisonId') : offender.fetch('prisonId')
+        complexity_level = if Prison.womens.exists?(prison_id)
                              HmppsApi::ComplexityApi.get_complexity(offender_no)
                            end
+
+        # Get additional data from other APIs
+        offender_categories = get_offender_categories([offender_no])
         temp_movement = if temp_out_of_prison?(offender)
                           HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for([offender_no])[offender_no]
                         end
