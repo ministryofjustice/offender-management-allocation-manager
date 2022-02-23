@@ -64,7 +64,7 @@ module HmppsApi
         # a hospital
         return nil unless offender.present? && (
             ALLOWED_LEGAL_STATUSES.include?(offender['legalStatus']) ||
-            (ignore_legal_status || offender['restrictedPatient' == true])
+            (ignore_legal_status || offender['restrictedPatient'] == true)
         )
 
         offender_no = offender.fetch('prisonerNumber')
