@@ -26,8 +26,7 @@ FactoryBot.define do
     legalStatus { 'SENTENCED' }
     dateOfBirth { Date.new(1990, 12, 6).to_s }
     firstName { Faker::Name.first_name }
-    restrictedPatient { false }
-    supportingPrisonId { nil }
+
     # We have some issues with corrupting the display
     # of names containing Mc or Du :-(
     # also ensure uniqueness as duplicate last names can cause issues
