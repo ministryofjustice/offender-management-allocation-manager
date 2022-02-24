@@ -373,7 +373,6 @@ workflows:
       - test_staging:
           requires:
             - deploy_staging
-            - deploy_staging_live_cluster
           filters:
             branches:
               only: main
