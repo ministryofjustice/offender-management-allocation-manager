@@ -279,7 +279,7 @@ jobs:
           name: Run integration tests
           command: bundle exec rspec spec/integration --no-color --format documentation --format RspecJunitFormatter -o screenshots/rspec.xml
           environment:
-            STAGING_START_PAGE: https://allocation-manager-staging.apps.live-1.cloud-platform.service.justice.gov.uk
+            STAGING_START_PAGE: https://dev.moic.service.justice.gov.uk
       - store_test_results:
           path: screenshots
       - store_artifacts:
