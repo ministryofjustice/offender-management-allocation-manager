@@ -235,36 +235,6 @@ jobs:
       - run:
           name: Kubectl deployment staging setup
           command: |
-            echo -n ${KUBE_ENV_STAGING_CACERT} | base64 -d > ./live_1_ca.crt
-            kubectl config set-cluster ${CLUSTER_NAME_LIVE_1} --certificate-authority=./live_1_ca.crt --server=https://api.${CLUSTER_NAME_LIVE_1}
-            kubectl config set-credentials circleci --token=${KUBE_ENV_STAGING_TOKEN}
-            kubectl config set-context ${CLUSTER_NAME_LIVE_1} --cluster=${CLUSTER_NAME_LIVE_1} --user=circleci --namespace=${KUBE_ENV_STAGING_NAMESPACE}
-            kubectl config use-context ${CLUSTER_NAME_LIVE_1}
-            kubectl config current-context
-            kubectl --namespace=${KUBE_ENV_STAGING_NAMESPACE} get pods
-      - *install_gpg
-      - *configure_gpg
-      - *decrypt_secrets
-      - deploy:
-          name: Deploy to staging
-          command: |
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/cron-*.yaml
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/deployment.yaml
-            kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
-            kubectl apply --record=false -f ./deploy/staging
-            kubectl apply --record=false -f ./deploy/staging/ingress/ingress-live-1.yaml
-          environment:
-            <<: *github_team_name_slug
-
-  deploy_staging_live_cluster:
-    <<: *deploy_container_config
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Kubectl deployment live staging setup
-          command: |
             echo -n ${CLUSTER_CERT_LIVE} | base64 -d > ./live_ca.crt
             kubectl config set-cluster ${CLUSTER_NAME_LIVE} --certificate-authority=./live_ca.crt --server=https://${CLUSTER_NAME_LIVE}
             kubectl config set-credentials circleci --token=${TOKEN_LIVE_STAGING}
@@ -282,7 +252,6 @@ jobs:
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/deployment.yaml
             kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
             kubectl apply --record=false -f ./deploy/staging
-            kubectl apply --record=false -f ./deploy/staging/ingress/ingress.yaml
           environment:
             <<: *github_team_name_slug
 
@@ -325,36 +294,6 @@ jobs:
       - run:
           name: Kubectl deployment preproduction setup
           command: |
-            echo -n ${KUBE_ENV_PREPROD_CACERT} | base64 -d > ./live_1_ca.crt
-            kubectl config set-cluster ${CLUSTER_NAME_LIVE_1} --certificate-authority=./live_1_ca.crt --server=https://api.${CLUSTER_NAME_LIVE_1}
-            kubectl config set-credentials circleci --token=${KUBE_ENV_PREPROD_TOKEN}
-            kubectl config set-context ${CLUSTER_NAME_LIVE_1} --cluster=${CLUSTER_NAME_LIVE_1} --user=circleci --namespace=${KUBE_ENV_PREPROD_NAMESPACE}
-            kubectl config use-context ${CLUSTER_NAME_LIVE_1}
-            kubectl config current-context
-            kubectl --namespace=${KUBE_ENV_PREPROD_NAMESPACE} get pods
-      - *install_gpg
-      - *configure_gpg
-      - *decrypt_secrets
-      - deploy:
-          name: Deploy to pre-production
-          command: |
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/cron/cron-*.yaml
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/deployment.yaml
-            kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
-            kubectl apply --record=false -f ./deploy/preprod
-            kubectl apply --record=false -f ./deploy/preprod/ingress/ingress-live-1.yaml
-          environment:
-            <<: *github_team_name_slug
-
-  deploy_preprod_live_cluster:
-    <<: *deploy_container_config
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Kubectl deployment to live cluster preproduction setup
-          command: |
             echo -n ${CLUSTER_CERT_LIVE} | base64 -d > ./live_ca.crt
             kubectl config set-cluster ${CLUSTER_NAME_LIVE} --certificate-authority=./live_ca.crt --server=https://${CLUSTER_NAME_LIVE}
             kubectl config set-credentials circleci --token=${TOKEN_LIVE_PREPROD}
@@ -368,12 +307,10 @@ jobs:
       - deploy:
           name: Deploy to live cluster pre-production
           command: |
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/cron/cron-*.yaml
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/cron-*.yaml
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/deployment.yaml
             kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
             kubectl apply --record=false -f ./deploy/preprod
-            kubectl apply --record=false -f ./deploy/preprod/cron
-            kubectl apply --record=false -f ./deploy/preprod/ingress/ingress.yaml
           environment:
             <<: *github_team_name_slug
 
@@ -386,36 +323,6 @@ jobs:
       - run:
           name: Kubectl deployment production setup
           command: |
-            echo -n ${KUBE_ENV_PRODUCTION_CACERT} | base64 -d > ./live_1_ca.crt
-            kubectl config set-cluster ${CLUSTER_NAME_LIVE_1} --certificate-authority=./live_1_ca.crt --server=https://api.${CLUSTER_NAME_LIVE_1}
-            kubectl config set-credentials circleci --token=${KUBE_ENV_PRODUCTION_TOKEN}
-            kubectl config set-context ${CLUSTER_NAME_LIVE_1} --cluster=${CLUSTER_NAME_LIVE_1} --user=circleci --namespace=${KUBE_ENV_PRODUCTION_NAMESPACE}
-            kubectl config use-context ${CLUSTER_NAME_LIVE_1}
-            kubectl config current-context
-            kubectl --namespace=${KUBE_ENV_PRODUCTION_NAMESPACE} get pods
-      - *install_gpg
-      - *configure_gpg
-      - *decrypt_secrets
-      - deploy:
-          name: Deploy to production
-          command: |
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/cron/cron-*.yaml
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/deployment.yaml
-            kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
-            kubectl apply --record=false -f ./deploy/production
-            kubectl apply --record=false -f ./deploy/production/ingress/ingress-live-1.yaml
-          environment:
-            <<: *github_team_name_slug
-
-  deploy_production_live_cluster:
-    <<: *deploy_container_config
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Kubectl deployment live cluster production setup
-          command: |
             echo -n ${CLUSTER_CERT_LIVE} | base64 -d > ./live_ca.crt
             kubectl config set-cluster ${CLUSTER_NAME_LIVE} --certificate-authority=./live_ca.crt --server=https://${CLUSTER_NAME_LIVE}
             kubectl config set-credentials circleci --token=${TOKEN_LIVE_PRODUCTION}
@@ -427,14 +334,12 @@ jobs:
       - *configure_gpg
       - *decrypt_secrets
       - deploy:
-          name: Deploy to live cluster production
+          name: Deploy to production
           command: |
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/cron/cron-*.yaml
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/cron-*.yaml
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/deployment.yaml
             kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
             kubectl apply --record=false -f ./deploy/production
-            kubectl apply --record=false -f ./deploy/production/cron
-            kubectl apply --record=false -f ./deploy/production/ingress/ingress.yaml
           environment:
             <<: *github_team_name_slug
 
@@ -465,15 +370,6 @@ workflows:
             branches:
               only:
                 - main
-      - deploy_staging_live_cluster:
-          requires:
-            - rubocop
-            - test
-            - build_and_push_docker_image
-          filters:
-            branches:
-              only:
-                - main
       - test_staging:
           requires:
             - deploy_staging
@@ -494,21 +390,7 @@ workflows:
           filters:
             branches:
               only: main
-      - deploy_production_live_cluster:
-          requires:
-            - deploy_production_approval
-          filters:
-            branches:
-              only: main
       - deploy_preprod:
-          requires:
-            - rubocop
-            - test
-            - build_and_push_docker_image
-          filters:
-            branches:
-              only: preproduction
-      - deploy_preprod_live_cluster:
           requires:
             - rubocop
             - test
