@@ -2,55 +2,34 @@
 
 # Offender Management Allocation Manager
 
-A service for allocating Prisoners to Prisoner Offender Managers (POMs).
+A Ruby On Rails application for allocating Prisoners to Prisoner Offender Managers (POMs).
 
-## Technical Information
+## Dependencies
 
-This Ruby on Rails application enables prison staff to manage the allocation of POMs to prisoners.
+### Versions
 
-### API Specification
+See `.ruby-version` file for the current Ruby version.
 
-[![API docs](https://img.shields.io/badge/API_docs-view-85EA2D.svg?logo=swagger)](https://allocation-manager-staging.apps.live-1.cloud-platform.service.justice.gov.uk/api-docs/index.html)
+Use [asdf](https://asdf-vm.com/) or similar to manage your ruby environment and sets of dependencies.
 
-### Posted Event Specification
+### Required
 
-Posted event Specification [![Event docs](https://img.shields.io/badge/Event_docs-view-85EA2D.svg)](https://playground.asyncapi.io/?url=https://raw.githubusercontent.com/ministryofjustice/offender-management-allocation-manager/main/EarlyAllocationStatus.yml)
-
-### Architecture - Context View
-
-[![auto-updating container diagram](https://static.structurizr.com/workspace/56937/diagrams/manage-POM-cases-container.png)](https://structurizr.com/share/56937/diagrams#manage-POM-cases-container)
-
-👆 edit in [hmpps-architecture-as-code](https://github.com/ministryofjustice/hmpps-architecture-as-code/blob/9990e7fbb3aa545208d2ebc40104f6f3d5a9813d/src/main/kotlin/model/manage-pom-cases.kt)
-
-### Dependencies
-
-- [Nomis Oauth2 Server](https://github.com/ministryofjustice/nomis-oauth2-server) - for logging into the application
-- [Git-crypt](https://github.com/AGWA/git-crypt) - for securing application secrets
-- [Postgres](https://www.postgresql.org) - for persisting data
 - [direnv](https://direnv.net/) - for managing environment variables and storing credentials
+- [Postgres](https://www.postgresql.org) - for persisting data
+- [Ruby](https://www.ruby-lang.org/) - for running app
+
+### Optional
+
+- [Git-crypt](https://github.com/AGWA/git-crypt) - for securing application secrets
 - [Nomis Elite2](https://github.com/ministryofjustice/elite2-api) - API for accessing prison, offender and staff information from the National Offender Management Integration System
+- [Nomis Oauth2 Server](https://github.com/ministryofjustice/nomis-oauth2-server) - for logging into the application
 
-### Ruby version
+## Running The Application
 
-This application uses Ruby v2.6.3. Use [RVM](https://rvm.io/) or similar to manage your ruby environment and sets of dependencies.
-
-### Setup
-
-Run `make setup` to install git pre-commit hooks that:
-- check you have git-crypt installed
-- help you avoid committing unencrypted secrets
-- lint changed files using govuk rubocop
-
-To test that the pre-commit hook is set up correctly, try removing the `diff`
-attribute from a line in a `.gitattributes` file and then committing something -
-the hook should prevent you from committing.
-
-### Running the application
-
-1. Install project dependencies using Homebrew
+1. Install [Bundler](https://bundler.io/)
 
 ```sh
-$ brew bundle
+$ gem install bundler:2.2.28
 ```
 
 2. Install gems locally
@@ -59,7 +38,7 @@ $ brew bundle
 $  bundle install
 ```
 
-3. Load govuk styles
+3. Load [govuk](https://github.com/alphagov/govuk-frontend) and [MoJ](https://github.com/ministryofjustice/moj-frontend) styles (see `package.json`)
 
 ```sh
 yarn install
@@ -70,20 +49,28 @@ yarn install
 5. Create and seed database
 
 ```sh
-$ rails db:setup
+$ bundle exec rails db:setup
 ```
 
 6. Start application
 
 ```sh
-$ rails s
+$ bundle exec rails s
 ```
 
 7. Check application status
 
-Visit `localhost:3000/status`
+Visit [localhost:3000](http://localhost:3000)
 
-### Environment variables
+## Running The Specs
+
+The first time you run the specs you'll need to record the VCR cassettes:
+
+```sh
+VCR=1 bundle exec rspec
+```
+
+## Environment Variables
 
 Several environment variables are required for the operation of this service.
 Not all are required to run the service locally
@@ -107,9 +94,31 @@ Extra variables not required locally
 | NOMIS_OAUTH_AUTHORISATION | Oauth authorisation string (base64 encoded) |
 | SENTRY_DSN | The URL of a sentry installation. If no installation is available, then this should be present but an empty string ( "" )|
 
-### Further Technical Information
+## Git Hooks
+
+Run `make setup` to install git pre-commit hooks that:
+
+- check you have git-crypt installed
+- help you avoid committing unencrypted secrets
+- lint changed files using govuk rubocop
+
+To test that the pre-commit hook is set up correctly, try removing the `diff`
+attribute from a line in a `.gitattributes` file and then committing something -
+the hook should prevent you from committing.
+
+## Further Documentation
+
+### Architectural Context
+
+[![auto-updating container diagram](https://static.structurizr.com/workspace/56937/diagrams/manage-POM-cases-container.png)](https://structurizr.com/share/56937/diagrams#manage-POM-cases-container)
+
+👆 edit in [hmpps-architecture-as-code](https://github.com/ministryofjustice/hmpps-architecture-as-code/blob/9990e7fbb3aa545208d2ebc40104f6f3d5a9813d/src/main/kotlin/model/manage-pom-cases.kt)
+
+### Other
 
 - Access the runbook in the OCM workspace of the MoJ wiki.
+- [![API docs](https://img.shields.io/badge/API_docs-view-85EA2D.svg?logo=swagger)](https://allocation-manager-staging.apps.live-1.cloud-platform.service.justice.gov.uk/api-docs/index.html)
+- [![Event docs](https://img.shields.io/badge/Event_docs-view-85EA2D.svg)](https://playground.asyncapi.io/?url=https://raw.githubusercontent.com/ministryofjustice/offender-management-allocation-manager/main/EarlyAllocationStatus.yml)
 - [Offender Management Architecture Decisions](https://github.com/ministryofjustice/offender-management-architecture-decisions)
 
 ## Licence
