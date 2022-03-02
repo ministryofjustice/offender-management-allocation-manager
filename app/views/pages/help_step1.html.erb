@@ -1,36 +1,46 @@
-<%= render :partial => "content", locals: { page: 1 }%>
+<% current_help_step = HelpStep.find(1) %>
+<%= render :partial => "content", locals: { current_help_step: current_help_step } %>
+<h1 class="part-title">List new staff members’ details</h1>
 
-<h1 class="part-title">List everyone using the service</h1>
 <div class="govuk-inset-text">
-  Senior Probation Officer / Head of Offender Management Unit (SPO/HoOMU) task
+  This task should be completed by a head of offender management delivery (HOMD) or head of offender management services
+  (HOMS).
 </div>
 
 <div class="govuk-grid-column">
   <div class="govuk-body">
-
-    <p>We need the names and job roles of everyone using the service. This usually includes:</p>
+    <p>List details of all new staff members, including:</p>
 
     <ul class="govuk-list--bullet">
-      <li>Senior probation officers (SPOs)</li>
-      <li>Prison offender managers (POMs)</li>
-      <li>Case admin staff in the Offender Management Unit</li>
-      <li>Local System Admin (LSA)</li>
+      <li>HOMDs</li>
+      <li>POMs</li>
+      <li>Case administration staff</li>
+      <li>Local system administrators</li>
     </ul>
 
-    <p>We also need the email addresses and working pattern for all prison offender managers.</p>
+    <p>
+      You can use this
 
-    <p>We have put together a <%= link_to("spreadsheet template", "https://drive.google.com/open?id=1wfKrP1RtuwZ_YCjmj3gljGKGIYlVd-IdvFvvdtwBduA") %> you can use to gather this information.</p>
+      <%=
+        link_to(
+          "spreadsheet template",
+          "https://drive.google.com/open?id=1wfKrP1RtuwZ_YCjmj3gljGKGIYlVd-IdvFvvdtwBduA"
+        )
+      %>
 
-    <p><%=image_tag("spreadsheet_image.png") %></p>
+      or update your own record.
+    </p>
 
-    <h2>Share the information with the Local System Administrator (LSA)</h2>
+    <p>
+      Add names, roles, email addresses and working patterns and then share the spreadsheet with a system administrator
+      so they can complete the next step.
+    </p>
 
-    <p>You need to send the same list of names, roles and, (for POMs only),
-      email addresses to the LSA so that they can complete
-      <%= link_to "Task 2: Set up access in Digital Prison Services", "help_step2" %>.</p>
-
-    <p>They will also need to access this guide.</p>
-
-    <%= render :partial => "next_link", locals: { url: help_step2_path, next_page_title: 'Set up access in Digital Prison Services'} %>
+    <%=
+      render(
+        :partial => "next_link",
+        locals: { url: help_step2_path, next_page_title: 'Set up access in Digital Prison Services'}
+      )
+    %>
   </div>
 </div>

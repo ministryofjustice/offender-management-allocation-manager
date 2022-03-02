@@ -3,7 +3,7 @@ require 'rails_helper'
 feature 'Help' do
   let!(:prison) { create(:prison) }
 
-  context 'when accessing help page' do
+  context 'when visiting root page' do
     it 'provides a link to the help pages', vcr: { cassette_name: 'prison_api/help_link' } do
       signin_spo_user([prison.code])
 
@@ -13,16 +13,15 @@ feature 'Help' do
   end
 
   context 'when visiting help page' do
-    it 'has links to help topics', vcr: { cassette_name: 'prison_api/help_page' } do
+    it 'has links to help options', vcr: { cassette_name: 'prison_api/help_page' } do
       visit '/help'
 
-      help_topics = [
-        ['Getting set up', help_step0_path],
-        ['Updating case information', update_case_information_path],
-        ['Missing cases', missing_cases_path]
+      help_options = [
+        ['set up new users', help_step0_path],
+        ['contact us', contact_us_path]
       ]
 
-      help_topics.each do |key, val|
+      help_options.each do |key, val|
         expect(page).to have_link(key, href: val)
       end
     end
@@ -30,9 +29,12 @@ feature 'Help' do
 
   context 'when viewing getting set up pages' do
     let(:inset_text) do
-      { LSA: 'Local System Administrator (LSA) task',
-        SPO_HoOMU: 'Senior Probation Officer / Head of Offender Management Unit (SPO/HoOMU) task',
-        CASE_ADMIN: 'Senior Probation Officer / Head of Offender Management Unit (SPO/HoOMU) / Case admin task'
+      {
+        LSA: 'This step should be completed by a local system administrator after new staff members’ details have been listed.',
+        SPO_HoOMU: 'This task should be completed by a head of offender management delivery (HOMD) or head of offender management services (HOMS).',
+        CASE_ADMIN_0: 'This task should be completed by a head of offender management delivery (HOMD), head of offender management services (HOMS) or a case administrator after everyone who will use the service has been added to Digital Prison Services.',
+        CASE_ADMIN_1: 'This task should be completed by a head of offender management delivery (HOMD), head of offender management services (HOMS) or case administrator after POMs have been added to NOMIS.',
+        CASE_ADMIN_2: 'This step must be completed by a head of offender management delivery (HOMD) or head of offender management services (HOMS).'
       }
     end
 
@@ -41,10 +43,14 @@ feature 'Help' do
     end
 
     scenario 'getting set up pages', vcr: { cassette_name: 'prison_api/help_getting_set_up_pages' } do
+      title = 'Overview'
+
+      expect(page).not_to have_link(title)
+
       help_links = [
-        ['List everyone using the service', 'help_step1'],
+        ['List new staff members’ details', 'help_step1'],
         ['Set up access in Digital Prison Services', 'help_step2'],
-        ['Set up POMs in NOMIS', 'help_step3'],
+        ['Set up staff in NOMIS', 'help_step3'],
         ['Update POM profiles', 'help_step4'],
         ['Update prisoner information', 'help_step5'],
         ['Start making allocations', 'help_step6']
@@ -54,35 +60,17 @@ feature 'Help' do
         expect(page).to have_link(key, href: val)
       end
 
-      title = 'Overview'
-
-      expect(page).not_to have_link(title)
       expect(page).to have_css('h1', text: title)
-
-      task_links = [
-        ['Task 1', 'help_step1'],
-        ['Task 2', 'help_step2'],
-        ['Task 3', 'help_step3'],
-        ['Task 4', 'help_step4'],
-        ['Task 5', 'help_step5'],
-        ['Task 6', 'help_step6']
-      ]
-
-      task_links.each do |key, val|
-        expect(page).to have_link(key, href: val)
-      end
     end
 
     scenario 'help getting set up step_1 page', vcr: { cassette_name: 'prison_api/help_getting_set_up_step_1' } do
-      title = 'List everyone using the service'
+      title = 'List new staff members’ details'
 
       click_link(title)
 
       expect(page).to have_css('h1', text: title)
       expect(page).to have_css('.govuk-inset-text', text: inset_text[:SPO_HoOMU])
       expect(page).to have_link('spreadsheet template')
-      expect(page).to have_xpath("//img[contains(@src,'assets/spreadsheet_image')]")
-      expect(page).to have_link('Task 2: Set up access in Digital Prison Services', href: 'help_step2')
     end
 
     scenario 'help getting set up step_2 page', vcr: { cassette_name: 'prison_api/help_getting_set_up_step_2' } do
@@ -92,19 +80,22 @@ feature 'Help' do
 
       expect(page).to have_css('h1', text: title)
       expect(page).to have_css('.govuk-inset-text', text: inset_text[:LSA])
+      expect(page).to have_link('new staff members’ details have been listed', href: 'help_step1')
+      expect(page).to have_link('Sign into Digital Prison Services', href: 'https://digital.prison.service.justice.gov.uk')
+      expect(page).to have_link('Manage user accounts', href: 'https://manage-users.hmpps.service.justice.gov.uk/')
     end
 
     scenario 'help getting set up step_3 page', vcr: { cassette_name: 'prison_api/help_getting_set_up_step_3' } do
-      title = 'Set up POMs in NOMIS'
+      title = 'Set up staff in NOMIS'
 
       click_link(title)
 
       expect(page).to have_css('h1', text: title)
       expect(page).to have_css('.govuk-inset-text', text: inset_text[:LSA])
-      expect(page).to have_link('Task 1: List everyone using the service', href: 'help_step1')
-      expect(page).to have_link('Task 4: Update POM profiles', href: 'help_step4')
+      expect(page).to have_link('new staff members’ details have been listed', href: 'help_step1')
+      expect(page).to have_link('next task', href: 'help_step4')
 
-      images = %w[caseload2_image search_box_image action_toolbar_image caseload1_image search_box_image]
+      images = %w[search_box_image caseload2_image caseload1_image]
 
       images.each do |image|
         expect(page).to have_xpath("//img[contains(@src,'assets/#{image}')]")
@@ -117,9 +108,9 @@ feature 'Help' do
       click_link(title)
 
       expect(page).to have_css('h1', text: title)
-      expect(page).to have_css('.govuk-inset-text', text: inset_text[:CASE_ADMIN])
-      expect(page).to have_link('Task 2: Set up access in Digital Prison Services', href: 'help_step2')
-      expect(page).to have_link('https://moic.service.justice.gov.uk')
+      expect(page).to have_css('.govuk-inset-text', text: inset_text[:CASE_ADMIN_0])
+      expect(page).to have_link('everyone who will use the service has been added to Digital Prison Services', href: 'help_step2')
+      expect(page).to have_link('Manage your staff', href: 'prisons/LEI/poms')
     end
 
     scenario 'help getting set up step_5 page', vcr: { cassette_name: 'prison_api/help_getting_set_up_step_5' } do
@@ -128,10 +119,9 @@ feature 'Help' do
       click_link(title)
 
       expect(page).to have_css('h1', text: title)
-      expect(page).to have_css('.govuk-inset-text', text: inset_text[:CASE_ADMIN])
-      expect(page).to have_link('Task 3: Set up POMs in NOMIS', href: 'help_step3')
-      expect(page).to have_link('https://moic.service.justice.gov.uk')
-      expect(page).to have_link('Home', href: '/')
+      expect(page).to have_css('.govuk-inset-text', text: inset_text[:CASE_ADMIN_1])
+      expect(page).to have_link('POMs have been added to NOMIS', href: 'help_step3')
+      expect(page).to have_link('Add missing details', href: 'prisons/LEI/prisoners/missing_information')
     end
 
     scenario 'help getting set up step_6 page', vcr: { cassette_name: 'prison_api/help_getting_set_up_step_6' } do
@@ -140,62 +130,8 @@ feature 'Help' do
       click_link(title)
 
       expect(page).to have_css('h1', text: title)
-      expect(page).to have_css('.govuk-inset-text', text: inset_text[:SPO_HoOMU])
-      expect(page).to have_link('https://moic.service.justice.gov.uk')
-    end
-  end
-
-  context 'when viewing updating case information page' do
-    before do
-      visit update_case_information_path
-    end
-
-    scenario 'help updating case information overview', vcr: { cassette_name: 'prison_api/help_update_case_info_overview' } do
-      expect(page).to have_css('h1', text: 'Overview')
-      expect(page).to have_link('Updating nDelius', href: updating_ndelius_path)
-    end
-
-    scenario 'help updating nDelius', vcr: { cassette_name: 'prison_api/help_update_ndelius' } do
-      title = 'Updating nDelius'
-
-      click_link(title)
-
-      expect(page).to have_link('Overview', href: update_case_information_path)
-      expect(page).to have_css('h1', text: title)
-      expect(page).to have_xpath("//img[contains(@src,'assets/ndelius_find_prisoner')]")
-      expect(page).to have_xpath("//img[contains(@src,'assets/ndelius_dss_results')]")
-      expect(page).to have_xpath("//img[contains(@src,'assets/ndelius_offender_details')]")
-    end
-  end
-
-  context 'when viewing missing cases page' do
-    before do
-      visit missing_cases_path
-    end
-
-    scenario 'help when no POM allocation needed', vcr: { cassette_name: 'prison_api/help_missing_case_no_pom_allocation' } do
-      expect(page).to have_link('Repatriated cases', href: repatriated_path)
-      expect(page).to have_link('Scottish and Northern Irish prisoners', href: scottish_northern_irish_path)
-      expect(page).to have_css('h1', text: 'No POM allocation needed')
-      expect(page).to have_link('https://intranet.noms.gsi.gov.uk/corporate/offender-management-model')
-      expect(page).to have_link('Contact us', href: contact_us_path)
-    end
-
-    scenario 'help with repatriated cases', vcr: { cassette_name: 'prison_api/help_with_repatriated_cases' } do
-      title = 'Repatriated cases'
-
-      click_link(title)
-
-      expect(page).to have_link('No POM allocation needed', href: missing_cases_path)
-      expect(page).to have_css('h1', text: title)
-    end
-
-    scenario 'help with scottish/irish prisoners', vcr: { cassette_name: 'prison_api/help_with_scottish_irish' } do
-      title = 'Scottish and Northern Irish prisoners'
-
-      click_link(title)
-
-      expect(page).to have_css('h1', text: title)
+      expect(page).to have_css('.govuk-inset-text', text: inset_text[:SHRUG])
+      expect(page).to have_link('Make new allocations', href: 'prisons/LEI/prisoners/unallocated')
     end
   end
 end

@@ -1,31 +1,47 @@
-<%= render :partial => "content", locals: { page: 4 } %>
-
+<% current_help_step = HelpStep.find(4) %>
+<%= render :partial => "content", locals: { current_help_step: current_help_step } %>
 <h1 class="part-title">Update POM profiles</h1>
 <div class="govuk-inset-text">
-  Senior Probation Officer / Head of Offender Management Unit (SPO/HoOMU) / Case admin task
+  This task should be completed by a head of offender management delivery (HOMD), head of offender management services
+  (HOMS) or a case administrator after
+
+  <%=
+    link_to(
+      'everyone who will use the service has been added to Digital Prison Services',
+      'help_step2'
+    )
+  %>.
 </div>
 <div class="govuk-grid-column">
   <div class="govuk-body">
+    <p>Before cases can be allocated, you must set POMs’ availability and working pattern in the allocation service.</p>
 
-    <div class="govuk-warning-text">
-      <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-      <strong class="govuk-warning-text__text">
-        <span class="govuk-warning-text__assistive">Warning</span>
-        Please note: This task can’t be started until <%=link_to "Task 2: Set up access in Digital Prison Services", "help_step2" %> has been completed
-      </strong>
-    </div>
+    <p>To do this:</p>
 
-    <p>You need to update POMs working patterns and availability in the new allocations service before you can start allocating cases.</p>
+    <ol class="govuk-list--number">
+      <li>
+        Go to
 
-    <p>Sign in to <%= link_to("https://moic.service.justice.gov.uk", "https://moic.service.justice.gov.uk") %> and follow these steps:</p>
+        <%=
+          link_to(
+            'Manage your staff',
+            'prisons/LEI/poms'
+          )
+        %>
+      </li>
 
-    <ul class="govuk-list--bullet">
-      <li>go to ‘view all offender managers’ under ‘manage staff’</li>
-      <li>choose a POM from the list and select ‘view’</li>
-      <li>on the POM profile page, select ‘edit’</li>
-      <li>set the working pattern and availability and save changes</li>
-    </ul>
+      <li>Select a POM's name</li>
+      <li>Choose to change their working pattern</li>
+      <li>Set their working pattern and status and then save</li>
+    </ol>
 
-    <%= render :partial => "next_link", locals: { url: help_step5_path, next_page_title: 'Update prisoner information'} %>
+    <p>
+      If someone is ready to be allocated cases immediately, set their status to active. If someone will be absent from
+      work for a while, set their status to inactive.
+    </p>
+
+    <%=
+      render :partial => "next_link", locals: { url: help_step5_path, next_page_title: 'Update prisoner information'}
+    %>
   </div>
 </div>
