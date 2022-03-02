@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
-git_source(:github) do |repo| "https://github.com/#{repo}.git" end
+git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.6.8'
+ruby '2.7.5'
 
 gem 'auto_strip_attributes'
 # Need AWS SNS SDK for publishing events to HMPPS_DOMAIN_EVENTS
@@ -24,10 +24,10 @@ gem 'logstash-logger'
 gem 'omniauth-oauth2'
 gem 'paper_trail'
 gem 'pg'
-gem 'puma', '~> 5.5'
+gem 'puma', '~> 5.6.2'
 gem 'prometheus_exporter'
-gem 'rails', '~> 6.0', '< 6.1'
-gem 'sidekiq', '>= 6.1.2'
+gem 'rails', '~> 6.1'
+gem 'sidekiq', '>= 6.4.0'
 gem 'sentry-raven'
 gem 'turbolinks', '~> 5'
 gem 'uglifier', '>= 1.3.0'
@@ -50,6 +50,7 @@ gem 'sassc-rails'
 gem 'valid_email2'
 gem 'wicked'
 gem 'zendesk_api'
+gem 'rails-i18n'
 
 gem 'activeadmin'
 
@@ -60,12 +61,12 @@ group :development, :test do
   gem 'factory_bot_rails'
   gem 'parallel_tests'
   gem 'rubocop'
-  gem 'rubocop-rspec', '>= 1.41'
+  gem 'rubocop-rspec'
   gem 'rubocop-performance'
   gem 'rubocop-rails'
   gem 'rubocop-govuk'
   # needed to support Rails 6.0
-  gem 'rspec-rails', '~> 4.0'
+  gem 'rspec-rails'
   gem 'rswag-specs'
   gem 'spring'
   gem 'undercover'
@@ -97,7 +98,7 @@ group :development do
   gem 'flamegraph'
   gem 'guard-rspec'
   gem 'guard-rubocop'
-  gem 'listen', '>= 3.0.5', '< 3.3'
+  gem 'listen'
   gem 'memory_profiler'
   # prevent warnings from parser as we are using ruby 2.6
   # change this when upgrading ruby version

@@ -25,7 +25,7 @@ module OffenderManagementAllocationClient
     # defined in ApplicationController to implement access control.
     config.flipflop.dashboard_access_filter = :ensure_admin_user
 
-    config.load_defaults 6.0
+    config.load_defaults 6.1
     config.exceptions_app = routes
     config.generators.system_tests = nil
     config.active_job.queue_adapter = :sidekiq
