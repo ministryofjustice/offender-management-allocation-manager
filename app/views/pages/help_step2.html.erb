@@ -1,50 +1,53 @@
-<%= render :partial => "content", locals: { page: 2 } %>
-
+<% current_help_step = HelpStep.find(2) %>
+<%= render :partial => "content", locals: { current_help_step: current_help_step } %>
 <h1 class="part-title">Set up access in Digital Prison Services</h1>
+
 <div class="govuk-inset-text">
-  Local System Administrator (LSA) task
+  This step should be completed by a local system administrator after
+
+  <%=
+    link_to(
+      'new staff members’ details have been listed',
+      'help_step1'
+    )
+  %>.
 </div>
 
 <div class="govuk-grid-column">
   <div class="govuk-body">
+    <p>
+      You should have received details of new staff members from a head of offender management delivery (HOMD) or head
+      of offender management services (HOMS).
+    </p>
 
     <p>
-      All HOMDs/HoOMUs, OMU case admin staff and POMs need to have the right roles assigned to them in order to access the allocations service.
+      These people need to be assigned the right role in Digital Prison Services so they can access the allocation
+      service.
     </p>
 
-    <p>Sign in to Digital Prison Services using your Desktop Icon and LSA Credentials:
-      <%= image_tag("help_step2/dps_desktop_icon.png", width: 79, height: 95, style: "vertical-align: middle", alt: "Desktop icon for Digital Prison Services") %>
+    <p>
+      To do this:
     </p>
 
-    <p><%=image_tag("help_step2/hmpps_login_image.png") %></p>
-
-    <ul class="govuk-list--bullet">
+    <ol class="govuk-list--number">
       <li>
-        <div>Select ‘Manage User Accounts’</div><br>
-        <div><%=image_tag("help_step2/dps_select_service.png", width: 999, height: 430) %></div><br>
+        <%= link_to("Sign into Digital Prison Services", "https://digital.prison.service.justice.gov.uk") %> with your
+        local system administrator username and password
       </li>
       <li>
-        <div>Select ‘Search for DPS User’</div><br>
-        <div><%=image_tag("help_step2/manage_user_accounts.png", width: 392, height: 288) %></div><br>
+        Go to <%= link_to("Manage user accounts", "https://manage-users.hmpps.service.justice.gov.uk/") %>
       </li>
       <li>
-        <div>Search for the staff member you want to set up by entering their user ID</div><br>
-        <div><%=image_tag("help_step2/search_dps_user.png", width: 840, height: 411) %></div><br>
+        Search for the user who needs access
       </li>
       <li>
-        <div>When you have found the staff member, click on their Name</div><br>
-        <div><%=image_tag("help_step2/user_search_results.png", width: 1226, height: 352) %></div><br>
+        Select their name and choose to add another role
       </li>
       <li>
-        <div>Click ‘Add Another Role’</div><br>
-        <div><%=image_tag("help_step2/user_roles.png", width: 552, height: 396) %></div><br>
-      </li>
-      <li>
-        <div>Select the Allocations – POM role for POMs. HOMDs and case admins need the Allocations – HOMD role. Choose confirm.
-        </div><br>
+        Select the Allocations – POM role for POMs. HOMDs and case admins need the Allocations – HOMD role
       </li>
     </ul>
 
-    <%= render :partial => "next_link", locals: { url: help_step3_path, next_page_title: 'Set up POMs in NOMIS'} %>
+    <%= render :partial => "next_link", locals: { url: help_step3_path, next_page_title: 'Set up staff in NOMIS'} %>
   </div>
 </div>

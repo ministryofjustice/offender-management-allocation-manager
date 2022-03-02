@@ -15,6 +15,8 @@ Use [asdf](https://asdf-vm.com/) or similar to manage your ruby environment and 
 ### Required
 
 - [direnv](https://direnv.net/) - for managing environment variables and storing credentials
+- [Firefox](https://www.mozilla.org/en-GB/firefox/new/) - for specs
+- [geckodriver](https://github.com/mozilla/geckodriver) - for specs
 - [Postgres](https://www.postgresql.org) - for persisting data
 - [Ruby](https://www.ruby-lang.org/) - for running app
 

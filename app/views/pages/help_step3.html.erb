@@ -1,103 +1,104 @@
-<%= render :partial => "content", locals: { page: 3 } %>
+<% current_help_step = HelpStep.find(3) %>
+<%= render :partial => "content", locals: { current_help_step: current_help_step } %>
+<h1 class="part-title">Set up staff in NOMIS</h1>
 
-<h1 class="part-title">Set up POMs in NOMIS</h1>
 <div class="govuk-inset-text">
-  Local System Administrator (LSA) task
+  This step should be completed by a local system administrator after
+
+  <%=
+    link_to(
+      'new staff members’ details have been listed',
+      'help_step1'
+    )
+  %>.
 </div>
 
 <div class="govuk-grid-column">
   <div class="govuk-body">
+    <p>
+      You should have received details of new staff members from a head of offender management delivery (HOMD) or head
+      of offender management services (HOMS).
+    </p>
 
-    <div class="govuk-warning-text">
-      <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-      <strong class="govuk-warning-text__text">
-        <span class="govuk-warning-text__assistive">Warning</span>
-        Please note: This task can’t be started until <%=link_to("Task 1: List everyone using the service", "help_step1") %> has been completed
-      </strong>
-    </div>
+    <p>
+      These people need a new position in NOMIS to access the allocation service. It usually takes about an hour for
+      someone to appear in the service once the steps below have been completed.
+    </p>
 
-    <h2>a) Make sure POMs have the right ‘roles’ assigned in NOMIS</h2>
+    <h2>Assign the new staff member's position</h2>
 
-    <p>All POMs need to have a new staff role added in NOMIS. This will add them to the list of POMs in the service.</p>
-
-    <p>It can take about an hour for POMs to appear in the service after they have been added to NOMIS.</p>
-
-    <p><%=image_tag("caseload2_image.png") %></p>
-
-    <ul class="govuk-list--bullet">
+    <ol class="govuk-list--number">
       <li>
-        Go to ‘Utilities’ then ‘User/system security’ then ‘Maintain staff member agency location activity’
+        Go to Utilities and then User/system security in the left-hand menu. Choose Maintain staff member agency
+        location activity
       </li>
+
       <li>
-        Enter the staff member’s name, then click the blue arrow by their name
+        Enter the staff member’s name, then select the blue arrow, shown here
+
         <div>
           <%=image_tag("search_box_image.png") %>
         </div><br>
       </li>
+
       <li>
-        Search using keyboard shortcut F8 or the ‘search icon’ in the toolbar at the top of the screen
+        Select the staff member whose details you are checking
       </li>
+
       <li>
-        If more than one person is displayed, select the member of staff whose record you are editing
+        Go to the Staff member position/roles/schedules section, as shown below
       </li>
+
       <li>
-        If more than one prison is displayed, select the correct prison(s) for the member of staff
+        Add a new row if there is no space available
       </li>
+
       <li>
-        Go to the ‘staff member position/roles/schedules’ section
+        Under position, choose either PRO (Prison Officer) or PO (Probation Officer). Under role, select POM. Under
+        schedule type, select full-time or part-time
       </li>
+
       <li>
-        Add a new line if there is already a position and role for this member of staff
-      </li>
-      <li>
-        Under ‘position’ choose either PRO (Prison Officer) or PO (Probation Officer)
-      </li>
-      <li>
-        Under ‘role’ select POM
-      </li>
-      <li>
-        Under ‘schedule type’ select ‘full-time’ or ‘part-time’
-      </li>
-      <li>
-        Save the changes by clicking keyboard shortcut F9  or the yellow ‘disk’ icon in the toolbar at the top of the screen
+        Save the changes using the yellow disk icon at the top of the screen
+
         <div>
-          <%=image_tag("action_toolbar_image.png") %>
+          <%=image_tag("caseload2_image.png") %>
         </div><br>
       </li>
-    </ul>
+    </ol>
 
-    <h2>b) Check all email addresses are up to date in NOMIS</h2>
+    <h2>Check all email addresses are up to date</h2>
 
-    <p>POMs email addresses stored in NOMIS need to be up to date. That’s because the
-      new service will send an email to let POMs know when they have been allocated to a prisoner.</p>
+    <p>
+      Email addresses need to be up to date in NOMIS so the service can notify POMs when they are allocated a case. The
+      @justice.gov.uk email address should be used.
+    </p>
 
-    <p><b>You should use the most up to date ‘name@justice.gov.uk’ email address.</b></p>
-
-    <p><%=image_tag("caseload1_image.png") %></p>
-
-    <ul>
+    <ol class="govuk-list--number">
       <li>
-        Go to ‘Utilities’ then ‘User/system security’ then ‘Maintain staff records’
+        Go to Utilities and then User/system security in the left-hand menu. Then choose Maintain staff records
       </li>
       <li>
-        Enter the staff member’s name, then click the blue arrow or keyboard shortcut ‘F8’ to search
+        Enter the staff member’s name, then select the blue arrow
+      </li>
+      <li>
+        Select the member of staff whose details you are checking
+      </li>
+      <li>
+        Update or add the correct address under Global emails if you need to, as shown below
+      </li>
+      <li>
+        Save the changes using the yellow disk icon at the top of the screen
+
         <div>
-          <%=image_tag("search_box_image.png") %>
+          <%= image_tag("caseload1_image.png") %>
         </div><br>
       </li>
-      <li>
-        If more than one person is displayed, select the member of staff whose record you are editing
-      </li>
-      <li>
-        Check the email address listed under ‘global emails’ and update (or add it) if you need to
-      </li>
-      <li>
-        Save the changes by pressing keyboard shortcut F9  or the yellow ‘disk’ icon in the toolbar at the top of the screen
-      </li>
-    </ul>
-    <br>
+    </ol>
 
-    <p>Let the HOMD/HoOMU know when this task has been completed, so that they can start <%= link_to "Task 4: Update POM profiles", "help_step4" %>.</p>
+    <p>
+      Once you have completed this step, notify the HOMD so they can start the <%= link_to "next task", "help_step4" %>.
+    </p>
 
     <%= render :partial => "next_link", locals: { url: help_step4_path, next_page_title: 'Update POM profiles'} %>
   </div>
