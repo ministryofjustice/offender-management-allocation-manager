@@ -1,4 +1,4 @@
-FROM ruby:2.6.8-slim-bullseye
+FROM ruby:2.7.5-slim-bullseye
 
 RUN \
   set -ex \
