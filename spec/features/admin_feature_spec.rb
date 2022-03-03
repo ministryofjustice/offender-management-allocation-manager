@@ -21,7 +21,7 @@ feature 'admin urls' do
   let(:prison_code) { create(:prison).code }
   let(:admin_urls) {
     [
-    '/admin', '/flip-flop-admin', '/sidekiq',
+    '/admin', '/sidekiq',
     "/prisons/#{prison_code}/debugging",
   ]
   }

@@ -175,8 +175,6 @@ GEM
     fast_underscore (0.3.3)
     ffi (1.15.5)
     flamegraph (0.9.5)
-    flipflop (2.6.0)
-      activesupport (>= 4.0)
     formatador (1.1.0)
     formtastic (4.0.0)
       actionpack (>= 5.2.0)
@@ -560,7 +558,6 @@ DEPENDENCIES
   faraday (~> 1.0)
   fast_underscore
   flamegraph
-  flipflop
   govuk_design_system_formbuilder (~> 2.5)
   govuk_notify_rails
   guard-rspec
@@ -580,13 +577,13 @@ DEPENDENCIES
   omniauth-oauth2
   paper_trail
   parallel_tests
-  parser (< 3.1)
+  parser
   pg
   prawn-rails
   prometheus_exporter
   puma (~> 5.6.2)
   rack-mini-profiler
-  rails (~> 6.1)
+  rails (= 6.1.4.6)
   rails-controller-testing
   rails-i18n
   redis
