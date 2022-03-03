@@ -150,8 +150,6 @@ Rails.application.routes.draw do
   mount Rswag::Ui::Engine => '/api-docs'
   mount Rswag::Api::Engine => '/api-docs'
 
-  mount Flipflop::Engine => "/flip-flop-admin"
-
   # Sidekiq admin interface
   constraints lambda {|request| SsoIdentity.new(request.session).current_user_is_admin?} do
     require 'sidekiq/web'

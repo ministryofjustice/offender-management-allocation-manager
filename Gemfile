@@ -3,6 +3,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.7.5'
 
+gem 'rails', '6.1.4.6'
 gem 'auto_strip_attributes'
 # Need AWS SNS SDK for publishing events to HMPPS_DOMAIN_EVENTS
 gem 'aws-sdk-sns'
@@ -26,7 +27,6 @@ gem 'paper_trail'
 gem 'pg'
 gem 'puma', '~> 5.6.2'
 gem 'prometheus_exporter'
-gem 'rails', '~> 6.1'
 gem 'sidekiq', '>= 6.4.0'
 gem 'sentry-raven'
 gem 'turbolinks', '~> 5'
@@ -34,7 +34,6 @@ gem 'uglifier', '>= 1.3.0'
 gem 'typhoeus'
 gem 'redis'
 gem 'fast_underscore', require: false
-gem 'flipflop'
 gem 'hashdiff', ['>= 1.0.0.beta1', '< 2.0.0']
 gem 'rubyzip'
 gem 'turnout'
@@ -100,9 +99,7 @@ group :development do
   gem 'guard-rubocop'
   gem 'listen'
   gem 'memory_profiler'
-  # prevent warnings from parser as we are using ruby 2.6
-  # change this when upgrading ruby version
-  gem 'parser', '< 3.1'
+  gem 'parser'
   gem 'rack-mini-profiler'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'stackprof'
