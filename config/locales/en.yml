@@ -51,7 +51,7 @@ en:
           format: "%{message}"
           attributes:
             parole_review_date:
-              after: The new parole review date must be in the future
+              date_after: The new parole review date must be in the future
               blank: Enter a new parole review date
         complexity_form:
           format: "%{message}"
@@ -68,8 +68,8 @@ en:
           attributes:
             oasys_risk_assessment_date:
               blank: Enter the date of the last OASys risk assessment
-              after: This date must be in the last 3 months
-              before: This must not be a date in the future
+              date_after: This date must be in the last 3 months
+              date_before: This must not be a date in the future
         early_allocation_eligible_form:
           format: "%{message}"
           attributes:
