@@ -31,4 +31,40 @@ RSpec.describe ApplicationHelper do
       expect(format_email(email)).to eq("<a href=\"mailto:john.doe@example.com\">john.doe@example.com</a>")
     end
   end
+
+  describe 'displays POM level' do
+    let(:po) { 'PO' }
+    let(:pom) { 'PRO' }
+    let(:staff) { 'STAFF' }
+
+    it 'returns Probation Officer' do
+      expect(pom_level(po)).to eq('Probation POM')
+    end
+
+    it 'returns Prison Officer' do
+      expect(pom_level(pom)).to eq('Prison POM')
+    end
+
+    it 'returns Staff member' do
+      expect(pom_level(staff)).to eq('N/A')
+    end
+  end
+
+  describe 'displays long POM level' do
+    let(:po) { 'PO' }
+    let(:pom) { 'PRO' }
+    let(:staff) { 'STAFF' }
+
+    it 'returns long Probation Officer' do
+      expect(pom_level_long(po)).to eq('Probation Officer POM')
+    end
+
+    it 'returns long Prison Officer' do
+      expect(pom_level_long(pom)).to eq('Prison Officer POM')
+    end
+
+    it 'returns long Staff member' do
+      expect(pom_level_long(staff)).to eq('N/A')
+    end
+  end
 end
