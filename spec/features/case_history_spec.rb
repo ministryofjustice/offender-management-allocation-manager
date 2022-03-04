@@ -36,31 +36,31 @@ feature 'Case History' do
 
   let(:spo) { build(:pom) }
 
-  let(:nomis_offender) {
+  let(:nomis_offender) do
     build(:nomis_offender,
           prisonId: open_prison.code,
           sentence: attributes_for(:sentence_detail, :indeterminate, :welsh_open_policy))
-  }
-  let(:nomis_pentonville_offender) {
+  end
+  let(:nomis_pentonville_offender) do
     build(:nomis_offender, prisonerNumber: nomis_offender.fetch(:prisonerNumber),
-          prisonId: second_prison.code,
-          sentence: attributes_for(:sentence_detail, :indeterminate, :welsh_open_policy))
-  }
-  let(:pontypool_ldu) {
+                           prisonId: second_prison.code,
+                           sentence: attributes_for(:sentence_detail, :indeterminate, :welsh_open_policy))
+  end
+  let(:pontypool_ldu) do
     create(:local_delivery_unit, name: 'Pontypool LDU', email_address: 'pontypool-ldu@digital.justice.gov.uk')
-  }
+  end
   let(:ci) { create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender.fetch(:prisonerNumber)), local_delivery_unit: pontypool_ldu) }
   let(:nomis_offender_id) { ci.nomis_offender_id }
   let!(:first_prison) { create(:prison) }
   let!(:second_prison) { create(:prison) }
   let!(:open_prison) { create(:prison, code: PrisonService::PRESCOED_CODE) }
-  let(:offender_movements) {
+  let(:offender_movements) do
     [
       attributes_for(:movement, toAgency: first_prison.code, movementDate: first_arrival_date - 1.day),
       attributes_for(:movement, toAgency: second_prison.code, movementDate: readmission_date),
       attributes_for(:movement, toAgency: open_prison.code, movementDate: transfer_date),
     ]
-  }
+  end
   let(:today) { Time.zone.now } # try not to call Time.zone.now too often, to avoid 1-minute drifts
   let(:first_arrival_date) { today - 20.days }
   let(:deallocate_date) { today - 14.days }
@@ -68,7 +68,7 @@ feature 'Case History' do
   let(:transfer_date) { today - 5.days }
 
   before do
-    Timecop.travel DateTime.new 2021, 2, 28, 11, 25, 35
+    Timecop.travel Time.zone.local 2021, 2, 28, 11, 25, 35
     stub_auth_token
   end
 
@@ -77,7 +77,7 @@ feature 'Case History' do
   end
 
   describe 'offender allocation history' do
-    before {
+    before do
       stub_offenders_for_prison(open_prison.code, [nomis_offender], offender_movements)
       stub_signin_spo spo, [open_prison.code]
 
@@ -94,7 +94,7 @@ feature 'Case History' do
       stub_pom_emails(prison_pom.fetch(:primary_pom_nomis_id), [prison_pom.fetch(:email)])
 
       stub_agencies(HmppsApi::PrisonApi::AgenciesApi::HOSPITAL_AGENCY_TYPE)
-    }
+    end
 
     context 'when on the allocation history page' do
       before do
@@ -158,10 +158,10 @@ feature 'Case History' do
         Timecop.travel(current_date) do
           create(:early_allocation, offender: ci.offender, prison: second_prison.code, nomis_offender_id: nomis_offender_id)
           create :email_history, nomis_offender_id: nomis_offender_id,
-                 name: ci.local_delivery_unit.name,
-                 email: ci.local_delivery_unit.email_address,
-                 event: EmailHistory::AUTO_EARLY_ALLOCATION,
-                 prison: second_prison.code
+                                 name: ci.local_delivery_unit.name,
+                                 email: ci.local_delivery_unit.email_address,
+                                 event: EmailHistory::AUTO_EARLY_ALLOCATION,
+                                 prison: second_prison.code
         end
 
         current_date += 1.day
@@ -169,10 +169,10 @@ feature 'Case History' do
           create(:early_allocation, :discretionary,
                  offender: ci.offender, prison: second_prison.code, nomis_offender_id: nomis_offender_id)
           create :email_history, nomis_offender_id: nomis_offender_id,
-                 name: ci.local_delivery_unit.name,
-                 email: ci.local_delivery_unit.email_address,
-                 event: EmailHistory::DISCRETIONARY_EARLY_ALLOCATION,
-                 prison: second_prison.code
+                                 name: ci.local_delivery_unit.name,
+                                 email: ci.local_delivery_unit.email_address,
+                                 event: EmailHistory::DISCRETIONARY_EARLY_ALLOCATION,
+                                 prison: second_prison.code
         end
 
         current_date += 1.day
@@ -198,7 +198,7 @@ feature 'Case History' do
       end
 
       let(:formatted_deallocate_date) { deallocate_date.strftime("#{deallocate_date.day.ordinalize} %B %Y (%R)") }
-      let(:formatted_transfer_date) { transfer_date.strftime("#{transfer_date.day.ordinalize} %B %Y") + " (" + transfer_date.strftime("%R") + ")" }
+      let(:formatted_transfer_date) { "#{transfer_date.strftime("#{transfer_date.day.ordinalize} %B %Y")} (#{transfer_date.strftime('%R')})" }
       let(:allocation) { AllocationHistory.last }
       let(:history) { allocation.get_old_versions.append(allocation).sort_by!(&:updated_at).reverse! }
       let(:created_by_name) { allocation.get_old_versions.first.created_by_name }
@@ -262,14 +262,15 @@ feature 'Case History' do
           within '.moj-timeline__item:nth-of-type(1)' do
             [
               ['.moj-timeline__title', "Prisoner reallocated"],
-              ['.moj-timeline__description', [
-                "Prisoner reallocated to #{history1.primary_pom_name.titleize} - (email address not found)",
-                "Tier: #{history1.allocated_at_tier}",
-                "Prison POM allocated instead of recommended Probation POM",
-                "Reason(s):",
-                "- Prisoner assessed as suitable for a probation POM despite tiering calculation",
-                "Too high risk"
-              ].join("\n")
+              ['.moj-timeline__description',
+               [
+                 "Prisoner reallocated to #{history1.primary_pom_name.titleize} - (email address not found)",
+                 "Tier: #{history1.allocated_at_tier}",
+                 "Prison POM allocated instead of recommended Probation POM",
+                 "Reason(s):",
+                 "- Prisoner assessed as suitable for a probation POM despite tiering calculation",
+                 "Too high risk"
+               ].join("\n")
               ],
               ['.moj-timeline__date', formatted_date_for(history1).to_s],
             ].each do |key, val|
@@ -312,8 +313,9 @@ feature 'Case History' do
           within '.moj-timeline__item:nth-of-type(6)' do
             [
               ['.moj-timeline__title', "Prisoner allocated"],
-              ['.moj-timeline__description', ["Prisoner allocated to #{history2.primary_pom_name.titleize} - #{prison_pom[:email]}\n",
-                                              "Tier: #{history2.allocated_at_tier}"].join],
+              ['.moj-timeline__description',
+               ["Prisoner allocated to #{history2.primary_pom_name.titleize} - #{prison_pom[:email]}\n",
+                "Tier: #{history2.allocated_at_tier}"].join],
               ['.moj-timeline__date', formatted_date_for(history2).to_s],
             ].each do |key, val|
               expect(page).to have_css(key, text: val)
@@ -366,14 +368,15 @@ feature 'Case History' do
           within '.moj-timeline__item:nth-of-type(4)' do
             [
               ['.moj-timeline__title', "Prisoner reallocated"],
-              ['.moj-timeline__description', [
-                "Prisoner reallocated to #{history6.primary_pom_name.titleize} - #{probation_pom_2[:email]}\n",
-                "Tier: #{history6.allocated_at_tier}\n",
-                "Prison POM allocated instead of recommended Probation POM\n",
-                "Reason(s):\n",
-                "- Prisoner assessed as suitable for a probation POM despite tiering calculation\n",
-                "Too high risk"
-              ].join],
+              ['.moj-timeline__description',
+               [
+                 "Prisoner reallocated to #{history6.primary_pom_name.titleize} - #{probation_pom_2[:email]}\n",
+                 "Tier: #{history6.allocated_at_tier}\n",
+                 "Prison POM allocated instead of recommended Probation POM\n",
+                 "Reason(s):\n",
+                 "- Prisoner assessed as suitable for a probation POM despite tiering calculation\n",
+                 "Too high risk"
+               ].join],
               ['.moj-timeline__date', "#{formatted_date_for(history6)} by #{history6.created_by_name.titleize}"],
             ].each do |key, val|
               expect(page).to have_css(key, text: val)
@@ -382,10 +385,11 @@ feature 'Case History' do
 
           within '.moj-timeline__item:nth-of-type(5)' do
             [
-              ['.moj-timeline__description', [
-                "Prisoner allocated to #{last_history.primary_pom_name.titleize} - #{probation_pom[:email]}\n",
-                "Tier: #{last_history.allocated_at_tier}"
-              ].join],
+              ['.moj-timeline__description',
+               [
+                 "Prisoner allocated to #{last_history.primary_pom_name.titleize} - #{probation_pom[:email]}\n",
+                 "Tier: #{last_history.allocated_at_tier}"
+               ].join],
               ['.moj-timeline__date', "#{formatted_date_for(last_history)} by #{last_history.created_by_name.titleize}"],
             ].each do |key, val|
               expect(page).to have_css(key, text: val)
@@ -421,7 +425,7 @@ feature 'Case History' do
   end
 
   def formatted_date_for(history)
-    history.updated_at.strftime("#{history.updated_at.day.ordinalize} %B %Y") + " (" + history.updated_at.strftime("%R") + ")"
+    "#{history.updated_at.strftime("#{history.updated_at.day.ordinalize} %B %Y")} (#{history.updated_at.strftime('%R')})"
   end
 
   context 'with a simple case' do
@@ -437,13 +441,13 @@ feature 'Case History' do
     let(:nomis_offender) { build(:nomis_offender, prisonId: open_prison.code) }
     let(:nomis_offender_id) { nomis_offender.fetch(:prisonerNumber) }
     let(:pom) { build(:pom) }
-    let!(:case_info) {
+    let!(:case_info) do
       create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
-    }
-    let!(:allocation) {
+    end
+    let!(:allocation) do
       create(:allocation_history, :primary, nomis_offender_id: nomis_offender_id, prison: first_prison.code,
-             primary_pom_nomis_id: pom.staff_id)
-    }
+                                            primary_pom_nomis_id: pom.staff_id)
+    end
 
     context 'with a discretionary accepted early allocation' do
       before do

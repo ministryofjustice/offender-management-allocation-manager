@@ -22,14 +22,14 @@ private
     if params['q'].present?
       @q = params['q']
       query = @q.upcase
-      allocations = allocations.select { |a|
+      allocations = allocations.select do |a|
         a.full_name.upcase.include?(query) || a.nomis_offender_id.include?(query)
-      }
+      end
     end
     if params['role'].present?
-      allocations = allocations.select { |a|
+      allocations = allocations.select do |a|
         view_context.pom_responsibility_label(a) == params['role']
-      }
+      end
     end
     allocations
   end

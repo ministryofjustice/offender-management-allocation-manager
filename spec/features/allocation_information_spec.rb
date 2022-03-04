@@ -9,14 +9,14 @@ feature "view an offender's allocation information" do
   let!(:allocated_at_tier) { 'A' }
   let!(:prison) { create(:prison) }
   let!(:recommended_pom_type) { 'probation' }
-  let!(:pom_detail) {
-    PomDetail.create!(
+  let!(:pom_detail) do
+    PomDetail.create(
       nomis_staff_id: probation_officer_nomis_staff_id,
       prison_code: prison.code,
       working_pattern: 1.0,
       status: 'Active'
     )
-  }
+  end
   let(:offender_no) { "G4273GI" }
 
   before do
@@ -198,28 +198,28 @@ feature "view an offender's allocation information" do
 private
 
   def stub_api_calls_for_prison_allocation_path(sentence_start_date:, conditional_release_date:, automatic_release_date:, hdced:)
-    stub_request(:post, "#{ApiHelper::AUTH_HOST}/auth/oauth/token?grant_type=client_credentials").
-            to_return(body: {}.to_json)
+    stub_request(:post, "#{ApiHelper::AUTH_HOST}/auth/oauth/token?grant_type=client_credentials")
+            .to_return(body: {}.to_json)
 
-    stub_request(:get, "#{ApiHelper::T3}/users/MOIC_POM").
-      to_return(body: { 'staffId': 1 }.to_json)
+    stub_request(:get, "#{ApiHelper::T3}/users/MOIC_POM")
+      .to_return(body: { 'staffId': 1 }.to_json)
     stub_pom_emails(1, [])
 
     stub_offender(build(:nomis_offender, prisonerNumber: offender_no,
-                        sentence: attributes_for(:sentence_detail,
-                                                 sentenceStartDate: sentence_start_date,
-                                                 conditionalReleaseDate: conditional_release_date,
-                                                 automaticReleaseDate: automatic_release_date,
-                                                 homeDetentionCurfewEligibilityDate: hdced
-                                        )))
+                                         sentence: attributes_for(:sentence_detail,
+                                                                  sentenceStartDate: sentence_start_date,
+                                                                  conditionalReleaseDate: conditional_release_date,
+                                                                  automaticReleaseDate: automatic_release_date,
+                                                                  homeDetentionCurfewEligibilityDate: hdced
+                                                                 )))
 
-    stub_request(:get, "#{ApiHelper::T3}/staff/roles/LEI/role/POM").
-      to_return(body: [{ staffId: 485_636, firstName: "JENNY", lastName: "DUCKETT", status: "ACTIVE", gender: "F", dateOfBirth: "1970-01-01", agencyId: "LEI", agencyDescription: "Leeds(HMP)", fromDate: "2019-01-22", position: "PRO", positionDescription: "PrisonOfficer", role: "POM", roleDescription: "Prison Offender Manager", scheduleType: "FT", scheduleTypeDescription: "FullTime", hoursPerWeek: 35 }].to_json)
+    stub_request(:get, "#{ApiHelper::T3}/staff/roles/LEI/role/POM")
+      .to_return(body: [{ staffId: 485_636, firstName: "JENNY", lastName: "DUCKETT", status: "ACTIVE", gender: "F", dateOfBirth: "1970-01-01", agencyId: "LEI", agencyDescription: "Leeds(HMP)", fromDate: "2019-01-22", position: "PRO", positionDescription: "PrisonOfficer", role: "POM", roleDescription: "Prison Offender Manager", scheduleType: "FT", scheduleTypeDescription: "FullTime", hoursPerWeek: 35 }].to_json)
 
-    stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/LEI/offender/#{offender_no}").
-      to_return(body: { staffId: 485_572, firstName: "DOM", lastName: "BULL" }.to_json)
+    stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/LEI/offender/#{offender_no}")
+      .to_return(body: { staffId: 485_572, firstName: "DOM", lastName: "BULL" }.to_json)
 
-    stub_request(:get, "#{ApiHelper::T3}/staff/485636").
-      to_return(body: { staffId: 485_636, firstName: "JENNY", lastName: "DUCKETT", status: "ACTIVE", gender: "F", dateOfBirth: "1970-01-01" }.to_json)
+    stub_request(:get, "#{ApiHelper::T3}/staff/485636")
+      .to_return(body: { staffId: 485_636, firstName: "JENNY", lastName: "DUCKETT", status: "ACTIVE", gender: "F", dateOfBirth: "1970-01-01" }.to_json)
   end
 end

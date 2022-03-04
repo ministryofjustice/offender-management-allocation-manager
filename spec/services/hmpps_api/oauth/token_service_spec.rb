@@ -11,9 +11,9 @@ describe HmppsApi::Oauth::TokenService do
   it 'returns an unexpired token' do
     unexpired_token = HmppsApi::Oauth::Token.new(access_token: generate_jwt_token)
 
-    allow(HmppsApi::Oauth::Api).
-      to receive(:fetch_new_auth_token).
-      and_return(unexpired_token)
+    allow(HmppsApi::Oauth::Api)
+      .to receive(:fetch_new_auth_token)
+      .and_return(unexpired_token)
 
     token_service = described_class.instance
 
@@ -25,9 +25,9 @@ describe HmppsApi::Oauth::TokenService do
     expired_encoded_token = generate_jwt_token(exp: Time.current.to_i - 3600)
     expired_token = HmppsApi::Oauth::Token.new(access_token: expired_encoded_token)
 
-    allow(HmppsApi::Oauth::Api).
-      to receive(:fetch_new_auth_token).
-      and_return(expired_token, unexpired_token)
+    allow(HmppsApi::Oauth::Api)
+      .to receive(:fetch_new_auth_token)
+      .and_return(expired_token, unexpired_token)
 
     token_service = described_class.instance
 

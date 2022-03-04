@@ -2,40 +2,40 @@ require "rails_helper"
 
 feature "female estate POMs list" do
   let!(:female_prison) { create(:womens_prison).code }
-  let(:staff_id) { 123456 }
+  let(:staff_id) { 123_456 }
   let(:spo) { build(:pom) }
-  let(:probation_poms) {
+  let(:probation_poms) do
     [
-    # Need deterministic POM order by surname
-    build(:pom, :probation_officer, lastName: 'Smith'),
-    build(:pom, :probation_officer, lastName: 'Watkins')
-  ]
-  }
+      # Need deterministic POM order by surname
+      build(:pom, :probation_officer, lastName: 'Smith'),
+      build(:pom, :probation_officer, lastName: 'Watkins')
+    ]
+  end
   let(:prison_poms) { build_list(:pom, 8, :prison_officer, status: 'inactive') }
   let(:poms) { probation_poms + prison_poms }
 
-  let(:nomis_offender) {
+  let(:nomis_offender) do
     build(:nomis_offender,
           prisonId: female_prison, complexityLevel: 'high',
           category: attributes_for(:offender_category, :female_closed),
           sentence: attributes_for(:sentence_detail))
-  }
+  end
 
-  let(:offenders_in_prison) {
+  let(:offenders_in_prison) do
     build_list(:nomis_offender, 14,
                prisonId: female_prison,
                category: attributes_for(:offender_category, :female_closed),
                sentence: attributes_for(:sentence_detail))
-  }
+  end
 
   before do
     stub_signin_spo spo, [female_prison]
     stub_offenders_for_prison(female_prison, offenders_in_prison << nomis_offender)
     stub_poms(female_prison, poms)
 
-    offenders_in_prison.map { |o| o.fetch(:prisonerNumber) }.each { |nomis_id|
+    offenders_in_prison.map { |o| o.fetch(:prisonerNumber) }.each do |nomis_id|
       stub_keyworker female_prison, nomis_id, build(:keyworker)
-    }
+    end
 
     create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender[:prisonerNumber]), case_allocation: 'NPS')
     create(:allocation_history, nomis_offender_id: nomis_offender[:prisonerNumber], primary_pom_nomis_id: poms.first.staffId, prison: female_prison)

@@ -53,16 +53,16 @@ module EarlyAllocationHelper
   end
 
   DESCRIPTIONS = {
-      convicted_under_terrorisom_act_2000: 'Convicted under Terrorism Act 2000',
-      high_profile: 'Identified as \'high profile\'',
-      serious_crime_prevention_order: 'Has Serious Crime Prevention Order',
-      mappa_level_3: 'Requires management as a Multi-Agency Public Protection (MAPPA) level 3',
-      cppc_case: 'Likely to be a Critical Public Protection Case (CPPC)',
-      extremism_separation: 'Has been held in an extremism separation centre',
-      high_risk_of_serious_harm: 'Presents a very high risk of serious harm',
-      mappa_level_2: 'Requires management as a Multi-Agency Public Protection (MAPPA) level 2',
-      pathfinder_process: 'Identified through the \'pathfinder\' process',
-      other_reason: 'Other reason for consideration for early allocation to the probation team',
+    convicted_under_terrorisom_act_2000: 'Convicted under Terrorism Act 2000',
+    high_profile: 'Identified as \'high profile\'',
+    serious_crime_prevention_order: 'Has Serious Crime Prevention Order',
+    mappa_level_3: 'Requires management as a Multi-Agency Public Protection (MAPPA) level 3',
+    cppc_case: 'Likely to be a Critical Public Protection Case (CPPC)',
+    extremism_separation: 'Has been held in an extremism separation centre',
+    high_risk_of_serious_harm: 'Presents a very high risk of serious harm',
+    mappa_level_2: 'Requires management as a Multi-Agency Public Protection (MAPPA) level 2',
+    pathfinder_process: 'Identified through the \'pathfinder\' process',
+    other_reason: 'Other reason for consideration for early allocation to the probation team',
   }.freeze
 
   def pom_full_name(early_allocation)

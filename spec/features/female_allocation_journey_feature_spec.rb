@@ -6,7 +6,7 @@ feature "womens allocation journey" do
   let(:prison) { create(:womens_prison) }
   let(:offenders) { build_list(:nomis_offender, 5, prisonId: prison.code, complexityLevel: 'high') }
   let(:offender) { build(:nomis_offender, sentence: attributes_for(:sentence_detail, :determinate_release_in_three_years), prisonId: prison.code) }
-  let(:offender_name) { offender.fetch(:lastName) + ', ' + offender.fetch(:firstName) }
+  let(:offender_name) { "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}" }
   let(:nomis_offender_id) { offender.fetch(:prisonerNumber) }
   let(:user) { build(:pom) }
   let(:probation_pom) { build(:pom, :probation_officer, lastName: 'Jones') }
@@ -55,22 +55,22 @@ feature "womens allocation journey" do
       fill_in 'allocation-form-message-field', with: message_text
       click_button 'Complete allocation'
       a = AllocationHistory.find_by!(nomis_offender_id: nomis_offender_id)
-      expect(a.attributes.symbolize_keys.except(:created_at, :updated_at, :id, :primary_pom_allocated_at)).
-        to eq(message: message_text,
-              allocated_at_tier: "A",
-              created_by_name: " ",
-              event: 'allocate_primary_pom',
-              event_trigger: "user",
-              nomis_offender_id: nomis_offender_id,
-              override_detail: nil,
-              override_reasons: nil,
-              primary_pom_name: "#{probation_pom2.last_name}, #{probation_pom2.first_name}",
-              primary_pom_nomis_id: probation_pom2.staff_id,
-              prison: prison.code,
-              recommended_pom_type: "probation",
-              secondary_pom_name: nil,
-              secondary_pom_nomis_id: nil,
-              suitability_detail: nil)
+      expect(a.attributes.symbolize_keys.except(:created_at, :updated_at, :id, :primary_pom_allocated_at))
+        .to eq(message: message_text,
+               allocated_at_tier: "A",
+               created_by_name: " ",
+               event: 'allocate_primary_pom',
+               event_trigger: "user",
+               nomis_offender_id: nomis_offender_id,
+               override_detail: nil,
+               override_reasons: nil,
+               primary_pom_name: "#{probation_pom2.last_name}, #{probation_pom2.first_name}",
+               primary_pom_nomis_id: probation_pom2.staff_id,
+               prison: prison.code,
+               recommended_pom_type: "probation",
+               secondary_pom_name: nil,
+               secondary_pom_nomis_id: nil,
+               suitability_detail: nil)
     end
 
     scenario 'rejecting recommendation' do
@@ -84,8 +84,8 @@ feature "womens allocation journey" do
       # Try to just hit 'Continue' - it should bounce with a nice error
       click_button 'Continue'
       within '.govuk-error-summary' do
-        expect(all('li').map(&:text)).
-          to match_array(
+        expect(all('li').map(&:text))
+          .to match_array(
             [
               "Select one or more reasons for not accepting the recommendation",
             ])
@@ -99,22 +99,22 @@ feature "womens allocation journey" do
       click_button 'Complete allocation'
 
       a = AllocationHistory.find_by!(nomis_offender_id: nomis_offender_id)
-      expect(a.attributes.symbolize_keys.except(:created_at, :updated_at, :id, :primary_pom_allocated_at)).
-        to eq(message: message_text,
-              allocated_at_tier: "A",
-              created_by_name: " ",
-              event: 'allocate_primary_pom',
-              event_trigger: "user",
-              nomis_offender_id: nomis_offender_id,
-              override_detail: '',
-              override_reasons: "[\"continuity\"]",
-              primary_pom_name: "#{prison_pom.last_name}, #{prison_pom.first_name}",
-              primary_pom_nomis_id: prison_pom.staff_id,
-              prison: prison.code,
-              recommended_pom_type: "probation",
-              secondary_pom_name: nil,
-              secondary_pom_nomis_id: nil,
-              suitability_detail: '')
+      expect(a.attributes.symbolize_keys.except(:created_at, :updated_at, :id, :primary_pom_allocated_at))
+        .to eq(message: message_text,
+               allocated_at_tier: "A",
+               created_by_name: " ",
+               event: 'allocate_primary_pom',
+               event_trigger: "user",
+               nomis_offender_id: nomis_offender_id,
+               override_detail: '',
+               override_reasons: "[\"continuity\"]",
+               primary_pom_name: "#{prison_pom.last_name}, #{prison_pom.first_name}",
+               primary_pom_nomis_id: prison_pom.staff_id,
+               prison: prison.code,
+               recommended_pom_type: "probation",
+               secondary_pom_name: nil,
+               secondary_pom_nomis_id: nil,
+               suitability_detail: '')
     end
   end
 
@@ -146,22 +146,22 @@ feature "womens allocation journey" do
       fill_in 'allocation-form-message-field', with: message_text
       click_button 'Complete allocation'
 
-      expect(allocation.attributes.symbolize_keys.except(:created_at, :updated_at, :id, :primary_pom_allocated_at)).
-        to eq(message: message_text,
-              allocated_at_tier: "C",
-              created_by_name: " ",
-              event: 'reallocate_primary_pom',
-              event_trigger: "user",
-              nomis_offender_id: offender_id,
-              override_detail: nil,
-              override_reasons: nil,
-              primary_pom_name: "#{prison_pom.last_name}, #{prison_pom.first_name}",
-              primary_pom_nomis_id: prison_pom.staff_id,
-              prison: prison.code,
-              recommended_pom_type: "prison",
-              secondary_pom_name: nil,
-              secondary_pom_nomis_id: nil,
-              suitability_detail: nil)
+      expect(allocation.attributes.symbolize_keys.except(:created_at, :updated_at, :id, :primary_pom_allocated_at))
+        .to eq(message: message_text,
+               allocated_at_tier: "C",
+               created_by_name: " ",
+               event: 'reallocate_primary_pom',
+               event_trigger: "user",
+               nomis_offender_id: offender_id,
+               override_detail: nil,
+               override_reasons: nil,
+               primary_pom_name: "#{prison_pom.last_name}, #{prison_pom.first_name}",
+               primary_pom_nomis_id: prison_pom.staff_id,
+               prison: prison.code,
+               recommended_pom_type: "prison",
+               secondary_pom_name: nil,
+               secondary_pom_nomis_id: nil,
+               suitability_detail: nil)
     end
   end
 end

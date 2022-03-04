@@ -19,13 +19,13 @@ RSpec.describe HandoverFollowUpJob, type: :job do
 
     let(:case_info) { build(:case_information, offender: build(:offender, nomis_offender_id: offender_no)) }
 
-    let!(:allocation) {
+    let!(:allocation) do
       create(:allocation_history,
              prison: active_prison.code,
              nomis_offender_id: offender_no,
              primary_pom_nomis_id: pom.staff_id,
              primary_pom_name: pom.full_name)
-    }
+    end
 
     let(:today) { Time.zone.today }
 
@@ -46,10 +46,10 @@ RSpec.describe HandoverFollowUpJob, type: :job do
 
     context 'when the offender does not exist in NOMIS' do
       let(:offender) { nil }
-      let(:offender_no) {
+      let(:offender_no) do
         # Use offender factory to give a 'realistic' offender number
         build(:hmpps_api_offender).offender_no
-      }
+      end
 
       it 'does not send email' do
         expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
@@ -59,9 +59,9 @@ RSpec.describe HandoverFollowUpJob, type: :job do
 
     context 'when the offender exists in NOMIS' do
       context 'when the offender is un-sentenced' do
-        let(:api_offender) {
+        let(:api_offender) do
           build_api_offender(sentence_type: :determinate, ard_crd_release: nil, ted: nil)
-        }
+        end
         let(:today) { Time.zone.today }
 
         it 'does not send email' do
@@ -72,10 +72,10 @@ RSpec.describe HandoverFollowUpJob, type: :job do
 
       context 'when the offender already has a COM allocated' do
         let(:today) { offender.handover_start_date + 1.week }
-        let(:case_info) {
+        let(:case_info) do
           create(:case_information, :with_com,
                  offender: build(:offender, nomis_offender_id: offender_no))
-        }
+        end
 
         it 'does not send email' do
           expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
@@ -84,12 +84,12 @@ RSpec.describe HandoverFollowUpJob, type: :job do
       end
 
       context 'when the offender does not have a handover_start_date' do
-        let(:api_offender) {
+        let(:api_offender) do
           build_api_offender(Time.zone.today + 10.months,
                              sentence_type: :indeterminate,
                              ard_crd_release: nil,
                              ted: nil)
-        }
+        end
         let(:today) { Time.zone.today }
 
         it 'does not send email' do
@@ -183,15 +183,15 @@ RSpec.describe HandoverFollowUpJob, type: :job do
 
 private
 
-  def build_api_offender(release_date = nil, prison: nil, sentence_type:, ard_crd_release:, ted:)
-    prison = prison || active_prison
+  def build_api_offender(release_date = nil, sentence_type:, ard_crd_release:, ted:, prison: nil)
+    prison ||= active_prison
     build(:hmpps_api_offender, prisonId: prison.code,
-          sentence: attributes_for(:sentence_detail,
-                                   sentence_type,
-                                   sentenceStartDate: Time.zone.today - 11.months,
-                                   conditionalReleaseDate: ard_crd_release,
-                                   automaticReleaseDate: ard_crd_release,
-                                   releaseDate: release_date,
-                                   tariffDate: ted))
+                               sentence: attributes_for(:sentence_detail,
+                                                        sentence_type,
+                                                        sentenceStartDate: Time.zone.today - 11.months,
+                                                        conditionalReleaseDate: ard_crd_release,
+                                                        automaticReleaseDate: ard_crd_release,
+                                                        releaseDate: release_date,
+                                                        tariffDate: ted))
   end
 end

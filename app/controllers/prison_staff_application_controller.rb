@@ -20,9 +20,10 @@ private
   def sort_allocations(allocations)
     field, direction = sort_params(default_sort: :last_name)
 
-    if field == :location
+    case field
+    when :location
       cell_location_sort(allocations, direction)
-    elsif field == :pom_responsibility
+    when :pom_responsibility
       if direction == :asc
         allocations.sort_by { |a| view_context.pom_responsibility_label(a) }
       else

@@ -94,7 +94,7 @@ feature "get poms list" do
       before do
         secondary = create :case_information, offender: build(:offender, nomis_offender_id: 'G4328GK')
         create(:allocation_history, prison: 'LEI', nomis_offender_id: secondary.nomis_offender_id,
-               primary_pom_nomis_id: 123456, secondary_pom_nomis_id: moic_pom_id)
+                                    primary_pom_nomis_id: 123_456, secondary_pom_nomis_id: moic_pom_id)
 
         visit "/prisons/LEI/poms/#{moic_pom_id}"
         click_link 'Caseload'

@@ -7,7 +7,7 @@ class VictimLiaisonOfficer < ApplicationRecord
 
   belongs_to :offender, foreign_key: :nomis_offender_id, inverse_of: :victim_liaison_officers
 
-  validates_presence_of :last_name, :first_name
+  validates :last_name, :first_name, presence: true
 
   validates :email, presence: true, 'valid_email_2/email': true
 

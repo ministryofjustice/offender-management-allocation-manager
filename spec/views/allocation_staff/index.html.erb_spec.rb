@@ -5,11 +5,11 @@ require 'rails_helper'
 RSpec.describe "allocation_staff/index", type: :view do
   let(:next_year) { (Time.zone.today + 1.year).year }
   let(:case_info) { build(:case_information, :crc) }
-  let(:api_offender) {
+  let(:api_offender) do
     build(:hmpps_api_offender,
           sentence: attributes_for(:sentence_detail, conditionalReleaseDate: Date.new(next_year + 1, 1, 28)),
           prisonerNumber: case_info.nomis_offender_id)
-  }
+  end
   let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
   let(:prison) { create(:prison) }
   let(:pom) { build(:pom) }

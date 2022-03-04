@@ -18,7 +18,7 @@ class AllocationValidation
 
     puts "Processing #{allocations.count} items"
 
-    allocations.each { |allocation|
+    allocations.each do |allocation|
       # Get the offender from NOMIS
       offender = OffenderService.get_offender(allocation.nomis_offender_id)
       if offender.nil?
@@ -49,6 +49,6 @@ class AllocationValidation
       # The offender is at a different prison so deallocate as a transfer
       puts "#{offender.offender_no} (allocated) appears to have been transferred to #{offender.prison_id} - deallocating"
       allocation.dealloate_offender_after_transfer
-    }
+    end
   end
 end

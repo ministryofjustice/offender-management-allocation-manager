@@ -46,7 +46,7 @@ class AllocationHistory < ApplicationRecord
     where(primary_pom_nomis_id: nomis_staff_id).or(secondaries).where(prison: prison)
   }
 
-  scope  :active_allocations_for_prison, lambda { |prison| where.not(primary_pom_nomis_id: nil).where(prison: prison) }
+  scope :active_allocations_for_prison, ->(prison) { where.not(primary_pom_nomis_id: nil).where(prison: prison) }
 
   scope :for_pom, lambda { |nomis_staff_id|
     secondaries = where(secondary_pom_nomis_id: nomis_staff_id)
@@ -85,7 +85,7 @@ class AllocationHistory < ApplicationRecord
     get_old_versions.map { |h| [h.primary_pom_nomis_id, h.secondary_pom_nomis_id] }.flatten.compact.uniq
   end
 
-  # note: this creates an allocation where the co-working POM is set, but the primary
+  # NOTE: this creates an allocation where the co-working POM is set, but the primary
   # one is not. It should still show up in the 'waiting to allocate' bucket.
   # This appears to be safe as allocations only show up for viewing if they have
   # a non-nil primary_pom_nomis_id
@@ -130,7 +130,7 @@ class AllocationHistory < ApplicationRecord
 
   # check for changes in the last week where the target value
   # (item[1] in the array) is our staff_id
-  def new_case_for? staff_id
+  def new_case_for?(staff_id)
     versions.where('created_at >= ?', 7.days.ago).map { |c|
       YAML.load(c.object_changes)
     }.select { |c|
@@ -141,7 +141,7 @@ class AllocationHistory < ApplicationRecord
 
 private
 
-  def deallocate_offender event:, event_trigger:
+  def deallocate_offender(event:, event_trigger:)
     primary_pom = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(primary_pom_nomis_id)
 
     # If the offender has been released from prison, OffenderService.get_offender will return nil (due to "OUT" being an unrecognised Prison)
@@ -151,12 +151,12 @@ private
     offender = HmppsApi::PrisonApi::OffenderApi.get_offender(nomis_offender_id, ignore_legal_status: true)
 
     mail_params = {
-        email: primary_pom.email_address,
-        pom_name: primary_pom.first_name.titleize,
-        offender_name: offender.full_name,
-        nomis_offender_id: nomis_offender_id,
-        prison_name: Prison.find(prison).name,
-        url: Rails.application.routes.default_url_options[:host] +
+      email: primary_pom.email_address,
+      pom_name: primary_pom.first_name.titleize,
+      offender_name: offender.full_name,
+      nomis_offender_id: nomis_offender_id,
+      prison_name: Prison.find(prison).name,
+      url: Rails.application.routes.default_url_options[:host] +
             Rails.application.routes.url_helpers.prison_staff_caseload_path(prison, primary_pom_nomis_id)
     }
     update!(

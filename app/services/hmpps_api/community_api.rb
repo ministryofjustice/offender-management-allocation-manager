@@ -10,28 +10,28 @@ module HmppsApi
 
     def self.client
       host = Rails.configuration.community_api_host
-      HmppsApi::Client.new(host + '/secure')
+      HmppsApi::Client.new("#{host}/secure")
     end
 
-    def self.get_offender nomis_offender_id
+    def self.get_offender(nomis_offender_id)
       safe_offender_no = URI.encode_www_form_component(nomis_offender_id)
       route = "/offenders/nomsNumber/#{safe_offender_no}/all"
 
-      self.client.get(route)
+      client.get(route)
     end
 
-    def self.get_offender_registrations nomis_offender_id
+    def self.get_offender_registrations(nomis_offender_id)
       safe_offender_no = URI.encode_www_form_component(nomis_offender_id)
       route = "/offenders/nomsNumber/#{safe_offender_no}/registrations"
 
-      self.client.get(route)
+      client.get(route)
     end
 
-    def self.get_latest_resourcing nomis_offender_id
+    def self.get_latest_resourcing(nomis_offender_id)
       safe_offender_no = URI.encode_www_form_component(nomis_offender_id)
       route = "/offenders/nomsNumber/#{safe_offender_no}/risk/resourcing/latest"
 
-      self.client.get(route)
+      client.get(route)
     end
 
     def self.set_pom(offender_no:, prison:, forename:, surname:)
@@ -39,14 +39,14 @@ module HmppsApi
       route = "/offenders/nomsNumber/#{safe_offender_no}/prisonOffenderManager"
 
       body = {
-          nomsPrisonInstitutionCode: prison,
-          officer: {
-              forenames: forename,
-              surname: surname
-          }
+        nomsPrisonInstitutionCode: prison,
+        officer: {
+          forenames: forename,
+          surname: surname
+        }
       }
 
-      self.client.put(route, body)
+      client.put(route, body)
 
       # So long as the API call didn't error, return true
       # The API response body isn't useful to us
@@ -57,8 +57,7 @@ module HmppsApi
       safe_offender_no = URI.encode_www_form_component(offender_no)
       route = "/offenders/nomsNumber/#{safe_offender_no}/prisonOffenderManager"
 
-
-      self.client.delete(route)
+      client.delete(route)
 
       # So long as the API call didn't error, return true
       # The API response body isn't useful to us
@@ -80,11 +79,11 @@ module HmppsApi
 
         if date.nil?
           # Delete the date from nDelius
-          self.client.delete(route)
+          client.delete(route)
         else
           # Create/update the date in nDelius
           body = { date: date.strftime('%F') }
-          self.client.put(route, body)
+          client.put(route, body)
         end
       end
 

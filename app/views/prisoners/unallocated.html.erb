@@ -82,7 +82,7 @@
         </td>
 
         <td aria-label="Location for" class="govuk-table__cell">
-          <%= prisoner_location(offender, true) %>
+          <%= prisoner_location(offender, location_only: true) %>
         </td>
         <td aria-label="Earliest release<br/>date" class="govuk-table__cell">
           <%= format_date(offender.earliest_release_date, replacement: 'Unknown') %>

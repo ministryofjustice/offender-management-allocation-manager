@@ -6,13 +6,13 @@ RSpec.describe SuitableForEarlyAllocationEmailJob, type: :job do
 
   let(:api_offender) do
     build(:hmpps_api_offender, prisonId: prison.code,
-          sentence: attributes_for(:sentence_detail,
-                                   :determinate,
-                                   sentenceStartDate: Time.zone.today - 10.months,
-                                   conditionalReleaseDate: release_date,
-                                   automaticReleaseDate: release_date,
-                                   releaseDate: release_date,
-                                   tariffDate: nil))
+                               sentence: attributes_for(:sentence_detail,
+                                                        :determinate,
+                                                        sentenceStartDate: Time.zone.today - 10.months,
+                                                        conditionalReleaseDate: release_date,
+                                                        automaticReleaseDate: release_date,
+                                                        releaseDate: release_date,
+                                                        tariffDate: nil))
   end
 
   before do
@@ -26,7 +26,7 @@ RSpec.describe SuitableForEarlyAllocationEmailJob, type: :job do
 
     it 'does not send email' do
       create(:early_allocation, created_at: Time.zone.today - 9.months, updated_at: Time.zone.today - 9.months,
-             created_within_referral_window: false, nomis_offender_id: api_offender.offender_no)
+                                created_within_referral_window: false, nomis_offender_id: api_offender.offender_no)
 
       expect_any_instance_of(EarlyAllocationMailer).not_to receive(:review_early_allocation)
       described_class.perform_now(api_offender.offender_no)
@@ -59,7 +59,7 @@ RSpec.describe SuitableForEarlyAllocationEmailJob, type: :job do
 
         it 'does not send email' do
           create(:early_allocation, created_at: Time.zone.today - 9.months, updated_at: Time.zone.today - 9.months,
-                 created_within_referral_window: false, nomis_offender_id:  api_offender.offender_no)
+                                    created_within_referral_window: false, nomis_offender_id:  api_offender.offender_no)
 
           expect_any_instance_of(EarlyAllocationMailer).not_to receive(:review_early_allocation)
           described_class.perform_now(api_offender.offender_no)
@@ -71,7 +71,7 @@ RSpec.describe SuitableForEarlyAllocationEmailJob, type: :job do
 
         it 'does not send email' do
           create(:early_allocation, created_at: Time.zone.today - 9.months, updated_at: Time.zone.today - 9.months,
-                 created_within_referral_window: false, nomis_offender_id:  api_offender.offender_no)
+                                    created_within_referral_window: false, nomis_offender_id:  api_offender.offender_no)
 
           expect_any_instance_of(EarlyAllocationMailer).not_to receive(:review_early_allocation)
           described_class.perform_now(api_offender.offender_no)
@@ -88,7 +88,7 @@ RSpec.describe SuitableForEarlyAllocationEmailJob, type: :job do
 
           it 'sends email' do
             create(:early_allocation, created_at: Time.zone.today - 9.months, updated_at: Time.zone.today - 9.months,
-                   created_within_referral_window: false, nomis_offender_id:  api_offender.offender_no)
+                                      created_within_referral_window: false, nomis_offender_id:  api_offender.offender_no)
 
             expect_any_instance_of(EarlyAllocationMailer).to receive(:review_early_allocation).with(
               email: pom.email_address,
@@ -111,7 +111,7 @@ RSpec.describe SuitableForEarlyAllocationEmailJob, type: :job do
 
             it 'does not send email if email previously sent' do
               create(:early_allocation, created_at: Time.zone.today - 9.months, updated_at: Time.zone.today - 9.months,
-                     created_within_referral_window: false, nomis_offender_id:  api_offender.offender_no)
+                                        created_within_referral_window: false, nomis_offender_id:  api_offender.offender_no)
 
               expect_any_instance_of(EarlyAllocationMailer).not_to receive(:review_early_allocation)
               expect { described_class.perform_now(api_offender.offender_no) }.to change(EmailHistory, :count).by(0)
@@ -125,13 +125,13 @@ RSpec.describe SuitableForEarlyAllocationEmailJob, type: :job do
 
             it 'does send email' do
               create(:early_allocation, created_at: Time.zone.today - 9.months, updated_at: Time.zone.today - 9.months,
-                     created_within_referral_window: false, nomis_offender_id:  api_offender.offender_no)
+                                        created_within_referral_window: false, nomis_offender_id:  api_offender.offender_no)
               expect_any_instance_of(EarlyAllocationMailer).to receive(:review_early_allocation).with(
                 email: pom.email_address,
                 prisoner_name: api_offender.full_name,
                 start_page_link: "http://localhost:3000/prisons/#{api_offender.prison_id}/prisoners/#{api_offender.offender_no}/early_allocations",
                 equip_guidance_link: "https://equip-portal.rocstac.com/CtrlWebIsapi.dll/?__id=webDiagram.show&map=0%3A9A63E167DE4B400EA07F81A9271E1944&dgm=4F984B45CBC447B1A304B2FFECABB777"
-                ).and_call_original
+              ).and_call_original
 
               expect { described_class.perform_now(api_offender.offender_no) }.to change(EmailHistory, :count).by(1)
             end

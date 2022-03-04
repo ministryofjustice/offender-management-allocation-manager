@@ -5,11 +5,11 @@ feature 'email history' do
   let(:user) { build(:pom) }
 
   context 'when offender has less than 10 months left to serve' do
-    let(:nomis_offender) {
+    let(:nomis_offender) do
       build(:nomis_offender,
             prisonId: prison.code,
             sentence: attributes_for(:sentence_detail, :less_than_10_months_to_serve))
-    }
+    end
     let(:offender_no) { nomis_offender.fetch(:prisonerNumber) }
 
     before do

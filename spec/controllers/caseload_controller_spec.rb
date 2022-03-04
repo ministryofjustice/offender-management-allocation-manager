@@ -5,18 +5,18 @@ require 'rails_helper'
 RSpec.describe CaseloadController, type: :controller do
   let(:staff_id) { 456_987 }
   let(:not_signed_in) { 123_456 }
-  let(:poms) {
+  let(:poms) do
     [
-        build(:pom,
-              firstName: 'Alice',
-              staffId:  staff_id,
-              position: RecommendationService::PRISON_POM),
-        build(:pom,
-              firstName: 'John',
-              staffId:  not_signed_in,
-              position: RecommendationService::PRISON_POM)
+      build(:pom,
+            firstName: 'Alice',
+            staffId: staff_id,
+            position: RecommendationService::PRISON_POM),
+      build(:pom,
+            firstName: 'John',
+            staffId: not_signed_in,
+            position: RecommendationService::PRISON_POM)
     ]
-  }
+  end
   let(:pom) { poms.first }
 
   before do
@@ -28,13 +28,13 @@ RSpec.describe CaseloadController, type: :controller do
     let(:today) { Time.zone.today }
     let(:yesterday) { Time.zone.today - 1.day }
 
-    let(:offenders) {
+    let(:offenders) do
       [
         build(:nomis_offender, :rotl, complexityLevel: 'high'),
         build(:nomis_offender, complexityLevel: 'medium'),
         build(:nomis_offender, complexityLevel: 'low')
       ]
-    }
+    end
 
     before do
       # we need 3 data points - 1 in, 1 out on ROTL, 1 out on ROTL and returned.

@@ -4,14 +4,14 @@ RSpec.describe StaffMember, type: :model do
   let(:prison) { create(:prison) }
   let(:staff_id) { 123 }
   let(:user) { described_class.new(prison, staff_id) }
-  let(:offenders) {
+  let(:offenders) do
     [
       build(:nomis_offender, prisonerNumber: 'G7514GW', prisonId: prison.code),
       build(:nomis_offender, prisonerNumber: 'G1234VV', prisonId: prison.code),
       build(:nomis_offender, prisonerNumber: 'G1234AB', prisonId: prison.code),
       build(:nomis_offender, prisonerNumber: 'G1234GG', prisonId: prison.code)
     ]
-  }
+  end
 
   before do
     stub_auth_token
@@ -44,7 +44,7 @@ RSpec.describe StaffMember, type: :model do
   context 'when a POM has new and old allocations' do
     let(:old) { 8.days.ago }
 
-    let(:old_primary_alloc) {
+    let(:old_primary_alloc) do
       Timecop.travel(old) do
         create(
           :allocation_history,
@@ -53,45 +53,45 @@ RSpec.describe StaffMember, type: :model do
           prison: prison.code
         )
       end
-    }
+    end
 
-    let(:old_secondary_alloc) {
+    let(:old_secondary_alloc) do
       Timecop.travel(old) do
         create(
           :allocation_history,
           primary_pom_nomis_id: other_staff_id,
           nomis_offender_id: 'G1234VV',
           prison: prison.code
-        ).tap { |item|
+        ).tap do |item|
           item.update!(secondary_pom_nomis_id: staff_id)
-        }
+        end
       end
-    }
+    end
 
-    let(:primary_alloc) {
+    let(:primary_alloc) do
       create(
         :allocation_history,
         primary_pom_nomis_id: staff_id,
         nomis_offender_id: 'G1234AB',
         prison: prison.code
       )
-    }
+    end
 
-    let(:secondary_alloc) {
+    let(:secondary_alloc) do
       create(
         :allocation_history,
         primary_pom_nomis_id: other_staff_id,
         nomis_offender_id: 'G1234GG',
         secondary_pom_nomis_id: staff_id,
         prison: prison.code
-      ).tap { |item|
+      ).tap do |item|
         item.update!(secondary_pom_nomis_id: staff_id)
-      }
-    }
+      end
+    end
 
-    let!(:all_allocations) {
+    let!(:all_allocations) do
       [old_primary_alloc, old_secondary_alloc, primary_alloc, secondary_alloc]
-    }
+    end
 
     let(:other_staff_id) { 485_637 }
 

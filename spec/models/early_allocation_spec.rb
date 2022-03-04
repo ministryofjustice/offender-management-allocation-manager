@@ -40,9 +40,9 @@ RSpec.describe EarlyAllocation, type: :model do
   end
 
   context 'when extremism seperation is true' do
-    subject {
+    subject do
       build(:early_allocation_discretionary_form, :discretionary, extremism_separation: true, due_for_release_in_less_than_24months: twenty_four_flag)
-    }
+    end
 
     context 'when not set' do
       let(:twenty_four_flag) { nil }
@@ -70,9 +70,9 @@ RSpec.describe EarlyAllocation, type: :model do
   end
 
   context 'when extremism seperation is not set' do
-    subject {
+    subject do
       build(:early_allocation_discretionary_form)
-    }
+    end
 
     it 'is doesnt validate due_for_release_in_less_than_24months' do
       expect(subject).not_to be_valid
@@ -113,11 +113,11 @@ RSpec.describe EarlyAllocation, type: :model do
     end
 
     context 'with extremism_seperation true' do
-      subject {
+      subject do
         build(:early_allocation, :ineligible,
               extremism_separation: true,
               due_for_release_in_less_than_24months: release_24).ineligible?
-      }
+      end
 
       context 'when > 24 months' do
         let(:release_24) { false }
@@ -152,17 +152,16 @@ RSpec.describe EarlyAllocation, type: :model do
 
   describe '#early_allocation?' do
     let(:prison) { build(:prison) }
-    let(:api_offender) {
+    let(:api_offender) do
       build(:hmpps_api_offender,
             sentence: attributes_for(:sentence_detail, sentenceStartDate: Time.zone.today - 1.week))
-    }
+    end
     let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
-    let(:case_info) {
+    let(:case_info) do
       create(:case_information, offender: build(:offender,
                                                 early_allocations: [build(:early_allocation, :eligible, created_at: assessment_date)]))
-    }
-
+    end
 
     context 'when early allocations comes before the current sentence start date' do
       let(:assessment_date) { Time.zone.today - 2.weeks }

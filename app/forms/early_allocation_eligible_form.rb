@@ -13,8 +13,8 @@ class EarlyAllocationEligibleForm
     attribute field, :boolean
 
     validates(field, inclusion: {
-        in: [true, false],
-        allow_nil: false
+      in: [true, false],
+      allow_nil: false
     })
   end
 end

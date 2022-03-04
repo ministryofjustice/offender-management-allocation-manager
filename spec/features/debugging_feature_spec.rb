@@ -25,7 +25,7 @@ feature 'Provide debugging information for our team to use' do
              prison: 'LEI',
              nomis_offender_id: nomis_offender_id,
              primary_pom_name: "Rossana Spinka"
-             )
+            )
       visit prison_debugging_path('LEI')
 
       expect(page).to have_text('Debugging')
@@ -81,9 +81,9 @@ feature 'Provide debugging information for our team to use' do
               sentence: attributes_for(:sentence_detail, :unsentenced))
       end
       let(:case_info) { create(:case_information, case_allocation: CaseInformation::NPS, offender: build(:offender, nomis_offender_id: nomis_offender_id)) }
-      let(:non_sentenced_offender) {
+      let(:non_sentenced_offender) do
         build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_non_sentenced_offender)
-      }
+      end
 
       before do
         allow(OffenderService).to receive(:get_offender).and_return(non_sentenced_offender)

@@ -6,12 +6,12 @@ feature "edit a POM's details" do
   context 'when not VCR tests' do
     let(:spo) { build(:pom) }
     let!(:prison) { create(:prison) }
-    let(:probation_poms) {
+    let(:probation_poms) do
       [
         build(:pom, :probation_officer),
         build(:pom, :probation_officer)
       ]
-    }
+    end
     let(:offenders) { build_list(:nomis_offender, 2, prisonId: prison.code) }
 
     before do
@@ -29,14 +29,14 @@ feature "edit a POM's details" do
       end
     end
 
-    context 'when the back button is clicked'do
+    context 'when the back button is clicked' do
       it 'returns to the "view a POM screen"' do
         click_link 'Back'
         expect(page).to have_current_path(prison_pom_path(prison_id: prison.code, nomis_staff_id: spo.staffId))
       end
     end
 
-    context 'when the cancel button is clicked'do
+    context 'when the cancel button is clicked' do
       it 'returns to the "view a POM screen"' do
         click_link 'Cancel'
         expect(page).to have_current_path(prison_pom_path(prison_id: prison.code, nomis_staff_id: spo.staffId))

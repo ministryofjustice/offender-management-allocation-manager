@@ -64,33 +64,33 @@ class EmailService
 
   private
 
-    def offender_for allocation
+    def offender_for(allocation)
       OffenderService.get_offender(allocation.nomis_offender_id)
     end
 
-    def pom_for allocation, pom_nomis_id
+    def pom_for(allocation, pom_nomis_id)
       Prison.find(allocation.prison).get_single_pom(pom_nomis_id)
     end
 
-    def current_responsibility offender
+    def current_responsibility(offender)
       offender.pom_responsible? ? 'responsible' : 'supporting'
     end
 
-    def previous_pom_for allocation
+    def previous_pom_for(allocation)
       # Check the versions (there MUST be previous records if this is a reallocation)
       # and find the last version with a primary_pom id that is not the same as the
       # allocation. That will be the POM that is notified of a reallocation.
       versions = allocation.get_old_versions
 
-      previous = versions.reverse.detect { |version|
+      previous = versions.reverse.detect do |version|
         version.primary_pom_nomis_id.present? && version.primary_pom_nomis_id != allocation.primary_pom_nomis_id
-      }
+      end
       return nil if previous.blank?
 
       HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(previous.primary_pom_nomis_id)
     end
 
-    def send_deallocation_email pom:, allocation:
+    def send_deallocation_email(pom:, allocation:)
       if allocation.event == 'reallocate_primary_pom'
         previous_pom = previous_pom_for(allocation)
         # If the previous pom does not have email configured, do not
@@ -112,7 +112,7 @@ class EmailService
       end
     end
 
-    def deliver_new_allocation_email pom:, message:, allocation:
+    def deliver_new_allocation_email(pom:, message:, allocation:)
       offender = offender_for(allocation)
 
       PomMailer.new_allocation_email(

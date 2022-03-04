@@ -29,7 +29,7 @@ feature "female prison index page" do
   let(:offender_ready_to_allocate) { build(:nomis_offender, complexityLevel: 'medium') }
   let(:newly_arrived_offender) { build(:nomis_offender, sentence: attributes_for(:sentence_detail, sentenceStartDate: Time.zone.today)) }
 
-  let(:offenders) {
+  let(:offenders) do
     [offender_with_missing_info_one,
      offender_with_missing_info_two,
      offender_with_missing_info_three,
@@ -38,7 +38,7 @@ feature "female prison index page" do
      offender_ready_to_allocate,
      newly_arrived_offender
     ]
-  }
+  end
 
   describe 'missing details page' do
     before do

@@ -197,9 +197,9 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
     before do
       stub_community_offender(nomis_offender_id, build(:community_data,
                                                        offenderManagers: [
-                                                           build(:community_offender_manager,
-                                                                 team: { code: "XYX",
-                                                                         localDeliveryUnit: { code: ldu.code } })
+                                                         build(:community_offender_manager,
+                                                               team: { code: "XYX",
+                                                                       localDeliveryUnit: { code: ldu.code } })
                                                        ]), registrations)
     end
 
@@ -311,9 +311,9 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
     end
 
     context 'when updating an existing Case Information record' do
-      let!(:case_info) {
+      let!(:case_info) do
         create(:case_information, tier: 'B', offender: build(:offender, nomis_offender_id: offender_no), crn: crn)
-      }
+      end
 
       include_examples 'recalculate handover dates'
 

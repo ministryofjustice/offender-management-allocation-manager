@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe ApplicationHelper do
   describe 'formatting date strings' do
     it 'displays a date object into a specific string format' do
-      date = '2019-07-9T08:54:07'.to_datetime
+      date = Time.zone.parse '2019-07-9T08:54:07'
       expect(format_date_long(date)).to eq('9th July 2019 (08:54)')
     end
   end

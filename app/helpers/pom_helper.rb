@@ -2,7 +2,7 @@
 
 module PomHelper
   def format_working_pattern(pattern)
-    if pattern == 1.0
+    if pattern.to_d == 1.0.to_d
       'Full time'
     else
       "Part time – #{pattern}"

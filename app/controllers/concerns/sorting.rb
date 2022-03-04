@@ -26,7 +26,7 @@ private
     end
   end
 
-  def compare_via_public_send field, direction, item1, item2
+  def compare_via_public_send(field, direction, item1, item2)
     if direction != :desc
       a = item1.public_send(field)
       b = item2.public_send(field)

@@ -12,8 +12,8 @@ class MovementsOnDateJob < ApplicationJob
 
     # Ensure that 1 movement failure doesn't prevent all the others from running
     # If we were to catch the exception here, then Sentry wouldn't report it :-(
-    movements.each { |movement|
+    movements.each do |movement|
       MovementJob.perform_later(movement.to_json)
-    }
+    end
   end
 end

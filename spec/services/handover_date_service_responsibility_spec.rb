@@ -18,11 +18,11 @@ describe HandoverDateService do
         let(:arrival_date) { recent_date }
 
         context 'when welsh' do
-          let(:api_offender) {
-            build(:hmpps_api_offender, :prescoed, sentence: attributes_for(:sentence_detail, :welsh_policy_sentence)).tap { |o|
+          let(:api_offender) do
+            build(:hmpps_api_offender, :prescoed, sentence: attributes_for(:sentence_detail, :welsh_policy_sentence)).tap do |o|
               o.prison_arrival_date = arrival_date
-            }
-          }
+            end
+          end
 
           context 'with NPS' do
             let(:case_info) { build(:case_information, :welsh, :nps) }
@@ -42,11 +42,11 @@ describe HandoverDateService do
         end
 
         context 'when english' do
-          let(:api_offender) {
-            build(:hmpps_api_offender, :prescoed, sentence: attributes_for(:sentence_detail, :english_policy_sentence)).tap { |o|
+          let(:api_offender) do
+            build(:hmpps_api_offender, :prescoed, sentence: attributes_for(:sentence_detail, :english_policy_sentence)).tap do |o|
               o.prison_arrival_date = arrival_date
-            }
-          }
+            end
+          end
 
           context 'with NPS english offender' do
             let(:case_info) { build(:case_information, :english, :nps) }
@@ -59,11 +59,11 @@ describe HandoverDateService do
       end
 
       context 'with past NPS welsh offender' do
-        let(:api_offender) {
-          build(:hmpps_api_offender, :prescoed, sentence: attributes_for(:sentence_detail, :welsh_policy_sentence)).tap { |o|
+        let(:api_offender) do
+          build(:hmpps_api_offender, :prescoed, sentence: attributes_for(:sentence_detail, :welsh_policy_sentence)).tap do |o|
             o.prison_arrival_date = arrival_date
-          }
-        }
+          end
+        end
 
         let(:arrival_date) { past_date }
         let(:case_info) { build(:case_information, :welsh, :nps) }
@@ -75,10 +75,10 @@ describe HandoverDateService do
     end
 
     context 'when an immigration offender' do
-      let(:offender) {
+      let(:offender) do
         OpenStruct.new immigration_case?: true,
                        inside_omic_policy?: true
-      }
+      end
 
       it 'will show the POM as supporting' do
         expect(pom).to be_supporting
@@ -86,11 +86,11 @@ describe HandoverDateService do
     end
 
     context 'when an offender has been recalled' do
-      let(:offender) {
+      let(:offender) do
         OpenStruct.new recalled?: true,
                        automatic_release_date: Time.zone.today,
                        inside_omic_policy?: true
-      }
+      end
 
       it 'will show the POM as supporting' do
         expect(pom).to be_supporting
@@ -98,10 +98,10 @@ describe HandoverDateService do
     end
 
     context 'when an offender has been recalled & does not have any relevant release dates' do
-      let(:offender) {
+      let(:offender) do
         OpenStruct.new recalled?: true,
                        inside_omic_policy?: true
-      }
+      end
 
       it 'will show the case as POM supporting' do
         expect(pom).to be_supporting
@@ -109,7 +109,7 @@ describe HandoverDateService do
     end
 
     context 'when relevant release dates are missing' do
-      let(:offender) {
+      let(:offender) do
         OpenStruct.new immigration_case?: false,
                        indeterminate_sentence?: false,
                        nps_case?: true,
@@ -118,7 +118,7 @@ describe HandoverDateService do
                        home_detention_curfew_eligibility_date: nil,
                        parole_eligibility_date: nil,
                        inside_omic_policy?: true
-      }
+      end
 
       it 'will default to responsible' do
         expect(pom).to be_responsible
@@ -126,12 +126,12 @@ describe HandoverDateService do
     end
 
     context 'when indeterminate with dates in the past' do
-      let(:offender) {
+      let(:offender) do
         OpenStruct.new indeterminate_sentence?: true,
                        recalled?: false,
                        tariff_date: Time.zone.today - 1.year,
                        inside_omic_policy?: true
-      }
+      end
 
       it 'is responsible' do
         expect(pom).to be_responsible
@@ -139,12 +139,12 @@ describe HandoverDateService do
     end
 
     context 'when indeterminate with no tariff date' do
-      let(:offender) {
+      let(:offender) do
         OpenStruct.new immigration_case?: false,
                        indeterminate_sentence?: true,
                        tariff_date: nil,
                        inside_omic_policy?: true
-      }
+      end
 
       it 'will default to responsible' do
         expect(pom).to be_responsible
@@ -152,14 +152,14 @@ describe HandoverDateService do
     end
 
     context 'when incorrect service provider entered for indeterminate offender' do
-      let(:offender) {
+      let(:offender) do
         OpenStruct.new  nps_case?: false,
                         welsh_offender: false,
                         indeterminate_sentence?: true,
                         sentence_start_date: Time.zone.today,
                         tariff_date: Time.zone.today + 24.months,
                         inside_omic_policy?: true
-      }
+      end
 
       it 'will calculate the responsibility using NPS rules' do
         expect(pom).to be_responsible
@@ -170,7 +170,7 @@ describe HandoverDateService do
       # CRC rules do not take into account whether the offender is located at an open or closed prison, the rules
       # remain the same
       context 'when an offender is in a public prison' do
-        let(:offender) {
+        let(:offender) do
           OpenStruct.new  nps_case?: false,
                           welsh_offender: false,
                           sentence_start_date: Time.zone.today,
@@ -179,7 +179,7 @@ describe HandoverDateService do
                           home_detention_curfew_actual_date: hdcad,
                           home_detention_curfew_eligibility_date: hdced,
                           inside_omic_policy?: true
-        }
+        end
 
         context 'with less than 12 weeks left to serve with home_detention_curfew_eligibility_date' do
           let(:ard)   { nil }
@@ -265,13 +265,13 @@ describe HandoverDateService do
             end
 
             let(:case_info) { build(:case_information, :english) }
-            let(:api_offender) {
+            let(:api_offender) do
               build(:hmpps_api_offender, prison_id: 'VEI',
-                    sentence: attributes_for(:sentence_detail,
-                                             sentenceStartDate: sentence_start_date,
-                                             automaticReleaseDate: ard,
-                                             conditionalReleaseDate: crd))
-            }
+                                         sentence: attributes_for(:sentence_detail,
+                                                                  sentenceStartDate: sentence_start_date,
+                                                                  automaticReleaseDate: ard,
+                                                                  conditionalReleaseDate: crd))
+            end
 
             context 'with over 20 months left to serve' do
               let(:ard)   { sentence_start_date + 21.months }
@@ -301,7 +301,7 @@ describe HandoverDateService do
               Timecop.return
             end
 
-            let(:offender) {
+            let(:offender) do
               OpenStruct.new  prison_id: 'TSI',
                               nps_case?: true,
                               welsh_offender: false,
@@ -309,7 +309,7 @@ describe HandoverDateService do
                               automatic_release_date: ard,
                               conditional_release_date: nil,
                               inside_omic_policy?: true
-            }
+            end
 
             context 'with expected release on the cutoff date' do
               let(:ard) { '1 June 2021'.to_date }
@@ -329,7 +329,7 @@ describe HandoverDateService do
           end
 
           context 'when a determinate NPS offender' do
-            let(:offender) {
+            let(:offender) do
               OpenStruct.new(
                 nps_case?: true,
                 welsh_offender: false,
@@ -338,7 +338,7 @@ describe HandoverDateService do
                 conditional_release_date: nil,
                 inside_omic_policy?: true
               )
-            }
+            end
 
             context 'when release date greater than cutoff date and within the handover window' do
               let(:ard) { '16 Feb 2021'.to_date }
@@ -374,22 +374,22 @@ describe HandoverDateService do
               let(:ard) { nil }
 
               it 'will return responsible as the offenders release is not calculatable' do
-                expect(pom).
-                  to be_responsible
+                expect(pom)
+                  .to be_responsible
               end
             end
           end
 
           context 'when a determinate NPS offender with parole eligibility' do
             let(:sentence_start_date) { Time.zone.today - 10.months }
-            let(:offender) {
+            let(:offender) do
               OpenStruct.new  nps_case?: true,
                               welsh_offender: false,
                               indeterminate_sentence?: false,
                               sentence_start_date: sentence_start_date,
                               parole_eligibility_date: ped,
                               inside_omic_policy?: true
-            }
+            end
 
             context 'with more than 17 months left to serve' do
               let(:ped) { sentence_start_date + 19.months }
@@ -409,14 +409,14 @@ describe HandoverDateService do
           end
 
           context 'when an indeterminate NPS offender' do
-            let(:offender) {
+            let(:offender) do
               OpenStruct.new  nps_case?: true,
                               welsh_offender: false,
                               indeterminate_sentence?: true,
                               sentence_start_date: sentence_start_date,
                               tariff_date: ted,
                               inside_omic_policy?: true
-            }
+            end
 
             context 'with more than 17 months left to serve and handover in future' do
               let(:ted) { sentence_start_date + 18.months }
@@ -440,14 +440,14 @@ describe HandoverDateService do
 
         context 'when sentenced after policy start date' do
           context 'when a determinate NPS offender' do
-            let(:offender) {
+            let(:offender) do
               OpenStruct.new  nps_case?: true,
                               welsh_offender: false,
                               sentence_start_date: Time.zone.today,
                               automatic_release_date: ard,
                               conditional_release_date: crd,
                               inside_omic_policy?: true
-            }
+            end
 
             context 'with more than 10 months left to serve' do
               let(:ard)   { Time.zone.today + 14.months }
@@ -469,14 +469,14 @@ describe HandoverDateService do
           end
 
           context 'when a determinate NPS offender with parole eligibility' do
-            let(:offender) {
+            let(:offender) do
               OpenStruct.new  nps_case?: true,
                               welsh_offender: false,
                               indeterminate_sentence?: false,
                               sentence_start_date: Time.zone.today,
                               parole_eligibility_date: ped,
                               inside_omic_policy?: true
-            }
+            end
 
             context 'with more than 10 months left to service' do
               let(:ped) { Time.zone.today + 12.months }
@@ -496,14 +496,14 @@ describe HandoverDateService do
           end
 
           context 'when an indeterminate NPS offender' do
-            let(:offender) {
+            let(:offender) do
               OpenStruct.new  nps_case?: true,
                               welsh_offender: false,
                               indeterminate_sentence?: true,
                               sentence_start_date: Time.zone.today,
                               tariff_date: ted,
                               inside_omic_policy?: true
-            }
+            end
 
             context 'with more than 10 months left to serve' do
               let(:ted) { Time.zone.today + 14.months }
@@ -529,14 +529,14 @@ describe HandoverDateService do
           let(:sentence_start_date) { Date.parse('03-02-2019') }
 
           context 'when a determinate NPS offender' do
-            let(:offender) {
+            let(:offender) do
               OpenStruct.new  nps_case?: true,
                               welsh_offender: true,
                               sentence_start_date: sentence_start_date,
                               automatic_release_date: ard,
                               conditional_release_date: nil,
                               inside_omic_policy?: true
-            }
+            end
 
             context 'when release date greater than cutoff date and within the handover window' do
               let(:ard) { '20 May 2020'.to_date }
@@ -572,21 +572,21 @@ describe HandoverDateService do
               let(:ard) { nil }
 
               it 'will return responsibile as offender release date is not calculable' do
-                expect(pom).
-                  to be_responsible
+                expect(pom)
+                  .to be_responsible
               end
             end
           end
 
           context 'when a determinate NPS offender with parole eligibility' do
-            let(:offender) {
+            let(:offender) do
               OpenStruct.new  nps_case?: true,
                               welsh_offender: true,
                               indeterminate_sentence?: false,
                               sentence_start_date: Time.zone.today,
                               parole_eligibility_date: ped,
                               inside_omic_policy?: true
-            }
+            end
 
             context 'with more than 10 months left to serve' do
               let(:ped) { Time.zone.today + 12.months }
@@ -606,14 +606,14 @@ describe HandoverDateService do
           end
 
           context 'when an indeterminate NPS offender' do
-            let(:offender) {
+            let(:offender) do
               OpenStruct.new  nps_case?: true,
                               welsh_offender: true,
                               indeterminate_sentence?: true,
                               sentence_start_date: sentence_start_date,
                               tariff_date: ted,
                               inside_omic_policy?: true
-            }
+            end
 
             context 'with more than 15 months left to serve' do
               let(:ted) { sentence_start_date + 18.months }
@@ -649,14 +649,14 @@ describe HandoverDateService do
 
         context 'when sentenced after policy start date' do
           context 'when a determinate NPS offender' do
-            let(:offender) {
+            let(:offender) do
               OpenStruct.new  nps_case?: true,
                               welsh_offender: true,
                               sentence_start_date: Time.zone.today,
                               automatic_release_date: ard,
                               conditional_release_date: crd,
                               inside_omic_policy?: true
-            }
+            end
 
             context 'with more than 10 months left to serve' do
               let(:ard)   { Time.zone.today + 14.months }
@@ -678,14 +678,14 @@ describe HandoverDateService do
           end
 
           context 'when a determinate NPS offender with parole eligibility' do
-            let(:offender) {
+            let(:offender) do
               OpenStruct.new  nps_case?: true,
                               welsh_offender: true,
                               indeterminate_sentence?: false,
                               sentence_start_date: Time.zone.today,
                               parole_eligibility_date: ped,
                               inside_omic_policy?: true
-            }
+            end
 
             context 'with more than 10 months left to service' do
               let(:ped) { Time.zone.today + 12.months }
@@ -705,14 +705,14 @@ describe HandoverDateService do
           end
 
           context 'when an indeterminate NPS offender' do
-            let(:offender) {
+            let(:offender) do
               OpenStruct.new  nps_case?: true,
                               welsh_offender: true,
                               indeterminate_sentence?: true,
                               sentence_start_date: Time.zone.today,
                               tariff_date: ted,
                               inside_omic_policy?: true
-            }
+            end
 
             context 'with more than 10 months left to serve' do
               let(:ted) { Time.zone.today + 14.months }
@@ -735,7 +735,7 @@ describe HandoverDateService do
     end
 
     context 'when home detention curfew eligibility date is before the start of handover' do
-      let(:offender) {
+      let(:offender) do
         OpenStruct.new nps_case?: nps_case,
                        indeterminate_sentence?: indeterminate,
                        recalled?: false,
@@ -745,7 +745,7 @@ describe HandoverDateService do
                        tariff_date: ted,
                        sentence_start_date: Time.zone.today - 2.months,
                        inside_omic_policy?: true
-      }
+      end
 
       context 'with a NPS case' do
         let(:indeterminate) { false }

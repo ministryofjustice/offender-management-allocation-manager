@@ -21,9 +21,9 @@ RSpec.describe "allocation_staff/index", type: :view do
   end
 
   context "when indeterminate" do
-    let(:api_offender) {
+    let(:api_offender) do
       build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :indeterminate))
-    }
+    end
 
     it "displays an indeterminate case type badge" do
       assert_you_have_an_indeterminate_badge
@@ -31,9 +31,9 @@ RSpec.describe "allocation_staff/index", type: :view do
   end
 
   context "when determinate" do
-    let(:api_offender) {
+    let(:api_offender) do
       build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :determinate))
-    }
+    end
 
     it "displays an determinate case type badge" do
       assert_you_have_a_determinate_badge
@@ -41,9 +41,9 @@ RSpec.describe "allocation_staff/index", type: :view do
   end
 
   context "when recall" do
-    let(:api_offender) {
+    let(:api_offender) do
       build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :indeterminate_recall))
-    }
+    end
 
     it "displays a recall case type badge and a indeterminate badge" do
       expect(case_type_badge.first.attributes['class'].value).to include 'moj-badge--purple'
@@ -53,11 +53,11 @@ RSpec.describe "allocation_staff/index", type: :view do
   end
 
   context "when parole eligibility(PED)" do
-    let(:api_offender) {
+    let(:api_offender) do
       build(:hmpps_api_offender,
             sentence: attributes_for(:sentence_detail,
                                      :indeterminate, paroleEligibilityDate: Time.zone.today.to_s))
-    }
+    end
 
     it "displays an parole eligibility case type badge" do
       assert_you_have_a_parole_eligibility_badge
@@ -66,9 +66,9 @@ RSpec.describe "allocation_staff/index", type: :view do
   end
 
   context "when parole eligibility(TED)" do
-    let(:api_offender) {
+    let(:api_offender) do
       build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :determinate, tariffDate: Time.zone.today.to_s))
-    }
+    end
 
     it "displays an parole eligibility case type badge and determinate badge" do
       assert_you_have_a_parole_eligibility_badge
@@ -78,13 +78,13 @@ RSpec.describe "allocation_staff/index", type: :view do
 
   context "when there is a parole review date" do
     let(:offender_no) { 'G7514GW' }
-    let(:case_info) {
+    let(:case_info) do
       build(:case_information, offender: build(:offender, nomis_offender_id: offender_no,
-                                                               parole_record: build(:parole_record, parole_review_date: Date.new(2019, 0o1, 3).to_s)))
-    }
-    let(:api_offender) {
+                                                          parole_record: build(:parole_record, parole_review_date: Date.new(2019, 0o1, 3).to_s)))
+    end
+    let(:api_offender) do
       build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :indeterminate), prisonerNumber: offender_no)
-    }
+    end
 
     it "displays an parole eligibility case type badge" do
       assert_you_have_an_indeterminate_badge
@@ -96,10 +96,10 @@ RSpec.describe "allocation_staff/index", type: :view do
   context 'when parole eligibility (both TED and PRD) and parole review date are nil' do
     let(:offender_no) { 'G7514GW' }
     let(:case_info) { build(:case_information, offender: build(:offender, nomis_offender_id: offender_no)) }
-    let(:api_offender) {
+    let(:api_offender) do
       build(:hmpps_api_offender, prisonerNumber: offender_no,
-       sentence: attributes_for(:sentence_detail, :indeterminate, tariffDate: nil))
-    }
+                                 sentence: attributes_for(:sentence_detail, :indeterminate, tariffDate: nil))
+    end
 
     it 'does not display the badge' do
       expect(offender.tariff_date).to eq nil
@@ -111,10 +111,10 @@ RSpec.describe "allocation_staff/index", type: :view do
   end
 
   context "when indeterminate, a recall case and parole eligibility(PED)" do
-    let(:api_offender) {
+    let(:api_offender) do
       build(:hmpps_api_offender,
             sentence: attributes_for(:sentence_detail, :indeterminate_recall, paroleEligibilityDate: Time.zone.today.to_s))
-    }
+    end
 
     it "displays an indeterminate, parole eligibility and recall case type badges" do
       assert_you_have_an_indeterminate_badge

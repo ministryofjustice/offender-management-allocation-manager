@@ -13,8 +13,8 @@ RSpec.describe "allocations/history", type: :view do
     assign(:history, history + early_allocations.map { |ea| EarlyAllocationHistory.new(ea) })
     assign(:timeline, build(:hmpps_api_prison_timeline, movements: build_list(:movement, 1)))
     stub_auth_token
-    stub_pom_emails 123456, []
-    stub_pom_emails 485926, []
+    stub_pom_emails 123_456, []
+    stub_pom_emails 485_926, []
   end
 
   context 'with early allocations' do
@@ -36,7 +36,7 @@ RSpec.describe "allocations/history", type: :view do
     let(:history) { [] }
 
     context 'with an ineligible early allocation' do
-      let(:ea) { create(:early_allocation, :ineligible, created_at: DateTime.new(2019, 11, 19, 11, 28, 0)) }
+      let(:ea) { create(:early_allocation, :ineligible, created_at: Time.zone.local(2019, 11, 19, 11, 28, 0)) }
       let(:early_allocations) { [ea] }
 
       it 'shows a single record' do
@@ -51,7 +51,7 @@ RSpec.describe "allocations/history", type: :view do
     end
 
     context 'with an eligible unsent early alloc' do
-      let(:ea) { create(:early_allocation, :pre_window, created_at: DateTime.new(2019, 11, 19, 11, 28, 0)) }
+      let(:ea) { create(:early_allocation, :pre_window, created_at: Time.zone.local(2019, 11, 19, 11, 28, 0)) }
       let(:early_allocations) { [ea] }
 
       it 'shows a single record' do
@@ -68,7 +68,7 @@ RSpec.describe "allocations/history", type: :view do
     end
 
     context 'with an ineligible unsent early alloc' do
-      let(:ea) { create(:early_allocation, :pre_window, :ineligible, created_at: DateTime.new(2019, 11, 19, 11, 28, 0)) }
+      let(:ea) { create(:early_allocation, :pre_window, :ineligible, created_at: Time.zone.local(2019, 11, 19, 11, 28, 0)) }
       let(:early_allocations) { [ea] }
 
       it 'shows a single record' do
@@ -83,7 +83,7 @@ RSpec.describe "allocations/history", type: :view do
     end
 
     context 'with a discretionary unsent early alloc' do
-      let(:ea) { create(:early_allocation, :pre_window, :discretionary, created_at: DateTime.new(2019, 11, 19, 11, 28, 0)) }
+      let(:ea) { create(:early_allocation, :pre_window, :discretionary, created_at: Time.zone.local(2019, 11, 19, 11, 28, 0)) }
       let(:early_allocations) { [ea] }
 
       it 'shows a single record' do
@@ -100,7 +100,7 @@ RSpec.describe "allocations/history", type: :view do
     end
 
     context 'with an eligible early allocation' do
-      let(:ea) { create(:early_allocation, created_at: DateTime.new(2019, 11, 19, 11, 28, 0)) }
+      let(:ea) { create(:early_allocation, created_at: Time.zone.local(2019, 11, 19, 11, 28, 0)) }
       let(:early_allocations) { [ea] }
 
       it 'shows a single record' do
@@ -116,7 +116,7 @@ RSpec.describe "allocations/history", type: :view do
     end
 
     context 'with a disretionary early allocation' do
-      let(:ea) { create(:early_allocation, :discretionary, created_at: DateTime.new(2019, 11, 19, 11, 28, 0)) }
+      let(:ea) { create(:early_allocation, :discretionary, created_at: Time.zone.local(2019, 11, 19, 11, 28, 0)) }
       let(:early_allocations) { [ea] }
 
       it 'shows a single record' do
@@ -132,7 +132,7 @@ RSpec.describe "allocations/history", type: :view do
     end
 
     context 'when community accept the case' do
-      let(:ea) { create(:early_allocation, :discretionary_accepted, created_at: DateTime.new(2019, 11, 19, 11, 28, 0), updated_at: DateTime.new(2019, 11, 21, 11, 35, 0)) }
+      let(:ea) { create(:early_allocation, :discretionary_accepted, created_at: Time.zone.local(2019, 11, 19, 11, 28, 0), updated_at: Time.zone.local(2019, 11, 21, 11, 35, 0)) }
       let(:early_allocations) { [] }
       let(:history) { [EarlyAllocationHistory.new(ea), EarlyAllocationDecision.new(ea)] }
 
@@ -153,7 +153,7 @@ RSpec.describe "allocations/history", type: :view do
     end
 
     context 'when community reject the case' do
-      let(:ea) { create(:early_allocation, :discretionary_declined, created_at: DateTime.new(2019, 11, 19, 11, 28, 0), updated_at: DateTime.new(2019, 11, 21, 11, 35, 0)) }
+      let(:ea) { create(:early_allocation, :discretionary_declined, created_at: Time.zone.local(2019, 11, 19, 11, 28, 0), updated_at: Time.zone.local(2019, 11, 21, 11, 35, 0)) }
       let(:early_allocations) { [] }
       let(:history) { [EarlyAllocationHistory.new(ea), EarlyAllocationDecision.new(ea)] }
 
@@ -229,14 +229,14 @@ RSpec.describe "allocations/history", type: :view do
     end
 
     context 'when a prisoner has been released' do
-      let(:history) {
+      let(:history) do
         [build(:allocation_history, :primary),
-         build(:allocation_history, :release)].
-          map { |ah| CaseHistory.new(nil, ah, released_version) }
-      }
+         build(:allocation_history, :release)]
+          .map { |ah| CaseHistory.new(nil, ah, released_version) }
+      end
 
       let(:released_version) { Struct.new(:object_changes).new({ 'updated_at' => [release_date_and_time, release_date_and_time] }.to_yaml) }
-      let(:release_date_and_time) { DateTime.new(2019, 11, 19, 11, 28, 0) }
+      let(:release_date_and_time) { Time.zone.local(2019, 11, 19, 11, 28, 0) }
 
       it 'displays a release label and the release date and time in the allocation history' do
         render

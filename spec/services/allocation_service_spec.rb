@@ -17,14 +17,14 @@ describe AllocationService do
     let(:secondary_pom_id) { moic_test_id }
     let(:message) { 'Additional text' }
 
-    let!(:allocation) {
+    let!(:allocation) do
       create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
       create(:allocation_history,
              prison: 'LEI',
              nomis_offender_id: nomis_offender_id,
              primary_pom_nomis_id: primary_pom_id,
              primary_pom_name: 'Pom, Moic')
-    }
+    end
 
     it 'sends an email to both primary and secondary POMS', vcr: { cassette_name: 'prison_api/allocation_service_allocate_secondary' } do
       expect {
@@ -32,7 +32,7 @@ describe AllocationService do
                                            secondary_pom_nomis_id: secondary_pom_id,
                                            created_by_username: 'MOIC_POM',
                                            message: message
-        )
+                                          )
         expect(allocation.reload.secondary_pom_nomis_id).to eq(secondary_pom_id)
         expect(allocation.reload.secondary_pom_name).to eq('INTEGRATION-TESTS, MOIC')
       }.to change(enqueued_jobs, :count).by(2)
@@ -42,8 +42,8 @@ describe AllocationService do
       # mail telling the primary POM about the co-working POM
       primary_args_hash = primary_email_job[:args][3]['args'][0]
       secondary_args_hash = secondary_email_job[:args][3]['args'][0]
-      expect(primary_args_hash).
-        to match(
+      expect(primary_args_hash)
+        .to match(
           hash_including(
             "message" => message,
             "offender_name" => "Annole, Omistius",
@@ -54,8 +54,8 @@ describe AllocationService do
           ))
 
       # message telling co-working POM who the Primary POM is.
-      expect(secondary_args_hash).
-        to match(
+      expect(secondary_args_hash)
+        .to match(
           hash_including(
             "message" => message,
             "pom_name" => "Moic",
@@ -74,8 +74,8 @@ describe AllocationService do
       before do
         create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
         stub_auth_token
-        stub_request(:get, "#{ApiHelper::T3}/users/MOIC_POM").
-          to_return(body: { staffId: 1, firstName: "MOIC", lastName: 'POM' }.to_json)
+        stub_request(:get, "#{ApiHelper::T3}/users/MOIC_POM")
+          .to_return(body: { staffId: 1, firstName: "MOIC", lastName: 'POM' }.to_json)
         stub_pom_emails 1, []
         stub_offender(build(:nomis_offender, prisonId: prison_code, prisonerNumber: nomis_offender_id))
         stub_poms prison_code, [pom]
@@ -90,7 +90,7 @@ describe AllocationService do
           prison: prison_code,
           allocated_at_tier: 'A',
           primary_pom_nomis_id: 485_833,
-          primary_pom_allocated_at: DateTime.now.utc,
+          primary_pom_allocated_at: Time.zone.now.utc,
           recommended_pom_type: 'probation',
           event: AllocationHistory::ALLOCATE_PRIMARY_POM,
           event_trigger: AllocationHistory::USER,

@@ -35,9 +35,9 @@ private
         # create the history first so that the validations will help with hard failures due to coding errors
         # rather than waiting for the mailer to object
         db_offender.email_histories.create! prison: nomis_offender.prison_id,
-                                          name: case_info.ldu_name,
-                                          email: case_info.ldu_email_address,
-                                          event: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION
+                                            name: case_info.ldu_name,
+                                            email: case_info.ldu_email_address,
+                                            event: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION
         # This is queued so that soft failures don't kill the whole job
         CommunityMailer.assign_com_less_than_10_months(
           email: case_info.ldu_email_address,
@@ -58,14 +58,14 @@ private
     request_supporting_com record, db_offender, nomis_offender
   end
 
-  def push_to_delius record
+  def push_to_delius(record)
     # Don't push if the dates haven't changed
     if record.saved_change_to_start_date? || record.saved_change_to_handover_date?
       PushHandoverDatesToDeliusJob.perform_later record
     end
   end
 
-  def request_supporting_com record, offender, nomis_offender
+  def request_supporting_com(record, offender, nomis_offender)
     reason_change = %w[nps_indeterminate nps_indeterminate_open]
     responsibility_change = [CalculatedHandoverDate::CUSTODY_ONLY, CalculatedHandoverDate::CUSTODY_WITH_COM]
 
@@ -77,9 +77,9 @@ private
       # Offender has moved to Open Prison conditions and now needs a supporting COM
       # Note: this covers both Male and Female offenders
       offender.email_histories.create! name: nomis_offender.ldu_name,
-                                        email: nomis_offender.ldu_email_address,
-                                        event: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION,
-                                        prison: nomis_offender.prison_id
+                                       email: nomis_offender.ldu_email_address,
+                                       event: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION,
+                                       prison: nomis_offender.prison_id
       CommunityMailer.open_prison_supporting_com_needed(
         prisoner_name: nomis_offender.full_name,
         prisoner_number: nomis_offender.offender_no,

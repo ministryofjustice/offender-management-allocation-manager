@@ -3,14 +3,14 @@
 require 'rails_helper'
 
 RSpec.describe AllocationsController, type: :controller do
-  let(:poms) {
+  let(:poms) do
     [
       build(:pom, :prison_officer, emails: []),
       build(:pom, :prison_officer),
       build(:pom, :probation_officer),
       build(:pom, :probation_officer)
     ]
-  }
+  end
   let(:pom_without_emails) { poms.first }
   let(:prison_code) { create(:prison).code }
   let(:offender) { build(:nomis_offender, prisonId: prison_code) }
@@ -139,7 +139,7 @@ RSpec.describe AllocationsController, type: :controller do
     end
 
     describe '#history' do
-      let(:pom_staff_id) { 754732 }
+      let(:pom_staff_id) { 754_732 }
 
       before do
         create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
@@ -151,7 +151,7 @@ RSpec.describe AllocationsController, type: :controller do
           create(:allocation_history, prison: prison_code, nomis_offender_id: case_info.nomis_offender_id)
           stub_offender(build(:nomis_offender, prisonerNumber: case_info.nomis_offender_id))
           stub_movements_for case_info.nomis_offender_id, [attributes_for(:movement)]
-          stub_pom_emails(485926, [])
+          stub_pom_emails(485_926, [])
         end
 
         let(:case_info) { CaseInformation.last }
@@ -167,7 +167,7 @@ RSpec.describe AllocationsController, type: :controller do
         context 'with update and delete VLO events' do
           before do
             case_info.offender.victim_liaison_officers.first.update!(first_name: 'Bill', last_name: 'Smuggs')
-            case_info.offender.victim_liaison_officers.first.destroy
+            case_info.offender.victim_liaison_officers.first.destroy!
             allocation.update!(
               primary_pom_nomis_id: poms.second.staffId,
               event: AllocationHistory::REALLOCATE_PRIMARY_POM
@@ -193,9 +193,9 @@ RSpec.describe AllocationsController, type: :controller do
         context 'when create, delius, update' do
           before do
             x = create(:allocation_history, prison: prison_code, primary_pom_nomis_id: poms.first.staffId, allocated_at_tier: 'C',
-                       nomis_offender_id: offender_no,
-                       created_at: create_time,
-                       updated_at: create_time)
+                                            nomis_offender_id: offender_no,
+                                            created_at: create_time,
+                                            updated_at: create_time)
             Timecop.travel 2.days.ago do
               ProcessDeliusDataJob.perform_now offender_no
             end
@@ -218,15 +218,15 @@ RSpec.describe AllocationsController, type: :controller do
         context 'when delius is updated' do
           before do
             create(:allocation_history, prison: prison_code, primary_pom_nomis_id: 1, allocated_at_tier: 'C',
-                   nomis_offender_id: offender_no,
-                   created_at: create_time,
-                   updated_at: create_time)
+                                        nomis_offender_id: offender_no,
+                                        created_at: create_time,
+                                        updated_at: create_time)
             Timecop.travel 2.days.ago do
               ProcessDeliusDataJob.perform_now offender_no
             end
 
-            stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/#{prison_code}/offender/#{offender_no}").
-              to_return(body: { staffId: 123_456 }.to_json)
+            stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/#{prison_code}/offender/#{offender_no}")
+              .to_return(body: { staffId: 123_456 }.to_json)
           end
 
           it 'shows the correct date on the show page' do
@@ -250,7 +250,7 @@ RSpec.describe AllocationsController, type: :controller do
                                 recommended_pom_type: 'probation',
                                 event: AllocationHistory::ALLOCATE_PRIMARY_POM,
                                 event_trigger: AllocationHistory::USER
-            )
+                               )
             allocation.update!(
               primary_pom_nomis_id: poms.second.staffId,
               prison: 'LEI',

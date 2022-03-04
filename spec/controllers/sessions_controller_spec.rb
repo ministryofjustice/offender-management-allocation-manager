@@ -12,7 +12,6 @@ RSpec.describe SessionsController, type: :controller do
 
     let(:auth_hash) { { 'info' => 'anything' } }
 
-
     before do
       request.env['omniauth.auth'] = auth_hash
     end

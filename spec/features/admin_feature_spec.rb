@@ -19,12 +19,13 @@ feature 'admin urls' do
   # end
 
   let(:prison_code) { create(:prison).code }
-  let(:admin_urls) {
+  let(:admin_urls) do
     [
-    '/admin', '/sidekiq',
-    "/prisons/#{prison_code}/debugging",
-  ]
-  }
+      '/admin',
+      '/sidekiq',
+      "/prisons/#{prison_code}/debugging",
+    ]
+  end
   let(:username) { 'MOIC_POM' }
   let(:staff_id) { 754_732 }
 
@@ -46,8 +47,8 @@ feature 'admin urls' do
     before do
       signin_spo_user
       stub_auth_token
-      stub_request(:get, "#{ApiHelper::T3}/users/#{username}").
-        to_return(body: { 'staffId': staff_id }.to_json)
+      stub_request(:get, "#{ApiHelper::T3}/users/#{username}")
+        .to_return(body: { 'staffId': staff_id }.to_json)
       stub_pom_emails staff_id, []
     end
 
@@ -64,8 +65,8 @@ feature 'admin urls' do
     before do
       signin_global_admin_user
       stub_auth_token
-      stub_request(:get, "#{ApiHelper::T3}/users/#{username}").
-        to_return(body: { 'staffId': staff_id }.to_json)
+      stub_request(:get, "#{ApiHelper::T3}/users/#{username}")
+        .to_return(body: { 'staffId': staff_id }.to_json)
       stub_pom_emails staff_id, []
       stub_offenders_for_prison(prison_code, [])
 

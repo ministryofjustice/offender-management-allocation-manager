@@ -127,9 +127,9 @@ module HmppsApi
         movements = HmppsApi::PrisonApi::MovementApi.admissions_for(offenders.map(&:offender_no))
 
         offenders.each do |offender|
-          arrival = movements.fetch(offender.offender_no, []).reverse.detect { |movement|
+          arrival = movements.fetch(offender.offender_no, []).reverse.detect do |movement|
             movement.to_agency == offender.prison_id
-          }
+          end
           offender.prison_arrival_date = [offender.sentence_start_date, arrival&.movement_date].compact.max
         end
       end

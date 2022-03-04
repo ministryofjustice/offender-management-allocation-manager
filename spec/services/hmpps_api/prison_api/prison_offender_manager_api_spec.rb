@@ -5,7 +5,7 @@ describe HmppsApi::PrisonApi::PrisonOffenderManagerApi do
     list = described_class.list('LEI')
     response = described_class.staff_detail list.first.staff_id
 
-    expect(response.staff_id).to eq(485636)
+    expect(response.staff_id).to eq(485_636)
     expect(response.first_name).to eq("JENNY")
     expect(response.last_name).to eq("DUCKETT")
     expect(response.status).to eq("ACTIVE")

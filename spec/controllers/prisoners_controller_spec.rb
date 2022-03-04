@@ -30,11 +30,11 @@ RSpec.describe PrisonersController, type: :controller do
       # new arrival - it's new and haven't matched with delius yet.
       let(:today) { Time.zone.today }
 
-      let(:offender_arrived_today_with_no_complexity_or_case_info) {
+      let(:offender_arrived_today_with_no_complexity_or_case_info) do
         build(:nomis_offender, sentence: attributes_for(:sentence_detail, sentenceStartDate: today), complexityLevel: nil)
-      }
+      end
 
-      let(:offenders) {
+      let(:offenders) do
         [offender_with_case_info_but_no_complexity_level,
          offender_with_complexity_level_but_no_case_info,
          offender_with_no_case_info_and_no_complexity_level,
@@ -43,16 +43,16 @@ RSpec.describe PrisonersController, type: :controller do
          allocated_offender_two,
          offender_arrived_today_with_no_complexity_or_case_info
         ]
-      }
-      let(:missing_info_offenders) {
+      end
+      let(:missing_info_offenders) do
         [offender_with_case_info_but_no_complexity_level,
          offender_with_complexity_level_but_no_case_info,
          offender_with_no_case_info_and_no_complexity_level]
-      }
-      let(:allocated_offenders) {
+      end
+      let(:allocated_offenders) do
         [allocated_offender_one,
          allocated_offender_two]
-      }
+      end
       let(:unallocated_offenders) { [offender_with_complexity_level_and_case_info] }
       let(:new_arrival_offenders) { [offender_arrived_today_with_no_complexity_or_case_info] }
 
@@ -110,34 +110,34 @@ RSpec.describe PrisonersController, type: :controller do
       let(:offenders_prisoner_name_ascending_order) { [offender_a, offender_b, offender_c, offender_d] }
       let(:offenders_awaiting_allocation_ascending_order) { [offender_b, offender_c, offender_a, offender_d] }
 
-      let(:offender_a) {
+      let(:offender_a) do
         build(:nomis_offender,
               sentence: attributes_for(:sentence_detail,
                                        sentenceStartDate: three_days_ago,
                                        conditionalReleaseDate: release_date_four),
               lastName: 'Austin')
-      }
-      let(:offender_b) {
+      end
+      let(:offender_b) do
         build(:nomis_offender,
               sentence: attributes_for(:sentence_detail,
                                        sentenceStartDate: one_day_ago,
                                        conditionalReleaseDate: release_date_three),
               lastName: 'Blackburn')
-      }
-      let(:offender_c) {
+      end
+      let(:offender_c) do
         build(:nomis_offender,
               sentence: attributes_for(:sentence_detail,
                                        sentenceStartDate: two_days_ago,
                                        conditionalReleaseDate: nil),
               lastName: 'Carsley')
-      }
-      let(:offender_d) {
+      end
+      let(:offender_d) do
         build(:nomis_offender,
               sentence: attributes_for(:sentence_detail,
                                        sentenceStartDate: four_days_ago,
                                        conditionalReleaseDate: release_date_two),
               lastName: 'Darrel')
-      }
+      end
 
       describe 'missing_information' do
         it 'sorts name by ascending order' do
@@ -285,23 +285,23 @@ RSpec.describe PrisonersController, type: :controller do
                 lastName: 'SMITH',
                 sentence: attributes_for(:sentence_detail, sentenceStartDate: "2011-01-20")),
           build(:nomis_offender, prisonerNumber: "G1234GY", imprisonmentStatus: "LIFE",
-                lastName: 'Minate-Offender',
-                sentence: attributes_for(:sentence_detail,
-                                         sentenceStartDate: "2009-02-08",
-                                         automaticReleaseDate: "2011-01-28")),
+                                 lastName: 'Minate-Offender',
+                                 sentence: attributes_for(:sentence_detail,
+                                                          sentenceStartDate: "2009-02-08",
+                                                          automaticReleaseDate: "2011-01-28")),
           build(:nomis_offender, prisonerNumber: "G1234VV",
-                lastName: 'JONES',
-                sentence: attributes_for(:sentence_detail,
-                                         sentenceStartDate: "2019-02-08",
-                                         automaticReleaseDate: today_plus_13_weeks)),
+                                 lastName: 'JONES',
+                                 sentence: attributes_for(:sentence_detail,
+                                                          sentenceStartDate: "2019-02-08",
+                                                          automaticReleaseDate: today_plus_13_weeks)),
           build(:nomis_offender, prisonerNumber: "G4234GG",
-                imprisonmentStatus: "SENT03",
-                firstName: "Fourth", lastName: "Offender",
-                sentence: attributes_for(:sentence_detail,
-                                         automaticReleaseDate: today_plus_10_days,
-                                         homeDetentionCurfewActualDate: today_plus_10_days,
-                                         sentenceStartDate: "2019-02-08",
-                                         ))
+                                 imprisonmentStatus: "SENT03",
+                                 firstName: "Fourth", lastName: "Offender",
+                                 sentence: attributes_for(:sentence_detail,
+                                                          automaticReleaseDate: today_plus_10_days,
+                                                          homeDetentionCurfewActualDate: today_plus_10_days,
+                                                          sentenceStartDate: "2019-02-08",
+                                                         ))
         ]
         create(:case_information, case_allocation: 'NPS', offender: build(:offender, nomis_offender_id: 'G4234GG'))
 
@@ -310,10 +310,10 @@ RSpec.describe PrisonersController, type: :controller do
 
       context 'without new arrivals' do
         before do
-          stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN").
-            with(body: %w[G7514GW G1234GY G1234VV G4234GG].to_json).
-            to_return(body: [attributes_for(:movement, offenderNo: 'G7514GW', toAgency: prison, movementDate: Date.new(2018, 10, 1).to_s),
-                             attributes_for(:movement, offenderNo: 'G1234VV', toAgency: prison, movementDate: Date.new(2018, 9, 1).to_s)].to_json)
+          stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN")
+            .with(body: %w[G7514GW G1234GY G1234VV G4234GG].to_json)
+            .to_return(body: [attributes_for(:movement, offenderNo: 'G7514GW', toAgency: prison, movementDate: Date.new(2018, 10, 1).to_s),
+                              attributes_for(:movement, offenderNo: 'G1234VV', toAgency: prison, movementDate: Date.new(2018, 9, 1).to_s)].to_json)
         end
 
         it 'gets missing_information records' do
@@ -339,21 +339,21 @@ RSpec.describe PrisonersController, type: :controller do
     end
 
     context 'when user is a POM' do
-      let(:poms) {
+      let(:poms) do
         [
           build(:pom,
                 firstName: 'Alice',
                 position: RecommendationService::PRISON_POM,
                 staffId: 1
-          )
+               )
         ]
-      }
+      end
 
       before do
         stub_poms(prison, poms)
         stub_signed_in_pom(prison, 1)
-        stub_request(:get, "#{ApiHelper::T3}/users/").
-          to_return(body: { staffId: 1 }.to_json)
+        stub_request(:get, "#{ApiHelper::T3}/users/")
+          .to_return(body: { staffId: 1 }.to_json)
       end
 
       it 'is not visible' do
@@ -364,18 +364,18 @@ RSpec.describe PrisonersController, type: :controller do
 
     context 'with enough offenders to page' do
       let(:offenders) { build_list(:nomis_offender, 120) }
-      let(:moves) {
+      let(:moves) do
         offenders.map { |o| o.fetch(:prisonerNumber) }
-      }
+      end
       let(:summary_offenders) { assigns(:offenders) }
 
       render_views
 
       before do
         stub_offenders_for_prison(prison, offenders)
-        stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN").
-          with(body: moves.to_json).
-          to_return(body: moves.map { |offender_no| attributes_for(:movement, offenderNo: offender_no, toAgency: prison, movementDate: Date.new(2018, 10, 1).to_s) }.to_json)
+        stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN")
+          .with(body: moves.to_json)
+          .to_return(body: moves.map { |offender_no| attributes_for(:movement, offenderNo: offender_no, toAgency: prison, movementDate: Date.new(2018, 10, 1).to_s) }.to_json)
       end
 
       it 'gets page 1 by default' do
@@ -410,8 +410,8 @@ RSpec.describe PrisonersController, type: :controller do
         it 'handles trying to sort by missing field for allocated offenders' do
           # Allocated offenders do have to have their prison_arrival_date even if they don't use it
           # because we now need it to calculate the totals.
-          stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN").
-            to_return(body: [].to_json)
+          stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN")
+            .to_return(body: [].to_json)
 
           # When viewing allocated, cannot sort by awaiting_allocation_for as it is not available and is
           # meaningless in this context. We do not want to crash if passed a field that is not searchable
@@ -437,17 +437,17 @@ RSpec.describe PrisonersController, type: :controller do
 
             build(:nomis_offender, prisonerNumber: "G7514GW", imprisonmentStatus: "LR"), # custody case
             build(:nomis_offender, prisonerNumber: "G1234VV", imprisonmentStatus: "SENT03",
-                  sentence: attributes_for(:sentence_detail, conditionalReleaseDate: today_plus_7_weeks)), # community case
+                                   sentence: attributes_for(:sentence_detail, conditionalReleaseDate: today_plus_7_weeks)), # community case
             build(:nomis_offender, prisonerNumber: "G4234GG", imprisonmentStatus: "SENT03"), # custody case
             build(:nomis_offender, prisonerNumber: "G1234GY", imprisonmentStatus: "SENT03",
-                  sentence: attributes_for(:sentence_detail, sentenceStartDate: "2019-02-08",
-                                           automaticReleaseDate: today_plus_13_weeks)) # community case
+                                   sentence: attributes_for(:sentence_detail, sentenceStartDate: "2019-02-08",
+                                                                              automaticReleaseDate: today_plus_13_weeks)) # community case
           ]
         end
 
         before do
-          stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN").
-            to_return(body: [].to_json)
+          stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN")
+            .to_return(body: [].to_json)
 
           offenders.each do |offender|
             create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
@@ -475,17 +475,17 @@ RSpec.describe PrisonersController, type: :controller do
 
     describe 'new arrivals feature' do
       before do
-        inmates = offenders.map { |offender|
+        inmates = offenders.map do |offender|
           build(:nomis_offender,
                 prisonerNumber: offender[:nomis_id],
                 sentence: attributes_for(:sentence_detail,
                                          sentenceStartDate: offender.fetch(:sentence_start_date).strftime('%F')))
-        }
+        end
 
         stub_offenders_for_prison(prison, inmates)
 
-        stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN").
-          to_return(body: movements.to_json)
+        stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN")
+          .to_return(body: movements.to_json)
       end
 
       context 'with no movements and four offenders' do
@@ -540,7 +540,7 @@ RSpec.describe PrisonersController, type: :controller do
               summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
               expect(summary_offenders).to include(
                 'A1111AA' => 0
-                                           )
+              )
             end
           end
 
@@ -577,11 +577,11 @@ RSpec.describe PrisonersController, type: :controller do
       context 'with a movement arriving on Monday, 5pm' do
         let(:offenders) do
           [{
-             nomis_id: 'A1111AA',
-             booking_id: 111_111,
-             sentence_start_date: '1 Jan 1980'.to_date,
-             prison_id: prison
-           }]
+            nomis_id: 'A1111AA',
+            booking_id: 111_111,
+            sentence_start_date: '1 Jan 1980'.to_date,
+            prison_id: prison
+          }]
         end
 
         let(:movements) do
@@ -594,7 +594,7 @@ RSpec.describe PrisonersController, type: :controller do
         end
 
         context 'when today is Tuesday, 8pm' do
-          let(:today) { 'Tue 14 Jan 2020 20:00'.to_datetime }
+          let(:today) { Time.zone.parse 'Tue 14 Jan 2020 20:00' }
 
           it 'shows that offender in new arrivals' do
             Timecop.travel(today) do
@@ -606,7 +606,7 @@ RSpec.describe PrisonersController, type: :controller do
         end
 
         context 'when today is Wed, 10am' do
-          let(:today) { 'Wed 15 Jan 2020 10:00'.to_datetime }
+          let(:today) { Time.zone.parse 'Wed 15 Jan 2020 10:00' }
 
           it 'does not show that offender in new arrivals' do
             Timecop.travel(today) do
@@ -632,16 +632,16 @@ RSpec.describe PrisonersController, type: :controller do
     describe '#search' do
       let(:nomis_staff_id) { 485_926 }
 
-      let(:poms) {
+      let(:poms) do
         [
           build(:pom,
                 firstName: 'Alice',
                 lastName: 'Ward',
                 position: RecommendationService::PRISON_POM,
                 staffId: nomis_staff_id
-          )
+               )
         ]
-      }
+      end
 
       before do
         stub_poms(prison, poms)
@@ -675,7 +675,7 @@ RSpec.describe PrisonersController, type: :controller do
 
           before do
             stub_offenders_for_prison(prison, [first_offender] + offenders)
-            PomDetail.create!(prison_code: prison, nomis_staff_id: nomis_staff_id, working_pattern: 1.0, status: 'active')
+            PomDetail.create(prison_code: prison, nomis_staff_id: nomis_staff_id, working_pattern: 1.0, status: 'active')
 
             ([first_offender] + offenders).each { |o| create(:case_information, offender: build(:offender, nomis_offender_id: o.fetch(:prisonerNumber))) }
             create(:allocation_history,
@@ -687,7 +687,7 @@ RSpec.describe PrisonersController, type: :controller do
           end
 
           context "with a date" do
-            let(:allocated_date) { DateTime.now.utc }
+            let(:allocated_date) { Time.zone.now.utc }
 
             it 'gets the POM names for allocated offenders' do
               get :search, params: { prison_id: prison, q: 'Blog' }
@@ -705,7 +705,7 @@ RSpec.describe PrisonersController, type: :controller do
           end
 
           context "when 'primary_pom_allocated_at' date is nil" do
-            let(:allocated_date) { DateTime.now.utc }
+            let(:allocated_date) { Time.zone.now.utc }
 
             it "uses 'updated_at' date when 'primary_pom_allocated_at' date is nil" do
               get :search, params: { prison_id: prison, q: 'Blog' }

@@ -1,10 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe OverrideForm, type: :model do
-  let!(:reason) {
+  let!(:reason) do
     "consectetur a eraconsectetur a erat nam at lectus urna duis convallis
     convallis tellus id interdum velit laoreet id donec ultrices tincidunt arcu non sodales neque sodales ut etiam"
-  }
+  end
 
   it {
     expect(subject).to validate_presence_of(:override_reasons).with_message('Select one or more reasons for not accepting the recommendation')

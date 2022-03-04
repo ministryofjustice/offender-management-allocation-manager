@@ -58,7 +58,7 @@ class ResponsibilitiesController < PrisonsApplicationController
     emails = [@current_user.email_address, @ldu_email_address]
 
     if @responsibility.valid?
-      Responsibility.find_by!(nomis_offender_id: nomis_offender_id_from_url).destroy
+      Responsibility.find_by!(nomis_offender_id: nomis_offender_id_from_url).destroy!
 
       if allocation&.active?
         pom_email = HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(allocation.primary_pom_nomis_id).first
@@ -99,9 +99,9 @@ private
   end
 
   def responsibility_params
-    params.
-      require(:responsibility).
-      permit(:nomis_offender_id, :reason, :reason_text).
-      merge(value: Responsibility::PROBATION)
+    params
+      .require(:responsibility)
+      .permit(:nomis_offender_id, :reason, :reason_text)
+      .merge(value: Responsibility::PROBATION)
   end
 end

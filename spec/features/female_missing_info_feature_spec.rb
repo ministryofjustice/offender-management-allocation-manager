@@ -32,8 +32,8 @@ feature "womens missing info journey" do
       # bang the update button - expect a big red error message
       click_button 'Update'
       within '.govuk-error-summary' do
-        expect(all('li').map(&:text)).
-          to match_array(["You must choose a complexity level"])
+        expect(all('li').map(&:text))
+          .to match_array(["You must choose a complexity level"])
       end
 
       find('label[for=complexity-form-complexity-level-low-field]').click
@@ -43,8 +43,8 @@ feature "womens missing info journey" do
         #  again should have lots of error messages
         click_button 'Update'
         within '.govuk-error-summary' do
-          expect(all('li').map(&:text)).
-            to match_array(
+          expect(all('li').map(&:text))
+            .to match_array(
               [
                 "Select yes if the prisoner’s last known address was in Wales",
                 "Select the prisoner’s tier",
@@ -56,8 +56,8 @@ feature "womens missing info journey" do
         click_button 'Update'
         # defect goes away once we fill in welshness correctly
         within '.govuk-error-summary' do
-          expect(all('li').map(&:text)).
-            to match_array(
+          expect(all('li').map(&:text))
+            .to match_array(
               [
                 "Select the prisoner’s tier",
                 "Select the service provider for this case",

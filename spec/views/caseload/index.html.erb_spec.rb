@@ -6,7 +6,7 @@ RSpec.describe "caseload/index", type: :view do
   before do
     assign(:pending_task_count, 0)
     assign(:allocations,
-           Kaminari::paginate_array(offenders).page(1))
+           Kaminari.paginate_array(offenders).page(1))
     assign(:new_cases_count, 0)
     assign(:pending_handover_count, offenders.count)
     assign(:pom, StaffMember.new(prison, staff_id))
@@ -23,11 +23,11 @@ RSpec.describe "caseload/index", type: :view do
     let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
     let(:allocation) { build(:allocation_history, nomis_offender_id: offender.offender_no, secondary_pom_nomis_id: staff_id) }
 
-    let(:offenders) {
+    let(:offenders) do
       [offender].map do |o|
         AllocatedOffender.new(staff_id, allocation, o)
       end
-    }
+    end
 
     context 'with a male prison' do
       before do
@@ -35,12 +35,12 @@ RSpec.describe "caseload/index", type: :view do
       end
 
       let(:prison) { create(:prison) }
-      let(:first_offender_row) {
+      let(:first_offender_row) do
         row = page.css('td').map(&:text).map(&:strip)
         # The first column is offender name and number underneath each other - just grab the non-blank data
         split_col_zero = row.first.split("\n").map(&:strip).reject(&:empty?)
         [split_col_zero] + row[1..]
-      }
+      end
 
       it 'displays caseload' do
         expect(page).to have_content 'Your caseload'
@@ -51,15 +51,15 @@ RSpec.describe "caseload/index", type: :view do
       end
 
       it 'displays correct data' do
-        expect(first_offender_row).
-          to eq [
-                  [offenders.first.full_name, offenders.first.offender_no],
-                  offenders.first.location,
-                  offenders.first.tier,
-                  offenders.first.earliest_release_date.to_s(:rfc822),
-                  Time.zone.today.to_s(:rfc822),
-                  "Co-working"
-                ]
+        expect(first_offender_row)
+          .to eq [
+            [offenders.first.full_name, offenders.first.offender_no],
+            offenders.first.location,
+            offenders.first.tier,
+            offenders.first.earliest_release_date.to_s(:rfc822),
+            Time.zone.today.to_s(:rfc822),
+            "Co-working"
+          ]
       end
     end
 

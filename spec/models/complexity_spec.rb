@@ -3,10 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe Complexity, type: :model do
-  subject {
+  subject do
     described_class.new(level: "high",
                         reason: "Lorem ipsum")
-  }
+  end
 
   it 'validates the presence of level, reason' do
     expect(subject).to be_valid :level

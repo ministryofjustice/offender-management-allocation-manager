@@ -4,18 +4,18 @@ RSpec.describe CaseloadHandoversController, :allocation, type: :controller do
   let(:prison) { create(:prison).code }
   let(:staff_id) { 456_987 }
   let(:not_signed_in) { 123_456 }
-  let(:poms) {
+  let(:poms) do
     [
-        build(:pom,
-              firstName: 'Alice',
-              staffId:  staff_id,
-              position: RecommendationService::PRISON_POM),
-        build(:pom,
-              firstName: 'John',
-              staffId:  not_signed_in,
-              position: RecommendationService::PRISON_POM)
+      build(:pom,
+            firstName: 'Alice',
+            staffId: staff_id,
+            position: RecommendationService::PRISON_POM),
+      build(:pom,
+            firstName: 'John',
+            staffId: not_signed_in,
+            position: RecommendationService::PRISON_POM)
     ]
-  }
+  end
   let(:pom) { poms.first }
 
   before do
@@ -58,7 +58,7 @@ RSpec.describe CaseloadHandoversController, :allocation, type: :controller do
 
       it 'retrieves just offenders due for handover' do
         get :index, params: { prison_id: prison, staff_id: staff_id }
-        expect(response).to have_http_status(200)
+        expect(response).to have_http_status(:ok)
         expect(response).to be_successful
         expect(assigns(:offenders).map(&:offender_no)).to match_array([offender.fetch(:prisonerNumber)])
       end

@@ -36,7 +36,7 @@ RSpec.describe ComplexityLevelsController, type: :controller do
 
       it 'saves the complexity level and renders the renders the confirmation page' do
         post :update,  params: { complexity: { level: updated_complexity_level, reason: 'Just because' }, prison_id: womens_prison.code, prisoner_id: offender_no }
-        expect(response).to have_http_status(200)
+        expect(response).to have_http_status(:ok)
         expect(assigns(:previous_complexity_level)).to eq('medium')
         expect(assigns(:complexity).level).to eq('high')
         expect(assigns(:offender_id)).to eq(offender_no)

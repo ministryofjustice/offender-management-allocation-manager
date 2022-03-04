@@ -26,22 +26,22 @@ module OffenderHelper
 
   def last_event(allocation)
     event = event_type(allocation.event)
-    event + ' - ' + allocation.created_at.strftime('%d/%m/%Y')
+    "#{event} - #{allocation.created_at.strftime('%d/%m/%Y')}"
   end
 
   def event_type(event)
     type = (event.include? 'primary_pom') ? 'POM ' : 'Co-working POM '
 
     if event.include? 'reallocate'
-      type + 're-allocated'
+      "#{type}re-allocated"
     elsif event.include? 'deallocate'
-      type + 'removed'
+      "#{type}removed"
     elsif event.include? 'allocate'
-      type + 'allocated'
+      "#{type}allocated"
     end
   end
 
-  def recommended_pom_type_label offender
+  def recommended_pom_type_label(offender)
     if RecommendationService.recommended_pom_type(offender) == RecommendationService::PRISON_POM
       'Prison officer'
     else
@@ -49,7 +49,7 @@ module OffenderHelper
     end
   end
 
-  def non_recommended_pom_type_label offender
+  def non_recommended_pom_type_label(offender)
     if RecommendationService.recommended_pom_type(offender) == RecommendationService::PRISON_POM
       'Probation officer'
     else
@@ -57,7 +57,7 @@ module OffenderHelper
     end
   end
 
-  def complex_reason_label offender
+  def complex_reason_label(offender)
     if RecommendationService.recommended_pom_type(offender) == RecommendationService::PRISON_POM
       'Prisoner assessed as not suitable for a prison officer POM'
     else
@@ -65,29 +65,29 @@ module OffenderHelper
     end
   end
 
-  def tier_a_case_count offenders
+  def tier_a_case_count(offenders)
     offenders.count { |a| a.tier == 'A' }
   end
 
-  def tier_b_case_count offenders
+  def tier_b_case_count(offenders)
     offenders.count { |a| a.tier == 'B' }
   end
 
-  def tier_c_case_count offenders
+  def tier_c_case_count(offenders)
     offenders.count { |a| a.tier == 'C' }
   end
 
-  def tier_d_case_count offenders
+  def tier_d_case_count(offenders)
     offenders.count { |a| a.tier == 'D' }
   end
 
   # :nocov: new case mix bar doesn't include tier N/A cases :-(
-  def no_tier_case_count offenders
+  def no_tier_case_count(offenders)
     offenders.count { |a| a.tier == 'N/A' }
   end
   # :nocov:
 
-  def probation_field offender, field
+  def probation_field(offender, field)
     offender.public_send field if offender.probation_record.present?
   end
 end

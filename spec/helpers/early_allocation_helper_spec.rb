@@ -39,9 +39,9 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
 
         context 'when the latest assessment was completed within the 18 month referral window' do
           context 'when the outcome was automatically "eligible"' do
-            let(:early_allocations) {
+            let(:early_allocations) do
               build_list(:early_allocation, 1, :eligible, created_within_referral_window: true)
-            }
+            end
 
             it 'reads "Eligible - case handover date has been updated"' do
               expect(subject).to eq('Eligible - case handover date has been updated')
@@ -50,9 +50,9 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
 
           context 'when the outcome was "discretionary" (so the community need to decide)' do
             context "when POM hasn't recorded the community decision yet" do
-              let(:early_allocations) {
+              let(:early_allocations) do
                 build_list(:early_allocation, 1, :discretionary, created_within_referral_window: true)
-              }
+              end
 
               it 'reads "Discretionary - the community probation team will make a decision"' do
                 expect(subject).to eq('Discretionary - the community probation team will make a decision')
@@ -60,9 +60,9 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
             end
 
             context "when the community accepted the case" do
-              let(:early_allocations) {
+              let(:early_allocations) do
                 build_list(:early_allocation, 1, :discretionary_accepted, created_within_referral_window: true)
-              }
+              end
 
               it 'reads "Eligible - case handover date has been updated"' do
                 expect(subject).to eq('Eligible - case handover date has been updated')
@@ -70,9 +70,9 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
             end
 
             context "when the community rejected the case" do
-              let(:early_allocations) {
+              let(:early_allocations) do
                 build_list(:early_allocation, 1, :discretionary_declined, created_within_referral_window: true)
-              }
+              end
 
               it 'reads "Has saved assessments"' do
                 expect(subject).to eq('Has saved assessments')
@@ -81,9 +81,9 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
           end
 
           context 'when the outcome was "not eligible"' do
-            let(:early_allocations) {
+            let(:early_allocations) do
               build_list(:early_allocation, 1, :ineligible, created_within_referral_window: true)
-            }
+            end
 
             it 'reads "Has saved assessments"' do
               expect(subject).to eq('Has saved assessments')
@@ -93,11 +93,11 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
 
         context 'when assessments were completed outside of the referral window (but none inside)' do
           context 'when at least one assessment had an outcome of automatically "eligible"' do
-            let(:early_allocations) {
+            let(:early_allocations) do
               # 1 eligible + 5 ineligible
               build_list(:early_allocation, 1, :eligible, created_within_referral_window: false) +
               build_list(:early_allocation, 5, :ineligible, created_within_referral_window: false)
-            }
+            end
 
             it 'reads "New assessment required"' do
               expect(subject).to eq('New assessment required')
@@ -105,11 +105,11 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
           end
 
           context 'when at least one assessment had an outcome of "discretionary"' do
-            let(:early_allocations) {
+            let(:early_allocations) do
               # 1 discretionary + 5 ineligible
               build_list(:early_allocation, 1, :discretionary, created_within_referral_window: false) +
               build_list(:early_allocation, 5, :ineligible, created_within_referral_window: false)
-            }
+            end
 
             it 'reads "New assessment required"' do
               expect(subject).to eq('New assessment required')
@@ -117,9 +117,9 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
           end
 
           context 'when all assessment outcomes are "not eligible"' do
-            let(:early_allocations) {
+            let(:early_allocations) do
               build_list(:early_allocation, 5, :ineligible, created_within_referral_window: false)
-            }
+            end
 
             it 'reads "Has saved assessments"' do
               expect(subject).to eq('Has saved assessments')
@@ -131,6 +131,8 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
   end
 
   describe '#early_allocation_action_link' do
+    subject { helper.early_allocation_action_link(offender, prison) }
+
     shared_examples 'Check and reassess' do
       it 'reads "Check and reassess"' do
         expect(text).to eq('Check and reassess')
@@ -140,8 +142,6 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
         expect(href).to eq(start_page_path)
       end
     end
-
-    subject { helper.early_allocation_action_link(offender, prison) }
 
     let(:link) { Nokogiri::HTML(subject).css('a') }
     let(:text) { link.text }
@@ -176,9 +176,9 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
 
         context 'when the latest assessment was completed within the 18 month referral window' do
           context 'when the outcome was automatically "eligible"' do
-            let(:early_allocations) {
+            let(:early_allocations) do
               build_list(:early_allocation, 1, :eligible, created_within_referral_window: true)
-            }
+            end
 
             it 'reads "View assessment"' do
               expect(text).to eq('View assessment')
@@ -192,9 +192,9 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
 
           context 'when the outcome was "discretionary" (so the community need to decide)' do
             context "when POM hasn't recorded the community decision yet" do
-              let(:early_allocations) {
+              let(:early_allocations) do
                 build_list(:early_allocation, 1, :discretionary, created_within_referral_window: true)
-              }
+              end
 
               it 'reads "Record community decision"' do
                 expect(text).to eq('Record community decision')
@@ -207,9 +207,9 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
             end
 
             context "when the community accepted the case" do
-              let(:early_allocations) {
+              let(:early_allocations) do
                 build_list(:early_allocation, 1, :discretionary_accepted, created_within_referral_window: true)
-              }
+              end
 
               it 'reads "View assessment"' do
                 expect(text).to eq('View assessment')
@@ -222,27 +222,27 @@ RSpec.describe EarlyAllocationHelper, type: :helper do
             end
 
             context "when the community rejected the case" do
-              let(:early_allocations) {
+              let(:early_allocations) do
                 build_list(:early_allocation, 1, :discretionary_declined, created_within_referral_window: true)
-              }
+              end
 
               include_examples 'Check and reassess'
             end
           end
 
           context 'when the outcome was "not eligible"' do
-            let(:early_allocations) {
+            let(:early_allocations) do
               build_list(:early_allocation, 1, :ineligible, created_within_referral_window: true)
-            }
+            end
 
             include_examples 'Check and reassess'
           end
         end
 
         context 'when the latest assessment was completed outside of the referral window' do
-          let(:early_allocations) {
+          let(:early_allocations) do
             build_list(:early_allocation, 1, created_within_referral_window: false)
-          }
+          end
 
           include_examples 'Check and reassess'
         end

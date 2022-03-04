@@ -4,8 +4,7 @@ describe ServiceNotificationsService do
   describe 'notifications' do
     let(:pom_role) { ['POM'] }
     let(:spo_role) { ['SPO'] }
-    let(:both_roles) { %w(SPO POM) }
-
+    let(:both_roles) { %w[SPO POM] }
 
     it 'returns an empty array when file is empty' do
       stub_const("ServiceNotifications::Yaml::Data", '')
@@ -90,35 +89,35 @@ describe ServiceNotificationsService do
               "id" => "new-spo-feature",
               "start_date" => start_dates.first,
               "role" => ["SPO"],
-              "end_date" => 11.days.from_now.strftime("%d/%m/%Y"), #active
+              "end_date" => 11.days.from_now.strftime("%d/%m/%Y"), # active
               "text" => "New SPO feature"
             },
             {
               "id" => "new-spo-feature",
               "start_date" => start_dates[1],
               "role" => ["SPO", "POM"],
-              "end_date" => Time.zone.now.to_date.strftime("%d/%m/%Y"), #active - today is the last day
+              "end_date" => Time.zone.now.to_date.strftime("%d/%m/%Y"), # active - today is the last day
               "text" => "New SPO feature"
             },
             {
               "id" => "new-app-feature",
               "start_date" => start_dates[2],
               "role" => ["POM", "SPO"],
-              "end_date" => 16.days.from_now.strftime("%d/%m/%Y"), #active
+              "end_date" => 16.days.from_now.strftime("%d/%m/%Y"), # active
               "text" => "New design layout"
             },
             {
               "id" => "recently-ended-feature",
               "start_date" => start_dates[2],
               "role" => ["POM", "SPO"],
-              "end_date" => 1.day.ago.strftime("%d/%m/%Y"), #inactive - ended yesterday
+              "end_date" => 1.day.ago.strftime("%d/%m/%Y"), # inactive - ended yesterday
               "text" => "An old feature"
             },
             {
               "id" => "old-feature",
               "start_date" => start_dates.last,
               "role" => ["POM", "SPO"],
-              "end_date" => 4.months.ago.strftime("%d/%m/%Y"), #inactive
+              "end_date" => 4.months.ago.strftime("%d/%m/%Y"), # inactive
               "text" => "An old feature"
             }
           ]

@@ -4,21 +4,21 @@ require 'rails_helper'
 
 feature 'Case history with complexity level' do
   before do
-    stub_request(:get, "https://complexity-of-need-staging.hmpps.service.justice.gov.uk/v1/complexity-of-need/offender-no/#{offender_no}/history").
-      to_return(body: history.to_json)
+    stub_request(:get, "https://complexity-of-need-staging.hmpps.service.justice.gov.uk/v1/complexity-of-need/offender-no/#{offender_no}/history")
+      .to_return(body: history.to_json)
 
     stub_signin_spo logged_in_user, [prison_code]
     stub_offenders_for_prison prison_code, [offender]
     stub_movements_for offender.fetch(:prisonerNumber), attributes_for_list(:movement, 1, toAgency: prison_code)
     stub_poms prison_code, [pom]
 
-    stub_request(:get, "#{ApiHelper::T3}/users/user").
-      to_return(body: { staffId: pom.staff_id, firstName: pom.first_name, lastName: pom.last_name }.to_json)
+    stub_request(:get, "#{ApiHelper::T3}/users/user")
+      .to_return(body: { staffId: pom.staff_id, firstName: pom.first_name, lastName: pom.last_name }.to_json)
 
     create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no,
-           allocated_at_tier: case_info.tier,
-           created_by_name: created_by_name,
-           primary_pom_nomis_id: pom.staff_id, primary_pom_name: pom_name)
+                                allocated_at_tier: case_info.tier,
+                                created_by_name: created_by_name,
+                                primary_pom_nomis_id: pom.staff_id, primary_pom_name: pom_name)
 
     visit history_prison_prisoner_allocation_path(prison_code, offender_no)
   end
@@ -41,11 +41,11 @@ feature 'Case history with complexity level' do
   let(:created_by_name) { "#{logged_in_user.last_name}, #{logged_in_user.first_name}" }
 
   context 'with 1 history record' do
-    let(:history) {
+    let(:history) do
       [{ level: 'high',
          createdTimeStamp: complexity_add_time.to_s,
          sourceUser: username }]
-    }
+    end
 
     it 'has 1 prison section' do
       expect(all('.govuk-grid-row').size).to eq(1)
@@ -63,10 +63,11 @@ feature 'Case history with complexity level' do
       within '.govuk-grid-row:nth-of-type(1)' do
         within '.moj-timeline__item:nth-of-type(1)' do
           [
-            ['.moj-timeline__description', [
-              "Prisoner allocated to #{pom_name.titleize} - #{pom.emails.first}\n",
-              "Tier: #{case_info.tier}"
-            ].join],
+            ['.moj-timeline__description',
+             [
+               "Prisoner allocated to #{pom_name.titleize} - #{pom.emails.first}\n",
+               "Tier: #{case_info.tier}"
+             ].join],
             ['.moj-timeline__date', "#{formatted_date_for(now.getlocal)} by #{created_by_name.titleize}"],
           ].each do |key, val|
             expect(page).to have_css(key, text: val)
@@ -91,7 +92,7 @@ feature 'Case history with complexity level' do
   end
 
   context 'with 2 history records' do
-    let(:history) {
+    let(:history) do
       [{ level: 'high',
          createdTimeStamp: complexity_add_time.to_s,
          sourceUser: username },
@@ -99,7 +100,7 @@ feature 'Case history with complexity level' do
          createdTimeStamp: complexity_change_time.to_s,
          notes: reason,
          sourceUser: username }]
-    }
+    end
     let(:reason) { Faker::ChuckNorris.fact }
 
     it 'has 1 prison section' do
@@ -143,6 +144,6 @@ feature 'Case history with complexity level' do
   end
 
   def formatted_date_for(updated_at)
-    updated_at.strftime("#{updated_at.day.ordinalize} %B %Y") + " (" + updated_at.strftime("%R") + ")"
+    "#{updated_at.strftime("#{updated_at.day.ordinalize} %B %Y")} (#{updated_at.strftime('%R')})"
   end
 end

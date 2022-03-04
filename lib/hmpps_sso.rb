@@ -18,12 +18,12 @@ module OmniAuth
         }
       end
 
-      #:nocov:
+      # :nocov:
       def build_access_token
         options.token_params[:headers] = { 'Authorization' => user_login_authorisation }
         super
       end
-      #:nocov:
+      # :nocov:
 
       # Without this login with sso breaks.
       # This issued was first identified in the Prison Visits Booking service. See
@@ -44,7 +44,7 @@ module OmniAuth
 
     private
 
-      #:nocov:
+      # :nocov:
       def decode_roles
         public_key = Base64.urlsafe_decode64(
           Rails.configuration.nomis_oauth_public_key
@@ -59,7 +59,7 @@ module OmniAuth
 
         decoded_token.first.fetch('authorities', [])
       end
-      #:nocov:
+      # :nocov:
 
       def active_caseload
         caseload = @user_details.active_case_load_id
@@ -76,12 +76,12 @@ module OmniAuth
       end
 
       def caseload_codes
-        @caseload_codes = @user_details.nomis_caseloads.map { |codes|
+        @caseload_codes = @user_details.nomis_caseloads.map do |codes|
           codes['caseLoadId']
-        }
+        end
       end
 
-      #:nocov:
+      # :nocov:
       def username
         access_token.params.fetch('user_name')
       end

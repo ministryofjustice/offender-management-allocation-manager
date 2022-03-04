@@ -1,7 +1,7 @@
 namespace :batch_push_pom_to_delius do
   desc 'batch push pom to delius job'
   task populate_delius: :environment do
-    Rails.logger = Logger.new(STDOUT)
+    Rails.logger = Logger.new($stdout)
 
     records = AllocationHistory.where.not(primary_pom_nomis_id: nil)
 

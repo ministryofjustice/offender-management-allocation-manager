@@ -17,9 +17,9 @@ feature 'Help' do
       visit '/help'
 
       help_topics = [
-          ['Getting set up', help_step0_path],
-          ['Updating case information', update_case_information_path],
-          ['Missing cases', missing_cases_path]
+        ['Getting set up', help_step0_path],
+        ['Updating case information', update_case_information_path],
+        ['Missing cases', missing_cases_path]
       ]
 
       help_topics.each do |key, val|
@@ -42,12 +42,12 @@ feature 'Help' do
 
     scenario 'getting set up pages', vcr: { cassette_name: 'prison_api/help_getting_set_up_pages' } do
       help_links = [
-          ['List everyone using the service', 'help_step1'],
-          ['Set up access in Digital Prison Services', 'help_step2'],
-          ['Set up POMs in NOMIS', 'help_step3'],
-          ['Update POM profiles', 'help_step4'],
-          ['Update prisoner information', 'help_step5'],
-          ['Start making allocations', 'help_step6']
+        ['List everyone using the service', 'help_step1'],
+        ['Set up access in Digital Prison Services', 'help_step2'],
+        ['Set up POMs in NOMIS', 'help_step3'],
+        ['Update POM profiles', 'help_step4'],
+        ['Update prisoner information', 'help_step5'],
+        ['Start making allocations', 'help_step6']
       ]
 
       help_links.each do |key, val|
@@ -60,12 +60,12 @@ feature 'Help' do
       expect(page).to have_css('h1', text: title)
 
       task_links = [
-          ['Task 1', 'help_step1'],
-          ['Task 2', 'help_step2'],
-          ['Task 3', 'help_step3'],
-          ['Task 4', 'help_step4'],
-          ['Task 5', 'help_step5'],
-          ['Task 6', 'help_step6']
+        ['Task 1', 'help_step1'],
+        ['Task 2', 'help_step2'],
+        ['Task 3', 'help_step3'],
+        ['Task 4', 'help_step4'],
+        ['Task 5', 'help_step5'],
+        ['Task 6', 'help_step6']
       ]
 
       task_links.each do |key, val|

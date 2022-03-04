@@ -103,10 +103,10 @@ class EarlyAllocationsController < PrisonsApplicationController
     @referrer = request.referer
 
     respond_to do |format|
-      format.pdf {
+      format.pdf do
         # disposition 'attachment' is the default for send_data
         send_data pdf_as_string
-      }
+      end
       format.html
     end
   end
@@ -128,14 +128,14 @@ private
   end
 
   def community_decision_params
-    params.fetch(:early_allocation, {}).permit(:community_decision).
-        merge(updated_by_firstname: @current_user.first_name,
-              updated_by_lastname: @current_user.last_name)
+    params.fetch(:early_allocation, {}).permit(:community_decision)
+        .merge(updated_by_firstname: @current_user.first_name,
+               updated_by_lastname: @current_user.last_name)
   end
 
   def eligible_params
-    params.require(:early_allocation).
-      permit(EarlyAllocation::ELIGIBLE_BOOLEAN_FIELDS +
+    params.require(:early_allocation)
+      .permit(EarlyAllocation::ELIGIBLE_BOOLEAN_FIELDS +
                 [:oasys_risk_assessment_date])
   end
 
@@ -144,13 +144,13 @@ private
   end
 
   def discretionary_params
-    params.require(:early_allocation).
-      permit(EarlyAllocation::ELIGIBLE_FIELDS + EarlyAllocation::ALL_DISCRETIONARY_FIELDS)
+    params.require(:early_allocation)
+      .permit(EarlyAllocation::ELIGIBLE_FIELDS + EarlyAllocation::ALL_DISCRETIONARY_FIELDS)
   end
 
   def early_allocation_params
-    params.require(:early_allocation).
-      permit(EarlyAllocation::ELIGIBLE_BOOLEAN_FIELDS +
+    params.require(:early_allocation)
+      .permit(EarlyAllocation::ELIGIBLE_BOOLEAN_FIELDS +
                 EarlyAllocation::ALL_DISCRETIONARY_FIELDS +
                 [:oasys_risk_assessment_date,
                  :reason,
@@ -159,9 +159,9 @@ private
 
   def default_params
     { prison: active_prison_id,
-        created_within_referral_window: @prisoner.within_early_allocation_window?,
-        created_by_firstname: @current_user.first_name,
-        created_by_lastname: @current_user.last_name }
+      created_within_referral_window: @prisoner.within_early_allocation_window?,
+      created_by_firstname: @current_user.first_name,
+      created_by_lastname: @current_user.last_name }
   end
 
   def offender_id_from_url

@@ -13,7 +13,11 @@ class DeliusImportError < ApplicationRecord
 
   validates :error_type, inclusion: {
     allow_nil: false,
-    in: [DUPLICATE_NOMIS_ID, INVALID_TIER, INVALID_CASE_ALLOCATION,
-         MISSING_TEAM, MISSING_LDU, MISMATCHED_DOB]
+    in: [DUPLICATE_NOMIS_ID,
+         INVALID_TIER,
+         INVALID_CASE_ALLOCATION,
+         MISSING_TEAM,
+         MISSING_LDU,
+         MISMATCHED_DOB]
   }
 end

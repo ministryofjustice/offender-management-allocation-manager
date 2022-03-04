@@ -90,10 +90,10 @@ private
   end
 
   def complexity_session_key
-    'complexity_' + params.fetch(:prisoner_id)
+    "complexity_#{params.fetch(:prisoner_id)}"
   end
 
   def case_info_session_key
-    'case_info_' + params.fetch(:prisoner_id)
+    "case_info_#{params.fetch(:prisoner_id)}"
   end
 end

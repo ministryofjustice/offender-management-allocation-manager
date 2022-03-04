@@ -23,12 +23,12 @@ FactoryBot.define do
     end
 
     # cell location is the format <1 letter>-<1 number>-<3 numbers> e.g 'E-4-014'
-    cellLocation {
+    cellLocation do
       block = Faker::Alphanumeric.alpha(number: 1).upcase
       num = Faker::Number.non_zero_digit
       numbers = Faker::Number.leading_zero_number(digits: 3)
       "#{block}-#{num}-#{numbers}"
-    }
+    end
 
     prisonerNumber { generate :nomis_offender_id }
     sequence(:bookingId) { |x| x + 700_000 }

@@ -13,9 +13,9 @@ class EarlyAllocationDateForm
   validates :oasys_risk_assessment_date,
             presence: true,
             date: {
-                before: proc { Time.zone.today },
-                after: proc { Time.zone.today - 3.months },
-                # validating presence, so stop date validator double-checking
-                allow_nil: true
+              before: proc { Time.zone.today },
+              after: proc { Time.zone.today - 3.months },
+              # validating presence, so stop date validator double-checking
+              allow_nil: true
             }
 end

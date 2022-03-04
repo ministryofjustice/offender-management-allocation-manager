@@ -6,7 +6,7 @@ class AutomaticHandoverEmailJob < ApplicationJob
   # Turns out that between? is inclusive at both ends, so a 45-day gap needs a 44-day threshold
   SEND_THRESHOLD = 44.days.freeze
 
-  def perform ldu
+  def perform(ldu)
     today = Time.zone.today
     ldu_offenders = get_ldu_offenders(ldu)
 
@@ -28,16 +28,16 @@ class AutomaticHandoverEmailJob < ApplicationJob
             allocation = allocations[offender.offender_no]
             csv <<
                 [
-                    offender.full_name,
-                    offender.crn,
-                    offender.offender_no,
-                    offender.handover_start_date,
-                    offender.responsibility_handover_date,
-                    [offender.conditional_release_date, offender.parole_eligibility_date, offender.tariff_date].compact.min,
-                    Prison.find(offender.prison_id).name,
-                    allocation&.primary_pom_name,
-                    allocation&.active? ? HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(allocation.primary_pom_nomis_id).first : nil,
-                    offender.allocated_com_name
+                  offender.full_name,
+                  offender.crn,
+                  offender.offender_no,
+                  offender.handover_start_date,
+                  offender.responsibility_handover_date,
+                  [offender.conditional_release_date, offender.parole_eligibility_date, offender.tariff_date].compact.min,
+                  Prison.find(offender.prison_id).name,
+                  allocation&.primary_pom_name,
+                  allocation&.active? ? HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(allocation.primary_pom_nomis_id).first : nil,
+                  offender.allocated_com_name
                 ]
           end
         end

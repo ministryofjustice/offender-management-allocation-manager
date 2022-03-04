@@ -20,13 +20,13 @@ feature 'Co-working' do
     }
   end
   let(:prison) { create(:prison) }
-  let(:poms) {
+  let(:poms) do
     [
       build(:pom, staffId: 485_926, firstName: 'MOIC', lastName: 'POM', emails: ['pom@digital.justice.gov.uk']),
       build(:pom, :probation_officer, staffId: 485_758, firstName: 'MOIC', lastName: 'INTEGRATION-TESTS', emails: ['ommiicc@digital.justice.gov.uk']),
       build(:pom, staffId: 485_833)
-  ]
-  }
+    ]
+  end
   let(:offender) { build(:nomis_offender, prisonId: prison.code, prisonerNumber: 'G4273GI', dateOfBirth: '15/08/1980') }
   let(:prisoner_name) { "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}" }
   let(:prisoner_name_forwards) { "#{offender.fetch(:firstName)} #{offender.fetch(:lastName)}" }
@@ -42,7 +42,7 @@ feature 'Co-working' do
   end
 
   context 'with just a primary POM allocated' do
-    let!(:allocation) {
+    let!(:allocation) do
       create(
         :allocation_history,
         prison: prison.code,
@@ -51,7 +51,7 @@ feature 'Co-working' do
         primary_pom_name: prison_pom[:pom_name],
         recommended_pom_type: 'probation'
       )
-    }
+    end
 
     scenario 'show allocate a co-working POM page' do
       visit new_prison_coworking_path(prison.code, nomis_offender_id)
@@ -99,7 +99,7 @@ feature 'Co-working' do
       visit prison_confirm_coworking_allocation_path(
         prison.code,
         nomis_offender_id, prison_pom[:staff_id], secondary_pom[:staff_id]
-            )
+      )
 
       expect(page).to have_content("Confirm co-working allocation")
       expect(page).to have_content("You are allocating co-working POM #{secondary_pom[:pom_name]} to #{prisoner_name_forwards}. The responsible POM is #{prison_pom[:pom_name]}.")
@@ -126,7 +126,7 @@ feature 'Co-working' do
   end
 
   context 'with a secondary POM allocated' do
-    let!(:allocation) {
+    let!(:allocation) do
       create(
         :allocation_history,
         prison: prison.code,
@@ -137,7 +137,7 @@ feature 'Co-working' do
         secondary_pom_name: secondary_pom[:pom_name],
         recommended_pom_type: 'probation'
       )
-    }
+    end
 
     before(:each) do
       visit prison_prisoner_allocation_path(prison.code, nomis_offender_id)
@@ -192,7 +192,7 @@ feature 'Co-working' do
       }
     end
 
-    let!(:allocation) {
+    let!(:allocation) do
       create(
         :allocation_history,
         prison: prison.code,
@@ -203,10 +203,10 @@ feature 'Co-working' do
         secondary_pom_name: another_pom[:pom_name],
         recommended_pom_type: 'probation'
       )
-    }
+    end
 
     scenario 'allocating' do
-      expect(allocation.secondary_pom_nomis_id).to eq(123456)
+      expect(allocation.secondary_pom_nomis_id).to eq(123_456)
       visit prison_prisoner_allocation_path(prison.code, nomis_offender_id)
 
       click_link 'Allocate'
@@ -215,7 +215,7 @@ feature 'Co-working' do
         click_link 'Allocate'
       end
       click_button 'Complete allocation'
-      expect(allocation.reload.secondary_pom_nomis_id).to eq(485758)
+      expect(allocation.reload.secondary_pom_nomis_id).to eq(485_758)
       expect(page).to have_current_path(unallocated_prison_prisoners_path(prison.code), ignore_query: true)
     end
   end

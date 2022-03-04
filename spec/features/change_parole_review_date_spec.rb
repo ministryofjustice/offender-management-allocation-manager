@@ -7,21 +7,21 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
   let(:nomis_offender_id) { nomis_offender.fetch(:prisonerNumber) }
 
   # Stub API response to represent an offender in NOMIS
-  let(:nomis_offender) {
+  let(:nomis_offender) do
     build(:nomis_offender, prisonId: prison.code,
-          sentence: attributes_for(:sentence_detail, :indeterminate, tariffDate: tariff_date)
+                           sentence: attributes_for(:sentence_detail, :indeterminate, tariffDate: tariff_date)
     )
-  }
+  end
 
   # Create an Offender record and associated CaseInformation record
-  let!(:offender_record) {
+  let!(:offender_record) do
     create(:offender, nomis_offender_id: nomis_offender_id, case_information: build(:case_information))
-  }
+  end
 
-  let(:user) {
+  let(:user) do
     # 'pom' is a misleading name for this factory. It actually represents any NOMIS user/staff member.
     build(:pom)
-  }
+  end
 
   before do
     stub_offenders_for_prison(prison.code, [nomis_offender])
@@ -49,8 +49,8 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
       let(:new_prd) { Faker::Date.forward }
 
       # Form input values (zero-padded, e.g. "05")
-      let(:valid_day) { '%02d' % new_prd.day }
-      let(:valid_month) { '%02d' % new_prd.month }
+      let(:valid_day) { sprintf('%02d', new_prd.day) }
+      let(:valid_month) { sprintf('%02d', new_prd.month) }
       let(:valid_year) { new_prd.year }
       let(:invalid_year) { 2.years.ago.year }
 
@@ -82,8 +82,8 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
       let(:new_prd) { Faker::Date.forward }
 
       # Form input values (zero-padded, e.g. "05")
-      let(:valid_day) { '%02d' % new_prd.day }
-      let(:valid_month) { '%02d' % new_prd.month }
+      let(:valid_day) { sprintf('%02d', new_prd.day) }
+      let(:valid_month) { sprintf('%02d', new_prd.month) }
       let(:valid_year) { new_prd.year }
       let(:invalid_year) { 2.years.ago.year }
 

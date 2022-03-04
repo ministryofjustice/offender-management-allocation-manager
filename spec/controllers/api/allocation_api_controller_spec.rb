@@ -4,10 +4,10 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
   describe '#show' do
     let(:rsa_private) { OpenSSL::PKey::RSA.generate 2048 }
     let(:prison) { create(:prison) }
-    let!(:co_working_allocation) {
+    let!(:co_working_allocation) do
       create(:allocation_history, :co_working, prison: prison.code, primary_pom_nomis_id: primary_pom.staff_id,
-                                          secondary_pom_nomis_id: secondary_pom.staff_id, nomis_offender_id: offender.fetch(:prisonerNumber))
-    }
+                                               secondary_pom_nomis_id: secondary_pom.staff_id, nomis_offender_id: offender.fetch(:prisonerNumber))
+    end
     let(:primary_pom) { build(:pom) }
     let(:secondary_pom) { build(:pom) }
 
@@ -29,7 +29,7 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
         it 'returns pom allocation details' do
           get :show, params: { prison_id: prison.code, offender_no: offender.fetch(:prisonerNumber) }
 
-          expect(response).to have_http_status(200)
+          expect(response).to have_http_status(:ok)
           expect(JSON.parse(response.body)).to eq("primary_pom" => { "name" => primary_pom.full_name.to_s, "staff_id" => primary_pom.staff_id },
                                                   "secondary_pom" => {  "name" => secondary_pom.full_name.to_s, "staff_id" => secondary_pom.staff_id })
         end
@@ -43,7 +43,7 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
         it 'does not return a poms allocation details' do
           get :show, params: { prison_id: prison.code, offender_no: offender.fetch(:prisonerNumber) }
 
-          expect(response).to have_http_status(404)
+          expect(response).to have_http_status(:not_found)
           expect(JSON.parse(response.body)).to eq("message" => "Not allocated", "status" => "error")
         end
       end
@@ -57,7 +57,7 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
           stub_nil_offender
           get :show, params: { prison_id: prison.code, offender_no: offender.fetch(:prisonerNumber) }
 
-          expect(response).to have_http_status(404)
+          expect(response).to have_http_status(:not_found)
           expect(JSON.parse(response.body)).to eq("message" => "Not allocated", "status" => "error")
         end
       end

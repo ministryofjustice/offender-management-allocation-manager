@@ -30,14 +30,13 @@ private
   end
 
   def custom_fields(contact)
-    attrs = [
-        as_hash(URL_FIELD, contact.referrer),
-        as_hash(BROWSER_FIELD, contact.user_agent),
-        as_hash(PRISON_FIELD, contact.prison),
-        as_hash(JOB_TYPE_FIELD, contact.job_type),
-        as_hash(SERVICE_FIELD, 'MOIC')
+    [
+      as_hash(URL_FIELD, contact.referrer),
+      as_hash(BROWSER_FIELD, contact.user_agent),
+      as_hash(PRISON_FIELD, contact.prison),
+      as_hash(JOB_TYPE_FIELD, contact.job_type),
+      as_hash(SERVICE_FIELD, 'MOIC')
     ]
-    attrs
   end
 
   def as_hash(id, value)

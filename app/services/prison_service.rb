@@ -129,7 +129,7 @@ class PrisonService
   ].index_by(&:code).freeze
 
   # Coverage is not used in real code only used in rake task import:prison
-  #:nocov:
+  # :nocov:
   def self.prison_type(prison)
     if prison.gender == :male
       if OPEN_PRISON_CODES.include?(prison.code)
@@ -141,7 +141,7 @@ class PrisonService
       'womens'
     end
   end
-  #:nocov:
+  # :nocov:
 
   PRESCOED_CODE = 'UPI'
 

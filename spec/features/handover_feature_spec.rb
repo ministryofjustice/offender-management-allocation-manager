@@ -74,16 +74,16 @@ feature "viewing upcoming handovers" do
       stub_user(staff_id: user.staff_id)
 
       offenders = [
-          build(:nomis_offender,
-                prisonerNumber: "A7514GW",
-                sentence: attributes_for(:sentence_detail, :handover_in_28_days)),
-          build(:nomis_offender,
-                prisonerNumber: "B7514GW",
-                sentence: attributes_for(:sentence_detail, :handover_in_14_days)),
-          build(:nomis_offender, prisonerNumber: "C7514GW",
-                sentence: attributes_for(:sentence_detail, :handover_in_21_days)),
-          build(:nomis_offender, prisonerNumber: "D7514GW",
-                sentence: attributes_for(:sentence_detail, :handover_in_6_days))
+        build(:nomis_offender,
+              prisonerNumber: "A7514GW",
+              sentence: attributes_for(:sentence_detail, :handover_in_28_days)),
+        build(:nomis_offender,
+              prisonerNumber: "B7514GW",
+              sentence: attributes_for(:sentence_detail, :handover_in_14_days)),
+        build(:nomis_offender, prisonerNumber: "C7514GW",
+                               sentence: attributes_for(:sentence_detail, :handover_in_21_days)),
+        build(:nomis_offender, prisonerNumber: "D7514GW",
+                               sentence: attributes_for(:sentence_detail, :handover_in_6_days))
       ]
 
       stub_offenders_for_prison(prison, offenders)

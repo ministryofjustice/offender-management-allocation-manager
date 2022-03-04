@@ -22,11 +22,11 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     it "recalculates the offender's handover dates and pushes them to the Community API" do
       offender = OffenderService.get_offender(offender_no)
 
-      expect(HmppsApi::CommunityApi).to receive(:set_handover_dates).
-        with(offender_no: offender_no,
-             handover_start_date: offender.handover_start_date,
-             responsibility_handover_date: offender.responsibility_handover_date
-        )
+      expect(HmppsApi::CommunityApi).to receive(:set_handover_dates)
+        .with(offender_no: offender_no,
+              handover_start_date: offender.handover_start_date,
+              responsibility_handover_date: offender.responsibility_handover_date
+             )
 
       described_class.perform_now(offender_no)
     end
@@ -60,11 +60,11 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
   end
 
   context 'when offender has less than 10 months left to serve' do
-    let(:nomis_offender) {
+    let(:nomis_offender) do
       build(:nomis_offender,
             prisonId: prison.code,
             sentence: attributes_for(:sentence_detail, :less_than_10_months_to_serve))
-    }
+    end
 
     before do
       stub_offender(nomis_offender)
@@ -166,11 +166,11 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       end
 
       context 'with a COM responsible case' do
-        let(:nomis_offender) {
+        let(:nomis_offender) do
           build(:nomis_offender,
                 prisonId: prison.code,
                 sentence: attributes_for(:sentence_detail, :less_than_10_months_to_serve))
-        }
+        end
 
         it 'records responsibility' do
           described_class.perform_now(offender_no)
@@ -179,11 +179,11 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       end
 
       context 'with a COM supporting case' do
-        let(:nomis_offender) {
+        let(:nomis_offender) do
           build(:nomis_offender,
                 prisonId: prison.code,
                 sentence: attributes_for(:sentence_detail, :inside_handover_window))
-        }
+        end
 
         before do
           described_class.perform_now(offender_no)
@@ -197,15 +197,15 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
     context 'when calculated handover dates already exist for the offender' do
       let(:nomis_offender) { build(:nomis_offender, prisonId: prison.code) }
-      let!(:existing_record) {
+      let!(:existing_record) do
         create(:calculated_handover_date,
                responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
                offender: case_info.offender,
                start_date: existing_start_date,
                handover_date: existing_handover_date,
                reason: existing_reason
-        )
-      }
+              )
+      end
 
       describe 'when the dates have changed' do
         let(:existing_start_date) { today + 1.week }
@@ -242,26 +242,26 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
   end
 
   context 'when an indeterminate offender has moved into open conditions' do
-    let(:nomis_offender) {
+    let(:nomis_offender) do
       build(:nomis_offender,
             prisonId: prison.code,
-                category: category,
-                sentence: attributes_for(:sentence_detail,
-                                         :indeterminate,
-                                         sentenceStartDate: sentence_start_date))
-    }
+            category: category,
+            sentence: attributes_for(:sentence_detail,
+                                     :indeterminate,
+                                     sentenceStartDate: sentence_start_date))
+    end
 
-    let!(:case_information) {
+    let!(:case_information) do
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no),
-                                     case_allocation: 'NPS', manual_entry: false)
-    }
+                                case_allocation: 'NPS', manual_entry: false)
+    end
 
-    let(:movement) {
+    let(:movement) do
       attributes_for(:movement,
                      toAgency: prison.code,
-                         offenderNo: offender_no,
-                         movementDate: movement_date.to_s)
-    }
+                     offenderNo: offender_no,
+                     movementDate: movement_date.to_s)
+    end
 
     let(:offender) { build(:nomis_offender, prisonId: prison.code, prisonerNumber: offender_no) }
     let(:sentence_start_date) { policy_start_date }
@@ -279,8 +279,8 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
       # Create an 'old' handover date, which will then be updated given the 'new' open conditions
       create(:calculated_handover_date, offender: case_information.offender,
-             responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
-             reason: :nps_indeterminate)
+                                        responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
+                                        reason: :nps_indeterminate)
     end
 
     context 'when in a male prison' do
@@ -292,7 +292,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
                                              prisoner_crn: case_information.crn,
                                              ldu_email: case_information.ldu_email_address,
                                              prison_name: prison.name,
-                                             ))
+                                           ))
                                      .and_return OpenStruct.new(deliver_later: true)
 
         expect { described_class.perform_now(offender_no) }.to change(EmailHistory, :count).by(1)
@@ -307,12 +307,12 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       it 'emails the LDU to notify them that a COM is now needed' do
         expect(CommunityMailer).to receive(:open_prison_supporting_com_needed)
                                      .with(hash_including(
-                                             # prisoner_number: offender_no,
-                                             # prisoner_name: "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}",
+                                       # prisoner_number: offender_no,
+                                       # prisoner_name: "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}",
                                        prisoner_crn: case_information.crn,
                                        ldu_email: case_information.ldu_email_address,
                                        prison_name: prison.name,
-                                             ))
+                                     ))
                                      .and_return OpenStruct.new(deliver_later: true)
 
         expect { described_class.perform_now(offender_no) }.to change(EmailHistory, :count).by(1)
@@ -320,11 +320,11 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     end
 
     context 'when the LDU email address is unknown' do
-      let!(:case_information) {
+      let!(:case_information) do
         create(:case_information, offender: build(:offender, nomis_offender_id: offender_no),
-               local_delivery_unit: nil,
-               case_allocation: 'NPS', manual_entry: true)
-      }
+                                  local_delivery_unit: nil,
+                                  case_allocation: 'NPS', manual_entry: true)
+      end
 
       it 'does not send an email' do
         expect(CommunityMailer).not_to receive(:open_prison_supporting_com_needed)
@@ -333,10 +333,10 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     end
 
     context 'when a COM is already allocated' do
-      let!(:case_information) {
+      let!(:case_information) do
         create(:case_information, :with_com, offender: build(:offender, nomis_offender_id: offender_no),
-               case_allocation: 'NPS', manual_entry: false)
-      }
+                                             case_allocation: 'NPS', manual_entry: false)
+      end
 
       it 'does not send an email' do
         expect(CommunityMailer).not_to receive(:open_prison_supporting_com_needed)

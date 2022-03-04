@@ -10,7 +10,7 @@ module HmppsApi
       safe_offender_no = URI.encode_www_form_component(offender_no)
       route = "/offenders/nomisId/#{safe_offender_no}/assessments/summary?assessmentStatus=COMPLETE"
 
-      assessment = self.client.get(route).select { |a| a.fetch('assessmentType', nil).in? VALID_ASSESSMENT_TYPES }
+      assessment = client.get(route).select { |a| a.fetch('assessmentType', nil).in? VALID_ASSESSMENT_TYPES }
                        .max_by { |a| [a.fetch('assessmentType'), a.fetch('completed')] }
 
       unless assessment.nil?

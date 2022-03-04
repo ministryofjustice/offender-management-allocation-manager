@@ -5,25 +5,24 @@ require 'swagger_helper'
 # The DescribeClass cop has been disabled as it is insists that the describe
 # block contain the name of the tested class.  However rswag is using this
 # text as part of the API documentation generated from these tests.
-# rubocop:disable RSpec/DescribeClass
 # rubocop:disable RSpec/EmptyExampleGroup
 # Authorization 'method' needs to be defined for rswag
 # rubocop:disable RSpec/VariableName
 describe 'Offender Early Allocation API', vcr: { cassette_name: 'prison_api/offender_api' } do
   let!(:private_key) { OpenSSL::PKey::RSA.generate 2048 }
   let!(:public_key) { Base64.strict_encode64(private_key.public_key.to_s) }
-  let!(:payload) {
+  let!(:payload) do
     {
       user_name: 'test-user',
       scope: ['read'],
       exp: 4.hours.from_now.to_i
     }
-  }
+  end
   let!(:token) { JWT.encode payload, private_key, 'RS256' }
 
-  before {
+  before do
     allow(Rails.configuration).to receive(:nomis_oauth_public_key).and_return(public_key)
-  }
+  end
 
   path '/api/offenders/{offender_no}' do
     get 'Retrieves the early allocation status for an prisoner' do
@@ -44,9 +43,9 @@ describe 'Offender Early Allocation API', vcr: { cassette_name: 'prison_api/offe
                required: %w[offender_no early_allocation_eligibility_status]
 
         let(:offender_no) { 'G7266VD' }
-        let!(:allocation) {
+        let!(:allocation) do
           create(:case_information, offender: build(:offender, nomis_offender_id: offender_no, early_allocations: build_list(:early_allocation, 1)))
-        }
+        end
         let(:Authorization) { "Bearer #{token}" }
 
         run_test! do |_|
@@ -85,4 +84,3 @@ describe 'Offender Early Allocation API', vcr: { cassette_name: 'prison_api/offe
 end
 # rubocop:enable RSpec/VariableName
 # rubocop:enable RSpec/EmptyExampleGroup
-# rubocop:enable RSpec/DescribeClass

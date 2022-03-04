@@ -35,11 +35,11 @@ RSpec.describe ResponsibilitiesController, type: :controller do
         ).and_call_original
         expect {
           delete :destroy, params: {
-              prison_id: prison.code,
-              nomis_offender_id: responsibility.nomis_offender_id,
-              responsibility: attributes_for(:remove_responsibility_form,
-                                             nomis_offender_id: responsibility.nomis_offender_id,
-                                             reason_text: reason)
+            prison_id: prison.code,
+            nomis_offender_id: responsibility.nomis_offender_id,
+            responsibility: attributes_for(:remove_responsibility_form,
+                                           nomis_offender_id: responsibility.nomis_offender_id,
+                                           reason_text: reason)
           }
         }.to change(Responsibility, :count).by(-1)
       end
@@ -66,11 +66,11 @@ RSpec.describe ResponsibilitiesController, type: :controller do
         ).and_call_original
 
         delete :destroy, params: {
-            prison_id: prison.code,
-            nomis_offender_id: responsibility.nomis_offender_id,
-            responsibility: attributes_for(:remove_responsibility_form,
-                                           nomis_offender_id: responsibility.nomis_offender_id,
-                                           reason_text: reason)
+          prison_id: prison.code,
+          nomis_offender_id: responsibility.nomis_offender_id,
+          responsibility: attributes_for(:remove_responsibility_form,
+                                         nomis_offender_id: responsibility.nomis_offender_id,
+                                         reason_text: reason)
         }
       end
     end

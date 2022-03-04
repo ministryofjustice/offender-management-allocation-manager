@@ -2,9 +2,9 @@ require 'rails_helper'
 
 RSpec.describe OffenderHelper do
   let(:prison) { build(:prison) }
-  let(:offender) {
+  let(:offender) do
     build(:mpc_offender, prison: prison, prison_record: api_offender, offender: build(:case_information).offender)
-  }
+  end
 
   describe 'Digital Prison Services profile path' do
     it "formats the link to an offender's profile page within the Digital Prison Services" do
@@ -16,7 +16,7 @@ RSpec.describe OffenderHelper do
     let(:nomis_staff_id) { 456_789 }
     let(:nomis_offender_id) { 123_456 }
 
-    let!(:allocation) {
+    let!(:allocation) do
       create(
         :allocation_history,
         prison: prison.code,
@@ -24,7 +24,7 @@ RSpec.describe OffenderHelper do
         primary_pom_nomis_id: nomis_staff_id,
         event: 'allocate_primary_pom'
       )
-    }
+    end
 
     it 'returns the event in a more readable format' do
       expect(helper.last_event(allocation)).to eq("POM allocated - #{allocation.updated_at.strftime('%d/%m/%Y')}")
@@ -51,11 +51,11 @@ RSpec.describe OffenderHelper do
 
   describe 'generates labels for case owner ' do
     context 'when Prison' do
-      let(:api_offender) {
+      let(:api_offender) do
         build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail,
                                                             sentenceStartDate: Time.zone.today - 20.months,
                                                             automaticReleaseDate: Time.zone.today + 20.months))
-      }
+      end
 
       it 'shows custody' do
         expect(helper.case_owner_label(offender)).to eq('Custody')
@@ -63,9 +63,9 @@ RSpec.describe OffenderHelper do
     end
 
     context 'when Probation' do
-      let(:api_offender) {
+      let(:api_offender) do
         build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, automaticReleaseDate: Time.zone.today))
-      }
+      end
 
       it 'shows community' do
         expect(helper.case_owner_label(offender)).to eq('Community')
@@ -102,9 +102,9 @@ RSpec.describe OffenderHelper do
 
     context 'when a probation POM' do
       let(:api_offender) { build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :indeterminate)) }
-      let(:offender) {
+      let(:offender) do
         build(:mpc_offender, prison: prison, prison_record: api_offender, offender: build(:case_information, tier: 'A').offender)
-      }
+      end
 
       it "can get for a probation owned offender" do
         expect(helper.complex_reason_label(offender)).to eq('Prisoner assessed as suitable for a prison officer POM despite tiering calculation')

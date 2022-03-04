@@ -7,9 +7,9 @@ class CoworkingController < PrisonsApplicationController
     poms = @prison.get_list_of_poms
     @current_pom = poms.detect { |pom| pom.staff_id == current_pom_id }
 
-    @active_poms, @unavailable_poms = poms.reject { |p| p.staff_id == current_pom_id }.partition { |pom|
+    @active_poms, @unavailable_poms = poms.reject { |p| p.staff_id == current_pom_id }.partition do |pom|
       %w[active unavailable].include? pom.status
-    }
+    end
 
     @prison_poms = @active_poms.select(&:prison_officer?)
     @probation_poms = @active_poms.select(&:probation_officer?)
@@ -42,7 +42,7 @@ class CoworkingController < PrisonsApplicationController
       nomis_offender_id: coworking_nomis_offender_id_from_url
     )
     @primary_pom = @prison.get_single_pom(@allocation.primary_pom_nomis_id
-    )
+                                         )
   end
 
   def destroy
@@ -70,8 +70,8 @@ class CoworkingController < PrisonsApplicationController
 private
 
   def allocation_params
-    params.require(:coworking_allocations).
-      permit(:message, :nomis_offender_id, :nomis_staff_id)
+    params.require(:coworking_allocations)
+      .permit(:message, :nomis_offender_id, :nomis_staff_id)
   end
 
   def offender(nomis_offender_id)

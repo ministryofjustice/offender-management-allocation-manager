@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rake'
-require_relative '../../app/models/hmpps_api/movement.rb'
+require_relative '../../app/models/hmpps_api/movement'
 
 namespace :movements do
   desc 'Process the movement events in the previous 24 hours'

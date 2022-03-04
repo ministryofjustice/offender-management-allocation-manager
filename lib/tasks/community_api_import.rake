@@ -3,7 +3,7 @@
 namespace :community_api do
   desc 'Import data from Community API'
   task import: :environment do |_task|
-    Rails.logger = Logger.new(STDOUT)
+    Rails.logger = Logger.new($stdout)
 
     # Avoid filling up the in-memory SQL query cache – we're going to be reading lots of database records
     ActiveRecord::Base.connection.disable_query_cache!
@@ -14,10 +14,10 @@ namespace :community_api do
       prison_log_prefix = "[#{prison_index + 1}/#{prison_count}]"
       Rails.logger.info("#{prison_log_prefix} Getting offenders for prison #{prison.name} (#{prison.code})")
 
-      offender_count = prison.all_policy_offenders.each do |offender|
+      offender_count = prison.all_policy_offenders.each { |offender|
         ProcessDeliusDataJob.perform_later offender.offender_no
         Rails.logger.info("#{prison_log_prefix} Queued job for offender #{offender.offender_no}")
-      end.count
+      }.count
 
       Rails.logger.info("#{prison_log_prefix} Queued jobs for #{offender_count} offenders")
     end

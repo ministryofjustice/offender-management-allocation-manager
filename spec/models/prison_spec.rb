@@ -73,11 +73,11 @@ RSpec.describe Prison, type: :model do
     end
 
     describe 'Validations' do
-      subject {
+      subject do
         described_class.new(prison_type: 'mens_open',
                             code: 'ACI',
                             name: 'HMP Altcourse')
-      }
+      end
 
       it "is not valid without a prison_type" do
         subject.prison_type = nil
@@ -90,17 +90,17 @@ RSpec.describe Prison, type: :model do
       end
 
       it 's code must be unique' do
-        described_class.create(prison_type: 'mens_open',
-                               code: 'ACI',
-                               name: 'HMP Altcourse')
+        described_class.create!(prison_type: 'mens_open',
+                                code: 'ACI',
+                                name: 'HMP Altcourse')
 
         expect(subject).to be_invalid
       end
 
       it 's name must be unique' do
-        described_class.create(prison_type: 'mens_open',
-                               code: 'AGI',
-                               name: 'HMP Altcourse')
+        described_class.create!(prison_type: 'mens_open',
+                                code: 'AGI',
+                                name: 'HMP Altcourse')
 
         expect(subject).to be_invalid
       end

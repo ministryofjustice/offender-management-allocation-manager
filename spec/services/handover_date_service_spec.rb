@@ -37,14 +37,14 @@ describe HandoverDateService do
   context 'when determinate' do
     let(:today) { Date.parse('01/01/2021') }
     let(:crd) { Date.parse('01/09/2022') }
-    let(:api_offender) {
+    let(:api_offender) do
       build(:hmpps_api_offender,
             prisonId: prison,
             sentence: attributes_for(:sentence_detail, :determinate, sentenceStartDate: sentence_start_date, conditionalReleaseDate: crd)
-      ).tap { |o|
+           ).tap do |o|
         o.prison_arrival_date = arrival_date
-      }
-    }
+      end
+    end
 
     context 'when NPS' do
       let(:case_info) { build(:case_information, :nps, probation_service: welsh? ? 'Wales' : 'England') }
@@ -382,15 +382,15 @@ describe HandoverDateService do
     context 'with tariff date in the future' do
       let(:tariff_date) { Date.parse('01/09/2022') }
       let(:case_info) { build(:case_information, :nps, probation_service: welsh? ? 'Wales' : 'England') }
-      let(:api_offender) {
+      let(:api_offender) do
         build(:hmpps_api_offender,
               prisonId: prison,
               category: category,
               sentence: attributes_for(:sentence_detail, :indeterminate, tariffDate: tariff_date, sentenceStartDate: sentence_start_date)
-        ).tap { |o|
+             ).tap do |o|
           o.prison_arrival_date = arrival_date
-        }
-      }
+        end
+      end
 
       it 'handover starts 8 months before TED/PED/PRD' do
         expect(start_date).to eq(tariff_date - 8.months)
@@ -612,15 +612,15 @@ describe HandoverDateService do
   end
 
   describe 'OMIC policy date boundaries' do
-    let(:api_offender) {
+    let(:api_offender) do
       build(:hmpps_api_offender,
             prisonId: prison,
             sentence: attributes_for(:sentence_detail, :determinate, sentenceStartDate: sentence_start_date, conditionalReleaseDate: crd),
             category: offender_category
-      ).tap { |o|
+           ).tap do |o|
         o.prison_arrival_date = arrival_date
-      }
-    }
+      end
+    end
 
     let(:offender_category) { build(:offender_category, :cat_c) }
 
@@ -810,12 +810,12 @@ describe HandoverDateService do
   end
 
   context 'when offender is outside OMIC policy' do
-    let(:api_offender) {
+    let(:api_offender) do
       build(:hmpps_api_offender,
             prisonId: prison,
             sentence: attributes_for(:sentence_detail, :civil_sentence)
-      )
-    }
+           )
+    end
 
     let(:case_info) { build(:case_information) }
 

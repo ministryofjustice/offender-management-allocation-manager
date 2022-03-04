@@ -23,7 +23,7 @@ feature 'Inactive POM' do
       expect(page).to have_text("This Prison Offender Manager does not appear to be active")
     end
 
-    it 'will deallocate the caseload'do
+    it 'will deallocate the caseload' do
       click_link("Set this POM's status to inactive")
 
       within first('.govuk-summary-list__row') do

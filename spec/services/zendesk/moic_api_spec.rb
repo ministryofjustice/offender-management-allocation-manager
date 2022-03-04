@@ -6,7 +6,6 @@ RSpec.describe Zendesk::MoicApi do
   let(:zendesk_api_client) { double(ZendeskAPI::Client) }
   let(:zendes_moic_client) { Zendesk::MoicClient.instance }
 
-
   before do
     allow(zendes_moic_client).to receive(:request).and_yield(zendesk_api_client)
   end
@@ -26,10 +25,10 @@ RSpec.describe Zendesk::MoicApi do
     it 'deletes tickets that have not been updated in twelve months or less' do
       inbox = 'an.inbox.tag'
 
-      expect(zendesk_api_client).to receive(:search).
-          and_return(ticket_ids, empty_ticket_ids)
-      expect(ZendeskAPI::Ticket).to receive(:destroy_many!).
-          with(zendesk_api_client, ticket_ids).once
+      expect(zendesk_api_client).to receive(:search)
+          .and_return(ticket_ids, empty_ticket_ids)
+      expect(ZendeskAPI::Ticket).to receive(:destroy_many!)
+          .with(zendesk_api_client, ticket_ids).once
 
       subject.cleanup_tickets(inbox)
     end
@@ -57,21 +56,21 @@ RSpec.describe Zendesk::MoicApi do
                      role: 'SPO',
                      tags: ['moic'],
                      custom_fields: [
-                           url_custom_field,
-                           browser_custom_field,
-                           prison_custom_field
-                       ] }
+                       url_custom_field,
+                       browser_custom_field,
+                       prison_custom_field
+                     ] }
       }
     end
 
     it 'calls save! to send the feedback' do
-      expect(ZendeskAPI::Ticket).
-          to receive(:new).
-              with(
+      expect(ZendeskAPI::Ticket)
+          .to receive(:new)
+              .with(
                 zendesk_api_client,
                 ticket_attributes
-              ).
-              and_return(ticket)
+              )
+              .and_return(ticket)
 
       expect(ticket).to receive(:save!).once
 

@@ -3,14 +3,14 @@
 require 'rails_helper'
 
 RSpec.describe AllocationStaffController, type: :controller do
-  let(:poms) {
+  let(:poms) do
     [
       build(:pom, :prison_officer, emails: []),
       build(:pom, :prison_officer),
       build(:pom, :probation_officer),
       build(:pom, :probation_officer)
     ]
-  }
+  end
   let(:pom_without_emails) { poms.first }
   let(:prison_code) { create(:prison).code }
   let(:offender) { build(:nomis_offender, prisonId: prison_code) }
@@ -86,9 +86,9 @@ RSpec.describe AllocationStaffController, type: :controller do
       end
 
       context 'when the offender has been allocated before' do
-        let!(:allocation) {
+        let!(:allocation) do
           create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no, primary_pom_nomis_id: poms.last.staff_id)
-        }
+        end
 
         before do
           stub_offenders_for_prison(prison_code, [offender])
@@ -119,10 +119,10 @@ RSpec.describe AllocationStaffController, type: :controller do
 
         let(:previous_pom) { build(:pom, :probation_officer) }
 
-        let!(:allocation) {
+        let!(:allocation) do
           # Allocate a POM in the previous prison
           create(:allocation_history, prison: previous_prison_code, nomis_offender_id: offender_no, primary_pom_nomis_id: previous_pom.staff_id)
-        }
+        end
 
         before do
           # Stub previous POM in the old prison

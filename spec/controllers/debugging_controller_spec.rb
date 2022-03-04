@@ -19,10 +19,10 @@ RSpec.describe DebuggingController, type: :controller do
       stub_offender(build(:nomis_offender, prisonId: prison.code, sentence: attributes_for(:sentence_detail, :indeterminate), prisonerNumber: offender_no))
 
       stub_movements_for offender_no, [attributes_for(:movement, offenderNo: offender_no,
-                                       fromAgency: "LEI",
-                                       toAgency: prison_id,
-                                       movementType: "TRN",
-                                       directionCode: "IN")], movement_types: %w[ADM TRN REL]
+                                                                 fromAgency: "LEI",
+                                                                 toAgency: prison_id,
+                                                                 movementType: "TRN",
+                                                                 directionCode: "IN")], movement_types: %w[ADM TRN REL]
 
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
       create(:allocation_history, prison: prison.code, nomis_offender_id: offender_no, primary_pom_nomis_id: pom_staff_id, primary_pom_name: primary_pom_name)

@@ -19,7 +19,8 @@
 
 module ActiveSupport
   module Inflector
-    def titleize(word, _keep_id_suffix = false)
+    def titleize(word, keep_id_suffix: false)
+      _keep_id_suffix = keep_id_suffix ? true : false
       word.split(/\b/).map(&:capitalize).join
     end
   end

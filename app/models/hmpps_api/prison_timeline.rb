@@ -18,7 +18,7 @@ module HmppsApi
     PrisonEpisode = Struct.new :start_date, :prison_code, keyword_init: true
 
     # return an prison episode/stay for the specified date/time.
-    def prison_episode date
+    def prison_episode(date)
       # need to filter out non-prison transfers as we are prison-centric
       relevent_movement = @movements.select(&:to_prison?).detect { |m| m.happened_at <= date }
       PrisonEpisode.new start_date: relevent_movement.movement_date, prison_code: relevent_movement.to_agency

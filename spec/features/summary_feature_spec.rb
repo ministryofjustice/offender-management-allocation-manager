@@ -30,7 +30,7 @@ feature 'male prisoners summary navigation tabs' do
   let(:offender_ready_to_allocate) { build(:nomis_offender) }
   let(:newly_arrived_offender) { build(:nomis_offender, sentence: attributes_for(:sentence_detail, sentenceStartDate: today)) }
 
-  let(:offenders) {
+  let(:offenders) do
     [offender_with_missing_info_one,
      offender_with_missing_info_two,
      offender_with_missing_info_three,
@@ -39,11 +39,11 @@ feature 'male prisoners summary navigation tabs' do
      offender_ready_to_allocate,
      newly_arrived_offender
     ]
-  }
+  end
 
-  let(:active_tab) {
+  let(:active_tab) do
     page.find('.moj-sub-navigation a[aria-current=page]').text
-  }
+  end
 
   it 'shows allocated offenders' do
     visit allocated_prison_prisoners_path(prison.code)

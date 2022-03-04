@@ -26,17 +26,17 @@ describe HmppsApi::PrisonApi::OffenderApi do
       let(:prison) { create(:prison).code }
 
       # These offenders should be allowed in because of their legal status
-      let(:accepted_offenders) {
+      let(:accepted_offenders) do
         [
           build(:nomis_offender, legalStatus: 'IMMIGRATION_DETAINEE'),
           build(:nomis_offender, legalStatus: 'INDETERMINATE_SENTENCE'),
           build(:nomis_offender, legalStatus: 'RECALL'),
           build(:nomis_offender, legalStatus: 'SENTENCED'),
         ]
-      }
+      end
 
       # These offenders should be filtered out because of their legal status
-      let(:rejected_offenders) {
+      let(:rejected_offenders) do
         [
           build(:nomis_offender, legalStatus: 'CIVIL_PRISONER'),
           build(:nomis_offender, legalStatus: 'CONVICTED_UNSENTENCED'),
@@ -45,11 +45,11 @@ describe HmppsApi::PrisonApi::OffenderApi do
           build(:nomis_offender, legalStatus: 'REMAND'),
           build(:nomis_offender, legalStatus: 'UNKNOWN'),
         ]
-      }
+      end
 
-      let(:offenders) {
+      let(:offenders) do
         (accepted_offenders + rejected_offenders).shuffle
-      }
+      end
 
       before do
         stub_auth_token
@@ -68,11 +68,11 @@ describe HmppsApi::PrisonApi::OffenderApi do
       let(:prison) { create(:prison).code }
       let(:in_offenders) { build_list(:nomis_offender, 3, prisonId: prison) }
       let(:out_offenders) { build_list(:nomis_offender, 2, :rotl, prisonId: prison) }
-      let(:rotl_movements) {
-        out_offenders.map { |o|
+      let(:rotl_movements) do
+        out_offenders.map do |o|
           attributes_for(:movement, :rotl, offenderNo: o[:prisonerNumber])
-        }
-      }
+        end
+      end
 
       before do
         stub_auth_token
@@ -140,17 +140,17 @@ describe HmppsApi::PrisonApi::OffenderApi do
 
     context 'when offender is on remand or unsentenced' do
       # These offenders should be allowed in because of their legal status
-      let(:accepted_offenders) {
+      let(:accepted_offenders) do
         [
           build(:nomis_offender, legalStatus: 'IMMIGRATION_DETAINEE'),
           build(:nomis_offender, legalStatus: 'INDETERMINATE_SENTENCE'),
           build(:nomis_offender, legalStatus: 'RECALL'),
           build(:nomis_offender, legalStatus: 'SENTENCED'),
         ]
-      }
+      end
 
       # These offenders should be filtered out because of their legal status
-      let(:rejected_offenders) {
+      let(:rejected_offenders) do
         [
           build(:nomis_offender, legalStatus: 'CIVIL_PRISONER'),
           build(:nomis_offender, legalStatus: 'CONVICTED_UNSENTENCED'),
@@ -159,11 +159,11 @@ describe HmppsApi::PrisonApi::OffenderApi do
           build(:nomis_offender, legalStatus: 'REMAND'),
           build(:nomis_offender, legalStatus: 'UNKNOWN'),
         ]
-      }
+      end
 
-      let(:offenders) {
+      let(:offenders) do
         (accepted_offenders + rejected_offenders).shuffle
-      }
+      end
 
       before do
         stub_auth_token
