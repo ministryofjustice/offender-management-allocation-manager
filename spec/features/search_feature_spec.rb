@@ -81,7 +81,7 @@ feature 'Search for offenders' do
     end
 
     it 'Can search from the Missing Information summary page', vcr: { cassette_name: 'prison_api/missing_info_search_feature' } do
-      visit  missing_information_prison_prisoners_path(prison_code)
+      visit missing_information_prison_prisoners_path(prison_code)
 
       expect(page).to have_text('Make new allocations')
       fill_in 'q', with: 'Ste'

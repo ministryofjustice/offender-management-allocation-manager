@@ -13,9 +13,9 @@ class VictimLiaisonOfficersController < PrisonsApplicationController
   def info_for_paper_trail
     user = HmppsApi::PrisonApi::UserApi.user_details(current_user)
     {
-        user_first_name: user.first_name,
-        user_last_name: user.last_name,
-        prison: active_prison_id
+      user_first_name: user.first_name,
+      user_last_name: user.last_name,
+      prison: active_prison_id
     }
   end
 
@@ -46,7 +46,7 @@ class VictimLiaisonOfficersController < PrisonsApplicationController
   def delete; end
 
   def destroy
-    @vlo.destroy
+    @vlo.destroy!
     redirect_to referrer
   end
 

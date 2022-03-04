@@ -26,7 +26,7 @@ class AllocationService
     EmailService.send_coworking_primary_email(allocation: alloc_version, message: message)
 
     EmailService.send_secondary_email(allocation: alloc_version, message: message,
-                          pom_nomis_id: secondary_pom_nomis_id, pom_firstname: coworking_pom.first_name)
+                                      pom_nomis_id: secondary_pom_nomis_id, pom_firstname: coworking_pom.first_name)
   end
 
   def self.create_or_update(params)
@@ -36,7 +36,7 @@ class AllocationService
     params_copy = params.except(:created_by_username).merge(
       primary_pom_name: "#{primary_pom.last_name}, #{primary_pom.first_name}",
       created_by_name: "#{created_by_user.first_name} #{created_by_user.last_name}",
-      primary_pom_allocated_at: DateTime.now.utc
+      primary_pom_allocated_at: Time.zone.now.utc
     )
 
     # When we look up the current allocation, we only do this for the current
@@ -57,8 +57,8 @@ class AllocationService
     end
 
     EmailService.send_email(allocation: alloc_version,
-                          message: params[:message],
-                          pom_nomis_id: params[:primary_pom_nomis_id])
+                            message: params[:message],
+                            pom_nomis_id: params[:primary_pom_nomis_id])
 
     alloc_version
   end

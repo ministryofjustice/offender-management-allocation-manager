@@ -44,9 +44,9 @@ class PomTasks
     # An early allocation request has been made but is pending a response from
     # the community, and therefore needs updating.
     PomTaskPresenter.new offender_name: offender.full_name,
-      offender_number: offender.offender_no,
-      action_label: 'Early allocation decision',
-      long_label: 'The community probation team’s decision about early allocation must be recorded.'
+                         offender_number: offender.offender_no,
+                         action_label: 'Early allocation decision',
+                         long_label: 'The community probation team’s decision about early allocation must be recorded.'
   end
 
   def get_early_allocations(offender_nos)

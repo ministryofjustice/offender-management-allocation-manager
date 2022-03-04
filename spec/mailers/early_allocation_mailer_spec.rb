@@ -4,10 +4,10 @@ RSpec.describe EarlyAllocationMailer, type: :mailer do
   describe 'review_early_allocation' do
     let(:params) do
       {
-      prisoner_name: "Brown, James",
-      start_page_link: prison_prisoner_early_allocations_path(prison_id: "LEI", prisoner_id: "T1000AA"),
-      equip_guidance_link: "http://www.equip_guidance_link.html",
-      email: "ursula.richards@thelighthouse.gov.uk"
+        prisoner_name: "Brown, James",
+        start_page_link: prison_prisoner_early_allocations_path(prison_id: "LEI", prisoner_id: "T1000AA"),
+        equip_guidance_link: "http://www.equip_guidance_link.html",
+        email: "ursula.richards@thelighthouse.gov.uk"
       }
     end
 
@@ -22,11 +22,11 @@ RSpec.describe EarlyAllocationMailer, type: :mailer do
     end
 
     it 'personalises the email' do
-      expect(mail.govuk_notify_personalisation).
-      to eq(prisoner_name: params[:prisoner_name],
-            start_page_link: "/prisons/LEI/prisoners/T1000AA/early_allocations",
-            equip_guidance_link: params[:equip_guidance_link]
-         )
+      expect(mail.govuk_notify_personalisation)
+      .to eq(prisoner_name: params[:prisoner_name],
+             start_page_link: "/prisons/LEI/prisoners/T1000AA/early_allocations",
+             equip_guidance_link: params[:equip_guidance_link]
+            )
     end
   end
 end

@@ -9,8 +9,8 @@ describe HandoverDateService do
     subject do
       x = described_class.handover(offender)
       {
-          start_date: x.start_date,
-          handover_date: x.handover_date
+        start_date: x.start_date,
+        handover_date: x.handover_date
       }
     end
 
@@ -23,14 +23,14 @@ describe HandoverDateService do
     end
 
     context 'when NPS' do
-      let(:offender) {
+      let(:offender) do
         OpenStruct.new indeterminate_sentence?: indeterminate,
                        nps_case?: true,
                        sentence_start_date: automatic_release_date - 2.years,
                        automatic_release_date: automatic_release_date,
                        tariff_date: tariff_date,
                        inside_omic_policy?: true
-      }
+      end
 
       let(:automatic_release_date) { Date.new(2025, 8, 30) }
       let(:tariff_date) { Date.new(2025, 8, 30) }
@@ -96,9 +96,9 @@ describe HandoverDateService do
       let(:case_info) { build(:case_information, :crc) }
       let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
-      let(:api_offender) {
+      let(:api_offender) do
         build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :indeterminate, tariffDate: tariff_date))
-      }
+      end
 
       let(:tariff_date) { Date.new(2030, 8, 30) }
 
@@ -112,17 +112,17 @@ describe HandoverDateService do
       let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
       context 'when outside referral window' do
-        let(:api_offender) {
+        let(:api_offender) do
           build(:hmpps_api_offender,
                 sentence: attributes_for(:sentence_detail, :determinate, :english_policy_sentence,
                                          automaticReleaseDate: ard,
                                          conditionalReleaseDate: crd))
-        }
-        let(:case_info) {
+        end
+        let(:case_info) do
           create(:case_information,
                  offender: build(:offender,
                                  early_allocations: [build(:early_allocation, created_within_referral_window: false)]))
-        }
+        end
         let(:ard) { nil }
 
         it 'will be unaffected' do
@@ -134,17 +134,17 @@ describe HandoverDateService do
         let(:ted) { Date.new(2022, 7, 3) }
         let(:ted15) { ted - 15.months }
 
-        let(:api_offender) {
+        let(:api_offender) do
           build(:hmpps_api_offender,
                 sentence: attributes_for(:sentence_detail, :indeterminate,
                                          paroleEligibilityDate: ped,
                                          tariffDate: ted))
-        }
-        let(:case_info) {
+        end
+        let(:case_info) do
           create(:case_information,
                  offender: build(:offender,
                                  early_allocations: [build(:early_allocation, created_within_referral_window: true)]))
-        }
+        end
 
         context 'without PED' do
           let(:ped) { nil }
@@ -164,19 +164,19 @@ describe HandoverDateService do
       end
 
       context 'when determinate' do
-        let(:api_offender) {
+        let(:api_offender) do
           build(:hmpps_api_offender,
                 sentence: attributes_for(:sentence_detail, :determinate, :english_policy_sentence,
                                          automaticReleaseDate: ard,
                                          conditionalReleaseDate: crd))
-        }
+        end
 
         context 'when inside referral window' do
-          let(:case_info) {
+          let(:case_info) do
             create(:case_information,
                    offender: build(:offender,
                                    early_allocations: [build(:early_allocation, created_within_referral_window: true)]))
-          }
+          end
 
           context 'without ARD' do
             let(:ard) { nil }
@@ -196,11 +196,11 @@ describe HandoverDateService do
         end
 
         context 'when outside referral window' do
-          let(:case_info) {
+          let(:case_info) do
             create(:case_information,
                    offender: build(:offender,
                                    early_allocations: [build(:early_allocation, created_within_referral_window: false)]))
-          }
+          end
           let(:ard) { nil }
 
           it 'will be unaffected' do
@@ -213,13 +213,13 @@ describe HandoverDateService do
 
   describe 'handover dates' do
     let(:result) { described_class.handover(offender).handover_date }
-    let(:sentence_type_trait) {
+    let(:sentence_type_trait) do
       if indeterminate_sentence
         recall? ? :indeterminate_recall : :indeterminate
       else
         recall? ? :determinate_recall : :determinate
       end
-    }
+    end
 
     let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
     let(:api_offender) do
@@ -479,24 +479,24 @@ describe HandoverDateService do
     let(:case_info) { build(:case_information) }
 
     let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
-    let(:api_offender) {
+    let(:api_offender) do
       build(:hmpps_api_offender,
             sentence: if indeterminate_sentence
                         attributes_for(:sentence_detail,
                                        :indeterminate,
                                        paroleEligibilityDate: parole_eligibility_date,
                                        tariffDate: tariff_date
-                        )
+                                      )
                       else
                         attributes_for(:sentence_detail,
                                        :determinate,
                                        automaticReleaseDate: automatic_release_date,
                                        conditionalReleaseDate: conditional_release_date,
                                        paroleEligibilityDate: parole_eligibility_date
-                        )
+                                      )
                       end
-            )
-    }
+           )
+    end
 
     let(:result) do
       described_class.nps_start_date(
@@ -572,11 +572,11 @@ describe HandoverDateService do
   context 'with an NPS and indeterminate case with a PRD and no TED' do
     let(:case_info) { build(:case_information, :nps, offender: build(:offender, parole_record: build(:parole_record))) }
     let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
-    let(:api_offender) {
+    let(:api_offender) do
       build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail,
                                                           :indeterminate,
                                                           tariffDate: nil))
-    }
+    end
 
     it 'displays the handover date (which is 8 months prior to PRD) ' do
       expect(described_class.handover(offender).handover_date).to eq(case_info.offender.parole_record.parole_review_date - 8.months)

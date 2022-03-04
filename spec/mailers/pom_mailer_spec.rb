@@ -21,23 +21,23 @@ RSpec.describe PomMailer, type: :mailer do
     end
 
     it 'personalises the email' do
-      expect(mail.govuk_notify_personalisation).
-          to eq(
+      expect(mail.govuk_notify_personalisation)
+          .to eq(
             email_subject: 'New OMIC allocation',
             pom_name: params[:pom_name],
             responsibility: params[:responsibility],
             offender_name: params[:offender_name],
             nomis_offender_id: params[:offender_no],
-            message: "Additional information: " + params[:message],
+            message: "Additional information: #{params[:message]}",
             url: params[:url]
-                 )
+          )
     end
 
     context 'when no optional message has been added to the email' do
       it 'personalises the email' do
         params[:message] = ""
-        expect(mail.govuk_notify_personalisation).
-            to eq(
+        expect(mail.govuk_notify_personalisation)
+            .to eq(
               email_subject: 'New OMIC allocation',
               pom_name: params[:pom_name],
               responsibility: params[:responsibility],
@@ -45,7 +45,7 @@ RSpec.describe PomMailer, type: :mailer do
               nomis_offender_id: params[:offender_no],
               message: params[:message],
               url: params[:url]
-                   )
+            )
       end
     end
   end
@@ -67,8 +67,8 @@ RSpec.describe PomMailer, type: :mailer do
     let(:mail) { described_class.deallocation_email(params) }
 
     it 'sets the template' do
-      expect(mail.govuk_notify_template).
-          to eq 'cd628495-6e7a-448e-b4ad-4d49d4d8567d'
+      expect(mail.govuk_notify_template)
+          .to eq 'cd628495-6e7a-448e-b4ad-4d49d4d8567d'
     end
 
     it 'sets the To address of the email using the provided user' do
@@ -76,8 +76,8 @@ RSpec.describe PomMailer, type: :mailer do
     end
 
     it 'personalises the email' do
-      expect(mail.govuk_notify_personalisation).
-          to eq(
+      expect(mail.govuk_notify_personalisation)
+          .to eq(
             email_subject: 'OMIC case reallocation',
             previous_pom_name: params[:previous_pom_name],
             responsibility: params[:responsibility],
@@ -86,7 +86,7 @@ RSpec.describe PomMailer, type: :mailer do
             nomis_offender_id: params[:offender_no],
             prison: params[:prison],
             url: params[:url]
-             )
+          )
     end
   end
 
@@ -105,8 +105,8 @@ RSpec.describe PomMailer, type: :mailer do
     let(:mail) { described_class.deallocate_coworking_pom(params) }
 
     it 'sets the template' do
-      expect(mail.govuk_notify_template).
-          to eq 'bbdd094b-037b-424d-8b9b-ee310e291c9e'
+      expect(mail.govuk_notify_template)
+          .to eq 'bbdd094b-037b-424d-8b9b-ee310e291c9e'
     end
 
     it 'sets the To address of the email using the provided user' do
@@ -114,15 +114,15 @@ RSpec.describe PomMailer, type: :mailer do
     end
 
     it 'personalises the email' do
-      expect(mail.govuk_notify_personalisation).
-          to eq(
+      expect(mail.govuk_notify_personalisation)
+          .to eq(
             email_address: params[:email_address],
             pom_name: params[:pom_name],
             secondary_pom_name: params[:secondary_pom_name],
             offender_name: params[:offender_name],
             nomis_offender_id: params[:nomis_offender_id],
             url: params[:url]
-             )
+          )
     end
   end
 end

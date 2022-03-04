@@ -31,7 +31,7 @@ class MpcOffender
     @probation_record = offender.case_information
   end
 
-  # TODO - view method in model needs to be removed
+  # TODO: - view method in model needs to be removed
   def case_owner
     if pom_responsible?
       'Custody'
@@ -120,9 +120,7 @@ class MpcOffender
   end
 
   # handover methods
-  def handover_start_date
-    handover.start_date
-  end
+  delegate :start_date, to: :handover, prefix: true
 
   def handover_reason
     handover.reason_text

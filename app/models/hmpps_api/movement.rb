@@ -51,13 +51,13 @@ module HmppsApi
 
     # date and time from the API should be in Zulu time
     def happened_at
-      DateTime.parse "#{@movement_date} #{@movement_time}"
+      Time.zone.parse "#{@movement_date} #{@movement_time}"
     end
 
     def self.from_json(payload)
-      Movement.new.tap { |obj|
+      Movement.new.tap do |obj|
         obj.load_from_json(payload)
-      }
+      end
     end
   end
 end

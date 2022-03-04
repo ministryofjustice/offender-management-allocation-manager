@@ -12,9 +12,9 @@ RSpec.describe "shared/notifications/offender_needs_a_com", type: :view do
   let(:prison) { build(:prison) }
 
   let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
-  let(:api_offender) {
+  let(:api_offender) do
     build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :determinate, :inside_handover_window))
-  }
+  end
 
   before do
     render partial: 'shared/notifications/offender_needs_a_com',

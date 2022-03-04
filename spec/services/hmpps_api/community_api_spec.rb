@@ -33,8 +33,8 @@ describe HmppsApi::CommunityApi do
         }
       }
 
-      expect(WebMock).to have_requested(:put, stub_url).
-        with(
+      expect(WebMock).to have_requested(:put, stub_url)
+        .with(
           headers: { 'Content-Type': 'application/json' },
           body: expect_body.to_json
         )
@@ -83,15 +83,15 @@ describe HmppsApi::CommunityApi do
 
       it 'sets both handover dates for the given offender' do
         # Handover start date
-        expect(WebMock).to have_requested(:put, start_date_url).
-          with(
+        expect(WebMock).to have_requested(:put, start_date_url)
+          .with(
             headers: { 'Content-Type': 'application/json' },
             body: { date: '2020-02-01' }.to_json
           )
 
         # Responsibility handover date
-        expect(WebMock).to have_requested(:put, handover_date_url).
-          with(
+        expect(WebMock).to have_requested(:put, handover_date_url)
+          .with(
             headers: { 'Content-Type': 'application/json' },
             body: { date: '2020-10-18' }.to_json
           )
@@ -122,8 +122,8 @@ describe HmppsApi::CommunityApi do
 
       it 'still sets responsibility handover date' do
         # Responsibility handover date
-        expect(WebMock).to have_requested(:put, handover_date_url).
-          with(
+        expect(WebMock).to have_requested(:put, handover_date_url)
+          .with(
             headers: { 'Content-Type': 'application/json' },
             body: { date: '2021-12-25' }.to_json
           )
@@ -136,8 +136,8 @@ describe HmppsApi::CommunityApi do
 
       it 'still sets handover start date' do
         # Handover start date
-        expect(WebMock).to have_requested(:put, start_date_url).
-          with(
+        expect(WebMock).to have_requested(:put, start_date_url)
+          .with(
             headers: { 'Content-Type': 'application/json' },
             body: { date: '2021-12-01' }.to_json
           )

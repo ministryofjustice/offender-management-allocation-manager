@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe ZendeskTicketsJob, type: :job do
   subject { described_class }
 
-  let!(:contact) {
+  let!(:contact) do
     ContactSubmission.create!(
       message: 'text',
       name: 'Frank',
@@ -13,7 +13,7 @@ RSpec.describe ZendeskTicketsJob, type: :job do
       user_agent: 'Mozilla',
       job_type: 'SPO'
     )
-  }
+  end
 
   let(:client) { double(Zendesk::Client) }
   let(:zendesk_moic_api) { double(Zendesk::MoicApi) }
@@ -46,19 +46,19 @@ RSpec.describe ZendeskTicketsJob, type: :job do
 
   context 'when contact is associated to a prison' do
     it 'creates a ticket with custom fields containing the prison' do
-      expect(zendesk_moic_api).
-          to receive(:raise_ticket).
-              with(
+      expect(zendesk_moic_api)
+          .to receive(:raise_ticket)
+              .with(
                 description: 'text',
                 requester: { email: 'email@example.com',
                              name: 'Frank' },
                 tags: ['moic'],
                 custom_fields: [
-                   url_custom_field,
-                   browser_custom_field,
-                   prison_custom_field,
-                   job_type_custom_field,
-                   service_custom_field
+                  url_custom_field,
+                  browser_custom_field,
+                  prison_custom_field,
+                  job_type_custom_field,
+                  service_custom_field
                 ]
               ).and_return(true)
 
@@ -68,19 +68,19 @@ RSpec.describe ZendeskTicketsJob, type: :job do
 
   context 'when raising a ticket is successful' do
     it 'deletes the contact submission' do
-      expect(zendesk_moic_api).
-          to receive(:raise_ticket).
-              with(
+      expect(zendesk_moic_api)
+          .to receive(:raise_ticket)
+              .with(
                 description: 'text',
                 requester: { email: 'email@example.com',
                              name: 'Frank' },
                 tags: ['moic'],
                 custom_fields: [
-                    url_custom_field,
-                    browser_custom_field,
-                    prison_custom_field,
-                    job_type_custom_field,
-                    service_custom_field
+                  url_custom_field,
+                  browser_custom_field,
+                  prison_custom_field,
+                  job_type_custom_field,
+                  service_custom_field
                 ]
               ).and_return(true)
 
@@ -92,19 +92,19 @@ RSpec.describe ZendeskTicketsJob, type: :job do
 
   context 'when raising a ticket is not successful' do
     it 'does not delete the contact submission' do
-      allow(zendesk_moic_api).
-          to receive(:raise_ticket).
-              with(
+      allow(zendesk_moic_api)
+          .to receive(:raise_ticket)
+              .with(
                 description: 'text',
                 requester: { email: 'email@example.com',
                              name: 'Frank' },
                 tags: ['moic'],
                 custom_fields: [
-                    url_custom_field,
-                    browser_custom_field,
-                    prison_custom_field,
-                    job_type_custom_field,
-                    service_custom_field
+                  url_custom_field,
+                  browser_custom_field,
+                  prison_custom_field,
+                  job_type_custom_field,
+                  service_custom_field
                 ]
               ).and_raise(ZendeskAPI::Error::ClientError.new('Error'))
 

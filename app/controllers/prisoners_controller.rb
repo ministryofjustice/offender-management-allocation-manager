@@ -43,8 +43,8 @@ class PrisonersController < PrisonsApplicationController
     @oasys_assessment = HmppsApi::AssessmentApi.get_latest_oasys_date(@prisoner.offender_no)
 
     if @allocation.present?
-      @primary_pom_name = PrisonOffenderManagerService.fetch_pom_name(@allocation.primary_pom_nomis_id).
-          titleize
+      @primary_pom_name = PrisonOffenderManagerService.fetch_pom_name(@allocation.primary_pom_nomis_id)
+          .titleize
     end
 
     if @allocation.present? && @allocation.secondary_pom_name.present?
@@ -77,7 +77,7 @@ private
     end
   end
 
-  def load_summary summary_type
+  def load_summary(summary_type)
     bucket = {
       unallocated: @unallocated,
       missing_information: @missing_info,

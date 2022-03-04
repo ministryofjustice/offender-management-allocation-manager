@@ -13,7 +13,7 @@ RSpec.describe "early_allocations/early_allocations_list", type: :view do
   end
 
   context 'with Early Allocation assessments' do
-    let(:early_allocations) {
+    let(:early_allocations) do
       # Create 5 Early Allocation records with different creation dates
       [
         create(:early_allocation, created_at: 1.year.ago),
@@ -22,7 +22,7 @@ RSpec.describe "early_allocations/early_allocations_list", type: :view do
         create(:early_allocation, created_at: 1.week.ago),
         create(:early_allocation, created_at: 1.day.ago)
       ]
-    }
+    end
 
     it 'renders a table with one row for each assessment' do
       rows = page.css('table > tbody > tr')
@@ -35,10 +35,10 @@ RSpec.describe "early_allocations/early_allocations_list", type: :view do
     end
 
     describe 'column values' do
-      let(:rendered_values) {
+      let(:rendered_values) do
         # An array of string cell values, one for each row for the table, for column specified by column_index
         page.css("tr > td:nth-child(#{column_index})").map(&:text).map(&:strip)
-      }
+      end
 
       describe 'Assessment date' do
         let(:column_index) { 1 }
@@ -84,9 +84,9 @@ RSpec.describe "early_allocations/early_allocations_list", type: :view do
         let(:column_index) { 3 }
 
         it 'shows the name of the POM who created the record' do
-          pom_names = early_allocations.map { |record|
+          pom_names = early_allocations.map do |record|
             "#{record.created_by_lastname}, #{record.created_by_firstname}"
-          }
+          end
           expect(rendered_values).to eq(pom_names)
         end
       end

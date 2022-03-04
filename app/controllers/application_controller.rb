@@ -15,13 +15,9 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def current_user
-    sso_identity.current_user
-  end
+  delegate :current_user, to: :sso_identity
 
-  def current_user_is_spo?
-    sso_identity.current_user_is_spo?
-  end
+  delegate :current_user_is_spo?, to: :sso_identity
 
   def ensure_spo_user
     unless current_user_is_spo?
@@ -35,13 +31,9 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def default_prison_code
-    sso_identity.default_prison_code
-  end
+  delegate :default_prison_code, to: :sso_identity
 
-  def caseloads
-    sso_identity.caseloads
-  end
+  delegate :caseloads, to: :sso_identity
 
   # called by active admin
   def access_denied(_active_admin_context)

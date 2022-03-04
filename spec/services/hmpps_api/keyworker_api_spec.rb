@@ -3,14 +3,14 @@ require 'rails_helper'
 describe HmppsApi::KeyworkerApi do
   before do
     stub_auth_token
-    stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/LEI/offender/G4273GI").
-     to_return(body: {
+    stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/LEI/offender/G4273GI")
+     .to_return(body: {
        staffId: 1,
        firstName: 'DOM',
        lastName: 'JONES'
      }.to_json)
-    stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/LEI/offender/GGGGGGG").
-    to_return(status: 404)
+    stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/LEI/offender/GGGGGGG")
+    .to_return(status: 404)
   end
 
   describe 'Keyworkers' do

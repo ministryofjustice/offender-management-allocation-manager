@@ -11,13 +11,13 @@ RSpec.describe PushPomToDeliusJob, type: :job, versioning: true do
   end
 
   describe 'when a Primary POM is allocated' do
-    let!(:allocation) {
+    let!(:allocation) do
       create(:allocation_history,
              prison: build(:prison).code,
              nomis_offender_id: offender_no,
              primary_pom_nomis_id: pom.staffId
-      )
-    }
+            )
+    end
 
     before do
       allow(HmppsApi::CommunityApi).to receive(:set_pom)
@@ -25,22 +25,22 @@ RSpec.describe PushPomToDeliusJob, type: :job, versioning: true do
 
     it "pushes the offender's allocated POM to the Community API" do
       described_class.perform_now(allocation)
-      expect(HmppsApi::CommunityApi).to have_received(:set_pom).
-          with(offender_no: offender_no,
-               prison: allocation.prison,
-               forename: pom.firstName,
-               surname: pom.lastName
-          )
+      expect(HmppsApi::CommunityApi).to have_received(:set_pom)
+          .with(offender_no: offender_no,
+                prison: allocation.prison,
+                forename: pom.firstName,
+                surname: pom.lastName
+               )
     end
   end
 
   describe 'when a Primary POM is de-allocated' do
-    let!(:allocation) {
+    let!(:allocation) do
       create(:allocation_history, :transfer,
-             prison:  build(:prison).code,
+             prison: build(:prison).code,
              nomis_offender_id: offender_no
       )
-    }
+    end
 
     before do
       allow(HmppsApi::CommunityApi).to receive(:unset_pom)
@@ -48,8 +48,8 @@ RSpec.describe PushPomToDeliusJob, type: :job, versioning: true do
 
     it "pushes the unset offender's POM to the Community API" do
       described_class.perform_now(allocation)
-      expect(HmppsApi::CommunityApi).to have_received(:unset_pom).
-          with(offender_no)
+      expect(HmppsApi::CommunityApi).to have_received(:unset_pom)
+          .with(offender_no)
     end
   end
 end

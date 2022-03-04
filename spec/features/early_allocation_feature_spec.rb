@@ -21,8 +21,8 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
 
     stub_auth_token
     stub_offenders_for_prison(prison, [nomis_offender])
-    stub_request(:get, "#{ApiHelper::T3}/users/#{username}").
-      to_return(body: { 'staffId': nomis_staff_id }.to_json)
+    stub_request(:get, "#{ApiHelper::T3}/users/#{username}")
+      .to_return(body: { 'staffId': nomis_staff_id }.to_json)
     stub_pom(pom)
     stub_poms(prison, [pom])
     stub_pom_emails(nomis_staff_id, [])
@@ -57,7 +57,7 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
 
         # Early Allocation start page
         expect(page).to have_content 'Early allocation assessment'
-        #expect(page).to have_content 'This case has no saved assessments.'
+        # expect(page).to have_content 'This case has no saved assessments.'
         displays_prisoner_information_in_side_panel
         click_link 'Start new assessment'
       end
@@ -71,8 +71,8 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
           within '.govuk-error-summary' do
             expect(all('li').map(&:text))
                 .to match_array([
-                                    "Enter the date of the last OASys risk assessment",
-                                ])
+                  "Enter the date of the last OASys risk assessment",
+                ])
           end
         end
 
@@ -86,15 +86,15 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
             expect(page).to have_text 'You must say if this case is \'high profile\''
             click_link 'You must say if this case is \'high profile\''
             # ensure that page is still intact
-            expect(all('li').map(&:text)).
-                to match_array([
-                                   "You must say if they are subject to a Serious Crime Prevention Order",
-                                   "You must say if they were convicted under the Terrorism Act 2000",
-                                   "You must say if this case is 'high profile'",
-                                   "You must say if this is a MAPPA level 3 case",
-                                   "You must say if this will be a CPPC case"
-                               ]
-            )
+            expect(all('li').map(&:text))
+                .to match_array([
+                  "You must say if they are subject to a Serious Crime Prevention Order",
+                  "You must say if they were convicted under the Terrorism Act 2000",
+                  "You must say if this case is 'high profile'",
+                  "You must say if this is a MAPPA level 3 case",
+                  "You must say if this will be a CPPC case"
+                ]
+                               )
           end
         end
 
@@ -152,15 +152,15 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
             expect(page).to have_css('.govuk-error-summary')
 
             within '.govuk-error-summary' do
-              expect(all('li').map(&:text)).
-                to match_array([
-                          "You must say if this prisoner has been in an extremism separation centre",
-                          "You must say if there is another reason for early allocation",
-                          "You must say whether this prisoner presents a risk of serious harm",
-                          "You must say if this is a MAPPA level 2 case",
-                          "You must say if this prisoner has been identified through the pathfinder process"
-                      ]
-                   )
+              expect(all('li').map(&:text))
+                .to match_array([
+                  "You must say if this prisoner has been in an extremism separation centre",
+                  "You must say if there is another reason for early allocation",
+                  "You must say whether this prisoner presents a risk of serious harm",
+                  "You must say if this is a MAPPA level 2 case",
+                  "You must say if this prisoner has been identified through the pathfinder process"
+                ]
+                               )
             end
           end
 
@@ -172,18 +172,18 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
               click_button 'Continue'
               expect(page).not_to have_text 'The community probation team will make a decision'
               displays_prisoner_information_in_side_panel
-                # Last prompt before end of journey
+              # Last prompt before end of journey
               expect(page).to have_text 'Why are you referring this case for early allocation to the community?'
               click_button 'Continue'
-                # we need to always tick the 'Head of Offender Management' box and fill in the reasons
+              # we need to always tick the 'Head of Offender Management' box and fill in the reasons
               expect(page).to have_css('.govuk-error-message')
               within '.govuk-error-summary' do
-                expect(all('li').map(&:text)).
-                    to match_array([
-                                       "You must give a reason for referring this case",
-                                       "You must say if this referral has been approved",
-                                   ]
-                       )
+                expect(all('li').map(&:text))
+                    .to match_array([
+                      "You must give a reason for referring this case",
+                      "You must say if this referral has been approved",
+                    ]
+                                   )
               end
 
               expect {

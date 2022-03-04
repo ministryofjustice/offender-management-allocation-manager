@@ -47,8 +47,8 @@ RSpec.describe PomsController, type: :controller do
       missing_offender = create(:case_information)
       create(:allocation_history, nomis_offender_id: missing_offender.nomis_offender_id, primary_pom_nomis_id: active_staff_id, prison: prison.code)
 
-      stub_request(:get, "#{ApiHelper::T3}/staff/#{active_staff_id}").
-        to_return(body: { staffId: active_staff_id, lastName: 'LastName', firstName: 'FirstName' }.to_json)
+      stub_request(:get, "#{ApiHelper::T3}/staff/#{active_staff_id}")
+        .to_return(body: { staffId: active_staff_id, lastName: 'LastName', firstName: 'FirstName' }.to_json)
 
       offenders = a_offenders + b_offenders + c_offenders + d_offenders + na_offenders
 
@@ -78,21 +78,39 @@ RSpec.describe PomsController, type: :controller do
       end
 
       expect(active_poms_list).to match_array [{ staff_id: active_staff_id,
-                                           tier_a: 2, tier_b: 4, tier_c: 3, tier_d: 1, no_tier: 5,
-                                           total_cases: 15 },
+                                                 tier_a: 2,
+                                                 tier_b: 4,
+                                                 tier_c: 3,
+                                                 tier_d: 1,
+                                                 no_tier: 5,
+                                                 total_cases: 15 },
                                                { staff_id: unavailable_staff_id,
-                                                 tier_a: 0, tier_b: 0, tier_c: 0, tier_d: 0, no_tier: 0,
+                                                 tier_a: 0,
+                                                 tier_b: 0,
+                                                 tier_c: 0,
+                                                 tier_d: 0,
+                                                 no_tier: 0,
                                                  total_cases: 0 }]
     end
 
     it 'shows the caseload on the show action' do
       get :show, params: { prison_id: prison.code, nomis_staff_id: active_staff_id }
       expect(response).to be_successful
-      expect(assigns(:allocations).map(&:tier)).to match_array(["A", 'A',
-                                                                "B", "B", "B", "B",
-                                                                "C", "C", "C",
+      expect(assigns(:allocations).map(&:tier)).to match_array(["A",
+                                                                'A',
+                                                                "B",
+                                                                "B",
+                                                                "B",
+                                                                "B",
+                                                                "C",
+                                                                "C",
+                                                                "C",
                                                                 "D",
-                                                                "N/A", "N/A", "N/A", "N/A", "N/A"])
+                                                                "N/A",
+                                                                "N/A",
+                                                                "N/A",
+                                                                "N/A",
+                                                                "N/A"])
     end
   end
 end

@@ -23,8 +23,8 @@ feature 'View a prisoner profile page' do
     before do
       create(:case_information,
              offender: build(:offender, nomis_offender_id: 'G7266VD',
-                             parole_record: build(:parole_record, parole_review_date: Time.zone.today + 1.year),
-             early_allocations: [build(:early_allocation, created_within_referral_window: within_window)]))
+                                        parole_record: build(:parole_record, parole_review_date: Time.zone.today + 1.year),
+                                        early_allocations: [build(:early_allocation, created_within_referral_window: within_window)]))
       visit prison_prisoner_path(prison.code, 'G7266VD')
     end
 
@@ -175,7 +175,7 @@ feature 'View a prisoner profile page' do
                local_delivery_unit: ldu,
                team_name: team_name,
                com_name: 'Bob Smith'
-        )
+              )
       end
 
       it "has community information", vcr: { cassette_name: 'prison_api/show_offender_community_info_full' } do
@@ -192,7 +192,7 @@ feature 'View a prisoner profile page' do
       before do
         create(:case_information,
                offender: build(:offender, nomis_offender_id: 'G7266VD'),
-        )
+              )
 
         visit prison_prisoner_path(prison.code, 'G7266VD')
       end
@@ -218,9 +218,9 @@ feature 'View a prisoner profile page' do
                                      sentenceStartDate: nil))
     end
     let(:case_info) { create(:case_information, case_allocation: CaseInformation::NPS, offender: build(:offender, nomis_offender_id: 'G7998GJ')) }
-    let(:non_sentenced_offender) {
+    let(:non_sentenced_offender) do
       build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_non_sentenced_offender)
-    }
+    end
 
     before do
       allow(OffenderService).to receive(:get_offender).and_return(non_sentenced_offender)
@@ -233,16 +233,16 @@ feature 'View a prisoner profile page' do
   end
 
   context "when the offender needs a COM but one isn't allocated" do
-    let!(:case_info) {
+    let!(:case_info) do
       create(:case_information,
              offender: build(:offender, nomis_offender_id: nomis_offender_id),
              local_delivery_unit: build(:local_delivery_unit)
-      )
-    }
+            )
+    end
 
-    let(:nomis_offender) {
+    let(:nomis_offender) do
       build(:nomis_offender, prisonId: prison.code, sentence: attributes_for(:sentence_detail, :inside_handover_window))
-    }
+    end
 
     let(:nomis_offender_id) { nomis_offender.fetch(:prisonerNumber) }
     let!(:prison) { create(:prison) }
@@ -277,12 +277,12 @@ feature 'View a prisoner profile page' do
     context 'when the LDU has already been emailed automatically' do
       let(:date_sent) { 2.days.ago }
 
-      let!(:email_history) {
+      let!(:email_history) do
         create(:email_history, :open_prison_community_allocation,
                nomis_offender_id: nomis_offender_id,
                created_at: date_sent
         )
-      }
+      end
 
       it 'says that an email has been sent' do
         visit prison_prisoner_path(prison.code, nomis_offender_id)

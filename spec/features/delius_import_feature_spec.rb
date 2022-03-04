@@ -6,7 +6,7 @@ feature "Delius import feature", :disable_push_to_delius do
   let(:offender_no) {  offender.fetch(:prisonerNumber) }
   let(:prison_code) { create(:prison).code }
   let(:offender) { build(:nomis_offender, prisonId: prison_code) }
-  let(:offender_name) { offender.fetch(:lastName) + ', ' + offender.fetch(:firstName) }
+  let(:offender_name) { "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}" }
   let(:pom) { build(:pom) }
 
   before do
@@ -21,9 +21,9 @@ feature "Delius import feature", :disable_push_to_delius do
 
       stub_community_offender(offender_no, build(:community_data,
                                                  offenderManagers: [
-                                                     build(:community_offender_manager,
-                                                           team: { code: 'XYX',
-                                                                   localDeliveryUnit: { code: ldu.code } })]))
+                                                   build(:community_offender_manager,
+                                                         team: { code: 'XYX',
+                                                                 localDeliveryUnit: { code: ldu.code } })]))
     end
 
     it "imports from Delius and creates case information" do

@@ -1,21 +1,19 @@
 require 'rails_helper'
 
-RSpec.describe HmppsApi::ApiDeserialiser do
-  # rubocop:disable RSpec/LeakyConstantDeclaration
-  class DeserialiseTest
-    attr_accessor :foo, :string
+class DeserialiseTest
+  attr_accessor :foo, :string
 
-    def self.from_json(payload)
-      DeserialiseTest.new.tap { |obj|
-        obj.foo = payload['foo']
-      }
+  def self.from_json(payload)
+    DeserialiseTest.new.tap do |obj|
+      obj.foo = payload['foo']
     end
   end
+end
 
-  class DeserialiseTestFail
-  end
-  # rubocop:enable RSpec/LeakyConstantDeclaration
+class DeserialiseTestFail
+end
 
+RSpec.describe HmppsApi::ApiDeserialiser do
   subject { model.from_json(payload) }
 
   let!(:memory_model_class) { DeserialiseTest }
@@ -24,7 +22,6 @@ RSpec.describe HmppsApi::ApiDeserialiser do
   let(:payload) do
     { 'foo' => 'bar', 'unknown_attribute' => 'boom' }
   end
-
 
   it 'will serialise a payload with unknown attributes' do
     expect(described_class.new.deserialise(memory_model_class, payload)).to have_attributes foo: 'bar'

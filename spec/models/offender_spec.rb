@@ -11,7 +11,7 @@ RSpec.describe Offender, type: :model do
     # NOMIS offender IDs must be of the form <letter><4 numbers><2 letters>
     let(:valid_ids) { %w[A0000AA Z5432HD A4567CD] }
 
-    let(:invalid_ids) {
+    let(:invalid_ids) do
       [
         'A 1234 AA', # no spaces allowed
         'E123456', # this is a nDelius CRN, not a NOMIS ID
@@ -21,7 +21,7 @@ RSpec.describe Offender, type: :model do
         '1234567',
         'ABCDEFG',
       ]
-    }
+    end
 
     it 'requires a valid NOMIS offender ID' do
       valid_ids.each do |id|
@@ -35,7 +35,6 @@ RSpec.describe Offender, type: :model do
       end
     end
   end
-
 
   describe '#early_allocations' do
     it { is_expected.to have_many(:early_allocations).dependent(:destroy) }

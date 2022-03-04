@@ -2,7 +2,7 @@
 
 desc 'Recalculate handover dates for all known offenders, and push changes into nDelius'
 task recalculate_handover_dates: :environment do |_task|
-  Rails.logger = Logger.new(STDOUT)
+  Rails.logger = Logger.new($stdout)
 
   Rails.logger.info('Queueing RecalculateHandoverDateJob for all offenders')
 

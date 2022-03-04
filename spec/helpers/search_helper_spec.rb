@@ -6,13 +6,13 @@ RSpec.describe SearchHelper do
   describe 'the CTA' do
     context 'with no allocation' do
       let(:api_offender) { build(:hmpps_api_offender) }
-      let(:offender) {
+      let(:offender) do
         x = build(:mpc_offender, prison: prison, offender: build(:case_information, tier: 'A').offender, prison_record: api_offender)
         OffenderWithAllocationPresenter.new(x, nil)
-      }
-      let(:expected_link) {
+      end
+      let(:expected_link) do
         link_to 'Allocate', prison_prisoner_staff_index_path('LEI', prisoner_id: offender.offender_no)
-      }
+      end
 
       it "will change to allocate if there is no allocation" do
         expect(cta_for_offender('LEI', offender)).to eq(expected_link)
@@ -22,10 +22,10 @@ RSpec.describe SearchHelper do
     context 'with an allocation' do
       let(:case_info) { build(:case_information, tier: 'A') }
       let(:api_offender) { build(:hmpps_api_offender) }
-      let(:offender) {
+      let(:offender) do
         x = build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender)
         OffenderWithAllocationPresenter.new(x, build(:allocation_history))
-      }
+      end
 
       it "will change to view" do
         text, _link = cta_for_offender('LEI', offender)

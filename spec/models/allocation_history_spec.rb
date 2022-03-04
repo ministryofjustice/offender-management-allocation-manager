@@ -6,20 +6,20 @@ RSpec.describe AllocationHistory, type: :model do
   let(:another_nomis_offender_id) { 654_321 }
 
   describe '#without_ldu_emails' do
-    let!(:crc_without_email) {
+    let!(:crc_without_email) do
       case_info = create(:case_information, case_allocation: 'CRC', local_delivery_unit: nil)
       create(:allocation_history, prison: build(:prison).code, nomis_offender_id: case_info.nomis_offender_id)
-    }
+    end
 
-    let!(:nps_without_email) {
+    let!(:nps_without_email) do
       case_info = create(:case_information, local_delivery_unit: nil)
       create(:allocation_history, prison: build(:prison).code, nomis_offender_id: case_info.nomis_offender_id)
-    }
+    end
 
-    let!(:nps_with_email) {
+    let!(:nps_with_email) do
       case_info = create(:case_information)
       create(:allocation_history, prison: build(:prison).code, nomis_offender_id: case_info.nomis_offender_id)
-    }
+    end
 
     it 'picks up NPS allocations without emails' do
       expect(described_class.without_ldu_emails).to match_array([nps_without_email])
@@ -54,7 +54,7 @@ RSpec.describe AllocationHistory, type: :model do
     let(:prison) { create(:prison) }
     let(:pom) { build(:pom, staffId: nomis_staff_id) }
 
-    let!(:allocation) {
+    let!(:allocation) do
       create(
         :allocation_history,
         prison: prison.code,
@@ -62,13 +62,13 @@ RSpec.describe AllocationHistory, type: :model do
         primary_pom_nomis_id: nomis_staff_id,
         override_reasons: "[\"suitability\", \"no_staff\", \"continuity\", \"other\"]"
       )
-    }
+    end
 
     describe 'Versions' do
       it 'creates a version when updating a record' do
         expect(allocation.versions.count).to be(1)
 
-        allocation.update(allocated_at_tier: 'B')
+        allocation.update!(allocated_at_tier: 'B')
 
         expect(allocation.versions.count).to be(2)
         expect(allocation.versions.last.reify.allocated_at_tier).to eq('A')
@@ -76,7 +76,7 @@ RSpec.describe AllocationHistory, type: :model do
     end
 
     describe 'when a POM is inactive' do
-      let!(:another_allocaton) {
+      let!(:another_allocaton) do
         create(
           :allocation_history,
           prison: allocation.prison,
@@ -85,7 +85,7 @@ RSpec.describe AllocationHistory, type: :model do
           secondary_pom_nomis_id: nomis_staff_id,
           override_reasons: "[\"suitability\", \"no_staff\", \"continuity\", \"other\"]"
         )
-      }
+      end
 
       it 'removes them as the primary pom\'s from all allocations' do
         described_class.deallocate_primary_pom(nomis_staff_id, allocation.prison)
@@ -130,7 +130,7 @@ RSpec.describe AllocationHistory, type: :model do
           prison: prison_code,
           allocated_at_tier: 'A',
           primary_pom_nomis_id: 485_833,
-          primary_pom_allocated_at: DateTime.now.utc,
+          primary_pom_allocated_at: Time.zone.now.utc,
           recommended_pom_type: 'probation',
           event: AllocationHistory::ALLOCATE_PRIMARY_POM,
           created_by_username: 'MOIC_POM',
@@ -157,7 +157,7 @@ RSpec.describe AllocationHistory, type: :model do
           prison: prison_code,
           allocated_at_tier: 'A',
           primary_pom_nomis_id: 485_833,
-          primary_pom_allocated_at: DateTime.now.utc,
+          primary_pom_allocated_at: Time.zone.now.utc,
           recommended_pom_type: 'probation',
           event: AllocationHistory::ALLOCATE_PRIMARY_POM,
           event_trigger: AllocationHistory::USER,
@@ -196,13 +196,13 @@ RSpec.describe AllocationHistory, type: :model do
     end
 
     describe '#override_reasons' do
-      let!(:allocation_no_overrides) {
+      let!(:allocation_no_overrides) do
         create(
           :allocation_history,
           prison: build(:prison).code,
           primary_pom_nomis_id: nomis_staff_id
         )
-      }
+      end
 
       it 'returns an array' do
         expect(allocation.override_reasons).to eq %w[suitability no_staff continuity other]
@@ -214,27 +214,27 @@ RSpec.describe AllocationHistory, type: :model do
     end
 
     describe '#active_pom_allocations' do
-      let!(:secondary_allocation) {
+      let!(:secondary_allocation) do
         create(
           :allocation_history,
           prison: allocation.prison,
           secondary_pom_nomis_id: nomis_staff_id
         )
-      }
-      let!(:another_allocation) {
+      end
+      let!(:another_allocation) do
         create(
           :allocation_history,
           prison: allocation.prison,
           primary_pom_nomis_id: 27
         )
-      }
-      let!(:another_prison) {
+      end
+      let!(:another_prison) do
         create(
           :allocation_history,
           primary_pom_nomis_id: nomis_staff_id,
           prison: create(:prison).code
         )
-      }
+      end
 
       it 'returns both primary and secondary allocations' do
         expect(described_class.active_pom_allocations(nomis_staff_id, allocation.prison)).to match_array [secondary_allocation, allocation]
@@ -275,7 +275,7 @@ RSpec.describe AllocationHistory, type: :model do
         expect(HmppsApi::CommunityApi).to receive(:set_pom).with offender_no: nomis_offender_id, prison: prison_code, forename: 'Bill', surname: 'Jones'
       end
 
-      it 'pushes the POM name to Ndelius'do
+      it 'pushes the POM name to Ndelius' do
         create(:allocation_history, :primary, nomis_offender_id: nomis_offender_id, prison: prison_code, primary_pom_nomis_id: nomis_staff_id)
       end
     end
@@ -291,7 +291,7 @@ RSpec.describe AllocationHistory, type: :model do
 
       describe 'updating secondary POM' do
         it 'doesnt update delius' do
-          allocation.update!(secondary_pom_nomis_id: 24689)
+          allocation.update!(secondary_pom_nomis_id: 24_689)
         end
       end
 
@@ -311,7 +311,7 @@ RSpec.describe AllocationHistory, type: :model do
           expect(HmppsApi::CommunityApi).to receive(:set_pom).with offender_no: nomis_offender_id, prison: prison_code, forename: 'Sally', surname: 'Albright'
         end
 
-        let(:updated_nomis_staff_id) { 146890 }
+        let(:updated_nomis_staff_id) { 146_890 }
 
         it 'updates the POM in Ndelius' do
           allocation.update!(primary_pom_nomis_id: updated_nomis_staff_id)

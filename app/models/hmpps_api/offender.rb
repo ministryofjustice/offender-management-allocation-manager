@@ -77,9 +77,7 @@ module HmppsApi
       @restricted_patient == true
     end
 
-    def sentence_start_date
-      sentence.sentence_start_date
-    end
+    delegate :sentence_start_date, to: :sentence
 
     def full_name
       "#{last_name}, #{first_name}".titleize

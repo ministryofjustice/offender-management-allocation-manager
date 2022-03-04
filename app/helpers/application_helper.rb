@@ -10,8 +10,7 @@ module ApplicationHelper
   end
 
   def format_date_long(date_obj)
-    date_obj.strftime("#{date_obj.day.ordinalize} %B %Y") +
-        ' (' + date_obj.strftime('%R') + ')'
+    "#{date_obj.strftime("#{date_obj.day.ordinalize} %B %Y")} (#{date_obj.strftime('%R')})"
   end
 
   def pom_level(level)
@@ -38,7 +37,7 @@ module ApplicationHelper
   end
 
   def working_pattern_name(pattern)
-    return 'Full time' if pattern.to_f == 1.0
+    return 'Full time' if pattern.to_d == 1.0.to_d
 
     'Part time'
   end

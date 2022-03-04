@@ -12,7 +12,7 @@ RSpec.describe Api::ApiController, type: :controller do
   it 'blocks access for missing tokens' do
     get :index
 
-    expect(response).to have_http_status(401)
+    expect(response).to have_http_status(:unauthorized)
     expect(JSON.parse(response.body)['status']).to eq('error')
   end
 
@@ -21,7 +21,7 @@ RSpec.describe Api::ApiController, type: :controller do
 
     get :index
 
-    expect(response).to have_http_status(401)
+    expect(response).to have_http_status(:unauthorized)
     expect(JSON.parse(response.body)['status']).to eq('error')
   end
 
@@ -30,7 +30,7 @@ RSpec.describe Api::ApiController, type: :controller do
 
     get :index
 
-    expect(response).to have_http_status(401)
+    expect(response).to have_http_status(:unauthorized)
     expect(JSON.parse(response.body)['status']).to eq('error')
   end
 
@@ -42,7 +42,7 @@ RSpec.describe Api::ApiController, type: :controller do
     request_header(payload)
     get :index
 
-    expect(response).to have_http_status(401)
+    expect(response).to have_http_status(:unauthorized)
     expect(JSON.parse(response.body)['status']).to eq('error')
   end
 
@@ -55,7 +55,7 @@ RSpec.describe Api::ApiController, type: :controller do
     request_header(payload)
     get :index
 
-    expect(response).to have_http_status(401)
+    expect(response).to have_http_status(:unauthorized)
     expect(JSON.parse(response.body)['status']).to eq('error')
   end
 
@@ -68,7 +68,7 @@ RSpec.describe Api::ApiController, type: :controller do
     request_header(payload)
     get :index
 
-    expect(response).to have_http_status(401)
+    expect(response).to have_http_status(:unauthorized)
     expect(JSON.parse(response.body)['status']).to eq('error')
   end
 
@@ -82,7 +82,7 @@ RSpec.describe Api::ApiController, type: :controller do
     request_header(payload)
     get :index
 
-    expect(response).to have_http_status(401)
+    expect(response).to have_http_status(:unauthorized)
     expect(JSON.parse(response.body)['status']).to eq('error')
   end
 
@@ -96,7 +96,7 @@ RSpec.describe Api::ApiController, type: :controller do
     request_header(payload)
     get :index
 
-    expect(response).to have_http_status(200)
+    expect(response).to have_http_status(:ok)
     expect(JSON.parse(response.body)).to eq(ok_message)
   end
 

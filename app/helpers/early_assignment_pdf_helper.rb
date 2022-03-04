@@ -76,8 +76,11 @@ private
     [:oasys_risk_assessment_date].each do |field|
       info_hash[field] = format_date(early_allocation.public_send(field))
     end
-    [:convicted_under_terrorisom_act_2000, :high_profile, :serious_crime_prevention_order,
-     :mappa_level_3, :cppc_case].each do |field|
+    [:convicted_under_terrorisom_act_2000,
+     :high_profile,
+     :serious_crime_prevention_order,
+     :mappa_level_3,
+     :cppc_case].each do |field|
       info_hash[field] = humanized_bool(early_allocation.public_send(field))
     end
 
@@ -128,9 +131,9 @@ private
 
   def setup_font(pdf)
     pdf.font_families.update('GDSTransport' => {
-                               normal: Rails.root.join('app', 'assets', 'fonts', 'GDSTransportWebsite.ttf'),
-                               bold: Rails.root.join('app', 'assets', 'fonts', 'GDSTransportWebsite-Bold.ttf')
-                             })
+      normal: Rails.root.join('app', 'assets', 'fonts', 'GDSTransportWebsite.ttf'),
+      bold: Rails.root.join('app', 'assets', 'fonts', 'GDSTransportWebsite-Bold.ttf')
+    })
     pdf.font 'GDSTransport'
     # make multi-line table rows look not n=so squashed up
     pdf.default_leading = 5

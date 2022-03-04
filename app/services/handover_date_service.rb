@@ -165,10 +165,10 @@ private
     end
   end
 
-  WELSH_POLICY_START_DATE = DateTime.new(2019, 2, 4).utc.to_date.freeze
+  WELSH_POLICY_START_DATE = Time.zone.local(2019, 2, 4).utc.to_date.freeze
   WELSH_CUTOFF_DATE = '4 May 2020'.to_date.freeze
 
-  ENGLISH_POLICY_START_DATE = DateTime.new(2019, 10, 1).utc.to_date
+  ENGLISH_POLICY_START_DATE = Time.zone.local(2019, 10, 1).utc.to_date
   ENGLISH_PRIVATE_CUTOFF = '1 Jun 2021'.to_date.freeze
   ENGLISH_PUBLIC_CUTOFF = '15 Feb 2021'.to_date.freeze
 

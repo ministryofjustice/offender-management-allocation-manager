@@ -30,7 +30,7 @@ feature 'Switching prisons' do
   end
 
   it 'Shows the list of prisons I can switch to',
-     vcr: { cassette_name: 'prison_api/prison_switching_feature_list_spec' }do
+     vcr: { cassette_name: 'prison_api/prison_switching_feature_list_spec' } do
     signin_spo_user(['LEI', 'RSI'])
     visit root_path
 
@@ -41,7 +41,7 @@ feature 'Switching prisons' do
   end
 
   it 'Changes my prison when I choose one',
-     vcr: { cassette_name: 'prison_api/prison_switching_feature_change_prisons_spec' }do
+     vcr: { cassette_name: 'prison_api/prison_switching_feature_change_prisons_spec' } do
     signin_spo_user(['LEI', 'RSI'])
     visit root_path
 

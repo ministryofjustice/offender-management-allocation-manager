@@ -19,9 +19,7 @@ module HmppsApi
 
       def self.user_caseloads(staff_id)
         route = "/staff/#{staff_id}/caseloads"
-        response = client.get(route)
-
-        response
+        client.get(route)
       end
     end
   end

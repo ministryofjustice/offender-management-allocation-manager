@@ -13,13 +13,14 @@ class EmailHistory < ApplicationRecord
              inverse_of: :email_histories
 
   # name is the name of the person/LDU being emailed
-  validates_presence_of :name
+  validates :name, presence: true
 
   validates :event, inclusion: { in: [AUTO_EARLY_ALLOCATION,
                                       DISCRETIONARY_EARLY_ALLOCATION,
                                       SUITABLE_FOR_EARLY_ALLOCATION,
                                       OPEN_PRISON_COMMUNITY_ALLOCATION,
-                                      IMMEDIATE_COMMUNITY_ALLOCATION], allow_nil: false }
+                                      IMMEDIATE_COMMUNITY_ALLOCATION],
+                                 allow_nil: false }
   validates :prison, inclusion: { in: PrisonService.prison_codes, allow_nil: false }
   validates :email, presence: true, 'valid_email_2/email': true
 

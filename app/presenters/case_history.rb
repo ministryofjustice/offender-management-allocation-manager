@@ -40,7 +40,7 @@ class CaseHistory
     end
   end
 
-  # TODO - this isn't great fetching emails in the view/presenter layer. However this is better than what came
+  # TODO: - this isn't great fetching emails in the view/presenter layer. However this is better than what came
   # before (which was to expose the id and let the view work it out via a hash of emails collected using the API)
   # Hopefully soon the model will answer these questions properly
   def primary_pom_email

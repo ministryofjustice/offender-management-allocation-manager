@@ -2,14 +2,14 @@
 
 class EarlyAllocationEventService
   class << self
-    def send_early_allocation early_allocation_status
+    def send_early_allocation(early_allocation_status)
       sns_topic&.publish(
         message: {
           offenderNo: early_allocation_status.nomis_offender_id,
           eligibilityStatus: early_allocation_status.eligible,
         }.to_json,
         message_attributes: {
-          eventType:  {
+          eventType: {
             string_value: 'community-early-allocation-eligibility.status.changed',
             data_type: 'String',
           },
@@ -26,7 +26,7 @@ class EarlyAllocationEventService
             data_type: 'String',
           },
         },
-        )
+      )
     end
 
   private
@@ -34,10 +34,8 @@ class EarlyAllocationEventService
     # storing the topic like this will make it used across threads. Hopefully it's thread-safe
     # :nocov:
     def sns_topic
-      @sns_topic ||= begin
-                       if sns_topic_arn.present?
-                         Aws::SNS::Resource.new(region: 'eu-west-2').topic(sns_topic_arn)
-                       end
+      @sns_topic ||= if sns_topic_arn.present?
+                       Aws::SNS::Resource.new(region: 'eu-west-2').topic(sns_topic_arn)
                      end
     end
 

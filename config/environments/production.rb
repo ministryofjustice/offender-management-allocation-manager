@@ -56,7 +56,7 @@ Rails.application.configure do
 
   # ActionMailer logger initialised and the level is set to FATAL to ensure that sensitive data isn't logged e.g. when
   # sending emails via Notify it displays the contents of the email in the logs.
-  config.action_mailer.logger = ActiveSupport::Logger.new(STDOUT)
+  config.action_mailer.logger = ActiveSupport::Logger.new($stdout)
   config.action_mailer.logger.level = ActiveSupport::Logger::Severity::FATAL
   config.action_mailer.perform_caching = false
 
@@ -78,31 +78,32 @@ Rails.application.configure do
   # config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new 'app-name')
 
   if ENV['RAILS_LOG_TO_STDOUT'].present?
-    logger           = ActiveSupport::Logger.new(STDOUT)
+    logger           = ActiveSupport::Logger.new($stdout)
     logger.formatter = config.log_formatter
     config.logger    = ActiveSupport::TaggedLogging.new(logger)
   end
 
   config.lograge.enabled = true
   config.lograge.formatter = Lograge::Formatters::Logstash.new
-  config.lograge.logger = ActiveSupport::Logger.new(STDOUT)
+  config.lograge.logger = ActiveSupport::Logger.new($stdout)
 
   if Rails.configuration.redis_url.present?
-    config.cache_store = :redis_cache_store, {
-      url: config.redis_url.to_s,
-      network_timeout: 5,
-      read_timeout: 1.0,
-      write_timeout: 1.0,
+    config.cache_store = :redis_cache_store,
+                         {
+                           url: config.redis_url.to_s,
+                           network_timeout: 5,
+                           read_timeout: 1.0,
+                           write_timeout: 1.0,
 
-      error_handler: lambda { |method:, returning:, exception:|
-                       # Report errors to Sentry as warnings
-                       Raven.capture_exception exception, level: 'warning',
-                                                          tags: {
-                                                            method: method,
-                                                            returning: returning
-                                                          }
-                     }
-    }
+                           error_handler: lambda { |method:, returning:, exception:|
+                                            # Report errors to Sentry as warnings
+                                            Raven.capture_exception exception, level: 'warning',
+                                                                               tags: {
+                                                                                 method: method,
+                                                                                 returning: returning
+                                                                               }
+                                          }
+                         }
 
     # Store user sessions in the Redis cache
     # This avoids the 4KB limit of cookie-backed sessions, which has affected users in production

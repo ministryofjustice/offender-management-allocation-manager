@@ -8,7 +8,7 @@ RSpec.describe "handovers/index", type: :view do
     assign(:staff_id, pom.staff_id)
     assign(:summary, double(handovers_total: 0))
     assign(:offenders,
-           Kaminari::paginate_array([]).page(1))
+           Kaminari.paginate_array([]).page(1))
     assign(:is_spo, is_spo)
     assign(:is_pom, is_pom)
     render

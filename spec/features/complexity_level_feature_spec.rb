@@ -8,7 +8,6 @@ feature 'complexity level feature' do
   let(:spo) { build(:pom) }
   let(:offender_no) { offender.fetch(:prisonerNumber) }
 
-
   before do
     create(:allocation_history, nomis_offender_id: offender.fetch(:prisonerNumber), primary_pom_nomis_id: pom.staff_id,  prison: womens_prison.code)
     create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
@@ -58,8 +57,8 @@ feature 'complexity level feature' do
       expect(page).to have_css('#complexity-level-update', text: 'Low')
 
       # Change the API response to reflect the newly updated level
-      stub_request(:get, "#{Rails.configuration.complexity_api_host}/v1/complexity-of-need/offender-no/#{offender_no}").
-        to_return(body: { level: 'low' }.to_json)
+      stub_request(:get, "#{Rails.configuration.complexity_api_host}/v1/complexity-of-need/offender-no/#{offender_no}")
+        .to_return(body: { level: 'low' }.to_json)
 
       click_on('Return to prisoner page')
 
@@ -123,8 +122,8 @@ feature 'complexity level feature' do
         fill_in('complexity[reason]', with: 'bla bla bla')
 
         # Change the API response to reflect the newly updated level
-        stub_request(:get, "#{Rails.configuration.complexity_api_host}/v1/complexity-of-need/offender-no/#{offender_no}").
-        to_return(body: { level: 'low' }.to_json)
+        stub_request(:get, "#{Rails.configuration.complexity_api_host}/v1/complexity-of-need/offender-no/#{offender_no}")
+        .to_return(body: { level: 'low' }.to_json)
 
         click_on('Update')
 

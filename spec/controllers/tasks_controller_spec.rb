@@ -3,25 +3,25 @@ require 'rails_helper'
 RSpec.describe TasksController, :allocation, type: :controller do
   let(:prison) { create(:prison).code }
   let(:staff_id) { 123 }
-  let(:pom) {
+  let(:pom) do
     [
       build(:pom,
             staffId: staff_id,
             position: RecommendationService::PRISON_POM
-      )
+           )
     ]
-  }
+  end
 
   let(:next_week) { Time.zone.today + 7.days }
   let(:tariff_end_date) { Time.zone.today - 3.days }
-  let(:offenders) {
+  let(:offenders) do
     [build(:nomis_offender, prisonerNumber: 'G7514GW', firstName: "Alice", lastName: "Aliceson",
-           sentence: attributes_for(:sentence_detail, :indeterminate, tariffDate: tariff_end_date)),
+                            sentence: attributes_for(:sentence_detail, :indeterminate, tariffDate: tariff_end_date)),
      build(:nomis_offender, prisonerNumber: 'G1234VV', firstName: "Bob", lastName: "Bibby"),
      build(:nomis_offender, prisonerNumber: 'G1234AB', firstName: "Carole", lastName: "Caroleson"),
      build(:nomis_offender, prisonerNumber: 'G1234GG', firstName: "David", lastName: "Davidson")
     ]
-  }
+  end
 
   before do
     stub_poms(prison, pom)
@@ -85,7 +85,7 @@ RSpec.describe TasksController, :allocation, type: :controller do
     it 'can show offenders needing early allocation decision updates' do
       offender_nos.each do |offender_no|
         create(:case_information, tier: 'A', mappa_level: 1,
-               offender: build(:offender, nomis_offender_id: offender_no, parole_record: build(:parole_record, parole_review_date: next_week)))
+                                  offender: build(:offender, nomis_offender_id: offender_no, parole_record: build(:parole_record, parole_review_date: next_week)))
         create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id, prison: prison)
       end
 
@@ -107,11 +107,11 @@ RSpec.describe TasksController, :allocation, type: :controller do
     before do
       # One offender (G1234VV) should have missing case info and one should have no PRD
       create(:case_information, tier: 'A', mappa_level: 1,
-             offender: build(:offender, nomis_offender_id: 'G1234AB', parole_record: build(:parole_record, parole_review_date: next_week)))
+                                offender: build(:offender, nomis_offender_id: 'G1234AB', parole_record: build(:parole_record, parole_review_date: next_week)))
       create(:allocation_history, nomis_offender_id: 'G1234AB', primary_pom_nomis_id: staff_id, prison: prison)
 
       create(:case_information, tier: 'A', mappa_level: 1,
-             offender: build(:offender, nomis_offender_id: 'G1234GG', parole_record: build(:parole_record, parole_review_date: next_week)))
+                                offender: build(:offender, nomis_offender_id: 'G1234GG', parole_record: build(:parole_record, parole_review_date: next_week)))
       create(:allocation_history, nomis_offender_id: 'G1234GG', primary_pom_nomis_id: staff_id, prison: prison)
 
       create(:case_information, offender: build(:offender, nomis_offender_id: 'G7514GW'), tier: 'A', mappa_level: 1)

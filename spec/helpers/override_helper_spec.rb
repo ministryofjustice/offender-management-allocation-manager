@@ -1,23 +1,23 @@
 require 'rails_helper'
 
 RSpec.describe OverrideHelper do
-  let(:allocation_one) {
+  let(:allocation_one) do
     build(:allocation_history,
           primary_pom_nomis_id: 485_833,
           nomis_offender_id: 'G2911GD',
           recommended_pom_type: 'prison',
           suitability_detail: "Prisoner too high risk",
           override_detail: "Concerns around behaviour"
-    )
-  }
+         )
+  end
 
-  let(:allocation_two) {
+  let(:allocation_two) do
     build(:allocation_history,
           primary_pom_nomis_id: 485_833,
           nomis_offender_id: 'G2911GD',
           recommended_pom_type: nil
-    )
-  }
+         )
+  end
 
   describe '#display_override_pom' do
     it 'displays which POM type was overriden, if present' do

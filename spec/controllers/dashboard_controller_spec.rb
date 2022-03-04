@@ -5,15 +5,15 @@ require 'rails_helper'
 RSpec.describe DashboardController, type: :controller do
   let(:offenders) { build_list(:nomis_offender, 3) }
   let(:prison) { create(:prison).code }
-  let(:poms) {
+  let(:poms) do
     [
       build(:pom,
             firstName: 'Alice',
             position: RecommendationService::PRISON_POM,
             staffId: 1
-      )
+           )
     ]
-  }
+  end
 
   before do
     stub_poms(prison, poms)
@@ -54,8 +54,8 @@ RSpec.describe DashboardController, type: :controller do
 
       before do
         stub_sso_data(prison)
-        stub_request(:get, "#{ApiHelper::T3}/users/").
-          to_return(body: { staffId: 1 }.to_json)
+        stub_request(:get, "#{ApiHelper::T3}/users/")
+          .to_return(body: { staffId: 1 }.to_json)
       end
 
       it 'shows me only SPO tasks' do

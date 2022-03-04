@@ -8,8 +8,8 @@ class Prison < ApplicationRecord
   def get_list_of_poms
     # This API call doesn't do what it says on the tin. It can return duplicate
     # staff_ids in the situation where someone has more than one role.
-    poms = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(code).
-      select { |pom| pom.prison_officer? || pom.probation_officer? }.uniq(&:staff_id)
+    poms = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(code)
+      .select { |pom| pom.prison_officer? || pom.probation_officer? }.uniq(&:staff_id)
 
     details = pom_details.where(nomis_staff_id: poms.map(&:staff_id))
 
@@ -53,21 +53,13 @@ class Prison < ApplicationRecord
     @allocations ||= AllocationHistory.active_allocations_for_prison(code).where(nomis_offender_id: all_policy_offenders.map(&:offender_no))
   end
 
-  def allocated
-    summary.allocated
-  end
+  delegate :allocated, to: :summary
 
-  def unallocated
-    summary.unallocated
-  end
+  delegate :unallocated, to: :summary
 
-  def new_arrivals
-    summary.new_arrivals
-  end
+  delegate :new_arrivals, to: :summary
 
-  def missing_info
-    summary.missing_info
-  end
+  delegate :missing_info, to: :summary
 
 private
 

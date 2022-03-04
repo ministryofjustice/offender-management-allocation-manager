@@ -9,7 +9,7 @@ RSpec.describe MovementsOnDateJob, type: :job do
   let(:yesterday) { today - 1.day }
   let(:pom) { build(:pom) }
   let!(:allocation) { create(:allocation_history, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: pom.staff_id, prison: from_prison_code) }
-  let(:mail_params) {
+  let(:mail_params) do
     {
       email: pom.email_address,
       pom_name: pom.first_name.titleize,
@@ -18,15 +18,15 @@ RSpec.describe MovementsOnDateJob, type: :job do
       prison_name: Prison.find(from_prison_code).name,
       url: "http://localhost:3000/prisons/#{from_prison_code}/staff/#{pom.staff_id}/caseload"
     }
-  }
+  end
 
   before do
     stub_offender(nomis_offender)
     stub_poms(from_prison_code, [pom])
 
     # Stub offender movements from yesterday
-    stub_request(:get, "#{ApiHelper::T3}/movements?fromDateTime=#{yesterday - 1.year}T00:00&movementDate=#{yesterday}").
-      to_return(body: [movement].to_json)
+    stub_request(:get, "#{ApiHelper::T3}/movements?fromDateTime=#{yesterday - 1.year}T00:00&movementDate=#{yesterday}")
+      .to_return(body: [movement].to_json)
 
     # Expect POM to be emailed about the deallocation
     expect(PomMailer).to receive(:offender_deallocated).with(mail_params).and_return(double(deliver_later: nil))
@@ -39,14 +39,14 @@ RSpec.describe MovementsOnDateJob, type: :job do
     let(:from_prison_code) { create(:prison).code }
     let(:to_prison_code) { 'OUT' } # "OUT" is the prison code NOMIS uses to mean "not in prison"
 
-    let(:movement) {
+    let(:movement) do
       attributes_for(:movement,
                      offenderNo: nomis_offender_id,
                      movementType: 'REL',
                      directionCode: 'OUT',
                      fromAgency: from_prison_code,
                      toAgency: to_prison_code)
-    }
+    end
 
     it 'deallocates and emails the POM' do
       expect(allocation).to be_active
@@ -60,14 +60,14 @@ RSpec.describe MovementsOnDateJob, type: :job do
     let(:from_prison_code) { create(:prison).code }
     let(:to_prison_code) { create(:prison).code }
 
-    let(:movement) {
+    let(:movement) do
       attributes_for(:movement,
                      offenderNo: nomis_offender_id,
                      movementType: 'ADM',
                      directionCode: 'IN',
                      fromAgency: from_prison_code,
                      toAgency: to_prison_code)
-    }
+    end
 
     it 'deallocates and emails the POM' do
       expect(allocation).to be_active

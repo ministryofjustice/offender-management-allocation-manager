@@ -4,24 +4,24 @@ context 'when NOMIS is missing information' do
   let(:prison_code) { create(:prison).code }
   let(:offender_no) { build(:offender).nomis_offender_id }
   let(:stub_keyworker_host) { Rails.configuration.keyworker_api_host }
-  let(:staff_id) { 123456 }
+  let(:staff_id) { 123_456 }
 
   describe 'when logged in as a POM' do
     before do
       stub_poms = [{ staffId: staff_id, position: RecommendationService::PRISON_POM }]
 
-      stub_request(:post, "#{ApiHelper::AUTH_HOST}/auth/oauth/token").
-        with(query: { grant_type: 'client_credentials' }).
-        to_return(body: {}.to_json)
+      stub_request(:post, "#{ApiHelper::AUTH_HOST}/auth/oauth/token")
+        .with(query: { grant_type: 'client_credentials' })
+        .to_return(body: {}.to_json)
 
-      stub_request(:get, "#{ApiHelper::T3}/users/example_user").
-        to_return(body: { staffId: staff_id }.to_json)
+      stub_request(:get, "#{ApiHelper::T3}/users/example_user")
+        .to_return(body: { staffId: staff_id }.to_json)
 
-      stub_request(:get, "#{ApiHelper::T3}/staff/#{staff_id}/emails").
-        to_return(body: [].to_json)
+      stub_request(:get, "#{ApiHelper::T3}/staff/#{staff_id}/emails")
+        .to_return(body: [].to_json)
 
-      stub_request(:get, "#{ApiHelper::T3}/staff/roles/#{prison_code}/role/POM").
-        to_return(body: stub_poms.to_json)
+      stub_request(:get, "#{ApiHelper::T3}/staff/roles/#{prison_code}/role/POM")
+        .to_return(body: stub_poms.to_json)
 
       signin_pom_user([prison_code])
       stub_user(username: 'MOIC_POM', staff_id: staff_id)
@@ -31,10 +31,10 @@ context 'when NOMIS is missing information' do
       context 'with an NPS offender with a determinate sentence, but no release dates' do
         before do
           stub_offenders = [build(:nomis_offender, prisonerNumber: offender_no,
-                                  imprisonmentStatus: 'SEC91',
-                                  sentence: attributes_for(:sentence_detail,
-                                                           releaseDate: 30.years.from_now.iso8601,
-                                                           sentenceStartDate: Time.zone.now.iso8601))]
+                                                   imprisonmentStatus: 'SEC91',
+                                                   sentence: attributes_for(:sentence_detail,
+                                                                            releaseDate: 30.years.from_now.iso8601,
+                                                                            sentenceStartDate: Time.zone.now.iso8601))]
 
           stub_offenders_for_prison(prison_code, stub_offenders)
 
@@ -53,18 +53,18 @@ context 'when NOMIS is missing information' do
     describe 'the prisoner page' do
       before do
         offender = build(:nomis_offender, prisonId: prison_code, prisonerNumber: offender_no,
-                         sentence: attributes_for(:sentence_detail,
-                                                  automaticReleaseDate: Time.zone.today + 3.years,
-                                                  conditionalReleaseDate: Time.zone.today + 22.months))
+                                          sentence: attributes_for(:sentence_detail,
+                                                                   automaticReleaseDate: Time.zone.today + 3.years,
+                                                                   conditionalReleaseDate: Time.zone.today + 22.months))
 
-        stub_request(:get, "#{ApiHelper::T3}/staff/#{staff_id}").
-          to_return(body: { staffId: staff_id, firstName: "TEST", lastName: "MOIC" }.to_json)
+        stub_request(:get, "#{ApiHelper::T3}/staff/#{staff_id}")
+          .to_return(body: { staffId: staff_id, firstName: "TEST", lastName: "MOIC" }.to_json)
 
-        stub_request(:post, "#{ApiHelper::T3}/offender-assessments/CATEGORY").
-          to_return(body: {}.to_json)
+        stub_request(:post, "#{ApiHelper::T3}/offender-assessments/CATEGORY")
+          .to_return(body: {}.to_json)
 
-        stub_request(:get, "#{stub_keyworker_host}/key-worker/#{prison_code}/offender/#{offender_no}").
-          to_return(body: {}.to_json)
+        stub_request(:get, "#{stub_keyworker_host}/key-worker/#{prison_code}/offender/#{offender_no}")
+          .to_return(body: {}.to_json)
 
         stub_offender(offender)
 
@@ -114,28 +114,28 @@ context 'when NOMIS is missing information' do
 
         stub_offenders_for_prison(prison_code, [stub_offender])
 
-        stub_request(:get, "#{ApiHelper::T3}/prisoners/#{offender_no}").
-          to_return(body: [stub_offender].to_json)
+        stub_request(:get, "#{ApiHelper::T3}/prisoners/#{offender_no}")
+          .to_return(body: [stub_offender].to_json)
 
-        stub_request(:post, "#{ApiHelper::T3}/offender-assessments/CATEGORY").
-          to_return(body: {}.to_json)
+        stub_request(:post, "#{ApiHelper::T3}/offender-assessments/CATEGORY")
+          .to_return(body: {}.to_json)
 
-        stub_request(:get, "#{ApiHelper::T3}/bookings/#{booking_id}/mainOffence").
-          to_return(body: {}.to_json)
+        stub_request(:get, "#{ApiHelper::T3}/bookings/#{booking_id}/mainOffence")
+          .to_return(body: {}.to_json)
 
         stub_poms = [{ staffId: staff_id, position: RecommendationService::PRISON_POM }]
 
-        stub_request(:get, "#{ApiHelper::T3}/staff/roles/#{prison_code}/role/POM").
-          to_return(body: stub_poms.to_json)
+        stub_request(:get, "#{ApiHelper::T3}/staff/roles/#{prison_code}/role/POM")
+          .to_return(body: stub_poms.to_json)
 
-        stub_request(:get, "#{ApiHelper::T3}/staff/#{staff_id}").
-          to_return(body: {}.to_json)
+        stub_request(:get, "#{ApiHelper::T3}/staff/#{staff_id}")
+          .to_return(body: {}.to_json)
 
-        stub_request(:get, "#{ApiHelper::T3}/staff/#{staff_id}/emails").
-          to_return(body: [].to_json)
+        stub_request(:get, "#{ApiHelper::T3}/staff/#{staff_id}/emails")
+          .to_return(body: [].to_json)
 
-        stub_request(:get, "#{stub_keyworker_host}/key-worker/#{prison_code}/offender/#{offender_no}").
-          to_return(body: {}.to_json)
+        stub_request(:get, "#{stub_keyworker_host}/key-worker/#{prison_code}/offender/#{offender_no}")
+          .to_return(body: {}.to_json)
 
         create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
         create(
@@ -147,10 +147,10 @@ context 'when NOMIS is missing information' do
       end
 
       describe 'the pom details page' do
-        before {
+        before do
           visit prison_pom_path(prison_code, staff_id)
           click_link 'Caseload'
-        }
+        end
 
         context 'with a welsh offender' do
           let(:welsh) { 'Yes' }

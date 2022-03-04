@@ -3,40 +3,40 @@ require 'rails_helper'
 RSpec.describe EmailService do
   include ActiveJob::TestHelper
 
-  let(:allocation) {
+  let(:allocation) do
     AllocationHistory.new.tap do |a|
       a.primary_pom_nomis_id = 485_833
       a.nomis_offender_id = 'G2911GD'
       a.allocated_at_tier = 'A'
       a.prison = prison_code
     end
-  }
+  end
 
-  let(:reallocation) {
-    AllocationHistory.new.tap { |a|
+  let(:reallocation) do
+    AllocationHistory.new.tap do |a|
       a.primary_pom_nomis_id = 485_766
       a.nomis_offender_id = 'G2911GD'
       a.allocated_at_tier = 'A'
       a.prison = prison_code
       a.event = AllocationHistory::REALLOCATE_PRIMARY_POM
       a.event_trigger = AllocationHistory::USER
-    }
-  }
+    end
+  end
 
-  let(:original_allocation) {
+  let(:original_allocation) do
     # The original allocation before the reallocation
-    AllocationHistory.new.tap { |a|
+    AllocationHistory.new.tap do |a|
       a.primary_pom_nomis_id = 485_833
       a.nomis_offender_id = 'G2911GD'
       a.allocated_at_tier = 'A'
       a.prison = prison_code
       a.event = AllocationHistory::ALLOCATE_PRIMARY_POM
       a.event_trigger = AllocationHistory::USER
-    }
-  }
+    end
+  end
 
   let(:coworking_allocation) do
-    AllocationHistory.new.tap { |a|
+    AllocationHistory.new.tap do |a|
       a.primary_pom_nomis_id = 485_833
       a.primary_pom_name = "Ricketts, Andrien"
       a.nomis_offender_id = 'G2911GD'
@@ -46,11 +46,11 @@ RSpec.describe EmailService do
       a.prison = prison_code
       a.event = AllocationHistory::ALLOCATE_SECONDARY_POM
       a.event_trigger = AllocationHistory::USER
-    }
+    end
   end
 
   let(:coworking_deallocation) do
-    AllocationHistory.new.tap { |a|
+    AllocationHistory.new.tap do |a|
       a.primary_pom_nomis_id = 485_833
       a.primary_pom_name = "Ricketts, Andrien"
       a.nomis_offender_id = 'G2911GD'
@@ -60,7 +60,7 @@ RSpec.describe EmailService do
       a.prison = prison_code
       a.event = AllocationHistory::DEALLOCATE_SECONDARY_POM
       a.event_trigger = AllocationHistory::USER
-    }
+    end
   end
 
   let(:andrien) { build(:pom, staffId: 485_833) }
@@ -70,13 +70,13 @@ RSpec.describe EmailService do
   let(:prison_code) { prison.code }
   let(:offender_name) { "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}" }
 
-  before {
+  before do
     PomDetail.create(nomis_staff_id: 485_637, working_pattern: 1.0, status: 'inactive')
     stub_auth_token
     create(:case_information, offender: build(:offender, nomis_offender_id: 'G2911GD'))
     stub_offender(offender)
     stub_poms(prison_code, [andrien, leigh])
-  }
+  end
 
   context 'when queueing', :queueing do
     it "Can send an allocation email"  do
@@ -162,8 +162,8 @@ RSpec.describe EmailService do
         url: "http://localhost:3000/prisons/#{prison_code}/prisoners/#{original_allocation.nomis_offender_id}/allocation"
       ).and_return OpenStruct.new(deliver_later: true)
 
-      described_class.
-        send_email(allocation: released_allocation, message: "", pom_nomis_id: released_allocation.primary_pom_nomis_id)
+      described_class
+        .send_email(allocation: released_allocation, message: "", pom_nomis_id: released_allocation.primary_pom_nomis_id)
     end
   end
 end

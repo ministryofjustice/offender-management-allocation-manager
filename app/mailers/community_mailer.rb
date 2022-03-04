@@ -49,7 +49,7 @@ class CommunityMailer < GovukNotifyRails::Mailer
     mail(to: ldu_email)
   end
 
-  def assign_com_less_than_10_months email:, prisoner_name:, prisoner_number:, crn_number:, prison_name:
+  def assign_com_less_than_10_months(email:, prisoner_name:, prisoner_number:, crn_number:, prison_name:)
     set_template('6cae6890-6a5a-4ceb-82bd-43c8b43fc639')
 
     set_personalisation(prisoner_number: prisoner_number,

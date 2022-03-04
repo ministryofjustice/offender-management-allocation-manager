@@ -34,13 +34,13 @@ RSpec.describe CaseMixHelper, type: :helper do
 
     let(:case_mix_bar) { page.css('.case-mix-bar') }
 
-    let(:allocations) {
+    let(:allocations) do
       1.upto(tier_a_count).map { |_i| double(tier: 'A') } +
                           1.upto(tier_b_count).map { |_i| double(tier: 'B') } +
                           1.upto(tier_c_count).map { |_i| double(tier: 'C') } +
                           1.upto(tier_d_count).map { |_i| double(tier: 'D') } +
                           1.upto(tier_na_count).map { |_i| double(tier: 'N/A') }
-    }
+    end
 
     # Randomise tier counts
     let(:tier_a_count) { rand(1..15) }

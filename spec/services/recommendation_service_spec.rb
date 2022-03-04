@@ -24,10 +24,10 @@ describe RecommendationService do
   end
 
   context 'when tier A immigration case' do
-    let(:api_offender) {
+    let(:api_offender) do
       build(:hmpps_api_offender,
             sentence: attributes_for(:sentence_detail, imprisonmentStatus: 'DET', sentenceStartDate: Time.zone.today))
-    }
+    end
     let(:case_info) { build(:case_information, tier: 'A') }
     let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 

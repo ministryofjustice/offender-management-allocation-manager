@@ -8,11 +8,11 @@ class EarlyAllocation < ApplicationRecord
              foreign_key: :nomis_offender_id,
              inverse_of: :early_allocations
 
-  validates_presence_of :prison, :created_by_firstname, :created_by_lastname
+  validates :prison, :created_by_firstname, :created_by_lastname, presence: true
 
   # assessments completed before 18 months prior to their release date, where
   # the assessment outcomes are 'discretionary' or 'eligible'
-  scope :active_pre_referral_window, -> {
+  scope :active_pre_referral_window, lambda {
     where(created_within_referral_window: false).where.not(outcome: 'ineligible')
   }
 
@@ -66,11 +66,11 @@ class EarlyAllocation < ApplicationRecord
   end
 
   def community_decision_eligible_or_automatically_eligible?
-    self.eligible? || community_decision == true
+    eligible? || community_decision == true
   end
 
   def community_decision_ineligible_or_automatically_ineligible?
-    self.ineligible? || community_decision == false
+    ineligible? || community_decision == false
   end
 
   def assessment_date

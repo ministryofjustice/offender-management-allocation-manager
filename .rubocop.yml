@@ -2,6 +2,7 @@ inherit_gem:
   rubocop-govuk:
     - config/default.yml
     - config/rails.yml
+    - config/rspec.yml
 
 require:
   - rubocop-rspec
@@ -11,7 +12,7 @@ require:
 AllCops:
   # Exclude anything that isn't really part of our code.
   # rails_helper is excluded because it's full of solecisms, but it's mostly
-  # generated code and copy-and-pasted snipets from READMEs.
+  # generated code and copy-and-pasted snippets from READMEs.
   Exclude:
     - 'vendor/**/*'
     - 'db/**/*'
@@ -103,6 +104,9 @@ Rails/FilePath:
 Rails/OutputSafety:
   Enabled: false
 
+Rails/SaveBang:
+  Enabled: false
+
 Security/YAMLLoad:
   Enabled: false
 
@@ -137,6 +141,12 @@ Lint/IneffectiveAccessModifier:
   Enabled: false
 
 RSpec/Capybara:
+  Enabled: false
+
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+
+RSpec/StubbedMock:
   Enabled: false
 
 # Below here is the set of (arbitrary) style failures against the govuk versions

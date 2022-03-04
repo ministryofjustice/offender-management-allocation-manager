@@ -51,8 +51,8 @@ class PomMailer < GovukNotifyRails::Mailer
   end
 
   def deallocate_coworking_pom(email_address:, pom_name:,
-    secondary_pom_name:, nomis_offender_id:,
-    offender_name:, url:)
+                               secondary_pom_name:, nomis_offender_id:,
+                               offender_name:, url:)
     set_template('bbdd094b-037b-424d-8b9b-ee310e291c9e')
 
     set_personalisation(pom_name: pom_name,
@@ -68,7 +68,7 @@ class PomMailer < GovukNotifyRails::Mailer
   def secondary_allocation_email(
     message:, pom_name:, offender_name:, nomis_offender_id:,
     responsible_pom_name:, pom_email:, url:, responsibility:
-)
+  )
     message = "Additional information: #{message}" if message.present?
     set_template('8d63ef1a-8f85-47ec-875c-a8bd3a22bb0d')
     set_personalisation(

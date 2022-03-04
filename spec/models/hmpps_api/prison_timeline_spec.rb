@@ -7,15 +7,15 @@ RSpec.describe HmppsApi::PrisonTimeline, type: :model do
   let(:p4) { build(:prison).code }
   let(:unknown_code) { 'XYZ' }
 
-  let(:model) {
+  let(:model) do
     described_class.new([
-                          build(:movement, movementDate: one_month_ago, toAgency: p1),
-                          build(:movement, movementDate: last_fortnight, toAgency: p2),
-                          build(:movement, movementDate: last_week, toAgency: p3),
-                          build(:movement, :transfer, :out, movementDate: three_days_ago, toAgency: p4),
-                          build(:movement, :transfer, movementDate: today, toAgency: unknown_code),
-                        ])
-  }
+      build(:movement, movementDate: one_month_ago, toAgency: p1),
+      build(:movement, movementDate: last_fortnight, toAgency: p2),
+      build(:movement, movementDate: last_week, toAgency: p3),
+      build(:movement, :transfer, :out, movementDate: three_days_ago, toAgency: p4),
+      build(:movement, :transfer, movementDate: today, toAgency: unknown_code),
+    ])
+  end
   let(:tomorrow) { Time.zone.today + 1.day }
   let(:today) { Time.zone.today }
   let(:last_fortnight) { Time.zone.today - 14.days }
@@ -25,9 +25,9 @@ RSpec.describe HmppsApi::PrisonTimeline, type: :model do
   let(:one_month_ago) { Time.zone.today - 1.month }
 
   context 'when today' do
-    subject {
+    subject do
       model.prison_episode(today).prison_code
-    }
+    end
 
     it 'returns prison code for today' do
       expect(subject).to eq(p3)
@@ -35,9 +35,9 @@ RSpec.describe HmppsApi::PrisonTimeline, type: :model do
   end
 
   context 'when tomorrow' do
-    subject {
+    subject do
       model.prison_episode(tomorrow).prison_code
-    }
+    end
 
     it 'returns prison code for tomorrow' do
       expect(subject).to eq(p3)
@@ -45,9 +45,9 @@ RSpec.describe HmppsApi::PrisonTimeline, type: :model do
   end
 
   context 'when second prison' do
-    subject {
+    subject do
       model.prison_episode(two_weeks_ago).prison_code
-    }
+    end
 
     it 'returns prison code for last week' do
       expect(subject).to eq(p2)

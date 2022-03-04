@@ -16,13 +16,13 @@ RSpec.describe ParoleReviewDateForm, type: :model do
     end
 
     context 'when the date is today or in the future' do
-      let(:future_dates) {
+      let(:future_dates) do
         [
           Time.zone.today,
           Time.zone.tomorrow,
           Time.zone.today + 1.year
         ]
-      }
+      end
 
       it { is_expected.to allow_values(*future_dates).for(:parole_review_date) }
     end

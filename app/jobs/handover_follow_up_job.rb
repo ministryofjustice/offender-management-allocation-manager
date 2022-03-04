@@ -7,10 +7,10 @@ class HandoverFollowUpJob < ApplicationJob
     active_prison_codes = Prison.active.map(&:code)
 
     offenders = get_ldu_offenders(ldu)
-                  .select { |o|
+                  .select do |o|
                     o.sentenced? && o.handover_start_date.present? &&
                       active_prison_codes.include?(o.prison_id) && o.handover_start_date == today - 1.week
-                  }
+                  end
 
     offenders.each do |offender|
       allocation = AllocationHistory.find_by(nomis_offender_id: offender.offender_no)
@@ -46,8 +46,8 @@ class HandoverFollowUpJob < ApplicationJob
 private
 
   def get_ldu_offenders(ldu)
-    ldu.case_information.where(com_name: nil).map(&:nomis_offender_id).map do |offender_id|
+    ldu.case_information.where(com_name: nil).map(&:nomis_offender_id).map { |offender_id|
       OffenderService.get_offender(offender_id)
-    end.compact
+    }.compact
   end
 end

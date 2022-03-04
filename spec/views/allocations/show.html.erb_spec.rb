@@ -6,10 +6,10 @@ RSpec.describe "allocations/show", type: :view do
   let(:prison) { build(:prison) }
   let(:page) { Nokogiri::HTML(rendered) }
   let(:next_year) { (Time.zone.today + 1.year).year }
-  let(:api_offender) {
+  let(:api_offender) do
     build(:hmpps_api_offender,
           sentence: attributes_for(:sentence_detail, conditionalReleaseDate: Date.new(next_year + 1, 1, 28)))
-  }
+  end
   let(:case_info) { build(:case_information, :crc) }
   let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 

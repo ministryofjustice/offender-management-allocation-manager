@@ -20,7 +20,7 @@ describe EarlyAllocationEventService do
       expect(topic).to receive(:publish).with(
         message: { offenderNo: calc_status.nomis_offender_id, eligibilityStatus: calc_status.eligible }.to_json,
         message_attributes: hash_including(
-          eventType:  {
+          eventType: {
             string_value: 'community-early-allocation-eligibility.status.changed',
             data_type: 'String',
           },

@@ -22,7 +22,7 @@ module HmppsApi
                   :email_address
 
     def self.from_json(payload)
-      UserDetails.new.tap { |obj|
+      UserDetails.new.tap do |obj|
         obj.account_status = payload['accountStatus']
         obj.active = payload['active']
         obj.active_case_load_id = payload['activeCaseLoadId']
@@ -36,7 +36,7 @@ module HmppsApi
         obj.status = payload['status']
         obj.thumbnail_id = payload['thumbnailId']
         obj.username = payload['username']
-      }
+      end
     end
 
     def full_name_ordered

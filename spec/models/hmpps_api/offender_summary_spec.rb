@@ -30,11 +30,11 @@ describe HmppsApi::Offender do
 
   describe '#within_early_allocation_window?' do
     context 'with no dates' do
-      let(:api_offender) {
+      let(:api_offender) do
         build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail,
                                                             conditionalReleaseDate: nil,
                                                             automaticReleaseDate: nil))
-      }
+      end
       let(:case_info) { build(:case_information) }
       let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
@@ -44,11 +44,11 @@ describe HmppsApi::Offender do
     end
 
     context 'when ARD > 18 months' do
-      let(:api_offender) {
+      let(:api_offender) do
         build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :blank,
                                                             automaticReleaseDate: Time.zone.today + 19.months
         ))
-      }
+      end
       let(:case_info) { build(:case_information) }
       let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
@@ -58,10 +58,10 @@ describe HmppsApi::Offender do
     end
 
     context 'when ARD < 18 months' do
-      let(:api_offender) {
+      let(:api_offender) do
         build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :blank,
                                                             automaticReleaseDate: Time.zone.today + 17.months))
-      }
+      end
       let(:case_info) { build(:case_information) }
       let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
@@ -71,16 +71,16 @@ describe HmppsApi::Offender do
     end
 
     context 'when PRD < 18 months' do
-      let(:case_info) {
+      let(:case_info) do
         build(:case_information, offender: build(:offender,
                                                  parole_record: build(:parole_record, parole_review_date: Time.zone.today + 17.months)))
-      }
-      let(:api_offender) {
+      end
+      let(:api_offender) do
         build(:hmpps_api_offender,
               sentence: attributes_for(:sentence_detail,
                                        conditionalReleaseDate: Time.zone.today + 24.months,
                                        automaticReleaseDate: Time.zone.today + 24.months))
-      }
+      end
       let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
       it 'is within window' do
@@ -89,17 +89,17 @@ describe HmppsApi::Offender do
     end
 
     context 'when TED < 18 months' do
-      let(:case_info) {
+      let(:case_info) do
         build(:case_information, offender: build(:offender,
                                                  parole_record: build(:parole_record, parole_review_date: Time.zone.today + 24.months)))
-      }
-      let(:api_offender) {
+      end
+      let(:api_offender) do
         build(:hmpps_api_offender,
               sentence: attributes_for(:sentence_detail,
                                        conditionalReleaseDate: Time.zone.today + 24.months,
                                        tariffDate: Time.zone.today + 17.months,
                                        automaticReleaseDate: Time.zone.today + 24.months))
-      }
+      end
       let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
       it 'is within window' do
@@ -108,18 +108,18 @@ describe HmppsApi::Offender do
     end
 
     context 'when PED < 18 months' do
-      let(:case_info) {
+      let(:case_info) do
         build(:case_information, offender: build(:offender,
                                                  parole_record: build(:parole_record, parole_review_date: Time.zone.today + 24.months)))
-      }
-      let(:api_offender) {
+      end
+      let(:api_offender) do
         build(:hmpps_api_offender,
               sentence: attributes_for(:sentence_detail,
                                        conditionalReleaseDate: Time.zone.today + 24.months,
                                        tariffDate: Time.zone.today + 24.months,
                                        paroleEligibilityDate: Time.zone.today + 17.months,
                                        automaticReleaseDate: Time.zone.today + 24.months))
-      }
+      end
       let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
       it 'is within window' do
@@ -130,12 +130,12 @@ describe HmppsApi::Offender do
 
   describe '#handover_start_date' do
     context 'when in custody' do
-      let(:api_offender) {
+      let(:api_offender) do
         build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail,
                                                             conditionalReleaseDate: nil,
                                                             automaticReleaseDate: Time.zone.today + 1.year,
                                                             sentenceStartDate: Time.zone.today))
-      }
+      end
       let(:case_info) { build(:case_information, case_allocation: 'NPS', mappa_level: 0) }
       let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
@@ -145,9 +145,9 @@ describe HmppsApi::Offender do
     end
 
     context 'when COM responsible already' do
-      let(:api_offender) {
+      let(:api_offender) do
         build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, conditionalReleaseDate: Time.zone.today + 1.week))
-      }
+      end
       let(:case_info) { build(:case_information) }
       let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
@@ -217,13 +217,13 @@ describe HmppsApi::Offender do
     end
 
     context 'when the responsibility has been overridden' do
-      let(:offender) {
+      let(:offender) do
         case_info = create(:case_information, offender: build(:offender, nomis_offender_id: api_offender.offender_no), case_allocation: 'NPS', mappa_level: 0)
 
         # Responsibility overrides exist as 'Responsibility' records
         create(:responsibility, nomis_offender_id: api_offender.offender_no, value: override_to)
         build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender)
-      }
+      end
 
       context 'when overridden to the community' do
         let(:override_to) { 'Probation' }
@@ -350,9 +350,9 @@ describe HmppsApi::Offender do
   describe '#needs_a_com?' do
     subject { offender.needs_a_com? }
 
-    let(:api_offender) {
+    let(:api_offender) do
       build(:hmpps_api_offender, sentence: sentence)
-    }
+    end
     let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
     let(:case_info) { build(:case_information) }

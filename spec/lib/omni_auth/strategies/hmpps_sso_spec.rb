@@ -4,11 +4,11 @@ describe OmniAuth::Strategies::HmppsSso, vcr: { cassette_name: 'prison_api/hmpps
     described_class.new(app, 'client_id', 'secret')
   end
 
-  let(:app) {
-    Rack::Builder.new do |b|
+  let(:app) do
+    Rack::Builder.new { |b|
       b.run ->(_env) { [200, {}, ['Hello']] }
-    end.to_app
-  }
+    }.to_app
+  end
 
   context 'when methods' do
     context 'when #info' do

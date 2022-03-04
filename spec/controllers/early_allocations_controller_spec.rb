@@ -12,12 +12,12 @@ RSpec.describe EarlyAllocationsController, type: :controller do
   let(:first_pom) { build(:pom) }
   let(:nomis_staff_id) { first_pom.staffId }
 
-  let(:poms) {
+  let(:poms) do
     [
       first_pom,
       build(:pom)
     ]
-  }
+  end
 
   let(:offender) { build(:nomis_offender, prisonId: prison, sentence: attributes_for(:sentence_detail, sentenceStartDate: Time.zone.today - 9.months,  conditionalReleaseDate: release_date)) }
 
@@ -35,7 +35,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
 
   context 'with some assessments' do
     let(:case_info) { create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id)) }
-    let!(:early_allocations) {
+    let!(:early_allocations) do
       # Create 5 Early Allocation records with different creation dates
       [
         create(:early_allocation, offender: case_info.offender, created_at: 1.year.ago),
@@ -44,7 +44,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
         create(:early_allocation, offender: case_info.offender, created_at: 1.week.ago),
         create(:early_allocation, offender: case_info.offender, created_at: 1.day.ago)
       ]
-    }
+    end
     let(:release_date) { Time.zone.today + 17.months }
     let(:early_allocation) { assigns(:early_assignment) }
 
@@ -92,7 +92,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
 
           context 'when a record with that ID does not exist' do
             it 'raises a "Not Found" error' do
-              id = 48753
+              id = 48_753
               expect {
                 get :show, params: { prison_id: prison, prisoner_id: nomis_offender_id, id: id }, format: :html
               }.to raise_error(ActiveRecord::RecordNotFound)
@@ -113,7 +113,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
         expect(topic).to receive(:publish).with(
           message: { offenderNo: nomis_offender_id, eligibilityStatus: true }.to_json,
           message_attributes: hash_including(
-            eventType:  {
+            eventType: {
               string_value: 'community-early-allocation-eligibility.status.changed',
               data_type: 'String',
             },
@@ -160,10 +160,10 @@ RSpec.describe EarlyAllocationsController, type: :controller do
     end
 
     context 'when on eligible screen' do
-      let(:eligible_params) {
+      let(:eligible_params) do
         { "oasys_risk_assessment_date" => valid_date,
         }.merge(s1_boolean_params)
-      }
+      end
       let(:early_allocation) { EarlyAllocation.last }
 
       context 'when > 18 months from release' do
@@ -171,8 +171,8 @@ RSpec.describe EarlyAllocationsController, type: :controller do
 
         it 'stores false in created_within_referral_window' do
           post :eligible, params: { prison_id: prison,
-                                  prisoner_id: nomis_offender_id,
-                                  early_allocation: eligible_params.merge(high_profile: true) }
+                                    prisoner_id: nomis_offender_id,
+                                    early_allocation: eligible_params.merge(high_profile: true) }
           assert_template('landing_eligible')
           expect(early_allocation.created_within_referral_window).to eq(false)
         end
@@ -186,8 +186,8 @@ RSpec.describe EarlyAllocationsController, type: :controller do
             s1_boolean_param_names.each do |field|
               expect {
                 post :eligible, params: { prison_id: prison,
-                                        prisoner_id: nomis_offender_id,
-                                        early_allocation: eligible_params.merge(field => true) }
+                                          prisoner_id: nomis_offender_id,
+                                          early_allocation: eligible_params.merge(field => true) }
               }.to change(EmailHistory, :count).by(1)
               assert_template('landing_eligible')
 
@@ -203,8 +203,8 @@ RSpec.describe EarlyAllocationsController, type: :controller do
           render_views
           it 'renders the second screen of questions' do
             post :eligible, params: { prison_id: prison,
-                                    prisoner_id: nomis_offender_id,
-                                    early_allocation: eligible_params }
+                                      prisoner_id: nomis_offender_id,
+                                      early_allocation: eligible_params }
             assert_template('discretionary')
             expect(response.body).to include('Extremism separation centres')
           end
@@ -215,13 +215,13 @@ RSpec.describe EarlyAllocationsController, type: :controller do
     context 'when stage 2' do
       let(:release_date) { Time.zone.today + 17.months }
 
-      let(:s2_boolean_param_names) {
+      let(:s2_boolean_param_names) do
         [:due_for_release_in_less_than_24months,
          :high_risk_of_serious_harm,
          :mappa_level_2,
          :pathfinder_process,
          :other_reason]
-      }
+      end
 
       let(:s2_boolean_params) { s2_boolean_param_names.index_with { |_p| 'false' }.to_h }
 

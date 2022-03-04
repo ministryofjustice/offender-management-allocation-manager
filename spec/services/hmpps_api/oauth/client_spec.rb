@@ -12,28 +12,28 @@ describe HmppsApi::Oauth::Client do
 
       client.post(route)
 
-      expect(WebMock).to have_requested(:post, /\w/).
-        with(
+      expect(WebMock).to have_requested(:post, /\w/)
+        .with(
           headers: {
-            'Authorization': 'Basic ' + Base64.urlsafe_encode64(
+            'Authorization': "Basic #{Base64.urlsafe_encode64(
               "#{Rails.configuration.hmpps_api_client_id}:#{Rails.configuration.hmpps_api_client_secret}"
-            )
+            )}"
           }
-      )
+        )
     end
 
     context 'when a HTTP error response is received' do
       before do
-        WebMock.stub_request(:post, /\w/).
-            to_return(status: status)
+        WebMock.stub_request(:post, /\w/)
+            .to_return(status: status)
       end
 
       describe 'a 5xx error' do
         let(:status) { 504 }
 
         it 'raises the correct error' do
-          expect { client.post(route) }.
-              to raise_error(Faraday::ServerError, "the server responded with status #{status}")
+          expect { client.post(route) }
+              .to raise_error(Faraday::ServerError, "the server responded with status #{status}")
         end
       end
     end

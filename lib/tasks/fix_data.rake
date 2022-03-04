@@ -7,7 +7,7 @@ namespace :fix_data do
   task :for_prison, [:prison] => [:environment] do |_task, args|
     prisons = args[:prison].split
 
-    prisons.each { |prison|
+    prisons.each do |prison|
       puts "Attempting to process #{prison}"
       if Prison.find_by(code: prison).nil?
         puts "Unable to find prison #{prison}"
@@ -15,6 +15,6 @@ namespace :fix_data do
       end
 
       AllocationValidation.fixup(prison)
-    }
+    end
   end
 end

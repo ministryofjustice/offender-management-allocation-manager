@@ -7,13 +7,13 @@ describe HmppsApi::Client do
   let(:access_token) { "access_token" }
   let(:valid_token) { HmppsApi::Oauth::Token.new(access_token: access_token) }
 
-  let(:auth_header) {
+  let(:auth_header) do
     {
       headers: {
         'Authorization': "Bearer #{access_token}"
       }
     }
-  }
+  end
 
   before do
     allow(token_service).to receive(:valid_token).and_return(valid_token)
@@ -27,8 +27,8 @@ describe HmppsApi::Client do
       route = "/api/users/#{username}"
       client.get(route)
 
-      expect(WebMock).to have_requested(:get, /\w/).
-        with(auth_header)
+      expect(WebMock).to have_requested(:get, /\w/)
+        .with(auth_header)
     end
   end
 
@@ -37,16 +37,16 @@ describe HmppsApi::Client do
     let(:route) { '/api/endpoint' }
 
     before do
-      WebMock.stub_request(:get, api_host + route).
-        to_return(status: status)
+      WebMock.stub_request(:get, api_host + route)
+        .to_return(status: status)
     end
 
     describe 'a 4xx error' do
       let(:status) { 401 }
 
       it 'raises a Faraday::ClientError error' do
-        expect { client.get(route) }.
-          to raise_error(Faraday::ClientError, "the server responded with status #{status}")
+        expect { client.get(route) }
+          .to raise_error(Faraday::ClientError, "the server responded with status #{status}")
       end
     end
 
@@ -54,8 +54,8 @@ describe HmppsApi::Client do
       let(:status) { 404 }
 
       it 'raises a Faraday::ResourceNotFound error' do
-        expect { client.get(route) }.
-          to raise_error(Faraday::ResourceNotFound, "the server responded with status #{status}")
+        expect { client.get(route) }
+          .to raise_error(Faraday::ResourceNotFound, "the server responded with status #{status}")
       end
     end
 
@@ -63,8 +63,8 @@ describe HmppsApi::Client do
       let(:status) { 500 }
 
       it 'raises the correct error' do
-        expect { client.get(route) }.
-          to raise_error(Faraday::ServerError, "the server responded with status #{status}")
+        expect { client.get(route) }
+          .to raise_error(Faraday::ServerError, "the server responded with status #{status}")
       end
     end
   end
@@ -73,13 +73,13 @@ describe HmppsApi::Client do
     let(:route) { '/api/endpoint' }
 
     before do
-      WebMock.stub_request(:get, api_host + route).
-        to_timeout
+      WebMock.stub_request(:get, api_host + route)
+        .to_timeout
     end
 
     it 'raises a Faraday::TimeoutError' do
-      expect { client.get(route) }.
-        to raise_error(Faraday::TimeoutError, 'request timed out')
+      expect { client.get(route) }
+        .to raise_error(Faraday::TimeoutError, 'request timed out')
     end
   end
 
@@ -101,16 +101,16 @@ describe HmppsApi::Client do
       end
 
       before do
-        WebMock.stub_request(:get, stub_url).
-          to_return(body: response_body)
+        WebMock.stub_request(:get, stub_url)
+          .to_return(body: response_body)
 
         # Trigger the request
         response
       end
 
       it 'performs an authenticated GET request' do
-        expect(WebMock).to have_requested(:get, stub_url).
-          with(auth_header)
+        expect(WebMock).to have_requested(:get, stub_url)
+          .with(auth_header)
       end
 
       include_examples 'handles JSON response'
@@ -153,21 +153,21 @@ describe HmppsApi::Client do
       end
 
       before do
-        WebMock.stub_request(:post, stub_url).
-          to_return(body: response_body)
+        WebMock.stub_request(:post, stub_url)
+          .to_return(body: response_body)
 
         # Trigger the request
         response
       end
 
       it 'performs an authenticated POST request' do
-        expect(WebMock).to have_requested(:post, stub_url).
-          with(auth_header)
+        expect(WebMock).to have_requested(:post, stub_url)
+          .with(auth_header)
       end
 
       it 'encodes the request body as JSON' do
-        expect(WebMock).to have_requested(:post, stub_url).
-          with(
+        expect(WebMock).to have_requested(:post, stub_url)
+          .with(
             headers: {
               'Content-Type': 'application/json'
             },
@@ -215,21 +215,21 @@ describe HmppsApi::Client do
       end
 
       before do
-        WebMock.stub_request(:put, stub_url).
-          to_return(body: response_body)
+        WebMock.stub_request(:put, stub_url)
+          .to_return(body: response_body)
 
         # Trigger the request
         response
       end
 
       it 'performs an authenticated PUT request' do
-        expect(WebMock).to have_requested(:put, stub_url).
-          with(auth_header)
+        expect(WebMock).to have_requested(:put, stub_url)
+          .with(auth_header)
       end
 
       it 'encodes the request body as JSON' do
-        expect(WebMock).to have_requested(:put, stub_url).
-          with(
+        expect(WebMock).to have_requested(:put, stub_url)
+          .with(
             headers: {
               'Content-Type': 'application/json'
             },
@@ -242,15 +242,15 @@ describe HmppsApi::Client do
 
     describe '#delete' do
       before do
-        WebMock.stub_request(:delete, stub_url).
-          to_return(status: 200)
+        WebMock.stub_request(:delete, stub_url)
+          .to_return(status: 200)
 
         client.delete(route)
       end
 
       it 'performs an authenticated DELETE request' do
-        expect(WebMock).to have_requested(:delete, stub_url).
-          with(auth_header)
+        expect(WebMock).to have_requested(:delete, stub_url)
+          .with(auth_header)
       end
     end
   end
@@ -258,7 +258,7 @@ describe HmppsApi::Client do
   describe 'request caching' do
     let(:memory_store) { ActiveSupport::Cache.lookup_store(:memory_store) }
 
-    let(:base_request) {
+    let(:base_request) do
       {
         root: 'https://example.com',
         route: '/some/endpoint',
@@ -268,7 +268,7 @@ describe HmppsApi::Client do
         # HTTP methods to test caching for – we support caching both GET and POST requests
         methods: [:get, :post],
       }
-    }
+    end
 
     # Helper to send a request
     def send_request(req)

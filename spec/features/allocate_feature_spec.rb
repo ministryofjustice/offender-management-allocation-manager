@@ -9,19 +9,19 @@ feature 'Allocation' do
   let!(:unallocated_offender_name) { 'Albina, Obinins' }
   let(:recently_allocated_offender_name) { 'Obinins Albina' }
 
-  let!(:probation_officer_pom_detail) {
-    PomDetail.create!(
+  let!(:probation_officer_pom_detail) do
+    PomDetail.create(
       prison_code: 'LEI',
       nomis_staff_id: probation_officer_nomis_staff_id,
       working_pattern: 1.0,
       status: 'Active'
     )
-  }
+  end
 
-  let!(:case_information) {
+  let!(:case_information) do
     create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id), tier: 'A', case_allocation: 'NPS', probation_service: 'England')
     create(:case_information, offender: build(:offender, nomis_offender_id: never_allocated_offender_id))
-  }
+  end
 
   before do
     signin_spo_user

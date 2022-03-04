@@ -47,7 +47,7 @@ class CaseInformationController < PrisonsApplicationController
         redirect_to missing_information_prison_prisoners_path(active_prison_id,
                                                               sort: params[:sort],
                                                               page: params[:page]
-                    )
+                                                             )
       else
         redirect_to prison_prisoner_staff_index_path(active_prison_id,  @case_info.nomis_offender_id)
       end
@@ -85,12 +85,12 @@ private
   end
 
   def case_information_params
-    params.require(:case_information).
-      permit(:nomis_offender_id, :tier, :case_allocation, :probation_service)
+    params.require(:case_information)
+      .permit(:nomis_offender_id, :tier, :case_allocation, :probation_service)
   end
 
   def parole_review_date_params
-    params.require(:parole_review_date_form).
-      permit(:parole_review_date)
+    params.require(:parole_review_date_form)
+      .permit(:parole_review_date)
   end
 end

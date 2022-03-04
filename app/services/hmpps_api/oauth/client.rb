@@ -9,10 +9,10 @@ module HmppsApi
         @host = host
         @connection = Faraday.new do |faraday|
           faraday.request :retry, max: 3, interval: 0.05,
-                          interval_randomness: 0.5, backoff_factor: 2,
-                          # We appear to get occasional transient 5xx errors, so retry them
-                          retry_statuses: [500, 502],
-                          methods: Faraday::Request::Retry::IDEMPOTENT_METHODS + [:post]
+                                  interval_randomness: 0.5, backoff_factor: 2,
+                                  # We appear to get occasional transient 5xx errors, so retry them
+                                  retry_statuses: [500, 502],
+                                  methods: Faraday::Request::Retry::IDEMPOTENT_METHODS + [:post]
 
           faraday.response :raise_error
         end
@@ -25,11 +25,11 @@ module HmppsApi
     private
 
       def request(method, route)
-        response = @connection.send(method) { |req|
+        response = @connection.send(method) do |req|
           url = URI.join(@host, route).to_s
           req.url(url)
           req.headers['Authorization'] = api_authorisation
-        }
+        end
 
         JSON.parse(response.body)
       end

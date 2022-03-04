@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module CaseloadHelper
-  def prisoner_location(offender, location_only = false)
+  def prisoner_location(offender, location_only: false)
     location = offender.location.presence || (offender.restricted_patient? ? 'Unknown' : 'N/A')
 
     if offender.restricted_patient?

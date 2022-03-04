@@ -18,7 +18,7 @@ module HmppsApi
         # Allow this object to be reconstituted from a hash, we can't use
         # from_json as the one passed in will already be using the snake case
         # names whereas from_json is expecting the elite2 camelcase names.
-        fields.each do |k, v| instance_variable_set("@#{k}", v) end
+        fields.each { |k, v| instance_variable_set("@#{k}", v) }
 
         @expiry_time = Time.zone.now + @expires_in.to_i.seconds
       end

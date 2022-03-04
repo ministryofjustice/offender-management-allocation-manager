@@ -8,7 +8,7 @@ feature "view POM's caseload" do
   let(:tomorrow) { Date.tomorrow }
   let(:other_pom) { build(:pom) }
 
-  let(:offender_map) {
+  let(:offender_map) do
     {
       'G7266VD' => 1_073,
       'G8563UA' => 1_020,
@@ -31,24 +31,24 @@ feature "view POM's caseload" do
       'G4706UP' => 1_180,
       'G9344UG' => 841
     }
-  }
+  end
   let(:nil_release_date_offender) { 'G9372GQ' }
-  let(:offender_ids_by_release_date) {
+  let(:offender_ids_by_release_date) do
     offender_map.excluding(nil_release_date_offender).map { |k, v| [k, v] }.sort_by { |_k, v| v }.map { |k, _v| k }
-  }
-  let(:offenders) {
-    ids_without_cells = %w(G6653UC G8563UA)
-    offender_map.merge(nomis_offender_id => 1_153).
-      map { |nomis_id, booking_id|
+  end
+  let(:offenders) do
+    ids_without_cells = %w[G6653UC G8563UA]
+    offender_map.merge(nomis_offender_id => 1_153)
+      .map do |nomis_id, booking_id|
       if ids_without_cells.include? nomis_id
         # generate 2 offenders without a cell location
         build(:nomis_offender, cellLocation: nil,
-              prisonId: prison.code,
-              prisonerNumber: nomis_id,
-              sentence: attributes_for(:sentence_detail,
-                                       automaticReleaseDate: "2031-01-22",
-                                       conditionalReleaseDate: "2031-01-24",
-                                       tariffDate: (nomis_id == nil_release_date_offender) ? nil : Time.zone.today + booking_id.days))
+                               prisonId: prison.code,
+                               prisonerNumber: nomis_id,
+                               sentence: attributes_for(:sentence_detail,
+                                                        automaticReleaseDate: "2031-01-22",
+                                                        conditionalReleaseDate: "2031-01-24",
+                                                        tariffDate: (nomis_id == nil_release_date_offender) ? nil : Time.zone.today + booking_id.days))
       else
         build(:nomis_offender,
               prisonId: prison.code,
@@ -58,14 +58,14 @@ feature "view POM's caseload" do
                                        conditionalReleaseDate: "2031-01-24",
                                        tariffDate: (nomis_id == nil_release_date_offender) ? nil : Time.zone.today + booking_id.days))
       end
-    }
-  }
-  let(:missing_cells) {
-    offenders.find_all { |x| x[:cellLocation] == nil }
-  }
-  let(:sorted_offenders) {
+    end
+  end
+  let(:missing_cells) do
+    offenders.find_all { |x| x[:cellLocation].nil? }
+  end
+  let(:sorted_offenders) do
     offenders.sort_by { |o| o.fetch(:lastName) }
-  }
+  end
   let(:first_offender) { sorted_offenders.first }
   let(:moved_offenders) { [sorted_offenders.fourth, sorted_offenders.fifth] }
 
@@ -82,7 +82,7 @@ feature "view POM's caseload" do
               firstName: 'Alice',
               position: RecommendationService::PRISON_POM,
               staffId: nomis_staff_id
-        ),
+             ),
         other_pom
       ]
 
@@ -91,9 +91,9 @@ feature "view POM's caseload" do
     signin_pom_user [prison.code]
 
     # Add attributes to moved_offenders to make them ROTLs - needed in conjunction with the ROTL movements
-    moved_offenders.each { |o|
+    moved_offenders.each do |o|
       o.merge!(inOutStatus: 'OUT', lastMovementTypeCode: 'TAP')
-    }
+    end
 
     stub_offenders_for_prison(prison.code, offenders, [
       attributes_for(:movement, :rotl, movementDate: Time.zone.today - 1.month, offenderNo: moved_offenders.first.fetch(:prisonerNumber)),
@@ -259,10 +259,10 @@ feature "view POM's caseload" do
         stub_user staff_id: nomis_staff_id
 
         stub_offender(first_offender)
-        stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/#{prison.code}/offender/#{first_offender.fetch(:prisonerNumber)}").
-          to_return(body: { staffId: 485_572, firstName: "DOM", lastName: "BULL" }.to_json)
-        stub_request(:get, "#{ApiHelper::T3}/staff/#{nomis_staff_id}").
-          to_return(body: { staffId: nomis_staff_id, firstName: "TEST", lastName: "MOIC" }.to_json)
+        stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/#{prison.code}/offender/#{first_offender.fetch(:prisonerNumber)}")
+          .to_return(body: { staffId: 485_572, firstName: "DOM", lastName: "BULL" }.to_json)
+        stub_request(:get, "#{ApiHelper::T3}/staff/#{nomis_staff_id}")
+          .to_return(body: { staffId: nomis_staff_id, firstName: "TEST", lastName: "MOIC" }.to_json)
 
         visit prison_staff_caseload_path(prison.code, nomis_staff_id)
 
@@ -280,7 +280,7 @@ feature "view POM's caseload" do
     it 'can sort all cases that have been allocated to a specific POM in the last week' do
       stub_user staff_id: nomis_staff_id
 
-      visit  prison_staff_caseload_path(prison.code, nomis_staff_id)
+      visit prison_staff_caseload_path(prison.code, nomis_staff_id)
       within('.new-cases-count') do
         click_link('1')
       end

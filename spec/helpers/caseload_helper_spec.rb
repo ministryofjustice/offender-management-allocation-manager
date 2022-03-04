@@ -32,7 +32,7 @@ RSpec.describe CaseloadHelper do
 
       it 'displays hospital location only for restricted patient' do
         offender = OpenStruct.new(offender_no: 'G4706UP', latest_temp_movement_date: nil, location: "Heartlands", restricted_patient?: true)
-        expect(helper.prisoner_location(offender, true)).to eq "Heartlands"
+        expect(helper.prisoner_location(offender, location_only: true)).to eq "Heartlands"
       end
     end
   end

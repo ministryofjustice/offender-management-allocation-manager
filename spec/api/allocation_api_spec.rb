@@ -5,25 +5,24 @@ require 'swagger_helper'
 # The DescribeClass cop has been disabled as it is insists that the describe
 # block contain the name of the tested class.  However rswag is using this
 # text as part of the API documentation generated from these tests.
-# rubocop:disable RSpec/DescribeClass
 # rubocop:disable RSpec/EmptyExampleGroup
 # Authorization 'method' needs to be defined for rswag
 # rubocop:disable RSpec/VariableName
 describe 'Allocation API', vcr: { cassette_name: 'prison_api/allocation_api' } do
   let!(:private_key) { OpenSSL::PKey::RSA.generate 2048 }
   let!(:public_key) { Base64.strict_encode64(private_key.public_key.to_s) }
-  let!(:payload) {
+  let!(:payload) do
     {
       user_name: 'test-user',
       scope: ['read'],
       exp: 4.hours.from_now.to_i
     }
-  }
+  end
   let!(:token) { JWT.encode payload, private_key, 'RS256' }
 
-  before {
+  before do
     allow(Rails.configuration).to receive(:nomis_oauth_public_key).and_return(public_key)
-  }
+  end
 
   path '/api/allocation/{offender_no}' do
     get 'Retrieves the current allocation for an offender' do
@@ -53,9 +52,9 @@ describe 'Allocation API', vcr: { cassette_name: 'prison_api/allocation_api' } d
                required: %w[primary_pom secondary_pom]
 
         let(:offender_no) { 'G7266VD' }
-        let!(:allocation) {
+        let!(:allocation) do
           create(:allocation_history, prison: 'LEI', nomis_offender_id: offender_no, primary_pom_name: 'OLD_NAME, MOIC')
-        }
+        end
         let(:Authorization) { "Bearer #{token}" }
 
         run_test! do |_|
@@ -104,4 +103,3 @@ describe 'Allocation API', vcr: { cassette_name: 'prison_api/allocation_api' } d
 end
 # rubocop:enable RSpec/VariableName
 # rubocop:enable RSpec/EmptyExampleGroup
-# rubocop:enable RSpec/DescribeClass

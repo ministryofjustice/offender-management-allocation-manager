@@ -15,12 +15,12 @@ module HmppsApi
         # obviously we have no idea how early this might be, so set it to last year so that they
         # are hopefully all caught.
         data = client.get(route, queryparams: {
-                               movementDate: date.strftime('%F'),
-                               fromDateTime: (date - 1.year).strftime('%FT%R')
-                             })
-        data.map { |movement|
+          movementDate: date.strftime('%F'),
+          fromDateTime: (date - 1.year).strftime('%FT%R')
+        })
+        data.map do |movement|
           api_deserialiser.deserialise(HmppsApi::Movement, movement)
-        }
+        end
       end
 
       # This is only called by allocation history and debugging (to find the last movement)
@@ -30,9 +30,9 @@ module HmppsApi
         data = client.post(route, [offender_no],
                            queryparams: { latestOnly: false, allBookings: true, movementTypes: movement_types },
                            cache: true)
-        movements = data.sort_by { |k| k.fetch('movementDate') + k.fetch('movementTime') }.map { |movement|
+        movements = data.sort_by { |k| k.fetch('movementDate') + k.fetch('movementTime') }.map do |movement|
           api_deserialiser.deserialise(HmppsApi::Movement, movement)
-        }
+        end
         PrisonTimeline.new movements
       end
 
@@ -45,11 +45,11 @@ module HmppsApi
                            cache: true)
                      .group_by { |x| x['offenderNo'] }.values
 
-        movements = data.map { |d|
-          d.sort_by { |k| k['movementDate'] }.map { |movement|
+        movements = data.map do |d|
+          d.sort_by { |k| k['movementDate'] }.map do |movement|
             api_deserialiser.deserialise(HmppsApi::Movement, movement)
-          }
-        }
+          end
+        end
         # return a hash of offender_no => [HmppsApi::Movement]
         movements.index_by { |m| m.first.offender_no }
       end
@@ -68,10 +68,10 @@ module HmppsApi
 
         # This reduces the data to the most recent per offender
         # (one array rather than an array of arrays)
-        movements = data.map { |d|
+        movements = data.map do |d|
           movement = d.max_by { |k| k['movementDate'] }
           api_deserialiser.deserialise(HmppsApi::Movement, movement)
-        }
+        end
         # filter out non-temp movements - so if the last movement was
         # not temp, the resulting array will not have an entry for that offender
         movements.select { |m| m.out? && m.temporary? }.index_by(&:offender_no)

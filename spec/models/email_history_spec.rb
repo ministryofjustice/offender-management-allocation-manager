@@ -15,36 +15,36 @@ RSpec.describe EmailHistory, type: :model do
     let!(:offender) { create(:offender, nomis_offender_id: nomis_offender.offender_no) }
 
     # An old email sent before the offender's current sentence
-    let!(:old_email) {
+    let!(:old_email) do
       create(:email_history,
              offender: offender,
              event: event,
              created_at: 1.year.ago)
-    }
+    end
 
     # An email sent within the offender's current sentence
-    let!(:recent_email) {
+    let!(:recent_email) do
       create(:email_history,
              offender: offender,
              event: event,
              created_at: 5.days.ago)
-    }
+    end
 
     # A recent email but for a different event
-    let!(:recent_email_different_event) {
+    let!(:recent_email_different_event) do
       create(:email_history,
              offender: offender,
              event: some_other_event,
              created_at: 5.days.ago)
-    }
+    end
 
     # A recent email sent for a different offender
-    let!(:recent_email_different_offender) {
+    let!(:recent_email_different_offender) do
       create(:email_history,
              offender: build(:offender, nomis_offender_id: some_other_offender.offender_no),
              event: event,
              created_at: 5.days.ago)
-    }
+    end
 
     it "returns emails for the specified event, sent within the offender's current sentence" do
       expect(subject).to eq([recent_email])

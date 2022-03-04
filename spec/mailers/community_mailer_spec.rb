@@ -9,21 +9,21 @@ RSpec.describe CommunityMailer, type: :mailer do
 
     let(:case_info) do
       create(:case_information, offender: build(:offender, nomis_offender_id: api_offender.offender_no,
-             responsibility: build(:responsibility, nomis_offender_id: api_offender.offender_no)))
+                                                           responsibility: build(:responsibility, nomis_offender_id: api_offender.offender_no)))
     end
 
     let(:params) do
       {
-      nomis_offender_id: offender.offender_no,
-      offender_name: offender.full_name,
-      offender_crn: offender.crn,
-      sentence_type: 'Determinate',
-      ldu_email: offender.ldu_email_address,
-      prison: Faker.name,
-      start_date: 'Mon, 13 June 2024',
-      responsibility_handover_date: 'Wed, 15 Aug 2024',
-      pom_name: "Richards, Ursula",
-      pom_email: "ursula.richards@thelighthouse.gov.uk"
+        nomis_offender_id: offender.offender_no,
+        offender_name: offender.full_name,
+        offender_crn: offender.crn,
+        sentence_type: 'Determinate',
+        ldu_email: offender.ldu_email_address,
+        prison: Faker.name,
+        start_date: 'Mon, 13 June 2024',
+        responsibility_handover_date: 'Wed, 15 Aug 2024',
+        pom_name: "Richards, Ursula",
+        pom_email: "ursula.richards@thelighthouse.gov.uk"
       }
     end
 
@@ -38,18 +38,18 @@ RSpec.describe CommunityMailer, type: :mailer do
     end
 
     it 'personalises the email for handover' do
-      expect(mail.govuk_notify_personalisation).
-      to eq(email: params[:ldu_email],
-            name: params[:offender_name],
-            crn: params[:offender_crn],
-            sentence_type: params[:sentence_type],
-            noms_no: params[:nomis_offender_id],
-            prison_name: params[:prison],
-            start_date: params[:start_date],
-            responsibility_handover_date: params[:responsibility_handover_date],
-            pom_name: params[:pom_name],
-            pom_email: params[:pom_email]
-         )
+      expect(mail.govuk_notify_personalisation)
+      .to eq(email: params[:ldu_email],
+             name: params[:offender_name],
+             crn: params[:offender_crn],
+             sentence_type: params[:sentence_type],
+             noms_no: params[:nomis_offender_id],
+             prison_name: params[:prison],
+             start_date: params[:start_date],
+             responsibility_handover_date: params[:responsibility_handover_date],
+             pom_name: params[:pom_name],
+             pom_email: params[:pom_email]
+            )
     end
   end
 
@@ -58,13 +58,13 @@ RSpec.describe CommunityMailer, type: :mailer do
 
     let(:ldu) { build(:local_delivery_unit) }
 
-    let(:params) {
+    let(:params) do
       {
         ldu_name: ldu.name,
         ldu_email: ldu.email_address,
         csv_data: "Comma, Separated, Values"
       }
-    }
+    end
 
     it 'sends to the LDU email address' do
       expect(subject.to).to eq([ldu.email_address])
@@ -93,7 +93,7 @@ RSpec.describe CommunityMailer, type: :mailer do
     let(:api_offender) { build(:hmpps_api_offender, prisonId: PrisonService::PRESCOED_CODE, sentence_type: :indeterminate) }
     let(:case_info) do
       create(:case_information, :welsh, offender: build(:offender, nomis_offender_id: api_offender.offender_no,
-             responsibility: build(:responsibility, nomis_offender_id: api_offender.offender_no)))
+                                                                   responsibility: build(:responsibility, nomis_offender_id: api_offender.offender_no)))
     end
 
     let(:params) do
@@ -117,12 +117,12 @@ RSpec.describe CommunityMailer, type: :mailer do
     end
 
     it 'personalises the email for handover' do
-      expect(mail.govuk_notify_personalisation).
-      to eq(prisoner_name: params[:prisoner_name],
-            prisoner_number: params[:prisoner_number],
-            prisoner_crn: params[:prisoner_crn],
-            prison_name: params[:prison_name]
-         )
+      expect(mail.govuk_notify_personalisation)
+      .to eq(prisoner_name: params[:prisoner_name],
+             prisoner_number: params[:prisoner_number],
+             prisoner_crn: params[:prisoner_crn],
+             prison_name: params[:prison_name]
+            )
     end
   end
 end

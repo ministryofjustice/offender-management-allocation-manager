@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe PrisonService do
   describe '#womens_prison?' do
-    subject { described_class::womens_prison?(PrisonService::WOMENS_PRISON_CODES.first) }
+    subject { described_class.womens_prison?(PrisonService::WOMENS_PRISON_CODES.first) }
 
     it 'will admit to being a womens prison' do
       expect(subject).to eq(true)

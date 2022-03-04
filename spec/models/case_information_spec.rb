@@ -27,17 +27,17 @@ RSpec.describe CaseInformation, type: :model do
   end
 
   context 'with basic factory' do
-    subject {
+    subject do
       build(:case_information)
-    }
+    end
 
     it { is_expected.to be_valid }
   end
 
   context 'with missing tier' do
-    subject {
+    subject do
       build(:case_information, tier: nil)
-    }
+    end
 
     it 'gives the correct message' do
       expect(subject).not_to be_valid
@@ -64,14 +64,14 @@ RSpec.describe CaseInformation, type: :model do
   end
 
   context 'when probation service' do
-    subject {
+    subject do
       build(:case_information, probation_service: nil)
-    }
+    end
 
     it 'gives the correct validation error message' do
       expect(subject).not_to be_valid
-      expect(subject.errors.messages).
-        to eq(probation_service: ["Select yes if the prisoner’s last known address was in Wales"])
+      expect(subject.errors.messages)
+        .to eq(probation_service: ["Select yes if the prisoner’s last known address was in Wales"])
     end
 
     it 'allows England, Wales' do

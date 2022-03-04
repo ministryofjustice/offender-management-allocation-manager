@@ -1,5 +1,5 @@
 Rails.application.configure do
-  stdout_logger = ActiveSupport::Logger.new(STDOUT)
+  stdout_logger = ActiveSupport::Logger.new($stdout)
   config.lograge.logger.extend(ActiveSupport::Logger.broadcast(stdout_logger))
 end
 

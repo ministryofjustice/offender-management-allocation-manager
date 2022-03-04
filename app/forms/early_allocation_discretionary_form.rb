@@ -18,13 +18,13 @@ class EarlyAllocationDiscretionaryForm
 
   EarlyAllocation::DISCRETIONARY_PLAIN_BOOLEAN_FIELDS.each do |field|
     validates(field, inclusion: {
-        in: [true, false],
-        allow_nil: false
+      in: [true, false],
+      allow_nil: false
     })
   end
 
   # This field is only prompted for if extremism_separation is true
   validates(:due_for_release_in_less_than_24months, inclusion: {
-      in: [true, false],
-      allow_nil: false }, if: -> { extremism_separation })
+    in: [true, false],
+    allow_nil: false }, if: -> { extremism_separation })
 end

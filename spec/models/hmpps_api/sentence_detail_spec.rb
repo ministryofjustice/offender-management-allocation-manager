@@ -8,11 +8,11 @@ describe HmppsApi::SentenceDetail, model: true do
 
   describe "#automatic_release_date" do
     context "when override present" do
-      subject {
+      subject do
         build :sentence_detail,
               automaticReleaseDate: date.to_s,
               automaticReleaseOverrideDate: override.to_s
-      }
+      end
 
       it "overrides" do
         expect(subject.automatic_release_date).to eq(override)
@@ -20,9 +20,9 @@ describe HmppsApi::SentenceDetail, model: true do
     end
 
     context "without override" do
-      subject {
+      subject do
         build :sentence_detail, automaticReleaseDate: date
-      }
+      end
 
       it "uses original" do
         expect(subject.automatic_release_date).to eq(date)
@@ -32,11 +32,11 @@ describe HmppsApi::SentenceDetail, model: true do
 
   describe "#conditional_release_date" do
     context "when override present" do
-      subject {
+      subject do
         build :sentence_detail,
               conditionalReleaseDate: date,
               conditionalReleaseOverrideDate: override
-      }
+      end
 
       it "overrides" do
         expect(subject.conditional_release_date).to eq(override)
@@ -44,9 +44,9 @@ describe HmppsApi::SentenceDetail, model: true do
     end
 
     context "without override" do
-      subject {
+      subject do
         build :sentence_detail, conditionalReleaseDate: date.to_s
-      }
+      end
 
       it "uses original" do
         expect(subject.conditional_release_date).to eq(date)
@@ -79,11 +79,11 @@ describe HmppsApi::SentenceDetail, model: true do
   end
 
   describe "#post_recall_release_date" do
-    subject {
+    subject do
       build :sentence_detail, automaticReleaseDate: date,
-            automaticReleaseOverrideDate: override,
-            actualParoleDate: actual_parole_date
-    }
+                              automaticReleaseOverrideDate: override,
+                              actualParoleDate: actual_parole_date
+    end
 
     let(:earliest_date) { Date.new(2019, 1, 2) }
     let(:latest_date) { Date.new(2019, 5, 4) }

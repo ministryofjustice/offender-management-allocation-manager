@@ -151,7 +151,7 @@ feature 'case information feature' do
       find('label[for=case-information-tier-a-field]').click
       click_button 'Save'
 
-      expect(current_url).to have_content(missing_information_prison_prisoners_path('LEI') + "?page=3&sort=last_name+desc")
+      expect(current_url).to have_content("#{missing_information_prison_prisoners_path('LEI')}?page=3&sort=last_name+desc")
       expect(current_page_number).to eq(3)
     end
   end

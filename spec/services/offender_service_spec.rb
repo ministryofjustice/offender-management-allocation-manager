@@ -56,15 +56,15 @@ describe OffenderService, type: :feature do
     # This test can only be run inside the VPN as nDelius test isn't globally accessible
     context 'when hitting API', :vpn_only, vcr: { cassette_name: 'delius/get_community_data' } do
       it 'gets some data' do
-        expect(described_class.get_community_data(nomis_offender_id)).
-            to eq(crn: "X349420",
-                  ldu_code: "N07NPSA",
-                  mappa_levels: [],
-                  noms_no: nomis_offender_id,
-                  offender_manager: "Cheema, Gurnank",
-                  service_provider: "NPS",
-                  team_name: "OMU A",
-                  tier: "B2")
+        expect(described_class.get_community_data(nomis_offender_id))
+            .to eq(crn: "X349420",
+                   ldu_code: "N07NPSA",
+                   mappa_levels: [],
+                   noms_no: nomis_offender_id,
+                   offender_manager: "Cheema, Gurnank",
+                   service_provider: "NPS",
+                   team_name: "OMU A",
+                   tier: "B2")
       end
     end
 
@@ -143,9 +143,9 @@ describe OffenderService, type: :feature do
           before do
             stub_community_offender(nomis_offender_id, build(:community_data,
                                                              offenderManagers: [
-                                                                 { active: false, staff: { unallocated: false, surname: 'Jones', forenames: 'Ruth Mary' } },
-                                                                 { active: true, staff: { unallocated: false, surname: 'Smith', forenames: 'Mel Griff' } },
-                                                                 { active: false, staff: { unallocated: false, surname: 'Rabbit', forenames: 'Richard Oliver' } },
+                                                               { active: false, staff: { unallocated: false, surname: 'Jones', forenames: 'Ruth Mary' } },
+                                                               { active: true, staff: { unallocated: false, surname: 'Smith', forenames: 'Mel Griff' } },
+                                                               { active: false, staff: { unallocated: false, surname: 'Rabbit', forenames: 'Richard Oliver' } },
                                                              ]))
           end
 
@@ -162,13 +162,13 @@ describe OffenderService, type: :feature do
                                         currentTier: 'A',
                                         otherIds: { crn: 'X5657657' },
                                         offenderManagers: [
-                                            {
-                                                team: { code: 'N07GHGF',
-                                                        description: 'Thing',
-                                                        localDeliveryUnit: { code: 'LDU123' } },
-                                                probationArea: { nps: true },
-                                                active: true,
-                                                staff: { unallocated: true } }
+                                          {
+                                            team: { code: 'N07GHGF',
+                                                    description: 'Thing',
+                                                    localDeliveryUnit: { code: 'LDU123' } },
+                                            probationArea: { nps: true },
+                                            active: true,
+                                            staff: { unallocated: true } }
                                         ]), registrations)
         end
 

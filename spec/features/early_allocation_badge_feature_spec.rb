@@ -4,12 +4,12 @@ require 'rails_helper'
 
 feature 'early allocation badges' do
   let(:prison) { create(:prison) }
-  let(:nomis_offender) {
+  let(:nomis_offender) do
     build(:nomis_offender, prisonId: prison.code,
-          sentence: attributes_for(:sentence_detail,
-                                   conditionalReleaseDate: release_date,
-                                   sentenceStartDate: sentence_start))
-  }
+                           sentence: attributes_for(:sentence_detail,
+                                                    conditionalReleaseDate: release_date,
+                                                    sentenceStartDate: sentence_start))
+  end
   let(:offender_no) { nomis_offender.fetch(:prisonerNumber) }
   let(:notes_badge) { 'EARLY ALLOCATION ASSESSMENT SAVED' }
   let(:active_badge) { 'EARLY ALLOCATION DECISION PENDING' }
@@ -25,7 +25,7 @@ feature 'early allocation badges' do
 
     create(:case_information,
            offender: build(:offender, nomis_offender_id: offender_no,
-                           early_allocations: [early_allocation]))
+                                      early_allocations: [early_allocation]))
     visit prison_prisoner_path(prison.code, offender_no)
   end
 
@@ -79,7 +79,7 @@ feature 'early allocation badges' do
     let(:release_date) { Time.zone.today + 17.months }
 
     context 'with current sentence' do
-      #sentence start date come before the allocation date
+      # sentence start date come before the allocation date
       let(:sentence_start) { Time.zone.today - 1.week }
       let(:allocation_date) { Time.zone.today }
 

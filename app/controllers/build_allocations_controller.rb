@@ -16,8 +16,8 @@ class BuildAllocationsController < PrisonsApplicationController
     save_to_session :female_allocation_override, OverrideForm.new
 
     # If the recommendation is different to the allocation, then go the full journey via override, otherwise jump straight to allocation
-    if RecommendationService::recommended_pom_type(@prisoner) == RecommendationService::PRISON_POM && pom.probation_officer? ||
-      RecommendationService::recommended_pom_type(@prisoner) == RecommendationService::PROBATION_POM && pom.prison_officer?
+    if RecommendationService.recommended_pom_type(@prisoner) == RecommendationService::PRISON_POM && pom.probation_officer? ||
+      RecommendationService.recommended_pom_type(@prisoner) == RecommendationService::PROBATION_POM && pom.prison_officer?
       redirect_to wizard_path(steps.first)
     else
       # Override isn't needed – go straight to the allocate step

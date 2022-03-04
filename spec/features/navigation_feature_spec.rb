@@ -56,7 +56,7 @@ feature 'Navigation' do
       visit prison_dashboard_index_path(prison.code)
     end
 
-    let(:moic_pom_staff_id) { 485926 }
+    let(:moic_pom_staff_id) { 485_926 }
     let(:offender_no) { 'G7806VO' }
     let(:offender_name) { 'Abdoria, Ongmetain' }
 
