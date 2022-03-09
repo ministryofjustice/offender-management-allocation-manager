@@ -20,24 +20,15 @@ feature 'Inactive POM' do
       )
       create(:pom_detail, prison_code: prison_code, nomis_staff_id: inactive_pom)
       visit prison_prisoner_allocation_path(prison_code, nomis_offender_id)
-      expect(page).to have_text("This Prison Offender Manager does not appear to be active")
+      expect(page).to have_text("Check this POM is still active")
     end
 
-    it 'will deallocate the caseload' do
-      click_link("Set this POM's status to inactive")
-
-      within first('.govuk-summary-list__row') do
-        click_link "Change"
-      end
-      choose("Inactive")
-      click_button("Save")
-
-      expect(AllocationHistory.where(primary_pom_nomis_id: inactive_pom).count).to eq(0)
+    it "displays 'following these instructions' link" do
+      expect(page).to have_link('following these instructions', href: help_step2_path)
     end
 
-    it "will redirect to the help page" do
-      click_link("Guide to getting set up")
-      expect(page).to have_current_path(help_step0_path)
+    it "displays 'use these instructions' link" do
+      expect(page).to have_link('use these instructions', href: help_step3_path)
     end
   end
 end
