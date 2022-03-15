@@ -11,7 +11,7 @@
   <td aria-label="Role" class="govuk-table__cell "><%= caseload.allocated_pom_name %></td>
   <td aria-label="Role" class="govuk-table__cell "><%= pom_responsibility_label caseload %></td>
   <td aria-label="Location" class="govuk-table__cell">
-    <%= prisoner_location(caseload, true) %>
+    <%= prisoner_location(caseload, location_only: true) %>
   </td>
   <% if @prison.womens? %>
     <td aria-label="Complexity Level" class="govuk-table__cell">

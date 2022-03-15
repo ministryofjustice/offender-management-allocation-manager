@@ -1,44 +1,54 @@
 <%= render partial: 'layouts/caseload' %>
-<h2 class="govuk-heading-l">
-  All allocations in this prison
-</h2>
-<div class="govuk-form-group">
-  <fieldset class="govuk-fieldset" aria-describedby="caseload-filter-hint">
-    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-      <h3 class="govuk-heading-m" style="margin-bottom: -5px;">
-        Choose which cases you want to see
-      </h3>
-    </legend>
-    <div class="govuk-radios govuk-radios--inline govuk-radios govuk-radios--small">
-      <div class="govuk-radios__item">
-        <input class="govuk-radios__input" name="caseload-filter" type="radio" <%= 'checked' if @filter == 'all' %> onclick="window.location = '<%= prison_staff_caseload_global_path(f: 'all') %>'">
-        <label class="govuk-label govuk-radios__label" for="changed-name">
-          <%= link_to "All allocations in this prison (#{@summary.fetch(:all_prison_cases)})", prison_staff_caseload_global_path(f: 'all') %>
-        </label>
-      </div>
-      <div class="govuk-radios__item">
-        <input class="govuk-radios__input" name="caseload-filter" type="radio" <%= 'checked' if @filter == 'recent_allocations' %> onclick="window.location = '<%= prison_staff_caseload_global_path(f: 'recent_allocations') %>'">
-        <label class="govuk-label govuk-radios__label" for="changed-name">
-          <%= link_to "All cases allocated in last 7 days (#{@summary.fetch(:last_seven_days)})", prison_staff_caseload_global_path(f: 'recent_allocations') %>
-        </label>
-      </div>
-      <div class="govuk-radios__item">
-        <input class="govuk-radios__input" name="caseload-filter" type="radio" <%= 'checked' if @filter == 'upcoming_releases' %> onclick="window.location = '<%= prison_staff_caseload_global_path(f: 'upcoming_releases') %>'">
-        <label class="govuk-label govuk-radios__label" for="changed-name">
-          <%= link_to "All releases in next 4 weeks (#{@summary.fetch(:release_next_four_weeks)})", prison_staff_caseload_global_path(f: 'upcoming_releases') %>
-        </label>
-      </div>
-    </div>
-  </fieldset>
+
+<div class="govuk-tabs" data-module="govuk-tabs">
+  <h2 class="govuk-tabs__title">
+    Choose which cases you want to see
+  </h2>
+  <ul class="govuk-tabs__list">
+    <li class="govuk-tabs__list-item">
+      <a class="govuk-tabs__tab" href="#all-allocations">
+        All allocations in this prison (<%= @summary.fetch(:all_prison_cases) %>)
+      </a>
+    </li>
+    <li class="govuk-tabs__list-item">
+      <a class="govuk-tabs__tab" href="#last-seven-days">
+        All cases allocated in last 7 days (<%= @summary.fetch(:last_seven_days) %>)
+      </a>
+    </li>
+    <li class="govuk-tabs__list-item">
+      <a class="govuk-tabs__tab" href="#upcoming-releases">
+        All releases in next 4 weeks (<%= @summary.fetch(:release_next_four_weeks) %>)
+      </a>
+    </li>
+  </ul>
+  <div class="govuk-tabs__panel" id="all-allocations">
+    <% if @all_other_allocations.empty? %>
+      <p class="govuk-body">No cases allocated</p>
+    <% else %>
+      <%= render partial: 'shared/pagination', locals: { data: @all_other_allocations } %>
+      <br/>
+      <%= render 'caseload_table', header_partial: 'caseload_headers', collection_partial: 'caseload', collection: @all_other_allocations %>
+      <%= render partial: 'shared/pagination', locals: { data: @all_other_allocations } %>
+    <% end %>
+  </div>
+  <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="last-seven-days">
+    <% if @recent_allocations.empty? %>
+      <p class="govuk-body">No cases allocated in last 7 days</p>
+    <% else %>
+      <%= render partial: 'shared/pagination', locals: { data: @recent_allocations } %>
+      <br/>
+      <%= render 'caseload_table', header_partial: 'caseload_headers', collection_partial: 'caseload', collection: @recent_allocations %>
+      <%= render partial: 'shared/pagination', locals: { data: @recent_allocations } %>
+    <% end %>
+  </div>
+  <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="upcoming-releases">
+    <% if @upcoming_releases.empty? %>
+      <p class="govuk-body">No releases in next 4 weeks</p>
+    <% else %>
+      <%= render partial: 'shared/pagination', locals: { data: @upcoming_releases } %>
+      <br/>
+      <%= render 'caseload_table', header_partial: 'caseload_headers', collection_partial: 'caseload', collection: @upcoming_releases %>
+      <%= render partial: 'shared/pagination', locals: { data: @upcoming_releases } %>
+    <% end %>
+  </div>
 </div>
-
-<% unless @allocations.empty? %>
-  <%=  render partial: 'shared/pagination', locals: {data: @allocations }  %>
-<% end %>
-<br/>
-<%= render 'caseload_table', header_partial: 'caseload_headers', collection_partial: 'caseload', collection: @allocations %>
-
-<% unless @allocations.empty? %>
-  <%=  render partial: 'shared/pagination', locals: {data: @allocations }  %>
-<% end %>
-
