@@ -2,7 +2,7 @@
   <%= render '/layouts/prison_switcher' %>
 <% end %>
 
-<h1 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-4">Search</h1>
+<h1 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-4"><%= "#{@offenders.length} results for #{@q}" %></h1>
 
 <%= render 'search/search_box' %>
 
@@ -22,22 +22,27 @@
   <table class="govuk-table responsive tablesorter govuk-!-margin-top-4">
     <thead class="govuk-table__head">
     <tr class="govuk-table__row">
-      <th class="govuk-table__header" scope="col">Prisoner name</th>
-      <th class="govuk-table__header sorter-false" scope="col">Prisoner number</th>
-      <th class="govuk-table__header sorter-false" scope="col">Date of birth</th>
-      <th class="govuk-table__header sorter-false" scope="col">Tier</th>
+      <th class="govuk-table__header" scope="col">Case</th>
       <th class="govuk-table__header" scope="col">POM</th>
+      <th class="govuk-table__header" scope="col">POM role</th>
+      <th class="govuk-table__header sorter-false" scope="col">Location</th>
+      <th class="govuk-table__header sorter-false" scope="col">Earliest release date</th>
+      <th class="govuk-table__header sorter-false" scope="col">Tier</th>
       <th class="govuk-table__header" scope="col">Action</th>
     </tr>
     </thead>
     <tbody class="govuk-table__body">
     <% @offenders.each_with_index do |offender, i| %>
       <tr class="govuk-table__row allocated_offender_row_<%= i %>">
-        <td aria-label="Prisoner name" class="govuk-table__cell"><%= highlight(offender.full_name, @q) %></td>
-        <td aria-label="Prisoner number" class="govuk-table__cell"><%= highlight(offender.offender_no, @q) %></td>
-        <td aria-label="Date of birth" class="govuk-table__cell"><%= format_date(offender.date_of_birth) %></td>
-        <td aria-label="Tier" class="govuk-table__cell"><%= probation_field(offender, :tier) || '-' %></td>
+        <td aria-label="Prisoner name" class="govuk-table__cell">
+          <%= link_to(highlight(offender.full_name, @q), prison_prisoner_allocation_path(@prison.code, prisoner_id: offender.offender_no)) %>
+          <br/><%= highlight(offender.offender_no, @q) %>
+        </td>
         <td aria-label="POM" class="govuk-table__cell"><%= offender.allocated_pom_name || '-' %></td>
+        <td aria-label="POM role" class="govuk-table__cell"> <%= offender.probation_record.present?? pom_responsibility_label(offender) : '-'  %> </td>
+        <td aria-label="Location" class="govuk-table__cell"><%= highlight(offender.location, @q) %></td>
+        <td aria-label="Date of birth" class="govuk-table__cell"><%= format_date(offender.earliest_release_date) %></td>
+        <td aria-label="Tier" class="govuk-table__cell"><%= probation_field(offender, :tier) || '-' %></td>
         <td aria-label="Action" class="govuk-table__cell">
           <% if @missing_info.map(&:offender_no).include?(offender.offender_no) %>
             <%= link_to "Add missing details", prison_prisoner_new_missing_info_path(@prison.code, offender.offender_no) %>
@@ -45,8 +50,6 @@
             <%= link_to 'Allocate', prison_prisoner_staff_index_path(@prison.code, offender.offender_no) %>
           <% elsif @new_arrivals.map(&:offender_no).include?(offender.offender_no) %>
             Wait
-          <% else %>
-            <%= link_to('View', prison_prisoner_allocation_path(@prison.code, prisoner_id: offender.offender_no)) %>
           <% end %>
         </td>
       </tr>

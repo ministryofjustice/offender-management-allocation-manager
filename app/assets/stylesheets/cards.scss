@@ -1,11 +1,17 @@
 
 .card {
-  margin: 10px 0;
+  margin-bottom: 40px;
   background: #fff;
   border: 1px solid #d9dadb;
   position: relative;
-  padding: 15px 20px;
-  font-weight: 400;
+  width: 100%;
+  padding: 25px;
+
+  &--caseload {
+    @extend .card;
+    width: 85%;
+    padding: 15px 20px;
+  }
 }
 
 .card__heading {

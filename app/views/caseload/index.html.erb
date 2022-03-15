@@ -11,7 +11,7 @@
         <div class="govuk-grid-row">
 
           <div class="govuk-grid-column-one-half">
-            <div class="card card-total">
+            <div class="card--caseload card-total">
               <%= link_to 'caseload', {controller: 'caseload', action: 'cases'}, class: 'govuk-link--no-visited-state' do %>
                 <span class="card__heading--large"><%= @summary.fetch(:total_cases) %></span>
                 <p><%= link_to 'total cases', prison_staff_caseload_cases_path, class: 'govuk-link--no-visited-state' %></p>
@@ -20,7 +20,7 @@
           </div>
 
           <div class="govuk-grid-column-one-half">
-            <div class="card card-total">
+            <div class="card--caseload card-total">
               <%= link_to prison_staff_caseload_handovers_path, class: 'govuk-link--no-visited-state' do %>
                 <span class="card__heading--large"><%= @summary.fetch(:pending_handover_count) %></span>
                 <p><%= link_to 'handovers in progress', prison_staff_caseload_handovers_path, class: 'govuk-link--no-visited-state' %></p>
