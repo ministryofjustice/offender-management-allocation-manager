@@ -12,7 +12,8 @@ class CaseloadController < PrisonStaffApplicationController
       total_cases: @pom.allocations.count,
       last_seven_days: @pom.allocations.count { |a| a.primary_pom_allocated_at.to_date >= 7.days.ago },
       release_next_four_weeks: @pom.allocations.count do |a|
-        a.earliest_release_date.to_date >= 4.weeks.after && Date.current.beginning_of_day > a.earliest_release_date.to_date
+        a.earliest_release_date.present? &&
+          a.earliest_release_date.to_date <= 4.weeks.after && Date.current.beginning_of_day < a.earliest_release_date.to_date
       end,
       pending_handover_count: @pom.allocations.count(&:approaching_handover?),
       pending_task_count: PomTasks.new.for_offenders(@pom.allocations).count
@@ -21,14 +22,17 @@ class CaseloadController < PrisonStaffApplicationController
 
   def cases
     @filter = (params['f'].present? && params['f'].in?(CASELOAD_FILTERS)) ? params['f'] : 'all'
-    @allocations = Kaminari.paginate_array(sort_allocations(filter_allocations(@pom.allocations))).page(page)
-    @recent_allocations = Kaminari.paginate_array(filter_allocations(@pom.allocations).filter { |a|
+
+    @recent_allocations = Kaminari.paginate_array(sort_allocations(filter_allocations(@pom.allocations).filter do |a|
       a.primary_pom_allocated_at.to_date >= 7.days.ago
-    })
-    @upcoming_releases = Kaminari.paginate_array(filter_allocations(@pom.allocations).filter { |a|
-      a.earliest_release_date.to_date <= 4.weeks.after &&
-        Date.current.beginning_of_day < a.earliest_release_date.to_date
-    }).page(page)
+    end)).page(page)
+
+    @upcoming_releases = Kaminari.paginate_array(sort_allocations(filter_allocations(@pom.allocations).filter do |a|
+      a.earliest_release_date.present? &&
+        a.earliest_release_date.to_date <= 4.weeks.after && Date.current.beginning_of_day < a.earliest_release_date.to_date
+    end)).page(page)
+
+    @allocations = Kaminari.paginate_array(sort_allocations(filter_allocations(@pom.allocations))).page(page)
   end
 
   def new_cases

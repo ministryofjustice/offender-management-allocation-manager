@@ -85,27 +85,27 @@ RSpec.describe CaseloadGlobalController, type: :controller do
         let(:prison) { create(:womens_prison) }
 
         it 'can sort by complexity' do
-          get :index, params: { f: 'all', prison_id: prison.code, staff_id: staff_id, sort: 'complexity_level_number asc' }
+          get :index, params: { prison_id: prison.code, staff_id: staff_id, sort: 'complexity_level_number asc' }
           expect(response).to be_successful
-          expect(assigns(:allocations).map(&:complexity_level)).to eq %w[low low medium medium high high]
+          expect(assigns(:all_other_allocations).map(&:complexity_level)).to eq %w[low low medium medium high high]
         end
 
         it 'can sort by complexity desc' do
-          get :index, params: { f: 'all', prison_id: prison.code, staff_id: staff_id, sort: 'complexity_level_number desc' }
+          get :index, params: { prison_id: prison.code, staff_id: staff_id, sort: 'complexity_level_number desc' }
           expect(response).to be_successful
-          expect(assigns(:allocations).map(&:complexity_level)).to eq %w[high high medium medium low low]
+          expect(assigns(:all_other_allocations).map(&:complexity_level)).to eq %w[high high medium medium low low]
         end
 
         it 'indicates offender is high complexity' do
-          get :index, params: { f: 'all', prison_id: prison.code, staff_id: staff_id, sort: 'complexity_level_number desc' }
+          get :index, params: { prison_id: prison.code, staff_id: staff_id, sort: 'complexity_level_number desc' }
           expect(response).to be_successful
-          expect(assigns(:allocations).first.high_complexity?).to eq true
+          expect(assigns(:all_other_allocations).first.high_complexity?).to eq true
         end
 
         it 'indicates offender is not high complexity' do
-          get :index, params: { f: 'all', prison_id: prison.code, staff_id: staff_id, sort: 'complexity_level_number desc' }
+          get :index, params: { prison_id: prison.code, staff_id: staff_id, sort: 'complexity_level_number desc' }
           expect(response).to be_successful
-          expect(assigns(:allocations).last.high_complexity?).to eq false
+          expect(assigns(:all_other_allocations).last.high_complexity?).to eq false
         end
       end
     end
@@ -127,9 +127,9 @@ RSpec.describe CaseloadGlobalController, type: :controller do
 
         describe 'can search by name' do
           it 'can search by name' do
-            get :index, params: { f: 'all', prison_id: prison.code, staff_id: staff_id, q: offenders.first.fetch(:prisonerNumber) }
+            get :index, params: { prison_id: prison.code, staff_id: staff_id, q: offenders.first.fetch(:prisonerNumber) }
             expect(response).to be_successful
-            expect(assigns(:allocations).map(&:offender_no)).to match_array([offenders.first.fetch(:prisonerNumber)])
+            expect(assigns(:all_other_allocations).map(&:offender_no)).to match_array([offenders.first.fetch(:prisonerNumber)])
           end
         end
 
@@ -139,7 +139,7 @@ RSpec.describe CaseloadGlobalController, type: :controller do
           end
 
           it 'cant see the caseload' do
-            get :index, params: { f: 'all', prison_id: prison.code, staff_id: not_signed_in }
+            get :index, params: { prison_id: prison.code, staff_id: not_signed_in }
             expect(response).to redirect_to('/401')
           end
         end
@@ -149,31 +149,31 @@ RSpec.describe CaseloadGlobalController, type: :controller do
             stub_signed_in_pom(prison.code, staff_id, 'alice')
           end
 
-          let(:allocations) { assigns(:allocations).index_by(&:offender_no) }
+          let(:all_other_allocations) { assigns(:all_other_allocations).index_by(&:offender_no) }
 
           it 'is allowed' do
-            get :index, params: { f: 'all', prison_id: prison.code, staff_id: staff_id }
+            get :index, params: { prison_id: prison.code, staff_id: staff_id }
             expect(response).to be_successful
           end
 
           it 'returns all caseloads for prison' do
-            get :index, params: { f: 'all', prison_id: prison.code, staff_id: staff_id }
-            expect(assigns(:allocations).map(&:offender_no)).to match_array(offenders.map { |o| o.fetch(:prisonerNumber) })
+            get :index, params: { prison_id: prison.code, staff_id: staff_id }
+            expect(assigns(:all_other_allocations).map(&:offender_no)).to match_array(offenders.map { |o| o.fetch(:prisonerNumber) })
           end
 
           it 'returns all caseloads for prison with recent allocations' do
             get :index, params: { f: 'recent_allocations', prison_id: prison.code, staff_id: staff_id }
-            expect(assigns(:allocations).map(&:offender_no)).to match_array([offenders.first.fetch(:prisonerNumber), offenders.last.fetch(:prisonerNumber)])
+            expect(assigns(:recent_allocations).map(&:offender_no)).to match_array([offenders.first.fetch(:prisonerNumber), offenders.last.fetch(:prisonerNumber)])
           end
 
           it 'returns all caseloads for prison with upcoming releases' do
             get :index, params: { f: 'upcoming_releases', prison_id: prison.code, staff_id: staff_id }
-            expect(assigns(:allocations).map(&:offender_no)).to match_array([offenders.first.fetch(:prisonerNumber)])
+            expect(assigns(:upcoming_releases).map(&:offender_no)).to match_array([offenders.first.fetch(:prisonerNumber)])
           end
 
           it 'returns ROTL information' do
-            get :index, params: { f: 'all', prison_id: prison.code, staff_id: staff_id }
-            expect(offenders.map { |o| allocations.fetch(o.fetch(:prisonerNumber)).latest_temp_movement_date }).to eq [today, nil, nil, nil, nil, nil]
+            get :index, params: { prison_id: prison.code, staff_id: staff_id }
+            expect(offenders.map { |o| all_other_allocations.fetch(o.fetch(:prisonerNumber)).latest_temp_movement_date }).to eq [today, nil, nil, nil, nil, nil]
           end
         end
       end

@@ -42,14 +42,14 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
       let(:release_date) { Time.zone.today }
 
       it 'does not show the section' do
-        click_link offender_name
+        find('#all-cases .govuk-table').click_link offender_name
         expect(page).not_to have_content 'Early allocation eligibility'
       end
     end
 
     context 'without existing early allocation' do
       before do
-        click_link offender_name
+        find('#all-cases .govuk-table').click_link offender_name
 
         # Prisoner profile page
         expect(page).to have_content 'Early allocation referral'
@@ -303,7 +303,7 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
                    nomis_offender_id: nomis_offender_id,
                    created_within_referral_window: true)
 
-            click_link offender_name
+            find('#all-cases .govuk-table').click_link offender_name
           end
 
           it 'links to the view page' do
@@ -322,7 +322,7 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
                    nomis_offender_id: nomis_offender_id,
                    created_within_referral_window: true)
 
-            click_link offender_name
+            find('#all-cases .govuk-table').click_link offender_name
           end
 
           it 'has a re-assess link' do
@@ -340,7 +340,7 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
                    nomis_offender_id: nomis_offender_id,
                    created_within_referral_window: false)
 
-            click_link offender_name
+            find('#all-cases .govuk-table').click_link offender_name
           end
 
           it 'has a re-assess link' do
@@ -357,7 +357,7 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
                  nomis_offender_id: nomis_offender_id,
                  created_within_referral_window: true)
 
-          click_link offender_name
+          find('#all-cases .govuk-table').click_link offender_name
 
           within '#early_allocation' do
             click_link 'Check and reassess'
@@ -402,7 +402,7 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
                  nomis_offender_id: nomis_offender_id,
                  created_within_referral_window: false)
 
-          click_link offender_name
+          find('#all-cases .govuk-table').click_link offender_name
           within '#early_allocation' do
             click_link 'Check and reassess'
           end

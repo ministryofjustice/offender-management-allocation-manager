@@ -19,8 +19,13 @@
     </td>
   <% end %>
   <td aria-label="Earliest release date" class="govuk-table__cell ">
-    <%= caseload.earliest_release[:type] %>: <br/>
-    <%= format_date(caseload.earliest_release[:date], replacement: "Unknown") %></td>
+    <% if caseload.earliest_release.present? %>
+      <%= caseload.earliest_release[:type] %> : <br/>
+      <%= format_date(caseload.earliest_release[:date], replacement: "Unknown") %>
+    <% else %>
+      Unknown
+    <% end %>
+  </td>
   <td aria-label="Tier" class="govuk-table__cell tier">
     <strong><%= caseload.tier %></strong>
   </td>

@@ -16,7 +16,11 @@
     <%= female.complexity_level.titleize %>
   </td>
   <td aria-label="Earliest release date" class="govuk-table__cell ">
-    <%= female.earliest_release[:type] %>: <br/>
-    <%= format_date(female.earliest_release[:date], replacement: "Unknown") %></td>
+    <% if female.earliest_release.present? %>
+      <%= female.earliest_release[:type] %> : <br/>
+      <%= format_date(female.earliest_release[:date] , replacement: "Unknown") %>
+    <% else %>
+      Unknown
+    <% end %></td>
   <td aria-label="Role" class="govuk-table__cell "><%= pom_responsibility_label female %></td>
 </tr>
