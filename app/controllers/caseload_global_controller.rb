@@ -6,18 +6,6 @@ class CaseloadGlobalController < CaseloadController
       OffenderWithAllocationPresenter.new(offender, @prison.allocations.detect { |a| a.nomis_offender_id == offender.offender_no })
     end
 
-    @summary = {
-      all_prison_cases: @allocated.count,
-      new_cases_count: @pom.allocations.count(&:new_case?),
-      total_cases: @pom.allocations.count,
-      last_seven_days: @allocated.count { |a| a.allocation_date.to_date >= 7.days.ago },
-      release_next_four_weeks: @allocated.count do |a|
-        a.earliest_release_date.to_date >= 4.weeks.after && Date.current.beginning_of_day > a.earliest_release_date.to_date
-      end,
-      pending_handover_count: @pom.allocations.count(&:approaching_handover?),
-      pending_task_count: PomTasks.new.for_offenders(@pom.allocations).count
-    }
-
     @total_cases = @allocated.count
 
     @recent_allocations = Kaminari.paginate_array(sort_allocations(filter_allocations(@allocated).filter do |a|
@@ -25,11 +13,21 @@ class CaseloadGlobalController < CaseloadController
     end)).page(page)
 
     @upcoming_releases = Kaminari.paginate_array(sort_allocations(filter_allocations(@allocated)).filter do |a|
-      a.earliest_release_date.to_date <= 4.weeks.after &&
-        Date.current.beginning_of_day < a.earliest_release_date.to_date
+      a.earliest_release_date.present? &&
+        a.earliest_release_date.to_date <= 4.weeks.after && Date.current.beginning_of_day < a.earliest_release_date.to_date
     end).page(page)
 
     @all_other_allocations = Kaminari.paginate_array(sort_allocations(filter_allocations(@allocated))).page(page)
+
+    @summary = {
+      all_prison_cases: @allocated.count,
+      new_cases_count: @pom.allocations.count(&:new_case?),
+      total_cases: @pom.allocations.count,
+      last_seven_days: @recent_allocations.count,
+      release_next_four_weeks: @upcoming_releases.length,
+      pending_handover_count: @pom.allocations.count(&:approaching_handover?),
+      pending_task_count: PomTasks.new.for_offenders(@pom.allocations).count
+    }
   end
 
   private
