@@ -2,6 +2,8 @@
   <%= render '/layouts/prison_switcher' %>
 <% end %>
 
+<%= render 'shared/backlink', page: @referrer %>
+
 <h1 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-4"><%= "Search results for #{@q}" %></h1>
 
 <%= render 'search/search_box' %>
@@ -10,12 +12,12 @@
   <ul class="govuk-tabs__list">
     <li class="govuk-tabs__list-item">
       <a class="govuk-tabs__tab" href="#caseload-results">
-        <%= @user_allocations.length %> results from your caseload
+        <%= @user_allocations.length %> result<%= 's' if @user_allocations.length != 1 %> from your caseload
       </a>
     </li>
     <li class="govuk-tabs__list-item">
       <a class="govuk-tabs__tab" href="#global-results">
-        <%= @offenders.length %> more results from this prison
+        <%= @offenders.length %> more result<%= 's' if @offenders.length != 1 %> from this prison
       </a>
     </li>
   </ul>
@@ -25,7 +27,8 @@
         Search again
       </p>
     <% else %>
-      <h2 class="govuk-heading-l"><%= @user_allocations.length %> results from your caseload</h2>
+      <h2 class="govuk-heading-l"><%= @user_allocations.length %> result<%= 's' if @user_allocations.length != 1 %> from
+        your caseload</h2>
       <%= render(
             :partial => 'shared/pagination',
             :locals => {
@@ -81,10 +84,11 @@
   <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="global-results">
     <% if @offenders.blank? %>
       <p>
-       Search again
+        Search again
       </p>
     <% else %>
-      <h2 class="govuk-heading-l"><%= @offenders.length %> more results from this prison</h2>
+      <h2 class="govuk-heading-l"><%= @offenders.length %> more result<%= 's' if @offenders.length != 1 %> from this
+        prison</h2>
       <%= render(
             :partial => 'shared/pagination',
             :locals => {
@@ -144,7 +148,7 @@
 
 <% if @user_allocations.empty? %>
   <script>
-      $(function() {
+      $(function () {
           document.querySelector('#tab_global-results').click()
       });
   </script>
