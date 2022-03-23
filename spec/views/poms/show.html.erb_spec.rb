@@ -95,7 +95,7 @@ RSpec.describe "poms/show", type: :view do
     let(:offenders) { [offender] }
 
     it 'displays correct headers' do
-      expect(page.css('th a').map(&:text).map(&:strip)).to eq(["Case", "Role", "Location", "Earliest release date", "Tier", "Allocationdate"])
+      expect(page.css('th a').map(&:text).map(&:strip)).to eq(["Case", "Role", "Location", "Earliest release date", "Tier", "Allocation date"])
     end
 
     it 'displays correct data' do

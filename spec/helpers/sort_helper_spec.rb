@@ -30,4 +30,10 @@ RSpec.describe SortHelper do
     result = sort_link('last_name')
     expect(result).to eq('/unallocated?sort=last_name+asc')
   end
+
+  it "Change the URL to include anchor tag" do
+    allow(request).to receive(:original_url).and_return('/unallocated?sort=last_name+desc')
+    result = sort_link('last_name', anchor: 'anchortag')
+    expect(result).to eq('/unallocated?sort=last_name+asc#anchortag')
+  end
 end

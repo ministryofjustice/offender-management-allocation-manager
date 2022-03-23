@@ -1,7 +1,7 @@
 <table class="govuk-table responsive tablesorter">
   <thead class="govuk-table__head">
     <tr class="govuk-table__row">
-      <%= render header_partial %>
+      <%= render header_partial, anchor: (defined?(selected_filter) ? selected_filter : nil)  %>
     </tr>
   </thead>
   <tbody class="govuk-table__body">

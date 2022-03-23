@@ -2,10 +2,8 @@
 
 class CaseloadController < PrisonStaffApplicationController
   before_action :ensure_signed_in_pom_is_this_pom, :load_pom, :load_summary
-  CASELOAD_FILTERS = %w[all upcoming_releases recent_allocation].freeze
 
   def load_summary
-    @filter = params['f'].presence || 'all'
     @summary = {
       all_prison_cases: @prison.allocations.all.count,
       new_cases_count: @pom.allocations.count(&:new_case?),
@@ -21,8 +19,6 @@ class CaseloadController < PrisonStaffApplicationController
   end
 
   def cases
-    @filter = (params['f'].present? && params['f'].in?(CASELOAD_FILTERS)) ? params['f'] : 'all'
-
     @recent_allocations = Kaminari.paginate_array(sort_allocations(filter_allocations(@pom.allocations).filter do |a|
       a.primary_pom_allocated_at.to_date >= 7.days.ago
     end)).page(page)

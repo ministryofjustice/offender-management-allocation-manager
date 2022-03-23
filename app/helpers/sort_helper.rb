@@ -3,8 +3,12 @@
 module SortHelper
   DEFAULT_SORT = 'last_name'
 
-  def sort_link(field_name)
-    link_for_field(field_name, URI.parse(request.original_url))
+  def sort_link(field_name, anchor: nil)
+    if anchor.nil?
+      link_for_field(field_name, URI.parse(request.original_url))
+    else
+      link_for_field(field_name, URI.parse(request.original_url)) << "##{anchor}"
+    end
   end
 
   def sort_arrow(field_name)

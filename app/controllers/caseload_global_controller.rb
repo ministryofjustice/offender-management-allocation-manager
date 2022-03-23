@@ -30,7 +30,7 @@ class CaseloadGlobalController < CaseloadController
     }
   end
 
-  private
+private
 
   def filter_allocations(allocations)
     if params['q'].present?

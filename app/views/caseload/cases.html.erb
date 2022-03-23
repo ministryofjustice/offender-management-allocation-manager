@@ -44,9 +44,9 @@
       <%= render partial: 'shared/pagination', locals: {data: @recent_allocations }, url_params: { anchor: 'recent-allocations' }  %>
       <br />
       <% if @prison.womens? %>
-        <%= render 'caseload_table', header_partial: 'female_headers', collection_partial: 'female', collection: @recent_allocations %>
+        <%= render 'caseload_table', header_partial: 'female_headers', collection_partial: 'female', collection: @recent_allocations, selected_filter: "recent-allocations" %>
       <% else %>
-        <%= render 'caseload_table', header_partial: 'male_headers', collection_partial: 'male', collection: @recent_allocations %>
+        <%= render 'caseload_table', header_partial: 'male_headers', collection_partial: 'male', collection: @recent_allocations, selected_filter: "recent-allocations" %>
       <% end %>
       <%= render partial: 'shared/pagination', locals: {data: @recent_allocations, url_params: { anchor: 'recent-allocations' } }  %>
     <% end %>
@@ -58,9 +58,9 @@
       <%= render partial: 'shared/pagination', locals: {data: @upcoming_releases, url_params: { anchor: 'upcoming-releases' } }  %>
       <br />
       <% if @prison.womens? %>
-        <%= render 'caseload_table', header_partial: 'female_headers', collection_partial: 'female', collection: @upcoming_releases %>
+        <%= render 'caseload_table', header_partial: 'female_headers', collection_partial: 'female', collection: @upcoming_releases, selected_filter: "upcoming-releases" %>
       <% else %>
-        <%= render 'caseload_table', header_partial: 'male_headers', collection_partial: 'male', collection: @upcoming_releases %>
+        <%= render 'caseload_table', header_partial: 'male_headers', collection_partial: 'male', collection: @upcoming_releases, selected_filter: "upcoming-releases" %>
       <% end %>
       <%= render partial: 'shared/pagination', locals: {data: @upcoming_releases, url_params: { anchor: 'upcoming-releases' } }  %>
     <% end %>
