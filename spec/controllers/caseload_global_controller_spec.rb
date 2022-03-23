@@ -6,7 +6,7 @@ RSpec.describe CaseloadGlobalController, type: :controller do
   let(:staff_id) { 456_987 }
   let(:other_staff_id) { 767_584 }
   let(:not_signed_in) { 123_456 }
-  let(:poms) {
+  let(:poms) do
     [
       build(:pom,
             firstName: 'Alice',
@@ -21,7 +21,7 @@ RSpec.describe CaseloadGlobalController, type: :controller do
             staffId: other_staff_id,
             position: RecommendationService::PRISON_POM)
     ]
-  }
+  end
   let(:pom) { poms.first }
 
   before do
@@ -33,17 +33,17 @@ RSpec.describe CaseloadGlobalController, type: :controller do
     let(:today) { Time.zone.today }
     let(:yesterday) { Time.zone.today - 1.day }
 
-    let(:offenders) {
+    let(:offenders) do
       [
         build(:nomis_offender, :rotl, complexityLevel: 'high', created: 1.day.ago,
-              sentence: attributes_for(:sentence_detail, automaticReleaseDate: Time.zone.today + 1.week)),
+                                      sentence: attributes_for(:sentence_detail, automaticReleaseDate: Time.zone.today + 1.week)),
         build(:nomis_offender, complexityLevel: 'medium', created: 1.month.ago),
         build(:nomis_offender, complexityLevel: 'low', created: 2.months.ago),
         build(:nomis_offender, complexityLevel: 'low', created: 2.months.ago),
         build(:nomis_offender, complexityLevel: 'medium', created: 1.month.ago),
         build(:nomis_offender, :rotl, complexityLevel: 'high', created: 1.day.ago),
       ]
-    }
+    end
 
     before do
       # we need 3 data points - 1 in, 1 out on ROTL, 1 out on ROTL and returned.
@@ -68,8 +68,8 @@ RSpec.describe CaseloadGlobalController, type: :controller do
       offenders.each.with_index(1) do |offender, index|
         create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
         alloc = create(:allocation_history, primary_pom_allocated_at: offender.fetch(:created),
-                       nomis_offender_id: offender.fetch(:prisonerNumber),
-                       primary_pom_nomis_id: pom.staffId, prison: prison.code)
+                                            nomis_offender_id: offender.fetch(:prisonerNumber),
+                                            primary_pom_nomis_id: pom.staffId, prison: prison.code)
         alloc.update!(primary_pom_nomis_id: index % 2 ? pom.staffId : other_staff_id,
                       event: AllocationHistory::REALLOCATE_PRIMARY_POM,
                       event_trigger: AllocationHistory::USER)
