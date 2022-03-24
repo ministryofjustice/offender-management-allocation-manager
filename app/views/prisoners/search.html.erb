@@ -11,10 +11,9 @@
 <%= render 'search/search_box' %>
 
 <div>
-
   <% if @offenders.blank? %>
     <p>
-      No offenders were found. Please try a different search.
+      Search again
     </p>
   <% else %>
     <%= render(
@@ -39,17 +38,20 @@
       <% @offenders.each_with_index do |offender, i| %>
         <tr class="govuk-table__row allocated_offender_row_<%= i %>">
           <td aria-label="Prisoner name" class="govuk-table__cell">
-            <a href="<%= sort_link('last_name') %>">
-              Case
-            </a>
-            <%= sort_arrow('last_name') %>
             <%= link_to(highlight(offender.full_name, @q), prison_prisoner_allocation_path(@prison.code, prisoner_id: offender.offender_no)) %>
             <br/><%= highlight(offender.offender_no, @q) %>
           </td>
           <td aria-label="POM" class="govuk-table__cell"><%= offender.allocated_pom_name || '-' %></td>
           <td aria-label="POM role" class="govuk-table__cell"> <%= offender.probation_record.present? ? pom_responsibility_label(offender) : '-' %> </td>
-          <td aria-label="Location" class="govuk-table__cell"><%= highlight(offender.location, @q) %></td>
-          <td aria-label="Date of birth" class="govuk-table__cell"><%= format_date(offender.earliest_release_date) %></td>
+          <td aria-label="Location" class="govuk-table__cell"><%= offender.location %></td>
+          <td aria-label="Date of birth" class="govuk-table__cell">
+            <% if offender.earliest_release.present? %>
+              <%= offender.earliest_release[:type] %> : <br/>
+              <%= format_date(offender.earliest_release[:date], replacement: "Unknown") %>
+            <% else %>
+              Unknown
+            <% end %>
+          </td>
           <td aria-label="Tier" class="govuk-table__cell"><%= probation_field(offender, :tier) || '-' %></td>
           <td aria-label="Action" class="govuk-table__cell">
             <% if @missing_info.map(&:offender_no).include?(offender.offender_no) %>
@@ -58,6 +60,8 @@
               <%= link_to 'Allocate', prison_prisoner_staff_index_path(@prison.code, offender.offender_no) %>
             <% elsif @new_arrivals.map(&:offender_no).include?(offender.offender_no) %>
               Wait
+            <% else %>
+                -
             <% end %>
           </td>
         </tr>
