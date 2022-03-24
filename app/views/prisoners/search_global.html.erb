@@ -44,7 +44,6 @@
           <th class="govuk-table__header sorter-false" scope="col">Location</th>
           <th class="govuk-table__header sorter-false" scope="col">Earliest release date</th>
           <th class="govuk-table__header sorter-false" scope="col">Tier</th>
-          <th class="govuk-table__header" scope="col">Action</th>
         </tr>
         </thead>
         <tbody class="govuk-table__body">
@@ -56,17 +55,15 @@
             </td>
             <td aria-label="POM role" class="govuk-table__cell"> <%= offender.probation_record.present? ? pom_responsibility_label(offender) : '-' %> </td>
             <td aria-label="Location" class="govuk-table__cell"><%= highlight(offender.location, @q) %></td>
-            <td aria-label="Date of birth" class="govuk-table__cell"><%= format_date(offender.earliest_release_date) %></td>
-            <td aria-label="Tier" class="govuk-table__cell"><%= probation_field(offender, :tier) || '-' %></td>
-            <td aria-label="Action" class="govuk-table__cell">
-              <% if @missing_info.map(&:offender_no).include?(offender.offender_no) %>
-                <%= link_to "Add missing details", prison_prisoner_new_missing_info_path(@prison.code, offender.offender_no) %>
-              <% elsif @unallocated.map(&:offender_no).include?(offender.offender_no) %>
-                <%= link_to 'Allocate', prison_prisoner_staff_index_path(@prison.code, offender.offender_no) %>
-              <% elsif @new_arrivals.map(&:offender_no).include?(offender.offender_no) %>
-                Wait
+            <td aria-label="Date of birth" class="govuk-table__cell">
+              <% if offender.earliest_release.present? %>
+                <%= offender.earliest_release[:type] %> : <br/>
+                <%= format_date(offender.earliest_release[:date], replacement: "Unknown") %>
+              <% else %>
+                Unknown
               <% end %>
             </td>
+            <td aria-label="Tier" class="govuk-table__cell"><%= probation_field(offender, :tier) || '-' %></td>
           </tr>
         <% end %>
         </tbody>
@@ -117,8 +114,15 @@
             </td>
             <td aria-label="POM" class="govuk-table__cell"><%= offender.allocated_pom_name || '-' %></td>
             <td aria-label="POM role" class="govuk-table__cell"> <%= offender.probation_record.present? ? pom_responsibility_label(offender) : '-' %> </td>
-            <td aria-label="Location" class="govuk-table__cell"><%= highlight(offender.location, @q) %></td>
-            <td aria-label="Date of birth" class="govuk-table__cell"><%= format_date(offender.earliest_release_date) %></td>
+            <td aria-label="Location" class="govuk-table__cell"><%= offender.location %></td>
+            <td aria-label="Date of birth" class="govuk-table__cell">
+              <% if offender.earliest_release.present? %>
+                <%= offender.earliest_release[:type] %> : <br/>
+                <%= format_date(offender.earliest_release[:date], replacement: "Unknown") %>
+              <% else %>
+                Unknown
+              <% end %>
+            </td>
             <td aria-label="Tier" class="govuk-table__cell"><%= probation_field(offender, :tier) || '-' %></td>
             <td aria-label="Action" class="govuk-table__cell">
               <% if @missing_info.map(&:offender_no).include?(offender.offender_no) %>
@@ -127,6 +131,8 @@
                 <%= link_to 'Allocate', prison_prisoner_staff_index_path(@prison.code, offender.offender_no) %>
               <% elsif @new_arrivals.map(&:offender_no).include?(offender.offender_no) %>
                 Wait
+              <% else %>
+                -
               <% end %>
             </td>
           </tr>

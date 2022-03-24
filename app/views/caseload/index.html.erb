@@ -4,15 +4,14 @@
 </h2>
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    <h3 class="govuk-heading-m govuk-!-margin-top-2">Current workload</h3>
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
-
+        <h3 class="govuk-heading-m govuk-!-margin-top-2">Current workload</h3>
         <div class="govuk-grid-row">
 
           <div class="govuk-grid-column-one-half">
             <div class="card--caseload card-total">
-              <%= link_to 'caseload', {controller: 'caseload', action: 'cases'}, class: 'govuk-link--no-visited-state' do %>
+              <%= link_to prison_staff_caseload_cases_path, class: 'govuk-link--no-visited-state' do %>
                 <span class="card__heading--large"><%= @summary.fetch(:total_cases) %></span>
                 <p><%= link_to 'total cases', prison_staff_caseload_cases_path, class: 'govuk-link--no-visited-state' %></p>
               <% end %>
@@ -76,11 +75,6 @@
               <dd class="govuk-summary-list__value">
                 <%= format_working_pattern(@pom.working_pattern) %>
               </dd>
-              <dd class="govuk-summary-list__actions">
-                <!--<a class="govuk-link" href="#">
-                  Edit<span class="govuk-visually-hidden"> name</span>
-                </a>-->
-              </dd>
             </div>
             <div class="govuk-summary-list__row">
               <dt class="govuk-summary-list__key">
@@ -89,11 +83,6 @@
               <dd class="govuk-summary-list__value">
                 <%= full_status(@pom) %>
               </dd>
-              <dd class="govuk-summary-list__actions">
-                <!--<a class="govuk-link" href="#">
-                  Edit<span class="govuk-visually-hidden"> name</span>
-                </a>-->
-              </dd>
             </div>
           </dl>
         </div>
@@ -101,7 +90,7 @@
       </div>
 
       <div class="govuk-grid-column-one-third">
-        <h3 class="govuk-heading-m">
+        <h3 class="govuk-heading-m govuk-!-margin-top-2">
           Case mix by tier
         </h3>
 
