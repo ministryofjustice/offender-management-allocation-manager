@@ -38,7 +38,6 @@ feature "view POM's caseload" do
   end
   let(:offenders) do
     ids_without_cells = %w[G6653UC G8563UA]
-    ids_due_for_release = %w[G1992GH G5992GA G8563UA]
     offender_map.merge(nomis_offender_id => 1_153)
       .map do |nomis_id, booking_id|
       if ids_without_cells.include? nomis_id
