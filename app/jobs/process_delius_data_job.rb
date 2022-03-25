@@ -41,9 +41,9 @@ private
         # Recalculate the offender's handover dates
         RecalculateHandoverDateJob.perform_later(delius_record.noms_no)
       else
-        case_information.errors.each do |field, _errors|
+        case_information.errors.each do |error|
           DeliusImportError.create! nomis_offender_id: delius_record.noms_no,
-                                    error_type: error_type(field)
+                                    error_type: error_type(error.attribute)
         end
       end
     end
