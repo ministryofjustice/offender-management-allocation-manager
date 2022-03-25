@@ -31,7 +31,9 @@
         <th class="govuk-table__header sorter-false" scope="col">Location</th>
         <th class="govuk-table__header sorter-false" scope="col">Earliest release date</th>
         <th class="govuk-table__header sorter-false" scope="col">Tier</th>
+        <% if @is_spo %>
         <th class="govuk-table__header" scope="col">Action</th>
+        <% end %>
       </tr>
       </thead>
       <tbody class="govuk-table__body">
@@ -53,6 +55,7 @@
             <% end %>
           </td>
           <td aria-label="Tier" class="govuk-table__cell"><%= probation_field(offender, :tier) || '-' %></td>
+          <% if @is_spo %>
           <td aria-label="Action" class="govuk-table__cell">
             <% if @missing_info.map(&:offender_no).include?(offender.offender_no) %>
               <%= link_to "Add missing details", prison_prisoner_new_missing_info_path(@prison.code, offender.offender_no) %>
@@ -64,6 +67,7 @@
                 -
             <% end %>
           </td>
+          <% end %>
         </tr>
       <% end %>
       </tbody>

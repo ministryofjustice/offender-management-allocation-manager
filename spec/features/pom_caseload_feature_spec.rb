@@ -11,7 +11,7 @@ feature "view POM's caseload" do
   let(:offender_map) do
     {
       'G7266VD' => 1_073,
-      'G8563UA' => 1_020,
+      'G8563UA' => 5,
       'G6068GV' => 1_030,
       'G0572VU' => 861,
       'G8668GF' => 1_106,
@@ -23,11 +23,11 @@ feature "view POM's caseload" do
       'G8180UO' => 1_172,
       'G8909GV' => 877,
       'G8339GD' => 260,
-      'G1992GH' => 1_179,
+      'G1992GH' => 6,
       'G1986GG' => 1_165,
       'G6262GI' => 961,
       'G6653UC' => 1_009,
-      'G5992GA' => 928,
+      'G5992GA' => 7,
       'G4706UP' => 1_180,
       'G9344UG' => 841
     }
@@ -47,7 +47,7 @@ feature "view POM's caseload" do
                                prisonId: prison.code,
                                prisonerNumber: nomis_id,
                                sentence: attributes_for(:sentence_detail,
-                                                        automaticReleaseDate: (ids_due_for_release.include? nomis_id) ? 5.days.from_now : "2031-01-22",
+                                                        automaticReleaseDate: "2031-01-22",
                                                         conditionalReleaseDate: "2031-01-24",
                                                         tariffDate: (nomis_id == nil_release_date_offender) ? nil : Time.zone.today + booking_id.days))
       else
@@ -55,7 +55,7 @@ feature "view POM's caseload" do
               prisonId: prison.code,
               prisonerNumber: nomis_id,
               sentence: attributes_for(:sentence_detail,
-                                       automaticReleaseDate: (ids_due_for_release.include? nomis_id) ? 5.days.from_now : "2031-01-22",
+                                       automaticReleaseDate: "2031-01-22",
                                        conditionalReleaseDate: "2031-01-24",
                                        tariffDate: (nomis_id == nil_release_date_offender) ? nil : Time.zone.today + booking_id.days))
       end
@@ -169,12 +169,11 @@ feature "view POM's caseload" do
       end
     end
 
-    skip it 'can be sorted by earliest release date' do
+    it 'can be sorted by earliest release date' do
       find('#all-cases .govuk-table').click_link 'Earliest release date'
-
       # pick out a few rows, and make sure they are in order by release date
       (2..7).each do |row_index|
-        within ".offender_row_#{row_index}" do
+        within "#all-cases .offender_row_#{row_index}" do
           offender = offenders.detect { |o| o.fetch(:prisonerNumber) == offender_ids_by_release_date[row_index] }
           name = "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}"
           expect(page).to have_content(name)

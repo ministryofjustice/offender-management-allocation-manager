@@ -3,7 +3,7 @@
 class PrisonersController < PrisonsApplicationController
   include Sorting
 
-  before_action :ensure_spo_user, except: [:show, :image]
+  before_action :ensure_spo_user, except: [:show, :image, :search]
 
   before_action :load_all_offenders, only: [:allocated, :missing_information, :unallocated, :new_arrivals, :search]
 
