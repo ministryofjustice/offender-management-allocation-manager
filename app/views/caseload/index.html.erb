@@ -51,7 +51,7 @@
               </dd>
               <dd class="govuk-summary-list__actions">
                 <%= link_to "View",
-                            { controller: :caseload, action: :cases, f: 'recent_allocations' },
+                            { controller: :caseload, action: :cases, anchor: 'recent-allocations' },
                             class: "govuk-link--no-visited-state" %>
               </dd>
             </div>
@@ -64,7 +64,7 @@
               </dd>
               <dd class="govuk-summary-list__actions">
                 <%= link_to "View",
-                            { controller: :caseload, action: :cases, f: 'upcoming_releases' },
+                            { controller: :caseload, action: :cases, anchor: 'upcoming-releases' },
                             class: "govuk-link--no-visited-state" %>
               </dd>
             </div>
