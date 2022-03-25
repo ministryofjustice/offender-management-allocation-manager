@@ -2,7 +2,7 @@
 <html class="govuk-template js flexbox">
   <head>
     <%= render 'layouts/google_tag_manager_head' %>
-    <title>Manage Offenders in Custody</title>
+    <title><%= yield(:title).blank? ? "Manage Offenders in Custody" : yield(:title).to_s%></title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>

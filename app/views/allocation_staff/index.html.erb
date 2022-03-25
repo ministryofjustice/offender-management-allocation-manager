@@ -6,8 +6,10 @@
 
 <h1 class="govuk-heading-l govuk-!-margin-bottom-5">
   <% if @current_pom %>
+    <% content_for :title, "Reallocate a POM – Digital Prison Services" %>
     Reallocate a POM
   <% else %>
+    <% content_for :title, "Allocate a POM – Digital Prison Services" %>
     Allocate a POM
   <% end %>
 </h1>

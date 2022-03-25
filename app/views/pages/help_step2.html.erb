@@ -1,5 +1,8 @@
 <% current_help_step = HelpStep.find(2) %>
 <%= render :partial => "content", locals: { current_help_step: current_help_step } %>
+
+<% content_for :title, "Set up access in DPS – Digital Prison Services" %>
+
 <h1 class="part-title">Set up access in Digital Prison Services</h1>
 
 <div class="govuk-inset-text">
