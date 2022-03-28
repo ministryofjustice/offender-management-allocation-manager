@@ -24,9 +24,10 @@ SimpleCov.start 'rails' do
   add_group "Services", "app/services"
 
   # Try to set this to current coverage levels so that it never goes down after a PR
-  minimum_coverage 90.00
+  # 10 lines uncovered at 99.69% coverage
+  minimum_coverage 99.69
   # sometimes coverage drops between branches - don't fail in these cases
-  maximum_coverage_drop 100
+  maximum_coverage_drop 0.5
 
   # set merge_timeout to 30 minutes on circle:ci
   merge_timeout ENV['MERGE_TIMEOUT'].to_i if ENV['MERGE_TIMEOUT']
