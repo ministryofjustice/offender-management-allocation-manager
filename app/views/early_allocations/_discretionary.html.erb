@@ -1,3 +1,5 @@
+<% content_for :title, "Assessment for discretionary early allocation – Digital Prison Services" %>
+
 <%= form_for(@early_allocation,
              as: :early_allocation,
              url: discretionary_prison_prisoner_early_allocations_path(@prison.code, @early_allocation.nomis_offender_id),
