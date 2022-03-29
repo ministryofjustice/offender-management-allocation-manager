@@ -50,7 +50,7 @@
         <span class="govuk-body">Earliest release date</span>
         <h3 class="govuk-heading-m" id="earliest_release_date">
           <% if @prisoner.earliest_release.present? %>
-            <%= @prisoner.earliest_release[:type] %> : <br/>
+            <%= @prisoner.earliest_release[:type] %>: <br/>
             <%= format_date(@prisoner.earliest_release[:date], replacement: "Unknown") %>
           <% else %>
             Unknown

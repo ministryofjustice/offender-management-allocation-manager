@@ -20,7 +20,7 @@
   <% end %>
   <td aria-label="Earliest release date" class="govuk-table__cell ">
     <% if caseload.earliest_release.present? %>
-      <%= caseload.earliest_release[:type] %> : <br/>
+      <%= caseload.earliest_release[:type] %>: <br/>
       <%= format_date(caseload.earliest_release[:date], replacement: "Unknown") %>
     <% else %>
       Unknown

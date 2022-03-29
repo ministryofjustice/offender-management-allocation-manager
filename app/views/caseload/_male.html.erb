@@ -14,7 +14,7 @@
   </td>
   <td aria-label="Earliest release date" class="govuk-table__cell ">
     <% if male.earliest_release.present? %>
-      <%= male.earliest_release[:type] %> : <br/>
+      <%= male.earliest_release[:type] %>: <br/>
       <%= format_date(male.earliest_release[:date], replacement: "Unknown") %>
     <% else %>
       Unknown
