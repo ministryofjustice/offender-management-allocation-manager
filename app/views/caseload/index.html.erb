@@ -13,7 +13,7 @@
             <div class="card--caseload card-total">
               <%= link_to prison_staff_caseload_cases_path, class: 'govuk-link--no-visited-state' do %>
                 <span class="card__heading--large"><%= @summary.fetch(:total_cases) %></span>
-                <p><%= link_to 'total cases', prison_staff_caseload_cases_path, class: 'govuk-link--no-visited-state' %></p>
+                <p>total cases</p>
               <% end %>
             </div>
           </div>
@@ -22,7 +22,7 @@
             <div class="card--caseload card-total">
               <%= link_to prison_staff_caseload_handovers_path, class: 'govuk-link--no-visited-state' do %>
                 <span class="card__heading--large"><%= @summary.fetch(:pending_handover_count) %></span>
-                <p><%= link_to 'handovers in progress', prison_staff_caseload_handovers_path, class: 'govuk-link--no-visited-state' %></p>
+                <p>handovers in progress</p>
               <% end %>
             </div>
           </div>
@@ -75,6 +75,7 @@
               <dd class="govuk-summary-list__value">
                 <%= format_working_pattern(@pom.working_pattern) %>
               </dd>
+              <dd class="govuk-summary-list__actions"></dd>
             </div>
             <div class="govuk-summary-list__row">
               <dt class="govuk-summary-list__key">
@@ -83,6 +84,7 @@
               <dd class="govuk-summary-list__value">
                 <%= full_status(@pom) %>
               </dd>
+              <dd class="govuk-summary-list__actions"></dd>
             </div>
           </dl>
         </div>

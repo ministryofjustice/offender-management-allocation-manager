@@ -104,7 +104,7 @@ RSpec.describe "poms/show", type: :view do
           [offender.full_name, case_info.nomis_offender_id],
           "Co-working",
           offender.location,
-          "#{offender.earliest_release[:type]} : #{offender.earliest_release[:date].to_s(:rfc822)}",
+          "#{offender.earliest_release[:type]}: #{offender.earliest_release[:date].to_s(:rfc822)}",
           case_info.tier,
           Time.zone.today.to_s(:rfc822),
         ]

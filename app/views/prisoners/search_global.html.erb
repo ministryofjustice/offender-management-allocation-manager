@@ -17,7 +17,7 @@
     </li>
     <li class="govuk-tabs__list-item">
       <a class="govuk-tabs__tab" href="#global-results">
-        <%= @offenders.length %> more result<%= 's' if @offenders.length != 1 %> from this prison
+        <%= @offenders.length %> <%= 'more' if @user_allocations.length > 0 %> result<%= 's' if @offenders.length != 1 %> from this prison
       </a>
     </li>
   </ul>
@@ -57,7 +57,7 @@
             <td aria-label="Location" class="govuk-table__cell"><%= highlight(offender.location, @q) %></td>
             <td aria-label="Date of birth" class="govuk-table__cell">
               <% if offender.earliest_release.present? %>
-                <%= offender.earliest_release[:type] %> : <br/>
+                <%= offender.earliest_release[:type] %>: <br/>
                 <%= format_date(offender.earliest_release[:date], replacement: "Unknown") %>
               <% else %>
                 Unknown
@@ -84,8 +84,7 @@
         Search again
       </p>
     <% else %>
-      <h2 class="govuk-heading-l"><%= @offenders.length %> more result<%= 's' if @offenders.length != 1 %> from this
-        prison</h2>
+      <h2 class="govuk-heading-l"><%= @offenders.length %> <%= 'more' if @user_allocations.length > 0 %> result<%= 's' if @offenders.length != 1 %> from this prison</h2>
       <%= render(
             :partial => 'shared/pagination',
             :locals => {
@@ -115,7 +114,7 @@
               <br/><%= highlight(offender.offender_no, @q) %>
             </td>
             <td aria-label="POM" class="govuk-table__cell"><%= offender.allocated_pom_name || '-' %></td>
-            <td aria-label="POM role" class="govuk-table__cell"> <%= offender.probation_record.present? ? pom_responsibility_label(offender) : '-' %> </td>
+            <td aria-label="POM role" class="govuk-table__cell"> <%= offender.probation_record.present? ? pom_responsibility_label(offender) : 'None allocated' %> </td>
             <td aria-label="Location" class="govuk-table__cell"><%= offender.location %></td>
             <td aria-label="Date of birth" class="govuk-table__cell">
               <% if offender.earliest_release.present? %>
@@ -125,7 +124,7 @@
                 Unknown
               <% end %>
             </td>
-            <td aria-label="Tier" class="govuk-table__cell"><%= probation_field(offender, :tier) || '-' %></td>
+            <td aria-label="Tier" class="govuk-table__cell"><%= probation_field(offender, :tier) || 'No tier found' %></td>
             <% if @is_spo %>
             <td aria-label="Action" class="govuk-table__cell">
               <% if @missing_info.map(&:offender_no).include?(offender.offender_no) %>
