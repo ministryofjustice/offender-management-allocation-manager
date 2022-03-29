@@ -1,13 +1,12 @@
 <% content_for :title, "There is a problem with the service – Digital Prison Services" %>
 
-<h1 class="govuk-heading-l">Sorry, there is a problem with the POM caseload service</h1>
+<h1 class="govuk-heading-l">Sorry, there is a problem with the <br/> POM caseload service</h1>
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds govuk-body-l">
     <p>Try again later.</p>
-
     <p>
-      <%= link_to 'Go to the Digital Prison Services homepage', 'https://digital-dev.prison.service.justice.gov.uk/'%>.
+      <%= link_to 'Go to the Digital Prison Services homepage', ENV['DIGITAL_PRISON_SERVICE_HOST'] %>
     </p>
   </div>
 </div>
