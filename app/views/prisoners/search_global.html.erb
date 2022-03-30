@@ -17,7 +17,8 @@
     </li>
     <li class="govuk-tabs__list-item">
       <a class="govuk-tabs__tab" href="#global-results">
-        <%= @offenders.length %> <%= 'more' if @user_allocations.length > 0 %> result<%= 's' if @offenders.length != 1 %> from this prison
+        <%= @offenders.length %> <%= 'more' if @user_allocations.length > 0 %>
+        result<%= 's' if @offenders.length != 1 %> from this prison
       </a>
     </li>
   </ul>
@@ -84,7 +85,8 @@
         Search again
       </p>
     <% else %>
-      <h2 class="govuk-heading-l"><%= @offenders.length %> <%= 'more' if @user_allocations.length > 0 %> result<%= 's' if @offenders.length != 1 %> from this prison</h2>
+      <h2 class="govuk-heading-l"><%= @offenders.length %> <%= 'more' if @user_allocations.length > 0 %>
+        result<%= 's' if @offenders.length != 1 %> from this prison</h2>
       <%= render(
             :partial => 'shared/pagination',
             :locals => {
@@ -102,7 +104,7 @@
           <th class="govuk-table__header sorter-false" scope="col">Earliest release date</th>
           <th class="govuk-table__header sorter-false" scope="col">Tier</th>
           <% if @is_spo %>
-          <th class="govuk-table__header" scope="col">Action</th>
+            <th class="govuk-table__header" scope="col">Action</th>
           <% end %>
         </tr>
         </thead>
@@ -110,7 +112,11 @@
         <% @offenders.each_with_index do |offender, i| %>
           <tr class="govuk-table__row allocated_offender_row_<%= i %>">
             <td aria-label="Prisoner name" class="govuk-table__cell">
-              <%= link_to(highlight(offender.full_name, @q), prison_prisoner_allocation_path(@prison.code, prisoner_id: offender.offender_no)) %>
+              <% if @is_spo %>
+                <%= link_to(highlight(offender.full_name, @q), prison_prisoner_allocation_path(@prison.code, prisoner_id: offender.offender_no)) %>
+              <% else %>
+                <%= link_to(highlight(offender.full_name, @q), prison_prisoner_path(@prison.code, offender.offender_no)) %>
+              <% end %>
               <br/><%= highlight(offender.offender_no, @q) %>
             </td>
             <td aria-label="POM" class="govuk-table__cell"><%= offender.allocated_pom_name || '-' %></td>
@@ -126,17 +132,17 @@
             </td>
             <td aria-label="Tier" class="govuk-table__cell"><%= probation_field(offender, :tier) || 'No tier found' %></td>
             <% if @is_spo %>
-            <td aria-label="Action" class="govuk-table__cell">
-              <% if @missing_info.map(&:offender_no).include?(offender.offender_no) %>
-                <%= link_to "Add missing details", prison_prisoner_new_missing_info_path(@prison.code, offender.offender_no) %>
-              <% elsif @unallocated.map(&:offender_no).include?(offender.offender_no) %>
-                <%= link_to 'Allocate', prison_prisoner_staff_index_path(@prison.code, offender.offender_no) %>
-              <% elsif @new_arrivals.map(&:offender_no).include?(offender.offender_no) %>
-                Wait
-              <% else %>
-                -
-              <% end %>
-            </td>
+              <td aria-label="Action" class="govuk-table__cell">
+                <% if @missing_info.map(&:offender_no).include?(offender.offender_no) %>
+                  <%= link_to "Add missing details", prison_prisoner_new_missing_info_path(@prison.code, offender.offender_no) %>
+                <% elsif @unallocated.map(&:offender_no).include?(offender.offender_no) %>
+                  <%= link_to 'Allocate', prison_prisoner_staff_index_path(@prison.code, offender.offender_no) %>
+                <% elsif @new_arrivals.map(&:offender_no).include?(offender.offender_no) %>
+                  Wait
+                <% else %>
+                  -
+                <% end %>
+              </td>
             <% end %>
           </tr>
         <% end %>
