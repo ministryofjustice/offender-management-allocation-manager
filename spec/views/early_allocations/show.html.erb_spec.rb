@@ -8,7 +8,6 @@ RSpec.describe "early_allocations/show", type: :view do
     assign(:prisoner, build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail)))
 
     assign(:early_allocation, early_allocation)
-    assign(:referrer, referrer)
     render
   end
 
@@ -33,22 +32,6 @@ RSpec.describe "early_allocations/show", type: :view do
         it 'shows the outcome' do
           expect(page.css('#outcome-label')).to have_text('Outcome')
           expect(page.css('#outcome')).to have_text('Eligible - the community probation team will take responsibility for this case early')
-        end
-      end
-    end
-
-    describe 'backlink' do
-      context 'when the referer is nil' do
-        it 'links to home' do
-          expect(page).to have_link('Back', href: '/')
-        end
-      end
-
-      context 'when the referer is a page' do
-        let(:referrer) { '/fred' }
-
-        it 'links to that page' do
-          expect(page).to have_link('Back', href: '/fred')
         end
       end
     end
