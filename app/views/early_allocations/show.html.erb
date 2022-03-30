@@ -2,7 +2,7 @@
 
 <div class="govuk-width-container">
 
-  <%= render :partial => "/shared/backlink", :locals => { :page => @referrer || root_path } %>
+  <%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
 
   <main class="govuk-main-wrapper " id="main-content" role="main">
     <dl class="govuk-grid-row">

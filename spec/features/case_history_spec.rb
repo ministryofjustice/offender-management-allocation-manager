@@ -415,11 +415,12 @@ feature 'Case History' do
         view_assessment_page = prison_prisoner_early_allocation_path(open_prison.code, nomis_offender_id, target_early_allocation.id)
         expect(page).to have_current_path(view_assessment_page)
         expect(page).to have_content('Eligible')
+        origin_url = page.current_path
 
         # Back link takes us back
         click_link 'Back'
         case_history_page = history_prison_prisoner_allocation_path(open_prison.code, nomis_offender_id)
-        expect(page).to have_current_path(case_history_page)
+        expect(page).to have_current_path(origin_url)
       end
     end
   end
