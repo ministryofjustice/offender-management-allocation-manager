@@ -5,7 +5,7 @@ RSpec.describe PrisonsApplicationController, type: :controller do
     context 'when referrer is set to null' do
       it 'redirects to the root_path of /' do
         allow(request).to receive(:referer).and_return(nil)
-        
+
         expect(subject.__send__(:referrer)).to eq('/')
       end
     end
