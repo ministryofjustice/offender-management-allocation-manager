@@ -24,7 +24,7 @@ feature "edit a POM's details" do
       visit prison_pom_path(prison_id: prison.code, nomis_staff_id: spo.staffId)
 
       # Goes to the Edit profile page where the SPO can change the working pattern or the status
-      within first('.govuk-summary-list__row') do
+      within first('.govuk-summary-list__row:nth-child(4)') do
         click_link "Change"
       end
     end
@@ -103,7 +103,7 @@ feature "edit a POM's details" do
         click_link "Inactive staff (1)"
         click_link 'Moic Integration-Tests'
 
-        within first('.govuk-summary-list__row') do
+        within first('.govuk-summary-list__row:nth-child(4)') do
           click_link "Change"
         end
 
@@ -145,7 +145,7 @@ feature "edit a POM's details" do
 
       it "de-allocates all a POM's cases", vcr: { cassette_name: 'prison_api/edit_poms_deactivate_pom_feature' } do
         visit "/prisons/LEI/poms/485926"
-        within first('.govuk-summary-list__row') do
+        within first('.govuk-summary-list__row:nth-child(4)') do
           click_link "Change"
         end
 

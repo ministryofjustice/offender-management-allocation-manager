@@ -11,7 +11,7 @@ feature "view POM's caseload" do
   let(:offender_map) do
     {
       'G7266VD' => 1_073,
-      'G8563UA' => 1_020,
+      'G8563UA' => 5,
       'G6068GV' => 1_030,
       'G0572VU' => 861,
       'G8668GF' => 1_106,
@@ -23,11 +23,11 @@ feature "view POM's caseload" do
       'G8180UO' => 1_172,
       'G8909GV' => 877,
       'G8339GD' => 260,
-      'G1992GH' => 1_179,
+      'G1992GH' => 6,
       'G1986GG' => 1_165,
       'G6262GI' => 961,
       'G6653UC' => 1_009,
-      'G5992GA' => 928,
+      'G5992GA' => 7,
       'G4706UP' => 1_180,
       'G9344UG' => 841
     }
@@ -67,6 +67,7 @@ feature "view POM's caseload" do
     offenders.sort_by { |o| o.fetch(:lastName) }
   end
   let(:first_offender) { sorted_offenders.first }
+  let(:last_offender) { sorted_offenders.last }
   let(:moved_offenders) { [sorted_offenders.fourth, sorted_offenders.fifth] }
 
   let(:sorted_locations) do
@@ -119,20 +120,20 @@ feature "view POM's caseload" do
 
   context 'when in a womens prison' do
     let(:prison) { create(:womens_prison) }
-    let(:complexities) { ['high', 'medium', 'low'].cycle.take(offenders.size) }
+    let(:complexities) { %w[high medium low].cycle.take(offenders.size) }
 
     before do
       offenders.each_with_index do |offender, index|
         allow(HmppsApi::ComplexityApi).to receive(:get_complexity).with(offender.fetch(:prisonerNumber)).and_return(complexities[index])
       end
-      visit prison_staff_caseload_path(prison.code, nomis_staff_id)
+      visit prison_staff_caseload_cases_path(prison.code, nomis_staff_id)
     end
 
     it 'can sort by complexity' do
-      click_link 'Complexity level'
-      expect(page).to have_current_path("/prisons/#{prison.code}/staff/#{nomis_staff_id}/caseload?sort=complexity_level_number+asc")
-      click_link 'Complexity level'
-      expect(page).to have_current_path("/prisons/#{prison.code}/staff/#{nomis_staff_id}/caseload?sort=complexity_level_number+desc")
+      find('#all-cases .govuk-table').click_link 'Complexity level'
+      expect(page).to have_current_path("/prisons/#{prison.code}/staff/#{nomis_staff_id}/caseload/cases?sort=complexity_level_number+asc")
+      find('#all-cases .govuk-table').click_link 'Complexity level'
+      expect(page).to have_current_path("/prisons/#{prison.code}/staff/#{nomis_staff_id}/caseload/cases?sort=complexity_level_number+desc")
     end
   end
 
@@ -140,37 +141,38 @@ feature "view POM's caseload" do
     let(:prison) { create(:prison) }
 
     before do
-      visit prison_staff_caseload_path(prison.code, nomis_staff_id)
+      visit prison_staff_caseload_cases_path(prison.code, nomis_staff_id)
     end
 
     it 'displays paginated cases for a specific POM' do
-      expect(page).to have_content("Showing 1 - 21 of 21 results")
-      expect(page).to have_content("Your caseload (21)")
+      expect(page).to have_content("Showing 1 to 21 of 21 results")
+      expect(page).to have_content("Your cases")
+      expect(page).to have_content("All your cases")
       sorted_offenders.first(20).each_with_index do |offender, index|
         name = "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}"
 
-        within ".offender_row_#{index}" do
+        within "#all-cases .offender_row_#{index}" do
           expect(page).to have_content(name)
         end
       end
     end
 
     it 'can be reverse sorted by name' do
-      click_link 'Case'
+      click_link 'All your cases'
+      find('#all-cases .govuk-table').click_link 'Case'
       sorted_offenders.last(20).reverse.each_with_index do |offender, index|
         name = "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}"
-        within ".offender_row_#{index}" do
+        within "#all-cases .offender_row_#{index}" do
           expect(page).to have_content(name)
         end
       end
     end
 
     it 'can be sorted by earliest release date' do
-      page.all('th')[3].find('a').click
-
+      find('#all-cases .govuk-table').click_link 'Earliest release date'
       # pick out a few rows, and make sure they are in order by release date
       (2..7).each do |row_index|
-        within ".offender_row_#{row_index}" do
+        within "#all-cases .offender_row_#{row_index}" do
           offender = offenders.detect { |o| o.fetch(:prisonerNumber) == offender_ids_by_release_date[row_index] }
           name = "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}"
           expect(page).to have_content(name)
@@ -179,10 +181,10 @@ feature "view POM's caseload" do
     end
 
     it 'can be sorted by responsibility' do
-      click_link 'Role'
-      expect(all('td[aria-label=Role]').map(&:text).uniq).to eq(['Co-working', 'Responsible', 'Supporting'])
-      click_link 'Role'
-      expect(all('td[aria-label=Role]').map(&:text).uniq).to eq(['Supporting', 'Responsible', 'Co-working'])
+      find('#all-cases .govuk-table').click_link 'Role'
+      expect(all('td[aria-label=Role]').map(&:text).uniq).to eq(%w[Co-working Responsible Supporting])
+      find('#all-cases .govuk-table').click_link 'Role'
+      expect(all('td[aria-label=Role]').map(&:text).uniq).to eq(%w[Supporting Responsible Co-working])
     end
 
     it 'can be sorted by cell location' do
@@ -190,68 +192,31 @@ feature "view POM's caseload" do
       # at the top otherwise they are grouped at the bottom
 
       # ascending order
-      click_link 'Location'
-      within ".offender_row_0" do
+      find('#all-cases .govuk-table').click_link 'Location'
+      within "#all-cases .offender_row_0" do
         expect(page).to have_content(moved_offenders.last[:lastName])
       end
 
       # descending order
-      click_link 'Location'
-      within ".offender_row_0" do
+      find('#all-cases .govuk-table').click_link 'Location'
+      within "#all-cases .offender_row_0" do
         expect(page).to have_content(sorted_locations.last[:lastName])
       end
     end
 
-    it 'can be searched by string' do
-      # make sure of at least one search hit.
-      search = first_offender.fetch(:lastName)[1..4]
-      expected_count = offenders.count { |o| o.fetch(:lastName).include?(search) || o.fetch(:firstName).include?(search) }
-      fill_in 'q', with: search
-      click_on 'Search'
-      expect(page).to have_content("Showing 1 - #{expected_count} of #{expected_count} results")
-    end
-
-    it 'can be searched by number' do
-      fill_in 'q', with: '8180U'
-      click_on 'Search'
-      expect(page).to have_content('Showing 1 - 1 of 1 results')
-      offender = offenders.detect { |o| o.fetch(:prisonerNumber) == 'G8180UO' }
-      name = "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}"
-      within '.offender_row_0' do
-        expect(page).to have_content(name)
-      end
-    end
-
-    it 'can be searched by supporting role' do
-      select 'Supporting', from: 'role'
-      click_on 'Search'
-      expect(page).to have_content('Showing 1 - 14 of 14 results')
-    end
-
     it 'shows the tier' do
-      within('.offender_row_20 .tier') do
+      within('#all-cases .offender_row_20 .tier') do
         expect(page).to have_content('A')
       end
     end
 
-    it 'can be searched by responsible role' do
-      select 'Responsible', from: 'role'
-      click_on 'Search'
-      expect(page).to have_content('Showing 1 - 6 of 6 results')
-    end
-
     it 'shows the number of upcoming handovers' do
-      within('.upcoming-handover-count') do
-        expect(find('a').text).to eq('21')
-      end
+      expect(find('a[href="#upcoming-releases"]').text).to eq('Releases in next 4 weeks (3)')
     end
 
     it 'can show us all upcoming handovers' do
-      within('.upcoming-handover-count') do
-        click_link('21')
-      end
-
-      expect(page).to have_css('tbody tr.govuk-table__row', count: 21)
+      find('a[href="#upcoming-releases"]').click
+      expect(page).to have_css('#upcoming-releases tbody tr.govuk-table__row', count: 3)
     end
 
     context 'when clicking through the offender link' do
@@ -264,11 +229,11 @@ feature "view POM's caseload" do
         stub_request(:get, "#{ApiHelper::T3}/staff/#{nomis_staff_id}")
           .to_return(body: { staffId: nomis_staff_id, firstName: "TEST", lastName: "MOIC" }.to_json)
 
-        visit prison_staff_caseload_path(prison.code, nomis_staff_id)
+        visit prison_staff_caseload_cases_path(prison.code, nomis_staff_id)
 
         expected_name = "#{first_offender.fetch(:lastName)}, #{first_offender.fetch(:firstName)}"
 
-        within('.offender_row_0') do
+        within('#all-cases .offender_row_0') do
           expect(page).to have_content(expected_name)
           click_link expected_name
         end
@@ -279,27 +244,29 @@ feature "view POM's caseload" do
 
     it 'can sort all cases that have been allocated to a specific POM in the last week' do
       stub_user staff_id: nomis_staff_id
-
-      visit prison_staff_caseload_path(prison.code, nomis_staff_id)
-      within('.new-cases-count') do
-        click_link('1')
-      end
-
-      expect(page).to have_content("New cases")
-
-      expected_name = "#{first_offender.fetch(:lastName)}, #{first_offender.fetch(:firstName)}"
+      expect(find('a[href="#recent-allocations"]').text).to eq('Allocated in last 7 days (21)')
 
       # The first name...
-      within('.offender_row_0') do
-        expect(find('.prisoner-name').text).to eq(expected_name)
+      within('#recent-allocations .offender_row_0') do
+        expect(find('.prisoner-name').text).to eq("#{first_offender.fetch(:lastName)}, #{first_offender.fetch(:firstName)}")
+      end
+
+      # Should be the last name
+      within('#recent-allocations .offender_row_20') do
+        expect(find('.prisoner-name').text).to eq("#{last_offender.fetch(:lastName)}, #{last_offender.fetch(:firstName)}")
       end
 
       # After sorting ...
-      click_link('Case')
+      find('#recent-allocations .govuk-table').click_link('Case')
+
+      # The last name...
+      within('#recent-allocations .offender_row_0') do
+        expect(find('.prisoner-name').text).to eq("#{last_offender.fetch(:lastName)}, #{last_offender.fetch(:firstName)}")
+      end
 
       # Should be the last name
-      within('.offender_row_20') do
-        expect(find('.prisoner-name').text).to eq(expected_name)
+      within('#recent-allocations .offender_row_20') do
+        expect(find('.prisoner-name').text).to eq("#{first_offender.fetch(:lastName)}, #{first_offender.fetch(:firstName)}")
       end
     end
   end

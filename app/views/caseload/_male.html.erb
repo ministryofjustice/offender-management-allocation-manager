@@ -1,20 +1,27 @@
 <tr class="govuk-table__row offender_row_<%= male_counter %>">
   <td aria-label="Prisoner name" class="govuk-table__cell">
     <span class="prisoner-name">
-      <%= link_to(highlight(male.full_name, @q), prison_prisoner_path(@prison.code, male.nomis_offender_id), class: "govuk-link" ) %>
+      <%= link_to(highlight(male.full_name, @q), prison_prisoner_path(@prison.code, male.nomis_offender_id), class: "govuk-link") %>
     </span>
     <br/>
     <span class='govuk-hint govuk-!-margin-bottom-0'>
       <%= highlight(male.nomis_offender_id, @q) %>
     </span>
   </td>
+  <td aria-label="Role" class="govuk-table__cell "><%= pom_responsibility_label male %></td>
   <td aria-label="Location" class="govuk-table__cell">
     <%= prisoner_location(male, location_only: true) %>
   </td>
-  <td aria-label="Tier" class="govuk-table__cell tier">
-    <%= male.tier %>
+  <td aria-label="Earliest release date" class="govuk-table__cell ">
+    <% if male.earliest_release.present? %>
+      <%= male.earliest_release[:type] %>: <br/>
+      <%= format_date(male.earliest_release[:date], replacement: "Unknown") %>
+    <% else %>
+      Unknown
+    <% end %>
   </td>
-  <td aria-label="Earliest release date" class="govuk-table__cell "><%= format_date(male.earliest_release_date, replacement: "Unknown") %></td>
+  <td aria-label="Tier" class="govuk-table__cell tier">
+    <strong><%= male.tier %></strong>
+  </td>
   <td aria-label="Allocation date" class="govuk-table__cell "><%= format_date(male.primary_pom_allocated_at.to_date) %></td>
-  <td aria-label="Role" class="govuk-table__cell "><%= pom_responsibility_label male %></td>
 </tr>

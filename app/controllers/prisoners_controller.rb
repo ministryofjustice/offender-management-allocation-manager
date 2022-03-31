@@ -3,7 +3,7 @@
 class PrisonersController < PrisonsApplicationController
   include Sorting
 
-  before_action :ensure_spo_user, except: [:show, :image]
+  before_action :ensure_spo_user, except: [:show, :image, :search]
 
   before_action :load_all_offenders, only: [:allocated, :missing_information, :unallocated, :new_arrivals, :search]
 
@@ -26,9 +26,10 @@ class PrisonersController < PrisonsApplicationController
   def search
     @q = search_term
     offenders = SearchService.search_for_offenders(@q, @prison.all_policy_offenders)
-    @offenders = get_slice_for_page(offenders)
-
+    @offenders, @user_allocations = get_slice_for_page(offenders, @current_user.staff_id)
     MetricsService.instance.increment_search_count
+
+    render @current_user.allocations.empty? ? 'search' : 'search_global'
   end
 
   def show
@@ -90,11 +91,18 @@ private
     @offenders = Kaminari.paginate_array(offenders).page(page)
   end
 
-  def get_slice_for_page(offender_list)
-    offenders = offender_list.map do |offender|
-      OffenderWithAllocationPresenter.new(offender, @prison.allocations.detect { |a| a.nomis_offender_id == offender.offender_no })
+  def get_slice_for_page(offender_list, user_id)
+    offenders = []
+    user_allocations = []
+    offender_list.map do |offender|
+      allocation = @prison.allocations.detect { |a| a.nomis_offender_id == offender.offender_no }
+      if !allocation.nil? && allocation.primary_pom_nomis_id == user_id
+        user_allocations.push OffenderWithAllocationPresenter.new(offender, allocation)
+      else
+        offenders.push OffenderWithAllocationPresenter.new(offender, allocation)
+      end
     end
-    Kaminari.paginate_array(offenders).page(page)
+    [Kaminari.paginate_array(offenders).page(page), Kaminari.paginate_array(user_allocations).page(page)]
   end
 
   def page

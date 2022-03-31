@@ -1,0 +1,33 @@
+<tr class="govuk-table__row offender_row_<%= caseload_counter %>">
+  <td aria-label="Prisoner name" class="govuk-table__cell">
+    <span class="prisoner-name">
+      <%= link_to(highlight(caseload.full_name, @q), prison_prisoner_path(@prison.code, caseload.offender_no) ) %>
+    </span>
+    <br/>
+    <span class='govuk-hint govuk-!-margin-bottom-0'>
+      <%= highlight(caseload.offender_no, @q) %>
+    </span>
+  </td>
+  <td aria-label="Role" class="govuk-table__cell "><%= caseload.allocated_pom_name %></td>
+  <td aria-label="Role" class="govuk-table__cell "><%= pom_responsibility_label caseload %></td>
+  <td aria-label="Location" class="govuk-table__cell">
+    <%= prisoner_location(caseload, location_only: true) %>
+  </td>
+  <% if @prison.womens? %>
+    <td aria-label="Complexity Level" class="govuk-table__cell">
+      <%= caseload.complexity_level.titleize %>
+    </td>
+  <% end %>
+  <td aria-label="Earliest release date" class="govuk-table__cell ">
+    <% if caseload.earliest_release.present? %>
+      <%= caseload.earliest_release[:type] %>: <br/>
+      <%= format_date(caseload.earliest_release[:date], replacement: "Unknown") %>
+    <% else %>
+      Unknown
+    <% end %>
+  </td>
+  <td aria-label="Tier" class="govuk-table__cell tier">
+    <strong><%= caseload.tier %></strong>
+  </td>
+  <td aria-label="Allocation date" class="govuk-table__cell "><%= format_date(caseload.allocation_date) %></td>
+</tr>

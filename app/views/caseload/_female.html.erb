@@ -10,11 +10,17 @@
     <%= prisoner_location(female, location_only: true) %>
   </td>
   <td aria-label="Tier" class="govuk-table__cell tier">
-    <%= female.tier %>
+    <strong><%= female.tier %></strong>
   </td>
   <td aria-label="Complexity Level" class="govuk-table__cell">
     <%= female.complexity_level.titleize %>
   </td>
-  <td aria-label="Earliest release date" class="govuk-table__cell "><%= format_date(female.earliest_release_date, replacement: "Unknown") %></td>
+  <td aria-label="Earliest release date" class="govuk-table__cell ">
+    <% if female.earliest_release.present? %>
+      <%= female.earliest_release[:type] %>: <br/>
+      <%= format_date(female.earliest_release[:date] , replacement: "Unknown") %>
+    <% else %>
+      Unknown
+    <% end %></td>
   <td aria-label="Role" class="govuk-table__cell "><%= pom_responsibility_label female %></td>
 </tr>

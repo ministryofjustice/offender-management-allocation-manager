@@ -58,19 +58,19 @@ RSpec.describe "poms/show", type: :view do
     let(:tabname) { 'overview' }
 
     it 'shows working pattern' do
-      expect(summary_rows.first).to have_content('Working pattern')
+      expect(summary_rows[3]).to have_content('Working pattern')
     end
 
     it 'shows last case allocated date' do
-      expect(summary_rows[2]).to have_content(two_days_ago.to_s(:rfc822))
+      expect(summary_rows.first).to have_content(two_days_ago.to_s(:rfc822))
     end
 
     it 'shows allocations in last 7 days' do
-      expect(summary_rows[3]).to have_content(2)
+      expect(summary_rows[1]).to have_content(2)
     end
 
     it 'shows releases due in next 4 weeks' do
-      expect(summary_rows[4]).to have_content(1)
+      expect(summary_rows[2]).to have_content(1)
     end
   end
 
@@ -84,24 +84,29 @@ RSpec.describe "poms/show", type: :view do
       row = page.css('td').map(&:text).map(&:strip)
       # The first column is offender name and number underneath each other - just grab the non-blank data
       split_col_zero = row.first.split("\n").map(&:strip).reject(&:empty?)
+      # remove new lines and repeating whitespace
+      row.each do |r|
+        r.delete!("\n")
+        r.squeeze!(" ")
+      end
       [split_col_zero] + row[1..]
     end
     let(:tabname) { 'caseload' }
     let(:offenders) { [offender] }
 
     it 'displays correct headers' do
-      expect(page.css('th a').map(&:text).map(&:strip)).to eq(["Case", "Location", "Tier", "Earliest release date", "Allocationdate", "Role"])
+      expect(page.css('th a').map(&:text).map(&:strip)).to eq(["Case", "Role", "Location", "Earliest release date", "Tier", "Allocation date"])
     end
 
     it 'displays correct data' do
       expect(first_offender_row)
         .to eq [
           [offender.full_name, case_info.nomis_offender_id],
+          "Co-working",
           offender.location,
+          "#{offender.earliest_release[:type]}: #{offender.earliest_release[:date].to_s(:rfc822)}",
           case_info.tier,
-          offender.earliest_release_date.to_s(:rfc822),
           Time.zone.today.to_s(:rfc822),
-          "Co-working"
         ]
     end
   end

@@ -1,4 +1,6 @@
 module ComplexityLevelHelper
+  COMPLEXITIES = { 'high' => 3, 'medium' => 2, 'low' => 1 }.freeze
+
   def display_complexity_change_info(previous_complexity_level:, updated_complexity_level:)
     if updated_complexity_level == 'high'
       render partial: 'complexity_levels/complexity_level_increase_to_high', locals: { previous_complexity_level: previous_complexity_level }

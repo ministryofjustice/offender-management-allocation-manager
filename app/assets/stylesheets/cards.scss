@@ -5,12 +5,24 @@
   border: 1px solid #d9dadb;
   position: relative;
   width: 100%;
-  padding: 25px
+  padding: 25px;
+
+  &--caseload {
+    @extend .card;
+    width: 85%;
+    padding: 15px 20px;
+  }
 }
 
 .card__heading {
   margin-top: 0;
-  margin-bottom: 15px
+  margin-bottom: 15px;
+
+  &--large {
+    @extend .card__heading;
+    font-size: 48px;
+    font-weight: 700;
+  }
 }
 
 .card__description {

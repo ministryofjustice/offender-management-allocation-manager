@@ -1,19 +1,43 @@
 # frozen_string_literal: true
 
 class CaseloadController < PrisonStaffApplicationController
-  before_action :ensure_signed_in_pom_is_this_pom, :load_pom
+  before_action :ensure_signed_in_pom_is_this_pom, :load_pom, :load_summary
 
-  def index
-    @new_cases_count = @pom.allocations.count(&:new_case?)
-    sorted_allocations = sort_allocations(filter_allocations(@pom.allocations))
-    @allocations = Kaminari.paginate_array(sorted_allocations).page(page)
+  def load_summary
+    @summary = {
+      all_prison_cases: @prison.allocations.all.count,
+      new_cases_count: @pom.allocations.count(&:new_case?),
+      total_cases: @pom.allocations.count,
+      last_seven_days: @pom.allocations.count { |a| a.primary_pom_allocated_at.to_date >= 7.days.ago },
+      release_next_four_weeks: @pom.allocations.count do |a|
+        a.earliest_release_date.present? &&
+          a.earliest_release_date.to_date <= 4.weeks.after && Date.current.beginning_of_day < a.earliest_release_date.to_date
+      end,
+      pending_handover_count: @pom.allocations.count(&:approaching_handover?),
+      pending_task_count: PomTasks.new.for_offenders(@pom.allocations).count
+    }
+  end
 
-    @pending_handover_count = @pom.allocations.count(&:approaching_handover?)
-    @pending_task_count = PomTasks.new.for_offenders(@pom.allocations).count
+  def cases
+    @recent_allocations = Kaminari.paginate_array(sort_allocations(filter_allocations(@pom.allocations).filter do |a|
+      a.primary_pom_allocated_at.to_date >= 7.days.ago
+    end)).page(page)
+
+    @upcoming_releases = Kaminari.paginate_array(sort_allocations(filter_allocations(@pom.allocations).filter do |a|
+      a.earliest_release_date.present? &&
+        a.earliest_release_date.to_date <= 4.weeks.after && Date.current.beginning_of_day < a.earliest_release_date.to_date
+    end)).page(page)
+
+    @allocations = Kaminari.paginate_array(sort_allocations(filter_allocations(@pom.allocations))).page(page)
   end
 
   def new_cases
     @new_cases = sort_allocations(@pom.allocations.select(&:new_case?))
+  end
+
+  def updates_required
+    sorted_tasks = PomTasks.new.for_offenders(@current_user.allocations)
+    @pom_tasks = Kaminari.paginate_array(sorted_tasks).page(page)
   end
 
 private

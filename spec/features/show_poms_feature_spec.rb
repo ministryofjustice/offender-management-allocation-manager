@@ -51,9 +51,9 @@ feature "get poms list" do
     expect(page).to have_content("Caseload")
 
     # click through the 'Total cases' link and make sure we arrive
-    expect(page).not_to have_content "Allocation\ndate"
-    first('.card-heading').click
-    expect(page).to have_content "Allocation\ndate"
+    expect(page).not_to have_content "Allocation date"
+    first('.card__heading--large').click
+    expect(page).to have_content "Allocation date"
   end
 
   describe 'sorting', vcr: { cassette_name: 'prison_api/show_poms_feature_view_sorting' } do

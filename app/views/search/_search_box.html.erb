@@ -1,12 +1,17 @@
-<div class="search-box govuk-grid-row">
-  <%= form_tag(search_prison_prisoners_path(@prison.code), method: :get, id: "search_form") do %>
-    <div class="govuk-form-group" style="display: inline;" >
-      <label class="govuk-label" for="q">
-        Enter a prisoner name or number
-      </label>
-      <input class="govuk-input" id="q" name="q" type="text" value="<%= @q %>" autofocus="true">
-
-      <input id="search-button" type="submit" class="govuk-button" value="    Search    "/>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-one-half">
+    <div class="moj-search govuk-!-margin-bottom-8">
+      <%= form_tag(search_prison_prisoners_path(@prison.code), method: :get, id: "search_form") do %>
+        <div class="govuk-form-group">
+          <label class="govuk-label moj-search__label govuk-!-font-weight-bold" for="search">
+            Find a case
+          </label>
+          <label for="q"></label><input class="govuk-input moj-search__input " id="q" name="q" type="search" aria-describedby="search-hint">
+        </div>
+        <button id="search-button" class="govuk-button moj-search__button " data-module="govuk-button">
+          Search
+        </button>
+      <% end %>
     </div>
-  <% end %>
+  </div>
 </div>

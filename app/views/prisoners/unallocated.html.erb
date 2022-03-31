@@ -87,7 +87,12 @@
           <%= prisoner_location(offender, location_only: true) %>
         </td>
         <td aria-label="Earliest release<br/>date" class="govuk-table__cell">
-          <%= format_date(offender.earliest_release_date, replacement: 'Unknown') %>
+          <% if offender.earliest_release.present? %>
+            <%= offender.earliest_release[:type] %>: <br/>
+            <%= format_date(offender.earliest_release[:date], replacement: "Unknown") %>
+          <% else %>
+            Unknown
+          <% end %>
         </td>
         <td aria-label="Case owner" class="govuk-table__cell">
           <%= case_owner_label(offender) %>

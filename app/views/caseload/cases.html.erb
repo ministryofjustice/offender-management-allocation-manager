@@ -1,0 +1,68 @@
+<%= render partial: 'layouts/caseload' %>
+<h2 class="govuk-heading-l">
+  Your cases
+</h2>
+<div class="govuk-tabs" data-module="govuk-tabs">
+  <h2 class="govuk-tabs__title">
+    Choose which cases you want to see
+  </h2>
+  <ul class="govuk-tabs__list">
+    <li class="govuk-tabs__list-item govuk-tabs__list-item">
+      <a class="govuk-tabs__tab" href="#all-cases">
+        <%= "All your cases (#{@summary.fetch(:total_cases)})"%>
+      </a>
+    </li>
+    <li class="govuk-tabs__list-item">
+      <a class="govuk-tabs__tab" href="#recent-allocations">
+        <%= "Allocated in last 7 days (#{@summary.fetch(:last_seven_days)})" %>
+      </a>
+    </li>
+    <li class="govuk-tabs__list-item">
+      <a class="govuk-tabs__tab" href="#upcoming-releases">
+        <%= "Releases in next 4 weeks (#{@summary.fetch(:release_next_four_weeks)})" %>
+      </a>
+    </li>
+  </ul>
+  <div class="govuk-tabs__panel" id="all-cases">
+    <% if @allocations.empty? %>
+      <p class="govuk-body">No cases allocated</p>
+    <% else %>
+      <%= render partial: 'shared/pagination', locals: {data: @allocations }  %>
+      <br />
+      <% if @prison.womens? %>
+        <%= render 'caseload_table', header_partial: 'female_headers', collection_partial: 'female', collection: @allocations %>
+      <% else %>
+        <%= render 'caseload_table', header_partial: 'male_headers', collection_partial: 'male', collection: @allocations %>
+      <% end %>
+      <%=  render partial: 'shared/pagination', locals: {data: @allocations }  %>
+    <% end %>
+  </div>
+  <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="recent-allocations">
+    <% if @recent_allocations.empty? %>
+      <p class="govuk-body">No cases allocated in last 7 days</p>
+    <% else %>
+      <%= render partial: 'shared/pagination', locals: {data: @recent_allocations }, url_params: { anchor: 'recent-allocations' }  %>
+      <br />
+      <% if @prison.womens? %>
+        <%= render 'caseload_table', header_partial: 'female_headers', collection_partial: 'female', collection: @recent_allocations, selected_filter: "recent-allocations" %>
+      <% else %>
+        <%= render 'caseload_table', header_partial: 'male_headers', collection_partial: 'male', collection: @recent_allocations, selected_filter: "recent-allocations" %>
+      <% end %>
+      <%= render partial: 'shared/pagination', locals: {data: @recent_allocations, url_params: { anchor: 'recent-allocations' } }  %>
+    <% end %>
+  </div>
+  <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="upcoming-releases">
+    <% if @upcoming_releases.empty? %>
+      <p class="govuk-body">No releases in next 4 weeks</p>
+    <% else %>
+      <%= render partial: 'shared/pagination', locals: {data: @upcoming_releases, url_params: { anchor: 'upcoming-releases' } }  %>
+      <br />
+      <% if @prison.womens? %>
+        <%= render 'caseload_table', header_partial: 'female_headers', collection_partial: 'female', collection: @upcoming_releases, selected_filter: "upcoming-releases" %>
+      <% else %>
+        <%= render 'caseload_table', header_partial: 'male_headers', collection_partial: 'male', collection: @upcoming_releases, selected_filter: "upcoming-releases" %>
+      <% end %>
+      <%= render partial: 'shared/pagination', locals: {data: @upcoming_releases, url_params: { anchor: 'upcoming-releases' } }  %>
+    <% end %>
+  </div>
+</div>

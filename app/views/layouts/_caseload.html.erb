@@ -1,0 +1,40 @@
+<% content_for :switcher do %>
+  <%= render 'layouts/prison_switcher' %>
+<% end %>
+<h2 class="govuk-heading-xl govuk-!-margin-bottom-6">Caseload</h2>
+<%= render "search/search_box" %>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <nav class="moj-sub-navigation" aria-label="Sub navigation">
+      <ul class="moj-sub-navigation__list">
+        <li class="moj-sub-navigation__item">
+          <%= link_to "Overview",
+                      { controller: :caseload },
+                      class: "moj-sub-navigation__link govuk-link--no-visited-state",
+                      aria: { current: current_page?(controller: :caseload, action: 'index') ? 'page' : '' } %>
+        </li>
+        <li class="moj-sub-navigation__item">
+          <%= link_to "Your cases (#{@summary.fetch(:total_cases)})",
+                      { controller: :caseload, action: :cases},
+                      class: "moj-sub-navigation__link govuk-link--no-visited-state",
+                      aria: { current: current_page?(controller: :caseload, action: 'cases') ? 'page' : '' }
+          %>
+        </li>
+        <li class="moj-sub-navigation__item">
+          <%= link_to "Case updates needed (#{@summary.fetch(:pending_task_count)})",
+                      { controller: :caseload, action: 'updates_required' },
+                      class: "moj-sub-navigation__link govuk-link--no-visited-state",
+                      aria: { current: current_page?(controller: :caseload, action: 'updates_required') ? 'page' : '' }
+          %>
+        </li>
+        <li class="moj-sub-navigation__item">
+          <%= link_to "All allocations in this prison (#{@summary.fetch(:all_prison_cases)})",
+                      { controller: :caseload_global },
+                      class: "moj-sub-navigation__link govuk-link--no-visited-state",
+                      aria: { current: current_page?(controller: :caseload_global) ? 'page' : '' }
+          %>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>

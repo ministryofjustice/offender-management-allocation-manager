@@ -1,0 +1,170 @@
+<% content_for :switcher do %>
+  <%= render '/layouts/prison_switcher' %>
+<% end %>
+
+<%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
+
+<h1 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-4"><%= "Search results for #{@q}" %></h1>
+
+<%= render 'search/search_box' %>
+
+<div class="govuk-tabs" data-module="govuk-tabs">
+  <ul class="govuk-tabs__list">
+    <li class="govuk-tabs__list-item">
+      <a class="govuk-tabs__tab" href="#caseload-results">
+        <%= @user_allocations.length %> result<%= 's' if @user_allocations.length != 1 %> from your caseload
+      </a>
+    </li>
+    <li class="govuk-tabs__list-item">
+      <a class="govuk-tabs__tab" href="#global-results">
+        <%= @offenders.length %> <%= 'more' if @user_allocations.length > 0 %>
+        result<%= 's' if @offenders.length != 1 %> from this prison
+      </a>
+    </li>
+  </ul>
+  <div class="govuk-tabs__panel" id="caseload-results">
+    <% if @user_allocations.blank? %>
+      <p>
+        Search again
+      </p>
+    <% else %>
+      <h2 class="govuk-heading-l"><%= @user_allocations.length %> result<%= 's' if @user_allocations.length != 1 %> from
+        your caseload</h2>
+      <%= render(
+            :partial => 'shared/pagination',
+            :locals => {
+              :data => @user_allocations,
+              :url_params => { anchor: 'caseload-results' }
+            }) %>
+
+      <table class="govuk-table responsive tablesorter govuk-!-margin-top-4">
+        <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th class="govuk-table__header" scope="col">Case</th>
+          <th class="govuk-table__header" scope="col">Role</th>
+          <th class="govuk-table__header sorter-false" scope="col">Location</th>
+          <th class="govuk-table__header sorter-false" scope="col">Earliest release date</th>
+          <th class="govuk-table__header sorter-false" scope="col">Tier</th>
+        </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+        <% @user_allocations.each_with_index do |offender, i| %>
+          <tr class="govuk-table__row allocated_offender_row_<%= i %>">
+            <td aria-label="Prisoner name" class="govuk-table__cell">
+              <%= link_to(highlight(offender.full_name, @q), prison_prisoner_allocation_path(@prison.code, prisoner_id: offender.offender_no)) %>
+              <br/><%= highlight(offender.offender_no, @q) %>
+            </td>
+            <td aria-label="POM role" class="govuk-table__cell"> <%= offender.probation_record.present? ? pom_responsibility_label(offender) : '-' %> </td>
+            <td aria-label="Location" class="govuk-table__cell"><%= highlight(offender.location, @q) %></td>
+            <td aria-label="Date of birth" class="govuk-table__cell">
+              <% if offender.earliest_release.present? %>
+                <%= offender.earliest_release[:type] %>: <br/>
+                <%= format_date(offender.earliest_release[:date], replacement: "Unknown") %>
+              <% else %>
+                Unknown
+              <% end %>
+            </td>
+            <td aria-label="Tier" class="govuk-table__cell"><%= probation_field(offender, :tier) || '-' %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+      <br/>
+      <%= render(
+            :partial => 'shared/pagination',
+            :locals => {
+              :data => @user_allocations,
+              :url_params => { anchor: 'caseload-results' }
+            }) %>
+    <% end %>
+
+  </div>
+  <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="global-results">
+    <% if @offenders.blank? %>
+      <p>
+        Search again
+      </p>
+    <% else %>
+      <h2 class="govuk-heading-l"><%= @offenders.length %> <%= 'more' if @user_allocations.length > 0 %>
+        result<%= 's' if @offenders.length != 1 %> from this prison</h2>
+      <%= render(
+            :partial => 'shared/pagination',
+            :locals => {
+              :data => @offenders,
+              :url_params => { anchor: 'global-results' }
+            }) %>
+
+      <table class="govuk-table responsive tablesorter govuk-!-margin-top-4">
+        <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th class="govuk-table__header" scope="col">Case</th>
+          <th class="govuk-table__header" scope="col">POM</th>
+          <th class="govuk-table__header" scope="col">POM role</th>
+          <th class="govuk-table__header sorter-false" scope="col">Location</th>
+          <th class="govuk-table__header sorter-false" scope="col">Earliest release date</th>
+          <th class="govuk-table__header sorter-false" scope="col">Tier</th>
+          <% if @is_spo %>
+            <th class="govuk-table__header" scope="col">Action</th>
+          <% end %>
+        </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+        <% @offenders.each_with_index do |offender, i| %>
+          <tr class="govuk-table__row allocated_offender_row_<%= i %>">
+            <td aria-label="Prisoner name" class="govuk-table__cell">
+              <% if @is_spo %>
+                <%= link_to(highlight(offender.full_name, @q), prison_prisoner_allocation_path(@prison.code, prisoner_id: offender.offender_no)) %>
+              <% else %>
+                <%= link_to(highlight(offender.full_name, @q), prison_prisoner_path(@prison.code, offender.offender_no)) %>
+              <% end %>
+              <br/><%= highlight(offender.offender_no, @q) %>
+            </td>
+            <td aria-label="POM" class="govuk-table__cell"><%= offender.allocated_pom_name || '-' %></td>
+            <td aria-label="POM role" class="govuk-table__cell"> <%= offender.probation_record.present? ? pom_responsibility_label(offender) : 'None allocated' %> </td>
+            <td aria-label="Location" class="govuk-table__cell"><%= offender.location %></td>
+            <td aria-label="Date of birth" class="govuk-table__cell">
+              <% if offender.earliest_release.present? %>
+                <%= offender.earliest_release[:type] %> : <br/>
+                <%= format_date(offender.earliest_release[:date], replacement: "Unknown") %>
+              <% else %>
+                Unknown
+              <% end %>
+            </td>
+            <td aria-label="Tier" class="govuk-table__cell"><%= probation_field(offender, :tier) || 'No tier found' %></td>
+            <% if @is_spo %>
+              <td aria-label="Action" class="govuk-table__cell">
+                <% if @missing_info.map(&:offender_no).include?(offender.offender_no) %>
+                  <%= link_to "Add missing details", prison_prisoner_new_missing_info_path(@prison.code, offender.offender_no) %>
+                <% elsif @unallocated.map(&:offender_no).include?(offender.offender_no) %>
+                  <%= link_to 'Allocate', prison_prisoner_staff_index_path(@prison.code, offender.offender_no) %>
+                <% elsif @new_arrivals.map(&:offender_no).include?(offender.offender_no) %>
+                  Wait
+                <% else %>
+                  -
+                <% end %>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+      <br/>
+      <%= render(
+            :partial => 'shared/pagination',
+            :locals => {
+              :data => @offenders,
+              :url_params => { anchor: 'global-results' }
+            }) %>
+
+    <% end %>
+
+  </div>
+</div>
+
+<% if @user_allocations.empty? %>
+  <script>
+      $(function () {
+          document.querySelector('#tab_global-results').click()
+      });
+  </script>
+<% end %>

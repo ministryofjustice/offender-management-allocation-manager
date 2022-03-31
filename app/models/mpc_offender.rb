@@ -7,7 +7,7 @@ class MpcOffender
            :sentence_start_date, :conditional_release_date, :automatic_release_date, :parole_eligibility_date,
            :tariff_date, :post_recall_release_date, :licence_expiry_date,
            :home_detention_curfew_actual_date, :home_detention_curfew_eligibility_date,
-           :prison_arrival_date, :earliest_release_date, :latest_temp_movement_date, :release_date,
+           :prison_arrival_date, :earliest_release_date, :earliest_release, :latest_temp_movement_date, :release_date,
            :date_of_birth, :main_offence, :awaiting_allocation_for, :location,
            :category_label, :complexity_level, :category_code, :category_active_since,
            :first_name, :last_name, :full_name_ordered, :full_name,

@@ -5,7 +5,7 @@
 # e.g. when fetching allocations
 #
 class AllocatedOffender
-  delegate :last_name, :full_name, :earliest_release_date, :approaching_handover?, :tariff_date, :release_date,
+  delegate :last_name, :full_name, :earliest_release_date, :earliest_release, :approaching_handover?, :tariff_date, :release_date,
            :indeterminate_sentence?, :prison_id, :parole_review_date,
            :handover_start_date, :responsibility_handover_date, :allocated_com_name, :case_allocation,
            :complexity_level, :offender_no, :sentence_start_date, :tier, :location, :latest_temp_movement_date, :restricted_patient?, to: :@offender
@@ -22,7 +22,7 @@ class AllocatedOffender
 
   # this is required for sorting only
   def complexity_level_number
-    COMPLEXITIES.fetch(complexity_level)
+    ComplexityLevelHelper::COMPLEXITIES.fetch(complexity_level)
   end
 
   def high_complexity?
