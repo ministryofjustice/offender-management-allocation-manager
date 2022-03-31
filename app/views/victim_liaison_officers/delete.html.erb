@@ -16,7 +16,7 @@ Contact details for the VLO <%= @vlo.full_name %> will be removed from the priso
              builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |f| %>
 
   <%= f.submit "Confirm", role: "button", draggable: "false", class: "govuk-button" %>
-  <%= link_to 'Cancel', @referrer, class: 'govuk-link cancel-button' %>
+  <%= link_to 'Cancel', 'javascript:history.back()', class: 'govuk-link cancel-button' %>
 
 <% end %>
 
