@@ -73,41 +73,4 @@ RSpec.describe "poms/show", type: :view do
       expect(summary_rows[2]).to have_content(1)
     end
   end
-
-  context 'when on the caseload tab' do
-    let(:case_info) { create(:case_information) }
-    let(:api_offender) { build(:hmpps_api_offender, prisonerNumber: case_info.nomis_offender_id) }
-    let(:offender) { build(:mpc_offender, prison_record: api_offender, offender: case_info.offender, prison: prison) }
-    let(:allocations) { [build(:allocation_history, nomis_offender_id: case_info.nomis_offender_id, secondary_pom_nomis_id: pom.staff_id)] }
-
-    let(:first_offender_row) do
-      row = page.css('td').map(&:text).map(&:strip)
-      # The first column is offender name and number underneath each other - just grab the non-blank data
-      split_col_zero = row.first.split("\n").map(&:strip).reject(&:empty?)
-      # remove new lines and repeating whitespace
-      row.each do |r|
-        r.delete!("\n")
-        r.squeeze!(" ")
-      end
-      [split_col_zero] + row[1..]
-    end
-    let(:tabname) { 'caseload' }
-    let(:offenders) { [offender] }
-
-    it 'displays correct headers' do
-      expect(page.css('th a').map(&:text).map(&:strip)).to eq(["Case", "Role", "Location", "Earliest release date", "Tier", "Allocation date"])
-    end
-
-    it 'displays correct data' do
-      expect(first_offender_row)
-        .to eq [
-          [offender.full_name, case_info.nomis_offender_id],
-          "Co-working",
-          offender.location,
-          "#{offender.earliest_release[:type]}: #{offender.earliest_release[:date].to_s(:rfc822)}",
-          case_info.tier,
-          Time.zone.today.to_s(:rfc822),
-        ]
-    end
-  end
 end

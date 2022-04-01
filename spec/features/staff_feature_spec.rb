@@ -108,6 +108,6 @@ feature "female estate POMs list" do
 
     click_link 'Caseload'
     # click on first prisoner name
-    first('td.govuk-table__cell > a').click
+    first('.govuk-table a:nth-child(1)').click
   end
 end

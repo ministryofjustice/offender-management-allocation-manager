@@ -39,8 +39,8 @@ feature "get poms list" do
     visit prison_pom_path('LEI', moic_pom_id)
     click_link 'Caseload'
 
-    expect(page).to have_css(".offender_row_0", count: 1)
-    expect(page).not_to have_css(".offender_row_1")
+    expect(page).to have_css("#all-cases .offender_row_0", count: 1)
+    expect(page).not_to have_css("#all-cases .offender_row_1")
     expect(page).to have_content(offender_missing_sentence_case_info.nomis_offender_id)
   end
 
@@ -53,7 +53,7 @@ feature "get poms list" do
     # click through the 'Total cases' link and make sure we arrive
     expect(page).not_to have_content "Allocation date"
     first('.card__heading--large').click
-    expect(page).to have_content "Allocation date"
+    expect(page).to have_content "All cases (0)"
   end
 
   describe 'sorting', vcr: { cassette_name: 'prison_api/show_poms_feature_view_sorting' } do
@@ -70,11 +70,11 @@ feature "get poms list" do
       expect(page).to have_content("Moic Pom")
       click_link 'Caseload'
       expect(page).to have_content("Caseload")
-      expect(page).to have_css('.sort-arrow', count: 1)
+      expect(page).to have_css('#all-cases .sort-arrow', count: 1)
 
       check_for_order = lambda { |names|
-        row0 = page.find(:css, '.offender_row_0')
-        row1 = page.find(:css, '.offender_row_1')
+        row0 = page.find(:css, '#all-cases .offender_row_0')
+        row1 = page.find(:css, '#all-cases .offender_row_1')
 
         within row0 do
           expect(page).to have_content(names[0])
@@ -86,7 +86,7 @@ feature "get poms list" do
       }
 
       check_for_order.call(['Abdoria, Ongmetain', 'Ahmonis, Imanjah'])
-      click_link('Case')
+      find('#all-cases').click_link('Case')
       check_for_order.call(['Ahmonis, Imanjah', 'Abdoria, Ongmetain'])
     end
 
@@ -101,10 +101,10 @@ feature "get poms list" do
       end
 
       it 'can sort' do
-        click_link 'Role'
-        expect(all('td[aria-label=Role]').map(&:text).uniq).to eq(['Co-working', 'Supporting'])
-        click_link 'Role'
-        expect(all('td[aria-label=Role]').map(&:text).uniq).to eq(['Supporting', 'Co-working'])
+        find('#all-cases').click_link 'Role'
+        expect(all('#all-cases td[aria-label=Role]').map(&:text).uniq).to eq(['Co-working', 'Supporting'])
+        find('#all-cases').click_link 'Role'
+        expect(all('#all-cases td[aria-label=Role]').map(&:text).uniq).to eq(['Supporting', 'Co-working'])
       end
     end
   end
