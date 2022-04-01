@@ -50,4 +50,46 @@ private
     allocations.reverse! if direction == :desc
     allocations
   end
+
+  def pom_allocations_summary
+    @recent_allocations = Kaminari.paginate_array(sort_allocations(filter_allocations(@pom.allocations).filter do |a|
+      a.primary_pom_allocated_at.to_date >= 7.days.ago
+    end)).page(page)
+
+    @upcoming_releases = Kaminari.paginate_array(sort_allocations(filter_allocations(@pom.allocations).filter do |a|
+      a.earliest_release_date.present? &&
+        a.earliest_release_date.to_date <= 4.weeks.after && Date.current.beginning_of_day < a.earliest_release_date.to_date
+    end)).page(page)
+
+    @allocations = Kaminari.paginate_array(sort_allocations(filter_allocations(@pom.allocations))).page(page)
+
+    @summary = {
+      all_prison_cases: @prison.allocations.all.count,
+      new_cases_count: @pom.allocations.count(&:new_case?),
+      total_cases: @pom.allocations.count,
+      last_seven_days: @pom.allocations.count { |a| a.primary_pom_allocated_at.to_date >= 7.days.ago },
+      release_next_four_weeks: @pom.allocations.count do |a|
+        a.earliest_release_date.present? &&
+          a.earliest_release_date.to_date <= 4.weeks.after && Date.current.beginning_of_day < a.earliest_release_date.to_date
+      end,
+      pending_handover_count: @pom.allocations.count(&:approaching_handover?),
+      pending_task_count: PomTasks.new.for_offenders(@pom.allocations).count
+    }
+  end
+
+  def filter_allocations(allocations)
+    if params['q'].present?
+      @q = params['q']
+      query = @q.upcase
+      allocations = allocations.select do |a|
+        a.full_name.upcase.include?(query) || a.nomis_offender_id.include?(query)
+      end
+    end
+    if params['role'].present?
+      allocations = allocations.select do |a|
+        view_context.pom_responsibility_label(a) == params['role']
+      end
+    end
+    allocations
+  end
 end

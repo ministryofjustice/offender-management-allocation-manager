@@ -13,7 +13,7 @@ class PomsController < PrisonStaffApplicationController
 
   def show
     @tab = params[:tab] || 'overview'
-    @allocations = sort_allocations(@pom.allocations)
+    pom_allocations_summary
   end
 
   # This is for the situation where the user is no longer a POM

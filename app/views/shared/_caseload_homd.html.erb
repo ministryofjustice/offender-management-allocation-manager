@@ -1,0 +1,32 @@
+<tr class="govuk-table__row offender_row_<%= caseload_homd_counter %>">
+  <td aria-label="Prisoner name" class="govuk-table__cell">
+    <span class="prisoner-name">
+       <%= link_to(highlight(caseload_homd.full_name, @q), prison_prisoner_allocation_path(@prison.code, caseload_homd.nomis_offender_id), class: "govuk-link") %>
+    </span>
+    <br/>
+    <span class='govuk-hint govuk-!-margin-bottom-0'>
+      <%= highlight(caseload_homd.nomis_offender_id, @q) %>
+    </span>
+  </td>
+  <td aria-label="Role" class="govuk-table__cell "><%= pom_responsibility_label caseload_homd %></td>
+  <td aria-label="Location" class="govuk-table__cell">
+    <%= prisoner_location(caseload_homd, location_only: true) %>
+  </td>
+  <% if @prison.womens? %>
+    <td aria-label="Complexity Level" class="govuk-table__cell">
+      <%= caseload_homd.complexity_level.titleize %>
+    </td>
+  <% end %>
+  <td aria-label="Earliest release date" class="govuk-table__cell ">
+    <% if caseload_homd.earliest_release.present? %>
+      <%= caseload_homd.earliest_release[:type] %>: <br/>
+      <%= format_date(caseload_homd.earliest_release[:date], replacement: "Unknown") %>
+    <% else %>
+      Unknown
+    <% end %>
+  </td>
+  <td aria-label="Tier" class="govuk-table__cell tier">
+    <strong><%= caseload_homd.tier %></strong>
+  </td>
+  <td aria-label="Allocation date" class="govuk-table__cell "><%= format_date(caseload_homd.primary_pom_allocated_at.to_date) %></td>
+</tr>
