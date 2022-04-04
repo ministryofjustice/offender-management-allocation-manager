@@ -22,6 +22,14 @@ class OffenderWithAllocationPresenter
     end
   end
 
+  # reverse order of surname, firstname stored within case-history model.
+  def formatted_pom_name
+    if @allocation
+      i = @allocation.primary_pom_name.index(',')
+      i.nil? ? nil : (@allocation.primary_pom_name[i + 2, @allocation.primary_pom_name.length - i] << ' ' << @allocation.primary_pom_name[0, i]).titleize
+    end
+  end
+
   def allocation_date
     if @allocation
       (@allocation.primary_pom_allocated_at || @allocation.updated_at)&.to_date

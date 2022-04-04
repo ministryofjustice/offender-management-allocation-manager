@@ -35,14 +35,14 @@
                      actions: ''
           %>
           <%= render 'govuk_summary_list_row',
-                     key: 'Number of allocations in past 7 days',
+                     key: 'Allocations in last 7 days',
                      value: @allocations.count(&:new_case?),
-                     actions: ''
+                     actions: link_to('View', prison_show_pom_tab_path(@prison.code, nomis_staff_id: @pom.staff_id, tab: 'caseload', anchor: 'recent-allocations'))
           %>
           <%= render 'govuk_summary_list_row',
-                     key: 'Cases due to be released in next 4 weeks',
+                     key: 'Releases in next 4 weeks',
                      value: @allocations.count { |a| a.release_date.present? && a.release_date <= Time.zone.today + 4.weeks },
-                     actions: ''
+                     actions: link_to('View', prison_show_pom_tab_path(@prison.code, nomis_staff_id: @pom.staff_id, tab: 'caseload', anchor: 'upcoming-releases'))
           %>
           <%= render 'govuk_summary_list_row',
                      key: 'Working pattern',

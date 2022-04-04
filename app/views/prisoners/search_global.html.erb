@@ -119,12 +119,12 @@
               <% end %>
               <br/><%= highlight(offender.offender_no, @q) %>
             </td>
-            <td aria-label="POM" class="govuk-table__cell"><%= offender.allocated_pom_name || '-' %></td>
+            <td aria-label="POM" class="govuk-table__cell"><%= offender.formatted_pom_name || 'None allocated' %></td>
             <td aria-label="POM role" class="govuk-table__cell"> <%= offender.probation_record.present? ? pom_responsibility_label(offender) : 'None allocated' %> </td>
             <td aria-label="Location" class="govuk-table__cell"><%= offender.location %></td>
             <td aria-label="Date of birth" class="govuk-table__cell">
               <% if offender.earliest_release.present? %>
-                <%= offender.earliest_release[:type] %> : <br/>
+                <%= offender.earliest_release[:type] %>: <br/>
                 <%= format_date(offender.earliest_release[:date], replacement: "Unknown") %>
               <% else %>
                 Unknown

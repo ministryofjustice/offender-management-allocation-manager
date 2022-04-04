@@ -9,12 +9,21 @@
       </li>
     <% end %>
     <% if @is_pom %>
-      <li class="moj-sub-navigation__item">
-        <a class="moj-sub-navigation__link" <%= 'aria-current=page' if active == :caseload_handovers %>
-           href="<%= prison_staff_caseload_handovers_path(@prison.code, @staff_id) %>">
-          See handover cases that you are allocated (<%= pending_handover_count %>)
-        </a>
-      </li>
+      <% if !@pom.nil? && @current_user.staff_id != @pom.staff_id %>
+        <li class="moj-sub-navigation__item">
+          <a class="moj-sub-navigation__link" <%= 'aria-current=page' if active == :caseload_handovers %>
+             href="<%= prison_staff_caseload_handovers_path(@prison.code, @pom.staff_id) %>">
+            See handover cases for <%= "#{@pom.first_name} #{@pom.last_name}" %> (<%= pending_handover_count %>)
+          </a>
+        </li>
+      <% else %>
+        <li class="moj-sub-navigation__item">
+          <a class="moj-sub-navigation__link" <%= 'aria-current=page' if active == :caseload_handovers %>
+             href="<%= prison_staff_caseload_handovers_path(@prison.code, @staff_id) %>">
+            See handover cases that you are allocated (<%= pending_handover_count %>)
+          </a>
+        </li>
+      <% end %>
     <% end %>
   </ul>
 </nav>

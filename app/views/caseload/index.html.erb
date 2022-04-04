@@ -37,7 +37,7 @@
                 Last case allocated
               </dt>
               <dd class="govuk-summary-list__value">
-                15 Aug 2021
+                <%= format_date(@summary.fetch(:last_allocated_date)) %>
               </dd>
               <dd class="govuk-summary-list__actions">
               </dd>
