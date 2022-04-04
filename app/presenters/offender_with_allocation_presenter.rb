@@ -44,4 +44,8 @@ class OffenderWithAllocationPresenter
   def high_complexity?
     complexity_level == 'high'
   end
+
+  def primary_pom_allocated_at
+    @allocation.primary_pom_allocated_at
+  end
 end
