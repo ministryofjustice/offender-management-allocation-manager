@@ -8,10 +8,5 @@
   <h2 class="govuk-heading-l">No new cases </h2>
 <% else %>
   <h2 class="govuk-heading-l">New cases</h2>
-
-  <% if @prison.womens? %>
-    <%= render 'caseload_table', header_partial: 'female_headers', collection_partial: 'female', collection: @new_cases %>
-  <% else %>
-    <%= render 'caseload_table', header_partial: 'male_headers', collection_partial: 'male', collection: @new_cases %>
-  <% end %>
-<% end  %>
+  <%= render 'shared/caseload_table', header_partial: 'shared/caseload_headers', collection_partial: 'shared/caseload', collection: @new_cases %>
+<% end %>

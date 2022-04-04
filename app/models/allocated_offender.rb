@@ -46,4 +46,8 @@ class AllocatedOffender
   def coworking?
     @allocation.secondary_pom_nomis_id == @staff_id
   end
+
+  def primary_pom_allocated_at
+    @allocation.primary_pom_allocated_at
+  end
 end
