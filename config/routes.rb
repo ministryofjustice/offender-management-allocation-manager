@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   ActiveAdmin.routes(self)
   root to: 'root#index'
 
-  get '/auth/:provider/callback', to: 'sessions#create'
+  get '/auth/hmpps_sso/callback', to: 'sessions#create'
   get '/signout', to: 'sessions#destroy'
 
   resources :prisons, only: [] do
@@ -15,12 +15,6 @@ Rails.application.routes.draw do
     resources :handovers, only: :index
     resources :staff do
       resources :caseload_handovers, only: %i[index]
-      #resources :caseload do
-      #  get 'new_cases'
-      #  get 'cases' => 'caseload#new_cases'
-      #  get 'updates_required'
-      #end
-
 
       get 'caseload' => 'caseload#index'
       get 'new_cases' => 'caseload#new_cases'

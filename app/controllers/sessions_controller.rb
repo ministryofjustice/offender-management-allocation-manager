@@ -1,11 +1,19 @@
 # frozen_string_literal: true
 
 class SessionsController < ApplicationController
+
   def create
-    identity = SignonIdentity.from_omniauth(request.env['omniauth.auth'])
+
+    if session[:oauth_state] != params[:state]
+      raise StandardError 'Invalid oauth state'
+    end
+
+    access_token = HmppsSso.get_token(params[:code])
+    identity = HmppsSso.get_session(access_token)
 
     if identity
       save_to_session(:sso_data, identity)
+      session.delete(:oauth_state)
       redirect_to session.delete(:redirect_path) || root_url
     else
       redirect_to root_url

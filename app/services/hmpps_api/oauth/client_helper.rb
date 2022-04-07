@@ -5,7 +5,7 @@ require 'base64'
 # :nocov:
 module HmppsApi
   module Oauth
-    module ClientHelper
+    module  ClientHelper
       def api_authorisation
         "Basic #{Base64.urlsafe_encode64(
           "#{Rails.configuration.hmpps_api_client_id}:#{Rails.configuration.hmpps_api_client_secret}"

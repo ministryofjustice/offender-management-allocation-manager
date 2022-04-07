@@ -9,7 +9,8 @@ class ApplicationController < ActionController::Base
   def authenticate_user
     if sso_identity.absent? || sso_identity.session_expired?
       session[:redirect_path] = request.original_fullpath
-      redirect_to '/auth/hmpps_sso'
+      session[:oauth_state] = [*'a'..'z', *0..9, *'A'..'Z'].sample(11).join
+      redirect_to HmppsSso.get_callback session[:oauth_state]
     else
       redirect_to '/401' unless sso_identity.allowed?
     end
@@ -47,7 +48,7 @@ class ApplicationController < ActionController::Base
   # Underlying principle: Never store complex objects in the session – they won't always re-hydrate as you expect.
   # Instead, only store JSON-safe primitives (i.e. Hash, Array, String, Number, Boolean, Nil) and re-hydrate them yourself.
   def save_to_session(key, record)
-    session[key] = record.attributes
+    session[key] = record.is_a?(Hash) ? record : record.attributes
   end
 
 private

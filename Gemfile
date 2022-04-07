@@ -22,7 +22,6 @@ gem 'lograge'
 gem 'logstash-event'
 # to enable custom log stats by writing logs directly
 gem 'logstash-logger'
-gem 'omniauth-oauth2'
 gem 'paper_trail'
 gem 'pg'
 gem 'puma', '~> 5.6.4'
@@ -106,3 +105,5 @@ group :development do
 end
 
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
+
+gem 'oauth2', '~> 1.4'

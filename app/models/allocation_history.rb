@@ -150,15 +150,6 @@ private
     # We only need the offender's name, so this is enough for us.
     offender = HmppsApi::PrisonApi::OffenderApi.get_offender(nomis_offender_id, ignore_legal_status: true)
 
-    mail_params = {
-      email: primary_pom.email_address,
-      pom_name: primary_pom.first_name.titleize,
-      offender_name: offender.full_name,
-      nomis_offender_id: nomis_offender_id,
-      prison_name: Prison.find(prison).name,
-      url: Rails.application.routes.default_url_options[:host] +
-            Rails.application.routes.url_helpers.prison_staff_caseload_path(prison, primary_pom_nomis_id)
-    }
     update!(
       event: event,
       event_trigger: event_trigger,
@@ -170,7 +161,14 @@ private
       recommended_pom_type: nil,
     )
 
-    PomMailer.offender_deallocated(mail_params).deliver_later
+    PomMailer.offender_deallocated(
+      email: primary_pom.email_address,
+      pom_name: primary_pom.first_name.titleize,
+      offender_name: offender.full_name,
+      nomis_offender_id: nomis_offender_id,
+      prison_name: Prison.find(prison).name,
+      url: Rails.application.routes.default_url_options[:host] + prison_staff_caseload_cases(prison, primary_pom_nomis_id)
+    ).deliver_later
   end
 
   def push_pom_to_community_api

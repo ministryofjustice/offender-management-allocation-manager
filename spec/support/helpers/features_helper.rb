@@ -13,9 +13,9 @@ module FeaturesHelper
 
   def stub_spo_user(pom)
     stub_request(:get, "#{ApiHelper::T3}/users/MOIC_POM")
-        .to_return(body: { 'staffId': pom.staff_id }.to_json)
+      .to_return(body: { 'staffId': pom.staff_id }.to_json)
     stub_request(:get, "#{ApiHelper::T3}/staff/#{pom.staff_id}/emails")
-        .to_return(body: pom.emails.to_json)
+      .to_return(body: pom.emails.to_json)
   end
 
   def signin_spo_pom_user(prisons = %w[LEI RSI], name = 'MOIC_POM')
@@ -31,13 +31,9 @@ module FeaturesHelper
   end
 
   def mock_sso_response(username, roles, prisons)
-    hmpps_sso_response = {
-      'info' => double('user_info', username: username, active_caseload: prisons.first, caseloads: prisons, roles: roles),
-      'credentials' => double('credentials', expires_at: Time.zone.local(2030, 1, 1).to_i,
-                                             'authorities': roles)
-    }
-
-    OmniAuth.config.add_mock(:hmpps_sso, hmpps_sso_response)
+    SsoIdentity.any_instance.stub(absent?: false, session_expired?: false, allowed?: true, current_user: username,
+                                  current_user_is_spo?: true, current_user_is_pom?: true, current_user_is_admin?: true,
+                                  default_prison_code: prisons.first, caseloads: prisons, roles: roles)
   end
 
   def stub_user(staff_id:, username: 'MOIC_POM')
