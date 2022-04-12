@@ -10,10 +10,10 @@
 <nav class="moj-sub-navigation" aria-label="Sub navigation">
   <ul class="moj-sub-navigation__list">
     <li class="moj-sub-navigation__item">
-      <% if @tab == 'caseload' %>
-        <%= link_to 'Overview', prison_show_pom_tab_path(@prison.code, @pom.staff_id, :overview), class: 'moj-sub-navigation__link' %>
-      <% else %>
+      <% if @tab == 'overview' %>
         <%= link_to 'Overview', prison_show_pom_tab_path(@prison.code, @pom.staff_id, :overview), class: 'moj-sub-navigation__link', aria: { current: "page" } %>
+      <% else %>
+        <%= link_to 'Overview', prison_show_pom_tab_path(@prison.code, @pom.staff_id, :overview), class: 'moj-sub-navigation__link' %>
       <% end %>
     </li>
     <li class="moj-sub-navigation__item">
@@ -23,11 +23,20 @@
         <%= link_to 'Caseload', prison_show_pom_tab_path(@prison.code, @pom.staff_id, :caseload), class: 'moj-sub-navigation__link' %>
       <% end %>
     </li>
+    <li class="moj-sub-navigation__item">
+      <% if @tab == 'parole' %>
+        <%= link_to 'Parole', prison_show_pom_tab_path(@prison.code, @pom.staff_id, :parole), class: 'moj-sub-navigation__link', aria: { current: "page" } %>
+      <% else %>
+        <%= link_to 'Parole', prison_show_pom_tab_path(@prison.code, @pom.staff_id, :parole), class: 'moj-sub-navigation__link' %>
+      <% end %>
+    </li>
   </ul>
 </nav>
 
 <% if @tab == 'caseload' %>
   <%= render 'caseload_tab' %>
+<% elsif @tab == 'parole'%>
+  <%= render 'parole_tab' %>
 <% else %>
   <%= render 'overview_tab' %>
 <% end %>

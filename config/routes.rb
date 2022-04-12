@@ -25,6 +25,7 @@ Rails.application.routes.draw do
       get 'caseload' => 'caseload#index'
       get 'new_cases' => 'caseload#new_cases'
       get 'caseload/cases' => 'caseload#cases'
+      get 'caseload/parole_cases' => 'caseload#parole_cases'
       get 'caseload/updates_required' => 'caseload#updates_required'
       get 'caseload/global' => 'caseload_global#index'
     end
