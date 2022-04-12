@@ -154,12 +154,12 @@ class MpcOffender
   end
 
   def approaching_parole?
-    return false unless @offender.parole_record.present?
+    return false if @offender.parole_record.blank?
 
     earliest_date = [
       tariff_date,
       parole_eligibility_date,
-      #target_hearing_date
+      # target_hearing_date
     ].compact.min
     earliest_date.present? && earliest_date <= Time.zone.today + 10.months
   end
