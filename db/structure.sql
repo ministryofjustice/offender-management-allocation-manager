@@ -611,8 +611,8 @@ ALTER SEQUENCE public.pom_details_id_seq OWNED BY public.pom_details.id;
 --
 
 CREATE TABLE public.prisons (
-    code character varying NOT NULL,
     prison_type character varying NOT NULL,
+    code character varying NOT NULL,
     name character varying NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL

@@ -18,7 +18,7 @@ class PomTasks
     end
 
     tasks = [
-      parole_review_date_task(offender)
+      target_hearing_date_task(offender)
     ].compact
 
     if early_allocations.include?(offender.offender_no)
@@ -28,15 +28,15 @@ class PomTasks
     tasks
   end
 
-  def parole_review_date_task(offender)
-    # Offender is indeterminate and their PRD is old or missing and their TED has expired
+  def target_hearing_date_task(offender)
+    # Offender is indeterminate and their THD is old or missing and their TED has expired
     if offender.indeterminate_sentence? &&
       (offender.tariff_date.blank? || offender.tariff_date < Time.zone.today) &&
-      (offender.parole_review_date.blank? || offender.parole_review_date < Time.zone.today)
+      (offender.target_hearing_date.blank? || offender.target_hearing_date < Time.zone.today)
       PomTaskPresenter.new offender_name: offender.full_name,
                            offender_number: offender.offender_no,
-                           action_label: 'Parole review date',
-                           long_label: 'Parole review date must be updated so handover dates can be calculated.'
+                           action_label: 'Target hearing date',
+                           long_label: 'Target hearing date must be updated so handover dates can be calculated.'
     end
   end
 
