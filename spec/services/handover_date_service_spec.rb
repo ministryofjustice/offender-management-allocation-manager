@@ -392,11 +392,11 @@ describe HandoverDateService do
         end
       end
 
-      it 'handover starts 8 months before TED/PED/PRD' do
+      it 'handover starts 8 months before TED/PED/THD' do
         expect(start_date).to eq(tariff_date - 8.months)
       end
 
-      it 'handover happens 8 months before TED/PED/PRD' do
+      it 'handover happens 8 months before TED/PED/THD' do
         expect(handover_date).to eq(tariff_date - 8.months)
       end
 
@@ -463,7 +463,7 @@ describe HandoverDateService do
             expect(start_date).to eq(offender.prison_arrival_date)
           end
 
-          it 'handover happens 8 months before TED/PED/PRD' do
+          it 'handover happens 8 months before TED/PED/THD' do
             expect(handover_date).to eq(tariff_date - 8.months)
           end
 
@@ -543,7 +543,7 @@ describe HandoverDateService do
               expect(start_date).to eq(offender.category_active_since)
             end
 
-            it 'handover happens 8 months before TED/PED/PRD' do
+            it 'handover happens 8 months before TED/PED/THD' do
               expect(handover_date).to eq(tariff_date - 8.months)
             end
 
@@ -575,7 +575,7 @@ describe HandoverDateService do
             expect(start_date).to eq(offender.prison_arrival_date)
           end
 
-          it 'handover happens 8 months before TED/PED/PRD' do
+          it 'handover happens 8 months before TED/PED/THD' do
             expect(handover_date).to eq(tariff_date - 8.months)
           end
 

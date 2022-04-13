@@ -569,7 +569,7 @@ describe HandoverDateService do
     end
   end
 
-  context 'with an NPS and indeterminate case with a PRD and no TED' do
+  context 'with an NPS and indeterminate case with a THD and no TED' do
     let(:case_info) { build(:case_information, :nps, offender: build(:offender, parole_record: build(:parole_record))) }
     let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
     let(:api_offender) do
@@ -578,8 +578,8 @@ describe HandoverDateService do
                                                           tariffDate: nil))
     end
 
-    it 'displays the handover date (which is 8 months prior to PRD) ' do
-      expect(described_class.handover(offender).handover_date).to eq(case_info.offender.parole_record.parole_review_date - 8.months)
+    it 'displays the handover date (which is 8 months prior to THD) ' do
+      expect(described_class.handover(offender).handover_date).to eq(case_info.offender.parole_record.target_hearing_date - 8.months)
     end
   end
 end
