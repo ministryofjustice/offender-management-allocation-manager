@@ -36,7 +36,7 @@
           %>
           <%= render 'govuk_summary_list_row',
                      key: 'Allocations in last 7 days',
-                     value: @summary.fetch(:new_cases_count),
+                     value: @summary.fetch(:last_seven_days),
                      actions: link_to('View', prison_show_pom_tab_path(@prison.code, nomis_staff_id: @pom.staff_id, tab: 'caseload', anchor: 'recent-allocations'))
           %>
           <%= render 'govuk_summary_list_row',
