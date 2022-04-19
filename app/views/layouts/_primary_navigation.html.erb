@@ -18,6 +18,7 @@
                        controllers: {caseload: [], tasks: [], prisoners: [:show], allocations: [:show]} %>
           <% end %>
           <% if @is_spo %>
+            <%= render 'layouts/controller_nav_link', text: 'Parole', path: prison_parole_index_path(@prison.code), controllers: {parole: []} %>
             <%= render 'layouts/controller_nav_link', text: 'Handover', path: prison_handovers_path(@prison.code), controllers: {handovers: [], caseload_handovers: []} %>
             <%= render 'layouts/controller_nav_link', text: 'Staff', path: prison_poms_path(@prison.code), controllers: {poms: []} %>
           <% else %>

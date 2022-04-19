@@ -1,0 +1,78 @@
+<% content_for :switcher do %>
+  <%= render '/layouts/prison_switcher' %>
+<% end %>
+
+<h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Parole cases</h1>
+<p>All cases in this prison with a target hearing date, PED or TED in the next 10 months.</p>
+
+<section id="approaching-parole">
+  <% if @offenders.empty? %>
+    <h2 class="govuk-heading-l">No cases approaching parole </h2>
+  <% else %>
+    <%= render(
+            :partial => 'shared/pagination',
+            :locals => {
+                :data => @offenders,
+            }) %>
+
+      <table class="govuk-table responsive tablesorter">
+        <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th class="govuk-table__header" scope="col">
+            <a href="<%= sort_link('last_name') %>">
+              Case
+            </a>
+            <%= sort_arrow('last_name') %>
+          </th>
+          <th class="govuk-table__header sorter-false" xscope="col">
+            <a href="<%= sort_link('allocated_pom_name') %>">
+              POM
+            </a>
+            <%= sort_arrow('allocated_pom_name') %>
+          </th>
+          <th class="govuk-table__header sorter-false" xscope="col">
+            <a href="<%= sort_link('allocated_pom_role') %>">
+              POM role
+            </a>
+            <%= sort_arrow('allocated_pom_role') %>
+          </th>
+          <th class="govuk-table__header sorter-false" xscope="col">
+            <a href="<%= sort_link('next_parole_date') %>">
+              Next parole date
+            </a>
+            <%= sort_arrow('next_parole_date') %>
+          </th>
+        </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+        <% @offenders.each_with_index do |offender, i| %>
+          <tr class="govuk-table__row offender_row_<%= i %>">
+            <td aria-label="Prisoner name" class="govuk-table__cell ">
+              <a href="<%= prison_prisoner_path(@prison.code, offender.offender_no) %>"><%= offender.full_name %></a>
+              <br/>
+              <span class='govuk-hint govuk-!-margin-bottom-0'>
+                <%= offender.offender_no %>
+              </span>
+            </td>
+            <td aria-label="POM" class="govuk-table__cell">
+              <%= offender.allocated_pom_name || "Not allocated" %>
+            </td>
+            <td aria-label="POM Role" class="govuk-table__cell">
+              <%= offender.allocated_pom_role %>
+            </td>
+            <td aria-label="Next parole date" class="govuk-table__cell">
+              <%= offender.next_parole_date %>
+            </td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+
+    <%= render(
+            :partial => 'shared/pagination',
+            :locals => {
+                :data => @offenders,
+            }) %>
+  <% end %>
+
+</section>
