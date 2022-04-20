@@ -47,6 +47,12 @@
 
   <div class="govuk-grid-row card-group">
     <%= render 'dashboard_partition',
+               title: "Parole cases",
+               link: prison_parole_index_path(@prison.code),
+               content: "All cases in the prison with a target hearing date, PED or TED in the next 10 months."
+    %>
+    
+    <%= render 'dashboard_partition',
                title: "See all allocated prisoners",
                link: allocated_prison_prisoners_path(@prison.code),
                content: "All prisoners who have been allocated to POMs."
@@ -84,6 +90,12 @@
   </div>
 
   <div class="govuk-grid-row card-group">
+    <%= render 'dashboard_partition',
+               title: 'Parole cases',
+               link: prison_staff_caseload_parole_cases_path(@prison.code, @staff_id),
+               content: 'Cases with a target hearing date, PED or TED in the next 10 months.'
+    %>
+    
     <%= render 'dashboard_partition',
                title: "Case updates needed",
                link: prison_tasks_path(@prison.code),
