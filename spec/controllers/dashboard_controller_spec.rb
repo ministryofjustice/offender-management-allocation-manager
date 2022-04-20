@@ -72,7 +72,6 @@ RSpec.describe DashboardController, type: :controller do
         expect(response.body).not_to have_content('Case updates needed')
         expect(response.body).not_to have_content('All allocations in this prison')
 
-
         expect(response.body).to have_content('All allocated cases')
         expect(response.body).to have_content('Make allocations')
         expect(response.body).to have_content('Add missing details')
