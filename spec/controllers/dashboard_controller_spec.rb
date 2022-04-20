@@ -35,17 +35,18 @@ RSpec.describe DashboardController, type: :controller do
         expect(assigns(:is_pom)).to be true
         expect(assigns(:is_spo)).to be false
 
-        expect(response.body).to have_content('See your caseload')
-        expect(response.body).to have_content('See new allocations')
-        expect(response.body).to have_content('See cases close to handover')
+        expect(response.body).to have_content('Your cases')
+        expect(response.body).to have_content('New allocations')
+        expect(response.body).to have_content('Cases close to handover')
         expect(response.body).to have_content('Case updates needed')
+        expect(response.body).to have_content('All allocations in this prison')
 
-        expect(response.body).not_to have_content('See all allocated prisoners')
-        expect(response.body).not_to have_content('Make new allocations')
-        expect(response.body).not_to have_content('Update case information')
-        expect(response.body).not_to have_content('Newly arrived')
+        expect(response.body).not_to have_content('All allocated cases')
+        expect(response.body).not_to have_content('Make allocations')
+        expect(response.body).not_to have_content('Add missing details')
+        expect(response.body).not_to have_content('Newly arrived cases')
         expect(response.body).not_to have_content('View all offender managers')
-        expect(response.body).not_to have_content('See case handover status')
+        expect(response.body).not_to have_content('All handover cases')
       end
     end
 
@@ -65,17 +66,18 @@ RSpec.describe DashboardController, type: :controller do
         expect(assigns(:is_pom)).to be false
         expect(assigns(:is_spo)).to be true
 
-        expect(response.body).not_to have_content('See your caseload')
-        expect(response.body).not_to have_content('See new allocations')
-        expect(response.body).not_to have_content('See cases close to handover')
+        expect(response.body).not_to have_content('Your cases')
+        expect(response.body).not_to have_content('New allocations')
+        expect(response.body).not_to have_content('Cases close to handover')
         expect(response.body).not_to have_content('Case updates needed')
+        expect(response.body).not_to have_content('All allocations in this prison')
 
-        expect(response.body).to have_content('See all allocated prisoners')
-        expect(response.body).to have_content('Make new allocations')
+        expect(response.body).to have_content('All allocated cases')
+        expect(response.body).to have_content('Make allocations')
         expect(response.body).to have_content('Add missing details')
-        expect(response.body).to have_content('Newly arrived')
+        expect(response.body).to have_content('Newly arrived cases')
         expect(response.body).to have_content('View all offender managers')
-        expect(response.body).to have_content('See case handover status')
+        expect(response.body).to have_content('All handover cases')
       end
 
       describe 'Make new allocations tab' do
@@ -96,7 +98,7 @@ RSpec.describe DashboardController, type: :controller do
             render_views
             it 'displays the number of cases that need to be allocated' do
               get :index, params: { prison_id: prison }
-              expect(response.body).to include 'You have 3 cases to allocate to POMs.'
+              expect(response.body).to include 'You have 3 cases to allocate.'
             end
           end
         end
@@ -134,7 +136,7 @@ RSpec.describe DashboardController, type: :controller do
             render_views
             it 'displays the number of cases that need to be allocated' do
               get :index, params: { prison_id: prison }
-              expect(response.body).to include 'You have 1 case to allocate to a POM.'
+              expect(response.body).to include 'You have 1 case to allocate.'
             end
           end
         end
@@ -153,7 +155,7 @@ RSpec.describe DashboardController, type: :controller do
             render_views
             it 'displays the number of cases that having missing details' do
               get :index, params: { prison_id: prison }
-              expect(response.body).to include 'You need to add missing details to 3 cases before they can be allocated to POMs.'
+              expect(response.body).to include 'Missing details need to be added to 3 cases before they can be allocated to POMs.'
             end
           end
         end
@@ -190,7 +192,7 @@ RSpec.describe DashboardController, type: :controller do
               render_views
               it 'displays the number of cases that having missing details' do
                 get :index, params: { prison_id: prison }
-                expect(response.body).to include 'You need to add missing details to 1 case before it can be allocated to a POM.'
+                expect(response.body).to include 'Missing details need to be added to 1 case before it can be allocated to a POM.'
               end
             end
           end
