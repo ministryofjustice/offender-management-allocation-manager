@@ -200,7 +200,7 @@ feature 'Allocation' do
 
     scenario 'removing a community override', vcr: { cassette_name: 'prison_api/allocation_remove_community_override' } do
       visit prison_dashboard_index_path('LEI')
-      click_link 'Make new allocations'
+      click_link 'Make allocations'
       find '.offender_row_0'
       within '.offender_row_0' do
         click_link unallocated_offender_name
