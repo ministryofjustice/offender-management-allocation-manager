@@ -4,5 +4,6 @@ class DashboardController < PrisonsApplicationController
   def index
     @unallocated_cases_count = @prison.unallocated.count
     @missing_details_cases_count = @prison.missing_info.count
+    @case_updates_needed_count = PomTasks.new.for_offenders(@current_user.allocations).count
   end
 end
