@@ -24,6 +24,17 @@ RSpec.describe "poms/show", type: :view do
                             offender)
     end)
 
+    assign(:summary, {
+      all_prison_cases: allocations.count,
+      new_cases_count: allocations.count,
+      total_cases: allocations.count,
+      last_seven_days: allocations.count { |a| a.primary_pom_allocated_at.to_date >= 7.days.ago },
+      release_next_four_weeks: 1,
+      pending_handover_count: offenders.count(&:approaching_handover?),
+      pending_task_count: 0,
+      last_allocated_date: allocations.max_by(&:primary_pom_allocated_at)&.primary_pom_allocated_at&.to_date
+    })
+
     render
   end
 

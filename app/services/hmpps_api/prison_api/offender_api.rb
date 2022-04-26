@@ -138,13 +138,23 @@ module HmppsApi
 
       def self.get_search_api_offenders_in_prison(prison_code)
         route = "/prisoner-search/prison/#{prison_code}"
+        page_num = 0
+        last_page = false
+        results = []
 
-        # Pagination was found to be faulty on this API endpoint (see Jira ticket DT-2719)
-        # So here we bypass pagination by asking for 10,000 results per page.
-        # There are only ever up to ~2000 offenders per prison, and this API seems happy to return them all at once.
-        # This endpoint also requires a "Content-Type: application/json" header even though it's a GET request with no body.
-        search_client.get(route, queryparams: { page: 0, size: 10_000, 'include-restricted-patients': true }, extra_headers: { 'Content-Type': 'application/json' })
-                     .fetch('content')
+        until last_page
+          r = search_client.get(
+            route,
+            queryparams: { page: page_num, size: 10_000, 'include-restricted-patients': true },
+            extra_headers: { 'Content-Type': 'application/json' }
+          )
+          # last should always indicate the last page of results, do perform manual check just to be safe
+          last_page = r.fetch('last') || page_num > r.fetch('totalPages')
+          page_num += 1
+          results.concat r.fetch('content')
+        end
+
+        results
       end
 
       def self.get_search_api_offenders(offender_nos)
