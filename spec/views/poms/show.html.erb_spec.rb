@@ -45,19 +45,19 @@ RSpec.describe "poms/show", type: :view do
     let!(:allocations) do
       [
         create(:allocation_history, prison: prison.code, nomis_offender_id: offender_nos.first,
-               primary_pom_nomis_id: pom.staff_id, primary_pom_allocated_at: Time.zone.today - 3.days),
+                                    primary_pom_nomis_id: pom.staff_id, primary_pom_allocated_at: Time.zone.today - 3.days),
         # Yes this line doesn't make sense. But the code cannot (easily/at all) work out the allocation date for co-working - so let's not try that hard until allocation data is fixed
         create(:allocation_history, prison: prison.code, nomis_offender_id: offender_nos.second,
-               secondary_pom_nomis_id: pom.staff_id, primary_pom_allocated_at: two_days_ago),
+                                    secondary_pom_nomis_id: pom.staff_id, primary_pom_allocated_at: two_days_ago),
 
         create(:allocation_history, prison: prison.code, nomis_offender_id: offender_nos.third,
-               primary_pom_nomis_id: pom.staff_id,
-               updated_at: Time.zone.today - 8.days, primary_pom_allocated_at: Time.zone.today - 8.days),
+                                    primary_pom_nomis_id: pom.staff_id,
+                                    updated_at: Time.zone.today - 8.days, primary_pom_allocated_at: Time.zone.today - 8.days),
 
         # add an allocation for an indeterminate with no release date
         create(:allocation_history, prison: prison.code, nomis_offender_id: offender_nos.fourth,
-               primary_pom_nomis_id: pom.staff_id,
-               updated_at: Time.zone.today - 8.days, primary_pom_allocated_at: Time.zone.today - 8.days)
+                                    primary_pom_nomis_id: pom.staff_id,
+                                    updated_at: Time.zone.today - 8.days, primary_pom_allocated_at: Time.zone.today - 8.days)
       ]
     end
     let(:api_one) { build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, releaseDate: Time.zone.today + 2.weeks)) }
