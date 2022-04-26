@@ -59,11 +59,11 @@
       </div>
       <div class="govuk-grid-column-one-third">
         <h3 class="govuk-heading-m govuk-!-margin-top-2">Case mix by tier</h3>
-        <%= case_mix_bar_by_tiers(@allocations) %>
-        <%= case_mix_vertical_by_tiers(@allocations) %>
+        <%= case_mix_bar_by_tiers(@pom.allocations) %>
+        <%= case_mix_vertical_by_tiers(@pom.allocations) %>
         <h3 class="govuk-heading-m">Case mix by POM role</h3>
-        <%= case_mix_bar_by_role(@allocations) %>
-        <%= case_mix_vertical_by_role(@allocations) %>
+        <%= case_mix_bar_by_role(@pom.allocations) %>
+        <%= case_mix_vertical_by_role(@pom.allocations) %>
       </div>
     </div>
   </div>
