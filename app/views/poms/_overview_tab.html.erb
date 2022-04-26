@@ -31,7 +31,7 @@
          Once we have sorted out the allocations into 2 separate types, this problem will just go away so it's not worth fixing until then -->
           <%= render 'govuk_summary_list_row',
                      key: 'Last case allocated',
-                     value: format_date(@allocations.max_by(&:primary_pom_allocated_at)&.primary_pom_allocated_at&.to_date),
+                     value: format_date(@pom.allocations.max_by(&:primary_pom_allocated_at)&.primary_pom_allocated_at&.to_date),
                      actions: ''
           %>
           <%= render 'govuk_summary_list_row',
