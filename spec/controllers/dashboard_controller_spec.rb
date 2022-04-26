@@ -173,7 +173,7 @@ RSpec.describe DashboardController, type: :controller do
             render_views
             it 'displays the number of cases that having missing details' do
               get :index, params: { prison_id: prison }
-              expect(response.body).to include 'None of your cases are missing information right now.'
+              expect(response.body).to include 'No cases are missing information right now.'
             end
           end
         end
