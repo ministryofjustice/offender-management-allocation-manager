@@ -17,35 +17,41 @@
 </div>
 
 <% if @is_spo %>
-  <h2 class="govuk-heading-m no-bottom-margin govuk-!-margin-top-3">Allocate a prisoner to an offender manager</h2>
+  <h2 class="govuk-heading-m no-bottom-margin govuk-!-margin-top-3">Allocate and manage cases</h2>
   <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-5">
   <div class="govuk-grid-row card-group">
     <%= render 'dashboard_partition',
-               title: "Make new allocations",
+               title: "Make allocations",
                link:  unallocated_prison_prisoners_path(@prison.code),
                content: display_content(@unallocated_cases_count,
                  no_cases: "You don’t have any cases to allocate currently.",
-                 one_case: "You have 1 case to allocate to a POM.",
-                 multiple_cases: "You have #{@unallocated_cases_count} cases to allocate to POMs.")
+                 one_case: "You have 1 case to allocate.",
+                 multiple_cases: "You have #{@unallocated_cases_count} cases to allocate.")
+    %>
+
+    <%= render 'dashboard_partition',
+               title: "All allocated cases",
+               link: allocated_prison_prisoners_path(@prison.code),
+               content: "Everyone who has been allocated to POMs in this prison."
     %>
 
     <%= render 'dashboard_partition',
                title: "Add missing details",
                link: missing_information_prison_prisoners_path(@prison.code),
                content: display_content(@missing_details_cases_count,
-                 no_cases: "None of your cases are missing information right now.",
-                 one_case: "You need to add missing details to 1 case before it can be allocated to a POM.",
-                 multiple_cases: "You need to add missing details to #{@missing_details_cases_count} cases before they can be allocated to POMs.")
-    %>
-
-    <%= render 'dashboard_partition',
-               title: "Newly arrived",
-               link: new_arrivals_prison_prisoners_path(@prison.code),
-               content: "Cases that have not yet been matched with NDelius records."
+                 no_cases: "No cases are missing information right now.",
+                 one_case: "Missing details need to be added to 1 case before it can be allocated to a POM.",
+                 multiple_cases: "Missing details need to be added to #{@missing_details_cases_count} cases before they can be allocated to POMs.")
     %>
   </div>
 
   <div class="govuk-grid-row card-group">
+    <%= render 'dashboard_partition',
+               title: "All handover cases",
+               link: prison_handovers_path(@prison.code),
+               content: "All cases coming up for handover in the next 30 days."
+    %>
+
     <%= render 'dashboard_partition',
                title: "Parole cases",
                link: prison_parole_index_path(@prison.code),
@@ -53,39 +59,45 @@
     %>
     
     <%= render 'dashboard_partition',
-               title: "See all allocated prisoners",
-               link: allocated_prison_prisoners_path(@prison.code),
-               content: "All prisoners who have been allocated to POMs."
+               title: "Newly arrived cases",
+               link: new_arrivals_prison_prisoners_path(@prison.code),
+               content: "Cases waiting to be matched with NDelius records before they can be allocated."
     %>
+  </div>
 
+  <h2 class="govuk-heading-m no-bottom-margin govuk-!-margin-top-3">Manage staff</h2>
+  <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-5">
+  <div class="govuk-grid-row card-group">
     <%= render 'dashboard_partition',
-               title: "See case handover status",
-               link: prison_handovers_path(@prison.code),
-               content: "Cases where responsibility is being handed over or is within 30 days of handover to the community probation team."
+               title: "View all POMs",
+               link: prison_poms_path(@prison.code),
+               content: "See what POMs are working on and change their availability."
     %>
+    <div class="govuk-grid-column-one-third"></div>
+    <div class="govuk-grid-column-one-third"></div>
   </div>
 <% end  %>
 
 <% if @is_pom %>
-  <h2 class="govuk-heading-m no-bottom-margin govuk-!-margin-top-3">Manage cases</h2>
+  <h2 class="govuk-heading-m no-bottom-margin govuk-!-margin-top-3">Caseload information</h2>
   <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-5">
   <div class="govuk-grid-row card-group">
     <%= render 'dashboard_partition',
-               title: "See your caseload",
+               title: "Your cases",
                link: prison_staff_caseload_path(@prison.code, @staff_id),
-               content: "All prisoners allocated to you."
+               content: "All cases allocated to you."
     %>
 
     <%= render 'dashboard_partition',
-               title: "See new allocations",
-               link: prison_staff_new_cases_path(@prison.code, @staff_id),
-               content: "Prisoners allocated to you in the last 7 days."
+               title: "New allocations",
+               link: prison_staff_caseload_cases_path(@prison.code, @staff_id, anchor: 'recent-allocations'),
+               content: "Cases allocated to you in the last 7 days."
     %>
 
     <%= render 'dashboard_partition',
-               title: "See cases close to handover",
+               title: "Cases close to handover",
                link: prison_staff_caseload_handovers_path(@prison.code, @staff_id),
-               content: "All cases coming up for handover to the community in the next 30 days."
+               content: "Your cases that need handing over in the next 30 days."
     %>
   </div>
 
@@ -98,23 +110,17 @@
     
     <%= render 'dashboard_partition',
                title: "Case updates needed",
-               link: prison_tasks_path(@prison.code),
-               content: "Update information so handover dates and community probation details are correct."
+               link: prison_staff_caseload_updates_required_path(@prison.code, @staff_id),
+               content: display_content(@case_updates_needed_count,
+                 no_cases: "You do not have any cases to update right now.",
+                 one_case: "Enter some information to ensure responsibility for this case is correct.",
+                 multiple_cases: "Enter some information to ensure responsibility for these cases is correct.")
     %>
 
-  </div>
-<% end %>
-
-<% if @is_spo %>
-  <h2 class="govuk-heading-m no-bottom-margin govuk-!-margin-top-3">Manage staff</h2>
-  <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-5">
-  <div class="govuk-grid-row card-group">
     <%= render 'dashboard_partition',
-               title: "View all offender managers",
-               link: prison_poms_path(@prison.code),
-               content: "Check and edit availability of offender managers."
+               title: "All allocations in this prison",
+               link: prison_staff_caseload_global_path(@prison.code, @staff_id),
+               content: "Cases allocated to all POMs."
     %>
-    <div class="govuk-grid-column-one-third"></div>
-    <div class="govuk-grid-column-one-third"></div>
   </div>
 <% end %>
