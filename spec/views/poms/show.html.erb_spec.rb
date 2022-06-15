@@ -24,6 +24,9 @@ RSpec.describe "poms/show", type: :view do
                             offender)
     end)
 
+    # stub POM offenders to prevent API call on the view
+    stub_offenders_for_prison(prison.code, [])
+
     assign(:summary, {
       all_prison_cases: allocations.count,
       new_cases_count: allocations.count,
