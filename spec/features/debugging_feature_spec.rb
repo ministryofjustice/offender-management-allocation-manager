@@ -16,7 +16,7 @@ feature 'Provide debugging information for our team to use' do
       fill_in 'offender_no', with: nomis_offender_id
       click_on('search-button')
 
-      expect(page).to have_css('tbody tr', count: 41)
+      expect(page).to have_css('tbody tr', count: 42)
       expect(page).to have_content("Not currently allocated")
     end
 
@@ -32,7 +32,7 @@ feature 'Provide debugging information for our team to use' do
       fill_in 'offender_no', with: nomis_offender_id
       click_on('search-button')
 
-      expect(page).to have_css('tbody tr', count: 46)
+      expect(page).to have_css('tbody tr', count: 47)
 
       pom_table_row = page.find(:css, 'tr.govuk-table__row#pom', text: 'POM')
 

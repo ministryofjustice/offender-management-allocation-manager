@@ -86,6 +86,11 @@
         <% end %>
       </td>
     </tr>
+    <tr class="govuk-table__row" id="restricted-patient">
+      <td class="govuk-table__cell">Restricted Patient Service</td>
+      <td class="govuk-table__cell table_cell__left_align">
+        <%= humanized_bool(@offender.restricted_patient?) %>
+    </tr>
     </tbody>
   </table>
 
