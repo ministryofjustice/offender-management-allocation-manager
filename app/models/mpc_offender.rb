@@ -17,7 +17,8 @@ class MpcOffender
            :tier,
            :mappa_level, :welsh_offender, to: :probation_record
 
-  delegate :victim_liaison_officers, to: :@offender
+  delegate :victim_liaison_officers, :current_parole_record, :previous_parole_records,
+           :build_parole_record_sections, to: :@offender
 
   # These fields make sense to be nil when the probation record is nil - the others dont
   delegate :ldu_email_address, :team_name, :ldu_name, to: :probation_record, allow_nil: true
@@ -29,6 +30,7 @@ class MpcOffender
     @offender = offender
     @prison_record = prison_record
     @probation_record = offender.case_information
+    offender.build_parole_record_sections
   end
 
   # TODO: - view method in model needs to be removed
@@ -154,11 +156,11 @@ class MpcOffender
   end
 
   def target_hearing_date
-    @offender.parole_record.target_hearing_date if @offender.parole_record.present?
+    @offender.current_parole_record.target_hearing_date if @offender.current_parole_record.present?
   end
 
   def approaching_parole?
-    return false if @offender.parole_record.blank?
+    return false if @offender.current_parole_record.blank?
 
     earliest_date = next_parole_date
     earliest_date.present? && earliest_date <= Time.zone.today + 10.months

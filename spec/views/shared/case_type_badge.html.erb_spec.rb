@@ -6,7 +6,7 @@ RSpec.describe "allocation_staff/index", type: :view do
   let(:case_type_badge) { page.css('#prisoner-case-type') }
   let(:recall_badge) { page.css('#recall-badge') }
   let(:parole_badge) { page.css('#parole-badge') }
-  let(:target_hearing_date) { page.css('#parole-review-date') }
+  let(:target_hearing_date_field) { page.css('#target-hearing-date') }
   let(:case_info) { build(:case_information) }
   let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
@@ -78,9 +78,18 @@ RSpec.describe "allocation_staff/index", type: :view do
 
   context "when there is a target hearing date" do
     let(:offender_no) { 'G7514GW' }
+    let(:target_hearing_date) { Time.zone.today - 6.months }
     let(:case_info) do
       build(:case_information, offender: build(:offender, nomis_offender_id: offender_no,
-                                                          parole_record: build(:parole_record, target_hearing_date: Date.new(2019, 0o1, 3).to_s)))
+                                                          parole_records: [
+                                                            build(
+                                                              :parole_record,
+                                                              target_hearing_date: target_hearing_date,
+                                                              review_status: 'Active',
+                                                              custody_report_due: Time.zone.today + 6.months,
+                                                              hearing_outcome: 'Not Specified'
+                                                            )
+                                                          ]))
     end
     let(:api_offender) do
       build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :indeterminate), prisonerNumber: offender_no)
@@ -88,7 +97,7 @@ RSpec.describe "allocation_staff/index", type: :view do
 
     it "displays an parole eligibility case type badge" do
       assert_you_have_an_indeterminate_badge
-      expect(target_hearing_date.text).to include '03 Jan 2019'
+      expect(target_hearing_date_field.text).to include format_date(target_hearing_date, replacement: 'N/A')
       assert_you_have_a_parole_eligibility_badge
     end
   end
@@ -105,7 +114,7 @@ RSpec.describe "allocation_staff/index", type: :view do
       expect(offender.tariff_date).to eq nil
       expect(offender.target_hearing_date).to eq nil
       expect(offender.parole_eligibility_date).to eq nil
-      expect(target_hearing_date.text).not_to include '01/03/2019'
+      expect(target_hearing_date_field.text).not_to include '01/03/2019'
       expect(parole_badge.text).not_to include 'Parole eligible'
     end
   end

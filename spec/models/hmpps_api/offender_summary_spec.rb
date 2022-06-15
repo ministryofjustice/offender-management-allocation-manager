@@ -73,7 +73,7 @@ describe HmppsApi::Offender do
     context 'when THD < 18 months' do
       let(:case_info) do
         build(:case_information, offender: build(:offender,
-                                                 parole_record: build(:parole_record, target_hearing_date: Time.zone.today + 17.months)))
+                                                 parole_records: [build(:parole_record, target_hearing_date: Time.zone.today + 17.months)]))
       end
       let(:api_offender) do
         build(:hmpps_api_offender,
@@ -91,7 +91,7 @@ describe HmppsApi::Offender do
     context 'when TED < 18 months' do
       let(:case_info) do
         build(:case_information, offender: build(:offender,
-                                                 parole_record: build(:parole_record, target_hearing_date: Time.zone.today + 24.months)))
+                                                 parole_records: [build(:parole_record, target_hearing_date: Time.zone.today + 24.months)]))
       end
       let(:api_offender) do
         build(:hmpps_api_offender,
@@ -110,7 +110,7 @@ describe HmppsApi::Offender do
     context 'when PED < 18 months' do
       let(:case_info) do
         build(:case_information, offender: build(:offender,
-                                                 parole_record: build(:parole_record, target_hearing_date: Time.zone.today + 24.months)))
+                                                 parole_records: [build(:parole_record, target_hearing_date: Time.zone.today + 24.months)]))
       end
       let(:api_offender) do
         build(:hmpps_api_offender,
