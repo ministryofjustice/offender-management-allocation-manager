@@ -101,7 +101,9 @@ module ApiHelper
     # Prison Search API
     stub_request(:get, "#{T3_SEARCH}/prisoner-search/prison/#{prison}").with(query: hash_including(:page, :size, 'include-restricted-patients'))
       .to_return(body: {
-        content: offenders.map { |o| search_api_response(o) }
+        content: offenders.map { |o| search_api_response(o) },
+        last: true,
+        totalPages: 1
       }.to_json)
 
     # Remove offenders with unwanted legal statuses – the following APIs are only called/stubbed for filtered offender IDs
