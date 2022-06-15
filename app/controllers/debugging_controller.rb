@@ -4,9 +4,9 @@ class DebuggingController < PrisonsApplicationController
   before_action :ensure_admin_user
 
   def debugging
-    nomis_offender_id = id
+    return unless id
 
-    prisoner = OffenderService.get_offender(nomis_offender_id) if nomis_offender_id.present?
+    prisoner = OffenderService.get_offender(id, ignore_legal_status: true)
 
     if prisoner.present?
       @offender = prisoner
