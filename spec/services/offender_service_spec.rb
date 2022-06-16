@@ -1,6 +1,28 @@
 require 'rails_helper'
 
 describe OffenderService, type: :feature do
+  describe '#get_offender (mocked API calls)' do
+    let(:offender_no) { "FAKENUMBER" }
+    let(:offender) { double :offender }
+    let(:api_offender) { double :api_offender, prison_id: "FAKE" }
+    let(:prison) { instance_double Prison, :prison }
+
+    before do
+      allow(Offender).to receive(:find_or_create_by)
+      allow(HmppsApi::PrisonApi::OffenderApi).to receive(:get_offender)
+      allow(Prison).to receive(:find_by)
+      allow(MpcOffender).to receive(:new)
+    end
+
+    it 'can ignore legal status when getting MOIC offender' do
+      allow(Offender).to receive(:find_or_create_by).and_return(offender)
+      described_class.get_offender(offender_no, ignore_legal_status: true)
+
+      expect(HmppsApi::PrisonApi::OffenderApi).to have_received(:get_offender).with(offender_no,
+                                                                                    ignore_legal_status: true)
+    end
+  end
+
   describe '#get_offender' do
     it "gets a single offender", vcr: { cassette_name: 'prison_api/offender_service_single_offender_spec' } do
       nomis_offender_id = 'G7266VD'
