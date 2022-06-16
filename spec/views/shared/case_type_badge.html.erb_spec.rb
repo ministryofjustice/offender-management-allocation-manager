@@ -104,7 +104,19 @@ RSpec.describe "allocation_staff/index", type: :view do
 
   context 'when parole eligibility (both TED and THD) and target hearing date are nil' do
     let(:offender_no) { 'G7514GW' }
-    let(:case_info) { build(:case_information, offender: build(:offender, nomis_offender_id: offender_no)) }
+    let(:target_hearing_date) { nil }
+    let(:case_info) do
+      build(:case_information, offender: build(:offender, nomis_offender_id: offender_no,
+                                                          parole_records: [
+                                                            build(
+                                                              :parole_record,
+                                                              target_hearing_date: target_hearing_date,
+                                                              review_status: 'Active',
+                                                              custody_report_due: Time.zone.today + 6.months,
+                                                              hearing_outcome: 'Not Specified'
+                                                            )
+                                                          ]))
+    end
     let(:api_offender) do
       build(:hmpps_api_offender, prisonerNumber: offender_no,
                                  sentence: attributes_for(:sentence_detail, :indeterminate, tariffDate: nil))
@@ -114,7 +126,7 @@ RSpec.describe "allocation_staff/index", type: :view do
       expect(offender.tariff_date).to eq nil
       expect(offender.target_hearing_date).to eq nil
       expect(offender.parole_eligibility_date).to eq nil
-      expect(target_hearing_date_field.text).not_to include '01/03/2019'
+      expect(target_hearing_date_field.text).to be_empty
       expect(parole_badge.text).not_to include 'Parole eligible'
     end
   end

@@ -7,25 +7,25 @@
     <% if @prisoner.tariff_date.present? %>
       <tr class="govuk-table__row">
         <td class="govuk-table__cell govuk-!-width-one-half">Tariff expiry date</td>
-        <td id='tariff-expiriy-date' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= format_date(@prisoner.tariff_date, replacement: 'N/A') %></td>
+        <td id='tariff-expiriy-date' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= format_date(@prisoner.tariff_date) %></td>
       </tr>
     <% end %>
     <% if @prisoner.current_parole_record.custody_report_due.present? %>
       <tr class="govuk-table__row">
         <td class="govuk-table__cell govuk-!-width-one-half">Custody report due</td>
-        <td id='custody-report-due' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= format_date(@prisoner.current_parole_record.custody_report_due, replacement: 'N/A') %></td>
+        <td id='custody-report-due' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= format_date(@prisoner.current_parole_record.custody_report_due) %></td>
       </tr>
     <% end %>
     <% if @prisoner.parole_eligibility_date.present? %>
       <tr class="govuk-table__row">
         <td class="govuk-table__cell govuk-!-width-one-half">Parole Eligibility Date</td>
-        <td id='parole-eligibility-date' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= format_date(@prisoner.parole_eligibility_date, replacement: 'N/A') %></td>
+        <td id='parole-eligibility-date' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= format_date(@prisoner.parole_eligibility_date) %></td>
       </tr>
     <% end %>
     <% if @prisoner.target_hearing_date.present? %>
       <tr class="govuk-table__row">
         <td class="govuk-table__cell govuk-!-width-one-half">Target hearing date</td>
-        <td id='target-hearing-date' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= format_date(@prisoner.target_hearing_date, replacement: 'N/A') %></td>
+        <td id='target-hearing-date' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= format_date(@prisoner.target_hearing_date) %></td>
       </tr>
     <% end %>
     <% if @prisoner.current_parole_record.hearing_outcome.present? %>
