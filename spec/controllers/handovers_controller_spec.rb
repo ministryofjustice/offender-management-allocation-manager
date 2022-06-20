@@ -1,11 +1,21 @@
 require 'rails_helper'
 
 RSpec.describe HandoversController, type: :controller do
-  let(:prison) { create(:prison).code }
+  let(:prison_code) { create(:prison).code }
 
-  before { stub_sso_data(prison) }
+  before { stub_sso_data(prison_code) }
 
-  context 'with 4 offenders' do
+  describe "index page" do
+    let(:default_params) { { new_handover: NEW_HANDOVER_TOKEN, prison_id: prison_code } }
+
+    it "redirects to upcoming handovers" do
+      get :index, params: default_params
+      expect(response).to redirect_to(upcoming_prison_handovers_path(**default_params))
+    end
+  end
+
+  context 'when legacy page with 4 offenders' do
+    let(:prison) { prison_code }
     let(:today_plus_10_days) { (Time.zone.today + 10.days).to_s }
     let(:today_plus_13_weeks) { (Time.zone.today + 13.weeks).to_s }
 

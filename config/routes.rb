@@ -12,7 +12,11 @@ Rails.application.routes.draw do
     resources :prisons, only: :index
 
     resources :dashboard, only: :index
-    resources :handovers, only: :index
+    resources :handovers, only: :index do
+      collection do
+        get :upcoming
+      end
+    end
     resources :staff do
       resources :caseload_handovers, only: %i[index]
       #resources :caseload do
