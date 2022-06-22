@@ -3,6 +3,8 @@
 class HandoversController < PrisonsApplicationController
   include Sorting
 
+  layout 'handovers'
+
   before_action :ensure_spo_user
 
   def index

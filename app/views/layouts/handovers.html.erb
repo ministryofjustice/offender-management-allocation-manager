@@ -1,0 +1,62 @@
+<% content_for :main_content do %>
+  <% content_for :switcher do %>
+    <%= render '/layouts/prison_switcher' %>
+  <% end %>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
+        Your handover cases
+      </h1>
+    </div>
+
+    <div class="govuk-grid-column-one-third">
+      <aside class="app-related-items" role="complementary">
+        <h3 class="govuk-heading-m">
+          More on handovers
+        </h3>
+
+        <ul class="govuk-list">
+          <li>
+            <a class="govuk-link govuk-link--no-visited-state" href="#">
+              View handover guidance on EQuiP
+            </a>
+          </li>
+          <li>
+            <a class="govuk-link govuk-link--no-visited-state" href="#">
+              Choose how often we send you emails to remind you about handovers
+            </a>
+          </li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <nav class="moj-sub-navigation" aria-label="Sub navigation">
+        <ul class='moj-sub-navigation__list'>
+          <% [
+               ['upcoming', 'Upcoming handovers (_)', upcoming_prison_handovers_path_shortcut],
+               ['in_progress', 'Handovers in progress (_)', '#'],
+               ['overdue_tasks', 'Overdue tasks (_)', '#'],
+               ['com_allocation_overdue', 'COM allocation overdue (_)', '#'],
+             ].each do |action, title, path|
+          %>
+            <li class="moj-sub-navigation__item">
+              <a class="moj-sub-navigation__link govuk-link--no-visited-state"
+                 <% if controller.action_name == action -%>aria-current="page"<% end -%>
+                 href="<%= path %>">
+                <%= title %>
+              </a>
+            </li>
+          <% end %>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <%= yield %>
+<% end %>
+
+<%= render template: "layouts/application" %>
