@@ -2,15 +2,44 @@ require 'rails_helper'
 
 RSpec.describe HandoversController, type: :controller do
   let(:prison_code) { create(:prison).code }
+  let(:default_params) { { new_handover: NEW_HANDOVER_TOKEN, prison_id: prison_code } }
+  let(:counts) { double :counts }
+  let(:upcoming) { double :upcoming }
+  let(:in_progress) { double :in_progress }
+  let(:overdue_tasks) { double :overdue_tasks }
+  let(:com_allocation_overdue) { double :com_allocation_overdue }
 
-  before { stub_sso_data(prison_code) }
+  before do
+    stub_sso_data(prison_code)
+    allow(HandoverOffender).to receive(:upcoming).and_return(upcoming)
+    allow(HandoverOffender).to receive(:in_progress).and_return(in_progress)
+    allow(HandoverOffender).to receive(:overdue_tasks).and_return(overdue_tasks)
+    allow(HandoverOffender).to receive(:com_allocation_overdue).and_return(com_allocation_overdue)
+    allow(HandoverOffender).to receive(:counts).and_return(counts)
+  end
 
-  describe "index page" do
-    let(:default_params) { { new_handover: NEW_HANDOVER_TOKEN, prison_id: prison_code } }
-
-    it "redirects to upcoming handovers" do
+  describe 'index page' do
+    it 'redirects to upcoming handovers' do
       get :index, params: default_params
       expect(response).to redirect_to(upcoming_prison_handovers_path(**default_params))
+    end
+  end
+
+  describe 'upcoming handovers page' do
+    before do
+      get :upcoming, params: default_params
+    end
+
+    it 'renders successfully' do
+      expect(response).to be_successful
+    end
+
+    it 'has counts' do
+      expect(assigns(:counts)).to eq counts
+    end
+
+    it 'has list of upcoming handover cases' do
+      expect(assigns(:upcoming)).to eq upcoming
     end
   end
 
