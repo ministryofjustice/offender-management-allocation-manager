@@ -5,7 +5,7 @@ class HandoversController < PrisonsApplicationController
 
   layout 'handovers'
 
-  before_action :ensure_spo_user
+  before_action :ensure_spo_user, :set_counts
 
   def index
     return legacy_index unless new_handovers_ui?
@@ -14,7 +14,7 @@ class HandoversController < PrisonsApplicationController
   end
 
   def upcoming
-    # TODO
+    @upcoming = HandoverOffender.upcoming
   end
 
 private
@@ -33,5 +33,9 @@ private
 
   def new_handovers_ui?
     params[:new_handover] == NEW_HANDOVER_TOKEN
+  end
+
+  def set_counts
+    @counts = HandoverOffender.counts
   end
 end
