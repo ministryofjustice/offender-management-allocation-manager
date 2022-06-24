@@ -74,7 +74,7 @@ private
     @unallocated = @prison.unallocated
     @new_arrivals = @prison.new_arrivals
     @allocated = @prison.allocated.map do |offender|
-      OffenderWithAllocationPresenter.new(offender, @prison.allocations.detect { |a| a.nomis_offender_id == offender.offender_no })
+      MpcOffenderWithAllocation.new(offender, @prison.allocations.detect { |a| a.nomis_offender_id == offender.offender_no })
     end
   end
 
@@ -97,9 +97,9 @@ private
     offender_list.map do |offender|
       allocation = @prison.allocations.detect { |a| a.nomis_offender_id == offender.offender_no }
       if !allocation.nil? && allocation.primary_pom_nomis_id == user_id
-        user_allocations.push OffenderWithAllocationPresenter.new(offender, allocation)
+        user_allocations.push MpcOffenderWithAllocation.new(offender, allocation)
       else
-        offenders.push OffenderWithAllocationPresenter.new(offender, allocation)
+        offenders.push MpcOffenderWithAllocation.new(offender, allocation)
       end
     end
     [Kaminari.paginate_array(offenders).page(page), Kaminari.paginate_array(user_allocations).page(page)]

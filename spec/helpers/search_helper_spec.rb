@@ -8,7 +8,7 @@ RSpec.describe SearchHelper do
       let(:api_offender) { build(:hmpps_api_offender) }
       let(:offender) do
         x = build(:mpc_offender, prison: prison, offender: build(:case_information, tier: 'A').offender, prison_record: api_offender)
-        OffenderWithAllocationPresenter.new(x, nil)
+        MpcOffenderWithAllocation.new(x, nil)
       end
       let(:expected_link) do
         link_to 'Allocate', prison_prisoner_staff_index_path('LEI', prisoner_id: offender.offender_no)
@@ -24,7 +24,7 @@ RSpec.describe SearchHelper do
       let(:api_offender) { build(:hmpps_api_offender) }
       let(:offender) do
         x = build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender)
-        OffenderWithAllocationPresenter.new(x, build(:allocation_history))
+        MpcOffenderWithAllocation.new(x, build(:allocation_history))
       end
 
       it "will change to view" do
