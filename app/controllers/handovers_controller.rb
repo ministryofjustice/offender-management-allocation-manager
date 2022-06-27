@@ -14,7 +14,7 @@ class HandoversController < PrisonsApplicationController
   end
 
   def upcoming
-    @upcoming = HandoverOffender.upcoming
+    @upcoming = handover_case_listing.upcoming
   end
 
 private
@@ -36,6 +36,10 @@ private
   end
 
   def set_counts
-    @counts = HandoverOffender.counts
+    @counts = handover_case_listing.counts
+  end
+
+  def handover_case_listing
+    @handover_case_listing ||= HandoverCaseListingService.new
   end
 end
