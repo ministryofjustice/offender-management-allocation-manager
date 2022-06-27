@@ -17,27 +17,13 @@ class PomTasks
       early_allocations = get_early_allocations([offender.offender_no])
     end
 
-    tasks = [
-      target_hearing_date_task(offender)
-    ].compact
+    tasks = []
 
     if early_allocations.include?(offender.offender_no)
       tasks << early_allocation_update_task(offender)
     end
 
     tasks
-  end
-
-  def target_hearing_date_task(offender)
-    # Offender is indeterminate and their THD is old or missing and their TED has expired
-    if offender.indeterminate_sentence? &&
-      (offender.tariff_date.blank? || offender.tariff_date < Time.zone.today) &&
-      (offender.target_hearing_date.blank? || offender.target_hearing_date < Time.zone.today)
-      PomTaskPresenter.new offender_name: offender.full_name,
-                           offender_number: offender.offender_no,
-                           action_label: 'Target hearing date',
-                           long_label: 'Target hearing date must be updated so handover dates can be calculated.'
-    end
   end
 
   def early_allocation_update_task(offender)

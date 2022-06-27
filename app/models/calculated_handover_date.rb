@@ -20,6 +20,8 @@ class CalculatedHandoverDate < ApplicationRecord
     nps_determinate_mappa_2_3: 'NPS Determinate Mappa 2/3',
     less_than_10_months_left_to_serve: 'Less than 10 months left to serve',
     pre_omic_rules: 'Pre-OMIC rules',
+    thd_within_12_months_of_hearing_outcome: 'Next parole hearing more than 12 months away',
+    thd_more_than_12_months_from_hearing_outcome: 'Next parole hearing under 12 months away',
   }.stringify_keys.freeze
 
   belongs_to :offender,

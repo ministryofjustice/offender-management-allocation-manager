@@ -45,6 +45,10 @@ class Offender < ApplicationRecord
     parole_records.max_by(&:custody_report_due)
   end
 
+  def most_recent_parole_record
+    parole_records.sort_by(&:custody_report_due).reverse.first
+  end
+
   def build_parole_record_sections
     @current_parole_record = nil
     @previous_parole_records = []

@@ -125,19 +125,6 @@ describe HandoverDateService do
       end
     end
 
-    context 'when indeterminate with dates in the past' do
-      let(:offender) do
-        OpenStruct.new indeterminate_sentence?: true,
-                       recalled?: false,
-                       tariff_date: Time.zone.today - 1.year,
-                       inside_omic_policy?: true
-      end
-
-      it 'is responsible' do
-        expect(pom).to be_responsible
-      end
-    end
-
     context 'when indeterminate with no tariff date' do
       let(:offender) do
         OpenStruct.new immigration_case?: false,
