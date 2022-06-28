@@ -28,7 +28,7 @@ private
     end
     offenders = sort_collection offenders_with_allocs, default_sort: :last_name
     @offenders = Kaminari.paginate_array(offenders).page(page)
-    render :legacy_index
+    render :legacy_index, layout: 'application'
   end
 
   def new_handovers_ui?
