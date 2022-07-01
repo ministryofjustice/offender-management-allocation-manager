@@ -149,6 +149,17 @@ class MpcOffender
     end
   end
 
+  def in_upcoming_handover_window?
+    # we can't calculate handover without case info as we don't know NPS/CRC
+    return false if @probation_record.blank?
+
+    start_date = handover_start_date
+
+    return false if start_date.nil?
+
+    (start_date - 8.weeks) <= Time.zone.now.to_date
+  end
+
   def parole_review_date
     @offender.parole_record.parole_review_date if @offender.parole_record.present?
   end

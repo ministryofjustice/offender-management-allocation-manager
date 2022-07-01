@@ -150,6 +150,41 @@
       </ul>
     </td>
   </tr>
+
+  <% upcoming_handovers.each do |handover_case| %>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">
+        <a class="govuk-link govuk-link--no-visited-state" data-sort-value="<%# TODO %>" href="#">
+          <%= handover_case.full_name %>
+        </a><br>
+        <span class="govuk-hint govuk-!-margin-bottom-0"><%= handover_case.offender_no %></span>
+      </td>
+
+      <td class="govuk-table__cell" data-sort-value="2021.09.11">COM responsible: <br>TODO</td>
+
+      <td class="govuk-table__cell" data-sort-value="2021.12.11">HDCED: <br>TODO</td>
+
+      <td class="govuk-table__cell" data-sort-value="D"><strong><%= handover_case.tier %></strong><br>TODO what does "STUFF (legacy)" meean?</td>
+
+      <td class="govuk-table__cell">
+        <ul class="govuk-list govuk-body-s task-summary-checklist">
+          <li class="none">
+            <img style="width:7%; padding-right: 5px;" src="<%= image_path('cross.png') %>" alt="task complete">
+            Have contact from COM
+          </li>
+          <li class="none">
+            <img style="width:7%; padding-right: 5px;" src="<%= image_path('cross.png') %>" alt="task not started">
+            Send handover report
+          </li>
+          <p class="govuk-!-margin-top-2">
+            <a class="govuk-link govuk-link--no-visited-state" href="./record-progress-crc.html" style="padding-left: 20px;">
+              Record progress
+            </a>
+          </p>
+        </ul>
+      </td>
+    </tr>
+  <% end %>
   </tbody>
 </table>
 
