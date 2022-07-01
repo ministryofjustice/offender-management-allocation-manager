@@ -5,7 +5,7 @@ class HandoversController < PrisonsApplicationController
 
   layout 'handovers'
 
-  before_action :ensure_spo_user, :set_counts
+  before_action :check_prerequisites_and_prepare_variables, except: :index
 
   def index
     return legacy_index unless new_handovers_ui?
@@ -14,12 +14,16 @@ class HandoversController < PrisonsApplicationController
   end
 
   def upcoming
-    @upcoming = handover_case_listing.upcoming
+    render locals: {
+      counts: @handover_case_listing.counts,
+      upcoming_handovers: @handover_case_listing.upcoming(@pom)
+    }
   end
 
 private
 
   def legacy_index
+    ensure_spo_user
     @pending_handover_count = @current_user.allocations.count(&:approaching_handover?)
     offender_list = @prison.offenders.select(&:approaching_handover?)
     allocations = @prison.allocations.where(nomis_offender_id: offender_list.map(&:offender_no))
@@ -35,11 +39,10 @@ private
     params[:new_handover] == NEW_HANDOVER_TOKEN
   end
 
-  def set_counts
-    @counts = handover_case_listing.counts
-  end
-
-  def handover_case_listing
-    @handover_case_listing ||= HandoverCaseListingService.new
+  def check_prerequisites_and_prepare_variables
+    ensure_pom
+    redirect_to '/401' unless new_handovers_ui?
+    @pom = StaffMember.new(@prison, @staff_id)
+    @handover_case_listing = HandoverCaseListingService.new
   end
 end
