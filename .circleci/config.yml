@@ -275,7 +275,7 @@ jobs:
           command: |
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/test/cron-*.yaml
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/test/deployment.yaml
-            kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
+            kubectl -n offender-management-test annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
             kubectl apply --record=false -f ./deploy/test
           environment:
             <<: *github_team_name_slug
