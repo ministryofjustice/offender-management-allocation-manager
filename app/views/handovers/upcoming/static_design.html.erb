@@ -1,0 +1,182 @@
+<h2 class="govuk-heading-l">
+  Upcoming handovers
+</h2>
+
+<p>A COM will be allocated in the next 8 weeks. Start getting ready to hand the case over to the community.</p>
+
+<nav class="moj-pagination" id="pagination-label">
+  <p class="govuk-visually-hidden" aria-labelledby="pagination-label">Pagination navigation</p>
+  <ul class="moj-pagination__list" style="padding-top: 15px; padding-bottom: 15px;">
+    <li class="moj-pagination__item  moj-pagination__item--prev">
+      <a class="moj-pagination__link" href="#" style="margin-left: -20px;">
+        Previous<span class="govuk-visually-hidden"> set of pages</span>
+      </a>
+    </li>
+
+    <li class="moj-pagination__item"><a class="moj-pagination__link" href="#">1</a></li>
+
+    <li class="moj-pagination__item moj-pagination__item--active">2</li>
+
+    <li class="moj-pagination__item"><a class="moj-pagination__link" href="#">3</a></li>
+
+    <li class="moj-pagination__item  moj-pagination__item--next">
+      <a class="moj-pagination__link" href="#">Next<span class="govuk-visually-hidden"> set of pages</span></a>
+    </li>
+  </ul>
+
+  <p class="moj-pagination__results" style="padding-top: 15px; padding-bottom: 15px;">
+    Showing <b>1</b> to <b>3</b> of <b>3</b> results
+  </p>
+</nav>
+
+<table class="govuk-table" data-module="moj-sortable-table">
+  <thead class="govuk-table__head">
+  <tr class="govuk-table__row">
+    <th scope="col" class="govuk-table__header" aria-sort="none">
+      <button type="button" data-index="0">Prisoner details</button>
+    </th>
+    <th scope="col" class="govuk-table__header" aria-sort="ascending">
+      <button type="button" data-index="1">COM responsible</button>
+    </th>
+    <th scope="col" class="govuk-table__header" aria-sort="none">
+      <button type="button" data-index="2">Earliest release date</button>
+    </th>
+    <th scope="col" class="govuk-table__header" aria-sort="none">
+      <button type="button" data-index="3">Tier</button>
+    </th>
+    <th scope="col" class="govuk-table__header" style="padding-left: 20px;">Handover progress</th>
+  </tr>
+  </thead>
+
+  <tbody class="govuk-table__body">
+  <tr class="govuk-table__row">
+    <td class="govuk-table__cell">
+      <a class="govuk-link govuk-link--no-visited-state" data-sort-value="Nguyễn" href="#">Nguyễn, Bảo</a><br>
+      <span class="govuk-hint govuk-!-margin-bottom-0"> G2911GD </span>
+    </td>
+
+    <td class="govuk-table__cell due-date" data-sort-value="2021.07.28">
+      <span class="date highlight" data-sort-value="2021.07.28">COM responsible: <br>28 Jul 2021</span>
+      <span class="secondary highlight">Handover due soon</span>
+    </td>
+
+    <td class="govuk-table__cell" data-sort-value="2021.03.28">TED: <br>28 Mar 2022</td>
+
+    <td class="govuk-table__cell" data-sort-value="B"><strong>B</strong><br>NPS (legacy)</td>
+
+    <td class="govuk-table__cell">
+      <ul class="govuk-list govuk-body-s task-summary-checklist">
+        <li class="none">
+          <img style="width:7%; padding-right: 5px;" src="<%= image_path('check.png') %>" alt="task complete">
+          Review OASys
+        </li>
+        <li class="none">
+          <img style="width:7%; padding-right: 5px;" src="<%= image_path('cross.png') %>" alt="task not started">
+          Have contact from COM
+        </li>
+        <li class="none">
+          <img style="width:7%; padding-right: 5px;" src="<%= image_path('cross.png') %>" alt="task not started">
+          Attend handover meeting
+        </li>
+        <p class="govuk-!-margin-top-2">
+          <a class="govuk-link govuk-link--no-visited-state" href="#" style="padding-left: 20px;">
+            Record progress
+          </a>
+        </p>
+      </ul>
+    </td>
+  </tr>
+
+  <tr class="govuk-table__row">
+    <td class="govuk-table__cell">
+      <a class="govuk-link govuk-link--no-visited-state" data-sort-value="Dalton" href="#">Dalton, Shane</a><br>
+      <span class="govuk-hint govuk-!-margin-bottom-0"> G2911GD </span>
+    </td>
+
+    <td class="govuk-table__cell" data-sort-value="2021.09.11">COM responsible: <br>11 Sep 2021</td>
+
+    <td class="govuk-table__cell" data-sort-value="2021.12.11">HDCED: <br>11 Dec 2021</td>
+
+    <td class="govuk-table__cell" data-sort-value="D"><strong>D</strong><br>CRC (legacy)</td>
+
+    <td class="govuk-table__cell">
+      <ul class="govuk-list govuk-body-s task-summary-checklist">
+        <li class="none">
+          <img style="width:7%; padding-right: 5px;" src="<%= image_path('cross.png') %>" alt="task complete">
+          Have contact from COM
+        </li>
+        <li class="none">
+          <img style="width:7%; padding-right: 5px;" src="<%= image_path('cross.png') %>" alt="task not started">
+          Send handover report
+        </li>
+        <p class="govuk-!-margin-top-2">
+          <a class="govuk-link govuk-link--no-visited-state" href="./record-progress-crc.html" style="padding-left: 20px;">
+            Record progress
+          </a>
+        </p>
+      </ul>
+    </td>
+  </tr>
+
+  <tr class="govuk-table__row">
+    <td class="govuk-table__cell">
+      <a class="govuk-link govuk-link--no-visited-state" data-sort-value="Robinson" href="#">Robinson, Jack</a><br>
+      <span class="govuk-hint govuk-!-margin-bottom-0"> G2911GD </span></td>
+    <td class="govuk-table__cell" data-sort-value="2021.12.06">COM allocated: <br>06 Sep 2021<br>
+      <p style="padding-top: 10px;">COM responsible: <br>06 Dec 2021</p></td>
+    <td class="govuk-table__cell" data-sort-value="2021.04.23">CRD: <br>23 Apr 2022</td>
+    <td class="govuk-table__cell" data-sort-value="A"><strong>A</strong><br>NPS (legacy)</td>
+    <td class="govuk-table__cell">
+
+      <ul class="govuk-list govuk-body-s task-summary-checklist">
+        <li class="none">
+          <img style="width:7%; padding-right: 5px;" src="<%= image_path('check.png') %>" alt="task complete">
+          Review OASys
+        </li>
+        <li class="none">
+          <img style="width:7%; padding-right: 5px;" src="<%= image_path('cross.png') %>" alt="task not started">
+          Have contact from COM
+        </li>
+        <li class="none">
+          <img style="width:7%; padding-right: 5px;" src="<%= image_path('cross.png') %>" alt="task not started">
+          Attend handover meeting
+        </li>
+        <p class="govuk-!-margin-top-2">
+          <a class="govuk-link govuk-link--no-visited-state" href="./record-progress-nps.html" style="padding-left: 20px;">
+            Record
+            progress
+          </a>
+        </p>
+      </ul>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+
+<nav class="moj-pagination" id="pagination-label">
+
+  <p class="govuk-visually-hidden" aria-labelledby="pagination-label">Pagination navigation</p>
+
+  <ul class="moj-pagination__list">
+    <li class="moj-pagination__item  moj-pagination__item--prev">
+      <a class="moj-pagination__link" href="#" style="margin-left: -20px;">
+        Previous<span class="govuk-visually-hidden"> set of pages</span>
+      </a>
+    </li>
+
+    <li class="moj-pagination__item"><a class="moj-pagination__link" href="/page=1">1</a></li>
+
+    <li class="moj-pagination__item moj-pagination__item--active">2</li>
+
+    <li class="moj-pagination__item"><a class="moj-pagination__link" href="/page=3">3</a></li>
+
+    <li class="moj-pagination__item  moj-pagination__item--next">
+      <a class="moj-pagination__link" href="#">Next<span class="govuk-visually-hidden"> set of pages</span></a>
+    </li>
+  </ul>
+  <p class="moj-pagination__results">Showing <b>1</b> to <b>3</b> of <b>3</b> results</p>
+</nav>
+
+<div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>
+<div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>
