@@ -72,6 +72,26 @@ The first time you run the specs you'll need to record the VCR cassettes:
 VCR=1 bundle exec rspec
 ```
 
+## Deploying to preprod and test
+
+preprod and test are deployed environments that can be used as part of the development process. Their purposes are:
+
+* preprod - Contains a copy of live data, updated via a script. Only security-cleared personnel can look at it. Deploy
+  here when you need to check WIP code against real data.
+* test - Points to the same database as the dev/staging environment, but does not need code to be mainlined to be
+  deployed to. Just like dev/staging, contains synthetic data so does not require SC to access.
+  Deploy here when you need to check WIP code that requires valid NOMIS data.
+
+The method to deploy to both branches is the same. Check any code to be deployed to a local branch, and run:
+
+```
+# Test environment
+git push --force origin HEAD:test
+
+# Preprod environment
+git push --force origin HEAD:preprod
+```
+
 ## Environment Variables
 
 Several environment variables are required for the operation of this service.
