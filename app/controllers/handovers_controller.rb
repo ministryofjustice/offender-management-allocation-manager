@@ -14,6 +14,11 @@ class HandoversController < PrisonsApplicationController
   end
 
   def upcoming
+    if params[:static_design]
+      render 'handovers/upcoming/static_design'
+      return
+    end
+
     render locals: {
       counts: @handover_case_listing.counts,
       upcoming_handovers: @handover_case_listing.upcoming(@pom)
