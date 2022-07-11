@@ -19,10 +19,8 @@ class HandoversController < PrisonsApplicationController
       return
     end
 
-    render locals: {
-      counts: @handover_case_listing.counts,
-      upcoming_handovers: @handover_case_listing.upcoming(@pom)
-    }
+    @counts = @handover_case_listing.counts
+    @upcoming_handovers = @handover_case_listing.upcoming(@pom)
   end
 
 private
