@@ -12,8 +12,8 @@ class RepushAllHandoverDatesToDeliusJob < ApplicationJob
         handover_date = Offender.find(offender.offender_no).calculated_handover_date
         begin
           PushHandoverDatesToDeliusJob.perform_now(handover_date)
-          rescue StandardError => e
-          p e.message
+        rescue StandardError => e
+          Rails.logger.error e.message
         end
       end
     end
