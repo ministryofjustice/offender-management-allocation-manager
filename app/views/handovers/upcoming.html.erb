@@ -38,11 +38,15 @@
       <td class="govuk-table__cell" data-sort-value="2021.12.11">HDCED: <br>TODO</td>
 
       <td class="govuk-table__cell" data-sort-value="D">
-        <strong><%= handover_case.tier %></strong><br>TODO what does "STUFF (legacy)" meean?
+        <strong><%= handover_case.tier %></strong><br>XXX (legacy)
       </td>
 
       <td class="govuk-table__cell">
         <ul class="govuk-list govuk-body-s task-summary-checklist">
+          <li class="none">
+            <img style="width:7%; padding-right: 5px;" src="<%= image_path('check.png') %>" alt="task complete">
+            Review OASys
+          </li>
           <li class="none">
             <img style="width:7%; padding-right: 5px;" src="<%= image_path('cross.png') %>" alt="task complete">
             Have contact from COM
