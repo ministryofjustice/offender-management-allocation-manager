@@ -20,7 +20,7 @@ class HandoversController < PrisonsApplicationController
     end
 
     @counts = @handover_case_listing.counts
-    @upcoming_handovers = @handover_case_listing.upcoming(@pom)
+    @upcoming_handover_allocated_offenders = @handover_case_listing.upcoming_handover_allocated_offenders(@pom)
   end
 
 private

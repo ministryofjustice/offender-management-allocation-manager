@@ -7,7 +7,7 @@ RSpec.describe HandoversController, type: :controller do
   let(:handover_case_listing) do
     instance_double HandoverCaseListingService, :handover_case_listing,
                     counts: double(:counts),
-                    upcoming: double(:upcoming),
+                    upcoming_handover_allocated_offenders: double(:upcoming_handover_allocated_offenders),
                     in_progress: double(:in_progress),
                     overdue_tasks: double(:overdue_tasks),
                     com_allocation_overdue: double(:com_allocation_overdue)
@@ -40,7 +40,7 @@ RSpec.describe HandoversController, type: :controller do
     end
 
     it 'has list of upcoming handover cases' do
-      expect(assigns(:upcoming)).to eq handover_case_listing.upcoming
+      expect(assigns(:upcoming_handover_allocated_offenders)).to eq handover_case_listing.upcoming_handover_allocated_offenders
     end
   end
 

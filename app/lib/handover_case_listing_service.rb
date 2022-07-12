@@ -3,7 +3,7 @@ class HandoverCaseListingService
     # TODO
   end
 
-  def upcoming(pom)
+  def upcoming_handover_allocated_offenders(pom)
     # collection = sort_collection(@pom.allocations.select(&:approaching_handover?), default_sort: :last_name)
     #
     # @offenders = Kaminari.paginate_array(collection).page(page)

@@ -24,21 +24,25 @@
   </thead>
 
   <tbody class="govuk-table__body">
-  <% @upcoming_handovers.each do |handover_case| %>
+  <% @upcoming_handover_allocated_offenders.each do |allocated_offender| %>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">
-        <a class="govuk-link govuk-link--no-visited-state" data-sort-value="<%# TODO %>" href="#">
-          <%= handover_case.full_name %>
+        <a class="govuk-link govuk-link--no-visited-state" data-sort-value="<%# TODO Surname %>" href="#">
+          <%= allocated_offender.full_name %>
         </a><br>
-        <span class="govuk-hint govuk-!-margin-bottom-0"><%= handover_case.offender_no %></span>
+        <span class="govuk-hint govuk-!-margin-bottom-0"><%= allocated_offender.offender_no %></span>
       </td>
 
-      <td class="govuk-table__cell" data-sort-value="2021.09.11">COM responsible: <br>TODO</td>
+      <% com_r_date = allocated_offender.handover_start_date %>
+      <td class="govuk-table__cell" data-sort-value="<%= com_r_date.strftime('%Y.%m.%d') %>">
+        COM responsible: <br>
+        <%= format_date(com_r_date, replacement: "Unknown") %>
+      </td>
 
-      <td class="govuk-table__cell" data-sort-value="2021.12.11">HDCED: <br>TODO</td>
+      <td class="govuk-table__cell" data-sort-value="2021.12.11">TODO: <br>TODO</td>
 
-      <td class="govuk-table__cell" data-sort-value="D">
-        <strong><%= handover_case.tier %></strong><br>XXX (legacy)
+      <td class="govuk-table__cell" data-sort-value="<%= allocated_offender.case_allocation %>">
+        <strong><%= allocated_offender.tier %></strong><br><%= allocated_offender.case_allocation %> (legacy)
       </td>
 
       <td class="govuk-table__cell">
