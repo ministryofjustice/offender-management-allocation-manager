@@ -34,13 +34,6 @@ RSpec.describe HandoversController, type: :controller do
     allow(HandoverCaseListingService).to receive(:new).and_return(handover_case_listing)
   end
 
-  describe 'index page' do
-    it 'redirects to upcoming handovers' do
-      get :index, params: default_params
-      expect(response).to redirect_to(upcoming_prison_handovers_path(**default_params))
-    end
-  end
-
   describe 'upcoming handovers page' do
     before do
       get :upcoming, params: default_params
