@@ -20,7 +20,7 @@ class HandoversController < PrisonsApplicationController
     end
 
     @counts = @handover_case_listing.counts
-    @upcoming_handover_allocated_offenders = @handover_case_listing.upcoming_handover_allocated_offenders(@pom)
+    @upcoming_handover_allocated_offenders = @handover_case_listing.upcoming_handover_allocated_offenders(@current_user)
   end
 
 private
@@ -45,7 +45,6 @@ private
   def check_prerequisites_and_prepare_variables
     ensure_pom
     redirect_to '/401' unless new_handovers_ui?
-    @pom = StaffMember.new(@prison, @staff_id)
     @handover_case_listing = HandoverCaseListingService.new
   end
 end
