@@ -280,36 +280,6 @@ jobs:
           environment:
             <<: *github_team_name_slug
 
-  test_staging:
-    <<: *test_container_config
-    working_directory: ~/integration-tests
-    steps:
-      - run:
-          name: Clone integration tests repo
-          command: git clone https://github.com/ministryofjustice/offender-management-integration-tests.git .
-      - restore_cache:
-          key: integration-tests-{{ checksum "Gemfile.lock" }}-v4 # increment v number to bust cache
-      - run:
-          name: Install ruby gems
-          command: |
-            bundle config set path 'vendor/bundle'
-            bundle check || bundle install
-      - install_firefox
-      - save_cache:
-          key: integration-tests-{{ checksum "Gemfile.lock" }}-v4 # increment v number to bust cache
-          paths:
-            - ~/integration-tests/vendor/bundle
-            - ~/.local/bin
-      - run:
-          name: Run integration tests
-          command: bundle exec rspec spec/integration --no-color --format documentation --format RspecJunitFormatter -o screenshots/rspec.xml
-          environment:
-            STAGING_START_PAGE: https://dev.moic.service.justice.gov.uk
-      - store_test_results:
-          path: screenshots
-      - store_artifacts:
-          path: screenshots
-
   deploy_preprod:
     <<: *deploy_container_config
     steps:
@@ -402,12 +372,6 @@ workflows:
             branches:
               only:
                 - main
-      - test_staging:
-          requires:
-            - deploy_staging
-          filters:
-            branches:
-              only: main
       - deploy_production_approval:
           type: approval
           requires:
