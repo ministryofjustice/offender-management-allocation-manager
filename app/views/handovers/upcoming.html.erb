@@ -4,7 +4,7 @@
 
 <p>A COM will be allocated in the next 8 weeks. Start getting ready to hand the case over to the community.</p>
 
-<table class="govuk-table" data-module="moj-sortable-table">
+<table class="govuk-table upcoming-handovers" data-module="moj-sortable-table">
   <thead class="govuk-table__head">
   <tr class="govuk-table__row">
     <th scope="col" class="govuk-table__header" aria-sort="none">
@@ -25,27 +25,30 @@
 
   <tbody class="govuk-table__body">
   <% @upcoming_handover_allocated_offenders.each do |allocated_offender| %>
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell">
-        <a class="govuk-link govuk-link--no-visited-state" data-sort-value="<%# TODO Surname %>" href="#">
+    <tr class="govuk-table__row allocated-offender">
+      <td class="govuk-table__cell prisoner-details">
+        <a class="govuk-link govuk-link--no-visited-state"
+           data-sort-value="<%= allocated_offender.last_name %>"
+           href="#">
           <%= allocated_offender.full_name %>
         </a><br>
-        <span class="govuk-hint govuk-!-margin-bottom-0"><%= allocated_offender.offender_no %></span>
+        <span class="govuk-hint govuk-!-margin-bottom-0 offender-no"><%= allocated_offender.offender_no %></span>
       </td>
 
       <% com_r_date = allocated_offender.handover_start_date %>
-      <td class="govuk-table__cell" data-sort-value="<%= com_r_date.strftime('%Y.%m.%d') %>">
+      <td class="govuk-table__cell com-responsible" data-sort-value="<%= com_r_date.iso8601 %>">
         COM responsible: <br>
         <%= format_date(com_r_date, replacement: "Unknown") %>
       </td>
 
-      <td class="govuk-table__cell" data-sort-value="2021.12.11">TODO: <br>TODO</td>
+      <td class="govuk-table__cell earliest-release-date" data-sort-value="2021.12.11">TODO: <br>TODO</td>
 
-      <td class="govuk-table__cell" data-sort-value="<%= allocated_offender.case_allocation %>">
-        <strong><%= allocated_offender.tier %></strong><br><%= allocated_offender.case_allocation %> (legacy)
+      <td class="govuk-table__cell tier" data-sort-value="<%= allocated_offender.case_allocation %>">
+        <strong><%= allocated_offender.tier %></strong>
+        <p><%= allocated_offender.case_allocation %> (legacy)</p>
       </td>
 
-      <td class="govuk-table__cell">
+      <td class="govuk-table__cell handover-progress">
         <ul class="govuk-list govuk-body-s task-summary-checklist">
           <li class="none">
             <img style="width:7%; padding-right: 5px;" src="<%= image_path('check.png') %>" alt="task complete">
