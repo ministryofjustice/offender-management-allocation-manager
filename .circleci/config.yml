@@ -374,6 +374,8 @@ workflows:
                 - main
       - deploy_production_approval:
           type: approval
+          requires:
+            - deploy_staging
           filters:
             branches:
               only: main
