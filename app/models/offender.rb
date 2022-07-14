@@ -41,24 +41,22 @@ class Offender < ApplicationRecord
 
   delegate :parsed_hearing_outcome, to: :parole_record
 
-  ACTIVE_REVIEW_STATUS = [
-    'Active',
-    'Active - REREFERRED',
-    'Active - Future',
-    'Active - Referred'
-  ].freeze
+  def most_recent_parole_record
+    parole_records.max_by(&:custody_report_due)
+  end
 
   def build_parole_record_sections
+    @current_parole_record = nil
     @previous_parole_records = []
 
-    parole_records.each do |record|
+    parole_records.sort_by(&:custody_report_due).reverse_each do |record|
       if record.no_hearing_outcome?
-        if ACTIVE_REVIEW_STATUS.include? record.review_status
+        if record.active?
           @current_parole_record = record
         else
           @previous_parole_records << record
         end
-      elsif record.target_hearing_date && record.target_hearing_date > Time.zone.today - 14.days
+      elsif record.hearing_outcome_received && record.hearing_outcome_received > Time.zone.today - 14.days
         @current_parole_record = record
       else
         @previous_parole_records << record

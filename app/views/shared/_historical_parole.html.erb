@@ -11,7 +11,15 @@
         <% else %>
           <td class="govuk-table__cell govuk-!-width-one-half"></td>
         <% end %>
-        <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= "#{record.custody_report_due.strftime("%b %Y")} – #{record.previous_hearing_outcome}" %></td>
+        <% if record.hearing_outcome_received.present? %>
+          <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= "#{record.hearing_outcome_received.strftime("%b %Y")} – #{record.previous_hearing_outcome}" %></td>
+        <% else %>
+          <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
+            <%= record.previous_hearing_outcome %>
+            <br/>
+            We do not have the date this outcome was confirmed
+          </td>
+        <% end %>
       </tr>
     <% end %>
   </tbody>

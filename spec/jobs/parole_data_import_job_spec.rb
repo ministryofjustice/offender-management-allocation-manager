@@ -17,7 +17,6 @@ RSpec.describe ParoleDataImportJob, type: :job do
 
   before do
     allow(Net::IMAP).to receive(:new).and_return(imap_mock)
-    allow(Mail).to receive(:new).and_return(mail_mock)
     allow(Rails.logger).to receive(:info)
 
     build(:offender, nomis_offender_id: 'A1111AA').save!
@@ -26,6 +25,10 @@ RSpec.describe ParoleDataImportJob, type: :job do
   end
 
   describe 'On record creation' do
+    before do
+      allow(Mail).to receive(:new).and_return(mail_mock)
+    end
+
     context 'when there are attachments on the email' do
       context 'when one attachment is a csv' do
         let(:mail_mock) { double(attachments: [attachment_mock_1]) }
@@ -34,7 +37,7 @@ RSpec.describe ParoleDataImportJob, type: :job do
           expect(Rails.logger).not_to receive(:info).with(/skipping non-csv attachment/i)
 
           described_class.perform_now(Time.zone.today)
-          
+
           parole_application_1 = ParoleRecord.find_by(review_id: '123456', nomis_offender_id: 'A1111AA')
           expect(parole_application_1.active?).to eq(true)
           expect(parole_application_1.current_hearing_outcome).to eq('No hearing outcome yet')
@@ -42,11 +45,10 @@ RSpec.describe ParoleDataImportJob, type: :job do
           parole_application_2 = ParoleRecord.find_by(review_id: '098765', nomis_offender_id: 'B2222BB')
           expect(parole_application_2.active?).to eq(true)
           expect(parole_application_2.previous_hearing_outcome).to eq('No hearing outcome given')
-          
+
           parole_application_3 = ParoleRecord.find_by(review_id: '024680', nomis_offender_id: 'C3333CC')
           expect(parole_application_3.active?).to eq(false)
           expect(parole_application_3.previous_hearing_outcome).to eq('No hearing outcome given')
-
         end
       end
 
@@ -124,7 +126,7 @@ RSpec.describe ParoleDataImportJob, type: :job do
         parole_application_2 = ParoleRecord.find_by(review_id: '098765', nomis_offender_id: 'B2222BB')
         expect(parole_application_2.active?).to eq(true)
         expect(parole_application_2.previous_hearing_outcome).to eq('No hearing outcome given')
-        
+
         parole_application_3 = ParoleRecord.find_by(review_id: '024680', nomis_offender_id: 'C3333CC')
         expect(parole_application_3.active?).to eq(false)
         expect(parole_application_3.previous_hearing_outcome).to eq('No hearing outcome given')
