@@ -42,15 +42,19 @@ private
     return if csv_record['Review ID'].blank? || csv_record['NOMIS ID'].blank?
 
     begin
-      ParoleRecord.create_or_find_by!(review_id: csv_record['Review ID'], nomis_offender_id: csv_record['NOMIS ID']) do |record|
-        record.target_hearing_date = csv_record['Current Target Date (Review)']
-        record.custody_report_due = csv_record['MS 13 Target Date']
-        record.review_status = csv_record['Review Status']
-        if record.no_hearing_outcome? && csv_record['Final Result (Review)'] != 'Not Applicable' && csv_record['Final Result (Review)'] != 'Not Specified'
-          record.hearing_outcome_received = @date - 1.day
-        end
-        record.hearing_outcome = csv_record['Final Result (Review)']
-      end
+      record = ParoleRecord.create_or_find_by!(review_id: csv_record['Review ID'], nomis_offender_id: csv_record['NOMIS ID'])
+      hearing_outcome_received = if record.hearing_outcome_received.present?
+                                   record.hearing_outcome_received
+                                 elsif record.no_hearing_outcome? && csv_record['Final Result (Review)'] != 'Not Applicable' && csv_record['Final Result (Review)'] != 'Not Specified'
+                                   @date - 1.day
+                                 end
+      record.update(
+        target_hearing_date: csv_record['Current Target Date (Review)'],
+        custody_report_due: csv_record['MS 13 Target Date'],
+        review_status: csv_record['Review Status'],
+        hearing_outcome_received: hearing_outcome_received,
+        hearing_outcome: csv_record['Final Result (Review)']
+      )
     rescue StandardError => e
       Rails.logger.error("Review ID: #{csv_record['Review ID']} had error: #{e}")
     end
