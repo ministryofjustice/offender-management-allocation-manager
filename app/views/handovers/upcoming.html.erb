@@ -29,7 +29,7 @@
       <td class="govuk-table__cell prisoner-details">
         <a class="govuk-link govuk-link--no-visited-state"
            data-sort-value="<%= allocated_offender.last_name %>"
-           href="#">
+           href="<%= prison_prisoner_path(@prison_id, allocated_offender.offender_no) %>">
           <%= allocated_offender.full_name %>
         </a><br>
         <span class="govuk-hint govuk-!-margin-bottom-0 offender-no"><%= allocated_offender.offender_no %></span>
