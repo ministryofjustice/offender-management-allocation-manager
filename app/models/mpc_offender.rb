@@ -23,7 +23,7 @@ class MpcOffender
   # These fields make sense to be nil when the probation record is nil - the others dont
   delegate :ldu_email_address, :team_name, :ldu_name, to: :probation_record, allow_nil: true
 
-  attr_reader :probation_record, :prison
+  attr_reader :probation_record, :prison, :pom_tasks
 
   def initialize(prison:, offender:, prison_record:)
     @prison = prison
@@ -31,6 +31,7 @@ class MpcOffender
     @prison_record = prison_record
     @probation_record = offender.case_information
     offender.build_parole_record_sections
+    @pom_tasks = build_pom_tasks
   end
 
   # TODO: - view method in model needs to be removed
@@ -219,5 +220,20 @@ private
                   else
                     HandoverDateService::NO_HANDOVER_DATE
                   end
+  end
+
+  def build_pom_tasks
+    tasks = []
+    # We don't want the task to be created if there's no parole record, if the most recent parole record is yet to have a hearing outcome, or if there is already
+    # a date that the hearing outcome was received.
+    if most_recent_parole_record.present? && !most_recent_parole_record.no_hearing_outcome? && most_recent_parole_record.hearing_outcome_received.blank?
+      tasks << PomTask.new(full_name, first_name, prison_id, offender_no, :parole_outcome_date, most_recent_parole_record.review_id)
+    end
+
+    if early_allocations.present?
+      tasks << PomTask.new(full_name, first_name, prison_id, offender_no, :early_allocation_decision)
+    end
+
+    tasks
   end
 end
