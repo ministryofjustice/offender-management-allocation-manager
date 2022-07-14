@@ -1,5 +1,12 @@
 # frozen_string_literal: true
 
+# This class calculates the handover dates for offenders and is the authority for these. The dates calculated here are
+# pushed to nDelius, for example.
+#
+# This class has 1 public class method - self.handover(). this returns a CalculatedHandoverDate model. The quirk,
+# however, is that the models returned are new, in-memory ones. Each Offender has a saved one already attached to it
+# (offender.calculated_handover_date) yet I cannot find any instance where it is used. Instead, we always calculate
+# the handover date afresh by calling HandoverDateService::handover.
 class HandoverDateService
   # OMIC open prison rules initially piloted in HMP Prescoed for Welsh offenders entering from 19/10/2020
   PRESCOED_POLICY_START_DATE = '19/10/2020'.to_date
