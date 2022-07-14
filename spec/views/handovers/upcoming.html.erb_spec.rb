@@ -1,4 +1,5 @@
 RSpec.describe 'handovers/upcoming' do
+  let(:prison_code) { 'PRI' }
   let(:upcoming_handover_allocated_offenders) do
     [
       instance_double(AllocatedOffender,
@@ -23,6 +24,7 @@ RSpec.describe 'handovers/upcoming' do
 
   before do
     assign(:upcoming_handover_allocated_offenders, upcoming_handover_allocated_offenders)
+    assign(:prison_id, prison_code)
     render
   end
 
@@ -32,7 +34,7 @@ RSpec.describe 'handovers/upcoming' do
     aggregate_failures do
       expect(link.text.strip).to eq 'Surname1, Firstname1'
       expect(link['data-sort-value']).to eq 'Surname1'
-      expect(link['href']).to eq '#'
+      expect(link['href']).to eq prison_prisoner_path(prison_id: prison_code, id: 'X1111XX')
       expect(prisoner_details.find('.offender-no').text.strip).to eq 'X1111XX'
     end
   end

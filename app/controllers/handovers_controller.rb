@@ -39,6 +39,7 @@ private
   def check_prerequisites_and_prepare_variables
     ensure_pom
     redirect_to '/401' unless new_handovers_ui?
+    @prison_id = active_prison_id
     @handover_case_listing = HandoverCaseListingService.new
   end
 end
