@@ -663,6 +663,15 @@ describe HandoverDateService do
           described_class.handover(offender)
         end
       end
+
+      context 'when an offender is mappa level 2 or 3' do
+        let(:target_hearing_date) { Time.zone.today + 2.years }
+        let(:case_info) { build(:case_information, :nps, probation_service: 'England', offender: case_info_offender, mappa_level: 3) }
+
+        it 'assigns to COM responsible, regardless of THD' do
+          expect(com).to be_responsible
+        end
+      end
     end
   end
 
