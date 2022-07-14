@@ -24,10 +24,16 @@ class HandoverDateService
 
     # Should only trigger on offenders who have not been released as a part of their parole review, ie not on their first allocation
     if eligible_unsuccessful_parole_applicant(offender)
-      if offender.target_hearing_date < offender.hearing_outcome_received + 12.months
+      if offender.mappa_level.in? [2, 3]
+        CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+                                   start_date: nil, handover_date: nil,
+                                   reason: :parole_mappa_2_3
+
+      elsif offender.target_hearing_date < offender.hearing_outcome_received + 12.months
         CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
                                    start_date: nil, handover_date: nil,
                                    reason: :thd_within_12_months_of_hearing_outcome
+
       else
         handover_date = indeterminate_responsibility_date(offender)
         CalculatedHandoverDate.new responsibility: responsibility(handover_date, handover_date),
