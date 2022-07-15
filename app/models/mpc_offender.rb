@@ -60,6 +60,10 @@ class MpcOffender
     end
   end
 
+  def allocated_pom_role
+    pom_responsible? ? 'Responsible' : 'Supporting'
+  end
+
   def com_responsible?
     if @offender.responsibility.nil?
       HandoverDateService.handover(self).community_responsible?
@@ -156,12 +160,16 @@ class MpcOffender
   def approaching_parole?
     return false if @offender.parole_record.blank?
 
-    earliest_date = [
+    earliest_date = next_parole_date
+    earliest_date.present? && earliest_date <= Time.zone.today + 10.months
+  end
+
+  def next_parole_date
+    [
       tariff_date,
       parole_eligibility_date,
       target_hearing_date
     ].compact.min
-    earliest_date.present? && earliest_date <= Time.zone.today + 10.months
   end
 
   def early_allocation_state
