@@ -5,7 +5,7 @@ class PomTaskPresenter
 
   # @offender may be either an AllocatedOffender or MpcOffender, depending on the source of the call.
   # However, all relevant methods can be found on MpcOffender.
-  delegate :offender_full_name, :offender_first_name, :offender_number, :prison_id, :type, :parole_record_id, to: :@pom_task
+  delegate :offender_name, :offender_first_name, :offender_number, :prison_id, :type, :parole_record_id, to: :@pom_task
 
   def initialize(pom_task)
     @pom_task = pom_task

@@ -47,7 +47,7 @@ RSpec.describe TasksController, :allocation, type: :controller do
     it 'can show offenders needing early allocation decision updates' do
       offender_nos.each do |offender_no|
         create(:case_information, tier: 'A', mappa_level: 1,
-                                  offender: build(:offender, nomis_offender_id: offender_no, parole_records: [build(:parole_record, target_hearing_date: next_week)]))
+                                  offender: build(:offender, nomis_offender_id: offender_no, parole_records: [build(:parole_record, hearing_outcome_received: Time.zone.today)]))
         create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id, prison: prison)
       end
 
@@ -58,39 +58,73 @@ RSpec.describe TasksController, :allocation, type: :controller do
       expect(response).to be_successful
 
       pomtasks = assigns(:pomtasks)
-      expect(pomtasks.map { |pt| { num: pt.offender_number, label: pt.action_label } }).to eq([{ num: test_offender_no, label: 'Early allocation decision' }])
+
+      expect(pomtasks.map do |pt|
+        task_presenter = PomTaskPresenter.new(pt)
+        { num: task_presenter.offender_number, label: task_presenter.action_label }
+      end).to eq([{ num: test_offender_no, label: 'Early allocation decision' }])
+    end
+  end
+
+  context 'when showing missing hearing outcome confirmed date' do
+    let(:offender_nos) { %w[G1234AB G1234GG G1234VV] }
+    let(:test_offender_no) { 'G1234AB' }
+
+    it 'can show offenders needing a hearing outcome confirmed date' do
+      create(:case_information, tier: 'A', mappa_level: 1,
+                                offender: build(:offender, nomis_offender_id: 'G1234AB', parole_records: [build(:parole_record)]))
+      create(:allocation_history, nomis_offender_id: 'G1234AB', primary_pom_nomis_id: staff_id, prison: prison)
+
+      create(:case_information, tier: 'A', mappa_level: 1,
+                                offender: build(:offender, nomis_offender_id: 'G1234GG', parole_records: [build(:parole_record, hearing_outcome_received: Time.zone.today)]))
+      create(:allocation_history, nomis_offender_id: 'G1234GG', primary_pom_nomis_id: staff_id, prison: prison)
+
+      create(:case_information, tier: 'A', mappa_level: 1,
+                                offender: build(:offender, nomis_offender_id: 'G1234VV', parole_records: [build(:parole_record, hearing_outcome_received: Time.zone.today)]))
+      create(:allocation_history, nomis_offender_id: 'G1234VV', primary_pom_nomis_id: staff_id, prison: prison)
+
+      get :index, params: { prison_id: prison }
+
+      expect(response).to be_successful
+
+      pomtasks = assigns(:pomtasks)
+
+      expect(pomtasks.map do |pt|
+        task_presenter = PomTaskPresenter.new(pt)
+        { num: task_presenter.offender_number, label: task_presenter.action_label }
+      end).to eq([{ num: test_offender_no, label: 'Date parole hearing outcome confirmed' }])
     end
   end
 
   context 'when showing tasks' do
-    let(:offender_nos) { %w[G1234AB G1234GG G1234VV] }
-    let(:test_offender_no) { 'G1234AB' }
-
     before do
-      # One offender (G1234VV) should have missing case info and one should have no THD
       create(:case_information, tier: 'A', mappa_level: 1,
-                                offender: build(:offender, nomis_offender_id: 'G1234AB', parole_records: [build(:parole_record, target_hearing_date: next_week)]))
+                                offender: build(:offender, nomis_offender_id: 'G1234AB', parole_records: [build(:parole_record, hearing_outcome_received: Time.zone.today)]))
       create(:allocation_history, nomis_offender_id: 'G1234AB', primary_pom_nomis_id: staff_id, prison: prison)
 
       create(:case_information, tier: 'A', mappa_level: 1,
-                                offender: build(:offender, nomis_offender_id: 'G1234GG', parole_records: [build(:parole_record, target_hearing_date: next_week)]))
+                                offender: build(:offender, nomis_offender_id: 'G1234GG', parole_records: [build(:parole_record, hearing_outcome_received: Time.zone.today)]))
       create(:allocation_history, nomis_offender_id: 'G1234GG', primary_pom_nomis_id: staff_id, prison: prison)
+
+      create(:case_information, tier: 'A', mappa_level: 1,
+                                offender: build(:offender, nomis_offender_id: 'G1234VV', parole_records: [build(:parole_record)]))
+      create(:allocation_history, nomis_offender_id: 'G1234VV', primary_pom_nomis_id: staff_id, prison: prison)
     end
 
     it 'can sort the results' do
-      # Two offenders should have a pending early allocation
+      # Two offenders should have a pending early allocation and one should be missing hearing_outcome_recieved
       create(:early_allocation, :discretionary, nomis_offender_id: 'G1234AB')
       create(:early_allocation, :discretionary, nomis_offender_id: 'G1234GG')
 
       get :index, params: { prison_id: prison, sort: 'offender_name asc' }
       expect(response).to be_successful
       pomtasks = assigns(:pomtasks)
-      expect(pomtasks.map(&:offender_name)).to eq(["Caroleson, Carole", 'Davidson, David'])
+      expect(pomtasks.map(&:offender_name)).to eq(["Bibby, Bob", "Caroleson, Carole", 'Davidson, David'])
 
       get :index, params: { prison_id: prison, sort: 'offender_name desc' }
       expect(response).to be_successful
       pomtasks = assigns(:pomtasks)
-      expect(pomtasks.map(&:offender_name)).to eq(['Davidson, David', "Caroleson, Carole"])
+      expect(pomtasks.map(&:offender_name)).to eq(['Davidson, David', "Caroleson, Carole", "Bibby, Bob"])
     end
   end
 end
