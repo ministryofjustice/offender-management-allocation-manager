@@ -659,7 +659,7 @@ describe HandoverDateService do
         it 'follows non-parole allocation rules' do
           expect_any_instance_of(MpcOffender).not_to receive(:hearing_outcome_received)
           expect_any_instance_of(MpcOffender).to receive(:recalled?)
-          
+
           described_class.handover(offender)
         end
       end
