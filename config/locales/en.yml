@@ -126,6 +126,8 @@ en:
             community_decision:
               inclusion: You must say whether the community has accepted this case or not
   views:
+    navigation:
+      skip_to_main_content: "Skip to main content"
     pagination:
       first: "&laquo; First"
       last: "Last &raquo;"

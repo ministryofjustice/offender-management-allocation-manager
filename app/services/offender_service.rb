@@ -2,20 +2,24 @@
 
 class OffenderService
   class << self
-    def get_offender(offender_no)
+    def get_offender(offender_no, ignore_legal_status: false)
       # use find_or_create_by here for performance, but might still have be a small race condition
       # This isn't find_or_create_by! because our offender_no might be invalid - we want to return nil rather than crash
       offender = Offender.find_or_create_by(nomis_offender_id: offender_no)
-      api_offender = HmppsApi::PrisonApi::OffenderApi.get_offender(offender_no)
-      prison = Prison.find_by(code: api_offender&.prison_id)
+      return unless offender
 
-      if [offender, api_offender, prison].all?(&:present?)
-        MpcOffender.new(
-          prison: prison,
-          offender: offender,
-          prison_record: api_offender
-        )
-      end
+      api_offender = HmppsApi::PrisonApi::OffenderApi.get_offender(offender_no,
+                                                                   ignore_legal_status: ignore_legal_status)
+      return unless api_offender
+
+      prison = Prison.find_by(code: api_offender.prison_id)
+      return unless prison
+
+      MpcOffender.new(
+        prison: prison,
+        offender: offender,
+        prison_record: api_offender
+      )
     end
 
     def get_offenders_in_prison(prison)

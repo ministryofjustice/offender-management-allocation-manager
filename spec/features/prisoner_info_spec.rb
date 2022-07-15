@@ -13,7 +13,7 @@ feature 'View a prisoner profile page' do
 
       expect(page).to have_css('h1', text: 'Annole, Omistius')
       expect(page).to have_content('26 Sep 1994')
-      cat_code = find('h3#category-code').text
+      cat_code = find('#category-code').text
       expect(cat_code).to eq('Cat B')
       expect(page).to have_css('#prisoner-case-type', text: 'Determinate')
     end
@@ -121,7 +121,7 @@ feature 'View a prisoner profile page' do
       it 'shows the prisoner information' do
         expect(page).to have_css('h1', text: 'Annole, Omistius')
         expect(page).to have_content('26 Sep 1994')
-        cat_code = find('h3#category-code').text
+        cat_code = find('#category-code').text
         expect(cat_code).to eq('Cat B')
       end
 

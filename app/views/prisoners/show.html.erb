@@ -20,7 +20,7 @@
 
 <div class="govuk-grid-row govuk-!-margin-bottom-5">
   <div class="govuk-grid-column-one-quarter">
-    <img src="<%= prison_prisoner_image_path(@prison.code, @prisoner.offender_no, format: :jpg) %>" alt="Prisoner photo will be here" width="95%">
+    <img src="<%= prison_prisoner_image_path(@prison.code, @prisoner.offender_no, format: :jpg) %>" alt="" width="95%">
   </div>
   <div class="govuk-grid-column-three-quarters">
     <div class="govuk-grid-row">
@@ -34,36 +34,36 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-third">
         <span class="govuk-body">Prisoner number</span>
-        <h3 class="govuk-heading-m"><%= @prisoner.offender_no %></h3>
+        <span class="govuk-heading-m"><%= @prisoner.offender_no %></span>
       </div>
       <div class="govuk-grid-column-one-third">
         <span class="govuk-body">CRN number</span>
-        <h3 class="govuk-heading-m"><%= probation_field(@prisoner, :crn) || "N/A" %></h3>
+        <span class="govuk-heading-m"><%= probation_field(@prisoner, :crn) || "N/A" %></span>
       </div>
       <div class="govuk-grid-column-one-third">
         <span class="govuk-body">Date of birth</span>
-        <h3 class="govuk-heading-m"><%= format_date(@prisoner.date_of_birth) %></h3>
+        <span class="govuk-heading-m"><%= format_date(@prisoner.date_of_birth) %></span>
       </div>
     </div>
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-third">
         <span class="govuk-body">Earliest release date</span>
-        <h3 class="govuk-heading-m" id="earliest_release_date">
+        <span class="govuk-heading-m" id="earliest_release_date">
           <% if @prisoner.earliest_release.present? %>
             <%= @prisoner.earliest_release[:type] %>: <br/>
             <%= format_date(@prisoner.earliest_release[:date], replacement: "Unknown") %>
           <% else %>
             Unknown
           <% end %>
-        </h3>
+        </span>
       </div>
       <div class="govuk-grid-column-one-third">
         <span class="govuk-body">Category</span>
-        <h3 class="govuk-heading-m" id="category-code"><%= @prisoner.category_label || "Unknown" %></h3>
+        <span class="govuk-heading-m" id="category-code"><%= @prisoner.category_label || "Unknown" %></span>
       </div>
       <div class="govuk-grid-column-one-third">
         <span class="govuk-body">Tier calculation</span>
-        <h3 class="govuk-heading-m"><%= probation_field(@prisoner, :tier) %></h3>
+        <span class="govuk-heading-m"><%= probation_field(@prisoner, :tier) %></span>
       </div>
     </div>
     <div class='govuk-grid-row'>

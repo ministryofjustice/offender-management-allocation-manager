@@ -131,7 +131,7 @@ describe HandoverDateService do
       end
 
       context 'when indeterminate' do
-        let(:ted) { Date.new(2022, 7, 3) }
+        let(:ted) { Time.zone.today + 1.week }
         let(:ted15) { ted - 15.months }
 
         let(:api_offender) do
@@ -149,7 +149,7 @@ describe HandoverDateService do
         context 'without PED' do
           let(:ped) { nil }
 
-          it 'will be 15 months before TED' do
+          it 'will be 15 months before TED', flaky: true do
             expect(subject).to eq(start_date: ted15, handover_date: ted15)
           end
         end
@@ -157,7 +157,7 @@ describe HandoverDateService do
         context 'with earlier PED' do
           let(:ped) { Date.new(2022, 7, 2)  }
 
-          it 'will still be 15 months before TED' do
+          it 'will still be 15 months before TED', flaky: true do
             expect(subject).to eq(start_date: ted15, handover_date: ted15)
           end
         end
