@@ -47,12 +47,12 @@ en:
   activemodel:
     errors:
       models:
-        parole_review_date_form:
+        target_hearing_date_form:
           format: "%{message}"
           attributes:
-            parole_review_date:
-              date_after: The new parole review date must be in the future
-              blank: Enter a new parole review date
+            target_hearing_date:
+              date_after: The new target hearing date must be in the future
+              blank: Enter a new target hearing date
         complexity_form:
           format: "%{message}"
           attributes:
@@ -144,7 +144,7 @@ en:
   helpers:
     fieldset:
       case_information:
-        parole_review_date: "What is the next parole review date?"
+        target_hearing_date: "What is the next target hearing date?"
       early_allocation:
         oasys_risk_assessment_date: 'When was the last OASys risk assessment?'
     page_entries_info:

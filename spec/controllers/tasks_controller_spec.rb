@@ -41,7 +41,7 @@ RSpec.describe TasksController, :allocation, type: :controller do
     end
   end
 
-  describe 'showing parole review date pom tasks' do
+  describe 'showing target hearing date pom tasks' do
     let(:offender_no) { 'G7514GW' }
     let(:pomtasks) { assigns(:pomtasks) }
 
@@ -60,19 +60,19 @@ RSpec.describe TasksController, :allocation, type: :controller do
     context 'with a TED in the past' do
       let(:tariff_end_date) { Time.zone.today - 3.days }
 
-      it 'can show offenders needing parole review date updates' do
-        # We expect only one of these to have a parole review date task
+      it 'can show offenders needing target hearing date updates' do
+        # We expect only one of these to have a target hearing date task
         expect(pomtasks).to eq([PomTaskPresenter.new(offender_number: offender_no,
-                                                     action_label: 'Parole review date',
+                                                     action_label: 'Target hearing date',
                                                      offender_name: 'Aliceson, Alice',
-                                                     long_label: 'Parole review date must be updated so handover dates can be calculated.')])
+                                                     long_label: 'Target hearing date must be updated so handover dates can be calculated.')])
       end
     end
 
     context 'with a TED in the future' do
       let(:tariff_end_date) { Time.zone.today + 3.days }
 
-      it 'does not show PRD task' do
+      it 'does not show THD task' do
         expect(pomtasks).to eq([])
       end
     end
@@ -85,7 +85,7 @@ RSpec.describe TasksController, :allocation, type: :controller do
     it 'can show offenders needing early allocation decision updates' do
       offender_nos.each do |offender_no|
         create(:case_information, tier: 'A', mappa_level: 1,
-                                  offender: build(:offender, nomis_offender_id: offender_no, parole_record: build(:parole_record, parole_review_date: next_week)))
+                                  offender: build(:offender, nomis_offender_id: offender_no, parole_record: build(:parole_record, target_hearing_date: next_week)))
         create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id, prison: prison)
       end
 
@@ -105,13 +105,13 @@ RSpec.describe TasksController, :allocation, type: :controller do
     let(:test_offender_no) { 'G1234AB' }
 
     before do
-      # One offender (G1234VV) should have missing case info and one should have no PRD
+      # One offender (G1234VV) should have missing case info and one should have no THD
       create(:case_information, tier: 'A', mappa_level: 1,
-                                offender: build(:offender, nomis_offender_id: 'G1234AB', parole_record: build(:parole_record, parole_review_date: next_week)))
+                                offender: build(:offender, nomis_offender_id: 'G1234AB', parole_record: build(:parole_record, target_hearing_date: next_week)))
       create(:allocation_history, nomis_offender_id: 'G1234AB', primary_pom_nomis_id: staff_id, prison: prison)
 
       create(:case_information, tier: 'A', mappa_level: 1,
-                                offender: build(:offender, nomis_offender_id: 'G1234GG', parole_record: build(:parole_record, parole_review_date: next_week)))
+                                offender: build(:offender, nomis_offender_id: 'G1234GG', parole_record: build(:parole_record, target_hearing_date: next_week)))
       create(:allocation_history, nomis_offender_id: 'G1234GG', primary_pom_nomis_id: staff_id, prison: prison)
 
       create(:case_information, offender: build(:offender, nomis_offender_id: 'G7514GW'), tier: 'A', mappa_level: 1)

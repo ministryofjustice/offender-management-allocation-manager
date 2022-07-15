@@ -220,7 +220,7 @@ private
           @offender.tariff_date
         else
           [
-            @offender.parole_review_date,
+            @offender.target_hearing_date,
             @offender.parole_eligibility_date
           ].compact.reject(&:past?).min
         end

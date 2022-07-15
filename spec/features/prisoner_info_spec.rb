@@ -23,7 +23,7 @@ feature 'View a prisoner profile page' do
     before do
       create(:case_information,
              offender: build(:offender, nomis_offender_id: 'G7266VD',
-                                        parole_record: build(:parole_record, parole_review_date: Time.zone.today + 1.year),
+                                        parole_record: build(:parole_record, target_hearing_date: Time.zone.today + 1.year),
                                         early_allocations: [build(:early_allocation, created_within_referral_window: within_window)]))
       visit prison_prisoner_path(prison.code, 'G7266VD')
     end
