@@ -53,6 +53,12 @@
     %>
 
     <%= render 'dashboard_partition',
+               title: "Parole cases",
+               link: prison_parole_index_path(@prison.code),
+               content: "All cases in the prison with a target hearing date, PED or TED in the next 10 months."
+    %>
+    
+    <%= render 'dashboard_partition',
                title: "Newly arrived cases",
                link: new_arrivals_prison_prisoners_path(@prison.code),
                content: "Cases waiting to be matched with NDelius records before they can be allocated."
@@ -96,6 +102,12 @@
   </div>
 
   <div class="govuk-grid-row card-group">
+    <%= render 'dashboard_partition',
+               title: 'Parole cases',
+               link: prison_staff_caseload_parole_cases_path(@prison.code, @staff_id),
+               content: 'Cases with a target hearing date, PED or TED in the next 10 months.'
+    %>
+    
     <%= render 'dashboard_partition',
                title: "Case updates needed",
                link: prison_staff_caseload_updates_required_path(@prison.code, @staff_id),
