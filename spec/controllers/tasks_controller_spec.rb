@@ -16,9 +16,9 @@ RSpec.describe TasksController, :allocation, type: :controller do
   let(:tariff_end_date) { Time.zone.today - 3.days }
   let(:offenders) do
     [
-     build(:nomis_offender, prisonerNumber: 'G1234VV', firstName: "Bob", lastName: "Bibby"),
-     build(:nomis_offender, prisonerNumber: 'G1234AB', firstName: "Carole", lastName: "Caroleson"),
-     build(:nomis_offender, prisonerNumber: 'G1234GG', firstName: "David", lastName: "Davidson")
+      build(:nomis_offender, prisonerNumber: 'G1234VV', firstName: "Bob", lastName: "Bibby"),
+      build(:nomis_offender, prisonerNumber: 'G1234AB', firstName: "Carole", lastName: "Caroleson"),
+      build(:nomis_offender, prisonerNumber: 'G1234GG', firstName: "David", lastName: "Davidson")
     ]
   end
 
