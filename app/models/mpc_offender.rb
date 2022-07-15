@@ -22,6 +22,8 @@ class MpcOffender
   # These fields make sense to be nil when the probation record is nil - the others dont
   delegate :ldu_email_address, :team_name, :ldu_name, to: :probation_record, allow_nil: true
 
+  delegate :start_date, to: :handover, prefix: true
+
   attr_reader :probation_record, :prison
 
   def initialize(prison:, offender:, prison_record:)
@@ -120,7 +122,6 @@ class MpcOffender
   end
 
   # handover methods
-  delegate :start_date, to: :handover, prefix: true
 
   def handover_reason
     handover.reason_text
@@ -149,16 +150,17 @@ class MpcOffender
     end
   end
 
-  def in_upcoming_handover_window?
-    # we can't calculate handover without case info as we don't know NPS/CRC
+  def in_upcoming_handover_window?(relative_to_date = Time.zone.now.to_date)
+    # we can't calculate handover without case info (in probation record) as we don't know NPS/CRC
     return false if @probation_record.blank?
 
-    start_date = handover_start_date
+    # We can't calculate handover if no handover start date
+    return false if handover_start_date.nil?
 
-    return false if start_date.nil?
-
-    (start_date - 8.weeks) <= Time.zone.now.to_date
+    handover_start_date >= relative_to_date - 8.weeks
   end
+
+  # early allocation methods
 
   def parole_review_date
     @offender.parole_record.parole_review_date if @offender.parole_record.present?

@@ -1,29 +1,13 @@
 # NOTES
 
-```ruby
-#prison = Prison.where(code: "LEI").first # in sessions, just @prison
-#prison.allocations
+## Strategy to fix the handover crapshow
 
-@current_user.allocations.select(&:approaching_handover?)
-```
-
-## Upcoming handovers
-
-Generate list:
-```ruby
-@current_user.allocations.select(&:approaching_handover?)
-```
-Entry data sources:
-* Prisoner details <= crim
-* COM responsible
-   * COM responsible date <= ???
-   * COM allocated date - ignored for this ticket
-* Earliest release date <= handover_date
-
+The existence of MpcOffender#handover_case directly maps to whether that offender is currently has an open handover
 
 ## WTF
 
-Why does HandoverDateService build in-memory CalculatedHandoverDate objects instead of querying the database?
+Why does HandoverDateService build in-memory CalculatedHandoverDate objects instead of querying the database? IT
+DOES THIS EVERY TIME EVEN WHEN IT IS SAVING A NEW CALCULATEDHANDOVERDATE - JUST ACCEPT IT.
 
 ## How do I get a list of upcoming handovers?
 
