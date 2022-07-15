@@ -153,6 +153,17 @@ class MpcOffender
     @offender.parole_record.parole_review_date if @offender.parole_record.present?
   end
 
+  def approaching_parole?
+    return false if @offender.parole_record.blank?
+
+    earliest_date = [
+      tariff_date,
+      parole_eligibility_date,
+      # target_hearing_date
+    ].compact.min
+    earliest_date.present? && earliest_date <= Time.zone.today + 10.months
+  end
+
   def early_allocation_state
     if early_allocation?
       :eligible

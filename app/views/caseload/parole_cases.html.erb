@@ -1,0 +1,12 @@
+<% content_for :title, "Cases approaching parole – Digital Prison Services" %>
+
+<%= render partial: 'layouts/caseload' %>
+
+<h2 class="govuk-heading-l">Parole cases</h2>
+<p class="govuk-body">Cases with a target hearing date, PED or TED in the next 10 months.</p>
+
+<% if @pom.blank? || @parole_cases.empty? %>
+  <h2 class="govuk-heading-l">No cases approaching parole </h2>
+<% else %>
+  <%= render 'shared/caseload_table', header_partial: 'shared/caseload_headers', collection_partial: 'shared/caseload', collection: @parole_cases %>
+<% end %>
