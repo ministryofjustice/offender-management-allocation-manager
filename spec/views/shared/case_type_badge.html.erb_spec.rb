@@ -85,9 +85,7 @@ RSpec.describe "allocation_staff/index", type: :view do
                                                             build(
                                                               :parole_record,
                                                               target_hearing_date: target_hearing_date,
-                                                              review_status: 'Active',
-                                                              custody_report_due: Time.zone.today + 6.months,
-                                                              hearing_outcome: 'Not Specified'
+                                                              custody_report_due: Time.zone.today + 6.months
                                                             )
                                                           ]))
     end
@@ -111,9 +109,7 @@ RSpec.describe "allocation_staff/index", type: :view do
                                                             build(
                                                               :parole_record,
                                                               target_hearing_date: target_hearing_date,
-                                                              review_status: 'Active',
-                                                              custody_report_due: Time.zone.today + 6.months,
-                                                              hearing_outcome: 'Not Specified'
+                                                              custody_report_due: Time.zone.today + 6.months
                                                             )
                                                           ]))
     end

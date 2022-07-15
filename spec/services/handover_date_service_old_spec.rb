@@ -570,7 +570,7 @@ describe HandoverDateService do
   end
 
   context 'with an NPS and indeterminate case with a THD and no TED' do
-    let(:case_info) { build(:case_information, :nps, offender: build(:offender, parole_records: [build(:parole_record, review_status: 'Active')])) }
+    let(:case_info) { build(:case_information, :nps, offender: build(:offender, parole_records: [build(:parole_record, target_hearing_date: Time.zone.today + 9.months)])) }
     let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
     let(:api_offender) do
       build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail,

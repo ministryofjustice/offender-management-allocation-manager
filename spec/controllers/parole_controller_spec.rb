@@ -53,19 +53,19 @@ RSpec.describe ParoleController, type: :controller do
                                        tariffDate: today_plus_11_months)),
       ]
 
-      create(:case_information, case_allocation: 'NPS', offender: build(:offender, nomis_offender_id: 'G1234QQ', parole_record: build(:parole_record, target_hearing_date: Time.zone.today + 8.months)))
+      create(:case_information, case_allocation: 'NPS', offender: build(:offender, nomis_offender_id: 'G1234QQ', parole_records: [build(:parole_record, target_hearing_date: Time.zone.today + 8.months)]))
       create(:allocation_history, prison: prison, nomis_offender_id: 'G1234QQ', primary_pom_nomis_id: pom.staffId)
 
-      create(:case_information, :with_com, offender: build(:offender, nomis_offender_id: 'G7514GW', parole_record: build(:parole_record, target_hearing_date: Time.zone.today + 1.year)))
+      create(:case_information, :with_com, offender: build(:offender, nomis_offender_id: 'G7514GW', parole_records: [build(:parole_record)]))
       create(:allocation_history, prison: prison, nomis_offender_id: 'G7514GW', primary_pom_nomis_id: pom2.staffId)
 
-      create(:case_information, offender: build(:offender, nomis_offender_id: 'G1234GY', parole_record: build(:parole_record, target_hearing_date: Time.zone.today + 1.year)))
+      create(:case_information, offender: build(:offender, nomis_offender_id: 'G1234GY', parole_records: [build(:parole_record, review_status: 'Inactive')]))
       create(:allocation_history, prison: prison, nomis_offender_id: 'G1234GY', primary_pom_nomis_id: pom2.staffId)
 
-      create(:case_information, :with_com, case_allocation: 'CRC', offender: build(:offender, nomis_offender_id: 'G1234VV', parole_record: build(:parole_record, target_hearing_date: Time.zone.today + 1.year)))
+      create(:case_information, :with_com, case_allocation: 'CRC', offender: build(:offender, nomis_offender_id: 'G1234VV', parole_records: [build(:parole_record)]))
       create(:allocation_history, prison: prison, nomis_offender_id: 'G1234VV', primary_pom_nomis_id: pom3.staffId)
 
-      create(:case_information, offender: build(:offender, nomis_offender_id: 'G4234GG', parole_record: build(:parole_record, target_hearing_date: Time.zone.today + 1.year)))
+      create(:case_information, offender: build(:offender, nomis_offender_id: 'G4234GG', parole_records: [build(:parole_record)]))
       create(:allocation_history, prison: prison, nomis_offender_id: 'G4234GG', primary_pom_nomis_id: pom3.staffId)
 
       stub_offenders_for_prison(prison, offenders)
