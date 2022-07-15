@@ -131,7 +131,7 @@ describe HandoverDateService do
       end
 
       context 'when indeterminate' do
-        let(:ted) { Date.new(2022, 7, 3) }
+        let(:ted) { Time.zone.today + 1.week }
         let(:ted15) { ted - 15.months }
 
         let(:api_offender) do
