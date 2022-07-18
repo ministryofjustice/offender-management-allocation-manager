@@ -72,7 +72,7 @@ RSpec.describe TasksController, :allocation, type: :controller do
 
     it 'can show offenders needing a hearing outcome confirmed date' do
       create(:case_information, tier: 'A', mappa_level: 1,
-                                offender: build(:offender, nomis_offender_id: 'G1234AB', parole_records: [build(:parole_record)]))
+                                offender: build(:offender, nomis_offender_id: 'G1234AB', parole_records: [build(:parole_record, review_status: 'Inactive', hearing_outcome: 'Stay in Closed')]))
       create(:allocation_history, nomis_offender_id: 'G1234AB', primary_pom_nomis_id: staff_id, prison: prison)
 
       create(:case_information, tier: 'A', mappa_level: 1,
@@ -107,7 +107,7 @@ RSpec.describe TasksController, :allocation, type: :controller do
       create(:allocation_history, nomis_offender_id: 'G1234GG', primary_pom_nomis_id: staff_id, prison: prison)
 
       create(:case_information, tier: 'A', mappa_level: 1,
-                                offender: build(:offender, nomis_offender_id: 'G1234VV', parole_records: [build(:parole_record)]))
+                                offender: build(:offender, nomis_offender_id: 'G1234VV', parole_records: [build(:parole_record, review_status: 'Inactive', hearing_outcome: 'Stay in Closed')]))
       create(:allocation_history, nomis_offender_id: 'G1234VV', primary_pom_nomis_id: staff_id, prison: prison)
     end
 
