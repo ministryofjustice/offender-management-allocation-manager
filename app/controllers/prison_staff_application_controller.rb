@@ -74,7 +74,7 @@ private
           a.earliest_release_date.to_date <= 4.weeks.after && Date.current.beginning_of_day < a.earliest_release_date.to_date
       end,
       pending_handover_count: @pom.allocations.count(&:approaching_handover?),
-      pending_task_count: PomTasks.new.for_offenders(@pom.allocations).count,
+      pending_task_count: @pom.allocations.map(&:pom_tasks).flatten.count,
       last_allocated_date: @allocations.max_by(&:primary_pom_allocated_at)&.primary_pom_allocated_at&.to_date,
       parole_cases_count: @parole_cases.size
     }

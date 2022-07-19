@@ -10,7 +10,7 @@ class CaseloadController < PrisonStaffApplicationController
   end
 
   def updates_required
-    sorted_tasks = PomTasks.new.for_offenders(@current_user.allocations)
-    @pom_tasks = Kaminari.paginate_array(sorted_tasks).page(page)
+    sorted_tasks = @current_user.allocations.map(&:pom_tasks).flatten
+    @pom_tasks = Kaminari.paginate_array(sorted_tasks.map { |pom_task| PomTaskPresenter.new(pom_task) }).page(page)
   end
 end
