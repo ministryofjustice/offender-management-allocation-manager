@@ -1,0 +1,49 @@
+<%= render 'breadcrumbs', trail: { '/' => 'Home' }, current: 'Help' %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-one-half">
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-6">
+      Missing cases
+    </h1>
+
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
+      Information missing on NOMIS or NDelius
+    </h2>
+    <p>
+      Make sure information about the case has been entered correctly on NOMIS.
+      For example, this might include sentence calculation dates.
+    </p>
+    <p>
+      Also check if the case is listed on
+      <a class="govuk-link govuk-link--no-visited-state" href="#">Add missing details</a>.
+      If it is, you will need to manually add some information from NDelius before it can be displayed.
+    </p>
+
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
+      Check the case needs a POM
+    </h2>
+    <p>Cases that do not need a POM will not be displayed. This might be because someone:</p>
+    <p></p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>is on remand</li>
+      <li>is under 18</li>
+      <li>is involved in a civil case</li>
+      <li>does not have an earliest release date or parole hearing date in NOMIS</li>
+    </ul>
+    <p></p>
+
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
+      Life sentences
+    </h2>
+    <p>
+      If someone on a life sentence is showing as a determinate case, you need to make the case active on NOMIS.
+    </p>
+
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
+      If you still need help
+    </h2>
+    <p>
+      <a class="govuk-link govuk-link--no-visited-state" href="#">Tell us about the problem you are having</a>
+    </p>
+  </div>
+</div>
