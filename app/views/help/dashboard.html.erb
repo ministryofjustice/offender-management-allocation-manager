@@ -1,0 +1,20 @@
+<% content_for :title, 'Help – Digital Prison Services' %>
+
+<%= render 'breadcrumbs', trail: { '/' => 'Home' }, current: 'Help' %>
+
+<h1 class="govuk-heading-l govuk-!-margin-bottom-6">Choose what you need help with</h1>
+
+<div class="govuk-grid-row card-group">
+  <%= render 'dashboard_partition',
+             title: 'Add staff members',
+             link: '#',
+             content: 'How to give new joiners access to this service' %>
+  <%= render 'dashboard_partition',
+             title: 'Missing cases',
+             link: '#',
+             content: 'What to do if you cannot find a prisoner in this service' %>
+  <%= render 'dashboard_partition',
+             title: 'Problems with case responsibility',
+             link: '#',
+             content: 'Checking if responsibility for a case in this service is right' %>
+</div>

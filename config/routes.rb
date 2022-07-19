@@ -132,7 +132,7 @@ Rails.application.routes.draw do
 
   get '/contact_us', to: 'pages#contact_us'
   post '/contact_us', to: 'pages#create_contact_us'
-  get '/help', to: 'pages#help'
+  get '/help', to: 'pages#help', as: nil
   get '/help_step0', to: 'pages#help_step0'
   get '/help_step1', to: 'pages#help_step1'
   get '/help_step2', to: 'pages#help_step2'
@@ -147,6 +147,8 @@ Rails.application.routes.draw do
   get '/scottish_northern_irish', to: 'pages#scottish_northern_irish'
   get '/contact', to: 'pages#contact'
   get '/whats-new', to: 'pages#whats_new'
+
+  get '/help/:page', to: 'help#show', as: 'help'
 
   resources :health, only: %i[ index ], controller: 'health'
   resources :status, only: %i[ index ], controller: 'status'
