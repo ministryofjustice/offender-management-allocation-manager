@@ -45,7 +45,7 @@ private
     if current_user.present?
       redirect_to prison_dashboard_index_path(@user.active_case_load_id)
     else
-      redirect_to help_path('dashboard')
+      redirect_to help_dashboard_path
     end
     flash[:notice] = 'Thank you for your message. We aim to reply within 2 working days.'
   end

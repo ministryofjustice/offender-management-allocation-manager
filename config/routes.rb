@@ -147,7 +147,10 @@ Rails.application.routes.draw do
   get '/help_step4', to: 'help#help_step4'
   get '/help_step5', to: 'help#help_step5'
   get '/help_step6', to: 'help#help_step6'
-  get '/help/:page', to: 'help#show', as: 'help'
+
+  get '/help/dashboard', to: 'help#dashboard'
+  get '/help/missing_cases', to: 'help#missing_cases'
+  get '/help/case_responsibility', to: 'help#case_responsibility'
 
   resources :health, only: %i[ index ], controller: 'health'
   resources :status, only: %i[ index ], controller: 'status'
