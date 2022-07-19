@@ -1,0 +1,26 @@
+<table class="govuk-table">
+  <tbody class="govuk-table__body">
+    <tr class="govuk-table__row">
+      <td class="govuk-table__header govuk-!-width-one-half" scope="row">Previous parole applications</td>
+      <td class="govuk-table__cell govuk-!-width-one-half"></td>
+    </tr>
+    <% @prisoner.previous_parole_records.first(3).each_with_index do |record, index| %>
+      <tr class="govuk-table__row">
+        <% if index == 0 %>
+          <td class="govuk-table__cell govuk-!-width-one-half">Hearing outcome</td>
+        <% else %>
+          <td class="govuk-table__cell govuk-!-width-one-half"></td>
+        <% end %>
+        <% if record.hearing_outcome_received.present? %>
+          <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= "#{record.hearing_outcome_received.strftime("%b %Y")} – #{record.previous_hearing_outcome}" %></td>
+        <% else %>
+          <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
+            <%= record.previous_hearing_outcome %>
+            <br/>
+            We do not have the date this outcome was confirmed
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

@@ -2,6 +2,8 @@ FactoryBot.define do
   factory :parole_record do
     association :offender
 
-    target_hearing_date {Time.zone.today + 8.months}
+    # Defaults a parole record to be the currently active record
+    review_status {'Active'}
+    hearing_outcome {'Not Specified'}
   end
 end
