@@ -35,8 +35,6 @@ class PagesController < ApplicationController
     end
   end
 
-  def help; end
-
   def contact; end
 
   def whats_new; end

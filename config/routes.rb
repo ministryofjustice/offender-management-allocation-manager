@@ -132,14 +132,6 @@ Rails.application.routes.draw do
 
   get '/contact_us', to: 'pages#contact_us'
   post '/contact_us', to: 'pages#create_contact_us'
-  get '/help', to: 'pages#help', as: nil
-  get '/help_step0', to: 'pages#help_step0'
-  get '/help_step1', to: 'pages#help_step1'
-  get '/help_step2', to: 'pages#help_step2'
-  get '/help_step3', to: 'pages#help_step3'
-  get '/help_step4', to: 'pages#help_step4'
-  get '/help_step5', to: 'pages#help_step5'
-  get '/help_step6', to: 'pages#help_step6'
   get '/update_case_information', to: 'pages#update_case_information'
   get '/updating_ndelius', to: 'pages#updating_ndelius'
   get '/missing_cases', to: 'pages#missing_cases'
@@ -148,6 +140,13 @@ Rails.application.routes.draw do
   get '/contact', to: 'pages#contact'
   get '/whats-new', to: 'pages#whats_new'
 
+  get '/help_step0', to: 'help#help_step0'
+  get '/help_step1', to: 'help#help_step1'
+  get '/help_step2', to: 'help#help_step2'
+  get '/help_step3', to: 'help#help_step3'
+  get '/help_step4', to: 'help#help_step4'
+  get '/help_step5', to: 'help#help_step5'
+  get '/help_step6', to: 'help#help_step6'
   get '/help/:page', to: 'help#show', as: 'help'
 
   resources :health, only: %i[ index ], controller: 'health'
