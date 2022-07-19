@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: recalculate-handover-dates
 spec:
-  schedule: "0 3 * * *"
+  schedule: "0 4 * * *"
   concurrencyPolicy: Replace
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3

@@ -380,7 +380,7 @@ describe HandoverDateService do
 
   context 'when indeterminate' do
     context 'with tariff date in the future' do
-      let(:tariff_date) { Date.parse('01/09/2022') }
+      let(:tariff_date) { 1.year.from_now.to_date }
       let(:case_info) { build(:case_information, :nps, probation_service: welsh? ? 'Wales' : 'England') }
       let(:api_offender) do
         build(:hmpps_api_offender,
@@ -606,6 +606,70 @@ describe HandoverDateService do
               expect(com).to be_responsible
             end
           end
+        end
+      end
+    end
+
+    context 'with a tariff date in the past' do
+      let(:tariff_date) { Date.parse('1/1/2020') }
+      let(:case_info) { build(:case_information, :nps, probation_service: 'England', offender: case_info_offender) }
+      let(:case_info_offender) { build(:offender, parole_records: [parole_record]) }
+      let(:parole_record) { build(:parole_record, target_hearing_date: target_hearing_date, hearing_outcome_received: Time.zone.today) }
+      let(:api_offender) do
+        build(:hmpps_api_offender,
+              prisonId: prison,
+              category: category,
+              sentence: attributes_for(:sentence_detail, :indeterminate, tariffDate: tariff_date, sentenceStartDate: '1/1/2018')
+             ).tap do |o|
+          o.prison_arrival_date = arrival_date
+        end
+      end
+
+      context 'with a target hearing date within a year of the hearing outcome' do
+        let(:target_hearing_date) { Time.zone.today + 6.months }
+
+        it 'COM is responsible' do
+          expect(com).to be_responsible
+        end
+      end
+
+      context 'with a target hearing date over a year away from the hearing outcome' do
+        context 'with a target hearing date more than 8 months in the future' do
+          let(:target_hearing_date) { Time.zone.today + 2.years }
+
+          it 'POM is responsibe' do
+            expect(pom).to be_responsible
+          end
+        end
+
+        context 'with a target hearing date less than 8 months in the future' do
+          let(:target_hearing_date) { Time.zone.today + 6.months }
+          let(:parole_record) { build(:parole_record, target_hearing_date: target_hearing_date, hearing_outcome_received: Time.zone.today - 18.months) }
+
+          it 'COM is responsible' do
+            expect(com).to be_responsible
+          end
+        end
+      end
+
+      context 'with a hearing outcome of "Release [*]"' do
+        let(:target_hearing_date) { Time.zone.today + 2.years }
+        let(:parole_record) { build(:parole_record, target_hearing_date: target_hearing_date, hearing_outcome_received: Time.zone.today - 1.week, hearing_outcome: 'Release [*]') }
+
+        it 'follows non-parole allocation rules' do
+          expect_any_instance_of(MpcOffender).not_to receive(:hearing_outcome_received)
+          expect_any_instance_of(MpcOffender).to receive(:recalled?)
+
+          described_class.handover(offender)
+        end
+      end
+
+      context 'when an offender is mappa level 2 or 3' do
+        let(:target_hearing_date) { Time.zone.today + 2.years }
+        let(:case_info) { build(:case_information, :nps, probation_service: 'England', offender: case_info_offender, mappa_level: 3) }
+
+        it 'assigns to COM responsible, regardless of THD' do
+          expect(com).to be_responsible
         end
       end
     end

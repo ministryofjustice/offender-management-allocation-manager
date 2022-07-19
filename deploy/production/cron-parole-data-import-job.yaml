@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: import-parole-records-job
 spec:
-  schedule: "0 4 * * *"
+  schedule: "0 3 * * *"
   concurrencyPolicy: Replace
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3

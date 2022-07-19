@@ -73,7 +73,13 @@ describe HmppsApi::Offender do
     context 'when THD < 18 months' do
       let(:case_info) do
         build(:case_information, offender: build(:offender,
-                                                 parole_records: [build(:parole_record, target_hearing_date: Time.zone.today + 17.months)]))
+                                                 parole_records: [build(:parole_record,
+                                                                        target_hearing_date: Time.zone.today + 17.months,
+                                                                        review_status: 'Active',
+                                                                        hearing_outcome: 'Not Specified'
+                                                                       )
+                                                 ]
+                                                ))
       end
       let(:api_offender) do
         build(:hmpps_api_offender,

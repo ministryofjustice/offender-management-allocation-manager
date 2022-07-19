@@ -22,7 +22,25 @@ class HandoverDateService
 
     offender = OffenderWrapper.new(raw_offender)
 
-    if offender.recalled?
+    # Should only trigger on offenders who have not been released as a part of their parole review, ie not on their first allocation
+    if eligible_unsuccessful_parole_applicant(offender)
+      if offender.mappa_level.in? [2, 3]
+        CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+                                   start_date: nil, handover_date: nil,
+                                   reason: :parole_mappa_2_3
+
+      elsif offender.target_hearing_date < offender.hearing_outcome_received + 12.months
+        CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+                                   start_date: nil, handover_date: nil,
+                                   reason: :thd_within_12_months_of_hearing_outcome
+
+      else
+        handover_date = indeterminate_responsibility_date(offender)
+        CalculatedHandoverDate.new responsibility: responsibility(handover_date, handover_date),
+                                   start_date: handover_date, handover_date: handover_date,
+                                   reason: :thd_more_than_12_months_from_hearing_outcome
+      end
+    elsif offender.recalled?
       CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
                                  start_date: nil, handover_date: nil,
                                  reason: :recall_case
@@ -165,6 +183,14 @@ private
     end
   end
 
+  def self.eligible_unsuccessful_parole_applicant(offender)
+    return false if offender.most_recent_parole_record.blank?
+    return false if offender.most_recent_parole_record.hearing_outcome_received.blank?
+    return false if offender.most_recent_parole_record.current_hearing_outcome == 'Release'
+
+    offender.indeterminate_sentence? && offender.tariff_date&.past?
+  end
+
   WELSH_POLICY_START_DATE = Time.zone.local(2019, 2, 4).utc.to_date.freeze
   WELSH_CUTOFF_DATE = '4 May 2020'.to_date.freeze
 
@@ -179,6 +205,7 @@ private
              :early_allocation?, :mappa_level, :prison_arrival_date, :category_active_since,
              :parole_eligibility_date, :conditional_release_date, :automatic_release_date,
              :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date,
+             :tariff_date, :target_hearing_date, :hearing_outcome_received, :most_recent_parole_record,
              to: :@offender
 
     def initialize(offender)
