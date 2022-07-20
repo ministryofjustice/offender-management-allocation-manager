@@ -130,14 +130,6 @@ Rails.application.routes.draw do
   match "/500", :to => "errors#internal_server_error", :via => :all
   match "/503", :to => "errors#internal_server_error", :via => :all
 
-  get '/contact_us', to: 'pages#contact_us'
-  post '/contact_us', to: 'pages#create_contact_us'
-  get '/update_case_information', to: 'pages#update_case_information'
-  get '/updating_ndelius', to: 'pages#updating_ndelius'
-  get '/missing_cases', to: 'pages#missing_cases'
-  get '/repatriated', to: 'pages#repatriated'
-  get '/scottish_northern_irish', to: 'pages#scottish_northern_irish'
-  get '/contact', to: 'pages#contact'
   get '/whats-new', to: 'pages#whats_new'
 
   get '/help_step0', to: 'help#help_step0'

@@ -1,5 +1,6 @@
-# frozen_string_literal: true
-
+# This is the old 'Contact Us' plumbing - these records would be sent off to Zendesk after being stored in the DB.
+# Model being kept around so we can query the old contact us messages should we need to, but can be removed once that
+# need is no longer present
 class ContactSubmission < ApplicationRecord
   validates :email_address, presence: {
     message: 'Email address is required'
