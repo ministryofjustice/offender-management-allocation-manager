@@ -4,4 +4,3 @@
 :queues:
   - default
   - mailers
-  - zendesk

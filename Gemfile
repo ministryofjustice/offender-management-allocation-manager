@@ -48,7 +48,6 @@ gem 'sassc-rails'
 # https://stackoverflow.com/questions/38611405/email-validation-in-ruby-on-rails
 gem 'valid_email2'
 gem 'wicked'
-gem 'zendesk_api'
 gem 'rails-i18n'
 
 gem 'activeadmin'
