@@ -1,3 +1,5 @@
+<% content_for :title, 'Case responsibility – Digital Prison Services' %>
+
 <%= render 'breadcrumbs', trail: { '/' => 'Home' }, current: 'Help' %>
 
 <div class="govuk-grid-row">
@@ -20,11 +22,11 @@
     </h2>
     <p>
       Email the OMIC policy team on
-      <a class="govuk-link govuk-link--no-visited-state" href="#">omicenquiries@justice.gov.uk</a>
+      <a class="govuk-link govuk-link--no-visited-state" href="mailto:omicenquiries@justice.gov.uk">omicenquiries@justice.gov.uk</a>
       if you are sure a COM should be responsible for a case instead of a POM.
     </p>
     <p>
-      <a href="#">Tell us if you confirm that a COM should be responsible for the case</a>.
+      <a href="<%= service_now_external_url %>">Tell us if you confirm that a COM should be responsible for the case</a>.
     </p>
 
     <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
@@ -74,7 +76,9 @@
       If you still need help
     </h2>
     <p>
-      <a class="govuk-link govuk-link--no-visited-state" href="#">Tell us about the problem you are having</a>
+      <a class="govuk-link govuk-link--no-visited-state" href="<%= service_now_external_url %>">
+        Tell us about the problem you are having
+      </a>
     </p>
   </div>
 </div>
