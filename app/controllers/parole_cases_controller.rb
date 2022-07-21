@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-class ParoleController < PrisonsApplicationController
+# Used to display all parole cases within a prison to the HOMD
+class ParoleCasesController < PrisonsApplicationController
   include Sorting
 
   before_action :ensure_spo_user

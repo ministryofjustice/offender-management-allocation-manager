@@ -177,6 +177,19 @@ class MpcOffender
     ].compact.min
   end
 
+  # Separate from next_parole_date as parole case index view sorts by next_parole_date, so it seemed sensible to avoid changing default rails behaviour
+  # for the sake of saving a couple of simple, albeit slightly inefficient, comparisons.
+  def next_parole_date_type
+    case next_parole_date
+    when tariff_date
+      'TED'
+    when parole_eligibility_date
+      'PED'
+    when target_hearing_date
+      'Target hearing date'
+    end
+  end
+
   def early_allocation_state
     if early_allocation?
       :eligible

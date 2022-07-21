@@ -12,7 +12,7 @@ Rails.application.routes.draw do
     resources :prisons, only: :index
 
     resources :dashboard, only: :index
-    resources :parole, only: :index
+    resources :parole_cases, only: :index
     resources :handovers, only: :index
     resources :staff do
       resources :caseload_handovers, only: %i[index]
@@ -82,11 +82,7 @@ Rails.application.routes.draw do
         end
       end
 
-      resources :parole_records, only: [:edit, :update] do
-        member do
-          get '/enter_parole_hearing_outcome_confirmed', to: 'parole_records#edit'
-        end
-      end
+      resources :parole_records, only: [:edit, :update]
 
       resources :staff, only: %i[index], controller: 'allocation_staff' do
         resources :build_allocations, only: %i[new show update], controller: 'build_allocations'

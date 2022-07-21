@@ -1,11 +1,12 @@
 require 'rails_helper'
 
-RSpec.describe ParoleController, type: :controller do
+RSpec.describe ParoleCasesController, type: :controller do
   let(:prison) { create(:prison).code }
 
   before { stub_sso_data(prison) }
 
   context 'with 5 offenders' do
+    # Those with PEDs/TEDs/THDs over 10 months should not appear on this page
     let(:today_plus_11_months) { (Time.zone.today + 11.months).to_s }
     let(:today_plus_9_months) { (Time.zone.today + 9.months).to_s }
     let(:today_plus_7_months) { (Time.zone.today + 7.months).to_s }
@@ -21,13 +22,6 @@ RSpec.describe ParoleController, type: :controller do
               lastName: 'STEVENS',
               sentence: attributes_for(:sentence_detail,
                                        sentenceStartDate: "2020-04-19")),
-        build(:nomis_offender,
-              prisonerNumber: "G7514GW",
-              firstName: 'STAN',
-              lastName: 'SMITH',
-              sentence: attributes_for(:sentence_detail,
-                                       sentenceStartDate: "2011-01-20",
-                                       paroleEligibilityDate: today_plus_9_months)),
         build(:nomis_offender,
               prisonerNumber: "G1234GY",
               imprisonmentStatus: "LIFE",
@@ -51,6 +45,14 @@ RSpec.describe ParoleController, type: :controller do
               sentence: attributes_for(:sentence_detail,
                                        sentenceStartDate: "2019-02-08",
                                        tariffDate: today_plus_11_months)),
+        # PED in the past means COM responsible
+        build(:nomis_offender,
+              prisonerNumber: "G7514GW",
+              firstName: 'STAN',
+              lastName: 'SMITH',
+              sentence: attributes_for(:sentence_detail,
+                                       sentenceStartDate: "2011-01-20",
+                                       paroleEligibilityDate: Time.zone.yesterday)),
       ]
 
       create(:case_information, case_allocation: 'NPS', offender: build(:offender, nomis_offender_id: 'G1234QQ', parole_records: [build(:parole_record, target_hearing_date: Time.zone.today + 8.months)]))
@@ -96,16 +98,17 @@ RSpec.describe ParoleController, type: :controller do
         end
 
         context 'when sorting by pom role' do
+          # This works a touch counter intuitively, it sorts based on 'true' or 'false', not what is on the screen of 'Responsible' or 'Supporting
           it 'sorts' do
             get :index, params: { prison_id: prison, sort: 'pom_responsible? asc' }
-            expect(assigns(:offenders).map(&:offender_no)).to eq(['G1234QQ', 'G7514GW', 'G1234VV'])
+            expect(assigns(:offenders).map(&:offender_no)).to eq(['G7514GW', 'G1234QQ', 'G1234VV'])
           end
         end
 
         context 'when sorting by next parole date' do
           it 'sorts' do
             get :index, params: { prison_id: prison, sort: 'next_parole_date desc' }
-            expect(assigns(:offenders).map(&:offender_no)).to eq(['G7514GW', 'G1234QQ', 'G1234VV'])
+            expect(assigns(:offenders).map(&:offender_no)).to eq(['G1234QQ', 'G1234VV', 'G7514GW'])
           end
         end
       end
