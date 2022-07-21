@@ -2,13 +2,13 @@
 
 <%= render 'breadcrumbs', trail: { '/' => 'Home' }, current: 'Help' %>
 
-<h1 class="govuk-heading-l govuk-!-margin-bottom-6">Choose what you need help with</h1>
+<h1 class="govuk-heading-l govuk-!-margin-bottom-9">Choose what you need help with</h1>
 
 <div class="govuk-grid-row card-group">
   <%= render 'dashboard_partition',
              title: 'Add staff members',
              link: help_step0_path,
-             content: 'How to give new joiners access to this service' %>
+             content: 'How to give new members of staff access to this service' %>
   <%= render 'dashboard_partition',
              title: 'Missing cases',
              link: help_missing_cases_path,
@@ -17,4 +17,17 @@
              title: 'Problems with case responsibility',
              link: help_case_responsibility_path,
              content: 'Checking if responsibility for a case in this service is right' %>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h2 class="govuk-heading-m govuk-!-margin-top-6 govuk-!-margin-bottom-2">
+      If you need help with something else
+    </h2>
+    <p>
+      <a class="govuk-link govuk-link--no-visited-state" href="<%= service_now_external_url %>">
+        Tell us about the problem you are having
+      </a>
+    </p>
+  </div>
 </div>
