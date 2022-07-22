@@ -98,9 +98,8 @@ RSpec.describe ParoleCasesController, type: :controller do
         end
 
         context 'when sorting by pom role' do
-          # This works a touch counter intuitively, it sorts based on 'true' or 'false', not what is on the screen of 'Responsible' or 'Supporting
           it 'sorts' do
-            get :index, params: { prison_id: prison, sort: 'pom_responsible? asc' }
+            get :index, params: { prison_id: prison, sort: 'allocated_pom_role desc' }
             expect(assigns(:offenders).map(&:offender_no)).to eq(['G7514GW', 'G1234QQ', 'G1234VV'])
           end
         end
