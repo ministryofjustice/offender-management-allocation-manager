@@ -61,7 +61,11 @@
               <%= offender.allocated_pom_role %>
             </td>
             <td aria-label="Next parole date" class="govuk-table__cell">
-              <%= offender.next_parole_date %>
+              <span class='govuk-!-margin-bottom-0'>
+                <%= offender.next_parole_date_type %>:
+              </span>
+              <br/>
+              <%= format_date(offender.next_parole_date) %>
             </td>
           </tr>
         <% end %>

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Used to view and edit individual parole applications (records) for individual offenders
 class ParoleRecordsController < PrisonsApplicationController
   before_action :load_offender
 

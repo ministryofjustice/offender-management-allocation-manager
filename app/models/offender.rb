@@ -39,8 +39,6 @@ class Offender < ApplicationRecord
 
   has_many :victim_liaison_officers, foreign_key: :nomis_offender_id, inverse_of: :offender, dependent: :destroy
 
-  delegate :parsed_hearing_outcome, to: :parole_record
-
   def most_recent_parole_record
     parole_records.max_by(&:custody_report_due)
   end
