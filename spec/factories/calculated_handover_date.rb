@@ -5,8 +5,10 @@ FactoryBot.define do
     association :offender
 
     start_date { Faker::Date.forward }
+    com_allocation_date { Faker::Date.forward }
 
     handover_date { Faker::Date.forward }
+    com_responsibility_date { Faker::Date.forward }
 
     reason {
       # Randomly select a valid reason

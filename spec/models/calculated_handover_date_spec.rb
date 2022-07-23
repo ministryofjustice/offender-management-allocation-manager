@@ -1,6 +1,4 @@
-require 'rails_helper'
-
-RSpec.describe CalculatedHandoverDate, type: :model do
+RSpec.describe CalculatedHandoverDate do
   subject { build(:calculated_handover_date) }
 
   let(:today) { Time.zone.today }
@@ -20,8 +18,8 @@ RSpec.describe CalculatedHandoverDate, type: :model do
       build(:offender,
             calculated_handover_date: build(:calculated_handover_date,
                                             responsibility: com_responsibility.responsibility,
-                                            start_date: com_responsibility.start_date,
-                                            handover_date: com_responsibility.handover_date,
+                                            com_allocation_date: com_responsibility.com_allocation_date,
+                                            com_responsibility_date: com_responsibility.com_responsibility_date,
                                             reason: com_responsibility.reason))
     end
     let(:com_responsibility) { HandoverDateService::NO_HANDOVER_DATE }
@@ -29,8 +27,8 @@ RSpec.describe CalculatedHandoverDate, type: :model do
 
     it 'allows nil handover dates' do
       expect(record).to be_valid
-      expect(record.start_date).to be_nil
-      expect(record.handover_date).to be_nil
+      expect(record.com_allocation_date).to be_nil
+      expect(record.com_responsibility_date).to be_nil
       expect(record.reason_text).to eq('COM Responsibility')
     end
   end
@@ -45,6 +43,18 @@ RSpec.describe CalculatedHandoverDate, type: :model do
 
     it 'is not valid' do
       expect(subject.valid?).to be(false)
+    end
+  end
+
+  describe 'using official domain language compliant naming' do
+    it 'has #com_allocation_date' do
+      subject.com_allocation_date = Date.new(2022, 7, 7)
+      expect(subject.com_allocation_date).to eq Date.new(2022, 7, 7)
+    end
+
+    it 'has #com_responsibility_date' do
+      subject.com_responsibility_date = Date.new(2022, 9, 7)
+      expect(subject.com_responsibility_date).to eq Date.new(2022, 9, 7)
     end
   end
 end

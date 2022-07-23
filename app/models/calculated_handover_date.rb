@@ -32,6 +32,9 @@ class CalculatedHandoverDate < ApplicationRecord
   validates :responsibility, inclusion: { in: [CUSTODY_ONLY, CUSTODY_WITH_COM, COMMUNITY_RESPONSIBLE], nil: false }
   validates :reason, inclusion: { in: REASONS.keys, nil: false }
 
+  alias_attribute :com_allocation_date, :start_date
+  alias_attribute :com_responsibility_date, :handover_date
+
   def custody_responsible?
     responsibility.in? [CUSTODY_WITH_COM, CUSTODY_ONLY]
   end
