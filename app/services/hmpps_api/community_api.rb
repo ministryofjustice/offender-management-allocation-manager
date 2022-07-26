@@ -4,6 +4,9 @@ module HmppsApi
   class CommunityApi
     class KeyDate
       # These are `{typeCode}` values for 'key dates' in the Community API
+      #
+      # TODO: Rename HANDOVER_START_DATE to COM_ALLOCATION_DATE and RESPONSIBILITY_HANDOVER_DATE to COM_RESPONSIBILITY_DATE to
+      #       match confirmed domain language
       HANDOVER_START_DATE = 'POM1'
       RESPONSIBILITY_HANDOVER_DATE = 'POM2'
     end
@@ -64,6 +67,7 @@ module HmppsApi
       true
     end
 
+    # TODO: Rename method and parameters to reflect new domain language for handover date names
     def self.set_handover_dates(offender_no:, handover_start_date:, responsibility_handover_date:)
       safe_offender_no = URI.encode_www_form_component(offender_no)
       base_route = "/offenders/nomsNumber/#{safe_offender_no}/custody/keyDates/"
