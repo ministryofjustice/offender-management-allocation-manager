@@ -130,23 +130,19 @@ Rails.application.routes.draw do
   match "/500", :to => "errors#internal_server_error", :via => :all
   match "/503", :to => "errors#internal_server_error", :via => :all
 
-  get '/contact_us', to: 'pages#contact_us'
-  post '/contact_us', to: 'pages#create_contact_us'
-  get '/help', to: 'pages#help'
-  get '/help_step0', to: 'pages#help_step0'
-  get '/help_step1', to: 'pages#help_step1'
-  get '/help_step2', to: 'pages#help_step2'
-  get '/help_step3', to: 'pages#help_step3'
-  get '/help_step4', to: 'pages#help_step4'
-  get '/help_step5', to: 'pages#help_step5'
-  get '/help_step6', to: 'pages#help_step6'
-  get '/update_case_information', to: 'pages#update_case_information'
-  get '/updating_ndelius', to: 'pages#updating_ndelius'
-  get '/missing_cases', to: 'pages#missing_cases'
-  get '/repatriated', to: 'pages#repatriated'
-  get '/scottish_northern_irish', to: 'pages#scottish_northern_irish'
-  get '/contact', to: 'pages#contact'
   get '/whats-new', to: 'pages#whats_new'
+
+  get '/help_step0', to: 'help#help_step0'
+  get '/help_step1', to: 'help#help_step1'
+  get '/help_step2', to: 'help#help_step2'
+  get '/help_step3', to: 'help#help_step3'
+  get '/help_step4', to: 'help#help_step4'
+  get '/help_step5', to: 'help#help_step5'
+  get '/help_step6', to: 'help#help_step6'
+
+  get '/help/dashboard', to: 'help#dashboard'
+  get '/help/missing_cases', to: 'help#missing_cases'
+  get '/help/case_responsibility', to: 'help#case_responsibility'
 
   resources :health, only: %i[ index ], controller: 'health'
   resources :status, only: %i[ index ], controller: 'status'
