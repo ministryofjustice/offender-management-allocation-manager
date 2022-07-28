@@ -150,16 +150,6 @@ class MpcOffender
     end
   end
 
-  def in_upcoming_handover_window?(relative_to_date = Time.zone.now.to_date)
-    # we can't calculate handover without case info (in probation record) as we don't know NPS/CRC
-    return false if @probation_record.blank?
-
-    # We can't calculate handover if no handover start date
-    return false if handover_start_date.nil?
-
-    handover_start_date >= relative_to_date - 8.weeks
-  end
-
   # early allocation methods
 
   def parole_review_date
