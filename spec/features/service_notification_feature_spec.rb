@@ -56,7 +56,7 @@ feature 'Service Notification' do
         expect(page).not_to have_css('.service_banner')
 
         # go to a static page (where service notifications are not displayed)
-        visit help_path
+        visit help_dashboard_path
 
         # go back to home page
         visit root_path

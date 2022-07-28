@@ -1,0 +1,82 @@
+<% content_for :title, 'Case responsibility – Digital Prison Services' %>
+
+<%= render 'breadcrumbs', trail: { '/' => 'Home', help_dashboard_path => 'Help' }, current: 'Case responsibility' %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-6">
+      Problems with case responsibility
+    </h1>
+
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
+      Check if the case is owned by legacy CRC
+    </h2>
+    <p>Responsibility for legacy CRC cases changes 12 weeks before the prisoner’s earliest release date.</p>
+    <p>
+      This is different to legacy NPS cases, where responsibility can change several months before the earliest release
+      date.
+    </p>
+
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
+      If a COM should be responsible
+    </h2>
+    <p>
+      Email the OMIC policy team on
+      <a class="govuk-link govuk-link--no-visited-state" href="mailto:omicenquiries@justice.gov.uk">omicenquiries@justice.gov.uk</a>
+      if you are sure a COM should be responsible for a case instead of a POM.
+    </p>
+    <p>
+      If you confirm that a COM should be responsible, report this to service desk on <%= SERVICE_DESK_NUMBER %>.
+    </p>
+
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
+      If a POM should be responsible
+    </h2>
+    <p>In NOMIS:</p>
+    <p></p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>make any old recall flags inactive if the prisoner has started a new sentence</li>
+      <li>make sure parole cases have a PED or TED</li>
+    </ul>
+    <p></p>
+    <p>If a PED or TED has passed, the POM allocated to the case will need to:</p>
+    <p></p>
+    <ul class="govuk-list govuk-list--number">
+      <li>
+        select the prisoner’s name from the
+        <a class="govuk-link govuk-link--no-visited-state" href="<%= prison_staff_caseload_updates_required_path(@prison_code, @staff_id) %>">Case updates needed</a>
+        page of the service
+      </li>
+      <li>enter a new parole hearing date</li>
+    </ul>
+    <p></p>
+
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
+      Changing responsibility
+    </h2>
+    <p>You can only change responsibility if you can allocate cases in the service.</p>
+    <p>Responsibility from custody to community can be changed on the person’s Allocation information page.</p>
+    <p>
+      If responsibility for a case has been changed from custody to community by mistake, you can change it back to be
+      owned by custody.
+    </p>
+    <p></p>
+    <ul class="govuk-list govuk-list--number">
+      <li>
+        Search for the person you need to change responsibility for and select their name to view more information
+      </li>
+      <li>Choose to reallocate a POM</li>
+      <li>In the Case information section of the Reallocate a POM page, change responsibility for the case</li>
+      <li>You will need to provide a reason for changing the responsibility</li>
+      <li>An email will be sent to the LDU to make sure a COM is allocated</li>
+    </ul>
+    <p></p>
+
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
+      If you still need help
+    </h2>
+    <p>
+      Contact service desk on <%= SERVICE_DESK_NUMBER %>
+    </p>
+  </div>
+</div>

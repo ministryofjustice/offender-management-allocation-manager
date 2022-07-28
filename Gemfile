@@ -3,7 +3,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.7.5'
 
-gem 'rails', ' 6.1.5.1'
+gem 'rails', '~> 6.1.6'
 gem 'auto_strip_attributes'
 # Need AWS SNS SDK for publishing events to HMPPS_DOMAIN_EVENTS
 gem 'aws-sdk-sns'
@@ -48,7 +48,6 @@ gem 'sassc-rails'
 # https://stackoverflow.com/questions/38611405/email-validation-in-ruby-on-rails
 gem 'valid_email2'
 gem 'wicked'
-gem 'zendesk_api'
 gem 'rails-i18n'
 
 gem 'activeadmin'
