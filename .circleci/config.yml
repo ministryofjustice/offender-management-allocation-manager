@@ -195,9 +195,10 @@ jobs:
           name: Run tests
           command: |
             cc-test-reporter before-build
-            MOZ_HEADLESS=1 bundle exec parallel_test -t rspec -- -t ~flaky -fd -- spec
+            bundle exec parallel_test -t rspec -- -t ~flaky --format progress -- spec
             cc-test-reporter after-build --coverage-input-type lcov --exit-code $?
           environment:
+            MOZ_HEADLESS: 1
             ALLOCATION_MANAGER_HOST: https://dev.moic.service.justice.gov.uk
             RAILS_ENV: test
             RACK_ENV: test
