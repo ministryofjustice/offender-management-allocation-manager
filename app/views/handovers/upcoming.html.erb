@@ -24,7 +24,7 @@
   </thead>
 
   <tbody class="govuk-table__body">
-  <% @upcoming_handover_allocated_offenders.each do |allocated_offender| %>
+  <% @handover_cases.upcoming.each do |calculated_handover_date, allocated_offender| %>
     <tr class="govuk-table__row allocated-offender">
       <td class="govuk-table__cell prisoner-details">
         <a class="govuk-link govuk-link--no-visited-state"
@@ -35,13 +35,16 @@
         <span class="govuk-hint govuk-!-margin-bottom-0 offender-no"><%= allocated_offender.offender_no %></span>
       </td>
 
-      <% com_r_date = allocated_offender.handover_start_date %>
+      <% com_r_date = calculated_handover_date.com_responsibility_date %>
       <td class="govuk-table__cell com-responsible" data-sort-value="<%= com_r_date.iso8601 %>">
         COM responsible: <br>
         <%= format_date(com_r_date, replacement: "Unknown") %>
       </td>
 
-      <td class="govuk-table__cell earliest-release-date" data-sort-value="2021.12.11">TODO: <br>TODO</td>
+      <td class="govuk-table__cell earliest-release-date" data-sort-value="<%= allocated_offender.release_date.iso8601 %>">
+        TODO: <br>
+        <%= format_date(allocated_offender.release_date, replacement: "ERROR: Unknown") %>
+      </td>
 
       <td class="govuk-table__cell tier" data-sort-value="<%= allocated_offender.case_allocation %>">
         <strong><%= allocated_offender.tier %></strong>
@@ -62,8 +65,8 @@
             <img style="width:7%; padding-right: 5px;" src="<%= image_path('cross.png') %>" alt="task not started">
             Send handover report
           </li>
-          <p class="govuk-!-margin-top-2">
-            <a class="govuk-link govuk-link--no-visited-state" href="./record-progress-crc.html" style="padding-left: 20px;">
+          <p class="govuk-!-margin-top-2"><%# TODO incorrect markup %>
+            <a class="govuk-link govuk-link--no-visited-state" href="#" style="padding-left: 20px;">
               Record progress
             </a>
           </p>

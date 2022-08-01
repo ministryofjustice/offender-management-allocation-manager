@@ -1,21 +1,27 @@
 RSpec.describe 'handovers/upcoming' do
   let(:prison_code) { 'PRI' }
-  let(:upcoming_handover_allocated_offenders) do
+  let(:upcoming_handover_cases) do
     [
-      instance_double(AllocatedOffender,
-                      full_name: 'Surname1, Firstname1',
-                      last_name: 'Surname1',
-                      offender_no: 'X1111XX',
-                      handover_start_date: Date.new(2022, 1, 12),
-                      tier: 'A',
-                      case_allocation: 'HDCED'),
-      instance_double(AllocatedOffender,
-                      full_name: 'Surname2, Firstname2',
-                      last_name: 'Surname2',
-                      offender_no: 'X2222XX',
-                      handover_start_date: Date.new(2022, 2, 12),
-                      tier: 'B',
-                      case_allocation: 'CRC')
+      [
+        double(:handover_date1, com_responsibility_date: Date.new(2022, 1, 12)),
+        instance_double(AllocatedOffender,
+                        full_name: 'Surname1, Firstname1',
+                        last_name: 'Surname1',
+                        offender_no: 'X1111XX',
+                        tier: 'A',
+                        release_date: Date.new(2022, 1, 30),
+                        case_allocation: 'HDCED')
+      ],
+      [
+        double(:handover_date2, com_responsibility_date: Date.new(2022, 2, 12)),
+        instance_double(AllocatedOffender,
+                        full_name: 'Surname2, Firstname2',
+                        last_name: 'Surname2',
+                        offender_no: 'X2222XX',
+                        tier: 'B',
+                        release_date: Date.new(2030, 1, 1),
+                        case_allocation: 'CRC')
+      ]
     ]
   end
 
@@ -23,7 +29,7 @@ RSpec.describe 'handovers/upcoming' do
   let(:first_row) { page.find '.upcoming-handovers .allocated-offender:first-child' }
 
   before do
-    assign(:upcoming_handover_allocated_offenders, upcoming_handover_allocated_offenders)
+    assign(:handover_cases, double(:handover_cases, upcoming: upcoming_handover_cases))
     assign(:prison_id, prison_code)
     render
   end
@@ -47,7 +53,13 @@ RSpec.describe 'handovers/upcoming' do
     end
   end
 
-  it 'shows earliest release date correctly'
+  it 'shows earliest release date correctly' do
+    release_date = first_row.find('td.earliest-release-date')
+    aggregate_failures do
+      expect(release_date.text.strip.gsub(/\s+/, ' ')).to eq 'TODO: 30 Jan 2022'
+      expect(release_date['data-sort-value']).to eq '2022-01-30'
+    end
+  end
 
   it 'shows tier information correctly' do
     tier_info = first_row.find('td.tier')

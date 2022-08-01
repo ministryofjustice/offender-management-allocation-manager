@@ -20,15 +20,7 @@ class HandoversController < PrisonsApplicationController
     render :legacy_index, layout: 'application'
   end
 
-  def upcoming
-    if params[:static_design]
-      render 'handovers/upcoming/static_design'
-      return
-    end
-
-    @counts = @handover_case_listing.counts
-    @upcoming_handover_allocated_offenders = @handover_case_listing.upcoming_handover_allocated_offenders(@current_user)
-  end
+  def upcoming; end
 
 private
 
@@ -40,6 +32,6 @@ private
     ensure_pom
     redirect_to '/401' unless new_handovers_ui?
     @prison_id = active_prison_id
-    @handover_case_listing = HandoverCaseListingService.new
+    @handover_cases = HandoverCasesList.new(staff_member: @current_user)
   end
 end
