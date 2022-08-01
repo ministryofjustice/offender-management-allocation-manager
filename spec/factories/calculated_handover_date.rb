@@ -4,10 +4,10 @@ FactoryBot.define do
   factory :calculated_handover_date do
     association :offender
 
-    start_date { Faker::Date.forward }
+    start_date { Faker::Date.forward } # legacy field name
     com_allocation_date { Faker::Date.forward }
 
-    handover_date { Faker::Date.forward }
+    handover_date { Faker::Date.forward } # legacy field name
     com_responsibility_date { Faker::Date.forward }
 
     reason {
@@ -23,5 +23,20 @@ FactoryBot.define do
         CalculatedHandoverDate::COMMUNITY_RESPONSIBLE
       ].sample
     }
+
+    trait :before_com_allocation_date do
+      responsibility { CalculatedHandoverDate::CUSTODY_ONLY }
+    end
+
+    trait :between_com_allocation_and_responsibility_dates do
+      com_allocation_date { Fake::Date.backward }
+      responsibility { CalculatedHandoverDate::CUSTODY_WITH_COM }
+    end
+
+    trait :after_com_responsibility_date do
+      com_allocation_date { Fake::Date.backward }
+      com_responsibility_date { Fake::Date.backward }
+      responsibility { CalculatedHandoverDate::COMMUNITY_RESPONSIBLE }
+    end
   end
 end
