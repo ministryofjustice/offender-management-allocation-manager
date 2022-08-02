@@ -35,6 +35,7 @@ feature "view an offender's allocation information" do
     end
 
     it "displays 'Data not available'",
+       flaky: true,
        vcr: { cassette_name: 'prison_api/show_allocation_information_keyworker_not_assigned' } do
       visit prison_prisoner_allocation_path('LEI', prisoner_id: nomis_offender_id_without_keyworker)
 
@@ -176,7 +177,8 @@ feature "view an offender's allocation information" do
         visit prison_prisoner_allocation_path('LEI', prisoner_id: nomis_offender_id_with_keyworker)
       end
 
-      it 'displays the name of the allocated co-worker', vcr: { cassette_name: 'prison_api/show_allocation_information_display_coworker_name' } do
+      it 'displays the name of the allocated co-worker',
+         flaky: true, vcr: { cassette_name: 'prison_api/show_allocation_information_display_coworker_name' } do
         allocation = AllocationHistory.find_by(nomis_offender_id: nomis_offender_id_with_keyworker)
 
         allocation.update!(event: AllocationHistory::ALLOCATE_SECONDARY_POM,
