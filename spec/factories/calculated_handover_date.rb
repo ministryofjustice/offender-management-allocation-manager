@@ -4,10 +4,8 @@ FactoryBot.define do
   factory :calculated_handover_date do
     association :offender
 
-    start_date { Faker::Date.forward } # legacy field name
     com_allocation_date { Faker::Date.forward }
 
-    handover_date { Faker::Date.forward } # legacy field name
     com_responsibility_date { Faker::Date.forward }
 
     reason {
