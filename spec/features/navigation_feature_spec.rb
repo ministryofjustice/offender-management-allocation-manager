@@ -87,7 +87,7 @@ feature 'Navigation' do
       describe 'caseload section' do
         let(:index) { 2 }
 
-        it 'highlights the section' do
+        it 'highlights the section', flaky: true do
           click_menu_and_wait(link_css, index, delay: 5)
           click_link_and_wait 'Your cases (1)'
           expect(page).to have_content offender_name

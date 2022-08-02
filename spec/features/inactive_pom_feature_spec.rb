@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature 'Inactive POM' do
+feature 'Inactive POM', flaky: true do
   context 'when viewing an inactive POMs caseload', vcr: { cassette_name: 'prison_api/deallocate_non_pom_caseload' } do
     # We need an inactive POM to test this feature, Toby has had his POM role removed and therefore a good candidate!
     let(:inactive_pom)      { 485_595 }
