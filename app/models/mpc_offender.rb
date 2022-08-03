@@ -170,10 +170,11 @@ class MpcOffender
   end
 
   def next_parole_date
+    return target_hearing_date if target_hearing_date.present?
+
     [
       tariff_date,
-      parole_eligibility_date,
-      target_hearing_date
+      parole_eligibility_date
     ].compact.min
   end
 
