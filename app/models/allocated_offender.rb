@@ -9,7 +9,7 @@ class AllocatedOffender
            :indeterminate_sentence?, :prison_id, :target_hearing_date, :approaching_parole?,
            :handover_start_date, :responsibility_handover_date, :allocated_com_name, :case_allocation,
            :complexity_level, :offender_no, :sentence_start_date, :tier, :location, :latest_temp_movement_date, :restricted_patient?,
-           :most_recent_parole_record, :pom_tasks, to: :@offender
+           :most_recent_parole_record, :pom_tasks, :allocated_pom_role, :next_parole_date, :next_parole_date_type, to: :@offender
   delegate :updated_at, :nomis_offender_id, :primary_pom_allocated_at, :prison, :primary_pom_nomis_id,
            to: :@allocation
 
