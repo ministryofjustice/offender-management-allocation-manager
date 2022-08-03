@@ -153,7 +153,7 @@ feature 'Allocation' do
     expect(page).to have_content('This reason cannot be more than 175 characters')
   end
 
-  scenario 're-allocating', vcr: { cassette_name: 'prison_api/re_allocate_feature' } do
+  scenario 're-allocating', flaky: true, vcr: { cassette_name: 'prison_api/re_allocate_feature' } do
     create(
       :allocation_history,
       prison: 'LEI',
