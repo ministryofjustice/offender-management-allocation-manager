@@ -105,6 +105,16 @@ spec:
                 secretKeyRef:
                   name: hmpps-auth-secrets
                   key: NOMIS_OAUTH_API_CLIENT_SECRET
+            - name: EMAIL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: parole-data-import
+                  key: email_username
+            - name: EMAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: parole-data-import
+                  key: email_password
         - name: allocation-manager-sidekiq
           image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
           imagePullPolicy: Always
