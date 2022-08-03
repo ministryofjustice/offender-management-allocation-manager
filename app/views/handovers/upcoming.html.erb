@@ -41,9 +41,10 @@
         <%= format_date(com_r_date, replacement: "Unknown") %>
       </td>
 
-      <td class="govuk-table__cell earliest-release-date" data-sort-value="<%= allocated_offender.release_date.iso8601 %>">
-        TODO: <br>
-        <%= format_date(allocated_offender.release_date, replacement: "ERROR: Unknown") %>
+      <% rel_date = allocated_offender.earliest_release.fetch(:date) %>
+      <td class="govuk-table__cell earliest-release-date" data-sort-value="<%= rel_date.iso8601 %>">
+        <%= allocated_offender.earliest_release.fetch(:type) %>: <br>
+        <%= format_date(rel_date, replacement: "ERROR: Unknown") %>
       </td>
 
       <td class="govuk-table__cell tier" data-sort-value="<%= allocated_offender.case_allocation %>">

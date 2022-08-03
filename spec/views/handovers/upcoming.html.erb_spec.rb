@@ -9,8 +9,8 @@ RSpec.describe 'handovers/upcoming' do
                         last_name: 'Surname1',
                         offender_no: 'X1111XX',
                         tier: 'A',
-                        release_date: Date.new(2022, 1, 30),
-                        case_allocation: 'HDCED')
+                        earliest_release: { type: 'TED', date: Date.new(2022, 1, 30) },
+                        case_allocation: 'NPS')
       ],
       [
         double(:handover_date2, com_responsibility_date: Date.new(2022, 2, 12)),
@@ -19,7 +19,7 @@ RSpec.describe 'handovers/upcoming' do
                         last_name: 'Surname2',
                         offender_no: 'X2222XX',
                         tier: 'B',
-                        release_date: Date.new(2030, 1, 1),
+                        earliest_release: { type: 'HDCED', date: Date.new(2030, 1, 1) },
                         case_allocation: 'CRC')
       ]
     ]
@@ -56,7 +56,7 @@ RSpec.describe 'handovers/upcoming' do
   it 'shows earliest release date correctly' do
     release_date = first_row.find('td.earliest-release-date')
     aggregate_failures do
-      expect(release_date.text.strip.gsub(/\s+/, ' ')).to eq 'TODO: 30 Jan 2022'
+      expect(release_date.text.strip.gsub(/\s+/, ' ')).to eq 'TED: 30 Jan 2022'
       expect(release_date['data-sort-value']).to eq '2022-01-30'
     end
   end
@@ -64,8 +64,8 @@ RSpec.describe 'handovers/upcoming' do
   it 'shows tier information correctly' do
     tier_info = first_row.find('td.tier')
     aggregate_failures do
-      expect(tier_info.text.strip.gsub(/\s+/, ' ')).to eq 'A HDCED (legacy)'
-      expect(tier_info['data-sort-value']).to eq 'HDCED'
+      expect(tier_info.text.strip.gsub(/\s+/, ' ')).to eq 'A NPS (legacy)'
+      expect(tier_info['data-sort-value']).to eq 'NPS'
     end
   end
 

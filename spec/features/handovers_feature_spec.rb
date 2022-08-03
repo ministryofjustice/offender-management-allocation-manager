@@ -20,7 +20,7 @@ RSpec.feature 'Handovers feature:' do
                           last_name: 'Surname1',
                           offender_no: 'X1111XX',
                           tier: 'A',
-                          release_date: Date.new(2022, 1, 30),
+                          earliest_release: { type: 'TED', date: Date.new(2022, 1, 30) },
                           case_allocation: 'HDCED')
         ]
       )
