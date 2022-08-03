@@ -19,7 +19,7 @@
     <th scope="col" class="govuk-table__header" aria-sort="none">
       <button type="button" data-index="3">Tier</button>
     </th>
-    <th scope="col" class="govuk-table__header" style="padding-left: 20px;">Handover progress</th>
+    <th scope="col" class="govuk-table__header handover-progress">Handover progress</th>
   </tr>
   </thead>
 
@@ -55,23 +55,23 @@
       <td class="govuk-table__cell handover-progress">
         <ul class="govuk-list govuk-body-s task-summary-checklist">
           <li class="none">
-            <img style="width:7%; padding-right: 5px;" src="<%= image_path('check.png') %>" alt="task complete">
+            <img src="<%= image_path('check.png') %>" alt="task complete">
             Review OASys
           </li>
           <li class="none">
-            <img style="width:7%; padding-right: 5px;" src="<%= image_path('cross.png') %>" alt="task complete">
+            <img src="<%= image_path('cross.png') %>" alt="task complete">
             Have contact from COM
           </li>
           <li class="none">
-            <img style="width:7%; padding-right: 5px;" src="<%= image_path('cross.png') %>" alt="task not started">
+            <img src="<%= image_path('cross.png') %>" alt="task not started">
             Send handover report
           </li>
-          <p class="govuk-!-margin-top-2"><%# TODO incorrect markup %>
-            <a class="govuk-link govuk-link--no-visited-state" href="#" style="padding-left: 20px;">
-              Record progress
-            </a>
-          </p>
         </ul>
+        <p>
+          <a class="govuk-link govuk-link--no-visited-state" href="#">
+            Record progress
+          </a>
+        </p>
       </td>
     </tr>
   <% end %>
