@@ -21,6 +21,7 @@ RSpec.feature 'Handovers feature:' do
                           offender_no: 'X1111XX',
                           tier: 'A',
                           earliest_release: { type: 'TED', date: Date.new(2022, 1, 30) },
+                          allocated_com_name: nil,
                           case_allocation: 'HDCED')
         ]
       )
