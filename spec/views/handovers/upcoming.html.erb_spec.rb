@@ -3,7 +3,8 @@ RSpec.describe 'handovers/upcoming' do
   let(:upcoming_handover_cases) do
     [
       [
-        double(:handover_date1, com_responsibility_date: Date.new(2022, 1, 12)),
+        double(:handover_date1, com_allocation_date: Date.new(2022, 1, 5),
+                                com_responsibility_date: Date.new(2022, 1, 12)),
         instance_double(AllocatedOffender,
                         full_name: 'Surname1, Firstname1',
                         last_name: 'Surname1',
@@ -13,7 +14,8 @@ RSpec.describe 'handovers/upcoming' do
                         case_allocation: 'NPS')
       ],
       [
-        double(:handover_date2, com_responsibility_date: Date.new(2022, 2, 12)),
+        double(:handover_date2, com_allocation_date: Date.new(2022, 2, 5),
+                                com_responsibility_date: Date.new(2022, 2, 12)),
         instance_double(AllocatedOffender,
                         full_name: 'Surname2, Firstname2',
                         last_name: 'Surname2',
@@ -31,45 +33,59 @@ RSpec.describe 'handovers/upcoming' do
   before do
     assign(:handover_cases, double(:handover_cases, upcoming: upcoming_handover_cases))
     assign(:prison_id, prison_code)
-    render
   end
 
-  it 'shows offender details correctly' do
-    prisoner_details = first_row.find('td.prisoner-details')
-    link = prisoner_details.find('a')
-    aggregate_failures do
-      expect(link.text.strip).to eq 'Surname1, Firstname1'
-      expect(link['data-sort-value']).to eq 'Surname1'
-      expect(link['href']).to eq prison_prisoner_path(prison_id: prison_code, id: 'X1111XX')
-      expect(prisoner_details.find('.offender-no').text.strip).to eq 'X1111XX'
+  describe 'in the general case' do
+    before do
+      render
+    end
+
+    it 'shows offender details correctly' do
+      prisoner_details = first_row.find('td.prisoner-details')
+      link = prisoner_details.find('a')
+      aggregate_failures do
+        expect(link.text.strip).to eq 'Surname1, Firstname1'
+        expect(link['data-sort-value']).to eq 'Surname1'
+        expect(link['href']).to eq prison_prisoner_path(prison_id: prison_code, id: 'X1111XX')
+        expect(prisoner_details.find('.offender-no').text.strip).to eq 'X1111XX'
+      end
+    end
+
+    it 'shows handover dates correctly' do
+      com_responsible = first_row.find('td.handover-dates')
+      aggregate_failures do
+        expect(com_responsible.text.strip.gsub(/\s+/, ' ')).to eq 'COM allocated: 05 Jan 2022 COM responsible: 12 Jan 2022'
+        expect(com_responsible['data-sort-value']).to eq '2022-01-05'
+      end
+    end
+
+    it 'shows earliest release date correctly' do
+      release_date = first_row.find('td.earliest-release-date')
+      aggregate_failures do
+        expect(release_date.text.strip.gsub(/\s+/, ' ')).to eq 'TED: 30 Jan 2022'
+        expect(release_date['data-sort-value']).to eq '2022-01-30'
+      end
+    end
+
+    it 'shows tier information correctly' do
+      tier_info = first_row.find('td.tier')
+      aggregate_failures do
+        expect(tier_info.text.strip.gsub(/\s+/, ' ')).to eq 'A NPS (legacy)'
+        expect(tier_info['data-sort-value']).to eq 'NPS'
+      end
+    end
+
+    it 'shows more than one case on the page' do
+      expect(page).to have_css('.upcoming-handovers .allocated-offender', count: 2)
     end
   end
 
-  it 'shows COM responsible date correctly' do
-    com_responsible = first_row.find('td.com-responsible')
-    aggregate_failures do
+  describe 'when com responsible date is the same as the com allocated date' do
+    it 'only shows com responsible date' do
+      allow(upcoming_handover_cases[0][0]).to receive(:com_allocation_date).and_return(Date.new(2022, 1, 12))
+      render
+      com_responsible = first_row.find('td.handover-dates')
       expect(com_responsible.text.strip.gsub(/\s+/, ' ')).to eq 'COM responsible: 12 Jan 2022'
-      expect(com_responsible['data-sort-value']).to eq '2022-01-12'
     end
-  end
-
-  it 'shows earliest release date correctly' do
-    release_date = first_row.find('td.earliest-release-date')
-    aggregate_failures do
-      expect(release_date.text.strip.gsub(/\s+/, ' ')).to eq 'TED: 30 Jan 2022'
-      expect(release_date['data-sort-value']).to eq '2022-01-30'
-    end
-  end
-
-  it 'shows tier information correctly' do
-    tier_info = first_row.find('td.tier')
-    aggregate_failures do
-      expect(tier_info.text.strip.gsub(/\s+/, ' ')).to eq 'A NPS (legacy)'
-      expect(tier_info['data-sort-value']).to eq 'NPS'
-    end
-  end
-
-  it 'shows more than one case on the page' do
-    expect(page).to have_css('.upcoming-handovers .allocated-offender', count: 2)
   end
 end

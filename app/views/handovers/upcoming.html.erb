@@ -24,7 +24,7 @@
   </thead>
 
   <tbody class="govuk-table__body">
-  <% @handover_cases.upcoming.each do |calculated_handover_date, allocated_offender| %>
+  <% @handover_cases.upcoming.each do |calc_h_o_date, allocated_offender| %>
     <tr class="govuk-table__row allocated-offender">
       <td class="govuk-table__cell prisoner-details">
         <a class="govuk-link govuk-link--no-visited-state"
@@ -35,10 +35,18 @@
         <span class="govuk-hint govuk-!-margin-bottom-0 offender-no"><%= allocated_offender.offender_no %></span>
       </td>
 
-      <% com_r_date = calculated_handover_date.com_responsibility_date %>
-      <td class="govuk-table__cell com-responsible" data-sort-value="<%= com_r_date.iso8601 %>">
-        COM responsible: <br>
-        <%= format_date(com_r_date, replacement: "Unknown") %>
+      <% alloc_date, resp_date = calc_h_o_date.com_allocation_date, calc_h_o_date.com_responsibility_date %>
+      <td class="govuk-table__cell handover-dates" data-sort-value="<%= alloc_date.iso8601 %>">
+        <% unless alloc_date == resp_date %>
+          <p>
+            COM allocated: <br>
+            <%= format_date(alloc_date, replacement: "Unknown") %>
+          </p>
+        <% end %>
+        <p>
+          COM responsible: <br>
+          <%= format_date(resp_date, replacement: "Unknown") %>
+        </p>
       </td>
 
       <% rel_date = allocated_offender.earliest_release.fetch(:date) %>
