@@ -93,7 +93,7 @@ class CalculatedHandoverDate < ApplicationRecord
     def by_handover_in_progress(offender_ids:)
       relation
         .by_offender_ids(offender_ids)
-        .where(responsibility: CUSTODY_WITH_COM)
+        .where(responsibility: [CUSTODY_WITH_COM, COMMUNITY_RESPONSIBLE])
     end
   end
 end

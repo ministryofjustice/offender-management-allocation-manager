@@ -129,7 +129,7 @@ RSpec.describe CalculatedHandoverDate do
       described_class.by_handover_in_progress(offender_ids: offender_ids)
     end
 
-    it 'gets the rows matching given criteria' do
+    it 'gets the rows that are POM responsible with COM supporting for the given list of offenders' do
       expect(query).to include row
     end
 
@@ -138,14 +138,14 @@ RSpec.describe CalculatedHandoverDate do
       expect(query).not_to include row
     end
 
-    it 'does not get rows unless responsibility status is handover in progress' do
-      aggregate_failures do
-        row.update! responsibility: described_class::COMMUNITY_RESPONSIBLE
-        expect(query).not_to include row
+    it 'gets all rows that are COM-responsible' do
+      row.update! responsibility: described_class::COMMUNITY_RESPONSIBLE
+      expect(query).to include row
+    end
 
-        row.update! responsibility: described_class::CUSTODY_ONLY
-        expect(query).not_to include row
-      end
+    it 'does not include rows where COM is not assigned' do
+      row.update! responsibility: described_class::CUSTODY_ONLY
+      expect(query).not_to include row
     end
   end
 end
