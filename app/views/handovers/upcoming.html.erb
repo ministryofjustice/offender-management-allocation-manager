@@ -35,7 +35,7 @@
         <span class="govuk-hint govuk-!-margin-bottom-0 offender-no"><%= allocated_offender.offender_no %></span>
       </td>
 
-      <% alloc_date, resp_date = calc_h_o_date.com_allocated_date, calc_h_o_date.com_responsibility_date %>
+      <% alloc_date, resp_date = calc_h_o_date.com_allocated_date, calc_h_o_date.com_responsible_date %>
       <td class="govuk-table__cell handover-dates" data-sort-value="<%= alloc_date.iso8601 %>">
         <% unless alloc_date == resp_date %>
           <p>

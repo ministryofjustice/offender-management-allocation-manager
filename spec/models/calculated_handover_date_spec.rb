@@ -19,7 +19,7 @@ RSpec.describe CalculatedHandoverDate do
             calculated_handover_date: build(:calculated_handover_date,
                                             responsibility: com_responsibility.responsibility,
                                             com_allocated_date: com_responsibility.com_allocated_date,
-                                            com_responsibility_date: com_responsibility.com_responsibility_date,
+                                            com_responsible_date: com_responsibility.com_responsible_date,
                                             reason: com_responsibility.reason))
     end
     let(:com_responsibility) { HandoverDateService::NO_HANDOVER_DATE }
@@ -28,7 +28,7 @@ RSpec.describe CalculatedHandoverDate do
     it 'allows nil handover dates' do
       expect(record).to be_valid
       expect(record.com_allocated_date).to be_nil
-      expect(record.com_responsibility_date).to be_nil
+      expect(record.com_responsible_date).to be_nil
       expect(record.reason_text).to eq('COM Responsibility')
     end
   end
@@ -52,9 +52,9 @@ RSpec.describe CalculatedHandoverDate do
       expect(subject.com_allocated_date).to eq Date.new(2022, 7, 7)
     end
 
-    it 'has #com_responsibility_date' do
-      subject.com_responsibility_date = Date.new(2022, 9, 7)
-      expect(subject.com_responsibility_date).to eq Date.new(2022, 9, 7)
+    it 'has #com_responsible_date' do
+      subject.com_responsible_date = Date.new(2022, 9, 7)
+      expect(subject.com_responsible_date).to eq Date.new(2022, 9, 7)
     end
   end
 
@@ -62,7 +62,7 @@ RSpec.describe CalculatedHandoverDate do
     let(:upcoming_handover_date_attributes) do
       {
         com_allocated_date: Date.new(2022, 12, 1),
-        com_responsibility_date: Date.new(2022, 12, 30)
+        com_responsible_date: Date.new(2022, 12, 30)
       }
     end
     let!(:row) do # instantiate it immediately
@@ -110,11 +110,11 @@ RSpec.describe CalculatedHandoverDate do
       expect(query(relative_to_date: Date.new(2022, 12, 2))).not_to include row
     end
 
-    it 'does not get rows where com responsibility date is reached' do
+    it 'does not get rows where com responsible date is reached' do
       expect(query(relative_to_date: Date.new(2022, 12, 30))).not_to include row
     end
 
-    it 'does not get rows where com responsibility date is past' do
+    it 'does not get rows where com responsible date is past' do
       expect(query(relative_to_date: Date.new(2022, 12, 31))).not_to include row
     end
   end

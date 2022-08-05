@@ -6,7 +6,7 @@ FactoryBot.define do
 
     com_allocated_date { Faker::Date.forward }
 
-    com_responsibility_date { Faker::Date.forward }
+    com_responsible_date { Faker::Date.forward }
 
     reason {
       # Randomly select a valid reason
@@ -31,9 +31,9 @@ FactoryBot.define do
       responsibility { CalculatedHandoverDate::CUSTODY_WITH_COM }
     end
 
-    trait :after_com_responsibility_date do
+    trait :after_com_responsible_date do
       com_allocated_date { Fake::Date.backward }
-      com_responsibility_date { Fake::Date.backward }
+      com_responsible_date { Fake::Date.backward }
       responsibility { CalculatedHandoverDate::COMMUNITY_RESPONSIBLE }
     end
   end

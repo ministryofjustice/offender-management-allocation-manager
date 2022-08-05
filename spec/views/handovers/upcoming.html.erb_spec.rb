@@ -4,7 +4,7 @@ RSpec.describe 'handovers/upcoming' do
     [
       [
         double(:handover_date1, com_allocated_date: Date.new(2022, 1, 5),
-                                com_responsibility_date: Date.new(2022, 1, 12)),
+                                com_responsible_date: Date.new(2022, 1, 12)),
         instance_double(AllocatedOffender,
                         full_name: 'Surname1, Firstname1',
                         last_name: 'Surname1',
@@ -15,7 +15,7 @@ RSpec.describe 'handovers/upcoming' do
       ],
       [
         double(:handover_date2, com_allocated_date: Date.new(2022, 2, 5),
-                                com_responsibility_date: Date.new(2022, 2, 12)),
+                                com_responsible_date: Date.new(2022, 2, 12)),
         instance_double(AllocatedOffender,
                         full_name: 'Surname2, Firstname2',
                         last_name: 'Surname2',
