@@ -26,14 +26,14 @@ FactoryBot.define do
       responsibility { CalculatedHandoverDate::CUSTODY_ONLY }
     end
 
-    trait :between_com_allocation_and_responsibility_dates do
-      com_allocated_date { Fake::Date.backward }
+    trait :between_com_allocated_and_responsible_dates do
+      com_allocated_date { Faker::Date.backward }
       responsibility { CalculatedHandoverDate::CUSTODY_WITH_COM }
     end
 
     trait :after_com_responsible_date do
-      com_allocated_date { Fake::Date.backward }
-      com_responsible_date { Fake::Date.backward }
+      com_allocated_date { Faker::Date.backward }
+      com_responsible_date { Faker::Date.backward }
       responsibility { CalculatedHandoverDate::COMMUNITY_RESPONSIBLE }
     end
   end

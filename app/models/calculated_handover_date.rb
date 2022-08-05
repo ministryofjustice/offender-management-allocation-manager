@@ -60,10 +60,6 @@ class CalculatedHandoverDate < ApplicationRecord
       where(nomis_offender_id: offender_id_or_ids)
     end
 
-    def before_com_allocated_date
-      where(responsibility: CUSTODY_ONLY)
-    end
-
     # Visualization of the calculation:
     #
     # cad = com allocated date (or start_date in legacy naming)
@@ -90,8 +86,14 @@ class CalculatedHandoverDate < ApplicationRecord
                                relative_to_date: relative_to_date }.compact_blank
       relation
         .by_offender_ids(offender_ids)
-        .before_com_allocated_date
+        .where(responsibility: CUSTODY_ONLY)
         .in_upcoming_handover_window(**handover_window_args)
+    end
+
+    def by_handover_in_progress(offender_ids:)
+      relation
+        .by_offender_ids(offender_ids)
+        .where(responsibility: CUSTODY_WITH_COM)
     end
   end
 end

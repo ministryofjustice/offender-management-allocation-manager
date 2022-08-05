@@ -98,7 +98,7 @@ RSpec.describe CalculatedHandoverDate do
       end
     end
 
-    it 'does not get rows earlier than the upcoming handover window' do
+    it 'does not get rows where upcoming handover window not yet reached' do
       expect(query(relative_to_date: Date.new(2022, 11, 20))).not_to include row
     end
 
@@ -116,6 +116,36 @@ RSpec.describe CalculatedHandoverDate do
 
     it 'does not get rows where com responsible date is past' do
       expect(query(relative_to_date: Date.new(2022, 12, 31))).not_to include row
+    end
+  end
+
+  describe '::by_handover_in_progress scope' do
+    let!(:row) do # instantiate it immediately
+      FactoryBot.create :calculated_handover_date, :between_com_allocated_and_responsible_dates,
+                        offender: FactoryBot.create(:offender, nomis_offender_id: 'X1111XX')
+    end
+
+    def query(offender_ids: ['X1111XX'])
+      described_class.by_handover_in_progress(offender_ids: offender_ids)
+    end
+
+    it 'gets the rows matching given criteria' do
+      expect(query).to include row
+    end
+
+    it 'does not get rows for unwanted offenders' do
+      row.update! offender: FactoryBot.create(:offender, nomis_offender_id: 'X2222XX')
+      expect(query).not_to include row
+    end
+
+    it 'does not get rows unless responsibility status is handover in progress' do
+      aggregate_failures do
+        row.update! responsibility: described_class::COMMUNITY_RESPONSIBLE
+        expect(query).not_to include row
+
+        row.update! responsibility: described_class::CUSTODY_ONLY
+        expect(query).not_to include row
+      end
     end
   end
 end
