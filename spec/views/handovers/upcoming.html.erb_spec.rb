@@ -3,7 +3,7 @@ RSpec.describe 'handovers/upcoming' do
   let(:upcoming_handover_cases) do
     [
       [
-        double(:handover_date1, com_allocation_date: Date.new(2022, 1, 5),
+        double(:handover_date1, com_allocated_date: Date.new(2022, 1, 5),
                                 com_responsibility_date: Date.new(2022, 1, 12)),
         instance_double(AllocatedOffender,
                         full_name: 'Surname1, Firstname1',
@@ -14,7 +14,7 @@ RSpec.describe 'handovers/upcoming' do
                         case_allocation: 'NPS')
       ],
       [
-        double(:handover_date2, com_allocation_date: Date.new(2022, 2, 5),
+        double(:handover_date2, com_allocated_date: Date.new(2022, 2, 5),
                                 com_responsibility_date: Date.new(2022, 2, 12)),
         instance_double(AllocatedOffender,
                         full_name: 'Surname2, Firstname2',
@@ -82,7 +82,7 @@ RSpec.describe 'handovers/upcoming' do
 
   describe 'when com responsible date is the same as the com allocated date' do
     it 'only shows com responsible date' do
-      allow(upcoming_handover_cases[0][0]).to receive(:com_allocation_date).and_return(Date.new(2022, 1, 12))
+      allow(upcoming_handover_cases[0][0]).to receive(:com_allocated_date).and_return(Date.new(2022, 1, 12))
       render
       com_responsible = first_row.find('td.handover-dates')
       expect(com_responsible.text.strip.gsub(/\s+/, ' ')).to eq 'COM responsible: 12 Jan 2022'

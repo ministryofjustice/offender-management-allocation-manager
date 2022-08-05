@@ -32,7 +32,7 @@ class CalculatedHandoverDate < ApplicationRecord
   validates :responsibility, inclusion: { in: [CUSTODY_ONLY, CUSTODY_WITH_COM, COMMUNITY_RESPONSIBLE], nil: false }
   validates :reason, inclusion: { in: REASONS.keys, nil: false }
 
-  alias_attribute :com_allocation_date, :start_date
+  alias_attribute :com_allocated_date, :start_date
   alias_attribute :com_responsibility_date, :handover_date
 
   def custody_responsible?
@@ -60,13 +60,13 @@ class CalculatedHandoverDate < ApplicationRecord
       where(nomis_offender_id: offender_id_or_ids)
     end
 
-    def before_com_allocation_date
+    def before_com_allocated_date
       where(responsibility: CUSTODY_ONLY)
     end
 
     # Visualization of the calculation:
     #
-    # cad = com allocation date (or start_date in legacy naming)
+    # cad = com allocated date (or start_date in legacy naming)
     # d = days before handover starts that case is considered in upcoming handovers window (e.g. 56 days, or 8 weeks)
     # rd = relative-to date (defaults to "today")
     #
@@ -80,7 +80,7 @@ class CalculatedHandoverDate < ApplicationRecord
     # case is considered to be in the upcoming handover window
     def in_upcoming_handover_window(upcoming_handover_window_duration: DEFAULT_UPCOMING_HANDOVER_WINDOW_DURATION,
                                     relative_to_date: Time.zone.now.to_date)
-      # TODO: start_date will be renamed to com_allocation_date when we update the schema
+      # TODO: start_date will be renamed to com_allocated_date when we update the schema
       where('"start_date" - :days_before <= :relative_to AND :relative_to < "start_date"',
             { days_before: upcoming_handover_window_duration, relative_to: relative_to_date })
     end
@@ -90,7 +90,7 @@ class CalculatedHandoverDate < ApplicationRecord
                                relative_to_date: relative_to_date }.compact_blank
       relation
         .by_offender_ids(offender_ids)
-        .before_com_allocation_date
+        .before_com_allocated_date
         .in_upcoming_handover_window(**handover_window_args)
     end
   end

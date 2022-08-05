@@ -4,7 +4,7 @@ FactoryBot.define do
   factory :calculated_handover_date do
     association :offender
 
-    com_allocation_date { Faker::Date.forward }
+    com_allocated_date { Faker::Date.forward }
 
     com_responsibility_date { Faker::Date.forward }
 
@@ -22,17 +22,17 @@ FactoryBot.define do
       ].sample
     }
 
-    trait :before_com_allocation_date do
+    trait :before_com_allocated_date do
       responsibility { CalculatedHandoverDate::CUSTODY_ONLY }
     end
 
     trait :between_com_allocation_and_responsibility_dates do
-      com_allocation_date { Fake::Date.backward }
+      com_allocated_date { Fake::Date.backward }
       responsibility { CalculatedHandoverDate::CUSTODY_WITH_COM }
     end
 
     trait :after_com_responsibility_date do
-      com_allocation_date { Fake::Date.backward }
+      com_allocated_date { Fake::Date.backward }
       com_responsibility_date { Fake::Date.backward }
       responsibility { CalculatedHandoverDate::COMMUNITY_RESPONSIBLE }
     end

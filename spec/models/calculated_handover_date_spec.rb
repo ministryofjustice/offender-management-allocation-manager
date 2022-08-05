@@ -18,7 +18,7 @@ RSpec.describe CalculatedHandoverDate do
       build(:offender,
             calculated_handover_date: build(:calculated_handover_date,
                                             responsibility: com_responsibility.responsibility,
-                                            com_allocation_date: com_responsibility.com_allocation_date,
+                                            com_allocated_date: com_responsibility.com_allocated_date,
                                             com_responsibility_date: com_responsibility.com_responsibility_date,
                                             reason: com_responsibility.reason))
     end
@@ -27,7 +27,7 @@ RSpec.describe CalculatedHandoverDate do
 
     it 'allows nil handover dates' do
       expect(record).to be_valid
-      expect(record.com_allocation_date).to be_nil
+      expect(record.com_allocated_date).to be_nil
       expect(record.com_responsibility_date).to be_nil
       expect(record.reason_text).to eq('COM Responsibility')
     end
@@ -47,9 +47,9 @@ RSpec.describe CalculatedHandoverDate do
   end
 
   describe 'using official domain language compliant naming' do
-    it 'has #com_allocation_date' do
-      subject.com_allocation_date = Date.new(2022, 7, 7)
-      expect(subject.com_allocation_date).to eq Date.new(2022, 7, 7)
+    it 'has #com_allocated_date' do
+      subject.com_allocated_date = Date.new(2022, 7, 7)
+      expect(subject.com_allocated_date).to eq Date.new(2022, 7, 7)
     end
 
     it 'has #com_responsibility_date' do
@@ -61,12 +61,12 @@ RSpec.describe CalculatedHandoverDate do
   describe '::by_upcoming_handover scope' do
     let(:upcoming_handover_date_attributes) do
       {
-        com_allocation_date: Date.new(2022, 12, 1),
+        com_allocated_date: Date.new(2022, 12, 1),
         com_responsibility_date: Date.new(2022, 12, 30)
       }
     end
     let!(:row) do # instantiate it immediately
-      FactoryBot.create :calculated_handover_date, :before_com_allocation_date,
+      FactoryBot.create :calculated_handover_date, :before_com_allocated_date,
                         offender: FactoryBot.create(:offender, nomis_offender_id: 'X1111XX'),
                         **upcoming_handover_date_attributes
     end
@@ -102,11 +102,11 @@ RSpec.describe CalculatedHandoverDate do
       expect(query(relative_to_date: Date.new(2022, 11, 20))).not_to include row
     end
 
-    it 'does not get rows where com allocation date is reached' do
+    it 'does not get rows where com allocated date is reached' do
       expect(query(relative_to_date: Date.new(2022, 12, 1))).not_to include row
     end
 
-    it 'does not get rows where com allocation date is passed' do
+    it 'does not get rows where com allocated date is passed' do
       expect(query(relative_to_date: Date.new(2022, 12, 2))).not_to include row
     end
 
