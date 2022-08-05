@@ -29,6 +29,7 @@ RSpec.describe 'handovers/upcoming' do
 
   let(:page) { Capybara::Node::Simple.new(rendered) }
   let(:first_row) { page.find '.upcoming-handovers .allocated-offender:first-child' }
+  let(:first_row_text) { first_row.text.strip.gsub(/\s+/, ' ') }
 
   before do
     assign(:handover_cases, double(:handover_cases, upcoming: upcoming_handover_cases))
@@ -41,38 +42,21 @@ RSpec.describe 'handovers/upcoming' do
     end
 
     it 'shows offender details correctly' do
-      prisoner_details = first_row.find('td.prisoner-details')
-      link = prisoner_details.find('a')
-      aggregate_failures do
-        expect(link.text.strip).to eq 'Surname1, Firstname1'
-        expect(link['data-sort-value']).to eq 'Surname1'
-        expect(link['href']).to eq prison_prisoner_path(prison_id: prison_code, id: 'X1111XX')
-        expect(prisoner_details.find('.offender-no').text.strip).to eq 'X1111XX'
-      end
+      expect(first_row_text).to include 'Surname1, Firstname1 X1111XX'
     end
 
     it 'shows handover dates correctly' do
-      com_responsible = first_row.find('td.handover-dates')
       aggregate_failures do
-        expect(com_responsible.text.strip.gsub(/\s+/, ' ')).to eq 'COM allocated: 05 Jan 2022 COM responsible: 12 Jan 2022'
-        expect(com_responsible['data-sort-value']).to eq '2022-01-05'
+        expect(first_row_text).to include 'COM allocated: 05 Jan 2022 COM responsible: 12 Jan 2022'
       end
     end
 
     it 'shows earliest release date correctly' do
-      release_date = first_row.find('td.earliest-release-date')
-      aggregate_failures do
-        expect(release_date.text.strip.gsub(/\s+/, ' ')).to eq 'TED: 30 Jan 2022'
-        expect(release_date['data-sort-value']).to eq '2022-01-30'
-      end
+      expect(first_row_text).to include 'TED: 30 Jan 2022'
     end
 
     it 'shows tier information correctly' do
-      tier_info = first_row.find('td.tier')
-      aggregate_failures do
-        expect(tier_info.text.strip.gsub(/\s+/, ' ')).to eq 'A NPS (legacy)'
-        expect(tier_info['data-sort-value']).to eq 'NPS'
-      end
+      expect(first_row_text).to include 'A NPS (legacy)'
     end
 
     it 'shows more than one case on the page' do
@@ -84,8 +68,10 @@ RSpec.describe 'handovers/upcoming' do
     it 'only shows com responsible date' do
       allow(upcoming_handover_cases[0][0]).to receive(:com_allocated_date).and_return(Date.new(2022, 1, 12))
       render
-      com_responsible = first_row.find('td.handover-dates')
-      expect(com_responsible.text.strip.gsub(/\s+/, ' ')).to eq 'COM responsible: 12 Jan 2022'
+      aggregate_failures do
+        expect(first_row_text).to include 'COM responsible: 12 Jan 2022'
+        expect(first_row_text).not_to include 'COM allocated: 12 Jan 2022'
+      end
     end
   end
 end
