@@ -238,7 +238,11 @@
     <tr class="govuk-table__row" id="pom-role">
       <td class="govuk-table__cell">POM role</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= pom_responsibility_label(@offender) if @offender.probation_record.present? %>
+        <% if @offender.inside_omic_policy? %>
+          <%= pom_responsibility_label(@offender) if @offender.probation_record.present? %>
+        <% else %>
+          Information unavailable as this case is outside OMIC policy
+        <% end %>
       </td>
     </tr>
     <tr class="govuk-table__row" id="pom">
