@@ -1,11 +1,11 @@
 ---
 http_interactions:
 - request:
-    method: post
-    uri: https://complexity-of-need-staging.hmpps.service.justice.gov.uk/v1/complexity-of-need/multiple/offender-no
+    method: put
+    uri: https://complexity-of-need-staging.hmpps.service.justice.gov.uk/v1/complexity-of-need/offender-no/S0005FT/inactivate
     body:
       encoding: UTF-8
-      string: '[["G0276VC","T0000FT"]]'
+      string: '{"cache":false}'
     headers:
       User-Agent:
       - Faraday v1.10.0
@@ -19,7 +19,7 @@ http_interactions:
       message: null
     headers:
       date:
-      - Tue, 09 Aug 2022 10:29:51 GMT
+      - Tue, 09 Aug 2022 10:29:52 GMT
       content-type:
       - application/json; charset=utf-8
       x-frame-options:
@@ -35,39 +35,38 @@ http_interactions:
       referrer-policy:
       - strict-origin-when-cross-origin
       etag:
-      - W/"f0e4c0f9dedb9e540073627233186e30"
+      - W/"c12f59d5f0f2a96d6ec85372303cfd89"
       cache-control:
       - max-age=0, private, must-revalidate
       x-request-id:
-      - df8fd0bed864865ec282354370c33018
+      - '090bb0fdfe5086921c5dd2eaed72db9f'
       x-runtime:
-      - '0.007321'
+      - '0.058149'
       strict-transport-security:
       - max-age=15724800; includeSubDomains
     body:
       encoding: ASCII-8BIT
-      string: '[{"offenderNo":"G0276VC","level":"high","createdTimeStamp":"2021-03-11T11:05:10.493Z","sourceSystem":"testing","active":true},{"offenderNo":"T0000FT","level":"high","createdTimeStamp":"2021-03-17T20:54:55.902Z","sourceSystem":"hardcoded-oauth-client-id","active":true}]'
-  recorded_at: Tue, 09 Aug 2022 10:29:51 GMT
+      string: '{"offenderNo":"S0005FT","level":"high","createdTimeStamp":"2022-08-09T10:29:51.814Z","sourceUser":"SDICKS_GEN","sourceSystem":"manage-pom-cases-api-3","notes":"Happy
+        Feet","active":false}'
+  recorded_at: Tue, 09 Aug 2022 10:29:52 GMT
 - request:
-    method: post
-    uri: https://complexity-of-need-staging.hmpps.service.justice.gov.uk/v1/complexity-of-need/multiple/offender-no
+    method: get
+    uri: https://complexity-of-need-staging.hmpps.service.justice.gov.uk/v1/complexity-of-need/offender-no/S0005FT
     body:
-      encoding: UTF-8
-      string: '[["G0276VC","T0000FT","X00887XX"]]'
+      encoding: US-ASCII
+      string: ''
     headers:
       User-Agent:
       - Faraday v1.10.0
       Authorization:
       - authorisation_header
-      Content-Type:
-      - application/json
   response:
     status:
-      code: 200
+      code: 404
       message: null
     headers:
       date:
-      - Tue, 09 Aug 2022 10:29:51 GMT
+      - Tue, 09 Aug 2022 10:29:52 GMT
       content-type:
       - application/json; charset=utf-8
       x-frame-options:
@@ -82,18 +81,16 @@ http_interactions:
       - none
       referrer-policy:
       - strict-origin-when-cross-origin
-      etag:
-      - W/"f0e4c0f9dedb9e540073627233186e30"
       cache-control:
-      - max-age=0, private, must-revalidate
+      - no-cache
       x-request-id:
-      - 3196884e48d4e43a24eac40b1fd1f96d
+      - bc698f0abc260e7dd2ebeea3fa9ec03e
       x-runtime:
-      - '0.008876'
+      - '0.004653'
       strict-transport-security:
       - max-age=15724800; includeSubDomains
     body:
       encoding: ASCII-8BIT
-      string: '[{"offenderNo":"G0276VC","level":"high","createdTimeStamp":"2021-03-11T11:05:10.493Z","sourceSystem":"testing","active":true},{"offenderNo":"T0000FT","level":"high","createdTimeStamp":"2021-03-17T20:54:55.902Z","sourceSystem":"hardcoded-oauth-client-id","active":true}]'
-  recorded_at: Tue, 09 Aug 2022 10:29:51 GMT
+      string: '{"message":"No record found for that offender"}'
+  recorded_at: Tue, 09 Aug 2022 10:29:52 GMT
 recorded_with: VCR 6.0.0

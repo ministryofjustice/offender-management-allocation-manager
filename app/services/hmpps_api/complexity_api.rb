@@ -40,6 +40,11 @@ module HmppsApi
         end
       end
 
+      def inactivate(offender_no)
+        route = "/complexity-of-need/offender-no/#{offender_no}/inactivate"
+        client.put route, cache: false
+      end
+
     private
 
       def client
