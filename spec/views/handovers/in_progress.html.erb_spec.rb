@@ -81,7 +81,7 @@ RSpec.describe 'handovers/in_progress' do
     end
   end
 
-  describe 'when no COM is allocated' do
+  describe 'when no COM is allocated and 2 days after COM allocated date' do
     it 'shows a warning' do
       allow(cases[0][1]).to receive(:allocated_com_name).and_return nil
       render

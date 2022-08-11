@@ -44,9 +44,17 @@
 }
 
 .govuk-table__cell {
-  .highlight {
+  .highlight-primary {
     font-weight: bold;
     padding-left: 5px;
+  }
+
+  .highlight-secondary {
+    padding-left: 5px;
+    color: #0b0c0c;
+    font-size: 16px;
+    font-weight: normal;
+    line-height: 1.25;
   }
 
   .highlight-blue {
@@ -55,12 +63,5 @@
 
   .highlight-red {
     border-left: 5px solid #d4351c;
-  }
-
-  .secondary {
-    color: #0b0c0c;
-    font-size: 16px;
-    font-weight: normal;
-    line-height: 1.25;
   }
 }
