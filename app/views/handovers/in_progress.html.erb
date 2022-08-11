@@ -46,8 +46,8 @@
         <% if com_name.nil? and calc_h_o_date.com_allocated_date > Time.zone.now.to_date - 2.days %>
           Unknown
         <% elsif com_name.nil? %>
-          <div class="highlight-primary highlight-red">Unknown</div>
-          <div class="highlight-secondary highlight-red">Allocation overdue</div>
+          <div class="highlight-primary highlight-alert">Unknown</div>
+          <div class="highlight-secondary highlight-alert">Allocation overdue</div>
         <% else %>
           <%= com_name %>
         <% end %>
