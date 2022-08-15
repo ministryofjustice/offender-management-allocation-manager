@@ -18,9 +18,9 @@ module OffenderHelper
 
   def case_owner_label(offender)
     if offender.pom_responsible?
-      'Custody'
+      'Responsible'
     elsif offender.com_responsible?
-      'Community'
+      'Supporting'
     end
   end
 

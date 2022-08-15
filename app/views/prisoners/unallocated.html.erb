@@ -16,6 +16,8 @@
   </p>
 <% end %>
 
+<h1 class="govuk-heading-xl">Allocations</h1>
+
 <div class="govuk-!-margin-bottom-4">
   <%= render "search/search_box" %>
 </div>
@@ -27,8 +29,7 @@
                                                             :new_arrivals_count => @new_arrivals.count
 }) %>
 
-<h1 class="govuk-heading-l govuk-!-margin-bottom-4">Make new allocations</h1>
-<p>There are currently <%= @unallocated.count %> cases waiting to be allocated to a POM.</p>
+<h2 class="govuk-heading-l govuk-!-margin-bottom-4">Make allocations</h2>
 
 <section id="awaiting-allocation">
   <%= render(
@@ -59,14 +60,26 @@
         <%= sort_arrow('earliest_release_date') %>
       </th>
       <th class="govuk-table__header sorter-false" scope="col">
+        <a href="<%= sort_link('tier') %>">
+          Tier
+        </a>
+        <%= sort_arrow('tier') %>
+      </th>
+      <th class="govuk-table__header sorter-false" scope="col">
         <a href="<%= sort_link('case_owner') %>">
-          Case owner
+          POM role needed
         </a>
         <%= sort_arrow('case_owner') %>
       </th>
       <th class="govuk-table__header sorter-false" scope="col">
+        <a href="<%= sort_link('additional_information') %>">
+          Additional information
+        </a>
+        <%= sort_arrow('additional_information') %>
+      </th>
+      <th class="govuk-table__header sorter-false" scope="col">
         <a href="<%= sort_link('awaiting_allocation_for') %>">
-          Days waiting for allocation
+          Working days since entering this prison
         </a>
         <%= sort_arrow('awaiting_allocation_for') %>
       </th>
@@ -94,11 +107,17 @@
             Unknown
           <% end %>
         </td>
-        <td aria-label="Case owner" class="govuk-table__cell">
+        <td aria-label="Tier" class="govuk-table__cell">
+          <%= offender.tier %>
+        </td>
+        <td aria-label="POM role needed" class="govuk-table__cell">
           <%= case_owner_label(offender) %>
         </td>
-        <td aria-label="Awaiting allocation for" class="govuk-table__cell">
-          <%= offender.awaiting_allocation_for %> days
+        <td aria-label="Additional information" class="govuk-table__cell">
+          TODO
+        </td>
+        <td aria-label="Working days since entering this prison" class="govuk-table__cell">
+          <%= offender.awaiting_allocation_for %> days TODO discount w/e and bh
         </td>
       </tr>
     <% end %>
