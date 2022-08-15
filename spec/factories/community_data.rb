@@ -41,4 +41,18 @@ FactoryBot.define do
       }
     end
   end
+
+  factory :community_all_offender_managers_datum, class: Hash do
+    transient do
+      forenames { Faker::Name.first_name }
+      surname { Faker::Name.last_name }
+      email { Faker::Internet.safe_email }
+    end
+
+    initialize_with { attributes }
+    isResponsibleOfficer { true }
+    isPrisonOffenderManager { false }
+    isUnallocated { false }
+    staff { { 'forenames' => forenames, 'surname' => surname, 'email' => email } }
+  end
 end

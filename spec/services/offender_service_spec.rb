@@ -225,4 +225,52 @@ describe OffenderService, type: :feature do
       end
     end
   end
+
+  describe '#get_com' do
+    # This offender has been set up in nDelius test especially for this test
+    let(:nomis_offender_id) { 'A5194DY' }
+
+    # This test can only be run inside the VPN as nDelius test isn't globally accessible
+    context 'when hitting API', :vpn_only, vcr: { cassette_name: 'delius/get_all_offender_managers_data' } do
+      it 'gets some data' do
+        expected = {
+          forenames: 'Gurnank',
+          surname: 'Cheema',
+          email: 'c6ddd443fa575bd6904a50319d868f4ba453e76310b8298d412e4d0bcf863517',
+          is_responsible: true,
+        }
+
+        result = described_class.get_com(nomis_offender_id)
+        # Some genius added a test case to dev nDelius with REAL DATA so now we have to SHA256-encode the result as well
+        # as our expectation, otherwise we'd be exposing a real email address in a public Github repo
+        result[:email] = Digest::SHA256.hexdigest(result[:email])
+
+        expect(result).to eq expected
+      end
+    end
+
+    context 'with stubbing' do
+      before do
+        stub_auth_token
+      end
+
+      describe 'when other unwanted data exist' do
+        it 'ignores them and picks out the allocated COM even when they are not responsible' do
+          stub_get_all_offender_managers(
+            nomis_offender_id,
+            [
+              build(:community_all_offender_managers_datum, isUnallocated: true),
+              build(:community_all_offender_managers_datum, isPrisonOffenderManager: true),
+              build(:community_all_offender_managers_datum, forenames: 'F1', surname: 'S1', email: 'E1',
+                                                            isResponsibleOfficer: false)
+            ]
+          )
+          expect(described_class.get_com(nomis_offender_id)).to eq({ forenames: 'F1',
+                                                                     surname: 'S1',
+                                                                     email: 'E1',
+                                                                     is_responsible: false })
+        end
+      end
+    end
+  end
 end
