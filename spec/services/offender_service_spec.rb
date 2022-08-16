@@ -237,6 +237,8 @@ describe OffenderService, type: :feature do
           forenames: 'Gurnank',
           surname: 'Cheema',
           email: 'c6ddd443fa575bd6904a50319d868f4ba453e76310b8298d412e4d0bcf863517',
+          ldu_code: 'N07NPSA',
+          team_name: 'OMU A',
           is_responsible: true,
         }
 
@@ -262,12 +264,15 @@ describe OffenderService, type: :feature do
               build(:community_all_offender_managers_datum, isUnallocated: true),
               build(:community_all_offender_managers_datum, isPrisonOffenderManager: true),
               build(:community_all_offender_managers_datum, forenames: 'F1', surname: 'S1', email: 'E1',
+                                                            team_name: 'Team1', ldu_code: 'TestLDU',
                                                             isResponsibleOfficer: false)
             ]
           )
           expect(described_class.get_com(nomis_offender_id)).to eq({ forenames: 'F1',
                                                                      surname: 'S1',
                                                                      email: 'E1',
+                                                                     ldu_code: 'TestLDU',
+                                                                     team_name: 'Team1',
                                                                      is_responsible: false })
         end
       end

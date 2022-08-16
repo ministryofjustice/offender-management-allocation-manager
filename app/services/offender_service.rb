@@ -72,7 +72,9 @@ class OffenderService
         forenames: com.fetch('staff').fetch('forenames'),
         surname: com.fetch('staff').fetch('surname'),
         email: com.fetch('staff').fetch('email'),
-        is_responsible: com.fetch('isResponsibleOfficer')
+        is_responsible: com.fetch('isResponsibleOfficer'),
+        team_name: com.fetch('team').fetch('description'),
+        ldu_code: com.fetch('team').fetch('localDeliveryUnit').fetch('code'),
       }
     end
 

@@ -47,6 +47,8 @@ FactoryBot.define do
       forenames { Faker::Name.first_name }
       surname { Faker::Name.last_name }
       email { Faker::Internet.safe_email }
+      ldu_code { Faker::Alphanumeric.alpha(number: 7) }
+      team_name { Faker::Alphanumeric.alpha(number: 5) }
     end
 
     initialize_with { attributes }
@@ -54,5 +56,6 @@ FactoryBot.define do
     isPrisonOffenderManager { false }
     isUnallocated { false }
     staff { { 'forenames' => forenames, 'surname' => surname, 'email' => email } }
+    team { { 'description' => team_name, 'localDeliveryUnit' => { code: ldu_code } } }
   end
 end
