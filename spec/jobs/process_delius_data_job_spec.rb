@@ -1,27 +1,48 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
-
+# NOTES for future developers
+#
+# This test is a clusterduck. It tries to be a full integration test, and then ends up having to mock the lowest level
+# of the stack - the API calls made at the networking library.
+#
+# With the introduction of the new COM details API call, this test is moving to a unit test. So OffenderService is
+# stubbed to return a mocked value and we do not need to worry about what API calls it is making or how it is processing
+# the data.
+#
+# Please follow this pattern for all future work - when significant work is done on any behaviour, that behaviour's test
+# section should replace API mocks with dependency mocks as has been described above.
 RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
   let(:nomis_offender_id) { 'G4281GV' }
   let(:remand_nomis_offender_id) { 'G3716UD' }
   let(:ldu) {  create(:local_delivery_unit) }
   let(:prison) { create(:prison) }
   let(:case_info) { CaseInformation.last }
+  let(:team_name) { Faker::Company.name }
+  let(:mock_com) do
+    {
+      name: 'TestSurname, TestForename',
+      email: 'test-email@example.org',
+      ldu_code: ldu.code,
+      team_name: team_name,
+      is_responsible: true,
+    }
+  end
 
   before do
     stub_auth_token
+
+    allow(OffenderService).to receive(:get_com).with(nomis_offender_id).and_return(mock_com)
   end
 
   context 'when on the happy path' do
-    let(:team_name) { Faker::Company.name }
-
     before do
       stub_offender(build(:nomis_offender, prisonId: prison.code, prisonerNumber: nomis_offender_id))
       stub_community_offender(nomis_offender_id, build(:community_data,
                                                        offenderManagers: [build(:community_offender_manager,
-                                                                                team: { code: "XYX",
-                                                                                        description: team_name,
+                                                                                staff: { unallocated: false,
+                                                                                         surname: 'TestSurname',
+                                                                                         forenames: 'TestForename' },
+                                                                                team: { description: team_name,
                                                                                         localDeliveryUnit: { code: ldu.code } })]))
     end
 
@@ -37,7 +58,8 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
                  local_delivery_unit_id: ldu.id,
                  ldu_code: ldu.code,
                  team_name: team_name,
-                 com_name: "Jones, Ruth Mary",
+                 com_name: "TestSurname, TestForename",
+                 com_email: "test-email@example.org",
                  tier: "A")
     end
   end
@@ -50,27 +72,33 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
 
       stub_community_offender(offender_id, build(:community_data,
                                                  offenderManagers: [build(:community_offender_manager,
-                                                                          staff: { unallocated: unallocated, forenames: 'Bob', surname: 'Smith' },
-                                                                          team: { code: 'XYX',
-                                                                                  localDeliveryUnit: { code: ldu.code } })]))
+                                                                          staff: { unallocated: unallocated, forenames: 'TestForename', surname: 'TestSurname' },
+                                                                          team: { localDeliveryUnit: { code: ldu.code } })]))
     end
 
     context 'with a normal COM name' do
-      let(:com_name) { 'Smith, Bob' }
       let(:unallocated) { false }
+
+      before do
+        allow(OffenderService).to receive(:get_com).with(offender_id).and_return(mock_com)
+      end
 
       it 'shows com name' do
         expect {
           described_class.perform_now offender_id
         }.to change(CaseInformation, :count).by(1)
 
-        expect(case_info.com_name).to eq(com_name)
+        expect(case_info.com_name).to eq("TestSurname, TestForename")
       end
     end
 
     context 'with an unallocated com name' do
       let(:com_name) { 'Staff, Unallocated' }
       let(:unallocated) { true }
+
+      before do
+        allow(OffenderService).to receive(:get_com).with(offender_id).and_return(nil)
+      end
 
       it 'maps com_name to nil' do
         expect {
@@ -84,6 +112,10 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
     context 'with an inactive com name' do
       let(:com_name) { 'Staff, Inactive Staff(N07)' }
       let(:unallocated) { true }
+
+      before do
+        allow(OffenderService).to receive(:get_com).with(offender_id).and_return(nil)
+      end
 
       it 'maps com_name to nil' do
         expect {
@@ -163,8 +195,9 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
       stub_offender(build(:nomis_offender, prisonId: prison.code, prisonerNumber: nomis_offender_id))
       stub_community_offender(nomis_offender_id, build(:community_data,
                                                        offenderManagers: [build(:community_offender_manager,
-                                                                                team: { code: 'XYX',
-                                                                                        localDeliveryUnit: { code: ldu_code } })]))
+                                                                                team: { localDeliveryUnit: { code: ldu_code } })]))
+
+      mock_com[:ldu_code] = ldu_code
       described_class.perform_now(nomis_offender_id)
     end
 
@@ -302,6 +335,7 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
     shared_examples 'recalculate handover dates' do
       it "recalculates the offender's handover dates, using the new Case Information data" do
         expect(RecalculateHandoverDateJob).to receive(:perform_later).with(offender_no)
+        allow(OffenderService).to receive(:get_com).with(offender_no).and_return(mock_com)
         described_class.perform_now offender_no
       end
     end
@@ -318,6 +352,7 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
       include_examples 'recalculate handover dates'
 
       it 'does not re-calculate if CaseInformation is unchanged' do
+        allow(OffenderService).to receive(:get_com).with(offender_no).and_return(mock_com)
         described_class.perform_now offender_no
         expect(RecalculateHandoverDateJob).not_to receive(:perform_later)
         described_class.perform_now offender_no
