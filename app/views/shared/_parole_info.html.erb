@@ -28,7 +28,7 @@
         <td id='target-hearing-date' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= format_date(@prisoner.target_hearing_date) %></td>
       </tr>
     <% end %>
-    <% if @prisoner.target_hearing_date <= Time.zone.today && @prisoner.current_parole_record&.hearing_outcome.present?%>
+    <% if @prisoner.target_hearing_date.present? && @prisoner.target_hearing_date <= Time.zone.today && @prisoner.current_parole_record&.hearing_outcome.present?%>
       <tr class="govuk-table__row">
         <td class="govuk-table__cell govuk-!-width-one-half">Hearing outcome</td>
         <td id='hearing-outcome' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= @prisoner.current_parole_record.current_hearing_outcome %></td>
