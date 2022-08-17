@@ -188,6 +188,7 @@ RSpec.describe AllocationsController, type: :controller do
 
         before do
           stub_community_offender(offender_no, build(:community_data))
+          allow(OffenderService).to receive(:get_com).and_return({ ldu_code: 'L', team_name: 'T' })
         end
 
         context 'when create, delius, update' do

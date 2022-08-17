@@ -1,8 +1,4 @@
-# frozen_string_literal: true
-
-require 'rails_helper'
-
-feature "Delius import feature", :disable_push_to_delius do
+RSpec.feature "Delius import feature", :disable_push_to_delius do
   let(:offender_no) {  offender.fetch(:prisonerNumber) }
   let(:prison_code) { create(:prison).code }
   let(:offender) { build(:nomis_offender, prisonId: prison_code) }
@@ -22,8 +18,11 @@ feature "Delius import feature", :disable_push_to_delius do
       stub_community_offender(offender_no, build(:community_data,
                                                  offenderManagers: [
                                                    build(:community_offender_manager,
-                                                         team: { code: 'XYX',
-                                                                 localDeliveryUnit: { code: ldu.code } })]))
+                                                         team: { localDeliveryUnit: { code: ldu.code } })]))
+
+      stub_get_all_offender_managers(offender_no, [build(:community_all_offender_managers_datum,
+                                                         forenames: 'F1', surname: 'S1', email: 'E1',
+                                                         team_name: 'Team1', ldu_code: 'TestLDU')])
     end
 
     it "imports from Delius and creates case information" do
@@ -44,6 +43,8 @@ feature "Delius import feature", :disable_push_to_delius do
       expect(page.find(:css, '#welsh-offender-row')).not_to have_content('Change')
       expect(page.find(:css, '#service-provider-row')).not_to have_content('Change')
       expect(page.find(:css, '#tier-row')).not_to have_content('Change')
+
+      expect(Offender.find(offender_no).case_information.values_at(:com_name, :com_email)).to eq ['S1, F1', 'E1']
     end
   end
 end
