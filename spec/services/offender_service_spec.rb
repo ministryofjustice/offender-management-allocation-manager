@@ -83,10 +83,10 @@ describe OffenderService, type: :feature do
                    ldu_code: "N07NPSA",
                    mappa_levels: [],
                    noms_no: nomis_offender_id,
-                   offender_manager: "Cheema, Gurnank",
+                   offender_manager: "TestUpdate01Surname, TestUpdate01Forname",
                    service_provider: "NPS",
                    team_name: "OMU A",
-                   tier: "B2")
+                   tier: "B-2")
       end
     end
 
@@ -234,20 +234,15 @@ describe OffenderService, type: :feature do
     context 'when hitting API', :vpn_only, vcr: { cassette_name: 'delius/get_all_offender_managers_data' } do
       it 'gets some data' do
         expected = {
-          forenames: 'Gurnank',
-          surname: 'Cheema',
-          email: 'c6ddd443fa575bd6904a50319d868f4ba453e76310b8298d412e4d0bcf863517',
+          forenames: 'TestUpdate01Forname',
+          surname: 'TestUpdate01Surname',
+          email: 'test-update-01-email@example.org ',
           ldu_code: 'N07NPSA',
           team_name: 'OMU A',
           is_responsible: true,
         }
 
-        result = described_class.get_com(nomis_offender_id)
-        # Some genius added a test case to dev nDelius with REAL DATA so now we have to SHA256-encode the result as well
-        # as our expectation, otherwise we'd be exposing a real email address in a public Github repo
-        result[:email] = Digest::SHA256.hexdigest(result[:email])
-
-        expect(result).to eq expected
+        expect(described_class.get_com(nomis_offender_id)).to eq expected
       end
     end
 
