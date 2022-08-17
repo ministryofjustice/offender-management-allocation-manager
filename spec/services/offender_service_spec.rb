@@ -234,12 +234,12 @@ describe OffenderService, type: :feature do
     context 'when hitting API', :vpn_only, vcr: { cassette_name: 'delius/get_all_offender_managers_data' } do
       it 'gets some data' do
         expected = {
-          forenames: 'TestUpdate01Forname',
-          surname: 'TestUpdate01Surname',
+          name: 'TestUpdate01Surname, TestUpdate01Forname',
           email: 'test-update-01-email@example.org ',
           ldu_code: 'N07NPSA',
           team_name: 'OMU A',
           is_responsible: true,
+          is_unallocated: false,
         }
 
         expect(described_class.get_com(nomis_offender_id)).to eq expected
@@ -256,18 +256,37 @@ describe OffenderService, type: :feature do
           stub_get_all_offender_managers(
             nomis_offender_id,
             [
-              build(:community_all_offender_managers_datum, isUnallocated: true),
-              build(:community_all_offender_managers_datum, isPrisonOffenderManager: true),
+              build(:community_all_offender_managers_datum, isPrisonOffenderManager: true, isResponsibleOfficer: true),
               build(:community_all_offender_managers_datum, forenames: 'F1', surname: 'S1', email: 'E1',
                                                             team_name: 'Team1', ldu_code: 'TestLDU',
                                                             isResponsibleOfficer: false)
             ]
           )
-          expect(described_class.get_com(nomis_offender_id)).to eq({ forenames: 'F1',
-                                                                     surname: 'S1',
+          expect(described_class.get_com(nomis_offender_id)).to eq({ name: 'S1, F1',
                                                                      email: 'E1',
                                                                      ldu_code: 'TestLDU',
                                                                      team_name: 'Team1',
+                                                                     is_unallocated: false,
+                                                                     is_responsible: false })
+        end
+      end
+
+      describe "when responsible officer is unallocated" do
+        it 'gets leaves out personal info' do
+          stub_get_all_offender_managers(
+            nomis_offender_id,
+            [
+              build(:community_all_offender_managers_datum, forenames: 'XXXX', surname: 'XXXX', email: 'XXXX',
+                                                            team_name: 'Team1', ldu_code: 'TestLDU',
+                                                            isUnallocated: true,
+                                                            isResponsibleOfficer: false)
+            ]
+          )
+          expect(described_class.get_com(nomis_offender_id)).to eq({ name: nil,
+                                                                     email: nil,
+                                                                     ldu_code: 'TestLDU',
+                                                                     team_name: 'Team1',
+                                                                     is_unallocated: true,
                                                                      is_responsible: false })
         end
       end

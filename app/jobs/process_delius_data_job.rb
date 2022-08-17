@@ -25,7 +25,7 @@ private
 
   def import_data(nomis_offender_id)
     delius_record = OpenStruct.new(OffenderService.get_community_data(nomis_offender_id))
-    delius_com_info = OpenStruct.new(OffenderService.get_com(nomis_offender_id))
+    delius_com_info = OffenderService.get_com(nomis_offender_id)
     offender = OffenderService.get_offender(delius_record.noms_no)
 
     if offender.nil?
@@ -52,18 +52,20 @@ private
   end
 
   def map_delius_to_case_info(delius_record, delius_com_info)
+    ldu_code = delius_com_info.fetch(:ldu_code)
+
     find_case_info(delius_record).tap do |case_info|
       case_info.assign_attributes(
         manual_entry: false,
-        com_name: delius_com_info.name,
-        com_email: delius_com_info.email,
+        com_name: delius_com_info[:name],
+        com_email: delius_com_info[:email],
         crn: delius_record.crn,
         tier: map_tier(delius_record.tier),
-        local_delivery_unit: map_ldu(delius_com_info.ldu_code),
-        ldu_code: delius_com_info.ldu_code,
-        team_name: delius_com_info.team_name,
+        local_delivery_unit: map_ldu(ldu_code),
+        ldu_code: ldu_code,
+        team_name: delius_com_info.fetch(:team_name),
         case_allocation: delius_record.service_provider,
-        probation_service: map_probation_service(delius_com_info.ldu_code),
+        probation_service: map_probation_service(ldu_code),
         mappa_level: map_mappa_level(delius_record.mappa_levels)
       )
     end

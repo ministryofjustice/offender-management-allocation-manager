@@ -25,6 +25,7 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
       ldu_code: ldu.code,
       team_name: team_name,
       is_responsible: true,
+      is_unallocated: false,
     }
   end
 
@@ -97,7 +98,10 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
       let(:unallocated) { true }
 
       before do
-        allow(OffenderService).to receive(:get_com).with(offender_id).and_return(nil)
+        mock_com.delete(:name)
+        mock_com.delete(:email)
+        mock_com[:is_unallocated] = true
+        allow(OffenderService).to receive(:get_com).with(offender_id).and_return(mock_com)
       end
 
       it 'maps com_name to nil' do
@@ -114,7 +118,10 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
       let(:unallocated) { true }
 
       before do
-        allow(OffenderService).to receive(:get_com).with(offender_id).and_return(nil)
+        mock_com.delete(:name)
+        mock_com.delete(:email)
+        mock_com[:is_unallocated] = true
+        allow(OffenderService).to receive(:get_com).with(offender_id).and_return(mock_com)
       end
 
       it 'maps com_name to nil' do
