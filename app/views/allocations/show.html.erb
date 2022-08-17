@@ -91,6 +91,12 @@
   </table>
 
   <%= render partial: 'shared/offence_info', locals: { editable_thd: true}  %>
+  <% if @prisoner.tariff_date.present? || @prisoner.parole_eligibility_date.present? || @prisoner.current_parole_record.present? %>
+    <%= render partial: 'shared/parole_info' %>
+  <% end %>
+  <% if @prisoner.previous_parole_records.any? %>
+    <%= render partial: 'shared/historical_parole' %>
+  <% end%>
 
   <table class="govuk-table">
     <tbody class="govuk-table__body">
