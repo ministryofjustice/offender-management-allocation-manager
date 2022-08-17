@@ -56,7 +56,8 @@ RSpec.feature 'Handovers feature:' do
     it 'works' do
       allow_any_instance_of(StaffMember).to receive(:unreleased_allocations).and_return(
         [
-          instance_double(AllocatedOffender, offender_attrs.merge(allocated_com_name: 'Mr COM'))
+          instance_double(AllocatedOffender, offender_attrs.merge(allocated_com_name: 'Mr COM',
+                                                                  allocated_com_email: 'mr-com@example.org'))
         ]
       )
       date = FactoryBot.create :calculated_handover_date, :between_com_allocated_and_responsible_dates,
@@ -69,6 +70,7 @@ RSpec.feature 'Handovers feature:' do
         expect(page.status_code).to eq 200
         expect(page).to have_text 'Handovers in progress'
         expect(page).to have_text 'Surname1, Firstname1 X1111XX'
+        expect(page).to have_text 'Mr COM mr-com@example.org'
       end
     end
   end

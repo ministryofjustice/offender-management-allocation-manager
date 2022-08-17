@@ -12,7 +12,8 @@ RSpec.describe 'handovers/in_progress' do
                         tier: 'A',
                         earliest_release: { type: 'TED', date: Date.new(2022, 1, 30) },
                         case_allocation: 'NPS',
-                        allocated_com_name: 'Com One')
+                        allocated_com_name: 'Com One',
+                        allocated_com_email: 'com1@example.org')
       ],
       [
         double(:calculated_dates2, com_allocated_date: Date.new(2022, 2, 5),
@@ -24,7 +25,8 @@ RSpec.describe 'handovers/in_progress' do
                         tier: 'B',
                         earliest_release: { type: 'HDCED', date: Date.new(2030, 1, 1) },
                         case_allocation: 'CRC',
-                        allocated_com_name: 'Com Two')
+                        allocated_com_name: 'Com Two',
+                        allocated_com_email: 'x')
       ]
     ]
   end
@@ -48,7 +50,7 @@ RSpec.describe 'handovers/in_progress' do
     end
 
     it 'shows COM details correctly' do
-      expect(first_row_text).to include 'Com One'
+      expect(first_row_text).to include 'Com One com1@example.org'
     end
 
     it 'shows handover dates correctly' do

@@ -84,6 +84,10 @@ class MpcOffender
     @probation_record.com_name
   end
 
+  def allocated_com_email
+    @probation_record.com_email
+  end
+
   def responsibility_override?
     @offender.responsibility.present?
   end
