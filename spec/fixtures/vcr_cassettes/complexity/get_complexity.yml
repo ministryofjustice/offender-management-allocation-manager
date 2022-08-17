@@ -8,48 +8,44 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - Faraday v1.3.0
+      - Faraday v1.10.0
       Authorization:
       - authorisation_header
   response:
     status:
       code: 200
-      message:
+      message: null
     headers:
-      Date:
-      - Mon, 22 Mar 2021 14:00:32 GMT
-      Content-Type:
+      date:
+      - Tue, 09 Aug 2022 10:29:51 GMT
+      content-type:
       - application/json; charset=utf-8
-      Transfer-Encoding:
-      - chunked
-      Connection:
-      - keep-alive
-      X-Frame-Options:
+      x-frame-options:
       - SAMEORIGIN
-      X-XSS-Protection:
+      x-xss-protection:
       - 1; mode=block
-      X-Content-Type-Options:
+      x-content-type-options:
       - nosniff
-      X-Download-Options:
+      x-download-options:
       - noopen
-      X-Permitted-Cross-Domain-Policies:
+      x-permitted-cross-domain-policies:
       - none
-      Referrer-Policy:
+      referrer-policy:
       - strict-origin-when-cross-origin
-      ETag:
-      - W/"099ff33b8455fec81022a47b948e6906"
-      Cache-Control:
+      etag:
+      - W/"97177497315a0ed823a95e895504f919"
+      cache-control:
       - max-age=0, private, must-revalidate
-      X-Request-Id:
-      - 7e04ab21cf81128638ed8944a68f2989
-      X-Runtime:
-      - '0.055926'
-      Strict-Transport-Security:
+      x-request-id:
+      - 774e8b02b9db60ef8ae39fb9b78e5827
+      x-runtime:
+      - '0.137866'
+      strict-transport-security:
       - max-age=15724800; includeSubDomains
     body:
-      encoding: UTF-8
-      string: '{"offenderNo":"G0276VC","level":"high","createdTimeStamp":"2021-03-11T11:05:10.493Z","sourceSystem":"testing"}'
-  recorded_at: Mon, 22 Mar 2021 14:00:32 GMT
+      encoding: ASCII-8BIT
+      string: '{"offenderNo":"G0276VC","level":"high","createdTimeStamp":"2021-03-11T11:05:10.493Z","sourceSystem":"testing","active":true}'
+  recorded_at: Tue, 09 Aug 2022 10:29:51 GMT
 - request:
     method: get
     uri: https://complexity-of-need-staging.hmpps.service.justice.gov.uk/v1/complexity-of-need/offender-no/T0276VC
@@ -58,44 +54,40 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - Faraday v1.3.0
+      - Faraday v1.10.0
       Authorization:
       - authorisation_header
   response:
     status:
       code: 404
-      message:
+      message: null
     headers:
-      Date:
-      - Mon, 22 Mar 2021 14:00:32 GMT
-      Content-Type:
+      date:
+      - Tue, 09 Aug 2022 10:29:51 GMT
+      content-type:
       - application/json; charset=utf-8
-      Transfer-Encoding:
-      - chunked
-      Connection:
-      - keep-alive
-      X-Frame-Options:
+      x-frame-options:
       - SAMEORIGIN
-      X-XSS-Protection:
+      x-xss-protection:
       - 1; mode=block
-      X-Content-Type-Options:
+      x-content-type-options:
       - nosniff
-      X-Download-Options:
+      x-download-options:
       - noopen
-      X-Permitted-Cross-Domain-Policies:
+      x-permitted-cross-domain-policies:
       - none
-      Referrer-Policy:
+      referrer-policy:
       - strict-origin-when-cross-origin
-      Cache-Control:
+      cache-control:
       - no-cache
-      X-Request-Id:
-      - c27f799f516a3992fe344beed29a2719
-      X-Runtime:
-      - '0.004807'
-      Strict-Transport-Security:
+      x-request-id:
+      - 74e83995a4a03721f96f19298b349f0e
+      x-runtime:
+      - '0.041163'
+      strict-transport-security:
       - max-age=15724800; includeSubDomains
     body:
-      encoding: UTF-8
+      encoding: ASCII-8BIT
       string: '{"message":"No record found for that offender"}'
-  recorded_at: Mon, 22 Mar 2021 14:00:32 GMT
+  recorded_at: Tue, 09 Aug 2022 10:29:51 GMT
 recorded_with: VCR 6.0.0

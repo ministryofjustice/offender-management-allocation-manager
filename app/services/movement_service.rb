@@ -41,7 +41,7 @@ private
     # when the movement is from a prison to an immigration or detention centre
     if ((IMMIGRATION_MOVEMENT_CODES.include? transfer.from_agency) && !transfer.to_prison?) ||
     ((IMMIGRATION_MOVEMENT_CODES.include? transfer.to_agency) && transfer.from_prison?)
-      release_offender(transfer.offender_no)
+      release_offender(transfer.offender_no, transfer.from_agency)
 
       return true
     end
@@ -89,7 +89,7 @@ private
     return false unless release.to_agency == RELEASE_MOVEMENT_CODE
 
     if release.from_agency == IMMIGRATION_MOVEMENT_CODES.first || release.from_agency == IMMIGRATION_MOVEMENT_CODES.last
-      release_offender(release.offender_no)
+      release_offender(release.offender_no, release.from_agency)
 
       return true
     end
@@ -100,11 +100,11 @@ private
 
     return false unless release.from_prison? || hospital_agencies.include?(release.from_agency)
 
-    release_offender(release.offender_no)
+    release_offender(release.offender_no, release.from_agency)
     true
   end
 
-  def self.release_offender(offender_no)
+  def self.release_offender(offender_no, from_agency)
     Rails.logger.info("[MOVEMENT] Processing release for #{offender_no}")
 
     CaseInformation.where(nomis_offender_id: offender_no).destroy_all
@@ -122,5 +122,7 @@ private
     # case information (in case they come back one day), and we
     # should de-activate any current allocations.
     alloc.deallocate_offender_after_release if alloc
+
+    HmppsApi::ComplexityApi.inactivate(offender_no) if PrisonService.womens_prison?(from_agency)
   end
 end
