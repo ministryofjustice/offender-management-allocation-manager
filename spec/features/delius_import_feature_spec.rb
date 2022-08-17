@@ -18,11 +18,13 @@ RSpec.feature "Delius import feature", :disable_push_to_delius do
       stub_community_offender(offender_no, build(:community_data,
                                                  offenderManagers: [
                                                    build(:community_offender_manager,
-                                                         team: { localDeliveryUnit: { code: ldu.code } })]))
+                                                         staff: { forenames: 'F1', surname: 'S1' },
+                                                         team: { description: 'Team1',
+                                                                 localDeliveryUnit: { code: ldu.code } })]))
 
       stub_get_all_offender_managers(offender_no, [build(:community_all_offender_managers_datum,
                                                          forenames: 'F1', surname: 'S1', email: 'E1',
-                                                         team_name: 'Team1', ldu_code: 'TestLDU')])
+                                                         team_name: 'Team1', ldu_code: ldu.code)])
     end
 
     it "imports from Delius and creates case information" do

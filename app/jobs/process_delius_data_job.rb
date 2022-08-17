@@ -36,6 +36,8 @@ private
   end
 
   def process_record(delius_record, delius_com_info)
+    assert_com_details(delius_record, delius_com_info)
+
     case_information = map_delius_to_case_info(delius_record, delius_com_info)
 
     if case_information.changed?
@@ -48,6 +50,14 @@ private
                                     error_type: error_type(error.attribute)
         end
       end
+    end
+  end
+
+  def assert_com_details(offender_record, delius_com_info)
+    com_from_offender = offender_record.to_h.symbolize_keys.values_at(:offender_manager, :team_name, :ldu_code)
+    com_from_oms = delius_com_info.values_at(:name, :team_name, :ldu_code)
+    if com_from_offender != com_from_oms
+      raise ComInconsistencyError, "COM inconsistent. Offender record: #{com_from_offender.to_json} All offender managers: #{com_from_oms.to_json}"
     end
   end
 

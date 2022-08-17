@@ -74,7 +74,7 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
       stub_community_offender(offender_id, build(:community_data,
                                                  offenderManagers: [build(:community_offender_manager,
                                                                           staff: { unallocated: unallocated, forenames: 'TestForename', surname: 'TestSurname' },
-                                                                          team: { localDeliveryUnit: { code: ldu.code } })]))
+                                                                          team: { description: mock_com[:team_name], localDeliveryUnit: { code: ldu.code } })]))
     end
 
     context 'with a normal COM name' do
@@ -140,8 +140,8 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
       stub_community_offender(nomis_offender_id, build(:community_data,
                                                        currentTier: 'B1',
                                                        offenderManagers: [build(:community_offender_manager,
-                                                                                team: { code: 'XXU',
-                                                                                        localDeliveryUnit: { code: ldu.code } })]))
+                                                                                staff: { forenames: 'TestForename', surname: 'TestSurname' },
+                                                                                team: { description: mock_com[:team_name], localDeliveryUnit: { code: ldu.code } })]))
     end
 
     it 'creates case information' do
@@ -158,8 +158,8 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
       stub_community_offender(nomis_offender_id, build(:community_data,
                                                        currentTier: 'X',
                                                        offenderManagers: [build(:community_offender_manager,
-                                                                                team: { code: 'XYX',
-                                                                                        localDeliveryUnit: { code: ldu.code } })]))
+                                                                                staff: { forenames: 'TestForename', surname: 'TestSurname' },
+                                                                                team: { description: mock_com[:team_name], localDeliveryUnit: { code: ldu.code } })]))
     end
 
     it 'does not create case information' do
@@ -174,8 +174,8 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
       stub_offender(build(:nomis_offender, prisonId: prison.code, prisonerNumber: nomis_offender_id))
       stub_community_offender(nomis_offender_id, build(:community_data,
                                                        offenderManagers: [build(:community_offender_manager,
-                                                                                team: { code: 'XYX',
-                                                                                        localDeliveryUnit: { code: ldu.code } })]))
+                                                                                staff: { forenames: 'TestForename', surname: 'TestSurname' },
+                                                                                team: { description: mock_com[:team_name], localDeliveryUnit: { code: ldu.code } })]))
     end
 
     context 'with an English LDU' do
@@ -202,7 +202,8 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
       stub_offender(build(:nomis_offender, prisonId: prison.code, prisonerNumber: nomis_offender_id))
       stub_community_offender(nomis_offender_id, build(:community_data,
                                                        offenderManagers: [build(:community_offender_manager,
-                                                                                team: { localDeliveryUnit: { code: ldu_code } })]))
+                                                                                staff: { forenames: 'TestForename', surname: 'TestSurname' },
+                                                                                team: { description: mock_com[:team_name], localDeliveryUnit: { code: ldu_code } })]))
 
       mock_com[:ldu_code] = ldu_code
       described_class.perform_now(nomis_offender_id)
@@ -238,8 +239,8 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
       stub_community_offender(nomis_offender_id, build(:community_data,
                                                        offenderManagers: [
                                                          build(:community_offender_manager,
-                                                               team: { code: "XYX",
-                                                                       localDeliveryUnit: { code: ldu.code } })
+                                                               staff: { forenames: 'TestForename', surname: 'TestSurname' },
+                                                               team: { description: mock_com[:team_name], localDeliveryUnit: { code: ldu.code } })
                                                        ]), registrations)
     end
 
@@ -306,8 +307,8 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
       stub_community_offender(nomis_offender_id, build(:community_data,
                                                        currentTier: 'C',
                                                        offenderManagers: [build(:community_offender_manager,
-                                                                                team: { code: 'XYX',
-                                                                                        localDeliveryUnit: { code: ldu.code } })]))
+                                                                                staff: { forenames: 'TestForename', surname: 'TestSurname' },
+                                                                                team: { description: mock_com[:team_name], localDeliveryUnit: { code: ldu.code } })]))
     end
 
     let!(:c1) { create(:case_information, tier: 'B', offender: build(:offender, nomis_offender_id: nomis_offender_id)) }
@@ -331,8 +332,9 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
                                                  otherIds: { crn: crn },
                                                  offenderManagers: [
                                                    build(:community_offender_manager,
+                                                         staff: { forenames: 'TestForename', surname: 'TestSurname' },
                                                          team: {
-                                                           code: 'XUX',
+                                                           description: mock_com[:team_name],
                                                            localDeliveryUnit: { code: ldu.code }
                                                          })
                                                  ]))
