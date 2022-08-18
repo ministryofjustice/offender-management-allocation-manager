@@ -17,7 +17,7 @@ class CnlDeactivation
       puts "Prison #{i + 1}/#{womens_prisons_count}: #{prison.name}: processing #{offender_count} offenders"
 
       offenders.each_with_index do |offender, j|
-        process_offender(offender.nomis_offender_id, j + 1, offender_count)
+        process_offender(offender.offender_no, j + 1, offender_count)
       end
     end
 
