@@ -3,7 +3,7 @@
 <%= render partial: 'layouts/caseload' %>
 
 <h2 class="govuk-heading-l">Parole cases</h2>
-<p class="govuk-body">Cases with a target hearing date, PED or TED in the next 10 months.</p>
+<p class="govuk-body">Cases with a target hearing date, PED or TED in the next 10 months or that have had a hearing recently.</p>
 
 <% if @pom.blank? || @parole_cases.empty? %>
   <h2 class="govuk-heading-l">No cases approaching parole </h2>
