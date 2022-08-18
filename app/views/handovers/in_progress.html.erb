@@ -50,7 +50,7 @@
           <div class="highlight-secondary highlight-alert">Allocation overdue</div>
         <% else %>
           <%= com_name %><br>
-          <%= allocated_offender.allocated_com_email %>
+          <%= allocated_offender.allocated_com_email || "No email address available" %>
         <% end %>
           </td>
 
