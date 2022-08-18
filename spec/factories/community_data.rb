@@ -55,7 +55,7 @@ FactoryBot.define do
     isResponsibleOfficer { true }
     isPrisonOffenderManager { false }
     isUnallocated { false }
-    staff { { 'forenames' => forenames, 'surname' => surname, 'email' => email } }
-    team { { 'description' => team_name, 'localDeliveryUnit' => { code: ldu_code } } }
+    staff { { 'forenames' => forenames, 'surname' => surname, 'email' => email }.compact_blank }
+    team { { 'description' => team_name, 'localDeliveryUnit' => { code: ldu_code }.compact_blank }.compact_blank }
   end
 end

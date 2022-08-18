@@ -79,7 +79,7 @@ class OffenderService
                            staff = com.fetch('staff')
                            {
                              name: [staff.fetch('surname'), staff.fetch('forenames')].join(', '),
-                             email: staff.fetch('email'),
+                             email: staff['email'],
                              is_unallocated: false,
                            }
                          end

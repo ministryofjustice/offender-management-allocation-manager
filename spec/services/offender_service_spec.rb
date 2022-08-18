@@ -290,6 +290,16 @@ describe OffenderService, type: :feature do
                                                                      is_responsible: false })
         end
       end
+
+      describe "when email is missing" do
+        it 'returns nil' do
+          stub_get_all_offender_managers(nomis_offender_id, [build(:community_all_offender_managers_datum, email: nil)])
+
+          result = nil
+          expect { result = described_class.get_com(nomis_offender_id) }.not_to raise_error
+          expect(result[:email]).to be_nil
+        end
+      end
     end
   end
 end
