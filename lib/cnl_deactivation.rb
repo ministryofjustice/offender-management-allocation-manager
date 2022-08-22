@@ -64,11 +64,11 @@ class CnlDeactivation
 
 private
 
-  def report_puts(msg=nil)
+  def report_puts(msg = nil)
     $stdout.puts msg unless silent
   end
 
-  def report_print(msg=nil)
+  def report_print(msg = nil)
     $stdout.print msg unless silent
   end
 end
