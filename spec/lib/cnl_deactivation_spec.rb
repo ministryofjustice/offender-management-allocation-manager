@@ -21,7 +21,7 @@ RSpec.describe CnlDeactivation do
   end
 
   describe '#call' do
-    before { described_class.new(dry_run: false).call }
+    before { described_class.new(dry_run: false, silent: true).call }
 
     context 'with a sentenced offender' do
       let(:is_sentenced) { true }
