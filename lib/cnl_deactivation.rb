@@ -1,49 +1,50 @@
 class CnlDeactivation
-  attr_reader :dry_run, :inactivated_count
+  attr_reader :dry_run, :inactivated_count, :silent
 
-  def initialize(dry_run: true)
+  def initialize(dry_run: true, silent: false)
     @dry_run = dry_run
+    @silent = silent
   end
 
   def call
     @inactivated_count = 0
     womens_prisons = Prison.where(code: PrisonService::WOMENS_PRISON_CODES)
     womens_prisons_count = womens_prisons.size
-    puts "Processing #{womens_prisons_count} women's prisons. Dry run: #{dry_run}"
+    report_puts "Processing #{womens_prisons_count} women's prisons. Dry run: #{dry_run}"
 
     womens_prisons.each_with_index do |prison, i|
       offenders = prison.offenders
       offender_count = offenders.size
-      puts "Prison #{i + 1}/#{womens_prisons_count}: #{prison.name}: processing #{offender_count} offenders"
+      report_puts "Prison #{i + 1}/#{womens_prisons_count}: #{prison.name}: processing #{offender_count} offenders"
 
       offenders.each_with_index do |offender, j|
         process_offender(offender.offender_no, j + 1, offender_count)
       end
     end
 
-    puts "\nDone. Complexity of need level inactivated for #{inactivated_count} offenders"
+    report_puts "\nDone. Complexity of need level inactivated for #{inactivated_count} offenders"
   end
 
   def process_offender(offender_id, offender_index, offender_count)
-    print '.'
+    report_print '.'
     nomis_offender = with_retries { HmppsApi::PrisonApi::OffenderApi.get_offender(offender_id) }
 
     unless nomis_offender.sentenced?
-      print "\n#{offender_index}/#{offender_count}: #{offender_id} need to de-activate CNL"
+      report_print "\n#{offender_index}/#{offender_count}: #{offender_id} need to de-activate CNL"
 
       unless dry_run
-        print ' - de-activating CNL'
+        report_print ' - de-activating CNL'
 
         begin
           with_retries { HmppsApi::ComplexityApi.inactivate(offender_id) }
           @inactivated_count += 1
-          print ' - done'
+          report_print ' - done'
         rescue Faraday::ResourceNotFound
-          print ' - resource not found'
+          report_print ' - resource not found'
         end
       end
 
-      puts
+      report_puts
     end
   end
 
@@ -52,12 +53,22 @@ class CnlDeactivation
       return yield
     rescue Faraday::ServerError
       if (i + 1) == retry_limit
-        puts "API error: #{retry_limit} re-try limit reached"
+        report_puts "API error: #{retry_limit} re-try limit reached"
         raise
       end
 
-      puts "\nAPI error. Pausing #{pause_secs}s before re-trying"
+      report_puts "\nAPI error. Pausing #{pause_secs}s before re-trying"
       sleep pause_secs
     end
+  end
+
+private
+
+  def report_puts(msg=nil)
+    $stdout.puts msg unless silent
+  end
+
+  def report_print(msg=nil)
+    $stdout.print msg unless silent
   end
 end
