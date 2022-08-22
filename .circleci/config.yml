@@ -11,7 +11,7 @@ references:
       - image: ministryofjustice/cloud-platform-tools
 
   test_container_config: &test_container_config
-    resource_class: medium
+    resource_class: large
     docker:
       - image: cimg/ruby:2.7.5-browsers
         environment:
@@ -20,16 +20,16 @@ references:
           PGUSER: ubuntu
           RACK_ENV: test
           VCR: 1
-          PARALLEL_TEST_PROCESSORS: 6
+          PARALLEL_TEST_PROCESSORS: 4
           COMPLEXITY_API_HOST: https://complexity-of-need-staging.hmpps.service.justice.gov.uk
           COMMUNITY_API_HOST: https://community-api-secure.test.delius.probation.hmpps.dsd.io
           ASSESSMENT_API_HOST: https://offender-dev.aks-dev-1.studio-hosting.service.justice.gov.uk
-      - image: circleci/postgres:10.5-alpine
+      - image: cimg/postgres:14.4
         environment:
           POSTGRES_USER: ubuntu
           POSTGRES_PASSWORD: ""
           POSTGRES_DB: offender-management-allocation-manager_test
-      - image: redis
+      - image: cimg/redis:7.0
 
   install_gpg: &install_gpg
     run:
@@ -217,7 +217,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - setup_remote_docker:
-          version: 20.10.7
+          version: 20.10.14
           docker_layer_caching: true
       - aws-cli/install
       - *build_docker_image
@@ -274,7 +274,6 @@ jobs:
       - deploy:
           name: Deploy to live test
           command: |
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/test/cron-*.yaml
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/test/deployment.yaml
             kubectl -n offender-management-test annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
             kubectl apply --record=false -f ./deploy/test
