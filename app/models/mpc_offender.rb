@@ -233,6 +233,10 @@ class MpcOffender
     tariff_date.present? || parole_eligibility_date.present? || current_parole_record.present?
   end
 
+  def due_for_release?
+    most_recent_parole_record&.current_record_hearing_outcome == 'Release'
+  end
+
 private
 
   def early_allocation_notes?
