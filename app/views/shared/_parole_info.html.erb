@@ -1,3 +1,4 @@
+<%= parole_record = @prisoner.current_parole_record%>
 <table class="govuk-table">
   <tbody class="govuk-table__body">
     <tr class="govuk-table__row">
@@ -10,10 +11,10 @@
         <td id='tariff-expiriy-date' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= format_date(@prisoner.tariff_date) %></td>
       </tr>
     <% end %>
-    <% if @prisoner.current_parole_record&.custody_report_due.present? %>
+    <% if parole_record&.custody_report_due.present? %>
       <tr class="govuk-table__row">
         <td class="govuk-table__cell govuk-!-width-one-half">Custody report due</td>
-        <td id='custody-report-due' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= format_date(@prisoner.current_parole_record.custody_report_due) %></td>
+        <td id='custody-report-due' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= format_date(parole_record.custody_report_due) %></td>
       </tr>
     <% end %>
     <% if @prisoner.parole_eligibility_date.present? %>
@@ -22,16 +23,16 @@
         <td id='parole-eligibility-date' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= format_date(@prisoner.parole_eligibility_date) %></td>
       </tr>
     <% end %>
-    <% if @prisoner.current_parole_record&.target_hearing_date.present? %>
+    <% if parole_record&.target_hearing_date.present? %>
       <tr class="govuk-table__row">
         <td class="govuk-table__cell govuk-!-width-one-half">Target hearing date</td>
-        <td id='target-hearing-date' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= format_date(@prisoner.target_hearing_date) %></td>
+        <td id='target-hearing-date' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= format_date(parole_record.target_hearing_date) %></td>
       </tr>
     <% end %>
-    <% if @prisoner.target_hearing_date.present? && @prisoner.target_hearing_date <= Time.zone.today && @prisoner.current_parole_record&.hearing_outcome.present?%>
+    <% if display_hearing_outcome?(parole_record)%>
       <tr class="govuk-table__row">
         <td class="govuk-table__cell govuk-!-width-one-half">Hearing outcome</td>
-        <td id='hearing-outcome' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= @prisoner.current_parole_record.current_hearing_outcome %></td>
+        <td id='hearing-outcome' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= parole_record.current_record_hearing_outcome %></td>
       </tr>
     <% end %>
   </tbody>

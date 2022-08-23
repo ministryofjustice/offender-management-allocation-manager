@@ -91,7 +91,7 @@
   </table>
 
   <%= render partial: 'shared/offence_info', locals: { editable_thd: true}  %>
-  <% if @prisoner.tariff_date.present? || @prisoner.parole_eligibility_date.present? || @prisoner.current_parole_record.present? %>
+  <% if @prisoner.display_current_parole_info? %>
     <%= render partial: 'shared/parole_info' %>
   <% end %>
   <% if @prisoner.previous_parole_records.any? %>

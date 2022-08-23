@@ -229,6 +229,10 @@ class MpcOffender
     end
   end
 
+  def display_current_parole_info?
+    tariff_date.present? || parole_eligibility_date.present? || current_parole_record.present?
+  end
+
 private
 
   def early_allocation_notes?
