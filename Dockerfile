@@ -1,5 +1,17 @@
 FROM ruby:2.7.5-slim-bullseye
 
+# Incremenent to bust Docker layer cache
+ENV DOCKER_CACHE_BUSTER=1
+
+ARG VERSION_NUMBER
+ARG COMMIT_ID
+ARG BUILD_DATE
+ARG BUILD_TAG
+
+RUN mkdir -p /home/appuser && \
+  useradd appuser -u 1001 --user-group --home /home/appuser && \
+  chown -R appuser:appuser /home/appuser
+
 RUN \
   set -ex \
   && apt-get update \
@@ -16,16 +28,6 @@ ENV \
   LANG=en_GB.UTF-8 \
   LANGUAGE=en_GB.UTF-8 \
   LC_ALL=en_GB.UTF-8
-
-ARG VERSION_NUMBER
-ARG COMMIT_ID
-ARG BUILD_DATE
-ARG BUILD_TAG
-
-ENV APPVERSION=${VERSION_NUMBER}
-ENV APP_GIT_COMMIT=${COMMIT_ID}
-ENV APP_BUILD_DATE=${BUILD_DATE}
-ENV APP_BUILD_TAG=${BUILD_TAG}
 
 WORKDIR /app
 
@@ -48,18 +50,24 @@ RUN (curl -fsSL https://deb.nodesource.com/setup_16.x | bash -) \
     && npm --global install yarn \
     && apt-get clean
 
+# Highly cachable layers. These statements are rarely expected to invalidate the cache.
+
 # Install Ruby and Node dependencies
 COPY Gemfile Gemfile.lock package.json ./
 RUN yarn install \
     && bundle config set --local without 'development test' \
     && bundle install --jobs 2 --retry 3
 
+# Non-cacheable layers. Everything below here is expected to change with every commit
+
+ENV APPVERSION=${VERSION_NUMBER}
+ENV APP_GIT_COMMIT=${COMMIT_ID}
+ENV APP_BUILD_DATE=${BUILD_DATE}
+ENV APP_BUILD_TAG=${BUILD_TAG}
+
 COPY . /app
 
-RUN mkdir -p /home/appuser && \
-  useradd appuser -u 1001 --user-group --home /home/appuser && \
-  chown -R appuser:appuser /app && \
-  chown -R appuser:appuser /home/appuser
+RUN chown -R appuser:appuser /app
 
 USER 1001
 

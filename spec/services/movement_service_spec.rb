@@ -124,38 +124,58 @@ describe MovementService, type: :feature do
     end
 
     context 'with a valid release movement' do
-      it "can process prison release movements", vcr: { cassette_name: 'prison_api/movement_service_process_release_spec' }  do
-        valid_release = build(:movement, offenderNo: 'G7266VD', directionCode: 'OUT', movementType: 'REL', toAgency: 'OUT', fromAgency: 'BAI')
-        pom_tester(valid_release)
-        processed = described_class.process_movement(valid_release)
-        updated_allocation = AllocationHistory.find_by(nomis_offender_id: valid_release.offender_no)
+      let(:updated_allocation) { AllocationHistory.find_by(nomis_offender_id: valid_release.offender_no) }
+      let(:processed) { described_class.process_movement(valid_release) }
 
-        expect(CaseInformation.where(nomis_offender_id: valid_release.offender_no)).to be_empty
-        expect(updated_allocation.event_trigger).to eq 'offender_released'
-        expect(updated_allocation.prison).to eq 'LEI'
-        expect(processed).to be true
+      let(:valid_release) do
+        build(:movement, offenderNo: 'G7266VD', directionCode: 'OUT', movementType: 'REL', toAgency: 'OUT', fromAgency: from_agency)
       end
 
-      it "can process hospital restricted patient release movements", vcr: { cassette_name: 'prison_api/movement_service_process_release_spec' }  do
-        valid_release = build(:movement, offenderNo: 'G7266VD', directionCode: 'OUT', movementType: 'REL', toAgency: 'OUT', fromAgency: 'BASDON')
-        pom_tester(valid_release)
-        processed = described_class.process_movement(valid_release)
-        updated_allocation = AllocationHistory.find_by(nomis_offender_id: valid_release.offender_no)
+      before { pom_tester(valid_release) }
 
-        expect(CaseInformation.where(nomis_offender_id: valid_release.offender_no)).to be_empty
-        expect(updated_allocation.event_trigger).to eq 'offender_released'
-        expect(updated_allocation.prison).to eq 'LEI'
-        expect(processed).to be true
+      context 'and from a male prison' do
+        let(:from_agency) { 'BAI' }
+
+        it "can process movements", vcr: { cassette_name: 'prison_api/movement_service_process_release_spec' }  do
+          expect(HmppsApi::ComplexityApi).not_to receive(:inactivate).with(valid_release.offender_no)
+          expect(processed).to be true
+          expect(CaseInformation.where(nomis_offender_id: valid_release.offender_no)).to be_empty
+          expect(updated_allocation.event_trigger).to eq 'offender_released'
+          expect(updated_allocation.prison).to eq 'LEI'
+        end
       end
 
-      it "can do an open prison release with an inactive allocation",
-         vcr: { cassette_name: 'prison_api/movement_service_process_release_spec' }  do
-        valid_release = build(:movement, offenderNo: 'G7266VD', directionCode: 'OUT', movementType: 'REL', toAgency: 'OUT', fromAgency: 'BAI')
-        pom_tester(valid_release)
-        allocation.deallocate_offender_after_release
-        processed = described_class.process_movement(valid_release)
+      context 'and from a female prison' do
+        let(:from_agency) { 'AGI' }
 
-        expect(processed).to be true
+        it "can process movements", vcr: { cassette_name: 'prison_api/movement_service_process_release_spec' }  do
+          expect(HmppsApi::ComplexityApi).to receive(:inactivate).with(valid_release.offender_no)
+          expect(processed).to be true
+          expect(CaseInformation.where(nomis_offender_id: valid_release.offender_no)).to be_empty
+          expect(updated_allocation.event_trigger).to eq 'offender_released'
+          expect(updated_allocation.prison).to eq 'LEI'
+        end
+      end
+
+      context 'and for hospital restricted patient' do
+        let(:from_agency) { 'BASDON' }
+
+        it "can process movements", vcr: { cassette_name: 'prison_api/movement_service_process_release_spec' }  do
+          expect(processed).to be true
+          expect(CaseInformation.where(nomis_offender_id: valid_release.offender_no)).to be_empty
+          expect(updated_allocation.event_trigger).to eq 'offender_released'
+          expect(updated_allocation.prison).to eq 'LEI'
+        end
+      end
+
+      context 'and from open prison with inactive allocation' do
+        let(:from_agency) { 'BAI' }
+
+        before { allocation.deallocate_offender_after_release }
+
+        it "can process movements", vcr: { cassette_name: 'prison_api/movement_service_process_release_spec' }  do
+          expect(processed).to be true
+        end
       end
     end
 

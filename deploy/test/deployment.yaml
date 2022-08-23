@@ -27,7 +27,7 @@ spec:
         - name: allocation-manager
           image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
           imagePullPolicy: Always
-          command: ['sh', '-c','bundle exec rails db:migrate && bundle exec rake import:prison && bundle exec puma -p 3000 -C ./config/puma_prod.rb --pidfile /tmp/server.pid']
+          command: ['sh', '-c','bundle exec puma -p 3000 -C ./config/puma_prod.rb --pidfile /tmp/server.pid']
           ports:
             - containerPort: 3000
           livenessProbe:
@@ -115,75 +115,6 @@ spec:
                 secretKeyRef:
                   name: parole-data-import
                   key: email_password
-        - name: allocation-manager-sidekiq
-          image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
-          imagePullPolicy: Always
-          command: ['sh', '-c', "bundle exec sidekiq -C config/sidekiq.yml"]
-          resources:
-            limits:
-              memory: "1500Mi"
-              cpu: "1000m"
-            requests:
-              memory: "500Mi"
-              cpu: "50m"
-          envFrom:
-            - configMapRef:
-                name: shared-environment
-            - secretRef:
-                name: allocation-manager-secrets
-          env:
-            - name: RAILS_LOG_TO_STDOUT
-              value: "on"
-            - name: POSTGRES_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: allocation-rds-instance-output
-                  key: rds_instance_address
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: allocation-rds-instance-output
-                  key: postgres_password
-            - name: POSTGRES_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: allocation-rds-instance-output
-                  key: postgres_name
-            - name: POSTGRES_USER
-              valueFrom:
-                secretKeyRef:
-                  name: allocation-rds-instance-output
-                  key: postgres_user
-            - name: REDIS_URL
-              valueFrom:
-                secretKeyRef:
-                  name: elasticache-offender-management-allocation-manager-token-cache-test
-                  key: url
-            - name: AWS_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  name: hmpps-domain-events-topic
-                  key: access_key_id
-            - name: AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: hmpps-domain-events-topic
-                  key: secret_access_key
-            - name: DOMAIN_EVENTS_TOPIC_ARN
-              valueFrom:
-                secretKeyRef:
-                  name: hmpps-domain-events-topic
-                  key: topic_arn
-            - name: HMPPS_API_CLIENT_ID
-              valueFrom:
-                secretKeyRef:
-                  name: hmpps-auth-secrets
-                  key: NOMIS_OAUTH_API_CLIENT_ID
-            - name: HMPPS_API_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: hmpps-auth-secrets
-                  key: NOMIS_OAUTH_API_CLIENT_SECRET
         - name: allocation-manager-metrics
           image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
           imagePullPolicy: Always

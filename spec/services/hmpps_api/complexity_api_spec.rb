@@ -39,9 +39,18 @@ describe HmppsApi::ComplexityApi do
       expect(described_class.get_history('S0004FT')).to eq(
         [
           { createdTimeStamp: Time.parse('2021-03-18T14:33:28.364Z'), level: 'low', sourceUser: 'SDICKS_GEN', notes: 'Happy Feet' },
-          { createdTimeStamp: Time.parse('2021-03-18T14:34:58.551Z'), level: 'high', sourceUser: 'SDICKS_GEN' },
-          { createdTimeStamp: Time.parse('2021-03-18T14:35:20.046Z'), level: 'high', notes: 'Happy Feet' },
+          { createdTimeStamp: Time.parse('2021-03-18T14:34:58.551Z'), level: 'high', sourceUser: 'SDICKS_GEN', notes: 'Happy Feet' },
+          { createdTimeStamp: Time.parse('2021-03-18T14:35:20.046Z'), level: 'high', sourceUser: 'SDICKS_GEN', notes: 'Happy Feet' },
         ])
+    end
+  end
+
+  describe '#inactivate', vcr: { cassette_name: 'complexity/put_inactivate' } do
+    let(:offender_no) { 'S0005FT' }
+
+    scenario 'item present' do
+      described_class.inactivate offender_no
+      expect(described_class.get_complexity offender_no).to eq(nil)
     end
   end
 end

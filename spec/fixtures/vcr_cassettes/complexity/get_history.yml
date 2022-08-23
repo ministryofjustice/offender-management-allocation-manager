@@ -8,49 +8,45 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - Faraday v1.3.0
+      - Faraday v1.10.0
       Authorization:
       - authorisation_header
   response:
     status:
       code: 200
-      message:
+      message: null
     headers:
-      Date:
-      - Mon, 22 Mar 2021 14:00:34 GMT
-      Content-Type:
+      date:
+      - Tue, 09 Aug 2022 10:29:52 GMT
+      content-type:
       - application/json; charset=utf-8
-      Transfer-Encoding:
-      - chunked
-      Connection:
-      - keep-alive
-      X-Frame-Options:
+      x-frame-options:
       - SAMEORIGIN
-      X-XSS-Protection:
+      x-xss-protection:
       - 1; mode=block
-      X-Content-Type-Options:
+      x-content-type-options:
       - nosniff
-      X-Download-Options:
+      x-download-options:
       - noopen
-      X-Permitted-Cross-Domain-Policies:
+      x-permitted-cross-domain-policies:
       - none
-      Referrer-Policy:
+      referrer-policy:
       - strict-origin-when-cross-origin
-      ETag:
-      - W/"cbc0cd4dcf8af50d731b9f5af974796e"
-      Cache-Control:
+      etag:
+      - W/"7314fba6505eadb6a6e1380ae1824cf0"
+      cache-control:
       - max-age=0, private, must-revalidate
-      X-Request-Id:
-      - 3f574e35056ba480117a742817e06a3d
-      X-Runtime:
-      - '0.009193'
-      Strict-Transport-Security:
+      x-request-id:
+      - 31bc14970a1a1b389fec60f9e4a9df91
+      x-runtime:
+      - '0.005867'
+      strict-transport-security:
       - max-age=15724800; includeSubDomains
     body:
-      encoding: UTF-8
-      string: '[{"offenderNo":"S0004FT","level":"high","createdTimeStamp":"2021-03-18T14:35:20.046Z","sourceSystem":"hardcoded-oauth-client-id","notes":"Happy
-        Feet"},{"offenderNo":"S0004FT","level":"high","createdTimeStamp":"2021-03-18T14:34:58.551Z","sourceUser":"SDICKS_GEN","sourceSystem":"hardcoded-oauth-client-id"
-        },{"offenderNo":"S0004FT","level":"low","createdTimeStamp":"2021-03-18T14:33:28.364Z","sourceUser":"SDICKS_GEN","sourceSystem":"hardcoded-oauth-client-id","notes":"Happy
-        Feet"}]'
-  recorded_at: Mon, 22 Mar 2021 14:00:34 GMT
+      encoding: ASCII-8BIT
+      string: '[{"offenderNo":"S0004FT","level":"high","createdTimeStamp":"2021-03-18T14:35:20.046Z","sourceUser":"SDICKS_GEN","sourceSystem":"hardcoded-oauth-client-id","notes":"Happy
+        Feet","active":true},{"offenderNo":"S0004FT","level":"high","createdTimeStamp":"2021-03-18T14:34:58.551Z","sourceUser":"SDICKS_GEN","sourceSystem":"hardcoded-oauth-client-id","notes":"Happy
+        Feet","active":true},{"offenderNo":"S0004FT","level":"low","createdTimeStamp":"2021-03-18T14:33:28.364Z","sourceUser":"SDICKS_GEN","sourceSystem":"hardcoded-oauth-client-id","notes":"Happy
+        Feet","active":true}]'
+  recorded_at: Tue, 09 Aug 2022 10:29:52 GMT
 recorded_with: VCR 6.0.0
