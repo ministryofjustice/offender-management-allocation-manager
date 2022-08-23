@@ -29,7 +29,7 @@ class HandoverDateService
                                    start_date: nil, handover_date: nil,
                                    reason: :parole_mappa_2_3
 
-      elsif offender.target_hearing_date < offender.hearing_outcome_received + 12.months
+      elsif offender.next_thd.present? && offender.next_thd < offender.last_hearing_outcome_received + 12.months
         CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
                                    start_date: nil, handover_date: nil,
                                    reason: :thd_within_12_months_of_hearing_outcome
@@ -184,8 +184,8 @@ private
   end
 
   def self.eligible_unsuccessful_parole_applicant(offender)
-    return false if offender.most_recent_parole_record.blank?
-    return false if offender.most_recent_parole_record.hearing_outcome_received.blank?
+    return false if offender.most_recent_completed_parole_record.blank?
+    return false if offender.last_hearing_outcome_received.blank?
     return false if offender.due_for_release?
 
     offender.indeterminate_sentence? && offender.tariff_date&.past?
@@ -206,6 +206,7 @@ private
              :parole_eligibility_date, :conditional_release_date, :automatic_release_date,
              :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date,
              :tariff_date, :target_hearing_date, :hearing_outcome_received, :most_recent_parole_record,
+             :next_thd, :most_recent_completed_parole_record, :last_hearing_outcome_received,
              :due_for_release?, to: :@offender
 
     def initialize(offender)

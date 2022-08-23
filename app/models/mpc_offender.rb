@@ -18,7 +18,8 @@ class MpcOffender
            :mappa_level, :welsh_offender, to: :probation_record
 
   delegate :victim_liaison_officers, :current_parole_record, :previous_parole_records,
-           :most_recent_parole_record, :build_parole_record_sections, to: :@offender
+           :most_recent_parole_record, :build_parole_record_sections, :parole_record_awaiting_hearing,
+           :most_recent_completed_parole_record, to: :@offender
 
   # These fields make sense to be nil when the probation record is nil - the others dont
   delegate :ldu_email_address, :team_name, :ldu_name, to: :probation_record, allow_nil: true
@@ -157,11 +158,24 @@ class MpcOffender
   end
 
   def target_hearing_date
-    @offender.most_recent_parole_record&.target_hearing_date
+    most_recent_parole_record&.target_hearing_date
   end
 
+  # Returns the target hearing date for the offender's next active parole application, or nil if there isn't one.
+  # Used to exclude THDs of previous (completed/inactive) parole applications.
+  def next_thd
+    parole_record_awaiting_hearing&.target_hearing_date
+  end
+
+  # Returns the date that the most recent hearing outcome was received.
   def hearing_outcome_received
-    @offender.most_recent_parole_record&.hearing_outcome_received
+    most_recent_parole_record&.hearing_outcome_received
+  end
+
+  # Returns the date that the most recent COMPLETED hearing outcome was received.
+  # Used to exclude any active parole applications.
+  def last_hearing_outcome_received
+    most_recent_completed_parole_record&.hearing_outcome_received
   end
 
   # If the parole application is set for a hearing within 10 months, or the outcome for a hearing was received in the last 14 days,

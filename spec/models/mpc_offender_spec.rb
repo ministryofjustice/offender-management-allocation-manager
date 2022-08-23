@@ -77,4 +77,70 @@ RSpec.describe MpcOffender, type: :model do
       end
     end
   end
+
+  describe 'parole-related methods' do
+    let(:completed_parole_record_1_date) { Time.zone.today - 2.years }
+    let(:completed_parole_record_2_thd) { Time.zone.today - 1.day }
+    let(:completed_parole_record_2_outcome_date) { Time.zone.today }
+    let(:completed_parole_record_1) { create(:parole_record, custody_report_due: completed_parole_record_1_date, target_hearing_date: completed_parole_record_1_date, hearing_outcome: 'Stay In Closed [*]', hearing_outcome_received: completed_parole_record_1_date) }
+    let(:completed_parole_record_2) { create(:parole_record, custody_report_due: Time.zone.today - 1.day, target_hearing_date: completed_parole_record_2_thd, hearing_outcome: 'Stay In Closed [*]', hearing_outcome_received: completed_parole_record_2_outcome_date) }
+
+    context 'when the offender has an upcoming parole hearing' do
+      let(:incomplete_parole_record_thd) { Time.zone.today + 2.years }
+      let(:incomplete_parole_record) { create(:parole_record, custody_report_due: Time.zone.today + 2.years, target_hearing_date: incomplete_parole_record_thd) }
+      let(:db_offender) { create(:offender, nomis_offender_id: 'G1234GY', parole_records: [completed_parole_record_1, completed_parole_record_2, incomplete_parole_record]) }
+
+      describe '#next_thd' do
+        it 'returns the target hearing date of the incomplete parole record' do
+          expect(mpc_offender.next_thd).to eq(incomplete_parole_record_thd)
+        end
+      end
+
+      describe '#target_hearing_date' do
+        it 'returns the target hearing date of the incomplete parole record' do
+          expect(mpc_offender.target_hearing_date).to eq(incomplete_parole_record_thd)
+        end
+      end
+
+      describe '#hearing_outcome_received' do
+        it 'returns nil' do
+          expect(mpc_offender.hearing_outcome_received).to eq(nil)
+        end
+      end
+
+      describe '#last_hearing_outcome_received' do
+        it 'returns the hearing outcome received date of the most recent completed parole record' do
+          expect(mpc_offender.last_hearing_outcome_received).to eq(completed_parole_record_2_outcome_date)
+        end
+      end
+    end
+
+    context 'when the offender does not have an upcoming parole hearing' do
+      let(:db_offender) { create(:offender, nomis_offender_id: 'G1234GY', parole_records: [completed_parole_record_1, completed_parole_record_2]) }
+
+      describe '#next_thd' do
+        it 'returns nil' do
+          expect(mpc_offender.next_thd).to eq(nil)
+        end
+      end
+
+      describe '#target_hearing_date' do
+        it 'returns the target hearing date of the most recent completed parole record' do
+          expect(mpc_offender.target_hearing_date).to eq(completed_parole_record_2_thd)
+        end
+      end
+
+      describe '#hearing_outcome_received' do
+        it 'returns the hearing outcome received date of the most recent completed parole record' do
+          expect(mpc_offender.hearing_outcome_received).to eq(completed_parole_record_2_outcome_date)
+        end
+      end
+
+      describe '#last_hearing_outcome_received' do
+        it 'returns the hearing outcome received date of the most recent completed parole record' do
+          expect(mpc_offender.last_hearing_outcome_received).to eq(completed_parole_record_2_outcome_date)
+        end
+      end
+    end
+  end
 end
