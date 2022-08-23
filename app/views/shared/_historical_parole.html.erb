@@ -12,10 +12,10 @@
           <td class="govuk-table__cell govuk-!-width-one-half"></td>
         <% end %>
         <% if record.hearing_outcome_received.present? %>
-          <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= "#{record.hearing_outcome_received.strftime("%b %Y")} – #{record.previous_hearing_outcome}" %></td>
+          <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= "#{record.hearing_outcome_received.strftime("%b %Y")} – #{record.previous_record_hearing_outcome}" %></td>
         <% else %>
           <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-            <%= record.previous_hearing_outcome %>
+            <%= record.previous_record_hearing_outcome %>
             <br/>
             We do not have the date this outcome was confirmed
           </td>

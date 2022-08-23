@@ -40,15 +40,15 @@ RSpec.describe ParoleDataImportJob, type: :job do
 
           parole_application_1 = ParoleRecord.find_by(review_id: '123456', nomis_offender_id: 'A1111AA')
           expect(parole_application_1.active?).to eq(true)
-          expect(parole_application_1.current_hearing_outcome).to eq('No hearing outcome yet')
+          expect(parole_application_1.current_record_hearing_outcome).to eq('No hearing outcome yet')
 
           parole_application_2 = ParoleRecord.find_by(review_id: '098765', nomis_offender_id: 'B2222BB')
           expect(parole_application_2.active?).to eq(true)
-          expect(parole_application_2.previous_hearing_outcome).to eq('No hearing outcome given')
+          expect(parole_application_2.previous_record_hearing_outcome).to eq('No hearing outcome given')
 
           parole_application_3 = ParoleRecord.find_by(review_id: '024680', nomis_offender_id: 'C3333CC')
           expect(parole_application_3.active?).to eq(false)
-          expect(parole_application_3.previous_hearing_outcome).to eq('No hearing outcome given')
+          expect(parole_application_3.previous_record_hearing_outcome).to eq('No hearing outcome given')
         end
       end
 
@@ -113,7 +113,7 @@ RSpec.describe ParoleDataImportJob, type: :job do
         # Ensure data is seeded correctly
         parole_application_1 = ParoleRecord.find_by(review_id: '123456', nomis_offender_id: 'A1111AA')
         expect(parole_application_1.active?).to eq(true)
-        expect(parole_application_1.current_hearing_outcome).to eq('No hearing outcome yet')
+        expect(parole_application_1.current_record_hearing_outcome).to eq('No hearing outcome yet')
 
         # Update seed data with new data
         allow(Mail).to receive(:new).and_return(double(attachments: [attachment_mock_3]))
@@ -121,15 +121,15 @@ RSpec.describe ParoleDataImportJob, type: :job do
 
         parole_application_1 = ParoleRecord.find_by(review_id: '123456', nomis_offender_id: 'A1111AA')
         expect(parole_application_1.active?).to eq(false)
-        expect(parole_application_1.current_hearing_outcome).to eq('Stay in closed')
+        expect(parole_application_1.current_record_hearing_outcome).to eq('Stay in closed')
 
         parole_application_2 = ParoleRecord.find_by(review_id: '098765', nomis_offender_id: 'B2222BB')
         expect(parole_application_2.active?).to eq(true)
-        expect(parole_application_2.previous_hearing_outcome).to eq('No hearing outcome given')
+        expect(parole_application_2.previous_record_hearing_outcome).to eq('No hearing outcome given')
 
         parole_application_3 = ParoleRecord.find_by(review_id: '024680', nomis_offender_id: 'C3333CC')
         expect(parole_application_3.active?).to eq(false)
-        expect(parole_application_3.previous_hearing_outcome).to eq('No hearing outcome given')
+        expect(parole_application_3.previous_record_hearing_outcome).to eq('No hearing outcome given')
       end
     end
   end

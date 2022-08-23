@@ -164,9 +164,22 @@ class MpcOffender
     @offender.most_recent_parole_record&.hearing_outcome_received
   end
 
+  # If the parole application is set for a hearing within 10 months, or the outcome for a hearing was received in the last 14 days,
+  # the offender should be counted as approaching parole. If we do not know the date that the hearing outcome was received,
+  # continue to count the case as approaching parole until we know.
   def approaching_parole?
     earliest_date = next_parole_date
-    earliest_date.present? && earliest_date <= Time.zone.today + 10.months
+    return false if earliest_date.blank?
+    return false unless earliest_date <= Time.zone.today + 10.months
+
+    if earliest_date.past? &&
+      hearing_outcome_received.present? &&
+      hearing_outcome_received <= Time.zone.today - 14.days
+
+      return false
+    end
+
+    true
   end
 
   def next_parole_date
@@ -214,6 +227,14 @@ class MpcOffender
       calc_status.save!
       EarlyAllocationEventService.send_early_allocation(calc_status)
     end
+  end
+
+  def display_current_parole_info?
+    tariff_date.present? || parole_eligibility_date.present? || current_parole_record.present?
+  end
+
+  def due_for_release?
+    most_recent_parole_record&.current_record_hearing_outcome == 'Release'
   end
 
 private

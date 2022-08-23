@@ -12,11 +12,13 @@ class ParoleRecord < ApplicationRecord
     'Active - Referred'
   ].freeze
 
-  def current_hearing_outcome
+  # Returns the hearing outcome formatted for upcoming hearing
+  def current_record_hearing_outcome
     no_hearing_outcome? ? 'No hearing outcome yet' : format_hearing_outcome
   end
 
-  def previous_hearing_outcome
+  # Returns the hearing outcome formatted for a past hearing
+  def previous_record_hearing_outcome
     no_hearing_outcome? ? 'No hearing outcome given' : format_hearing_outcome
   end
 

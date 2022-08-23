@@ -186,7 +186,7 @@ private
   def self.eligible_unsuccessful_parole_applicant(offender)
     return false if offender.most_recent_parole_record.blank?
     return false if offender.most_recent_parole_record.hearing_outcome_received.blank?
-    return false if offender.most_recent_parole_record.current_hearing_outcome == 'Release'
+    return false if offender.due_for_release?
 
     offender.indeterminate_sentence? && offender.tariff_date&.past?
   end
@@ -206,7 +206,7 @@ private
              :parole_eligibility_date, :conditional_release_date, :automatic_release_date,
              :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date,
              :tariff_date, :target_hearing_date, :hearing_outcome_received, :most_recent_parole_record,
-             to: :@offender
+             :due_for_release?, to: :@offender
 
     def initialize(offender)
       @offender = offender
