@@ -39,10 +39,26 @@ class Offender < ApplicationRecord
 
   has_many :victim_liaison_officers, foreign_key: :nomis_offender_id, inverse_of: :offender, dependent: :destroy
 
+  # Returns the most recent parole record (can be a future parole application), regardless of activity status and outcome.
   def most_recent_parole_record
     parole_records.max_by(&:custody_report_due)
   end
 
+  # Returns the most recent parole application if it has not yet had a hearing.
+  def parole_record_awaiting_hearing
+    most_recent_parole_record.no_hearing_outcome? ? most_recent_parole_record : nil
+  end
+
+  # Returns the most recent parole record that has an outcome
+  def most_recent_completed_parole_record
+    parole_records.where.not(hearing_outcome: ['Not Specified', 'Not Applicable']).max_by(&:custody_report_due)
+  end
+
+  # @current_parole_record is the most recent parole record and will either be currently active, or will have had its hearing outcome
+  # within the last 14 days
+  # @previous_parole_records are all other parole records, those that are inactive and/or had hearing outcomes more than 14 days ago.
+  #
+  # There are situations where parole records will be inactive and not have hearing outcomes.
   def build_parole_record_sections
     @current_parole_record = nil
     @previous_parole_records = []

@@ -71,4 +71,61 @@ RSpec.describe Offender, type: :model do
       end
     end
   end
+
+  describe 'parole-related methods' do
+    let(:completed_parole_record) { create(:parole_record, custody_report_due: Time.zone.today, target_hearing_date: Time.zone.today, hearing_outcome: 'Stay in closed [*]', hearing_outcome_received: Time.zone.today, review_status: 'Inactive') }
+    let(:incomplete_parole_record) { create(:parole_record, custody_report_due: incomplete_thd, target_hearing_date: incomplete_thd) }
+    let(:incomplete_thd) { Time.zone.today + 2.years }
+    let(:offender) { create(:offender, parole_records: [completed_parole_record, incomplete_parole_record]) }
+
+    before do
+      offender.build_parole_record_sections
+    end
+
+    describe '#most_recent_parole_record' do
+      it 'returns the most recent parole record' do
+        expect(offender.most_recent_parole_record).to eq(incomplete_parole_record)
+      end
+    end
+
+    describe '#parole_record_awaiting_hearing' do
+      it 'returns the most recent parole record that does not have a hearing outcome' do
+        expect(offender.parole_record_awaiting_hearing).to eq(incomplete_parole_record)
+      end
+    end
+
+    describe '#most_recent_completed_parole_record' do
+      it 'returns the most recently completed parole record' do
+        expect(offender.most_recent_completed_parole_record).to eq(completed_parole_record)
+      end
+    end
+
+    describe '#build_parole_record_sections' do
+      let(:completed_parole_record_1) { create(:parole_record, custody_report_due: Time.zone.today - 2.years, target_hearing_date: Time.zone.today - 2.years, hearing_outcome: 'Stay in closed [*]', hearing_outcome_received: Time.zone.today - 2.years, review_status: 'Inactive') }
+      let(:completed_parole_record_2) { create(:parole_record, custody_report_due: Time.zone.today, target_hearing_date: Time.zone.today, hearing_outcome: 'Stay in closed [*]', hearing_outcome_received: Time.zone.today, review_status: 'Inactive') }
+      let(:offender) { create(:offender, parole_records: [completed_parole_record_1, completed_parole_record_2, incomplete_parole_record]) }
+
+      context 'with a completed parole record whose outcome was received within the last 14 days' do
+        it 'sets current_parole_record to the most recent completed parole record' do
+          expect(offender.current_parole_record).to eq(completed_parole_record_2)
+        end
+
+        it 'adds any older parole records to the previous_parole_records' do
+          expect(offender.previous_parole_records).to match_array([completed_parole_record_1])
+        end
+      end
+
+      context 'with a completed parole record whose outcome was received over 14 days ago' do
+        let(:completed_parole_record_2) { create(:parole_record, custody_report_due: Time.zone.today - 15.days, target_hearing_date: Time.zone.today - 15.days, hearing_outcome: 'Stay in closed [*]', hearing_outcome_received: Time.zone.today - 15.days, review_status: 'Inactive') }
+
+        it 'sets the current_parole_record to the incomplete parole record' do
+          expect(offender.current_parole_record).to eq(incomplete_parole_record)
+        end
+
+        it 'adds any older parole records to the previous_parole_records, in descending date order' do
+          expect(offender.previous_parole_records).to eq([completed_parole_record_2, completed_parole_record_1])
+        end
+      end
+    end
+  end
 end

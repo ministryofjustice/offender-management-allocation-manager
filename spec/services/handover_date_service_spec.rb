@@ -613,8 +613,10 @@ describe HandoverDateService do
     context 'with a tariff date in the past' do
       let(:tariff_date) { Date.parse('1/1/2020') }
       let(:case_info) { build(:case_information, :nps, probation_service: 'England', offender: case_info_offender) }
-      let(:case_info_offender) { build(:offender, parole_records: [parole_record]) }
-      let(:parole_record) { build(:parole_record, target_hearing_date: target_hearing_date, hearing_outcome_received: Time.zone.today) }
+      let(:case_info_offender) { create(:offender, parole_records: [completed_parole_record, incomplete_parole_record]) }
+      let(:completed_parole_record) { create(:parole_record, custody_report_due: Time.zone.today, target_hearing_date: Time.zone.today, hearing_outcome: 'Stay in closed [*]', hearing_outcome_received: Time.zone.today, review_status: 'Inactive') }
+      let(:incomplete_parole_record) { create(:parole_record, custody_report_due: incomplete_thd, target_hearing_date: incomplete_thd) }
+      let(:incomplete_thd) { Time.zone.today + 2.years }
       let(:api_offender) do
         build(:hmpps_api_offender,
               prisonId: prison,
@@ -625,47 +627,39 @@ describe HandoverDateService do
         end
       end
 
-      context 'with a target hearing date within a year of the hearing outcome' do
-        let(:target_hearing_date) { Time.zone.today + 6.months }
+      context 'with a new target hearing date within a year of the previous hearing outcome' do
+        let(:incomplete_thd) { Time.zone.today + 6.months }
 
         it 'COM is responsible' do
+          # Make sure it's going down the correct code path and not incidentally returning COM responsible using non-parole rules
+          expect(offender).to receive(:next_thd)
+
           expect(com).to be_responsible
         end
       end
 
-      context 'with a target hearing date over a year away from the hearing outcome' do
-        context 'with a target hearing date more than 8 months in the future' do
-          let(:target_hearing_date) { Time.zone.today + 2.years }
+      context 'with a new target hearing date over a year from the previous hearing outcome' do
+        it 'POM is responsible' do
+          # Make sure it's going down the correct code path and not incidentally returning COM responsible using non-parole rules
+          expect(offender).to receive(:next_thd)
 
-          it 'POM is responsibe' do
-            expect(pom).to be_responsible
-          end
-        end
-
-        context 'with a target hearing date less than 8 months in the future' do
-          let(:target_hearing_date) { Time.zone.today + 6.months }
-          let(:parole_record) { build(:parole_record, target_hearing_date: target_hearing_date, hearing_outcome_received: Time.zone.today - 18.months) }
-
-          it 'COM is responsible' do
-            expect(com).to be_responsible
-          end
+          expect(pom).to be_responsible
         end
       end
 
       context 'with a hearing outcome of "Release [*]"' do
-        let(:target_hearing_date) { Time.zone.today + 2.years }
-        let(:parole_record) { build(:parole_record, target_hearing_date: target_hearing_date, hearing_outcome_received: Time.zone.today - 1.week, hearing_outcome: 'Release [*]') }
+        let(:case_info_offender) { create(:offender, parole_records: [completed_parole_record]) }
+        let(:completed_parole_record) { create(:parole_record, custody_report_due: Time.zone.today, target_hearing_date: Time.zone.today, hearing_outcome: 'Release [*]', hearing_outcome_received: Time.zone.today) }
 
         it 'follows non-parole allocation rules' do
-          expect_any_instance_of(MpcOffender).not_to receive(:hearing_outcome_received)
-          expect_any_instance_of(MpcOffender).to receive(:recalled?)
+          expect(offender).not_to receive(:next_thd)
+          expect(offender).to receive(:recalled?)
 
           described_class.handover(offender)
         end
       end
 
       context 'when an offender is mappa level 2 or 3' do
-        let(:target_hearing_date) { Time.zone.today + 2.years }
         let(:case_info) { build(:case_information, :nps, probation_service: 'England', offender: case_info_offender, mappa_level: 3) }
 
         it 'assigns to COM responsible, regardless of THD' do
