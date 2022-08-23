@@ -67,3 +67,9 @@ img {
   max-width: 100%;
   height: auto;
 }
+
+@media(min-width: 1250px) {
+  .govuk-width-container, .moj-primary-navigation__container {
+    max-width: 1170px;
+  }
+}
