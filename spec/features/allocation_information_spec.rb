@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-feature "view an offender's allocation information" do
+feature "view an offender's allocation information", flaky: true do
   let!(:probation_officer_nomis_staff_id) { 485_636 }
   let!(:nomis_offender_id_with_keyworker) { 'G6951VK' }
   let!(:nomis_offender_id_without_keyworker) { 'G8859UP' }
