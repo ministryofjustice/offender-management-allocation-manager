@@ -165,6 +165,11 @@ module ApiHelper
         .to_return(body: community_data.slice(:enhancedResourcing).to_json)
   end
 
+  def stub_get_all_offender_managers(nomis_offender_id, stubbed_data)
+    stub_request(:get, "#{COMMUNITY_HOST}/offenders/nomsNumber/#{nomis_offender_id}/allOffenderManagers")
+      .to_return(body: stubbed_data.to_json)
+  end
+
   def stub_resourcing_404(nomis_offender_id)
     stub_request(:get, "#{COMMUNITY_HOST}/offenders/nomsNumber/#{nomis_offender_id}/risk/resourcing/latest")
       .to_return(status: 404)

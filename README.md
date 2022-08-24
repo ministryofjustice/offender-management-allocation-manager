@@ -89,7 +89,7 @@ The method to deploy to both branches is the same. Check any code to be deployed
 git push --force origin HEAD:test
 
 # Preprod environment
-git push --force origin HEAD:preprod
+git push --force origin HEAD:preproduction
 ```
 
 ## Environment Variables

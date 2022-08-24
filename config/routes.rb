@@ -13,7 +13,12 @@ Rails.application.routes.draw do
 
     resources :dashboard, only: :index
     resources :parole_cases, only: :index
-    resources :handovers, only: :index
+    resources :handovers, only: :index do
+      collection do
+        get :upcoming
+        get :in_progress
+      end
+    end
     resources :staff do
       resources :caseload_handovers, only: %i[index]
       #resources :caseload do

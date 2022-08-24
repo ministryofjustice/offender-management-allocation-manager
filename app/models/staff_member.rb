@@ -57,6 +57,10 @@ class StaffMember
     end
   end
 
+  def unreleased_allocations
+    allocations.select { |offender| offender.earliest_release_date > Time.zone.now.to_date }
+  end
+
 private
 
   def pom

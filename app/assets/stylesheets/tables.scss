@@ -1,3 +1,5 @@
+@import "colours";
+
 @media screen and (max-width: 768px) {
   table.responsive thead {
     display: none;
@@ -33,4 +35,35 @@
 
 .pull-right {
   float: right;
+}
+
+.task-summary-checklist li {
+  img {
+    margin-top: 0;
+    width: 7%;
+    padding-right: 5px;
+  }
+}
+
+.govuk-table__cell {
+  .highlight-primary {
+    font-weight: bold;
+    padding-left: 5px;
+  }
+
+  .highlight-secondary {
+    padding-left: 5px;
+    color: #0b0c0c;
+    font-size: 16px;
+    font-weight: normal;
+    line-height: 1.25;
+  }
+
+  .highlight-notice {
+    border-left: 5px solid $purble;
+  }
+
+  .highlight-alert {
+    border-left: 5px solid $bright-red;
+  }
 }

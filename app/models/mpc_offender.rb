@@ -24,6 +24,8 @@ class MpcOffender
   # These fields make sense to be nil when the probation record is nil - the others dont
   delegate :ldu_email_address, :team_name, :ldu_name, to: :probation_record, allow_nil: true
 
+  delegate :start_date, to: :handover, prefix: true
+
   attr_reader :probation_record, :prison, :pom_tasks
 
   def initialize(prison:, offender:, prison_record:)
@@ -90,6 +92,10 @@ class MpcOffender
     @probation_record.com_name
   end
 
+  def allocated_com_email
+    @probation_record.com_email
+  end
+
   def responsibility_override?
     @offender.responsibility.present?
   end
@@ -128,7 +134,6 @@ class MpcOffender
   end
 
   # handover methods
-  delegate :start_date, to: :handover, prefix: true
 
   def handover_reason
     handover.reason_text
@@ -156,6 +161,8 @@ class MpcOffender
       today.between?(start_date, handover_date)
     end
   end
+
+  # parole methods
 
   def target_hearing_date
     most_recent_parole_record&.target_hearing_date
@@ -218,6 +225,16 @@ class MpcOffender
     end
   end
 
+  def display_current_parole_info?
+    tariff_date.present? || parole_eligibility_date.present? || current_parole_record.present?
+  end
+
+  def due_for_release?
+    most_recent_parole_record&.current_record_hearing_outcome == 'Release'
+  end
+
+  # early allocation methods
+
   def early_allocation_state
     if early_allocation?
       :eligible
@@ -241,14 +258,6 @@ class MpcOffender
       calc_status.save!
       EarlyAllocationEventService.send_early_allocation(calc_status)
     end
-  end
-
-  def display_current_parole_info?
-    tariff_date.present? || parole_eligibility_date.present? || current_parole_record.present?
-  end
-
-  def due_for_release?
-    most_recent_parole_record&.current_record_hearing_outcome == 'Release'
   end
 
 private

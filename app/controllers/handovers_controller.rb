@@ -3,7 +3,10 @@
 class HandoversController < PrisonsApplicationController
   include Sorting
 
-  before_action :ensure_spo_user
+  layout 'handovers'
+
+  before_action :check_prerequisites_and_prepare_variables, except: :index
+  before_action :ensure_spo_user, only: :index
 
   def index
     @pending_handover_count = @current_user.allocations.count(&:approaching_handover?)
@@ -14,5 +17,21 @@ class HandoversController < PrisonsApplicationController
     end
     offenders = sort_collection offenders_with_allocs, default_sort: :last_name
     @offenders = Kaminari.paginate_array(offenders).page(page)
+    render :legacy_index, layout: 'application'
+  end
+
+  def upcoming; end
+
+private
+
+  def new_handovers_ui?
+    params[:new_handover] == NEW_HANDOVER_TOKEN
+  end
+
+  def check_prerequisites_and_prepare_variables
+    ensure_pom
+    redirect_to '/401' unless new_handovers_ui?
+    @prison_id = active_prison_id
+    @handover_cases = HandoverCasesList.new(staff_member: @current_user)
   end
 end

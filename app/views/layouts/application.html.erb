@@ -22,7 +22,7 @@
     <div class='govuk-width-container'>
       <main class='govuk-main-wrapper' id='main-content' role='main'>
 
-        <%= yield %>
+        <%= content_for?(:main_content) ? yield(:main_content) : yield %>
       </main>
     </div>
 
