@@ -1,0 +1,9 @@
+.govuk-table__header.handover-progress, .govuk-table__cell.handover-progress {
+  padding-left: 20px;
+}
+
+.govuk-table__cell.handover-progress {
+  .task-summary-checklist {
+    margin-bottom: 10px !important;
+  }
+}

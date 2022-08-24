@@ -17,24 +17,28 @@ class ProcessDeliusDataJob < ApplicationJob
 
       DeliusImportError.where(nomis_offender_id: nomis_offender_id).destroy_all
 
-      import_data(OpenStruct.new(OffenderService.get_community_data(nomis_offender_id)))
+      import_data(nomis_offender_id)
     end
   end
 
 private
 
-  def import_data(delius_record)
+  def import_data(nomis_offender_id)
+    delius_record = OpenStruct.new(OffenderService.get_community_data(nomis_offender_id))
+    delius_com_info = OffenderService.get_com(nomis_offender_id)
     offender = OffenderService.get_offender(delius_record.noms_no)
 
     if offender.nil?
       return logger.error("[DELIUS] Failed to retrieve NOMIS record #{delius_record.noms_no}")
     end
 
-    process_record(delius_record) if offender.inside_omic_policy?
+    process_record(delius_record, delius_com_info) if offender.inside_omic_policy?
   end
 
-  def process_record(delius_record)
-    case_information = map_delius_to_case_info(delius_record)
+  def process_record(delius_record, delius_com_info)
+    assert_com_details(delius_record, delius_com_info)
+
+    case_information = map_delius_to_case_info(delius_record, delius_com_info)
 
     if case_information.changed?
       if case_information.save
@@ -49,18 +53,29 @@ private
     end
   end
 
-  def map_delius_to_case_info(delius_record)
+  def assert_com_details(offender_record, delius_com_info)
+    com_from_offender = offender_record.to_h.symbolize_keys.values_at(:offender_manager, :team_name, :ldu_code)
+    com_from_oms = delius_com_info.values_at(:name, :team_name, :ldu_code)
+    if com_from_offender != com_from_oms
+      raise ComInconsistencyError, "COM inconsistent. Offender record: #{com_from_offender.to_json} All offender managers: #{com_from_oms.to_json}"
+    end
+  end
+
+  def map_delius_to_case_info(delius_record, delius_com_info)
+    ldu_code = delius_com_info.fetch(:ldu_code)
+
     find_case_info(delius_record).tap do |case_info|
       case_info.assign_attributes(
         manual_entry: false,
-        com_name: delius_record.offender_manager,
+        com_name: delius_com_info[:name],
+        com_email: delius_com_info[:email],
         crn: delius_record.crn,
         tier: map_tier(delius_record.tier),
-        local_delivery_unit: map_ldu(delius_record.ldu_code),
-        ldu_code: delius_record.ldu_code,
-        team_name: delius_record.team_name,
+        local_delivery_unit: map_ldu(ldu_code),
+        ldu_code: ldu_code,
+        team_name: delius_com_info.fetch(:team_name),
         case_allocation: delius_record.service_provider,
-        probation_service: map_probation_service(delius_record.ldu_code),
+        probation_service: map_probation_service(ldu_code),
         mappa_level: map_mappa_level(delius_record.mappa_levels)
       )
     end

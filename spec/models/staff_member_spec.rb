@@ -41,6 +41,34 @@ RSpec.describe StaffMember, type: :model do
     end
   end
 
+  describe '#unreleased_allocations' do
+    it 'filters out released offenders' do
+      released_offenders = [
+        build(:nomis_offender, prisonerNumber: 'G9991GG', prisonId: prison.code,
+                               sentence: attributes_for(:sentence_detail, conditionalReleaseDate: 1.day.ago.to_date)),
+        build(:nomis_offender, prisonerNumber: 'G9992GG', prisonId: prison.code,
+                               sentence: attributes_for(:sentence_detail, conditionalReleaseDate: Time.zone.now.to_date))
+      ]
+      released_offenders.each do |offender|
+        create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
+      end
+      unreleased_offenders = offenders
+      all_offenders = unreleased_offenders + released_offenders
+
+      stub_offenders_for_prison(prison.code, all_offenders)
+      all_offenders.each do |offender|
+        create(:allocation_history, nomis_offender_id: offender.fetch(:prisonerNumber), primary_pom_nomis_id: staff_id,
+                                    prison: prison.code)
+      end
+
+      aggregate_failures do
+        results = user.unreleased_allocations
+        expect(results.map(&:nomis_offender_id)).to eq(unreleased_offenders.map { |i| i.fetch(:prisonerNumber) })
+        expect(results.map(&:nomis_offender_id)).not_to include(released_offenders.map { |i| i.fetch(:prisonerNumber) })
+      end
+    end
+  end
+
   context 'when a POM has new and old allocations' do
     let(:old) { 8.days.ago }
 

@@ -65,6 +65,31 @@ class OffenderService
       }
     end
 
+    def get_com(nomis_offender_id)
+      oms = HmppsApi::CommunityApi.get_all_offender_managers(nomis_offender_id)
+      com = oms.detect { |om| om['isPrisonOffenderManager'] == false }
+
+      personal_details = if com['isUnallocated']
+                           {
+                             name: nil,
+                             email: nil,
+                             is_unallocated: true,
+                           }
+                         else
+                           staff = com.fetch('staff')
+                           {
+                             name: [staff.fetch('surname'), staff.fetch('forenames')].join(', '),
+                             email: staff['email'],
+                             is_unallocated: false,
+                           }
+                         end
+      personal_details.merge({
+        is_responsible: com.fetch('isResponsibleOfficer'),
+        team_name: com.fetch('team').fetch('description'),
+        ldu_code: com.fetch('team').fetch('localDeliveryUnit').fetch('code'),
+      })
+    end
+
   private
 
     def find_or_create_offenders(nomis_ids)

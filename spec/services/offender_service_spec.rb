@@ -83,10 +83,10 @@ describe OffenderService, type: :feature do
                    ldu_code: "N07NPSA",
                    mappa_levels: [],
                    noms_no: nomis_offender_id,
-                   offender_manager: "Cheema, Gurnank",
+                   offender_manager: "TestUpdate01Surname, TestUpdate01Forname",
                    service_provider: "NPS",
                    team_name: "OMU A",
-                   tier: "B2")
+                   tier: "B-2")
       end
     end
 
@@ -221,6 +221,83 @@ describe OffenderService, type: :feature do
             expect(described_class.get_community_data(nomis_offender_id).fetch(:mappa_levels))
                 .to eq([2])
           end
+        end
+      end
+    end
+  end
+
+  describe '#get_com' do
+    # This offender has been set up in nDelius test especially for this test
+    let(:nomis_offender_id) { 'A5194DY' }
+
+    # This test can only be run inside the VPN as nDelius test isn't globally accessible
+    context 'when hitting API', :vpn_only, vcr: { cassette_name: 'delius/get_all_offender_managers_data' } do
+      it 'gets some data' do
+        expected = {
+          name: 'TestUpdate01Surname, TestUpdate01Forname',
+          email: 'test-update-01-email@example.org ',
+          ldu_code: 'N07NPSA',
+          team_name: 'OMU A',
+          is_responsible: true,
+          is_unallocated: false,
+        }
+
+        expect(described_class.get_com(nomis_offender_id)).to eq expected
+      end
+    end
+
+    context 'with stubbing' do
+      before do
+        stub_auth_token
+      end
+
+      describe 'when other unwanted data exist' do
+        it 'ignores them and picks out the allocated COM even when they are not responsible' do
+          stub_get_all_offender_managers(
+            nomis_offender_id,
+            [
+              build(:community_all_offender_managers_datum, isPrisonOffenderManager: true, isResponsibleOfficer: true),
+              build(:community_all_offender_managers_datum, forenames: 'F1', surname: 'S1', email: 'E1',
+                                                            team_name: 'Team1', ldu_code: 'TestLDU',
+                                                            isResponsibleOfficer: false)
+            ]
+          )
+          expect(described_class.get_com(nomis_offender_id)).to eq({ name: 'S1, F1',
+                                                                     email: 'E1',
+                                                                     ldu_code: 'TestLDU',
+                                                                     team_name: 'Team1',
+                                                                     is_unallocated: false,
+                                                                     is_responsible: false })
+        end
+      end
+
+      describe "when responsible officer is unallocated" do
+        it 'gets leaves out personal info' do
+          stub_get_all_offender_managers(
+            nomis_offender_id,
+            [
+              build(:community_all_offender_managers_datum, forenames: 'XXXX', surname: 'XXXX', email: 'XXXX',
+                                                            team_name: 'Team1', ldu_code: 'TestLDU',
+                                                            isUnallocated: true,
+                                                            isResponsibleOfficer: false)
+            ]
+          )
+          expect(described_class.get_com(nomis_offender_id)).to eq({ name: nil,
+                                                                     email: nil,
+                                                                     ldu_code: 'TestLDU',
+                                                                     team_name: 'Team1',
+                                                                     is_unallocated: true,
+                                                                     is_responsible: false })
+        end
+      end
+
+      describe "when email is missing" do
+        it 'returns nil' do
+          stub_get_all_offender_managers(nomis_offender_id, [build(:community_all_offender_managers_datum, email: nil)])
+
+          result = nil
+          expect { result = described_class.get_com(nomis_offender_id) }.not_to raise_error
+          expect(result[:email]).to be_nil
         end
       end
     end
