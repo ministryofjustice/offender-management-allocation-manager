@@ -168,7 +168,7 @@ ActiveRecord::Schema.define(version: 2022_08_16_170141) do
   end
 
   create_table "parole_records", primary_key: "nomis_offender_id", id: :string, force: :cascade do |t|
-    t.date "target_hearing_date", null: false
+    t.date "parole_review_date", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
