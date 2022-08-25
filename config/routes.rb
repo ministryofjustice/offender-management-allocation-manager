@@ -146,6 +146,7 @@ Rails.application.routes.draw do
   get '/help_step6', to: 'help#help_step6'
 
   get '/help/dashboard', to: 'help#dashboard'
+  get '/help', to: redirect('/help/dashboard')
   get '/help/missing_cases', to: 'help#missing_cases'
   get '/help/case_responsibility', to: 'help#case_responsibility'
 
