@@ -58,7 +58,7 @@ RSpec.describe OffenderHelper do
       end
 
       it 'shows custody' do
-        expect(helper.case_owner_label(offender)).to eq('Custody')
+        expect(helper.case_owner_label(offender)).to eq('Responsible')
       end
     end
 
@@ -68,7 +68,7 @@ RSpec.describe OffenderHelper do
       end
 
       it 'shows community' do
-        expect(helper.case_owner_label(offender)).to eq('Community')
+        expect(helper.case_owner_label(offender)).to eq('Supporting')
       end
     end
   end

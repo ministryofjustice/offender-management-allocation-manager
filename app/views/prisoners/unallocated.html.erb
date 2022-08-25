@@ -117,7 +117,7 @@
           TODO
         </td>
         <td aria-label="Working days since entering this prison" class="govuk-table__cell">
-          <%= offender.awaiting_allocation_for %> days TODO discount w/e and bh
+          <%= offender.awaiting_allocation_for(only_working_days: true) %> days
         </td>
       </tr>
     <% end %>

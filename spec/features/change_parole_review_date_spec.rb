@@ -30,6 +30,8 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
     if existing_prd.present?
       offender_record.create_parole_record!(parole_review_date: existing_prd)
     end
+
+    stub_request(:get, "https://www.gov.uk/bank-holidays.json").to_return(body: {}.to_json)
   end
 
   shared_examples 'update PRD behaviour' do

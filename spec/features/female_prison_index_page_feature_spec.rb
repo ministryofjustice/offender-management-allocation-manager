@@ -6,6 +6,7 @@ feature "female prison index page" do
   before do
     stub_signin_spo(pom, [prison.code])
     stub_offenders_for_prison(prison.code, offenders)
+    stub_request(:get, "https://www.gov.uk/bank-holidays.json").to_return(body: {}.to_json)
 
     create(:case_information, offender: build(:offender, nomis_offender_id: allocated_offender_one.fetch(:prisonerNumber)))
     create(:allocation_history, primary_pom_allocated_at: one_day_ago,  nomis_offender_id: allocated_offender_one.fetch(:prisonerNumber), prison: prison.code)
@@ -84,8 +85,7 @@ feature "female prison index page" do
 
     it 'shows unallocated offenders' do
       click_link('Make new allocations (1)')
-      expect(page).to have_css("h1", text: "Make new allocations")
-      expect(page).to have_css("p", text: "There are currently 1 cases waiting to be allocated to a POM.")
+      expect(page).to have_css("h1", text: "Allocations")
     end
 
     it 'shows newly arrived offenders' do
