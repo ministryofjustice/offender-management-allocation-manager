@@ -186,12 +186,13 @@ class MpcOffender
   end
 
   # If the parole application is set for a hearing within 10 months, or the outcome for a hearing was received in the last 14 days,
-  # the offender should be counted as approaching parole. If we do not know the date that the hearing outcome was received,
-  # continue to count the case as approaching parole until we know.
+  # return true. If the hearing has an outcome but we do not have the date that it was received, assume that it is no longer
+  # approaching parole (return false).
   def approaching_parole?
     earliest_date = next_parole_date
     return false if earliest_date.blank?
     return false unless earliest_date <= Time.zone.today + 10.months
+    return false if !most_recent_parole_record&.no_hearing_outcome? && hearing_outcome_received.blank?
 
     if earliest_date.past? &&
       hearing_outcome_received.present? &&
