@@ -62,9 +62,9 @@ RSpec.describe StaffMember, type: :model do
       end
 
       aggregate_failures do
-        results = user.unreleased_allocations
-        expect(results.map(&:nomis_offender_id)).to eq(unreleased_offenders.map { |i| i.fetch(:prisonerNumber) })
-        expect(results.map(&:nomis_offender_id)).not_to include(released_offenders.map { |i| i.fetch(:prisonerNumber) })
+        results = user.unreleased_allocations.map(&:nomis_offender_id)
+        expect(results).to match_array(unreleased_offenders.map { |i| i.fetch(:prisonerNumber) })
+        expect(results).not_to include(released_offenders.map { |i| i.fetch(:prisonerNumber) })
       end
     end
   end
