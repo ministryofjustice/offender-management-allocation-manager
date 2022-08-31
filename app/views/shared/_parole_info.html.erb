@@ -11,7 +11,7 @@
         <td id='tariff-expiriy-date' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= format_date(@prisoner.tariff_date) %></td>
       </tr>
     <% end %>
-    <% if parole_record&.custody_report_due.present? %>
+    <% if parole_record&.custody_report_due.present? && !parole_record&.target_hearing_date&.past? %>
       <tr class="govuk-table__row">
         <td class="govuk-table__cell govuk-!-width-one-half">Custody report due</td>
         <td id='custody-report-due' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= format_date(parole_record.custody_report_due) %></td>
@@ -19,7 +19,7 @@
     <% end %>
     <% if @prisoner.parole_eligibility_date.present? %>
       <tr class="govuk-table__row">
-        <td class="govuk-table__cell govuk-!-width-one-half">Parole Eligibility Date</td>
+        <td class="govuk-table__cell govuk-!-width-one-half">Parole eligibility date</td>
         <td id='parole-eligibility-date' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= format_date(@prisoner.parole_eligibility_date) %></td>
       </tr>
     <% end %>
