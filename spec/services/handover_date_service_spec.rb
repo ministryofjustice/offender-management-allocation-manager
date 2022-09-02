@@ -380,7 +380,7 @@ describe HandoverDateService do
 
   context 'when indeterminate' do
     context 'with tariff date in the future' do
-      let(:tariff_date) { Date.parse('01/09/2022') }
+      let(:tariff_date) { 1.year.from_now.to_date }
       let(:case_info) { build(:case_information, :nps, probation_service: welsh? ? 'Wales' : 'England') }
       let(:api_offender) do
         build(:hmpps_api_offender,
