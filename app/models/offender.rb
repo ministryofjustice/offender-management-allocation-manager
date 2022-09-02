@@ -37,7 +37,7 @@ class Offender < ApplicationRecord
 
   # Returns the most recent parole record (can be a future parole application), regardless of activity status and outcome.
   def most_recent_parole_record
-    parole_records.max_by(&:custody_report_due)
+    filtered_parole_records.max_by(&:sortable_date)
   end
 
   # Returns the most recent parole application if it has not yet had a hearing.
@@ -47,7 +47,7 @@ class Offender < ApplicationRecord
 
   # Returns the most recent parole record that has an outcome
   def most_recent_completed_parole_record
-    parole_records.where.not(hearing_outcome: ['Not Specified', 'Not Applicable']).max_by(&:custody_report_due)
+    filtered_parole_records.reject(&:no_hearing_outcome?).max_by(&:sortable_date)
   end
 
   # @current_parole_record is the most recent parole record and will either be currently active, or will have had its hearing outcome
@@ -59,7 +59,7 @@ class Offender < ApplicationRecord
     @current_parole_record = nil
     @previous_parole_records = []
 
-    parole_records.sort_by(&:custody_report_due).reverse_each do |record|
+    filtered_parole_records.sort_by(&:sortable_date).reverse_each do |record|
       if record.no_hearing_outcome?
         if record.active?
           @current_parole_record = record
@@ -72,5 +72,12 @@ class Offender < ApplicationRecord
         @previous_parole_records << record
       end
     end
+  end
+
+private
+
+  # If neither the THD or custody_report_due date are defined, we have no method of determining when the parole hearing was, which is vital for MPC.
+  def filtered_parole_records
+    parole_records.reject { |pr| pr.sortable_date.blank? }
   end
 end
