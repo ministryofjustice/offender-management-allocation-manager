@@ -34,7 +34,7 @@ class ParoleRecord < ApplicationRecord
   end
 
   def sortable_date
-    target_hearing_date.present? ? target_hearing_date : custody_report_due
+    target_hearing_date.presence || custody_report_due
   end
 
 private
