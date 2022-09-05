@@ -584,7 +584,7 @@ DEPENDENCIES
   rails (~> 6.1.6)
   rails-controller-testing
   rails-i18n
-  redis
+  redis (~> 4.6.0)
   rspec-rails
   rswag-api
   rswag-specs
