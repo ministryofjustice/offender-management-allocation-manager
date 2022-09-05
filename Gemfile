@@ -33,7 +33,7 @@ gem 'sentry-raven'
 gem 'turbolinks', '~> 5'
 gem 'uglifier', '>= 1.3.0'
 gem 'typhoeus'
-gem 'redis', '~> 4.6.0'
+gem 'redis', '~> 5.0.2'
 gem 'fast_underscore', require: false
 gem 'hashdiff', ['>= 1.0.0.beta1', '< 2.0.0']
 gem 'rubyzip'
