@@ -10,7 +10,7 @@ gem 'aws-sdk-sns'
 gem 'bootsnap', '>= 1.1.0', require: false
 gem 'coffee-rails', '~> 5.0'
 gem 'date_validator'
-gem 'faraday', '~> 1.0'
+gem 'faraday', '~> 2.5'
 gem 'govuk_notify_rails'
 # we need the extra is_csv parameter available in 5.2 and above
 gem 'notifications-ruby-client', '>= 5.2'
@@ -33,7 +33,7 @@ gem 'sentry-raven'
 gem 'turbolinks', '~> 5'
 gem 'uglifier', '>= 1.3.0'
 gem 'typhoeus'
-gem 'redis'
+gem 'redis', '~> 4.6.0'
 gem 'fast_underscore', require: false
 gem 'hashdiff', ['>= 1.0.0.beta1', '< 2.0.0']
 gem 'rubyzip'
