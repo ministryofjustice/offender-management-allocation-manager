@@ -149,7 +149,7 @@ GEM
       railties (>= 5.0.0)
     faker (2.23.0)
       i18n (>= 1.8.11, < 2)
-    faraday (1.10.0)
+    faraday (1.10.2)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
       faraday-excon (~> 1.1)
@@ -299,7 +299,7 @@ GEM
     omniauth-oauth2 (1.7.3)
       oauth2 (>= 1.4, < 3)
       omniauth (>= 1.9, < 3)
-    paper_trail (12.2.0)
+    paper_trail (12.3.0)
       activerecord (>= 5.2)
       request_store (~> 1.1)
     parallel (1.22.1)
@@ -464,7 +464,7 @@ GEM
     shellany (0.0.1)
     shoulda-matchers (5.1.0)
       activesupport (>= 5.2.0)
-    sidekiq (6.4.1)
+    sidekiq (6.4.2)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.2.0)
@@ -573,7 +573,7 @@ DEPENDENCIES
   notifications-ruby-client (>= 5.2)
   omniauth (~> 1.9.2)
   omniauth-oauth2
-  paper_trail
+  paper_trail (~> 12.3.0)
   parallel_tests
   parser
   pg
@@ -600,7 +600,7 @@ DEPENDENCIES
   selenium-webdriver
   sentry-raven
   shoulda-matchers
-  sidekiq (>= 6.4.0)
+  sidekiq (>= 6.4.0, < 6.5.0)
   simplecov
   simplecov-lcov (< 0.9)
   spring
