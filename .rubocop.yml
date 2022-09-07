@@ -29,6 +29,8 @@ AllCops:
     - 'spec/dummy/db/**/*'
     - 'config/routes.rb'
     - 'spec/factories/*.rb'
+    - 'features/support/env.rb'
+    - 'lib/tasks/cucumber.rake'
 
 Style/MultilineBlockChain:
   Enabled: false
@@ -148,6 +150,14 @@ RSpec/MultipleMemoizedHelpers:
 
 RSpec/StubbedMock:
   Enabled: false
+
+RSpec/ContextWording:
+  Exclude:
+    - spec/lib/rules/**/*
+
+RSpec/RepeatedExampleGroupBody:
+  Exclude:
+    - spec/lib/rules/**/*
 
 # Below here is the set of (arbitrary) style failures against the govuk versions
 Style/WordArray:
