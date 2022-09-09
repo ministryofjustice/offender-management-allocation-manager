@@ -118,12 +118,10 @@ private
     if offender.parole_eligibility_date.present?
       offender.parole_eligibility_date - 8.months
     elsif offender.conditional_release_date.present? || offender.automatic_release_date.present?
-      earliest_release_date = [
-        offender.conditional_release_date,
-        offender.automatic_release_date
-      ].compact.min
-
-      earliest_release_date - (7.months + 15.days)
+      Rules::CommunityDateRules.determinate_nps_community_dates(
+        sentence_start_date: offender.sentence_start_date,
+        conditional_release_date: offender.conditional_release_date,
+        automatic_release_date: offender.automatic_release_date).com_allocated_date
     end
   end
 
@@ -135,12 +133,13 @@ private
       [indeterminate_responsibility_date(offender), reason]
     elsif offender.parole_eligibility_date.present?
       [offender.parole_eligibility_date - 8.months, :nps_determinate_parole_case]
-    elsif offender.mappa_level.blank?
+
+    elsif offender.mappa_level.blank?                                                # remove here...
       [mappa1_responsibility_date(offender), :nps_mappa_unknown]
     elsif offender.mappa_level.in? [1, 0]
       [mappa1_responsibility_date(offender), :nps_determinate_mappa_1_n]
     else
-      [mappa_23_responsibility_date(offender), :nps_determinate_mappa_2_3]
+      [mappa_23_responsibility_date(offender), :nps_determinate_mappa_2_3]           # ...to here
     end
   end
 
@@ -154,7 +153,7 @@ private
       offender.automatic_release_date
     ].compact.map { |date| date - (7.months + 15.days) }.min
 
-    [Time.zone.today, earliest_date].compact.max
+    [Time.zone.today, earliest_date].compact.max # TODO: Check with Laura - do we need this or can we always use earliest_date?
   end
 
   # There are a couple of places where we need .5 of a month - which
@@ -186,6 +185,7 @@ private
              :early_allocation?, :mappa_level, :prison_arrival_date, :category_active_since,
              :parole_eligibility_date, :conditional_release_date, :automatic_release_date,
              :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date,
+             :sentence_start_date,
              to: :@offender
 
     def initialize(offender)
