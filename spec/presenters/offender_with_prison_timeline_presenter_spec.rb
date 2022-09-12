@@ -2,6 +2,8 @@ require 'rails_helper'
 
 RSpec.describe OffenderWithPrisonTimelinePresenter do
   describe '#additional_information' do
+    subject { described_class.new(mpc_offender, prison_timeline).additional_information }
+
     let(:prison_timeline) do
       { "prisonPeriod" => prison_periods }
     end
@@ -19,11 +21,9 @@ RSpec.describe OffenderWithPrisonTimelinePresenter do
     let(:offender) { build(:offender) }
     let(:recalled) { false }
 
-    subject { described_class.new(mpc_offender, prison_timeline).additional_information }
-
     # New to custody – never been in prison before
     context 'when never been in any prison before the current one' do
-      let(:prison_periods) { [{"prisons" => [prison.code]}] }
+      let(:prison_periods) { [{ "prisons" => [prison.code] }] }
 
       it 'New to custody' do
         expect(subject).to eq(['New to custody'])
@@ -35,8 +35,8 @@ RSpec.describe OffenderWithPrisonTimelinePresenter do
       context 'when first time here' do
         let(:prison_periods) do
           [
-            {'prisons' => ['ABC', 'DEF']},
-            {"prisons" => [prison.code]}
+            { 'prisons' => ['ABC', 'DEF'] },
+            { "prisons" => [prison.code] }
           ]
         end
 
@@ -49,9 +49,9 @@ RSpec.describe OffenderWithPrisonTimelinePresenter do
       context 'when returning to here' do
         let(:prison_periods) do
           [
-            {"prisons" => ['XYZ', prison.code]},
-            {'prisons' => ['ABC', 'DEF']},
-            {"prisons" => [prison.code]}
+            { "prisons" => ['XYZ', prison.code] },
+            { 'prisons' => ['ABC', 'DEF'] },
+            { "prisons" => [prison.code] }
           ]
         end
 
@@ -68,8 +68,8 @@ RSpec.describe OffenderWithPrisonTimelinePresenter do
         context 'when first time here' do
           let(:prison_periods) do
             [
-              {'prisons' => ['ABC', 'DEF']},
-              {"prisons" => [prison.code]}
+              { 'prisons' => ['ABC', 'DEF'] },
+              { "prisons" => [prison.code] }
             ]
           end
 
@@ -82,9 +82,9 @@ RSpec.describe OffenderWithPrisonTimelinePresenter do
         context 'when returning to here' do
           let(:prison_periods) do
             [
-              {"prisons" => ['XYZ', prison.code]},
-              {'prisons' => ['ABC', 'DEF']},
-              {"prisons" => [prison.code]}
+              { "prisons" => ['XYZ', prison.code] },
+              { 'prisons' => ['ABC', 'DEF'] },
+              { "prisons" => [prison.code] }
             ]
           end
 

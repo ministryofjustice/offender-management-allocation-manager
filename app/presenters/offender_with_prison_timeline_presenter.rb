@@ -15,27 +15,26 @@ class OffenderWithPrisonTimelinePresenter
   end
 
   def additional_information
-    attended_prisons = prison_timeline['prisonPeriod'].map { |p| p['prisons'] } .flatten
+    attended_prisons = prison_timeline['prisonPeriod'].map { |p| p['prisons'] }.flatten
 
-    # Remove only ONE of any prison codes that match the current prison
+    # Remove only ONE of any prison codes that match the current prison
     previously_attended_prisons = (attended_prisons.reject { |p| p == offender.prison.code }) +
-      (attended_prisons.select { |p| p == offender.prison.code } .drop(1))
+      attended_prisons.select { |p| p == offender.prison.code }.drop(1)
 
     [].tap do |response|
       response << 'Recall' if offender.recalled?
 
-      if previously_attended_prisons.empty?
-        response << 'New to custody'
-      elsif previously_attended_prisons.include?(offender.prison.code)
-        response << 'Returning to this prison'
-      else
-        response << 'New to this prison'
-      end
+      response << if previously_attended_prisons.empty?
+                    'New to custody'
+                  elsif previously_attended_prisons.include?(offender.prison.code)
+                    'Returning to this prison'
+                  else
+                    'New to this prison'
+                  end
     end
   end
 
-  private
+private
 
   attr_reader :offender, :prison_timeline
 end
-
