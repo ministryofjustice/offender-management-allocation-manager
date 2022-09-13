@@ -111,7 +111,7 @@ module ApiHelper
       .to_return(
         status: 200,
         body: {
-          "prisonPeriod"=> [
+          "prisonPeriod" => [
             { 'prisons' => ['ABC', 'DEF'] }
           ]
         }.to_json)
