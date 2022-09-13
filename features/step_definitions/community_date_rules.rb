@@ -11,7 +11,7 @@ Given(/^automatic release date is (\d+) months (\d+) days after sentence start d
 end
 
 When(/^community dates are calculated$/) do
-  @community_dates = Rules::CommunityDateRules.determinate_nps_community_dates(
+  @community_dates = ResponsibilityAndHandover::HandoverDateRules.determinate_nps_community_dates(
     conditional_release_date: @conditional_release_date,
     automatic_release_date: @automatic_release_date,
     sentence_start_date: @sentence_start_date)

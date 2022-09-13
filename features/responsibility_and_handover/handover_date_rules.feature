@@ -1,4 +1,4 @@
-Feature: Community Date Calculation Rules
+Feature: Handover Date Rules
 
   Scenario Outline: Determinate NPS Conditional Release Date Case
     Given a determinate NPS CRD case

@@ -1,5 +1,5 @@
-module Rules
-  class CommunityDateRules
+module ResponsibilityAndHandover
+  class HandoverDateRules
     class << self
       def determinate_nps_community_dates(sentence_start_date:,
                                           conditional_release_date: nil,
@@ -11,8 +11,8 @@ module Rules
 
         com_responsible_date = sentence_start_date if com_responsible_date < sentence_start_date
 
-        Community::CommunityDates.new(com_allocated_date: com_responsible_date,
-                                      com_responsible_date: com_responsible_date)
+        CommunityDates.new(com_allocated_date: com_responsible_date,
+                           com_responsible_date: com_responsible_date)
       end
     end
   end

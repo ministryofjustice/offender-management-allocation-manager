@@ -35,7 +35,7 @@ describe HandoverDateService do
   end
 
   before do
-    allow(Rules::CommunityDateRules).to receive(:determinate_nps_community_dates).and_raise('Please mock appropriately')
+    allow(ResponsibilityAndHandover::HandoverDateRules).to receive(:determinate_nps_community_dates).and_raise('Please mock appropriately')
   end
 
   context 'when determinate' do
@@ -65,15 +65,15 @@ describe HandoverDateService do
         allow(offender).to receive(:conditional_release_date).and_return(mock_conditional_release_date)
         allow(offender).to receive(:automatic_release_date).and_return(mock_automatic_release_date)
 
-        allow(Rules::CommunityDateRules).to receive(:determinate_nps_community_dates).and_return(
-          Community::CommunityDates.new(com_responsible_date: nil, com_allocated_date: mock_com_allocated_date))
+        allow(ResponsibilityAndHandover::HandoverDateRules).to receive(:determinate_nps_community_dates).and_return(
+          ResponsibilityAndHandover::CommunityDates.new(com_responsible_date: nil, com_allocated_date: mock_com_allocated_date))
 
         start_date # run the calculations
       end
 
       it 'handover start date is calculated according to correct rules' do
         aggregate_failures do
-          expect(Rules::CommunityDateRules).to have_received(:determinate_nps_community_dates).with(
+          expect(ResponsibilityAndHandover::HandoverDateRules).to have_received(:determinate_nps_community_dates).with(
             sentence_start_date: mock_sentence_start_date,
             conditional_release_date: mock_conditional_release_date,
             automatic_release_date: mock_automatic_release_date)
@@ -687,15 +687,15 @@ describe HandoverDateService do
         allow(offender).to receive(:conditional_release_date).and_return(mock_conditional_release_date)
         allow(offender).to receive(:automatic_release_date).and_return(mock_automatic_release_date)
 
-        allow(Rules::CommunityDateRules).to receive(:determinate_nps_community_dates).and_return(
-          Community::CommunityDates.new(com_responsible_date: nil, com_allocated_date: mock_com_allocated_date))
+        allow(ResponsibilityAndHandover::HandoverDateRules).to receive(:determinate_nps_community_dates).and_return(
+          ResponsibilityAndHandover::CommunityDates.new(com_responsible_date: nil, com_allocated_date: mock_com_allocated_date))
 
         start_date # run the calculations
       end
 
       it 'handover start date is calculated according to correct rules' do
         aggregate_failures do
-          expect(Rules::CommunityDateRules).to have_received(:determinate_nps_community_dates).with(
+          expect(ResponsibilityAndHandover::HandoverDateRules).to have_received(:determinate_nps_community_dates).with(
             sentence_start_date: mock_sentence_start_date,
             conditional_release_date: mock_conditional_release_date,
             automatic_release_date: mock_automatic_release_date)
