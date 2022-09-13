@@ -107,7 +107,7 @@ module ApiHelper
       }.to_json)
 
     # Prison timeline
-    stub_request(:get, "#{T3}/offenders/T0000AA/prison-timeline")
+    stub_request(:get, Addressable::Template.new("#{T3}/offenders/{id}/prison-timeline"))
       .to_return(
         status: 200,
         body: {
