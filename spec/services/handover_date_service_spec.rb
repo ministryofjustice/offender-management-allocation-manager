@@ -34,6 +34,10 @@ describe HandoverDateService do
     Timecop.return
   end
 
+  before do
+    allow(Rules::CommunityDateRules).to receive(:determinate_nps_community_dates).and_raise('Please mock appropriately')
+  end
+
   context 'when determinate' do
     let(:today) { Date.parse('01/01/2021') }
     let(:crd) { Date.parse('01/09/2022') }
@@ -49,8 +53,32 @@ describe HandoverDateService do
     context 'when NPS' do
       let(:case_info) { build(:case_information, :nps, probation_service: welsh? ? 'Wales' : 'England') }
 
-      it 'handover starts 7.5 months before CRD/ARD' do
-        expect(start_date).to eq(crd - (7.months + 15.days))
+      # TODO: Cannot be doubles yet as rest of the described class does calculations on it. Convert to instance
+      #  doubles (even the ARD) when all calculations are abstracted out
+      let(:mock_com_allocated_date) { crd - (7.months + 15.days) } # has to be set accurately otherwise other tests fail
+      let(:mock_sentence_start_date) { sentence_start_date }
+      let(:mock_conditional_release_date) { crd }
+      let(:mock_automatic_release_date) { nil }
+
+      before do
+        allow(offender).to receive(:sentence_start_date).and_return(mock_sentence_start_date)
+        allow(offender).to receive(:conditional_release_date).and_return(mock_conditional_release_date)
+        allow(offender).to receive(:automatic_release_date).and_return(mock_automatic_release_date)
+
+        allow(Rules::CommunityDateRules).to receive(:determinate_nps_community_dates).and_return(
+          Community::CommunityDates.new(com_responsible_date: nil, com_allocated_date: mock_com_allocated_date))
+
+        start_date # run the calculations
+      end
+
+      it 'handover start date is calculated according to correct rules' do
+        aggregate_failures do
+          expect(Rules::CommunityDateRules).to have_received(:determinate_nps_community_dates).with(
+            sentence_start_date: mock_sentence_start_date,
+            conditional_release_date: mock_conditional_release_date,
+            automatic_release_date: mock_automatic_release_date)
+          expect(start_date).to eq mock_com_allocated_date
+        end
       end
 
       it 'handover happens 4.5 months before CRD/ARD' do
@@ -643,6 +671,38 @@ describe HandoverDateService do
     end
 
     shared_examples 'OMIC policy rules' do
+      # TODO: Cannot be doubles yet as rest of the described class does calculations on it. Convert to instance
+      #  doubles (even the ARD) when all calculations are abstracted out
+      #
+      # TODO: These mocks are repeated but because of the way things are structured, it is not possible to have this all
+      #  just at the beginning of a single context block, and I refuse to use shared contexts as they are extremely
+      #  confusing to the reader, which will just make an awful test even worse
+      let(:mock_com_allocated_date) { crd - (7.months + 15.days) } # has to be set accurately otherwise other tests fail
+      let(:mock_sentence_start_date) { sentence_start_date }
+      let(:mock_conditional_release_date) { crd }
+      let(:mock_automatic_release_date) { nil }
+
+      before do
+        allow(offender).to receive(:sentence_start_date).and_return(mock_sentence_start_date)
+        allow(offender).to receive(:conditional_release_date).and_return(mock_conditional_release_date)
+        allow(offender).to receive(:automatic_release_date).and_return(mock_automatic_release_date)
+
+        allow(Rules::CommunityDateRules).to receive(:determinate_nps_community_dates).and_return(
+          Community::CommunityDates.new(com_responsible_date: nil, com_allocated_date: mock_com_allocated_date))
+
+        start_date # run the calculations
+      end
+
+      it 'handover start date is calculated according to correct rules' do
+        aggregate_failures do
+          expect(Rules::CommunityDateRules).to have_received(:determinate_nps_community_dates).with(
+            sentence_start_date: mock_sentence_start_date,
+            conditional_release_date: mock_conditional_release_date,
+            automatic_release_date: mock_automatic_release_date)
+          expect(start_date).to eq mock_com_allocated_date
+        end
+      end
+
       it 'is POM responsible' do
         expect(pom).to be_responsible
         expect(com).not_to be_involved # until the handover start date
@@ -761,7 +821,7 @@ describe HandoverDateService do
       let(:sentence_start_date) { HandoverDateService::ENGLISH_POLICY_START_DATE } # 1 Oct 2019
 
       # A release date some time in the future
-      let(:crd) { 3.years.from_now }
+      let(:crd) { 3.years.from_now.to_date }
 
       # Set today's date to early on in the sentence (before the start of handover)
       let(:today) { sentence_start_date + 1.week }
