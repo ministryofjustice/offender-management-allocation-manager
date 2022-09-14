@@ -106,15 +106,7 @@ module ApiHelper
         totalPages: 1
       }.to_json)
 
-    # Prison timeline
-    stub_request(:get, Addressable::Template.new("#{T3}/offenders/{id}/prison-timeline"))
-      .to_return(
-        status: 200,
-        body: {
-          "prisonPeriod" => [
-            { 'prisons' => ['ABC', 'DEF'] }
-          ]
-        }.to_json)
+    stub_prison_timeline
 
     # Remove offenders with unwanted legal statuses – the following APIs are only called/stubbed for filtered offender IDs
     filtered_offenders = offenders.select { |o| HmppsApi::PrisonApi::OffenderApi::ALLOWED_LEGAL_STATUSES.include?(o.fetch(:legalStatus)) }
@@ -126,6 +118,17 @@ module ApiHelper
     filtered_offenders.each { |o| stub_offender(o) }
 
     stub_movements(movements)
+  end
+
+  def stub_prison_timeline
+    stub_request(:get, Addressable::Template.new("#{T3}/offenders/{id}/prison-timeline"))
+      .to_return(
+        status: 200,
+        body: {
+          "prisonPeriod" => [
+            { 'prisons' => ['ABC', 'DEF'] }
+          ]
+        }.to_json)
   end
 
   def stub_oasys_assessments(offender_no)

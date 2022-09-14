@@ -7,7 +7,7 @@ class OffenderWithPrisonTimelinePresenter
            :probation_record, :handover_start_date, :restricted_patient?,
            :location, :responsibility_handover_date, :pom_responsible?,
            :com_responsible?, :pom_supporting?, :coworking?,
-           :awaiting_allocation_for, to: :@offender
+           :awaiting_allocation_for, :case_owner, to: :@offender
 
   def initialize(offender, prison_timeline)
     @offender = offender
