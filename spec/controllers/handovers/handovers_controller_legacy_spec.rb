@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe HandoversController, 'legacy', type: :controller do # rubocop:disable RSpec/DescribeMethod
+RSpec.describe HandoversController, 'legacy', type: :controller do
   let(:prison_code) { create(:prison).code }
 
   context 'when legacy page with 4 offenders' do
