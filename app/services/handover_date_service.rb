@@ -133,13 +133,8 @@ private
       [indeterminate_responsibility_date(offender), reason]
     elsif offender.parole_eligibility_date.present?
       [offender.parole_eligibility_date - 8.months, :nps_determinate_parole_case]
-
-    elsif offender.mappa_level.blank?                                                # remove here...
-      [mappa1_responsibility_date(offender), :nps_mappa_unknown]
-    elsif offender.mappa_level.in? [1, 0]
-      [mappa1_responsibility_date(offender), :nps_determinate_mappa_1_n]
     else
-      [mappa_23_responsibility_date(offender), :nps_determinate_mappa_2_3]           # ...to here
+      [nps_determinate_responsibility_date(offender), :nps_determinate]
     end
   end
 
@@ -147,28 +142,13 @@ private
     offender.release_date - 8.months
   end
 
-  def self.mappa_23_responsibility_date(offender)
+  def self.nps_determinate_responsibility_date(offender)
     earliest_date = [
       offender.conditional_release_date,
       offender.automatic_release_date
     ].compact.map { |date| date - (7.months + 15.days) }.min
 
     [Time.zone.today, earliest_date].compact.max # TODO: Check with Laura - do we need this or can we always use earliest_date?
-  end
-
-  # There are a couple of places where we need .5 of a month - which
-  # we have assumed 15.days is a reasonable compromise implementation
-  def self.mappa1_responsibility_date(offender)
-    if offender.home_detention_curfew_actual_date.present?
-      offender.home_detention_curfew_actual_date
-    else
-      earliest_date = [
-        offender.conditional_release_date,
-        offender.automatic_release_date
-      ].compact.map { |date| date - (4.months + 15.days) }.min
-
-      [earliest_date, offender.home_detention_curfew_eligibility_date].compact.min
-    end
   end
 
   WELSH_POLICY_START_DATE = Time.zone.local(2019, 2, 4).utc.to_date.freeze
