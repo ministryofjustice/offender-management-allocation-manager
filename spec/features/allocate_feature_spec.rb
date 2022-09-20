@@ -25,7 +25,7 @@ feature 'Allocation' do
 
   before do
     allow(HmppsApi::PrisonTimelineApi).to receive(:get_prison_timeline).and_return(
-      { "prisonPeriod" => [ { 'prisons' => ['ABC', 'DEF'] } ] }
+      { "prisonPeriod" => [{ 'prisons' => ['ABC', 'DEF'] }] }
     )
     signin_spo_user
   end
