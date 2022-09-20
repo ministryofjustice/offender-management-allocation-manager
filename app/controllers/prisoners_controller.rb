@@ -71,10 +71,7 @@ private
 
   def load_all_offenders
     @missing_info = @prison.missing_info
-    @unallocated = @prison.unallocated.map do |offender|
-      prison_timeline = HmppsApi::PrisonTimelineApi.get_prison_timeline(offender.offender_no)
-      OffenderWithPrisonTimelinePresenter.new(offender, prison_timeline)
-    end
+    @unallocated = @prison.unallocated
     @new_arrivals = @prison.new_arrivals
     @allocated = @prison.allocated.map do |offender|
       OffenderWithAllocationPresenter.new(offender, @prison.allocations.detect { |a| a.nomis_offender_id == offender.offender_no })
