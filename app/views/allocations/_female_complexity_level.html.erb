@@ -2,7 +2,7 @@
   <tr class="govuk-table__row" id="complexity-level-row">
     <td class="govuk-table__cell">Complexity of need level</td>
     <td id=complexity-level class="govuk-table__cell table_cell__left_align">
-      <%= @prisoner.complexity_level.capitalize %>
+      <%= @prisoner.complexity_level&.capitalize %>
       <%= link_to 'Change', url, class: 'govuk-link pull-right' %>
     </td>
   </tr>
