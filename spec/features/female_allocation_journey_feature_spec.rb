@@ -31,8 +31,6 @@ feature "womens allocation journey" do
     alloc.deallocate_offender_after_release
     alloc.update! primary_pom_nomis_id: prison_pom.staff_id
     alloc.deallocate_offender_after_release
-
-    stub_request(:get, "https://www.gov.uk/bank-holidays.json").to_return(body: {}.to_json)
   end
 
   context 'without an existing allocation' do
