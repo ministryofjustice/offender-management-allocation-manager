@@ -141,7 +141,7 @@ feature 'case information feature' do
       visit missing_information_prison_prisoners_path('LEI', sort: "last_name desc", page: 3)
       expect(current_page_number).to eq(3)
 
-      within ".govuk-table tr:first-child td:nth-child(3)" do
+      within ".govuk-table tr:nth-child(4) td:nth-child(3)" do
         click_link 'Add missing details'
       end
       expect(page).to have_selector('h1', text: 'Case information')

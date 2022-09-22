@@ -50,6 +50,7 @@ gem 'sassc-rails'
 gem 'valid_email2'
 gem 'wicked'
 gem 'rails-i18n'
+gem 'business_time'
 
 gem 'activeadmin'
 

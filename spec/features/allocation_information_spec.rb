@@ -75,7 +75,7 @@ feature "view an offender's allocation information", flaky: true do
       end
 
       it "displays the case owner as custody" do
-        expect(page).to have_css('.govuk-table__cell', text: 'Custody')
+        expect(page).to have_css('.govuk-table__cell', text: 'Responsible')
       end
 
       it "displays a badge" do
