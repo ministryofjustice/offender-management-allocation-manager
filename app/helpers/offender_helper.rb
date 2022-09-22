@@ -117,6 +117,6 @@ module OffenderHelper
                 'New to this prison'
               end
 
-    output.join('<br />')
+    output.join('<br />').html_safe
   end
 end
