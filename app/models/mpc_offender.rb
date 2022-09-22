@@ -185,10 +185,6 @@ class MpcOffender
     end
   end
 
-  def prison_timeline
-    @prison_timeline ||= HmppsApi::PrisonTimelineApi.get_prison_timeline(offender_no)
-  end
-
 private
 
   def early_allocation_notes?
