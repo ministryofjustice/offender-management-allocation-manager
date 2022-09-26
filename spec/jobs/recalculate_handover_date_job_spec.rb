@@ -179,17 +179,13 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       end
 
       context 'with a COM supporting case' do
-        before do
-          dboffender = Offender.find_or_create_by! nomis_offender_id: nomis_offender[:prisonerNumber]
-          api_offender = FactoryBot.build(:hmpps_api_offender, nomis_offender)
-          mpc_offender = MpcOffender.new(prison: prison, offender: dboffender, prison_record: api_offender)
-          allow(OffenderService).to receive(:get_offender).with(dboffender.id).and_return(mpc_offender)
-          allow(HandoverDateService).to receive(:handover).with(mpc_offender).and_return(
-            CalculatedHandoverDate.new(responsibility: CalculatedHandoverDate::CUSTODY_WITH_COM,
-                                       com_allocated_date: Faker::Date.forward,
-                                       com_responsible_date: Faker::Date.forward,
-                                       reason: :nps_determinate))
+        let(:nomis_offender) do
+          build(:nomis_offender,
+                prisonId: prison.code,
+                sentence: attributes_for(:sentence_detail, :inside_handover_window))
+        end
 
+        before do
           described_class.perform_now(offender_no)
         end
 

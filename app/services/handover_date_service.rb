@@ -118,10 +118,12 @@ private
     if offender.parole_eligibility_date.present?
       offender.parole_eligibility_date - 8.months
     elsif offender.conditional_release_date.present? || offender.automatic_release_date.present?
-      ResponsibilityAndHandover::HandoverDateRules.determinate_nps_community_dates(
-        sentence_start_date: offender.sentence_start_date,
-        conditional_release_date: offender.conditional_release_date,
-        automatic_release_date: offender.automatic_release_date).com_allocated_date
+      earliest_release_date = [
+        offender.conditional_release_date,
+        offender.automatic_release_date
+      ].compact.min
+
+      earliest_release_date - (7.months + 15.days)
     end
   end
 
