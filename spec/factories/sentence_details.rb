@@ -72,12 +72,12 @@ FactoryBot.define do
       paroleEligibilityDate { Time.zone.today + 8.months + 21.days }
     end
 
-    trait :unsentenced do
-      sentenceStartDate { nil }
+    trait :after_handover do
+      conditionalReleaseDate { Time.zone.today + 7.months }
     end
 
-    trait :inside_handover_window do
-      conditionalReleaseDate { Time.zone.today + 7.days + 7.months }
+    trait :unsentenced do
+      sentenceStartDate { nil }
     end
 
     trait :indeterminate do
@@ -121,6 +121,3 @@ FactoryBot.define do
     end
   end
 end
-
-
-
