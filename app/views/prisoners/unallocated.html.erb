@@ -114,7 +114,7 @@
           <%= pom_role_needed(offender) %>
         </td>
         <td aria-label="Additional information" class="govuk-table__cell">
-          <%= additional_information(offender) %>
+          <%= offender.additional_information.join('<br />').html_safe %>
         </td>
         <td aria-label="Working days since entering this prison" class="govuk-table__cell">
           <%= offender.awaiting_allocation_for(only_working_days: true) %> days

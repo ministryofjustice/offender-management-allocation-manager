@@ -98,25 +98,4 @@ module OffenderHelper
   def probation_field(offender, field)
     offender.public_send field if offender.probation_record.present?
   end
-
-  def additional_information(offender)
-    attended_prisons = offender.prison_timeline['prisonPeriod'].map { |p| p['prisons'] }.flatten
-
-    # Remove only ONE of any prison codes that match the current prison
-    previously_attended_prisons = (attended_prisons.reject { |p| p == offender.prison.code }) +
-      attended_prisons.select { |p| p == offender.prison.code }.drop(1)
-
-    output = []
-    output << 'Recall' if offender.recalled?
-
-    output << if previously_attended_prisons.empty?
-                'New to custody'
-              elsif previously_attended_prisons.include?(offender.prison.code)
-                'Returning to this prison'
-              else
-                'New to this prison'
-              end
-
-    output.join('<br />').html_safe
-  end
 end
