@@ -4,7 +4,6 @@ metadata:
   name: allocation-manager
   namespace: offender-management-production
   annotations:
-    kubernetes.io/ingress.class: "nginx"
     external-dns.alpha.kubernetes.io/set-identifier: allocation-manager-offender-management-production-green
     external-dns.alpha.kubernetes.io/aws-weight: "100"
     nginx.ingress.kubernetes.io/whitelist-source-range: >
@@ -72,6 +71,7 @@ metadata:
       20.49.214.228,
       35.176.93.186/32
 spec:
+  ingressClassName: default
   tls:
     - hosts:
         - allocation-manager-production.apps.live.cloud-platform.service.justice.gov.uk
@@ -83,13 +83,20 @@ spec:
       http:
         paths:
           - path: /
+            pathType: ImplementationSpecific
             backend:
-              serviceName: allocation-manager
-              servicePort: 3000
+              service:
+                name: allocation-manager
+                port:
+                  number: 3000
+
     - host: moic.service.justice.gov.uk
       http:
         paths:
           - path: /
+            pathType: ImplementationSpecific
             backend:
-              serviceName: allocation-manager
-              servicePort: 3000
+              service:
+                name: allocation-manager
+                port:
+                  number: 3000
