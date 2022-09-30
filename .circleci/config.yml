@@ -344,17 +344,17 @@ workflows:
       - install_dependencies:
           filters:
             branches:
-              ignore: [main, preproduction, test]
+              ignore: [main, main2, preproduction, test]
       - rubocop:
           requires: [install_dependencies]
           filters:
             branches:
-              ignore: [main, preproduction, test]
+              ignore: [main, main2, preproduction, test]
       - test:
           requires: [install_dependencies]
           filters:
             branches:
-              ignore: [main, preproduction, test]
+              ignore: [main, main2, preproduction, test]
 
   deploy_test_env:
     jobs:
@@ -367,63 +367,54 @@ workflows:
           requires: [install_dependencies]
           filters: { branches: { only: [test] } }
 
-#  build_and_test:
-#    jobs:
-#      - install_dependencies
-#      - rubocop:
-#          requires:
-#            - install_dependencies
-#          filters:
-#            branches:
-#              ignore: test
-#      - test:
-#          requires:
-#            - install_dependencies
-#          filters:
-#            branches:
-#              ignore: test
-#      - build_and_push_docker_image:
-#          requires:
-#            - install_dependencies
-#          filters:
-#            branches:
-#              only:
-#                - main
-#                - preproduction
-#                - test
-#      - deploy_staging:
-#          requires:
-#            - rubocop
-#            - test
-#            - build_and_push_docker_image
-#          filters:
-#            branches:
-#              only:
-#                - main
-#      - deploy_production_approval:
-#          type: approval
-#          requires:
-#            - deploy_staging
-#          filters:
-#            branches:
-#              only: main
-#      - deploy_production:
-#          requires:
-#            - deploy_production_approval
-#          filters:
-#            branches:
-#              only: main
-#      - deploy_preprod:
-#          requires:
-#            - rubocop
-#            - test
-#            - build_and_push_docker_image
-#          filters:
-#            branches:
-#              only: preproduction
-#      - deploy_test:
-#          requires:
-#            - build_and_push_docker_image
-#          filters:
-#            branches:
-#              only: test
+  test_and_deploy_preprod:
+    jobs:
+      - install_dependencies:
+          filters: { branches: { only: [preproduction] } }
+  
+      - build_and_push_docker_image:
+          requires: [install_dependencies]
+          filters: { branches: { only: [preproduction] } }
+      - rubocop:
+          requires: [install_dependencies]
+          filters: { branches: { only: [preproduction] } }
+      - test:
+          requires: [install_dependencies]
+          filters: { branches: { only: [preproduction] } }
+
+      - deploy_preprod:
+          requires:
+            - build_and_push_docker_image
+            - rubocop
+            - test
+          filters: { branches: { only: [preproduction] } }
+
+  test_and_deploy_production:
+    jobs:
+      - install_dependencies:
+          filters: { branches: { only: [main2] } }
+
+      - build_and_push_docker_image:
+          requires: [install_dependencies]
+          filters: { branches: { only: [main2] } }
+      - rubocop:
+          requires: [install_dependencies]
+          filters: { branches: { only: [main2] } }
+      - test:
+          requires: [install_dependencies]
+          filters: { branches: { only: [main2] } }
+
+      - deploy_staging:
+          requires:
+            - build_and_push_docker_image
+            - rubocop
+            - test
+          filters: { branches: { only: [main2] } }
+
+      - deploy_production_approval:
+          type: approval
+          requires: [deploy_staging]
+          filters: { branches: { only: [main2] } }
+      - deploy_production:
+          requires: [deploy_production_approval]
+          filters: { branches: { only: [main2] } }
