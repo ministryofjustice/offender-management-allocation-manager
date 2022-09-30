@@ -339,7 +339,7 @@ jobs:
             <<: *github_team_name_slug
 
 workflows:
-  run_branch_tests:
+  feature_branch:
     jobs:
       - install_dependencies:
           filters:
@@ -356,7 +356,7 @@ workflows:
             branches:
               ignore: [main, main2, preproduction, test]
 
-  deploy_test_env:
+  test_env:
     jobs:
       - install_dependencies:
           filters: { branches: { only: [test] } }
@@ -367,7 +367,7 @@ workflows:
           requires: [install_dependencies]
           filters: { branches: { only: [test] } }
 
-  test_and_deploy_preprod:
+  preprod:
     jobs:
       - install_dependencies:
           filters: { branches: { only: [preproduction] } }
@@ -389,7 +389,7 @@ workflows:
             - test
           filters: { branches: { only: [preproduction] } }
 
-  test_and_deploy_production:
+  staging_and_production:
     jobs:
       - install_dependencies:
           filters: { branches: { only: [main2] } }
