@@ -595,7 +595,7 @@ DEPENDENCIES
   rubocop-rails
   rubocop-rspec
   ruby-prof (>= 0.16.0)
-  rubyzip
+  rubyzip (< 3)
   sassc-rails
   selenium-webdriver
   sentry-raven

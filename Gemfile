@@ -36,7 +36,7 @@ gem 'typhoeus'
 gem 'redis', '~> 4.6.0'
 gem 'fast_underscore', require: false
 gem 'hashdiff', ['>= 1.0.0.beta1', '< 2.0.0']
-gem 'rubyzip'
+gem 'rubyzip', '< 3'
 gem 'turnout'
 gem 'kaminari' # pagination
 gem 'prawn-rails'
