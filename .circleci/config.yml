@@ -126,7 +126,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - restore_cache:
-          key: allocation-manager-{{ checksum "Gemfile.lock" }}-v4 # increment v number to bust cache
+          key: allocation-manager-{{ checksum "Gemfile.lock" }}-2022-10-05T13:43:00 # Set current time in iso8601 to bust cache
       - run:
           name: Which bundler?
           command: bundle -v
@@ -155,7 +155,7 @@ jobs:
               chmod +x ~/.local/bin/cc-test-reporter
             fi
       - save_cache:
-          key: allocation-manager-{{ checksum "Gemfile.lock" }}-v4 # increment v number to bust cache
+          key: allocation-manager-{{ checksum "Gemfile.lock" }}-2022-10-05T13:43:00 # Set current time in iso8601 to bust cache
           paths:
             - ~/repo/vendor/bundle
             - ~/repo/node_modules
