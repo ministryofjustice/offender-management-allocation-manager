@@ -1,4 +1,4 @@
-FROM ruby:2.7.5-slim-bullseye
+FROM ruby:2.7.6-slim-bullseye
 
 # Incremenent to bust Docker layer cache
 ENV DOCKER_CACHE_BUSTER=1
