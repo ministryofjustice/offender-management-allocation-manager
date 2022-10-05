@@ -129,7 +129,8 @@ jobs:
           key: allocation-manager-{{ checksum "Gemfile.lock" }}-2022-10-05T13:43:00 # Set current time in iso8601 to bust cache
       - run:
           name: Which bundler?
-          command: bundle -v
+          # Install the version of bundler used in Gemfile.lock
+          command: gem install -v $(ruby -e 'puts /BUNDLED WITH\s+(\d+\.\d+\.\d+)/m.match(File.read("Gemfile.lock"))[1]') bundler && bundle -v
       - run:
           name: Install frontend modules
           command: yarn install
