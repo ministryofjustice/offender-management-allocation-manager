@@ -35,7 +35,7 @@ describe HandoverDateService do
   end
 
   before do
-    allow(ResponsibilityAndHandover::HandoverDateRules).to receive(:determinate_nps_community_dates).and_raise('Please mock appropriately')
+    allow(Handover::HandoverDateRules).to receive(:determinate_nps_community_dates).and_raise('Please mock appropriately')
   end
 
   context 'when determinate' do

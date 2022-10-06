@@ -1,6 +1,7 @@
-module ResponsibilityAndHandover
+module Handover
   class HandoverDateRules
     class << self
+      # TODO: rename method to be inline with new domain language
       def determinate_nps_community_dates(sentence_start_date:,
                                           conditional_release_date: nil,
                                           automatic_release_date: nil)
