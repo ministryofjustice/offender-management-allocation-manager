@@ -16,20 +16,22 @@ SimpleCov::Formatter::LcovFormatter.config.output_directory = 'coverage'
 SimpleCov::Formatter::LcovFormatter.config.lcov_file_name = 'lcov.info'
 SimpleCov.formatter = SimpleCov::Formatter::MergedFormatter
 
-SimpleCov.start 'rails' do
-  add_filter 'app/services/hmpps_api/error/'
-  add_filter 'lib/allocation_validation.rb'
-  add_filter 'app/jobs/custom_stats_logging_job.rb'
-  add_filter 'app/admin/'
-  add_group "Services", "app/services"
+if ENV['DISABLE_COVERAGE'].blank?
+  SimpleCov.start 'rails' do
+    add_filter 'app/services/hmpps_api/error/'
+    add_filter 'lib/allocation_validation.rb'
+    add_filter 'app/jobs/custom_stats_logging_job.rb'
+    add_filter 'app/admin/'
+    add_group "Services", "app/services"
 
-  # Set to very low minimum - now it is simply for mostly informational purposes
-  minimum_coverage 20
-  # sometimes coverage drops between branches - don't fail in these cases
-  maximum_coverage_drop 0.5
+    # Set to very low minimum - now it is simply for mostly informational purposes
+    minimum_coverage 20
+    # sometimes coverage drops between branches - don't fail in these cases
+    maximum_coverage_drop 0.5
 
-  # set merge_timeout to 30 minutes on circle:ci
-  merge_timeout ENV['MERGE_TIMEOUT'].to_i if ENV['MERGE_TIMEOUT']
+    # set merge_timeout to 30 minutes on circle:ci
+    merge_timeout ENV['MERGE_TIMEOUT'].to_i if ENV['MERGE_TIMEOUT']
+  end
 end
 
 if ENV['CIRCLE_ARTIFACTS']

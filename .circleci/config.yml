@@ -13,7 +13,7 @@ references:
   test_container_config: &test_container_config
     resource_class: large
     docker:
-      - image: cimg/ruby:2.7.5-browsers
+      - image: cimg/ruby:2.7.6-browsers
         environment:
           RAILS_ENV: test
           PGHOST: 127.0.0.1
@@ -126,10 +126,11 @@ jobs:
       - attach_workspace:
           at: ~/
       - restore_cache:
-          key: allocation-manager-{{ checksum "Gemfile.lock" }}-v4 # increment v number to bust cache
+          key: allocation-manager-{{ checksum "Gemfile.lock" }}-2022-10-05T13:43:00 # Set current time in iso8601 to bust cache
       - run:
           name: Which bundler?
-          command: bundle -v
+          # Install the version of bundler used in Gemfile.lock
+          command: gem install -v $(ruby -e 'puts /BUNDLED WITH\s+(\d+\.\d+\.\d+)/m.match(File.read("Gemfile.lock"))[1]') bundler && bundle -v
       - run:
           name: Install frontend modules
           command: yarn install
@@ -155,7 +156,7 @@ jobs:
               chmod +x ~/.local/bin/cc-test-reporter
             fi
       - save_cache:
-          key: allocation-manager-{{ checksum "Gemfile.lock" }}-v4 # increment v number to bust cache
+          key: allocation-manager-{{ checksum "Gemfile.lock" }}-2022-10-05T13:43:00 # Set current time in iso8601 to bust cache
           paths:
             - ~/repo/vendor/bundle
             - ~/repo/node_modules
