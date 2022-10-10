@@ -22,6 +22,13 @@
     <div class='govuk-width-container'>
       <main class='govuk-main-wrapper' id='main-content' role='main'>
 
+        <% content_for :info_banner do %>
+          An error is causing some people who have been released to reappear in Manage POM cases.
+          This problem will be fixed as soon as possible. In the meantime, do not allocate someone
+          if you recognise they have recently been released.
+        <% end %>
+        <%= render '/layouts/info_banner' %>
+
         <%= content_for?(:main_content) ? yield(:main_content) : yield %>
       </main>
     </div>

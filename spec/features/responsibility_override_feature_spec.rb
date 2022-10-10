@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature 'Responsibility override', :flaky do
+feature 'Responsibility override', flaky: true do
   include ActiveJob::TestHelper
 
   before do

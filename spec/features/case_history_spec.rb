@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'Case History' do
+feature 'Case History', flaky: true do
   let(:probation_pom) do
     {
       primary_pom_nomis_id: 485_926,

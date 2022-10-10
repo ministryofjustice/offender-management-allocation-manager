@@ -37,13 +37,3 @@ notifications:
     text: >
       You can help us improve this service by participating in research and giving us feedback.
       Sign up to the HMPPS Digital research panel <a href="https://www.smartsurvey.co.uk/s/SCREENERALL/">here</a>
-  - id: released-offender-still-in-mpc
-    start_date: 10/10/2022
-    end_date: 17/10/2022
-    role:
-      - POM
-      - SPO
-    text: >
-      An error is causing some people who have been released to reappear in Manage POM cases.
-      This problem will be fixed as soon as possible. In the meantime, do not allocate someone
-      if you recognise they have recently been released.
