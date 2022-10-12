@@ -419,8 +419,8 @@ describe HandoverDateService, 'old' do
           let(:conditional_release_date) { nil }
           let(:automatic_release_date) { nil }
 
-          it 'returns nil' do
-            expect(result).to be_nil
+          it 'raises error' do
+            expect { result }.to raise_error(Handover::HandoverDateCalculationError)
           end
         end
       end

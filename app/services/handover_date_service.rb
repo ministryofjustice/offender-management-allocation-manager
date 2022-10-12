@@ -106,25 +106,12 @@ private
     elsif offender.indeterminate_sentence?
       indeterminate_responsibility_date(offender)
     else
-      determinate_sentence_handover_start_date(offender)
+      nps_determinate_responsibility_date(offender)[0]
     end
   end
 
   def self.early_allocation_handover_date(offender)
     offender.release_date - 15.months
-  end
-
-  def self.determinate_sentence_handover_start_date(offender)
-    if offender.parole_eligibility_date.present?
-      offender.parole_eligibility_date - 8.months
-    elsif offender.conditional_release_date.present? || offender.automatic_release_date.present?
-      earliest_release_date = [
-        offender.conditional_release_date,
-        offender.automatic_release_date
-      ].compact.min
-
-      earliest_release_date - (7.months + 15.days)
-    end
   end
 
   def self.nps_handover_date(offender)
@@ -133,10 +120,8 @@ private
     elsif offender.indeterminate_sentence?
       reason = offender.in_open_conditions? ? :nps_indeterminate_open : :nps_indeterminate
       [indeterminate_responsibility_date(offender), reason]
-    elsif offender.parole_eligibility_date.present?
-      [offender.parole_eligibility_date - 8.months, :nps_determinate_parole_case]
     else
-      [nps_determinate_responsibility_date(offender), :nps_determinate]
+      nps_determinate_responsibility_date(offender)
     end
   end
 
@@ -145,12 +130,21 @@ private
   end
 
   def self.nps_determinate_responsibility_date(offender)
-    earliest_date = [
-      offender.conditional_release_date,
-      offender.automatic_release_date
-    ].compact.map { |date| date - (7.months + 15.days) }.min
+    if offender.parole_eligibility_date.present?
+      [offender.parole_eligibility_date - 8.months, :nps_determinate_parole_case]
+    elsif offender.conditional_release_date.present? || offender.automatic_release_date.present?
+      earliest_date = [
+        offender.conditional_release_date,
+        offender.automatic_release_date
+      ].compact.min
 
-    [Time.zone.today, earliest_date].compact.max # TODO: Check with Laura - do we need this or can we always use earliest_date?
+      [earliest_date - (7.months + 15.days), :nps_determinate]
+    else
+      # Should never get here as the release_date.blank? check on L42 should have eliminated this possibility
+      raise Handover::HandoverDateCalculationError.new(
+        'parole_eligibility_date, conditional_release_date, and automatic_release_date are all blank',
+        nomis_offender_id: offender.offender_no)
+    end
   end
 
   WELSH_POLICY_START_DATE = Time.zone.local(2019, 2, 4).utc.to_date.freeze
@@ -167,7 +161,7 @@ private
              :early_allocation?, :mappa_level, :prison_arrival_date, :category_active_since,
              :parole_eligibility_date, :conditional_release_date, :automatic_release_date,
              :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date,
-             :sentence_start_date,
+             :sentence_start_date, :offender_no,
              to: :@offender
 
     def initialize(offender)
