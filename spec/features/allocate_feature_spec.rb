@@ -25,6 +25,10 @@ feature 'Allocation' do
 
   before do
     signin_spo_user
+
+    # RoSH summary
+    stub_request(:get, Addressable::Template.new("#{Rails.configuration.assess_risks_and_needs_api_host}/risks/crn/{crn}/summary"))
+      .to_return(body: {}.to_json)
   end
 
   context 'when a journey begins on the "Make new allocations" page' do
