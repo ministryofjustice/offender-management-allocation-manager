@@ -91,7 +91,7 @@ class BuildAllocationsController < PrisonsApplicationController
             handover_completion_date: @prisoner.responsibility_handover_date,
             last_oasys_completed: last_oasys_completed(@prisoner.offender_no),
             active_alerts: @prisoner.active_alert_labels.join(', ')
-          }.merge({}) # @prisoner.rosh_summary)
+          }.merge(@prisoner.rosh_summary)
         )
       end
 
