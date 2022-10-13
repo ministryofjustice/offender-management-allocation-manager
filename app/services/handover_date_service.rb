@@ -101,12 +101,8 @@ private
         # Men's estate: the day the offender arrived in the open prison
         offender.prison_arrival_date
       end
-    elsif offender.early_allocation?
-      early_allocation_handover_date(offender)
-    elsif offender.indeterminate_sentence?
-      indeterminate_responsibility_date(offender)
     else
-      nps_determinate_responsibility_date(offender)[0]
+      nps_handover_date(offender)[0]
     end
   end
 
