@@ -52,6 +52,8 @@ class HandoverDateService
                                  reason: :crc_case
 
     elsif !offender.expected_time_in_custody_gt_10_months?
+      # TODO: This should be part of the policy case check below
+
       # COM is always responsible if the expected time in custody is less than 10 months
       CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
                                  start_date: nil, handover_date: nil,
