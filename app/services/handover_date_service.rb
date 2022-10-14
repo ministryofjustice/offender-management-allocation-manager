@@ -51,7 +51,7 @@ class HandoverDateService
                                  start_date: handover_date, handover_date: handover_date,
                                  reason: :crc_case
 
-    elsif !offender.expected_time_in_custody_gt_10_months?
+    elsif !offender.expected_time_in_custody_gt_10_months? && !USE_HANDOVER_RULES_COMPONENT
       # TODO: This should be part of the policy case check below
 
       # COM is always responsible if the expected time in custody is less than 10 months
@@ -59,7 +59,7 @@ class HandoverDateService
                                  start_date: nil, handover_date: nil,
                                  reason: :less_than_10_months_left_to_serve
 
-    elsif offender.policy_case?
+    elsif offender.policy_case? && !USE_HANDOVER_RULES_COMPONENT
       # Offender is NPS Determinate or Indeterminate
       handover_date, reason = nps_handover_date(offender)
       start_date = nps_start_date(offender)
@@ -68,6 +68,8 @@ class HandoverDateService
       CalculatedHandoverDate.new responsibility: responsibility(start_date, handover_date),
                                  start_date: start_date, handover_date: handover_date,
                                  reason: reason
+    elsif offender.policy_case? && USE_HANDOVER_RULES_COMPONENT
+      raise NotImplementedError
     else
       # This is a pre-OMIC policy case
       # e.g. they were sentenced before the OMIC policy start date and will be released before the cutoff date,
