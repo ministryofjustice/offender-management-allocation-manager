@@ -40,7 +40,7 @@ RSpec.feature "Delius import feature", :disable_push_to_delius do
       expect(page).not_to have_content(offender_no)
 
       visit unallocated_prison_prisoners_path(prison_code)
-      expect(page).to have_content("Make new allocations")
+      expect(page).to have_content("Make allocations")
       expect(page).to have_content(offender_no)
       click_link offender_name
       expect(page.find(:css, '#welsh-offender-row')).not_to have_content('Change')

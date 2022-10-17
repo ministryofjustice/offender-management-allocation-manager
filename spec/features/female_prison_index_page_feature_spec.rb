@@ -84,7 +84,7 @@ feature "female prison index page" do
     end
 
     it 'shows unallocated offenders' do
-      click_link('Make new allocations (1)')
+      click_link('Make allocations (1)')
       expect(page).to have_css("h1", text: "Allocations")
     end
 

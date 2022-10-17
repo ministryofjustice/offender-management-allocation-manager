@@ -30,7 +30,7 @@ feature 'Allocation' do
     signin_spo_user
   end
 
-  context 'when a journey begins on the "Make new allocations" page' do
+  context 'when a journey begins on the "Make allocations" page' do
     let(:start_page) { unallocated_prison_prisoners_path('LEI') }
 
     before do
