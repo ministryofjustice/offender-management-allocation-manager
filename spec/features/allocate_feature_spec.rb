@@ -31,7 +31,8 @@ feature 'Allocation' do
     let(:start_page) { unallocated_prison_prisoners_path('LEI') }
 
     before do
-      allow(OffenderService).to receive(:get_community_data).and_return({crn: 12345})
+      allow(OffenderService).to receive(:get_community_data).and_return({ crn: 12_345 })
+      allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_rosh_summary).and_return({})
       visit start_page
       click_link unallocated_offender_name
       # Takes you to the Review case and allocate page where users review case details and scroll down to select from a list of POMs
