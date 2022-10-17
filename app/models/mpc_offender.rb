@@ -186,9 +186,12 @@ class MpcOffender
   end
 
   def rosh_summary
+    puts ">>>>>>> MpcOffender#rosh_summary: start: OffenderService.get_community_data"
     community_data = OffenderService.get_community_data(offender_no)
+    puts ">>>>>>> MpcOffender#rosh_summary: HmppsApi::AssessRisksAndNeedsApi.get_rosh_summary"
     all_risks = HmppsApi::AssessRisksAndNeedsApi.get_rosh_summary(community_data[:crn])
 
+    puts ">>>>>>> MpcOffender#rosh_summary: grouped_risks"
     grouped_risks = {}.tap do |risks|
       if all_risks['riskInCustody'].present?
         all_risks['riskInCustody'].each do |level, groups|
@@ -197,6 +200,7 @@ class MpcOffender
       end
     end
 
+    puts ">>>>>>> MpcOffender#rosh_summary: return hash"
     {
       high_rosh_children: grouped_risks['Children'],
       high_rosh_public: grouped_risks['Public'],
@@ -205,6 +209,7 @@ class MpcOffender
       high_rosh_prisoners: grouped_risks['Prisoners']
     }
   rescue Faraday::ResourceNotFound
+    puts ">>>>>>> MpcOffender#rosh_summary: rescue ResourceNotFound"
     {
       high_rosh_children: nil,
       high_rosh_public: nil,

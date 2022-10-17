@@ -33,6 +33,7 @@ class BuildAllocationsController < PrisonsApplicationController
   end
 
   def update
+    puts ">>>>>>> BuildAllocationsController#update: start"
     if step == :override
       @override = OverrideForm.new override_params
       if @override.valid?
@@ -42,7 +43,9 @@ class BuildAllocationsController < PrisonsApplicationController
         render_wizard
       end
     else
+      puts ">>>>>>> BuildAllocationsController#update: step: #{step}"
       override = OverrideForm.new session[:female_allocation_override]
+      puts ">>>>>>> BuildAllocationsController#update: history"
       history = AllocationHistory.find_by(prison: @prison.code, nomis_offender_id: nomis_offender_id_from_url)
       event = if history&.active?
                 :reallocate_primary_pom
@@ -50,6 +53,7 @@ class BuildAllocationsController < PrisonsApplicationController
                 :allocate_primary_pom
               end
 
+      puts ">>>>>>> BuildAllocationsController#update: allocation_attributes"
       allocation_attributes =
         {
           primary_pom_nomis_id: staff_id,
@@ -66,11 +70,13 @@ class BuildAllocationsController < PrisonsApplicationController
           override_detail: override.more_detail,
         }
 
+      puts ">>>>>>> BuildAllocationsController#update: AllocationService.create_or_update"
       AllocationService.create_or_update(allocation_attributes)
       session.delete :female_allocation_override
       pom = StaffMember.new(@prison, staff_id)
 
       unless event == :reallocate_primary_pom && staff_id == history.primary_pom_nomis_id
+        puts ">>>>>>> BuildAllocationsController#update: store_latest_allocation_details"
         store_latest_allocation_details(
           {
             offender_name: @prisoner.full_name_ordered,
@@ -95,8 +101,10 @@ class BuildAllocationsController < PrisonsApplicationController
         )
       end
 
+      puts ">>>>>>> BuildAllocationsController#update: redirect"
       redirect_to @referrer
     end
+    puts ">>>>>>> BuildAllocationsController#update: finished"
   end
 
 private
