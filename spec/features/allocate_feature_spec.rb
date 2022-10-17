@@ -25,25 +25,26 @@ feature 'Allocation' do
 
   before do
     signin_spo_user
-
-    # RoSH summary
-    stub_request(:get, Addressable::Template.new("#{Rails.configuration.assess_risks_and_needs_api_host}/risks/crn/{crn}/summary"))
-      .to_return(body: {}.to_json)
   end
 
   context 'when a journey begins on the "Make new allocations" page' do
     let(:start_page) { unallocated_prison_prisoners_path('LEI') }
 
     before do
+      puts ">>>>>>> before: visit start_page"
       visit start_page
+      puts ">>>>>>> before: click unallocated off name"
       click_link unallocated_offender_name
       # Takes you to the Review case and allocate page where users review case details and scroll down to select from a list of POMs
       expect(page).to have_current_path(prison_prisoner_staff_index_path('LEI', never_allocated_offender_id))
+      puts ">>>>>>> before: finished"
     end
 
     scenario 'accepting the recommended POM type', vcr: { cassette_name: 'prison_api/create_new_allocation_feature' } do
+      puts ">>>>>>> scenario accepting start"
       expect(page).to have_content('Determinate')
 
+      puts ">>>>>>> scenario accepting click allocate"
       # Allocate to the Prison POM called "Moic Pom"
       within '#recommended_poms' do
         within row_containing 'Moic Pom' do
@@ -53,6 +54,7 @@ feature 'Allocation' do
 
       expect(page).to have_css('h1', text: 'Confirm allocation')
 
+      puts ">>>>>>> scenario accepting click complete"
       click_button 'Complete allocation'
 
       expect(page).to have_current_path(start_page)
@@ -60,11 +62,14 @@ feature 'Allocation' do
       expect(page).to have_css('.govuk-details__summary-text', text: "You can copy information about this allocation to paste into an email to someone else")
       expect(page).to have_css('#text-to-copy')
       expect(page).to have_css('button', text: "Copy this information")
+      puts ">>>>>>> scenario accepting finished"
     end
 
     scenario 'overriding the recommended POM type', vcr: { cassette_name: 'prison_api/override_allocation_feature_ok' } do
+      puts ">>>>>>> scenario overriding start"
       find('#non-recommended-accordion-section-heading').click
 
+      puts ">>>>>>> scenario overriding click allocate"
       # Allocate to the Probation POM called "Moic Integration-Tests"
       within '#non-recommended-accordion-section' do
         within row_containing 'Moic Integration-Tests' do
@@ -77,8 +82,10 @@ feature 'Allocation' do
       find('label[for=override-form-override-reasons-no-staff-field]').click
       find('label[for=override-form-override-reasons-continuity-field]').click
 
+      puts ">>>>>>> scenario overriding click continue"
       click_button('Continue')
 
+      puts ">>>>>>> scenario overriding click complete"
       click_button 'Complete allocation'
       # Returns to the "Make new allocation" page
 
@@ -87,6 +94,7 @@ feature 'Allocation' do
       expect(page).to have_css('.govuk-details__summary-text', text: "You can copy information about this allocation to paste into an email to someone else")
       expect(page).to have_css('#text-to-copy')
       expect(page).to have_css('button', text: "Copy this information")
+      puts ">>>>>>> scenario overriding finished"
     end
   end
 
