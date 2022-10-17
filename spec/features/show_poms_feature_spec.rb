@@ -7,6 +7,7 @@ feature "get poms list" do
   let(:moic_pom_id) { 485_926 }
 
   before do
+    allow(OffenderService).to receive(:get_community_data).and_return({crn: 12345})
     signin_spo_user
   end
 
