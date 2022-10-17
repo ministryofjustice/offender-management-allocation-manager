@@ -31,6 +31,7 @@ feature 'Allocation' do
     let(:start_page) { unallocated_prison_prisoners_path('LEI') }
 
     before do
+      allow(OffenderService).to receive(:get_community_data).and_return({crn: 12345})
       puts ">>>>>>> before: visit start_page"
       visit start_page
       puts ">>>>>>> before: click unallocated off name"
