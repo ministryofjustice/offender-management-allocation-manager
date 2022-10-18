@@ -36,13 +36,6 @@ module ApiHelper
     stub_request(:get, "#{Rails.configuration.complexity_api_host}/v1/complexity-of-need/offender-no/#{offender_no}")
       .to_return(body: { level: offender.fetch(:complexityLevel) }.to_json)
 
-    # RoSH summary
-    stub_request(:get, Addressable::Template.new("#{Rails.configuration.assess_risks_and_needs_api_host}/risks/crn/{crn}/summary"))
-      .to_return(body: {}.to_json)
-
-    # Alerts
-    stub_request(:get, "#{T3}/offenders/#{offender_no}/alerts/v2").to_return(body: [].to_json)
-
     stub_oasys_assessments(offender_no)
   end
 
