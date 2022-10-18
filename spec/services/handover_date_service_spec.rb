@@ -34,10 +34,6 @@ describe HandoverDateService do
     Timecop.return
   end
 
-  before do
-    allow(Handover::HandoverDateRules).to receive(:determinate_nps_community_dates).and_raise('Please mock appropriately')
-  end
-
   context 'when determinate' do
     let(:today) { Date.parse('01/01/2021') }
     let(:crd) { Date.parse('01/09/2022') }

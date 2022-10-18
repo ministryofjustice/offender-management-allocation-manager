@@ -51,7 +51,7 @@ class HandoverDateService
                                  start_date: handover_date, handover_date: handover_date,
                                  reason: :crc_case
 
-    elsif !offender.expected_time_in_custody_gt_10_months? && !USE_HANDOVER_RULES_COMPONENT
+    elsif !offender.expected_time_in_custody_gt_10_months?
       # TODO: This should be part of the policy case check below
 
       # COM is always responsible if the expected time in custody is less than 10 months
@@ -59,7 +59,7 @@ class HandoverDateService
                                  start_date: nil, handover_date: nil,
                                  reason: :less_than_10_months_left_to_serve
 
-    elsif offender.policy_case? && !USE_HANDOVER_RULES_COMPONENT
+    elsif offender.policy_case?
       # Offender is NPS Determinate or Indeterminate
       handover_date, reason = nps_handover_date(offender)
       start_date = nps_start_date(offender)
@@ -68,8 +68,7 @@ class HandoverDateService
       CalculatedHandoverDate.new responsibility: responsibility(start_date, handover_date),
                                  start_date: start_date, handover_date: handover_date,
                                  reason: reason
-    elsif offender.policy_case? && USE_HANDOVER_RULES_COMPONENT
-      raise NotImplementedError
+
     else
       # This is a pre-OMIC policy case
       # e.g. they were sentenced before the OMIC policy start date and will be released before the cutoff date,
@@ -106,7 +105,8 @@ private
         offender.prison_arrival_date
       end
     else
-      nps_handover_date(offender)[0]
+      d = nps_handover_date(offender)
+      d[0] if d
     end
   end
 
@@ -133,17 +133,21 @@ private
     if offender.parole_eligibility_date.present?
       [offender.parole_eligibility_date - 8.months, :nps_determinate_parole_case]
     elsif offender.conditional_release_date.present? || offender.automatic_release_date.present?
-      earliest_date = [
-        offender.conditional_release_date,
-        offender.automatic_release_date
-      ].compact.min
+      if USE_HANDOVER_RULES_COMPONENT
+        dates = Handover::HandoverDateRules.calculate_handover_dates(
+          nomis_offender_id: offender.offender_no,
+          sentence_start_date: offender.sentence_start_date,
+          conditional_release_date: offender.conditional_release_date,
+          automatic_release_date: offender.automatic_release_date)
+        [dates.handover_date, dates.reason]
+      else
+        earliest_date = [
+          offender.conditional_release_date,
+          offender.automatic_release_date
+        ].compact.min
 
-      [earliest_date - (7.months + 15.days), :nps_determinate]
-    else
-      # Should never get here as the release_date.blank? check on L42 should have eliminated this possibility
-      raise Handover::HandoverDateCalculationError.new(
-        'parole_eligibility_date, conditional_release_date, and automatic_release_date are all blank',
-        nomis_offender_id: offender.offender_no)
+        [earliest_date - (7.months + 15.days), :nps_determinate]
+      end
     end
   end
 
