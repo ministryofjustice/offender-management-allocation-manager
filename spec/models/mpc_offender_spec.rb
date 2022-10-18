@@ -20,7 +20,7 @@ RSpec.describe MpcOffender, type: :model do
     end
 
     context 'when never been in any prison before the current one' do
-      let(:prison_periods) { [{ "prisons" => [prison.code] }] }
+      let(:prison_periods) { [{ 'prisons' => [prison.code] }] }
 
       it 'New to custody' do
         expect(subject.additional_information).to eq(['New to custody'])
@@ -32,7 +32,7 @@ RSpec.describe MpcOffender, type: :model do
         let(:prison_periods) do
           [
             { 'prisons' => ['ABC', 'DEF'] },
-            { "prisons" => [prison.code] }
+            { 'prisons' => [prison.code] }
           ]
         end
 
@@ -44,9 +44,9 @@ RSpec.describe MpcOffender, type: :model do
       context 'when returning to here' do
         let(:prison_periods) do
           [
-            { "prisons" => ['XYZ', prison.code] },
+            { 'prisons' => ['XYZ', prison.code] },
             { 'prisons' => ['ABC', 'DEF'] },
-            { "prisons" => [prison.code] }
+            { 'prisons' => [prison.code] }
           ]
         end
 
@@ -62,11 +62,11 @@ RSpec.describe MpcOffender, type: :model do
           let(:prison_periods) do
             [
               { 'prisons' => ['ABC', 'DEF'] },
-              { "prisons" => [prison.code] }
+              { 'prisons' => [prison.code] }
             ]
           end
 
-          it 'Recalled - New to this prison' do
+          it 'Recall - New to this prison' do
             expect(subject.additional_information).to eq(['Recall', 'New to this prison'])
           end
         end
@@ -74,14 +74,33 @@ RSpec.describe MpcOffender, type: :model do
         context 'when returning to here' do
           let(:prison_periods) do
             [
-              { "prisons" => ['XYZ', prison.code] },
+              { 'prisons' => ['XYZ', prison.code] },
               { 'prisons' => ['ABC', 'DEF'] },
-              { "prisons" => [prison.code] }
+              { 'prisons' => [prison.code] }
             ]
           end
 
-          it 'Recalled - Returning to this prison' do
+          it 'Recall - Returning to this prison' do
             expect(subject.additional_information).to eq(['Recall', 'Returning to this prison'])
+          end
+        end
+
+        # Although this doesn't make sense (an offender being recalled when they're new to custody),
+        # it's been seen in data from the prison timeline API.
+        #
+        # We can only assume that either:
+        #  1. The recalled flag (which comes from OffenderService.get_offender) has been set
+        #     erroneously or not reset from previously (most likely), or
+        #  2. The prison timeline is missing previous movements
+        #
+        # So this feature is a safeguard against conflicting data
+        context 'when there are no previous prisons from API but recalled is true' do
+          let(:prison_periods) do
+            [{ 'prisons' => [prison.code] }]
+          end
+
+          it 'New to custody' do
+            expect(subject.additional_information).to eq(['New to custody'])
           end
         end
       end

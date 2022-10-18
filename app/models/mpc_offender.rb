@@ -197,7 +197,7 @@ class MpcOffender
       attended_prisons.select { |p| p == prison.code }.drop(1)
 
     [].tap do |output|
-      output << 'Recall' if recalled?
+      output << 'Recall' if recalled? && previously_attended_prisons.any?
 
       output << if previously_attended_prisons.empty?
                   'New to custody'
