@@ -24,7 +24,6 @@ references:
           COMPLEXITY_API_HOST: https://complexity-of-need-staging.hmpps.service.justice.gov.uk
           COMMUNITY_API_HOST: https://community-api-secure.test.delius.probation.hmpps.dsd.io
           ASSESSMENT_API_HOST: https://offender-dev.aks-dev-1.studio-hosting.service.justice.gov.uk
-          ASSESS_RISKS_AND_NEEDS_API_HOST: https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk
       - image: cimg/postgres:14.4
         environment:
           POSTGRES_USER: ubuntu
@@ -373,7 +372,7 @@ workflows:
     jobs:
       - install_dependencies:
           filters: { branches: { only: [preproduction] } }
-
+  
       - build_and_push_docker_image:
           requires: [install_dependencies]
           filters: { branches: { only: [preproduction] } }

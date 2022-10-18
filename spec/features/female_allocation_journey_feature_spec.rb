@@ -31,8 +31,6 @@ feature "womens allocation journey" do
     alloc.deallocate_offender_after_release
     alloc.update! primary_pom_nomis_id: prison_pom.staff_id
     alloc.deallocate_offender_after_release
-
-    stub_community_offender(nomis_offender_id, build(:community_data))
   end
 
   context 'without an existing allocation' do
@@ -135,8 +133,6 @@ feature "womens allocation journey" do
       within '.allocated_offender_row_0' do
         click_link 'View'
       end
-
-      stub_community_offender(offender_id, build(:community_data))
     end
 
     scenario 'accepting recommendation' do

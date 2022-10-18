@@ -4,10 +4,6 @@
   <%= render partial: 'shared/notifications/offender_needs_a_com', locals: {offender: @prisoner, email_history: @emails_sent_to_ldu} %>
 <% end %>
 
-<% if @latest_allocation_details.present? %>
-  <%= render partial: 'allocations/allocated_notice', locals: @latest_allocation_details %>
-<% end %>
-
 <h1 class="govuk-heading-l govuk-!-margin-bottom-5">Allocation information</h1>
 
 <%= render 'shared/badges', offender: @prisoner %>
