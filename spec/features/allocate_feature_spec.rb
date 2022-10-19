@@ -34,6 +34,8 @@ feature 'Allocation' do
     let(:start_page) { unallocated_prison_prisoners_path('LEI') }
 
     before do
+      allow(OffenderService).to receive(:get_community_data).and_return({ crn: 12_345 })
+      allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_rosh_summary).and_return({})
       visit start_page
       click_link unallocated_offender_name
       # Takes you to the Review case and allocate page where users review case details and scroll down to select from a list of POMs
@@ -55,7 +57,10 @@ feature 'Allocation' do
       click_button 'Complete allocation'
 
       expect(page).to have_current_path(start_page)
-      expect(page).to have_css('.notification', text: "#{recently_allocated_offender_name} has been allocated to Moic Pom (Prison POM)")
+      expect(page).to have_css('.message', text: "#{recently_allocated_offender_name} allocated to Moic Pom")
+      expect(page).to have_css('.govuk-details__summary-text', text: "You can copy information about this allocation to paste into an email to someone else")
+      expect(page).to have_css('#text-to-copy')
+      expect(page).to have_css('button', text: "Copy this information")
     end
 
     scenario 'overriding the recommended POM type', vcr: { cassette_name: 'prison_api/override_allocation_feature_ok' } do
@@ -79,7 +84,10 @@ feature 'Allocation' do
       # Returns to the "Make new allocation" page
 
       expect(current_url).to have_content(unallocated_prison_prisoners_path('LEI'))
-      expect(page).to have_css('.notification', text: "#{recently_allocated_offender_name} has been allocated to Moic Integration-Tests (Probation POM)")
+      expect(page).to have_css('.message', text: "#{recently_allocated_offender_name} allocated to Moic Integration-Tests")
+      expect(page).to have_css('.govuk-details__summary-text', text: "You can copy information about this allocation to paste into an email to someone else")
+      expect(page).to have_css('#text-to-copy')
+      expect(page).to have_css('button', text: "Copy this information")
     end
   end
 

@@ -43,7 +43,8 @@ class BuildAllocationsController < PrisonsApplicationController
       end
     else
       override = OverrideForm.new session[:female_allocation_override]
-      event = if AllocationHistory.find_by(prison: @prison.code, nomis_offender_id: nomis_offender_id_from_url)&.active?
+      history = AllocationHistory.find_by(prison: @prison.code, nomis_offender_id: nomis_offender_id_from_url)
+      event = if history&.active?
                 :reallocate_primary_pom
               else
                 :allocate_primary_pom
@@ -68,8 +69,31 @@ class BuildAllocationsController < PrisonsApplicationController
       AllocationService.create_or_update(allocation_attributes)
       session.delete :female_allocation_override
       pom = StaffMember.new(@prison, staff_id)
-      flash[:notice] =
-        "#{@prisoner.full_name_ordered} has been allocated to #{view_context.full_name_ordered(pom)} (#{view_context.grade(pom)})"
+
+      unless event == :reallocate_primary_pom && staff_id == history.primary_pom_nomis_id
+        store_latest_allocation_details(
+          {
+            offender_name: @prisoner.full_name_ordered,
+            prisoner_number: @prisoner.offender_no,
+            pom_name: view_context.full_name_ordered(pom),
+            pom_role: if @prisoner.pom_responsible?
+                        'Responsible'
+                      else
+                        (@prisoner.com_responsible? ? 'Supporting' : '')
+                      end,
+            additional_notes: allocation_params[:message],
+            mappa_level: @prisoner.mappa_level,
+            ldu_name: @prisoner.ldu_name,
+            ldu_email: @prisoner.ldu_email_address,
+            com_name: @prisoner.allocated_com_name,
+            com_email: @prisoner.allocated_com_email,
+            handover_start_date: @prisoner.handover_start_date,
+            handover_completion_date: @prisoner.responsibility_handover_date,
+            last_oasys_completed: last_oasys_completed(@prisoner.offender_no),
+            active_alerts: @prisoner.active_alert_labels.join(', ')
+          }.merge(@prisoner.rosh_summary)
+        )
+      end
 
       redirect_to @referrer
     end
@@ -99,5 +123,15 @@ private
 
   def staff_id
     params.require(:staff_id).to_i
+  end
+
+  def last_oasys_completed(offender_no)
+    details = HmppsApi::AssessmentApi.get_latest_oasys_date(offender_no)
+
+    return nil if details.nil? ||
+      details.fetch(:assessment_type) == Faraday::ConflictError ||
+      details.fetch(:assessment_type) == Faraday::ServerError
+
+    details.fetch(:completed)
   end
 end
