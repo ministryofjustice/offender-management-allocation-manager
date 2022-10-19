@@ -191,21 +191,12 @@ private
     if offender.parole_eligibility_date.present?
       [offender.parole_eligibility_date - 8.months, :nps_determinate_parole_case]
     elsif offender.conditional_release_date.present? || offender.automatic_release_date.present?
-      if USE_HANDOVER_RULES_COMPONENT
-        dates = Handover::HandoverDateRules.calculate_handover_dates(
-          nomis_offender_id: offender.offender_no,
-          sentence_start_date: offender.sentence_start_date,
-          conditional_release_date: offender.conditional_release_date,
-          automatic_release_date: offender.automatic_release_date)
-        [dates.handover_date, dates.reason]
-      else
-        earliest_date = [
-          offender.conditional_release_date,
-          offender.automatic_release_date
-        ].compact.min
-
-        [earliest_date - (7.months + 15.days), :nps_determinate]
-      end
+      dates = Handover::HandoverDateRules.calculate_handover_dates(
+        nomis_offender_id: offender.offender_no,
+        sentence_start_date: offender.sentence_start_date,
+        conditional_release_date: offender.conditional_release_date,
+        automatic_release_date: offender.automatic_release_date)
+      [dates.handover_date, dates.reason]
     end
   end
 
