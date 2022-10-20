@@ -16,6 +16,14 @@ module OffenderHelper
     end
   end
 
+  def pom_role_needed(offender)
+    if offender.pom_responsible?
+      'Responsible'
+    elsif offender.com_responsible?
+      'Supporting'
+    end
+  end
+
   def case_owner_label(offender)
     if offender.pom_responsible?
       'Custody'

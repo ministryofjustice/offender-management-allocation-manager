@@ -5,6 +5,7 @@ feature 'male prisoners summary navigation tabs' do
     signin_spo_user([prison.code, 'AGI'])
     stub_signin_spo(pom, [prison.code, 'AGI'])
     stub_offenders_for_prison(prison.code, offenders)
+    stub_request(:get, "https://www.gov.uk/bank-holidays.json").to_return(body: {}.to_json)
 
     create(:case_information, offender: build(:offender, nomis_offender_id: offender_ready_to_allocate.fetch(:prisonerNumber)))
     create(:case_information, offender: build(:offender, nomis_offender_id: allocated_offender_one.fetch(:prisonerNumber)))
@@ -49,16 +50,16 @@ feature 'male prisoners summary navigation tabs' do
     visit allocated_prison_prisoners_path(prison.code)
     expect(active_tab).to eq('See allocations (2)')
     expect(page).to have_content('See allocations (2)')
-    expect(page).to have_content('Make new allocations (1)')
+    expect(page).to have_content('Make allocations (1)')
     expect(page).to have_content('Add missing details (3)')
     expect(page).to have_content('Newly arrived (1)')
   end
 
   it 'shows unallocated offenders' do
     visit unallocated_prison_prisoners_path(prison.code)
-    expect(active_tab).to eq('Make new allocations (1)')
+    expect(active_tab).to eq('Make allocations (1)')
     expect(page).to have_content('See allocations (2)')
-    expect(page).to have_content('Make new allocations (1)')
+    expect(page).to have_content('Make allocations (1)')
     expect(page).to have_content('Add missing details (3)')
     expect(page).to have_content('Newly arrived (1)')
   end
@@ -67,7 +68,7 @@ feature 'male prisoners summary navigation tabs' do
     visit new_arrivals_prison_prisoners_path(prison.code)
     expect(active_tab).to eq('Newly arrived (1)')
     expect(page).to have_content('See allocations (2)')
-    expect(page).to have_content('Make new allocations (1)')
+    expect(page).to have_content('Make allocations (1)')
     expect(page).to have_content('Add missing details (3)')
     expect(page).to have_content('Newly arrived (1)')
   end
@@ -76,7 +77,7 @@ feature 'male prisoners summary navigation tabs' do
     visit missing_information_prison_prisoners_path(prison.code)
     expect(active_tab).to eq('Add missing details (3)')
     expect(page).to have_content('See allocations (2)')
-    expect(page).to have_content('Make new allocations (1)')
+    expect(page).to have_content('Make allocations (1)')
     expect(page).to have_content('Add missing details (3)')
     expect(page).to have_content('Newly arrived (1)')
   end
