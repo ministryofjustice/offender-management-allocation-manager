@@ -128,6 +128,18 @@ To test that the pre-commit hook is set up correctly, try removing the `diff`
 attribute from a line in a `.gitattributes` file and then committing something -
 the hook should prevent you from committing.
 
+## CircleCI
+
+CircleCI is used for testing of branches and deploying.
+
+It runs tests in parallel and skips flaky specs.
+
+Mark specs as flaky by adding the `flaky: true` flag to them.
+
+To disable parallel testing in CircleCI, set the environment variable
+`PARALLEL_TEST_PROCESSORS=1` in the CircleCI project settings. Delete
+it from project settings to go back to the default of parallel testing.
+
 ## Further Documentation
 
 ### Architectural Context

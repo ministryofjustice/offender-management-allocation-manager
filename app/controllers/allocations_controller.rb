@@ -10,7 +10,10 @@ class AllocationsController < PrisonsApplicationController
     @oasys_assessment = HmppsApi::AssessmentApi.get_latest_oasys_date(@prisoner.offender_no)
 
     @pom = StaffMember.new(@prison, @allocation.primary_pom_nomis_id)
-    redirect_to prison_pom_non_pom_path(@prison.code, @pom.staff_id) unless @pom.has_pom_role?
+    unless @pom.has_pom_role?
+      redirect_to prison_pom_non_pom_path(@prison.code, @pom.staff_id)
+      return
+    end
 
     secondary_pom_nomis_id = @allocation.secondary_pom_nomis_id
     if secondary_pom_nomis_id.present?

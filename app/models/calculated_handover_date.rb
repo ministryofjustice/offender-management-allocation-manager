@@ -15,9 +15,10 @@ class CalculatedHandoverDate < ApplicationRecord
     nps_indeterminate: 'NPS Indeterminate',
     nps_indeterminate_open: 'NPS Indeterminate - Open conditions',
     nps_determinate_parole_case: 'NPS Determinate Parole Case',
-    nps_mappa_unknown: 'NPS - MAPPA level unknown',
-    nps_determinate_mappa_1_n: 'NPS Determinate Mappa 1/N',
-    nps_determinate_mappa_2_3: 'NPS Determinate Mappa 2/3',
+    nps_determinate: 'NPS Determinate Case',
+    nps_mappa_unknown: 'NPS - MAPPA level unknown', # legacy
+    nps_determinate_mappa_1_n: 'NPS Determinate Mappa 1/N', # legacy
+    nps_determinate_mappa_2_3: 'NPS Determinate Mappa 2/3', # legacy
     less_than_10_months_left_to_serve: 'Less than 10 months left to serve',
     pre_omic_rules: 'Pre-OMIC rules',
   }.stringify_keys.freeze

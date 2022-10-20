@@ -178,6 +178,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
         end
       end
 
+      # TODO: delete this when USE_NEW_HANDOVER_POLICY goes away
       context 'with a COM supporting case' do
         let(:nomis_offender) do
           build(:nomis_offender,
@@ -186,6 +187,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
         end
 
         before do
+          stub_const('USE_NEW_HANDOVER_POLICY', false)
           described_class.perform_now(offender_no)
         end
 

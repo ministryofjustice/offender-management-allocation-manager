@@ -2,8 +2,12 @@
 
 require 'rails_helper'
 
-describe HandoverDateService do
+describe HandoverDateService, 'old policy' do # rubocop:disable RSpec/FilePath
   subject { described_class.handover(offender) }
+
+  before do
+    stub_const('USE_NEW_HANDOVER_POLICY', false)
+  end
 
   let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
   let(:pom) { OffenderManagerResponsibility.new subject.custody_responsible?, subject.custody_supporting?  }
@@ -49,11 +53,12 @@ describe HandoverDateService do
     context 'when NPS' do
       let(:case_info) { build(:case_information, :nps, probation_service: welsh? ? 'Wales' : 'England') }
 
-      it 'handover happens 7.5 months before CRD/ARD with no handover window' do
-        aggregate_failures do
-          expect(start_date).to eq(crd - (7.months + 15.days))
-          expect(handover_date).to eq(crd - (7.months + 15.days))
-        end
+      it 'handover starts 7.5 months before CRD/ARD' do
+        expect(start_date).to eq(crd - (7.months + 15.days))
+      end
+
+      it 'handover happens 4.5 months before CRD/ARD' do
+        expect(handover_date).to eq(crd - (4.months + 15.days))
       end
 
       describe 'before handover start date' do
@@ -68,8 +73,20 @@ describe HandoverDateService do
         end
       end
 
-      describe 'on/after handover date' do
+      describe 'within the handover window' do
         let(:today) { crd - (7.months + 15.days) }
+
+        it 'POM is responsible' do
+          expect(pom).to be_responsible
+        end
+
+        it 'COM is supporting' do
+          expect(com).to be_supporting
+        end
+      end
+
+      describe 'on/after handover date' do
+        let(:today) { crd - (4.months + 15.days) }
 
         it 'POM is supporting' do
           expect(pom).to be_supporting
@@ -123,8 +140,12 @@ describe HandoverDateService do
           let(:welsh?) { true }
           let(:arrival_date) { prescoed_policy_start_date }
 
-          it 'handover occurs 7.5 months before CRD/ARD with no handover window' do
+          it 'handover starts 7.5 months before CRD/ARD' do
             expect(start_date).to eq(crd - (7.months + 15.days))
+          end
+
+          it 'handover happens 4.5 months before CRD/ARD' do
+            expect(handover_date).to eq(crd - (4.months + 15.days))
           end
 
           describe 'before handover start date' do
@@ -139,8 +160,20 @@ describe HandoverDateService do
             end
           end
 
-          describe 'on/after handover date' do
+          describe 'within the handover window' do
             let(:today) { crd - (7.months + 15.days) }
+
+            it 'POM is responsible' do
+              expect(pom).to be_responsible
+            end
+
+            it 'COM is supporting' do
+              expect(com).to be_supporting
+            end
+          end
+
+          describe 'on/after handover date' do
+            let(:today) { crd - (4.months + 15.days) }
 
             it 'POM is supporting' do
               expect(pom).to be_supporting
@@ -183,11 +216,15 @@ describe HandoverDateService do
         context 'when offender enters on/after the policy start date' do
           let(:arrival_date) { open_policy_start_date }
 
-          it 'handover occurs 7.5 months before CRD/ARD with no handover window' do
+          it 'handover starts 7.5 months before CRD/ARD' do
             expect(start_date).to eq(crd - (7.months + 15.days))
           end
 
-          describe 'before handover date' do
+          it 'handover happens 4.5 months before CRD/ARD' do
+            expect(handover_date).to eq(crd - (4.months + 15.days))
+          end
+
+          describe 'before handover start date' do
             let(:today) { crd - (7.months + 16.days) }
 
             it 'POM is responsible' do
@@ -199,8 +236,20 @@ describe HandoverDateService do
             end
           end
 
-          describe 'on/after handover date' do
+          describe 'within the handover window' do
             let(:today) { crd - (7.months + 15.days) }
+
+            it 'POM is responsible' do
+              expect(pom).to be_responsible
+            end
+
+            it 'COM is supporting' do
+              expect(com).to be_supporting
+            end
+          end
+
+          describe 'on/after handover date' do
+            let(:today) { crd - (4.months + 15.days) }
 
             it 'POM is supporting' do
               expect(pom).to be_supporting
@@ -609,7 +658,8 @@ describe HandoverDateService do
       end
 
       it 'has the expected reason' do
-        expect(reason).to eq('NPS Determinate Case')
+        # The offender is stubbed as NPS without a MAPPA level
+        expect(reason).to eq('NPS - MAPPA level unknown')
       end
     end
 
@@ -715,7 +765,7 @@ describe HandoverDateService do
       let(:sentence_start_date) { HandoverDateService::ENGLISH_POLICY_START_DATE } # 1 Oct 2019
 
       # A release date some time in the future
-      let(:crd) { 3.years.from_now.to_date }
+      let(:crd) { 3.years.from_now }
 
       # Set today's date to early on in the sentence (before the start of handover)
       let(:today) { sentence_start_date + 1.week }

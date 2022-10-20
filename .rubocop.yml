@@ -29,6 +29,8 @@ AllCops:
     - 'spec/dummy/db/**/*'
     - 'config/routes.rb'
     - 'spec/factories/*.rb'
+    - 'features/support/env.rb'
+    - 'lib/tasks/cucumber.rake'
 
 Style/MultilineBlockChain:
   Enabled: false
@@ -147,6 +149,9 @@ RSpec/MultipleMemoizedHelpers:
   Enabled: false
 
 RSpec/StubbedMock:
+  Enabled: false
+
+RSpec/DescribeMethod:
   Enabled: false
 
 # Below here is the set of (arbitrary) style failures against the govuk versions

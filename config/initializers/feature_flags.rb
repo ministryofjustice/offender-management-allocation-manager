@@ -1,0 +1,1 @@
+USE_NEW_HANDOVER_POLICY = ENV.fetch('USE_NEW_HANDOVER_POLICY', '').strip == '1'
