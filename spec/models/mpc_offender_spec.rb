@@ -6,6 +6,7 @@ RSpec.describe MpcOffender, type: :model do
   end
 
   let(:prison) { build(:prison) }
+  let(:api_offender) { double(:nomis_offender, offender_no: 'AB000C') }
 
   describe '#additional_information' do
     let(:api_offender) { double(:nomis_offender, recalled?: recalled) }
@@ -106,8 +107,6 @@ RSpec.describe MpcOffender, type: :model do
       end
     end
   end
-
-  let(:api_offender) { double(:nomis_offender, offender_no: 'AB000C') }
 
   describe '#rosh_summary' do
     before do
