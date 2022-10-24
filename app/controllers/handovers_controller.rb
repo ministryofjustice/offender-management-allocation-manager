@@ -22,6 +22,8 @@ class HandoversController < PrisonsApplicationController
 
   def upcoming; end
 
+  def in_progress; end
+
 private
 
   def new_handovers_ui?
