@@ -15,7 +15,6 @@ Rails.application.routes.draw do
     resources :handovers, only: :index do
       collection do
         get :upcoming
-        get :in_progress
       end
     end
     resources :staff do
