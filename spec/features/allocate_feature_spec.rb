@@ -167,7 +167,7 @@ feature 'Allocation' do
     # Goes to 'allocations' page
     visit allocated_prison_prisoners_path('LEI')
     within('.allocated_offender_row_0') do
-      click_link 'View'
+      click_link recently_allocated_offender_name
     end
 
     # Takes you to the 'View a case' page (Allocation information)
