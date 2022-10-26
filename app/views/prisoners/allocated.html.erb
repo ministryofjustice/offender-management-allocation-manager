@@ -4,6 +4,8 @@
   <%= render '/layouts/prison_switcher' %>
 <% end %>
 
+<h1 class="govuk-heading-xl">Allocations</h1>
+
 <div class="govuk-!-margin-bottom-4">
   <%= render "search/search_box" %>
 </div>
@@ -14,7 +16,7 @@
                                                             :allocated_count => @allocated.count,
                                                             :new_arrivals_count => @new_arrivals.count
 }) %>
-<h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Allocations</h1>
+<h2 class="govuk-heading-l govuk-!-margin-bottom-4">See allocations</h2>
 
 <section id="allocated">
   <%= render(
@@ -28,7 +30,7 @@
     <tr class="govuk-table__row">
       <th class="govuk-table__header" scope="col">
         <a href="<%= sort_link('last_name') %>">
-          Prisoner
+          Case
         </a>
         <%= sort_arrow('last_name') %>
       </th>
@@ -44,21 +46,31 @@
         </a>
         <%= sort_arrow('earliest_release_date') %>
       </th>
-      <th class="govuk-table__header" scope="col">POM</th>
+      <th class="govuk-table__header sorter-false" scope="col">
+        <a href="<%= sort_link('tier') %>">
+          Tier
+        </a>
+        <%= sort_arrow('tier') %>
+      </th>
+      <th class="govuk-table__header" scope="col">
+        <a href="<%= sort_link('allocated_pom_name') %>">
+          POM
+        </a>
+        <%= sort_arrow('allocated_pom_name') %>
+      </th>
       <th class="govuk-table__header sorter-false" scope="col">
         <a href="<%= sort_link('allocation_date') %>">
           Allocation date
         </a>
         <%= sort_arrow('allocation_date') %>
       </th>
-      <th class="govuk-table__header sorter-false" scope="col">Action</th>
     </tr>
     </thead>
     <tbody class="govuk-table__body">
     <% @offenders.each_with_index do |offender, i| %>
       <tr class="govuk-table__row allocated_offender_row_<%= i %>">
         <td aria-label="Prisoner" class="govuk-table__cell">
-          <%= offender.full_name %>
+          <%= link_to offender.full_name, prison_prisoner_allocation_path(@prison.code, prisoner_id: offender.offender_no, sort: params[:sort], page: params[:page] || 1) %>
           <br/>
           <span class='govuk-hint govuk-!-margin-bottom-0'>
             <%= offender.offender_no %>
@@ -75,11 +87,13 @@
             Unknown
           <% end %>
         </td>
-        <td aria-label="POM" class="govuk-table__cell"><%= offender.allocated_pom_name %></td>
-        <td aria-label="Allocation date" class="govuk-table__cell"><%= format_date(offender.allocation_date) %></td>
-        <td aria-label="Action" class="govuk-table__cell ">
-          <%= link_to "View", prison_prisoner_allocation_path(@prison.code, prisoner_id: offender.offender_no, sort: params[:sort], page: params[:page] || 1) %>
+        <td aria-label="Tier" class="govuk-table__cell">
+          <%= offender.tier %>
         </td>
+        <td aria-label="POM" class="govuk-table__cell">
+          <%= link_to offender.allocated_pom_name, prison_pom_path(offender.prison.code, offender.allocated_pom_nomis_id), class: "govuk-link" %>
+        </td>
+        <td aria-label="Allocation date" class="govuk-table__cell"><%= format_date(offender.allocation_date) %></td>
       </tr>
     <% end %>
     </tbody>
