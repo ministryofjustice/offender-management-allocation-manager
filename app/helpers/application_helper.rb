@@ -26,7 +26,7 @@ module ApplicationHelper
       'PO' => 'Probation Officer POM',
       'PRO' => 'Prison Officer POM',
       'STAFF' => 'N/A'
-    }.fetch(level)
+    }[level]
   end
 
   def service_provider_label(provider)
