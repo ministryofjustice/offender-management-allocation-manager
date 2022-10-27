@@ -210,32 +210,36 @@ class MpcOffender
   end
 
   def rosh_summary
-    community_data = OffenderService.get_community_data(offender_no)
-    all_risks = HmppsApi::AssessRisksAndNeedsApi.get_rosh_summary(community_data[:crn])
+    nil_result = { high_rosh_children: nil,
+                   high_rosh_public: nil,
+                   high_rosh_known_adult: nil,
+                   high_rosh_staff: nil,
+                   high_rosh_prisoners: nil }
 
-    grouped_risks = {}.tap do |risks|
-      if all_risks['riskInCustody'].present?
-        all_risks['riskInCustody'].each do |level, groups|
-          groups.each { |group| risks[group] = level.tr('_', ' ').downcase }
+    return nil_result unless USE_RISKS_API
+
+    begin
+      community_data = OffenderService.get_community_data(offender_no)
+      all_risks = HmppsApi::AssessRisksAndNeedsApi.get_rosh_summary(community_data[:crn])
+
+      grouped_risks = {}.tap do |risks|
+        if all_risks['riskInCustody'].present?
+          all_risks['riskInCustody'].each do |level, groups|
+            groups.each { |group| risks[group] = level.tr('_', ' ').downcase }
+          end
         end
       end
-    end
 
-    {
-      high_rosh_children: grouped_risks['Children'],
-      high_rosh_public: grouped_risks['Public'],
-      high_rosh_known_adult: grouped_risks['Know adult'],
-      high_rosh_staff: grouped_risks['Staff'],
-      high_rosh_prisoners: grouped_risks['Prisoners']
-    }
-  rescue Faraday::ResourceNotFound
-    {
-      high_rosh_children: nil,
-      high_rosh_public: nil,
-      high_rosh_known_adult: nil,
-      high_rosh_staff: nil,
-      high_rosh_prisoners: nil
-    }
+      {
+        high_rosh_children: grouped_risks['Children'],
+        high_rosh_public: grouped_risks['Public'],
+        high_rosh_known_adult: grouped_risks['Know adult'],
+        high_rosh_staff: grouped_risks['Staff'],
+        high_rosh_prisoners: grouped_risks['Prisoners']
+      }
+    rescue Faraday::ResourceNotFound
+      nil_result
+    end
   end
 
   def active_alert_labels

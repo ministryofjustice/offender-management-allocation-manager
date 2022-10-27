@@ -110,6 +110,7 @@ RSpec.describe MpcOffender, type: :model do
 
   describe '#rosh_summary' do
     before do
+      stub_const('USE_RISKS_API', true)
       allow(OffenderService).to receive(:get_community_data).and_return({})
 
       allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_rosh_summary).and_return(
