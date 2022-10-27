@@ -1,7 +1,7 @@
 RSpec.describe HandoversController, type: :controller do
   let(:prison_code) { 'DBG' }
   let(:prison) { instance_double Prison, :prison, code: prison_code }
-  let(:default_params) { { new_handover: NEW_HANDOVER_TOKEN, prison_id: prison_code } }
+  let(:default_params) { { prison_id: prison_code } }
   let(:staff_id) { 456_987 }
   let(:pom_staff_member) { instance_double StaffMember, :pom_staff_member, staff_id: staff_id }
   let(:upcoming_handover_allocated_offenders) do
@@ -22,6 +22,8 @@ RSpec.describe HandoversController, type: :controller do
     controller.instance_variable_set(:@current_user, pom_staff_member)
 
     allow(HandoverCasesList).to receive(:new).with(staff_member: pom_staff_member).and_return(handover_cases)
+
+    session[:new_handovers_ui] = true
   end
 
   shared_examples 'handover cases list page' do

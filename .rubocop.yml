@@ -154,6 +154,9 @@ RSpec/StubbedMock:
 RSpec/DescribeMethod:
   Enabled: false
 
+RSpec/PredicateMatcher:
+  Enabled: false
+
 # Below here is the set of (arbitrary) style failures against the govuk versions
 Style/WordArray:
   Enabled: false
