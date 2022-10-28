@@ -104,4 +104,9 @@ module FeaturesHelper
   def reload_page
     visit current_path
   end
+
+  def activate_new_handovers_ui
+    visit "/feature_flags/activate_new_handovers_ui?token=#{NEW_HANDOVER_TOKEN}"
+    expect(page.status_code).to eq 200
+  end
 end

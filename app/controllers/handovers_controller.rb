@@ -27,12 +27,16 @@ class HandoversController < PrisonsApplicationController
 private
 
   def new_handovers_ui?
-    params[:new_handover] == NEW_HANDOVER_TOKEN
+    session[:new_handovers_ui] == true
   end
 
   def check_prerequisites_and_prepare_variables
+    unless new_handovers_ui?
+      redirect_to '/401'
+      return
+    end
+
     ensure_pom
-    redirect_to '/401' unless new_handovers_ui?
     @prison_id = active_prison_id
     @handover_cases = HandoverCasesList.new(staff_member: @current_user)
   end

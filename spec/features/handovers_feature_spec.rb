@@ -4,12 +4,7 @@ RSpec.feature 'Handovers feature:' do
   let!(:prison) { FactoryBot.create(:prison) }
   let(:prison_code) { prison.code }
   let(:user) { FactoryBot.build(:pom) }
-  let(:default_params) do
-    {
-      prison_id: prison_code,
-      new_handover: NEW_HANDOVER_TOKEN
-    }
-  end
+  let(:default_params) { { prison_id: prison_code } }
   let(:offender_attrs) do
     erd = Faker::Date.forward
     {
@@ -26,6 +21,7 @@ RSpec.feature 'Handovers feature:' do
   before do
     stub_auth_token
     stub_user(staff_id: user.staff_id)
+    activate_new_handovers_ui
 
     signin_pom_user([prison_code])
     stub_poms(prison_code, [user])
