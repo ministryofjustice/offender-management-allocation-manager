@@ -18,6 +18,7 @@ Rails.application.routes.draw do
         get :in_progress
       end
     end
+    resources :handover_progress_checklists, only: %i[show]
     resources :staff do
       resources :caseload_handovers, only: %i[index]
       #resources :caseload do
