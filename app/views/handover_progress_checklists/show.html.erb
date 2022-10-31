@@ -1,0 +1,106 @@
+<%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-4">
+      Record handover progress for Bảo
+    </h1>
+
+    <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Handover started</h2>
+    <p class="govuk-body">You have completed 1 of 3 tasks.</p>
+
+    <div class="govuk-inset-text">
+      COM responsible from 28 Jul 2021.
+    </div>
+
+    <form action="#" method="post" novalidate="">
+      <div class="app-task-list">
+        <ul class="app-task-list__items">
+          <li class="app-task-list__item">
+
+            <div class="govuk-checkboxes">
+              <div class="govuk-checkboxes__item">
+                <input class="govuk-checkboxes__input" id="oasys" name="oasys" type="checkbox" value="complete" checked="checked">
+                <label class="govuk-label govuk-checkboxes__label" for="oasys">
+                  <strong>Review the last OASys assessment</strong>
+                </label>
+                <strong class="govuk-tag  app-task-list__tag" id="oaysys-review">Complete</strong>
+
+                <div>
+                  <p class="govuk-hint govuk-checkboxes__hint">
+                    Check the last OASys assessment still reflects current risks and circumstances. If not, update
+                    it to show how things have changed and any work not completed.
+                  </p>
+                </div>
+
+              </div>
+
+            </div>
+          </li>
+
+          <li class="app-task-list__item">
+            <div class="govuk-checkboxes">
+              <div class="govuk-checkboxes__item">
+                <input class="govuk-checkboxes__input" id="share" name="share" type="checkbox" value="complete">
+                <label class="govuk-label govuk-checkboxes__label" for="share">
+                  <strong>Have contact from COM</strong>
+                </label>
+                <strong class="govuk-tag govuk-tag--grey app-task-list__tag" id="explain-handover">To do</strong>
+                <div>
+                  <p class="govuk-hint govuk-checkboxes__hint">Highlight any of the prisoner's pre-release or
+                    pre-parole needs and any public protection concerns you have identified.</p>
+                </div>
+              </div>
+            </div>
+          </li>
+
+          <li class="app-task-list__item">
+            <div class="govuk-checkboxes">
+              <div class="govuk-checkboxes__item">
+                <input class="govuk-checkboxes__input" id="report" name="report" type="checkbox" value="complete">
+                <label class="govuk-label govuk-checkboxes__label" for="report">
+                  <strong>Attend handover meeting</strong>
+                </label>
+                <strong class="govuk-tag govuk-tag--grey app-task-list__tag" id="explain-handover">To do</strong>
+                <div>
+                  <p class="govuk-hint govuk-checkboxes__hint">
+                    The COM should be in touch about arranging this with  you, the prisoner and anyone else involved in
+                    the case, such as family members and key  workers.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="govuk-button-group" style="margin-top: -20px;">
+        <button class="govuk-button" data-module="govuk-button">
+          Save tasks
+        </button>
+
+        <a class="govuk-link govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+  <div class="govuk-grid-column-one-third">
+    <%= render '/handovers/more_on_handovers' %>
+
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+    <h2 class="govuk-heading-m" id="subsection-title">
+      Case details
+    </h2>
+    <ul class="govuk-list govuk-!-font-size-16">
+      <li>
+        <p class="govuk-body">Name: <a href="#">Bảo Nguyễn</a></p>
+        <p class="govuk-body">Date of birth: 15 Jan 2000 </p>
+        <p class="govuk-body">Prison number: G2911GD</p>
+        <p class="govuk-body">COM name: Stephen Dicks</p>
+        <p class="govuk-body">COM email: stephen.dicks@justice.gov.uk</p>
+      </li>
+    </ul>
+  </div>
+</div>
