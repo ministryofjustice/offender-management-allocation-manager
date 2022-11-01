@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe HandoverDateService, 'old policy, old' do # rubocop:disable RSpec/FilePath
+describe HandoverDateService, 'old policy, old' do
   let(:prison) { build(:prison) }
 
   before do

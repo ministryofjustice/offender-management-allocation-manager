@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe HandoverDateService, 'old policy, responsibility' do # rubocop:disable RSpec/FilePath
+describe HandoverDateService, 'old policy, responsibility' do
   let(:prison) { build(:prison) }
   let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
