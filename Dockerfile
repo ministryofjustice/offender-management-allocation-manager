@@ -41,7 +41,7 @@ RUN \
     libpq-dev \
     libjemalloc-dev \
   && timedatectl set-timezone Europe/London || true \
-  && gem update bundler --no-document \
+  && gem install bundler -v 2.2.29 --no-document \
   && apt-get clean
 
 # Install Node.js and Yarn
