@@ -157,6 +157,9 @@ RSpec/DescribeMethod:
 RSpec/PredicateMatcher:
   Enabled: false
 
+RSpec/ExampleWording:
+  Enabled: false
+
 # Below here is the set of (arbitrary) style failures against the govuk versions
 Style/WordArray:
   Enabled: false
@@ -171,4 +174,7 @@ Style/TrailingCommaInArrayLiteral:
   Enabled: false
 
 Style/MethodCalledOnDoEndBlock:
+  Enabled: false
+
+Style/EachForSimpleLoop:
   Enabled: false

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe HandoverDateService, 'old policy' do # rubocop:disable RSpec/FilePath
+describe HandoverDateService, 'old policy' do
   subject { described_class.handover(offender) }
 
   before do
