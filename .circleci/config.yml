@@ -388,7 +388,6 @@ workflows:
             branches:
               ignore: [main, preproduction, test]
       - verify_docker_image_builds:
-          requires: [install_dependencies]
           filters:
             branches:
               ignore: [main, preproduction, test]
