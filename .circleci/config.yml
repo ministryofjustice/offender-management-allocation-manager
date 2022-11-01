@@ -242,6 +242,19 @@ jobs:
       - *build_docker_image
       - *push_docker_image
 
+  verify_docker_image_builds:
+    <<: *defaults
+    <<: *test_container_config
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - setup_remote_docker:
+          version: 20.10.14
+          docker_layer_caching: true
+      - aws-cli/install
+      - *build_docker_image
+
   deploy_staging:
     <<: *deploy_container_config
     steps:
@@ -370,6 +383,11 @@ workflows:
             branches:
               ignore: [main, preproduction, test]
       - test:
+          requires: [install_dependencies]
+          filters:
+            branches:
+              ignore: [main, preproduction, test]
+      - verify_docker_image_builds:
           requires: [install_dependencies]
           filters:
             branches:
