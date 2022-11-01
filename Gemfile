@@ -60,11 +60,8 @@ group :development, :test do
   gem 'dotenv-rails'
   gem 'factory_bot_rails'
   gem 'parallel_tests'
-  gem 'rubocop'
-  gem 'rubocop-rspec'
-  gem 'rubocop-performance'
-  gem 'rubocop-rails'
-  gem 'rubocop-govuk'
+  gem 'rubocop-govuk', '~> 4.8'
+  gem 'rubocop-performance', '~> 1.15'
   # needed to support Rails 6.0
   gem 'rspec-rails'
   gem 'rswag-specs'
