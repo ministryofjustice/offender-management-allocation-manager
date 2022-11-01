@@ -83,13 +83,13 @@ class BuildAllocationsController < PrisonsApplicationController
                       end,
             additional_notes: allocation_params[:message],
             mappa_level: @prisoner.mappa_level,
-            ldu_name: @prisoner.ldu_name,
-            ldu_email: @prisoner.ldu_email_address,
-            com_name: @prisoner.allocated_com_name,
-            com_email: @prisoner.allocated_com_email,
-            handover_start_date: @prisoner.handover_start_date,
-            handover_completion_date: @prisoner.responsibility_handover_date,
-            last_oasys_completed: last_oasys_completed(@prisoner.offender_no),
+            ldu_name: @prisoner.ldu_name || 'Unknown',
+            ldu_email: @prisoner.ldu_email_address || 'Unknown',
+            com_name: view_context.unreverse_name(@prisoner.allocated_com_name) || 'Unknown',
+            com_email: @prisoner.allocated_com_email || 'Unknown',
+            handover_start_date: view_context.format_date(@prisoner.handover_start_date) || 'Unknown',
+            handover_completion_date: view_context.format_date(@prisoner.responsibility_handover_date) || 'Unknown',
+            last_oasys_completed: view_context.format_date(last_oasys_completed(@prisoner.offender_no)) || 'Unknown',
             active_alerts: @prisoner.active_alert_labels.join(', ')
           }.merge(@prisoner.rosh_summary)
         )

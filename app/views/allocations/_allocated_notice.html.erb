@@ -20,7 +20,9 @@
           <li>POM: <%= pom_name %></li>
           <li>POM role: <%= pom_role %></li>
 
-          <li class="govuk-!-margin-top-4">MAPPA: <%= mappa_level %></li>
+          <% if USE_MAPPA_IN_ALLOC_MSG %>
+            <li class="govuk-!-margin-top-4">MAPPA: <%= mappa_level %></li>
+          <% end %>
 
           <% unless [high_rosh_children, high_rosh_public, high_rosh_known_adult, high_rosh_staff, high_rosh_prisoners].compact.empty? %>
             <li class="govuk-!-margin-top-4">High RoSH:
@@ -34,7 +36,9 @@
             </li>
           <% end %>
 
-          <li class="govuk-!-margin-top-4">Active alerts: <%= active_alerts %></li>
+          <% if USE_ALERTS_IN_ALLOC_MSG %>
+            <li class="govuk-!-margin-top-4">Active alerts: <%= active_alerts %></li>
+          <% end %>
 
           <li class="govuk-!-margin-top-4">Last OASys completed: <%= last_oasys_completed %></li>
           <li>Handover start due: <%= handover_start_date %></li>

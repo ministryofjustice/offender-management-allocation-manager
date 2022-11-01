@@ -59,4 +59,10 @@ module ApplicationHelper
       mail_to(email)
     end
   end
+
+  def unreverse_name(reversed_name)
+    return '' if reversed_name.blank?
+
+    reversed_name.split(',').reverse.join(' ').strip
+  end
 end
