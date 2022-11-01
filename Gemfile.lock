@@ -537,7 +537,7 @@ GEM
     stackprof (0.2.21)
     sys-uname (1.2.2)
       ffi (~> 1.1)
-    test-prof (1.0.10)
+    test-prof (1.0.11)
     thor (1.2.1)
     tilt (2.0.10)
     timecop (0.9.4)
