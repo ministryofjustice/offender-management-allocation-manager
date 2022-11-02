@@ -91,7 +91,7 @@ feature 'case information feature' do
       expect(page).to have_selector('h1', text: 'Case information')
       click_link 'Back'
       find('#awaiting-information')
-      expect(page).to have_selector('h1', text: 'Add missing details')
+      expect(page).to have_selector('h2', text: 'Add missing details')
       expect(current_page_number).to eq(3)
     end
 
