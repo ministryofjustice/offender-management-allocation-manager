@@ -88,10 +88,10 @@ feature 'case information feature' do
       within ".govuk-table tr:first-child td:nth-child(3)" do
         click_link 'Add missing details'
       end
-      expect(page).to have_selector('h1', text: 'Case information')
+      expect(page).to have_content('Case information')
       click_link 'Back'
       find('#awaiting-information')
-      expect(page).to have_selector('h2', text: 'Add missing details')
+      expect(page).to have_content('Add missing details')
       expect(current_page_number).to eq(3)
     end
 

@@ -90,12 +90,12 @@ feature "female prison index page" do
 
     it 'shows newly arrived offenders' do
       click_link('Newly arrived (1)')
-      expect(page).to have_css("h2", text: "Newly arrived")
+      expect(page).to have_content("Newly arrived")
     end
 
     it 'shows offenders with missing information' do
       click_link('Add missing details (3)')
-      expect(page).to have_css("h2", text: "Add missing details")
+      expect(page).to have_content("Add missing details")
     end
   end
 end
