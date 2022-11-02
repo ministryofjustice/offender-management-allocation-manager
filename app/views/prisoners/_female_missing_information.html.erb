@@ -4,6 +4,8 @@
   <%= render '/layouts/prison_switcher' %>
 <% end %>
 
+<h1 class="govuk-heading-xl">Allocations</h1>
+
 <div class="govuk-!-margin-bottom-4">
   <label class="govuk-label moj-search__label govuk-!-font-weight-bold" for="search">
     Find a case
@@ -18,7 +20,7 @@
                                                           :new_arrivals_count => @new_arrivals.count
                                                           }) %>
 
-<h1 class="govuk-heading-l">Add missing details</h1>
+<h2 class="govuk-heading-l">Add missing details</h2>
 <p id="number-of-cases">You need to add missing details to <%= @missing_info.count %> cases so they can be allocated to a POM.</p>
 
 <section id="awaiting-information">
