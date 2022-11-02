@@ -14,6 +14,10 @@
 // Import GOV.UK Design System first
 @import "gov_uk";
 
+// GOV.UK Design System customizations
+@import "gov_uk_tag";
+@import "gov_uk_button_group";
+
 // Then application specific components
 @import "case_mix";
 @import "case_type_badge";
