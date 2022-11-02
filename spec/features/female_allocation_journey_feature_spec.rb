@@ -33,6 +33,7 @@ feature "womens allocation journey" do
     alloc.deallocate_offender_after_release
 
     stub_request(:get, "https://www.gov.uk/bank-holidays.json").to_return(body: {}.to_json)
+    stub_community_offender(nomis_offender_id, build(:community_data))
   end
 
   context 'without an existing allocation' do
@@ -136,6 +137,8 @@ feature "womens allocation journey" do
       within '.allocated_offender_row_0' do
         click_link offender_name
       end
+
+      stub_community_offender(offender_id, build(:community_data))
     end
 
     scenario 'accepting recommendation' do

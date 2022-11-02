@@ -10,6 +10,10 @@
   </p>
 <% end %>
 
+<% if @latest_allocation_details.present? %>
+  <%= render partial: 'allocations/allocated_notice', locals: @latest_allocation_details %>
+<% end %>
+
 <% if alert.present? %>
   <p class="alert govuk-!-margin-bottom-9" role="group" aria-labelledby="error-summary-heading">
     <%= alert %>

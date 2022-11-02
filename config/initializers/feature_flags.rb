@@ -1,1 +1,4 @@
 USE_NEW_HANDOVER_POLICY = ENV.fetch('USE_NEW_HANDOVER_POLICY', '').strip == '1'
+USE_RISKS_API = ENV.fetch('USE_RISKS_API', '').strip == '1'
+USE_ALERTS_IN_ALLOC_MSG = ENV.fetch('USE_ALERTS_IN_ALLOC_MSG', '').strip == '1'
+USE_MAPPA_IN_ALLOC_MSG = ENV.fetch('USE_MAPPA_IN_ALLOC_MSG', '').strip == '1'
