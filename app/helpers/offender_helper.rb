@@ -117,18 +117,18 @@ module OffenderHelper
       com_email: (offender.allocated_com_email.presence || 'Unknown'),
       handover_start_date: (view_context.format_date(offender.handover_start_date).presence || 'Unknown'),
       handover_completion_date: (view_context.format_date(offender.responsibility_handover_date).presence || 'Unknown'),
-      last_oasys_completed: (last_oasys_completed(offender.offender_no, view_context) || 'No OASys information'),
+      last_oasys_completed: (view_context.format_date(last_oasys_completed(offender.offender_no)).presence || 'No OASys information'),
       active_alerts: offender.active_alert_labels.join(', ')
     }.merge(offender.rosh_summary)
   end
 
-  def last_oasys_completed(offender_no, view_context)
+  def last_oasys_completed(offender_no)
     details = HmppsApi::AssessmentApi.get_latest_oasys_date(offender_no)
 
     return nil if details.nil? ||
       details.fetch(:assessment_type) == Faraday::ConflictError ||
       details.fetch(:assessment_type) == Faraday::ServerError
 
-    view_context.format_date details.fetch(:completed)
+    details.fetch(:completed)
   end
 end
