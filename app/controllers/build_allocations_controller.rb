@@ -6,6 +6,7 @@ class BuildAllocationsController < PrisonsApplicationController
   before_action :set_referrer
 
   include Wicked::Wizard
+  include OffenderHelper
 
   steps :override, :allocate
 
@@ -72,26 +73,7 @@ class BuildAllocationsController < PrisonsApplicationController
 
       unless event == :reallocate_primary_pom && staff_id == history.primary_pom_nomis_id
         store_latest_allocation_details(
-          {
-            offender_name: @prisoner.full_name_ordered,
-            prisoner_number: @prisoner.offender_no,
-            pom_name: view_context.full_name_ordered(pom),
-            pom_role: if @prisoner.pom_responsible?
-                        'Responsible'
-                      else
-                        (@prisoner.com_responsible? ? 'Supporting' : '')
-                      end,
-            additional_notes: allocation_params[:message],
-            mappa_level: @prisoner.mappa_level,
-            ldu_name: @prisoner.ldu_name || 'Unknown',
-            ldu_email: @prisoner.ldu_email_address || 'Unknown',
-            com_name: view_context.unreverse_name(@prisoner.allocated_com_name) || 'Unknown',
-            com_email: @prisoner.allocated_com_email || 'Unknown',
-            handover_start_date: view_context.format_date(@prisoner.handover_start_date) || 'Unknown',
-            handover_completion_date: view_context.format_date(@prisoner.responsibility_handover_date) || 'Unknown',
-            last_oasys_completed: view_context.format_date(last_oasys_completed(@prisoner.offender_no)) || 'Unknown',
-            active_alerts: @prisoner.active_alert_labels.join(', ')
-          }.merge(@prisoner.rosh_summary)
+          format_allocation(@prisoner, pom, allocation_params[:message], view_context)
         )
       end
 
@@ -123,15 +105,5 @@ private
 
   def staff_id
     params.require(:staff_id).to_i
-  end
-
-  def last_oasys_completed(offender_no)
-    details = HmppsApi::AssessmentApi.get_latest_oasys_date(offender_no)
-
-    return nil if details.nil? ||
-      details.fetch(:assessment_type) == Faraday::ConflictError ||
-      details.fetch(:assessment_type) == Faraday::ServerError
-
-    details.fetch(:completed)
   end
 end
