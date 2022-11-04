@@ -18,7 +18,8 @@ Rails.application.routes.draw do
         get :in_progress
       end
     end
-    resources :handover_progress_checklists, only: %i[show]
+    get 'handovers/:id/progress_checklist' => 'handover_progress_checklists#edit', as: :edit_handover_progress_checklist
+    put 'handovers/:id/progress_checklist' => 'handover_progress_checklists#update', as: :update_handover_progress_checklist
     resources :staff do
       resources :caseload_handovers, only: %i[index]
       #resources :caseload do

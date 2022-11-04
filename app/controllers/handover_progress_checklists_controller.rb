@@ -1,3 +1,7 @@
 class HandoverProgressChecklistsController < PrisonsApplicationController
-  def show; end
+  def edit; end
+
+  def update
+    raise NotImplementedError
+  end
 end

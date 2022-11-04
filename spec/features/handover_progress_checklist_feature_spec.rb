@@ -13,7 +13,7 @@ RSpec.feature 'Handover progress checklist feature:' do
   end
 
   it 'works' do
-    visit prison_handover_progress_checklist_path(default_params.merge(id: 'ABC123D'))
+    visit prison_edit_handover_progress_checklist_path(default_params.merge(id: 'ABC123D'))
     expect(page.status_code).to eq 200
   end
 end
