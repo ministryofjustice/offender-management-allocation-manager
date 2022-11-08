@@ -17,8 +17,7 @@
     <%= form_for(@handover_progress_checklist,
                  url: prison_update_handover_progress_checklist_path(@prison.code,
                                                                      @handover_progress_checklist.nomis_offender_id),
-                 method: :put,
-                 builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |form| %>
+                 method: :put) do |form| %>
       <%= form.hidden_field(:nomis_offender_id) %>
 
       <div class="app-task-list">
