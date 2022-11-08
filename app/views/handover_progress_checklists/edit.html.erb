@@ -10,46 +10,50 @@
     <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Handover started</h2>
     <p class="govuk-body">You have completed 1 of 3 tasks.</p>
 
-    <div class="govuk-inset-text">
+    <div class="govuk-inset-text govuk-inset-text--com-responsible-date">
       COM responsible from 28 Jul 2021.
     </div>
 
-    <form action="#" method="post" novalidate="">
+    <%= form_for(@handover_progress_checklist,
+                 url: prison_update_handover_progress_checklist_path(@prison.code,
+                                                                     @handover_progress_checklist.nomis_offender_id),
+                 method: :put,
+                 builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |form| %>
+      <%= form.hidden_field(:nomis_offender_id) %>
+
       <div class="app-task-list">
         <ul class="app-task-list__items">
-          <li class="app-task-list__item">
 
+          <li class="app-task-list__item">
             <div class="govuk-checkboxes">
               <div class="govuk-checkboxes__item">
-                <input class="govuk-checkboxes__input" id="oasys" name="oasys" type="checkbox" value="complete" checked="checked">
-                <label class="govuk-label govuk-checkboxes__label" for="oasys">
+                <%= form.check_box :reviewed_oasys, class: 'govuk-checkboxes__input', 'aria-describedby': 'reviewed-oasys-hint' %>
+                <%= form.label :reviewed_oasys, class: 'govuk-label govuk-checkboxes__label' do %>
                   <strong>Review the last OASys assessment</strong>
-                </label>
-                <strong class="govuk-tag  app-task-list__tag" id="oaysys-review">Complete</strong>
+                <% end %>
+                <strong class="govuk-tag app-task-list__tag">Complete</strong>
 
-                <div>
-                  <p class="govuk-hint govuk-checkboxes__hint">
-                    Check the last OASys assessment still reflects current risks and circumstances. If not, update
-                    it to show how things have changed and any work not completed.
-                  </p>
-                </div>
-
+                <span class="govuk-hint govuk-checkboxes__hint" id="reviewed-oasys-hint">
+                  Check the last OASys assessment still reflects current risks and circumstances. If not, update it to
+                  show how things have changed and any work not completed.
+                </span>
               </div>
-
             </div>
           </li>
 
           <li class="app-task-list__item">
             <div class="govuk-checkboxes">
               <div class="govuk-checkboxes__item">
-                <input class="govuk-checkboxes__input" id="share" name="share" type="checkbox" value="complete">
-                <label class="govuk-label govuk-checkboxes__label" for="share">
+                <%= form.check_box :contacted_com, class: 'govuk-checkboxes__input', 'aria-describedby': 'contacted-com-hint' %>
+                <%= form.label :contacted_com, class: 'govuk-label govuk-checkboxes__label' do %>
                   <strong>Have contact from COM</strong>
-                </label>
-                <strong class="govuk-tag govuk-tag--grey app-task-list__tag" id="explain-handover">To do</strong>
+                <% end %>
+                <strong class="govuk-tag govuk-tag--grey app-task-list__tag">To do</strong>
                 <div>
-                  <p class="govuk-hint govuk-checkboxes__hint">Highlight any of the prisoner's pre-release or
-                    pre-parole needs and any public protection concerns you have identified.</p>
+                <span class="govuk-hint govuk-checkboxes__hint" id="contacted-com-hint">
+                    Highlight any of the prisoner's pre-release or pre-parole needs and any public protection concerns
+                    you have identified.
+                </span>
                 </div>
               </div>
             </div>
@@ -58,31 +62,33 @@
           <li class="app-task-list__item">
             <div class="govuk-checkboxes">
               <div class="govuk-checkboxes__item">
-                <input class="govuk-checkboxes__input" id="report" name="report" type="checkbox" value="complete">
-                <label class="govuk-label govuk-checkboxes__label" for="report">
+                <%= form.check_box :attended_handover_meeting, class: 'govuk-checkboxes__input',
+                                   'aria-describedby': 'attended-handover-meeting-hint' %>
+                <%= form.label :attended_handover_meeting, class: 'govuk-label govuk-checkboxes__label' do %>
                   <strong>Attend handover meeting</strong>
-                </label>
-                <strong class="govuk-tag govuk-tag--grey app-task-list__tag" id="explain-handover">To do</strong>
+                <% end %>
+                <strong class="govuk-tag govuk-tag--grey app-task-list__tag">To do</strong>
                 <div>
-                  <p class="govuk-hint govuk-checkboxes__hint">
-                    The COM should be in touch about arranging this with  you, the prisoner and anyone else involved in
-                    the case, such as family members and key  workers.
-                  </p>
+                <span class="govuk-hint govuk-checkboxes__hint" id="attended-handover-meeting-hint">
+                    The COM should be in touch about arranging this with you, the prisoner and anyone else involved in
+                    the case, such as family members and key workers.
+                </span>
                 </div>
               </div>
             </div>
           </li>
+
         </ul>
       </div>
 
-      <div class="govuk-button-group" style="margin-top: -20px;">
-        <button class="govuk-button" data-module="govuk-button">
-          Save tasks
-        </button>
+      <div class="govuk-button-group handover-progress-checklist-save-tasks">
+        <%= form.button 'Save tasks', type: 'submit', role: 'button', draggable: 'false',
+                        class: 'govuk-button', data: { module: 'govuk-button' } %>
 
-        <a class="govuk-link govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        <%= link_to 'Cancel', 'javascript:history.back()',
+                    class: "govuk-link govuk-link govuk-link--no-visited-state" %>
       </div>
-    </form>
+    <% end %>
   </div>
 
   <div class="govuk-grid-column-one-third">
