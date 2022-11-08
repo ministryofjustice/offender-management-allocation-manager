@@ -10,17 +10,7 @@ RSpec.describe HandoversController, type: :controller do
   let(:handover_cases) { instance_double HandoverCasesList, :handover_cases }
 
   before do
-    # TODO: this amount of stubbing to get the tests to run really tells us that our controller plumbing is not very
-    #  well designed. We need to find ways to tidy it up, one strand at a time.
-    allow(controller).to receive(:authenticate_user)
-    allow(controller).to receive(:check_prison_access)
-    allow(controller).to receive(:load_staff_member)
-    allow(controller).to receive(:service_notifications)
-    allow(controller).to receive(:load_roles)
-    allow(controller).to receive(:ensure_pom)
-    allow(controller).to receive(:active_prison_id).and_return(prison_code)
-    controller.instance_variable_set(:@current_user, pom_staff_member)
-
+    stub_high_level_pom_auth(prison_code: prison_code, pom_staff_member: pom_staff_member)
     allow(HandoverCasesList).to receive(:new).with(staff_member: pom_staff_member).and_return(handover_cases)
 
     session[:new_handovers_ui] = true

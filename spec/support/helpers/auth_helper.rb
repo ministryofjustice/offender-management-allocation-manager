@@ -34,4 +34,21 @@ module AuthHelper
     stub_request(:get, "#{ApiHelper::T3}/staff/754732/emails")
         .to_return(body: emails.to_json)
   end
+
+  # Stub out POM authentication and authorization at a high level - does not go near the API calls, simply stubs out
+  # the controller helpers that authenticate and authorize.
+  #
+  # @param pom_staff_member If StaffMember model/stub is given, authorize to that; otherwise create a new anonymous stub
+  def stub_high_level_pom_auth(prison_code:, pom_staff_member: nil)
+    # TODO: this amount of stubbing to get the tests to run really tells us that our controller plumbing is not very
+    #  well designed. We need to find ways to tidy it up, one strand at a time.
+    allow(controller).to receive(:authenticate_user)
+    allow(controller).to receive(:check_prison_access)
+    allow(controller).to receive(:load_staff_member)
+    allow(controller).to receive(:service_notifications)
+    allow(controller).to receive(:load_roles)
+    allow(controller).to receive(:ensure_pom)
+    allow(controller).to receive(:active_prison_id).and_return(prison_code)
+    controller.instance_variable_set(:@current_user, pom_staff_member)
+  end
 end
