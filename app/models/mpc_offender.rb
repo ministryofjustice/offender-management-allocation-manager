@@ -154,6 +154,10 @@ class MpcOffender
     end
   end
 
+  def com_responsible_date
+    CalculatedHandoverDate.find_by(nomis_offender_id: offender_no)&.com_responsible_date
+  end
+
   # early allocation methods
 
   def parole_review_date
