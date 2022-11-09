@@ -4,14 +4,14 @@
   <div class="govuk-grid-column-two-thirds">
 
     <h1 class="govuk-heading-l govuk-!-margin-bottom-4">
-      Record handover progress for Bảo
+      Record handover progress for <%= @offender.first_name.titleize %>
     </h1>
 
     <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Handover started</h2>
     <p class="govuk-body">You have completed 1 of 3 tasks.</p>
 
     <div class="govuk-inset-text govuk-inset-text--com-responsible-date">
-      COM responsible from 28 Jul 2021.
+      COM responsible from <%= format_date(@offender.com_responsible_date, replacement: 'Unknown') %>
     </div>
 
     <%= form_for(@handover_progress_checklist,
@@ -100,11 +100,13 @@
     </h2>
     <ul class="govuk-list govuk-!-font-size-16">
       <li>
-        <p class="govuk-body">Name: <a href="#">Bảo Nguyễn</a></p>
-        <p class="govuk-body">Date of birth: 15 Jan 2000 </p>
-        <p class="govuk-body">Prison number: G2911GD</p>
-        <p class="govuk-body">COM name: Stephen Dicks</p>
-        <p class="govuk-body">COM email: stephen.dicks@justice.gov.uk</p>
+        <p class="govuk-body">
+          Name: <%= link_to @offender.full_name_ordered, prison_prisoner_path(@prison.code, @offender.offender_no) %>
+        </p>
+        <p class="govuk-body">Date of birth: <%= format_date(@offender.date_of_birth, replacement: 'Unknown') %></p>
+        <p class="govuk-body">Prison number: <%= @offender.offender_no %></p>
+        <p class="govuk-body">COM name: <%= @offender.allocated_com_name %></p>
+        <p class="govuk-body">COM email: <%= @offender.allocated_com_email %></p>
       </li>
     </ul>
   </div>

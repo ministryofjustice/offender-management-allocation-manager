@@ -1,10 +1,15 @@
 RSpec.feature 'Handover progress checklist feature:' do
   let!(:prison) { FactoryBot.create(:prison) }
   let(:prison_code) { prison.code }
+  let(:nomis_offender_id) { FactoryBot.generate :nomis_offender_id }
   let(:user) { FactoryBot.build(:pom) }
-  let(:default_params) { { nomis_offender_id: 'ABC123D', prison_id: prison_code } }
+  let(:offender) { stub_mpc_offender(offender_no: nomis_offender_id) }
+  let(:default_params) { { nomis_offender_id: nomis_offender_id, prison_id: prison_code } }
 
   before do
+    allow(OffenderService).to receive(:get_offender).and_return nil
+    offender # instantiate and stub
+
     stub_auth_token
     stub_user(staff_id: user.staff_id)
 
