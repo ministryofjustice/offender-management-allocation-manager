@@ -6,8 +6,8 @@ module HighLevelMockingAndStubbingHelper
   def stub_mpc_offender(**mpc_offender_attributes)
     mpc_offender_attributes.symbolize_keys!
 
+    offender_no = mpc_offender_attributes[:offender_no] ||= FactoryBot.generate(:nomis_offender_id)
     mpc_offender_attributes = {
-      offender_no: FactoryBot.generate(:nomis_offender_id),
       com_responsible_date: Faker::Date.forward,
       first_name: Faker::Name.first_name,
       full_name_ordered: Faker::Name.name,
@@ -17,7 +17,8 @@ module HighLevelMockingAndStubbingHelper
     }.merge(mpc_offender_attributes)
 
     mock_offender = instance_double(MpcOffender, **mpc_offender_attributes)
-    allow(OffenderService).to receive(:get_offender).with(nomis_offender_id).and_return(mock_offender)
+    allow(OffenderService).to receive(:get_offender).with(offender_no).and_return(mock_offender)
+    FactoryBot.create :offender, nomis_offender_id: offender_no
     mock_offender
   end
 end
