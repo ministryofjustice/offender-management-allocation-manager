@@ -1,38 +1,29 @@
 RSpec.describe HandoverProgressChecklistsController do
   let(:prison) { FactoryBot.create :prison }
   let(:prison_code) { prison.code }
+  let(:nomis_offender_id) { FactoryBot.generate :nomis_offender_id }
+  let(:default_params) { { prison_id: prison_code, nomis_offender_id: nomis_offender_id } }
 
   before do
-    stub_high_level_pom_auth(prison_code: prison_code)
+    stub_high_level_pom_auth(prison: prison)
+    allow(OffenderService).to receive(:get_offender).and_return(nil)
   end
 
   describe '#edit' do
     describe 'when offender exists' do
-      let(:nomis_offender_id) { FactoryBot.generate :nomis_offender_id }
-      let(:offender) { instance_double MpcOffender, :offender, offender_no: nomis_offender_id }
+      let!(:offender) { stub_mpc_offender(offender_no: nomis_offender_id) }
 
-      before do
-        FactoryBot.create :offender, nomis_offender_id: nomis_offender_id # Internal DB offender, not the MpcOffender
-        allow(OffenderService).to receive(:get_offender).and_return nil
-      end
-
-      it 'authorizes POM'
+      it 'authorizes allocated POM'
 
       it 'assigns the offender' do
-        get :edit, params: {
-          prison_id: prison_code,
-          nomis_offender_id: nomis_offender_id,
-        }
+        get :edit, params: default_params
 
         expect(assigns(:offender)).to eq offender
       end
 
       it 'assigns existing record if that exists' do
         checklist = FactoryBot.create :handover_progress_checklist, nomis_offender_id: nomis_offender_id
-        get :edit, params: {
-          prison_id: prison_code,
-          nomis_offender_id: checklist.nomis_offender_id,
-        }
+        get :edit, params: default_params
 
         aggregate_failures do
           expect(response.code).to eq '200'
@@ -41,16 +32,77 @@ RSpec.describe HandoverProgressChecklistsController do
       end
 
       it 'assigns new record if one does not already exist' do
-        get :edit, params: {
-          prison_id: prison_code,
-          nomis_offender_id: nomis_offender_id,
-        }
+        get :edit, params: default_params
 
         record = assigns(:handover_progress_checklist)
         aggregate_failures do
           expect(response.code).to eq '200'
           expect(record.new_record?).to eq true
           expect(record.nomis_offender_id).to eq nomis_offender_id
+        end
+      end
+    end
+
+    describe 'when offender does not exist' do
+      it 'shows error'
+    end
+  end
+
+  describe '#update' do
+    describe 'when offender exists' do
+      let!(:offender) { stub_mpc_offender(offender_no: nomis_offender_id) }
+
+      it 'authorizes allocated POM'
+
+      describe 'when checklist does not exist' do
+        before do
+          tasks = {
+            reviewed_oasys: true,
+            contacted_com: true,
+            attended_handover_meeting: true,
+          }
+          put :update, params: default_params.merge(handover_progress_checklist: tasks)
+        end
+
+        it 'creates new checklist with correct data' do
+          model = HandoverProgressChecklist.find_by(nomis_offender_id: nomis_offender_id)
+          aggregate_failures do
+            expect(model.reviewed_oasys).to eq true
+            expect(model.contacted_com).to eq true
+            expect(model.attended_handover_meeting).to eq true
+          end
+        end
+
+        it 'redirects to checklist page' do
+          expect(response).to redirect_to(prison_edit_handover_progress_checklist_path(prison_code, nomis_offender_id))
+        end
+      end
+
+      describe 'when checklist already exists' do
+        before do
+          FactoryBot.create :handover_progress_checklist, nomis_offender_id: nomis_offender_id,
+                                                          reviewed_oasys: true,
+                                                          contacted_com: false,
+                                                          attended_handover_meeting: true
+          tasks = {
+            reviewed_oasys: false,
+            contacted_com: true,
+            attended_handover_meeting: false,
+          }
+          put :update, params: default_params.merge(handover_progress_checklist: tasks)
+        end
+
+        it 'updates checklist with correct data' do
+          model = HandoverProgressChecklist.find_by(nomis_offender_id: nomis_offender_id)
+          aggregate_failures do
+            expect(model.reviewed_oasys).to eq false
+            expect(model.contacted_com).to eq true
+            expect(model.attended_handover_meeting).to eq false
+          end
+        end
+
+        it 'redirects to checklist page' do
+          expect(response).to redirect_to(prison_edit_handover_progress_checklist_path(prison_code, nomis_offender_id))
         end
       end
     end

@@ -6,7 +6,11 @@ class HandoverProgressChecklistsController < PrisonsApplicationController
   end
 
   def update
-    raise NotImplementedError, "request params: #{params.inspect}"
+    nomis_offender_id = params[:nomis_offender_id]
+    checklist = HandoverProgressChecklist.find_or_initialize_by(nomis_offender_id: nomis_offender_id)
+    checklist.attributes = handover_progress_checklist_params
+    checklist.save!
+    redirect_to prison_edit_handover_progress_checklist_path(@prison.code, nomis_offender_id)
   end
 
 private

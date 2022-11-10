@@ -18,8 +18,6 @@
                  url: prison_update_handover_progress_checklist_path(@prison.code,
                                                                      @handover_progress_checklist.nomis_offender_id),
                  method: :put) do |form| %>
-      <%= form.hidden_field(:nomis_offender_id) %>
-
       <div class="app-task-list">
         <ul class="app-task-list__items">
 

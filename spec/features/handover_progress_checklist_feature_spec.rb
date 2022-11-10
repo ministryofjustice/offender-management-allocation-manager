@@ -18,7 +18,11 @@ RSpec.feature 'Handover progress checklist feature:' do
   end
 
   it 'works' do
+    expect(HandoverProgressChecklist.count).to eq 0
     visit prison_edit_handover_progress_checklist_path(default_params)
     expect(page.status_code).to eq 200
+    click_on 'Save tasks'
+    expect(page.status_code).to eq 200
+    expect(HandoverProgressChecklist.find_by(nomis_offender_id: nomis_offender_id).reviewed_oasys).to eq false
   end
 end
