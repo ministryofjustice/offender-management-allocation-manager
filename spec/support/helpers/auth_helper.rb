@@ -37,18 +37,20 @@ module AuthHelper
 
   # Stub out POM authentication and authorization at a high level - does not go near the API calls, simply stubs out
   # the controller helpers that authenticate and authorize.
-  #
+  # @param prison A Prison model or mock set to @prison - if a mock, must have valid #code attribute
   # @param pom_staff_member If StaffMember model/stub is given, authorize to that; otherwise create a new anonymous stub
-  def stub_high_level_pom_auth(prison_code:, pom_staff_member: nil)
+  def stub_high_level_pom_auth(prison:, pom_staff_member: nil)
     # TODO: this amount of stubbing to get the tests to run really tells us that our controller plumbing is not very
     #  well designed. We need to find ways to tidy it up, one strand at a time.
+    pom_staff_member ||= instance_double(StaffMember, :pom_staff_member, staff_id: Random.rand(100))
     allow(controller).to receive(:authenticate_user)
     allow(controller).to receive(:check_prison_access)
     allow(controller).to receive(:load_staff_member)
     allow(controller).to receive(:service_notifications)
     allow(controller).to receive(:load_roles)
     allow(controller).to receive(:ensure_pom)
-    allow(controller).to receive(:active_prison_id).and_return(prison_code)
+    allow(controller).to receive(:active_prison_id).and_return(prison.code)
     controller.instance_variable_set(:@current_user, pom_staff_member)
+    controller.instance_variable_set(:@prison, prison)
   end
 end

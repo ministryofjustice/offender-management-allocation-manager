@@ -10,7 +10,7 @@ RSpec.describe HandoversController, type: :controller do
   let(:handover_cases) { instance_double HandoverCasesList, :handover_cases }
 
   before do
-    stub_high_level_pom_auth(prison_code: prison_code, pom_staff_member: pom_staff_member)
+    stub_high_level_pom_auth(prison: prison, pom_staff_member: pom_staff_member)
     allow(HandoverCasesList).to receive(:new).with(staff_member: pom_staff_member).and_return(handover_cases)
 
     session[:new_handovers_ui] = true
