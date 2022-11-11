@@ -4,4 +4,15 @@ module HandoverHelper
             prison_update_handover_progress_checklist_path(prison_code, nomis_offender_id),
             class: 'govuk-link govuk-link--no-visited-state')
   end
+
+  def handover_progress_checklist_completion_tag(value)
+    css_classes = %w[govuk-tag app-task-list__tag]
+    if value
+      text = 'Complete'
+    else
+      text = 'To do'
+      css_classes.push 'govuk-tag govuk-tag--grey'
+    end
+    tag.strong text, class: css_classes
+  end
 end

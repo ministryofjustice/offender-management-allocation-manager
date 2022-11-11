@@ -34,7 +34,7 @@
                 <%= form.label :reviewed_oasys, class: 'govuk-label govuk-checkboxes__label' do %>
                   <strong>Review the last OASys assessment</strong>
                 <% end %>
-                <strong class="govuk-tag app-task-list__tag">Complete</strong>
+                <%= handover_progress_checklist_completion_tag @handover_progress_checklist.reviewed_oasys %>
 
                 <span class="govuk-hint govuk-checkboxes__hint" id="reviewed-oasys-hint">
                   Check the last OASys assessment still reflects current risks and circumstances. If not, update it to
@@ -51,13 +51,12 @@
                 <%= form.label :contacted_com, class: 'govuk-label govuk-checkboxes__label' do %>
                   <strong>Have contact from COM</strong>
                 <% end %>
-                <strong class="govuk-tag govuk-tag--grey app-task-list__tag">To do</strong>
-                <div>
+                <%= handover_progress_checklist_completion_tag @handover_progress_checklist.contacted_com %>
+
                 <span class="govuk-hint govuk-checkboxes__hint" id="contacted-com-hint">
                     Highlight any of the prisoner's pre-release or pre-parole needs and any public protection concerns
                     you have identified.
                 </span>
-                </div>
               </div>
             </div>
           </li>
@@ -70,13 +69,12 @@
                 <%= form.label :attended_handover_meeting, class: 'govuk-label govuk-checkboxes__label' do %>
                   <strong>Attend handover meeting</strong>
                 <% end %>
-                <strong class="govuk-tag govuk-tag--grey app-task-list__tag">To do</strong>
-                <div>
+                <%= handover_progress_checklist_completion_tag @handover_progress_checklist.attended_handover_meeting %>
+
                 <span class="govuk-hint govuk-checkboxes__hint" id="attended-handover-meeting-hint">
                     The COM should be in touch about arranging this with you, the prisoner and anyone else involved in
                     the case, such as family members and key workers.
                 </span>
-                </div>
               </div>
             </div>
           </li>
