@@ -8,7 +8,13 @@
     </h1>
 
     <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Handover started</h2>
-    <p class="govuk-body">You have completed 1 of 3 tasks.</p>
+    <p class="govuk-body">
+      You have completed
+      <%= @handover_progress_checklist.progress_data['complete'] %>
+      of
+      <%= @handover_progress_checklist.progress_data['total'] %>
+      tasks.
+    </p>
 
     <div class="govuk-inset-text govuk-inset-text--com-responsible-date">
       COM responsible from <%= format_date(@offender.com_responsible_date, replacement: 'Unknown') %>

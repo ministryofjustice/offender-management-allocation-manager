@@ -12,6 +12,14 @@ RSpec.describe 'handover_progress_checklists/edit' do
       allocated_com_name: 'Comfirstname Comlastname',
       allocated_com_email: 'comfirstname.comlastname@example.com')
   end
+  let(:handover_progress_checklist) do
+    # Use model and not instance_double because form_for expects all kinds of crap that we can't be bothered to mock
+    HandoverProgressChecklist.new(
+      nomis_offender_id: nomis_offender_id,
+      reviewed_oasys: false,
+      contacted_com: false,
+      attended_handover_meeting: false)
+  end
   let(:page) { Capybara::Node::Simple.new(rendered) }
 
   before do
@@ -19,15 +27,11 @@ RSpec.describe 'handover_progress_checklists/edit' do
 
     assign(:prison, prison)
     assign(:offender, offender)
+    assign(:handover_progress_checklist, handover_progress_checklist)
   end
 
   describe 'in the usual case, when all items are unfinished' do
     before do
-      assign(:handover_progress_checklist, HandoverProgressChecklist.new(
-                                             nomis_offender_id: nomis_offender_id,
-                                             reviewed_oasys: false,
-                                             contacted_com: false,
-                                             attended_handover_meeting: false))
       render
     end
 
@@ -46,31 +50,33 @@ RSpec.describe 'handover_progress_checklists/edit' do
 
     it 'shows offender data' do
       aggregate_failures do
-        expect(page).to have_content 'Record handover progress for Offenderfirstname'
-        # expect(page).to have_content '0 of 3 tasks'
-        expect(page).to have_content 'Name: Offenderfirstname Offenderlastname'
-        expect(page).to have_content 'COM responsible from 01 Nov 2022'
-        expect(page).to have_content 'Date of birth: 20 Feb 1993'
-        expect(page).to have_content "Prison number: #{nomis_offender_id}"
-        expect(page).to have_content 'COM name: Comfirstname Comlastname'
-        expect(page).to have_content 'COM email: comfirstname.comlastname@example.com'
-        expect(page).to have_content 'COM responsible from 01 Nov 2022'
+        expect(page).to have_content 'Record handover progress for Offenderfirstname', normalize_ws: true
+        expect(page).to have_content '0 of 3 tasks', normalize_ws: true
+        expect(page).to have_content 'Name: Offenderfirstname Offenderlastname', normalize_ws: true
+        expect(page).to have_content 'COM responsible from 01 Nov 2022', normalize_ws: true
+        expect(page).to have_content 'Date of birth: 20 Feb 1993', normalize_ws: true
+        expect(page).to have_content "Prison number: #{nomis_offender_id}", normalize_ws: true
+        expect(page).to have_content 'COM name: Comfirstname Comlastname', normalize_ws: true
+        expect(page).to have_content 'COM email: comfirstname.comlastname@example.com', normalize_ws: true
+        expect(page).to have_content 'COM responsible from 01 Nov 2022', normalize_ws: true
       end
     end
   end
 
   describe 'when all items are completed' do
     before do
-      assign(:handover_progress_checklist, HandoverProgressChecklist.new(
-                                             nomis_offender_id: nomis_offender_id,
-                                             reviewed_oasys: true,
-                                             contacted_com: true,
-                                             attended_handover_meeting: true))
+      handover_progress_checklist.attributes = {
+        reviewed_oasys: true,
+        contacted_com: true,
+        attended_handover_meeting: true,
+      }
       render
     end
 
-    it 'shows offender data different from the usual case' do
-      # expect(page).to have_content '3 of 3 tasks'
+    it 'shows offender data that depends on task completion' do
+      aggregate_failures do
+        expect(page).to have_content '3 of 3 tasks', normalize_ws: true
+      end
     end
 
     it 'renders checkboxes correctly' do
