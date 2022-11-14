@@ -27,22 +27,24 @@
       <div class="app-task-list">
         <ul class="app-task-list__items">
 
-          <li class="app-task-list__item">
-            <div class="govuk-checkboxes">
-              <div class="govuk-checkboxes__item">
-                <%= form.check_box :reviewed_oasys, class: 'govuk-checkboxes__input', 'aria-describedby': 'reviewed-oasys-hint' %>
-                <%= form.label :reviewed_oasys, class: 'govuk-label govuk-checkboxes__label' do %>
-                  <strong>Review the last OASys assessment</strong>
-                <% end %>
-                <%= handover_progress_checklist_completion_tag @handover_progress_checklist.reviewed_oasys %>
+          <% if @handover_progress_checklist.case_allocation == 'NPS' %>
+            <li class="app-task-list__item">
+              <div class="govuk-checkboxes">
+                <div class="govuk-checkboxes__item">
+                  <%= form.check_box :reviewed_oasys, class: 'govuk-checkboxes__input', 'aria-describedby': 'reviewed-oasys-hint' %>
+                  <%= form.label :reviewed_oasys, class: 'govuk-label govuk-checkboxes__label' do %>
+                    <strong>Review the last OASys assessment</strong>
+                  <% end %>
+                  <%= handover_progress_checklist_completion_tag @handover_progress_checklist.reviewed_oasys %>
 
-                <span class="govuk-hint govuk-checkboxes__hint" id="reviewed-oasys-hint">
+                  <span class="govuk-hint govuk-checkboxes__hint" id="reviewed-oasys-hint">
                   Check the last OASys assessment still reflects current risks and circumstances. If not, update it to
                   show how things have changed and any work not completed.
                 </span>
+                </div>
               </div>
-            </div>
-          </li>
+            </li>
+          <% end %>
 
           <li class="app-task-list__item">
             <div class="govuk-checkboxes">

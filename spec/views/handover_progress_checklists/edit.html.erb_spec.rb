@@ -14,11 +14,13 @@ RSpec.describe 'handover_progress_checklists/edit' do
   end
   let(:handover_progress_checklist) do
     # Use model and not instance_double because form_for expects all kinds of crap that we can't be bothered to mock
-    HandoverProgressChecklist.new(
+    model = HandoverProgressChecklist.new(
       nomis_offender_id: nomis_offender_id,
       reviewed_oasys: false,
       contacted_com: false,
       attended_handover_meeting: false)
+    allow(model).to receive(:case_allocation).and_return('NPS')
+    model
   end
   let(:page) { Capybara::Node::Simple.new(rendered) }
 
@@ -90,6 +92,28 @@ RSpec.describe 'handover_progress_checklists/edit' do
         expect(page).to have_css('input[name="handover_progress_checklist[attended_handover_meeting]"][checked=checked]',
                                  visible: false)
       end
+    end
+  end
+
+  describe 'when case type is CRC' do
+    before do
+      allow(handover_progress_checklist).to receive(:case_allocation).and_return('CRC')
+      render
+    end
+
+    it 'only renders 2 checkboxes' do
+      aggregate_failures do
+        expect(page).to have_css('input[name="handover_progress_checklist[contacted_com]"]',
+                                 visible: false)
+
+        expect(page).to have_css('input[name="handover_progress_checklist[attended_handover_meeting]"]',
+                                 visible: false)
+      end
+    end
+
+    it 'does not render reviewed_oasys checkbox' do
+      expect(page).not_to have_css('input[name="handover_progress_checklist[reviewed_oasys]"]',
+                                   visible: false)
     end
   end
 end

@@ -23,6 +23,6 @@ RSpec.feature 'Handover progress checklist feature:' do
     expect(page.status_code).to eq 200
     click_on 'Save tasks'
     expect(page.status_code).to eq 200
-    expect(HandoverProgressChecklist.find_by(nomis_offender_id: nomis_offender_id).reviewed_oasys).to eq false
+    expect(HandoverProgressChecklist.find_by(nomis_offender_id: nomis_offender_id).contacted_com).to eq false
   end
 end
