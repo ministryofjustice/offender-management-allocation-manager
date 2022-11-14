@@ -109,8 +109,8 @@
         </p>
         <p class="govuk-body">Date of birth: <%= format_date(@offender.date_of_birth, replacement: 'Unknown') %></p>
         <p class="govuk-body">Prison number: <%= @offender.offender_no %></p>
-        <p class="govuk-body">COM name: <%= @offender.allocated_com_name %></p>
-        <p class="govuk-body">COM email: <%= @offender.allocated_com_email %></p>
+        <p class="govuk-body">COM name: <%= @offender.allocated_com_name || 'Unknown' %></p>
+        <p class="govuk-body">COM email: <%= @offender.allocated_com_email || 'Unknown' %></p>
       </li>
     </ul>
   </div>
