@@ -43,10 +43,13 @@ RSpec.describe HandoverProgressChecklistsController do
       end
     end
 
-    describe 'when offender does not exist' do
-      it 'shows error'
+      describe 'when offender does not exist' do
+        it 'shows error' do
+          get :edit, params: default_params
+          expect(response).to redirect_to('/404')
+        end
+      end
     end
-  end
 
   describe '#update' do
     describe 'when offender exists' do
@@ -108,7 +111,15 @@ RSpec.describe HandoverProgressChecklistsController do
     end
 
     describe 'when offender does not exist' do
-      it 'shows error'
+      it 'shows error' do
+        tasks = {
+          reviewed_oasys: false,
+          contacted_com: false,
+          attended_handover_meeting: false,
+        }
+        put :update, params: default_params.merge(handover_progress_checklist: tasks)
+        expect(response).to redirect_to('/404')
+      end
     end
   end
 end
