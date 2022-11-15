@@ -7,6 +7,7 @@ RSpec.describe HandoverProgressChecklistsController do
   before do
     stub_high_level_pom_auth(prison: prison)
     allow(OffenderService).to receive(:get_offender).and_return(nil)
+    allow(controller.helpers).to receive(:last_handovers_url).and_return '/last'
   end
 
   describe '#edit' do
@@ -43,13 +44,13 @@ RSpec.describe HandoverProgressChecklistsController do
       end
     end
 
-      describe 'when offender does not exist' do
-        it 'shows error' do
-          get :edit, params: default_params
-          expect(response).to redirect_to('/404')
-        end
+    describe 'when offender does not exist' do
+      it 'shows error' do
+        get :edit, params: default_params
+        expect(response).to redirect_to('/404')
       end
     end
+  end
 
   describe '#update' do
     describe 'when offender exists' do
@@ -76,8 +77,8 @@ RSpec.describe HandoverProgressChecklistsController do
           end
         end
 
-        it 'redirects to checklist page' do
-          expect(response).to redirect_to(prison_edit_handover_progress_checklist_path(prison_code, nomis_offender_id))
+        it 'redirects to the correct handovers url' do
+          expect(response).to redirect_to('/last')
         end
       end
 
@@ -104,8 +105,8 @@ RSpec.describe HandoverProgressChecklistsController do
           end
         end
 
-        it 'redirects to checklist page' do
-          expect(response).to redirect_to(prison_edit_handover_progress_checklist_path(prison_code, nomis_offender_id))
+        it 'redirects to the correct handovers url' do
+          expect(response).to redirect_to('/last')
         end
       end
     end

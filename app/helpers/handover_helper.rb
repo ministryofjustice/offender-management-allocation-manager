@@ -15,4 +15,8 @@ module HandoverHelper
     end
     tag.strong text, class: css_classes
   end
+
+  def last_handovers_url
+    flash[:current_handovers_url] || upcoming_prison_handovers_url(@prison) # rubocop:disable Rails/HelperInstanceVariable
+  end
 end

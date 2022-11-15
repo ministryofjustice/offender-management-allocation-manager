@@ -1,4 +1,4 @@
-<%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
+<%= link_to "Back", last_handovers_url, class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
@@ -88,8 +88,7 @@
         <%= form.button 'Save tasks', type: 'submit', role: 'button', draggable: 'false',
                         class: 'govuk-button', data: { module: 'govuk-button' } %>
 
-        <%= link_to 'Cancel', 'javascript:history.back()',
-                    class: "govuk-link govuk-link govuk-link--no-visited-state" %>
+        <%= link_to 'Cancel', last_handovers_url, class: "govuk-link govuk-link govuk-link--no-visited-state" %>
       </div>
     <% end %>
   </div>

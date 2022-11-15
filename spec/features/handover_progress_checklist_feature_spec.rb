@@ -12,9 +12,12 @@ RSpec.feature 'Handover progress checklist feature:' do
 
     stub_auth_token
     stub_user(staff_id: user.staff_id)
+    activate_new_handovers_ui
 
     signin_pom_user([prison_code])
     stub_poms(prison_code, [user])
+
+    allow_any_instance_of(StaffMember).to receive(:unreleased_allocations).and_return([])
   end
 
   it 'works' do
