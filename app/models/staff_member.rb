@@ -49,7 +49,7 @@ class StaffMember
 
   def allocations
     @allocations ||= begin
-      alloc_hash = @prison.allocations.for_pom(@staff_id).index_by(&:nomis_offender_id)
+      alloc_hash = @prison.allocations_for_pom(@staff_id).index_by(&:nomis_offender_id)
 
       @prison.allocated.select { |a| alloc_hash.key?(a.offender_no) }.map do |offender|
         AllocatedOffender.new(@staff_id, alloc_hash.fetch(offender.offender_no), offender)
