@@ -61,6 +61,10 @@ class StaffMember
     allocations.select { |offender| offender.earliest_release_date > Time.zone.now.to_date }
   end
 
+  def has_allocation?(nomis_offender_id)
+    @prison.allocations_for_pom(@staff_id).detect { |a| a.nomis_offender_id == nomis_offender_id }.present?
+  end
+
 private
 
   def pom
