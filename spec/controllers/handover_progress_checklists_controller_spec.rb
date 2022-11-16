@@ -1,11 +1,13 @@
 RSpec.describe HandoverProgressChecklistsController do
   let(:prison) { FactoryBot.create :prison }
   let(:prison_code) { prison.code }
+  let(:current_pom) { instance_double(StaffMember, :pom_staff_member, staff_id: 'STAFF1', has_allocation?: false) }
   let(:nomis_offender_id) { FactoryBot.generate :nomis_offender_id }
   let(:default_params) { { prison_id: prison_code, nomis_offender_id: nomis_offender_id } }
 
   before do
-    stub_high_level_pom_auth(prison: prison)
+    stub_high_level_pom_auth(prison: prison, pom_staff_member: current_pom)
+    allow(current_pom).to receive(:has_allocation?).with(nomis_offender_id).and_return true
     allow(OffenderService).to receive(:get_offender).and_return(nil)
     allow(controller.helpers).to receive(:last_handovers_url).and_return '/last'
   end
@@ -13,8 +15,6 @@ RSpec.describe HandoverProgressChecklistsController do
   describe '#edit' do
     describe 'when offender exists' do
       let!(:offender) { stub_mpc_offender(offender_no: nomis_offender_id) }
-
-      it 'authorizes allocated POM'
 
       it 'assigns the offender' do
         get :edit, params: default_params
@@ -56,7 +56,16 @@ RSpec.describe HandoverProgressChecklistsController do
     describe 'when offender exists' do
       let!(:offender) { stub_mpc_offender(offender_no: nomis_offender_id) }
 
-      it 'authorizes allocated POM'
+      describe 'when current POM is not the allocated POM' do
+        before do
+          allow(current_pom).to receive(:has_allocation?).with(nomis_offender_id).and_return false
+          put :update, params: default_params.merge(handover_progress_checklist: { empty: true })
+        end
+
+        it 'responds with unauthorized error' do
+          expect(response).to redirect_to('/401')
+        end
+      end
 
       describe 'when checklist does not exist' do
         before do
@@ -113,11 +122,7 @@ RSpec.describe HandoverProgressChecklistsController do
 
     describe 'when offender does not exist' do
       it 'shows error' do
-        tasks = {
-          reviewed_oasys: false,
-          contacted_com: false,
-          attended_handover_meeting: false,
-        }
+        tasks = { reviewed_oasys: false, contacted_com: false, attended_handover_meeting: false }
         put :update, params: default_params.merge(handover_progress_checklist: tasks)
         expect(response).to redirect_to('/404')
       end

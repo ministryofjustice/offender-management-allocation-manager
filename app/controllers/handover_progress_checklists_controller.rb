@@ -10,6 +10,11 @@ class HandoverProgressChecklistsController < PrisonsApplicationController
 
   def update
     with_valid_offender do |offender, nomis_offender_id|
+      unless @current_user.has_allocation?(nomis_offender_id)
+        redirect_to '/401'
+        return
+      end
+
       checklist = HandoverProgressChecklist.find_or_initialize_by(nomis_offender_id: nomis_offender_id)
       checklist.attributes = handover_progress_checklist_params
       checklist.save!
