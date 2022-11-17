@@ -21,7 +21,7 @@ RSpec.feature 'Handover progress checklist feature:' do
     allow_any_instance_of(StaffMember).to receive(:unreleased_allocations).and_return([])
   end
 
-  it 'works' do
+  it 'allows completing the checklist' do
     expect(HandoverProgressChecklist.count).to eq 0
     visit prison_edit_handover_progress_checklist_path(default_params)
     expect(page.status_code).to eq 200
