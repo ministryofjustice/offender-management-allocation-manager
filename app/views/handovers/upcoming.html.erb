@@ -75,11 +75,7 @@
             Send handover report
           </li>
         </ul>
-        <p>
-          <a class="govuk-link govuk-link--no-visited-state" href="#">
-            Record progress
-          </a>
-        </p>
+        <p><%= handover_record_progress_link(@prison_id, allocated_offender.offender_no) %></p>
       </td>
     </tr>
   <% end %>

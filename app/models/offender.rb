@@ -32,4 +32,8 @@ class Offender < ApplicationRecord
   has_one :calculated_early_allocation_status, foreign_key: :nomis_offender_id, inverse_of: :offender, dependent: :destroy
 
   has_many :victim_liaison_officers, foreign_key: :nomis_offender_id, inverse_of: :offender, dependent: :destroy
+
+  has_one :handover_progress_checklist, foreign_key: :nomis_offender_id
+
+  delegate :case_allocation, to: :case_information, allow_nil: true
 end

@@ -1,12 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe MpcOffender, type: :model do
-  subject do
+  subject(:offender) do
     build(:mpc_offender, prison: prison, prison_record: api_offender, offender: build(:case_information).offender)
   end
 
   let(:prison) { build(:prison) }
-  let(:api_offender) { double(:nomis_offender, offender_no: 'AB000C') }
+  let(:api_offender) { double(:nomis_offender, offender_no: FactoryBot.generate(:nomis_offender_id)) }
 
   describe '#additional_information' do
     let(:api_offender) { double(:nomis_offender, recalled?: recalled) }
@@ -162,6 +162,18 @@ RSpec.describe MpcOffender, type: :model do
 
     it 'returns correct list' do
       expect(subject.active_alert_labels).to eq(["Veteran", "PEEP"])
+    end
+  end
+
+  describe '#com_responsible_date' do
+    it 'returns value from DB if that exists' do
+      FactoryBot.create :offender, id: offender.offender_no
+      chd = FactoryBot.create :calculated_handover_date, nomis_offender_id: offender.offender_no
+      expect(offender.com_responsible_date).to eq chd.com_responsible_date
+    end
+
+    it 'returns nil if saved value does not exist' do
+      expect(offender.com_responsible_date).to be_nil
     end
   end
 end

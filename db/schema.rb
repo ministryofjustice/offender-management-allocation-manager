@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_16_170141) do
+ActiveRecord::Schema.define(version: 2022_11_04_000001) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -138,6 +138,16 @@ ActiveRecord::Schema.define(version: 2022_08_16_170141) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "handover_progress_checklists", force: :cascade do |t|
+    t.string "nomis_offender_id", null: false
+    t.boolean "reviewed_oasys", default: false, null: false
+    t.boolean "contacted_com", default: false, null: false
+    t.boolean "attended_handover_meeting", default: false, null: false
+    t.datetime "created_at", precision: 6
+    t.datetime "updated_at", precision: 6
+    t.index ["nomis_offender_id"], name: "index_handover_progress_checklists_on_nomis_offender_id", unique: true
+  end
+
   create_table "local_delivery_units", force: :cascade do |t|
     t.string "code", null: false
     t.string "name", null: false
@@ -226,4 +236,5 @@ ActiveRecord::Schema.define(version: 2022_08_16_170141) do
     t.index ["nomis_offender_id"], name: "index_victim_liaison_officers_on_nomis_offender_id"
   end
 
+  add_foreign_key "handover_progress_checklists", "offenders", column: "nomis_offender_id", primary_key: "nomis_offender_id"
 end

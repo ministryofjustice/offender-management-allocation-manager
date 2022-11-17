@@ -403,7 +403,6 @@ workflows:
       - install_dependencies:
           filters: { branches: { only: [test] } }
       - build_and_push_docker_image:
-          requires: [install_dependencies]
           filters: { branches: { only: [test] } }
       - deploy_test:
           requires: [build_and_push_docker_image]
@@ -413,10 +412,9 @@ workflows:
     jobs:
       - install_dependencies:
           filters: { branches: { only: [preproduction] } }
-
       - build_and_push_docker_image:
-          requires: [install_dependencies]
           filters: { branches: { only: [preproduction] } }
+
       - rubocop:
           requires: [install_dependencies]
           filters: { branches: { only: [preproduction] } }

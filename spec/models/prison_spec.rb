@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
-
-RSpec.describe Prison, type: :model do
+RSpec.describe Prison do
   describe '#active' do
     before do
       create(:allocation_history, prison: p1.code)
@@ -120,6 +118,22 @@ RSpec.describe Prison, type: :model do
       it 'has many pom details' do
         expect(described_class.find(prison.code).pom_details.size).to be(5)
       end
+    end
+  end
+
+  describe '#allocations_for_pom' do
+    it 'returns all AllocatedOffenders in this prison for the POM with the given nomis_staff_id' do
+      prison = FactoryBot.create :prison
+      nomis_staff_id = 'STAFF1'
+      expected_allocations = double(:expected_allocations)
+      # This crap codebase forces us to stub out methods on the class we're testing - this is awful practice and a "test
+      # smell" indicating badly drawn boundaries between components. But refactoring the whole thing is not practical so
+      # we are forced to use this bad practice.
+      alloc_relation = double :allocation_relation, for_pom: []
+      allow(prison).to receive(:allocations).and_return(alloc_relation)
+      allow(alloc_relation).to receive(:for_pom).with(nomis_staff_id).and_return(expected_allocations)
+
+      expect(prison.allocations_for_pom(nomis_staff_id)).to eq expected_allocations
     end
   end
 end

@@ -4,23 +4,10 @@ RSpec.describe HandoversController, type: :controller do
   let(:default_params) { { prison_id: prison_code } }
   let(:staff_id) { 456_987 }
   let(:pom_staff_member) { instance_double StaffMember, :pom_staff_member, staff_id: staff_id }
-  let(:upcoming_handover_allocated_offenders) do
-    double(:upcoming_handover_allocated_offenders)
-  end
   let(:handover_cases) { instance_double HandoverCasesList, :handover_cases }
 
   before do
-    # TODO: this amount of stubbing to get the tests to run really tells us that our controller plumbing is not very
-    #  well designed. We need to find ways to tidy it up, one strand at a time.
-    allow(controller).to receive(:authenticate_user)
-    allow(controller).to receive(:check_prison_access)
-    allow(controller).to receive(:load_staff_member)
-    allow(controller).to receive(:service_notifications)
-    allow(controller).to receive(:load_roles)
-    allow(controller).to receive(:ensure_pom)
-    allow(controller).to receive(:active_prison_id).and_return(prison_code)
-    controller.instance_variable_set(:@current_user, pom_staff_member)
-
+    stub_high_level_pom_auth(prison: prison, pom_staff_member: pom_staff_member)
     allow(HandoverCasesList).to receive(:new).with(staff_member: pom_staff_member).and_return(handover_cases)
 
     session[:new_handovers_ui] = true
@@ -38,11 +25,23 @@ RSpec.describe HandoversController, type: :controller do
     it 'has handover cases list' do
       expect(assigns(:handover_cases)).to eq handover_cases
     end
+
+    it 'sets current_handovers_url' do
+      expect(flash[:current_handovers_url]).to eq request.url
+    end
   end
 
   describe 'upcoming handovers page' do
     before do
       get :upcoming, params: default_params
+    end
+
+    it_behaves_like 'handover cases list page'
+  end
+
+  describe 'in_progress handovers page' do
+    before do
+      get :in_progress, params: default_params
     end
 
     it_behaves_like 'handover cases list page'

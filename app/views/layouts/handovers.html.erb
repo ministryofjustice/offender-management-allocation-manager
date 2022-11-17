@@ -11,24 +11,7 @@
     </div>
 
     <div class="govuk-grid-column-one-third">
-      <aside class="app-related-items" role="complementary">
-        <h3 class="govuk-heading-m">
-          More on handovers
-        </h3>
-
-        <ul class="govuk-list">
-          <li>
-            <a class="govuk-link govuk-link--no-visited-state" href="#">
-              View handover guidance on EQuiP
-            </a>
-          </li>
-          <li>
-            <a class="govuk-link govuk-link--no-visited-state" href="#">
-              Choose how often we send you emails to remind you about handovers
-            </a>
-          </li>
-        </ul>
-      </aside>
+      <%= render '/handovers/more_on_handovers' %>
     </div>
   </div>
 
@@ -55,6 +38,20 @@
       </nav>
     </div>
   </div>
+
+  <% if flash[:handover_success_notice].present? %>
+    <div class="moj-banner moj-banner--success">
+      <svg class="moj-banner__icon" fill="currentColor" role="img" focusable="false"
+           xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" height="25" width="25">
+        <path d="M25,6.2L8.7,23.2L0,14.1l4-4.2l4.7,4.9L21,2L25,6.2z"></path>
+      </svg>
+
+      <div class="moj-banner__message">
+        <span class="moj-banner__assistive">Success</span>
+        <%= flash[:handover_success_notice] %>
+      </div>
+    </div>
+  <% end %>
 
   <%= yield %>
 <% end %>

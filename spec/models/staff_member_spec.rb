@@ -132,4 +132,25 @@ RSpec.describe StaffMember, type: :model do
       expect(allocated_offenders.map(&:nomis_offender_id)).to match_array ["G1234AB", "G1234GG"]
     end
   end
+
+  describe '#has_allocation?' do
+    let(:nomis_offender_id) { FactoryBot.generate :nomis_offender_id }
+
+    before do
+      allow(prison).to receive(:allocations_for_pom).with(staff_id).and_return(
+        [
+          double(:allocation, nomis_offender_id: nomis_offender_id),
+          double(:allocation, nomis_offender_id: FactoryBot.generate(:nomis_offender_id)),
+        ]
+      )
+    end
+
+    it 'returns true if the given nomis_offender_id is allocated to this staff member' do
+      expect(user.has_allocation?(nomis_offender_id)).to eq true
+    end
+
+    it 'returns false if the given nomis_offender_id is not allocated to this staff member' do
+      expect(user.has_allocation?(FactoryBot.generate(:nomis_offender_id))).to eq false
+    end
+  end
 end
