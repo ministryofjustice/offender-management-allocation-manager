@@ -7,29 +7,15 @@
   highlighting any pre-release or pre-parole needs you have identified.
 </p>
 
-<table class="govuk-table in-progress-handovers" data-module="moj-sortable-table">
-  <thead class="govuk-table__head">
-  <tr class="govuk-table__row">
-    <th scope="col" class="govuk-table__header" aria-sort="none">
-      <button type="button" data-index="0">Prisoner details</button>
-    </th>
-    <th scope="col" class="govuk-table__header" aria-sort="none">
-      <button type="button" data-index="1">COM details</button>
-    </th>
-    <th scope="col" class="govuk-table__header" aria-sort="ascending">
-      <button type="button" data-index="2">COM responsible</button>
-    </th>
-    <th scope="col" class="govuk-table__header" aria-sort="none">
-      <button type="button" data-index="3">Earliest release date</button>
-    </th>
-    <th scope="col" class="govuk-table__header" aria-sort="none">
-      <button type="button" data-index="4">Tier</button>
-    </th>
-    <th scope="col" class="govuk-table__header handover-progress">Handover progress</th>
-  </tr>
-  </thead>
-
-  <tbody class="govuk-table__body">
+<%= handover_list_table(table_class: ['in-progress-handovers'],
+                        headers: [
+                          { type: 'button', body: 'Prisoner details' },
+                          { type: 'button', body: 'COM details' },
+                          { type: 'button', body: 'COM responsible', sort: 'ascending' },
+                          { type: 'button', body: 'Earliest release date' },
+                          { type: 'button', body: 'Tier' },
+                          { body: 'Handover progress' },
+                        ]) do %>
   <% @handover_cases.in_progress.each do |calc_h_o_date, allocated_offender| %>
     <tr class="govuk-table__row allocated-offender">
       <td class="govuk-table__cell prisoner-details">
@@ -52,7 +38,7 @@
           <%= com_name %><br>
           <%= allocated_offender.allocated_com_email || "No email address available" %>
         <% end %>
-          </td>
+      </td>
 
       <% alloc_date, resp_date = calc_h_o_date.com_allocated_date, calc_h_o_date.com_responsible_date %>
       <td class="govuk-table__cell handover-dates" data-sort-value="<%= alloc_date.iso8601 %>">
@@ -98,8 +84,7 @@
       </td>
     </tr>
   <% end %>
-  </tbody>
-</table>
+<% end %>
 
 <div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>
 <div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>

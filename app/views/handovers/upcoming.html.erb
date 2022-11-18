@@ -4,26 +4,15 @@
 
 <p>A COM will be allocated in the next 8 weeks. Start getting ready to hand the case over to the community.</p>
 
-<table class="govuk-table upcoming-handovers" data-module="moj-sortable-table">
-  <thead class="govuk-table__head">
-  <tr class="govuk-table__row">
-    <th scope="col" class="govuk-table__header" aria-sort="none">
-      <button type="button" data-index="0">Prisoner details</button>
-    </th>
-    <th scope="col" class="govuk-table__header" aria-sort="ascending">
-      <button type="button" data-index="1">COM responsible</button>
-    </th>
-    <th scope="col" class="govuk-table__header" aria-sort="none">
-      <button type="button" data-index="2">Earliest release date</button>
-    </th>
-    <th scope="col" class="govuk-table__header" aria-sort="none">
-      <button type="button" data-index="3">Tier</button>
-    </th>
-    <th scope="col" class="govuk-table__header handover-progress">Handover progress</th>
-  </tr>
-  </thead>
+<%= handover_list_table(table_class: ['upcoming-handovers'],
+                        headers: [
+                          { type: 'button', body: 'Prisoner details' },
+                          { type: 'button', body: 'COM responsible', sort: 'ascending' },
+                          { type: 'button', body: 'Earliest release date' },
+                          { type: 'button', body: 'Tier' },
+                          { body: 'Handover progress' },
+                        ]) do %>
 
-  <tbody class="govuk-table__body">
   <% @handover_cases.upcoming.each do |calc_h_o_date, allocated_offender| %>
     <tr class="govuk-table__row allocated-offender">
       <td class="govuk-table__cell prisoner-details">
@@ -79,8 +68,7 @@
       </td>
     </tr>
   <% end %>
-  </tbody>
-</table>
+<% end %>
 
 <div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>
 <div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>
