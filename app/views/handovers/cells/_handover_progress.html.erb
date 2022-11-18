@@ -1,0 +1,17 @@
+<td class="govuk-table__cell handover-progress">
+  <ul class="govuk-list govuk-body-s task-summary-checklist">
+    <li class="none">
+      <img src="<%= image_path('check.png') %>" alt="task complete">
+      Review OASys
+    </li>
+    <li class="none">
+      <img src="<%= image_path('cross.png') %>" alt="task complete">
+      Have contact from COM
+    </li>
+    <li class="none">
+      <img src="<%= image_path('cross.png') %>" alt="task not started">
+      Send handover report
+    </li>
+  </ul>
+  <p><%= handover_record_progress_link(prison_id, offender.offender_no) %></p>
+</td>
