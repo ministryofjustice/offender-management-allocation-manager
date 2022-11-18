@@ -10,6 +10,10 @@ class HandoverProgressChecklist < ApplicationRecord
     }
   end
 
+  def task_completion_data
+    attributes.slice(*task_fields)
+  end
+
 private
 
   def task_fields

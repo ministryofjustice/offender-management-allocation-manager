@@ -14,7 +14,8 @@ RSpec.feature 'Handovers feature:' do
       tier: 'A',
       earliest_release: { type: 'TED', date: erd },
       earliest_release_date: erd,
-      case_allocation: 'HDCED'
+      case_allocation: 'HDCED',
+      handover_progress_task_completion_data: {},
     }
   end
 
