@@ -95,6 +95,7 @@ class CalculatedHandoverDate < ApplicationRecord
       relation
         .by_offender_ids(offender_ids)
         .where(responsibility: [CUSTODY_WITH_COM, COMMUNITY_RESPONSIBLE])
+        .where.not(handover_date: nil)
     end
   end
 end
