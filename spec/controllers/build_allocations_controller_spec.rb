@@ -12,15 +12,14 @@ RSpec.describe BuildAllocationsController, type: :controller do
     stub_offender(offender)
     create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
     stub_community_offender(offender_no, build(:community_data))
+    allow_any_instance_of(StaffMember).to receive(:first_name).and_return('Bob')
+    allow_any_instance_of(StaffMember).to receive(:last_name).and_return('Billings')
   end
 
-  describe '#update' do
-    let(:notes) { 'A note' }
-
+  describe '#show' do
     context 'when allocating' do
       before do
-        put :update, params: {
-          "allocation_form" => { "message" => notes },
+        get :show, params: {
           "prison_id" => prison.code,
           "prisoner_id" => offender_no,
           "staff_id" => pom.staffId,
@@ -28,14 +27,13 @@ RSpec.describe BuildAllocationsController, type: :controller do
         }
       end
 
-      it 'redirects' do
-        expect(response.code).to eq('302')
+      it 'returns success' do
+        expect(response.code).to eq('200')
       end
 
       it 'stores offender details' do
         expect(session).to have_key(:latest_allocation_details)
-        expect(session[:latest_allocation_details]).to include(prisoner_number: offender_no,
-                                                               additional_notes: notes)
+        expect(session[:latest_allocation_details]).to include(prisoner_number: offender_no)
       end
     end
 
@@ -44,8 +42,7 @@ RSpec.describe BuildAllocationsController, type: :controller do
         create(:allocation_history, prison: prison.code, nomis_offender_id: offender_no,
                                     primary_pom_nomis_id: pom_nomis_id)
 
-        put :update, params: {
-          "allocation_form" => { "message" => notes },
+        get :show, params: {
           "prison_id" => prison.code,
           "prisoner_id" => offender_no,
           "staff_id" => pom.staffId,
@@ -56,8 +53,8 @@ RSpec.describe BuildAllocationsController, type: :controller do
       context 'with the same POM' do
         let(:pom_nomis_id) { pom.staffId }
 
-        it 'redirects' do
-          expect(response.code).to eq('302')
+        it 'returns success' do
+          expect(response.code).to eq('200')
         end
 
         it 'does not store offender details' do
@@ -68,13 +65,119 @@ RSpec.describe BuildAllocationsController, type: :controller do
       context 'with a different POM' do
         let(:pom_nomis_id) { pom.staffId + 123 }
 
-        it 'redirects' do
-          expect(response.code).to eq('302')
+        it 'returns success' do
+          expect(response.code).to eq('200')
         end
 
         it 'stores offender details' do
           expect(session).to have_key(:latest_allocation_details)
-          expect(session[:latest_allocation_details]).to include(prisoner_number: offender_no, additional_notes: notes)
+          expect(session[:latest_allocation_details]).to include(prisoner_number: offender_no)
+        end
+      end
+    end
+  end
+
+  describe '#update' do
+    before do
+      allow(AllocationService).to receive(:create_or_update).and_return(nil)
+    end
+
+    let(:notes) { 'A note' }
+
+    context 'when allocating' do
+      before do
+        session[:latest_allocation_details] = {}
+
+        put :update, params: {
+          allocation_form: { message: notes },
+          prison_id: prison.code,
+          prisoner_id: offender_no,
+          staff_id: pom.staffId,
+          id: 'allocate'
+        }
+      end
+
+      it 'calls AllocationService.create_or_update' do
+        expect(AllocationService).to have_received(:create_or_update).once
+      end
+
+      it 'stores no message in flash notice' do
+        expect(flash[:notice]).to be_nil
+      end
+
+      it 'adds additional notes to stored allocation details' do
+        expect(session[:latest_allocation_details]).to include(additional_notes: notes)
+      end
+
+      it 'redirects to Make allocations' do
+        expect(response).to redirect_to(unallocated_prison_prisoners_path)
+      end
+    end
+
+    context 'when re-allocating' do
+      before do
+        create(:allocation_history, prison: prison.code, nomis_offender_id: offender_no,
+                                    primary_pom_nomis_id: pom_nomis_id)
+      end
+
+      context 'with the same POM' do
+        before do
+          put :update, params: {
+            prison_id: prison.code,
+            prisoner_id: offender_no,
+            staff_id: pom.staffId,
+            id: 'allocate'
+          }
+        end
+
+        let(:pom_nomis_id) { pom.staffId }
+
+        it 'does not call AllocationService.create_or_update' do
+          expect(AllocationService).not_to have_received(:create_or_update)
+        end
+
+        it 'stores message in flash notice' do
+          expect(flash[:notice]).to match(/allocated to/)
+        end
+
+        it 'does not store offender details' do
+          expect(session).not_to have_key(:latest_allocation_details)
+        end
+
+        it 'redirects to See allocations' do
+          expect(response).to redirect_to(allocated_prison_prisoners_path)
+        end
+      end
+
+      context 'with a different POM' do
+        before do
+          session[:latest_allocation_details] = {}
+
+          put :update, params: {
+            allocation_form: { message: notes },
+            prison_id: prison.code,
+            prisoner_id: offender_no,
+            staff_id: pom.staffId,
+            id: 'allocate'
+          }
+        end
+
+        let(:pom_nomis_id) { pom.staffId + 123 }
+
+        it 'calls AllocationService.create_or_update' do
+          expect(AllocationService).to have_received(:create_or_update).once
+        end
+
+        it 'stores no message in flash notice' do
+          expect(flash[:notice]).to be_nil
+        end
+
+        it 'adds additional notes to stored allocation details' do
+          expect(session[:latest_allocation_details]).to include(additional_notes: notes)
+        end
+
+        it 'redirects to See allocations' do
+          expect(response).to redirect_to(allocated_prison_prisoners_path)
         end
       end
     end

@@ -2,31 +2,59 @@
 
 <%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
 
-<div class="govuk-grid-row">
-
-  <div class="govuk-grid-column-two-thirds">
-    <%= form_for(@allocation,
-                 url: wizard_path,
-                 builder: GOVUKDesignSystemFormBuilder::FormBuilder,
-                 method: :put) do |form| %>
-      <h1 class="govuk-heading-xl govuk-!-margin-top-4">Confirm allocation</h1>
-      <p class="govuk-body">You are allocating <%= "#{@prisoner.first_name} #{@prisoner.last_name}".titleize %> to <%= "#{@pom.first_name} #{@pom.last_name}".titleize %>.</p>
-      <% if @pom.email_address.blank? %>
-        <p class="govuk-body">No notification email will be sent to <%= "#{@pom.first_name} #{@pom.last_name}".titleize %> as they have no registered email address in NOMIS.</p>
+<%= form_for(@allocation,
+              url: wizard_path,
+              builder: GOVUKDesignSystemFormBuilder::FormBuilder,
+              method: :put) do |form| %>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <% if @reallocating_same_pom %>
+        <h1 class="govuk-heading-l govuk-!-margin-bottom-0">Confirm allocation for <%= "#{@prisoner.first_name} #{@prisoner.last_name}".titleize %></h1>
+        <span class="govuk-caption-l govuk-!-margin-bottom-2">Currently allocated to <%= "#{@pom.first_name} #{@pom.last_name}".titleize %></span>
       <% else %>
-        <p class="govuk-body">We will send a confirmation email to <%= @pom.email_address %>.</p>
+        <h1 class="govuk-heading-l govuk-!-margin-bottom-0">Check allocation details for <%= "#{@prisoner.first_name} #{@prisoner.last_name}".titleize %></h1>
       <% end %>
-
-      <div class="govuk-form-group">
-        <%= form.govuk_text_area :message,
-                                 label: { text: 'Add a note to the email:', size: 's' },
-                                 hint: { text: 'For example, you can tell the prison offender manager about any special requirements.' },
-                                 rows: 3 %>
-      </div>
-
-      <%= form.submit "Complete allocation", role: "button", draggable: "false", class: "govuk-button" %>
-      <a class="govuk-link cancel-button" href="<%= prison_prisoner_staff_index_path(@prison.code, @prisoner.offender_no) %>">Cancel</a>
-    <% end %>
+      <span class="govuk-caption-l">Prison number: <%= @prisoner.offender_no %></span>
+      <span class="govuk-caption-l">Date of birth: <%= format_date(@prisoner.date_of_birth) %> (<%= @prisoner.age %>)</span>
+    </div>
   </div>
 
-</div>
+  <div class="govuk-width-container govuk-!-margin-top-6">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <% if @reallocating_same_pom %>
+          <p>Confirm you want <%= "#{@prisoner.first_name} #{@prisoner.last_name}".titleize %> to stay allocated to <%= "#{@pom.first_name} #{@pom.last_name}".titleize %>.</p>
+
+          <%= form.submit "Continue", role: "button", draggable: "false", class: "govuk-button" %>
+          <a class="govuk-link cancel-button" href="<%= prison_prisoner_staff_index_path(@prison.code, @prisoner.offender_no) %>">Choose a different POM</a>
+        <% else %>
+          <% if @pom.email_address.blank? %>
+            <p>No notification email will be sent to <strong><%= "#{@pom.first_name} #{@pom.last_name}".titleize %></strong> as they have no registered email address in NOMIS.</p>
+          <% else %>
+            <% if @event == :reallocate_primary_pom %>
+              <p>We will send the information below to <strong><%= @pom.email_address %></strong> and notify <%= @prev_pom_name %> of the reallocation.</p>
+            <% else %>
+              <p>We will send a confirmation email to <strong><%= @pom.email_address %></strong>.</p>
+            <% end %>
+          <% end %>
+
+          <div class="govuk-inset-text govuk-!-padding-top-1 govuk-!-padding-bottom-1">
+            <% if @latest_allocation_details.present? %>
+              <%= render partial: 'allocations/allocated_details', locals: @latest_allocation_details %>
+            <% end %>
+
+            <div class="govuk-form-group">
+              <%= form.govuk_text_area :message,
+                                      label: { text: 'Add a note to the email', size: 's' },
+                                      rows: 3,
+                                      class: 'govuk-!-margin-bottom-2' %>
+            </div>
+          </div>
+
+          <%= form.submit "Complete allocation", role: "button", draggable: "false", class: "govuk-button" %>
+          <a class="govuk-link cancel-button" href="<%= prison_prisoner_staff_index_path(@prison.code, @prisoner.offender_no) %>">Cancel</a>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

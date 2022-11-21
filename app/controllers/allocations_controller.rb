@@ -24,6 +24,7 @@ class AllocationsController < PrisonsApplicationController
     end
     @keyworker = HmppsApi::KeyworkerApi.get_keyworker(active_prison_id, @prisoner.offender_no)
     @emails_sent_to_ldu = EmailHistory.sent_within_current_sentence(@prisoner, EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION)
+    retrieve_latest_allocation_details
   end
 
   def history

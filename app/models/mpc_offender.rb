@@ -11,7 +11,7 @@ class MpcOffender
            :date_of_birth, :main_offence, :awaiting_allocation_for, :location,
            :category_label, :complexity_level, :category_code, :category_active_since,
            :first_name, :last_name, :full_name_ordered, :full_name,
-           :inside_omic_policy?, :offender_no, :prison_id, :restricted_patient?, to: :@prison_record
+           :inside_omic_policy?, :offender_no, :prison_id, :restricted_patient?, :age, to: :@prison_record
 
   delegate :crn, :case_allocation, :manual_entry?, :nps_case?,
            :tier,

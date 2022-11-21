@@ -101,9 +101,8 @@ feature 'Co-working' do
         nomis_offender_id, prison_pom[:staff_id], secondary_pom[:staff_id]
       )
 
-      expect(page).to have_content("Confirm co-working allocation")
-      expect(page).to have_content("You are allocating co-working POM #{secondary_pom[:pom_name]} to #{prisoner_name_forwards}. The responsible POM is #{prison_pom[:pom_name]}.")
-      expect(page).to have_content("We will send a confirmation email to #{secondary_pom[:email]}")
+      expect(page).to have_content("Check co-working allocation details")
+      expect(page).to have_content("We will send the information below to co-working prison POM #{secondary_pom[:email]}")
       expect(page).to have_button('Complete allocation')
       expect(page).to have_link('Cancel')
 
@@ -111,7 +110,7 @@ feature 'Co-working' do
 
       click_button 'Complete allocation'
 
-      expect(page).to have_current_path(unallocated_prison_prisoners_path(prison.code))
+      expect(page).to have_current_path(allocated_prison_prisoners_path(prison.code))
 
       allocation.reload
       expect(allocation.secondary_pom_nomis_id).to eq(secondary_pom[:staff_id])
@@ -216,7 +215,7 @@ feature 'Co-working' do
       end
       click_button 'Complete allocation'
       expect(allocation.reload.secondary_pom_nomis_id).to eq(485_758)
-      expect(page).to have_current_path(unallocated_prison_prisoners_path(prison.code), ignore_query: true)
+      expect(page).to have_current_path(allocated_prison_prisoners_path(prison.code), ignore_query: true)
     end
   end
 end
