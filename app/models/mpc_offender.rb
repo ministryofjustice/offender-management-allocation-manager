@@ -29,7 +29,7 @@ class MpcOffender
   def initialize(prison:, offender:, prison_record:)
     @prison = prison
     @offender = offender
-    @prison_record = prison_record
+    @prison_record = prison_record # @type HmppsApi::Offender
     @probation_record = offender.case_information
   end
 
