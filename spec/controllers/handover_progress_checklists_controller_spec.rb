@@ -72,7 +72,7 @@ RSpec.describe HandoverProgressChecklistsController do
           tasks = {
             reviewed_oasys: true,
             contacted_com: true,
-            attended_handover_meeting: true,
+            sent_handover_report: true,
           }
           put :update, params: default_params.merge(handover_progress_checklist: tasks)
         end
@@ -82,7 +82,7 @@ RSpec.describe HandoverProgressChecklistsController do
           aggregate_failures do
             expect(model.reviewed_oasys).to eq true
             expect(model.contacted_com).to eq true
-            expect(model.attended_handover_meeting).to eq true
+            expect(model.sent_handover_report).to eq true
           end
         end
 
@@ -96,11 +96,11 @@ RSpec.describe HandoverProgressChecklistsController do
           FactoryBot.create :handover_progress_checklist, nomis_offender_id: nomis_offender_id,
                                                           reviewed_oasys: true,
                                                           contacted_com: false,
-                                                          attended_handover_meeting: true
+                                                          sent_handover_report: true
           tasks = {
             reviewed_oasys: false,
             contacted_com: true,
-            attended_handover_meeting: false,
+            sent_handover_report: false,
           }
           put :update, params: default_params.merge(handover_progress_checklist: tasks)
         end
@@ -110,7 +110,7 @@ RSpec.describe HandoverProgressChecklistsController do
           aggregate_failures do
             expect(model.reviewed_oasys).to eq false
             expect(model.contacted_com).to eq true
-            expect(model.attended_handover_meeting).to eq false
+            expect(model.sent_handover_report).to eq false
           end
         end
 
@@ -122,7 +122,7 @@ RSpec.describe HandoverProgressChecklistsController do
 
     describe 'when offender does not exist' do
       it 'shows error' do
-        tasks = { reviewed_oasys: false, contacted_com: false, attended_handover_meeting: false }
+        tasks = { reviewed_oasys: false, contacted_com: false, sent_handover_report: false }
         put :update, params: default_params.merge(handover_progress_checklist: tasks)
         expect(response).to redirect_to('/404')
       end

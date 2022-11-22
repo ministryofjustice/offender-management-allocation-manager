@@ -40,7 +40,7 @@ private
     params.require(:handover_progress_checklist).permit(
       :reviewed_oasys,
       :contacted_com,
-      :attended_handover_meeting,
+      :sent_handover_report,
     )
   end
 end

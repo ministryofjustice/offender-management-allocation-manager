@@ -7,7 +7,7 @@ class CreateHandoverProgressChecklists < ActiveRecord::Migration[6.1]
                    foreign_key: { to_table: :offenders, primary_key: :nomis_offender_id }
       t.boolean :reviewed_oasys, null: false, default: false
       t.boolean :contacted_com, null: false, default: false
-      t.boolean :attended_handover_meeting, null: false, default: false
+      t.boolean :sent_handover_report, null: false, default: false
       t.timestamps null: true
     end
   end

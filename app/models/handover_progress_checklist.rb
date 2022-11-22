@@ -17,7 +17,7 @@ class HandoverProgressChecklist < ApplicationRecord
 private
 
   def task_fields
-    fields = %w[contacted_com attended_handover_meeting]
+    fields = %w[contacted_com sent_handover_report]
     fields.push('reviewed_oasys') if case_allocation == 'NPS'
     fields
   end

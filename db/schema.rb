@@ -142,7 +142,7 @@ ActiveRecord::Schema.define(version: 2022_11_04_000001) do
     t.string "nomis_offender_id", null: false
     t.boolean "reviewed_oasys", default: false, null: false
     t.boolean "contacted_com", default: false, null: false
-    t.boolean "attended_handover_meeting", default: false, null: false
+    t.boolean "sent_handover_report", default: false, null: false
     t.datetime "created_at", precision: 6
     t.datetime "updated_at", precision: 6
     t.index ["nomis_offender_id"], name: "index_handover_progress_checklists_on_nomis_offender_id", unique: true

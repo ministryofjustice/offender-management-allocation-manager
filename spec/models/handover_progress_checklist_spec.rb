@@ -11,7 +11,7 @@ RSpec.describe HandoverProgressChecklist do
         checklist.attributes = {
           reviewed_oasys: false,
           contacted_com: false,
-          attended_handover_meeting: true,
+          sent_handover_report: true,
         }
       end
 
@@ -26,7 +26,7 @@ RSpec.describe HandoverProgressChecklist do
         checklist.attributes = {
           reviewed_oasys: true, # ignored
           contacted_com: false,
-          attended_handover_meeting: true,
+          sent_handover_report: true,
         }
       end
 
@@ -39,7 +39,7 @@ RSpec.describe HandoverProgressChecklist do
   describe '#task_completion_data' do
     describe 'when NPS case' do
       let(:expected_data) do
-        { 'reviewed_oasys' => false, 'contacted_com' => false, 'attended_handover_meeting' => true }
+        { 'reviewed_oasys' => false, 'contacted_com' => false, 'sent_handover_report' => true }
       end
 
       before do
@@ -52,7 +52,7 @@ RSpec.describe HandoverProgressChecklist do
     end
 
     describe 'when CRC case' do
-      let(:expected_data) { { 'contacted_com' => false, 'attended_handover_meeting' => true } }
+      let(:expected_data) { { 'contacted_com' => false, 'sent_handover_report' => true } }
 
       before do
         allow(checklist.offender).to receive(:case_allocation).and_return('CRC')

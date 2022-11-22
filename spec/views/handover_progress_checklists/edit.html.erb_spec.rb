@@ -18,7 +18,7 @@ RSpec.describe 'handover_progress_checklists/edit' do
       nomis_offender_id: nomis_offender_id,
       reviewed_oasys: false,
       contacted_com: false,
-      attended_handover_meeting: false)
+      sent_handover_report: false)
     allow(model).to receive(:case_allocation).and_return('NPS')
     model
   end
@@ -44,7 +44,7 @@ RSpec.describe 'handover_progress_checklists/edit' do
         expect(page).not_to have_css('input[name="handover_progress_checklist[contacted_com]"][checked=checked]',
                                      visible: false)
 
-        expect(page).not_to have_css('input[name="handover_progress_checklist[attended_handover_meeting]"]' \
+        expect(page).not_to have_css('input[name="handover_progress_checklist[sent_handover_report]"]' \
                                      '[checked=checked]',
                                      visible: false)
       end
@@ -70,7 +70,7 @@ RSpec.describe 'handover_progress_checklists/edit' do
       handover_progress_checklist.attributes = {
         reviewed_oasys: true,
         contacted_com: true,
-        attended_handover_meeting: true,
+        sent_handover_report: true,
       }
       render
     end
@@ -89,7 +89,7 @@ RSpec.describe 'handover_progress_checklists/edit' do
         expect(page).to have_css('input[name="handover_progress_checklist[contacted_com]"][checked=checked]',
                                  visible: false)
 
-        expect(page).to have_css('input[name="handover_progress_checklist[attended_handover_meeting]"][checked=checked]',
+        expect(page).to have_css('input[name="handover_progress_checklist[sent_handover_report]"][checked=checked]',
                                  visible: false)
       end
     end
@@ -106,7 +106,7 @@ RSpec.describe 'handover_progress_checklists/edit' do
         expect(page).to have_css('input[name="handover_progress_checklist[contacted_com]"]',
                                  visible: false)
 
-        expect(page).to have_css('input[name="handover_progress_checklist[attended_handover_meeting]"]',
+        expect(page).to have_css('input[name="handover_progress_checklist[sent_handover_report]"]',
                                  visible: false)
       end
     end
