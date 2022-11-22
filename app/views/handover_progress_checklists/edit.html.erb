@@ -9,7 +9,14 @@
       Record handover progress for <%= @offender.first_name.titleize %>
     </h1>
 
-    <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Handover started</h2>
+    <h2 class="govuk-heading-s govuk-!-margin-bottom-2">
+      <% if @handover_progress_checklist.progress_data['complete'] == 0 %>
+        Handover not started
+      <% else %>
+        Handover started
+      <% end %>
+    </h2>
+
     <p class="govuk-body">
       You have completed
       <%= @handover_progress_checklist.progress_data['complete'] %>
