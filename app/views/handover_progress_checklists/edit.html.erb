@@ -72,22 +72,42 @@
             </div>
           </li>
 
-          <li class="app-task-list__item">
-            <div class="govuk-checkboxes">
-              <div class="govuk-checkboxes__item">
-                <%= form.check_box :sent_handover_report, class: 'govuk-checkboxes__input',
-                                   'aria-describedby': 'sent-handover-report-hint' %>
-                <%= form.label :sent_handover_report, class: 'govuk-label govuk-checkboxes__label' do %>
-                  <strong>Send handover report</strong>
-                <% end %>
-                <%= handover_progress_checklist_completion_tag @handover_progress_checklist.sent_handover_report %>
+          <% if @handover_progress_checklist.case_allocation == 'NPS' %>
+            <li class="app-task-list__item">
+              <div class="govuk-checkboxes">
+                <div class="govuk-checkboxes__item">
+                  <%= form.check_box :attended_handover_meeting, class: 'govuk-checkboxes__input',
+                                     'aria-describedby': 'attended-handover-meeting-hint' %>
+                  <%= form.label :attended_handover_meeting, class: 'govuk-label govuk-checkboxes__label' do %>
+                    <strong>Attend handover meeting</strong>
+                  <% end %>
+                  <%= handover_progress_checklist_completion_tag @handover_progress_checklist.attended_handover_meeting %>
 
-                <span class="govuk-hint govuk-checkboxes__hint" id="sent-handover-report-hint">
+                  <span class="govuk-hint govuk-checkboxes__hint" id="attended-handover-meeting-hint">
+                    The COM should be in touch about arranging this with you, the prisoner and anyone else involved in
+                    the case, such as family members and key workers.
+                </span>
+                </div>
+              </div>
+            </li>
+          <% else %>
+            <li class="app-task-list__item">
+              <div class="govuk-checkboxes">
+                <div class="govuk-checkboxes__item">
+                  <%= form.check_box :sent_handover_report, class: 'govuk-checkboxes__input',
+                                     'aria-describedby': 'sent-handover-report-hint' %>
+                  <%= form.label :sent_handover_report, class: 'govuk-label govuk-checkboxes__label' do %>
+                    <strong>Send handover report</strong>
+                  <% end %>
+                  <%= handover_progress_checklist_completion_tag @handover_progress_checklist.sent_handover_report %>
+
+                  <span class="govuk-hint govuk-checkboxes__hint" id="sent-handover-report-hint">
                     You can find a template for this in the <%= link_to 'handover guidance on EQuiP', EQUIP_BASE_URL %>.
                 </span>
+                </div>
               </div>
-            </div>
-          </li>
+            </li>
+          <% end %>
 
         </ul>
       </div>

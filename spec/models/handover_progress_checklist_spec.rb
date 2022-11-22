@@ -11,11 +11,12 @@ RSpec.describe HandoverProgressChecklist do
         checklist.attributes = {
           reviewed_oasys: false,
           contacted_com: false,
-          sent_handover_report: true,
+          sent_handover_report: true, # ignored
+          attended_handover_meeting: true,
         }
       end
 
-      it 'returns completed and total tasks' do
+      it 'returns completed and total NPS tasks' do
         expect(checklist.progress_data).to eq('complete' => 1, 'total' => 3)
       end
     end
@@ -30,7 +31,7 @@ RSpec.describe HandoverProgressChecklist do
         }
       end
 
-      it 'returns completed and total tasks (ignoring reviewed_oasys)' do
+      it 'returns completed and total CRC tasks' do
         expect(checklist.progress_data).to eq('complete' => 1, 'total' => 2)
       end
     end
@@ -39,11 +40,11 @@ RSpec.describe HandoverProgressChecklist do
   describe '#task_completion_data' do
     describe 'when NPS case' do
       let(:expected_data) do
-        { 'reviewed_oasys' => false, 'contacted_com' => false, 'sent_handover_report' => true }
+        { 'reviewed_oasys' => false, 'contacted_com' => false, 'attended_handover_meeting' => true }
       end
 
       before do
-        checklist.attributes = expected_data
+        checklist.attributes = expected_data.merge(sent_handover_report: true) # extra field should be ignored
       end
 
       it 'returns completion data for NPS fields' do

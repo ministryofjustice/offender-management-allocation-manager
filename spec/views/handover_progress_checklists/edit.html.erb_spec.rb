@@ -32,14 +32,15 @@ RSpec.describe 'handover_progress_checklists/edit' do
     assign(:handover_progress_checklist, handover_progress_checklist)
   end
 
-  describe 'in the usual case, when all items are unfinished' do
+  describe 'when all items are incomplete' do
     before do
       render
     end
 
     it 'renders all checkboxes unticked' do
       aggregate_failures do
-        expect(page).not_to have_css('input[name="handover_progress_checklist[reviewed_oasys]"][checked=checked]')
+        expect(page).not_to have_css('input[name="handover_progress_checklist[reviewed_oasys]"][checked=checked]',
+                                     visible: false)
 
         expect(page).not_to have_css('input[name="handover_progress_checklist[contacted_com]"][checked=checked]',
                                      visible: false)
@@ -70,7 +71,7 @@ RSpec.describe 'handover_progress_checklists/edit' do
       handover_progress_checklist.attributes = {
         reviewed_oasys: true,
         contacted_com: true,
-        sent_handover_report: true,
+        attended_handover_meeting: true,
       }
       render
     end
@@ -89,7 +90,7 @@ RSpec.describe 'handover_progress_checklists/edit' do
         expect(page).to have_css('input[name="handover_progress_checklist[contacted_com]"][checked=checked]',
                                  visible: false)
 
-        expect(page).to have_css('input[name="handover_progress_checklist[sent_handover_report]"][checked=checked]',
+        expect(page).to have_css('input[name="handover_progress_checklist[attended_handover_meeting]"][checked=checked]',
                                  visible: false)
       end
     end

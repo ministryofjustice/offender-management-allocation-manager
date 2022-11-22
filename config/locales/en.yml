@@ -164,4 +164,5 @@ en:
       short_description:
         reviewed_oasys: 'Review OASys'
         contacted_com: 'Have contact from COM'
+        attended_handover_meeting: 'Attend handover meeting'
         sent_handover_report: 'Send handover report'
