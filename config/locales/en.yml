@@ -157,6 +157,9 @@ en:
         display_entries: "Showing %{first}&nbsp;to&nbsp;%{last} of <b>%{total}</b> results"
 
   handovers:
+    page_title:
+      default: 'Your handover cases - Digital Prison Services'
+      progress_checklist: 'Record handover progress - Digital Prison Services'
     progress:
       short_description:
         reviewed_oasys: 'Review OASys'
