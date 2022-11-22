@@ -78,13 +78,12 @@
                 <%= form.check_box :attended_handover_meeting, class: 'govuk-checkboxes__input',
                                    'aria-describedby': 'attended-handover-meeting-hint' %>
                 <%= form.label :attended_handover_meeting, class: 'govuk-label govuk-checkboxes__label' do %>
-                  <strong>Attend handover meeting</strong>
+                  <strong>Send handover report</strong>
                 <% end %>
                 <%= handover_progress_checklist_completion_tag @handover_progress_checklist.attended_handover_meeting %>
 
                 <span class="govuk-hint govuk-checkboxes__hint" id="attended-handover-meeting-hint">
-                    The COM should be in touch about arranging this with you, the prisoner and anyone else involved in
-                    the case, such as family members and key workers.
+                    You can find a template for this in the <%= link_to 'handover guidance on EQuiP', EQUIP_BASE_URL %>.
                 </span>
               </div>
             </div>
