@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_11_04_000001) do
+ActiveRecord::Schema.define(version: 2022_11_23_000001) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -140,12 +140,12 @@ ActiveRecord::Schema.define(version: 2022_11_04_000001) do
 
   create_table "handover_progress_checklists", force: :cascade do |t|
     t.string "nomis_offender_id", null: false
-    t.boolean "contacted_com", default: false, null: false
     t.boolean "reviewed_oasys", default: false, null: false
+    t.boolean "contacted_com", default: false, null: false
     t.boolean "attended_handover_meeting", default: false, null: false
-    t.boolean "sent_handover_report", default: false, null: false
     t.datetime "created_at", precision: 6
     t.datetime "updated_at", precision: 6
+    t.boolean "sent_handover_report", default: false, null: false
     t.index ["nomis_offender_id"], name: "index_handover_progress_checklists_on_nomis_offender_id", unique: true
   end
 
