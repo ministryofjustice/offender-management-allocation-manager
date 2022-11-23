@@ -93,7 +93,7 @@
     <% @offenders.each_with_index do |offender, i| %>
       <tr class="govuk-table__row offender_row_<%= i %>">
         <td aria-label="Prisoner name" class="govuk-table__cell ">
-          <%= link_to offender.full_name, prison_prisoner_staff_index_path(@prison.code, offender.offender_no) %>
+          <%= link_to offender.full_name, prison_prisoner_review_case_details_path(@prison.code, offender.offender_no) %>
           <br/>
           <span class='govuk-hint govuk-!-margin-bottom-0'>
             <%= offender.offender_no %>

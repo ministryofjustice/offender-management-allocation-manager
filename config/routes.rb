@@ -47,7 +47,7 @@ Rails.application.routes.draw do
       get 'caseload/global' => 'caseload_global#index'
     end
 
-    resources :prisoners, only: [:show] do
+    resources :prisoners, only: [:show, :review_case_details] do
       constraints lambda {
         |request| !PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id))
       } do
@@ -62,6 +62,8 @@ Rails.application.routes.draw do
       end
 
       resource :female_missing_info, only: [:new, :show, :update]
+
+      get 'review_case_details'
 
       collection do
         get 'allocated'
