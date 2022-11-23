@@ -34,6 +34,12 @@ class PrisonersController < PrisonsApplicationController
     render @current_user.allocations.empty? ? 'search' : 'search_global'
   end
 
+  def review_case_details
+    @prisoner = OffenderService.get_offender(params[:prisoner_id])
+
+    return redirect_to '/404' if @prisoner.nil?
+  end
+
   def show
     @prisoner = OffenderService.get_offender(params[:id])
 
