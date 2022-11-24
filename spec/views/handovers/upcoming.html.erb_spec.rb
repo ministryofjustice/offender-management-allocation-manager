@@ -1,5 +1,6 @@
 RSpec.describe 'handovers/upcoming' do
   let(:prison_code) { 'PRI' }
+  let(:all_false_hash) { Hash.new { |h, k| h[k] = false } }
   let(:upcoming_handover_cases) do
     [
       [
@@ -11,7 +12,8 @@ RSpec.describe 'handovers/upcoming' do
                         offender_no: 'X1111XX',
                         tier: 'A',
                         earliest_release: { type: 'TED', date: Date.new(2022, 1, 30) },
-                        case_allocation: 'NPS')
+                        case_allocation: 'NPS',
+                        handover_progress_task_completion_data: all_false_hash),
       ],
       [
         double(:handover_date2, com_allocated_date: Date.new(2022, 2, 5),
@@ -22,7 +24,8 @@ RSpec.describe 'handovers/upcoming' do
                         offender_no: 'X2222XX',
                         tier: 'B',
                         earliest_release: { type: 'HDCED', date: Date.new(2030, 1, 1) },
-                        case_allocation: 'CRC')
+                        case_allocation: 'CRC',
+                        handover_progress_task_completion_data: all_false_hash),
       ]
     ]
   end

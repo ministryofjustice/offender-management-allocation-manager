@@ -1,86 +1,34 @@
-<h2 class="govuk-heading-l">
+<h2 class="govuk-heading-m">
   Upcoming handovers
 </h2>
 
-<p>A COM will be allocated in the next 8 weeks. Start getting ready to hand the case over to the community.</p>
+<p>
+  A COM will be allocated in the next 8 weeks. Start getting ready to hand the case over to the community.
+</p>
 
-<table class="govuk-table upcoming-handovers" data-module="moj-sortable-table">
-  <thead class="govuk-table__head">
-  <tr class="govuk-table__row">
-    <th scope="col" class="govuk-table__header" aria-sort="none">
-      <button type="button" data-index="0">Prisoner details</button>
-    </th>
-    <th scope="col" class="govuk-table__header" aria-sort="ascending">
-      <button type="button" data-index="1">COM responsible</button>
-    </th>
-    <th scope="col" class="govuk-table__header" aria-sort="none">
-      <button type="button" data-index="2">Earliest release date</button>
-    </th>
-    <th scope="col" class="govuk-table__header" aria-sort="none">
-      <button type="button" data-index="3">Tier</button>
-    </th>
-    <th scope="col" class="govuk-table__header handover-progress">Handover progress</th>
-  </tr>
-  </thead>
+<%= handover_list_table(table_class: ['upcoming-handovers'],
+                        headers: [
+                          { type: 'button', body: 'Prisoner details' },
+                          { type: 'button', body: 'COM responsible', sort: 'ascending' },
+                          { type: 'button', body: 'Earliest release date' },
+                          { type: 'button', body: 'Tier' },
+                          { body: 'Handover progress', class: ['handover-progress'] },
+                        ]) do %>
 
-  <tbody class="govuk-table__body">
-  <% @handover_cases.upcoming.each do |calc_h_o_date, allocated_offender| %>
+  <% @handover_cases.upcoming.each do |calc_handover, offender| %>
     <tr class="govuk-table__row allocated-offender">
-      <td class="govuk-table__cell prisoner-details">
-        <a class="govuk-link govuk-link--no-visited-state"
-           data-sort-value="<%= allocated_offender.last_name %>"
-           href="<%= prison_prisoner_path(@prison_id, allocated_offender.offender_no) %>">
-          <%= allocated_offender.full_name %>
-        </a><br>
-        <span class="govuk-hint govuk-!-margin-bottom-0 offender-no"><%= allocated_offender.offender_no %></span>
-      </td>
+      <%= render 'handovers/cells/prisoner_details', prison_id: @prison_id, offender: offender %>
 
-      <% alloc_date, resp_date = calc_h_o_date.com_allocated_date, calc_h_o_date.com_responsible_date %>
-      <td class="govuk-table__cell handover-dates" data-sort-value="<%= alloc_date.iso8601 %>">
-        <% unless alloc_date == resp_date %>
-          <p>
-            COM allocated: <br>
-            <%= format_date(alloc_date, replacement: "Unknown") %>
-          </p>
-        <% end %>
-        <p>
-          COM responsible: <br>
-          <%= format_date(resp_date, replacement: "Unknown") %>
-        </p>
-      </td>
+      <%= render 'handovers/cells/handover_dates', calc_handover: calc_handover %>
 
-      <% rel_date = allocated_offender.earliest_release.fetch(:date) %>
-      <td class="govuk-table__cell earliest-release-date" data-sort-value="<%= rel_date.iso8601 %>">
-        <%= allocated_offender.earliest_release.fetch(:type) %>: <br>
-        <%= format_date(rel_date, replacement: "ERROR: Unknown") %>
-      </td>
+      <%= render 'handovers/cells/earliest_release_date', offender: offender %>
 
-      <td class="govuk-table__cell tier" data-sort-value="<%= allocated_offender.case_allocation %>">
-        <strong><%= allocated_offender.tier %></strong>
-        <p><%= allocated_offender.case_allocation %> (legacy)</p>
-      </td>
+      <%= render 'handovers/cells/tier', offender: offender %>
 
-      <td class="govuk-table__cell handover-progress">
-        <ul class="govuk-list govuk-body-s task-summary-checklist">
-          <li class="none">
-            <img src="<%= image_path('check.png') %>" alt="task complete">
-            Review OASys
-          </li>
-          <li class="none">
-            <img src="<%= image_path('cross.png') %>" alt="task complete">
-            Have contact from COM
-          </li>
-          <li class="none">
-            <img src="<%= image_path('cross.png') %>" alt="task not started">
-            Send handover report
-          </li>
-        </ul>
-        <p><%= handover_record_progress_link(@prison_id, allocated_offender.offender_no) %></p>
-      </td>
+      <%= render 'handovers/cells/handover_progress', prison_id: @prison_id, offender: offender %>
     </tr>
   <% end %>
-  </tbody>
-</table>
+<% end %>
 
 <div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>
 <div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>

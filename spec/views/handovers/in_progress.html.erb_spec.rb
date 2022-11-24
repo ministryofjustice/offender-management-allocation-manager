@@ -1,5 +1,6 @@
 RSpec.describe 'handovers/in_progress' do
   let(:prison_code) { 'PRI' }
+  let(:all_false_hash) { Hash.new { |h, k| h[k] = false } }
   let(:cases) do
     [
       [
@@ -13,7 +14,8 @@ RSpec.describe 'handovers/in_progress' do
                         earliest_release: { type: 'TED', date: Date.new(2022, 1, 30) },
                         case_allocation: 'NPS',
                         allocated_com_name: 'Com One',
-                        allocated_com_email: 'com1@example.org')
+                        allocated_com_email: 'com1@example.org',
+                        handover_progress_task_completion_data: all_false_hash),
       ],
       [
         double(:calculated_dates2, com_allocated_date: Date.new(2022, 2, 5),
@@ -26,7 +28,8 @@ RSpec.describe 'handovers/in_progress' do
                         earliest_release: { type: 'HDCED', date: Date.new(2030, 1, 1) },
                         case_allocation: 'CRC',
                         allocated_com_name: 'Com Two',
-                        allocated_com_email: 'x')
+                        allocated_com_email: 'x',
+                        handover_progress_task_completion_data: all_false_hash),
       ]
     ]
   end

@@ -1,0 +1,6 @@
+<td class="govuk-table__cell prisoner-details">
+  <%= link_to offender.full_name, prison_prisoner_path(prison_id, offender.offender_no),
+              class: %w[govuk-link govuk-link--no-visited-state], data: { 'sort-value' => offender.last_name} %>
+  <br>
+  <span class="govuk-hint govuk-!-margin-bottom-0 offender-no"><%= offender.offender_no %></span>
+</td>

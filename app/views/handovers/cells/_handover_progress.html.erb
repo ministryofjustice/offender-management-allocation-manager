@@ -1,0 +1,15 @@
+<td class="govuk-table__cell handover-progress">
+  <ul class="govuk-list govuk-body-s task-summary-checklist">
+    <% offender.handover_progress_task_completion_data.each do |name, complete| %>
+      <li class="none">
+        <% if complete %>
+          <img src="<%= image_path('check.png') %>" alt="task complete">
+        <% else %>
+          <img src="<%= image_path('cross.png') %>" alt="task not started">
+        <% end %>
+        <%= translate "handovers.progress.short_description.#{name}" %>
+      </li>
+    <% end %>
+  </ul>
+  <p><%= handover_record_progress_link(prison_id, offender.offender_no) %></p>
+</td>

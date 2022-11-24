@@ -10,12 +10,18 @@ class HandoverProgressChecklist < ApplicationRecord
     }
   end
 
+  def task_completion_data
+    attributes.slice(*task_fields)
+  end
+
 private
 
   def task_fields
-    fields = %w[contacted_com attended_handover_meeting]
-    fields.push('reviewed_oasys') if case_allocation == 'NPS'
-    fields
+    if case_allocation == 'NPS'
+      %w[reviewed_oasys contacted_com attended_handover_meeting]
+    else
+      %w[contacted_com sent_handover_report]
+    end
   end
 
   def completed_task_fields

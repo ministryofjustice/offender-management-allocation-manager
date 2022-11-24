@@ -155,3 +155,14 @@ en:
           other: "Showing <b>1</b> to <b>%{count}</b> of <b>%{count}</b> results"
       more_pages:
         display_entries: "Showing %{first}&nbsp;to&nbsp;%{last} of <b>%{total}</b> results"
+
+  handovers:
+    page_title:
+      default: 'Your handover cases - Digital Prison Services'
+      progress_checklist: 'Record handover progress - Digital Prison Services'
+    progress:
+      short_description:
+        reviewed_oasys: 'Review OASys'
+        contacted_com: 'Have contact from COM'
+        attended_handover_meeting: 'Attend handover meeting'
+        sent_handover_report: 'Send handover report'

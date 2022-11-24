@@ -17,7 +17,7 @@ class MpcOffender
            :tier,
            :mappa_level, :welsh_offender, to: :probation_record
 
-  delegate :victim_liaison_officers, to: :@offender
+  delegate :victim_liaison_officers, :handover_progress_task_completion_data, to: :@offender
 
   # These fields make sense to be nil when the probation record is nil - the others dont
   delegate :ldu_email_address, :team_name, :ldu_name, to: :probation_record, allow_nil: true
@@ -29,7 +29,7 @@ class MpcOffender
   def initialize(prison:, offender:, prison_record:)
     @prison = prison
     @offender = offender
-    @prison_record = prison_record
+    @prison_record = prison_record # @type HmppsApi::Offender
     @probation_record = offender.case_information
   end
 

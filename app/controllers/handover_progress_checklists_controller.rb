@@ -41,6 +41,7 @@ private
       :reviewed_oasys,
       :contacted_com,
       :attended_handover_meeting,
+      :sent_handover_report,
     )
   end
 end

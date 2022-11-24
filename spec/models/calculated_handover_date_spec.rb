@@ -147,5 +147,15 @@ RSpec.describe CalculatedHandoverDate do
       row.update! responsibility: described_class::CUSTODY_ONLY
       expect(query).not_to include row
     end
+
+    it 'does not include rows that have no handover date' do
+      FactoryBot.create :calculated_handover_date,
+                        responsibility: described_class::COMMUNITY_RESPONSIBLE,
+                        handover_date: nil,
+                        start_date: nil,
+                        offender: FactoryBot.create(:offender, nomis_offender_id: 'X2222XX')
+
+      expect(query(offender_ids: ['X2222XX'])).to be_blank
+    end
   end
 end

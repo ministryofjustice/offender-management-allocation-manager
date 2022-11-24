@@ -71,4 +71,21 @@ RSpec.describe Offender, type: :model do
       end
     end
   end
+
+  describe '#handover_progress_task_completion_data' do
+    it 'gets the correct data when the checklist exists' do
+      data = { t1: true, t2: false }
+      allow(offender).to receive(:handover_progress_checklist).and_return(
+        instance_double(HandoverProgressChecklist, task_completion_data: data)
+      )
+      expect(offender.handover_progress_task_completion_data).to eq(data)
+    end
+
+    it 'responds with all tasks incomplete if checklist model does not exist' do
+      data = { t1: false, t2: false }
+      mock = instance_double HandoverProgressChecklist, task_completion_data: data
+      allow(offender).to receive(:build_handover_progress_checklist).and_return(mock)
+      expect(offender.handover_progress_task_completion_data).to eq data
+    end
+  end
 end

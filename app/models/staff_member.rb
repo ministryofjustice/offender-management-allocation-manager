@@ -58,7 +58,9 @@ class StaffMember
   end
 
   def unreleased_allocations
-    allocations.select { |offender| offender.earliest_release_date > Time.zone.now.to_date }
+    allocations.select do |offender|
+      offender.earliest_release_date.nil? || offender.earliest_release_date > Time.zone.now.to_date
+    end
   end
 
   def has_allocation?(nomis_offender_id)
