@@ -2,11 +2,18 @@ require 'rails_helper'
 
 RSpec.describe MpcOffender, type: :model do
   subject(:offender) do
-    build(:mpc_offender, prison: prison, prison_record: api_offender, offender: build(:case_information).offender)
+    build(:mpc_offender, prison: prison, prison_record: api_offender, offender: offender_model)
   end
 
+  let(:nomis_offender_id) { FactoryBot.generate :nomis_offender_id }
+  let(:offender_model) do
+    instance_double(Offender,
+                    id: nomis_offender_id,
+                    nomis_offender_id: nomis_offender_id,
+                    case_information: instance_double(CaseInformation))
+  end
   let(:prison) { build(:prison) }
-  let(:api_offender) { double(:nomis_offender, offender_no: FactoryBot.generate(:nomis_offender_id)) }
+  let(:api_offender) { double(:nomis_offender, offender_no: nomis_offender_id) }
 
   describe '#additional_information' do
     let(:api_offender) { double(:nomis_offender, recalled?: recalled) }
@@ -174,6 +181,12 @@ RSpec.describe MpcOffender, type: :model do
 
     it 'returns nil if saved value does not exist' do
       expect(offender.com_responsible_date).to be_nil
+    end
+  end
+
+  describe '#model' do
+    it 'returns the Offender model instance' do
+      expect(offender.model).to eq offender_model
     end
   end
 end
