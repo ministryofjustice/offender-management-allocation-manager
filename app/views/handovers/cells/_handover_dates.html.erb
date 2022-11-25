@@ -1,13 +1,7 @@
-<% alloc_date, resp_date = calc_handover.com_allocated_date, calc_handover.com_responsible_date %>
-<td class="govuk-table__cell handover-dates" data-sort-value="<%= alloc_date.iso8601 %>">
-  <% unless alloc_date == resp_date %>
-    <p>
-      COM allocated: <br>
-      <%= format_date(alloc_date, replacement: "Unknown") %>
-    </p>
-  <% end %>
+<% handover_date = calc_handover.handover_date %>
+<td class="govuk-table__cell handover-dates" data-sort-value="<%= handover_date.iso8601 %>">
   <p>
     COM responsible: <br>
-    <%= format_date(resp_date, replacement: "Unknown") %>
+    <%= format_date(handover_date, replacement: "Unknown") %>
   </p>
 </td>

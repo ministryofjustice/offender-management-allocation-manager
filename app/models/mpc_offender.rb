@@ -283,6 +283,10 @@ class MpcOffender
     active_codes.map { |c| labels[c] }.compact
   end
 
+  def model
+    @offender
+  end
+
 private
 
   def early_allocation_notes?

@@ -35,7 +35,7 @@ RSpec.feature 'Handovers feature:' do
           instance_double(AllocatedOffender, offender_attrs.merge(allocated_com_name: nil))
         ]
       )
-      date = FactoryBot.create :calculated_handover_date,
+      date = FactoryBot.create :calculated_handover_date, :before_handover,
                                offender: FactoryBot.create(:offender, nomis_offender_id: 'X1111XX')
       allow(CalculatedHandoverDate).to receive(:by_upcoming_handover).and_return [date]
 
@@ -57,7 +57,7 @@ RSpec.feature 'Handovers feature:' do
                                                                   allocated_com_email: 'mr-com@example.org'))
         ]
       )
-      date = FactoryBot.create :calculated_handover_date, :between_com_allocated_and_responsible_dates,
+      date = FactoryBot.create :calculated_handover_date, :after_handover,
                                offender: FactoryBot.create(:offender, nomis_offender_id: 'X1111XX')
       allow(CalculatedHandoverDate).to receive(:by_handover_in_progress).and_return [date]
 

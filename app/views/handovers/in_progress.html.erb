@@ -23,7 +23,7 @@
 
       <% com_name = offender.allocated_com_name %>
       <td class="govuk-table__cell com-details" data-sort-value="<%= com_name || 'Unknown' %>">
-        <% if com_name.nil? and calc_handover.com_allocated_date > Time.zone.now.to_date - 2.days %>
+        <% if com_name.nil? and calc_handover.handover_date > Time.zone.now.to_date - 2.days %>
           Unknown
         <% elsif com_name.nil? %>
           <div class="highlight-primary highlight-alert">Unknown</div>

@@ -61,12 +61,11 @@ RSpec.describe CalculatedHandoverDate do
   describe '::by_upcoming_handover scope' do
     let(:upcoming_handover_date_attributes) do
       {
-        com_allocated_date: Date.new(2022, 12, 1),
-        com_responsible_date: Date.new(2022, 12, 30)
+        handover_date: Date.new(2022, 12, 1),
       }
     end
     let!(:row) do # instantiate it immediately
-      FactoryBot.create :calculated_handover_date, :before_com_allocated_date,
+      FactoryBot.create :calculated_handover_date, :before_handover,
                         offender: FactoryBot.create(:offender, nomis_offender_id: 'X1111XX'),
                         **upcoming_handover_date_attributes
     end
@@ -121,7 +120,7 @@ RSpec.describe CalculatedHandoverDate do
 
   describe '::by_handover_in_progress scope' do
     let!(:row) do # instantiate it immediately
-      FactoryBot.create :calculated_handover_date, :between_com_allocated_and_responsible_dates,
+      FactoryBot.create :calculated_handover_date, :after_handover,
                         offender: FactoryBot.create(:offender, nomis_offender_id: 'X1111XX')
     end
 
