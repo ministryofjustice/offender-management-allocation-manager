@@ -11,3 +11,40 @@
 .govuk-inset-text.govuk-inset-text--com-responsible-date {
   margin-bottom: 40px;
 }
+
+.govuk-table__cell.days-overdue {
+  span {
+    display: block;
+  }
+
+  .due {
+    border-left: 5px solid govuk-colour('turquoise');
+    font-weight: bold;
+    padding-left: 5px;
+  }
+
+  .overdue {
+    border-left: 5px solid govuk-colour('red');
+    font-weight: bold;
+    padding-left: 5px;
+  }
+
+  .highlight {
+    border-left: 5px solid govuk-colour('purple');
+    font-weight: bold;
+    padding-left: 5px;
+  }
+
+  .secondary {
+    color: govuk-colour('black');
+    font-size: 16px;
+    font-weight: normal;
+    line-height: 1.25;
+  }
+}
+
+.govuk-table__cell.ldu-details {
+  p:first-child {
+    margin-bottom: 10px;
+  }
+}

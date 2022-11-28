@@ -1,0 +1,47 @@
+<h2 class="govuk-heading-m">
+  COM allocation overdue
+</h2>
+
+<p>
+  These cases have past their handover date and are missing COM details on NDelius. You could:
+</p>
+
+<ul class="govuk-list govuk-list--bullet">
+  <li>notify the local divisional unit (LDU) that COM allocation is overdue</li>
+  <li>if there's no response, discuss the allocation with your manager</li>
+</ul>
+
+<%= handover_list_table(table_class: %w[com-allocation-overdue],
+                        headers: [
+                          { type: 'button', body: 'Prisoner details' },
+                          { type: 'button', body: 'COM responsible', sort: 'ascending' },
+                          { type: 'button', body: 'Earliest release date' },
+                          { type: 'button', body: 'Tier' },
+                          { type: 'button', body: 'Days overdue', class: %w[days-overdue], sort: 'descending' },
+                          { body: 'LDU details', class: %w[ldu-details govuk-!-width-one-quarter] },
+                        ]) do %>
+
+  <% @handover_cases.in_progress.each do |calc_handover, offender| %>
+    <tr class="govuk-table__row allocated-offender">
+      <%= render 'handovers/cells/prisoner_details', prison_id: @prison_id, offender: offender %>
+
+      <%= render 'handovers/cells/handover_dates', calc_handover: calc_handover %>
+
+      <%= render 'handovers/cells/earliest_release_date', offender: offender %>
+
+      <%= render 'handovers/cells/tier', offender: offender %>
+
+      <td class="govuk-table__cell days-overdue">
+        <span class="date overdue"><%= rand(30) %></span>
+      </td>
+
+      <td class="govuk-table__cell ldu-details">
+        <p>Cornwall and Isles of Scilly</p>
+        <p>PlymouthCornwallandIslesofScilly-omic@justice.gov.uk</p>
+      </td>
+    </tr>
+  <% end %>
+<% end %>
+
+<div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>
+<div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>
