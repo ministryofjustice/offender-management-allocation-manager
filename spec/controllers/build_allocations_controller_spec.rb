@@ -1,5 +1,5 @@
 RSpec.describe BuildAllocationsController, type: :controller do
-  let(:poms) { [build(:pom, :prison_officer, emails: [])] }
+  let(:poms) { [build(:pom, :prison_officer)] }
   let(:pom) { poms.first }
   let(:prison) { create(:prison) }
   let(:offender) { build(:nomis_offender, prisonId: prison.code) }
@@ -79,14 +79,16 @@ RSpec.describe BuildAllocationsController, type: :controller do
 
   describe '#update' do
     before do
-      allow(AllocationService).to receive(:create_or_update).and_return(nil)
+      allow(PomMailer).to receive(:new_allocation_email).and_return(fake_job)
+      allow(PomMailer).to receive(:deallocation_email).and_return(fake_job)
     end
 
+    let(:fake_job) { double(:fake_job, deliver_later: nil) }
     let(:notes) { 'A note' }
 
     context 'when allocating' do
       before do
-        session[:latest_allocation_details] = {}
+        session[:latest_allocation_details] = further_info
 
         put :update, params: {
           allocation_form: { message: notes },
@@ -97,8 +99,33 @@ RSpec.describe BuildAllocationsController, type: :controller do
         }
       end
 
-      it 'calls AllocationService.create_or_update' do
-        expect(AllocationService).to have_received(:create_or_update).once
+      # Tried making this a let but the `put :update` added
+      # :additional_notes to it. The code adds this to the session as
+      # part of the update, so it may be due to some odd interaction
+      # between rspec and sessions. It's a mystery. Using a method rather
+      # than a let gets round this issue.
+      def further_info
+        {
+          last_oasys_completed: '23-Jul-2009',
+          handover_start_date: '12-Aug-2010',
+          handover_completion_date: '13-Sep-2011',
+          com_name: 'Billy Smart',
+          com_email: 'billy@smart.com'
+        }
+      end
+
+      it 'sends an allocation email with the correct info' do
+        expect(PomMailer).to have_received(:new_allocation_email)
+          .with(
+            offender_no: offender_no,
+            offender_name: "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}",
+            pom_name: pom.firstName.capitalize,
+            pom_email: pom.email_address,
+            responsibility: 'responsible',
+            message: notes,
+            url: Rails.application.routes.default_url_options[:host] + prison_prisoner_allocation_path(prison, offender_no),
+            further_info: further_info
+          )
       end
 
       it 'stores no message in flash notice' do
@@ -116,6 +143,7 @@ RSpec.describe BuildAllocationsController, type: :controller do
 
     context 'when re-allocating' do
       before do
+        allow(AllocationService).to receive(:create_or_update).and_return(nil)
         create(:allocation_history, prison: prison.code, nomis_offender_id: offender_no,
                                     primary_pom_nomis_id: pom_nomis_id)
       end
@@ -151,6 +179,7 @@ RSpec.describe BuildAllocationsController, type: :controller do
 
       context 'with a different POM' do
         before do
+          allow(AllocationService).to receive(:create_or_update).and_return(nil)
           session[:latest_allocation_details] = {}
 
           put :update, params: {

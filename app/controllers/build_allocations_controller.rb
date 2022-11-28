@@ -61,23 +61,30 @@ class BuildAllocationsController < PrisonsApplicationController
       else
         override = OverrideForm.new session[:female_allocation_override]
 
-        allocation_attributes =
-          {
-            primary_pom_nomis_id: staff_id,
-            nomis_offender_id: nomis_offender_id_from_url,
-            event: event(history),
-            event_trigger: :user,
-            created_by_username: current_user,
-            allocated_at_tier: @prisoner.tier,
-            recommended_pom_type: (RecommendationService.recommended_pom_type(@prisoner) == RecommendationService::PRISON_POM) ? 'prison' : 'probation',
-            prison: active_prison_id,
-            message: allocation_params[:message],
-            override_reasons: override.override_reasons,
-            suitability_detail: override.suitability_detail,
-            override_detail: override.more_detail,
-          }
+        allocation_attributes = {
+          primary_pom_nomis_id: staff_id,
+          nomis_offender_id: nomis_offender_id_from_url,
+          event: event(history),
+          event_trigger: :user,
+          created_by_username: current_user,
+          allocated_at_tier: @prisoner.tier,
+          recommended_pom_type: (RecommendationService.recommended_pom_type(@prisoner) == RecommendationService::PRISON_POM) ? 'prison' : 'probation',
+          prison: active_prison_id,
+          message: allocation_params[:message],
+          override_reasons: override.override_reasons,
+          suitability_detail: override.suitability_detail,
+          override_detail: override.more_detail,
+        }
 
-        AllocationService.create_or_update(allocation_attributes)
+        further_info = session[:latest_allocation_details].slice(
+          :last_oasys_completed,
+          :handover_start_date,
+          :handover_completion_date,
+          :com_name,
+          :com_email
+        )
+
+        AllocationService.create_or_update(allocation_attributes, further_info)
         session.delete :female_allocation_override
         session[:latest_allocation_details][:additional_notes] = allocation_params[:message]
       end
