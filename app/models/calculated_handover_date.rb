@@ -85,11 +85,20 @@ class CalculatedHandoverDate < ApplicationRecord
                { days_before: upcoming_handover_window_duration, relative_to: relative_to_date })
     end
 
+    # A handover is considered in progress once responsibility goes to the community, until the prisoner is released
     def by_handover_in_progress(offender_ids:)
       relation
         .by_offender_ids(offender_ids)
         .where(responsibility: [COMMUNITY_RESPONSIBLE])
         .where.not(handover_date: nil)
+    end
+
+    def by_com_allocation_overdue(offender_ids:, relative_to_date: Time.zone.now.to_date)
+      relation
+        .by_handover_in_progress(offender_ids: offender_ids)
+        .joins(offender: :case_information)
+        .where(offender: { case_information: { com_email: nil } })
+        .where(':relative_to::date >= "handover_date"::date + \'2 days\'::interval', relative_to: relative_to_date)
     end
   end
 end
