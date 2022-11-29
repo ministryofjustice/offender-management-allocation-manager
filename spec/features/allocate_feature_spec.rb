@@ -38,15 +38,23 @@ feature 'Allocation' do
     before do
       allow(OffenderService).to receive(:get_community_data).and_return({ crn: 12_345 })
       allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_rosh_summary).and_return({})
+
       visit start_page
       click_link unallocated_offender_name
-      # Takes you to the Review case and allocate page where users review case details and scroll down to select from a list of POMs
-      expect(page).to have_current_path(prison_prisoner_staff_index_path('LEI', never_allocated_offender_id))
+
+      # Takes you to the Review case page
+      expect(page).to have_css('h1', text: "Review Obinins Albina's case")
+      expect(page).to have_content('Determinate')
+
+      within '.moj-page-header-actions__actions' do
+        click_link 'Choose POM'
+      end
+
+      # Takes you to the Choose a POM page
+      expect(page).to have_css('h1', text: "Allocate a POM to Obinins Albina")
     end
 
     scenario 'accepting the recommended POM type', vcr: { cassette_name: 'prison_api/create_new_allocation_feature' } do
-      expect(page).to have_content('Determinate')
-
       # Allocate to the Prison POM called "Moic Pom"
       within '#recommended_poms' do
         within row_containing 'Moic Pom' do
