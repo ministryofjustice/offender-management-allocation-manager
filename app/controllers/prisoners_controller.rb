@@ -36,6 +36,8 @@ class PrisonersController < PrisonsApplicationController
 
   def review_case_details
     @prisoner = OffenderService.get_offender(params[:prisoner_id])
+    @alerts = @prisoner.active_alert_labels
+    @rosh = @prisoner.rosh_summary
 
     return redirect_to '/404' if @prisoner.nil?
   end

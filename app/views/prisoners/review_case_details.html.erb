@@ -4,15 +4,13 @@
   <div class="govuk-grid-column-two-thirds">
     <div class="moj-page-header-actions">
       <div class="moj-page-header-actions__title">
-        <h1 class="govuk-heading-l">Review <%= @prisoner.first_name %> <%= @prisoner.last_name %>'s case</h1>
+        <h1 class="govuk-heading-l">Review <%= @prisoner.first_name.capitalize %> <%= @prisoner.last_name.capitalize %>'s case</h1>
         <span class="govuk-caption-l">Prison number: <%= @prisoner.offender_no %></span>
-        <span class="govuk-caption-l">Date of birth: <%= format_date(@prisoner.date_of_birth) %> (FIXME)</span>
+        <span class="govuk-caption-l">Date of birth: <%= format_date(@prisoner.date_of_birth) %> (<%= @prisoner.age %>)</span>
       </div>
 
       <div class="moj-page-header-actions__actions">
-        <button class="govuk-button" data-module="govuk-button">
-          Choose POM
-        </button>
+        <%= link_to 'Choose POM', prison_prisoner_staff_index_path(@prison, @prisoner.offender_no), class: 'govuk-button' %>
       </div>
     </div>
   </div>
@@ -77,7 +75,7 @@
             </tr>
             <tr class="govuk-table__row">
               <th scope="row" class="govuk-table__header govuk-!-width-one-third">Location</th>
-              <td class="govuk-table__cell govuk-!-width-one-third">E-4-017</td>
+              <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.location %></td>
               <td class="govuk-table__cell govuk-!-width-one-third"></td>
             </tr>
             <tr class="govuk-table__row">
@@ -122,11 +120,12 @@
         <p></p>
       <div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div></div>
     </div>
+    <!-- /At a glance box -->
 
     <!-- More info -->
     <h2 class="govuk-heading-l govuk-!-margin-top-8">More information</h2>
 
-    <p>You can also see Jack's:</p>
+    <p>You can also see <%= @prisoner.first_name.capitalize %>'s:</p>
 
     <ul class="govuk-list govuk-list--bullet">
       <li><a class="govuk-link govuk-link--no-visited-state" href="#">full Digital Prison Services profile</a></li>
@@ -155,22 +154,22 @@
                 <tbody class="govuk-table__body">
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell govuk-!-width-one-third">Main offence</td>
-                  <td class="govuk-table__cell govuk-!-width-one-third">Section 18 - wounding with intent</td>
+                  <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.main_offence %></td>
                   <td class="govuk-table__cell govuk-!-width-one-third"></td>
                 </tr>
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell govuk-!-width-one-third">Sentence start date</td>
-                  <td class="govuk-table__cell govuk-!-width-one-third">26 May 2015</td>
+                  <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.sentence_start_date, replacement: 'N/A') %></td>
                   <td class="govuk-table__cell govuk-!-width-one-third"></td>
                 </tr>
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell govuk-!-width-one-third">Conditional release date</td>
-                  <td class="govuk-table__cell govuk-!-width-one-third">22 May 2022</td>
+                  <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.conditional_release_date) %></td>
                   <td class="govuk-table__cell govuk-!-width-one-third"></td>
                 </tr>
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell govuk-!-width-one-third">Sentence/licence end date</td>
-                  <td class="govuk-table__cell govuk-!-width-one-third">26 May 2023</td>
+                  <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.licence_expiry_date) %></td>
                   <td class="govuk-table__cell govuk-!-width-one-third"></td>
                 </tr>
                 </tbody>
@@ -353,11 +352,11 @@
         </div>
 
     </div>
+    <!-- /Accordians -->
+    <!-- /More info -->
   </div>
 
-  <button class="govuk-button" data-module="govuk-button">
-    Choose POM
-  </button>
+  <%= link_to 'Choose POM', prison_prisoner_staff_index_path(@prison, @prisoner.offender_no), class: 'govuk-button' %>
 </div>
 
 <!--Right column-->
@@ -367,11 +366,15 @@
       Active alerts
     </h3>
 
-    <ul class="govuk-list govuk-list--bullet">
-      <li>Racist</li>
-      <li>Risk to LGBT</li>
-      <li>TACT</li>
-    </ul>
+    <% if @alerts.none? %>
+      <p>None</p>
+    <% else %>
+      <ul class="govuk-list govuk-list--bullet">
+        <% @alerts.each do |alert| %>
+          <li><%= alert %></li>
+        <% end %>
+      </ul>
+    <% end %>
 
     <p class="govuk-!-margin-bottom-6">
       <a class="govuk-link govuk-link--no-visited-state" href="https://digital-dev.prison.service.justice.gov.uk/prisoner/G4227GV/alerts" target="_blank">
@@ -379,7 +382,48 @@
       </a>
     </p>
 
-    <img src="/public/images/risk/Mappa_date.png" style="width:380px; margin-top: 10px" alt="MAPPA">
-    <img src="/public/images/risk/Rosh_High.png" style="width:380px; margin-top: 30px;" alt="RoSH">
+    <div style="border: 2px solid" class="govuk-!-padding-4 govuk-!-margin-bottom-3">
+      <p class="govuk-!-margin-bottom-1"><%= @prisoner.mappa_level %> MAPPA</p>
+      <span class="govuk-caption-m govuk-body-s govuk-!-margin-bottom-1">Last updated: FIXME</span>
+    </div>
+
+    <!-- RoSH summary -->
+    <div style="border: 2px solid" class="govuk-!-padding-4 govuk-!-margin-bottom-3">
+      <table class="govuk-table">
+        <caption class="govuk-table__caption govuk-table__caption--m">
+          <%= 'FIXME' %> RoSH<br />
+          Risk of serious harm<br />
+          <span class="govuk-caption-m govuk-body-s">Last updated: FIXME</span>
+        </caption>
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Risk to</th>
+            <th scope="col" class="govuk-table__header">Custody</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Children</th>
+            <td class="govuk-table__cell"><%= @rosh[:high_rosh_children] %></td>
+          </tr>
+          <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Public</th>
+            <td class="govuk-table__cell"><%= @rosh[:high_rosh_public] %></td>
+          </tr>
+          <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Known adult</th>
+            <td class="govuk-table__cell"><%= @rosh[:high_rosh_known_adult] %></td>
+          </tr>
+          <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Staff</th>
+            <td class="govuk-table__cell"><%= @rosh[:high_rosh_staff] %></td>
+          </tr>
+          <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Prisoners</th>
+            <td class="govuk-table__cell"><%= @rosh[:high_rosh_prisoners] %></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </aside>
 </div>
