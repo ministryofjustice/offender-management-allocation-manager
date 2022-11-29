@@ -69,4 +69,19 @@ RSpec.feature 'Handovers feature:' do
       end
     end
   end
+
+  describe 'COM allocation overdue handovers page' do
+    it 'works' do
+      allow(handover_cases_list).to receive(:com_allocation_overdue).and_return([[calc_handover_date, offender]])
+      visit com_allocation_overdue_prison_handovers_path(default_params)
+
+      aggregate_failures do
+        expect(page.status_code).to eq 200
+        expect(page).to have_text 'Upcoming handovers'
+        expect(page).to have_text 'Surname1, Firstname1 X1111XX'
+        expect(page).to have_text 'Days overdue'
+        expect(page).to have_text 'LDU details'
+      end
+    end
+  end
 end

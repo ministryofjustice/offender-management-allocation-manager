@@ -22,10 +22,13 @@
       <nav class="moj-sub-navigation" aria-label="Sub navigation">
         <ul class='moj-sub-navigation__list'>
           <% [
-               ['upcoming', "Upcoming handovers (#{@handover_cases.upcoming.count})", upcoming_prison_handovers_path(@prison_id)],
-               ['in_progress', "Handovers in progress (#{@handover_cases.in_progress.count})", in_progress_prison_handovers_path(@prison_id)],
+               ['upcoming', "Upcoming handovers (#{@handover_cases.upcoming.count})",
+                upcoming_prison_handovers_path(@prison_id)],
+               ['in_progress', "Handovers in progress (#{@handover_cases.in_progress.count})",
+                in_progress_prison_handovers_path(@prison_id)],
                ['overdue_tasks', 'Overdue tasks (_)', '#'],
-               ['com_allocation_overdue', 'COM allocation overdue (_)', com_allocation_overdue_prison_handovers_path(@prison_id)],
+               ['com_allocation_overdue', "COM allocation overdue (#{@handover_cases.com_allocation_overdue.count})",
+                com_allocation_overdue_prison_handovers_path(@prison_id)],
              ].each do |action, title, path|
           %>
             <li class="moj-sub-navigation__item">
