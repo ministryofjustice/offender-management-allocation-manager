@@ -120,9 +120,10 @@ for example if a particular POM has worked with <%= @prisoner.first_name.capital
 </table>
 
 <div style="overflow: hidden">
-  <button class="govuk-button govuk-button--secondary" data-module="govuk-button" style="float: right">
+  <!-- FIXME -->
+  <a class="govuk-button govuk-button--secondary" data-module="govuk-button" style="float: right" href="https://hmpps-moic-prototype.apps.live.cloud-platform.service.justice.gov.uk/allocations/final/step2b-select-pom-jack-smith">
     Compare workloads
-  </button>
+  </a>
 </div>
 
 <div class="govuk-accordion" data-module="govuk-accordion">
@@ -131,7 +132,7 @@ for example if a particular POM has worked with <%= @prisoner.first_name.capital
       <thead class="govuk-table__head">
       <tr class="govuk-table__row">
         <th class="govuk-table__header">POM</th>
-        <th class="govuk-table__header">POM status</th>
+        <th class="govuk-table__header">Status</th>
         <th class="govuk-table__header">POM type</th>
         <th class="govuk-table__header">Total cases</th>
       </tr>
