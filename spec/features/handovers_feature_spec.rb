@@ -1,5 +1,3 @@
-require 'ostruct'
-
 RSpec.feature 'Handovers feature:' do
   let!(:prison) { FactoryBot.create(:prison) }
   let(:prison_code) { prison.code }
@@ -19,6 +17,8 @@ RSpec.feature 'Handovers feature:' do
       allocated_com_email: nil,
       allocated_com_name: nil,
       com_responsible_date: Faker::Date.backward,
+      ldu_name: nil,
+      ldu_email_address: nil,
     }
   end
   let(:offender) { instance_double AllocatedOffender, offender_attrs }

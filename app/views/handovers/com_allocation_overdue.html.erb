@@ -36,8 +36,18 @@
       </td>
 
       <td class="govuk-table__cell ldu-details">
-        <p>Cornwall and Isles of Scilly</p>
-        <p>PlymouthCornwallandIslesofScilly-omic@justice.gov.uk</p>
+        <% if offender.ldu_name.nil? && offender.ldu_email_address.nil? %>
+          We don’t have this information.
+          <a class="govuk-link govuk-link--no-visited-state" href="#">
+            Check DPS to find where this person was sentenced
+          </a>
+          and then try contacting the LDU for that area.
+        <% elsif offender.ldu_email_address.nil? %>
+          Check how to contact <%= offender.ldu_name %> LDU. We do not have an email address recorded for it.
+        <% else %>
+          <p><%= offender.ldu_name || 'Unknown - data inconsistency - please notify support' %></p>
+          <p><%= offender.ldu_email_address %></p>
+        <% end %>
       </td>
     </tr>
   <% end %>
