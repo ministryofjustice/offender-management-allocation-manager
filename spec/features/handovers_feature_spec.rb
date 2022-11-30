@@ -18,6 +18,7 @@ RSpec.feature 'Handovers feature:' do
       handover_progress_task_completion_data: {},
       allocated_com_email: nil,
       allocated_com_name: nil,
+      com_responsible_date: Faker::Date.backward,
     }
   end
   let(:offender) { instance_double AllocatedOffender, offender_attrs }

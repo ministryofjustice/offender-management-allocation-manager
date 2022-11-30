@@ -32,7 +32,7 @@
       <%= render 'handovers/cells/tier', offender: offender %>
 
       <td class="govuk-table__cell days-overdue">
-        <span class="date overdue"><%= rand(30) %></span>
+        <span class="date overdue"><%= com_allocation_overdue_days(offender) %></span>
       </td>
 
       <td class="govuk-table__cell ldu-details">
