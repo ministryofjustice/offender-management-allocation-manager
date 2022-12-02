@@ -47,7 +47,7 @@
         <% elsif offender.ldu_email_address.nil? %>
           Check how to contact <%= offender.ldu_name %> LDU. We do not have an email address recorded for it.
         <% else %>
-          <p><%= offender.ldu_name || 'Unknown - data inconsistency - please notify support' %></p>
+          <p><%= offender.ldu_name %></p>
           <p><%= offender.ldu_email_address %></p>
         <% end %>
       </td>
