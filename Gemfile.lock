@@ -568,7 +568,7 @@ GEM
       mail (~> 2.5)
     vcr (6.0.0)
     version_gem (1.1.0)
-    webmock (3.14.0)
+    webmock (3.18.1)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
