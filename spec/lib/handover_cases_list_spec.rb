@@ -1,5 +1,5 @@
 RSpec.describe HandoverCasesList do
-  let(:offender_numbers) { ('A'..'G').to_a }
+  let(:offender_numbers) { ('A'..'Z').to_a }
   let(:offenders) do
     value = {}
     offender_numbers.each { |no| value[no] = double("offender#{no}", offender_no: no, allocated_com_name: nil) }
@@ -19,6 +19,12 @@ RSpec.describe HandoverCasesList do
       double(:in_progress2, nomis_offender_id: 'F'),
     ]
   end
+  let(:com_allocation_overdue_calculated_handover_dates) do
+    [
+      double(:com_allocation_overdue1, nomis_offender_id: 'G'),
+      double(:com_allocation_overdue2, nomis_offender_id: 'I'),
+    ]
+  end
 
   before do
     allow(CalculatedHandoverDate).to receive(:by_upcoming_handover)
@@ -27,6 +33,9 @@ RSpec.describe HandoverCasesList do
     allow(CalculatedHandoverDate).to receive(:by_handover_in_progress)
                                        .with(offender_ids: offender_numbers)
                                        .and_return(double(to_a: in_progress_calculated_handover_dates))
+    allow(CalculatedHandoverDate).to receive(:by_com_allocation_overdue)
+                                       .with(offender_ids: offender_numbers)
+                                       .and_return(double(to_a: com_allocation_overdue_calculated_handover_dates))
   end
 
   describe '#upcoming' do
@@ -52,6 +61,15 @@ RSpec.describe HandoverCasesList do
       allow(offenders['C']).to receive(:allocated_com_name).and_return('TEST COM NAME')
 
       expect(handover_cases_list.in_progress.map(&:second)).to include(offenders['C'])
+    end
+  end
+
+  describe '#com_allocation_overdue' do
+    it 'gets a list of handover cases that are COM allocation overdue' do
+      expect(handover_cases_list.com_allocation_overdue).to eq([[com_allocation_overdue_calculated_handover_dates[0],
+                                                                 offenders['G']],
+                                                                [com_allocation_overdue_calculated_handover_dates[1],
+                                                                 offenders['I']]])
     end
   end
 end

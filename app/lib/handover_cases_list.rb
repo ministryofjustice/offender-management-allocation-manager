@@ -5,15 +5,19 @@ class HandoverCasesList
     all_offender_ids = @all_offenders_by_no.keys
     all_upcoming = build_tuple CalculatedHandoverDate.by_upcoming_handover(offender_ids: all_offender_ids).to_a
     @upcoming_without_com, upcoming_with_com = all_upcoming.partition { |_, offender| offender.allocated_com_name.nil? }
+
     @in_progress = build_tuple CalculatedHandoverDate.by_handover_in_progress(offender_ids: all_offender_ids).to_a
     @in_progress += upcoming_with_com
+
+    @com_allocation_overdue = build_tuple(
+      CalculatedHandoverDate.by_com_allocation_overdue(offender_ids: all_offender_ids).to_a)
   end
 
   def upcoming
     @upcoming_without_com
   end
 
-  attr_reader :in_progress
+  attr_reader :in_progress, :com_allocation_overdue
 
 private
 

@@ -16,6 +16,7 @@ Rails.application.routes.draw do
       collection do
         get :upcoming
         get :in_progress
+        get :com_allocation_overdue
       end
     end
     get 'handovers/:nomis_offender_id/progress_checklist' => 'handover_progress_checklists#edit',

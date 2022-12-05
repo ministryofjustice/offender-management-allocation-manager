@@ -24,6 +24,8 @@ class HandoversController < PrisonsApplicationController
 
   def in_progress; end
 
+  def com_allocation_overdue; end
+
 private
 
   def new_handovers_ui?
