@@ -43,7 +43,7 @@ RSpec.feature 'Handovers feature:' do
   end
 
   describe 'upcoming handovers' do
-    it 'works' do
+    it 'renders correctly' do
       allow(handover_cases_list).to receive(:upcoming).and_return([[calc_handover_date, offender]])
       visit upcoming_prison_handovers_path(default_params)
 
@@ -56,7 +56,7 @@ RSpec.feature 'Handovers feature:' do
   end
 
   describe 'in progress handovers' do
-    it 'works' do
+    it 'renders correctly' do
       allow(offender).to receive(:allocated_com_name).and_return('Mr COM')
       allow(offender).to receive(:allocated_com_email).and_return('mr-com@example.org')
       allow(handover_cases_list).to receive(:in_progress).and_return([[calc_handover_date, offender]])
@@ -72,7 +72,7 @@ RSpec.feature 'Handovers feature:' do
   end
 
   describe 'COM allocation overdue handovers page' do
-    it 'works' do
+    it 'renders correctly' do
       allow(handover_cases_list).to receive(:com_allocation_overdue).and_return([[calc_handover_date, offender]])
       visit com_allocation_overdue_prison_handovers_path(default_params)
 
