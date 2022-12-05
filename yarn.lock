@@ -9,10 +9,10 @@
   dependencies:
     moment "^2.27.0"
 
-govuk-frontend@^3.4.0:
-  version "3.4.0"
-  resolved "https://registry.npmjs.org/govuk-frontend/-/govuk-frontend-3.4.0.tgz"
-  integrity sha512-rmYPtcCtWgz92QBejYwOnfSxbPGYfvSruLwB4CBk/yJtySHRY0whG1e2/iFRRSj0pMx1Bu+zh/IqCTo+84hbFw==
+govuk-frontend@^4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/govuk-frontend/-/govuk-frontend-4.4.0.tgz#36531ae3b12798267e5a72409c7e4b3b10565102"
+  integrity sha512-3Hg4GePCdlynd7F6a3YPOEJx0lDPPP6iBv1S893tv3+efYGWLGvsSFdCG0uob8Xc1O7ckL19dSsFpFhBWUkTNA==
 
 moment@^2.27.0:
   version "2.29.2"
