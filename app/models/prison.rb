@@ -1,4 +1,6 @@
 class Prison < ApplicationRecord
+  has_paper_trail
+
   validates :prison_type, presence: true
   validates :code, :name, presence: true, uniqueness: true
   has_many :pom_details, dependent: :destroy, foreign_key: :prison_code, inverse_of: :prison

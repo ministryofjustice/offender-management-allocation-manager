@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class PomDetail < ApplicationRecord
+  has_paper_trail
+
   validates :nomis_staff_id, presence: true, uniqueness: { scope: :prison_code }
   validates :status, presence: true
   validates :working_pattern, presence: {

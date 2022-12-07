@@ -6,6 +6,8 @@ class CaseInformation < ApplicationRecord
   NPS = 'NPS'
   CRC = 'CRC'
 
+  has_paper_trail
+
   belongs_to :offender, foreign_key: :nomis_offender_id, inverse_of: :case_information
 
   belongs_to :local_delivery_unit, -> { enabled }, optional: true, inverse_of: :case_information

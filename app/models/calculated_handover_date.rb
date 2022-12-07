@@ -23,6 +23,8 @@ class CalculatedHandoverDate < ApplicationRecord
     pre_omic_rules: 'Pre-OMIC rules',
   }.stringify_keys.freeze
 
+  has_paper_trail
+
   belongs_to :offender,
              primary_key: :nomis_offender_id,
              foreign_key: :nomis_offender_id,
