@@ -125,6 +125,14 @@ en:
               inclusion: You must say if this referral has been approved
             community_decision:
               inclusion: You must say whether the community has accepted this case or not
+
+  allocation_staff:
+    index:
+      poms_unavailable:
+        zero: There are no POMs unavailable for new allocations
+        one: There is 1 POM unavailable for new allocations
+        other: There are %{count} POMs unavailable for new allocations
+
   views:
     navigation:
       skip_to_main_content: "Skip to main content"

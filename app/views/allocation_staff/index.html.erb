@@ -82,7 +82,9 @@
   <%= render 'shared/accordion_section',
              id: 'non-recommended-accordion-section',
              title: "Full List of available #{non_recommended_pom_type_label(@prisoner)} POMs",
-             body: "You will need to provide a valid reason for overridding the recommended #{recommended_pom_type_label(@prisoner)} POMs.",
+             body: "You will need to provide a reason for overriding the recommended #{recommended_pom_type_label(@prisoner)} officer POM",
+
+
              content: accordion_body_1 %>
   <% accordion_body_2 = capture do %>
     <table class="govuk-table">
@@ -107,7 +109,7 @@
   <%= render 'shared/accordion_section',
              id: 'accordion-2',
              title: "POMs currently unavailable for new allocations",
-             body: "There are #{(@prison_poms + @probation_poms).reject(&:active?).count} POMs unavailable.",
+             body: t('.poms_unavailable', count: (@prison_poms + @probation_poms).reject(&:active?).count),
              content: accordion_body_2 %>
 </div>
 
