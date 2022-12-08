@@ -133,6 +133,7 @@ Rails.application.routes.draw do
     end
 
     get('/debugging' => 'debugging#debugging')
+    get('prisoners/:id/debugging' => redirect('/prisons/%{prison_id}/debugging?offender_no=%{id}'))
   end
 
   match "/401", :to => "errors#unauthorized", :via => :all
