@@ -1,4 +1,6 @@
 class HandoverProgressChecklist < ApplicationRecord
+  has_paper_trail
+
   belongs_to :offender, foreign_key: :nomis_offender_id
 
   delegate :case_allocation, to: :offender, allow_nil: true

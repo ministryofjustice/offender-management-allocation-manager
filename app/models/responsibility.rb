@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Responsibility < ApplicationRecord
+  has_paper_trail
+
   belongs_to :offender,
              primary_key: :nomis_offender_id,
              foreign_key: :nomis_offender_id,

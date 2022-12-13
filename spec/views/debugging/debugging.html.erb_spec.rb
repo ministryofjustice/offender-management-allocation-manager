@@ -47,7 +47,7 @@ RSpec.describe "debugging/debugging", type: :view do
 
   describe 'category label' do
     let(:key) { page.css('#category > td:nth-child(1)').text }
-    let(:value) { page.css('#category > td:nth-child(2)').text.strip }
+    let(:value) { page.css('#category > td:nth-child(2)').text.gsub(/\s+/, ' ').strip }
 
     context 'when the offender has a category' do
       let(:api_offender) { build(:hmpps_api_offender, category: build(:offender_category, :female_open, approvalDate: '17/06/2021'.to_date)) }
