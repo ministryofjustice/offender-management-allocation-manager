@@ -6,7 +6,7 @@ class CaseInformation < ApplicationRecord
   NPS = 'NPS'
   CRC = 'CRC'
 
-  has_paper_trail
+  has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
 
   belongs_to :offender, foreign_key: :nomis_offender_id, inverse_of: :case_information
 

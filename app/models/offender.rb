@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Offender < ApplicationRecord
-  has_paper_trail
+  has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
 
   # NOMIS offender IDs must be of the form <letter><4 numbers><2 letters> (all uppercase)
   validates :nomis_offender_id, format: { with: /\A[A-Z][0-9]{4}[A-Z]{2}\z/ }
