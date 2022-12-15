@@ -3,7 +3,7 @@
 class AllocationHistory < ApplicationRecord
   self.table_name = 'allocation_history'
 
-  has_paper_trail
+  has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
 
   ALLOCATE_PRIMARY_POM = 0
   REALLOCATE_PRIMARY_POM = 1
