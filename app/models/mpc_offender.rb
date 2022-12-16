@@ -287,6 +287,64 @@ class MpcOffender
     @offender
   end
 
+  def attributes_to_archive
+    attr_names = %w[
+      recalled?
+      immigration_case?
+      indeterminate_sentence?
+      sentenced?
+      over_18?
+      describe_sentence
+      civil_sentence?
+      sentence_start_date
+      conditional_release_date
+      automatic_release_date
+      parole_eligibility_date
+      tariff_date
+      post_recall_release_date
+      licence_expiry_date
+      home_detention_curfew_actual_date
+      home_detention_curfew_eligibility_date
+      prison_arrival_date
+      earliest_release_date
+      earliest_release
+      latest_temp_movement_date
+      release_date
+      date_of_birth
+      main_offence
+      awaiting_allocation_for
+      location
+      category_label
+      complexity_level
+      category_code
+      category_active_since
+      first_name
+      last_name
+      full_name_ordered
+      full_name
+      inside_omic_policy?
+      offender_no
+      prison_id
+      restricted_patient?
+      crn
+      case_allocation
+      manual_entry?
+      nps_case?
+      tier
+      mappa_level
+      welsh_offender
+      ldu_email_address
+      team_name
+      ldu_name
+      allocated_com_name
+      allocated_com_email
+      parole_review_date
+      early_allocation_state
+    ]
+
+    attr_names.index_with { |attr_name| send(attr_name) }
+  end
+
 private
 
   def early_allocation_notes?
