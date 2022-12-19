@@ -7,12 +7,14 @@
 
   <% record = @offender.probation_record %>
   <% if record %>
-    <% [record, *record.versions.map(&:reify).compact].each_with_index do |version, index| %>
+    <% record.versions.each_with_index do |version, index| %>
       <tr class="govuk-table__row">
         <td class="govuk-table__cell"><%= index == 0 ? 'Current Version' : '' %></td>
         <td class="govuk-table__cell table_cell__left_align">
-          <%= version.attributes.select { |k, v| !%w[id local_delivery_unit_id created_at nomis_offender_id].include?(k) \
-                                                 && v.present? }.map { |k, v| "#{k} = #{v}" }.join(', ') %>
+          <%= detail_component('Attributes') do %>
+            <%= version.changeset.slice(*%w[id local_delivery_unit_id created_at nomis_offender_id])
+                       .map { |k, v| "#{k} = #{v.last}" }.join('<br>').html_safe %>
+          <% end %>
         </td>
       </tr>
     <% end %>
