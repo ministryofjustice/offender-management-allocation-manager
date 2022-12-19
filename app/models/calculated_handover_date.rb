@@ -23,7 +23,7 @@ class CalculatedHandoverDate < ApplicationRecord
     pre_omic_rules: 'Pre-OMIC rules',
   }.stringify_keys.freeze
 
-  has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
+  has_paper_trail meta: { nomis_offender_id: :nomis_offender_id, offender_attributes_to_archive: :offender_attributes_to_archive }
 
   belongs_to :offender,
              primary_key: :nomis_offender_id,
@@ -57,6 +57,8 @@ class CalculatedHandoverDate < ApplicationRecord
   def reason_text
     REASONS.fetch(reason, "Unknown handover reason #{reason}")
   end
+
+  attr_accessor :offender_attributes_to_archive
 
   class << self
     def by_offender_ids(offender_id_or_ids)

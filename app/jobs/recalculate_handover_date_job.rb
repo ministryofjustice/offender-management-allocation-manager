@@ -22,7 +22,8 @@ private
       responsibility: handover.responsibility,
       start_date: handover.start_date,
       handover_date: handover.handover_date,
-      reason: handover.reason
+      reason: handover.reason,
+      offender_attributes_to_archive: nomis_offender.attributes_to_archive,
     )
     if handover.community_responsible? &&
       handover.reason.to_sym == :less_than_10_months_left_to_serve &&
