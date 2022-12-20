@@ -454,10 +454,6 @@ workflows:
             - test
           filters: { branches: { only: [main] } }
 
-      - deploy_production_approval:
-          type: approval
-          requires: [deploy_staging]
-          filters: { branches: { only: [main] } }
       - deploy_production:
-          requires: [deploy_production_approval]
+          requires: [deploy_staging]
           filters: { branches: { only: [main] } }
