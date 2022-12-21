@@ -39,6 +39,8 @@ class Offender < ApplicationRecord
 
   delegate :case_allocation, to: :case_information, allow_nil: true
 
+  delegate :handover_progress_complete?, to: :handover_progress_checklist, allow_nil: true
+
   def handover_progress_task_completion_data
     (handover_progress_checklist || build_handover_progress_checklist).task_completion_data
   end

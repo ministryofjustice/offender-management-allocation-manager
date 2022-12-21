@@ -66,30 +66,46 @@ RSpec.describe HandoverProgressChecklist do
     end
   end
 
-  describe '::with_incomplete_tasks' do
-    before do
-      # completed rows
-      FactoryBot.create :handover_progress_checklist, :nps_complete
-      FactoryBot.create :handover_progress_checklist, :crc_complete
+  describe '#handover_progress_complete?' do
+    describe 'when NPS case' do
+      it 'is false when all tasks are not complete' do
+        aggregate_failures do
+          checklist.attributes = { reviewed_oasys: false, contacted_com: true, attended_handover_meeting: true }
+          expect(checklist.handover_progress_complete?).to eq false
+
+          checklist.attributes = { reviewed_oasys: true, contacted_com: false, attended_handover_meeting: true }
+          expect(checklist.handover_progress_complete?).to eq false
+
+          checklist.attributes = { reviewed_oasys: true, contacted_com: true, attended_handover_meeting: false }
+          expect(checklist.handover_progress_complete?).to eq false
+        end
+      end
+
+      it 'is true when all tasks are complete' do
+        checklist.attributes = { reviewed_oasys: true, contacted_com: true, attended_handover_meeting: true }
+        expect(checklist.handover_progress_complete?).to eq true
+      end
     end
 
-    it 'finds incomplete nps rows' do
-      incomplete_rows = [
-        FactoryBot.create(:handover_progress_checklist, :nps_complete, reviewed_oasys: false),
-        FactoryBot.create(:handover_progress_checklist, :nps_complete, contacted_com: false),
-        FactoryBot.create(:handover_progress_checklist, :nps_complete, attended_handover_meeting: false),
-      ]
+    describe 'when CRC case' do
+      before do
+        allow(checklist.offender).to receive(:case_allocation).and_return('CRC')
+      end
 
-      expect(described_class.with_incomplete_tasks).to match_array(incomplete_rows)
-    end
+      it 'is false when all tasks are not complete' do
+        aggregate_failures do
+          checklist.attributes = { contacted_com: false, sent_handover_report: true }
+          expect(checklist.handover_progress_complete?).to eq false
 
-    it 'finds incomplete crc rows' do
-      incomplete_rows = [
-        FactoryBot.create(:handover_progress_checklist, :crc_complete, contacted_com: false),
-        FactoryBot.create(:handover_progress_checklist, :crc_complete, sent_handover_report: false),
-      ]
+          checklist.attributes = { contacted_com: true, sent_handover_report: false }
+          expect(checklist.handover_progress_complete?).to eq false
+        end
+      end
 
-      expect(described_class.with_incomplete_tasks).to match_array(incomplete_rows)
+      it 'is true when all tasks are complete' do
+        checklist.attributes = { contacted_com: true, sent_handover_report: true }
+        expect(checklist.handover_progress_complete?).to eq true
+      end
     end
   end
 end
