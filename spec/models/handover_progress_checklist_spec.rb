@@ -65,4 +65,31 @@ RSpec.describe HandoverProgressChecklist do
       end
     end
   end
+
+  describe '::with_incomplete_tasks' do
+    before do
+      # completed rows
+      FactoryBot.create :handover_progress_checklist, :nps_complete
+      FactoryBot.create :handover_progress_checklist, :crc_complete
+    end
+
+    it 'finds incomplete nps rows' do
+      incomplete_rows = [
+        FactoryBot.create(:handover_progress_checklist, :nps_complete, reviewed_oasys: false),
+        FactoryBot.create(:handover_progress_checklist, :nps_complete, contacted_com: false),
+        FactoryBot.create(:handover_progress_checklist, :nps_complete, attended_handover_meeting: false),
+      ]
+
+      expect(described_class.with_incomplete_tasks).to match_array(incomplete_rows)
+    end
+
+    it 'finds incomplete crc rows' do
+      incomplete_rows = [
+        FactoryBot.create(:handover_progress_checklist, :crc_complete, contacted_com: false),
+        FactoryBot.create(:handover_progress_checklist, :crc_complete, sent_handover_report: false),
+      ]
+
+      expect(described_class.with_incomplete_tasks).to match_array(incomplete_rows)
+    end
+  end
 end

@@ -18,7 +18,7 @@ module HighLevelMockingAndStubbingHelper
 
     mock_offender = instance_double(MpcOffender, **mpc_offender_attributes)
     allow(OffenderService).to receive(:get_offender).with(offender_no).and_return(mock_offender)
-    FactoryBot.create :offender, nomis_offender_id: offender_no
+    FactoryBot.create :offender, nomis_offender_id: offender_no unless Offender.find_by_nomis_offender_id(offender_no)
     mock_offender
   end
 end
