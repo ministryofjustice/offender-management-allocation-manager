@@ -28,6 +28,7 @@ RSpec.feature 'Handovers feature:' do
   let(:handover_cases_list) do
     instance_double(HandoverCasesList, :handover_cases_list, upcoming: [],
                                                              in_progress: [],
+                                                             overdue_tasks: [],
                                                              com_allocation_overdue: [])
   end
 
@@ -67,6 +68,19 @@ RSpec.feature 'Handovers feature:' do
         expect(page).to have_text 'Handovers in progress'
         expect(page).to have_text 'Surname1, Firstname1 X1111XX'
         expect(page).to have_text 'Mr COM mr-com@example.org'
+      end
+    end
+  end
+
+  describe 'overdue tasks' do
+    it 'renders correctly' do
+      allow(handover_cases_list).to receive(:overdue_tasks).and_return([[calc_handover_date, offender]])
+      visit overdue_tasks_prison_handovers_path(default_params)
+
+      aggregate_failures do
+        expect(page.status_code).to eq 200
+        expect(page).to have_text 'Overdue tasks'
+        expect(page).to have_text 'Surname1, Firstname1 X1111XX'
       end
     end
   end

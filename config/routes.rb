@@ -16,6 +16,7 @@ Rails.application.routes.draw do
       collection do
         get :upcoming
         get :in_progress
+        get :overdue_tasks
         get :com_allocation_overdue
       end
     end
