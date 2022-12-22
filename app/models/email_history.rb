@@ -7,8 +7,6 @@ class EmailHistory < ApplicationRecord
   OPEN_PRISON_COMMUNITY_ALLOCATION = 'open_prison_community_allocation'
   IMMEDIATE_COMMUNITY_ALLOCATION = 'immediate_community_allocation'
 
-  has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
-
   belongs_to :offender,
              primary_key: :nomis_offender_id,
              foreign_key: :nomis_offender_id,
