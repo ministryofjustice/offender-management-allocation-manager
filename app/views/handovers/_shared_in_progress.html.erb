@@ -31,7 +31,8 @@
         <% end %>
       </td>
 
-      <%= render 'handovers/cells/handover_dates', calc_handover: calc_handover %>
+      <%= render 'handovers/cells/handover_dates', offender: offender, calc_handover: calc_handover,
+                 should_highlight: true %>
 
       <%= render 'handovers/cells/earliest_release_date', offender: offender %>
 

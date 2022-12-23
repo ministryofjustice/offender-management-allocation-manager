@@ -19,6 +19,7 @@ RSpec.feature 'Handovers feature:' do
       com_responsible_date: Faker::Date.backward,
       ldu_name: nil,
       ldu_email_address: nil,
+      handover_progress_complete?: false,
     }
   end
   let(:offender) { instance_double AllocatedOffender, offender_attrs }

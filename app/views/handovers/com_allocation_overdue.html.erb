@@ -25,7 +25,7 @@
     <tr class="govuk-table__row allocated-offender">
       <%= render 'handovers/cells/prisoner_details', prison_id: @prison_id, offender: offender %>
 
-      <%= render 'handovers/cells/handover_dates', calc_handover: calc_handover %>
+      <%= render 'handovers/cells/handover_dates', offender: offender, calc_handover: calc_handover %>
 
       <%= render 'handovers/cells/earliest_release_date', offender: offender %>
 
