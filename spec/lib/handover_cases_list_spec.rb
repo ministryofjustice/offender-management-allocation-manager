@@ -1,4 +1,6 @@
 RSpec.describe HandoverCasesList do
+  subject(:handover_cases_list) { described_class.new(staff_member: staff_member) }
+
   let(:offender_numbers) { ('A'..'Z').to_a }
   let(:offenders) do
     value = {}
@@ -10,7 +12,6 @@ RSpec.describe HandoverCasesList do
     value
   end
   let(:staff_member) { instance_double StaffMember, :staff_member, unreleased_allocations: offenders.values }
-  let(:handover_cases_list) { described_class.new(staff_member: staff_member) }
   let(:upcoming_calculated_handover_dates) do
     [
       double(:upcoming1, nomis_offender_id: 'A'),
