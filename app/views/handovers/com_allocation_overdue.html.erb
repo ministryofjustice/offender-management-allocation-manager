@@ -32,7 +32,7 @@
       <%= render 'handovers/cells/tier', offender: offender %>
 
       <td class="govuk-table__cell days-overdue">
-        <span class="date overdue"><%= com_allocation_overdue_days(offender) %></span>
+        <%= highlight_tag 'primary', 'alert', com_allocation_overdue_days(offender), more_classes: %w[date overdue] %>
       </td>
 
       <td class="govuk-table__cell ldu-details">
