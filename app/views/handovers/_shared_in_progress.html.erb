@@ -43,5 +43,9 @@
   <% end %>
 <% end %>
 
+<% if cases.size == 0 %>
+  <p><%= no_cases_message %></p>
+<% end %>
+
 <div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>
 <div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>
