@@ -12,7 +12,10 @@ RSpec.describe CnlDeactivation do
 
   before do
     allow_any_instance_of(Prison).to receive(:offenders).and_return(
-      [MpcOffender.new(prison: prison, offender: Offender.new(nomis_offender_id: offender_id), prison_record: api_offender)]
+      [
+        MpcOffender.new(prison: prison, offender: Offender.new(nomis_offender_id: offender_id), prison_record: api_offender),
+        MpcOffender.new(prison: prison, offender: Offender.new(nomis_offender_id: offender_id), prison_record: api_offender)
+      ]
     )
 
     allow_any_instance_of(HmppsApi::Offender).to receive(:sentenced?).and_return(is_sentenced)
@@ -21,7 +24,7 @@ RSpec.describe CnlDeactivation do
   end
 
   describe '#call' do
-    before { described_class.new(dry_run: false, silent: true).call }
+    before { described_class.new(dry_run: false).call }
 
     context 'with a sentenced offender' do
       let(:is_sentenced) { true }
@@ -35,7 +38,7 @@ RSpec.describe CnlDeactivation do
       let(:is_sentenced) { false }
 
       it 'sends inactivate to complexity of need microservice' do
-        expect(HmppsApi::ComplexityApi).to have_received(:inactivate).with(offender_id)
+        expect(HmppsApi::ComplexityApi).to have_received(:inactivate).twice.with(offender_id)
       end
     end
   end
