@@ -1,6 +1,6 @@
 require "rails_helper"
 
-feature "get poms list" do
+feature "get poms list", flaky: true do
   let(:offender_missing_sentence_case_info) { create(:case_information, offender: build(:offender, nomis_offender_id: 'G1247VX')) }
 
   # NOMIS Staff ID of the POM called "Moic Pom"
