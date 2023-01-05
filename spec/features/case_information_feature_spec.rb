@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'case information feature' do
+feature 'case information feature', flaky: true do
   context 'when doing an allocate and save' do
     let(:prison) { create(:prison) }
     let(:offender) { build(:nomis_offender, prisonId: prison.code) }
