@@ -1,9 +1,8 @@
 class DeactivateCnls
-  attr_reader :dry_run, :inactivated_count, :log_to_console
+  attr_reader :dry_run, :inactivated_count
 
-  def initialize(dry_run: true, log_to_console: false)
+  def initialize(dry_run: true)
     @dry_run = dry_run
-    @log_to_console = log_to_console
   end
 
   def call
@@ -63,11 +62,13 @@ class DeactivateCnls
 
   private
 
+  CONSOLE_ENVS = %w[development test]
+
   def report_info(msg)
-    log_to_console ? $stdout.puts(msg) : Rails.logger.info("#{self.class}: #{msg}")
+    CONSOLE_ENVS.include?(Rails.env) ? $stdout.puts(msg) : Rails.logger.info("#{self.class}: #{msg}")
   end
 
   def report_error(msg)
-    log_to_console ? $stderr.puts(msg) : Rails.logger.error("#{self.class}: #{msg}")
+    CONSOLE_ENVS.include?(Rails.env) ? $stderr.puts(msg) : Rails.logger.error("#{self.class}: #{msg}")
   end
 end
