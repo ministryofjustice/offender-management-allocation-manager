@@ -1,7 +1,7 @@
 require 'rails_helper'
-require 'cnl_deactivation'
+require 'deactivate_cnls'
 
-RSpec.describe CnlDeactivation do
+RSpec.describe DeactivateCnls do
   let(:prison) { create(:womens_prison) }
   let(:offender_id) { 'A0000BC' }
   let(:nomis_offender) { build(:nomis_offender, prisonerNumber: offender_id).with_indifferent_access }
