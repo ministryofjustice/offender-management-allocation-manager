@@ -60,15 +60,15 @@ class DeactivateCnls
     end
   end
 
-  private
+private
 
-  CONSOLE_ENVS = %w[development test]
+  CONSOLE_ENVS = %w[development test].freeze
 
   def report_info(msg)
     CONSOLE_ENVS.include?(Rails.env) ? $stdout.puts(msg) : Rails.logger.info("#{self.class}: #{msg}")
   end
 
   def report_error(msg)
-    CONSOLE_ENVS.include?(Rails.env) ? $stderr.puts(msg) : Rails.logger.error("#{self.class}: #{msg}")
+    CONSOLE_ENVS.include?(Rails.env) ? warn(msg) : Rails.logger.error("#{self.class}: #{msg}")
   end
 end
