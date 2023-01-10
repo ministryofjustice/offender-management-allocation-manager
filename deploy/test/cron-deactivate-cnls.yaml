@@ -55,7 +55,7 @@ spec:
                 - name: REDIS_URL
                   valueFrom:
                     secretKeyRef:
-                      name: elasticache-offender-management-allocation-manager-token-cache-staging
+                      name: elasticache-offender-management-allocation-manager-token-cache-test
                       key: url
                 - name: AWS_ACCESS_KEY_ID
                   valueFrom:
