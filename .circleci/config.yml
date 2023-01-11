@@ -277,35 +277,6 @@ jobs:
       - aws-cli/install
       - *build_docker_image
 
-  deploy_staging:
-    <<: *deploy_container_config
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Kubectl deployment staging setup
-          command: |
-            echo -n ${CLUSTER_CERT_LIVE} | base64 -d > ./live_ca.crt
-            kubectl config set-cluster ${CLUSTER_NAME_LIVE} --certificate-authority=./live_ca.crt --server=https://${CLUSTER_NAME_LIVE}
-            kubectl config set-credentials circleci --token=${TOKEN_LIVE_STAGING}
-            kubectl config set-context ${CLUSTER_NAME_LIVE} --cluster=${CLUSTER_NAME_LIVE} --user=circleci --namespace=${KUBE_ENV_STAGING_NAMESPACE}
-            kubectl config use-context ${CLUSTER_NAME_LIVE}
-            kubectl config current-context
-            kubectl --namespace=${KUBE_ENV_STAGING_NAMESPACE} get pods
-      - *install_gpg
-      - *configure_gpg
-      - *decrypt_secrets
-      - deploy:
-          name: Deploy to live staging
-          command: |
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/cron-*.yaml
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/deployment.yaml
-            kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
-            kubectl apply --record=false -f ./deploy/staging
-          environment:
-            <<: *github_team_name_slug
-
   deploy:
     <<: *deploy_container_config
     steps:
@@ -323,35 +294,6 @@ jobs:
             sed -i -e "s/:latest/:${CIRCLE_SHA1}/" deploy/"${CIRCLE_BRANCH}"/deployment.yaml deploy/"${CIRCLE_BRANCH}"/cron-*.yaml
             kubectl -n "${K8S_NAMESPACE}" annotate deployments/allocation-manager kubernetes.io/change-cause="${CIRCLE_BUILD_URL}"
             kubectl apply --record=false -f ./deploy/"${CIRCLE_BRANCH}"
-
-  deploy_production:
-    <<: *deploy_container_config
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Kubectl deployment production setup
-          command: |
-            echo -n ${CLUSTER_CERT_LIVE} | base64 -d > ./live_ca.crt
-            kubectl config set-cluster ${CLUSTER_NAME_LIVE} --certificate-authority=./live_ca.crt --server=https://${CLUSTER_NAME_LIVE}
-            kubectl config set-credentials circleci --token=${TOKEN_LIVE_PRODUCTION}
-            kubectl config set-context ${CLUSTER_NAME_LIVE} --cluster=${CLUSTER_NAME_LIVE} --user=circleci --namespace=${KUBE_ENV_PRODUCTION_NAMESPACE}
-            kubectl config use-context ${CLUSTER_NAME_LIVE}
-            kubectl config current-context
-            kubectl --namespace=${KUBE_ENV_PRODUCTION_NAMESPACE} get pods
-      - *install_gpg
-      - *configure_gpg
-      - *decrypt_secrets
-      - deploy:
-          name: Deploy to production
-          command: |
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/cron-*.yaml
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/deployment.yaml
-            kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
-            kubectl apply --record=false -f ./deploy/production
-          environment:
-            <<: *github_team_name_slug
 
 workflows:
   feature_branch:
@@ -444,6 +386,7 @@ workflows:
       - build_and_push_docker_image:
           requires: [install_dependencies]
           filters: { branches: { only: [main] } }
+          context: [offender-management-shared, offender-management-staging]
       - rubocop:
           requires: [install_dependencies]
           filters: { branches: { only: [main] } }
@@ -451,13 +394,15 @@ workflows:
           requires: [install_dependencies]
           filters: { branches: { only: [main] } }
 
-      - deploy_staging:
+      - deploy:
           requires:
             - build_and_push_docker_image
             - rubocop
             - test
           filters: { branches: { only: [main] } }
+          context: [offender-management-shared, offender-management-staging]
 
-      - deploy_production:
+      - deploy:
           requires: [deploy_staging]
           filters: { branches: { only: [main] } }
+          context: [offender-management-shared, offender-management-production]
