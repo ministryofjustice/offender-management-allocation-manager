@@ -32,6 +32,18 @@ references:
           POSTGRES_DB: offender-management-allocation-manager_test
       - image: cimg/redis:7.0
 
+  configure_k8s: &configure_k8s
+    run:
+      name: Setup Kubectl
+      command: |
+        echo -n "${K8S_CLUSTER_CERT}" | base64 -d > ./live_ca.crt
+        kubectl config set-cluster "${K8S_CLUSTER_NAME}" --certificate-authority=./live_ca.crt --server="https://${K8S_CLUSTER_NAME}"
+        kubectl config set-credentials circleci --token="${K8S_TOKEN}"
+        kubectl config set-context "${K8S_CLUSTER_NAME}" --cluster="${K8S_CLUSTER_NAME}" --user=circleci --namespace="${K8S_NAMESPACE}"
+        kubectl config use-context "${K8S_CLUSTER_NAME}"
+        kubectl config current-context
+        kubectl -n "${K8S_NAMESPACE}" get pods
+
   install_gpg: &install_gpg
     run:
       name: Install GPG
@@ -76,6 +88,13 @@ references:
     run:
       name: Push allocation-manager docker image
       command: |
+        set -xeuo pipefail
+        kubectl -n "${K8S_NAMESPACE}" get secrets ecr-repo-allocation-manager -o json > /tmp/ecr-secrets.json
+        apk add jq
+        export AWS_ACCESS_KEY_ID="$(jq -r .data.access_key_id /tmp/ecr-secrets.json | base64 -d)"
+        export AWS_SECRET_ACCESS_KEY="$(jq -r .data.secret_access_key /tmp/ecr-secrets.json | base64 -d)"
+        export ECR_ENDPOINT="$(jq -r .data.repo_url /tmp/ecr-secrets.json | base64 -d)"
+        rm /tmp/ecr-secrets.json
         ecr_host="$(echo "${ECR_ENDPOINT}" | cut -f1 -d/)"
         aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin "${ecr_host}"
         docker tag app "${ECR_ENDPOINT}:${CIRCLE_SHA1}"
@@ -232,7 +251,7 @@ jobs:
 
   build_and_push_docker_image:
     <<: *defaults
-    <<: *test_container_config
+    <<: *deploy_container_config
     steps:
       - checkout
       - attach_workspace:
@@ -241,6 +260,7 @@ jobs:
           version: 20.10.14
           docker_layer_caching: true
       - aws-cli/install
+      - *configure_k8s
       - *build_docker_image
       - *push_docker_image
 
@@ -320,16 +340,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/
-      - run:
-          name: Kubectl deployment setup
-          command: |
-            echo -n "${K8S_CLUSTER_CERT}" | base64 -d > ./live_ca.crt
-            kubectl config set-cluster "${K8S_CLUSTER_NAME}" --certificate-authority=./live_ca.crt --server="https://${K8S_CLUSTER_NAME}"
-            kubectl config set-credentials circleci --token="${K8S_TOKEN}"
-            kubectl config set-context "${K8S_CLUSTER_NAME}" --cluster="${K8S_CLUSTER_NAME}" --user=circleci --namespace="${K8S_NAMESPACE}"
-            kubectl config use-context "${K8S_CLUSTER_NAME}"
-            kubectl config current-context
-            kubectl -n "${K8S_NAMESPACE}" get pods
+      - *configure_k8s
       - *install_gpg
       - *configure_gpg
       - *decrypt_secrets
