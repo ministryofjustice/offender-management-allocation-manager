@@ -313,6 +313,34 @@ jobs:
           environment:
             <<: *github_team_name_slug
 
+  deploy_test2:
+    <<: *deploy_container_config
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Kubectl deployment test2 setup
+          command: |
+            echo -n ${CLUSTER_CERT_LIVE} | base64 -d > ./live_ca.crt
+            kubectl config set-cluster ${CLUSTER_NAME_LIVE} --certificate-authority=./live_ca.crt --server=https://${CLUSTER_NAME_LIVE}
+            kubectl config set-credentials circleci --token=${TOKEN_LIVE_TEST2}
+            kubectl config set-context ${CLUSTER_NAME_LIVE} --cluster=${CLUSTER_NAME_LIVE} --user=circleci --namespace=offender-management-test2
+            kubectl config use-context ${CLUSTER_NAME_LIVE}
+            kubectl config current-context
+            kubectl --namespace=offender-management-test2 get pods
+      - *install_gpg
+      - *configure_gpg
+      - *decrypt_secrets
+      - deploy:
+          name: Deploy to test2
+          command: |
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/test2/deployment.yaml
+            kubectl -n offender-management-test2 annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
+            kubectl apply --record=false -f ./deploy/test2
+          environment:
+            <<: *github_team_name_slug
+
   deploy_preprod:
     <<: *deploy_container_config
     steps:
@@ -377,26 +405,26 @@ workflows:
       - install_dependencies:
           filters:
             branches:
-              ignore: [main, preproduction, test]
+              ignore: [main, preproduction, test, test2]
       - rubocop:
           requires: [install_dependencies]
           filters:
             branches:
-              ignore: [main, preproduction, test]
+              ignore: [main, preproduction, test, test2]
       - test:
           requires: [install_dependencies]
           filters:
             branches:
-              ignore: [main, preproduction, test]
+              ignore: [main, preproduction, test, test2]
       - verify_docker_image_builds:
           filters:
             branches:
-              ignore: [main, preproduction, test]
+              ignore: [main, preproduction, test, test2]
       - cucumber:
           requires: [install_dependencies]
           filters:
             branches:
-              ignore: [main, preproduction, test]
+              ignore: [main, preproduction, test, test2]
 
   test_env:
     jobs:
@@ -407,6 +435,16 @@ workflows:
       - deploy_test:
           requires: [build_and_push_docker_image]
           filters: { branches: { only: [test] } }
+
+  test2_env:
+    jobs:
+      - install_dependencies:
+          filters: { branches: { only: [test2] } }
+      - build_and_push_docker_image:
+          filters: { branches: { only: [test2] } }
+      - deploy_test2:
+          requires: [build_and_push_docker_image]
+          filters: { branches: { only: [test2] } }
 
   preprod:
     jobs:
