@@ -76,12 +76,13 @@ references:
     run:
       name: Push allocation-manager docker image
       command: |
-        aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin "$ECR_ENDPOINT"
-        docker tag app "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:${CIRCLE_SHA1}"
-        docker push "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:${CIRCLE_SHA1}"
+        ecr_host="$(echo "${ECR_ENDPOINT}" | cut -f1 -d/)"
+        aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin "${ecr_host}"
+        docker tag app "${ECR_ENDPOINT}:${CIRCLE_SHA1}"
+        docker push "${ECR_ENDPOINT}:${CIRCLE_SHA1}"
         if [ "${CIRCLE_BRANCH}" == "main" ]; then
-          docker tag app "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:latest"
-          docker push "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:latest"
+          docker tag app "${ECR_ENDPOINT}:latest"
+          docker push "${ECR_ENDPOINT}:latest"
         fi
       environment:
         <<: *github_team_name_slug
@@ -440,11 +441,14 @@ workflows:
     jobs:
       - install_dependencies:
           filters: { branches: { only: [test2] } }
+          context: [offender-management-shared, offender-management-test2]
       - build_and_push_docker_image:
           filters: { branches: { only: [test2] } }
+          context: [offender-management-shared, offender-management-test2]
       - deploy_test2:
           requires: [build_and_push_docker_image]
           filters: { branches: { only: [test2] } }
+          context: [offender-management-shared, offender-management-test2]
 
   preprod:
     jobs:
