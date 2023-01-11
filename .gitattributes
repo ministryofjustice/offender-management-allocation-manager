@@ -1,3 +1,0 @@
-deploy/*secrets.yaml filter=git-crypt diff=git-crypt
-app/data/*.yaml filter=git-crypt diff=git-crypt
-app/data/*.csv filter=git-crypt diff=git-crypt
