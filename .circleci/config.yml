@@ -319,38 +319,10 @@ jobs:
       - deploy:
           name: Deploy
           command: |
-            sed -i -e "s/:latest/:${CIRCLE_SHA1}/" "deploy/${CIRCLE_BRANCH}/deployment.yaml"
+            shopt -s nullglob
+            sed -i -e "s/:latest/:${CIRCLE_SHA1}/" deploy/"${CIRCLE_BRANCH}"/deployment.yaml deploy/"${CIRCLE_BRANCH}"/cron-*.yaml
             kubectl -n "${K8S_NAMESPACE}" annotate deployments/allocation-manager kubernetes.io/change-cause="${CIRCLE_BUILD_URL}"
             kubectl apply --record=false -f ./deploy/"${CIRCLE_BRANCH}"
-
-  deploy_preprod:
-    <<: *deploy_container_config
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Kubectl deployment preproduction setup
-          command: |
-            echo -n ${CLUSTER_CERT_LIVE} | base64 -d > ./live_ca.crt
-            kubectl config set-cluster ${CLUSTER_NAME_LIVE} --certificate-authority=./live_ca.crt --server=https://${CLUSTER_NAME_LIVE}
-            kubectl config set-credentials circleci --token=${TOKEN_LIVE_PREPROD}
-            kubectl config set-context ${CLUSTER_NAME_LIVE} --cluster=${CLUSTER_NAME_LIVE} --user=circleci --namespace=${KUBE_ENV_PREPROD_NAMESPACE}
-            kubectl config use-context ${CLUSTER_NAME_LIVE}
-            kubectl config current-context
-            kubectl --namespace=${KUBE_ENV_PREPROD_NAMESPACE} get pods
-      - *install_gpg
-      - *configure_gpg
-      - *decrypt_secrets
-      - deploy:
-          name: Deploy to live cluster pre-production
-          command: |
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/cron-*.yaml
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/deployment.yaml
-            kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
-            kubectl apply --record=false -f ./deploy/preprod
-          environment:
-            <<: *github_team_name_slug
 
   deploy_production:
     <<: *deploy_container_config
@@ -438,25 +410,31 @@ workflows:
     jobs:
       - install_dependencies:
           filters: { branches: { only: [preproduction] } }
+          context: [offender-management-shared, offender-management-preprod]
       - build_and_push_docker_image:
           filters: { branches: { only: [preproduction] } }
+          context: [offender-management-shared, offender-management-preprod]
 
       - rubocop:
           requires: [install_dependencies]
           filters: { branches: { only: [preproduction] } }
+          context: [offender-management-shared, offender-management-preprod]
       - test:
           requires: [install_dependencies]
           filters: { branches: { only: [preproduction] } }
+          context: [offender-management-shared, offender-management-preprod]
       - cucumber:
           requires: [install_dependencies]
           filters: { branches: { only: [preproduction] } }
+          context: [offender-management-shared, offender-management-preprod]
 
-      - deploy_preprod:
+      - deploy:
           requires:
             - build_and_push_docker_image
             - rubocop
             - test
           filters: { branches: { only: [preproduction] } }
+          context: [offender-management-shared, offender-management-preprod]
 
   staging_and_production:
     jobs:
