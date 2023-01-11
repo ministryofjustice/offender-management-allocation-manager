@@ -314,31 +314,31 @@ jobs:
           environment:
             <<: *github_team_name_slug
 
-  deploy_test2:
+  deploy:
     <<: *deploy_container_config
     steps:
       - checkout
       - attach_workspace:
           at: ~/
       - run:
-          name: Kubectl deployment test2 setup
+          name: Kubectl deployment setup
           command: |
-            echo -n ${CLUSTER_CERT_LIVE} | base64 -d > ./live_ca.crt
-            kubectl config set-cluster ${CLUSTER_NAME_LIVE} --certificate-authority=./live_ca.crt --server=https://${CLUSTER_NAME_LIVE}
-            kubectl config set-credentials circleci --token=${TOKEN_LIVE_TEST2}
-            kubectl config set-context ${CLUSTER_NAME_LIVE} --cluster=${CLUSTER_NAME_LIVE} --user=circleci --namespace=offender-management-test2
-            kubectl config use-context ${CLUSTER_NAME_LIVE}
+            echo -n "${K8S_CLUSTER_CERT}" | base64 -d > ./live_ca.crt
+            kubectl config set-cluster "${K8S_CLUSTER_NAME}" --certificate-authority=./live_ca.crt --server="https://${K8S_CLUSTER_NAME}"
+            kubectl config set-credentials circleci --token="${K8S_TOKEN}"
+            kubectl config set-context "${K8S_CLUSTER_NAME}" --cluster="${K8S_CLUSTER_NAME}" --user=circleci --namespace="${K8S_NAMESPACE}"
+            kubectl config use-context "${K8S_CLUSTER_NAME}"
             kubectl config current-context
-            kubectl --namespace=offender-management-test2 get pods
+            kubectl -n "${K8S_NAMESPACE}" get pods
       - *install_gpg
       - *configure_gpg
       - *decrypt_secrets
       - deploy:
-          name: Deploy to test2
+          name: Deploy
           command: |
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/test2/deployment.yaml
-            kubectl -n offender-management-test2 annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
-            kubectl apply --record=false -f ./deploy/test2
+            sed -i -e "s/:latest/:${CIRCLE_SHA1}/" "deploy/${CIRCLE_BRANCH}/deployment.yaml"
+            kubectl -n "${K8S_NAMESPACE}" annotate deployments/allocation-manager kubernetes.io/change-cause="${CIRCLE_BUILD_URL}"
+            kubectl apply --record=false -f ./deploy/"${CIRCLE_BRANCH}"
           environment:
             <<: *github_team_name_slug
 
@@ -445,7 +445,7 @@ workflows:
       - build_and_push_docker_image:
           filters: { branches: { only: [test2] } }
           context: [offender-management-shared, offender-management-test2]
-      - deploy_test2:
+      - deploy:
           requires: [build_and_push_docker_image]
           filters: { branches: { only: [test2] } }
           context: [offender-management-shared, offender-management-test2]
