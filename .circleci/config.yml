@@ -365,6 +365,7 @@ workflows:
           filters: { branches: { only: [main] } }
 
       - deploy:
+          name: deploy_staging
           requires:
             - build_and_push_docker_image
             - rubocop
@@ -373,6 +374,7 @@ workflows:
           context: [offender-management-shared, offender-management-staging]
 
       - deploy:
+          name: deploy_production
           requires: [deploy_staging]
           filters: { branches: { only: [main] } }
           context: [offender-management-shared, offender-management-production]
