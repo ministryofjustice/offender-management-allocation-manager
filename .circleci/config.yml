@@ -306,34 +306,6 @@ jobs:
           environment:
             <<: *github_team_name_slug
 
-  deploy_test:
-    <<: *deploy_container_config
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Kubectl deployment test setup
-          command: |
-            echo -n ${CLUSTER_CERT_LIVE} | base64 -d > ./live_ca.crt
-            kubectl config set-cluster ${CLUSTER_NAME_LIVE} --certificate-authority=./live_ca.crt --server=https://${CLUSTER_NAME_LIVE}
-            kubectl config set-credentials circleci --token=${TOKEN_LIVE_TEST}
-            kubectl config set-context ${CLUSTER_NAME_LIVE} --cluster=${CLUSTER_NAME_LIVE} --user=circleci --namespace=${KUBE_ENV_TEST_NAMESPACE}
-            kubectl config use-context ${CLUSTER_NAME_LIVE}
-            kubectl config current-context
-            kubectl --namespace=${KUBE_ENV_TEST_NAMESPACE} get pods
-      - *install_gpg
-      - *configure_gpg
-      - *decrypt_secrets
-      - deploy:
-          name: Deploy to live test
-          command: |
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/test/deployment.yaml
-            kubectl -n offender-management-test annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
-            kubectl apply --record=false -f ./deploy/test
-          environment:
-            <<: *github_team_name_slug
-
   deploy:
     <<: *deploy_container_config
     steps:
@@ -350,8 +322,6 @@ jobs:
             sed -i -e "s/:latest/:${CIRCLE_SHA1}/" "deploy/${CIRCLE_BRANCH}/deployment.yaml"
             kubectl -n "${K8S_NAMESPACE}" annotate deployments/allocation-manager kubernetes.io/change-cause="${CIRCLE_BUILD_URL}"
             kubectl apply --record=false -f ./deploy/"${CIRCLE_BRANCH}"
-          environment:
-            <<: *github_team_name_slug
 
   deploy_preprod:
     <<: *deploy_container_config
@@ -442,11 +412,14 @@ workflows:
     jobs:
       - install_dependencies:
           filters: { branches: { only: [test] } }
+          context: [offender-management-shared, offender-management-test]
       - build_and_push_docker_image:
           filters: { branches: { only: [test] } }
-      - deploy_test:
+          context: [offender-management-shared, offender-management-test]
+      - deploy:
           requires: [build_and_push_docker_image]
           filters: { branches: { only: [test] } }
+          context: [offender-management-shared, offender-management-test]
 
   test2_env:
     jobs:
