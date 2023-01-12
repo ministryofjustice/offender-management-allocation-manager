@@ -271,26 +271,26 @@ workflows:
       - install_dependencies:
           filters:
             branches:
-              ignore: [main, preproduction, test, test2]
+              ignore: [main, preprod, test, test2]
       - rubocop:
           requires: [install_dependencies]
           filters:
             branches:
-              ignore: [main, preproduction, test, test2]
+              ignore: [main, preprod, test, test2]
       - test:
           requires: [install_dependencies]
           filters:
             branches:
-              ignore: [main, preproduction, test, test2]
+              ignore: [main, preprod, test, test2]
       - verify_docker_image_builds:
           filters:
             branches:
-              ignore: [main, preproduction, test, test2]
+              ignore: [main, preprod, test, test2]
       - cucumber:
           requires: [install_dependencies]
           filters:
             branches:
-              ignore: [main, preproduction, test, test2]
+              ignore: [main, preprod, test, test2]
 
   test_env:
     jobs:
@@ -321,23 +321,23 @@ workflows:
   preprod:
     jobs:
       - install_dependencies:
-          filters: { branches: { only: [preproduction] } }
+          filters: { branches: { only: [preprod] } }
           context: [offender-management-shared, offender-management-preprod]
       - build_and_push_docker_image:
-          filters: { branches: { only: [preproduction] } }
+          filters: { branches: { only: [preprod] } }
           context: [offender-management-shared, offender-management-preprod]
 
       - rubocop:
           requires: [install_dependencies]
-          filters: { branches: { only: [preproduction] } }
+          filters: { branches: { only: [preprod] } }
           context: [offender-management-shared, offender-management-preprod]
       - test:
           requires: [install_dependencies]
-          filters: { branches: { only: [preproduction] } }
+          filters: { branches: { only: [preprod] } }
           context: [offender-management-shared, offender-management-preprod]
       - cucumber:
           requires: [install_dependencies]
-          filters: { branches: { only: [preproduction] } }
+          filters: { branches: { only: [preprod] } }
           context: [offender-management-shared, offender-management-preprod]
 
       - deploy:
@@ -345,7 +345,7 @@ workflows:
             - build_and_push_docker_image
             - rubocop
             - test
-          filters: { branches: { only: [preproduction] } }
+          filters: { branches: { only: [preprod] } }
           context: [offender-management-shared, offender-management-preprod]
 
   staging_and_production:
