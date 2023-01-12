@@ -22,7 +22,6 @@ Use [asdf](https://asdf-vm.com/) or similar to manage your ruby environment and 
 
 ### Optional
 
-- [Git-crypt](https://github.com/AGWA/git-crypt) - for securing application secrets
 - [Nomis Elite2](https://github.com/ministryofjustice/elite2-api) - API for accessing prison, offender and staff information from the National Offender Management Integration System
 - [Nomis Oauth2 Server](https://github.com/ministryofjustice/nomis-oauth2-server) - for logging into the application
 
@@ -71,6 +70,18 @@ The first time you run the specs you'll need to record the VCR cassettes:
 ```sh
 VCR=1 bundle exec rspec
 ```
+
+## Secrets
+
+Secrets are stored in the `secret/allocation-manager-secrets` item in each K8s namespace.
+
+So for example, for production, one would do:
+
+```
+kubectl -n offender-management-production get secrets allocation-manager-secrets
+```
+
+These are all managed manually using kubectl. [See here for more info](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/other-topics/secrets.html#secrets-overview)
 
 ## Deploying to preprod and test
 
@@ -121,9 +132,7 @@ Extra variables not required locally
 
 Run `make setup` to install git pre-commit hooks that:
 
-- check you have git-crypt installed
-- help you avoid committing unencrypted secrets
-- lint changed files using govuk rubocop
+- lint changed files using govuk rubocop (TODO)
 
 To test that the pre-commit hook is set up correctly, try removing the `diff`
 attribute from a line in a `.gitattributes` file and then committing something -
