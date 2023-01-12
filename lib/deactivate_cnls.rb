@@ -6,6 +6,8 @@ class DeactivateCnls
   end
 
   def call
+    Rails.logger = Logger.new($stdout)
+
     @inactivated_count = 0
     womens_prisons = Prison.where(code: PrisonService::WOMENS_PRISON_CODES)
     womens_prisons_count = womens_prisons.size
@@ -62,13 +64,11 @@ class DeactivateCnls
 
 private
 
-  CONSOLE_ENVS = %w[development test].freeze
-
   def report_info(msg)
-    CONSOLE_ENVS.include?(Rails.env) ? $stdout.puts(msg) : Rails.logger.info("#{self.class}: #{msg}")
+    Rails.logger.info("#{self.class}: #{msg}")
   end
 
   def report_error(msg)
-    CONSOLE_ENVS.include?(Rails.env) ? warn(msg) : Rails.logger.error("#{self.class}: #{msg}")
+    Rails.logger.error("#{self.class}: #{msg}")
   end
 end
