@@ -112,6 +112,14 @@ commands:
           install-dir: /home/circleci/.local/bin
 
 jobs:
+  noop:
+    <<: *defaults
+    <<: *deploy_container_config
+    steps:
+      - run:
+          name: Truthy no-op
+          command: "true"
+
   install_dependencies:
     <<: *defaults
     <<: *test_container_config
