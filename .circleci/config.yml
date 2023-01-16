@@ -187,10 +187,16 @@ jobs:
 
             kubectl -n "${K8S_NAMESPACE}" get secrets ecr-repo-allocation-manager -o json > /tmp/ecr-secrets.json
             > ~/env/ecr-secrets.sh
-            echo "export AWS_ACCESS_KEY_ID=\"$(jq -r .data.access_key_id /tmp/ecr-secrets.json | base64 -d)\"" >> ~/env/ecr-secrets.sh
-            echo "export AWS_SECRET_ACCESS_KEY=\"$(jq -r .data.secret_access_key /tmp/ecr-secrets.json | base64 -d)\"" >> ~/env/ecr-secrets.sh
-            echo "export ECR_ENDPOINT=\"$(jq -r .data.repo_url /tmp/ecr-secrets.json | base64 -d)\"" >> ~/env/ecr-secrets.sh
+            echo "export AWS_ACCESS_KEY_ID='$(jq -r .data.access_key_id /tmp/ecr-secrets.json | base64 -d)'" >> ~/env/ecr-secrets.sh
+            echo "export AWS_SECRET_ACCESS_KEY='$(jq -r .data.secret_access_key /tmp/ecr-secrets.json | base64 -d)'" >> ~/env/ecr-secrets.sh
+            echo "export ECR_ENDPOINT='$(jq -r .data.repo_url /tmp/ecr-secrets.json | base64 -d)'" >> ~/env/ecr-secrets.sh
             rm /tmp/ecr-secrets.json
+            
+            kubectl -n "${K8S_NAMESPACE}" get secrets hmpps-auth-secrets -o json > /tmp/hmpps-secrets.json
+            > ~/env/hmpps-secrets.sh
+            echo "export HMPPS_API_CLIENT_ID='$(jq -r .data.NOMIS_OAUTH_API_CLIENT_ID /tmp/hmpps-secrets.json | base64 -d)'" >> ~/env/hmpps-secrets.sh
+            echo "export HMPPS_API_CLIENT_SECRET='$(jq -r .data.NOMIS_OAUTH_API_CLIENT_SECRET /tmp/hmpps-secrets.json | base64 -d)'" >> ~/env/hmpps-secrets.sh
+            rm /tmp/hmpps-secrets.json
       - persist_to_workspace:
           root: ~/
           paths:
@@ -223,6 +229,7 @@ jobs:
       - run:
           name: Run tests
           command: |
+            . ~/env/hmpps-secrets.sh
             cc-test-reporter before-build
             bundle exec parallel_test -t rspec -- -t ~flaky --format progress -- spec
             cc-test-reporter after-build --coverage-input-type lcov --exit-code $?
@@ -305,28 +312,23 @@ workflows:
   feature_branch:
     jobs:
       - install_dependencies:
-          filters:
-            branches:
-              ignore: [main, preprod, test, test2]
+          filters: { branches: { ignore: [main, preprod, test, test2] } }
+      - fetch_secrets:
+          filters: { branches: { ignore: [main, preprod, test, test2] } }
+          context: [offender-management-shared, offender-management-staging]
+
       - rubocop:
           requires: [install_dependencies]
-          filters:
-            branches:
-              ignore: [main, preprod, test, test2]
+          filters: { branches: { ignore: [main, preprod, test, test2] } }
       - test:
-          requires: [install_dependencies]
-          filters:
-            branches:
-              ignore: [main, preprod, test, test2]
+          requires: [install_dependencies, fetch_secrets]
+          filters: { branches: { ignore: [main, preprod, test, test2] } }
+          context: [offender-management-shared, offender-management-staging]
       - verify_docker_image_builds:
-          filters:
-            branches:
-              ignore: [main, preprod, test, test2]
+          filters: { branches: { ignore: [main, preprod, test, test2] } }
       - cucumber:
           requires: [install_dependencies]
-          filters:
-            branches:
-              ignore: [main, preprod, test, test2]
+          filters: { branches: { ignore: [main, preprod, test, test2] } }
 
   test_env:
     jobs:
@@ -381,6 +383,7 @@ workflows:
       - test:
           requires: [install_dependencies]
           filters: { branches: { only: [main] } }
+          context: [offender-management-shared, offender-management-staging]
 
       - deploy:
           name: deploy_staging
