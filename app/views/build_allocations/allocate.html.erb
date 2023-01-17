@@ -34,7 +34,7 @@
             <% if @event == :reallocate_primary_pom %>
               <p>We will send the information below to <strong><%= @pom.email_address %></strong> and notify <%= @prev_pom_name %> of the reallocation.</p>
             <% else %>
-              <p>We will send a confirmation email to <strong><%= @pom.email_address %></strong>.</p>
+              <p>We will send the information below to <strong><%= @pom.email_address %></strong>.</p>
             <% end %>
           <% end %>
 
@@ -47,7 +47,7 @@
               <%= form.govuk_text_area :message,
                                       label: { text: 'Add a note to the email', size: 's' },
                                       rows: 3,
-                                      class: 'govuk-!-margin-bottom-2' %>
+                                      class: 'govuk-!-margin-top-2 govuk-!-margin-bottom-2' %>
             </div>
           </div>
 
