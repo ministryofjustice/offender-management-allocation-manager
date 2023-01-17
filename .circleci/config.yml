@@ -336,10 +336,11 @@ workflows:
 
   test_env:
     jobs:
-      - install_dependencies:
+      - fetch_secrets:
           filters: { branches: { only: [test] } }
           context: [offender-management-shared, offender-management-test]
       - build_and_push_docker_image:
+          requires: [fetch_secrets]
           filters: { branches: { only: [test] } }
           context: [offender-management-shared, offender-management-test]
       - deploy:
@@ -363,10 +364,13 @@ workflows:
 
   preprod:
     jobs:
-      - build_and_push_docker_image:
+      - fetch_secrets:
           filters: { branches: { only: [preprod] } }
           context: [offender-management-shared, offender-management-preprod]
-
+      - build_and_push_docker_image:
+          requires: [fetch_secrets]
+          filters: { branches: { only: [preprod] } }
+          context: [offender-management-shared, offender-management-preprod]
       - deploy:
           requires: [build_and_push_docker_image]
           filters: { branches: { only: [preprod] } }
@@ -376,25 +380,26 @@ workflows:
     jobs:
       - install_dependencies:
           filters: { branches: { only: [main] } }
+      - fetch_secrets:
+          name: 'fetch_staging_secrets'
+          filters: { branches: { only: [main] } }
+          context: [offender-management-shared, offender-management-staging]
 
       - build_and_push_docker_image:
-          requires: [install_dependencies]
+          requires: [install_dependencies, fetch_staging_secrets]
           filters: { branches: { only: [main] } }
           context: [offender-management-shared, offender-management-staging]
       - rubocop:
           requires: [install_dependencies]
           filters: { branches: { only: [main] } }
       - test:
-          requires: [install_dependencies]
+          requires: [install_dependencies, fetch_staging_secrets]
           filters: { branches: { only: [main] } }
           context: [offender-management-shared, offender-management-staging]
 
       - deploy:
           name: deploy_staging
-          requires:
-            - build_and_push_docker_image
-            - rubocop
-            - test
+          requires: [build_and_push_docker_image, rubocop, test]
           filters: { branches: { only: [main] } }
           context: [offender-management-shared, offender-management-staging]
 
