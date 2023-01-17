@@ -1,5 +1,5 @@
 RSpec.describe BuildAllocationsController, type: :controller do
-  let(:poms) { [build(:pom, :prison_officer)] }
+  let(:poms) { [build(:pom, :prison_officer), build(:pom, :prison_officer)] }
   let(:pom) { poms.first }
   let(:prison) { create(:prison) }
   let(:offender) { build(:nomis_offender, prisonId: prison.code) }
@@ -40,12 +40,12 @@ RSpec.describe BuildAllocationsController, type: :controller do
     context 'when re-allocating' do
       before do
         create(:allocation_history, prison: prison.code, nomis_offender_id: offender_no,
-                                    primary_pom_nomis_id: pom_nomis_id)
+                                    primary_pom_nomis_id: pom.staffId)
 
         get :show, params: {
           "prison_id" => prison.code,
           "prisoner_id" => offender_no,
-          "staff_id" => pom.staffId,
+          "staff_id" => pom_nomis_id,
           "id" => "allocate"
         }
       end
@@ -78,6 +78,21 @@ RSpec.describe BuildAllocationsController, type: :controller do
   end
 
   describe '#update' do
+    # Tried making this a let but the `put :update` added
+    # :additional_notes to it. The code adds this to the session as
+    # part of the update, so it may be due to some odd interaction
+    # between rspec and sessions. It's a mystery. Using a method rather
+    # than a let gets round this issue.
+    def further_info
+      {
+        last_oasys_completed: '23-Jul-2009',
+        handover_start_date: '12-Aug-2010',
+        handover_completion_date: '13-Sep-2011',
+        com_name: 'Billy Smart',
+        com_email: 'billy@smart.com'
+      }
+    end
+
     before do
       allow(PomMailer).to receive(:new_allocation_email).and_return(fake_job)
       allow(PomMailer).to receive(:deallocation_email).and_return(fake_job)
@@ -96,21 +111,6 @@ RSpec.describe BuildAllocationsController, type: :controller do
           prisoner_id: offender_no,
           staff_id: pom.staffId,
           id: 'allocate'
-        }
-      end
-
-      # Tried making this a let but the `put :update` added
-      # :additional_notes to it. The code adds this to the session as
-      # part of the update, so it may be due to some odd interaction
-      # between rspec and sessions. It's a mystery. Using a method rather
-      # than a let gets round this issue.
-      def further_info
-        {
-          last_oasys_completed: '23-Jul-2009',
-          handover_start_date: '12-Aug-2010',
-          handover_completion_date: '13-Sep-2011',
-          com_name: 'Billy Smart',
-          com_email: 'billy@smart.com'
         }
       end
 
@@ -143,13 +143,14 @@ RSpec.describe BuildAllocationsController, type: :controller do
 
     context 'when re-allocating' do
       before do
-        allow(AllocationService).to receive(:create_or_update).and_return(nil)
         create(:allocation_history, prison: prison.code, nomis_offender_id: offender_no,
                                     primary_pom_nomis_id: pom_nomis_id)
       end
 
       context 'with the same POM' do
         before do
+          allow(AllocationService).to receive(:create_or_update).and_return(nil)
+
           put :update, params: {
             prison_id: prison.code,
             prisoner_id: offender_no,
@@ -179,8 +180,7 @@ RSpec.describe BuildAllocationsController, type: :controller do
 
       context 'with a different POM' do
         before do
-          allow(AllocationService).to receive(:create_or_update).and_return(nil)
-          session[:latest_allocation_details] = {}
+          session[:latest_allocation_details] = further_info
 
           put :update, params: {
             allocation_form: { message: notes },
@@ -191,10 +191,21 @@ RSpec.describe BuildAllocationsController, type: :controller do
           }
         end
 
-        let(:pom_nomis_id) { pom.staffId + 123 }
+        let(:pom_nomis_id) { poms.last.staffId }
 
-        it 'calls AllocationService.create_or_update' do
-          expect(AllocationService).to have_received(:create_or_update).once
+        it 'sends a de-allocation email with the correct info' do
+          expect(PomMailer).to have_received(:deallocation_email)
+            .with(
+              previous_pom_name: poms.last.firstName.capitalize,
+              responsibility: 'responsible',
+              previous_pom_email: poms.last.email_address,
+              new_pom_name: pom.full_name,
+              offender_name: "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}",
+              offender_no: offender_no,
+              prison: prison.name,
+              url: Rails.application.routes.default_url_options[:host] + prison_staff_caseload_path(prison, pom.staffId),
+              further_info: further_info
+            )
         end
 
         it 'stores no message in flash notice' do
