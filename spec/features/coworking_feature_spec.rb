@@ -37,6 +37,7 @@ feature 'Co-working' do
     stub_offenders_for_prison prison.code, [offender]
     stub_signin_spo poms.last, [prison.code]
     stub_keyworker prison.code, 'G4273GI', build(:keyworker)
+    stub_community_offender(nomis_offender_id, build(:community_data))
 
     create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
   end

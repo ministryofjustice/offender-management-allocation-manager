@@ -13,6 +13,7 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
     create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
     stub_poms(prison, [primary_pom, new_secondary_pom])
     stub_offenders_for_prison(prison, [offender])
+    stub_community_offender(offender_no, build(:community_data))
   end
 
   context 'when there is an existing invalid co-worker' do

@@ -12,11 +12,11 @@ class PomMailer < GovukNotifyRails::Mailer
       nomis_offender_id: params[:offender_no],
       message: message_detail || '',
       url: params[:url],
-      last_oasys_completed: params[:further_info][:last_oasys_completed],
-      handover_start_date: params[:further_info][:handover_start_date],
-      handover_completion_date: params[:further_info][:handover_completion_date],
-      com_name: params[:further_info][:com_name],
-      com_email: params[:further_info][:com_email]
+      last_oasys_completed: params[:further_info]&.fetch(:last_oasys_completed, ''),
+      handover_start_date: params[:further_info]&.fetch(:handover_start_date, ''),
+      handover_completion_date: params[:further_info]&.fetch(:handover_completion_date, ''),
+      com_name: params[:further_info]&.fetch(:com_name, ''),
+      com_email: params[:further_info]&.fetch(:com_email, '')
     )
 
     mail(to: params[:pom_email])
@@ -111,11 +111,11 @@ class PomMailer < GovukNotifyRails::Mailer
       nomis_offender_id: params[:offender_no],
       prison: params[:prison],
       url: params[:url],
-      last_oasys_completed: params[:further_info][:last_oasys_completed],
-      handover_start_date: params[:further_info][:handover_start_date],
-      handover_completion_date: params[:further_info][:handover_completion_date],
-      com_name: params[:further_info][:com_name],
-      com_email: params[:further_info][:com_email]
+      last_oasys_completed: params[:further_info]&.fetch(:last_oasys_completed, ''),
+      handover_start_date: params[:further_info]&.fetch(:handover_start_date, ''),
+      handover_completion_date: params[:further_info]&.fetch(:handover_completion_date, ''),
+      com_name: params[:further_info]&.fetch(:com_name, ''),
+      com_email: params[:further_info]&.fetch(:com_email, '')
     )
 
     mail(to: params[:previous_pom_email])
