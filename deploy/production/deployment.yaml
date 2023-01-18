@@ -54,6 +54,8 @@ spec:
                 name: shared-environment
             - secretRef:
                 name: allocation-manager-secrets
+            - secretRef:
+                name: hmpps-auth-secrets
           env:
             - name: POSTGRES_HOST
               valueFrom:
@@ -121,6 +123,8 @@ spec:
                 name: shared-environment
             - secretRef:
                 name: allocation-manager-secrets
+            - secretRef:
+                name: hmpps-auth-secrets
           env:
             - name: RAILS_LOG_TO_STDOUT
               value: "on"
