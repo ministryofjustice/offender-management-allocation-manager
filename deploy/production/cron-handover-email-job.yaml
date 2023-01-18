@@ -29,6 +29,8 @@ spec:
                     name: shared-environment
                 - secretRef:
                     name: allocation-manager-secrets
+                - secretRef:
+                    name: hmpps-auth-secrets
               env:
                 - name: PROMETHEUS_METRICS
                   value: "off"
