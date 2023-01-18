@@ -197,8 +197,8 @@ jobs:
             
             kubectl -n "${K8S_NAMESPACE}" get secrets hmpps-auth-secrets -o json > /tmp/hmpps-secrets.json
             > ~/env/"${env_name}"-hmpps-secrets.sh
-            echo "export HMPPS_API_CLIENT_ID='$(jq -r .data.NOMIS_OAUTH_API_CLIENT_ID /tmp/hmpps-secrets.json | base64 -d)'" >> ~/env/"${env_name}"-hmpps-secrets.sh
-            echo "export HMPPS_API_CLIENT_SECRET='$(jq -r .data.NOMIS_OAUTH_API_CLIENT_SECRET /tmp/hmpps-secrets.json | base64 -d)'" >> ~/env/"${env_name}"-hmpps-secrets.sh
+            echo "export HMPPS_API_CLIENT_ID='$(jq -r .data.HMPPS_API_CLIENT_ID /tmp/hmpps-secrets.json | base64 -d)'" >> ~/env/"${env_name}"-hmpps-secrets.sh
+            echo "export HMPPS_API_CLIENT_SECRET='$(jq -r .data.HMPPS_API_CLIENT_SECRET /tmp/hmpps-secrets.json | base64 -d)'" >> ~/env/"${env_name}"-hmpps-secrets.sh
             rm /tmp/hmpps-secrets.json
       - persist_to_workspace:
           root: ~/
