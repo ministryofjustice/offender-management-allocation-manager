@@ -72,14 +72,4 @@ spec:
                     secretKeyRef:
                       name: hmpps-domain-events-topic
                       key: topic_arn
-                - name: HMPPS_API_CLIENT_ID
-                  valueFrom:
-                    secretKeyRef:
-                      name: hmpps-auth-secrets
-                      key: NOMIS_OAUTH_API_CLIENT_ID
-                - name: HMPPS_API_CLIENT_SECRET
-                  valueFrom:
-                    secretKeyRef:
-                      name: hmpps-auth-secrets
-                      key: NOMIS_OAUTH_API_CLIENT_SECRET
           restartPolicy: OnFailure
