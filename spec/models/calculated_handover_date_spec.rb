@@ -19,7 +19,7 @@ RSpec.describe CalculatedHandoverDate do
       build(:offender,
             calculated_handover_date: build(:calculated_handover_date,
                                             responsibility: com_responsibility.responsibility,
-                                            com_allocated_date: com_responsibility.com_allocated_date,
+                                            start_date: com_responsibility.start_date,
                                             com_responsible_date: com_responsibility.com_responsible_date,
                                             reason: com_responsibility.reason))
     end
@@ -28,7 +28,7 @@ RSpec.describe CalculatedHandoverDate do
 
     it 'allows nil handover dates' do
       expect(record).to be_valid
-      expect(record.com_allocated_date).to be_nil
+      expect(record.start_date).to be_nil
       expect(record.com_responsible_date).to be_nil
       expect(record.reason_text).to eq('COM Responsibility')
     end
@@ -43,18 +43,6 @@ RSpec.describe CalculatedHandoverDate do
 
     it 'is not valid' do
       expect(subject.valid?).to be(false)
-    end
-  end
-
-  describe 'using official domain language compliant naming' do
-    it 'has #com_allocated_date' do
-      subject.com_allocated_date = Date.new(2022, 7, 7)
-      expect(subject.com_allocated_date).to eq Date.new(2022, 7, 7)
-    end
-
-    it 'has #com_responsible_date' do
-      subject.com_responsible_date = Date.new(2022, 9, 7)
-      expect(subject.com_responsible_date).to eq Date.new(2022, 9, 7)
     end
   end
 
