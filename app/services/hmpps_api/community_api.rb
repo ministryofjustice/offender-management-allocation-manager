@@ -5,8 +5,6 @@ module HmppsApi
     class KeyDate
       # These are `{typeCode}` values for 'key dates' in the Community API
       #
-      # TODO: Rename HANDOVER_START_DATE to COM_ALLOCATED_DATE and RESPONSIBILITY_HANDOVER_DATE to COM_RESPONSIBLE_DATE
-      #  to match confirmed domain language
       HANDOVER_START_DATE = 'POM1'
       RESPONSIBILITY_HANDOVER_DATE = 'POM2'
     end
