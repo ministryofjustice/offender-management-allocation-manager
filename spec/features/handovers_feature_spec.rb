@@ -16,7 +16,7 @@ RSpec.feature 'Handovers feature:' do
       handover_progress_task_completion_data: {},
       allocated_com_email: nil,
       allocated_com_name: nil,
-      com_responsible_date: Faker::Date.backward,
+      model: double(:model, handover_date: Faker::Date.backward),
       ldu_name: nil,
       ldu_email_address: nil,
       handover_progress_complete?: false,

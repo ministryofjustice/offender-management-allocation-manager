@@ -88,4 +88,17 @@ RSpec.describe Offender, type: :model do
       expect(offender.handover_progress_task_completion_data).to eq data
     end
   end
+
+  describe '#handover_date' do
+    it 'returns value from DB if that exists' do
+      chd = FactoryBot.create :calculated_handover_date, nomis_offender_id: offender.nomis_offender_id
+      expect(offender.handover_date).to eq chd.handover_date
+    end
+
+    it 'returns nil if saved value does not exist' do
+      raise 'There should not be a calculated handover date' if offender.calculated_handover_date.present?
+
+      expect(offender.handover_date).to be_nil
+    end
+  end
 end

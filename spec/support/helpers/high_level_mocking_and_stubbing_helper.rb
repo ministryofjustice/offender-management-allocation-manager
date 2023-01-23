@@ -8,7 +8,7 @@ module HighLevelMockingAndStubbingHelper
 
     offender_no = mpc_offender_attributes[:offender_no] ||= FactoryBot.generate(:nomis_offender_id)
     mpc_offender_attributes = {
-      com_responsible_date: Faker::Date.forward,
+      model: double(handover_date: Faker::Date.forward),
       first_name: Faker::Name.first_name,
       full_name_ordered: Faker::Name.name,
       date_of_birth: Faker::Date.backward,

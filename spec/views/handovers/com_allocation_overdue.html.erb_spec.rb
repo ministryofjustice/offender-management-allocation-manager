@@ -12,7 +12,7 @@ RSpec.describe 'handovers/com_allocation_overdue' do
                     allocated_com_name: 'Com One',
                     allocated_com_email: 'com1@example.org',
                     handover_progress_task_completion_data: all_false_hash,
-                    com_responsible_date: Faker::Date.backward,
+                    model: double(handover_date: Faker::Date.backward),
                     ldu_name: 'LDU Name',
                     ldu_email_address: 'ldu-email@example.org',
                    )

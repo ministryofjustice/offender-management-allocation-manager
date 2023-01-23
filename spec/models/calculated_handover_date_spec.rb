@@ -20,7 +20,7 @@ RSpec.describe CalculatedHandoverDate do
             calculated_handover_date: build(:calculated_handover_date,
                                             responsibility: com_responsibility.responsibility,
                                             start_date: com_responsibility.start_date,
-                                            com_responsible_date: com_responsibility.com_responsible_date,
+                                            handover_date: com_responsibility.handover_date,
                                             reason: com_responsibility.reason))
     end
     let(:com_responsibility) { HandoverDateService::NO_HANDOVER_DATE }
@@ -29,7 +29,7 @@ RSpec.describe CalculatedHandoverDate do
     it 'allows nil handover dates' do
       expect(record).to be_valid
       expect(record.start_date).to be_nil
-      expect(record.com_responsible_date).to be_nil
+      expect(record.handover_date).to be_nil
       expect(record.reason_text).to eq('COM Responsibility')
     end
   end
