@@ -1,7 +1,6 @@
 module Handover
   class CategorisedHandoverCases
-    def initialize(staff_member:)
-      offenders = staff_member.unreleased_allocations # @type [AllocatedOffender]
+    def initialize(offenders)
       @all_offenders_by_no = offenders.index_by(&:offender_no)
       all_offender_ids = @all_offenders_by_no.keys
       all_upcoming = build_tuple CalculatedHandoverDate.by_upcoming_handover(offender_ids: all_offender_ids).to_a

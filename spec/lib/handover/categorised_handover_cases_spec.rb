@@ -1,5 +1,5 @@
 RSpec.describe Handover::CategorisedHandoverCases do
-  subject(:handover_cases) { described_class.new(staff_member: staff_member) }
+  subject(:handover_cases) { described_class.new(offenders.values) }
 
   let(:offender_numbers) { ('A'..'Z').to_a }
   let(:offenders) do
@@ -11,7 +11,6 @@ RSpec.describe Handover::CategorisedHandoverCases do
     end
     value
   end
-  let(:staff_member) { instance_double StaffMember, :staff_member, unreleased_allocations: offenders.values }
   let(:upcoming_calculated_handover_dates) do
     [
       double(:upcoming1, nomis_offender_id: 'A'),

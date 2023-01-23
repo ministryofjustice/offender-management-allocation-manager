@@ -42,7 +42,7 @@ private
 
     ensure_pom
     @prison_id = active_prison_id
-    @handover_cases = Handover::CategorisedHandoverCases.new(staff_member: @current_user)
+    @handover_cases = Handover::CategorisedHandoverCasesForPom.new(@current_user)
     flash[:current_handovers_url] = request.url
   end
 end

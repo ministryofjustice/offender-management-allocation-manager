@@ -27,10 +27,10 @@ RSpec.feature 'Handovers feature:' do
     instance_double CalculatedHandoverDate, :calc_handover_date, handover_date: Faker::Date.forward
   end
   let(:handover_cases) do
-    instance_double(Handover::CategorisedHandoverCases, :handover_cases, upcoming: [],
-                                                                         in_progress: [],
-                                                                         overdue_tasks: [],
-                                                                         com_allocation_overdue: [])
+    instance_double(Handover::CategorisedHandoverCasesForPom, :handover_cases, upcoming: [],
+                                                                               in_progress: [],
+                                                                               overdue_tasks: [],
+                                                                               com_allocation_overdue: [])
   end
 
   before do
@@ -41,7 +41,7 @@ RSpec.feature 'Handovers feature:' do
     signin_pom_user([prison_code])
     stub_poms(prison_code, [user])
 
-    allow(Handover::CategorisedHandoverCases).to receive(:new).and_return(handover_cases)
+    allow(Handover::CategorisedHandoverCasesForPom).to receive(:new).and_return(handover_cases)
   end
 
   describe 'upcoming handovers' do

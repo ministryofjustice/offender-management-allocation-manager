@@ -4,11 +4,11 @@ RSpec.describe HandoversController, type: :controller do
   let(:default_params) { { prison_id: prison_code } }
   let(:staff_id) { 456_987 }
   let(:pom_staff_member) { instance_double StaffMember, :pom_staff_member, staff_id: staff_id }
-  let(:handover_cases) { instance_double Handover::CategorisedHandoverCases, :handover_cases }
+  let(:handover_cases) { instance_double Handover::CategorisedHandoverCasesForPom, :handover_cases }
 
   before do
     stub_high_level_pom_auth(prison: prison, pom_staff_member: pom_staff_member)
-    allow(Handover::CategorisedHandoverCases).to receive(:new).with(staff_member: pom_staff_member).and_return(handover_cases)
+    allow(Handover::CategorisedHandoverCasesForPom).to receive(:new).with(pom_staff_member).and_return(handover_cases)
 
     session[:new_handovers_ui] = true
   end
