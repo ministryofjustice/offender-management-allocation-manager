@@ -25,8 +25,8 @@
       tasks.
     </p>
 
-    <div class="govuk-inset-text govuk-inset-text--com-responsible-date">
-      COM responsible from <%= format_date(@offender.com_responsible_date, replacement: 'Unknown') %>
+    <div class="govuk-inset-text govuk-inset-text--handover-date">
+      COM responsible from <%= format_date(@offender.model.handover_date, replacement: 'Unknown') %>
     </div>
 
     <%= form_for(@handover_progress_checklist,

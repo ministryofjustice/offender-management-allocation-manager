@@ -11,7 +11,7 @@ class AllocatedOffender
            :handover_start_date, :responsibility_handover_date, :allocated_com_name, :case_allocation,
            :complexity_level, :offender_no, :sentence_start_date, :tier, :location, :latest_temp_movement_date,
            :restricted_patient?, :handover_progress_task_completion_data, :handover_progress_complete?,
-           :com_responsible_date, :ldu_name, :ldu_email_address, to: :@offender
+           :ldu_name, :ldu_email_address, :model, to: :@offender
   delegate :updated_at, :nomis_offender_id, :primary_pom_allocated_at, :prison, :primary_pom_nomis_id,
            to: :@allocation
 

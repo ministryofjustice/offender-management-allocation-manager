@@ -12,12 +12,11 @@ module Handover
             nomis_offender_id: nomis_offender_id)
         end
 
-        com_responsible_date = earliest_release_date - 7.months - 15.days
+        handover_date = earliest_release_date - 7.months - 15.days
 
-        com_responsible_date = sentence_start_date if com_responsible_date < sentence_start_date
+        handover_date = sentence_start_date if handover_date < sentence_start_date
 
-        HandoverDates.new(handover_date: com_responsible_date,
-                          com_responsible_date: com_responsible_date,
+        HandoverDates.new(handover_date: handover_date,
                           reason: :nps_determinate)
       end
     end

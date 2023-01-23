@@ -5,7 +5,7 @@ RSpec.describe 'handover_progress_checklists/edit' do
   let(:offender) do
     stub_mpc_offender(
       offender_no: nomis_offender_id,
-      com_responsible_date: Date.new(2022, 11, 1),
+      model: double(handover_date: Date.new(2022, 11, 1)),
       first_name: 'OFFENDERFIRSTNAME',
       full_name_ordered: 'Offenderfirstname Offenderlastname',
       date_of_birth: Date.new(1993, 2, 20),

@@ -41,7 +41,7 @@
         <% if offender.ldu_name.nil? && offender.ldu_email_address.nil? %>
           We don’t have this information.
           <%= link_to 'Check DPS to find where this person was sentenced',
-                      dps_sentence_and_release_link(offender),
+                      dps_sentence_and_release_link(offender.offender_no),
                       class: %w[govuk-link govuk-link--no-visited-state],
                       target: '_blank'
           %>

@@ -21,13 +21,11 @@ end
 Then(/^handover date is (\d+) months (\d+) days before CRD$/) do |num_months, num_days|
   expected_handover = @conditional_release_date - num_months.months - num_days.days
   expect(@community_dates.handover_date).to eq(expected_handover)
-  expect(@community_dates.com_responsible_date).to eq(expected_handover)
 end
 
 Then(/^handover date is (\d+) months (\d+) days before ARD$/) do |num_months, num_days|
   expected_handover = @automatic_release_date - num_months.months - num_days.days
   expect(@community_dates.handover_date).to eq(expected_handover)
-  expect(@community_dates.com_responsible_date).to eq(expected_handover)
 end
 
 Then(/^reason is ([a-z_]+)$/) do |expected_reason|

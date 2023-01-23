@@ -41,6 +41,8 @@ class Offender < ApplicationRecord
 
   delegate :handover_progress_complete?, to: :handover_progress_checklist, allow_nil: true
 
+  delegate :handover_date, to: :calculated_handover_date, allow_nil: true
+
   def handover_progress_task_completion_data
     (handover_progress_checklist || build_handover_progress_checklist).task_completion_data
   end

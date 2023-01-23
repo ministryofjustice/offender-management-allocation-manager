@@ -172,18 +172,6 @@ RSpec.describe MpcOffender, type: :model do
     end
   end
 
-  describe '#com_responsible_date' do
-    it 'returns value from DB if that exists' do
-      FactoryBot.create :offender, id: offender.offender_no
-      chd = FactoryBot.create :calculated_handover_date, nomis_offender_id: offender.offender_no
-      expect(offender.com_responsible_date).to eq chd.com_responsible_date
-    end
-
-    it 'returns nil if saved value does not exist' do
-      expect(offender.com_responsible_date).to be_nil
-    end
-  end
-
   describe '#model' do
     it 'returns the Offender model instance' do
       expect(offender.model).to eq offender_model
