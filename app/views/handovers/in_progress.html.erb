@@ -1,49 +1,8 @@
-<h2 class="govuk-heading-l">
-  Handovers in progress
-</h2>
-
-<p>
-  Discuss information about the case with the COM,
-  highlighting any pre-release or pre-parole needs you have identified.
-</p>
-
-<%= handover_list_table(table_class: ['in-progress-handovers'],
-                        headers: [
-                          { type: 'button', body: 'Prisoner details' },
-                          { type: 'button', body: 'COM details' },
-                          { type: 'button', body: 'COM responsible', sort: 'ascending' },
-                          { type: 'button', body: 'Earliest release date' },
-                          { type: 'button', body: 'Tier' },
-                          { body: 'Handover progress', class: ['handover-progress'] },
-                        ]) do %>
-
-  <% @handover_cases.in_progress.each do |calc_handover, offender| %>
-    <tr class="govuk-table__row allocated-offender">
-      <%= render 'handovers/cells/prisoner_details', prison_id: @prison_id, offender: offender %>
-
-      <% com_name = offender.allocated_com_name %>
-      <td class="govuk-table__cell com-details" data-sort-value="<%= com_name || 'Unknown' %>">
-        <% if com_name.nil? and calc_handover.handover_date > Time.zone.now.to_date - 2.days %>
-          Unknown
-        <% elsif com_name.nil? %>
-          <div class="highlight-primary highlight-alert">Unknown</div>
-          <div class="highlight-secondary highlight-alert">Allocation overdue</div>
-        <% else %>
-          <%= com_name %><br>
-          <%= offender.allocated_com_email || "No email address available" %>
-        <% end %>
-      </td>
-
-      <%= render 'handovers/cells/handover_dates', calc_handover: calc_handover %>
-
-      <%= render 'handovers/cells/earliest_release_date', offender: offender %>
-
-      <%= render 'handovers/cells/tier', offender: offender %>
-
-      <%= render 'handovers/cells/handover_progress', prison_id: @prison_id, offender: offender %>
-    </tr>
-  <% end %>
-<% end %>
-
-<div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>
-<div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>
+<%= render 'shared_in_progress',
+           heading: 'Handovers in progress',
+           description: 'Discuss information about the case with the COM,' \
+                        'highlighting any pre-release or pre-parole needs you have identified.',
+           table_class: 'in-progress-handovers',
+           cases: @handover_cases.in_progress,
+           no_cases_message: 'No handovers in progress right now'
+%>

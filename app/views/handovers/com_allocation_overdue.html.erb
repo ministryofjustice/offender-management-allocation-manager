@@ -1,3 +1,5 @@
+<% cases = @handover_cases.com_allocation_overdue %>
+
 <h2 class="govuk-heading-l">
   COM allocation overdue
 </h2>
@@ -21,18 +23,18 @@
                           { body: 'LDU details', class: %w[ldu-details govuk-!-width-one-quarter] },
                         ]) do %>
 
-  <% @handover_cases.com_allocation_overdue.each do |calc_handover, offender| %>
+  <% cases.each do |calc_handover, offender| %>
     <tr class="govuk-table__row allocated-offender">
       <%= render 'handovers/cells/prisoner_details', prison_id: @prison_id, offender: offender %>
 
-      <%= render 'handovers/cells/handover_dates', calc_handover: calc_handover %>
+      <%= render 'handovers/cells/handover_dates', offender: offender, calc_handover: calc_handover %>
 
       <%= render 'handovers/cells/earliest_release_date', offender: offender %>
 
       <%= render 'handovers/cells/tier', offender: offender %>
 
       <td class="govuk-table__cell days-overdue">
-        <span class="date overdue"><%= com_allocation_overdue_days(offender) %></span>
+        <%= highlight_tag 'primary', 'alert', com_allocation_overdue_days(offender), more_classes: %w[date overdue] %>
       </td>
 
       <td class="govuk-table__cell ldu-details">
@@ -53,6 +55,10 @@
       </td>
     </tr>
   <% end %>
+<% end %>
+
+<% if cases.size == 0 %>
+  <p>No handover cases missing COM details</p>
 <% end %>
 
 <div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>

@@ -65,4 +65,47 @@ RSpec.describe HandoverProgressChecklist do
       end
     end
   end
+
+  describe '#handover_progress_complete?' do
+    describe 'when NPS case' do
+      it 'is false when all tasks are not complete' do
+        aggregate_failures do
+          checklist.attributes = { reviewed_oasys: false, contacted_com: true, attended_handover_meeting: true }
+          expect(checklist.handover_progress_complete?).to eq false
+
+          checklist.attributes = { reviewed_oasys: true, contacted_com: false, attended_handover_meeting: true }
+          expect(checklist.handover_progress_complete?).to eq false
+
+          checklist.attributes = { reviewed_oasys: true, contacted_com: true, attended_handover_meeting: false }
+          expect(checklist.handover_progress_complete?).to eq false
+        end
+      end
+
+      it 'is true when all tasks are complete' do
+        checklist.attributes = { reviewed_oasys: true, contacted_com: true, attended_handover_meeting: true }
+        expect(checklist.handover_progress_complete?).to eq true
+      end
+    end
+
+    describe 'when CRC case' do
+      before do
+        allow(checklist.offender).to receive(:case_allocation).and_return('CRC')
+      end
+
+      it 'is false when all tasks are not complete' do
+        aggregate_failures do
+          checklist.attributes = { contacted_com: false, sent_handover_report: true }
+          expect(checklist.handover_progress_complete?).to eq false
+
+          checklist.attributes = { contacted_com: true, sent_handover_report: false }
+          expect(checklist.handover_progress_complete?).to eq false
+        end
+      end
+
+      it 'is true when all tasks are complete' do
+        checklist.attributes = { contacted_com: true, sent_handover_report: true }
+        expect(checklist.handover_progress_complete?).to eq true
+      end
+    end
+  end
 end

@@ -14,7 +14,8 @@ RSpec.describe 'handovers/in_progress' do
                         case_allocation: 'NPS',
                         allocated_com_name: 'Com One',
                         allocated_com_email: 'com1@example.org',
-                        handover_progress_task_completion_data: all_false_hash),
+                        handover_progress_task_completion_data: all_false_hash,
+                        handover_progress_complete?: false),
       ],
       [
         double(:calculated_dates2, handover_date: Date.new(2022, 2, 12)),
@@ -27,7 +28,8 @@ RSpec.describe 'handovers/in_progress' do
                         case_allocation: 'CRC',
                         allocated_com_name: 'Com Two',
                         allocated_com_email: 'x',
-                        handover_progress_task_completion_data: all_false_hash),
+                        handover_progress_task_completion_data: all_false_hash,
+                        handover_progress_complete?: false),
       ]
     ]
   end

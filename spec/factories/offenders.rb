@@ -52,6 +52,14 @@ FactoryBot.define do
 
   factory :offender do
     nomis_offender_id
+
+    trait :nps do
+      case_information { create(:case_information, :nps) }
+    end
+
+    trait :crc do
+      case_information { create(:case_information, :crc) }
+    end
   end
 
   factory :mpc_offender do
