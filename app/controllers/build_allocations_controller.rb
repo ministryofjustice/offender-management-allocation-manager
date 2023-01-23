@@ -30,6 +30,15 @@ class BuildAllocationsController < PrisonsApplicationController
     @pom = StaffMember.new(@prison, staff_id)
     @override = OverrideForm.new session[:female_allocation_override]
     @allocation = AllocationForm.new
+    history = AllocationHistory.find_by(prison: @prison.code, nomis_offender_id: nomis_offender_id_from_url)
+    @reallocating_same_pom = (event(history) == :reallocate_primary_pom && staff_id == history.primary_pom_nomis_id)
+
+    unless @reallocating_same_pom
+      @prev_pom_name = history&.primary_pom_nomis_id ? view_context.full_name_ordered(StaffMember.new(@prison, history.primary_pom_nomis_id)) : nil
+      @latest_allocation_details = session[:latest_allocation_details] = format_allocation(
+        offender: @prisoner, pom: @pom, prev_pom_name: @prev_pom_name, view_context: view_context)
+    end
+
     render_wizard
   end
 
@@ -43,19 +52,19 @@ class BuildAllocationsController < PrisonsApplicationController
         render_wizard
       end
     else
-      override = OverrideForm.new session[:female_allocation_override]
       history = AllocationHistory.find_by(prison: @prison.code, nomis_offender_id: nomis_offender_id_from_url)
-      event = if history&.active?
-                :reallocate_primary_pom
-              else
-                :allocate_primary_pom
-              end
+      reallocating_same_pom = (event(history) == :reallocate_primary_pom && staff_id == history.primary_pom_nomis_id)
 
-      allocation_attributes =
-        {
+      if reallocating_same_pom
+        pom = StaffMember.new(@prison, staff_id)
+        flash[:notice] = "#{@prisoner.full_name_ordered} allocated to #{view_context.full_name_ordered(pom)}"
+      else
+        override = OverrideForm.new session[:female_allocation_override]
+
+        allocation_attributes = {
           primary_pom_nomis_id: staff_id,
           nomis_offender_id: nomis_offender_id_from_url,
-          event: event,
+          event: event(history),
           event_trigger: :user,
           created_by_username: current_user,
           allocated_at_tier: @prisoner.tier,
@@ -67,17 +76,20 @@ class BuildAllocationsController < PrisonsApplicationController
           override_detail: override.more_detail,
         }
 
-      AllocationService.create_or_update(allocation_attributes)
-      session.delete :female_allocation_override
-      pom = StaffMember.new(@prison, staff_id)
-
-      unless event == :reallocate_primary_pom && staff_id == history.primary_pom_nomis_id
-        store_latest_allocation_details(
-          format_allocation(@prisoner, pom, allocation_params[:message], view_context)
+        further_info = session[:latest_allocation_details].slice(
+          :last_oasys_completed,
+          :handover_start_date,
+          :handover_completion_date,
+          :com_name,
+          :com_email
         )
+
+        AllocationService.create_or_update(allocation_attributes, further_info)
+        session.delete :female_allocation_override
+        session[:latest_allocation_details][:additional_notes] = allocation_params[:message]
       end
 
-      redirect_to @referrer
+      redirect_to (event(history) == :allocate_primary_pom) ? unallocated_prison_prisoners_path : allocated_prison_prisoners_path
     end
   end
 
@@ -105,5 +117,9 @@ private
 
   def staff_id
     params.require(:staff_id).to_i
+  end
+
+  def event(history)
+    @event ||= history&.active? ? :reallocate_primary_pom : :allocate_primary_pom
   end
 end

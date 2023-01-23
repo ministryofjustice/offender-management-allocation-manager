@@ -29,7 +29,7 @@ class AllocationService
                                       pom_nomis_id: secondary_pom_nomis_id, pom_firstname: coworking_pom.first_name)
   end
 
-  def self.create_or_update(params)
+  def self.create_or_update(params, further_info = {})
     primary_pom = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(params[:primary_pom_nomis_id])
     created_by_user = HmppsApi::PrisonApi::UserApi.user_details(params[:created_by_username])
 
@@ -58,7 +58,8 @@ class AllocationService
 
     EmailService.send_email(allocation: alloc_version,
                             message: params[:message],
-                            pom_nomis_id: params[:primary_pom_nomis_id])
+                            pom_nomis_id: params[:primary_pom_nomis_id],
+                            further_info: further_info)
 
     alloc_version
   end

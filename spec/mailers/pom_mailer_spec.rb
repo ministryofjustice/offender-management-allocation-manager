@@ -1,6 +1,16 @@
 require 'rails_helper'
 
 RSpec.describe PomMailer, type: :mailer do
+  let(:further_info) do
+    {
+      last_oasys_completed: Time.zone.today,
+      handover_start_date: Time.zone.today,
+      handover_completion_date: Time.zone.today,
+      com_name: 'Ben Bosh',
+      com_email: 'ben@bosh.net'
+    }
+  end
+
   describe 'new_allocation_email' do
     let(:params) do
       {
@@ -10,7 +20,8 @@ RSpec.describe PomMailer, type: :mailer do
         offender_name: "Franks, Jason",
         offender_no: "AB1234S",
         message: "This is just a test",
-        url: "http:://example.com"
+        url: "http:://example.com",
+        further_info: further_info
       }
     end
 
@@ -21,31 +32,33 @@ RSpec.describe PomMailer, type: :mailer do
     end
 
     it 'personalises the email' do
-      expect(mail.govuk_notify_personalisation)
-          .to eq(
-            email_subject: 'New OMIC allocation',
-            pom_name: params[:pom_name],
-            responsibility: params[:responsibility],
-            offender_name: params[:offender_name],
-            nomis_offender_id: params[:offender_no],
-            message: "Additional information: #{params[:message]}",
-            url: params[:url]
-          )
+      expect(mail.govuk_notify_personalisation).to eq(
+        {
+          email_subject: 'New OMIC allocation',
+          pom_name: params[:pom_name],
+          responsibility: params[:responsibility],
+          offender_name: params[:offender_name],
+          nomis_offender_id: params[:offender_no],
+          message: "Additional information: #{params[:message]}",
+          url: params[:url]
+        }.merge(further_info)
+      )
     end
 
     context 'when no optional message has been added to the email' do
       it 'personalises the email' do
         params[:message] = ""
-        expect(mail.govuk_notify_personalisation)
-            .to eq(
-              email_subject: 'New OMIC allocation',
-              pom_name: params[:pom_name],
-              responsibility: params[:responsibility],
-              offender_name: params[:offender_name],
-              nomis_offender_id: params[:offender_no],
-              message: params[:message],
-              url: params[:url]
-            )
+        expect(mail.govuk_notify_personalisation).to eq(
+          {
+            email_subject: 'New OMIC allocation',
+            pom_name: params[:pom_name],
+            responsibility: params[:responsibility],
+            offender_name: params[:offender_name],
+            nomis_offender_id: params[:offender_no],
+            message: params[:message],
+            url: params[:url]
+          }.merge(further_info)
+        )
       end
     end
   end
@@ -60,7 +73,8 @@ RSpec.describe PomMailer, type: :mailer do
         offender_name: "Marks, Simon",
         offender_no: "GE4595D",
         url: "http:://example.com",
-        prison: "Leeds (HMP)"
+        prison: "Leeds (HMP)",
+        further_info: further_info
       }
     end
 
@@ -76,17 +90,18 @@ RSpec.describe PomMailer, type: :mailer do
     end
 
     it 'personalises the email' do
-      expect(mail.govuk_notify_personalisation)
-          .to eq(
-            email_subject: 'OMIC case reallocation',
-            previous_pom_name: params[:previous_pom_name],
-            responsibility: params[:responsibility],
-            new_pom_name: params[:new_pom_name],
-            offender_name: params[:offender_name],
-            nomis_offender_id: params[:offender_no],
-            prison: params[:prison],
-            url: params[:url]
-          )
+      expect(mail.govuk_notify_personalisation).to eq(
+        {
+          email_subject: 'OMIC case reallocation',
+          previous_pom_name: params[:previous_pom_name],
+          responsibility: params[:responsibility],
+          new_pom_name: params[:new_pom_name],
+          offender_name: params[:offender_name],
+          nomis_offender_id: params[:offender_no],
+          prison: params[:prison],
+          url: params[:url]
+        }.merge(further_info)
+      )
     end
   end
 

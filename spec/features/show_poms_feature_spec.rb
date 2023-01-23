@@ -34,7 +34,7 @@ feature "get poms list", flaky: true do
       end
     end
 
-    expect(page).to have_css('p', text: "You are allocating Aianilan Albina to Moic Pom")
+    expect(page).to have_css('h1', text: "Check allocation details for Aianilan Albina")
 
     click_button 'Complete allocation'
 

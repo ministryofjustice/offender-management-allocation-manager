@@ -99,8 +99,6 @@ module HmppsApi
         criminal_sentence?
     end
 
-  private
-
     def age
       return nil if date_of_birth.blank?
 
@@ -116,6 +114,8 @@ module HmppsApi
 
       @age ||= birthday_passed ? birth_years_ago : birth_years_ago - 1
     end
+
+  private
 
     def criminal_sentence?
       @sentence.criminal_sentence?

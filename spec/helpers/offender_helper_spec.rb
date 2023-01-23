@@ -130,7 +130,7 @@ RSpec.describe OffenderHelper do
 
   describe '#format_allocation' do
     subject do
-      helper.format_allocation(offender, pom, notes, view_context)
+      helper.format_allocation(offender: offender, pom: pom, view_context: view_context)
     end
 
     let(:api_offender) { build(:hmpps_api_offender) }

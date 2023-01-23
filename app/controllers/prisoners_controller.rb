@@ -8,6 +8,7 @@ class PrisonersController < PrisonsApplicationController
   before_action :load_all_offenders, only: [:allocated, :missing_information, :unallocated, :new_arrivals, :search]
 
   def allocated
+    retrieve_latest_allocation_details
     load_summary :allocated
   end
 
@@ -16,6 +17,7 @@ class PrisonersController < PrisonsApplicationController
   end
 
   def unallocated
+    retrieve_latest_allocation_details
     load_summary :unallocated
   end
 

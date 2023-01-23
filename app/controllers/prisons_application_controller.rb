@@ -5,8 +5,7 @@
 class PrisonsApplicationController < ApplicationController
   include Sorting
 
-  before_action :authenticate_user, :check_prison_access, :load_staff_member, :service_notifications, :load_roles,
-                :retrieve_latest_allocation_details
+  before_action :authenticate_user, :check_prison_access, :load_staff_member, :service_notifications, :load_roles
 
 protected
 
@@ -24,11 +23,12 @@ protected
     sso_identity.current_user_is_pom? && @current_user.has_pom_role?
   end
 
-  # These 2 methods manage the data for the quite lengthy acknowledgement
-  # message that appears at the top of the next page immediately after user has
-  # successfully allocated. No good storing the redered HTML in flash as it will
-  # blow the max cookie size. Instead we just store the locals in the session,
-  # which gets rendered via a partial if @latest_allocation_details is present.
+  # These 2 methods manage the data for the quite lengthy allocation summary
+  # message that appears on the confirm page and as a success message after
+  # allocation.
+  # No good storing the redered HTML in flash as it will blow the max cookie
+  # size. Instead we just store the locals in the session, which gets rendered
+  # via a partial if @latest_allocation_details is present.
   def store_latest_allocation_details(details_hash)
     session[:latest_allocation_details] = details_hash
   end
