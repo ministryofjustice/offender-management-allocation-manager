@@ -242,4 +242,28 @@ RSpec.describe MpcOffender, type: :model do
       expect(offender.attributes_to_archive).to eq expected
     end
   end
+
+  describe '#released?' do
+    let(:today) { Date.new(2021, 1, 2) }
+
+    it 'is false if release date is nil' do
+      allow(subject).to receive_messages(earliest_release_date: nil)
+      expect(subject.released?(relative_to_date: today)).to eq false
+    end
+
+    it 'is false if earliest release date is later than today' do
+      allow(subject).to receive_messages(earliest_release_date: Date.new(2021, 1, 3))
+      expect(subject.released?(relative_to_date: today)).to eq false
+    end
+
+    it 'is true if earliest release date is today'  do
+      allow(subject).to receive_messages(earliest_release_date: today)
+      expect(subject.released?(relative_to_date: today)).to eq true
+    end
+
+    it 'is true if earliest release date is earlier than today' do
+      allow(subject).to receive_messages(earliest_release_date: Date.new(2021, 1, 1))
+      expect(subject.released?(relative_to_date: today)).to eq true
+    end
+  end
 end

@@ -65,6 +65,15 @@ class Prison < ApplicationRecord
 
   delegate :missing_info, to: :summary
 
+  def primary_allocated_offenders
+    alloc_hash = allocations.index_by(&:nomis_offender_id)
+
+    allocated.select { |offender| alloc_hash.key?(offender.offender_no) && !offender.released? }.map do |offender|
+      AllocatedOffender.new(alloc_hash[offender.offender_no].primary_pom_nomis_id,
+                            alloc_hash.fetch(offender.offender_no), offender)
+    end
+  end
+
 private
 
   Summary = Struct.new :allocated, :unallocated, :new_arrivals, :missing_info, :outside_omic_policy, keyword_init: true

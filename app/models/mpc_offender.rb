@@ -342,6 +342,12 @@ class MpcOffender
     attr_names.index_with { |attr_name| send(attr_name) }
   end
 
+  def released?(relative_to_date: Time.zone.now.utc.to_date)
+    return false if earliest_release_date.nil?
+
+    earliest_release_date <= relative_to_date
+  end
+
 private
 
   def early_allocation_notes?

@@ -136,4 +136,41 @@ RSpec.describe Prison do
       expect(prison.allocations_for_pom(nomis_staff_id)).to eq expected_allocations
     end
   end
+
+  describe '#primary_allocated_offenders' do
+    let(:prison) { FactoryBot.create :prison }
+    let(:allocation_history) { FactoryBot.create_list :allocation_history, 3, :primary, prison: prison.code }
+    let(:mpc_offenders) do
+      allocation_history.map do |ah|
+        nomis_offender_id = ah.nomis_offender_id
+        instance_double MpcOffender, "mpc_offender-#{nomis_offender_id}", offender_no: nomis_offender_id,
+                                                                          inside_omic_policy?: true,
+                                                                          probation_record: double,
+                                                                          released?: false
+      end
+    end
+    let(:allocated_offenders) do
+      allocation_history.each { |ah| instance_double AllocatedOffender, "allocated_offender-#{ah.nomis_offender_id}" }
+    end
+    let(:unrelated_allocation_history) { FactoryBot.create_list :allocation_history, 3, :primary }
+
+    before do
+      allow(prison).to receive(:unfiltered_offenders).and_return(mpc_offenders)
+      mpc_offenders.each { |o| Offender.create! nomis_offender_id: o.offender_no }
+
+      allocation_history.each_with_index do |ah, idx|
+        allow(AllocatedOffender).to receive(:new).with(ah.primary_pom_nomis_id, ah, mpc_offenders[idx])
+                                                 .and_return(allocated_offenders[idx])
+      end
+    end
+
+    it 'builds AllocatedOffender objects for each offender allocated to a primary POM in this prison' do
+      expect(prison.primary_allocated_offenders).to match_array(allocated_offenders)
+    end
+
+    it 'filters out released offenders' do
+      allow(mpc_offenders[0]).to receive_messages(released?: true)
+      expect(prison.primary_allocated_offenders).not_to include(allocated_offenders[0])
+    end
+  end
 end
