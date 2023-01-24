@@ -30,19 +30,25 @@ class HandoversController < PrisonsApplicationController
 
 private
 
-  def new_handovers_ui?
-    session[:new_handovers_ui] == true
-  end
-
   def check_prerequisites_and_prepare_variables
-    unless new_handovers_ui?
+    unless session[:new_handovers_ui] == true
       redirect_to '/401'
       return
     end
 
-    ensure_pom
+    if (current_user_is_pom? && current_user_is_spo? && params[:pom] == '1') ||
+      (current_user_is_pom? && !current_user_is_spo?)
+      @handover_cases = Handover::CategorisedHandoverCasesForPom.new(@current_user)
+      @pom_view = true
+    elsif current_user_is_spo?
+      @handover_cases = Handover::CategorisedHandoverCasesForHomd.new(@prison)
+      @pom_view = false
+    else
+      redirect_to '/401'
+      return
+    end
+
     @prison_id = active_prison_id
-    @handover_cases = Handover::CategorisedHandoverCasesForPom.new(@current_user)
     flash[:current_handovers_url] = request.url
   end
 end

@@ -30,6 +30,7 @@ RSpec.describe 'handovers/com_allocation_overdue' do
   before do
     assign(:handover_cases, double(:handover_cases, com_allocation_overdue: cases))
     assign(:prison_id, prison_code)
+    assign(:pom_view, true)
   end
 
   describe 'when no LDU details' do

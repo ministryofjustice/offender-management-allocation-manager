@@ -19,6 +19,10 @@ class StaffMember
     "#{last_name}, #{first_name}"
   end
 
+  def full_name_ordered
+    "#{first_name} #{last_name}"
+  end
+
   def first_name
     staff_detail.first_name&.titleize
   end

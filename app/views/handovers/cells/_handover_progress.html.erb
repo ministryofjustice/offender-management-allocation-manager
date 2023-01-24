@@ -11,5 +11,7 @@
       </li>
     <% end %>
   </ul>
-  <p><%= handover_record_progress_link(prison_id, offender.offender_no) %></p>
+  <% if @pom_view %>
+    <p><%= handover_record_progress_link(prison_id, offender.offender_no) %></p>
+  <% end %>
 </td>

@@ -41,6 +41,7 @@ RSpec.describe 'handovers/in_progress' do
   before do
     assign(:handover_cases, double(:handover_cases, in_progress: cases))
     assign(:prison_id, prison_code)
+    assign(:pom_view, true)
   end
 
   describe 'in the general case' do
