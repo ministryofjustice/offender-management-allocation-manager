@@ -1,18 +1,25 @@
 RSpec.describe HandoversController, type: :controller do
   let(:prison_code) { 'DBG' }
   let(:prison) { instance_double Prison, :prison, code: prison_code }
-  let(:default_params) { { prison_id: prison_code } }
+  let(:default_params) { { prison_id: prison_code, pom: pom_param } }
   let(:staff_id) { 456_987 }
   let(:staff_member) { instance_double StaffMember, :staff_member, staff_id: staff_id }
+  let(:handover_cases) { double :handover_cases }
+  let(:pom_param) { 'pom_param' }
+  let(:pom_view_flag) { double :pom_view_flag }
+  let(:current_user_is_pom_stub) { double :current_user_is_pom_stub }
+  let(:current_user_is_spo_stub) { double :current_user_is_spo_stub }
 
   before do
     session[:new_handovers_ui] = true
 
-    allow(Handover::CategorisedHandoverCasesForPom).to receive(:new).and_raise('Unexpected')
-    allow(Handover::CategorisedHandoverCasesForHomd).to receive(:new).and_raise('Unexpected')
+    stub_high_level_staff_member_auth(prison: prison, staff_member: staff_member)
+    allow(controller.helpers).to receive_messages(handover_cases_view: [pom_view_flag, handover_cases])
+    allow(controller).to receive_messages(current_user_is_pom?: current_user_is_pom_stub)
+    allow(controller).to receive_messages(current_user_is_spo?: current_user_is_spo_stub)
   end
 
-  shared_examples 'handover cases list page' do |pom_view:|
+  shared_examples 'handover cases list page' do
     it 'renders successfully' do
       expect(response).to be_successful
     end
@@ -21,27 +28,36 @@ RSpec.describe HandoversController, type: :controller do
       expect(assigns(:prison_id)).to eq prison_code
     end
 
-    it 'has handover cases list' do
-      # handover_cases is defined in an inner describe block and is different per POM or HOMD user
-      expect(assigns(:handover_cases)).to eq handover_cases
-    end
-
     it 'sets current_handovers_url' do
       expect(flash[:current_handovers_url]).to eq request.url
     end
 
+    it 'has handover cases list' do
+      expect(assigns(:handover_cases)).to eq handover_cases
+    end
+
     it 'has correct POM view flag' do
-      expect(assigns[:pom_view]).to eq pom_view
+      expect(assigns[:pom_view]).to eq pom_view_flag
+    end
+
+    it 'gets handover cases correctly' do
+      expect(controller.helpers).to have_received(:handover_cases_view).with(
+        current_user: staff_member,
+        prison: prison,
+        current_user_is_pom: current_user_is_pom_stub,
+        current_user_is_spo: current_user_is_spo_stub,
+        pom_param: pom_param,
+      )
     end
   end
 
-  shared_examples 'all handover cases list pages' do |pom_view:|
+  describe 'when user is authorised' do
     describe 'upcoming handovers page' do
       before do
         get :upcoming, params: default_params
       end
 
-      it_behaves_like 'handover cases list page', pom_view: pom_view
+      it_behaves_like 'handover cases list page'
     end
 
     describe 'in progress handovers page' do
@@ -49,7 +65,7 @@ RSpec.describe HandoversController, type: :controller do
         get :in_progress, params: default_params
       end
 
-      it_behaves_like 'handover cases list page', pom_view: pom_view
+      it_behaves_like 'handover cases list page'
     end
 
     describe 'overdue tasks page' do
@@ -57,7 +73,7 @@ RSpec.describe HandoversController, type: :controller do
         get :overdue_tasks, params: default_params
       end
 
-      it_behaves_like 'handover cases list page', pom_view: pom_view
+      it_behaves_like 'handover cases list page'
     end
 
     describe 'COM allocation overdue page' do
@@ -65,41 +81,13 @@ RSpec.describe HandoversController, type: :controller do
         get :com_allocation_overdue, params: default_params
       end
 
-      it_behaves_like 'handover cases list page', pom_view: pom_view
+      it_behaves_like 'handover cases list page'
     end
   end
 
-  describe 'when only POM authorised' do
-    let(:handover_cases) { instance_double Handover::CategorisedHandoverCasesForPom, :handover_cases }
-
+  describe 'when user is not authorised' do
     before do
-      stub_high_level_staff_member_auth(prison: prison, staff_member: staff_member)
-      allow(controller).to receive_messages(current_user_is_pom?: true)
-      allow(controller).to receive_messages(current_user_is_spo?: false)
-      allow(Handover::CategorisedHandoverCasesForPom).to receive(:new).with(staff_member).and_return(handover_cases)
-    end
-
-    it_behaves_like 'all handover cases list pages', pom_view: true
-  end
-
-  describe 'when only HOMD authorised' do
-    let(:handover_cases) { instance_double Handover::CategorisedHandoverCasesForHomd, :handover_cases }
-
-    before do
-      stub_high_level_staff_member_auth(prison: prison, staff_member: staff_member)
-      allow(controller).to receive_messages(current_user_is_pom?: false)
-      allow(controller).to receive_messages(current_user_is_spo?: true)
-      allow(Handover::CategorisedHandoverCasesForHomd).to receive(:new).with(prison).and_return(handover_cases)
-    end
-
-    it_behaves_like 'all handover cases list pages', pom_view: false
-  end
-
-  describe 'when neither POM or HOMD authorised' do
-    before do
-      stub_high_level_staff_member_auth(prison: prison, staff_member: staff_member)
-      allow(controller).to receive_messages(current_user_is_pom?: false)
-      allow(controller).to receive_messages(current_user_is_spo?: false)
+      allow(controller.helpers).to receive_messages(handover_cases_view: nil)
     end
 
     describe 'upcoming handovers page' do
