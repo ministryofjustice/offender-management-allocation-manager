@@ -178,3 +178,8 @@ Style/MethodCalledOnDoEndBlock:
 
 Style/EachForSimpleLoop:
   Enabled: false
+
+# We don't want anyone to have to know that an `if` statement evaluates to nil if none of its conditions are met,
+# so we allow `else  nil` so it's crystal clear
+Style/EmptyElse:
+  Enabled: false
