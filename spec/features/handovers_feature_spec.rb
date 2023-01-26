@@ -26,11 +26,11 @@ RSpec.feature 'Handovers feature:' do
   let(:calc_handover_date) do
     instance_double CalculatedHandoverDate, :calc_handover_date, handover_date: Faker::Date.forward
   end
-  let(:handover_cases_list) do
-    instance_double(HandoverCasesList, :handover_cases_list, upcoming: [],
-                                                             in_progress: [],
-                                                             overdue_tasks: [],
-                                                             com_allocation_overdue: [])
+  let(:handover_cases) do
+    instance_double(Handover::CategorisedHandoverCasesForPom, :handover_cases, upcoming: [],
+                                                                               in_progress: [],
+                                                                               overdue_tasks: [],
+                                                                               com_allocation_overdue: [])
   end
 
   before do
@@ -41,12 +41,12 @@ RSpec.feature 'Handovers feature:' do
     signin_pom_user([prison_code])
     stub_poms(prison_code, [user])
 
-    allow(HandoverCasesList).to receive(:new).and_return(handover_cases_list)
+    allow(Handover::CategorisedHandoverCasesForPom).to receive(:new).and_return(handover_cases)
   end
 
   describe 'upcoming handovers' do
     it 'renders correctly' do
-      allow(handover_cases_list).to receive(:upcoming).and_return([[calc_handover_date, offender]])
+      allow(handover_cases).to receive(:upcoming).and_return([[calc_handover_date, offender]])
       visit upcoming_prison_handovers_path(default_params)
 
       aggregate_failures do
@@ -61,7 +61,7 @@ RSpec.feature 'Handovers feature:' do
     it 'renders correctly' do
       allow(offender).to receive(:allocated_com_name).and_return('Mr COM')
       allow(offender).to receive(:allocated_com_email).and_return('mr-com@example.org')
-      allow(handover_cases_list).to receive(:in_progress).and_return([[calc_handover_date, offender]])
+      allow(handover_cases).to receive(:in_progress).and_return([[calc_handover_date, offender]])
       visit in_progress_prison_handovers_path(default_params)
 
       aggregate_failures do
@@ -75,7 +75,7 @@ RSpec.feature 'Handovers feature:' do
 
   describe 'overdue tasks' do
     it 'renders correctly' do
-      allow(handover_cases_list).to receive(:overdue_tasks).and_return([[calc_handover_date, offender]])
+      allow(handover_cases).to receive(:overdue_tasks).and_return([[calc_handover_date, offender]])
       visit overdue_tasks_prison_handovers_path(default_params)
 
       aggregate_failures do
@@ -88,7 +88,7 @@ RSpec.feature 'Handovers feature:' do
 
   describe 'COM allocation overdue handovers page' do
     it 'renders correctly' do
-      allow(handover_cases_list).to receive(:com_allocation_overdue).and_return([[calc_handover_date, offender]])
+      allow(handover_cases).to receive(:com_allocation_overdue).and_return([[calc_handover_date, offender]])
       visit com_allocation_overdue_prison_handovers_path(default_params)
 
       aggregate_failures do

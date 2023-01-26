@@ -6,7 +6,7 @@ RSpec.describe HandoverProgressChecklistsController do
   let(:default_params) { { prison_id: prison_code, nomis_offender_id: nomis_offender_id } }
 
   before do
-    stub_high_level_pom_auth(prison: prison, pom_staff_member: current_pom)
+    stub_high_level_pom_auth(prison: prison, staff_member: current_pom)
     allow(current_pom).to receive(:has_allocation?).with(nomis_offender_id).and_return true
     allow(OffenderService).to receive(:get_offender).and_return(nil)
     allow(controller.helpers).to receive(:last_handovers_url).and_return '/last'

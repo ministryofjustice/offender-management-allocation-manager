@@ -30,19 +30,24 @@ class HandoversController < PrisonsApplicationController
 
 private
 
-  def new_handovers_ui?
-    session[:new_handovers_ui] == true
-  end
-
   def check_prerequisites_and_prepare_variables
-    unless new_handovers_ui?
+    unless session[:new_handovers_ui] == true
       redirect_to '/401'
       return
     end
 
-    ensure_pom
+    @pom_view, @handover_cases = helpers.handover_cases_view(current_user: @current_user,
+                                                             prison: @prison,
+                                                             current_user_is_pom: current_user_is_pom?,
+                                                             current_user_is_spo: current_user_is_spo?,
+                                                             pom_param: params[:pom])
+
+    if @handover_cases.nil?
+      redirect_to '/401'
+      return
+    end
+
     @prison_id = active_prison_id
-    @handover_cases = HandoverCasesList.new(staff_member: @current_user)
     flash[:current_handovers_url] = request.url
   end
 end

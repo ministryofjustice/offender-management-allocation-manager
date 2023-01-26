@@ -1,5 +1,5 @@
-RSpec.describe HandoverCasesList do
-  subject(:handover_cases_list) { described_class.new(staff_member: staff_member) }
+RSpec.describe Handover::CategorisedHandoverCases do
+  subject(:handover_cases) { described_class.new(offenders.values) }
 
   let(:offender_numbers) { ('A'..'Z').to_a }
   let(:offenders) do
@@ -11,7 +11,6 @@ RSpec.describe HandoverCasesList do
     end
     value
   end
-  let(:staff_member) { instance_double StaffMember, :staff_member, unreleased_allocations: offenders.values }
   let(:upcoming_calculated_handover_dates) do
     [
       double(:upcoming1, nomis_offender_id: 'A'),
@@ -56,20 +55,20 @@ RSpec.describe HandoverCasesList do
 
   describe '#upcoming' do
     it 'gets a list of handover cases whose handovers are upcoming' do
-      expect(handover_cases_list.upcoming).to eq([[upcoming_calculated_handover_dates[0], offenders['A']],
-                                                  [upcoming_calculated_handover_dates[1], offenders['C']]])
+      expect(handover_cases.upcoming).to eq([[upcoming_calculated_handover_dates[0], offenders['A']],
+                                             [upcoming_calculated_handover_dates[1], offenders['C']]])
     end
 
     it 'does not include upcoming handover cases with a COM allocated' do
       allow(offenders['C']).to receive(:allocated_com_name).and_return('TEST COM NAME')
 
-      expect(handover_cases_list.upcoming.map(&:second)).not_to include(offenders['C'])
+      expect(handover_cases.upcoming.map(&:second)).not_to include(offenders['C'])
     end
   end
 
   describe '#in_progress' do
     it 'gets a list of handover cases whose handovers are in progress' do
-      expect(handover_cases_list.in_progress).to eq([
+      expect(handover_cases.in_progress).to eq([
         [in_progress_calculated_handover_dates[0], offenders['D']],
         [in_progress_calculated_handover_dates[1], offenders['F']],
         [overdue_tasks_calculated_handover_dates[0], offenders['G']],
@@ -80,13 +79,13 @@ RSpec.describe HandoverCasesList do
     it 'includes upcoming handover cases that have a COM allocated' do
       allow(offenders['C']).to receive(:allocated_com_name).and_return('TEST COM NAME')
 
-      expect(handover_cases_list.in_progress.map(&:second)).to include(offenders['C'])
+      expect(handover_cases.in_progress.map(&:second)).to include(offenders['C'])
     end
   end
 
   describe '#overdue_tasks' do
     it 'gets a list of handover cases past handover and with tasks overdue' do
-      expect(handover_cases_list.overdue_tasks).to eq([
+      expect(handover_cases.overdue_tasks).to eq([
         [overdue_tasks_calculated_handover_dates[0], offenders['G']],
         [overdue_tasks_calculated_handover_dates[1], offenders['H']],
       ])
@@ -95,16 +94,16 @@ RSpec.describe HandoverCasesList do
     it 'includes upcoming handover cases that have a COM allocated' do
       allow(offenders['C']).to receive(:allocated_com_name).and_return('TEST COM NAME')
 
-      expect(handover_cases_list.in_progress.map(&:second)).to include(offenders['C'])
+      expect(handover_cases.in_progress.map(&:second)).to include(offenders['C'])
     end
   end
 
   describe '#com_allocation_overdue' do
     it 'gets a list of handover cases that are COM allocation overdue' do
-      expect(handover_cases_list.com_allocation_overdue).to eq([[com_allocation_overdue_calculated_handover_dates[0],
-                                                                 offenders['J']],
-                                                                [com_allocation_overdue_calculated_handover_dates[1],
-                                                                 offenders['K']]])
+      expect(handover_cases.com_allocation_overdue).to eq([[com_allocation_overdue_calculated_handover_dates[0],
+                                                            offenders['J']],
+                                                           [com_allocation_overdue_calculated_handover_dates[1],
+                                                            offenders['K']]])
     end
   end
 end

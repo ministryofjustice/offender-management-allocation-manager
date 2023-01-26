@@ -35,6 +35,7 @@ RSpec.describe 'handovers/upcoming' do
   before do
     assign(:handover_cases, double(:handover_cases, upcoming: upcoming_handover_cases))
     assign(:prison_id, prison_code)
+    assign(:pom_view, true)
   end
 
   describe 'in the general case' do
