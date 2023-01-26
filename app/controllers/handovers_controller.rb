@@ -36,14 +36,13 @@ private
       return
     end
 
-    if (current_user_is_pom? && current_user_is_spo? && params[:pom] == '1') ||
-      (current_user_is_pom? && !current_user_is_spo?)
-      @handover_cases = Handover::CategorisedHandoverCasesForPom.new(@current_user)
-      @pom_view = true
-    elsif current_user_is_spo?
-      @handover_cases = Handover::CategorisedHandoverCasesForHomd.new(@prison)
-      @pom_view = false
-    else
+    @pom_view, @handover_cases = helpers.handover_cases_view(current_user: @current_user,
+                                                             prison: @prison,
+                                                             current_user_is_pom: current_user_is_pom?,
+                                                             current_user_is_spo: current_user_is_spo?,
+                                                             pom_param: params[:pom])
+
+    if @handover_cases.nil?
       redirect_to '/401'
       return
     end
