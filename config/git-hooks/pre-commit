@@ -1,5 +1,10 @@
-#!/bin/bash
+#!/bin/bash --login
 
 set -euo pipefail
 
-true
+run_rubocop_on_modified() {
+  files=$(git status --porcelain | awk '/(\.(rb|rake|ru))|Gemfile$/ {print $2}')
+  [[ -n "${files}" ]] && bundle exec rubocop --force-exclusion --format quiet --no-color ${files}
+}
+
+run_rubocop_on_modified

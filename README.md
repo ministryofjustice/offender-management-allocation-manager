@@ -132,11 +132,10 @@ Extra variables not required locally
 
 Run `make setup` to install git pre-commit hooks that:
 
-- lint changed files using govuk rubocop (TODO)
+- lint changed files using govuk rubocop
 
-To test that the pre-commit hook is set up correctly, try removing the `diff`
-attribute from a line in a `.gitattributes` file and then committing something -
-the hook should prevent you from committing.
+To test that the pre-commit hook is set up correctly, make an anti-rubocop change in app/models/offender.rb and
+try to commit - it should stop you doing so. (If it succeeds, undo the commit).
 
 ## CircleCI
 
