@@ -27,6 +27,14 @@ RSpec.describe MpcOffender, type: :model do
       allow(subject).to receive(:prison_timeline).and_return(prison_timeline)
     end
 
+    context 'when prison_timeline returns nil (e.g. when API returns 500)' do
+      let(:prison_timeline) { nil }
+
+      it 'returns empty array' do
+        expect(subject.additional_information).to eq([])
+      end
+    end
+
     context 'when never been in any prison before the current one' do
       let(:prison_periods) { [{ 'prisons' => [prison.code] }] }
 

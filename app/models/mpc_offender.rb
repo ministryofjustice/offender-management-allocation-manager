@@ -188,9 +188,16 @@ class MpcOffender
 
   def prison_timeline
     @prison_timeline ||= HmppsApi::PrisonTimelineApi.get_prison_timeline(offender_no)
+
+  # Temp fix while Prison API prison timeline sometimes returns 500
+  # for some offenders
+  rescue Faraday::ServerError
+    nil
   end
 
   def additional_information
+    return [] if prison_timeline.nil?
+
     attended_prisons = prison_timeline['prisonPeriod'].map { |p| p['prisons'] }.flatten
 
     # Remove only ONE of any prison codes that match the current prison
