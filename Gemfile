@@ -63,7 +63,7 @@ group :development, :test do
   gem 'rubocop-govuk', '~> 4.8'
   gem 'rubocop-performance', '~> 1.15'
   # needed to support Rails 6.0
-  gem 'rspec-rails'
+  gem 'rspec-rails', '~> 6.0'
   gem 'rswag-specs'
   gem 'spring'
   gem 'undercover'
