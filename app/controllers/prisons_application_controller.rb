@@ -22,6 +22,7 @@ protected
   def current_user_is_pom?
     sso_identity.current_user_is_pom? && @current_user.has_pom_role?
   end
+  helper_method :current_user_is_pom?
 
   # These 2 methods manage the data for the quite lengthy allocation summary
   # message that appears on the confirm page and as a success message after
