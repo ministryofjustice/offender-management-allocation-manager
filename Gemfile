@@ -1,16 +1,17 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.7.6'
+ruby '2.7.7'
 
-gem 'rails', '~> 6.1.6'
+gem 'rails', '~> 6.1.7'
 gem 'auto_strip_attributes'
 # Need AWS SNS SDK for publishing events to HMPPS_DOMAIN_EVENTS
 gem 'aws-sdk-sns'
 gem 'bootsnap', '>= 1.1.0', require: false
 gem 'coffee-rails', '~> 5.0'
 gem 'date_validator'
-gem 'faraday', '~> 1.0'
+gem 'faraday', '~> 1.10.3'
+gem 'net-http' # needed to undo a conflict with system libs
 gem 'govuk_notify_rails'
 # we need the extra is_csv parameter available in 5.2 and above
 gem 'notifications-ruby-client', '>= 5.2'
@@ -63,7 +64,7 @@ group :development, :test do
   gem 'rubocop-govuk', '~> 4.8'
   gem 'rubocop-performance', '~> 1.15'
   # needed to support Rails 6.0
-  gem 'rspec-rails'
+  gem 'rspec-rails', '~> 6.0'
   gem 'rswag-specs'
   gem 'spring'
   gem 'undercover'
@@ -98,7 +99,7 @@ group :development do
   gem 'guard-rubocop'
   gem 'listen'
   gem 'memory_profiler'
-  gem 'parser'
+  gem 'parser', '~> 3.2'
   gem 'rack-mini-profiler'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'stackprof'

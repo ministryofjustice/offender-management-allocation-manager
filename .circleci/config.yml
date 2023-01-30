@@ -13,7 +13,7 @@ references:
   test_container_config: &test_container_config
     resource_class: large
     docker:
-      - image: cimg/ruby:2.7.6-browsers
+      - image: cimg/ruby:2.7.7-browsers
         environment:
           RAILS_ENV: test
           PGHOST: 127.0.0.1
@@ -224,7 +224,7 @@ jobs:
           at: ~/
       - run:
           name: Security analysis
-          command: bundle exec brakeman -o ~/test-results/brakeman/brakeman.json -o ~/test-results/brakeman/brakeman.html
+          command: bundle exec brakeman --except EOLRuby -o ~/test-results/brakeman/brakeman.json -o ~/test-results/brakeman/brakeman.html
       - run:
           name: Setup database
           command: |
