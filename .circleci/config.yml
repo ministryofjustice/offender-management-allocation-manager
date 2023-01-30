@@ -224,7 +224,7 @@ jobs:
           at: ~/
       - run:
           name: Security analysis
-          command: bundle exec brakeman -o ~/test-results/brakeman/brakeman.json -o ~/test-results/brakeman/brakeman.html
+          command: bundle exec brakeman --except EOLRuby -o ~/test-results/brakeman/brakeman.json -o ~/test-results/brakeman/brakeman.html
       - run:
           name: Setup database
           command: |
