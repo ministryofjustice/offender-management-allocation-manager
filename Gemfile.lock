@@ -190,7 +190,7 @@ GEM
       railties (>= 5.0.0)
     faker (3.0.0)
       i18n (>= 1.8.11, < 2)
-    faraday (1.10.2)
+    faraday (1.10.3)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
       faraday-excon (~> 1.1)
@@ -324,8 +324,10 @@ GEM
     msgpack (1.4.5)
     multi_test (0.1.2)
     multi_xml (0.6.0)
-    multipart-post (2.2.3)
+    multipart-post (2.3.0)
     nenv (0.3.0)
+    net-http (0.3.2)
+      uri
     net-imap (0.3.4)
       date
       net-protocol
@@ -576,6 +578,7 @@ GEM
       rainbow (>= 2.1, < 4.0)
       rugged (>= 0.27, < 1.6)
     unicode-display_width (2.3.0)
+    uri (0.12.0)
     valid_email2 (4.0.4)
       activemodel (>= 3.2)
       mail (~> 2.5)
@@ -617,7 +620,7 @@ DEPENDENCIES
   dotenv-rails
   factory_bot_rails
   faker
-  faraday (~> 1.0)
+  faraday (~> 1.10.3)
   fast_underscore
   flamegraph
   govuk_design_system_formbuilder (~> 2.5)
@@ -635,6 +638,9 @@ DEPENDENCIES
   logstash-event
   logstash-logger
   memory_profiler
+  net-http
+  net-imap
+  net-smtp
   notifications-ruby-client (>= 5.2)
   omniauth (~> 1.9.2)
   omniauth-oauth2
