@@ -10,6 +10,18 @@
       <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
         Your handover cases
       </h1>
+
+      <p>
+        <% if current_user_is_pom? && current_user_is_spo? %>
+          <% if @pom_view %>
+            <%= link_to 'See all handover cases in this prison', url_for,
+                        class: %w[govuk-link govuk-link--no-visited-state] %>
+          <% else %>
+            <%= link_to 'See your handover cases only ', url_for(params: {pom: '1'}),
+                        class: %w[govuk-link govuk-link--no-visited-state] %>
+          <% end %>
+        <% end %>
+      </p>
     </div>
 
     <div class="govuk-grid-column-one-third">
@@ -22,18 +34,14 @@
       <nav class="moj-sub-navigation" aria-label="Sub navigation">
         <ul class='moj-sub-navigation__list'>
           <% [
-               ['upcoming', "Upcoming handovers (#{@handover_cases.upcoming.count})",
-                upcoming_prison_handovers_path(@prison_id)],
-               ['in_progress', "Handovers in progress (#{@handover_cases.in_progress.count})",
-                in_progress_prison_handovers_path(@prison_id)],
-               ['overdue_tasks', "Overdue tasks (#{@handover_cases.overdue_tasks.count})",
-                overdue_tasks_prison_handovers_path(@prison_id)],
-               ['com_allocation_overdue', "COM allocation overdue (#{@handover_cases.com_allocation_overdue.count})",
-                com_allocation_overdue_prison_handovers_path(@prison_id)],
-             ].each do |action, title, path|
+               ['upcoming', "Upcoming handovers (#{@handover_cases.upcoming.count})"],
+               ['in_progress', "Handovers in progress (#{@handover_cases.in_progress.count})"],
+               ['overdue_tasks', "Overdue tasks (#{@handover_cases.overdue_tasks.count})"],
+               ['com_allocation_overdue', "COM allocation overdue (#{@handover_cases.com_allocation_overdue.count})"],
+             ].each do |action, title|
           %>
             <li class="moj-sub-navigation__item">
-              <%= handover_tab_navigation_link action: action, title: title, path: path %>
+              <%= handover_tab_navigation_link action, title, @pom_view %>
             </li>
           <% end %>
         </ul>
