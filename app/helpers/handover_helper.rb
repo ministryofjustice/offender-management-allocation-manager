@@ -19,4 +19,9 @@ module HandoverHelper
   def last_handovers_url
     flash[:current_handovers_url] || upcoming_prison_handovers_url(@prison) # rubocop:disable Rails/HelperInstanceVariable
   end
+
+  def handover_tab_navigation_link(action:, title:, path:)
+    aria = (controller.action_name == action) ? { current: 'page' } : nil
+    link_to title, path, class: %w[moj-sub-navigation__link govuk-link--no-visited-state], aria: aria
+  end
 end

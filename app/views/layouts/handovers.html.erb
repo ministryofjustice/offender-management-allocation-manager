@@ -33,11 +33,7 @@
              ].each do |action, title, path|
           %>
             <li class="moj-sub-navigation__item">
-              <a class="moj-sub-navigation__link govuk-link--no-visited-state"
-                 <% if controller.action_name == action -%>aria-current="page"<% end -%>
-                 href="<%= path %>">
-                <%= title %>
-              </a>
+              <%= handover_tab_navigation_link action: action, title: title, path: path %>
             </li>
           <% end %>
         </ul>
