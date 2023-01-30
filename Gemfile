@@ -99,7 +99,7 @@ group :development do
   gem 'guard-rubocop'
   gem 'listen'
   gem 'memory_profiler'
-  gem 'parser'
+  gem 'parser', '~> 3.2'
   gem 'rack-mini-profiler'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'stackprof'
