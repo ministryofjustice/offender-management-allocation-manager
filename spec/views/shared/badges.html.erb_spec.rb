@@ -1,12 +1,11 @@
 require 'rails_helper'
 
-RSpec.describe "allocation_staff/index", type: :view do
+RSpec.describe "shared/badges", type: :view do
   let(:prison) { create(:prison) }
   let(:page) { Nokogiri::HTML(rendered) }
   let(:case_type_badge) { page.css('#prisoner-case-type') }
   let(:recall_badge) { page.css('#recall-badge') }
   let(:parole_badge) { page.css('#parole-badge') }
-  let(:parole_review_date) { page.css('#parole-review-date') }
   let(:case_info) { build(:case_information) }
   let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
@@ -17,7 +16,7 @@ RSpec.describe "allocation_staff/index", type: :view do
     assign(:prison_poms, [])
     assign(:unavailable_pom_count, 0)
     assign(:prisoner, offender)
-    render
+    render partial: 'shared/badges', locals: {offender: offender}
   end
 
   context "when indeterminate" do
@@ -88,7 +87,6 @@ RSpec.describe "allocation_staff/index", type: :view do
 
     it "displays an parole eligibility case type badge" do
       assert_you_have_an_indeterminate_badge
-      expect(parole_review_date.text).to include '03 Jan 2019'
       assert_you_have_a_parole_eligibility_badge
     end
   end
@@ -103,9 +101,7 @@ RSpec.describe "allocation_staff/index", type: :view do
 
     it 'does not display the badge' do
       expect(offender.tariff_date).to eq nil
-      expect(offender.parole_review_date).to eq nil
       expect(offender.parole_eligibility_date).to eq nil
-      expect(parole_review_date.text).not_to include '01/03/2019'
       expect(parole_badge.text).not_to include 'Parole eligible'
     end
   end
