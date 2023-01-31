@@ -33,11 +33,8 @@ RSpec.describe "allocation_staff/index", type: :view do
     let(:poms) { [pom] }
 
     it 'says they have been assigned' do
-      expect(page).to have_text("#{pom.first_name} #{pom.last_name} has previously been allocated to this case")
-    end
-
-    it 'links up the previous POM' do
-      expect(page.css('.pom_name')).to have_text('Previously allocated to case')
+      expect(page).to have_text("The following POMs have been allocated to this case")
+      expect(page).to have_text("#{pom.first_name} #{pom.last_name}")
     end
   end
 
@@ -46,7 +43,9 @@ RSpec.describe "allocation_staff/index", type: :view do
     let(:poms) { [pom, other] }
 
     it 'says they have been assigned' do
-      expect(page).to have_text("#{pom.first_name} #{pom.last_name} and #{other.first_name} #{other.last_name} have previously been allocated to this case")
+      expect(page).to have_text("The following POMs have been allocated to this case")
+      expect(page).to have_text("#{pom.first_name} #{pom.last_name}")
+      expect(page).to have_text("#{other.first_name} #{other.last_name}")
     end
   end
 
@@ -56,7 +55,10 @@ RSpec.describe "allocation_staff/index", type: :view do
     let(:poms) { [pom, other, other2] }
 
     it 'says they have been assigned' do
-      expect(page).to have_text("#{pom.first_name} #{pom.last_name}, #{other.first_name} #{other.last_name}, and #{other2.first_name} #{other2.last_name} have previously been allocated to this case")
+      expect(page).to have_text("The following POMs have been allocated to this case")
+      expect(page).to have_text("#{pom.first_name} #{pom.last_name}")
+      expect(page).to have_text("#{other.first_name} #{other.last_name}")
+      expect(page).to have_text("#{other2.first_name} #{other2.last_name}")
     end
   end
 
