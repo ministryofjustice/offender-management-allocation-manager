@@ -36,10 +36,23 @@ class PrisonersController < PrisonsApplicationController
 
   def review_case_details
     @prisoner = OffenderService.get_offender(params[:prisoner_id])
-    @alerts = @prisoner.active_alert_labels
-    @rosh = @prisoner.rosh_summary
 
     return redirect_to '/404' if @prisoner.nil?
+
+    @alerts = @prisoner.active_alert_labels
+    @rosh = @prisoner.rosh_summary
+    @oasys_assessment = HmppsApi::AssessmentApi.get_latest_oasys_date(@prisoner.offender_no)
+
+    @allocation = AllocationHistory.find_by(nomis_offender_id: @prisoner.offender_no)
+
+    if @allocation.present? && @allocation.secondary_pom_name.present?
+      @secondary_pom_name = PrisonOffenderManagerService.fetch_pom_name(@allocation.secondary_pom_nomis_id).titleize
+      @secondary_pom_email = PrisonOffenderManagerService.fetch_pom_email(@allocation.secondary_pom_nomis_id)
+    end
+
+    @keyworker = HmppsApi::KeyworkerApi.get_keyworker(
+      active_prison_id, @prisoner.offender_no
+    )
   end
 
   def show
