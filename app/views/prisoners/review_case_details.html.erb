@@ -54,7 +54,7 @@
             <tr class="govuk-table__row">
               <th scope="row" class="govuk-table__header govuk-!-width-one-third">Tier</th>
               <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.tier %></td>
-              <td class="govuk-table__cell govuk-!-width-one-third"><a href="" class="govuk-link govuk-link--no-visited-state">Change</a></td>
+              <td class="govuk-table__cell govuk-!-width-one-third"><%= link_to('Change', edit_prison_case_information_path(@prison, @prisoner.offender_no), class: 'govuk-link govuk-link--no-visited-state') %></td>
             </tr>
             <tr class="govuk-table__row">
               <th scope="row" class="govuk-table__header govuk-!-width-one-third">Category</th>
@@ -70,7 +70,7 @@
             </tr>
             <tr class="govuk-table__row">
               <th scope="row" class="govuk-table__header govuk-!-width-one-third">Earliest release date</th>
-              <td class="govuk-table__cell govuk-!-width-one-third">Conditional release date: 22 May 2022</td>
+              <td class="govuk-table__cell govuk-!-width-one-third"><%= format_earliest_release_date(@prisoner.earliest_release) %></td>
               <td class="govuk-table__cell govuk-!-width-one-third"></td>
             </tr>
             <tr class="govuk-table__row">
@@ -80,7 +80,7 @@
             </tr>
             <tr class="govuk-table__row">
               <th scope="row" class="govuk-table__header govuk-!-width-one-third">POM role needed</th>
-              <td class="govuk-table__cell govuk-!-width-one-third">Supporting</td>
+              <td class="govuk-table__cell govuk-!-width-one-third"><%= pom_responsibility_label(@prisoner) %></td>
               <td class="govuk-table__cell govuk-!-width-one-third"></td>
             </tr>
           </tbody>
@@ -100,12 +100,14 @@
             </tr>
             <tr class="govuk-table__row">
               <th scope="row" class="govuk-table__header govuk-!-width-one-third">Last OASys completed</th>
-              <td class="govuk-table__cell govuk-!-width-one-third">Layer 3 – 01 Dec 2021</td>
+              <td class="govuk-table__cell govuk-!-width-one-third">
+                <%= render 'oasys_assessment', assessment: @oasys_assessment %>
+              </td>
               <td class="govuk-table__cell"></td>
             </tr>
             <tr class="govuk-table__row">
               <th scope="row" class="govuk-table__header govuk-!-width-one-third">Handover start due</th>
-              <td class="govuk-table__cell">01 Nov 2021</td>
+              <td class="govuk-table__cell"><%= format_date(@prisoner.handover_start_date) %></td>
               <td class="govuk-table__cell"></td>
             </tr>
             <tr class="govuk-table__row">
@@ -134,7 +136,11 @@
           full Digital Prison Services profile
         </a>
       </li>
-      <li><a class="govuk-link govuk-link--no-visited-state" href="#">allocation history</a></li>
+      <% if AllocationHistory.find_by(nomis_offender_id: @prisoner.offender_no) %>
+        <li>
+          <%= link_to('allocation history', history_prison_prisoner_allocation_path(@prison, @prisoner.offender_no), class: 'govuk-link govuk-link--no-visited-state') %>
+        </li>
+      <% end %>
     </ul>
 
     <!-- Accordians -->
@@ -201,22 +207,34 @@
             <tbody class="govuk-table__body">
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">LDU</td>
-                <td class="govuk-table__cell govuk-!-width-one-third">Cornwall and Isles of Scilly</td>
+                <td class="govuk-table__cell govuk-!-width-one-third">
+                  <%= probation_field(@prisoner, :ldu_name) || "Unknown" %>
+                </td>
                 <td class="govuk-table__cell govuk-!-width-one-third"></td>
               </tr>
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">LDU email</td>
-                <td class="govuk-table__cell govuk-!-width-one-third">cornwallldu@justice.gov.uk</td>
+                <td class="govuk-table__cell govuk-!-width-one-third">
+                  <% if probation_field(@prisoner, :ldu_email_address).present? %>
+                    <%= mail_to(@prisoner.ldu_email_address, @prisoner.ldu_email_address) %>
+                  <% else %>
+                    Unknown
+                  <% end %>
+                </td>
                 <td class="govuk-table__cell govuk-!-width-one-third"></td>
               </tr>
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">COM</td>
-                <td class="govuk-table__cell govuk-!-width-one-third">Antonia Farro</td>
+                <td class="govuk-table__cell govuk-!-width-one-third">
+                  <%= probation_field(@prisoner, :allocated_com_name) || "Unknown" %>
+                </td>
                 <td class="govuk-table__cell govuk-!-width-one-third"></td>
               </tr>
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">COM email</td>
-                <td class="govuk-table__cell govuk-!-width-one-third">antonia.farro@justice.gov.uk</td>
+                <td class="govuk-table__cell govuk-!-width-one-third">
+                  <%= probation_field(@prisoner, :allocated_com_email) || "Unknown" %>
+                </td>
                 <td class="govuk-table__cell govuk-!-width-one-third"></td>
               </tr>
             </tbody>
@@ -255,19 +273,18 @@
 
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">Co-working POM</td>
-                <td class="govuk-table__cell govuk-!-width-one-third">Tanja Moore</td>
-                <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                <td class="govuk-table__cell govuk-!-width-one-third"><%= @secondary_pom_name %></td>
               </tr>
 
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">Co-working POM email</td>
-                <td class="govuk-table__cell govuk-!-width-one-third">tanja.moore@justice.gov.uk</td>
+                <td class="govuk-table__cell govuk-!-width-one-third"><%= @secondary_pom_email %></td>
                 <td class="govuk-table__cell govuk-!-width-one-third"></td>
               </tr>
 
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">Key worker</td>
-                <td class="govuk-table__cell govuk-!-width-one-third">None assigned</td>
+                <td class="govuk-table__cell govuk-!-width-one-third"><%= @keyworker&.full_name || 'None assigned' %></td>
                 <td class="govuk-table__cell govuk-!-width-one-third"></td>
               </tr>
 
@@ -277,8 +294,13 @@
                 <span class="moj-badge moj-badge--red" style="margin-top: 5px;">NON-DISCLOSABLE</span>
                 </td>
                 <td class="govuk-table__cell govuk-!-width-one-third">
-                  Jen Carr<br>jen.carr@justice.gov.uk<br><br>
-                  Wyne Banbury<br>wayne.banbury@justice.gov.uk
+                  <% if @prisoner.victim_liaison_officers.any? %>
+                    <% @prisoner.victim_liaison_officers.each do |vlo| %>
+                      <p><%= vlo.full_name_ordered %><br /><%= vlo.email %></p>
+                    <% end %>
+                  <% else %>
+                    No VLO details added
+                  <% end %>
                 </td>
                 <td class="govuk-table__cell govuk-!-width-one-third"><br></td>
               </tr>
@@ -306,13 +328,21 @@
             <tbody class="govuk-table__body">
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">Service provider</td>
-                <td class="govuk-table__cell govuk-!-width-one-third">NPS (legacy)</td>
-                <td class="govuk-table__cell govuk-!-width-one-third"><a href="" class="govuk-link govuk-link--no-visited-state">Change</a></td>
+                <td class="govuk-table__cell govuk-!-width-one-third">
+                  <%= service_provider_label(@prisoner.case_allocation) %>
+                </td>
+                <td class="govuk-table__cell govuk-!-width-one-third">
+                  <%= link_to 'Change', edit_prison_case_information_path(@prison.code, @prisoner.offender_no), class: 'govuk-link govuk-link--no-visited-state' if @prisoner.manual_entry? %>
+                </td>
               </tr>
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">Last known address in Wales?</td>
-                <td class="govuk-table__cell govuk-!-width-one-third">No</td>
-                <td class="govuk-table__cell govuk-!-width-one-third"><a href="" class="govuk-link govuk-link--no-visited-state">Change</a></td>
+                <td class="govuk-table__cell govuk-!-width-one-third">
+                  <%= humanized_bool(@prisoner.welsh_offender) if @prisoner.probation_record.present? %>
+                </td>
+                <td class="govuk-table__cell govuk-!-width-one-third">
+                  <%= link_to 'Change', edit_prison_case_information_path(@prison.code, @prisoner.offender_no), class: 'govuk-link govuk-link--no-visited-state' if @prisoner.manual_entry? %>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -353,7 +383,7 @@
         <span class="govuk-caption-m govuk-body-s govuk-!-margin-bottom-1">Last updated: FIXME</span>
       </div>
 
-      <!-- RoSH summary -->
+      <!-- RoSH summary
       <div style="border: 2px solid" class="govuk-!-padding-4 govuk-!-margin-bottom-3">
         <table class="govuk-table">
           <caption class="govuk-table__caption govuk-table__caption--m">
@@ -391,6 +421,7 @@
           </tbody>
         </table>
       </div>
+      -->
     </aside>
   </div>
 </div>

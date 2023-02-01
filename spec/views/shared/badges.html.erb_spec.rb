@@ -16,7 +16,7 @@ RSpec.describe "shared/badges", type: :view do
     assign(:prison_poms, [])
     assign(:unavailable_pom_count, 0)
     assign(:prisoner, offender)
-    render partial: 'shared/badges', locals: {offender: offender}
+    render partial: 'shared/badges', locals: { offender: offender }
   end
 
   context "when indeterminate" do

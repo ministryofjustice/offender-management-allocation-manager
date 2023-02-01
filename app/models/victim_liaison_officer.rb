@@ -14,4 +14,8 @@ class VictimLiaisonOfficer < ApplicationRecord
   def full_name
     "#{last_name}, #{first_name}"
   end
+
+  def full_name_ordered
+    "#{first_name} #{last_name}"
+  end
 end
