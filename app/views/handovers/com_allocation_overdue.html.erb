@@ -1,5 +1,3 @@
-<% cases = @handover_cases.com_allocation_overdue %>
-
 <h2 class="govuk-heading-l">
   COM allocation overdue
 </h2>
@@ -30,7 +28,7 @@
                           { body: 'LDU details', class: %w[ldu-details govuk-!-width-one-quarter] },
                         ].compact) do %>
 
-  <% cases.each do |calc_handover, offender| %>
+  <% @paginated_handover_cases.each do |calc_handover, offender| %>
     <tr class="govuk-table__row allocated-offender">
       <%= render 'handovers/cells/prisoner_details', prison_id: @prison_id, offender: offender %>
 
@@ -66,8 +64,10 @@
   <% end %>
 <% end %>
 
-<% if cases.size == 0 %>
+<% if @paginated_handover_cases.size == 0 %>
   <p>No handover cases missing COM details</p>
+<% else %>
+  <%= render partial: 'shared/pagination', locals: { data: @paginated_handover_cases } %>
 <% end %>
 
 <div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>

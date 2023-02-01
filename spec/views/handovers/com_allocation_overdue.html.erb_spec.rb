@@ -28,7 +28,8 @@ RSpec.describe 'handovers/com_allocation_overdue' do
   let(:first_row_text) { first_row.text.strip.gsub(/\s+/, ' ') }
 
   before do
-    assign(:handover_cases, double(:handover_cases, com_allocation_overdue: cases))
+    stub_template 'shared/_pagination.html.erb' => ''
+    assign(:paginated_handover_cases, cases)
     assign(:prison_id, prison_code)
     assign(:pom_view, true)
   end

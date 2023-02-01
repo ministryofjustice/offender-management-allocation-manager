@@ -1,7 +1,7 @@
 RSpec.describe 'handovers/upcoming' do
   let(:prison_code) { 'PRI' }
   let(:all_false_hash) { Hash.new { |h, k| h[k] = false } }
-  let(:upcoming_handover_cases) do
+  let(:cases) do
     [
       [
         double(:handover_date1, handover_date: Date.new(2022, 1, 12)),
@@ -33,7 +33,8 @@ RSpec.describe 'handovers/upcoming' do
   let(:first_row_text) { first_row.text.strip.gsub(/\s+/, ' ') }
 
   before do
-    assign(:handover_cases, double(:handover_cases, upcoming: upcoming_handover_cases))
+    stub_template 'shared/_pagination.html.erb' => ''
+    assign(:paginated_handover_cases, cases)
     assign(:prison_id, prison_code)
     assign(:pom_view, true)
   end

@@ -1,5 +1,3 @@
-<% cases = @handover_cases.upcoming %>
-
 <h2 class="govuk-heading-l">
   Upcoming handovers
 </h2>
@@ -23,7 +21,7 @@
                           { body: 'Handover progress', class: ['handover-progress'] },
                         ].compact) do %>
 
-  <% cases.each do |calc_handover, offender| %>
+  <% @paginated_handover_cases.each do |calc_handover, offender| %>
     <tr class="govuk-table__row allocated-offender">
       <%= render 'handovers/cells/prisoner_details', prison_id: @prison_id, offender: offender %>
 
@@ -40,8 +38,10 @@
   <% end %>
 <% end %>
 
-<% if cases.size == 0 %>
+<% if @paginated_handover_cases.size == 0 %>
   <p>No upcoming handovers at the moment</p>
+<% else %>
+  <%= render partial: 'shared/pagination', locals: { data: @paginated_handover_cases } %>
 <% end %>
 
 <div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>
