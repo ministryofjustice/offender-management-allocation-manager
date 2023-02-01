@@ -103,7 +103,7 @@ GEM
       activesupport (>= 3.2.0)
       tzinfo
     byebug (11.1.3)
-    capybara (3.36.0)
+    capybara (3.38.0)
       addressable
       matrix
       mini_mime (>= 0.1.3)
@@ -313,7 +313,7 @@ GEM
       net-smtp
     marcel (1.0.2)
     matrix (0.4.2)
-    memory_profiler (1.0.0)
+    memory_profiler (1.0.1)
     method_source (1.0.0)
     mime-types (3.4.1)
       mime-types-data (~> 3.2015)
@@ -338,7 +338,7 @@ GEM
     net-smtp (0.3.3)
       net-protocol
     nio4r (2.5.8)
-    nokogiri (1.14.0)
+    nokogiri (1.14.1)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
     notiffany (0.1.3)
@@ -378,7 +378,7 @@ GEM
       prawn-table
     prawn-table (0.2.2)
       prawn (>= 1.3.0, < 3.0.0)
-    prometheus_exporter (2.0.6)
+    prometheus_exporter (2.0.8)
       webrick
     pry (0.14.1)
       coderay (~> 1.1)
@@ -437,7 +437,7 @@ GEM
     rb-inotify (0.10.1)
       ffi (~> 1.0)
     redis (4.6.0)
-    regexp_parser (2.6.0)
+    regexp_parser (2.6.2)
     request_store (1.5.1)
       rack (>= 1.4)
     responders (3.0.1)
@@ -553,7 +553,7 @@ GEM
     stackprof (0.2.21)
     sys-uname (1.2.2)
       ffi (~> 1.1)
-    test-prof (1.0.11)
+    test-prof (1.1.0)
     thor (1.2.1)
     tilt (2.0.10)
     timecop (0.9.6)
@@ -588,7 +588,7 @@ GEM
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
-    webrick (1.7.0)
+    webrick (1.8.1)
     websocket (1.2.9)
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
