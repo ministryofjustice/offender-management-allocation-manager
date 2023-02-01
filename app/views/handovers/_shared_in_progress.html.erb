@@ -48,6 +48,8 @@
 
 <% if cases.size == 0 %>
   <p><%= no_cases_message %></p>
+<% else %>
+  <%= render partial: 'shared/pagination', locals: { data: @paginated_handover_cases } %>
 <% end %>
 
 <div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>

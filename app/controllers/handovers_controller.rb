@@ -22,7 +22,9 @@ class HandoversController < PrisonsApplicationController
 
   def upcoming; end
 
-  def in_progress; end
+  def in_progress
+    @paginated_handover_cases = Kaminari.paginate_array(@handover_cases.in_progress).page(page)
+  end
 
   def overdue_tasks; end
 
