@@ -35,6 +35,10 @@ module PomHelper
     "#{pom.position_description.split(' ').first} POM"
   end
 
+  def full_grade(pom)
+    "#{pom.position_description.split(' ').first} Officer POM"
+  end
+
   def status(pom)
     # we are now displaying 'Available', instead of 'Active' which is stored in the database
     pom.status == 'active' ? 'available' : pom.status

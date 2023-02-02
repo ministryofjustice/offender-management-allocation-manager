@@ -28,6 +28,10 @@
   <%= recommended_pom_type_label(@prisoner) %> POM recommended
 </h2>
 
+<div class="govuk-inset-text">
+  <p><%= RecommendationService.recommended_pom_type_reason(@prisoner) %>.</p>
+</div>
+
 <% if @previous_poms.any? %>
   <div class="govuk-warning-text">
     <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
@@ -58,21 +62,36 @@ for example if a particular POM has worked with <%= @prisoner.first_name.capital
 <table class="govuk-table">
   <thead class="govuk-table__head">
     <tr>
-      <th class="govuk-table__header" scope="col" aria-sort="none" style="width: 200px;"><button type="button" data-index="0">POM</button></th>
-      <th class="govuk-table__header" scope="col" aria-sort="none" style="width: 200px;"><button type="button" data-index="1">POM type</button></th>
-      <th class="govuk-table__header" scope="col" aria-sort="none" style="width: 140px;"><button type="button" data-index="2">Working pattern</button></th>
+      <th class="govuk-table__header" scope="col" aria-sort="none" style="width: 200px;">
+        <a href="<%= sort_link('last_name') %>">
+          POM
+        </a>
+        <%= sort_arrow('last_name') %>
+      </th>
+      <th class="govuk-table__header" scope="col" aria-sort="none" style="width: 200px;">
+        <a href="<%= sort_link('position') %>">
+          POM type
+        </a>
+        <%= sort_arrow('position') %>
+      </th>
+      <th class="govuk-table__header" scope="col" aria-sort="none" style="width: 140px;">
+        <a href="<%= sort_link('working_pattern') %>">
+          Working pattern
+        </a>
+        <%= sort_arrow('working_pattern') %>
+      </th>
       <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none"><button type="button" data-index="3">Allocations in  last 7 days</button></th>
       <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none"><button type="button" data-index="4">Supporting cases</button></th>
       <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none"><button type="button" data-index="5">Responsible cases</button></th>
       <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none"><button type="button" data-index="6">Co-working cases</button></th>
       <th scope="col" class="govuk-table__header govuk-table__header--numeric" aria-sort="none"><button type="button" data-index="7">Total cases</button></th>
       <th class="govuk-table__header" scope="col" style="width: 80px; padding-left: 20px;">Action</th>
-      <th class="govuk-table__header">Select POMs <br>to compare workloads</th>
+      <!-- <th class="govuk-table__header">Select POMs <br>to compare workloads</th> -->
     </tr>
   </thead>
   <tbody class="govuk-table__body">
 
-    <% (@probation_poms.select(&:active?) + @prison_poms.select(&:active?)).each do |pom| %>
+    <% @available_poms.each do |pom| %>
       <tr class="govuk-table__row recommended_pom_row_1">
         <td aria-label="POM name" class="govuk-table__cell pom_name">
           <%= pom.first_name %> <%= pom.last_name %>
@@ -83,27 +102,23 @@ for example if a particular POM has worked with <%= @prisoner.first_name.capital
         </td>
 
         <td aria-label="POM role" class="govuk-table__cell">
-          <% if @prisoner.recommended_pom_type == pom.position %>
-            <div class="highlight-cell">
-              <span class="govuk-!-font-weight-bold"><%= pom.probation_officer? ? 'Probation' : 'Prison' %> POM</span>
-              <span class="govuk-body-s">recommended</span>
-            </div>
-          <% else %>
+          <%= highlight_conditionally('notice', 'recommended', -> { @prisoner.recommended_pom_type == pom.position }) do %>
             <%= pom.probation_officer? ? 'Probation' : 'Prison' %> POM
           <% end %>
         </td>
 
         <td aria-label="Working pattern" class="govuk-table__cell"><%= format_working_pattern(pom.working_pattern) %></td>
-        <td aria-label="case mix" class="govuk-table__cell govuk-table__cell--numeric">5</td>
-        <td aria-label="recent allocations" class="govuk-table__cell govuk-table__cell--numeric">6</td>
+        <td aria-label="recent allocations" class="govuk-table__cell govuk-table__cell--numeric"><%= pom.allocations.count(&:new_case?) %></td>
+        <td aria-label="recent allocations" class="govuk-table__cell govuk-table__cell--numeric">10</td>
         <td aria-label="Total prison" class="govuk-table__cell govuk-table__cell--numeric">10</td>
         <td aria-label="recent allocations" class="govuk-table__cell govuk-table__cell--numeric">19</td>
-        <td aria-label="recent allocations" class="govuk-table__cell govuk-table__cell--numeric govuk-!-font-weight-bold"><%= pom.allocations.count %></td>
+        <td aria-label="total allocations" class="govuk-table__cell govuk-table__cell--numeric govuk-!-font-weight-bold"><%= pom.allocations.count %></td>
 
         <td aria-label="recent allocations" class="govuk-table__cell" style="width: 80px; padding-left: 20px;">
           <%= link_to 'Allocate', new_prison_prisoner_staff_build_allocation_path(@prison.code, @prisoner.offender_no, pom.staff_id) %>
         </td>
 
+        <!--
         <td aria-label="select" class="govuk-table__cell">
           <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes" style="margin-left: 20px; margin-top: -8px;">
             <div class="govuk-checkboxes__item">
@@ -113,18 +128,20 @@ for example if a particular POM has worked with <%= @prisoner.first_name.capital
             </div>
           </div>
         </td>
+        -->
       </tr>
     <% end %>
 
   </tbody>
 </table>
 
+<!--
 <div style="overflow: hidden">
-  <!-- FIXME -->
   <a class="govuk-button govuk-button--secondary" data-module="govuk-button" style="float: right" href="https://hmpps-moic-prototype.apps.live.cloud-platform.service.justice.gov.uk/allocations/final/step2b-select-pom-jack-smith">
     Compare workloads
   </a>
 </div>
+-->
 
 <div class="govuk-accordion" data-module="govuk-accordion">
   <% accordion_body = capture do %>
@@ -133,17 +150,17 @@ for example if a particular POM has worked with <%= @prisoner.first_name.capital
       <tr class="govuk-table__row">
         <th class="govuk-table__header">POM</th>
         <th class="govuk-table__header">Status</th>
-        <th class="govuk-table__header">POM type</th>
-        <th class="govuk-table__header">Total cases</th>
+        <th class="govuk-table__header">POM level</th>
+        <th class="govuk-table__header"><span class="pull-right">Total cases</span></th>
       </tr>
       </thead>
       <tbody class="govuk-table__body">
       <% (@prison_poms + @probation_poms).reject(&:active?).each do |pom| %>
         <tr class="govuk-table__row">
           <td class="govuk-table__cell"><%= pom.first_name %> <%= pom.last_name %></td>
-          <td class="govuk-table__cell"><%= status(pom) %></td>
-          <td class="govuk-table__cell"><%= grade(pom) %></td>
-          <td class="govuk-table__cell"><%= pom.allocations.count %></td>
+          <td class="govuk-table__cell"><%= full_status(pom) %></td>
+          <td class="govuk-table__cell"><%= full_grade(pom) %></td>
+          <td class="govuk-table__cell"><span class="govuk-!-font-weight-bold pull-right"><%= pom.allocations.count %></span></td>
         </tr>
       <% end %>
       </tbody>
