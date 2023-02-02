@@ -183,3 +183,6 @@ Style/EachForSimpleLoop:
 # so we allow `else  nil` so it's crystal clear
 Style/EmptyElse:
   Enabled: false
+
+Performance/RedundantBlockCall:
+  Enabled: false
