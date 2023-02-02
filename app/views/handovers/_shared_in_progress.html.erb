@@ -15,7 +15,7 @@
                           { body: 'Handover progress', class: ['handover-progress'] },
                         ].compact) do %>
 
-  <% @paginated_handover_cases.each do |calc_handover, offender| %>
+  <% @filtered_handover_cases.each do |calc_handover, offender| %>
     <tr class="govuk-table__row allocated-offender">
       <%= render 'handovers/cells/prisoner_details', prison_id: @prison_id, offender: offender %>
 
@@ -46,10 +46,10 @@
   <% end %>
 <% end %>
 
-<% if @paginated_handover_cases.size == 0 %>
+<% if @filtered_handover_cases.size == 0 %>
   <p><%= no_cases_message %></p>
 <% else %>
-  <%= render partial: 'shared/pagination', locals: { data: @paginated_handover_cases } %>
+  <%= render partial: 'shared/pagination', locals: { data: @filtered_handover_cases } %>
 <% end %>
 
 <div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>

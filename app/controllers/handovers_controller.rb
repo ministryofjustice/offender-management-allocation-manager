@@ -21,19 +21,19 @@ class HandoversController < PrisonsApplicationController
   end
 
   def upcoming
-    @paginated_handover_cases = paginated_handover_cases(@handover_cases.upcoming)
+    @filtered_handover_cases = filtered_handover_cases(@handover_cases.upcoming)
   end
 
   def in_progress
-    @paginated_handover_cases = paginated_handover_cases(@handover_cases.in_progress)
+    @filtered_handover_cases = filtered_handover_cases(@handover_cases.in_progress)
   end
 
   def overdue_tasks
-    @paginated_handover_cases = paginated_handover_cases(@handover_cases.overdue_tasks)
+    @filtered_handover_cases = filtered_handover_cases(@handover_cases.overdue_tasks)
   end
 
   def com_allocation_overdue
-    @paginated_handover_cases = paginated_handover_cases(@handover_cases.com_allocation_overdue)
+    @filtered_handover_cases = filtered_handover_cases(@handover_cases.com_allocation_overdue)
   end
 
 private
@@ -59,7 +59,7 @@ private
     flash[:current_handovers_url] = request.url
   end
 
-  def paginated_handover_cases(cases)
+  def filtered_handover_cases(cases)
     Kaminari.paginate_array(cases).page(page)
   end
 end

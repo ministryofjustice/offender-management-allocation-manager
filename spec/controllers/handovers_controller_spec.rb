@@ -24,7 +24,7 @@ RSpec.describe HandoversController, type: :controller do
     allow(controller).to receive_messages(current_user_is_pom?: current_user_is_pom_stub,
                                           current_user_is_spo?: current_user_is_spo_stub,
                                           page: page)
-    allow(controller).to receive(:paginated_handover_cases) { |arg| arg }
+    allow(controller).to receive(:filtered_handover_cases) { |arg| arg }
   end
 
   shared_examples 'handover cases list page' do |case_type|
@@ -49,7 +49,7 @@ RSpec.describe HandoversController, type: :controller do
     end
 
     it 'has correct paginated cases' do
-      expect(assigns(:paginated_handover_cases)).to eq handover_cases.send(case_type)
+      expect(assigns(:filtered_handover_cases)).to eq handover_cases.send(case_type)
     end
 
     it 'gets handover cases correctly' do

@@ -29,7 +29,7 @@ RSpec.describe 'handovers/com_allocation_overdue' do
 
   before do
     stub_template 'shared/_pagination.html.erb' => ''
-    assign(:paginated_handover_cases, cases)
+    assign(:filtered_handover_cases, cases)
     assign(:prison_id, prison_code)
     assign(:pom_view, true)
   end
