@@ -9,7 +9,7 @@
                  builder: GOVUKDesignSystemFormBuilder::FormBuilder,
                  method: :put) do |form| %>
 
-      <h1 class="govuk-heading-xl govuk-!-margin-top-4">
+      <h1 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-2">
         <% if RecommendationService.recommended_pom_type(@prisoner) == RecommendationService::PROBATION_POM %>
           Why are you allocating a prison officer POM?
         <% else %>
@@ -20,7 +20,7 @@
       <%= form.govuk_error_summary %>
 
       <!-- have to set multiple: false here to prevent govuk_check_boxes_fieldset adding an empty checkbox -->
-      <%= form.govuk_check_boxes_fieldset :override_reasons, multiple: false, legend: { text: 'Choose all that apply:', size: 's' } do %>
+      <%= form.govuk_check_boxes_fieldset :override_reasons, multiple: false, legend: { text: 'Choose all that apply.', size: 's', class: 'govuk-hint' } do %>
         <%= form.govuk_check_box :override_reasons, :suitability, label: { text: complex_reason_label(@prisoner), link_errors: true } do %>
           <%= form.govuk_text_area :suitability_detail,
                                    label: { text: 'Enter your reason for this decision'},
