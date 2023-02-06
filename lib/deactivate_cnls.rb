@@ -14,7 +14,7 @@ class DeactivateCnls
     report_info "Processing #{womens_prisons_count} women's prisons. Dry run: #{dry_run}"
 
     womens_prisons.each_with_index do |prison, i|
-      offenders = prison.offenders
+      offenders = OffenderService.get_offenders_in_prison(prison, include_remand: true)
       offender_count = offenders.size
       report_info "Prison #{i + 1}/#{womens_prisons_count}: #{prison.name}: processing #{offender_count} offenders"
 
