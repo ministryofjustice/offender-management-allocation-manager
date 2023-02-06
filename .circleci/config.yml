@@ -57,6 +57,31 @@ references:
           --build-arg BUILD_TAG=${CIRCLE_BRANCH} \
           -t app .
 
+  build_quick_docker_image: &build_quick_docker_image
+    run:
+      name: Build allocation-manager docker image - quick mode
+      command: |
+        set -euo pipefail
+        env_name="${K8S_NAMESPACE#offender-management-}"
+        . ~/env/"${env_name}"-ecr-secrets.sh
+
+        export BUILD_DATE=$(date -Is) >> $BASH_ENV
+        source $BASH_ENV
+
+        ecr_host="$(echo "${ECR_ENDPOINT}" | cut -f1 -d/)"
+        aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin "${ecr_host}"
+        
+        docker pull "${ECR_ENDPOINT}:latest"
+        docker tag "${ECR_ENDPOINT}:latest" offender-management-allocation-manager:latest
+
+        docker build \
+          --build-arg VERSION_NUMBER=${CIRCLE_BUILD_NUM} \
+          --build-arg COMMIT_ID=${CIRCLE_SHA1} \
+          --build-arg BUILD_DATE=${BUILD_DATE} \
+          --build-arg BUILD_TAG=${CIRCLE_BRANCH} \
+          -f Dockerfile.quick \
+          -t app .
+
   push_docker_image: &push_docker_image
     run:
       name: Push allocation-manager docker image
@@ -282,6 +307,21 @@ jobs:
       - *build_docker_image
       - *push_docker_image
 
+  build_and_push_quick_docker_image:
+    <<: *defaults
+    <<: *deploy_container_config
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - setup_remote_docker:
+          version: 20.10.14
+          docker_layer_caching: true
+      - aws-cli/install
+      - *configure_k8s
+      - *build_quick_docker_image
+      - *push_docker_image
+
   verify_docker_image_builds:
     <<: *defaults
     <<: *test_container_config
@@ -353,12 +393,12 @@ workflows:
       - fetch_secrets:
           filters: { branches: { only: [test2] } }
           context: [offender-management-shared, offender-management-test2]
-      - build_and_push_docker_image:
+      - build_and_push_quick_docker_image:
           requires: [fetch_secrets]
           filters: { branches: { only: [test2] } }
           context: [offender-management-shared, offender-management-test2]
       - deploy:
-          requires: [build_and_push_docker_image]
+          requires: [build_and_push_quick_docker_image]
           filters: { branches: { only: [test2] } }
           context: [offender-management-shared, offender-management-test2]
 

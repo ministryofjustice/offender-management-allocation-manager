@@ -1,0 +1,33 @@
+FROM offender-management-allocation-manager:latest
+
+# Incremenent to bust Docker layer cache
+ENV DOCKER_CACHE_BUSTER=1
+
+ARG VERSION_NUMBER
+ARG COMMIT_ID
+ARG BUILD_DATE
+ARG BUILD_TAG
+
+WORKDIR /app
+
+USER root
+
+# Update Ruby and Node dependencies
+COPY Gemfile Gemfile.lock package.json ./
+RUN yarn install \
+    && bundle install --jobs 2 --retry 3
+
+# Non-cacheable layers. Everything below here is expected to change with every commit
+
+ENV APPVERSION=${VERSION_NUMBER}
+ENV APP_GIT_COMMIT=${COMMIT_ID}
+ENV APP_BUILD_DATE=${BUILD_DATE}
+ENV APP_BUILD_TAG=${BUILD_TAG}
+
+COPY . /app
+
+RUN chown -R appuser:appuser /app
+
+USER 1001
+
+RUN RAILS_ENV=production rails assets:precompile
