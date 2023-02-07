@@ -1,4 +1,4 @@
-FROM ruby:2.7.5-slim-bullseye
+FROM ruby:2.7.7-slim-bullseye
 
 # Incremenent to bust Docker layer cache
 ENV DOCKER_CACHE_BUSTER=1
@@ -41,7 +41,7 @@ RUN \
     libpq-dev \
     libjemalloc-dev \
   && timedatectl set-timezone Europe/London || true \
-  && gem update bundler --no-document \
+  && gem install bundler -v 2.2.29 --no-document \
   && apt-get clean
 
 # Install Node.js and Yarn

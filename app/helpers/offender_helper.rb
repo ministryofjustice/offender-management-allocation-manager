@@ -16,6 +16,14 @@ module OffenderHelper
     end
   end
 
+  def pom_role_needed(offender)
+    if offender.pom_responsible?
+      'Responsible'
+    elsif offender.com_responsible?
+      'Supporting'
+    end
+  end
+
   def case_owner_label(offender)
     if offender.pom_responsible?
       'Custody'
@@ -89,5 +97,40 @@ module OffenderHelper
 
   def probation_field(offender, field)
     offender.public_send field if offender.probation_record.present?
+  end
+
+  def format_allocation(offender:, pom:, view_context:, co_working_pom: nil, prev_pom_name: nil)
+    {
+      offender_name: offender.full_name_ordered,
+      prisoner_number: offender.offender_no,
+      pom_name: view_context.full_name_ordered(pom),
+      prev_pom_name: prev_pom_name,
+      co_working_pom_name: co_working_pom.blank? ? nil : view_context.full_name_ordered(co_working_pom),
+      pom_role: if offender.pom_responsible?
+                  'Responsible'
+                else
+                  (offender.com_responsible? ? 'Supporting' : '')
+                end,
+      mappa_level: offender.mappa_level,
+      ldu_name: (offender.ldu_name.presence || 'Unknown'),
+      ldu_email: (offender.ldu_email_address.presence || 'Unknown'),
+      com_name: (view_context.unreverse_name(offender.allocated_com_name).presence || 'Unknown'),
+      com_email: (offender.allocated_com_email.presence || 'Unknown'),
+      handover_start_date: (view_context.format_date(offender.handover_start_date).presence || 'Unknown'),
+      handover_completion_date: (view_context.format_date(offender.responsibility_handover_date).presence || 'Unknown'),
+      last_oasys_completed: (view_context.format_date(last_oasys_completed(offender.offender_no)).presence || 'No OASys information'),
+      active_alerts: offender.active_alert_labels.join(', '),
+      additional_notes: nil
+    }.merge(offender.rosh_summary)
+  end
+
+  def last_oasys_completed(offender_no)
+    details = HmppsApi::AssessmentApi.get_latest_oasys_date(offender_no)
+
+    return nil if details.nil? ||
+      details.fetch(:assessment_type) == Faraday::ConflictError ||
+      details.fetch(:assessment_type) == Faraday::ServerError
+
+    details.fetch(:completed)
   end
 end

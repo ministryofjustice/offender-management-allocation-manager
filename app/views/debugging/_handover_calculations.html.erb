@@ -1,0 +1,30 @@
+<table class="govuk-table">
+  <tbody class="govuk-table__body">
+  <tr class="govuk-table__row">
+    <td class="govuk-table__header govuk-!-width-one-half">Handover Calculation History</td>
+    <td class="govuk-table__cell govuk-!-width-one-half"></td>
+  </tr>
+
+  <% handover_calc = @offender.model.calculated_handover_date %>
+  <% if handover_calc %>
+    <% handover_calc.versions.each_with_index do |version| %>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell"><%= version.created_at.strftime('%c') %></td>
+        <td class="govuk-table__cell table_cell__left_align">
+          <%= detail_component('Handover calculation changes') do %>
+            <%= version.changeset.slice(*%w[start_date handover_date reason responsibility
+                                          offender_attributes_to_archive])
+                                 .map { |k, v| "#{k} = #{v.last}" }.join('<br>').html_safe %>
+          <% end %>
+
+          <% if version.offender_attributes_to_archive %>
+            <%= detail_component('NOMIS offender at time of calculation') do %>
+              <%= version.offender_attributes_to_archive.select { |_, v| v.present? }.map { |k, v| "#{k} = #{v}" }.join('<br>').html_safe %>
+            <% end %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  <% end %>
+  </tbody>
+</table>

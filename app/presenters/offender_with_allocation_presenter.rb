@@ -5,8 +5,8 @@
 class OffenderWithAllocationPresenter
   delegate :offender_no, :full_name, :last_name, :earliest_release_date, :earliest_release, :latest_temp_movement_date, :allocated_com_name,
            :case_allocation, :complexity_level, :date_of_birth, :tier, :probation_record, :handover_start_date, :restricted_patient?,
-           :location, :responsibility_handover_date, :pom_responsible?, :pom_supporting?, :coworking?, :next_parole_date, :next_parole_date_type,
-           :allocated_pom_role, to: :@offender
+           :location, :responsibility_handover_date, :pom_responsible?, :pom_supporting?, :coworking?, :prison, :next_parole_date,
+           :next_parole_date_type, :allocated_pom_role, to: :@offender
 
   def initialize(offender, allocation)
     @offender = offender
@@ -21,6 +21,10 @@ class OffenderWithAllocationPresenter
     if @allocation
       @allocation.primary_pom_name.titleize
     end
+  end
+
+  def allocated_pom_nomis_id
+    @allocation.primary_pom_nomis_id if @allocation
   end
 
   # reverse order of surname, firstname stored within case-history model.

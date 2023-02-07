@@ -9,7 +9,9 @@ class AllocatedOffender
            :in_upcoming_handover_window?, :indeterminate_sentence?, :prison_id, :target_hearing_date, :allocated_com_email,
            :approaching_parole?, :handover_start_date, :responsibility_handover_date, :allocated_com_name, :case_allocation,
            :complexity_level, :offender_no, :sentence_start_date, :tier, :location, :latest_temp_movement_date, :restricted_patient?,
-           :most_recent_parole_record, :pom_tasks, :allocated_pom_role, :next_parole_date, :next_parole_date_type, to: :@offender
+           :most_recent_parole_record, :pom_tasks, :allocated_pom_role, :next_parole_date, :next_parole_date_type, 
+           :handover_progress_task_completion_data, :handover_progress_complete?,
+           :ldu_name, :ldu_email_address, :model, :released?, to: :@offender
   delegate :updated_at, :nomis_offender_id, :primary_pom_allocated_at, :prison, :primary_pom_nomis_id,
            to: :@allocation
 
@@ -50,5 +52,9 @@ class AllocatedOffender
 
   def primary_pom_allocated_at
     @allocation.primary_pom_allocated_at
+  end
+
+  def staff_member
+    StaffMember.new(Prison.find(prison_id), @staff_id)
   end
 end

@@ -18,6 +18,7 @@ class ApplicationController < ActionController::Base
   delegate :current_user, to: :sso_identity
 
   delegate :current_user_is_spo?, to: :sso_identity
+  helper_method :current_user_is_spo?
 
   def ensure_spo_user
     unless current_user_is_spo?

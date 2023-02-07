@@ -24,13 +24,20 @@ feature 'Allocation' do
   end
 
   before do
+    allow(HmppsApi::PrisonTimelineApi).to receive(:get_prison_timeline).and_return(
+      { "prisonPeriod" => [{ 'prisons' => ['ABC', 'DEF'] }] }
+    )
+
+    allow_any_instance_of(StaffMember).to receive(:email_address).and_return('pom@example.com')
     signin_spo_user
   end
 
-  context 'when a journey begins on the "Make new allocations" page' do
+  context 'when a journey begins on the "Make allocations" page' do
     let(:start_page) { unallocated_prison_prisoners_path('LEI') }
 
     before do
+      allow(OffenderService).to receive(:get_community_data).and_return({ crn: 12_345 })
+      allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_rosh_summary).and_return({})
       visit start_page
       click_link unallocated_offender_name
       # Takes you to the Review case and allocate page where users review case details and scroll down to select from a list of POMs
@@ -47,12 +54,13 @@ feature 'Allocation' do
         end
       end
 
-      expect(page).to have_css('h1', text: 'Confirm allocation')
+      expect(page).to have_css('h1', text: "Check allocation details for #{recently_allocated_offender_name}")
 
       click_button 'Complete allocation'
 
       expect(page).to have_current_path(start_page)
-      expect(page).to have_css('.notification', text: "#{recently_allocated_offender_name} has been allocated to Moic Pom (Prison POM)")
+      expect(page).to have_css('.message', text: "#{recently_allocated_offender_name} allocated to Moic Pom")
+      expect(page).to have_css('.govuk-details__summary-text', text: "You can copy information about this allocation to paste into an email to someone else")
     end
 
     scenario 'overriding the recommended POM type', vcr: { cassette_name: 'prison_api/override_allocation_feature_ok' } do
@@ -76,7 +84,8 @@ feature 'Allocation' do
       # Returns to the "Make new allocation" page
 
       expect(current_url).to have_content(unallocated_prison_prisoners_path('LEI'))
-      expect(page).to have_css('.notification', text: "#{recently_allocated_offender_name} has been allocated to Moic Integration-Tests (Probation POM)")
+      expect(page).to have_css('.message', text: "#{recently_allocated_offender_name} allocated to Moic Integration-Tests")
+      expect(page).to have_css('.govuk-details__summary-text', text: "You can copy information about this allocation to paste into an email to someone else")
     end
   end
 
@@ -153,7 +162,7 @@ feature 'Allocation' do
     expect(page).to have_content('This reason cannot be more than 175 characters')
   end
 
-  scenario 're-allocating', flaky: true, vcr: { cassette_name: 'prison_api/re_allocate_feature' } do
+  scenario 're-allocating', vcr: { cassette_name: 'prison_api/re_allocate_feature' } do
     create(
       :allocation_history,
       prison: 'LEI',
@@ -161,11 +170,10 @@ feature 'Allocation' do
       primary_pom_nomis_id: 485_735,
       recommended_pom_type: 'probation'
     )
+
     # Goes to 'allocations' page
     visit allocated_prison_prisoners_path('LEI')
-    within('.allocated_offender_row_0') do
-      click_link 'View'
-    end
+    all('.allocated_offender_row_0 a').first.click # Click the one and only offender
 
     # Takes you to the 'View a case' page (Allocation information)
     expect(current_url).to have_content(prison_prisoner_allocation_path('LEI', nomis_offender_id))
@@ -174,9 +182,9 @@ feature 'Allocation' do
     expect(page).to have_css('.table_cell__left_align', text: 'Responsible')
 
     click_link 'Reallocate'
+
     # Takes you to the 'Review case and reallocate' page (‘Reallocate a POM)
     expect(page).to have_current_path(prison_prisoner_staff_index_path(prison_id: 'LEI', prisoner_id: nomis_offender_id))
-
     expect(page).to have_css('.current_pom_full_name', text: 'Jara Duncan, Laura')
     expect(page).to have_css('.current_pom_grade', text: 'Probation POM')
 
@@ -186,10 +194,18 @@ feature 'Allocation' do
       end
     end
 
+    # Takes you to the 'Check allocation' page
+    expect(page).to have_text('Check allocation details')
+    expect(page).to have_text('We will send the information below to')
+    expect(page).to have_text('Allocating from:')
+    expect(page).to have_text('Allocating to:')
+
     click_button 'Complete allocation'
 
-    # Returns to the 'View a case' page (Allocation information)
-    expect(page).to have_current_path(prison_prisoner_allocation_path(prison_id: 'LEI', prisoner_id: nomis_offender_id), ignore_query: true)
+    # Returns to the 'See allocations' page with a success message
+    expect(page).to have_text('See allocations')
+    expect(page).to have_text('Allocating from:')
+    expect(page).to have_text('Allocating to:')
     expect(AllocationHistory.find_by(nomis_offender_id: nomis_offender_id).event).to eq("reallocate_primary_pom")
   end
 

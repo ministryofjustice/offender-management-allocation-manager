@@ -10,8 +10,10 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
   before do
     stub_sso_data(prison)
     stub_offender(offender)
+    create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
     stub_poms(prison, [primary_pom, new_secondary_pom])
     stub_offenders_for_prison(prison, [offender])
+    stub_community_offender(offender_no, build(:community_data))
   end
 
   context 'when there is an existing invalid co-worker' do
@@ -22,11 +24,12 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
         .to_return(body: { 'firstName' => 'bill' }.to_json)
       stub_pom_emails(user.staffId, [])
 
-      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
       create(:allocation_history, prison: prison,
                                   nomis_offender_id: offender_no,
                                   primary_pom_nomis_id: primary_pom.staffId,
                                   secondary_pom_nomis_id: secondary_pom.staffId)
+
+      session[:latest_allocation_details] = {}
     end
 
     let(:user) { build(:pom) }
@@ -34,8 +37,32 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
 
     it 'allocates' do
       post :create, params: { prison_id: prison, coworking_allocations: { nomis_offender_id: offender_no, nomis_staff_id: new_secondary_pom.staffId } }
-      expect(response).to redirect_to(unallocated_prison_prisoners_path(prison))
+      expect(response).to redirect_to(allocated_prison_prisoners_path(prison))
       expect(AllocationHistory.find_by(nomis_offender_id: offender_no).secondary_pom_nomis_id).to eq(new_secondary_pom.staffId)
+    end
+  end
+
+  describe '#confirm' do
+    before do
+      get :confirm, params: {
+        "prison_id" => prison,
+        "nomis_offender_id" => offender_no,
+        "primary_pom_id" => primary_pom.staffId,
+        "secondary_pom_id" => new_secondary_pom.staffId
+      }
+    end
+
+    it 'returns success' do
+      expect(response.code).to eq('200')
+    end
+
+    it 'stores offender details' do
+      expect(session).to have_key(:latest_allocation_details)
+      expect(session[:latest_allocation_details]).to include(prisoner_number: offender_no)
+    end
+
+    it 'stores allocation details in instance variable' do
+      expect(assigns(:latest_allocation_details)).to include(prisoner_number: offender_no)
     end
   end
 

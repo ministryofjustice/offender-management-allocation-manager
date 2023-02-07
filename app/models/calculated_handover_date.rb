@@ -15,15 +15,18 @@ class CalculatedHandoverDate < ApplicationRecord
     nps_indeterminate: 'NPS Indeterminate',
     nps_indeterminate_open: 'NPS Indeterminate - Open conditions',
     nps_determinate_parole_case: 'NPS Determinate Parole Case',
-    nps_mappa_unknown: 'NPS - MAPPA level unknown',
-    nps_determinate_mappa_1_n: 'NPS Determinate Mappa 1/N',
-    nps_determinate_mappa_2_3: 'NPS Determinate Mappa 2/3',
+    nps_determinate: 'NPS Determinate Case',
+    nps_mappa_unknown: 'NPS - MAPPA level unknown', # legacy
+    nps_determinate_mappa_1_n: 'NPS Determinate Mappa 1/N', # legacy
+    nps_determinate_mappa_2_3: 'NPS Determinate Mappa 2/3', # legacy
     less_than_10_months_left_to_serve: 'Less than 10 months left to serve',
     parole_mappa_2_3: 'Unsuccessful parole and Mappa 2/3',
     pre_omic_rules: 'Pre-OMIC rules',
     thd_within_12_months_of_hearing_outcome: 'Next parole hearing more than 12 months away',
     thd_more_than_12_months_from_hearing_outcome: 'Next parole hearing under 12 months away',
   }.stringify_keys.freeze
+
+  has_paper_trail meta: { nomis_offender_id: :nomis_offender_id, offender_attributes_to_archive: :offender_attributes_to_archive }
 
   belongs_to :offender,
              primary_key: :nomis_offender_id,
@@ -34,9 +37,6 @@ class CalculatedHandoverDate < ApplicationRecord
 
   validates :responsibility, inclusion: { in: [CUSTODY_ONLY, CUSTODY_WITH_COM, COMMUNITY_RESPONSIBLE], nil: false }
   validates :reason, inclusion: { in: REASONS.keys, nil: false }
-
-  alias_attribute :com_allocated_date, :start_date
-  alias_attribute :com_responsible_date, :handover_date
 
   def custody_responsible?
     responsibility.in? [CUSTODY_WITH_COM, CUSTODY_ONLY]
@@ -58,6 +58,8 @@ class CalculatedHandoverDate < ApplicationRecord
     REASONS.fetch(reason, "Unknown handover reason #{reason}")
   end
 
+  attr_accessor :offender_attributes_to_archive
+
   class << self
     def by_offender_ids(offender_id_or_ids)
       where(nomis_offender_id: offender_id_or_ids)
@@ -65,38 +67,42 @@ class CalculatedHandoverDate < ApplicationRecord
 
     # Visualization of the calculation:
     #
-    # cad = com allocated date (or start_date in legacy naming)
+    # h = handover date
     # d = days before handover starts that case is considered in upcoming handovers window (e.g. 56 days, or 8 weeks)
     # rd = relative-to date (defaults to "today")
     #
     # "in upcoming handover window":
     #
-    # cad - d                              cad
+    #  h - d                                h
     #   |                                   |
     #   |<----------------------------------|
     #
-    # So, if rd is (cad - d) or later, and rd is less than but not equal to cad, then the
+    # So, if rd is (h - d) or later, and rd is less than but not equal to h, then the
     # case is considered to be in the upcoming handover window
-    def in_upcoming_handover_window(upcoming_handover_window_duration: DEFAULT_UPCOMING_HANDOVER_WINDOW_DURATION,
-                                    relative_to_date: Time.zone.now.to_date)
-      # TODO: start_date will be renamed to com_allocated_date when we update the schema
-      where('"start_date" - :days_before <= :relative_to AND :relative_to < "start_date"',
-            { days_before: upcoming_handover_window_duration, relative_to: relative_to_date })
-    end
-
-    def by_upcoming_handover(offender_ids:, upcoming_handover_window_duration: nil, relative_to_date: nil)
-      handover_window_args = { upcoming_handover_window_duration: upcoming_handover_window_duration,
-                               relative_to_date: relative_to_date }.compact_blank
+    def by_upcoming_handover(offender_ids:,
+                             upcoming_handover_window_duration: DEFAULT_UPCOMING_HANDOVER_WINDOW_DURATION,
+                             relative_to_date: Time.zone.now.to_date)
       relation
         .by_offender_ids(offender_ids)
         .where(responsibility: CUSTODY_ONLY)
-        .in_upcoming_handover_window(**handover_window_args)
+        .where('"handover_date" - :days_before <= :relative_to AND :relative_to < "handover_date"',
+               { days_before: upcoming_handover_window_duration, relative_to: relative_to_date })
     end
 
+    # A handover is considered in progress once responsibility goes to the community, until the prisoner is released
     def by_handover_in_progress(offender_ids:)
       relation
         .by_offender_ids(offender_ids)
-        .where(responsibility: [CUSTODY_WITH_COM, COMMUNITY_RESPONSIBLE])
+        .where(responsibility: [COMMUNITY_RESPONSIBLE])
+        .where.not(handover_date: nil)
+    end
+
+    def by_com_allocation_overdue(offender_ids:, relative_to_date: Time.zone.now.to_date)
+      relation
+        .by_handover_in_progress(offender_ids: offender_ids)
+        .joins(offender: :case_information)
+        .where(offender: { case_information: { com_email: nil } })
+        .where(':relative_to::date >= "handover_date"::date + \'2 days\'::interval', relative_to: relative_to_date)
     end
   end
 end

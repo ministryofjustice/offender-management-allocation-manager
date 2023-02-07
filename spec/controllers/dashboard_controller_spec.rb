@@ -80,7 +80,7 @@ RSpec.describe DashboardController, type: :controller do
         expect(response.body).to have_content('All handover cases')
       end
 
-      describe 'Make new allocations tab' do
+      describe 'Make allocations tab' do
         context 'when the count is more than 0' do
           # create offenders with case_information so that they display as un-allocated
           before do

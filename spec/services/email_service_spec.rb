@@ -149,6 +149,7 @@ RSpec.describe EmailService do
         offender_name: offender_name,
         offender_no: "G2911GD",
         prison: prison.name,
+        further_info: {},
         url: "http://localhost:3000/prisons/#{prison_code}/staff/#{staff_id}/caseload"
       ).and_return OpenStruct.new(deliver_later: true)
 
@@ -159,6 +160,7 @@ RSpec.describe EmailService do
         offender_name: offender_name,
         offender_no: "G2911GD",
         message: '',
+        further_info: {},
         url: "http://localhost:3000/prisons/#{prison_code}/prisoners/#{original_allocation.nomis_offender_id}/allocation"
       ).and_return OpenStruct.new(deliver_later: true)
 

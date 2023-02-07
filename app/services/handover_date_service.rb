@@ -70,6 +70,8 @@ class HandoverDateService
                                  reason: :crc_case
 
     elsif !offender.expected_time_in_custody_gt_10_months?
+      # TODO: This should be part of the policy case check below
+
       # COM is always responsible if the expected time in custody is less than 10 months
       CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
                                  start_date: nil, handover_date: nil,
@@ -77,8 +79,13 @@ class HandoverDateService
 
     elsif offender.policy_case?
       # Offender is NPS Determinate or Indeterminate
-      handover_date, reason = nps_handover_date(offender)
-      start_date = nps_start_date(offender)
+      if USE_NEW_HANDOVER_POLICY
+        handover_date, reason = nps_handover_date(offender)
+        start_date = nps_start_date(offender)
+      else
+        handover_date, reason = nps_handover_date_old_policy(offender)
+        start_date = nps_start_date_old_policy(offender)
+      end
       handover_date = start_date if start_date.present? && start_date > handover_date
 
       CalculatedHandoverDate.new responsibility: responsibility(start_date, handover_date),
@@ -110,7 +117,9 @@ private
     end
   end
 
-  def self.nps_start_date(offender)
+  def self.nps_start_date_old_policy(offender)
+    raise 'Incompatible' if USE_NEW_HANDOVER_POLICY
+
     if offender.open_prison_rules_apply? && offender.indeterminate_sentence?
       if offender.in_womens_prison?
         # Women's estate: the day the offender's category changed to "open"
@@ -124,7 +133,22 @@ private
     elsif offender.indeterminate_sentence?
       indeterminate_responsibility_date(offender)
     else
-      determinate_sentence_handover_start_date(offender)
+      determinate_sentence_handover_start_date_old_policy(offender)
+    end
+  end
+
+  def self.nps_start_date(offender)
+    if offender.open_prison_rules_apply? && offender.indeterminate_sentence?
+      if offender.in_womens_prison?
+        # Women's estate: the day the offender's category changed to "open"
+        offender.category_active_since
+      else
+        # Men's estate: the day the offender arrived in the open prison
+        offender.prison_arrival_date
+      end
+    else
+      d = nps_handover_date(offender)
+      d[0] if d
     end
   end
 
@@ -132,7 +156,9 @@ private
     offender.release_date - 15.months
   end
 
-  def self.determinate_sentence_handover_start_date(offender)
+  def self.determinate_sentence_handover_start_date_old_policy(offender)
+    raise 'Incompatible' if USE_NEW_HANDOVER_POLICY
+
     if offender.parole_eligibility_date.present?
       offender.parole_eligibility_date - 8.months
     elsif offender.conditional_release_date.present? || offender.automatic_release_date.present?
@@ -145,7 +171,9 @@ private
     end
   end
 
-  def self.nps_handover_date(offender)
+  def self.nps_handover_date_old_policy(offender)
+    raise 'Incompatible' if USE_NEW_HANDOVER_POLICY
+
     if offender.early_allocation?
       [early_allocation_handover_date(offender), :nps_early_allocation]
     elsif offender.indeterminate_sentence?
@@ -162,11 +190,37 @@ private
     end
   end
 
+  def self.nps_handover_date(offender)
+    if offender.early_allocation?
+      [early_allocation_handover_date(offender), :nps_early_allocation]
+    elsif offender.indeterminate_sentence?
+      reason = offender.in_open_conditions? ? :nps_indeterminate_open : :nps_indeterminate
+      [indeterminate_responsibility_date(offender), reason]
+    else
+      nps_determinate_responsibility_date(offender)
+    end
+  end
+
   def self.indeterminate_responsibility_date(offender)
     offender.release_date - 8.months
   end
 
+  def self.nps_determinate_responsibility_date(offender)
+    if offender.parole_eligibility_date.present?
+      [offender.parole_eligibility_date - 8.months, :nps_determinate_parole_case]
+    elsif offender.conditional_release_date.present? || offender.automatic_release_date.present?
+      dates = Handover::HandoverDateRules.calculate_handover_dates(
+        nomis_offender_id: offender.offender_no,
+        sentence_start_date: offender.sentence_start_date,
+        conditional_release_date: offender.conditional_release_date,
+        automatic_release_date: offender.automatic_release_date)
+      [dates.handover_date, dates.reason]
+    end
+  end
+
   def self.mappa_23_responsibility_date(offender)
+    raise 'Incompatible' if USE_NEW_HANDOVER_POLICY
+
     earliest_date = [
       offender.conditional_release_date,
       offender.automatic_release_date
@@ -178,6 +232,8 @@ private
   # There are a couple of places where we need .5 of a month - which
   # we have assumed 15.days is a reasonable compromise implementation
   def self.mappa1_responsibility_date(offender)
+    raise 'Incompatible' if USE_NEW_HANDOVER_POLICY
+
     if offender.home_detention_curfew_actual_date.present?
       offender.home_detention_curfew_actual_date
     else
@@ -214,7 +270,7 @@ private
              :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date,
              :tariff_date, :target_hearing_date, :hearing_outcome_received, :most_recent_parole_record,
              :next_thd, :most_recent_completed_parole_record, :last_hearing_outcome_received,
-             :due_for_release?, to: :@offender
+             :due_for_release?, :sentence_start_date, :offender_no, to: :@offender
 
     def initialize(offender)
       @offender = offender

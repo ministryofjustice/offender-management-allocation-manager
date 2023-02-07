@@ -22,7 +22,6 @@ Use [asdf](https://asdf-vm.com/) or similar to manage your ruby environment and 
 
 ### Optional
 
-- [Git-crypt](https://github.com/AGWA/git-crypt) - for securing application secrets
 - [Nomis Elite2](https://github.com/ministryofjustice/elite2-api) - API for accessing prison, offender and staff information from the National Offender Management Integration System
 - [Nomis Oauth2 Server](https://github.com/ministryofjustice/nomis-oauth2-server) - for logging into the application
 
@@ -72,6 +71,18 @@ The first time you run the specs you'll need to record the VCR cassettes:
 VCR=1 bundle exec rspec
 ```
 
+## Secrets
+
+Secrets are stored in the `secret/allocation-manager-secrets` item in each K8s namespace.
+
+So for example, for production, one would do:
+
+```
+kubectl -n offender-management-production get secrets allocation-manager-secrets
+```
+
+These are all managed manually using kubectl. [See here for more info](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/other-topics/secrets.html#secrets-overview)
+
 ## Deploying to preprod and test
 
 preprod and test are deployed environments that can be used as part of the development process. Their purposes are:
@@ -101,12 +112,13 @@ Required
 
 | Env var  | Description  |
 |---|---|
-| KEYWORKER_API_HOST | The host where the keyworker API is hosted |
+| KEYWORKER_API_HOST | The URL where the keyworker API is hosted |
 | HMPPS_OAUTH_CLIENT_ID | The client ID of the application in OAUTH |
 | NOMIS_OAUTH_HOST  |  This is the full URL of the OAUTH host where access is granted to users using the service |
 | HMPPS_API_CLIENT_ID | This is the full URL of the API host where access is granted to read from the relevant APIs |
 | NOMIS_OAUTH_PUBLIC_KEY  | This is the base64 encoded public key for decoding Tokens provided by the OAUTH server |
 | PROMETHEUS_METRICS | If set to 'on' then will enable the generation of prometheus metrics |
+| ASSESS_RISKS_AND_NEEDS_API_HOST | The URL where the Assess Risks and Needs API is hosted |
 
 Extra variables not required locally
 
@@ -120,13 +132,22 @@ Extra variables not required locally
 
 Run `make setup` to install git pre-commit hooks that:
 
-- check you have git-crypt installed
-- help you avoid committing unencrypted secrets
 - lint changed files using govuk rubocop
 
-To test that the pre-commit hook is set up correctly, try removing the `diff`
-attribute from a line in a `.gitattributes` file and then committing something -
-the hook should prevent you from committing.
+To test that the pre-commit hook is set up correctly, make an anti-rubocop change in app/models/offender.rb and
+try to commit - it should stop you doing so. (If it succeeds, undo the commit).
+
+## CircleCI
+
+CircleCI is used for testing of branches and deploying.
+
+It runs tests in parallel and skips flaky specs.
+
+Mark specs as flaky by adding the `flaky: true` flag to them.
+
+To disable parallel testing in CircleCI, set the environment variable
+`PARALLEL_TEST_PROCESSORS=1` in the CircleCI project settings. Delete
+it from project settings to go back to the default of parallel testing.
 
 ## Further Documentation
 

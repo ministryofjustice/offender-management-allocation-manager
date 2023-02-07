@@ -34,4 +34,31 @@ module AuthHelper
     stub_request(:get, "#{ApiHelper::T3}/staff/754732/emails")
         .to_return(body: emails.to_json)
   end
+
+  # Stub out authentication and authorization at a high level - does not go near the API calls, simply stubs out
+  # the controller helpers that authenticate and authorize.
+  # @param prison A Prison model or mock set to @prison - if a mock, must have valid #code attribute
+  # @param staff_member If StaffMember model/stub is given, authorize to that; otherwise create a new anonymous stub
+
+  # TODO: this amount of stubbing to get the tests to run really tells us that our controller plumbing is not very
+  #  well designed. We need to find ways to tidy it up, one strand at a time.
+
+  def stub_high_level_staff_member_auth(prison:, staff_member: nil)
+    staff_member ||= instance_double(StaffMember, staff_id: Random.rand(100))
+    allow(controller).to receive_messages(authenticate_user: nil,
+                                          check_prison_access: nil,
+                                          load_staff_member: nil,
+                                          service_notifications: nil,
+                                          load_roles: nil,
+                                          active_prison_id: prison.code)
+    controller.instance_variable_set(:@current_user, staff_member)
+    controller.instance_variable_set(:@prison, prison)
+  end
+
+  def stub_high_level_pom_auth(prison:, staff_member: nil)
+    staff_member ||= instance_double(StaffMember, :pom_staff_member, staff_id: Random.rand(100))
+    stub_high_level_staff_member_auth(prison: prison, staff_member: staff_member)
+    allow(controller).to receive_messages(ensure_pom: nil,
+                                          current_user_is_pom?: true)
+  end
 end

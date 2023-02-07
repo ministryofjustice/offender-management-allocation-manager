@@ -2,6 +2,7 @@ RSpec.describe CalculatedHandoverDate do
   subject { build(:calculated_handover_date) }
 
   let(:today) { Time.zone.today }
+  let(:offender) { FactoryBot.create(:offender, nomis_offender_id: 'X1111XX') }
 
   before do
     allow(HmppsApi::CommunityApi).to receive(:set_handover_dates)
@@ -18,8 +19,8 @@ RSpec.describe CalculatedHandoverDate do
       build(:offender,
             calculated_handover_date: build(:calculated_handover_date,
                                             responsibility: com_responsibility.responsibility,
-                                            com_allocated_date: com_responsibility.com_allocated_date,
-                                            com_responsible_date: com_responsibility.com_responsible_date,
+                                            start_date: com_responsibility.start_date,
+                                            handover_date: com_responsibility.handover_date,
                                             reason: com_responsibility.reason))
     end
     let(:com_responsibility) { HandoverDateService::NO_HANDOVER_DATE }
@@ -27,8 +28,8 @@ RSpec.describe CalculatedHandoverDate do
 
     it 'allows nil handover dates' do
       expect(record).to be_valid
-      expect(record.com_allocated_date).to be_nil
-      expect(record.com_responsible_date).to be_nil
+      expect(record.start_date).to be_nil
+      expect(record.handover_date).to be_nil
       expect(record.reason_text).to eq('COM Responsibility')
     end
   end
@@ -37,8 +38,7 @@ RSpec.describe CalculatedHandoverDate do
     subject do
       build(:calculated_handover_date,
             offender: nil,
-            nomis_offender_id: "A1234BC"
-           )
+            nomis_offender_id: "A1234BC")
     end
 
     it 'is not valid' do
@@ -46,32 +46,19 @@ RSpec.describe CalculatedHandoverDate do
     end
   end
 
-  describe 'using official domain language compliant naming' do
-    it 'has #com_allocated_date' do
-      subject.com_allocated_date = Date.new(2022, 7, 7)
-      expect(subject.com_allocated_date).to eq Date.new(2022, 7, 7)
-    end
-
-    it 'has #com_responsible_date' do
-      subject.com_responsible_date = Date.new(2022, 9, 7)
-      expect(subject.com_responsible_date).to eq Date.new(2022, 9, 7)
-    end
-  end
-
   describe '::by_upcoming_handover scope' do
     let(:upcoming_handover_date_attributes) do
       {
-        com_allocated_date: Date.new(2022, 12, 1),
-        com_responsible_date: Date.new(2022, 12, 30)
+        handover_date: Date.new(2022, 12, 1),
       }
     end
-    let!(:row) do # instantiate it immediately
-      FactoryBot.create :calculated_handover_date, :before_com_allocated_date,
-                        offender: FactoryBot.create(:offender, nomis_offender_id: 'X1111XX'),
-                        **upcoming_handover_date_attributes
+    let!(:row) do
+      # instantiate it immediately
+      FactoryBot.create :calculated_handover_date, :before_handover, offender: offender,
+                                                                     **upcoming_handover_date_attributes
     end
 
-    def query(offender_ids: ['X1111XX'], relative_to_date: Date.new(2022, 11, 21))
+    def query(offender_ids: [offender.id], relative_to_date: Date.new(2022, 11, 21))
       described_class.by_upcoming_handover(offender_ids: offender_ids,
                                            relative_to_date: relative_to_date,
                                            upcoming_handover_window_duration: 10)
@@ -120,12 +107,12 @@ RSpec.describe CalculatedHandoverDate do
   end
 
   describe '::by_handover_in_progress scope' do
-    let!(:row) do # instantiate it immediately
-      FactoryBot.create :calculated_handover_date, :between_com_allocated_and_responsible_dates,
-                        offender: FactoryBot.create(:offender, nomis_offender_id: 'X1111XX')
+    let!(:row) do
+      # instantiate it immediately
+      FactoryBot.create :calculated_handover_date, :after_handover, offender: offender
     end
 
-    def query(offender_ids: ['X1111XX'])
+    def query(offender_ids: [offender.id])
       described_class.by_handover_in_progress(offender_ids: offender_ids)
     end
 
@@ -146,6 +133,69 @@ RSpec.describe CalculatedHandoverDate do
     it 'does not include rows where COM is not assigned' do
       row.update! responsibility: described_class::CUSTODY_ONLY
       expect(query).not_to include row
+    end
+
+    it 'does not include rows that have no handover date' do
+      FactoryBot.create :calculated_handover_date,
+                        responsibility: described_class::COMMUNITY_RESPONSIBLE,
+                        handover_date: nil,
+                        start_date: nil,
+                        offender: FactoryBot.create(:offender, nomis_offender_id: 'X2222XX')
+
+      expect(query(offender_ids: ['X2222XX'])).to be_blank
+    end
+  end
+
+  describe '::by_com_allocation_overdue' do
+    let!(:row) do
+      # instantiate it immediately
+      FactoryBot.create :calculated_handover_date, :after_handover, offender: offender
+    end
+    let!(:case_information) { FactoryBot.create :case_information, :english, offender: offender }
+
+    def query(offender_ids: [offender.id])
+      described_class.by_com_allocation_overdue(offender_ids: offender_ids, relative_to_date: Date.new(2022, 11, 21))
+    end
+
+    describe 'when 48 hours after handover date' do
+      before do
+        row.update! responsibility: described_class::COMMUNITY_RESPONSIBLE, handover_date: Date.new(2022, 11, 19)
+      end
+
+      describe 'when COM is not allocated' do
+        before do
+          case_information.update! com_email: nil
+        end
+
+        it 'gets the case for the given offender IDs' do
+          expect(query).to include row
+        end
+
+        it 'does not get the case of other offender IDs' do
+          expect(query(offender_ids: ['Y1111YY'])).not_to include row
+        end
+
+        it 'does not get the case when not community responsible' do
+          row.update! responsibility: described_class::CUSTODY_ONLY
+          expect(query).not_to include row
+        end
+      end
+
+      it 'does not get cases with COM allocated' do
+        case_information.update! com_email: 'a@b'
+        expect(query).not_to include row
+      end
+    end
+
+    describe 'when less than 48 hours after handover date' do
+      before do
+        row.update! responsibility: described_class::COMMUNITY_RESPONSIBLE, handover_date: Date.new(2022, 11, 20)
+      end
+
+      it 'does not get cases without COM allocated' do
+        case_information.update! com_email: nil
+        expect(query).not_to include(row)
+      end
     end
   end
 end

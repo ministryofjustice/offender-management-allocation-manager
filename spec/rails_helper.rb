@@ -1,18 +1,18 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 ENV['RAILS_ENV'] ||= 'test'
+ENV['USE_NEW_HANDOVER_POLICY'] = '1'
+
 require File.expand_path('../config/environment', __dir__)
 # Prevent database truncation if the environment is production
 abort('The Rails environment is running in production mode!') if Rails.env.production?
 require 'rspec/rails'
 require 'spec_helper'
-require 'support/helpers/api_helper'
-require 'support/helpers/jwt_helper'
-require 'support/helpers/features_helper'
-require 'support/helpers/auth_helper'
-require 'support/helpers/api_helper'
-require 'support/matchers/responsibility_matchers'
 require 'capybara/rspec'
 require 'webmock/rspec'
+
+Dir.glob(File.join(__dir__, 'support/**/*.rb')).each do |file|
+  require file
+end
 
 Capybara.default_max_wait_time = 10
 Capybara.asset_host = 'http://localhost:3000'

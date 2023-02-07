@@ -19,6 +19,10 @@ class StaffMember
     "#{last_name}, #{first_name}"
   end
 
+  def full_name_ordered
+    "#{first_name} #{last_name}"
+  end
+
   def first_name
     staff_detail.first_name&.titleize
   end
@@ -49,7 +53,7 @@ class StaffMember
 
   def allocations
     @allocations ||= begin
-      alloc_hash = @prison.allocations.for_pom(@staff_id).index_by(&:nomis_offender_id)
+      alloc_hash = @prison.allocations_for_pom(@staff_id).index_by(&:nomis_offender_id)
 
       @prison.allocated.select { |a| alloc_hash.key?(a.offender_no) }.map do |offender|
         AllocatedOffender.new(@staff_id, alloc_hash.fetch(offender.offender_no), offender)
@@ -58,7 +62,13 @@ class StaffMember
   end
 
   def unreleased_allocations
-    allocations.select { |offender| offender.earliest_release_date > Time.zone.now.to_date }
+    allocations.select do |offender|
+      offender.earliest_release_date.nil? || offender.earliest_release_date > Time.zone.now.to_date
+    end
+  end
+
+  def has_allocation?(nomis_offender_id)
+    @prison.allocations_for_pom(@staff_id).detect { |a| a.nomis_offender_id == nomis_offender_id }.present?
   end
 
 private

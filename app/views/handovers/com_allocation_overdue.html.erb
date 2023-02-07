@@ -1,0 +1,74 @@
+<% cases = @handover_cases.com_allocation_overdue %>
+
+<h2 class="govuk-heading-l">
+  COM allocation overdue
+</h2>
+
+<% if @pom_view %>
+  <p>
+    These cases have past their handover date and are missing COM details on NDelius. You could:
+  </p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>notify the local divisional unit (LDU) that COM allocation is overdue</li>
+    <li>if there's no response, discuss the allocation with your manager</li>
+  </ul>
+<% else %>
+  <p>
+    These cases have past their handover date and are missing COM details on NDelius.
+  </p>
+<% end %>
+
+<%= handover_list_table(table_class: %w[com-allocation-overdue],
+                        headers: [
+                          { type: 'button', body: 'Prisoner details' },
+                          @pom_view ? nil : { type: 'button', body: 'POM' },
+                          { type: 'button', body: 'COM responsible', sort: 'ascending' },
+                          { type: 'button', body: 'Earliest release date' },
+                          { type: 'button', body: 'Tier' },
+                          { type: 'button', body: 'Days overdue', class: %w[days-overdue], sort: 'descending' },
+                          { body: 'LDU details', class: %w[ldu-details govuk-!-width-one-quarter] },
+                        ].compact) do %>
+
+  <% cases.each do |calc_handover, offender| %>
+    <tr class="govuk-table__row allocated-offender">
+      <%= render 'handovers/cells/prisoner_details', prison_id: @prison_id, offender: offender %>
+
+      <%= render 'handovers/cells/staff_member', staff_member: offender.staff_member unless @pom_view %>
+
+      <%= render 'handovers/cells/handover_dates', offender: offender, calc_handover: calc_handover %>
+
+      <%= render 'handovers/cells/earliest_release_date', offender: offender %>
+
+      <%= render 'handovers/cells/tier', offender: offender %>
+
+      <td class="govuk-table__cell days-overdue">
+        <%= highlight_tag 'primary', 'alert', com_allocation_overdue_days(offender), more_classes: %w[date overdue] %>
+      </td>
+
+      <td class="govuk-table__cell ldu-details">
+        <% if offender.ldu_name.nil? && offender.ldu_email_address.nil? %>
+          We don’t have this information.
+          <%= link_to 'Check DPS to find where this person was sentenced',
+                      dps_sentence_and_release_link(offender.offender_no),
+                      class: %w[govuk-link govuk-link--no-visited-state],
+                      target: '_blank'
+          %>
+          and then try contacting the LDU for that area.
+        <% elsif offender.ldu_email_address.nil? %>
+          Check how to contact <%= offender.ldu_name %> LDU. We do not have an email address recorded for it.
+        <% else %>
+          <p><%= offender.ldu_name %></p>
+          <p><%= offender.ldu_email_address %></p>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+<% end %>
+
+<% if cases.size == 0 %>
+  <p>No handover cases missing COM details</p>
+<% end %>
+
+<div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>
+<div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>

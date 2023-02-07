@@ -29,6 +29,8 @@ AllCops:
     - 'spec/dummy/db/**/*'
     - 'config/routes.rb'
     - 'spec/factories/*.rb'
+    - 'features/support/env.rb'
+    - 'lib/tasks/cucumber.rake'
 
 Style/MultilineBlockChain:
   Enabled: false
@@ -149,6 +151,15 @@ RSpec/MultipleMemoizedHelpers:
 RSpec/StubbedMock:
   Enabled: false
 
+RSpec/DescribeMethod:
+  Enabled: false
+
+RSpec/PredicateMatcher:
+  Enabled: false
+
+RSpec/ExampleWording:
+  Enabled: false
+
 # Below here is the set of (arbitrary) style failures against the govuk versions
 Style/WordArray:
   Enabled: false
@@ -163,4 +174,12 @@ Style/TrailingCommaInArrayLiteral:
   Enabled: false
 
 Style/MethodCalledOnDoEndBlock:
+  Enabled: false
+
+Style/EachForSimpleLoop:
+  Enabled: false
+
+# We don't want anyone to have to know that an `if` statement evaluates to nil if none of its conditions are met,
+# so we allow `else  nil` so it's crystal clear
+Style/EmptyElse:
   Enabled: false

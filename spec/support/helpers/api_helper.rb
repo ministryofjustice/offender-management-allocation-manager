@@ -36,6 +36,13 @@ module ApiHelper
     stub_request(:get, "#{Rails.configuration.complexity_api_host}/v1/complexity-of-need/offender-no/#{offender_no}")
       .to_return(body: { level: offender.fetch(:complexityLevel) }.to_json)
 
+    # RoSH summary
+    stub_request(:get, Addressable::Template.new("#{Rails.configuration.assess_risks_and_needs_api_host}/risks/crn/{crn}/summary"))
+      .to_return(body: {}.to_json)
+
+    # Alerts
+    stub_request(:get, "#{T3}/offenders/#{offender_no}/alerts/v2").to_return(body: [].to_json)
+
     stub_oasys_assessments(offender_no)
   end
 
@@ -106,6 +113,8 @@ module ApiHelper
         totalPages: 1
       }.to_json)
 
+    stub_prison_timeline
+
     # Remove offenders with unwanted legal statuses – the following APIs are only called/stubbed for filtered offender IDs
     filtered_offenders = offenders.select { |o| HmppsApi::PrisonApi::OffenderApi::ALLOWED_LEGAL_STATUSES.include?(o.fetch(:legalStatus)) }
     stub_offender_categories(filtered_offenders)
@@ -116,6 +125,17 @@ module ApiHelper
     filtered_offenders.each { |o| stub_offender(o) }
 
     stub_movements(movements)
+  end
+
+  def stub_prison_timeline
+    stub_request(:get, Addressable::Template.new("#{T3}/offenders/{id}/prison-timeline"))
+      .to_return(
+        status: 200,
+        body: {
+          "prisonPeriod" => [
+            { 'prisons' => ['ABC', 'DEF'] }
+          ]
+        }.to_json)
   end
 
   def stub_oasys_assessments(offender_no)

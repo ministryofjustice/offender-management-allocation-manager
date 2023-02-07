@@ -22,6 +22,22 @@ protected
   def current_user_is_pom?
     sso_identity.current_user_is_pom? && @current_user.has_pom_role?
   end
+  helper_method :current_user_is_pom?
+
+  # These 2 methods manage the data for the quite lengthy allocation summary
+  # message that appears on the confirm page and as a success message after
+  # allocation.
+  # No good storing the redered HTML in flash as it will blow the max cookie
+  # size. Instead we just store the locals in the session, which gets rendered
+  # via a partial if @latest_allocation_details is present.
+  def store_latest_allocation_details(details_hash)
+    session[:latest_allocation_details] = details_hash
+  end
+
+  def retrieve_latest_allocation_details
+    @latest_allocation_details = session[:latest_allocation_details]&.with_indifferent_access
+    session.delete(:latest_allocation_details)
+  end
 
 private
 

@@ -26,7 +26,7 @@ module ApplicationHelper
       'PO' => 'Probation Officer POM',
       'PRO' => 'Prison Officer POM',
       'STAFF' => 'N/A'
-    }.fetch(level)
+    }[level]
   end
 
   def service_provider_label(provider)
@@ -58,5 +58,11 @@ module ApplicationHelper
     else
       mail_to(email)
     end
+  end
+
+  def unreverse_name(reversed_name)
+    return '' if reversed_name.blank?
+
+    reversed_name.split(',').reverse.join(' ').strip
   end
 end

@@ -9,6 +9,7 @@ RSpec.feature "Delius import feature", :disable_push_to_delius do
     stub_signin_spo(pom, [prison_code])
     stub_poms prison_code, [pom]
     stub_offenders_for_prison(prison_code, [offender])
+    stub_request(:get, "https://www.gov.uk/bank-holidays.json").to_return(body: {}.to_json)
   end
 
   context "when the LDU is known" do
@@ -39,7 +40,7 @@ RSpec.feature "Delius import feature", :disable_push_to_delius do
       expect(page).not_to have_content(offender_no)
 
       visit unallocated_prison_prisoners_path(prison_code)
-      expect(page).to have_content("Make new allocations")
+      expect(page).to have_content("Make allocations")
       expect(page).to have_content(offender_no)
       click_link offender_name
       expect(page.find(:css, '#welsh-offender-row')).not_to have_content('Change')

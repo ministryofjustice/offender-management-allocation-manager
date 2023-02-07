@@ -127,4 +127,60 @@ RSpec.describe OffenderHelper do
       expect(helper.non_recommended_pom_type_label(subject)).to eq('Prison officer')
     end
   end
+
+  describe '#format_allocation' do
+    subject do
+      helper.format_allocation(offender: offender, pom: pom, view_context: view_context)
+    end
+
+    let(:api_offender) { build(:hmpps_api_offender) }
+    let(:pom) { double('StaffMember') }
+    let(:notes) { 'a note' }
+    let(:view_context) { double('view_context', full_name_ordered: '', unreverse_name: '', format_date: '') }
+    let(:last_oasys_completed) { Time.zone.today }
+
+    before do
+      allow(helper).to receive(:last_oasys_completed).and_return(last_oasys_completed)
+      allow(offender).to receive(:rosh_summary).and_return({})
+      allow(offender).to receive(:active_alert_labels).and_return(%w[bish bosh bash])
+    end
+
+    context 'when no last completed OASys' do
+      let(:last_oasys_completed) { nil }
+
+      it 'displays "No OASys information"' do
+        expect(subject[:last_oasys_completed]).to eq('No OASys information')
+      end
+    end
+
+    context 'when no handover start date' do
+      before do
+        allow(offender).to receive(:handover_start_date).and_return(nil)
+      end
+
+      it 'displays "Unknown"' do
+        expect(subject[:handover_start_date]).to eq('Unknown')
+      end
+    end
+
+    context 'when no responsibility handover' do
+      before do
+        allow(offender).to receive(:responsibility_handover_date).and_return(nil)
+      end
+
+      it 'displays "Unknown"' do
+        expect(subject[:handover_completion_date]).to eq('Unknown')
+      end
+    end
+
+    context 'when no COM name' do
+      before do
+        allow(offender).to receive(:allocated_com_name).and_return(nil)
+      end
+
+      it 'displays "Unknown"' do
+        expect(subject[:com_name]).to eq('Unknown')
+      end
+    end
+  end
 end

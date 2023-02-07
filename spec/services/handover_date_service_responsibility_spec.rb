@@ -1,10 +1,10 @@
 require 'rails_helper'
 
-describe HandoverDateService do
+describe HandoverDateService, 'responsibility' do
   let(:prison) { build(:prison) }
   let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
-  describe '#calculate_pom_responsibility' do
+  describe 'when calculating POM responsibility' do
     subject { described_class.handover(offender) }
 
     let(:pom) { OffenderManagerResponsibility.new subject.custody_responsible?, subject.custody_supporting?  }
@@ -281,7 +281,7 @@ describe HandoverDateService do
 
           context 'when the prison is private' do
             before do
-              Timecop.travel Date.new(2021, 1, 1)
+              Timecop.travel Date.new(2020, 6, 1)
             end
 
             after do
@@ -299,7 +299,7 @@ describe HandoverDateService do
             end
 
             context 'with expected release on the cutoff date' do
-              let(:ard) { '1 June 2021'.to_date }
+              let(:ard) { HandoverDateService::ENGLISH_PRIVATE_CUTOFF }
 
               it 'returns responsible' do
                 expect(pom).to be_responsible
@@ -337,11 +337,11 @@ describe HandoverDateService do
               end
             end
 
-            context 'when release date greater than cutoff date and before the handover window' do
+            context 'when release date greater than cutoff date and before handover' do
               let(:ard) { '16 Feb 2021'.to_date }
 
               it 'returns responsible' do
-                Timecop.travel('20 Sep 2020') do
+                Timecop.travel(2020, 5, 20) do
                   expect(pom).to be_responsible
                 end
               end
@@ -535,11 +535,11 @@ describe HandoverDateService do
               end
             end
 
-            context 'when release date greater than cutoff date and before the handover window' do
+            context 'when release date greater than cutoff date and before handover' do
               let(:ard) { '20 May 2020'.to_date }
 
               it 'returns responsible' do
-                Timecop.travel('1 Jan 2020') do
+                Timecop.travel('1 Jan 2019') do
                   expect(pom).to be_responsible
                 end
               end

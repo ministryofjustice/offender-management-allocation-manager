@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature 'Responsibility override', :flaky do
+feature 'Responsibility override', flaky: true do
   include ActiveJob::TestHelper
 
   before do
@@ -72,13 +72,13 @@ feature 'Responsibility override', :flaky do
         expect(page).to have_content 'Recommendation: Prison officer POM'
       end
 
-      it 'shows case owner as Community when overridden' do
+      it 'shows POM responsibility as Supporting when overridden' do
         override_responsibility_for(offender_id)
 
         visit unallocated_prison_prisoners_path('LEI')
 
         within 'tr.govuk-table__row.offender_row_0' do
-          expect(page).to have_content('Community')
+          expect(page).to have_content('Supporting')
         end
       end
     end

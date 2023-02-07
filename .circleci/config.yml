@@ -13,7 +13,7 @@ references:
   test_container_config: &test_container_config
     resource_class: large
     docker:
-      - image: cimg/ruby:2.7.5-browsers
+      - image: cimg/ruby:2.7.7-browsers
         environment:
           RAILS_ENV: test
           PGHOST: 127.0.0.1
@@ -24,6 +24,7 @@ references:
           COMPLEXITY_API_HOST: https://complexity-of-need-staging.hmpps.service.justice.gov.uk
           COMMUNITY_API_HOST: https://community-api-secure.test.delius.probation.hmpps.dsd.io
           ASSESSMENT_API_HOST: https://offender-dev.aks-dev-1.studio-hosting.service.justice.gov.uk
+          ASSESS_RISKS_AND_NEEDS_API_HOST: https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk
       - image: cimg/postgres:14.4
         environment:
           POSTGRES_USER: ubuntu
@@ -31,32 +32,17 @@ references:
           POSTGRES_DB: offender-management-allocation-manager_test
       - image: cimg/redis:7.0
 
-  install_gpg: &install_gpg
+  configure_k8s: &configure_k8s
     run:
-      name: Install GPG
+      name: Setup Kubectl
       command: |
-        apk add \
-          --no-cache \
-          --no-progress \
-          gnupg
-
-  configure_gpg: &configure_gpg
-    run:
-      name: Configure GPG
-      command: |
-        echo "${GPG_PRIVATE_KEY}" | base64 -d | gpg --batch --allow-secret-key-import --import
-
-  decrypt_secrets: &decrypt_secrets
-    run:
-      name: Decrypt secrets file
-      command: |
-        gpg --export-ownertrust > /tmp/ownertrust.txt
-        echo $GPG_KEY_ID:1 >> /tmp/ownertrust.txt
-        gpg --import-ownertrust /tmp/ownertrust.txt
-        gpgconf --kill gpg-agent
-        gpg-agent --daemon --allow-preset-passphrase
-        /usr/libexec/gpg-preset-passphrase --preset --passphrase $GPG_PASSPHRASE $GPG_KEY_KEYGRIP_ID
-        git-crypt unlock
+        echo -n "${K8S_CLUSTER_CERT}" | base64 -d > ./live_ca.crt
+        kubectl config set-cluster "${K8S_CLUSTER_NAME}" --certificate-authority=./live_ca.crt --server="https://${K8S_CLUSTER_NAME}"
+        kubectl config set-credentials circleci --token="${K8S_TOKEN}"
+        kubectl config set-context "${K8S_CLUSTER_NAME}" --cluster="${K8S_CLUSTER_NAME}" --user=circleci --namespace="${K8S_NAMESPACE}"
+        kubectl config use-context "${K8S_CLUSTER_NAME}"
+        kubectl config current-context
+        kubectl -n "${K8S_NAMESPACE}" get pods
 
   build_docker_image: &build_docker_image
     run:
@@ -75,12 +61,18 @@ references:
     run:
       name: Push allocation-manager docker image
       command: |
-        aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin "$ECR_ENDPOINT"
-        docker tag app "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:${CIRCLE_SHA1}"
-        docker push "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:${CIRCLE_SHA1}"
+        set -euo pipefail
+        env_name="${K8S_NAMESPACE#offender-management-}"
+        . ~/env/"${env_name}"-ecr-secrets.sh
+
+        set -x # doing -x earlier displays sensitive credentials
+        ecr_host="$(echo "${ECR_ENDPOINT}" | cut -f1 -d/)"
+        aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin "${ecr_host}"
+        docker tag app "${ECR_ENDPOINT}:${CIRCLE_SHA1}"
+        docker push "${ECR_ENDPOINT}:${CIRCLE_SHA1}"
         if [ "${CIRCLE_BRANCH}" == "main" ]; then
-          docker tag app "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:latest"
-          docker push "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:latest"
+          docker tag app "${ECR_ENDPOINT}:latest"
+          docker push "${ECR_ENDPOINT}:latest"
         fi
       environment:
         <<: *github_team_name_slug
@@ -118,6 +110,14 @@ commands:
           install-dir: /home/circleci/.local/bin
 
 jobs:
+  noop:
+    <<: *defaults
+    <<: *deploy_container_config
+    steps:
+      - run:
+          name: Truthy no-op
+          command: "true"
+
   install_dependencies:
     <<: *defaults
     <<: *test_container_config
@@ -126,10 +126,11 @@ jobs:
       - attach_workspace:
           at: ~/
       - restore_cache:
-          key: allocation-manager-{{ checksum "Gemfile.lock" }}-v4 # increment v number to bust cache
+          key: allocation-manager-{{ checksum "Gemfile.lock" }}-2022-10-05T13:43:00 # Set current time in iso8601 to bust cache
       - run:
           name: Which bundler?
-          command: bundle -v
+          # Install the version of bundler used in Gemfile.lock
+          command: gem install -v $(ruby -e 'puts /BUNDLED WITH\s+(\d+\.\d+\.\d+)/m.match(File.read("Gemfile.lock"))[1]') bundler && bundle -v
       - run:
           name: Install frontend modules
           command: yarn install
@@ -155,7 +156,7 @@ jobs:
               chmod +x ~/.local/bin/cc-test-reporter
             fi
       - save_cache:
-          key: allocation-manager-{{ checksum "Gemfile.lock" }}-v4 # increment v number to bust cache
+          key: allocation-manager-{{ checksum "Gemfile.lock" }}-2022-10-05T13:43:00 # Set current time in iso8601 to bust cache
           paths:
             - ~/repo/vendor/bundle
             - ~/repo/node_modules
@@ -167,6 +168,43 @@ jobs:
             - repo/node_modules
             - .local/bin
             - .bundle/config
+
+  fetch_secrets:
+    <<: *defaults
+    <<: *deploy_container_config
+    steps:
+      - attach_workspace:
+          at: ~/
+      - *configure_k8s
+      - run:
+          name: Fetch creds from K8s and store in workspace
+          command: |
+            set -euo pipefail
+
+            env_name="${K8S_NAMESPACE#offender-management-}"
+            
+            rm -rf ~/env/
+            mkdir ~/env
+
+            apk add jq
+
+            kubectl -n "${K8S_NAMESPACE}" get secrets ecr-repo-allocation-manager -o json > /tmp/ecr-secrets.json
+            > ~/env/"${env_name}"-ecr-secrets.sh
+            echo "export AWS_ACCESS_KEY_ID='$(jq -r .data.access_key_id /tmp/ecr-secrets.json | base64 -d)'" >> ~/env/"${env_name}"-ecr-secrets.sh
+            echo "export AWS_SECRET_ACCESS_KEY='$(jq -r .data.secret_access_key /tmp/ecr-secrets.json | base64 -d)'" >> ~/env/"${env_name}"-ecr-secrets.sh
+            echo "export ECR_ENDPOINT='$(jq -r .data.repo_url /tmp/ecr-secrets.json | base64 -d)'" >> ~/env/"${env_name}"-ecr-secrets.sh
+            rm /tmp/ecr-secrets.json
+            
+            kubectl -n "${K8S_NAMESPACE}" get secrets hmpps-auth-secrets -o json > /tmp/hmpps-secrets.json
+            > ~/env/"${env_name}"-hmpps-secrets.sh
+            echo "export HMPPS_API_CLIENT_ID='$(jq -r .data.HMPPS_API_CLIENT_ID /tmp/hmpps-secrets.json | base64 -d)'" >> ~/env/"${env_name}"-hmpps-secrets.sh
+            echo "export HMPPS_API_CLIENT_SECRET='$(jq -r .data.HMPPS_API_CLIENT_SECRET /tmp/hmpps-secrets.json | base64 -d)'" >> ~/env/"${env_name}"-hmpps-secrets.sh
+            rm /tmp/hmpps-secrets.json
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - env
+
   rubocop:
     <<: *defaults
     <<: *test_container_config
@@ -186,7 +224,7 @@ jobs:
           at: ~/
       - run:
           name: Security analysis
-          command: bundle exec brakeman -o ~/test-results/brakeman/brakeman.json -o ~/test-results/brakeman/brakeman.html
+          command: bundle exec brakeman --except EOLRuby -o ~/test-results/brakeman/brakeman.json -o ~/test-results/brakeman/brakeman.html
       - run:
           name: Setup database
           command: |
@@ -194,6 +232,8 @@ jobs:
       - run:
           name: Run tests
           command: |
+            env_name="${K8S_NAMESPACE#offender-management-}"
+            . ~/env/"${env_name}"-hmpps-secrets.sh
             cc-test-reporter before-build
             bundle exec parallel_test -t rspec -- -t ~flaky --format progress -- spec
             cc-test-reporter after-build --coverage-input-type lcov --exit-code $?
@@ -209,7 +249,40 @@ jobs:
       - store_artifacts:
           path: ~/test-results
 
+  cucumber:
+    <<: *defaults
+    <<: *test_container_config
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Setup separate cucumber database
+          command: bundle exec rake db:create db:migrate
+          environment:
+            TEST_ENV_NUMBER: CUCUMBER1
+      - run:
+          name: Run cucumber features
+          command: bundle exec cucumber
+          environment:
+            TEST_ENV_NUMBER: CUCUMBER1
+
   build_and_push_docker_image:
+    <<: *defaults
+    <<: *deploy_container_config
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - setup_remote_docker:
+          version: 20.10.14
+          docker_layer_caching: true
+      - aws-cli/install
+      - *configure_k8s
+      - *build_docker_image
+      - *push_docker_image
+
+  verify_docker_image_builds:
     <<: *defaults
     <<: *test_container_config
     steps:
@@ -221,181 +294,117 @@ jobs:
           docker_layer_caching: true
       - aws-cli/install
       - *build_docker_image
-      - *push_docker_image
 
-  deploy_staging:
+  deploy:
     <<: *deploy_container_config
     steps:
       - checkout
       - attach_workspace:
           at: ~/
-      - run:
-          name: Kubectl deployment staging setup
-          command: |
-            echo -n ${CLUSTER_CERT_LIVE} | base64 -d > ./live_ca.crt
-            kubectl config set-cluster ${CLUSTER_NAME_LIVE} --certificate-authority=./live_ca.crt --server=https://${CLUSTER_NAME_LIVE}
-            kubectl config set-credentials circleci --token=${TOKEN_LIVE_STAGING}
-            kubectl config set-context ${CLUSTER_NAME_LIVE} --cluster=${CLUSTER_NAME_LIVE} --user=circleci --namespace=${KUBE_ENV_STAGING_NAMESPACE}
-            kubectl config use-context ${CLUSTER_NAME_LIVE}
-            kubectl config current-context
-            kubectl --namespace=${KUBE_ENV_STAGING_NAMESPACE} get pods
-      - *install_gpg
-      - *configure_gpg
-      - *decrypt_secrets
+      - *configure_k8s
       - deploy:
-          name: Deploy to live staging
+          name: Deploy
           command: |
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/cron-*.yaml
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/deployment.yaml
-            kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
-            kubectl apply --record=false -f ./deploy/staging
-          environment:
-            <<: *github_team_name_slug
-
-  deploy_test:
-    <<: *deploy_container_config
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Kubectl deployment test setup
-          command: |
-            echo -n ${CLUSTER_CERT_LIVE} | base64 -d > ./live_ca.crt
-            kubectl config set-cluster ${CLUSTER_NAME_LIVE} --certificate-authority=./live_ca.crt --server=https://${CLUSTER_NAME_LIVE}
-            kubectl config set-credentials circleci --token=${TOKEN_LIVE_TEST}
-            kubectl config set-context ${CLUSTER_NAME_LIVE} --cluster=${CLUSTER_NAME_LIVE} --user=circleci --namespace=${KUBE_ENV_TEST_NAMESPACE}
-            kubectl config use-context ${CLUSTER_NAME_LIVE}
-            kubectl config current-context
-            kubectl --namespace=${KUBE_ENV_TEST_NAMESPACE} get pods
-      - *install_gpg
-      - *configure_gpg
-      - *decrypt_secrets
-      - deploy:
-          name: Deploy to live test
-          command: |
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/test/deployment.yaml
-            kubectl -n offender-management-test annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
-            kubectl apply --record=false -f ./deploy/test
-          environment:
-            <<: *github_team_name_slug
-
-  deploy_preprod:
-    <<: *deploy_container_config
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Kubectl deployment preproduction setup
-          command: |
-            echo -n ${CLUSTER_CERT_LIVE} | base64 -d > ./live_ca.crt
-            kubectl config set-cluster ${CLUSTER_NAME_LIVE} --certificate-authority=./live_ca.crt --server=https://${CLUSTER_NAME_LIVE}
-            kubectl config set-credentials circleci --token=${TOKEN_LIVE_PREPROD}
-            kubectl config set-context ${CLUSTER_NAME_LIVE} --cluster=${CLUSTER_NAME_LIVE} --user=circleci --namespace=${KUBE_ENV_PREPROD_NAMESPACE}
-            kubectl config use-context ${CLUSTER_NAME_LIVE}
-            kubectl config current-context
-            kubectl --namespace=${KUBE_ENV_PREPROD_NAMESPACE} get pods
-      - *install_gpg
-      - *configure_gpg
-      - *decrypt_secrets
-      - deploy:
-          name: Deploy to live cluster pre-production
-          command: |
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/cron-*.yaml
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/deployment.yaml
-            kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
-            kubectl apply --record=false -f ./deploy/preprod
-          environment:
-            <<: *github_team_name_slug
-
-  deploy_production:
-    <<: *deploy_container_config
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Kubectl deployment production setup
-          command: |
-            echo -n ${CLUSTER_CERT_LIVE} | base64 -d > ./live_ca.crt
-            kubectl config set-cluster ${CLUSTER_NAME_LIVE} --certificate-authority=./live_ca.crt --server=https://${CLUSTER_NAME_LIVE}
-            kubectl config set-credentials circleci --token=${TOKEN_LIVE_PRODUCTION}
-            kubectl config set-context ${CLUSTER_NAME_LIVE} --cluster=${CLUSTER_NAME_LIVE} --user=circleci --namespace=${KUBE_ENV_PRODUCTION_NAMESPACE}
-            kubectl config use-context ${CLUSTER_NAME_LIVE}
-            kubectl config current-context
-            kubectl --namespace=${KUBE_ENV_PRODUCTION_NAMESPACE} get pods
-      - *install_gpg
-      - *configure_gpg
-      - *decrypt_secrets
-      - deploy:
-          name: Deploy to production
-          command: |
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/cron-*.yaml
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/deployment.yaml
-            kubectl annotate deployments/allocation-manager kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
-            kubectl apply --record=false -f ./deploy/production
-          environment:
-            <<: *github_team_name_slug
+            set -x
+            shopt -s nullglob
+            env_name="${K8S_NAMESPACE#offender-management-}"
+            sed -i -e "s/:latest/:${CIRCLE_SHA1}/" deploy/"${env_name}"/deployment.yaml deploy/"${env_name}"/cron-*.yaml
+            kubectl -n "${K8S_NAMESPACE}" annotate deployments/allocation-manager kubernetes.io/change-cause="${CIRCLE_BUILD_URL}"
+            kubectl apply --record=false -f ./deploy/"${env_name}"
 
 workflows:
-  build_and_test:
+  feature_branch:
     jobs:
-      - install_dependencies
+      - install_dependencies:
+          filters: { branches: { ignore: [main, preprod, test, test2] } }
+      - fetch_secrets:
+          filters: { branches: { ignore: [main, preprod, test, test2] } }
+          context: [offender-management-shared, offender-management-staging]
+
       - rubocop:
-          requires:
-            - install_dependencies
-          filters:
-            branches:
-              ignore: test
+          requires: [install_dependencies]
+          filters: { branches: { ignore: [main, preprod, test, test2] } }
       - test:
-          requires:
-            - install_dependencies
-          filters:
-            branches:
-              ignore: test
+          requires: [install_dependencies, fetch_secrets]
+          filters: { branches: { ignore: [main, preprod, test, test2] } }
+          context: [offender-management-shared, offender-management-staging]
+      - verify_docker_image_builds:
+          filters: { branches: { ignore: [main, preprod, test, test2] } }
+      - cucumber:
+          requires: [install_dependencies]
+          filters: { branches: { ignore: [main, preprod, test, test2] } }
+
+  test_env:
+    jobs:
+      - fetch_secrets:
+          filters: { branches: { only: [test] } }
+          context: [offender-management-shared, offender-management-test]
       - build_and_push_docker_image:
-          requires:
-            - install_dependencies
-          filters:
-            branches:
-              only:
-                - main
-                - preproduction
-                - test
-      - deploy_staging:
-          requires:
-            - rubocop
-            - test
-            - build_and_push_docker_image
-          filters:
-            branches:
-              only:
-                - main
-      - deploy_production_approval:
-          type: approval
-          requires:
-            - deploy_staging
-          filters:
-            branches:
-              only: main
-      - deploy_production:
-          requires:
-            - deploy_production_approval
-          filters:
-            branches:
-              only: main
-      - deploy_preprod:
-          requires:
-            - rubocop
-            - test
-            - build_and_push_docker_image
-          filters:
-            branches:
-              only: preproduction
-      - deploy_test:
-          requires:
-            - build_and_push_docker_image
-          filters:
-            branches:
-              only: test
+          requires: [fetch_secrets]
+          filters: { branches: { only: [test] } }
+          context: [offender-management-shared, offender-management-test]
+      - deploy:
+          requires: [build_and_push_docker_image]
+          filters: { branches: { only: [test] } }
+          context: [offender-management-shared, offender-management-test]
+
+  test2_env:
+    jobs:
+      - fetch_secrets:
+          filters: { branches: { only: [test2] } }
+          context: [offender-management-shared, offender-management-test2]
+      - build_and_push_docker_image:
+          requires: [fetch_secrets]
+          filters: { branches: { only: [test2] } }
+          context: [offender-management-shared, offender-management-test2]
+      - deploy:
+          requires: [build_and_push_docker_image]
+          filters: { branches: { only: [test2] } }
+          context: [offender-management-shared, offender-management-test2]
+
+  preprod:
+    jobs:
+      - fetch_secrets:
+          filters: { branches: { only: [preprod] } }
+          context: [offender-management-shared, offender-management-preprod]
+      - build_and_push_docker_image:
+          requires: [fetch_secrets]
+          filters: { branches: { only: [preprod] } }
+          context: [offender-management-shared, offender-management-preprod]
+      - deploy:
+          requires: [build_and_push_docker_image]
+          filters: { branches: { only: [preprod] } }
+          context: [offender-management-shared, offender-management-preprod]
+
+  staging_and_production:
+    jobs:
+      - install_dependencies:
+          filters: { branches: { only: [main] } }
+      - fetch_secrets:
+          name: 'fetch_staging_secrets'
+          filters: { branches: { only: [main] } }
+          context: [offender-management-shared, offender-management-staging]
+
+      - build_and_push_docker_image:
+          requires: [install_dependencies, fetch_staging_secrets]
+          filters: { branches: { only: [main] } }
+          context: [offender-management-shared, offender-management-staging]
+      - rubocop:
+          requires: [install_dependencies]
+          filters: { branches: { only: [main] } }
+      - test:
+          requires: [install_dependencies, fetch_staging_secrets]
+          filters: { branches: { only: [main] } }
+          context: [offender-management-shared, offender-management-staging]
+
+      - deploy:
+          name: deploy_staging
+          requires: [build_and_push_docker_image, rubocop, test]
+          filters: { branches: { only: [main] } }
+          context: [offender-management-shared, offender-management-staging]
+
+      - deploy:
+          name: deploy_production
+          requires: [deploy_staging]
+          filters: { branches: { only: [main] } }
+          context: [offender-management-shared, offender-management-production]

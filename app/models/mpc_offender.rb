@@ -11,7 +11,7 @@ class MpcOffender
            :date_of_birth, :main_offence, :awaiting_allocation_for, :location,
            :category_label, :complexity_level, :category_code, :category_active_since,
            :first_name, :last_name, :full_name_ordered, :full_name,
-           :inside_omic_policy?, :offender_no, :prison_id, :restricted_patient?, to: :@prison_record
+           :inside_omic_policy?, :offender_no, :prison_id, :restricted_patient?, :age, to: :@prison_record
 
   delegate :crn, :case_allocation, :manual_entry?, :nps_case?,
            :tier,
@@ -19,7 +19,8 @@ class MpcOffender
 
   delegate :victim_liaison_officers, :current_parole_record, :previous_parole_records,
            :most_recent_parole_record, :build_parole_record_sections, :parole_record_awaiting_hearing,
-           :most_recent_completed_parole_record, to: :@offender
+           :most_recent_completed_parole_record, :handover_progress_task_completion_data, :handover_progress_complete?,
+           to: :@offender
 
   # These fields make sense to be nil when the probation record is nil - the others dont
   delegate :ldu_email_address, :team_name, :ldu_name, to: :probation_record, allow_nil: true
@@ -31,7 +32,7 @@ class MpcOffender
   def initialize(prison:, offender:, prison_record:)
     @prison = prison
     @offender = offender
-    @prison_record = prison_record
+    @prison_record = prison_record # @type HmppsApi::Offender
     @probation_record = offender.case_information
     offender.build_parole_record_sections
     @pom_tasks = build_pom_tasks
@@ -259,6 +260,175 @@ class MpcOffender
       calc_status.save!
       EarlyAllocationEventService.send_early_allocation(calc_status)
     end
+  end
+
+  def prison_timeline
+    @prison_timeline ||= HmppsApi::PrisonTimelineApi.get_prison_timeline(offender_no)
+
+  # Temp fix while Prison API prison timeline sometimes returns 500
+  # for some offenders
+  rescue Faraday::ServerError
+    nil
+  end
+
+  def additional_information
+    return [] if prison_timeline.nil?
+
+    attended_prisons = prison_timeline['prisonPeriod'].map { |p| p['prisons'] }.flatten
+
+    # Remove only ONE of any prison codes that match the current prison
+    previously_attended_prisons = (attended_prisons.reject { |p| p == prison.code }) +
+      attended_prisons.select { |p| p == prison.code }.drop(1)
+
+    [].tap do |output|
+      output << 'Recall' if recalled? && previously_attended_prisons.any?
+
+      output << if previously_attended_prisons.empty?
+                  'New to custody'
+                elsif previously_attended_prisons.include?(prison.code)
+                  'Returning to this prison'
+                else
+                  'New to this prison'
+                end
+    end
+  end
+
+  def rosh_summary
+    nil_result = { high_rosh_children: nil,
+                   high_rosh_public: nil,
+                   high_rosh_known_adult: nil,
+                   high_rosh_staff: nil,
+                   high_rosh_prisoners: nil }
+
+    return nil_result unless USE_RISKS_API
+
+    begin
+      community_data = OffenderService.get_community_data(offender_no)
+      all_risks = HmppsApi::AssessRisksAndNeedsApi.get_rosh_summary(community_data[:crn])
+
+      grouped_risks = {}.tap do |risks|
+        if all_risks['riskInCustody'].present?
+          all_risks['riskInCustody'].each do |level, groups|
+            groups.each { |group| risks[group] = level.tr('_', ' ').downcase }
+          end
+        end
+      end
+
+      {
+        high_rosh_children: grouped_risks['Children'],
+        high_rosh_public: grouped_risks['Public'],
+        high_rosh_known_adult: grouped_risks['Know adult'],
+        high_rosh_staff: grouped_risks['Staff'],
+        high_rosh_prisoners: grouped_risks['Prisoners']
+      }
+    rescue Faraday::ResourceNotFound
+      nil_result
+    end
+  end
+
+  def active_alert_labels
+    labels = {
+      'CSIP' => 'CSIP',
+      'F1' => 'Veteran',
+      'HA' => 'ACCT open',
+      'HA1' => 'ACCT post closure',
+      'LCE' => 'Care experienced',
+      'PEEP' => 'PEEP',
+      'RCDR' => 'Quarantined',
+      'RCON' => 'Conflict',
+      'RLG' => 'Risk to LGBT',
+      'RNO121' => 'No one-to-one',
+      'RTP' => 'Risk to LGBT',
+      'UPIU' => 'Protective Isolation Unit',
+      'URCU' => 'Reverse Cohorting Unit',
+      'URS' => 'Refusing to shield',
+      'USU' => 'Shielding Unit',
+      'XA' => 'Arsonist',
+      'XCA' => 'Chemical attacker',
+      'XCI' => 'Concerted indiscipline',
+      'XCO' => 'Corruptor',
+      'XCU' => 'Controlled unlock',
+      'XEL' => 'E-list',
+      'XGANG' => 'Gang member',
+      'XHT' => 'Hostage taker',
+      'XR' => 'Racist',
+      'XRF' => 'Risk to females',
+      'XSA' => 'Staff assaulter',
+      'XTACT' => 'TACT'
+    }
+
+    all_alerts = HmppsApi::PrisonApi::OffenderApi.get_offender_alerts(offender_no)
+    active_alerts = all_alerts.select { |a| a['active'] == true }
+    active_codes = active_alerts.map { |a| a['alertCode'] }.uniq
+    active_codes.map { |c| labels[c] }.compact
+  end
+
+  def model
+    @offender
+  end
+
+  def attributes_to_archive
+    attr_names = %w[
+      recalled?
+      immigration_case?
+      indeterminate_sentence?
+      sentenced?
+      over_18?
+      describe_sentence
+      civil_sentence?
+      sentence_start_date
+      conditional_release_date
+      automatic_release_date
+      parole_eligibility_date
+      tariff_date
+      post_recall_release_date
+      licence_expiry_date
+      home_detention_curfew_actual_date
+      home_detention_curfew_eligibility_date
+      prison_arrival_date
+      earliest_release_date
+      earliest_release
+      latest_temp_movement_date
+      release_date
+      date_of_birth
+      main_offence
+      awaiting_allocation_for
+      location
+      category_label
+      complexity_level
+      category_code
+      category_active_since
+      first_name
+      last_name
+      full_name_ordered
+      full_name
+      inside_omic_policy?
+      offender_no
+      prison_id
+      restricted_patient?
+      crn
+      case_allocation
+      manual_entry?
+      nps_case?
+      tier
+      mappa_level
+      welsh_offender
+      ldu_email_address
+      team_name
+      ldu_name
+      allocated_com_name
+      allocated_com_email
+      target_hearing_date
+      early_allocation_state
+    ]
+
+    attr_names.index_with { |attr_name| send(attr_name) }
+  end
+
+  def released?(relative_to_date: Time.zone.now.utc.to_date)
+    return false if earliest_release_date.nil?
+
+    earliest_release_date <= relative_to_date
   end
 
 private

@@ -31,6 +31,9 @@ feature "womens allocation journey" do
     alloc.deallocate_offender_after_release
     alloc.update! primary_pom_nomis_id: prison_pom.staff_id
     alloc.deallocate_offender_after_release
+
+    stub_request(:get, "https://www.gov.uk/bank-holidays.json").to_return(body: {}.to_json)
+    stub_community_offender(nomis_offender_id, build(:community_data))
   end
 
   context 'without an existing allocation' do
@@ -120,6 +123,7 @@ feature "womens allocation journey" do
 
   context 'with an existing allocation' do
     let(:offender_id) { offenders.first.fetch(:prisonerNumber) }
+    let(:offender_name) { "#{offenders.first.fetch(:lastName)}, #{offenders.first.fetch(:firstName)}" }
     let(:allocation) { AllocationHistory.find_by!(nomis_offender_id: offender_id) }
 
     before do
@@ -131,8 +135,10 @@ feature "womens allocation journey" do
       visit allocated_prison_prisoners_path prison.code
       sleep 1
       within '.allocated_offender_row_0' do
-        click_link 'View'
+        click_link offender_name
       end
+
+      stub_community_offender(offender_id, build(:community_data))
     end
 
     scenario 'accepting recommendation' do

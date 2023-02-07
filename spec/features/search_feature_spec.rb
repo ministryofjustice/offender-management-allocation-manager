@@ -72,7 +72,7 @@ feature 'Search for offenders' do
     it 'Can search from the Awaiting Allocation summary page', vcr: { cassette_name: 'prison_api/waiting_allocation_search_feature' } do
       visit unallocated_prison_prisoners_path(prison_code)
 
-      expect(page).to have_text('Make new allocations')
+      expect(page).to have_text('Make allocations')
       fill_in 'q', with: 'Tre'
       click_on('search-button')
 
@@ -83,7 +83,7 @@ feature 'Search for offenders' do
     it 'Can search from the Missing Information summary page', vcr: { cassette_name: 'prison_api/missing_info_search_feature' } do
       visit missing_information_prison_prisoners_path(prison_code)
 
-      expect(page).to have_text('Make new allocations')
+      expect(page).to have_text('Make allocations')
       fill_in 'q', with: 'Ste'
       click_on('search-button')
 

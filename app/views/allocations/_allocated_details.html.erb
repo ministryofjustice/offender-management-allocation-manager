@@ -1,0 +1,51 @@
+<ul id="text-to-copy" class="govuk-list" style="margin-top: 10px;">
+  <li>Name: <%= offender_name %></li>
+  <li>Prison number: <%= prisoner_number %></li>
+
+  <% if prev_pom_name.blank? %>
+    <% if co_working_pom_name.nil? %>
+      <li>POM: <%= pom_name %></li>
+    <% else %>
+      <li>Primary POM: <%= pom_name %></li>
+      <li>Co-working POM: <%= co_working_pom_name %></li>
+    <% end %>
+  <% else %>
+    <li>Allocating from: <%= prev_pom_name %></li>
+    <li>Allocating to: <%= pom_name %></li>
+  <% end %>
+
+  <li>POM role: <%= pom_role %></li>
+
+  <% if USE_MAPPA_IN_ALLOC_MSG %>
+    <li class="govuk-!-margin-top-4">MAPPA: <%= mappa_level %></li>
+  <% end %>
+
+  <% unless [high_rosh_children, high_rosh_public, high_rosh_known_adult, high_rosh_staff, high_rosh_prisoners].compact.empty? %>
+    <li class="govuk-!-margin-top-4">High RoSH:
+      <ul class="govuk-list govuk-list--bullet">
+        <li>Children - <%= high_rosh_children %></li>
+        <li>Public - <%= high_rosh_public %></li>
+        <li>Known adult - <%= high_rosh_known_adult %></li>
+        <li>Staff - <%= high_rosh_staff %></li>
+        <li>Prisoners - <%= high_rosh_prisoners %></li>
+      </ul>
+    </li>
+  <% end %>
+
+  <% if USE_ALERTS_IN_ALLOC_MSG %>
+    <li class="govuk-!-margin-top-4">Active alerts: <%= active_alerts %></li>
+  <% end %>
+
+  <li class="govuk-!-margin-top-4">Last OASys completed: <%= last_oasys_completed %></li>
+  <li>Handover start due: <%= handover_start_date %></li>
+  <li>Handover completion due: <%= handover_completion_date %></li>
+
+  <li class="govuk-!-margin-top-4">LDU: <%= ldu_name %></li>
+  <li>LDU email: <%= ldu_email %></li>
+  <li>COM: <%= com_name %></li>
+  <li>COM email: <%= com_email %></li>
+
+  <% unless additional_notes.blank? %>
+    <li class="govuk-!-margin-top-4 govuk-!-margin-bottom-3">Additional notes: <%= additional_notes %></li>
+  <% end %>
+</ul>

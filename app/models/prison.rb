@@ -1,4 +1,6 @@
 class Prison < ApplicationRecord
+  has_paper_trail
+
   validates :prison_type, presence: true
   validates :code, :name, presence: true, uniqueness: true
   has_many :pom_details, dependent: :destroy, foreign_key: :prison_code, inverse_of: :prison
@@ -53,6 +55,8 @@ class Prison < ApplicationRecord
     @allocations ||= AllocationHistory.active_allocations_for_prison(code).where(nomis_offender_id: all_policy_offenders.map(&:offender_no))
   end
 
+  delegate :for_pom, to: :allocations, prefix: true
+
   delegate :allocated, to: :summary
 
   delegate :unallocated, to: :summary
@@ -60,6 +64,15 @@ class Prison < ApplicationRecord
   delegate :new_arrivals, to: :summary
 
   delegate :missing_info, to: :summary
+
+  def primary_allocated_offenders
+    alloc_hash = allocations.index_by(&:nomis_offender_id)
+
+    allocated.select { |offender| alloc_hash.key?(offender.offender_no) && !offender.released? }.map do |offender|
+      AllocatedOffender.new(alloc_hash[offender.offender_no].primary_pom_nomis_id,
+                            alloc_hash.fetch(offender.offender_no), offender)
+    end
+  end
 
 private
 

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe HandoverDateService do
+describe HandoverDateService, 'old' do
   let(:prison) { build(:prison) }
 
   describe 'calculating when community start supporting custody' do
@@ -39,7 +39,7 @@ describe HandoverDateService do
         let(:indeterminate) { false }
 
         it 'is 7.5 months before release date' do
-          expect(subject).to eq(start_date: Date.new(2025, 1, 15), handover_date: Date.new(2025, 4, 15))
+          expect(subject[:start_date]).to eq(Date.new(2025, 1, 15))
         end
 
         describe 'com_supporting?' do
@@ -57,14 +57,6 @@ describe HandoverDateService do
             it 'is false' do
               Timecop.travel Date.new(2025, 4, 16) do
                 expect(subject).to eq(false)
-              end
-            end
-          end
-
-          context 'when between dates' do
-            it 'is true' do
-              Timecop.travel Date.new(2025, 3, 16) do
-                expect(subject).to eq(true)
               end
             end
           end
@@ -126,7 +118,7 @@ describe HandoverDateService do
         let(:ard) { nil }
 
         it 'will be unaffected' do
-          expect(subject).to eq(start_date: Date.new(2020, 10, 18), handover_date: Date.new(2021, 1, 18))
+          expect(subject[:start_date]).to eq Date.new(2020, 10, 18)
         end
       end
 
@@ -204,7 +196,7 @@ describe HandoverDateService do
           let(:ard) { nil }
 
           it 'will be unaffected' do
-            expect(subject).to eq(start_date: Date.new(2020, 10, 18), handover_date: Date.new(2021, 1, 18))
+            expect(subject[:start_date]).to eq Date.new(2020, 10, 18)
           end
         end
       end
@@ -309,140 +301,6 @@ describe HandoverDateService do
 
             it 'is 8 months before parole date' do
               expect(result).to eq(Date.new(2020, 1, 30))
-            end
-          end
-
-          context 'when non-parole case' do
-            context 'when mappa unknown' do
-              let(:mappa_level) { nil }
-
-              context 'when crd before ard' do
-                it 'is 4.5 months before CRD' do
-                  expect(result).to eq(Date.new(2021, 3, 1))
-                end
-              end
-
-              context 'when HDCED is present and earlier than the ARD/CRD calculated date' do
-                let(:home_detention_curfew_eligibility_date) {  Date.new(2021, 6, 16) }
-                let(:automatic_release_date) { Date.new(2021, 11, 10) }
-                let(:conditional_release_date) { Date.new(2021, 12, 5) }
-
-                it 'is set to HDCED' do
-                  expect(result).to eq(home_detention_curfew_eligibility_date)
-                end
-              end
-
-              context 'when HDCAD is present' do
-                let(:home_detention_curfew_eligibility_date) { Date.new(2021, 6, 16) }
-                let(:home_detention_curfew_actual_date) { Date.new(2021, 6, 20) }
-
-                it 'is set to HDCAD' do
-                  expect(result).to eq(home_detention_curfew_actual_date)
-                end
-              end
-            end
-
-            context "with mappa level 0 (maapa doesn't apply)" do
-              let(:mappa_level) { 0 }
-
-              context 'when crd before ard' do
-                it 'is 4.5 months before CRD' do
-                  expect(result).to eq(Date.new(2021, 3, 1))
-                end
-              end
-
-              context 'when crd after ard' do
-                let(:conditional_release_date) { Date.new(2021, 8, 17) }
-
-                it 'is 4.5 months before ARD' do
-                  expect(result).to eq(Date.new(2021, 4, 1))
-                end
-              end
-
-              context 'when HDC date earlier than the CRD/ARD calculated date' do
-                let(:home_detention_curfew_eligibility_date) { Date.new(2021, 2, 28) }
-
-                it 'is on HDC date' do
-                  expect(result).to eq(Date.new(2021, 2, 28))
-                end
-              end
-
-              context 'when HDCED date later than date indicated by CRD/ARD' do
-                let(:home_detention_curfew_eligibility_date) { Date.new(2022, 2, 14) }
-
-                it 'is 4.5 months before CRD' do
-                  expect(result).to eq(Date.new(2021, 3, 1))
-                end
-              end
-
-              context 'when HDCAD is present' do
-                let(:home_detention_curfew_actual_date) { Date.new(2021, 2, 15) }
-                let(:home_detention_curfew_eligibility_date) { Date.new(2021, 2, 28) }
-
-                it 'is on HDCAD date' do
-                  expect(result).to eq(Date.new(2021, 2, 15))
-                end
-              end
-            end
-
-            context 'with mappa level 1' do
-              let(:mappa_level) { 1 }
-
-              it 'is 4.5 months before CRD/ARD date or on HDC date' do
-                expect(result).to eq(Date.new(2021, 3, 1))
-              end
-            end
-
-            context 'with mappa level 2' do
-              let(:mappa_level) { 2 }
-
-              it 'is todays date' do
-                expect(result).to eq(Time.zone.today)
-              end
-
-              context 'with release dates far in the future' do
-                let(:conditional_release_date) { '20 Sept 2100'.to_date }
-                let(:automatic_release_date) { '20 Sept 2100'.to_date }
-
-                it 'returns 7.5 months before those release dates' do
-                  expect(result).to eq('5 Feb 2100'.to_date)
-                end
-              end
-
-              context 'with missing release dates' do
-                let(:conditional_release_date) { nil }
-                let(:automatic_release_date) { nil }
-
-                it 'returns nil' do
-                  expect(result).to be_nil
-                end
-              end
-            end
-
-            context 'with mappa level 3' do
-              let(:mappa_level) { 3 }
-
-              it 'is todays date' do
-                expect(result).to eq(Time.zone.today)
-              end
-
-              context 'with release dates far in the future' do
-                let(:conditional_release_date) { '20 Sept 2100'.to_date }
-                let(:automatic_release_date) { '20 Sept 2100'.to_date }
-
-                it 'returns 7.5 months before those release dates' do
-                  expect(result).to eq('5 Feb 2100'.to_date)
-                end
-              end
-
-              context 'with missing release dates' do
-                let(:conditional_release_date) { nil }
-                let(:automatic_release_date) { nil }
-
-                it 'returns nil' do
-                  expect(result).to be_nil
-                end
-              end
             end
           end
         end

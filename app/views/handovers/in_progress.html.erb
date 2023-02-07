@@ -1,109 +1,16 @@
-<h2 class="govuk-heading-l">
-  Handovers in progress
-</h2>
+<%=
+  if @pom_view
+    description = 'Discuss information about the case with the COM,' \
+                  'highlighting any pre-release or pre-parole needs you have identified.'
+  else
+    description = 'The POM should start sharing information about the case with the COM, ' \
+                   'highlighting any pre-release or pre-parole needs they have identified.'
+  end
 
-<p>
-  Discuss information about the case with the COM,
-  highlighting any pre-release or pre-parole needs you have identified.
-</p>
-
-<table class="govuk-table in-progress-handovers" data-module="moj-sortable-table">
-  <thead class="govuk-table__head">
-  <tr class="govuk-table__row">
-    <th scope="col" class="govuk-table__header" aria-sort="none">
-      <button type="button" data-index="0">Prisoner details</button>
-    </th>
-    <th scope="col" class="govuk-table__header" aria-sort="none">
-      <button type="button" data-index="1">COM details</button>
-    </th>
-    <th scope="col" class="govuk-table__header" aria-sort="ascending">
-      <button type="button" data-index="2">COM responsible</button>
-    </th>
-    <th scope="col" class="govuk-table__header" aria-sort="none">
-      <button type="button" data-index="3">Earliest release date</button>
-    </th>
-    <th scope="col" class="govuk-table__header" aria-sort="none">
-      <button type="button" data-index="4">Tier</button>
-    </th>
-    <th scope="col" class="govuk-table__header handover-progress">Handover progress</th>
-  </tr>
-  </thead>
-
-  <tbody class="govuk-table__body">
-  <% @handover_cases.in_progress.each do |calc_h_o_date, allocated_offender| %>
-    <tr class="govuk-table__row allocated-offender">
-      <td class="govuk-table__cell prisoner-details">
-        <a class="govuk-link govuk-link--no-visited-state"
-           data-sort-value="<%= allocated_offender.last_name %>"
-           href="<%= prison_prisoner_path(@prison_id, allocated_offender.offender_no) %>">
-          <%= allocated_offender.full_name %>
-        </a><br>
-        <span class="govuk-hint govuk-!-margin-bottom-0 offender-no"><%= allocated_offender.offender_no %></span>
-      </td>
-
-      <% com_name = allocated_offender.allocated_com_name %>
-      <td class="govuk-table__cell com-details" data-sort-value="<%= com_name || 'Unknown' %>">
-        <% if com_name.nil? and calc_h_o_date.com_allocated_date > Time.zone.now.to_date - 2.days %>
-          Unknown
-        <% elsif com_name.nil? %>
-          <div class="highlight-primary highlight-alert">Unknown</div>
-          <div class="highlight-secondary highlight-alert">Allocation overdue</div>
-        <% else %>
-          <%= com_name %><br>
-          <%= allocated_offender.allocated_com_email || "No email address available" %>
-        <% end %>
-          </td>
-
-      <% alloc_date, resp_date = calc_h_o_date.com_allocated_date, calc_h_o_date.com_responsible_date %>
-      <td class="govuk-table__cell handover-dates" data-sort-value="<%= alloc_date.iso8601 %>">
-        <% unless alloc_date == resp_date %>
-          <p>
-            COM allocated: <br>
-            <%= format_date(alloc_date, replacement: "Unknown") %>
-          </p>
-        <% end %>
-        <p>
-          COM responsible: <br>
-          <%= format_date(resp_date, replacement: "Unknown") %>
-        </p>
-      </td>
-
-      <% rel_date = allocated_offender.earliest_release.fetch(:date) %>
-      <td class="govuk-table__cell earliest-release-date" data-sort-value="<%= rel_date.iso8601 %>">
-        <%= allocated_offender.earliest_release.fetch(:type) %>: <br>
-        <%= format_date(rel_date, replacement: "ERROR: Unknown") %>
-      </td>
-
-      <td class="govuk-table__cell tier" data-sort-value="<%= allocated_offender.case_allocation %>">
-        <strong><%= allocated_offender.tier %></strong>
-        <p><%= allocated_offender.case_allocation %> (legacy)</p>
-      </td>
-
-      <td class="govuk-table__cell handover-progress">
-        <ul class="govuk-list govuk-body-s task-summary-checklist">
-          <li class="none">
-            <img src="<%= image_path('check.png') %>" alt="task complete">
-            Review OASys
-          </li>
-          <li class="none">
-            <img src="<%= image_path('cross.png') %>" alt="task complete">
-            Have contact from COM
-          </li>
-          <li class="none">
-            <img src="<%= image_path('cross.png') %>" alt="task not started">
-            Send handover report
-          </li>
-        </ul>
-        <p>
-          <a class="govuk-link govuk-link--no-visited-state" href="#">
-            Record progress
-          </a>
-        </p>
-      </td>
-    </tr>
-  <% end %>
-  </tbody>
-</table>
-
-<div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>
-<div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>
+  render 'shared_in_progress',
+         heading: 'Handovers in progress',
+         description: description,
+         table_class: 'in-progress-handovers',
+         cases: @handover_cases.in_progress,
+         no_cases_message: 'No handovers in progress right now'
+%>

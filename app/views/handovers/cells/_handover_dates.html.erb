@@ -1,0 +1,9 @@
+<% handover_date = calc_handover.handover_date %>
+<% should_highlight = local_assigns[:should_highlight] %>
+<td class="govuk-table__cell handover-dates" data-sort-value="<%= handover_date.iso8601 %>">
+  <%= highlight_conditionally('alert', 'Handover tasks overdue',
+                              -> { should_highlight && !offender.handover_progress_complete? }) do %>
+    COM responsible: <br>
+    <%= format_date(handover_date, replacement: "Unknown") %>
+  <% end %>
+</td>

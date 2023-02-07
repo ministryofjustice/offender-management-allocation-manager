@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class CoworkingController < PrisonsApplicationController
+  include OffenderHelper
+
   def new
     @prisoner = offender(nomis_offender_id_from_url)
     current_pom_id = AllocationHistory.find_by!(nomis_offender_id: nomis_offender_id_from_url).primary_pom_nomis_id
@@ -19,20 +21,20 @@ class CoworkingController < PrisonsApplicationController
     @prisoner = offender(nomis_offender_id_from_url)
     @primary_pom = @prison.get_single_pom(primary_pom_id_from_url)
     @secondary_pom = @prison.get_single_pom(secondary_pom_id_from_url)
+    @latest_allocation_details = session[:latest_allocation_details] = format_allocation(
+      offender: @prisoner, pom: @primary_pom, view_context: view_context, co_working_pom: @secondary_pom)
   end
 
   def create
-    offender = offender(allocation_params[:nomis_offender_id])
-    pom = @prison.get_single_pom(allocation_params[:nomis_staff_id])
-
     AllocationService.allocate_secondary(
       nomis_offender_id: allocation_params[:nomis_offender_id],
       secondary_pom_nomis_id: allocation_params[:nomis_staff_id],
       created_by_username: current_user,
       message: allocation_params[:message]
     )
-    redirect_to unallocated_prison_prisoners_path(active_prison_id),
-                notice: "#{offender.full_name_ordered} has been allocated to #{view_context.full_name_ordered(pom)} (#{view_context.grade(pom)})"
+
+    session[:latest_allocation_details][:additional_notes] = allocation_params[:message]
+    redirect_to allocated_prison_prisoners_path(active_prison_id)
   end
 
   def confirm_removal

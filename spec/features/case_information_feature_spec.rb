@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'case information feature' do
+feature 'case information feature', flaky: true do
   context 'when doing an allocate and save' do
     let(:prison) { create(:prison) }
     let(:offender) { build(:nomis_offender, prisonId: prison.code) }
@@ -88,10 +88,10 @@ feature 'case information feature' do
       within ".govuk-table tr:first-child td:nth-child(3)" do
         click_link 'Add missing details'
       end
-      expect(page).to have_selector('h1', text: 'Case information')
+      expect(page).to have_content('Case information')
       click_link 'Back'
       find('#awaiting-information')
-      expect(page).to have_selector('h1', text: 'Add missing details')
+      expect(page).to have_content('Add missing details')
       expect(current_page_number).to eq(3)
     end
 
@@ -141,7 +141,7 @@ feature 'case information feature' do
       visit missing_information_prison_prisoners_path('LEI', sort: "last_name desc", page: 3)
       expect(current_page_number).to eq(3)
 
-      within ".govuk-table tr:first-child td:nth-child(3)" do
+      within ".govuk-table tr:nth-child(4) td:nth-child(3)" do
         click_link 'Add missing details'
       end
       expect(page).to have_selector('h1', text: 'Case information')

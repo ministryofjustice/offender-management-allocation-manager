@@ -72,10 +72,15 @@ FactoryBot.define do
       paroleEligibilityDate { Time.zone.today + 8.months + 21.days }
     end
 
+    trait :after_handover do
+      conditionalReleaseDate { Time.zone.today + 7.months }
+    end
+
     trait :unsentenced do
       sentenceStartDate { nil }
     end
 
+    # TODO: delete this when USE_NEW_HANDOVER_POLICY goes away
     trait :inside_handover_window do
       conditionalReleaseDate { Time.zone.today + 7.days + 7.months }
     end
@@ -121,6 +126,3 @@ FactoryBot.define do
     end
   end
 end
-
-
-

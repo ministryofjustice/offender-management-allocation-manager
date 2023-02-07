@@ -16,6 +16,7 @@ module HmppsApi
 
           faraday.response :raise_error
         end
+        @connection.basic_auth(Rails.configuration.hmpps_api_client_id, Rails.configuration.hmpps_api_client_secret)
       end
 
       def post(route)
@@ -28,7 +29,6 @@ module HmppsApi
         response = @connection.send(method) do |req|
           url = URI.join(@host, route).to_s
           req.url(url)
-          req.headers['Authorization'] = api_authorisation
         end
 
         JSON.parse(response.body)

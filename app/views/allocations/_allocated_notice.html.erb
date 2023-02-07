@@ -1,0 +1,29 @@
+<div class="moj-banner moj-banner--success">
+  <svg class="moj-banner__icon" fill="currentColor" role="presentation" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" height="25" width="25">
+  <path d="M25,6.2L8.7,23.2L0,14.1l4-4.2l4.7,4.9L21,2L25,6.2z"></path></svg>
+
+  <div class="moj-banner__message">
+    <span class="moj-banner__assistive">Success</span>
+    <% if co_working_pom_name.blank? %>
+      <span class="message"><%= offender_name %> allocated to <%= pom_name %></span>
+    <% else %>
+      <span class="message"><%= co_working_pom_name %> allocated as co-working POM for <%= offender_name %> with <%= pom_name %></span>
+    <% end %>
+
+    <details class="govuk-details" data-module="govuk-details" style="margin-top: 10px; margin-bottom: 5px;">
+      <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">
+          You can copy information about this allocation to paste into an email to someone else
+        </span>
+      </summary>
+
+      <div class="govuk-details__text">
+        <%= render partial: 'allocations/allocated_details', locals: local_assigns %>
+
+        <button onclick="copyToClipboard('text-to-copy')" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+          Copy this information
+        </button>
+      </div>
+    </details>
+  </div>
+</div>

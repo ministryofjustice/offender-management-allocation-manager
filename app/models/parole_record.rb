@@ -2,6 +2,8 @@
 
 class ParoleRecord < ApplicationRecord
   self.table_name = 'parole_records_v2'
+  
+  has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
 
   belongs_to :offender, foreign_key: :nomis_offender_id, inverse_of: :parole_records
 

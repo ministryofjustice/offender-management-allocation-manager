@@ -17,8 +17,14 @@ Rails.application.routes.draw do
       collection do
         get :upcoming
         get :in_progress
+        get :overdue_tasks
+        get :com_allocation_overdue
       end
     end
+    get 'handovers/:nomis_offender_id/progress_checklist' => 'handover_progress_checklists#edit',
+        as: :edit_handover_progress_checklist
+    put 'handovers/:nomis_offender_id/progress_checklist' => 'handover_progress_checklists#update',
+        as: :update_handover_progress_checklist
     resources :staff do
       resources :caseload_handovers, only: %i[index]
       #resources :caseload do
@@ -132,6 +138,7 @@ Rails.application.routes.draw do
     end
 
     get('/debugging' => 'debugging#debugging')
+    get('prisoners/:id/debugging' => redirect('/prisons/%{prison_id}/debugging?offender_no=%{id}'))
   end
 
   match "/401", :to => "errors#unauthorized", :via => :all
@@ -156,6 +163,12 @@ Rails.application.routes.draw do
 
   resources :health, only: %i[ index ], controller: 'health'
   resources :status, only: %i[ index ], controller: 'status'
+
+  resources :feature_flags, only: [] do
+    collection do
+      get :activate_new_handovers_ui
+    end
+  end
 
   namespace :api do
     get('/' => 'api#index')

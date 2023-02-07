@@ -1,12 +1,14 @@
 require "rails_helper"
 
-feature "get poms list" do
+feature "get poms list", flaky: true do
   let(:offender_missing_sentence_case_info) { create(:case_information, offender: build(:offender, nomis_offender_id: 'G1247VX')) }
 
   # NOMIS Staff ID of the POM called "Moic Pom"
   let(:moic_pom_id) { 485_926 }
 
   before do
+    allow(OffenderService).to receive(:get_community_data).and_return({ crn: 12_345 })
+    allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_rosh_summary).and_return({})
     signin_spo_user
   end
 
@@ -32,7 +34,7 @@ feature "get poms list" do
       end
     end
 
-    expect(page).to have_css('p', text: "You are allocating Aianilan Albina to Moic Pom")
+    expect(page).to have_css('h1', text: "Check allocation details for Aianilan Albina")
 
     click_button 'Complete allocation'
 

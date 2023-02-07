@@ -1,3 +1,5 @@
+<% content_for :title, translate('handovers.page_title.default') %>
+
 <% content_for :main_content do %>
   <% content_for :switcher do %>
     <%= render '/layouts/prison_switcher' %>
@@ -8,27 +10,22 @@
       <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
         Your handover cases
       </h1>
+
+      <p>
+        <% if current_user_is_pom? && current_user_is_spo? %>
+          <% if @pom_view %>
+            <%= link_to 'See all handover cases in this prison', url_for,
+                        class: %w[govuk-link govuk-link--no-visited-state] %>
+          <% else %>
+            <%= link_to 'See your handover cases only ', url_for(params: {pom: '1'}),
+                        class: %w[govuk-link govuk-link--no-visited-state] %>
+          <% end %>
+        <% end %>
+      </p>
     </div>
 
     <div class="govuk-grid-column-one-third">
-      <aside class="app-related-items" role="complementary">
-        <h3 class="govuk-heading-m">
-          More on handovers
-        </h3>
-
-        <ul class="govuk-list">
-          <li>
-            <a class="govuk-link govuk-link--no-visited-state" href="#">
-              View handover guidance on EQuiP
-            </a>
-          </li>
-          <li>
-            <a class="govuk-link govuk-link--no-visited-state" href="#">
-              Choose how often we send you emails to remind you about handovers
-            </a>
-          </li>
-        </ul>
-      </aside>
+      <%= render '/handovers/more_on_handovers' %>
     </div>
   </div>
 
@@ -37,24 +34,34 @@
       <nav class="moj-sub-navigation" aria-label="Sub navigation">
         <ul class='moj-sub-navigation__list'>
           <% [
-               ['upcoming', "Upcoming handovers (#{@handover_cases.upcoming.count})", upcoming_prison_handovers_path(@prison_id)],
-               ['in_progress', "Handovers in progress (#{@handover_cases.in_progress.count})", in_progress_prison_handovers_path(@prison_id)],
-               ['overdue_tasks', 'Overdue tasks (_)', '#'],
-               ['com_allocation_overdue', 'COM allocation overdue (_)', '#'],
-             ].each do |action, title, path|
+               ['upcoming', "Upcoming handovers (#{@handover_cases.upcoming.count})"],
+               ['in_progress', "Handovers in progress (#{@handover_cases.in_progress.count})"],
+               ['overdue_tasks', "Overdue tasks (#{@handover_cases.overdue_tasks.count})"],
+               ['com_allocation_overdue', "COM allocation overdue (#{@handover_cases.com_allocation_overdue.count})"],
+             ].each do |action, title|
           %>
             <li class="moj-sub-navigation__item">
-              <a class="moj-sub-navigation__link govuk-link--no-visited-state"
-                 <% if controller.action_name == action -%>aria-current="page"<% end -%>
-                 href="<%= path %>">
-                <%= title %>
-              </a>
+              <%= handover_tab_navigation_link action, title, @pom_view %>
             </li>
           <% end %>
         </ul>
       </nav>
     </div>
   </div>
+
+  <% if flash[:handover_success_notice].present? %>
+    <div class="moj-banner moj-banner--success">
+      <svg class="moj-banner__icon" fill="currentColor" role="img" focusable="false"
+           xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" height="25" width="25">
+        <path d="M25,6.2L8.7,23.2L0,14.1l4-4.2l4.7,4.9L21,2L25,6.2z"></path>
+      </svg>
+
+      <div class="moj-banner__message">
+        <span class="moj-banner__assistive">Success</span>
+        <%= flash[:handover_success_notice] %>
+      </div>
+    </div>
+  <% end %>
 
   <%= yield %>
 <% end %>

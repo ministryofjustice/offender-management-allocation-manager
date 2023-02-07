@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class EarlyAllocation < ApplicationRecord
+  has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
+
   before_save :record_outcome
 
   belongs_to :offender,

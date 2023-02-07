@@ -2,12 +2,12 @@
 
 class EmailService
   class << self
-    def send_email(message:, allocation:, pom_nomis_id:)
+    def send_email(message:, allocation:, pom_nomis_id:, further_info: {})
       pom = pom_for(allocation, pom_nomis_id)
       return if pom.email_address.blank?
 
-      send_deallocation_email pom: pom, allocation: allocation
-      deliver_new_allocation_email pom: pom, message: message, allocation: allocation
+      send_deallocation_email pom: pom, allocation: allocation, further_info: further_info
+      deliver_new_allocation_email pom: pom, message: message, allocation: allocation, further_info: further_info
     end
 
     def send_coworking_primary_email(message:, allocation:)
@@ -90,7 +90,7 @@ class EmailService
       HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(previous.primary_pom_nomis_id)
     end
 
-    def send_deallocation_email(pom:, allocation:)
+    def send_deallocation_email(pom:, allocation:, further_info:)
       if allocation.event == 'reallocate_primary_pom'
         previous_pom = previous_pom_for(allocation)
         # If the previous pom does not have email configured, do not
@@ -107,12 +107,13 @@ class EmailService
           offender_name: offender.full_name,
           offender_no: offender.offender_no,
           prison: Prison.find(pom.agency_id).name,
-          url: Rails.application.routes.url_helpers.prison_staff_caseload_url(allocation.prison, pom.staff_id)
+          url: Rails.application.routes.url_helpers.prison_staff_caseload_url(allocation.prison, pom.staff_id),
+          further_info: further_info
         ).deliver_later
       end
     end
 
-    def deliver_new_allocation_email(pom:, message:, allocation:)
+    def deliver_new_allocation_email(pom:, message:, allocation:, further_info:)
       offender = offender_for(allocation)
 
       PomMailer.new_allocation_email(
@@ -122,7 +123,8 @@ class EmailService
         offender_name: offender.full_name,
         offender_no: offender.offender_no,
         message: message,
-        url: Rails.application.routes.url_helpers.prison_prisoner_allocation_url(allocation.prison, offender.offender_no)
+        url: Rails.application.routes.url_helpers.prison_prisoner_allocation_url(allocation.prison, offender.offender_no),
+        further_info: further_info
       ).deliver_later
     end
   end

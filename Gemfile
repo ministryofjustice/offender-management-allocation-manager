@@ -1,16 +1,17 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.7.5'
+ruby '2.7.7'
 
-gem 'rails', '~> 6.1.6'
+gem 'rails', '~> 6.1.7'
 gem 'auto_strip_attributes'
 # Need AWS SNS SDK for publishing events to HMPPS_DOMAIN_EVENTS
 gem 'aws-sdk-sns'
 gem 'bootsnap', '>= 1.1.0', require: false
 gem 'coffee-rails', '~> 5.0'
 gem 'date_validator'
-gem 'faraday', '~> 1.0'
+gem 'faraday', '~> 1.10.3'
+gem 'net-http' # needed to undo a conflict with system libs
 gem 'govuk_notify_rails'
 # we need the extra is_csv parameter available in 5.2 and above
 gem 'notifications-ruby-client', '>= 5.2'
@@ -23,19 +24,20 @@ gem 'logstash-event'
 # to enable custom log stats by writing logs directly
 gem 'logstash-logger'
 gem 'omniauth-oauth2'
-gem 'paper_trail'
+gem 'omniauth', '~> 1.9.2', require: nil
+gem 'paper_trail', '~> 12.3.0'
 gem 'pg'
 gem 'puma', '~> 5.6.4'
 gem 'prometheus_exporter'
-gem 'sidekiq', '>= 6.4.0'
+gem 'sidekiq', '>= 6.4.0', '< 6.5.0'
 gem 'sentry-raven'
 gem 'turbolinks', '~> 5'
 gem 'uglifier', '>= 1.3.0'
 gem 'typhoeus'
-gem 'redis'
+gem 'redis', '~> 4.6.0'
 gem 'fast_underscore', require: false
 gem 'hashdiff', ['>= 1.0.0.beta1', '< 2.0.0']
-gem 'rubyzip'
+gem 'rubyzip', '< 3'
 gem 'turnout'
 gem 'kaminari' # pagination
 gem 'prawn-rails'
@@ -49,6 +51,7 @@ gem 'sassc-rails'
 gem 'valid_email2'
 gem 'wicked'
 gem 'rails-i18n'
+gem 'business_time'
 
 gem 'activeadmin'
 
@@ -58,13 +61,10 @@ group :development, :test do
   gem 'dotenv-rails'
   gem 'factory_bot_rails'
   gem 'parallel_tests'
-  gem 'rubocop'
-  gem 'rubocop-rspec'
-  gem 'rubocop-performance'
-  gem 'rubocop-rails'
-  gem 'rubocop-govuk'
+  gem 'rubocop-govuk', '~> 4.8'
+  gem 'rubocop-performance', '~> 1.15'
   # needed to support Rails 6.0
-  gem 'rspec-rails'
+  gem 'rspec-rails', '~> 6.0'
   gem 'rswag-specs'
   gem 'spring'
   gem 'undercover'
@@ -72,6 +72,7 @@ end
 
 group :test do
   gem 'capybara'
+  gem 'cucumber-rails', '~> 2.5.1', require: false
   gem 'database_cleaner-active_record'
   gem 'faker'
   gem 'launchy'
@@ -98,7 +99,7 @@ group :development do
   gem 'guard-rubocop'
   gem 'listen'
   gem 'memory_profiler'
-  gem 'parser'
+  gem 'parser', '~> 3.2'
   gem 'rack-mini-profiler'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'stackprof'

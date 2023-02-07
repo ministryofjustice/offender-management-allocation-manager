@@ -2,6 +2,8 @@
 
 class Offender < ApplicationRecord
   attr_reader :current_parole_record, :previous_parole_records
+  
+  has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
 
   # NOMIS offender IDs must be of the form <letter><4 numbers><2 letters> (all uppercase)
   validates :nomis_offender_id, format: { with: /\A[A-Z][0-9]{4}[A-Z]{2}\z/ }
@@ -34,6 +36,18 @@ class Offender < ApplicationRecord
   has_one :calculated_early_allocation_status, foreign_key: :nomis_offender_id, inverse_of: :offender, dependent: :destroy
 
   has_many :victim_liaison_officers, foreign_key: :nomis_offender_id, inverse_of: :offender, dependent: :destroy
+
+  has_one :handover_progress_checklist, foreign_key: :nomis_offender_id
+
+  delegate :case_allocation, to: :case_information, allow_nil: true
+
+  delegate :handover_progress_complete?, to: :handover_progress_checklist, allow_nil: true
+
+  delegate :handover_date, to: :calculated_handover_date, allow_nil: true
+
+  def handover_progress_task_completion_data
+    (handover_progress_checklist || build_handover_progress_checklist).task_completion_data 
+  end 
 
   # Returns the most recent parole record (can be a future parole application), regardless of activity status and outcome.
   def most_recent_parole_record

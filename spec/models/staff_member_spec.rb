@@ -42,17 +42,27 @@ RSpec.describe StaffMember, type: :model do
   end
 
   describe '#unreleased_allocations' do
-    it 'filters out released offenders' do
-      released_offenders = [
+    let(:unreleased_offenders) { offenders }
+    let(:released_offenders) do
+      [
         build(:nomis_offender, prisonerNumber: 'G9991GG', prisonId: prison.code,
                                sentence: attributes_for(:sentence_detail, conditionalReleaseDate: 1.day.ago.to_date)),
         build(:nomis_offender, prisonerNumber: 'G9992GG', prisonId: prison.code,
                                sentence: attributes_for(:sentence_detail, conditionalReleaseDate: Time.zone.now.to_date))
       ]
+    end
+
+    before do
       released_offenders.each do |offender|
         create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
       end
-      unreleased_offenders = offenders
+      offender_without_release_date = build(:nomis_offender, prisonerNumber: 'G9592GH', prisonId: prison.code,
+                                                             sentence: attributes_for(:sentence_detail, :indeterminate,
+                                                                                      tariffDate: nil,
+                                                                                      conditionalReleaseDate: nil,
+                                                                                      releaseDate: nil))
+      create(:case_information, offender: build(:offender, nomis_offender_id: offender_without_release_date.fetch(:prisonerNumber)))
+      unreleased_offenders.push(offender_without_release_date)
       all_offenders = unreleased_offenders + released_offenders
 
       stub_offenders_for_prison(prison.code, all_offenders)
@@ -60,12 +70,11 @@ RSpec.describe StaffMember, type: :model do
         create(:allocation_history, nomis_offender_id: offender.fetch(:prisonerNumber), primary_pom_nomis_id: staff_id,
                                     prison: prison.code)
       end
+    end
 
-      aggregate_failures do
-        results = user.unreleased_allocations.map(&:nomis_offender_id)
-        expect(results).to match_array(unreleased_offenders.map { |i| i.fetch(:prisonerNumber) })
-        expect(results).not_to include(released_offenders.map { |i| i.fetch(:prisonerNumber) })
-      end
+    it 'finds unreleased offenders without any unreleased offenders' do
+      results = user.unreleased_allocations.map(&:nomis_offender_id)
+      expect(results).to match_array(unreleased_offenders.map { |i| i.fetch(:prisonerNumber) })
     end
   end
 
@@ -130,6 +139,27 @@ RSpec.describe StaffMember, type: :model do
     it "will get allocations for a POM made within the last 7 days" do
       allocated_offenders = described_class.new(prison, staff_id).allocations.select(&:new_case?)
       expect(allocated_offenders.map(&:nomis_offender_id)).to match_array ["G1234AB", "G1234GG"]
+    end
+  end
+
+  describe '#has_allocation?' do
+    let(:nomis_offender_id) { FactoryBot.generate :nomis_offender_id }
+
+    before do
+      allow(prison).to receive(:allocations_for_pom).with(staff_id).and_return(
+        [
+          double(:allocation, nomis_offender_id: nomis_offender_id),
+          double(:allocation, nomis_offender_id: FactoryBot.generate(:nomis_offender_id)),
+        ]
+      )
+    end
+
+    it 'returns true if the given nomis_offender_id is allocated to this staff member' do
+      expect(user.has_allocation?(nomis_offender_id)).to eq true
+    end
+
+    it 'returns false if the given nomis_offender_id is not allocated to this staff member' do
+      expect(user.has_allocation?(FactoryBot.generate(:nomis_offender_id))).to eq false
     end
   end
 end

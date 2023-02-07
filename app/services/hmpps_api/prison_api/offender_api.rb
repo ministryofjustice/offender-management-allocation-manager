@@ -134,6 +134,11 @@ module HmppsApi
         end
       end
 
+      def self.get_offender_alerts(offender_no)
+        path = "/offenders/#{offender_no}/alerts/v2"
+        client.get(path)
+      end
+
     private
 
       def self.get_search_api_offenders_in_prison(prison_code)

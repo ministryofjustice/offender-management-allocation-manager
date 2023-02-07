@@ -54,6 +54,8 @@ spec:
                 name: shared-environment
             - secretRef:
                 name: allocation-manager-secrets
+            - secretRef:
+                name: hmpps-auth-secrets
           env:
             - name: POSTGRES_HOST
               valueFrom:
@@ -95,26 +97,6 @@ spec:
                 secretKeyRef:
                   name: hmpps-domain-events-topic
                   key: topic_arn
-            - name: HMPPS_API_CLIENT_ID
-              valueFrom:
-                secretKeyRef:
-                  name: hmpps-auth-secrets
-                  key: NOMIS_OAUTH_API_CLIENT_ID
-            - name: HMPPS_API_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: hmpps-auth-secrets
-                  key: NOMIS_OAUTH_API_CLIENT_SECRET
-            - name: EMAIL_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: parole-data-import
-                  key: email_username
-            - name: EMAIL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: parole-data-import
-                  key: email_password
         - name: allocation-manager-sidekiq
           image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
           imagePullPolicy: Always
@@ -131,6 +113,8 @@ spec:
                 name: shared-environment
             - secretRef:
                 name: allocation-manager-secrets
+            - secretRef:
+                name: hmpps-auth-secrets
           env:
             - name: RAILS_LOG_TO_STDOUT
               value: "on"
@@ -174,16 +158,6 @@ spec:
                 secretKeyRef:
                   name: hmpps-domain-events-topic
                   key: topic_arn
-            - name: HMPPS_API_CLIENT_ID
-              valueFrom:
-                secretKeyRef:
-                  name: hmpps-auth-secrets
-                  key: NOMIS_OAUTH_API_CLIENT_ID
-            - name: HMPPS_API_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: hmpps-auth-secrets
-                  key: NOMIS_OAUTH_API_CLIENT_SECRET
         - name: allocation-manager-metrics
           image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
           imagePullPolicy: Always
