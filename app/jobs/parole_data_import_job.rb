@@ -19,7 +19,7 @@ private
   # It was confirmed by the PPUD team that in the case of duplicate emails, we should take the most recently-received one.
   # For this reason, the email with the highest ID is taken, as the IDs appear to be sequential.
   def fetch_email(imap)
-    imap.login(ENV['EMAIL_USERNAME'], ENV['EMAIL_PASSWORD'])
+    imap.login(ENV['PAROLE_DATA_IMPORT_EMAIL_USERNAME'], ENV['PAROLE_DATA_IMPORT_EMAIL_PASSWORD'])
     imap.select('INBOX')
     email_id = imap.search(['FROM', 'moic-data@digital.justice.gov.uk', 'SUBJECT', 'POM Cases list', 'ON', @date.strftime('%d-%b-%Y').to_s]).max
     imap.fetch(email_id, 'RFC822')[0].attr['RFC822']
