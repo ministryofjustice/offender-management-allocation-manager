@@ -9,9 +9,10 @@ module HmppsApi
       # Used to filter out offenders who are on remand, civil prisoners, unsentenced, etc.
       ALLOWED_LEGAL_STATUSES = %w[SENTENCED INDETERMINATE_SENTENCE RECALL IMMIGRATION_DETAINEE].freeze
 
-      def self.get_offenders_in_prison(prison)
+      def self.get_offenders_in_prison(prison, include_remand: false)
         # Get offenders from the Prisoner Offender Search API - and filter out those with unwanted legal statuses
-        offenders = get_search_api_offenders_in_prison(prison).select { |o| ALLOWED_LEGAL_STATUSES.include?(o['legalStatus']) }
+        allowed_stati = include_remand ? ALLOWED_LEGAL_STATUSES + ['REMAND'] : ALLOWED_LEGAL_STATUSES
+        offenders = get_search_api_offenders_in_prison(prison).select { |o| allowed_stati.include?(o['legalStatus']) }
 
         return [] if offenders.empty?
 

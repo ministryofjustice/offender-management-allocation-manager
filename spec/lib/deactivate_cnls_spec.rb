@@ -11,7 +11,7 @@ RSpec.describe DeactivateCnls do
   end
 
   before do
-    allow_any_instance_of(Prison).to receive(:offenders).and_return(
+    allow(OffenderService).to receive(:get_offenders_in_prison).and_return(
       [
         MpcOffender.new(prison: prison, offender: Offender.new(nomis_offender_id: offender_id), prison_record: api_offender),
         MpcOffender.new(prison: prison, offender: Offender.new(nomis_offender_id: offender_id), prison_record: api_offender)
