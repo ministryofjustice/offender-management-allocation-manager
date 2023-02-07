@@ -8,6 +8,10 @@ module HmppsApi
       ApiDeserialiser.new.deserialise(HmppsApi::KeyworkerDetails, response)
     rescue Faraday::ResourceNotFound # 404 Not Found error
       HmppsApi::NullKeyworker.new
+    rescue Faraday::Error => e
+      Rails.logger.error(
+        "nomis_offender_id=#{offender_no},event=keyworker_api_error|#{e.inspect},#{e.backtrace.join(',')}")
+      HmppsApi::NullKeyworker.new
     end
 
     def self.client
