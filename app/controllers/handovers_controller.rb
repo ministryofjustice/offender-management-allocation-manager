@@ -60,6 +60,7 @@ private
   end
 
   def filtered_handover_cases(cases)
-    Kaminari.paginate_array(cases).page(page)
+    sorted_cases = sort_collection cases, default_sort: :handover_date, default_direction: :asc
+    Kaminari.paginate_array(sorted_cases).page(page)
   end
 end
