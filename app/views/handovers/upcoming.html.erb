@@ -21,19 +21,20 @@
                           { body: 'Handover progress', class: ['handover-progress'] },
                         ].compact) do %>
 
-  <% @filtered_handover_cases.each do |calc_handover, offender| %>
+  <% @filtered_handover_cases.each do |handover_case| %>
     <tr class="govuk-table__row allocated-offender">
-      <%= render 'handovers/cells/prisoner_details', prison_id: @prison_id, offender: offender %>
+      <%= render 'handovers/cells/prisoner_details', prison_id: @prison_id, offender: handover_case.offender %>
 
-      <%= render 'handovers/cells/staff_member', staff_member: offender.staff_member unless @pom_view %>
+      <%= render 'handovers/cells/staff_member', staff_member: handover_case.offender.staff_member unless @pom_view %>
 
-      <%= render 'handovers/cells/handover_dates', calc_handover: calc_handover %>
+      <%= render 'handovers/cells/handover_dates',
+                 offender: handover_case.offender, handover_date: handover_case.handover_date, should_highlight: true %>
 
-      <%= render 'handovers/cells/earliest_release_date', offender: offender %>
+      <%= render 'handovers/cells/earliest_release_date', offender: handover_case.offender %>
 
-      <%= render 'handovers/cells/tier', offender: offender %>
+      <%= render 'handovers/cells/tier', offender: handover_case.offender %>
 
-      <%= render 'handovers/cells/handover_progress', prison_id: @prison_id, offender: offender %>
+      <%= render 'handovers/cells/handover_progress', prison_id: @prison_id, offender: handover_case.offender %>
     </tr>
   <% end %>
 <% end %>
