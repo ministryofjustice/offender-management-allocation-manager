@@ -10,13 +10,25 @@
       <div class="moj-page-header-actions__title">
         <h1 class="govuk-heading-l">
           <% if @current_pom %>
-            <% content_for :title, "Reallocate a POM – Digital Prison Services" %>
-            Reallocate a POM
+            <% if @coworking %>
+              <% content_for :title, "Allocate a co-working POM – Digital Prison Services" %>
+              Allocate a co-working POM to <%= @prisoner.first_name.capitalize %> <%= @prisoner.last_name.capitalize %>
+            <% else %>
+              <% content_for :title, "Reallocate a POM – Digital Prison Services" %>
+              Reallocate a POM
+            <% end %>
           <% else %>
             <% content_for :title, "Allocate a POM – Digital Prison Services" %>
             Allocate a POM to <%= @prisoner.first_name.capitalize %> <%= @prisoner.last_name.capitalize %>
           <% end %>
         </h1>
+        <% if @current_pom %>
+          <% if @coworking %>
+            <span class="govuk-caption-l govuk-!-margin-bottom-2">Primary POM: <%= @current_pom.full_name_ordered %></span>
+          <% else %>
+            <span class="govuk-caption-l govuk-!-margin-bottom-2">Currently allocated to <%= @current_pom.full_name_ordered %></span>
+          <% end %>
+        <% end %>
         <span class="govuk-caption-l">Prison number: <%= @prisoner.offender_no %></span>
         <span class="govuk-caption-l">Date of birth: <%= format_date(@prisoner.date_of_birth) %> (<%= @prisoner.age %>)</span>
       </div>
@@ -59,7 +71,7 @@
 <p>You can choose an available prison POM below or allocate to a probation POM,<br>
 for example if a particular POM has worked with <%= @prisoner.first_name.capitalize %> before.</p>
 
-<table class="govuk-table">
+<table id="available-poms" class="govuk-table">
   <thead class="govuk-table__head">
     <tr>
       <th class="govuk-table__header" scope="col" aria-sort="none" style="width: 200px;">
@@ -80,11 +92,11 @@ for example if a particular POM has worked with <%= @prisoner.first_name.capital
         </a>
         <%= sort_arrow('working_pattern') %>
       </th>
-      <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none"><button type="button" data-index="3">Allocations in  last 7 days</button></th>
-      <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none"><button type="button" data-index="4">Supporting cases</button></th>
-      <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none"><button type="button" data-index="5">Responsible cases</button></th>
-      <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none"><button type="button" data-index="6">Co-working cases</button></th>
-      <th scope="col" class="govuk-table__header govuk-table__header--numeric" aria-sort="none"><button type="button" data-index="7">Total cases</button></th>
+      <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none">Allocations in  last 7 days</th>
+      <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none">Supporting cases</th>
+      <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none">Responsible cases</th>
+      <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none">Co-working cases</th>
+      <th scope="col" class="govuk-table__header govuk-table__header--numeric" aria-sort="none">Total cases</th>
       <th class="govuk-table__header" scope="col" style="width: 80px; padding-left: 20px;">Action</th>
       <!-- <th class="govuk-table__header">Select POMs <br>to compare workloads</th> -->
     </tr>
@@ -109,13 +121,17 @@ for example if a particular POM has worked with <%= @prisoner.first_name.capital
 
         <td aria-label="Working pattern" class="govuk-table__cell"><%= format_working_pattern(pom.working_pattern) %></td>
         <td aria-label="recent allocations" class="govuk-table__cell govuk-table__cell--numeric"><%= pom.allocations.count(&:new_case?) %></td>
-        <td aria-label="recent allocations" class="govuk-table__cell govuk-table__cell--numeric">10</td>
-        <td aria-label="Total prison" class="govuk-table__cell govuk-table__cell--numeric">10</td>
-        <td aria-label="recent allocations" class="govuk-table__cell govuk-table__cell--numeric">19</td>
+        <td aria-label="recent allocations" class="govuk-table__cell govuk-table__cell--numeric">TODO</td>
+        <td aria-label="Total prison" class="govuk-table__cell govuk-table__cell--numeric">TODO</td>
+        <td aria-label="recent allocations" class="govuk-table__cell govuk-table__cell--numeric">TODO</td>
         <td aria-label="total allocations" class="govuk-table__cell govuk-table__cell--numeric govuk-!-font-weight-bold"><%= pom.allocations.count %></td>
 
         <td aria-label="recent allocations" class="govuk-table__cell" style="width: 80px; padding-left: 20px;">
-          <%= link_to 'Allocate', new_prison_prisoner_staff_build_allocation_path(@prison.code, @prisoner.offender_no, pom.staff_id) %>
+          <% if @coworking %>
+            <%= link_to 'Allocate', prison_confirm_coworking_allocation_path(@prison.code, @prisoner.offender_no, @current_pom.staff_id, pom.staff_id) %>
+          <% else %>
+            <%= link_to 'Allocate', new_prison_prisoner_staff_build_allocation_path(@prison.code, @prisoner.offender_no, pom.staff_id) %>
+          <% end %>
         </td>
 
         <!--

@@ -45,14 +45,21 @@ class PrisonersController < PrisonsApplicationController
 
     @allocation = AllocationHistory.find_by(nomis_offender_id: @prisoner.offender_no)
 
-    if @allocation.present? && @allocation.secondary_pom_name.present?
-      @secondary_pom_name = PrisonOffenderManagerService.fetch_pom_name(@allocation.secondary_pom_nomis_id).titleize
-      @secondary_pom_email = PrisonOffenderManagerService.fetch_pom_email(@allocation.secondary_pom_nomis_id)
+    if @allocation.present?
+      if @allocation.primary_pom_nomis_id.present?
+        @pom = StaffMember.new(@prison, @allocation.primary_pom_nomis_id)
+      end
+      if @allocation.secondary_pom_name.present?
+        @secondary_pom_name = PrisonOffenderManagerService.fetch_pom_name(@allocation.secondary_pom_nomis_id).titleize
+        @secondary_pom_email = PrisonOffenderManagerService.fetch_pom_email(@allocation.secondary_pom_nomis_id)
+      end
     end
 
     @keyworker = HmppsApi::KeyworkerApi.get_keyworker(
       active_prison_id, @prisoner.offender_no
     )
+
+    @coworking = params[:coworking].present?
   end
 
   def show

@@ -27,6 +27,8 @@ class AllocationStaffController < PrisonsApplicationController
       @prison_poms.select(&:active?) + @probation_poms.select(&:active?),
       default_sort: :position,
       default_direction: sort_dir)
+
+    @coworking = params[:coworking].present?
   end
 
 private

@@ -5,12 +5,19 @@
     <div class="moj-page-header-actions">
       <div class="moj-page-header-actions__title">
         <h1 class="govuk-heading-l">Review <%= @prisoner.first_name.capitalize %> <%= @prisoner.last_name.capitalize %>'s case</h1>
+        <% if @allocation.present? %>
+          <% if @coworking %>
+            <span class="govuk-caption-l govuk-!-margin-bottom-2">Primary POM: <%= @pom.full_name_ordered %></span>
+          <% else %>
+            <span class="govuk-caption-l govuk-!-margin-bottom-2">Currently allocated to <%= @pom.full_name_ordered %></span>
+          <% end %>
+        <% end %>
         <span class="govuk-caption-l">Prison number: <%= @prisoner.offender_no %></span>
         <span class="govuk-caption-l">Date of birth: <%= format_date(@prisoner.date_of_birth) %> (<%= @prisoner.age %>)</span>
       </div>
 
       <div class="moj-page-header-actions__actions">
-        <%= link_to 'Choose POM', prison_prisoner_staff_index_path(@prison, @prisoner.offender_no), class: 'govuk-button' %>
+        <%= render partial: 'choose_pom_button', locals: {coworking: @coworking, prison: @prison, offender_no: @prisoner.offender_no} %>
       </div>
     </div>
   </div>
@@ -78,11 +85,29 @@
               <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.location %></td>
               <td class="govuk-table__cell govuk-!-width-one-third"></td>
             </tr>
-            <tr class="govuk-table__row">
-              <th scope="row" class="govuk-table__header govuk-!-width-one-third">POM role needed</th>
-              <td class="govuk-table__cell govuk-!-width-one-third"><%= pom_responsibility_label(@prisoner) %></td>
-              <td class="govuk-table__cell govuk-!-width-one-third"></td>
-            </tr>
+            <% if @allocation.present? %>
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header govuk-!-width-one-third">POM</th>
+                <td class="govuk-table__cell govuk-!-width-one-third"><%= @pom.full_name_ordered %></td>
+                <td class="govuk-table__cell govuk-!-width-one-third"></td>
+              </tr>
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header govuk-!-width-one-third">POM email</th>
+                <td class="govuk-table__cell govuk-!-width-one-third"><%= @pom.email_address %></td>
+                <td class="govuk-table__cell govuk-!-width-one-third"></td>
+              </tr>
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header govuk-!-width-one-third">POM role</th>
+                <td class="govuk-table__cell govuk-!-width-one-third"><%= @pom.position_description %></td>
+                <td class="govuk-table__cell govuk-!-width-one-third"></td>
+              </tr>
+            <% else %>
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header govuk-!-width-one-third">POM role needed</th>
+                <td class="govuk-table__cell govuk-!-width-one-third"><%= pom_responsibility_label(@prisoner) %></td>
+                <td class="govuk-table__cell govuk-!-width-one-third"></td>
+              </tr>
+            <% end %>
           </tbody>
         </table>
 
@@ -273,14 +298,17 @@
 
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">Co-working POM</td>
-                <td class="govuk-table__cell govuk-!-width-one-third"><%= @secondary_pom_name %></td>
-              </tr>
-
-              <tr class="govuk-table__row">
-                <td class="govuk-table__cell govuk-!-width-one-third">Co-working POM email</td>
-                <td class="govuk-table__cell govuk-!-width-one-third"><%= @secondary_pom_email %></td>
+                <td class="govuk-table__cell govuk-!-width-one-third"><%= @secondary_pom_name || 'None allocated' %></td>
                 <td class="govuk-table__cell govuk-!-width-one-third"></td>
               </tr>
+
+              <% if @secondary_pom_name.present? %>
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell govuk-!-width-one-third">Co-working POM email</td>
+                  <td class="govuk-table__cell govuk-!-width-one-third"><%= @secondary_pom_email %></td>
+                  <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                </tr>
+              <% end %>
 
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">Key worker</td>
@@ -352,7 +380,7 @@
     <!-- /Accordians -->
     <!-- /More info -->
 
-    <%= link_to 'Choose POM', prison_prisoner_staff_index_path(@prison, @prisoner.offender_no), class: 'govuk-button' %>
+    <%= render partial: 'choose_pom_button', locals: {coworking: @coworking, prison: @prison, offender_no: @prisoner.offender_no} %>
   </div>
 
   <!--Right column-->
