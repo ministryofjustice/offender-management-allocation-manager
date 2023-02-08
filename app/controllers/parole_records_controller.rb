@@ -13,7 +13,7 @@ class ParoleRecordsController < PrisonsApplicationController
     hearing_outcome_received_date = validate_date(params)
     if @parole_record.errors.empty? && @parole_record.update(hearing_outcome_received: hearing_outcome_received_date)
       RecalculateHandoverDateJob.perform_now(@offender.offender_no)
-      redirect_to prison_prisoner_path(prison_id: 'LEI', id: @offender.offender_no)
+      redirect_to prison_prisoner_path(prison_id: @offender.prison_id, id: @offender.offender_no)
     else
       render 'edit'
     end
