@@ -135,7 +135,7 @@ describe HandoverDateService, 'old policy, old' do
       end
 
       context 'when indeterminate' do
-        let(:ted) { Date.new(2022, 7, 3) }
+        let(:ted) { Time.zone.today + 2.years }
         let(:ted15) { ted - 15.months }
 
         let(:api_offender) do
@@ -159,7 +159,7 @@ describe HandoverDateService, 'old policy, old' do
         end
 
         context 'with earlier PED' do
-          let(:ped) { Date.new(2022, 7, 2)  }
+          let(:ped) { Time.zone.today + 18.months  }
 
           it 'will still be 15 months before TED', flaky: true do
             expect(subject).to eq(start_date: ted15, handover_date: ted15)
@@ -573,8 +573,8 @@ describe HandoverDateService, 'old policy, old' do
     end
   end
 
-  context 'with an NPS and indeterminate case with a PRD and no TED' do
-    let(:case_info) { build(:case_information, :nps, offender: build(:offender, parole_record: build(:parole_record))) }
+  context 'with an NPS and indeterminate case with a THD and no TED' do
+    let(:case_info) { build(:case_information, :nps, offender: build(:offender, parole_records: [build(:parole_record, target_hearing_date: Time.zone.today + 1.year)])) }
     let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
     let(:api_offender) do
       build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail,
@@ -582,8 +582,8 @@ describe HandoverDateService, 'old policy, old' do
                                                           tariffDate: nil))
     end
 
-    it 'displays the handover date (which is 8 months prior to PRD) ' do
-      expect(described_class.handover(offender).handover_date).to eq(case_info.offender.parole_record.parole_review_date - 8.months)
+    it 'displays the handover date (which is 8 months prior to THD) ' do
+      expect(described_class.handover(offender).handover_date).to eq(offender.target_hearing_date - 8.months)
     end
   end
 end

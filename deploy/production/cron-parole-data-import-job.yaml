@@ -1,9 +1,9 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: recalculate-handover-dates
+  name: import-parole-records-job
 spec:
-  schedule: "0 4 * * *"
+  schedule: "0 3 * * *"
   concurrencyPolicy: Replace
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
@@ -13,10 +13,10 @@ spec:
       template:
         spec:
           containers:
-            - name: recalculate-handover-dates
+            - name: import-parole-records-job
               image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
               imagePullPolicy: Always
-              command: ['sh', '-c', "bundle exec rake recalculate_handover_dates"]
+              command: ['sh', '-c', "bundle exec rake cronjob:import_parole_record_updates"]
               resources:
                 limits:
                   memory: "1500Mi"
@@ -29,8 +29,6 @@ spec:
                     name: shared-environment
                 - secretRef:
                     name: allocation-manager-secrets
-                - secretRef:
-                    name: hmpps-auth-secrets
               env:
                 - name: PROMETHEUS_METRICS
                   value: "off"
@@ -74,4 +72,14 @@ spec:
                     secretKeyRef:
                       name: hmpps-domain-events-topic
                       key: topic_arn
+                - name: HMPPS_API_CLIENT_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: hmpps-auth-secrets
+                      key: NOMIS_OAUTH_API_CLIENT_ID
+                - name: HMPPS_API_CLIENT_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: hmpps-auth-secrets
+                      key: NOMIS_OAUTH_API_CLIENT_SECRET
           restartPolicy: OnFailure

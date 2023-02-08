@@ -15,7 +15,7 @@ feature 'Navigation' do
       end
 
       it 'has an SPO menu' do
-        expect(nav_links.map(&:text)).to eq(["Home", "Allocations", "Handover", "Staff"])
+        expect(nav_links.map(&:text)).to eq(["Home", "Allocations", "Parole", "Handover", "Staff"])
       end
     end
 
@@ -37,7 +37,7 @@ feature 'Navigation' do
       end
 
       it 'has a POM/SPO menu' do
-        expect(nav_links.map(&:text)).to eq(["Home", "Allocations", "Caseload", "Handover", "Staff"])
+        expect(nav_links.map(&:text)).to eq(["Home", "Allocations", "Caseload", "Parole", "Handover", "Staff"])
       end
 
       it 'highlights the current page via the nav links' do
@@ -61,7 +61,7 @@ feature 'Navigation' do
     let(:offender_name) { 'Abdoria, Ongmetain' }
 
     describe 'staff section' do
-      let(:index) { 4 }
+      let(:index) { 5 }
 
       it 'highlights the section' do
         all(link_css)[index].click

@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 class CaseInformationController < PrisonsApplicationController
-  before_action :set_prisoner_from_url, only: [:new, :edit, :edit_prd, :update_prd]
+  before_action :set_prisoner_from_url, only: [:new, :edit]
   before_action :set_case_info, only: [:edit]
 
   before_action :set_referrer
-  before_action :store_referrer_in_session, only: [:edit_prd, :edit]
+  before_action :store_referrer_in_session, only: [:edit]
 
   def new
     offender = Offender.find_by(nomis_offender_id: nomis_offender_id_from_url)
@@ -15,22 +15,6 @@ class CaseInformationController < PrisonsApplicationController
   end
 
   def edit; end
-
-  # Just edit the parole_review_date field
-  def edit_prd
-    @parole_form = ParoleReviewDateForm.new
-  end
-
-  def update_prd
-    @parole_form = ParoleReviewDateForm.new parole_review_date_params
-    if @parole_form.valid?
-      ParoleRecord.find_or_initialize_by(nomis_offender_id: nomis_offender_id_from_url)
-                  .update!(parole_review_date: @parole_form.parole_review_date)
-      redirect_to referrer
-    else
-      render 'edit_prd'
-    end
-  end
 
   def create
     prisoner = Offender.find_by! nomis_offender_id: case_information_params[:nomis_offender_id]
@@ -89,8 +73,8 @@ private
       .permit(:nomis_offender_id, :tier, :case_allocation, :probation_service)
   end
 
-  def parole_review_date_params
-    params.require(:parole_review_date_form)
-      .permit(:parole_review_date)
+  def target_hearing_date_params
+    params.require(:target_hearing_date_form)
+      .permit(:target_hearing_date)
   end
 end

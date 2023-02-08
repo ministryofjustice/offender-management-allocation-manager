@@ -4,7 +4,7 @@
     <%= back_link %>
 
     <%= form_for(@parole_form,
-                 url: update_prd_prison_case_information_path(@prison.code, @prisoner.offender_no),
+                 url: update_thd_prison_case_information_path(@prison.code, @prisoner.offender_no),
                  method: :put,
                  builder: GOVUKDesignSystemFormBuilder::FormBuilder,
                  id: "case_info_form") do |f| %>
@@ -12,8 +12,8 @@
 
       <div class="govuk-form-group">
         <%=
-          f.govuk_date_field :parole_review_date,
-                             legend: { text: "Enter a new parole review date (PRD) for #{ @prisoner.full_name_ordered } (#{ @prisoner.offender_no })", tag: 'h1', size: 'l' },
+          f.govuk_date_field :target_hearing_date,
+                             legend: { text: "Enter a new target hearing date (THD) for #{ @prisoner.full_name_ordered } (#{ @prisoner.offender_no })", tag: 'h1', size: 'l' },
                              hint: -> do %>
           <p class="govuk-hint">You can find this on the outcome letter from the Parole Board or by asking a case admin to
             look it up in the Public Protection Unit Database (PPUD).</p>

@@ -17,7 +17,9 @@ class MpcOffender
            :tier,
            :mappa_level, :welsh_offender, to: :probation_record
 
-  delegate :victim_liaison_officers, :handover_progress_task_completion_data, :handover_progress_complete?,
+  delegate :victim_liaison_officers, :current_parole_record, :previous_parole_records,
+           :most_recent_parole_record, :build_parole_record_sections, :parole_record_awaiting_hearing,
+           :most_recent_completed_parole_record, :handover_progress_task_completion_data, :handover_progress_complete?,
            to: :@offender
 
   # These fields make sense to be nil when the probation record is nil - the others dont
@@ -25,13 +27,15 @@ class MpcOffender
 
   delegate :start_date, to: :handover, prefix: true
 
-  attr_reader :probation_record, :prison
+  attr_reader :probation_record, :prison, :pom_tasks
 
   def initialize(prison:, offender:, prison_record:)
     @prison = prison
     @offender = offender
     @prison_record = prison_record # @type HmppsApi::Offender
     @probation_record = offender.case_information
+    offender.build_parole_record_sections
+    @pom_tasks = build_pom_tasks
   end
 
   # TODO: - view method in model needs to be removed
@@ -61,6 +65,10 @@ class MpcOffender
     else
       @offender.responsibility.value == Responsibility::PROBATION
     end
+  end
+
+  def allocated_pom_role
+    pom_responsible? ? 'Responsible' : 'Supporting'
   end
 
   def com_responsible?
@@ -108,7 +116,7 @@ class MpcOffender
   end
 
   def needs_early_allocation_notify?
-    # The probation_record.present? check is needed as one of the dates is PRD which is currently inside case_information
+    # The probation_record.present? check is needed as one of the dates is THD which is currently inside case_information
     @probation_record.present? &&
       within_early_allocation_window? &&
       early_allocations.active_pre_referral_window.any? &&
@@ -119,7 +127,7 @@ class MpcOffender
     earliest_date = [
       tariff_date,
       parole_eligibility_date,
-      parole_review_date,
+      target_hearing_date,
       automatic_release_date,
       conditional_release_date
     ].compact.min
@@ -155,11 +163,79 @@ class MpcOffender
     end
   end
 
-  # early allocation methods
+  # parole methods
 
-  def parole_review_date
-    @offender.parole_record.parole_review_date if @offender.parole_record.present?
+  def target_hearing_date
+    most_recent_parole_record&.target_hearing_date
   end
+
+  # Returns the target hearing date for the offender's next active parole application, or nil if there isn't one.
+  # Used to exclude THDs of previous (completed/inactive) parole applications.
+  def next_thd
+    parole_record_awaiting_hearing&.target_hearing_date
+  end
+
+  # Returns the date that the most recent hearing outcome was received.
+  def hearing_outcome_received
+    most_recent_parole_record&.hearing_outcome_received
+  end
+
+  # Returns the date that the most recent COMPLETED hearing outcome was received.
+  # Used to exclude any active parole applications.
+  def last_hearing_outcome_received
+    most_recent_completed_parole_record&.hearing_outcome_received
+  end
+
+  # If the parole application is set for a hearing within 10 months, or the outcome for a hearing was received in the last 14 days,
+  # return true. If the hearing has an outcome but we do not have the date that it was received, assume that it is no longer
+  # approaching parole (return false).
+  def approaching_parole?
+    earliest_date = next_parole_date
+    return false if earliest_date.blank?
+    return false unless earliest_date <= Time.zone.today + 10.months
+    return false if !most_recent_parole_record&.no_hearing_outcome? && hearing_outcome_received.blank?
+
+    if earliest_date.past? &&
+      hearing_outcome_received.present? &&
+      hearing_outcome_received <= Time.zone.today - 14.days
+
+      return false
+    end
+
+    true
+  end
+
+  def next_parole_date
+    return target_hearing_date if target_hearing_date.present?
+
+    [
+      tariff_date,
+      parole_eligibility_date
+    ].compact.min
+  end
+
+  # Separate from next_parole_date as parole case index view sorts by next_parole_date, so it seemed sensible to avoid changing default rails behaviour
+  # for the sake of saving a couple of simple, albeit slightly inefficient, comparisons.
+  def next_parole_date_type
+    case next_parole_date
+    when tariff_date
+      'TED'
+    when parole_eligibility_date
+      'PED'
+    when target_hearing_date
+      'Target hearing date'
+    end
+  end
+
+  def display_current_parole_info?
+    tariff_date.present? || parole_eligibility_date.present? || current_parole_record.present?
+  end
+
+  def due_for_release?
+    most_recent_parole_record&.current_record_hearing_outcome == 'Release'
+  end
+
+  # early allocation methods
 
   def early_allocation_state
     if early_allocation?
@@ -342,7 +418,7 @@ class MpcOffender
       ldu_name
       allocated_com_name
       allocated_com_email
-      parole_review_date
+      target_hearing_date
       early_allocation_state
     ]
 
@@ -373,5 +449,20 @@ private
                   else
                     HandoverDateService::NO_HANDOVER_DATE
                   end
+  end
+
+  def build_pom_tasks
+    tasks = []
+    # We don't want the task to be created if there's no parole record, if the most recent parole record is yet to have a hearing outcome, or if there is already
+    # a date that the hearing outcome was received.
+    if most_recent_parole_record.present? && !most_recent_parole_record.no_hearing_outcome? && most_recent_parole_record.hearing_outcome_received.blank?
+      tasks << PomTask.new(full_name, first_name, prison_id, offender_no, :parole_outcome_date, most_recent_parole_record.review_id)
+    end
+
+    if early_allocations.present?
+      tasks << PomTask.new(full_name, first_name, prison_id, offender_no, :early_allocation_decision)
+    end
+
+    tasks
   end
 end

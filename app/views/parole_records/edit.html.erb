@@ -1,0 +1,29 @@
+<% content_for :title, "Enter date of parole hearing outcome – Digital Prison Services" %>
+
+<% content_for :switcher do %>
+  <%= render '/layouts/prison_switcher' %>
+<% end %>
+
+<%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
+
+<div>
+  <%= form_with model: @parole_record, 
+                url: prison_prisoner_parole_record_path(@offender.prison_id, @offender.offender_no), 
+                method: :patch, id: 'edit_parole_record_form',
+                builder: GOVUKDesignSystemFormBuilder::FormBuilder do |form| %>
+    <%= form.govuk_error_summary%>
+    <h1 class="govuk-heading-l govuk-!-margin-top-4"></h1>
+    <div class="govuk-form-group">
+        <%=
+          form.govuk_date_field :hearing_outcome_received,
+                             maxlength_enabled: true,
+                             legend: { text: "Enter the date that the outcome of #{@offender.first_name.capitalize}#{@offender.first_name.downcase[-1] == 's' ? '\'' : '\'s'} parole hearing was confirmed", tag: 'h1', size: 'l' },
+                             hint: -> do %>
+          <p class="govuk-hint">This is the date that PPCS sent the ‘outcome of Parole Board decision’ letter. <br/>For example, enter 12 6 2022.</p>
+        <% end %>
+      </div>
+    </div>
+
+    <%= form.submit 'Save', role: "button", draggable: "false", class: "govuk-button" %>
+  <% end %>
+</div>

@@ -7,7 +7,10 @@ feature 'Responsibility override', flaky: true do
     signin_spo_user
   end
 
-  let(:offender_id) { 'G8060UF' }
+  # This WILL break again, most likely when the Earliest Release Date for the offender below comes within 10 months.
+  # This will cause the case responsiblity to swap to COM, which will cause the 'Change' link to disappear.
+  # When this happens, replace the offender_id with one for an offender with a more distant ERD.
+  let(:offender_id) { 'G7281UH' }
   let(:pom_id) { 485_926 }
 
   context 'when overriding responsibility', vcr: { cassette_name: 'prison_api/override_responsibility' } do
@@ -69,13 +72,13 @@ feature 'Responsibility override', flaky: true do
         expect(page).to have_content 'Recommendation: Prison officer POM'
       end
 
-      it 'shows case owner as Community when overridden' do
+      it 'shows POM responsibility as Supporting when overridden' do
         override_responsibility_for(offender_id)
 
         visit unallocated_prison_prisoners_path('LEI')
 
         within 'tr.govuk-table__row.offender_row_0' do
-          expect(page).to have_content('Community')
+          expect(page).to have_content('Supporting')
         end
       end
     end

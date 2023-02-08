@@ -184,6 +184,17 @@ ActiveRecord::Schema.define(version: 2022_12_16_000001) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "parole_records_v2", primary_key: "review_id", id: :serial, force: :cascade do |t|
+    t.string "nomis_offender_id"
+    t.date "target_hearing_date"
+    t.date "custody_report_due"
+    t.string "review_status"
+    t.string "hearing_outcome"
+    t.date "hearing_outcome_received"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "pom_details", force: :cascade do |t|
     t.integer "nomis_staff_id"
     t.float "working_pattern"

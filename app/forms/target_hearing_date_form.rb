@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-class ParoleReviewDateForm
+class TargetHearingDateForm
   include ActiveModel::Model
   include ActiveModel::Attributes
   include ActiveRecord::AttributeAssignment
 
-  attribute :parole_review_date, :date
+  attribute :target_hearing_date, :date
 
-  validates :parole_review_date,
+  validates :target_hearing_date,
             date: { after: proc { Date.yesterday }, allow_blank: true },
             presence: true
 end

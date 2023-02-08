@@ -63,8 +63,8 @@ feature "view an offender's allocation information", flaky: true do
         )
 
         stub_api_calls_for_prison_allocation_path(sentence_start_date: (Time.zone.today - 4.months),
-                                                  conditional_release_date: (Time.zone.today + 7.months),
-                                                  automatic_release_date: (Time.zone.today + 7.months),
+                                                  conditional_release_date: (Time.zone.today + 8.months),
+                                                  automatic_release_date: (Time.zone.today + 8.months),
                                                   hdced: (Time.zone.today + 7.months))
 
         visit prison_prisoner_allocation_path('LEI', prisoner_id: offender_no)

@@ -1,17 +1,17 @@
 require 'rails_helper'
 
-RSpec.describe ParoleReviewDateForm, type: :model do
+RSpec.describe TargetHearingDateForm, type: :model do
   describe 'validation rules' do
     context 'when the date is missing' do
-      it { is_expected.to validate_presence_of(:parole_review_date).with_message('Enter a new parole review date') }
+      it { is_expected.to validate_presence_of(:target_hearing_date).with_message('Enter a new target hearing date') }
     end
 
     context 'when the date is in the past' do
-      subject { described_class.new(parole_review_date: 2.days.ago) }
+      subject { described_class.new(target_hearing_date: 2.days.ago) }
 
       it 'is not valid' do
         expect(subject).not_to be_valid
-        expect(subject.errors[:parole_review_date]).to eq ['The new parole review date must be in the future']
+        expect(subject.errors[:target_hearing_date]).to eq ['The new target hearing date must be in the future']
       end
     end
 
@@ -24,7 +24,7 @@ RSpec.describe ParoleReviewDateForm, type: :model do
         ]
       end
 
-      it { is_expected.to allow_values(*future_dates).for(:parole_review_date) }
+      it { is_expected.to allow_values(*future_dates).for(:target_hearing_date) }
     end
   end
 end

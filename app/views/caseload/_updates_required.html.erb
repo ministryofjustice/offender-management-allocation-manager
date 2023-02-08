@@ -10,6 +10,6 @@
     <%= updates_required.action_label %>
   </td>
   <td aria-label="Tier" class="govuk-table__cell tier">
-    <%= link_to('View', prison_prisoner_path(@prison.code, updates_required.offender_number)) %>
+    <%= link_to(updates_required.link_text, updates_required.link_path) %>
   </td>
 </tr>

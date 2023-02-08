@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Offender < ApplicationRecord
+  attr_reader :current_parole_record, :previous_parole_records
+  
   has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
 
   # NOMIS offender IDs must be of the form <letter><4 numbers><2 letters> (all uppercase)
@@ -29,7 +31,7 @@ class Offender < ApplicationRecord
           inverse_of: :offender,
           dependent: :destroy
 
-  has_one :parole_record, foreign_key: :nomis_offender_id, inverse_of: :offender, dependent: :destroy
+  has_many :parole_records, foreign_key: :nomis_offender_id, inverse_of: :offender, dependent: :destroy
 
   has_one :calculated_early_allocation_status, foreign_key: :nomis_offender_id, inverse_of: :offender, dependent: :destroy
 
@@ -44,6 +46,52 @@ class Offender < ApplicationRecord
   delegate :handover_date, to: :calculated_handover_date, allow_nil: true
 
   def handover_progress_task_completion_data
-    (handover_progress_checklist || build_handover_progress_checklist).task_completion_data
+    (handover_progress_checklist || build_handover_progress_checklist).task_completion_data 
+  end 
+
+  # Returns the most recent parole record (can be a future parole application), regardless of activity status and outcome.
+  def most_recent_parole_record
+    filtered_parole_records.max_by(&:sortable_date)
+  end
+
+  # Returns the most recent parole application if it has not yet had a hearing.
+  def parole_record_awaiting_hearing
+    most_recent_parole_record.no_hearing_outcome? ? most_recent_parole_record : nil
+  end
+
+  # Returns the most recent parole record that has an outcome
+  def most_recent_completed_parole_record
+    filtered_parole_records.reject(&:no_hearing_outcome?).max_by(&:sortable_date)
+  end
+
+  # @current_parole_record is the most recent parole record and will either be currently active, or will have had its hearing outcome
+  # within the last 14 days
+  # @previous_parole_records are all other parole records, those that are inactive and/or had hearing outcomes more than 14 days ago.
+  #
+  # There are situations where parole records will be inactive and not have hearing outcomes.
+  def build_parole_record_sections
+    @current_parole_record = nil
+    @previous_parole_records = []
+
+    filtered_parole_records.sort_by(&:sortable_date).reverse_each do |record|
+      if record.no_hearing_outcome?
+        if record.active?
+          @current_parole_record = record
+        else
+          @previous_parole_records << record
+        end
+      elsif record.hearing_outcome_received && record.hearing_outcome_received > Time.zone.today - 14.days
+        @current_parole_record = record
+      else
+        @previous_parole_records << record
+      end
+    end
+  end
+
+private
+
+  # If neither the THD or custody_report_due date are defined, we have no method of determining when the parole hearing was, which is vital for MPC.
+  def filtered_parole_records
+    parole_records.reject { |pr| pr.sortable_date.blank? }
   end
 end

@@ -12,6 +12,7 @@ Rails.application.routes.draw do
     resources :prisons, only: :index
 
     resources :dashboard, only: :index
+    resources :parole_cases, only: :index
     resources :handovers, only: :index do
       collection do
         get :upcoming
@@ -36,6 +37,7 @@ Rails.application.routes.draw do
       get 'caseload' => 'caseload#index'
       get 'new_cases' => 'caseload#new_cases'
       get 'caseload/cases' => 'caseload#cases'
+      get 'caseload/parole_cases' => 'caseload#parole_cases'
       get 'caseload/updates_required' => 'caseload#updates_required'
       get 'caseload/global' => 'caseload_global#index'
     end
@@ -91,6 +93,8 @@ Rails.application.routes.draw do
         end
       end
 
+      resources :parole_records, only: [:edit, :update]
+
       resources :staff, only: %i[index], controller: 'allocation_staff' do
         resources :build_allocations, only: %i[new show update], controller: 'build_allocations'
       end
@@ -112,8 +116,8 @@ Rails.application.routes.draw do
     resources :case_information, only: %i[new create edit update show], param: :prisoner_id, controller: 'case_information', path_names: {
         new: 'new/:prisoner_id',
     } do
-      get('edit_prd' => 'case_information#edit_prd', as: 'edit_prd', on: :member)
-      put('update_prd' => 'case_information#update_prd', as: 'update_prd', on: :member)
+      get('edit_thd' => 'case_information#edit_thd', as: 'edit_thd', on: :member)
+      put('update_thd' => 'case_information#update_thd', as: 'update_thd', on: :member)
     end
 
     resources :poms, only: %i[ index show edit update ], param: :nomis_staff_id

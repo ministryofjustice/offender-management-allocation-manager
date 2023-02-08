@@ -21,6 +21,13 @@
           %>
         </li>
         <li class="moj-sub-navigation__item">
+          <%= link_to "Parole cases (#{@summary.fetch(:parole_cases_count)})",
+                      { controller: :caseload, action: :parole_cases},
+                      class: "moj-sub-navigation__link govuk-link--no-visited-state",
+                      aria: { current: current_page?(controller: :caseload, action: 'parole_cases') ? 'page' : '' }
+          %>
+        </li>
+        <li class="moj-sub-navigation__item">
           <%= link_to "Case updates needed (#{@summary.fetch(:pending_task_count)})",
                       { controller: :caseload, action: 'updates_required' },
                       class: "moj-sub-navigation__link govuk-link--no-visited-state",

@@ -20,7 +20,10 @@ class CalculatedHandoverDate < ApplicationRecord
     nps_determinate_mappa_1_n: 'NPS Determinate Mappa 1/N', # legacy
     nps_determinate_mappa_2_3: 'NPS Determinate Mappa 2/3', # legacy
     less_than_10_months_left_to_serve: 'Less than 10 months left to serve',
+    parole_mappa_2_3: 'Unsuccessful parole and Mappa 2/3',
     pre_omic_rules: 'Pre-OMIC rules',
+    thd_within_12_months_of_hearing_outcome: 'Next parole hearing more than 12 months away',
+    thd_more_than_12_months_from_hearing_outcome: 'Next parole hearing under 12 months away',
   }.stringify_keys.freeze
 
   has_paper_trail meta: { nomis_offender_id: :nomis_offender_id, offender_attributes_to_archive: :offender_attributes_to_archive }

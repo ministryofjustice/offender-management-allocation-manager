@@ -5,56 +5,64 @@
       <div class="govuk-grid-column-two-thirds">
         <h2 class="govuk-heading-m">Current workload</h2>
         <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-half">
+          <div class="govuk-grid-column-one-third">
             <div class="card--caseload card-total">
               <%= link_to prison_show_pom_tab_path(@prison.code, @pom.staff_id, :caseload) do %>
                 <span class="card__heading--large"><%= @summary.fetch(:total_cases) %></span>
                 <p>total cases</p>
               <% end %>
             </div>
-        </div>
-        <div class="govuk-grid-column-one-half">
+          </div>
+          <div class="govuk-grid-column-one-third">
             <div class="card--caseload card-total">
               <%= link_to prison_staff_caseload_handovers_path(@prison.code, @pom.staff_id, :caseload) do %>
                 <span class="card__heading--large"><%= @summary.fetch(:pending_handover_count) %></span>
                 <p>handover cases</p>
               <% end %>
+            </div>
+          </div>
+          <div class="govuk-grid-column-one-third">
+            <div class="card--caseload card-total">
+              <%= link_to prison_show_pom_tab_path(@prison.code, @pom.staff_id, :parole) do %>
+                <span class="card__heading--large"><%= @allocations.count(&:approaching_parole?) %></span>
+                <p>parole cases</p>
+              <% end %>
+            </div>
           </div>
         </div>
-        </div>
         <div class="govuk-grid-column-row">
-        <h3 class="govuk-heading-m govuk-!-margin-top-8">
-          Allocations summary
-        </h3>
-        <dl class="govuk-summary-list govuk-!-margin-bottom-9">
-          <!-- Yes this code is technically wrong, as we can't actually tell when the last (co-working) case was allocated to this POM
-         Once we have sorted out the allocations into 2 separate types, this problem will just go away so it's not worth fixing until then -->
-          <%= render 'govuk_summary_list_row',
-                     key: 'Last case allocated',
-                     value: format_date(@summary.fetch(:last_allocated_date)),
-                     actions: ''
-          %>
-          <%= render 'govuk_summary_list_row',
-                     key: 'Allocations in last 7 days',
-                     value: @summary.fetch(:last_seven_days),
-                     actions: link_to('View', prison_show_pom_tab_path(@prison.code, nomis_staff_id: @pom.staff_id, tab: 'caseload', anchor: 'recent-allocations'))
-          %>
-          <%= render 'govuk_summary_list_row',
-                     key: 'Releases in next 4 weeks',
-                     value: @summary.fetch(:release_next_four_weeks),
-                     actions: link_to('View', prison_show_pom_tab_path(@prison.code, nomis_staff_id: @pom.staff_id, tab: 'caseload', anchor: 'upcoming-releases'))
-          %>
-          <%= render 'govuk_summary_list_row',
-                     key: 'Working pattern',
-                     value: format_working_pattern(@pom.working_pattern),
-                     actions: link_to('Change', edit_prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id), class: 'govuk-link pull-right')
-          %>
-          <%= render 'govuk_summary_list_row',
-                     key: 'Status',
-                     value: full_status(@pom),
-                     actions: link_to('Change', edit_prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id), class: 'govuk-link pull-right')
-          %>
-        </dl>
+          <h3 class="govuk-heading-m govuk-!-margin-top-8">
+            Allocations summary
+          </h3>
+          <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+            <!-- Yes this code is technically wrong, as we can't actually tell when the last (co-working) case was allocated to this POM
+          Once we have sorted out the allocations into 2 separate types, this problem will just go away so it's not worth fixing until then -->
+            <%= render 'govuk_summary_list_row',
+                      key: 'Last case allocated',
+                      value: format_date(@summary.fetch(:last_allocated_date)),
+                      actions: ''
+            %>
+            <%= render 'govuk_summary_list_row',
+                      key: 'Allocations in last 7 days',
+                      value: @summary.fetch(:last_seven_days),
+                      actions: link_to('View', prison_show_pom_tab_path(@prison.code, nomis_staff_id: @pom.staff_id, tab: 'caseload', anchor: 'recent-allocations'))
+            %>
+            <%= render 'govuk_summary_list_row',
+                      key: 'Releases in next 4 weeks',
+                      value: @summary.fetch(:release_next_four_weeks),
+                      actions: link_to('View', prison_show_pom_tab_path(@prison.code, nomis_staff_id: @pom.staff_id, tab: 'caseload', anchor: 'upcoming-releases'))
+            %>
+            <%= render 'govuk_summary_list_row',
+                      key: 'Working pattern',
+                      value: format_working_pattern(@pom.working_pattern),
+                      actions: link_to('Change', edit_prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id), class: 'govuk-link pull-right')
+            %>
+            <%= render 'govuk_summary_list_row',
+                      key: 'Status',
+                      value: full_status(@pom),
+                      actions: link_to('Change', edit_prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id), class: 'govuk-link pull-right')
+            %>
+          </dl>
         </div>
       </div>
       <div class="govuk-grid-column-one-third">
