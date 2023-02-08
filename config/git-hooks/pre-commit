@@ -3,7 +3,7 @@
 set -euo pipefail
 
 run_rubocop_on_modified() {
-  files=$(git status --porcelain | awk '/(\.(rb|rake|ru))|Gemfile$/ {print $2}')
+  files=$(git status --porcelain | awk '/(M|A|T|C) {1,2}.+(\.(rb|rake|ru)|Gemfile)$/ {print $2}')
   [[ -z "${files}" ]] || bundle exec rubocop --force-exclusion --format quiet --no-color ${files}
 }
 
