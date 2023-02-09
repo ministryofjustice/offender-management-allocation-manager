@@ -8,7 +8,7 @@
                         headers: [
                           { type: 'button', body: 'Prisoner details' },
                           @pom_view ? nil : { type: 'button', body: 'POM' },
-                          { type: 'button', body: 'COM details' },
+                          local_assigns[:hide_com_details] ? nil : { type: 'button', body: 'COM details' },
                           { type: 'button', body: 'COM responsible', sort: 'ascending' },
                           { type: 'button', body: 'Earliest release date' },
                           { type: 'button', body: 'Tier' },
@@ -21,8 +21,8 @@
 
       <%= render 'handovers/cells/staff_member', staff_member: handover_case.offender.staff_member unless @pom_view %>
 
-      <%= render 'handovers/cells/com_details',
-                 offender: handover_case.offender, handover_date: handover_case.handover_date %>
+      <%= render 'handovers/cells/com_details', offender: handover_case.offender,
+                 handover_date: handover_case.handover_date unless local_assigns[:hide_com_details] %>
 
       <%= render 'handovers/cells/handover_dates',
                  offender: handover_case.offender, handover_date: handover_case.handover_date, should_highlight: true %>
