@@ -302,4 +302,47 @@ describe OffenderService, type: :feature do
       end
     end
   end
+
+  describe 'get_mappa_details' do
+    before do
+      allow(HmppsApi::CommunityApi).to receive(:get_offender_mappa_details)
+        .and_return(api_mappa)
+    end
+
+    let(:result) { described_class.get_mappa_details('ABC123') }
+
+    let(:api_mappa) do
+      {
+        "category" => 3,
+        "categoryDescription" => "MAPPA Cat 1",
+        "level" => 1,
+        "levelDescription" => "MAPPA Level 1",
+        "notes" => "string",
+        "officer" => {
+          "code" => "AN001A",
+          "forenames" => "Sheila Linda",
+          "surname" => "Hancock",
+          "unallocated" => true
+        },
+        "probationArea" => {
+          "code" => "ABC123",
+          "description" => "Some description"
+        },
+        "reviewDate" => "2021-04-27",
+        "startDate" => "2021-01-27",
+        "team" => {
+          "code" => "ABC123",
+          "description" => "Some description"
+        }
+      }
+    end
+
+    it 'gets short descripton' do
+      expect(result[:short_description]).to eq('CAT 3/LEVEL 1')
+    end
+
+    it 'gets start date' do
+      expect(result[:start_date]).to eq(Date.new(2021, 1, 27))
+    end
+  end
 end

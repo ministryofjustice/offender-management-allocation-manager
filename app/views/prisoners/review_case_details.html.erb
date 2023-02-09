@@ -406,10 +406,7 @@
         </a>
       </p>
 
-      <div style="border: 2px solid" class="govuk-!-padding-4 govuk-!-margin-bottom-3">
-        <p class="govuk-!-margin-bottom-1"><%= @prisoner.mappa_level %> MAPPA</p>
-        <span class="govuk-caption-m govuk-body-s govuk-!-margin-bottom-1">Last updated: FIXME</span>
-      </div>
+      <%= render partial: 'shared/mappa', locals: {level: @mappa_details[:short_description], last_updated: @mappa_details[:start_date]} %>
 
       <!-- RoSH summary
       <div style="border: 2px solid" class="govuk-!-padding-4 govuk-!-margin-bottom-3">
