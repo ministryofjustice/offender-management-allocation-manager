@@ -1,7 +1,7 @@
 RSpec.describe HandoversController, type: :controller do
   let(:prison_code) { 'DBG' }
   let(:prison) { instance_double Prison, :prison, code: prison_code }
-  let(:default_params) { { prison_id: prison_code, pom: pom_param } }
+  let(:default_params) { { prison_id: prison_code, pom: pom_param, sort: 'offender_last_name+asc' } }
   let(:staff_id) { 456_987 }
   let(:staff_member) { instance_double StaffMember, :staff_member, staff_id: staff_id }
   let(:handover_cases) do
@@ -127,6 +127,40 @@ RSpec.describe HandoversController, type: :controller do
       it 'redirects to unauthorized' do
         get :com_allocation_overdue, params: default_params
         expect(response).to redirect_to('/401')
+      end
+    end
+  end
+
+  describe 'when no sorting specified' do
+    describe 'upcoming handovers page' do
+      it 'defaults sort to handover_date+desc' do
+        get :upcoming, params: default_params.except(:sort)
+        expect(response).to redirect_to(
+          upcoming_prison_handovers_path(default_params.merge(sort: 'handover_date asc')))
+      end
+    end
+
+    describe 'in progress handovers page' do
+      it 'defaults sort to handover_date+desc' do
+        get :in_progress, params: default_params.except(:sort)
+        expect(response).to redirect_to(
+          in_progress_prison_handovers_path(default_params.merge(sort: 'handover_date asc')))
+      end
+    end
+
+    describe 'overdue tasks page' do
+      it 'defaults sort to handover_date+desc' do
+        get :overdue_tasks, params: default_params.except(:sort)
+        expect(response).to redirect_to(
+          overdue_tasks_prison_handovers_path(default_params.merge(sort: 'handover_date asc')))
+      end
+    end
+
+    describe 'COM allocation overdue page' do
+      it 'defaults sort to handover_date+desc' do
+        get :com_allocation_overdue, params: default_params.except(:sort)
+        expect(response).to redirect_to(
+          com_allocation_overdue_prison_handovers_path(default_params.merge(sort: 'handover_date asc')))
       end
     end
   end

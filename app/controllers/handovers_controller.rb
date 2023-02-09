@@ -38,9 +38,18 @@ class HandoversController < PrisonsApplicationController
 
 private
 
+  def permitted_params
+    params.permit(:prison_id, :pom, :sort)
+  end
+
   def check_prerequisites_and_prepare_variables
     unless session[:new_handovers_ui] == true
       redirect_to '/401'
+      return
+    end
+
+    if params[:sort].blank?
+      redirect_to permitted_params.merge(sort: 'handover_date asc')
       return
     end
 
