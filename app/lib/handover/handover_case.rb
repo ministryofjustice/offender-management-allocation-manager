@@ -20,4 +20,10 @@ class Handover::HandoverCase
            to: :offender
   delegate :last_name, to: :staff_member, prefix: true
   delegate :handover_date, to: :calculated_handover_date
+
+  def com_allocation_days_overdue(relative_to_date: Time.zone.now.to_date)
+    raise ArgumentError, 'Handover date not set' unless handover_date
+
+    (relative_to_date - handover_date).to_i
+  end
 end

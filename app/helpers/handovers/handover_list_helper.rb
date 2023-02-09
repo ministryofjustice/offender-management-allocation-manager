@@ -11,14 +11,6 @@ module Handovers
       end
     end
 
-    def com_allocation_overdue_days(mpc_offender, relative_to_date: Time.zone.now.to_date)
-      raise 'Handover date not set' unless mpc_offender.model.handover_date
-
-      raise 'Handover date is in the future' if mpc_offender.model.handover_date > relative_to_date
-
-      (relative_to_date - mpc_offender.model.handover_date).to_i
-    end
-
     def dps_sentence_and_release_link(offender_no)
       "#{ENV['DIGITAL_PRISON_SERVICE_HOST']}/prisoner/#{offender_no}/sentence-and-release"
     end
