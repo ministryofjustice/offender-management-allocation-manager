@@ -92,11 +92,36 @@ for example if a particular POM has worked with <%= @prisoner.first_name.capital
         </a>
         <%= sort_arrow('working_pattern') %>
       </th>
-      <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none">Allocations in  last 7 days</th>
-      <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none">Supporting cases</th>
-      <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none">Responsible cases</th>
-      <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none">Co-working cases</th>
-      <th scope="col" class="govuk-table__header govuk-table__header--numeric" aria-sort="none">Total cases</th>
+      <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none">
+        <a href="<%= sort_link('new_allocations_count') %>">
+          Allocations in last 7 days
+        </a>
+        <%= sort_arrow('new_allocations_count') %>
+      </th>
+      <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none">
+        <a href="<%= sort_link('supporting_allocations_count') %>">
+          Supporting cases
+        </a>
+        <%= sort_arrow('supporting_allocations_count') %>
+      </th>
+      <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none">
+        <a href="<%= sort_link('responsible_allocations_count') %>">
+          Responsible cases
+        </a>
+        <%= sort_arrow('responsible_allocations_count') %>
+      </th>
+      <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none">
+        <a href="<%= sort_link('coworking_allocations_count') %>">
+          Co-working cases
+        </a>
+        <%= sort_arrow('coworking_allocations_count') %>
+      </th>
+      <th scope="col" class="govuk-table__header govuk-table__header--numeric" aria-sort="none">
+        <a href="<%= sort_link('total_allocations_count') %>">
+          Total cases
+        </a>
+        <%= sort_arrow('total_allocations_count') %>
+      </th>
       <th class="govuk-table__header" scope="col" style="width: 80px; padding-left: 20px;">Action</th>
       <!-- <th class="govuk-table__header">Select POMs <br>to compare workloads</th> -->
     </tr>
@@ -120,11 +145,11 @@ for example if a particular POM has worked with <%= @prisoner.first_name.capital
         </td>
 
         <td aria-label="Working pattern" class="govuk-table__cell"><%= format_working_pattern(pom.working_pattern) %></td>
-        <td aria-label="recent allocations" class="govuk-table__cell govuk-table__cell--numeric"><%= pom.allocations.count(&:new_case?) %></td>
-        <td aria-label="recent allocations" class="govuk-table__cell govuk-table__cell--numeric">TODO</td>
-        <td aria-label="Total prison" class="govuk-table__cell govuk-table__cell--numeric">TODO</td>
-        <td aria-label="recent allocations" class="govuk-table__cell govuk-table__cell--numeric">TODO</td>
-        <td aria-label="total allocations" class="govuk-table__cell govuk-table__cell--numeric govuk-!-font-weight-bold"><%= pom.allocations.count %></td>
+        <td aria-label="Recent allocations" class="govuk-table__cell govuk-table__cell--numeric"><%= pom.new_allocations_count %></td>
+        <td aria-label="Total suporting" class="govuk-table__cell govuk-table__cell--numeric"><%= pom.supporting_allocations_count %></td>
+        <td aria-label="Total responsible" class="govuk-table__cell govuk-table__cell--numeric"><%= pom.responsible_allocations_count %></td>
+        <td aria-label="Total co-working" class="govuk-table__cell govuk-table__cell--numeric"><%= pom.coworking_allocations_count %></td>
+        <td aria-label="Total allocations" class="govuk-table__cell govuk-table__cell--numeric govuk-!-font-weight-bold"><%= pom.total_allocations_count %></td>
 
         <td aria-label="recent allocations" class="govuk-table__cell" style="width: 80px; padding-left: 20px;">
           <% if @coworking %>
