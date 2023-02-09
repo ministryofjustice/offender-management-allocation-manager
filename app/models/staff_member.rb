@@ -71,6 +71,27 @@ class StaffMember
     @prison.allocations_for_pom(@staff_id).detect { |a| a.nomis_offender_id == nomis_offender_id }.present?
   end
 
+  # Counts for ordering
+  def new_allocations_count
+    allocations.count(&:new_case?)
+  end
+
+  def supporting_allocations_count
+    allocations.count(&:pom_supporting?)
+  end
+
+  def responsible_allocations_count
+    allocations.count(&:pom_responsible?)
+  end
+
+  def coworking_allocations_count
+    allocations.count(&:coworking?)
+  end
+
+  def total_allocations_count
+    allocations.count
+  end
+
 private
 
   def pom
