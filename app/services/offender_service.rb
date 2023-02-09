@@ -90,6 +90,24 @@ class OffenderService
       })
     end
 
+    def get_mappa_details(crn)
+      nil_details = { category: nil, level: nil, short_description: nil, review_date: nil, start_date: nil }
+
+      return nil_details if crn.blank?
+
+      details = HmppsApi::CommunityApi.get_offender_mappa_details(crn)
+
+      {
+        category: details['category'],
+        level: details['level'],
+        short_description: "CAT #{details['category']}/LEVEL #{details['level']}",
+        review_date: Date.parse(details['reviewDate']),
+        start_date: Date.parse(details['startDate'])
+      }
+    rescue Faraday::ResourceNotFound
+      nil_details
+    end
+
   private
 
     def find_or_create_offenders(nomis_ids)

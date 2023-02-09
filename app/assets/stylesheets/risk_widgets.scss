@@ -1,0 +1,110 @@
+// Please ensure that any changes made here are also reflected
+// in https://github.com/ministryofjustice/hmpps-risk-ui-elements
+
+$low-score-colour: #485b10;
+$low-score-border-colour: #85994b;
+$medium-score-colour: #a34e00;
+$medium-score-border-colour: #f47738;
+$high-score-colour: #942514;
+$high-score-border-colour: #d4351c;
+$very-high-score-colour: #711a0d;
+$very-high-score-border-colour: #942514;
+$unknown-score-border-colour: #fd0;
+$mappa-colour: #4c2c92;
+
+.rosh-widget {
+  border: 2px solid govuk-colour("black");
+  padding: govuk-spacing(4);
+  margin-bottom: govuk-spacing(4);
+
+  & h3 {
+    margin-bottom: govuk-spacing(1);
+    font-weight: 400;
+  }
+}
+
+.rosh-widget--unknown {
+  border: 2px solid $unknown-score-border-colour;
+}
+
+.rosh-widget--low {
+  border: 2px solid $low-score-border-colour;
+
+  & h3 {
+    color: $low-score-colour;
+  }
+}
+
+.rosh-widget--medium {
+  border: 2px solid $medium-score-border-colour;
+
+  & h3 {
+    color: $medium-score-colour;
+  }
+}
+
+.rosh-widget--high {
+  border: 2px solid $high-score-border-colour;
+
+  & h3 {
+    color: $high-score-colour;
+  }
+}
+
+.rosh-widget--very-high {
+  border: 2px solid $very-high-score-border-colour;
+
+  & h3 {
+    color: $very-high-score-colour;
+  }
+}
+
+.rosh-widget__table {
+  text-align: left;
+  margin: 0;
+
+  & tbody {
+    & th {
+      font-weight: 400;
+    }
+
+    & td {
+      font-weight: bold;
+    }
+  }
+}
+
+.rosh-widget__risk--low {
+  color: $low-score-colour;
+}
+
+.rosh-widget__risk--medium {
+  color: $medium-score-colour;
+}
+
+.rosh-widget__risk--high {
+  color: $high-score-colour;
+}
+
+.rosh-widget__risk--very-high {
+  color: $very-high-score-colour;
+}
+
+.mappa-widget {
+  border: 2px solid $mappa-colour;
+  padding: govuk-spacing(4);
+  margin-bottom: govuk-spacing(4);
+
+  & h3 {
+    color: $mappa-colour;
+    margin-bottom: govuk-spacing(1);
+    font-weight: 400;
+  }
+}
+
+.risk-flag-widget {
+  border: 2px solid #93afc3;
+  background-color: #ebf7ff;
+  padding: govuk-spacing(4);
+  margin-bottom: govuk-spacing(4);
+}

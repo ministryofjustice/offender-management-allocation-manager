@@ -1,0 +1,15 @@
+<aside class="mappa-widget" aria-label="MAPPA level">
+  <% if level.present? %>
+      <h3 class="govuk-heading-m"><strong><%= level %></strong> MAPPA</h3>
+      <p class="govuk-body-m">Multi-agency public protection arrangements</p>
+      <% if last_updated.present? %>
+          <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+          <p class="govuk-hint govuk-body-m">Last updated: <%= date_format(last_updated) %></p>
+      <% end %>
+  <% else %>
+      <h3 class="govuk-heading-m"><strong>UNKNOWN</strong> MAPPA</h3>
+      <p class="govuk-body-m">Multi-agency public protection arrangements</p>
+      <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+      <p class="govuk-body-m">Something went wrong. We are unable to show MAPPA information at this time. Try again later.</p>
+  <% end %>
+</aside>
