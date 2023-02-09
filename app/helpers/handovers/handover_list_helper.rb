@@ -27,9 +27,10 @@ module Handovers
 
     def handover_list_th(col, index)
       th_class = ['govuk-table__header'] + col.fetch(:class, [])
-      tag.th(scope: 'col', class: th_class, 'aria-sort': col.fetch(:sort, 'none')) do
-        if col[:type] == 'button'
-          tag.button(type: 'button', data: { index: index.to_s }) { col.fetch(:body) }
+      tag.th(scope: 'col', class: th_class) do
+        if col[:sort]
+          link_to(col.fetch(:body), sort_link(col[:sort]), data: { index: index.to_s }) +
+          sort_arrow(col[:sort])
         else
           col.fetch(:body)
         end

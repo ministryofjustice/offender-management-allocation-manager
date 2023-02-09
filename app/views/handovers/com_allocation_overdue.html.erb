@@ -19,12 +19,12 @@
 
 <%= handover_list_table(table_class: %w[com-allocation-overdue],
                         headers: [
-                          { type: 'button', body: 'Prisoner details' },
-                          @pom_view ? nil : { type: 'button', body: 'POM' },
-                          { type: 'button', body: 'COM responsible', sort: 'ascending' },
-                          { type: 'button', body: 'Earliest release date' },
-                          { type: 'button', body: 'Tier' },
-                          { type: 'button', body: 'Days overdue', class: %w[days-overdue], sort: 'descending' },
+                          { sort: 'offender_last_name', body: 'Prisoner details' },
+                          @pom_view ? nil : { sort: 'staff_member_last_name', body: 'POM' },
+                          { sort: 'handover_date', body: 'COM responsible' },
+                          { sort: 'earliest_release_date', body: 'Earliest release date' },
+                          { sort: 'case_allocation', body: 'Tier' },
+                          { sort: 'com_allocation_days_overdue', body: 'Days overdue', class: %w[days-overdue] },
                           { body: 'LDU details', class: %w[ldu-details govuk-!-width-one-quarter] },
                         ].compact) do %>
 

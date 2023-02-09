@@ -6,12 +6,12 @@
 
 <%= handover_list_table(table_class: [table_class],
                         headers: [
-                          { type: 'button', body: 'Prisoner details' },
-                          @pom_view ? nil : { type: 'button', body: 'POM' },
-                          local_assigns[:hide_com_details] ? nil : { type: 'button', body: 'COM details' },
-                          { type: 'button', body: 'COM responsible', sort: 'ascending' },
-                          { type: 'button', body: 'Earliest release date' },
-                          { type: 'button', body: 'Tier' },
+                          { sort: 'offender_last_name', body: 'Prisoner details' },
+                          @pom_view ? nil : { sort: 'staff_member_last_name', body: 'POM' },
+                          local_assigns[:hide_com_details] ? nil : { sort: 'allocated_com_name', body: 'COM details' },
+                          { sort: 'handover_date', body: 'COM responsible' },
+                          { sort: 'earliest_release_date', body: 'Earliest release date' },
+                          { sort: 'case_allocation', body: 'Tier' },
                           { body: 'Handover progress', class: ['handover-progress'] },
                         ].compact) do %>
 
