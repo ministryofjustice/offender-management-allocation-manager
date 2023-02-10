@@ -131,13 +131,8 @@
               <td class="govuk-table__cell"></td>
             </tr>
             <tr class="govuk-table__row">
-              <th scope="row" class="govuk-table__header govuk-!-width-one-third">Handover start due</th>
-              <td class="govuk-table__cell"><%= format_date(@prisoner.handover_start_date) %></td>
-              <td class="govuk-table__cell"></td>
-            </tr>
-            <tr class="govuk-table__row">
               <th scope="row" class="govuk-table__header govuk-!-width-one-third">Handover completion due</th>
-              <td class="govuk-table__cell"><!-- 09 Jan 2022 FIXME --></td>
+              <td class="govuk-table__cell"><%= format_date(@prisoner.responsibility_handover_date) %></td>
               <td class="govuk-table__cell"></td>
             </tr>
           </tbody>
