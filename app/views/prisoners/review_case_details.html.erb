@@ -143,7 +143,11 @@
           </tbody>
         </table>
 
-        <%= link_to 'Choose a POM to allocate to now', prison_prisoner_staff_index_path(@prison, @prisoner.offender_no) %>
+        <% if @coworking %>
+          <%= link_to 'Choose a co-working POM to allocate to now', prison_prisoner_staff_index_path(@prison, @prisoner.offender_no, coworking: true) %>
+        <% else %>
+          <%= link_to 'Choose a POM to allocate to now', prison_prisoner_staff_index_path(@prison, @prisoner.offender_no) %>
+        <% end %>
         or see more information below before allocating.
         <p></p>
       <div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div></div>
