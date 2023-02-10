@@ -21,6 +21,12 @@ module HighLevelMockingAndStubbingHelper
     FactoryBot.create :offender, nomis_offender_id: offender_no unless Offender.find_by_nomis_offender_id(offender_no)
     mock_offender
   end
+
+  def sneaky_instance_double(the_class, *args, **kwargs)
+    d = instance_double(the_class, *args, **kwargs.merge(is_a?: false))
+    allow(d).to receive(:is_a?).with(the_class).and_return(true)
+    d
+  end
 end
 
 RSpec.configure do |config|

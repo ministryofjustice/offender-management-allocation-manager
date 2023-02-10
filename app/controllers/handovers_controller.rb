@@ -38,9 +38,18 @@ class HandoversController < PrisonsApplicationController
 
 private
 
+  def permitted_params
+    params.permit(:prison_id, :pom, :sort)
+  end
+
   def check_prerequisites_and_prepare_variables
     unless session[:new_handovers_ui] == true
       redirect_to '/401'
+      return
+    end
+
+    if params[:sort].blank?
+      redirect_to permitted_params.merge(sort: 'handover_date asc')
       return
     end
 
@@ -60,6 +69,7 @@ private
   end
 
   def filtered_handover_cases(cases)
-    Kaminari.paginate_array(cases).page(page)
+    sorted_cases = sort_collection cases, default_sort: :handover_date, default_direction: :asc
+    Kaminari.paginate_array(sorted_cases).page(page)
   end
 end
