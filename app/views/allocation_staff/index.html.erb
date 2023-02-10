@@ -132,7 +132,10 @@ for example if a particular POM has worked with <%= @prisoner.first_name.capital
       <tr class="govuk-table__row recommended_pom_row_1">
         <td aria-label="POM name" class="govuk-table__cell pom_name">
           <%= pom.first_name %> <%= pom.last_name %>
-          <% if @previous_poms.map(&:staff_id).include? pom.staff_id %>
+          <% if @current_pom&.staff_id == pom.staff_id %>
+            <br>
+            <span class="govuk-!-font-weight-bold"><%= @coworking ? 'Primary POM' : 'Currently allocated' %></span>
+          <% elsif @previous_poms.map(&:staff_id).include? pom.staff_id %>
             <br>
             <span class="govuk-!-font-weight-bold">Previously allocated</span>
           <% end %>
