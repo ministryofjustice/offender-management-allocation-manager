@@ -75,5 +75,7 @@ module OffenderManagementAllocationClient
     config.action_view.field_error_proc = proc { |html_tag, _instance|
       html_tag
     }
+
+    config.active_record.schema_format = :sql
   end
 end
