@@ -16,4 +16,10 @@ class HandoverMailer < GovukNotifyRails::Mailer
                         release_date: release_date)
     mail(to: email)
   end
+
+  def handover_date(email:,
+                    nomis_offender_id:)
+    set_personalisation(nomis_offender_id: nomis_offender_id)
+    mail(to: email)
+  end
 end
