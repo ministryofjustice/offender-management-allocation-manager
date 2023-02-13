@@ -461,6 +461,38 @@ ALTER SEQUENCE public.offender_email_opt_outs_id_seq OWNED BY public.offender_em
 
 
 --
+-- Name: offender_email_sent; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.offender_email_sent (
+    id bigint NOT NULL,
+    nomis_offender_id character varying NOT NULL,
+    offender_email_type public.offender_email_type NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: offender_email_sent_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.offender_email_sent_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: offender_email_sent_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.offender_email_sent_id_seq OWNED BY public.offender_email_sent.id;
+
+
+--
 -- Name: offender_events; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -761,6 +793,13 @@ ALTER TABLE ONLY public.offender_email_opt_outs ALTER COLUMN id SET DEFAULT next
 
 
 --
+-- Name: offender_email_sent id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.offender_email_sent ALTER COLUMN id SET DEFAULT nextval('public.offender_email_sent_id_seq'::regclass);
+
+
+--
 -- Name: offender_events id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -897,6 +936,14 @@ ALTER TABLE ONLY public.local_delivery_units
 
 ALTER TABLE ONLY public.offender_email_opt_outs
     ADD CONSTRAINT offender_email_opt_outs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: offender_email_sent offender_email_sent_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.offender_email_sent
+    ADD CONSTRAINT offender_email_sent_pkey PRIMARY KEY (id);
 
 
 --
@@ -1042,6 +1089,13 @@ CREATE UNIQUE INDEX index_offender_email_opt_outs_on_nomis_offender_id ON public
 
 
 --
+-- Name: index_offender_email_sent_on_nomis_offender_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_offender_email_sent_on_nomis_offender_id ON public.offender_email_sent USING btree (nomis_offender_id);
+
+
+--
 -- Name: index_offender_events_on_nomis_offender_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1096,6 +1150,14 @@ CREATE INDEX index_victim_liaison_officers_on_nomis_offender_id ON public.victim
 
 ALTER TABLE ONLY public.handover_progress_checklists
     ADD CONSTRAINT fk_rails_0f7d3e1f9a FOREIGN KEY (nomis_offender_id) REFERENCES public.offenders(nomis_offender_id);
+
+
+--
+-- Name: offender_email_sent fk_rails_5f6304c3c6; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.offender_email_sent
+    ADD CONSTRAINT fk_rails_5f6304c3c6 FOREIGN KEY (nomis_offender_id) REFERENCES public.offenders(nomis_offender_id);
 
 
 --
@@ -1219,6 +1281,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20221123000001'),
 ('20221216000001'),
 ('20230213000001'),
-('20230213000002');
+('20230213000002'),
+('20230213000003');
 
 
