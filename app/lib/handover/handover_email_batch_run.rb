@@ -13,6 +13,7 @@ class Handover::HandoverEmailBatchRun
     Handover::HandoverEmail.deliver_if_deliverable(
       :upcoming_handover_window,
       offender.offender_no,
+      offender.staff_member.staff_id,
       email: offender.staff_member.email_address,
       full_name_ordered: offender.full_name_ordered,
       first_name: offender.first_name,

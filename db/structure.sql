@@ -434,7 +434,7 @@ ALTER SEQUENCE public.local_delivery_units_id_seq OWNED BY public.local_delivery
 
 CREATE TABLE public.offender_email_opt_outs (
     id bigint NOT NULL,
-    nomis_offender_id character varying NOT NULL,
+    staff_member_id character varying NOT NULL,
     offender_email_type public.offender_email_type NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
@@ -467,6 +467,7 @@ ALTER SEQUENCE public.offender_email_opt_outs_id_seq OWNED BY public.offender_em
 CREATE TABLE public.offender_email_sent (
     id bigint NOT NULL,
     nomis_offender_id character varying NOT NULL,
+    staff_member_id character varying NOT NULL,
     offender_email_type public.offender_email_type NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
@@ -1082,17 +1083,24 @@ CREATE UNIQUE INDEX index_local_delivery_units_on_code ON public.local_delivery_
 
 
 --
--- Name: index_offender_email_opt_outs_on_nomis_offender_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_offender_email_opt_out_unique_composite_key; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_offender_email_opt_outs_on_nomis_offender_id ON public.offender_email_opt_outs USING btree (nomis_offender_id);
+CREATE UNIQUE INDEX index_offender_email_opt_out_unique_composite_key ON public.offender_email_opt_outs USING btree (staff_member_id, offender_email_type);
 
 
 --
 -- Name: index_offender_email_sent_on_nomis_offender_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_offender_email_sent_on_nomis_offender_id ON public.offender_email_sent USING btree (nomis_offender_id);
+CREATE INDEX index_offender_email_sent_on_nomis_offender_id ON public.offender_email_sent USING btree (nomis_offender_id);
+
+
+--
+-- Name: index_offender_email_sent_unique_composite_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_offender_email_sent_unique_composite_key ON public.offender_email_sent USING btree (nomis_offender_id, staff_member_id, offender_email_type);
 
 
 --
@@ -1158,14 +1166,6 @@ ALTER TABLE ONLY public.handover_progress_checklists
 
 ALTER TABLE ONLY public.offender_email_sent
     ADD CONSTRAINT fk_rails_5f6304c3c6 FOREIGN KEY (nomis_offender_id) REFERENCES public.offenders(nomis_offender_id);
-
-
---
--- Name: offender_email_opt_outs fk_rails_fb91f52e2d; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.offender_email_opt_outs
-    ADD CONSTRAINT fk_rails_fb91f52e2d FOREIGN KEY (nomis_offender_id) REFERENCES public.offenders(nomis_offender_id);
 
 
 --

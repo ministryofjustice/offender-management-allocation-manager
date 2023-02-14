@@ -16,7 +16,7 @@ RSpec.describe Handover::HandoverEmailBatchRun do
                         full_name_ordered: Faker::Name.name,
                         case_allocation: 'NPS',
                         earliest_release_date: Date.new(2100, 11, 12),
-                        staff_member: double(email_address: 'staff1@example.org')),
+                        staff_member: double(staff_id: 'STAFF1', email_address: 'staff1@example.org')),
         instance_double(AllocatedOffender,
                         :to_process1,
                         offender_no: FactoryBot.generate(:nomis_offender_id),
@@ -24,7 +24,7 @@ RSpec.describe Handover::HandoverEmailBatchRun do
                         full_name_ordered: Faker::Name.name,
                         case_allocation: 'CRC',
                         earliest_release_date: Date.new(2200, 6, 14),
-                        staff_member: double(email_address: 'staff2@example.org')),
+                        staff_member: double(staff_id: 'STAFF2', email_address: 'staff2@example.org')),
       ]
     end
 
@@ -45,7 +45,7 @@ RSpec.describe Handover::HandoverEmailBatchRun do
 
       aggregate_failures do
         expect(Handover::HandoverEmail).to have_received(:deliver_if_deliverable).with(
-          :upcoming_handover_window, allocated_to_process[0].offender_no,
+          :upcoming_handover_window, allocated_to_process[0].offender_no, 'STAFF1',
           email: 'staff1@example.org',
           full_name_ordered: allocated_to_process[0].full_name_ordered,
           first_name: allocated_to_process[0].first_name,
@@ -55,7 +55,7 @@ RSpec.describe Handover::HandoverEmailBatchRun do
           deliver_now: false,
         )
         expect(Handover::HandoverEmail).to have_received(:deliver_if_deliverable).with(
-          :upcoming_handover_window, allocated_to_process[1].offender_no,
+          :upcoming_handover_window, allocated_to_process[1].offender_no, 'STAFF2',
           email: 'staff2@example.org',
           full_name_ordered: allocated_to_process[1].full_name_ordered,
           first_name: allocated_to_process[1].first_name,
