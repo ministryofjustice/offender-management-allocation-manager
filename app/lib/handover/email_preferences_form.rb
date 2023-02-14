@@ -1,18 +1,18 @@
 class Handover::EmailPreferencesForm
   include ActiveModel::Model
 
-  OPT_OUT_FIELDS = OffenderEmailOptOut::OPT_OUT_FIELDS
+  FIELDS = OffenderEmailOptOut::FIELDS
 
-  attr_accessor :staff_member_id, *OPT_OUT_FIELDS
+  attr_accessor :staff_member_id, *FIELDS
 
-  validates(*OPT_OUT_FIELDS, presence: true, inclusion: [true, false])
+  validates(*FIELDS, presence: true, inclusion: [true, false])
 
   def self.load_opt_outs(staff_member:)
     model = new
     model.staff_member_id = staff_member.staff_id
     # Load attributes from DB - remember, opt out is reversed
 
-    OPT_OUT_FIELDS.each do |field|
+    FIELDS.each do |field|
       opt_out = OffenderEmailOptOut.find_by(staff_member_id: model.staff_member_id, offender_email_type: field)
       model.send("#{field}=", opt_out.nil?)
     end
@@ -21,7 +21,7 @@ class Handover::EmailPreferencesForm
   end
 
   def update!(params)
-    OPT_OUT_FIELDS.each do |field|
+    FIELDS.each do |field|
       value = params.fetch(field)
       send("#{field}=", value)
 
