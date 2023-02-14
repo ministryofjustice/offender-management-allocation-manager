@@ -39,6 +39,7 @@ RUN \
     curl \
     build-essential \
     libpq-dev \
+    postgresql-client \
     libjemalloc-dev \
   && timedatectl set-timezone Europe/London || true \
   && gem install bundler -v 2.2.29 --no-document \
