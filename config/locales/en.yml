@@ -172,6 +172,7 @@ en:
         pom: 'Your handover cases - Digital Prison Services'
         homd: 'Handover cases - Digital Prison Services'
       progress_checklist: 'Record handover progress - Digital Prison Services'
+      email_preferences: 'Manage email reminders - Digital Prison Services'
     page_header:
       pom: 'Your handover cases'
       homd: 'Handover cases'

@@ -10,10 +10,12 @@
                   class: %w[govuk-link govuk-link--no-visited-state],
                   target: '_blank' %>
     </li>
-    <li>
-      <a class="govuk-link govuk-link--no-visited-state" href="#">
-        Choose how often we send you emails to remind you about handovers
-      </a>
-    </li>
+    <% unless local_assigns[:hide_email_preferences_link] %>
+      <li>
+        <%= link_to 'Choose how often we send you emails to remind you about handovers',
+                    prison_edit_handover_email_preferences_path(params[:prison_id]),
+                    class: %w[govuk-link govuk-link--no-visited-state] %>
+      </li>
+    <% end %>
   </ul>
 </aside>

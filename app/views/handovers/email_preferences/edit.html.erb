@@ -1,0 +1,79 @@
+<% content_for :title, translate('handovers.page_title.email_preferences'), flush: true %>
+
+<%= link_to "Back", last_handovers_url, class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-4">
+      Manage email reminders
+    </h1>
+
+    <p class="govuk-body">
+      You can receive email reminders to help you keep track of case handovers. The preferences you choose below will
+      apply to all your handover cases.
+    </p>
+
+    <p>
+      Emails will be sent to <strong><%= @current_user.email_address %></strong>. You can update this address on NOMIS.
+    </p>
+
+
+    <%= form_for(:email_preferences,
+                 url: prison_update_handover_email_preferences_path(@prison.code),
+                 method: :put) do |form| %>
+      <div class="app-task-list">
+        <ul class="app-task-list__items">
+
+          <li class="app-task-list__item">
+            <div class="govuk-checkboxes">
+              <div class="govuk-checkboxes__item">
+                <%= form.check_box :upcoming_handover_window, class: 'govuk-checkboxes__input', 'aria-describedby': 'upcoming-handover-window-hint' %>
+                <%= form.label :upcoming_handover_window, class: 'govuk-label govuk-checkboxes__label' do %>
+                  To let you know to start planning for handover
+                <% end %>
+
+                <span class="govuk-hint govuk-checkboxes__hint" id="contacted-com-hint">
+                    We send this 8 weeks before COM allocation to give you time to prepare more complex cases.
+                </span>
+              </div>
+            </div>
+          </li>
+
+          <li class="app-task-list__item">
+            <div class="govuk-checkboxes">
+              <div class="govuk-checkboxes__item">
+                <%= form.check_box :handover_date, class: 'govuk-checkboxes__input', 'aria-describedby': 'handover-date-hint' %>
+                <%= form.label :handover_date, class: 'govuk-label govuk-checkboxes__label' do %>
+                  When a COM has been allocated
+                <% end %>
+              </div>
+            </div>
+          </li>
+
+          <li class="app-task-list__item">
+            <div class="govuk-checkboxes">
+              <div class="govuk-checkboxes__item">
+                <%= form.check_box :com_allocation_overdue, class: 'govuk-checkboxes__input', 'aria-describedby': 'com-allocation-overdue-hint' %>
+                <%= form.label :com_allocation_overdue, class: 'govuk-label govuk-checkboxes__label' do %>
+                  If COM allocation is overdue
+                <% end %>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="govuk-button-group">
+        <%= form.button 'Update', type: 'submit', role: 'button', draggable: 'false',
+                        class: 'govuk-button', data: { module: 'govuk-button' } %>
+
+        <%= link_to 'Cancel', last_handovers_url, class: "govuk-link govuk-link govuk-link--no-visited-state" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="govuk-grid-column-one-third">
+    <%= render '/handovers/more_on_handovers', hide_email_preferences_link: true %>
+  </div>
+</div>
