@@ -37,7 +37,7 @@
         <ul class="app-task-list__items">
 
           <% if @handover_progress_checklist.case_allocation == 'NPS' %>
-            <li class="app-task-list__item">
+            <li class="app-task-list__item with-divider">
               <div class="govuk-checkboxes">
                 <div class="govuk-checkboxes__item">
                   <%= form.check_box :reviewed_oasys, class: 'govuk-checkboxes__input', 'aria-describedby': 'reviewed-oasys-hint' %>
@@ -55,7 +55,7 @@
             </li>
           <% end %>
 
-          <li class="app-task-list__item">
+          <li class="app-task-list__item with-divider">
             <div class="govuk-checkboxes">
               <div class="govuk-checkboxes__item">
                 <%= form.check_box :contacted_com, class: 'govuk-checkboxes__input', 'aria-describedby': 'contacted-com-hint' %>
@@ -73,7 +73,7 @@
           </li>
 
           <% if @handover_progress_checklist.case_allocation == 'NPS' %>
-            <li class="app-task-list__item">
+            <li class="app-task-list__item with-divider">
               <div class="govuk-checkboxes">
                 <div class="govuk-checkboxes__item">
                   <%= form.check_box :attended_handover_meeting, class: 'govuk-checkboxes__input',
@@ -86,12 +86,12 @@
                   <span class="govuk-hint govuk-checkboxes__hint" id="attended-handover-meeting-hint">
                     The COM should be in touch about arranging this with you, the prisoner and anyone else involved in
                     the case, such as family members and key workers.
-                </span>
+                  </span>
                 </div>
               </div>
             </li>
           <% else %>
-            <li class="app-task-list__item">
+            <li class="app-task-list__item with-divider">
               <div class="govuk-checkboxes">
                 <div class="govuk-checkboxes__item">
                   <%= form.check_box :sent_handover_report, class: 'govuk-checkboxes__input',
@@ -113,7 +113,7 @@
         </ul>
       </div>
 
-      <div class="govuk-button-group handover-progress-checklist-save-tasks">
+      <div class="govuk-button-group">
         <%= form.button 'Save tasks', type: 'submit', role: 'button', draggable: 'false',
                         class: 'govuk-button', data: { module: 'govuk-button' } %>
 

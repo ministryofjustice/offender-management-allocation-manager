@@ -5,7 +5,10 @@
 
   <ul class="govuk-list">
     <li>
-      <%= link_to 'View handover guidance on EQuiP', translate(:equip_url), target: '_blank' %>
+      <%= link_to 'View handover guidance on EQuiP',
+                  translate(:equip_url),
+                  class: %w[govuk-link govuk-link--no-visited-state],
+                  target: '_blank' %>
     </li>
     <li>
       <a class="govuk-link govuk-link--no-visited-state" href="#">

@@ -1,5 +1,6 @@
 class HandoverProgressChecklistsController < PrisonsApplicationController
   def edit
+    flash.keep(:current_handovers_url)
     with_valid_offender do |offender, nomis_offender_id|
       flash.keep[:current_handovers_url]
       @offender = offender

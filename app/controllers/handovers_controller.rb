@@ -65,7 +65,7 @@ private
     end
 
     @prison_id = active_prison_id
-    flash[:current_handovers_url] = request.url
+    flash[:current_handovers_url] = request.original_url
   end
 
   def filtered_handover_cases(cases)
