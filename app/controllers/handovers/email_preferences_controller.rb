@@ -1,4 +1,6 @@
 class Handovers::EmailPreferencesController < PrisonsApplicationController
+  OPT_OUT_FIELDS = Handover::EmailPreferencesForm::OPT_OUT_FIELDS
+
   def edit
     flash.keep(:current_handovers_url)
     @email_preferences = Handover::EmailPreferencesForm.load(staff_member: @current_user)
@@ -14,6 +16,6 @@ class Handovers::EmailPreferencesController < PrisonsApplicationController
 private
 
   def email_preferences_params
-    params.require(:email_preferences).permit(:upcoming_handover_window, :handover_date, :com_allocation_overdue)
+    params.require(:email_preferences).permit(*OPT_OUT_FIELDS)
   end
 end

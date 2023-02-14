@@ -1,7 +1,11 @@
 class Handover::EmailPreferencesForm
   include ActiveModel::Model
 
-  attr_accessor :staff_member_id, :upcoming_handover_window, :handover_date, :com_allocation_overdue
+  OPT_OUT_FIELDS = OffenderEmailOptOut::OPT_OUT_FIELDS
+
+  attr_accessor :staff_member_id, *OPT_OUT_FIELDS
+
+  validates(*OPT_OUT_FIELDS, presence: true, inclusion: [true, false])
 
   def self.load(staff_member:)
     model = new
