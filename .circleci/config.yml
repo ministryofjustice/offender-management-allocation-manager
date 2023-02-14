@@ -283,7 +283,7 @@ jobs:
           at: ~/
       - run:
           name: Setup separate cucumber database
-          command: bundle exec rake db:create db:migrate
+          command: bundle exec rake db:setup
           environment:
             TEST_ENV_NUMBER: CUCUMBER1
       - run:
