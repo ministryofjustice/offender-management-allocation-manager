@@ -182,3 +182,5 @@ en:
         contacted_com: 'Have contact from COM'
         attended_handover_meeting: 'Attend handover meeting'
         sent_handover_report: 'Send handover report'
+    email_preferences:
+      success_notice: 'You have successfully updated your email preferences.'
