@@ -129,7 +129,7 @@ for example if a particular POM has worked with <%= @prisoner.first_name.capital
   <tbody class="govuk-table__body">
 
     <% @available_poms.each do |pom| %>
-      <tr class="govuk-table__row recommended_pom_row_1">
+      <tr class="govuk-table__row recommended_pom_row_1" id="pom-<%= pom.staff_id %>">
         <td aria-label="POM name" class="govuk-table__cell pom_name">
           <%= pom.first_name %> <%= pom.last_name %>
           <% if @current_pom&.staff_id == pom.staff_id %>

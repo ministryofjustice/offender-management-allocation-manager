@@ -4,7 +4,7 @@
       <p class="govuk-body-m">Multi-agency public protection arrangements</p>
       <% if last_updated.present? %>
           <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-          <p class="govuk-hint govuk-body-m">Last updated: <%= date_format(last_updated) %></p>
+          <p class="govuk-hint govuk-body-m">Last updated: <%= format_date(last_updated) %></p>
       <% end %>
   <% else %>
       <h3 class="govuk-heading-m"><strong>UNKNOWN</strong> MAPPA</h3>

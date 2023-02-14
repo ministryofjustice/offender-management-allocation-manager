@@ -46,7 +46,7 @@ class PrisonersController < PrisonsApplicationController
     @allocation = AllocationHistory.find_by(nomis_offender_id: @prisoner.offender_no)
 
     if @allocation.present?
-      if @allocation.primary_pom_nomis_id.present?
+      if @allocation.active?
         @pom = StaffMember.new(@prison, @allocation.primary_pom_nomis_id)
       end
       if @allocation.secondary_pom_name.present?
