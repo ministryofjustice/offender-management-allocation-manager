@@ -1,6 +1,7 @@
 RSpec.feature "Delius import feature", :disable_push_to_delius do
   let(:offender_no) {  offender.fetch(:prisonerNumber) }
-  let(:prison_code) { create(:prison).code }
+  let(:prison) { create(:prison) }
+  let(:prison_code) { prison.code }
   let(:offender) { build(:nomis_offender, prisonId: prison_code) }
   let(:offender_name) { "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}" }
   let(:pom) { build(:pom) }
@@ -10,6 +11,8 @@ RSpec.feature "Delius import feature", :disable_push_to_delius do
     stub_poms prison_code, [pom]
     stub_offenders_for_prison(prison_code, [offender])
     stub_request(:get, "https://www.gov.uk/bank-holidays.json").to_return(body: {}.to_json)
+
+    create(:allocation_history, nomis_offender_id: offender_no, prison: prison.code, primary_pom_nomis_id: pom.staff_id)
   end
 
   context "when the LDU is known" do
@@ -26,6 +29,7 @@ RSpec.feature "Delius import feature", :disable_push_to_delius do
       stub_get_all_offender_managers(offender_no, [build(:community_all_offender_managers_datum,
                                                          forenames: 'F1', surname: 'S1', email: 'E1',
                                                          team_name: 'Team1', ldu_code: ldu.code)])
+      stub_keyworker(prison_code, offender_no, build(:keyworker))
     end
 
     it "imports from Delius and creates case information" do
@@ -39,10 +43,11 @@ RSpec.feature "Delius import feature", :disable_push_to_delius do
       expect(page).to have_content("Add missing details")
       expect(page).not_to have_content(offender_no)
 
-      visit unallocated_prison_prisoners_path(prison_code)
-      expect(page).to have_content("Make allocations")
+      visit allocated_prison_prisoners_path(prison_code)
+      expect(page).to have_content("See allocations")
       expect(page).to have_content(offender_no)
       click_link offender_name
+
       expect(page.find(:css, '#welsh-offender-row')).not_to have_content('Change')
       expect(page.find(:css, '#service-provider-row')).not_to have_content('Change')
       expect(page.find(:css, '#tier-row')).not_to have_content('Change')

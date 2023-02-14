@@ -184,12 +184,11 @@ feature 'Co-working' do
   end
 
   context 'with a secondary from somewhere else' do
+    before { stub_poms(prison, [another_pom]) }
+
     let(:another_pom) do
-      {
-        staff_id: 123_456,
-        pom_name: 'Some Other POM',
-        email: 'ommiicc@digital.justice.gov.uk'
-      }
+      build(:pom, staffId: 123_456, firstName: 'Some', lastName: 'Other POM',
+                  emails: ['ommiicc@digital.justice.gov.uk'])
     end
 
     let!(:allocation) do
@@ -199,22 +198,32 @@ feature 'Co-working' do
         nomis_offender_id: nomis_offender_id,
         primary_pom_nomis_id: prison_pom[:staff_id],
         primary_pom_name: prison_pom[:pom_name],
-        secondary_pom_nomis_id: another_pom[:staff_id],
-        secondary_pom_name: another_pom[:pom_name],
+        secondary_pom_nomis_id: another_pom.staffId,
+        secondary_pom_name: "#{another_pom.firstName} #{another_pom.lastName}",
         recommended_pom_type: 'probation'
       )
     end
 
     scenario 'allocating' do
       expect(allocation.secondary_pom_nomis_id).to eq(123_456)
+
+      # Go to allocation page
       visit prison_prisoner_allocation_path(prison.code, nomis_offender_id)
 
-      click_link 'Allocate'
-
-      within '.probation_pom_row_0' do
+      within 'tr#co-working-pom' do
         click_link 'Allocate'
       end
+
+      # Now on Review case page
+      click_link 'Choose a co-working POM to allocate to now' # For some reason it sees the 'Choose co-working POM' button as disabled
+
+      # Now on 'Choose a POM' page
+      within "#pom-485758" do
+        click_link 'Allocate'
+      end
+
       click_button 'Complete allocation'
+
       expect(allocation.reload.secondary_pom_nomis_id).to eq(485_758)
       expect(page).to have_current_path(allocated_prison_prisoners_path(prison.code), ignore_query: true)
     end

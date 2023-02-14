@@ -44,17 +44,22 @@ feature "womens allocation journey" do
         create(:allocation_history, prison: prison.code, nomis_offender_id: ci.nomis_offender_id, primary_pom_nomis_id: probation_pom.staff_id)
       end
 
+      stub_keyworker(prison.code, offender[:prisonerNumber], build(:keyworker))
+
       visit unallocated_prison_prisoners_path prison.code
       click_link offender_name
+      # Now on Review case page
+
+      click_link 'Choose a POM to allocate to now'
+      # Now on 'Choose a POM' page
     end
 
     scenario 'accepting recommendation' do
-      within '#recommended_poms' do
+      within "tr#pom-#{probation_pom2.staffId}" do
         # allocate to the second person in the list
-        within 'tr:nth-of-type(2)' do
-          click_link 'Allocate'
-        end
+        click_link 'Allocate'
       end
+
       fill_in 'allocation-form-message-field', with: message_text
       click_button 'Complete allocation'
       a = AllocationHistory.find_by!(nomis_offender_id: nomis_offender_id)
@@ -77,13 +82,11 @@ feature "womens allocation journey" do
     end
 
     scenario 'rejecting recommendation' do
-      find('#non-recommended-accordion-section-heading').click
-      find('#accordion-2-heading').click
-
       # Choose the one non-recommended POM
-      within '#non-recommended-accordion-section' do
+      within "tr#pom-#{prison_pom.staffId}" do
         click_link 'Allocate'
       end
+
       # Try to just hit 'Continue' - it should bounce with a nice error
       click_button 'Continue'
       within '.govuk-error-summary' do
@@ -137,15 +140,18 @@ feature "womens allocation journey" do
       within '.allocated_offender_row_0' do
         click_link offender_name
       end
+      # Now on allocation page
 
       stub_community_offender(offender_id, build(:community_data))
     end
 
     scenario 'accepting recommendation' do
       click_link 'Reallocate'
+      # Now on Review case page
 
-      within '#recommended_poms' do
-        # there is only 1 allocation for this person, so can just click through
+      click_link 'Choose a POM to allocate to now'
+
+      within "tr#pom-#{prison_pom.staffId}" do
         click_link 'Allocate'
       end
 
