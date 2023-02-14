@@ -44,6 +44,8 @@ en:
   nps: NPS (Legacy)
   crc: CRC (Legacy)
 
+  equip_url: 'https://equip-portal.equip.service.justice.gov.uk/'
+
   activemodel:
     errors:
       models:
