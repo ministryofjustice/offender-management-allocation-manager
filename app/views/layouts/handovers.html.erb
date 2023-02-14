@@ -1,4 +1,4 @@
-<% content_for :title, translate('handovers.page_title.default') %>
+#<% content_for :title, translate("handovers.page_title.default.#{@pom_view ? 'pom' : 'homd'}") %>
 
 <% content_for :main_content do %>
   <% content_for :switcher do %>
@@ -8,7 +8,7 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
-        Your handover cases
+        <%= translate("handovers.page_header.#{@pom_view ? 'pom' : 'homd'}") %>
       </h1>
 
       <p>

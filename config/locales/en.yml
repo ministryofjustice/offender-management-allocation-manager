@@ -166,8 +166,13 @@ en:
 
   handovers:
     page_title:
-      default: 'Your handover cases - Digital Prison Services'
+      default:
+        pom: 'Your handover cases - Digital Prison Services'
+        homd: 'Handover cases - Digital Prison Services'
       progress_checklist: 'Record handover progress - Digital Prison Services'
+    page_header:
+      pom: 'Your handover cases'
+      homd: 'Handover cases'
     progress:
       short_description:
         reviewed_oasys: 'Review OASys'
