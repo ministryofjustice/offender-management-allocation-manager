@@ -57,4 +57,10 @@ class AllocatedOffender
   def staff_member
     StaffMember.new(Prison.find(prison_id), @staff_id)
   end
+
+  class << self
+    def all
+      Prison.all.map(&:primary_allocated_offenders).inject(:+)
+    end
+  end
 end
