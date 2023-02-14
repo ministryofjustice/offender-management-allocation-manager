@@ -3,11 +3,11 @@ class Handovers::EmailPreferencesController < PrisonsApplicationController
 
   def edit
     flash.keep(:current_handovers_url)
-    @email_preferences = Handover::EmailPreferencesForm.load(staff_member: @current_user)
+    @email_preferences = Handover::EmailPreferencesForm.load_opt_outs(staff_member: @current_user)
   end
 
   def update
-    email_preferences = Handover::EmailPreferencesForm.load(staff_member: @current_user)
+    email_preferences = Handover::EmailPreferencesForm.load_opt_outs(staff_member: @current_user)
     email_preferences.update!(email_preferences_params)
 
     redirect_to helpers.last_handovers_url
