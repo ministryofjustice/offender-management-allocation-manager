@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe MpcOffender, type: :model do
   subject(:offender) do
-    build(:mpc_offender, prison: prison, prison_record: api_offender, offender: offender_model)
+    described_class.new(prison: prison, offender: offender_model, prison_record: api_offender)
   end
 
   let(:nomis_offender_id) { FactoryBot.generate :nomis_offender_id }

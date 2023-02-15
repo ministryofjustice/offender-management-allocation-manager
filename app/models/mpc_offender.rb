@@ -11,7 +11,7 @@ class MpcOffender
            :date_of_birth, :main_offence, :awaiting_allocation_for, :location,
            :category_label, :complexity_level, :category_code, :category_active_since,
            :first_name, :last_name, :full_name_ordered, :full_name,
-           :inside_omic_policy?, :offender_no, :prison_id, :restricted_patient?, :age, to: :@prison_record
+           :inside_omic_policy?, :offender_no, :prison_id, :restricted_patient?, :age, to: :@api_offender
 
   delegate :crn, :case_allocation, :manual_entry?, :nps_case?,
            :tier,
@@ -25,13 +25,17 @@ class MpcOffender
 
   delegate :start_date, to: :handover, prefix: true
 
-  attr_reader :probation_record, :prison
+  attr_reader :case_information, :prison
 
   def initialize(prison:, offender:, prison_record:)
     @prison = prison
     @offender = offender
-    @prison_record = prison_record # @type HmppsApi::Offender
-    @probation_record = offender.case_information
+    @api_offender = prison_record # @type HmppsApi::Offender
+    @case_information = offender.case_information
+  end
+
+  def probation_record
+    @case_information
   end
 
   # TODO: - view method in model needs to be removed
@@ -44,7 +48,7 @@ class MpcOffender
   end
 
   def needs_a_com?
-    @probation_record.present? && (com_responsible? || com_supporting?) && allocated_com_name.blank?
+    @case_information.present? && (com_responsible? || com_supporting?) && allocated_com_name.blank?
   end
 
   def pom_responsible?
@@ -82,11 +86,11 @@ class MpcOffender
   end
 
   def allocated_com_name
-    @probation_record.com_name
+    @case_information.com_name
   end
 
   def allocated_com_email
-    @probation_record.com_email
+    @case_information.com_email
   end
 
   def responsibility_override?
@@ -109,7 +113,7 @@ class MpcOffender
 
   def needs_early_allocation_notify?
     # The probation_record.present? check is needed as one of the dates is PRD which is currently inside case_information
-    @probation_record.present? &&
+    @case_information.present? &&
       within_early_allocation_window? &&
       early_allocations.active_pre_referral_window.any? &&
       early_allocations.post_referral_window.empty?
@@ -138,7 +142,7 @@ class MpcOffender
 
   def approaching_handover?
     # we can't calculate handover without case info as we don't know NPS/CRC
-    return false if @probation_record.blank?
+    return false if @case_information.blank?
 
     today = Time.zone.today
     thirty_days_time = today + 30.days
