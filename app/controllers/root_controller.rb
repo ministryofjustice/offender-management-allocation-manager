@@ -6,4 +6,8 @@ class RootController < ApplicationController
   def index
     redirect_to prison_dashboard_index_path(default_prison_code)
   end
+
+  def handovers_email_preferences
+    redirect_to prison_edit_handover_email_preferences_path(default_prison_code)
+  end
 end
