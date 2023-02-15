@@ -27,15 +27,20 @@ RSpec.describe "allocation_staff/index", type: :view do
     assign(:probation_poms, poms.map { |p| StaffMember.new(prison, p.staff_id) })
     assign(:available_poms, poms.map { |p| StaffMember.new(prison, p.staff_id) })
     assign(:prison_poms, [])
+    assign(:recent_pom_history, recent_pom_history)
     render
   end
 
   context 'with 1 previous pom' do
     let(:poms) { [pom] }
 
+    let(:recent_pom_history) do
+      [{ name: 'FRED', started_at: Time.zone.now, ended_at: Time.zone.now }]
+    end
+
     it 'says they have been assigned' do
       expect(page).to have_text("The following POMs have been allocated to this case")
-      expect(page).to have_text("#{pom.first_name} #{pom.last_name}")
+      expect(page).to have_text("Fred")
     end
   end
 
@@ -43,10 +48,17 @@ RSpec.describe "allocation_staff/index", type: :view do
     let(:other) { build(:pom) }
     let(:poms) { [pom, other] }
 
+    let(:recent_pom_history) do
+      [
+        { name: 'FRED', started_at: Time.zone.now, ended_at: Time.zone.now },
+        { name: 'BARNEY', started_at: Time.zone.now, ended_at: Time.zone.now }
+      ]
+    end
+
     it 'says they have been assigned' do
       expect(page).to have_text("The following POMs have been allocated to this case")
-      expect(page).to have_text("#{pom.first_name} #{pom.last_name}")
-      expect(page).to have_text("#{other.first_name} #{other.last_name}")
+      expect(page).to have_text("Fred")
+      expect(page).to have_text("Barney")
     end
   end
 
@@ -55,11 +67,19 @@ RSpec.describe "allocation_staff/index", type: :view do
     let(:other2) { build(:pom) }
     let(:poms) { [pom, other, other2] }
 
+    let(:recent_pom_history) do
+      [
+        { name: 'FRED', started_at: Time.zone.now, ended_at: Time.zone.now },
+        { name: 'BARNEY', started_at: Time.zone.now, ended_at: Time.zone.now },
+        { name: 'WILMER', started_at: Time.zone.now, ended_at: Time.zone.now }
+      ]
+    end
+
     it 'says they have been assigned' do
       expect(page).to have_text("The following POMs have been allocated to this case")
-      expect(page).to have_text("#{pom.first_name} #{pom.last_name}")
-      expect(page).to have_text("#{other.first_name} #{other.last_name}")
-      expect(page).to have_text("#{other2.first_name} #{other2.last_name}")
+      expect(page).to have_text("Fred")
+      expect(page).to have_text("Barney")
+      expect(page).to have_text("Wilmer")
     end
   end
 end

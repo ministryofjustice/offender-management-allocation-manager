@@ -155,4 +155,28 @@ describe AllocationService do
       expect(emails.count).to eq(3)
     end
   end
+
+  describe '.pom_terms' do
+    subject(:terms) { described_class.pom_terms(case_histories) }
+
+    let(:case_histories) do
+      [
+        double(CaseHistory, created_at: -3, primary_pom_name: 'APPLES'),
+        double(CaseHistory, created_at: -2, primary_pom_name: 'PEARS'),
+        double(CaseHistory, created_at: -1, primary_pom_name: 'SPUDS'),
+        double(CaseHistory, created_at:  0,   primary_pom_name: 'FIGS')
+      ]
+    end
+
+    before { allow(described_class).to receive(:history).and_return(case_histories) }
+
+    it 'works' do
+      expect(terms).to eq([
+        { name: 'APPLES', started_at: -3, ended_at: -2 },
+        { name: 'PEARS',  started_at: -2, ended_at: -1 },
+        { name: 'SPUDS',  started_at: -1, ended_at:  0 },
+        { name: 'FIGS',   started_at:  0, ended_at: nil }
+      ])
+    end
+  end
 end

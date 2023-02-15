@@ -44,7 +44,7 @@
   <p><%= RecommendationService.recommended_pom_type_reason(@prisoner) %>.</p>
 </div>
 
-<% if @previous_poms.any? %>
+<% if @recent_pom_history.any? %>
   <div class="govuk-warning-text">
     <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
     <p class="govuk-warning-text__text">
@@ -52,8 +52,8 @@
     The following POMs have been allocated to this case most recently:
     <div class="govuk-!-margin-left-5">
       <ul class="govuk-list govuk-list--bullet">
-        <% @previous_poms.each do |pom| %>
-          <li><%= pom.first_name.capitalize %> <%= pom.last_name.capitalize %> <!-- - 09 Apr 2020 to 03 Mar 2021 --></li>
+        <% @recent_pom_history.each do |term| %>
+          <li><%= flip_name(term[:name]).titleize %> - <%= format_date(term[:started_at].to_date) %> to <%= format_date(term[:ended_at].to_date) %></li>
         <% end %>
       </ul>
 
