@@ -98,7 +98,7 @@ class CalculatedHandoverDate < ApplicationRecord
       relation
         .by_handover_in_progress(offender_ids: offender_ids)
         .joins(offender: :case_information)
-        .where(offender: { case_information: { com_email: nil } })
+        .where(offender: { case_information: { com_email: nil, com_name: nil } })
         .where(':relative_to::date >= "handover_date"::date + \'2 days\'::interval', relative_to: relative_to_date)
     end
   end
