@@ -49,9 +49,9 @@ RSpec.describe Handover::HandoverEmailBatchRun do
           email: 'staff1@example.org',
           full_name_ordered: allocated_to_process[0].full_name_ordered,
           first_name: allocated_to_process[0].first_name,
-          handover_date: '9 Apr 2021',
+          handover_date: '9 April 2021',
           service_provider: 'NPS',
-          release_date: '12 Nov 2100',
+          release_date: '12 November 2100',
           deliver_now: false,
         )
         expect(Handover::HandoverEmail).to have_received(:deliver_if_deliverable).with(
@@ -59,9 +59,9 @@ RSpec.describe Handover::HandoverEmailBatchRun do
           email: 'staff2@example.org',
           full_name_ordered: allocated_to_process[1].full_name_ordered,
           first_name: allocated_to_process[1].first_name,
-          handover_date: '9 Apr 2021',
+          handover_date: '9 April 2021',
           service_provider: 'CRC',
-          release_date: '14 Jun 2200',
+          release_date: '14 June 2200',
           deliver_now: false,
         )
       end

@@ -26,6 +26,6 @@ class Handover::HandoverEmailBatchRun
   end
 
   def self.format_date(date)
-    date.strftime('%-d %b %Y')
+    date.strftime('%-d %B %Y')
   end
 end
