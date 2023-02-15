@@ -1,8 +1,12 @@
-<% should_highlight = local_assigns[:should_highlight] %>
-<td class="govuk-table__cell handover-dates" data-sort-value="<%= handover_date.iso8601 %>">
-  <%= highlight_conditionally('alert', 'Handover tasks overdue',
-                              -> { should_highlight && !offender.handover_progress_complete? }) do %>
-    COM responsible: <br>
-    <%= format_date(handover_date, replacement: "Unknown") %>
+<% primary_content = (format_date(handover_case.handover_date, replacement: "Unknown")).html_safe %>
+<td class="govuk-table__cell handover-dates">
+  <% if handover_date_highlight == :tasks_overdue && @handover_cases.overdue_tasks.include?(handover_case) %>
+    <%= highlight_tag 'primary', 'alert', primary_content %>
+    <%= highlight_tag 'secondary', 'alert', 'Handover tasks overdue' %>
+  <% elsif handover_date_highlight == :due_soon && Time.zone.now.to_date >= handover_case.handover_date - 14.days %>
+    <%= highlight_tag 'primary', 'notice', primary_content %>
+    <%= highlight_tag 'secondary', 'notice', 'Handover due soon' %>
+  <% else %>
+    <%= primary_content %>
   <% end %>
 </td>

@@ -2,12 +2,6 @@
   <%= render '/layouts/prison_switcher' %>
 <% end %>
 
-<% if session[:new_handovers_ui] == true %>
-  <p class="notification govuk-!-margin-bottom-9" role="group" aria-labelledby="notice-heading">
-    <%= link_to 'New handovers UI available here', upcoming_prison_handovers_path %>
-  </p>
-<% end %>
-
 <%= render(:partial => 'subnav', :locals => {:active => :all_handovers,
                                              prison_total_handovers: @offenders.total_count,
                                              pending_handover_count: @pending_handover_count}) %>

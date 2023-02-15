@@ -66,12 +66,5 @@ feature 'summary summary feature' do
       expect(page).to have_css('.moj-sub-navigation__item')
       expect(page).to have_content('Newly arrived')
     end
-
-    it 'displays offenders approaching their handover date', vcr: { cassette_name: 'prison_api/approaching_handover_feature' } do
-      visit prison_handovers_path(prison)
-
-      expect(page).to have_css('.moj-sub-navigation__item')
-      expect(page).to have_content('Case handover status')
-    end
   end
 end

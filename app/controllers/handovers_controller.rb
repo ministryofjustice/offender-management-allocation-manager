@@ -9,15 +9,19 @@ class HandoversController < PrisonsApplicationController
   before_action :ensure_spo_user, only: :index
 
   def index
-    @pending_handover_count = @current_user.allocations.count(&:approaching_handover?)
-    offender_list = @prison.offenders.select(&:approaching_handover?)
-    allocations = @prison.allocations.where(nomis_offender_id: offender_list.map(&:offender_no))
-    offenders_with_allocs = offender_list.map do |o|
-      OffenderWithAllocationPresenter.new(o, allocations.detect { |a| a.nomis_offender_id == o.offender_no })
+    if helpers.use_new_handovers_ui?
+      redirect_to upcoming_prison_handovers_path
+    else
+      @pending_handover_count = @current_user.allocations.count(&:approaching_handover?)
+      offender_list = @prison.offenders.select(&:approaching_handover?)
+      allocations = @prison.allocations.where(nomis_offender_id: offender_list.map(&:offender_no))
+      offenders_with_allocs = offender_list.map do |o|
+        OffenderWithAllocationPresenter.new(o, allocations.detect { |a| a.nomis_offender_id == o.offender_no })
+      end
+      offenders = sort_collection offenders_with_allocs, default_sort: :last_name
+      @offenders = Kaminari.paginate_array(offenders).page(page)
+      render :legacy_index, layout: 'application'
     end
-    offenders = sort_collection offenders_with_allocs, default_sort: :last_name
-    @offenders = Kaminari.paginate_array(offenders).page(page)
-    render :legacy_index, layout: 'application'
   end
 
   def upcoming
@@ -43,11 +47,6 @@ private
   end
 
   def check_prerequisites_and_prepare_variables
-    unless session[:new_handovers_ui] == true
-      redirect_to '/401'
-      return
-    end
-
     if params[:sort].blank?
       redirect_to permitted_params.merge(sort: 'handover_date asc')
       return
@@ -65,7 +64,7 @@ private
     end
 
     @prison_id = active_prison_id
-    flash[:current_handovers_url] = request.url
+    flash[:current_handovers_url] = request.original_url
   end
 
   def filtered_handover_cases(cases)

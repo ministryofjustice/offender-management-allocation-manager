@@ -1,5 +1,9 @@
-<% rel_type, rel_date = offender.earliest_release&.values_at(:type, :date) || ['Unknown', nil] %>
-<td class="govuk-table__cell earliest-release-date" data-sort-value="<%= rel_date&.iso8601 %>">
-  <%= rel_type %>: <br>
-  <%= format_date(rel_date, replacement: "ERROR: Unknown") %>
+<% rel_type, rel_date = offender.earliest_release&.values_at(:type, :date) %>
+<td class="govuk-table__cell earliest-release-date">
+  <% if rel_type && rel_date %>
+    <%= rel_type %>: <br>
+    <%= format_date(rel_date) %>
+  <% else %>
+    Date is unknown
+  <% end %>
 </td>

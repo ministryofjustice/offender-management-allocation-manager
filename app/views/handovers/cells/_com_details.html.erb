@@ -1,5 +1,5 @@
 <% com_name = offender.allocated_com_name %>
-<td class="govuk-table__cell com-details" data-sort-value="<%= com_name || 'Unknown' %>">
+<td class="govuk-table__cell com-details">
   <% if com_name.nil? %>
     <%= highlight_conditionally('alert', 'Allocation overdue',
                                 -> { handover_date <= Time.zone.now.to_date - 2.days }) do %>

@@ -28,6 +28,7 @@ RSpec.describe 'handover_progress_checklists/edit' do
     offender # instantiate and stub
 
     assign(:prison, prison)
+    assign(:prison_id, prison_code)
     assign(:offender, offender)
     assign(:handover_progress_checklist, handover_progress_checklist)
   end

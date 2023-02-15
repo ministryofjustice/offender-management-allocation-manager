@@ -1,14 +1,16 @@
-<% content_for :title, translate('handovers.page_title.default') %>
+<% content_for :title, translate("handovers.page_title.default.#{@pom_view ? 'pom' : 'homd'}") %>
 
 <% content_for :main_content do %>
   <% content_for :switcher do %>
     <%= render '/layouts/prison_switcher' %>
   <% end %>
 
+  <%= render 'layouts/notice', notice: flash[:notice] %>
+
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
-        Your handover cases
+        <%= translate("handovers.page_header.#{@pom_view ? 'pom' : 'homd'}") %>
       </h1>
 
       <p>
@@ -17,16 +19,18 @@
             <%= link_to 'See all handover cases in this prison', url_for,
                         class: %w[govuk-link govuk-link--no-visited-state] %>
           <% else %>
-            <%= link_to 'See your handover cases only ', url_for(params: {pom: '1'}),
+            <%= link_to 'See your handover cases only ', url_for(params: { pom: '1' }),
                         class: %w[govuk-link govuk-link--no-visited-state] %>
           <% end %>
         <% end %>
       </p>
     </div>
 
-    <div class="govuk-grid-column-one-third">
-      <%= render '/handovers/more_on_handovers' %>
-    </div>
+    <% if @pom_view %>
+      <div class="govuk-grid-column-one-third">
+        <%= render '/handovers/more_on_handovers' %>
+      </div>
+    <% end %>
   </div>
 
   <div class="govuk-grid-row">
@@ -49,19 +53,7 @@
     </div>
   </div>
 
-  <% if flash[:handover_success_notice].present? %>
-    <div class="moj-banner moj-banner--success">
-      <svg class="moj-banner__icon" fill="currentColor" role="img" focusable="false"
-           xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" height="25" width="25">
-        <path d="M25,6.2L8.7,23.2L0,14.1l4-4.2l4.7,4.9L21,2L25,6.2z"></path>
-      </svg>
-
-      <div class="moj-banner__message">
-        <span class="moj-banner__assistive">Success</span>
-        <%= flash[:handover_success_notice] %>
-      </div>
-    </div>
-  <% end %>
+  <%= render 'layouts/notice', notice: flash[:handover_success_notice] %>
 
   <%= yield %>
 <% end %>

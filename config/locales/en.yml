@@ -44,6 +44,8 @@ en:
   nps: NPS (Legacy)
   crc: CRC (Legacy)
 
+  equip_url: 'https://equip-portal.equip.service.justice.gov.uk/'
+
   activemodel:
     errors:
       models:
@@ -166,11 +168,19 @@ en:
 
   handovers:
     page_title:
-      default: 'Your handover cases - Digital Prison Services'
+      default:
+        pom: 'Your handover cases - Digital Prison Services'
+        homd: 'Handover cases - Digital Prison Services'
       progress_checklist: 'Record handover progress - Digital Prison Services'
+      email_preferences: 'Manage email reminders - Digital Prison Services'
+    page_header:
+      pom: 'Your handover cases'
+      homd: 'Handover cases'
     progress:
       short_description:
         reviewed_oasys: 'Review OASys'
         contacted_com: 'Have contact from COM'
         attended_handover_meeting: 'Attend handover meeting'
         sent_handover_report: 'Send handover report'
+    email_preferences:
+      success_notice: 'You have successfully updated your email preferences.'

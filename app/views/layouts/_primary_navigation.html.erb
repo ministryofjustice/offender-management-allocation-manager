@@ -8,21 +8,32 @@
             <%= render 'layouts/controller_nav_link',
                        text: 'Allocations',
                        path: unallocated_prison_prisoners_path(@prison.code),
-                       controllers: {allocation_staff: [], allocations: [:index], prisoners: [:allocated, :unallocated, :missing_information, :new_arrivals, :search]}
+                       controllers: { allocation_staff: [], allocations: [:index], prisoners: [:allocated, :unallocated, :missing_information, :new_arrivals, :search] }
             %>
           <% end %>
           <% if @is_pom %>
             <%= render 'layouts/controller_nav_link',
                        text: 'Caseload',
                        path: prison_staff_caseload_path(@prison.code, @staff_id),
-                       controllers: {caseload: [], tasks: [], prisoners: [:show], allocations: [:show]} %>
+                       controllers: { caseload: [], tasks: [], prisoners: [:show], allocations: [:show] } %>
           <% end %>
-          <% if @is_spo %>
-            <%= render 'layouts/controller_nav_link', text: 'Handover', path: prison_handovers_path(@prison.code), controllers: {handovers: [], caseload_handovers: []} %>
-            <%= render 'layouts/controller_nav_link', text: 'Staff', path: prison_poms_path(@prison.code), controllers: {poms: []} %>
+
+          <% if use_new_handovers_ui? %>
+            <% if @is_spo %>
+              <%= render 'layouts/controller_nav_link', text: 'Handover', path: upcoming_prison_handovers_path(@prison.code), controllers: { handovers: [] } %>
+              <%= render 'layouts/controller_nav_link', text: 'Staff', path: prison_poms_path(@prison.code), controllers: { poms: [] } %>
+            <% else %>
+              <%= render 'layouts/nav_link', text: 'Handover', path: upcoming_prison_handovers_path(@prison.code) %>
+            <% end %>
           <% else %>
-            <%= render 'layouts/nav_link', text: 'Handover', path: prison_staff_caseload_handovers_path(@prison.code, @staff_id) %>
+            <% if @is_spo %>
+              <%= render 'layouts/controller_nav_link', text: 'Handover', path: prison_handovers_path(@prison.code), controllers: { handovers: [], caseload_handovers: [] } %>
+              <%= render 'layouts/controller_nav_link', text: 'Staff', path: prison_poms_path(@prison.code), controllers: { poms: [] } %>
+            <% else %>
+              <%= render 'layouts/nav_link', text: 'Handover', path: prison_staff_caseload_handovers_path(@prison.code, @staff_id) %>
+            <% end %>
           <% end %>
+
         </ul>
       </nav>
     </div>

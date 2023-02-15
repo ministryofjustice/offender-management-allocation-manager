@@ -4,7 +4,7 @@
 
 <% if @pom_view %>
   <p>
-    These cases have past their handover date and are missing COM details on NDelius. You could:
+    These cases have passed their handover date and are missing COM details on NDelius. You could:
   </p>
 
   <ul class="govuk-list govuk-list--bullet">
@@ -13,7 +13,7 @@
   </ul>
 <% else %>
   <p>
-    These cases have past their handover date and are missing COM details on NDelius.
+    These cases have passed their handover date and are missing COM details on NDelius.
   </p>
 <% end %>
 
@@ -23,7 +23,7 @@
                           @pom_view ? nil : { sort: 'staff_member_last_name', body: 'POM' },
                           { sort: 'handover_date', body: 'COM responsible' },
                           { sort: 'earliest_release_date', body: 'Earliest release date' },
-                          { sort: 'case_allocation', body: 'Tier' },
+                          { sort: 'tier', body: 'Tier' },
                           { sort: 'com_allocation_days_overdue', body: 'Days overdue', class: %w[days-overdue] },
                           { body: 'LDU details', class: %w[ldu-details govuk-!-width-one-quarter] },
                         ].compact) do %>
@@ -35,7 +35,7 @@
       <%= render 'handovers/cells/staff_member', staff_member: handover_case.offender.staff_member unless @pom_view %>
 
       <%= render 'handovers/cells/handover_dates',
-                 offender: handover_case.offender, handover_date: handover_case.handover_date %>
+                 handover_case: handover_case, handover_date_highlight: nil %>
 
       <%= render 'handovers/cells/earliest_release_date', offender: handover_case.offender %>
 
