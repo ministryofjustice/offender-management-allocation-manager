@@ -1,4 +1,4 @@
-<% primary_content = ("COM responsible: <br>" + format_date(handover_case.handover_date, replacement: "Unknown")).html_safe %>
+<% primary_content = (format_date(handover_case.handover_date, replacement: "Unknown")).html_safe %>
 <td class="govuk-table__cell handover-dates">
   <% if handover_date_highlight == :tasks_overdue && @handover_cases.overdue_tasks.include?(handover_case) %>
     <%= highlight_tag 'primary', 'alert', primary_content %>
