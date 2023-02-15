@@ -274,4 +274,21 @@ RSpec.describe MpcOffender, type: :model do
       expect(subject.released?(relative_to_date: today)).to eq true
     end
   end
+
+  describe '#has_com?' do
+    it 'is true if COM email is given and COM name is blank' do
+      allow(offender_model.case_information).to receive_messages(com_email: 'a@b', com_name: nil)
+      expect(subject.has_com?).to eq true
+    end
+
+    it 'is true if COM email is blank and COM name is given' do
+      allow(offender_model.case_information).to receive_messages(com_email: nil, com_name: 'A B')
+      expect(subject.has_com?).to eq true
+    end
+
+    it 'is false if COM email and COM name are both blank' do
+      allow(offender_model.case_information).to receive_messages(com_email: nil, com_name: nil)
+      expect(subject.has_com?).to eq false
+    end
+  end
 end

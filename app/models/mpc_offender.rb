@@ -359,6 +359,10 @@ class MpcOffender
     earliest_release_date <= relative_to_date
   end
 
+  def has_com?
+    allocated_com_name.present? || allocated_com_email.present?
+  end
+
 private
 
   def early_allocation_notes?
