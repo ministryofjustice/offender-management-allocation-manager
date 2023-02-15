@@ -61,7 +61,12 @@ class AllocatedOffender
 
   class << self
     def all
-      Prison.all.map(&:primary_allocated_offenders).inject(:+)
+      prisons = Prison.all
+      Enumerator.new do |yielder|
+        prisons.each do |prison|
+          prison.primary_allocated_offenders.each { |o| yielder.yield o }
+        end
+      end
     end
   end
 end
