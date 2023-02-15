@@ -23,7 +23,7 @@
                           @pom_view ? nil : { sort: 'staff_member_last_name', body: 'POM' },
                           { sort: 'handover_date', body: 'COM responsible' },
                           { sort: 'earliest_release_date', body: 'Earliest release date' },
-                          { sort: 'case_allocation', body: 'Tier' },
+                          { sort: 'tier', body: 'Tier' },
                           { sort: 'com_allocation_days_overdue', body: 'Days overdue', class: %w[days-overdue] },
                           { body: 'LDU details', class: %w[ldu-details govuk-!-width-one-quarter] },
                         ].compact) do %>
