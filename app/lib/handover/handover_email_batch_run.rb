@@ -61,7 +61,7 @@ class Handover::HandoverEmailBatchRun
 
   def self.send_one_com_allocation_overdue(offender, deliver_now: false, for_date: Time.zone.now.to_date)
     chd = CalculatedHandoverDate.find_by(nomis_offender_id: offender.offender_no)
-    return unless for_date == chd.handover_date + 14.days && !offender.has_com?
+    return unless chd.handover_date == for_date - 14.days && !offender.has_com?
 
     Handover::HandoverEmail.deliver_if_deliverable(
       :com_allocation_overdue,
