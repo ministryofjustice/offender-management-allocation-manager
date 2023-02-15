@@ -16,7 +16,9 @@ RSpec.describe Handover::HandoverEmailBatchRun do
                       earliest_release_date: Date.new(2100, 11, 12),
                       staff_member: double(staff_id: 'STAFF1', email_address: 'staff1@example.org'),
                       allocated_com_name: 'COM 0',
-                      allocated_com_email: 'com0@example.com'),
+                      allocated_com_email: 'com0@example.com',
+                      ldu_name: 'LDU 0',
+                      ldu_email_address: 'ldu0@example.com'),
       instance_double(AllocatedOffender,
                       :to_process1,
                       offender_no: FactoryBot.generate(:nomis_offender_id),
@@ -26,7 +28,9 @@ RSpec.describe Handover::HandoverEmailBatchRun do
                       earliest_release_date: Date.new(2200, 6, 14),
                       staff_member: double(staff_id: 'STAFF2', email_address: 'staff2@example.org'),
                       allocated_com_name: 'COM 1',
-                      allocated_com_email: 'com1@example.com'),
+                      allocated_com_email: 'com1@example.com',
+                      ldu_name: 'LDU 1',
+                      ldu_email_address: 'ldu1@example.com'),
     ]
   end
 
@@ -117,6 +121,56 @@ RSpec.describe Handover::HandoverEmailBatchRun do
           com_name: 'COM 1',
           com_email: 'com1@example.com',
           service_provider: allocated_to_process[1].case_allocation,
+          deliver_now: false,
+        )
+        expect(Handover::HandoverEmail).to have_received(:deliver_if_deliverable).twice
+      end
+    end
+  end
+
+  describe '::send_all_com_allocation_overdue' do
+    before do
+      allocated_to_process.map do |offender|
+        allow(offender).to receive_messages(has_com?: false)
+        o = FactoryBot.create :offender, id: offender.offender_no
+        FactoryBot.create :calculated_handover_date, offender: o, handover_date: today - 14.days
+      end
+      ignored = []
+
+      ignored1 = FactoryBot.create :calculated_handover_date, handover_date: today + 1.day
+      ignored.push instance_double(AllocatedOffender, offender_no: ignored1.offender.id, has_com?: false)
+
+      ignored2 = FactoryBot.create :calculated_handover_date, handover_date: today + 1.day
+      ignored.push instance_double(AllocatedOffender, offender_no: ignored2.offender.id, has_com?: false)
+
+      ignored_has_com = FactoryBot.create :calculated_handover_date, handover_date: today - 14.days
+      ignored.push instance_double(AllocatedOffender, offender_no: ignored_has_com.offender.id, has_com?: true)
+
+      allow(AllocatedOffender).to receive(:all).and_return(allocated_to_process + ignored)
+    end
+
+    it "delivers the correct cases" do
+      described_class.send_all_com_allocation_overdue(for_date: today)
+
+      aggregate_failures do
+        expect(Handover::HandoverEmail).to have_received(:deliver_if_deliverable).with(
+          :com_allocation_overdue, allocated_to_process[0].offender_no, 'STAFF1',
+          email: 'staff1@example.org',
+          full_name_ordered: allocated_to_process[0].full_name_ordered,
+          release_date: '12 November 2100',
+          handover_date: '29 January 2021',
+          ldu_name: 'LDU 0',
+          ldu_email: 'ldu0@example.com',
+          deliver_now: false,
+        )
+        expect(Handover::HandoverEmail).to have_received(:deliver_if_deliverable).with(
+          :com_allocation_overdue, allocated_to_process[1].offender_no, 'STAFF2',
+          email: 'staff2@example.org',
+          full_name_ordered: allocated_to_process[1].full_name_ordered,
+          release_date: '14 June 2200',
+          handover_date: '29 January 2021',
+          ldu_name: 'LDU 1',
+          ldu_email: 'ldu1@example.com',
           deliver_now: false,
         )
         expect(Handover::HandoverEmail).to have_received(:deliver_if_deliverable).twice

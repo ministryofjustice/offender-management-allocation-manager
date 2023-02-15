@@ -10,4 +10,10 @@ namespace :handover do
     Rails.logger = Logger.new($stdout)
     Handover::HandoverEmailBatchRun.send_all_handover_date
   end
+
+  desc 'send_all_com_allocation_overdue'
+  task send_all_com_allocation_overdue: :environment do
+    Rails.logger = Logger.new($stdout)
+    Handover::HandoverEmailBatchRun.send_all_com_allocation_overdue
+  end
 end
