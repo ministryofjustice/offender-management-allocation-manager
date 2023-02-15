@@ -46,7 +46,7 @@
   </div>
 
   <div class="govuk-grid-row card-group">
-    <% if session[:new_handovers_ui] == true %>
+    <% if use_new_handovers_ui? %>
       <%= render 'dashboard_partition',
                  title: "View all handover cases",
                  link: upcoming_prison_handovers_path(@prison.code),
@@ -96,7 +96,7 @@
                content: "Cases allocated to you in the last 7 days."
     %>
 
-    <% if session[:new_handovers_ui] == true %>
+    <% if use_new_handovers_ui? %>
       <%= render 'dashboard_partition',
                  title: "View your handover cases",
                  link: upcoming_prison_handovers_path(@prison.code, pom: '1'),

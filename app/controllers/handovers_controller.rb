@@ -9,7 +9,7 @@ class HandoversController < PrisonsApplicationController
   before_action :ensure_spo_user, only: :index
 
   def index
-    if session[:new_handovers_ui] == true
+    if helpers.use_new_handovers_ui?
       redirect_to upcoming_prison_handovers_path
     else
       @pending_handover_count = @current_user.allocations.count(&:approaching_handover?)

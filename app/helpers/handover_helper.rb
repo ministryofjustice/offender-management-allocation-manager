@@ -1,4 +1,8 @@
 module HandoverHelper
+  def use_new_handovers_ui?
+    USE_NEW_HANDOVERS_UI_BY_DEFAULT || session[:new_handovers_ui] == true
+  end
+
   def handover_record_progress_link(prison_code, nomis_offender_id)
     link_to('Record progress',
             prison_update_handover_progress_checklist_path(prison_code, nomis_offender_id),
