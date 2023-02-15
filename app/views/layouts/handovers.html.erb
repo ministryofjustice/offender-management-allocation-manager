@@ -26,9 +26,11 @@
       </p>
     </div>
 
-    <div class="govuk-grid-column-one-third">
-      <%= render '/handovers/more_on_handovers' %>
-    </div>
+    <% if @pom_view %>
+      <div class="govuk-grid-column-one-third">
+        <%= render '/handovers/more_on_handovers' %>
+      </div>
+    <% end %>
   </div>
 
   <div class="govuk-grid-row">
