@@ -36,4 +36,27 @@ class HandoverMailer < GovukNotifyRails::Mailer
                         release_date: release_date)
     mail(to: email)
   end
+
+  def com_allocation_overdue(email:,
+                             nomis_offender_id:,
+                             full_name_ordered:,
+                             handover_date:,
+                             release_date:,
+                             ldu_name:,
+                             ldu_email:)
+    set_template('be1ea651-be9d-4fb0-84cd-60af0556c8f9')
+
+    ldu_information = ''
+    ldu_information += "LDU: #{ldu_name}\n" if ldu_name.present?
+    ldu_information += "LDU email: #{ldu_email}\n" if ldu_email.present?
+
+    set_personalisation(nomis_offender_id: nomis_offender_id,
+                        full_name_ordered: full_name_ordered,
+                        handover_date: handover_date,
+                        release_date: release_date,
+                        ldu_information: ldu_information,
+                        has_ldu_email: ldu_email.present?,
+                        missing_ldu_email: ldu_email.blank?)
+    mail(to: email)
+  end
 end
