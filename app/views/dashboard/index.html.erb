@@ -13,7 +13,7 @@
 <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Dashboard</h1>
 
 <div class="govuk-!-margin-bottom-4">
-    <%= render "search/search_box" %>
+  <%= render "search/search_box" %>
 </div>
 
 <% if @is_spo %>
@@ -22,11 +22,11 @@
   <div class="govuk-grid-row card-group">
     <%= render 'dashboard_partition',
                title: "Make allocations",
-               link:  unallocated_prison_prisoners_path(@prison.code),
+               link: unallocated_prison_prisoners_path(@prison.code),
                content: display_content(@unallocated_cases_count,
-                 no_cases: "You don’t have any cases to allocate currently.",
-                 one_case: "You have 1 case to allocate.",
-                 multiple_cases: "You have #{@unallocated_cases_count} cases to allocate.")
+                                        no_cases: "You don’t have any cases to allocate currently.",
+                                        one_case: "You have 1 case to allocate.",
+                                        multiple_cases: "You have #{@unallocated_cases_count} cases to allocate.")
     %>
 
     <%= render 'dashboard_partition',
@@ -39,9 +39,9 @@
                title: "Add missing details",
                link: missing_information_prison_prisoners_path(@prison.code),
                content: display_content(@missing_details_cases_count,
-                 no_cases: "No cases are missing information right now.",
-                 one_case: "Missing details need to be added to 1 case before it can be allocated to a POM.",
-                 multiple_cases: "Missing details need to be added to #{@missing_details_cases_count} cases before they can be allocated to POMs.")
+                                        no_cases: "No cases are missing information right now.",
+                                        one_case: "Missing details need to be added to 1 case before it can be allocated to a POM.",
+                                        multiple_cases: "Missing details need to be added to #{@missing_details_cases_count} cases before they can be allocated to POMs.")
     %>
   </div>
 
@@ -70,7 +70,7 @@
     <div class="govuk-grid-column-one-third"></div>
     <div class="govuk-grid-column-one-third"></div>
   </div>
-<% end  %>
+<% end %>
 
 <% if @is_pom %>
   <h2 class="govuk-heading-m no-bottom-margin govuk-!-margin-top-3">Caseload information</h2>
@@ -100,9 +100,9 @@
                title: "Case updates needed",
                link: prison_staff_caseload_updates_required_path(@prison.code, @staff_id),
                content: display_content(@case_updates_needed_count,
-                 no_cases: "You do not have any cases to update right now.",
-                 one_case: "Enter some information to ensure responsibility for this case is correct.",
-                 multiple_cases: "Enter some information to ensure responsibility for these cases is correct.")
+                                        no_cases: "You do not have any cases to update right now.",
+                                        one_case: "Enter some information to ensure responsibility for this case is correct.",
+                                        multiple_cases: "Enter some information to ensure responsibility for these cases is correct.")
     %>
 
     <%= render 'dashboard_partition',
