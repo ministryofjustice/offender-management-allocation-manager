@@ -18,8 +18,22 @@ class HandoverMailer < GovukNotifyRails::Mailer
   end
 
   def handover_date(email:,
-                    nomis_offender_id:)
-    set_personalisation(nomis_offender_id: nomis_offender_id)
+                    nomis_offender_id:,
+                    first_name:,
+                    full_name_ordered:,
+                    release_date:,
+                    com_name:,
+                    com_email:,
+                    service_provider:)
+    set_template('7eaafff6-dae8-4eb2-bca5-bb530e0f1078')
+    set_personalisation(nomis_offender_id: nomis_offender_id,
+                        full_name_ordered: full_name_ordered,
+                        first_name: first_name,
+                        com_name: com_name,
+                        com_email: com_email,
+                        is_nps: service_provider == 'NPS' ? 'yes' : 'no',
+                        is_crc: service_provider == 'CRC' ? 'yes' : 'no',
+                        release_date: release_date)
     mail(to: email)
   end
 end
