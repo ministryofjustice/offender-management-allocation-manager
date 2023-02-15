@@ -24,7 +24,13 @@ module OffenderManagementAllocationClient
     config.load_defaults 6.1
     config.exceptions_app = routes
     config.generators.system_tests = nil
-    config.active_job.queue_adapter = :sidekiq
+
+    config.active_job.queue_adapter = if ENV['RUN_JOBS_INLINE'].present?
+                                        :inline
+                                      else
+                                        :sidekiq
+                                      end
+
     config.allocation_manager_host =
       ENV.fetch(
         'ALLOCATION_MANAGER_HOST',
