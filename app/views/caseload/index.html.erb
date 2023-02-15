@@ -18,14 +18,16 @@
             </div>
           </div>
 
-          <div class="govuk-grid-column-one-half">
-            <div class="card--caseload card-total">
-              <%= link_to prison_staff_caseload_handovers_path, class: 'govuk-link--no-visited-state' do %>
-                <span class="card__heading--large"><%= @summary.fetch(:pending_handover_count) %></span>
-                <p>handovers in progress</p>
-              <% end %>
+          <% unless use_new_handovers_ui? %>
+            <div class="govuk-grid-column-one-half">
+              <div class="card--caseload card-total">
+                <%= link_to prison_staff_caseload_handovers_path, class: 'govuk-link--no-visited-state' do %>
+                  <span class="card__heading--large"><%= @summary.fetch(:pending_handover_count) %></span>
+                  <p>handovers in progress</p>
+                <% end %>
+              </div>
             </div>
-          </div>
+          <% end %>
 
         </div>
 
@@ -109,5 +111,3 @@
     </div>
   </div>
 </div>
-
-
