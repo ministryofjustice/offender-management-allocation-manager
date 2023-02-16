@@ -9,7 +9,7 @@ class AllocatedOffender
            :earliest_release_date, :earliest_release, :approaching_handover?, :tariff_date, :release_date,
            :in_upcoming_handover_window?,
            :indeterminate_sentence?, :prison_id, :parole_review_date, :allocated_com_email,
-           :handover_start_date, :responsibility_handover_date, :allocated_com_name, :case_allocation,
+           :handover_start_date, :responsibility_handover_date, :allocated_com_name, :has_com?, :case_allocation,
            :complexity_level, :offender_no, :sentence_start_date, :tier, :location, :latest_temp_movement_date,
            :restricted_patient?, :handover_progress_task_completion_data, :handover_progress_complete?,
            :ldu_name, :ldu_email_address, :model, :released?, to: :@offender
@@ -61,7 +61,12 @@ class AllocatedOffender
 
   class << self
     def all
-      Prison.all.map(&:primary_allocated_offenders).inject(:+)
+      prisons = Prison.all
+      Enumerator.new do |yielder|
+        prisons.each do |prison|
+          prison.primary_allocated_offenders.each { |o| yielder.yield o }
+        end
+      end
     end
   end
 end

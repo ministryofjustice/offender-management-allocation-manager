@@ -6,6 +6,7 @@ Rails.application.routes.draw do
 
   get '/auth/:provider/callback', to: 'sessions#create'
   get '/signout', to: 'sessions#destroy'
+  get '/handovers/email_preferences', to: 'root#handovers_email_preferences'
 
   resources :prisons, only: [] do
     # Prison switcher - starting from an existing prison

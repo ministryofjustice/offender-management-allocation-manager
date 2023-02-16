@@ -147,10 +147,11 @@ RSpec.describe CalculatedHandoverDate do
   end
 
   describe '::by_com_allocation_overdue' do
-    let!(:row) do
+    subject!(:row) do
       # instantiate it immediately
       FactoryBot.create :calculated_handover_date, :after_handover, offender: offender
     end
+
     let!(:case_information) { FactoryBot.create :case_information, :english, offender: offender }
 
     def query(offender_ids: [offender.id])
@@ -162,16 +163,16 @@ RSpec.describe CalculatedHandoverDate do
         row.update! responsibility: described_class::COMMUNITY_RESPONSIBLE, handover_date: Date.new(2022, 11, 19)
       end
 
-      describe 'when COM is not allocated' do
+      describe 'when neither COM email or COM name of test subject is allocated' do
         before do
-          case_information.update! com_email: nil
+          case_information.update! com_name: nil, com_email: nil
         end
 
-        it 'gets the case for the given offender IDs' do
+        it 'finds the test subject if their offender ID is in `offender_ids`' do
           expect(query).to include row
         end
 
-        it 'does not get the case of other offender IDs' do
+        it 'does not find the test subject if its offener ID is not listed in `offender_ids`' do
           expect(query(offender_ids: ['Y1111YY'])).not_to include row
         end
 
@@ -181,8 +182,13 @@ RSpec.describe CalculatedHandoverDate do
         end
       end
 
-      it 'does not get cases with COM allocated' do
-        case_information.update! com_email: 'a@b'
+      it 'does not find rows who have a COM email but not a COM name' do
+        case_information.update! com_email: 'a@b', com_name: nil
+        expect(query).not_to include row
+      end
+
+      it 'does not find rows who do not have COM email but do have a COM_name' do
+        case_information.update! com_email: nil, com_name: 'A B'
         expect(query).not_to include row
       end
     end
