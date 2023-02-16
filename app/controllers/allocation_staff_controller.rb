@@ -7,6 +7,8 @@ class AllocationStaffController < PrisonsApplicationController
   before_action :store_referrer_in_session, only: [:index]
   before_action :set_referrer
 
+  MAX_RECENT_POM_HISTORY = 3
+
   def index
     @case_info = Offender.find_by!(nomis_offender_id: prisoner_id_from_url).case_information
     @allocation = AllocationHistory.find_by nomis_offender_id: prisoner_id_from_url
@@ -19,7 +21,7 @@ class AllocationStaffController < PrisonsApplicationController
     @previous_poms = previous_pom_ids.map { |staff_id| poms[staff_id] }.compact
     @current_pom = poms[@allocation.primary_pom_nomis_id] if @allocation&.primary_pom_nomis_id
     @oasys_assessment = HmppsApi::AssessmentApi.get_latest_oasys_date(@prisoner.offender_no)
-    @recent_pom_history = AllocationService.pom_terms(@allocation).select { |t| t[:ended_at].present? }.reverse
+    @recent_pom_history = AllocationService.pom_terms(@allocation).select { |t| t[:ended_at].present? }.reverse.first(MAX_RECENT_POM_HISTORY)
 
     sort_dir = @prisoner.recommended_pom_type == RecommendationService::PRISON_POM ? :desc : :asc
     @available_poms = sort_collection(

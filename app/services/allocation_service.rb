@@ -88,17 +88,15 @@ class AllocationService
   end
 
   def self.pom_terms(allocation)
-    terms = []
+    allowed_events = %w[allocate_primary_pom reallocate_primary_pom]
 
-    history(allocation).sort_by(&:created_at).each do |hist|
-      next if hist.primary_pom_name.blank?
+    [].tap do |terms|
+      history(allocation).select { |h| allowed_events.include?(h.event) }.sort_by(&:created_at).each do |hist|
+        next if terms.any? && hist.primary_pom_name == terms.last[:name]
 
-      unless hist.primary_pom_name == terms.any? ? terms.last[:name] : nil
         terms.last[:ended_at] = hist.created_at if terms.any?
         terms << { name: hist.primary_pom_name, started_at: hist.created_at, ended_at: nil, email: hist.primary_pom_email }
       end
     end
-
-    terms
   end
 end
