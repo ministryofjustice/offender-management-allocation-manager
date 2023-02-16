@@ -95,7 +95,7 @@ class AllocationService
 
       unless hist.primary_pom_name == terms.any? ? terms.last[:name] : nil
         terms.last[:ended_at] = hist.created_at if terms.any?
-        terms << { name: hist.primary_pom_name, started_at: hist.created_at, ended_at: nil }
+        terms << { name: hist.primary_pom_name, started_at: hist.created_at, ended_at: nil, email: hist.primary_pom_email }
       end
     end
 

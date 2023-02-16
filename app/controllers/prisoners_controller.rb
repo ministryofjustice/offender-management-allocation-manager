@@ -46,9 +46,12 @@ class PrisonersController < PrisonsApplicationController
     @allocation = AllocationHistory.find_by(nomis_offender_id: @prisoner.offender_no)
 
     if @allocation.present?
+      @prev_pom_details = AllocationService.pom_terms(@allocation).reverse.find { |t| t[:ended_at].present? } || {}
+
       if @allocation.active?
         @pom = StaffMember.new(@prison, @allocation.primary_pom_nomis_id)
       end
+
       if @allocation.secondary_pom_name.present?
         @secondary_pom_name = PrisonOffenderManagerService.fetch_pom_name(@allocation.secondary_pom_nomis_id).titleize
         @secondary_pom_email = PrisonOffenderManagerService.fetch_pom_email(@allocation.secondary_pom_nomis_id)

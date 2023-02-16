@@ -285,13 +285,15 @@
             <tbody class="govuk-table__body">
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">Previous POM</td>
-                <td class="govuk-table__cell govuk-!-width-one-third"><!-- FIXME Stephen Dicks – 09 Apr 2020 to 03 Mar 2021 --></td>
+                <td class="govuk-table__cell govuk-!-width-one-third">
+                  <%= render partial: 'case_history/allocation/pom_term', locals: {term: @prev_pom_details} %>
+                </td>
                 <td class="govuk-table__cell govuk-!-width-one-third"></td>
               </tr>
 
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">Previous POM email</td>
-                <td class="govuk-table__cell govuk-!-width-one-third"><!-- FIXME stephen.dicks@justice.gov.uk --></td>
+                <td class="govuk-table__cell govuk-!-width-one-third"><%= @prev_pom_details&.fetch(:email, '') %></td>
                 <td class="govuk-table__cell govuk-!-width-one-third"></td>
               </tr>
 

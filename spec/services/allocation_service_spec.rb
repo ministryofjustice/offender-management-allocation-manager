@@ -161,10 +161,10 @@ describe AllocationService do
 
     let(:case_histories) do
       [
-        double(CaseHistory, created_at: -3, primary_pom_name: 'APPLES'),
-        double(CaseHistory, created_at: -2, primary_pom_name: 'PEARS'),
-        double(CaseHistory, created_at: -1, primary_pom_name: 'SPUDS'),
-        double(CaseHistory, created_at:  0,   primary_pom_name: 'FIGS')
+        double(CaseHistory, created_at: -3, primary_pom_name: 'APPLES', primary_pom_email: 'me@apples.net'),
+        double(CaseHistory, created_at: -2, primary_pom_name: 'PEARS', primary_pom_email: 'me@pears.net'),
+        double(CaseHistory, created_at: -1, primary_pom_name: 'SPUDS', primary_pom_email: 'me@spuds.net'),
+        double(CaseHistory, created_at:  0,   primary_pom_name: 'FIGS', primary_pom_email: 'me@figs.net')
       ]
     end
 
@@ -172,10 +172,10 @@ describe AllocationService do
 
     it 'works' do
       expect(terms).to eq([
-        { name: 'APPLES', started_at: -3, ended_at: -2 },
-        { name: 'PEARS',  started_at: -2, ended_at: -1 },
-        { name: 'SPUDS',  started_at: -1, ended_at:  0 },
-        { name: 'FIGS',   started_at:  0, ended_at: nil }
+        { name: 'APPLES', started_at: -3, ended_at: -2, email: 'me@apples.net' },
+        { name: 'PEARS',  started_at: -2, ended_at: -1, email: 'me@pears.net' },
+        { name: 'SPUDS',  started_at: -1, ended_at:  0, email: 'me@spuds.net' },
+        { name: 'FIGS',   started_at:  0, ended_at: nil, email: 'me@figs.net' }
       ])
     end
   end
