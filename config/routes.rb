@@ -47,7 +47,7 @@ Rails.application.routes.draw do
       get 'caseload/global' => 'caseload_global#index'
     end
 
-    resources :prisoners, only: [:show, :review_case_details] do
+    resources :prisoners, only: [:show] do
       constraints lambda {
         |request| !PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id))
       } do
