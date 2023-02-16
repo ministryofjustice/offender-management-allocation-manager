@@ -29,6 +29,7 @@ class HandoverMailer < GovukNotifyRails::Mailer
     set_personalisation(nomis_offender_id: nomis_offender_id,
                         full_name_ordered: full_name_ordered,
                         first_name: first_name,
+                        service_provider: service_provider,
                         com_name: com_name,
                         com_email: com_email,
                         is_nps: service_provider == 'NPS' ? 'yes' : 'no',
@@ -43,7 +44,8 @@ class HandoverMailer < GovukNotifyRails::Mailer
                              handover_date:,
                              release_date:,
                              ldu_name:,
-                             ldu_email:)
+                             ldu_email:,
+                             service_provider:)
     set_template('be1ea651-be9d-4fb0-84cd-60af0556c8f9')
 
     ldu_information = ''
@@ -52,6 +54,7 @@ class HandoverMailer < GovukNotifyRails::Mailer
 
     set_personalisation(nomis_offender_id: nomis_offender_id,
                         full_name_ordered: full_name_ordered,
+                        service_provider: service_provider,
                         handover_date: handover_date,
                         release_date: release_date,
                         ldu_information: ldu_information,

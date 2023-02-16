@@ -74,6 +74,7 @@ class Handover::HandoverEmailBatchRun
       release_date: format_date(offender.earliest_release_date),
       ldu_name: offender.ldu_name,
       ldu_email: offender.ldu_email_address,
+      service_provider: offender.case_allocation,
       deliver_now: deliver_now,
     )
     Rails.logger.info("event=handover_email_delivered,nomis_offender_id=#{offender.offender_no},email=com_allocation_overdue,for_date=#{for_date.iso8601}")
