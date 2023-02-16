@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class AllocationStaffController < PrisonsApplicationController
-  include Sorting
-
   before_action :ensure_spo_user
   before_action :load_pom_types
   before_action :load_prisoner_via_prisoner_id

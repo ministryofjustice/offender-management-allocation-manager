@@ -134,20 +134,20 @@ module OffenderHelper
     details.fetch(:completed)
   end
 
-  def format_earliest_release_date(date_hash)
-    type_descriptions = {
-      'CRD' => 'Conditional release date:',
-      'ARD' => 'Automatic release date',
-      'HDCED' => 'Home detention curfew eligibility date',
-      'HDCEA' => 'Home detention curfew actual date',
-      'PED' => 'Parole eligibility date',
-      'TED' => 'Tariff date',
-      'SED' => 'Sentence expiry date',
-      'LED' => 'Licence expiry date',
-      'PRRD' => 'Post recall release date',
-      'APD' => 'Actual parole date'
-    }
+  TYPE_DESCRIPTIONS = {
+    'CRD' => 'Conditional release date:',
+    'ARD' => 'Automatic release date',
+    'HDCED' => 'Home detention curfew eligibility date',
+    'HDCEA' => 'Home detention curfew actual date',
+    'PED' => 'Parole eligibility date',
+    'TED' => 'Tariff date',
+    'SED' => 'Sentence expiry date',
+    'LED' => 'Licence expiry date',
+    'PRRD' => 'Post recall release date',
+    'APD' => 'Actual parole date'
+  }.freeze
 
-    "#{type_descriptions[date_hash[:type]]}: #{date_hash[:date].to_s(:rfc822)}"
+  def format_earliest_release_date(date_hash)
+    "#{TYPE_DESCRIPTIONS[date_hash[:type]]}: #{date_hash[:date].to_s(:rfc822)}"
   end
 end

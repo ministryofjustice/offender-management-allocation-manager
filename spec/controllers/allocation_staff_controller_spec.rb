@@ -68,7 +68,6 @@ RSpec.describe AllocationStaffController, type: :controller do
 
           it 'has a nil allocation' do
             expect(assigns(:allocation)).to be_nil
-            # expect(response.body).to have_content 'No history'
           end
 
           it 'serves prison POMs' do
