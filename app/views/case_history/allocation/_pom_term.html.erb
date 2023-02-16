@@ -1,0 +1,5 @@
+<% if term.present? %>
+  <%= flip_name(term[:name]).titleize %>
+    - <%= format_date(term[:started_at].to_date) %>
+    to <%= format_date(term[:ended_at].to_date) %>
+<% end %>
