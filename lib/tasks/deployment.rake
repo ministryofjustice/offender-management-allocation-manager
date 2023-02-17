@@ -52,6 +52,24 @@ namespace :deployment do
         '0 5 * * *',
         'bundle exec rake handover_chase_emails:process',
       ],
+      [
+        'production',
+        'handover-email-job',
+        '4 9 1 * *',
+        'bundle exec rake cronjob:handover_email',
+      ],
+      [
+        'production',
+        'recalculate-handover-dates',
+        '0 3 * * *',
+        'bundle exec rake recalculate_handover_dates',
+      ],
+      [
+        'production',
+        'repush-all-handover-dates-to-delius-job',
+        '0 6 * * 1',
+        'bundle exec rake repush_all_handover_dates_to_delius',
+      ],
     ].each do |env, name, schedule, command|
       warn "Generating #{env}/#{name}, schedule='#{schedule}', command: #{command}"
       target = "deploy/#{env}/cron-#{name}.yaml"
