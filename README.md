@@ -83,21 +83,24 @@ kubectl -n offender-management-production get secrets allocation-manager-secrets
 
 These are all managed manually using kubectl. [See here for more info](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/other-topics/secrets.html#secrets-overview)
 
-## Deploying to preprod and test
+## Deploying to preprod and test/test2
 
 preprod and test are deployed environments that can be used as part of the development process. Their purposes are:
 
 * preprod - Contains a copy of live data, updated via a script. Only security-cleared personnel can look at it. Deploy
   here when you need to check WIP code against real data.
-* test - Points to the same database as the dev/staging environment, but does not need code to be mainlined to be
+* test/test2 - Points to the same database as the dev/staging environment, but does not need code to be mainlined to be
   deployed to. Just like dev/staging, contains synthetic data so does not require SC to access.
   Deploy here when you need to check WIP code that requires valid NOMIS data.
 
-The method to deploy to both branches is the same. Check any code to be deployed to a local branch, and run:
+The method to deploy to these envs is the same. Commit any code to be deployed locally, and run:
 
 ```
 # Test environment
 git push --force origin HEAD:test
+
+# Test2 environment
+git push --force origin HEAD:test2
 
 # Preprod environment
 git push --force origin HEAD:preproduction
@@ -136,6 +139,9 @@ Run `make setup` to install git pre-commit hooks that:
 
 To test that the pre-commit hook is set up correctly, make an anti-rubocop change in app/models/offender.rb and
 try to commit - it should stop you doing so. (If it succeeds, undo the commit).
+
+If there are problems with Rubocop running (e.g. during a rebase session where the commits change Gemfile/Gemfile.lock)
+then disable the hook first: `chmod -x .git/hooks/pre-commit`
 
 ## CircleCI
 
