@@ -1,3 +1,9 @@
+######### DO NOT EDIT #########
+# This file is generated from a template in deploy/templates/ by the rake tasks in lib/tasks/deployment.rake
+# Any changes will be overwritten by that cron job!
+#
+# Do remember to check in generated files. Have a nice day.
+
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
@@ -6,17 +12,17 @@ spec:
   schedule: "0 2 * * *"
   concurrencyPolicy: Replace
   successfulJobsHistoryLimit: 3
-  failedJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
       ttlSecondsAfterFinished: 3600
       template:
         spec:
           containers:
-            - name: process-movements
+            - name: offender-manager-process-movements
               image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
               imagePullPolicy: Always
-              command: ['sh', '-c', "bundle exec rake movements:process"]
+              command: ["sh", "-c", "bundle exec rake movements:process"]
               resources:
                 limits:
                   memory: "1500Mi"
@@ -59,4 +65,19 @@ spec:
                     secretKeyRef:
                       name: elasticache-offender-management-allocation-manager-token-cache-production
                       key: url
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: hmpps-domain-events-topic
+                      key: access_key_id
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: hmpps-domain-events-topic
+                      key: secret_access_key
+                - name: DOMAIN_EVENTS_TOPIC_ARN
+                  valueFrom:
+                    secretKeyRef:
+                      name: hmpps-domain-events-topic
+                      key: topic_arn
           restartPolicy: OnFailure

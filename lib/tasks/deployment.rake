@@ -60,6 +60,12 @@ namespace :deployment do
       ],
       [
         'production',
+        'offender-manager-process-movements',
+        '0 2 * * *',
+        'bundle exec rake movements:process',
+      ],
+      [
+        'production',
         'recalculate-handover-dates',
         '0 3 * * *',
         'bundle exec rake recalculate_handover_dates',
