@@ -22,6 +22,30 @@ namespace :deployment do
         '5 2 * * *',
         'bundle exec rake handover:send_all_com_allocation_overdue',
       ],
+      [
+        'production',
+        'community-api-import',
+        '00 06 * * *',
+        'bundle exec rake community_api:import',
+      ],
+      [
+        'production',
+        'deactivate-cnls',
+        '0 4 * * *',
+        'bundle exec rake deactivate_cnls:process',
+      ],
+      [
+        'production',
+        'early-allocation-events',
+        '00 02 * * *',
+        'bundle exec rake trigger:early_allocation_events',
+      ],
+      [
+        'production',
+        'early-allocation-suitability-email-job',
+        '30 4 * * *',
+        'bundle exec rake early_allocation_suitability_email:process',
+      ],
     ].each do |env, name, schedule, command|
       warn "Generating #{env}/#{name}, schedule='#{schedule}', command: #{command}"
       target = "deploy/#{env}/cron-#{name}.yaml"
