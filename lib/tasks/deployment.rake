@@ -46,6 +46,12 @@ namespace :deployment do
         '30 4 * * *',
         'bundle exec rake early_allocation_suitability_email:process',
       ],
+      [
+        'production',
+        'handover-chase-email',
+        '0 5 * * *',
+        'bundle exec rake handover_chase_emails:process',
+      ],
     ].each do |env, name, schedule, command|
       warn "Generating #{env}/#{name}, schedule='#{schedule}', command: #{command}"
       target = "deploy/#{env}/cron-#{name}.yaml"
