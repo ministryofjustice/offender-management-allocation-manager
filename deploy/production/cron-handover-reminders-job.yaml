@@ -7,7 +7,7 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: handover-reminder-upcoming-handover-window-job
+  name: handover-reminders-job
 spec:
   schedule: "5 0 * * *"
   concurrencyPolicy: Replace
@@ -19,10 +19,10 @@ spec:
       template:
         spec:
           containers:
-            - name: handover-reminder-upcoming-handover-window-job
+            - name: handover-reminders-job
               image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
               imagePullPolicy: Always
-              command: ["sh", "-c", "bundle exec rake handover:send_all_upcoming_handover_window"]
+              command: ["sh", "-c", "bundle exec rake handover:send_all_handover_reminders"]
               resources:
                 limits:
                   memory: "1500Mi"

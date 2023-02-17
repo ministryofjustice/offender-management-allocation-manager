@@ -6,21 +6,9 @@ namespace :deployment do
     [
       [
         'production',
-        'handover-reminder-upcoming-handover-window-job',
+        'handover-reminders-job',
         '5 0 * * *',
-        'bundle exec rake handover:send_all_upcoming_handover_window',
-      ],
-      [
-        'production',
-        'handover-reminder-handover-date-job',
-        '5 1 * * *',
-        'bundle exec rake handover:send_all_handover_date',
-      ],
-      [
-        'production',
-        'handover-reminder-com-allocation-overdue-job',
-        '5 2 * * *',
-        'bundle exec rake handover:send_all_com_allocation_overdue',
+        'bundle exec rake handover:send_all_handover_reminders',
       ],
       [
         'production',
