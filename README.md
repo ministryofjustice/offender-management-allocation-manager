@@ -143,6 +143,20 @@ try to commit - it should stop you doing so. (If it succeeds, undo the commit).
 If there are problems with Rubocop running (e.g. during a rebase session where the commits change Gemfile/Gemfile.lock)
 then disable the hook first: `chmod -x .git/hooks/pre-commit`
 
+## Deployment files
+
+Kubernetes files in deploy/ manage deployment. Modify these to manage deployment.
+
+### Templating System
+
+A simple custom templating system has been built to manage these files. For now it is used to manage production cron
+jobs.
+
+Modify the relevant template in deploy/templates/, add the file to generate to the relevant job in
+lib/tasks/deployment.rake, and run the rake task.
+
+It should not be made any more complex - if more complexity is required, stop requiring it. Simplicity is genius.
+
 ## CircleCI
 
 CircleCI is used for testing of branches and deploying.
