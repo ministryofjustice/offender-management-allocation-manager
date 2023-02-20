@@ -1,4 +1,10 @@
-<% rel_type, rel_date = offender.earliest_release&.values_at(:type, :date) %>
+<%
+  if params[:rd2].present?
+    rel_type, rel_date = offender.earliest_release_2&.to_h&.values_at('name', 'date')
+  else
+    rel_type, rel_date = offender.earliest_release&.values_at(:type, :date)
+  end
+%>
 <td class="govuk-table__cell earliest-release-date">
   <% if rel_type && rel_date %>
     <%= rel_type %>: <br>
