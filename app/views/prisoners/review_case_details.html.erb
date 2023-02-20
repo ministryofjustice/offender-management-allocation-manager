@@ -60,12 +60,13 @@
             </tr>
             <tr class="govuk-table__row" id="tier">
               <th scope="row" class="govuk-table__header govuk-!-width-one-third">Tier</th>
-              <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.tier %></td>
+              <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.tier.presence || 'No tier found' %></td>
               <td class="govuk-table__cell govuk-!-width-one-third"><%= link_to('Change', edit_prison_case_information_path(@prison, @prisoner.offender_no), class: 'govuk-link govuk-link--no-visited-state') %></td>
             </tr>
             <tr class="govuk-table__row">
               <th scope="row" class="govuk-table__header govuk-!-width-one-third">Category</th>
-              <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.category_code %></td>
+              <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.category_code.presence || 'No category found
+' %></td>
               <td class="govuk-table__cell govuk-!-width-one-third"></td>
             </tr>
             <tr class="govuk-table__row">
@@ -83,6 +84,11 @@
             <tr class="govuk-table__row">
               <th scope="row" class="govuk-table__header govuk-!-width-one-third">Location</th>
               <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.location %></td>
+              <td class="govuk-table__cell govuk-!-width-one-third"></td>
+            </tr>
+            <tr class="govuk-table__row">
+              <th scope="row" class="govuk-table__header govuk-!-width-one-third">POM role needed</th>
+              <td class="govuk-table__cell govuk-!-width-one-third"><%= pom_responsibility_label(@prisoner) %></td>
               <td class="govuk-table__cell govuk-!-width-one-third"></td>
             </tr>
             <% if @pom.present? %>
@@ -103,8 +109,8 @@
               </tr>
             <% else %>
               <tr class="govuk-table__row">
-                <th scope="row" class="govuk-table__header govuk-!-width-one-third">POM role needed</th>
-                <td class="govuk-table__cell govuk-!-width-one-third"><%= pom_responsibility_label(@prisoner) %></td>
+                <th scope="row" class="govuk-table__header govuk-!-width-one-third">POM</th>
+                <td class="govuk-table__cell govuk-!-width-one-third">None allocated</td>
                 <td class="govuk-table__cell govuk-!-width-one-third"></td>
               </tr>
             <% end %>
@@ -132,7 +138,7 @@
             </tr>
             <tr class="govuk-table__row">
               <th scope="row" class="govuk-table__header govuk-!-width-one-third">Handover completion due</th>
-              <td class="govuk-table__cell"><%= format_date(@prisoner.responsibility_handover_date) %></td>
+              <td class="govuk-table__cell"><%= format_date(@prisoner.responsibility_handover_date, replacement: 'Unknown') %></td>
               <td class="govuk-table__cell"></td>
             </tr>
           </tbody>
@@ -192,21 +198,76 @@
                   <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.main_offence %></td>
                   <td class="govuk-table__cell govuk-!-width-one-third"></td>
                 </tr>
-                <tr class="govuk-table__row">
-                  <td class="govuk-table__cell govuk-!-width-one-third">Sentence start date</td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.sentence_start_date, replacement: 'N/A') %></td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"></td>
-                </tr>
-                <tr class="govuk-table__row">
-                  <td class="govuk-table__cell govuk-!-width-one-third">Conditional release date</td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.conditional_release_date) %></td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"></td>
-                </tr>
-                <tr class="govuk-table__row">
-                  <td class="govuk-table__cell govuk-!-width-one-third">Sentence/licence end date</td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.licence_expiry_date) %></td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"></td>
-                </tr>
+                <% if @prisoner.sentence_start_date.present? %>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell govuk-!-width-one-third">Sentence start date</td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.sentence_start_date) %></td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  </tr>
+                <% end %>
+                <% if @prisoner.conditional_release_date.present? %>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell govuk-!-width-one-third">Conditional release date</td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.conditional_release_date) %></td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  </tr>
+                <% end %>
+                <% if @prisoner.earliest_release_date.present? %>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell govuk-!-width-one-third">Actual release date</td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.earliest_release_date) %></td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  </tr>
+                <% end %>
+                <% if @prisoner.parole_eligibility_date.present? %>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell govuk-!-width-one-third">Parole eligability date</td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.parole_eligibility_date) %></td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  </tr>
+                <% end %>
+                <% if @prisoner.tariff_date.present? %>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell govuk-!-width-one-third">Tariff expiry date</td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.tariff_date) %></td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  </tr>
+                <% end %>
+                <% if @prisoner.home_detention_curfew_actual_date.present? %>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell govuk-!-width-one-third">Home detention curfew actual date</td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.home_detention_curfew_actual_date) %></td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  </tr>
+                <% end %>
+                <% if @prisoner.home_detention_curfew_eligibility_date.present? %>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell govuk-!-width-one-third">Home detention curfew eligibility date</td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.home_detention_curfew_eligibility_date) %></td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  </tr>
+                <% end %>
+                <% if @prisoner.licence_expiry_date.present? %>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell govuk-!-width-one-third">Licence expiry date</td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.licence_expiry_date) %></td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  </tr>
+                <% end %>
+                <% if @prisoner.post_recall_release_date.present? %>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell govuk-!-width-one-third">Post recall release date</td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.post_recall_release_date) %></td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  </tr>
+                <% end %>
+                <% if @prisoner.parole_review_date.present? %>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell govuk-!-width-one-third">Parole review date</td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.parole_review_date) %></td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  </tr>
+                <% end %>
               </tbody>
             </table>
         </div>
@@ -291,11 +352,13 @@
                 <td class="govuk-table__cell govuk-!-width-one-third"></td>
               </tr>
 
-              <tr class="govuk-table__row">
-                <td class="govuk-table__cell govuk-!-width-one-third">Previous POM email</td>
-                <td class="govuk-table__cell govuk-!-width-one-third"><%= @prev_pom_details&.fetch(:email, '') %></td>
-                <td class="govuk-table__cell govuk-!-width-one-third"></td>
-              </tr>
+              <% if @prev_pom_details.present? && @prev_pom_details[:email].present? %>
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell govuk-!-width-one-third">Previous POM email</td>
+                  <td class="govuk-table__cell govuk-!-width-one-third"><%= @prev_pom_details[:email] %></td>
+                  <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                </tr>
+              <% end %>
 
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">Co-working POM</td>
