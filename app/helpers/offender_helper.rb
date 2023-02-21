@@ -116,7 +116,6 @@ module OffenderHelper
       ldu_email: (offender.ldu_email_address.presence || 'Unknown'),
       com_name: (view_context.unreverse_name(offender.allocated_com_name).presence || 'Unknown'),
       com_email: (offender.allocated_com_email.presence || 'Unknown'),
-      handover_start_date: (view_context.format_date(offender.handover_start_date).presence || 'Unknown'),
       handover_completion_date: (view_context.format_date(offender.responsibility_handover_date).presence || 'Unknown'),
       last_oasys_completed: (view_context.format_date(last_oasys_completed(offender.offender_no)).presence || 'No OASys information'),
       active_alerts: offender.active_alert_labels.join(', '),
