@@ -71,6 +71,13 @@
 ' %></td>
               <td class="govuk-table__cell govuk-!-width-one-third"></td>
             </tr>
+            <% if @prison.womens? %>
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header govuk-!-width-one-third">Complexity of need level</th>
+                <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.complexity_level&.capitalize %></td>
+                <td class="govuk-table__cell govuk-!-width-one-third"></td>
+              </tr>
+            <% end %>
             <tr class="govuk-table__row">
               <th scope="row" class="govuk-table__header govuk-!-width-one-third">Sentence start date</th>
               <td class="govuk-table__cell govuk-!-width-one-third">
