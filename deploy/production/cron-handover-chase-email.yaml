@@ -7,9 +7,9 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: early-allocation-suitability-email-job
+  name: handover-chase-email
 spec:
-  schedule: "30 4 * * *"
+  schedule: "0 5 * * *"
   concurrencyPolicy: Replace
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
@@ -19,10 +19,10 @@ spec:
       template:
         spec:
           containers:
-            - name: early-allocation-suitability-email-job
+            - name: handover-chase-email
               image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
               imagePullPolicy: Always
-              command: ["sh", "-c", "bundle exec rake early_allocation_suitability_email:process"]
+              command: ["sh", "-c", "bundle exec rake handover_chase_emails:process"]
               resources:
                 limits:
                   memory: "1500Mi"

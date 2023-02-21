@@ -1,9 +1,15 @@
+######### DO NOT EDIT #########
+# This file is generated from a template in deploy/templates/ by the rake tasks in lib/tasks/deployment.rake
+# Any changes will be overwritten by that cron job!
+#
+# Do remember to check in generated files. Have a nice day.
+
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: handover-chase-email
+  name: offender-manager-process-movements
 spec:
-  schedule: "0 5 * * *"
+  schedule: "0 2 * * *"
   concurrencyPolicy: Replace
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
@@ -13,10 +19,10 @@ spec:
       template:
         spec:
           containers:
-            - name: process-emails
+            - name: offender-manager-process-movements
               image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
               imagePullPolicy: Always
-              command: ['sh', '-c', "bundle exec rake handover_chase_emails:process"]
+              command: ["sh", "-c", "bundle exec rake movements:process"]
               resources:
                 limits:
                   memory: "1500Mi"
