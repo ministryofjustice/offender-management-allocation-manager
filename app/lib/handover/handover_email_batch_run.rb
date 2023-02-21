@@ -13,7 +13,7 @@ class Handover::HandoverEmailBatchRun
         first_name: offender.first_name.titleize,
         handover_date: format_date(chd.handover_date),
         service_provider: offender.case_allocation,
-        release_date: format_date(offender.earliest_release_date),
+        release_date: format_date(offender.earliest_release_2&.date),
         deliver_now: deliver_now,
       )
       Rails.logger.info("event=handover_email_delivered,nomis_offender_id=#{offender.offender_no},email=upcoming_handover_window,for_date=#{for_date.iso8601}")
@@ -30,7 +30,7 @@ class Handover::HandoverEmailBatchRun
         email: offender.staff_member.email_address,
         full_name_ordered: offender.full_name_ordered,
         first_name: offender.first_name.titleize,
-        release_date: format_date(offender.earliest_release_date),
+        release_date: format_date(offender.earliest_release_2&.date),
         com_name: offender.allocated_com_name,
         com_email: offender.allocated_com_email,
         service_provider: offender.case_allocation,
@@ -50,7 +50,7 @@ class Handover::HandoverEmailBatchRun
         email: offender.staff_member.email_address,
         full_name_ordered: offender.full_name_ordered,
         handover_date: format_date(chd.handover_date),
-        release_date: format_date(offender.earliest_release_date),
+        release_date: format_date(offender.earliest_release_2&.date),
         ldu_name: offender.ldu_name,
         ldu_email: offender.ldu_email_address,
         service_provider: offender.case_allocation,
