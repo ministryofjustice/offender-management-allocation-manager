@@ -1,3 +1,5 @@
+<% content_for :title, "Confirm co-working allocation – Digital Prison Services" %>
+
 <%= render :partial => "/shared/backlink", :locals => { :page => new_prison_coworking_path(@prison.code, nomis_offender_id: @prisoner.offender_no) } %>
 
 <%= form_tag(prison_coworking_index_path(@prison.code), method: :post, id: "confirm_coworking_allocation_form") do %>
