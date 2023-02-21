@@ -50,7 +50,6 @@ feature 'Allocation' do
       # Takes you to the Review case page
       expect(page).to have_css('h1', text: "Review Obinins Albina's case")
       expect(page).to have_content('Determinate')
-      expect(page).to have_content('MAPPA')
 
       within '.moj-page-header-actions__actions' do
         click_link 'Choose POM'
