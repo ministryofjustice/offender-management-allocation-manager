@@ -35,18 +35,20 @@ RSpec.describe DashboardController, type: :controller do
         expect(assigns(:is_pom)).to be true
         expect(assigns(:is_spo)).to be false
 
-        expect(response.body).to have_content('Your cases')
-        expect(response.body).to have_content('New allocations')
-        expect(response.body).to have_content('Cases close to handover')
-        expect(response.body).to have_content('Case updates needed')
-        expect(response.body).to have_content('All allocations in this prison')
+        aggregate_failures do
+          expect(response.body).to have_content('Your cases')
+          expect(response.body).to have_content('New allocations')
+          expect(response.body).to have_text('View your handover cases')
+          expect(response.body).to have_content('Case updates needed')
+          expect(response.body).to have_content('All allocations in this prison')
 
-        expect(response.body).not_to have_content('All allocated cases')
-        expect(response.body).not_to have_content('Make allocations')
-        expect(response.body).not_to have_content('Add missing details')
-        expect(response.body).not_to have_content('Newly arrived cases')
-        expect(response.body).not_to have_content('View all POMs')
-        expect(response.body).not_to have_content('All handover cases')
+          expect(response.body).not_to have_content('All allocated cases')
+          expect(response.body).not_to have_content('Make allocations')
+          expect(response.body).not_to have_content('Add missing details')
+          expect(response.body).not_to have_content('Newly arrived cases')
+          expect(response.body).not_to have_content('View all POMs')
+          expect(response.body).not_to have_content('View all handover cases')
+        end
       end
     end
 
@@ -68,7 +70,7 @@ RSpec.describe DashboardController, type: :controller do
 
         expect(response.body).not_to have_content('Your cases')
         expect(response.body).not_to have_content('New allocations')
-        expect(response.body).not_to have_content('Cases close to handover')
+        expect(response.body).not_to have_content('View your handover cases')
         expect(response.body).not_to have_content('Case updates needed')
         expect(response.body).not_to have_content('All allocations in this prison')
 
@@ -77,7 +79,7 @@ RSpec.describe DashboardController, type: :controller do
         expect(response.body).to have_content('Add missing details')
         expect(response.body).to have_content('Newly arrived cases')
         expect(response.body).to have_content('View all POMs')
-        expect(response.body).to have_content('All handover cases')
+        expect(response.body).to have_text('View all handover cases')
       end
 
       describe 'Make allocations tab' do
