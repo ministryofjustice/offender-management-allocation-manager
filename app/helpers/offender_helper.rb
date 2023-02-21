@@ -135,7 +135,7 @@ module OffenderHelper
   end
 
   TYPE_DESCRIPTIONS = {
-    'CRD' => 'Conditional release date:',
+    'CRD' => 'Conditional release date',
     'ARD' => 'Automatic release date',
     'HDCED' => 'Home detention curfew eligibility date',
     'HDCEA' => 'Home detention curfew actual date',
