@@ -1,4 +1,5 @@
 <% content_for :title, "Review case – Digital Prison Services" %>
+<% content_for :turbolinks_nocache, 'true' %>
 
 <%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
 
@@ -183,7 +184,7 @@
     </ul>
 
     <!-- Accordians -->
-    <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
+    <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-<%= (rand * 1000000).floor %>">
       <div class="govuk-accordion__section ">
         <div class="govuk-accordion__section-header">
           <h2 class="govuk-accordion__section-heading">
