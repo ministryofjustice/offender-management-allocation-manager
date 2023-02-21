@@ -369,7 +369,7 @@ class MpcOffender
   def earliest_release_2
     if indeterminate_sentence?
       if tariff_date.present? && tariff_date.future?
-        NamedDate[tariff_date, 'TRD']
+        NamedDate[tariff_date, 'TED']
       else
         [
           NamedDate[parole_review_date, 'PRD'],
