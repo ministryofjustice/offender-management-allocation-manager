@@ -9,11 +9,11 @@
                  builder: GOVUKDesignSystemFormBuilder::FormBuilder,
                  method: :put) do |form| %>
 
-      <h1 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-2">
+      <h1 class="govuk-heading-l govuk-!-margin-top-4 govuk-!-margin-bottom-2">
         <% if RecommendationService.recommended_pom_type(@prisoner) == RecommendationService::PROBATION_POM %>
-          Why are you allocating a prison officer POM?
+          Why are you allocating a prison POM?
         <% else %>
-          Why are you allocating a probation officer POM?
+          Why are you allocating a probation POM?
         <% end %>
       </h1>
 

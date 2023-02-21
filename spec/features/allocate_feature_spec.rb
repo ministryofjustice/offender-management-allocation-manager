@@ -80,7 +80,7 @@ feature 'Allocation' do
         click_link 'Allocate'
       end
 
-      expect(page).to have_css('h1', text: 'Why are you allocating a probation officer POM?')
+      expect(page).to have_css('h1', text: 'Why are you allocating a probation POM?')
 
       find('label[for=override-form-override-reasons-no-staff-field]').click
       find('label[for=override-form-override-reasons-continuity-field]').click
@@ -104,7 +104,7 @@ feature 'Allocation' do
       click_link 'Allocate'
     end
 
-    expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
+    expect(page).to have_css('h1', text: 'Why are you allocating a prison POM?')
 
     click_button('Continue')
     expect(page).to have_content('Select one or more reasons for not accepting the recommendation')
@@ -118,7 +118,7 @@ feature 'Allocation' do
       click_link 'Allocate'
     end
 
-    expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
+    expect(page).to have_css('h1', text: 'Why are you allocating a prison POM?')
 
     find('label[for=override-form-override-reasons-other-field]').click
     click_button('Continue')
@@ -134,7 +134,7 @@ feature 'Allocation' do
       click_link 'Allocate'
     end
 
-    expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
+    expect(page).to have_css('h1', text: 'Why are you allocating a prison POM?')
 
     find('label[for=override-form-override-reasons-suitability-field]').click
     click_button('Continue')
@@ -149,7 +149,7 @@ feature 'Allocation' do
       click_link 'Allocate'
     end
 
-    expect(page).to have_css('h1', text: 'Why are you allocating a prison officer POM?')
+    expect(page).to have_css('h1', text: 'Why are you allocating a prison POM?')
 
     find('label[for=override-form-override-reasons-suitability-field]').click
     fill_in 'override-form-suitability-detail-field', with: 'consectetur a eraconsectetur a erat nam at lectus urna duis convallis convallis tellus id interdum velit laoreet id donec ultrices tincidunt arcu non sodales neque sodales ut etiam'
