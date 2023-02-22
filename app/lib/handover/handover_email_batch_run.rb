@@ -73,8 +73,9 @@ class Handover::HandoverEmailBatchRun
         with_error_handling(offender.offender_no, 'com_allocation_overdue') do
           send_one_com_allocation_overdue(offender, for_date: for_date)
         end
-        Rails.logger.info("event=handover_email_batch_run_end,for_date=#{for_date.iso8601}")
       end
+    ensure
+      Rails.logger.info("event=handover_email_batch_run_end,for_date=#{for_date.iso8601}")
     end
 
   private
