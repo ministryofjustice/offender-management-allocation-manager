@@ -32,6 +32,8 @@ class AllocationStaffController < PrisonsApplicationController
     @coworking = params[:coworking].present?
   end
 
+  def compare_poms; end
+
 private
 
   def prisoner_id_from_url

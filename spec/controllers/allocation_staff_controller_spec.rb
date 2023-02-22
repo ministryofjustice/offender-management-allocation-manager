@@ -208,5 +208,15 @@ RSpec.describe AllocationStaffController, type: :controller do
         end
       end
     end
+
+    describe '#compare_poms' do
+      before do
+        put :compare_poms, params: { prison_id: prison_code, prisoner_id: offender_no }
+      end
+
+      it 'return success' do
+        expect(response).to be_successful
+      end
+    end
   end
 end

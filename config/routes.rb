@@ -109,6 +109,8 @@ Rails.application.routes.draw do
           get 'history'
         end
       end
+
+      put 'compare_poms', to: 'allocation_staff#compare_poms'
     end
 
     resources :coworking, only: [:new, :create, :destroy], param: :nomis_offender_id, path_names: {
