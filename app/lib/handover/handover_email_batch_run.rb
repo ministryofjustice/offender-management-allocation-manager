@@ -2,7 +2,7 @@ class Handover::HandoverEmailBatchRun
   class << self
     def send_one_upcoming_handover_window(offender, deliver_now: false, for_date: Time.zone.now.to_date)
       chd = CalculatedHandoverDate.find_by(nomis_offender_id: offender.offender_no)
-      return unless chd.handover_date == for_date + DEFAULT_UPCOMING_HANDOVER_WINDOW_DURATION
+      return unless chd&.handover_date && chd.handover_date == for_date + DEFAULT_UPCOMING_HANDOVER_WINDOW_DURATION
 
       Handover::HandoverEmail.deliver_if_deliverable(
         :upcoming_handover_window,
@@ -21,7 +21,7 @@ class Handover::HandoverEmailBatchRun
 
     def send_one_handover_date(offender, deliver_now: false, for_date: Time.zone.now.to_date)
       chd = CalculatedHandoverDate.find_by(nomis_offender_id: offender.offender_no)
-      return unless chd.handover_date == for_date && offender.has_com?
+      return unless chd&.handover_date && chd.handover_date == for_date && offender.has_com?
 
       Handover::HandoverEmail.deliver_if_deliverable(
         :handover_date,
@@ -41,7 +41,7 @@ class Handover::HandoverEmailBatchRun
 
     def send_one_com_allocation_overdue(offender, deliver_now: false, for_date: Time.zone.now.to_date)
       chd = CalculatedHandoverDate.find_by(nomis_offender_id: offender.offender_no)
-      return unless chd.handover_date == for_date - 14.days && !offender.has_com?
+      return unless chd&.handover_date && chd.handover_date == for_date - 14.days && !offender.has_com?
 
       Handover::HandoverEmail.deliver_if_deliverable(
         :com_allocation_overdue,
@@ -73,8 +73,9 @@ class Handover::HandoverEmailBatchRun
         with_error_handling(offender.offender_no, 'com_allocation_overdue') do
           send_one_com_allocation_overdue(offender, for_date: for_date)
         end
-        Rails.logger.info("event=handover_email_batch_run_end,for_date=#{for_date.iso8601}")
       end
+    ensure
+      Rails.logger.info("event=handover_email_batch_run_end,for_date=#{for_date.iso8601}")
     end
 
   private
