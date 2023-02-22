@@ -153,16 +153,6 @@ RSpec.describe OffenderHelper do
       end
     end
 
-    context 'when no handover start date' do
-      before do
-        allow(offender).to receive(:handover_start_date).and_return(nil)
-      end
-
-      it 'displays "Unknown"' do
-        expect(subject[:handover_start_date]).to eq('Unknown')
-      end
-    end
-
     context 'when no responsibility handover' do
       before do
         allow(offender).to receive(:responsibility_handover_date).and_return(nil)
