@@ -42,10 +42,14 @@ RSpec.describe Handover::HandoverEmailBatchRun do
           FactoryBot.create :calculated_handover_date,
                             offender: o, handover_date: today + DEFAULT_UPCOMING_HANDOVER_WINDOW_DURATION
         end
-        ignored = FactoryBot.create :calculated_handover_date, handover_date: today + 1.day
-        ignored_offender = instance_double(AllocatedOffender, offender_no: ignored.nomis_offender_id)
+        ignored = []
 
-        allow(AllocatedOffender).to receive(:all).and_return(allocated_to_process + [ignored_offender])
+        ignored1 = FactoryBot.create :calculated_handover_date, handover_date: today + 1.day
+        ignored.push instance_double(AllocatedOffender, offender_no: ignored1.nomis_offender_id)
+
+        ignored.push instance_double(AllocatedOffender, offender_no: 'NO_CHD', has_com?: true)
+
+        allow(AllocatedOffender).to receive(:all).and_return(allocated_to_process + ignored)
       end
 
       it "delivers the correct cases" do
@@ -94,6 +98,8 @@ RSpec.describe Handover::HandoverEmailBatchRun do
 
         ignored_no_com = FactoryBot.create :calculated_handover_date, handover_date: today
         ignored.push instance_double(AllocatedOffender, offender_no: ignored_no_com.offender.id, has_com?: false)
+
+        ignored.push instance_double(AllocatedOffender, offender_no: 'NO_CHD', has_com?: true)
 
         allow(AllocatedOffender).to receive(:all).and_return(allocated_to_process + ignored)
       end
@@ -146,6 +152,8 @@ RSpec.describe Handover::HandoverEmailBatchRun do
 
         ignored_has_com = FactoryBot.create :calculated_handover_date, handover_date: today - 14.days
         ignored.push instance_double(AllocatedOffender, offender_no: ignored_has_com.offender.id, has_com?: true)
+
+        ignored.push instance_double(AllocatedOffender, offender_no: 'NO_CHD', has_com?: true)
 
         allow(AllocatedOffender).to receive(:all).and_return(allocated_to_process + ignored)
       end
