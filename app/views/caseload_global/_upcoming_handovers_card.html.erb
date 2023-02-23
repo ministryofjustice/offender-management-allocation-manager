@@ -1,0 +1,12 @@
+<% information = capture do %>
+  <span class="card__heading--large"><%= @summary.fetch(:pending_handover_count) %></span>
+  <p>upcoming handover<%= 's' if @summary.fetch(:pending_handover_count) != 1 %></p>
+<% end %>
+
+<div class="card--caseload card-total">
+  <% if local_assigns[:with_link] %>
+    <%= link_to information, upcoming_prison_handovers_path(@prison.code, pom: 1), class: 'govuk-link--no-visited-state' %>
+  <% else %>
+    <%= information %>
+  <% end %>
+</div>

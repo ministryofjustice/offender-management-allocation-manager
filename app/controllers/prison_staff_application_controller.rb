@@ -63,6 +63,8 @@ private
 
     @allocations = Kaminari.paginate_array(sort_allocations(filter_allocations(@pom.allocations))).page(page)
 
+    @handover_cases = Handover::CategorisedHandoverCasesForPom.new(@pom)
+
     @summary = {
       all_prison_cases: @prison.allocations.all.count,
       new_cases_count: @pom.allocations.count(&:new_case?),
@@ -72,7 +74,7 @@ private
         a.earliest_release_date.present? &&
           a.earliest_release_date.to_date <= 4.weeks.after && Date.current.beginning_of_day < a.earliest_release_date.to_date
       end,
-      pending_handover_count: @pom.allocations.count(&:approaching_handover?),
+      pending_handover_count: @handover_cases.upcoming.count,
       pending_task_count: PomTasks.new.for_offenders(@pom.allocations).count,
       last_allocated_date: @allocations.max_by(&:primary_pom_allocated_at)&.primary_pom_allocated_at&.to_date
     }
