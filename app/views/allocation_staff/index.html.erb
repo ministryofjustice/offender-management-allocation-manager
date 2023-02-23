@@ -3,6 +3,12 @@
 <% if @prisoner.needs_a_com? %>
   <%= render partial: 'shared/notifications/offender_needs_a_com', locals: {offender: @prisoner, email_history: @emails_sent_to_ldu} %>
 <% end %>
+<% if flash[:alert] %>
+  <div id="pom-selection-error">
+    <p><%= flash[:alert]['title'] %></p>
+    <p><%= flash[:alert]['body'] %></p>
+  </div>
+<% end %>
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
@@ -73,7 +79,7 @@
 <p>You can choose an available prison POM below or allocate to a probation POM,<br>
 for example if a particular POM has worked with <%= @prisoner.first_name.capitalize %> before.</p>
 
-<%= form_tag(prison_prisoner_compare_poms_path(@prison, @prisoner.offender_no), method: :put) do %>
+<%= form_tag(prison_prisoner_check_compare_list_path(@prison, @prisoner.offender_no), method: :put) do %>
   <table id="available-poms" class="govuk-table">
     <thead class="govuk-table__head">
       <tr>
@@ -168,9 +174,8 @@ for example if a particular POM has worked with <%= @prisoner.first_name.capital
           <td aria-label="select" class="govuk-table__cell">
             <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes" style="margin-left: 20px; margin-top: -8px;">
               <div class="govuk-checkboxes__item">
-                <input class="govuk-checkboxes__input" id="organisation" name="organisation" type="checkbox" value="hmrc">
-                <label class="govuk-label govuk-checkboxes__label" for="organisation">
-                </label>
+                <input class="govuk-checkboxes__input" id="pom-select-<%= pom.staff_id %>" name="pom_ids[]" type="checkbox" value="<%= pom.staff_id %>">
+                <label class="govuk-label govuk-checkboxes__label" for="pom-select-<%= pom.staff_id %>"></label>
               </div>
             </div>
           </td>

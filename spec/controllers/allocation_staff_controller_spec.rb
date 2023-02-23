@@ -209,13 +209,33 @@ RSpec.describe AllocationStaffController, type: :controller do
       end
     end
 
-    describe '#compare_poms' do
+    describe '#check_compare_list' do
       before do
-        put :compare_poms, params: { prison_id: prison_code, prisoner_id: offender_no }
+        put :check_compare_list, params: { prison_id: prison_code, prisoner_id: offender_no, pom_ids: pom_ids }
       end
 
-      it 'return success' do
-        expect(response).to be_successful
+      context 'with correct number of POMs selected' do
+        let(:pom_ids) { [1, 2] }
+
+        it 'sends no error message' do
+          expect(flash[:alert]).to eq(nil)
+        end
+      end
+
+      context 'with too many POMs selected' do
+        let(:pom_ids) { [1, 2, 3, 4, 5] }
+
+        it 'sends error message' do
+          expect(flash[:alert]).to eq({ title: 'There is a problem', body: 'You can only choose up to 4 POMs to compare workloads' })
+        end
+      end
+
+      context 'with no POMs selected' do
+        let(:pom_ids) { [] }
+
+        it 'sends error message' do
+          expect(flash[:alert]).to eq({ title: 'There is a problem', body: 'Choose someone to allocate to or compare workloads' })
+        end
       end
     end
   end

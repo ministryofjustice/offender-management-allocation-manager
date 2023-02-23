@@ -32,6 +32,22 @@ class AllocationStaffController < PrisonsApplicationController
     @coworking = params[:coworking].present?
   end
 
+  MAX_COMPARISON_SIZE = 4
+
+  def check_compare_list
+    if params[:pom_ids].nil?
+      error_message = { title: 'There is a problem', body: 'Choose someone to allocate to or compare workloads' }
+    elsif params[:pom_ids].size > MAX_COMPARISON_SIZE
+      error_message = { title: 'There is a problem', body: 'You can only choose up to 4 POMs to compare workloads' }
+    end
+
+    if error_message
+      redirect_to(prison_prisoner_staff_index_path(@prison, @prisoner.offender_no), alert: error_message) and return
+    end
+
+    redirect_to prison_prisoner_compare_poms_path(@prison, @prisoner.offender_no, pom_ids: params[:pom_ids])
+  end
+
   def compare_poms; end
 
 private

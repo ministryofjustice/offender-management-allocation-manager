@@ -110,7 +110,13 @@ Rails.application.routes.draw do
         end
       end
 
-      put 'compare_poms', to: 'allocation_staff#compare_poms'
+      # Very annoyingly, if SSO needs to re-auth as PUT check_compare_list is
+      # executing, it tries to redirect to GET check_compare_list after it's
+      # finished, causing a 'no such route' error. So we need this GET version
+      # to land the slightly bemused user safely back on the 'Choose a POM' page.
+      get 'check_compare_list', to: 'allocation_staff#index'
+      put 'check_compare_list', to: 'allocation_staff#check_compare_list'
+      get 'compare_poms', to: 'allocation_staff#compare_poms'
     end
 
     resources :coworking, only: [:new, :create, :destroy], param: :nomis_offender_id, path_names: {
