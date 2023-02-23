@@ -13,16 +13,9 @@
               <% end %>
             </div>
           </div>
-          <% unless use_new_handovers_ui? %>
-            <div class="govuk-grid-column-one-half">
-              <div class="card--caseload card-total">
-                <%= link_to prison_staff_caseload_handovers_path(@prison.code, @pom.staff_id, :caseload) do %>
-                  <span class="card__heading--large"><%= @summary.fetch(:pending_handover_count) %></span>
-                  <p>handover cases</p>
-                <% end %>
-              </div>
-            </div>
-          <% end %>
+          <div class="govuk-grid-column-one-half">
+            <%= render 'caseload_global/upcoming_handovers_card' %>
+          </div>
         </div>
         <div class="govuk-grid-column-row">
           <h3 class="govuk-heading-m govuk-!-margin-top-8">
