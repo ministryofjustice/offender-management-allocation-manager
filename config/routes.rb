@@ -13,7 +13,7 @@ Rails.application.routes.draw do
     resources :prisons, only: :index
 
     resources :dashboard, only: :index
-    resources :handovers, only: :index do
+    resources :handovers, only: [] do # Yeah I know it effing sucks but legacy code goes brrrrrr
       collection do
         get :upcoming
         get :in_progress
@@ -32,14 +32,6 @@ Rails.application.routes.draw do
         as: :update_handover_email_preferences
 
     resources :staff do
-      resources :caseload_handovers, only: %i[index]
-      #resources :caseload do
-      #  get 'new_cases'
-      #  get 'cases' => 'caseload#new_cases'
-      #  get 'updates_required'
-      #end
-
-
       get 'caseload' => 'caseload#index'
       get 'new_cases' => 'caseload#new_cases'
       get 'caseload/cases' => 'caseload#cases'
