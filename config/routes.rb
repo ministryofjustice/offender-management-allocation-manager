@@ -159,12 +159,6 @@ Rails.application.routes.draw do
   resources :health, only: %i[ index ], controller: 'health'
   resources :status, only: %i[ index ], controller: 'status'
 
-  resources :feature_flags, only: [] do
-    collection do
-      get :activate_new_handovers_ui
-    end
-  end
-
   namespace :api do
     get('/' => 'api#index')
     resources :allocation, only: [:show], param: :offender_no, controller: 'allocation_api',path_names: { show: ':offender_no' }
