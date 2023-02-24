@@ -24,7 +24,7 @@ gem 'logstash-event'
 # to enable custom log stats by writing logs directly
 gem 'logstash-logger'
 gem 'omniauth-oauth2'
-gem 'omniauth', '~> 1.9.2', require: nil
+gem 'omniauth', '~> 2.0.0', require: nil
 gem 'paper_trail', '~> 12.3.0'
 gem 'pg'
 gem 'puma', '~> 5.6.4'
