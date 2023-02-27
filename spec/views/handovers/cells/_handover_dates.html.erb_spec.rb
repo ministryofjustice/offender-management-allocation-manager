@@ -6,7 +6,7 @@ RSpec.describe 'handovers/cells/_handover_dates' do
 
   describe 'in the simplest case' do
     before do
-      render 'handovers/cells/handover_dates', handover_case: handover_case, handover_date_highlight: nil
+      render 'handovers/cells/handover_dates', handover_case: handover_case, show_highlight: nil
     end
 
     it 'renders correct date' do
@@ -21,7 +21,7 @@ RSpec.describe 'handovers/cells/_handover_dates' do
   describe 'when tasks overdue' do
     before do
       assign(:handover_cases, double(overdue_tasks: [handover_case]))
-      render 'handovers/cells/handover_dates', handover_case: handover_case, handover_date_highlight: :tasks_overdue
+      render 'handovers/cells/handover_dates', handover_case: handover_case, show_highlight: :tasks_overdue
     end
 
     it 'has alert highlight' do
@@ -34,7 +34,7 @@ RSpec.describe 'handovers/cells/_handover_dates' do
 
   describe 'when due soon' do
     before do
-      render 'handovers/cells/handover_dates', handover_case: handover_case, handover_date_highlight: :due_soon
+      render 'handovers/cells/handover_dates', handover_case: handover_case, show_highlight: :due_soon
     end
 
     it 'has notice highlight' do
