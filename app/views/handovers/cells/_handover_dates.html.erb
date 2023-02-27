@@ -1,6 +1,6 @@
 <% primary_content = format_date(handover_case.handover_date, replacement: "Unknown").html_safe %>
 <td class="govuk-table__cell handover-dates">
-  <% if show_highlight == :tasks_overdue && @handover_cases.overdue_tasks.include?(handover_case) %>
+  <% if show_highlight == :tasks_overdue && handover_cases.overdue_tasks.include?(handover_case) %>
     <%= highlight_tag 'primary', 'alert', primary_content %>
     <%= highlight_tag 'secondary', 'alert', 'Handover tasks overdue' %>
   <% elsif show_highlight == :due_soon && Time.zone.now.to_date >= handover_case.handover_date - 14.days %>
