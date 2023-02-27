@@ -5,8 +5,16 @@
 <% end %>
 <% if flash[:alert] %>
   <div id="pom-selection-error">
-    <p><%= flash[:alert]['title'] %></p>
-    <p><%= flash[:alert]['body'] %></p>
+    <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+      <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
+      <div class="govuk-error-summary__body">
+        <ul class="govuk-list govuk-error-summary__list">
+          <li>
+            <a href="#pom-select-<%= @available_poms.first.staff_id %>"><%= flash[:alert] %></a>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
 <% end %>
 
@@ -132,7 +140,15 @@ for example if a particular POM has worked with <%= @prisoner.first_name.capital
           <%= sort_arrow('total_allocations_count') %>
         </th>
         <th class="govuk-table__header" scope="col" style="width: 80px; padding-left: 20px;">Action</th>
-        <th class="govuk-table__header">Select POMs <br>to compare workloads</th>
+        <th class="govuk-table__header">
+          <div class="govuk-form-group govuk-!-margin-bottom-0<%= flash[:alert] ? ' govuk-form-group--error' : '' %>">
+            <fieldset class="govuk-fieldset">
+              <p class="<%= flash[:alert] ? 'govuk-error-message' : '' %>">
+                Select POMs<br>to compare workloads
+              </p>
+            </fieldset>
+          </div>
+        </th>
       </tr>
     </thead>
     <tbody class="govuk-table__body">
@@ -172,11 +188,13 @@ for example if a particular POM has worked with <%= @prisoner.first_name.capital
           </td>
 
           <td aria-label="select" class="govuk-table__cell">
-            <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes" style="margin-left: 20px; margin-top: -8px;">
-              <div class="govuk-checkboxes__item">
-                <input class="govuk-checkboxes__input" id="pom-select-<%= pom.staff_id %>" name="pom_ids[]" type="checkbox" value="<%= pom.staff_id %>">
-                <label class="govuk-label govuk-checkboxes__label" for="pom-select-<%= pom.staff_id %>"></label>
-              </div>
+            <div class="govuk-form-group govuk-!-margin-bottom-0<%= flash[:alert] ? ' govuk-form-group--error' : '' %>">
+              <fieldset class="govuk-fieldset">
+                <div class="govuk-checkboxes__item govuk-checkboxes--small">
+                  <input class="govuk-checkboxes__input" id="pom-select-<%= pom.staff_id %>" name="pom_ids[]" type="checkbox" value="<%= pom.staff_id %>">
+                  <label class="govuk-label govuk-checkboxes__label" for="pom-select-<%= pom.staff_id %>"></label>
+                </div>
+              </fieldset>
             </div>
           </td>
         </tr>

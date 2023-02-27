@@ -36,9 +36,9 @@ class AllocationStaffController < PrisonsApplicationController
 
   def check_compare_list
     if params[:pom_ids].nil?
-      error_message = { title: 'There is a problem', body: 'Choose someone to allocate to or compare workloads' }
+      error_message = 'Choose someone to allocate to or compare workloads'
     elsif params[:pom_ids].size > MAX_COMPARISON_SIZE
-      error_message = { title: 'There is a problem', body: 'You can only choose up to 4 POMs to compare workloads' }
+      error_message = 'You can only choose up to 4 POMs to compare workloads'
     end
 
     if error_message

@@ -226,7 +226,7 @@ RSpec.describe AllocationStaffController, type: :controller do
         let(:pom_ids) { [1, 2, 3, 4, 5] }
 
         it 'sends error message' do
-          expect(flash[:alert]).to eq({ title: 'There is a problem', body: 'You can only choose up to 4 POMs to compare workloads' })
+          expect(flash[:alert]).to eq('You can only choose up to 4 POMs to compare workloads')
         end
       end
 
@@ -234,7 +234,7 @@ RSpec.describe AllocationStaffController, type: :controller do
         let(:pom_ids) { [] }
 
         it 'sends error message' do
-          expect(flash[:alert]).to eq({ title: 'There is a problem', body: 'Choose someone to allocate to or compare workloads' })
+          expect(flash[:alert]).to eq('Choose someone to allocate to or compare workloads')
         end
       end
     end
