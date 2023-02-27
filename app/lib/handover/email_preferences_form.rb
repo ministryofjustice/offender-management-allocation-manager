@@ -10,8 +10,8 @@ class Handover::EmailPreferencesForm
   def self.load_opt_outs(staff_member:)
     model = new
     model.staff_member_id = staff_member.staff_id
-    # Load attributes from DB - remember, opt out is reversed
 
+    # Load attributes from DB - remember, opt out is reversed
     FIELDS.each do |field|
       opt_out = OffenderEmailOptOut.find_by(staff_member_id: model.staff_member_id, offender_email_type: field)
       model.send("#{field}=", opt_out.nil?)
