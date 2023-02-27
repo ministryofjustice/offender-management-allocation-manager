@@ -27,7 +27,6 @@ AllCops:
     - 'lib/tasks/brakeman.rake'
     - 'lib/tasks/elasticsearch.rake'
     - 'spec/dummy/db/**/*'
-    - 'config/routes.rb'
     - 'spec/factories/*.rb'
     - 'features/support/env.rb'
     - 'lib/tasks/cucumber.rake'
