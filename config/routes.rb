@@ -13,7 +13,7 @@ Rails.application.routes.draw do
     resources :prisons, only: :index
 
     resources :dashboard, only: :index
-    resources :handovers, only: :index do
+    resources :handovers, only: [] do # Yeah I know it effing sucks but legacy code goes brrrrrr
       collection do
         get :upcoming
         get :in_progress
@@ -32,14 +32,6 @@ Rails.application.routes.draw do
         as: :update_handover_email_preferences
 
     resources :staff do
-      resources :caseload_handovers, only: %i[index]
-      #resources :caseload do
-      #  get 'new_cases'
-      #  get 'cases' => 'caseload#new_cases'
-      #  get 'updates_required'
-      #end
-
-
       get 'caseload' => 'caseload#index'
       get 'new_cases' => 'caseload#new_cases'
       get 'caseload/cases' => 'caseload#cases'
@@ -48,15 +40,11 @@ Rails.application.routes.draw do
     end
 
     resources :prisoners, only: [:show] do
-      constraints lambda {
-        |request| !PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id))
-      } do
+      constraints ->(request) { !PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id)) } do
         get 'new_missing_info' => 'case_information#new'
       end
 
-      constraints lambda {
-        |request| PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id))
-      } do
+      constraints ->(request) { PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id)) } do
         get 'new_missing_info' => 'female_missing_infos#new'
         resource :female_missing_info, only: [:show, :update]
       end
@@ -71,7 +59,7 @@ Rails.application.routes.draw do
         get 'search'
       end
 
-      scope :format => true, :constraints => { :format => 'jpg' } do
+      scope format: true, constraints: { format: 'jpg' } do
         get('image' => 'prisoners#image', as: 'image')
       end
 
@@ -117,19 +105,19 @@ Rails.application.routes.draw do
     get('/coworking/confirm/:nomis_offender_id/:primary_pom_id/:secondary_pom_id' => 'coworking#confirm', as: 'confirm_coworking_allocation')
 
     resources :case_information, only: %i[new create edit update show], param: :prisoner_id, controller: 'case_information', path_names: {
-        new: 'new/:prisoner_id',
+      new: 'new/:prisoner_id',
     } do
       get('edit_prd' => 'case_information#edit_prd', as: 'edit_prd', on: :member)
       put('update_prd' => 'case_information#update_prd', as: 'update_prd', on: :member)
     end
 
-    resources :poms, only: %i[ index show edit update ], param: :nomis_staff_id
+    resources :poms, only: %i[index show edit update], param: :nomis_staff_id
     # routes to show the 2 tabs on PomsController#show
-    get "poms/:nomis_staff_id/tabs/:tab", to: "poms#show", as: :show_pom_tab
+    get 'poms/:nomis_staff_id/tabs/:tab', to: 'poms#show', as: :show_pom_tab
 
     get '/poms/:nomis_staff_id/non_pom' => 'poms#show_non_pom', as: 'pom_non_pom'
 
-    resources :tasks, only: %i[ index ]
+    resources :tasks, only: %i[index]
 
     resources :responsibilities, only: %i[new create destroy], param: :nomis_offender_id do
       member do
@@ -144,10 +132,10 @@ Rails.application.routes.draw do
     get('prisoners/:id/debugging' => redirect('/prisons/%{prison_id}/debugging?offender_no=%{id}'))
   end
 
-  match "/401", :to => "errors#unauthorized", :via => :all
-  match "/404", :to => "errors#not_found", :via => :all, constraints: lambda { |req| req.format == :html }
-  match "/500", :to => "errors#internal_server_error", :via => :all
-  match "/503", :to => "errors#internal_server_error", :via => :all
+  match '/401', to: 'errors#unauthorized', via: :all
+  match '/404', to: 'errors#not_found', via: :all, constraints: ->(req) { req.format == :html }
+  match '/500', to: 'errors#internal_server_error', via: :all
+  match '/503', to: 'errors#internal_server_error', via: :all
 
   get '/whats-new', to: 'pages#whats_new'
 
@@ -164,18 +152,12 @@ Rails.application.routes.draw do
   get '/help/missing_cases', to: 'help#missing_cases'
   get '/help/case_responsibility', to: 'help#case_responsibility'
 
-  resources :health, only: %i[ index ], controller: 'health'
-  resources :status, only: %i[ index ], controller: 'status'
-
-  resources :feature_flags, only: [] do
-    collection do
-      get :activate_new_handovers_ui
-    end
-  end
+  resources :health, only: %i[index], controller: 'health'
+  resources :status, only: %i[index], controller: 'status'
 
   namespace :api do
     get('/' => 'api#index')
-    resources :allocation, only: [:show], param: :offender_no, controller: 'allocation_api',path_names: { show: ':offender_no' }
+    resources :allocation, only: [:show], param: :offender_no, controller: 'allocation_api', path_names: { show: ':offender_no' }
     resources :offenders, only: [:show], param: :nomis_offender_id
   end
 
@@ -183,10 +165,10 @@ Rails.application.routes.draw do
   mount Rswag::Api::Engine => '/api-docs'
 
   # Sidekiq admin interface
-  constraints lambda {|request| SsoIdentity.new(request.session).current_user_is_admin?} do
+  constraints ->(request) { SsoIdentity.new(request.session).current_user_is_admin? } do
     require 'sidekiq/web'
     mount Sidekiq::Web => '/sidekiq'
   end
   # Redirect to 'unauthorized' page if user isn't an admin
-  get '/sidekiq', :to => redirect('/401')
+  get '/sidekiq', to: redirect('/401')
 end

@@ -33,8 +33,6 @@ RSpec.feature 'Handovers feature:' do
   end
 
   before do
-    activate_new_handovers_ui
-
     stub_auth_token
     stub_user(staff_id: user.staff_id)
     signin_pom_user([prison_code])

@@ -6,7 +6,7 @@
 #
 class AllocatedOffender
   delegate :first_name, :last_name, :full_name_ordered, :full_name,
-           :earliest_release_date, :earliest_release, :earliest_release_2, :approaching_handover?, :tariff_date, :release_date,
+           :earliest_release_date, :earliest_release, :earliest_release_2, :tariff_date, :release_date,
            :in_upcoming_handover_window?,
            :indeterminate_sentence?, :prison_id, :parole_review_date, :allocated_com_email,
            :handover_start_date, :responsibility_handover_date, :allocated_com_name, :has_com?, :case_allocation,

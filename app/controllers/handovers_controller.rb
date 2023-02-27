@@ -5,24 +5,7 @@ class HandoversController < PrisonsApplicationController
 
   layout 'handovers'
 
-  before_action :check_prerequisites_and_prepare_variables, except: :index
-  before_action :ensure_spo_user, only: :index
-
-  def index
-    if helpers.use_new_handovers_ui?
-      redirect_to upcoming_prison_handovers_path
-    else
-      @pending_handover_count = @current_user.allocations.count(&:approaching_handover?)
-      offender_list = @prison.offenders.select(&:approaching_handover?)
-      allocations = @prison.allocations.where(nomis_offender_id: offender_list.map(&:offender_no))
-      offenders_with_allocs = offender_list.map do |o|
-        OffenderWithAllocationPresenter.new(o, allocations.detect { |a| a.nomis_offender_id == o.offender_no })
-      end
-      offenders = sort_collection offenders_with_allocs, default_sort: :last_name
-      @offenders = Kaminari.paginate_array(offenders).page(page)
-      render :legacy_index, layout: 'application'
-    end
-  end
+  before_action :check_prerequisites_and_prepare_variables
 
   def upcoming
     @filtered_handover_cases = filtered_handover_cases(@handover_cases.upcoming)
