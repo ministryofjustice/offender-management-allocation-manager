@@ -1,8 +1,25 @@
 RSpec.describe Handover::HandoverCase do
   subject(:hcase) { described_class.new(offender, chd) }
 
-  let(:offender) { sneaky_instance_double AllocatedOffender, :offender }
+  let(:offender) { sneaky_instance_double AllocatedOffender, :offender, offender_no: 'X1111XX' }
   let(:chd) { sneaky_instance_double CalculatedHandoverDate, :chd, handover_date: nil }
+
+  before do
+    allow(CalculatedHandoverDate).to receive(:find_by!).and_raise(ActiveRecord::RecordNotFound, 'Default stub')
+  end
+
+  describe '::new' do
+    it 'finds CalculatedHandoverDate by offender number if it is not given' do
+      allow(CalculatedHandoverDate).to receive(:find_by!).with(nomis_offender_id: 'X1111XX')
+                                                         .and_return(chd)
+      handover_case = described_class.new(offender)
+
+      aggregate_failures do
+        expect(handover_case.offender).to eq offender
+        expect(handover_case.calculated_handover_date).to eq chd
+      end
+    end
+  end
 
   describe '#==' do
     it 'returns true when attributes are the same' do
@@ -13,10 +30,10 @@ RSpec.describe Handover::HandoverCase do
 
     it 'returns false when attributes are not the same' do
       aggregate_failures do
-        expect(described_class.new(offender, sneaky_instance_double(CalculatedHandoverDate)) ==
-                 described_class.new(offender, chd)).to eq false
-        expect(described_class.new(sneaky_instance_double(AllocatedOffender), chd) ==
-          described_class.new(offender, chd)).to eq false
+        expect(described_class.new(offender, sneaky_instance_double(CalculatedHandoverDate)))
+          .not_to eq described_class.new(offender, chd)
+        expect(described_class.new(sneaky_instance_double(AllocatedOffender), chd))
+          .not_to eq described_class.new(offender, chd)
       end
     end
   end
