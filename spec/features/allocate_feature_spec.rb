@@ -81,6 +81,15 @@ feature 'Allocation' do
 
       click_button 'Compare workloads'
       expect(page).to have_content('Compare POMs for')
+
+      find('a.govuk-button').click # 'Allocate' button - cucumber seems to think it's "disabled", bless it
+      expect(page).to have_css('h1', text: "Check allocation details for #{recently_allocated_offender_name}")
+
+      click_button 'Complete allocation'
+
+      expect(page).to have_current_path(start_page)
+      expect(page).to have_css('.message', text: "#{recently_allocated_offender_name} allocated to Moic Pom")
+      expect(page).to have_css('.govuk-details__summary-text', text: "You can copy information about this allocation to paste into an email to someone else")
     end
 
     scenario 'using the compare POM page with no POMs checked', vcr: { cassette_name: 'prison_api/use_compare_with_none_checked_feature' } do
