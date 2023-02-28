@@ -1,7 +1,7 @@
 class Handover::HandoverCase
   # we pass calculated handover date explicitly instead of finding it ourselves because: (1) its not our job to find it,
   # and (2) the CategorisedHandoverCases factories will have found them already when it initialises this class
-  def initialize(calculated_handover_date, allocated_offender)
+  def initialize(allocated_offender, calculated_handover_date)
     raise ArgumentError unless calculated_handover_date.is_a?(CalculatedHandoverDate)
     raise ArgumentError unless allocated_offender.is_a?(AllocatedOffender)
 

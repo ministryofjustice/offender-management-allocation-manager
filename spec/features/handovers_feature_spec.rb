@@ -43,7 +43,7 @@ RSpec.feature 'Handovers feature:' do
 
   describe 'upcoming handovers' do
     it 'renders correctly' do
-      allow(handover_cases).to receive(:upcoming).and_return([Handover::HandoverCase.new(calc_handover_date, offender)])
+      allow(handover_cases).to receive(:upcoming).and_return([Handover::HandoverCase.new(offender, calc_handover_date)])
       visit upcoming_prison_handovers_path(default_params)
 
       aggregate_failures do
@@ -59,7 +59,7 @@ RSpec.feature 'Handovers feature:' do
       allow(offender).to receive(:allocated_com_name).and_return('Mr COM')
       allow(offender).to receive(:allocated_com_email).and_return('mr-com@example.org')
       allow(handover_cases).to receive(:in_progress)
-                                 .and_return([Handover::HandoverCase.new(calc_handover_date, offender)])
+                                 .and_return([Handover::HandoverCase.new(offender, calc_handover_date)])
       visit in_progress_prison_handovers_path(default_params)
 
       aggregate_failures do
@@ -74,7 +74,7 @@ RSpec.feature 'Handovers feature:' do
   describe 'overdue tasks' do
     it 'renders correctly' do
       allow(handover_cases).to receive(:overdue_tasks)
-                                 .and_return([Handover::HandoverCase.new(calc_handover_date, offender)])
+                                 .and_return([Handover::HandoverCase.new(offender, calc_handover_date)])
       visit overdue_tasks_prison_handovers_path(default_params)
 
       aggregate_failures do
@@ -88,7 +88,7 @@ RSpec.feature 'Handovers feature:' do
   describe 'COM allocation overdue handovers page' do
     it 'renders correctly' do
       allow(handover_cases).to receive(:com_allocation_overdue)
-                                 .and_return([Handover::HandoverCase.new(calc_handover_date, offender)])
+                                 .and_return([Handover::HandoverCase.new(offender, calc_handover_date)])
       visit com_allocation_overdue_prison_handovers_path(default_params)
 
       aggregate_failures do
