@@ -80,11 +80,6 @@ FactoryBot.define do
       sentenceStartDate { nil }
     end
 
-    # TODO: delete this when USE_NEW_HANDOVER_POLICY goes away
-    trait :inside_handover_window do
-      conditionalReleaseDate { Time.zone.today + 7.days + 7.months }
-    end
-
     trait :indeterminate do
       indeterminateSentence { true }
       releaseDate { nil }

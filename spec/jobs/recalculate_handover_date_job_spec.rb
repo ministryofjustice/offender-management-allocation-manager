@@ -177,24 +177,6 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
           expect(record.responsibility).to eq(CalculatedHandoverDate::COMMUNITY_RESPONSIBLE)
         end
       end
-
-      # TODO: delete this when USE_NEW_HANDOVER_POLICY goes away
-      context 'with a COM supporting case' do
-        let(:nomis_offender) do
-          build(:nomis_offender,
-                prisonId: prison.code,
-                sentence: attributes_for(:sentence_detail, :inside_handover_window))
-        end
-
-        before do
-          stub_const('USE_NEW_HANDOVER_POLICY', false)
-          described_class.perform_now(offender_no)
-        end
-
-        it 'has POM responsibility with COM supporting' do
-          expect(record.responsibility).to eq(CalculatedHandoverDate::CUSTODY_WITH_COM)
-        end
-      end
     end
 
     context 'when calculated handover dates already exist for the offender' do

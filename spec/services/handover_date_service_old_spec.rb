@@ -357,7 +357,7 @@ describe HandoverDateService, 'old' do
     end
 
     let(:result) do
-      described_class.nps_start_date(
+      described_class.start_date(
         HandoverDateService::OffenderWrapper.new(offender)
       )
     end

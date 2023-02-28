@@ -25,7 +25,6 @@ class CaseloadGlobalController < CaseloadController
       total_cases: @pom.allocations.count,
       last_seven_days: @recent_allocations.count,
       release_next_four_weeks: @upcoming_releases.length,
-      pending_handover_count: @pom.allocations.count(&:approaching_handover?),
       pending_task_count: PomTasks.new.for_offenders(@pom.allocations).count
     }
   end

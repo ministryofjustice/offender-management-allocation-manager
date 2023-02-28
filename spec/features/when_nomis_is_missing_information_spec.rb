@@ -80,22 +80,6 @@ context 'when NOMIS is missing information' do
         expect(Date.parse(earliest_release_date)).to eq(Time.zone.today + 22.months)
       end
     end
-
-    describe 'the handover start page' do
-      before do
-        stub_offenders = [build(:nomis_offender, prisonerNumber: offender_no)]
-
-        stub_offenders_for_prison(prison_code, stub_offenders)
-      end
-
-      it 'does not error' do
-        create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
-
-        visit prison_staff_caseload_handovers_path(prison_code, staff_id)
-
-        expect(page).to have_content('All cases for start of handover to the community in the next 30 days')
-      end
-    end
   end
 
   context 'when logged in as an SPO' do
