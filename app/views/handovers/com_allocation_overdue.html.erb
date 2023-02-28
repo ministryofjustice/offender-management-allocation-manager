@@ -35,7 +35,7 @@
       <%= render 'handovers/cells/staff_member', staff_member: handover_case.offender.staff_member unless @pom_view %>
 
       <%= render 'handovers/cells/handover_dates',
-                 handover_case: handover_case, handover_date_highlight: nil %>
+                 handover_case: handover_case, show_highlight: nil %>
 
       <%= render 'handovers/cells/earliest_release_date', offender: handover_case.offender %>
 

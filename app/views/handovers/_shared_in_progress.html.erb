@@ -24,8 +24,8 @@
       <%= render 'handovers/cells/com_details', offender: handover_case.offender,
                  handover_date: handover_case.handover_date unless local_assigns[:hide_com_details] %>
 
-      <%= render 'handovers/cells/handover_dates',
-                 handover_case: handover_case, handover_date_highlight: handover_date_highlight %>
+      <%= render 'handovers/cells/handover_dates', handover_cases: @handover_cases, handover_case: handover_case,
+                 show_highlight: show_handover_date_highlight %>
 
       <%= render 'handovers/cells/earliest_release_date', offender: handover_case.offender %>
 
