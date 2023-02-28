@@ -59,26 +59,29 @@
             <%= case_mix_bar_by_tiers(pom.allocations, preserve_space_if_none: true) %>
             <%= case_mix_vertical_by_tiers(pom.allocations) %>
 
+            <% recent_count = pom.allocations.count { |a| a.primary_pom_allocated_at.to_date >= 7.days.ago } %>
             <h3 class="govuk-heading-s">Current workload</h3>
             <div class="card--caseload card-total">
               <a href="<%= prison_staff_caseload_cases_path(@prison, pom.staff_id, anchor: 'recent-allocations') %>" class="govuk-link--no-visited-state">
-                <span class="card__heading--large"><%= pom.allocations.count { |a| a.primary_pom_allocated_at.to_date >= 7.days.ago } %></span>
-                <p>allocations in last 7 days</p>
+                <span class="card__heading--large"><%= recent_count %></span>
+                <p><%= t('.recent_cases', count: recent_count) %></p>
               </a>
             </div>
 
+            <% handover_count = Handover::CategorisedHandoverCasesForPom.new(pom).upcoming.count %>
             <div class="govuk-grid-column-half">
               <div class="card--caseload card-total">
-                <span class="card__heading--large"><%= Handover::CategorisedHandoverCasesForPom.new(pom).upcoming.count %></span>
-                <p>handover cases</p>
+                <span class="card__heading--large"><%= handover_count %></span>
+                <p><%= t('.handover_cases', count: handover_count) %></p>
               </div>
             </div>
 
+            <% high_complexity_count = pom.allocations.count(&:high_complexity?) %>
             <% if @prison.womens? %>
               <div class="govuk-grid-column-half">
                 <div class="card--caseload card-total">
-                  <span class="card__heading--large"><%= pom.allocations.count(&:high_complexity?) %></span>
-                  <p>high complexity cases</p>
+                  <span class="card__heading--large"><%= high_complexity_count %></span>
+                  <p><%= t('.high_complexity_cases', count: high_complexity_count) %></p>
                 </div>
               </div>
             <% end %>
@@ -98,5 +101,4 @@
       </tr>
     </tbody>
   </table>
-
 </div>

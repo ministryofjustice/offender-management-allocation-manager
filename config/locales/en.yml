@@ -134,6 +134,19 @@ en:
         zero: There are no POMs unavailable for new allocations
         one: There is 1 POM unavailable for new allocations
         other: There are %{count} POMs unavailable for new allocations
+    compare_poms:
+      handover_cases:
+        zero: handover cases
+        one: handover case
+        other: handover cases
+      recent_cases:
+        zero: allocations in last 7 days
+        one: allocation in last 7 days
+        other: allocations in last 7 days
+      high_complexity_cases:
+        zero: high complexity cases
+        one: high complexity case
+        other: high complexity cases
 
   views:
     navigation:
