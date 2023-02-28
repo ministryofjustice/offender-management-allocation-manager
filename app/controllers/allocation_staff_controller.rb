@@ -12,11 +12,7 @@ class AllocationStaffController < PrisonsApplicationController
   def index
     @case_info = Offender.find_by!(nomis_offender_id: prisoner_id_from_url).case_information
     @allocation = AllocationHistory.find_by nomis_offender_id: prisoner_id_from_url
-    previous_pom_ids = if @allocation
-                         @allocation.previously_allocated_poms
-                       else
-                         []
-                       end
+    previous_pom_ids = @allocation ? @allocation.previously_allocated_poms : []
     poms = @prison.get_list_of_poms.index_by(&:staff_id)
     @previous_poms = previous_pom_ids.map { |staff_id| poms[staff_id] }.compact
     @current_pom = poms[@allocation.primary_pom_nomis_id] if @allocation&.primary_pom_nomis_id
@@ -29,7 +25,7 @@ class AllocationStaffController < PrisonsApplicationController
       default_sort: :position,
       default_direction: sort_dir)
 
-    @coworking = params[:coworking].present?
+    @coworking = coworking?
   end
 
   MAX_COMPARISON_SIZE = 4
@@ -45,10 +41,19 @@ class AllocationStaffController < PrisonsApplicationController
       redirect_to(prison_prisoner_staff_index_path(@prison, @prisoner.offender_no), alert: error_message) and return
     end
 
-    redirect_to prison_prisoner_compare_poms_path(@prison, @prisoner.offender_no, pom_ids: params[:pom_ids])
+    redirect_to prison_prisoner_compare_poms_path(@prison, @prisoner.offender_no, pom_ids: params[:pom_ids], coworking: coworking?)
   end
 
-  def compare_poms; end
+  def compare_poms
+    @coworking = coworking?
+    @poms = params[:pom_ids].map { |staff_id| StaffMember.new(@prison, staff_id) }
+    allocation = AllocationHistory.find_by nomis_offender_id: prisoner_id_from_url
+
+    if allocation
+      @current_pom_id = allocation.primary_pom_nomis_id
+      @previous_pom_ids = allocation.previously_allocated_poms
+    end
+  end
 
 private
 
@@ -64,5 +69,9 @@ private
   def load_prisoner_via_prisoner_id
     @prisoner = OffenderService.get_offender(prisoner_id_from_url)
     redirect_to('/404') if @prisoner.nil?
+  end
+
+  def coworking?
+    params[:coworking].present? && params[:coworking] == 'true'
   end
 end

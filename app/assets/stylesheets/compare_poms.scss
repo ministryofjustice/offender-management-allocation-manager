@@ -1,0 +1,21 @@
+table.govuk-table-compare-poms {
+  border-collapse: separate;
+
+  .govuk-table__cell, .govuk-table__header {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 0;
+    background-color: #f3f2f1;
+    border-left: 15px solid white;
+    border-right: 15px solid white;
+    border-bottom: none;
+  }
+
+  .govuk-table__cell:last-child, .govuk-table__head:last-child {
+    padding-right: 20px;
+  }
+
+  .card--caseload {
+    width: 80%;
+  }
+}

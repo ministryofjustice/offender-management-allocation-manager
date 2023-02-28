@@ -59,6 +59,10 @@ class AllocatedOffender
     StaffMember.new(Prison.find(prison_id), @staff_id)
   end
 
+  def latest_oasys_date
+    @latest_oasys_date ||= HmppsApi::AssessmentApi.get_latest_oasys_date(nomis_offender_id)
+  end
+
   class << self
     def all
       prisons = Prison.all

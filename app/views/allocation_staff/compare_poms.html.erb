@@ -1,4 +1,102 @@
-<h1>Compare POMs for</h1>
-<pre>
-  <%= params[:pom_ids] %>
-</pre>
+<%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <div class="moj-page-header-actions">
+      <div class="moj-page-header-actions__title">
+        <h1 class="govuk-heading-l">Compare POMs for <%= @prisoner.first_name.capitalize %> <%= @prisoner.last_name.capitalize %></h1>
+        <span class="govuk-caption-l">Prison number: <%= @prisoner.offender_no %></span>
+        <span class="govuk-caption-l">Date of birth: <%= format_date(@prisoner.date_of_birth) %> (<%= @prisoner.age %>)</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <table id="compare-poms" class="govuk-table govuk-table-compare-poms">
+    <thead class="govuk-table__head">
+      <tr>
+        <% @poms.each do |pom| %>
+          <th class="govuk-table__header govuk-!-width-one-quarter" scope="col" aria-sort="none">
+            <h2 class="govuk-cookie-banner__heading govuk-heading-m govuk-!-margin-bottom-0"><%= full_name_ordered(pom) %></h2>
+          </th>
+        <% end %>
+      </tr>
+    </thead>
+
+    <tbody class="govuk-table__body">
+      <tr>
+        <% @poms.each do |pom| %>
+          <td class="govuk-table__cell govuk-!-width-one-quarter" scope="col" aria-sort="none">
+            <p><%= format_working_pattern(pom.working_pattern) %></p>
+
+            <% if @current_pom_id == pom.staff_id || @previous_pom_ids&.include?(pom.staff_id) %>
+              <div class="govuk-warning-text govuk-!-margin-bottom-0">
+                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                <p class="govuk-warning-text__text">
+                  <span class="govuk-warning-text__assistive">Warning</span>
+                  <% if @current_pom_id == pom.staff_id %>
+                    Currently allocated
+                  <% else %>
+                    Previously allocated
+                  <% end %>
+                </p>
+              </div>
+            <% end %>
+          </td>
+        <% end %>
+      </tr>
+
+      <tr class="govuk-table__row">
+        <% @poms.each do |pom| %>
+          <td class="govuk-table__cell">
+
+            <h3 class="govuk-heading-s">Case mix by role</h3>
+            <%= case_mix_bar_by_role(pom.allocations, preserve_space_if_none: true) %>
+            <%= case_mix_vertical_by_role(pom.allocations) %>
+
+            <h3 class="govuk-heading-s">Case mix by tier</h3>
+            <%= case_mix_bar_by_tiers(pom.allocations, preserve_space_if_none: true) %>
+            <%= case_mix_vertical_by_tiers(pom.allocations) %>
+
+            <h3 class="govuk-heading-s">Current workload</h3>
+            <div class="card--caseload card-total">
+              <a href="<%= prison_staff_caseload_cases_path(@prison, pom.staff_id, anchor: 'recent-allocations') %>" class="govuk-link--no-visited-state">
+                <span class="card__heading--large"><%= pom.allocations.count { |a| a.primary_pom_allocated_at.to_date >= 7.days.ago } %></span>
+                <p>allocations in last 7 days</p>
+              </a>
+            </div>
+
+            <div class="govuk-grid-column-half">
+              <div class="card--caseload card-total">
+                <span class="card__heading--large"><%= Handover::CategorisedHandoverCasesForPom.new(pom).upcoming.count %></span>
+                <p>handover cases</p>
+              </div>
+            </div>
+
+            <% if @prison.womens? %>
+              <div class="govuk-grid-column-half">
+                <div class="card--caseload card-total">
+                  <span class="card__heading--large"><%= pom.allocations.count(&:high_complexity?) %></span>
+                  <p>high complexity cases</p>
+                </div>
+              </div>
+            <% end %>
+
+            <% if @coworking %>
+              <%= link_to 'Allocate',
+                          prison_confirm_coworking_allocation_path(@prison.code, @prisoner.offender_no, @current_pom_id, pom.staff_id),
+                          class: 'govuk-button' %>
+            <% else %>
+              <%= link_to 'Allocate',
+                          new_prison_prisoner_staff_build_allocation_path(@prison.code, @prisoner.offender_no, pom.staff_id),
+                          class: 'govuk-button' %>
+            <% end %>
+
+          </td>
+        <% end %>
+      </tr>
+    </tbody>
+  </table>
+
+</div>

@@ -87,7 +87,7 @@
 <p>You can choose an available prison POM below or allocate to a probation POM,<br>
 for example if a particular POM has worked with <%= @prisoner.first_name.capitalize %> before.</p>
 
-<%= form_tag(prison_prisoner_check_compare_list_path(@prison, @prisoner.offender_no), method: :put) do %>
+<%= form_tag(prison_prisoner_check_compare_list_path(@prison, @prisoner.offender_no, coworking: @coworking), method: :put) do %>
   <table id="available-poms" class="govuk-table">
     <thead class="govuk-table__head">
       <tr>
@@ -143,7 +143,7 @@ for example if a particular POM has worked with <%= @prisoner.first_name.capital
         <th class="govuk-table__header">
           <div class="govuk-form-group govuk-!-margin-bottom-0<%= flash[:alert] ? ' govuk-form-group--error' : '' %>">
             <fieldset class="govuk-fieldset">
-              <p class="<%= flash[:alert] ? 'govuk-error-message' : '' %>">
+              <p class="govuk-!-font-weight-bold<%= flash[:alert] ? ' govuk-error-message' : '' %>">
                 Select POMs<br>to compare workloads
               </p>
             </fieldset>
@@ -204,7 +204,7 @@ for example if a particular POM has worked with <%= @prisoner.first_name.capital
   </table>
 
   <div style="overflow: hidden">
-    <input id="search-button" type="submit" class="govuk-button pull-right" value="Compare workloads"/>
+    <input id="search-button" type="submit" class="govuk-button govuk-button--secondary pull-right" value="Compare workloads"/>
   </div>
 <% end %><!-- /form -->
 
