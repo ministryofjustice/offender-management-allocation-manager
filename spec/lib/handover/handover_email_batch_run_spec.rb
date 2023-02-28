@@ -1,9 +1,5 @@
 # Shitty integrated test doesn't stub out models - what can we do, short on time
 RSpec.describe Handover::HandoverEmailBatchRun do
-  before do
-    allow(Handover::HandoverEmail).to receive(:deliver_if_deliverable)
-  end
-
   let(:today) { Date.new(2021, 2, 12) }
   let(:allocated_to_process) do
     [
@@ -13,7 +9,6 @@ RSpec.describe Handover::HandoverEmailBatchRun do
                       first_name: 'ALI',
                       full_name_ordered: 'Ali Bloggs',
                       case_allocation: 'NPS',
-                      earliest_release_2: NamedDate[Date.new(2100, 11, 12), 'UNUSED'],
                       staff_member: double(staff_id: 'STAFF1', email_address: 'staff1@example.org'),
                       allocated_com_name: 'COM 0',
                       allocated_com_email: 'com0@example.com',
@@ -25,7 +20,6 @@ RSpec.describe Handover::HandoverEmailBatchRun do
                       first_name: 'SALLY',
                       full_name_ordered: 'Sally Patel',
                       case_allocation: 'CRC',
-                      earliest_release_2: NamedDate[Date.new(2200, 6, 14), 'UNUSED'],
                       staff_member: double(staff_id: 'STAFF2', email_address: 'staff2@example.org'),
                       allocated_com_name: 'COM 1',
                       allocated_com_email: 'com1@example.com',
@@ -33,14 +27,25 @@ RSpec.describe Handover::HandoverEmailBatchRun do
                       ldu_email_address: 'ldu1@example.com'),
     ]
   end
+  let(:handover_cases) do
+    [
+      instance_double(Handover::HandoverCase, earliest_release_for_handover: NamedDate[Date.new(2100, 11, 12), 'UNUSED']),
+      instance_double(Handover::HandoverCase, earliest_release_for_handover: NamedDate[Date.new(2200, 6, 14), 'UNUSED']),
+    ]
+  end
+
+  before do
+    allow(Handover::HandoverEmail).to receive(:deliver_if_deliverable)
+  end
 
   describe '::send_all' do
     describe 'for upcoming_handover_window emails' do
       before do
-        allocated_to_process.map do |offender|
+        allocated_to_process.zip(handover_cases).map do |offender, hc|
           o = FactoryBot.create :offender, id: offender.offender_no
-          FactoryBot.create :calculated_handover_date,
-                            offender: o, handover_date: today + DEFAULT_UPCOMING_HANDOVER_WINDOW_DURATION
+          chd = FactoryBot.create :calculated_handover_date,
+                                  offender: o, handover_date: today + DEFAULT_UPCOMING_HANDOVER_WINDOW_DURATION
+          allow(Handover::HandoverCase).to receive(:new).with(offender, chd).and_return(hc)
         end
         ignored = []
 
@@ -83,10 +88,11 @@ RSpec.describe Handover::HandoverEmailBatchRun do
 
     describe 'for handover_date emails' do
       before do
-        allocated_to_process.map do |offender|
+        allocated_to_process.zip(handover_cases).map do |offender, hc|
           allow(offender).to receive_messages(has_com?: true)
           o = FactoryBot.create :offender, id: offender.offender_no
-          FactoryBot.create :calculated_handover_date, offender: o, handover_date: today
+          chd = FactoryBot.create :calculated_handover_date, offender: o, handover_date: today
+          allow(Handover::HandoverCase).to receive(:new).with(offender, chd).and_return(hc)
         end
         ignored = []
 
@@ -137,10 +143,11 @@ RSpec.describe Handover::HandoverEmailBatchRun do
 
     describe 'for com_allocation_overdue emails' do
       before do
-        allocated_to_process.map do |offender|
+        allocated_to_process.zip(handover_cases).map do |offender, hc|
           allow(offender).to receive_messages(has_com?: false)
           o = FactoryBot.create :offender, id: offender.offender_no
-          FactoryBot.create :calculated_handover_date, offender: o, handover_date: today - 14.days
+          chd = FactoryBot.create :calculated_handover_date, offender: o, handover_date: today - 14.days
+          allow(Handover::HandoverCase).to receive(:new).with(offender, chd).and_return(hc)
         end
         ignored = []
 

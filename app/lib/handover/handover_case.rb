@@ -30,4 +30,29 @@ class Handover::HandoverCase
 
     (relative_to_date - handover_date).to_i
   end
+
+  # We can not calculate the handover date for NPS Indeterminate
+  # with parole cases where the TED is in the past as we need
+  # the parole board decision which currently is not available to us.
+  def earliest_release_for_handover
+    if offender.indeterminate_sentence?
+      if offender.tariff_date&.future?
+        NamedDate[offender.tariff_date, 'TED']
+      else
+        [
+          NamedDate[offender.parole_review_date, 'PRD'],
+          NamedDate[offender.parole_eligibility_date, 'PED'],
+        ].compact.reject { |nd| nd.date.past? }.min
+      end
+    elsif offender.case_information&.nps_case?
+      possible_dates = [NamedDate[offender.conditional_release_date, 'CRD'], NamedDate[offender.automatic_release_date, 'ARD']]
+      NamedDate[offender.parole_eligibility_date, 'PED'] || possible_dates.compact.min
+    else
+      # CRC can look at HDC date, NPS is not supposed to
+      NamedDate[offender.home_detention_curfew_actual_date, 'HDCEA'] ||
+        [NamedDate[offender.automatic_release_date, 'ARD'],
+         NamedDate[offender.conditional_release_date, 'CRD'],
+         NamedDate[offender.home_detention_curfew_eligibility_date, 'HDCED']].compact.min
+    end
+  end
 end

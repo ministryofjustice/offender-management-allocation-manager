@@ -1,4 +1,4 @@
-<% rel_type, rel_date = offender.earliest_release_2&.to_h&.values_at('name', 'date') %>
+<% rel_type, rel_date = handover_case.earliest_release_for_handover&.to_h&.values_at('name', 'date') %>
 <td class="govuk-table__cell earliest-release-date">
   <% if rel_type && rel_date %>
     <%= rel_type %>: <br>
