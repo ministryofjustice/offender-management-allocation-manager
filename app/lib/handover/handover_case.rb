@@ -16,8 +16,7 @@ class Handover::HandoverCase
   end
 
   delegate :last_name, to: :offender, prefix: true
-  delegate :staff_member, :allocated_com_name, :earliest_release_date, :tier, :handover_progress_complete?,
-           to: :offender
+  delegate :staff_member, :allocated_com_name, :tier, :handover_progress_complete?, to: :offender
   delegate :last_name, to: :staff_member, prefix: true
   delegate :handover_date, to: :calculated_handover_date
 
