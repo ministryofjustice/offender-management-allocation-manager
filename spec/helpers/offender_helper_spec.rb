@@ -173,4 +173,24 @@ RSpec.describe OffenderHelper do
       end
     end
   end
+
+  describe '#format_earliest_release_date' do
+    subject { helper.format_earliest_release_date(date_hash) }
+
+    context 'with expected date hash' do
+      let(:date_hash) { { type: 'LED', date: Date.new(2000, 1, 1) } }
+
+      it 'returns formatted output' do
+        expect(subject).to eq('Licence expiry date: 01 Jan 2000')
+      end
+    end
+
+    context 'with nil date hash' do
+      let(:date_hash) { nil }
+
+      it 'returns empty string' do
+        expect(subject).to eq('')
+      end
+    end
+  end
 end
