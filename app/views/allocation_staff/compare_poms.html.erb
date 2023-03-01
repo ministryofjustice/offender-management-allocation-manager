@@ -92,7 +92,8 @@
                           prison_confirm_coworking_allocation_path(@prison.code, @prisoner.offender_no, @current_pom_id, pom.staff_id),
                           class: 'govuk-button' %>
             <% else %>
-              <%= link_to 'Allocate',
+              <% button_text = @current_pom_id == pom.staff_id ? 'Keep allocation' : 'Allocate' %>
+              <%= link_to button_text,
                           new_prison_prisoner_staff_build_allocation_path(@prison.code, @prisoner.offender_no, pom.staff_id),
                           class: 'govuk-button' %>
             <% end %>
