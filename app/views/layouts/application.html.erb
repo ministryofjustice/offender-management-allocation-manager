@@ -13,9 +13,9 @@
       <%= I18n.t('views.navigation.skip_to_main_content') %>
     </a>
     <%= render '/layouts/header' %>
-    <%= render 'layouts/primary_navigation' %>
+    <%= render 'layouts/primary_navigation' if @prison %>
     <%= yield(:switcher) if content_for?(:switcher) %>
-    <%= render 'layouts/service_notification_banner' %>
+    <%= render 'layouts/service_notification_banner' if @service_notifications.present? %>
 
     <div class='govuk-width-container'>
       <main class='govuk-main-wrapper' id='main-content' role='main'>
