@@ -101,7 +101,7 @@ group :development do
   gem 'memory_profiler'
   gem 'parser', '~> 3.2'
   gem 'rack-mini-profiler'
-  gem 'spring-watcher-listen', '~> 2.0.0'
+  gem 'spring-watcher-listen', '~> 2.1.0'
   gem 'stackprof'
 end
 
