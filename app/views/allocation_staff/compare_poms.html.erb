@@ -63,7 +63,7 @@
             <% recent_count = pom.allocations.count { |a| a.primary_pom_allocated_at.to_date >= 7.days.ago } %>
             <h3 class="govuk-heading-s">Current workload</h3>
             <div class="card--caseload card-total">
-              <a href="<%= prison_staff_caseload_cases_path(@prison, pom.staff_id, anchor: 'recent-allocations') %>" class="govuk-link--no-visited-state">
+              <a href="<%= prison_show_pom_tab_path(@prison, pom.staff_id, :caseload, anchor: 'recent-allocations') %>" class="govuk-link--no-visited-state">
                 <span class="card__heading--large"><%= recent_count %></span>
                 <p><%= t('.recent_cases', count: recent_count) %></p>
               </a>
