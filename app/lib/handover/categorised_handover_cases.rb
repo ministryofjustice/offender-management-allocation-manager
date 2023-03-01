@@ -24,7 +24,7 @@ module Handover
 
     def build_cases(cal_handover_dates)
       cal_handover_dates.map do |chd|
-        HandoverCase.new(chd, @all_offenders_by_no[chd.nomis_offender_id])
+        HandoverCase.new(@all_offenders_by_no[chd.nomis_offender_id], chd)
       end
     end
   end

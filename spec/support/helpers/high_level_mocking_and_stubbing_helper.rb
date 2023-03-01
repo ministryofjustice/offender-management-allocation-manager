@@ -22,6 +22,7 @@ module HighLevelMockingAndStubbingHelper
     mock_offender
   end
 
+  # Like instance double, but stubs `is_a?` so it can pretend to be of the same type as what it is doubling
   def sneaky_instance_double(the_class, *args, **kwargs)
     d = instance_double(the_class, *args, **kwargs.merge(is_a?: false))
     allow(d).to receive(:is_a?).with(the_class).and_return(true)
