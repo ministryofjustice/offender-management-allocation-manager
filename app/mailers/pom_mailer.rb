@@ -19,6 +19,7 @@ class PomMailer < GovukNotifyRails::Mailer
       com_email: params[:further_info]&.fetch(:com_email, '')
     )
 
+    Rails.logger.info("MO-1223: PomMailer.new_allocation_email, URL:#{params[:url]}") # Temporary to debug an issue where URL is getting split into 2 lines
     mail(to: params[:pom_email])
   end
 
