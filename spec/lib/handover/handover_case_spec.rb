@@ -1,25 +1,8 @@
 RSpec.describe Handover::HandoverCase do
   subject(:hcase) { described_class.new(offender, chd) }
 
-  let(:offender) { sneaky_instance_double AllocatedOffender, :offender, offender_no: 'X1111XX' }
+  let(:offender) { sneaky_instance_double AllocatedOffender, :offender }
   let(:chd) { sneaky_instance_double CalculatedHandoverDate, :chd, handover_date: nil }
-
-  before do
-    allow(CalculatedHandoverDate).to receive(:find_by!).and_raise(ActiveRecord::RecordNotFound, 'Default stub')
-  end
-
-  describe '::new' do
-    it 'finds CalculatedHandoverDate by offender number if it is not given' do
-      allow(CalculatedHandoverDate).to receive(:find_by!).with(nomis_offender_id: 'X1111XX')
-                                                         .and_return(chd)
-      handover_case = described_class.new(offender)
-
-      aggregate_failures do
-        expect(handover_case.offender).to eq offender
-        expect(handover_case.calculated_handover_date).to eq chd
-      end
-    end
-  end
 
   describe '#==' do
     it 'returns true when attributes are the same' do
