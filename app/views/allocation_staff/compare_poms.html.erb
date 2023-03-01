@@ -71,16 +71,16 @@
 
             <% handover_count = Handover::CategorisedHandoverCasesForPom.new(pom).upcoming.count %>
             <div class="govuk-grid-column-half">
-              <div class="card--caseload card-total">
+              <div class="card--caseload">
                 <span class="card__heading--large"><%= handover_count %></span>
-                <p><%= t('.handover_cases', count: handover_count) %></p>
+                <p><%= t('.upcoming_handovers', count: handover_count) %></p>
               </div>
             </div>
 
             <% high_complexity_count = pom.allocations.count(&:high_complexity?) %>
             <% if @prison.womens? %>
               <div class="govuk-grid-column-half">
-                <div class="card--caseload card-total">
+                <div class="card--caseload">
                   <span class="card__heading--large"><%= high_complexity_count %></span>
                   <p><%= t('.high_complexity_cases', count: high_complexity_count) %></p>
                 </div>

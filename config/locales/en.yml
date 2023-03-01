@@ -135,10 +135,10 @@ en:
         one: There is 1 POM unavailable for new allocations
         other: There are %{count} POMs unavailable for new allocations
     compare_poms:
-      handover_cases:
-        zero: handover cases
-        one: handover case
-        other: handover cases
+      upcoming_handovers:
+        zero: upcoming handovers
+        one: upcoming handover
+        other: upcoming handovers
       recent_cases:
         zero: allocations in last 7 days
         one: allocation in last 7 days

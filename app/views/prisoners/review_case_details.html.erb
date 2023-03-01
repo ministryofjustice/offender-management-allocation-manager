@@ -117,12 +117,6 @@
                 <td class="govuk-table__cell govuk-!-width-one-third"><%= @pom.position_description %></td>
                 <td class="govuk-table__cell govuk-!-width-one-third"></td>
               </tr>
-            <% else %>
-              <tr class="govuk-table__row">
-                <th scope="row" class="govuk-table__header govuk-!-width-one-third">POM</th>
-                <td class="govuk-table__cell govuk-!-width-one-third">None allocated</td>
-                <td class="govuk-table__cell govuk-!-width-one-third"></td>
-              </tr>
             <% end %>
           </tbody>
         </table>
@@ -206,11 +200,6 @@
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell govuk-!-width-one-third">Main offence</td>
                   <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.main_offence %></td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"></td>
-                </tr>
-                <tr class="govuk-table__row">
-                  <td class="govuk-table__cell govuk-!-width-one-third">Sentence type</td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"><%= sentence_type_label(@prisoner) %></td>
                   <td class="govuk-table__cell govuk-!-width-one-third"></td>
                 </tr>
                 <% if @prisoner.sentence_start_date.present? %>
