@@ -29,7 +29,7 @@
               Allocate a co-working POM to <%= @prisoner.first_name.capitalize %> <%= @prisoner.last_name.capitalize %>
             <% else %>
               <% content_for :title, "Reallocate a POM – Digital Prison Services" %>
-              Reallocate a POM
+              Reallocate a POM to <%= @prisoner.first_name.capitalize %> <%= @prisoner.last_name.capitalize %>
             <% end %>
           <% else %>
             <% content_for :title, "Allocate a POM – Digital Prison Services" %>
