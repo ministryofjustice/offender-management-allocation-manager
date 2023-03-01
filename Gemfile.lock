@@ -550,7 +550,7 @@ GEM
       actionpack (>= 5.2)
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
-    stackprof (0.2.21)
+    stackprof (0.2.23)
     sys-uname (1.2.2)
       ffi (~> 1.1)
     test-prof (1.1.0)
