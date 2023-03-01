@@ -46,13 +46,25 @@ class AllocationStaffController < PrisonsApplicationController
 
   def compare_poms
     @coworking = coworking?
-    @poms = params[:pom_ids].map { |staff_id| StaffMember.new(@prison, staff_id) }
     allocation = AllocationHistory.find_by nomis_offender_id: prisoner_id_from_url
 
     if allocation
       @current_pom_id = allocation.primary_pom_nomis_id
       @previous_pom_ids = allocation.previously_allocated_poms
+
+      # Make current and previous POMs appear first
+      ordered_pom_ids = params[:pom_ids].sort_by do |id|
+        if id.to_i == @current_pom_id
+          0
+        elsif @previous_pom_ids.include?(id.to_i)
+          1
+        else
+          2
+        end
+      end
     end
+
+    @poms = (ordered_pom_ids || params[:pom_ids]).map { |staff_id| StaffMember.new(@prison, staff_id) }
   end
 
 private
