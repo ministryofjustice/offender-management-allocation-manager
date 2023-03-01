@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" class="govuk-template js flexbox">
   <head>
-    <%= render 'layouts/google_tag_manager_head' %>
-    <title><%= yield(:title).blank? ? "Manage Offenders in Custody" : yield(:title).to_s%></title>
+    <%= render 'layouts/gtm/head' %>
+    <title><%= yield(:title).blank? ? "Manage Offenders in Custody" : yield(:title).to_s %></title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
@@ -10,14 +10,14 @@
   </head>
 
   <body class="govuk-template__body js-enabled">
+    <%= render 'layouts/gtm/body' %>
     <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link" style="outline: none">
       <%= I18n.t('views.navigation.skip_to_main_content') %>
     </a>
-    <%= render 'layouts/google_tag_manager_body' %>
     <%= render '/layouts/header' %>
-    <%= render 'layouts/primary_navigation' %>
+    <%= render 'layouts/primary_navigation' if @prison %>
     <%= yield(:switcher) if content_for?(:switcher) %>
-    <%= render 'layouts/service_notification_banner' %>
+    <%= render 'layouts/service_notification_banner' if @service_notifications.present? %>
 
     <div class='govuk-width-container'>
       <main class='govuk-main-wrapper' id='main-content' role='main'>

@@ -1,6 +1,4 @@
 class HelpController < ApplicationController
-  layout 'errors_and_contact'
-
   def missing_cases
     @prison_code = default_prison_code
   end

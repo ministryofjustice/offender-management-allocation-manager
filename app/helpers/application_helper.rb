@@ -65,4 +65,8 @@ module ApplicationHelper
 
     reversed_name.split(',').reverse.join(' ').strip
   end
+
+  def gtm_id
+    Rails.configuration.gtm_id
+  end
 end

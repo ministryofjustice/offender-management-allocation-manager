@@ -83,5 +83,7 @@ module OffenderManagementAllocationClient
     }
 
     config.active_record.schema_format = :sql
+
+    config.gtm_id = ENV['GTM_ID']&.strip
   end
 end
