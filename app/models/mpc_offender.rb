@@ -344,31 +344,6 @@ class MpcOffender
     allocated_com_name.present? || allocated_com_email.present?
   end
 
-  # We can not calculate the handover date for NPS Indeterminate
-  # with parole cases where the TED is in the past as we need
-  # the parole board decision which currently is not available to us.
-  def earliest_release_2
-    if indeterminate_sentence?
-      if tariff_date.present? && tariff_date.future?
-        NamedDate[tariff_date, 'TED']
-      else
-        [
-          NamedDate[parole_review_date, 'PRD'],
-          NamedDate[parole_eligibility_date, 'PED'],
-        ].compact.reject { |nd| nd.date.past? }.min
-      end
-    elsif case_information&.nps_case?
-      possible_dates = [NamedDate[conditional_release_date, 'CRD'], NamedDate[automatic_release_date, 'ARD']]
-      NamedDate[parole_eligibility_date, 'PED'] || possible_dates.compact.min
-    else
-      # CRC can look at HDC date, NPS is not supposed to
-      NamedDate[home_detention_curfew_actual_date, 'HDCEA'].presence ||
-        [NamedDate[automatic_release_date, 'ARD'],
-         NamedDate[conditional_release_date, 'CRD'],
-         NamedDate[home_detention_curfew_eligibility_date, 'HDCED']].compact.min
-    end
-  end
-
 private
 
   def early_allocation_notes?

@@ -58,8 +58,8 @@ RSpec.describe Handover::CategorisedHandoverCases do
   describe '#upcoming' do
     it 'gets a list of handover cases whose handovers are upcoming' do
       expect(handover_cases.upcoming).to eq([
-        Handover::HandoverCase.new(upcoming_calculated_handover_dates[0], offenders['A']),
-        Handover::HandoverCase.new(upcoming_calculated_handover_dates[1], offenders['C'])
+        Handover::HandoverCase.new(offenders['A'], upcoming_calculated_handover_dates[0]),
+        Handover::HandoverCase.new(offenders['C'], upcoming_calculated_handover_dates[1])
       ])
     end
 
@@ -73,10 +73,10 @@ RSpec.describe Handover::CategorisedHandoverCases do
   describe '#in_progress' do
     it 'gets a list of handover cases whose handovers are in progress' do
       expect(handover_cases.in_progress).to eq([
-        Handover::HandoverCase.new(in_progress_calculated_handover_dates[0], offenders['D']),
-        Handover::HandoverCase.new(in_progress_calculated_handover_dates[1], offenders['F']),
-        Handover::HandoverCase.new(overdue_tasks_calculated_handover_dates[0], offenders['G']),
-        Handover::HandoverCase.new(overdue_tasks_calculated_handover_dates[1], offenders['H']),
+        Handover::HandoverCase.new(offenders['D'], in_progress_calculated_handover_dates[0]),
+        Handover::HandoverCase.new(offenders['F'], in_progress_calculated_handover_dates[1]),
+        Handover::HandoverCase.new(offenders['G'], overdue_tasks_calculated_handover_dates[0]),
+        Handover::HandoverCase.new(offenders['H'], overdue_tasks_calculated_handover_dates[1]),
       ])
     end
 
@@ -90,8 +90,8 @@ RSpec.describe Handover::CategorisedHandoverCases do
   describe '#overdue_tasks' do
     it 'gets a list of handover cases past handover and with tasks overdue' do
       expect(handover_cases.overdue_tasks).to eq([
-        Handover::HandoverCase.new(overdue_tasks_calculated_handover_dates[0], offenders['G']),
-        Handover::HandoverCase.new(overdue_tasks_calculated_handover_dates[1], offenders['H']),
+        Handover::HandoverCase.new(offenders['G'], overdue_tasks_calculated_handover_dates[0]),
+        Handover::HandoverCase.new(offenders['H'], overdue_tasks_calculated_handover_dates[1]),
       ])
     end
 
@@ -105,8 +105,8 @@ RSpec.describe Handover::CategorisedHandoverCases do
   describe '#com_allocation_overdue' do
     it 'gets a list of handover cases that are COM allocation overdue' do
       expect(handover_cases.com_allocation_overdue).to eq([
-        Handover::HandoverCase.new(com_allocation_overdue_calculated_handover_dates[0], offenders['J']),
-        Handover::HandoverCase.new(com_allocation_overdue_calculated_handover_dates[1], offenders['K'])
+        Handover::HandoverCase.new(offenders['J'], com_allocation_overdue_calculated_handover_dates[0]),
+        Handover::HandoverCase.new(offenders['K'], com_allocation_overdue_calculated_handover_dates[1])
       ])
     end
   end

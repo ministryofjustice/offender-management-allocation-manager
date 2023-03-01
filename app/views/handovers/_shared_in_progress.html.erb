@@ -27,7 +27,7 @@
       <%= render 'handovers/cells/handover_dates', handover_cases: @handover_cases, handover_case: handover_case,
                  show_highlight: show_handover_date_highlight %>
 
-      <%= render 'handovers/cells/earliest_release_date', offender: handover_case.offender %>
+      <%= render 'handovers/cells/earliest_release_date', handover_case: handover_case %>
 
       <%= render 'handovers/cells/tier', offender: handover_case.offender %>
 
