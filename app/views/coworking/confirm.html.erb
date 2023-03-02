@@ -1,6 +1,6 @@
 <% content_for :title, "Confirm co-working allocation – Digital Prison Services" %>
 
-<%= render :partial => "/shared/backlink", :locals => { :page => new_prison_coworking_path(@prison.code, nomis_offender_id: @prisoner.offender_no) } %>
+<%= render :partial => "/shared/backlink", :locals => { :page => prison_prisoner_staff_index_path(@prison.code, @prisoner.offender_no, coworking: true) } %>
 
 <%= form_tag(prison_coworking_index_path(@prison.code), method: :post, id: "confirm_coworking_allocation_form") do %>
   <div class="govuk-grid-row">
@@ -37,7 +37,7 @@ for <%= "#{@prisoner.first_name} #{@prisoner.last_name}".titleize %></h1>
         <%= hidden_field_tag("coworking_allocations[nomis_offender_id]", @prisoner.offender_no) %>
         <%= hidden_field_tag("coworking_allocations[nomis_staff_id]", @secondary_pom.staff_id) %>
         <%= submit_tag "Complete allocation", role: "button", draggable: "false", class: "govuk-button" %>
-        <a class="govuk-link cancel-button" href="<%= new_prison_coworking_path(@prison.code, @prisoner.offender_no) %>">Cancel</a>
+        <a class="govuk-link cancel-button" href="<%= prison_prisoner_staff_index_path(@prison.code, @prisoner.offender_no, coworking: true) %>">Cancel</a>
 
       </div>
     </div>
