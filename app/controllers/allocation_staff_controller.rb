@@ -38,7 +38,7 @@ class AllocationStaffController < PrisonsApplicationController
     end
 
     if error_message
-      redirect_to(prison_prisoner_staff_index_path(@prison, @prisoner.offender_no), alert: error_message) and return
+      redirect_to(prison_prisoner_staff_index_path(@prison, @prisoner.offender_no, coworking: coworking?), alert: error_message) and return
     end
 
     redirect_to prison_prisoner_compare_poms_path(@prison, @prisoner.offender_no, pom_ids: params[:pom_ids], coworking: coworking?)
