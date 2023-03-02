@@ -82,6 +82,11 @@ feature 'Allocation' do
       click_button 'Compare workloads'
       expect(page).to have_content('Compare POMs for')
 
+      # Follow link in box
+      click_link '0 allocations in last 7 days'
+      expect(page).to have_content('No cases allocated in last 7 days')
+      click_link 'Back'
+
       find('a.govuk-button').click # 'Allocate' button - cucumber seems to think it's "disabled", bless it
       expect(page).to have_css('h1', text: "Check allocation details for #{recently_allocated_offender_name}")
 
@@ -204,6 +209,7 @@ feature 'Allocation' do
     click_link 'Choose a POM to allocate to now'
 
     # Now on the 'Choose a POM' page
+    expect(page).to have_text('Reallocate a POM to')
     expect(page).to have_text("Currently allocated to Laura Jara Duncan")
     expect(page).to have_current_path(prison_prisoner_staff_index_path(prison_id: 'LEI', prisoner_id: nomis_offender_id))
 
