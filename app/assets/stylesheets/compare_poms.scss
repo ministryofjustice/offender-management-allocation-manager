@@ -2,13 +2,38 @@ table.govuk-table-compare-poms {
   border-collapse: separate;
 
   .govuk-table__cell, .govuk-table__header {
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-bottom: 0;
     background-color: #f3f2f1;
     border-left: 15px solid white;
     border-right: 15px solid white;
     border-bottom: none;
+    padding: 0;
+
+    .pom-data {
+      padding-left: 20px;
+      padding-right: 20px;
+      padding-bottom: 0;
+      min-height: 65px;
+    }
+
+    .current-pom {
+      background-color: white;
+      border-left: 1px solid black;
+      border-right: 1px solid black;
+    }
+  }
+
+  thead tr:first-child {
+    .current-pom {
+      border-top: 1px solid black;
+    }
+
+    .pom-data {
+      padding-top: 20px;
+    }
+  }
+
+  tbody tr:last-child .current-pom {
+    border-bottom: 1px solid black;
   }
 
   .blank-cell {
