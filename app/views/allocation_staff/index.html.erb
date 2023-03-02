@@ -182,7 +182,9 @@ for example if a particular POM has worked with <%= @prisoner.first_name.capital
 
           <td aria-label="recent allocations" class="govuk-table__cell" style="width: 80px; padding-left: 20px;">
             <% if @coworking %>
-              <%= link_to 'Allocate', prison_confirm_coworking_allocation_path(@prison.code, @prisoner.offender_no, @current_pom.staff_id, pom.staff_id) %>
+              <% unless @current_pom&.staff_id == pom.staff_id %>
+                <%= link_to 'Allocate', prison_confirm_coworking_allocation_path(@prison.code, @prisoner.offender_no, @current_pom.staff_id, pom.staff_id) %>
+              <% end %>
             <% else %>
               <%= link_to 'Allocate', new_prison_prisoner_staff_build_allocation_path(@prison.code, @prisoner.offender_no, pom.staff_id) %>
             <% end %>
