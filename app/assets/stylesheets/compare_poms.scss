@@ -11,6 +11,10 @@ table.govuk-table-compare-poms {
     border-bottom: none;
   }
 
+  .blank-cell {
+    background-color: white;
+  }
+
   .govuk-table__cell:last-child, .govuk-table__head:last-child {
     padding-right: 20px;
   }

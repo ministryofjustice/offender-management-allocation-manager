@@ -18,9 +18,13 @@
     <thead class="govuk-table__head">
       <tr>
         <% @poms.each do |pom| %>
-          <th class="govuk-table__header govuk-!-width-one-quarter" scope="col" aria-sort="none">
-            <h2 class="govuk-cookie-banner__heading govuk-heading-m govuk-!-margin-bottom-0"><%= full_name_ordered(pom) %></h2>
-          </th>
+          <% if pom.nil? %>
+            <th class="govuk-table__header govuk-!-width-one-quarter blank-cell" scope="col" aria-sort="none"></th>
+          <% else %>
+            <th class="govuk-table__header govuk-!-width-one-quarter" scope="col" aria-sort="none">
+              <h2 class="govuk-cookie-banner__heading govuk-heading-m govuk-!-margin-bottom-0"><%= full_name_ordered(pom) %></h2>
+            </th>
+          <% end %>
         <% end %>
       </tr>
     </thead>
@@ -28,83 +32,91 @@
     <tbody class="govuk-table__body">
       <tr>
         <% @poms.each do |pom| %>
-          <td class="govuk-table__cell govuk-!-width-one-quarter" scope="col" aria-sort="none">
-            <p><%= format_working_pattern(pom.working_pattern) %></p>
+          <% if pom.nil? %>
+            <td class="govuk-table__cell govuk-!-width-one-quarter blank-cell" scope="col" aria-sort="none"></td>
+          <% else %>
+            <td class="govuk-table__cell govuk-!-width-one-quarter" scope="col" aria-sort="none">
+              <p><%= format_working_pattern(pom.working_pattern) %></p>
 
-            <% if @current_pom_id == pom.staff_id || @previous_pom_ids&.include?(pom.staff_id) %>
-              <div class="govuk-warning-text govuk-!-margin-bottom-0">
-                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-                <p class="govuk-warning-text__text">
-                  <span class="govuk-warning-text__assistive">Warning</span>
-                  <% if @current_pom_id == pom.staff_id %>
-                    <%= @coworking ? 'Primary POM' : 'Currently allocated' %>
-                  <% else %>
-                    Previously allocated
-                  <% end %>
-                </p>
-              </div>
-            <% end %>
-          </td>
+              <% if @current_pom_id == pom.staff_id || @previous_pom_ids&.include?(pom.staff_id) %>
+                <div class="govuk-warning-text govuk-!-margin-bottom-0">
+                  <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                  <p class="govuk-warning-text__text">
+                    <span class="govuk-warning-text__assistive">Warning</span>
+                    <% if @current_pom_id == pom.staff_id %>
+                      <%= @coworking ? 'Primary POM' : 'Currently allocated' %>
+                    <% else %>
+                      Previously allocated
+                    <% end %>
+                  </p>
+                </div>
+              <% end %>
+            </td>
+          <% end %>
         <% end %>
       </tr>
 
       <tr class="govuk-table__row">
         <% @poms.each do |pom| %>
-          <td class="govuk-table__cell">
+          <% if pom.nil? %>
+            <td class="govuk-table__cell govuk-!-width-one-quarter blank-cell" scope="col" aria-sort="none"></td>
+          <% else %>
+            <td class="govuk-table__cell govuk-!-width-one-quarter">
 
-            <h3 class="govuk-heading-s">Case mix by role</h3>
-            <%= case_mix_bar_by_role(pom.allocations, preserve_space_if_none: true) %>
-            <%= case_mix_vertical_by_role(pom.allocations) %>
+              <h3 class="govuk-heading-s">Case mix by role</h3>
+              <%= case_mix_bar_by_role(pom.allocations, preserve_space_if_none: true) %>
+              <%= case_mix_vertical_by_role(pom.allocations) %>
 
-            <h3 class="govuk-heading-s">Case mix by tier</h3>
-            <%= case_mix_bar_by_tiers(pom.allocations, preserve_space_if_none: true) %>
-            <%= case_mix_vertical_by_tiers(pom.allocations) %>
+              <h3 class="govuk-heading-s">Case mix by tier</h3>
+              <%= case_mix_bar_by_tiers(pom.allocations, preserve_space_if_none: true) %>
+              <%= case_mix_vertical_by_tiers(pom.allocations) %>
 
-            <% recent_count = pom.allocations.count { |a| a.primary_pom_allocated_at.to_date >= 7.days.ago } %>
-            <h3 class="govuk-heading-s">Current workload</h3>
-            <div class="card--caseload card-total">
-              <a href="<%= prison_show_pom_tab_path(@prison, pom.staff_id, :caseload, anchor: 'recent-allocations') %>" class="govuk-link--no-visited-state">
-                <span class="card__heading--large"><%= recent_count %></span>
-                <p><%= t('.recent_cases', count: recent_count) %></p>
-              </a>
-            </div>
-
-            <% handover_count = Handover::CategorisedHandoverCasesForPom.new(pom).upcoming.count %>
-            <div class="govuk-grid-column-half">
-              <div class="card--caseload">
-                <span class="card__heading--large"><%= handover_count %></span>
-                <p><%= t('.upcoming_handovers', count: handover_count) %></p>
+              <% recent_count = pom.allocations.count { |a| a.primary_pom_allocated_at.to_date >= 7.days.ago } %>
+              <h3 class="govuk-heading-s">Current workload</h3>
+              <div class="card--caseload card-total">
+                <a href="<%= prison_show_pom_tab_path(@prison, pom.staff_id, :caseload, anchor: 'recent-allocations') %>" class="govuk-link--no-visited-state">
+                  <span class="card__heading--large"><%= recent_count %></span>
+                  <p><%= t('.recent_cases', count: recent_count) %></p>
+                </a>
               </div>
-            </div>
 
-            <% high_complexity_count = pom.allocations.count(&:high_complexity?) %>
-            <% if @prison.womens? %>
+              <% handover_count = Handover::CategorisedHandoverCasesForPom.new(pom).upcoming.count %>
               <div class="govuk-grid-column-half">
                 <div class="card--caseload">
-                  <span class="card__heading--large"><%= high_complexity_count %></span>
-                  <p><%= t('.high_complexity_cases', count: high_complexity_count) %></p>
+                  <span class="card__heading--large"><%= handover_count %></span>
+                  <p><%= t('.upcoming_handovers', count: handover_count) %></p>
                 </div>
               </div>
-            <% end %>
 
-            <% if @coworking %>
-              <% if @current_pom_id == pom.staff_id %>
-                <button disabled="disabled" aria-disabled="true" class="govuk-button govuk-button--disabled" data-module="govuk-button">
-                  Allocate co-working POM
-                </button>
+              <% high_complexity_count = pom.allocations.count(&:high_complexity?) %>
+              <% if @prison.womens? %>
+                <div class="govuk-grid-column-half">
+                  <div class="card--caseload">
+                    <span class="card__heading--large"><%= high_complexity_count %></span>
+                    <p><%= t('.high_complexity_cases', count: high_complexity_count) %></p>
+                  </div>
+                </div>
+              <% end %>
+
+              <% if @coworking %>
+                <% if @current_pom_id == pom.staff_id %>
+                  <button disabled="disabled" aria-disabled="true" class="govuk-button govuk-button--disabled" data-module="govuk-button">
+                    Allocate co-working POM
+                  </button>
+                <% else %>
+                  <%= link_to 'Allocate co-working POM',
+                              prison_confirm_coworking_allocation_path(@prison.code, @prisoner.offender_no, @current_pom_id, pom.staff_id),
+                              class: 'govuk-button' %>
+                <% end %>
               <% else %>
-                <%= link_to 'Allocate co-working POM',
-                            prison_confirm_coworking_allocation_path(@prison.code, @prisoner.offender_no, @current_pom_id, pom.staff_id),
+                <% button_text = @current_pom_id == pom.staff_id ? 'Keep allocation' : 'Allocate' %>
+                <%= link_to button_text,
+                            new_prison_prisoner_staff_build_allocation_path(@prison.code, @prisoner.offender_no, pom.staff_id),
                             class: 'govuk-button' %>
               <% end %>
-            <% else %>
-              <% button_text = @current_pom_id == pom.staff_id ? 'Keep allocation' : 'Allocate' %>
-              <%= link_to button_text,
-                          new_prison_prisoner_staff_build_allocation_path(@prison.code, @prisoner.offender_no, pom.staff_id),
-                          class: 'govuk-button' %>
-            <% end %>
 
-          </td>
+            </td>
+          <% end %>
         <% end %>
       </tr>
     </tbody>
