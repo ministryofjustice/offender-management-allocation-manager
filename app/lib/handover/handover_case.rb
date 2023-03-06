@@ -50,4 +50,8 @@ class Handover::HandoverCase
          NamedDate[offender.home_detention_curfew_eligibility_date, 'HDCED']].compact.min
     end
   end
+
+  def earliest_release_date
+    earliest_release_for_handover&.date
+  end
 end
