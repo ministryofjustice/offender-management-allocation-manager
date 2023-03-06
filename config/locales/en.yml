@@ -134,7 +134,7 @@ en:
         zero: There are no POMs unavailable for new allocations
         one: There is 1 POM unavailable for new allocations
         other: There are %{count} POMs unavailable for new allocations
-    compare_poms:
+    grid_compare_row:
       upcoming_handovers:
         zero: upcoming handovers
         one: upcoming handover

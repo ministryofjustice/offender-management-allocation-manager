@@ -1,50 +1,41 @@
-table.govuk-table-compare-poms {
-  border-collapse: separate;
+#compare-table {
+  .govuk-grid-row {
+    display: flex;
+  }
 
-  .govuk-table__cell, .govuk-table__header {
-    background-color: #f3f2f1;
-    border-left: 15px solid white;
-    border-right: 15px solid white;
-    border-bottom: none;
-    padding: 0;
-
-    .pom-data {
+  .pom-data {
+      background-color: #f3f2f1;
       padding-left: 20px;
       padding-right: 20px;
-      padding-bottom: 0;
-      min-height: 65px;
-    }
+      border-left: 10px white solid;
+      border-right: 10px white solid;
+      padding: 15px;
 
-    .current-pom {
-      background-color: white;
-      border-left: 1px solid black;
-      border-right: 1px solid black;
+    .card--caseload {
+      width: 80%;
+      margin-bottom: 0;
     }
   }
 
-  thead tr:first-child {
+  .current-pom {
+    background-color: white;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+  }
+
+  .govuk-grid-row:first-child {
     .current-pom {
-      border-top: 1px solid black;
+      border-top: 1px solid black !important;
     }
 
     .pom-data {
-      padding-top: 20px;
+      border-top: 1px solid white;
     }
   }
 
-  tbody tr:last-child .current-pom {
-    border-bottom: 1px solid black;
-  }
-
-  .blank-cell {
-    background-color: white;
-  }
-
-  .govuk-table__cell:last-child, .govuk-table__head:last-child {
-    padding-right: 20px;
-  }
-
-  .card--caseload {
-    width: 80%;
+  .govuk-grid-row:last-child {
+    .current-pom {
+      border-bottom: 1px solid black;
+    }
   }
 }

@@ -64,16 +64,10 @@ class AllocationStaffController < PrisonsApplicationController
       end
     end
 
-    @poms = pad_to_max_comparison_size(
-      (ordered_pom_ids || params[:pom_ids]).map { |staff_id| StaffMember.new(@prison, staff_id) }
-    )
+    @poms = (ordered_pom_ids || params[:pom_ids]).map { |staff_id| StaffMember.new(@prison, staff_id) }
   end
 
 private
-
-  def pad_to_max_comparison_size(array_to_pad)
-    Array.new(MAX_COMPARISON_SIZE) { |i| array_to_pad[i] }
-  end
 
   def prisoner_id_from_url
     params.require(:prisoner_id)
