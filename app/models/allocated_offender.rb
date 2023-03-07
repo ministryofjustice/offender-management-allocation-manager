@@ -8,11 +8,14 @@ class AllocatedOffender
   delegate :first_name, :last_name, :full_name_ordered, :full_name,
            :earliest_release_date, :earliest_release, :tariff_date, :release_date,
            :in_upcoming_handover_window?,
-           :indeterminate_sentence?, :prison_id, :parole_review_date, :allocated_com_email,
+           :indeterminate_sentence?, :prison_id, :parole_review_date, :parole_eligibility_date, :allocated_com_email,
            :handover_start_date, :responsibility_handover_date, :allocated_com_name, :has_com?, :case_allocation,
            :complexity_level, :offender_no, :sentence_start_date, :tier, :location, :latest_temp_movement_date,
            :restricted_patient?, :handover_progress_task_completion_data, :handover_progress_complete?,
-           :ldu_name, :ldu_email_address, :model, :released?, to: :@offender
+           :ldu_name, :ldu_email_address, :model, :released?,
+           :case_information, :home_detention_curfew_actual_date, :home_detention_curfew_eligibility_date,
+           :conditional_release_date, :automatic_release_date,
+           to: :@offender
   delegate :updated_at, :nomis_offender_id, :primary_pom_allocated_at, :prison, :primary_pom_nomis_id,
            to: :@allocation
 
