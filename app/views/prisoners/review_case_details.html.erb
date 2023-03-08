@@ -1,0 +1,515 @@
+<% content_for :title, "Review case – Digital Prison Services" %>
+<% content_for :turbolinks_nocache, 'true' %>
+
+<%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <div class="moj-page-header-actions">
+      <div class="moj-page-header-actions__title">
+        <h1 class="govuk-heading-l">Review <%= @prisoner.first_name.capitalize %> <%= @prisoner.last_name.capitalize %>'s case</h1>
+        <% if @allocation.present? %>
+          <% if @coworking %>
+            <span class="govuk-caption-l govuk-!-margin-bottom-2">Primary POM: <%= @pom.full_name_ordered %></span>
+          <% elsif @pom.present? %>
+            <span class="govuk-caption-l govuk-!-margin-bottom-2">Currently allocated to <%= @pom.full_name_ordered %></span>
+          <% end %>
+        <% end %>
+        <span class="govuk-caption-l">Prison number: <%= @prisoner.offender_no %></span>
+        <span class="govuk-caption-l govuk-!-margin-bottom-3">Date of birth: <%= format_date(@prisoner.date_of_birth) %> (<%= @prisoner.age %>)</span>
+      </div>
+
+      <div class="moj-page-header-actions__actions">
+        <%= render partial: 'choose_pom_button', locals: {coworking: @coworking, prison: @prison, offender_no: @prisoner.offender_no} %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+
+  <!-- Left column -->
+  <div class="govuk-grid-column-two-thirds">
+
+    <!-- At a glance box -->
+    <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+      <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+          At a glance
+        </h2>
+      </div>
+      <div class="govuk-notification-banner__content">
+        <p class="govuk-notification-banner__heading"></p>
+        <p style="margin-bottom: -40px; margin-top:-5px">
+          <strong class="govuk-tag govuk-tag--blue govuk-!-margin-bottom-7">
+            <%= sentence_type_label(@prisoner) %>
+          </strong>
+        </p>
+
+        <table class="govuk-table">
+          <caption class="govuk-table__caption govuk-table__caption--m"></caption>
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header"></th>
+              <th scope="col" class="govuk-table__header"></th>
+              <th scope="col" class="govuk-table__header"></th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            <tr class="govuk-table__row">
+              <th scope="row" class="govuk-table__header govuk-!-width-one-third">Main offence</th>
+              <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.main_offence %></td>
+              <td class="govuk-table__cell govuk-!-width-one-third"></td>
+            </tr>
+            <tr class="govuk-table__row" id="tier">
+              <th scope="row" class="govuk-table__header govuk-!-width-one-third">Tier</th>
+              <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.tier.presence || 'No tier found' %></td>
+              <td class="govuk-table__cell govuk-!-width-one-third"><%= link_to('Change', edit_prison_case_information_path(@prison, @prisoner.offender_no), class: 'govuk-link govuk-link--no-visited-state') %></td>
+            </tr>
+            <tr class="govuk-table__row">
+              <th scope="row" class="govuk-table__header govuk-!-width-one-third">Category</th>
+              <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.category_code.presence || 'No category found
+' %></td>
+              <td class="govuk-table__cell govuk-!-width-one-third"></td>
+            </tr>
+            <% if @prison.womens? %>
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header govuk-!-width-one-third">Complexity of need level</th>
+                <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.complexity_level&.capitalize %></td>
+                <td class="govuk-table__cell govuk-!-width-one-third"></td>
+              </tr>
+            <% end %>
+            <tr class="govuk-table__row">
+              <th scope="row" class="govuk-table__header govuk-!-width-one-third">Sentence start date</th>
+              <td class="govuk-table__cell govuk-!-width-one-third">
+                <%= format_date(@prisoner.sentence_start_date, replacement: 'N/A') %>
+              </td>
+              <td class="govuk-table__cell govuk-!-width-one-third"></td>
+            </tr>
+            <tr class="govuk-table__row">
+              <th scope="row" class="govuk-table__header govuk-!-width-one-third">Earliest release date</th>
+              <td class="govuk-table__cell govuk-!-width-one-third"><%= format_earliest_release_date(@prisoner.earliest_release) %></td>
+              <td class="govuk-table__cell govuk-!-width-one-third"></td>
+            </tr>
+            <tr class="govuk-table__row">
+              <th scope="row" class="govuk-table__header govuk-!-width-one-third">Location</th>
+              <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.location %></td>
+              <td class="govuk-table__cell govuk-!-width-one-third"></td>
+            </tr>
+            <tr class="govuk-table__row">
+              <th scope="row" class="govuk-table__header govuk-!-width-one-third">POM role needed</th>
+              <td class="govuk-table__cell govuk-!-width-one-third"><%= pom_responsibility_label(@prisoner) %></td>
+              <td class="govuk-table__cell govuk-!-width-one-third"></td>
+            </tr>
+            <% if @pom.present? %>
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header govuk-!-width-one-third">POM</th>
+                <td class="govuk-table__cell govuk-!-width-one-third"><%= @pom.full_name_ordered %></td>
+                <td class="govuk-table__cell govuk-!-width-one-third"></td>
+              </tr>
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header govuk-!-width-one-third">POM email</th>
+                <td class="govuk-table__cell govuk-!-width-one-third"><%= @pom.email_address %></td>
+                <td class="govuk-table__cell govuk-!-width-one-third"></td>
+              </tr>
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header govuk-!-width-one-third">POM role</th>
+                <td class="govuk-table__cell govuk-!-width-one-third"><%= @pom.position_description %></td>
+                <td class="govuk-table__cell govuk-!-width-one-third"></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+
+        <table class="govuk-table">
+          <caption class="govuk-table__caption govuk-table__caption--m">Key dates</caption>
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header"></th>
+              <th scope="col" class="govuk-table__header"></th>
+              <th scope="col" class="govuk-table__header"></th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            <tr class="govuk-table__row">
+            </tr>
+            <tr class="govuk-table__row">
+              <th scope="row" class="govuk-table__header govuk-!-width-one-third">Last OASys completed</th>
+              <td class="govuk-table__cell govuk-!-width-one-third">
+                <%= render 'oasys_assessment', assessment: @oasys_assessment %>
+              </td>
+              <td class="govuk-table__cell"></td>
+            </tr>
+            <tr class="govuk-table__row">
+              <th scope="row" class="govuk-table__header govuk-!-width-one-third">Handover completion due</th>
+              <td class="govuk-table__cell"><%= format_date(@prisoner.responsibility_handover_date, replacement: 'Unknown') %></td>
+              <td class="govuk-table__cell"></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <% if @coworking %>
+          <%= link_to 'Choose a co-working POM to allocate to now', prison_prisoner_staff_index_path(@prison, @prisoner.offender_no, coworking: true) %>
+        <% else %>
+          <%= link_to 'Choose a POM to allocate to now', prison_prisoner_staff_index_path(@prison, @prisoner.offender_no) %>
+        <% end %>
+        or see more information below before allocating.
+        <p></p>
+      <div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div></div>
+    </div>
+    <!-- /At a glance box -->
+
+    <!-- More info -->
+    <h2 class="govuk-heading-l govuk-!-margin-top-8">More information</h2>
+
+    <p>You can also see <%= @prisoner.first_name.capitalize %>'s:</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li>
+        <a class="govuk-link govuk-link--no-visited-state" href="<%= ENV['DIGITAL_PRISON_SERVICE_HOST'] %>/prisoner/<%= @prisoner.offender_no %>" target="_blank">
+          full Digital Prison Services profile
+        </a>
+      </li>
+      <% if AllocationHistory.find_by(nomis_offender_id: @prisoner.offender_no) %>
+        <li>
+          <%= link_to('allocation history', history_prison_prisoner_allocation_path(@prison, @prisoner.offender_no), class: 'govuk-link govuk-link--no-visited-state') %>
+        </li>
+      <% end %>
+    </ul>
+
+    <!-- Accordians -->
+    <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-<%= (rand * 1000000).floor %>">
+      <div class="govuk-accordion__section ">
+        <div class="govuk-accordion__section-header">
+          <h2 class="govuk-accordion__section-heading">
+            <span class="govuk-accordion__section-button" id="accordion-default-heading-1">
+              Sentence and offence
+            </span>
+          </h2>
+        </div>
+        <div id="accordion-default-content-1" class="govuk-accordion__section-content" aria-labelledby="accordion-default-heading-1">
+          <table class="govuk-table">
+              <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                  <th scope="col" class="govuk-table__header"></th>
+                  <th scope="col" class="govuk-table__header"></th>
+                  <th scope="col" class="govuk-table__header"></th>
+                </tr>
+              </thead>
+              <tbody class="govuk-table__body">
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell govuk-!-width-one-third">Main offence</td>
+                  <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.main_offence %></td>
+                  <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                </tr>
+                <% if @prisoner.sentence_start_date.present? %>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell govuk-!-width-one-third">Sentence start date</td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.sentence_start_date) %></td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  </tr>
+                <% end %>
+                <% if @prisoner.conditional_release_date.present? %>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell govuk-!-width-one-third">Conditional release date</td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.conditional_release_date) %></td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  </tr>
+                <% end %>
+                <% if @prisoner.automatic_release_date.present? %>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell govuk-!-width-one-third">Automatic release date</td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.automatic_release_date) %></td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  </tr>
+                <% end %>
+                <% if @prisoner.parole_eligibility_date.present? %>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell govuk-!-width-one-third">Parole eligability date</td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.parole_eligibility_date) %></td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  </tr>
+                <% end %>
+                <% if @prisoner.home_detention_curfew_actual_date.present? %>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell govuk-!-width-one-third">Home detention curfew actual date</td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.home_detention_curfew_actual_date) %></td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  </tr>
+                <% end %>
+                <% if @prisoner.tariff_date.present? %>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell govuk-!-width-one-third">Tariff expiry date</td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.tariff_date) %></td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  </tr>
+                <% end %>
+                <% if @prisoner.parole_review_date.present? %>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell govuk-!-width-one-third">Parole review date</td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.parole_review_date) %></td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  </tr>
+                <% end %>
+                <% if @prisoner.post_recall_release_date.present? %>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell govuk-!-width-one-third">Post recall release date</td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.post_recall_release_date) %></td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  </tr>
+                <% end %>
+                <% if @prisoner.licence_expiry_date.present? %>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell govuk-!-width-one-third">Sentence/licence end date</td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.licence_expiry_date) %></td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+        </div>
+      </div>
+      <div class="govuk-accordion__section ">
+        <div class="govuk-accordion__section-header">
+          <h2 class="govuk-accordion__section-heading">
+            <span class="govuk-accordion__section-button" id="accordion-default-heading-2">
+              Handover
+            </span>
+          </h2>
+        </div>
+        <div id="accordion-default-content-2" class="govuk-accordion__section-content" aria-labelledby="accordion-default-heading-2">
+          <table class="govuk-table">
+            <thead class="govuk-table__head">
+              <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header"></th>
+                <th scope="col" class="govuk-table__header"></th>
+                <th scope="col" class="govuk-table__header"></th>
+              </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell govuk-!-width-one-third">LDU</td>
+                <td class="govuk-table__cell govuk-!-width-one-third">
+                  <%= probation_field(@prisoner, :ldu_name) || "Unknown" %>
+                </td>
+                <td class="govuk-table__cell govuk-!-width-one-third"></td>
+              </tr>
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell govuk-!-width-one-third">LDU email</td>
+                <td class="govuk-table__cell govuk-!-width-one-third">
+                  <% if probation_field(@prisoner, :ldu_email_address).present? %>
+                    <%= mail_to(@prisoner.ldu_email_address, @prisoner.ldu_email_address) %>
+                  <% else %>
+                    Unknown
+                  <% end %>
+                </td>
+                <td class="govuk-table__cell govuk-!-width-one-third"></td>
+              </tr>
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell govuk-!-width-one-third">COM</td>
+                <td class="govuk-table__cell govuk-!-width-one-third">
+                  <%= probation_field(@prisoner, :allocated_com_name) || "Unknown" %>
+                </td>
+                <td class="govuk-table__cell govuk-!-width-one-third"></td>
+              </tr>
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell govuk-!-width-one-third">COM email</td>
+                <td class="govuk-table__cell govuk-!-width-one-third">
+                  <%= probation_field(@prisoner, :allocated_com_email) || "Unknown" %>
+                </td>
+                <td class="govuk-table__cell govuk-!-width-one-third"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="govuk-accordion__section ">
+        <div class="govuk-accordion__section-header">
+          <h2 class="govuk-accordion__section-heading">
+            <span class="govuk-accordion__section-button" id="accordion-default-heading-3">
+              Contacts
+            </span>
+          </h2>
+        </div>
+        <div id="accordion-default-content-3" class="govuk-accordion__section-content" aria-labelledby="accordion-default-heading-3">
+          <table class="govuk-table">
+            <thead class="govuk-table__head">
+              <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header"></th>
+                <th scope="col" class="govuk-table__header"></th>
+                <th scope="col" class="govuk-table__header"></th>
+              </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+              <% if @prev_pom_details.present? %>
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell govuk-!-width-one-third">Previous POM</td>
+                  <td class="govuk-table__cell govuk-!-width-one-third">
+                    <%= render partial: 'case_history/allocation/pom_term', locals: {term: @prev_pom_details} %>
+                  </td>
+                  <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                </tr>
+
+                <% if @prev_pom_details[:email].present? %>
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell govuk-!-width-one-third">Previous POM email</td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"><%= @prev_pom_details[:email] %></td>
+                    <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  </tr>
+                <% end %>
+              <% end %>
+
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell govuk-!-width-one-third">Co-working POM</td>
+                <td class="govuk-table__cell govuk-!-width-one-third"><%= @secondary_pom_name || 'None allocated' %></td>
+                <td class="govuk-table__cell govuk-!-width-one-third"></td>
+              </tr>
+
+              <% if @secondary_pom_name.present? %>
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell govuk-!-width-one-third">Co-working POM email</td>
+                  <td class="govuk-table__cell govuk-!-width-one-third"><%= @secondary_pom_email %></td>
+                  <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                </tr>
+              <% end %>
+
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell govuk-!-width-one-third">Key worker</td>
+                <td class="govuk-table__cell govuk-!-width-one-third"><%= @keyworker&.full_name || 'None assigned' %></td>
+                <td class="govuk-table__cell govuk-!-width-one-third"></td>
+              </tr>
+
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell govuk-!-width-one-third">Victim liaison officer (VLO)
+                <br>
+                <span class="moj-badge moj-badge--red" style="margin-top: 5px;">NON-DISCLOSABLE</span>
+                </td>
+                <td class="govuk-table__cell govuk-!-width-one-third">
+                  <% if @prisoner.victim_liaison_officers.any? %>
+                    <% @prisoner.victim_liaison_officers.each do |vlo| %>
+                      <p><%= vlo.full_name_ordered %><br /><%= vlo.email %></p>
+                    <% end %>
+                  <% else %>
+                    No VLO details added
+                  <% end %>
+                </td>
+                <td class="govuk-table__cell govuk-!-width-one-third"><br></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="govuk-accordion__section ">
+        <div class="govuk-accordion__section-header">
+          <h2 class="govuk-accordion__section-heading">
+            <span class="govuk-accordion__section-button" id="accordion-default-heading-4">
+              Case management
+            </span>
+          </h2>
+        </div>
+        <div id="accordion-default-content-4" class="govuk-accordion__section-content" aria-labelledby="accordion-default-heading-4">
+          <table class="govuk-table">
+            <thead class="govuk-table__head">
+              <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header"></th>
+                <th scope="col" class="govuk-table__header"></th>
+                <th scope="col" class="govuk-table__header"></th>
+              </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell govuk-!-width-one-third">Service provider</td>
+                <td class="govuk-table__cell govuk-!-width-one-third">
+                  <%= service_provider_label(@prisoner.case_allocation) %>
+                </td>
+                <td class="govuk-table__cell govuk-!-width-one-third">
+                  <%= link_to 'Change', edit_prison_case_information_path(@prison.code, @prisoner.offender_no), class: 'govuk-link govuk-link--no-visited-state' if @prisoner.manual_entry? %>
+                </td>
+              </tr>
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell govuk-!-width-one-third">Last known address in Wales?</td>
+                <td class="govuk-table__cell govuk-!-width-one-third">
+                  <%= humanized_bool(@prisoner.welsh_offender) if @prisoner.probation_record.present? %>
+                </td>
+                <td class="govuk-table__cell govuk-!-width-one-third">
+                  <%= link_to 'Change', edit_prison_case_information_path(@prison.code, @prisoner.offender_no), class: 'govuk-link govuk-link--no-visited-state' if @prisoner.manual_entry? %>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!-- /Accordians -->
+    <!-- /More info -->
+
+    <%= render partial: 'choose_pom_button', locals: {coworking: @coworking, prison: @prison, offender_no: @prisoner.offender_no} %>
+  </div>
+
+  <!--Right column-->
+  <div class="govuk-grid-column-one-third">
+    <aside class="app-related-items" role="complementary">
+      <h3 class="govuk-heading-m">
+        Active alerts
+      </h3>
+
+      <% if @alerts.none? %>
+        <p>None</p>
+      <% else %>
+        <ul class="govuk-list govuk-list--bullet">
+          <% @alerts.each do |alert| %>
+            <li><%= alert %></li>
+          <% end %>
+        </ul>
+      <% end %>
+
+      <p class="govuk-!-margin-bottom-6">
+        <a class="govuk-link govuk-link--no-visited-state" href="<%= ENV['DIGITAL_PRISON_SERVICE_HOST'] %>/prisoner/<%= @prisoner.offender_no %>/alerts" target="_blank">
+          View more alerts information
+        </a>
+      </p>
+
+      <%= render partial: 'shared/mappa', locals: {level: @mappa_details[:short_description], last_updated: @mappa_details[:start_date]} %>
+
+      <!-- RoSH summary
+      <div style="border: 2px solid" class="govuk-!-padding-4 govuk-!-margin-bottom-3">
+        <table class="govuk-table">
+          <caption class="govuk-table__caption govuk-table__caption--m">
+            <%= 'FIXME' %> RoSH<br />
+            Risk of serious harm<br />
+            <span class="govuk-caption-m govuk-body-s">Last updated: FIXME</span>
+          </caption>
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">Risk to</th>
+              <th scope="col" class="govuk-table__header">Custody</th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            <tr class="govuk-table__row">
+              <th scope="row" class="govuk-table__header">Children</th>
+              <td class="govuk-table__cell"><%= @rosh[:high_rosh_children] %></td>
+            </tr>
+            <tr class="govuk-table__row">
+              <th scope="row" class="govuk-table__header">Public</th>
+              <td class="govuk-table__cell"><%= @rosh[:high_rosh_public] %></td>
+            </tr>
+            <tr class="govuk-table__row">
+              <th scope="row" class="govuk-table__header">Known adult</th>
+              <td class="govuk-table__cell"><%= @rosh[:high_rosh_known_adult] %></td>
+            </tr>
+            <tr class="govuk-table__row">
+              <th scope="row" class="govuk-table__header">Staff</th>
+              <td class="govuk-table__cell"><%= @rosh[:high_rosh_staff] %></td>
+            </tr>
+            <tr class="govuk-table__row">
+              <th scope="row" class="govuk-table__header">Prisoners</th>
+              <td class="govuk-table__cell"><%= @rosh[:high_rosh_prisoners] %></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      -->
+    </aside>
+  </div>
+</div>

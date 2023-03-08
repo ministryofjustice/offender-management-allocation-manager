@@ -16,6 +16,7 @@ feature 'complexity level feature' do
     stub_signin_spo(spo, [womens_prison.code])
     stub_poms(womens_prison.code, [pom, spo])
     stub_keyworker(womens_prison.code, offender.fetch(:prisonerNumber), build(:keyworker))
+    # stub_community_offender(offender.fetch(:prisonerNumber), build(:community_data))
   end
 
   context 'when on allocation information page' do
@@ -84,7 +85,7 @@ feature 'complexity level feature' do
   context 'when on the new allocation page' do
     context 'when changing the complexity level' do
       it 'can click back link to return to the new allocation page' do
-        visit prison_prisoner_staff_index_path(womens_prison.code, offender_no)
+        visit prison_prisoner_allocation_path(womens_prison.code, offender_no)
 
         within(:css, "tr#complexity-level-row") do
           click_link('Change')
@@ -93,13 +94,13 @@ feature 'complexity level feature' do
         expect(page).to have_text 'Update complexity of need level'
 
         click_link('Back')
-        expect(page).to have_current_path(prison_prisoner_staff_index_path(womens_prison.code, offender_no))
+        expect(page).to have_current_path(prison_prisoner_allocation_path(womens_prison.code, offender_no))
       end
 
       it 'can update the complexity level' do
         expect(HmppsApi::ComplexityApi).to receive(:save).with(offender.fetch(:prisonerNumber), level: 'low', username: "MOIC_POM", reason: 'bla bla bla')
 
-        visit prison_prisoner_staff_index_path(womens_prison.code, offender_no)
+        visit prison_prisoner_allocation_path(womens_prison.code, offender_no)
 
         within(:css, "tr#complexity-level-row") do
           click_link('Change')
@@ -127,7 +128,7 @@ feature 'complexity level feature' do
 
         click_on('Update')
 
-        expect(page).to have_current_path(prison_prisoner_staff_index_path(womens_prison.code, offender_no))
+        expect(page).to have_current_path(prison_prisoner_allocation_path(womens_prison.code, offender_no))
         expect(page).to have_css('#complexity-level-row', text: 'Low')
         expect(page).to have_css('#complexity-badge', text: 'LOW COMPLEXITY')
       end

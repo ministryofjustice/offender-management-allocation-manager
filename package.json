@@ -3,7 +3,7 @@
   "private": true,
   "dependencies": {
     "@ministryofjustice/frontend": "0.2.4",
-    "govuk-frontend": "^4.4.0"
+    "govuk-frontend": "^4.5.0"
   },
   "description": "This README would normally document whatever steps are necessary to get the application up and running.",
   "version": "1.0.0",

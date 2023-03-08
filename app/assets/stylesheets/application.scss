@@ -17,6 +17,7 @@
 // GOV.UK Design System customizations
 @import "gov_uk_tag";
 @import "gov_uk_button_group";
+@import "gov_uk_notification_banner";
 
 // Then application specific components
 @import "case_mix";
@@ -27,6 +28,7 @@
 @import "pagination";
 @import "prison_switcher";
 @import "prisoner";
+@import "risk_widgets";
 @import "search";
 @import "service_banner";
 @import "sorting";
@@ -36,6 +38,7 @@
 @import "cards";
 @import 'handovers';
 @import 'task_list';
+@import 'compare_poms';
 
 a:visited {
     color: #005ea5;

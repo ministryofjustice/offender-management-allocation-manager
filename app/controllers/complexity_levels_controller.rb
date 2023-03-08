@@ -16,7 +16,7 @@ class ComplexityLevelsController < PrisonsApplicationController
     if @complexity.valid?
       HmppsApi::ComplexityApi.save(@offender_id, level: @complexity.level, username: current_user, reason: @complexity.reason)
       if @complexity.level == @previous_complexity_level
-        redirect_to prison_prisoner_allocation_path(nomis_offender_id: @offender_id, prison_id: @prison.code)
+        redirect_to prison_prisoner_allocation_path(@prison.code, @offender_id)
       else
         render :confirm_complexity_changed
       end

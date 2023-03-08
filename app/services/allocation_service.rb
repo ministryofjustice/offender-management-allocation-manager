@@ -70,4 +70,33 @@ class AllocationService
 
     pom_ids.index_with { |pom_id| HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(pom_id).first }
   end
+
+  # Gets the versions in *forward* order - so often we want to reverse
+  # this list as we're interested in recent rather than ancient history
+  # Returns an array of CaseHistory objects
+  def self.history(allocation)
+    return [] if allocation.blank?
+
+    version_pairs = allocation.get_old_versions.append(allocation).zip(allocation.versions)
+
+    # make CaseHistory records which contain the previous and current allocation history
+    # records - so that deallocation can look at the old version to work out the POM name and ID
+    [CaseHistory.new(nil, version_pairs.first.first, version_pairs.first.second)] +
+      version_pairs.each_cons(2).map do |prev_pair, curr_pair|
+        CaseHistory.new(prev_pair.first, curr_pair.first, curr_pair.second)
+      end
+  end
+
+  def self.pom_terms(allocation)
+    allowed_events = %w[allocate_primary_pom reallocate_primary_pom]
+
+    [].tap do |terms|
+      history(allocation).select { |h| allowed_events.include?(h.event) }.sort_by(&:created_at).each do |hist|
+        next if terms.any? && hist.primary_pom_name == terms.last[:name]
+
+        terms.last[:ended_at] = hist.created_at if terms.any?
+        terms << { name: hist.primary_pom_name, started_at: hist.created_at, ended_at: nil, email: hist.primary_pom_email }
+      end
+    end
+  end
 end

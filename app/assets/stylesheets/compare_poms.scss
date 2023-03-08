@@ -1,0 +1,41 @@
+#compare-table {
+  .govuk-grid-row {
+    display: flex;
+  }
+
+  .pom-data {
+      background-color: #f3f2f1;
+      padding-left: 20px;
+      padding-right: 20px;
+      border-left: 10px white solid;
+      border-right: 10px white solid;
+      padding: 15px;
+
+    .card--caseload {
+      width: 80%;
+      margin-bottom: 0;
+    }
+  }
+
+  .current-pom {
+    background-color: white;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+  }
+
+  .govuk-grid-row:first-child {
+    .current-pom {
+      border-top: 1px solid black !important;
+    }
+
+    .pom-data {
+      border-top: 1px solid white;
+    }
+  }
+
+  .govuk-grid-row:last-child {
+    .current-pom {
+      border-bottom: 1px solid black;
+    }
+  }
+}

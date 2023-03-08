@@ -116,7 +116,6 @@ module OffenderHelper
       ldu_email: (offender.ldu_email_address.presence || 'Unknown'),
       com_name: (view_context.unreverse_name(offender.allocated_com_name).presence || 'Unknown'),
       com_email: (offender.allocated_com_email.presence || 'Unknown'),
-      handover_start_date: (view_context.format_date(offender.handover_start_date).presence || 'Unknown'),
       handover_completion_date: (view_context.format_date(offender.responsibility_handover_date).presence || 'Unknown'),
       last_oasys_completed: (view_context.format_date(last_oasys_completed(offender.offender_no)).presence || 'No OASys information'),
       active_alerts: offender.active_alert_labels.join(', '),
@@ -132,5 +131,24 @@ module OffenderHelper
       details.fetch(:assessment_type) == Faraday::ServerError
 
     details.fetch(:completed)
+  end
+
+  TYPE_DESCRIPTIONS = {
+    'CRD' => 'Conditional release date',
+    'ARD' => 'Automatic release date',
+    'HDCED' => 'Home detention curfew eligibility date',
+    'HDCEA' => 'Home detention curfew actual date',
+    'PED' => 'Parole eligibility date',
+    'TED' => 'Tariff date',
+    'SED' => 'Sentence expiry date',
+    'LED' => 'Licence expiry date',
+    'PRRD' => 'Post recall release date',
+    'APD' => 'Actual parole date'
+  }.freeze
+
+  def format_earliest_release_date(date_hash)
+    return '' if date_hash.nil?
+
+    "#{TYPE_DESCRIPTIONS[date_hash[:type]]}: #{date_hash[:date].to_s(:rfc822)}"
   end
 end

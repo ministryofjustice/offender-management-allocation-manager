@@ -1,0 +1,5 @@
+<% if coworking %>
+  <%= link_to 'Choose co-working POM', prison_prisoner_staff_index_path(prison, offender_no, coworking: true), class: 'govuk-button' %>
+<% else %>
+  <%= link_to 'Choose POM', prison_prisoner_staff_index_path(prison, offender_no), class: 'govuk-button' %>
+<% end %>

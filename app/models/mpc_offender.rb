@@ -276,6 +276,10 @@ class MpcOffender
     @offender
   end
 
+  def recommended_pom_type
+    RecommendationService.recommended_pom_type(self)
+  end
+
   def attributes_to_archive
     attr_names = %w[
       recalled?

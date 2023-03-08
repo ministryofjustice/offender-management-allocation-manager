@@ -96,24 +96,6 @@ feature 'Navigation' do
           expect(new_link['aria-current']).to eq('page')
         end
       end
-
-      describe 'allocations section' do
-        let(:index) { 1 }
-        let!(:offender_id) { 'G9403UP' }
-        let(:offender_name) { 'Albina, Obinins' }
-
-        before do
-          create(:case_information, offender: Offender.find(offender_id))
-        end
-
-        it 'highlights the section' do
-          click_menu_and_wait(link_css, index, delay: 10)
-          click_link_and_wait offender_name
-          wait_for(80) { page.has_content? 'Conspire to do an act to facilitate the commission of a breach of UK immigration law by a non EU person' }
-          new_link = all(link_css)[index]
-          expect(new_link['aria-current']).to eq('page')
-        end
-      end
     end
   end
 

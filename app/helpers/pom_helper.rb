@@ -31,8 +31,16 @@ module PomHelper
     "#{pom.first_name} #{pom.last_name}".titleize
   end
 
+  def flip_name(name)
+    name.split(',').reverse.join(' ').strip
+  end
+
   def grade(pom)
     "#{pom.position_description.split(' ').first} POM"
+  end
+
+  def full_grade(pom)
+    "#{pom.position_description.split(' ').first} Officer POM"
   end
 
   def status(pom)
@@ -45,7 +53,7 @@ module PomHelper
       active: 'Active: available for new allocations',
       inactive: 'Inactive',
       unavailable: 'Unavailable for new allocations'
-    }.fetch(pom.status.to_sym)
+    }.fetch(pom.status.downcase.to_sym)
   end
 
   def active_probation_poms(poms)

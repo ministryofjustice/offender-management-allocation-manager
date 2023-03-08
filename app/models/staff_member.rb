@@ -6,7 +6,7 @@ class StaffMember
   # maybe this method shouldn't be here?
   attr_reader :staff_id, :prison
 
-  delegate :position_description, :probation_officer?, :prison_officer?, to: :pom
+  delegate :position, :position_description, :probation_officer?, :prison_officer?, to: :pom
   delegate :working_pattern, :status, to: :@pom_detail
 
   def initialize(prison, staff_id, pom_detail = default_pom_detail(prison, staff_id))
@@ -69,6 +69,27 @@ class StaffMember
 
   def has_allocation?(nomis_offender_id)
     @prison.allocations_for_pom(@staff_id).detect { |a| a.nomis_offender_id == nomis_offender_id }.present?
+  end
+
+  # Counts for ordering
+  def new_allocations_count
+    allocations.count(&:new_case?)
+  end
+
+  def supporting_allocations_count
+    allocations.count(&:pom_supporting?)
+  end
+
+  def responsible_allocations_count
+    allocations.count(&:pom_responsible?)
+  end
+
+  def coworking_allocations_count
+    allocations.count(&:coworking?)
+  end
+
+  def total_allocations_count
+    allocations.count
   end
 
 private

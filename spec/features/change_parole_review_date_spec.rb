@@ -117,11 +117,9 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
       # Stub the user to be a HOMD
       stub_signin_spo(user, [prison.code])
       stub_poms(prison.code, [])
+      stub_community_offender(nomis_offender_id, build(:community_data))
 
-      # Navigate to the "Allocate a POM" page
-      visit prison_dashboard_index_path(prison.code)
-      click_link 'Make allocations'
-      page.find('[aria-label="Prisoner name"] a').click
+      visit(prison_prisoner_path(prison, nomis_offender_id))
     end
 
     include_examples 'update PRD behaviour'

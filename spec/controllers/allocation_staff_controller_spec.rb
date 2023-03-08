@@ -68,7 +68,6 @@ RSpec.describe AllocationStaffController, type: :controller do
 
           it 'has a nil allocation' do
             expect(assigns(:allocation)).to be_nil
-            expect(response.body).to have_content 'No history'
           end
 
           it 'serves prison POMs' do
@@ -175,14 +174,10 @@ RSpec.describe AllocationStaffController, type: :controller do
           before do
             expect(HmppsApi::AssessmentApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_3', completed: completed_date)
             get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
-            expect(page.css('#oasys-date')).to have_text('Last completed OASys')
           end
-
-          render_views
 
           it 'displays the latest one' do
             expect(assigns(:oasys_assessment)).to eq(assessment_type: 'LAYER_3', completed: completed_date)
-            expect(page.css('#oasys-date')).to have_text("Layer 3 – 02 Jun 2021")
           end
         end
 
@@ -192,14 +187,10 @@ RSpec.describe AllocationStaffController, type: :controller do
           before do
             expect(HmppsApi::AssessmentApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_1', completed: completed_date)
             get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
-            expect(page.css('#oasys-date')).to have_text('Last completed OASys')
           end
-
-          render_views
 
           it 'displays the latest one' do
             expect(assigns(:oasys_assessment)).to eq(assessment_type: 'LAYER_1', completed: completed_date)
-            expect(page.css('#oasys-date')).to have_text("Layer 1 – 02 Jun 2021")
           end
         end
 
@@ -209,15 +200,41 @@ RSpec.describe AllocationStaffController, type: :controller do
           before do
             expect(HmppsApi::AssessmentApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(nil)
             get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
-            expect(page.css('#oasys-date')).to have_text('Last completed OASys')
           end
-
-          render_views
 
           it 'displays a reason for no date being present' do
             expect(assigns(:oasys_assessment)).to eq(nil)
-            expect(page.css('#oasys-date')).to have_text('No OASys information')
           end
+        end
+      end
+    end
+
+    describe '#check_compare_list' do
+      before do
+        put :check_compare_list, params: { prison_id: prison_code, prisoner_id: offender_no, pom_ids: pom_ids }
+      end
+
+      context 'with correct number of POMs selected' do
+        let(:pom_ids) { [1, 2] }
+
+        it 'sends no error message' do
+          expect(flash[:alert]).to eq(nil)
+        end
+      end
+
+      context 'with too many POMs selected' do
+        let(:pom_ids) { [1, 2, 3, 4, 5] }
+
+        it 'sends error message' do
+          expect(flash[:alert]).to eq('You can only choose up to 4 POMs to compare workloads')
+        end
+      end
+
+      context 'with no POMs selected' do
+        let(:pom_ids) { [] }
+
+        it 'sends error message' do
+          expect(flash[:alert]).to eq('Choose someone to allocate to or compare workloads')
         end
       end
     end

@@ -1,0 +1,10 @@
+<% if level.present? %>
+  <aside class="mappa-widget" aria-label="MAPPA level">
+    <h3 class="govuk-heading-m"><strong><%= level %></strong> MAPPA</h3>
+    <p class="govuk-body-m">Multi-agency public protection arrangements</p>
+    <% if last_updated.present? %>
+      <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+      <p class="govuk-hint govuk-body-m">Last updated: <%= format_date(last_updated) %></p>
+    <% end %>
+  </aside>
+<% end %>

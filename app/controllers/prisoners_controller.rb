@@ -34,6 +34,38 @@ class PrisonersController < PrisonsApplicationController
     render @current_user.allocations.empty? ? 'search' : 'search_global'
   end
 
+  def review_case_details
+    @prisoner = OffenderService.get_offender(params[:prisoner_id])
+
+    return redirect_to '/404' if @prisoner.nil?
+
+    @alerts = @prisoner.active_alert_labels
+    @rosh = @prisoner.rosh_summary
+    @oasys_assessment = HmppsApi::AssessmentApi.get_latest_oasys_date(@prisoner.offender_no)
+
+    @allocation = AllocationHistory.find_by(nomis_offender_id: @prisoner.offender_no)
+
+    if @allocation.present?
+      @prev_pom_details = AllocationService.pom_terms(@allocation).reverse.find { |t| t[:ended_at].present? } || {}
+
+      if @allocation.active?
+        @pom = StaffMember.new(@prison, @allocation.primary_pom_nomis_id)
+      end
+
+      if @allocation.secondary_pom_name.present?
+        @secondary_pom_name = PrisonOffenderManagerService.fetch_pom_name(@allocation.secondary_pom_nomis_id).titleize
+        @secondary_pom_email = PrisonOffenderManagerService.fetch_pom_email(@allocation.secondary_pom_nomis_id)
+      end
+    end
+
+    @keyworker = HmppsApi::KeyworkerApi.get_keyworker(
+      active_prison_id, @prisoner.offender_no
+    )
+
+    @mappa_details = OffenderService.get_mappa_details(@prisoner.crn)
+    @coworking = params[:coworking].present?
+  end
+
   def show
     @prisoner = OffenderService.get_offender(params[:id])
 

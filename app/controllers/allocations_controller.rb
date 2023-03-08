@@ -55,23 +55,10 @@ class AllocationsController < PrisonsApplicationController
       end
     }.flatten
 
-    @history = (allocation_history(allocation) + vlo_history + complexity_history + email_history + ea_history).sort_by(&:created_at)
+    @history = (AllocationService.history(allocation) + vlo_history + complexity_history + email_history + ea_history).sort_by(&:created_at)
   end
 
 private
-
-  # Gets the versions in *forward* order - so often we want to reverse
-  # this list as we're interested in recent rather than ancient history
-  def allocation_history(allocation)
-    version_pairs = allocation.get_old_versions.append(allocation).zip(allocation.versions)
-
-    # make CaseHistory records which contain the previous and current allocation history
-    # records - so that deallocation can look at the old version to work out the POM name and ID
-    [CaseHistory.new(nil, version_pairs.first.first, version_pairs.first.second)] +
-      version_pairs.each_cons(2).map do |prev_pair, curr_pair|
-        CaseHistory.new(prev_pair.first, curr_pair.first, curr_pair.second)
-      end
-  end
 
   def offender(nomis_offender_id)
     OffenderService.get_offender(nomis_offender_id)

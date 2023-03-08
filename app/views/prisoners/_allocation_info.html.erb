@@ -2,6 +2,7 @@
   <td class="govuk-table__cell">POM</td>
   <td class="govuk-table__cell table_cell__left_align" id="primary_pom_name">
     <%= @primary_pom_name %>
+    <%= link_to 'Reallocate', prison_prisoner_review_case_details_path(allocation.prison, allocation.nomis_offender_id), class: "govuk-link pull-right" %>
   </td>
 </tr>
 <tr class="govuk-table__row">
@@ -9,8 +10,10 @@
   <td class="govuk-table__cell table_cell__left_align">
     <% if allocation.secondary_pom_name.present? %>
       <%= @secondary_pom_name %>
+      <%= link_to 'Remove', prison_coworking_confirm_removal_path(allocation.prison, allocation.nomis_offender_id), class: "govuk-link pull-right" %>
     <% else %>
       N/A
+      <%= link_to 'Allocate', prison_prisoner_review_case_details_path(allocation.prison, allocation.nomis_offender_id, coworking: true), class: "govuk-link pull-right" %>
     <% end %>
   </td>
 </tr>

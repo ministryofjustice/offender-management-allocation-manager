@@ -1,4 +1,5 @@
 <% content_for :title, "All allocations – Digital Prison Services" %>
+<% content_for :turbolinks_nocache, 'true' %>
 
 <% content_for :switcher do %>
   <%= render '/layouts/prison_switcher' %>
@@ -84,7 +85,7 @@
     <% @offenders.each_with_index do |offender, i| %>
       <tr class="govuk-table__row allocated_offender_row_<%= i %>">
         <td aria-label="Prisoner" class="govuk-table__cell">
-          <%= link_to offender.full_name, prison_prisoner_allocation_path(@prison.code, prisoner_id: offender.offender_no, sort: params[:sort], page: params[:page] || 1) %>
+          <%= link_to offender.full_name, prison_prisoner_allocation_path(@prison.code, offender.offender_no) %>
           <br/>
           <span class='govuk-hint govuk-!-margin-bottom-0'>
             <%= offender.offender_no %>

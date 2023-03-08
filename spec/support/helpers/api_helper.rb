@@ -183,6 +183,8 @@ module ApiHelper
         .to_return(body: { registrations: registrations }.to_json)
     stub_request(:get, "#{COMMUNITY_HOST}/offenders/nomsNumber/#{nomis_offender_id}/risk/resourcing/latest")
         .to_return(body: community_data.slice(:enhancedResourcing).to_json)
+    stub_request(:get, Addressable::Template.new("#{COMMUNITY_HOST}/offenders/crn/{crn}/risk/mappa"))
+        .to_return(body: { "category" => 3, "level" => 1, "reviewDate" => "2021-04-27", "startDate" => "2021-01-27" }.to_json)
   end
 
   def stub_get_all_offender_managers(nomis_offender_id, stubbed_data)

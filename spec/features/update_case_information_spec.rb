@@ -13,6 +13,7 @@ RSpec.feature "Update case information", type: :feature do
     stub_signin_spo(spo, [prison.code])
     stub_poms(prison.code, [pom, spo])
     stub_keyworker(prison.code, offender.fetch(:prisonerNumber), build(:keyworker))
+    stub_community_offender(offender.fetch(:prisonerNumber), build(:community_data))
   end
 
   context 'when there is a new allocation' do
@@ -21,17 +22,17 @@ RSpec.feature "Update case information", type: :feature do
     end
 
     it 'returns to the Allocate a POM page' do
-      visit prison_prisoner_staff_index_path(prison_id: prison.code, prisoner_id: offender_no)
+      visit prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no)
 
       # This takes you to the change case information edit page
-      within(:css, "td#tier") do
+      within(:css, "tr#tier") do
         click_link('Change')
       end
 
       # This returns you back from where you came (Allocation information page)
       click_on('Update')
 
-      expect(page).to have_current_path(prison_prisoner_staff_index_path(prison_id: prison.code, prisoner_id: offender_no))
+      expect(page).to have_current_path(prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no))
     end
   end
 
@@ -42,17 +43,17 @@ RSpec.feature "Update case information", type: :feature do
     end
 
     it 'returns to the prisoner Allocation information page' do
-      visit prison_prisoner_allocation_path(prison_id: prison.code, prisoner_id: offender_no)
+      visit prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no)
 
       # This takes you to the change case information edit page
-      within(:css, "td#tier") do
+      within(:css, "tr#tier") do
         click_link('Change')
       end
 
       # This returns you back from where you came (Allocation information page)
       click_on('Update')
 
-      expect(page).to have_current_path(prison_prisoner_allocation_path(prison_id: prison.code, prisoner_id: offender_no))
+      expect(page).to have_current_path(prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no))
     end
   end
 
@@ -63,20 +64,17 @@ RSpec.feature "Update case information", type: :feature do
     end
 
     it 'returns to the Reallocate POM page' do
-      visit prison_prisoner_allocation_path(prison_id: prison.code, prisoner_id: offender_no)
-
-      # To reallocate the pom page
-      click_link('Reallocate')
+      visit prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no)
 
       # To take you to the change case information edit page
-      within(:css, "td#tier") do
+      within(:css, "tr#tier") do
         click_link('Change')
       end
 
       # This returns you back from where you came (Reallocate Pom page)
       click_on('Update')
 
-      expect(page).to have_current_path(prison_prisoner_staff_index_path(prison_id: prison.code, prisoner_id: offender_no))
+      expect(page).to have_current_path(prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no))
     end
   end
 end
