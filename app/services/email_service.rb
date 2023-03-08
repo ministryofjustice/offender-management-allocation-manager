@@ -116,11 +116,6 @@ class EmailService
     def deliver_new_allocation_email(pom:, message:, allocation:, further_info:)
       offender = offender_for(allocation)
 
-      # Temporary to debug an issue where URL is getting split into 2 lines
-      url = Rails.application.routes.url_helpers.prison_prisoner_allocation_url(allocation.prison, offender.offender_no)
-      Rails.logger.info("MO-1223: EmailService.deliver_new_allocation_email, URL:#{url}")
-      # /debug
-
       PomMailer.new_allocation_email(
         pom_name: pom.first_name.capitalize,
         responsibility: current_responsibility(offender),
@@ -128,7 +123,7 @@ class EmailService
         offender_name: offender.full_name,
         offender_no: offender.offender_no,
         message: message,
-        url: url,
+        url: Rails.application.routes.url_helpers.prison_prisoner_allocation_url(allocation.prison, offender.offender_no),
         further_info: further_info
       ).deliver_later
     end
