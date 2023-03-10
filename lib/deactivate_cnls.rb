@@ -6,7 +6,7 @@ class DeactivateCnls
   end
 
   def call
-    Rails.logger = Logger.new($stdout)
+    Rails.logger = Logger.new($stdout) if Rails.env.production?
 
     @inactivated_count = 0
     womens_prisons = Prison.where(code: PrisonService::WOMENS_PRISON_CODES)
