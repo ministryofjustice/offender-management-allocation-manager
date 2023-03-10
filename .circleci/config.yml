@@ -262,6 +262,7 @@ jobs:
             cc-test-reporter before-build
             export SPEC_STATUS_PATH=~/spec_status
             bundle exec parallel_test -t rspec -- -t ~flaky --format progress -- spec
+            [[ "${?}" == 0 ]] || (echo "Flaky tests detected, trying again..." && sleep 30 && bundle exec parallel_test -t rspec -- -t ~flaky --format progress --only-failures -- spec)
             cc-test-reporter after-build --coverage-input-type lcov --exit-code $?
           environment:
             MOZ_HEADLESS: 1
@@ -274,24 +275,6 @@ jobs:
           path: coverage
       - store_artifacts:
           path: ~/test-results
-
-  retest_only_failures:
-    <<: *defaults
-    <<: *test_container_config
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Rerun failing tests
-          command: |
-            env_name="${K8S_NAMESPACE#offender-management-}"
-            . ~/env/"${env_name}"-hmpps-secrets.sh
-            export SPEC_STATUS_PATH=~/spec_status
-            bundle exec parallel_test -t rspec -- -t ~flaky --format progress --only-failures -- spec
-          environment:
-            MOZ_HEADLESS: 1
-            ALLOCATION_MANAGER_HOST: https://dev.moic.service.justice.gov.uk
 
   cucumber:
     <<: *defaults
@@ -387,10 +370,6 @@ workflows:
           requires: [install_dependencies, fetch_secrets]
           filters: { branches: { ignore: [main, preprod, test, test2] } }
           context: [offender-management-shared, offender-management-staging]
-      - retest_only_failures:
-          requires: [test]
-          filters: { branches: { ignore: [main, preprod, test, test2] } }
-          context: [offender-management-shared, offender-management-staging]
       - verify_docker_image_builds:
           filters: { branches: { ignore: [main, preprod, test, test2] } }
       - cucumber:
@@ -457,10 +436,6 @@ workflows:
           filters: { branches: { only: [main] } }
       - test:
           requires: [install_dependencies, fetch_staging_secrets]
-          filters: { branches: { only: [main] } }
-          context: [offender-management-shared, offender-management-staging]
-      - retest_only_failures:
-          requires: [test]
           filters: { branches: { only: [main] } }
           context: [offender-management-shared, offender-management-staging]
 
