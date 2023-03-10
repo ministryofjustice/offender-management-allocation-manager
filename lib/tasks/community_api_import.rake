@@ -3,7 +3,7 @@
 namespace :community_api do
   desc 'Import data from Community API'
   task import: :environment do |_task|
-    Rails.logger = Logger.new($stdout)
+    Rails.logger = Logger.new($stdout) if Rails.env.production?
 
     # Avoid filling up the in-memory SQL query cache – we're going to be reading lots of database records
     ActiveRecord::Base.connection.disable_query_cache!
