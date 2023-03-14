@@ -8,7 +8,7 @@ RSpec.describe Handover::HandoverCalculation do
           result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
                                                            earliest_release_date: Date.new(2024, 10, 31),
                                                            is_determinate: true)
-          expect(result).to eq nil
+          expect(result).to eq [nil, :determinate_short]
         end
       end
 
@@ -17,7 +17,7 @@ RSpec.describe Handover::HandoverCalculation do
           result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
                                                            earliest_release_date: Date.new(2024, 11, 1),
                                                            is_determinate: true)
-          expect(result).to eq nil
+          expect(result).to eq [nil, :determinate_short]
         end
       end
 
@@ -26,7 +26,7 @@ RSpec.describe Handover::HandoverCalculation do
           result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
                                                            earliest_release_date: Date.new(2024, 11, 2),
                                                            is_determinate: true)
-          expect(result).to eq Date.new(2024, 2, 17)
+          expect(result).to eq [Date.new(2024, 2, 17), :determinate]
         end
       end
 
@@ -35,7 +35,7 @@ RSpec.describe Handover::HandoverCalculation do
           result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
                                                            earliest_release_date: Date.new(2024, 11, 3),
                                                            is_determinate: true)
-          expect(result).to eq Date.new(2024, 2, 18)
+          expect(result).to eq [Date.new(2024, 2, 18), :determinate]
         end
       end
     end

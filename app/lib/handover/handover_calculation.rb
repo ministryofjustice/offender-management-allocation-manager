@@ -6,9 +6,9 @@ class Handover::HandoverCalculation
       raise NotImplementedError unless is_determinate
 
       if sentence_start_date + 10.months >= earliest_release_date
-        nil
+        [nil, :determinate_short]
       else
-        earliest_release_date - 8.months - 14.days
+        [earliest_release_date - 8.months - 14.days, :determinate]
       end
     end
 
