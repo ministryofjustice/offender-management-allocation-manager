@@ -11,5 +11,13 @@ class Handover::HandoverCalculation
         earliest_release_date - 8.months - 14.days
       end
     end
+
+    def calculate_responsibility(handover_date:, today: Time.zone.now.to_date)
+      if handover_date && handover_date > today
+        :pom
+      else
+        :com
+      end
+    end
   end
 end

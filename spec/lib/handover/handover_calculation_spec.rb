@@ -50,4 +50,35 @@ RSpec.describe Handover::HandoverCalculation do
       end
     end
   end
+
+  describe '::calculate_responsibility' do
+    describe 'for determinate case' do
+      describe 'when there is no handover date' do
+        example 'responsibility is with COM' do
+          expect(described_class.calculate_responsibility(handover_date: nil, today: Faker::Date.rand)).to eq :com
+        end
+      end
+
+      describe 'when handover date is today' do
+        example 'responsibility is with COM' do
+          expect(described_class.calculate_responsibility(handover_date: Date.new(2024, 6, 12),
+                                                          today: Date.new(2024, 6, 12))).to eq :com
+        end
+      end
+
+      describe 'when handover date was yesterday' do
+        example 'responsibility is with COM' do
+          expect(described_class.calculate_responsibility(handover_date: Date.new(2024, 6, 11),
+                                                          today: Date.new(2024, 6, 12))).to eq :com
+        end
+      end
+
+      describe 'when handover date is tomorrow' do
+        example 'responsibility is with POM' do
+          expect(described_class.calculate_responsibility(handover_date: Date.new(2024, 6, 13),
+                                                          today: Date.new(2024, 6, 12))).to eq :pom
+        end
+      end
+    end
+  end
 end
