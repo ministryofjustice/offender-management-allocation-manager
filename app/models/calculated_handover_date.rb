@@ -10,17 +10,24 @@ class CalculatedHandoverDate < ApplicationRecord
     recall_case: 'Recall case',
     immigration_case: 'Immigration Case',
     release_date_unknown: 'Release Date Unknown',
-    crc_case: 'CRC Case',
-    nps_early_allocation: 'NPS Early Allocation',
-    nps_indeterminate: 'NPS Indeterminate',
-    nps_indeterminate_open: 'NPS Indeterminate - Open conditions',
-    nps_determinate_parole_case: 'NPS Determinate Parole Case',
-    nps_determinate: 'NPS Determinate Case',
+
+    crc_case: 'CRC Case', # legacy
+    nps_early_allocation: 'NPS Early Allocation', # legacy
+    nps_indeterminate: 'NPS Indeterminate', # legacy
+    nps_indeterminate_open: 'NPS Indeterminate - Open conditions', # legacy
+    nps_determinate_parole_case: 'NPS Determinate Parole Case', # legacy
+    nps_determinate: 'NPS Determinate Case', # legacy
     nps_mappa_unknown: 'NPS - MAPPA level unknown', # legacy
     nps_determinate_mappa_1_n: 'NPS Determinate Mappa 1/N', # legacy
     nps_determinate_mappa_2_3: 'NPS Determinate Mappa 2/3', # legacy
-    less_than_10_months_left_to_serve: 'Less than 10 months left to serve',
+    less_than_10_months_left_to_serve: 'Less than 10 months left to serve', # legacy
     pre_omic_rules: 'Pre-OMIC rules',
+
+    early_allocation: 'Early Allocation',
+    determinate_short: 'Determinate sentence 10 months or less',
+    determinate: 'Determinate sentence more than 10 months',
+    indeterminate: 'Indeterminate',
+    indeterminate_open: 'Indeterminate - Open conditions',
   }.stringify_keys.freeze
 
   has_paper_trail meta: { nomis_offender_id: :nomis_offender_id, offender_attributes_to_archive: :offender_attributes_to_archive }
