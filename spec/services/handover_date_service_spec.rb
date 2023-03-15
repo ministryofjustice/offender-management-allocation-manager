@@ -6,7 +6,7 @@ describe HandoverDateService do
   subject { described_class.handover(offender) }
 
   let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
-  let(:pom) { OffenderManagerResponsibility.new subject.custody_responsible?, subject.custody_supporting?  }
+  let(:pom) { OffenderManagerResponsibility.new subject.custody_responsible?, subject.custody_supporting? }
   let(:com) { OffenderManagerResponsibility.new subject.community_responsible?, subject.community_supporting? }
   let(:start_date) { subject.start_date }
   let(:handover_date) { subject.handover_date }
@@ -785,58 +785,87 @@ describe HandoverDateService do
     let(:offender_wrapper) do
       instance_double described_class::OffenderWrapper, :offender_wrapper,
                       policy_case?: true, recalled?: false, immigration_case?: false,
-                      release_date: Faker::Date.forward
+                      sentence_start_date: double(:sentence_start_date),
+                      release_date: double(:release_date),
+                      early_allocation?: double(:early_allocation?),
+                      indeterminate_sentence?: double(:indeterminate_sentence?),
+                      in_open_conditions?: double(:in_open_conditions?)
     end
 
     before do
       allow(described_class::OffenderWrapper).to receive(:new).with(mpc_offender).and_return(offender_wrapper)
+      allow(Handover::HandoverCalculation)
+        .to receive_messages(calculate_handover_date: [Date.new(2099, 1, 1), 'policy_reason'])
     end
 
-    context 'when outside OMIC policy' do
-      it 'raises error' do
+    context 'when not a policy case' do
+      it 'raises error when outside OMIC policy' do
         allow(mpc_offender).to receive_messages(inside_omic_policy?: false)
         expect { described_class.handover_2(mpc_offender) }.to raise_error(/OMIC/)
       end
+
+      it 'calculates no date and COM responsible for recall cases' do
+        allow(offender_wrapper).to receive_messages(recalled?: true)
+
+        expect(described_class.handover_2(mpc_offender).attributes)
+          .to include({ 'responsibility' => CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+                        'start_date' => nil,
+                        'handover_date' => nil,
+                        'reason' => 'recall_case' })
+      end
+
+      it 'calculates no date and COM responsible for immigration cases' do
+        allow(offender_wrapper).to receive_messages(immigration_case?: true)
+
+        expect(described_class.handover_2(mpc_offender).attributes)
+          .to include({ 'responsibility' => CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+                        'start_date' => nil,
+                        'handover_date' => nil,
+                        'reason' => 'immigration_case' })
+      end
+
+      it 'calculates no date and COM responsible when no release date' do
+        allow(offender_wrapper).to receive_messages(release_date: nil)
+
+        expect(described_class.handover_2(mpc_offender).attributes)
+          .to include({ 'responsibility' => CalculatedHandoverDate::CUSTODY_ONLY,
+                        'start_date' => nil,
+                        'handover_date' => nil,
+                        'reason' => 'release_date_unknown' })
+      end
+
+      it 'calculates no date and COM responsible when pre-OMIC case' do
+        allow(offender_wrapper).to receive_messages(policy_case?: false)
+
+        expect(described_class.handover_2(mpc_offender).attributes)
+          .to include({ 'responsibility' => CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+                        'start_date' => nil,
+                        'handover_date' => nil,
+                        'reason' => 'pre_omic_rules' })
+      end
     end
 
-    it 'calculates no date and COM responsible for recall cases' do
-      allow(offender_wrapper).to receive_messages(recalled?: true)
+    context 'when policy case' do
+      subject!(:result) { described_class.handover_2(mpc_offender) } # Invoke immediately
 
-      expect(described_class.handover_2(mpc_offender).attributes)
-        .to include({ 'responsibility' => CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
-                      'start_date' => nil,
-                      'handover_date' => nil,
-                      'reason' => 'recall_case' })
-    end
+      it 'uses official calculations for handover date correctly' do
+        expect(Handover::HandoverCalculation).to have_received(:calculate_handover_date).with(
+          sentence_start_date: offender_wrapper.sentence_start_date,
+          earliest_release_date: offender_wrapper.release_date,
+          is_early_allocation: offender_wrapper.early_allocation?,
+          is_indeterminate: offender_wrapper.indeterminate_sentence?,
+          in_open_conditions: offender_wrapper.in_open_conditions?)
+      end
 
-    it 'calculates no date and COM responsible for immigration cases' do
-      allow(offender_wrapper).to receive_messages(immigration_case?: true)
+      it 'gets handover date and reason using official calculations' do
+        expect(result.attributes).to include({ 'handover_date' => Date.new(2099, 1, 1), 'reason' => 'policy_reason' })
+      end
 
-      expect(described_class.handover_2(mpc_offender).attributes)
-        .to include({ 'responsibility' => CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
-                      'start_date' => nil,
-                      'handover_date' => nil,
-                      'reason' => 'immigration_case' })
-    end
+      it 'gets handover start date using official calculations'
 
-    it 'calculates no date and COM responsible when no release date' do
-      allow(offender_wrapper).to receive_messages(release_date: nil)
-
-      expect(described_class.handover_2(mpc_offender).attributes)
-        .to include({ 'responsibility' => CalculatedHandoverDate::CUSTODY_ONLY,
-                      'start_date' => nil,
-                      'handover_date' => nil,
-                      'reason' => 'release_date_unknown' })
-    end
-
-    it 'calculates no date and COM responsible when pre-OMIC case' do
-      allow(offender_wrapper).to receive_messages(policy_case?: false)
-
-      expect(described_class.handover_2(mpc_offender).attributes)
-        .to include({ 'responsibility' => CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
-                      'start_date' => nil,
-                      'handover_date' => nil,
-                      'reason' => 'pre_omic_rules' })
+      describe 'responsibility' do
+        it 'is based on the current day, start date, and handover date, and all conditions will be tested herein'
+      end
     end
   end
 end

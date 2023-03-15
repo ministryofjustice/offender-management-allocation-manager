@@ -102,6 +102,17 @@ class HandoverDateService
       CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
                                  start_date: nil, handover_date: nil,
                                  reason: :pre_omic_rules
+    else
+      handover_date, handover_reason = Handover::HandoverCalculation.calculate_handover_date(
+        sentence_start_date: offender.sentence_start_date,
+        earliest_release_date: offender.release_date,
+        is_early_allocation: offender.early_allocation?,
+        is_indeterminate: offender.indeterminate_sentence?,
+        in_open_conditions: offender.in_open_conditions?,
+      )
+      CalculatedHandoverDate.new responsibility: nil,
+                                 start_date: nil, handover_date: handover_date,
+                                 reason: handover_reason
     end
   end
 
@@ -176,6 +187,7 @@ private
 
   WOMENS_CUTOFF_DATE = '30/9/2022'.to_date
 
+  # TODO: Clean up all the shit here that's no longer used
   class OffenderWrapper
     delegate :recalled?, :immigration_case?, :indeterminate_sentence?,
              :early_allocation?, :mappa_level, :prison_arrival_date, :category_active_since,
