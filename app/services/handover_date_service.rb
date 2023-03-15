@@ -194,6 +194,7 @@ private
              :parole_eligibility_date, :conditional_release_date, :automatic_release_date,
              :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date,
              :sentence_start_date, :offender_no,
+             :earliest_release_for_handover,
              to: :@offender
 
     def initialize(offender)
@@ -226,29 +227,8 @@ private
       end
     end
 
-    # We can not calculate the handover date for NPS Indeterminate
-    # with parole cases where the TED is in the past as we need
-    # the parole board decision which currently is not available to us.
     def release_date
-      if @offender.indeterminate_sentence?
-        if @offender.tariff_date.present? && @offender.tariff_date.future?
-          @offender.tariff_date
-        else
-          [
-            @offender.parole_review_date,
-            @offender.parole_eligibility_date
-          ].compact.reject(&:past?).min
-        end
-      elsif @offender.nps_case?
-        possible_dates = [@offender.conditional_release_date, @offender.automatic_release_date]
-        @offender.parole_eligibility_date || possible_dates.compact.min
-      else
-        # CRC can look at HDC date, NPS is not supposed to
-        @offender.home_detention_curfew_actual_date.presence ||
-          [@offender.automatic_release_date,
-           @offender.conditional_release_date,
-           @offender.home_detention_curfew_eligibility_date].compact.min
-      end
+      earliest_release_for_handover&.date
     end
 
     def open_prison_rules_apply?
