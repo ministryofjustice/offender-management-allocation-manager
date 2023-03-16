@@ -789,13 +789,20 @@ describe HandoverDateService do
                       release_date: double(:release_date),
                       early_allocation?: double(:early_allocation?),
                       indeterminate_sentence?: double(:indeterminate_sentence?),
-                      in_open_conditions?: double(:in_open_conditions?)
+                      in_open_conditions?: double(:in_open_conditions?),
+                      category_active_since: double(:category_active_since),
+                      prison_arrival_date: double(:prison_arrival_date),
+                      open_prison_rules_apply?: double(:open_prison_rules_apply?),
+                      in_womens_prison?: double(:in_womens_prison?)
     end
+    let(:handover_date) { double :handover_date }
+    let(:handover_start_date) { double :handover_start_date }
 
     before do
       allow(described_class::OffenderWrapper).to receive(:new).with(mpc_offender).and_return(offender_wrapper)
       allow(Handover::HandoverCalculation)
-        .to receive_messages(calculate_handover_date: [Date.new(2099, 1, 1), 'policy_reason'])
+        .to receive_messages(calculate_handover_date: [handover_date, 'policy_reason'],
+                             calculate_handover_start_date: handover_start_date)
     end
 
     context 'when not a policy case' do
@@ -848,20 +855,37 @@ describe HandoverDateService do
     context 'when policy case' do
       subject!(:result) { described_class.handover_2(mpc_offender) } # Invoke immediately
 
-      it 'uses official calculations for handover date correctly' do
-        expect(Handover::HandoverCalculation).to have_received(:calculate_handover_date).with(
-          sentence_start_date: offender_wrapper.sentence_start_date,
-          earliest_release_date: offender_wrapper.release_date,
-          is_early_allocation: offender_wrapper.early_allocation?,
-          is_indeterminate: offender_wrapper.indeterminate_sentence?,
-          in_open_conditions: offender_wrapper.in_open_conditions?)
+      describe 'handover date' do
+        it 'uses official calculations correctly' do
+          expect(Handover::HandoverCalculation).to have_received(:calculate_handover_date).with(
+            sentence_start_date: offender_wrapper.sentence_start_date,
+            earliest_release_date: offender_wrapper.release_date,
+            is_early_allocation: offender_wrapper.early_allocation?,
+            is_indeterminate: offender_wrapper.indeterminate_sentence?,
+            in_open_conditions: offender_wrapper.in_open_conditions?)
+        end
+
+        it 'uses official calculations' do
+          expect(result.attributes).to include({ 'handover_date' => handover_date, 'reason' => 'policy_reason' })
+        end
       end
 
-      it 'gets handover date and reason using official calculations' do
-        expect(result.attributes).to include({ 'handover_date' => Date.new(2099, 1, 1), 'reason' => 'policy_reason' })
-      end
+      describe 'handover start date' do
+        it 'uses official calculations correctly' do
+          expect(Handover::HandoverCalculation).to have_received(:calculate_handover_start_date).with(
+            handover_date: handover_date,
+            category_active_since_date: offender_wrapper.category_active_since,
+            prison_arrival_date: offender_wrapper.prison_arrival_date,
+            is_indeterminate: offender_wrapper.indeterminate_sentence?,
+            open_prison_rules_apply: offender_wrapper.open_prison_rules_apply?,
+            in_womens_prison: offender_wrapper.in_womens_prison?,
+          )
+        end
 
-      it 'gets handover start date using official calculations'
+        it 'is set to the calculated value' do
+          expect(result.start_date).to eq handover_start_date
+        end
+      end
 
       describe 'responsibility' do
         it 'is based on the current day, start date, and handover date, and all conditions will be tested herein'

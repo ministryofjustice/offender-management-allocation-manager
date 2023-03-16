@@ -79,4 +79,113 @@ RSpec.describe Handover::HandoverCalculation do
       end
     end
   end
+
+  describe '::calculate_handover_start_date' do
+    describe 'for indeterminate sentences' do
+      describe 'when result is before handover date' do
+        it 'is date since category was active at open womens prisons' do
+          cat_active_since_date = Date.new(2020, 6, 1)
+          result = described_class.calculate_handover_start_date(
+            handover_date: Date.new(2020, 6, 2),
+            category_active_since_date: cat_active_since_date,
+            prison_arrival_date: anything,
+            is_indeterminate: true,
+            open_prison_rules_apply: true,
+            in_womens_prison: true,
+          )
+          expect(result).to eq cat_active_since_date
+        end
+
+        it 'is prison arrival date at open mens prisons' do
+          prison_arrival_date = Date.new(2020, 6, 1)
+          result = described_class.calculate_handover_start_date(
+            handover_date: Date.new(2020, 6, 2),
+            category_active_since_date: anything,
+            prison_arrival_date: prison_arrival_date,
+            is_indeterminate: true,
+            open_prison_rules_apply: true,
+            in_womens_prison: false,
+          )
+          expect(result).to eq prison_arrival_date
+        end
+      end
+
+      describe 'when result is after handover date' do
+        it 'defaults to handover date at open womens prisons' do
+          handover_date = Date.new(2020, 6, 2)
+          result = described_class.calculate_handover_start_date(
+            handover_date: handover_date,
+            category_active_since_date: Date.new(2020, 6, 3),
+            prison_arrival_date: anything,
+            is_indeterminate: true,
+            open_prison_rules_apply: true,
+            in_womens_prison: true,
+          )
+          expect(result).to eq handover_date
+        end
+
+        it 'defaults to handover date at open mens prisons' do
+          handover_date = Date.new(2020, 6, 2)
+          result = described_class.calculate_handover_start_date(
+            handover_date: handover_date,
+            category_active_since_date: anything,
+            prison_arrival_date: Date.new(2020, 6, 3),
+            is_indeterminate: true,
+            open_prison_rules_apply: true,
+            in_womens_prison: false,
+          )
+          expect(result).to eq handover_date
+        end
+      end
+
+      describe 'when result is nil' do
+        it 'defaults to handover date at open womens prisons' do
+          handover_date = Date.new(2020, 6, 2)
+          result = described_class.calculate_handover_start_date(
+            handover_date: handover_date,
+            category_active_since_date: nil,
+            prison_arrival_date: anything,
+            is_indeterminate: true,
+            open_prison_rules_apply: true,
+            in_womens_prison: true,
+          )
+          expect(result).to eq handover_date
+        end
+
+        it 'defaults to handover date at open mens prisons' do
+          handover_date = Date.new(2020, 6, 2)
+          result = described_class.calculate_handover_start_date(
+            handover_date: handover_date,
+            category_active_since_date: anything,
+            prison_arrival_date: nil,
+            is_indeterminate: true,
+            open_prison_rules_apply: true,
+            in_womens_prison: false,
+          )
+          expect(result).to eq handover_date
+        end
+      end
+    end
+
+    it 'is set to handover date for other cases' do
+      handover_date = double :handover_date
+      aggregate_failures do
+        expect(described_class.calculate_handover_start_date(
+                 handover_date: handover_date,
+                 category_active_since_date: anything,
+                 prison_arrival_date: anything,
+                 is_indeterminate: true,
+                 open_prison_rules_apply: false,
+                 in_womens_prison: false)).to eq handover_date
+
+        expect(described_class.calculate_handover_start_date(
+                 handover_date: handover_date,
+                 category_active_since_date: anything,
+                 prison_arrival_date: anything,
+                 is_indeterminate: false,
+                 open_prison_rules_apply: true,
+                 in_womens_prison: false)).to eq handover_date
+      end
+    end
+  end
 end

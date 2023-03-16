@@ -110,8 +110,16 @@ class HandoverDateService
         is_indeterminate: offender.indeterminate_sentence?,
         in_open_conditions: offender.in_open_conditions?,
       )
+      handover_start_date = Handover::HandoverCalculation.calculate_handover_start_date(
+        handover_date: handover_date,
+        category_active_since_date: offender.category_active_since,
+        prison_arrival_date: offender.prison_arrival_date,
+        is_indeterminate: offender.indeterminate_sentence?,
+        open_prison_rules_apply: offender.open_prison_rules_apply?,
+        in_womens_prison: offender.in_womens_prison?,
+      )
       CalculatedHandoverDate.new responsibility: nil,
-                                 start_date: nil, handover_date: handover_date,
+                                 start_date: handover_start_date, handover_date: handover_date,
                                  reason: handover_reason
     end
   end
