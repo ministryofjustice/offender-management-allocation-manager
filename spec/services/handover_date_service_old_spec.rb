@@ -29,6 +29,7 @@ describe HandoverDateService, 'old' do
                        sentence_start_date: automatic_release_date - 2.years,
                        automatic_release_date: automatic_release_date,
                        tariff_date: tariff_date,
+                       earliest_release_for_handover: NamedDate[automatic_release_date, 'X'],
                        inside_omic_policy?: true
       end
 
@@ -72,6 +73,10 @@ describe HandoverDateService, 'old' do
 
         context 'with no tariff date' do
           let(:tariff_date) { nil }
+
+          before do
+            offender.earliest_release_for_handover = nil
+          end
 
           it 'is not set' do
             expect(described_class.handover(offender).start_date).to be_nil
