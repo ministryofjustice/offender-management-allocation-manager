@@ -797,12 +797,14 @@ describe HandoverDateService do
     end
     let(:handover_date) { double :handover_date }
     let(:handover_start_date) { double :handover_start_date }
+    let(:responsibility) { double :responsibility }
 
     before do
       allow(described_class::OffenderWrapper).to receive(:new).with(mpc_offender).and_return(offender_wrapper)
       allow(Handover::HandoverCalculation)
         .to receive_messages(calculate_handover_date: [handover_date, 'policy_reason'],
-                             calculate_handover_start_date: handover_start_date)
+                             calculate_handover_start_date: handover_start_date,
+                             calculate_responsibility: responsibility)
     end
 
     context 'when not a policy case' do
@@ -888,7 +890,16 @@ describe HandoverDateService do
       end
 
       describe 'responsibility' do
-        it 'is based on the current day, start date, and handover date, and all conditions will be tested herein'
+        it 'is calculated using on the two calculated dates and today\'s date' do
+          expect(Handover::HandoverCalculation).to have_received(:calculate_responsibility).with(
+            handover_date: handover_date,
+            handover_start_date: handover_start_date,
+          )
+        end
+
+        it 'is set to the calculated value' do
+          expect(result.responsibility).to eq responsibility.to_s
+        end
       end
     end
   end

@@ -1,4 +1,8 @@
-class Handover::HandoverCalculation
+module Handover::HandoverCalculation
+  POM_RESPONSIBLE = CalculatedHandoverDate::CUSTODY_ONLY
+  POM_RESPONSIBLE_COM_SUPPORTING = CalculatedHandoverDate::CUSTODY_WITH_COM
+  COM_RESPONSIBLE = CalculatedHandoverDate::COMMUNITY_RESPONSIBLE
+
   class << self
     def calculate_handover_date(sentence_start_date:,
                                 earliest_release_date:,
@@ -33,6 +37,22 @@ class Handover::HandoverCalculation
         handover_start_date
       else
         handover_date
+      end
+    end
+
+    def calculate_responsibility(handover_date:, handover_start_date:, today: Time.zone.now.utc.to_date)
+      raise HandoverCalculationArgumentError, 'handover_date must be given' if handover_date.nil?
+      raise HandoverCalculationArgumentError, 'handover_start_date must be given' if handover_start_date.nil?
+      if handover_start_date > handover_date
+        raise HandoverCalculationArgumentError, 'handover_start_date cannot be after handover_date'
+      end
+
+      if today < handover_start_date
+        POM_RESPONSIBLE
+      elsif today < handover_date
+        POM_RESPONSIBLE_COM_SUPPORTING
+      else
+        COM_RESPONSIBLE
       end
     end
 

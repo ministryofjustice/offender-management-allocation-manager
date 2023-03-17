@@ -82,7 +82,7 @@ RSpec.describe Handover::HandoverCalculation do
 
   describe '::calculate_handover_start_date' do
     describe 'for indeterminate sentences' do
-      describe 'when result is before handover date' do
+      describe 'when calculated value is before handover date' do
         it 'is date since category was active at open womens prisons' do
           cat_active_since_date = Date.new(2020, 6, 1)
           result = described_class.calculate_handover_start_date(
@@ -110,7 +110,7 @@ RSpec.describe Handover::HandoverCalculation do
         end
       end
 
-      describe 'when result is after handover date' do
+      describe 'when calculated value is after handover date' do
         it 'defaults to handover date at open womens prisons' do
           handover_date = Date.new(2020, 6, 2)
           result = described_class.calculate_handover_start_date(
@@ -138,7 +138,7 @@ RSpec.describe Handover::HandoverCalculation do
         end
       end
 
-      describe 'when result is nil' do
+      describe 'when calculated value is nil' do
         it 'defaults to handover date at open womens prisons' do
           handover_date = Date.new(2020, 6, 2)
           result = described_class.calculate_handover_start_date(
@@ -186,6 +186,76 @@ RSpec.describe Handover::HandoverCalculation do
                  open_prison_rules_apply: true,
                  in_womens_prison: false)).to eq handover_date
       end
+    end
+  end
+
+  describe '::calculate_responsibility' do
+    let(:today) { Date.new(2023, 5, 1) }
+
+    it 'raises an error if handover date is not set' do
+      expect {
+        described_class.calculate_responsibility(handover_date: nil,
+                                                 handover_start_date: Faker::Date.forward,
+                                                 today: today)
+      }.to raise_error(described_class::HandoverCalculationArgumentError, /handover_date/)
+    end
+
+    it 'raises an error if handover start date is not set' do
+      expect {
+        described_class.calculate_responsibility(handover_date: Faker::Date.forward,
+                                                 handover_start_date: nil,
+                                                 today: today)
+      }.to raise_error(described_class::HandoverCalculationArgumentError, /handover_start_date/)
+    end
+
+    it 'raises an error if handover start date is after handover date' do
+      expect {
+        described_class.calculate_responsibility(handover_date: today + 1.day,
+                                                 handover_start_date: today + 2.days,
+                                                 today: today)
+      }.to raise_error(described_class::HandoverCalculationArgumentError, /handover_start_date cannot be after/)
+    end
+
+    it 'is COM responsible when handover date is in the past and start date is in the past' do
+      expect(described_class.calculate_responsibility(handover_date: today - 1.day,
+                                                      handover_start_date: today - 2.days,
+                                                      today: today))
+        .to eq described_class::COM_RESPONSIBLE
+    end
+
+    it 'is COM responsible when handover date is today and start date is in the past' do
+      expect(described_class.calculate_responsibility(handover_date: today,
+                                                      handover_start_date: today - 1.day,
+                                                      today: today))
+        .to eq described_class::COM_RESPONSIBLE
+    end
+
+    it 'is COM responsible when handover date is today and start date is today' do
+      expect(described_class.calculate_responsibility(handover_date: today,
+                                                      handover_start_date: today,
+                                                      today: today))
+        .to eq described_class::COM_RESPONSIBLE
+    end
+
+    it 'is POM responsible/COM supporting when handover date is in the future and start date is in the past' do
+      expect(described_class.calculate_responsibility(handover_date: today + 1.day,
+                                                      handover_start_date: today - 1.day,
+                                                      today: today))
+        .to eq described_class::POM_RESPONSIBLE_COM_SUPPORTING
+    end
+
+    it 'is POM responsible/COM supporting when handover date is in the future and start date is today' do
+      expect(described_class.calculate_responsibility(handover_date: today + 1.day,
+                                                      handover_start_date: today,
+                                                      today: today))
+        .to eq described_class::POM_RESPONSIBLE_COM_SUPPORTING
+    end
+
+    it 'is POM responsible when handover date is in the future and start date is future' do
+      expect(described_class.calculate_responsibility(handover_date: today + 2.days,
+                                                      handover_start_date: today + 1.day,
+                                                      today: today))
+        .to eq described_class::POM_RESPONSIBLE
     end
   end
 end

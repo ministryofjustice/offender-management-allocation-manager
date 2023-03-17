@@ -118,7 +118,11 @@ class HandoverDateService
         open_prison_rules_apply: offender.open_prison_rules_apply?,
         in_womens_prison: offender.in_womens_prison?,
       )
-      CalculatedHandoverDate.new responsibility: nil,
+      responsibility = Handover::HandoverCalculation.calculate_responsibility(
+        handover_date: handover_date,
+        handover_start_date: handover_start_date,
+      )
+      CalculatedHandoverDate.new responsibility: responsibility,
                                  start_date: handover_start_date, handover_date: handover_date,
                                  reason: handover_reason
     end
