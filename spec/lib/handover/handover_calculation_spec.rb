@@ -192,15 +192,14 @@ RSpec.describe Handover::HandoverCalculation do
   describe '::calculate_responsibility' do
     let(:today) { Date.new(2023, 5, 1) }
 
-    it 'raises an error if handover date is not set' do
-      expect {
-        described_class.calculate_responsibility(handover_date: nil,
-                                                 handover_start_date: Faker::Date.forward,
-                                                 today: today)
-      }.to raise_error(described_class::HandoverCalculationArgumentError, /handover_date/)
+    it 'is COM responsible if handover date is not set' do
+      expect(described_class.calculate_responsibility(handover_date: nil,
+                                                      handover_start_date: Faker::Date.forward,
+                                                      today: today))
+        .to eq described_class::COM_RESPONSIBLE
     end
 
-    it 'raises an error if handover start date is not set' do
+    it 'raises an error if handover date is set and handover start date is not set' do
       expect {
         described_class.calculate_responsibility(handover_date: Faker::Date.forward,
                                                  handover_start_date: nil,

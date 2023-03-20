@@ -41,7 +41,7 @@ module Handover::HandoverCalculation
     end
 
     def calculate_responsibility(handover_date:, handover_start_date:, today: Time.zone.now.utc.to_date)
-      raise HandoverCalculationArgumentError, 'handover_date must be given' if handover_date.nil?
+      return COM_RESPONSIBLE if handover_date.nil?
       raise HandoverCalculationArgumentError, 'handover_start_date must be given' if handover_start_date.nil?
       if handover_start_date > handover_date
         raise HandoverCalculationArgumentError, 'handover_start_date cannot be after handover_date'
