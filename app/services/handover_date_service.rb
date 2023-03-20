@@ -79,6 +79,55 @@ class HandoverDateService
     end
   end
 
+  def self.handover_2(mpc_offender)
+    unless mpc_offender.inside_omic_policy?
+      raise "Offender #{mpc_offender.offender_no} falls outside of OMIC policy - cannot calculate handover dates"
+    end
+
+    offender = OffenderWrapper.new(mpc_offender)
+
+    if offender.recalled?
+      CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+                                 start_date: nil, handover_date: nil,
+                                 reason: :recall_case
+    elsif offender.immigration_case?
+      CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+                                 start_date: nil, handover_date: nil,
+                                 reason: :immigration_case
+    elsif offender.release_date.blank?
+      CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
+                                 start_date: nil, handover_date: nil,
+                                 reason: :release_date_unknown
+    elsif !offender.policy_case?
+      CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+                                 start_date: nil, handover_date: nil,
+                                 reason: :pre_omic_rules
+    else
+      handover_date, handover_reason = Handover::HandoverCalculation.calculate_handover_date(
+        sentence_start_date: offender.sentence_start_date,
+        earliest_release_date: offender.release_date,
+        is_early_allocation: offender.early_allocation?,
+        is_indeterminate: offender.indeterminate_sentence?,
+        in_open_conditions: offender.in_open_conditions?,
+      )
+      handover_start_date = Handover::HandoverCalculation.calculate_handover_start_date(
+        handover_date: handover_date,
+        category_active_since_date: offender.category_active_since,
+        prison_arrival_date: offender.prison_arrival_date,
+        is_indeterminate: offender.indeterminate_sentence?,
+        open_prison_rules_apply: offender.open_prison_rules_apply?,
+        in_womens_prison: offender.in_womens_prison?,
+      )
+      responsibility = Handover::HandoverCalculation.calculate_responsibility(
+        handover_date: handover_date,
+        handover_start_date: handover_start_date,
+      )
+      CalculatedHandoverDate.new responsibility: responsibility,
+                                 start_date: handover_start_date, handover_date: handover_date,
+                                 reason: handover_reason
+    end
+  end
+
 private
 
   def self.responsibility(start_date, handover_date)
@@ -150,12 +199,14 @@ private
 
   WOMENS_CUTOFF_DATE = '30/9/2022'.to_date
 
+  # TODO: Clean up all the shit here that's no longer used
   class OffenderWrapper
     delegate :recalled?, :immigration_case?, :indeterminate_sentence?,
              :early_allocation?, :mappa_level, :prison_arrival_date, :category_active_since,
              :parole_eligibility_date, :conditional_release_date, :automatic_release_date,
              :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date,
              :sentence_start_date, :offender_no,
+             :earliest_release_for_handover,
              to: :@offender
 
     def initialize(offender)
@@ -188,29 +239,8 @@ private
       end
     end
 
-    # We can not calculate the handover date for NPS Indeterminate
-    # with parole cases where the TED is in the past as we need
-    # the parole board decision which currently is not available to us.
     def release_date
-      if @offender.indeterminate_sentence?
-        if @offender.tariff_date.present? && @offender.tariff_date.future?
-          @offender.tariff_date
-        else
-          [
-            @offender.parole_review_date,
-            @offender.parole_eligibility_date
-          ].compact.reject(&:past?).min
-        end
-      elsif @offender.nps_case?
-        possible_dates = [@offender.conditional_release_date, @offender.automatic_release_date]
-        @offender.parole_eligibility_date || possible_dates.compact.min
-      else
-        # CRC can look at HDC date, NPS is not supposed to
-        @offender.home_detention_curfew_actual_date.presence ||
-          [@offender.automatic_release_date,
-           @offender.conditional_release_date,
-           @offender.home_detention_curfew_eligibility_date].compact.min
-      end
+      earliest_release_for_handover&.date
     end
 
     def open_prison_rules_apply?

@@ -261,8 +261,8 @@ jobs:
             . ~/env/"${env_name}"-hmpps-secrets.sh
             cc-test-reporter before-build
             export SPEC_STATUS_PATH=~/spec_status
-            bundle exec parallel_test -t rspec -- -t ~flaky --format progress -- spec
-            [[ "${?}" == 0 ]] || (echo "Flaky tests detected, trying again..." && sleep 30 && bundle exec parallel_test -t rspec -- -t ~flaky --format progress --only-failures -- spec)
+            bundle exec parallel_test -t rspec -- -t ~flaky --format progress -- spec || \
+              (echo "Flaky tests detected, trying again..." && sleep 30 && bundle exec parallel_test -t rspec -- -t ~flaky --format progress --only-failures -- spec)
             cc-test-reporter after-build --coverage-input-type lcov --exit-code $?
           environment:
             MOZ_HEADLESS: 1

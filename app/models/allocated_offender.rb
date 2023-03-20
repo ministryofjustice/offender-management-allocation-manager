@@ -15,6 +15,7 @@ class AllocatedOffender
            :ldu_name, :ldu_email_address, :model, :released?,
            :case_information, :home_detention_curfew_actual_date, :home_detention_curfew_eligibility_date,
            :conditional_release_date, :automatic_release_date,
+           :earliest_release_for_handover,
            to: :@offender
   delegate :updated_at, :nomis_offender_id, :primary_pom_allocated_at, :prison, :primary_pom_nomis_id,
            to: :@allocation
