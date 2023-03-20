@@ -7,6 +7,7 @@ file = ARGV.fetch(0)
 CSV.open(file, 'wb') do |csv|
   csv.add_row([
                 'NOMS No',
+                'Prison ID',
                 'Earliest release for handover date',
                 'Earliest release for handover type',
                 'Sentence start date',
@@ -28,6 +29,7 @@ CSV.open(file, 'wb') do |csv|
         if a.attributes != b.attributes
           csv.add_row([
                         o.offender_no,
+                        prison.code,
                         o.earliest_release_for_handover.date,
                         o.earliest_release_for_handover.name,
                         o.sentence_start_date,
