@@ -1,0 +1,48 @@
+#!/usr/bin/env ruby
+
+raise 'Run it with "bin/rails runner", not on its own' unless Object.constants.include?(:Rails)
+
+file = ARGV.fetch(0)
+
+CSV.open(file, 'wb') do |csv|
+  csv.add_row([
+                'NOMS No',
+                'Earliest release for handover date',
+                'Earliest release for handover type',
+                'Sentence start date',
+                'OLD Handover start date',
+                'NEW Handover start date',
+                'OLD Handover date',
+                'NEW Handover date',
+                'OLD responsibility',
+                'NEW responsibility',
+              ])
+  Prison.all.each do |prison|
+    offenders = prison.offenders
+
+    offenders.each do |o|
+      begin
+        a = HandoverDateService.handover(o)
+        b = HandoverDateService.handover_2(o)
+
+        if a.attributes != b.attributes
+          csv.add_row([
+                        o.offender_no,
+                        o.earliest_release_for_handover.date,
+                        o.earliest_release_for_handover.name,
+                        o.sentence_start_date,
+                        a.start_date&.iso8601,
+                        b.start_date&.iso8601,
+                        a.handover_date&.iso8601,
+                        b.handover_date&.iso8601,
+                        a.responsibility,
+                        b.responsibility
+                      ])
+        end
+      end
+    rescue
+      warn "Error with #{o.offender_no}"
+      raise
+    end
+  end
+end
