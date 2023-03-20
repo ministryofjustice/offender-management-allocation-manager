@@ -24,7 +24,7 @@ RSpec.describe SentryCircuitBreakerService do
   end
 
   before do
-    allow(Redis).to receive(:new).and_return(fake_redis)
+    allow(described_class).to receive(:redis_client).and_return(fake_redis)
   end
 
   let(:fake_redis) do
