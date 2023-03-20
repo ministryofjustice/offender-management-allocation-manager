@@ -6,39 +6,52 @@ file = ARGV.fetch(0)
 
 CSV.open(file, 'wb') do |csv|
   csv.add_row([
+                '',
+                '',
+                'Earliest release',
+                '',
+                '',
+                '',
+                'OLD',
+                '',
+                '',
+                'NEW',
+                '',
+              ])
+  csv.add_row([
                 'NOMS No',
                 'Prison ID',
-                'Earliest release for handover date',
-                'Earliest release for handover type',
+                'Date',
+                'Type',
                 'Sentence start date',
-                'OLD Handover start date',
-                'NEW Handover start date',
-                'OLD Handover date',
-                'NEW Handover date',
-                'OLD responsibility',
-                'NEW responsibility',
+                'Handover start date',
+                'Handover date',
+                'Responsibility',
+                'Handover start date',
+                'Handover date',
+                'Responsibility',
               ])
   Prison.all.each do |prison|
     offenders = prison.offenders
 
     offenders.each do |o|
       begin
-        a = HandoverDateService.handover(o)
-        b = HandoverDateService.handover_2(o)
+        old = HandoverDateService.handover(o)
+        new = HandoverDateService.handover_2(o)
 
-        if a.attributes != b.attributes
+        if old.attributes != new.attributes
           csv.add_row([
                         o.offender_no,
                         prison.code,
                         o.earliest_release_for_handover.date,
                         o.earliest_release_for_handover.name,
                         o.sentence_start_date,
-                        a.start_date&.iso8601,
-                        b.start_date&.iso8601,
-                        a.handover_date&.iso8601,
-                        b.handover_date&.iso8601,
-                        a.responsibility,
-                        b.responsibility
+                        old.start_date&.iso8601,
+                        old.handover_date&.iso8601,
+                        old.responsibility,
+                        new.start_date&.iso8601,
+                        new.handover_date&.iso8601,
+                        new.responsibility
                       ])
         end
       end
