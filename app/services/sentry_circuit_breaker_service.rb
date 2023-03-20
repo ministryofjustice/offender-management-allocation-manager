@@ -1,7 +1,7 @@
 class SentryCircuitBreakerService
   COUNT_KEY = 'sentry_request_count'.freeze
   LAST_RESET_KEY = 'sentry_request_count_last_reset'.freeze
-  MONTHLY_QUOTA = 3_500_000
+  MONTHLY_QUOTA = 25_000
   MONTHLY_RESET_DAY = 14
 
   def self.check_within_quota(date: Time.zone.today)
