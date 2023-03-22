@@ -520,8 +520,14 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
-    sentry-raven (3.1.2)
-      faraday (>= 1.0)
+    sentry-rails (5.8.0)
+      railties (>= 5.0)
+      sentry-ruby (~> 5.8.0)
+    sentry-ruby (5.8.0)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+    sentry-sidekiq (5.8.0)
+      sentry-ruby (~> 5.8.0)
+      sidekiq (>= 3.0)
     shellany (0.0.1)
     shoulda-matchers (5.3.0)
       activesupport (>= 5.2.0)
@@ -664,7 +670,9 @@ DEPENDENCIES
   rubyzip (< 3)
   sassc-rails
   selenium-webdriver
-  sentry-raven
+  sentry-rails
+  sentry-ruby
+  sentry-sidekiq
   shoulda-matchers
   sidekiq (>= 6.4.0, < 6.5.0)
   simplecov

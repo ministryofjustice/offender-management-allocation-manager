@@ -95,11 +95,11 @@ Rails.application.configure do
 
                            error_handler: lambda { |method:, returning:, exception:|
                                             # Report errors to Sentry as warnings
-                                            Raven.capture_exception exception, level: 'warning',
-                                                                               tags: {
-                                                                                 method: method,
-                                                                                 returning: returning
-                                                                               }
+                                            Sentry.capture_exception exception, level: 'warning',
+                                                                                tags: {
+                                                                                  method: method,
+                                                                                  returning: returning
+                                                                                }
                                           }
                          }
 
