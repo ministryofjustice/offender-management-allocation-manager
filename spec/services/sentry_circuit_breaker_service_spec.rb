@@ -33,6 +33,7 @@ RSpec.describe SentryCircuitBreakerService do
 
   let(:count_key) { SentryCircuitBreakerService::COUNT_KEY }
   let(:reset_key) { SentryCircuitBreakerService::LAST_RESET_KEY }
+  let(:warn_key) { SentryCircuitBreakerService::LAST_WARN_KEY }
 
   context 'when first time called' do
     let(:check_date) { Date.new(2000, 1, 1) }
@@ -66,9 +67,14 @@ RSpec.describe SentryCircuitBreakerService do
 
     context 'and it is not reset day' do
       let(:check_date) { Date.new(2000, 1, 1) }
+      let(:last_warn) { nil }
 
       let(:redis_data) do
-        { count_key => request_count, reset_key => Date.new(1999, 1, 1).to_s }
+        {
+          count_key => request_count,
+          reset_key => Date.new(1999, 1, 1).to_s,
+          warn_key => last_warn
+        }
       end
 
       it 'increments counter' do
@@ -78,6 +84,27 @@ RSpec.describe SentryCircuitBreakerService do
 
       it 'returns false' do
         expect(result).to eq(false)
+      end
+
+      context 'when has not logged a warning today' do
+        it 'logs a warning' do
+          expect(Rails.logger).to receive(:warn)
+          result
+        end
+
+        it 'sets last warn' do
+          result
+          expect(fake_redis.data[warn_key]).to eq(check_date.to_s)
+        end
+      end
+
+      context 'when has already logged a warning today' do
+        let(:last_warn) { check_date.to_s }
+
+        it 'does not log a warning' do
+          expect(Rails.logger).not_to receive(:warn)
+          result
+        end
       end
     end
 
