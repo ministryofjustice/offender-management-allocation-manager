@@ -7,10 +7,6 @@ if sentry_dsn
     config.dsn = sentry_dsn
     config.excluded_exceptions << 'JWT::ExpiredSignature'
 
-    # If we're in Heroku, set the environment name to be the current app name
-    # This allows us to tell which PR/Review App an error came from
-    config.environment = ENV['HEROKU_APP_NAME'] if ENV['HEROKU_APP_NAME'].present?
-
     config.before_send = lambda do |event, _hint|
       SentryCircuitBreakerService.check_within_quota ? param_filter.filter(event.to_hash) : nil
     end
