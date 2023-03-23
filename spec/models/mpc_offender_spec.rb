@@ -163,11 +163,11 @@ RSpec.describe MpcOffender, type: :model do
   describe '#active_alert_labels' do
     let(:api_result) do
       [
-        { "alertCode" => "F1", "active" => true },
-        { "alertCode" => "PEEP", "active" => true },
-        { "alertCode" => "HA", "active" => false },
-        { "alertCode" => "HA", "active" => false },
-        { "alertCode" => "HA", "active" => false }
+        { "alertCodeDescription" => "Apples", "active" => true, "dateCreated" => "2022-01-01" },
+        { "alertCodeDescription" => "Pears", "active" => true, "dateCreated" => "2022-01-02" },
+        { "alertCodeDescription" => "Bananas", "active" => false, "dateCreated" => "2021-06-04" },
+        { "alertCodeDescription" => "Artichokes", "active" => false, "dateCreated" => "2021-01-01" },
+        { "alertCodeDescription" => "Carrots", "active" => false, "dateCreated" => "2021-01-01" }
       ]
     end
 
@@ -175,8 +175,8 @@ RSpec.describe MpcOffender, type: :model do
       allow(HmppsApi::PrisonApi::OffenderApi).to receive(:get_offender_alerts).and_return(api_result)
     end
 
-    it 'returns correct list' do
-      expect(subject.active_alert_labels).to eq(["Veteran", "PEEP"])
+    it 'returns correct filtered and sorted list' do
+      expect(subject.active_alert_labels).to eq(["Pears", "Apples"])
     end
   end
 
