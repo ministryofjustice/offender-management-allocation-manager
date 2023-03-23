@@ -342,6 +342,10 @@ class MpcOffender
     end
   end
 
+  def determinate_parole?
+    parole_eligibility_date.present?
+  end
+
 private
 
   def early_allocation_notes?

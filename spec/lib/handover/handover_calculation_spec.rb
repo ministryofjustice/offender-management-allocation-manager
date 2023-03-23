@@ -7,6 +7,7 @@ RSpec.describe Handover::HandoverCalculation do
         example 'there is no handover' do
           result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
                                                            earliest_release_date: Date.new(2024, 10, 31),
+                                                           is_determinate_parole: false,
                                                            is_indeterminate: false,
                                                            in_open_conditions: false,
                                                            is_early_allocation: false)
@@ -18,6 +19,7 @@ RSpec.describe Handover::HandoverCalculation do
         example 'there is no handover' do
           result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
                                                            earliest_release_date: Date.new(2024, 11, 1),
+                                                           is_determinate_parole: false,
                                                            is_indeterminate: false,
                                                            in_open_conditions: false,
                                                            is_early_allocation: false)
@@ -29,6 +31,7 @@ RSpec.describe Handover::HandoverCalculation do
         example 'handover date is 8 months 14 days before earliest release date' do
           result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
                                                            earliest_release_date: Date.new(2024, 11, 2),
+                                                           is_determinate_parole: false,
                                                            is_indeterminate: false,
                                                            in_open_conditions: false,
                                                            is_early_allocation: false)
@@ -40,6 +43,7 @@ RSpec.describe Handover::HandoverCalculation do
         example 'handover date is 8 months 14 days before earliest release date' do
           result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
                                                            earliest_release_date: Date.new(2024, 11, 3),
+                                                           is_determinate_parole: false,
                                                            is_indeterminate: false,
                                                            in_open_conditions: false,
                                                            is_early_allocation: false)
@@ -51,6 +55,7 @@ RSpec.describe Handover::HandoverCalculation do
         example 'handover date is 15 months before earliest release date' do
           result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
                                                            earliest_release_date: Date.new(2026, 1, 1),
+                                                           is_determinate_parole: false,
                                                            is_indeterminate: false,
                                                            in_open_conditions: false,
                                                            is_early_allocation: true)
@@ -63,6 +68,7 @@ RSpec.describe Handover::HandoverCalculation do
       example 'handover date for open prison is 8 months before earliest release date' do
         result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
                                                          earliest_release_date: Date.new(2026, 1, 1),
+                                                         is_determinate_parole: false,
                                                          is_indeterminate: true,
                                                          in_open_conditions: true,
                                                          is_early_allocation: false)
@@ -72,10 +78,23 @@ RSpec.describe Handover::HandoverCalculation do
       example 'handover date for non-open prison is 8 months before earliest release date' do
         result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
                                                          earliest_release_date: Date.new(2026, 1, 1),
+                                                         is_determinate_parole: false,
                                                          is_indeterminate: true,
                                                          in_open_conditions: false,
                                                          is_early_allocation: false)
         expect(result).to eq [Date.new(2025, 5, 1), :indeterminate]
+      end
+    end
+
+    describe 'for extended determinate parole case' do
+      example 'handover date is 8 months before earliest release date' do
+        result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
+                                                         earliest_release_date: Date.new(2026, 1, 1),
+                                                         is_determinate_parole: true,
+                                                         is_indeterminate: false,
+                                                         in_open_conditions: false,
+                                                         is_early_allocation: false)
+        expect(result).to eq [Date.new(2025, 5, 1), :determinate_parole]
       end
     end
   end

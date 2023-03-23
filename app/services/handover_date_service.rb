@@ -109,6 +109,7 @@ class HandoverDateService
         is_early_allocation: offender.early_allocation?,
         is_indeterminate: offender.indeterminate_sentence?,
         in_open_conditions: offender.in_open_conditions?,
+        is_determinate_parole: offender.determinate_parole?,
       )
       handover_start_date = Handover::HandoverCalculation.calculate_handover_start_date(
         handover_date: handover_date,
@@ -207,6 +208,7 @@ private
              :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date,
              :sentence_start_date, :offender_no,
              :earliest_release_for_handover,
+             :determinate_parole?,
              to: :@offender
 
     def initialize(offender)

@@ -793,7 +793,8 @@ describe HandoverDateService do
                       category_active_since: double(:category_active_since),
                       prison_arrival_date: double(:prison_arrival_date),
                       open_prison_rules_apply?: double(:open_prison_rules_apply?),
-                      in_womens_prison?: double(:in_womens_prison?)
+                      in_womens_prison?: double(:in_womens_prison?),
+                      determinate_parole?: double(:determinate_parole?)
     end
     let(:handover_date) { double :handover_date }
     let(:handover_start_date) { double :handover_start_date }
@@ -864,7 +865,8 @@ describe HandoverDateService do
             earliest_release_date: offender_wrapper.release_date,
             is_early_allocation: offender_wrapper.early_allocation?,
             is_indeterminate: offender_wrapper.indeterminate_sentence?,
-            in_open_conditions: offender_wrapper.in_open_conditions?)
+            in_open_conditions: offender_wrapper.in_open_conditions?,
+            is_determinate_parole: offender_wrapper.determinate_parole?)
         end
 
         it 'uses official calculations' do

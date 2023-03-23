@@ -6,11 +6,14 @@ module Handover::HandoverCalculation
   class << self
     def calculate_handover_date(sentence_start_date:,
                                 earliest_release_date:,
+                                is_determinate_parole:,
                                 is_early_allocation:,
                                 is_indeterminate:,
                                 in_open_conditions:)
       if is_indeterminate
         [earliest_release_date - 8.months, in_open_conditions ? :indeterminate_open : :indeterminate]
+      elsif is_determinate_parole
+        [earliest_release_date - 8.months, :determinate_parole]
       else
         calculate_determinate_handover_date(sentence_start_date: sentence_start_date,
                                             earliest_release_date: earliest_release_date,
