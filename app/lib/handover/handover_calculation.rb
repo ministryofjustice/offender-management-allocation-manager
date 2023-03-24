@@ -59,6 +59,18 @@ module Handover::HandoverCalculation
       end
     end
 
+    def calculate_earliest_release(is_indeterminate:,
+                                   today: Time.zone.now.utc.to_date,
+                                   **dates)
+      if is_indeterminate
+        if dates[:tariff_date] && dates[:tariff_date] > today
+          NamedDate[dates[:tariff_date], 'TED']
+        elsif dates[:parole_review_date] && dates[:parole_review_date] > today
+          NamedDate[dates[:parole_review_date], 'PED']
+        end
+      end
+    end
+
   private
 
     def calculate_determinate_handover_date(sentence_start_date:,
