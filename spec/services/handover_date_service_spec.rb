@@ -786,7 +786,6 @@ describe HandoverDateService do
       instance_double described_class::OffenderWrapper, :offender_wrapper,
                       policy_case?: true, recalled?: false, immigration_case?: false,
                       sentence_start_date: double(:sentence_start_date),
-                      release_date: double(:release_date),
                       early_allocation?: double(:early_allocation?),
                       indeterminate_sentence?: double(:indeterminate_sentence?),
                       in_open_conditions?: double(:in_open_conditions?),
@@ -794,18 +793,37 @@ describe HandoverDateService do
                       prison_arrival_date: double(:prison_arrival_date),
                       open_prison_rules_apply?: double(:open_prison_rules_apply?),
                       in_womens_prison?: double(:in_womens_prison?),
-                      determinate_parole?: double(:determinate_parole?)
+                      determinate_parole?: double(:determinate_parole?),
+                      tariff_date: double(:tariff_date),
+                      parole_review_date: double(:parole_review_date),
+                      parole_eligibility_date: double(:parole_eligibility_date),
+                      automatic_release_date: double(:automatic_release_date),
+                      conditional_release_date: double(:conditional_release_date)
     end
     let(:handover_date) { double :handover_date }
     let(:handover_start_date) { double :handover_start_date }
     let(:responsibility) { double :responsibility }
+    let(:earliest_release) { double(:earliest_release, date: double(:earliest_release_date)) }
 
     before do
       allow(described_class::OffenderWrapper).to receive(:new).with(mpc_offender).and_return(offender_wrapper)
       allow(Handover::HandoverCalculation)
-        .to receive_messages(calculate_handover_date: [handover_date, 'policy_reason'],
+        .to receive_messages(calculate_earliest_release: earliest_release,
+                             calculate_handover_date: [handover_date, 'policy_reason'],
                              calculate_handover_start_date: handover_start_date,
                              calculate_responsibility: responsibility)
+    end
+
+    it 'calculates earliest release date correctly' do
+      allow(Handover::HandoverCalculation).to receive_messages(calculate_earliest_release: nil)
+      described_class.handover_2(mpc_offender)
+      expect(Handover::HandoverCalculation).to have_received(:calculate_earliest_release)
+        .with(is_indeterminate: offender_wrapper.indeterminate_sentence?,
+              tariff_date: offender_wrapper.tariff_date,
+              parole_review_date: offender_wrapper.parole_review_date,
+              parole_eligibility_date: offender_wrapper.parole_eligibility_date,
+              automatic_release_date: offender_wrapper.automatic_release_date,
+              conditional_release_date: offender_wrapper.conditional_release_date)
     end
 
     context 'when not a policy case' do
@@ -835,7 +853,7 @@ describe HandoverDateService do
       end
 
       it 'calculates no date and COM responsible when no release date' do
-        allow(offender_wrapper).to receive_messages(release_date: nil)
+        allow(Handover::HandoverCalculation).to receive_messages(calculate_earliest_release: nil)
 
         expect(described_class.handover_2(mpc_offender).attributes)
           .to include({ 'responsibility' => CalculatedHandoverDate::CUSTODY_ONLY,
@@ -862,7 +880,7 @@ describe HandoverDateService do
         it 'uses official calculations correctly' do
           expect(Handover::HandoverCalculation).to have_received(:calculate_handover_date).with(
             sentence_start_date: offender_wrapper.sentence_start_date,
-            earliest_release_date: offender_wrapper.release_date,
+            earliest_release_date: earliest_release.date,
             is_early_allocation: offender_wrapper.early_allocation?,
             is_indeterminate: offender_wrapper.indeterminate_sentence?,
             in_open_conditions: offender_wrapper.in_open_conditions?,
