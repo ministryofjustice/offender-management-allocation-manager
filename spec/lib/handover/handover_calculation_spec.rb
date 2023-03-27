@@ -280,61 +280,70 @@ RSpec.describe Handover::HandoverCalculation do
   describe '::calculate_earliest_release' do
     let(:today) { Date.new(2023, 3, 1) }
 
-    let(:all_dates) do
+    let(:args) do
+      result = {
+        is_indeterminate: false,
+        today: today,
+      }
+
       # It is vital that all these dates be on different days and all be different to `today`
-      result = {}
       [
         :tariff_date,
         :parole_review_date,
       ].each_with_index do |name, index|
         result[name] = today + 1.day + index.days
       end
+
       result
     end
 
     describe 'when case is indeterminate' do
+      before do
+        args[:is_indeterminate] = true
+      end
+
       example 'there is no earliest release if tariff date and parole review date are nil or not in the future' do
         aggregate_failures do
-          all_dates[:tariff_date] = today
-          all_dates[:parole_review_date] = today
-          expect(described_class.calculate_earliest_release(is_indeterminate: true, today: today, **all_dates))
+          args[:tariff_date] = today
+          args[:parole_review_date] = today
+          expect(described_class.calculate_earliest_release(**args))
             .to eq nil
 
-          all_dates[:tariff_date] = today
-          all_dates[:parole_review_date] = nil
-          expect(described_class.calculate_earliest_release(is_indeterminate: true, today: today, **all_dates))
+          args[:tariff_date] = today
+          args[:parole_review_date] = nil
+          expect(described_class.calculate_earliest_release(**args))
             .to eq nil
 
-          all_dates[:tariff_date] = nil
-          all_dates[:parole_review_date] = today
-          expect(described_class.calculate_earliest_release(is_indeterminate: true, today: today, **all_dates))
+          args[:tariff_date] = nil
+          args[:parole_review_date] = today
+          expect(described_class.calculate_earliest_release(**args))
             .to eq nil
 
-          all_dates[:tariff_date] = nil
-          all_dates[:parole_review_date] = nil
-          expect(described_class.calculate_earliest_release(is_indeterminate: true, today: today, **all_dates))
+          args[:tariff_date] = nil
+          args[:parole_review_date] = nil
+          expect(described_class.calculate_earliest_release(**args))
             .to eq nil
         end
       end
 
       example 'earliest release is parole review date if it is in the future and tariff date is not' do
         aggregate_failures do
-          all_dates[:parole_review_date] = today + 1.day
-          all_dates[:tariff_date] = today
-          expect(described_class.calculate_earliest_release(is_indeterminate: true, today: today, **all_dates))
-            .to eq NamedDate[all_dates[:parole_review_date], 'PED']
+          args[:parole_review_date] = today + 1.day
+          args[:tariff_date] = today
+          expect(described_class.calculate_earliest_release(**args))
+            .to eq NamedDate[args[:parole_review_date], 'PED']
         end
       end
 
       example 'earliest release is tariff date if it is in the future' do
-        all_dates[:tariff_date] = today + 1.day
-        expect(described_class.calculate_earliest_release(is_indeterminate: true, today: today, **all_dates))
-          .to eq NamedDate[all_dates[:tariff_date], 'TED']
+        args[:tariff_date] = today + 1.day
+        expect(described_class.calculate_earliest_release(**args))
+          .to eq NamedDate[args[:tariff_date], 'TED']
       end
     end
 
-    describe 'when case is extended determinate' do
-      it 'is is parole eligibility date'
+    describe 'when case is extended determinate (has parole eligibility date)' do
+      it 'is parole eligibility date'
     end
 
     describe 'when case is determinate' do
