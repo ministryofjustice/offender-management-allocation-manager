@@ -236,40 +236,9 @@ class MpcOffender
   end
 
   def active_alert_labels
-    labels = {
-      'CSIP' => 'CSIP',
-      'F1' => 'Veteran',
-      'HA' => 'ACCT open',
-      'HA1' => 'ACCT post closure',
-      'LCE' => 'Care experienced',
-      'PEEP' => 'PEEP',
-      'RCDR' => 'Quarantined',
-      'RCON' => 'Conflict',
-      'RLG' => 'Risk to LGBT',
-      'RNO121' => 'No one-to-one',
-      'RTP' => 'Risk to LGBT',
-      'UPIU' => 'Protective Isolation Unit',
-      'URCU' => 'Reverse Cohorting Unit',
-      'URS' => 'Refusing to shield',
-      'USU' => 'Shielding Unit',
-      'XA' => 'Arsonist',
-      'XCA' => 'Chemical attacker',
-      'XCI' => 'Concerted indiscipline',
-      'XCO' => 'Corruptor',
-      'XCU' => 'Controlled unlock',
-      'XEL' => 'E-list',
-      'XGANG' => 'Gang member',
-      'XHT' => 'Hostage taker',
-      'XR' => 'Racist',
-      'XRF' => 'Risk to females',
-      'XSA' => 'Staff assaulter',
-      'XTACT' => 'TACT'
-    }
-
     all_alerts = HmppsApi::PrisonApi::OffenderApi.get_offender_alerts(offender_no)
-    active_alerts = all_alerts.select { |a| a['active'] == true }
-    active_codes = active_alerts.map { |a| a['alertCode'] }.uniq
-    active_codes.map { |c| labels[c] }.compact
+    sorted_active_alerts = all_alerts.select { |a| a['active'] && !a['expired'] }.sort_by { |a| a['dateCreated'] }.reverse
+    sorted_active_alerts.map { |a| a['alertCodeDescription'] }.uniq
   end
 
   def model
