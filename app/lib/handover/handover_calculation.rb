@@ -60,14 +60,24 @@ module Handover::HandoverCalculation
     end
 
     def calculate_earliest_release(is_indeterminate:,
-                                   today: Time.zone.now.utc.to_date,
-                                   **dates)
+                                   tariff_date:,
+                                   parole_review_date:,
+                                   parole_eligibility_date:,
+                                   conditional_release_date:,
+                                   automatic_release_date:,
+                                   today: Time.zone.now.utc.to_date)
       if is_indeterminate
-        if dates[:tariff_date] && dates[:tariff_date] > today
-          NamedDate[dates[:tariff_date], 'TED']
-        elsif dates[:parole_review_date] && dates[:parole_review_date] > today
-          NamedDate[dates[:parole_review_date], 'PED']
+        if tariff_date && tariff_date > today
+          NamedDate[tariff_date, 'TED']
+        elsif parole_review_date && parole_review_date > today
+          NamedDate[parole_review_date, 'PRD']
         end
+      elsif parole_eligibility_date
+        NamedDate[parole_eligibility_date, 'PED']
+      else
+        crd = NamedDate[conditional_release_date, 'CRD']
+        ard = NamedDate[automatic_release_date, 'ARD']
+        [crd, ard].compact.min
       end
     end
 

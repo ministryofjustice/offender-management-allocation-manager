@@ -281,20 +281,15 @@ RSpec.describe Handover::HandoverCalculation do
     let(:today) { Date.new(2023, 3, 1) }
 
     let(:args) do
-      result = {
+      {
         is_indeterminate: false,
         today: today,
+        tariff_date: Faker::Date.forward,
+        parole_review_date: Faker::Date.forward,
+        parole_eligibility_date: nil,
+        conditional_release_date: Faker::Date.forward,
+        automatic_release_date: Faker::Date.forward,
       }
-
-      # It is vital that all these dates be on different days and all be different to `today`
-      [
-        :tariff_date,
-        :parole_review_date,
-      ].each_with_index do |name, index|
-        result[name] = today + 1.day + index.days
-      end
-
-      result
     end
 
     describe 'when case is indeterminate' do
@@ -327,15 +322,14 @@ RSpec.describe Handover::HandoverCalculation do
       end
 
       example 'earliest release is parole review date if it is in the future and tariff date is not' do
-        aggregate_failures do
-          args[:parole_review_date] = today + 1.day
-          args[:tariff_date] = today
-          expect(described_class.calculate_earliest_release(**args))
-            .to eq NamedDate[args[:parole_review_date], 'PED']
-        end
+        args[:parole_review_date] = today + 1.day
+        args[:tariff_date] = today
+        expect(described_class.calculate_earliest_release(**args))
+          .to eq NamedDate[args[:parole_review_date], 'PRD']
       end
 
       example 'earliest release is tariff date if it is in the future' do
+        args[:parole_review_date] = today + 1.day
         args[:tariff_date] = today + 1.day
         expect(described_class.calculate_earliest_release(**args))
           .to eq NamedDate[args[:tariff_date], 'TED']
@@ -343,18 +337,47 @@ RSpec.describe Handover::HandoverCalculation do
     end
 
     describe 'when case is extended determinate (has parole eligibility date)' do
-      it 'is parole eligibility date'
+      before do
+        args[:parole_eligibility_date] = today + rand(100).days
+      end
+
+      it 'is parole eligibility date' do
+        expect(described_class.calculate_earliest_release(**args))
+          .to eq NamedDate[args[:parole_eligibility_date], 'PED']
+      end
     end
 
     describe 'when case is determinate' do
-      it 'is automatic release date when only that is available'
+      before do
+        args[:is_indeterminate] = false
+      end
 
-      it 'is conditional release date when only that is available'
+      it 'is automatic release date when only that is available' do
+        args[:automatic_release_date] = Faker::Date.backward
+        expect(described_class.calculate_earliest_release(**args))
+          .to eq NamedDate[args[:automatic_release_date], 'ARD']
+      end
+
+      it 'is conditional release date when only that is available' do
+        args[:conditional_release_date] = Faker::Date.backward
+        expect(described_class.calculate_earliest_release(**args))
+          .to eq NamedDate[args[:conditional_release_date], 'CRD']
+      end
 
       describe 'when both ARD and CRD are available' do
-        it 'is automatic release date when that is the earliest'
+        it 'is automatic release date when that is the earliest' do
+          args[:conditional_release_date] = today - 1.day
+          args[:automatic_release_date] = today - 2.days
+          expect(described_class.calculate_earliest_release(**args))
+            .to eq NamedDate[args[:automatic_release_date], 'ARD']
+        end
 
-        it 'is conditional release date when that is the earliest'
+        it 'is conditional release date when that is the earliest' do
+          args[:conditional_release_date] = today - 2.days
+          args[:automatic_release_date] = today - 1.day
+          expect(described_class.calculate_earliest_release(**args))
+            .to eq NamedDate[args[:conditional_release_date], 'CRD']
+        end
       end
     end
   end
