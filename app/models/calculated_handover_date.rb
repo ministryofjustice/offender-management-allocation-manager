@@ -28,6 +28,7 @@ class CalculatedHandoverDate < ApplicationRecord
     determinate: 'Determinate sentence more than 10 months',
     indeterminate: 'Indeterminate',
     indeterminate_open: 'Indeterminate - Open conditions',
+    determinate_parole: 'Parole'
   }.stringify_keys.freeze
 
   has_paper_trail meta: { nomis_offender_id: :nomis_offender_id, offender_attributes_to_archive: :offender_attributes_to_archive }

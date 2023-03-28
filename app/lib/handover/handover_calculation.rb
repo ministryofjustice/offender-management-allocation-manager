@@ -6,11 +6,14 @@ module Handover::HandoverCalculation
   class << self
     def calculate_handover_date(sentence_start_date:,
                                 earliest_release_date:,
+                                is_determinate_parole:,
                                 is_early_allocation:,
                                 is_indeterminate:,
                                 in_open_conditions:)
       if is_indeterminate
         [earliest_release_date - 8.months, in_open_conditions ? :indeterminate_open : :indeterminate]
+      elsif is_determinate_parole
+        [earliest_release_date - 8.months, :determinate_parole]
       else
         calculate_determinate_handover_date(sentence_start_date: sentence_start_date,
                                             earliest_release_date: earliest_release_date,
@@ -53,6 +56,28 @@ module Handover::HandoverCalculation
         POM_RESPONSIBLE_COM_SUPPORTING
       else
         COM_RESPONSIBLE
+      end
+    end
+
+    def calculate_earliest_release(is_indeterminate:,
+                                   tariff_date:,
+                                   parole_review_date:,
+                                   parole_eligibility_date:,
+                                   conditional_release_date:,
+                                   automatic_release_date:,
+                                   today: Time.zone.now.utc.to_date)
+      if is_indeterminate
+        if tariff_date && tariff_date > today
+          NamedDate[tariff_date, 'TED']
+        elsif parole_review_date && parole_review_date > today
+          NamedDate[parole_review_date, 'PRD']
+        end
+      elsif parole_eligibility_date
+        NamedDate[parole_eligibility_date, 'PED']
+      else
+        crd = NamedDate[conditional_release_date, 'CRD']
+        ard = NamedDate[automatic_release_date, 'ARD']
+        [crd, ard].compact.min
       end
     end
 

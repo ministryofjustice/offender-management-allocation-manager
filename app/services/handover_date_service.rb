@@ -85,6 +85,14 @@ class HandoverDateService
     end
 
     offender = OffenderWrapper.new(mpc_offender)
+    earliest_release = Handover::HandoverCalculation.calculate_earliest_release(
+      is_indeterminate: offender.indeterminate_sentence?,
+      tariff_date: offender.tariff_date,
+      parole_review_date: offender.parole_review_date,
+      parole_eligibility_date: offender.parole_eligibility_date,
+      automatic_release_date: offender.automatic_release_date,
+      conditional_release_date: offender.conditional_release_date,
+    )
 
     if offender.recalled?
       CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
@@ -94,7 +102,7 @@ class HandoverDateService
       CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
                                  start_date: nil, handover_date: nil,
                                  reason: :immigration_case
-    elsif offender.release_date.blank?
+    elsif !earliest_release
       CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
                                  start_date: nil, handover_date: nil,
                                  reason: :release_date_unknown
@@ -105,10 +113,11 @@ class HandoverDateService
     else
       handover_date, handover_reason = Handover::HandoverCalculation.calculate_handover_date(
         sentence_start_date: offender.sentence_start_date,
-        earliest_release_date: offender.release_date,
+        earliest_release_date: earliest_release.date,
         is_early_allocation: offender.early_allocation?,
         is_indeterminate: offender.indeterminate_sentence?,
         in_open_conditions: offender.in_open_conditions?,
+        is_determinate_parole: offender.determinate_parole?,
       )
       handover_start_date = Handover::HandoverCalculation.calculate_handover_start_date(
         handover_date: handover_date,
@@ -204,9 +213,11 @@ private
     delegate :recalled?, :immigration_case?, :indeterminate_sentence?,
              :early_allocation?, :mappa_level, :prison_arrival_date, :category_active_since,
              :parole_eligibility_date, :conditional_release_date, :automatic_release_date,
+             :tariff_date, :parole_review_date,
              :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date,
              :sentence_start_date, :offender_no,
              :earliest_release_for_handover,
+             :determinate_parole?,
              to: :@offender
 
     def initialize(offender)

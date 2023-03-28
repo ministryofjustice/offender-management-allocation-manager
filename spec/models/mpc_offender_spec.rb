@@ -291,4 +291,16 @@ RSpec.describe MpcOffender, type: :model do
       expect(subject.has_com?).to eq false
     end
   end
+
+  describe '#determinate_parole?' do
+    it 'is true if parole eligibility date is present' do
+      allow(api_offender).to receive(:parole_eligibility_date).and_return(Faker::Date.rand)
+      expect(subject.determinate_parole?).to eq true
+    end
+
+    it 'is false if parole eligibility date is absent' do
+      allow(api_offender).to receive(:parole_eligibility_date).and_return(nil)
+      expect(subject.determinate_parole?).to eq false
+    end
+  end
 end

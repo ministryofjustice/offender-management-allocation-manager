@@ -7,6 +7,7 @@ RSpec.describe Handover::HandoverCalculation do
         example 'there is no handover' do
           result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
                                                            earliest_release_date: Date.new(2024, 10, 31),
+                                                           is_determinate_parole: false,
                                                            is_indeterminate: false,
                                                            in_open_conditions: false,
                                                            is_early_allocation: false)
@@ -18,6 +19,7 @@ RSpec.describe Handover::HandoverCalculation do
         example 'there is no handover' do
           result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
                                                            earliest_release_date: Date.new(2024, 11, 1),
+                                                           is_determinate_parole: false,
                                                            is_indeterminate: false,
                                                            in_open_conditions: false,
                                                            is_early_allocation: false)
@@ -29,6 +31,7 @@ RSpec.describe Handover::HandoverCalculation do
         example 'handover date is 8 months 14 days before earliest release date' do
           result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
                                                            earliest_release_date: Date.new(2024, 11, 2),
+                                                           is_determinate_parole: false,
                                                            is_indeterminate: false,
                                                            in_open_conditions: false,
                                                            is_early_allocation: false)
@@ -40,6 +43,7 @@ RSpec.describe Handover::HandoverCalculation do
         example 'handover date is 8 months 14 days before earliest release date' do
           result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
                                                            earliest_release_date: Date.new(2024, 11, 3),
+                                                           is_determinate_parole: false,
                                                            is_indeterminate: false,
                                                            in_open_conditions: false,
                                                            is_early_allocation: false)
@@ -51,6 +55,7 @@ RSpec.describe Handover::HandoverCalculation do
         example 'handover date is 15 months before earliest release date' do
           result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
                                                            earliest_release_date: Date.new(2026, 1, 1),
+                                                           is_determinate_parole: false,
                                                            is_indeterminate: false,
                                                            in_open_conditions: false,
                                                            is_early_allocation: true)
@@ -63,6 +68,7 @@ RSpec.describe Handover::HandoverCalculation do
       example 'handover date for open prison is 8 months before earliest release date' do
         result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
                                                          earliest_release_date: Date.new(2026, 1, 1),
+                                                         is_determinate_parole: false,
                                                          is_indeterminate: true,
                                                          in_open_conditions: true,
                                                          is_early_allocation: false)
@@ -72,10 +78,23 @@ RSpec.describe Handover::HandoverCalculation do
       example 'handover date for non-open prison is 8 months before earliest release date' do
         result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
                                                          earliest_release_date: Date.new(2026, 1, 1),
+                                                         is_determinate_parole: false,
                                                          is_indeterminate: true,
                                                          in_open_conditions: false,
                                                          is_early_allocation: false)
         expect(result).to eq [Date.new(2025, 5, 1), :indeterminate]
+      end
+    end
+
+    describe 'for extended determinate parole case' do
+      example 'handover date is 8 months before earliest release date' do
+        result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
+                                                         earliest_release_date: Date.new(2026, 1, 1),
+                                                         is_determinate_parole: true,
+                                                         is_indeterminate: false,
+                                                         in_open_conditions: false,
+                                                         is_early_allocation: false)
+        expect(result).to eq [Date.new(2025, 5, 1), :determinate_parole]
       end
     end
   end
@@ -255,6 +274,111 @@ RSpec.describe Handover::HandoverCalculation do
                                                       handover_start_date: today + 1.day,
                                                       today: today))
         .to eq described_class::POM_RESPONSIBLE
+    end
+  end
+
+  describe '::calculate_earliest_release' do
+    let(:today) { Date.new(2023, 3, 1) }
+
+    let(:args) do
+      {
+        is_indeterminate: false,
+        today: today,
+        tariff_date: Faker::Date.forward,
+        parole_review_date: Faker::Date.forward,
+        parole_eligibility_date: nil,
+        conditional_release_date: Faker::Date.forward,
+        automatic_release_date: Faker::Date.forward,
+      }
+    end
+
+    describe 'when case is indeterminate' do
+      before do
+        args[:is_indeterminate] = true
+      end
+
+      example 'there is no earliest release if tariff date and parole review date are nil or not in the future' do
+        aggregate_failures do
+          args[:tariff_date] = today
+          args[:parole_review_date] = today
+          expect(described_class.calculate_earliest_release(**args))
+            .to eq nil
+
+          args[:tariff_date] = today
+          args[:parole_review_date] = nil
+          expect(described_class.calculate_earliest_release(**args))
+            .to eq nil
+
+          args[:tariff_date] = nil
+          args[:parole_review_date] = today
+          expect(described_class.calculate_earliest_release(**args))
+            .to eq nil
+
+          args[:tariff_date] = nil
+          args[:parole_review_date] = nil
+          expect(described_class.calculate_earliest_release(**args))
+            .to eq nil
+        end
+      end
+
+      example 'earliest release is parole review date if it is in the future and tariff date is not' do
+        args[:parole_review_date] = today + 1.day
+        args[:tariff_date] = today
+        expect(described_class.calculate_earliest_release(**args))
+          .to eq NamedDate[args[:parole_review_date], 'PRD']
+      end
+
+      example 'earliest release is tariff date if it is in the future' do
+        args[:parole_review_date] = today + 1.day
+        args[:tariff_date] = today + 1.day
+        expect(described_class.calculate_earliest_release(**args))
+          .to eq NamedDate[args[:tariff_date], 'TED']
+      end
+    end
+
+    describe 'when case is extended determinate (has parole eligibility date)' do
+      before do
+        args[:parole_eligibility_date] = today + rand(100).days
+      end
+
+      it 'is parole eligibility date' do
+        expect(described_class.calculate_earliest_release(**args))
+          .to eq NamedDate[args[:parole_eligibility_date], 'PED']
+      end
+    end
+
+    describe 'when case is determinate' do
+      before do
+        args[:is_indeterminate] = false
+      end
+
+      it 'is automatic release date when only that is available' do
+        args[:automatic_release_date] = Faker::Date.backward
+        expect(described_class.calculate_earliest_release(**args))
+          .to eq NamedDate[args[:automatic_release_date], 'ARD']
+      end
+
+      it 'is conditional release date when only that is available' do
+        args[:conditional_release_date] = Faker::Date.backward
+        expect(described_class.calculate_earliest_release(**args))
+          .to eq NamedDate[args[:conditional_release_date], 'CRD']
+      end
+
+      describe 'when both ARD and CRD are available' do
+        it 'is automatic release date when that is the earliest' do
+          args[:conditional_release_date] = today - 1.day
+          args[:automatic_release_date] = today - 2.days
+          expect(described_class.calculate_earliest_release(**args))
+            .to eq NamedDate[args[:automatic_release_date], 'ARD']
+        end
+
+        it 'is conditional release date when that is the earliest' do
+          args[:conditional_release_date] = today - 2.days
+          args[:automatic_release_date] = today - 1.day
+          expect(described_class.calculate_earliest_release(**args))
+            .to eq NamedDate[args[:conditional_release_date], 'CRD']
+        end
+      end
     end
   end
 end
