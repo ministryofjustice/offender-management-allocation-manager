@@ -5,32 +5,45 @@ raise 'Run it with "bin/rails runner", not on its own' unless Object.constants.i
 file = ARGV.fetch(0)
 
 CSV.open(file, 'wb') do |csv|
-  csv.add_row([
-                '',
-                '',
-                'Earliest release',
-                '',
-                '',
-                '',
-                'OLD',
-                '',
-                '',
-                'NEW',
-                '',
-              ])
-  csv.add_row([
-                'NOMS No',
-                'Prison ID',
-                'Date',
-                'Type',
-                'Sentence start date',
-                'Handover start date',
-                'Handover date',
-                'Responsibility',
-                'Handover start date',
-                'Handover date',
-                'Responsibility',
-              ])
+  h0 = []
+  h1 = []
+
+  h0.push ''
+  h1.push 'NOMS No'
+
+  h0.push ''
+  h1.push 'Prison'
+
+  h0.push ''
+  h1.push 'Sentence start date'
+
+  h0.push ''
+  h1.push 'Case type'
+
+  h0.push 'OLD Earliest release'
+  h1.push 'Date'
+  h0.push ''
+  h1.push 'Type'
+  h0.push ''
+  h1.push 'Handover start date'
+  h0.push 'OLD'
+  h1.push 'Handover date'
+  h0.push ''
+  h1.push 'Responsibility'
+
+  h0.push 'NEW Earliest release'
+  h1.push 'Date'
+  h0.push ''
+  h1.push 'Type'
+  h0.push ''
+  h1.push 'Handover start date'
+  h0.push 'NEW'
+  h1.push 'Handover date'
+  h0.push ''
+  h1.push 'Responsibility'
+
+  csv.add_row(h0)
+  csv.add_row(h1)
   Prison.all.each do |prison|
     offenders = prison.offenders
 
@@ -39,16 +52,30 @@ CSV.open(file, 'wb') do |csv|
         old = HandoverDateService.handover(o)
         new = HandoverDateService.handover_2(o)
 
+        newerd = Handover::HandoverCalculation.calculate_earliest_release(
+          is_indeterminate: o.indeterminate_sentence?,
+          tariff_date: o.tariff_date,
+          parole_review_date: o.parole_review_date,
+          parole_eligibility_date: o.parole_eligibility_date,
+          automatic_release_date: o.automatic_release_date,
+          conditional_release_date: o.conditional_release_date,
+        )
+
         if old.attributes != new.attributes
           csv.add_row([
                         o.offender_no,
                         prison.code,
+
+                        (!o.nps_case? && !o.indeterminate_sentence?) ? 'CRC' : 'NPS',
+
                         o.earliest_release_for_handover.date,
                         o.earliest_release_for_handover.name,
                         o.sentence_start_date,
                         old.start_date&.iso8601,
                         old.handover_date&.iso8601,
                         old.responsibility,
+                        newerd.date,
+                        newerd.name,
                         new.start_date&.iso8601,
                         new.handover_date&.iso8601,
                         new.responsibility
