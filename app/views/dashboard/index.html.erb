@@ -46,19 +46,11 @@
   </div>
 
   <div class="govuk-grid-row card-group">
-    <% if use_new_handovers_ui? %>
-      <%= render 'dashboard_partition',
-                 title: "View all handover cases",
-                 link: upcoming_prison_handovers_path(@prison.code),
-                 content: "Track the progress of cases being handed over to the community probation team."
-      %>
-    <% else %>
-      <%= render 'dashboard_partition',
-                 title: "All handover cases",
-                 link: prison_handovers_path(@prison.code),
-                 content: "All cases coming up for handover in the next 30 days."
-      %>
-    <% end %>
+    <%= render 'dashboard_partition',
+               title: "View all handover cases",
+               link: upcoming_prison_handovers_path(@prison.code),
+               content: "Track the progress of cases being handed over to the community probation team."
+    %>
 
     <%= render 'dashboard_partition',
                title: "Newly arrived cases",
@@ -96,19 +88,11 @@
                content: "Cases allocated to you in the last 7 days."
     %>
 
-    <% if use_new_handovers_ui? %>
-      <%= render 'dashboard_partition',
-                 title: "View your handover cases",
-                 link: upcoming_prison_handovers_path(@prison.code, pom: '1'),
-                 content: "Keep track of your cases that must be handed over to the community probation team."
-      %>
-    <% else %>
-      <%= render 'dashboard_partition',
-                 title: "Cases close to handover",
-                 link: prison_staff_caseload_handovers_path(@prison.code, @staff_id),
-                 content: "Your cases that need handing over in the next 30 days."
-      %>
-    <% end %>
+    <%= render 'dashboard_partition',
+               title: "View your handover cases",
+               link: upcoming_prison_handovers_path(@prison.code, pom: '1'),
+               content: "Keep track of your cases that must be handed over to the community probation team."
+    %>
   </div>
 
   <div class="govuk-grid-row card-group">
