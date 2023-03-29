@@ -17,8 +17,6 @@ RSpec.describe HandoversController, type: :controller do
   let(:page) { double :page }
 
   before do
-    session[:new_handovers_ui] = true
-
     stub_high_level_staff_member_auth(prison: prison, staff_member: staff_member)
     allow(controller.helpers).to receive_messages(handover_cases_view: [pom_view_flag, handover_cases])
     allow(controller).to receive_messages(current_user_is_pom?: current_user_is_pom_stub,
