@@ -49,8 +49,8 @@ CSV.open(file, 'wb') do |csv|
 
     offenders.each do |o|
       begin
-        old = HandoverDateService.handover(o)
-        new = HandoverDateService.handover_2(o)
+        oldchd = HandoverDateService.handover(o)
+        newchd = HandoverDateService.handover_2(o)
 
         newerd = Handover::HandoverCalculation.calculate_earliest_release(
           is_indeterminate: o.indeterminate_sentence?,
@@ -61,24 +61,32 @@ CSV.open(file, 'wb') do |csv|
           conditional_release_date: o.conditional_release_date,
         )
 
-        if old.attributes != new.attributes
+        old = [
+          o.earliest_release_for_handover&.date&.iso8601,
+          o.earliest_release_for_handover&.name,
+          oldchd.start_date&.iso8601,
+          oldchd.handover_date&.iso8601,
+          oldchd.responsibility,
+        ]
+
+        new = [
+          newerd&.date&.iso8601,
+          newerd&.name,
+          newchd.start_date&.iso8601,
+          newchd.handover_date&.iso8601,
+          newchd.responsibility,
+        ]
+
+        if old != new
           csv.add_row([
                         o.offender_no,
                         prison.code,
+                        o.sentence_start_date,
 
                         (!o.nps_case? && !o.indeterminate_sentence?) ? 'CRC' : 'NPS',
 
-                        o.earliest_release_for_handover.date,
-                        o.earliest_release_for_handover.name,
-                        o.sentence_start_date,
-                        old.start_date&.iso8601,
-                        old.handover_date&.iso8601,
-                        old.responsibility,
-                        newerd.date,
-                        newerd.name,
-                        new.start_date&.iso8601,
-                        new.handover_date&.iso8601,
-                        new.responsibility
+                        *old,
+                        *new,
                       ])
         end
       end
