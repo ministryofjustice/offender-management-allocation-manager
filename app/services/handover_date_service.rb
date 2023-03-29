@@ -84,15 +84,15 @@ class HandoverDateService
       raise "Offender #{mpc_offender.offender_no} falls outside of OMIC policy - cannot calculate handover dates"
     end
 
-    offender = OffenderWrapper.new(mpc_offender)
     earliest_release = Handover::HandoverCalculation.calculate_earliest_release(
-      is_indeterminate: offender.indeterminate_sentence?,
-      tariff_date: offender.tariff_date,
-      parole_review_date: offender.parole_review_date,
-      parole_eligibility_date: offender.parole_eligibility_date,
-      automatic_release_date: offender.automatic_release_date,
-      conditional_release_date: offender.conditional_release_date,
+      is_indeterminate: mpc_offender.indeterminate_sentence?,
+      tariff_date: mpc_offender.tariff_date,
+      parole_review_date: mpc_offender.parole_review_date,
+      parole_eligibility_date: mpc_offender.parole_eligibility_date,
+      automatic_release_date: mpc_offender.automatic_release_date,
+      conditional_release_date: mpc_offender.conditional_release_date,
     )
+    offender = OffenderWrapper.new(mpc_offender, release_date: earliest_release&.date)
 
     if offender.recalled?
       CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
@@ -220,8 +220,9 @@ private
              :determinate_parole?,
              to: :@offender
 
-    def initialize(offender)
+    def initialize(offender, release_date: nil)
       @offender = offender
+      @release_date = release_date
     end
 
     # CRC cases can only have determinate sentences
@@ -251,7 +252,7 @@ private
     end
 
     def release_date
-      earliest_release_for_handover&.date
+      @release_date || earliest_release_for_handover&.date
     end
 
     def open_prison_rules_apply?

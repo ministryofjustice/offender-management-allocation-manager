@@ -780,25 +780,33 @@ describe HandoverDateService do
 
   context 'when April 2023 calculations' do
     let(:mpc_offender) do
-      instance_double MpcOffender, :mpc_offender, offender_no: 'X1111XX', inside_omic_policy?: true
+      instance_double MpcOffender, :mpc_offender,
+                      offender_no: 'X1111XX',
+                      inside_omic_policy?: true,
+                      indeterminate_sentence?: double(:indeterminate_sentence?),
+                      tariff_date: double(:tariff_date),
+                      parole_review_date: double(:parole_review_date),
+                      parole_eligibility_date: double(:parole_eligibility_date),
+                      automatic_release_date: double(:automatic_release_date),
+                      conditional_release_date: double(:conditional_release_date)
     end
     let(:offender_wrapper) do
       instance_double described_class::OffenderWrapper, :offender_wrapper,
                       policy_case?: true, recalled?: false, immigration_case?: false,
                       sentence_start_date: double(:sentence_start_date),
                       early_allocation?: double(:early_allocation?),
-                      indeterminate_sentence?: double(:indeterminate_sentence?),
+                      indeterminate_sentence?: mpc_offender.indeterminate_sentence?,
                       in_open_conditions?: double(:in_open_conditions?),
                       category_active_since: double(:category_active_since),
                       prison_arrival_date: double(:prison_arrival_date),
                       open_prison_rules_apply?: double(:open_prison_rules_apply?),
                       in_womens_prison?: double(:in_womens_prison?),
                       determinate_parole?: double(:determinate_parole?),
-                      tariff_date: double(:tariff_date),
-                      parole_review_date: double(:parole_review_date),
-                      parole_eligibility_date: double(:parole_eligibility_date),
-                      automatic_release_date: double(:automatic_release_date),
-                      conditional_release_date: double(:conditional_release_date)
+                      tariff_date: mpc_offender.tariff_date,
+                      parole_review_date: mpc_offender.parole_review_date,
+                      parole_eligibility_date: mpc_offender.parole_eligibility_date,
+                      automatic_release_date: mpc_offender.automatic_release_date,
+                      conditional_release_date: mpc_offender.conditional_release_date
     end
     let(:handover_date) { double :handover_date }
     let(:handover_start_date) { double :handover_start_date }
@@ -806,7 +814,8 @@ describe HandoverDateService do
     let(:earliest_release) { double(:earliest_release, date: double(:earliest_release_date)) }
 
     before do
-      allow(described_class::OffenderWrapper).to receive(:new).with(mpc_offender).and_return(offender_wrapper)
+      allow(described_class::OffenderWrapper).to receive(:new).with(mpc_offender, release_date: earliest_release.date)
+                                                              .and_return(offender_wrapper)
       allow(Handover::HandoverCalculation)
         .to receive_messages(calculate_earliest_release: earliest_release,
                              calculate_handover_date: [handover_date, 'policy_reason'],
@@ -816,6 +825,8 @@ describe HandoverDateService do
 
     it 'calculates earliest release date correctly' do
       allow(Handover::HandoverCalculation).to receive_messages(calculate_earliest_release: nil)
+      allow(described_class::OffenderWrapper).to receive(:new).with(mpc_offender, release_date: nil)
+                                                              .and_return(offender_wrapper)
       described_class.handover_2(mpc_offender)
       expect(Handover::HandoverCalculation).to have_received(:calculate_earliest_release)
         .with(is_indeterminate: offender_wrapper.indeterminate_sentence?,
@@ -854,6 +865,8 @@ describe HandoverDateService do
 
       it 'calculates no date and COM responsible when no release date' do
         allow(Handover::HandoverCalculation).to receive_messages(calculate_earliest_release: nil)
+        allow(described_class::OffenderWrapper).to receive(:new).with(mpc_offender, release_date: nil)
+                                                                .and_return(offender_wrapper)
 
         expect(described_class.handover_2(mpc_offender).attributes)
           .to include({ 'responsibility' => CalculatedHandoverDate::CUSTODY_ONLY,
