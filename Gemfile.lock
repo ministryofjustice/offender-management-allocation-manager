@@ -584,7 +584,7 @@ GEM
       rainbow (>= 2.1, < 4.0)
       rugged (>= 0.27, < 1.6)
     unicode-display_width (2.3.0)
-    uri (0.12.0)
+    uri (0.12.1)
     valid_email2 (4.0.5)
       activemodel (>= 3.2)
       mail (~> 2.5)
