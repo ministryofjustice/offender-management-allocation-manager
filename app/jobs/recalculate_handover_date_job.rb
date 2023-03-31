@@ -66,7 +66,11 @@ private
   end
 
   def request_supporting_com(record, offender, nomis_offender)
-    reason_change = %w[nps_indeterminate nps_indeterminate_open]
+    reason_change = if USE_APR_2023_HANDOVER_POLICY_CALCULATIONS
+                      %w[indeterminate indeterminate_open]
+                    else
+                      %w[nps_indeterminate nps_indeterminate_open]
+                    end
     responsibility_change = [CalculatedHandoverDate::CUSTODY_ONLY, CalculatedHandoverDate::CUSTODY_WITH_COM]
 
     if record.saved_change_to_reason == reason_change &&
