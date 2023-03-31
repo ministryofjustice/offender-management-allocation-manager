@@ -22,7 +22,15 @@ class HandoverDateService
                                                 start_date: nil, handover_date: nil,
                                                 reason: :com_responsibility
 
-  def self.handover(raw_offender)
+  def self.handover(mpc_offender)
+    if USE_APR_2023_HANDOVER_POLICY_CALCULATIONS
+      handover_2(mpc_offender)
+    else
+      handover_1(mpc_offender)
+    end
+  end
+
+  def self.handover_1(raw_offender)
     unless raw_offender.inside_omic_policy?
       raise "Offender #{raw_offender.offender_no} falls outside of OMIC policy - cannot calculate handover dates"
     end
