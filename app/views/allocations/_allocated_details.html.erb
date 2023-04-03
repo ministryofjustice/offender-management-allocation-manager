@@ -20,14 +20,14 @@
     <li class="govuk-!-margin-top-4">MAPPA: <%= mappa_level %></li>
   <% end %>
 
-  <% unless [high_rosh_children, high_rosh_public, high_rosh_known_adult, high_rosh_staff, high_rosh_prisoners].compact.empty? %>
+  <% if rosh[:status] == :found %>
     <li class="govuk-!-margin-top-4">High RoSH:
       <ul class="govuk-list govuk-list--bullet">
-        <li>Children - <%= high_rosh_children %></li>
-        <li>Public - <%= high_rosh_public %></li>
-        <li>Known adult - <%= high_rosh_known_adult %></li>
-        <li>Staff - <%= high_rosh_staff %></li>
-        <li>Prisoners - <%= high_rosh_prisoners %></li>
+        <li>Children - <%= rosh[:custody][:children] %></li>
+        <li>Public - <%= rosh[:custody][:public] %></li>
+        <li>Known adult - <%= rosh[:custody][:known_adult] %></li>
+        <li>Staff - <%= rosh[:custody][:staff] %></li>
+        <li>Prisoners - <%= rosh[:custody][:prisoners] %></li>
       </ul>
     </li>
   <% end %>

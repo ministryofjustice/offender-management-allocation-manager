@@ -119,8 +119,9 @@ module OffenderHelper
       handover_completion_date: (view_context.format_date(offender.responsibility_handover_date).presence || 'Unknown'),
       last_oasys_completed: (view_context.format_date(last_oasys_completed(offender.offender_no)).presence || 'No OASys information'),
       active_alerts: offender.active_alert_labels.join(', '),
-      additional_notes: nil
-    }.merge(offender.rosh_summary)
+      additional_notes: nil,
+      rosh: offender.rosh_summary
+    }
   end
 
   def last_oasys_completed(offender_no)

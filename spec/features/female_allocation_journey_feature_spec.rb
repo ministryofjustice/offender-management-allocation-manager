@@ -34,6 +34,7 @@ feature "womens allocation journey" do
 
     stub_request(:get, "https://www.gov.uk/bank-holidays.json").to_return(body: {}.to_json)
     stub_community_offender(nomis_offender_id, build(:community_data))
+    allow_any_instance_of(MpcOffender).to receive(:rosh_summary).and_return({ status: :missing })
   end
 
   context 'without an existing allocation' do
