@@ -69,15 +69,17 @@ module Handover::HandoverCalculation
       if is_indeterminate
         if tariff_date && tariff_date > today
           NamedDate[tariff_date, 'TED']
-        elsif parole_review_date && parole_review_date > today
-          NamedDate[parole_review_date, 'PRD']
+        else
+          ped = NamedDate[parole_eligibility_date, 'PED']
+          prd = NamedDate[parole_review_date, 'PRD']
+          [ped, prd].keep_if { |d| d && d.date > today }.min
         end
       elsif parole_eligibility_date
         NamedDate[parole_eligibility_date, 'PED']
       else
         crd = NamedDate[conditional_release_date, 'CRD']
         ard = NamedDate[automatic_release_date, 'ARD']
-        [crd, ard].compact.min
+        [ard, crd].compact.min
       end
     end
 
