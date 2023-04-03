@@ -353,11 +353,6 @@ RSpec.describe Handover::HandoverCalculation do
             expect(described_class.calculate_earliest_release(**args))
               .to eq NamedDate[args[:parole_eligibility_date], 'PED']
 
-            args[:parole_review_date] = today + 1
-            args[:parole_eligibility_date] = today + 1
-            expect(described_class.calculate_earliest_release(**args))
-              .to eq NamedDate[args[:parole_eligibility_date], 'PED']
-
             args[:parole_review_date] = nil
             args[:parole_eligibility_date] = today + 1
             expect(described_class.calculate_earliest_release(**args))
@@ -378,6 +373,13 @@ RSpec.describe Handover::HandoverCalculation do
             expect(described_class.calculate_earliest_release(**args))
               .to eq NamedDate[args[:parole_review_date], 'PRD']
           end
+        end
+
+        example 'earliest release is parole review date if it is on qualified and same as parole eligibility date' do
+          args[:parole_review_date] = today + 1
+          args[:parole_eligibility_date] = today + 1
+          expect(described_class.calculate_earliest_release(**args))
+            .to eq NamedDate[args[:parole_eligibility_date], 'PRD']
         end
       end
     end

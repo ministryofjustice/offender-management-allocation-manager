@@ -72,7 +72,7 @@ module Handover::HandoverCalculation
         else
           ped = NamedDate[parole_eligibility_date, 'PED']
           prd = NamedDate[parole_review_date, 'PRD']
-          [ped, prd].keep_if { |d| d && d.date > today }.min
+          [prd, ped].keep_if { |d| d && d.date > today }.min
         end
       elsif parole_eligibility_date
         NamedDate[parole_eligibility_date, 'PED']
