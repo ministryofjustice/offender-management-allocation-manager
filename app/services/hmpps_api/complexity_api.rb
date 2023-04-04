@@ -42,7 +42,12 @@ module HmppsApi
 
       def inactivate(offender_no)
         route = "/complexity-of-need/offender-no/#{offender_no}/inactivate"
-        client.put route, cache: false
+
+        begin
+          client.put route, cache: false
+        rescue Faraday::ResourceNotFound
+          nil
+        end
       end
 
     private
