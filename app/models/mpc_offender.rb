@@ -204,6 +204,10 @@ class MpcOffender
     end
   end
 
+  def mappa_details
+    OffenderService.get_mappa_details(crn)
+  end
+
   def rosh_summary
     return { status: :unable } if probation_record.blank?
     return { status: :unable } if crn.blank?
@@ -233,7 +237,7 @@ class MpcOffender
     end
 
     {
-      status: :found,
+      status: 'found',
       overall: risks['overallRiskLevel'].upcase,
       last_updated: Date.parse(risks['assessedOn']),
       custody: {

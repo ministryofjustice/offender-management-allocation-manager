@@ -194,7 +194,7 @@ RSpec.describe MpcOffender, type: :model do
       it 'returns correct level for each risk' do
         expect(subject.rosh_summary).to eq(
           {
-            status: :found,
+            status: 'found',
             overall: 'HIGH',
             last_updated: Date.new(2022, 7, 5),
             custody: {

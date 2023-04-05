@@ -111,7 +111,7 @@ module OffenderHelper
                 else
                   (offender.com_responsible? ? 'Supporting' : '')
                 end,
-      mappa_level: offender.mappa_level,
+      mappa_details: offender.mappa_details,
       ldu_name: (offender.ldu_name.presence || 'Unknown'),
       ldu_email: (offender.ldu_email_address.presence || 'Unknown'),
       com_name: (view_context.unreverse_name(offender.allocated_com_name).presence || 'Unknown'),
