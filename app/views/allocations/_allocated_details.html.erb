@@ -16,23 +16,6 @@
 
   <li>POM role: <%= pom_role %></li>
 
-  <li class="govuk-!-margin-top-4">MAPPA: <%= mappa_details[:short_description] %></li>
-
-  <% if rosh[:status] == 'found' %>
-    <li class="govuk-!-margin-top-4"><%= rosh[:overall] %> RoSH:
-      <% %i[custody community].each do |area| %>
-        <p><%= area.to_s.capitalize %>:</p>
-        <ul class="govuk-list govuk-list--bullet">
-          <li>Children - <%= rosh[area][:children] %></li>
-          <li>Public - <%= rosh[area][:public] %></li>
-          <li>Known adult - <%= rosh[area][:known_adult] %></li>
-          <li>Staff - <%= rosh[area][:staff] %></li>
-          <li>Prisoners - <%= rosh[area][:prisoners] || 'N/A' %></li>
-        </ul>
-      <% end %>
-    </li>
-  <% end %>
-
   <li class="govuk-!-margin-top-4">Active alerts: <%= active_alerts %></li>
 
   <li class="govuk-!-margin-top-4">Last OASys completed: <%= last_oasys_completed %></li>

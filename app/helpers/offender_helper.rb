@@ -111,7 +111,6 @@ module OffenderHelper
                 else
                   (offender.com_responsible? ? 'Supporting' : '')
                 end,
-      mappa_details: offender.mappa_details,
       ldu_name: (offender.ldu_name.presence || 'Unknown'),
       ldu_email: (offender.ldu_email_address.presence || 'Unknown'),
       com_name: (view_context.unreverse_name(offender.allocated_com_name).presence || 'Unknown'),
@@ -119,8 +118,7 @@ module OffenderHelper
       handover_completion_date: (view_context.format_date(offender.responsibility_handover_date).presence || 'Unknown'),
       last_oasys_completed: (view_context.format_date(last_oasys_completed(offender.offender_no)).presence || 'No OASys information'),
       active_alerts: offender.active_alert_labels.join(', '),
-      additional_notes: nil,
-      rosh: offender.rosh_summary
+      additional_notes: nil
     }
   end
 

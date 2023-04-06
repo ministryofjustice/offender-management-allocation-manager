@@ -141,9 +141,7 @@ RSpec.describe OffenderHelper do
 
     before do
       allow(helper).to receive(:last_oasys_completed).and_return(last_oasys_completed)
-      allow(offender).to receive(:rosh_summary).and_return({})
       allow(offender).to receive(:active_alert_labels).and_return(%w[bish bosh bash])
-      allow(offender).to receive(:mappa_details).and_return({ short_description: 'CAT 1/LEVEL 2' })
     end
 
     context 'when no last completed OASys' do
