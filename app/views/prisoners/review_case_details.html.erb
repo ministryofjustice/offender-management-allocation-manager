@@ -91,15 +91,17 @@
               <td class="govuk-table__cell govuk-!-width-one-third"><%= format_earliest_release_date(@prisoner.earliest_release) %></td>
               <td class="govuk-table__cell govuk-!-width-one-third"></td>
             </tr>
-            <tr class="govuk-table__row">
-              <th scope="row" class="govuk-table__header govuk-!-width-one-third">Handover type</th>
-              <td class="govuk-table__cell govuk-!-width-one-third">
-                <%= service_provider_label(@prisoner.case_allocation) %>
-              </td>
-              <td class="govuk-table__cell govuk-!-width-one-third">
-                <%= link_to 'Change', edit_prison_case_information_path(@prison.code, @prisoner.offender_no), class: 'govuk-link govuk-link--no-visited-state' if @prisoner.manual_entry? %>
-              </td>
-            </tr>
+            <% if USE_APR_2023_HANDOVER_POLICY_CHANGES %>
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header govuk-!-width-one-third">Handover type</th>
+                <td class="govuk-table__cell govuk-!-width-one-third">
+                  <%= service_provider_label(@prisoner.case_allocation) %>
+                </td>
+                <td class="govuk-table__cell govuk-!-width-one-third">
+                  <%= link_to 'Change', edit_prison_case_information_path(@prison.code, @prisoner.offender_no), class: 'govuk-link govuk-link--no-visited-state' if @prisoner.manual_entry? %>
+                </td>
+              </tr>
+            <% end %>
             <tr class="govuk-table__row">
               <th scope="row" class="govuk-table__header govuk-!-width-one-third">Location</th>
               <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.location %></td>
@@ -436,6 +438,17 @@
               </tr>
             </thead>
             <tbody class="govuk-table__body">
+              <% unless USE_APR_2023_HANDOVER_POLICY_CHANGES %>
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell govuk-!-width-one-third">Service provider</td>
+                  <td class="govuk-table__cell govuk-!-width-one-third">
+                    <%= service_provider_label(@prisoner.case_allocation) %>
+                  </td>
+                  <td class="govuk-table__cell govuk-!-width-one-third">
+                    <%= link_to 'Change', edit_prison_case_information_path(@prison.code, @prisoner.offender_no), class: 'govuk-link govuk-link--no-visited-state' if @prisoner.manual_entry? %>
+                  </td>
+                </tr>
+              <% end %>
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">Last known address in Wales?</td>
                 <td class="govuk-table__cell govuk-!-width-one-third">

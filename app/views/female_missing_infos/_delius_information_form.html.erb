@@ -21,7 +21,7 @@
        OpenStruct.new(name: t(:crc), value: 'CRC')],
       :value,
       :name,
-      legend: { text: "Select the handover type" }
+      legend: { text: USE_APR_2023_HANDOVER_POLICY_CHANGES ? "Select the handover type" : "Select the service provider" }
       ) %>
   <%= form.govuk_collection_radio_buttons(
       :tier,

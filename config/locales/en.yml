@@ -41,9 +41,6 @@ en:
   9th: Ninth
   10th: Tenth
 
-  nps: Enhanced
-  crc: Standard
-
   equip_url: 'https://equip-portal.equip.service.justice.gov.uk/'
 
   activemodel:
