@@ -1,10 +1,10 @@
-<span id="prisoner-case-type" class="moj-badge moj-badge--<%= badge_colour(offender) %>"><%= badge_text(offender) %></span>
+<span id="prisoner-case-type" class="govuk-tag govuk-tag--<%= badge_colour(offender) %>"><%= badge_text(offender) %></span>
 <%= render('shared/badges/recall_badge') if offender.recalled? %>
 <%= render('shared/badges/parole_badge') if badge_for_parole?(offender) %>
 
 <% status = offender.early_allocation_state %>
 <% if EarlyAllocationHelper::EARLY_ALLOCATION_STATUSES.key?(status) %>
-  <span id="early-allocation-badge" class="moj-badge moj-badge--blue">
+  <span id="early-allocation-badge" class="govuk-tag govuk-tag--blue">
     EARLY ALLOCATION <%= EarlyAllocationHelper::EARLY_ALLOCATION_STATUSES.fetch(status) %>
   </span>
 <% end %>
