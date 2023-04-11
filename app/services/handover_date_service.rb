@@ -23,7 +23,7 @@ class HandoverDateService
                                                 reason: :com_responsibility
 
   def self.handover(mpc_offender)
-    if USE_APR_2023_HANDOVER_POLICY_CALCULATIONS
+    if USE_APR_2023_HANDOVER_POLICY_CHANGES
       handover_2(mpc_offender)
     else
       handover_1(mpc_offender)

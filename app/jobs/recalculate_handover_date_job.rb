@@ -66,7 +66,7 @@ private
   end
 
   def request_supporting_com(record, offender, nomis_offender)
-    reason_change = if USE_APR_2023_HANDOVER_POLICY_CALCULATIONS
+    reason_change = if USE_APR_2023_HANDOVER_POLICY_CHANGES
                       %w[indeterminate indeterminate_open]
                     else
                       %w[nps_indeterminate nps_indeterminate_open]
