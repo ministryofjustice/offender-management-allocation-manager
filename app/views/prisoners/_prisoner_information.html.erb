@@ -24,6 +24,12 @@
         <span class="handover-reason">(<%= probation_field(@prisoner, :handover_reason) %>)</span>
       </td>
     </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-width-one-half">Handover type</td>
+      <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
+        <%= service_provider_label(probation_field(@prisoner, :case_allocation)) %>
+      </td>
+    </tr>
     <% if @prisoner.probation_record.present? && @prisoner.nps_case? %>
     <tr id="early_allocation" class="govuk-table__row">
       <td class="govuk-table__cell">Early allocation referral</td>
@@ -41,12 +47,6 @@
       <td class="govuk-table__cell govuk-!-width-one-half">Last known address in Wales</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
         <%= humanized_bool(@prisoner.welsh_offender) if @prisoner.probation_record.present? %>
-      </td>
-    </tr>
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell govuk-!-width-one-half">Handover type</td>
-      <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-        <%= service_provider_label(probation_field(@prisoner, :case_allocation)) %>
       </td>
     </tr>
     <tr class="govuk-table__row">
