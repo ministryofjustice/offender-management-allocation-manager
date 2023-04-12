@@ -3,39 +3,39 @@
              builder: GOVUKDesignSystemFormBuilder::FormBuilder,
              method: method) do |form| %>
   <%= form.govuk_error_summary %>
-    <%= form.hidden_field(:nomis_offender_id) %>
-    <%= hidden_field_tag("sort", params[:sort])%>
-    <%= hidden_field_tag("page", params[:page]) %>
+  <%= form.hidden_field(:nomis_offender_id) %>
+  <%= hidden_field_tag("sort", params[:sort]) %>
+  <%= hidden_field_tag("page", params[:page]) %>
 
-    <%= form.govuk_collection_radio_buttons(
-          :probation_service,
-          [OpenStruct.new(name: 'Yes', value: 'Wales'), OpenStruct.new(name: 'No', value: 'England')],
-          :value,
-          :name,
-          legend: { text: "Was this prisoner's last known address in Wales?" }
+  <%= form.govuk_collection_radio_buttons(
+        :probation_service,
+        [OpenStruct.new(name: 'Yes', value: 'Wales'), OpenStruct.new(name: 'No', value: 'England')],
+        :value,
+        :name,
+        legend: { text: "Was this prisoner's last known address in Wales?" }
       ) %>
 
   <%= form.govuk_collection_radio_buttons(
-          :case_allocation,
-          [OpenStruct.new(name: t(:nps), value: 'NPS'),
-           OpenStruct.new(name: t(:crc), value: 'CRC')],
-          :value,
-          :name,
-          legend: { text: USE_APR_2023_HANDOVER_POLICY_CHANGES ? "What is the handover type for this case?" : "Who is the service provider for this case?" }
+        :case_allocation,
+        [OpenStruct.new(name: t(:nps), value: 'NPS'),
+         OpenStruct.new(name: t(:crc), value: 'CRC')],
+        :value,
+        :name,
+        legend: { text: USE_APR_2023_HANDOVER_POLICY_CHANGES ? "What is the handover type for this case?" : "Who is the service provider for this case?" }
       ) %>
 
   <%= form.govuk_collection_radio_buttons(
-          :tier,
-          [OpenStruct.new(name: 'A', value: 'A'),
-           OpenStruct.new(name: 'B', value: 'B'),
-           OpenStruct.new(name: 'C', value: 'C'),
-           OpenStruct.new(name: 'D', value: 'D')],
-          :value,
-          :name,
-          legend: { text: "What tier has the prisoner been assigned to?" }
+        :tier,
+        [OpenStruct.new(name: 'A', value: 'A'),
+         OpenStruct.new(name: 'B', value: 'B'),
+         OpenStruct.new(name: 'C', value: 'C'),
+         OpenStruct.new(name: 'D', value: 'D')],
+        :value,
+        :name,
+        legend: { text: "What tier has the prisoner been assigned to?" }
       ) %>
 
-  <% buttons.each do  |button| %>
+  <% buttons.each do |button| %>
     <%= form.submit button.fetch(:text), role: "button", draggable: "false", class: "govuk-button govuk-!-margin-top-4 #{button.fetch(:class)}" %>
   <% end %>
 
