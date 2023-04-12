@@ -15,14 +15,26 @@
         legend: { text: "Was this prisoner's last known address in Wales?" }
       ) %>
 
-  <%= form.govuk_collection_radio_buttons(
-        :case_allocation,
-        [OpenStruct.new(name: t(:nps), value: 'NPS'),
-         OpenStruct.new(name: t(:crc), value: 'CRC')],
-        :value,
-        :name,
-        legend: { text: USE_APR_2023_HANDOVER_POLICY_CHANGES ? "What is the handover type for this case?" : "Who is the service provider for this case?" }
-      ) %>
+  <% if USE_APR_2023_HANDOVER_POLICY_CHANGES %>
+    <%= form.govuk_collection_radio_buttons(
+          :case_allocation,
+          [OpenStruct.new(name: t('.case_allocation.resourcing.enhanced'), value: 'NPS'),
+           OpenStruct.new(name: t('.case_allocation.resourcing.normal'), value: 'CRC')],
+          :value,
+          :name,
+          legend: { text: t('.case_allocation.legend') },
+          hint: { text: t('.case_allocation.hint') },
+        ) %>
+  <% else %>
+    <%= form.govuk_collection_radio_buttons(
+          :case_allocation,
+          [OpenStruct.new(name: t(:nps), value: 'NPS'),
+           OpenStruct.new(name: t(:crc), value: 'CRC')],
+          :value,
+          :name,
+          legend: { text: 'Who is the service provider for this case?' }
+        ) %>
+  <% end %>
 
   <%= form.govuk_collection_radio_buttons(
         :tier,

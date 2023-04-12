@@ -194,3 +194,14 @@ en:
         sent_handover_report: 'Send handover report'
     email_preferences:
       success_notice: 'You have successfully updated your email preferences.'
+
+  case_information:
+    form:
+      case_allocation:
+        resourcing:
+          enhanced: 'Retained/Enhanced Resourcing'
+          normal: 'Allocated/Normal Resourcing'
+        legend: 'What case allocation decision has been made for this prisoner?'
+        hint: |
+          You can find this on NDelius by opening someone’s most recent event and then choosing case allocation
+          from the menu on the left. This determines what kind of handover this prisoner needs.
