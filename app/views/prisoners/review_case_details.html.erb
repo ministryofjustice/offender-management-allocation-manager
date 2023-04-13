@@ -40,10 +40,9 @@
       </div>
       <div class="govuk-notification-banner__content">
         <p class="govuk-notification-banner__heading"></p>
-        <p style="margin-bottom: -40px; margin-top:-5px">
-          <strong class="govuk-tag govuk-tag--blue govuk-!-margin-bottom-7">
-            <%= sentence_type_label(@prisoner) %>
-          </strong>
+        <p class="govuk-!-margin-bottom-0">
+          <span class="govuk-tag govuk-tag--blue"><%= sentence_type_label(@prisoner) %></span>
+          <%= vlo_tag(@prisoner) %>
         </p>
 
         <table class="govuk-table">

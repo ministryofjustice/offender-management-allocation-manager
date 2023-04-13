@@ -61,7 +61,8 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
                  team_name: team_name,
                  com_name: "TestSurname, TestForename",
                  com_email: "test-email@example.org",
-                 tier: "A")
+                 tier: "A",
+                 active_vlo: false)
     end
   end
 

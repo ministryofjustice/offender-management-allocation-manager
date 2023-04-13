@@ -48,6 +48,12 @@ module ApplicationHelper
     'Determinate'
   end
 
+  def vlo_tag(offender)
+    return '' unless offender.active_vlo?
+
+    tag.span('VLO CONTACT', class: 'govuk-tag govuk-tag--red')
+  end
+
   def humanized_bool(bool_value)
     bool_value ? 'Yes' : 'No'
   end
