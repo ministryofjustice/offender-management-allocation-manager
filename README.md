@@ -103,7 +103,7 @@ git push --force origin HEAD:test
 git push --force origin HEAD:test2
 
 # Preprod environment
-git push --force origin HEAD:preproduction
+git push --force origin HEAD:preprod
 ```
 
 ## Environment Variables
