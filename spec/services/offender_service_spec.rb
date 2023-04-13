@@ -86,7 +86,8 @@ describe OffenderService, type: :feature do
                    offender_manager: "TestUpdate01Surname, TestUpdate01Forname",
                    service_provider: "NPS",
                    team_name: "OMU A",
-                   tier: "B-2")
+                   tier: "B-2",
+                   active_vlo: false)
       end
     end
 
@@ -199,9 +200,15 @@ describe OffenderService, type: :feature do
 
           it 'gets some data' do
             expect(described_class.get_community_data(nomis_offender_id))
-                .to eq(noms_no: nomis_offender_id, tier: 'A', crn: 'X5657657',
-                       offender_manager: nil, service_provider: 'NPS', mappa_levels: [],
-                       team_name: 'Thing', ldu_code: 'LDU123')
+                .to eq(noms_no: nomis_offender_id,
+                       tier: 'A',
+                       crn: 'X5657657',
+                       offender_manager: nil,
+                       service_provider: 'NPS',
+                       mappa_levels: [],
+                       team_name: 'Thing',
+                       ldu_code: 'LDU123',
+                       active_vlo: false)
           end
         end
 
@@ -220,6 +227,46 @@ describe OffenderService, type: :feature do
           it 'gets mappa_levels' do
             expect(described_class.get_community_data(nomis_offender_id).fetch(:mappa_levels))
                 .to eq([2])
+          end
+        end
+      end
+
+      context 'with VLO data' do
+        before do
+          stub_community_offender(nomis_offender_id, community_data, registrations)
+        end
+
+        let(:community_data) { build(:community_data, enhancedResourcing: true) }
+
+        context 'with inactive registrations' do
+          let(:registrations) do
+            [
+              build(:community_registration, :type_invi, active: false),
+              build(:community_registration, :type_daso, active: false)
+            ]
+          end
+
+          it 'deems no active VLO' do
+            expect(described_class.get_community_data(nomis_offender_id).fetch(:active_vlo))
+                .to eq(false)
+          end
+        end
+
+        context 'with an active INVI registration' do
+          let(:registrations) { [build(:community_registration, :type_invi)] }
+
+          it 'deems an active VLO' do
+            expect(described_class.get_community_data(nomis_offender_id).fetch(:active_vlo))
+                .to eq(true)
+          end
+        end
+
+        context 'with an active DASO registration' do
+          let(:registrations) { [build(:community_registration, :type_daso)] }
+
+          it 'deems an active VLO' do
+            expect(described_class.get_community_data(nomis_offender_id).fetch(:active_vlo))
+                .to eq(true)
           end
         end
       end

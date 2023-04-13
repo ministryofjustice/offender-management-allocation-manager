@@ -39,11 +39,11 @@ class OffenderService
 
     def get_community_data(nomis_offender_id)
       community_info = HmppsApi::CommunityApi.get_offender(nomis_offender_id).deep_symbolize_keys
-      mappa_registrations = HmppsApi::CommunityApi.get_offender_registrations(nomis_offender_id).deep_symbolize_keys
-                              .fetch(:registrations, [])
-                              .select do |r|
-                                r.fetch(:active) && r.key?(:registerLevel) && r.dig(:registerLevel, :code).starts_with?('M')
-                              end
+      registrations = HmppsApi::CommunityApi.get_offender_registrations(nomis_offender_id).deep_symbolize_keys.fetch(:registrations, [])
+
+      mappa_registrations = registrations.select do |r|
+        r.fetch(:active) && r.key?(:registerLevel) && r.dig(:registerLevel, :code).starts_with?('M')
+      end
 
       is_nps = begin
         HmppsApi::CommunityApi.get_latest_resourcing(nomis_offender_id)
@@ -53,6 +53,7 @@ class OffenderService
       end
 
       com = community_info.fetch(:offenderManagers).detect { |om| om.fetch(:active) }
+
       {
         noms_no: nomis_offender_id,
         tier: community_info.fetch(:currentTier),
@@ -61,7 +62,8 @@ class OffenderService
         offender_manager: com.dig(:staff, :unallocated) ? nil : "#{com.dig(:staff, :surname)}, #{com.dig(:staff, :forenames)}",
         team_name: com.dig(:team, :description),
         ldu_code: com.dig(:team, :localDeliveryUnit, :code),
-        mappa_levels: mappa_registrations.map { |r| r.dig(:registerLevel, :code).last.to_i }
+        mappa_levels: mappa_registrations.map { |r| r.dig(:registerLevel, :code).last.to_i },
+        active_vlo: registrations.any? { |r| r.fetch(:active) && %w[INVI DASO].include?(r.dig(:type, :code)) }
       }
     end
 

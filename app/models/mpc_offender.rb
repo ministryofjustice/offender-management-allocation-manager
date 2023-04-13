@@ -17,6 +17,8 @@ class MpcOffender
            :tier,
            :mappa_level, :welsh_offender, to: :probation_record
 
+  delegate :active_vlo?, to: :probation_record, allow_nil: true
+
   delegate :victim_liaison_officers, :handover_progress_task_completion_data, :handover_progress_complete?,
            to: :@offender
 
