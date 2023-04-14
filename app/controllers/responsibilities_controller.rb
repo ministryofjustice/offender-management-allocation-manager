@@ -77,7 +77,7 @@ class ResponsibilitiesController < PrisonsApplicationController
                                                        prison_name: @prison.name,
                                                        notes: @responsibility.reason_text).deliver_later
       end
-      redirect_to referrer
+      redirect_to prison_prisoner_allocation_path(@prison.code, @responsibility.nomis_offender_id)
     else
       render :confirm_removal
     end
