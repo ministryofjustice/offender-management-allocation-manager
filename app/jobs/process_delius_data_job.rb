@@ -76,7 +76,8 @@ private
         team_name: delius_com_info.fetch(:team_name),
         case_allocation: delius_record.service_provider,
         probation_service: map_probation_service(ldu_code),
-        mappa_level: map_mappa_level(delius_record.mappa_levels)
+        mappa_level: map_mappa_level(delius_record.mappa_levels),
+        active_vlo: delius_record.active_vlo
       )
     end
   end

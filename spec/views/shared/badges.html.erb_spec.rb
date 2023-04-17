@@ -45,7 +45,7 @@ RSpec.describe "shared/badges", type: :view do
     end
 
     it "displays a recall case type badge and a indeterminate badge" do
-      expect(case_type_badge.first.attributes['class'].value).to include 'moj-badge--purple'
+      expect(case_type_badge.first.attributes['class'].value).to include 'govuk-tag--purple'
       expect(case_type_badge.text).to include 'Indeterminate'
       assert_you_have_a_recall_badge
     end
@@ -130,22 +130,22 @@ RSpec.describe "shared/badges", type: :view do
   end
 
   def assert_you_have_a_parole_eligibility_badge
-    expect(parole_badge.first.attributes['class'].value).to include 'moj-badge--grey'
+    expect(parole_badge.first.attributes['class'].value).to include 'govuk-tag--grey'
     expect(parole_badge.text).to include 'Parole eligible'
   end
 
   def assert_you_have_a_determinate_badge
-    expect(case_type_badge.first.attributes['class'].value).to include 'moj-badge--blue'
+    expect(case_type_badge.first.attributes['class'].value).to include 'govuk-tag--blue'
     expect(case_type_badge.text).to include 'Determinate'
   end
 
   def assert_you_have_a_recall_badge
-    expect(recall_badge.first.attributes['class'].value).to include 'moj-badge--grey'
+    expect(recall_badge.first.attributes['class'].value).to include 'govuk-tag--grey'
     expect(recall_badge.text).to include 'Recall'
   end
 
   def assert_you_have_an_indeterminate_badge
-    expect(case_type_badge.first.attributes['class'].value).to include 'moj-badge--purple'
+    expect(case_type_badge.first.attributes['class'].value).to include 'govuk-tag--purple'
     expect(case_type_badge.text).to include 'Indeterminate'
   end
 end

@@ -40,6 +40,18 @@ FactoryBot.define do
         }
       }
     end
+
+    trait :type_invi do
+      type {
+        { code: 'INVI' }
+      }
+    end
+
+    trait :type_daso do
+      type {
+        { code: 'DASO' }
+      }
+    end
   end
 
   factory :community_all_offender_managers_datum, class: Hash do
