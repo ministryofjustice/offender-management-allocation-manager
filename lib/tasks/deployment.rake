@@ -4,6 +4,21 @@ namespace :deployment do
     header = File.read('deploy/templates/do_not_edit_header.txt')
     template = File.read('deploy/templates/cron_job_template.yaml.erb')
     [
+      # Staging
+      [
+        'staging',
+        'recalculate-handover-dates',
+        '6 30 * * *',
+        'bundle exec rake recalculate_handover_dates',
+      ],
+      [
+        'staging',
+        'integration-test-cleanup',
+        '6 30 * * *',
+        'bundle exec rake integration_tests:clean_up',
+      ],
+
+      # Production
       [
         'production',
         'handover-reminders-job',
