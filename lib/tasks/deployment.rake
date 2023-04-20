@@ -18,6 +18,26 @@ namespace :deployment do
         'bundle exec rake integration_tests:clean_up',
       ],
 
+      # Preprod
+      [
+        'preprod',
+        'community-api-import',
+        '6 30 * * *',
+        'bundle exec rake community_api:import',
+      ],
+      [
+        'preprod',
+        'early-allocation-events',
+        '7 0 * * *',
+        'bundle exec rake trigger:early_allocation_events',
+      ],
+      [
+        'preprod',
+        'process-movements',
+        '7 30 * * *',
+        'bundle exec rake movements:process',
+      ],
+
       # Production
       [
         'production',

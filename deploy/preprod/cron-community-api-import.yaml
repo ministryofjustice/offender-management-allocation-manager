@@ -1,12 +1,18 @@
+######### DO NOT EDIT #########
+# This file is generated from a template in deploy/templates/ by the rake tasks in lib/tasks/deployment.rake
+# Any changes will be overwritten by that cron job!
+#
+# Do remember to check in generated files. Have a nice day.
+
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: community-api-import
 spec:
-  schedule: "00 06 * * *"
+  schedule: "6 30 * * *"
   concurrencyPolicy: Replace
   successfulJobsHistoryLimit: 3
-  failedJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
       ttlSecondsAfterFinished: 3600
@@ -16,14 +22,14 @@ spec:
             - name: community-api-import
               image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
               imagePullPolicy: Always
-              command: ['sh', '-c', "bundle exec rake community_api:import"]
+              command: ["sh", "-c", "bundle exec rake community_api:import"]
               resources:
                 limits:
                   memory: "1500Mi"
                   cpu: "1000m"
                 requests:
                   memory: "500Mi"
-                  cpu: "50m"
+                  cpu: "100m"
               envFrom:
                 - configMapRef:
                     name: shared-environment
