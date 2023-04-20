@@ -1,9 +1,15 @@
+######### DO NOT EDIT #########
+# This file is generated from a template in deploy/templates/ by the rake tasks in lib/tasks/deployment.rake
+# Any changes will be overwritten by that cron job!
+#
+# Do remember to check in generated files. Have a nice day.
+
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: recalculate-handover-dates
 spec:
-  schedule: "0 3 * * *"
+  schedule: "6 30 * * *"
   concurrencyPolicy: Replace
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
@@ -16,7 +22,7 @@ spec:
             - name: recalculate-handover-dates
               image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
               imagePullPolicy: Always
-              command: ['sh', '-c', "bundle exec rake recalculate_handover_dates"]
+              command: ["sh", "-c", "bundle exec rake recalculate_handover_dates"]
               resources:
                 limits:
                   memory: "1500Mi"
