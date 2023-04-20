@@ -8,13 +8,13 @@ namespace :deployment do
       [
         'staging',
         'recalculate-handover-dates',
-        '6 30 * * *',
+        '30 6 * * *',
         'bundle exec rake recalculate_handover_dates',
       ],
       [
         'staging',
         'integration-test-cleanup',
-        '6 30 * * *',
+        '30 6 * * *',
         'bundle exec rake integration_tests:clean_up',
       ],
 
@@ -22,19 +22,19 @@ namespace :deployment do
       [
         'preprod',
         'community-api-import',
-        '6 30 * * *',
+        '30 6 * * *',
         'bundle exec rake community_api:import',
       ],
       [
         'preprod',
         'early-allocation-events',
-        '7 0 * * *',
+        '0 7 * * *',
         'bundle exec rake trigger:early_allocation_events',
       ],
       [
         'preprod',
         'process-movements',
-        '7 30 * * *',
+        '30 7 * * *',
         'bundle exec rake movements:process',
       ],
 

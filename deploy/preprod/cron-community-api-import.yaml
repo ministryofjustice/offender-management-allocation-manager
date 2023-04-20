@@ -9,7 +9,7 @@ kind: CronJob
 metadata:
   name: community-api-import
 spec:
-  schedule: "6 30 * * *"
+  schedule: "30 6 * * *"
   concurrencyPolicy: Replace
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
