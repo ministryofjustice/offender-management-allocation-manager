@@ -9,7 +9,7 @@ kind: CronJob
 metadata:
   name: early-allocation-events
 spec:
-  schedule: "7 0 * * *"
+  schedule: "0 7 * * *"
   concurrencyPolicy: Replace
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3

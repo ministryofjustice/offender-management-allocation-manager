@@ -9,7 +9,7 @@ kind: CronJob
 metadata:
   name: process-movements
 spec:
-  schedule: "7 30 * * *"
+  schedule: "30 7 * * *"
   concurrencyPolicy: Replace
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
