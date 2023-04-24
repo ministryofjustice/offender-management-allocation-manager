@@ -41,6 +41,9 @@ def output_row(file, prison_code, o)
 
                     o.nps_case? ? 'NPS' : 'CRC',
 
+                    o.ldu_name,
+                    o.ldu_email_address,
+
                     *old,
                     *new,
                   ])
@@ -71,6 +74,12 @@ CSV.open(file, 'wb') do |csv|
 
   h0.push ''
   h1.push 'Case type'
+
+  h0.push ''
+  h1.push 'LDU name'
+
+  h0.push ''
+  h1.push 'LDU email'
 
   h0.push 'OLD Earliest release'
   h1.push 'Date'
