@@ -39,7 +39,7 @@ describe MovementService, type: :feature do
     let!(:existing_allocation) { create(:allocation_history, nomis_offender_id: 'G7266VD', prison: 'LEI')   }
     let(:existing_alloc_transfer) { build(:movement, offenderNo: 'G7266VD', fromAgency: 'PRI', toAgency: 'LEI')   }
 
-    it "can process transfers were offender already allocated at new prison",
+    it "can process transfers where offender already allocated at new prison",
        vcr: { cassette_name: 'prison_api/movement_service_transfer_in_existing_spec' }  do
       expect(existing_allocation.prison).to eq('LEI')
       processed = described_class.process_movement(existing_alloc_transfer)
@@ -105,6 +105,25 @@ describe MovementService, type: :feature do
       unknown_movement_type = build(:movement, offenderNo: 'G4273GI', movementType: 'TMP')
       processed = described_class.process_movement(unknown_movement_type)
       expect(processed).to be false
+    end
+
+    context "when offender moving from a hospital to a new prison",
+            vcr: { cassette_name: 'prison_api/movement_service_hospital_spec' }  do
+      subject(:processed) { described_class.process_movement(transfer) }
+
+      let(:transfer) do
+        build(:movement, offenderNo: 'G7266VD', directionCode: 'IN', movementType: 'ADM',
+                         fromAgency: 'ASHWTH', toAgency: 'GTI')
+      end
+
+      it 'returns true' do
+        expect(processed).to be true
+      end
+
+      it 'de-allocates offender' do
+        processed
+        expect(existing_allocation.reload.active?).to eq(false)
+      end
     end
   end
 

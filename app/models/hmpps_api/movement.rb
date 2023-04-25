@@ -2,6 +2,8 @@
 
 module HmppsApi
   class Movement
+    IMMIGRATION_MOVEMENT_CODES = %w[IMM].freeze
+
     attr_reader :movement_type, :from_agency, :to_agency, :offender_no
 
     def initialize(fields = {})
@@ -17,6 +19,14 @@ module HmppsApi
 
     def to_prison?
       PrisonService::PRISONS.include?(@to_agency)
+    end
+
+    def from_immigration?
+      IMMIGRATION_MOVEMENT_CODES.include?(@from_agency)
+    end
+
+    def to_immigration?
+      IMMIGRATION_MOVEMENT_CODES.include?(@to_agency)
     end
 
     def temporary?
