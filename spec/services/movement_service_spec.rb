@@ -39,7 +39,7 @@ describe MovementService, type: :feature do
     let!(:existing_allocation) { create(:allocation_history, nomis_offender_id: 'G7266VD', prison: 'LEI')   }
     let(:existing_alloc_transfer) { build(:movement, offenderNo: 'G7266VD', fromAgency: 'PRI', toAgency: 'LEI')   }
 
-    it "can process transfers were offender already allocated at new prison",
+    it "can process transfers where offender already allocated at new prison",
        vcr: { cassette_name: 'prison_api/movement_service_transfer_in_existing_spec' }  do
       expect(existing_allocation.prison).to eq('LEI')
       processed = described_class.process_movement(existing_alloc_transfer)
