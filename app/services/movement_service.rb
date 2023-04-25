@@ -3,7 +3,6 @@
 class MovementService
   ADMISSION_MOVEMENT_CODE = 'IN'
   RELEASE_MOVEMENT_CODE = 'OUT'
-  IMMIGRATION_MOVEMENT_CODES = %w[IMM].freeze
 
   def self.movements_on(date)
     HmppsApi::PrisonApi::MovementApi.movements_on_date(date)
@@ -39,8 +38,8 @@ private
     # when the movement is from immigration or a detention centre
     # and is not going back to a prison OR
     # when the movement is from a prison to an immigration or detention centre
-    if ((IMMIGRATION_MOVEMENT_CODES.include? transfer.from_agency) && !transfer.to_prison?) ||
-    ((IMMIGRATION_MOVEMENT_CODES.include? transfer.to_agency) && transfer.from_prison?)
+    if (transfer.from_immigration? && !transfer.to_prison?) ||
+       (transfer.to_immigration? && transfer.from_prison?)
       release_offender(transfer.offender_no, transfer.from_agency)
 
       return true
@@ -88,7 +87,8 @@ private
   def self.process_release(release)
     return false unless release.to_agency == RELEASE_MOVEMENT_CODE
 
-    if release.from_agency == IMMIGRATION_MOVEMENT_CODES.first || release.from_agency == IMMIGRATION_MOVEMENT_CODES.last
+    if release.from_agency == HmppsApi::Movement::IMMIGRATION_MOVEMENT_CODES.first ||
+       release.from_agency == HmppsApi::Movement::IMMIGRATION_MOVEMENT_CODES.last
       release_offender(release.offender_no, release.from_agency)
 
       return true
