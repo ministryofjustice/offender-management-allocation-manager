@@ -106,6 +106,25 @@ describe MovementService, type: :feature do
       processed = described_class.process_movement(unknown_movement_type)
       expect(processed).to be false
     end
+
+    context "when offender moving from a hospital to a new prison",
+            vcr: { cassette_name: 'prison_api/movement_service_hospital_spec' }  do
+      subject(:processed) { described_class.process_movement(transfer) }
+
+      let(:transfer) do
+        build(:movement, offenderNo: 'G7266VD', directionCode: 'IN', movementType: 'ADM',
+                         fromAgency: 'ASHWTH', toAgency: 'GTI')
+      end
+
+      it 'returns true' do
+        expect(processed).to be true
+      end
+
+      it 'de-allocates offender' do
+        processed
+        expect(existing_allocation.reload.active?).to eq(false)
+      end
+    end
   end
 
   describe "processing an offender release" do

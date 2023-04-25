@@ -31,6 +31,7 @@ private
 
   def self.process_transfer(transfer)
     return false unless transfer.in?
+    return false if transfer.from_agency.blank?
 
     Rails.logger.info("[MOVEMENT] Processing transfer for #{transfer.offender_no}")
 
@@ -45,8 +46,10 @@ private
       return true
     end
 
-    # Bail if this is a new admission to prison
-    return false unless transfer.from_prison? && transfer.to_prison?
+    unless hospital_agencies.include?(transfer.from_agency) ||
+           (transfer.from_prison? && transfer.to_prison?)
+      return false
+    end
 
     # We only want to deallocate the offender if they have not already been
     # allocated at their new prison
@@ -94,10 +97,6 @@ private
       return true
     end
 
-    hospital_agencies = HmppsApi::PrisonApi::AgenciesApi.agency_ids_by_type(
-      HmppsApi::PrisonApi::AgenciesApi::HOSPITAL_AGENCY_TYPE
-    )
-
     return false unless release.from_prison? || hospital_agencies.include?(release.from_agency)
 
     release_offender(release.offender_no, release.from_agency)
@@ -124,5 +123,13 @@ private
     alloc.deallocate_offender_after_release if alloc
 
     HmppsApi::ComplexityApi.inactivate(offender_no) if PrisonService.womens_prison?(from_agency)
+  end
+
+private
+
+  def self.hospital_agencies
+    @hospital_agencies ||= HmppsApi::PrisonApi::AgenciesApi.agency_ids_by_type(
+      HmppsApi::PrisonApi::AgenciesApi::HOSPITAL_AGENCY_TYPE
+    )
   end
 end
