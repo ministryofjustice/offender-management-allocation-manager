@@ -4,18 +4,11 @@
              builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |f| %>
   <%= f.govuk_error_summary %>
 
-  <div class="govuk-form-group">
-    <fieldset class="govuk-fieldset">
-      <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-        Victim Liaison Officer
-      </legend>
-    </fieldset>
-  </div>
-
-  <%= f.govuk_text_field :first_name, label: { text: 'First name' } %>
-  <%= f.govuk_text_field :last_name, label: { text: 'Last name' } %>
+  <%= f.govuk_text_field :first_name, label: { text: 'First name' }, width: 20 %>
+  <%= f.govuk_text_field :last_name, label: { text: 'Last name' }, width: 20 %>
   <!-- govuk_email_field seems to have strange popup behaviour - so use plain text field instead-->
-  <%= f.govuk_text_field :email, label: { text: 'Email address' } %>
+  <%= f.govuk_text_field :email, label: { text: 'Email address' }, width: 20 %>
 
-  <%= f.submit "Submit", role: "button", draggable: "false", class: "govuk-button" %>
+  <%= f.submit "Save details", role: "button", draggable: "false", class: "govuk-button" %>
+  <%= link_to 'Cancel', 'javascript:history.back()', class: 'govuk-link cancel-button' %>
 <% end %>

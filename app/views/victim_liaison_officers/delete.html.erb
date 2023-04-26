@@ -1,19 +1,37 @@
-<% content_for :title, "Delete VLO contact details – Digital Prison Services" %>
+<% content_for :title, "Delete VLO details – Digital Prison Services" %>
 
 <% content_for :switcher do %>
   <%= render '/layouts/prison_switcher' %>
 <% end %>
 
-<h2 class="govuk-heading-l">Delete the selected Victim Liaison Officer (VLO) contact?</h2>
-
-<p class="govuk-body">
-Contact details for the VLO <%= @vlo.full_name %> will be removed from the prisoner record.
-</p>
-
 <%= form_for(@vlo,
              url: prison_prisoner_victim_liaison_officer_path(@prison.code, @vlo.nomis_offender_id, @vlo.id),
              method: :delete,
              builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |f| %>
+
+  <div class="govuk-form-group">
+    <fieldset class="govuk-fieldset" aria-describedby="changed-name-hint">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+        <h1 class="govuk-fieldset__heading">
+          Are you sure you want to remove <%= @vlo.full_name_ordered %> as a VLO for this person?
+        </h1>
+      </legend>
+      <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="delete-yes" name="delete_confirm" type="radio" value="yes">
+          <label class="govuk-label govuk-radios__label" for="delete-yes">
+            Yes
+          </label>
+        </div>
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="delete-no" name="delete_confirm" type="radio" value="no">
+          <label class="govuk-label govuk-radios__label" for="delete-no">
+            No
+          </label>
+        </div>
+      </div>
+    </fieldset>
+  </div>
 
   <%= f.submit "Confirm", role: "button", draggable: "false", class: "govuk-button" %>
   <%= link_to 'Cancel', 'javascript:history.back()', class: 'govuk-link cancel-button' %>

@@ -46,7 +46,7 @@ class VictimLiaisonOfficersController < PrisonsApplicationController
   def delete; end
 
   def destroy
-    @vlo.destroy!
+    @vlo.destroy! if params[:delete_confirm] == 'yes'
     redirect_to referrer
   end
 
