@@ -2,6 +2,7 @@
 <% content_for :turbolinks_nocache, 'true' %>
 
 <%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
+<%= render 'layouts/notice', notice: flash[:notice] %>
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
@@ -386,13 +387,23 @@
                 <td class="govuk-table__cell govuk-!-width-one-third">
                   <% if @prisoner.victim_liaison_officers.any? %>
                     <% @prisoner.victim_liaison_officers.each do |vlo| %>
-                      <p><%= vlo.full_name_ordered %><br /><%= vlo.email %></p>
+                      <p><%= vlo.full_name_ordered %> -<br /><%= vlo.email %></p>
                     <% end %>
                   <% else %>
                     No VLO details added
                   <% end %>
+                  <div class="govuk-!-margin-top-6">
+                    <%= link_to 'Add new VLO contact', new_prison_prisoner_victim_liaison_officer_path(@prison.code, @prisoner.offender_no), class: 'govuk-link' %>
+                  </div>
                 </td>
-                <td class="govuk-table__cell govuk-!-width-one-third"><br></td>
+                <td class="govuk-table__cell govuk-!-width-one-third">
+                  <% @prisoner.victim_liaison_officers.each do |vlo| %>
+                    <p>
+                      <%= link_to 'Change details', edit_prison_prisoner_victim_liaison_officer_path(@prison.code, @prisoner.offender_no, vlo) %><br />
+                      <%= link_to 'Remove contact', delete_prison_prisoner_victim_liaison_officer_path(@prison.code, @prisoner.offender_no, vlo) %>
+                    </p>
+                  <% end %>
+                </td>
               </tr>
             </tbody>
           </table>

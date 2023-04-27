@@ -27,6 +27,7 @@ class VictimLiaisonOfficersController < PrisonsApplicationController
     @vlo = @offender.victim_liaison_officers.new vlo_parameters
 
     if @vlo.save
+      flash[:notice] = 'VLO contact added'
       redirect_to referrer
     else
       render 'new'
@@ -37,6 +38,7 @@ class VictimLiaisonOfficersController < PrisonsApplicationController
 
   def update
     if @vlo.update vlo_parameters
+      flash[:notice] = 'VLO contact updated'
       redirect_to referrer
     else
       render 'edit'
@@ -46,7 +48,11 @@ class VictimLiaisonOfficersController < PrisonsApplicationController
   def delete; end
 
   def destroy
-    @vlo.destroy!
+    if params[:delete_confirm] == 'yes'
+      @vlo.destroy!
+      flash[:notice] = 'VLO contact removed'
+    end
+
     redirect_to referrer
   end
 
