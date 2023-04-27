@@ -3,7 +3,8 @@
 }
 
 .govuk-table__cell.handover-progress {
-  .task-summary-checklist {
+  .task-summary-checklist, strong {
+    display: block;
     margin-bottom: 10px !important;
   }
 }

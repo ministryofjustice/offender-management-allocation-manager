@@ -1,4 +1,6 @@
 <td class="govuk-table__cell tier">
   <strong><%= offender.tier %></strong>
-  <p><%= offender.case_allocation %> (legacy)</p>
+  <% unless USE_APR_2023_HANDOVER_POLICY_CHANGES %>
+    <p><%= offender.case_allocation %> (legacy)</p>
+  <% end %>
 </td>

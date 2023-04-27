@@ -31,3 +31,7 @@ $govuk-font-url-function: "asset-url";
 .app-related-items .govuk-list > li {
   margin-bottom: govuk-spacing(2);
 }
+
+.govuk-hint {
+  display: block;
+}
