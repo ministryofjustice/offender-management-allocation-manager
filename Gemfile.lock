@@ -585,7 +585,7 @@ GEM
       rugged (>= 0.27, < 1.6)
     unicode-display_width (2.3.0)
     uri (0.12.1)
-    valid_email2 (4.0.5)
+    valid_email2 (4.0.6)
       activemodel (>= 3.2)
       mail (~> 2.5)
     vcr (6.0.0)
