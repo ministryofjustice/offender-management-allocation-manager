@@ -169,6 +169,7 @@ Rails.application.routes.draw do
     get('/' => 'api#index')
     resources :allocation, only: [:show], param: :offender_no, controller: 'allocation_api', path_names: { show: ':offender_no' }
     resources :offenders, only: [:show], param: :nomis_offender_id
+    resources :handovers, only: [:show], controller: :handovers_api
   end
 
   mount Rswag::Ui::Engine => '/api-docs'

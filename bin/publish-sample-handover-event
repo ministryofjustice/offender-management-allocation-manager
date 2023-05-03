@@ -1,0 +1,27 @@
+#!/usr/bin/env ruby
+
+raise 'Run it with "bin/rails runner", not on its own' unless Object.constants.include?(:Rails)
+
+topic = Aws::SNS::Resource.new(region: 'eu-west-2').topic(ENV.fetch('DOMAIN_EVENTS_TOPIC_ARN'))
+
+event = {
+  "eventType" => "offender-management.handover.changed",
+  "version" => 1,
+  "description" => "Handover date and/or responsibility was updated",
+  "detailUrl" => "https://test2.moic.service.justice.gov.uk/api/handovers/G0862VO",
+  "occurredAt" => Time.zone.now.iso8601,
+  "personReference" => {
+    "identifiers" => [
+      {"type" => "NOMS","value" =>"G0862VO"}
+    ]
+  }
+}
+topic.publish({
+                message: event.to_json,
+                message_attributes: {
+                  "eventType" => {
+                    data_type: "String",
+                    string_value: "offender-management.handover.changed",
+                  }
+                }
+              })

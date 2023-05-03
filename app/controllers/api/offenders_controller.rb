@@ -1,18 +1,28 @@
 # frozen_string_literal: true
 
-module Api
-  class OffendersController < Api::ApiController
-    respond_to :json
+class Api::OffendersController < Api::ApiController
+  respond_to :json
 
-    def show
-      @offender = OffenderService.get_offender(offender_number)
-      render_404('Not found') if @offender.nil?
+  def show
+    @offender = OffenderService.get_offender(offender_number)
+    if @offender.nil?
+      render_404('Not found')
+    else
+      render json: offender_as_json(@offender)
     end
+  end
 
-  private
+private
 
-    def offender_number
-      params.require(:nomis_offender_id)
-    end
+  def offender_number
+    params.require(:nomis_offender_id)
+  end
+
+  def offender_as_json(offender)
+    {
+      'offender_no' => offender.offender_no,
+      'noms_number' => offender.offender_no,
+      'early_allocation_eligibility_status' => offender.early_allocation?,
+    }
   end
 end

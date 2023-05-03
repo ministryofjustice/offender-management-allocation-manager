@@ -8,7 +8,7 @@ module Api
       render json: { status: 'ok' }
     end
 
-    def render_404(msg)
+    def render_404(msg = 'Not found')
       render json:  { status: 'error', message: msg }, status: :not_found
     end
 
