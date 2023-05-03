@@ -36,9 +36,9 @@ class Api::Handover
 
   def as_json
     {
-      'noms_number' => noms_number,
-      'handover_date' => handover_date.iso8601,
-      'handover_start_date' => handover_start_date&.iso8601,
+      'nomsNumber' => noms_number,
+      'handoverDate' => handover_date.iso8601,
+      'handoverStartDate' => handover_start_date&.iso8601,
       'responsibility' => responsibility,
     }.compact
   end

@@ -40,8 +40,8 @@ RSpec.describe Api::Handover do
 
       it 'serialises to JSON' do
         expect(handover.as_json).to eq({
-          'noms_number' => nomis_offender_id,
-          'handover_date' => '2021-02-01',
+          'nomsNumber' => nomis_offender_id,
+          'handoverDate' => '2021-02-01',
           'responsibility' => 'POM',
         })
       end
@@ -63,9 +63,9 @@ RSpec.describe Api::Handover do
 
       it 'serialises to JSON' do
         expect(handover.as_json).to eq({
-          'noms_number' => nomis_offender_id,
-          'handover_date' => '2021-02-01',
-          'handover_start_date' => '2021-01-01',
+          'nomsNumber' => nomis_offender_id,
+          'handoverDate' => '2021-02-01',
+          'handoverStartDate' => '2021-01-01',
           'responsibility' => 'POM',
         })
       end
