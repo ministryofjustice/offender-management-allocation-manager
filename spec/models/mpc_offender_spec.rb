@@ -176,18 +176,20 @@ RSpec.describe MpcOffender, type: :model do
 
       let(:fake_response) do
         {
-          'riskInCommunity' => {
-            'HIGH' => ['Children'],
-            'MEDIUM' => ['Public', 'Staff'],
-            'LOW' => ['Known Adult']
-          },
-          'riskInCustody' => {
-            'HIGH' => ['Know adult'],
-            'VERY_HIGH' => ['Staff', 'Prisoners'],
-            'LOW' => ['Children', 'Public']
-          },
-          'assessedOn' => '2022-07-05T15:29:01',
-          'overallRiskLevel' => 'HIGH'
+          'summary' => {
+            'riskInCommunity' => {
+              'HIGH' => ['Children'],
+              'MEDIUM' => ['Public', 'Staff'],
+              'LOW' => ['Known Adult']
+            },
+            'riskInCustody' => {
+              'HIGH' => ['Know adult'],
+              'VERY_HIGH' => ['Staff', 'Prisoners'],
+              'LOW' => ['Children', 'Public']
+            },
+            'assessedOn' => '2022-07-05T15:29:01',
+            'overallRiskLevel' => 'HIGH'
+          }
         }
       end
 

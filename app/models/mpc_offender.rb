@@ -213,7 +213,7 @@ class MpcOffender
     return { status: :unable } if crn.blank?
 
     begin
-      risks = HmppsApi::AssessRisksAndNeedsApi.get_rosh_summary(crn)
+      risks = HmppsApi::AssessRisksAndNeedsApi.get_rosh_summary(crn)['summary']
     rescue Faraday::ResourceNotFound
       return { status: :missing }
     rescue Faraday::ServerError
