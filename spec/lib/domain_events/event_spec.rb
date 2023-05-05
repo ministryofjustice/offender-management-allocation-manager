@@ -1,5 +1,5 @@
 RSpec.describe DomainEvents::Event do
-  subject(:event) { described_class.new }
+  subject(:basic_event) { described_class.new(event_type: 'test-domain.changed', version: 77) }
 
   let(:now) { Time.new(2022, 6, 16, 15, 1, 44, 'Z') }
   let(:mock_env) { { 'DOMAIN_EVENTS_TOPIC_ARN' => topic_arn } }
@@ -15,6 +15,10 @@ RSpec.describe DomainEvents::Event do
   end
   let(:sns_resource) { double :sns_resource, topic: sns_topic }
 
+  def published_message
+    ActiveSupport::JSON.decode(published_data.fetch(:message, 'null'))
+  end
+
   before do
     stub_const('ENV', mock_env)
     allow(Aws::SNS::Resource).to receive_messages(new: sns_resource)
@@ -22,7 +26,7 @@ RSpec.describe DomainEvents::Event do
 
   describe 'in all cases' do
     before do
-      event.publish(now: now)
+      basic_event.publish(now: now)
     end
 
     it 'is published to the domain events SNS topic' do
@@ -33,30 +37,78 @@ RSpec.describe DomainEvents::Event do
     end
 
     it 'is published with an auto-generated timestamp' do
-      timestamp = Time.zone.parse(published_data.fetch(:message).fetch("occurredAt"))
+      timestamp = Time.zone.parse(published_message.fetch("occurredAt"))
       expect(timestamp).to eq now
     end
   end
 
-  describe 'when initialised with all available arguments' do
-    it 'is published with the given event type in the message wrapper'
-    it 'is published with the given event type in the message body'
-    it 'is published with the given version'
-    it 'is published with the given description text'
-    it 'is published with the given detail URL'
-    it 'is published with the given additional information'
-    it 'is published with the given person reference'
+  shared_examples 'common examples' do
+    it 'is published with the given event type in the message wrapper' do
+      expect(published_data.dig(:message_attributes, 'eventType'))
+        .to eq({ data_type: 'String', string_value: 'offender-management.test-domain.changed' })
+    end
+
+    it 'is published with the given event type in the message body' do
+      expect(published_message.fetch('eventType')).to eq 'offender-management.test-domain.changed'
+    end
+
+    it 'is published with the given version' do
+      expect(published_message.fetch('version')).to eq 77
+    end
   end
 
   describe 'when initialised with only required arguments' do
-    it 'is published with the given event type in the message wrapper'
-    it 'is published with the given event type in the message body'
-    it 'is published with an auto-generated version'
+    before do
+      basic_event.publish(now: now)
+    end
+
+    it_behaves_like 'common examples'
+
+    it 'only has required message attributes' do
+      expect(published_message.keys).to match_array(%w[eventType occurredAt version])
+    end
+  end
+
+  describe 'when initialised with all available arguments' do
+    before do
+      event = described_class.new(event_type: 'test-domain.changed',
+                                  version: 77,
+                                  description: 'Test event',
+                                  detail_url: 'https://example.com/r/1',
+                                  additional_information: { 'dataA' => 'valueX' },
+                                  noms_number: 'X1111XX')
+      event.publish(now: now)
+    end
+
+    it_behaves_like 'common examples'
+
+    it 'is published with the given description text' do
+      expect(published_message.fetch('description')).to eq 'Test event'
+    end
+
+    it 'is published with the given detail URL' do
+      expect(published_message.fetch('detailUrl')).to eq 'https://example.com/r/1'
+    end
+
+    it 'is published with the given additional information' do
+      expect(published_message.fetch('additionalInformation')).to eq('dataA' => 'valueX')
+    end
+
+    it 'is published with the given NOMS number in the person reference' do
+      expect(published_message.fetch('personReference'))
+        .to eq('identifiers' => [{ 'type' => 'NOMS', 'value' => 'X1111XX' }])
+    end
   end
 
   describe 'message body schema validation' do
-    it 'allows a valid message body to be published'
+    it 'allows a valid message body to be published' do
+      expect { basic_event.publish(now: now) }.not_to raise_error
+    end
 
-    it 'raises an error if attempting to publish a message with an invalid message body'
+    it 'raises an error if attempting to publish a message with an invalid message body' do
+      # Schema validates that version is an integer
+      invalid_event = described_class.new(event_type: 'test-domain.changed', version: 'alpha')
+      expect { invalid_event.publish(now: now) }.to raise_error(JSON::Schema::ValidationError, %r{#/version})
+    end
   end
 end
