@@ -1,0 +1,121 @@
+openapi: 3.0.3
+info:
+  title: MPC/MOIC API
+  version: v2
+servers:
+  - url: https://dev.moic.service.justice.gov.uk/
+paths:
+  '/api/allocation/{nomsNumber}':
+    get:
+      tags:
+        - Allocations
+      summary: Retrieves the current allocation for an offender
+      parameters:
+        - name: nomsNumber
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/NomsNumber'
+      responses:
+        200:
+          description: Offender is allocated
+          content:
+            application/json:
+              schema:
+                required:
+                  - primary_pom
+                  - secondary_pom
+                type: object
+                properties:
+                  primary_pom:
+                    type: object
+                    properties:
+                      staff_id:
+                        type: integer
+                      name:
+                        type: string
+                  secondary_pom:
+                    type: object
+                    properties:
+                      staff_id:
+                        type: integer
+                      name:
+                        type: string
+        401:
+          description: Request is not authorised
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+        404:
+          description: Allocation for offender not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+      security:
+        - Bearer: []
+  '/api/handovers/{nomsNumber}':
+    get:
+      tags:
+        - Handovers
+      summary: Retrieves the handover information for an offender
+      parameters:
+        - name: nomsNumber
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/NomsNumber'
+      responses:
+        200:
+          description: Handover information successfully found
+          content:
+            application/json:
+              schema:
+                required:
+                  - nomsNumber
+                  - handoverDate
+                  - responsibility
+                type: object
+                properties:
+                  nomsNumber:
+                    $ref: '#/components/schemas/NomsNumber'
+                  handoverDate:
+                    type: string
+                    format: date
+                  responsibility:
+                    type: string
+                    pattern: '^POM|COM$'
+        401:
+          description: Request is not authorised
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+        404:
+          description: Handover information for offender not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+      security:
+        - Bearer: []
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      description: A bearer token obtained from HMPPS SSO
+      name: Authorization
+      in: header
+  schemas:
+    NomsNumber:
+      type: string
+      pattern: '^[A-Z]\d{4}[A-Z]{2}'
+      example: G0862VO
+    Status:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
