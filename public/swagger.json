@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Allocation API",
+    "title": "MPC/MOIC API",
     "version": "v1"
   },
   "securityDefinitions": {
@@ -13,7 +13,7 @@
     }
   },
   "paths": {
-    "/api/allocation/{offender_no}": {
+    "/api/allocation/{nomsNo}": {
       "get": {
         "summary": "Retrieves the current allocation for an offender",
         "tags": [
@@ -24,7 +24,7 @@
         ],
         "parameters": [
           {
-            "name": "offender_no",
+            "name": "nomsNo",
             "in": "path",
             "type": "string",
             "required": true
@@ -33,7 +33,6 @@
         "security": [
           {
             "Bearer": [
-
             ]
           }
         ],
