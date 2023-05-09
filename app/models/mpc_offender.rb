@@ -220,6 +220,16 @@ class MpcOffender
       return { status: :unable }
     end
 
+    if risks['overallRiskLevel'].blank?
+      Rails.logger.warn('event=risks_api_blank_value|overallRiskLevel is blank')
+      return { status: :unable }
+    end
+
+    if risks['assessedOn'].blank?
+      Rails.logger.warn('event=risks_api_blank_value|assessedOn is blank')
+      return { status: :unable }
+    end
+
     custody = {}.tap do |out|
       if risks['riskInCustody'].present?
         risks['riskInCustody'].each do |level, groups|
