@@ -213,34 +213,30 @@ class MpcOffender
     return { status: :unable } if crn.blank?
 
     begin
-      risks = HmppsApi::AssessRisksAndNeedsApi.get_rosh_summary(crn)['summary']
+      risks = HmppsApi::AssessRisksAndNeedsApi.get_rosh_summary(crn)
+      risks_summary = risks['summary']
     rescue Faraday::ResourceNotFound
       return { status: :missing }
     rescue Faraday::ServerError
       return { status: :unable }
     end
 
-    if risks['overallRiskLevel'].blank?
+    if risks_summary['overallRiskLevel'].blank?
       Rails.logger.warn('event=risks_api_blank_value|overallRiskLevel is blank')
       return { status: :unable }
     end
 
-    if risks['assessedOn'].blank?
-      Rails.logger.warn('event=risks_api_blank_value|assessedOn is blank')
-      return { status: :unable }
-    end
-
     custody = {}.tap do |out|
-      if risks['riskInCustody'].present?
-        risks['riskInCustody'].each do |level, groups|
+      if risks_summary['riskInCustody'].present?
+        risks_summary['riskInCustody'].each do |level, groups|
           groups.each { |group| out[group] = level.tr('_', ' ').downcase }
         end
       end
     end
 
     community = {}.tap do |out|
-      if risks['riskInCommunity'].present?
-        risks['riskInCommunity'].each do |level, groups|
+      if risks_summary['riskInCommunity'].present?
+        risks_summary['riskInCommunity'].each do |level, groups|
           groups.each { |group| out[group] = level.tr('_', ' ').downcase }
         end
       end
@@ -248,7 +244,7 @@ class MpcOffender
 
     {
       status: 'found',
-      overall: risks['overallRiskLevel'].upcase,
+      overall: risks_summary['overallRiskLevel'].upcase,
       last_updated: Date.parse(risks['assessedOn']),
       custody: {
         children: custody['Children'],

@@ -187,9 +187,9 @@ RSpec.describe MpcOffender, type: :model do
               'VERY_HIGH' => ['Staff', 'Prisoners'],
               'LOW' => ['Children', 'Public']
             },
-            'assessedOn' => '2022-07-05T15:29:01',
             'overallRiskLevel' => 'HIGH'
-          }
+          },
+          'assessedOn' => '2022-07-05T15:29:01',
         }
       end
 
