@@ -96,8 +96,20 @@ RSpec/ScatteredSetup:
 RSpec/SubjectStub:
   Enabled: false
 
+RSpec/EmptyExampleGroup:
+  Exclude:
+    # The DescribeClass cop has been disabled as it is insists that the describe
+    # block contain the name of the tested class.  However rswag is using this
+    # text as part of the API documentation generated from these tests.
+    - 'spec/api/**/*_spec.rb'
+
 RSpec/VerifiedDoubles:
   Enabled: false
+
+RSpec/VariableName:
+  Exclude:
+    # Authorization 'method' needs to be defined for rswag
+    - 'spec/api/**/*_spec.rb'
 
 Rails/FilePath:
   Enabled: false

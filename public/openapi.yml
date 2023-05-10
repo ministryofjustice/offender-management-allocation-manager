@@ -1,0 +1,172 @@
+---
+openapi: 3.0.3
+info:
+  title: MPC/MOIC API
+  version: v2
+servers:
+- url: "{protocol}://{defaultHost}"
+  variables:
+    protocol:
+      default: https
+    defaultHost:
+      default: dev.moic.service.justice.gov.uk
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      description: A bearer token obtained from HMPPS SSO
+      name: Authorization
+      in: header
+  schemas:
+    NomsNumber:
+      type: string
+      pattern: "^[A-Z]\\d{4}[A-Z]{2}"
+      example: G0862VO
+    Status:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+paths:
+  "/api/allocation/{nomsNumber}":
+    get:
+      summary: Retrieves the current allocation for an offender
+      tags:
+      - Allocations
+      parameters:
+      - name: nomsNumber
+        in: path
+        schema:
+          "$ref": "#/components/schemas/NomsNumber"
+        required: true
+      security:
+      - Bearer: []
+      responses:
+        '401':
+          description: Request is not authorised
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Status"
+        '200':
+          description: Offender is allocated
+          content:
+            application/json:
+              schema:
+                required:
+                - primary_pom
+                - secondary_pom
+                type: object
+                properties:
+                  primary_pom:
+                    type: object
+                    properties:
+                      staff_id:
+                        type: integer
+                      name:
+                        type: string
+                  secondary_pom:
+                    type: object
+                    properties:
+                      staff_id:
+                        type: integer
+                      name:
+                        type: string
+        '404':
+          description: Allocation for offender not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Status"
+  "/api/handovers/{nomsNumber}":
+    get:
+      summary: Retrieves the handover information for an offender
+      tags:
+      - Handovers
+      parameters:
+      - name: nomsNumber
+        in: path
+        schema:
+          "$ref": "#/components/schemas/NomsNumber"
+        required: true
+      security:
+      - Bearer: []
+      responses:
+        '401':
+          description: Request is not authorised
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Status"
+        '200':
+          description: Handover information successfully found
+          content:
+            application/json:
+              schema:
+                required:
+                - nomsNumber
+                - handoverDate
+                - responsibility
+                type: object
+                properties:
+                  nomsNumber:
+                    "$ref": "#/components/schemas/NomsNumber"
+                  handoverDate:
+                    type: string
+                    format: date
+                  responsibility:
+                    type: string
+                    pattern: "^POM|COM$"
+        '404':
+          description: Handover information for offender not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Status"
+  "/api/offenders/{nomsNumber}":
+    get:
+      summary: Retrieves information for a prisoner including early allocation status
+      tags:
+      - Offenders
+      parameters:
+      - name: nomsNumber
+        in: path
+        schema:
+          "$ref": "#/components/schemas/NomsNumber"
+        required: true
+      security:
+      - Bearer: []
+      responses:
+        '401':
+          description: Request is not authorised
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Status"
+        '200':
+          description: Offender has an early allocation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  offender_no:
+                    "$ref": "#/components/schemas/NomsNumber"
+                  nomsNumber:
+                    "$ref": "#/components/schemas/NomsNumber"
+                  early_allocation_eligibility_status:
+                    type: boolean
+                    description: true if prisoner is subject to early allocation,
+                      and so has an early handover date
+                required:
+                - offender_no
+                - nomsNumber
+                - early_allocation_eligibility_status
+        '404':
+          description: Offender not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Status"
