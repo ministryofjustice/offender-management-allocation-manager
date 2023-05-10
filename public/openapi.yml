@@ -1,30 +1,58 @@
+---
 openapi: 3.0.3
 info:
   title: MPC/MOIC API
   version: v2
 servers:
-  - url: https://dev.moic.service.justice.gov.uk/
+- url: https://dev.moic.service.justice.gov.uk/
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      description: A bearer token obtained from HMPPS SSO
+      name: Authorization
+      in: header
+  schemas:
+    NomsNumber:
+      type: string
+      pattern: "^[A-Z]\\d{4}[A-Z]{2}"
+      example: G0862VO
+    Status:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
 paths:
-  '/api/allocation/{nomsNumber}':
+  "/api/allocation/{nomsNumber}":
     get:
-      tags:
-        - Allocations
       summary: Retrieves the current allocation for an offender
+      tags:
+      - Allocations
       parameters:
-        - name: nomsNumber
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/NomsNumber'
+      - name: nomsNumber
+        in: path
+        schema:
+          "$ref": "#/components/schemas/NomsNumber"
+        required: true
+      security:
+      - Bearer: []
       responses:
-        200:
+        '401':
+          description: Request is not authorised
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Status"
+        '200':
           description: Offender is allocated
           content:
             application/json:
               schema:
                 required:
-                  - primary_pom
-                  - secondary_pom
+                - primary_pom
+                - secondary_pom
                 type: object
                 properties:
                   primary_pom:
@@ -41,21 +69,13 @@ paths:
                         type: integer
                       name:
                         type: string
-        401:
-          description: Request is not authorised
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Status'
-        404:
+        '404':
           description: Allocation for offender not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Status'
-      security:
-        - Bearer: []
-  '/api/handovers/{nomsNumber}':
+                "$ref": "#/components/schemas/Status"
+  "/api/handovers/{nomsNumber}":
     get:
       tags:
         - Handovers
@@ -100,22 +120,3 @@ paths:
                 $ref: '#/components/schemas/Status'
       security:
         - Bearer: []
-components:
-  securitySchemes:
-    Bearer:
-      type: apiKey
-      description: A bearer token obtained from HMPPS SSO
-      name: Authorization
-      in: header
-  schemas:
-    NomsNumber:
-      type: string
-      pattern: '^[A-Z]\d{4}[A-Z]{2}'
-      example: G0862VO
-    Status:
-      type: object
-      properties:
-        status:
-          type: string
-        message:
-          type: string
