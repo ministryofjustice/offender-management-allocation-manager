@@ -204,37 +204,63 @@ class MpcOffender
     end
   end
 
-  def rosh_summary
-    nil_result = { high_rosh_children: nil,
-                   high_rosh_public: nil,
-                   high_rosh_known_adult: nil,
-                   high_rosh_staff: nil,
-                   high_rosh_prisoners: nil }
+  def mappa_details
+    OffenderService.get_mappa_details(crn)
+  end
 
-    return nil_result unless USE_RISKS_API
+  def rosh_summary
+    return { status: :unable } if probation_record.blank?
+    return { status: :unable } if crn.blank?
 
     begin
-      community_data = OffenderService.get_community_data(offender_no)
-      all_risks = HmppsApi::AssessRisksAndNeedsApi.get_rosh_summary(community_data[:crn])
+      risks = HmppsApi::AssessRisksAndNeedsApi.get_rosh_summary(crn)
+      risks_summary = risks['summary']
+    rescue Faraday::ResourceNotFound
+      return { status: :missing }
+    rescue Faraday::ServerError
+      return { status: :unable }
+    end
 
-      grouped_risks = {}.tap do |risks|
-        if all_risks['riskInCustody'].present?
-          all_risks['riskInCustody'].each do |level, groups|
-            groups.each { |group| risks[group] = level.tr('_', ' ').downcase }
-          end
+    if risks_summary['overallRiskLevel'].blank?
+      Rails.logger.warn('event=risks_api_blank_value|overallRiskLevel is blank')
+      return { status: :unable }
+    end
+
+    custody = {}.tap do |out|
+      if risks_summary['riskInCustody'].present?
+        risks_summary['riskInCustody'].each do |level, groups|
+          groups.each { |group| out[group] = level.tr('_', ' ').downcase }
         end
       end
-
-      {
-        high_rosh_children: grouped_risks['Children'],
-        high_rosh_public: grouped_risks['Public'],
-        high_rosh_known_adult: grouped_risks['Know adult'],
-        high_rosh_staff: grouped_risks['Staff'],
-        high_rosh_prisoners: grouped_risks['Prisoners']
-      }
-    rescue Faraday::ResourceNotFound
-      nil_result
     end
+
+    community = {}.tap do |out|
+      if risks_summary['riskInCommunity'].present?
+        risks_summary['riskInCommunity'].each do |level, groups|
+          groups.each { |group| out[group] = level.tr('_', ' ').downcase }
+        end
+      end
+    end
+
+    {
+      status: 'found',
+      overall: risks_summary['overallRiskLevel'].upcase,
+      last_updated: Date.parse(risks['assessedOn']),
+      custody: {
+        children: custody['Children'],
+        public: custody['Public'],
+        known_adult: custody['Known Adult'] || custody['Know adult'],
+        staff: custody['Staff'],
+        prisoners: custody['Prisoners']
+      },
+      community: {
+        children: community['Children'],
+        public: community['Public'],
+        known_adult: community['Known Adult'],
+        staff: community['Staff'],
+        prisoners: nil
+      }
+    }
   end
 
   def active_alert_labels

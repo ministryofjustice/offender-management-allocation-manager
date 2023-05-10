@@ -141,7 +141,6 @@ RSpec.describe OffenderHelper do
 
     before do
       allow(helper).to receive(:last_oasys_completed).and_return(last_oasys_completed)
-      allow(offender).to receive(:rosh_summary).and_return({})
       allow(offender).to receive(:active_alert_labels).and_return(%w[bish bosh bash])
     end
 

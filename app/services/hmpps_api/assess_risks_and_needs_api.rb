@@ -7,7 +7,7 @@ module HmppsApi
 
     def self.get_rosh_summary(crn)
       safe_crn = URI.encode_www_form_component(crn)
-      route = "/risks/crn/#{safe_crn}/summary"
+      route = "/risks/crn/#{safe_crn}"
       client.get(route)
     end
   end

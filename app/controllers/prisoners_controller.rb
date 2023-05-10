@@ -62,7 +62,7 @@ class PrisonersController < PrisonsApplicationController
       active_prison_id, @prisoner.offender_no
     )
 
-    @mappa_details = OffenderService.get_mappa_details(@prisoner.crn)
+    @mappa_details = @prisoner.mappa_details
     @coworking = params[:coworking].present?
   end
 

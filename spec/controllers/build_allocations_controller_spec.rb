@@ -14,6 +14,7 @@ RSpec.describe BuildAllocationsController, type: :controller do
     stub_community_offender(offender_no, build(:community_data))
     allow_any_instance_of(StaffMember).to receive(:first_name).and_return('Bob')
     allow_any_instance_of(StaffMember).to receive(:last_name).and_return('Billings')
+    allow_any_instance_of(MpcOffender).to receive(:rosh_summary).and_return({ status: :missing })
   end
 
   describe '#show' do

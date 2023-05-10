@@ -111,7 +111,6 @@ module OffenderHelper
                 else
                   (offender.com_responsible? ? 'Supporting' : '')
                 end,
-      mappa_level: offender.mappa_level,
       ldu_name: (offender.ldu_name.presence || 'Unknown'),
       ldu_email: (offender.ldu_email_address.presence || 'Unknown'),
       com_name: (view_context.unreverse_name(offender.allocated_com_name).presence || 'Unknown'),
@@ -120,7 +119,7 @@ module OffenderHelper
       last_oasys_completed: (view_context.format_date(last_oasys_completed(offender.offender_no)).presence || 'No OASys information'),
       active_alerts: offender.active_alert_labels.join(', '),
       additional_notes: nil
-    }.merge(offender.rosh_summary)
+    }
   end
 
   def last_oasys_completed(offender_no)
