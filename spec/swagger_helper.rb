@@ -10,7 +10,17 @@ RSpec.configure do |config|
         version: 'v2',
       },
       servers: [
-        { url: 'https://dev.moic.service.justice.gov.uk/' },
+        {
+          url: '{protocol}://{defaultHost}',
+          variables: {
+            protocol: {
+              default: :https
+            },
+            defaultHost: {
+              default: 'dev.moic.service.justice.gov.uk'
+            }
+          }
+        },
       ],
       components: {
         securitySchemes: {

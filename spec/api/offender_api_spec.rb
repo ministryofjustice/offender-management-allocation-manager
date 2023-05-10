@@ -50,7 +50,7 @@ describe 'Offender Early Allocation API', vcr: { cassette_name: 'prison_api/offe
           end
         end
 
-        response '404', 'offender not found' do
+        response '404', 'Offender not found' do
           security [Bearer: []]
           schema '$ref' => '#/components/schemas/Status'
 
