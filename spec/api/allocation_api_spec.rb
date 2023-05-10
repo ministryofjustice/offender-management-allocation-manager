@@ -5,22 +5,18 @@ require 'swagger_helper'
 describe 'Allocation API', vcr: { cassette_name: 'prison_api/allocation_api' } do
   let(:Authorization) { "Bearer TEST_TOKEN" }
 
-  path '/api/allocation/{offender_no}' do
+  path '/api/allocation/{nomsNumber}' do
     get 'Retrieves the current allocation for an offender' do
       tags 'Allocations'
       produces 'application/json'
-      parameter name: :offender_no, in: :path, type: :string
+      parameter name: :nomsNumber, in: :path, schema: { '$ref' => '#/components/schemas/NomsNumber' }
 
       describe 'when not authorised' do
         response '401', 'Request is not authorised' do
           security [Bearer: []]
-          schema type: :object,
-                 properties: {
-                   status: { type: :string },
-                   message: { type: :string }
-                 }
+          schema '$ref' => '#/components/schemas/Status'
 
-          let(:offender_no) { 'A1111AA' }
+          let(:nomsNumber) { 'A1111AA' }
           run_test!
         end
       end
@@ -32,7 +28,8 @@ describe 'Allocation API', vcr: { cassette_name: 'prison_api/allocation_api' } d
 
         response '200', 'Offender is allocated' do
           security [Bearer: []]
-          schema type: :object,
+          schema required: %w[primary_pom secondary_pom],
+                 type: :object,
                  properties: {
                    primary_pom: {
                      type: :object,
@@ -48,12 +45,11 @@ describe 'Allocation API', vcr: { cassette_name: 'prison_api/allocation_api' } d
                        name: { type: :string }
                      }
                    }
-                 },
-                 required: %w[primary_pom secondary_pom]
+                 }
 
-          let(:offender_no) { 'G7266VD' }
+          let(:nomsNumber) { 'G7266VD' }
           let!(:allocation) do
-            create(:allocation_history, prison: 'LEI', nomis_offender_id: offender_no, primary_pom_name: 'OLD_NAME, MOIC')
+            create(:allocation_history, prison: 'LEI', nomis_offender_id: nomsNumber, primary_pom_name: 'OLD_NAME, MOIC')
           end
 
           run_test! do |_|
@@ -74,13 +70,9 @@ describe 'Allocation API', vcr: { cassette_name: 'prison_api/allocation_api' } d
 
         response '404', 'Allocation for offender not found' do
           security [Bearer: []]
-          schema type: :object,
-                 properties: {
-                   status: { type: :string },
-                   message: { type: :string }
-                 }
+          schema '$ref' => '#/components/schemas/Status'
 
-          let(:offender_no) { 'A1111AA' }
+          let(:nomsNumber) { 'A1111AA' }
           run_test!
         end
       end

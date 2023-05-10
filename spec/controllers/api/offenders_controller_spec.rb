@@ -26,7 +26,7 @@ RSpec.describe Api::OffendersController, type: :controller do
         expect(response).to have_http_status(:ok)
         expect(ActiveSupport::JSON.decode(response.body)).to eq({
           'offender_no' => nomis_offender_id,
-          'noms_number' => nomis_offender_id,
+          'nomsNumber' => nomis_offender_id,
           'early_allocation_eligibility_status' => true,
         })
       end

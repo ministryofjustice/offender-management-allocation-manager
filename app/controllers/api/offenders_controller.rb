@@ -21,7 +21,7 @@ private
   def offender_as_json(offender)
     {
       'offender_no' => offender.offender_no,
-      'noms_number' => offender.offender_no,
+      'nomsNumber' => offender.offender_no,
       'early_allocation_eligibility_status' => offender.early_allocation?,
     }
   end
