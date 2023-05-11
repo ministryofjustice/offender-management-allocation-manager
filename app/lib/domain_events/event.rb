@@ -12,6 +12,8 @@ class DomainEvents::Event
     @sns_topic = Aws::SNS::Resource.new(region: aws_region).topic(topic_arn)
     full_event_type = "#{EVENT_TYPE_PREFIX}#{event_type}"
 
+    @noms_number = noms_number
+
     @message_attributes = {
       'eventType' => {
         data_type: 'String',
@@ -34,7 +36,8 @@ class DomainEvents::Event
       message_attributes: @message_attributes,
       message: ActiveSupport::JSON.encode(self.class.json_validate!(@message.merge('occurredAt' => now.iso8601))),
     }
-    @sns_topic.publish(message_data)
+    sns_response = @sns_topic.publish(message_data)
+    Rails.logger.info "nomis_offender_id=#{@noms_number},domain_event=#{@message['eventType']},sns_message_id=#{sns_response.message_id},event=domain_event_published"
   end
 
   def self.extract_region(topic_arn)

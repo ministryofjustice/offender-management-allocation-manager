@@ -10,6 +10,7 @@ RSpec.describe DomainEvents::Event do
     t = double :sns_topic
     allow(t).to receive(:publish) do |values|
       published_data.replace(values)
+      double(:sns_response, message_id: 'fake-uuid')
     end
     t
   end
@@ -22,13 +23,10 @@ RSpec.describe DomainEvents::Event do
   before do
     stub_const('ENV', mock_env)
     allow(Aws::SNS::Resource).to receive_messages(new: sns_resource)
+    allow(Rails.logger).to receive_messages(info: nil, error: nil)
   end
 
-  describe 'in all cases' do
-    before do
-      basic_event.publish(now: now)
-    end
-
+  shared_examples 'common examples' do
     it 'is published to the domain events SNS topic' do
       aggregate_failures do
         expect(Aws::SNS::Resource).to have_received(:new).with(region: aws_region)
@@ -40,9 +38,7 @@ RSpec.describe DomainEvents::Event do
       timestamp = Time.zone.parse(published_message.fetch("occurredAt"))
       expect(timestamp).to eq now
     end
-  end
 
-  shared_examples 'common examples' do
     it 'is published with the given event type in the message wrapper' do
       expect(published_data.dig(:message_attributes, 'eventType'))
         .to eq({ data_type: 'String', string_value: 'offender-management.test-domain.changed' })
@@ -54,6 +50,13 @@ RSpec.describe DomainEvents::Event do
 
     it 'is published with the given version' do
       expect(published_message.fetch('version')).to eq 77
+    end
+
+    it 'logs when published' do
+      expect(Rails.logger).to have_received(:info).once
+      expect(Rails.logger).to have_received(:info).with(/domain_event=offender-management\.test-domain\.changed/)
+      expect(Rails.logger).to have_received(:info).with(/event=domain_event_published/)
+      expect(Rails.logger).to have_received(:info).with(/sns_message_id=fake-uuid/)
     end
   end
 
