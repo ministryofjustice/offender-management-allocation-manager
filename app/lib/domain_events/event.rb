@@ -32,9 +32,12 @@ class DomainEvents::Event
   end
 
   def publish(now: Time.zone.now.utc)
+    full_message = @message.merge('occurredAt' => now.iso8601)
+    self.class.json_validate!(full_message)
+
     message_data = {
       message_attributes: @message_attributes,
-      message: ActiveSupport::JSON.encode(self.class.json_validate!(@message.merge('occurredAt' => now.iso8601))),
+      message: ActiveSupport::JSON.encode(full_message),
     }
     sns_response = @sns_topic.publish(message_data)
     Rails.logger.info "nomis_offender_id=#{@noms_number},domain_event=#{@message['eventType']},sns_message_id=#{sns_response.message_id},event=domain_event_published"
@@ -51,6 +54,5 @@ class DomainEvents::Event
     @schema ||= ActiveSupport::JSON.decode(File.read(Rails.root.join('config', 'domain_events_message_schema.json')))
 
     JSON::Validator.validate!(@schema, data)
-    data
   end
 end
