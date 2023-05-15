@@ -7,6 +7,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
   before do
     stub_auth_token
     allow(DomainEvents::EventFactory).to receive(:build_handover_event).and_return(event)
+    allow(Rails.configuration).to receive(:allocation_manager_host).and_return 'https://test.example.com'
   end
 
   before use_events: true do
@@ -42,7 +43,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
       expect(DomainEvents::EventFactory).to have_received(:build_handover_event).with(
         noms_number: offender.offender_no,
-        host: 'http://localhost:3000',
+        host: 'https://test.example.com',
       )
       expect(event).to have_received(:publish).with(no_args)
       expect(HmppsApi::CommunityApi).not_to have_received(:set_handover_dates)
