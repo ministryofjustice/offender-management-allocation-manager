@@ -1,14 +1,16 @@
-# frozen_string_literal: true
-
-require 'rails_helper'
-
 RSpec.describe RecalculateHandoverDateJob, type: :job do
   let(:offender_no) { nomis_offender.fetch(:prisonerNumber) }
   let(:today) { Time.zone.now }
   let(:prison) { create(:prison) }
+  let(:event) { instance_double DomainEvents::Event, :event, publish: nil }
 
   before do
     stub_auth_token
+    allow(DomainEvents::EventFactory).to receive(:build_handover_event).and_return(event)
+  end
+
+  before use_events: true do
+    stub_const('USE_EVENTS_TO_PUSH_HANDOVER_TO_DELIUS', true)
   end
 
   context "when the offender exists in both NOMIS and nDelius (happy path)" do
@@ -19,7 +21,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
     let(:nomis_offender) { build(:nomis_offender, prisonId: prison.code) }
 
-    it "recalculates the offender's handover dates and pushes them to the Community API" do
+    it "recalculates the offender's handover dates and pushes them to the Community API", aggregate_failures: true do
       offender = OffenderService.get_offender(offender_no)
 
       expect(HmppsApi::CommunityApi).to receive(:set_handover_dates)
@@ -29,6 +31,21 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
              )
 
       described_class.perform_now(offender_no)
+      expect(event).not_to have_received(:publish)
+    end
+
+    it 'recalculates the offenders handover dates and publishes a domain event', use_events: true,
+                                                                                 aggregate_failures: true do
+      allow(HmppsApi::CommunityApi).to receive(:set_handover_dates)
+      offender = OffenderService.get_offender(offender_no)
+      described_class.perform_now(offender_no)
+
+      expect(DomainEvents::EventFactory).to have_received(:build_handover_event).with(
+        noms_number: offender.offender_no,
+        host: 'http://localhost:3000',
+      )
+      expect(event).to have_received(:publish).with(no_args)
+      expect(HmppsApi::CommunityApi).not_to have_received(:set_handover_dates)
     end
   end
 
@@ -39,9 +56,14 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
     let(:nomis_offender) { build(:nomis_offender, prisonId: prison.code) }
 
-    it 'does nothing' do
+    it 'does not push to the API' do
       expect(HmppsApi::CommunityApi).not_to receive(:set_handover_dates)
       described_class.perform_now(offender_no)
+    end
+
+    it 'does not publish an event', use_events: true do
+      described_class.perform_now(offender_no)
+      expect(event).not_to have_received(:publish)
     end
   end
 
@@ -53,9 +75,14 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), case_allocation: 'NPS')
     end
 
-    it 'does nothing' do
+    it 'does not push to the API' do
       expect(HmppsApi::CommunityApi).not_to receive(:set_handover_dates)
       described_class.perform_now(offender_no)
+    end
+
+    it 'does not publish an event', use_events: true do
+      described_class.perform_now(offender_no)
+      expect(event).not_to have_received(:publish)
     end
   end
 
