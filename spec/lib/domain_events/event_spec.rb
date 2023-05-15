@@ -26,6 +26,11 @@ RSpec.describe DomainEvents::Event do
     allow(Rails.logger).to receive_messages(info: nil, error: nil)
   end
 
+  after do
+    # Remove the memoized sns_topic that the ::sns_topic method creates
+    described_class.remove_instance_variable(:@sns_topic) if described_class.instance_variable_defined?(:@sns_topic)
+  end
+
   shared_examples 'common examples' do
     it 'is published to the domain events SNS topic' do
       aggregate_failures do

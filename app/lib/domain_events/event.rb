@@ -7,9 +7,6 @@ class DomainEvents::Event
                  detail_url: nil,
                  additional_information: nil,
                  noms_number: nil)
-    topic_arn = ENV.fetch('DOMAIN_EVENTS_TOPIC_ARN')
-    aws_region = self.class.extract_region(topic_arn)
-    @sns_topic = Aws::SNS::Resource.new(region: aws_region).topic(topic_arn)
     full_event_type = "#{EVENT_TYPE_PREFIX}#{event_type}"
 
     @noms_number = noms_number
@@ -39,8 +36,18 @@ class DomainEvents::Event
       message_attributes: @message_attributes,
       message: ActiveSupport::JSON.encode(full_message),
     }
-    sns_response = @sns_topic.publish(message_data)
+    sns_response = self.class.sns_topic.publish(message_data)
     Rails.logger.info "nomis_offender_id=#{@noms_number},domain_event=#{@message['eventType']},sns_message_id=#{sns_response.message_id},event=domain_event_published"
+  end
+
+  def self.sns_topic
+    unless @sns_topic
+      topic_arn = ENV.fetch('DOMAIN_EVENTS_TOPIC_ARN')
+      aws_region = extract_region(topic_arn)
+      @sns_topic = Aws::SNS::Resource.new(region: aws_region).topic(topic_arn)
+    end
+
+    @sns_topic
   end
 
   def self.extract_region(topic_arn)
