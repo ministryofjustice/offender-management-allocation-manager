@@ -64,7 +64,7 @@ private
       if USE_EVENTS_TO_PUSH_HANDOVER_TO_DELIUS
         event = DomainEvents::EventFactory.build_handover_event(host: Rails.configuration.allocation_manager_host,
                                                                 noms_number: record.nomis_offender_id)
-        event.publish
+        event.publish(job: 'recalculate_handover_date_job')
       else
         PushHandoverDatesToDeliusJob.perform_later record
       end

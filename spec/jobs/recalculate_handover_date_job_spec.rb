@@ -45,7 +45,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
         noms_number: offender.offender_no,
         host: 'https://test.example.com',
       )
-      expect(event).to have_received(:publish).with(no_args)
+      expect(event).to have_received(:publish).with(job: 'recalculate_handover_date_job')
       expect(HmppsApi::CommunityApi).not_to have_received(:set_handover_dates)
     end
   end
