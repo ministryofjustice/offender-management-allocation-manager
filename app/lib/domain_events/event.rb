@@ -28,7 +28,7 @@ class DomainEvents::Event
     }.compact
   end
 
-  def publish(now: Time.zone.now.utc)
+  def publish(now: Time.zone.now.utc, job: nil)
     full_message = @message.merge('occurredAt' => now.iso8601)
     self.class.json_validate!(full_message)
 
@@ -37,7 +37,9 @@ class DomainEvents::Event
       message: ActiveSupport::JSON.encode(full_message),
     }
     sns_response = self.class.sns_topic.publish(message_data)
-    Rails.logger.info "nomis_offender_id=#{@noms_number},domain_event=#{@message['eventType']},sns_message_id=#{sns_response.message_id},event=domain_event_published"
+    log_message = "nomis_offender_id=#{@noms_number},domain_event=#{@message['eventType']},sns_message_id=#{sns_response.message_id},event=domain_event_published"
+    log_message += ",job=#{job}" if job
+    Rails.logger.info log_message
   end
 
   def self.sns_topic

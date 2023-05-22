@@ -108,6 +108,11 @@ RSpec.describe DomainEvents::Event do
     end
   end
 
+  it 'can include job name in published log message' do
+    basic_event.publish(now: now, job: 'test_job')
+    expect(Rails.logger).to have_received(:info).with(/job=test_job/)
+  end
+
   describe 'message body schema validation' do
     it 'allows a valid message body to be published' do
       expect { basic_event.publish(now: now) }.not_to raise_error
