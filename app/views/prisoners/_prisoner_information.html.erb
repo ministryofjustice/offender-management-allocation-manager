@@ -33,17 +33,17 @@
       </tr>
     <% end %>
     <% if @prisoner.probation_record.present? && @prisoner.nps_case? %>
-    <tr id="early_allocation" class="govuk-table__row">
-      <td class="govuk-table__cell">Early allocation referral</td>
-      <td class="govuk-table__cell table_cell__left_align">
-        <span id="early_allocation_status">
-          <%= early_allocation_status_text(@prisoner) %>
-        </span>
-        <span id="early_allocation_action" class="pull-right">
-          <%= early_allocation_action_link(@prisoner, @prison) %>
-        </span>
-      </td>
-    </tr>
+      <tr id="early_allocation" class="govuk-table__row">
+        <td class="govuk-table__cell">Early allocation referral</td>
+        <td class="govuk-table__cell table_cell__left_align">
+          <span id="early_allocation_status">
+            <%= early_allocation_status_text(@prisoner) %>
+          </span>
+          <span id="early_allocation_action" class="pull-right">
+            <%= early_allocation_action_link(@prisoner, @prison) %>
+          </span>
+        </td>
+      </tr>
     <% end %>
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">Last known address in Wales</td>
@@ -68,7 +68,7 @@
     <tr id="oasys-date" class="govuk-table__row">
       <td class="govuk-table__cell">Last completed OASys</td>
       <td class="govuk-table__cell table_cell__left_align">
-        <%= render partial: 'oasys_assessment', locals: {assessment: @oasys_assessment} %>
+        <%= render partial: 'oasys_assessment', locals: { assessment: @oasys_assessment } %>
       </td>
     </tr>
   </tbody>
