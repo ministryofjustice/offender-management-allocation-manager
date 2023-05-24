@@ -43,5 +43,13 @@ FactoryBot.define do
         h[:manager][:team][:local_delivery_unit][:description] = nil
       end
     end
+
+    trait :no_com do
+      after(:build) do |h|
+        h[:manager].delete(:name)
+        h[:manager].delete(:code)
+        h[:manager].delete(:email)
+      end
+    end
   end
 end

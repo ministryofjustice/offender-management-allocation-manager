@@ -75,6 +75,8 @@ private
   end
 
   def com_name(probation_record)
+    return nil unless probation_record.dig(:manager, :name)
+
     forename = probation_record.dig(:manager, :name, :forename)
     surname = probation_record.dig(:manager, :name, :surname)
 

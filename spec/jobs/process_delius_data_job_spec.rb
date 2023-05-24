@@ -85,24 +85,20 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
       end
     end
 
-    context 'with an unallocated com name' do
+    context 'with no COM details' do
+      let(:mock_probation_record) do
+        build :probation_record, :no_com, offender_no: nomis_offender_id,
+                                          crn: crn,
+                                          tier: tier,
+                                          team_description: team_name,
+                                          ldu_code: ldu.code,
+                                          ldu_description: ldu.name
+      end
+
       let(:com_name) { 'Staff, Unallocated' }
       let(:unallocated) { true }
 
-      xit 'maps com_name to nil' do
-        expect {
-          described_class.perform_now offender_id
-        }.to change(CaseInformation, :count).by(1)
-
-        expect(case_info.com_name).to be_nil
-      end
-    end
-
-    context 'with an inactive com name' do
-      let(:com_name) { 'Staff, Inactive Staff(N07)' }
-      let(:unallocated) { true }
-
-      xit 'maps com_name to nil' do
+      it 'maps com_name to nil' do
         expect {
           described_class.perform_now offender_id
         }.to change(CaseInformation, :count).by(1)
