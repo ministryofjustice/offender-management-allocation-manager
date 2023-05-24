@@ -362,4 +362,28 @@ RSpec.describe MpcOffender, type: :model do
       expect(subject.determinate_parole?).to eq false
     end
   end
+
+  describe '#to_allocated_offender' do
+    describe 'when allocation history exists' do
+      it 'build an AllocatedOffender' do
+        alloc_history = FactoryBot.create :allocation_history, :primary, nomis_offender_id: offender.offender_no,
+                                                                         prison: offender.prison.code
+        alloc_offender = instance_double AllocatedOffender
+        allow(AllocatedOffender).to receive(:new).with(alloc_history.primary_pom_nomis_id, alloc_history, offender)
+                                                 .and_return(alloc_offender)
+        expect(offender.to_allocated_offender).to eq alloc_offender
+      end
+    end
+
+    describe 'when allocation history is not there' do
+      it 'returns nil' do
+        allow(AllocatedOffender).to receive(:new)
+
+        aggregate_failures do
+          expect(offender.to_allocated_offender).to eq nil
+          expect(AllocatedOffender).not_to have_received(:new)
+        end
+      end
+    end
+  end
 end

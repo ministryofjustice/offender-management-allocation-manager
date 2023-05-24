@@ -374,6 +374,15 @@ class MpcOffender
     parole_eligibility_date.present?
   end
 
+  def to_allocated_offender
+    alloc_history = AllocationHistory.active_allocations_for_prison(prison.code).find_by(nomis_offender_id: offender_no)
+    if alloc_history
+      AllocatedOffender.new(alloc_history.primary_pom_nomis_id, alloc_history, self)
+    else
+      nil
+    end
+  end
+
 private
 
   def early_allocation_notes?
