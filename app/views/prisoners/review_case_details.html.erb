@@ -8,8 +8,9 @@
   <div class="govuk-grid-column-two-thirds">
     <div class="moj-page-header-actions">
       <div class="moj-page-header-actions__title">
-        <h1 class="govuk-heading-l">Review <%= @prisoner.first_name.capitalize %> <%= @prisoner.last_name.capitalize %>
-          's case</h1>
+        <h1 class="govuk-heading-l">
+          Review <%= @prisoner.first_name.capitalize %> <%= @prisoner.last_name.capitalize %>'s case
+        </h1>
         <% if @allocation.present? %>
           <% if @coworking %>
             <span class="govuk-caption-l govuk-!-margin-bottom-2">Primary POM: <%= @pom.full_name_ordered %></span>

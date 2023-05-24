@@ -4,9 +4,9 @@ RSpec.describe HandoverFollowUpJob, type: :job do
   shared_context 'with expected behaviour' do
     let(:offender) { build(:mpc_offender, prison: active_prison, offender: case_info.offender, prison_record: api_offender) }
     let(:api_offender) do
-      build_api_offender(Time.zone.today + 8.months,
+      build_api_offender(Time.zone.today + 12.months,
                          sentence_type: :determinate,
-                         ard_crd_release: Time.zone.today + 8.months,
+                         ard_crd_release: Time.zone.today + 12.months,
                          ted: nil)
     end
 

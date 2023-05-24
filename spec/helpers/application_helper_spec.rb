@@ -10,11 +10,11 @@ RSpec.describe ApplicationHelper do
 
   describe 'returns the correct label' do
     it "for service provider CRC" do
-      expect(service_provider_label('CRC')).to eq('CRC (Legacy)')
+      expect(service_provider_label('CRC')).to eq('Standard')
     end
 
     it "for service provider NPS" do
-      expect(service_provider_label('NPS')).to eq('NPS (Legacy)')
+      expect(service_provider_label('NPS')).to eq('Enhanced')
     end
   end
 

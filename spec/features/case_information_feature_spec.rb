@@ -105,7 +105,7 @@ feature 'case information feature', flaky: true do
       click_button 'Save'
 
       expect(CaseInformation.count).to eq(0)
-      expect(page).to have_content("Select the service provider for this case")
+      expect(page).to have_content("Select the handover type for this case")
       expect(page).to have_content("Select yes if the prisoner’s last known address was in Wales")
     end
 
@@ -118,7 +118,7 @@ feature 'case information feature', flaky: true do
       click_button 'Save'
 
       expect(CaseInformation.count).to eq(0)
-      expect(page).to have_content("Select the service provider for this case")
+      expect(page).to have_content("Select the handover type for this case")
       expect(page).to have_content("Select the prisoner’s tier")
       expect(page).to have_content("Select yes if the prisoner’s last known address was in Wales")
     end

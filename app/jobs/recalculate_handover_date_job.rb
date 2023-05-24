@@ -26,7 +26,7 @@ private
       offender_attributes_to_archive: nomis_offender.attributes_to_archive,
     )
     if handover.community_responsible? &&
-      handover.reason.to_sym == :less_than_10_months_left_to_serve &&
+      handover.reason.to_sym == :determinate_short &&
       nomis_offender.ldu_email_address.present? &&
       nomis_offender.allocated_com_name.blank?
       # need to chase if we haven't chased recently

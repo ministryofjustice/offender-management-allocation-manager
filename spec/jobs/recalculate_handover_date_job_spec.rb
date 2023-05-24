@@ -292,7 +292,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       # Create an 'old' handover date, which will then be updated given the 'new' open conditions
       create(:calculated_handover_date, offender: case_information.offender,
                                         responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
-                                        reason: :nps_indeterminate)
+                                        reason: :indeterminate)
     end
 
     context 'when in a male prison' do
