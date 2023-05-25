@@ -267,6 +267,7 @@ RSpec.describe MpcOffender, type: :model do
         prison_arrival_date
         earliest_release_date
         earliest_release
+        earliest_release_for_handover
         latest_temp_movement_date
         release_date
         date_of_birth
@@ -360,6 +361,59 @@ RSpec.describe MpcOffender, type: :model do
     it 'is false if parole eligibility date is absent' do
       allow(api_offender).to receive(:parole_eligibility_date).and_return(nil)
       expect(subject.determinate_parole?).to eq false
+    end
+  end
+
+  describe '#to_allocated_offender' do
+    describe 'when allocation history exists' do
+      it 'build an AllocatedOffender' do
+        alloc_history = FactoryBot.create :allocation_history, :primary, nomis_offender_id: offender.offender_no,
+                                                                         prison: offender.prison.code
+        alloc_offender = instance_double AllocatedOffender
+        allow(AllocatedOffender).to receive(:new).with(alloc_history.primary_pom_nomis_id, alloc_history, offender)
+                                                 .and_return(alloc_offender)
+        expect(offender.to_allocated_offender).to eq alloc_offender
+      end
+    end
+
+    describe 'when allocation history is not there' do
+      it 'returns nil' do
+        allow(AllocatedOffender).to receive(:new)
+
+        aggregate_failures do
+          expect(offender.to_allocated_offender).to eq nil
+          expect(AllocatedOffender).not_to have_received(:new)
+        end
+      end
+    end
+  end
+
+  describe '#earliest_release_for_handover' do
+    it 'uses official calculations correctly' do
+      expected = double :expected
+
+      allow(offender).to receive_messages(
+        indeterminate_sentence?: double(:indeterminate_sentence?),
+        tariff_date: double(:tariff_date),
+        parole_review_date: double(:parole_review_date),
+        parole_eligibility_date: double(:parole_eligibility_date),
+        automatic_release_date: double(:automatic_release_date),
+        conditional_release_date: double(:conditional_release_date),
+      )
+
+      allow(Handover::HandoverCalculation).to receive_messages(calculate_earliest_release: expected)
+
+      aggregate_failures do
+        expect(offender.earliest_release_for_handover).to eq expected
+
+        expect(Handover::HandoverCalculation).to have_received(:calculate_earliest_release)
+                                                   .with(is_indeterminate: offender.indeterminate_sentence?,
+                                                         tariff_date: offender.tariff_date,
+                                                         parole_review_date: offender.parole_review_date,
+                                                         parole_eligibility_date: offender.parole_eligibility_date,
+                                                         automatic_release_date: offender.automatic_release_date,
+                                                         conditional_release_date: offender.conditional_release_date)
+      end
     end
   end
 end

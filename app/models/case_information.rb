@@ -33,7 +33,7 @@ class CaseInformation < ApplicationRecord
   validates :case_allocation, inclusion: {
     in: [NPS, CRC],
     allow_nil: false,
-    message: "Select the #{USE_APR_2023_HANDOVER_POLICY_CHANGES ? 'handover type' : 'service provider'} for this case"
+    message: 'Select the handover type for this case'
   }
 
   # nil means MAPPA level is completely unknown.

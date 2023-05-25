@@ -298,6 +298,7 @@ class MpcOffender
       prison_arrival_date
       earliest_release_date
       earliest_release
+      earliest_release_for_handover
       latest_temp_movement_date
       release_date
       date_of_birth
@@ -345,33 +346,28 @@ class MpcOffender
     allocated_com_name.present? || allocated_com_email.present?
   end
 
-  # We can not calculate the handover date for NPS Indeterminate
-  # with parole cases where the TED is in the past as we need
-  # the parole board decision which currently is not available to us.
   def earliest_release_for_handover
-    if indeterminate_sentence?
-      if tariff_date&.future?
-        NamedDate[tariff_date, 'TED']
-      else
-        [
-          NamedDate[parole_review_date, 'PRD'],
-          NamedDate[parole_eligibility_date, 'PED'],
-        ].compact.reject { |nd| nd.date.past? }.min
-      end
-    elsif case_information&.nps_case?
-      possible_dates = [NamedDate[conditional_release_date, 'CRD'], NamedDate[automatic_release_date, 'ARD']]
-      NamedDate[parole_eligibility_date, 'PED'] || possible_dates.compact.min
-    else
-      # CRC can look at HDC date, NPS is not supposed to
-      NamedDate[home_detention_curfew_actual_date, 'HDCEA'] ||
-        [NamedDate[automatic_release_date, 'ARD'],
-         NamedDate[conditional_release_date, 'CRD'],
-         NamedDate[home_detention_curfew_eligibility_date, 'HDCED']].compact.min
-    end
+    Handover::HandoverCalculation.calculate_earliest_release(
+      is_indeterminate: indeterminate_sentence?,
+      tariff_date: tariff_date,
+      parole_review_date: parole_review_date,
+      parole_eligibility_date: parole_eligibility_date,
+      automatic_release_date: automatic_release_date,
+      conditional_release_date: conditional_release_date,
+    )
   end
 
   def determinate_parole?
     parole_eligibility_date.present?
+  end
+
+  def to_allocated_offender
+    alloc_history = AllocationHistory.active_allocations_for_prison(prison.code).find_by(nomis_offender_id: offender_no)
+    if alloc_history
+      AllocatedOffender.new(alloc_history.primary_pom_nomis_id, alloc_history, self)
+    else
+      nil
+    end
   end
 
 private
