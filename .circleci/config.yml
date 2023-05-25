@@ -394,12 +394,12 @@ workflows:
       - fetch_secrets:
           filters: { branches: { only: [test2] } }
           context: [offender-management-shared, offender-management-test2]
-      - build_and_push_quick_docker_image:
+      - build_and_push_docker_image:
           requires: [fetch_secrets]
           filters: { branches: { only: [test2] } }
           context: [offender-management-shared, offender-management-test2]
       - deploy:
-          requires: [build_and_push_quick_docker_image]
+          requires: [build_and_push_docker_image]
           filters: { branches: { only: [test2] } }
           context: [offender-management-shared, offender-management-test2]
 
