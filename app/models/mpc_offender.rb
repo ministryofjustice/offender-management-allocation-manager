@@ -15,15 +15,13 @@ class MpcOffender
 
   delegate :crn, :case_allocation, :manual_entry?, :nps_case?,
            :tier,
-           :mappa_level, :welsh_offender, to: :probation_record
-
-  delegate :active_vlo?, to: :probation_record, allow_nil: true
+           :mappa_level, :welsh_offender, to: :case_information
 
   delegate :victim_liaison_officers, :handover_progress_task_completion_data, :handover_progress_complete?,
            to: :@offender
 
-  # These fields make sense to be nil when the probation record is nil - the others dont
-  delegate :ldu_email_address, :team_name, :ldu_name, to: :probation_record, allow_nil: true
+  # These fields make sense to be nil when the case information is nil - the others dont
+  delegate :ldu_email_address, :team_name, :ldu_name, :active_vlo?, to: :case_information, allow_nil: true
 
   delegate :start_date, to: :handover, prefix: true
 
@@ -36,8 +34,10 @@ class MpcOffender
     @case_information = offender.case_information
   end
 
+  # @deprecated Deprecated old name - I don't know why probation record is sometimes used but the database table and the
+  # model are called case information so let's standardize on that
   def probation_record
-    @case_information
+    case_information
   end
 
   # TODO: - view method in model needs to be removed
@@ -50,7 +50,7 @@ class MpcOffender
   end
 
   def needs_a_com?
-    @case_information.present? && (com_responsible? || com_supporting?) && allocated_com_name.blank?
+    case_information.present? && (com_responsible? || com_supporting?) && allocated_com_name.blank?
   end
 
   def pom_responsible?
@@ -88,11 +88,11 @@ class MpcOffender
   end
 
   def allocated_com_name
-    @case_information.com_name
+    case_information.com_name
   end
 
   def allocated_com_email
-    @case_information.com_email
+    case_information.com_email
   end
 
   def responsibility_override?
@@ -114,8 +114,8 @@ class MpcOffender
   end
 
   def needs_early_allocation_notify?
-    # The probation_record.present? check is needed as one of the dates is PRD which is currently inside case_information
-    @case_information.present? &&
+    # The case_information.present? check is needed as one of the dates is PRD which is currently inside case_information
+    case_information.present? &&
       within_early_allocation_window? &&
       early_allocations.active_pre_referral_window.any? &&
       early_allocations.post_referral_window.empty?
@@ -209,7 +209,7 @@ class MpcOffender
   end
 
   def rosh_summary
-    return { status: :unable } if probation_record.blank?
+    return { status: :unable } if case_information.blank?
     return { status: :unable } if crn.blank?
 
     begin
