@@ -192,11 +192,6 @@ module ApiHelper
       .to_return(body: stubbed_data.to_json)
   end
 
-  def stub_resourcing_404(nomis_offender_id)
-    stub_request(:get, "#{COMMUNITY_HOST}/offenders/nomsNumber/#{nomis_offender_id}/risk/resourcing/latest")
-      .to_return(status: 404)
-  end
-
   def stub_agencies(type)
     stub_request(:get, "https://api-dev.prison.service.justice.gov.uk/api/agencies/type/#{type}")
       .to_return(body: [{ 'agencyId' => 'HOS1', 'description' => 'Hospital One', 'active' => 1 }].to_json)

@@ -45,11 +45,10 @@ class OffenderService
         r.fetch(:active) && r.key?(:registerLevel) && r.dig(:registerLevel, :code).starts_with?('M')
       end
 
-      is_nps = begin
-        HmppsApi::CommunityApi.get_latest_resourcing(nomis_offender_id)
-                              .fetch('enhancedResourcing')
-      rescue Faraday::ResourceNotFound, KeyError
-        true # default to NPS if 404 Not Found or no enhancedResourcing field present in the response
+      enhanced_resourcing = begin
+        HmppsApi::CommunityApi.get_latest_resourcing(nomis_offender_id).fetch('enhancedResourcing', true)
+      rescue Faraday::ResourceNotFound
+        true
       end
 
       com = community_info.fetch(:offenderManagers).detect { |om| om.fetch(:active) }
@@ -58,7 +57,7 @@ class OffenderService
         noms_no: nomis_offender_id,
         tier: community_info.fetch(:currentTier),
         crn: community_info.dig(:otherIds, :crn),
-        service_provider: is_nps ? 'NPS' : 'CRC',
+        enhanced_handover?: enhanced_resourcing,
         offender_manager: com.dig(:staff, :unallocated) ? nil : "#{com.dig(:staff, :surname)}, #{com.dig(:staff, :forenames)}",
         team_name: com.dig(:team, :description),
         ldu_code: com.dig(:team, :localDeliveryUnit, :code),

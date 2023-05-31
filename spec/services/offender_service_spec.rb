@@ -84,76 +84,58 @@ describe OffenderService, type: :feature do
                    mappa_levels: [],
                    noms_no: nomis_offender_id,
                    offender_manager: "TestUpdate01Surname, TestUpdate01Forname",
-                   service_provider: "NPS",
+                   enhanced_handover?: true,
                    team_name: "OMU A",
                    tier: "B-2",
                    active_vlo: false)
       end
     end
 
-    context 'with stubbing' do
+    describe '[with some stubbing]' do
       before do
         stub_auth_token
       end
 
-      context 'without MAPPA data' do
-        describe '#service_provider' do
-          subject { described_class.get_community_data(nomis_offender_id).fetch(:service_provider) }
+      describe 'enhanced_handover? attr:' do
+        subject(:value) { described_class.get_community_data(nomis_offender_id).fetch(:enhanced_handover?) }
 
-          before do
-            stub_community_offender(nomis_offender_id, community_data)
-          end
-
-          context 'when enhancedResourcing is true' do
-            let(:community_data) { build(:community_data, enhancedResourcing: true) }
-
-            it 'is NPS' do
-              expect(subject).to eq('NPS')
-            end
-          end
-
-          context 'when enhancedResourcing is false' do
-            let(:community_data) { build(:community_data, enhancedResourcing: false) }
-
-            it 'is CRC' do
-              expect(subject).to eq('CRC')
-            end
-          end
-
-          context 'when not found' do
-            # this means that the offender hasn't had a CAS assessment yet
-            let(:community_data) { build(:community_data) }
-
-            before do
-              stub_resourcing_404 nomis_offender_id
-            end
-
-            it 'defaults to NPS' do
-              expect(subject).to eq('NPS')
-            end
-          end
-
-          context 'when enhancedResourcing field is missing' do
-            # this typically means that the offender has a draft CAS assessment which hasn't been completed yet
-            # and is therefore in a "Not Assessed" state
-            let(:community_data) { build(:community_data) }
-
-            before do
-              # enhancedResourcing field is missing
-              stub_community_offender(nomis_offender_id,
-                                      build(:community_data))
-            end
-
-            it 'defaults to NPS' do
-              expect(subject).to eq('NPS')
-            end
-          end
+        before do
+          # Transitioning from mocking of APIs to stubbing using mocks
+          stub_community_offender(nomis_offender_id, build(:community_data))
+          allow(HmppsApi::CommunityApi).to receive(:get_latest_resourcing).and_raise(Faraday::ResourceNotFound.allocate)
+          allow(HmppsApi::CommunityApi).to receive(:get_offender_registrations).and_return({})
         end
 
+        it 'uses latest resourcing info for the given offender from Delius' do
+          value # invoke it
+          expect(HmppsApi::CommunityApi).to have_received(:get_latest_resourcing).with(nomis_offender_id)
+        end
+
+        it 'is true when offender has not had a CAS assessment yet' do
+          expect(value).to eq true
+        end
+
+        it 'is true when enhancedResourcing is true' do
+          allow(HmppsApi::CommunityApi).to receive(:get_latest_resourcing).and_return('enhancedResourcing' => true)
+          expect(value).to eq true
+        end
+
+        it 'is false when enhancedResourcing is false' do
+          allow(HmppsApi::CommunityApi).to receive(:get_latest_resourcing).and_return('enhancedResourcing' => false)
+          expect(value).to eq false
+        end
+
+        it 'defaults to true when a draft CAS assessment is in the "Not Assessed" state' do
+          allow(HmppsApi::CommunityApi).to receive(:get_latest_resourcing).and_return({})
+          expect(value).to eq true
+        end
+      end
+
+      context 'without MAPPA data' do
         context 'with a single allocated COM' do
           before do
             stub_community_offender(nomis_offender_id, build(:community_data,
-                                                             offenderManagers: [{ probationArea: { nps: true }, active: true, staff: { unallocated: false, surname: 'Jones', forenames: 'Ruth Mary' } }]))
+                                                             offenderManagers: [{ active: true, staff: { unallocated: false, surname: 'Jones', forenames: 'Ruth Mary' } }]))
           end
 
           it 'gets the surname and forenames' do
@@ -189,7 +171,6 @@ describe OffenderService, type: :feature do
                                             team: { code: 'N07GHGF',
                                                     description: 'Thing',
                                                     localDeliveryUnit: { code: 'LDU123' } },
-                                            probationArea: { nps: true },
                                             active: true,
                                             staff: { unallocated: true } }
                                         ]), registrations)
@@ -204,7 +185,7 @@ describe OffenderService, type: :feature do
                        tier: 'A',
                        crn: 'X5657657',
                        offender_manager: nil,
-                       service_provider: 'NPS',
+                       enhanced_handover?: true,
                        mappa_levels: [],
                        team_name: 'Thing',
                        ldu_code: 'LDU123',
