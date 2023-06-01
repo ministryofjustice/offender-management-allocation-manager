@@ -1,1 +1,1 @@
-class Handover::HandoverCalculation::HandoverCalculationArgumentError < RuntimeError; end
+class Handover::HandoverCalculation::HandoverCalculationArgumentError < Handover::HandoverError; end
