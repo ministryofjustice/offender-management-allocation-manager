@@ -39,11 +39,13 @@ class PrisonService
     PrisonInfo.new('EYI', 'Elmley (HMP)', :england, :male),
     PrisonInfo.new('FBI', 'Forest Bank (HMP/YOI)', :england, :male),
     PrisonInfo.new('FDI', 'Ford (HMP)', :england, :male),
+    PrisonInfo.new('FEI', 'Fosse Way (HMP/YOI)', :england, :male),
     PrisonInfo.new('FHI', 'Foston Hall (HMP)', :england, :female),
     PrisonInfo.new('FKI', 'Frankland (HMP)', :england, :male),
     PrisonInfo.new('FMI', 'Feltham (HMP/YOI)', :england, :male),
     PrisonInfo.new('FNI', 'Full Sutton (HMP)', :england, :male),
     PrisonInfo.new('FSI', 'Featherstone (HMP)', :england, :male),
+    PrisonInfo.new('FWI', 'Five Wells (FWI)', :england, :male),
     PrisonInfo.new('GHI', 'Garth (HMP)', :england, :male),
     PrisonInfo.new('GMI', 'Guys Marsh (HMP)', :england, :male),
     PrisonInfo.new('GNI', 'Grendon (HMP)', :england, :male),
@@ -76,6 +78,7 @@ class PrisonService
     PrisonInfo.new('LWI', 'Lewes (HMP)', :england, :male),
     PrisonInfo.new('LYI', 'Leyhill (HMP)', :england, :male),
     PrisonInfo.new('MDI', 'Moorland (HMP/YOI)', :england, :male),
+    PrisonInfo.new('MHI', 'Morton Hall (HMP)', :england, :male),
     PrisonInfo.new('MRI', 'Manchester (HMP)', :england, :male),
     PrisonInfo.new('MSI', 'Maidstone (HMP)', :england, :male),
     PrisonInfo.new('MTI', 'The Mount (HMP)', :england, :male),
@@ -87,8 +90,8 @@ class PrisonService
     PrisonInfo.new('ONI', 'Onley (HMP)', :england, :male),
     PrisonInfo.new('OWI', 'Oakwood (HMP)', :england, :male),
     PrisonInfo.new('PBI', 'Peterborough (HMP)', :england, :male),
-    PrisonInfo.new('PFI', 'Peterborough Female (HMP)', :england, :female),
     PrisonInfo.new('PDI', 'Portland (HMP/YOI)', :england, :male),
+    PrisonInfo.new('PFI', 'Peterborough Female (HMP)', :england, :female),
     PrisonInfo.new('PNI', 'Preston (HMP)', :england, :male),
     PrisonInfo.new('PRI', 'Parc (HMP)', :wales, :male),
     PrisonInfo.new('PVI', 'Pentonville (HMP)', :england, :male),
@@ -123,9 +126,7 @@ class PrisonService
     PrisonInfo.new('WSI', 'Wormwood Scrubs (HMP)', :england, :male),
     PrisonInfo.new('WTI', 'Whatton (HMP)', :england, :male),
     PrisonInfo.new('WWI', 'Wandsworth (HMP)', :england, :male),
-    PrisonInfo.new('WYI', 'Wetherby (HMP/YOI)', :england, :male),
-    PrisonInfo.new('MHI', 'Morton Hall (HMP)', :england, :male),
-    PrisonInfo.new('FWI', 'Five Wells (FWI)', :england, :male)
+    PrisonInfo.new('WYI', 'Wetherby (HMP/YOI)', :england, :male)
   ].index_by(&:code).freeze
 
   # Coverage is not used in real code only used in rake task import:prison
