@@ -28,8 +28,6 @@ AllCops:
     - 'lib/tasks/elasticsearch.rake'
     - 'spec/dummy/db/**/*'
     - 'spec/factories/*.rb'
-    - 'features/support/env.rb'
-    - 'lib/tasks/cucumber.rake'
 
 Style/MultilineBlockChain:
   Enabled: false
