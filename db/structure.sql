@@ -150,7 +150,7 @@ CREATE TABLE public.case_information (
     ldu_code character varying,
     com_email character varying,
     active_vlo boolean DEFAULT false,
-    enhanced_handover boolean
+    enhanced_handover boolean NOT NULL
 );
 
 
@@ -1286,6 +1286,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230213000002'),
 ('20230213000003'),
 ('20230412150435'),
-('20230602102101');
+('20230602102101'),
+('20230602163929');
 
 
