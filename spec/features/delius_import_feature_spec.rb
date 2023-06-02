@@ -39,6 +39,8 @@ RSpec.feature "Delius import feature", :disable_push_to_delius do
 
       ProcessDeliusDataJob.perform_now offender_no
 
+      expect(DeliusImportError.all).to eq []
+
       reload_page
       expect(page).to have_content("Add missing details")
       expect(page).not_to have_content(offender_no)
