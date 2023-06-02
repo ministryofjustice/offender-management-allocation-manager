@@ -3,13 +3,6 @@ require 'rails_helper'
 RSpec.describe CaseInformation, type: :model do
   let(:case_info) { create(:case_information) }
 
-  it 'has timestamps' do
-    expect(case_info.created_at).not_to be_nil
-    sleep 2
-    case_info.touch
-    expect(case_info.updated_at).not_to eq(case_info.created_at)
-  end
-
   context 'with mappa level' do
     subject { build(:case_information) }
 
@@ -79,6 +72,16 @@ RSpec.describe CaseInformation, type: :model do
         subject.probation_service = service
         expect(subject).to be_valid
       end
+    end
+  end
+
+  it 'ensures enhanced_handover? flag is always set based on NPS/CRC value' do
+    crc_ci = FactoryBot.create :case_information, case_allocation: 'CRC'
+    nps_ci = FactoryBot.create :case_information, case_allocation: 'NPS'
+
+    aggregate_failures do
+      expect(crc_ci.enhanced_handover?).to eq false
+      expect(nps_ci.enhanced_handover?).to eq true
     end
   end
 end

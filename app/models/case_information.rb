@@ -15,6 +15,8 @@ class CaseInformation < ApplicationRecord
 
   scope :nps, -> { where(case_allocation: NPS) }
 
+  before_save { self.enhanced_handover = (case_allocation == NPS) }
+
   def nps_case?
     case_allocation == NPS
   end
