@@ -53,12 +53,12 @@ FactoryBot.define do
   factory :offender do
     nomis_offender_id
 
-    trait :nps do
-      case_information { create(:case_information, :nps) }
+    trait :enhanced_handover do
+      case_information { create(:case_information, enhanced_handover: true) }
     end
 
-    trait :crc do
-      case_information { create(:case_information, :crc) }
+    trait :normal_handover do
+      case_information { create(:case_information, enhanced_handover: false) }
     end
   end
 

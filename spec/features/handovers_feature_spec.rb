@@ -9,7 +9,6 @@ RSpec.feature 'Handovers feature:' do
       last_name: 'Surname1',
       offender_no: 'X1111XX',
       tier: 'A',
-      case_allocation: 'HDCED',
       handover_progress_task_completion_data: {},
       allocated_com_email: nil,
       allocated_com_name: nil,
@@ -17,6 +16,7 @@ RSpec.feature 'Handovers feature:' do
       ldu_name: nil,
       ldu_email_address: nil,
       handover_progress_complete?: false,
+      case_information: double(enhanced_handover?: false),
     }
   end
   let(:offender) { sneaky_instance_double AllocatedOffender, offender_attrs }

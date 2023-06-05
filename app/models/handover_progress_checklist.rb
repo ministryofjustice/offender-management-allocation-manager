@@ -1,14 +1,12 @@
 class HandoverProgressChecklist < ApplicationRecord
-  TASK_FIELDS_FOR_CASE_ALLOCATION = {
-    'NPS' => %w[reviewed_oasys contacted_com attended_handover_meeting],
-    'CRC' => %w[contacted_com sent_handover_report],
-  }.freeze
+  ENHANCED_HANDOVER_TASK_FIELDS = %w[reviewed_oasys contacted_com attended_handover_meeting].freeze
+  NORMAL_HANDOVER_TASK_FIELD = %w[contacted_com sent_handover_report].freeze
 
   has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
 
   belongs_to :offender, foreign_key: :nomis_offender_id
 
-  delegate :case_allocation, to: :offender, allow_nil: true
+  delegate :enhanced_handover?, to: :offender
 
   def progress_data
     {
@@ -28,7 +26,7 @@ class HandoverProgressChecklist < ApplicationRecord
 private
 
   def task_fields
-    TASK_FIELDS_FOR_CASE_ALLOCATION.fetch(case_allocation)
+    enhanced_handover? ? ENHANCED_HANDOVER_TASK_FIELDS : NORMAL_HANDOVER_TASK_FIELD
   end
 
   def task_attributes
