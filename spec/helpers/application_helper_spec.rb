@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 RSpec.describe ApplicationHelper do
   describe 'formatting date strings' do
     it 'displays a date object into a specific string format' do
@@ -8,13 +6,20 @@ RSpec.describe ApplicationHelper do
     end
   end
 
-  describe 'returns the correct label' do
-    it "for service provider CRC" do
-      expect(service_provider_label('CRC')).to eq('Standard')
+  describe '#handover_type_label' do
+    it 'returns correct value when enhanced handover is false' do
+      o = double(:mpc_offender, case_information: double(enhanced_handover?: false))
+      expect(handover_type_label(o)).to eq(t('handover_type.standard'))
     end
 
-    it "for service provider NPS" do
-      expect(service_provider_label('NPS')).to eq('Enhanced')
+    it 'returns correct value when enhanced handover is true' do
+      o = double(:mpc_offender, case_information: double(enhanced_handover?: true))
+      expect(handover_type_label(o)).to eq(t('handover_type.enhanced'))
+    end
+
+    it 'returns "Not provided" if case information is missing' do
+      o = double(:mpc_offender, case_information: nil)
+      expect(handover_type_label(o)).to eq(t('handover_type.missing'))
     end
   end
 
