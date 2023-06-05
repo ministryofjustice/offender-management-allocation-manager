@@ -152,5 +152,5 @@
   </table>
 
   <%= render 'prisoners/community_information' %>
-  <%= render 'shared/vlo_information', victim_liaison_officers: @prisoner.victim_liaison_officers, offender_no: @prisoner.offender_no, prison_code: @prison.code %>
+  <%= render 'shared/vlo_information', offender: @prisoner, prison_code: @prison.code %>
 </div>
