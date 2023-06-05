@@ -136,7 +136,7 @@ describe HmppsApi::Offender do
                                                             automaticReleaseDate: Time.zone.today + 1.year,
                                                             sentenceStartDate: Time.zone.today))
       end
-      let(:case_info) { build(:case_information, case_allocation: 'NPS', mappa_level: 0) }
+      let(:case_info) { build(:case_information, enhanced_handover: true, mappa_level: 0) }
       let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
       it 'has a value' do
@@ -174,7 +174,7 @@ describe HmppsApi::Offender do
 
     context 'when the responsibility has been overridden' do
       let(:offender) do
-        case_info = create(:case_information, offender: build(:offender, nomis_offender_id: api_offender.offender_no), case_allocation: 'NPS', mappa_level: 0)
+        case_info = create(:case_information, offender: build(:offender, nomis_offender_id: api_offender.offender_no), enhanced_handover: true, mappa_level: 0)
 
         # Responsibility overrides exist as 'Responsibility' records
         create(:responsibility, nomis_offender_id: api_offender.offender_no, value: override_to)
@@ -218,7 +218,7 @@ describe HmppsApi::Offender do
 
     context 'when the responsibility has been overridden' do
       let(:offender) do
-        case_info = create(:case_information, offender: build(:offender, nomis_offender_id: api_offender.offender_no), case_allocation: 'NPS', mappa_level: 0)
+        case_info = create(:case_information, offender: build(:offender, nomis_offender_id: api_offender.offender_no), enhanced_handover: true, mappa_level: 0)
 
         # Responsibility overrides exist as 'Responsibility' records
         create(:responsibility, nomis_offender_id: api_offender.offender_no, value: override_to)
@@ -252,7 +252,7 @@ describe HmppsApi::Offender do
     let(:api_offender) { build(:hmpps_api_offender) }
     let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
-    delegated_fields = [:tier, :case_allocation, :mappa_level]
+    delegated_fields = [:tier, :enhanced_handover?, :mappa_level]
     delegated_fields.each do |delegated_field|
       describe "##{delegated_field}" do
         let(:field) { delegated_field }

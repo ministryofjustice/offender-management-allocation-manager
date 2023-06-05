@@ -63,7 +63,7 @@ class OffenderService
         ldu_code: com.dig(:team, :localDeliveryUnit, :code),
         mappa_levels: mappa_registrations.map { |r| r.dig(:registerLevel, :code).last.to_i },
         active_vlo: registrations.any? { |r| r.fetch(:active) && %w[INVI DASO].include?(r.dig(:type, :code)) }
-      }
+      }.with_indifferent_access
     end
 
     def get_com(nomis_offender_id)
@@ -88,7 +88,7 @@ class OffenderService
         is_responsible: com.fetch('isResponsibleOfficer'),
         team_name: com.fetch('team').fetch('description'),
         ldu_code: com.fetch('team').fetch('localDeliveryUnit').fetch('code'),
-      })
+      }).with_indifferent_access
     end
 
     def get_mappa_details(crn)

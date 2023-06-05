@@ -4,17 +4,9 @@ FactoryBot.define do
   factory :case_information do
     association :offender
 
-    tier do
-      'A'
-    end
+    tier { 'A' }
 
-    case_allocation do
-      CaseInformation::NPS
-    end
-
-    manual_entry do
-      true
-    end
+    manual_entry { true }
 
     association :local_delivery_unit
 
@@ -22,20 +14,14 @@ FactoryBot.define do
 
     probation_service { 'Wales' }
 
+    enhanced_handover { false }
+
     trait :welsh do
       probation_service { 'Wales' }
     end
 
     trait :english do
       probation_service { 'England' }
-    end
-
-    trait :nps do
-      case_allocation { CaseInformation::NPS }
-    end
-
-    trait :crc do
-      case_allocation { CaseInformation::CRC }
     end
 
     trait :with_com do

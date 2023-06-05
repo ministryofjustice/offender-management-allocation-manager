@@ -3,9 +3,6 @@
 class CaseInformation < ApplicationRecord
   self.table_name = 'case_information'
 
-  NPS = 'NPS'
-  CRC = 'CRC'
-
   has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
 
   belongs_to :offender, foreign_key: :nomis_offender_id, inverse_of: :case_information
@@ -13,17 +10,7 @@ class CaseInformation < ApplicationRecord
   belongs_to :local_delivery_unit, -> { enabled }, optional: true, inverse_of: :case_information
   delegate :name, :email_address, to: :local_delivery_unit, prefix: :ldu, allow_nil: true
 
-  scope :nps, -> { where(case_allocation: NPS) }
-
-  before_save { self.enhanced_handover = (case_allocation == NPS) }
-
-  def nps_case?
-    case_allocation == NPS
-  end
-
-  def welsh_offender
-    probation_service == 'Wales'
-  end
+  before_validation { self[:case_allocation] = enhanced_handover? ? 'NPS' : 'CRC' }
 
   validates :manual_entry, inclusion: { in: [true, false], allow_nil: false }
   validates :nomis_offender_id, presence: true, uniqueness: true
@@ -33,7 +20,7 @@ class CaseInformation < ApplicationRecord
   validates :tier, inclusion: { in: %w[A B C D N/A], message: 'Select the prisoner’s tier' }
 
   validates :case_allocation, inclusion: {
-    in: [NPS, CRC],
+    in: %w[NPS CRC],
     allow_nil: false,
     message: 'Select the handover type for this case'
   }
@@ -47,4 +34,12 @@ class CaseInformation < ApplicationRecord
     allow_nil: false,
     message: 'Select yes if the prisoner’s last known address was in Wales'
   }
+
+  def welsh_offender
+    probation_service == 'Wales'
+  end
+
+  def case_allocation=(_)
+    raise 'Disabled - use enhanced_handover'
+  end
 end

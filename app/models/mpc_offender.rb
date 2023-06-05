@@ -13,15 +13,14 @@ class MpcOffender
            :first_name, :last_name, :full_name_ordered, :full_name,
            :inside_omic_policy?, :offender_no, :prison_id, :restricted_patient?, :age, to: :@api_offender
 
-  delegate :crn, :case_allocation, :manual_entry?, :nps_case?,
-           :tier,
-           :mappa_level, :welsh_offender, to: :case_information
+  delegate :crn, :manual_entry?, :enhanced_handover?, :tier, :mappa_level, :welsh_offender,
+           to: :@case_information
 
   delegate :victim_liaison_officers, :handover_progress_task_completion_data, :handover_progress_complete?,
            to: :@offender
 
   # These fields make sense to be nil when the case information is nil - the others dont
-  delegate :ldu_email_address, :team_name, :ldu_name, :active_vlo?, to: :case_information, allow_nil: true
+  delegate :ldu_email_address, :team_name, :ldu_name, :active_vlo?, to: :@case_information, allow_nil: true
 
   delegate :start_date, to: :handover, prefix: true
 
@@ -318,9 +317,8 @@ class MpcOffender
       prison_id
       restricted_patient?
       crn
-      case_allocation
       manual_entry?
-      nps_case?
+      enhanced_handover?
       tier
       mappa_level
       welsh_offender

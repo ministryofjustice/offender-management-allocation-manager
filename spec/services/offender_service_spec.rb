@@ -27,13 +27,13 @@ describe OffenderService, type: :feature do
     it "gets a single offender", vcr: { cassette_name: 'prison_api/offender_service_single_offender_spec' } do
       nomis_offender_id = 'G7266VD'
 
-      create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id), tier: 'C', case_allocation: 'CRC', probation_service: 'Wales')
+      create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id), tier: 'C', enhanced_handover: false, probation_service: 'Wales')
       offender = described_class.get_offender(nomis_offender_id)
 
       expect(offender.tier).to eq 'C'
       expect(offender.conditional_release_date).to eq(Date.new(2040, 1, 27))
       expect(offender.main_offence).to eq 'Robbery'
-      expect(offender.case_allocation).to eq 'CRC'
+      expect(offender.enhanced_handover?).to eq false
     end
 
     it "returns nil if offender record not found", vcr: { cassette_name: 'prison_api/offender_service_single_offender_not_found_spec' } do
@@ -79,15 +79,15 @@ describe OffenderService, type: :feature do
     context 'when hitting API', :vpn_only, vcr: { cassette_name: 'delius/get_community_data' } do
       it 'gets some data' do
         expect(described_class.get_community_data(nomis_offender_id))
-            .to eq(crn: "X349420",
-                   ldu_code: "N07NPSA",
-                   mappa_levels: [],
-                   noms_no: nomis_offender_id,
-                   offender_manager: "TestUpdate01Surname, TestUpdate01Forname",
-                   enhanced_handover?: true,
-                   team_name: "OMU A",
-                   tier: "B-2",
-                   active_vlo: false)
+            .to eq('crn' => "X349420",
+                   'ldu_code' => "N07NPSA",
+                   'mappa_levels' => [],
+                   'noms_no' => nomis_offender_id,
+                   'offender_manager' => "TestUpdate01Surname, TestUpdate01Forname",
+                   'enhanced_handover?' => true,
+                   'team_name' => "OMU A",
+                   'tier' => "B-2",
+                   'active_vlo' => false)
       end
     end
 
@@ -181,15 +181,15 @@ describe OffenderService, type: :feature do
 
           it 'gets some data' do
             expect(described_class.get_community_data(nomis_offender_id))
-                .to eq(noms_no: nomis_offender_id,
-                       tier: 'A',
-                       crn: 'X5657657',
-                       offender_manager: nil,
-                       enhanced_handover?: true,
-                       mappa_levels: [],
-                       team_name: 'Thing',
-                       ldu_code: 'LDU123',
-                       active_vlo: false)
+                .to eq('noms_no' => nomis_offender_id,
+                       'tier' => 'A',
+                       'crn' => 'X5657657',
+                       'offender_manager' => nil,
+                       'enhanced_handover?' => true,
+                       'mappa_levels' => [],
+                       'team_name' => 'Thing',
+                       'ldu_code' => 'LDU123',
+                       'active_vlo' => false)
           end
         end
 
@@ -262,12 +262,12 @@ describe OffenderService, type: :feature do
     context 'when hitting API', :vpn_only, vcr: { cassette_name: 'delius/get_all_offender_managers_data' } do
       it 'gets some data' do
         expected = {
-          name: 'TestUpdate01Surname, TestUpdate01Forname',
-          email: 'test-update-01-email@example.org ',
-          ldu_code: 'N07NPSA',
-          team_name: 'OMU A',
-          is_responsible: true,
-          is_unallocated: false,
+          'name' => 'TestUpdate01Surname, TestUpdate01Forname',
+          'email' => 'test-update-01-email@example.org ',
+          'ldu_code' => 'N07NPSA',
+          'team_name' => 'OMU A',
+          'is_responsible' => true,
+          'is_unallocated' => false,
         }
 
         expect(described_class.get_com(nomis_offender_id)).to eq expected
@@ -290,12 +290,12 @@ describe OffenderService, type: :feature do
                                                             isResponsibleOfficer: false)
             ]
           )
-          expect(described_class.get_com(nomis_offender_id)).to eq({ name: 'S1, F1',
-                                                                     email: 'E1',
-                                                                     ldu_code: 'TestLDU',
-                                                                     team_name: 'Team1',
-                                                                     is_unallocated: false,
-                                                                     is_responsible: false })
+          expect(described_class.get_com(nomis_offender_id)).to eq({ 'name' => 'S1, F1',
+                                                                     'email' => 'E1',
+                                                                     'ldu_code' => 'TestLDU',
+                                                                     'team_name' => 'Team1',
+                                                                     'is_unallocated' => false,
+                                                                     'is_responsible' => false })
         end
       end
 
@@ -310,12 +310,12 @@ describe OffenderService, type: :feature do
                                                             isResponsibleOfficer: false)
             ]
           )
-          expect(described_class.get_com(nomis_offender_id)).to eq({ name: nil,
-                                                                     email: nil,
-                                                                     ldu_code: 'TestLDU',
-                                                                     team_name: 'Team1',
-                                                                     is_unallocated: true,
-                                                                     is_responsible: false })
+          expect(described_class.get_com(nomis_offender_id)).to eq({ 'name' => nil,
+                                                                     'email' => nil,
+                                                                     'ldu_code' => 'TestLDU',
+                                                                     'team_name' => 'Team1',
+                                                                     'is_unallocated' => true,
+                                                                     'is_responsible' => false })
         end
       end
 
