@@ -303,7 +303,7 @@ RSpec.describe PrisonersController, type: :controller do
                                                           sentenceStartDate: "2019-02-08",
                                                          ))
         ]
-        create(:case_information, case_allocation: 'NPS', offender: build(:offender, nomis_offender_id: 'G4234GG'))
+        create(:case_information, enhanced_handover: true, offender: build(:offender, nomis_offender_id: 'G4234GG'))
 
         stub_offenders_for_prison(prison, offenders)
       end

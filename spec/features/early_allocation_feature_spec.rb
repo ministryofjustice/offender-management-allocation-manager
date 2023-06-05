@@ -13,10 +13,10 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
   let(:pom) { build(:pom, staffId: nomis_staff_id) }
   let(:date_of_birth) { Date.new(1980, 1, 6).to_s }
   let(:offender_name) { "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}" }
-  let(:case_alloc) { CaseInformation::NPS }
+  let!(:case_information) { create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id), enhanced_handover: true) }
 
   before do
-    create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id), case_allocation: case_alloc)
+    case_information # create it
     create(:allocation_history, prison: prison, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
 
     stub_auth_token
@@ -37,9 +37,12 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
   end
 
   context 'with switch' do
-    context 'when CRC' do
-      let(:case_alloc) { CaseInformation::CRC }
+    context 'when standard handover' do
       let(:release_date) { Time.zone.today }
+
+      before do
+        case_information.update! enhanced_handover: false
+      end
 
       it 'does not show the section' do
         find('#all-cases .govuk-table').click_link offender_name

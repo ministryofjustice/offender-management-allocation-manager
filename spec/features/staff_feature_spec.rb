@@ -37,16 +37,16 @@ feature "female estate POMs list" do
       stub_keyworker female_prison, nomis_id, build(:keyworker)
     end
 
-    create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender[:prisonerNumber]), case_allocation: 'NPS')
+    create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender[:prisonerNumber]), enhanced_handover: true)
     create(:allocation_history, nomis_offender_id: nomis_offender[:prisonerNumber], primary_pom_nomis_id: poms.first.staffId, prison: female_prison)
 
     %w[A B C].each_with_index do |tier, index|
-      create(:case_information, tier: tier, offender: build(:offender, nomis_offender_id: offenders_in_prison[index][:prisonerNumber]), case_allocation: 'NPS')
+      create(:case_information, tier: tier, offender: build(:offender, nomis_offender_id: offenders_in_prison[index][:prisonerNumber]), enhanced_handover: true)
       create(:allocation_history, nomis_offender_id: offenders_in_prison[index][:prisonerNumber], primary_pom_nomis_id: poms.first.staffId, prison: female_prison)
     end
 
     %w[D N/A].each_with_index do |tier, index|
-      create(:case_information, tier: tier, offender: build(:offender, nomis_offender_id: offenders_in_prison[index + 4][:prisonerNumber]), case_allocation: 'NPS')
+      create(:case_information, tier: tier, offender: build(:offender, nomis_offender_id: offenders_in_prison[index + 4][:prisonerNumber]), enhanced_handover: true)
       create(:allocation_history, nomis_offender_id: offenders_in_prison[index + 4][:prisonerNumber], primary_pom_nomis_id: poms.last.staffId, prison: female_prison)
     end
 

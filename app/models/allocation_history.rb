@@ -65,7 +65,7 @@ class AllocationHistory < ApplicationRecord
   # find all allocations which cannot be handed over as there is no LDU email address
   def self.without_ldu_emails
     blank_ldu_cases = CaseInformation.where(local_delivery_unit: nil)
-    offenders = blank_ldu_cases.nps.pluck(:nomis_offender_id)
+    offenders = blank_ldu_cases.where(enhanced_handover: true).pluck(:nomis_offender_id)
     AllocationHistory.where(nomis_offender_id: offenders)
   end
 
