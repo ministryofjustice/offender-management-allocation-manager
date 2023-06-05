@@ -4,15 +4,15 @@ class HandoverMailer < GovukNotifyRails::Mailer
                                full_name_ordered:,
                                first_name:,
                                handover_date:,
-                               service_provider:,
+                               enhanced_handover:,
                                release_date:)
     set_template('7114ad9e-e71a-4424-a884-bcc72bd1a569')
     set_personalisation(nomis_offender_id: nomis_offender_id,
                         full_name_ordered: full_name_ordered,
                         first_name: first_name,
                         handover_date: handover_date,
-                        is_standard: service_provider == 'NPS' ? 'no' : 'yes',
-                        is_enhanced: service_provider == 'NPS' ? 'yes' : 'no',
+                        is_standard: enhanced_handover ? 'no' : 'yes',
+                        is_enhanced: enhanced_handover ? 'yes' : 'no',
                         release_date: release_date)
     mail(to: email)
   end
@@ -24,15 +24,15 @@ class HandoverMailer < GovukNotifyRails::Mailer
                     release_date:,
                     com_name:,
                     com_email:,
-                    service_provider:)
+                    enhanced_handover:)
     set_template('95ddd96c-23f9-4066-b033-d4a1d83b702e')
     set_personalisation(nomis_offender_id: nomis_offender_id,
                         full_name_ordered: full_name_ordered,
                         first_name: first_name,
                         com_name: com_name,
                         com_email: com_email,
-                        is_standard: service_provider == 'NPS' ? 'no' : 'yes',
-                        is_enhanced: service_provider == 'NPS' ? 'yes' : 'no',
+                        is_standard: enhanced_handover ? 'no' : 'yes',
+                        is_enhanced: enhanced_handover ? 'yes' : 'no',
                         release_date: release_date)
     mail(to: email)
   end
@@ -44,7 +44,7 @@ class HandoverMailer < GovukNotifyRails::Mailer
                              release_date:,
                              ldu_name:,
                              ldu_email:,
-                             service_provider:)
+                             enhanced_handover:)
     ldu_information = ''
     ldu_information += "LDU: #{ldu_name}\n" if ldu_name.present?
     ldu_information += "LDU email: #{ldu_email}\n" if ldu_email.present?
@@ -54,8 +54,8 @@ class HandoverMailer < GovukNotifyRails::Mailer
                         full_name_ordered: full_name_ordered,
                         handover_date: handover_date,
                         release_date: release_date,
-                        is_standard: service_provider == 'NPS' ? 'no' : 'yes',
-                        is_enhanced: service_provider == 'NPS' ? 'yes' : 'no',
+                        is_standard: enhanced_handover ? 'no' : 'yes',
+                        is_enhanced: enhanced_handover ? 'yes' : 'no',
                         ldu_information: ldu_information,
                         has_ldu_email: ldu_email.present?,
                         missing_ldu_email: ldu_email.blank?)

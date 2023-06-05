@@ -1,4 +1,3 @@
-# Shitty integrated test doesn't stub out models - what can we do, short on time
 RSpec.describe Handover::HandoverEmailBatchRun do
   let(:today) { Date.new(2021, 2, 12) }
   let(:allocated_to_process) do
@@ -8,7 +7,7 @@ RSpec.describe Handover::HandoverEmailBatchRun do
                       offender_no: FactoryBot.generate(:nomis_offender_id),
                       first_name: 'ALI',
                       full_name_ordered: 'Ali Bloggs',
-                      case_allocation: 'NPS',
+                      enhanced_handover?: true,
                       staff_member: double(staff_id: 'STAFF1', email_address: 'staff1@example.org'),
                       allocated_com_name: 'COM 0',
                       allocated_com_email: 'com0@example.com',
@@ -19,7 +18,7 @@ RSpec.describe Handover::HandoverEmailBatchRun do
                       offender_no: FactoryBot.generate(:nomis_offender_id),
                       first_name: 'SALLY',
                       full_name_ordered: 'Sally Patel',
-                      case_allocation: 'CRC',
+                      enhanced_handover?: false,
                       staff_member: double(staff_id: 'STAFF2', email_address: 'staff2@example.org'),
                       allocated_com_name: 'COM 1',
                       allocated_com_email: 'com1@example.com',
@@ -67,7 +66,7 @@ RSpec.describe Handover::HandoverEmailBatchRun do
             full_name_ordered: 'Ali Bloggs',
             first_name: 'Ali',
             handover_date: '9 April 2021',
-            service_provider: 'NPS',
+            enhanced_handover: true,
             release_date: '12 November 2100',
             deliver_now: false,
           )
@@ -77,7 +76,7 @@ RSpec.describe Handover::HandoverEmailBatchRun do
             full_name_ordered: 'Sally Patel',
             first_name: 'Sally',
             handover_date: '9 April 2021',
-            service_provider: 'CRC',
+            enhanced_handover: false,
             release_date: '14 June 2200',
             deliver_now: false,
           )
@@ -122,7 +121,7 @@ RSpec.describe Handover::HandoverEmailBatchRun do
             release_date: '12 November 2100',
             com_name: 'COM 0',
             com_email: 'com0@example.com',
-            service_provider: 'NPS',
+            enhanced_handover: true,
             deliver_now: false,
           )
           expect(Handover::HandoverEmail).to have_received(:deliver_if_deliverable).with(
@@ -133,7 +132,7 @@ RSpec.describe Handover::HandoverEmailBatchRun do
             release_date: '14 June 2200',
             com_name: 'COM 1',
             com_email: 'com1@example.com',
-            service_provider: 'CRC',
+            enhanced_handover: false,
             deliver_now: false,
           )
           expect(Handover::HandoverEmail).to have_received(:deliver_if_deliverable).twice
@@ -177,7 +176,7 @@ RSpec.describe Handover::HandoverEmailBatchRun do
             handover_date: '29 January 2021',
             ldu_name: 'LDU 0',
             ldu_email: 'ldu0@example.com',
-            service_provider: 'NPS',
+            enhanced_handover: true,
             deliver_now: false,
           )
           expect(Handover::HandoverEmail).to have_received(:deliver_if_deliverable).with(
@@ -188,7 +187,7 @@ RSpec.describe Handover::HandoverEmailBatchRun do
             handover_date: '29 January 2021',
             ldu_name: 'LDU 1',
             ldu_email: 'ldu1@example.com',
-            service_provider: 'CRC',
+            enhanced_handover: false,
             deliver_now: false,
           )
           expect(Handover::HandoverEmail).to have_received(:deliver_if_deliverable).twice
