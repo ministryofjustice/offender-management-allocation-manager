@@ -399,13 +399,29 @@
                   <span class="govuk-tag govuk-tag--red" style="margin-top: 5px;">NON-DISCLOSABLE</span>
                 </td>
 
-                <% if @prisoner.victim_liaison_officers.any? %>
+                <% if @prisoner.active_vlo? && @prisoner.victim_liaison_officers.none? %>
+                  <td class="govuk-table__cell govuk-!-width-two-thirds">
+                    <%= render 'shared/vlo_warning', prison_code: @prison.code, offender_no: @prisoner.offender_no %>
+                  </td>
+                <% elsif @prisoner.victim_liaison_officers.none? %>
+                  <td class="govuk-table__cell govuk-!-width-one-third">
+                    No VLO details added
+                    <div class="govuk-!-margin-top-6">
+                      <%= link_to 'Add new VLO contact',
+                                  new_prison_prisoner_victim_liaison_officer_path(@prison.code, @prisoner.offender_no),
+                                  class: 'govuk-link' %>
+                    </div>
+                  </td>
+                  <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                <% else %>
                   <td class="govuk-table__cell govuk-!-width-one-third">
                     <% @prisoner.victim_liaison_officers.each do |vlo| %>
-                      <p><%= vlo.full_name_ordered %> -<br/><%= vlo.email %></p>
+                      <p class="vlo-details"><%= vlo.full_name_ordered %> -<br/><%= vlo.email %></p>
                     <% end %>
                     <div class="govuk-!-margin-top-6">
-                      <%= link_to 'Add new VLO contact', new_prison_prisoner_victim_liaison_officer_path(@prison.code, @prisoner.offender_no), class: 'govuk-link' %>
+                      <%= link_to 'Add new VLO contact',
+                                  new_prison_prisoner_victim_liaison_officer_path(@prison.code, @prisoner.offender_no),
+                                  class: 'govuk-link' %>
                     </div>
                   </td>
                   <td class="govuk-table__cell govuk-!-width-one-third">
@@ -417,13 +433,6 @@
                       </p>
                     <% end %>
                   </td>
-                <% elsif @prisoner.active_vlo? %>
-                  <td class="govuk-table__cell govuk-!-width-two-thirds">
-                    <%= render 'shared/vlo_warning', prison_code: @prison.code, offender_no: @prisoner.offender_no %>
-                  </td>
-                <% else %>
-                  <td class="govuk-table__cell govuk-!-width-one-third">No VLO details added</td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"></td>
                 <% end %>
               </tr>
             </tbody>
