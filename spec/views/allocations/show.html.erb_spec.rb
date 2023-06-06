@@ -18,6 +18,7 @@ RSpec.describe "allocations/show", type: :view do
                     handover_start_date: nil,
                     responsibility_handover_date: nil).as_null_object
   end
+
   let(:page) { Nokogiri::HTML(rendered) }
 
   before do
@@ -30,7 +31,6 @@ RSpec.describe "allocations/show", type: :view do
     stub_template 'shared/_badges.html.erb' => ''
     stub_template 'shared/_offence_info.html.erb' => ''
     stub_template 'prisoners/_community_information.html.erb' => ''
-    stub_template 'shared/_vlo_information.html.erb' => ''
 
     allow(view).to receive(:vlo_tag).and_return('')
     allow(view).to receive(:prisoner_location).and_return('')
@@ -38,6 +38,8 @@ RSpec.describe "allocations/show", type: :view do
   end
 
   describe 'responsibility' do
+    before { stub_template 'shared/_vlo_information.html.erb' => '' }
+
     it 'allows POM responsible cases to have responsibility overridden' do
       render
       expect(page).to have_css ".responsibility_change a[href='#{new_prison_responsibility_path(prison.code, nomis_offender_id: offender.offender_no)}']"
@@ -51,6 +53,60 @@ RSpec.describe "allocations/show", type: :view do
       )
       render
       expect(page).to have_css ".responsibility_change a[href='#{confirm_removal_prison_responsibility_path(prison.code, nomis_offender_id: offender.offender_no)}']"
+    end
+  end
+
+  describe 'VLO section' do
+    let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
+    let(:api_offender) { build(:hmpps_api_offender, category: build(:offender_category, :cat_a)) }
+
+    context 'with no VLO in nDelius' do
+      let(:case_info) { build(:case_information) }
+
+      before { render }
+
+      it 'has a stand-alone link to create a VLO' do
+        expect(page).to have_content('Add new VLO contact')
+      end
+    end
+
+    context 'with active VLO in nDelius' do
+      let(:case_info) { build(:case_information, :with_active_vlo) }
+
+      context 'with no VLO in MPC' do
+        before { render }
+
+        it 'displays no VLOs' do
+          expect(page).not_to have_content('Victim liaison officer name')
+        end
+
+        it 'has a message containing a link to create a VLO' do
+          expect(page).to have_css('a', text: 'add it to this service')
+        end
+
+        it 'has no stand-alone link to create a VLO' do
+          expect(page).not_to have_content('Add new VLO contact')
+        end
+      end
+
+      context 'with VLO in MPC' do
+        before do
+          create(:victim_liaison_officer, offender: case_info.offender)
+          render
+        end
+
+        it 'displays the VLO' do
+          expect(page).to have_content('Victim liaison officer name')
+        end
+
+        it 'has no message containing a link to create a VLO' do
+          expect(page).not_to have_css('a', text: 'add it to this service')
+        end
+
+        it 'has a stand-alone link to create a VLO' do
+          expect(page).to have_content('Add new VLO contact')
+        end
+      end
     end
   end
 end

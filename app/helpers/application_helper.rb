@@ -49,7 +49,7 @@ module ApplicationHelper
   end
 
   def vlo_tag(offender)
-    return '' unless offender.active_vlo?
+    return '' unless offender.active_vlo? || offender.victim_liaison_officers.any?
 
     tag.span('VLO CONTACT', class: 'govuk-tag govuk-tag--red')
   end

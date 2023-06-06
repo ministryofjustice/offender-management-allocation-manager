@@ -398,27 +398,42 @@
                   <br>
                   <span class="govuk-tag govuk-tag--red" style="margin-top: 5px;">NON-DISCLOSABLE</span>
                 </td>
-                <td class="govuk-table__cell govuk-!-width-one-third">
-                  <% if @prisoner.victim_liaison_officers.any? %>
-                    <% @prisoner.victim_liaison_officers.each do |vlo| %>
-                      <p><%= vlo.full_name_ordered %> -<br/><%= vlo.email %></p>
-                    <% end %>
-                  <% else %>
+
+                <% if @prisoner.active_vlo? && @prisoner.victim_liaison_officers.none? %>
+                  <td class="govuk-table__cell govuk-!-width-two-thirds">
+                    <%= render 'shared/vlo_warning', prison_code: @prison.code, offender_no: @prisoner.offender_no %>
+                  </td>
+                <% elsif @prisoner.victim_liaison_officers.none? %>
+                  <td class="govuk-table__cell govuk-!-width-one-third">
                     No VLO details added
-                  <% end %>
-                  <div class="govuk-!-margin-top-6">
-                    <%= link_to 'Add new VLO contact', new_prison_prisoner_victim_liaison_officer_path(@prison.code, @prisoner.offender_no), class: 'govuk-link' %>
-                  </div>
-                </td>
-                <td class="govuk-table__cell govuk-!-width-one-third">
-                  <% @prisoner.victim_liaison_officers.each do |vlo| %>
-                    <p>
-                      <%= link_to 'Change details', edit_prison_prisoner_victim_liaison_officer_path(@prison.code, @prisoner.offender_no, vlo) %>
-                      <br/>
-                      <%= link_to 'Remove contact', delete_prison_prisoner_victim_liaison_officer_path(@prison.code, @prisoner.offender_no, vlo) %>
-                    </p>
-                  <% end %>
-                </td>
+                    <div class="govuk-!-margin-top-6">
+                      <%= link_to 'Add new VLO contact',
+                                  new_prison_prisoner_victim_liaison_officer_path(@prison.code, @prisoner.offender_no),
+                                  class: 'govuk-link' %>
+                    </div>
+                  </td>
+                  <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                <% else %>
+                  <td class="govuk-table__cell govuk-!-width-one-third">
+                    <% @prisoner.victim_liaison_officers.each do |vlo| %>
+                      <p class="vlo-details"><%= vlo.full_name_ordered %> -<br/><%= vlo.email %></p>
+                    <% end %>
+                    <div class="govuk-!-margin-top-6">
+                      <%= link_to 'Add new VLO contact',
+                                  new_prison_prisoner_victim_liaison_officer_path(@prison.code, @prisoner.offender_no),
+                                  class: 'govuk-link' %>
+                    </div>
+                  </td>
+                  <td class="govuk-table__cell govuk-!-width-one-third">
+                    <% @prisoner.victim_liaison_officers.each do |vlo| %>
+                      <p>
+                        <%= link_to 'Change details', edit_prison_prisoner_victim_liaison_officer_path(@prison.code, @prisoner.offender_no, vlo) %>
+                        <br/>
+                        <%= link_to 'Remove contact', delete_prison_prisoner_victim_liaison_officer_path(@prison.code, @prisoner.offender_no, vlo) %>
+                      </p>
+                    <% end %>
+                  </td>
+                <% end %>
               </tr>
             </tbody>
           </table>

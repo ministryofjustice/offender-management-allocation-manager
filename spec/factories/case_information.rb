@@ -41,5 +41,9 @@ FactoryBot.define do
     trait :with_com do
       com_name { "#{Faker::Name.last_name}, #{Faker::Name.first_name}" }
     end
+
+    trait :with_active_vlo do
+      active_vlo { true }
+    end
   end
 end

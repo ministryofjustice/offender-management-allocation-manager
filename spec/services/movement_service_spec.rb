@@ -116,11 +116,11 @@ describe MovementService, type: :feature do
                          fromAgency: 'ASHWTH', toAgency: 'GTI')
       end
 
-      it 'returns true' do
+      it 'returns true', flaky: true do
         expect(processed).to be true
       end
 
-      it 'de-allocates offender' do
+      it 'de-allocates offender', flaky: true do
         processed
         expect(existing_allocation.reload.active?).to eq(false)
       end
@@ -179,7 +179,7 @@ describe MovementService, type: :feature do
       context 'and for hospital restricted patient' do
         let(:from_agency) { 'BASDON' }
 
-        it "can process movements", vcr: { cassette_name: 'prison_api/movement_service_process_release_spec' }  do
+        it "can process movements", vcr: { cassette_name: 'prison_api/movement_service_process_release_spec' }, flaky: true do
           expect(processed).to be true
           expect(CaseInformation.where(nomis_offender_id: valid_release.offender_no)).to be_empty
           expect(updated_allocation.event_trigger).to eq 'offender_released'

@@ -1,19 +1,27 @@
-<table class="govuk-table no-bottom-padding">
-  <tbody class="govuk-table__body">
-    <tr class="govuk-table__row">
-      <td class="govuk-table__header govuk-!-width-one-half" scope="row">Victim Liaison Officer (VLO)
-        <span id="non-disclosable-badge" class="govuk-tag govuk-tag--red" >Non-Disclosable</span>
-      </td>
-      <td class="govuk-table__cell govuk-!-width-one-half"></td>
-    </tr>
-    <tr>
-      <td class="govuk-!-width-full">
-        <%= render collection: victim_liaison_officers, partial: 'shared/victim_liaison_officer' %>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<div class="govuk-body vlo-spacing">
-  <%= link_to 'Add new VLO contact', new_prison_prisoner_victim_liaison_officer_path(prison_code, offender_no), class: 'govuk-link' %>
-</div>
-
+<% if offender.probation_record.present? %>
+  <table class="govuk-table no-bottom-padding" id="vlo-information">
+    <tbody class="govuk-table__body">
+      <tr class="govuk-table__row">
+        <td class="govuk-table__header govuk-!-width-one-half" scope="row">Victim liaison officer (VLO)
+          <span id="non-disclosable-badge" class="govuk-tag govuk-tag--red" >Non-Disclosable</span>
+        </td>
+        <td class="govuk-table__cell govuk-!-width-one-half"></td>
+      </tr>
+      <tr>
+        <td class="govuk-!-width-full">
+          <% if offender.active_vlo? && offender.victim_liaison_officers.none? %>
+            <%= render 'shared/vlo_warning', prison_code: prison_code, offender_no: offender.offender_no %>
+          <% end %>
+          <%= render collection: offender.victim_liaison_officers, partial: 'shared/victim_liaison_officer' %>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <% unless offender.active_vlo? && offender.victim_liaison_officers.none? %>
+    <div class="govuk-body vlo-spacing">
+      <%= link_to 'Add new VLO contact',
+                  new_prison_prisoner_victim_liaison_officer_path(prison_code, offender.offender_no),
+                  class: 'govuk-link' %>
+    </div>
+  <% end %>
+<% end %>

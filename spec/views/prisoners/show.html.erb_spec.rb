@@ -78,4 +78,55 @@ RSpec.describe "prisoners/show", type: :view do
       end
     end
   end
+
+  describe 'VLO section' do
+    let(:api_offender) { build(:hmpps_api_offender, category: build(:offender_category, :cat_a)) }
+
+    context 'with no VLO in nDelius' do
+      before { render }
+
+      it 'has a stand-alone link to create a VLO' do
+        expect(page).to have_content('Add new VLO contact')
+      end
+    end
+
+    context 'with active VLO in nDelius' do
+      let(:case_info) { build(:case_information, :with_active_vlo) }
+
+      context 'with no VLO in MPC' do
+        before { render }
+
+        it 'displays no VLOs' do
+          expect(page).not_to have_content('Victim liaison officer name')
+        end
+
+        it 'has a message containing a link to create a VLO' do
+          expect(page).to have_css('a', text: 'add it to this service')
+        end
+
+        it 'has no stand-alone link to create a VLO' do
+          expect(page).not_to have_content('Add new VLO contact')
+        end
+      end
+
+      context 'with VLO in MPC' do
+        before do
+          create(:victim_liaison_officer, offender: case_info.offender)
+          render
+        end
+
+        it 'displays the VLO' do
+          expect(page).to have_content('Victim liaison officer name')
+        end
+
+        it 'has no message containing a link to create a VLO' do
+          expect(page).not_to have_css('a', text: 'add it to this service')
+        end
+
+        it 'has a stand-alone link to create a VLO' do
+          expect(page).to have_content('Add new VLO contact')
+        end
+      end
+    end
+  end
 end
