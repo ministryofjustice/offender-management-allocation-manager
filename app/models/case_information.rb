@@ -19,9 +19,8 @@ class CaseInformation < ApplicationRecord
   # prisoners it makes sense to have N/A (as this is genuine) but not otherwise
   validates :tier, inclusion: { in: %w[A B C D N/A], message: 'Select the prisoner’s tier' }
 
-  validates :case_allocation, inclusion: {
-    in: %w[NPS CRC],
-    allow_nil: false,
+  validates :enhanced_handover, inclusion: {
+    in: [true, false],
     message: 'Select the handover type for this case'
   }
 

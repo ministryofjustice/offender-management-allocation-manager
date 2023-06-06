@@ -17,8 +17,8 @@
 
   <%= form.govuk_collection_radio_buttons(
         :enhanced_handover,
-        [OpenStruct.new(name: t('.case_allocation.resourcing.enhanced'), value: true),
-         OpenStruct.new(name: t('.case_allocation.resourcing.normal'), value: false)],
+        [OpenStruct.new(name: t('.case_allocation.resourcing.enhanced'), value: 'true'),
+         OpenStruct.new(name: t('.case_allocation.resourcing.normal'), value: 'false')],
         :value,
         :name,
         legend: { text: t('.case_allocation.legend') },

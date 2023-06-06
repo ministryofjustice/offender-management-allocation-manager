@@ -84,4 +84,17 @@ RSpec.describe CaseInformation, type: :model do
       expect(enhanced_ci.case_allocation).to eq 'NPS'
     end
   end
+
+  it 'validates that enhanced_handover is always set to true or false, and not "nil"' do
+    aggregate_failures do
+      ci = FactoryBot.build :case_information, enhanced_handover: false
+      expect(ci.valid?).to eq true
+
+      ci = FactoryBot.build :case_information, enhanced_handover: true
+      expect(ci.valid?).to eq true
+
+      ci = FactoryBot.build :case_information, enhanced_handover: nil
+      expect(ci.valid?).to eq false
+    end
+  end
 end

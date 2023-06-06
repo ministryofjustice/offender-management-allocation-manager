@@ -16,9 +16,9 @@
       )
   %>
   <%= form.govuk_collection_radio_buttons(
-      :case_allocation,
-      [OpenStruct.new(name: t(:nps), value: 'NPS'),
-       OpenStruct.new(name: t(:crc), value: 'CRC')],
+      :enhanced_handover,
+      [OpenStruct.new(name: t('handover_type.enhanced'), value: 'true'),
+       OpenStruct.new(name: t('handover_type.standard'), value: 'false')],
       :value,
       :name,
       legend: { text: "Select the handover type" }
