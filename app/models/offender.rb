@@ -37,7 +37,7 @@ class Offender < ApplicationRecord
 
   has_one :handover_progress_checklist, foreign_key: :nomis_offender_id
 
-  delegate :case_allocation, to: :case_information, allow_nil: true
+  delegate :enhanced_handover?, to: :case_information, allow_nil: true
 
   delegate :handover_progress_complete?, to: :handover_progress_checklist, allow_nil: true
 

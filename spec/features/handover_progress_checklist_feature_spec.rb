@@ -7,7 +7,7 @@ RSpec.feature 'Handover progress checklist feature:' do
   let(:default_params) { { nomis_offender_id: nomis_offender_id, prison_id: prison_code } }
 
   before do
-    FactoryBot.create :offender, :nps, nomis_offender_id: nomis_offender_id
+    FactoryBot.create :offender, :enhanced_handover, nomis_offender_id: nomis_offender_id
     allow(OffenderService).to receive(:get_offender).and_return nil
     offender # instantiate and stub
 

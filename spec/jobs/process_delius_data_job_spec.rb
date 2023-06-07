@@ -20,13 +20,13 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
   let(:team_name) { Faker::Company.name }
   let(:mock_com) do
     {
-      name: 'TestSurname, TestForename',
-      email: 'test-email@example.org',
-      ldu_code: ldu.code,
-      team_name: team_name,
-      is_responsible: true,
-      is_unallocated: false,
-    }
+      'name' => 'TestSurname, TestForename',
+      'email' => 'test-email@example.org',
+      'ldu_code' => ldu.code,
+      'team_name' => team_name,
+      'is_responsible' => true,
+      'is_unallocated' => false,
+    }.with_indifferent_access
   end
 
   before do
@@ -53,8 +53,11 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
       }.to change(CaseInformation, :count).by(1)
 
       expect(case_info.attributes.symbolize_keys.except(:created_at, :id, :updated_at, :parole_review_date, :prisoner_id, :welsh_offender))
-          .to eq(case_allocation: "NPS", crn: "X362207", manual_entry: false, mappa_level: 0,
+          .to eq(crn: "X362207",
+                 manual_entry: false,
+                 mappa_level: 0,
                  enhanced_handover: true,
+                 case_allocation: 'NPS', # TODO: remove after the field disappears from the DB
                  nomis_offender_id: "G4281GV",
                  probation_service: "England",
                  local_delivery_unit_id: ldu.id,

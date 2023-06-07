@@ -287,9 +287,8 @@ RSpec.describe MpcOffender, type: :model do
         prison_id
         restricted_patient?
         crn
-        case_allocation
         manual_entry?
-        nps_case?
+        enhanced_handover?
         tier
         mappa_level
         welsh_offender

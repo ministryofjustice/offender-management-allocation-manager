@@ -24,12 +24,12 @@ class ProcessDeliusDataJob < ApplicationJob
 private
 
   def import_data(nomis_offender_id)
-    delius_record = OpenStruct.new(OffenderService.get_community_data(nomis_offender_id))
+    delius_record = OffenderService.get_community_data(nomis_offender_id)
     delius_com_info = OffenderService.get_com(nomis_offender_id)
-    offender = OffenderService.get_offender(delius_record.noms_no)
+    offender = OffenderService.get_offender(delius_record['noms_no'])
 
     if offender.nil?
-      return logger.error("[DELIUS] Failed to retrieve NOMIS record #{delius_record.noms_no}")
+      return logger.error("[DELIUS] Failed to retrieve NOMIS record #{delius_record['noms_no']}")
     end
 
     process_record(delius_record, delius_com_info) if offender.inside_omic_policy?
@@ -43,41 +43,41 @@ private
     if case_information.changed?
       if case_information.save
         # Recalculate the offender's handover dates
-        RecalculateHandoverDateJob.perform_later(delius_record.noms_no)
+        RecalculateHandoverDateJob.perform_later(delius_record['noms_no'])
       else
         case_information.errors.each do |error|
-          DeliusImportError.create! nomis_offender_id: delius_record.noms_no,
+          DeliusImportError.create! nomis_offender_id: delius_record['noms_no'],
                                     error_type: error_type(error.attribute)
         end
       end
     end
   end
 
-  def assert_com_details(offender_record, delius_com_info)
-    com_from_offender = offender_record.to_h.symbolize_keys.values_at(:offender_manager, :team_name, :ldu_code)
-    com_from_oms = delius_com_info.values_at(:name, :team_name, :ldu_code)
+  def assert_com_details(delius_record, delius_com_info)
+    com_from_offender = delius_record.values_at('offender_manager', 'team_name', 'ldu_code')
+    com_from_oms = delius_com_info.values_at('name', 'team_name', 'ldu_code')
     if com_from_offender != com_from_oms
       raise ComInconsistencyError, "COM inconsistent. Offender record: #{com_from_offender.to_json} All offender managers: #{com_from_oms.to_json}"
     end
   end
 
   def map_delius_to_case_info(delius_record, delius_com_info)
-    ldu_code = delius_com_info.fetch(:ldu_code)
+    ldu_code = delius_com_info.fetch('ldu_code')
 
     find_case_info(delius_record).tap do |case_info|
       case_info.assign_attributes(
         manual_entry: false,
-        com_name: delius_com_info[:name],
-        com_email: delius_com_info[:email],
-        crn: delius_record.crn,
-        tier: map_tier(delius_record.tier),
+        com_name: delius_com_info['name'],
+        com_email: delius_com_info['email'],
+        crn: delius_record['crn'],
+        tier: map_tier(delius_record['tier']),
         local_delivery_unit: map_ldu(ldu_code),
         ldu_code: ldu_code,
-        team_name: delius_com_info.fetch(:team_name),
-        case_allocation: delius_record.service_provider,
+        team_name: delius_com_info.fetch('team_name'),
+        enhanced_handover: delius_record.fetch('enhanced_handover?'),
         probation_service: map_probation_service(ldu_code),
-        mappa_level: map_mappa_level(delius_record.mappa_levels),
-        active_vlo: delius_record.active_vlo
+        mappa_level: map_mappa_level(delius_record['mappa_levels']),
+        active_vlo: delius_record['active_vlo']
       )
     end
   end
@@ -88,7 +88,7 @@ private
   end
 
   def find_case_info(delius_record)
-    prisoner = Offender.find_by!(nomis_offender_id: delius_record.noms_no)
+    prisoner = Offender.find_by!(nomis_offender_id: delius_record['noms_no'])
     prisoner.case_information || prisoner.build_case_information
   end
 

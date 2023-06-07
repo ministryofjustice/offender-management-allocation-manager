@@ -29,11 +29,14 @@ module ApplicationHelper
     }[level]
   end
 
-  def service_provider_label(provider)
-    {
-      'CRC' => t(:crc),
-      'NPS' => t(:nps)
-    }[provider]
+  def handover_type_label(offender)
+    if offender.case_information.nil?
+      t('handover_type.missing')
+    elsif offender.case_information.enhanced_handover?
+      t('handover_type.enhanced')
+    else
+      t('handover_type.standard')
+    end
   end
 
   def working_pattern_name(pattern)

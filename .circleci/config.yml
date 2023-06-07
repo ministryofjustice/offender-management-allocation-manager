@@ -275,24 +275,6 @@ jobs:
       - store_artifacts:
           path: ~/test-results
 
-  cucumber:
-    <<: *defaults
-    <<: *test_container_config
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Setup separate cucumber database
-          command: bundle exec rake db:setup
-          environment:
-            TEST_ENV_NUMBER: CUCUMBER1
-      - run:
-          name: Run cucumber features
-          command: bundle exec cucumber
-          environment:
-            TEST_ENV_NUMBER: CUCUMBER1
-
   build_and_push_docker_image:
     <<: *defaults
     <<: *deploy_container_config
@@ -370,9 +352,6 @@ workflows:
           filters: { branches: { ignore: [main, preprod, test, test2] } }
           context: [offender-management-shared, offender-management-staging]
       - verify_docker_image_builds:
-          filters: { branches: { ignore: [main, preprod, test, test2] } }
-      - cucumber:
-          requires: [install_dependencies]
           filters: { branches: { ignore: [main, preprod, test, test2] } }
 
   test_env:

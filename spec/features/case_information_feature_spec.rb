@@ -19,7 +19,7 @@ feature 'case information feature', flaky: true do
       before do
         visit new_prison_case_information_path(prison.code, offender.fetch(:prisonerNumber))
         find('label[for=case-information-probation-service-england-field]').click
-        find('label[for=case-information-case-allocation-nps-field]').click
+        find('label[for=case-information-enhanced-handover-true-field]').click
         find('label[for=case-information-tier-a-field]').click
       end
 
@@ -69,7 +69,7 @@ feature 'case information feature', flaky: true do
       end
 
       find('label[for=case-information-probation-service-england-field]').click
-      find('label[for=case-information-case-allocation-nps-field]').click
+      find('label[for=case-information-enhanced-handover-true-field]').click
       find('label[for=case-information-tier-a-field]').click
       click_button 'Save'
 
@@ -129,7 +129,7 @@ feature 'case information feature', flaky: true do
       visit new_prison_case_information_path('LEI', nomis_offender_id)
       expect(page).to have_current_path new_prison_case_information_path('LEI', nomis_offender_id)
 
-      find('label[for=case-information-case-allocation-nps-field]').click
+      find('label[for=case-information-enhanced-handover-true-field]').click
       click_button 'Save'
 
       expect(CaseInformation.count).to eq(0)
@@ -147,7 +147,7 @@ feature 'case information feature', flaky: true do
       expect(page).to have_selector('h1', text: 'Case information')
 
       find('label[for=case-information-probation-service-england-field]').click
-      find('label[for=case-information-case-allocation-nps-field]').click
+      find('label[for=case-information-enhanced-handover-true-field]').click
       find('label[for=case-information-tier-a-field]').click
       click_button 'Save'
 

@@ -17,7 +17,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
   context "when the offender exists in both NOMIS and nDelius (happy path)" do
     before do
       stub_offender(nomis_offender)
-      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), case_allocation: 'NPS', manual_entry: false)
+      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), enhanced_handover: true, manual_entry: false)
     end
 
     let(:nomis_offender) { build(:nomis_offender, prisonId: prison.code) }
@@ -73,7 +73,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
     before do
       stub_offender(nomis_offender)
-      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), case_allocation: 'NPS')
+      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), enhanced_handover: true)
     end
 
     it 'does not push to the API' do
@@ -103,7 +103,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     context 'when there is no COM assigned' do
       context 'without an LDU' do
         before do
-          create(:case_information, :nps, local_delivery_unit: nil, offender: build(:offender, nomis_offender_id: offender_no))
+          create(:case_information, enhanced_handover: true, local_delivery_unit: nil, offender: build(:offender, nomis_offender_id: offender_no))
         end
 
         it 'does not send an email' do
@@ -114,7 +114,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
       context 'when there is an LDU' do
         let(:ldu) { build(:local_delivery_unit) }
-        let!(:case_info) { create(:case_information, :nps, local_delivery_unit: ldu, offender: build(:offender, nomis_offender_id: offender_no)) }
+        let!(:case_info) { create(:case_information, enhanced_handover: true, local_delivery_unit: ldu, offender: build(:offender, nomis_offender_id: offender_no)) }
         let(:one_day_later) { today + 1.day }
         let(:two_days_later) { today + 2.days }
 
@@ -159,7 +159,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       let(:ldu) { build(:local_delivery_unit) }
 
       before do
-        create(:case_information, :nps, :with_com, local_delivery_unit: ldu, offender: build(:offender, nomis_offender_id: offender_no))
+        create(:case_information, :with_com, enhanced_handover: true, local_delivery_unit: ldu, offender: build(:offender, nomis_offender_id: offender_no))
       end
 
       it 'does not send an email' do
@@ -170,7 +170,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
   end
 
   describe 're-calculation' do
-    let!(:case_info) { create(:case_information, :nps, offender: build(:offender, nomis_offender_id: offender_no)) }
+    let!(:case_info) { create(:case_information, enhanced_handover: true, offender: build(:offender, nomis_offender_id: offender_no)) }
     let(:offender) { OffenderService.get_offender(offender_no) }
 
     before do
@@ -265,7 +265,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
     let!(:case_information) do
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no),
-                                case_allocation: 'NPS', manual_entry: false)
+                                enhanced_handover: true, manual_entry: false)
     end
 
     let(:movement) do
@@ -335,7 +335,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       let!(:case_information) do
         create(:case_information, offender: build(:offender, nomis_offender_id: offender_no),
                                   local_delivery_unit: nil,
-                                  case_allocation: 'NPS', manual_entry: true)
+                                  enhanced_handover: true, manual_entry: true)
       end
 
       it 'does not send an email' do
@@ -347,7 +347,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     context 'when a COM is already allocated' do
       let!(:case_information) do
         create(:case_information, :with_com, offender: build(:offender, nomis_offender_id: offender_no),
-                                             case_allocation: 'NPS', manual_entry: false)
+                                             enhanced_handover: true, manual_entry: false)
       end
 
       it 'does not send an email' do

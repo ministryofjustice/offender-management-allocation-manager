@@ -27,10 +27,10 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">Handover type</td>
       <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-        <%= service_provider_label(probation_field(@prisoner, :case_allocation)) %>
+        <%= handover_type_label(@prisoner) %>
       </td>
     </tr>
-    <% if @prisoner.probation_record.present? && @prisoner.nps_case? %>
+    <% if @prisoner.case_information.present? && @prisoner.enhanced_handover? %>
       <tr id="early_allocation" class="govuk-table__row">
         <td class="govuk-table__cell">Early allocation referral</td>
         <td class="govuk-table__cell table_cell__left_align">

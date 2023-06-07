@@ -27,13 +27,13 @@ describe OffenderService, type: :feature do
     it "gets a single offender", vcr: { cassette_name: 'prison_api/offender_service_single_offender_spec' } do
       nomis_offender_id = 'G7266VD'
 
-      create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id), tier: 'C', case_allocation: 'CRC', probation_service: 'Wales')
+      create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id), tier: 'C', enhanced_handover: false, probation_service: 'Wales')
       offender = described_class.get_offender(nomis_offender_id)
 
       expect(offender.tier).to eq 'C'
       expect(offender.conditional_release_date).to eq(Date.new(2040, 1, 27))
       expect(offender.main_offence).to eq 'Robbery'
-      expect(offender.case_allocation).to eq 'CRC'
+      expect(offender.enhanced_handover?).to eq false
     end
 
     it "returns nil if offender record not found", vcr: { cassette_name: 'prison_api/offender_service_single_offender_not_found_spec' } do
@@ -79,81 +79,63 @@ describe OffenderService, type: :feature do
     context 'when hitting API', :vpn_only, vcr: { cassette_name: 'delius/get_community_data' } do
       it 'gets some data' do
         expect(described_class.get_community_data(nomis_offender_id))
-            .to eq(crn: "X349420",
-                   ldu_code: "N07NPSA",
-                   mappa_levels: [],
-                   noms_no: nomis_offender_id,
-                   offender_manager: "TestUpdate01Surname, TestUpdate01Forname",
-                   service_provider: "NPS",
-                   team_name: "OMU A",
-                   tier: "B-2",
-                   active_vlo: false)
+            .to eq('crn' => "X349420",
+                   'ldu_code' => "N07NPSA",
+                   'mappa_levels' => [],
+                   'noms_no' => nomis_offender_id,
+                   'offender_manager' => "TestUpdate01Surname, TestUpdate01Forname",
+                   'enhanced_handover?' => true,
+                   'team_name' => "OMU A",
+                   'tier' => "B-2",
+                   'active_vlo' => false)
       end
     end
 
-    context 'with stubbing' do
+    describe '[with some stubbing]' do
       before do
         stub_auth_token
       end
 
-      context 'without MAPPA data' do
-        describe '#service_provider' do
-          subject { described_class.get_community_data(nomis_offender_id).fetch(:service_provider) }
+      describe 'enhanced_handover? attr:' do
+        subject(:value) { described_class.get_community_data(nomis_offender_id).fetch(:enhanced_handover?) }
 
-          before do
-            stub_community_offender(nomis_offender_id, community_data)
-          end
-
-          context 'when enhancedResourcing is true' do
-            let(:community_data) { build(:community_data, enhancedResourcing: true) }
-
-            it 'is NPS' do
-              expect(subject).to eq('NPS')
-            end
-          end
-
-          context 'when enhancedResourcing is false' do
-            let(:community_data) { build(:community_data, enhancedResourcing: false) }
-
-            it 'is CRC' do
-              expect(subject).to eq('CRC')
-            end
-          end
-
-          context 'when not found' do
-            # this means that the offender hasn't had a CAS assessment yet
-            let(:community_data) { build(:community_data) }
-
-            before do
-              stub_resourcing_404 nomis_offender_id
-            end
-
-            it 'defaults to NPS' do
-              expect(subject).to eq('NPS')
-            end
-          end
-
-          context 'when enhancedResourcing field is missing' do
-            # this typically means that the offender has a draft CAS assessment which hasn't been completed yet
-            # and is therefore in a "Not Assessed" state
-            let(:community_data) { build(:community_data) }
-
-            before do
-              # enhancedResourcing field is missing
-              stub_community_offender(nomis_offender_id,
-                                      build(:community_data))
-            end
-
-            it 'defaults to NPS' do
-              expect(subject).to eq('NPS')
-            end
-          end
+        before do
+          # Transitioning from mocking of APIs to stubbing using mocks
+          stub_community_offender(nomis_offender_id, build(:community_data))
+          allow(HmppsApi::CommunityApi).to receive(:get_latest_resourcing).and_raise(Faraday::ResourceNotFound.allocate)
+          allow(HmppsApi::CommunityApi).to receive(:get_offender_registrations).and_return({})
         end
 
+        it 'uses latest resourcing info for the given offender from Delius' do
+          value # invoke it
+          expect(HmppsApi::CommunityApi).to have_received(:get_latest_resourcing).with(nomis_offender_id)
+        end
+
+        it 'is true when offender has not had a CAS assessment yet' do
+          expect(value).to eq true
+        end
+
+        it 'is true when enhancedResourcing is true' do
+          allow(HmppsApi::CommunityApi).to receive(:get_latest_resourcing).and_return('enhancedResourcing' => true)
+          expect(value).to eq true
+        end
+
+        it 'is false when enhancedResourcing is false' do
+          allow(HmppsApi::CommunityApi).to receive(:get_latest_resourcing).and_return('enhancedResourcing' => false)
+          expect(value).to eq false
+        end
+
+        it 'defaults to true when a draft CAS assessment is in the "Not Assessed" state' do
+          allow(HmppsApi::CommunityApi).to receive(:get_latest_resourcing).and_return({})
+          expect(value).to eq true
+        end
+      end
+
+      context 'without MAPPA data' do
         context 'with a single allocated COM' do
           before do
             stub_community_offender(nomis_offender_id, build(:community_data,
-                                                             offenderManagers: [{ probationArea: { nps: true }, active: true, staff: { unallocated: false, surname: 'Jones', forenames: 'Ruth Mary' } }]))
+                                                             offenderManagers: [{ active: true, staff: { unallocated: false, surname: 'Jones', forenames: 'Ruth Mary' } }]))
           end
 
           it 'gets the surname and forenames' do
@@ -189,7 +171,6 @@ describe OffenderService, type: :feature do
                                             team: { code: 'N07GHGF',
                                                     description: 'Thing',
                                                     localDeliveryUnit: { code: 'LDU123' } },
-                                            probationArea: { nps: true },
                                             active: true,
                                             staff: { unallocated: true } }
                                         ]), registrations)
@@ -200,15 +181,15 @@ describe OffenderService, type: :feature do
 
           it 'gets some data' do
             expect(described_class.get_community_data(nomis_offender_id))
-                .to eq(noms_no: nomis_offender_id,
-                       tier: 'A',
-                       crn: 'X5657657',
-                       offender_manager: nil,
-                       service_provider: 'NPS',
-                       mappa_levels: [],
-                       team_name: 'Thing',
-                       ldu_code: 'LDU123',
-                       active_vlo: false)
+                .to eq('noms_no' => nomis_offender_id,
+                       'tier' => 'A',
+                       'crn' => 'X5657657',
+                       'offender_manager' => nil,
+                       'enhanced_handover?' => true,
+                       'mappa_levels' => [],
+                       'team_name' => 'Thing',
+                       'ldu_code' => 'LDU123',
+                       'active_vlo' => false)
           end
         end
 
@@ -281,12 +262,12 @@ describe OffenderService, type: :feature do
     context 'when hitting API', :vpn_only, vcr: { cassette_name: 'delius/get_all_offender_managers_data' } do
       it 'gets some data' do
         expected = {
-          name: 'TestUpdate01Surname, TestUpdate01Forname',
-          email: 'test-update-01-email@example.org ',
-          ldu_code: 'N07NPSA',
-          team_name: 'OMU A',
-          is_responsible: true,
-          is_unallocated: false,
+          'name' => 'TestUpdate01Surname, TestUpdate01Forname',
+          'email' => 'test-update-01-email@example.org ',
+          'ldu_code' => 'N07NPSA',
+          'team_name' => 'OMU A',
+          'is_responsible' => true,
+          'is_unallocated' => false,
         }
 
         expect(described_class.get_com(nomis_offender_id)).to eq expected
@@ -309,12 +290,12 @@ describe OffenderService, type: :feature do
                                                             isResponsibleOfficer: false)
             ]
           )
-          expect(described_class.get_com(nomis_offender_id)).to eq({ name: 'S1, F1',
-                                                                     email: 'E1',
-                                                                     ldu_code: 'TestLDU',
-                                                                     team_name: 'Team1',
-                                                                     is_unallocated: false,
-                                                                     is_responsible: false })
+          expect(described_class.get_com(nomis_offender_id)).to eq({ 'name' => 'S1, F1',
+                                                                     'email' => 'E1',
+                                                                     'ldu_code' => 'TestLDU',
+                                                                     'team_name' => 'Team1',
+                                                                     'is_unallocated' => false,
+                                                                     'is_responsible' => false })
         end
       end
 
@@ -329,12 +310,12 @@ describe OffenderService, type: :feature do
                                                             isResponsibleOfficer: false)
             ]
           )
-          expect(described_class.get_com(nomis_offender_id)).to eq({ name: nil,
-                                                                     email: nil,
-                                                                     ldu_code: 'TestLDU',
-                                                                     team_name: 'Team1',
-                                                                     is_unallocated: true,
-                                                                     is_responsible: false })
+          expect(described_class.get_com(nomis_offender_id)).to eq({ 'name' => nil,
+                                                                     'email' => nil,
+                                                                     'ldu_code' => 'TestLDU',
+                                                                     'team_name' => 'Team1',
+                                                                     'is_unallocated' => true,
+                                                                     'is_responsible' => false })
         end
       end
 

@@ -73,7 +73,6 @@ end
 
 group :test do
   gem 'capybara'
-  gem 'cucumber-rails', '~> 2.5.1', require: false
   gem 'database_cleaner-active_record'
   gem 'faker'
   gem 'launchy'

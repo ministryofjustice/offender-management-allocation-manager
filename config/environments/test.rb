@@ -3,10 +3,6 @@
 # your test database is "scratch space" for the test suite and is wiped
 # and recreated between test runs. Don't rely on the data there!
 Rails.application.configure do
-  # Configure 'rails notes' to inspect Cucumber files
-  config.annotations.register_directories('features')
-  config.annotations.register_extensions('feature') { |tag| /#\s*(#{tag}):?\s*(.*)$/ }
-
   # Before filter for Flipflop dashboard. Replace with a lambda or method name
   # defined in ApplicationController to implement access control.
   # don't override this here - we want to test that we have implemented the access controls correctly

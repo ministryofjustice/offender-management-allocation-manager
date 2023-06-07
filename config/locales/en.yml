@@ -43,8 +43,10 @@ en:
 
   equip_url: 'https://equip-portal.equip.service.justice.gov.uk/'
 
-  nps: 'Enhanced'
-  crc: 'Standard'
+  handover_type:
+    standard: 'Standard'
+    enhanced: 'Enhanced'
+    missing: 'Not provided'
 
   activemodel:
     errors:

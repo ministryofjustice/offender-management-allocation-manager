@@ -10,11 +10,11 @@ FactoryBot.define do
 
     offenderManagers { [ build(:community_offender_manager) ] }
 
-    trait :crc do
+    trait :normal_handover do
       enhancedResourcing { false }
     end
 
-    trait :nps do
+    trait :enhanced_handover do
       enhancedResourcing { true }
     end
   end

@@ -7,22 +7,22 @@ RSpec.describe AllocationHistory, type: :model do
 
   describe '#without_ldu_emails' do
     let!(:crc_without_email) do
-      case_info = create(:case_information, case_allocation: 'CRC', local_delivery_unit: nil)
+      case_info = create(:case_information, enhanced_handover: false, local_delivery_unit: nil)
       create(:allocation_history, prison: build(:prison).code, nomis_offender_id: case_info.nomis_offender_id)
     end
 
-    let!(:nps_without_email) do
-      case_info = create(:case_information, local_delivery_unit: nil)
+    let!(:enhanced_handover_without_email) do
+      case_info = create(:case_information, enhanced_handover: true, local_delivery_unit: nil)
       create(:allocation_history, prison: build(:prison).code, nomis_offender_id: case_info.nomis_offender_id)
     end
 
-    let!(:nps_with_email) do
-      case_info = create(:case_information)
+    let!(:enhanced_handover_with_email) do
+      case_info = create(:case_information, enhanced_handover: true)
       create(:allocation_history, prison: build(:prison).code, nomis_offender_id: case_info.nomis_offender_id)
     end
 
-    it 'picks up NPS allocations without emails' do
-      expect(described_class.without_ldu_emails).to match_array([nps_without_email])
+    it 'picks up enhanced handover allocations without emails' do
+      expect(described_class.without_ldu_emails).to match_array([enhanced_handover_without_email])
     end
   end
 

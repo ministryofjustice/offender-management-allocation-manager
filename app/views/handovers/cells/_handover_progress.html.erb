@@ -1,5 +1,5 @@
 <td class="govuk-table__cell handover-progress">
-  <strong><%= service_provider_label(offender.case_allocation) %> handover</strong>
+  <strong><%= handover_type_label(offender) %> handover</strong>
   <ul class="govuk-list govuk-body-s task-summary-checklist">
     <% offender.handover_progress_task_completion_data.each do |name, complete| %>
       <li class="none">
