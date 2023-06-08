@@ -41,21 +41,26 @@
 @import 'compare_poms';
 
 a:visited {
-    color: #005ea5;
+  color: #005ea5;
 }
- .no-bottom-margin {
-     margin-bottom: 0;
- }
 
- .cancel-button {
-    line-height: 38px;
-    margin-left: 20px;
-    font-size: 1.2em;
- }
+.no-bottom-margin {
+  margin-bottom: 0;
+}
 
- .govuk-header__navigation-item a {
-     color: white !important;
- }
+.cancel-button {
+  line-height: 38px;
+  margin-left: 20px;
+  font-size: 1.2em;
+}
+
+.govuk-header {
+  border-bottom: 10px solid #1d70b8;
+}
+
+.govuk-header__navigation-item a {
+  color: white !important;
+}
 
 .govuk-table__cell-error {
   border-left: 5px solid #d4351c;
@@ -79,7 +84,9 @@ img {
 }
 
 @media(min-width: 1250px) {
-  .govuk-width-container, .moj-primary-navigation__container {
+
+  .govuk-width-container,
+  .moj-primary-navigation__container {
     max-width: 1170px;
   }
 }
