@@ -16,7 +16,7 @@ class EmailService
       offender = offender_for allocation
       coworking_pom_name = allocation.secondary_pom_name
       if pom.email_address.present?
-        PomMailer.allocate_coworking_pom(
+        PomMailer.with(
           message: message,
           pom_name: pom.first_name.capitalize,
           offender_name: offender.full_name,
@@ -24,7 +24,7 @@ class EmailService
           coworking_pom_name: coworking_pom_name,
           pom_email: pom.email_address,
           url: Rails.application.routes.url_helpers.prison_staff_caseload_url(allocation.prison, pom.staff_id)
-        ).deliver_later
+        ).allocate_coworking_pom.deliver_later
       end
     end
 
@@ -33,7 +33,7 @@ class EmailService
       offender = offender_for allocation
 
       if pom.email_address.present?
-        PomMailer.secondary_allocation_email(
+        PomMailer.with(
           message: message,
           pom_name: pom_firstname.capitalize,
           offender_name: offender.full_name,
@@ -42,7 +42,7 @@ class EmailService
           responsible_pom_name: allocation.primary_pom_name,
           pom_email: pom.email_address,
           url: Rails.application.routes.url_helpers.prison_staff_caseload_url(allocation.prison, pom.staff_id)
-        ).deliver_later
+        ).secondary_allocation_email.deliver_later
       end
     end
 
@@ -52,14 +52,14 @@ class EmailService
 
       offender = offender_for allocation
 
-      PomMailer.deallocate_coworking_pom(
+      PomMailer.with(
         pom_name: pom.first_name.capitalize,
         email_address: pom.email_address,
         secondary_pom_name: secondary_pom_name,
         nomis_offender_id: offender.offender_no,
         offender_name: offender.full_name,
         url: Rails.application.routes.url_helpers.prison_staff_caseload_url(allocation.prison, pom.staff_id)
-      ).deliver_later
+      ).deallocate_coworking_pom.deliver_later
     end
 
   private
