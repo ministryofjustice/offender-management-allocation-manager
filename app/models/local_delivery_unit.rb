@@ -4,7 +4,7 @@
 # The old (incorrectly named) one will be removed in February 2021 after the PDU/LDU go live
 class LocalDeliveryUnit < ApplicationRecord
   VALID_COUNTRIES = ['England', 'Wales'].freeze
-  CODE_REGEX = /\A[a-zA-Z0-9]+\z/.freeze
+  CODE_REGEX = /\A[a-zA-Z0-9]+\z/
 
   auto_strip_attributes :code, :name, :email_address
 
