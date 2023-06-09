@@ -25,7 +25,7 @@ RSpec.describe PomMailer, type: :mailer do
       }
     end
 
-    let(:mail) { described_class.new_allocation_email(params) }
+    let(:mail) { described_class.with(**params).new_allocation_email }
 
     it 'sets the To address of the email using the provided user' do
       expect(mail.to).to eq(["something@example.com"])
@@ -113,11 +113,11 @@ RSpec.describe PomMailer, type: :mailer do
         secondary_pom_name: "Pom, Moic",
         nomis_offender_id: "GE4595D",
         offender_name: "Marks, Simon",
-        url: "http:://example.com"
+        url: "http:://example.com",
       }
     end
 
-    let(:mail) { described_class.deallocate_coworking_pom(params) }
+    let(:mail) { described_class.with(**params).deallocate_coworking_pom }
 
     it 'sets the template' do
       expect(mail.govuk_notify_template)

@@ -3,11 +3,19 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
   let(:today) { Time.zone.now }
   let(:prison) { create(:prison) }
   let(:event) { instance_double DomainEvents::Event, :event, publish: nil }
+  let(:assign_com_less_than_10_months_mailer) { double :assign_com_less_than_10_months_mailer, deliver_later: nil }
+  let(:open_prison_supporting_com_needed_mailer) { double :open_prison_supporting_com_needed_mailer, deliver_later: nil }
+  let(:community_mailer_with) do
+    double(:community_mailer_with,
+           assign_com_less_than_10_months: assign_com_less_than_10_months_mailer,
+           open_prison_supporting_com_needed: open_prison_supporting_com_needed_mailer)
+  end
 
   before do
     stub_auth_token
     allow(DomainEvents::EventFactory).to receive(:build_handover_event).and_return(event)
     allow(Rails.configuration).to receive(:allocation_manager_host).and_return 'https://test.example.com'
+    allow(CommunityMailer).to receive(:with).and_return(community_mailer_with)
   end
 
   before use_events: true do
@@ -118,21 +126,18 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
         let(:one_day_later) { today + 1.day }
         let(:two_days_later) { today + 2.days }
 
-        before do
-          # because we are inlining jobs and calling original, this method gets called twice
-          expect(CommunityMailer).to receive(:assign_com_less_than_10_months).at_least(:twice).with(
+        it 'sends an email and records the fact', :aggregate_failures do
+          expect {
+            described_class.perform_now(offender_no)
+          }.to change(EmailHistory, :count).by(1)
+          expect(CommunityMailer).to have_received(:with).with(
             email: ldu.email_address,
             prisoner_name: "#{nomis_offender.fetch(:firstName)} #{nomis_offender.fetch(:lastName)}",
             prisoner_number: offender_no,
             crn_number: case_info.crn,
-            prison_name: PrisonService.name_for(nomis_offender.fetch(:prisonId))
-          ).and_call_original
-        end
-
-        it 'sends an email and records the fact' do
-          expect {
-            described_class.perform_now(offender_no)
-          }.to change(EmailHistory, :count).by(1)
+            prison_name: PrisonService.name_for(nomis_offender.fetch(:prisonId)),
+          )
+          expect(assign_com_less_than_10_months_mailer).to have_received(:deliver_later)
         end
 
         it 'nags the LDU 48 hours later' do
@@ -296,18 +301,17 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     end
 
     context 'when in a male prison' do
-      it 'emails the LDU to notify them that a COM is now needed' do
-        expect(CommunityMailer).to receive(:open_prison_supporting_com_needed)
-                                     .with(hash_including(
-                                             prisoner_number: offender_no,
-                                             # prisoner_name: "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}",
-                                             prisoner_crn: case_information.crn,
-                                             ldu_email: case_information.ldu_email_address,
-                                             prison_name: prison.name,
-                                           ))
-                                     .and_return OpenStruct.new(deliver_later: true)
-
+      it 'emails the LDU to notify them that a COM is now needed', :aggregate_failures do
         expect { described_class.perform_now(offender_no) }.to change(EmailHistory, :count).by(1)
+        expect(CommunityMailer).to have_received(:with).with(
+          hash_including(
+            prisoner_number: offender_no,
+            prisoner_crn: case_information.crn,
+            ldu_email: case_information.ldu_email_address,
+            prison_name: prison.name,
+          )
+        )
+        expect(open_prison_supporting_com_needed_mailer).to have_received(:deliver_later)
       end
     end
 
@@ -316,18 +320,15 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       let(:category) { attributes_for(:offender_category, :female_open) }
       let(:policy_start_date) { HandoverDateService::WOMENS_POLICY_START_DATE }
 
-      it 'emails the LDU to notify them that a COM is now needed' do
-        expect(CommunityMailer).to receive(:open_prison_supporting_com_needed)
-                                     .with(hash_including(
-                                       # prisoner_number: offender_no,
-                                       # prisoner_name: "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}",
-                                       prisoner_crn: case_information.crn,
-                                       ldu_email: case_information.ldu_email_address,
-                                       prison_name: prison.name,
-                                     ))
-                                     .and_return OpenStruct.new(deliver_later: true)
-
+      it 'emails the LDU to notify them that a COM is now needed', :aggregate_failures do
         expect { described_class.perform_now(offender_no) }.to change(EmailHistory, :count).by(1)
+        expect(CommunityMailer).to have_received(:with)
+                                     .with(hash_including(
+                                             prisoner_crn: case_information.crn,
+                                             ldu_email: case_information.ldu_email_address,
+                                             prison_name: prison.name,
+                                           ))
+        expect(open_prison_supporting_com_needed_mailer).to have_received(:deliver_later)
       end
     end
 

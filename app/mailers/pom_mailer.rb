@@ -24,7 +24,10 @@ class PomMailer < GovukNotifyRails::Mailer
 
   def responsibility_override
     set_template('ca952ba5-58b5-4e2d-8d87-60590d76560c')
-    set_personalisation(**params.slice(:prisoner_name, :prisoner_number, :reason, :prison_name))
+    set_personalisation(prisoner_name: params.fetch(:prisoner_name),
+                        prisoner_number: params.fetch(:prisoner_number),
+                        reason: params.fetch(:message),
+                        prison_name: params.fetch(:prison_name))
     mail(to: params[:email])
   end
 

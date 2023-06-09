@@ -132,14 +132,16 @@ describe MovementService, type: :feature do
     let!(:allocation) { create(:allocation_history, prison: 'LEI', nomis_offender_id: 'G7266VD') }
 
     def pom_tester(valid_release)
-      expect_any_instance_of(PomMailer)
-        .to receive(:offender_deallocated)
+      mailer = double(:mailer)
+      expect(PomMailer).to receive(:with)
               .with(email: "pom@digital.justice.gov.uk",
                     pom_name: "Moic",
                     offender_name: "Annole, Omistius",
                     nomis_offender_id: valid_release.offender_no,
                     prison_name: 'Leeds (HMP)',
                     url: "http://localhost:3000/prisons/LEI/staff/485926/caseload")
+              .and_return(double(:pom_mailer_with, offender_deallocated: mailer))
+      expect(mailer).to receive(:deliver_later)
     end
 
     context 'with a valid release movement' do

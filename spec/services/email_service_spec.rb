@@ -140,8 +140,12 @@ RSpec.describe EmailService do
       end
     end
 
-    it "Can send a reallocation email" do
-      expect(PomMailer).to receive(:deallocation_email).with(
+    it "Can send a reallocation email", :aggregate_failures do
+      deallocation_email = double(:deallocation_email, deliver_later: nil)
+      new_allocation_email = double(:new_allocation_email, deliver_later: nil)
+
+      allow(PomMailer).to receive(:with).and_raise('Unexpected arguments')
+      allow(PomMailer).to receive(:with).with(
         previous_pom_name: leigh.first_name,
         responsibility: 'responsible',
         previous_pom_email: leigh.email_address,
@@ -151,9 +155,9 @@ RSpec.describe EmailService do
         prison: prison.name,
         further_info: {},
         url: "http://localhost:3000/prisons/#{prison_code}/staff/#{staff_id}/caseload"
-      ).and_return OpenStruct.new(deliver_later: true)
+      ).and_return(double(deallocation_email: deallocation_email))
 
-      expect(PomMailer).to receive(:new_allocation_email).with(
+      allow(PomMailer).to receive(:with).with(
         pom_name: andrien.first_name,
         responsibility: 'responsible',
         pom_email: andrien.email_address,
@@ -162,10 +166,13 @@ RSpec.describe EmailService do
         message: '',
         further_info: {},
         url: "http://localhost:3000/prisons/#{prison_code}/prisoners/#{original_allocation.nomis_offender_id}/allocation"
-      ).and_return OpenStruct.new(deliver_later: true)
+      ).and_return(double(new_allocation_email: new_allocation_email))
 
-      described_class
-        .send_email(allocation: released_allocation, message: "", pom_nomis_id: released_allocation.primary_pom_nomis_id)
+      described_class.send_email(allocation: released_allocation, message: "",
+                                 pom_nomis_id: released_allocation.primary_pom_nomis_id)
+
+      expect(deallocation_email).to have_received(:deliver_later).with(no_args)
+      expect(new_allocation_email).to have_received(:deliver_later).with(no_args)
     end
   end
 end

@@ -38,7 +38,7 @@ class ResponsibilitiesController < PrisonsApplicationController
         prisoner_name: @offender.full_name,
         prison_name: @prison.name,
         email: email
-      ).new_allocation_email.deliver_later
+      ).responsibility_override.deliver_later
     end
 
     redirect_to referrer

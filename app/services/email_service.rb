@@ -99,7 +99,7 @@ class EmailService
 
         offender = offender_for(allocation)
 
-        PomMailer.deallocation_email(
+        PomMailer.with(
           previous_pom_name: previous_pom.first_name.capitalize,
           responsibility: current_responsibility(offender),
           previous_pom_email: previous_pom.email_address,
@@ -109,7 +109,7 @@ class EmailService
           prison: Prison.find(pom.agency_id).name,
           url: Rails.application.routes.url_helpers.prison_staff_caseload_url(allocation.prison, pom.staff_id),
           further_info: further_info
-        ).deliver_later
+        ).deallocation_email.deliver_later
       end
     end
 
