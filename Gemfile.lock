@@ -597,6 +597,7 @@ DEPENDENCIES
   lograge
   logstash-event
   logstash-logger
+  matrix
   memory_profiler
   net-http
   notifications-ruby-client (>= 5.2)
