@@ -11,7 +11,7 @@ RSpec.describe EarlyAllocationMailer, type: :mailer do
       }
     end
 
-    let(:mail) { described_class.review_early_allocation(params) }
+    let(:mail) { described_class.with(**params).review_early_allocation }
 
     it 'sets the template' do
       expect(mail.govuk_notify_template).to eq('502e057c-a875-4653-9b33-63dcfd33e582')

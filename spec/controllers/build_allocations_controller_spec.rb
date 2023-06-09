@@ -15,6 +15,8 @@ RSpec.describe BuildAllocationsController, type: :controller do
     allow_any_instance_of(StaffMember).to receive(:first_name).and_return('Bob')
     allow_any_instance_of(StaffMember).to receive(:last_name).and_return('Billings')
     allow_any_instance_of(MpcOffender).to receive(:rosh_summary).and_return({ status: :missing })
+
+    allow(EmailService).to receive(:send_email)
   end
 
   describe '#show' do
@@ -94,12 +96,6 @@ RSpec.describe BuildAllocationsController, type: :controller do
       }
     end
 
-    before do
-      allow(PomMailer).to receive(:new_allocation_email).and_return(fake_job)
-      allow(PomMailer).to receive(:deallocation_email).and_return(fake_job)
-    end
-
-    let(:fake_job) { double(:fake_job, deliver_later: nil) }
     let(:notes) { 'A note' }
 
     context 'when allocating' do
@@ -115,18 +111,13 @@ RSpec.describe BuildAllocationsController, type: :controller do
         }
       end
 
-      it 'sends an allocation email with the correct info' do
-        expect(PomMailer).to have_received(:new_allocation_email)
-          .with(
-            offender_no: offender_no,
-            offender_name: "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}",
-            pom_name: pom.firstName.capitalize,
-            pom_email: pom.email_address,
-            responsibility: 'responsible',
-            message: notes,
-            url: Rails.application.routes.default_url_options[:host] + prison_prisoner_allocation_path(prison, offender_no),
-            further_info: further_info
-          )
+      it 'sends the correct emails' do
+        expect(EmailService).to have_received(:send_email).with(
+          message: notes,
+          allocation: anything,
+          pom_nomis_id: pom.staffId,
+          further_info: further_info,
+        )
       end
 
       it 'stores no message in flash notice' do
@@ -194,19 +185,13 @@ RSpec.describe BuildAllocationsController, type: :controller do
 
         let(:pom_nomis_id) { poms.last.staffId }
 
-        it 'sends a de-allocation email with the correct info' do
-          expect(PomMailer).to have_received(:deallocation_email)
-            .with(
-              previous_pom_name: poms.last.firstName.capitalize,
-              responsibility: 'responsible',
-              previous_pom_email: poms.last.email_address,
-              new_pom_name: pom.full_name,
-              offender_name: "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}",
-              offender_no: offender_no,
-              prison: prison.name,
-              url: Rails.application.routes.default_url_options[:host] + prison_staff_caseload_path(prison, pom.staffId),
-              further_info: further_info
-            )
+        it 'sends the correct emails' do
+          expect(EmailService).to have_received(:send_email).with(
+            message: notes,
+            allocation: anything,
+            pom_nomis_id: pom.staffId,
+            further_info: further_info,
+          )
         end
 
         it 'stores no message in flash notice' do

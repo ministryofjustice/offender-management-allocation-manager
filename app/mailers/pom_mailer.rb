@@ -22,19 +22,10 @@ class PomMailer < GovukNotifyRails::Mailer
     mail(to: params[:pom_email])
   end
 
-  def responsibility_override(
-    message:,
-    prisoner_number:,
-    prisoner_name:,
-    prison_name:,
-    email:
-  )
+  def responsibility_override
     set_template('ca952ba5-58b5-4e2d-8d87-60590d76560c')
-    set_personalisation(prisoner_name: prisoner_name,
-                        prisoner_number: prisoner_number,
-                        reason: message,
-                        prison_name: prison_name)
-    mail(to: email)
+    set_personalisation(**params.slice(:prisoner_name, :prisoner_number, :reason, :prison_name))
+    mail(to: params[:email])
   end
 
   def allocate_coworking_pom
@@ -99,19 +90,10 @@ class PomMailer < GovukNotifyRails::Mailer
     mail(to: params[:previous_pom_email])
   end
 
-  def offender_deallocated(email:,
-                           pom_name:,
-                           offender_name:,
-                           nomis_offender_id:,
-                           prison_name:,
-                           url:)
+  def offender_deallocated
     set_template('1df51f52-512d-434b-9088-50eacaa47c59')
-    set_personalisation(pom_name: pom_name,
-                        offender_name: offender_name,
-                        nomis_offender_id: nomis_offender_id,
-                        prison_name: prison_name,
-                        url: url)
+    set_personalisation(**params.slice(:pom_name, :offender_name, :nomis_offender_id, :prison_name, :url))
 
-    mail(to: email)
+    mail(to: params.fetch(:email))
   end
 end

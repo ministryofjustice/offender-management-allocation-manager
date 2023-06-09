@@ -28,7 +28,7 @@ class HandoverFollowUpJob < ApplicationJob
 
       offender_type = offender.indeterminate_sentence? ? 'Indeterminate' : 'Determinate'
 
-      CommunityMailer.urgent_pipeline_to_community(
+      CommunityMailer.with(
         nomis_offender_id: offender.offender_no,
         offender_name: offender.full_name,
         offender_crn: offender.crn,
@@ -39,7 +39,7 @@ class HandoverFollowUpJob < ApplicationJob
         responsibility_handover_date: offender.responsibility_handover_date,
         pom_name: pom_name,
         pom_email: pom_email
-      ).deliver_now
+      ).urgent_pipeline_to_community.deliver_now
     end
   end
 

@@ -32,13 +32,13 @@ class ResponsibilitiesController < PrisonsApplicationController
 
     # GovUk notify can only deliver to 1 address at a time.
     emails.each do |email|
-      PomMailer.responsibility_override(
+      PomMailer.with(
         message: params[:message],
         prisoner_number: @responsibility.nomis_offender_id,
         prisoner_name: @offender.full_name,
         prison_name: @prison.name,
         email: email
-      ).deliver_later
+      ).new_allocation_email.deliver_later
     end
 
     redirect_to referrer

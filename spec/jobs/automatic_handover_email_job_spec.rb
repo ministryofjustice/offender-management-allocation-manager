@@ -109,13 +109,13 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
       end
 
       it 'sends an email for offenders handing over in the next 45 days' do
-        expect_any_instance_of(CommunityMailer)
-          .to receive(:pipeline_to_community)
-                .with(
-                  ldu_name: active_ldu.name,
-                  ldu_email: active_ldu.email_address,
-                  csv_data: expected_csv
-                ).and_call_original
+        mailer = double(:mailer)
+        expect(CommunityMailer).to receive(:with).with(
+          ldu_name: active_ldu.name,
+          ldu_email: active_ldu.email_address,
+          csv_data: expected_csv
+        ).and_return(double(pipeline_to_community: mailer))
+        expect(mailer).to receive(:deliver_now)
         described_class.perform_now active_ldu
       end
     end
@@ -137,9 +137,7 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
       let(:offenders) { [] }
 
       it 'doesnt send an email' do
-        expect_any_instance_of(CommunityMailer)
-          .not_to receive(:pipeline_to_community_no_handovers)
-                    .with(active_ldu).and_call_original
+        expect_any_instance_of(ActionMailer::Parameterized::MessageDelivery).not_to receive(:deliver_now)
         described_class.perform_now active_ldu
       end
     end
@@ -157,9 +155,11 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
       end
 
       it 'sends the no data email' do
-        expect_any_instance_of(CommunityMailer)
-          .to receive(:pipeline_to_community_no_handovers)
-                .with(ldu_name: active_ldu.name, ldu_email: active_ldu.email_address).and_call_original
+        mailer = double(:mailer)
+        expect(CommunityMailer).to receive(:with)
+                .with(ldu_name: active_ldu.name, ldu_email: active_ldu.email_address)
+                .and_return(double(pipeline_to_community_no_handovers: mailer))
+        expect(mailer).to receive(:deliver_now)
         described_class.perform_now active_ldu
       end
     end

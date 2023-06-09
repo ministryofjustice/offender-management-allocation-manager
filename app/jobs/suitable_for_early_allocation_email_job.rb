@@ -13,18 +13,18 @@ class SuitableForEarlyAllocationEmailJob < ApplicationJob
 
     if !prisoner.nil? && prisoner.within_early_allocation_window?
 
-      already_emailed = EmailHistory.sent_within_current_sentence(prisoner,  EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION)
+      already_emailed = EmailHistory.sent_within_current_sentence(prisoner, EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION)
 
       if already_emailed.empty?
         prison = Prison.find(prisoner.prison_id)
         pom = prison.get_single_pom(allocation.primary_pom_nomis_id)
-        EarlyAllocationMailer.review_early_allocation(
+        EarlyAllocationMailer.with(
           email: pom.email_address,
           prisoner_name: prisoner.full_name,
           start_page_link: Rails.application.routes.url_helpers.prison_prisoner_early_allocations_url(
             prison_id: prisoner.prison_id,
             prisoner_id: prisoner.offender_no),
-          equip_guidance_link: EQUIP_URL).deliver_now
+          equip_guidance_link: EQUIP_URL).review_early_allocation.deliver_now
 
         EmailHistory.create! nomis_offender_id: prisoner.offender_no,
                              name: pom.full_name,

@@ -132,42 +132,42 @@ RSpec.describe HandoverFollowUpJob, type: :job do
           let!(:allocation) { create(:allocation_history, :release, prison: active_prison.code, nomis_offender_id: offender_no) }
 
           it 'emails the LDU' do
-            expect_any_instance_of(CommunityMailer)
-              .to receive(:urgent_pipeline_to_community)
-                    .with(
-                      nomis_offender_id: offender_no,
-                      offender_name: offender.full_name,
-                      offender_crn: offender.crn,
-                      ldu_email: offender.ldu_email_address,
-                      sentence_type: "Determinate",
-                      prison: active_prison.name,
-                      start_date: offender.handover_start_date,
-                      responsibility_handover_date: offender.responsibility_handover_date,
-                      pom_name: "This offender does not have an allocated POM",
-                      pom_email: ""
-                    ).and_call_original
-
+            mailer = double(:mailer)
+            expect(CommunityMailer).to receive(:with)
+                                         .with(
+                                           nomis_offender_id: offender_no,
+                                           offender_name: offender.full_name,
+                                           offender_crn: offender.crn,
+                                           ldu_email: offender.ldu_email_address,
+                                           sentence_type: "Determinate",
+                                           prison: active_prison.name,
+                                           start_date: offender.handover_start_date,
+                                           responsibility_handover_date: offender.responsibility_handover_date,
+                                           pom_name: "This offender does not have an allocated POM",
+                                           pom_email: "")
+                                         .and_return(double(urgent_pipeline_to_community: mailer))
+            expect(mailer).to receive(:deliver_now)
             described_class.perform_now(ldu)
           end
         end
 
         context 'when the offender has a POM allocated' do
           it 'emails the LDU' do
-            expect_any_instance_of(CommunityMailer)
-              .to receive(:urgent_pipeline_to_community)
-                    .with(
-                      nomis_offender_id: offender_no,
-                      offender_name: offender.full_name,
-                      offender_crn: offender.crn,
-                      ldu_email: offender.ldu_email_address,
-                      sentence_type: "Determinate",
-                      prison: active_prison.name,
-                      start_date: offender.handover_start_date,
-                      responsibility_handover_date: offender.responsibility_handover_date,
-                      pom_name: pom.full_name,
-                      pom_email: pom.email_address
-                    ).and_call_original
-
+            mailer = double(:mailer)
+            expect(CommunityMailer).to receive(:with)
+                                         .with(
+                                           nomis_offender_id: offender_no,
+                                           offender_name: offender.full_name,
+                                           offender_crn: offender.crn,
+                                           ldu_email: offender.ldu_email_address,
+                                           sentence_type: "Determinate",
+                                           prison: active_prison.name,
+                                           start_date: offender.handover_start_date,
+                                           responsibility_handover_date: offender.responsibility_handover_date,
+                                           pom_name: pom.full_name,
+                                           pom_email: pom.email_address)
+                                         .and_return(double(urgent_pipeline_to_community: mailer))
+            expect(mailer).to receive(:deliver_now)
             described_class.perform_now(ldu)
           end
         end

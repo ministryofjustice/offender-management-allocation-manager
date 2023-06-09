@@ -104,35 +104,38 @@ RSpec.describe EarlyAllocationsController, type: :controller do
 
     describe '#update' do
       let(:early_allocation) { assigns(:early_allocation) }
-      let(:topic) { instance_double("topic") }
+      let(:topic) { double("topic", publish: nil) }
       let(:early_allocation_datum) { CalculatedEarlyAllocationStatus.find(nomis_offender_id) }
 
       before do
         create(:calculated_early_allocation_status, nomis_offender_id: nomis_offender_id, eligible: false)
         allow(EarlyAllocationEventService).to receive(:sns_topic).and_return(topic)
-        expect(topic).to receive(:publish).with(
-          message: { offenderNo: nomis_offender_id, eligibilityStatus: true }.to_json,
-          message_attributes: hash_including(
-            eventType: {
-              string_value: 'community-early-allocation-eligibility.status.changed',
-              data_type: 'String',
-            },
-            version: {
-              string_value: 1.to_s,
-              data_type: 'Number',
-            },
-            detailURL: {
-              string_value: "http://localhost:3000/api/offenders/#{nomis_offender_id}",
-              data_type: 'String',
-            }
-          )
-        )
       end
 
       it 'updates the updated_by_ fields' do
         put :update, params: { prison_id: prison, prisoner_id: nomis_offender_id, early_allocation: { community_decision: true } }
-        expect(early_allocation.updated_by_firstname).to eq(first_pom.firstName)
-        expect(early_allocation.updated_by_lastname).to eq(first_pom.lastName)
+        aggregate_failures do
+          expect(early_allocation.updated_by_firstname).to eq(first_pom.firstName)
+          expect(early_allocation.updated_by_lastname).to eq(first_pom.lastName)
+
+          expect(topic).to have_received(:publish).with(
+            message: { offenderNo: nomis_offender_id, eligibilityStatus: true }.to_json,
+            message_attributes: hash_including(
+              eventType: {
+                string_value: 'community-early-allocation-eligibility.status.changed',
+                data_type: 'String',
+              },
+              version: {
+                string_value: 1.to_s,
+                data_type: 'Number',
+              },
+              detailURL: {
+                string_value: "http://localhost:3000/api/offenders/#{nomis_offender_id}",
+                data_type: 'String',
+              }
+            )
+          )
+        end
       end
     end
   end

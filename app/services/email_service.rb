@@ -116,7 +116,7 @@ class EmailService
     def deliver_new_allocation_email(pom:, message:, allocation:, further_info:)
       offender = offender_for(allocation)
 
-      PomMailer.new_allocation_email(
+      PomMailer.with(
         pom_name: pom.first_name.capitalize,
         responsibility: current_responsibility(offender),
         pom_email: pom.email_address,
@@ -125,7 +125,7 @@ class EmailService
         message: message,
         url: Rails.application.routes.url_helpers.prison_prisoner_allocation_url(allocation.prison, offender.offender_no),
         further_info: further_info
-      ).deliver_later
+      ).new_allocation_email.deliver_later
     end
   end
 end

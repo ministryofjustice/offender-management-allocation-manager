@@ -42,9 +42,9 @@ class AutomaticHandoverEmailJob < ApplicationJob
           end
         end
         # deliver_now - this is all we are doing, so we want the whole job to repeat if it fails
-        CommunityMailer.pipeline_to_community(ldu_name: ldu.name, ldu_email: ldu.email_address, csv_data: csv_data).deliver_now
+        CommunityMailer.with(ldu_name: ldu.name, ldu_email: ldu.email_address, csv_data: csv_data).pipeline_to_community.deliver_now
       else
-        CommunityMailer.pipeline_to_community_no_handovers(ldu_name: ldu.name, ldu_email: ldu.email_address).deliver_now
+        CommunityMailer.with(ldu_name: ldu.name, ldu_email: ldu.email_address).pipeline_to_community_no_handovers.deliver_now
       end
     end
   end

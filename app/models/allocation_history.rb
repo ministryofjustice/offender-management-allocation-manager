@@ -170,7 +170,7 @@ private
       recommended_pom_type: nil,
     )
 
-    PomMailer.offender_deallocated(**mail_params).deliver_later
+    PomMailer.with(**mail_params).offender_deallocated.deliver_later
   end
 
   def push_pom_to_community_api

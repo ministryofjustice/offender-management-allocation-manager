@@ -1,61 +1,52 @@
 # frozen_string_literal: true
 
 class CommunityMailer < GovukNotifyRails::Mailer
-  def pipeline_to_community(ldu_name:, ldu_email:, csv_data:)
+  def pipeline_to_community
     set_template('6e2f7565-a0e3-4fd7-b814-ee9dd5148924')
-    set_personalisation(ldu_name: ldu_name,
-                        link_to_document: Notifications.prepare_upload(StringIO.new(csv_data), true))
+    set_personalisation(ldu_name: params.fetch(:ldu_name),
+                        link_to_document: Notifications.prepare_upload(StringIO.new(params.fetch(:csv_data)), true))
 
-    mail(to: ldu_email)
+    mail(to: params.fetch(:ldu_email))
   end
 
-  def pipeline_to_community_no_handovers(ldu_name:, ldu_email:)
+  def pipeline_to_community_no_handovers
     set_template('bac3628c-aabe-4043-af11-147467720e04')
-    set_personalisation(ldu_name: ldu_name)
+    set_personalisation(ldu_name: params.fetch(:ldu_name))
 
-    mail(to: ldu_email)
+    mail(to: params.fetch(:ldu_email))
   end
 
-  def urgent_pipeline_to_community(nomis_offender_id:, offender_name:, offender_crn:, ldu_email:, prison:,
-                                   sentence_type:, start_date:, responsibility_handover_date:, pom_name:, pom_email:)
+  def urgent_pipeline_to_community
     set_template('d7366b11-c93e-48de-824f-cb80a9778e71')
 
     set_personalisation(
-      email: ldu_email,
-      name: offender_name,
-      crn: offender_crn,
-      sentence_type: sentence_type,
-      noms_no: nomis_offender_id,
-      prison_name: prison,
-      start_date: start_date,
-      responsibility_handover_date: responsibility_handover_date,
-      pom_name: pom_name,
-      pom_email: pom_email
+      email: params.fetch(:ldu_email),
+      name: params.fetch(:offender_name),
+      crn: params.fetch(:offender_crn),
+      sentence_type: params.fetch(:sentence_type),
+      noms_no: params.fetch(:nomis_offender_id),
+      prison_name: params.fetch(:prison),
+      start_date: params.fetch(:start_date),
+      responsibility_handover_date: params.fetch(:responsibility_handover_date),
+      pom_name: params.fetch(:pom_name),
+      pom_email: params.fetch(:pom_email),
     )
-
-    mail(to: ldu_email)
+    mail(to: params.fetch(:ldu_email))
   end
 
-  def open_prison_supporting_com_needed(prisoner_name:, prisoner_number:, prisoner_crn:, prison_name:, ldu_email:)
+  def open_prison_supporting_com_needed
     set_template('51eea8d1-6c73-4b86-bac0-f74ad5573b43')
 
-    set_personalisation(
-      prisoner_name: prisoner_name,
-      prisoner_number: prisoner_number,
-      prisoner_crn: prisoner_crn,
-      prison_name: prison_name
-    )
+    set_personalisation(**params.slice(:prisoner_name, :prisoner_number, :prisoner_crn, :prison_name))
 
-    mail(to: ldu_email)
+    mail(to: params.fetch(:ldu_email))
   end
 
-  def assign_com_less_than_10_months(email:, prisoner_name:, prisoner_number:, crn_number:, prison_name:)
+  def assign_com_less_than_10_months
     set_template('6cae6890-6a5a-4ceb-82bd-43c8b43fc639')
 
-    set_personalisation(prisoner_number: prisoner_number,
-                        prison_name: prison_name,
-                        crn_number: crn_number,
-                        prisoner_name: prisoner_name)
-    mail(to: email)
+    set_personalisation(**params.slice(:prisoner_number, :prison_name, :crn_number, :prisoner_name))
+
+    mail(to: params.fetch(:email))
   end
 end
