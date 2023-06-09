@@ -64,8 +64,7 @@ group :development, :test do
   gem 'parallel_tests'
   gem 'rubocop-govuk', '~> 4.8'
   gem 'rubocop-performance', '~> 1.15'
-  # needed to support Rails 6.0
-  gem 'rspec-rails', '~> 6.0'
+  gem 'rspec-rails', '~> 6.0.3'
   gem 'rswag-specs'
   gem 'spring'
   gem 'undercover'
