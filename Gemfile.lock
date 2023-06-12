@@ -97,7 +97,7 @@ GEM
       debug_inspector (>= 0.0.1)
     bootsnap (1.10.3)
       msgpack (~> 1.2)
-    brakeman (5.4.1)
+    brakeman (6.0.0)
     builder (3.2.4)
     business_time (0.13.0)
       activesupport (>= 3.2.0)
@@ -571,7 +571,7 @@ DEPENDENCIES
   better_errors
   binding_of_caller
   bootsnap (>= 1.1.0)
-  brakeman
+  brakeman (~> 6.0)
   business_time
   byebug
   capybara

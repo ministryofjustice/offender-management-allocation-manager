@@ -58,7 +58,7 @@ gem 'matrix' # App does not use it directly but it has to be explicitly declared
 gem 'activeadmin'
 
 group :development, :test do
-  gem 'brakeman'
+  gem 'brakeman', '~> 6.0'
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
   gem 'dotenv-rails'
   gem 'factory_bot_rails'
