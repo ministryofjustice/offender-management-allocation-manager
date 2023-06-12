@@ -4,7 +4,7 @@ class EarlyAllocationMailer < GovukNotifyRails::Mailer
   def auto_early_allocation
     set_template('dfaeb1b1-26c3-4646-8ef4-1f0ebd18e2e7')
     params[:link_to_document] = Notifications.prepare_upload(StringIO.new(params[:pdf]))
-
+    params[:pom_email_address] = params.fetch(:pom_email)
     set_personalisation(**params.slice(:prisoner_name, :prisoner_number, :pom_name, :pom_email_address, :prison_name,
                                        :link_to_document))
 
@@ -14,6 +14,7 @@ class EarlyAllocationMailer < GovukNotifyRails::Mailer
   def community_early_allocation
     set_template('5e546d65-57ff-49e1-8fae-c955a7b1da80')
     params[:link_to_document] = Notifications.prepare_upload(StringIO.new(params.fetch(:pdf)))
+    params[:pom_email_address] = params.fetch(:pom_email)
     set_personalisation(**params.slice(:prisoner_name, :prisoner_number, :pom_name, :pom_email_address, :prison_name,
                                        :link_to_document))
 
