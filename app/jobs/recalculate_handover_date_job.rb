@@ -39,13 +39,13 @@ private
                                             email: case_info.ldu_email_address,
                                             event: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION
         # This is queued so that soft failures don't kill the whole job
-        CommunityMailer.assign_com_less_than_10_months(
+        CommunityMailer.with(
           email: case_info.ldu_email_address,
           crn_number: case_info.crn,
           prison_name: PrisonService.name_for(nomis_offender.prison_id),
           prisoner_name: "#{nomis_offender.first_name} #{nomis_offender.last_name}",
           prisoner_number: nomis_offender.offender_no
-        ).deliver_later
+        ).assign_com_less_than_10_months.deliver_later
       end
     end
 
@@ -86,13 +86,13 @@ private
                                        email: nomis_offender.ldu_email_address,
                                        event: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION,
                                        prison: nomis_offender.prison_id
-      CommunityMailer.open_prison_supporting_com_needed(
+      CommunityMailer.with(
         prisoner_name: nomis_offender.full_name,
         prisoner_number: nomis_offender.offender_no,
         prisoner_crn: nomis_offender.crn,
         prison_name: PrisonService.name_for(nomis_offender.prison_id),
         ldu_email: nomis_offender.ldu_email_address
-      ).deliver_later
+      ).open_prison_supporting_com_needed.deliver_later
     end
   end
 end

@@ -82,8 +82,13 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
       fakejob = double
       allow(fakejob).to receive(:deliver_later)
 
-      expect(PomMailer).to receive(:deallocate_coworking_pom)
-        .with(
+      allow(PomMailer).to receive(:with).and_return(double(deallocate_coworking_pom: fakejob))
+
+      delete :destroy, params: { prison_id: prison, nomis_offender_id: allocation.nomis_offender_id }
+
+      aggregate_failures do
+        expect(response).to redirect_to(prison_prisoner_allocation_path(prison, allocation.nomis_offender_id))
+        expect(PomMailer).to have_received(:with).with(
           secondary_pom_name: secondary_pom_name,
           email_address: primary_pom.emails.first,
           nomis_offender_id: offender_no,
@@ -91,10 +96,8 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
           pom_name: primary_pom.firstName.capitalize,
           url: Rails.application.routes.default_url_options[:host] + prison_staff_caseload_path(prison, primary_pom.staffId)
         )
-        .and_return(fakejob)
-
-      delete :destroy, params: { prison_id: prison, nomis_offender_id: allocation.nomis_offender_id }
-      expect(response).to redirect_to(prison_prisoner_allocation_path(prison, allocation.nomis_offender_id))
+        expect(fakejob).to have_received(:deliver_later)
+      end
     end
   end
 end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class PomMailer < GovukNotifyRails::Mailer
-  def new_allocation_email(params = {})
+  def new_allocation_email
     message_detail = "Additional information: #{params[:message]}" if params[:message].present?
     set_template('9fbba261-45c7-4f99-aaf2-46570c6eac73')
     set_personalisation(
@@ -22,71 +22,43 @@ class PomMailer < GovukNotifyRails::Mailer
     mail(to: params[:pom_email])
   end
 
-  def responsibility_override(
-    message:,
-    prisoner_number:,
-    prisoner_name:,
-    prison_name:,
-    email:
-  )
+  def responsibility_override
     set_template('ca952ba5-58b5-4e2d-8d87-60590d76560c')
-    set_personalisation(prisoner_name: prisoner_name,
-                        prisoner_number: prisoner_number,
-                        reason: message,
-                        prison_name: prison_name)
-    mail(to: email)
+    set_personalisation(prisoner_name: params.fetch(:prisoner_name),
+                        prisoner_number: params.fetch(:prisoner_number),
+                        reason: params.fetch(:message),
+                        prison_name: params.fetch(:prison_name))
+    mail(to: params[:email])
   end
 
-  def allocate_coworking_pom(
-    pom_email:, message:, pom_name:, coworking_pom_name:, url:,
-    offender_name:, nomis_offender_id:
-  )
+  def allocate_coworking_pom
     set_template('a76f44a0-e214-4967-bfe3-4564d28e2951')
 
-    message = "Additional information: #{message}" if message.present?
+    params[:message] = params[:message].present? ? "Additional information: #{params[:message]}" : ''
 
-    set_personalisation(message: message || '',
-                        pom_name: pom_name,
-                        coworking_pom_name: coworking_pom_name,
-                        url: url,
-                        offender_name: offender_name,
-                        nomis_offender_id: nomis_offender_id)
+    set_personalisation(**params.slice(:message, :pom_name, :coworking_pom_name, :url, :offender_name,
+                                       :nomis_offender_id))
 
-    mail(to: pom_email)
+    mail(to: params[:pom_email])
   end
 
-  def deallocate_coworking_pom(email_address:, pom_name:,
-                               secondary_pom_name:, nomis_offender_id:,
-                               offender_name:, url:)
+  def deallocate_coworking_pom
     set_template('bbdd094b-037b-424d-8b9b-ee310e291c9e')
 
-    set_personalisation(pom_name: pom_name,
-                        email_address: email_address,
-                        secondary_pom_name: secondary_pom_name,
-                        nomis_offender_id: nomis_offender_id,
-                        offender_name: offender_name,
-                        url: url)
+    set_personalisation(**params.slice(:pom_name, :email_address, :secondary_pom_name, :nomis_offender_id,
+                                       :offender_name, :url))
 
-    mail(to: email_address)
+    mail(to: params[:email_address])
   end
 
-  def secondary_allocation_email(
-    message:, pom_name:, offender_name:, nomis_offender_id:,
-    responsible_pom_name:, pom_email:, url:, responsibility:
-  )
-    message = "Additional information: #{message}" if message.present?
-    set_template('8d63ef1a-8f85-47ec-875c-a8bd3a22bb0d')
-    set_personalisation(
-      pom_name: pom_name,
-      url: url,
-      responsibility: responsibility,
-      offender_name: offender_name,
-      nomis_offender_id: nomis_offender_id,
-      responsible_pom_name: responsible_pom_name,
-      message: message || ''
-    )
+  def secondary_allocation_email
+    params[:message] = params[:message].present? ? "Additional information: #{params[:message]}" : ''
 
-    mail(to: pom_email)
+    set_template('8d63ef1a-8f85-47ec-875c-a8bd3a22bb0d')
+    set_personalisation(**params.slice(:pom_name, :url, :responsibility, :offender_name, :nomis_offender_id,
+                                       :responsible_pom_name, :message))
+
+    mail(to: params[:pom_email])
   end
 
   def new_prison_allocation_email(prison)
@@ -121,19 +93,10 @@ class PomMailer < GovukNotifyRails::Mailer
     mail(to: params[:previous_pom_email])
   end
 
-  def offender_deallocated(email:,
-                           pom_name:,
-                           offender_name:,
-                           nomis_offender_id:,
-                           prison_name:,
-                           url:)
+  def offender_deallocated
     set_template('1df51f52-512d-434b-9088-50eacaa47c59')
-    set_personalisation(pom_name: pom_name,
-                        offender_name: offender_name,
-                        nomis_offender_id: nomis_offender_id,
-                        prison_name: prison_name,
-                        url: url)
+    set_personalisation(**params.slice(:pom_name, :offender_name, :nomis_offender_id, :prison_name, :url))
 
-    mail(to: email)
+    mail(to: params.fetch(:email))
   end
 end

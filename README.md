@@ -25,6 +25,17 @@ Use [asdf](https://asdf-vm.com/) or similar to manage your ruby environment and 
 - [Nomis Elite2](https://github.com/ministryofjustice/elite2-api) - API for accessing prison, offender and staff information from the National Offender Management Integration System
 - [Nomis Oauth2 Server](https://github.com/ministryofjustice/nomis-oauth2-server) - for logging into the application
 
+### Installing Ruby
+
+The app uses Ruby 3+. Installation is a little tricky on M1 Macs:
+
+Install libyaml: `brew install libyaml`
+
+Use Brew's libffi, not the system's one:
+`export LDFLAGS="-L/opt/homebrew/opt/libffi/lib" CPPFLAGS="-I/opt/homebrew/opt/libffi/include"`
+
+Install with your Ruby version manager: `rbenv install 3.y.z`
+
 ## Running The Application
 
 1. Install [Bundler](https://bundler.io/)

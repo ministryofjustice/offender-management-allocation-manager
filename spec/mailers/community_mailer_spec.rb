@@ -27,7 +27,7 @@ RSpec.describe CommunityMailer, type: :mailer do
       }
     end
 
-    let(:mail) { described_class.urgent_pipeline_to_community(params) }
+    let(:mail) { described_class.with(**params).urgent_pipeline_to_community }
 
     it 'sets the template' do
       expect(mail.govuk_notify_template).to eq('d7366b11-c93e-48de-824f-cb80a9778e71')
@@ -54,7 +54,7 @@ RSpec.describe CommunityMailer, type: :mailer do
   end
 
   describe '#pipeline_to_community' do
-    subject { described_class.pipeline_to_community(params) }
+    subject { described_class.with(**params).pipeline_to_community }
 
     let(:ldu) { build(:local_delivery_unit) }
 
@@ -76,7 +76,7 @@ RSpec.describe CommunityMailer, type: :mailer do
   end
 
   describe '#pipeline_to_community_no_handovers' do
-    subject { described_class.pipeline_to_community_no_handovers(ldu_name: ldu.name, ldu_email: ldu.email_address) }
+    subject { described_class.with(ldu_name: ldu.name, ldu_email: ldu.email_address).pipeline_to_community_no_handovers }
 
     let(:ldu) { build(:local_delivery_unit) }
 
@@ -106,7 +106,7 @@ RSpec.describe CommunityMailer, type: :mailer do
       }
     end
 
-    let(:mail) { described_class.open_prison_supporting_com_needed(params) }
+    let(:mail) { described_class.with(**params).open_prison_supporting_com_needed }
 
     it 'sets the template' do
       expect(mail.govuk_notify_template).to eq('51eea8d1-6c73-4b86-bac0-f74ad5573b43')

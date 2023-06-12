@@ -32,13 +32,13 @@ class ResponsibilitiesController < PrisonsApplicationController
 
     # GovUk notify can only deliver to 1 address at a time.
     emails.each do |email|
-      PomMailer.responsibility_override(
+      PomMailer.with(
         message: params[:message],
         prisoner_number: @responsibility.nomis_offender_id,
         prisoner_name: @offender.full_name,
         prison_name: @prison.name,
         email: email
-      ).deliver_later
+      ).responsibility_override.deliver_later
     end
 
     redirect_to referrer
@@ -63,19 +63,19 @@ class ResponsibilitiesController < PrisonsApplicationController
       if allocation&.active?
         pom_email = HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(allocation.primary_pom_nomis_id).first
         emails << pom_email
-        ResponsibilityMailer.responsibility_to_custody_with_pom(emails: emails.compact,
-                                                                pom_name: allocation.primary_pom_name,
-                                                                pom_email: pom_email,
-                                                                prisoner_name: @offender.full_name,
-                                                                prisoner_number: nomis_offender_id_from_url,
-                                                                prison_name: @prison.name,
-                                                                notes: @responsibility.reason_text).deliver_later
+        ResponsibilityMailer.with(emails: emails.compact,
+                                  pom_name: allocation.primary_pom_name,
+                                  pom_email: pom_email,
+                                  prisoner_name: @offender.full_name,
+                                  prisoner_number: nomis_offender_id_from_url,
+                                  prison_name: @prison.name,
+                                  notes: @responsibility.reason_text).responsibility_to_custody_with_pom.deliver_later
       else
-        ResponsibilityMailer.responsibility_to_custody(emails: emails.compact,
-                                                       prisoner_name: @offender.full_name,
-                                                       prisoner_number: nomis_offender_id_from_url,
-                                                       prison_name: @prison.name,
-                                                       notes: @responsibility.reason_text).deliver_later
+        ResponsibilityMailer.with(emails: emails.compact,
+                                  prisoner_name: @offender.full_name,
+                                  prisoner_number: nomis_offender_id_from_url,
+                                  prison_name: @prison.name,
+                                  notes: @responsibility.reason_text).responsibility_to_custody.deliver_later
       end
       redirect_to prison_prisoner_allocation_path(@prison.code, @responsibility.nomis_offender_id)
     else

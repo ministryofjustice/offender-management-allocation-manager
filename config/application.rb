@@ -85,5 +85,12 @@ module OffenderManagementAllocationClient
     config.active_record.schema_format = :sql
 
     config.gtm_id = ENV['GTM_ID']&.strip
+
+    config.active_record.yaml_column_permitted_classes = [
+      Symbol,
+      ActiveSupport::HashWithIndifferentAccess,
+      Time,
+      Date,
+    ]
   end
 end

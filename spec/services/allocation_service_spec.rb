@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe AllocationService do
   include ActiveJob::TestHelper
 
@@ -26,46 +24,25 @@ describe AllocationService do
              primary_pom_name: 'Pom, Moic')
     end
 
-    it 'sends an email to both primary and secondary POMS', vcr: { cassette_name: 'prison_api/allocation_service_allocate_secondary' } do
-      expect {
-        described_class.allocate_secondary(nomis_offender_id: nomis_offender_id,
-                                           secondary_pom_nomis_id: secondary_pom_id,
-                                           created_by_username: 'MOIC_POM',
-                                           message: message
-                                          )
-        expect(allocation.reload.secondary_pom_nomis_id).to eq(secondary_pom_id)
-        expect(allocation.reload.secondary_pom_name).to eq('INTEGRATION-TESTS, MOIC')
-      }.to change(enqueued_jobs, :count).by(2)
+    before do
+      allow(EmailService).to receive_messages(send_coworking_primary_email: nil,
+                                              send_secondary_email: nil)
+    end
 
-      primary_email_job, secondary_email_job = enqueued_jobs.last(2)
+    it 'sends an email to both primary and secondary POMS', :aggregate_failures, vcr: { cassette_name: 'prison_api/allocation_service_allocate_secondary' } do
+      described_class.allocate_secondary(nomis_offender_id: nomis_offender_id,
+                                         secondary_pom_nomis_id: secondary_pom_id,
+                                         created_by_username: 'MOIC_POM',
+                                         message: message
+                                        )
+      expect(allocation.reload.secondary_pom_nomis_id).to eq(secondary_pom_id)
+      expect(allocation.reload.secondary_pom_name).to eq('INTEGRATION-TESTS, MOIC')
 
-      # mail telling the primary POM about the co-working POM
-      primary_args_hash = primary_email_job[:args][3]['args'][0]
-      secondary_args_hash = secondary_email_job[:args][3]['args'][0]
-      expect(primary_args_hash)
-        .to match(
-          hash_including(
-            "message" => message,
-            "offender_name" => "Annole, Omistius",
-            "nomis_offender_id" => nomis_offender_id,
-            "pom_email" => "pom@digital.justice.gov.uk",
-            "pom_name" => "Moic",
-            "url" => "http://localhost:3000/prisons/LEI/staff/#{primary_pom_id}/caseload"
-          ))
-
-      # message telling co-working POM who the Primary POM is.
-      expect(secondary_args_hash)
-        .to match(
-          hash_including(
-            "message" => message,
-            "pom_name" => "Moic",
-            "offender_name" => "Annole, Omistius",
-            "nomis_offender_id" => nomis_offender_id,
-            "responsibility" => "responsible",
-            "responsible_pom_name" => 'Pom, Moic',
-            "pom_email" => "ommiicc@digital.justice.gov.uk",
-            "url" => "http://localhost:3000/prisons/LEI/staff/#{secondary_pom_id}/caseload"
-          ))
+      expect(EmailService).to have_received(:send_coworking_primary_email).with(
+        allocation: allocation, message: message)
+      expect(EmailService).to have_received(:send_secondary_email).with(
+        allocation: allocation, message: message,
+        pom_nomis_id: secondary_pom_id, pom_firstname: 'MOIC')
     end
   end
 

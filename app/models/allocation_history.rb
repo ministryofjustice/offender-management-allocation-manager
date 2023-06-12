@@ -132,7 +132,7 @@ class AllocationHistory < ApplicationRecord
   # (item[1] in the array) is our staff_id
   def new_case_for?(staff_id)
     versions.where('created_at >= ?', 7.days.ago).map { |c|
-      YAML.load(c.object_changes)
+      YAML.unsafe_load(c.object_changes)
     }.select { |c|
       c.key?('primary_pom_nomis_id') && c['primary_pom_nomis_id'][1] == staff_id ||
         c.key?('secondary_pom_nomis_id') && c['secondary_pom_nomis_id'][1] == staff_id
@@ -170,7 +170,7 @@ private
       recommended_pom_type: nil,
     )
 
-    PomMailer.offender_deallocated(mail_params).deliver_later
+    PomMailer.with(**mail_params).offender_deallocated.deliver_later
   end
 
   def push_pom_to_community_api

@@ -20,7 +20,7 @@ class CaseHistory
   # The diff is of course stored in UTC, so we have to convert to local time
   # manually as we've bypassed the library code in this instance
   def created_at
-    YAML.load(@version.object_changes).fetch('updated_at').second.getlocal
+    YAML.unsafe_load(@version.object_changes).fetch('updated_at').second.getlocal
   end
 
   # If we have a 'first' reallocation for a prison then show it as an allocation because it is -

@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 RSpec.describe ComplexityLevelsController, type: :controller do
   let(:offender) { build(:nomis_offender, complexityLevel: 'medium', prisonId: womens_prison.code, firstName: 'Sally', lastName: 'Albright') }
   let(:womens_prison) { create(:womens_prison) }
@@ -28,7 +26,7 @@ RSpec.describe ComplexityLevelsController, type: :controller do
 
   describe '#update' do
     before do
-      expect(HmppsApi::ComplexityApi).to receive(:save).with(offender.fetch(:prisonerNumber), level: updated_complexity_level, username: 'user', reason: 'Just because')
+      allow(HmppsApi::ComplexityApi).to receive(:save)
     end
 
     context 'when complexity level increases from medium to high' do
@@ -36,12 +34,21 @@ RSpec.describe ComplexityLevelsController, type: :controller do
 
       it 'saves the complexity level and renders the renders the confirmation page' do
         post :update,  params: { complexity: { level: updated_complexity_level, reason: 'Just because' }, prison_id: womens_prison.code, prisoner_id: offender_no }
-        expect(response).to have_http_status(:ok)
-        expect(assigns(:previous_complexity_level)).to eq('medium')
-        expect(assigns(:complexity).level).to eq('high')
-        expect(assigns(:offender_id)).to eq(offender_no)
-        expect(assigns(:prisoner).first_name).to eq('Sally')
-        expect(assigns(:prisoner).last_name).to eq('Albright')
+        aggregate_failures do
+          expect(response).to have_http_status(:ok)
+          expect(assigns(:previous_complexity_level)).to eq('medium')
+          expect(assigns(:complexity).level).to eq('high')
+          expect(assigns(:offender_id)).to eq(offender_no)
+          expect(assigns(:prisoner).first_name).to eq('Sally')
+          expect(assigns(:prisoner).last_name).to eq('Albright')
+
+          expect(HmppsApi::ComplexityApi).to have_received(:save).with(
+            offender.fetch(:prisonerNumber),
+            level: updated_complexity_level,
+            username: 'user',
+            reason: 'Just because'
+          )
+        end
       end
     end
 

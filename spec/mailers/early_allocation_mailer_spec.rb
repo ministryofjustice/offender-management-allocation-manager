@@ -7,11 +7,11 @@ RSpec.describe EarlyAllocationMailer, type: :mailer do
         prisoner_name: "Brown, James",
         start_page_link: prison_prisoner_early_allocations_path(prison_id: "LEI", prisoner_id: "T1000AA"),
         equip_guidance_link: "http://www.equip_guidance_link.html",
-        email: "ursula.richards@thelighthouse.gov.uk"
+        email: 'to@example.com',
       }
     end
 
-    let(:mail) { described_class.review_early_allocation(params) }
+    let(:mail) { described_class.with(**params).review_early_allocation }
 
     it 'sets the template' do
       expect(mail.govuk_notify_template).to eq('502e057c-a875-4653-9b33-63dcfd33e582')
@@ -27,6 +27,38 @@ RSpec.describe EarlyAllocationMailer, type: :mailer do
              start_page_link: "/prisons/LEI/prisoners/T1000AA/early_allocations",
              equip_guidance_link: params[:equip_guidance_link]
             )
+    end
+  end
+
+  describe 'community_early_allocation' do
+    subject(:mail) { described_class.with(**params).community_early_allocation }
+
+    let(:params) do
+      {
+        prisoner_name: 'TESTNAME',
+        prisoner_number: '1111',
+        pom_name: 'POMNAME',
+        pom_email: 'pom@example.com',
+        prison_name: 'PRISONMAME',
+        email: 'to@example.com',
+        pdf: 'FAKEPDF',
+      }
+    end
+
+    before do
+      allow(Notifications).to receive(:prepare_upload)
+    end
+
+    it 'sets the To address of the email using the provided user' do
+      expect(mail.to).to eq(['to@example.com'])
+    end
+
+    it 'personalises the email' do
+      expect(mail.govuk_notify_personalisation).to include(prisoner_name: 'TESTNAME',
+                                                           prisoner_number: '1111',
+                                                           pom_name: 'POMNAME',
+                                                           pom_email_address: 'pom@example.com',
+                                                           prison_name: 'PRISONMAME')
     end
   end
 end

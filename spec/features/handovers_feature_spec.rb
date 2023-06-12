@@ -19,7 +19,7 @@ RSpec.feature 'Handovers feature:' do
       case_information: double(enhanced_handover?: false),
     }
   end
-  let(:offender) { sneaky_instance_double AllocatedOffender, offender_attrs }
+  let(:offender) { sneaky_instance_double AllocatedOffender, **offender_attrs }
   let(:handover_cases) do
     sneaky_instance_double(Handover::CategorisedHandoverCasesForPom, upcoming: [],
                                                                      in_progress: [],

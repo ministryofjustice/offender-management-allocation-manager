@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.7.7'
+ruby '3.2.2'
 
 gem 'rails', '~> 6.1.7'
 gem 'auto_strip_attributes'
@@ -53,6 +53,7 @@ gem 'valid_email2'
 gem 'wicked'
 gem 'rails-i18n'
 gem 'business_time'
+gem 'matrix' # App does not use it directly but it has to be explicitly declared otherwise build breaks
 
 gem 'activeadmin'
 
@@ -64,8 +65,7 @@ group :development, :test do
   gem 'parallel_tests'
   gem 'rubocop-govuk', '~> 4.8'
   gem 'rubocop-performance', '~> 1.15'
-  # needed to support Rails 6.0
-  gem 'rspec-rails', '~> 6.0'
+  gem 'rspec-rails', '~> 6.0.3'
   gem 'rswag-specs'
   gem 'spring'
   gem 'undercover'

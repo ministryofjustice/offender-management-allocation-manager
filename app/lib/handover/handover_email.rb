@@ -9,7 +9,8 @@ class Handover::HandoverEmail
       return
     end
 
-    mailer = HandoverMailer.public_send(handover_email_type, **mailer_args.merge(nomis_offender_id: nomis_offender_id))
+    mailer = HandoverMailer.with(**mailer_args.merge(nomis_offender_id: nomis_offender_id))
+                           .public_send(handover_email_type)
 
     ApplicationRecord.transaction do
       OffenderEmailSent.create!(offender_email_type: handover_email_type,
