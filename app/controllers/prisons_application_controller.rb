@@ -10,7 +10,7 @@ class PrisonsApplicationController < ApplicationController
 protected
 
   def active_prison_id
-    params[:prison_id]
+    params.fetch(:prison_id, default_prison_code)
   end
 
   def ensure_pom
