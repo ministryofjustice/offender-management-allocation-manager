@@ -172,6 +172,11 @@ Rails.application.routes.draw do
     resources :handovers, only: [:show], controller: :handovers_api
   end
 
+  # '/admin' is already taken by ActiveAdmin
+  namespace :manage do
+    resources :audit_events, only: %i[index]
+  end
+
   mount Rswag::Ui::Engine => '/api-docs'
   mount Rswag::Api::Engine => '/api-docs'
 
