@@ -1,0 +1,2 @@
+class AuditEvent < ApplicationRecord
+end
