@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ResponsibilityMailer < GovukNotifyRails::Mailer
+class ResponsibilityMailer < ApplicationMailer
   class EmailWrapper
     def initialize(mails)
       @mails = mails

@@ -78,7 +78,7 @@ RSpec.describe PomMailer, type: :mailer do
       }
     end
 
-    let(:mail) { described_class.deallocation_email(params) }
+    let(:mail) { described_class.with(**params).deallocation_email }
 
     it 'sets the template' do
       expect(mail.govuk_notify_template)
