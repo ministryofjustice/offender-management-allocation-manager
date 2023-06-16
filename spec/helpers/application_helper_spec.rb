@@ -6,6 +6,13 @@ RSpec.describe ApplicationHelper do
     end
   end
 
+  describe '#format_time_readably' do
+    it 'formats in a complete, terse, and manner' do
+      t = Time.new(2023, 4, 3, 17, 4, 12, 'Z')
+      expect(format_time_readably(t)).to eq '3 Apr 2023 17:04'
+    end
+  end
+
   describe '#handover_type_label' do
     it 'returns correct value when enhanced handover is false' do
       o = double(:mpc_offender, case_information: double(enhanced_handover?: false))

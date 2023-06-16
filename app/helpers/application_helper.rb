@@ -13,6 +13,10 @@ module ApplicationHelper
     "#{date_obj.strftime("#{date_obj.day.ordinalize} %B %Y")} (#{date_obj.strftime('%R')})"
   end
 
+  def format_time_readably(time)
+    time.strftime('%-d %b %Y %H:%M')
+  end
+
   def pom_level(level)
     {
       'PO' => 'Probation POM',
