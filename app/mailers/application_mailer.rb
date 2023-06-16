@@ -2,7 +2,11 @@ class ApplicationMailer < GovukNotifyRails::Mailer
   before_action :store_default_tags
 
   class << self
-    attr_accessor :mailer_tag
+    attr_reader :mailer_tag
+
+    def set_mailer_tag(tag)
+      @mailer_tag = tag
+    end
   end
 
 protected
