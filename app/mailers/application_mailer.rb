@@ -15,6 +15,6 @@ protected
     return if govuk_notify_reference
 
     mailer_tag = self.class.mailer_tag || self.class.name.underscore.delete_suffix('_mailer')
-    set_reference ['email', mailer_tag, action_name]
+    set_reference ['email', mailer_tag, action_name].join('.')
   end
 end
