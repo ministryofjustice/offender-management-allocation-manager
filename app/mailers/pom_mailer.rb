@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class PomMailer < GovukNotifyRails::Mailer
+class PomMailer < ApplicationMailer
   def new_allocation_email
     message_detail = "Additional information: #{params[:message]}" if params[:message].present?
     set_template('9fbba261-45c7-4f99-aaf2-46570c6eac73')
@@ -61,17 +61,17 @@ class PomMailer < GovukNotifyRails::Mailer
     mail(to: params[:pom_email])
   end
 
-  def new_prison_allocation_email(prison)
+  def new_prison_allocation_email
     set_template('651da525-7564-4f04-85ff-b0343fb7c47d')
     set_personalisation(
       email_subject: 'New Allocation',
-      prison: Prison.find(prison).name
+      prison: Prison.find(params.fetch(:prison)).name
     )
 
     mail(to: ENV['SUPPORT_EMAIL'])
   end
 
-  def deallocation_email(params = {})
+  def deallocation_email
     set_template('cd628495-6e7a-448e-b4ad-4d49d4d8567d')
 
     set_personalisation(

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class EarlyAllocationMailer < GovukNotifyRails::Mailer
+class EarlyAllocationMailer < ApplicationMailer
   def auto_early_allocation
     set_template('dfaeb1b1-26c3-4646-8ef4-1f0ebd18e2e7')
     params[:link_to_document] = Notifications.prepare_upload(StringIO.new(params[:pdf]))

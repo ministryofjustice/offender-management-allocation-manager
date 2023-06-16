@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class CommunityMailer < GovukNotifyRails::Mailer
+class CommunityMailer < ApplicationMailer
   def pipeline_to_community
     set_template('6e2f7565-a0e3-4fd7-b814-ee9dd5148924')
     set_personalisation(ldu_name: params.fetch(:ldu_name),

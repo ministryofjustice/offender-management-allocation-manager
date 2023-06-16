@@ -1,4 +1,6 @@
-class HandoverMailer < GovukNotifyRails::Mailer
+class HandoverMailer < ApplicationMailer
+  set_mailer_tag 'handover_reminder'
+
   def upcoming_handover_window
     set_template('7114ad9e-e71a-4424-a884-bcc72bd1a569')
     set_personalisation(nomis_offender_id: params.fetch(:nomis_offender_id),

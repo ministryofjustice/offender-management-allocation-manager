@@ -8,38 +8,20 @@
     <tr class="govuk-table__row">
       <th scope="col" class="govuk-table__header">Time</th>
       <th scope="col" class="govuk-table__header">NOMS No.</th>
-      <th scope="col" class="govuk-table__header">Event Type</th>
+      <th scope="col" class="govuk-table__header">Tags</th>
+      <th scope="col" class="govuk-table__header">System event?</th>
       <th scope="col" class="govuk-table__header">User</th>
       <th scope="col" class="govuk-table__header">Event</th>
     </tr>
   </thead>
   <tbody class="govuk-table__body">
-    <% 3.times.map do
-      {
-        'nomis_offender_id' => 'X1111XX',
-        'type' => %w[email handover_reminder upcoming_handover_window],
-        'user_id' => SecureRandom.alphanumeric(10),
-        'data' => {
-          'govuk_notify_message' => {
-            'template' => SecureRandom.uuid,
-            'personalisation' => {
-              'email' => SecureRandom.alphanumeric(10) + '@example.org',
-              'full_name_ordered' => SecureRandom.alphanumeric(10),
-              'first_name' => SecureRandom.alphanumeric(10),
-              'handover_date' => rand(20).days.from_now.to_date,
-              'enhanced_handover' => true,
-              'release_date' => rand(20).days.from_now.to_date,
-              'nomis_offender_id' => 'X1111XX',
-            },
-          }
-        }
-      }
-    end.each do |info| %>
+    <% @audit_events.each do |audit_event| %>
       <tr class="govuk-table__row">
         <td class="govuk-table__cell"><%= rand(20).days.ago.to_date %></td>
-        <td class="govuk-table__cell"><%= info['nomis_offender_id'] %></td>
-        <td class="govuk-table__cell govuk-body-s"><%= info['type'].join("<br>").html_safe %></td>
-        <td class="govuk-table__cell"><%= info['user_id'] %></td>
+        <td class="govuk-table__cell"><%= audit_event.nomis_offender_id || 'N/A' %></td>
+        <td class="govuk-table__cell govuk-body-s"><%= audit_event.tags.join('<br>').html_safe %></td>
+        <td class="govuk-table__cell"><%= audit_event.system_event? ? 'Yes' : 'No' %></td>
+        <td class="govuk-table__cell">TODO</td>
         <td class="govuk-table__cell">
           <details class="govuk-details" data-module="govuk-details">
             <summary class="govuk-details__summary">
@@ -48,7 +30,7 @@
               </span>
             </summary>
             <div class="govuk-details__text">
-              <pre><%= info['data'].to_yaml %></pre>
+              <pre><%= audit_event.data.to_yaml %></pre>
             </div>
           </details>
         </td>

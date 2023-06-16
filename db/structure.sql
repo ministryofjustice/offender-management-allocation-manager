@@ -83,6 +83,25 @@ CREATE TABLE public.ar_internal_metadata (
 
 
 --
+-- Name: audit_events; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.audit_events (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    nomis_offender_id text,
+    tags text[] NOT NULL,
+    published_at timestamp(6) without time zone NOT NULL,
+    system_event boolean,
+    username text,
+    user_human_name text,
+    data jsonb NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    CONSTRAINT system_event_cannot_have_user_details CHECK ((((system_event = true) AND (username IS NULL) AND (user_human_name IS NULL)) OR (system_event = false)))
+);
+
+
+--
 -- Name: calculated_early_allocation_statuses; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -854,6 +873,14 @@ ALTER TABLE ONLY public.ar_internal_metadata
 
 
 --
+-- Name: audit_events audit_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.audit_events
+    ADD CONSTRAINT audit_events_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: calculated_early_allocation_statuses calculated_early_allocation_statuses_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1287,6 +1314,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230213000003'),
 ('20230412150435'),
 ('20230602102101'),
-('20230602163929');
+('20230602163929'),
+('20230613125426');
 
 

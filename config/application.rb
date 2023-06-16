@@ -92,5 +92,7 @@ module OffenderManagementAllocationClient
       Time,
       Date,
     ]
+
+    config.action_mailer.observers = %w[MailPublishAuditEventObserver]
   end
 end
