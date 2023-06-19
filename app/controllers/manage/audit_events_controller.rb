@@ -1,4 +1,6 @@
 class Manage::AuditEventsController < PrisonsApplicationController
+  before_action :ensure_admin_user
+
   def index
     @nomis_offender_id = params[:nomis_offender_id]
     query = AuditEvent.order(published_at: :desc)
