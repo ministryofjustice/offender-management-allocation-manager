@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
-
 describe HandoverDateService do
   context 'when April 2023 calculations' do
     let(:mpc_offender) do

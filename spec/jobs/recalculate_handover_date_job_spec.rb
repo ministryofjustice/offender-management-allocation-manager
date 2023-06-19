@@ -23,38 +23,51 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
   end
 
   context "when the offender exists in both NOMIS and nDelius (happy path)" do
+    let(:nomis_offender) { build(:nomis_offender, prisonId: prison.code) }
+    let(:offender) { OffenderService.get_offender(offender_no) }
+
     before do
       stub_offender(nomis_offender)
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), enhanced_handover: true, manual_entry: false)
-    end
-
-    let(:nomis_offender) { build(:nomis_offender, prisonId: prison.code) }
-
-    it "recalculates the offender's handover dates and pushes them to the Community API", aggregate_failures: true do
-      offender = OffenderService.get_offender(offender_no)
-
-      expect(HmppsApi::CommunityApi).to receive(:set_handover_dates)
-        .with(offender_no: offender_no,
-              handover_start_date: offender.handover_start_date,
-              responsibility_handover_date: offender.responsibility_handover_date
-             )
+      offender # instantiate it after the previous lines
+      allow(HmppsApi::CommunityApi).to receive(:set_handover_dates)
 
       described_class.perform_now(offender_no)
+    end
+
+    it "recalculates the offender's handover dates and pushes them to the Community API", aggregate_failures: true do
       expect(event).not_to have_received(:publish)
+      expect(HmppsApi::CommunityApi).to have_received(:set_handover_dates)
+                                          .with(offender_no: offender_no,
+                                                handover_start_date: offender.handover_start_date,
+                                                responsibility_handover_date: offender.responsibility_handover_date
+                                               )
     end
 
     it 'recalculates the offenders handover dates and publishes a domain event', use_events: true,
                                                                                  aggregate_failures: true do
-      allow(HmppsApi::CommunityApi).to receive(:set_handover_dates)
-      offender = OffenderService.get_offender(offender_no)
-      described_class.perform_now(offender_no)
-
       expect(DomainEvents::EventFactory).to have_received(:build_handover_event).with(
         noms_number: offender.offender_no,
         host: 'https://test.example.com',
       )
       expect(event).to have_received(:publish).with(job: 'recalculate_handover_date_job')
       expect(HmppsApi::CommunityApi).not_to have_received(:set_handover_dates)
+    end
+
+    it 'publishes an audit event', use_events: true, aggregate_failures: true do
+      record = AuditEvent.first
+      expect(record.attributes.except('id', 'created_at', 'updated_at', 'data')).to match(
+        hash_including(
+          'nomis_offender_id' => offender_no,
+          'system_event' => true,
+          'tags' => %w[job recalculate_handover_date],
+          'user_human_name' => nil,
+          'username' => nil
+        )
+      )
+      expect(record.data['before'].keys).to include('handover_date', 'start_date', 'responsibility', 'reason')
+      expect(record.data['after'].values_at('handover_date', 'start_date', 'responsibility', 'reason'))
+                                 .to eq(['2023-10-05', '2023-10-05', 'CustodyOnly', 'determinate'])
     end
   end
 

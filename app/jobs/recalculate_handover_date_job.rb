@@ -13,49 +13,67 @@ class RecalculateHandoverDateJob < ApplicationJob
 private
 
   def recalculate_dates_for(nomis_offender)
-    # we have to go direct to handover data to avoid being blocked when COM is responsible
-    handover = HandoverDateService.handover(nomis_offender)
-    db_offender = Offender.find_by! nomis_offender_id: nomis_offender.offender_no
-    case_info = db_offender.case_information
-    record = db_offender.calculated_handover_date.presence || db_offender.build_calculated_handover_date
-    record.assign_attributes(
-      responsibility: handover.responsibility,
-      start_date: handover.start_date,
-      handover_date: handover.handover_date,
-      reason: handover.reason,
-      offender_attributes_to_archive: nomis_offender.attributes_to_archive,
-    )
-    if handover.community_responsible? &&
-      handover.reason.to_sym == :determinate_short &&
-      nomis_offender.ldu_email_address.present? &&
-      nomis_offender.allocated_com_name.blank?
-      # need to chase if we haven't chased recently
-      last_chaser = db_offender.email_histories.where(event: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION).last
-      if last_chaser.nil? || last_chaser.created_at < 2.days.ago
-        # create the history first so that the validations will help with hard failures due to coding errors
-        # rather than waiting for the mailer to object
-        db_offender.email_histories.create! prison: nomis_offender.prison_id,
-                                            name: case_info.ldu_name,
-                                            email: case_info.ldu_email_address,
-                                            event: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION
-        # This is queued so that soft failures don't kill the whole job
-        CommunityMailer.with(
-          email: case_info.ldu_email_address,
-          crn_number: case_info.crn,
-          prison_name: PrisonService.name_for(nomis_offender.prison_id),
-          prisoner_name: "#{nomis_offender.first_name} #{nomis_offender.last_name}",
-          prisoner_number: nomis_offender.offender_no
-        ).assign_com_less_than_10_months.deliver_later
+    ApplicationRecord.transaction do
+      # we have to go direct to handover data to avoid being blocked when COM is responsible
+      handover = HandoverDateService.handover(nomis_offender)
+      db_offender = Offender.find_by! nomis_offender_id: nomis_offender.offender_no
+      case_info = db_offender.case_information
+      record = db_offender.calculated_handover_date.presence || db_offender.build_calculated_handover_date
+      handover_before = record.attributes.except(:id, :created_at, :updated_at)
+      record.assign_attributes(
+        responsibility: handover.responsibility,
+        start_date: handover.start_date,
+        handover_date: handover.handover_date,
+        reason: handover.reason,
+        offender_attributes_to_archive: nomis_offender.attributes_to_archive,
+      )
+      if handover.community_responsible? &&
+        handover.reason.to_sym == :determinate_short &&
+        nomis_offender.ldu_email_address.present? &&
+        nomis_offender.allocated_com_name.blank?
+        # need to chase if we haven't chased recently
+        last_chaser = db_offender.email_histories.where(event: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION).last
+        if last_chaser.nil? || last_chaser.created_at < 2.days.ago
+          # create the history first so that the validations will help with hard failures due to coding errors
+          # rather than waiting for the mailer to object
+          db_offender.email_histories.create! prison: nomis_offender.prison_id,
+                                              name: case_info.ldu_name,
+                                              email: case_info.ldu_email_address,
+                                              event: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION
+          # This is queued so that soft failures don't kill the whole job
+          CommunityMailer.with(
+            email: case_info.ldu_email_address,
+            crn_number: case_info.crn,
+            prison_name: PrisonService.name_for(nomis_offender.prison_id),
+            prisoner_name: "#{nomis_offender.first_name} #{nomis_offender.last_name}",
+            prisoner_number: nomis_offender.offender_no
+          ).assign_com_less_than_10_months.deliver_later
+        end
       end
+
+      if record.changed?
+        record.save!
+        handover_after = record.attributes.except(:id, :created_at, :updated_at)
+
+        AuditEvent.create!(
+          nomis_offender_id: handover_after['nomis_offender_id'],
+          tags: %w[job recalculate_handover_date],
+          published_at: Time.zone.now.utc,
+          system_event: true,
+          data: {
+            before: handover_before,
+            after: handover_after,
+            nomis_offender_state: nomis_offender.attributes_to_archive,
+          }
+        )
+      end
+
+      # Don't push if the CaseInformation record is a manual entry (meaning it didn't match against nDelius)
+      # This avoids 404 Not Found errors for offenders who don't exist in nDelius (they could be Scottish, etc.)
+      push_to_delius record unless case_info.manual_entry?
+
+      request_supporting_com record, db_offender, nomis_offender
     end
-
-    record.save! if record.changed?
-
-    # Don't push if the CaseInformation record is a manual entry (meaning it didn't match against nDelius)
-    # This avoids 404 Not Found errors for offenders who don't exist in nDelius (they could be Scottish, etc.)
-    push_to_delius record unless case_info.manual_entry?
-
-    request_supporting_com record, db_offender, nomis_offender
   end
 
   def push_to_delius(record)

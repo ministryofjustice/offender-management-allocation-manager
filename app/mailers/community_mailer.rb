@@ -44,8 +44,8 @@ class CommunityMailer < ApplicationMailer
 
   def assign_com_less_than_10_months
     set_template('6cae6890-6a5a-4ceb-82bd-43c8b43fc639')
-
-    set_personalisation(**params.slice(:prisoner_number, :prison_name, :crn_number, :prisoner_name))
+    params[:nomis_offender_id] = params.fetch(:prisoner_number)
+    set_personalisation(**params.slice(:prisoner_number, :nomis_offender_id, :prison_name, :crn_number, :prisoner_name))
 
     mail(to: params.fetch(:email))
   end
