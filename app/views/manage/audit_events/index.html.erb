@@ -2,6 +2,21 @@
   Log of Audit Events
 </h2>
 
+<div class="search-box govuk-grid-row">
+  <%= form_tag(manage_audit_events_path, method: :get) do %>
+    <span class="govuk-form-group">
+      <label class="govuk-label" for="nomis_offender_id">
+        Enter a prisoner number/NOMS no/case number (looks like X1111XX)
+      </label>
+      <input class="govuk-input" id="nomis_offender_id" name="nomis_offender_id" type="text" value="<%= @nomis_offender_id %>" autofocus>
+
+      <input id="search-button" type="submit" class="govuk-button" value="    Search    "/>
+    </span>
+  <% end %>
+</div>
+
+<%= render partial: 'shared/pagination', locals: { data: @audit_events } %>
+
 <table class="govuk-table">
   <caption class="govuk-table__caption govuk-table__caption--m">All</caption>
   <thead class="govuk-table__head">
@@ -9,7 +24,6 @@
       <th scope="col" class="govuk-table__header">Time</th>
       <th scope="col" class="govuk-table__header">NOMS No.</th>
       <th scope="col" class="govuk-table__header">Tags</th>
-      <th scope="col" class="govuk-table__header">System event?</th>
       <th scope="col" class="govuk-table__header">User</th>
       <th scope="col" class="govuk-table__header">Event</th>
     </tr>
@@ -17,15 +31,20 @@
   <tbody class="govuk-table__body">
     <% @audit_events.each do |audit_event| %>
       <tr class="govuk-table__row">
-        <td class="govuk-table__cell"><%= rand(20).days.ago.to_date %></td>
+        <td class="govuk-table__cell"><%= format_time_readably(audit_event.published_at) %></td>
         <td class="govuk-table__cell"><%= audit_event.nomis_offender_id || 'N/A' %></td>
         <td class="govuk-table__cell govuk-body-s"><%= audit_event.tags.join('<br>').html_safe %></td>
-        <td class="govuk-table__cell"><%= audit_event.system_event? ? 'Yes' : 'No' %></td>
-        <td class="govuk-table__cell">TODO</td>
+        <td class="govuk-table__cell">
+          <% if audit_event.system_event? %>
+            <em>System</em>
+          <% else %>
+            <%= audit_event.user_human_name %> (<%= audit_event.username %>)
+          <% end %>
+        </td>
         <td class="govuk-table__cell">
           <details class="govuk-details" data-module="govuk-details">
             <summary class="govuk-details__summary">
-              <span class="govuk-details__summary-text">
+              <span class="govuk-details__summary-text raw-data">
                 Raw data
               </span>
             </summary>
@@ -38,3 +57,5 @@
     </tr>
   </tbody>
 </table>
+
+<%= render partial: 'shared/pagination', locals: { data: @audit_events } %>
