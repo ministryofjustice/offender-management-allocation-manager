@@ -12,4 +12,20 @@ RSpec.describe AuditEvent do
     expect { FactoryBot.create :audit_event, :system, user_human_name: 'test' }
       .to raise_error(/PG::CheckViolation: ERROR:.+audit_events.+system_event_cannot_have_user_details/)
   end
+
+  describe '::tags' do
+    it 'filters by tag', :aggregate_failures do
+      r1 = FactoryBot.create :audit_event, :system, nomis_offender_id: 'X1111XX', tags: ['test', 'tag1'], data: {}
+      r2 = FactoryBot.create :audit_event, :system, nomis_offender_id: 'X1111YY', tags: ['test', 'tag1'], data: {}
+      rx = FactoryBot.create :audit_event, :system, nomis_offender_id: 'X1111ZZ', tags: ['test', 'tag2'], data: {}
+
+      expect(described_class.tags('test')).to match_array([r1, r2, rx])
+      expect(described_class.tags('test', 'tag1')).to match_array([r1, r2])
+    end
+
+    it 'lowercases tags before search' do
+      r1 = FactoryBot.create :audit_event, :system, nomis_offender_id: 'X1111XX', tags: ['test', 'tag1'], data: {}
+      expect(described_class.tags('tEst')).to eq([r1])
+    end
+  end
 end
