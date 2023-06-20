@@ -56,6 +56,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
     it 'publishes an audit event', use_events: true, aggregate_failures: true do
       record = AuditEvent.first
+      handover = CalculatedHandoverDate.find_by(nomis_offender_id: record.nomis_offender_id)
       expect(record.attributes.except('id', 'created_at', 'updated_at', 'data')).to match(
         hash_including(
           'nomis_offender_id' => offender_no,
@@ -66,8 +67,10 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
         )
       )
       expect(record.data['before'].keys).to include('handover_date', 'start_date', 'responsibility', 'reason')
+      expect(record.data['before'].keys).not_to include('id', 'created_at', 'updated_at')
       expect(record.data['after'].values_at('handover_date', 'start_date', 'responsibility', 'reason'))
-                                 .to eq(['2023-10-05', '2023-10-05', 'CustodyOnly', 'determinate'])
+                                 .to eq([handover.handover_date.iso8601, handover.start_date.iso8601, 'CustodyOnly', 'determinate'])
+      expect(record.data['after'].keys).not_to include('id', 'created_at', 'updated_at')
     end
   end
 
