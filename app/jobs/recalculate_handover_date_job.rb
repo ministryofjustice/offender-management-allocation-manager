@@ -19,7 +19,7 @@ private
       db_offender = Offender.find_by! nomis_offender_id: nomis_offender.offender_no
       case_info = db_offender.case_information
       record = db_offender.calculated_handover_date.presence || db_offender.build_calculated_handover_date
-      handover_before = record.attributes.except(:id, :created_at, :updated_at)
+      handover_before = record.attributes.except('id', 'created_at', 'updated_at')
       record.assign_attributes(
         responsibility: handover.responsibility,
         start_date: handover.start_date,
@@ -53,7 +53,7 @@ private
 
       if record.changed?
         record.save!
-        handover_after = record.attributes.except(:id, :created_at, :updated_at)
+        handover_after = record.attributes.except('id', 'created_at', 'updated_at')
 
         AuditEvent.create!(
           nomis_offender_id: handover_after['nomis_offender_id'],
@@ -61,9 +61,9 @@ private
           published_at: Time.zone.now.utc,
           system_event: true,
           data: {
-            before: handover_before,
-            after: handover_after,
-            nomis_offender_state: nomis_offender.attributes_to_archive,
+            'before' => handover_before,
+            'after' => handover_after,
+            'nomis_offender_state' => nomis_offender.attributes_to_archive,
           }
         )
       end
