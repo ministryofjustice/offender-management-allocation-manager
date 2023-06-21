@@ -4,14 +4,21 @@
 
 <div class="search-box govuk-grid-row">
   <%= form_tag(manage_audit_events_path, method: :get) do %>
-    <span class="govuk-form-group">
+    <div class="govuk-form-group">
       <label class="govuk-label" for="nomis_offender_id">
-        Enter a prisoner number/NOMS no/case number (looks like X1111XX)
+        Prisoner number/NOMS no/case number (looks like X1111XX)
       </label>
       <input class="govuk-input" id="nomis_offender_id" name="nomis_offender_id" type="text" value="<%= @nomis_offender_id %>" autofocus>
+    </div>
+
+    <div class="govuk-form-group">
+    <label class="govuk-label" for="tags">
+        Tags (comma or space separated)
+      </label>
+      <input class="govuk-input" id="tags" name="tags" type="text" value="<%= @tags.join(' ') %>">
 
       <input id="search-button" type="submit" class="govuk-button" value="    Search    "/>
-    </span>
+    </div>
   <% end %>
 </div>
 

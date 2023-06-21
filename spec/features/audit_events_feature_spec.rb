@@ -11,7 +11,7 @@ RSpec.describe 'Audit events' do
       )
     end
 
-    it 'shows common information for each record', :aggregate_failures do
+    it 'shows common information for each record' do
       FactoryBot.create :audit_event, :system,
                         nomis_offender_id: 'X1111XX',
                         tags: ['test', 'event1'],
@@ -20,6 +20,25 @@ RSpec.describe 'Audit events' do
       expect(page).to have_content 'X1111XX'
       expect(page).to have_content 'testevent1'
       expect(page).to have_content(:all, 'event_data')
+    end
+
+    it 'can filter by tag', aggregate_failures: true do
+      FactoryBot.create_list :audit_event, 3, :system,
+                             nomis_offender_id: 'X1111XX',
+                             tags: ['test', 'tag1'],
+                             data: {}
+      FactoryBot.create :audit_event, :system,
+                        nomis_offender_id: 'X1111YY',
+                        tags: ['test', 'tag2'],
+                        data: {}
+
+      visit manage_audit_events_path
+      fill_in 'tags', with: " test, tag1\n"
+      click_on 'Search'
+      expect(page).to have_content 'X1111XX'
+      expect(page).not_to have_content 'X1111YY'
+      expect(page).to have_content 'tag1'
+      expect(page).not_to have_content 'tag2'
     end
   end
 
