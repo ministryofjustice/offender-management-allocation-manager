@@ -46,7 +46,8 @@ en:
   handover_type:
     standard: 'Standard'
     enhanced: 'Enhanced'
-    missing: 'Not provided'
+    missing: 'Unknown'
+    none: 'None'
 
   activemodel:
     errors:
