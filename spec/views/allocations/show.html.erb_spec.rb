@@ -16,7 +16,9 @@ RSpec.describe "allocations/show", type: :view do
                     tier: 'A',
                     manual_entry?: false,
                     handover_start_date: nil,
-                    responsibility_handover_date: nil).as_null_object
+                    responsibility_handover_date: nil,
+                    model: double(:model, calculated_handover_date: nil) # TODO: CHD hack
+                   ).as_null_object
   end
 
   let(:page) { Nokogiri::HTML(rendered) }

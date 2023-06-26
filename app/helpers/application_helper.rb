@@ -36,6 +36,9 @@ module ApplicationHelper
   def handover_type_label(offender)
     if offender.case_information.nil?
       t('handover_type.missing')
+    elsif offender.model&.calculated_handover_date&.reason == 'determinate_short'
+      # TODO: CHD hack - change this when we redesign the backend design to support no handovers
+      t('handover_type.none')
     elsif offender.case_information.enhanced_handover?
       t('handover_type.enhanced')
     else
