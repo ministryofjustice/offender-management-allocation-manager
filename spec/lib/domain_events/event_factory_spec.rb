@@ -10,7 +10,7 @@ RSpec.describe DomainEvents::EventFactory do
 
     expect(response).to eq event
     expect(DomainEvents::Event).to have_received(:new).with(
-      event_type: 'domain-events.handover.changed',
+      event_type: 'handover.changed',
       version: 1,
       description: 'Handover date and/or responsibility was updated',
       detail_url: 'https://example.com/handovers/X1111XX',
