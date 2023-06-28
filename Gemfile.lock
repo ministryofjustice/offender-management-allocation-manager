@@ -589,6 +589,7 @@ DEPENDENCIES
   guard-rspec
   guard-rubocop
   hashdiff (>= 1.0.0.beta1, < 2.0.0)
+  json-schema (~> 3.0)
   jsonb_accessor
   jwt
   kaminari
