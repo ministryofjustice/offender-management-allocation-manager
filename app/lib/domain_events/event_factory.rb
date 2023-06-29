@@ -5,7 +5,7 @@ module DomainEvents::EventFactory
         event_type: 'handover.changed',
         version: 1,
         description: 'Handover date and/or responsibility was updated',
-        detail_url: "#{host}/handovers/#{noms_number}",
+        detail_url: "#{host}/api/handovers/#{noms_number}",
         noms_number: noms_number,
       )
     end
