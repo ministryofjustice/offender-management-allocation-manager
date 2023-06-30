@@ -23,7 +23,7 @@ RSpec.describe DomainEvents::Event do
   before do
     stub_const('ENV', mock_env)
     allow(Aws::SNS::Resource).to receive_messages(new: sns_resource)
-    allow(Rails.logger).to receive_messages(info: nil, error: nil)
+    allow(AuditEvent).to receive(:publish)
   end
 
   after do
@@ -56,16 +56,9 @@ RSpec.describe DomainEvents::Event do
     it 'is published with the given version' do
       expect(published_message.fetch('version')).to eq 77
     end
-
-    it 'logs when published' do
-      expect(Rails.logger).to have_received(:info).once
-      expect(Rails.logger).to have_received(:info).with(/domain_event=offender-management\.test-domain\.changed/)
-      expect(Rails.logger).to have_received(:info).with(/event=domain_event_published/)
-      expect(Rails.logger).to have_received(:info).with(/sns_message_id=fake-uuid/)
-    end
   end
 
-  describe 'when initialised with only required arguments' do
+  describe 'when used with minimal arguments' do
     before do
       basic_event.publish(now: now)
     end
@@ -75,9 +68,21 @@ RSpec.describe DomainEvents::Event do
     it 'only has required message attributes' do
       expect(published_message.keys).to match_array(%w[eventType occurredAt version])
     end
+
+    it 'produces an audit event when published with sensible tag names' do
+      expect(AuditEvent).to have_received(:publish).with(
+        nomis_offender_id: nil,
+        system_event: true,
+        tags: %w[domain_event_published test-domain changed],
+        data: {
+          'sns_message_id' => 'fake-uuid',
+          'domain_event' => published_message,
+        },
+      )
+    end
   end
 
-  describe 'when initialised with all available arguments' do
+  describe 'when used with all available arguments' do
     before do
       event = described_class.new(event_type: 'test-domain.changed',
                                   version: 77,
@@ -85,7 +90,7 @@ RSpec.describe DomainEvents::Event do
                                   detail_url: 'https://example.com/r/1',
                                   additional_information: { 'dataA' => 'valueX' },
                                   noms_number: 'X1111XX')
-      event.publish(now: now)
+      event.publish(now: now, job: 'test_job')
     end
 
     it_behaves_like 'common examples'
@@ -106,11 +111,18 @@ RSpec.describe DomainEvents::Event do
       expect(published_message.fetch('personReference'))
         .to eq('identifiers' => [{ 'type' => 'NOMS', 'value' => 'X1111XX' }])
     end
-  end
 
-  it 'can include job name in published log message' do
-    basic_event.publish(now: now, job: 'test_job')
-    expect(Rails.logger).to have_received(:info).with(/job=test_job/)
+    it 'produces an audit event when published with sensible tag names including job name, nomis_offender_id' do
+      expect(AuditEvent).to have_received(:publish).with(
+        nomis_offender_id: 'X1111XX',
+        system_event: true,
+        tags: %w[domain_event_published test-domain changed job test_job],
+        data: {
+          'sns_message_id' => 'fake-uuid',
+          'domain_event' => published_message,
+        },
+      )
+    end
   end
 
   describe 'message body schema validation' do
