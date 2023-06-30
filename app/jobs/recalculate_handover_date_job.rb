@@ -55,12 +55,12 @@ private
         record.save!
         handover_after = record.attributes.except('id', 'created_at', 'updated_at')
 
-        AuditEvent.create!(
+        AuditEvent.publish(
           nomis_offender_id: handover_after['nomis_offender_id'],
-          tags: %w[job recalculate_handover_date],
-          published_at: Time.zone.now.utc,
+          tags: %w[job recalculate_handover_date handover changed],
           system_event: true,
           data: {
+            'case_info_manual_entry' => case_info.manual_entry?,
             'before' => handover_before,
             'after' => handover_after,
             'nomis_offender_state' => nomis_offender.attributes_to_archive,
@@ -82,7 +82,7 @@ private
       if USE_EVENTS_TO_PUSH_HANDOVER_TO_DELIUS
         event = DomainEvents::EventFactory.build_handover_event(host: Rails.configuration.allocation_manager_host,
                                                                 noms_number: record.nomis_offender_id)
-        event.publish(job: 'recalculate_handover_date_job')
+        event.publish(job: 'recalculate_handover_date')
       else
         PushHandoverDatesToDeliusJob.perform_later record
       end
