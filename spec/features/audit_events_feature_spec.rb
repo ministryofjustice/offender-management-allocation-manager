@@ -42,7 +42,7 @@ RSpec.describe 'Audit events' do
     end
   end
 
-  describe 'DB records' do
+  describe 'when delivering email' do
     it 'contain the govuk notify details for each emails' do
       TestOnlyMailer.with(to: 'test@example.org', template: 'test-template-x', personalisation: { 'test' => 'value' })
                     .test_mail.deliver_now
