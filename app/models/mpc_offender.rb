@@ -26,6 +26,8 @@ class MpcOffender
 
   attr_reader :case_information, :prison
 
+  alias_method :nomis_offender_id, :offender_no
+
   def initialize(prison:, offender:, prison_record:)
     @prison = prison
     @offender = offender

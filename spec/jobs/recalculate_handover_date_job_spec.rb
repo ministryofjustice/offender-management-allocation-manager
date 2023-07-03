@@ -10,12 +10,14 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
            assign_com_less_than_10_months: assign_com_less_than_10_months_mailer,
            open_prison_supporting_com_needed: open_prison_supporting_com_needed_mailer)
   end
+  let(:published_args) { {} }
 
   before do
     stub_auth_token
     allow(DomainEvents::EventFactory).to receive(:build_handover_event).and_return(event)
     allow(Rails.configuration).to receive(:allocation_manager_host).and_return 'https://test.example.com'
     allow(CommunityMailer).to receive(:with).and_return(community_mailer_with)
+    allow(AuditEvent).to receive(:publish) { |**args| published_args.replace(args) }
   end
 
   before use_events: true do
@@ -50,27 +52,24 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
         noms_number: offender.offender_no,
         host: 'https://test.example.com',
       )
-      expect(event).to have_received(:publish).with(job: 'recalculate_handover_date_job')
+      expect(event).to have_received(:publish).with(job: 'recalculate_handover_date')
       expect(HmppsApi::CommunityApi).not_to have_received(:set_handover_dates)
     end
 
     it 'publishes an audit event', use_events: true, aggregate_failures: true do
-      record = AuditEvent.first
-      handover = CalculatedHandoverDate.find_by(nomis_offender_id: record.nomis_offender_id)
-      expect(record.attributes.except('id', 'created_at', 'updated_at', 'data')).to match(
-        hash_including(
-          'nomis_offender_id' => offender_no,
-          'system_event' => true,
-          'tags' => %w[job recalculate_handover_date],
-          'user_human_name' => nil,
-          'username' => nil
-        )
-      )
-      expect(record.data['before'].keys).to include('handover_date', 'start_date', 'responsibility', 'reason')
-      expect(record.data['before'].keys).not_to include('id', 'created_at', 'updated_at')
-      expect(record.data['after'].values_at('handover_date', 'start_date', 'responsibility', 'reason'))
-                                 .to eq([handover.handover_date.iso8601, handover.start_date.iso8601, 'CustodyOnly', 'determinate'])
-      expect(record.data['after'].keys).not_to include('id', 'created_at', 'updated_at')
+      handover = CalculatedHandoverDate.find_by(nomis_offender_id: offender_no)
+      expect(AuditEvent).to have_received(:publish)
+      expect(published_args.keys).to match_array(%i[nomis_offender_id system_event tags data])
+      expect(published_args[:nomis_offender_id]).to eq(offender_no)
+      expect(published_args[:system_event]).to eq true
+      expect(published_args[:tags]).to match_array %w[job recalculate_handover_date handover changed]
+      expect(published_args[:data]).to be_a(Hash)
+
+      expect(published_args[:data]['before'].keys).to include('handover_date', 'start_date', 'responsibility', 'reason')
+      expect(published_args[:data]['before'].keys).not_to include('id', 'created_at', 'updated_at')
+      expect(published_args[:data]['after'].values_at('handover_date', 'start_date', 'responsibility', 'reason'))
+                                 .to eq([handover.handover_date, handover.start_date, 'CustodyOnly', 'determinate'])
+      expect(published_args[:data]['after'].keys).not_to include('id', 'created_at', 'updated_at')
     end
   end
 

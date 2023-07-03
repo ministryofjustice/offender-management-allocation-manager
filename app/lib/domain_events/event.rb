@@ -10,6 +10,7 @@ class DomainEvents::Event
     full_event_type = "#{EVENT_TYPE_PREFIX}#{event_type}"
 
     @noms_number = noms_number
+    @short_event_type = event_type
 
     @message_attributes = {
       'eventType' => {
@@ -37,9 +38,18 @@ class DomainEvents::Event
       message: ActiveSupport::JSON.encode(full_message),
     }
     sns_response = self.class.sns_topic.publish(message_data)
-    log_message = "nomis_offender_id=#{@noms_number},domain_event=#{@message['eventType']},sns_message_id=#{sns_response.message_id},event=domain_event_published"
-    log_message += ",job=#{job}" if job
-    Rails.logger.info log_message
+
+    audit_tags = ['domain_event_published', *@short_event_type.split('.')]
+    audit_tags += ['job', job] if job
+    AuditEvent.publish(
+      nomis_offender_id: @noms_number,
+      tags: audit_tags,
+      system_event: true,
+      data: {
+        'sns_message_id' => sns_response.message_id,
+        'domain_event' => full_message,
+      }
+    )
   end
 
   def self.sns_topic
